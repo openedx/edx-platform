@@ -253,7 +253,29 @@ class CreateSubsectionGrade(NonZeroSubsectionGrade):
         Saves or updates the subsection grade in a persisted model.
         """
         if self._should_persist_per_attempted(score_deleted, force_update_subsections):
-            return PersistentSubsectionGrade.update_or_create_grade(**self._persisted_model_params(student))
+            model = PersistentSubsectionGrade.update_or_create_grade(**self._persisted_model_params(student))
+            self._update_aggregated_scores_from_model(model)
+            return model
+
+    def _update_aggregated_scores_from_model(self, model):
+        """
+        Updates this grade's `all_total` and `graded_total` attributes
+        to reflect the values from the related persisted model.
+        This is important, because PersistentSubsectionGradeOverrides
+        are only taken into account when reading/writing at the persistence layer,
+        so after we update a PersistentSubsectionGrade model (which could involve
+        writing values that are overridden by the PersistentSubsectionGradeOverride model)
+        we also need to update this grade object's attributes to reflect the
+        now (possibly) overriden values.
+        TODO: https://openedx.atlassian.net/browse/EDUCATOR-3835
+        """
+        self.all_total.earned = model.earned_all
+        self.all_total.possible = model.possible_all
+        self.all_total.first_attempted = model.first_attempted
+
+        self.graded_total.earned = model.earned_graded
+        self.graded_total.possible = model.possible_graded
+        self.graded_total.first_attempted = model.first_attempted
 
     @classmethod
     def bulk_create_models(cls, student, subsection_grades, course_key):
