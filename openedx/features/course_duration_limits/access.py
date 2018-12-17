@@ -7,7 +7,7 @@ from datetime import timedelta
 
 from django.apps import apps
 from django.utils import timezone
-from django.utils.translation import ugettext as _
+from django.utils.translation import get_language, ugettext as _
 
 from student.models import CourseEnrollment
 from util.date_utils import DEFAULT_SHORT_DATE_FORMAT, strftime_localized
@@ -34,7 +34,11 @@ class AuditExpiredError(AccessError):
     def __init__(self, user, course, expiration_date):
         error_code = "audit_expired"
         developer_message = "User {} had access to {} until {}".format(user, course, expiration_date)
-        expiration_date = strftime_localized(expiration_date, DEFAULT_SHORT_DATE_FORMAT)
+        language = get_language()
+        if language and language.split('-')[0].lower() == 'es':
+            expiration_date = strftime_localized(expiration_date, '%-d de %b. de %Y').lower()
+        else:
+            expiration_date = strftime_localized(expiration_date, '%b. %-d, %Y')
         user_message = _("Access expired on {expiration_date}").format(expiration_date=expiration_date)
         try:
             course_name = CourseOverview.get_from_id(course.id).display_name_with_default
@@ -152,6 +156,14 @@ def register_course_expired_message(request, course):
         if now < course_upgrade_deadline:
             full_message += upgrade_deadline_message
 
+        language = get_language()
+        if language and language.split('-')[0].lower() == 'es':
+            formatted_expiration_date = strftime_localized(expiration_date, '%-d de %b. de %Y').lower()
+            formatted_upgrade_deadline = strftime_localized(upgrade_deadline, '%-d de %b. de %Y').lower()
+        else:
+            formatted_expiration_date = strftime_localized(expiration_date, '%b. %-d, %Y')
+            formatted_upgrade_deadline = strftime_localized(upgrade_deadline, '%b. %-d, %Y')
+
         PageLevelMessages.register_info_message(
             request,
             Text(full_message).format(
@@ -162,10 +174,10 @@ def register_course_expired_message(request, course):
                 sighted_only_span_open=HTML('<span aria-hidden="true">'),
                 span_close=HTML('</span>'),
                 a_close=HTML('</a>'),
-                expiration_date=strftime_localized(expiration_date, '%b. %-d, %Y'),
+                expiration_date=formatted_expiration_date,
                 strong_open=HTML('<strong>'),
                 strong_close=HTML('</strong>'),
                 line_break=HTML('<br>'),
-                upgrade_deadline=strftime_localized(upgrade_deadline, '%b. %-d, %Y')
+                upgrade_deadline=formatted_upgrade_deadline
             )
         )
