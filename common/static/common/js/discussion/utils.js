@@ -482,10 +482,10 @@
                 this.postMathJaxProcessor(this.markdownWithHighlight(element.text()))
             );
 
-            this.typesetMathJax(element);
         };
 
         DiscussionUtil.typesetMathJax = function(element) {
+
             if (typeof MathJax !== 'undefined' && MathJax !== null) {
                 MathJax.Hub.Queue(['Typeset', MathJax.Hub, element[0]]);
             }
