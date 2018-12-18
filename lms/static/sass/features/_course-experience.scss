@@ -463,6 +463,7 @@ button.accordion-trigger, button.prerequisite-button {
 
     .heading {
       font-size: 0.9rem;
+      font: -apple-system-body;
       line-height: 1;
       font-weight: $font-bold;
       color: theme-color("dark");
@@ -485,6 +486,7 @@ button.accordion-trigger, button.prerequisite-button {
 
     .date {
       color: theme-color("dark");
+      font: -apple-system-body;
     }
 
     &-todays-date {
