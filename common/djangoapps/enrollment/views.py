@@ -627,17 +627,6 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
             # other users, do not let them deduce the existence of an enrollment.
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        can_vip_enroll = VIPCourseEnrollment.can_vip_enroll(request.user, course_id)
-        if mode not in (CourseMode.AUDIT, CourseMode.HONOR, None) and not has_api_key_permissions and not can_vip_enroll:
-            return Response(
-                status=status.HTTP_403_FORBIDDEN,
-                data={
-                    "message": u"User does not have permission to create enrollment with mode [{mode}].".format(
-                        mode=mode
-                    )
-                }
-            )
-
         try:
             # Lookup the user, instead of using request.user, since request.user may not match the username POSTed.
             user = User.objects.get(username=username)
@@ -646,6 +635,17 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 status=status.HTTP_406_NOT_ACCEPTABLE,
                 data={
                     'message': u'The user {} does not exist.'.format(username)
+                }
+            )
+
+        can_vip_enroll = VIPCourseEnrollment.can_vip_enroll(user, course_id)
+        if mode not in (CourseMode.AUDIT, CourseMode.HONOR, None) and not has_api_key_permissions and not can_vip_enroll:
+            return Response(
+                status=status.HTTP_403_FORBIDDEN,
+                data={
+                    "message": u"User does not have permission to create enrollment with mode [{mode}].".format(
+                        mode=mode
+                    )
                 }
             )
 

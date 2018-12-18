@@ -1,14 +1,10 @@
 // http://0.0.0.0:18000/courses/course-v1:edX+E2E-101+course/about
 // 课程详情 about页
 
+.window-wrap .content-wrapper .container{
+  padding: 30px 0;
+}
 .course-info{ 
-  background-image: linear-gradient(to bottom, #fff 0%, #fff 35%, #f2f9ff 100%);
-
-  .container{
-    max-width: 1200px;
-    padding: 360px 0 30px;
-  }
-
   /* 课程header */
   header.course-profile{
     height: auto;
@@ -17,8 +13,6 @@
     border-bottom: none;
     background: url('/static/normal-theme/images/course_dec.png');
     background-size: cover;
-    position: absolute;
-    left: 0;
 
     .intro-inner-wrapper>div.table{
       position: relative;
