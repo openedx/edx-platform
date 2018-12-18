@@ -179,7 +179,7 @@
                                 ),
                                 options: fieldsData.language.options,
                                 persistChanges: true,
-                                focusNextID: '#u-field-select-country',
+                                focusNextID: '#u-field-select-country'
                             })
                         },
                         countryFieldView,
