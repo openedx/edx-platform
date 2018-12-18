@@ -14,6 +14,10 @@ def check_and_get_upgrade_link_and_date(user, enrollment=None, course=None):
     """
     For an authenticated user, return a link to allow them to upgrade
     in the specified course.
+
+    Returns the upgrade link and upgrade deadline for a user in a given course given
+    that the user is within the window to upgrade defined by our dynamic pacing feature;
+    otherwise, returns None for both the link and date.
     """
     if enrollment is None and course is None:
         raise ValueError("Must specify either an enrollment or a course")
@@ -68,6 +72,7 @@ def get_experiment_user_metadata_context(course, user):
     except CourseEnrollment.DoesNotExist:
         pass  # Not enrolled, used the default None values
 
+    # upgrade_link and upgrade_date should be None if user has passed their dynamic pacing deadline.
     upgrade_link, upgrade_date = check_and_get_upgrade_link_and_date(user, enrollment, course)
     has_staff_access = has_staff_access_to_preview_mode(user, course.id)
     forum_roles = []
