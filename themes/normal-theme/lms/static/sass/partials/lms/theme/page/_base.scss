@@ -28,16 +28,17 @@
     {
       max-width: 1220px;
       margin: 0 auto;
-      width: 100%;
+      width: 96%;
       box-sizing: border-box;
-      padding: 0 10px;
+      padding: 0;
+      margin: 0 auto;
     }
   }
 }
 .wrapper-preview-menu{
-  max-width: 1200px;
+  max-width: 1220px;
   margin: 0 auto;
-  width: 98%;
+  width: 96%;
   box-sizing: border-box;
 
 }
@@ -67,16 +68,16 @@ select{
 }
 
 // input
-input::-webkit-input-placeholder{
+input::-webkit-input-placeholder, .form-control::-webkit-input-placeholder{
   color:#ccd1d9;
 }
-input::-moz-placeholder{
+input::-moz-placeholder, .form-control::-moz-placeholder{
   color:#ccd1d9;
 }
-input:-moz-placeholder{
+input:-moz-placeholder, .form-control:-moz-placeholder{
   color:#ccd1d9;
 }
-input:-ms-input-placeholder{
+input:-ms-input-placeholder, .form-control:-ms-input-placeholder{
   color:#ccd1d9;
 }
 
