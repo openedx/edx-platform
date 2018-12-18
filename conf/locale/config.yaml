@@ -172,10 +172,12 @@ generate_merge:
         - mako-studio.po
         - wiki.po
         - membership.po
+        - ecommerce.po
     djangojs.po:
         - djangojs-partial.po
         - djangojs-studio.po
         - underscore.po
         - underscore-studio.po
         - membership-js.po
+        - ecommerce-js.po
         

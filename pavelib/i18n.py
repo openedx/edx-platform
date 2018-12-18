@@ -2,15 +2,10 @@
 Internationalization tasks
 """
 
-import os
-import polib
 import re
 import subprocess
 import sys
 
-from shutil import move
-from tempfile import mkstemp
-from os import remove, walk
 from path import Path as path
 from paver.easy import cmdopts, needs, sh, task
 
@@ -327,162 +322,105 @@ def find_release_resources():
         raise ValueError(msg)
 
 
-""" Eliteu command """
-@task
-def i18n_third_party():
-    sh("cp ../edx-membership/conf/locale/en/LC_MESSAGES/django.po conf/locale/en/LC_MESSAGES/membership-saved.po")
-    sh("cp ../edx-membership/conf/locale/en/LC_MESSAGES/djangojs.po conf/locale/en/LC_MESSAGES/membershipjs-saved.po")
-    sh("mv conf/locale/en/LC_MESSAGES/membership-saved.po conf/locale/en/LC_MESSAGES/membership.po")
-    sh("mv conf/locale/en/LC_MESSAGES/membershipjs-saved.po conf/locale/en/LC_MESSAGES/membership-js.po")    
+""" Eliteu Custom Command """
+
+import polib
+import os
+import re
+
+from os import remove, walk
+from shutil import move
+from tempfile import mkstemp
 
 
-@task
-def i18n_check():
-    base_dir = 'conf/locale/zh_CN/LC_MESSAGES'
-    names = ['django.po', 'djangojs.po']
+def get_check_rules():
     zhPattern = re.compile(u'[\u4e00-\u9fa5]+')
-
-    for name in names:
-        spath = os.path.join(base_dir, name)
-        tpath = os.path.join(base_dir, 'zh-' + name)
-        source = polib.pofile(spath)
-
-        # create file
-        f = open(tpath, 'w')
-        f.close()
-        target = polib.pofile(tpath)
-
-        for msg in source:
-            text = msg.msgid.strip()
-            match = zhPattern.search(text)
-            if match:
-                target.append(msg)
-
-        target.sort(key=lambda x: len(x.msgid), reverse=True)
-        target.save()
+    no_cn = lambda x: zhPattern.search(x.strip()) is None
+    rules = [no_cn]
+    return rules
 
 
-@task
-@needs(
-    "pavelib.i18n.i18n_check",
-)
-@timed
-def i18n_replace():
-    BASE_DIR = '/edx/app/edxapp/edx-platform/'
-    base_dir = 'conf/locale/zh_CN/LC_MESSAGES'
-    names = ['zh-django.po', 'zh-djangojs.po']
-    source = [os.path.join(base_dir, name) for name in names]
-
-    for s in source:
-        pomsgs = polib.pofile(s)
-
-        for msg in pomsgs:
-            msgid = msg.msgid.encode('utf-8')
-            msgstr = msg.msgstr.encode('utf-8')
-
-            # A list of file path
-            occurrences = msg.occurrences
-
-            for (path, line) in occurrences:
-                fpath = os.path.join(BASE_DIR, path)
-
-                if os.path.exists(fpath) and os.path.isfile(fpath):
-                    if msgstr != '':
-                        replace(fpath, msgid, msgstr)
+CONFIG = {
+    'BASE_DIR': '/edx/app/edxapp/edx-platform',
+    'create_prefiex': 'invalid',
+    'rules': get_check_rules(),
+}
 
 
-@task
-def i18n_exchange():
-    base_dir = 'conf/locale/zh_CN/LC_MESSAGES'
-    names = ['django.po', 'djangojs.po']
-    source = [os.path.join(base_dir, name) for name in names]
-
-    for s in source:
-        exchange(s)
-
-
-@task
-@needs(
-    "pavelib.i18n.i18n_third_party",
-    "pavelib.i18n.i18n_extract",
-    "pavelib.i18n.i18n_generate",
-    "pavelib.i18n.i18n_transifex_pull",
-    "pavelib.i18n.i18n_transifex_push",
-    "pavelib.i18n.i18n_dummy",
-    "pavelib.i18n.i18n_generate_strict",
-    "pavelib.i18n.i18n_replace",
-    "pavelib.i18n.i18n_exchange",
-)
-@timed
-def i18n_eliteu_update():
-    """
-    Pull source strings, generate po and mo files, and validate
-    """
-
-    # sh('paver test_i18n')
-    # Tests were removed from repo, but there should still be tests covering the translations
-    # TODO: Validate the recently pulled translations, and give a bail option
-    sh('git clean -fdX conf/locale/rtl')
-    sh('git clean -fdX conf/locale/eo')
-    print "\n\nValidating translations with `i18n_tool validate`..."
-
-    sh("rm conf/locale/zh_CN/LC_MESSAGES/zh-django.po")
-    sh("rm conf/locale/zh_CN/LC_MESSAGES/zh-djangojs.po")
-    sh("rm conf/locale/zh_HANS/LC_MESSAGES/zh-django.po")
-    sh("rm conf/locale/zh_HANS/LC_MESSAGES/zh-djangojs.po")
-    sh("rm conf/locale/zh_HANS/LC_MESSAGES/*.mo")
-    sh("rm conf/locale/zh_HANS/LC_MESSAGES/*.mo")
-    sh("i18n_tool validate")
-
-    con = raw_input("Continue with committing these translations (y/n)? ")
-
-    if con.lower() == 'y':
-        sh('git add conf/locale/zh_CN')
-        sh('git add conf/locale/zh_HANS')
-        sh('git add cms/static/js/i18n')
-        sh('git add lms/static/js/i18n')
-
-    dirty = i18n_dirty_check()
-    if dirty:
-        print "\n\nStill has invalid word in po file."
+def valid(msg, rules):
+    """ A logic to validate a string's validity. """
+    results = [rule(msg) for rule in rules]
+    result = reduce(lambda x, y: x and y, results)
     
+    return result
 
-@task
-def i18n_dirty_check():
-    base_dir = 'conf/locale/en/LC_MESSAGES'
-    names = ['django.po', 'djangojs.po']
-    zhPattern = re.compile(u'[\u4e00-\u9fa5]+')
-    flag = False
 
-    for name in names:
-        spath = os.path.join(base_dir, name)
-        source = polib.pofile(spath)
+def check(path, create_flag=False):
+    """ 
+    validate if there exists invalid character in po file.
+    if create_flag, invalid character would be extracted to a new file.
+    """
+    flag = True
+    pomsgs = polib.pofile(path)
 
-        for msg in source:
-            text = msg.msgid.strip()
-            match = zhPattern.search(text)
-            if match:
-                flag = True
-                break
-    
-    if flag:
-        print "\nDirty."
-    else:
-        print "\nPure."
+    for msg in pomsgs:
+        flag = valid(msg.msgid, CONFIG['rules'])
+        if flag is False:
+            break
+
+    if create_flag is True and flag is False:
+        create(path, CONFIG['rules'])
 
     return flag
 
 
+def create(fpath, rules):
+    filename = os.path.basename(fpath)
+    dirname = os.path.dirname(fpath)
+    name = os.path.join(dirname, CONFIG['create_prefiex'] + '-' + filename)
+
+    # create if not exists, truncate if exists.
+    if not os.path.exists(name):
+        f = open(name, 'w')
+        f.close()
+    else:
+        f = open(name, 'w')
+        f.seek(0)
+        f.truncate()
+        f.close()
+
+    source = polib.pofile(fpath)
+    target = polib.pofile(name)
+    target.header = source.header
+    target.metadata = source.metadata
+
+    for msg in source:
+        if valid(msg.msgid, rules) is False:
+            target.append(msg)
+
+    target.sort(key=lambda x: len(x.msgid), reverse=True)
+    target.save()
+
+
+def find_specific_resources(lang):
+    resource_dir = 'conf/locale/' + lang + '/LC_MESSAGES'
+    f_list = os.listdir(resource_dir)
+    
+    resource = []
+    for i in f_list:
+        if os.path.splitext(i)[1] == '.po':
+            resource.append(i)
+    
+    return resource
+
+
+def extract_invalid(path):
+    fpath = os.path.join('conf/locale/zh_CN/LC_MESSAGES', path)
+    check(fpath, create_flag=True)
+
+
 def replace(source_file_path, pattern, substring):
-    """
-    Update msgid with specified pattern and replace to substring
-
-    :param source_file_path:
-    :param pattern:
-    :param substring:
-    :return:
-    """
-
+    
     def need_to_pass(line):
         # comment need to pass
         c1 = line.lstrip().startswith('#')
@@ -507,14 +445,32 @@ def replace(source_file_path, pattern, substring):
     move(target_file_path, source_file_path)
 
 
-def exchange(source_file_path):
+def code_replace(source):
+    fpath = os.path.join('conf/locale/zh_CN/LC_MESSAGES', source)
+    pomsgs = polib.pofile(fpath)
+
+    for msg in pomsgs:
+        msgid = msg.msgid.encode('utf-8')
+        msgstr = msg.msgstr.encode('utf-8')
+
+        # A list of file path
+        occurrences = msg.occurrences
+
+        for (path, line) in occurrences:
+            fpath = os.path.join(CONFIG['BASE_DIR'], path)
+            if os.path.exists(fpath) and msgstr != '':
+                replace(fpath, msgid, msgstr)
+
+
+def exchange_position(fpath):
     """
     Exchange msgid and msgstr position of zh.po
 
     :param source_file_path: File which need to be exchange
     :return:
     """
-
+    source_file_path = os.path.join('conf/locale/zh_CN/LC_MESSAGES', fpath)
+    
     source = polib.pofile(source_file_path)
 
     fh, target_file_path = mkstemp()
@@ -523,13 +479,85 @@ def exchange(source_file_path):
     target = polib.pofile(target_file_path)
     zhPattern = re.compile(u'[\u4e00-\u9fa5]+')
 
+    target.header = source.header
+    target.metadata = source.metadata
+
     for s in source:
-        match = zhPattern.search(s.msgid.strip())
-        if match:
-            s.msgid, s.msgstr = s.msgstr, s.msgid
+        if valid(s.msgid, CONFIG['rules']) is False:
+            if s.msgstr != "":
+                s.msgid, s.msgstr = s.msgstr, s.msgid
         target.append(s)
 
     target.save()
     remove(source_file_path)
-    move(target_file_path, source_file_path)
+    move(target_file_path, source_file_path)  
 
+
+
+@task
+def pure_check(lang='en'):
+    resource = find_specific_resources(lang)
+    flist = [os.path.join('conf/locale/{lang}/LC_MESSAGES'.format(lang=lang), name) for name in resource]
+    results = map(check, flist)
+    pure = reduce(lambda x, y: x and y, results)
+
+    if pure:
+        msg = colorize(
+            'green',
+            "Your source language is pure.\n"
+        )
+    else:
+        msg = colorize(
+            'red',
+            "Your source language is dirty.\n"
+            "Please check your code!"
+        )
+    print msg
+
+
+@task
+def i18n_third_party():
+    sh("cp ../edx-membership/conf/locale/en/LC_MESSAGES/django.po conf/locale/en/LC_MESSAGES/membership-saved.po")
+    sh("cp ../edx-membership/conf/locale/en/LC_MESSAGES/djangojs.po conf/locale/en/LC_MESSAGES/membershipjs-saved.po")
+    sh("mv conf/locale/en/LC_MESSAGES/membership-saved.po conf/locale/en/LC_MESSAGES/membership.po")
+    sh("mv conf/locale/en/LC_MESSAGES/membershipjs-saved.po conf/locale/en/LC_MESSAGES/membership-js.po")    
+
+
+@task
+@needs(
+    "pavelib.i18n.i18n_transifex_pull",
+)
+@timed
+def i18n_replace():
+    """ replace en msgstr in pofile to responsed position. """
+
+    # This will extract invalid character to a new file.    
+    resource = find_specific_resources('zh_CN')
+    map(extract_invalid, resource)
+    
+    flist = find_specific_resources('zh_CN')
+    source = filter(lambda x: x.startswith('invalid'), flist)
+    map(code_replace, source)
+
+    # remove invalid file
+    invalid = [os.path.join('conf/locale/zh_CN/LC_MESSAGES', s) for s in source]
+    map(os.remove, invalid)
+
+    # process cn invalid-file
+    print(resource)
+    map(exchange_position, resource)
+
+    # check duplicate here, if failed exit sys.
+    sh("i18n_tool extract")
+    sh("i18n_tool generate")
+    sh("i18n_tool validate")
+
+    # push translations if validate success.
+    sh("tx push -s -t -l zh_CN")
+
+    # pull again
+    sh("i18n_tool transifex pull")
+    sh("i18n_tool generate --strict")
+
+    # check pure
+    sh("paver pure_check")
