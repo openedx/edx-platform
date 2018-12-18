@@ -5,7 +5,7 @@ def runBokchoyTests() {
     if (env.ghprbActualCommit) {
         git_branch = "${ghprbActualCommit}"
         git_refspec = "+refs/pull/${ghprbPullId}/*:refs/remotes/origin/pr/${ghprbPullId}/*"
-    else {
+    } else {
         git_branch = 'master'
         git_refspec = "+refs/heads/master:refs/remotes/origin/master"
     }
