@@ -22,25 +22,20 @@ function(Backbone, gettext, Certificate) {
             this.bind('add', this.onModelAdd, this);
         },
 
-        certificate_array: function(certificate_info) {
-            var return_array;
+        certificateArray: function(certificateInfo) {
+            var returnArray;
             try {
-                return_array = JSON.parse(certificate_info);
+                returnArray = JSON.parse(certificateInfo);
             } catch (ex) {
-                // If it didn't parse, and `certificate_info` is an object then return as it is
+                // If it didn't parse, and `certificateInfo` is an object then return as it is
                 // otherwise return empty array
-                if (typeof certificate_info === 'object') {
-                    return_array = certificate_info;
+                if (typeof certificateInfo === 'object') {
+                    returnArray = certificateInfo;
                 } else {
-                    console.error(
-                        interpolate(
-                            gettext('Could not parse certificate JSON. %(message)s'), {message: ex.message}, true
-                        )
-                    );
-                    return_array = [];
+                    returnArray = [];
                 }
             }
-            return return_array;
+            return returnArray;
         },
 
         onModelRemoved: function() {
@@ -66,13 +61,10 @@ function(Backbone, gettext, Certificate) {
 
         parse: function(certificatesJson) {
             // Transforms the provided JSON into a Certificates collection
-            var modelArray = this.certificate_array(certificatesJson);
-
-            for (var i in modelArray) {
-                if (modelArray.hasOwnProperty(i)) {
-                    this.push(modelArray[i]);
-                }
-            }
+            var modelArray = this.certificateArray(certificatesJson);
+            modelArray.forEach(function(item) {
+                this.push(item);
+            }, this);
             return this.models;
         }
     });
