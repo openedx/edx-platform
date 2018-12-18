@@ -37,6 +37,7 @@ class RestrictedCourseAdmin(admin.ModelAdmin):
     """Admin for configuring course restrictions. """
     inlines = [CountryAccessRuleInline]
     form = RestrictedCourseForm
+    search_fields = ('course_key',)
 
 
 admin.site.register(IPFilter, IPFilterAdmin)
