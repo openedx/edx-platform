@@ -147,6 +147,7 @@ class UserReadOnlySerializer(serializers.Serializer):
                         user_profile.social_links.all(), many=True
                     ).data,
                     "extended_profile": get_extended_profile(user_profile),
+                    "phone":user_profile.phone or '',
                 }
             )
 
