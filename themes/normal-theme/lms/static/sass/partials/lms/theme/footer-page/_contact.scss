@@ -15,20 +15,22 @@
   margin-top: 42px;
 }
 .contact-dec{ 
+  width: 100%;
+  padding: 0 20px;
+  box-sizing: border-box;
   max-width: 1140px;
   overflow: hidden;
   height: auto;
-  margin: 0 auto;
-  margin-top: 60px;
+  margin: 70px auto;
 }
 .contact-dec ul{  
   padding-left: 0;
   margin: 0;
 }
 .contact-dec li{  
-  width: 490px;
+  width: 45%;
   border-bottom: 1px solid #cecece;
-  height: 116px;
+  min-height: 120px;
   color: #656D78;
   padding-top: 28px;
   box-sizing: border-box;
@@ -50,8 +52,8 @@
 .contact-dec li:nth-child(even){ 
   float: right;   
 }
-.contact-dec li p:nth-of-type(1){ 
-    margin-bottom: 10px; 
+.contact-dec li p{ 
+  line-height: 2;
 }
 .contact-dec li p:nth-of-type(2){ 
   margin-top: 0px;
@@ -62,7 +64,11 @@
 .contact-dec li p:nth-of-type(8){ 
   border-bottom: none;
 }
-@media screen and (max-width:576px){
+
+@media screen and (max-width:900px){
+  .contact-dec{
+    margin: 40px auto;
+  }
   .contact-dec li{
     width: 100%;
   }
