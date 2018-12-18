@@ -66,6 +66,54 @@ def get_password_reset_form():
     return form_desc
 
 
+def get_account_recovery_form():
+    """
+    Return a description of the password reset, using secondary email, form.
+
+    This decouples clients from the API definition:
+    if the API decides to modify the form, clients won't need
+    to be updated.
+
+    See `user_api.helpers.FormDescription` for examples
+    of the JSON-encoded form description.
+
+    Returns:
+        HttpResponse
+
+    """
+    form_desc = FormDescription("post", reverse("account_recovery"))
+
+    # Translators: This label appears above a field on the password reset
+    # form meant to hold the user's email address.
+    email_label = _(u"Secondary email")
+
+    # Translators: This example email address is used as a placeholder in
+    # a field on the password reset form meant to hold the user's email address.
+    email_placeholder = _(u"username@domain.com")
+
+    # Translators: These instructions appear on the password reset form,
+    # immediately below a field meant to hold the user's email address.
+    email_instructions = _(
+        u"Secondary email address you registered with {platform_name} using account settings page"
+    ).format(
+        platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
+    )
+
+    form_desc.add_field(
+        "email",
+        field_type="email",
+        label=email_label,
+        placeholder=email_placeholder,
+        instructions=email_instructions,
+        restrictions={
+            "min_length": accounts.EMAIL_MIN_LENGTH,
+            "max_length": accounts.EMAIL_MAX_LENGTH,
+        }
+    )
+
+    return form_desc
+
+
 def get_login_session_form(request):
     """Return a description of the login form.
 

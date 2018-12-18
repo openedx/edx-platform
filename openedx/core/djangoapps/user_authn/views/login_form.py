@@ -19,10 +19,12 @@ from openedx.core.djangoapps.external_auth.login_and_register import login as ex
 from openedx.core.djangoapps.external_auth.login_and_register import register as external_auth_register
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
+from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled
 from openedx.core.djangoapps.user_api.api import (
     RegistrationFormFactory,
+    get_account_recovery_form,
     get_login_session_form,
-    get_password_reset_form
+    get_password_reset_form,
 )
 from openedx.core.djangoapps.user_authn.cookies import are_logged_in_cookies_set
 from openedx.features.enterprise_support.api import enterprise_customer_for_request
@@ -129,8 +131,10 @@ def login_and_registration_form(request, initial_mode="login"):
             'login_form_desc': json.loads(form_descriptions['login']),
             'registration_form_desc': json.loads(form_descriptions['registration']),
             'password_reset_form_desc': json.loads(form_descriptions['password_reset']),
+            'account_recovery_form_desc': json.loads(form_descriptions['account_recovery']),
             'account_creation_allowed': configuration_helpers.get_value(
-                'ALLOW_PUBLIC_ACCOUNT_CREATION', settings.FEATURES.get('ALLOW_PUBLIC_ACCOUNT_CREATION', True))
+                'ALLOW_PUBLIC_ACCOUNT_CREATION', settings.FEATURES.get('ALLOW_PUBLIC_ACCOUNT_CREATION', True)),
+            'is_account_recovery_feature_enabled': is_secondary_email_feature_enabled()
         },
         'login_redirect_url': redirect_to,  # This gets added to the query string of the "Sign In" button in header
         'responsive': True,
@@ -166,6 +170,7 @@ def _get_form_descriptions(request):
 
     return {
         'password_reset': get_password_reset_form().to_json(),
+        'account_recovery': get_account_recovery_form().to_json(),
         'login': get_login_session_form(request).to_json(),
         'registration': RegistrationFormFactory().get_registration_form(request).to_json()
     }
