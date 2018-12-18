@@ -22,7 +22,7 @@ class HTMLComponentEditor(ContainerBase):
         self.unit = self.go_to_unit_page()
         self.container_page = ContainerPage(self.browser, None)
         self.xblock_wrapper = XBlockWrapper(self.browser, None)
-        # Add Discussion component
+        # Add HTML component
         add_component(self.container_page, 'html', self.component)
         self.component = self.unit.xblocks[1]
         self.container_page.edit()
