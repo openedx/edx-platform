@@ -9,7 +9,6 @@ from .bok_choy import *  # pylint: disable=wildcard-import
 CMS_BASE = '{}:{}'.format(os.environ['BOK_CHOY_HOSTNAME'], os.environ.get('BOK_CHOY_CMS_PORT', 8031))
 LMS_BASE = '{}:{}'.format(os.environ['BOK_CHOY_HOSTNAME'], os.environ.get('BOK_CHOY_LMS_PORT', 8003))
 LMS_ROOT_URL = 'http://{}'.format(LMS_BASE)
-LOGIN_REDIRECT_WHITELIST = [CMS_BASE]
 
 COMMENTS_SERVICE_URL = 'http://{}:4567'.format(os.environ['BOK_CHOY_HOSTNAME'])
 EDXNOTES_PUBLIC_API = 'http://{}:8042/api/v1'.format(os.environ['BOK_CHOY_HOSTNAME'])

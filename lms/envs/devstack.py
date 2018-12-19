@@ -228,8 +228,6 @@ CORS_ALLOW_HEADERS = corsheaders_default_headers + (
     'use-jwt-cookie',
 )
 
-LOGIN_REDIRECT_WHITELIST = [CMS_BASE]
-
 ###################### JWTs ######################
 JWT_AUTH.update({
     'JWT_ISSUER': OAUTH_OIDC_ISSUER,
