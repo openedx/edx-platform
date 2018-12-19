@@ -12,6 +12,7 @@ from lxml import etree
 from opaque_keys.edx.locator import LibraryLocator
 from pkg_resources import resource_string
 from webob import Response
+from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
 from xblock.fields import Boolean, Integer, List, Scope, String
 from xblock.fragment import Fragment
@@ -108,6 +109,7 @@ class LibraryContentFields(object):
         scope=Scope.user_state,
     )
     has_children = True
+    completion_mode = XBlockCompletionMode.AGGREGATOR
 
     @property
     def source_library_key(self):

@@ -24,7 +24,7 @@ from openedx.core.djangolib.markup import HTML
         role="option"
     >
          % if entry:
-        <span class="forum-nav-browse-title">${entry}</span>
+        <span class="forum-nav-browse-title">${_(entry)}</span>
          %endif
     </li>
 </%def>
@@ -33,7 +33,7 @@ from openedx.core.djangolib.markup import HTML
     <li class="forum-nav-browse-menu-item"
         id='${category | u}'
     >
-        <span class="forum-nav-browse-title">${category}</span>
+        <span class="forum-nav-browse-title">${_(category)}</span>
         <ul class="forum-nav-browse-submenu">
             ${HTML(render_dropdown(categories[category]))}
         </ul>

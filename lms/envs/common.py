@@ -1947,6 +1947,11 @@ BULK_EMAIL_RETRY_DELAY_BETWEEN_SENDS = 0.02
 # Queue to use for updating persistent grades
 RECALCULATE_GRADES_ROUTING_KEY = LOW_PRIORITY_QUEUE
 
+####################### Persistent Social Engagement ##############################
+
+# Queue to use for updating persistent social engagements
+RECALCULATE_SOCIAL_ENGAGEMENT_ROUTING_KEY = LOW_PRIORITY_QUEUE
+
 ############################# Email Opt In ####################################
 
 # Minimum age for organization-wide email opt in
