@@ -527,7 +527,7 @@ class CourseWikiA11yTest(UniqueCourseTest):
         """
         self.course_wiki_page.a11y_audit.config.set_rules({
             "ignore": [
-                'aria-valid-attr', #TODO: LEARNER-6611 & LEARNER-6865
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
             ]
         })
         self.course_wiki_page.a11y_audit.check_for_accessibility_errors()
@@ -539,7 +539,7 @@ class CourseWikiA11yTest(UniqueCourseTest):
         self._open_editor()
         self.course_wiki_edit_page.a11y_audit.config.set_rules({
             "ignore": [
-                'aria-valid-attr', #TODO: LEARNER-6611 & LEARNER-6865
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
             ]
         })
         self.course_wiki_edit_page.a11y_audit.check_for_accessibility_errors()
@@ -552,7 +552,7 @@ class CourseWikiA11yTest(UniqueCourseTest):
         history_page = CourseWikiHistoryPage(self.browser, self.course_id, self.course_info)
         history_page.a11y_audit.config.set_rules({
             "ignore": [
-                'aria-valid-attr', #TODO: LEARNER-6611 & LEARNER-6865
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
             ]
         })
         history_page.wait_for_page()
@@ -566,7 +566,7 @@ class CourseWikiA11yTest(UniqueCourseTest):
         children_page = CourseWikiChildrenPage(self.browser, self.course_id, self.course_info)
         children_page.a11y_audit.config.set_rules({
             "ignore": [
-                'aria-valid-attr', #TODO: LEARNER-6611 & LEARNER-6865
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
             ]
         })
         children_page.wait_for_page()

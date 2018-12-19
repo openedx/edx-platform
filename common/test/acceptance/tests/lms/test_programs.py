@@ -123,7 +123,7 @@ class ProgramListingPageA11yTest(ProgramPageBase):
         """Test a11y of the page's empty state."""
         self.listing_page.a11y_audit.config.set_rules({
             "ignore": [
-                'aria-valid-attr', #TODO: LEARNER-6611 & LEARNER-6865
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
             ]
         })
         self.auth(enroll=False)
@@ -140,7 +140,7 @@ class ProgramListingPageA11yTest(ProgramPageBase):
         """Test a11y when program cards are present."""
         self.listing_page.a11y_audit.config.set_rules({
             "ignore": [
-                'aria-valid-attr', #TODO: LEARNER-6611 & LEARNER-6865
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
             ]
         })
         self.auth()
@@ -169,7 +169,7 @@ class ProgramDetailsPageA11yTest(ProgramPageBase):
         """Test the page's a11y compliance."""
         self.details_page.a11y_audit.config.set_rules({
             "ignore": [
-                'aria-valid-attr', #TODO: LEARNER-6611 & LEARNER-6865
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
             ]
         })
         self.auth()

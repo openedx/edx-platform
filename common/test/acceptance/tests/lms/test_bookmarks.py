@@ -597,7 +597,7 @@ class BookmarksA11yTests(BookmarksTestMixin):
         """
         self.bookmarks_page.a11y_audit.config.set_rules({
             "ignore": [
-                'aria-valid-attr', #TODO: LEARNER-6611 & LEARNER-6865
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
             ]
         })
         self.setup_test(num_chapters=11)
