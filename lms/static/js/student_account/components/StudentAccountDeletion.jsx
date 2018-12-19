@@ -51,7 +51,7 @@ export class StudentAccountDeletion extends React.Component {
     const socialAuthError = StringUtils.interpolate(
       gettext('Before proceeding, please {htmlStart}unlink all social media accounts{htmlEnd}.'),
       {
-        htmlStart: '<a href="https://support.edx.org/hc/en-us/articles/207206067" target="_blank">',
+        htmlStart: '<a onclick="$(&apos;#accounts-tab&apos;).click()">',
         htmlEnd: '</a>',
       },
     );

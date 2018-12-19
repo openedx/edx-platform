@@ -1,11 +1,11 @@
 // http://0.0.0.0:18000/courses/course-v1:edX+E2E-101+course/about
 // 课程详情 about页
-
-.window-wrap .content-wrapper .container{
-  padding: 30px 0;
+.window-wrap .content-wrapper .course-info .container{
+  margin-top: 30px;
 }
 .course-info{ 
   /* 课程header */
+
   header.course-profile{
     height: auto;
     box-sizing: border-box;
@@ -181,6 +181,7 @@
         color: #fff;
         padding: 15px;
         line-height: 1.5;
+        text-align: center;
       }
       .qrcode-icon{
         position: absolute;

@@ -44,6 +44,9 @@ $icon-width: 18px;
 .fa-filter:before,
 .fa-newspaper-o:before,
 .course-content .bookmark-button::before,
+.fa-floppy-o:before,
+.fa-save:before,
+.fa-arrow-right:before
 {
   content: '';
   display: inline-block;
@@ -170,6 +173,10 @@ $icon-width: 18px;
     background-position: calcP(2, 9)
   }
 }
+.dashboard .fa-search:before{
+  position: relative;
+  top: 2px;
+}
 .wiki .fa-plus{
   display: none;
 }
@@ -218,6 +225,17 @@ $icon-width: 18px;
   position: relative;
   top: 4px;
   transform: scale(0.95);
+}
+.fa-floppy-o:before,
+.fa-save:before{
+  background-position: calcP(13, 7)
+}
+.fa-arrow-right:before{
+  background-position: calcP(11, 4);
+  margin-left: 10px;
+  transform: scale(0.6);
+  position: relative;
+  left: -2px;
 }
 
 
