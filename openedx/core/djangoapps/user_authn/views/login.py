@@ -26,10 +26,7 @@ from openedx.core.djangoapps.password_policy import compliance as password_polic
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangolib.markup import HTML, Text
-from student.models import (
-    LoginFailures,
-    PasswordHistory,
-)
+from student.models import LoginFailures
 from student.views import send_reactivation_email_for_user
 from student.forms import send_password_reset_email_for_user
 from track import segment
@@ -132,16 +129,6 @@ def _check_excessive_login_attempts(user):
         if LoginFailures.is_user_locked_out(user):
             raise AuthFailedError(_('This account has been temporarily locked due '
                                     'to excessive login failures. Try again later.'))
-
-
-def _check_forced_password_reset(user):
-    """
-    See if the user must reset his/her password due to any policy settings
-    """
-    if user and PasswordHistory.should_user_reset_password_now(user):
-        raise AuthFailedError(_('Your password has expired due to password policy on this account. You must '
-                                'reset your password before you can log in again. Please click the '
-                                '"Forgot Password" link on this page to reset your password before logging in again.'))
 
 
 def _enforce_password_policy_compliance(request, user):
@@ -359,7 +346,6 @@ def login_user(request):
 
         _check_shib_redirect(email_user)
         _check_excessive_login_attempts(email_user)
-        _check_forced_password_reset(email_user)
 
         possibly_authenticated_user = email_user
 

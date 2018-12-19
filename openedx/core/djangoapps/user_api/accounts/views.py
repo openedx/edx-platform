@@ -47,7 +47,6 @@ from openedx.core.lib.api.parsers import MergePatchParser
 from student.models import (
     CourseEnrollment,
     ManualEnrollmentAudit,
-    PasswordHistory,
     PendingNameChange,
     CourseEnrollmentAllowed,
     LoginFailures,
@@ -825,7 +824,6 @@ class LMSAccountRetirementView(ViewSet):
             RevisionPluginRevision.retire_user(retirement.user)
             ArticleRevision.retire_user(retirement.user)
             PendingNameChange.delete_by_user_value(retirement.user, field='user')
-            PasswordHistory.retire_user(retirement.user.id)
             ManualEnrollmentAudit.retire_manual_enrollments(retirement.user, retirement.retired_email)
 
             CreditRequest.retire_user(retirement)

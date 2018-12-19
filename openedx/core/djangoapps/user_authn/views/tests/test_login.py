@@ -110,8 +110,7 @@ class LoginTest(CacheIsolationTestCase):
                               value='Email or password is incorrect')
         self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Unknown user email', nonexistent_email])
 
-    @patch.dict("django.conf.settings.FEATURES", {'ADVANCED_SECURITY': True})
-    def test_login_fail_incorrect_email_with_advanced_security(self):
+    def test_login_fail_incorrect_email(self):
         nonexistent_email = u'not_a_user@edx.org'
         response, mock_audit_log = self._login_response(
             nonexistent_email,
