@@ -393,17 +393,13 @@ class CapaDescriptor(CapaFields, RawDescriptor):
 
                 question_text = lcp.find_question_label(answer_id)
                 answer_text = lcp.find_answer_text(answer_id, current_answer=orig_answers)
-                correct_answer_text = lcp.find_correct_answer_text(answer_id)
 
                 count += 1
-                report = {
+                yield (user_state.username, {
                     _("Answer ID"): answer_id,
                     _("Question"): question_text,
                     _("Answer"): answer_text,
-                }
-                if correct_answer_text is not None:
-                    report[_("Correct Answer")] = correct_answer_text
-                yield (user_state.username, report)
+                })
 
     # Proxy to CapaModule for access to any of its attributes
     answer_available = module_attr('answer_available')

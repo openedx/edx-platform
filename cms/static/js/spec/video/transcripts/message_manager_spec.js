@@ -184,7 +184,6 @@ function($, _, Backbone, Utils, MessageManager, FileUploader, sinon) {
             };
 
             it('Invoke without extraParamas', function(done) {
-
                 spyOn(Backbone, 'trigger');
 
                 sinonXhr.respondWith([
@@ -213,7 +212,6 @@ function($, _, Backbone, Utils, MessageManager, FileUploader, sinon) {
             });
 
             it('Invoke with extraParamas', function(done) {
-
                 spyOn(Backbone, 'trigger');
 
                 sinonXhr.respondWith([

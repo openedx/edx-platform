@@ -58,7 +58,7 @@ function($, Backbone, _, TranscriptUtils) {
         */
         upload: function() {
             var data = {
-                'edx_video_id': TranscriptUtils.Storage.get('edx_video_id') || ''
+                edx_video_id: TranscriptUtils.Storage.get('edx_video_id') || ''
             };
 
             if (!this.file) {

@@ -36,15 +36,10 @@ from shoppingcart.models import (
     Invoice,
     InvoiceTransaction,
     Order,
-    PaidCourseRegistration,
+    PaidCourseRegistration
 )
 from six import text_type
-from student.models import (
-    ALLOWEDTOENROLL_TO_ENROLLED,
-    CourseEnrollment,
-    CourseEnrollmentAllowed,
-    ManualEnrollmentAudit,
-)
+from student.models import ALLOWEDTOENROLL_TO_ENROLLED, CourseEnrollment, CourseEnrollmentAllowed, ManualEnrollmentAudit
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from survey.models import SurveyAnswer, SurveyForm
 from xmodule.modulestore import ModuleStoreEnum
@@ -516,7 +511,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
             student = self.create_student('student{}'.format(ctr))
             self.submit_student_answer(student.username, u'Problem1', ['Option 1'])
 
-        student_data, _ = ProblemResponses._build_student_data(
+        student_data = ProblemResponses._build_student_data(
             user_id=self.instructor.id,
             course_key=self.course.id,
             usage_key_str=str(self.course.location),
@@ -536,7 +531,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         problem = self.define_option_problem(u'Problem1')
         self.submit_student_answer(self.student.username, u'Problem1', ['Option 1'])
         with self._remove_capa_report_generator():
-            student_data, _ = ProblemResponses._build_student_data(
+            student_data = ProblemResponses._build_student_data(
                 user_id=self.instructor.id,
                 course_key=self.course.id,
                 usage_key_str=str(problem.location),
@@ -558,12 +553,11 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         ``generate_report_data`` method works as expected.
         """
         self.define_option_problem(u'Problem1')
-        self.submit_student_answer(self.student.username, u'Problem1', ['Option 1'])
-        state = {'some': 'state', 'more': 'state!'}
+        state = {'some': 'state'}
         mock_generate_report_data.return_value = iter([
             ('student', state),
         ])
-        student_data, _ = ProblemResponses._build_student_data(
+        student_data = ProblemResponses._build_student_data(
             user_id=self.instructor.id,
             course_key=self.course.id,
             usage_key_str=str(self.course.location),
@@ -574,8 +568,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
             'location': 'test_course > Section > Subsection > Problem1',
             'block_key': 'i4x://edx/1.23x/problem/Problem1',
             'title': 'Problem1',
-            'some': 'state',
-            'more': 'state!',
+            'state': state,
         }, student_data[0])
 
     def test_build_student_data_for_block_with_real_generate_report_data(self):
@@ -585,7 +578,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         """
         self.define_option_problem(u'Problem1')
         self.submit_student_answer(self.student.username, u'Problem1', ['Option 1'])
-        student_data, _ = ProblemResponses._build_student_data(
+        student_data = ProblemResponses._build_student_data(
             user_id=self.instructor.id,
             course_key=self.course.id,
             usage_key_str=str(self.course.location),
@@ -596,12 +589,12 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
             'location': 'test_course > Section > Subsection > Problem1',
             'block_key': 'i4x://edx/1.23x/problem/Problem1',
             'title': 'Problem1',
-            'Answer ID': 'i4x-edx-1_23x-problem-Problem1_2_1',
-            'Answer': 'Option 1',
-            'Correct Answer': u'Option 1',
-            'Question': u'The correct answer is Option 1',
+            'state': {
+                'Answer ID': 'i4x-edx-1_23x-problem-Problem1_2_1',
+                'Answer': 'Option 1',
+                'Question': u'The correct answer is Option 1'
+            },
         }, student_data[0])
-        self.assertIn('state', student_data[0])
 
     @patch('lms.djangoapps.instructor_task.tasks_helper.grades.list_problem_responses')
     @patch('xmodule.capa_module.CapaDescriptor.generate_report_data', create=True)
@@ -632,14 +625,11 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
             with patch('lms.djangoapps.instructor_task.tasks_helper.grades'
                        '.ProblemResponses._build_student_data') as mock_build_student_data:
-                mock_build_student_data.return_value = (
-                    [
-                        {'username': 'user0', 'state': u'state0'},
-                        {'username': 'user1', 'state': u'state1'},
-                        {'username': 'user2', 'state': u'state2'},
-                    ],
-                    ['username', 'state']
-                )
+                mock_build_student_data.return_value = [
+                    {'username': 'user0', 'state': u'state0'},
+                    {'username': 'user1', 'state': u'state1'},
+                    {'username': 'user2', 'state': u'state2'},
+                ]
                 result = ProblemResponses.generate(
                     None, None, self.course.id, task_input, 'calculated'
                 )

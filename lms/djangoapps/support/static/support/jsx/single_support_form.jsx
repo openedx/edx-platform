@@ -51,7 +51,7 @@ class RenderForm extends React.Component {
 
     data.requester = {
       email: $userInfo.data('email'),
-      name: $userInfo.data('username')
+      name: $userInfo.data('username'),
     };
 
     course = $course.find(':selected').val();
