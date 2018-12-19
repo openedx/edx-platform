@@ -44,6 +44,8 @@ $icon-width: 18px;
 .fa-filter:before,
 .fa-newspaper-o:before,
 .course-content .bookmark-button::before,
+.fa-floppy-o:before,
+.fa-save:before
 {
   content: '';
   display: inline-block;
@@ -218,6 +220,10 @@ $icon-width: 18px;
   position: relative;
   top: 4px;
   transform: scale(0.95);
+}
+.fa-floppy-o:before,
+.fa-save:before{
+  background-position: calcP(13, 7)
 }
 
 

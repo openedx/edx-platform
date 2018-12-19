@@ -231,3 +231,45 @@
     border: none;
   }
 }
+
+// add a discussion
+.discussion-body .discussion-column .new-post-article{
+  margin-top: 0;
+  .forum-new-post-form{
+    padding: 30px 30px 50px;
+  }
+}
+.new-post-article .forum-new-post-form{
+  .post-field .post-topic.field-input{
+    height: 36px;
+    padding: 0 10px;
+    width: 100%;
+    border: 1px solid #e6e9ed!important;
+  }
+  .post-field .field-label{
+    width: 100%;
+    font-size: 14px;
+    .js-post-title{
+      width: 100%;
+      height: 36px;
+      border: 1px solid #e6e9ed;
+    }
+  }
+
+  .post-field .field-help#field_help_post_type{
+    margin: 5px 0;
+  }
+  .post-options .icon{
+    vertical-align: bottom;
+  }
+  .wmd-preview-label{
+    padding: 10px 10px 0;
+  }
+  .wmd-input{
+    border: 1px solid #e6e9ed;
+  }
+  .wmd-preview-container{
+    border: 1px solid #e6e9ed;
+    border-top: 0;
+  }
+} 
