@@ -3103,9 +3103,6 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py lms/djangoapps/branding/api.py
 #: lms/templates/footer.html lms/templates/static_templates/about.html
-#: themes/normal-theme/lms/templates/static_templates/about.html
-#: themes/normal-theme/lms/templates/static_templates/contact.html
-#: themes/normal-theme/lms/templates/static_templates/disclaimer.html
 #: themes/red-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/about.html
@@ -7606,6 +7603,7 @@ msgstr ""
 #: lms/djangoapps/shoppingcart/pdf.py
 #: lms/templates/static_templates/disclaimer.html
 #: themes/normal-theme/lms/templates/footer.html
+#: themes/normal-theme/lms/templates/static_templates/disclaimer.html
 msgid "Disclaimer"
 msgstr ""
 
@@ -11922,7 +11920,6 @@ msgstr ""
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: lms/templates/static_templates/help.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
-#: themes/normal-theme/lms/templates/static_templates/help.html
 #: wiki/plugins/help/wiki_plugin.py
 msgid "Help"
 msgstr ""
@@ -14577,6 +14574,51 @@ msgstr ""
 
 #: lms/templates/certificates/valid.html
 msgid "About edX Certificates"
+msgstr ""
+
+#: lms/templates/certificates/verify.html
+#: themes/normal-theme/lms/templates/static_templates/about.html
+msgid "英荔商学院"
+msgstr ""
+
+#: lms/templates/certificates/verify.html
+msgid "该证书真实有效"
+msgstr ""
+
+#: lms/templates/certificates/verify.html
+msgid "持证学员"
+msgstr ""
+
+#: lms/templates/certificates/verify.html
+msgid "证书编号"
+msgstr ""
+
+#: lms/templates/certificates/verify.html
+msgid "所属机构"
+msgstr ""
+
+#: lms/templates/certificates/verify.html
+msgid "课程名称"
+msgstr ""
+
+#: lms/templates/certificates/verify.html
+msgid "学习时间"
+msgstr ""
+
+#: lms/templates/certificates/verify.html
+msgid "学习类型"
+msgstr ""
+
+#: lms/templates/certificates/verify.html
+msgid "发证时间"
+msgstr ""
+
+#: lms/templates/certificates/verify.html
+msgid "电子证书"
+msgstr ""
+
+#: lms/templates/certificates/verify.html
+msgid "点击查看"
 msgstr ""
 
 #: lms/templates/commerce/checkout_cancel.html
@@ -19086,6 +19128,26 @@ msgstr ""
 msgid "Account Settings"
 msgstr ""
 
+#: lms/templates/student_account/account_settings.html
+msgid "手机"
+msgstr ""
+
+#: lms/templates/student_account/account_settings.html
+msgid "绑定您的手机"
+msgstr ""
+
+#: lms/templates/student_account/account_settings.html
+msgid "已经绑定手机号"
+msgstr ""
+
+#: lms/templates/student_account/account_settings.html
+msgid "修改手机号"
+msgstr ""
+
+#: lms/templates/student_account/account_settings.html
+msgid "将您的手机号码与EliteMBA的账号绑定"
+msgstr ""
+
 #: lms/templates/student_account/finish_auth.html
 msgid "Please Wait"
 msgstr ""
@@ -19778,6 +19840,7 @@ msgid "About Platform"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/footer.html
+#: themes/normal-theme/lms/templates/static_templates/help.html
 msgid "Help and Complaint"
 msgstr ""
 
@@ -19845,15 +19908,13 @@ msgstr ""
 #. Translators: 'Open edX' is a registered trademark, please keep this
 #. untranslated. See http://open.edx.org for more information.
 #: themes/normal-theme/lms/templates/index_overlay.html
-msgid "Learn and Change · Change and Progress - Elite MBA."
+msgid "Learn to Change · Change to Improve —— EliteMBA"
 msgstr ""
 
 #. Translators: 'Open edX' is a registered trademark, please keep this
 #. untranslated. See http://open.edx.org for more information.
 #: themes/normal-theme/lms/templates/index_overlay.html
-msgid ""
-"Worth hundreds of thousands of MBA curriculum system. Minimum ￥99.9 per "
-"month for the whole year."
+msgid "Enjoy high-value MBA curriculum with ￥99.8 monthly payment!"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/courseware/course_about.html
@@ -19867,17 +19928,16 @@ msgid ""
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/about.html
-#: themes/normal-theme/lms/templates/static_templates/contact.html
-msgid "英荔教育"
+msgid "About us"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/about.html
-msgid "英荔教育是广东英荔国际教育科技有限公司旗下的商业管理类互联网课堂。"
+msgid "英荔商学院（www.EliteMBA.cn）是广东英荔国际教育科技有限公司旗下的商业管理类互联网课堂"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/about.html
 msgid ""
-"英荔教育与国内外商业管理学术界资深的教授和专家联手，精心设计并制作高质量且极具知识价值的体系化在线课程。同时，筛选并引进国外优质教育内容，向学习者提供经英荔团队打造后的本土化版本。"
+"英荔与国内外商业管理学术界资深的教授和专家联手，精心设计并制作高质量且极具知识价值的体系化在线课程。同时，筛选并引进国外优质教育内容，向学习者提供经英荔团队打造后的本土化版本。"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/about.html
@@ -19890,7 +19950,7 @@ msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/about.html
 msgid ""
-"教育家蔡元培先生说：“教育应指导社会，而不是追逐社会”。英荔教育摒弃追逐社会的模式，倡导学习者自我实现和引领社会的精神。英荔课堂没有生搬硬套的知识灌输，只有寻求智慧和解决实际问题的动力。"
+"教育家蔡元培先生说：“教育应指导社会，而不是追逐社会”。英荔摒弃追逐社会的模式，倡导学习者自我实现和引领社会的精神。英荔课堂没有生搬硬套的知识灌输，只有寻求智慧和解决实际问题的动力。"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/about.html
@@ -19906,7 +19966,15 @@ msgid "我们的愿景"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/about.html
-msgid "成为中国享有声誉的数字化教育品牌"
+msgid "成为中国享有声誉的数字化教育品牌。"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/static_templates/contact.html
+msgid "Contact us"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/static_templates/contact.html
+msgid "英荔教育"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/contact.html
