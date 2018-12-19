@@ -59,12 +59,13 @@
                 this.renderAttrs();
                 this.$('span.timeago').timeago();
                 this.convertMath();
+                this.$('.post-body');
+                this.$('h1,h3');
                 return this;
             };
 
             DiscussionThreadShowView.prototype.convertMath = function() {
                 DiscussionUtil.convertMath(this.$('.post-body'));
-                DiscussionUtil.typesetMathJax(this.$('.post-body'));
             };
 
             DiscussionThreadShowView.prototype.edit = function(event) {
