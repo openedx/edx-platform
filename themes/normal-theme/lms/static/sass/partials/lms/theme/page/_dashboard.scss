@@ -72,6 +72,22 @@
   }
 }
 
+.wrapper-messages-primary .message{
+  &.message-status{
+    font-weight: normal;
+    color: $font;
+  }
+  .message-title{
+    font-size: 14px;
+    line-height: 1.8;
+    font-weight: normal;
+    color: $font;
+  }
+}
+.wrapper-messages-primary .message.message-status.course-status-certavailable .actions-primary .action-certificate .btn{
+  @extend %btn-my-primary;
+}
+
 
 /* 右侧sidebar框 */
 .dashboard .side-container{
@@ -87,7 +103,7 @@
     background: #fffaf6;
     padding: 25px 20px;
     box-shadow: 0px 1px 4px 0px #ffe4d1;
-    border: 1px solid #ffe4d1;
+    border: 1px solid #ffe4d1 !important;
     margin-top: 20px;
     text-align: right;
     background-image: url("/static/normal-theme/images/crown2.png");

@@ -236,17 +236,30 @@ body.view-in-course .wrapper-course-material .course-tabs{
     line-height: 2;
     color: $font;
   }
-  .dismiss-message{
-    display: none;
+  .dismiss-message .btn-link:focus{
+    outline: none;
   }
 } 
 
 // course-message
-.course-message .message-content{
-  color: $font;
-  padding: 15px;
-  .message-header{ color: $title; }
-} 
+.course-message{
+  .message-author{
+    position: relative;
+    top: 5px;
+  }
+  .message-content{
+    color: $font;
+    padding: 15px;
+    border: 1px solid #e6e9ed;
+    font-weight: normal;
+    font-size: 16px;
+    .message-header{ 
+      color: $title;
+      margin-bottom: 7px;
+      font-weight: normal;
+    }
+  }
+}  
 
 // view this course as 
 body.view-in-course .wrapper-preview-menu, .wrapper-preview-menu{
