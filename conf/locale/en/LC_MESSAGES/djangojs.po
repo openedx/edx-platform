@@ -28,23 +28,15 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2018.
 #
-# #-#-#-#-#  ecommerce-js.po (edx-platform)  #-#-#-#-#
-# #-#-#-#-#  django.po (ecommerce)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2018 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-#
-# Translators:
-# EdX Team <info@edx.org>, 2018
 msgid ""
 msgstr ""
-"Project-Id-Version: edx-platform\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-04-05 11:00+0000\n"
-"PO-Revision-Date: 2018-03-26 19:44+0000\n"
-"Last-Translator: Ned Batchelder <ned@edx.org>\n"
-"Language-Team: English (United States) (http://www.transifex.com/open-edx/edx-platform/language/en_US/)\n"
-"Language: en_US\n"
+"Project-Id-Version: 0.1a\n"
+"Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
+"POT-Creation-Date: 2018-12-13 17:36+0800\n"
+"PO-Revision-Date: 2018-12-13 09:36:08.621139\n"
+"Last-Translator: \n"
+"Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
+"Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -338,9 +330,18 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
-#: ecommerce/static/js/views/coupon_list_view.js
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: cms/static/js/views/assets.js
+#: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js cms/templates/js/asset-library.underscore
+#: cms/templates/js/course-instructor-details.underscore
+#: cms/templates/js/previous-video-upload-list.underscore
+#: cms/templates/js/signatory-details.underscore
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Name"
-msgstr "Name"
+msgstr ""
 
 #: cms/static/js/views/assets.js lms/static/js/Markdown.Editor.js
 #: cms/templates/js/asset-upload-modal.underscore
@@ -947,9 +948,22 @@ msgstr ""
 msgid "Warning"
 msgstr ""
 
-#: ecommerce/static/vendor-extensions/oscar/js/refund_list.js
+#. Translators: This message will be added to the front of messages of type
+#. error,
+#. e.g. "Error: required field is missing".
+#: cms/static/js/views/xblock_validation.js
+#: common/static/bundles/js/factories/xblock_validation.js
+#: common/static/common/js/discussion/utils.js
+#: common/static/common/js/discussion/views/discussion_inline_view.js
+#: common/static/common/js/discussion/views/discussion_thread_list_view.js
+#: common/static/common/js/discussion/views/discussion_thread_view.js
+#: common/static/common/js/discussion/views/response_comment_view.js
+#: lms/static/js/student_account/views/FinishAuthView.js
+#: lms/static/js/verify_student/views/payment_confirmation_step_view.js
+#: lms/static/js/verify_student/views/step_view.js
+#: lms/static/js/views/fields.js
 msgid "Error"
-msgstr "Error"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/assets/library_content/public/js/library_content_edit.js
 #: common/lib/xmodule/xmodule/js/public/js/library_content_edit.js
@@ -2012,10 +2026,15 @@ msgstr ""
 msgid "New window"
 msgstr ""
 
-#: ecommerce/static/js/views/coupon_list_view.js
-#: ecommerce/static/js/views/course_list_view.js
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js cms/templates/js/paging-header.underscore
+#: common/static/common/templates/components/paging-footer.underscore
+#: common/static/common/templates/discussion/pagination.underscore
 msgid "Next"
-msgstr "Next"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -2897,6 +2916,16 @@ msgstr ""
 msgid "There was an error updating your goal."
 msgstr ""
 
+#: common/static/bundles/CourseOutline.js
+#: lms/templates/ccx/schedule.underscore
+msgid "Expand All"
+msgstr ""
+
+#: common/static/bundles/CourseOutline.js
+#: lms/templates/ccx/schedule.underscore
+msgid "Collapse All"
+msgstr ""
+
 #: common/static/bundles/EntitlementFactory.js
 #: common/static/bundles/ProgramDetailsFactory.js
 #: lms/static/js/learner_dashboard/models/course_card_model.js
@@ -3060,9 +3089,10 @@ msgstr ""
 msgid "Browsing"
 msgstr ""
 
-#: ecommerce/static/js/views/provider_selection_view.js
+#: common/static/bundles/ProblemBrowser.js
+#: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
 msgid "Select"
-msgstr "Select"
+msgstr ""
 
 #: common/static/bundles/ProblemBrowser.js
 #: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/Main/Main.jsx
@@ -3122,9 +3152,10 @@ msgstr ""
 msgid "Remove file"
 msgstr ""
 
-#: ecommerce/static/js/models/course_model.js
+#: common/static/bundles/SingleSupportForm.js
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Course Name"
-msgstr "Course Name"
+msgstr ""
 
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
@@ -3297,11 +3328,8 @@ msgstr ""
 #: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
-"Once your account is deleted, you cannot use it to take courses on the edX "
-"app, edx.org, or any other site hosted by edX. This includes access to "
-"edx.org from your employer’s or university’s system and access to private "
-"sites offered by MIT Open Learning, Wharton Executive Education, and Harvard"
-" Medical School."
+"Once your account is deleted, you cannot use it to take courses on the "
+"EliteMBA app, elitemba.cn, or any other site hosted by EliteMBA."
 msgstr ""
 
 #: common/static/bundles/StudentAccountDeletion.js
@@ -5715,11 +5743,14 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid " Link"
+#, javascript-format
+msgid ""
+"Enter your %s username or the URL to your %s page. Delete the URL to remove "
+"the link."
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Enter your "
+msgid " Link"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -5847,17 +5878,17 @@ msgstr ""
 msgid "Professional Education Verified Certificate"
 msgstr ""
 
-#: ecommerce/static/js/views/course_form_view.js
+#: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Professional Education"
-msgstr "Professional Education"
+msgstr ""
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Verified Certificate upgrade"
 msgstr ""
 
-#: ecommerce/static/js/models/course_seats/course_seat.js
+#: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Verified Certificate"
-msgstr "Verified Certificate"
+msgstr ""
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Checkout"
@@ -6889,9 +6920,9 @@ msgid ""
 "Please address the errors on this page first, and then save your progress."
 msgstr ""
 
-#: ecommerce/static/js/views/coupon_form_view.js
+#: cms/static/js/views/validation.js
 msgid "Save Changes"
-msgstr "Save Changes"
+msgstr ""
 
 #: cms/static/js/views/video_thumbnail.js
 msgid "Add Thumbnail"
@@ -7055,10 +7086,11 @@ msgstr ""
 msgid "Date"
 msgstr ""
 
-#: ecommerce/static/js/views/coupon_list_view.js
-#: ecommerce/static/js/views/course_list_view.js
+#: cms/templates/js/paging-header.underscore
+#: common/static/common/templates/components/paging-footer.underscore
+#: common/static/common/templates/discussion/pagination.underscore
 msgid "Previous"
-msgstr "Previous"
+msgstr ""
 
 #: cms/templates/js/previous-video-upload-list.underscore
 #: lms/djangoapps/support/static/support/templates/manage_user.underscore
@@ -7546,10 +7578,9 @@ msgstr ""
 msgid "Username or email address"
 msgstr ""
 
-#: ecommerce/static/js/models/course_model.js
-#: ecommerce/static/js/views/dynamic_catalog_view.js
+#: lms/djangoapps/support/static/support/templates/enrollment.underscore
 msgid "Course ID"
-msgstr "Course ID"
+msgstr ""
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 msgid "Course Start"
@@ -7563,9 +7594,9 @@ msgstr ""
 msgid "Upgrade Deadline"
 msgstr ""
 
-#: ecommerce/static/js/models/course_model.js
+#: lms/djangoapps/support/static/support/templates/enrollment.underscore
 msgid "Verification Deadline"
-msgstr "Verification Deadline"
+msgstr ""
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 msgid "Enrollment Date"
@@ -7706,14 +7737,6 @@ msgstr ""
 
 #: lms/templates/api_admin/catalog-results.underscore
 msgid "This catalog's courses:"
-msgstr ""
-
-#: lms/templates/ccx/schedule.underscore
-msgid "Expand All"
-msgstr ""
-
-#: lms/templates/ccx/schedule.underscore
-msgid "Collapse All"
 msgstr ""
 
 #: lms/templates/ccx/schedule.underscore
@@ -8339,9 +8362,9 @@ msgstr ""
 msgid "View Archived Course"
 msgstr ""
 
-#: ecommerce/static/js/pages/course_detail_page.js
+#: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "View Course"
-msgstr "View Course"
+msgstr ""
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "Select a session:"
@@ -8413,10 +8436,12 @@ msgstr ""
 msgid "Explore New Programs"
 msgstr ""
 
-#: ecommerce/static/js/views/course_list_view.js
+#: lms/templates/learner_dashboard/program_card.underscore
+#: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Course"
 msgid_plural "Courses"
-msgstr[0] "Course"
+msgstr[0] ""
+msgstr[1] ""
 
 #: lms/templates/learner_dashboard/program_card.underscore
 msgid "Completed"
@@ -10919,428 +10944,3 @@ msgstr ""
 #: membership/static/membership/js/pay.js
 msgid "Return to EliteMBA in _ seconds"
 msgstr ""
-
-#: ecommerce/static/js/models/coupon_model.js
-msgid "This field is required."
-msgstr "This field is required."
-
-#: ecommerce/static/js/models/coupon_model.js
-msgid "This value must be a number."
-msgstr "This value must be a number."
-
-#: ecommerce/static/js/models/coupon_model.js
-msgid "This value must be a date."
-msgstr "This value must be a date."
-
-#: ecommerce/static/js/models/coupon_model.js
-msgid "At least one seat type must be selected."
-msgstr "At least one seat type must be selected."
-
-#: ecommerce/static/js/models/coupon_model.js
-msgid "This field must be empty or contain 1-16 alphanumeric characters."
-msgstr "This field must be empty or contain 1-16 alphanumeric characters."
-
-#: ecommerce/static/js/models/coupon_model.js
-msgid "A valid course ID is required"
-msgstr "A valid course ID is required"
-
-#: ecommerce/static/js/models/coupon_model.js
-#, javascript-format
-msgid "Email domain {%s} is invalid."
-msgstr "Email domain {%s} is invalid."
-
-#: ecommerce/static/js/models/coupon_model.js
-msgid "Must occur after start date"
-msgstr "Must occur after start date"
-
-#: ecommerce/static/js/models/coupon_model.js
-msgid "Max uses for multi-use coupons must be higher than 2."
-msgstr "Max uses for multi-use coupons must be higher than 2."
-
-#: ecommerce/static/js/models/coupon_model.js
-msgid "A valid Program UUID is required."
-msgstr "A valid Program UUID is required."
-
-#: ecommerce/static/js/models/coupon_model.js
-msgid "Must occur before end date"
-msgstr "Must occur before end date"
-
-#: ecommerce/static/js/models/course_model.js
-msgid "You must select a course type."
-msgstr "You must select a course type."
-
-#: ecommerce/static/js/models/course_model.js
-msgid "You must choose if an honor seat should be created."
-msgstr "You must choose if an honor seat should be created."
-
-#: ecommerce/static/js/models/course_model.js
-msgid "The verification deadline must occur AFTER the upgrade deadline."
-msgstr "The verification deadline must occur AFTER the upgrade deadline."
-
-#: ecommerce/static/js/models/course_model.js
-msgid "Product validation failed."
-msgstr "Product validation failed."
-
-#: ecommerce/static/js/models/course_model.js
-#: ecommerce/static/js/views/course_list_view.js
-msgid "Course Type"
-msgstr "Course Type"
-
-#: ecommerce/static/js/models/course_model.js
-msgid "Include Honor Seat"
-msgstr "Include Honor Seat"
-
-#: ecommerce/static/js/models/course_seats/course_seat.js
-msgid "All course seats must have a price."
-msgstr "All course seats must have a price."
-
-#: ecommerce/static/js/models/course_seats/course_seat.js
-msgid "Verified seats must have an upgrade deadline."
-msgstr "Verified seats must have an upgrade deadline."
-
-#: ecommerce/static/js/models/course_seats/course_seat.js
-msgid "The upgrade deadline must occur BEFORE the verification deadline."
-msgstr "The upgrade deadline must occur BEFORE the verification deadline."
-
-#: ecommerce/static/js/models/course_seats/course_seat.js
-#: ecommerce/static/js/views/course_form_view.js
-msgid "Verified"
-msgstr "Verified"
-
-#: ecommerce/static/js/models/course_seats/course_seat.js
-#: ecommerce/static/js/views/course_form_view.js
-msgid "Credit"
-msgstr "Credit"
-
-#: ecommerce/static/js/models/course_seats/course_seat.js
-msgid "Professional"
-msgstr "Professional"
-
-#: ecommerce/static/js/models/course_seats/course_seat.js
-msgid "Honor"
-msgstr "Honor"
-
-#: ecommerce/static/js/models/course_seats/course_seat.js
-msgid "Audit"
-msgstr "Audit"
-
-#: ecommerce/static/js/models/course_seats/course_seat.js
-msgid "Professional Certificate"
-msgstr "Professional Certificate"
-
-#: ecommerce/static/js/models/course_seats/course_seat.js
-msgid "Honor Certificate"
-msgstr "Honor Certificate"
-
-#: ecommerce/static/js/models/course_seats/course_seat.js
-msgid "No Certificate"
-msgstr "No Certificate"
-
-#: ecommerce/static/js/models/course_seats/credit_seat.js
-msgid "All credit seats must have a credit provider."
-msgstr "All credit seats must have a credit provider."
-
-#: ecommerce/static/js/models/course_seats/credit_seat.js
-msgid "Please select a valid credit provider."
-msgstr "Please select a valid credit provider."
-
-#: ecommerce/static/js/models/course_seats/credit_seat.js
-msgid "All credit seats must designate a number of credit hours."
-msgstr "All credit seats must designate a number of credit hours."
-
-#: ecommerce/static/js/pages/basket_page.js
-msgid "Problem occurred during checkout. Please contact support."
-msgstr "Problem occurred during checkout. Please contact support."
-
-#: ecommerce/static/js/pages/basket_page.js
-msgid "This field is required"
-msgstr "This field is required"
-
-#: ecommerce/static/js/pages/basket_page.js
-msgid "Invalid card number"
-msgstr "Invalid card number"
-
-#: ecommerce/static/js/pages/basket_page.js
-msgid "Unsupported card type"
-msgstr "Unsupported card type"
-
-#: ecommerce/static/js/pages/basket_page.js
-msgid "Invalid security number"
-msgstr "Invalid security number"
-
-#: ecommerce/static/js/pages/basket_page.js
-msgid "Invalid month"
-msgstr "Invalid month"
-
-#: ecommerce/static/js/pages/basket_page.js
-msgid "Invalid year"
-msgstr "Invalid year"
-
-#: ecommerce/static/js/pages/basket_page.js
-msgid "Card expired"
-msgstr "Card expired"
-
-#: ecommerce/static/js/pages/basket_page.js
-msgid "<Choose state/province>"
-msgstr "<Choose state/province>"
-
-#: ecommerce/static/js/pages/basket_page.js
-msgid "State/Province (required)"
-msgstr "State/Province (required)"
-
-#: ecommerce/static/js/pages/coupon_create_page.js
-msgid "Create New Coupon"
-msgstr "Create New Coupon"
-
-#: ecommerce/static/js/pages/coupon_detail_page.js
-msgid "View Coupon"
-msgstr "View Coupon"
-
-#: ecommerce/static/js/pages/coupon_edit_page.js
-msgid "Edit Coupon"
-msgstr "Edit Coupon"
-
-#: ecommerce/static/js/pages/coupon_list_page.js
-msgid "Coupon Codes"
-msgstr "Coupon Codes"
-
-#: ecommerce/static/js/pages/course_create_page.js
-msgid "Create New Course"
-msgstr "Create New Course"
-
-#: ecommerce/static/js/pages/course_edit_page.js
-msgid "Edit Course"
-msgstr "Edit Course"
-
-#: ecommerce/static/js/pages/course_list_page.js
-msgid "Courses"
-msgstr "Courses"
-
-#: ecommerce/static/js/pages/offer_page.js
-msgid "Redeem"
-msgstr "Redeem"
-
-#: ecommerce/static/js/pages/receipt_page.js
-msgid ""
-"Caution! Using the back button on this page may cause you to be charged "
-"again."
-msgstr ""
-"Caution! Using the back button on this page may cause you to be charged "
-"again."
-
-#. Translators: Do not translate "Apple Pay".
-#: ecommerce/static/js/payment_processors/cybersource.js
-msgid ""
-"Apple Pay is not available at this time. Please try another payment method."
-msgstr ""
-"Apple Pay is not available at this time. Please try another payment method."
-
-#: ecommerce/static/js/payment_processors/cybersource.js
-msgid ""
-"An error occurred while processing your payment. You have NOT been charged. "
-"Please try again, or select another payment method."
-msgstr ""
-"An error occurred while processing your payment. You have NOT been charged. "
-"Please try again, or select another payment method."
-
-#: ecommerce/static/js/payment_processors/stripe.js
-msgid ""
-"An error occurred while attempting to process your payment. You have not "
-"been charged. Please check your payment details, and try again."
-msgstr ""
-"An error occurred while attempting to process your payment. You have not "
-"been charged. Please check your payment details, and try again."
-
-#: ecommerce/static/js/payment_processors/stripe.js
-msgid "An error occurred while processing your payment. Please try again."
-msgstr "An error occurred while processing your payment. Please try again."
-
-#: ecommerce/static/js/utils/utils.js
-msgid "Trailing comma not allowed."
-msgstr "Trailing comma not allowed."
-
-#: ecommerce/static/js/views/coupon_detail_view.js
-#: ecommerce/static/js/views/coupon_form_view.js
-msgid "Can be used once by one customer"
-msgstr "Can be used once by one customer"
-
-#: ecommerce/static/js/views/coupon_detail_view.js
-#: ecommerce/static/js/views/coupon_form_view.js
-msgid "Can be used multiple times by multiple customers"
-msgstr "Can be used multiple times by multiple customers"
-
-#: ecommerce/static/js/views/coupon_detail_view.js
-#: ecommerce/static/js/views/coupon_form_view.js
-msgid "Can be used once by multiple customers"
-msgstr "Can be used once by multiple customers"
-
-#: ecommerce/static/js/views/coupon_form_view.js
-msgid "Enrollment Code"
-msgstr "Enrollment Code"
-
-#: ecommerce/static/js/views/coupon_form_view.js
-msgid "Discount Code"
-msgstr "Discount Code"
-
-#: ecommerce/static/js/views/coupon_form_view.js
-msgid "Create Coupon"
-msgstr "Create Coupon"
-
-#: ecommerce/static/js/views/coupon_list_view.js
-#: ecommerce/static/js/views/course_list_view.js
-msgid "Search..."
-msgstr "Search..."
-
-#. Translators: _START_, _END_, and _TOTAL_ are placeholders. Do NOT translate
-#. them.
-#: ecommerce/static/js/views/coupon_list_view.js
-msgid "Displaying _START_ to _END_ of _TOTAL_ coupons"
-msgstr "Displaying _START_ to _END_ of _TOTAL_ coupons"
-
-#. Translators: _MAX_ is a placeholder. Do NOT translate it.
-#: ecommerce/static/js/views/coupon_list_view.js
-msgid "(filtered from _MAX_ total coupons)"
-msgstr "(filtered from _MAX_ total coupons)"
-
-#. Translators: _MENU_ is a placeholder. Do NOT translate it.
-#: ecommerce/static/js/views/coupon_list_view.js
-msgid "Display _MENU_ coupons"
-msgstr "Display _MENU_ coupons"
-
-#: ecommerce/static/js/views/coupon_list_view.js
-msgid "Created"
-msgstr "Created"
-
-#: ecommerce/static/js/views/coupon_list_view.js
-msgid "Custom Code"
-msgstr "Custom Code"
-
-#: ecommerce/static/js/views/coupon_list_view.js
-msgid "Client"
-msgstr "Client"
-
-#: ecommerce/static/js/views/coupon_list_view.js
-msgid "Category"
-msgstr "Category"
-
-#: ecommerce/static/js/views/coupon_list_view.js
-msgid "Coupon Report"
-msgstr "Coupon Report"
-
-#: ecommerce/static/js/views/course_form_view.js
-msgid "Free (Audit)"
-msgstr "Free (Audit)"
-
-#: ecommerce/static/js/views/course_form_view.js
-msgid "Free audit track. No certificate."
-msgstr "Free audit track. No certificate."
-
-#: ecommerce/static/js/views/course_form_view.js
-msgid ""
-"Paid certificate track with initial verification and Verified Certificate"
-msgstr ""
-"Paid certificate track with initial verification and Verified Certificate"
-
-#: ecommerce/static/js/views/course_form_view.js
-msgid ""
-"Paid certificate track with initial verification and Professional Education "
-"Certificate"
-msgstr ""
-"Paid certificate track with initial verification and Professional Education "
-"Certificate"
-
-#: ecommerce/static/js/views/course_form_view.js
-msgid ""
-"Paid certificate track with initial verification and Verified Certificate, "
-"and option to purchase credit"
-msgstr ""
-"Paid certificate track with initial verification and Verified Certificate, "
-"and option to purchase credit"
-
-#. Translators: _START_, _END_, and _TOTAL_ are placeholders. Do NOT translate
-#. them.
-#: ecommerce/static/js/views/course_list_view.js
-msgid "Displaying _START_ to _END_ of _TOTAL_ courses"
-msgstr "Displaying _START_ to _END_ of _TOTAL_ courses"
-
-#. Translators: _MAX_ is a placeholder. Do NOT translate it.
-#: ecommerce/static/js/views/course_list_view.js
-msgid "(filtered from _MAX_ total courses)"
-msgstr "(filtered from _MAX_ total courses)"
-
-#. Translators: _MENU_ is a placeholder. Do NOT translate it.
-#: ecommerce/static/js/views/course_list_view.js
-msgid "Display _MENU_ courses"
-msgstr "Display _MENU_ courses"
-
-#: ecommerce/static/js/views/course_list_view.js
-msgid "Last Edited"
-msgstr "Last Edited"
-
-#: ecommerce/static/js/views/dynamic_catalog_view.js
-msgid "Seat title"
-msgstr "Seat title"
-
-#: ecommerce/static/js/views/dynamic_catalog_view.js
-msgid "Seat type"
-msgstr "Seat type"
-
-#: ecommerce/static/js/views/form_view.js
-msgid "A course with the specified ID already exists."
-msgstr "A course with the specified ID already exists."
-
-#: ecommerce/static/js/views/form_view.js
-msgid "Error!"
-msgstr "Error!"
-
-#: ecommerce/static/js/views/form_view.js
-msgid "Saving..."
-msgstr "Saving..."
-
-#: ecommerce/static/js/views/form_view.js
-msgid "Please complete all required fields."
-msgstr "Please complete all required fields."
-
-#: ecommerce/static/js/views/form_view.js
-msgid "An error occurred while saving the data."
-msgstr "An error occurred while saving the data."
-
-#: ecommerce/static/js/views/offer_view.js
-msgid "Ellipsis"
-msgstr "Ellipsis"
-
-#: ecommerce/static/js/views/offer_view.js
-msgid "Load the records for page "
-msgstr "Load the records for page "
-
-#: ecommerce/static/js/views/offer_view.js
-msgid "Load the records for the next page"
-msgstr "Load the records for the next page"
-
-#: ecommerce/static/js/views/offer_view.js
-msgid "Load the records for the previous page"
-msgstr "Load the records for the previous page"
-
-#: ecommerce/static/js/views/provider_selection_view.js
-msgid "Selected"
-msgstr "Selected"
-
-#: ecommerce/static/vendor-extensions/oscar/js/order_actions.js
-msgid "Order %(order_number)s has been fulfilled."
-msgstr "Order %(order_number)s has been fulfilled."
-
-#: ecommerce/static/vendor-extensions/oscar/js/order_actions.js
-msgid "Failed to fulfill order %(order_number)s: %(error)s"
-msgstr "Failed to fulfill order %(order_number)s: %(error)s"
-
-#: ecommerce/static/vendor-extensions/oscar/js/refund_list.js
-msgid "Refund #%(refund_id)s has been processed."
-msgstr "Refund #%(refund_id)s has been processed."
-
-#: ecommerce/static/vendor-extensions/oscar/js/refund_list.js
-msgid ""
-"Failed to process refund #%(refund_id)s: %(error)s. Please try again, or "
-"contact the E-Commerce Development Team."
-msgstr ""
-"Failed to process refund #%(refund_id)s: %(error)s. Please try again, or "
-"contact the E-Commerce Development Team."
