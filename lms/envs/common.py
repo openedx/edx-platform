@@ -2584,8 +2584,8 @@ REGISTRATION_FIELD_ORDER = [
 REGISTRATION_EMAIL_PATTERNS_ALLOWED = None
 
 ########################## CERTIFICATE NAME ########################
-CERT_NAME_SHORT = "Certificate"
-CERT_NAME_LONG = "Certificate of Achievement"
+CERT_NAME_SHORT = _("Certificate")
+CERT_NAME_LONG = _("Certificate of Achievement")
 
 #################### OpenBadges Settings #######################
 
