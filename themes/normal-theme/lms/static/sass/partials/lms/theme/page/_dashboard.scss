@@ -195,18 +195,9 @@
     padding: 15px;
     min-height: 40px;
 
-    .result-link{
-      line-height: 1.2;
-    }
-    .result-location{
-      line-height: 1.4;
-      .result-course-name{
-        color: $font;
-        word-break: break-word;
-      }
-    }
-    .result-type{
-      font-size: 12px;
+    .result-location .result-course-name{
+      color: $font;
+      word-break: break-word;
     }
   }
 
@@ -222,6 +213,14 @@
     padding: 0 8px;
   }
 }
+.search-results .search-results-item{
+  .result-type{
+    font-size: 12px;
+  }
+  .result-location{
+    line-height: 1.4;
+  }
+} 
 
 // no courses
 .empty-dashboard-message{

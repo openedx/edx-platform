@@ -168,12 +168,14 @@ $icon-width: 18px;
 .discussion-board{
   .fa-search:before{
     background-position: calcP(7, 4);
-    position: relative;
-    top: 2px;
   }
   .fa-plus:before{
     background-position: calcP(2, 9)
   }
+}
+.dashboard .fa-search:before{
+  position: relative;
+  top: 2px;
 }
 .wiki .fa-plus{
   display: none;
