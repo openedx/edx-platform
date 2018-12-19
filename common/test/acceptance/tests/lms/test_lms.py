@@ -525,12 +525,22 @@ class CourseWikiA11yTest(UniqueCourseTest):
         """
         Verify the basic accessibility of the wiki page as initially displayed.
         """
+        self.course_wiki_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-valid-attr', #TODO: LEARNER-6611 & LEARNER-6865
+            ]
+        })
         self.course_wiki_page.a11y_audit.check_for_accessibility_errors()
 
     def test_edit(self):
         """
         Verify the basic accessibility of edit wiki page.
         """
+        self.course_wiki_edit_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-valid-attr', #TODO: LEARNER-6611 & LEARNER-6865
+            ]
+        })
         self._open_editor()
         self.course_wiki_edit_page.a11y_audit.check_for_accessibility_errors()
 
@@ -540,6 +550,11 @@ class CourseWikiA11yTest(UniqueCourseTest):
         """
         self.course_wiki_page.show_history()
         history_page = CourseWikiHistoryPage(self.browser, self.course_id, self.course_info)
+        history_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-valid-attr', #TODO: LEARNER-6611 & LEARNER-6865
+            ]
+        })
         history_page.wait_for_page()
         history_page.a11y_audit.check_for_accessibility_errors()
 
@@ -549,6 +564,11 @@ class CourseWikiA11yTest(UniqueCourseTest):
         """
         self.course_wiki_page.show_children()
         children_page = CourseWikiChildrenPage(self.browser, self.course_id, self.course_info)
+        children_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-valid-attr', #TODO: LEARNER-6611 & LEARNER-6865
+            ]
+        })
         children_page.wait_for_page()
         children_page.a11y_audit.check_for_accessibility_errors()
 
