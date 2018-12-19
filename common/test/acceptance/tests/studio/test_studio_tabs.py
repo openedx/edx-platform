@@ -120,7 +120,7 @@ class PagesTest(StudioCourseTest):
                 Then the built-in pages are switched
         """
         default_order = ['Home', 'Course', 'Discussion', 'Wiki', 'Progress']
-        new_order = ['Home', 'Course', 'Progress', 'Wiki', 'Discussion']
+        new_order = ['Home', 'Course', 'Wiki', 'Progress', 'Discussion']
         default_tabs_order = self.pages_page.default_tab_titles
         self.assertEqual(
             default_tabs_order,
@@ -182,5 +182,5 @@ class PagesTest(StudioCourseTest):
         self.pages_page.set_field_val("Display Name", "First")
         self.pages_page.save()
         self.pages_page.add_static_page()
-        tab_names = self.pages_page.default_tab_titles
+        tab_names = self.pages_page.default_tab_titles + self.pages_page.static_tab_titles
         self.assertEqual(tab_names, expected_order)
