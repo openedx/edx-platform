@@ -317,10 +317,7 @@
                 if (options.focusAddedResponse) {
                     this.focusToTheAddedResponse(view.el);
                 }
-
-                // Typeset the response when initially loaded for any forum
-                DiscussionUtil.typesetMathJax(view.$el);
-                return view;
+                DiscussionUtil.typesetMathJax(view.$el.find('.js-response-list'));
             };
 
             DiscussionThreadView.prototype.renderAddResponseButton = function() {
@@ -348,7 +345,7 @@
             };
 
             DiscussionThreadView.prototype.submitComment = function(event) {
-                var body, comment, url, view;
+                var body, comment, url;
                 event.preventDefault();
                 url = this.model.urlFor('reply');
                 body = this.getWmdContent('reply-body');
@@ -368,7 +365,7 @@
                     user_id: window.user.get('id')
                 });
                 comment.set('thread', this.model.get('thread'));
-                view = this.renderResponseToList(comment, '.js-response-list', {
+                this.renderResponseToList(comment, '.js-response-list', {
                     focusAddedResponse: true
                 });
                 this.model.addComment();
@@ -382,9 +379,8 @@
                         body: body
                     },
                     success: function(data) {
-                         comment.updateInfo(data.annotated_content_info);
-                         comment.set(data.content);
-                         DiscussionUtil.typesetMathJax(view.$el.find('.response-body'));
+                        comment.updateInfo(data.annotated_content_info);
+                        return comment.set(data.content);
                     }
                 });
             };
