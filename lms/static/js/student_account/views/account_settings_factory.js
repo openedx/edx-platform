@@ -271,7 +271,8 @@
                 subtitle: gettext('Optionally, link your personal accounts to the social media icons on your edX profile.'),  // eslint-disable-line max-len
                 fields: []
             };
-
+            
+            fmts = gettext('Enter your %s username or the URL to your %s page. Delete the URL to remove the link.')
             for (var socialPlatform in socialPlatforms) {  // eslint-disable-line guard-for-in, no-restricted-syntax, vars-on-top, max-len
                 platformData = socialPlatforms[socialPlatform];
                 socialFields.fields.push(
@@ -280,10 +281,12 @@
                             model: userAccountModel,
                             title: gettext(platformData.display_name + ' Link'),
                             valueAttribute: 'social_links',
-                            helpMessage: gettext(
-                                'Enter your ' + platformData.display_name + ' username or the URL to your ' +
-                                platformData.display_name + ' page. Delete the URL to remove the link.'
-                            ),
+                            // helpMessage: gettext(
+                            //     'Enter your ' + platformData.display_name + ' username or the URL to your ' +
+                            //     platformData.display_name + ' page. Delete the URL to remove the link.'
+                            // ),
+                            
+                            helpMessage: interpolate(fmts, [platformData.display_name, platformData.display_name]),
                             platform: socialPlatform,
                             persistChanges: true,
                             placeholder: platformData.example
