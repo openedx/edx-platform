@@ -802,7 +802,8 @@ class StaffLockTest(CourseOutlineTest):
         course_home_page.wait_for_page()
         self.assertEqual(course_home_page.outline.num_sections, 2)
         course_home_page.preview.set_staff_view_mode('Learner')
-        self.assertEqual(course_home_page.outline.num_sections, 1)
+        course_home_page.wait_for(lambda: course_home_page.outline.num_sections == 1,
+                                  'Only 1 section is visible in the outline')
 
     def test_toggling_staff_lock_on_section_does_not_publish_draft_units(self):
         """
