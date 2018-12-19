@@ -790,15 +790,6 @@ EVENT_NAME_ENROLLMENT_DEACTIVATED = 'edx.course.enrollment.deactivated'
 EVENT_NAME_ENROLLMENT_MODE_CHANGED = 'edx.course.enrollment.mode_changed'
 
 
-class PasswordHistory(models.Model):
-    """
-    This model is deprecated, no longer used, and slated for removal.
-    """
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    password = models.CharField(max_length=128)
-    time_set = models.DateTimeField(default=timezone.now)
-
-
 class LoginFailures(models.Model):
     """
     This model will keep track of failed login attempts
