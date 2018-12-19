@@ -132,7 +132,7 @@ def verify_certificates(request, certificate_uuid):
             'verify_id': certificate.verify_uuid,
             'mode': certificate.mode,
             'issue_date': certificate.modified_date,
-            'learner': certificate.name,
+            'learner': certificate.user.profile.name,
             'org': co.org,
             'start_date': co.start,
             'end_date': co.end,
