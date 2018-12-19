@@ -2786,7 +2786,8 @@ class TestXBlockInfo(ItemTest):
             self.assertIsNone(xblock_info.get('child_info', None))
 
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
-    def test_proctored_exam_xblock_info(self):
+    @patch('contentstore.views.item.get_exam_configuration_dashboard_url')
+    def test_proctored_exam_xblock_info(self, get_exam_configuration_dashboard_url_patch):
         self.course.enable_proctored_exams = True
         self.course.save()
         self.store.update_item(self.course, self.user.id)
@@ -2807,6 +2808,8 @@ class TestXBlockInfo(ItemTest):
             default_time_limit_minutes=100
         )
         sequential = modulestore().get_item(sequential.location)
+
+        get_exam_configuration_dashboard_url_patch.return_value = 'test_url'
         xblock_info = create_xblock_info(
             sequential,
             include_child_info=True,
@@ -2816,6 +2819,8 @@ class TestXBlockInfo(ItemTest):
         self.assertEqual(xblock_info['is_proctored_exam'], True)
         self.assertEqual(xblock_info['is_time_limited'], True)
         self.assertEqual(xblock_info['default_time_limit_minutes'], 100)
+        self.assertEqual(xblock_info['proctoring_exam_configuration_link'], 'test_url')
+        get_exam_configuration_dashboard_url_patch.assert_called_with(self.course.id, xblock_info['id'])
 
 
 class TestLibraryXBlockInfo(ModuleStoreTestCase):
