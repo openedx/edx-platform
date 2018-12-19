@@ -148,7 +148,7 @@ MOCK_SEARCH_BACKING_FILE = (
 # this secret key should be the same as lms/envs/bok_choy.py's
 SECRET_KEY = "very_secret_bok_choy_key"
 
-LMS_ROOT_URL = "http://localhost:8000"
+LMS_ROOT_URL = "http://localhost:8003"
 if RELEASE_LINE == "master":
     # On master, acceptance tests use edX books, not the default Open edX books.
     HELP_TOKENS_BOOKS = {

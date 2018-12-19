@@ -146,6 +146,7 @@ from lms.envs.common import (
     _make_locale_paths,
 )
 from path import Path as path
+from django.core.urlresolvers import reverse_lazy
 
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 from cms.lib.xblock.authoring_mixin import AuthoringMixin
@@ -368,6 +369,7 @@ CONTEXT_PROCESSORS = (
     'django.contrib.auth.context_processors.auth',  # this is required for admin
     'django.template.context_processors.csrf',
     'help_tokens.context_processor',
+    'openedx.core.djangoapps.site_configuration.context_processors.configuration_context',
 )
 
 # Django templating
@@ -423,9 +425,8 @@ DEFAULT_TEMPLATE_ENGINE = TEMPLATES[0]
 ##############################################################################
 
 EDX_ROOT_URL = ''
-
-LOGIN_REDIRECT_URL = EDX_ROOT_URL + '/signin'
-LOGIN_URL = EDX_ROOT_URL + '/signin'
+LOGIN_REDIRECT_URL = EDX_ROOT_URL + '/home/'
+LOGIN_URL = reverse_lazy('login_redirect_to_lms')
 
 # use the ratelimit backend to prevent brute force attacks
 AUTHENTICATION_BACKENDS = [

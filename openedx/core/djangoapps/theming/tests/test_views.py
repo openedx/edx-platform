@@ -46,7 +46,7 @@ class TestThemingViews(TestCase):
         self.assertRedirects(
             response,
             '{login_url}?next={url}'.format(
-                login_url=settings.LOGIN_REDIRECT_URL,
+                login_url=settings.LOGIN_URL,
                 url=THEMING_ADMIN_URL,
             )
         )
