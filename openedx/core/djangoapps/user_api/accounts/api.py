@@ -299,6 +299,18 @@ def update_account_settings(requesting_user, update, username=None):
                 u"Error thrown from do_email_change_request: '{}'".format(text_type(err)),
                 user_message=text_type(err)
             )
+    if changing_secondary_email:
+        try:
+            student_views.do_email_change_request(
+                user=existing_user,
+                new_email=update["secondary_email"],
+                secondary_email_change_request=True,
+            )
+        except ValueError as err:
+            raise AccountUpdateError(
+                u"Error thrown from do_email_change_request: '{}'".format(text_type(err)),
+                user_message=text_type(err)
+            )
 
 
 @helpers.intercept_errors(errors.UserAPIInternalError, ignore_errors=[errors.UserAPIRequestError])
