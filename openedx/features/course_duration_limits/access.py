@@ -5,7 +5,6 @@ and course access based on these limits.
 """
 from datetime import timedelta
 
-from django.apps import apps
 from django.utils import timezone
 from django.utils.translation import get_language, ugettext as _
 
