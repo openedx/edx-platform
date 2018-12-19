@@ -1237,6 +1237,8 @@ class CourseEnrollment(models.Model):
                 'run': self.course_id.run,
                 'mode': self.mode,
             }
+            if event_name == EVENT_NAME_ENROLLMENT_ACTIVATED:
+                segment_properties['email'] = self.user.email
             with tracker.get_tracker().context(event_name, context):
                 tracker.emit(event_name, data)
                 segment.track(self.user_id, event_name, segment_properties)
