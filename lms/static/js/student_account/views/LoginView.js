@@ -51,6 +51,7 @@
                 this.passwordResetSupportUrl = data.passwordResetSupportUrl;
                 this.createAccountOption = data.createAccountOption;
                 this.accountActivationMessages = data.accountActivationMessages;
+                this.accountRecoveryMessages = data.accountRecoveryMessages;
                 this.hideAuthWarnings = data.hideAuthWarnings;
                 this.pipelineUserDetails = data.pipelineUserDetails;
                 this.enterpriseName = data.enterpriseName;
@@ -111,13 +112,18 @@
 
                 // Display account activation success or error messages.
                 this.renderAccountActivationMessages();
+                this.renderAccountRecoveryMessages();
             },
 
             renderAccountActivationMessages: function() {
-                _.each(this.accountActivationMessages, this.renderAccountActivationMessage, this);
+                _.each(this.accountActivationMessages, this.renderMessage, this);
             },
 
-            renderAccountActivationMessage: function(message) {
+            renderAccountRecoveryMessages: function() {
+                _.each(this.accountRecoveryMessages, this.renderMessage, this);
+            },
+
+            renderMessage: function(message) {
                 this.renderFormFeedback(this.formStatusTpl, {
                     jsHook: message.tags,
                     message: HtmlUtils.HTML(message.message)

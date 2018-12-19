@@ -765,6 +765,7 @@ def account_recovery_request_handler(request):
             AUDIT_LOG.warning(
                 "Account recovery attempt via invalid secondary email '{email}'.".format(email=email)
             )
+            limiter.tick_bad_request_counter(request)
 
         return HttpResponse(status=200)
     else:
@@ -931,6 +932,132 @@ def password_reset_confirm_wrapper(request, uidb36=None, token=None):
     else:
         response = password_reset_confirm(
             request, uidb64=uidb64, token=token, extra_context=platform_name
+        )
+
+        response_was_successful = response.context_data.get('validlink')
+        if response_was_successful and not user.is_active:
+            user.is_active = True
+            user.save()
+
+    return response
+
+
+def account_recovery_confirm_wrapper(request, uidb36=None, token=None):
+    """
+    A wrapper around django.contrib.auth.views.password_reset_confirm.
+    Needed because we want to set the user as active at this step.
+    We also optionally do some additional password policy checks.
+    """
+    # convert old-style base36-encoded user id to base64
+    uidb64 = uidb36_to_uidb64(uidb36)
+    platform_name = {
+        "platform_name": configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)
+    }
+
+    # User can not get this link unless secondary email feature is enabled.
+    if not is_secondary_email_feature_enabled():
+        raise Http404
+
+    try:
+        uid_int = base36_to_int(uidb36)
+        user = User.objects.get(id=uid_int)
+    except (ValueError, User.DoesNotExist):
+        # if there's any error getting a user, just let django's
+        # password_reset_confirm function handle it.
+
+        return password_reset_confirm(
+            request,
+            uidb64=uidb64,
+            token=token,
+            extra_context=platform_name,
+            template_name='account_recovery/password_create_confirm.html'
+        )
+
+    if request.method == 'POST':
+        # We have to make a copy of request.POST because it is a QueryDict object which is immutable until copied.
+        # We have to use request.POST because the password_reset_confirm method takes in the request and a user's
+        # password is set to the request.POST['new_password1'] field. We have to also normalize the new_password2
+        # field so it passes the equivalence check that new_password1 == new_password2
+        # In order to switch out of having to do this copy, we would want to move the normalize_password code into
+        # a custom User model's set_password method to ensure it is always happening upon calling set_password.
+        request.POST = request.POST.copy()
+        request.POST['new_password1'] = normalize_password(request.POST['new_password1'])
+        request.POST['new_password2'] = normalize_password(request.POST['new_password2'])
+
+        password = request.POST['new_password1']
+
+        try:
+            validate_password(password, user=user)
+        except ValidationError as err:
+            # We have a password reset attempt which violates some security
+            # policy, or any other validation. Use the existing Django template to communicate that
+            # back to the user.
+            context = {
+                'validlink': True,
+                'form': None,
+                'title': _('Password creation unsuccessful'),
+                'err_msg': ' '.join(err.messages),
+            }
+            context.update(platform_name)
+
+            return TemplateResponse(
+                request, 'account_recovery/password_create_confirm.html', context
+            )
+
+        # remember what the old password hash is before we call down
+        old_password_hash = user.password
+
+        response = password_reset_confirm(
+            request,
+            uidb64=uidb64,
+            token=token,
+            extra_context=platform_name,
+            template_name='account_recovery/password_create_confirm.html',
+            post_reset_redirect='signin_user',
+        )
+
+        # If password reset was unsuccessful a template response is returned (status_code 200).
+        # Check if form is invalid then show an error to the user.
+        # Note if password reset was successful we get response redirect (status_code 302).
+        if response.status_code == 200:
+            form_valid = response.context_data['form'].is_valid() if response.context_data['form'] else False
+            if not form_valid:
+                log.warning(
+                    u'Unable to create password for user [%s] because form is not valid. '
+                    u'A possible cause is that the user had an invalid create token',
+                    user.username,
+                )
+                response.context_data['err_msg'] = _('Error in creating your password. Please try again.')
+                return response
+
+        # get the updated user
+        updated_user = User.objects.get(id=uid_int)
+        updated_user.email = updated_user.account_recovery.secondary_email
+        updated_user.save()
+
+        if response.status_code == 302:
+            messages.success(
+                request,
+                HTML(_(
+                    '{html_start}Password Creation Complete{html_end}'
+                    'Your password has been created. {bold_start}{email}{bold_end} is now your primary login email.'
+                )).format(
+                    support_url=configuration_helpers.get_value('SUPPORT_SITE_LINK', settings.SUPPORT_SITE_LINK),
+                    html_start=HTML('<p class="message-title">'),
+                    html_end=HTML('</p>'),
+                    bold_start=HTML('<b>'),
+                    bold_end=HTML('</b>'),
+                    email=updated_user.email,
+                ),
+                extra_tags='account-recovery aa-icon submission-success'
+            )
+    else:
+        response = password_reset_confirm(
+            request,
+            uidb64=uidb64,
+            token=token,
+            extra_context=platform_name,
+            template_name='account_recovery/password_create_confirm.html',
         )
 
         response_was_successful = response.context_data.get('validlink')
