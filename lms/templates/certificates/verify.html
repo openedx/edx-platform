@@ -4,12 +4,12 @@ from django.utils.translation import ugettext as _
 %>
 
 <%block name="title">
-    <title>${_("英荔商学院")}</title>
+    <title>${_(u"英荔商学院")}</title>
 </%block>
 
 <div class="validate">
   <img src="/static/certificates/images/validate.png">
-  <div class="right"><span></span><span>${_("该证书真实有效")}</span></div>
+  <div class="right"><span></span><span>${_(u"该证书真实有效")}</span></div>
   <div class="validate-dec-line">
     <div> </div>
     <div> </div>
@@ -17,36 +17,36 @@ from django.utils.translation import ugettext as _
   </div>
   <ul class="validate-dec">
     <li>
-      <span>${_("持证学员")}</span>
+      <span>${_(u"持证学员")}</span>
       <span>${learner}</span>
     </li>
     <li>
-      <span>${_("证书编号")}</span>
+      <span>${_(u"证书编号")}</span>
       <span>${verify_id}</span>
     </li>
     <li>
-      <span>${_("所属机构")}</span>
+      <span>${_(u"所属机构")}</span>
       <span>${org}</span>
     </li>
     <li>
-      <span>${_("课程名称")}</span>
+      <span>${_(u"课程名称")}</span>
       <span>${name}</span>
     </li>
     <li>
-      <span>${_("学习时间")}</span>
+      <span>${_(u"学习时间")}</span>
       <span>${start_date}-${end_date}</span>
     </li>
     <li>
-      <span>${_("学习类型")}</span>
+      <span>${_(u"学习类型")}</span>
       <span>${mode}</span>
     </li>
     <li>
-      <span>${_("发证时间")}</span>
+      <span>${_(u"发证时间")}</span>
       <span>${issue_date}</span>
     </li>
     <li>
-      <span>${_("电子证书")}</span>
-      <span><a href="${cert_web_url}">${_("点击查看")}</a></span>
+      <span>${_(u"电子证书")}</span>
+      <span><a href="${cert_web_url}">${_(u"点击查看")}</a></span>
     </li>
   </ul>
 </div>
