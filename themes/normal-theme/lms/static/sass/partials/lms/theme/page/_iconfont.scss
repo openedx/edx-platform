@@ -45,7 +45,8 @@ $icon-width: 18px;
 .fa-newspaper-o:before,
 .course-content .bookmark-button::before,
 .fa-floppy-o:before,
-.fa-save:before
+.fa-save:before,
+.fa-arrow-right:before
 {
   content: '';
   display: inline-block;
@@ -167,6 +168,8 @@ $icon-width: 18px;
 .discussion-board{
   .fa-search:before{
     background-position: calcP(7, 4);
+    position: relative;
+    top: 2px;
   }
   .fa-plus:before{
     background-position: calcP(2, 9)
@@ -224,6 +227,13 @@ $icon-width: 18px;
 .fa-floppy-o:before,
 .fa-save:before{
   background-position: calcP(13, 7)
+}
+.fa-arrow-right:before{
+  background-position: calcP(11, 4);
+  margin-left: 10px;
+  transform: scale(0.6);
+  position: relative;
+  left: -2px;
 }
 
 

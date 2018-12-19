@@ -49,10 +49,6 @@ body.view-in-course .wrapper-course-material .course-tabs{
     margin-right: 10px;
   }
   
-  .search-button{
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-  }
   @media(max-width:767px){
     .form-actions{
       margin-top: 0;
@@ -66,6 +62,10 @@ body.view-in-course .wrapper-course-material .course-tabs{
   }
 }
 
+#course-container .page-header .input-group-btn .search-button{
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
 
 
 

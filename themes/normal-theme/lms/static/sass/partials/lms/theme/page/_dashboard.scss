@@ -198,9 +198,15 @@
     .result-link{
       line-height: 1.2;
     }
-    .result-location, .result-course-name{
-      color: $font;
-      word-break: break-word;
+    .result-location{
+      line-height: 1.4;
+      .result-course-name{
+        color: $font;
+        word-break: break-word;
+      }
+    }
+    .result-type{
+      font-size: 12px;
     }
   }
 
