@@ -411,7 +411,7 @@ class LmsDashboardA11yTest(BaseLmsDashboardTestMultiple):
         """
         self.dashboard_page.a11y_audit.config.set_rules({
             "ignore": [
-                'aria-valid-attr', #TODO: LEARNER-6611 & LEARNER-6865
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
             ]
         })
         course_listings = self.dashboard_page.get_courses()

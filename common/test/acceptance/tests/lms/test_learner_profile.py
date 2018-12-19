@@ -695,7 +695,7 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, AcceptanceTest):
         profile_page = self.visit_profile_page(username)
         profile_page.a11y_audit.config.set_rules({
             "ignore": [
-                'aria-valid-attr', #TODO: LEARNER-6611 & LEARNER-6865
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
             ]
         })
         profile_page.a11y_audit.check_for_accessibility_errors()
@@ -721,7 +721,7 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, AcceptanceTest):
         profile_page = self.visit_profile_page(different_username)
         profile_page.a11y_audit.config.set_rules({
             "ignore": [
-                'aria-valid-attr', #TODO: LEARNER-6611 & LEARNER-6865
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
             ]
         })
         profile_page.a11y_audit.check_for_accessibility_errors()
@@ -731,12 +731,12 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, AcceptanceTest):
         Test the accessibility of the badge listings and sharing modal.
         """
         username = 'testcert'
-        
+
         AutoAuthPage(self.browser, username=username).visit()
         profile_page = self.visit_profile_page(username)
         profile_page.a11y_audit.config.set_rules({
             "ignore": [
-                'aria-valid-attr', #TODO: LEARNER-6611 & LEARNER-6865
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
             ]
         })
         profile_page.display_accomplishments()
