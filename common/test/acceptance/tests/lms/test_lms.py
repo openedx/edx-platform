@@ -536,12 +536,12 @@ class CourseWikiA11yTest(UniqueCourseTest):
         """
         Verify the basic accessibility of edit wiki page.
         """
+        self._open_editor()
         self.course_wiki_edit_page.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr', #TODO: LEARNER-6611 & LEARNER-6865
             ]
         })
-        self._open_editor()
         self.course_wiki_edit_page.a11y_audit.check_for_accessibility_errors()
 
     def test_changes(self):
