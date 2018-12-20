@@ -272,7 +272,7 @@
                 fields: []
             };
             
-            fmts = gettext('Enter your %s username or the URL to your %s page. Delete the URL to remove the link.')
+            var fmts = gettext('Enter your %s username or the URL to your %s page. Delete the URL to remove the link.')
             for (var socialPlatform in socialPlatforms) {  // eslint-disable-line guard-for-in, no-restricted-syntax, vars-on-top, max-len
                 platformData = socialPlatforms[socialPlatform];
                 socialFields.fields.push(
