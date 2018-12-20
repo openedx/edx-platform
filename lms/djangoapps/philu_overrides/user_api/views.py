@@ -208,7 +208,10 @@ def create_account_with_params_custom(request, params, is_alquity_user):
         not eamap.external_domain.startswith(openedx.core.djangoapps.external_auth.views.SHIBBOLETH_DOMAIN_PREFIX)
     )
 
-    params['name'] = "{} {}".format(params.get('first_name'), params.get('last_name'))
+    params['name'] = "{} {}".format(
+        params.get('first_name', '').encode('utf-8'), params.get('last_name', '').encode('utf-8')
+    )
+
     form = AccountCreationForm(
         data=params,
         extra_fields=extra_fields,

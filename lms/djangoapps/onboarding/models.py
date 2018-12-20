@@ -510,7 +510,7 @@ class UserExtendedProfile(TimeStampedModel):
             if _function_area_field in selected_values:
                 _updated_value_about_philanthropy = self.HEAR_ABOUT_PHILANTHROPY_LABELS.get(function_area_field)
             if _function_area_field == 'hear_about_other' and _other_field:
-                _updated_value_about_philanthropy_other = str(_other_field[0])
+                _updated_value_about_philanthropy_other = _other_field[0]
 
         self.__setattr__('hear_about_philanthropy', _updated_value_about_philanthropy)
         self.__setattr__('hear_about_philanthropy_other', _updated_value_about_philanthropy_other)
