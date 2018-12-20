@@ -320,9 +320,15 @@ from student.models import CourseEnrollment
                 <div class="user-info">
                   <ul>
                     <li class="status status-verification status-is-vip">
-                          <p class="status-note">会员有效期到 <br/>
-                            <span style="font-size:16px;line-height: 1.8;">${vip_expired_at.strftime('%Y-%m-%d %H:%M')}</span>
-                        </p>
+                      <p class="status-note">会员有效期到 <br/>
+                        <span style="font-size:16px;line-height: 1.8;">
+                          % if user_timezone:
+                            ${vip_expired_at.astimezone(pytz.timezone(user_timezone)).strftime('%Y-%m-%d %H:%M')}
+                          % else:
+                            ${vip_expired_at.astimezone(pytz.timezone(settings.TIME_ZONE)).strftime('%Y-%m-%d %H:%M')}
+                          % endif
+                        </span>
+                      </p>
                     </li>
                   </ul>
                 </div>
