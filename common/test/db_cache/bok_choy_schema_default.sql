@@ -2181,7 +2181,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=505 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=507 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2866,7 +2866,7 @@ CREATE TABLE `enterprise_historicalenterprisecustomer` (
   `slug` varchar(30) NOT NULL,
   `country` varchar(2) DEFAULT NULL,
   `enable_autocohorting` tinyint(1) NOT NULL,
-  `customer_type_id` int(11) DEFAULT NULL,
+  `customer_type_id` int(11),
   `enable_portal_code_management_screen` tinyint(1) NOT NULL,
   PRIMARY KEY (`history_id`),
   KEY `enterprise_hist_history_user_id_2938dabbace21ece_fk_auth_user_id` (`history_user_id`),
