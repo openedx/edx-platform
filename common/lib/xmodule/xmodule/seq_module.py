@@ -497,7 +497,8 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
 
             if is_user_authenticated:
                 if item.location.block_type == 'vertical':
-                    iteminfo['complete'] = completion_service.vertical_is_complete(item)
+                    if completion_service:
+                        iteminfo['complete'] = completion_service.vertical_is_complete(item)
 
             contents.append(iteminfo)
 
