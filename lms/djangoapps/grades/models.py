@@ -415,7 +415,6 @@ class PersistentSubsectionGrade(TimeStampedModel):
         cls._prepare_params(params)
         VisibleBlocks.cached_get_or_create(params['user_id'], params['visible_blocks'])
         cls._prepare_params_visible_blocks_id(params)
-        cls._prepare_params_override(params)
 
         # TODO: do we NEED to pop these?
         first_attempted = params.pop('first_attempted')
@@ -428,6 +427,7 @@ class PersistentSubsectionGrade(TimeStampedModel):
             usage_key=usage_key,
             defaults=params,
         )
+        grade.override = PersistentSubsectionGradeOverride.get_override(user_id, usage_key)
         if first_attempted is not None and grade.first_attempted is None:
             grade.first_attempted = first_attempted
             grade.save()
@@ -450,7 +450,6 @@ class PersistentSubsectionGrade(TimeStampedModel):
             user_id, course_key, [params['visible_blocks'] for params in grade_params_iter]
         )
         map(cls._prepare_params_visible_blocks_id, grade_params_iter)
-        map(cls._prepare_params_override, grade_params_iter)
 
         grades = [PersistentSubsectionGrade(**params) for params in grade_params_iter]
         grades = cls.objects.bulk_create(grades)
@@ -480,19 +479,6 @@ class PersistentSubsectionGrade(TimeStampedModel):
         """
         params['visible_blocks_id'] = params['visible_blocks'].hash_value
         del params['visible_blocks']
-
-    @classmethod
-    def _prepare_params_override(cls, params):
-        override = PersistentSubsectionGradeOverride.get_override(params['user_id'], params['usage_key'])
-        if override:
-            if override.earned_all_override is not None:
-                params['earned_all'] = override.earned_all_override
-            if override.possible_all_override is not None:
-                params['possible_all'] = override.possible_all_override
-            if override.earned_graded_override is not None:
-                params['earned_graded'] = override.earned_graded_override
-            if override.possible_graded_override is not None:
-                params['possible_graded'] = override.possible_graded_override
 
     @staticmethod
     def _emit_grade_calculated_event(grade):
@@ -689,6 +675,55 @@ class PersistentSubsectionGradeOverride(models.Model):
             )
         except PersistentSubsectionGradeOverride.DoesNotExist:
             pass
+
+    @classmethod
+    def update_or_create_override(
+        cls, requesting_user, subsection_grade_model, feature=None, action=None, **override_data
+    ):
+        """
+        Creates or updates an override object for the given PersistentSubsectionGrade.
+        Args:
+            requesting_user: The user that is creating the override (so we can record this action in
+            a PersistentSubsectionGradeOverrideHistory record).
+            subsection_grade_model: The PersistentSubsectionGrade object associated with this override.
+            override_data: The parameters of score values used to create the override record.
+        """
+        override, _ = PersistentSubsectionGradeOverride.objects.update_or_create(
+            grade=subsection_grade_model,
+            defaults=cls._prepare_override_params(subsection_grade_model, override_data),
+        )
+
+        action = action or PersistentSubsectionGradeOverrideHistory.CREATE_OR_UPDATE
+
+        PersistentSubsectionGradeOverrideHistory.objects.create(
+            override_id=override.id,
+            user=requesting_user,
+            feature=feature,
+            action=action,
+        )
+        return override
+
+    @staticmethod
+    def _prepare_override_params(subsection_grade_model, override_data):
+        """
+        Helper method to strip any grade override field names that won't work
+        as defaults when calling PersistentSubsectionGradeOverride.update_or_create(),
+        and to use default values from the associated PersistentSubsectionGrade
+        for any override fields that are not specified.
+        """
+        allowed_fields_and_defaults = {
+            'earned_all_override': 'earned_all',
+            'possible_all_override': 'possible_all',
+            'earned_graded_override': 'earned_graded',
+            'possible_graded_override': 'possible_graded',
+        }
+        cleaned_data = {}
+        for override_field_name, field_name in allowed_fields_and_defaults.items():
+            cleaned_data[override_field_name] = override_data.get(
+                override_field_name,
+                getattr(subsection_grade_model, field_name)
+            )
+        return cleaned_data
 
 
 class PersistentSubsectionGradeOverrideHistory(models.Model):

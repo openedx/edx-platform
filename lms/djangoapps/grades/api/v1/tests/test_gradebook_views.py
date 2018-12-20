@@ -385,6 +385,8 @@ class GradebookViewTest(GradebookViewTestBase):
         Helper function to mock a subsection grade.
         """
         model = MagicMock(**kwargs)
+        if 'override' not in kwargs:
+            del model.override
         factory = MagicMock()
         return ReadSubsectionGrade(subsection, model, factory)
 
@@ -623,42 +625,48 @@ class GradebookViewTest(GradebookViewTestBase):
         with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
             course_grade = self.mock_course_grade(self.student, passed=True, letter_grade='A', percent=0.85)
 
+            mock_override = MagicMock(
+                earned_all_override=1.0,
+                possible_all_override=2.0,
+                earned_graded_override=1.0,
+                possible_graded_override=2.0,
+            )
             mock_subsection_grades = {
                 self.subsections[self.chapter_1.location][0].location: self.mock_subsection_grade(
                     self.subsections[self.chapter_1.location][0],
                     earned_all=1.0,
                     possible_all=2.0,
-                    earned_graded=1.0,
+                    earned_graded=2.0,
                     possible_graded=2.0,
                     first_attempted=None,
-                    override=MagicMock(),
+                    override=mock_override,
                 ),
                 self.subsections[self.chapter_1.location][1].location: self.mock_subsection_grade(
                     self.subsections[self.chapter_1.location][1],
                     earned_all=1.0,
                     possible_all=2.0,
-                    earned_graded=1.0,
+                    earned_graded=2.0,
                     possible_graded=2.0,
                     first_attempted=None,
-                    override=MagicMock(),
+                    override=mock_override,
                 ),
                 self.subsections[self.chapter_2.location][0].location: self.mock_subsection_grade(
                     self.subsections[self.chapter_2.location][0],
                     earned_all=1.0,
                     possible_all=2.0,
-                    earned_graded=1.0,
+                    earned_graded=2.0,
                     possible_graded=2.0,
                     first_attempted=None,
-                    override=MagicMock(),
+                    override=mock_override,
                 ),
                 self.subsections[self.chapter_2.location][1].location: self.mock_subsection_grade(
                     self.subsections[self.chapter_2.location][1],
                     earned_all=1.0,
                     possible_all=2.0,
-                    earned_graded=1.0,
+                    earned_graded=2.0,
                     possible_graded=2.0,
                     first_attempted=None,
-                    override=MagicMock(),
+                    override=mock_override,
                 ),
             }
             course_grade.subsection_grade = lambda key: mock_subsection_grades[key]
@@ -1163,20 +1171,31 @@ class GradebookBulkUpdateViewTest(GradebookViewTestBase):
 
             # We should now have PersistentSubsectionGradeOverride records corresponding to
             # our bulk-update request, and PersistentSubsectionGrade records with grade values
-            # equal to those of the override.
-            for usage_key, expected_grades in (
-                (self.subsections[self.chapter_1.location][0].location, GradeFields(3, 3, 2, 2)),
-                (self.subsections[self.chapter_1.location][1].location, GradeFields(3, 4, 3, 4)),
+            # equal to the aggregate of their problem scores (in this case, zeros, since we
+            # didn't mock out CourseGradeFactory.read() to return a non-zero score for anything).
+            for usage_key, expected_grades, expected_grade_overrides in (
+                (
+                    self.subsections[self.chapter_1.location][0].location,
+                    GradeFields(0, 0, 0, 0),
+                    GradeFields(3, 3, 2, 2)
+                ),
+                (
+                    self.subsections[self.chapter_1.location][1].location,
+                    GradeFields(0, 0, 0, 0),
+                    GradeFields(3, 4, 3, 4)
+                ),
             ):
                 # this selects related PersistentSubsectionGradeOverride objects.
                 grade = PersistentSubsectionGrade.read_grade(
                     user_id=self.student.id,
                     usage_key=usage_key,
                 )
+                for field_name in expected_grade_overrides._fields:
+                    expected_value = getattr(expected_grade_overrides, field_name)
+                    self.assertEqual(expected_value, getattr(grade.override, field_name + '_override'))
                 for field_name in expected_grades._fields:
                     expected_value = getattr(expected_grades, field_name)
                     self.assertEqual(expected_value, getattr(grade, field_name))
-                    self.assertEqual(expected_value, getattr(grade.override, field_name + '_override'))
 
             update_records = PersistentSubsectionGradeOverrideHistory.objects.filter(user=request_user)
             self.assertEqual(update_records.count(), 3)

@@ -2,12 +2,18 @@
 Tests for the SubsectionGradeFactory class.
 """
 import ddt
-from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
-from django.conf import settings
-from lms.djangoapps.grades.config.tests.utils import persistent_grades_feature_flags
 from mock import patch
+from django.conf import settings
 
-from ..models import PersistentSubsectionGrade, PersistentSubsectionGradeOverride
+from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
+from lms.djangoapps.grades.config.tests.utils import persistent_grades_feature_flags
+from student.tests.factories import UserFactory
+
+from ..models import (
+    PersistentSubsectionGrade,
+    PersistentSubsectionGradeOverride,
+    PersistentSubsectionGradeOverrideHistory,
+)
 from ..subsection_grade_factory import ZeroSubsectionGrade
 from .base import GradeTestBase
 from .utils import mock_get_score
@@ -125,10 +131,12 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
         self.assertEqual(3, persistent_grade.possible_graded)
 
         # Now create the override
-        PersistentSubsectionGradeOverride.objects.create(
-            grade=persistent_grade,
+        PersistentSubsectionGradeOverride.update_or_create_override(
+            UserFactory(),
+            persistent_grade,
             earned_graded_override=0,
             earned_all_override=0,
+            feature=PersistentSubsectionGradeOverrideHistory.GRADEBOOK,
         )
 
         # Now, even if the problem scores interface gives us a 2/3,

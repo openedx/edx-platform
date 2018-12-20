@@ -1,5 +1,5 @@
-1. Gradebook read and write APIs
---------------------------------
+Gradebook read and write APIs
+-----------------------------
 
 Status
 ======

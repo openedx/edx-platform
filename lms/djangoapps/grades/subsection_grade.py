@@ -43,7 +43,7 @@ class SubsectionGradeBase(object):
         Returns whether any problem in this subsection
         was attempted by the student.
         """
-
+        # pylint: disable=no-member
         assert self.all_total is not None, (
             "SubsectionGrade not fully populated yet.  Call init_from_structure or init_from_model "
             "before use."
@@ -182,24 +182,34 @@ class NonZeroSubsectionGrade(SubsectionGradeBase):
                     block,
                 )
 
+    @staticmethod
+    def _aggregated_score_from_model(grade_model, is_graded):
+        """
+        Helper method that returns `AggregatedScore` objects based on
+        the values in the given `grade_model`.  If the given model
+        has an associated override, the values from the override are
+        used instead.
+        """
+        score_type = 'graded' if is_graded else 'all'
+        grade_object = grade_model
+        if hasattr(grade_model, 'override'):
+            score_type = 'graded_override' if is_graded else 'all_override'
+            grade_object = grade_model.override
+        return AggregatedScore(
+            tw_earned=getattr(grade_object, 'earned_{}'.format(score_type)),
+            tw_possible=getattr(grade_object, 'possible_{}'.format(score_type)),
+            graded=is_graded,
+            first_attempted=grade_model.first_attempted,
+        )
+
 
 class ReadSubsectionGrade(NonZeroSubsectionGrade):
     """
     Class for Subsection grades that are read from the database.
     """
     def __init__(self, subsection, model, factory):
-        all_total = AggregatedScore(
-            tw_earned=model.earned_all,
-            tw_possible=model.possible_all,
-            graded=False,
-            first_attempted=model.first_attempted,
-        )
-        graded_total = AggregatedScore(
-            tw_earned=model.earned_graded,
-            tw_possible=model.possible_graded,
-            graded=True,
-            first_attempted=model.first_attempted,
-        )
+        all_total = self._aggregated_score_from_model(model, is_graded=False)
+        graded_total = self._aggregated_score_from_model(model, is_graded=True)
         override = model.override if hasattr(model, 'override') else None
 
         # save these for later since we compute problem_scores lazily
@@ -216,6 +226,7 @@ class ReadSubsectionGrade(NonZeroSubsectionGrade):
         It means we look through the user-specific subtree of this subsection,
         taking into account which problems are visible to the user.
         """
+        # pylint: disable=protected-access
         problem_scores = OrderedDict()
         for block in self.model.visible_blocks.blocks:
             problem_score = self._compute_block_score(
@@ -254,28 +265,16 @@ class CreateSubsectionGrade(NonZeroSubsectionGrade):
         """
         if self._should_persist_per_attempted(score_deleted, force_update_subsections):
             model = PersistentSubsectionGrade.update_or_create_grade(**self._persisted_model_params(student))
-            self._update_aggregated_scores_from_model(model)
+
+            if hasattr(model, 'override'):
+                # When we're doing an update operation, the PersistentSubsectionGrade model
+                # will be updated based on the problem_scores, but if a grade override
+                # exists that's related to the updated persistent grade, we need to update
+                # the aggregated scores for this object to reflect the override.
+                self.all_total = self._aggregated_score_from_model(model, is_graded=False)
+                self.graded_total = self._aggregated_score_from_model(model, is_graded=True)
+
             return model
-
-    def _update_aggregated_scores_from_model(self, model):
-        """
-        Updates this grade's `all_total` and `graded_total` attributes
-        to reflect the values from the related persisted model.
-        This is important, because PersistentSubsectionGradeOverrides
-        are only taken into account when reading/writing at the persistence layer,
-        so after we update a PersistentSubsectionGrade model (which could involve
-        writing values that are overridden by the PersistentSubsectionGradeOverride model)
-        we also need to update this grade object's attributes to reflect the
-        now (possibly) overriden values.
-        TODO: https://openedx.atlassian.net/browse/EDUCATOR-3835
-        """
-        self.all_total.earned = model.earned_all
-        self.all_total.possible = model.possible_all
-        self.all_total.first_attempted = model.first_attempted
-
-        self.graded_total.earned = model.earned_graded
-        self.graded_total.possible = model.possible_graded
-        self.graded_total.first_attempted = model.first_attempted
 
     @classmethod
     def bulk_create_models(cls, student, subsection_grades, course_key):

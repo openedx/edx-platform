@@ -1,5 +1,5 @@
-2. Gradebook User Interface and Experience
-------------------------------------------
+Gradebook User Interface and Experience
+---------------------------------------
 
 Status
 ======
