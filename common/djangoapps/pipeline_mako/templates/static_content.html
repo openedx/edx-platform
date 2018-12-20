@@ -86,7 +86,13 @@ except:
 from django.conf import settings
 from django.template.engine import Engine
 from django.template.loaders.filesystem import Loader
-engine = Engine(dirs=settings.DEFAULT_TEMPLATE_ENGINE['DIRS'])
+from openedx.core.djangoapps.theming.helpers import get_current_theme
+dirs = settings.DEFAULT_TEMPLATE_ENGINE['DIRS']
+theme = get_current_theme()
+if theme:
+    dirs = list(dirs)
+    dirs.insert(0, theme.path / 'templates')
+engine = Engine(dirs=dirs)
 source, template_path = Loader(engine).load_template_source(path)
 %>${source | n, decode.utf8}</%def>
 
