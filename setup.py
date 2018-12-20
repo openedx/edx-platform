@@ -1,5 +1,5 @@
 """
-Setup script for the Open edX package.
+Setup script for the Open edX package. Trivial Change
 """
 
 from setuptools import setup
