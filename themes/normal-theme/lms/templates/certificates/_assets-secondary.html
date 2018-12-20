@@ -17,7 +17,7 @@
     //二维码扫码
     var code = document.getElementById("code");
     var url = $.trim($('#url').text());
-    url = location.host+url;   
+    url = location.protocol+ '//' + location.host + url;   
     var data = {    
         text: url,
         width: 78,
