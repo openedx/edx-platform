@@ -26,6 +26,7 @@ from lms.djangoapps.courseware.views.views import CourseTabView
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.util.maintenance_banner import add_maintenance_banner
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
+from openedx.features.course_duration_limits.access import generate_course_expired_fragment
 from student.models import CourseEnrollment
 from util.views import ensure_valid_course_key
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC_OUTLINE, COURSE_VISIBILITY_PUBLIC
@@ -132,6 +133,7 @@ class CourseHomeFragmentView(EdxFragmentView):
         outline_fragment = None
         update_message_fragment = None
         course_sock_fragment = None
+        course_expiration_fragment = None
         has_visited_course = None
         resume_course_url = None
         handouts_html = None
@@ -151,6 +153,7 @@ class CourseHomeFragmentView(EdxFragmentView):
             course_sock_fragment = CourseSockFragmentView().render_to_fragment(request, course=course, **kwargs)
             has_visited_course, resume_course_url = self._get_resume_course_info(request, course_id)
             handouts_html = self._get_course_handouts(request, course)
+            course_expiration_fragment = generate_course_expired_fragment(request.user, course)
         elif allow_public_outline or allow_public:
             outline_fragment = CourseOutlineFragmentView().render_to_fragment(
                 request, course_id=course_id, user_is_enrolled=False, **kwargs
@@ -198,6 +201,7 @@ class CourseHomeFragmentView(EdxFragmentView):
             'outline_fragment': outline_fragment,
             'handouts_html': handouts_html,
             'course_home_message_fragment': course_home_message_fragment,
+            'course_expiration_fragment': course_expiration_fragment,
             'has_visited_course': has_visited_course,
             'resume_course_url': resume_course_url,
             'course_tools': course_tools,

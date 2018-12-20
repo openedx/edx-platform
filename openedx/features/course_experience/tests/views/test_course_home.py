@@ -64,7 +64,7 @@ TEST_PASSWORD = 'test'
 TEST_CHAPTER_NAME = 'Test Chapter'
 TEST_COURSE_TOOLS = 'Course Tools'
 TEST_COURSE_TODAY = 'Today is'
-TEST_BANNER_CLASS = '<div class="page-banner">'
+TEST_BANNER_CLASS = '<div class="course-expiration-message">'
 TEST_WELCOME_MESSAGE = '<h2>Welcome!</h2>'
 TEST_UPDATE_MESSAGE = '<h2>Test Update!</h2>'
 TEST_COURSE_UPDATES_TOOL = '/course/updates">'
@@ -688,7 +688,6 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         response = self.client.get(url)
         bannerText = get_expiration_banner_text(user, self.course)
         self.assertContains(response, bannerText, html=True)
-        self.assertContains(response, TEST_BANNER_CLASS)
 
         # Verify that enrolled users are not shown the course expiration banner if content gating is disabled
         config.enabled = False

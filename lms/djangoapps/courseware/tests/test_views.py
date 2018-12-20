@@ -10,6 +10,7 @@ from HTMLParser import HTMLParser
 from urllib import quote, urlencode
 from uuid import uuid4
 from crum import set_current_request
+from markupsafe import escape
 
 from completion.test_utils import CompletionWaffleTestMixin
 import ddt
@@ -214,8 +215,8 @@ class IndexQueryTestCase(ModuleStoreTestCase):
     NUM_PROBLEMS = 20
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 10, 178),
-        (ModuleStoreEnum.Type.split, 4, 172),
+        (ModuleStoreEnum.Type.mongo, 10, 179),
+        (ModuleStoreEnum.Type.split, 4, 173),
     )
     @ddt.unpack
     def test_index_query_counts(self, store_type, expected_mongo_query_count, expected_mysql_query_count):
@@ -2753,6 +2754,7 @@ class TestIndexViewWithCourseDurationLimits(ModuleStoreTestCase):
         with self.store.bulk_operations(self.course.id):
             self.chapter = ItemFactory.create(parent=self.course, category="chapter")
             self.sequential = ItemFactory.create(parent=self.chapter, category='sequential')
+            self.vertical = ItemFactory.create(parent=self.sequential, category="vertical")
 
         CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
 
@@ -2775,7 +2777,12 @@ class TestIndexViewWithCourseDurationLimits(ModuleStoreTestCase):
             )
         )
         bannerText = get_expiration_banner_text(self.user, self.course)
-        self.assertContains(response, bannerText, html=True)
+        # Banner is XBlock wrapper, so it is escaped in raw response. Since
+        # it's escaped, ignoring the whitespace with assertContains doesn't
+        # work. Instead we remove all whitespace to verify content is correct.
+        bannerText_no_spaces = escape(bannerText).replace(' ', '')
+        response_no_spaces = response.content.decode('utf-8').replace(' ', '')
+        self.assertIn(bannerText_no_spaces, response_no_spaces)
 
     def test_index_without_course_duration_limits(self):
         """
