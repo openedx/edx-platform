@@ -1447,8 +1447,12 @@ class UserRoleTest(ModuleStoreTestCase):
             'role': role.ROLE,
         }
 
-    def _assert_roles(self, expected_response):
-        response = self.client.get(reverse('roles'))
+    def _assert_roles(self, expected_roles, course_id=None):
+        """ Asserts that the api call is successful and returns the expected roles """
+        if course_id is not None:
+            response = self.client.get(reverse('roles'), {'course_id': course_id})
+        else:
+            response = self.client.get(reverse('roles'))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         response_data = json.loads(response.content)
         self.assertEqual(response_data, expected_response)
@@ -1470,6 +1474,16 @@ class UserRoleTest(ModuleStoreTestCase):
         role2.add_users(self.user)
         expected_role2 = self._create_expected_role_dict(self.course2, role2)
         self._assert_roles([expected_role2, expected_role1])
+
+    def test_roles_filter(self):
+        role1 = CourseStaffRole(self.course1.id)
+        role1.add_users(self.user)
+        expected_role1 = self._create_expected_role_dict(self.course1, role1)
+        role2 = CourseStaffRole(self.course2.id)
+        role2.add_users(self.user)
+        expected_role2 = self._create_expected_role_dict(self.course2, role2)
+        self._assert_roles([expected_role1], course_id=text_type(self.course1.id))
+        self._assert_roles([expected_role2], course_id=text_type(self.course2.id))
 
     def test_roles_exception(self):
         with patch('enrollment.api.get_user_roles') as mock_get_user_roles:
