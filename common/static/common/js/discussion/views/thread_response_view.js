@@ -82,9 +82,7 @@
 
             ThreadResponseView.prototype.render = function() {
                 this.$el.addClass('response_' + this.model.get('id'));
-
-                // Setting the HTML through utils to cope for tag-less text
-                edx.HtmlUtils.setHtml(this.$el, edx.HtmlUtils.HTML(this.renderTemplate()));
+                this.$el.html(this.renderTemplate());
                 this.delegateEvents();
                 this.renderShowView();
                 this.renderAttrs();
@@ -311,7 +309,6 @@
                 event.preventDefault();
                 this.createShowView();
                 this.renderShowView();
-                DiscussionUtil.typesetMathJax(this.$el.find('.response-body'));
                 return this.showCommentForm();
             };
 
@@ -345,7 +342,6 @@
                         });
                         self.createShowView();
                         self.renderShowView();
-                        DiscussionUtil.typesetMathJax(self.$el.find('.response-body'));
                         return self.showCommentForm();
                     }
                 });
