@@ -137,7 +137,9 @@ class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         store = modulestore()
 
         services = kwargs.setdefault('services', {})
-        services['completion'] = CompletionService(user=kwargs.get('user'), course_key=kwargs.get('course_id'))
+        user = kwargs.get('user')
+        if user and user.is_authenticated:
+            services['completion'] = CompletionService(user=user, course_key=kwargs.get('course_id'))
         services['fs'] = xblock.reference.plugins.FSService()
         services['i18n'] = ModuleI18nService
         services['library_tools'] = LibraryToolsService(store)
