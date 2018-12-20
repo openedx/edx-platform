@@ -45,7 +45,7 @@ else:
   % else:
     <div class="message message-status ${status_css_class} is-shown">
       <p class="message-copy">${_("Your final grade:")}
-        <span class="grade-value">${"{0:.0f}%".format(float(cert_status['grade'])*100)}</span>.
+        <span class="grade-value">${"{0:.0f}%".format(float(cert_status['grade'])*100)}</span>
 
         % if cert_status['status'] == 'notpassing':
           % if enrollment.mode != 'audit':

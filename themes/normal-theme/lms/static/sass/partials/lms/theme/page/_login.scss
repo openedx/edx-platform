@@ -102,6 +102,7 @@
   .action-primary{
     @extend %btn-my-primary;
     margin-top: 20px;
+    line-height: 34px;
     &:disabled{
       @extend %btn-my-disable;
     }

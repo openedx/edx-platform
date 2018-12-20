@@ -165,6 +165,7 @@
         font-weight: bold;
     }
 }
+
 .account-settings-sections #accountsTabSections-tabpanel .section .account-settings-section-body .u-field{
     width: 32%;
     margin-right: 2%;
@@ -172,6 +173,16 @@
         margin-right: 0;
     }
 }
+@media screen and (max-width:576px){
+    .wrapper-account-settings .wrapper-header .header-title{
+        padding-left: 22px;
+    }
+    .account-settings-sections #accountsTabSections-tabpanel .section .account-settings-section-body .u-field{
+        width: 100%;
+        margin-right: 0;
+    }  
+}
+
 .account-settings-sections #accountsTabSections-tabpanel .u-field-value.field{
     margin: 0;
     box-shadow: 0px 1px 4px 0px #b6dcfe;

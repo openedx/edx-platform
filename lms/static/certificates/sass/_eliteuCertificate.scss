@@ -122,10 +122,17 @@ p.accomplishment-success{
   color:#b0b0b0;
 }
 
-@media print {  
+@media print {
+  .wrapper-accomplishment-rendering{
+    
+    height: 700px;
+    width: 1170px;
+  }
   .layout-accomplishment.certificate-verified .accomplishment-rendering{  
     background: none;
-    height:40rem;
+
+    transform: scale(0.8474576);
+    transform-origin: center top;
   }
   .certificate-content-box{  
     height: 50%;
@@ -133,15 +140,13 @@ p.accomplishment-success{
   .wrapper-accomplishment-metadata{   
     display: none;
   }
-  .layout-accomplishment.certificate-verified .accomplishment-rendering{  
-    background: none;
-    height:40rem;      
+  .layout-accomplishment.certificate-verified .accomplishment-rendering{      
   }     
   .certificate-content-box{  
     margin: 0 auto;
     display: block;
-    width: 100%;
-    height: 100%;
+    width: 88.55%;
+    height: 83.55%;
   }
   .accomplishment-box-right{      
     right: 0px;
@@ -149,12 +154,12 @@ p.accomplishment-success{
   }
 
   .layout-accomplishment .accomplishment-rendering .accomplishment-type{  
-    left: 140px;  
+    // left: 140px;  
     /* top值根据实际打印情况进行调整，也要相应的调整背景图片的位置 */
     top: 90px;
   }  
   .accomplishment-box-right{  
-    right: 140px;  
+    right: 70px;  
     /* top值根据实际打印情况进行调整，也要相应的调整背景图片的位置 */  
     top: 90px;
   }  
@@ -164,7 +169,7 @@ p.accomplishment-success{
     background-size: 45%;
   }
   .layout-accomplishment.certificate-verified .accomplishment-rendering{   
-    height:700px;
+    // height:700px;
   }
   .accomplishment-box-right{   
     height: 630px;
