@@ -141,6 +141,13 @@ class CourseMetadata(object):
         return black_list
 
     @classmethod
+    def get_whitelist_disabled_editing_after_course_start(cls):
+        """
+        Returns a list of fields which should not be editable after course start
+        """
+        return ['proctoring_provider']
+
+    @classmethod
     def fetch(cls, descriptor):
         """
         Fetch the key:value editable course details for the given course from
@@ -241,6 +248,18 @@ class CourseMetadata(object):
             except (TypeError, ValueError) as err:
                 did_validate = False
                 errors.append({'message': text_type(err), 'model': model})
+
+        if descriptor.has_started():
+            whitelist_of_fields = cls.get_whitelist_disabled_editing_after_course_start()
+            filtered_dict = dict((k, v) for k, v in jsondict.iteritems() if k in whitelist_of_fields)
+            for key, model in filtered_dict.iteritems():
+                val = model['value']
+                if hasattr(descriptor, key) and getattr(descriptor, key) != val:
+                    did_validate = False
+                    errors.append({
+                        'message': _('Proctoring provider cannot be changed after course start date.'),
+                        'model': model
+                    })
 
         # If did validate, go ahead and update the metadata
         if did_validate:

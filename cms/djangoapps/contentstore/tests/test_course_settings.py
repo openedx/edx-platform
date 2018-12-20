@@ -1041,6 +1041,22 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.assertNotEqual(test_model['days_early_for_beta']['value'], "supposed to be an integer",
                             'days_early_for beta should not be updated to a wrong value')
 
+    @patch.dict(settings.PROCTORING_BACKENDS, {'DEFAULT': 'null', 'null': {}, 'other': {}})
+    def test_validate_from_json_post_start(self):
+        """
+        Test fields which cannot be updated after course start date
+        """
+        self.course.start = datetime.datetime(2012, 11, 15, 1, 30, tzinfo=UTC)
+        is_valid, _, _ = CourseMetadata.validate_and_update_from_json(
+            self.course,
+            {
+                'proctoring_provider': {'value': 'other'}
+            },
+            user=self.user,
+        )
+
+        self.assertFalse(is_valid)
+
     def test_correct_http_status(self):
         json_data = json.dumps({
             "advertised_start": {"value": 1, "display_name": "Course Advertised Start Date", },
