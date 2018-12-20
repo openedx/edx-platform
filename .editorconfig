@@ -58,11 +58,26 @@ insert_final_newline = true
 charset = utf-8
 indent_style = space
 indent_size = 4
+max_line_length = 120
+trim_trailing_whitespace = true
 
 [{Makefile, *.mk}]
 indent_style = tab
+indent_size = 8
 
-[{*.yml, *.yaml, *.json}]
+[*.{yml,yaml,json}]
 indent_size = 2
 
-# e2776282f95423f221b17c09c4888883be77b437
+[*.js]
+indent_size = 2
+
+[*.diff]
+trim_trailing_whitespace = false
+
+[.git/*]
+trim_trailing_whitespace = false
+
+[*.rst]
+max_line_length = 79
+
+# a699cc442902ab24adc720ac080c00e9ee72f728
