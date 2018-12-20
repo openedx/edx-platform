@@ -32,7 +32,7 @@ from lms.djangoapps.grades.models import (
     PersistentCourseGrade,
     PersistentSubsectionGrade,
     PersistentSubsectionGradeOverride,
-    PersistentSubsectionGradeOverrideHistory
+    PersistentSubsectionGradeOverrideHistory,
 )
 from lms.djangoapps.grades.subsection_grade import CreateSubsectionGrade
 from lms.djangoapps.grades.tasks import are_grades_frozen, recalculate_subsection_grade_v3
@@ -731,16 +731,11 @@ class GradebookBulkUpdateView(GradeViewMixin, PaginatedAPIView):
         Helper method to create a `PersistentSubsectionGradeOverride` object
         and send a `SUBSECTION_OVERRIDE_CHANGED` signal.
         """
-        override, _ = PersistentSubsectionGradeOverride.objects.update_or_create(
-            grade=subsection_grade_model,
-            defaults=self._clean_override_data(override_data),
-        )
-
-        _ = PersistentSubsectionGradeOverrideHistory.objects.create(
-            override_id=override.id,
-            user=request_user,
+        override = PersistentSubsectionGradeOverride.update_or_create_override(
+            requesting_user=request_user,
+            subsection_grade_model=subsection_grade_model,
             feature=PersistentSubsectionGradeOverrideHistory.GRADEBOOK,
-            action=PersistentSubsectionGradeOverrideHistory.CREATE_OR_UPDATE,
+            **override_data
         )
 
         set_event_transaction_type(SUBSECTION_GRADE_CALCULATED)
@@ -764,23 +759,6 @@ class GradebookBulkUpdateView(GradeViewMixin, PaginatedAPIView):
         # Emit events to let our tracking system to know we updated subsection grade
         subsection_grade_calculated(subsection_grade_model)
         return override
-
-    def _clean_override_data(self, override_data):
-        """
-        Helper method to strip any grade override field names that won't work
-        as defaults when calling PersistentSubsectionGradeOverride.update_or_create().
-        """
-        allowed_fields = {
-            'earned_all_override',
-            'possible_all_override',
-            'earned_graded_override',
-            'possible_graded_override',
-        }
-        stripped_data = {}
-        for field in override_data.keys():
-            if field in allowed_fields:
-                stripped_data[field] = override_data[field]
-        return stripped_data
 
     @staticmethod
     def _log_update_result(

@@ -24,6 +24,7 @@ class MockWaffleFlag(object):
     def __init__(self, state):
         self.state = state
 
+    # pylint: disable=unused-argument
     def is_enabled(self, course_key):
         return self.state
 
@@ -38,7 +39,7 @@ class GradesServiceTests(ModuleStoreTestCase):
     def setUp(self):
         super(GradesServiceTests, self).setUp()
         self.service = GradesService()
-        self.course = CourseFactory.create(org='edX', number='DemoX', display_name='Demo_Course')
+        self.course = CourseFactory.create(org='edX', number='DemoX', display_name='Demo_Course', run='Spring2019')
         self.subsection = ItemFactory.create(parent=self.course, category="subsection", display_name="Subsection")
         self.user = UserFactory()
         self.grade = PersistentSubsectionGrade.update_or_create_grade(
@@ -123,11 +124,11 @@ class GradesServiceTests(ModuleStoreTestCase):
             }
         )
 
-        # test with id strings as parameters instead
+        # test with course key parameter as string instead
         self.assertDictEqual(self.subsection_grade_override_to_dict(self.service.get_subsection_grade_override(
             user_id=self.user.id,
             course_key_or_id=unicode(self.course.id),
-            usage_key_or_id=unicode(self.subsection.location)
+            usage_key_or_id=self.subsection.location
         )), {
             'earned_all_override': override.earned_all_override,
             'earned_graded_override': override.earned_graded_override

@@ -23,8 +23,10 @@ from lms.djangoapps.grades.models import (
     PersistentCourseGrade,
     PersistentSubsectionGrade,
     PersistentSubsectionGradeOverride,
+    PersistentSubsectionGradeOverrideHistory,
     VisibleBlocks
 )
+from student.tests.factories import UserFactory
 from track.event_transaction_utils import get_event_transaction_id, get_event_transaction_type
 
 
@@ -226,6 +228,7 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
             "visible_blocks": self.block_records,
             "first_attempted": datetime(2000, 1, 1, 12, 30, 45, tzinfo=pytz.UTC),
         }
+        self.user = UserFactory(id=self.params['user_id'])
 
     @ddt.data('course_version', 'subtree_edited_timestamp')
     def test_optional_fields(self, field):
@@ -300,12 +303,31 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
         self._assert_tracker_emitted_event(tracker_mock, grade)
 
     def test_grade_override(self):
+        """
+        Creating a subsection grade override should NOT change the score values
+        of the related PersistentSubsectionGrade.
+        """
         grade = PersistentSubsectionGrade.update_or_create_grade(**self.params)
-        override = PersistentSubsectionGradeOverride(grade=grade, earned_all_override=0.0, earned_graded_override=0.0)
-        override.save()
+        override = PersistentSubsectionGradeOverride.update_or_create_override(
+            requesting_user=self.user,
+            subsection_grade_model=grade,
+            earned_all_override=0.0,
+            earned_graded_override=0.0,
+            feature=PersistentSubsectionGradeOverrideHistory.GRADEBOOK,
+        )
+
         grade = PersistentSubsectionGrade.update_or_create_grade(**self.params)
-        self.assertEqual(grade.earned_all, 0.0)
-        self.assertEqual(grade.earned_graded, 0.0)
+        self.assertEqual(self.params['earned_all'], grade.earned_all)
+        self.assertEqual(self.params['earned_graded'], grade.earned_graded)
+
+        # Any score values that aren't specified should use the values from grade as defaults
+        self.assertEqual(0, override.earned_all_override)
+        self.assertEqual(0, override.earned_graded_override)
+        self.assertEqual(grade.possible_all, override.possible_all_override)
+        self.assertEqual(grade.possible_graded, override.possible_graded_override)
+
+        # An override history record should be created
+        self.assertEqual(1, PersistentSubsectionGradeOverrideHistory.objects.filter(override_id=override.id).count())
 
     def _assert_tracker_emitted_event(self, tracker_mock, grade):
         """
