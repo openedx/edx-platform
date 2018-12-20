@@ -1424,6 +1424,8 @@ class UserRoleTest(ModuleStoreTestCase):
     """
     USERNAME = "Bob"
     EMAIL = "bob@example.com"
+    STAFF_USERNAME = "Bobstaff"
+    STAFF_EMAIL = "bobStaff@example.com"
     PASSWORD = "edx"
 
     ENABLED_CACHES = ['default']
@@ -1438,38 +1440,62 @@ class UserRoleTest(ModuleStoreTestCase):
             email=self.EMAIL,
             password=self.PASSWORD,
         )
+        self.staff_user = UserFactory.create(
+            username=self.STAFF_USERNAME,
+            email=self.STAFF_EMAIL,
+            password=self.PASSWORD,
+            is_staff=True,
+        )
         self.client.login(username=self.USERNAME, password=self.PASSWORD)
 
     def _create_expected_role_dict(self, course, role):
+        """ Creates the expected role dict object that the view should return """
         return {
             'course_id': text_type(course.id),
             'org': course.org,
             'role': role.ROLE,
         }
 
-    def _assert_roles(self, expected_response):
+    def _assert_roles(self, expected_roles, is_staff):
+        """ Asserts that the api call is successful and returns the expected roles """
         response = self.client.get(reverse('roles'))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         response_data = json.loads(response.content)
-        self.assertEqual(response_data, expected_response)
+        sort_by_role_id = lambda r: r['course_id']
+        response_data['roles'] = sorted(response_data['roles'], key=sort_by_role_id)
+        expected_roles = sorted(expected_roles, key=sort_by_role_id)
+        expected = {'roles': expected_roles, 'is_staff': is_staff}
+        self.assertEqual(response_data, expected)
+
+    def _login(self, is_staff):
+        """ If is_staff is true, logs in the staff user. Otherwise, logs in the non-staff user """
+        logged_in_user = self.staff_user if is_staff else self.user
+        self.client.login(username=logged_in_user.username, password=self.PASSWORD)
+        return logged_in_user
 
     def test_not_logged_in(self):
         self.client.logout()
         response = self.client.get(reverse('roles'))
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_roles_no_roles(self):
-        self._assert_roles([])
+    @ddt.data(True, False)
+    def test_roles_no_roles(self, is_staff):
+        self._login(is_staff)
+        self._assert_roles([], is_staff)
 
-    def test_roles(self):
+    @ddt.data(True, False)
+    def test_roles(self, is_staff):
+        logged_in_user = self._login(is_staff)
         role1 = CourseStaffRole(self.course1.id)
-        role1.add_users(self.user)
+        role1.add_users(logged_in_user)
         expected_role1 = self._create_expected_role_dict(self.course1, role1)
-        self._assert_roles([expected_role1])
+        expected_roles = [expected_role1]
+        self._assert_roles(expected_roles, is_staff)
         role2 = CourseStaffRole(self.course2.id)
-        role2.add_users(self.user)
+        role2.add_users(logged_in_user)
         expected_role2 = self._create_expected_role_dict(self.course2, role2)
-        self._assert_roles([expected_role2, expected_role1])
+        expected_roles.append(expected_role2)
+        self._assert_roles(expected_roles, is_staff)
 
     def test_roles_exception(self):
         with patch('enrollment.api.get_user_roles') as mock_get_user_roles:
