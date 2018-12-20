@@ -1,6 +1,7 @@
 """
 Defines an endpoint for gradebook data related to a course.
 """
+import logging
 from collections import namedtuple
 from contextlib import contextmanager
 from functools import wraps
@@ -52,6 +53,8 @@ from track.event_transaction_utils import (
 )
 from xmodule.modulestore.django import modulestore
 from xmodule.util.misc import get_default_short_labeler
+
+log = logging.getLogger(__name__)
 
 
 @contextmanager
@@ -666,6 +669,7 @@ class GradebookBulkUpdateView(GradeViewMixin, PaginatedAPIView):
                 user = self._get_single_user(request, course_key, requested_user_id)
                 usage_key = UsageKey.from_string(requested_usage_id)
             except (USER_MODEL.DoesNotExist, InvalidKeyError, CourseEnrollment.DoesNotExist) as exc:
+                self._log_update_result(request.user, requested_user_id, requested_usage_id, success=False)
                 result.append(GradebookUpdateResponseItem(
                     user_id=requested_user_id,
                     usage_id=requested_usage_id,
@@ -685,6 +689,7 @@ class GradebookBulkUpdateView(GradeViewMixin, PaginatedAPIView):
                 if subsection:
                     subsection_grade_model = self._create_subsection_grade(user, course, subsection)
                 else:
+                    self._log_update_result(request.user, requested_user_id, requested_usage_id, success=False)
                     result.append(GradebookUpdateResponseItem(
                         user_id=requested_user_id,
                         usage_id=requested_usage_id,
@@ -694,7 +699,11 @@ class GradebookBulkUpdateView(GradeViewMixin, PaginatedAPIView):
                     continue
 
             if subsection_grade_model:
-                self._create_override(request.user, subsection_grade_model, **user_data['grade'])
+                override = self._create_override(request.user, subsection_grade_model, **user_data['grade'])
+
+                self._log_update_result(
+                    request.user, requested_user_id, requested_usage_id, subsection_grade_model, override, True
+                )
                 result.append(GradebookUpdateResponseItem(
                     user_id=user.id,
                     usage_id=text_type(usage_key),
@@ -754,6 +763,7 @@ class GradebookBulkUpdateView(GradeViewMixin, PaginatedAPIView):
         )
         # Emit events to let our tracking system to know we updated subsection grade
         subsection_grade_calculated(subsection_grade_model)
+        return override
 
     def _clean_override_data(self, override_data):
         """
@@ -771,3 +781,22 @@ class GradebookBulkUpdateView(GradeViewMixin, PaginatedAPIView):
             if field in allowed_fields:
                 stripped_data[field] = override_data[field]
         return stripped_data
+
+    @staticmethod
+    def _log_update_result(
+        request_user,
+        user_id, usage_id,
+        subsection_grade_model=None,
+        subsection_grade_override=None,
+        success=False
+    ):
+
+        log.info(
+            'Grades: Bulk_Update, UpdatedByUser: %s, User: %s, Usage: %s, Grade: %s, GradeOverride: %s, Success: %s',
+            request_user.id,
+            user_id,
+            usage_id,
+            subsection_grade_model,
+            subsection_grade_override,
+            success
+        )
