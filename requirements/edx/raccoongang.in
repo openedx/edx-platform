@@ -41,3 +41,6 @@
 
 # InvideoQuiz xblock
 -e git+https://github.com/raccoongang/xblock-in-video-quiz.git@invquiz-rg#egg=xblock-in-video-quiz
+
+# Free text response xbloxk
+-e git+https://github.com/raccoongang/xblock-free-text-response.git@v0.2.1#egg=xblock-free-text-response==0.2.1
