@@ -5,7 +5,7 @@ eliteu envs
 import json
 import os
 from path import Path as path
-from .common import ENV_ROOT
+from .common import ENV_ROOT, FEATURES
 
 
 # SERVICE_VARIANT specifies name of the variant used, which decides what JSON
@@ -29,8 +29,15 @@ with open(CONFIG_ROOT / CONFIG_PREFIX + "env.json") as env_file:
 with open(CONFIG_ROOT / CONFIG_PREFIX + "auth.json") as auth_file:
     AUTH_TOKENS = json.load(auth_file)
 
+ENV_FEATURES = ENV_TOKENS.get('FEATURES', {})
+for feature, value in ENV_FEATURES.items():
+    FEATURES[feature] = value
+
 # Apple In-app purchase
 APPLE_VERIFY_RECEIPT_IS_SANDBOX = ENV_TOKENS.get('APPLE_VERIFY_RECEIPT_URL', '')
 APPLE_VERIFY_RECEIPT_URL = ENV_TOKENS.get('APPLE_VERIFY_RECEIPT_URL', '')
 APPLE_VERIFY_RECEIPT_SANDBOX_URL = ENV_TOKENS.get('APPLE_VERIFY_RECEIPT_SANDBOX_URL', '')
 APPLE_IN_APP_PRODUCT_ID = AUTH_TOKENS.get('APPLE_IN_APP_PRODUCT_ID', {})
+
+# verify student
+SHOW_VERIFY_STUDENT_SUPPORT = FEATURES.get('SHOW_VERIFY_STUDENT_SUPPORT', True)
