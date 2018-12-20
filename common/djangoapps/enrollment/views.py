@@ -779,7 +779,11 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
             cohort_name = request.data.get('cohort')
             if cohort_name is not None:
                 cohort = get_cohort_by_name(course_id, cohort_name)
-                add_user_to_cohort(cohort, user)
+                try:
+                    add_user_to_cohort(cohort, user)
+                except ValueError:
+                    # user already in cohort, probably because they were un-enrolled and re-enrolled
+                    log.exception('Cohort re-addition')
             email_opt_in = request.data.get('email_opt_in', None)
             if email_opt_in is not None:
                 org = course_id.org
