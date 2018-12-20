@@ -2,10 +2,13 @@
 eliteu envs
 """
 
+import logging
 import json
 import os
 from path import Path as path
 from .common import ENV_ROOT, FEATURES
+
+log = logging.getLogger(__name__)
 
 
 # SERVICE_VARIANT specifies name of the variant used, which decides what JSON
@@ -41,3 +44,17 @@ APPLE_IN_APP_PRODUCT_ID = AUTH_TOKENS.get('APPLE_IN_APP_PRODUCT_ID', {})
 
 # verify student
 SHOW_VERIFY_STUDENT_SUPPORT = FEATURES.get('SHOW_VERIFY_STUDENT_SUPPORT', True)
+
+# Sentry
+try:
+    import sentry_sdk
+    from sentry_sdk.integrations.django import DjangoIntegration
+    sentry_dsn = ENV_FEATURES.get('SENTRY_DSN', '')
+    if sentry_dsn:
+        sentry_sdk.init(
+            dsn=sentry_dsn,
+            integrations=[DjangoIntegration()]
+        )
+        log.info("Sentry Start Up Success")
+except ImportError:
+    log.info("Sentry Module Import Error")
