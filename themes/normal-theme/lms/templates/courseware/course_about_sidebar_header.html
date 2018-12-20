@@ -53,6 +53,9 @@ import urllib
             url=request.build_absolute_uri()
         )
 
+        tweet_dict = {'text': share_text}
+        tweetstr = urllib.urlencode(tweet_dict)
+
         weibo_dict = {'ralateUid': 5974026525,'language': 'zh_cn','title': share_text}
         weibostr = urllib.urlencode(weibo_dict)
         weibourl = "http://service.weibo.com/share/share.php?" + weibostr
@@ -62,7 +65,7 @@ import urllib
         qzoneurl = "https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?" + qzonestr
 
         weixin_url = request.build_absolute_uri()
-        tweet_action = u"http://twitter.com/intent/tweet?text={tweet_text}".format(tweet_text=tweet_text)
+        tweet_action = u"http://twitter.com/intent/tweet?" + tweetstr
 
         facebook_link = static.get_value('course_about_facebook_link', settings.PLATFORM_FACEBOOK_ACCOUNT)
 
