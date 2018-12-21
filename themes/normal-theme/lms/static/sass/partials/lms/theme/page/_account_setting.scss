@@ -241,8 +241,9 @@
     color: #2e313c;
 }
 .account-settings-sections #ordersTabSections-tabpanel  span.u-field-order-link{
+    z-index: 1000;
     position: absolute;
-    right: 20px;
+    right: 40px;
     cursor: pointer;
     a.u-field-link {
         @extend %btn-my-primary;
