@@ -76,7 +76,10 @@ from lms.djangoapps.instructor.enrollment import (
     unenroll_email
 )
 from lms.djangoapps.instructor.views import INVOICE_KEY
-from lms.djangoapps.instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
+from lms.djangoapps.instructor.views.instructor_task_helpers import (
+    extract_email_features,
+    extract_task_features,
+)
 from lms.djangoapps.instructor_task.api import submit_override_score
 from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError, QueueConnectionError
 from lms.djangoapps.instructor_task.models import ReportStore
@@ -125,6 +128,7 @@ from util.json_request import JsonResponse, JsonResponseBadRequest
 from util.views import require_global_staff
 from xmodule.modulestore.django import modulestore
 
+from rapid_response_xblock.utils import get_run_submission_data
 from .tools import (
     dump_module_extensions,
     dump_student_extensions,
@@ -134,7 +138,7 @@ from .tools import (
     parse_datetime,
     require_student_from_identifier,
     set_due_date_extension,
-    strip_if_string
+    strip_if_string,
 )
 
 log = logging.getLogger(__name__)
@@ -568,7 +572,9 @@ def create_and_enroll_user(email, username, name, country, password, course_id, 
     except Exception as ex:  # pylint: disable=broad-except
         log.exception(type(ex).__name__)
         errors.append({
-            'username': username, 'email': email, 'response': type(ex).__name__,
+            'username': username,
+            'email': email,
+            'response': type(ex).__name__
         })
     else:
         try:
@@ -1844,26 +1850,12 @@ def get_anon_ids(request, course_id):  # pylint: disable=unused-argument
     # has similar functionality but not quite what's needed.
     course_id = CourseKey.from_string(course_id)
 
-    def csv_response(filename, header, rows):
-        """Returns a CSV http response for the given header and rows (excel/utf-8)."""
-        response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename={0}'.format(text_type(filename).encode('utf-8'))
-        writer = csv.writer(response, dialect='excel', quotechar='"', quoting=csv.QUOTE_ALL)
-        # In practice, there should not be non-ascii data in this query,
-        # but trying to do the right thing anyway.
-        encoded = [text_type(s).encode('utf-8') for s in header]
-        writer.writerow(encoded)
-        for row in rows:
-            encoded = [text_type(s).encode('utf-8') for s in row]
-            writer.writerow(encoded)
-        return response
-
     students = User.objects.filter(
         courseenrollment__course_id=course_id,
     ).order_by('id')
     header = ['User ID', 'Anonymized User ID', 'Course Specific Anonymized User ID']
     rows = [[s.id, unique_id_for_user(s, save=False), anonymous_id_for_user(s, course_id, save=False)] for s in students]
-    return csv_response(text_type(course_id).replace('/', '-') + '-anon-ids.csv', header, rows)
+    return _return_csv_response(text_type(course_id).replace('/', '-') + '-anon-ids.csv', header, rows)
 
 
 @require_POST
@@ -2304,6 +2296,7 @@ def list_instructor_tasks(request, course_id):
         - `problem_location_str` and `unique_student_identifier` lists task
             history for problem AND student (intersection)
     """
+    include_remote_gradebook = request.GET.get('include_remote_gradebook') is not None
     course_id = CourseKey.from_string(course_id)
     problem_location_str = strip_if_string(request.POST.get('problem_location_str', False))
     student = request.POST.get('unique_student_identifier', None)
@@ -2326,6 +2319,11 @@ def list_instructor_tasks(request, course_id):
         else:
             # Specifying for single problem's history
             tasks = lms.djangoapps.instructor_task.api.get_instructor_task_history(course_id, module_state_key)
+    elif include_remote_gradebook:
+        tasks = lms.djangoapps.instructor_task.api.get_running_instructor_rgb_tasks(
+            course_id,
+            user=request.user
+        )
     else:
         # If no problem or student, just get currently running tasks
         tasks = lms.djangoapps.instructor_task.api.get_running_instructor_tasks(course_id)
@@ -2474,11 +2472,18 @@ def problem_grade_report(request, course_id):
     updated.
     """
     course_key = CourseKey.from_string(course_id)
-    report_type = _('problem grade')
-    lms.djangoapps.instructor_task.api.submit_problem_grade_report(request, course_key)
-    success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
-
-    return JsonResponse({"status": success_status})
+    try:
+        lms.djangoapps.instructor_task.api.submit_problem_grade_report(request, course_key)
+        success_status = _("The problem grade report is being created."
+                           " To view the status of the report, see Pending Tasks below.")
+        return JsonResponse({"status": success_status})
+    except AlreadyRunningError:
+        already_running_status = _("A problem grade report is already being generated."
+                                   " To view the status of the report, see Pending Tasks below."
+                                   " You will be able to download the report when it is complete.")
+        return JsonResponse({
+            "status": already_running_status
+        })
 
 
 @require_POST
@@ -3432,3 +3437,28 @@ def _create_error_response(request, msg):
     in JSON form.
     """
     return JsonResponse({"error": _(msg)}, 400)
+
+
+def _return_csv_response(filename, header, rows):
+    """Returns a CSV http response for the given header and rows (excel/utf-8)."""
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename={0}'.format(text_type(filename).encode('utf-8'))
+    writer = csv.writer(response, dialect='excel', quotechar='"', quoting=csv.QUOTE_ALL)
+    # In practice, there should not be non-ascii data in this query,
+    # but trying to do the right thing anyway.
+    encoded = [text_type(s).encode('utf-8') for s in header]
+    writer.writerow(encoded)
+    for row in rows:
+        encoded = [text_type(s).encode('utf-8') for s in row]
+        writer.writerow(encoded)
+    return response
+
+
+@ensure_csrf_cookie
+@require_level('staff')
+def get_rapid_response_report(request, course_id, run_id):  # pylint: disable=unused-argument
+    """
+    Return csv file corresponding to given run_id
+    """
+    header = ['Date', 'Submitted Answer', 'Username', 'User Email', 'Correct']
+    return _return_csv_response('rapid_response_submissions.csv', header, get_run_submission_data(run_id))

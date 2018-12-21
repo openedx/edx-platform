@@ -27,6 +27,7 @@ from xblock.scorable import ScorableXBlockMixin
 from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2
 
 from xmodule.seq_module import SequenceModule
+from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.vertical_block import VerticalBlock
 from xmodule.x_module import shim_xmodule_js, XModuleDescriptor, XModule, PREVIEW_VIEWS, STUDIO_VIEW
 
@@ -150,8 +151,7 @@ def wrap_xblock(
 
     if isinstance(block, (XModule, XModuleDescriptor)):
         # Add the webpackified asset tags
-        for tag in webpack_loader.utils.get_as_tags(class_name):
-            frag.add_resource(tag, mimetype='text/html', placement='head')
+        add_webpack_to_fragment(frag, class_name)
 
     return wrap_fragment(frag, render_to_string('xblock_wrapper.html', template_context))
 

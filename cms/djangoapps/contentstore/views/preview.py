@@ -39,6 +39,7 @@ from xmodule.modulestore.django import ModuleI18nService, modulestore
 from xmodule.partitions.partitions_service import PartitionService
 from xmodule.services import SettingsService
 from xmodule.studio_editable import has_author_view
+from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.x_module import AUTHOR_VIEW, PREVIEW_VIEWS, STUDENT_VIEW, ModuleSystem, XModule, XModuleDescriptor
 import webpack_loader.utils
 
@@ -302,11 +303,9 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
         if isinstance(xblock, (XModule, XModuleDescriptor)):
             # Add the webpackified asset tags
             class_name = getattr(xblock.__class__, 'unmixed_class', xblock.__class__).__name__
-            for tag in webpack_loader.utils.get_as_tags(class_name):
-                frag.add_resource(tag, mimetype='text/html', placement='head')
+            add_webpack_to_fragment(frag, class_name)
 
-        for tag in webpack_loader.utils.get_as_tags("js/factories/xblock_validation"):
-            frag.add_resource(tag, mimetype='text/html', placement='head')
+        add_webpack_to_fragment(frag, "js/factories/xblock_validation")
 
         html = render_to_string('studio_xblock_wrapper.html', template_context)
         frag = wrap_fragment(frag, html)

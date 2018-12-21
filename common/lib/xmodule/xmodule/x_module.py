@@ -32,6 +32,7 @@ from xmodule import block_metadata_utils
 from xmodule.fields import RelativeTime
 from xmodule.errortracker import exc_info_to_str
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.util.xmodule_django import add_webpack_to_fragment
 
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.asides import AsideUsageKeyV2, AsideDefinitionKeyV2
@@ -260,8 +261,7 @@ def shim_xmodule_js(block, fragment):
         fragment.initialize_js('XBlockToXModuleShim')
         fragment.json_init_args = {'xmodule-type': block.js_module_name}
 
-        for tag in webpack_loader.utils.get_as_tags('XModuleShim'):
-            fragment.add_resource(tag, mimetype='text/html', placement='head')
+        add_webpack_to_fragment(fragment, 'XModuleShim')
 
 
 class XModuleFields(object):

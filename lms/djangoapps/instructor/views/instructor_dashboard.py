@@ -41,6 +41,7 @@ from django_comment_client.utils import available_division_schemes, has_forum_ac
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, CourseDiscussionSettings
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.courseware.module_render import get_module_by_usage_id
+from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 from openedx.core.djangoapps.course_groups.cohorts import DEFAULT_COHORT_NAME, get_course_cohorts, is_course_cohorted
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.verified_track_content.models import VerifiedTrackCohortedCourse
@@ -54,6 +55,8 @@ from util.json_request import JsonResponse
 from xmodule.html_module import HtmlDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import CourseTab
+
+from rapid_response_xblock.utils import get_run_data_for_course
 
 from .tools import get_units_with_due_date, title_or_url
 
@@ -128,6 +131,9 @@ def instructor_dashboard_2(request, course_id):
         _section_student_admin(course, access),
         _section_data_download(course, access),
     ]
+
+    if settings.FEATURES.get('ENABLE_INSTRUCTOR_REMOTE_GRADEBOOK_CONTROLS', False):
+        sections.append(_section_remote_gradebook(course))
 
     analytics_dashboard_message = None
     if show_analytics_dashboard_message(course_key):
@@ -226,6 +232,10 @@ def instructor_dashboard_2(request, course_id):
     )
 
     certificate_invalidations = CertificateInvalidation.get_certificate_invalidations(course_key)
+
+    # x block asides enabled, included rapid response tab
+    if XBlockAsidesConfig.current().enabled:
+        sections.append(_section_rapid_response(course_key))
 
     context = {
         'course': course,
@@ -638,6 +648,57 @@ def _section_data_download(course, access):
     return section_data
 
 
+def _section_remote_gradebook(course):
+    """ Provide data for the corresponding dashboard section """
+    rg_course_setting = course.remote_gradebook or {}
+    rg_name = rg_course_setting.get('name') or settings.REMOTE_GRADEBOOK.get('DEFAULT_NAME')
+    section_data = {
+        'section_key': 'remote_gradebook',
+        'section_display_name': _('Remote Gradebook'),
+        'course': course,
+        'remote_gradebook_name': rg_name,
+        'get_remote_gradebook_sections_url': reverse(
+            'get_remote_gradebook_sections', kwargs={'course_id': unicode(course.id)}
+        ),
+        'get_assignment_names_url': reverse(
+            'get_assignment_names', kwargs={'course_id': unicode(course.id)}
+        ),
+        'get_non_staff_enrollments_url': reverse(
+            'get_non_staff_enrollments', kwargs={'course_id': unicode(course.id)}
+        ),
+        'list_remote_enrolled_students_url': reverse(
+            'list_remote_enrolled_students', kwargs={'course_id': unicode(course.id)}
+        ),
+        'list_remote_students_in_section_url': reverse(
+            'list_remote_students_in_section', kwargs={'course_id': unicode(course.id)}
+        ),
+        'add_enrollments_using_remote_gradebook_url': reverse(
+            'add_enrollments_using_remote_gradebook', kwargs={'course_id': unicode(course.id)}
+        ),
+        'list_remote_assignments_url': reverse(
+            'list_remote_assignments', kwargs={'course_id': unicode(course.id)}
+        ),
+        'display_assignment_grades_url': reverse(
+            'display_assignment_grades', kwargs={'course_id': unicode(course.id)}
+        ),
+        'export_assignment_grades_to_rg_url': reverse(
+            'export_assignment_grades_to_rg', kwargs={'course_id': unicode(course.id)}
+        ),
+        'export_assignment_grades_csv_url': reverse(
+            'export_assignment_grades_csv', kwargs={'course_id': unicode(course.id)}
+        ),
+        'list_instructor_tasks_url': '{}?include_remote_gradebook=true'.format(
+            reverse(
+                'list_instructor_tasks', kwargs={'course_id': unicode(course.id)}
+            )
+        ),
+        'list_report_downloads_url': reverse(
+            'list_report_downloads', kwargs={'course_id': unicode(course.id)}
+        ),
+    }
+    return section_data
+
+
 def null_applicable_aside_types(block):  # pylint: disable=unused-argument
     """
     get_aside method for monkey-patching into applicable_aside_types
@@ -783,3 +844,16 @@ def is_ecommerce_course(course_key):
     """
     sku_count = len([mode.sku for mode in CourseMode.modes_for_course(course_key) if mode.sku])
     return sku_count > 0
+
+
+def _section_rapid_response(course_key):
+    """Provide data for the rapid response dashboard section """
+
+    section_data = {
+        'section_key': 'rapid_response',
+        'section_display_name': _('Rapid Responses'),
+        'problem_runs': get_run_data_for_course(course_key=course_key),
+        'course_key': course_key,
+        'download_url': 'get_rapid_response_report'
+    }
+    return section_data

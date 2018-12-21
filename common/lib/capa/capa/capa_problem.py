@@ -495,27 +495,6 @@ class LoncapaProblem(object):
             answer_ids.append(results.keys())
         return answer_ids
 
-    def find_correct_answer_text(self, answer_id):
-        """
-        Returns the correct answer(s) for the provided answer_id as a single string.
-
-        Arguments::
-            answer_id (str): a string like "98e6a8e915904d5389821a94e48babcf_13_1"
-
-        Returns:
-            str: A string containing the answer or multiple answers separated by commas.
-        """
-        xml_elements = self.tree.xpath('//*[@id="' + answer_id + '"]')
-        if not xml_elements:
-            return
-        xml_element = xml_elements[0]
-        answer_text = xml_element.xpath('@answer')
-        if answer_text:
-            return answer_id[0]
-        if xml_element.tag == 'optioninput':
-            return xml_element.xpath('@correct')[0]
-        return ', '.join(xml_element.xpath('*[@correct="true"]/text()'))
-
     def find_question_label(self, answer_id):
         """
         Obtain the most relevant question text for a particular answer.

@@ -90,4 +90,8 @@ urlpatterns = [
     url(r'^generate_bulk_certificate_exceptions', api.generate_bulk_certificate_exceptions,
         name='generate_bulk_certificate_exceptions'),
     url(r'^certificate_invalidation_view/$', api.certificate_invalidation_view, name='certificate_invalidation_view'),
+
+    # rapid response downloads
+    url(r'rapid_response_report/(?P<run_id>[^/]*)$', api.get_rapid_response_report,
+        name='get_rapid_response_report'),
 ]

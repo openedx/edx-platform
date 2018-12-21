@@ -1,0 +1,16 @@
+<p>
+    <h2><%- title %></h2>
+    <table class="stat_table"><tr>
+        <%_.forEach(header, function (h) {%>
+            <th><%- h %></th>
+        <%})%>
+        </tr>
+        <%_.forEach(data, function (row) {%>
+            <tr>
+                <%_.forEach(row, function (value) {%>
+                    <td><%- value %></td>
+                <%})%>
+            </tr>
+        <%})%>
+    </table>
+</p>
