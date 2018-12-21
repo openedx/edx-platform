@@ -53,7 +53,6 @@ argh==0.26.2
 argparse==1.4.0
 asn1crypto==0.24.0
 astroid==1.5.3
-atomicwrites==1.2.1
 attrs==17.4.0
 babel==1.3
 backports.functools-lru-cache==1.5
@@ -113,7 +112,7 @@ django-require==1.0.11
 django-rest-swagger==2.2.0
 django-sekizai==0.10.0
 django-ses==0.8.4
-django-simple-history==2.5.1
+django-simple-history==2.6.0
 django-splash==0.2.2
 django-statici18n==1.4.0
 django-storages==1.4.1
@@ -137,28 +136,7 @@ edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
 edx-django-utils==1.0.3
 edx-drf-extensions==2.0.1
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 edx-enterprise==1.2.0
-=======
-=======
->>>>>>> Removed course-run exam rule configuration
-<<<<<<< HEAD
-edx-enterprise==1.1.2
-=======
-edx-enterprise==1.1.0
->>>>>>> make upgrade
-<<<<<<< HEAD
->>>>>>> make upgrade
-=======
-=======
-edx-enterprise==1.1.2
->>>>>>> Removed course-run exam rule configuration
->>>>>>> Removed course-run exam rule configuration
-=======
-edx-enterprise==1.1.2
->>>>>>> $ make upgrade
 edx-i18n-tools==0.4.6
 edx-lint==1.0.0
 edx-milestones==0.1.13
@@ -189,7 +167,6 @@ flask==1.0.2
 freezegun==0.3.11
 fs-s3fs==0.1.8
 fs==2.0.18
-funcsigs==1.0.2
 functools32==3.2.3.post2
 future==0.17.1
 futures==3.2.0 ; python_version == "2.7"
@@ -234,7 +211,6 @@ mccabe==0.6.1
 mock==1.0.1
 modernize==0.6.1
 mongoengine==0.10.0
-more-itertools==4.3.0
 moto==0.3.1
 mysql-python==1.2.5
 networkx==1.7
@@ -256,7 +232,7 @@ pdfminer==20140328
 piexif==1.0.2
 pillow==5.3.0
 pip-tools==3.2.0
-pluggy==0.6.0
+pluggy==0.8.0
 polib==1.1.0
 psutil==1.2.1
 py2neo==3.1.2

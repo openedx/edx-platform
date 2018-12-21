@@ -94,7 +94,7 @@ django-require==1.0.11
 django-rest-swagger==2.2.0
 django-sekizai==0.10.0
 django-ses==0.8.4
-django-simple-history==2.5.1
+django-simple-history==2.6.0
 django-splash==0.2.2
 django-statici18n==1.4.0
 django-storages==1.4.1
@@ -118,28 +118,7 @@ edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
 edx-django-utils==1.0.3
 edx-drf-extensions==2.0.1
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 edx-enterprise==1.2.0
-=======
-=======
->>>>>>> Removed course-run exam rule configuration
-<<<<<<< HEAD
-edx-enterprise==1.1.2
-=======
-edx-enterprise==1.1.0
->>>>>>> make upgrade
-<<<<<<< HEAD
->>>>>>> make upgrade
-=======
-=======
-edx-enterprise==1.1.2
->>>>>>> Removed course-run exam rule configuration
->>>>>>> Removed course-run exam rule configuration
-=======
-edx-enterprise==1.1.2
->>>>>>> $ make upgrade
 edx-i18n-tools==0.4.6
 edx-milestones==0.1.13
 edx-oauth2-provider==1.2.2
