@@ -18,9 +18,9 @@ from email_marketing.models import EmailMarketingConfiguration
 from lms.djangoapps.email_marketing.tasks import get_email_cookies_via_sailthru, update_user, update_user_email
 from openedx.core.djangoapps.user_authn.cookies import CREATE_LOGON_COOKIE
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
+from openedx.core.djangoapps.user_authn.views.register import REGISTER_USER
 from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 from student.signals import SAILTHRU_AUDIT_PURCHASE
-from student.views import REGISTER_USER
 from util.model_utils import USER_FIELD_CHANGED
 
 from .tasks import update_course_enrollment
