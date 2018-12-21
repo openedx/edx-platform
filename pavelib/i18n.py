@@ -544,7 +544,6 @@ def i18n_replace():
     map(os.remove, invalid)
 
     # process cn invalid-file
-    print(resource)
     map(exchange_position, resource)
 
     # check duplicate here, if failed exit sys.

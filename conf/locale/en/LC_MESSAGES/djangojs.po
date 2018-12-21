@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-12-13 17:36+0800\n"
-"PO-Revision-Date: 2018-12-13 09:36:08.621139\n"
+"POT-Creation-Date: 2018-12-18 10:17+0800\n"
+"PO-Revision-Date: 2018-12-18 02:17:43.312974\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -2914,16 +2914,6 @@ msgstr ""
 #: common/static/bundles/CourseHome.js
 #: openedx/features/course_experience/static/course_experience/js/CourseHome.js
 msgid "There was an error updating your goal."
-msgstr ""
-
-#: common/static/bundles/CourseOutline.js
-#: lms/templates/ccx/schedule.underscore
-msgid "Expand All"
-msgstr ""
-
-#: common/static/bundles/CourseOutline.js
-#: lms/templates/ccx/schedule.underscore
-msgid "Collapse All"
 msgstr ""
 
 #: common/static/bundles/EntitlementFactory.js
@@ -7740,6 +7730,14 @@ msgid "This catalog's courses:"
 msgstr ""
 
 #: lms/templates/ccx/schedule.underscore
+msgid "Expand All"
+msgstr ""
+
+#: lms/templates/ccx/schedule.underscore
+msgid "Collapse All"
+msgstr ""
+
+#: lms/templates/ccx/schedule.underscore
 msgid "Start Date"
 msgstr ""
 
@@ -10942,5 +10940,5 @@ msgid "Average per month"
 msgstr ""
 
 #: membership/static/membership/js/pay.js
-msgid "Return to EliteMBA in _ seconds"
+msgid "调起支付失败"
 msgstr ""

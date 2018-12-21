@@ -7,9 +7,10 @@
 # Translators:
 # 嘉杰 李 <jj.li@eliteu.com.cn>, 2018
 # 微 李 <w.li@eliteu.com.cn>, 2018
-# 家璧 刘 <jb.liu@eliteu.com.cn>, 2018
 # 婕 高 <j.gao@eliteu.cn>, 2018
 # li ying <code@eliteu.cn>, 2018
+# Yi Li <y.li@eliteu.cn>, 2018
+# 家璧 刘 <jb.liu@eliteu.com.cn>, 2018
 #
 # #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/).
@@ -47,15 +48,14 @@
 #
 # Translators:
 # li ying <code@eliteu.cn>, 2018
-# 微 李 <w.li@eliteu.com.cn>, 2018
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-12-13 17:36+0800\n"
+"POT-Creation-Date: 2018-12-18 10:17+0800\n"
 "PO-Revision-Date: 2018-12-07 12:23+0000\n"
-"Last-Translator: 微 李 <w.li@eliteu.com.cn>, 2018\n"
+"Last-Translator: li ying <code@eliteu.cn>, 2018\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
@@ -2942,14 +2942,6 @@ msgstr "您已成功更新目标。"
 msgid "There was an error updating your goal."
 msgstr "更新目标时出错。"
 
-#: lms/templates/ccx/schedule.underscore
-msgid "Expand All"
-msgstr "展开全部"
-
-#: lms/templates/ccx/schedule.underscore
-msgid "Collapse All"
-msgstr "折叠全部"
-
 #: common/static/bundles/EntitlementFactory.js
 #: common/static/bundles/ProgramDetailsFactory.js
 #: lms/static/js/learner_dashboard/models/course_card_model.js
@@ -3356,7 +3348,7 @@ msgstr "请注意：删除账号及个人数据的操作将不可撤销。EdX无
 msgid ""
 "Once your account is deleted, you cannot use it to take courses on the "
 "EliteMBA app, elitemba.cn, or any other site hosted by EliteMBA."
-msgstr ""
+msgstr "一旦删除了账号，您将无法在英荔商学院 App、elitemba.cn或其他任何由英荔商学院托管的站点上学习课程。"
 
 #: common/static/bundles/StudentAccountDeletion.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
@@ -5777,7 +5769,7 @@ msgstr "您可以选择将个人社交媒体的链接图标放到您的edX个人
 msgid ""
 "Enter your %s username or the URL to your %s page. Delete the URL to remove "
 "the link."
-msgstr ""
+msgstr "输入您的%s用户名或您的%s主页URL。删除URL以移除链接。"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid " Link"
@@ -7775,6 +7767,14 @@ msgstr "在获取这个目录的预览结果时发生错误。请检查您的指
 #: lms/templates/api_admin/catalog-results.underscore
 msgid "This catalog's courses:"
 msgstr "此目录下的课程："
+
+#: lms/templates/ccx/schedule.underscore
+msgid "Expand All"
+msgstr "展开全部"
+
+#: lms/templates/ccx/schedule.underscore
+msgid "Collapse All"
+msgstr "折叠全部"
 
 #: lms/templates/ccx/schedule.underscore
 msgid "Start Date"
@@ -10958,7 +10958,7 @@ msgstr "开通"
 
 #: membership/static/membership/js/card.js
 msgid "Become a VIP member and watch all EliteMBA courses for free"
-msgstr "开通VIP会员，可免费观看英荔商学院全部课程"
+msgstr "开通VIP会员，可免费观看英荔商学院全部课程。"
 
 #: membership/static/membership/js/card.js
 msgid "DD/MM/YYYY"
@@ -10997,5 +10997,5 @@ msgid "Average per month"
 msgstr "月均"
 
 #: membership/static/membership/js/pay.js
-msgid "Return to EliteMBA in _ seconds"
-msgstr "在 _ 秒后返回英荔商学院"
+msgid "调起支付失败"
+msgstr ""

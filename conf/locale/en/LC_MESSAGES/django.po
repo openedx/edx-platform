@@ -45,8 +45,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-12-13 17:36+0800\n"
-"PO-Revision-Date: 2018-12-13 09:36:08.605105\n"
+"POT-Creation-Date: 2018-12-18 10:17+0800\n"
+"PO-Revision-Date: 2018-12-18 02:17:43.298592\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -4639,6 +4639,7 @@ msgstr ""
 #: lms/djangoapps/branding/api.py cms/templates/widgets/sock_links.html
 #: themes/edx.org/cms/templates/widgets/sock.html
 #: themes/normal-theme/lms/templates/footer.html
+#: themes/normal-theme/lms/templates/static_templates/contact.html
 #: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "Contact Us"
 msgstr ""
@@ -5946,7 +5947,8 @@ msgid "Added Course"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py cms/templates/course-create-rerun.html
-#: cms/templates/index.html lms/templates/shoppingcart/receipt.html
+#: cms/templates/index.html lms/templates/certificates/verify.html
+#: lms/templates/shoppingcart/receipt.html
 msgid "Course Name"
 msgstr ""
 
@@ -8414,8 +8416,10 @@ msgstr ""
 msgid "Review ID Verification Photos For {username}"
 msgstr ""
 
-#: lms/envs/common.py
-msgid "Your Platform Name Here"
+#: lms/envs/common.py lms/templates/certificates/verify.html
+#: themes/normal-theme/lms/templates/static_templates/about.html
+#: membership/templates/membership/index.html
+msgid "EliteMBA"
 msgstr ""
 
 #: lms/envs/common.py
@@ -11886,6 +11890,7 @@ msgstr ""
 #. #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
 #. Translators: this is a verb describing the action of viewing more details
 #: cms/templates/studio_xblock_wrapper.html
+#: lms/templates/certificates/verify.html
 #: lms/templates/wiki/includes/article_menu.html
 #: wiki/templates/wiki/includes/article_menu.html
 msgid "View"
@@ -12189,22 +12194,21 @@ msgid "Order History"
 msgstr ""
 
 #: lms/templates/dashboard.html
-msgid "\\u4f1a\\u5458\\u6709\\u6548\\u671f"
+msgid "VIP Expiry Date"
 msgstr ""
 
 #: lms/templates/dashboard.html
-msgid "\\u8ba2\\u9605\\u671f\\u6ee1\\uff0c\\u8bf7\\u53ca\\u65f6\\u5145\\u503c"
+msgid "Subscription will soon be overdue. Please recharge in time."
 msgstr ""
 
 #: lms/templates/dashboard.html
 msgid ""
-"\\u60a8\\u597d\\uff0c\\u60a8\\u8d2d\\u4e70\\u7684\\u82f1\\u8354\\u5546\\u5b66\\u9662"
-" VIP "
-"\\u4f1a\\u5458\\u5df2\\u5230\\u671f\\uff0c\\u4e3a\\u4e86\\u4e0d\\u5f71\\u54cd\\u60a8\\u7684\\u5b66\\u4e60\\u8fdb\\u5ea6\\uff0c\\u8bf7\\u53ca\\u65f6\\u5145\\u503c"
+"Sorry, your EliteMBA VIP has expired. In order not to disrupt your learning "
+"schedule, please recharge in time."
 msgstr ""
 
 #: lms/templates/dashboard.html
-msgid "\\u4f1a\\u5458\\u7eed\\u8d39"
+msgid "Renew VIP"
 msgstr ""
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
@@ -14577,20 +14581,15 @@ msgid "About edX Certificates"
 msgstr ""
 
 #: lms/templates/certificates/verify.html
-#: themes/normal-theme/lms/templates/static_templates/about.html
-msgid "英荔商学院"
+msgid "Trustworthy Certificate"
 msgstr ""
 
 #: lms/templates/certificates/verify.html
-msgid "该证书真实有效"
+msgid "Certificated Learner"
 msgstr ""
 
 #: lms/templates/certificates/verify.html
-msgid "持证学员"
-msgstr ""
-
-#: lms/templates/certificates/verify.html
-msgid "证书编号"
+msgid "Certificate No."
 msgstr ""
 
 #: lms/templates/certificates/verify.html
@@ -14598,27 +14597,19 @@ msgid "所属机构"
 msgstr ""
 
 #: lms/templates/certificates/verify.html
-msgid "课程名称"
+msgid "Learning Time"
 msgstr ""
 
 #: lms/templates/certificates/verify.html
-msgid "学习时间"
+msgid "Learning Type"
 msgstr ""
 
 #: lms/templates/certificates/verify.html
-msgid "学习类型"
+msgid "Certificate Issuing Date"
 msgstr ""
 
 #: lms/templates/certificates/verify.html
-msgid "发证时间"
-msgstr ""
-
-#: lms/templates/certificates/verify.html
-msgid "电子证书"
-msgstr ""
-
-#: lms/templates/certificates/verify.html
-msgid "点击查看"
+msgid "Electronic Certificate"
 msgstr ""
 
 #: lms/templates/commerce/checkout_cancel.html
@@ -16786,7 +16777,7 @@ msgid "Resume your last course"
 msgstr ""
 
 #: lms/templates/header/user_dropdown.html
-msgid "\\u4f1a\\u5458\\u4e2d\\u5fc3"
+msgid "会员中心"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
@@ -19129,23 +19120,23 @@ msgid "Account Settings"
 msgstr ""
 
 #: lms/templates/student_account/account_settings.html
-msgid "手机"
+msgid "Mobile"
 msgstr ""
 
 #: lms/templates/student_account/account_settings.html
-msgid "绑定您的手机"
+msgid "Bind Mobile"
 msgstr ""
 
 #: lms/templates/student_account/account_settings.html
-msgid "已经绑定手机号"
+msgid "Successfully Bound."
 msgstr ""
 
 #: lms/templates/student_account/account_settings.html
-msgid "修改手机号"
+msgid "Change Mobile No."
 msgstr ""
 
 #: lms/templates/student_account/account_settings.html
-msgid "将您的手机号码与EliteMBA的账号绑定"
+msgid "bind your EliteMBA account to your cellphone number"
 msgstr ""
 
 #: lms/templates/student_account/finish_auth.html
@@ -19827,11 +19818,13 @@ msgid "Reform·Innovation·Future"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/footer.html
+#: themes/normal-theme/lms/templates/static_templates/contact.html
 #: membership/templates/membership/card.html
 msgid "Elite Education"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/footer.html
+#: themes/normal-theme/lms/templates/static_templates/about.html
 msgid "About Us"
 msgstr ""
 
@@ -19928,11 +19921,10 @@ msgid ""
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/about.html
-msgid "About us"
-msgstr ""
-
-#: themes/normal-theme/lms/templates/static_templates/about.html
-msgid "英荔商学院（www.EliteMBA.cn）是广东英荔国际教育科技有限公司旗下的商业管理类互联网课堂"
+msgid ""
+"EliteMBA (www.EliteMBA.cn) is a sub-brand of Guangdong Elite International "
+"Education & Technology Co., Ltd. focusing on the development of MBA online "
+"classroom."
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/about.html
@@ -19950,11 +19942,16 @@ msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/about.html
 msgid ""
-"教育家蔡元培先生说：“教育应指导社会，而不是追逐社会”。英荔摒弃追逐社会的模式，倡导学习者自我实现和引领社会的精神。英荔课堂没有生搬硬套的知识灌输，只有寻求智慧和解决实际问题的动力。"
+"Mr. Cai Yuanpei said that education should guide the society, rather than "
+"pursue it. Elite Education abandons the ideas of upholding the pursuit of "
+"society, and advocates learners' self-achievement and their ambition in "
+"leading the society. EliteMBA courses advocate, instead of the rote of "
+"knowledge input, the motivation for pursuing wisdom and solving practical "
+"problems."
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/about.html
-msgid "我们的使命"
+msgid "Our Mission"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/about.html
@@ -19962,59 +19959,49 @@ msgid "提供启发和创新的教育体验，使学习者有一个便捷和包�
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/about.html
-msgid "我们的愿景"
+msgid "Our Vision"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/about.html
-msgid "成为中国享有声誉的数字化教育品牌。"
+msgid "To become a reputable brand of digital education in China."
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/contact.html
-msgid "Contact us"
+msgid ""
+"Address: Room 1005, CITIC Plaza, No. 233 Tianhe North Road, Tianhe District,"
+" Guangzhou, China"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/contact.html
-msgid "英荔教育"
+msgid "Telephone: 400-931-8118 (Monday to Friday at 9:00-18:00)"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/contact.html
-msgid "地址：广州市天河区天河北路233号中信广场写字楼1005室"
+msgid "Human Resources and Recruitment"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/contact.html
-msgid "电话：400-931-8118（周一至周五9：00 - 18：00）"
+msgid "Feedback and Technical Support"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/contact.html
-msgid "人力资源及招聘"
+msgid "Course-Related"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/contact.html
-msgid "建议及技术支持"
+msgid "Media Communication"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/contact.html
-msgid "课程相关"
+msgid "Business Cooperation"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/contact.html
-msgid "媒体交流"
+msgid "General Information"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/contact.html
-msgid "商务合作"
-msgstr ""
-
-#: themes/normal-theme/lms/templates/static_templates/contact.html
-msgid "综合资讯"
-msgstr ""
-
-#: themes/normal-theme/lms/templates/static_templates/contact.html
-msgid "系统漏洞"
-msgstr ""
-
-#: themes/normal-theme/lms/templates/static_templates/disclaimer.html
-msgid "免责声明"
+msgid "System Bugs"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/disclaimer.html
@@ -20117,7 +20104,7 @@ msgid "Join us"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/join_us.html
-msgid "成为更有价值的自己"
+msgid "Let Yourself be More Valuable"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/join_us.html
@@ -24982,6 +24969,10 @@ msgid "Apple Pay"
 msgstr ""
 
 #: membership/models.py
+msgid "Apple Inpurasing"
+msgstr ""
+
+#: membership/models.py
 msgid "subscribe normal"
 msgstr ""
 
@@ -25037,10 +25028,6 @@ msgstr ""
 
 #: membership/templates/membership/card.html
 msgid "Encounter a problem？"
-msgstr ""
-
-#: membership/templates/membership/index.html
-msgid "EliteMBA"
 msgstr ""
 
 #: membership/templates/membership/index.html
