@@ -174,13 +174,28 @@
     }
 }
 @media screen and (max-width:576px){
+    #orders-tab{
+        padding: 10px 15px;
+    }
     .wrapper-account-settings .wrapper-header .header-title{
         padding-left: 22px;
     }
     .account-settings-sections #accountsTabSections-tabpanel .section .account-settings-section-body .u-field{
         width: 100%;
         margin-right: 0;
-    }  
+    }
+    .account-settings-sections #ordersTabSections-tabpanel .section .account-settings-section-body .u-field-order-link{
+        position: absolute;
+        bottom: 12px;
+        right: 40px;
+    }
+    .account-settings-sections #ordersTabSections-tabpanel .u-field-order{
+        padding-bottom: 50px;
+        flex-wrap: wrap;
+    }
+    .u-field-order-lines{
+        padding-top: 10px;
+    }
 }
 
 .account-settings-sections #accountsTabSections-tabpanel .u-field-value.field{
@@ -283,4 +298,31 @@
 }
 .account-settings-sections #about-tab{
     padding-left: 0;
+}
+.account-settings-sections #aboutTabSections-tabpanel{
+    .phone-number,.change-phone-btn{
+        padding-top: 7px;
+        display: inline-block;
+    }
+}
+.account-settings-sections #aboutTabSections-tabpanel .section .account-settings-section-body .u-field .u-field-message{
+    padding-top: 34px;
+}
+.account-settings-sections #aboutTabSections-tabpanel .section .account-settings-section-body .u-field.u-field-dropdown .u-field-value .u-field-title, .account-settings-sections .section .account-settings-section-body .u-field.editable-never .account-settings-sections .section .account-settings-section-body .u-field.mode-display .u-field-value .u-field-title{
+    font-size: 14px;
+    line-height: 1;
+}
+
+.account-settings-sections #accountsTabSections-tabpanel .section .account-settings-section-body .u-field .u-field-message{
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    .u-field-message-notification{
+        width: 100%;
+        height: 30px;
+        padding: 0;
+        margin: 0;
+        text-align: center;
+        padding-top: 15px;
+    }
 }
