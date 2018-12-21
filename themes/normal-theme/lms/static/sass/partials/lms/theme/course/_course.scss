@@ -19,7 +19,6 @@
 body.view-in-course .wrapper-course-material .course-tabs{
   .tab a{ 
     padding: 20px 15px 20px 10px;
-    color: $blue;
     &:hover, &:focus, &.active{
       border: 0;
       outline: none;
@@ -40,6 +39,9 @@ body.view-in-course .wrapper-course-material .course-tabs{
   .breadcrumbs{
     line-height: 1.5;
     margin: 5px 0;
+    .nav-item{
+      vertical-align: middle;
+    }
     .nav-item:not(:first-child){
       margin-left: 5px;
     }

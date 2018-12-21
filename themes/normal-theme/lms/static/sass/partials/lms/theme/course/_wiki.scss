@@ -18,13 +18,12 @@ body.view-in-course .wiki-wrapper{
     margin: 0;
     li a{
       font-size: 18px;
+      line-height: 35px;
     }
     li:after{
-      line-height: 30px;
-      font-size: 20px;
       font-size: 20px;
       color: #ccd1d9;
-      line-height: 30px;
+      line-height: 33px;
     }
     .active a{
       color: $title;
@@ -51,7 +50,7 @@ body.view-in-course .wiki-wrapper{
 .container .wiki-wrapper section.wiki{
   .nav-tabs{
     height: auto;
-    border: 1px solid #ddd;
+    border: 1px solid #e6e9ed;
     padding: 10px;
   }
   .nav-tabs li{
@@ -95,12 +94,12 @@ body.view-in-course .wiki-wrapper{
   }
   table{
     width: 100%;
-    border: 1px solid #ddd;
+    border: 1px solid #e6e9ed;
     margin: 10px 0;
     border-collapse: collapse;
   }
   th,td{
-    border: 1px solid #ddd;
+    border: 1px solid #e6e9ed;
     padding: 5px 10px;
     text-align: left;
   }
@@ -171,7 +170,18 @@ body.view-in-course .wiki-wrapper{
   }
 }
 // edit a wiki page
+.wiki-wrapper section.wiki .main-article{
+  padding: 20px;
+}
 .wiki-wrapper section.wiki{
+  #id_content{
+    height: 300px;
+  }
+  label{
+    font-size: 14px;
+    font-weight: normal;
+    color: $title;
+  }
   .btn.btn-primary{
     @extend %btn-my-primary;
     span{ display: none; }
@@ -204,7 +214,7 @@ body.view-in-course .wiki-wrapper{
 } 
 textarea, form#wiki_revision .CodeMirror, input[type="text"]{
   box-shadow: none;
-  border: 1px solid #ddd;
+  border: 1px solid #e6e9ed;
   background: #fff;
 }
 

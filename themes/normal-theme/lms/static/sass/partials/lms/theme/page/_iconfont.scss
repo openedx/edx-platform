@@ -235,7 +235,16 @@ $icon-width: 18px;
   margin-left: 10px;
   transform: scale(0.6);
   position: relative;
-  left: -2px;
+  left: -5px;
+  top: 1px;
+}
+@media screen and (max-width:767px){
+  .breadcrumbs .fa-angle-right{
+    position: static;
+    &:before{
+      content: ">";
+    }
+  }
 }
 
 
