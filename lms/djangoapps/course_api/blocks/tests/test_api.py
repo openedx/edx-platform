@@ -3,6 +3,7 @@ Tests for Blocks api.py
 """
 
 from itertools import product
+from mock import patch
 
 import ddt
 from django.test.client import RequestFactory
@@ -16,6 +17,7 @@ from student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import SampleCourseFactory, check_mongo_calls
+from xmodule.modulestore.tests.sample_courses import BlockInfo
 
 
 from ..api import get_blocks
@@ -107,6 +109,55 @@ class TestGetBlocks(SharedModuleStoreTestCase):
         self.assertEquals(len(blocks['blocks']), 3)
         for block in blocks['blocks'].itervalues():
             self.assertEqual(block['type'], 'problem')
+
+
+# TODO: Remove this class after REVE-52 lands and old-mobile-app traffic falls to < 5% of mobile traffic
+@ddt.ddt
+class TestGetBlocksMobileHack(SharedModuleStoreTestCase):
+    """
+    Tests that requests from the mobile app don't receive empty containers.
+    """
+    shard = 4
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestGetBlocksMobileHack, cls).setUpClass()
+        with cls.store.default_store(ModuleStoreEnum.Type.split):
+            cls.course = SampleCourseFactory.create(
+                block_info_tree=[
+                    BlockInfo('empty_chapter', 'chapter', {}, [
+                        BlockInfo('empty_sequential', 'sequential', {}, [
+                            BlockInfo('empty_vertical', 'vertical', {}, []),
+                        ]),
+                    ]),
+                    BlockInfo('full_chapter', 'chapter', {}, [
+                        BlockInfo('full_sequential', 'sequential', {}, [
+                            BlockInfo('full_vertical', 'vertical', {}, [
+                                BlockInfo('html', 'html', {}, []),
+                            ]),
+                        ]),
+                    ])
+                ]
+            )
+
+    def setUp(self):
+        super(TestGetBlocksMobileHack, self).setUp()
+        self.user = UserFactory.create()
+        self.request = RequestFactory().get("/dummy")
+        self.request.user = self.user
+
+    @ddt.data(
+        *product([True, False], ['chapter', 'sequential', 'vertical'])
+    )
+    @ddt.unpack
+    def test_empty_containers(self, is_mobile, container_type):
+        with patch('lms.djangoapps.course_api.blocks.api.is_request_from_mobile_app', return_value=is_mobile):
+            blocks = get_blocks(self.request, self.course.location)
+        full_container_key = self.course.id.make_usage_key(container_type, 'full_{}'.format(container_type))
+        self.assertIn(str(full_container_key), blocks['blocks'])
+        empty_container_key = self.course.id.make_usage_key(container_type, 'empty_{}'.format(container_type))
+        assert_containment = self.assertNotIn if is_mobile else self.assertIn
+        assert_containment(str(empty_container_key), blocks['blocks'])
 
 
 @ddt.ddt
