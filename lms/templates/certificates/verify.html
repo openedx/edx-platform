@@ -35,16 +35,18 @@ from django.utils.translation import ugettext as _
     </li>
     <li>
       <span>${_(u"学习时间")}</span>
-      <span class="localized_datetime"
-            data-format="shortDate"
-            data-language="${LANGUAGE_CODE}"
-            data-datetime="${start_date}">
-      </span>
-      -
-      <span class="localized_datetime"
-            data-format="shortDate"
-            data-language="${LANGUAGE_CODE}"
-            data-datetime="${end_date}">
+      <span>
+        <span class="localized_datetime"
+              data-format="shortDate"
+              data-language="${LANGUAGE_CODE}"
+              data-datetime="${start_date}">
+        </span>
+        -
+        <span class="localized_datetime"
+              data-format="shortDate"
+              data-language="${LANGUAGE_CODE}"
+              data-datetime="${end_date}">
+        </span>
       </span>
     </li>
     <li>
