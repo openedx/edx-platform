@@ -35,7 +35,11 @@ from lms.djangoapps.courseware.tests.factories import (
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 from openedx.core.djangoapps.util.testing import TestConditionalContent
 from openedx.core.lib.url_utils import quote_slashes
-from openedx.features.content_type_gating.partitions import CONTENT_GATING_PARTITION_ID, CONTENT_TYPE_GATE_GROUP_IDS
+from openedx.features.content_type_gating.partitions import (
+    CONTENT_GATING_PARTITION_ID,
+    CONTENT_TYPE_GATE_GROUP_IDS,
+    ContentTypeGatingPartition
+)
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.config import (
     EXPERIMENT_ID,
@@ -89,7 +93,7 @@ def _get_fragment_from_block(block, user_id, course, request_factory, mock_get_c
     return frag
 
 
-def _assert_block_is_gated(block, is_gated, user_id, course, request_factory):
+def _assert_block_is_gated(block, is_gated, user_id, course, request_factory, has_upgrade_link=True):
     """
     Asserts that a block in a specific course is gated for a specific user
     Arguments:
@@ -98,9 +102,15 @@ def _assert_block_is_gated(block, is_gated, user_id, course, request_factory):
         user_id (int): id of user
         course_id (CourseLocator): id of course
     """
-    frag = _get_fragment_from_block(block, user_id, course, request_factory)
+    checkout_link = '#' if has_upgrade_link else None
+    with patch.object(ContentTypeGatingPartition, '_get_checkout_link', return_value=checkout_link):
+        frag = _get_fragment_from_block(block, user_id, course, request_factory)
     if is_gated:
         assert 'content-paywall' in frag.content
+        if has_upgrade_link:
+            assert 'certA_1' in frag.content
+        else:
+            assert 'certA_1' not in frag.content
     else:
         assert 'content-paywall' not in frag.content
 
@@ -236,6 +246,18 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
             component_types=['problem', 'html']
         )
 
+        cls.courses['expired_upgrade_deadline'] = cls._create_course(
+            run='expired_upgrade_deadline_run_1',
+            display_name='Expired Upgrade Deadline Course Title',
+            modes=['audit'],
+            component_types=['problem', 'html']
+        )
+        CourseModeFactory.create(
+            course_id=cls.courses['expired_upgrade_deadline']['course'].scope_ids.usage_id.course_key,
+            mode_slug='verified',
+            expiration_datetime=datetime(2018, 1, 1)
+        )
+
     def setUp(self):
         super(TestProblemTypeAccess, self).setUp()
 
@@ -264,6 +286,12 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
         CourseEnrollmentFactory.create(
             user=self.audit_user,
             course_id=self.courses['audit_only']['course'].id,
+            mode='audit'
+        )
+        # enroll audit user into the upgrade expired course
+        CourseEnrollmentFactory.create(
+            user=self.audit_user,
+            course_id=self.courses['expired_upgrade_deadline']['course'].id,
             mode='audit'
         )
         ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
@@ -404,6 +432,20 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
             course=self.courses[course]['course'],
             is_gated=is_gated,
             request_factory=self.factory,
+        )
+
+    def test_access_expired_upgrade_deadline(self):
+        """
+        If a user is enrolled as an audit user and the upgrade deadline has passed
+        the user will continue to see gated content, but the upgrade messaging will be removed.
+        """
+        _assert_block_is_gated(
+            block=self.courses['default']['blocks']['problem'],
+            user_id=self.users['audit'].id,
+            course=self.courses['default']['course'],
+            is_gated=True,
+            request_factory=self.factory,
+            has_upgrade_link=False
         )
 
     @ddt.data(

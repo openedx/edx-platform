@@ -66,7 +66,7 @@ def get_user_course_expiration_date(user, course):
 
     access_duration = MIN_DURATION
 
-    if not CourseMode.verified_mode_for_course(course.id):
+    if not CourseMode.verified_mode_for_course(course.id, include_expired=True):
         return None
 
     enrollment = CourseEnrollment.get_enrollment(user, course.id)
@@ -138,11 +138,9 @@ def register_course_expired_message(request, course):
             return
 
         upgrade_deadline = enrollment.upgrade_deadline
-        if upgrade_deadline is None:
-            return
         now = timezone.now()
         course_upgrade_deadline = enrollment.course_upgrade_deadline
-        if now > upgrade_deadline:
+        if upgrade_deadline and now > upgrade_deadline:
             upgrade_deadline = course_upgrade_deadline
 
         expiration_message = _('{strong_open}Audit Access Expires {expiration_date}{strong_close}'
@@ -152,31 +150,47 @@ def register_course_expired_message(request, course):
                                      'as long as it exists on the site. {a_open}Upgrade now{sronly_span_open} to '
                                      'retain access past {expiration_date}{span_close}{a_close}')
         full_message = expiration_message
-        if now < course_upgrade_deadline:
+        if course_upgrade_deadline and now < course_upgrade_deadline:
             full_message += upgrade_deadline_message
 
         language = get_language()
-        if language and language.split('-')[0].lower() == 'es':
+        language_is_es = language and language.split('-')[0].lower() == 'es'
+        if language_is_es:
             formatted_expiration_date = strftime_localized(expiration_date, '%-d de %b. de %Y').lower()
-            formatted_upgrade_deadline = strftime_localized(upgrade_deadline, '%-d de %b. de %Y').lower()
         else:
             formatted_expiration_date = strftime_localized(expiration_date, '%b. %-d, %Y')
-            formatted_upgrade_deadline = strftime_localized(upgrade_deadline, '%b. %-d, %Y')
 
-        PageLevelMessages.register_info_message(
-            request,
-            Text(full_message).format(
-                a_open=HTML('<a href="{upgrade_link}">').format(
-                    upgrade_link=verified_upgrade_deadline_link(user=request.user, course=course)
-                ),
-                sronly_span_open=HTML('<span class="sr-only">'),
-                sighted_only_span_open=HTML('<span aria-hidden="true">'),
-                span_close=HTML('</span>'),
-                a_close=HTML('</a>'),
-                expiration_date=formatted_expiration_date,
-                strong_open=HTML('<strong>'),
-                strong_close=HTML('</strong>'),
-                line_break=HTML('<br>'),
-                upgrade_deadline=formatted_upgrade_deadline
+        if upgrade_deadline:
+            if language_is_es:
+                formatted_upgrade_deadline = strftime_localized(upgrade_deadline, '%-d de %b. de %Y').lower()
+            else:
+                formatted_upgrade_deadline = strftime_localized(upgrade_deadline, '%b. %-d, %Y')
+
+        if upgrade_deadline:
+            PageLevelMessages.register_info_message(
+                request,
+                Text(full_message).format(
+                    a_open=HTML('<a href="{upgrade_link}">').format(
+                        upgrade_link=verified_upgrade_deadline_link(user=request.user, course=course)
+                    ),
+                    sronly_span_open=HTML('<span class="sr-only">'),
+                    span_close=HTML('</span>'),
+                    a_close=HTML('</a>'),
+                    expiration_date=formatted_expiration_date,
+                    strong_open=HTML('<strong>'),
+                    strong_close=HTML('</strong>'),
+                    line_break=HTML('<br>'),
+                    upgrade_deadline=formatted_upgrade_deadline
+                )
             )
-        )
+        else:
+            PageLevelMessages.register_info_message(
+                request,
+                Text(full_message).format(
+                    span_close=HTML('</span>'),
+                    expiration_date=formatted_expiration_date,
+                    strong_open=HTML('<strong>'),
+                    strong_close=HTML('</strong>'),
+                    line_break=HTML('<br>'),
+                )
+            )
