@@ -75,7 +75,9 @@
 .home .highlighted-courses{
   margin: 0;
 }
-
+.courses-container .courses .courses-listing .courses-listing-item{
+  max-height: 1000px;
+}
 .home .highlighted-courses .courses .course, .find-courses .courses-container .courses .course{
   border: 1px solid #e6e9ed;
   box-shadow: 0px 0px 2px 0px $border;
@@ -86,7 +88,6 @@
   }
   
   .course-image .cover-image{
-    height: 156px;
     border-radius: 3px;
   }
   .course-image .cover-image .learn-more{

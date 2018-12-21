@@ -185,21 +185,6 @@
       top: 4px;
     }
   }
-  
-  .search-results-item .result-excerpt{
-    margin-bottom: 5px;
-  }
-
-  .search-results .search-results-item{
-    border-bottom: 1px solid $border;
-    padding: 15px;
-    min-height: 40px;
-
-    .result-location .result-course-name{
-      color: $font;
-      word-break: break-word;
-    }
-  }
 
   .search-load-next{
     border: none;
@@ -213,14 +198,42 @@
     padding: 0 8px;
   }
 }
+
+// search results item
 .search-results .search-results-item{
+  border-bottom: 1px solid $border;
+  padding: 15px 50px 15px 15px;
+  min-height: 45px;
+
+  .result-location .result-course-name{
+    color: $font;
+    word-break: break-word;
+  }
+  .result-link-block{
+    position: absolute;
+    right: 10px;
+    top: 20px;
+  }
+  .result-link{
+    float: none;
+    margin-bottom: 5px;
+  }
   .result-type{
     font-size: 12px;
+    bottom: 15px;
+    width: 34px;
+    text-align: center;
+    position: static;
+    display: block;
   }
   .result-location{
     line-height: 1.4;
   }
-} 
+  .result-excerpt{
+    margin-bottom: 5px;
+    line-height: 1.4;
+  }
+}
 
 // no courses
 .empty-dashboard-message{
@@ -269,8 +282,5 @@
   }
   .wrapper-messages-primary .message{
     padding: 10px 20px;
-  }
-  .search-results .search-results-item .result-type{
-    bottom: 40px;
   }
 }
