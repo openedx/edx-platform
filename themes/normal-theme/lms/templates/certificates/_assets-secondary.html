@@ -4,20 +4,21 @@
             margin: 0mm;    
         }  
 </style>
+<script type="text/javascript" src="/static/common/js/vendor/jquery.js"></script>
 <script src="/static/normal-theme/js/certificates/qrcode.js"></script>
 <script type="text/javascript">
-
-    document.getElementById("action-print-view").addEventListener("click", printView);
-
-    function printView(event) {
-       event.preventDefault();
-       window.print();
+    if (document.getElementById("action-print-view") != null){
+        document.getElementById("action-print-view").addEventListener("click", printView);
+        function printView(event) {
+           event.preventDefault();
+           window.print();
+        }
     }
 
     //二维码扫码
     var code = document.getElementById("code");
     var url = $.trim($('#url').text());
-    url = location.host+url;   
+    url = location.protocol+ '//' + location.host + url;   
     var data = {    
         text: url,
         width: 78,

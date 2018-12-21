@@ -235,7 +235,7 @@ FEATURES = {
     'ENABLE_THIRD_PARTY_AUTH': False,
 
     # Toggle to enable alternate urls for marketing links
-    'ENABLE_MKTG_SITE': False,
+    'ENABLE_MKTG_SITE': True,
 
     # Prevent concurrent logins per user
     'PREVENT_CONCURRENT_LOGINS': True,
