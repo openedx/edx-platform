@@ -244,14 +244,16 @@ class EnrollmentUserRolesView(APIView):
                     ).format(username=request.user.username)
                 }
             )
-        return Response([
-            {
-                "org": role.org,
-                "course_id": text_type(role.course_id),
-                "role": role.role
-            }
-            for role in roles_data
-        ])
+        return Response({
+            'roles': [
+                {
+                    "org": role.org,
+                    "course_id": text_type(role.course_id),
+                    "role": role.role
+                }
+                for role in roles_data],
+            'is_staff': request.user.is_staff,
+        })
 
 
 @can_disable_rate_limit
