@@ -406,8 +406,8 @@ def _default_course_mode(course_id):
     available_modes = [m.slug for m in course_modes]
 
     if settings.FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION', False):
-        if 'profession' in available_modes:
-            return 'profession'
+        if 'professional' in available_modes:
+            return 'professional'
         elif 'no-id-professional' in available_modes:
             return 'no-id-professional'
         elif 'verified' in available_modes:
