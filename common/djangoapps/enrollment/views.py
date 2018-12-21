@@ -210,17 +210,24 @@ class EnrollmentUserRolesView(APIView):
     **Use Case**
 
         Get the roles for the current logged-in user.
+        A field is also included to indicate whether or not the user is a global
+        staff member.
+        If an optional course_id parameter is supplied, the returned roles will be
+        filtered to only include roles for the given course.
 
     **Example Requests**
 
-        GET /api/enrollment/v1/roles/
+        GET /api/enrollment/v1/roles/?course_id={course_id}
+
+        course_id: (optional) A course id. The returned roles will be filtered to
+        only include roles for the given course.
 
     **Response Values**
 
         If the request is successful, an HTTP 200 "OK" response is
         returned along with a collection of user roles for the
-        logged-in user
-
+        logged-in user, filtered by course_id if given, along with
+        whether or not the user is global staff
     """
     authentication_classes = (JwtAuthentication,
                               OAuth2AuthenticationAllowInactiveUser,
@@ -231,10 +238,13 @@ class EnrollmentUserRolesView(APIView):
     @method_decorator(ensure_csrf_cookie_cross_domain)
     def get(self, request):
         """
-        Gets a list of all roles for the currently logged-in user
+        Gets a list of all roles for the currently logged-in user, filtered by course_id if supplied
         """
         try:
+            course_id = request.GET.get('course_id')
             roles_data = api.get_user_roles(request.user.username)
+            if course_id:
+                roles_data = [role for role in roles_data if text_type(role.course_id) == course_id]
         except Exception:
             return Response(
                 status=status.HTTP_400_BAD_REQUEST,
