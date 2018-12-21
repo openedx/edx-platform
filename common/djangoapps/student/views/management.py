@@ -111,8 +111,6 @@ REGISTRATION_UTM_PARAMETERS = {
     'utm_content': 'registration_utm_content',
 }
 REGISTRATION_UTM_CREATED_AT = 'registration_utm_created_at'
-# used to announce a registration
-REGISTER_USER = Signal(providing_args=["user", "registration"])
 
 
 def csrf_token(context):
