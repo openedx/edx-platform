@@ -13,8 +13,8 @@
 }
 .view-profile .wrapper-profile{
   background: none;
-  padding-bottom: 40px;
   min-height: 0;
+  padding:  0 10px 40px;
 }
 .u-field.editable-toggle.mode-display:hover{
   background: rgba(182,220,254,0.1);
@@ -103,6 +103,7 @@
       .u-field-value-readonly{
         color: $font;
         font-weight: normal;
+        -webkit-font-smoothing: unset;
       }
     } 
 
@@ -152,6 +153,8 @@
       border: 1px solid #e6e9ed;
       background: #fff;
       box-shadow: none;
+      border-radius: 3px;
+      margin-top: 0;
 
       .message-header{
         font-size: 16px;
@@ -162,6 +165,9 @@
         @extend %btn-my-primary;
         vertical-align: sub;
       }
+      .fa-search:before{
+        vertical-align: sub;
+      }
     }
 
     .u-field-value textarea{
@@ -169,7 +175,6 @@
       background: #fff;
       padding: 10px;
       border-radius: 0;
-      padding: 0;
     }
     .wrapper-u-field {
       color: $font;

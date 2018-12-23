@@ -57,6 +57,10 @@
   
   .sequence-nav-button{
     border: 1px solid $border;
+    .fa{
+      position: relative;
+      top: 2px;
+    }
     &.button-next{
       height: 43px;
       box-sizing: border-box;
@@ -84,6 +88,9 @@
   }
   .sequence-bottom .sequence-nav-button{
     padding-top: 2px;
+    .fa{
+      top: 0;
+    }
   }
 } 
 
