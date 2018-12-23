@@ -118,6 +118,13 @@ textarea:focus, input[type="text"]:focus, input[type="url"]:focus, input[type="e
 // button
 // button样式
 // 底色蓝，字体白按钮
+input[type="submit"], input[type="button"], button, .button{
+  -webkit-font-smoothing: unset;
+}
+button:focus:not(:disabled){
+  outline: none;
+  border: none;
+}
 %btn-my-primary{
   display: inline-block;
   width: auto;
