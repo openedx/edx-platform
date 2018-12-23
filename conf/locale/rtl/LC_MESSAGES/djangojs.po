@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-12-16 20:36+0000\n"
-"PO-Revision-Date: 2018-12-16 20:37:10.221428\n"
+"POT-Creation-Date: 2018-12-23 20:36+0000\n"
+"PO-Revision-Date: 2018-12-23 20:37:01.665688\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -5451,10 +5451,6 @@ msgstr "فاهس مهرن صهمم خحثر هر ش رثص زقخصسثق صهر
 msgid "This link will open in a modal window"
 msgstr "فاهس مهرن صهمم خحثر هر ش وخيشم صهريخص"
 
-#: cms/static/js/certificates/collections/certificates.js
-msgid "Could not parse certificate JSON. %(message)s"
-msgstr "ذخعمي رخف حشقسث ذثقفهبهذشفث تسخر. %(message)s"
-
 #: cms/static/js/certificates/models/certificate.js
 msgid "Certificate name is required."
 msgstr "ذثقفهبهذشفث رشوث هس قثضعهقثي."
@@ -8456,6 +8452,22 @@ msgstr "ذاشرلث وغ ثوشهم شييقثسس"
 #: lms/templates/student_account/account.underscore
 msgid "Reset Password"
 msgstr "قثسثف حشسسصخقي"
+
+#: lms/templates/student_account/account_recovery.underscore
+msgid "Account Recovery"
+msgstr "شذذخعرف قثذخدثقغ"
+
+#: lms/templates/student_account/account_recovery.underscore
+msgid ""
+"Please enter your secondary email address below and we will send you "
+"instructions for recovering your account and setting a new password."
+msgstr ""
+"حمثشسث ثرفثق غخعق سثذخريشقغ ثوشهم شييقثسس زثمخص شري صث صهمم سثري غخع "
+"هرسفقعذفهخرس بخق قثذخدثقهرل غخعق شذذخعرف شري سثففهرل ش رثص حشسسصخقي."
+
+#: lms/templates/student_account/account_recovery.underscore
+msgid "Recover my account"
+msgstr "قثذخدثق وغ شذذخعرف"
 
 #: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"

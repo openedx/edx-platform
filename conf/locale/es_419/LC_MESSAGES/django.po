@@ -229,7 +229,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-12-13 16:59+0000\n"
+"POT-Creation-Date: 2018-12-16 20:42+0000\n"
 "PO-Revision-Date: 2018-12-03 12:00+0000\n"
 "Last-Translator: Marina Pastor <mpastor@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -6951,6 +6951,7 @@ msgstr "Curso añadido"
 
 #: lms/djangoapps/dashboard/sysadmin.py cms/templates/course-create-rerun.html
 #: cms/templates/index.html lms/templates/shoppingcart/receipt.html
+#: lms/templates/support/feature_based_enrollments.html
 msgid "Course Name"
 msgstr "Nombre del curso"
 
@@ -9449,6 +9450,14 @@ msgstr "Derechos"
 msgid "View, create, and reissue learner entitlements"
 msgstr "Ver, crear y reexpedir derechos de los estudiantes."
 
+#: lms/templates/support/feature_based_enrollments.html
+msgid "Feature Based Enrollments"
+msgstr "Inscripciones basadas en características"
+
+#: lms/djangoapps/support/views/index.py
+msgid "View feature based enrollment settings"
+msgstr ""
+
 #: lms/djangoapps/support/views/manage_user.py
 msgid "user_support_url"
 msgstr "user_support_url"
@@ -9484,6 +9493,7 @@ msgstr "Dirección de correo electrónico"
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+#: lms/templates/support/feature_based_enrollments.html
 msgid "Course ID"
 msgstr "Id de Curso"
 
@@ -12304,10 +12314,9 @@ msgid ""
 "then that course will be Enabled only if the org that it is in is Enabled."
 msgstr ""
 
-#: openedx/features/content_type_gating/models.py
-#: openedx/features/course_duration_limits/models.py
+#: lms/templates/support/feature_based_enrollments.html
 msgid "Enabled As Of"
-msgstr ""
+msgstr "Habilitado a partir de"
 
 #: openedx/features/content_type_gating/models.py
 #: openedx/features/course_duration_limits/models.py
@@ -16630,7 +16639,7 @@ msgstr "Lo sentimos, hubo un error al intentar inscribirte"
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid "Pursue Academic Credit with the Verified Track"
-msgstr ""
+msgstr "Obtén crédito académico con con la opción con certificado "
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
@@ -16653,7 +16662,7 @@ msgstr ""
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid "Benefits of the Verified Track"
-msgstr ""
+msgstr "Beneficios de un Certificado Verificado"
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
@@ -17596,7 +17605,7 @@ msgstr "Inicia - {date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "for {course_display_name}"
-msgstr ""
+msgstr "Para {course_display_name}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You must select a session by {expiration_date} to access the course."
@@ -18436,22 +18445,24 @@ msgid ""
 "Sorry! The photos you submitted for ID verification were not accepted, for "
 "the following reason(s):"
 msgstr ""
+"¡Lo siento! Las fotos que envió para la verificación de ID no fueron "
+"aceptadas por la siguiente razón(es):"
 
 #: lms/templates/emails/failed_verification_email.txt
 msgid "The photo(s) of you:"
-msgstr ""
+msgstr "Foto(s) de ti:"
 
 #: lms/templates/emails/failed_verification_email.txt
 msgid "The photo of you:"
-msgstr ""
+msgstr "La foto de ti:"
 
 #: lms/templates/emails/failed_verification_email.txt
 msgid "The photo of your ID:"
-msgstr ""
+msgstr "La foto de tu ID:"
 
 #: lms/templates/emails/failed_verification_email.txt
 msgid "Other Reasons:"
-msgstr ""
+msgstr "Otras Razones:"
 
 #: lms/templates/emails/failed_verification_email.txt
 msgid "Resubmit Verification: {reverify_url}"
@@ -20076,6 +20087,7 @@ msgid "Therefore, please give enough detail to account for this action."
 msgstr "Por favor suministre los detalles suficientes para esta acción."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
+#: lms/templates/support/feature_based_enrollments.html
 msgid "Reason"
 msgstr "Razón"
 
@@ -20563,7 +20575,7 @@ msgstr "Ver libro de calificaciones"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View a specific learner's enrollment status"
-msgstr ""
+msgstr "Ver el estado de inscripción de un estudiante específico"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Learner's {platform_name} email address or username *"
@@ -20575,7 +20587,7 @@ msgstr "Dirección de correo electrónico o nombre de usuario del estudiante"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View Enrollment Status"
-msgstr ""
+msgstr "Ver estado de inscripción"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View a specific learner's grades and progress"
@@ -21629,6 +21641,18 @@ msgstr "Contacte el soporte de {platform_name}"
 msgid "Student Support: Enrollment"
 msgstr "Soporte a estudiantes: Inscripciones"
 
+#: lms/templates/support/feature_based_enrollments.html
+msgid "Student Support: Feature Based Enrollments"
+msgstr ""
+
+#: lms/templates/support/feature_based_enrollments.html
+msgid "Is Enabled"
+msgstr "Está habilitado"
+
+#: lms/templates/support/feature_based_enrollments.html
+msgid "No results found"
+msgstr "No se han encontrado resultados"
+
 #: lms/templates/support/manage_user.html
 msgid "Student Support: Manage User"
 msgstr "Soporte a Estudiantes: Administrar Usuario"
@@ -22323,6 +22347,9 @@ msgid ""
 "{b_start}Support our Mission: {b_end}EdX, a non-profit, relies on verified "
 "certificates to help fund affordable education to everyone globally."
 msgstr ""
+"{b_start}Apoya nuestra misión: {b_end}EdX, una organización sin fines de "
+"lucro, se basa en certificados verificados para ayudar a financiar una "
+"educación asequible para todos en todo el mundo."
 
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""

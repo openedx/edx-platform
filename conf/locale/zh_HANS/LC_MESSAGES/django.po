@@ -377,7 +377,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-12-13 16:59+0000\n"
+"POT-Creation-Date: 2018-12-16 20:42+0000\n"
 "PO-Revision-Date: 2018-12-12 13:57+0000\n"
 "Last-Translator: 微 李 <w.li@eliteu.com.cn>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
@@ -5869,7 +5869,7 @@ msgstr "正在生成课程证书。"
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Upgrade to Verified Certificate"
-msgstr "身分认证升级"
+msgstr "身份认证升级"
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Verification Upgrade Deadline"
@@ -5885,7 +5885,7 @@ msgstr "学习新知识、磨炼新技能、获取认证证书，好机会不容
 msgid ""
 "You are still eligible to upgrade to a Verified Certificate! Pursue it to "
 "highlight the knowledge and skills you gain in this course."
-msgstr "你仍有资格升级至合格证书！继续努力精进您从这个课程所获的知识和技能。"
+msgstr "您仍有资格升级至认证证书！获得认证证书以突显您从这个课程所获的知识和技能。"
 
 #. Translators: This describes the time by which the user
 #. should upgrade to the verified track. 'date' will be
@@ -6362,6 +6362,7 @@ msgstr "添加课程"
 
 #: lms/djangoapps/dashboard/sysadmin.py cms/templates/course-create-rerun.html
 #: cms/templates/index.html lms/templates/shoppingcart/receipt.html
+#: lms/templates/support/feature_based_enrollments.html
 msgid "Course Name"
 msgstr "课程名称"
 
@@ -7549,7 +7550,7 @@ msgstr "招生手册 (Un)"
 
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Enrollment Role"
-msgstr "注册身分"
+msgstr "注册身份"
 
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "List Price"
@@ -8646,6 +8647,14 @@ msgstr "授权"
 msgid "View, create, and reissue learner entitlements"
 msgstr "查看、新建、重新颁发学员权益"
 
+#: lms/djangoapps/support/views/index.py
+msgid "Feature Based Enrollments"
+msgstr "基于功能的注册"
+
+#: lms/djangoapps/support/views/index.py
+msgid "View feature based enrollment settings"
+msgstr "查看基于功能的注册设置"
+
 #: lms/djangoapps/support/views/manage_user.py
 msgid "user_support_url"
 msgstr "user_support_url"
@@ -8681,6 +8690,7 @@ msgstr "电子邮件地址"
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+#: lms/templates/support/feature_based_enrollments.html
 msgid "Course ID"
 msgstr "课程编号"
 
@@ -18172,6 +18182,7 @@ msgid "Therefore, please give enough detail to account for this action."
 msgstr "因此，请提供足够的信息来解释这个操作。"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
+#: lms/templates/support/feature_based_enrollments.html
 msgid "Reason"
 msgstr "原因"
 
@@ -19543,6 +19554,18 @@ msgstr "联系{platform_name}支持"
 #: lms/templates/support/enrollment.html
 msgid "Student Support: Enrollment"
 msgstr "学生支持：选课"
+
+#: lms/templates/support/feature_based_enrollments.html
+msgid "Student Support: Feature Based Enrollments"
+msgstr ""
+
+#: lms/templates/support/feature_based_enrollments.html
+msgid "Is Enabled"
+msgstr ""
+
+#: lms/templates/support/feature_based_enrollments.html
+msgid "No results found"
+msgstr ""
 
 #: lms/templates/support/manage_user.html
 msgid "Student Support: Manage User"
