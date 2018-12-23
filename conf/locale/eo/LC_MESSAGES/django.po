@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-12-16 20:37+0000\n"
-"PO-Revision-Date: 2018-12-16 20:37:10.730161\n"
+"POT-Creation-Date: 2018-12-23 20:36+0000\n"
+"PO-Revision-Date: 2018-12-23 20:37:01.693724\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -897,6 +897,15 @@ msgstr ""
 "Çhéçk ýöür {email_start}{email}{email_end} ïnßöx för än äççöünt äçtïvätïön "
 "lïnk fröm {platform_name}. Ìf ýöü nééd hélp, çöntäçt "
 "{link_start}{platform_name} Süppört{link_end}. Ⱡ'σяєм ιρѕυм ∂σłσя#"
+
+#: common/djangoapps/student/views/dashboard.py
+#, python-brace-format
+msgid ""
+"Add a recovery email to retain access when single-sign on is not available. "
+"Go to {link_start}your Account Settings{link_end}."
+msgstr ""
+"Àdd ä réçövérý émäïl tö rétäïn äççéss whén sïnglé-sïgn ön ïs nöt äväïläßlé. "
+"Gö tö {link_start}ýöür Àççöünt Séttïngs{link_end}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: common/djangoapps/student/views/dashboard.py
 #, python-brace-format
@@ -13183,6 +13192,21 @@ msgstr ""
 "Thé émäïl äddréss ýöü üséd tö régïstér wïth {platform_name} Ⱡ'σяєм ιρѕυм "
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
+#. Translators: This label appears above a field on the password reset
+#. form meant to hold the user's email address.
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Secondary email"
+msgstr "Séçöndärý émäïl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: openedx/core/djangoapps/user_api/api.py
+#, python-brace-format
+msgid ""
+"Secondary email address you registered with {platform_name} using account "
+"settings page"
+msgstr ""
+"Séçöndärý émäïl äddréss ýöü régïstéréd wïth {platform_name} üsïng äççöünt "
+"séttïngs pägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
+
 #: openedx/core/djangoapps/user_api/api.py lms/templates/login.html
 msgid "Remember me"
 msgstr "Rémémßér mé Ⱡ'σяєм ιρѕυм ∂σłσя #"
@@ -13495,21 +13519,6 @@ msgid "There was an error receiving your login information. Please email us."
 msgstr ""
 "Théré wäs än érrör réçéïvïng ýöür lögïn ïnförmätïön. Pléäsé émäïl üs. Ⱡ'σяєм"
 " ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
-
-#: openedx/core/djangoapps/user_authn/views/login.py
-msgid ""
-"Your password has expired due to password policy on this account. You must "
-"reset your password before you can log in again. Please click the \"Forgot "
-"Password\" link on this page to reset your password before logging in again."
-msgstr ""
-"Ýöür pässwörd häs éxpïréd düé tö pässwörd pölïçý ön thïs äççöünt. Ýöü müst "
-"rését ýöür pässwörd ßéföré ýöü çän lög ïn ägäïn. Pléäsé çlïçk thé \"Förgöt "
-"Pässwörd\" lïnk ön thïs pägé tö rését ýöür pässwörd ßéföré löggïng ïn ägäïn."
-" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
-"тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
-" qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт #"
 
 #: openedx/core/djangoapps/user_authn/views/login.py
 #, python-brace-format
