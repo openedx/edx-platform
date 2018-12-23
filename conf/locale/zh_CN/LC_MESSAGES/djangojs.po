@@ -6182,7 +6182,7 @@ msgstr "成绩分页"
 
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_fields.js
 msgid "Account Settings page."
-msgstr "账号设置页面。"
+msgstr "账号设置页面"
 
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_fields.js
 msgid ""

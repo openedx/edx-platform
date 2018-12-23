@@ -20075,7 +20075,10 @@ msgid ""
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/disclaimer.html
-msgid "4.  个人或单位如认为英荔存在侵犯自身合法权益的内容，应准备好具有法律效应的证明材料，及时与英荔取得联系，以便英荔迅速做出处理。"
+msgid ""
+"4. User should inform Elite when he/she discovers any violation of this "
+"Service Agreement, the terms of service of any other individual service, and"
+" various announcements made by Elite Education. "
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/disclaimer.html
@@ -20109,11 +20112,18 @@ msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/join_us.html
 msgid ""
-"英荔关注员工发展，重视交流的力量。作为一个整体，我们不断学习，相互启发，在工作中不断发现行业灵感，大开眼界。在这里，工作是享受与拼搏的有机结合。"
+"Eliteu pays attention to employee development and attaches importance to the"
+" power of communication. We continue to learn, inspire each other, and "
+"constantly discover industry inspiration at work, and open our eyes as a "
+"whole community. Here, work is an organic combination of enjoyment and hard "
+"work."
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/join_us.html
-msgid "职位信息整理中，我们将尽快发布，敬请期待。当然，这并不意味着我们愿意错过任何一位未来的成员，欢迎直接邮件联系"
+msgid ""
+"We will release job information as soon as possible, so stay tuned. Of "
+"course, this does not mean that we want to miss any future members. Feel "
+"free to contact us through email directly."
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/privacy.html
@@ -20255,10 +20265,6 @@ msgid "6.  英荔在各服务条款及声明中列明的使用方式或免责�
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
-msgid "用户协议"
-msgstr ""
-
-#: themes/normal-theme/lms/templates/static_templates/user_agreement.html
 msgid "一、服务条款"
 msgstr ""
 
@@ -20384,7 +20390,7 @@ msgid "破坏国家宗教政策，宣扬邪教和封建迷信的；"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
-msgid "散布谣言，扰乱社会秩序，破坏社会稳定的；"
+msgid "Spread rumors, disrupting social order or endanger social stability;"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -20448,7 +20454,10 @@ msgid "10.  故意或非故意地违反任何适用的当地、国家法律，
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
-msgid "11.  未经合法授权而截获、篡改、收集、储存或删除他人个人信息、站内邮件或其它数据资料，或将获知的此类资料用于任何非法或不正当目的。"
+msgid ""
+"11. Intercept, tamper with, collect, store or delete personal information, "
+"on-site mail or other data  without legal authorization, or use such "
+"information for any illegal or improper purpose. "
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html

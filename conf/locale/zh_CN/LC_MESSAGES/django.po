@@ -5,10 +5,10 @@
 # EdX Team <info@edx.org>, 2018.
 #
 # Translators:
-# 微 李 <w.li@eliteu.com.cn>, 2018
-# li ying <code@eliteu.cn>, 2018
-# Yi Li <y.li@eliteu.cn>, 2018
 # 婕 高 <j.gao@eliteu.cn>, 2018
+# 微 李 <w.li@eliteu.com.cn>, 2018
+# Yi Li <y.li@eliteu.cn>, 2018
+# li ying <code@eliteu.cn>, 2018
 # 陈滢冲 <yc.chen@eliteu.cn>, 2018
 # 家璧 刘 <jb.liu@eliteu.com.cn>, 2018
 #
@@ -30,11 +30,11 @@
 # EdX Team <info@edx.org>, 2018.
 #
 # Translators:
-# 微 李 <w.li@eliteu.com.cn>, 2018
 # 婕 高 <j.gao@eliteu.cn>, 2018
 # 家璧 刘 <jb.liu@eliteu.com.cn>, 2018
 # Yi Li <y.li@eliteu.cn>, 2018
 # li ying <code@eliteu.cn>, 2018
+# 微 李 <w.li@eliteu.com.cn>, 2018
 #
 # #-#-#-#-#  mako-studio.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)
@@ -8590,7 +8590,9 @@ msgstr "已收到{platform_name}身份认证照片"
 msgid "Review ID Verification Photos For {username}"
 msgstr "查看{username}的身份验证照片"
 
-#: lms/envs/common.py membership/templates/membership/index.html
+#: lms/envs/common.py lms/templates/certificates/verify.html
+#: themes/normal-theme/lms/templates/static_templates/about.html
+#: membership/templates/membership/index.html
 msgid "EliteMBA"
 msgstr "英荔商学院"
 
@@ -12422,7 +12424,7 @@ msgstr "订单记录"
 
 #: lms/templates/dashboard.html
 msgid "VIP Expiry Date"
-msgstr ""
+msgstr "会员有效期"
 
 #: lms/templates/dashboard.html
 msgid "Subscription will soon be overdue. Please recharge in time."
@@ -12432,7 +12434,7 @@ msgstr ""
 msgid ""
 "Sorry, your EliteMBA VIP has expired. In order not to disrupt your learning "
 "schedule, please recharge in time."
-msgstr ""
+msgstr "您好，您购买的英荔商学院 VIP 会员已到期，为了不影响您的学习进度，请及时充值"
 
 #: lms/templates/dashboard.html
 msgid "Renew VIP"
@@ -14886,11 +14888,11 @@ msgstr ""
 
 #: lms/templates/certificates/verify.html
 msgid "Certificated Learner"
-msgstr ""
+msgstr "持证学员"
 
 #: lms/templates/certificates/verify.html
 msgid "Certificate No."
-msgstr ""
+msgstr "证书编号"
 
 #: lms/templates/certificates/verify.html
 msgid "所属机构"
@@ -14898,19 +14900,19 @@ msgstr ""
 
 #: lms/templates/certificates/verify.html
 msgid "Learning Time"
-msgstr ""
+msgstr "学习时间"
 
 #: lms/templates/certificates/verify.html
 msgid "Learning Type"
-msgstr ""
+msgstr "学习类型"
 
 #: lms/templates/certificates/verify.html
 msgid "Certificate Issuing Date"
-msgstr ""
+msgstr "发证时间"
 
 #: lms/templates/certificates/verify.html
 msgid "Electronic Certificate"
-msgstr ""
+msgstr "电子证书"
 
 #: lms/templates/commerce/checkout_cancel.html
 msgid "Checkout Cancelled"
@@ -19482,11 +19484,11 @@ msgstr "账户设置"
 
 #: lms/templates/student_account/account_settings.html
 msgid "Mobile"
-msgstr ""
+msgstr "手机"
 
 #: lms/templates/student_account/account_settings.html
 msgid "Bind Mobile"
-msgstr ""
+msgstr "绑定您的手机"
 
 #: lms/templates/student_account/account_settings.html
 msgid "Successfully Bound."
@@ -19498,7 +19500,7 @@ msgstr ""
 
 #: lms/templates/student_account/account_settings.html
 msgid "bind your EliteMBA account to your cellphone number"
-msgstr ""
+msgstr "将您的手机号码与EliteMBA的账号绑定"
 
 #: lms/templates/student_account/finish_auth.html
 msgid "Please Wait"
@@ -20320,7 +20322,7 @@ msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/about.html
 msgid "Our Mission"
-msgstr ""
+msgstr "我们的使命"
 
 #: themes/normal-theme/lms/templates/static_templates/about.html
 msgid "提供启发和创新的教育体验，使学习者有一个便捷和包容的学习环境，促进他们职业和个人发展的成功。"
@@ -20328,49 +20330,49 @@ msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/about.html
 msgid "Our Vision"
-msgstr ""
+msgstr "我们的愿景"
 
 #: themes/normal-theme/lms/templates/static_templates/about.html
 msgid "To become a reputable brand of digital education in China."
-msgstr ""
+msgstr "成为中国享有声誉的数字化教育品牌。"
 
 #: themes/normal-theme/lms/templates/static_templates/contact.html
 msgid ""
 "Address: Room 1005, CITIC Plaza, No. 233 Tianhe North Road, Tianhe District,"
 " Guangzhou, China"
-msgstr ""
+msgstr "地址：广州市天河区天河北路233号中信广场写字楼1005室"
 
 #: themes/normal-theme/lms/templates/static_templates/contact.html
 msgid "Telephone: 400-931-8118 (Monday to Friday at 9:00-18:00)"
-msgstr ""
+msgstr "电话：400-931-8118（周一至周五9：00 - 18：00）"
 
 #: themes/normal-theme/lms/templates/static_templates/contact.html
 msgid "Human Resources and Recruitment"
-msgstr ""
+msgstr "人力资源及招聘"
 
 #: themes/normal-theme/lms/templates/static_templates/contact.html
 msgid "Feedback and Technical Support"
-msgstr ""
+msgstr "建议及技术支持"
 
 #: themes/normal-theme/lms/templates/static_templates/contact.html
 msgid "Course-Related"
-msgstr ""
+msgstr "课程相关"
 
 #: themes/normal-theme/lms/templates/static_templates/contact.html
 msgid "Media Communication"
-msgstr ""
+msgstr "媒体交流"
 
 #: themes/normal-theme/lms/templates/static_templates/contact.html
 msgid "Business Cooperation"
-msgstr ""
+msgstr "商务合作"
 
 #: themes/normal-theme/lms/templates/static_templates/contact.html
 msgid "General Information"
-msgstr ""
+msgstr "综合资讯"
 
 #: themes/normal-theme/lms/templates/static_templates/contact.html
 msgid "System Bugs"
-msgstr ""
+msgstr "系统漏洞"
 
 #: themes/normal-theme/lms/templates/static_templates/disclaimer.html
 msgid "总则"
@@ -20378,7 +20380,7 @@ msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/disclaimer.html
 msgid ""
-"英荔教育（www.elitemba.cn）的产品及服务由广东英荔国际教育科技有限公司（以下简称“英荔”或“我们”）提供。本Disclaimer（以下简称“本声明”）适用于英荔的网站、在计算机/手机/平板电脑或其它设备上使用的英荔的应用程序和其它产品及服务。英荔用户（以下简称“用户”）在接受英荔服务之前，请务必仔细阅读本条款并同意本声明"
+"英荔教育（www.elitemba.cn）的产品及服务由广东英荔国际教育科技有限公司（以下简称“英荔”或“我们”）提供。本免责声明（以下简称“本声明”）适用于英荔的网站、在计算机/手机/平板电脑或其它设备上使用的英荔的应用程序和其它产品及服务。英荔用户（以下简称“用户”）在接受英荔服务之前，请务必仔细阅读本条款并同意本声明"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/disclaimer.html
@@ -20388,7 +20390,7 @@ msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/disclaimer.html
 msgid ""
-"本Disclaimer可由英荔随时修正或更改，英荔将公布并更新生效日期。更新后的Disclaimer一旦公布即有效代替原来的声明，用户继续使用英荔服务即表示用户同意并接受本声明及其任何更新版本。"
+"本免责声明可由英荔随时修正或更改，英荔将公布并更新生效日期。更新后的免责声明一旦公布即有效代替原来的声明，用户继续使用英荔服务即表示用户同意并接受本声明及其任何更新版本。"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/disclaimer.html
@@ -20443,15 +20445,18 @@ msgid ""
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/disclaimer.html
-msgid "4.  个人或单位如认为英荔存在侵犯自身合法权益的内容，应准备好具有法律效应的证明材料，及时与英荔取得联系，以便英荔迅速做出处理。"
-msgstr ""
+msgid ""
+"4. User should inform Elite when he/she discovers any violation of this "
+"Service Agreement, the terms of service of any other individual service, and"
+" various announcements made by Elite Education. "
+msgstr "4.  个人或单位如认为英荔存在侵犯自身合法权益的内容，应准备好具有法律效应的证明材料，及时与英荔取得联系，以便英荔迅速做出处理。"
 
 #: themes/normal-theme/lms/templates/static_templates/disclaimer.html
 msgid "附则"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/disclaimer.html
-msgid "对Disclaimer的解释、修改及更新权均属于英荔教育所有。"
+msgid "对免责声明的解释、修改及更新权均属于英荔教育所有。"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/disclaimer.html
@@ -20477,17 +20482,20 @@ msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/join_us.html
 msgid ""
-"英荔关注员工发展，重视交流的力量。作为一个整体，我们不断学习，相互启发，在工作中不断发现行业灵感，大开眼界。在这里，工作是享受与拼搏的有机结合。"
+"Eliteu pays attention to employee development and attaches importance to the"
+" power of communication. We continue to learn, inspire each other, and "
+"constantly discover industry inspiration at work, and open our eyes as a "
+"whole community. Here, work is an organic combination of enjoyment and hard "
+"work."
 msgstr ""
+"英荔关注员工发展，重视交流的力量。作为一个整体，我们不断学习，相互启发，在工作中不断发现行业灵感，大开眼界。在这里，工作是享受与拼搏的有机结合。"
 
 #: themes/normal-theme/lms/templates/static_templates/join_us.html
-msgid "职位信息整理中，我们将尽快发布，敬请期待。当然，这并不意味着我们愿意错过任何一位未来的成员，欢迎直接邮件联系"
-msgstr ""
-
-#: themes/normal-theme/lms/templates/static_templates/privacy.html
-#: themes/normal-theme/lms/templates/static_templates/privacy_policy.html
-msgid "隐私政策"
-msgstr ""
+msgid ""
+"We will release job information as soon as possible, so stay tuned. Of "
+"course, this does not mean that we want to miss any future members. Feel "
+"free to contact us through email directly."
+msgstr "职位信息整理中，我们将尽快发布，敬请期待。当然，这并不意味着我们愿意错过任何一位未来的成员，欢迎直接邮件联系"
 
 #: themes/normal-theme/lms/templates/static_templates/privacy.html
 #: themes/normal-theme/lms/templates/static_templates/privacy_policy.html
@@ -20623,10 +20631,6 @@ msgid "6.  英荔在各服务条款及声明中列明的使用方式或免责�
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
-msgid "用户协议"
-msgstr ""
-
-#: themes/normal-theme/lms/templates/static_templates/user_agreement.html
 msgid "一、服务条款"
 msgstr ""
 
@@ -20752,8 +20756,8 @@ msgid "破坏国家宗教政策，宣扬邪教和封建迷信的；"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
-msgid "散布谣言，扰乱社会秩序，破坏社会稳定的；"
-msgstr ""
+msgid "Spread rumors, disrupting social order or endanger social stability;"
+msgstr "散布谣言，扰乱社会秩序，破坏社会稳定的；"
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
 msgid "散布淫秽、色情、赌博、暴力、凶杀、恐怖或者教唆犯罪的；"
@@ -20816,8 +20820,11 @@ msgid "10.  故意或非故意地违反任何适用的当地、国家法律，
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
-msgid "11.  未经合法授权而截获、篡改、收集、储存或删除他人个人信息、站内邮件或其它数据资料，或将获知的此类资料用于任何非法或不正当目的。"
-msgstr ""
+msgid ""
+"11. Intercept, tamper with, collect, store or delete personal information, "
+"on-site mail or other data  without legal authorization, or use such "
+"information for any illegal or improper purpose. "
+msgstr "11.  未经合法授权而截获、篡改、收集、储存或删除他人个人信息、站内邮件或其它数据资料，或将获知的此类资料用于任何非法或不正当目的。"
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
 msgid ""
@@ -25684,7 +25691,7 @@ msgstr "蒂姆·塞米特 教授"
 msgid ""
 "Vice President & Chief Management Officer of International Finance Education"
 " Association (IFEA)"
-msgstr "国际金融教育协会副会长及  首席营销官"
+msgstr "国际金融教育协会副会长及首席营销官"
 
 #: membership/templates/membership/index.html
 msgid "Dr. Wei Yang"
@@ -25732,7 +25739,7 @@ msgstr "施建军 博士"
 msgid ""
 "Prior President and Professor of the University of International Business "
 "and Economics {br}"
-msgstr "原对外经济贸易大学校长、{br}教授."
+msgstr "原对外经济贸易大学校长、{br}教授"
 
 #: membership/templates/membership/index.html
 msgid "Professor of Economics in Davidson College"
