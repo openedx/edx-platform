@@ -211,7 +211,7 @@ button:focus:not(:disabled){
 .page-banner{
   padding: 0 10px;
 }
-.alert-warning{
+.alert-warning, .page-banner .alert.alert-warning{
   background: #fffaf6;
   border: 1px solid #ffe4d1;
   box-shadow: 0px 1px 4px 0px	#ffe4d1;
