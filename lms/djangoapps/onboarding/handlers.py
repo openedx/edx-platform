@@ -4,8 +4,19 @@ Handlers for onboarding app
 from django.db import connection
 
 from django.contrib.auth.models import User
-from django.db.models.signals import post_delete
+from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
+
+
+@receiver(post_save, sender=User)
+def update_user_profile(sender, instance, update_fields, **kwargs):
+    user = instance
+    user_profile = user.profile
+
+    # To avoid an extra sync at every login
+    if not update_fields or 'last_login' not in update_fields:
+        user_profile.name = '{} {}'.format(user.first_name, user.last_name)
+        user_profile.save()
 
 
 @receiver(post_delete, sender=User)
