@@ -1,0 +1,231 @@
+// 身份认证
+.verification-process .wrapper-content-supplementary{
+    display: none;
+}
+.verification-process .carousel .requirements .requirement{
+    background-color: #fffaf6;
+	box-shadow: 0px 1px 4px 0px 
+		#ffe4d1;
+	border-radius: 3px;
+    border: solid 1px #ffe4d1;
+    .title{
+        color: #2e313c;
+        font-size: 14px;
+    }
+    p{
+        color: #656d78;
+        font-size: 14px;
+    }
+}
+.verification-process .carousel{
+    .facephoto.view,.idphoto.view,.review.view{
+        background-color: #ffffff;
+        box-shadow: 0px 1px 4px 0px #b6dcfe;
+        border-radius: 3px;
+        &>.title{
+            padding: 14px 20px;
+            color: #2e313c;
+            font-size: 18px;
+            border-bottom: solid 1px #e3f2fe;
+        }
+        .instruction{
+            padding-left: 20px;
+            margin-bottom: 0;
+            p{
+                color: #656d78;
+                font-size: 14px;
+            }
+        }
+        .cam .placeholder-cam{
+            background-color: #e6e9ed;
+        }
+        .wrapper-task{
+            padding: 20px;
+            margin: 0;
+            #facecam{
+                border: none;
+                background-color: rgba(182, 220, 254, 0.1);
+            }
+            .controls{
+                background: transparent;
+                height: auto;
+                padding-bottom: 20px;
+                .control-do{
+                    .action-do{
+                        width: 138px;
+                        height: 60px;
+                        background-color: #b6dcfe;
+                        border-radius: 30px;
+                        border: solid 1px #346ca3;
+                        box-shadow: unset;
+                    }
+                }
+                .control-retake{
+                    .action-do{
+                        background-color: #4788c7;
+                        border-radius: 2px;
+                        box-shadow: unset;
+                    }
+                }
+            }
+            .wrapper-help .help{
+                margin-bottom: 10px;
+                .copy-extra{
+                    color: #2e313c;
+                    width: 270px;
+                    display: inline-block;
+                    margin-top: 0;
+                }
+            }
+            .wrapper-help .help .list-help .help-item{
+                border-bottom: none;
+                color: #656d78;
+                font-weight: normal;
+                font-size: 14px;
+            }
+        }
+    }
+}
+.verification-process .pay-and-verify .list-faq dd{
+    color: #656d78;
+    font-weight: normal;
+    margin-bottom: 10px;
+}
+.verification-process .list-faq .faq-question{
+    border-bottom: none;
+    font-size: 14px;
+    color: #2e313c;
+}
+.verification-process .carousel .wrapper-task .wrapper-help .help .title, .verification-process .carousel #wrapper-review .review-task>.title, .verification-process .list-faq .faq-question, .verification-process.step-confirmation .list-info .info-item>.title{
+    color: #2e313c;
+    font-size: 14px;
+}
+.verification-process .nav-wizard{
+    background: #fff;
+    box-shadow: unset;
+    margin: 0;
+}
+.verification-process .action-primary{
+    background-color: #4788c7;
+    border-radius: 2px;
+    box-shadow: unset;
+    &:focus,&:hover,&:active{
+        box-shadow: unset;
+        background-color: #4788c7;
+    }
+}
+.verification-process .pay-and-verify .nav-wizard .right, .verification-process .incourse-reverify .nav-wizard .right, .verification-process .reverify .nav-wizard .right{
+    padding: 6px 16px; 
+    &:focus{
+        outline: none;
+    }
+}
+.verification-process .carousel #wrapper-review .review-task{
+   background: #fff;
+}
+.verification-process .carousel #wrapper-review .review-task-photos .wrapper-photos .wrapper-photo .placeholder-photo{
+    background-color: rgba(182, 220, 254, 0.1);
+    border-radius: 3px;
+    border: none;
+}
+.verification-process .carousel #wrapper-review .review-task-photos .wrapper-photos{
+    margin: 0;
+}
+.verification-process .carousel #wrapper-review .review-task-photos .wrapper-photos .help-tips .list-tips{
+    color: #656d78;
+    li{
+        font-size: 14px;
+        border: none;
+        font-weight: normal;
+        .help-tip.is-expandable.is-ready{
+            display: inline-block;
+            .title-expand{
+                border: none;
+                background: unset;
+                color: #346ca3 !important;
+                box-shadow: unset;
+                font-size: 16px !important;
+                padding: 0;
+                line-height: 24px;
+            }
+        }
+    }
+}
+.verification-process .carousel .wrapper-task .msg-followup{
+    padding: 0;
+    border: none;
+    margin: 0;
+    padding-top: 16px;
+    margin-top: 20px;
+    border-top: solid 1px #b6dcfe;
+}
+.verification-process .pay-and-verify .retake-photos{
+    color: #346ca3;
+}
+#current-step-container{
+    .wrapper-content-main.enrollment-confirmation-step{
+        background-color: #ffffff;
+        box-shadow: 0px 1px 4px 0px 
+            #b6dcfe;
+        border-radius: 3px;
+    }
+    .content-main{
+        &>.title{
+            padding: 14px 20px;
+            color: #2e313c;
+            font-size: 18px;
+            border-bottom: solid 1px #e3f2fe;
+        }
+    }
+    .instruction{
+        padding-left: 20px;
+        margin-bottom: 0;
+        p{
+            color: #656d78;
+            font-size: 14px;
+        }
+    }
+    .wrapper-report{
+        padding: 0 20px;
+    }
+    .report.report-course{
+        margin-top: 10px;
+        border: 1px solid #b6dcfe;
+        box-shadow: 0px 1px 4px 0px #b6dcfe;
+        tbody{
+            background: #fff;
+            td{
+                border-bottom: solid 1px #b6dcfe;
+                color: #656d78;
+                font-size: 14px;
+            }
+        }
+        .course-actions{
+            .action-primary{
+                background-color: #4788c7;
+                border-radius: 2px;
+                padding: 6px 16px;
+            }
+            td:last-child{
+                text-align: right;
+            }
+        }
+    }
+    .enrollment-status-footer{
+        margin: 0;
+        padding: 20px;
+        .title{
+            font-size: 14px;
+            color: #2e313c;
+        }
+        p{
+            color: #656d78;
+        }
+    }
+}
+.verification-process .wrapper-report .report thead th[scope="col"]{
+    background: #f7fbfe;
+    border-bottom: solid 1px #b6dcfe;
+    color: #2e313c;
+    
+}
