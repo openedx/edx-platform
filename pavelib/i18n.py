@@ -450,12 +450,16 @@ def i18n_third_party():
 
 
 @task
+@needs(
+    "pavelib.i18n.i18n_clean",
+)
 @timed
 def i18n_update():
     # Step1: extract new word
     # Step2: generate and validate
     # Step3: push to transifex
     sh("i18n_tool extract")
+    sh("paver i18n_third_party")
     sh("i18n_tool transifex pull")
     sh("i18n_tool generate --strict")
     sh("i18n_tool validate")

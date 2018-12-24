@@ -324,30 +324,6 @@ msgid ""
 "ecommerce service."
 msgstr "这是此模式在外部电子商务服务中的批量库存单位（SKU）。"
 
-#: common/djangoapps/course_modes/models.py
-msgid "honor"
-msgstr "荣誉"
-
-#: common/djangoapps/course_modes/models.py
-msgid "professional"
-msgstr "教授"
-
-#: common/djangoapps/course_modes/models.py
-msgid "verified"
-msgstr "已认证"
-
-#: common/djangoapps/course_modes/models.py
-msgid "audit"
-msgstr "旁听"
-
-#: common/djangoapps/course_modes/models.py
-msgid "no-id-professional"
-msgstr "未注册教授"
-
-#: common/djangoapps/course_modes/models.py
-msgid "credit"
-msgstr "学分"
-
 #: common/djangoapps/course_modes/models.py lms/envs/common.py
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Honor"
@@ -15206,7 +15182,7 @@ msgstr "课程结束"
 #: lms/templates/courseware/course_about.html
 #: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid "Estimated Effort"
-msgstr "预期课程目标"
+msgstr "预计课时"
 
 #: lms/templates/courseware/course_about.html
 #: themes/normal-theme/lms/templates/courseware/course_about.html
@@ -15510,7 +15486,7 @@ msgstr "{weeks_to_complete} 周/课"
 
 #: lms/templates/courseware/program_marketing.html
 msgid "Effort"
-msgstr "用功时间"
+msgstr "课时"
 
 #: lms/templates/courseware/program_marketing.html
 msgid ""
@@ -17075,6 +17051,7 @@ msgid "Journals"
 msgstr "文章"
 
 #: lms/templates/header/navbar-authenticated.html
+#: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/header/user_dropdown.html
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
@@ -17084,7 +17061,7 @@ msgstr "用户资料"
 
 #: lms/templates/header/navbar-authenticated.html
 msgid "Discover New"
-msgstr "马上发现课程"
+msgstr "发现课程"
 
 #. Translators: This is short for "System administration".
 #: lms/templates/header/navbar-authenticated.html
@@ -17121,8 +17098,8 @@ msgid "Resume your last course"
 msgstr "继续上门课程学习"
 
 #: lms/templates/header/user_dropdown.html
-msgid "会员中心"
-msgstr ""
+msgid "VIP Center"
+msgstr "会员中心"
 
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -18930,6 +18907,32 @@ msgstr "维持举报"
 msgid "Go Back"
 msgstr "返回"
 
+#: lms/templates/professors/detail.html lms/templates/professors/index.html
+#: lms/templates/static_templates/about.html
+#: lms/templates/static_templates/blog.html
+#: lms/templates/static_templates/contact.html
+#: lms/templates/static_templates/disclaimer.html
+#: lms/templates/static_templates/donate.html
+#: lms/templates/static_templates/faq.html
+#: lms/templates/static_templates/help.html
+#: lms/templates/static_templates/honor.html
+#: lms/templates/static_templates/jobs.html
+#: lms/templates/static_templates/join_us.html
+#: lms/templates/static_templates/manual.html
+#: lms/templates/static_templates/media-kit.html
+#: lms/templates/static_templates/news.html
+#: lms/templates/static_templates/press.html
+#: lms/templates/static_templates/privacy.html
+#: lms/templates/static_templates/privacy_policy.html
+#: lms/templates/static_templates/tos.html
+#: lms/templates/static_templates/user_agreement.html
+msgid "This page left intentionally blank. Feel free to add your own content."
+msgstr "这个页面是有意留空的。欢迎您添加自己的评论。"
+
+#: lms/templates/professors/index.html
+msgid "Professors List"
+msgstr "教授列表"
+
 #: lms/templates/provider/authorize.html
 msgid ""
 "{start_strong}{application_name}{end_strong} would like to access your data "
@@ -19398,27 +19401,6 @@ msgid ""
 "been moved at {email}."
 msgstr "未能找到您查找的页面。返回到{link_start}主页{link_end}或发电子邮件至{email}告诉我们可能被移除的页面。"
 
-#: lms/templates/static_templates/about.html
-#: lms/templates/static_templates/blog.html
-#: lms/templates/static_templates/contact.html
-#: lms/templates/static_templates/disclaimer.html
-#: lms/templates/static_templates/donate.html
-#: lms/templates/static_templates/faq.html
-#: lms/templates/static_templates/help.html
-#: lms/templates/static_templates/honor.html
-#: lms/templates/static_templates/jobs.html
-#: lms/templates/static_templates/join_us.html
-#: lms/templates/static_templates/manual.html
-#: lms/templates/static_templates/media-kit.html
-#: lms/templates/static_templates/news.html
-#: lms/templates/static_templates/press.html
-#: lms/templates/static_templates/privacy.html
-#: lms/templates/static_templates/privacy_policy.html
-#: lms/templates/static_templates/tos.html
-#: lms/templates/static_templates/user_agreement.html
-msgid "This page left intentionally blank. Feel free to add your own content."
-msgstr "这个页面是有意留空的。欢迎您添加自己的评论。"
-
 #: lms/templates/static_templates/embargo.html
 msgid ""
 "Our system indicates that you are trying to access this {platform_name} "
@@ -19495,8 +19477,9 @@ msgid "Mobile"
 msgstr "手机"
 
 #: lms/templates/student_account/account_settings.html
+#: themes/normal-theme/lms/templates/footer.html
 msgid "Bind Mobile"
-msgstr "绑定您的手机"
+msgstr "绑定手机"
 
 #: lms/templates/student_account/account_settings.html
 msgid "Successfully Bound."
@@ -20273,10 +20256,6 @@ msgid ""
 "proceeding."
 msgstr "应国家法规对于账号实名的要求，请您在进行下一步操作前，先完成手机绑定。"
 
-#: themes/normal-theme/lms/templates/footer.html
-msgid "bind your account to your cellphone number now"
-msgstr "去绑定手机"
-
 #. Translators: 'Open edX' is a registered trademark, please keep this
 #. untranslated. See http://open.edx.org for more information.
 #: themes/normal-theme/lms/templates/index_overlay.html
@@ -20354,7 +20333,7 @@ msgstr "地址：广州市天河区天河北路233号中信广场写字楼1005�
 
 #: themes/normal-theme/lms/templates/static_templates/contact.html
 msgid "Telephone: 400-931-8118 (Monday to Friday at 9:00-18:00)"
-msgstr "电话：400-931-8118（周一至周五9：00 - 18：00）"
+msgstr "电话：400-931-8118（周一至周五9:00 - 18:00）"
 
 #: themes/normal-theme/lms/templates/static_templates/contact.html
 msgid "Human Resources and Recruitment"
