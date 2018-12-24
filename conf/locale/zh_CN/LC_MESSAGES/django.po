@@ -24,20 +24,20 @@
 # 婕 高 <j.gao@eliteu.cn>, 2018
 #
 # #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
-# edX translation file
+# edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)
 # Copyright (C) 2018 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2018.
 #
 # Translators:
-# 婕 高 <j.gao@eliteu.cn>, 2018
-# 家璧 刘 <jb.liu@eliteu.com.cn>, 2018
-# Yi Li <y.li@eliteu.cn>, 2018
 # 微 李 <w.li@eliteu.com.cn>, 2018
+# 婕 高 <j.gao@eliteu.cn>, 2018
+# Yi Li <y.li@eliteu.cn>, 2018
+# 家璧 刘 <jb.liu@eliteu.com.cn>, 2018
 # li ying <code@eliteu.cn>, 2018
 #
 # #-#-#-#-#  mako-studio.po (0.1a)  #-#-#-#-#
-# edX translation file
+# edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)
 # Copyright (C) 2018 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2018.
@@ -46,7 +46,7 @@
 # li ying <code@eliteu.cn>, 2018
 #
 # #-#-#-#-#  wiki.po (0.1a)  #-#-#-#-#
-# edX translation file
+# edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)
 # Copyright (C) 2018 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2018.
@@ -56,13 +56,13 @@
 #
 # #-#-#-#-#  membership.po (0.1a)  #-#-#-#-#
 # #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
-# edX translation file.
+# edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/).
 # Copyright (C) 2018 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2018.
 #
 # #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
-# edX translation file
+# edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)
 # Copyright (C) 2018 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2018.
@@ -15907,6 +15907,9 @@ msgid "Enrolled as: "
 msgstr "选修为："
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/normal-theme/lms/templates/static_templates/help.html
+#: themes/normal-theme/lms/templates/static_templates/honor.html
+#: themes/normal-theme/lms/templates/static_templates/manual.html
 msgid "Coming Soon"
 msgstr "即将上线"
 
