@@ -14,7 +14,7 @@
         type: 'GET',
         url: 'api/v1/professors/' + teacher_id + '/',
         success: function(res){
-            $('.my-theme-course-about')[0].innerHTML = res.professor_info + '<a class="professor-course" href="/courses?search_query=' +  res.name + '">讲授课程</a>';
+            $('.my-theme-course-about')[0].innerHTML = res.professor_info + '<a class="professor-course" href="/courses?search_query=&QUOT;' +  res.name + '&QUOT;">讲授课程</a>';
         }
     })
 </script>
