@@ -2,6 +2,7 @@
 <%!
 from django.utils.translation import ugettext as _
 %>
+<%namespace name='static' file='/static_content.html'/>
 
 <%block name="title">
     <title>${_(u"EliteMBA")}</title>
@@ -34,7 +35,19 @@ from django.utils.translation import ugettext as _
     </li>
     <li>
       <span>${_(u"Learning Time")}</span>
-      <span>${start_date}-${end_date}</span>
+      <span>
+        <span class="localized_datetime"
+              data-format="shortDate"
+              data-language="${LANGUAGE_CODE}"
+              data-datetime="${start_date}">
+        </span>
+        -
+        <span class="localized_datetime"
+              data-format="shortDate"
+              data-language="${LANGUAGE_CODE}"
+              data-datetime="${end_date}">
+        </span>
+      </span>
     </li>
     <li>
       <span>${_(u"Learning Type")}</span>
@@ -42,7 +55,11 @@ from django.utils.translation import ugettext as _
     </li>
     <li>
       <span>${_(u"Certificate Issuing Date")}</span>
-      <span>${issue_date}</span>
+      <span class="localized_datetime"
+            data-format="shortDate"
+            data-language="${LANGUAGE_CODE}"
+            data-datetime="${issue_date}">
+      </span>
     </li>
     <li>
       <span>${_(u"Electronic Certificate")}</span>
@@ -50,3 +67,7 @@ from django.utils.translation import ugettext as _
     </li>
   </ul>
 </div>
+
+<%static:require_module_async module_name="js/dateutil_factory" class_name="DateUtilFactory">
+    DateUtilFactory.transform(iterationKey=".localized_datetime");
+</%static:require_module_async>

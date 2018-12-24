@@ -1140,3 +1140,8 @@ SMS_API = AUTH_TOKENS.get('SMS_API','')
 SMS_API_BY_LINKGROUP = AUTH_TOKENS.get('SMS_API_BY_LINKGROUP','')
 SMS_API_URL = ENV_TOKENS.get('SMS_API_URL','')
 SMS_API_URL_BY_LINKGROUP = ENV_TOKENS.get('SMS_API_URL_BY_LINKGROUP','')
+
+######################## Professors ###########################
+
+if FEATURES.get('ENABLE_PROFESSORS'):
+    INSTALLED_APPS.append('professors')
