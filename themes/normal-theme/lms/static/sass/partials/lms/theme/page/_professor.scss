@@ -1,0 +1,119 @@
+// professor-list
+.professor-banner{
+  text-align: center;
+  background: url('/static/normal-theme/images/course_dec.png');
+  background-size: cover;
+  padding: 50px 0;
+}
+.professor-banner div{
+  width: 98%;
+  max-width: 1200px;
+  margin: 0 auto;
+  background: rgba(255,255,255,0.7);
+  box-shadow: 0px 2px 4px 0px #aab2bd;
+  padding: 35px 20px 60px;
+  box-sizing: border-box;
+}
+.professor-banner h2{
+  color: $blue;
+  font-size: 36px;
+  font-weight: normal;
+  line-height: 2;
+  margin: 0 0 10px;
+}
+.professor-banner p{
+  margin: 0;
+  line-height: 1.8;
+  font-size: 14px;
+  color: $font;
+}
+
+#professor-list{
+  max-width: 1200px;
+  margin: 30px auto;
+}
+.professor-block{
+  display: inline-block;
+  width: 31.5%;
+  height: 150px;
+  position: relative;
+  padding: 10px 10px 10px 150px;
+  box-sizing: border-box;
+  font-size: 14px;
+  margin-bottom: 30px;
+  color: $font;
+  background: #fff;
+  border-radius: 3px;
+  box-shadow: 0px 1px 4px 0px $border;
+  margin: 0 0.7% 30px;
+  min-width: 280px;
+  line-height: 1.5;
+  vertical-align: middle;
+}
+.professor-block img{
+  width: 130px;
+  position: absolute;
+  top: 10px;
+  left: 10px;
+}
+.professor-block .professor-name{
+  margin-bottom: 3px;
+  color: $title;
+}
+.professor-block a{
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  color: $blue;
+  cursor: pointer;
+}
+.professor-block a span{
+  transform: scale(0.6);
+  vertical-align: text-top;
+}
+@media screen and (max-width:992px){
+  .professor-block{
+  width: 48%;
+  }
+}
+@media screen and (max-width:767px){
+  .professor-block{
+  width: 98%;
+  }
+  .professor-banner{
+  padding: 10px 0;
+  }
+  .professor-banner div{
+  padding: 20px;
+  }
+  .professor-banner h2{
+  font-size: 24px;
+  line-height: 2;
+  margin: 0;
+  }
+}
+
+// professor detail
+.professor-detail{
+  width: 70%;
+  background: #fff;
+  box-shadow: 0px 0px 3px 0px $border;
+  border-radius: 3px;   
+  margin-top: 30px;
+  box-sizing: border-box;
+  position: relative;
+  padding: 30px 20px !important;
+}
+.professor-course{
+  @extend %btn-my-primary;
+  position: absolute;
+  top:40px;
+  right: 20px;
+  color: #fff !important;
+  line-height: 36px !important;
+}
+@media screen and (max-width:992px){
+  .professor-detail{
+      width: 100%;
+  }
+}

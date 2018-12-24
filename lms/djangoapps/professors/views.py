@@ -15,7 +15,7 @@ def professors_index(request):
     return response
 
 
-def professors_detail(request):
+def professors_detail(request, pk):
     context = {
 
     }

@@ -2,15 +2,19 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%inherit file="../main.html" />
 
-<%block name="pagetitle">${_u("教授详情")}</%block>
+<%block name="pagetitle">${_(u"教授详情")}</%block>
 
-<main id="main" aria-label="Content" tabindex="-1">
-    <section class="container about">
-        <h1>
-            <%block name="pageheader">${page_header or _u("教授详情")}</%block>
-        </h1>
-        <p>
-            <%block name="pagecontent">${page_content or _("This page left intentionally blank. Feel free to add your own content.")}</%block>
-        </p>
-    </section>
-</main>
+<div class="container">
+    <div class="my-theme-course-about professor-detail"></div>
+</div>
+
+<script>
+    var teacher_id = window.location.href.split('/professors/')[1].split('/')[0];
+    $.ajax({
+        type: 'GET',
+        url: 'api/v1/professors/' + teacher_id + '/',
+        success: function(res){
+            $('.my-theme-course-about')[0].innerHTML = res.professor_info + '<a class="professor-course" href="/courses?search_query=' +  res.name + '">讲授课程</a>';
+        }
+    })
+</script>

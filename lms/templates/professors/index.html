@@ -4,13 +4,25 @@
 
 <%block name="pagetitle">${_(u"教授列表")}</%block>
 
-<main id="main" aria-label="Content" tabindex="-1">
-    <section class="container about">
-        <h1>
-            <%block name="pageheader">${page_header or _(u"教授列表")}</%block>
-        </h1>
-        <p>
-            <%block name="pagecontent">${page_content or _("This page left intentionally blank. Feel free to add your own content.")}</%block>
-        </p>
-    </section>
-</main>
+<div class="professor-banner">
+    <div>
+        <h2>教育的目的</h2>
+        <p>教育不是生搬硬套的知识灌输，而是对学习者自由发展潜力的启发。 智慧是运用知识的能力。英荔教育不仅传播知识，更注重智慧的培养。</p>
+        <p>我们希望把国内外成功的商业管理经验和智慧传授给更多不安于现状且积极求变的弄潮儿。</p>
+    </div>
+</div>
+<div id="professor-list"></div>
+<script>
+    $.ajax({
+        url: '/api/v1/professors/',
+        method: 'GET',
+        success: function(res){
+            var list = res.results;
+            var elem = '';
+            for ( var i = 0; i < list.length; i++ ){
+                elem = elem + '<div class="professor-block"><img src="' + list[i].avatar + '" /><div class="professor-name">' + list[i].name + '</div><div>' + list[i].description + '</div><a href="/professors/' + list[i].id + '">详情<span class="fa-my fa-my-arrow"></span></a></div>';
+            }
+            document.getElementById('professor-list').innerHTML = elem;
+        }
+    })
+</script>
