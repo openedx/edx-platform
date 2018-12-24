@@ -4985,6 +4985,16 @@ msgstr ""
 msgid "There was an error updating your goal."
 msgstr ""
 
+#: openedx/features/course_experience/static/course_experience/js/CourseOutline.js
+#: lms/templates/ccx/schedule.underscore
+msgid "Expand All"
+msgstr ""
+
+#: openedx/features/course_experience/static/course_experience/js/CourseOutline.js
+#: lms/templates/ccx/schedule.underscore
+msgid "Collapse All"
+msgstr ""
+
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result"
 msgid_plural "{total_results} results"
@@ -7177,14 +7187,6 @@ msgstr ""
 
 #: lms/templates/api_admin/catalog-results.underscore
 msgid "This catalog's courses:"
-msgstr ""
-
-#: lms/templates/ccx/schedule.underscore
-msgid "Expand All"
-msgstr ""
-
-#: lms/templates/ccx/schedule.underscore
-msgid "Collapse All"
 msgstr ""
 
 #: lms/templates/ccx/schedule.underscore

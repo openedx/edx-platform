@@ -136,12 +136,12 @@ class CourseMode(models.Model):
         )
     )
 
-    HONOR = _('honor')
-    PROFESSIONAL = _('professional')
-    VERIFIED = _('verified')
-    AUDIT = _('audit')
-    NO_ID_PROFESSIONAL_MODE = _('no-id-professional')
-    CREDIT_MODE = _('credit')
+    HONOR = 'honor'
+    PROFESSIONAL = 'professional'
+    VERIFIED = 'verified'
+    AUDIT = 'audit'
+    NO_ID_PROFESSIONAL_MODE = 'no-id-professional'
+    CREDIT_MODE = 'credit'
 
     DEFAULT_MODE = Mode(
         settings.COURSE_MODE_DEFAULTS['slug'],
