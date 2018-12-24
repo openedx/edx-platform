@@ -235,7 +235,7 @@ FEATURES = {
     'ENABLE_THIRD_PARTY_AUTH': False,
 
     # Toggle to enable alternate urls for marketing links
-    'ENABLE_MKTG_SITE': False,
+    'ENABLE_MKTG_SITE': True,
 
     # Prevent concurrent logins per user
     'PREVENT_CONCURRENT_LOGINS': True,
@@ -2584,8 +2584,8 @@ REGISTRATION_FIELD_ORDER = [
 REGISTRATION_EMAIL_PATTERNS_ALLOWED = None
 
 ########################## CERTIFICATE NAME ########################
-CERT_NAME_SHORT = "Certificate"
-CERT_NAME_LONG = "Certificate of Achievement"
+CERT_NAME_SHORT = _("Certificate")
+CERT_NAME_LONG = _("Certificate of Achievement")
 
 #################### OpenBadges Settings #######################
 

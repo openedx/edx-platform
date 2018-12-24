@@ -29,6 +29,13 @@ from django.conf import settings
         </a>
       </div>
   % endif
+  % if settings.FEATURES.get('ENABLE_PROFESSORS'):
+      <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
+        <a class="${'active ' if reverse('professor_index') in request.path else ''}tab-nav-link" href="${reverse('professor_index')}">
+          ${_("Profile")}
+        </a>
+      </div>
+  % endif
   % if mktg_site_enabled:
     <div class="mobile-nav-item hidden-mobile nav-item">
       <a href="${marketing_link('HOW_IT_WORKS')}">${_("How it Works")}</a>

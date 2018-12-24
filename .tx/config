@@ -66,15 +66,3 @@ file_filter = conf/locale/<lang>/LC_MESSAGES/membership-js.po
 source_file = conf/locale/en/LC_MESSAGES/membership-js.po
 source_lang = en
 type = PO
-
-[elitemba.ecommerce]
-file_filter = conf/locale/<lang>/LC_MESSAGES/ecommerce.po
-source_file = conf/locale/en/LC_MESSAGES/ecommerce.po
-source_lang = en
-type = PO
-
-[elitemba.ecommerce-js]
-file_filter = conf/locale/<lang>/LC_MESSAGES/ecommerce-js.po
-source_file = conf/locale/en/LC_MESSAGES/ecommerce-js.po
-source_lang = en
-type = PO
