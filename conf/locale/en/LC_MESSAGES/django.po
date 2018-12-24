@@ -15590,6 +15590,9 @@ msgid "Enrolled as: "
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/normal-theme/lms/templates/static_templates/help.html
+#: themes/normal-theme/lms/templates/static_templates/honor.html
+#: themes/normal-theme/lms/templates/static_templates/manual.html
 msgid "Coming Soon"
 msgstr ""
 
@@ -19868,7 +19871,8 @@ msgstr ""
 
 #: themes/normal-theme/lms/templates/footer.html
 msgid ""
-"Guangzhou Elite Education & Technology Co., Ltd.    All Rights Reserved"
+"Guangdong Elite International Education & Technology Co., Ltd.    All Rights"
+" Reserved"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/footer.html
@@ -20024,7 +20028,7 @@ msgid ""
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/disclaimer.html
-msgid "第一条"
+msgid "Article 1"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/disclaimer.html
@@ -20041,7 +20045,9 @@ msgid "2.  不得干扰、损害和侵犯英荔的各种合法权利与利益�
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/disclaimer.html
-msgid "3.  不得干扰、损害和侵犯其他英荔用户的各种合法权利与利益；"
+msgid ""
+"3.   Shall not interfere with, damage and infringe upon the various legal "
+"rights and interests of other EliteMBA users;"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/disclaimer.html
@@ -20053,7 +20059,7 @@ msgid "5.  英荔有权对违反上述承诺的内容予以删除。"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/disclaimer.html
-msgid "第二条"
+msgid "Article 2"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/disclaimer.html
@@ -20064,8 +20070,13 @@ msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/disclaimer.html
 msgid ""
-"2.  "
-"用户在英荔发表的内容（包含但不限于英荔目前各产品功能里的内容）仅表明其个人的立场和观点，并不代表英荔的立场或观点。作为内容的发表者，需自行对所发表内容负责，因所发表内容引发的一切纠纷，由该内容的发表者承担全部法律及连带责任。英荔不承担任何法律及连带责任。"
+"2. The content published by Elite User (including but not limited to the "
+"contents of the current product features of Elite) only indicates their "
+"personal position and views, and does not represent the position or opinion "
+"of Elite. As the content publisher, it is the responsibility of the content "
+"to be published. All the disputes arising from the published content shall "
+"be the legal and joint responsibility of the publisher of the content. "
+"Eliteu does not assume any legal and joint responsibility. "
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/disclaimer.html
@@ -20082,7 +20093,7 @@ msgid ""
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/disclaimer.html
-msgid "附则"
+msgid "Supplementary"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/disclaimer.html
@@ -20093,13 +20104,7 @@ msgstr ""
 #: themes/normal-theme/lms/templates/static_templates/privacy.html
 #: themes/normal-theme/lms/templates/static_templates/privacy_policy.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
-msgid "协议生效日期：2018年11月30日"
-msgstr ""
-
-#: themes/normal-theme/lms/templates/static_templates/help.html
-#: themes/normal-theme/lms/templates/static_templates/honor.html
-#: themes/normal-theme/lms/templates/static_templates/manual.html
-msgid "敬请期待"
+msgid "Effective on Nov 30th, 2018"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/join_us.html
@@ -20128,11 +20133,6 @@ msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/privacy.html
 #: themes/normal-theme/lms/templates/static_templates/privacy_policy.html
-msgid "隐私政策"
-msgstr ""
-
-#: themes/normal-theme/lms/templates/static_templates/privacy.html
-#: themes/normal-theme/lms/templates/static_templates/privacy_policy.html
 msgid ""
 "英荔教育（www.elitemba.cn）的产品及服务由广东英荔国际教育科技有限公司（以下简称“英荔”或“我们”）提供。本隐私政策（以下简称“本政策”）适用于英荔的网站、在计算机/手机/平板电脑或其它设备上使用的英荔的应用程序和其它产品及服务。英荔非常重视对英荔用户（以下简称“用户”）个人隐私的保护，有时候我们需要某些信息才能为用户提供请求的服务，本政策解释了这些情况下的数据收集和使用情况。"
 msgstr ""
@@ -20145,7 +20145,7 @@ msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/privacy.html
 #: themes/normal-theme/lms/templates/static_templates/privacy_policy.html
-msgid "一、我们收集哪些信息"
+msgid "Ⅰ. The Information that We Collect"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/privacy.html
@@ -20156,7 +20156,7 @@ msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/privacy.html
 #: themes/normal-theme/lms/templates/static_templates/privacy_policy.html
-msgid "二、关于您的个人信息"
+msgid "Ⅱ. About User's Personal Information"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/privacy.html
@@ -20197,7 +20197,7 @@ msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/privacy.html
 #: themes/normal-theme/lms/templates/static_templates/privacy_policy.html
-msgid "三、COOKIE的使用"
+msgid "III.Use of Cookie"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/privacy.html
@@ -20226,7 +20226,7 @@ msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/privacy.html
 #: themes/normal-theme/lms/templates/static_templates/privacy_policy.html
-msgid "四、关于免责说明"
+msgid "IV. About Disclaimer"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/privacy.html
@@ -20265,7 +20265,7 @@ msgid "6.  英荔在各服务条款及声明中列明的使用方式或免责�
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
-msgid "一、服务条款"
+msgid "Ⅰ. Terms of Service"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -20279,7 +20279,7 @@ msgid ""
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
-msgid "二、服务说明"
+msgid "Ⅱ. Service Description"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -20288,7 +20288,7 @@ msgid ""
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
-msgid "三、遵守法律"
+msgid "Ⅲ. Abidance by Law"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -20302,7 +20302,7 @@ msgid ""
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
-msgid "四、用户的注册义务"
+msgid "Ⅳ. User Registration Obligation"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -20315,7 +20315,7 @@ msgid "英荔无须对任何用户的任何登记资料承担任何责任，包�
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
-msgid "五、用户帐号、密码及安全"
+msgid "V. User Accounts, Passwords and Security"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -20328,7 +20328,9 @@ msgid "用户应对所有使用的密码及帐号的活动负全部责任。用�
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
-msgid "1.  用户的英荔帐号遭到未获授权的使用，或者发生其它任何安全问题时，用户将立即通知英荔；"
+msgid ""
+"1. Upon the occurrence of noticing any unauthorized account activity or "
+"other security issue, User shall contact and notify E-ducation immediately. "
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -20336,11 +20338,16 @@ msgid "2.  如果用户未保管好自己的帐号和密码，因此而产生�
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
-msgid "3.  每个用户都要对其帐号中的所有行为和事件负全责。如果用户未保管好自己的帐号和密码而对用户、英荔或第三方造成的损害，用户将负全部责任。"
+msgid ""
+"3. User is solely responsible for all the activities and issues that occur "
+"in their account. Upon the occurrence of any loss or damage to other Users, "
+"Elite or any other third party due to the failure by the User in securing "
+"their own Account and password, the aforementioned User shall take full "
+"responsible."
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
-msgid "六、英荔隐私权政策"
+msgid "VI. Privacy Policy of Elite Education "
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -20348,7 +20355,7 @@ msgid "用户提供的登记资料及英荔保留的有关用户的若干其它�
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
-msgid "七、提供者之责任"
+msgid "VII. Responsibility of the Provider/User"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -20358,7 +20365,7 @@ msgid ""
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
-msgid "八、用户行为"
+msgid "VIII. User Behavior"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -20394,7 +20401,9 @@ msgid "Spread rumors, disrupting social order or endanger social stability;"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
-msgid "散布淫秽、色情、赌博、暴力、凶杀、恐怖或者教唆犯罪的；"
+msgid ""
+"Spreading obscenity, eroticism, gambling, violence, murder and terrorism or "
+"instigating others to commit crime;"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -20490,7 +20499,7 @@ msgid "5.  其它英荔认为有必要的情况。"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
-msgid "九、国际使用之特别警告"
+msgid "IX. Special Warning for International Use"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -20499,7 +20508,7 @@ msgid ""
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
-msgid "十、在英荔发布的公开信息"
+msgid "X. Public information published on EliteMBA"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -20513,7 +20522,7 @@ msgid ""
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
-msgid "十一、赔偿"
+msgid "XI. Compensation"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -20523,7 +20532,7 @@ msgid ""
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
-msgid "十二、关于使用"
+msgid "XII. About Use"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -20531,7 +20540,7 @@ msgid "用户同意不对本服务任何部分或本服务之使用或获得，�
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
-msgid "十三、关于储存"
+msgid "XIII. About Storage"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -20539,7 +20548,7 @@ msgid "通过本服务发布或传送之任何信息、通讯资料和其它内�
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
-msgid "十四、服务之修改"
+msgid "XIV. Modification of Service"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -20548,7 +20557,7 @@ msgid ""
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
-msgid "十五、终止服务"
+msgid "XV. Termination of Service"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -20557,7 +20566,7 @@ msgid ""
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
-msgid "十六、与广告商及其他第三方进行交易"
+msgid "XVI. Dealing with Advertisers and Other Third Parties"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -20566,7 +20575,7 @@ msgid ""
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
-msgid "十七、英荔之专属权利"
+msgid "XVII. Exclusive Rights of EliteMBA"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -20575,7 +20584,7 @@ msgid ""
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
-msgid "十八、担保与保证"
+msgid "XVIII. Guarantee and Warranty"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -20605,7 +20614,7 @@ msgid "5.  第三方以任何方式发布或投递欺诈性信息，或诱导�
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
-msgid "十九、英荔商标信息"
+msgid "ⅩⅨ. EliteMBA Trademarks Information"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -20614,7 +20623,7 @@ msgid ""
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
-msgid "二十、用户专属权利"
+msgid "XX. Exclusive User Rights"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -20642,7 +20651,7 @@ msgid ""
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
-msgid "二十一、一般条款"
+msgid "XXI. General Terms"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -20668,7 +20677,9 @@ msgid ""
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
-msgid "5.  本使用协议之标题仅供方便而设，不具任何法律或契约效果；"
+msgid ""
+"5. The title of this User Agreement is for convenience only and does not "
+"have any legal or contractual effect;"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html

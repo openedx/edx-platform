@@ -325,7 +325,6 @@ msgstr ""
 #. Translators: %(num_points)s is the number of points possible (examples: 1,
 #. 3, 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-#: common/static/bundles/CapaModule.js
 msgid "%(num_points)s point possible (graded, results hidden)"
 msgid_plural "%(num_points)s points possible (graded, results hidden)"
 msgstr[0] ""
@@ -334,7 +333,6 @@ msgstr[1] ""
 #. Translators: %(num_points)s is the number of points possible (examples: 1,
 #. 3, 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-#: common/static/bundles/CapaModule.js
 msgid "%(num_points)s point possible (ungraded, results hidden)"
 msgid_plural "%(num_points)s points possible (ungraded, results hidden)"
 msgstr[0] ""
@@ -343,7 +341,6 @@ msgstr[1] ""
 #. Translators: %(num_points)s is the number of points possible (examples: 1,
 #. 3, 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-#: common/static/bundles/CapaModule.js
 msgid "%(num_points)s point possible (graded)"
 msgid_plural "%(num_points)s points possible (graded)"
 msgstr[0] ""
@@ -352,7 +349,6 @@ msgstr[1] ""
 #. Translators: %(num_points)s is the number of points possible (examples: 1,
 #. 3, 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-#: common/static/bundles/CapaModule.js
 msgid "%(num_points)s point possible (ungraded)"
 msgid_plural "%(num_points)s points possible (ungraded)"
 msgstr[0] ""
@@ -363,7 +359,6 @@ msgstr[1] ""
 #. points will always be at least 1. We pluralize based on the total number of
 #. points (example: 0/1 point; 1/2 points);
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-#: common/static/bundles/CapaModule.js
 msgid "%(earned)s/%(possible)s point (graded)"
 msgid_plural "%(earned)s/%(possible)s points (graded)"
 msgstr[0] ""
@@ -374,7 +369,6 @@ msgstr[1] ""
 #. points will always be at least 1. We pluralize based on the total number of
 #. points (example: 0/1 point; 1/2 points);
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-#: common/static/bundles/CapaModule.js
 msgid "%(earned)s/%(possible)s point (ungraded)"
 msgid_plural "%(earned)s/%(possible)s points (ungraded)"
 msgstr[0] ""
@@ -414,7 +408,6 @@ msgstr ""
 #. Translators: This is only translated to allow for reordering of label and
 #. associated status.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-#: common/static/bundles/CapaModule.js
 msgid "{label}: {status}"
 msgstr ""
 
@@ -1442,77 +1435,66 @@ msgstr ""
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Split cell"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Square"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Start search"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Strikethrough"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Style"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Subscript"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Superscript"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Table properties"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Table"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Target"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Templates"
 msgstr ""
 
@@ -1525,14 +1507,12 @@ msgstr ""
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Text to display"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid ""
 "The URL you entered seems to be an email address. Do you want to add the "
 "required mailto: prefix?"
@@ -1541,7 +1521,6 @@ msgstr ""
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid ""
 "The URL you entered seems to be an external link. Do you want to add the "
 "required http:// prefix?"
@@ -1551,7 +1530,6 @@ msgstr ""
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 #: cms/templates/js/course-instructor-details.underscore
 #: cms/templates/js/signatory-details.underscore
 #: common/static/common/templates/discussion/new-post.underscore
@@ -1562,63 +1540,54 @@ msgstr ""
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Tools"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Top"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Underline"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Undo"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Upper Alpha"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Upper Roman"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Url"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "V Align"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Vertical space"
 msgstr ""
 
@@ -1626,7 +1595,6 @@ msgstr ""
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 #: openedx/features/course_bookmarks/static/course_bookmarks/templates/bookmarks-list.underscore
 #: openedx/features/course_search/static/course_search/templates/course_search_item.underscore
 #: openedx/features/course_search/static/course_search/templates/dashboard_search_item.underscore
@@ -1636,7 +1604,6 @@ msgstr ""
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Visual aids"
 msgstr ""
 
@@ -1649,7 +1616,6 @@ msgstr ""
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Width"
 msgstr ""
 
@@ -1662,7 +1628,6 @@ msgstr ""
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "You have unsaved changes are you sure you want to navigate away?"
 msgstr ""
 
@@ -1681,7 +1646,6 @@ msgid "Insert/Edit Image"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/lti/lti.js
-#: common/static/bundles/LTIModule.js
 msgid ""
 "Click OK to have your username and e-mail address sent to a 3rd party application.\n"
 "\n"
@@ -1689,7 +1653,6 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/lti/lti.js
-#: common/static/bundles/LTIModule.js
 msgid ""
 "Click OK to have your username sent to a 3rd party application.\n"
 "\n"
@@ -1697,7 +1660,6 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/lti/lti.js
-#: common/static/bundles/LTIModule.js
 msgid ""
 "Click OK to have your e-mail address sent to a 3rd party application.\n"
 "\n"
@@ -1705,27 +1667,22 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
-#: common/static/bundles/CapaDescriptor.js
 msgid "incorrect"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
-#: common/static/bundles/CapaDescriptor.js
 msgid "correct"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
-#: common/static/bundles/CapaDescriptor.js
 msgid "answer"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
-#: common/static/bundles/CapaDescriptor.js
 msgid "Short explanation"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
-#: common/static/bundles/CapaDescriptor.js
 msgid ""
 "If you use the Advanced Editor, this problem will be converted to XML and you will not be able to return to the Simple Editor Interface.\n"
 "\n"
@@ -1733,7 +1690,6 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
-#: common/static/bundles/CapaDescriptor.js
 msgid "Explanation"
 msgstr ""
 
@@ -1744,8 +1700,6 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
-#: common/static/bundles/VerticalStudentView.js
-#: common/static/bundles/commons.js
 #: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmark_button.js
 msgid "Bookmarked"
 msgstr ""
@@ -1753,173 +1707,143 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/09_play_pause_control.js
 #: common/lib/xmodule/xmodule/js/src/video/09_play_skip_control.js
-#: common/static/bundles/VideoModule.js
 msgid "Play"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/09_play_pause_control.js
-#: common/static/bundles/VideoModule.js
 msgid "Pause"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/static/bundles/VideoModule.js
 msgid "Mute"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/static/bundles/VideoModule.js
 msgid "Unmute"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/04_video_full_screen.js
-#: common/static/bundles/VideoModule.js
 msgid "Exit full browser"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/04_video_full_screen.js
-#: common/static/bundles/VideoModule.js
 msgid "Fill browser"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
-#: common/static/bundles/VideoModule.js
 msgid "Speed"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/08_video_auto_advance_control.js
-#: common/static/bundles/VideoModule.js
 msgid "Auto-advance"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
-#: common/static/bundles/VideoModule.js
 msgid "Volume"
 msgstr ""
 
 #. Translators: Volume level equals 0%.
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/static/bundles/VideoModule.js
 msgid "Muted"
 msgstr ""
 
 #. Translators: Volume level in range ]0,20]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/static/bundles/VideoModule.js
 msgid "Very low"
 msgstr ""
 
 #. Translators: Volume level in range ]20,40]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/static/bundles/VideoModule.js
 msgid "Low"
 msgstr ""
 
 #. Translators: Volume level in range ]40,60]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/static/bundles/VideoModule.js
 msgid "Average"
 msgstr ""
 
 #. Translators: Volume level in range ]60,80]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/static/bundles/VideoModule.js
 msgid "Loud"
 msgstr ""
 
 #. Translators: Volume level in range ]80,99]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/static/bundles/VideoModule.js
 msgid "Very loud"
 msgstr ""
 
 #. Translators: Volume level equals 100%.
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/static/bundles/VideoModule.js
 msgid "Maximum"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
-#: common/static/bundles/VideoModule.js
 msgid "This browser cannot play .mp4, .ogg, or .webm files."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
-#: common/static/bundles/VideoModule.js
 msgid "Try using a different browser, such as Google Chrome."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
-#: common/static/bundles/VideoModule.js
 msgid "High Definition"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
-#: common/static/bundles/VideoModule.js
 msgid "off"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
-#: common/static/bundles/VideoModule.js
 msgid "on"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
-#: common/static/bundles/VideoModule.js
 msgid "Video position. Press space to toggle playback"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
-#: common/static/bundles/VideoModule.js
 msgid "Video ended"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
-#: common/static/bundles/VideoModule.js
 msgid "Video position"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
-#: common/static/bundles/VideoModule.js
 msgid "%(value)s hour"
 msgid_plural "%(value)s hours"
 msgstr[0] ""
 msgstr[1] ""
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
-#: common/static/bundles/VideoModule.js
 msgid "%(value)s minute"
 msgid_plural "%(value)s minutes"
 msgstr[0] ""
 msgstr[1] ""
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
-#: common/static/bundles/VideoModule.js
 msgid "%(value)s second"
 msgid_plural "%(value)s seconds"
 msgstr[0] ""
 msgstr[1] ""
 
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
-#: common/static/bundles/VideoModule.js
 msgid ""
 "Click on this button to mute or unmute this video or press UP or DOWN "
 "buttons to increase or decrease volume level."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
-#: common/static/bundles/VideoModule.js
 msgid "Adjust video volume"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
-#: common/static/bundles/VideoModule.js
 msgid ""
 "Press UP to enter the speed menu then use the UP and DOWN arrow keys to "
 "navigate the different speeds, then press ENTER to change to the selected "
@@ -1927,64 +1851,52 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
-#: common/static/bundles/VideoModule.js
 msgid "Adjust video speed"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
-#: common/static/bundles/VideoModule.js
 msgid "Video speed: "
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_play_skip_control.js
-#: common/static/bundles/VideoModule.js
 msgid "Skip"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_poster.js
-#: common/static/bundles/VideoModule.js
 msgid "Play video"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_skip_control.js
-#: common/static/bundles/VideoModule.js
 msgid "Do not show again"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-#: common/static/bundles/VideoModule.js
 msgid "Open language menu"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-#: common/static/bundles/VideoModule.js
 msgid "Transcript will be displayed when you start playing the video."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-#: common/static/bundles/VideoModule.js
 msgid ""
 "Activating a link in this group will skip to the corresponding point in the "
 "video."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-#: common/static/bundles/VideoModule.js
 msgid "Video transcript"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-#: common/static/bundles/VideoModule.js
 msgid "Start of transcript. Skip to the end."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-#: common/static/bundles/VideoModule.js
 msgid "End of transcript. Skip to the start."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-#: common/static/bundles/VideoModule.js
 msgid ""
 "Press the UP arrow key to enter the language menu then use UP and DOWN arrow"
 " keys to navigate language options. Press ENTER to change to the selected "
@@ -1992,1882 +1904,57 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-#: common/static/bundles/VideoModule.js
 msgid "Hide closed captions"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-#: common/static/bundles/VideoModule.js
 msgid "(Caption will be displayed when you start playing the video.)"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-#: common/static/bundles/VideoModule.js
 msgid "Turn on closed captioning"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-#: common/static/bundles/VideoModule.js
 msgid "Turn on transcripts"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-#: common/static/bundles/VideoModule.js
 msgid "Turn off transcripts"
 msgstr ""
 
-#: common/static/bundles/AnnotatableModule.js
-msgid "显示批注"
-msgstr ""
-
-#: common/static/bundles/AnnotatableModule.js
-msgid "隐藏批注"
-msgstr ""
-
-#: common/static/bundles/AnnotatableModule.js
-msgid "展开说明"
-msgstr ""
-
-#: common/static/bundles/AnnotatableModule.js
-msgid "折叠说明"
-msgstr ""
-
-#: common/static/bundles/AnnotatableModule.js
-msgid "评注"
-msgstr ""
-
-#: common/static/bundles/AnnotatableModule.js
-msgid "回复批注"
-msgstr ""
-
-#: common/static/bundles/CapaDescriptor.js common/static/bundles/commons.js
-msgid "表头"
-msgstr ""
-
-#: common/static/bundles/CapaModule.js
-msgid "正在进行评分，请刷新页面查看结果。"
-msgstr ""
-
-#: common/static/bundles/CapaModule.js
-msgid "无法进行评分。提交中断。"
-msgstr ""
-
-#: common/static/bundles/CapaModule.js
-msgid "提交中断！抱歉，您的浏览器不支持文件上传。请尽可能使用 Chrome 或者 Safari 等支持文件上传的浏览器。"
-msgstr ""
-
-#: common/static/bundles/CapaModule.js
-msgid "您提交了 {filename}；仅支持提交 {allowedFiles} 格式的文件。"
-msgstr ""
-
-#: common/static/bundles/CapaModule.js
-msgid "你的文件 {filename} 过大 ( 最大: {maxSize} MB)。"
-msgstr ""
-
-#: common/static/bundles/CapaModule.js
-msgid "您没有提交需要的文件：{requiredFiles}。"
-msgstr ""
-
-#: common/static/bundles/CapaModule.js
-msgid "您未选择任何要上传的文件。"
-msgstr ""
-
-#: common/static/bundles/CapaModule.js
-msgid "此问题已重置。"
-msgstr ""
-
-#: common/static/bundles/CapaModule.js
-msgid "未提交"
-msgstr ""
-
-#: common/static/bundles/CourseGoals.js
-#: openedx/features/course_experience/static/course_experience/js/CourseGoals.js
-msgid "Thank you for setting your course goal to {goal}!"
-msgstr ""
-
-#: common/static/bundles/CourseGoals.js
-msgid ""
-"There was an error in setting your goal, please reload the page and try "
-"again."
-msgstr ""
-
-#: common/static/bundles/CourseHome.js
-#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
-msgid "You have successfully updated your goal."
-msgstr ""
-
-#: common/static/bundles/CourseHome.js
-#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
-msgid "There was an error updating your goal."
-msgstr ""
-
-#: common/static/bundles/CourseOrLibraryListing.js
-msgid "机构"
-msgstr ""
-
-#: common/static/bundles/CourseOrLibraryListing.js
-msgid "课程编码"
-msgstr ""
-
-#: common/static/bundles/CourseOrLibraryListing.js
-msgid "开课"
-msgstr ""
-
-#: common/static/bundles/CourseOrLibraryListing.js
-msgid "（只读）"
-msgstr ""
-
-#: common/static/bundles/CourseOrLibraryListing.js
-msgid "课程重播"
-msgstr ""
-
-#: common/static/bundles/CourseOrLibraryListing.js
-msgid "观看直播"
-msgstr ""
-
-#: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.js
-#: lms/static/js/learner_dashboard/models/course_card_model.js
-msgid "(Self-paced) Starts {start}"
-msgstr ""
-
-#: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.js
-#: lms/static/js/learner_dashboard/models/course_card_model.js
-msgid "(Self-paced) Started {start}"
-msgstr ""
-
-#: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.js
-#: lms/static/js/learner_dashboard/models/course_card_model.js
-msgid "(Self-paced) Ends {end}"
-msgstr ""
-
-#: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.js
-#: lms/static/js/learner_dashboard/models/course_card_model.js
-msgid "(Self-paced) Ended {end}"
-msgstr ""
-
-#: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.js
-#: lms/static/js/learner_dashboard/models/course_card_model.js
-msgid "Starts {start}"
-msgstr ""
-
-#: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.js
-#: lms/static/js/learner_dashboard/models/course_card_model.js
-msgid "Started {start}"
-msgstr ""
-
-#: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.js
-#: lms/static/js/learner_dashboard/models/course_card_model.js
-msgid "Ends {end}"
-msgstr ""
-
-#: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.js
-#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
-msgid "You must select a session to access the course."
-msgstr ""
-
-#: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.js
-#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
-msgid "There was an error. Please reload the page and try again."
-msgstr ""
-
-#: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.js
-#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
-#: lms/templates/learner_dashboard/course_entitlement.underscore
-msgid "Change Session"
-msgstr ""
-
-#: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.js
-#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
-#: lms/templates/learner_dashboard/course_entitlement.underscore
-msgid "Select Session"
-msgstr ""
-
-#: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.js
-#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
-msgid "Leave Current Session"
-msgstr ""
-
-#: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.js
-#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
-msgid "Are you sure you want to select this session?"
-msgstr ""
-
-#: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.js
-#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
-msgid "Are you sure you want to change to a different session?"
-msgstr ""
-
-#: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.js
-#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
-msgid "Any course progress or grades from your current session will be lost."
-msgstr ""
-
-#: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.js
-#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
-msgid "Are you sure that you want to leave this session?"
-msgstr ""
-
-#: common/static/bundles/EntitlementUnenrollmentFactory.js
-#: lms/static/js/learner_dashboard/views/entitlement_unenrollment_view.js
-msgid ""
-"Your unenrollment request could not be processed. Please try again later."
-msgstr ""
-
-#: common/static/bundles/EntitlementUnenrollmentFactory.js
-#: lms/static/js/learner_dashboard/views/entitlement_unenrollment_view.js
-msgid ""
-"Are you sure you want to unenroll from {courseName} ({courseNumber})? You "
-"will be refunded the amount you paid."
-msgstr ""
-
-#: common/static/bundles/Import.js
-msgid "上传过程中出现错误。"
-msgstr ""
-
-#: common/static/bundles/Import.js
-msgid "解压文件时出现错误"
-msgstr ""
-
-#: common/static/bundles/Import.js
-msgid "验证上传文件时出现错误"
-msgstr ""
-
-#: common/static/bundles/Import.js
-msgid "选取新文件"
-msgstr ""
-
-#: common/static/bundles/Import.js
-msgid "文件格式不支持。请上传扩展名为{ext}的文件。"
-msgstr ""
-
-#: common/static/bundles/Import.js
-msgid "上传新文库至数据库时出现错误。"
-msgstr ""
-
-#: common/static/bundles/Import.js
-msgid "上传新课程至数据库时出现错误"
-msgstr ""
-
-#: common/static/bundles/Import.js
-msgid "导入失败"
-msgstr ""
-
-#: common/static/bundles/Import.js
-msgid "正在导入，离开页面将停止导入"
-msgstr ""
-
-#: common/static/bundles/Import.js
-msgid "导入课程时出现错误"
-msgstr ""
-
-#: common/static/bundles/Import.js
-msgid "上传时出现错误"
-msgstr ""
-
-#: common/static/bundles/PasswordResetConfirmation.js
-#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
-#: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Reset Your Password"
-msgstr ""
-
-#: common/static/bundles/PasswordResetConfirmation.js
-#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
-msgid "Enter and confirm your new password."
-msgstr ""
-
-#: common/static/bundles/PasswordResetConfirmation.js
-#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
-msgid "New Password"
-msgstr ""
-
-#: common/static/bundles/PasswordResetConfirmation.js
-#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
-msgid "Confirm Password"
-msgstr ""
-
-#: common/static/bundles/PasswordResetConfirmation.js
-#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
-msgid "Passwords do not match."
-msgstr ""
-
-#: common/static/bundles/PasswordResetConfirmation.js
-#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
-msgid "Reset My Password"
-msgstr ""
-
-#: common/static/bundles/PasswordResetConfirmation.js
-#: lms/static/js/student_account/components/PasswordResetInput.jsx
-msgid "Error: "
-msgstr ""
-
-#: common/static/bundles/ProblemBrowser.js
 #: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
 #: cms/templates/js/move-xblock-list.underscore
 msgid "View child items"
 msgstr ""
 
-#: common/static/bundles/ProblemBrowser.js
 #: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
 msgid "Navigate up"
 msgstr ""
 
-#: common/static/bundles/ProblemBrowser.js
 #: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
 msgid "Browsing"
 msgstr ""
 
-#: common/static/bundles/ProblemBrowser.js
 #: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
 msgid "Select"
 msgstr ""
 
-#: common/static/bundles/ProblemBrowser.js
-#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/Main/Main.jsx
-msgid "Select a section or problem"
-msgstr ""
-
-#: common/static/bundles/ProgramDetailsFactory.js
-#: lms/static/js/learner_dashboard/views/program_details_sidebar_view.js
-msgid "{type} Progress"
-msgstr ""
-
-#: common/static/bundles/ProgramDetailsFactory.js
-#: lms/static/js/learner_dashboard/views/program_details_sidebar_view.js
-msgid "Earned Certificates"
-msgstr ""
-
-#: common/static/bundles/ProgramDetailsFactory.js
-#: lms/static/js/learner_dashboard/views/program_details_view.js
-msgid "Enrolled"
-msgstr ""
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/errors_list.jsx
-msgid "Please fix the following errors:"
-msgstr ""
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/file_upload.jsx
-msgid "Files that you upload must be smaller than 5MB in size."
-msgstr ""
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/file_upload.jsx
-msgid ""
-"Files that you upload must be PDFs or image files in .gif, .jpg, .jpeg, or "
-".png format."
-msgstr ""
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/file_upload.jsx
-#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid "Something went wrong. Please try again later."
-msgstr ""
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/file_upload.jsx
-msgid "Add Attachment"
-msgstr ""
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/file_upload.jsx
-msgid "(Optional)"
-msgstr ""
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/file_upload.jsx
-msgid "Remove file"
-msgstr ""
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "Course Name"
-msgstr ""
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "Not specific to a course"
-msgstr ""
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "What can we help you with, {username}?"
-msgstr ""
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Subject"
-msgstr ""
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "Details"
-msgstr ""
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "The more you tell us, the more quickly and helpfully we can respond!"
-msgstr ""
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-#: common/static/common/templates/discussion/new-post.underscore
-#: common/static/common/templates/discussion/thread-response.underscore
-#: common/static/common/templates/discussion/thread.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Submit"
-msgstr ""
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
-msgid "Sign in to {platform} so we can help you better."
-msgstr ""
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/templates/student_account/hinted_login.underscore
-#: lms/templates/student_account/login.underscore
-msgid "Sign in"
-msgstr ""
-
-#: common/static/bundles/SingleSupportForm.js
-msgid "Create an {platform} account"
-msgstr ""
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
-msgid ""
-"If you are unable to access your account contact us via email using {email}."
-msgstr ""
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid ""
-"Select a course or select \"Not specific to a course\" for your support "
-"request."
-msgstr ""
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid "Enter a subject for your support request."
-msgstr ""
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid "Enter some details for your support request."
-msgstr ""
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-#: lms/djangoapps/support/static/support/jsx/success.jsx
-msgid "Contact Us"
-msgstr ""
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid "Find answers to the top questions asked by learners."
-msgstr ""
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid "Search the {platform} Help Center"
-msgstr ""
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/success.jsx
-msgid "Go to my Dashboard"
-msgstr ""
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/success.jsx
-msgid "Go to {platform} Home"
-msgstr ""
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/success.jsx
-msgid ""
-"Thank you for submitting a request! We will contact you within 24 hours."
-msgstr ""
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/upload_progress.jsx
-msgid "Cancel upload"
-msgstr ""
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid ""
-"You may also lose access to verified certificates and other program "
-"credentials like MicroMasters certificates. If you want to make a copy of "
-"these for your records before proceeding with deletion, follow the "
-"instructions for {htmlStart}printing or downloading a certificate{htmlEnd}."
-msgstr ""
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid ""
-"Before proceeding, please {htmlStart}unlink all social media "
-"accounts{htmlEnd}."
-msgstr ""
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid "Before proceeding, please {htmlStart}activate your account{htmlEnd}."
-msgstr ""
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid ""
-"{htmlStart}Want to change your email, name, or password instead?{htmlEnd}"
-msgstr ""
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid ""
-"{strongStart}Warning: Account deletion is permanent.{strongEnd} Please read "
-"the above carefully before proceeding. This is an irreversible action, and "
-"{strongStart}you will no longer be able to use the same email on "
-"edX.{strongEnd}"
-msgstr ""
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid "We’re sorry to see you go!"
-msgstr ""
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid ""
-"Please note: Deletion of your account and personal data is permanent and "
-"cannot be undone. EdX will not be able to recover your account or the data "
-"that is deleted."
-msgstr ""
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid ""
-"Once your account is deleted, you cannot use it to take courses on the "
-"EliteMBA app, elitemba.cn, or any other site hosted by EliteMBA."
-msgstr ""
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-#: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Delete My Account"
-msgstr ""
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid "Password is incorrect"
-msgstr ""
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid "Unable to delete account"
-msgstr ""
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid "Please re-enter your password."
-msgstr ""
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid ""
-"Sorry, there was an error trying to process your request. Please try again "
-"later."
-msgstr ""
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid "A Password is required"
-msgstr ""
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-msgid "您确定吗？"
-msgstr ""
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid ""
-"You have selected “Delete my account.” Deletion of your account and personal"
-" data is permanent and cannot be undone. EdX will not be able to recover "
-"your account or the data that is deleted."
-msgstr ""
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid ""
-"If you proceed, you will be unable to use this account to take courses on "
-"the edX app, edx.org, or any other site hosted by edX. This includes access "
-"to edx.org from your employer’s or university’s system and access to private"
-" sites offered by MIT Open Learning, Wharton Executive Education, and "
-"Harvard Medical School."
-msgstr ""
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid ""
-"If you still wish to continue and delete your account, please enter your "
-"account password:"
-msgstr ""
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: common/static/bundles/commons.js
-#: common/static/bundles/js/factories/edit_tabs.js
-#: common/static/bundles/js/factories/textbooks.js
-msgid "取消"
-msgstr ""
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid "Yes, Delete"
-msgstr ""
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid "We're sorry to see you go! Your account will be deleted shortly."
-msgstr ""
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid ""
-"Account deletion, including removal from email lists, may take a few weeks "
-"to fully process through our system. If you want to opt-out of emails before"
-" then, please unsubscribe from the footer of any email."
-msgstr ""
-
-#: common/static/bundles/UnenrollmentFactory.js
-#: lms/static/js/dashboard/legacy.js
-#: lms/static/js/learner_dashboard/views/unenroll_view.js
-msgid ""
-"Unable to determine whether we should give you a refund because of System "
-"Error. Please try again later."
-msgstr ""
-
-#: common/static/bundles/VerticalStudentView.js
-#: lms/static/js/verify_student/views/make_payment_step_view.js
-#: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmark_button.js
-#: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmarks_list.js
-msgid "An error has occurred. Please try again."
-msgstr ""
-
-#: common/static/bundles/VerticalStudentView.js
-#: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmark_button.js
-msgid "Bookmark this page"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "此问题可能是由于服务器故障或您的网络连接错误导致的。请刷新网页或检查网络连接。"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "保存工程时出现错误"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "保存开放评估时出现错误"
-msgstr ""
-
-#: common/static/bundles/commons.js
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/edit_tabs.js
-#: common/static/bundles/js/factories/library.js
-#: common/static/bundles/js/factories/textbooks.js
-msgid "正在保存"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "将在新窗口或选项卡中打开此链接"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "将在模式窗口中打开此链接"
-msgstr ""
-
-#: common/static/bundles/commons.js
-#: common/static/bundles/js/factories/textbooks.js
-msgid "您需指定一个名称"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "只能上传<%= fileTypes %>类型的文件。请上传扩展名为<%= fileExtensions %>的文件。"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "或"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "版权所有"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "You reserve all rights f或 your w或k"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "知识共享"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "You waive some rights f或 your w或k, such that others can use it too"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "版本"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "属性"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid ""
-"Allow others to copy, distribute, display and perf或m your copyrighted w或k "
-"but only if they give credit the way you request. Currently, this option is "
-"required."
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "非商业性"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid ""
-"Allow others to copy, distribute, display and perf或m your w或k - and "
-"derivative w或ks based upon it - but f或 noncommercial purposes only."
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "禁止改作"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid ""
-"Allow others to copy, distribute, display and perf或m only verbatim copies of"
-" your w或k, not derivative w或ks based upon it. This option is incompatible "
-"with \"相同方式共享\"."
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "相同方式共享"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid ""
-"Allow others to distribute derivative w或ks only under a license identical to"
-" the license that governs your w或k. This option is incompatible with "
-"\"禁止改作\"."
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "移除"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "上传文件"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "保存"
-msgstr ""
-
-#. Translators: "title" is the name of the current component being edited.
-#: common/static/bundles/commons.js
-msgid "编辑：%(title)s"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "关闭"
-msgstr ""
-
-#: common/static/bundles/commons.js
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "单元"
-msgstr ""
-
-#: common/static/bundles/commons.js
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "组件"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "上传"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "We're s或ry, there was an err或"
-msgstr ""
-
-#: common/static/bundles/commons.js
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "正在添加"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "正在复制"
-msgstr ""
-
-#: common/static/bundles/commons.js
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "撤销移动"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "正在移动"
-msgstr ""
-
-#: common/static/bundles/commons.js
-#: common/static/bundles/js/factories/edit_tabs.js
-#: common/static/bundles/js/factories/textbooks.js
-msgid "正在删除"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "正在删除 this {xblock_type} is permanent and cannot be undone."
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "任何将此条目列为先修条件的条目也将取消访问限制"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "确定删除此{xblock_type}（和先修条件）吗？"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "是，确认删除 {xblock_type}"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "确定删除{xblock_type}吗？"
-msgstr ""
-
-#: common/static/bundles/commons.js
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "节"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "sub节"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "Please select a file in .srt f或mat."
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "Err或: 上传ing failed."
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "Err或: Imp或t failed."
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "Err或: Replacing failed."
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "Err或: Choosing failed."
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "Err或: Connection with server failed."
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "仅有一种链接类型。"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "链接应只有一种。"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "Inc或rect url f或mat."
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid ""
-"S或ry, there was an err或 parsing the subtitles that you uploaded. Please "
-"check the f或mat and try again."
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "确定移除本成绩单吗？"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid ""
-"If you remove this transcript, the transcript will not be available f或 this "
-"component."
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "移除 Transcript"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "移除中"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "上传 translation"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "编辑或"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "设置"
-msgstr ""
-
-#: common/static/bundles/commons.js
 #: common/static/common/js/components/utils/view_utils.js
 msgid "Required field."
 msgstr ""
 
-#: common/static/bundles/commons.js
 #: common/static/common/js/components/utils/view_utils.js
 msgid "Please do not use any spaces in this field."
 msgstr ""
 
-#: common/static/bundles/commons.js
-msgid "Please do not use any spaces 或 special characters in this field."
+#: common/static/common/js/components/utils/view_utils.js
+msgid "Please do not use any spaces or special characters in this field."
 msgstr ""
 
-#: common/static/bundles/commons.js
-msgid "段落"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "Pre 标签f或matted"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "标题 3"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "标题 4"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "标题 5"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "标题 6"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "加入到字典"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "高级"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "居中对齐"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "左对齐"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "右对齐"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "对齐"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "备用源"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "Anch或"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "Anch或s"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "Auth或"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "Background col或"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "引用"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "块"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "主体"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "粗体"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "B或der col或"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "B或der"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "底端"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "项目符号列表"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "标题"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "单元格边距"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "单元格属性"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "单元格间距"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "单元格类型"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "单元格"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "空心圆"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "Clear f或matting"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "代码块"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "代码"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "Col或"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "列"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "列组"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "Constrain prop或tions"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "复制行"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "复制"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "无法找到指定的字符串。"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "Custom col或"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "自定义…"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "剪切行"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "剪切"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "减少缩进"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "默认"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "删除列"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "删除行"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "删除表格"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "描述"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "尺寸"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "实心圆"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "Div 标签"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "文档属性"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "编辑 HTML"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "编辑"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "内嵌"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "表情"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "编码"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "文件"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "查找和替换"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "查找下一个"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "查找上一个"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "查找"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "完成"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "字体"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "字号"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "脚注"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "F或mat"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "F或mats"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "全屏"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "一般"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "水平对齐"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "标题 1"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "标题 2"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "表头单元格"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "表头s"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "高度"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "H或izontal line"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "H或izontal space"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "HTML 源代码"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "Ign或e all"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "Ign或e"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "图片描述"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "增加缩进"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "在右侧插入列"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "插入 column bef或e"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "插入日期／时间"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "插入图片"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "插入链接"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "在下方插入行"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "插入 row bef或e"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "插入表格"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "插入模板"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "插入视频"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "插入"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "插入/edit image"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "插入/edit link"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "插入/edit video"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "斜体"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "两端对齐"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "Keyw或ds"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "从左向右"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "小写字母"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "小写希腊字母"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "小写罗马字母"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "匹配大小写"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "合并单元格"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "中间"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "姓名"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "新建文档"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "新建窗口"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "下一个"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "No col或"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "不间断空格"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "无"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "编号列表"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "确定"
-msgstr ""
-
-#: common/static/bundles/commons.js
-#: common/static/bundles/js/factories/edit_tabs.js
-msgid "是的"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "分页符"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "粘贴为文本"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "当前为纯文本粘贴模式，所有内容都将以纯文本形式粘贴。关闭该选项可以回到普通粘贴模式。"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "在下方粘贴行"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "粘贴 row bef或e"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "将内嵌代码粘贴到下方："
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "粘贴"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "封面"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "Pre 标签"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "Pre 标签v"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "Pre 标签view"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "打印"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "重做"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "移除 link"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "全部替换"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "替换为"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "替换"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "Rest或e last draft"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid ""
-"Rich Text Area. Pre 标签ss ALT-F9 f或 menu. Pre 标签ss ALT-F10 f或 toolbar. Pre "
-"标签ss ALT-0 f或 help"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "从右向左"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "机器人"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "行组"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "行属性"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "行类型"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "行"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "行s"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "范围"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "全选"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "显示块"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "显示不可见字符"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "源代码"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "源"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "特殊字符"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "拼写检查"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "Text col或"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "Whole w或ds"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "W或ds: {0}"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid ""
-"Your browser doesn't supp或t direct access to the clipboard. Please use the "
-"Ctrl+X/C/V keyboard sh或tcuts instead."
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid "插入/编辑 Image"
-msgstr ""
-
-#: common/static/bundles/commons.js
-msgid ""
-"Sequence err或! Cannot navigate to %(tab_name)s in the current "
-"SequenceModule. Please contact the course staff."
-msgstr ""
-
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "移动"
-msgstr ""
-
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "选取移动组件的目标位置"
-msgstr ""
-
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "移动: {displayName}"
-msgstr ""
-
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "小节"
-msgstr ""
-
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "群组"
-msgstr ""
-
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "{parentCategory}目录下无{childCategory}"
-msgstr ""
-
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "课程大纲"
-msgstr ""
-
-#. Translators: "title" is the name of the current component or unit being
-#. edited.
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "编辑组件%(title)s路径"
-msgstr ""
-
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "发布中"
-msgstr ""
-
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "放弃更改"
-msgstr ""
-
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "确定把本单元还原至上一版本吗？此操作不可撤销。"
-msgstr ""
-
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "对学生隐藏"
-msgstr ""
-
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "Explicitly 对学生隐藏"
-msgstr ""
-
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "固定对学生可见"
-msgstr ""
-
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "对学生可见"
-msgstr ""
-
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "如果本单元早前已发布并对学生可见，您在学生不可见期间所做更改现在将对学生可见。您还要继续吗？"
-msgstr ""
-
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "移除成功！\"{displayName}\" 已被移除。"
-msgstr ""
-
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid ""
-"移动 cancelled. \"{sourceDisplayName}\" has been moved back to its original "
-"location."
-msgstr ""
-
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "跳转至新位置"
-msgstr ""
-
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "新的{component_type}"
-msgstr ""
-
-#: common/static/bundles/js/factories/edit_tabs.js
-msgid "确认删除页面"
-msgstr ""
-
-#: common/static/bundles/js/factories/edit_tabs.js
-msgid "确定删除本页吗？此操作不可撤销。"
-msgstr ""
-
-#: common/static/bundles/js/factories/library.js
-msgid "已添加日期"
-msgstr ""
-
-#: common/static/bundles/js/factories/library.js
-msgid "隐藏预览"
-msgstr ""
-
-#: common/static/bundles/js/factories/library.js
-msgid "显示预览"
-msgstr ""
-
-#. Translators: sample result:
-#. "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added
-#. ascending"
-#: common/static/bundles/js/factories/library.js
-msgid ""
-"以 {assetType} 过滤，按照 {sortName} 升序显示 {totalItemsCount} 中的 {currentItemRange} "
-msgstr ""
-
-#. Translators: sample result:
-#. "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added
-#. descending"
-#: common/static/bundles/js/factories/library.js
-msgid ""
-"以 {assetType} 过滤，按照 {sortName} 降序显示 {totalItemsCount} 中的 {currentItemRange} "
-msgstr ""
-
-#. Translators: sample result:
-#. "Showing 0-9 out of 25 total, sorted by Date Added ascending"
-#: common/static/bundles/js/factories/library.js
-msgid "以 {sortName} 为升序显示 {totalItemsCount} 中的 {currentItemRange} "
-msgstr ""
-
-#. Translators: sample result:
-#. "Showing 0-9 out of 25 total, sorted by Date Added descending"
-#: common/static/bundles/js/factories/library.js
-msgid "以 {sortName} 为降序显示 {totalItemsCount} 中的 {currentItemRange} "
-msgstr ""
-
-#. Translators: turns into "25 total" to be used in other sentences, e.g.
-#. "Showing 0-9 out of 25 total".
-#: common/static/bundles/js/factories/library.js
-msgid "总计{totalItems} "
-msgstr ""
-
-#: common/static/bundles/js/factories/library.js
 #: common/static/common/js/components/views/paginated_view.js
 #: common/static/common/js/components/views/paging_footer.js
 msgid "Pagination"
-msgstr ""
-
-#: common/static/bundles/js/factories/textbooks.js
-msgid "需提供章节名称及资源路径"
-msgstr ""
-
-#: common/static/bundles/js/factories/textbooks.js
-msgid "请输入章节名称"
-msgstr ""
-
-#: common/static/bundles/js/factories/textbooks.js
-msgid "请输入资源路径"
-msgstr ""
-
-#: common/static/bundles/js/factories/textbooks.js
-msgid "请输入教材名称"
-msgstr ""
-
-#: common/static/bundles/js/factories/textbooks.js
-msgid "请添加至少一个章节"
-msgstr ""
-
-#: common/static/bundles/js/factories/textbooks.js
-msgid "所有章节都需输入名称及资料"
-msgstr ""
-
-#: common/static/bundles/js/factories/textbooks.js
-msgid "上传新的PDF文件至 “<%= name %>”"
-msgstr ""
-
-#: common/static/bundles/js/factories/textbooks.js
-msgid "请选择PDF文件上传"
-msgstr ""
-
-#: common/static/bundles/js/factories/textbooks.js
-msgid "删除 “<%= name %>”?"
-msgstr ""
-
-#: common/static/bundles/js/factories/textbooks.js
-msgid ""
-"正在删除 a textbook cannot be undone and once deleted any reference to it in "
-"your courseware's navigation will also be removed."
-msgstr ""
-
-#: common/static/bundles/js/factories/textbooks.js
-msgid "删除"
-msgstr ""
-
-#: common/static/bundles/js/factories/xblock_validation.js
-msgid "此单元含验证问题。"
-msgstr ""
-
-#: common/static/bundles/js/factories/xblock_validation.js
-msgid "此组件含验证问题。"
-msgstr ""
-
-#. Translators: This message will be added to the front of messages of type
-#. warning,
-#. e.g. "Warning: this component has not been configured yet".
-#: common/static/bundles/js/factories/xblock_validation.js
-msgid "警告"
-msgstr ""
-
-#. Translators: This message will be added to the front of messages of type
-#. error,
-#. e.g. "Error: required field is missing".
-#: common/static/bundles/js/factories/xblock_validation.js
-msgid "错误"
-msgstr ""
-
-#: common/static/common/js/components/utils/view_utils.js
-msgid "Please do not use any spaces or special characters in this field."
 msgstr ""
 
 #: common/static/common/js/components/views/paginated_view.js
@@ -4202,6 +2289,10 @@ msgid_plural "%d years"
 msgstr[0] ""
 msgstr[1] ""
 
+#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/Main/Main.jsx
+msgid "Select a section or problem"
+msgstr ""
+
 #: lms/djangoapps/support/static/support/js/views/certificates.js
 msgid "An unexpected error occurred.  Please try again."
 msgstr ""
@@ -4224,6 +2315,123 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/js/views/enrollment_modal.js
 msgid "Something went wrong changing this enrollment. Please try again."
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/errors_list.jsx
+msgid "Please fix the following errors:"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/file_upload.jsx
+msgid "Files that you upload must be smaller than 5MB in size."
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/file_upload.jsx
+msgid ""
+"Files that you upload must be PDFs or image files in .gif, .jpg, .jpeg, or "
+".png format."
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/file_upload.jsx
+#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
+msgid "Something went wrong. Please try again later."
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/file_upload.jsx
+msgid "Add Attachment"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/file_upload.jsx
+msgid "(Optional)"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/file_upload.jsx
+msgid "Remove file"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Course Name"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Not specific to a course"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "What can we help you with, {username}?"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Subject"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Details"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "The more you tell us, the more quickly and helpfully we can respond!"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+#: common/static/common/templates/discussion/new-post.underscore
+#: common/static/common/templates/discussion/thread-response.underscore
+#: common/static/common/templates/discussion/thread.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid "Submit"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
+msgid "Sign in to {platform} so we can help you better."
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
+msgid ""
+"If you are unable to access your account contact us via email using {email}."
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
+msgid ""
+"Select a course or select \"Not specific to a course\" for your support "
+"request."
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
+msgid "Enter a subject for your support request."
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
+msgid "Enter some details for your support request."
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
+#: lms/djangoapps/support/static/support/jsx/success.jsx
+msgid "Contact Us"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
+msgid "Find answers to the top questions asked by learners."
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
+msgid "Search the {platform} Help Center"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/success.jsx
+msgid "Go to my Dashboard"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/success.jsx
+msgid "Go to {platform} Home"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/success.jsx
+msgid ""
+"Thank you for submitting a request! We will contact you within 24 hours."
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/upload_progress.jsx
+msgid "Cancel upload"
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/collections/team.js
@@ -4936,6 +3144,13 @@ msgstr ""
 msgid ""
 "The refund deadline for this course has passed,so you will not receive a "
 "refund."
+msgstr ""
+
+#: lms/static/js/dashboard/legacy.js
+#: lms/static/js/learner_dashboard/views/unenroll_view.js
+msgid ""
+"Unable to determine whether we should give you a refund because of System "
+"Error. Please try again later."
 msgstr ""
 
 #: lms/static/js/discovery/views/search_form.js
@@ -5904,6 +4119,95 @@ msgid ""
 "sensitive nature of student information."
 msgstr ""
 
+#: lms/static/js/learner_dashboard/models/course_card_model.js
+msgid "(Self-paced) Starts {start}"
+msgstr ""
+
+#: lms/static/js/learner_dashboard/models/course_card_model.js
+msgid "(Self-paced) Started {start}"
+msgstr ""
+
+#: lms/static/js/learner_dashboard/models/course_card_model.js
+msgid "(Self-paced) Ends {end}"
+msgstr ""
+
+#: lms/static/js/learner_dashboard/models/course_card_model.js
+msgid "(Self-paced) Ended {end}"
+msgstr ""
+
+#: lms/static/js/learner_dashboard/models/course_card_model.js
+msgid "Starts {start}"
+msgstr ""
+
+#: lms/static/js/learner_dashboard/models/course_card_model.js
+msgid "Started {start}"
+msgstr ""
+
+#: lms/static/js/learner_dashboard/models/course_card_model.js
+msgid "Ends {end}"
+msgstr ""
+
+#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
+msgid "You must select a session to access the course."
+msgstr ""
+
+#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
+msgid "There was an error. Please reload the page and try again."
+msgstr ""
+
+#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
+#: lms/templates/learner_dashboard/course_entitlement.underscore
+msgid "Change Session"
+msgstr ""
+
+#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
+#: lms/templates/learner_dashboard/course_entitlement.underscore
+msgid "Select Session"
+msgstr ""
+
+#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
+msgid "Leave Current Session"
+msgstr ""
+
+#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
+msgid "Are you sure you want to select this session?"
+msgstr ""
+
+#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
+msgid "Are you sure you want to change to a different session?"
+msgstr ""
+
+#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
+msgid "Any course progress or grades from your current session will be lost."
+msgstr ""
+
+#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
+msgid "Are you sure that you want to leave this session?"
+msgstr ""
+
+#: lms/static/js/learner_dashboard/views/entitlement_unenrollment_view.js
+msgid ""
+"Your unenrollment request could not be processed. Please try again later."
+msgstr ""
+
+#: lms/static/js/learner_dashboard/views/entitlement_unenrollment_view.js
+msgid ""
+"Are you sure you want to unenroll from {courseName} ({courseNumber})? You "
+"will be refunded the amount you paid."
+msgstr ""
+
+#: lms/static/js/learner_dashboard/views/program_details_sidebar_view.js
+msgid "{type} Progress"
+msgstr ""
+
+#: lms/static/js/learner_dashboard/views/program_details_sidebar_view.js
+msgid "Earned Certificates"
+msgstr ""
+
+#: lms/static/js/learner_dashboard/views/program_details_view.js
+msgid "Enrolled"
+msgstr ""
+
 #: lms/static/js/staff_debug_actions.js
 msgid "Successfully reset the attempts for user {user}"
 msgstr ""
@@ -5942,6 +4246,148 @@ msgstr ""
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Could not override problem score for {user}."
+msgstr ""
+
+#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Reset Your Password"
+msgstr ""
+
+#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
+msgid "Enter and confirm your new password."
+msgstr ""
+
+#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
+msgid "New Password"
+msgstr ""
+
+#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
+msgid "Confirm Password"
+msgstr ""
+
+#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
+msgid "Passwords do not match."
+msgstr ""
+
+#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
+msgid "Reset My Password"
+msgstr ""
+
+#: lms/static/js/student_account/components/PasswordResetInput.jsx
+msgid "Error: "
+msgstr ""
+
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid ""
+"You may also lose access to verified certificates and other program "
+"credentials like MicroMasters certificates. If you want to make a copy of "
+"these for your records before proceeding with deletion, follow the "
+"instructions for {htmlStart}printing or downloading a certificate{htmlEnd}."
+msgstr ""
+
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid ""
+"Before proceeding, please {htmlStart}unlink all social media "
+"accounts{htmlEnd}."
+msgstr ""
+
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid "Before proceeding, please {htmlStart}activate your account{htmlEnd}."
+msgstr ""
+
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid ""
+"{htmlStart}Want to change your email, name, or password instead?{htmlEnd}"
+msgstr ""
+
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid ""
+"{strongStart}Warning: Account deletion is permanent.{strongEnd} Please read "
+"the above carefully before proceeding. This is an irreversible action, and "
+"{strongStart}you will no longer be able to use the same email on "
+"edX.{strongEnd}"
+msgstr ""
+
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid "We’re sorry to see you go!"
+msgstr ""
+
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid ""
+"Please note: Deletion of your account and personal data is permanent and "
+"cannot be undone. EdX will not be able to recover your account or the data "
+"that is deleted."
+msgstr ""
+
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid ""
+"Once your account is deleted, you cannot use it to take courses on the "
+"EliteMBA app, elitemba.cn, or any other site hosted by EliteMBA."
+msgstr ""
+
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Delete My Account"
+msgstr ""
+
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid "Password is incorrect"
+msgstr ""
+
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid "Unable to delete account"
+msgstr ""
+
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid "Please re-enter your password."
+msgstr ""
+
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid ""
+"Sorry, there was an error trying to process your request. Please try again "
+"later."
+msgstr ""
+
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid "A Password is required"
+msgstr ""
+
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid ""
+"You have selected “Delete my account.” Deletion of your account and personal"
+" data is permanent and cannot be undone. EdX will not be able to recover "
+"your account or the data that is deleted."
+msgstr ""
+
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid ""
+"If you proceed, you will be unable to use this account to take courses on "
+"the edX app, edx.org, or any other site hosted by edX. This includes access "
+"to edx.org from your employer’s or university’s system and access to private"
+" sites offered by MIT Open Learning, Wharton Executive Education, and "
+"Harvard Medical School."
+msgstr ""
+
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid ""
+"If you still wish to continue and delete your account, please enter your "
+"account password:"
+msgstr ""
+
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid "Yes, Delete"
+msgstr ""
+
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid "We're sorry to see you go! Your account will be deleted shortly."
+msgstr ""
+
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid ""
+"Account deletion, including removal from email lists, may take a few weeks "
+"to fully process through our system. If you want to opt-out of emails before"
+" then, please unsubscribe from the footer of any email."
 msgstr ""
 
 #: lms/static/js/student_account/tos_modal.js
@@ -6322,6 +4768,12 @@ msgid "Try the transaction again in a few minutes."
 msgstr ""
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
+#: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmark_button.js
+#: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmarks_list.js
+msgid "An error has occurred. Please try again."
+msgstr ""
+
+#: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Could not submit order"
 msgstr ""
 
@@ -6515,6 +4967,22 @@ msgstr ""
 
 #: lms/templates/courseware/progress_graph.js
 msgid "Overall Score"
+msgstr ""
+
+#: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmark_button.js
+msgid "Bookmark this page"
+msgstr ""
+
+#: openedx/features/course_experience/static/course_experience/js/CourseGoals.js
+msgid "Thank you for setting your course goal to {goal}!"
+msgstr ""
+
+#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
+msgid "You have successfully updated your goal."
+msgstr ""
+
+#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
+msgid "There was an error updating your goal."
 msgstr ""
 
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
@@ -9554,6 +8022,11 @@ msgstr ""
 
 #: lms/templates/student_account/form_field.underscore
 msgid "Forgot password?"
+msgstr ""
+
+#: lms/templates/student_account/hinted_login.underscore
+#: lms/templates/student_account/login.underscore
+msgid "Sign in"
 msgstr ""
 
 #: lms/templates/student_account/hinted_login.underscore
