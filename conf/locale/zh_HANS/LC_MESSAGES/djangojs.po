@@ -6,10 +6,11 @@
 #
 # Translators:
 # 嘉杰 李 <jj.li@eliteu.com.cn>, 2018
-# 微 李 <w.li@eliteu.com.cn>, 2018
-# 家璧 刘 <jb.liu@eliteu.com.cn>, 2018
 # 婕 高 <j.gao@eliteu.cn>, 2018
+# 微 李 <w.li@eliteu.com.cn>, 2018
 # li ying <code@eliteu.cn>, 2018
+# Yi Li <y.li@eliteu.cn>, 2018
+# 家璧 刘 <jb.liu@eliteu.com.cn>, 2018
 #
 # #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/).
@@ -47,15 +48,14 @@
 #
 # Translators:
 # li ying <code@eliteu.cn>, 2018
-# 微 李 <w.li@eliteu.com.cn>, 2018
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-12-13 17:36+0800\n"
+"POT-Creation-Date: 2018-12-18 10:17+0800\n"
 "PO-Revision-Date: 2018-12-07 12:23+0000\n"
-"Last-Translator: 微 李 <w.li@eliteu.com.cn>, 2018\n"
+"Last-Translator: li ying <code@eliteu.cn>, 2018\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
@@ -64,21 +64,6 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "Generated-By: Babel 1.3\n"
 "#-#-#-#-#  membership-js.po (0.1a)  #-#-#-#-#\n"
-
-#: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
-#: cms/static/js/views/video_transcripts.js common/static/bundles/commons.js
-msgid ""
-"This may be happening because of an error with our server or your internet "
-"connection. Try refreshing the page or making sure you are online."
-msgstr "此问题可能是由于服务器故障或您的网络连接错误导致的。请刷新网页或检查网络连接。"
-
-#: cms/static/cms/js/main.js common/static/bundles/commons.js
-msgid "Studio's having trouble saving your work"
-msgstr "保存工程时出现错误"
-
-#: cms/static/cms/js/xblock/cms.runtime.v1.js common/static/bundles/commons.js
-msgid "OpenAssessment Save Error"
-msgstr "保存开放评估时出现错误"
 
 #: cms/static/cms/js/xblock/cms.runtime.v1.js
 #: cms/static/js/certificates/views/signatory_details.js
@@ -89,28 +74,15 @@ msgstr "保存开放评估时出现错误"
 #: cms/static/js/views/edit_textbook.js
 #: cms/static/js/views/list_item_editor.js
 #: cms/static/js/views/modals/edit_xblock.js cms/static/js/views/tabs.js
-#: cms/static/js/views/utils/xblock_utils.js common/static/bundles/commons.js
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/edit_tabs.js
-#: common/static/bundles/js/factories/library.js
-#: common/static/bundles/js/factories/textbooks.js
-#: lms/static/js/ccx/schedule.js lms/static/js/views/fields.js
+#: cms/static/js/views/utils/xblock_utils.js lms/static/js/ccx/schedule.js
+#: lms/static/js/views/fields.js
 msgid "Saving"
 msgstr "正在保存"
-
-#: cms/static/js/base.js common/static/bundles/commons.js
-msgid "This link will open in a new browser window/tab"
-msgstr "将在新窗口或选项卡中打开此链接"
-
-#: cms/static/js/base.js common/static/bundles/commons.js
-msgid "This link will open in a modal window"
-msgstr "将在模式窗口中打开此链接"
 
 #: cms/static/js/certificates/views/signatory_editor.js
 #: cms/static/js/views/asset.js cms/static/js/views/list_item.js
 #: cms/static/js/views/manage_users_and_roles.js
 #: cms/static/js/views/show_textbook.js
-#: common/static/bundles/js/factories/textbooks.js
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 #: cms/templates/js/certificate-details.underscore
 #: cms/templates/js/certificate-editor.underscore
@@ -131,15 +103,6 @@ msgstr "将在模式窗口中打开此链接"
 msgid "Delete"
 msgstr "删除"
 
-#: cms/static/js/certificates/views/signatory_editor.js
-#: cms/static/js/views/course_info_update.js cms/static/js/views/list_item.js
-#: cms/static/js/views/show_textbook.js cms/static/js/views/tabs.js
-#: cms/static/js/views/utils/xblock_utils.js common/static/bundles/commons.js
-#: common/static/bundles/js/factories/edit_tabs.js
-#: common/static/bundles/js/factories/textbooks.js
-msgid "Deleting"
-msgstr "正在删除"
-
 #. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -151,11 +114,6 @@ msgstr "正在删除"
 #: cms/static/js/views/show_textbook.js cms/static/js/views/tabs.js
 #: cms/static/js/views/validation.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: common/static/bundles/commons.js
-#: common/static/bundles/js/factories/edit_tabs.js
-#: common/static/bundles/js/factories/textbooks.js
 #: common/static/common/js/components/utils/view_utils.js
 #: lms/static/js/Markdown.Editor.js
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
@@ -182,157 +140,11 @@ msgstr "正在删除"
 msgid "Cancel"
 msgstr "取消"
 
-#: cms/static/js/features/import/factories/import.js
-#: common/static/bundles/Import.js
-msgid "There was an error during the upload process."
-msgstr "上传过程中出现错误。"
-
-#: cms/static/js/features/import/factories/import.js
-#: common/static/bundles/Import.js
-msgid "There was an error while unpacking the file."
-msgstr "解压文件时出现错误"
-
-#: cms/static/js/features/import/factories/import.js
-#: common/static/bundles/Import.js
-msgid "There was an error while verifying the file you submitted."
-msgstr "验证上传文件时出现错误"
-
-#: cms/static/js/features/import/factories/import.js
-#: common/static/bundles/Import.js
-msgid "Choose new file"
-msgstr "选取新文件"
-
-#: cms/static/js/features/import/factories/import.js
-#: common/static/bundles/Import.js
-msgid ""
-"File format not supported. Please upload a file with a {ext} extension."
-msgstr "文件格式不支持。请上传扩展名为{ext}的文件。"
-
-#: cms/static/js/features/import/factories/import.js
-#: common/static/bundles/Import.js
-msgid "There was an error while importing the new library to our database."
-msgstr "上传新文库至数据库时出现错误。"
-
-#: cms/static/js/features/import/factories/import.js
-#: common/static/bundles/Import.js
-msgid "There was an error while importing the new course to our database."
-msgstr "上传新课程至数据库时出现错误"
-
-#: cms/static/js/features/import/factories/import.js
-#: common/static/bundles/Import.js
-msgid "Your import has failed."
-msgstr "导入失败"
-
-#: cms/static/js/features/import/views/import.js
-#: common/static/bundles/Import.js
-msgid "Your import is in progress; navigating away will abort it."
-msgstr "正在导入，离开页面将停止导入"
-
-#: cms/static/js/features/import/views/import.js
-#: common/static/bundles/Import.js
-msgid "Error importing course"
-msgstr "导入课程时出现错误"
-
-#: cms/static/js/features/import/views/import.js
-#: common/static/bundles/Import.js
-msgid "There was an error with the upload"
-msgstr "上传时出现错误"
-
-#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
-#: common/static/bundles/CourseOrLibraryListing.js
-msgid "Organization:"
-msgstr "机构"
-
-#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
-#: common/static/bundles/CourseOrLibraryListing.js
-msgid "Course Number:"
-msgstr "课程编码"
-
-#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
-#: common/static/bundles/CourseOrLibraryListing.js
-msgid "Course Run:"
-msgstr "开课"
-
-#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
-#: common/static/bundles/CourseOrLibraryListing.js
-msgid "(Read-only)"
-msgstr "（只读）"
-
-#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
-#: common/static/bundles/CourseOrLibraryListing.js
-msgid "Re-run Course"
-msgstr "课程重播"
-
-#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
-#: common/static/bundles/CourseOrLibraryListing.js
-#: cms/templates/js/show-textbook.underscore
-msgid "View Live"
-msgstr "观看直播"
-
 #. Translators: This is the status of an active video upload
 #: cms/static/js/models/active_video_upload.js cms/static/js/views/assets.js
 #: cms/static/js/views/video_thumbnail.js lms/static/js/views/image_field.js
 msgid "Uploading"
 msgstr "上传中"
-
-#: cms/static/js/models/chapter.js
-#: common/static/bundles/js/factories/textbooks.js
-msgid "Chapter name and asset_path are both required"
-msgstr "需提供章节名称及资源路径"
-
-#: cms/static/js/models/chapter.js
-#: common/static/bundles/js/factories/textbooks.js
-msgid "Chapter name is required"
-msgstr "请输入章节名称"
-
-#: cms/static/js/models/chapter.js
-#: common/static/bundles/js/factories/textbooks.js
-msgid "asset_path is required"
-msgstr "请输入资源路径"
-
-#: cms/static/js/models/course.js cms/static/js/models/section.js
-#: common/static/bundles/commons.js
-#: common/static/bundles/js/factories/textbooks.js
-msgid "You must specify a name"
-msgstr "您需指定一个名称"
-
-#: cms/static/js/models/textbook.js
-#: common/static/bundles/js/factories/textbooks.js
-msgid "Textbook name is required"
-msgstr "请输入教材名称"
-
-#: cms/static/js/models/textbook.js
-#: common/static/bundles/js/factories/textbooks.js
-msgid "Please add at least one chapter"
-msgstr "请添加至少一个章节"
-
-#: cms/static/js/models/textbook.js
-#: common/static/bundles/js/factories/textbooks.js
-msgid "All chapters must have a name and asset"
-msgstr "所有章节都需输入名称及资料"
-
-#: cms/static/js/models/uploads.js common/static/bundles/commons.js
-msgid ""
-"Only <%= fileTypes %> files can be uploaded. Please select a file ending in "
-"<%= fileExtensions %> to upload."
-msgstr "只能上传<%= fileTypes %>类型的文件。请上传扩展名为<%= fileExtensions %>的文件。"
-
-#: cms/static/js/models/uploads.js common/static/bundles/commons.js
-#: lms/templates/student_account/hinted_login.underscore
-#: lms/templates/student_account/institution_login.underscore
-#: lms/templates/student_account/institution_register.underscore
-msgid "or"
-msgstr "或"
-
-#: cms/static/js/models/xblock_validation.js
-#: common/static/bundles/js/factories/xblock_validation.js
-msgid "This unit has validation issues."
-msgstr "此单元含验证问题。"
-
-#: cms/static/js/models/xblock_validation.js
-#: common/static/bundles/js/factories/xblock_validation.js
-msgid "This component has validation issues."
-msgstr "此组件含验证问题。"
 
 #. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
@@ -341,7 +153,7 @@ msgstr "此组件含验证问题。"
 #: cms/static/js/views/modals/edit_xblock.js
 #: cms/static/js/views/video_transcripts.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js lms/static/js/student_account/tos_modal.js
+#: lms/static/js/student_account/tos_modal.js
 #: cms/templates/js/course-video-settings.underscore
 #: common/static/common/templates/image-modal.underscore
 #: common/static/common/templates/discussion/alert-popup.underscore
@@ -356,7 +168,7 @@ msgstr "关闭"
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/assets.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js cms/templates/js/asset-library.underscore
+#: cms/templates/js/asset-library.underscore
 #: cms/templates/js/course-instructor-details.underscore
 #: cms/templates/js/previous-video-upload-list.underscore
 #: cms/templates/js/signatory-details.underscore
@@ -369,20 +181,11 @@ msgstr "姓名"
 msgid "Choose File"
 msgstr "选取文件"
 
-#: cms/static/js/views/components/add_xblock.js
-#: cms/static/js/views/utils/xblock_utils.js common/static/bundles/commons.js
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "Adding"
-msgstr "正在添加"
-
 #. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/course_info_update.js cms/static/js/views/tabs.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
-#: common/static/bundles/js/factories/edit_tabs.js
 #: lms/static/js/Markdown.Editor.js
 #: common/static/common/templates/discussion/alert-popup.underscore
 #: lms/templates/learner_dashboard/verification_popover.underscore
@@ -394,7 +197,6 @@ msgstr "是的"
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/course_video_settings.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "None"
 msgstr "无"
@@ -402,7 +204,7 @@ msgstr "无"
 #: cms/static/js/views/course_video_settings.js
 #: cms/static/js/views/metadata.js
 #: cms/static/js/views/previous_video_upload.js
-#: cms/static/js/views/video_transcripts.js common/static/bundles/commons.js
+#: cms/static/js/views/video_transcripts.js
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 #: lms/static/js/views/image_field.js
 #: cms/templates/js/video/metadata-translations-item.underscore
@@ -410,85 +212,10 @@ msgstr "无"
 msgid "Remove"
 msgstr "移除"
 
-#: cms/static/js/views/edit_chapter.js
-#: common/static/bundles/js/factories/textbooks.js
-msgid "Upload a new PDF to “<%= name %>”"
-msgstr "上传新的PDF文件至 “<%= name %>”"
-
-#: cms/static/js/views/edit_chapter.js
-#: common/static/bundles/js/factories/textbooks.js
-msgid "Please select a PDF file to upload."
-msgstr "请选择PDF文件上传"
-
-#: cms/static/js/views/license.js common/static/bundles/commons.js
-#: cms/templates/js/license-selector.underscore
-msgid "All Rights Reserved"
-msgstr "版权所有"
-
-#: cms/static/js/views/license.js common/static/bundles/commons.js
-msgid "You reserve all rights for your work"
-msgstr "您拥有对您作品的所有使用权。"
-
-#: cms/static/js/views/license.js common/static/bundles/commons.js
-msgid "Creative Commons"
-msgstr "知识共享"
-
-#: cms/static/js/views/license.js common/static/bundles/commons.js
-msgid "You waive some rights for your work, such that others can use it too"
-msgstr "您放弃对作品的某些权利，即他人亦可使用。"
-
-#: cms/static/js/views/license.js common/static/bundles/commons.js
-msgid "Version"
-msgstr "版本"
-
-#: cms/static/js/views/license.js common/static/bundles/commons.js
-msgid "Attribution"
-msgstr "属性"
-
-#: cms/static/js/views/license.js common/static/bundles/commons.js
-msgid ""
-"Allow others to copy, distribute, display and perform your copyrighted work "
-"but only if they give credit the way you request. Currently, this option is "
-"required."
-msgstr "您将允许他人对您享有著作权的作品进行复制、发行、展览、表演，但在这些过程中对方必须根据您的要求保留对原作品的署名。当前，此项为必选。"
-
-#: cms/static/js/views/license.js common/static/bundles/commons.js
-msgid "Noncommercial"
-msgstr "非商业性"
-
-#: cms/static/js/views/license.js common/static/bundles/commons.js
-msgid ""
-"Allow others to copy, distribute, display and perform your work - and "
-"derivative works based upon it - but for noncommercial purposes only."
-msgstr "您允许他人对自己享有著作权的作品及衍生作品进行复制、发行、展览、表演，但仅可用于非商业用途。"
-
-#: cms/static/js/views/license.js common/static/bundles/commons.js
-msgid "No Derivatives"
-msgstr "禁止改作"
-
-#: cms/static/js/views/license.js common/static/bundles/commons.js
-msgid ""
-"Allow others to copy, distribute, display and perform only verbatim copies "
-"of your work, not derivative works based upon it. This option is "
-"incompatible with \"Share Alike\"."
-msgstr "您允许他人对您的作品原封不动地进行复制、发行、展览、表演，但不得进行演绎创作。此选项与“相同方式共享”选项不兼容。"
-
-#: cms/static/js/views/license.js common/static/bundles/commons.js
-msgid "Share Alike"
-msgstr "相同方式共享"
-
-#: cms/static/js/views/license.js common/static/bundles/commons.js
-msgid ""
-"Allow others to distribute derivative works only under a license identical "
-"to the license that governs your work. This option is incompatible with \"No"
-" Derivatives\"."
-msgstr "您将同意让他人拥有和你同等的创作牌照，否则他们将不能展出你的修改作品。此选项与“禁止改作”选项不兼容。"
-
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/manage_users_and_roles.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Ok"
 msgstr "确定"
 
@@ -498,14 +225,11 @@ msgid "Unknown"
 msgstr "未知"
 
 #: cms/static/js/views/manage_users_and_roles.js
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "Are you sure?"
 msgstr "您确定吗？"
 
-#: cms/static/js/views/metadata.js common/static/bundles/commons.js
-#: lms/static/js/views/file_uploader.js
+#: cms/static/js/views/metadata.js lms/static/js/views/file_uploader.js
 msgid "Upload File"
 msgstr "上传文件"
 
@@ -515,7 +239,7 @@ msgstr "上传文件"
 #: cms/static/js/views/modals/base_modal.js
 #: cms/static/js/views/modals/course_outline_modals.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js lms/static/js/writable_gradebook.js
+#: lms/static/js/writable_gradebook.js
 #: cms/templates/js/certificate-editor.underscore
 #: cms/templates/js/content-group-editor.underscore
 #: cms/templates/js/course_info_handouts.underscore
@@ -536,336 +260,15 @@ msgstr "保存"
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/modals/course_outline_modals.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 msgid "Advanced"
 msgstr "高级"
 
-#. Translators: "title" is the name of the current component being edited.
-#: cms/static/js/views/modals/edit_xblock.js common/static/bundles/commons.js
-msgid "Editing: %(title)s"
-msgstr "编辑：%(title)s"
-
-#: cms/static/js/views/modals/edit_xblock.js common/static/bundles/commons.js
-#: lms/templates/ccx/schedule.underscore
-msgid "Unit"
-msgstr "单元"
-
-#: cms/static/js/views/modals/edit_xblock.js common/static/bundles/commons.js
-msgid "Component"
-msgstr "组件"
-
-#: cms/static/js/views/modals/move_xblock_modal.js
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "Move"
-msgstr "移动"
-
-#: cms/static/js/views/modals/move_xblock_modal.js
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "Choose a location to move your component to"
-msgstr "选取移动组件的目标位置"
-
-#: cms/static/js/views/modals/move_xblock_modal.js
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "Move: {displayName}"
-msgstr "移动：{displayName}"
-
-#: cms/static/js/views/move_xblock_list.js
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "Sections"
-msgstr "节"
-
-#: cms/static/js/views/move_xblock_list.js
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "Subsections"
-msgstr "小节"
-
-#: cms/static/js/views/move_xblock_list.js
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "Units"
-msgstr "单元"
-
-#: cms/static/js/views/move_xblock_list.js
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "Components"
-msgstr "组件"
-
-#: cms/static/js/views/move_xblock_list.js
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-#: cms/templates/js/group-configuration-editor.underscore
-msgid "Groups"
-msgstr "群组"
-
-#: cms/static/js/views/move_xblock_list.js
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "This {parentCategory} has no {childCategory}"
-msgstr "{parentCategory}目录下无{childCategory}"
-
-#: cms/static/js/views/move_xblock_list.js
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-#: cms/templates/js/group-configuration-details.underscore
-#: cms/templates/js/partition-group-details.underscore
-msgid "Course Outline"
-msgstr "课程大纲"
-
-#: cms/static/js/views/paged_container.js
-#: common/static/bundles/js/factories/library.js
-msgid "Date added"
-msgstr "已添加日期"
-
-#. Translators: "title" is the name of the current component or unit being
-#. edited.
-#: cms/static/js/views/pages/container.js
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "Editing access for: %(title)s"
-msgstr "编辑组件%(title)s路径"
-
-#: cms/static/js/views/pages/container_subviews.js
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "Publishing"
-msgstr "发布中"
-
-#: cms/static/js/views/pages/container_subviews.js
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-#: cms/templates/js/course-video-settings-update-org-credentials-footer.underscore
-#: cms/templates/js/course-video-settings-update-settings-footer.underscore
-#: cms/templates/js/publish-xblock.underscore
-msgid "Discard Changes"
-msgstr "放弃更改"
-
-#: cms/static/js/views/pages/container_subviews.js
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid ""
-"Are you sure you want to revert to the last published version of the unit? "
-"You cannot undo this action."
-msgstr "确定把本单元还原至上一版本吗？此操作不可撤销。"
-
-#: cms/static/js/views/pages/container_subviews.js
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "Discarding Changes"
-msgstr "放弃更改"
-
-#: cms/static/js/views/pages/container_subviews.js
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "Hiding from Students"
-msgstr "对学生隐藏"
-
-#: cms/static/js/views/pages/container_subviews.js
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "Explicitly Hiding from Students"
-msgstr "对学生显示为不可见"
-
-#: cms/static/js/views/pages/container_subviews.js
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "Inheriting Student Visibility"
-msgstr "固定对学生可见"
-
-#: cms/static/js/views/pages/container_subviews.js
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "Make Visible to Students"
-msgstr "对学生可见"
-
-#: cms/static/js/views/pages/container_subviews.js
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid ""
-"If the unit was previously published and released to students, any changes "
-"you made to the unit when it was hidden will now be visible to students. Do "
-"you want to proceed?"
-msgstr "如果本单元早前已发布并对学生可见，您在学生不可见期间所做更改现在将对学生可见。您还要继续吗？"
-
-#: cms/static/js/views/pages/container_subviews.js
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "Making Visible to Students"
-msgstr "对学生可见"
-
-#: cms/static/js/views/pages/paged_container.js
-#: common/static/bundles/js/factories/library.js
-msgid "Hide Previews"
-msgstr "隐藏预览"
-
-#: cms/static/js/views/pages/paged_container.js
-#: common/static/bundles/js/factories/library.js
-msgid "Show Previews"
-msgstr "显示预览"
-
-#. Translators: sample result:
-#. "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added
-#. ascending"
-#: cms/static/js/views/paging_header.js
-#: common/static/bundles/js/factories/library.js
-msgid ""
-"Showing {currentItemRange} out of {totalItemsCount}, filtered by "
-"{assetType}, sorted by {sortName} ascending"
-msgstr ""
-"以 {assetType} 过滤，按照 {sortName} 升序显示 {totalItemsCount} 中的 {currentItemRange} "
-
-#. Translators: sample result:
-#. "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added
-#. descending"
-#: cms/static/js/views/paging_header.js
-#: common/static/bundles/js/factories/library.js
-msgid ""
-"Showing {currentItemRange} out of {totalItemsCount}, filtered by "
-"{assetType}, sorted by {sortName} descending"
-msgstr ""
-"以 {assetType} 过滤，按照 {sortName} 降序显示 {totalItemsCount} 中的 {currentItemRange} "
-
-#. Translators: sample result:
-#. "Showing 0-9 out of 25 total, sorted by Date Added ascending"
-#: cms/static/js/views/paging_header.js
-#: common/static/bundles/js/factories/library.js
-msgid ""
-"Showing {currentItemRange} out of {totalItemsCount}, sorted by {sortName} "
-"ascending"
-msgstr "以 {sortName} 为升序显示 {totalItemsCount} 中的 {currentItemRange} "
-
-#. Translators: sample result:
-#. "Showing 0-9 out of 25 total, sorted by Date Added descending"
-#: cms/static/js/views/paging_header.js
-#: common/static/bundles/js/factories/library.js
-msgid ""
-"Showing {currentItemRange} out of {totalItemsCount}, sorted by {sortName} "
-"descending"
-msgstr "以 {sortName} 为降序显示 {totalItemsCount} 中的 {currentItemRange} "
-
-#. Translators: turns into "25 total" to be used in other sentences, e.g.
-#. "Showing 0-9 out of 25 total".
-#: cms/static/js/views/paging_header.js
-#: common/static/bundles/js/factories/library.js
-msgid "{totalItems} total"
-msgstr "总计{totalItems} "
-
 #: cms/static/js/views/previous_video_upload.js
 #: cms/static/js/views/video/translations_editor.js
-#: cms/static/js/views/video_transcripts.js common/static/bundles/commons.js
-#: lms/static/js/views/image_field.js
+#: cms/static/js/views/video_transcripts.js lms/static/js/views/image_field.js
 msgid "Removing"
 msgstr "移除中"
-
-#: cms/static/js/views/show_textbook.js
-#: common/static/bundles/js/factories/textbooks.js
-msgid "Delete “<%= name %>”?"
-msgstr "确定删除“<%= name %>”吗？"
-
-#: cms/static/js/views/show_textbook.js
-#: common/static/bundles/js/factories/textbooks.js
-msgid ""
-"Deleting a textbook cannot be undone and once deleted any reference to it in"
-" your courseware's navigation will also be removed."
-msgstr "删除教材操作不可撤销，一旦删除，课件中的教材内容相关导航将被移除。"
-
-#: cms/static/js/views/tabs.js common/static/bundles/js/factories/edit_tabs.js
-msgid "Delete Page Confirmation"
-msgstr "确认删除页面"
-
-#: cms/static/js/views/tabs.js common/static/bundles/js/factories/edit_tabs.js
-msgid ""
-"Are you sure you want to delete this page? This action cannot be undone."
-msgstr "确定删除本页吗？此操作不可撤销。"
-
-#: cms/static/js/views/uploads.js common/static/bundles/commons.js
-#: cms/templates/js/metadata-file-uploader-item.underscore
-#: cms/templates/js/video/metadata-translations-item.underscore
-msgid "Upload"
-msgstr "上传"
-
-#: cms/static/js/views/uploads.js common/static/bundles/commons.js
-msgid "We're sorry, there was an error"
-msgstr "抱歉，此处出现错误"
-
-#: cms/static/js/views/utils/move_xblock_utils.js
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "Success! \"{displayName}\" has been moved."
-msgstr "移除成功！\"{displayName}\" 已被移除。"
-
-#: cms/static/js/views/utils/move_xblock_utils.js
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid ""
-"Move cancelled. \"{sourceDisplayName}\" has been moved back to its original "
-"location."
-msgstr "取消移动。\"{sourceDisplayName}\"已被移回原始位置。"
-
-#: cms/static/js/views/utils/move_xblock_utils.js
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "Undo move"
-msgstr "撤销移动"
-
-#: cms/static/js/views/utils/move_xblock_utils.js
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "Take me to the new location"
-msgstr "跳转至新位置"
-
-#: cms/static/js/views/utils/xblock_utils.js common/static/bundles/commons.js
-msgid "Duplicating"
-msgstr "正在复制"
-
-#: cms/static/js/views/utils/xblock_utils.js common/static/bundles/commons.js
-msgid "Undo moving"
-msgstr "撤销移动"
-
-#: cms/static/js/views/utils/xblock_utils.js common/static/bundles/commons.js
-msgid "Moving"
-msgstr "正在移动"
-
-#: cms/static/js/views/utils/xblock_utils.js common/static/bundles/commons.js
-msgid "Deleting this {xblock_type} is permanent and cannot be undone."
-msgstr "永久删除此 {xblock_type} 并无法撤回"
-
-#: cms/static/js/views/utils/xblock_utils.js common/static/bundles/commons.js
-msgid ""
-"Any content that has listed this content as a prerequisite will also have "
-"access limitations removed."
-msgstr "任何将此条目列为先修条件的条目也将取消访问限制"
-
-#: cms/static/js/views/utils/xblock_utils.js common/static/bundles/commons.js
-msgid "Delete this {xblock_type} (and prerequisite)?"
-msgstr "确定删除此{xblock_type}（和先修条件）吗？"
-
-#: cms/static/js/views/utils/xblock_utils.js common/static/bundles/commons.js
-msgid "Yes, delete this {xblock_type}"
-msgstr "是，确认删除 {xblock_type}"
-
-#: cms/static/js/views/utils/xblock_utils.js common/static/bundles/commons.js
-msgid "Delete this {xblock_type}?"
-msgstr "确定删除{xblock_type}吗？"
-
-#: cms/static/js/views/utils/xblock_utils.js common/static/bundles/commons.js
-msgid "section"
-msgstr "节"
-
-#: cms/static/js/views/utils/xblock_utils.js common/static/bundles/commons.js
-msgid "subsection"
-msgstr "小节"
-
-#: cms/static/js/views/utils/xblock_utils.js common/static/bundles/commons.js
-#: cms/templates/js/container-access.underscore
-msgid "unit"
-msgstr "单元"
 
 #: cms/static/js/views/validation.js
 #: lms/static/js/discussions_management/views/divided_discussions_course_wide.js
@@ -874,108 +277,10 @@ msgstr "单元"
 msgid "Your changes have been saved."
 msgstr "您所作的变更已保存。"
 
-#: cms/static/js/views/video/transcripts/file_uploader.js
-#: common/static/bundles/commons.js
-msgid "Please select a file in .srt format."
-msgstr "请选取srt格式的文件"
-
-#: cms/static/js/views/video/transcripts/file_uploader.js
-#: common/static/bundles/commons.js
-msgid "Error: Uploading failed."
-msgstr "错误：上传失败"
-
-#: cms/static/js/views/video/transcripts/message_manager.js
-#: common/static/bundles/commons.js
-msgid "Error: Import failed."
-msgstr "错误：导入失败"
-
-#: cms/static/js/views/video/transcripts/message_manager.js
-#: common/static/bundles/commons.js
-msgid "Error: Replacing failed."
-msgstr "错误：替代失败"
-
-#: cms/static/js/views/video/transcripts/message_manager.js
-#: common/static/bundles/commons.js
-msgid "Error: Choosing failed."
-msgstr "错误：选取失败"
-
-#: cms/static/js/views/video/transcripts/metadata_videolist.js
-#: common/static/bundles/commons.js
-msgid "Error: Connection with server failed."
-msgstr "错误：服务器连接失败"
-
-#: cms/static/js/views/video/transcripts/metadata_videolist.js
-#: common/static/bundles/commons.js
-msgid "Link types should be unique."
-msgstr "仅有一种链接类型。"
-
-#: cms/static/js/views/video/transcripts/metadata_videolist.js
-#: common/static/bundles/commons.js
-msgid "Links should be unique."
-msgstr "链接应只有一种。"
-
-#: cms/static/js/views/video/transcripts/metadata_videolist.js
-#: common/static/bundles/commons.js
-msgid "Incorrect url format."
-msgstr "URL格式错误"
-
-#: cms/static/js/views/video/translations_editor.js
-#: common/static/bundles/commons.js
-msgid ""
-"Sorry, there was an error parsing the subtitles that you uploaded. Please "
-"check the format and try again."
-msgstr "抱歉，解析上传的字幕时发生错误。请检查格式后重试。"
-
-#: cms/static/js/views/video/translations_editor.js
-#: cms/static/js/views/video_transcripts.js common/static/bundles/commons.js
-msgid "Are you sure you want to remove this transcript?"
-msgstr "确定移除本成绩单吗？"
-
-#: cms/static/js/views/video/translations_editor.js
-#: common/static/bundles/commons.js
-msgid ""
-"If you remove this transcript, the transcript will not be available for this"
-" component."
-msgstr "如果移除本成绩单，此组件的成绩单将不可用。"
-
-#: cms/static/js/views/video/translations_editor.js
-#: common/static/bundles/commons.js
-msgid "Remove Transcript"
-msgstr "移除成绩单"
-
-#: cms/static/js/views/video/translations_editor.js
-#: common/static/bundles/commons.js
-msgid "Upload translation"
-msgstr "上传翻译"
-
-#: cms/static/js/views/xblock_editor.js common/static/bundles/commons.js
-msgid "Editor"
-msgstr "编辑"
-
-#: cms/static/js/views/xblock_editor.js common/static/bundles/commons.js
-#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
-msgid "Settings"
-msgstr "设置"
-
-#: cms/static/js/views/xblock_outline.js
-#: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.js
-msgid "New {component_type}"
-msgstr "新的{component_type}"
-
-#. Translators: This message will be added to the front of messages of type
-#. warning,
-#. e.g. "Warning: this component has not been configured yet".
-#: cms/static/js/views/xblock_validation.js
-#: common/static/bundles/js/factories/xblock_validation.js
-msgid "Warning"
-msgstr "警告"
-
 #. Translators: This message will be added to the front of messages of type
 #. error,
 #. e.g. "Error: required field is missing".
 #: cms/static/js/views/xblock_validation.js
-#: common/static/bundles/js/factories/xblock_validation.js
 #: common/static/common/js/discussion/utils.js
 #: common/static/common/js/discussion/views/discussion_inline_view.js
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
@@ -1015,39 +320,32 @@ msgid "text_word_{uniqueId}"
 msgstr "text_word_{uniqueId}"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
-#: common/static/bundles/AnnotatableModule.js
 msgid "Show Annotations"
 msgstr "显示批注"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
-#: common/static/bundles/AnnotatableModule.js
 msgid "Hide Annotations"
 msgstr "隐藏批注"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
-#: common/static/bundles/AnnotatableModule.js
 msgid "Expand Instructions"
 msgstr "展开说明"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
-#: common/static/bundles/AnnotatableModule.js
 msgid "Collapse Instructions"
 msgstr "折叠说明"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
-#: common/static/bundles/AnnotatableModule.js
 msgid "Commentary"
 msgstr "评注"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
-#: common/static/bundles/AnnotatableModule.js
 msgid "Reply to Annotation"
 msgstr "回复批注"
 
 #. Translators: %(num_points)s is the number of points possible (examples: 1,
 #. 3, 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-#: common/static/bundles/CapaModule.js
 msgid "%(num_points)s point possible (graded, results hidden)"
 msgid_plural "%(num_points)s points possible (graded, results hidden)"
 msgstr[0] "%(num_points)s 满分 (计入成绩, 隐藏答案)"
@@ -1055,7 +353,6 @@ msgstr[0] "%(num_points)s 满分 (计入成绩, 隐藏答案)"
 #. Translators: %(num_points)s is the number of points possible (examples: 1,
 #. 3, 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-#: common/static/bundles/CapaModule.js
 msgid "%(num_points)s point possible (ungraded, results hidden)"
 msgid_plural "%(num_points)s points possible (ungraded, results hidden)"
 msgstr[0] " %(num_points)s满分 (不计入成绩, 隐藏答案)"
@@ -1063,7 +360,6 @@ msgstr[0] " %(num_points)s满分 (不计入成绩, 隐藏答案)"
 #. Translators: %(num_points)s is the number of points possible (examples: 1,
 #. 3, 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-#: common/static/bundles/CapaModule.js
 msgid "%(num_points)s point possible (graded)"
 msgid_plural "%(num_points)s points possible (graded)"
 msgstr[0] "%(num_points)s 满分 (计入成绩)"
@@ -1071,7 +367,6 @@ msgstr[0] "%(num_points)s 满分 (计入成绩)"
 #. Translators: %(num_points)s is the number of points possible (examples: 1,
 #. 3, 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-#: common/static/bundles/CapaModule.js
 msgid "%(num_points)s point possible (ungraded)"
 msgid_plural "%(num_points)s points possible (ungraded)"
 msgstr[0] "%(num_points)s满分（不计入成绩）"
@@ -1081,7 +376,6 @@ msgstr[0] "%(num_points)s满分（不计入成绩）"
 #. points will always be at least 1. We pluralize based on the total number of
 #. points (example: 0/1 point; 1/2 points);
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-#: common/static/bundles/CapaModule.js
 msgid "%(earned)s/%(possible)s point (graded)"
 msgid_plural "%(earned)s/%(possible)s points (graded)"
 msgstr[0] "%(earned)s/%(possible)s得分 (计入成绩)"
@@ -1091,23 +385,19 @@ msgstr[0] "%(earned)s/%(possible)s得分 (计入成绩)"
 #. points will always be at least 1. We pluralize based on the total number of
 #. points (example: 0/1 point; 1/2 points);
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-#: common/static/bundles/CapaModule.js
 msgid "%(earned)s/%(possible)s point (ungraded)"
 msgid_plural "%(earned)s/%(possible)s points (ungraded)"
 msgstr[0] "%(earned)s/%(possible)s/得分 (不计入成绩)"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-#: common/static/bundles/CapaModule.js
 msgid "The grading process is still running. Refresh the page to see updates."
 msgstr "正在进行评分，请刷新页面查看结果。"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-#: common/static/bundles/CapaModule.js
 msgid "Could not grade your answer. The submission was aborted."
 msgstr "无法进行评分。提交中断。"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-#: common/static/bundles/CapaModule.js
 msgid ""
 "Submission aborted! Sorry, your browser does not support file uploads. If "
 "you can, please use Chrome or Safari which have been verified to support "
@@ -1115,268 +405,229 @@ msgid ""
 msgstr "提交中断！抱歉，您的浏览器不支持文件上传。请尽可能使用 Chrome 或者 Safari 等支持文件上传的浏览器。"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-#: common/static/bundles/CapaModule.js
 msgid "You submitted {filename}; only {allowedFiles} are allowed."
 msgstr "您提交了 {filename}；仅支持提交 {allowedFiles} 格式的文件。"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-#: common/static/bundles/CapaModule.js
 msgid "Your file {filename} is too large (max size: {maxSize}MB)."
 msgstr "你的文件 {filename} 过大 ( 最大: {maxSize} MB)。"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-#: common/static/bundles/CapaModule.js
 msgid "You did not submit the required files: {requiredFiles}."
 msgstr "您没有提交需要的文件：{requiredFiles}。"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-#: common/static/bundles/CapaModule.js
 msgid "You did not select any files to submit."
 msgstr "您未选择任何要上传的文件。"
 
 #. Translators: This is only translated to allow for reordering of label and
 #. associated status.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-#: common/static/bundles/CapaModule.js
 msgid "{label}: {status}"
 msgstr "{label}: {status}"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-#: common/static/bundles/CapaModule.js
 msgid "This problem has been reset."
 msgstr "此问题已重置。"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-#: common/static/bundles/CapaModule.js
 msgid "unsubmitted"
 msgstr "未提交"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Paragraph"
 msgstr "段落"
 
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Preformatted"
 msgstr "预设格式"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Heading 3"
 msgstr "标题 3"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Heading 4"
 msgstr "标题 4"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Heading 5"
 msgstr "标题 5"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Heading 6"
 msgstr "标题 6"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Add to Dictionary"
 msgstr "加入到字典"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Align center"
 msgstr "居中对齐"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Align left"
 msgstr "左对齐"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Align right"
 msgstr "右对齐"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Alignment"
 msgstr "对齐"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Alternative source"
 msgstr "备用源"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Anchor"
 msgstr "锚点"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Anchors"
 msgstr "锚点"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Author"
 msgstr "作者"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Background color"
 msgstr "背景颜色"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js lms/static/js/Markdown.Editor.js
+#: lms/static/js/Markdown.Editor.js
 msgid "Blockquote"
 msgstr "引用"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Blocks"
 msgstr "块"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Body"
 msgstr "主体"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Bold"
 msgstr "粗体"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Border color"
 msgstr "边框色"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Border"
 msgstr "边框"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Bottom"
 msgstr "底端"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Bullet list"
 msgstr "项目符号列表"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Caption"
 msgstr "标题"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Cell padding"
 msgstr "单元格边距"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Cell properties"
 msgstr "单元格属性"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Cell spacing"
 msgstr "单元格间距"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Cell type"
 msgstr "单元格类型"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Cell"
 msgstr "单元格"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Center"
 msgstr "居中对齐"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Circle"
 msgstr "空心圆"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Clear formatting"
 msgstr "清除格式"
 
@@ -1384,12 +635,7 @@ msgstr "清除格式"
 #. browser when a user needs to edit HTML
 #. Translators: this is a toolbar button tooltip from the raw HTML editor
 #. displayed in the browser when a user needs to edit HTML
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#. Translators: this is a toolbar button tooltip from the raw HTML editor
-#. displayed in the browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Code block"
 msgstr "代码块"
 
@@ -1397,7 +643,6 @@ msgstr "代码块"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
 msgid "Code"
 msgstr "代码"
@@ -1405,119 +650,102 @@ msgstr "代码"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Color"
 msgstr "颜色"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Cols"
 msgstr "列"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Column group"
 msgstr "列组"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Column"
 msgstr "列"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Constrain proportions"
 msgstr "保持纵横比"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Copy row"
 msgstr "复制行"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Copy"
 msgstr "复制"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Could not find the specified string."
 msgstr "无法找到指定的字符串。"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Custom color"
 msgstr "自定义颜色"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Custom..."
 msgstr "自定义…"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Cut row"
 msgstr "剪切行"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Cut"
 msgstr "剪切"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Decrease indent"
 msgstr "减少缩进"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Default"
 msgstr "默认"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Delete column"
 msgstr "删除列"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Delete row"
 msgstr "删除行"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Delete table"
 msgstr "删除表格"
 
@@ -1525,7 +753,6 @@ msgstr "删除表格"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 #: cms/templates/js/certificate-editor.underscore
 #: cms/templates/js/group-configuration-editor.underscore
 #: lms/templates/commerce/receipt.underscore
@@ -1536,35 +763,30 @@ msgstr "描述"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Dimensions"
 msgstr "尺寸"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Disc"
 msgstr "实心圆"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Div"
 msgstr "Div 标签"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Document properties"
 msgstr "文档属性"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Edit HTML"
 msgstr "编辑 HTML"
 
@@ -1572,7 +794,6 @@ msgstr "编辑 HTML"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 #: cms/templates/js/certificate-details.underscore
 #: cms/templates/js/course_info_handouts.underscore
 #: cms/templates/js/course_info_update.underscore
@@ -1588,98 +809,84 @@ msgstr "编辑"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Embed"
 msgstr "内嵌"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Emoticons"
 msgstr "表情"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Encoding"
 msgstr "编码"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "File"
 msgstr "文件"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Find and replace"
 msgstr "查找和替换"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Find next"
 msgstr "查找下一个"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Find previous"
 msgstr "查找上一个"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Find"
 msgstr "查找"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Finish"
 msgstr "完成"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Font Family"
 msgstr "字体"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Font Sizes"
 msgstr "字号"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Footer"
 msgstr "脚注"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Format"
 msgstr "格式"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Formats"
 msgstr "格式"
 
@@ -1687,7 +894,6 @@ msgstr "格式"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 #: common/static/common/templates/image-modal.underscore
 msgid "Fullscreen"
 msgstr "全屏"
@@ -1695,63 +901,54 @@ msgstr "全屏"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "General"
 msgstr "一般"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "H Align"
 msgstr "水平对齐"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Header 1"
 msgstr "标题 1"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Header 2"
 msgstr "标题 2"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Header 3"
 msgstr "标题 3"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Header 4"
 msgstr "标题 4"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Header 5"
 msgstr "标题 5"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Header 6"
 msgstr "标题 6"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Header cell"
 msgstr "表头单元格"
 
@@ -1759,287 +956,246 @@ msgstr "表头单元格"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
-#: common/static/bundles/CapaDescriptor.js common/static/bundles/commons.js
 msgid "Header"
 msgstr "表头"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Headers"
 msgstr "标题"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Heading 1"
 msgstr "标题 1"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Heading 2"
 msgstr "标题 2"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Headings"
 msgstr "标题"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Height"
 msgstr "高度"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Horizontal line"
 msgstr "水平线"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Horizontal space"
 msgstr "水平间距"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "HTML source code"
 msgstr "HTML 源代码"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Ignore all"
 msgstr "全部忽略"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Ignore"
 msgstr "忽略"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Image description"
 msgstr "图片描述"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Increase indent"
 msgstr "增加缩进"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Inline"
 msgstr "对齐"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Insert column after"
 msgstr "在右侧插入列"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Insert column before"
 msgstr "在左侧插入列"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Insert date/time"
 msgstr "插入日期／时间"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Insert image"
 msgstr "插入图片"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Insert link"
 msgstr "插入链接"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Insert row after"
 msgstr "在下方插入行"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Insert row before"
 msgstr "在上方插入行"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Insert table"
 msgstr "插入表格"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Insert template"
 msgstr "插入模板"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Insert video"
 msgstr "插入视频"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Insert"
 msgstr "插入"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Insert/edit image"
 msgstr "插入／编辑图片"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Insert/edit link"
 msgstr "插入／编辑链接"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Insert/edit video"
 msgstr "插入／编辑视频"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Italic"
 msgstr "斜体"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Justify"
 msgstr "两端对齐"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Keywords"
 msgstr "关键字"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Left to right"
 msgstr "从左向右"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Left"
 msgstr "左对齐"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Lower Alpha"
 msgstr "小写字母"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Lower Greek"
 msgstr "小写希腊字母"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Lower Roman"
 msgstr "小写罗马字母"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Match case"
 msgstr "匹配大小写"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Merge cells"
 msgstr "合并单元格"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Middle"
 msgstr "中间"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "New document"
 msgstr "新建文档"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "New window"
 msgstr "新建窗口"
 
@@ -2047,7 +1203,7 @@ msgstr "新建窗口"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js cms/templates/js/paging-header.underscore
+#: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
 #: common/static/common/templates/discussion/pagination.underscore
 msgid "Next"
@@ -2056,42 +1212,36 @@ msgstr "下一个"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "No color"
 msgstr "无颜色"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Nonbreaking space"
 msgstr "不间断空格"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Numbered list"
 msgstr "编号列表"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Page break"
 msgstr "分页符"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Paste as text"
 msgstr "粘贴为文本"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid ""
 "Paste is now in plain text mode. Contents will now be pasted as plain text "
 "until you toggle this option off."
@@ -2100,57 +1250,49 @@ msgstr "当前为纯文本粘贴模式，所有内容都将以纯文本形式粘
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Paste row after"
 msgstr "在下方粘贴行"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Paste row before"
 msgstr "在上方粘贴行"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Paste your embed code below:"
 msgstr "将内嵌代码粘贴到下方："
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Paste"
 msgstr "粘贴"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Poster"
 msgstr "封面"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Pre"
 msgstr "Pre 标签"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Prev"
 msgstr "上一个"
 
 #. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js lms/static/js/customwmd.js
+#: common/lib/xmodule/xmodule/js/src/html/edit.js lms/static/js/customwmd.js
 #: cms/templates/js/asset-library.underscore
 msgid "Preview"
 msgstr "预览"
@@ -2158,35 +1300,30 @@ msgstr "预览"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Print"
 msgstr "打印"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Redo"
 msgstr "重做"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Remove link"
 msgstr "移除链接"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Replace all"
 msgstr "全部替换"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Replace with"
 msgstr "替换为"
 
@@ -2194,7 +1331,6 @@ msgstr "替换为"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 #: cms/templates/js/metadata-file-uploader-item.underscore
 #: cms/templates/js/video-transcripts.underscore
 #: cms/templates/js/video/metadata-translations-item.underscore
@@ -2204,14 +1340,12 @@ msgstr "替换"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Restore last draft"
 msgstr "恢复上一版草稿"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid ""
 "Rich Text Area. Press ALT-F9 for menu. Press ALT-F10 for toolbar. Press "
 "ALT-0 for help"
@@ -2220,210 +1354,180 @@ msgstr "RTF富文本区域。按 ALT-F9 打开菜单，按 ALT-F10 打开工具�
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Right to left"
 msgstr "从右向左"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Right"
 msgstr "右对齐"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Robots"
 msgstr "机器人"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Row group"
 msgstr "行组"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Row properties"
 msgstr "行属性"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Row type"
 msgstr "行类型"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Row"
 msgstr "行"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Rows"
 msgstr "行"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Scope"
 msgstr "范围"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Select all"
 msgstr "全选"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Show blocks"
 msgstr "显示块"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Show invisible characters"
 msgstr "显示不可见字符"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Source code"
 msgstr "源代码"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Source"
 msgstr "源"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Special character"
 msgstr "特殊字符"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Spellcheck"
 msgstr "拼写检查"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Split cell"
 msgstr "拆分单元格"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Square"
 msgstr "正方形"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Start search"
 msgstr "开始搜索"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Strikethrough"
 msgstr "删除线"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Style"
 msgstr "样式"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Subscript"
 msgstr "下标"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Superscript"
 msgstr "上标"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Table properties"
 msgstr "表格属性"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Table"
 msgstr "表格"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Target"
 msgstr "目标"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Templates"
 msgstr "模板"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Text color"
 msgstr "文本颜色"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Text to display"
 msgstr "要显示的文字"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid ""
 "The URL you entered seems to be an email address. Do you want to add the "
 "required mailto: prefix?"
@@ -2432,7 +1536,6 @@ msgstr "输入的URL似乎是一个电子邮件地址，您想加上必要的“
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid ""
 "The URL you entered seems to be an external link. Do you want to add the "
 "required http:// prefix?"
@@ -2442,7 +1545,6 @@ msgstr "输入的 URL 似乎是一个外部链接，您想加上必要的 http:/
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 #: cms/templates/js/course-instructor-details.underscore
 #: cms/templates/js/signatory-details.underscore
 #: common/static/common/templates/discussion/new-post.underscore
@@ -2453,63 +1555,54 @@ msgstr "标题"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Tools"
 msgstr "工具"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Top"
 msgstr "顶端"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Underline"
 msgstr "下划线"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Undo"
 msgstr "撤销"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Upper Alpha"
 msgstr "大写字母"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Upper Roman"
 msgstr "大写罗马字母"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Url"
 msgstr "URL"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "V Align"
 msgstr "垂直对齐"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Vertical space"
 msgstr "垂直间距"
 
@@ -2517,7 +1610,6 @@ msgstr "垂直间距"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 #: openedx/features/course_bookmarks/static/course_bookmarks/templates/bookmarks-list.underscore
 #: openedx/features/course_search/static/course_search/templates/course_search_item.underscore
 #: openedx/features/course_search/static/course_search/templates/dashboard_search_item.underscore
@@ -2527,42 +1619,36 @@ msgstr "视图"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Visual aids"
 msgstr "网格线"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Whole words"
 msgstr "全字匹配"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Width"
 msgstr "宽"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Words: {0}"
 msgstr "字数： {0}"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "You have unsaved changes are you sure you want to navigate away?"
 msgstr "有未保存的更改，确定要离开吗？"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid ""
 "Your browser doesn't support direct access to the clipboard. Please use the "
 "Ctrl+X/C/V keyboard shortcuts instead."
@@ -2571,12 +1657,10 @@ msgstr "您的浏览器不支持直接访问剪贴板，请使用快捷键 Ctrl+
 #. Translators: this is a toolbar button tooltip from the raw HTML editor
 #. displayed in the browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.js
 msgid "Insert/Edit Image"
 msgstr "插入/编辑图片"
 
 #: common/lib/xmodule/xmodule/js/src/lti/lti.js
-#: common/static/bundles/LTIModule.js
 msgid ""
 "Click OK to have your username and e-mail address sent to a 3rd party application.\n"
 "\n"
@@ -2587,7 +1671,6 @@ msgstr ""
 "点击取消，取消发送信息并返回当前页。"
 
 #: common/lib/xmodule/xmodule/js/src/lti/lti.js
-#: common/static/bundles/LTIModule.js
 msgid ""
 "Click OK to have your username sent to a 3rd party application.\n"
 "\n"
@@ -2598,7 +1681,6 @@ msgstr ""
 "点击取消，取消发送信息并返回当前页。"
 
 #: common/lib/xmodule/xmodule/js/src/lti/lti.js
-#: common/static/bundles/LTIModule.js
 msgid ""
 "Click OK to have your e-mail address sent to a 3rd party application.\n"
 "\n"
@@ -2609,27 +1691,22 @@ msgstr ""
 "点击取消，取消发送信息并返回当前页。"
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
-#: common/static/bundles/CapaDescriptor.js
 msgid "incorrect"
 msgstr "不正确"
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
-#: common/static/bundles/CapaDescriptor.js
 msgid "correct"
 msgstr "正确"
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
-#: common/static/bundles/CapaDescriptor.js
 msgid "answer"
 msgstr "答案"
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
-#: common/static/bundles/CapaDescriptor.js
 msgid "Short explanation"
 msgstr "简要说明"
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
-#: common/static/bundles/CapaDescriptor.js
 msgid ""
 "If you use the Advanced Editor, this problem will be converted to XML and you will not be able to return to the Simple Editor Interface.\n"
 "\n"
@@ -2640,20 +1717,16 @@ msgstr ""
 "要继续使用高级编辑器并将该题目转换为XML格式吗？"
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
-#: common/static/bundles/CapaDescriptor.js
 msgid "Explanation"
 msgstr "解释"
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
-#: common/static/bundles/commons.js
 msgid ""
 "Sequence error! Cannot navigate to %(tab_name)s in the current "
 "SequenceModule. Please contact the course staff."
 msgstr "序列错误！ 无法导航到当前序列模块中的%(tab_name)s，请联系课程工作人员。"
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
-#: common/static/bundles/VerticalStudentView.js
-#: common/static/bundles/commons.js
 #: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmark_button.js
 msgid "Bookmarked"
 msgstr "已收藏"
@@ -2661,170 +1734,140 @@ msgstr "已收藏"
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/09_play_pause_control.js
 #: common/lib/xmodule/xmodule/js/src/video/09_play_skip_control.js
-#: common/static/bundles/VideoModule.js
 msgid "Play"
 msgstr "播放"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/09_play_pause_control.js
-#: common/static/bundles/VideoModule.js
 msgid "Pause"
 msgstr "暂停"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/static/bundles/VideoModule.js
 msgid "Mute"
 msgstr "静音"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/static/bundles/VideoModule.js
 msgid "Unmute"
 msgstr "取消静音"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/04_video_full_screen.js
-#: common/static/bundles/VideoModule.js
 msgid "Exit full browser"
 msgstr "退出全屏"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/04_video_full_screen.js
-#: common/static/bundles/VideoModule.js
 msgid "Fill browser"
 msgstr "全屏"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
-#: common/static/bundles/VideoModule.js
 msgid "Speed"
 msgstr "速度"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/08_video_auto_advance_control.js
-#: common/static/bundles/VideoModule.js
 msgid "Auto-advance"
 msgstr "自动播放"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
-#: common/static/bundles/VideoModule.js
 msgid "Volume"
 msgstr "音量"
 
 #. Translators: Volume level equals 0%.
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/static/bundles/VideoModule.js
 msgid "Muted"
 msgstr "静音"
 
 #. Translators: Volume level in range ]0,20]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/static/bundles/VideoModule.js
 msgid "Very low"
 msgstr "音量最小"
 
 #. Translators: Volume level in range ]20,40]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/static/bundles/VideoModule.js
 msgid "Low"
 msgstr "音量较小"
 
 #. Translators: Volume level in range ]40,60]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/static/bundles/VideoModule.js
 msgid "Average"
 msgstr "音量中等"
 
 #. Translators: Volume level in range ]60,80]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/static/bundles/VideoModule.js
 msgid "Loud"
 msgstr "音量较大"
 
 #. Translators: Volume level in range ]80,99]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/static/bundles/VideoModule.js
 msgid "Very loud"
 msgstr "音量最大"
 
 #. Translators: Volume level equals 100%.
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/static/bundles/VideoModule.js
 msgid "Maximum"
 msgstr "最大数值"
 
 #: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
-#: common/static/bundles/VideoModule.js
 msgid "This browser cannot play .mp4, .ogg, or .webm files."
 msgstr "当前浏览器不支持播放 MP4、OGG 或 WEBM 格式的文件。"
 
 #: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
-#: common/static/bundles/VideoModule.js
 msgid "Try using a different browser, such as Google Chrome."
 msgstr "请尝试更换一个浏览器，如谷歌的 Chrome 浏览器。"
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
-#: common/static/bundles/VideoModule.js
 msgid "High Definition"
 msgstr "高级定义"
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
-#: common/static/bundles/VideoModule.js
 msgid "off"
 msgstr "关闭"
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
-#: common/static/bundles/VideoModule.js
 msgid "on"
 msgstr "开启"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
-#: common/static/bundles/VideoModule.js
 msgid "Video position. Press space to toggle playback"
 msgstr "视频位置。按空格键控制播放"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
-#: common/static/bundles/VideoModule.js
 msgid "Video ended"
 msgstr "视频结束"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
-#: common/static/bundles/VideoModule.js
 msgid "Video position"
 msgstr "视频位置"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
-#: common/static/bundles/VideoModule.js
 msgid "%(value)s hour"
 msgid_plural "%(value)s hours"
 msgstr[0] "%(value)s小时"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
-#: common/static/bundles/VideoModule.js
 msgid "%(value)s minute"
 msgid_plural "%(value)s minutes"
 msgstr[0] "%(value)s分钟"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
-#: common/static/bundles/VideoModule.js
 msgid "%(value)s second"
 msgid_plural "%(value)s seconds"
 msgstr[0] "%(value)s秒"
 
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
-#: common/static/bundles/VideoModule.js
 msgid ""
 "Click on this button to mute or unmute this video or press UP or DOWN "
 "buttons to increase or decrease volume level."
 msgstr "请点击此按钮以对该视频静音／取消静音, 或者使用键盘的上下方向键增大或减小音量。"
 
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
-#: common/static/bundles/VideoModule.js
 msgid "Adjust video volume"
 msgstr "调整视频音量"
 
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
-#: common/static/bundles/VideoModule.js
 msgid ""
 "Press UP to enter the speed menu then use the UP and DOWN arrow keys to "
 "navigate the different speeds, then press ENTER to change to the selected "
@@ -2832,64 +1875,52 @@ msgid ""
 msgstr "按向上键打开速度菜单，再按上下方向键来选择速度，然后按回车键切换到选定速度。"
 
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
-#: common/static/bundles/VideoModule.js
 msgid "Adjust video speed"
 msgstr "调整视频播放速度"
 
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
-#: common/static/bundles/VideoModule.js
 msgid "Video speed: "
 msgstr "视频播放速度:"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_play_skip_control.js
-#: common/static/bundles/VideoModule.js
 msgid "Skip"
 msgstr "跳过"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_poster.js
-#: common/static/bundles/VideoModule.js
 msgid "Play video"
 msgstr "播放视频"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_skip_control.js
-#: common/static/bundles/VideoModule.js
 msgid "Do not show again"
 msgstr "不再显示"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-#: common/static/bundles/VideoModule.js
 msgid "Open language menu"
 msgstr "打开语言功能菜单"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-#: common/static/bundles/VideoModule.js
 msgid "Transcript will be displayed when you start playing the video."
 msgstr "开始播放视频时将显示字幕。"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-#: common/static/bundles/VideoModule.js
 msgid ""
 "Activating a link in this group will skip to the corresponding point in the "
 "video."
 msgstr "激活本组中的链接将跳转至视频中相应的时间点。"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-#: common/static/bundles/VideoModule.js
 msgid "Video transcript"
 msgstr "视频字幕"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-#: common/static/bundles/VideoModule.js
 msgid "Start of transcript. Skip to the end."
 msgstr "字幕开始。跳转至结尾。"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-#: common/static/bundles/VideoModule.js
 msgid "End of transcript. Skip to the start."
 msgstr "字幕结尾。跳转至开始。"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-#: common/static/bundles/VideoModule.js
 msgid ""
 "Press the UP arrow key to enter the language menu then use UP and DOWN arrow"
 " keys to navigate language options. Press ENTER to change to the selected "
@@ -2897,594 +1928,54 @@ msgid ""
 msgstr "按向上键打开语言功能菜单，然后使用上下方向键来选择语言选项。按回车键以切换到所选择的语言。"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-#: common/static/bundles/VideoModule.js
 msgid "Hide closed captions"
 msgstr "隐藏CC字幕"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-#: common/static/bundles/VideoModule.js
 msgid "(Caption will be displayed when you start playing the video.)"
 msgstr "(开始播放视频时将显示字幕)"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-#: common/static/bundles/VideoModule.js
 msgid "Turn on closed captioning"
 msgstr "打开CC字幕"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-#: common/static/bundles/VideoModule.js
 msgid "Turn on transcripts"
 msgstr "打开字幕"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-#: common/static/bundles/VideoModule.js
 msgid "Turn off transcripts"
 msgstr "关闭字幕"
 
-#: common/static/bundles/CourseGoals.js
-#: openedx/features/course_experience/static/course_experience/js/CourseGoals.js
-msgid "Thank you for setting your course goal to {goal}!"
-msgstr "感谢您将课程目标定为{goal}！"
-
-#: common/static/bundles/CourseGoals.js
-msgid ""
-"There was an error in setting your goal, please reload the page and try "
-"again."
-msgstr "设置目标时出现错误，请刷新页面并重试。"
-
-#: common/static/bundles/CourseHome.js
-#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
-msgid "You have successfully updated your goal."
-msgstr "您已成功更新目标。"
-
-#: common/static/bundles/CourseHome.js
-#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
-msgid "There was an error updating your goal."
-msgstr "更新目标时出错。"
-
-#: lms/templates/ccx/schedule.underscore
-msgid "Expand All"
-msgstr "展开全部"
-
-#: lms/templates/ccx/schedule.underscore
-msgid "Collapse All"
-msgstr "折叠全部"
-
-#: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.js
-#: lms/static/js/learner_dashboard/models/course_card_model.js
-msgid "(Self-paced) Starts {start}"
-msgstr "(自主模式) 开始 {start}"
-
-#: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.js
-#: lms/static/js/learner_dashboard/models/course_card_model.js
-msgid "(Self-paced) Started {start}"
-msgstr "(自主模式) 开始 {start}"
-
-#: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.js
-#: lms/static/js/learner_dashboard/models/course_card_model.js
-msgid "(Self-paced) Ends {end}"
-msgstr "(自主模式) 结束 {end}"
-
-#: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.js
-#: lms/static/js/learner_dashboard/models/course_card_model.js
-msgid "(Self-paced) Ended {end}"
-msgstr "(自主模式) 结束 {end}"
-
-#: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.js
-#: lms/static/js/learner_dashboard/models/course_card_model.js
-msgid "Starts {start}"
-msgstr "开始{start}"
-
-#: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.js
-#: lms/static/js/learner_dashboard/models/course_card_model.js
-msgid "Started {start}"
-msgstr "开始{start}"
-
-#: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.js
-#: lms/static/js/learner_dashboard/models/course_card_model.js
-msgid "Ends {end}"
-msgstr "结束{end}"
-
-#: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.js
-#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
-msgid "You must select a session to access the course."
-msgstr "必须选择一个学期才能访问课程。"
-
-#: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.js
-#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
-msgid "There was an error. Please reload the page and try again."
-msgstr "发生错误，请重新加载页面并重试。"
-
-#: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.js
-#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
-#: lms/templates/learner_dashboard/course_entitlement.underscore
-msgid "Change Session"
-msgstr "更改学期"
-
-#: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.js
-#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
-#: lms/templates/learner_dashboard/course_entitlement.underscore
-msgid "Select Session"
-msgstr "选择学期"
-
-#: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.js
-#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
-msgid "Leave Current Session"
-msgstr "离开当前学期"
-
-#: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.js
-#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
-msgid "Are you sure you want to select this session?"
-msgstr "确定选择此学期？"
-
-#: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.js
-#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
-msgid "Are you sure you want to change to a different session?"
-msgstr "确定更改学期？"
-
-#: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.js
-#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
-msgid "Any course progress or grades from your current session will be lost."
-msgstr "所有当前学期的学习进度和成绩都会丢失。"
-
-#: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.js
-#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
-msgid "Are you sure that you want to leave this session?"
-msgstr "确定离开此学期？"
-
-#: common/static/bundles/EntitlementUnenrollmentFactory.js
-#: lms/static/js/learner_dashboard/views/entitlement_unenrollment_view.js
-msgid ""
-"Your unenrollment request could not be processed. Please try again later."
-msgstr "未能处理您的课程退选申请，请稍后重试。"
-
-#: common/static/bundles/EntitlementUnenrollmentFactory.js
-#: lms/static/js/learner_dashboard/views/entitlement_unenrollment_view.js
-msgid ""
-"Are you sure you want to unenroll from {courseName} ({courseNumber})? You "
-"will be refunded the amount you paid."
-msgstr "确定退选课程 {courseName} ({courseNumber})？您将会收到全额退款。"
-
-#: common/static/bundles/PasswordResetConfirmation.js
-#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
-#: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Reset Your Password"
-msgstr "重置您的密码"
-
-#: common/static/bundles/PasswordResetConfirmation.js
-#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
-msgid "Enter and confirm your new password."
-msgstr "输入并确认新密码"
-
-#: common/static/bundles/PasswordResetConfirmation.js
-#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
-msgid "New Password"
-msgstr "新密码"
-
-#: common/static/bundles/PasswordResetConfirmation.js
-#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
-msgid "Confirm Password"
-msgstr "确认密码"
-
-#: common/static/bundles/PasswordResetConfirmation.js
-#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
-msgid "Passwords do not match."
-msgstr "密码错误"
-
-#: common/static/bundles/PasswordResetConfirmation.js
-#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
-msgid "Reset My Password"
-msgstr "重置密码"
-
-#: common/static/bundles/PasswordResetConfirmation.js
-#: lms/static/js/student_account/components/PasswordResetInput.jsx
-msgid "Error: "
-msgstr "错误："
-
-#: common/static/bundles/ProblemBrowser.js
 #: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
 #: cms/templates/js/move-xblock-list.underscore
 msgid "View child items"
 msgstr "查看子类目"
 
-#: common/static/bundles/ProblemBrowser.js
 #: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
 msgid "Navigate up"
 msgstr "回到顶部"
 
-#: common/static/bundles/ProblemBrowser.js
 #: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
 msgid "Browsing"
 msgstr "浏览"
 
-#: common/static/bundles/ProblemBrowser.js
 #: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
 msgid "Select"
 msgstr "选取"
 
-#: common/static/bundles/ProblemBrowser.js
-#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/Main/Main.jsx
-msgid "Select a section or problem"
-msgstr "选择一个章节或一个问题"
-
-#: common/static/bundles/ProgramDetailsFactory.js
-#: lms/static/js/learner_dashboard/views/program_details_sidebar_view.js
-msgid "{type} Progress"
-msgstr "{type}进度"
-
-#: common/static/bundles/ProgramDetailsFactory.js
-#: lms/static/js/learner_dashboard/views/program_details_sidebar_view.js
-msgid "Earned Certificates"
-msgstr "已获取证书"
-
-#: common/static/bundles/ProgramDetailsFactory.js
-#: lms/static/js/learner_dashboard/views/program_details_view.js
-msgid "Enrolled"
-msgstr "已报名"
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/errors_list.jsx
-msgid "Please fix the following errors:"
-msgstr "请改正以下错误："
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/file_upload.jsx
-msgid "Files that you upload must be smaller than 5MB in size."
-msgstr "上传的文件不得超过5MB。"
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/file_upload.jsx
-msgid ""
-"Files that you upload must be PDFs or image files in .gif, .jpg, .jpeg, or "
-".png format."
-msgstr "只支持上传PDF或 .gif .jpg .jpeg .png 格式图片文件。"
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/file_upload.jsx
-#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid "Something went wrong. Please try again later."
-msgstr "发生错误，请稍后重试。"
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/file_upload.jsx
-msgid "Add Attachment"
-msgstr "添加附件"
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/file_upload.jsx
-msgid "(Optional)"
-msgstr "(非必填)"
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/file_upload.jsx
-msgid "Remove file"
-msgstr "移除文件"
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "Course Name"
-msgstr "课程名称"
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "Not specific to a course"
-msgstr "不针对特定课程"
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "What can we help you with, {username}?"
-msgstr "请问需要什么帮助，{username}?"
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Subject"
-msgstr "标题"
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "Details"
-msgstr "细节"
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "The more you tell us, the more quickly and helpfully we can respond!"
-msgstr "若您能提供更详尽的信息，我们就能在更短时间内更有针对性地答复您。"
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-#: common/static/common/templates/discussion/new-post.underscore
-#: common/static/common/templates/discussion/thread-response.underscore
-#: common/static/common/templates/discussion/thread.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Submit"
-msgstr "提交"
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
-msgid "Sign in to {platform} so we can help you better."
-msgstr "请登录{platform}，以获得更好的帮助。"
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/templates/student_account/hinted_login.underscore
-#: lms/templates/student_account/login.underscore
-msgid "Sign in"
-msgstr "登录"
-
-#: common/static/bundles/SingleSupportForm.js
-msgid "Create an {platform} account"
-msgstr "创建{platform}账号"
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
-msgid ""
-"If you are unable to access your account contact us via email using {email}."
-msgstr "如果您无法访问账号，请通过以下邮箱联系我们{email}."
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid ""
-"Select a course or select \"Not specific to a course\" for your support "
-"request."
-msgstr "选择一门课程或选择“不针对特定课程”选项。"
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid "Enter a subject for your support request."
-msgstr "输入您所需要的支持的主题。"
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid "Enter some details for your support request."
-msgstr "输入您所需要的支持的细节。"
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-#: lms/djangoapps/support/static/support/jsx/success.jsx
-msgid "Contact Us"
-msgstr "联系我们"
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid "Find answers to the top questions asked by learners."
-msgstr "查看学员最常问的问题及答案。"
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid "Search the {platform} Help Center"
-msgstr "搜索{platform}帮助中心"
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/success.jsx
-msgid "Go to my Dashboard"
-msgstr "前往我的课程面板"
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/success.jsx
-msgid "Go to {platform} Home"
-msgstr "前往{platform}主页"
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/success.jsx
-msgid ""
-"Thank you for submitting a request! We will contact you within 24 hours."
-msgstr "感谢您提交请求！我们将在24小时内与您联系。"
-
-#: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/upload_progress.jsx
-msgid "Cancel upload"
-msgstr "取消上传"
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid ""
-"You may also lose access to verified certificates and other program "
-"credentials like MicroMasters certificates. If you want to make a copy of "
-"these for your records before proceeding with deletion, follow the "
-"instructions for {htmlStart}printing or downloading a certificate{htmlEnd}."
-msgstr ""
-"您可能也将无法访问已认证的证书和其他专业课程的证书，比如MicroMasters证书。如果您希望在操作删除前对这些文件进行备份，请根据指引{htmlStart}打印或下载证书{htmlEnd}。"
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid ""
-"Before proceeding, please {htmlStart}unlink all social media "
-"accounts{htmlEnd}."
-msgstr "继续操作前，请先{htmlStart}解绑所有社交软件账号{htmlEnd}。"
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid "Before proceeding, please {htmlStart}activate your account{htmlEnd}."
-msgstr "继续操作前，请先{htmlStart}激活您的账号{htmlEnd}。"
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid ""
-"{htmlStart}Want to change your email, name, or password instead?{htmlEnd}"
-msgstr "{htmlStart}是否想要更改您的电子邮件，名字，或者密码？{htmlEnd}"
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid ""
-"{strongStart}Warning: Account deletion is permanent.{strongEnd} Please read "
-"the above carefully before proceeding. This is an irreversible action, and "
-"{strongStart}you will no longer be able to use the same email on "
-"edX.{strongEnd}"
-msgstr ""
-"{strongStart}警告：账号将被永久删除。{strongEnd}在继续之前，请仔细阅读以上内容。这是一个不可撤销的操作，并且{strongStart}您将不能够在edX上使用相同的电子邮件地址。.{strongEnd}"
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid "We’re sorry to see you go!"
-msgstr "很遗憾看到您要离开！"
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid ""
-"Please note: Deletion of your account and personal data is permanent and "
-"cannot be undone. EdX will not be able to recover your account or the data "
-"that is deleted."
-msgstr "请注意：删除账号及个人数据的操作将不可撤销。EdX无法恢复已删除的账号及数据。"
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid ""
-"Once your account is deleted, you cannot use it to take courses on the "
-"EliteMBA app, elitemba.cn, or any other site hosted by EliteMBA."
-msgstr ""
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-#: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Delete My Account"
-msgstr "删除我的账号"
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid "Password is incorrect"
-msgstr "密码错误"
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid "Unable to delete account"
-msgstr "无法删除账号"
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid "Please re-enter your password."
-msgstr "请重新输入您的密码。"
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid ""
-"Sorry, there was an error trying to process your request. Please try again "
-"later."
-msgstr "抱歉，处理您的请求时发生错误，请稍后重试。"
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid "A Password is required"
-msgstr "密码为必填项"
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid ""
-"You have selected “Delete my account.” Deletion of your account and personal"
-" data is permanent and cannot be undone. EdX will not be able to recover "
-"your account or the data that is deleted."
-msgstr "您选择了“删除我的账号”，删除账号与个人数据将无法撤销。EdX无法恢复您已删除的账号或数据。"
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid ""
-"If you proceed, you will be unable to use this account to take courses on "
-"the edX app, edx.org, or any other site hosted by edX. This includes access "
-"to edx.org from your employer’s or university’s system and access to private"
-" sites offered by MIT Open Learning, Wharton Executive Education, and "
-"Harvard Medical School."
-msgstr ""
-"如果继续此操作，您将不能再使用本账号在edX "
-"app，edX.org或其他任何由edX管理的网站上参加课程；不能使用本账号从雇主系统或学校系统登陆edX.org或访问由麻省理工开放学习平台，沃顿商学院高层管理教育项目或哈佛医学院提供的私人网站。"
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid ""
-"If you still wish to continue and delete your account, please enter your "
-"account password:"
-msgstr "如果您仍然要删除账号，请输入您的账号密码："
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid "Yes, Delete"
-msgstr "是的，确定删除"
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid "We're sorry to see you go! Your account will be deleted shortly."
-msgstr "很遗憾您要离开！您的账号将很快被删除。"
-
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid ""
-"Account deletion, including removal from email lists, may take a few weeks "
-"to fully process through our system. If you want to opt-out of emails before"
-" then, please unsubscribe from the footer of any email."
-msgstr ""
-"删除账号包括从邮箱列表中移除您的邮箱地址，我们的系统可能需要耗时数周才能完成处理。如果在此期间您不希望收到邮件，请从任意邮件的页脚取消订阅。"
-
-#: common/static/bundles/UnenrollmentFactory.js
-#: lms/static/js/dashboard/legacy.js
-#: lms/static/js/learner_dashboard/views/unenroll_view.js
-msgid ""
-"Unable to determine whether we should give you a refund because of System "
-"Error. Please try again later."
-msgstr "系统发生错误，无法判断是否应给您退款，请稍后重试。"
-
-#: common/static/bundles/VerticalStudentView.js
-#: lms/static/js/verify_student/views/make_payment_step_view.js
-#: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmark_button.js
-#: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmarks_list.js
-msgid "An error has occurred. Please try again."
-msgstr "发生了一个未知错误，请重试。"
-
-#: common/static/bundles/VerticalStudentView.js
-#: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmark_button.js
-msgid "Bookmark this page"
-msgstr "收藏此页"
-
-#: common/static/bundles/commons.js
 #: common/static/common/js/components/utils/view_utils.js
 msgid "Required field."
 msgstr "必填字段。"
 
-#: common/static/bundles/commons.js
 #: common/static/common/js/components/utils/view_utils.js
 msgid "Please do not use any spaces in this field."
 msgstr "此字段的内容不能包含空格。"
 
-#: common/static/bundles/commons.js
 #: common/static/common/js/components/utils/view_utils.js
 msgid "Please do not use any spaces or special characters in this field."
 msgstr "此字段的内容不能包含空格或特殊字符。"
 
-#: common/static/bundles/js/factories/library.js
 #: common/static/common/js/components/views/paginated_view.js
 #: common/static/common/js/components/views/paging_footer.js
 msgid "Pagination"
@@ -3812,6 +2303,10 @@ msgid "%d year"
 msgid_plural "%d years"
 msgstr[0] "%d年"
 
+#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/Main/Main.jsx
+msgid "Select a section or problem"
+msgstr "选择一个章节或一个问题"
+
 #: lms/djangoapps/support/static/support/js/views/certificates.js
 msgid "An unexpected error occurred.  Please try again."
 msgstr "意外错误发生，请重试。"
@@ -3835,6 +2330,123 @@ msgstr "请说明原因。"
 #: lms/djangoapps/support/static/support/js/views/enrollment_modal.js
 msgid "Something went wrong changing this enrollment. Please try again."
 msgstr "在变更这项注册时出现了一些问题。请再试一次。"
+
+#: lms/djangoapps/support/static/support/jsx/errors_list.jsx
+msgid "Please fix the following errors:"
+msgstr "请改正以下错误："
+
+#: lms/djangoapps/support/static/support/jsx/file_upload.jsx
+msgid "Files that you upload must be smaller than 5MB in size."
+msgstr "上传的文件不得超过5MB。"
+
+#: lms/djangoapps/support/static/support/jsx/file_upload.jsx
+msgid ""
+"Files that you upload must be PDFs or image files in .gif, .jpg, .jpeg, or "
+".png format."
+msgstr "只支持上传PDF或 .gif .jpg .jpeg .png 格式图片文件。"
+
+#: lms/djangoapps/support/static/support/jsx/file_upload.jsx
+#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
+msgid "Something went wrong. Please try again later."
+msgstr "发生错误，请稍后重试。"
+
+#: lms/djangoapps/support/static/support/jsx/file_upload.jsx
+msgid "Add Attachment"
+msgstr "添加附件"
+
+#: lms/djangoapps/support/static/support/jsx/file_upload.jsx
+msgid "(Optional)"
+msgstr "(非必填)"
+
+#: lms/djangoapps/support/static/support/jsx/file_upload.jsx
+msgid "Remove file"
+msgstr "移除文件"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Course Name"
+msgstr "课程名称"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Not specific to a course"
+msgstr "不针对特定课程"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "What can we help you with, {username}?"
+msgstr "请问需要什么帮助，{username}?"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Subject"
+msgstr "标题"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Details"
+msgstr "细节"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "The more you tell us, the more quickly and helpfully we can respond!"
+msgstr "若您能提供更详尽的信息，我们就能在更短时间内更有针对性地答复您。"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+#: common/static/common/templates/discussion/new-post.underscore
+#: common/static/common/templates/discussion/thread-response.underscore
+#: common/static/common/templates/discussion/thread.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid "Submit"
+msgstr "提交"
+
+#: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
+msgid "Sign in to {platform} so we can help you better."
+msgstr "请登录{platform}，以获得更好的帮助。"
+
+#: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
+msgid ""
+"If you are unable to access your account contact us via email using {email}."
+msgstr "如果您无法访问账号，请通过以下邮箱联系我们{email}."
+
+#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
+msgid ""
+"Select a course or select \"Not specific to a course\" for your support "
+"request."
+msgstr "选择一门课程或选择“不针对特定课程”选项。"
+
+#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
+msgid "Enter a subject for your support request."
+msgstr "输入您所需要的支持的主题。"
+
+#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
+msgid "Enter some details for your support request."
+msgstr "输入您所需要的支持的细节。"
+
+#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
+#: lms/djangoapps/support/static/support/jsx/success.jsx
+msgid "Contact Us"
+msgstr "联系我们"
+
+#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
+msgid "Find answers to the top questions asked by learners."
+msgstr "查看学员最常问的问题及答案。"
+
+#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
+msgid "Search the {platform} Help Center"
+msgstr "搜索{platform}帮助中心"
+
+#: lms/djangoapps/support/static/support/jsx/success.jsx
+msgid "Go to my Dashboard"
+msgstr "前往我的课程面板"
+
+#: lms/djangoapps/support/static/support/jsx/success.jsx
+msgid "Go to {platform} Home"
+msgstr "前往{platform}主页"
+
+#: lms/djangoapps/support/static/support/jsx/success.jsx
+msgid ""
+"Thank you for submitting a request! We will contact you within 24 hours."
+msgstr "感谢您提交请求！我们将在24小时内与您联系。"
+
+#: lms/djangoapps/support/static/support/jsx/upload_progress.jsx
+msgid "Cancel upload"
+msgstr "取消上传"
 
 #: lms/djangoapps/teams/static/teams/js/collections/team.js
 msgid "last activity"
@@ -4547,6 +3159,13 @@ msgid ""
 "The refund deadline for this course has passed,so you will not receive a "
 "refund."
 msgstr "此课程的退款期限已过，您将无法获得退款。"
+
+#: lms/static/js/dashboard/legacy.js
+#: lms/static/js/learner_dashboard/views/unenroll_view.js
+msgid ""
+"Unable to determine whether we should give you a refund because of System "
+"Error. Please try again later."
+msgstr "系统发生错误，无法判断是否应给您退款，请稍后重试。"
 
 #: lms/static/js/discovery/views/search_form.js
 #, javascript-format
@@ -5522,6 +4141,95 @@ msgid ""
 "sensitive nature of student information."
 msgstr "由于包含涉及学生的敏感信息，生成的链接将在5分钟后失效。"
 
+#: lms/static/js/learner_dashboard/models/course_card_model.js
+msgid "(Self-paced) Starts {start}"
+msgstr "(自主模式) 开始 {start}"
+
+#: lms/static/js/learner_dashboard/models/course_card_model.js
+msgid "(Self-paced) Started {start}"
+msgstr "(自主模式) 开始 {start}"
+
+#: lms/static/js/learner_dashboard/models/course_card_model.js
+msgid "(Self-paced) Ends {end}"
+msgstr "(自主模式) 结束 {end}"
+
+#: lms/static/js/learner_dashboard/models/course_card_model.js
+msgid "(Self-paced) Ended {end}"
+msgstr "(自主模式) 结束 {end}"
+
+#: lms/static/js/learner_dashboard/models/course_card_model.js
+msgid "Starts {start}"
+msgstr "开始{start}"
+
+#: lms/static/js/learner_dashboard/models/course_card_model.js
+msgid "Started {start}"
+msgstr "开始{start}"
+
+#: lms/static/js/learner_dashboard/models/course_card_model.js
+msgid "Ends {end}"
+msgstr "结束{end}"
+
+#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
+msgid "You must select a session to access the course."
+msgstr "必须选择一个学期才能访问课程。"
+
+#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
+msgid "There was an error. Please reload the page and try again."
+msgstr "发生错误，请重新加载页面并重试。"
+
+#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
+#: lms/templates/learner_dashboard/course_entitlement.underscore
+msgid "Change Session"
+msgstr "更改学期"
+
+#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
+#: lms/templates/learner_dashboard/course_entitlement.underscore
+msgid "Select Session"
+msgstr "选择学期"
+
+#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
+msgid "Leave Current Session"
+msgstr "离开当前学期"
+
+#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
+msgid "Are you sure you want to select this session?"
+msgstr "确定选择此学期？"
+
+#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
+msgid "Are you sure you want to change to a different session?"
+msgstr "确定更改学期？"
+
+#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
+msgid "Any course progress or grades from your current session will be lost."
+msgstr "所有当前学期的学习进度和成绩都会丢失。"
+
+#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
+msgid "Are you sure that you want to leave this session?"
+msgstr "确定离开此学期？"
+
+#: lms/static/js/learner_dashboard/views/entitlement_unenrollment_view.js
+msgid ""
+"Your unenrollment request could not be processed. Please try again later."
+msgstr "未能处理您的课程退选申请，请稍后重试。"
+
+#: lms/static/js/learner_dashboard/views/entitlement_unenrollment_view.js
+msgid ""
+"Are you sure you want to unenroll from {courseName} ({courseNumber})? You "
+"will be refunded the amount you paid."
+msgstr "确定退选课程 {courseName} ({courseNumber})？您将会收到全额退款。"
+
+#: lms/static/js/learner_dashboard/views/program_details_sidebar_view.js
+msgid "{type} Progress"
+msgstr "{type}进度"
+
+#: lms/static/js/learner_dashboard/views/program_details_sidebar_view.js
+msgid "Earned Certificates"
+msgstr "已获取证书"
+
+#: lms/static/js/learner_dashboard/views/program_details_view.js
+msgid "Enrolled"
+msgstr "已报名"
+
 #: lms/static/js/staff_debug_actions.js
 msgid "Successfully reset the attempts for user {user}"
 msgstr "成功重置用户{user}的请求"
@@ -5561,6 +4269,153 @@ msgstr "成功覆盖{user}的题目得分"
 #: lms/static/js/staff_debug_actions.js
 msgid "Could not override problem score for {user}."
 msgstr "无法覆盖{user}的题目得分。"
+
+#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Reset Your Password"
+msgstr "重置您的密码"
+
+#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
+msgid "Enter and confirm your new password."
+msgstr "输入并确认新密码"
+
+#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
+msgid "New Password"
+msgstr "新密码"
+
+#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
+msgid "Confirm Password"
+msgstr "确认密码"
+
+#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
+msgid "Passwords do not match."
+msgstr "密码错误"
+
+#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
+msgid "Reset My Password"
+msgstr "重置密码"
+
+#: lms/static/js/student_account/components/PasswordResetInput.jsx
+msgid "Error: "
+msgstr "错误："
+
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid ""
+"You may also lose access to verified certificates and other program "
+"credentials like MicroMasters certificates. If you want to make a copy of "
+"these for your records before proceeding with deletion, follow the "
+"instructions for {htmlStart}printing or downloading a certificate{htmlEnd}."
+msgstr ""
+"您可能也将无法访问已认证的证书和其他专业课程的证书，比如MicroMasters证书。如果您希望在操作删除前对这些文件进行备份，请根据指引{htmlStart}打印或下载证书{htmlEnd}。"
+
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid ""
+"Before proceeding, please {htmlStart}unlink all social media "
+"accounts{htmlEnd}."
+msgstr "继续操作前，请先{htmlStart}解绑所有社交软件账号{htmlEnd}。"
+
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid "Before proceeding, please {htmlStart}activate your account{htmlEnd}."
+msgstr "继续操作前，请先{htmlStart}激活您的账号{htmlEnd}。"
+
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid ""
+"{htmlStart}Want to change your email, name, or password instead?{htmlEnd}"
+msgstr "{htmlStart}是否想要更改您的电子邮件，名字，或者密码？{htmlEnd}"
+
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid ""
+"{strongStart}Warning: Account deletion is permanent.{strongEnd} Please read "
+"the above carefully before proceeding. This is an irreversible action, and "
+"{strongStart}you will no longer be able to use the same email on "
+"edX.{strongEnd}"
+msgstr ""
+"{strongStart}警告：账号将被永久删除。{strongEnd}在继续之前，请仔细阅读以上内容。这是一个不可撤销的操作，并且{strongStart}您将不能够在edX上使用相同的电子邮件地址。{strongEnd}"
+
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid "We’re sorry to see you go!"
+msgstr "很遗憾看到您要离开！"
+
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid ""
+"Please note: Deletion of your account and personal data is permanent and "
+"cannot be undone. EdX will not be able to recover your account or the data "
+"that is deleted."
+msgstr "请注意：删除账号及个人数据的操作将不可撤销。EdX无法恢复已删除的账号及数据。"
+
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid ""
+"Once your account is deleted, you cannot use it to take courses on the "
+"EliteMBA app, elitemba.cn, or any other site hosted by EliteMBA."
+msgstr "一旦删除了账号，您将无法在英荔商学院 App、elitemba.cn或其他任何由英荔商学院托管的站点上学习课程。"
+
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Delete My Account"
+msgstr "删除我的账号"
+
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid "Password is incorrect"
+msgstr "密码错误"
+
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid "Unable to delete account"
+msgstr "无法删除账号"
+
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid "Please re-enter your password."
+msgstr "请重新输入您的密码。"
+
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid ""
+"Sorry, there was an error trying to process your request. Please try again "
+"later."
+msgstr "抱歉，处理您的请求时发生错误，请稍后重试。"
+
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid "A Password is required"
+msgstr "密码为必填项"
+
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid ""
+"You have selected “Delete my account.” Deletion of your account and personal"
+" data is permanent and cannot be undone. EdX will not be able to recover "
+"your account or the data that is deleted."
+msgstr "您选择了“删除我的账号”，删除账号与个人数据将无法撤销。EdX无法恢复您已删除的账号或数据。"
+
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid ""
+"If you proceed, you will be unable to use this account to take courses on "
+"the edX app, edx.org, or any other site hosted by edX. This includes access "
+"to edx.org from your employer’s or university’s system and access to private"
+" sites offered by MIT Open Learning, Wharton Executive Education, and "
+"Harvard Medical School."
+msgstr ""
+"如果继续此操作，您将不能再使用本账号在edX "
+"app，edX.org或其他任何由edX管理的网站上参加课程；不能使用本账号从雇主系统或学校系统登陆edX.org或访问由麻省理工开放学习平台，沃顿商学院高层管理教育项目或哈佛医学院提供的私人网站。"
+
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid ""
+"If you still wish to continue and delete your account, please enter your "
+"account password:"
+msgstr "如果您仍然要删除账号，请输入您的账号密码："
+
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid "Yes, Delete"
+msgstr "是的，确定删除"
+
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid "We're sorry to see you go! Your account will be deleted shortly."
+msgstr "很遗憾您要离开！您的账号将很快被删除。"
+
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid ""
+"Account deletion, including removal from email lists, may take a few weeks "
+"to fully process through our system. If you want to opt-out of emails before"
+" then, please unsubscribe from the footer of any email."
+msgstr ""
+"删除账号包括从邮箱列表中移除您的邮箱地址，我们的系统可能需要耗时数周才能完成处理。如果在此期间您不希望收到邮件，请从任意邮件的页脚取消订阅。"
 
 #: lms/static/js/student_account/tos_modal.js
 msgid "Terms of Service and Honor Code"
@@ -5777,7 +4632,7 @@ msgstr "您可以选择将个人社交媒体的链接图标放到您的edX个人
 msgid ""
 "Enter your %s username or the URL to your %s page. Delete the URL to remove "
 "the link."
-msgstr ""
+msgstr "输入您的%s用户名或您的%s主页URL。删除URL以移除链接。"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid " Link"
@@ -5943,6 +4798,12 @@ msgstr "所有的付款方式目前不可用。"
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Try the transaction again in a few minutes."
 msgstr "请等待几分钟后再尝试。"
+
+#: lms/static/js/verify_student/views/make_payment_step_view.js
+#: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmark_button.js
+#: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmarks_list.js
+msgid "An error has occurred. Please try again."
+msgstr "发生了一个未知错误，请重试。"
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Could not submit order"
@@ -6137,6 +4998,22 @@ msgstr "学生数目"
 msgid "Overall Score"
 msgstr "总成绩"
 
+#: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmark_button.js
+msgid "Bookmark this page"
+msgstr "收藏此页"
+
+#: openedx/features/course_experience/static/course_experience/js/CourseGoals.js
+msgid "Thank you for setting your course goal to {goal}!"
+msgstr "感谢您将课程目标定为{goal}！"
+
+#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
+msgid "You have successfully updated your goal."
+msgstr "您已成功更新目标。"
+
+#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
+msgid "There was an error updating your goal."
+msgstr "更新目标时出错。"
+
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result"
 msgid_plural "{total_results} results"
@@ -6190,7 +5067,7 @@ msgstr "成绩分页"
 
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_fields.js
 msgid "Account Settings page."
-msgstr "账号设置页面。"
+msgstr "账号设置页面"
 
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_fields.js
 msgid ""
@@ -6240,6 +5117,29 @@ msgstr "手机号码格式不正确"
 #: themes/normal-theme/lms/static/js/binding.js
 msgid "Cellphone number binding successfully"
 msgstr "手机号码绑定成功"
+
+#: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
+#: cms/static/js/views/video_transcripts.js
+msgid ""
+"This may be happening because of an error with our server or your internet "
+"connection. Try refreshing the page or making sure you are online."
+msgstr "此问题可能是由于服务器故障或您的网络连接错误导致的。请刷新网页或检查网络连接。"
+
+#: cms/static/cms/js/main.js
+msgid "Studio's having trouble saving your work"
+msgstr "保存时遇到问题"
+
+#: cms/static/cms/js/xblock/cms.runtime.v1.js
+msgid "OpenAssessment Save Error"
+msgstr "保存开放评估时出现错误"
+
+#: cms/static/js/base.js
+msgid "This link will open in a new browser window/tab"
+msgstr "该链接将在新浏览器窗口/标签页中打开"
+
+#: cms/static/js/base.js
+msgid "This link will open in a modal window"
+msgstr "将在模式窗口中打开此链接"
 
 #: cms/static/js/certificates/collections/certificates.js
 msgid "Could not parse certificate JSON. %(message)s"
@@ -6292,6 +5192,13 @@ msgstr "确定要从签章列表中删除 \"<%= signatoryName %>\" 吗？"
 #: cms/static/js/views/course_info_update.js
 msgid "This action cannot be undone."
 msgstr "这个动作无法取消。"
+
+#: cms/static/js/certificates/views/signatory_editor.js
+#: cms/static/js/views/course_info_update.js cms/static/js/views/list_item.js
+#: cms/static/js/views/show_textbook.js cms/static/js/views/tabs.js
+#: cms/static/js/views/utils/xblock_utils.js
+msgid "Deleting"
+msgstr "正在删除"
 
 #: cms/static/js/certificates/views/signatory_editor.js
 msgid "Upload signature image."
@@ -6364,6 +5271,76 @@ msgstr "显示已过时的设置"
 msgid "You have unsaved changes. Do you really want to leave this page?"
 msgstr "您尚有未保存的修改，确定要离此页面吗？"
 
+#: cms/static/js/features/import/factories/import.js
+msgid "There was an error during the upload process."
+msgstr "上传过程中出现错误。"
+
+#: cms/static/js/features/import/factories/import.js
+msgid "There was an error while unpacking the file."
+msgstr "解压文件时出错。"
+
+#: cms/static/js/features/import/factories/import.js
+msgid "There was an error while verifying the file you submitted."
+msgstr "验证上传文件时出现错误"
+
+#: cms/static/js/features/import/factories/import.js
+msgid "Choose new file"
+msgstr "选择文件"
+
+#: cms/static/js/features/import/factories/import.js
+msgid ""
+"File format not supported. Please upload a file with a {ext} extension."
+msgstr "文件格式不支持。请上传扩展名为{ext}的文件。"
+
+#: cms/static/js/features/import/factories/import.js
+msgid "There was an error while importing the new library to our database."
+msgstr "上传新文库至数据库时出现错误。"
+
+#: cms/static/js/features/import/factories/import.js
+msgid "There was an error while importing the new course to our database."
+msgstr "导入新课程到数据库时出错。"
+
+#: cms/static/js/features/import/factories/import.js
+msgid "Your import has failed."
+msgstr "导入失败"
+
+#: cms/static/js/features/import/views/import.js
+msgid "Your import is in progress; navigating away will abort it."
+msgstr "正在导入，离开将导致此过程中止。"
+
+#: cms/static/js/features/import/views/import.js
+msgid "Error importing course"
+msgstr "导入课程时出错"
+
+#: cms/static/js/features/import/views/import.js
+msgid "There was an error with the upload"
+msgstr "文件上传错误"
+
+#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
+msgid "Organization:"
+msgstr "机构："
+
+#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
+msgid "Course Number:"
+msgstr "课程代码："
+
+#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
+msgid "Course Run:"
+msgstr "开课时间："
+
+#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
+msgid "(Read-only)"
+msgstr "（只读）"
+
+#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
+msgid "Re-run Course"
+msgstr "重新开课"
+
+#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
+#: cms/templates/js/show-textbook.underscore
+msgid "View Live"
+msgstr "在线查看"
+
 #: cms/static/js/maintenance/force_publish_course.js
 msgid "Internal Server Error."
 msgstr "内部服务器错误"
@@ -6384,6 +5361,22 @@ msgstr "上传完成"
 #: cms/static/js/models/active_video_upload.js
 msgid "Upload failed"
 msgstr "上传失败"
+
+#: cms/static/js/models/chapter.js
+msgid "Chapter name and asset_path are both required"
+msgstr "需提供章节名称及资源路径"
+
+#: cms/static/js/models/chapter.js
+msgid "Chapter name is required"
+msgstr "请输入章节名称"
+
+#: cms/static/js/models/chapter.js
+msgid "asset_path is required"
+msgstr "请输入资源路径"
+
+#: cms/static/js/models/course.js cms/static/js/models/section.js
+msgid "You must specify a name"
+msgstr "您需指定一个名称"
 
 #: cms/static/js/models/course_update.js
 msgid "Action required: Enter a valid date."
@@ -6480,6 +5473,39 @@ msgstr "宽限时间必须以 HH:MM 格式设定。"
 #: cms/static/js/models/settings/course_grading_policy.js
 msgid "Not able to set passing grade to less than %(minimum_grade_cutoff)s%."
 msgstr "及格分数不能低于%(minimum_grade_cutoff)s%。"
+
+#: cms/static/js/models/textbook.js
+msgid "Textbook name is required"
+msgstr "教材名称必填"
+
+#: cms/static/js/models/textbook.js
+msgid "Please add at least one chapter"
+msgstr "请至少添加一个章节"
+
+#: cms/static/js/models/textbook.js
+msgid "All chapters must have a name and asset"
+msgstr "所有章节都必须拥有名称和内容"
+
+#: cms/static/js/models/uploads.js
+msgid ""
+"Only <%= fileTypes %> files can be uploaded. Please select a file ending in "
+"<%= fileExtensions %> to upload."
+msgstr "只能上传<%= fileTypes %>类型的文件。请上传扩展名为<%= fileExtensions %>的文件。"
+
+#: cms/static/js/models/uploads.js
+#: lms/templates/student_account/hinted_login.underscore
+#: lms/templates/student_account/institution_login.underscore
+#: lms/templates/student_account/institution_register.underscore
+msgid "or"
+msgstr "或"
+
+#: cms/static/js/models/xblock_validation.js
+msgid "This unit has validation issues."
+msgstr "此单元含验证问题。"
+
+#: cms/static/js/models/xblock_validation.js
+msgid "This component has validation issues."
+msgstr "此组件含验证问题。"
 
 #: cms/static/js/views/active_video_upload.js cms/static/js/views/assets.js
 msgid "Your file could not be uploaded"
@@ -6583,6 +5609,11 @@ msgstr "上传新文件"
 msgid "Load Another File"
 msgstr "加载其他文件"
 
+#: cms/static/js/views/components/add_xblock.js
+#: cms/static/js/views/utils/xblock_utils.js
+msgid "Adding"
+msgstr "正在添加"
+
 #: cms/static/js/views/course_info_update.js
 msgid "Are you sure you want to delete this update?"
 msgstr "您确定要删除此更新吗？"
@@ -6635,6 +5666,14 @@ msgstr "自动脚本已禁用。"
 #: cms/static/js/views/course_video_settings.js
 msgid "{selectedProvider} credentials saved"
 msgstr "{selectedProvider} 证书已保存"
+
+#: cms/static/js/views/edit_chapter.js
+msgid "Upload a new PDF to “<%= name %>”"
+msgstr "上传新的PDF文件至 “<%= name %>”"
+
+#: cms/static/js/views/edit_chapter.js
+msgid "Please select a PDF file to upload."
+msgstr "请选择PDF文件上传"
 
 #: cms/static/js/views/export.js
 msgid "There has been an error while exporting."
@@ -6730,6 +5769,69 @@ msgstr "上传教师的照片"
 #: cms/static/js/views/instructor_info.js cms/static/js/views/settings/main.js
 msgid "Files must be in JPEG or PNG format."
 msgstr "文件必须是JPEG或者PNG格式。"
+
+#: cms/static/js/views/license.js cms/templates/js/license-selector.underscore
+msgid "All Rights Reserved"
+msgstr "保留所有权利"
+
+#: cms/static/js/views/license.js
+msgid "You reserve all rights for your work"
+msgstr "您拥有对您作品的所有使用权。"
+
+#: cms/static/js/views/license.js
+msgid "Creative Commons"
+msgstr "知识共享"
+
+#: cms/static/js/views/license.js
+msgid "You waive some rights for your work, such that others can use it too"
+msgstr "您需要对您所做的贡献放弃部分权利，例如他人也可以使用您的成果"
+
+#: cms/static/js/views/license.js
+msgid "Version"
+msgstr "版本"
+
+#: cms/static/js/views/license.js
+msgid "Attribution"
+msgstr "署名"
+
+#: cms/static/js/views/license.js
+msgid ""
+"Allow others to copy, distribute, display and perform your copyrighted work "
+"but only if they give credit the way you request. Currently, this option is "
+"required."
+msgstr "请按照您指定的方式获取许可，允许他人复制、发行、演示及使用您拥有版权的作品。当前，该选项为必选项。"
+
+#: cms/static/js/views/license.js
+msgid "Noncommercial"
+msgstr "非商业的"
+
+#: cms/static/js/views/license.js
+msgid ""
+"Allow others to copy, distribute, display and perform your work - and "
+"derivative works based upon it - but for noncommercial purposes only."
+msgstr "您允许他人对自己享有著作权的作品及衍生作品进行复制、发行、展览、表演，但仅可用于非商业用途。"
+
+#: cms/static/js/views/license.js
+msgid "No Derivatives"
+msgstr "禁止改作"
+
+#: cms/static/js/views/license.js
+msgid ""
+"Allow others to copy, distribute, display and perform only verbatim copies "
+"of your work, not derivative works based upon it. This option is "
+"incompatible with \"Share Alike\"."
+msgstr "您允许他人对您的作品原封不动地进行复制、发行、展览、表演，但不得进行演绎创作。此选项与“相同方式共享”选项不兼容。"
+
+#: cms/static/js/views/license.js
+msgid "Share Alike"
+msgstr "相同方式共享"
+
+#: cms/static/js/views/license.js
+msgid ""
+"Allow others to distribute derivative works only under a license identical "
+"to the license that governs your work. This option is incompatible with \"No"
+" Derivatives\"."
+msgstr "在遵守与本作品一致的授权条款的前提下，允许他人发行衍生作品。该选项不符合“禁止改作”的规定。"
 
 #. Translators: "item_display_name" is the name of the item to be deleted.
 #: cms/static/js/views/list_item.js
@@ -6829,6 +5931,32 @@ msgstr "基本"
 msgid "Visibility"
 msgstr "可见性"
 
+#. Translators: "title" is the name of the current component being edited.
+#: cms/static/js/views/modals/edit_xblock.js
+msgid "Editing: %(title)s"
+msgstr "编辑：%(title)s"
+
+#: cms/static/js/views/modals/edit_xblock.js
+#: lms/templates/ccx/schedule.underscore
+msgid "Unit"
+msgstr "单元"
+
+#: cms/static/js/views/modals/edit_xblock.js
+msgid "Component"
+msgstr "组件"
+
+#: cms/static/js/views/modals/move_xblock_modal.js
+msgid "Move"
+msgstr "移动"
+
+#: cms/static/js/views/modals/move_xblock_modal.js
+msgid "Choose a location to move your component to"
+msgstr "选择一个位置并将您的的组件移动至此"
+
+#: cms/static/js/views/modals/move_xblock_modal.js
+msgid "Move: {displayName}"
+msgstr "移动：{displayName}"
+
 #: cms/static/js/views/modals/validation_error_modal.js
 msgid "Validation Error While Saving"
 msgstr "在保存过程中出现验证错误"
@@ -6841,6 +5969,95 @@ msgstr "撤销更改"
 msgid "Change Manually"
 msgstr "手动更改"
 
+#: cms/static/js/views/move_xblock_list.js
+msgid "Sections"
+msgstr "章节"
+
+#: cms/static/js/views/move_xblock_list.js
+msgid "Subsections"
+msgstr "小节"
+
+#: cms/static/js/views/move_xblock_list.js
+msgid "Units"
+msgstr "单元"
+
+#: cms/static/js/views/move_xblock_list.js
+msgid "Components"
+msgstr "组件"
+
+#: cms/static/js/views/move_xblock_list.js
+#: cms/templates/js/group-configuration-editor.underscore
+msgid "Groups"
+msgstr "群组"
+
+#: cms/static/js/views/move_xblock_list.js
+msgid "This {parentCategory} has no {childCategory}"
+msgstr "{parentCategory}目录下无{childCategory}"
+
+#: cms/static/js/views/move_xblock_list.js
+#: cms/templates/js/group-configuration-details.underscore
+#: cms/templates/js/partition-group-details.underscore
+msgid "Course Outline"
+msgstr "课程大纲"
+
+#: cms/static/js/views/paged_container.js
+msgid "Date added"
+msgstr "已添加日期"
+
+#. Translators: "title" is the name of the current component or unit being
+#. edited.
+#: cms/static/js/views/pages/container.js
+msgid "Editing access for: %(title)s"
+msgstr "编辑组件%(title)s路径"
+
+#: cms/static/js/views/pages/container_subviews.js
+msgid "Publishing"
+msgstr "正在发布"
+
+#: cms/static/js/views/pages/container_subviews.js
+#: cms/templates/js/course-video-settings-update-org-credentials-footer.underscore
+#: cms/templates/js/course-video-settings-update-settings-footer.underscore
+#: cms/templates/js/publish-xblock.underscore
+msgid "Discard Changes"
+msgstr "放弃更改"
+
+#: cms/static/js/views/pages/container_subviews.js
+msgid ""
+"Are you sure you want to revert to the last published version of the unit? "
+"You cannot undo this action."
+msgstr "确定把本单元还原至上一版本吗？此操作不可撤销。"
+
+#: cms/static/js/views/pages/container_subviews.js
+msgid "Discarding Changes"
+msgstr "放弃更改"
+
+#: cms/static/js/views/pages/container_subviews.js
+msgid "Hiding from Students"
+msgstr "对学生隐藏"
+
+#: cms/static/js/views/pages/container_subviews.js
+msgid "Explicitly Hiding from Students"
+msgstr "对学生显示为不可见"
+
+#: cms/static/js/views/pages/container_subviews.js
+msgid "Inheriting Student Visibility"
+msgstr "继承学生可见性"
+
+#: cms/static/js/views/pages/container_subviews.js
+msgid "Make Visible to Students"
+msgstr "对学生可见"
+
+#: cms/static/js/views/pages/container_subviews.js
+msgid ""
+"If the unit was previously published and released to students, any changes "
+"you made to the unit when it was hidden will now be visible to students. Do "
+"you want to proceed?"
+msgstr "如果本单元早前已发布并对学生可见，您在学生不可见期间所做更改现在将对学生可见。您还要继续吗？"
+
+#: cms/static/js/views/pages/container_subviews.js
+msgid "Making Visible to Students"
+msgstr "对学生可见"
+
 #: cms/static/js/views/pages/course_outline.js
 msgid "Course Index"
 msgstr "课程索引"
@@ -6848,6 +6065,56 @@ msgstr "课程索引"
 #: cms/static/js/views/pages/course_outline.js
 msgid "There were errors reindexing course."
 msgstr "重建课程索引时出错了。"
+
+#: cms/static/js/views/pages/paged_container.js
+msgid "Hide Previews"
+msgstr "隐藏预览"
+
+#: cms/static/js/views/pages/paged_container.js
+msgid "Show Previews"
+msgstr "显示预览"
+
+#. Translators: sample result:
+#. "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added
+#. ascending"
+#: cms/static/js/views/paging_header.js
+msgid ""
+"Showing {currentItemRange} out of {totalItemsCount}, filtered by "
+"{assetType}, sorted by {sortName} ascending"
+msgstr ""
+"以 {assetType} 过滤，按照 {sortName} 升序显示 {totalItemsCount} 中的 {currentItemRange} "
+
+#. Translators: sample result:
+#. "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added
+#. descending"
+#: cms/static/js/views/paging_header.js
+msgid ""
+"Showing {currentItemRange} out of {totalItemsCount}, filtered by "
+"{assetType}, sorted by {sortName} descending"
+msgstr ""
+"以 {assetType} 过滤，按照 {sortName} 降序显示 {totalItemsCount} 中的 {currentItemRange} "
+
+#. Translators: sample result:
+#. "Showing 0-9 out of 25 total, sorted by Date Added ascending"
+#: cms/static/js/views/paging_header.js
+msgid ""
+"Showing {currentItemRange} out of {totalItemsCount}, sorted by {sortName} "
+"ascending"
+msgstr "以 {sortName} 为升序显示 {totalItemsCount} 中的 {currentItemRange} "
+
+#. Translators: sample result:
+#. "Showing 0-9 out of 25 total, sorted by Date Added descending"
+#: cms/static/js/views/paging_header.js
+msgid ""
+"Showing {currentItemRange} out of {totalItemsCount}, sorted by {sortName} "
+"descending"
+msgstr "在 {totalItemsCount} 外显示 {currentItemRange}，根据 {sortName} 降序进行分类"
+
+#. Translators: turns into "25 total" to be used in other sentences, e.g.
+#. "Showing 0-9 out of 25 total".
+#: cms/static/js/views/paging_header.js
+msgid "{totalItems} total"
+msgstr "总计{totalItems} "
 
 #. Translators: This refers to a content group that can be linked to a student
 #. cohort.
@@ -6923,6 +6190,35 @@ msgstr "上传你的横幅图像。"
 msgid "Upload your video thumbnail image."
 msgstr "上传你的视频缩略图图像。"
 
+#: cms/static/js/views/show_textbook.js
+msgid "Delete “<%= name %>”?"
+msgstr "确定删除“<%= name %>”吗？"
+
+#: cms/static/js/views/show_textbook.js
+msgid ""
+"Deleting a textbook cannot be undone and once deleted any reference to it in"
+" your courseware's navigation will also be removed."
+msgstr "删除教材的操作无法撤销。一旦删除，课件导航中对该教材的引用也将被移除。"
+
+#: cms/static/js/views/tabs.js
+msgid "Delete Page Confirmation"
+msgstr "确认删除页面"
+
+#: cms/static/js/views/tabs.js
+msgid ""
+"Are you sure you want to delete this page? This action cannot be undone."
+msgstr "确定删除本页吗？此操作不可撤销。"
+
+#: cms/static/js/views/uploads.js
+#: cms/templates/js/metadata-file-uploader-item.underscore
+#: cms/templates/js/video/metadata-translations-item.underscore
+msgid "Upload"
+msgstr "上传"
+
+#: cms/static/js/views/uploads.js
+msgid "We're sorry, there was an error"
+msgstr "很抱歉，此处出现错误"
+
 #: cms/static/js/views/utils/create_course_utils.js
 msgid ""
 "The combined length of the organization, course number, and course run "
@@ -6934,6 +6230,71 @@ msgid ""
 "The combined length of the organization and library code fields cannot be "
 "more than <%=limit%> characters."
 msgstr "机构和知识库编号字段合在一起不能超过 <%=limit%> 个字符"
+
+#: cms/static/js/views/utils/move_xblock_utils.js
+msgid "Success! \"{displayName}\" has been moved."
+msgstr "移除成功！\"{displayName}\" 已被移除。"
+
+#: cms/static/js/views/utils/move_xblock_utils.js
+msgid ""
+"Move cancelled. \"{sourceDisplayName}\" has been moved back to its original "
+"location."
+msgstr "取消移动。\"{sourceDisplayName}\"已被移回原始位置。"
+
+#: cms/static/js/views/utils/move_xblock_utils.js
+msgid "Undo move"
+msgstr "撤销移动"
+
+#: cms/static/js/views/utils/move_xblock_utils.js
+msgid "Take me to the new location"
+msgstr "跳转至新位置"
+
+#: cms/static/js/views/utils/xblock_utils.js
+msgid "Duplicating"
+msgstr "正在复制"
+
+#: cms/static/js/views/utils/xblock_utils.js
+msgid "Undo moving"
+msgstr "撤销移动"
+
+#: cms/static/js/views/utils/xblock_utils.js
+msgid "Moving"
+msgstr "正在移动"
+
+#: cms/static/js/views/utils/xblock_utils.js
+msgid "Deleting this {xblock_type} is permanent and cannot be undone."
+msgstr "永久删除此 {xblock_type}并无法撤回"
+
+#: cms/static/js/views/utils/xblock_utils.js
+msgid ""
+"Any content that has listed this content as a prerequisite will also have "
+"access limitations removed."
+msgstr "任何将此条目列为先修条件的条目也将取消访问限制"
+
+#: cms/static/js/views/utils/xblock_utils.js
+msgid "Delete this {xblock_type} (and prerequisite)?"
+msgstr "确认删除此 {xblock_type}（以及先修内容）？"
+
+#: cms/static/js/views/utils/xblock_utils.js
+msgid "Yes, delete this {xblock_type}"
+msgstr "是的，删除该 {xblock_type}"
+
+#: cms/static/js/views/utils/xblock_utils.js
+msgid "Delete this {xblock_type}?"
+msgstr "确定删除{xblock_type}吗？"
+
+#: cms/static/js/views/utils/xblock_utils.js
+msgid "section"
+msgstr "节"
+
+#: cms/static/js/views/utils/xblock_utils.js
+msgid "subsection"
+msgstr "小节"
+
+#: cms/static/js/views/utils/xblock_utils.js
+#: cms/templates/js/container-access.underscore
+msgid "unit"
+msgstr "单元"
 
 #: cms/static/js/views/validation.js
 msgid "You've made some changes"
@@ -6955,6 +6316,67 @@ msgstr "请先解决本页存在的错误，然后保存。"
 #: cms/static/js/views/validation.js
 msgid "Save Changes"
 msgstr "保存更改"
+
+#: cms/static/js/views/video/transcripts/file_uploader.js
+msgid "Please select a file in .srt format."
+msgstr "请选择格式为.srt的文件。"
+
+#: cms/static/js/views/video/transcripts/file_uploader.js
+msgid "Error: Uploading failed."
+msgstr "错误：上传失败"
+
+#: cms/static/js/views/video/transcripts/message_manager.js
+msgid "Error: Import failed."
+msgstr "错误：导入失败"
+
+#: cms/static/js/views/video/transcripts/message_manager.js
+msgid "Error: Replacing failed."
+msgstr "错误：替代失败"
+
+#: cms/static/js/views/video/transcripts/message_manager.js
+msgid "Error: Choosing failed."
+msgstr "错误：选取失败"
+
+#: cms/static/js/views/video/transcripts/metadata_videolist.js
+msgid "Error: Connection with server failed."
+msgstr "错误：连接服务器失败。"
+
+#: cms/static/js/views/video/transcripts/metadata_videolist.js
+msgid "Link types should be unique."
+msgstr "链接类型具有唯一性。"
+
+#: cms/static/js/views/video/transcripts/metadata_videolist.js
+msgid "Links should be unique."
+msgstr "链接具有唯一性。"
+
+#: cms/static/js/views/video/transcripts/metadata_videolist.js
+msgid "Incorrect url format."
+msgstr "URL格式错误"
+
+#: cms/static/js/views/video/translations_editor.js
+msgid ""
+"Sorry, there was an error parsing the subtitles that you uploaded. Please "
+"check the format and try again."
+msgstr "抱歉，解析上传的字幕时发生错误。请检查格式后重试。"
+
+#: cms/static/js/views/video/translations_editor.js
+#: cms/static/js/views/video_transcripts.js
+msgid "Are you sure you want to remove this transcript?"
+msgstr "您确定要移除此字幕？"
+
+#: cms/static/js/views/video/translations_editor.js
+msgid ""
+"If you remove this transcript, the transcript will not be available for this"
+" component."
+msgstr "移除此字幕将导致此组件中的字幕不可用。"
+
+#: cms/static/js/views/video/translations_editor.js
+msgid "Remove Transcript"
+msgstr "移除字幕"
+
+#: cms/static/js/views/video/translations_editor.js
+msgid "Upload translation"
+msgstr "上传翻译"
 
 #: cms/static/js/views/video_thumbnail.js
 msgid "Add Thumbnail"
@@ -7099,6 +6521,26 @@ msgid ""
 "If you remove this transcript, the transcript will not be available for any "
 "components that use this video."
 msgstr "如果您移除此字幕，那么使用此视频的所有组件将无法使用此字幕。"
+
+#: cms/static/js/views/xblock_editor.js
+msgid "Editor"
+msgstr "编辑器"
+
+#: cms/static/js/views/xblock_editor.js
+#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
+msgid "Settings"
+msgstr "设置"
+
+#: cms/static/js/views/xblock_outline.js
+msgid "New {component_type}"
+msgstr "新建 {component_type}"
+
+#. Translators: This message will be added to the front of messages of type
+#. warning,
+#. e.g. "Warning: this component has not been configured yet".
+#: cms/static/js/views/xblock_validation.js
+msgid "Warning"
+msgstr "警告"
 
 #: cms/static/js/xblock_asides/structured_tags.js
 msgid "Updating Tags"
@@ -7775,6 +7217,14 @@ msgstr "在获取这个目录的预览结果时发生错误。请检查您的指
 #: lms/templates/api_admin/catalog-results.underscore
 msgid "This catalog's courses:"
 msgstr "此目录下的课程："
+
+#: lms/templates/ccx/schedule.underscore
+msgid "Expand All"
+msgstr "展开全部"
+
+#: lms/templates/ccx/schedule.underscore
+msgid "Collapse All"
+msgstr "折叠全部"
 
 #: lms/templates/ccx/schedule.underscore
 msgid "Start Date"
@@ -8615,6 +8065,11 @@ msgstr "发生了一个错误，请重新加载页面。"
 #: lms/templates/student_account/form_field.underscore
 msgid "Forgot password?"
 msgstr "忘记密码？"
+
+#: lms/templates/student_account/hinted_login.underscore
+#: lms/templates/student_account/login.underscore
+msgid "Sign in"
+msgstr "登录"
 
 #: lms/templates/student_account/hinted_login.underscore
 #, python-format
@@ -10958,7 +10413,7 @@ msgstr "开通"
 
 #: membership/static/membership/js/card.js
 msgid "Become a VIP member and watch all EliteMBA courses for free"
-msgstr "开通VIP会员，可免费观看英荔商学院全部课程"
+msgstr "开通VIP会员，可免费观看英荔商学院全部课程。"
 
 #: membership/static/membership/js/card.js
 msgid "DD/MM/YYYY"
@@ -10997,5 +10452,5 @@ msgid "Average per month"
 msgstr "月均"
 
 #: membership/static/membership/js/pay.js
-msgid "Return to EliteMBA in _ seconds"
-msgstr "在 _ 秒后返回英荔商学院"
+msgid "调起支付失败"
+msgstr ""

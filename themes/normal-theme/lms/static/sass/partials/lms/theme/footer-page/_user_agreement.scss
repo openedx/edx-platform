@@ -4,13 +4,14 @@
   box-sizing: border-box;
   max-width: 900px;
   height: auto;
-  margin: 60px auto;
+  margin: 50px auto;
   color: $title;
   h3{ 
     text-align: center;
     font-size: 20px;
     color: $title;
     line-height: 3;
+    font-weight: bold;
   }
   h4{ 
     font-size: 14px;

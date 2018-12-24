@@ -1062,3 +1062,9 @@ if settings.FEATURES.get('ENABLE_PAYMENTS_INTEGRATION', False):
     ]
 
 urlpatterns.extend(plugin_urls.get_patterns(plugin_constants.ProjectType.LMS))
+
+# professors
+if settings.FEATURES.get('ENABLE_PROFESSORS'):
+    urlpatterns += [
+        url(r'', include('professors.urls')),
+    ]
