@@ -322,8 +322,9 @@ def find_release_resources():
         raise ValueError(msg)
 
 
-""" Eliteu Custom Command """
-
+"""
+Eliteu Custom Command
+"""
 import polib
 import os
 import re
@@ -333,51 +334,21 @@ from shutil import move
 from tempfile import mkstemp
 
 
-def get_check_rules():
-    zhPattern = re.compile(u'[\u4e00-\u9fa5]+')
-    no_cn = lambda x: zhPattern.search(x.strip()) is None
-    rules = [no_cn]
-    return rules
+def find_specific_resource(lang):
+    LOCALE_DIR = "conf/locale/{lang}/LC_MESSAGES"
+    resource_dir = LOCALE_DIR.format(lang=lang)
+    flist = os.listdir(resource_dir)
+
+    result = filter(lambda x: os.path.splitext(x)[1] == '.po', flist)
+    resource = [os.path.join(resource_dir, i) for i in result]
+    return resource
 
 
-CONFIG = {
-    'BASE_DIR': '/edx/app/edxapp/edx-platform',
-    'create_prefiex': 'invalid',
-    'rules': get_check_rules(),
-}
-
-
-def valid(msg, rules):
-    """ A logic to validate a string's validity. """
-    results = [rule(msg) for rule in rules]
-    result = reduce(lambda x, y: x and y, results)
-    
-    return result
-
-
-def check(path, create_flag=False):
-    """ 
-    validate if there exists invalid character in po file.
-    if create_flag, invalid character would be extracted to a new file.
-    """
-    flag = True
-    pomsgs = polib.pofile(path)
-
-    for msg in pomsgs:
-        flag = valid(msg.msgid, CONFIG['rules'])
-        if flag is False:
-            break
-
-    if create_flag is True and flag is False:
-        create(path, CONFIG['rules'])
-
-    return flag
-
-
-def create(fpath, rules):
+def extract_invalid(fpath):
     filename = os.path.basename(fpath)
     dirname = os.path.dirname(fpath)
-    name = os.path.join(dirname, CONFIG['create_prefiex'] + '-' + filename)
+    name = os.path.join(dirname, 'invalid-' + filename)
+    zhPattern = re.compile(u'[\u4e00-\u9fa5]+')
 
     # create if not exists, truncate if exists.
     if not os.path.exists(name):
@@ -388,35 +359,36 @@ def create(fpath, rules):
         f.seek(0)
         f.truncate()
         f.close()
-
+        
     source = polib.pofile(fpath)
     target = polib.pofile(name)
     target.header = source.header
     target.metadata = source.metadata
 
     for msg in source:
-        if valid(msg.msgid, rules) is False:
+        if zhPattern.search(msg.msgid) is not None:
             target.append(msg)
 
-    target.sort(key=lambda x: len(x.msgid), reverse=True)
-    target.save()
+    if len(target) > 0:
+        target.sort(key=lambda x: len(x.msgid), reverse=True)
+        target.save()
+    else:
+        os.remove(name)
 
 
-def find_specific_resources(lang):
-    resource_dir = 'conf/locale/' + lang + '/LC_MESSAGES'
-    f_list = os.listdir(resource_dir)
-    
-    resource = []
-    for i in f_list:
-        if os.path.splitext(i)[1] == '.po':
-            resource.append(i)
-    
-    return resource
+def code_replace(source):
+    BASE_DIR = "/edx/app/edxapp/edx-platform"
+    pomsgs = polib.pofile(source)
 
-
-def extract_invalid(path):
-    fpath = os.path.join('conf/locale/zh_CN/LC_MESSAGES', path)
-    check(fpath, create_flag=True)
+    for msg in pomsgs:
+        # A list of file path
+        occurrences = msg.occurrences
+        for (path, line) in occurrences:
+            fpath = os.path.join(BASE_DIR, path)
+            if os.path.exists(fpath) and msg.msgstr != '':
+                msgid = msg.msgid.encode('utf-8')
+                msgstr = msg.msgstr.encode('utf-8')
+                replace(fpath, msgid, msgstr)
 
 
 def replace(source_file_path, pattern, substring):
@@ -445,33 +417,8 @@ def replace(source_file_path, pattern, substring):
     move(target_file_path, source_file_path)
 
 
-def code_replace(source):
-    fpath = os.path.join('conf/locale/zh_CN/LC_MESSAGES', source)
-    pomsgs = polib.pofile(fpath)
-
-    for msg in pomsgs:
-        msgid = msg.msgid.encode('utf-8')
-        msgstr = msg.msgstr.encode('utf-8')
-
-        # A list of file path
-        occurrences = msg.occurrences
-
-        for (path, line) in occurrences:
-            fpath = os.path.join(CONFIG['BASE_DIR'], path)
-            if os.path.exists(fpath) and msgstr != '':
-                replace(fpath, msgid, msgstr)
-
-
-def exchange_position(fpath):
-    """
-    Exchange msgid and msgstr position of zh.po
-
-    :param source_file_path: File which need to be exchange
-    :return:
-    """
-    source_file_path = os.path.join('conf/locale/zh_CN/LC_MESSAGES', fpath)
-    
-    source = polib.pofile(source_file_path)
+def change_position(fpath):
+    source = polib.pofile(fpath)
 
     fh, target_file_path = mkstemp()
     target = open(target_file_path, 'w')
@@ -483,36 +430,15 @@ def exchange_position(fpath):
     target.metadata = source.metadata
 
     for s in source:
-        if valid(s.msgid, CONFIG['rules']) is False:
+        valid = zhPattern.search(s.msgid)
+        if valid is not None:
             if s.msgstr != "":
                 s.msgid, s.msgstr = s.msgstr, s.msgid
         target.append(s)
 
     target.save()
-    remove(source_file_path)
-    move(target_file_path, source_file_path)  
-
-
-
-@task
-def pure_check(lang='en'):
-    resource = find_specific_resources(lang)
-    flist = [os.path.join('conf/locale/{lang}/LC_MESSAGES'.format(lang=lang), name) for name in resource]
-    results = map(check, flist)
-    pure = reduce(lambda x, y: x and y, results)
-
-    if pure:
-        msg = colorize(
-            'green',
-            "Your source language is pure.\n"
-        )
-    else:
-        msg = colorize(
-            'red',
-            "Your source language is dirty.\n"
-            "Please check your code!"
-        )
-    print msg
+    remove(fpath)
+    move(target_file_path, fpath)  
 
 
 @task
@@ -524,40 +450,37 @@ def i18n_third_party():
 
 
 @task
-@needs(
-    "pavelib.i18n.i18n_transifex_pull",
-)
 @timed
-def i18n_replace():
-    """ replace en msgstr in pofile to responsed position. """
-
-    # This will extract invalid character to a new file.    
-    resource = find_specific_resources('zh_CN')
-    map(extract_invalid, resource)
-    
-    flist = find_specific_resources('zh_CN')
-    source = filter(lambda x: x.startswith('invalid'), flist)
-    map(code_replace, source)
-
-    # remove invalid file
-    invalid = [os.path.join('conf/locale/zh_CN/LC_MESSAGES', s) for s in source]
-    map(os.remove, invalid)
-
-    # process cn invalid-file
-    print(resource)
-    map(exchange_position, resource)
-
-    # check duplicate here, if failed exit sys.
+def i18n_update():
+    # Step1: extract new word
+    # Step2: generate and validate
+    # Step3: push to transifex
     sh("i18n_tool extract")
-    sh("i18n_tool generate")
-    sh("i18n_tool validate")
-
-    # push translations if validate success.
-    sh("tx push -s -t -l zh_CN")
-
-    # pull again
     sh("i18n_tool transifex pull")
     sh("i18n_tool generate --strict")
+    sh("i18n_tool validate")
+    sh("i18n_tool transifex push")
 
-    # check pure
-    sh("paver pure_check")
+
+@task
+# @needs(
+#     "pavelib.i18n.i18n_transifex_pull",
+# )
+@timed
+def i18n_replace():
+    # Step1: pull transifex file
+    # Step2: extract invalid word
+    # Step3: replace code
+    # Step4: remove invalid file
+    # Step5: change position of code
+    
+    resource = find_specific_resource('zh_CN')
+    map(extract_invalid, resource)
+
+    flist = find_specific_resource('zh_CN')
+    invalid = filter(lambda x: x.split('/')[-1].startswith('invalid'), flist)
+    map(code_replace, invalid)
+    
+    map(os.remove, invalid)
+
+    map(change_position, resource)
