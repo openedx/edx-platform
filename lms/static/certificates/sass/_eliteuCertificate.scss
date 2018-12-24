@@ -124,13 +124,11 @@ p.accomplishment-success{
 
 @media print {
   .wrapper-accomplishment-rendering{
-    
     height: 700px;
     width: 1170px;
   }
-  .layout-accomplishment.certificate-verified .accomplishment-rendering{  
+  .layout-accomplishment .accomplishment-rendering{  
     background: none;
-
     transform: scale(0.8474576);
     transform-origin: center top;
   }
@@ -140,7 +138,7 @@ p.accomplishment-success{
   .wrapper-accomplishment-metadata{   
     display: none;
   }
-  .layout-accomplishment.certificate-verified .accomplishment-rendering{      
+  .layout-accomplishment .accomplishment-rendering{      
   }     
   .certificate-content-box{  
     margin: 0 auto;
@@ -168,13 +166,13 @@ p.accomplishment-success{
     background-position: center 116px;
     background-size: 45%;
   }
-  .layout-accomplishment.certificate-verified .accomplishment-rendering{   
+  .layout-accomplishment .accomplishment-rendering{   
     // height:700px;
   }
   .accomplishment-box-right{   
     height: 630px;
   }
 }
-.layout-accomplishment.certificate-verified .accomplishment-rendering,.layout-accomplishment.certificate-no-id-professional .accomplishment-rendering,.layout-accomplishment.certificate-professional .accomplishment-rendering,.layout-accomplishment.certificate-honor .accomplishment-rendering,.layout-accomplishment.certificate-audit .accomplishment-rendering {
+.layout-accomplishment .accomplishment-rendering,.layout-accomplishment.certificate-no-id-professional .accomplishment-rendering,.layout-accomplishment.certificate-professional .accomplishment-rendering,.layout-accomplishment.certificate-honor .accomplishment-rendering,.layout-accomplishment.certificate-audit .accomplishment-rendering {
   background: $white url('../images/bg-verified.png') center no-repeat;
 }
