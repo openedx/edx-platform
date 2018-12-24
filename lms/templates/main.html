@@ -45,6 +45,13 @@ from pipeline_mako import render_require_js_path_overrides
       </title>
   </%block>
 
+<script src="https://browser.sentry-cdn.com/4.4.2/bundle.min.js" crossorigin="anonymous"></script>
+<script type="text/javascript">
+    // Sentry Settings
+    Sentry.init({ dsn: 'https://b84c50ff7f2b4cc1b555e4d825a55352@sentry.io/1359551' });
+</script>
+
+
   % if not allow_iframing:
       <script type="text/javascript">
         /* immediately break out of an iframe if coming from the marketing website */
@@ -135,7 +142,7 @@ from pipeline_mako import render_require_js_path_overrides
   <%include file="widgets/segment-io.html" />
 
   <meta name="path_prefix" content="${EDX_ROOT_URL}">
-  
+
   <% google_site_verification_id = configuration_helpers.get_value('GOOGLE_SITE_VERIFICATION_ID', settings.GOOGLE_SITE_VERIFICATION_ID) %>
   % if google_site_verification_id:
     <meta name="google-site-verification" content="${google_site_verification_id}" />
@@ -165,6 +172,7 @@ from pipeline_mako import render_require_js_path_overrides
         branch.init('${branch_key | n, js_escaped_string}');
     </script>
 % endif
+
 
 </head>
 
