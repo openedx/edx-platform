@@ -39,7 +39,7 @@ displayname = get_enterprise_learner_generic_name(request) or username
         <div class="mobile-nav-item dropdown-item dropdown-nav-item"><a href="${reverse('dashboard')}" role="menuitem">${_("Dashboard")}</a></div>
         <div class="mobile-nav-item dropdown-item dropdown-nav-item"><a href="${reverse('learner_profile', kwargs={'username': username})}" role="menuitem">${_("Profile")}</a></div>
         <div class="mobile-nav-item dropdown-item dropdown-nav-item"><a href="${reverse('account_settings')}" role="menuitem">${_("Account")}</a></div>
-        <div class="mobile-nav-item dropdown-item dropdown-nav-item"><a href="${reverse('membership_card')}" role="menuitem">${_(u"会员中心")}</a></div>
+        <div class="mobile-nav-item dropdown-item dropdown-nav-item"><a href="${reverse('membership_card')}" role="menuitem">${_(u"VIP Center")}</a></div>
         <div class="mobile-nav-item dropdown-item dropdown-nav-item"><a href="${reverse('logout')}" role="menuitem">${_("Sign Out")}</a></div>
     </div>
 </div>
