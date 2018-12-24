@@ -58,7 +58,7 @@
       box-shadow: none;
       border-radius: 2px;
       &:focus{
-        border: 1px solid $blue;
+        border: 1px solid $primary;
         box-shadow: 0px 1px 2px 0px $border;
         outline: none;
       }
@@ -155,7 +155,7 @@
     &::after{
       background: none;
       height: 0;
-      border-bottom: 1px dashed $blue;
+      border-bottom: 1px dashed $primary;
     }
   } 
 

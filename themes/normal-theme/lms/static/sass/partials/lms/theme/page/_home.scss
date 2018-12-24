@@ -27,7 +27,7 @@
       padding-bottom: 0;
       h1{
         text-align: center;
-        color: $blue;
+        color: $primary;
         font-size: 36px;
       }
       p{
@@ -50,7 +50,7 @@
     position: relative;
   }
   .title .course-search .search-input{
-    border: 1px solid $blue;
+    border: 1px solid $primary;
     height: 48px;
     font-size: 14px;
     padding: 10px 150px 10px 20px;
@@ -60,13 +60,13 @@
     height: 48px;
     border: none;
     width: 100px;
-    background: $blue;
+    background: $primary;
     .fa-search:before{
       transform: scale(1.5);
     }
   }
   .title .course-search .search-button:hover{
-    background: $blue;
+    background: $primary;
     opacity: 0.9;
   }
 }
@@ -122,7 +122,7 @@
   &:hover{
     background: none;
     border: 1px solid $border;
-    box-shadow: 0px 1px 5px 0px $blue;
+    box-shadow: 0px 1px 5px 0px $primary;
 
     .course-image .cover-image{
       transform: scale(1.3)
