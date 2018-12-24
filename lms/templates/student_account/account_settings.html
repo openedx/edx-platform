@@ -83,16 +83,16 @@ from webpack_loader.templatetags.webpack_loader import render_bundle
 </%static:require_module>
 <div class="phone-fileds" style="display:none">
     <div class="u-field u-field-button u-field-phone"><div class="u-field-value field">
-        <span class="u-field-title field-label">${_(u"手机")}</span>
+        <span class="u-field-title field-label">${_(u"Mobile")}</span>
         % if phone == 'null':
-        <button class="u-field-link u-field-link-title-phone " id="u-field-link-phone" aria-describedby="u-field-message-help-phone">${_(u"绑定您的手机")}</button>
+        <button class="u-field-link u-field-link-title-phone " id="u-field-link-phone" aria-describedby="u-field-message-help-phone">${_(u"Bind Mobile")}</button>
         % else:
-        <span class="phone-number">${_(u"已经绑定手机号")}: ${ phone }</span> <span style="float:right; color:#346ca3; cursor: pointer;" class="change-phone-btn">${_(u"修改手机号")}</span>
+        <span class="phone-number">${_(u"Successfully Bound.")}: ${ phone }</span> <span style="float:right; color:#346ca3; cursor: pointer;" class="change-phone-btn">${_(u"Change Mobile No.")}</span>
         % endif
     </div>
     <span class="u-field-message" id="u-field-message-phone">
         <span class="u-field-message-notification" aria-live="polite"></span>
-        <span class="u-field-message-help" id="u-field-message-help-phone">${_(u"将您的手机号码与EliteMBA的账号绑定")}</span>
+        <span class="u-field-message-help" id="u-field-message-help-phone">${_(u"bind your EliteMBA account to your cellphone number")}</span>
     </span>
     </div> 
 </div>
