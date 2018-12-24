@@ -107,10 +107,13 @@
 .professor-course{
   @extend %btn-my-primary;
   position: absolute;
-  top:40px;
+  top:30px;
   right: 20px;
   color: #fff !important;
   line-height: 36px !important;
+  &:not(.btn):hover{
+    text-decoration: none;
+  }
 }
 @media screen and (max-width:992px){
   .professor-detail{
