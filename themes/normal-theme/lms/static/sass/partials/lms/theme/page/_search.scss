@@ -24,7 +24,7 @@
     margin-bottom: 17px;
   }
   .discovery-input{
-    border: 1px solid $blue;
+    border: 1px solid $primary;
     height: 36px;
     font-weight: normal;
   }
@@ -46,7 +46,7 @@
   .clear-filters{
     margin: 0;
     line-height: 46px;
-    color: $blue;
+    color: $primary;
     font-size: 14px;
     letter-spacing: 0;
     &:hover{
@@ -123,16 +123,16 @@
     letter-spacing: 0;
     &:hover{
       background: rgba(182, 220, 254, 0.5);
-      color: $blue;
+      color: $primary;
       .count{
-        color: $blue;
+        color: $primary;
       }
     }
     &.selected{
       background: rgba(182, 220, 254, 0.5);
-      color: $blue;
+      color: $primary;
       .count{
-        color: $blue;
+        color: $primary;
       }
     }
   }

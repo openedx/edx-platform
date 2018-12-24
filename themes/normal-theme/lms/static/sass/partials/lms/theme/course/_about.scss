@@ -46,7 +46,7 @@
 
       >.heading-group span{
         font-size: 14px;
-        color: $blue
+        color: $primary
       }
 
     
@@ -177,7 +177,7 @@
         font-size: 14px;
       }
       .qrcode-text{
-        background: $blue;
+        background: $primary;
         color: #fff;
         padding: 15px;
         line-height: 1.5;
@@ -233,7 +233,7 @@
   }
   .about-tab-active {
     border-bottom: 2px solid $bule;
-    color: $blue;
+    color: $primary;
   }
 }
 
@@ -273,7 +273,7 @@
     padding-left: 40px;
   }
   .about-staff-content h3{
-    color:$blue;
+    color:$primary;
     border-top: 1px dashed #e6e9ed;
     position: relative;
   }

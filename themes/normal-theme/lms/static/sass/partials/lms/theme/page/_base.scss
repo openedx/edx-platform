@@ -46,7 +46,7 @@
 
 // a
 a:not(.btn):hover, a:not(.btn):focus, a:visited:not(.btn):hover, a:visited:not(.btn):focus{
-  color: $blue;
+  color: $primary;
   opacity: 0.95;
 }
 
@@ -105,12 +105,12 @@ ol, ul, dl{
 }
 textarea:focus, input[type="text"]:focus, input[type="url"]:focus, input[type="email"]:focus, input[type="password"]:focus, input[type="tel"]:focus{  
   box-shadow: none;
-  border: 1px solid $blue;
+  border: 1px solid $primary;
   outline: none;
   @include media-breakpoint-down(sm){
     &{
       box-shadow: none;
-      border: 1px solid $blue;
+      border: 1px solid $primary;
     }
   }
 }
@@ -137,8 +137,8 @@ button:focus:not(:disabled){
   font-weight: normal;
   cursor: pointer;
   border: none;
-  background: $blue;
-  border: 1px solid $blue;
+  background: $primary;
+  border: 1px solid $primary;
   color: #fff;
   text-shadow: none;
   box-shadow: none;
@@ -146,7 +146,7 @@ button:focus:not(:disabled){
   outline: none;
 
   &:hover,&:focus, &:active, &:visited{
-    background: $blue;
+    background: $primary;
     text-decoration: none;
     opacity: 0.95;
     box-shadow: none;
@@ -167,15 +167,15 @@ button:focus:not(:disabled){
   border-radius: 3px;
   cursor: pointer;
   background: #fff;
-  color: $blue;
-  border: 1px solid $blue;
+  color: $primary;
+  border: 1px solid $primary;
   text-shadow: none;
   font-family: $font-family-sans-serif;
   outline: none;
 
   &:hover, &:focus &:active, &:visited{
     background: #f7fbfe;
-    color: $blue;
+    color: $primary;
     text-decoration: none;
   }
 }
