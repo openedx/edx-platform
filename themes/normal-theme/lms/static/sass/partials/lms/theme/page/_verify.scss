@@ -229,3 +229,38 @@
     color: #2e313c;
     
 }
+@media screen and (max-width:768px){
+    .verification-process .carousel .requirements .requirement{
+        min-height: 150px;
+    }
+    .verification-process .carousel .wrapper-task{
+        width: 100%;
+        
+    }
+    .facephoto.view .wrapper-task .wrapper-help{
+        width: 100%;
+    }
+    .verification-process .carousel .facephoto.view .wrapper-task #facecam{
+        width: 100%;
+    }
+    .verification-process .carousel .wrapper-task .task{
+        width: 100%;
+        margin-right: 0;
+    }
+    .verification-process .carousel .wrapper-task .wrapper-help{
+        width: 100%;
+    }
+    .verification-process .pay-and-verify .nav-wizard {
+        text-align: center;
+        .right{
+            float:unset;
+            font-size: 14px;
+        }
+        .prompt-verify .title{
+            font-size: 12px;
+            line-height: 24px;
+            padding-bottom: 10px;
+            margin-top: -40px;
+        }
+    }
+}
