@@ -143,3 +143,5 @@ dist
 
 # Visual Studio Code
 .vscode
+newrelic.ini
+
