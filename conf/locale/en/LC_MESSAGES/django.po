@@ -293,30 +293,6 @@ msgid ""
 "ecommerce service."
 msgstr ""
 
-#: common/djangoapps/course_modes/models.py
-msgid "honor"
-msgstr ""
-
-#: common/djangoapps/course_modes/models.py
-msgid "professional"
-msgstr ""
-
-#: common/djangoapps/course_modes/models.py
-msgid "verified"
-msgstr ""
-
-#: common/djangoapps/course_modes/models.py
-msgid "audit"
-msgstr ""
-
-#: common/djangoapps/course_modes/models.py
-msgid "no-id-professional"
-msgstr ""
-
-#: common/djangoapps/course_modes/models.py
-msgid "credit"
-msgstr ""
-
 #: common/djangoapps/course_modes/models.py lms/envs/common.py
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Honor"
@@ -16734,6 +16710,7 @@ msgid "Journals"
 msgstr ""
 
 #: lms/templates/header/navbar-authenticated.html
+#: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/header/user_dropdown.html
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
@@ -16780,7 +16757,7 @@ msgid "Resume your last course"
 msgstr ""
 
 #: lms/templates/header/user_dropdown.html
-msgid "会员中心"
+msgid "VIP Center"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
@@ -18565,6 +18542,32 @@ msgstr ""
 msgid "Go Back"
 msgstr ""
 
+#: lms/templates/professors/detail.html lms/templates/professors/index.html
+#: lms/templates/static_templates/about.html
+#: lms/templates/static_templates/blog.html
+#: lms/templates/static_templates/contact.html
+#: lms/templates/static_templates/disclaimer.html
+#: lms/templates/static_templates/donate.html
+#: lms/templates/static_templates/faq.html
+#: lms/templates/static_templates/help.html
+#: lms/templates/static_templates/honor.html
+#: lms/templates/static_templates/jobs.html
+#: lms/templates/static_templates/join_us.html
+#: lms/templates/static_templates/manual.html
+#: lms/templates/static_templates/media-kit.html
+#: lms/templates/static_templates/news.html
+#: lms/templates/static_templates/press.html
+#: lms/templates/static_templates/privacy.html
+#: lms/templates/static_templates/privacy_policy.html
+#: lms/templates/static_templates/tos.html
+#: lms/templates/static_templates/user_agreement.html
+msgid "This page left intentionally blank. Feel free to add your own content."
+msgstr ""
+
+#: lms/templates/professors/index.html
+msgid "Professors List"
+msgstr ""
+
 #: lms/templates/provider/authorize.html
 msgid ""
 "{start_strong}{application_name}{end_strong} would like to access your data "
@@ -19032,27 +19035,6 @@ msgid ""
 "been moved at {email}."
 msgstr ""
 
-#: lms/templates/static_templates/about.html
-#: lms/templates/static_templates/blog.html
-#: lms/templates/static_templates/contact.html
-#: lms/templates/static_templates/disclaimer.html
-#: lms/templates/static_templates/donate.html
-#: lms/templates/static_templates/faq.html
-#: lms/templates/static_templates/help.html
-#: lms/templates/static_templates/honor.html
-#: lms/templates/static_templates/jobs.html
-#: lms/templates/static_templates/join_us.html
-#: lms/templates/static_templates/manual.html
-#: lms/templates/static_templates/media-kit.html
-#: lms/templates/static_templates/news.html
-#: lms/templates/static_templates/press.html
-#: lms/templates/static_templates/privacy.html
-#: lms/templates/static_templates/privacy_policy.html
-#: lms/templates/static_templates/tos.html
-#: lms/templates/static_templates/user_agreement.html
-msgid "This page left intentionally blank. Feel free to add your own content."
-msgstr ""
-
 #: lms/templates/static_templates/embargo.html
 msgid ""
 "Our system indicates that you are trying to access this {platform_name} "
@@ -19127,6 +19109,7 @@ msgid "Mobile"
 msgstr ""
 
 #: lms/templates/student_account/account_settings.html
+#: themes/normal-theme/lms/templates/footer.html
 msgid "Bind Mobile"
 msgstr ""
 
@@ -19896,10 +19879,6 @@ msgid ""
 "To meet the requirements of national policies and regulations of using a "
 "real legal name，please bind your account to your cellphone number before "
 "proceeding."
-msgstr ""
-
-#: themes/normal-theme/lms/templates/footer.html
-msgid "bind your account to your cellphone number now"
 msgstr ""
 
 #. Translators: 'Open edX' is a registered trademark, please keep this
