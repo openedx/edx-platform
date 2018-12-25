@@ -22,7 +22,7 @@
       cursor: pointer;
       padding: 0;
       &:hover, &:focus{
-        color: $blue;
+        color: $primary;
         text-decoration: none;
         outline: none;
       }
@@ -42,7 +42,7 @@
       border-top-right-radius: 0;
       border-bottom-right-radius: 0;
       font-size: 14px;
-      border: 1px solid $blue;
+      border: 1px solid $primary;
     }
     .search-button{
       @extend %btn-my-primary;

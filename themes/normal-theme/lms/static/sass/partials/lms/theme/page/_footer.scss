@@ -65,7 +65,7 @@
   }
   a:hover,a:not(.btn):hover{
     text-decoration: none;
-    color: $blue;
+    color: $primary;
   }
   h3{
     font-size: 14px;
@@ -90,8 +90,8 @@
   }
   .footer-btn{
     display: inline-block;
-    border: 1px solid $blue;
-    color: $blue;
+    border: 1px solid $primary;
+    color: $primary;
     border-radius: 4px;
     margin-right: 5px;
     padding: 4px 10px 2px;
@@ -118,7 +118,7 @@
     }
     &:hover{
       color: #fff;
-      background: $blue;
+      background: $primary;
       .footer-icon svg{
         fill: #fff;
       }
@@ -133,7 +133,7 @@
     vertical-align: middle;
   }
   .footer-icon svg{
-    fill: $blue;
+    fill: $primary;
   }
 
   // Wechat

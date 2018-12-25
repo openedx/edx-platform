@@ -22,7 +22,7 @@ body.view-in-course .wrapper-course-material .course-tabs{
     &:hover, &:focus, &.active{
       border: 0;
       outline: none;
-      color: $blue;
+      color: $primary;
     }
   }
 }
@@ -95,7 +95,7 @@ body.view-in-course .wrapper-course-material .course-tabs{
       height: 16px;
       font-size: 14px;
       color: $font;
-      border: 1px solid $blue;
+      border: 1px solid $primary;
       border-top-left-radius: 3px;
       border-bottom-left-radius: 3px;
     }
@@ -158,7 +158,7 @@ body.view-in-course .wrapper-course-material .course-tabs{
       font-size: 14px;
       margin: 0 0 0 30px;
       &:hover{
-        color: $blue;
+        color: $primary;
       }
     }
     .subsection-text .details{  
@@ -222,7 +222,7 @@ body.view-in-course .wrapper-course-material .course-tabs{
   ul li a{
     color: $font;
     &:hover{ 
-      color: $blue;
+      color: $primary;
     }
   }
 }
@@ -274,7 +274,7 @@ body.view-in-course .wrapper-preview-menu, .wrapper-preview-menu{
   }
   .preview-actions .action-preview{
     .action-preview-label{
-      color: $blue;
+      color: $primary;
       font-size: 14px;
     }
     .action-preview-username-container .action-preview-username{

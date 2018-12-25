@@ -56,15 +56,7 @@
       @extend %btn-my-disable;
       margin-bottom: 5px;
     }
-    .wrapper-messages-primary .message.message-upsell .action-upgrade-container,
-    .wrapper-messages-primary .message.message-upsell .action-upgrade{
-      @extend $btn-my-primary;
-      background: #40A24D;
-      padding: 8px 15px;
-      .copy{
-        margin-right: 0;
-      }
-    }
+    
   }
 
   .course-info{
@@ -86,6 +78,15 @@
 }
 .wrapper-messages-primary .message.message-status.course-status-certavailable .actions-primary .action-certificate .btn{
   @extend %btn-my-primary;
+}
+.wrapper-messages-primary .message.message-upsell .action-upgrade{
+  @extend %btn-my-primary;
+  background: #40A24D !important;
+  border: none;
+  line-height: 34px;
+  .copy{
+    margin-right: 0;
+  }
 }
 
 
@@ -155,16 +156,19 @@
   }
   .search-field{
     font-size: 14px;
-    border: 1px solid $blue;  
+    border: 1px solid $primary;  
   }
 
   .search-field-wrapper .search-button, .cancel-button{
     width: 60px;
     &:hover, &:focus, &:active, &:hover:hover, &:hover:focus, &:hover:active{
-      background: $blue;
+      background: $primary;
       opacity: 0.95;
       outline: none;
     }
+  }
+  .fa-search:before{
+    vertical-align: top;
   }
   
 }
@@ -188,7 +192,7 @@
 
   .search-load-next{
     border: none;
-    color: $blue;
+    color: $primary;
     text-decoration: underline;
   }
 

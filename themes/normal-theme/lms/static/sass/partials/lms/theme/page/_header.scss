@@ -62,7 +62,7 @@
         font-size: $mobileFont14;
         box-sizing: border-box;
         &:hover{  
-          background-color:$blue;
+          background-color:$primary;
         }
       }
     }
@@ -93,7 +93,7 @@
     }
     a:active, a:hover, a.active{
       border-bottom: none;
-      color: $blue;
+      color: $primary;
     }
   } 
   .global-header .nav-links .secondary .dropdown-user-menu{

@@ -15,7 +15,7 @@ from professors.api import (
 
 urlpatterns = [
     url(
-        r'^professors/',
+        r'^professors/$',
         professors_index,
         name='professor_index'
     ),
