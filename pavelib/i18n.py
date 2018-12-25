@@ -456,14 +456,14 @@ def i18n_third_party():
 @timed
 def i18n_update():
     # Step1: extract new word
-    # Step2: generate and validate
-    # Step3: push to transifex
+    # Step2: push to transifex and validate
+    # Step3: generate
     sh("i18n_tool extract")
     sh("paver i18n_third_party")
-    sh("i18n_tool transifex pull")
-    sh("i18n_tool generate --strict")
-    sh("i18n_tool validate")
     sh("i18n_tool transifex push")
+    sh("i18n_tool transifex pull")
+    sh("i18n_tool validate")
+    sh("i18n_tool generate --strict")
 
 
 @task
@@ -477,6 +477,9 @@ def i18n_replace():
     # Step3: replace code
     # Step4: remove invalid file
     # Step5: change position of code
+    files = find_specific_resource('zh_CN')
+    remove = filter(lambda x: x.split('/')[-1].startswith('invalid'), files)
+    map(os.remove, remove)
     
     resource = find_specific_resource('zh_CN')
     map(extract_invalid, resource)
