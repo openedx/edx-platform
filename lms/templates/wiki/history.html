@@ -102,7 +102,24 @@
           <div class="accordion-heading">
             <a class="accordion-toggle" style="float: left;" href="{% url 'wiki:diff' revision.id %}">
               <span class="icon fa fa-plus" aria-hidden="true"></span>
-              {% include "wiki/includes/revision_info.html" with current_revision=article.current_revision %}
+              {% load wiki_tags i18n %}
+              {% trans "anonymous (IP not logged)" as default_msg %}
+              {% if not hidedate %}{{ revision.created|date:"SHORT_DATE_FORMAT" }}{% endif %} {% if not hidenumber %}(#{{ revision.revision_number }}) {% trans "by" %}{% endif %} {% if revision.user %}{{ revision.user }}{% else %}{% if article|can_moderate:user %}{{ revision.ip_address|default:default_msg }}{% else %}{% trans "anonymous (IP logged)" %}{% endif %}{% endif %}
+              {% if revision == current_revision %}
+                <strong>*</strong>
+              {% endif %}
+              {% if revision.deleted %}
+              <span class="badge badge-important">{% trans "deleted" %}</span>
+              {% endif %}
+              {% if revision.previous_revision.deleted and not revision.deleted %}
+              <span class="badge badge-success">{% trans "restored" %}</span>
+              {% endif %}
+              {% if revision.locked %}
+              <span class="badge">{% trans "locked" %}</span>
+              {% endif %}
+              {% if revision.previous_revision.locked and not revision.locked %}
+              <span class="badge">{% trans "unlocked" %}</span>
+              {% endif %}
               <div style="color: #CCC;">
                 <small>
                 {% if revision.user_message %}
