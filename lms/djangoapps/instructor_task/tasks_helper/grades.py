@@ -3,7 +3,7 @@ Functionality for generating grade reports.
 """
 import logging
 import re
-from collections import OrderedDict
+from collections import defaultdict, OrderedDict
 from datetime import datetime
 from itertools import chain, izip, izip_longest
 from time import time
@@ -615,15 +615,15 @@ class ProblemResponses(object):
             Tuple[str, List[str], UsageKey]: tuple of a block's display name, path, and
                 usage key
         """
-        display_name = course_blocks.get_xblock_field(root, 'display_name')
+        name = course_blocks.get_xblock_field(root, 'display_name') or root.category
         if path is None:
-            path = [display_name]
+            path = [name]
 
-        yield display_name, path, root
+        yield name, path, root
 
         for block in course_blocks.get_children(root):
-            display_name = course_blocks.get_xblock_field(block, 'display_name')
-            for result in cls._build_problem_list(course_blocks, block, path + [display_name]):
+            name = course_blocks.get_xblock_field(block, 'display_name') or block.category
+            for result in cls._build_problem_list(course_blocks, block, path + [name]):
                 yield result
 
     @classmethod
@@ -664,33 +664,42 @@ class ProblemResponses(object):
                     continue
 
                 block = store.get_item(block_key)
-                generated_report_data = {}
+                generated_report_data = defaultdict(list)
 
                 # Blocks can implement the generate_report_data method to provide their own
                 # human-readable formatting for user state.
                 if hasattr(block, 'generate_report_data'):
                     try:
                         user_state_iterator = user_state_client.iter_all_for_block(block_key)
-                        generated_report_data = {
-                            username: state
-                            for username, state in
-                            block.generate_report_data(user_state_iterator, max_count)
-                        }
+                        for username, state in block.generate_report_data(user_state_iterator, max_count):
+                            generated_report_data[username].append(state)
                     except NotImplementedError:
                         pass
 
-                responses = list_problem_responses(course_key, block_key, max_count)
+                responses = []
 
-                student_data += responses
-                for response in responses:
+                for response in list_problem_responses(course_key, block_key, max_count):
                     response['title'] = title
                     # A human-readable location for the current block
                     response['location'] = ' > '.join(path)
                     # A machine-friendly location for the current block
                     response['block_key'] = str(block_key)
-                    user_data = generated_report_data.get(response['username'], {})
-                    response.update(user_data)
-                    student_data_keys = student_data_keys.union(user_data.keys())
+                    # A block that has a single state per user can contain multiple responses
+                    # within the same state.
+                    user_states = generated_report_data.get(response['username'], [])
+                    if user_states:
+                        # For each response in the block, copy over the basic data like the
+                        # title, location, block_key and state, and add in the responses
+                        for user_state in user_states:
+                            user_response = response.copy()
+                            user_response.update(user_state)
+                            student_data_keys = student_data_keys.union(user_state.keys())
+                            responses.append(user_response)
+                    else:
+                        responses.append(response)
+
+                student_data += responses
+
                 if max_count is not None:
                     max_count -= len(responses)
                     if max_count <= 0:
