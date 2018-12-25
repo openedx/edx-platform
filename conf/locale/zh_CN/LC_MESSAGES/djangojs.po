@@ -53,7 +53,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-12-18 10:17+0800\n"
+"POT-Creation-Date: 2018-12-25 11:55+0800\n"
 "PO-Revision-Date: 2018-12-07 12:23+0000\n"
 "Last-Translator: li ying <code@eliteu.cn>, 2018\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)\n"
@@ -4402,6 +4402,12 @@ msgid ""
 msgstr "如果您仍然要删除账号，请输入您的账号密码："
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: lms/static/js/student_account/views/account_settings_factory.js
+#: lms/templates/student_account/account.underscore
+msgid "Password"
+msgstr "密码"
+
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "Yes, Delete"
 msgstr "是的，确定删除"
 
@@ -4560,11 +4566,6 @@ msgid ""
 "The name that identifies you on {platform_name}. You cannot change your "
 "username."
 msgstr "您在{platform_name}上的名字，用户名无法更改。"
-
-#: lms/static/js/student_account/views/account_settings_factory.js
-#: lms/templates/student_account/account.underscore
-msgid "Password"
-msgstr "密码"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Check your email account for instructions to reset your password."
@@ -5022,7 +5023,7 @@ msgstr "展开全部"
 #: openedx/features/course_experience/static/course_experience/js/CourseOutline.js
 #: lms/templates/ccx/schedule.underscore
 msgid "Collapse All"
-msgstr "折叠全部"
+msgstr "全部折叠"
 
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result"
@@ -10448,6 +10449,10 @@ msgstr "到期日期:"
 #: membership/static/membership/js/card.js
 msgid "Membership expired"
 msgstr "会员已过期"
+
+#: membership/static/membership/js/card.js
+msgid "续费"
+msgstr ""
 
 #: membership/static/membership/js/index.js
 msgid "Average per month"

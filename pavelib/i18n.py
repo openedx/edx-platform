@@ -461,9 +461,7 @@ def i18n_update():
     sh("i18n_tool extract")
     sh("paver i18n_third_party")
     sh("i18n_tool transifex push")
-    sh("i18n_tool transifex pull")
     sh("i18n_tool validate")
-    sh("i18n_tool generate --strict")
 
 
 @task
@@ -491,8 +489,22 @@ def i18n_replace():
     map(os.remove, invalid)
     map(change_position, resource)
 
+   
+@task
+@timed
+def i18n_push():
     # Re extract after code replace
     sh("i18n_tool extract")
+    sh("paver i18n_third_party")
     sh("i18n_tool validate")
-    sh("tx push -s -t -l zh_CN")
-    
+    sh("i18n_tool generate --strict")
+
+    msg = colorize(
+            'green',
+            "Please checking your code after update and replace."
+        )
+    print msg
+
+    con = raw_input("Are you finish code checking (y/n)? ")
+    if con.lower() == 'y':
+        sh("tx push -s -t -l zh_CN")

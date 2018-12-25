@@ -45,8 +45,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-12-18 10:17+0800\n"
-"PO-Revision-Date: 2018-12-18 02:17:43.298592\n"
+"POT-Creation-Date: 2018-12-25 11:54+0800\n"
+"PO-Revision-Date: 2018-12-25 03:55:00.153486\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -7009,7 +7009,7 @@ msgstr ""
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
-#: lms/djangoapps/instructor_task/tasks.py
+#: lms/djangoapps/instructor_task/tasks.py lms/templates/wiki/history.html
 #: lms/templates/wiki/plugins/attachments/index.html wiki/models/article.py
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
@@ -9106,6 +9106,37 @@ msgid ""
 msgstr ""
 
 #: lms/templates/wiki/history.html
+msgid "anonymous (IP not logged)"
+msgstr ""
+
+#: lms/templates/wiki/history.html
+#: wiki/templates/wiki/includes/revision_info.html
+msgid "by"
+msgstr ""
+
+#: lms/templates/wiki/history.html
+#: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/templates/wiki/includes/revision_info.html
+msgid "anonymous (IP logged)"
+msgstr ""
+
+#: lms/templates/wiki/history.html
+#: wiki/templates/wiki/includes/revision_info.html
+msgid "restored"
+msgstr ""
+
+#: lms/templates/wiki/history.html wiki/models/article.py
+#: wiki/templates/wiki/article.html
+#: wiki/templates/wiki/includes/revision_info.html
+msgid "locked"
+msgstr ""
+
+#: lms/templates/wiki/history.html
+#: wiki/templates/wiki/includes/revision_info.html
+msgid "unlocked"
+msgstr ""
+
+#: lms/templates/wiki/history.html
 msgid "(no log message)"
 msgstr ""
 
@@ -9383,11 +9414,6 @@ msgstr ""
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 #: wiki/templates/wiki/deleted.html
 msgid "Restore"
-msgstr ""
-
-#: lms/templates/wiki/plugins/attachments/index.html
-#: wiki/templates/wiki/includes/revision_info.html
-msgid "anonymous (IP logged)"
 msgstr ""
 
 #: lms/templates/wiki/plugins/attachments/index.html
@@ -12467,6 +12493,10 @@ msgid ""
 msgstr ""
 
 #: lms/templates/index.html lms/templates/courseware/courses.html
+msgid "List of Courses"
+msgstr ""
+
+#: lms/templates/index.html lms/templates/courseware/courses.html
 #: themes/stanford-style/lms/templates/index.html
 msgid "Search for a course"
 msgstr ""
@@ -14987,10 +15017,6 @@ msgid "Show Earlier Course Updates"
 msgstr ""
 
 #: lms/templates/courseware/courses.html
-msgid "List of Courses"
-msgstr ""
-
-#: lms/templates/courseware/courses.html
 msgid "Refine Your Search"
 msgstr ""
 
@@ -16710,7 +16736,6 @@ msgid "Journals"
 msgstr ""
 
 #: lms/templates/header/navbar-authenticated.html
-#: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/header/user_dropdown.html
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
@@ -16727,6 +16752,11 @@ msgstr ""
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 msgid "Sysadmin"
+msgstr ""
+
+#: lms/templates/header/navbar-authenticated.html
+#: lms/templates/header/navbar-not-authenticated.html
+msgid "Professor"
 msgstr ""
 
 #: lms/templates/header/navbar-authenticated.html
@@ -18542,30 +18572,24 @@ msgstr ""
 msgid "Go Back"
 msgstr ""
 
-#: lms/templates/professors/detail.html lms/templates/professors/index.html
-#: lms/templates/static_templates/about.html
-#: lms/templates/static_templates/blog.html
-#: lms/templates/static_templates/contact.html
-#: lms/templates/static_templates/disclaimer.html
-#: lms/templates/static_templates/donate.html
-#: lms/templates/static_templates/faq.html
-#: lms/templates/static_templates/help.html
-#: lms/templates/static_templates/honor.html
-#: lms/templates/static_templates/jobs.html
-#: lms/templates/static_templates/join_us.html
-#: lms/templates/static_templates/manual.html
-#: lms/templates/static_templates/media-kit.html
-#: lms/templates/static_templates/news.html
-#: lms/templates/static_templates/press.html
-#: lms/templates/static_templates/privacy.html
-#: lms/templates/static_templates/privacy_policy.html
-#: lms/templates/static_templates/tos.html
-#: lms/templates/static_templates/user_agreement.html
-msgid "This page left intentionally blank. Feel free to add your own content."
+#: lms/templates/professors/detail.html
+msgid "教授详情"
 msgstr ""
 
 #: lms/templates/professors/index.html
 msgid "Professors List"
+msgstr ""
+
+#: lms/templates/professors/index.html
+msgid "教育的目的"
+msgstr ""
+
+#: lms/templates/professors/index.html
+msgid "教育不是生搬硬套的知识灌输，而是对学习者自由发展潜力的启发。 智慧是运用知识的能力。英荔教育不仅传播知识，更注重智慧的培养。"
+msgstr ""
+
+#: lms/templates/professors/index.html
+msgid "我们希望把国内外成功的商业管理经验和智慧传授给更多不安于现状且积极求变的弄潮儿。"
 msgstr ""
 
 #: lms/templates/provider/authorize.html
@@ -19033,6 +19057,27 @@ msgid ""
 "The page that you were looking for was not found. Go back to the "
 "{link_start}homepage{link_end} or let us know about any pages that may have "
 "been moved at {email}."
+msgstr ""
+
+#: lms/templates/static_templates/about.html
+#: lms/templates/static_templates/blog.html
+#: lms/templates/static_templates/contact.html
+#: lms/templates/static_templates/disclaimer.html
+#: lms/templates/static_templates/donate.html
+#: lms/templates/static_templates/faq.html
+#: lms/templates/static_templates/help.html
+#: lms/templates/static_templates/honor.html
+#: lms/templates/static_templates/jobs.html
+#: lms/templates/static_templates/join_us.html
+#: lms/templates/static_templates/manual.html
+#: lms/templates/static_templates/media-kit.html
+#: lms/templates/static_templates/news.html
+#: lms/templates/static_templates/press.html
+#: lms/templates/static_templates/privacy.html
+#: lms/templates/static_templates/privacy_policy.html
+#: lms/templates/static_templates/tos.html
+#: lms/templates/static_templates/user_agreement.html
+msgid "This page left intentionally blank. Feel free to add your own content."
 msgstr ""
 
 #: lms/templates/static_templates/embargo.html
@@ -24111,11 +24156,6 @@ msgstr ""
 msgid "user"
 msgstr ""
 
-#: wiki/models/article.py wiki/templates/wiki/article.html
-#: wiki/templates/wiki/includes/revision_info.html
-msgid "locked"
-msgstr ""
-
 #: wiki/models/article.py wiki/models/pluginbase.py
 msgid "article"
 msgstr ""
@@ -24839,18 +24879,6 @@ msgstr ""
 msgid "New article below"
 msgstr ""
 
-#: wiki/templates/wiki/includes/revision_info.html
-msgid "by"
-msgstr ""
-
-#: wiki/templates/wiki/includes/revision_info.html
-msgid "restored"
-msgstr ""
-
-#: wiki/templates/wiki/includes/revision_info.html
-msgid "unlocked"
-msgstr ""
-
 #: wiki/views/accounts.py
 msgid "You are now sign up... and now you can sign in!"
 msgstr ""
@@ -25038,7 +25066,7 @@ msgid "Six Course Specializations of Elite MBA School"
 msgstr ""
 
 #: membership/templates/membership/index.html
-msgid "Activate your all-round business gene, you alone are a team!"
+msgid "Activate your all-round business gene, you alone are a team"
 msgstr ""
 
 #: membership/templates/membership/index.html
@@ -25136,7 +25164,7 @@ msgstr ""
 #: membership/templates/membership/index.html
 msgid ""
 "Enjoy learning all courses in the Eliteu MBA school during the study "
-"period，You can join the new class online now!"
+"period，You can join the new class online now"
 msgstr ""
 
 #: membership/templates/membership/index.html
