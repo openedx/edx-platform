@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-12-18 10:17+0800\n"
-"PO-Revision-Date: 2018-12-18 02:17:43.312974\n"
+"POT-Creation-Date: 2018-12-25 11:55+0800\n"
+"PO-Revision-Date: 2018-12-25 03:55:00.169516\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -4376,6 +4376,12 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: lms/static/js/student_account/views/account_settings_factory.js
+#: lms/templates/student_account/account.underscore
+msgid "Password"
+msgstr ""
+
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "Yes, Delete"
 msgstr ""
 
@@ -4529,11 +4535,6 @@ msgstr ""
 msgid ""
 "The name that identifies you on {platform_name}. You cannot change your "
 "username."
-msgstr ""
-
-#: lms/static/js/student_account/views/account_settings_factory.js
-#: lms/templates/student_account/account.underscore
-msgid "Password"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -10390,6 +10391,10 @@ msgstr ""
 
 #: membership/static/membership/js/card.js
 msgid "Membership expired"
+msgstr ""
+
+#: membership/static/membership/js/card.js
+msgid "续费"
 msgstr ""
 
 #: membership/static/membership/js/index.js
