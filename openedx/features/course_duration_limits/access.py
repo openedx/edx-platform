@@ -15,7 +15,7 @@ from course_modes.models import CourseMode
 from lms.djangoapps.courseware.access_response import AccessError
 from lms.djangoapps.courseware.access_utils import ACCESS_GRANTED
 from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link
-from lms.djangoapps.courseware.masquerade import get_course_masquerade, is_masquerading_as_student
+from lms.djangoapps.courseware.masquerade import get_course_masquerade, is_masquerading_as_specific_student
 from openedx.core.djangoapps.catalog.utils import get_course_run_details
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
@@ -123,7 +123,7 @@ def register_course_expired_message(request, course):
     if not expiration_date:
         return
 
-    if is_masquerading_as_student(request.user, course.id) and timezone.now() > expiration_date:
+    if is_masquerading_as_specific_student(request.user, course.id) and timezone.now() > expiration_date:
         upgrade_message = _('This learner does not have access to this course. '
                             'Their access expired on {expiration_date}.')
         PageLevelMessages.register_warning_message(

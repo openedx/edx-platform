@@ -129,27 +129,29 @@ class CourseDurationLimitConfig(StackedConfigurationModel):
             elif has_staff_roles(user, course_key):
                 return False
 
+        no_masquerade = get_course_masquerade(user, course_key) is None
+        is_in_holdback = False
+        student_masquerade = is_masquerading_as_specific_student(user, course_key)
+        # TODO: clean up as part of REV-100
+        if user and user.username and (no_masquerade or student_masquerade):
+            try:
+                holdback_value = ExperimentData.objects.get(
+                    user=user,
+                    experiment_id=EXPERIMENT_ID,
+                    key=EXPERIMENT_DATA_HOLDBACK_KEY,
+                ).value
+                is_in_holdback = holdback_value == 'True'
+            except ExperimentData.DoesNotExist:
+                pass
+        if is_in_holdback:
+            return False
+
         # enrollment might be None if the user isn't enrolled. In that case,
         # return enablement as if the user enrolled today
-        if enrollment is None:
+        # Also, ignore enrollment creation date if the user is masquerading.
+        if enrollment is None or not no_masquerade:
             return cls.enabled_for_course(course_key=course_key, target_datetime=timezone.now())
         else:
-            # TODO: clean up as part of REV-100
-            is_in_holdback = False
-            no_masquerade = get_course_masquerade(user, course_key) is None
-            student_masquerade = is_masquerading_as_specific_student(user, course_key)
-            if user and (no_masquerade or student_masquerade):
-                try:
-                    holdback_value = ExperimentData.objects.get(
-                        user=user,
-                        experiment_id=EXPERIMENT_ID,
-                        key=EXPERIMENT_DATA_HOLDBACK_KEY,
-                    ).value
-                    is_in_holdback = holdback_value == 'True'
-                except ExperimentData.DoesNotExist:
-                    pass
-            if is_in_holdback:
-                return False
             current_config = cls.current(course_key=enrollment.course_id)
             return current_config.enabled_as_of_datetime(target_datetime=enrollment.created)
 
