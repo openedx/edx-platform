@@ -46,7 +46,8 @@ $icon-width: 18px;
 .course-content .bookmark-button::before,
 .fa-floppy-o:before,
 .fa-save:before,
-.fa-arrow-right:before
+.fa-arrow-right:before,
+.fa-exclamation-circle:before
 {
   content: '';
   display: inline-block;
@@ -248,6 +249,9 @@ $icon-width: 18px;
     }
   }
 }
+.fa-exclamation-circle:before{
+  background-position: calcP(8, 3)
+}
 
 
 // 2. 课程详情页的新icon
@@ -297,4 +301,13 @@ $icon-width: 18px;
 }
 .fa-my-arrow{
   background-position: calcP(10, 4)
+}
+.fa-my-play{
+  background-position: calcP(12, 4)
+}
+.fa-my-play-circle{
+  background-position: calcP(13, 4)
+}
+.fa-my-close{
+  background-position: calcP(14, 4)
 }

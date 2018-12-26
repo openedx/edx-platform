@@ -12,7 +12,7 @@
     margin: 0 auto;
     max-width: none;
     width: 100%;
-    flex: 1;
+    flex: 1 0 auto;
     padding: 0;
     box-sizing: border-box;
     background-image: linear-gradient(to bottom, #fff 0%, #fff 45%, #f2f9ff 100%);
@@ -27,7 +27,7 @@
     .container,
     .course-updates
     {
-      max-width: 1220px;
+      max-width: 1200px;
       margin: 0 auto;
       width: 96%;
       box-sizing: border-box;
@@ -37,7 +37,7 @@
   }
 }
 .wrapper-preview-menu{
-  max-width: 1220px;
+  max-width: 1200px;
   margin: 0 auto;
   width: 96%;
   box-sizing: border-box;
@@ -120,10 +120,14 @@ textarea:focus, input[type="text"]:focus, input[type="url"]:focus, input[type="e
 // 底色蓝，字体白按钮
 input[type="submit"], input[type="button"], button, .button{
   -webkit-font-smoothing: unset;
+  box-shadow: none;
+  text-shadow: none;
 }
-button:focus:not(:disabled){
+button:focus:not(:disabled), button:hover:not(:disabled){
   outline: none;
   border: none;
+  background-image: none;
+  background-color: transparent;
 }
 %btn-my-primary{
   display: inline-block;

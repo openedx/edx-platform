@@ -76,10 +76,10 @@
     color: $font;
   }
 }
+
+.wrapper-messages-primary .message.message-upsell .action-upgrade,
+.wrapper-messages-primary .message.message-status .verification-cta .btn,
 .wrapper-messages-primary .message.message-status.course-status-certavailable .actions-primary .action-certificate .btn{
-  @extend %btn-my-primary;
-}
-.wrapper-messages-primary .message.message-upsell .action-upgrade{
   @extend %btn-my-primary;
   background: #40A24D !important;
   border: none;
