@@ -641,15 +641,16 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
         if settings.FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION'):
             from membership.models import VIPCourseEnrollment
             can_vip_enroll = VIPCourseEnrollment.can_vip_enroll(user, course_id)
-        if mode not in (CourseMode.AUDIT, CourseMode.HONOR, None) and not has_api_key_permissions and not can_vip_enroll:
-            return Response(
-                status=status.HTTP_403_FORBIDDEN,
-                data={
-                    "message": u"User does not have permission to create enrollment with mode [{mode}].".format(
-                        mode=mode
-                    )
-                }
-            )
+        if mode not in (CourseMode.AUDIT, CourseMode.HONOR, None):
+            if not has_api_key_permissions or not can_vip_enroll:
+                return Response(
+                    status=status.HTTP_403_FORBIDDEN,
+                    data={
+                        "message": u"User does not have permission to create enrollment with mode [{mode}].".format(
+                            mode=mode
+                        )
+                    }
+                )
 
         embargo_response = embargo_api.get_embargo_response(request, course_id, user)
 
@@ -732,7 +733,8 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                     unicode(course_id),
                     mode=mode,
                     is_active=is_active,
-                    enrollment_attributes=enrollment_attributes
+                    enrollment_attributes=enrollment_attributes,
+                    user=user
                 )
 
             if can_vip_enroll:
