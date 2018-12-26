@@ -262,10 +262,68 @@
   
 
   // 1.1 课程详情页 课程简介
-  .about-info ul{
-    padding: 0 0 0 20px;
-    margin: 0;
-    list-style: disc;
+  .about-info{
+    ul{
+      padding: 0 0 0 20px;
+      margin: 0;
+      list-style: disc;
+    }
+    h3{
+      margin: 10px 0;
+    }
+    a{
+      cursor: pointer;
+      line-height: 2.3;
+    }
+    a span{
+      vertical-align: middle;
+      margin-left: 10px;
+      transform: scale(0.95)
+    }
+  } 
+
+  .about-video{
+    text-align: center;
+    position: relative;
+    width: 270px;
+    margin: 0 auto;
+    cursor: pointer;
+
+    &:hover{
+      .about-play{
+        background: rgba(0, 117, 180, 1);
+      }
+    }
+
+    img{
+      width: 270px;
+    }
+
+    .about-play{
+      width: 46px;
+      height: 46px;
+      background: rgba(0, 117, 180, 0.65);
+      position: absolute;
+      top: 35px;
+      left: 105px;
+      border-radius: 23px;
+    }
+
+    .fa-my-play{
+      position: relative;
+      top: 13px;
+      left: 1px;
+    }
+  }
+
+  .about-language{
+    border-top: 1px solid #eeeeee;
+    padding-top: 30px;
+    margin-top: 30px !important;
+    img{
+      width: 200px;
+      margin-top: 10px;
+    }
   }
 
   // 1.2 课程性情页 授课老师 
@@ -310,40 +368,43 @@
   // 1.3 课程详情页 大纲
   .about-outline{
     padding-left: 35px;
+
+    h3{
+      position: relative;
+      left: -20px;
+      padding-top: 25px;
+      font-size: 15px;
+      border-top: 2px dashed #eeeeee;
+      margin: 30px 0 10px 0;
+      line-height: 2;
+      &:first-child{
+        border-top: none;
+        margin: 0;
+        padding-top: 10px;
+      }
+      &:before{
+        content: '';
+        display: inline-block;
+        height: 20px;
+        width: 20px;
+        background-size: 300px;
+        background-image: url("/static/normal-theme/images/iconfont.png");
+        background-position: -62px -40px;
+        position: relative;
+        top: 4px;
+        left: -10px;
+        transform: scale(0.8);
+      }
+    }
+
+    p {
+      padding-left: 15px;
+      border-left: 3px solid #eeeeee;
+      margin: 15px 0;
+      line-height: 15px;
+    }
   }
-  .about-outline h3{
-    position: relative;
-    left: -20px;
-    padding-top: 25px;
-    font-size: 15px;
-    border-top: 2px dashed #eeeeee;
-    margin: 30px 0 10px 0;
-    line-height: 2;
-  }
-  .about-outline h3:first-child{
-    border-top: none;
-    margin: 0;
-    padding-top: 10px;
-  }
-  .about-outline h3:before{
-    content: '';
-    display: inline-block;
-    height: 20px;
-    width: 20px;
-    background-size: 300px;
-    background-image: url("/static/normal-theme/images/iconfont.png");
-    background-position: -62px -40px;
-    position: relative;
-    top: 4px;
-    left: -10px;
-    transform: scale(0.8);
-  }
-  .about-outline p {
-    padding-left: 15px;
-    border-left: 3px solid #eeeeee;
-    margin: 15px 0;
-    line-height: 15px;
-  }
+
   .about-outline-indent{
     padding-left: 28px;
   }
@@ -352,6 +413,36 @@
   }
 }
 
+
+// video
+#player-container-id{
+  position: fixed;
+  z-index: 101;
+  top: 50%;
+  left: 50%;
+  margin-top: -225px;
+  margin-left: -400px;
+  width:800px;
+  height: 450px;
+}
+
+.about-cover{
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  background: rgba(0,0,0,0.8);
+  top: 0;
+  left: 0;
+  z-index: 100;
+
+  .fa-my-close{
+    position: absolute;
+    top: 10%;
+    right: 10%;
+    transform: scale(2);
+    cursor: pointer;
+  }
+}
 
 
 
@@ -385,6 +476,10 @@
         margin-top: 10px;
       }
     }
+  }
+  .my-theme-course-about #player-container-id{
+    width: 100%;
+    height: auto;
   }
 }
 

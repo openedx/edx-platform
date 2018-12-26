@@ -45,7 +45,7 @@
   background: #fff;
   border-radius: 3px;
   box-shadow: 0px 1px 4px 0px $border;
-  margin: 0 0.7% 30px;
+  margin: 0 0.9% 30px;
   min-width: 280px;
   line-height: 1.5;
   vertical-align: middle;
@@ -55,6 +55,8 @@
   position: absolute;
   top: 10px;
   left: 10px;
+  border-radius: 3px;
+  border: 1px solid #e6e9ed;
 }
 .professor-block .professor-name{
   margin-bottom: 3px;

@@ -32,10 +32,14 @@
     @extend %btn-my-primary;
     height: 36px;
     border: none;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+
   }
   .loading-spinner{
     top: 0;
     width: 40%;
+    background: $primary;
   }
 }
 

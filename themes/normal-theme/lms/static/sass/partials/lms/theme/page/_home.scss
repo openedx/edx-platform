@@ -86,6 +86,11 @@
   .course-image{
     overflow: hidden;
   }
+  @media screen and (min-width:1200px){
+    .course-image{
+      height: 160px;
+    }
+  }
   
   .course-image .cover-image{
     border-radius: 3px;

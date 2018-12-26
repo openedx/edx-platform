@@ -16,6 +16,9 @@
     $.ajax({
         url: '/api/v1/professors/',
         method: 'GET',
+        data: {
+            page_size: 1000,
+        },
         success: function(res){
             var list = res.results;
             var elem = '';
