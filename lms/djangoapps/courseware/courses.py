@@ -491,8 +491,9 @@ def sort_by_start_date(courses):
     courses = sorted(
         courses,
         key=lambda course: (course.has_ended(), course.start is None, course.start),
-        reverse=False
+        reverse=True if settings.FEATURES.get('ENABLE_ELITE_COURSES_SORT') else False
     )
+
 
     return courses
 
