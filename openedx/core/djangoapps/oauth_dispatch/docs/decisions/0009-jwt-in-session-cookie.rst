@@ -69,6 +69,19 @@ Login -> Cookie -> API
        open edX REST endpoints that support JWT-based authentication derive from this base class, their authentication
        checks will make use of the JWTs provided in the JWT-related cookies.
 
+#. **Introduce HTTP_USE_JWT_COOKIE header for backward compatibility and rollout.**
+     * As we incrementally add JWTAuthentication throughout all backend microservices and APIs, we will need to support
+       multiple authentication mechanisms for a period of time. Once JWT cookies are enabled and automatically sent with
+       every (post-Login) AJAX request from the browser, backend APIs will try to authenticate the request with the
+       sent JWT cookies.
+     * The cookies are sent regardless of whether the request comes from an updated microfrontend or from a legacy
+       server-side rendered UI. However, since only updated microfrontends will have the logic to refresh JWT cookies
+       (see "Refresh JWT Cookies" below), older frontends will not handle expired JWT cookies and so will run into 401
+       failures.
+     * To prevent this issue, we will introduce a new HTTP header called "HTTP_USE_JWT_COOKIE" that will be selectively
+       set only by microfrontends that want to use JWT cookie based authentication. The new middleware will check for
+       this header before trying to reconstitute and use the JWT token.
+
 .. _`Lightrail's design`: https://medium.com/lightrail/getting-token-authentication-right-in-a-stateless-single-page-application-57d0c6474e3
 .. _Django Rest Framework JWT: https://getblimp.github.io/django-rest-framework-jwt/
 .. _JWT_AUTH_COOKIE: https://github.com/GetBlimp/django-rest-framework-jwt/blob/master/docs/index.md#jwt_auth_cookie

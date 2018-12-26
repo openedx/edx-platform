@@ -45,6 +45,7 @@ from student.roles import CourseStaffRole
 from student.tests.factories import AdminFactory, UserFactory, SuperuserFactory
 from util.models import RateLimitConfiguration
 from util.testing import UrlResetMixin
+from six import text_type
 
 
 class EnrollmentTestMixin(object):
@@ -1413,3 +1414,111 @@ class UnenrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase):
         url = reverse('unenrollment')
         headers = self.build_jwt_headers(submitting_user)
         return self.client.post(url, json.dumps(data), content_type='application/json', **headers)
+
+
+@ddt.ddt
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+class UserRoleTest(ModuleStoreTestCase):
+    """
+    Tests the API call to list user roles.
+    """
+    USERNAME = "Bob"
+    EMAIL = "bob@example.com"
+    STAFF_USERNAME = "Bobstaff"
+    STAFF_EMAIL = "bobStaff@example.com"
+    PASSWORD = "edx"
+
+    ENABLED_CACHES = ['default']
+
+    def setUp(self):
+        """ Create a course and user, then log in. """
+        super(UserRoleTest, self).setUp()
+        self.course1 = CourseFactory.create(emit_signals=True, org="org1", course="course1", run="run1")
+        self.course2 = CourseFactory.create(emit_signals=True, org="org2", course="course2", run="run2")
+        self.user = UserFactory.create(
+            username=self.USERNAME,
+            email=self.EMAIL,
+            password=self.PASSWORD,
+        )
+        self.staff_user = UserFactory.create(
+            username=self.STAFF_USERNAME,
+            email=self.STAFF_EMAIL,
+            password=self.PASSWORD,
+            is_staff=True,
+        )
+        self.client.login(username=self.USERNAME, password=self.PASSWORD)
+
+    def _create_expected_role_dict(self, course, role):
+        """ Creates the expected role dict object that the view should return """
+        return {
+            'course_id': text_type(course.id),
+            'org': course.org,
+            'role': role.ROLE,
+        }
+
+    def _assert_roles(self, expected_roles, is_staff, course_id=None):
+        """ Asserts that the api call is successful and returns the expected roles """
+        if course_id is not None:
+            response = self.client.get(reverse('roles'), {'course_id': course_id})
+        else:
+            response = self.client.get(reverse('roles'))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response_data = json.loads(response.content)
+        sort_by_role_id = lambda r: r['course_id']
+        response_data['roles'] = sorted(response_data['roles'], key=sort_by_role_id)
+        expected_roles = sorted(expected_roles, key=sort_by_role_id)
+        expected = {'roles': expected_roles, 'is_staff': is_staff}
+        self.assertEqual(response_data, expected)
+
+    def _login(self, is_staff):
+        """ If is_staff is true, logs in the staff user. Otherwise, logs in the non-staff user """
+        logged_in_user = self.staff_user if is_staff else self.user
+        self.client.login(username=logged_in_user.username, password=self.PASSWORD)
+        return logged_in_user
+
+    def test_not_logged_in(self):
+        self.client.logout()
+        response = self.client.get(reverse('roles'))
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    @ddt.data(True, False)
+    def test_roles_no_roles(self, is_staff):
+        self._login(is_staff)
+        self._assert_roles([], is_staff)
+
+    @ddt.data(True, False)
+    def test_roles(self, is_staff):
+        logged_in_user = self._login(is_staff)
+        role1 = CourseStaffRole(self.course1.id)
+        role1.add_users(logged_in_user)
+        expected_role1 = self._create_expected_role_dict(self.course1, role1)
+        expected_roles = [expected_role1]
+        self._assert_roles(expected_roles, is_staff)
+        role2 = CourseStaffRole(self.course2.id)
+        role2.add_users(logged_in_user)
+        expected_role2 = self._create_expected_role_dict(self.course2, role2)
+        expected_roles.append(expected_role2)
+        self._assert_roles(expected_roles, is_staff)
+
+    def test_roles_filter(self):
+        role1 = CourseStaffRole(self.course1.id)
+        role1.add_users(self.user)
+        expected_role1 = self._create_expected_role_dict(self.course1, role1)
+        role2 = CourseStaffRole(self.course2.id)
+        role2.add_users(self.user)
+        expected_role2 = self._create_expected_role_dict(self.course2, role2)
+        self._assert_roles([expected_role1], False, course_id=text_type(self.course1.id))
+        self._assert_roles([expected_role2], False, course_id=text_type(self.course2.id))
+
+    def test_roles_exception(self):
+        with patch('enrollment.api.get_user_roles') as mock_get_user_roles:
+            mock_get_user_roles.side_effect = Exception()
+            response = self.client.get(reverse('roles'))
+            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+            expected_response = {
+                "message": (
+                    u"An error occurred while retrieving roles for user '{username}"
+                ).format(username=self.user.username)
+            }
+            response_data = json.loads(response.content)
+            self.assertEqual(response_data, expected_response)

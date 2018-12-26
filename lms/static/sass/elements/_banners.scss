@@ -58,6 +58,13 @@ $full-width-banner-margin: 20px;
       color: $link-color;
       text-decoration: underline !important;
     }
+
+  .user-messages-ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
   }
 
   .alert {

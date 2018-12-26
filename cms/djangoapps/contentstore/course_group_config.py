@@ -10,7 +10,7 @@ from contentstore.utils import reverse_usage_url
 from lms.lib.utils import get_parent_unit
 from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_user_partition
 from util.db import MYSQL_MAX_INT, generate_int_id
-from xmodule.partitions.partitions import MINIMUM_STATIC_PARTITION_ID, UserPartition
+from xmodule.partitions.partitions import MINIMUM_STATIC_PARTITION_ID, ReadOnlyUserPartitionError, UserPartition
 from xmodule.partitions.partitions_service import get_all_partitions_for_course
 from xmodule.split_test_module import get_split_user_partitions
 
@@ -105,7 +105,10 @@ class GroupConfiguration(object):
         """
         Get user partition for saving in course.
         """
-        return UserPartition.from_json(self.configuration)
+        try:
+            return UserPartition.from_json(self.configuration)
+        except ReadOnlyUserPartitionError:
+            raise GroupConfigurationsValidationError(_("unable to load this type of group configuration"))
 
     @staticmethod
     def _get_usage_info(course, unit, item, usage_info, group_id, scheme_name=None):

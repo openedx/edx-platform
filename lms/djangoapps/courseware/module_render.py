@@ -15,7 +15,6 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.template.context_processors import csrf
-from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.http import Http404, HttpResponse, HttpResponseForbidden
 from django.utils.text import slugify
@@ -27,6 +26,7 @@ from edx_proctoring.services import ProctoringService
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from requests.auth import HTTPBasicAuth
+from rest_framework.decorators import api_view
 from six import text_type
 from xblock.core import XBlock
 from xblock.django.request import django_to_webob_request, webob_to_django_response
@@ -59,6 +59,7 @@ from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.credit.services import CreditService
 from openedx.core.djangoapps.util.user_utils import SystemUser
 from openedx.core.djangolib.markup import HTML
+from openedx.core.lib.api.view_utils import view_auth_classes
 from openedx.core.lib.gating.services import GatingService
 from openedx.core.lib.license import wrap_with_license
 from openedx.core.lib.url_utils import quote_slashes, unquote_slashes
@@ -68,7 +69,9 @@ from openedx.core.lib.xblock_utils import (
     replace_course_urls,
     replace_jump_to_id_urls,
     replace_static_urls,
-    wrap_xblock
+    wrap_xblock,
+    is_xblock_aside,
+    get_aside_from_xblock,
 )
 from student.models import anonymous_id_for_user, user_by_anonymous_id
 from student.roles import CourseBetaTesterRole
@@ -1115,7 +1118,18 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
     set_custom_metrics_for_course_key(course_key)
 
     with modulestore().bulk_operations(course_key):
-        instance, tracking_context = get_module_by_usage_id(request, course_id, usage_id, course=course)
+        try:
+            usage_key = UsageKey.from_string(unquote_slashes(usage_id))
+        except InvalidKeyError:
+            raise Http404
+        if is_xblock_aside(usage_key):
+            # Get the usage key for the block being wrapped by the aside (not the aside itself)
+            block_usage_key = usage_key.usage_key
+        else:
+            block_usage_key = usage_key
+        instance, tracking_context = get_module_by_usage_id(
+            request, course_id, unicode(block_usage_key), course=course
+        )
 
         # Name the transaction so that we can view XBlock handlers separately in
         # New Relic. The suffix is necessary for XModule handlers because the
@@ -1128,7 +1142,14 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
         req = django_to_webob_request(request)
         try:
             with tracker.get_tracker().context(tracking_context_name, tracking_context):
-                resp = instance.handle(handler, req, suffix)
+                if is_xblock_aside(usage_key):
+                    # In this case, 'instance' is the XBlock being wrapped by the aside, so
+                    # the actual aside instance needs to be retrieved in order to invoke its
+                    # handler method.
+                    handler_instance = get_aside_from_xblock(instance, usage_key.aside_type)
+                else:
+                    handler_instance = instance
+                resp = handler_instance.handle(handler, req, suffix)
                 if suffix == 'problem_check' \
                         and course \
                         and getattr(course, 'entrance_exam_enabled', False) \
@@ -1169,6 +1190,8 @@ def hash_resource(resource):
     return md5.hexdigest()
 
 
+@api_view(['GET'])
+@view_auth_classes(is_authenticated=True)
 def xblock_view(request, course_id, usage_id, view_name):
     """
     Returns the rendered view of a given XBlock, with related resources
@@ -1182,9 +1205,6 @@ def xblock_view(request, course_id, usage_id, view_name):
         log.warn("Attempt to use deactivated XBlock view endpoint -"
                  " see FEATURES['ENABLE_XBLOCK_VIEW_ENDPOINT']")
         raise Http404
-
-    if not request.user.is_authenticated:
-        raise PermissionDenied
 
     try:
         course_key = CourseKey.from_string(course_id)

@@ -7,6 +7,8 @@
 #   * confirm that it has no system requirements beyond what we already install
 #   * run "make upgrade" to update the detailed requirements files
 
+-c ../constraints.txt
+
 cryptography                        # Implementations of assorted cryptography algorithms
 lxml==3.8.0                         # XML parser
 networkx==1.7                       # Utilities for creating, manipulating, and studying network graphs

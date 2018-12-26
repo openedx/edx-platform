@@ -115,6 +115,7 @@ def _create_jwt(
         'sub': anonymous_id_for_user(user, None),
         'filters': filters or [],
         'is_restricted': is_restricted,
+        'email_verified': user.is_active,
     }
     payload.update(additional_claims or {})
     _update_from_additional_handlers(payload, user, scopes)

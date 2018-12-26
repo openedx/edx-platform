@@ -79,6 +79,13 @@ class HtmlBlock(object):
         """
         return Fragment(self.get_html())
 
+    @XBlock.supports("multi_device")
+    def public_view(self, context):
+        """
+        Returns a fragment that contains the html for the preview view
+        """
+        return self.student_view(context)
+
     def student_view_data(self, context=None):  # pylint: disable=unused-argument
         """
         Return a JSON representation of the student_view of this XBlock.

@@ -52,7 +52,7 @@ from models.settings.course_grading import CourseGradingModel
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
 from openedx.core.djangoapps.waffle_utils import WaffleSwitch
 from openedx.core.lib.gating import api as gating_api
-from openedx.core.lib.xblock_utils import request_token, wrap_xblock
+from openedx.core.lib.xblock_utils import request_token, wrap_xblock, wrap_xblock_aside
 from static_replace import replace_static_urls
 from student.auth import has_studio_read_access, has_studio_write_access
 from util.date_utils import get_default_time_display
@@ -326,6 +326,14 @@ def xblock_view_handler(request, usage_key_string, view_name):
             request_token=request_token(request),
         ))
 
+        xblock.runtime.wrappers_asides.append(partial(
+            wrap_xblock_aside,
+            'StudioRuntime',
+            usage_id_serializer=unicode,
+            request_token=request_token(request),
+            extra_classes=['wrapper-comp-plugins']
+        ))
+
         if view_name in (STUDIO_VIEW, VISIBILITY_VIEW):
             if view_name == STUDIO_VIEW and xblock.xmodule_runtime is None:
                 xblock.xmodule_runtime = StudioEditModuleRuntime(request.user)
@@ -584,6 +592,7 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
 
                         field.write_to(xblock, value)
 
+        validate_and_update_xblock_due_date(xblock)
         # update the xblock and call any xblock callbacks
         xblock = _update_with_callback(xblock, user, old_metadata, old_content)
 
@@ -1451,6 +1460,14 @@ def _get_release_date(xblock, user=None):
 
     # Treat DEFAULT_START_DATE as a magic number that means the release date has not been set
     return get_default_time_display(xblock.start) if xblock.start != DEFAULT_START_DATE else None
+
+
+def validate_and_update_xblock_due_date(xblock):
+    """
+    Validates the due date for the xblock, and set to None if pre-1900 due date provided
+    """
+    if xblock.due and xblock.due.year < 1900:
+        xblock.due = None
 
 
 def _get_release_date_from(xblock):

@@ -24,6 +24,7 @@ from edx_proctoring.tests.test_services import MockCreditService, MockGradesServ
 from freezegun import freeze_time
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import MagicMock, Mock, patch
+from opaque_keys.edx.asides import AsideUsageKeyV2
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from pyquery import PyQuery
 from six import text_type
@@ -32,7 +33,12 @@ from xblock.completable import CompletableXBlockMixin
 from xblock.core import XBlock, XBlockAside
 from xblock.field_data import FieldData
 from xblock.fields import ScopeIds
-from xblock.runtime import Runtime
+from xblock.runtime import (
+    DictKeyValueStore,
+    KvsFieldData,
+    Runtime
+)
+from xblock.test.tools import TestRuntime
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
 from course_modes.models import CourseMode
@@ -379,16 +385,42 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     @override_settings(FIELD_OVERRIDE_PROVIDERS=(
         'lms.djangoapps.courseware.student_field_overrides.IndividualStudentOverrideProvider',
     ))
-    def test_rebind_different_users(self):
+    @patch('xmodule.modulestore.xml.ImportSystem.applicable_aside_types', lambda self, block: ['test_aside'])
+    @patch('xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.applicable_aside_types',
+           lambda self, block: ['test_aside'])
+    @XBlockAside.register_temp_plugin(AsideTestType, 'test_aside')
+    @ddt.data('regular', 'test_aside')
+    def test_rebind_different_users(self, block_category):
         """
         This tests the rebinding a descriptor to a student does not result
         in overly nested _field_data.
         """
+        def create_aside(item, block_type):
+            """
+            Helper function to create aside
+            """
+            key_store = DictKeyValueStore()
+            field_data = KvsFieldData(key_store)
+            runtime = TestRuntime(services={'field-data': field_data})
+
+            def_id = runtime.id_generator.create_definition(block_type)
+            usage_id = AsideUsageKeyV2(runtime.id_generator.create_usage(def_id), "aside")
+            aside = AsideTestType(scope_ids=ScopeIds('user', block_type, def_id, usage_id), runtime=runtime)
+            aside.content = '%s_new_value11' % block_type
+            aside.data_field = '%s_new_value12' % block_type
+            aside.has_score = False
+
+            modulestore().update_item(item, self.mock_user.id, asides=[aside])
+            return item
+
         request = self.request_factory.get('')
         request.user = self.mock_user
         course = CourseFactory.create()
 
-        descriptor = ItemFactory(category='html', parent=course)
+        descriptor = ItemFactory(category="html", parent=course)
+        if block_category == 'test_aside':
+            descriptor = create_aside(descriptor, "test_aside")
+
         field_data_cache = FieldDataCache(
             [course, descriptor], course.id, self.mock_user
         )
@@ -407,7 +439,7 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertIsNot(descriptor._unwrapped_field_data, descriptor._field_data)
 
         # now bind this module to a few other students
-        for user in [UserFactory(), UserFactory(), UserFactory()]:
+        for user in [UserFactory(), UserFactory(), self.mock_user]:
             render.get_module_for_descriptor(
                 user,
                 request,
@@ -689,6 +721,72 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
             self.assertEqual(completion.completion, 0.625)
 
     @XBlock.register_temp_plugin(StubCompletableXBlock, identifier='comp')
+    @ddt.data((True, True), (False, False),)
+    @ddt.unpack
+    def test_aside(self, is_xblock_aside, is_get_aside_called):
+        """
+        test get_aside_from_xblock called
+        """
+        course = CourseFactory.create()
+        block = ItemFactory.create(category='comp', parent=course)
+        request = self.request_factory.post(
+            '/',
+            data=json.dumps({'completion': 0.625}),
+            content_type='application/json',
+        )
+        request.user = self.mock_user
+
+        def get_usage_key():
+            """return usage key"""
+            return (
+                quote_slashes(text_type(AsideUsageKeyV2(block.scope_ids.usage_id, "aside")))
+                if is_xblock_aside
+                else text_type(block.scope_ids.usage_id)
+            )
+
+        with patch(
+            'courseware.module_render.is_xblock_aside',
+            return_value=is_xblock_aside
+        ), patch(
+            'courseware.module_render.get_aside_from_xblock'
+        ) as mocked_get_aside_from_xblock, patch(
+            "courseware.module_render.webob_to_django_response"
+        ) as mocked_webob_to_django_response:
+            render.handle_xblock_callback(
+                request,
+                unicode(course.id),
+                get_usage_key(),
+                'complete',
+                '',
+            )
+            assert mocked_webob_to_django_response.called is True
+        assert mocked_get_aside_from_xblock.called is is_get_aside_called
+
+    def test_aside_invalid_usage_id(self):
+        """
+        test aside work when invalid usage id
+        """
+        course = CourseFactory.create()
+        request = self.request_factory.post(
+            '/',
+            data=json.dumps({'completion': 0.625}),
+            content_type='application/json',
+        )
+        request.user = self.mock_user
+
+        with patch(
+            'courseware.module_render.is_xblock_aside',
+            return_value=True
+        ), self.assertRaises(Http404):
+            render.handle_xblock_callback(
+                request,
+                unicode(course.id),
+                "foo@bar",
+                'complete',
+                '',
+            )
+
+    @XBlock.register_temp_plugin(StubCompletableXBlock, identifier='comp')
     def test_progress_signal_ignored_for_completable_xblock(self):
         with completion_waffle.waffle().override(completion_waffle.ENABLE_COMPLETION_TRACKING, True):
             course = CourseFactory.create()
@@ -743,21 +841,33 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
         with self.assertRaises(BlockCompletion.DoesNotExist):
             BlockCompletion.objects.get(block_key=block.scope_ids.usage_id)
 
-    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_XBLOCK_VIEW_ENDPOINT': True})
-    def test_xblock_view_handler(self):
-        args = [
-            'edX/toy/2012_Fall',
-            quote_slashes('i4x://edX/toy/videosequence/Toy_Videos'),
-            'student_view'
-        ]
-        xblock_view_url = reverse(
-            'xblock_view',
-            args=args
-        )
 
-        request = self.request_factory.get(xblock_view_url)
-        request.user = self.mock_user
-        response = render.xblock_view(request, *args)
+@attr(shard=1)
+@ddt.ddt
+@patch.dict('django.conf.settings.FEATURES', {'ENABLE_XBLOCK_VIEW_ENDPOINT': True})
+class TestXBlockView(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
+    """
+    Test the handle_xblock_callback function
+    """
+    @classmethod
+    def setUpClass(cls):
+        super(TestXBlockView, cls).setUpClass()
+        cls.course_key = ToyCourseFactory.create().id
+        cls.toy_course = modulestore().get_course(cls.course_key)
+
+    def setUp(self):
+        super(TestXBlockView, self).setUp()
+
+        self.location = unicode(self.course_key.make_usage_key('html', 'toyhtml'))
+        self.request_factory = RequestFactory()
+
+        self.view_args = [unicode(self.course_key), quote_slashes(self.location), 'student_view']
+        self.xblock_view_url = reverse('xblock_view', args=self.view_args)
+
+    def test_xblock_view_handler(self):
+        request = self.request_factory.get(self.xblock_view_url)
+        request.user = UserFactory.create()
+        response = render.xblock_view(request, *self.view_args)
         self.assertEquals(200, response.status_code)
 
         expected = ['csrf_token', 'html', 'resources']
@@ -765,7 +875,30 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
         for section in expected:
             self.assertIn(section, content)
         doc = PyQuery(content['html'])
-        self.assertEquals(len(doc('div.xblock-student_view-videosequence')), 1)
+        self.assertEquals(len(doc('div.xblock-student_view-html')), 1)
+
+    @ddt.data(True, False)
+    def test_hide_staff_markup(self, hide):
+        """
+        When xblock_view gets 'hide_staff_markup' in its context, the staff markup
+        should not be included. See 'add_staff_markup' in xblock_utils/__init__.py
+        """
+        request = self.request_factory.get(self.xblock_view_url)
+        request.user = GlobalStaffFactory.create()
+        request.session = {}
+        if hide:
+            request.GET = {'hide_staff_markup': 'true'}
+        response = render.xblock_view(request, *self.view_args)
+        self.assertEquals(200, response.status_code)
+
+        html = json.loads(response.content)['html']
+        self.assertEqual('Staff Debug Info' in html, not hide)
+
+    def test_xblock_view_handler_not_authenticated(self):
+        request = self.request_factory.get(self.xblock_view_url)
+        request.user = AnonymousUser()
+        response = render.xblock_view(request, *self.view_args)
+        self.assertEquals(401, response.status_code)
 
 
 @attr(shard=1)
@@ -1466,7 +1599,7 @@ class JsonInitDataTest(ModuleStoreTestCase):
 
     @ddt.data(
         ({'a': 17}, '''{"a": 17}'''),
-        ({'xss': '</script>alert("XSS")'}, r'''{"xss": "<\/script>alert(\"XSS\")"}'''),
+        ({'xss': '</script>alert("XSS")'}, r'''{"xss": "\u003c/script\u003ealert(\"XSS\")"}'''),
     )
     @ddt.unpack
     @XBlock.register_temp_plugin(XBlockWithJsonInitData, identifier='withjson')

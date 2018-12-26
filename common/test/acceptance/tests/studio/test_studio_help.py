@@ -85,68 +85,6 @@ class StudioHelpTest(StudioCourseTest):
 
 
 @attr(shard=20)
-class SignInHelpTest(AcceptanceTest):
-    """
-    Tests help links on 'Sign In' page
-    """
-    def setUp(self):
-        super(SignInHelpTest, self).setUp()
-        self.index_page = IndexPage(self.browser)
-        self.index_page.visit()
-
-    def test_sign_in_nav_help(self):
-        """
-        Scenario: Help link in navigation bar is working on 'Sign In' page.
-        Given that I am on the 'Sign In" page.
-        And I want help about the sign in
-        And I click the 'Help' in the navigation bar
-        Then Help link should open.
-        And help url should be correct
-        """
-        sign_in_page = self.index_page.click_sign_in()
-        expected_url = _get_expected_documentation_url('/getting_started/index.html')
-
-        # Assert that help link is correct.
-        assert_nav_help_link(
-            test=self,
-            page=sign_in_page,
-            href=expected_url,
-            signed_in=False
-        )
-
-
-@attr(shard=20)
-class SignUpHelpTest(AcceptanceTest):
-    """
-    Tests help links on 'Sign Up' page.
-    """
-    def setUp(self):
-        super(SignUpHelpTest, self).setUp()
-        self.index_page = IndexPage(self.browser)
-        self.index_page.visit()
-
-    def test_sign_up_nav_help(self):
-        """
-        Scenario: Help link in navigation bar is working on 'Sign Up' page.
-        Given that I am on the 'Sign Up" page.
-        And I want help about the sign up
-        And I click the 'Help' in the navigation bar
-        Then Help link should open.
-        And help url should be correct
-        """
-        sign_up_page = self.index_page.click_sign_up()
-        expected_url = _get_expected_documentation_url('/getting_started/index.html')
-
-        # Assert that help link is correct.
-        assert_nav_help_link(
-            test=self,
-            page=sign_up_page,
-            href=expected_url,
-            signed_in=False
-        )
-
-
-@attr(shard=20)
 class HomeHelpTest(StudioCourseTest):
     """
     Tests help links on 'Home'(Courses tab) page.

@@ -5,7 +5,7 @@ Tests courseware views.py
 import itertools
 import json
 import unittest
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta
 from HTMLParser import HTMLParser
 from urllib import quote, urlencode
 from uuid import uuid4
@@ -59,7 +59,6 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.credit.api import set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
-from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlagNamespace
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.gating import api as gating_api
@@ -67,8 +66,10 @@ from openedx.core.lib.tests import attr
 from openedx.core.lib.url_utils import quote_slashes
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
+from openedx.features.course_experience.tests.views.helpers import add_course_mode
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from openedx.features.course_experience import (
+    COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
     COURSE_OUTLINE_PAGE_FLAG,
     UNIFIED_COURSE_TAB_FLAG,
 )
@@ -77,13 +78,15 @@ from student.tests.factories import TEST_PASSWORD, AdminFactory, CourseEnrollmen
 from util.tests.test_date_utils import fake_pgettext, fake_ugettext
 from util.url import reload_django_url_config
 from util.views import ensure_valid_course_key
+from xmodule.course_module import COURSE_VISIBILITY_PRIVATE, COURSE_VISIBILITY_PUBLIC_OUTLINE, COURSE_VISIBILITY_PUBLIC
 from xmodule.graders import ShowCorrectness
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_MIXED_MODULESTORE,
     ModuleStoreTestCase,
-    SharedModuleStoreTestCase
+    SharedModuleStoreTestCase,
+    CourseUserType,
 )
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
@@ -211,12 +214,13 @@ class IndexQueryTestCase(ModuleStoreTestCase):
     NUM_PROBLEMS = 20
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 10, 162),
-        (ModuleStoreEnum.Type.split, 4, 160),
+        (ModuleStoreEnum.Type.mongo, 10, 178),
+        (ModuleStoreEnum.Type.split, 4, 172),
     )
     @ddt.unpack
     def test_index_query_counts(self, store_type, expected_mongo_query_count, expected_mysql_query_count):
-        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=date(2018, 1, 1))
+        # TODO: decrease query count as part of REVO-28
+        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         with self.store.default_store(store_type):
             course = CourseFactory.create()
             with self.store.bulk_operations(course.id):
@@ -1437,25 +1441,26 @@ class ProgressPageTests(ProgressPageBaseTests):
                 self.assertContains(resp, u"Download Your Certificate")
 
     @ddt.data(
-        (True, 46),
-        (False, 45)
+        (True, 56),
+        (False, 55)
     )
     @ddt.unpack
     def test_progress_queries_paced_courses(self, self_paced, query_count):
         """Test that query counts remain the same for self-paced and instructor-paced courses."""
-        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=date(2018, 1, 1))
+        # TODO: decrease query count as part of REVO-28
+        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         self.setup_course(self_paced=self_paced)
         with self.assertNumQueries(query_count, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST), check_mongo_calls(1):
             self._get_progress_page()
 
     @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
     @ddt.data(
-        (False, 53, 33),
-        (True, 45, 29)
+        (False, 63, 43),
+        (True, 55, 39)
     )
     @ddt.unpack
     def test_progress_queries(self, enable_waffle, initial, subsequent):
-        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=date(2018, 1, 1))
+        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         self.setup_course()
         with grades_waffle().override(ASSUME_ZERO_GRADE_IF_ABSENT, active=enable_waffle):
             with self.assertNumQueries(
@@ -1666,9 +1671,10 @@ class ProgressPageTests(ProgressPageBaseTests):
         Verify that expired banner message appears on progress page, if learner is enrolled
         in audit mode.
         """
-        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=date(2018, 1, 1))
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         user = UserFactory.create()
         self.assertTrue(self.client.login(username=user.username, password='test'))
+        add_course_mode(self.course, upgrade_deadline_expired=False)
         CourseEnrollmentFactory(user=user, course_id=self.course.id, mode=course_mode)
 
         response = self._get_progress_page()
@@ -2327,7 +2333,6 @@ class TestIndexView(ModuleStoreTestCase):
     """
     Tests of the courseware.views.index view.
     """
-    SEO_WAFFLE_FLAG = CourseWaffleFlag(WaffleFlagNamespace(name='seo'), 'enable_anonymous_courseware_access')
 
     @XBlock.register_temp_plugin(ViewCheckerBlock, 'view_checker')
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
@@ -2397,12 +2402,48 @@ class TestIndexView(ModuleStoreTestCase):
         )
         self.assertIn("Activate Block ID: test_block_id", response.content)
 
-    def test_anonymous_access(self):
-        course = CourseFactory()
+    @ddt.data(
+        [False, COURSE_VISIBILITY_PRIVATE, CourseUserType.ANONYMOUS, False],
+        [False, COURSE_VISIBILITY_PUBLIC_OUTLINE, CourseUserType.ANONYMOUS, False],
+        [False, COURSE_VISIBILITY_PUBLIC, CourseUserType.ANONYMOUS, False],
+        [True, COURSE_VISIBILITY_PRIVATE, CourseUserType.ANONYMOUS, False],
+        [True, COURSE_VISIBILITY_PUBLIC_OUTLINE, CourseUserType.ANONYMOUS, False],
+        [True, COURSE_VISIBILITY_PUBLIC, CourseUserType.ANONYMOUS, True],
+
+        [False, COURSE_VISIBILITY_PRIVATE, CourseUserType.UNENROLLED, False],
+        [False, COURSE_VISIBILITY_PUBLIC_OUTLINE, CourseUserType.UNENROLLED, False],
+        [False, COURSE_VISIBILITY_PUBLIC, CourseUserType.UNENROLLED, False],
+        [True, COURSE_VISIBILITY_PRIVATE, CourseUserType.UNENROLLED, False],
+        [True, COURSE_VISIBILITY_PUBLIC_OUTLINE, CourseUserType.UNENROLLED, False],
+        [True, COURSE_VISIBILITY_PUBLIC, CourseUserType.UNENROLLED, True],
+
+        [False, COURSE_VISIBILITY_PRIVATE, CourseUserType.ENROLLED, True],
+        [True, COURSE_VISIBILITY_PRIVATE, CourseUserType.ENROLLED, True],
+        [True, COURSE_VISIBILITY_PUBLIC_OUTLINE, CourseUserType.ENROLLED, True],
+        [True, COURSE_VISIBILITY_PUBLIC, CourseUserType.ENROLLED, True],
+
+        [False, COURSE_VISIBILITY_PRIVATE, CourseUserType.UNENROLLED_STAFF, True],
+        [True, COURSE_VISIBILITY_PRIVATE, CourseUserType.UNENROLLED_STAFF, True],
+        [True, COURSE_VISIBILITY_PUBLIC_OUTLINE, CourseUserType.UNENROLLED_STAFF, True],
+        [True, COURSE_VISIBILITY_PUBLIC, CourseUserType.UNENROLLED_STAFF, True],
+
+        [False, COURSE_VISIBILITY_PRIVATE, CourseUserType.GLOBAL_STAFF, True],
+        [True, COURSE_VISIBILITY_PRIVATE, CourseUserType.GLOBAL_STAFF, True],
+        [True, COURSE_VISIBILITY_PUBLIC_OUTLINE, CourseUserType.GLOBAL_STAFF, True],
+        [True, COURSE_VISIBILITY_PUBLIC, CourseUserType.GLOBAL_STAFF, True],
+    )
+    @ddt.unpack
+    def test_courseware_access(self, waffle_override, course_visibility, user_type, expected_course_content):
+
+        course = CourseFactory(course_visibility=course_visibility)
         with self.store.bulk_operations(course.id):
             chapter = ItemFactory(parent=course, category='chapter')
             section = ItemFactory(parent=chapter, category='sequential')
-            ItemFactory.create(parent=section, category='vertical', display_name="Vertical")
+            vertical = ItemFactory.create(parent=section, category='vertical', display_name="Vertical")
+            ItemFactory.create(parent=vertical, category='html', display_name='HTML block')
+            ItemFactory.create(parent=vertical, category='video', display_name='Video')
+
+        self.create_user_for_course(course, user_type)
 
         url = reverse(
             'courseware_section',
@@ -2412,23 +2453,27 @@ class TestIndexView(ModuleStoreTestCase):
                 'section': section.url_name,
             }
         )
-        response = self.client.get(url, follow=False)
-        assert response.status_code == 302
 
-        waffle_flag = CourseWaffleFlag(WaffleFlagNamespace(name='seo'), 'enable_anonymous_courseware_access')
-        with override_waffle_flag(waffle_flag, active=True):
+        with override_waffle_flag(COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, active=waffle_override):
+
             response = self.client.get(url, follow=False)
-            assert response.status_code == 200
-            self.assertIn('data-save-position="false"', response.content)
-            self.assertIn('data-show-completion="false"', response.content)
+            assert response.status_code == (200 if expected_course_content else 302)
 
-        user = UserFactory()
-        CourseEnrollmentFactory(user=user, course_id=course.id)
-        self.assertTrue(self.client.login(username=user.username, password='test'))
-        response = self.client.get(url, follow=False)
-        assert response.status_code == 200
-        self.assertIn('data-save-position="true"', response.content)
-        self.assertIn('data-show-completion="true"', response.content)
+            if expected_course_content:
+                if user_type in (CourseUserType.ANONYMOUS, CourseUserType.UNENROLLED):
+                    self.assertIn('data-save-position="false"', response.content)
+                    self.assertIn('data-show-completion="false"', response.content)
+                    self.assertIn('xblock-public_view-sequential', response.content)
+                    self.assertIn('xblock-public_view-vertical', response.content)
+                    self.assertIn('xblock-public_view-html', response.content)
+                    self.assertIn('xblock-public_view-video', response.content)
+                else:
+                    self.assertIn('data-save-position="true"', response.content)
+                    self.assertIn('data-show-completion="true"', response.content)
+                    self.assertIn('xblock-student_view-sequential', response.content)
+                    self.assertIn('xblock-student_view-vertical', response.content)
+                    self.assertIn('xblock-student_view-html', response.content)
+                    self.assertIn('xblock-student_view-video', response.content)
 
 
 @attr(shard=5)
@@ -2712,8 +2757,9 @@ class TestIndexViewWithCourseDurationLimits(ModuleStoreTestCase):
         Test that the courseware contains the course expiration banner
         when course_duration_limits are enabled.
         """
-        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=date(2018, 1, 1))
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         self.assertTrue(self.client.login(username=self.user.username, password='test'))
+        add_course_mode(self.course, upgrade_deadline_expired=False)
         response = self.client.get(
             reverse(
                 'courseware_section',
@@ -2734,6 +2780,7 @@ class TestIndexViewWithCourseDurationLimits(ModuleStoreTestCase):
         """
         CourseDurationLimitConfig.objects.create(enabled=False)
         self.assertTrue(self.client.login(username=self.user.username, password='test'))
+        add_course_mode(self.course, upgrade_deadline_expired=False)
         response = self.client.get(
             reverse(
                 'courseware_section',

@@ -11,17 +11,18 @@ from course_modes.models import CourseMode
 
 import crum
 from django.apps import apps
+from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
-
 from web_fragments.fragment import Fragment
+
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.masquerade import (
     get_course_masquerade,
     is_masquerading_as_specific_student,
     get_masquerading_user_group,
 )
-from xmodule.partitions.partitions import Group, UserPartition, UserPartitionError
+from xmodule.partitions.partitions import Group, UserPartition, UserPartitionError, ENROLLMENT_TRACK_PARTITION_ID
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 
@@ -43,7 +44,9 @@ def create_content_gating_partition(course):
     Create and return the Content Gating user partition.
     """
 
-    if not ContentTypeGatingConfig.enabled_for_course(course_key=course.id):
+    enabled_for_course = ContentTypeGatingConfig.enabled_for_course(course_key=course.id)
+    studio_override_for_course = ContentTypeGatingConfig.current(course_key=course.id).studio_override_enabled
+    if not (enabled_for_course or studio_override_for_course):
         return None
 
     try:
@@ -97,7 +100,7 @@ class ContentTypeGatingPartition(UserPartition):
 
     def access_denied_message(self, block, user, user_group, allowed_groups):
         if self._is_audit_enrollment(user, block):
-            return "Graded assessments are available to Verified Track learners. Upgrade to Unlock."
+            return _(u"Graded assessments are available to Verified Track learners. Upgrade to Unlock.")
         return None
 
     def _is_audit_enrollment(self, user, block):
@@ -124,6 +127,8 @@ class ContentTypeGatingPartitionScheme(object):
     LIMITED_ACCESS = Group(CONTENT_TYPE_GATE_GROUP_IDS['limited_access'], 'Limited-access Users')
     FULL_ACCESS = Group(CONTENT_TYPE_GATE_GROUP_IDS['full_access'], 'Full-access Users')
 
+    read_only = True
+
     @classmethod
     def get_group_for_user(cls, course_key, user, user_partition, **kwargs):  # pylint: disable=unused-argument
         """
@@ -135,8 +140,18 @@ class ContentTypeGatingPartitionScheme(object):
         # same logic as normal to return that student's group. If the current
         # user is masquerading as a generic student in a specific group, then
         # return that group.
-        if get_course_masquerade(user, course_key) and not is_masquerading_as_specific_student(user, course_key):
-            return get_masquerading_user_group(course_key, user, user_partition)
+        course_masquerade = get_course_masquerade(user, course_key)
+        if course_masquerade and not is_masquerading_as_specific_student(user, course_key):
+            masquerade_group = get_masquerading_user_group(course_key, user, user_partition)
+            if masquerade_group is not None:
+                return masquerade_group
+            else:
+                audit_mode_id = settings.COURSE_ENROLLMENT_MODES.get(CourseMode.AUDIT, {}).get('id')
+                if course_masquerade.user_partition_id == ENROLLMENT_TRACK_PARTITION_ID:
+                    if course_masquerade.group_id != audit_mode_id:
+                        return cls.FULL_ACCESS
+                    else:
+                        return cls.LIMITED_ACCESS
 
         # For now, treat everyone as a Full-access user, until we have the rest of the
         # feature gating logic in place.

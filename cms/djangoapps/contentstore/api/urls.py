@@ -2,7 +2,10 @@
 from django.conf import settings
 from django.conf.urls import url
 
-from cms.djangoapps.contentstore.api.views import course_import, course_validation, course_quality
+from cms.djangoapps.contentstore.api.views import course_import, course_quality, course_validation
+
+
+app_name = 'contentstore'
 
 urlpatterns = [
     url(r'^v0/import/{course_id}/$'.format(course_id=settings.COURSE_ID_PATTERN,),

@@ -1,0 +1,56 @@
+<%page expression_filter="h"/>
+
+<%!
+from django.utils.translation import ugettext as _
+%>
+
+<%namespace name='static' file='../static_content.html'/>
+<%inherit file="../main.html" />
+
+<%block name="pagetitle">
+${_("Feature Based Enrollments")}
+</%block>
+
+<%block name="content">
+<section class="container outside-app">
+  <h1>${_("Student Support: Feature Based Enrollments")}</h1>
+  <div class="fb-enrollments-content">
+    <div class="fb-enrollments-search">
+        <form class="fb-enrollments-form">
+            <label class="sr" for="course-query-input">Search</label>
+            <input id="course-query-input" type="text" name="course_key" value="${course_key}" placeholder="Course Id">
+            <input type="submit" value="Search" class="btn-disable-on-submit">
+        </form>
+    </div>
+
+    <div class="fb-enrollments-results">
+      % if len(results) > 0:
+        <table id="fb-enrollments-table" class="fb-enrollments-table display compact nowrap">
+          <thead>
+            <tr>
+              <th>${_("Course ID")}</th>
+              <th>${_("Course Name")}</th>
+              <th>${_("Is Enabled")}</th>
+              <th>${_("Enabled As Of")}</th>
+              <th>${_("Reason")}</th>
+            </tr>
+          </thead>
+          <tbody>
+            % for data in results:
+            <tr>
+              <td>${data.get('course_id')}</td>
+              <td>${data.get('course_name')}</td>
+              <td>${data.get('enabled')}</td>
+              <td>${data.get('enabled_as_of')}</td>
+              <td>${data.get('reason')}</td>
+            </tr>
+            % endfor
+          </tbody>
+        </table>
+      % elif course_key:
+        <div>${_("No results found")}</div>
+      % endif
+    </div>
+  </div>
+</section>
+</%block>

@@ -802,7 +802,8 @@ class StaffLockTest(CourseOutlineTest):
         course_home_page.wait_for_page()
         self.assertEqual(course_home_page.outline.num_sections, 2)
         course_home_page.preview.set_staff_view_mode('Learner')
-        self.assertEqual(course_home_page.outline.num_sections, 1)
+        course_home_page.wait_for(lambda: course_home_page.outline.num_sections == 1,
+                                  'Only 1 section is visible in the outline')
 
     def test_toggling_staff_lock_on_section_does_not_publish_draft_units(self):
         """
@@ -1911,3 +1912,65 @@ class CourseStatusOutlineTest(CourseOutlineTest):
         self.course_outline_page.visit()
         self.course_outline_page.click_course_status_section_checklists_link()
         self.checklists.wait_for_page()
+
+
+class InstructorPacedToSelfPacedOutlineTest(CourseOutlineTest):
+    """
+    Test the course outline when pacing is changed from
+    instructor to self paced.
+    """
+    def populate_course_fixture(self, course_fixture):
+        course_fixture.add_children(
+            XBlockFixtureDesc('chapter', SECTION_NAME).add_children(
+                XBlockFixtureDesc('sequential', SUBSECTION_NAME).add_children(
+                    XBlockFixtureDesc('vertical', UNIT_NAME)
+                )
+            ),
+        )
+        self.course_fixture.add_course_details({
+            'start_date': datetime.now() + timedelta(days=1),
+        })
+        self.course_fixture.add_advanced_settings({
+            'enable_timed_exams': {
+                'value': True
+            }
+        })
+
+    def test_due_dates_not_shown(self):
+        """
+        Scenario: Ensure that due dates for timed exams
+            are not displayed on the course outline page when switched to
+            self-paced mode from instructor-paced.
+
+        Given an instructor paced course, add a due date for a subsection.
+        Change the course's pacing to self-paced.
+        Make the subsection a timed exam.
+        Make sure adding the timed exam doesn't display the due date.
+        """
+        self.course_outline_page.visit()
+        section = self.course_outline_page.section(SECTION_NAME)
+        subsection = section.subsection(SUBSECTION_NAME)
+
+        modal = subsection.edit()
+        modal.due_date = '5/14/2016'
+        modal.policy = 'Homework'
+        modal.save()
+        # Checking if the added due date saved
+        self.assertIn('May 14', subsection.due_date)
+        # Checking if grading policy added
+        self.assertEqual('Homework', subsection.policy)
+
+        # Updating the course mode to self-paced
+        self.course_fixture.add_course_details({
+            'self_paced': True
+        })
+        # Making the subsection a timed exam
+        self.course_outline_page.open_subsection_settings_dialog()
+        self.course_outline_page.select_advanced_tab()
+        self.course_outline_page.make_exam_timed()
+
+        # configure call to actually update course with new settings
+        self.course_fixture.configure_course()
+        # Reloading page after the changes
+        self.course_outline_page.visit()
+        self.assertIsNone(subsection.due_date)

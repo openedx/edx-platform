@@ -790,207 +790,6 @@ EVENT_NAME_ENROLLMENT_DEACTIVATED = 'edx.course.enrollment.deactivated'
 EVENT_NAME_ENROLLMENT_MODE_CHANGED = 'edx.course.enrollment.mode_changed'
 
 
-class PasswordHistory(models.Model):
-    """
-    This model will keep track of past passwords that a user has used
-    as well as providing contraints (e.g. can't reuse passwords)
-    """
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    password = models.CharField(max_length=128)
-    time_set = models.DateTimeField(default=timezone.now)
-
-    def create(self, user):
-        """
-        This will copy over the current password, if any of the configuration has been turned on
-        """
-
-        if not (PasswordHistory.is_student_password_reuse_restricted() or
-                PasswordHistory.is_staff_password_reuse_restricted() or
-                PasswordHistory.is_password_reset_frequency_restricted() or
-                PasswordHistory.is_staff_forced_password_reset_enabled() or
-                PasswordHistory.is_student_forced_password_reset_enabled()):
-
-            return
-
-        self.user = user
-        self.password = user.password
-        self.save()
-
-    @classmethod
-    def is_student_password_reuse_restricted(cls):
-        """
-        Returns whether the configuration which limits password reuse has been turned on
-        """
-        if not settings.FEATURES['ADVANCED_SECURITY']:
-            return False
-        min_diff_pw = settings.ADVANCED_SECURITY_CONFIG.get(
-            'MIN_DIFFERENT_STUDENT_PASSWORDS_BEFORE_REUSE', 0
-        )
-        return min_diff_pw > 0
-
-    @classmethod
-    def is_staff_password_reuse_restricted(cls):
-        """
-        Returns whether the configuration which limits password reuse has been turned on
-        """
-        if not settings.FEATURES['ADVANCED_SECURITY']:
-            return False
-        min_diff_pw = settings.ADVANCED_SECURITY_CONFIG.get(
-            'MIN_DIFFERENT_STAFF_PASSWORDS_BEFORE_REUSE', 0
-        )
-        return min_diff_pw > 0
-
-    @classmethod
-    def is_password_reset_frequency_restricted(cls):
-        """
-        Returns whether the configuration which limits the password reset frequency has been turned on
-        """
-        if not settings.FEATURES['ADVANCED_SECURITY']:
-            return False
-        min_days_between_reset = settings.ADVANCED_SECURITY_CONFIG.get(
-            'MIN_TIME_IN_DAYS_BETWEEN_ALLOWED_RESETS'
-        )
-        return min_days_between_reset
-
-    @classmethod
-    def is_staff_forced_password_reset_enabled(cls):
-        """
-        Returns whether the configuration which forces password resets to occur has been turned on
-        """
-        if not settings.FEATURES['ADVANCED_SECURITY']:
-            return False
-        min_days_between_reset = settings.ADVANCED_SECURITY_CONFIG.get(
-            'MIN_DAYS_FOR_STAFF_ACCOUNTS_PASSWORD_RESETS'
-        )
-        return min_days_between_reset
-
-    @classmethod
-    def is_student_forced_password_reset_enabled(cls):
-        """
-        Returns whether the configuration which forces password resets to occur has been turned on
-        """
-        if not settings.FEATURES['ADVANCED_SECURITY']:
-            return False
-        min_days_pw_reset = settings.ADVANCED_SECURITY_CONFIG.get(
-            'MIN_DAYS_FOR_STUDENT_ACCOUNTS_PASSWORD_RESETS'
-        )
-        return min_days_pw_reset
-
-    @classmethod
-    def should_user_reset_password_now(cls, user):
-        """
-        Returns whether a password has 'expired' and should be reset. Note there are two different
-        expiry policies for staff and students
-        """
-        assert user
-
-        if not settings.FEATURES['ADVANCED_SECURITY']:
-            return False
-
-        days_before_password_reset = None
-        if user.is_staff:
-            if cls.is_staff_forced_password_reset_enabled():
-                days_before_password_reset = \
-                    settings.ADVANCED_SECURITY_CONFIG['MIN_DAYS_FOR_STAFF_ACCOUNTS_PASSWORD_RESETS']
-        elif cls.is_student_forced_password_reset_enabled():
-            days_before_password_reset = \
-                settings.ADVANCED_SECURITY_CONFIG['MIN_DAYS_FOR_STUDENT_ACCOUNTS_PASSWORD_RESETS']
-
-        if days_before_password_reset:
-            history = PasswordHistory.objects.filter(user=user).order_by('-time_set')
-            time_last_reset = None
-
-            if history:
-                # first element should be the last time we reset password
-                time_last_reset = history[0].time_set
-            else:
-                # no history, then let's take the date the user joined
-                time_last_reset = user.date_joined
-
-            now = timezone.now()
-
-            delta = now - time_last_reset
-
-            return delta.days >= days_before_password_reset
-
-        return False
-
-    @classmethod
-    def is_password_reset_too_soon(cls, user):
-        """
-        Verifies that the password is not getting reset too frequently
-        """
-        if not cls.is_password_reset_frequency_restricted():
-            return False
-
-        history = PasswordHistory.objects.filter(user=user).order_by('-time_set')
-
-        if not history:
-            return False
-
-        now = timezone.now()
-
-        delta = now - history[0].time_set
-
-        return delta.days < settings.ADVANCED_SECURITY_CONFIG['MIN_TIME_IN_DAYS_BETWEEN_ALLOWED_RESETS']
-
-    @classmethod
-    def is_allowable_password_reuse(cls, user, new_password):
-        """
-        Verifies that the password adheres to the reuse policies
-        """
-        assert user
-
-        if not settings.FEATURES['ADVANCED_SECURITY']:
-            return True
-
-        if user.is_staff and cls.is_staff_password_reuse_restricted():
-            min_diff_passwords_required = \
-                settings.ADVANCED_SECURITY_CONFIG['MIN_DIFFERENT_STAFF_PASSWORDS_BEFORE_REUSE']
-        elif cls.is_student_password_reuse_restricted():
-            min_diff_passwords_required = \
-                settings.ADVANCED_SECURITY_CONFIG['MIN_DIFFERENT_STUDENT_PASSWORDS_BEFORE_REUSE']
-        else:
-            min_diff_passwords_required = 0
-
-        # just limit the result set to the number of different
-        # password we need
-        history = PasswordHistory.objects.filter(user=user).order_by('-time_set')[:min_diff_passwords_required]
-
-        for entry in history:
-
-            # be sure to re-use the same salt
-            # NOTE, how the salt is serialized in the password field is dependent on the algorithm
-            # in pbkdf2_sha256 [LMS] it's the 3rd element, in sha1 [unit tests] it's the 2nd element
-            hash_elements = entry.password.split('$')
-            algorithm = hash_elements[0]
-            if algorithm == 'pbkdf2_sha256':
-                hashed_password = make_password(new_password, hash_elements[2])
-            elif algorithm == 'sha1':
-                hashed_password = make_password(new_password, hash_elements[1])
-            else:
-                # This means we got something unexpected. We don't want to throw an exception, but
-                # log as an error and basically allow any password reuse
-                AUDIT_LOG.error('''
-                                Unknown password hashing algorithm "{0}" found in existing password
-                                hash, password reuse policy will not be enforced!!!
-                                '''.format(algorithm))
-                return True
-
-            if entry.password == hashed_password:
-                return False
-
-        return True
-
-    @classmethod
-    def retire_user(cls, user_id):
-        """
-        Updates the password in all rows corresponding to a user
-        to an empty string as part of removing PII for user retirement.
-        """
-        return cls.objects.filter(user_id=user_id).update(password="")
-
-
 class LoginFailures(models.Model):
     """
     This model will keep track of failed login attempts
@@ -2879,3 +2678,20 @@ class LogoutViewConfiguration(ConfigurationModel):
     def __unicode__(self):
         """Unicode representation of the instance. """
         return u'Logout view configuration: {enabled}'.format(enabled=self.enabled)
+
+
+class AccountRecovery(models.Model):
+    """
+    Model for storing information for user's account recovery in case of access loss.
+    """
+    user = models.OneToOneField(User, related_name='account_recovery', on_delete=models.CASCADE)
+    secondary_email = models.EmailField(
+        verbose_name=_('Secondary email address'),
+        help_text=_('Secondary email address to recover linked account.'),
+        unique=True,
+        null=False,
+        blank=False,
+    )
+
+    class Meta(object):
+        db_table = "auth_accountrecovery"

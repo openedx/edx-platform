@@ -8,7 +8,7 @@ required by server-side events.
 To use, call "from track import segment", then call segment.track() or segment.identify().
 
 """
-from urlparse import urljoin
+from urlparse import urlunsplit
 
 import analytics
 from django.conf import settings
@@ -39,10 +39,12 @@ def track(user_id, event_name, properties=None, context=None):
         page = tracking_context.get('page')
 
         if path and not page:
-            # Try to put together a url from host and path:
+            # Try to put together a url from host and path, hardcoding the schema.
+            # (Segment doesn't care about the schema for GA, but will extract the host and path from the url.)
             host = tracking_context.get('host')
             if host:
-                page = urljoin("//{host}".format(host=host), path)
+                parts = ("https", host, path, "", "")
+                page = urlunsplit(parts)
 
         if path is not None or referer is not None or page is not None:
             if 'page' not in segment_context:

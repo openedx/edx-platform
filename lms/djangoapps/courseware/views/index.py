@@ -24,6 +24,7 @@ from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
 
 from edxmako.shortcuts import render_to_response, render_to_string
+
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from lms.djangoapps.gating.api import get_entrance_exam_score_ratio, get_entrance_exam_usage_key
@@ -32,21 +33,23 @@ from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
-from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace, WaffleFlagNamespace, CourseWaffleFlag
+from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_duration_limits.access import register_course_expired_message
-from openedx.features.course_experience import COURSE_OUTLINE_PAGE_FLAG, default_course_url_name
+from openedx.features.course_experience import (
+    COURSE_OUTLINE_PAGE_FLAG, default_course_url_name, COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
+)
 from openedx.features.course_experience.views.course_sock import CourseSockFragmentView
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 from shoppingcart.models import CourseRegistrationCode
 from student.views import is_course_blocked
 from util.views import ensure_valid_course_key
 from xmodule.modulestore.django import modulestore
-from xmodule.x_module import STUDENT_VIEW
+from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
+from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
 from .views import CourseTabView
 from ..access import has_access
-from ..access_utils import check_course_open_for_learner
-from ..courses import get_course_with_access, get_current_child, get_studio_url
+from ..courses import check_course_access, get_course_with_access, get_current_child, get_studio_url
 from ..entrance_exams import (
     course_has_entrance_exam,
     get_entrance_exam_content,
@@ -69,9 +72,8 @@ class CoursewareIndex(View):
     """
 
     @cached_property
-    def enable_anonymous_courseware_access(self):
-        waffle_flag = CourseWaffleFlag(WaffleFlagNamespace(name='seo'), 'enable_anonymous_courseware_access')
-        return waffle_flag.is_enabled(self.course_key)
+    def enable_unenrolled_access(self):
+        return COURSE_ENABLE_UNENROLLED_ACCESS_FLAG.is_enabled(self.course_key)
 
     @method_decorator(ensure_csrf_cookie)
     @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True))
@@ -98,7 +100,7 @@ class CoursewareIndex(View):
         """
         self.course_key = CourseKey.from_string(course_id)
 
-        if not (request.user.is_authenticated or self.enable_anonymous_courseware_access):
+        if not (request.user.is_authenticated or self.enable_unenrolled_access):
             return redirect_to_login(request.get_full_path())
 
         self.original_chapter_url_name = chapter
@@ -114,11 +116,34 @@ class CoursewareIndex(View):
             set_custom_metrics_for_course_key(self.course_key)
             self._clean_position()
             with modulestore().bulk_operations(self.course_key):
+
+                self.view = STUDENT_VIEW
+
+                # Do the enrollment check if enable_unenrolled_access is not enabled.
                 self.course = get_course_with_access(
                     request.user, 'load', self.course_key,
                     depth=CONTENT_DEPTH,
-                    check_if_enrolled=not self.enable_anonymous_courseware_access,
+                    check_if_enrolled=not self.enable_unenrolled_access,
                 )
+
+                if self.enable_unenrolled_access:
+                    # Check if the user is considered enrolled (i.e. is an enrolled learner or staff).
+                    try:
+                        check_course_access(
+                            self.course, request.user, 'load', check_if_enrolled=True,
+                        )
+                    except CourseAccessRedirect as exception:
+                        # If the user is not considered enrolled:
+                        if self.course.course_visibility == COURSE_VISIBILITY_PUBLIC:
+                            # If course visibility is public show the XBlock public_view.
+                            self.view = PUBLIC_VIEW
+                        else:
+                            # Otherwise deny them access.
+                            raise exception
+                    else:
+                        # If the user is considered enrolled show the default XBlock student_view.
+                        pass
+
                 self.is_staff = has_access(request.user, 'staff', self.course)
                 self._setup_masquerade_for_effective_user()
                 register_course_expired_message(request, self.course)
@@ -412,13 +437,6 @@ class CoursewareIndex(View):
         # entrance exam data
         self._add_entrance_exam_to_context(courseware_context)
 
-        # staff masquerading data
-        if not check_course_open_for_learner(self.effective_user, self.course):
-            # Disable student view button if user is staff and
-            # course is not yet visible to students.
-            courseware_context['disable_student_access'] = True
-            courseware_context['supports_preview_menu'] = False
-
         if self.section:
             # chromeless data
             if self.section.chrome:
@@ -438,7 +456,9 @@ class CoursewareIndex(View):
                 table_of_contents['previous_of_active_section'],
                 table_of_contents['next_of_active_section'],
             )
-            courseware_context['fragment'] = self.section.render(STUDENT_VIEW, section_context)
+
+            courseware_context['fragment'] = self.section.render(self.view, section_context)
+
             if self.section.position and self.section.has_children:
                 self._add_sequence_title_to_context(courseware_context)
 

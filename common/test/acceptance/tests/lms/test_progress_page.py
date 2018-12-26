@@ -429,5 +429,10 @@ class ProgressPageA11yTest(ProgressPageBaseTest):
         """
         Test the accessibility of the progress page.
         """
+        self.progress_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+            ]
+        })
         self.progress_page.visit()
         self.progress_page.a11y_audit.check_for_accessibility_errors()

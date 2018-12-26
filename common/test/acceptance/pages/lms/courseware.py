@@ -325,6 +325,14 @@ class CoursewarePage(CoursePage, CompletionOnViewMixin):
         bookmarks_page = BookmarksPage(self.browser, self.course_id)
         bookmarks_page.visit()
 
+    def is_gating_banner_visible(self):
+        """
+        Check if the gated banner for locked content is visible.
+        """
+        return self.q(css='.problem-header').is_present() \
+            and self.q(css='.btn-brand').text[0] == u'Go To Prerequisite Section' \
+            and self.q(css='.problem-header').text[0] == u'Content Locked'
+
 
 class CoursewareSequentialTabPage(CoursePage):
     """

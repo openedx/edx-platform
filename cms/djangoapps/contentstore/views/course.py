@@ -88,6 +88,7 @@ from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import DuplicateCourseError, ItemNotFoundError
+from xmodule.partitions.partitions import UserPartition
 from xmodule.tabs import CourseTab, CourseTabList, InvalidTabsException
 
 from .component import ADVANCED_COMPONENT_TYPES
@@ -1602,6 +1603,8 @@ def group_configurations_list_handler(request, course_key_string):
             has_content_groups = False
             displayable_partitions = []
             for partition in all_partitions:
+                partition['read_only'] = getattr(UserPartition.get_scheme(partition['scheme']), 'read_only', False)
+
                 if partition['scheme'] == COHORT_SCHEME:
                     has_content_groups = True
                     displayable_partitions.append(partition)

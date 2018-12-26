@@ -57,6 +57,7 @@ from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.theming.helpers import get_current_site
+from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled
 from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from openedx.core.djangoapps.user_api.errors import UserNotFound, UserAPIInternalError
 from openedx.core.djangoapps.user_api.models import UserRetirementRequest
@@ -67,17 +68,13 @@ from openedx.features.journals.api import get_journals_context
 from student.forms import AccountCreationForm, PasswordResetFormNoActive, get_registration_extension_form
 from student.helpers import (
     DISABLE_UNENROLL_CERT_STATES,
-    auth_pipeline_urls,
     cert_info,
-    create_or_set_user_attribute_created_on_site,
-    do_create_account,
     generate_activation_email_context,
-    get_next_url_for_login_page
 )
 from student.message_types import EmailChange, PasswordReset
 from student.models import (
+    AccountRecovery,
     CourseEnrollment,
-    PasswordHistory,
     PendingEmailChange,
     Registration,
     RegistrationCookieConfiguration,
@@ -114,8 +111,6 @@ REGISTRATION_UTM_PARAMETERS = {
     'utm_content': 'registration_utm_content',
 }
 REGISTRATION_UTM_CREATED_AT = 'registration_utm_created_at'
-# used to announce a registration
-REGISTER_USER = Signal(providing_args=["user", "registration"])
 
 
 def csrf_token(context):
@@ -125,8 +120,8 @@ def csrf_token(context):
     token = context.get('csrf_token', '')
     if token == 'NOTPROVIDED':
         return ''
-    return (u'<div style="display:none"><input type="hidden"'
-            ' name="csrfmiddlewaretoken" value="{}" /></div>'.format(token))
+    return (HTML(u'<div style="display:none"><input type="hidden"'
+            ' name="csrfmiddlewaretoken" value="{}" /></div>').format(token))
 
 
 # NOTE: This view is not linked to directly--it is called from
@@ -723,6 +718,59 @@ def password_change_request_handler(request):
         return HttpResponseBadRequest(_("No email address provided."))
 
 
+@require_http_methods(['POST'])
+def account_recovery_request_handler(request):
+    """
+    Handle account recovery requests.
+
+    Arguments:
+        request (HttpRequest)
+
+    Returns:
+        HttpResponse: 200 if the email was sent successfully
+        HttpResponse: 400 if there is no 'email' POST parameter
+        HttpResponse: 403 if the client has been rate limited
+        HttpResponse: 405 if using an unsupported HTTP method
+        HttpResponse: 404 if account recovery feature is not enabled
+
+    Example:
+
+        POST /account/account_recovery
+
+    """
+    if not is_secondary_email_feature_enabled():
+        raise Http404
+
+    limiter = BadRequestRateLimiter()
+    if limiter.is_rate_limit_exceeded(request):
+        AUDIT_LOG.warning("Account recovery rate limit exceeded")
+        return HttpResponseForbidden()
+
+    user = request.user
+    # Prefer logged-in user's email
+    email = request.POST.get('email')
+
+    if email:
+        try:
+            # Send an email with a link to direct user towards account recovery.
+            from openedx.core.djangoapps.user_api.accounts.api import request_account_recovery
+            request_account_recovery(email, request.is_secure())
+
+            # Check if a user exists with the given secondary email, if so then invalidate the existing oauth tokens.
+            user = user if user.is_authenticated else User.objects.get(
+                id=AccountRecovery.objects.get(secondary_email__iexact=email).user.id
+            )
+            destroy_oauth_tokens(user)
+        except UserNotFound:
+            AUDIT_LOG.warning(
+                "Account recovery attempt via invalid secondary email '{email}'.".format(email=email)
+            )
+
+        return HttpResponse(status=200)
+    else:
+        return HttpResponseBadRequest(_("No email address provided."))
+
+
 @csrf_exempt
 @require_POST
 def password_reset(request):
@@ -880,11 +928,6 @@ def password_reset_confirm_wrapper(request, uidb36=None, token=None):
         # get the updated user
         updated_user = User.objects.get(id=uid_int)
 
-        # did the password hash change, if so record it in the PasswordHistory
-        if updated_user.password != old_password_hash:
-            entry = PasswordHistory()
-            entry.create(updated_user)
-
     else:
         response = password_reset_confirm(
             request, uidb64=uidb64, token=token, extra_context=platform_name
@@ -910,6 +953,33 @@ def validate_new_email(user, new_email):
 
     if new_email == user.email:
         raise ValueError(_('Old email is the same as the new email.'))
+
+
+def validate_secondary_email(account_recovery, new_email):
+    """
+    Enforce valid email addresses.
+    """
+    from openedx.core.djangoapps.user_api.accounts.api import get_email_validation_error, \
+        get_email_existence_validation_error, get_secondary_email_validation_error
+
+    if get_email_validation_error(new_email):
+        raise ValueError(_('Valid e-mail address required.'))
+
+    if new_email == account_recovery.secondary_email:
+        raise ValueError(_('Old email is the same as the new email.'))
+
+    # Make sure that secondary email address is not same as user's primary email.
+    if new_email == account_recovery.user.email:
+        raise ValueError(_('Cannot be same as your sign in email address.'))
+
+    # Make sure that secondary email address is not same as any of the primary emails.
+    message = get_email_existence_validation_error(new_email)
+    if message:
+        raise ValueError(message)
+
+    message = get_secondary_email_validation_error(new_email)
+    if message:
+        raise ValueError(message)
 
 
 def do_email_change_request(user, new_email, activation_key=None):

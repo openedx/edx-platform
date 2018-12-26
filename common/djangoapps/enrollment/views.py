@@ -205,6 +205,67 @@ class EnrollmentView(APIView, ApiKeyPermissionMixIn):
             )
 
 
+class EnrollmentUserRolesView(APIView):
+    """
+    **Use Case**
+
+        Get the roles for the current logged-in user.
+        A field is also included to indicate whether or not the user is a global
+        staff member.
+        If an optional course_id parameter is supplied, the returned roles will be
+        filtered to only include roles for the given course.
+
+    **Example Requests**
+
+        GET /api/enrollment/v1/roles/?course_id={course_id}
+
+        course_id: (optional) A course id. The returned roles will be filtered to
+        only include roles for the given course.
+
+    **Response Values**
+
+        If the request is successful, an HTTP 200 "OK" response is
+        returned along with a collection of user roles for the
+        logged-in user, filtered by course_id if given, along with
+        whether or not the user is global staff
+    """
+    authentication_classes = (JwtAuthentication,
+                              OAuth2AuthenticationAllowInactiveUser,
+                              EnrollmentCrossDomainSessionAuth)
+    permission_classes = ApiKeyHeaderPermissionIsAuthenticated,
+    throttle_classes = EnrollmentUserThrottle,
+
+    @method_decorator(ensure_csrf_cookie_cross_domain)
+    def get(self, request):
+        """
+        Gets a list of all roles for the currently logged-in user, filtered by course_id if supplied
+        """
+        try:
+            course_id = request.GET.get('course_id')
+            roles_data = api.get_user_roles(request.user.username)
+            if course_id:
+                roles_data = [role for role in roles_data if text_type(role.course_id) == course_id]
+        except Exception:
+            return Response(
+                status=status.HTTP_400_BAD_REQUEST,
+                data={
+                    "message": (
+                        u"An error occurred while retrieving roles for user '{username}"
+                    ).format(username=request.user.username)
+                }
+            )
+        return Response({
+            'roles': [
+                {
+                    "org": role.org,
+                    "course_id": text_type(role.course_id),
+                    "role": role.role
+                }
+                for role in roles_data],
+            'is_staff': request.user.is_staff,
+        })
+
+
 @can_disable_rate_limit
 class EnrollmentCourseDetailView(APIView):
     """
@@ -730,7 +791,11 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
             cohort_name = request.data.get('cohort')
             if cohort_name is not None:
                 cohort = get_cohort_by_name(course_id, cohort_name)
-                add_user_to_cohort(cohort, user)
+                try:
+                    add_user_to_cohort(cohort, user)
+                except ValueError:
+                    # user already in cohort, probably because they were un-enrolled and re-enrolled
+                    log.exception('Cohort re-addition')
             email_opt_in = request.data.get('email_opt_in', None)
             if email_opt_in is not None:
                 org = course_id.org

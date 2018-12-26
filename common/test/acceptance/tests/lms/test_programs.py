@@ -121,6 +121,11 @@ class ProgramListingPageA11yTest(ProgramPageBase):
 
     def test_empty_a11y(self):
         """Test a11y of the page's empty state."""
+        self.listing_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+            ]
+        })
         self.auth(enroll=False)
         self.stub_catalog_api(programs=[self.program], pathways=[])
         self.cache_programs()
@@ -133,6 +138,11 @@ class ProgramListingPageA11yTest(ProgramPageBase):
 
     def test_cards_a11y(self):
         """Test a11y when program cards are present."""
+        self.listing_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+            ]
+        })
         self.auth()
         self.stub_catalog_api(programs=[self.program], pathways=[])
         self.cache_programs()
@@ -157,6 +167,11 @@ class ProgramDetailsPageA11yTest(ProgramPageBase):
 
     def test_a11y(self):
         """Test the page's a11y compliance."""
+        self.details_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+            ]
+        })
         self.auth()
         self.stub_catalog_api(programs=[self.program], pathways=[])
         self.cache_programs()

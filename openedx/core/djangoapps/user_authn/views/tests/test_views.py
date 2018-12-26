@@ -327,9 +327,19 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
 
     @ddt.data("signin_user", "register_user")
     def test_login_and_registration_form_already_authenticated(self, url_name):
-        # Create/activate a new account and log in
-        activation_key = create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
-        activate_account(activation_key)
+        # call the account registration api that sets the login cookies
+        url = reverse('user_api_registration')
+        request_data = {
+            'username': self.USERNAME,
+            'password': self.PASSWORD,
+            'email': self.EMAIL,
+            'name': self.USERNAME,
+            'terms_of_service': 'true',
+            'honor_code': 'true',
+        }
+        result = self.client.post(url, data=request_data)
+        self.assertEqual(result.status_code, 200)
+
         result = self.client.login(username=self.USERNAME, password=self.PASSWORD)
         self.assertTrue(result)
 
@@ -710,27 +720,6 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         self.assertEqual(enterprise_cookie['domain'], settings.BASE_COOKIE_DOMAIN)
         self.assertEqual(enterprise_cookie.value, '')
 
-    @override_settings(SITE_NAME=settings.MICROSITE_TEST_HOSTNAME)
-    def test_microsite_uses_old_login_page(self):
-        # Retrieve the login page from a microsite domain
-        # and verify that we're served the old page.
-        resp = self.client.get(
-            reverse("signin_user"),
-            HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME
-        )
-        self.assertContains(resp, "Log into your Test Site Account")
-        self.assertContains(resp, "login-form")
-
-    def test_microsite_uses_old_register_page(self):
-        # Retrieve the register page from a microsite domain
-        # and verify that we're served the old page.
-        resp = self.client.get(
-            reverse("register_user"),
-            HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME
-        )
-        self.assertContains(resp, "Register for Test Site")
-        self.assertContains(resp, "register-form")
-
     def test_login_registration_xframe_protected(self):
         resp = self.client.get(
             reverse("register_user"),
@@ -841,64 +830,6 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         response = self.client.get(reverse('signin_user'), [], HTTP_ACCEPT="text/html", HTTP_ACCEPT_LANGUAGE="es-es")
 
         self.assertEqual(response['Content-Language'], 'es-es')
-
-
-@skip_unless_lms
-@override_settings(SITE_NAME=settings.MICROSITE_LOGISTRATION_HOSTNAME)
-class MicrositeLogistrationTests(TestCase):
-    """
-    Test to validate that microsites can display the logistration page
-    """
-
-    def test_login_page(self):
-        """
-        Make sure that we get the expected logistration page on our specialized
-        microsite
-        """
-
-        resp = self.client.get(
-            reverse('signin_user'),
-            HTTP_HOST=settings.MICROSITE_LOGISTRATION_HOSTNAME
-        )
-        self.assertEqual(resp.status_code, 200)
-
-        self.assertIn('<div id="login-and-registration-container"', resp.content)
-
-    def test_registration_page(self):
-        """
-        Make sure that we get the expected logistration page on our specialized
-        microsite
-        """
-
-        resp = self.client.get(
-            reverse('register_user'),
-            HTTP_HOST=settings.MICROSITE_LOGISTRATION_HOSTNAME
-        )
-        self.assertEqual(resp.status_code, 200)
-
-        self.assertIn('<div id="login-and-registration-container"', resp.content)
-
-    @override_settings(SITE_NAME=settings.MICROSITE_TEST_HOSTNAME)
-    def test_no_override(self):
-        """
-        Make sure we get the old style login/registration if we don't override
-        """
-
-        resp = self.client.get(
-            reverse('signin_user'),
-            HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME
-        )
-        self.assertEqual(resp.status_code, 200)
-
-        self.assertNotIn('<div id="login-and-registration-container"', resp.content)
-
-        resp = self.client.get(
-            reverse('register_user'),
-            HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME
-        )
-        self.assertEqual(resp.status_code, 200)
-
-        self.assertNotIn('<div id="login-and-registration-container"', resp.content)
 
 
 @skip_unless_lms

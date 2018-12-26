@@ -55,12 +55,17 @@ DEPRECATED_LOGGED_IN_COOKIE_NAMES = (
 ALL_LOGGED_IN_COOKIE_NAMES = JWT_COOKIE_NAMES + DEPRECATED_LOGGED_IN_COOKIE_NAMES
 
 
-def is_logged_in_cookie_set(request):
+def are_logged_in_cookies_set(request):
     """ Check whether the request has logged in cookies set. """
-    return (
-        settings.EDXMKTG_LOGGED_IN_COOKIE_NAME in request.COOKIES and
-        request.COOKIES[settings.EDXMKTG_LOGGED_IN_COOKIE_NAME]
-    )
+    if settings.FEATURES.get('DISABLE_SET_JWT_COOKIES_FOR_TESTS', False):
+        cookies_that_should_exist = DEPRECATED_LOGGED_IN_COOKIE_NAMES
+    else:
+        cookies_that_should_exist = ALL_LOGGED_IN_COOKIE_NAMES
+
+    return all(
+        cookie_name in request.COOKIES
+        for cookie_name in cookies_that_should_exist
+    ) and request.COOKIES[settings.EDXMKTG_LOGGED_IN_COOKIE_NAME]
 
 
 def delete_logged_in_cookies(response):
@@ -107,7 +112,7 @@ def standard_cookie_settings(request):
     # In non-production environments (acceptance tests, devstack, and sandboxes),
     # we still want to set this cookie.  However, we do NOT want to set it to "secure"
     # because the browser won't send it back to us.  This can cause an infinite redirect
-    # loop in the third-party auth flow, which calls `is_logged_in_cookie_set` to determine
+    # loop in the third-party auth flow, which calls `are_logged_in_cookies_set` to determine
     # whether it needs to set the cookie or continue to the next pipeline stage.
     cookie_settings['secure'] = request.is_secure()
 
@@ -139,7 +144,7 @@ def set_logged_in_cookies(request, response, user):
         cookie_settings = standard_cookie_settings(request)
 
         _set_deprecated_logged_in_cookie(response, cookie_settings)
-        set_deprecated_user_info_cookie(response, request, user, cookie_settings)
+        _set_deprecated_user_info_cookie(response, request, user, cookie_settings)
         _create_and_set_jwt_cookies(response, request, cookie_settings, user=user)
         CREATE_LOGON_COOKIE.send(sender=None, user=user, response=response)
 
@@ -162,7 +167,7 @@ def refresh_jwt_cookies(request, response):
     return response
 
 
-def set_deprecated_user_info_cookie(response, request, user, cookie_settings=None):
+def _set_deprecated_user_info_cookie(response, request, user, cookie_settings=None):
     """
     Sets the user info cookie on the response.
 

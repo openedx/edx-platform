@@ -5,6 +5,7 @@ from abc import ABCMeta
 from collections import OrderedDict
 from logging import getLogger
 
+from django.utils.html import escape
 from lazy import lazy
 
 from lms.djangoapps.grades.models import BlockRecord, PersistentSubsectionGrade
@@ -23,7 +24,7 @@ class SubsectionGradeBase(object):
 
     def __init__(self, subsection):
         self.location = subsection.location
-        self.display_name = block_metadata_utils.display_name_with_default_escaped(subsection)
+        self.display_name = escape(block_metadata_utils.display_name_with_default(subsection))
         self.url_name = block_metadata_utils.url_name_for_block(subsection)
 
         self.format = getattr(subsection, 'format', '')
@@ -89,10 +90,22 @@ class ZeroSubsectionGrade(SubsectionGradeBase):
 
     @property
     def all_total(self):
+        """
+        Returns the total score (earned and possible) amongst all problems (graded and ungraded) in this subsection.
+        NOTE: This will traverse this subsection's subtree to determine
+        problem scores.  If self.course_data.structure is currently null, this means
+        we will first fetch the user-specific course structure from the data store!
+        """
         return self._aggregate_scores[0]
 
     @property
     def graded_total(self):
+        """
+        Returns the total score (earned and possible) amongst all graded problems in this subsection.
+        NOTE: This will traverse this subsection's subtree to determine
+        problem scores.  If self.course_data.structure is currently null, this means
+        we will first fetch the user-specific course structure from the data store!
+        """
         return self._aggregate_scores[1]
 
     @lazy
@@ -105,6 +118,9 @@ class ZeroSubsectionGrade(SubsectionGradeBase):
         Overrides the problem_scores member variable in order
         to return empty scores for all scorable problems in the
         course.
+        NOTE: The use of `course_data.structure` here is very intentional.
+        It means we look through the user-specific subtree of this subsection,
+        taking into account which problems are visible to the user.
         """
         locations = OrderedDict()  # dict of problem locations to ProblemScore
         for block_key in self.course_data.structure.post_order_traversal(
@@ -194,6 +210,12 @@ class ReadSubsectionGrade(NonZeroSubsectionGrade):
 
     @lazy
     def problem_scores(self):
+        """
+        Returns the scores of the problem blocks that compose this subsection.
+        NOTE: The use of `course_data.structure` here is very intentional.
+        It means we look through the user-specific subtree of this subsection,
+        taking into account which problems are visible to the user.
+        """
         problem_scores = OrderedDict()
         for block in self.model.visible_blocks.blocks:
             problem_score = self._compute_block_score(
@@ -231,7 +253,29 @@ class CreateSubsectionGrade(NonZeroSubsectionGrade):
         Saves or updates the subsection grade in a persisted model.
         """
         if self._should_persist_per_attempted(score_deleted, force_update_subsections):
-            return PersistentSubsectionGrade.update_or_create_grade(**self._persisted_model_params(student))
+            model = PersistentSubsectionGrade.update_or_create_grade(**self._persisted_model_params(student))
+            self._update_aggregated_scores_from_model(model)
+            return model
+
+    def _update_aggregated_scores_from_model(self, model):
+        """
+        Updates this grade's `all_total` and `graded_total` attributes
+        to reflect the values from the related persisted model.
+        This is important, because PersistentSubsectionGradeOverrides
+        are only taken into account when reading/writing at the persistence layer,
+        so after we update a PersistentSubsectionGrade model (which could involve
+        writing values that are overridden by the PersistentSubsectionGradeOverride model)
+        we also need to update this grade object's attributes to reflect the
+        now (possibly) overriden values.
+        TODO: https://openedx.atlassian.net/browse/EDUCATOR-3835
+        """
+        self.all_total.earned = model.earned_all
+        self.all_total.possible = model.possible_all
+        self.all_total.first_attempted = model.first_attempted
+
+        self.graded_total.earned = model.earned_graded
+        self.graded_total.possible = model.possible_graded
+        self.graded_total.first_attempted = model.first_attempted
 
     @classmethod
     def bulk_create_models(cls, student, subsection_grades, course_key):

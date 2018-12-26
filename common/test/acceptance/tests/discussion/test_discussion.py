@@ -227,6 +227,7 @@ class DiscussionHomePageTest(BaseDiscussionTestCase):
             "ignore": [
                 'section',  # TODO: AC-491
                 'aria-required-children',  # TODO: AC-534
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
             ]
         })
         self.page.a11y_audit.check_for_accessibility_errors()
@@ -464,6 +465,7 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase, BaseDiscussionMixi
             "ignore": [
                 'section',  # TODO: AC-491
                 'aria-required-children',  # TODO: AC-534
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
             ]
         })
 
@@ -536,6 +538,7 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
                 'section',  # TODO: AC-491
                 'aria-required-children',  # TODO: AC-534
                 'color-contrast',  # Commented out for now because they reproducibly fail on Jenkins but not locally
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
             ]
         })
         page.a11y_audit.check_for_accessibility_errors()
@@ -546,6 +549,7 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
                 'section',  # TODO: AC-491
                 'aria-required-children',  # TODO: AC-534
                 'color-contrast',  # Commented out for now because they reproducibly fail on Jenkins but not locally
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
             ]
         })
         page.a11y_audit.check_for_accessibility_errors()
@@ -839,6 +843,7 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
             'ignore': [
                 'section',  # TODO: AC-491
                 'aria-required-children',  # TODO: AC-534
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
             ]
         })
         page.visit()
@@ -940,6 +945,7 @@ class DiscussionCommentEditTest(BaseDiscussionTestCase):
             'ignore': [
                 'section',  # TODO: AC-491
                 'aria-required-children',  # TODO: AC-534
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
             ]
         })
         page.a11y_audit.check_for_accessibility_errors()
@@ -1366,6 +1372,7 @@ class DiscussionSearchAlertTest(UniqueCourseTest):
             'ignore': [
                 'section',  # TODO: AC-491
                 'aria-required-children',  # TODO: AC-534
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
             ]
         })
         self.page.a11y_audit.check_for_accessibility_errors()

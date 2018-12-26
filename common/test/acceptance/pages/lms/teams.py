@@ -520,6 +520,7 @@ class TeamPage(CoursePage, PaginatedUIMixin, BreadcrumbsMixin):
     def click_leave_team_link(self, remaining_members=0, cancel=False):
         """ Click on Leave Team link"""
         leave_team_css = '.leave-team-link'
+        self.scroll_to_element(leave_team_css)
         self.wait_for_element_visibility(leave_team_css, 'Leave Team link is visible.')
         click_css(self, leave_team_css, require_notification=False)
         confirm_prompt(self, cancel, require_notification=False)

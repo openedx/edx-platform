@@ -3,6 +3,7 @@ Helper functions for loading environment settings.
 """
 from __future__ import print_function
 
+import io
 import json
 import os
 import sys
@@ -11,7 +12,7 @@ from time import sleep
 import memcache
 from lazy import lazy
 from path import Path as path
-from paver.easy import sh
+from paver.easy import BuildFailure, sh
 from six.moves import configparser
 
 from pavelib.utils.cmd import django_cmd
@@ -94,6 +95,8 @@ class Env(object):
 
     # Directory that videos are served from
     VIDEO_SOURCE_DIR = REPO_ROOT / "test_root" / "data" / "video"
+
+    PRINT_SETTINGS_LOG_FILE = BOK_CHOY_LOG_DIR / "print_settings.log"
 
     # Detect if in a Docker container, and if so which one
     SERVER_HOST = os.environ.get('BOK_CHOY_HOSTNAME', '0.0.0.0')
@@ -240,17 +243,27 @@ class Env(object):
         """
         if not settings:
             settings = os.environ.get("EDX_PLATFORM_SETTINGS", "aws")
-        value = sh(
-            django_cmd(
-                system,
-                settings,
-                "print_setting {django_setting} 2>/dev/null".format(
-                    django_setting=django_setting
-                )
-            ),
-            capture=True
-        )
-        return unicode(value).strip()
+        log_dir = os.path.dirname(cls.PRINT_SETTINGS_LOG_FILE)
+        if not os.path.exists(log_dir):
+            os.makedirs(log_dir)
+        try:
+            value = sh(
+                django_cmd(
+                    system,
+                    settings,
+                    "print_setting {django_setting} 2>{log_file}".format(
+                        django_setting=django_setting,
+                        log_file=cls.PRINT_SETTINGS_LOG_FILE
+                    )
+                ),
+                capture=True
+            )
+            return unicode(value).strip()
+        except BuildFailure:
+            print("Unable to print the value of the {} setting:".format(django_setting))
+            with io.open(cls.PRINT_SETTINGS_LOG_FILE, 'r') as f:
+                print(f.read())
+            sys.exit(1)
 
     @classmethod
     def covered_modules(cls):

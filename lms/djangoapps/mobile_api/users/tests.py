@@ -30,6 +30,7 @@ from openedx.core.lib.courses import course_image_url
 from openedx.core.lib.tests import attr
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
+from openedx.features.course_experience.tests.views.helpers import add_course_mode
 from student.models import CourseEnrollment
 from student.tests.factories import CourseEnrollmentFactory
 from util.milestones_helpers import set_prerequisite_courses
@@ -255,6 +256,9 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
             self.assertEqual(entry['course']['org'], 'edX')
 
     def create_enrollment(self, expired):
+        """
+        Create an enrollment
+        """
         if expired:
             course = CourseFactory.create(start=self.THREE_YEARS_AGO, mobile_available=True)
             enrollment = CourseEnrollmentFactory.create(
@@ -266,12 +270,14 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
             course = CourseFactory.create(start=self.LAST_WEEK, mobile_available=True)
             self.enroll(course.id)
 
+        add_course_mode(course, upgrade_deadline_expired=False)
+
     def _get_enrollment_data(self, api_version, expired):
         self.login()
         self.create_enrollment(expired)
         return self.api_response(api_version=api_version).data
 
-    def _assert_enrollment_results(self, api_version, courses, num_courses_returned):
+    def _assert_enrollment_results(self, api_version, courses, num_courses_returned, gating_enabled=True):
         self.assertEqual(len(courses), num_courses_returned)
 
         if api_version == API_V05:
@@ -279,7 +285,8 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
                 self.assertNotIn('audit_access_expires', courses[0])
         else:
             self.assertIn('audit_access_expires', courses[0])
-            self.assertIsNotNone(courses[0].get('audit_access_expires'))
+            if gating_enabled:
+                self.assertIsNotNone(courses[0].get('audit_access_expires'))
 
     @ddt.data(
         (API_V05, True, 0),
@@ -293,9 +300,9 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         Test that expired courses are only returned in v1 of API
         when waffle flag enabled, and un-expired courses always returned
         '''
-        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime.date(2018, 1, 1))
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime.datetime(2018, 1, 1))
         courses = self._get_enrollment_data(api_version, expired)
-        self._assert_enrollment_results(api_version, courses, num_courses_returned)
+        self._assert_enrollment_results(api_version, courses, num_courses_returned, True)
 
     @ddt.data(
         (API_V05, True, 1),
@@ -311,7 +318,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         '''
         CourseDurationLimitConfig.objects.create(enabled=False)
         courses = self._get_enrollment_data(api_version, expired)
-        self._assert_enrollment_results(api_version, courses, num_courses_returned)
+        self._assert_enrollment_results(api_version, courses, num_courses_returned, False)
 
 
 @attr(shard=9)
@@ -586,7 +593,6 @@ class TestCourseEnrollmentSerializer(MobileAPITestCase, MilestonesTestCaseMixin)
         '''
         if api_version != API_V05:
             self.assertIn('audit_access_expires', response)
-            self.assertIsNotNone(response.get('audit_access_expires'))
         else:
             self.assertNotIn('audit_access_expires', response)
 

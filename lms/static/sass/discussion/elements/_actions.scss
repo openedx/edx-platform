@@ -338,4 +338,10 @@
       }
     }
   }
+
+  .btn-primary, .btn-outline-primary{
+    &:focus{
+      box-shadow: 0 0 0 2px rgb(0,120,180);
+    }
+  }
 }

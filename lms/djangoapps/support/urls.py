@@ -7,6 +7,7 @@ from lms.djangoapps.support.views.contact_us import ContactUsView
 from support.views.certificate import CertificatesSupportView
 from support.views.course_entitlements import EntitlementSupportView
 from support.views.enrollments import EnrollmentSupportListView, EnrollmentSupportView
+from support.views.feature_based_enrollments import FeatureBasedEnrollmentsSupportView
 from support.views.index import index
 from support.views.manage_user import ManageUserDetailView, ManageUserSupportView
 from support.views.refund import RefundSupportView
@@ -31,5 +32,10 @@ urlpatterns = [
         r'^manage_user/(?P<username_or_email>[\w.@+-]+)?$',
         ManageUserDetailView.as_view(),
         name="manage_user_detail"
+    ),
+    url(
+        r'^feature_based_enrollments/?$',
+        FeatureBasedEnrollmentsSupportView.as_view(),
+        name="feature_based_enrollments"
     ),
 ]

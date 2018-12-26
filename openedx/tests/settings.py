@@ -54,6 +54,7 @@ DATABASES = {
 FEATURES = {}
 
 INSTALLED_APPS = (
+    'django_comment_common',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -75,6 +76,7 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.content.block_structure.apps.BlockStructureConfig',
     'openedx.core.djangoapps.catalog',
     'openedx.core.djangoapps.self_paced',
+    'experiments',
     'openedx.features.content_type_gating',
     'openedx.features.course_duration_limits',
     'milestones',
@@ -85,7 +87,7 @@ INSTALLED_APPS = (
     'completion',
 )
 
-LMS_ROOT_URL = 'http://localhost:8000'
+LMS_ROOT_URL = "http://localhost:8000"
 
 MEDIA_ROOT = tempfile.mkdtemp()
 

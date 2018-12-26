@@ -29,7 +29,7 @@ from courseware.tests.factories import (
 from courseware.tests.helpers import LoginEnrollmentTestCase, masquerade_as_group_member
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
+from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.core.lib.tests import attr
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from student.models import CourseEnrollment
@@ -828,7 +828,7 @@ class CourseOverviewAccessTestCase(ModuleStoreTestCase):
     @ddt.unpack
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_course_catalog_access_num_queries(self, user_attr_name, action, course_attr_name):
-        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime.date(2018, 1, 1))
+        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime.datetime(2018, 1, 1))
 
         course = getattr(self, course_attr_name)
 
@@ -842,15 +842,20 @@ class CourseOverviewAccessTestCase(ModuleStoreTestCase):
         if user_attr_name == 'user_staff' and action == 'see_exists':
             # always checks staff role, and if the course has started, check the duration configuration
             if course_attr_name == 'course_started':
-                num_queries = 4
+                num_queries = 3
             else:
                 num_queries = 1
         elif user_attr_name == 'user_normal' and action == 'see_exists':
             if course_attr_name == 'course_started':
-                num_queries = 4
+                num_queries = 6
             else:
                 # checks staff role and enrollment data
                 num_queries = 2
+        elif user_attr_name == 'user_anonymous' and action == 'see_exists':
+            if course_attr_name == 'course_started':
+                num_queries = 3
+            else:
+                num_queries = 0
         else:
             # if the course has started, check the duration configuration
             if action == 'see_exists' and course_attr_name == 'course_started':

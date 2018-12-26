@@ -138,8 +138,10 @@ html.video-fullscreen {
       word-wrap: break-word;
       word-break: break-word;
       margin: 0 auto;
+      font: -apple-system-body;
 
-      &.xblock-student_view-vertical {
+      &.xblock-student_view-vertical,
+      &.xblock-public_view-vertical {
         max-width: $text-width-readability-max;
       }
     }
@@ -581,7 +583,8 @@ html.video-fullscreen {
         padding: 0 0 15px;
       }
 
-      .vert > .xblock-student_view.is-hidden {
+      .vert > .xblock-student_view.is-hidden,
+      .vert > .xblock-public_view.is-hidden {
         display: none;
         border-bottom: 0;
         margin-bottom: 0;
@@ -594,7 +597,8 @@ html.video-fullscreen {
       }
     }
 
-    section.xblock-student_view-wrapper div.vert-mod > div {
+    section.xblock-student_view-wrapper div.vert-mod > div,
+    section.xblock-public_view-wrapper div.vert-mod > div {
       border-bottom: none;
     }
 
