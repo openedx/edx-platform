@@ -407,7 +407,7 @@ FEATURES = {
     'ENABLE_COURSE_UNENROLL': False,
 
     # Whether to enable elite courses sort
-    'ENABLE_ELITE_COURSES_SORT': False
+    'ENABLE_COURSE_SORTING_BY_START_DATE_DESC': False
 }
 
 # Settings for the course reviews tool template and identification key, set either to None to disable course reviews
