@@ -72,7 +72,7 @@ def password_validators_instruction_texts():
             complexity_instructions=' & '.join(complexity_instructions)
         )
     else:
-        return _('Your password must contain {length_instruction}.'.format(length_instruction=length_instruction))
+        return _('Your password must contain {length_instruction}.').format(length_instruction=length_instruction)
 
 
 def password_validators_restrictions():
@@ -145,7 +145,28 @@ def _validate_condition(password, fn, min_count):
     return valid_count >= min_count
 
 
-class MinimumLengthValidator(DjangoMinimumLengthValidator):
+class MinimumLengthValidator(object):
+    def __init__(self, min_length=8):
+        self.min_length = min_length
+
+    def validate(self, password, user=None):
+        if len(password) < self.min_length:
+            raise ValidationError(
+                ungettext(
+                    "This password is too short. It must contain at least %(min_length)d character.",
+                    "This password is too short. It must contain at least %(min_length)d characters.",
+                    self.min_length
+                ),
+                code='password_too_short',
+                params={'min_length': self.min_length},
+            )
+
+    def get_help_text(self):
+        return ungettext(
+            "Your password must contain at least %(min_length)d character.",
+            "Your password must contain at least %(min_length)d characters.",
+            self.min_length
+        ) % {'min_length': self.min_length}
     def get_instruction_text(self):
         return ungettext(
             'at least %(min_length)d character',
