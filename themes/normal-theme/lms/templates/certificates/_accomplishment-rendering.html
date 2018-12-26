@@ -61,7 +61,6 @@ course_mode_class = course_mode if course_mode else ''
     }
     var qrcode = new QRCode(document.getElementById("qrcode"), data);
     $(document).ready(function(){
-        console.log(12312)
         var data = {
             username: '${accomplishment_copy_name}',
             course: '${accomplishment_copy_course_name}',
@@ -78,11 +77,5 @@ course_mode_class = course_mode if course_mode else ''
                 _certificates(data)
             }
         })
-    })
-    console.log($)
-    // $(document).ready(function(){
-    //     console.log('aba')
-    // })
-    
-    
+    })    
 </script>
