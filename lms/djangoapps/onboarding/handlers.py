@@ -15,7 +15,7 @@ def update_user_profile(sender, instance, update_fields, **kwargs):
 
     # To avoid an extra sync at every login
     if not update_fields or 'last_login' not in update_fields:
-        user_profile.name = '{} {}'.format(user.first_name, user.last_name)
+        user_profile.name = '{} {}'.format(user.first_name.encode('utf-8'), user.last_name.encode('utf-8'))
         user_profile.save()
 
 
