@@ -1,4 +1,4 @@
-from .utils import CommentClientRequestError, perform_request
+from .utils import CommentClientPaginatedResult, CommentClientRequestError, perform_request
 
 from .thread import Thread, _url_for_flag_abuse_thread, _url_for_unflag_abuse_thread
 from lms.lib.comment_client import models
@@ -41,6 +41,72 @@ class Comment(models.Model):
     def context(self):
         """Return the context of the thread which this comment belongs to."""
         return self.thread.context
+
+    @classmethod
+    def search(cls, query_params):
+        default_params = {'page': 1,
+                          'per_page': 20,
+                          'course_id': query_params['course_id'],
+                          'thread_id': query_params['thread_id']}
+        params = merge_dict(default_params, strip_blank(strip_none(query_params)))
+
+        if query_params.get('text'):
+            url = cls.url(action='search')
+        else:
+            url = cls.url(action='get_all', params=extract(params, 'commentable_id'))
+            if params.get('commentable_id'):
+                del params['commentable_id']
+        response = perform_request(
+            'get',
+            url,
+            params,
+            metric_tags=[
+                u'course_id:{}'.format(query_params['course_id'])
+                u'thread_id:{}'.format(query_params['thread_id']),
+            ],
+            metric_action='comment.search',
+            paged_results=True
+        )
+        if query_params.get('text'):
+            search_query = query_params['text']
+            course_id = query_params['course_id']
+            thread_id = query_params['thread_id']
+            group_id = query_params['group_id'] if 'group_id' in query_params else None
+            requested_page = params['page']
+            total_results = response.get('total_results')
+            corrected_text = response.get('corrected_text')
+            # Record search result metric to allow search quality analysis.
+            # course_id is already included in the context for the event tracker
+            tracker.emit(
+                'edx.forum.searched_comment',
+                {
+                    'query': search_query,
+                    'corrected_text': corrected_text,
+                    'group_id': group_id,
+                    'page': requested_page,
+                    'total_results': total_results,
+                }
+            )
+            log.info(
+                u'forum_text_search_comment query="{search_query}" corrected_text="{corrected_text}" course_id={course_id} thread_id={thread_id} group_id={group_id} page={requested_page} total_results={total_results}'.format(
+                    search_query=search_query,
+                    corrected_text=corrected_text,
+                    course_id=course_id,
+                    thread_id=thread_id,
+                    group_id=group_id,
+                    requested_page=requested_page,
+                    total_results=total_results
+                )
+            )
+
+        return CommentClientPaginatedResult(
+            collection=response.get('collection', []),
+            page=response.get('page', 1),
+            num_pages=response.get('num_pages', 1),
+            comment_count=response.get('comment_count', 0),
+            corrected_text=response.get('corrected_text', None)
+        )
+
 
     @classmethod
     def url_for_comments(cls, params={}):
