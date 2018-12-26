@@ -121,58 +121,209 @@ p.accomplishment-success{
 #code .certificates-mes p:nth-of-type(3),#code .certificates-mes p:nth-of-type(4){  
   color:#b0b0b0;
 }
+#container img{
+  width: 100%;
+  max-width: 1170px;
+}
 
+// new style
+.wrapper-header{
+  padding: 13px 0;
+  margin-bottom: 0;
+}
+
+.wrapper-banner-certificates{
+  max-width: 1200px;
+  background-color: #ffffff;
+	box-shadow: 0px 1px 4px 0px 
+		#b6dcfe;
+  border-radius: 3px;
+  padding: 15px 26px;
+  margin: 20px auto;
+  .message-notice-certificates{
+    float: left;
+    p{
+      margin: 0;
+    }
+    p:first-child{
+      font-size: 16px;
+      color: #2e313c;
+    }
+    p:last-child{
+      font-size: 14px;
+      color: #656d78;
+    }
+  }
+  .op-container-certificates{
+    float: right;
+    .certificates-btn{
+      background-color: #4788c7;
+      border-radius: 2px;
+      color: #fff;
+      font-size: 14px;
+      display: inline-block;
+      padding: 5px 15px;
+      cursor: pointer;
+    }
+    .print-btn{
+      margin-right: 10px;
+    }
+  }
+}
+.layout-accomplishment .header-app .logo{
+  width: 117px;
+}
+.layout-accomplishment .accomplishment-main{
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: #ffffff !important;
+  box-shadow: 0px 1px 4px 0px #b6dcfe;
+  border-radius: 3px;
+  .wrapper-accomplishment-rendering-header{
+    padding: 13px 25px;
+    color: #2e313c;
+    line-height: 1;
+    font-size: 18px;
+    border-bottom: solid 1px #e3f2fe;
+  }
+  .wrapper-accomplishment-rendering{
+    padding: 25px;
+    img{
+      width: 100%;
+    }
+  }
+  .wrapper-accomplishment-extend-info{
+    padding-left: 25px;
+    padding-top: 25px;
+    border-top: 1px solid #e6e9ed;
+    padding-bottom: 45px;
+  }
+  .accomplishment-extend-info-title{
+    font-size: 16px;
+    color: #2e313c;
+    margin-bottom: 20px;
+    font-weight: normal;
+  }
+  .accomplishment-extend-info-data{
+    display: flex;
+    flex-wrap: nowrap;
+    h3,p{
+      margin: 0;
+      padding: 0;
+    }
+    .recipient-img{
+      img{
+        width: 60px;
+        border-radius: 50%;
+      }
+    }
+    .recipient-details.first{
+      padding-left: 20px;
+      padding-right: 60px;
+    }
+    .recipient-details{
+      padding-top: 10px;
+      h3{
+        font-size: 14px;
+        color: #2e313c;
+        line-height: 2;
+      }
+      p{
+        color: #656d78;
+        line-height: 2;
+        font-size: 14px;
+      }
+    }
+  }
+}
+.layout-accomplishment .wrapper-about .about{
+  max-width: 1200px;
+  padding: 30px 24px;
+}
+.layout-accomplishment .wrapper-about .about-item{
+  width: 100%;
+  .about-edx-title,.about-title {
+    color: #2e313c;
+    line-height: 24px;
+    font-size: 16px;
+    margin: 0;
+    font-weight: bold;
+  }
+  .copy-meta{
+    p{
+      font-size: 14px;
+      color: #656d78;
+    }
+    a{
+      color: #346ca3;
+    }
+  }
+}
+@media screen and (max-width:768px){
+  .wrap-h5{
+    padding: 0 10px;
+  }
+  .accomplishment-rendering{
+    #container{
+      width: 100%;
+    }
+  }
+  .layout-accomplishment .accomplishment-main .accomplishment-extend-info-data{
+    flex-wrap: wrap;
+  }
+  .layout-accomplishment .accomplishment-main .accomplishment-extend-info-data .recipient-details.first{
+    padding-left: 0;
+  }
+  .layout-accomplishment .wrapper-about .about-item{
+    margin-bottom: 20px;
+    p{
+      margin: 0;
+    }
+  }
+  .wrapper-banner-certificates .op-container-certificates{
+    float: unset;
+    text-align: center;
+  }
+  .layout-accomplishment .accomplishment-main .wrapper-accomplishment-extend-info{
+    padding-bottom: 25px;
+  }
+  .layout-accomplishment .wrapper-about .about{
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .wrapper-banner-certificates .message-notice-certificates{
+    padding-bottom: 10px;
+    width: 100%;
+  }
+}
 @media print {
   .wrapper-accomplishment-rendering{
     height: 700px;
-    width: 1170px;
+    width: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+    #container img{
+      height: 668px;
+    } 
   }
-  .layout-accomplishment .accomplishment-rendering{  
-    background: none;
-    transform: scale(0.8474576);
-    transform-origin: center top;
+  .layout-accomplishment .accomplishment-main{
+      box-shadow:unset;
   }
-  .certificate-content-box{  
-    height: 50%;
+  .accomplishment-metadata{
+    display: none !important;
   }
-  .wrapper-accomplishment-metadata{   
-    display: none;
+  .wrapper-banner-certificates{
+    display:none;
   }
-  .layout-accomplishment .accomplishment-rendering{      
-  }     
-  .certificate-content-box{  
-    margin: 0 auto;
-    display: block;
-    width: 88.55%;
-    height: 83.55%;
+  .wrapper-accomplishment-rendering-header{
+      display:none;
   }
-  .accomplishment-box-right{      
-    right: 0px;
-    top: 0px;  
+  .wrapper-accomplishment-extend-info{
+    display:none;
   }
 
-  .layout-accomplishment .accomplishment-rendering .accomplishment-type{  
-    // left: 140px;  
-    /* top值根据实际打印情况进行调整，也要相应的调整背景图片的位置 */
-    top: 90px;
-  }  
-  .accomplishment-box-right{  
-    right: 70px;  
-    /* top值根据实际打印情况进行调整，也要相应的调整背景图片的位置 */  
-    top: 90px;
-  }  
-  .certificate-content-box{   
-    /*调整背景图片的位置 */
-    background-position: center 116px;
-    background-size: 45%;
-  }
-  .layout-accomplishment .accomplishment-rendering{   
-    // height:700px;
-  }
-  .accomplishment-box-right{   
-    height: 630px;
-  }
 }
 .layout-accomplishment .accomplishment-rendering,.layout-accomplishment.certificate-no-id-professional .accomplishment-rendering,.layout-accomplishment.certificate-professional .accomplishment-rendering,.layout-accomplishment.certificate-honor .accomplishment-rendering,.layout-accomplishment.certificate-audit .accomplishment-rendering {
   background: $white url('../images/bg-verified.png') center no-repeat;
 }
+

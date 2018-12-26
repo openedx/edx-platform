@@ -1,0 +1,19 @@
+<%page expression_filter="h"/>
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.js_utils import js_escaped_string
+%>
+<%namespace name='static' file='../static_content.html'/>
+<%block name="js_extra">
+  <%static:js group='certificates_wv'/>
+</%block>
+<div class="wrapper-banner-certificates">
+    <div class="message-notice-certificates">
+        <p>${accomplishment_banner_opening}</p>
+        <p>${accomplishment_banner_congrats}</p>
+    </div>
+    <div class="op-container-certificates">
+        <div id="action-print-view" class="certificates-btn print-btn">${_("Print Certificate")}</div>
+        <div id="action-download-view" class="certificates-btn download-btn">${_("下载证书")}</div>
+    </div>
+</div>

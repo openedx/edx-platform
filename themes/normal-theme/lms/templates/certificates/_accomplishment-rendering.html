@@ -6,97 +6,83 @@ course_mode_class = course_mode if course_mode else ''
 %>
 
 <main class="accomplishment accomplishment-main">
-
+    <div class="wrapper-accomplishment-rendering-header">
+        ${document_banner}
+    </div>
     <div class="wrapper-accomplishment-rendering">
-        <div class="accomplishment-rendering">
-            
-            <div class="certificate-content-box">
-                <div class="accomplishment-type">
+        <div id="container" style="text-align:center">
 
-                    <span class="accomplishment-type-symbol">
-                        <img class="src" src="/static/certificates/images/ico-${course_mode_class}.png" alt="Image for course mode of type ${course_mode_class}">
-                    </span>
-                    <p class="prove">兹证明</p>
-
-                    <p class="pro-name">${accomplishment_copy_name}</p>
-
-                    <p class="accomplishment-success">顺利完成并通过</p>
-                    
-                    
-                    <sapn class="span-accomplishment-course-name">${accomplishment_copy_course_name}
-                        <div class="course-name-line"></div>
-                        <span class="span-accomplishment-course-id">${course_number}</span>
-                    </sapn>
-                    
-
-                    <p class="eliteu-support">该课程由英荔教育提供并授权</p>
-                    
-                    <div id="code">
-                        <div class="certificates-mes">
-                            <p>签发日期</p>
-                            <p>${certificate_date_issued}</p>
-                            <p>验证地址</p>
-                            <p class="code-url"></p>
-                        </div>   
-                        
-                    </div>
-                    <!-- <span class="accomplishment-type-label hd-3">${document_title}</span> -->
-                </div>
-
-                <div class="accomplishment-box-right">
-                    <div class="verified-end-box">
-                        <img src="/static/certificates/images/verified-end.png" alt="">
-                    </div>
-
-                    <div class="underwrite">
-                        <ul>
-
-                            % if certificate_data:
-                                % for signatory in certificate_data.get('signatories', []):
-                                    <li>
-                                        <span>${signatory['name']}</span>
-                                        <img class="pro-img" src="${signatory['signature_image_path']}" alt="${signatory['name']}">
-                                        
-                                    </li>
-                                % endfor
-                            % endif
-
-                            
-                        </ul>
-                    </div>
-                </div>
-
+        </div>
+    </div>
+    <div class="wrapper-accomplishment-extend-info">
+        <h2 class="accomplishment-extend-info-title hd-6">${accomplishment_copy_more_about}</h2>
+        <div class="accomplishment-extend-info-data">
+            <span class="recipient-img">
+                <img class="src" src="/static/certificates/images/demo-user-profile.png" alt="Recipient Image">
+            </span>
+            <div class="recipient-details first">
+                <h3 class="recipient-name">${accomplishment_copy_name}</h3>
+                <p class="recipient-username">${accomplishment_copy_username} @ ${platform_name}</p>
+            </div>
+            <div class="recipient-details">
+                <p>${certificate_id_number_title}: ${certificate_id_number}</p>
+                <p>${certificate_date_issued_title}${certificate_date_issued}</p>
             </div>
         </div>
     </div>
-
-    <div class="wrapper-accomplishment-metadata">
-        <div class="accomplishment-metadata">
-            <h2 class="accomplishment-metadata-title hd-6">${accomplishment_copy_more_about}</h2>
-
-            <div class="wrapper-metadata">
-                <dl class="metadata accomplishment-recipient">
-                    <dt class="label sr-only">${_("Awarded to:")}</dt>
-                    <dd class="value copy copy-meta">
-                        <span class="recipient-img">
-                            <img class="src" src="/static/certificates/images/demo-user-profile.png" alt="Recipient Image">
-                        </span>
-                        <div class="recipient-details">
-                            <h3 class="recipient-name">${accomplishment_copy_name}</h3>
-                            <p class="recipient-username">${accomplishment_copy_username} @ ${platform_name}</p>
-                        </div>
-                    </dd>
-                </dl>
-                <dl class="metadata accomplishment-id">
-                    <dt class="label copy copy-meta">${certificate_id_number_title}:</dt>
-                    <dd class="value copy copy-base">${certificate_id_number}</dd>
-                </dl>
-                <dl class="metadata accomplishment-date">
-                    <dt class="label copy copy-meta">${certificate_date_issued_title}</dt>
-                    <dd class="value copy copy-base">${certificate_date_issued}</dd>
-                </dl>
-            </div>
-        </div>
-    </div>
-
 </main>
+<div style="display:none">
+    <canvas width="1170" height="826"  id="canvas">
+
+    </canvas>
+    <div id="img-list">
+        <img id="bg" src="/static/normal-theme/images/certificates/zh-cn.png" />
+        % if certificate_data:
+            % for signatory in certificate_data.get('signatories', []):
+                <img name="${signatory['name']}" class="signature" src="${signatory['signature_image_path']}" alt="${signatory['name']}">
+            % endfor
+        % endif
+    </div>
+    <div id="qrcode"></div>
+    <div id="url" style="display: none">${verify_url}</div>
+</div>
+<script src="/static/normal-theme/js/certificates/canvas.js"></script>
+<script src="/static/normal-theme/js/certificates/qrcode.js"></script>
+<script>
+    var url = $.trim($('#url').text());
+    url = location.protocol+ '//' + location.host + url;   
+    var data = {    
+        text: url,
+        width: 78,
+        height: 78,
+        colorDark : "#000000",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.H
+    }
+    var qrcode = new QRCode(document.getElementById("qrcode"), data);
+    $(document).ready(function(){
+        console.log(12312)
+        var data = {
+            username: '${accomplishment_copy_name}',
+            course: '${accomplishment_copy_course_name}',
+            course_id: '${course_number}',
+            dateTime: '${certificate_date_issued_title}',
+            date: '${certificate_date_issued}',
+            verifyTitle: '验证地址',
+            verifyAdress: url,
+        }
+        var i = 0;
+        $('#img-list .signature').load(function(){
+            i++;
+            if (i == $('#img-list .signature').length){
+                _certificates(data)
+            }
+        })
+    })
+    console.log($)
+    // $(document).ready(function(){
+    //     console.log('aba')
+    // })
+    
+    
+</script>
