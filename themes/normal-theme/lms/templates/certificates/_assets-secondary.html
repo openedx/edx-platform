@@ -4,7 +4,7 @@
             margin: 0mm;    
         }  
 </style>
-<script type="text/javascript" src="/static/common/js/vendor/jquery.js"></script>
+<!-- <script type="text/javascript" src="/static/common/js/vendor/jquery.js"></script> -->
 <script src="/static/normal-theme/js/certificates/qrcode.js"></script>
 <script type="text/javascript">
     if (document.getElementById("action-print-view") != null){
@@ -13,22 +13,13 @@
            event.preventDefault();
            window.print();
         }
+        document.getElementById("action-download-view").addEventListener("click", function(){
+            var aLink = document.createElement('a')
+            aLink.download = 'certificates.png'
+            var url = document.querySelector('#container img').src;
+            aLink.href = url 
+            aLink.dispatchEvent(new MouseEvent('click', {}))
+        });
     }
-
-    //二维码扫码
-    var code = document.getElementById("code");
-    var url = $.trim($('#url').text());
-    url = location.protocol+ '//' + location.host + url;   
-    var data = {    
-        text: url,
-        width: 78,
-        height: 78,
-        colorDark : "#000000",
-        colorLight : "#ffffff",
-        correctLevel : QRCode.CorrectLevel.H
-    }
-    var qrcode = new QRCode("code", data);
-
-    $("#code div .code-url").text(url);
 </script>
 
