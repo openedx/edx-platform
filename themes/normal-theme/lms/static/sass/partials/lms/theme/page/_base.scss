@@ -122,8 +122,14 @@ input[type="submit"], input[type="button"], button, .button{
   -webkit-font-smoothing: unset;
   box-shadow: none;
   text-shadow: none;
+  &:hover, &:focus{
+    box-shadow: none;
+  }
 }
-button:focus:not(:disabled), button:hover:not(:disabled){
+button{
+  border: none;
+}
+button:focus:not(:disabled), button:hover:not(:disabled), .btn-default{
   outline: none;
   border: none;
   background-image: none;

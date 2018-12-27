@@ -317,3 +317,15 @@ body.view-in-course .wrapper-preview-menu, .wrapper-preview-menu{
     line-height: 1.8;
   }
 }
+
+// course bookmarks
+.course-bookmarks .search-results .search-count{
+  background: #fff;
+  font-size: 14px;
+  padding: 0 15px;
+  font-weight: normal;
+  color: $font;
+}
+.course-bookmarks .bookmarks-results-list .bookmarks-results-list-item:hover{
+  opacity: 1;
+}

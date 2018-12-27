@@ -35,6 +35,9 @@
     overflow-y: hidden;
     overflow-x: hidden;
 
+    .fa{
+      vertical-align: middle;
+    }
     ol li{
       border: 0;
       &:not(:last-child){
@@ -78,6 +81,9 @@
     }
     &:hover{
       border-bottom: 3px solid $primary;
+    }
+    span:not(:last-child){
+      padding-right: 0;
     }
   }
   .button-previous span:last-child{

@@ -47,7 +47,7 @@ $icon-width: 18px;
 .fa-floppy-o:before,
 .fa-save:before,
 .fa-arrow-right:before,
-.fa-exclamation-circle:before
+.fa-exclamation-circle:before,
 {
   content: '';
   display: inline-block;
@@ -77,6 +77,9 @@ $icon-width: 18px;
 }
 .fa-info-circle:before{
   background-position: calcP(7, 2);
+}
+.problem .fa-info-circle:before{
+  background-position: calcP(14, 7);
 }
 .fa-close:before,
 .xmodule_display.xmodule_CapaModule .problem .capa_inputtype.textline>.incorrect .status .status-icon::after, .xmodule_display.xmodule_CapaModule .problem .inputtype.formulaequationinput>.incorrect .status .status-icon::after,
@@ -250,7 +253,7 @@ $icon-width: 18px;
   }
 }
 .fa-exclamation-circle:before{
-  background-position: calcP(8, 3)
+  background-position: calcP(1, 5)
 }
 
 
