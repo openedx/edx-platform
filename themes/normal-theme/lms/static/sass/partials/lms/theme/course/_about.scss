@@ -286,7 +286,7 @@
     text-align: center;
     position: relative;
     width: 270px;
-    margin: 0 auto;
+    margin: 20px auto;
     cursor: pointer;
 
     &:hover{
@@ -477,9 +477,13 @@
       }
     }
   }
-  .my-theme-course-about #player-container-id{
+  #player-container-id{
     width: 100%;
-    height: auto;
+    height: 50%;
+    top: 25%;
+    left: 0;
+    margin-top: 0;
+    margin-left: 0;
   }
 }
 
