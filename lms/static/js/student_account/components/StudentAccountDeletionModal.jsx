@@ -31,7 +31,7 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
     this.props.onClose();
 
     removeLoggedInCookies();
-    window.location.href = 'https://www.edx.org';
+    window.location.href = '/';
   }
 
   deleteAccount() {
@@ -183,6 +183,7 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
           body={gettext('Account deletion, including removal from email lists, may take a few weeks to fully process through our system. If you want to opt-out of emails before then, please unsubscribe from the footer of any email.')}
           onClose={this.handleConfirmationModalClose}
           aria-live="polite"
+          closeText={gettext('Close')}
           open
         />
       </div>
