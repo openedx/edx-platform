@@ -4,7 +4,15 @@
 <%
 course_mode_class = course_mode if course_mode else ''
 %>
-
+<%
+  jsi18n_path = "js/i18n/{language}/djangojs.js".format(language=LANGUAGE_CODE)
+  ie11_fix_path = "js/ie11_find_array.js"
+%>
+% if user_language:
+<% user_language_or_default = user_language %>
+% else:
+<% user_language_or_default = settings.LANGUAGE_CODE %>
+% endif
 <main class="accomplishment accomplishment-main">
     <div class="wrapper-accomplishment-rendering-header">
         ${document_banner}
@@ -36,7 +44,7 @@ course_mode_class = course_mode if course_mode else ''
 
     </canvas>
     <div id="img-list">
-        <img id="bg" src="/static/normal-theme/images/certificates/zh-cn.png" />
+        <img id="bg" src="/static/normal-theme/images/certificates/${user_language_or_default}.png" />
         % if certificate_data:
             % for signatory in certificate_data.get('signatories', []):
                 <img name="${signatory['name']}" class="signature" src="${signatory['signature_image_path']}" alt="${signatory['name']}">
@@ -46,6 +54,9 @@ course_mode_class = course_mode if course_mode else ''
     <div id="qrcode"></div>
     <div id="url" style="display: none">${verify_url}</div>
 </div>
+
+<script type="text/javascript" src="${static.url(jsi18n_path)}"></script>
+<script type="text/javascript" src="${static.url(ie11_fix_path)}"></script>
 <script src="/static/normal-theme/js/certificates/canvas.js"></script>
 <script src="/static/normal-theme/js/certificates/qrcode.js"></script>
 <script>
@@ -69,6 +80,7 @@ course_mode_class = course_mode if course_mode else ''
             date: '${certificate_date_issued}',
             verifyTitle: gettext('验证地址'),
             verifyAdress: url,
+            langulage: '${user_language_or_default}'
         }
         var i = 0;
         $('#img-list .signature').load(function(){

@@ -26,19 +26,24 @@ var _certificates = function (data) {
         ctx.textBaseline = 'top';
         ctx.fillStyle = '#434a54'
         ctx.font = "400 36px 'Open Sans','Helvetica Neue',Helvetica,Arial,sans-serif";
-        ctx.fillText(username, 137, 307);
+        ctx.fillText(this.username, 137, 307);
         ctx.fillStyle = '#205179';
-        ctx.font = "400 34px 'Open Sans','Helvetica Neue',Helvetica,Arial,sans-serif";
-        ctx.fillText(course, 137, 424);
+        // 英文判断
+        if (course.length > 36){
+            ctx.font = "400 28px 'Open Sans','Helvetica Neue',Helvetica,Arial,sans-serif";
+        }else{
+            ctx.font = "400 34px 'Open Sans','Helvetica Neue',Helvetica,Arial,sans-serif";
+        }
+        ctx.fillText(this.course, 137, 424);
         ctx.font = "400 18px 'Open Sans','Helvetica Neue',Helvetica,Arial,sans-serif";
-        ctx.fillText(course_id, 137, 476);
+        ctx.fillText(this.course_id, 137, 476);
         ctx.fillStyle = '#434a54';
         ctx.font = "400 12px 'Open Sans','Helvetica Neue',Helvetica,Arial,sans-serif";
-        ctx.fillText(dateTime, 221, 621);
-        ctx.fillText(date, 221, 638);
+        ctx.fillText(this.dateTime, 221, 621);
+        ctx.fillText(this.date, 221, 638);
         ctx.fillStyle = '#b0b0b0';
-        ctx.fillText(verifyTitle, 221, 660);
-        ctx.fillText(verifyAdress, 221, 678);
+        ctx.fillText(this.verifyTitle, 221, 660);
+        ctx.fillText(this.verifyAdress, 221, 678);
         // 画签名
         this.drawSignature();
         var imgDom = this.convertCanvasToImage(c);
