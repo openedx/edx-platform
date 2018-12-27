@@ -586,6 +586,7 @@
                         },
 
                         processNumericalResponse = function(answerValues) {
+
                             var firstAnswer, answerData, numericalResponseString, additionalAnswerString,
                                 textHint, hintLine, additionalTextHint, additionalHintLine, orMatch, hasTolerance;
 
