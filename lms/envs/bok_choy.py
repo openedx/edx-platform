@@ -159,6 +159,9 @@ FEATURES['RESTRICT_AUTOMATIC_AUTH'] = False
 # Open up endpoint for faking Software Secure responses
 FEATURES['ENABLE_SOFTWARE_SECURE_FAKE'] = True
 
+# Disable instructor dash buttons for downloading course data when enrollment exceeds this number
+FEATURES['MAX_ENROLLMENT_INSTR_BUTTONS'] = 4
+
 FEATURES['ENABLE_ENROLLMENT_TRACK_USER_PARTITION'] = True
 
 ########################### Entrance Exams #################################

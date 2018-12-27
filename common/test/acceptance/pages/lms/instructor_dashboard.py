@@ -1090,6 +1090,27 @@ class DataDownloadPage(PageObject):
         return self.q(css='input[name=list-profiles-csv]')
 
     @property
+    def enrolled_student_profile_button(self):
+        """
+        Returns the "List enrolled students' profile information" button.
+        """
+        return self.q(css='input[name=list-profiles]')
+
+    @property
+    def enrolled_student_profile_button_present(self):
+        """
+        Checks for the presence of Enrolled Student Profile Button
+        """
+        return self.q(css='input[name=list-profiles]').present
+
+    @property
+    def generate_grading_configuration_button(self):
+        """
+        Returns the "Grading Configuration" button.
+        """
+        return self.q(css='input[name="dump-gradeconf"]')
+
+    @property
     def generate_grade_report_button(self):
         """
         Returns the "Generate Grade Report" button.
@@ -1130,6 +1151,21 @@ class DataDownloadPage(PageObject):
         Returns a list of all the available reports for download.
         """
         return self.report_download_links.map(lambda el: el.text)
+
+    @property
+    def student_profile_information(self):
+        """
+        Returns Student profile information
+        """
+        return self.q(css='#data-student-profiles-table').text
+
+    @property
+    def grading_config_text(self):
+        """
+        Returns grading configuration text
+        """
+        self.wait_for_element_visibility('#data-grade-config-text', 'Grading Configurations are visible')
+        return self.q(css='#data-grade-config-text').text[0]
 
 
 class StudentAdminPage(PageObject):
