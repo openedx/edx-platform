@@ -204,7 +204,7 @@ class TestCourseHomePage(CourseHomePageTestCase):
 
         # Fetch the view and verify the query counts
         # TODO: decrease query count as part of REVO-28
-        with self.assertNumQueries(86, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
+        with self.assertNumQueries(87, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
             with check_mongo_calls(4):
                 url = course_home_url(self.course)
                 self.client.get(url)
@@ -537,6 +537,27 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
             params=expected_params.urlencode()
         )
         self.assertRedirects(response, expected_url)
+
+    @mock.patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False})
+    def test_expiration_banner_with_expired_upgrade_deadline(self):
+        """
+        Ensure that a user accessing a course with an expired upgrade deadline
+        will still see the course expiration banner without the upgrade related text.
+        """
+        past = datetime(2010, 1, 1)
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=past)
+        course = CourseFactory.create(start=now() - timedelta(days=10))
+        CourseModeFactory.create(course_id=course.id, mode_slug=CourseMode.AUDIT)
+        CourseModeFactory.create(course_id=course.id, mode_slug=CourseMode.VERIFIED, expiration_datetime=past)
+        user = UserFactory(password=self.TEST_PASSWORD)
+        self.client.login(username=user.username, password=self.TEST_PASSWORD)
+        CourseEnrollment.enroll(user, course.id, mode=CourseMode.AUDIT)
+
+        url = course_home_url(course)
+        response = self.client.get(url)
+        bannerText = get_expiration_banner_text(user, course)
+        self.assertContains(response, bannerText, html=True)
+        self.assertContains(response, TEST_BANNER_CLASS)
 
     def test_audit_only_not_expired(self):
         """

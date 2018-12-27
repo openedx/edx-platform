@@ -364,26 +364,35 @@ def get_expiration_banner_text(user, course):
     upgrade_link = verified_upgrade_deadline_link(user=user, course=course)
     enrollment = CourseEnrollment.get_enrollment(user, course.id)
     upgrade_deadline = enrollment.upgrade_deadline
-    if upgrade_deadline is None:
-        return
-    if now() < upgrade_deadline:
+    if upgrade_deadline is None or now() < upgrade_deadline:
         upgrade_deadline = enrollment.course_upgrade_deadline
 
     language = get_language()
-    if language and language.split('-')[0].lower() == 'es':
+    language_is_es = language and language.split('-')[0].lower() == 'es'
+    if language_is_es:
         formatted_expiration_date = strftime_localized(expiration_date, '%-d de %b. de %Y').lower()
-        formatted_upgrade_deadline = strftime_localized(upgrade_deadline, '%-d de %b. de %Y').lower()
     else:
         formatted_expiration_date = strftime_localized(expiration_date, '%b. %-d, %Y')
-        formatted_upgrade_deadline = strftime_localized(upgrade_deadline, '%b. %-d, %Y')
 
-    bannerText = '<strong>Audit Access Expires {expiration_date}</strong><br>\
-                 You lose all access to this course, including your progress, on {expiration_date}.<br>\
-                 Upgrade by {upgrade_deadline} to get unlimited access to the course as long as it exists on the site.\
-                  <a href="{upgrade_link}">Upgrade now<span class="sr-only"> to retain access past {expiration_date}\
-                 </span></a>'.format(
-        expiration_date=formatted_expiration_date,
-        upgrade_link=upgrade_link,
-        upgrade_deadline=formatted_upgrade_deadline
-    )
+    if upgrade_deadline:
+        if language_is_es:
+            formatted_upgrade_deadline = strftime_localized(upgrade_deadline, '%-d de %b. de %Y').lower()
+        else:
+            formatted_upgrade_deadline = strftime_localized(upgrade_deadline, '%b. %-d, %Y')
+
+        bannerText = '<strong>Audit Access Expires {expiration_date}</strong><br>\
+                     You lose all access to this course, including your progress, on {expiration_date}.\
+                     <br>Upgrade by {upgrade_deadline} to get unlimited access to the course as long as it exists\
+                     on the site. <a href="{upgrade_link}">Upgrade now<span class="sr-only"> to retain access past\
+                     {expiration_date}</span></a>'.format(
+            expiration_date=formatted_expiration_date,
+            upgrade_link=upgrade_link,
+            upgrade_deadline=formatted_upgrade_deadline
+        )
+    else:
+        bannerText = '<strong>Audit Access Expires {expiration_date}</strong><br>\
+                     You lose all access to this course, including your progress, on {expiration_date}.\
+                     '.format(
+            expiration_date=formatted_expiration_date
+        )
     return bannerText

@@ -130,6 +130,22 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         self.assertEqual(result, content_availability_date + access_duration)
 
     @mock.patch("openedx.features.course_duration_limits.access.get_course_run_details")
+    def test_expired_upgrade_deadline(self, mock_get_course_run_details):
+        """
+        The expiration date still exists if the upgrade deadline has passed
+        """
+        access_duration = timedelta(weeks=7)
+        mock_get_course_run_details.return_value = {'weeks_to_complete': 7}
+
+        start_date = now() - timedelta(weeks=10)
+        course = CourseFactory(start=start_date)
+        enrollment = CourseEnrollment.enroll(self.user, course.id, CourseMode.AUDIT)
+        add_course_mode(course, upgrade_deadline_expired=True)
+        result = get_user_course_expiration_date(self.user, course)
+        content_availability_date = enrollment.created
+        self.assertEqual(result, content_availability_date + access_duration)
+
+    @mock.patch("openedx.features.course_duration_limits.access.get_course_run_details")
     @ddt.data(
         ({'user_partition_id': CONTENT_GATING_PARTITION_ID,
           'group_id': CONTENT_TYPE_GATE_GROUP_IDS['limited_access']}, True),
