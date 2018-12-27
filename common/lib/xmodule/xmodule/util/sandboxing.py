@@ -1,7 +1,7 @@
 import re
-
 from django.conf import settings
-from lms.djangoapps.dashboard.git_import import DEFAULT_PYTHON_LIB_FILENAME
+
+DEFAULT_PYTHON_LIB_FILENAME = 'python_lib.zip'
 
 
 def can_execute_unsafe_code(course_id):

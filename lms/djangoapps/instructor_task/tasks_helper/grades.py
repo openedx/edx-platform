@@ -595,8 +595,9 @@ class ProblemResponses(object):
                 block and it child blocks.
 
         Returns:
-              List[Dict]: Returns a list of dictionaries containing the student
-                data which will be included in the final csv.
+              Tuple[List[Dict], List[str]]: Returns a list of dictionaries
+                containing the student data which will be included in the
+                final csv, and the features/keys to include in that CSV.
         """
         usage_key = UsageKey.from_string(usage_key_str).map_into_course(course_key)
         user = get_user_model().objects.get(pk=user_id)
@@ -608,6 +609,8 @@ class ProblemResponses(object):
         store = modulestore()
         user_state_client = DjangoXBlockUserStateClient()
 
+        student_data_keys = set()
+
         with store.bulk_operations(course_key):
             for title, path, block_key in cls._build_problem_list(course_blocks, usage_key):
                 # Chapter and sequential blocks are filtered out since they include state
@@ -616,21 +619,22 @@ class ProblemResponses(object):
                     continue
 
                 block = store.get_item(block_key)
+                generated_report_data = {}
 
                 # Blocks can implement the generate_report_data method to provide their own
                 # human-readable formatting for user state.
                 if hasattr(block, 'generate_report_data'):
                     try:
                         user_state_iterator = user_state_client.iter_all_for_block(block_key)
-                        responses = [
-                            {'username': username, 'state': state}
+                        generated_report_data = {
+                            username: state
                             for username, state in
                             block.generate_report_data(user_state_iterator, max_count)
-                        ]
+                        }
                     except NotImplementedError:
-                        responses = list_problem_responses(course_key, block_key, max_count)
-                else:
-                    responses = list_problem_responses(course_key, block_key, max_count)
+                        pass
+
+                responses = list_problem_responses(course_key, block_key, max_count)
 
                 student_data += responses
                 for response in responses:
@@ -639,12 +643,24 @@ class ProblemResponses(object):
                     response['location'] = ' > '.join(path)
                     # A machine-friendly location for the current block
                     response['block_key'] = str(block_key)
+                    user_data = generated_report_data.get(response['username'], {})
+                    response.update(user_data)
+                    student_data_keys = student_data_keys.union(user_data.keys())
                 if max_count is not None:
                     max_count -= len(responses)
                     if max_count <= 0:
                         break
 
-        return student_data
+        # Keep the keys in a useful order, starting with username, title and location,
+        # then the columns returned by the xblock report generator in sorted order and
+        # finally end with the more machine friendly block_key and state.
+        student_data_keys_list = (
+            ['username', 'title', 'location'] +
+            sorted(student_data_keys) +
+            ['block_key', 'state']
+        )
+
+        return student_data, student_data_keys_list
 
     @classmethod
     def generate(cls, _xmodule_instance_args, _entry_id, course_id, task_input, action_name):
@@ -661,14 +677,17 @@ class ProblemResponses(object):
         problem_location = task_input.get('problem_location')
 
         # Compute result table and format it
-        student_data = cls._build_student_data(
+        student_data, student_data_keys = cls._build_student_data(
             user_id=task_input.get('user_id'),
             course_key=course_id,
             usage_key_str=problem_location
         )
 
-        features = ['username', 'title', 'location', 'block_key', 'state']
-        header, rows = format_dictlist(student_data, features)
+        for data in student_data:
+            for key in student_data_keys:
+                data.setdefault(key, '')
+
+        header, rows = format_dictlist(student_data, student_data_keys)
 
         task_progress.attempted = task_progress.succeeded = len(rows)
         task_progress.skipped = task_progress.total - task_progress.attempted

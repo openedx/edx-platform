@@ -11,7 +11,9 @@ import dogstats_wrapper as dog_stats_api
 from capa import responsetypes
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.raw_module import RawDescriptor
+from xmodule.contentstore.django import contentstore
 from xmodule.util.misc import escape_html_characters
+from xmodule.util.sandboxing import get_python_lib_zip
 from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT, XModule, module_attr
 
 from .capa_base import CapaFields, CapaMixin, ComplexEncoder
@@ -331,7 +333,6 @@ class CapaDescriptor(CapaFields, RawDescriptor):
         if limit_responses == 0:
             # Don't even start collecting answers
             return
-
         capa_system = LoncapaSystem(
             ajax_url=None,
             # TODO set anonymous_student_id to the anonymous ID of the user which answered each problem
@@ -341,7 +342,7 @@ class CapaDescriptor(CapaFields, RawDescriptor):
             anonymous_student_id=None,
             cache=None,
             can_execute_unsafe_code=lambda: None,
-            get_python_lib_zip=lambda: None,
+            get_python_lib_zip=(lambda: get_python_lib_zip(contentstore, self.runtime.course_id)),
             DEBUG=None,
             filestore=self.runtime.resources_fs,
             i18n=self.runtime.service(self, "i18n"),
@@ -393,13 +394,17 @@ class CapaDescriptor(CapaFields, RawDescriptor):
 
                 question_text = lcp.find_question_label(answer_id)
                 answer_text = lcp.find_answer_text(answer_id, current_answer=orig_answers)
+                correct_answer_text = lcp.find_correct_answer_text(answer_id)
 
                 count += 1
-                yield (user_state.username, {
+                report = {
                     _("Answer ID"): answer_id,
                     _("Question"): question_text,
                     _("Answer"): answer_text,
-                })
+                }
+                if correct_answer_text is not None:
+                    report[_("Correct Answer")] = correct_answer_text
+                yield (user_state.username, report)
 
     # Proxy to CapaModule for access to any of its attributes
     answer_available = module_attr('answer_available')
