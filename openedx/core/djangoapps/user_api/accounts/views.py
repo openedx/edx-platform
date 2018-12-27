@@ -16,6 +16,7 @@ from django.contrib.auth import authenticate, get_user_model, logout
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.db import transaction
+from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 from edx_ace import ace
 from edx_ace.recipient import Recipient
@@ -524,7 +525,8 @@ def _set_unusable_password(user):
 
 
 class PhoneBindingViewSet(ViewSet):
-    authentication_classes = (SessionAuthenticationAllowInactiveUser, JwtAuthentication, OAuth2AuthenticationAllowInactiveUser)
+    authentication_classes = (
+        SessionAuthenticationAllowInactiveUser, JwtAuthentication, OAuth2AuthenticationAllowInactiveUser)
     permission_classes = (permissions.IsAuthenticated,)
 
     verify_code_key = 'phone_binding_verifycode_{username}_{name}'
@@ -542,7 +544,7 @@ class PhoneBindingViewSet(ViewSet):
             self.send_mobile_code(request.user.username, phone, language_version)
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Exception as e:
-            return Response(getattr(e, 'message', str(e)), status.HTTP_400_BAD_REQUEST)
+            return HttpResponse(content=getattr(e, 'message', str(e)), status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request):
         if self.verify_code(request):
@@ -550,7 +552,7 @@ class PhoneBindingViewSet(ViewSet):
             request.user.profile.save()
             return Response(status=status.HTTP_204_NO_CONTENT)
         else:
-            return Response(_('Verification failed'), status=status.HTTP_400_BAD_REQUEST)
+            return HttpResponse(content=_('Verification failed'), status=status.HTTP_400_BAD_REQUEST)
 
     def send_mobile_code(self, username, mobile, language='en'):
         '''
