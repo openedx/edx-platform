@@ -310,21 +310,23 @@ from six import string_types
         var appID = "1251349076";
         var aboutVideoID = $('.about-video').attr('data-video-id');
         
-        if (aboutVideoID){
-          var player = TCPlayer("player-container-id", {
-            fileID: aboutVideoID,
-            appID: appID,
-            autoplay: true,
-          });
-        }
-
-        
+        var player;
         function showVideo(e){
           var videoID = e.getAttribute('data-video-id');
-          player.loadVideoByID({
-            fileID: videoID, // 请传入需要播放的视频 filID 必须
-            appID: appID, // 请传入点播账号的 appID 必须
-          });
+          if (player){
+            player.loadVideoByID({
+              fileID: videoID, // 请传入需要播放的视频 filID 必须
+              appID: appID, // 请传入点播账号的 appID 必须
+              autoplay: true,
+            });
+          } else {
+            player = TCPlayer("player-container-id", {
+              fileID: videoID,
+              appID: appID,
+              autoplay: true,
+            });
+          }
+          
           $('.about-cover').show();
           $('.video-box').show();
         }
@@ -332,6 +334,7 @@ from six import string_types
         function closeVideo(){
           $('.about-cover').hide();
           $('.video-box').hide();
+          player.pause();
         }
 
       </script>

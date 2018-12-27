@@ -51,8 +51,8 @@ from django.conf import settings
   % endif
   % if allows_login:
     % if can_discover_courses:
-      <div class="mobile-nav-item hidden-mobile nav-item">
-        <a href="/courses">${_('Explore courses')}</a>
+      <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
+        <a class="${'active ' if reverse('courses') in request.path else ''}tab-nav-link" href="/courses">${_('Explore courses')}</a>
       </div>
     %endif
   % endif

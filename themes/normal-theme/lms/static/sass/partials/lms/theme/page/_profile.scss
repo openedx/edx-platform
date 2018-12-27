@@ -194,7 +194,21 @@
   }
 }
 
-
+// certificate card
+.certificate-card{
+  border-color: #e6e9ed;
+  &.mode-verified{
+    border-color: #e6e9ed;
+  }
+  .card-title{
+    font-weight: normal;
+    font-size: 16px;
+    color: $title;
+  }
+}
+.certificate-card .card-logo{
+  background-image: url("../images/certificates/red-certificate.png");
+}
 @media screen and (max-width:768px){
   .profile.profile-self{
     padding: 0;
