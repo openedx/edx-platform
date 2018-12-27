@@ -9318,15 +9318,18 @@ msgstr "由"
 msgid "anonymous (IP logged)"
 msgstr "匿名(IP已记录)"
 
+#: lms/templates/wiki/history.html
 #: wiki/templates/wiki/includes/revision_info.html
 msgid "restored"
 msgstr "恢复"
 
-#: wiki/models/article.py wiki/templates/wiki/article.html
+#: lms/templates/wiki/history.html wiki/models/article.py
+#: wiki/templates/wiki/article.html
 #: wiki/templates/wiki/includes/revision_info.html
 msgid "locked"
 msgstr "已锁定"
 
+#: lms/templates/wiki/history.html
 #: wiki/templates/wiki/includes/revision_info.html
 msgid "unlocked"
 msgstr "解锁"
@@ -9662,6 +9665,7 @@ msgstr "前往%(platform_name)s主页"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#: cms/templates/login.html cms/templates/widgets/header.html
 msgid "Sign In"
 msgstr "登录"
 
@@ -10836,6 +10840,7 @@ msgstr ""
 "{user_agreement_link_start}{user_agreement}{user_agreement_link_end}, "
 "{disclaimer_link_start}{disclaimer}{disclaimer_link_end}和{privacy_policy_link_start}隐私政策{privacy_policy_link_end}."
 
+#: openedx/core/djangoapps/user_api/api.py
 #: lms/templates/static_templates/user_agreement.html
 #: themes/normal-theme/lms/templates/footer.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -23108,15 +23113,15 @@ msgstr "了解更多关于内容知识库的信息"
 
 #: cms/templates/login.html
 msgid "Sign In to {studio_name}"
-msgstr ""
+msgstr "登录{studio_name}"
 
 #: cms/templates/login.html
 msgid "Don't have a {studio_name} Account? Sign up!"
-msgstr ""
+msgstr "还没有{studio_name}账户？现在就注册！"
 
 #: cms/templates/login.html
 msgid "Required Information to Sign In to {studio_name}"
-msgstr ""
+msgstr "登录{studio_name}所必须的信息"
 
 #: cms/templates/manage_users.html
 msgid "Course Team Settings"
