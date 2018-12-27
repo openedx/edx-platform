@@ -3596,20 +3596,6 @@ ALIPAY_APP_INFO = {
     }
 }
 
-############################ ALIPAY_H5_INFO #########################
-ALIPAY_H5_INFO = {
-    "basic_info":{
-        "APP_ID": "",
-        "APP_PRIVATE_KEY": "",
-        "ALIPAY_RSA_PUBLIC_KEY": ""
-    },
-    "other_info":{
-        "SIGN_TYPE": "",
-        "NOTIFY_URL": "",
-        "RETURN_URL": ""
-    }
-}
-
 ############################ ALIPAY_INFO #########################
 ALIPAY_INFO = {
     'basic_info': {
