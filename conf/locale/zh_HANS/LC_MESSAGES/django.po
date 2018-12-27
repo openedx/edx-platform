@@ -1427,7 +1427,7 @@ msgid ""
 msgid_plural ""
 "This password is too short. It must contain at least %(min_length)d "
 "characters."
-msgstr[0] "这个密码太短了. 它必须包含至少%(min_length)d个字符。"
+msgstr[0] "这个密码太短了，它必须包含至少%(min_length)d个字符。"
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-format
@@ -1439,7 +1439,7 @@ msgstr[0] "你的密码必须至少包含%(min_length)d个字符。"
 #, python-format
 msgid "at least %(min_length)d character"
 msgid_plural "at least %(min_length)d characters"
-msgstr[0] "至少%(min_length)d 字符"
+msgstr[0] "至少%(min_length)d个字符"
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-format
