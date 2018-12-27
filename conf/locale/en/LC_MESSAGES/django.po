@@ -392,7 +392,6 @@ msgstr ""
 #: lms/templates/login.html lms/templates/provider_login.html
 #: lms/templates/register-form.html lms/templates/signup_modal.html
 #: lms/templates/sysadmin_dashboard.html
-#: themes/red-theme/cms/templates/login.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Password"
 msgstr ""
@@ -3097,7 +3096,6 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py lms/djangoapps/branding/api.py
 #: lms/templates/footer.html lms/templates/static_templates/about.html
-#: themes/red-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "About"
@@ -4617,12 +4615,8 @@ msgstr ""
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: 'Open edX' is a brand, please keep this untranslated.
 #. See http://openedx.org for more information.
-#. #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
-#. Translators: 'Open edX' is a brand, please keep this untranslated. See
-#. http://openedx.org for more information.
 #: lms/djangoapps/branding/api.py cms/templates/widgets/footer.html
 #: themes/edx.org/lms/templates/certificates/_accomplishment-footer.html
-#: themes/red-theme/lms/templates/footer.html
 msgid "Powered by Open edX"
 msgstr ""
 
@@ -4656,12 +4650,11 @@ msgstr ""
 msgid "{platform_name} for Business"
 msgstr ""
 
-#: lms/djangoapps/branding/api.py themes/red-theme/lms/templates/footer.html
+#: lms/djangoapps/branding/api.py
 msgid "News"
 msgstr ""
 
 #: lms/djangoapps/branding/api.py lms/templates/static_templates/contact.html
-#: themes/red-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "Contact"
@@ -4689,7 +4682,6 @@ msgstr ""
 #: themes/normal-theme/lms/templates/footer.html
 #: themes/normal-theme/lms/templates/static_templates/privacy.html
 #: themes/normal-theme/lms/templates/static_templates/privacy_policy.html
-#: themes/red-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Privacy Policy"
@@ -4708,7 +4700,6 @@ msgstr ""
 #. in order to register a new account.
 #: lms/djangoapps/branding/api.py openedx/core/djangoapps/user_api/api.py
 #: cms/templates/widgets/footer.html lms/templates/static_templates/tos.html
-#: themes/red-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Terms of Service"
@@ -4999,7 +4990,6 @@ msgstr ""
 #: lms/djangoapps/certificates/views/webview.py
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "All rights reserved"
 msgstr ""
 
@@ -9477,69 +9467,58 @@ msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #, python-format
 msgid "Go to %(platform_name)s Home Page"
 msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #: cms/templates/login.html cms/templates/widgets/header.html
-#: themes/red-theme/cms/templates/login.html
 msgid "Sign In"
 msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on LinkedIn"
 msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on Twitter"
 msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on Facebook"
 msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on Google Plus"
 msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on Reddit"
 msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "Download the iOS app on the Apple Store"
 msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "Download the Android app on the Google Play Store"
 msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "Our mailing address is"
 msgstr ""
 
@@ -10217,7 +10196,6 @@ msgstr ""
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #: themes/normal-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
-#: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 msgid "Start learning now"
 msgstr ""
 
@@ -11046,7 +11024,6 @@ msgid ""
 msgstr ""
 
 #: themes/normal-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
-#: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #, python-format
 msgid ""
 "Remember when you enrolled in %(course_name)s, and other courses on edX.org?"
@@ -11054,7 +11031,6 @@ msgid ""
 msgstr ""
 
 #: themes/normal-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
-#: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #, python-format
 msgid ""
 "Remember when you enrolled in %(course_name)s on edX.org? We do, and we’re "
@@ -11835,23 +11811,10 @@ msgstr ""
 msgid "Courses"
 msgstr ""
 
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Sign In to {studio_name}"
-msgstr ""
-
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Don't have a {studio_name} Account? Sign up!"
-msgstr ""
-
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Required Information to Sign In to {studio_name}"
-msgstr ""
-
 #: cms/templates/login.html cms/templates/register.html
 #: lms/templates/help_modal.html lms/templates/login.html
 #: lms/templates/provider_login.html lms/templates/register-form.html
 #: lms/templates/register-shib.html lms/templates/signup_modal.html
-#: themes/red-theme/cms/templates/login.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "E-mail"
@@ -11863,14 +11826,13 @@ msgstr ""
 #: cms/templates/login.html cms/templates/manage_users.html
 #: cms/templates/manage_users_lib.html cms/templates/register.html
 #: lms/templates/login.html lms/templates/register-form.html
-#: lms/templates/register-shib.html themes/red-theme/cms/templates/login.html
+#: lms/templates/register-shib.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "example: username@domain.com"
 msgstr ""
 
 #: cms/templates/login.html lms/templates/login.html
-#: themes/red-theme/cms/templates/login.html
 msgid "Forgot password?"
 msgstr ""
 
@@ -11932,7 +11894,6 @@ msgid "Reset"
 msgstr ""
 
 #: cms/templates/widgets/footer.html lms/templates/footer.html
-#: themes/red-theme/lms/templates/footer.html
 msgid "Legal"
 msgstr ""
 
@@ -14539,6 +14500,7 @@ msgid "Add to Mozilla Backpack"
 msgstr ""
 
 #: lms/templates/certificates/_accomplishment-banner.html
+#: themes/normal-theme/lms/templates/certificates/_accomplishment-banner.html
 msgid "Print Certificate"
 msgstr ""
 
@@ -14555,7 +14517,6 @@ msgid "Supported by the following organizations"
 msgstr ""
 
 #: lms/templates/certificates/_accomplishment-rendering.html
-#: themes/normal-theme/lms/templates/certificates/_accomplishment-rendering.html
 msgid "Awarded to:"
 msgstr ""
 
@@ -19115,12 +19076,10 @@ msgid ""
 msgstr ""
 
 #: lms/templates/static_templates/faq.html
-#: themes/red-theme/lms/templates/footer.html
 msgid "FAQ"
 msgstr ""
 
 #: lms/templates/static_templates/jobs.html
-#: themes/red-theme/lms/templates/footer.html
 msgid "Jobs"
 msgstr ""
 
@@ -19958,6 +19917,10 @@ msgstr ""
 msgid "Enjoy high-value MBA curriculum with ￥99.8 monthly payment!"
 msgstr ""
 
+#: themes/normal-theme/lms/templates/certificates/_accomplishment-banner.html
+msgid "\\u4e0b\\u8f7d\\u8bc1\\u4e66"
+msgstr ""
+
 #: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid "Add {course_name} to Cart <span>({price} USD)</span>"
 msgstr ""
@@ -20732,20 +20695,6 @@ msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
 msgid "请用户在发现任何违反本服务协议以及其他任何单项服务的服务条款、英荔各类公告之情形时，通知英荔。"
-msgstr ""
-
-#. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
-#. Please do not translate any of these trademarks and company names.
-#: themes/red-theme/lms/templates/footer.html
-msgid ""
-"EdX, Open edX, and the edX and Open edX logos are registered trademarks or "
-"trademarks of {link_start}edX Inc.{link_end}"
-msgstr ""
-
-#: themes/red-theme/lms/templates/footer.html
-msgid ""
-"{tos_link_start}Terms of Service{tos_link_end} and {honor_link_start}Honor "
-"Code{honor_link_end}"
 msgstr ""
 
 #: themes/stanford-style/lms/templates/footer.html
@@ -22721,6 +22670,18 @@ msgstr ""
 
 #: cms/templates/library.html
 msgid "Learn more about content libraries"
+msgstr ""
+
+#: cms/templates/login.html
+msgid "Sign In to {studio_name}"
+msgstr ""
+
+#: cms/templates/login.html
+msgid "Don't have a {studio_name} Account? Sign up!"
+msgstr ""
+
+#: cms/templates/login.html
+msgid "Required Information to Sign In to {studio_name}"
 msgstr ""
 
 #: cms/templates/manage_users.html
