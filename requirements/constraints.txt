@@ -19,9 +19,6 @@ Markdown==2.6.11
 # Can be removed when we get to Python 3.
 pylint-plugin-utils==0.3
 
-# Testing framework # Pinned due to https://github.com/pytest-dev/pytest/issues/3749
-pytest==3.6.3
-
 # pytest plugin for measuring code coverage. # Pinned due to https://openedx.atlassian.net/browse/TE-2731
 pytest-cov<2.6
 
