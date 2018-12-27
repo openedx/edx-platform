@@ -304,8 +304,10 @@
       height: 46px;
       background: rgba(0, 117, 180, 0.65);
       position: absolute;
-      top: 35px;
-      left: 105px;
+      top: 50%;
+      left: 50%;
+      margin-top: -23px;
+      margin-left: -23px;
       border-radius: 23px;
     }
 
