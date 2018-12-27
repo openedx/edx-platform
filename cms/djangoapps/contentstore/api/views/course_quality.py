@@ -191,7 +191,8 @@ class CourseQualityView(DeveloperErrorViewMixin, GenericAPIView):
 
     def _videos_quality(self, course):
         video_blocks_in_course = modulestore().get_items(course.id, qualifiers={'category': 'video'})
-        videos_in_val = list(get_videos_for_course(course.id))
+        videos, __ = get_videos_for_course(course.id)
+        videos_in_val = list(videos)
         video_durations = [video['duration'] for video in videos_in_val]
 
         return dict(
