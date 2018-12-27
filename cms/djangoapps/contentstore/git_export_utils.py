@@ -130,11 +130,8 @@ def export_to_git(course_id, repo, user='', rdir=None):
             raise GitExportError(GitExportError.CANNOT_PULL)
 
     # export course as xml before commiting and pushing
-    root_dir = os.path.dirname(rdirp)
-    course_dir = os.path.basename(rdirp).rsplit('.git', 1)[0]
     try:
-        export_course_to_xml(modulestore(), contentstore(), course_id,
-                             root_dir, course_dir)
+        export_course_to_xml(modulestore(), contentstore(), course_id, rdirp, 'course')
     except (EnvironmentError, AttributeError):
         log.exception('Failed export to xml')
         raise GitExportError(GitExportError.XML_EXPORT_FAIL)
