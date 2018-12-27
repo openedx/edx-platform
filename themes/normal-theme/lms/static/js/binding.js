@@ -99,8 +99,13 @@ var phoneDialog = function(){
                 headers : {'Authorization': $.cookie('csrftoken')},
                 success: function(){
                 console.log('绑定成功');
-                $('.eliteu-message-box').show();
-                $('.message-content').html(gettext('Cellphone number binding successfully'));
+                $('.eliteu-message-tips').show();
+                $('.eliteu-message-tips .text').html(gettext('Cellphone number binding successfully'))
+                setTimeout(() => {
+                    $('.eliteu-message-tips').hide();
+                }, 3000);
+                // $('.eliteu-message-box').show();
+                // $('.message-content').html(gettext('Cellphone number binding successfully'));
                 $('.phone-dialog').hide();
                 $('.meassage-op').hide();
                 },
