@@ -40,15 +40,15 @@ course_mode_class = course_mode if course_mode else ''
     </div>
 </main>
 <div style="display:none">
-    <canvas width="1170" height="826"  id="canvas">
+    <canvas width="1170" height="826" id="canvas">
 
     </canvas>
     <div id="img-list">
         <img id="bg" src="/static/normal-theme/images/certificates/${user_language_or_default}.png" />
         % if certificate_data:
-            % for signatory in certificate_data.get('signatories', []):
-                <img name="${signatory['name']}" class="signature" src="${signatory['signature_image_path']}" alt="${signatory['name']}">
-            % endfor
+        % for signatory in certificate_data.get('signatories', []):
+        <img name="${signatory['name']}" class="signature" src="${signatory['signature_image_path']}" alt="${signatory['name']}">
+        % endfor
         % endif
     </div>
     <div id="qrcode"></div>
@@ -61,17 +61,18 @@ course_mode_class = course_mode if course_mode else ''
 <script src="/static/normal-theme/js/certificates/qrcode.js"></script>
 <script>
     var url = $.trim($('#url').text());
-    url = location.protocol+ '//' + location.host + url;   
-    var data = {    
+    url = location.protocol + '//' + location.host + url;
+    var data = {
         text: url,
         width: 78,
         height: 78,
-        colorDark : "#000000",
-        colorLight : "#ffffff",
-        correctLevel : QRCode.CorrectLevel.H
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
     }
     var qrcode = new QRCode(document.getElementById("qrcode"), data);
-    $(document).ready(function(){
+
+    $(document).ready(function () {
         var data = {
             username: '${accomplishment_copy_name}',
             course: '${accomplishment_copy_course_name}',
@@ -82,12 +83,36 @@ course_mode_class = course_mode if course_mode else ''
             verifyAdress: url,
             langulage: '${user_language_or_default}'
         }
-        var i = 0;
-        $('#img-list .signature').load(function(){
-            i++;
-            if (i == $('#img-list .signature').length){
-                _certificates(data)
+        var bg = document.querySelector('#bg').src;
+        var list = document.querySelector('#img-list .signature');
+        var img = [], flag = 0, mulitImg = [];
+        for (var i = 0; i < list.length; i++) {
+            mulitImg.push(list[i].src);
+        }
+        mulitImg.push(bg);
+        var imgTotal = mulitImg.length;
+        for (var i = 0; i < imgTotal; i++) {
+            img[i] = new Image()
+            img[i].src = mulitImg[i]
+            img[i].onload = function () {
+                //第i张图片加载完成
+                flag++
+                if (flag == imgTotal) {
+                    //全部加载完成
+                    console.log('加载完全')
+                    _certificates(data)
+                }
             }
-        })
+        }
+        // var i = 0;
+        // setTimeout(() => {
+            
+        // }, 1500);
+        // $('#img-list .signature').load(function(){
+        //     i++;
+        //     if (i == $('#img-list .signature').length){
+        //         _certificates(data)
+        //     }
+        // })
     })    
 </script>
