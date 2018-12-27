@@ -3,6 +3,7 @@
 Student dashboard page.
 """
 from bok_choy.page_object import PageObject
+from opaque_keys.edx.keys import CourseKey
 
 from common.test.acceptance.pages.lms import BASE_URL
 
@@ -246,3 +247,20 @@ class DashboardPage(PageObject):
             'Language selector element is available'
         )
         return self.q(css='#settings-language-value')
+
+    def is_course_present(self, course_id):
+        """
+        Checks whether course is present or not.
+
+        Arguments:
+            course_id(str): The unique course id.
+
+        Returns:
+            bool: True if the course is present.
+        """
+        course_number = CourseKey.from_string(course_id).course
+        return self.q(
+            css='#actions-dropdown-link-0[data-course-number="{}"]'.format(
+                course_number
+            )
+        ).present
