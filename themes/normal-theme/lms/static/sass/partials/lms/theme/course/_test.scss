@@ -82,6 +82,9 @@
     &:hover{
       border-bottom: 3px solid $primary;
     }
+    span:not(:last-child){
+      padding-right: 0;
+    }
   }
   .button-previous span:last-child{
     display: none;
