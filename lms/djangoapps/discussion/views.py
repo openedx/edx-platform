@@ -19,7 +19,7 @@ from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseServerError
 from django.shortcuts import render_to_response
 from django.template.loader import render_to_string
-from django.utils.translation import get_language_bidi
+from django.utils.translation import get_language_bidi, get_language
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods
 from django_comment_client.constants import TYPE_ENTRY
@@ -45,6 +45,7 @@ from web_fragments.fragment import Fragment
 from xmodule.modulestore.django import modulestore
 
 import lms.lib.comment_client as cc
+from xmodule.modulestore.django import ModuleI18nService
 from lms.djangoapps.courseware.views.views import check_and_get_upgrade_link, get_cosmetic_verified_display_price
 from openedx.core.djangoapps.course_groups.cohorts import (
     is_course_cohorted,
@@ -477,6 +478,7 @@ def _create_discussion_board_context(request, course_key, discussion_id=None, th
         'user_group_id': user_group_id,  # read from container in NewPostView
         'sort_preference': cc_user.default_sort_key,
         'category_map': course_settings["category_map"],
+        'i18n_service': ModuleI18nService,
         'course_settings': course_settings,
         'is_commentable_divided': is_commentable_divided(course_key, discussion_id, course_discussion_settings),
         # TODO: (Experimental Code). See https://openedx.atlassian.net/wiki/display/RET/2.+In-course+Verification+Prompts
@@ -682,11 +684,13 @@ class DiscussionBoardFragmentView(EdxFragmentView):
             return fragment
         except cc.utils.CommentClientMaintenanceError:
             log.warning('Forum is in maintenance mode')
-            html = render_to_response('discussion/maintenance_fragment.html', {
+            html = render_to_string('discussion/maintenance_fragment.html', {
                 'disable_courseware_js': True,
                 'uses_pattern_library': True,
             })
-            return Fragment(html)
+            fragment = Fragment(html)
+            self.add_fragment_resource_urls(fragment)
+            return fragment
 
     def vendor_js_dependencies(self):
         """
@@ -701,9 +705,19 @@ class DiscussionBoardFragmentView(EdxFragmentView):
             base_vendor_dependencies = self.get_js_dependencies('base_vendor')
             base_vendor_dependencies.append('js/vendor/jquery.leanModal.js')
             base_vendor_dependencies.append('lms/js/require-config.js')
+            base_vendor_dependencies.append(self.get_translation_content())
             vendor_dependencies = base_vendor_dependencies + vendor_dependencies
 
         return vendor_dependencies
+
+    @staticmethod
+    def get_translation_content():
+        try:
+            return 'js/i18n/{lang}/djangojs.js'.format(
+                lang=get_language(),
+            )
+        except IOError:
+            return 'js/i18n/en/djangojs.js'
 
     def js_dependencies(self):
         """

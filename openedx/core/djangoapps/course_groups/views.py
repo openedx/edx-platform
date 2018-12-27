@@ -537,8 +537,10 @@ class CohortHandler(DeveloperErrorViewMixin, APIPermissions):
             raise self.api_error(status.HTTP_400_BAD_REQUEST,
                                  '"assignment_type" must be specified to create cohort.',
                                  'missing-assignment-type')
-        return _get_cohort_response(
-            cohorts.add_cohort(course_key, name, assignment_type), course)
+        try:
+            return _get_cohort_response(cohorts.add_cohort(course_key, name, assignment_type), course)
+        except ValueError as err:
+            raise self.api_error(status.HTTP_400_BAD_REQUEST, str(err), 'cohort-name-exists')
 
     def patch(self, request, course_key_string, cohort_id=None):
         """

@@ -7,7 +7,7 @@ from datetime import datetime
 
 import ddt
 import pytz
-from mock import Mock
+from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
 
 from django_comment_common.signals import (
@@ -185,12 +185,14 @@ class TeamSignalsTest(EventTestMixin, SharedModuleStoreTestCase):
         )
     )
     @ddt.unpack
-    def test_signals(self, signal, (user, should_update)):
+    @patch('lms.lib.comment_client.thread.Thread.__getattr__')
+    def test_signals(self, signal, (user, should_update), mock_func):
         """Test that `last_activity_at` is correctly updated when team-related
         signals are sent.
         """
         with self.assert_last_activity_updated(should_update):
             user = getattr(self, user)
+            mock_func.return_value = user.id
             signal.send(sender=None, user=user, post=self.mock_comment())
 
     @ddt.data(thread_voted, comment_voted)
@@ -201,9 +203,11 @@ class TeamSignalsTest(EventTestMixin, SharedModuleStoreTestCase):
             signal.send(sender=None, user=self.user, post=self.mock_comment(user=self.moderator))
 
     @ddt.data(*SIGNALS_LIST)
-    def test_signals_course_context(self, signal):
+    @patch('lms.lib.comment_client.thread.Thread.__getattr__')
+    def test_signals_course_context(self, signal, mock_func):
         """Test that `last_activity_at` is not updated when activity takes
         place in discussions outside of a team.
         """
         with self.assert_last_activity_updated(False):
+            mock_func.return_value = self.user.id
             signal.send(sender=None, user=self.user, post=self.mock_comment(context='course'))
