@@ -84,15 +84,25 @@
     .profile-section-one-fields>.u-field{
       padding: 10px 0;
 
+      &:hover{
+        border: none;
+        background: rgba(182,220,254,0.1);
+      }
+
       .u-field-title{
         text-align: center;
         color: $title;
+        width: 100%;
       }
       &:first-child{
         padding: 0;
         font-size: 16px;
         color: $title;
         font-weight: bold;
+      }
+      &:not(:first-child){
+        padding: 0;
+        margin: 0 0 10px;
       }
       &:not(.u-field-readonly):not(:last-child){
         padding-bottom: 15px;
@@ -104,6 +114,8 @@
         color: $font;
         font-weight: normal;
         -webkit-font-smoothing: unset;
+        word-break: break-all;
+        line-height: 1.5;
       }
     } 
 
@@ -140,6 +152,7 @@
       font-size: 16px;
       color: $title;
       font-weight: normal;
+      margin-bottom: 10px;
     }
     .u-field-value{
       color: $font;
@@ -199,16 +212,32 @@
   border-color: #e6e9ed;
   &.mode-verified{
     border-color: #e6e9ed;
+
+    &:hover{
+      border: 1px solid $border;
+      box-shadow: none;
+    }
+  }
+
+  &:hover{
+    border: 1px solid $border;
+    box-shadow: none;
+  }
+  .card-logo{
+    background-image: url("../images/certificates/red-certificate.png");
   }
   .card-title{
     font-weight: normal;
     font-size: 16px;
     color: $title;
   }
+  .card-supertitle{
+    color: $font;
+    font-size: 14px;
+  }
 }
-.certificate-card .card-logo{
-  background-image: url("../images/certificates/red-certificate.png");
-}
+
+
 @media screen and (max-width:768px){
   .profile.profile-self{
     padding: 0;

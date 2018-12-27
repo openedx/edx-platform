@@ -35,6 +35,9 @@
     overflow-y: hidden;
     overflow-x: hidden;
 
+    .fa{
+      vertical-align: middle;
+    }
     ol li{
       border: 0;
       &:not(:last-child){

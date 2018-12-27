@@ -123,6 +123,9 @@ input[type="submit"], input[type="button"], button, .button{
   box-shadow: none;
   text-shadow: none;
 }
+button{
+  border: none;
+}
 button:focus:not(:disabled), button:hover:not(:disabled){
   outline: none;
   border: none;
