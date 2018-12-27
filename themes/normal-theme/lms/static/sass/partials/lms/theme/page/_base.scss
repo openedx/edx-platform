@@ -232,3 +232,27 @@ button:focus:not(:disabled), button:hover:not(:disabled){
     cursor: pointer;
   }
 }
+
+.eliteu-message-tips{
+  background-color: #ffffff;
+  box-shadow: 0px 4px 12px 0px 
+    rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  border: solid 1px #e6e9ed;
+  padding: 9px 16px;
+  position: absolute;
+  left: 50%;
+  top: 20%;
+  display: block;
+  font-size: 14px;
+  color: #2e313c;
+  transform: translate(-50%,0);
+  .fa{
+      &:before{
+          vertical-align: middle;
+      }
+  }
+  span{
+      vertical-align: middle;
+  }
+}

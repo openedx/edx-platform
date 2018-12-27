@@ -238,6 +238,9 @@ textarea, form#wiki_revision .CodeMirror, input[type="text"]{
     #hint_id_summary{
       display: none;
     }
+    .pull-right{
+      display: none;
+    }
     
   } 
   .container .wiki-wrapper section.wiki .article-functions{
