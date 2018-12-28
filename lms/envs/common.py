@@ -404,7 +404,10 @@ FEATURES = {
     'ENABLE_PAYMENTS_INTEGRATION': False,
 
     # Whether to enable course unenroll
-    'ENABLE_COURSE_UNENROLL': False
+    'ENABLE_COURSE_UNENROLL': False,
+
+    # Whether to enable elite courses sort
+    'ENABLE_COURSE_SORTING_BY_START_DATE_DESC': False
 }
 
 # Settings for the course reviews tool template and identification key, set either to None to disable course reviews
@@ -3585,24 +3588,14 @@ WECHAT_H5_PAY_INFO = {
 
 ############################ ALIPAY_INFO #########################
 ALIPAY_APP_INFO = {
-    'basic_info': {
-        "KEY": "",
-        "PARTNER": "",
-        "SELLER_EMAIL": ""
+    "basic_info":{
+        "APP_ID": "",
+        "APP_PRIVATE_KEY": "",
+        "ALIPAY_RSA_PUBLIC_KEY": ""
     },
-    'other_info': {
-        "INPUT_CHARSET": "",
-        "INPUT_DIRECT_CHARSET": "",
+    "other_info":{
         "SIGN_TYPE": "",
-        "RETURN_URL": "",
-        "NOTIFY_URL": "",
-        "REFUND_NOTIFY_URL": "",
-        "SHOW_URL": "",
-        "ERROR_NOTIFY_URL": "",
-        "TRANSPORT": "",
-        "DEFAULT_BANK": "",
-        "IT_B_PAY": "",
-        "REFUND_URL": ""
+        "NOTIFY_URL": ""
     }
 }
 
@@ -3628,3 +3621,4 @@ ALIPAY_INFO = {
         "REFUND_URL": ""
     }
 }
+

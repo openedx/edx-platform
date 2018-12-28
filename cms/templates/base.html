@@ -9,6 +9,7 @@
 <%namespace name='static' file='static_content.html'/>
 <%!
 from django.utils.translation import ugettext as _
+from django.conf import settings
 
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangolib.js_utils import (
@@ -40,6 +41,15 @@ from openedx.core.release import RELEASE_LINE
     <%
       jsi18n_path = "js/i18n/{language}/djangojs.js".format(language=LANGUAGE_CODE)
     %>
+
+    <% sentry_dsn_frontend = getattr(settings, 'SENTRY_DSN_FRONTEND', '') %>
+    % if sentry_dsn_frontend:
+        <script src="https://browser.sentry-cdn.com/4.4.2/bundle.min.js" crossorigin="anonymous"></script>
+        <script type="text/javascript">
+            // Sentry Settings
+            Sentry.init({ dsn: '${sentry_dsn_frontend}' });
+        </script>
+    % endif
 
     % if getattr(settings, 'CAPTURE_CONSOLE_LOG', False):
         <script type="text/javascript">

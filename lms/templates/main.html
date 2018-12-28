@@ -14,6 +14,7 @@
 <% online_help_token = self.online_help_token() if hasattr(self, 'online_help_token') else None %>
 <%!
 from branding import api as branding_api
+from django.conf import settings
 from django.urls import reverse
 from django.utils.http import urlquote_plus
 from django.utils.translation import ugettext as _
@@ -45,11 +46,14 @@ from pipeline_mako import render_require_js_path_overrides
       </title>
   </%block>
 
-<script src="https://browser.sentry-cdn.com/4.4.2/bundle.min.js" crossorigin="anonymous"></script>
-<script type="text/javascript">
-    // Sentry Settings
-    Sentry.init({ dsn: 'https://b84c50ff7f2b4cc1b555e4d825a55352@sentry.io/1359551' });
-</script>
+  <% sentry_dsn_frontend= getattr(settings, 'SENTRY_DSN_FRONTEND', '') %>
+  % if sentry_dsn_frontend:
+      <script src="https://browser.sentry-cdn.com/4.4.2/bundle.min.js" crossorigin="anonymous"></script>
+      <script type="text/javascript">
+          // Sentry Settings
+          Sentry.init({ dsn: '${sentry_dsn_frontend}' });
+      </script>
+  % endif
 
 
   % if not allow_iframing:

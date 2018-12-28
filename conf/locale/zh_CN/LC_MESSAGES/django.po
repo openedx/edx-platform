@@ -8,9 +8,9 @@
 # 婕 高 <j.gao@eliteu.cn>, 2018
 # 微 李 <w.li@eliteu.com.cn>, 2018
 # Yi Li <y.li@eliteu.cn>, 2018
-# li ying <code@eliteu.cn>, 2018
 # 陈滢冲 <yc.chen@eliteu.cn>, 2018
 # 家璧 刘 <jb.liu@eliteu.com.cn>, 2018
+# li ying <code@eliteu.cn>, 2018
 #
 # #-#-#-#-#  django-studio.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/).
@@ -30,11 +30,11 @@
 # EdX Team <info@edx.org>, 2018.
 #
 # Translators:
-# 微 李 <w.li@eliteu.com.cn>, 2018
 # 婕 高 <j.gao@eliteu.cn>, 2018
 # Yi Li <y.li@eliteu.cn>, 2018
 # 家璧 刘 <jb.liu@eliteu.com.cn>, 2018
 # li ying <code@eliteu.cn>, 2018
+# 微 李 <w.li@eliteu.com.cn>, 2018
 #
 # #-#-#-#-#  mako-studio.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)
@@ -76,7 +76,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-12-18 10:17+0800\n"
+"POT-Creation-Date: 2018-12-13 17:36+0800\n"
 "PO-Revision-Date: 2018-12-07 12:23+0000\n"
 "Last-Translator: li ying <code@eliteu.cn>, 2018\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)\n"
@@ -423,7 +423,6 @@ msgstr "用户资料"
 #: lms/templates/login.html lms/templates/provider_login.html
 #: lms/templates/register-form.html lms/templates/signup_modal.html
 #: lms/templates/sysadmin_dashboard.html
-#: themes/red-theme/cms/templates/login.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Password"
 msgstr "密码"
@@ -1413,7 +1412,7 @@ msgstr "您的密码必须包含{length_instruction}，包括{complexity_instruc
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
 msgid "Your password must contain {length_instruction}."
-msgstr "您的密码必须包含 {length_instruction}。"
+msgstr "您的密码必须包含{length_instruction}。"
 
 #: common/djangoapps/util/password_policy_validators.py
 msgid "Invalid password."
@@ -1421,9 +1420,25 @@ msgstr "密码无效。"
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-format
+msgid ""
+"This password is too short. It must contain at least %(min_length)d "
+"character."
+msgid_plural ""
+"This password is too short. It must contain at least %(min_length)d "
+"characters."
+msgstr[0] "这个密码太短了，它必须包含至少%(min_length)d个字符。"
+
+#: common/djangoapps/util/password_policy_validators.py
+#, python-format
+msgid "Your password must contain at least %(min_length)d character."
+msgid_plural "Your password must contain at least %(min_length)d characters."
+msgstr[0] "你的密码必须至少包含%(min_length)d个字符。"
+
+#: common/djangoapps/util/password_policy_validators.py
+#, python-format
 msgid "at least %(min_length)d character"
 msgid_plural "at least %(min_length)d characters"
-msgstr[0] "至少%(min_length)d 字符"
+msgstr[0] "至少%(min_length)d个字符"
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-format
@@ -2389,7 +2404,7 @@ msgstr "你的答案已保存。"
 msgid ""
 "Your answers have been saved but not graded. Click '{button_name}' to grade "
 "them."
-msgstr "您的答案已保存，但不计分。点击 '{button_name}'以分级他们。"
+msgstr "您的答案已保存，点击'{button_name}'以供评分。"
 
 #. Translators: 'closed' means the problem's due date has passed. You may no
 #. longer attempt to solve the problem.
@@ -3116,7 +3131,6 @@ msgstr "两者都"
 
 #: common/lib/xmodule/xmodule/course_module.py lms/djangoapps/branding/api.py
 #: lms/templates/footer.html lms/templates/static_templates/about.html
-#: themes/red-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "About"
@@ -4689,12 +4703,8 @@ msgstr "© {org_name}。版权所有，除非另有注明。EdX、Open edX和他
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: 'Open edX' is a brand, please keep this untranslated.
 #. See http://openedx.org for more information.
-#. #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
-#. Translators: 'Open edX' is a brand, please keep this untranslated. See
-#. http://openedx.org for more information.
 #: lms/djangoapps/branding/api.py cms/templates/widgets/footer.html
 #: themes/edx.org/lms/templates/certificates/_accomplishment-footer.html
-#: themes/red-theme/lms/templates/footer.html
 msgid "Powered by Open edX"
 msgstr "Powered by Open edX"
 
@@ -4728,12 +4738,11 @@ msgstr "捐助"
 msgid "{platform_name} for Business"
 msgstr "{platform_name} 为商业"
 
-#: lms/djangoapps/branding/api.py themes/red-theme/lms/templates/footer.html
+#: lms/djangoapps/branding/api.py
 msgid "News"
 msgstr "新闻"
 
 #: lms/djangoapps/branding/api.py lms/templates/static_templates/contact.html
-#: themes/red-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "Contact"
@@ -4761,7 +4770,6 @@ msgstr "服务条款 & 荣誉准则"
 #: themes/normal-theme/lms/templates/footer.html
 #: themes/normal-theme/lms/templates/static_templates/privacy.html
 #: themes/normal-theme/lms/templates/static_templates/privacy_policy.html
-#: themes/red-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Privacy Policy"
@@ -4780,7 +4788,6 @@ msgstr "网站导航"
 #. in order to register a new account.
 #: lms/djangoapps/branding/api.py openedx/core/djangoapps/user_api/api.py
 #: cms/templates/widgets/footer.html lms/templates/static_templates/tos.html
-#: themes/red-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Terms of Service"
@@ -5075,7 +5082,6 @@ msgstr "{platform_name} 借由证书承认已完成修习课程，该课之修�
 #: lms/djangoapps/certificates/views/webview.py
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "All rights reserved"
 msgstr "保留所有权利"
 
@@ -5450,12 +5456,12 @@ msgstr "升级到验证"
 #: lms/djangoapps/courseware/date_summary.py
 #, python-brace-format
 msgid "{relative} ago - {absolute}"
-msgstr "{relative} 年 - {absolute}"
+msgstr "{relative} 前 - {absolute}"
 
 #: lms/djangoapps/courseware/date_summary.py
 #, python-brace-format
 msgid "in {relative} - {absolute}"
-msgstr "in {relative} - {absolute}"
+msgstr " {relative}后 - {absolute}"
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Course Starts"
@@ -7114,7 +7120,7 @@ msgstr "重置"
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
-#: lms/djangoapps/instructor_task/tasks.py
+#: lms/djangoapps/instructor_task/tasks.py lms/templates/wiki/history.html
 #: lms/templates/wiki/plugins/attachments/index.html wiki/models/article.py
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
@@ -7696,7 +7702,7 @@ msgstr "金额"
 msgid "Billing Address"
 msgstr "帐单地址"
 
-#: lms/djangoapps/shoppingcart/pdf.py
+#: lms/djangoapps/shoppingcart/pdf.py openedx/core/djangoapps/user_api/api.py
 #: lms/templates/static_templates/disclaimer.html
 #: themes/normal-theme/lms/templates/footer.html
 #: themes/normal-theme/lms/templates/static_templates/disclaimer.html
@@ -8697,7 +8703,7 @@ msgstr "订阅 {platform_name} 的YouTube频道"
 
 #: lms/envs/common.py membership/templates/membership/index.html
 msgid "Certificate"
-msgstr "证书"
+msgstr "结课证书"
 
 #: lms/envs/common.py
 msgid "Certificate of Achievement"
@@ -9298,6 +9304,37 @@ msgstr ""
 "点击每一个版本，您将会看到被编辑行的列表。点击预览按钮，您可以看到这篇文章目前的状态。在页面的底部，您可以切换到一个指定版本，或者合并两个现存的版本生成新版本。"
 
 #: lms/templates/wiki/history.html
+msgid "anonymous (IP not logged)"
+msgstr "匿名(IP未记录)"
+
+#: lms/templates/wiki/history.html
+#: wiki/templates/wiki/includes/revision_info.html
+msgid "by"
+msgstr "由"
+
+#: lms/templates/wiki/history.html
+#: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/templates/wiki/includes/revision_info.html
+msgid "anonymous (IP logged)"
+msgstr "匿名(IP已记录)"
+
+#: lms/templates/wiki/history.html
+#: wiki/templates/wiki/includes/revision_info.html
+msgid "restored"
+msgstr "恢复"
+
+#: lms/templates/wiki/history.html wiki/models/article.py
+#: wiki/templates/wiki/article.html
+#: wiki/templates/wiki/includes/revision_info.html
+msgid "locked"
+msgstr "已锁定"
+
+#: lms/templates/wiki/history.html
+#: wiki/templates/wiki/includes/revision_info.html
+msgid "unlocked"
+msgstr "解锁"
+
+#: lms/templates/wiki/history.html
 msgid "(no log message)"
 msgstr "(无日志消息)"
 
@@ -9580,11 +9617,6 @@ msgid "Restore"
 msgstr "恢复"
 
 #: lms/templates/wiki/plugins/attachments/index.html
-#: wiki/templates/wiki/includes/revision_info.html
-msgid "anonymous (IP logged)"
-msgstr "匿名(IP已记录)"
-
-#: lms/templates/wiki/plugins/attachments/index.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid "File history"
 msgstr "文件历史"
@@ -9627,69 +9659,58 @@ msgstr "ACE 共享"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #, python-format
 msgid "Go to %(platform_name)s Home Page"
 msgstr "前往%(platform_name)s主页"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #: cms/templates/login.html cms/templates/widgets/header.html
-#: themes/red-theme/cms/templates/login.html
 msgid "Sign In"
 msgstr "登录"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on LinkedIn"
 msgstr "%(platform_name)s的领英官方号"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on Twitter"
 msgstr "%(platform_name)s的推特官方账号"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on Facebook"
 msgstr "%(platform_name)s的Facebook官方账号"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on Google Plus"
 msgstr "%(platform_name)s的Google+官方账号"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on Reddit"
 msgstr "%(platform_name)s的Reddit官方账号"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "Download the iOS app on the Apple Store"
 msgstr "在平台官方应用商店下载iOS App"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "Download the Android app on the Google Play Store"
 msgstr "在Google Play商店下载安卓App"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "Our mailing address is"
 msgstr "我们的邮箱地址"
 
@@ -10383,7 +10404,6 @@ msgstr ""
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #: themes/normal-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
-#: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 msgid "Start learning now"
 msgstr "马上开始学习"
 
@@ -10811,12 +10831,21 @@ msgstr "您必须同意接受{platform_name}的{terms_of_service}"
 msgid ""
 "By creating an account with {platform_name}, you agree                   to "
 "abide by our {platform_name}                   "
-"{terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end}"
-"                   and agree to our {privacy_policy_link_start}Privacy "
+"{user_agreement_link_start}{user_agreement}{user_agreement_link_end}, "
+"{disclaimer_link_start}{disclaimer}{disclaimer_link_end}                   "
+"and agree to our {privacy_policy_link_start}Privacy "
 "Policy{privacy_policy_link_end}."
 msgstr ""
 "注册{platform_name}即表示同意遵守{platform_name} "
-"{terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end}和{privacy_policy_link_start}隐私政策{privacy_policy_link_end}."
+"{user_agreement_link_start}{user_agreement}{user_agreement_link_end}, "
+"{disclaimer_link_start}{disclaimer}{disclaimer_link_end}和{privacy_policy_link_start}隐私政策{privacy_policy_link_end}."
+
+#: openedx/core/djangoapps/user_api/api.py
+#: lms/templates/static_templates/user_agreement.html
+#: themes/normal-theme/lms/templates/footer.html
+#: themes/normal-theme/lms/templates/static_templates/user_agreement.html
+msgid "User Agreement"
+msgstr "用户协议"
 
 #. Translators: "Terms of service" is a legal document users must agree to
 #. in order to register a new account.
@@ -11218,7 +11247,6 @@ msgstr ""
 "欢迎来到新学员账号页面，提供更多账号信息方便其他学员查看。您也可以选择只显示部分内容。{learn_more_link_start}了解更多内容{learn_more_link_end}"
 
 #: themes/normal-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
-#: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #, python-format
 msgid ""
 "Remember when you enrolled in %(course_name)s, and other courses on edX.org?"
@@ -11226,7 +11254,6 @@ msgid ""
 msgstr "您还记得在edX上报名了%(course_name)s和其他课程吗？很高兴您选择了我们的课程！赶紧来看看大家都在学习什么吧。"
 
 #: themes/normal-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
-#: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #, python-format
 msgid ""
 "Remember when you enrolled in %(course_name)s on edX.org? We do, and we’re "
@@ -12019,23 +12046,10 @@ msgstr "课程长度："
 msgid "Courses"
 msgstr "课程"
 
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Sign In to {studio_name}"
-msgstr "登录{studio_name}"
-
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Don't have a {studio_name} Account? Sign up!"
-msgstr "还没有 {studio_name}账户？现在就注册！"
-
-#: cms/templates/login.html themes/red-theme/cms/templates/login.html
-msgid "Required Information to Sign In to {studio_name}"
-msgstr "登录{studio_name}所必须的信息"
-
 #: cms/templates/login.html cms/templates/register.html
 #: lms/templates/help_modal.html lms/templates/login.html
 #: lms/templates/provider_login.html lms/templates/register-form.html
 #: lms/templates/register-shib.html lms/templates/signup_modal.html
-#: themes/red-theme/cms/templates/login.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "E-mail"
@@ -12047,14 +12061,13 @@ msgstr "电子邮件"
 #: cms/templates/login.html cms/templates/manage_users.html
 #: cms/templates/manage_users_lib.html cms/templates/register.html
 #: lms/templates/login.html lms/templates/register-form.html
-#: lms/templates/register-shib.html themes/red-theme/cms/templates/login.html
+#: lms/templates/register-shib.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "example: username@domain.com"
 msgstr "例：username@domain.com"
 
 #: cms/templates/login.html lms/templates/login.html
-#: themes/red-theme/cms/templates/login.html
 msgid "Forgot password?"
 msgstr "忘记密码？"
 
@@ -12116,7 +12129,6 @@ msgid "Reset"
 msgstr "重置"
 
 #: cms/templates/widgets/footer.html lms/templates/footer.html
-#: themes/red-theme/lms/templates/footer.html
 msgid "Legal"
 msgstr "合法"
 
@@ -12707,6 +12719,10 @@ msgid ""
 msgstr ""
 "由于截止日期已过，此作业不再可用。{line_break} 如果您已经完成此作业，您可以在 {link_start}进度页面{link_end} "
 "上查询作业成绩。"
+
+#: lms/templates/index.html lms/templates/courseware/courses.html
+msgid "List of Courses"
+msgstr "课程列表"
 
 #: lms/templates/index.html lms/templates/courseware/courses.html
 #: themes/stanford-style/lms/templates/index.html
@@ -14788,6 +14804,7 @@ msgid "Add to Mozilla Backpack"
 msgstr "添加到Mozilla Backpack"
 
 #: lms/templates/certificates/_accomplishment-banner.html
+#: themes/normal-theme/lms/templates/certificates/_accomplishment-banner.html
 msgid "Print Certificate"
 msgstr "打印证书"
 
@@ -14804,7 +14821,6 @@ msgid "Supported by the following organizations"
 msgstr "被以下的组织支持"
 
 #: lms/templates/certificates/_accomplishment-rendering.html
-#: themes/normal-theme/lms/templates/certificates/_accomplishment-rendering.html
 msgid "Awarded to:"
 msgstr "授予："
 
@@ -15294,10 +15310,6 @@ msgstr "显示"
 #: lms/templates/courseware/course_updates.html
 msgid "Show Earlier Course Updates"
 msgstr "显示更早的课程更新"
-
-#: lms/templates/courseware/courses.html
-msgid "List of Courses"
-msgstr "课程列表"
 
 #: lms/templates/courseware/courses.html
 msgid "Refine Your Search"
@@ -17051,7 +17063,6 @@ msgid "Journals"
 msgstr "文章"
 
 #: lms/templates/header/navbar-authenticated.html
-#: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/header/user_dropdown.html
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
@@ -17069,6 +17080,11 @@ msgstr "发现课程"
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 msgid "Sysadmin"
 msgstr "系统管理员"
+
+#: lms/templates/header/navbar-authenticated.html
+#: lms/templates/header/navbar-not-authenticated.html
+msgid "Professor"
+msgstr "教授"
 
 #: lms/templates/header/navbar-authenticated.html
 #: lms/templates/navigation/navbar-authenticated.html
@@ -18907,31 +18923,25 @@ msgstr "维持举报"
 msgid "Go Back"
 msgstr "返回"
 
-#: lms/templates/professors/detail.html lms/templates/professors/index.html
-#: lms/templates/static_templates/about.html
-#: lms/templates/static_templates/blog.html
-#: lms/templates/static_templates/contact.html
-#: lms/templates/static_templates/disclaimer.html
-#: lms/templates/static_templates/donate.html
-#: lms/templates/static_templates/faq.html
-#: lms/templates/static_templates/help.html
-#: lms/templates/static_templates/honor.html
-#: lms/templates/static_templates/jobs.html
-#: lms/templates/static_templates/join_us.html
-#: lms/templates/static_templates/manual.html
-#: lms/templates/static_templates/media-kit.html
-#: lms/templates/static_templates/news.html
-#: lms/templates/static_templates/press.html
-#: lms/templates/static_templates/privacy.html
-#: lms/templates/static_templates/privacy_policy.html
-#: lms/templates/static_templates/tos.html
-#: lms/templates/static_templates/user_agreement.html
-msgid "This page left intentionally blank. Feel free to add your own content."
-msgstr "这个页面是有意留空的。欢迎您添加自己的评论。"
+#: lms/templates/professors/detail.html
+msgid "教授详情"
+msgstr ""
 
 #: lms/templates/professors/index.html
 msgid "Professors List"
 msgstr "教授列表"
+
+#: lms/templates/professors/index.html
+msgid "教育的目的"
+msgstr ""
+
+#: lms/templates/professors/index.html
+msgid "教育不是生搬硬套的知识灌输，而是对学习者自由发展潜力的启发。 智慧是运用知识的能力。英荔教育不仅传播知识，更注重智慧的培养。"
+msgstr ""
+
+#: lms/templates/professors/index.html
+msgid "我们希望把国内外成功的商业管理经验和智慧传授给更多不安于现状且积极求变的弄潮儿。"
+msgstr ""
 
 #: lms/templates/provider/authorize.html
 msgid ""
@@ -19401,6 +19411,27 @@ msgid ""
 "been moved at {email}."
 msgstr "未能找到您查找的页面。返回到{link_start}主页{link_end}或发电子邮件至{email}告诉我们可能被移除的页面。"
 
+#: lms/templates/static_templates/about.html
+#: lms/templates/static_templates/blog.html
+#: lms/templates/static_templates/contact.html
+#: lms/templates/static_templates/disclaimer.html
+#: lms/templates/static_templates/donate.html
+#: lms/templates/static_templates/faq.html
+#: lms/templates/static_templates/help.html
+#: lms/templates/static_templates/honor.html
+#: lms/templates/static_templates/jobs.html
+#: lms/templates/static_templates/join_us.html
+#: lms/templates/static_templates/manual.html
+#: lms/templates/static_templates/media-kit.html
+#: lms/templates/static_templates/news.html
+#: lms/templates/static_templates/press.html
+#: lms/templates/static_templates/privacy.html
+#: lms/templates/static_templates/privacy_policy.html
+#: lms/templates/static_templates/tos.html
+#: lms/templates/static_templates/user_agreement.html
+msgid "This page left intentionally blank. Feel free to add your own content."
+msgstr "这个页面是有意留空的。欢迎您添加自己的评论。"
+
 #: lms/templates/static_templates/embargo.html
 msgid ""
 "Our system indicates that you are trying to access this {platform_name} "
@@ -19411,12 +19442,10 @@ msgstr ""
 "我们的系统表明您所在的国家或地区正在受到美国经济贸易制裁，非常抱歉，{platform_name}必须接受出口管制，所以我们暂时无法允许您访问此{platform_name}课程。"
 
 #: lms/templates/static_templates/faq.html
-#: themes/red-theme/lms/templates/footer.html
 msgid "FAQ"
 msgstr "常见问题"
 
 #: lms/templates/static_templates/jobs.html
-#: themes/red-theme/lms/templates/footer.html
 msgid "Jobs"
 msgstr "招才纳贤"
 
@@ -19429,7 +19458,7 @@ msgstr "加入我们"
 #: themes/normal-theme/lms/templates/footer.html
 #: themes/normal-theme/lms/templates/static_templates/manual.html
 msgid "Manual"
-msgstr "手册"
+msgstr "使用手册"
 
 #: lms/templates/static_templates/news.html
 #: lms/templates/static_templates/press.html
@@ -19461,12 +19490,6 @@ msgstr "请等待几秒钟后再刷新该页面。如果问题照旧，请向{em
 #: lms/templates/static_templates/server-overloaded.html
 msgid "Currently the {platform_name} servers are overloaded"
 msgstr " 目前{platform_name}平台的服务器已经超负荷"
-
-#: lms/templates/static_templates/user_agreement.html
-#: themes/normal-theme/lms/templates/footer.html
-#: themes/normal-theme/lms/templates/static_templates/user_agreement.html
-msgid "User Agreement"
-msgstr "用户协议"
 
 #: lms/templates/student_account/account_settings.html
 msgid "Account Settings"
@@ -20268,6 +20291,10 @@ msgstr "学则变 · 变则进 —— 英荔商学院"
 msgid "Enjoy high-value MBA curriculum with ￥99.8 monthly payment!"
 msgstr "月均99.8元 畅学高价值MBA课程！"
 
+#: themes/normal-theme/lms/templates/certificates/_accomplishment-banner.html
+msgid "\\u4e0b\\u8f7d\\u8bc1\\u4e66"
+msgstr ""
+
 #: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid "Add {course_name} to Cart <span>({price} USD)</span>"
 msgstr "添加{course_name}到购物<span>({price} USD)</span>"
@@ -20594,8 +20621,12 @@ msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/privacy.html
 #: themes/normal-theme/lms/templates/static_templates/privacy_policy.html
-msgid "1.  由于用户将用户密码告知他人或与他人共享注册帐户，由此导致的任何个人信息的泄漏，或其他非因英荔原因导致的个人信息的泄漏；"
-msgstr ""
+msgid ""
+"1. The leakage of any personal information caused by the User's notification"
+" of the User's password or sharing the registered account with others, or "
+"the leakage of other personal information that is not caused by EliteMBA "
+"reasons; "
+msgstr "1.  由于用户将用户密码告知他人或与他人共享注册帐户，由此导致的任何个人信息的泄漏，或其他非因英荔原因导致的个人信息的泄漏；"
 
 #: themes/normal-theme/lms/templates/static_templates/privacy.html
 #: themes/normal-theme/lms/templates/static_templates/privacy_policy.html
@@ -20665,8 +20696,17 @@ msgstr "四、用户的注册义务"
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
 msgid ""
-"为能使用本服务，用户同意以下事项：依本服务提示填写正确的注册账号（邮箱地址及/或手机号）、密码，并确保今后更新的登录账号、头像等资料的有效性和合法性。若用户提供任何违法、不道德或英荔认为不适合在本网站上展示的资料；或者英荔有理由怀疑用户的资料属于程序或恶意操作，英荔有权暂停或终止用户的帐号，并拒绝用户于现在和未来使用本服务之全部或任何部分。"
+"In order to use the service, the User agrees to provide correct registered "
+"account (email address and/or mobile phone number) and password according to"
+" the service prompt, and ensure the validity and legality of the login "
+"account, Avatar and other materials updated in the future. If the User "
+"provides any material that is illegal, unethical, or that is deemed "
+"unsuitable for display on this website, or that has reason to suspect that "
+"the User's data is a program or malicious operation, EliteMBA has the right "
+"to suspend or terminate the User's account and refuse the User to use all or"
+" any part of the Service now and in the future.  "
 msgstr ""
+"为能使用本服务，用户同意以下事项：依本服务提示填写正确的注册账号（邮箱地址及/或手机号）、密码，并确保今后更新的登录账号、头像等资料的有效性和合法性。若用户提供任何违法、不道德或英荔认为不适合在本网站上展示的资料；或者英荔有理由怀疑用户的资料属于程序或恶意操作，英荔有权暂停或终止用户的帐号，并拒绝用户于现在和未来使用本服务之全部或任何部分。"
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
 msgid "英荔无须对任何用户的任何登记资料承担任何责任，包括但不限于鉴别、核实任何登记资料的真实性、正确性、完整性、适用性及/或是否为最新资料的责任。"
@@ -21047,22 +21087,6 @@ msgstr ""
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
 msgid "请用户在发现任何违反本服务协议以及其他任何单项服务的服务条款、英荔各类公告之情形时，通知英荔。"
 msgstr ""
-
-#. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
-#. Please do not translate any of these trademarks and company names.
-#: themes/red-theme/lms/templates/footer.html
-msgid ""
-"EdX, Open edX, and the edX and Open edX logos are registered trademarks or "
-"trademarks of {link_start}edX Inc.{link_end}"
-msgstr ""
-"EdX、Open edX以及 edX、Open edX 的标识是注册商标或者 {link_start}edX 公司{link_end} 的商标。"
-
-#: themes/red-theme/lms/templates/footer.html
-msgid ""
-"{tos_link_start}Terms of Service{tos_link_end} and {honor_link_start}Honor "
-"Code{honor_link_end}"
-msgstr ""
-"{tos_link_start}服务条款{tos_link_end}以及{honor_link_start}诚信准则{honor_link_end}"
 
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
@@ -23100,6 +23124,18 @@ msgstr ""
 msgid "Learn more about content libraries"
 msgstr "了解更多关于内容知识库的信息"
 
+#: cms/templates/login.html
+msgid "Sign In to {studio_name}"
+msgstr "登录{studio_name}"
+
+#: cms/templates/login.html
+msgid "Don't have a {studio_name} Account? Sign up!"
+msgstr "还没有{studio_name}账户？现在就注册！"
+
+#: cms/templates/login.html
+msgid "Required Information to Sign In to {studio_name}"
+msgstr "登录{studio_name}所必须的信息"
+
 #: cms/templates/manage_users.html
 msgid "Course Team Settings"
 msgstr "课程团队设置"
@@ -24571,11 +24607,6 @@ msgstr "IP地址"
 msgid "user"
 msgstr "用户"
 
-#: wiki/models/article.py wiki/templates/wiki/article.html
-#: wiki/templates/wiki/includes/revision_info.html
-msgid "locked"
-msgstr "已锁定"
-
 #: wiki/models/article.py wiki/models/pluginbase.py
 msgid "article"
 msgstr "文档"
@@ -25306,18 +25337,6 @@ msgstr "下一篇新的文章"
 msgid "New article below"
 msgstr "下面的新文章"
 
-#: wiki/templates/wiki/includes/revision_info.html
-msgid "by"
-msgstr "由"
-
-#: wiki/templates/wiki/includes/revision_info.html
-msgid "restored"
-msgstr "恢复"
-
-#: wiki/templates/wiki/includes/revision_info.html
-msgid "unlocked"
-msgstr "解锁"
-
 #: wiki/views/accounts.py
 msgid "You are now sign up... and now you can sign in!"
 msgstr "您正在注册……现在你可以登录了！"
@@ -25435,10 +25454,6 @@ msgid "Apple Pay"
 msgstr "Apple Pay"
 
 #: membership/models.py
-msgid "Apple Inpurasing"
-msgstr ""
-
-#: membership/models.py
 msgid "subscribe normal"
 msgstr "常规订阅"
 
@@ -25506,7 +25521,7 @@ msgstr "英荔商学院六大课程方向"
 
 #: membership/templates/membership/index.html
 msgid "Activate your all-round business gene, you alone are a team!"
-msgstr "激活全能商业基因，你就是一个团队！"
+msgstr "激活全能商业基因，你就是一个团队"
 
 #: membership/templates/membership/index.html
 msgid "Business Administration"
@@ -25580,7 +25595,7 @@ msgstr "（美国戴维森学院）"
 
 #: membership/templates/membership/index.html
 msgid "Dr. Clark Ross"
-msgstr "克拉克·罗斯（Clark Ross） 博士"
+msgstr "克拉克·罗斯 博士"
 
 #: membership/templates/membership/index.html
 msgid "PhD. in Economics, Boston College, USA"
@@ -25654,7 +25669,7 @@ msgstr "*现在报名可享以上优惠，具体详情请前往购买页。"
 
 #: membership/templates/membership/index.html
 msgid "Best faculties ---- Elite Education"
-msgstr "超强师资——精英式教学"
+msgstr "超强师资 —— 精英式教学"
 
 #: membership/templates/membership/index.html
 msgid "Professor of American Famous Business Schools"
@@ -25664,7 +25679,7 @@ msgstr "美国名校商学院教授"
 msgid ""
 "To build the all-around business knowledge matrix, and systematic learning "
 "from zero to one"
-msgstr "构建全方位的商科知识矩阵，从0到1，系统学习 "
+msgstr "构建全方位的商科知识矩阵，从0到1，系统学习"
 
 #: membership/templates/membership/index.html
 msgid "Dr. Bochun Xiao"
@@ -25742,7 +25757,7 @@ msgstr "施建军 博士"
 msgid ""
 "Prior President and Professor of the University of International Business "
 "and Economics {br}"
-msgstr "原对外经济贸易大学校长、{br}教授"
+msgstr "原对外经济贸易大学校长、{br}教授."
 
 #: membership/templates/membership/index.html
 msgid "Professor of Economics in Davidson College"
@@ -25752,7 +25767,7 @@ msgstr "美国戴维森学院经济学教授"
 msgid ""
 "Prior President and Professor of the University of International Business "
 "and Economics"
-msgstr "原对外经济贸易大学校长、  教授"
+msgstr "原对外经济贸易大学校长、教授"
 
 #: membership/templates/membership/index.html
 msgid "View More"

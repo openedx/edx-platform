@@ -17,12 +17,25 @@
       <%static:include path="discovery/${template_name}.underscore" />
   </script>
   % endfor
+
+  % if user_language:
+    <% user_language_or_default = user_language %>
+  % else:
+    <% user_language_or_default = settings.LANGUAGE_CODE %>
+  % endif
+
+  % if user_timezone:
+    <% user_timezone_or_default = user_timezone %>
+  % else:
+    <% user_timezone_or_default = settings.TIME_ZONE%>
+  % endif
+
   <%static:require_module module_name="js/discovery/discovery_factory" class_name="DiscoveryFactory">
     DiscoveryFactory(
       ${course_discovery_meanings | n, dump_js_escaped_json},
       getParameterByName('search_query'),
-      "${user_language}",
-      "${user_timezone}"
+      "${user_language_or_default}",
+      "${user_timezone_or_default}"
     );
   </%static:require_module>
 </%block>
