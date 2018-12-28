@@ -1,3 +1,4 @@
+# -*- coding:utf-8 -*-
 """
 The Enrollment API Views should be simple, lean HTTP endpoints for API access. This should
 consist primarily of authentication, request validation, and serialization.
@@ -641,7 +642,9 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
         if settings.FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION'):
             from membership.models import VIPCourseEnrollment
             can_vip_enroll = VIPCourseEnrollment.can_vip_enroll(user, course_id)
-        if mode not in (CourseMode.AUDIT, CourseMode.HONOR, None) and not has_api_key_permissions and not can_vip_enroll:
+        
+        is_ecommerce_request = mode not in (CourseMode.AUDIT, CourseMode.HONOR, None)
+        if is_ecommerce_request and not has_api_key_permissions and not can_vip_enroll:
                 return Response(
                     status=status.HTTP_403_FORBIDDEN,
                     data={
@@ -733,7 +736,8 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                     mode=mode,
                     is_active=is_active,
                     enrollment_attributes=enrollment_attributes,
-                    user=user
+                    user=user,
+                    is_ecommerce_request=is_ecommerce_request
                 )
 
             cohort_name = request.data.get('cohort')
