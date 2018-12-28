@@ -320,11 +320,12 @@
     padding: 0;
     .u-field-message-notification{
         width: 100%;
-        height: 30px;
+        // height: 30px;
         padding: 0;
         margin: 0;
         text-align: center;
         padding-top: 15px;
+        display: inline-block;
     }
 }
 .account-settings-sections .section .account-deletion-details .paragon__modal-open .paragon__btn:not(.cancel-btn){
