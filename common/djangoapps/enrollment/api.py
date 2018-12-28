@@ -1,3 +1,4 @@
+# -*- coding:utf-8 -*-
 """
 Enrollment API for creating, updating, and deleting enrollments. Also provides access to enrollment information at a
 course level, such as available course modes.
@@ -143,7 +144,8 @@ def get_enrollment(user_id, course_id):
     return _data_api().get_course_enrollment(user_id, course_id)
 
 
-def add_enrollment(user_id, course_id, mode=None, is_active=True, enrollment_attributes=None, user=None):
+def add_enrollment(user_id, course_id, mode=None, is_active=True, enrollment_attributes=None,
+                   user=None, is_ecommerce_request=False):
     """Enrolls a user in a course.
 
     Enrolls a user in a course. If the mode is not specified, this will default to `CourseMode.DEFAULT_MODE_SLUG`.
@@ -195,15 +197,21 @@ def add_enrollment(user_id, course_id, mode=None, is_active=True, enrollment_att
         mode = _default_course_mode(course_id)
     validate_course_mode(course_id, mode, is_active=is_active)
 
-    if settings.FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION', False):
+    if settings.FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION', False) and not is_ecommerce_request:
         from membership.models import VIPCourseEnrollment
 
-        can_vip_enroll = VIPCourseEnrollment.can_vip_enroll(user, course_id)
+        course_key = CourseKey.from_string(course_id)
+        can_vip_enroll = VIPCourseEnrollment.can_vip_enroll(user, course_key)
         if mode in ('professional', 'no-id-professional', 'verified'):
             if not can_vip_enroll:
-                raise errors.CourseModeNotFoundError()
+                msg = u"Sorry, your VIP has expired."
+                error_data = {
+                    'mode': mode,
+                    'can_vip_enroll': can_vip_enroll
+                }
+                raise errors.CourseModeNotFoundError(msg, error_data)
             else:
-                VIPCourseEnrollment.enroll(user, course_id)
+                VIPCourseEnrollment.enroll(user, course_key)
 
     enrollment = _data_api().create_course_enrollment(user_id, course_id, mode, is_active)
 
