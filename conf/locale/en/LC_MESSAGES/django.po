@@ -20243,7 +20243,11 @@ msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/privacy.html
 #: themes/normal-theme/lms/templates/static_templates/privacy_policy.html
-msgid "1.  由于用户将用户密码告知他人或与他人共享注册帐户，由此导致的任何个人信息的泄漏，或其他非因英荔原因导致的个人信息的泄漏；"
+msgid ""
+"1. The leakage of any personal information caused by the User's notification"
+" of the User's password or sharing the registered account with others, or "
+"the leakage of other personal information that is not caused by EliteMBA "
+"reasons; "
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/privacy.html
@@ -20314,7 +20318,15 @@ msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
 msgid ""
-"为能使用本服务，用户同意以下事项：依本服务提示填写正确的注册账号（邮箱地址及/或手机号）、密码，并确保今后更新的登录账号、头像等资料的有效性和合法性。若用户提供任何违法、不道德或英荔认为不适合在本网站上展示的资料；或者英荔有理由怀疑用户的资料属于程序或恶意操作，英荔有权暂停或终止用户的帐号，并拒绝用户于现在和未来使用本服务之全部或任何部分。"
+"In order to use the service, the User agrees to provide correct registered "
+"account (email address and/or mobile phone number) and password according to"
+" the service prompt, and ensure the validity and legality of the login "
+"account, Avatar and other materials updated in the future. If the User "
+"provides any material that is illegal, unethical, or that is deemed "
+"unsuitable for display on this website, or that has reason to suspect that "
+"the User's data is a program or malicious operation, EliteMBA has the right "
+"to suspend or terminate the User's account and refuse the User to use all or"
+" any part of the Service now and in the future.  "
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
