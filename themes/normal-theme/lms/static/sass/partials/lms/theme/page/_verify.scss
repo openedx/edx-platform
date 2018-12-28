@@ -58,6 +58,9 @@
                         border-radius: 30px;
                         border: solid 1px #346ca3;
                         box-shadow: unset;
+                        .fa-camera:before{
+                            transform: scale(1.7);
+                        }
                     }
                 }
                 .control-retake{
@@ -72,7 +75,7 @@
                 margin-bottom: 10px;
                 .copy-extra{
                     color: #2e313c;
-                    width: 270px;
+                    width: 272px;
                     display: inline-block;
                     margin-top: 0;
                 }
@@ -120,6 +123,25 @@
         outline: none;
     }
 }
+.verification-process .carousel .wrapper-task .controls .control .action.action-do{
+    background-color: #b6dcfe;
+    border-radius: 30px;
+    border: solid 1px #346ca3;
+    box-shadow: unset;
+    font-size: 16px;
+    color: #346ca3;
+    font-weight: 400;
+    padding: 19px 36px;
+    font-family: "宋体";
+    line-height: 20px;
+    .icon{
+        padding: 0;
+    }
+}
+.fa-camera{
+    vertical-align: middle;
+
+}
 .verification-process .carousel #wrapper-review .review-task{
    background: #fff;
 }
@@ -138,7 +160,8 @@
         border: none;
         font-weight: normal;
         .help-tip.is-expandable.is-ready{
-            display: inline-block;
+            // display: inline-block;
+            display: block;
             .title-expand{
                 border: none;
                 background: unset;
@@ -163,6 +186,10 @@
     color: #346ca3;
 }
 #current-step-container{
+    padding-top: 10px;
+    .wrapper-view{
+        margin-top: 10px;
+    }
     .wrapper-content-main.enrollment-confirmation-step{
         background-color: #ffffff;
         box-shadow: 0px 1px 4px 0px 
