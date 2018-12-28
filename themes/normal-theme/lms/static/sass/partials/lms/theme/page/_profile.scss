@@ -96,29 +96,23 @@
         width: 100%;
       }
       &:first-child{
-        padding: 0;
         font-size: 16px;
         color: $title;
+        line-height: 1.5;
         font-weight: bold;
       }
-      /*
-      &:not(:first-child){
-        padding: 0;
-        margin: 0 0 10px;
-      }
-      &:not(.u-field-readonly):not(:last-child){
-        padding-bottom: 15px;
-      }
-      .u-field-dropdown:not(.editable-never){
-        margin-top: 0;
-      }
-      */
       .u-field-value-readonly{
         color: $font;
         font-weight: normal;
         -webkit-font-smoothing: unset;
         word-break: break-all;
         line-height: 1.5;
+      }
+      &.u-field-username{
+        padding: 0 !important;
+      }
+      #u-field-value-name{
+        color: $title;
       }
     } 
 
@@ -143,6 +137,9 @@
       }
       .upload-button-icon{
         transform: translateY(15px)
+      }
+      .u-field-remove-button{
+        display: none;
       }
     }
   }
@@ -206,7 +203,12 @@
     .u-field.mode-placeholder:hover{
       border: 1px solid $border;
     }
-    
+    .btn-brand .icon:only-child{
+      margin-right: 0;
+      transform: scale(0.85);
+      vertical-align: text-top;
+      padding-right: 3px;
+    }
   }
 }
 

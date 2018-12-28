@@ -112,13 +112,17 @@
   .status{
     margin: 0 0 20px;
     padding: 15px;
-    background-color: #f6fffc;
-    box-shadow: 0px 1px 4px 0px	#d4f8af;
-    border: 0;
+    background-color: #f6fffc !important;
+    box-shadow: 0px 1px 4px 0px rgba(55, 197, 145, 0.36) !important;
+    border: 0 !important;
+    color: $font !important;
+    
     .message-title{
       font-size: 14px;
       margin: 0;
       padding: 0;
+      color: #1cac77 !important;
+      font-weight: normal;
     }
     .message-copy{
       padding: 0;
