@@ -95,8 +95,9 @@ class StudentModule(models.Model):
     module_type = models.CharField(max_length=32, choices=MODULE_TYPES, default='problem', db_index=True)
 
     # Key used to share state. This is the XBlock usage_id
-    module_state_key = UsageKeyField(max_length=255, db_column='module_id')
-    student = models.ForeignKey(User, db_index=True, db_constraint=False, on_delete=models.CASCADE)
+    module_state_key = UsageKeyField(max_length=255, db_column='module_id',
+                                     db_index=True)
+    student = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
 
     course_id = CourseKeyField(max_length=255, db_index=True)
 
