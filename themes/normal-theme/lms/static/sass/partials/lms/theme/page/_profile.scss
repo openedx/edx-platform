@@ -82,11 +82,12 @@
     border-radius: 3px;
 
     .profile-section-one-fields>.u-field{
-      padding: 10px 0;
+      padding: 10px 0 !important;
+      margin: 0 !important;
 
       &:hover{
-        border: none;
         background: rgba(182,220,254,0.1);
+        outline: none;
       }
 
       .u-field-title{
@@ -100,6 +101,7 @@
         color: $title;
         font-weight: bold;
       }
+      /*
       &:not(:first-child){
         padding: 0;
         margin: 0 0 10px;
@@ -110,6 +112,7 @@
       .u-field-dropdown:not(.editable-never){
         margin-top: 0;
       }
+      */
       .u-field-value-readonly{
         color: $font;
         font-weight: normal;
