@@ -48,6 +48,7 @@ $icon-width: 18px;
 .fa-save:before,
 .fa-arrow-right:before,
 .fa-exclamation-circle:before,
+.fa-camera:before,
 {
   content: '';
   display: inline-block;
@@ -255,7 +256,9 @@ $icon-width: 18px;
 .fa-exclamation-circle:before{
   background-position: calcP(1, 5)
 }
-
+.fa-camera:before{
+  background-position: calcP(10, 3)
+}
 
 // 2. 课程详情页的新icon
 // http://0.0.0.0:18000/courses/course-v1:edX+E2E-101+course/about
@@ -313,4 +316,7 @@ $icon-width: 18px;
 }
 .fa-my-close{
   background-position: calcP(14, 4)
+}
+.fa-my-camera{
+  background-position: calcP(10, 3)
 }

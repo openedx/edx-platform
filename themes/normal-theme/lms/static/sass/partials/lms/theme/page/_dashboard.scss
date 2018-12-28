@@ -289,3 +289,8 @@
     padding: 10px 20px;
   }
 }
+@media screen and (max-width: 568px){
+  .wrapper-messages-primary .message.message-status .verification-cta .btn{
+    display: none;
+  }
+}
