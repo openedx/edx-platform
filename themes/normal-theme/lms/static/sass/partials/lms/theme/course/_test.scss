@@ -127,7 +127,7 @@
     }
   }
   
-  .notification.success .icon, .notification.error .icon{
+  .notification.success .icon, .notification.error .icon, .notification.warning .icon{
     margin-right: 10px;
   }
   .notification .notification-message{
@@ -147,7 +147,7 @@
   .action .problem-action-btn .icon{
     display: inline-block;
     vertical-align: middle;
-    margin: 0 5px 0;
+    margin: 0 6px 0;
   }
   .capa_inputtype.textline .status{
     margin-top: 3px;
@@ -180,7 +180,7 @@
   .choicegroup .status .status-icon{
     position: absolute;
     margin-left: 5px;
-    margin-top: -1px;
+    margin-top: 1px;
   }
 
   

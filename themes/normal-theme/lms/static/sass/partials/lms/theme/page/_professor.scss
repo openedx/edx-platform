@@ -123,8 +123,12 @@
   }
 }
 @media screen and (max-width:576px){
+  .professor-banner{
+    display: none;
+  }
   .professor-course{
     top: 130px;
     left: 100px;
+    right: unset;
   }
 }
