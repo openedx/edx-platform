@@ -209,18 +209,10 @@
 
 // certificate card
 .certificate-card{
-  border-color: #e6e9ed;
-  &.mode-verified{
-    border-color: #e6e9ed;
-
-    &:hover{
-      border: 1px solid $border;
-      box-shadow: none;
-    }
-  }
+  border-color: #e6e9ed !important;
 
   &:hover{
-    border: 1px solid $border;
+    border: 1px solid $border !important;
     box-shadow: none;
   }
   .card-logo{

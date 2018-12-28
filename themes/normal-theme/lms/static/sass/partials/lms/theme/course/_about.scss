@@ -417,7 +417,7 @@
 
 
 // video
-#player-container-id{
+.video-box .video-js{
   position: fixed;
   z-index: 101;
   top: 50%;
@@ -427,6 +427,13 @@
   width:800px;
   height: 450px;
 }
+.video-box .video-js.vjs-fullscreen{
+  top: 0;
+  left: 0;
+  margin-top: 0;
+  margin-left: 0;
+}	
+
 
 .about-cover{
   width: 100%;
@@ -505,6 +512,25 @@
   }
   .course-container{
     padding-top: 10px;
+  }
+  .my-theme-course-about{
+    .about-staff-block{
+      height: 130px;
+    }
+    .about-staff div{
+      margin-top: 0;
+    }
+    .about-staff-img{
+      width: 60px;
+      height: 60px;
+    }
+    .about-staff-name{
+      padding-top: 0;
+    }
+    .about-staff-intro{
+      margin-top: 3px;
+      display: inline-block;
+    }
   }
 }
 
