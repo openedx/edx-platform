@@ -14,6 +14,13 @@ class ProblemPage(PageObject):
 
     url = None
     CSS_PROBLEM_HEADER = '.problem-header'
+    status_indicators = {
+        'correct': ['span.correct'],
+        'incorrect': ['span.incorrect'],
+        'unanswered': ['span.unanswered'],
+        'submitted': ['span.submitted'],
+        'unsubmitted': ['.unsubmitted']
+    }
 
     def is_browser_on_page(self):
         return self.q(css='.xblock-student_view').present
@@ -498,3 +505,31 @@ class ProblemPage(PageObject):
         Returns the text in the special "sr" region used for display status.
         """
         return self.q(css='#reader-feedback').text[0]
+
+    @property
+    def submission_feedback(self):
+        """
+        Returns the submission feedback of the problem
+        """
+        return self.q(css='div[class="submission-feedback"]').text[0].split('\n')[0]
+
+    @property
+    def answer(self):
+        """
+        Returns the answer of the problem
+        """
+        return self.q(css='p[class="answer"]').text[0]
+
+    @property
+    def score_notification(self):
+        """
+        Returns the score after the submission of answer
+        """
+        self.wait_for_element_visibility('.notification-submit .notification-message', 'Problem score is visible')
+        return self.q(css='.notification-submit .notification-message').text[0]
+
+    def is_present(self, selector):
+        """
+        Checks for the presence of the locator
+        """
+        return self.q(css=selector).present
