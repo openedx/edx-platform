@@ -11,7 +11,7 @@
 -e git+https://github.com/open-craft/xblock-drag-and-drop-v2.git@82c9dc5e16d10793e8b79e60661e1a78893fce25#egg=xblock-drag-and-drop-v2-new
 -e git+https://github.com/edx-solutions/xblock-ooyala.git@v2.0.20#egg=xblock-ooyala==2.0.20
 git+https://github.com/edx-solutions/xblock-group-project.git@0.1.1#egg=xblock-group-project==0.1.1
--e git+https://github.com/edx-solutions/xblock-adventure.git@7bdeb62b1055377dc04a7b503f7eea8264f5847b#egg=xblock-adventure
+-e git+https://github.com/edx-solutions/xblock-adventure.git@v0.1.1#egg=xblock-adventure==0.1.1
 -e git+https://github.com/open-craft/xblock-poll.git@1.6.3#egg=xblock-poll==1.6.3
 -e git+https://github.com/edx/edx-notifications.git@0.8.1#egg=edx-notifications==0.8.1
 -e git+https://github.com/open-craft/problem-builder.git@v3.1.6#egg=xblock-problem-builder==3.1.6
