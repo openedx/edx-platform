@@ -197,9 +197,13 @@ def add_enrollment(user_id, course_id, mode=None, is_active=True, enrollment_att
 
     if settings.FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION', False):
         from membership.models import VIPCourseEnrollment
+
         can_vip_enroll = VIPCourseEnrollment.can_vip_enroll(user, course_id)
-        if mode in ('professional', 'no-id-professional', 'verified') and not can_vip_enroll:
-            raise errors.CourseModeNotFoundError()
+        if mode in ('professional', 'no-id-professional', 'verified'):
+            if not can_vip_enroll:
+                raise errors.CourseModeNotFoundError()
+            else:
+                VIPCourseEnrollment.enroll(user, course_id)
 
     enrollment = _data_api().create_course_enrollment(user_id, course_id, mode, is_active)
 
