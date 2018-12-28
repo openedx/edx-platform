@@ -45,7 +45,6 @@ from student.models import User
 from student.roles import CourseStaffRole, GlobalStaff
 from util.disable_rate_limit import can_disable_rate_limit
 
-from membership.models import VIPCourseEnrollment, VIPInfo, VIPCoursePrice
 
 log = logging.getLogger(__name__)
 REQUIRED_ATTRIBUTES = {
@@ -638,16 +637,19 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 }
             )
 
-        can_vip_enroll = VIPCourseEnrollment.can_vip_enroll(user, course_id)
+        can_vip_enroll = False
+        if settings.FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION'):
+            from membership.models import VIPCourseEnrollment
+            can_vip_enroll = VIPCourseEnrollment.can_vip_enroll(user, course_id)
         if mode not in (CourseMode.AUDIT, CourseMode.HONOR, None) and not has_api_key_permissions and not can_vip_enroll:
-            return Response(
-                status=status.HTTP_403_FORBIDDEN,
-                data={
-                    "message": u"User does not have permission to create enrollment with mode [{mode}].".format(
-                        mode=mode
-                    )
-                }
-            )
+                return Response(
+                    status=status.HTTP_403_FORBIDDEN,
+                    data={
+                        "message": u"User does not have permission to create enrollment with mode [{mode}].".format(
+                            mode=mode
+                        )
+                    }
+                )
 
         embargo_response = embargo_api.get_embargo_response(request, course_id, user)
 
@@ -730,11 +732,9 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                     unicode(course_id),
                     mode=mode,
                     is_active=is_active,
-                    enrollment_attributes=enrollment_attributes
+                    enrollment_attributes=enrollment_attributes,
+                    user=user
                 )
-
-            if can_vip_enroll:
-                VIPCourseEnrollment.enroll(user, course_id)
 
             cohort_name = request.data.get('cohort')
             if cohort_name is not None:
@@ -765,6 +765,9 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
             )
         except CourseEnrollmentExistsError as error:
             log.warning('An enrollment already exists for user [%s] in course run [%s].', username, course_id)
+            if settings.FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION'):
+                if not can_vip_enroll:
+                    VIPCourseEnrollment.objects.filter(user=user, course_id=course_id).update(is_active=False)
             return Response(data=error.enrollment)
         except CourseEnrollmentError:
             log.exception("An error occurred while creating the new course enrollment for user "

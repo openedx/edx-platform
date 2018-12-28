@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-12-18 10:17+0800\n"
-"PO-Revision-Date: 2018-12-18 02:17:43.312974\n"
+"POT-Creation-Date: 2018-12-13 17:36+0800\n"
+"PO-Revision-Date: 2018-12-13 09:36:08.621139\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -132,6 +132,7 @@ msgstr ""
 #: cms/static/js/views/modals/edit_xblock.js
 #: cms/static/js/views/video_transcripts.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 #: lms/static/js/student_account/tos_modal.js
 #: cms/templates/js/course-video-settings.underscore
 #: common/static/common/templates/image-modal.underscore
@@ -4376,6 +4377,12 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: lms/static/js/student_account/views/account_settings_factory.js
+#: lms/templates/student_account/account.underscore
+msgid "Password"
+msgstr ""
+
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "Yes, Delete"
 msgstr ""
 
@@ -4529,11 +4536,6 @@ msgstr ""
 msgid ""
 "The name that identifies you on {platform_name}. You cannot change your "
 "username."
-msgstr ""
-
-#: lms/static/js/student_account/views/account_settings_factory.js
-#: lms/templates/student_account/account.underscore
-msgid "Password"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -10397,5 +10399,5 @@ msgid "Average per month"
 msgstr ""
 
 #: membership/static/membership/js/pay.js
-msgid "调起支付失败"
+msgid "Return to EliteMBA in _ seconds"
 msgstr ""

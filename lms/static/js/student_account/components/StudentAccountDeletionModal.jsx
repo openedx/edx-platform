@@ -31,7 +31,7 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
     this.props.onClose();
 
     removeLoggedInCookies();
-    window.location.href = 'https://www.edx.org';
+    window.location.href = '/';
   }
 
   deleteAccount() {
@@ -149,7 +149,7 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
               <p className="next-steps">{ gettext('If you still wish to continue and delete your account, please enter your account password:') }</p>
               <InputText
                 name="confirm-password"
-                label="Password"
+                label={ gettext("Password") }
                 type="password"
                 className={['confirm-password-input']}
                 onBlur={this.passwordFieldValidation}
@@ -183,6 +183,7 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
           body={gettext('Account deletion, including removal from email lists, may take a few weeks to fully process through our system. If you want to opt-out of emails before then, please unsubscribe from the footer of any email.')}
           onClose={this.handleConfirmationModalClose}
           aria-live="polite"
+          closeText={gettext('Close')}
           open
         />
       </div>

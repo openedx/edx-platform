@@ -28,7 +28,7 @@
       </ul>
       <div class="timestamp">
         <span class="label">{% trans "Last modified:" %}</span><br />
-        <span class="date">{{ article.current_revision.modified }}</span>
+        <span class="date">{{ article.current_revision.modified|date:"SHORT_DATE_FORMAT" }}</span>
       </div>
 
       {% if urlpath %}
