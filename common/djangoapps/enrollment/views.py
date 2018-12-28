@@ -641,8 +641,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
         if settings.FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION'):
             from membership.models import VIPCourseEnrollment
             can_vip_enroll = VIPCourseEnrollment.can_vip_enroll(user, course_id)
-        if mode not in (CourseMode.AUDIT, CourseMode.HONOR, None):
-            if not has_api_key_permissions or not can_vip_enroll:
+        if mode not in (CourseMode.AUDIT, CourseMode.HONOR, None) and not has_api_key_permissions and not can_vip_enroll:
                 return Response(
                     status=status.HTTP_403_FORBIDDEN,
                     data={
@@ -736,9 +735,6 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                     enrollment_attributes=enrollment_attributes,
                     user=user
                 )
-
-            if can_vip_enroll:
-                VIPCourseEnrollment.enroll(user, course_id)
 
             cohort_name = request.data.get('cohort')
             if cohort_name is not None:
