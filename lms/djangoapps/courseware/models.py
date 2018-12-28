@@ -95,7 +95,8 @@ class StudentModule(models.Model):
     module_type = models.CharField(max_length=32, db_index=True)
 
     # Key used to share state. This is the XBlock usage_id
-    module_state_key = UsageKeyField(max_length=255, db_column='module_id')
+    module_state_key = UsageKeyField(max_length=255, db_column='module_id',
+                                     db_index=True)
     student = models.ForeignKey(User, db_index=True, db_constraint=False, on_delete=models.CASCADE)
 
     # The learning context of the usage_key (usually a course ID, but may be a library or something else)
