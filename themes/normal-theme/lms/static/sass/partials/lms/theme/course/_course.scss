@@ -18,6 +18,9 @@
 }
 body.view-in-course .wrapper-course-material{
   overflow: hidden;
+  .course-material{
+    overflow: hidden;
+  }
 }
 body.view-in-course .wrapper-course-material .course-tabs{
   .tab a{ 
