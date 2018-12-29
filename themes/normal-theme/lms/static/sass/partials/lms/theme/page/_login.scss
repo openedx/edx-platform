@@ -81,10 +81,11 @@
       width: 49.5%;
       padding-right: 10px;
       box-sizing: border-box;
+      margin-top: 10px;
     }
     &.select-year_of_birth{
       width: 49.5%;
-      margin: 0;
+      margin: 10px 0 0;
     }
     .tip, .plaintext-field{
       color: $font;
@@ -142,8 +143,8 @@
     box-shadow: 0px 1px 4px 0px	#ffd2d1;
     border-bottom: none;
   }
-  .submission-success{
-    background: #f6fffc;
+  .submission-success, .account-activation.success{
+    background-color: #f6fffc !important;
     box-shadow: 0px 1px 4px 0px rgba(55, 197, 145, 0.36);
     border: none;
     .message-title{
