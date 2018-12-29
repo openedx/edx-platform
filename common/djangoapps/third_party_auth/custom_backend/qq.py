@@ -12,7 +12,7 @@ from social_core.backends.oauth import BaseOAuth2
 
 class QQOAuth2(BaseOAuth2):
     name = 'qq'
-    ID_KEY = 'unioid'
+    ID_KEY = 'unionid'
     AUTHORIZE_URL = 'https://graph.qq.com/oauth2.0/authorize'
     ACCESS_TOKEN_URL = 'https://graph.qq.com/oauth2.0/token'
     AUTHORIZATION_URL = 'https://graph.qq.com/oauth2.0/authorize'
