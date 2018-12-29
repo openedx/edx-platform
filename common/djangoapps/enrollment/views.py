@@ -645,14 +645,14 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
         
         is_ecommerce_request = mode not in (CourseMode.AUDIT, CourseMode.HONOR, None)
         if is_ecommerce_request and not has_api_key_permissions and not can_vip_enroll:
-                return Response(
-                    status=status.HTTP_403_FORBIDDEN,
-                    data={
-                        "message": u"User does not have permission to create enrollment with mode [{mode}].".format(
-                            mode=mode
-                        )
-                    }
-                )
+            return Response(
+                status=status.HTTP_403_FORBIDDEN,
+                data={
+                    "message": u"User does not have permission to create enrollment with mode [{mode}].".format(
+                        mode=mode
+                    )
+                }
+            )
 
         embargo_response = embargo_api.get_embargo_response(request, course_id, user)
 
@@ -769,9 +769,6 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
             )
         except CourseEnrollmentExistsError as error:
             log.warning('An enrollment already exists for user [%s] in course run [%s].', username, course_id)
-            if settings.FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION'):
-                if not can_vip_enroll:
-                    VIPCourseEnrollment.objects.filter(user=user, course_id=course_id).update(is_active=False)
             return Response(data=error.enrollment)
         except CourseEnrollmentError:
             log.exception("An error occurred while creating the new course enrollment for user "
