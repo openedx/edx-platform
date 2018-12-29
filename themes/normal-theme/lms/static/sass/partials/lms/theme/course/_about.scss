@@ -56,6 +56,7 @@
       .main-cta a.register{
         @extend %btn-my-primary;
         margin-right: 10px;
+        line-height: 34px;
       }
 
       .main-cta span.disabled, 
@@ -63,6 +64,7 @@
         @extend %btn-my-disable;
         margin-right: 10px;
         margin-top: 0;
+        line-height: 34px;
       }
 
       
