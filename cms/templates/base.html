@@ -85,6 +85,19 @@ from openedx.core.release import RELEASE_LINE
     <%include file="widgets/segment-io.html" />
 
     <%block name="header_extras"></%block>
+
+    <% ga_acct = getattr(settings, 'GOOGLE_ANALYTICS_ACCOUNT', None) %>
+    % if ga_acct:
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=${ga_acct}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', ${ga_acct});
+    </script>
+    % endif
   </head>
 
   <body class="${static.dir_rtl()} <%block name='bodyclass'></%block> lang_${LANGUAGE_CODE}">
