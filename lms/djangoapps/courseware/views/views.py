@@ -864,6 +864,7 @@ def course_about(request, course_id):
             'registered': registered,
             'course_target': course_target,
             'is_cosmetic_price_enabled': settings.FEATURES.get('ENABLE_COSMETIC_DISPLAY_PRICE'),
+            'registration_price': registration_price,
             'course_price': course_price,
             'in_cart': in_cart,
             'ecommerce_checkout': ecommerce_checkout,
