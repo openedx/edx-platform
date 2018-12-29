@@ -268,7 +268,8 @@
             // Add the social link fields
             socialFields = {
                 title: gettext('Social Media Links'),
-                subtitle: gettext('Optionally, link your personal accounts to the social media icons on your edX profile.'),  // eslint-disable-line max-len
+                // subtitle: gettext('Optionally, link your personal accounts to the social media icons on your edX profile.'),  // eslint-disable-line max-len
+                subtitle: gettext('Optionally, link your personal accounts to the social media icons on your EliteMBA profile.'),
                 fields: []
             };
             
