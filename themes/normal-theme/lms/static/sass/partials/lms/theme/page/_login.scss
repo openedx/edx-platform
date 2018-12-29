@@ -155,14 +155,32 @@
   // sign in other ways
   .section-title.lines{
     margin: 30px 0 0;
+    
     .text{
       font-size: 16px;
       color: $title;
+      background: none;
     }
     &::after{
       background: none;
       height: 0;
       border-bottom: 1px dashed $primary;
+      width:130px;
+    }
+    &::before{
+      position: absolute;
+      right: 0;
+      top: 50%;
+      width: 130px;
+      height: 1px;
+      content: '';
+      z-index: 5;
+      border-bottom: 1px dashed $blue;
+    }
+    @media screen and (max-width:576px){
+      &::before, &::after{
+        width: 50px;
+      }
     }
   } 
 
