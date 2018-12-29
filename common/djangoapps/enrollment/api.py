@@ -197,29 +197,31 @@ def add_enrollment(user_id, course_id, mode=None, is_active=True, enrollment_att
         mode = _default_course_mode(course_id)
     validate_course_mode(course_id, mode, is_active=is_active)
 
-    if settings.FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION', False):
+    if settings.FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION') and is_ecommerce_request:
         from membership.models import VIPCourseEnrollment
-
         course_key = CourseKey.from_string(course_id)
-        if is_ecommerce_request:
-            VIPCourseEnrollment.objects.filter(user=user, course_id=course_key).update(is_active=False)
-        else:
-            can_vip_enroll = VIPCourseEnrollment.can_vip_enroll(user, course_key)
-            if mode in ('professional', 'no-id-professional', 'verified'):
-                if not can_vip_enroll:
-                    msg = u"Sorry, your VIP has expired."
-                    error_data = {
-                        'mode': mode,
-                        'can_vip_enroll': can_vip_enroll
-                    }
-                    raise errors.CourseModeNotFoundError(msg, error_data)
-                else:
-                    VIPCourseEnrollment.enroll(user, course_key)
+        VIPCourseEnrollment.objects.filter(user=user, course_id=course_key).update(is_active=False)
 
     enrollment = _data_api().create_course_enrollment(user_id, course_id, mode, is_active)
 
     if enrollment_attributes is not None:
         set_enrollment_attributes(user_id, course_id, enrollment_attributes)
+
+    if settings.FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION', False) and not is_ecommerce_request:
+        from membership.models import VIPCourseEnrollment
+
+        course_key = CourseKey.from_string(course_id)
+        can_vip_enroll = VIPCourseEnrollment.can_vip_enroll(user, course_key)
+        if mode in ('professional', 'no-id-professional', 'verified'):
+            if not can_vip_enroll:
+                msg = u"Sorry, your VIP has expired."
+                error_data = {
+                    'mode': mode,
+                    'can_vip_enroll': can_vip_enroll
+                }
+                raise errors.CourseModeNotFoundError(msg, error_data)
+            else:
+                VIPCourseEnrollment.enroll(user, course_key)
 
     return enrollment
 
