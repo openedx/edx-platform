@@ -39,7 +39,7 @@ export class StudentAccountDeletion extends React.Component {
   render() {
     const { deletionModalOpen, socialAuthConnected, isActive } = this.state;
     const loseAccessText = StringUtils.interpolate(
-      gettext('You may also lose access to verified certificates and other program credentials like MicroMasters certificates. If you want to make a copy of these for your records before proceeding with deletion, follow the instructions for {htmlStart}printing or downloading a certificate{htmlEnd}.'),
+      gettext('You may also lose access to verified certificates and other program credentials. If you want to make a copy of these for your records before proceeding with deletion, follow the instructions for {htmlStart}printing or downloading a certificate{htmlEnd}.'),
       {
         htmlStart: '<a href="https://edx.readthedocs.io/projects/edx-guide-for-students/en/latest/SFD_certificates.html#printing-a-certificate" target="_blank">',
         htmlEnd: '</a>',
@@ -73,7 +73,7 @@ export class StudentAccountDeletion extends React.Component {
     );
 
     const acctDeletionWarningText = StringUtils.interpolate(
-      gettext('{strongStart}Warning: Account deletion is permanent.{strongEnd} Please read the above carefully before proceeding. This is an irreversible action, and {strongStart}you will no longer be able to use the same email on edX.{strongEnd}'),
+      gettext('{strongStart}Warning: Account deletion is permanent.{strongEnd} Please read the above carefully before proceeding. This is an irreversible action, and {strongStart}you will no longer be able to use the same email on EliteMBA.{strongEnd}'),
       {
         strongStart: '<strong>',
         strongEnd: '</strong>',
@@ -83,7 +83,7 @@ export class StudentAccountDeletion extends React.Component {
     return (
       <div className="account-deletion-details">
         <p className="account-settings-header-subtitle">{ gettext('We’re sorry to see you go!') }</p>
-        <p className="account-settings-header-subtitle">{ gettext('Please note: Deletion of your account and personal data is permanent and cannot be undone. EdX will not be able to recover your account or the data that is deleted.') }</p>
+        <p className="account-settings-header-subtitle">{ gettext('Please note: Deletion of your account and personal data is permanent and cannot be undone. EliteMBA will not be able to recover your account or the data that is deleted.') }</p>
         {
           // <p className="account-settings-header-subtitle">{ gettext('Once your account is deleted, you cannot use it to take courses on the edX app, edx.org, or any other site hosted by edX. This includes access to edx.org from your employer’s or university’s system and access to private sites offered by MIT Open Learning, Wharton Executive Education, and Harvard Medical School.') }</p>
         }
