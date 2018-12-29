@@ -139,7 +139,11 @@ from six import string_types
                 href_class = "register"
             %>
             <a href="${reg_href}" class="${href_class}" data-is-subscribe-pay="${is_subscribe_pay}">
-              ${_("Enroll in {course_name}").format(course_name=course.display_number_with_default) | h} 
+              %if registration_price > 0:
+                ${_("Enroll {price}").format(price=course_price)}
+              %else:
+                ${pgettext("Free Enroll Course", "Enroll")}
+              %endif
             </a>
             <div id="register_error"></div>
           %else:
@@ -205,7 +209,7 @@ from six import string_types
               href_class = "register"
             %>
             <a href="${reg_href}" class="${href_class}" data-is-subscribe-pay="${is_subscribe_pay}">
-              ${_("VIP会员免费加入{course_name}").format(course_name=course.display_number_with_default) | h}
+              ${_("Free Enrollment for VIP")}
             </a>
           %else:
             <%
@@ -219,7 +223,11 @@ from six import string_types
                 href_class = "register"
             %>
             <a href="${reg_href}" class="${href_class}" data-is-subscribe-pay="${is_subscribe_pay}">
-              ${_("Enroll in {course_name}").format(course_name=course.display_number_with_default) | h}
+              %if registration_price > 0:
+                  ${_("Enroll {price}").format(price=course_price)}
+              %else:
+                  ${pgettext("Free Enroll Course", "Enroll")}
+              %endif
             </a>
             <div id="register_error"></div>
           %endif
