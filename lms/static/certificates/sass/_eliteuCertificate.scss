@@ -222,9 +222,10 @@ p.accomplishment-success{
     .recipient-details.first{
       padding-left: 20px;
       padding-right: 60px;
+      padding-top: 0;
     }
     .recipient-details{
-      padding-top: 10px;
+      // padding-top: 10px;
       h3{
         font-size: 14px;
         color: #2e313c;
@@ -299,6 +300,12 @@ p.accomplishment-success{
   }
   .op-container-certificates{
     display: none;
+  }
+  .recipient-details.first{
+    padding-top: 0;
+  }
+  .recipient-details{
+    padding-top: 10px;
   }
 }
 @media print {
