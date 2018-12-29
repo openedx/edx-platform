@@ -123,7 +123,7 @@
                     helpMessage: '',
                     userLanguage: accountSettingsModel.get('language'),
                     userTimezone: accountPreferencesModel.get('time_zone'),
-                    dateFormat: 'MMMM YYYY'  // not localized, but hopefully ok.
+                    dateFormat: 'YYYY.MM'  // not localized, but hopefully ok.
                 }),
 
                 new FieldsView.DropdownFieldView({
