@@ -16,6 +16,9 @@
     border: none;
   }
 }
+body.view-in-course .wrapper-course-material{
+  overflow: hidden;
+}
 body.view-in-course .wrapper-course-material .course-tabs{
   .tab a{ 
     padding: 20px 15px 20px 10px;
@@ -90,6 +93,7 @@ body.view-in-course .wrapper-course-material .course-tabs{
     }
     .action-resume-course{ 
       @extend %btn-my-primary;
+      vertical-align: inherit;
     }
     .input-group .field-input{
       height: 16px;
