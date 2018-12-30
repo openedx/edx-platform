@@ -229,7 +229,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-12-16 20:42+0000\n"
+"POT-Creation-Date: 2018-12-23 20:42+0000\n"
 "PO-Revision-Date: 2018-12-03 12:00+0000\n"
 "Last-Translator: Marina Pastor <mpastor@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -1000,6 +1000,13 @@ msgstr ""
 "Busque un enlace de activación de cuenta de {platform_name} en su bandeja de"
 " {email_start}{email}{email_end}. Si necesite asistencia, contáctese con "
 "{link_start}Soporte de {platform_name}{link_end}."
+
+#: common/djangoapps/student/views/dashboard.py
+#, python-brace-format
+msgid ""
+"Add a recovery email to retain access when single-sign on is not available. "
+"Go to {link_start}your Account Settings{link_end}."
+msgstr ""
 
 #: common/djangoapps/student/views/dashboard.py
 #, python-brace-format
@@ -11852,6 +11859,19 @@ msgstr ""
 "La dirección de correo electrónico que utilizó para registrarse con "
 "{platform_name}"
 
+#. Translators: This label appears above a field on the password reset
+#. form meant to hold the user's email address.
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Secondary email"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/api.py
+#, python-brace-format
+msgid ""
+"Secondary email address you registered with {platform_name} using account "
+"settings page"
+msgstr ""
+
 #: openedx/core/djangoapps/user_api/api.py lms/templates/login.html
 msgid "Remember me"
 msgstr "Recordarme"
@@ -12131,16 +12151,6 @@ msgid "There was an error receiving your login information. Please email us."
 msgstr ""
 "Ocurrió un error en la recepción de su información de ingreso. Por favor "
 "escríbanos al correo electrónico."
-
-#: openedx/core/djangoapps/user_authn/views/login.py
-msgid ""
-"Your password has expired due to password policy on this account. You must "
-"reset your password before you can log in again. Please click the \"Forgot "
-"Password\" link on this page to reset your password before logging in again."
-msgstr ""
-"Su contraseña ha expirado de acuerdo con las políticas establecidas al "
-"respecto. Para poder reingresar, elija una nueva contraseña presionando el "
-"vínculo \"Olvidé mi contraseña\" en esta misma página."
 
 #: openedx/core/djangoapps/user_authn/views/login.py
 #, python-brace-format

@@ -255,7 +255,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-12-16 20:42+0000\n"
+"POT-Creation-Date: 2018-12-23 20:42+0000\n"
 "PO-Revision-Date: 2018-10-17 17:41+0000\n"
 "Last-Translator: Michael Savin <m.savin.ru@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
@@ -1025,6 +1025,13 @@ msgstr ""
 "получения ссылки для активации учётной записи платформы «{platform_name}». "
 "Если вам нужна помощь, свяжитесь с {link_start}технической поддержкой "
 "платформы «{platform_name}»{link_end}."
+
+#: common/djangoapps/student/views/dashboard.py
+#, python-brace-format
+msgid ""
+"Add a recovery email to retain access when single-sign on is not available. "
+"Go to {link_start}your Account Settings{link_end}."
+msgstr ""
 
 #: common/djangoapps/student/views/dashboard.py
 #, python-brace-format
@@ -11682,6 +11689,19 @@ msgstr ""
 "Электронный адрес, который вы использовали для регистрации на "
 "{platform_name}"
 
+#. Translators: This label appears above a field on the password reset
+#. form meant to hold the user's email address.
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Secondary email"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/api.py
+#, python-brace-format
+msgid ""
+"Secondary email address you registered with {platform_name} using account "
+"settings page"
+msgstr ""
+
 #: openedx/core/djangoapps/user_api/api.py lms/templates/login.html
 msgid "Remember me"
 msgstr "Запомнить меня"
@@ -11937,16 +11957,6 @@ msgid "There was an error receiving your login information. Please email us."
 msgstr ""
 "Произошла ошибка при получении от вас информации для входа в систему. "
 "Пожалуйста, свяжитесь с нами по электронной почте."
-
-#: openedx/core/djangoapps/user_authn/views/login.py
-msgid ""
-"Your password has expired due to password policy on this account. You must "
-"reset your password before you can log in again. Please click the \"Forgot "
-"Password\" link on this page to reset your password before logging in again."
-msgstr ""
-"Согласно правилам для этой учётной записи, срок действия вашего пароля "
-"истёк. Чтобы снова войти в систему, смените его, нажав на ссылку "
-"«Восстановление пароля»."
 
 #: openedx/core/djangoapps/user_authn/views/login.py
 #, python-brace-format
