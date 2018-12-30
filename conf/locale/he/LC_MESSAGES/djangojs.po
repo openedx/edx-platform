@@ -70,7 +70,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-12-16 20:42+0000\n"
+"POT-Creation-Date: 2018-12-23 20:42+0000\n"
 "PO-Revision-Date: 2018-12-09 20:43+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)\n"
@@ -5284,10 +5284,6 @@ msgstr ""
 msgid "This link will open in a modal window"
 msgstr ""
 
-#: cms/static/js/certificates/collections/certificates.js
-msgid "Could not parse certificate JSON. %(message)s"
-msgstr "לא ניתן לעבד JSON של תעודה. %(message)s"
-
 #: cms/static/js/certificates/models/certificate.js
 msgid "Certificate name is required."
 msgstr "שם התעודה הוא שדה חובה."
@@ -8208,6 +8204,20 @@ msgstr "שנה את כתובת הדואר האלקטרוני שלי"
 #: lms/templates/student_account/account.underscore
 msgid "Reset Password"
 msgstr "איפוס סיסמה"
+
+#: lms/templates/student_account/account_recovery.underscore
+msgid "Account Recovery"
+msgstr ""
+
+#: lms/templates/student_account/account_recovery.underscore
+msgid ""
+"Please enter your secondary email address below and we will send you "
+"instructions for recovering your account and setting a new password."
+msgstr ""
+
+#: lms/templates/student_account/account_recovery.underscore
+msgid "Recover my account"
+msgstr ""
 
 #: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
