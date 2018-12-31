@@ -19,7 +19,7 @@ from edxmako.shortcuts import render_to_response, render_to_string
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from openedx.core.djangoapps.catalog.utils import get_programs_data
 from philu_overrides.helpers import reactivation_email_for_user_custom, get_course_next_classes, \
-    get_user_current_enrolled_class, get_next_url_for_login_page_override
+    get_user_current_enrolled_class, get_next_url_for_login_page_override, is_user_enrolled_in_any_class
 from lms.djangoapps.courseware.views.views import add_tag_to_enrolled_courses
 from student.views import (
     signin_user as old_login_view,
@@ -615,7 +615,7 @@ def course_about(request, course_id):
         else:
             course_details = CourseDetails.populate(course)
 
-
+        is_enrolled_in_any_class = is_user_enrolled_in_any_class(user_current_enrolled_class, course_next_classes)
         # Alquity specific check
         is_alquity = True if request.GET.get('ref') == 'alquity' else False
 
@@ -629,6 +629,7 @@ def course_about(request, course_id):
             'current_class': current_class,
             'can_user_enroll': can_enroll.has_access,
             'user_current_enrolled_class': user_current_enrolled_class,
+            'is_user_enrolled_in_any_class': is_enrolled_in_any_class,
             'current_enrolled_class_target': current_enrolled_class_target,
             'staff_access': staff_access,
             'studio_url': studio_url,

@@ -145,6 +145,12 @@ def get_user_current_enrolled_class(request, course):
 
     return current_class, current_enrolled_class, current_enrolled_class_target
 
+
+def is_user_enrolled_in_any_class(course_current_class, course_next_classes):
+    next_reg_classes = filter(lambda next_class: next_class['registered'], course_next_classes)
+    return bool(course_current_class or next_reg_classes)
+
+
 # Query string parameters that can be passed to the "finish_auth" view to manage
 # things like auto-enrollment.
 POST_AUTH_PARAMS = ('course_id', 'enrollment_action', 'course_mode', 'email_opt_in', 'purchase_workflow')
