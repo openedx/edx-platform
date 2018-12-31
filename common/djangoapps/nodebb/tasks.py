@@ -89,6 +89,17 @@ def task_join_group_on_nodebb(category_id, username):
 
 
 @task(default_retry_delay=RETRY_DELAY, max_retries=None)
+def task_un_join_group_on_nodebb(category_id, username):
+    """
+    Celery task to join user to a community on NodeBB
+    """
+    status_code, response = NodeBBClient().users.un_join(category_id=category_id, username=username)
+    handle_response(task_un_join_group_on_nodebb, 'Removed user from category with id {}'.format(category_id), status_code, response, username)
+
+
+
+
+@task(default_retry_delay=RETRY_DELAY, max_retries=None)
 def task_update_onboarding_surveys_status(username):
     """
     Celery task to update survey status for username on NodeBB

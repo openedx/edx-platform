@@ -15,6 +15,13 @@ class ForumUser(User):
         payload = {'category_id': category_id, 'username': username, '_uid': uid}
         return self.client.post('/api/v2/users/join', **payload)
 
+    def un_join(self, category_id, username, uid=1):
+        """
+        Remove user from specified group
+        """
+        payload = {'category_id': category_id, 'username': username, '_uid': uid}
+        return self.client.post('/api/v2/users/unjoin', **payload)
+
     def create(self, username, user_data):
         """
         Create a user on Nodebb
