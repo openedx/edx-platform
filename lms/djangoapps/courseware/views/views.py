@@ -7,16 +7,17 @@ import urllib
 from collections import OrderedDict, namedtuple
 from datetime import datetime
 
+import bleach
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import AnonymousUser, User
 from django.core.exceptions import PermissionDenied
-from django.urls import reverse
 from django.db import transaction
-from django.db.models import prefetch_related_objects, Q
+from django.db.models import Q, prefetch_related_objects
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import redirect
 from django.template.context_processors import csrf
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.http import urlquote_plus
 from django.utils.text import slugify
@@ -27,20 +28,15 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 from django.views.generic import View
 from edx_django_utils.monitoring import set_custom_metrics_for_course_key
-from eventtracking import tracker
-from ipware.ip import get_ip
 from markupsafe import escape
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from pytz import UTC
 from rest_framework import status
 from six import text_type
-from web_fragments.fragment import Fragment
 
 import shoppingcart
 import survey.views
-from lms.djangoapps.certificates import api as certs_api
-from lms.djangoapps.certificates.models import CertificateStatuses
 from course_modes.models import CourseMode, get_course_prices
 from courseware.access import has_access, has_ccx_coach_role
 from courseware.access_utils import check_course_open_for_learner
@@ -64,7 +60,10 @@ from courseware.url_helpers import get_redirect_url
 from courseware.user_state_client import DjangoXBlockUserStateClient
 from edxmako.shortcuts import marketing_link, render_to_response, render_to_string
 from enrollment.api import add_enrollment
+from ipware.ip import get_ip
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
+from lms.djangoapps.certificates import api as certs_api
+from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect, Redirect
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
@@ -91,8 +90,8 @@ from openedx.features.course_duration_limits.access import register_course_expir
 from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, course_home_url_name
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
 from openedx.features.course_experience.views.course_dates import CourseDatesFragmentView
-from openedx.features.course_experience.waffle import waffle as course_experience_waffle
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
+from openedx.features.course_experience.waffle import waffle as course_experience_waffle
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 from openedx.features.journals.api import get_journals_context
 from shoppingcart.utils import is_shopping_cart_enabled
@@ -102,6 +101,7 @@ from util.cache import cache, cache_if_anonymous
 from util.db import outer_atomic
 from util.milestones_helpers import get_prerequisite_courses_display
 from util.views import _record_feedback_in_zendesk, ensure_valid_course_key, ensure_valid_usage_key
+from web_fragments.fragment import Fragment
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.tabs import CourseTabList
@@ -1450,7 +1450,9 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
 
     requested_view = request.GET.get('view', 'student_view')
     if requested_view != 'student_view':
-        return HttpResponseBadRequest("Rendering of the xblock view '{}' is not supported.".format(requested_view))
+        return HttpResponseBadRequest(
+            "Rendering of the xblock view '{}' is not supported.".format(bleach.clean(requested_view, strip=True))
+        )
 
     with modulestore().bulk_operations(course_key):
         # verify the user has access to the course, including enrollment check
