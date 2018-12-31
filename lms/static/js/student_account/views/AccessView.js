@@ -59,6 +59,7 @@
 
                     // Account activation messages
                     this.accountActivationMessages = options.account_activation_messages || [];
+                    this.accountRecoveryMessages = options.account_recovery_messages || [];
 
                     if (options.login_redirect_url) {
                         this.nextUrl = options.login_redirect_url;
@@ -99,9 +100,10 @@
                 // there is no need to show it again, if the user changes mode:
                     this.thirdPartyAuth.errorMessage = null;
 
-                    // Once the account activation messages have been shown once,
+                    // Once the account activation/account recovery messages have been shown once,
                     // there is no need to show it again, if the user changes mode:
                     this.accountActivationMessages = [];
+                    this.accountRecoveryMessages = [];
                 },
 
                 render: function() {
@@ -148,6 +150,7 @@
                             accountRecoveryModel: this.accountRecoveryModel,
                             thirdPartyAuth: this.thirdPartyAuth,
                             accountActivationMessages: this.accountActivationMessages,
+                            accountRecoveryMessages: this.accountRecoveryMessages,
                             platformName: this.platformName,
                             supportURL: this.supportURL,
                             passwordResetSupportUrl: this.passwordResetSupportUrl,

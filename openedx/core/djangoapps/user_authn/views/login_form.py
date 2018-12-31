@@ -110,6 +110,12 @@ def login_and_registration_form(request, initial_mode="login"):
         } for message in messages.get_messages(request) if 'account-activation' in message.tags
     ]
 
+    account_recovery_messages = [
+        {
+            'message': message.message, 'tags': message.tags
+        } for message in messages.get_messages(request) if 'account-recovery' in message.tags
+    ]
+
     # Otherwise, render the combined login/registration page
     context = {
         'data': {
@@ -123,6 +129,7 @@ def login_and_registration_form(request, initial_mode="login"):
                 'PASSWORD_RESET_SUPPORT_LINK', settings.PASSWORD_RESET_SUPPORT_LINK
             ) or settings.SUPPORT_SITE_LINK,
             'account_activation_messages': account_activation_messages,
+            'account_recovery_messages': account_recovery_messages,
 
             # Include form descriptions retrieved from the user API.
             # We could have the JS client make these requests directly,
