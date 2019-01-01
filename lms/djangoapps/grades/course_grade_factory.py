@@ -101,14 +101,6 @@ class CourseGradeFactory(object):
         course_data = CourseData(
             user=None, course=course, collected_block_structure=collected_block_structure, course_key=course_key,
         )
-        # adding temporary log to investigate EDUCATOR-3668
-        log.info(
-            "EDUCATOR-3668-lms.grades.CourseGradeFactory.iter: using course_version: {course_version} "
-            "and course_key: {course_key}".format(
-                course_version=course_data.version,
-                course_key=course_data.course_key
-            )
-        )
         stats_tags = [u'action:{}'.format(course_data.course_key)]
         for user in users:
             with dog_stats_api.timer('lms.grades.CourseGradeFactory.iter', tags=stats_tags):
