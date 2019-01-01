@@ -575,3 +575,112 @@ class EmailChangeConfirmationTests(EmailTestMixin, CacheIsolationMixin, Transact
                 confirm_email_change(self.request, self.key)
 
             mock_rollback.assert_called_with()
+
+
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
+class SecondaryEmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, CacheIsolationTestCase):
+    """
+    Test changing a user's email address
+    """
+
+    def setUp(self, tracker='student.views.management.tracker'):
+        super(SecondaryEmailChangeRequestTests, self).setUp(tracker)
+        self.user = UserFactory.create()
+        self.new_secondary_email = 'new.secondary.email@edx.org'
+        self.req_factory = RequestFactory()
+        self.request = self.req_factory.post('unused_url', data={
+            'password': 'test',
+            'new_email': self.new_secondary_email
+        })
+        self.request.user = self.user
+        self.user.email_user = Mock()
+
+    def do_email_validation(self, email):
+        """
+        Executes validate_new_secondary_email, returning any resulting error message.
+        """
+        try:
+            validate_new_email(self.request.user, email)
+        except ValueError as err:
+            return text_type(err)
+
+    def do_secondary_email_change(self, user, email, activation_key=None):
+        """
+        Executes do_secondary_email_change_request, returning any resulting error message.
+        """
+        with patch('crum.get_current_request', return_value=self.fake_request):
+            do_email_change_request(
+                user=user,
+                new_email=email,
+                activation_key=activation_key,
+                secondary_email_change_request=True
+            )
+
+    def assertFailedRequest(self, response_data, expected_error):
+        """
+        Assert that `response_data` indicates a failed request that returns `expected_error`
+        """
+        self.assertFalse(response_data['success'])
+        self.assertEquals(expected_error, response_data['error'])
+        self.assertFalse(self.user.email_user.called)
+
+    def test_invalid_emails(self):
+        """
+        Assert the expected error message from the email validation method for an invalid
+        (improperly formatted) email address.
+        """
+        for email in ('bad_email', 'bad_email@', '@bad_email'):
+            self.assertEqual(self.do_email_validation(email), 'Valid e-mail address required.')
+
+    @patch('django.core.mail.send_mail')
+    def test_email_failure(self, send_mail):
+        """
+        Test the return value if sending the email for the user to click fails.
+        """
+        send_mail.side_effect = [Exception, None]
+        with self.assertRaisesRegexp(ValueError, 'Unable to send email activation link. Please try again later.'):
+            self.do_secondary_email_change(self.user, "valid@email.com")
+
+        self.assert_no_events_were_emitted()
+
+    def test_email_success(self):
+        """
+        Test email was sent if no errors encountered.
+        """
+        new_email = "valid@example.com"
+        registration_key = "test-registration-key"
+
+        self.do_secondary_email_change(self.user, new_email, registration_key)
+
+        self._assert_email(
+            subject=u'Request to change édX account secondary e-mail',
+            body_fragments=[
+                u'We received a request to change the secondary e-mail associated with',
+                u'your édX account to {new_email}.'.format(
+                    new_email=new_email,
+                ),
+                u'If this is correct, please confirm your new secondary e-mail address by visiting:',
+                u'http://edx.org/activate_secondary_email/{key}'.format(key=registration_key),
+                u'If you didn\'t request this, you don\'t need to do anything;',
+                u'you won\'t receive any more email from us.',
+                u'Please do not reply to this e-mail; if you require assistance,',
+                u'check the help section of the édX web site.',
+            ],
+        )
+
+    def _assert_email(self, subject, body_fragments):
+        """
+        Verify that the email was sent.
+        """
+        assert len(mail.outbox) == 1
+        assert len(body_fragments) > 1, 'Should provide at least two body fragments'
+
+        message = mail.outbox[0]
+        text = message.body
+        html = message.alternatives[0][0]
+
+        assert message.subject == subject
+
+        for body in text, html:
+            for fragment in body_fragments:
+                assert fragment in body

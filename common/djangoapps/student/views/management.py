@@ -76,6 +76,7 @@ from student.models import (
     AccountRecovery,
     CourseEnrollment,
     PendingEmailChange,
+    PendingSecondaryEmailChange,
     Registration,
     RegistrationCookieConfiguration,
     UserAttribute,
@@ -1109,26 +1110,35 @@ def validate_secondary_email(account_recovery, new_email):
         raise ValueError(message)
 
 
-def do_email_change_request(user, new_email, activation_key=None):
+def do_email_change_request(user, new_email, activation_key=None, secondary_email_change_request=False):
     """
     Given a new email for a user, does some basic verification of the new address and sends an activation message
     to the new address. If any issues are encountered with verification or sending the message, a ValueError will
     be thrown.
     """
-    pec_list = PendingEmailChange.objects.filter(user=user)
-    if len(pec_list) == 0:
-        pec = PendingEmailChange()
-        pec.user = user
-    else:
-        pec = pec_list[0]
-
     # if activation_key is not passing as an argument, generate a random key
     if not activation_key:
         activation_key = uuid.uuid4().hex
 
-    pec.new_email = new_email
-    pec.activation_key = activation_key
-    pec.save()
+    confirm_link = reverse('confirm_email_change', kwargs={'key': activation_key, })
+
+    if secondary_email_change_request:
+        PendingSecondaryEmailChange.objects.update_or_create(
+            user=user,
+            defaults={
+                'new_secondary_email': new_email,
+                'activation_key': activation_key,
+            }
+        )
+        confirm_link = reverse('activate_secondary_email', kwargs={'key': activation_key})
+    else:
+        PendingEmailChange.objects.update_or_create(
+            user=user,
+            defaults={
+                'new_email': new_email,
+                'activation_key': activation_key,
+            }
+        )
 
     use_https = theming_helpers.get_current_request().is_secure()
 
@@ -1136,18 +1146,17 @@ def do_email_change_request(user, new_email, activation_key=None):
     message_context = get_base_template_context(site)
     message_context.update({
         'old_email': user.email,
-        'new_email': pec.new_email,
+        'new_email': new_email,
+        'is_secondary_email_change_request': secondary_email_change_request,
         'confirm_link': '{protocol}://{site}{link}'.format(
             protocol='https' if use_https else 'http',
             site=configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME),
-            link=reverse('confirm_email_change', kwargs={
-                'key': pec.activation_key,
-            }),
+            link=confirm_link,
         ),
     })
 
     msg = EmailChange().personalize(
-        recipient=Recipient(user.username, pec.new_email),
+        recipient=Recipient(user.username, new_email),
         language=preferences_api.get_user_preference(user, LANGUAGE_KEY),
         user_context=message_context,
     )
@@ -1159,18 +1168,42 @@ def do_email_change_request(user, new_email, activation_key=None):
         log.error(u'Unable to send email activation link to user from "%s"', from_address, exc_info=True)
         raise ValueError(_('Unable to send email activation link. Please try again later.'))
 
-    # When the email address change is complete, a "edx.user.settings.changed" event will be emitted.
-    # But because changing the email address is multi-step, we also emit an event here so that we can
-    # track where the request was initiated.
-    tracker.emit(
-        SETTING_CHANGE_INITIATED,
-        {
-            "setting": "email",
-            "old": message_context['old_email'],
-            "new": message_context['new_email'],
-            "user_id": user.id,
-        }
-    )
+    if not secondary_email_change_request:
+        # When the email address change is complete, a "edx.user.settings.changed" event will be emitted.
+        # But because changing the email address is multi-step, we also emit an event here so that we can
+        # track where the request was initiated.
+        tracker.emit(
+            SETTING_CHANGE_INITIATED,
+            {
+                "setting": "email",
+                "old": message_context['old_email'],
+                "new": message_context['new_email'],
+                "user_id": user.id,
+            }
+        )
+
+
+@ensure_csrf_cookie
+def activate_secondary_email(request, key):  # pylint: disable=unused-argument
+    """
+    This is called when the activation link is clicked. We activate the secondary email
+    for the requested user.
+    """
+    try:
+        pending_secondary_email_change = PendingSecondaryEmailChange.objects.get(activation_key=key)
+    except PendingSecondaryEmailChange.DoesNotExist:
+        return render_to_response("invalid_email_key.html", {})
+
+    try:
+        account_recovery_obj = AccountRecovery.objects.get(user_id=pending_secondary_email_change.user)
+    except AccountRecovery.DoesNotExist:
+        return render_to_response("secondary_email_change_failed.html", {
+            'secondary_email': pending_secondary_email_change.new_secondary_email
+        })
+
+    account_recovery_obj.is_active = True
+    account_recovery_obj.save()
+    return render_to_response("secondary_email_change_successful.html")
 
 
 @ensure_csrf_cookie

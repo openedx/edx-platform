@@ -246,7 +246,17 @@
 			// Secondary email address
             if (isSecondaryEmailFeatureEnabled) {
                 secondaryEmailFieldView = {
-                    view: new AccountSettingsFieldViews.EmailFieldView(secondaryEmailFieldData)
+                    view: new AccountSettingsFieldViews.EmailFieldView(secondaryEmailFieldData),
+                    successMessage: function() {
+                    return HtmlUtils.joinHtml(
+                        this.indicators.success,
+                        StringUtils.interpolate(
+                            gettext('We\'ve sent a confirmation message to {new_secondary_email_address}. Click the link in the message to update your secondary email address.'),  // eslint-disable-line max-len
+                            {
+                                new_secondary_email_address: this.fieldValue()
+                            }
+                        )
+                    );}
                 };
                 emailFieldViewIndex = aboutSectionsData[0].fields.indexOf(emailFieldView);
 
