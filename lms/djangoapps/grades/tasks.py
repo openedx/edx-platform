@@ -63,10 +63,6 @@ def compute_all_grades_for_course(**kwargs):
         if are_grades_frozen(course_key):
             log.info("Attempted compute_all_grades_for_course for course '%s', but grades are frozen.", course_key)
             return
-        # adding temporary log to investigate EDUCATOR-3668
-        log.info("EDUCATOR-3668-Computing grades for all students in course: {course_key}".format(
-            course_key=course_key
-        ))
         for course_key_string, offset, batch_size in _course_task_args(course_key=course_key, **kwargs):
             kwargs.update({
                 'course_key': course_key_string,
