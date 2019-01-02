@@ -1,39 +1,39 @@
 # #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2018 EdX
+# Copyright (C) 2019 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 #
 # #-#-#-#-#  django-studio.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2018 EdX
+# Copyright (C) 2019 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 #
 # #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2018 edX
+# Copyright (C) 2019 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 #
 # #-#-#-#-#  mako-studio.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2018 edX
+# Copyright (C) 2019 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 #
 # #-#-#-#-#  wiki.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2018 edX
+# Copyright (C) 2019 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-12-30 20:37+0000\n"
-"PO-Revision-Date: 2018-12-30 20:37:11.339813\n"
+"POT-Creation-Date: 2019-01-02 15:30+0000\n"
+"PO-Revision-Date: 2019-01-02 15:30:42.381305\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -1057,6 +1057,26 @@ msgid "Error in resetting your password. Please try again."
 msgstr ""
 "Érrör ïn réséttïng ýöür pässwörd. Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α#"
+
+#: common/djangoapps/student/views/management.py
+msgid "Password creation unsuccessful"
+msgstr "Pässwörd çréätïön ünsüççéssfül Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: common/djangoapps/student/views/management.py
+msgid "Error in creating your password. Please try again."
+msgstr ""
+"Érrör ïn çréätïng ýöür pässwörd. Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
+#: common/djangoapps/student/views/management.py
+#, python-brace-format
+msgid ""
+"{html_start}Password Creation Complete{html_end}Your password has been "
+"created. {bold_start}{email}{bold_end} is now your primary login email."
+msgstr ""
+"{html_start}Pässwörd Çréätïön Çömplété{html_end}Ýöür pässwörd häs ßéén "
+"çréätéd. {bold_start}{email}{bold_end} ïs nöw ýöür prïmärý lögïn émäïl. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
 
 #: common/djangoapps/student/views/management.py
 msgid "Valid e-mail address required."
@@ -5776,9 +5796,77 @@ msgstr ""
 "Töp nüm_töp_wörds wörds för wörd çlöüd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
 
+#: common/templates/student/edx_ace/accountrecovery/email/body.html
+msgid "Create Password"
+msgstr "Çréäté Pässwörd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: common/templates/student/edx_ace/accountrecovery/email/body.html
+#: common/templates/student/edx_ace/accountrecovery/email/body.txt
+#, python-format
+msgid ""
+"You're receiving this e-mail because you requested to create a password for "
+"your user account at %(platform_name)s."
+msgstr ""
+"Ýöü'ré réçéïvïng thïs é-mäïl ßéçäüsé ýöü réqüéstéd tö çréäté ä pässwörd för "
+"ýöür üsér äççöünt ät %(platform_name)s. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: common/templates/student/edx_ace/accountrecovery/email/body.html
+#: common/templates/student/edx_ace/accountrecovery/email/body.txt
+msgid ""
+"If you didn't request this change, you can disregard this email - we have "
+"not yet created your password."
+msgstr ""
+"Ìf ýöü dïdn't réqüést thïs çhängé, ýöü çän dïsrégärd thïs émäïl - wé hävé "
+"nöt ýét çréätéd ýöür pässwörd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: common/templates/student/edx_ace/accountrecovery/email/body.html
+msgid "Create my Password"
+msgstr "Çréäté mý Pässwörd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: common/templates/student/edx_ace/accountrecovery/email/body.txt
+#: common/templates/student/edx_ace/passwordreset/email/body.txt
+msgid "Please go to the following page and choose a new password:"
+msgstr ""
+"Pléäsé gö tö thé föllöwïng pägé änd çhöösé ä néw pässwörd: Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: common/templates/student/edx_ace/accountrecovery/email/body.txt
+#: common/templates/student/edx_ace/passwordreset/email/body.txt
+msgid "Thanks for using our site!"
+msgstr "Thänks för üsïng öür sïté! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: common/templates/student/edx_ace/accountrecovery/email/body.txt
+#: common/templates/student/edx_ace/passwordreset/email/body.txt
+#, python-format
+msgid "The %(platform_name)s Team"
+msgstr "Thé %(platform_name)s Téäm Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: common/templates/student/edx_ace/accountrecovery/email/subject.txt
+#, python-format
+msgid "Create password on %(platform_name)s"
+msgstr "Çréäté pässwörd ön %(platform_name)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
 #: common/templates/student/edx_ace/emailchange/email/body.html
 msgid "Email Change"
 msgstr "Émäïl Çhängé Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: common/templates/student/edx_ace/emailchange/email/body.html
+#: common/templates/student/edx_ace/emailchange/email/body.txt
+#, python-format
+msgid ""
+"We received a request to change the secondary e-mail associated with your "
+"%(platform_name)s account to %(new_email)s. If this is correct, please "
+"confirm your new secondary e-mail address by visiting:"
+msgstr ""
+"Wé réçéïvéd ä réqüést tö çhängé thé séçöndärý é-mäïl ässöçïätéd wïth ýöür "
+"%(platform_name)s äççöünt tö %(new_email)s. Ìf thïs ïs çörréçt, pléäsé "
+"çönfïrm ýöür néw séçöndärý é-mäïl äddréss ßý vïsïtïng: Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт "
+"łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ "
+"єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ "
+"αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ "
+"ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт "
+"ιη ¢υłρ#"
 
 #: common/templates/student/edx_ace/emailchange/email/body.html
 #: common/templates/student/edx_ace/emailchange/email/body.txt
@@ -5818,6 +5906,13 @@ msgstr ""
 "ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
 "¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
 "¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕι#"
+
+#: common/templates/student/edx_ace/emailchange/email/subject.txt
+#, python-format
+msgid "Request to change %(platform_name)s account secondary e-mail"
+msgstr ""
+"Réqüést tö çhängé %(platform_name)s äççöünt séçöndärý é-mäïl Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: common/templates/student/edx_ace/emailchange/email/subject.txt
 #, python-format
@@ -5870,21 +5965,6 @@ msgstr ""
 #: common/templates/student/edx_ace/passwordreset/email/body.html
 msgid "Change my Password"
 msgstr "Çhängé mý Pässwörd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
-
-#: common/templates/student/edx_ace/passwordreset/email/body.txt
-msgid "Please go to the following page and choose a new password:"
-msgstr ""
-"Pléäsé gö tö thé föllöwïng pägé änd çhöösé ä néw pässwörd: Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: common/templates/student/edx_ace/passwordreset/email/body.txt
-msgid "Thanks for using our site!"
-msgstr "Thänks för üsïng öür sïté! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: common/templates/student/edx_ace/passwordreset/email/body.txt
-#, python-format
-msgid "The %(platform_name)s Team"
-msgstr "Thé %(platform_name)s Téäm Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: common/templates/student/edx_ace/passwordreset/email/subject.txt
 #, python-format
@@ -15372,6 +15452,7 @@ msgstr ""
 
 #: lms/templates/email_change_failed.html lms/templates/email_exists.html
 #: lms/templates/invalid_email_key.html
+#: lms/templates/secondary_email_change_failed.html
 msgid "Go back to the {link_start}home page{link_end}."
 msgstr ""
 "Gö ßäçk tö thé {link_start}hömé pägé{link_end}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
@@ -16413,6 +16494,30 @@ msgstr ""
 "{dashboard_link_start}rétürn tö ýöür däshßöärd{link_end}. Ⱡ'σяєм ιρѕυм ∂σłσя"
 " ѕιт αмєт, ¢#"
 
+#: lms/templates/secondary_email_change_failed.html
+msgid "Secondary e-mail change failed"
+msgstr "Séçöndärý é-mäïl çhängé fäïléd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: lms/templates/secondary_email_change_failed.html
+msgid "We were unable to activate your secondary email {secondary_email}"
+msgstr ""
+"Wé wéré ünäßlé tö äçtïväté ýöür séçöndärý émäïl {secondary_email} Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/secondary_email_change_successful.html
+msgid "Secondary e-mail change successful!"
+msgstr ""
+"Séçöndärý é-mäïl çhängé süççéssfül! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: lms/templates/secondary_email_change_successful.html
+msgid ""
+"Your secondary email has been activated. Please visit "
+"{link_start}dashboard{link_end} for courses."
+msgstr ""
+"Ýöür séçöndärý émäïl häs ßéén äçtïvätéd. Pléäsé vïsït "
+"{link_start}däshßöärd{link_end} för çöürsés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тє#"
+
 #: lms/templates/seq_module.html
 msgid "Important!"
 msgstr "Ìmpörtänt! Ⱡ'σяєм ιρѕυм ∂σłσ#"
@@ -16906,6 +17011,15 @@ msgstr "{num} öf {total} Ⱡ'σяєм ιρѕυм ∂σłσ#"
 #: lms/templates/word_cloud.html
 msgid "Your words were:"
 msgstr "Ýöür wörds wéré: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: lms/templates/account_recovery/password_create_confirm.html
+msgid "Create Your {platform_name} Password"
+msgstr ""
+"Çréäté Ýöür {platform_name} Pässwörd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: lms/templates/account_recovery/password_create_confirm.html
+msgid "Invalid Password Create Link"
+msgstr "Ìnvälïd Pässwörd Çréäté Lïnk Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: lms/templates/api_admin/api_access_request_form.html
 msgid "API Access Request"
