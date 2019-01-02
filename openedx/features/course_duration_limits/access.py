@@ -152,6 +152,9 @@ def register_course_expired_message(request, course):
         full_message = expiration_message
         if course_upgrade_deadline and now < course_upgrade_deadline:
             full_message += upgrade_deadline_message
+            using_upgrade_messaging = True
+        else:
+            using_upgrade_messaging = False
 
         language = get_language()
         language_is_es = language and language.split('-')[0].lower() == 'es'
@@ -166,7 +169,7 @@ def register_course_expired_message(request, course):
             else:
                 formatted_upgrade_deadline = strftime_localized(upgrade_deadline, '%b. %-d, %Y')
 
-        if upgrade_deadline:
+        if using_upgrade_messaging:
             PageLevelMessages.register_info_message(
                 request,
                 Text(full_message).format(
