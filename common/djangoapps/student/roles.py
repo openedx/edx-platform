@@ -120,7 +120,7 @@ class GlobalStaff(AccessRole):
     The global staff role
     """
     def has_user(self, user):
-        return user.is_staff
+        return bool(user and user.is_staff)
 
     def add_users(self, *users):
         for user in users:

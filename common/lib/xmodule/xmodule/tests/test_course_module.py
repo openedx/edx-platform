@@ -9,6 +9,8 @@ from fs.memoryfs import MemoryFS
 from mock import Mock, patch
 from pytz import utc
 from xblock.runtime import KvsFieldData, DictKeyValueStore
+from django.conf import settings
+from django.test import override_settings
 
 import xmodule.course_module
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
@@ -419,3 +421,73 @@ class CourseDescriptorTestCase(unittest.TestCase):
         """
         expected_certificate_available_date = self.course.end + timedelta(days=2)
         self.assertEqual(expected_certificate_available_date, self.course.certificate_available_date)
+
+
+class ProctoringProviderTestCase(unittest.TestCase):
+    """
+    Tests for ProctoringProvider, including the default value, validation, and inheritance behavior.
+    """
+    shard = 1
+
+    def setUp(self):
+        """
+        Initialize dummy testing course.
+        """
+        super(ProctoringProviderTestCase, self).setUp()
+        self.proctoring_provider = xmodule.course_module.ProctoringProvider()
+
+    def test_from_json_with_platform_default(self):
+        """
+        Test that a proctoring provider value equivalent to the platform
+        default will pass validation.
+        """
+        default_provider = settings.PROCTORING_BACKENDS.get('DEFAULT')
+
+        # we expect the validated value to be equivalent to the value passed in,
+        # since there are no validation errors or missing data
+        self.assertEqual(self.proctoring_provider.from_json(default_provider), default_provider)
+
+    def test_from_json_with_invalid_provider(self):
+        """
+        Test that an invalid provider (i.e. not one configured at the platform level)
+        throws a ValueError with the correct error message.
+        """
+        provider = 'invalid-provider'
+        proctoring_provider_whitelist = [u'mock', u'mock_proctoring_without_rules']
+
+        with self.assertRaises(ValueError) as context_manager:
+            self.proctoring_provider.from_json(provider)
+        self.assertEqual(
+            context_manager.exception.args[0],
+            ['The selected proctoring provider, {}, is not a valid provider. Please select from one of {}.'
+                .format(provider, proctoring_provider_whitelist)]
+        )
+
+    def test_from_json_adds_platform_default_for_missing_provider(self):
+        """
+        Test that a value with no provider will inherit the default provider
+        from the platform defaults.
+        """
+        default_provider = 'mock'
+
+        self.assertEqual(self.proctoring_provider.from_json(None), default_provider)
+
+    @override_settings(
+        PROCTORING_BACKENDS={
+            'mock': {},
+            'mock_proctoring_without_rules': {}
+        }
+    )
+    def test_default_with_no_platform_default(self):
+        """
+        Test that, when the platform defaults are not set, the default is correct.
+        """
+        self. assertEqual(self.proctoring_provider.default, None)
+
+    @override_settings(PROCTORING_BACKENDS=None)
+    def test_default_with_no_platform_configuration(self):
+        """
+        Test that, when the platform default is not specified, the default is correct.
+        """
+        default = self.proctoring_provider.default
+        self.assertEqual(default, None)

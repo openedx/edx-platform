@@ -24,3 +24,5 @@ requests                            # Simple interface for making HTTP requests
 stevedore==1.10.0                   # via edx-opaque-keys
 watchdog                            # Used in paver watch_assets
 wrapt==1.10.5                       # Decorator utilities used in the @timed paver task decorator
+
+six==1.11.0                         # Pinned because a few things here need it, but later transifex-client says ==1.11.0

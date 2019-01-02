@@ -183,6 +183,89 @@ class TextbookList(List):
         return json_data
 
 
+class ProctoringProvider(String):
+    """
+    ProctoringProvider field, which includes validation of the provider
+    and default that pulls from edx platform settings.
+    """
+    def from_json(self, value):
+        """
+        Return ProctoringProvider as full featured Python type. Perform validation on the provider
+        and include any inherited values from the platform default.
+        """
+        errors = []
+        value = super(ProctoringProvider, self).from_json(value)
+
+        provider_errors = self._validate_proctoring_provider(value)
+        errors.extend(provider_errors)
+
+        if errors:
+            raise ValueError(errors)
+
+        value = self._get_proctoring_value(value)
+
+        return value
+
+    def _get_proctoring_value(self, value):
+        """
+        Return a proctoring value that includes any inherited attributes from the platform defaults
+        for the provider.
+        """
+        # if provider is missing from the value, return the default
+        if value is None:
+            return self.default
+
+        return value
+
+    def _validate_proctoring_provider(self, value):
+        """
+        Validate the value for the proctoring provider. If the proctoring provider value is
+        specified, and it is not one of the providers configured at the platform level, return
+        a list of error messages to the caller.
+        """
+        errors = []
+
+        available_providers = get_available_providers()
+
+        if value and value not in available_providers:
+            errors.append(
+                _('The selected proctoring provider, {proctoring_provider}, is not a valid provider. '
+                    'Please select from one of {available_providers}.')
+                .format(
+                    proctoring_provider=value,
+                    available_providers=available_providers
+                )
+            )
+
+        return errors
+
+    @property
+    def default(self):
+        """
+        Return default value for ProctoringProvider.
+        """
+        default = super(ProctoringProvider, self).default
+
+        proctoring_backend_settings = getattr(settings, 'PROCTORING_BACKENDS', None)
+
+        if proctoring_backend_settings:
+            return proctoring_backend_settings.get('DEFAULT', None)
+
+        return default
+
+
+def get_available_providers():
+    proctoring_backend_settings = getattr(
+        settings,
+        'PROCTORING_BACKENDS',
+        {}
+    )
+
+    available_providers = [provider for provider in proctoring_backend_settings if provider != 'DEFAULT']
+    available_providers.sort()
+    return available_providers
+
+
 class CourseFields(object):
     lti_passports = List(
         display_name=_("LTI Passports"),
@@ -738,6 +821,21 @@ class CourseFields(object):
         scope=Scope.settings
     )
 
+    proctoring_provider = ProctoringProvider(
+        display_name=_("Proctoring Provider"),
+        help=_(
+            "Enter the proctoring provider you want to use for this course run. "
+            "Choose from the following options: {available_providers}."),
+        help_format_args=dict(
+            # Put the available providers into a format variable so that translators
+            # don't translate them.
+            available_providers=(
+                ', '.join(get_available_providers())
+            ),
+        ),
+        scope=Scope.settings,
+    )
+
     allow_proctoring_opt_out = Boolean(
         display_name=_("Allow Opting Out of Proctored Exams"),
         help=_(
@@ -1049,7 +1147,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
     def definition_to_xml(self, resource_fs):
         xml_object = super(CourseDescriptor, self).definition_to_xml(resource_fs)
 
-        if len(self.textbooks) > 0:
+        if self.textbooks:
             textbook_xml_object = etree.Element('textbook')
             for textbook in self.textbooks:
                 textbook_xml_object.set('title', textbook.title)
@@ -1103,7 +1201,8 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
 
     @raw_grader.setter
     def raw_grader(self, value):
-        # NOTE WELL: this change will not update the processed graders. If we need that, this needs to call grader_from_conf
+        # NOTE WELL: this change will not update the processed graders.
+        # If we need that, this needs to call grader_from_conf.
         self._grading_policy['RAW_GRADER'] = value
         self.grading_policy['GRADER'] = value
 

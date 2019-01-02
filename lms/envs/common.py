@@ -1345,28 +1345,6 @@ courseware_js = [
     'js/modules/tab.js',
 ]
 
-proctoring_js = (
-    [
-        'proctoring/js/models/proctored_exam_allowance_model.js',
-        'proctoring/js/models/proctored_exam_attempt_model.js',
-        'proctoring/js/models/proctored_exam_model.js'
-    ] +
-    [
-        'proctoring/js/collections/proctored_exam_allowance_collection.js',
-        'proctoring/js/collections/proctored_exam_attempt_collection.js',
-        'proctoring/js/collections/proctored_exam_collection.js'
-    ] +
-    [
-        'proctoring/js/views/Backbone.ModalDialog.js',
-        'proctoring/js/views/proctored_exam_add_allowance_view.js',
-        'proctoring/js/views/proctored_exam_allowance_view.js',
-        'proctoring/js/views/proctored_exam_attempt_view.js',
-        'proctoring/js/views/proctored_exam_view.js'
-    ] +
-    [
-        'proctoring/js/proctored_app.js'
-    ]
-)
 
 # Before a student accesses courseware, we do not
 # need many of the JS dependencies.  This includes
@@ -1693,10 +1671,6 @@ PIPELINE_JS = {
         ),
         'output_filename': 'js/lms-application.js',
     },
-    'proctoring': {
-        'source_filenames': proctoring_js,
-        'output_filename': 'js/lms-proctoring.js',
-    },
     'courseware': {
         'source_filenames': courseware_js,
         'output_filename': 'js/lms-courseware.js',
@@ -1841,6 +1815,10 @@ WEBPACK_LOADER = {
     'DEFAULT': {
         'BUNDLE_DIR_NAME': 'bundles/',
         'STATS_FILE': os.path.join(STATIC_ROOT, 'webpack-stats.json')
+    },
+    'WORKERS': {
+        'BUNDLE_DIR_NAME': 'bundles/',
+        'STATS_FILE': os.path.join(STATIC_ROOT, 'webpack-worker-stats.json')
     }
 }
 WEBPACK_CONFIG_PATH = 'webpack.prod.config.js'
@@ -2881,9 +2859,6 @@ OPTIONAL_APPS = [
     # edxval
     ('edxval', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
 
-    # edX Proctoring
-    ('edx_proctoring', None),
-
     # Organizations App (http://github.com/edx/edx-organizations)
     ('organizations', None),
 
@@ -3214,14 +3189,6 @@ MICROSITE_DATABASE_TEMPLATE_CACHE_TTL = 5 * 60
 ################################ Settings for rss_proxy ################################
 
 RSS_PROXY_CACHE_TIMEOUT = 3600  # The length of time we cache RSS retrieved from remote URLs in seconds
-
-#### PROCTORING CONFIGURATION DEFAULTS
-
-PROCTORING_BACKEND_PROVIDER = {
-    'class': 'edx_proctoring.backends.null.NullBackendProvider',
-    'options': {},
-}
-PROCTORING_SETTINGS = {}
 
 #### Custom Courses for EDX (CCX) configuration
 

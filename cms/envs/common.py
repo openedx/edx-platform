@@ -881,6 +881,10 @@ WEBPACK_LOADER = {
     'DEFAULT': {
         'BUNDLE_DIR_NAME': 'bundles/',
         'STATS_FILE': os.path.join(STATIC_ROOT, 'webpack-stats.json')
+    },
+    'WORKERS': {
+        'BUNDLE_DIR_NAME': 'bundles/',
+        'STATS_FILE': os.path.join(STATIC_ROOT, 'webpack-worker-stats.json')
     }
 }
 WEBPACK_CONFIG_PATH = 'webpack.prod.config.js'
@@ -1092,9 +1096,6 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.credit.apps.CreditConfig',
 
     'xblock_django',
-
-    # edX Proctoring
-    'edx_proctoring',
 
     # Catalog integration
     'openedx.core.djangoapps.catalog',
@@ -1445,12 +1446,6 @@ MICROSITE_TEMPLATE_BACKEND = 'microsite_configuration.backends.filebased.Filebas
 # TTL for microsite database template cache
 MICROSITE_DATABASE_TEMPLATE_CACHE_TTL = 5 * 60
 
-############################### PROCTORING CONFIGURATION DEFAULTS ##############
-PROCTORING_BACKEND_PROVIDER = {
-    'class': 'edx_proctoring.backends.null.NullBackendProvider',
-    'options': {},
-}
-PROCTORING_SETTINGS = {}
 
 ############################ Global Database Configuration #####################
 
