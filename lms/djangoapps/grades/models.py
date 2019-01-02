@@ -41,7 +41,7 @@ class BaseTuple(tuple):
     """
     Wrapper class for tuple to allow overrides for both __new__ and __init__
     
-    Normally overriding both methods will produce a deprication warning.  This will
+    Normally overriding both methods will produce a deprecation warning.  This will
     resolve that error and maintain existing behavior.
         See https://bugs.python.org/issue1683368
     """
