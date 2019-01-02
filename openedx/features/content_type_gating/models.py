@@ -125,7 +125,8 @@ class ContentTypeGatingConfig(StackedConfigurationModel):
 
         # enrollment might be None if the user isn't enrolled. In that case,
         # return enablement as if the user enrolled today
-        if enrollment is None:
+        # Also, ignore enrollment creation date if the user is masquerading.
+        if enrollment is None or not no_masquerade:
             return cls.enabled_for_course(course_key=course_key, target_datetime=timezone.now())
         else:
             current_config = cls.current(course_key=enrollment.course_id)
