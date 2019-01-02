@@ -1,33 +1,33 @@
 # #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2018 EdX
+# Copyright (C) 2019 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 #
 # #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2018 EdX
+# Copyright (C) 2019 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 #
 # #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2018 edX
+# Copyright (C) 2019 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 #
 # #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2018 edX
+# Copyright (C) 2019 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-12-30 20:36+0000\n"
-"PO-Revision-Date: 2018-12-30 20:37:11.699664\n"
+"POT-Creation-Date: 2019-01-02 15:30+0000\n"
+"PO-Revision-Date: 2019-01-02 15:30:42.102744\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -5542,6 +5542,15 @@ msgstr "Ýéär öf Bïrth Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Preferred Language"
 msgstr "Préférréd Längüägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid ""
+"We've sent a confirmation message to {new_secondary_email_address}. Click "
+"the link in the message to update your secondary email address."
+msgstr ""
+"Wé'vé sént ä çönfïrmätïön méssägé tö {new_secondary_email_address}. Çlïçk "
+"thé lïnk ïn thé méssägé tö üpdäté ýöür séçöndärý émäïl äddréss. Ⱡ'σяєм ιρѕυм"
+" ∂σłσя #"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Social Media Links"

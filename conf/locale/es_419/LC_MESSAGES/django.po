@@ -120,7 +120,7 @@
 # Developer EdX <mperez_ges@galileo.edu>, 2016
 # Diego Rojas <diego.rojas@edunext.co>, 2017
 # David Salazar <imdjsg@gmail.com>, 2014
-# Eduardo Zambrano <ezambrano@edx.org>, 2017-2018
+# Eduardo Zambrano <ezambrano@edx.org>, 2017-2019
 # Elias Estay <eestay@u.uchile.cl>, 2015
 # Fabio Avellaneda <fabio_avellaneda@javeriana.edu.co>, 2015
 # Félix Antonio Valdez Noverola <felix@itesm.mx>, 2015
@@ -229,7 +229,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-12-23 20:42+0000\n"
+"POT-Creation-Date: 2018-12-30 20:42+0000\n"
 "PO-Revision-Date: 2018-12-03 12:00+0000\n"
 "Last-Translator: Marina Pastor <mpastor@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -16698,6 +16698,8 @@ msgid ""
 "{b_start}Graded Assignments: {b_end}Build your skills through graded "
 "assignments and projects."
 msgstr ""
+"{b_start}Asignaciones calificadas: {b_end}Desarrolla tus habilidades a "
+"través de tareas y proyectos calificados."
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
@@ -16705,6 +16707,8 @@ msgid ""
 "{b_start}Easily Sharable: {b_end}Add the certificate to your CV or resume, "
 "or post it directly on LinkedIn."
 msgstr ""
+"{b_start}Fácil de compartir: {b_end}Agrega el certificado a tu CV o "
+"publícalo directamente en LinkedIn."
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
@@ -16737,7 +16741,7 @@ msgstr "Tomar el curso con Certificado Verificado"
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid "Pursue the Verified Track"
-msgstr ""
+msgstr "Tomar el curso con Certificado Verificado "
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
@@ -18476,11 +18480,11 @@ msgstr "Otras Razones:"
 
 #: lms/templates/emails/failed_verification_email.txt
 msgid "Resubmit Verification: {reverify_url}"
-msgstr ""
+msgstr "Volver a enviar la verificación: {reverify_url}"
 
 #: lms/templates/emails/failed_verification_email.txt
 msgid "ID Verification FAQ: {faq_url}"
-msgstr ""
+msgstr "Preguntas frecuentes sobre la verificación de ID: {faq_url}"
 
 #: lms/templates/emails/failed_verification_email.txt
 #: lms/templates/emails/order_confirmation_email.txt
@@ -18510,16 +18514,16 @@ msgstr "Su número de orden es: {order_number}"
 
 #: lms/templates/emails/passed_verification_email.txt
 msgid "Hi {full_name}"
-msgstr ""
+msgstr "Hola {full_name} "
 
 #: lms/templates/emails/passed_verification_email.txt
 msgid "Congratulations! Your ID verification process was successful."
-msgstr ""
+msgstr "¡Felicidades! Su proceso de verificación de ID fue exitoso."
 
 #: lms/templates/emails/passed_verification_email.txt
 msgid ""
 "Your verification is effective for one year. It will expire on {expiry_date}"
-msgstr ""
+msgstr "Tu verificación es efectiva por un año. Expirará el {expiry_date}"
 
 #: lms/templates/emails/photo_submission_confirmation.txt
 msgid "Hi {full_name},"
@@ -20590,6 +20594,7 @@ msgstr "Ver el estado de inscripción de un estudiante específico"
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Learner's {platform_name} email address or username *"
 msgstr ""
+"Dirección de email {platform_name} o nombre de usuario del estudiante *"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Learner email address or username"
@@ -21653,7 +21658,7 @@ msgstr "Soporte a estudiantes: Inscripciones"
 
 #: lms/templates/support/feature_based_enrollments.html
 msgid "Student Support: Feature Based Enrollments"
-msgstr ""
+msgstr "Soporte al estudiante: inscripciones basadas en características"
 
 #: lms/templates/support/feature_based_enrollments.html
 msgid "Is Enabled"
