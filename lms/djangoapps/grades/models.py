@@ -37,22 +37,19 @@ BLOCK_RECORD_LIST_VERSION = 1
 BlockRecord = namedtuple('BlockRecord', ['locator', 'weight', 'raw_possible', 'graded'])
 
 
-class BlockRecordList(tuple):
+class BlockRecordList(object):
     """
     An immutable ordered list of BlockRecord objects.
     """
 
-    def __new__(cls, blocks, course_key, version=None):  # pylint: disable=unused-argument
-        return super(BlockRecordList, cls).__new__(cls, blocks)
-
     def __init__(self, blocks, course_key, version=None):
-        super(BlockRecordList, self).__init__(blocks)
+        self.blocks = tuple(blocks)
         self.course_key = course_key
         self.version = version or BLOCK_RECORD_LIST_VERSION
 
     def __eq__(self, other):
         assert isinstance(other, BlockRecordList)
-        return hash(self) == hash(other)
+        return self.json_value == other.json_value
 
     def __hash__(self):
         """
@@ -60,6 +57,12 @@ class BlockRecordList(tuple):
         list of block records, as required by python.
         """
         return hash(self.hash_value)
+
+    def __iter__(self):
+        return iter(self.blocks)
+
+    def __len__(self):
+        return len(self.blocks)
 
     @lazy
     def hash_value(self):
@@ -79,7 +82,7 @@ class BlockRecordList(tuple):
         Return a JSON-serialized version of the list of block records, using a
         stable ordering.
         """
-        list_of_block_dicts = [block._asdict() for block in self]
+        list_of_block_dicts = [block._asdict() for block in self.blocks]
         for block_dict in list_of_block_dicts:
             block_dict['locator'] = unicode(block_dict['locator'])  # BlockUsageLocator is not json-serializable
         data = {
