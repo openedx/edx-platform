@@ -37,14 +37,31 @@ BLOCK_RECORD_LIST_VERSION = 1
 BlockRecord = namedtuple('BlockRecord', ['locator', 'weight', 'raw_possible', 'graded'])
 
 
-class BlockRecordList(tuple):
+class BaseTuple(tuple):
+    """
+    Wrapper class for tuple to allow overrides for both __new__ and __init__
+    
+    Normally overriding both methods will produce a deprication warning.  This will
+    resolve that error and maintain existing behavior.
+        See https://bugs.python.org/issue1683368
+    """
+    # pylint: disable=unused-argument,super-init-not-called,no-member
+
+    def __new__(cls, iterable, *args, **kwargs):
+        return super(BaseTuple, cls).__new__(cls, iterable)
+
+    def __init__(self, iterable, *args, **kwargs):
+        super_init = super(BaseTuple, self).__init__
+        if super_init.__objclass__ is object:
+            super_init()
+        else:
+            super_init(iterable)
+
+
+class BlockRecordList(BaseTuple):
     """
     An immutable ordered list of BlockRecord objects.
     """
-
-    def __new__(cls, blocks, course_key, version=None):  # pylint: disable=unused-argument
-        return super(BlockRecordList, cls).__new__(cls, blocks)
-
     def __init__(self, blocks, course_key, version=None):
         super(BlockRecordList, self).__init__(blocks)
         self.course_key = course_key
