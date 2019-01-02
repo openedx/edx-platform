@@ -153,7 +153,67 @@ def delete_site(site_id):
     site.delete()
 
 
+def migrate_page_element(element):
+    """
+    Translate the `content` in the page element, apply the same for all children elements.
+    """
+    if not isinstance(element, dict):
+        print 'DEBUG:', element
+        raise Exception('An element should be a dict')
+
+    if 'options' not in element:
+        print 'DEBUG:', element
+        raise Exception('Unknown element type')
+
+    options = element['options']
+
+    if 'content' in options or 'text-content' in options:
+        if 'content' in options and 'text-content' in options:
+            print 'DEBUG:', options
+            raise Exception(
+                'Both `content` and `text-content` are there, but which one to translate?'
+            )
+
+        if 'content' in options and not isinstance(options['content'], dict):
+            options['content'] = {
+                'en': options['content']
+            }
+
+        if 'text-content' in options and not isinstance(options['text-content'], dict):
+            options['text-content'] = {
+                'en': options['text-content']
+            }
+
+    for _column_name, children in element.get('children', {}).iteritems():
+        for child_element in children:
+            migrate_page_element(child_element)
+
+
+def to_new_page_elements(page_elements):
+    """
+    Migrate the page elements of a site.
+    """
+    for page_id, page_obj in page_elements.iteritems():
+        if isinstance(page_obj, (unicode, str)):
+            continue  # Skip pages like `"course-card": "course-tile-01"`
+
+        for element in page_obj.get('content', []):
+            migrate_page_element(element)
+
+
 def get_initial_page_elements():
+    """
+    Get the initial page elements, with i18n support.
+    """
+    initial_elements = _get_initial_page_elements()
+    to_new_page_elements(initial_elements)
+    return initial_elements
+
+
+def _get_initial_page_elements():
+    """
+    Get the initial page elements, without i18n support.
+    """
     # pylint: disable=line-too-long
     return {
         "embargo": {
