@@ -17,6 +17,14 @@ from student.roles import (
     OrgInstructorRole,
     GlobalStaff
 )
+from xmodule.partitions.partitions import Group
+
+CONTENT_TYPE_GATE_GROUP_IDS = {
+    'limited_access': 1,
+    'full_access': 2,
+}
+LIMITED_ACCESS = Group(CONTENT_TYPE_GATE_GROUP_IDS['limited_access'], 'Limited-access Users')
+FULL_ACCESS = Group(CONTENT_TYPE_GATE_GROUP_IDS['full_access'], 'Full-access Users')
 
 
 def has_staff_roles(user, course_key):
