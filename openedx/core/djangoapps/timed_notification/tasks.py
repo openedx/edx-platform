@@ -31,7 +31,7 @@ def task_course_notifications():
 
         # create context when 7 days left to course start
         if course_start_date - timedelta(days=7) == date_now:
-            template = 'test-template'
+            template = MandrillClient.COURSE_EARLY_WELCOME_TEMPLATE
             context = {
                 'course_name': course_name,
                 'course_discussion_URL': course_discussion_url
@@ -39,7 +39,7 @@ def task_course_notifications():
 
         # create context when when 2 days left to course start
         elif course_start_date - timedelta(days=2) == date_now:
-            template = 'test-template'
+            template = MandrillClient.COURSE_START_REMINDER_TEMPLATE
             context = {
                 'course_name': course_name,
                 'course_discussion_URL': course_discussion_url
