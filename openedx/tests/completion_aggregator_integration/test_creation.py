@@ -10,7 +10,7 @@ import logging
 from completion.models import BlockCompletion
 from completion.test_utils import CompletionWaffleTestMixin
 from completion_aggregator.models import Aggregator
-from completion_aggregator.tasks.aggregation_tasks import AggregationUpdater
+from completion_aggregator.core import AggregationUpdater
 import ddt
 from django.test.utils import override_settings
 from django.utils import timezone
