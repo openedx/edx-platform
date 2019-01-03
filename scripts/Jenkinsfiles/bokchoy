@@ -1,7 +1,6 @@
 def runBokchoyTests() {
     // Determine git refspec, branch, and clone type
     git_shallow_clone = true
-    git_extensions = []
     if (env.ghprbActualCommit) {
         git_branch = "${ghprbActualCommit}"
         git_refspec = "+refs/pull/${ghprbPullId}/*:refs/remotes/origin/pr/${ghprbPullId}/*"
