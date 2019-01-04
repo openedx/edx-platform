@@ -10,7 +10,8 @@ var phoneDialog = function(){
         var timer = null;
         var clock = function(){
         if (all >= 0){
-            $('.get-qrcode-btn').html(all);
+            var fmts = gettext('%s s')
+            $('.get-qrcode-btn').html(interpolate(fmts, [all]));
             all -= 1;
         } else {
             clearInterval(timer);
@@ -100,7 +101,8 @@ var phoneDialog = function(){
                 success: function(){
                 console.log('绑定成功');
                 $('.eliteu-message-tips').show();
-                $('.eliteu-message-tips .text').html(gettext('Cellphone number binding successfully'))
+                $('.eliteu-message-tips .text').html(gettext('Cellphone number binding successfully'))；
+                window.location.reload();
                 setTimeout(() => {
                     $('.eliteu-message-tips').hide();
                 }, 3000);
