@@ -847,6 +847,7 @@ div.problem {
         .status-icon {
           &::after {
             content: '';
+            display: inline-block;
           }
         }
       }
