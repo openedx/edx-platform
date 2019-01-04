@@ -7,13 +7,14 @@
         }
     %>
     <div class='exam-text'>
+        <% // xss-lint: disable=underscore-not-escaped %>
         <%= interpolate_text('You are taking "{exam_link}" as a {exam_type} exam. The timer on the right shows the time remaining in the exam.', {exam_link: "<a href='" + exam_url_path + "'>"+gtLtEscape(exam_display_name)+"</a>", exam_type: (!_.isUndefined(arguments[0].exam_type)) ? exam_type : gettext('timed')}) %>
         <%- gettext('To receive credit for problems, you must select "Submit" for each problem before you select "End My Exam".') %>
     </div>
     <div id="turn_in_exam_id" class="pull-right turn_in_exam">
         <span>
             <% if(attempt_status !== 'ready_to_submit') {%>
-                <button class="exam-button-turn-in-exam btn btn-pl-primary">
+                <button class="exam-button-turn-in-exam btn btn-pl-primary btn-primary">
                     <%- gettext("End My Exam") %>
                 </button>
             <% } %>
@@ -24,7 +25,7 @@
                 <b>
                 </b>
             </span>
-            <button role="button" id="toggle_timer" aria-label="<%- gettext("Hide Timer") %>" aria-pressed="false">
+            <button role="button" id="toggle_timer" class="btn btn-primary" aria-label="<%- gettext("Hide Timer") %>" aria-pressed="false">
                 <i class="fa fa-eye-slash" aria-hidden="true"></i>
             </button>
         </span>
