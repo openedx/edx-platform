@@ -53,7 +53,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-01-04 10:36+0800\n"
+"POT-Creation-Date: 2019-01-04 16:04+0800\n"
 "PO-Revision-Date: 2018-12-07 12:23+0000\n"
 "Last-Translator: li ying <code@eliteu.cn>, 2019\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)\n"
@@ -10410,8 +10410,8 @@ msgid "Become a VIP member and watch all EliteMBA courses for free"
 msgstr "开通VIP会员，可免费观看英荔商学院全部课程。"
 
 #: membership/static/membership/js/card.js
-msgid "DD/MM/YYYY"
-msgstr "YYYY年MM月DD日"
+msgid "YYYY-MM-DD"
+msgstr "YYYY-MM-DD"
 
 #: membership/static/membership/js/card.js
 msgid "Membership opened"
@@ -10426,14 +10426,8 @@ msgid "Remaining days"
 msgstr "剩余"
 
 #: membership/static/membership/js/card.js
-msgctxt "Membership"
-msgid "Opened:"
-msgstr "开始："
-
-#: membership/static/membership/js/card.js
-msgctxt "Membership"
-msgid "Expire:"
-msgstr "结束："
+msgid "Duration:"
+msgstr "起止时间："
 
 #: membership/static/membership/js/card.js
 msgid "Opened on:"
@@ -10460,5 +10454,6 @@ msgid "Failed to pay the payment"
 msgstr "调起支付失败"
 
 #: membership/static/membership/js/result.js
-msgid "Return to EliteMBA in {second} seconds"
-msgstr "{second}秒后返回英荔商学院"
+#, javascript-format
+msgid "Return to EliteMBA in %s seconds"
+msgstr "%s 秒后返回英荔商学院"
