@@ -3,7 +3,7 @@ define(['js/views/baseview', 'jquery', 'js/views/edit_textbook', 'js/views/show_
             var ListTextbooks = BaseView.extend({
                 initialize: function() {
                     this.emptyTemplate = this.loadTemplate('no-textbooks');
-                    this.listenTo(this.collection, 'all', this.render);
+                    this.listenTo(this.collection, 'change:editing', this.render);
                     this.listenTo(this.collection, 'destroy', this.handleDestroy);
                 },
                 tagName: 'div',
@@ -34,6 +34,7 @@ define(['js/views/baseview', 'jquery', 'js/views/edit_textbook', 'js/views/show_
                     var $sectionEl, $inputEl;
                     if (e && e.preventDefault) { e.preventDefault(); }
                     this.collection.add([{editing: true}]); // (render() call triggered here)
+                    this.render();
             // find the outer 'section' tag for the newly added textbook
                     $sectionEl = this.$el.find('section:last');
             // scroll to put this at top of viewport

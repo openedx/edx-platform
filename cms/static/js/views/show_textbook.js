@@ -5,6 +5,7 @@ define(['js/views/baseview', 'underscore', 'gettext', 'common/js/components/view
                 initialize: function() {
                     this.template = _.template($('#show-textbook-tpl').text());
                     this.listenTo(this.model, 'change', this.render);
+                    this.listenTo(this.model, 'destroy', this.remove);
                 },
                 tagName: 'section',
                 className: 'textbook',
