@@ -1,8 +1,8 @@
 # #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/).
-# Copyright (C) 2018 EdX
+# Copyright (C) 2019 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 #
 # Translators:
 # 嘉杰 李 <jj.li@eliteu.com.cn>, 2018
@@ -14,18 +14,18 @@
 #
 # #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/).
-# Copyright (C) 2018 EdX
+# Copyright (C) 2019 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 #
 # Translators:
 # li ying <code@eliteu.cn>, 2018
 #
 # #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)
-# Copyright (C) 2018 edX
+# Copyright (C) 2019 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 #
 # Translators:
 # li ying <code@eliteu.cn>, 2018
@@ -33,29 +33,29 @@
 #
 # #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)
-# Copyright (C) 2018 edX
+# Copyright (C) 2019 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 #
 # Translators:
 # li ying <code@eliteu.cn>, 2018
 #
 # #-#-#-#-#  membership-js.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/).
-# Copyright (C) 2018 EdX
+# Copyright (C) 2019 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 #
 # Translators:
-# li ying <code@eliteu.cn>, 2018
+# li ying <code@eliteu.cn>, 2019
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-12-29 17:04+0800\n"
+"POT-Creation-Date: 2019-01-04 10:36+0800\n"
 "PO-Revision-Date: 2018-12-07 12:23+0000\n"
-"Last-Translator: li ying <code@eliteu.cn>, 2018\n"
+"Last-Translator: li ying <code@eliteu.cn>, 2019\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
@@ -10426,8 +10426,14 @@ msgid "Remaining days"
 msgstr "剩余"
 
 #: membership/static/membership/js/card.js
-msgid "Date:"
-msgstr "日期:"
+msgctxt "Membership"
+msgid "Opened:"
+msgstr "开始："
+
+#: membership/static/membership/js/card.js
+msgctxt "Membership"
+msgid "Expire:"
+msgstr "结束："
 
 #: membership/static/membership/js/card.js
 msgid "Opened on:"
