@@ -19,9 +19,7 @@
 # EdX Team <info@edx.org>, 2019.
 #
 # Translators:
-# li ying <code@eliteu.cn>, 2018
-# Yi Li <y.li@eliteu.cn>, 2018
-# 婕 高 <j.gao@eliteu.cn>, 2018
+# li ying <code@eliteu.cn>, 2019
 #
 # #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)
@@ -11577,7 +11575,7 @@ msgstr "已完成的课程入学考试"
 
 #: cms/djangoapps/contentstore/views/export_git.py
 msgid "Course successfully exported to git repository"
-msgstr "课程成功被导出到Git源"
+msgstr "课程成功被导出到Git仓库"
 
 #: cms/djangoapps/contentstore/views/helpers.py
 msgid "Vertical"
@@ -11585,7 +11583,7 @@ msgstr "纵列块"
 
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "File upload corrupted. Please try again"
-msgstr "文件上次错误,请重试"
+msgstr "文件上传失败,请重试"
 
 #: cms/djangoapps/contentstore/views/item.py
 msgid "Invalid data"
@@ -11713,7 +11711,7 @@ msgstr "不支持此字幕文件类型。"
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Video ID is required."
-msgstr "必须提供视频。"
+msgstr "必须提供视频ID。"
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Incoming video data is empty."
@@ -11775,7 +11773,7 @@ msgstr "您不能移除最后一个管理员，请先添加另一个管理员后
 #. Translators: This is the status of an active video upload
 #: cms/djangoapps/contentstore/views/videos.py cms/templates/import.html
 msgid "Uploading"
-msgstr "正在上传"
+msgstr "上传中"
 
 #. Translators: This is the status for a video that the servers are currently
 #. processing
@@ -16478,13 +16476,13 @@ msgstr "享受您在{platform_name}上的学习之旅。"
 msgid ""
 "If you need help, please use our web form at {support_url} or email "
 "{support_email}."
-msgstr "如需帮助，请使用我们的网站表格{support_url}或发邮件至{support_email}。"
+msgstr "如需帮助，请使用我们的网站表格{support_url} 或发邮件至{support_email} 。"
 
 #: lms/templates/emails/activation_email.txt
 msgid ""
 "This email message was automatically sent by {lms_url} because someone "
 "attempted to create an account on {platform_name} using this email address."
-msgstr "这是一封由{lms_url}自动发送的邮件，通知您有人使用此邮箱地址注册{platform_name}账号。"
+msgstr "这是一封由{lms_url} 自动发送的邮件，通知您有人使用此邮箱地址注册{platform_name} 账号。"
 
 #: lms/templates/emails/activation_email_subject.txt
 msgid "Action Required: Activate your {platform_name} account"
@@ -16503,7 +16501,7 @@ msgstr "您已成功付款。"
 msgid ""
 "If you have billing questions, please read the FAQ ({faq_url}) or contact "
 "{billing_email}."
-msgstr "如果您对账单有疑问，请阅读FAQ({faq_url})或给{billing_email}发邮件。"
+msgstr "如果您对账单有疑问，请阅读FAQ({faq_url} )或给{billing_email} 发邮件。"
 
 #: lms/templates/emails/business_order_confirmation_email.txt
 #: lms/templates/emails/order_confirmation_email.txt
@@ -16629,7 +16627,7 @@ msgstr "(3) 在选课确认页面，点击“激活选课码”按钮，您将�
 msgid ""
 "(4) You should be able to click on 'view course' button or see your course "
 "on your student dashboard at {url}"
-msgstr "(4)您可以点击“查看课程”按钮或者通过{url}处的学生课程面板查看你的课程。"
+msgstr "(4)您可以点击“查看课程”按钮或者通过{url} 处的学生课程面板查看你的课程。"
 
 #: lms/templates/emails/business_order_confirmation_email.txt
 msgid ""
