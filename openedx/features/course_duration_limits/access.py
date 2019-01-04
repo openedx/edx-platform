@@ -140,7 +140,7 @@ def register_course_expired_message(request, course):
         upgrade_deadline = enrollment.upgrade_deadline
         now = timezone.now()
         course_upgrade_deadline = enrollment.course_upgrade_deadline
-        if upgrade_deadline and now > upgrade_deadline:
+        if (not upgrade_deadline) or (now > upgrade_deadline):
             upgrade_deadline = course_upgrade_deadline
 
         expiration_message = _('{strong_open}Audit Access Expires {expiration_date}{strong_close}'
@@ -150,7 +150,7 @@ def register_course_expired_message(request, course):
                                      'as long as it exists on the site. {a_open}Upgrade now{sronly_span_open} to '
                                      'retain access past {expiration_date}{span_close}{a_close}')
         full_message = expiration_message
-        if course_upgrade_deadline and now < course_upgrade_deadline:
+        if upgrade_deadline and now < upgrade_deadline:
             full_message += upgrade_deadline_message
             using_upgrade_messaging = True
         else:
@@ -163,13 +163,12 @@ def register_course_expired_message(request, course):
         else:
             formatted_expiration_date = strftime_localized(expiration_date, '%b. %-d, %Y')
 
-        if upgrade_deadline:
+        if using_upgrade_messaging:
             if language_is_es:
                 formatted_upgrade_deadline = strftime_localized(upgrade_deadline, '%-d de %b. de %Y').lower()
             else:
                 formatted_upgrade_deadline = strftime_localized(upgrade_deadline, '%b. %-d, %Y')
 
-        if using_upgrade_messaging:
             PageLevelMessages.register_info_message(
                 request,
                 Text(full_message).format(
