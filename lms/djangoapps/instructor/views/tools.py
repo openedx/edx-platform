@@ -17,6 +17,7 @@ from courseware.models import StudentFieldOverride
 from courseware.student_field_overrides import clear_override_for_user, get_override_for_user, override_field_for_user
 from xmodule.fields import Date
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 
 DATE_FIELD = Date()
@@ -247,5 +248,16 @@ def add_block_ids(payload):
 
 
 def get_display_name_from_usage_key(key):
-    """Return problem display name from given UsageKey."""
-    return modulestore().get_item(key).display_name
+    """
+    Returns problem display name from given block UsageKey.
+
+    Args:
+        key (UsageKey) : Usage key of block
+
+    Returns:
+        String : Returns the display name of block if exists else 'Deleted'.
+    """
+    try:
+        return modulestore().get_item(key).display_name
+    except ItemNotFoundError:
+        return "Deleted"
