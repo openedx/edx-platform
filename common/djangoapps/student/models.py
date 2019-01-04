@@ -1728,7 +1728,7 @@ class CourseEnrollment(models.Model):
         if self.dynamic_upgrade_deadline is not None:
             # When course modes expire they aren't found any more and None would be returned.
             # Replicate that behavior here by returning None if the personalized deadline is in the past.
-            if datetime.now(UTC) >= self.dynamic_upgrade_deadline:
+            if self.dynamic_upgrade_deadline <= datetime.now(UTC):
                 log.debug('Schedules: Returning None since dynamic upgrade deadline has already passed.')
                 return None
 
@@ -1775,14 +1775,12 @@ class CourseEnrollment(models.Model):
                 'Schedules: Pulling upgrade deadline for CourseEnrollment %d from Schedule %d.',
                 self.id, self.schedule.id
             )
-            upgrade_deadline = self.schedule.upgrade_deadline
+            return self.schedule.upgrade_deadline
         except ObjectDoesNotExist:
             # NOTE: Schedule has a one-to-one mapping with CourseEnrollment. If no schedule is associated
             # with this enrollment, Django will raise an exception rather than return None.
             log.debug('Schedules: No schedule exists for CourseEnrollment %d.', self.id)
             return None
-
-        return upgrade_deadline
 
     @cached_property
     def course_upgrade_deadline(self):
