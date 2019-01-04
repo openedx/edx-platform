@@ -45,7 +45,7 @@ pipeline {
                             string(name: 'GIT_SHA', value: commit_sha),
                             string(name: 'GITHUB_ORG', value: 'edx'), string(name: 'GITHUB_REPO', value: 'edx-platform'),
                             string(name: 'TARGET_URL', value: "${BUILD_URL}"),
-                            string(name: 'DESCRIPTION', value: 'Pending'), string(name: 'CONTEXT', value: 'jenkins/bokchoy-pipeline-master'),
+                            string(name: 'DESCRIPTION', value: 'Pending'), string(name: 'CONTEXT', value: 'jenkins/bokchoy'),
                             string(name: 'CREATE_DEPLOYMENT', value: 'false'), string(name: 'BUILD_STATUS', value: 'pending')
                         ],
                         propagate: false, wait: false
@@ -102,7 +102,7 @@ pipeline {
                             string(name: 'GIT_SHA', value: commit_sha),
                             string(name: 'GITHUB_ORG', value: 'edx'), string(name: 'GITHUB_REPO', value: 'edx-platform'),
                             string(name: 'TARGET_URL', value: "${BUILD_URL}"),
-                            string(name: 'DESCRIPTION', value: build_description), string(name: 'CONTEXT', value: 'jenkins/bokchoy-pipeline-master'),
+                            string(name: 'DESCRIPTION', value: build_description), string(name: 'CONTEXT', value: 'jenkins/bokchoy'),
                             string(name: 'CREATE_DEPLOYMENT', value: create_deployment), string(name: 'BUILD_STATUS', value: build_status)
                         ],
                         propagate: false, wait: false
