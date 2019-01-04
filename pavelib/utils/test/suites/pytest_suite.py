@@ -126,12 +126,7 @@ class SystemTestSuite(PytestSuite):
         unaltered otherwise.
         """
         if self.run_under_coverage:
-            if self.xdist_ip_addresses:
-                for module in Env.covered_modules():
-                    cmd.append('--cov')
-                    cmd.append(module)
-            else:
-                cmd.append('--cov')
+            cmd.append('--cov')
             cmd.append('--cov-report=')
 
         return cmd
@@ -320,12 +315,7 @@ class LibTestSuite(PytestSuite):
         unaltered otherwise.
         """
         if self.run_under_coverage:
-            if self.xdist_ip_addresses:
-                for module in Env.covered_modules():
-                    cmd.append('--cov')
-                    cmd.append(module)
-            else:
-                cmd.append('--cov')
+            cmd.append('--cov')
             if self.append_coverage:
                 cmd.append('--cov-append')
             cmd.append('--cov-report=')

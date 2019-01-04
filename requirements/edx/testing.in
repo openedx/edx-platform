@@ -37,7 +37,7 @@ pysqlite                  # DB-API 2.0 interface for SQLite 3.x (used as the rel
 pytest                    # Testing framework
 pytest-attrib             # Select tests based on attributes
 pytest-cov                # pytest plugin for measuring code coverage.
-pytest-django==3.1.2      # Django support for pytest
+pytest-django             # Django support for pytest
 pytest-randomly           # pytest plugin to randomly order tests
 pytest-xdist              # Parallel execution of tests on multiple CPU cores or hosts
 radon                     # Calculates cyclomatic complexity of Python code (code quality utility)
