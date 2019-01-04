@@ -105,6 +105,8 @@ class ProgramProgressMeter(object):
         self.course_uuids = [str(entitlement.course_uuid) for entitlement in self.entitlements]
 
         self.course_grade_factory = CourseGradeFactory()
+        course_keys = CourseOverview.get_all_courses().values_list('id', flat=True)
+        self.real_course_ids = [c.to_deprecated_string() for c in course_keys]
 
         if uuid:
             self.programs = [get_programs(self.site, uuid=uuid)]
@@ -231,6 +233,11 @@ class ProgramProgressMeter(object):
             completed, in_progress, not_started = [], [], []
 
             for course in program_copy['courses']:
+
+                course_runs = course.get('course_runs', [])
+                if not any(r['key'] in self.real_course_ids for r in course_runs):
+                    continue
+
                 active_entitlement = CourseEntitlement.get_entitlement_if_active(
                     user=self.user,
                     course_uuid=course['uuid']
@@ -262,8 +269,9 @@ class ProgramProgressMeter(object):
 
             grades = {}
             for run in self.course_run_ids:
-                grade = self.course_grade_factory.read(self.user, course_key=CourseKey.from_string(run))
-                grades[run] = grade.percent
+                if run in self.real_course_ids:
+                    grade = self.course_grade_factory.read(self.user, course_key=CourseKey.from_string(run))
+                    grades[run] = grade.percent
 
             progress.append({
                 'uuid': program_copy['uuid'],
