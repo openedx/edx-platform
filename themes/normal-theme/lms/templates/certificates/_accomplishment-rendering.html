@@ -13,6 +13,9 @@ course_mode_class = course_mode if course_mode else ''
 % else:
 <% user_language_or_default = settings.LANGUAGE_CODE %>
 % endif
+<%block name="js_extra">
+  <%static:js group='certificates_wv'/>
+</%block>
 <main class="accomplishment accomplishment-main">
     <div class="wrapper-accomplishment-rendering-header">
         ${document_banner}

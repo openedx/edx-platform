@@ -1,8 +1,8 @@
 # #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/).
-# Copyright (C) 2018 EdX
+# Copyright (C) 2019 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 #
 # Translators:
 # 嘉杰 李 <jj.li@eliteu.com.cn>, 2018
@@ -14,18 +14,18 @@
 #
 # #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/).
-# Copyright (C) 2018 EdX
+# Copyright (C) 2019 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 #
 # Translators:
 # li ying <code@eliteu.cn>, 2018
 #
 # #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)
-# Copyright (C) 2018 edX
+# Copyright (C) 2019 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 #
 # Translators:
 # li ying <code@eliteu.cn>, 2018
@@ -33,29 +33,29 @@
 #
 # #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)
-# Copyright (C) 2018 edX
+# Copyright (C) 2019 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 #
 # Translators:
 # li ying <code@eliteu.cn>, 2018
 #
 # #-#-#-#-#  membership-js.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/).
-# Copyright (C) 2018 EdX
+# Copyright (C) 2019 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 #
 # Translators:
-# li ying <code@eliteu.cn>, 2018
+# li ying <code@eliteu.cn>, 2019
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-12-13 17:36+0800\n"
+"POT-Creation-Date: 2019-01-04 16:04+0800\n"
 "PO-Revision-Date: 2018-12-07 12:23+0000\n"
-"Last-Translator: li ying <code@eliteu.cn>, 2018\n"
+"Last-Translator: li ying <code@eliteu.cn>, 2019\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
@@ -4304,11 +4304,11 @@ msgstr "错误："
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
 "You may also lose access to verified certificates and other program "
-"credentials like MicroMasters certificates. If you want to make a copy of "
-"these for your records before proceeding with deletion, follow the "
-"instructions for {htmlStart}printing or downloading a certificate{htmlEnd}."
+"credentials. If you want to make a copy of these for your records before "
+"proceeding with deletion, follow the instructions for {htmlStart}printing or"
+" downloading a certificate{htmlEnd}."
 msgstr ""
-"您可能也将无法访问已认证的证书和其他专业课程的证书，比如MicroMasters证书。如果您希望在操作删除前对这些文件进行备份，请根据指引{htmlStart}打印或下载证书{htmlEnd}。"
+"您可能也将无法访问已认证的证书和其他专业课程的证书。如果您希望在操作删除前对这些文件进行备份，请根据指引{htmlStart}打印或下载证书{htmlEnd}。"
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
@@ -4330,9 +4330,9 @@ msgid ""
 "{strongStart}Warning: Account deletion is permanent.{strongEnd} Please read "
 "the above carefully before proceeding. This is an irreversible action, and "
 "{strongStart}you will no longer be able to use the same email on "
-"edX.{strongEnd}"
+"EliteMBA.{strongEnd}"
 msgstr ""
-"{strongStart}警告：账号将被永久删除。{strongEnd}在继续之前，请仔细阅读以上内容。这是一个不可撤销的操作，并且{strongStart}您将不能够在edX上使用相同的电子邮件地址。{strongEnd}"
+"{strongStart}警告：账号将被永久删除。{strongEnd}在继续之前，请仔细阅读以上内容。这是一个不可撤销的操作，并且{strongStart}您将不能够在英荔商学院上使用相同的电子邮件地址。{strongEnd}"
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid "We’re sorry to see you go!"
@@ -4341,11 +4341,12 @@ msgstr "很遗憾看到您要离开！"
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
 "Please note: Deletion of your account and personal data is permanent and "
-"cannot be undone. EdX will not be able to recover your account or the data "
-"that is deleted."
-msgstr "请注意：删除账号及个人数据的操作将不可撤销。EdX无法恢复已删除的账号及数据。"
+"cannot be undone. EliteMBA will not be able to recover your account or the "
+"data that is deleted."
+msgstr "请注意：删除账号及个人数据的操作将不可撤销。英荔商学院无法恢复已删除的账号及数据。"
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
 "Once your account is deleted, you cannot use it to take courses on the "
 "EliteMBA app, elitemba.cn, or any other site hosted by EliteMBA."
@@ -4381,20 +4382,9 @@ msgstr "密码为必填项"
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
 "You have selected “Delete my account.” Deletion of your account and personal"
-" data is permanent and cannot be undone. EdX will not be able to recover "
-"your account or the data that is deleted."
-msgstr "您选择了“删除我的账号”，删除账号与个人数据将无法撤销。EdX无法恢复您已删除的账号或数据。"
-
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid ""
-"If you proceed, you will be unable to use this account to take courses on "
-"the edX app, edx.org, or any other site hosted by edX. This includes access "
-"to edx.org from your employer’s or university’s system and access to private"
-" sites offered by MIT Open Learning, Wharton Executive Education, and "
-"Harvard Medical School."
-msgstr ""
-"如果继续此操作，您将不能再使用本账号在edX "
-"app，edX.org或其他任何由edX管理的网站上参加课程；不能使用本账号从雇主系统或学校系统登陆edX.org或访问由麻省理工开放学习平台，沃顿商学院高层管理教育项目或哈佛医学院提供的私人网站。"
+" data is permanent and cannot be undone. EliteMBA will not be able to "
+"recover your account or the data that is deleted."
+msgstr "您选择了“删除我的账号”，删除账号与个人数据将无法撤销。英荔商学院无法恢复您已删除的账号或数据。"
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
@@ -4626,8 +4616,8 @@ msgstr "社交媒体链接"
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
 "Optionally, link your personal accounts to the social media icons on your "
-"edX profile."
-msgstr "您可以选择将个人社交媒体的链接图标放到您的edX个人资料中。"
+"EliteMBA profile."
+msgstr "您可以选择将个人社交媒体的链接图标放到您的EliteMBA个人资料中。"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #, javascript-format
@@ -5079,7 +5069,7 @@ msgstr "成绩分页"
 
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_fields.js
 msgid "Account Settings page."
-msgstr "账号设置页面"
+msgstr "账号设置"
 
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_fields.js
 msgid ""
@@ -10420,8 +10410,8 @@ msgid "Become a VIP member and watch all EliteMBA courses for free"
 msgstr "开通VIP会员，可免费观看英荔商学院全部课程。"
 
 #: membership/static/membership/js/card.js
-msgid "DD/MM/YYYY"
-msgstr "YYYY年MM月DD日"
+msgid "YYYY-MM-DD"
+msgstr "YYYY-MM-DD"
 
 #: membership/static/membership/js/card.js
 msgid "Membership opened"
@@ -10436,8 +10426,8 @@ msgid "Remaining days"
 msgstr "剩余"
 
 #: membership/static/membership/js/card.js
-msgid "Date:"
-msgstr "日期:"
+msgid "Duration:"
+msgstr "起止时间："
 
 #: membership/static/membership/js/card.js
 msgid "Opened on:"
@@ -10451,10 +10441,19 @@ msgstr "到期日期:"
 msgid "Membership expired"
 msgstr "会员已过期"
 
+#: membership/static/membership/js/card.js
+msgid "Renew"
+msgstr "续费"
+
 #: membership/static/membership/js/index.js
 msgid "Average per month"
 msgstr "月均"
 
 #: membership/static/membership/js/pay.js
-msgid "Return to EliteMBA in _ seconds"
-msgstr ""
+msgid "Failed to pay the payment"
+msgstr "调起支付失败"
+
+#: membership/static/membership/js/result.js
+#, javascript-format
+msgid "Return to EliteMBA in %s seconds"
+msgstr "%s 秒后返回英荔商学院"

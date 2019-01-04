@@ -1,7 +1,7 @@
 // professor-list
 .professor-banner{
   text-align: center;
-  background: url('/static/normal-theme/images/course_dec.png');
+  background: url('/static/normal-theme/images/professor-bg.png');
   background-size: cover;
   padding: 50px 0;
 }
@@ -120,5 +120,15 @@
 @media screen and (max-width:992px){
   .professor-detail{
       width: 100%;
+  }
+}
+@media screen and (max-width:576px){
+  .professor-banner{
+    display: none;
+  }
+  .professor-course{
+    top: 130px;
+    left: 100px;
+    right: unset;
   }
 }

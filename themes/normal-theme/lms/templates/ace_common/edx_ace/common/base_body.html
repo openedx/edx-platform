@@ -64,7 +64,7 @@
                     <tr>
                         <td width="70">
                             <a href="{% with_link_tracking homepage_url %}"><img
-                                    src="http://{{ request.get_host }}/{% static 'images/logo.png' %}"
+                                    src="http://{% firstof request.get_host "www.elitemba.cn" %}/{% static 'images/logo.png' %}"
                                     alt="{% blocktrans %}Go to {{ platform_name }} Home Page{% endblocktrans %}"/></a>
                         </td>
                         <td align="right" style="text-align: {{ LANGUAGE_BIDI|yesno:"left,right" }};">

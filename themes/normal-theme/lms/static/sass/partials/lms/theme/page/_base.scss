@@ -48,6 +48,7 @@
 a:not(.btn):hover, a:not(.btn):focus, a:visited:not(.btn):hover, a:visited:not(.btn):focus{
   color: $primary;
   opacity: 0.95;
+  outline: none;
 }
 
 // select
@@ -67,6 +68,7 @@ select{
   background: url("/static/normal-theme/images/select.png") no-repeat scroll right center #fff;
   background-size: 15px;
 }
+select::-ms-expand { display: none; }
 
 // input
 input::-webkit-input-placeholder, .form-control::-webkit-input-placeholder{

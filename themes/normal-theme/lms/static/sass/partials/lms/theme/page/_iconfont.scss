@@ -48,7 +48,8 @@ $icon-width: 18px;
 .fa-save:before,
 .fa-arrow-right:before,
 .fa-exclamation-circle:before,
-.fa-camera:before,
+.account-activation.success.aa-icon .message-copy::before,
+.fa-camera:before
 {
   content: '';
   display: inline-block;
@@ -255,6 +256,11 @@ $icon-width: 18px;
 }
 .fa-exclamation-circle:before{
   background-position: calcP(1, 5)
+}
+.account-activation.success.aa-icon .message-copy::before{
+  background-position: calcP(4, 5);
+  padding: 0;
+  margin-top: 3px;
 }
 .fa-camera:before{
   background-position: calcP(10, 3)

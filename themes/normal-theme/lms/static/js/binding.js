@@ -94,27 +94,23 @@ var phoneDialog = function(){
                 url: '/api/user/v1/accounts/binding_phone/',
                 type: 'post',
                 data: {
-                phone: phone,
-                code: code,
+                    phone: phone,
+                    code: code
                 },
-                headers : {'Authorization': $.cookie('csrftoken')},
-                success: function(){
-                console.log('绑定成功');
-                $('.eliteu-message-tips').show();
-                $('.eliteu-message-tips .text').html(gettext('Cellphone number binding successfully'))；
-                window.location.reload();
-                setTimeout(() => {
-                    $('.eliteu-message-tips').hide();
-                }, 3000);
-                // $('.eliteu-message-box').show();
-                // $('.message-content').html(gettext('Cellphone number binding successfully'));
-                $('.phone-dialog').hide();
-                $('.meassage-op').hide();
+                headers: {'Authorization': $.cookie('csrftoken')},
+                success: function() {
+                    $('.eliteu-message-tips').show();
+                    $('.eliteu-message-tips .text').html(gettext('Cellphone number binding successfully'));
+                    window.location.reload();
+                    setTimeout(function() {
+                        $('.eliteu-message-tips').hide();
+                    }, 3000);
+                    $('.phone-dialog').hide();
+                    $('.meassage-op').hide();
                 },
-                error: function(error){
-                console.log(error)
-                $('.error-text').addClass('active');
-                $('.error-text').html(error.responseText);
+                error: function(error) {
+                    $('.error-text').addClass('active');
+                    $('.error-text').html(error.responseText);
                 }
             });
             }

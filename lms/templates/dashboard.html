@@ -270,11 +270,6 @@ from student.models import CourseEnrollment
         </div>
       </div>
       <div class="side-container">
-        %if display_sidebar_account_activation_message:
-          <div class="sidebar-notification">
-            <%include file="${static.get_template_path('registration/account_activation_sidebar_notice.html')}" />
-          </div>
-        %endif
 
         % if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
           <div id="dashboard-search-bar" class="search-bar dashboard-search-bar" role="search" aria-label="Dashboard">
@@ -293,6 +288,12 @@ from student.models import CourseEnrollment
           </div>
           <div id="dashboard-search-results" class="search-results dashboard-search-results"></div>
         % endif
+
+        %if display_sidebar_account_activation_message:
+          <div class="sidebar-notification">
+            <%include file="${static.get_template_path('registration/account_activation_sidebar_notice.html')}" />
+          </div>
+        %endif
 
         % if display_sidebar_on_dashboard:
           <div class="profile-sidebar" id="profile-sidebar" role="region" aria-label="Account Status Info">

@@ -1,6 +1,8 @@
 // login
 .login-register-content{
   background: none;
+  max-width: 460px;
+  margin: 0 auto;
 }
 .login-register{
   background: none;
@@ -81,10 +83,11 @@
       width: 49.5%;
       padding-right: 10px;
       box-sizing: border-box;
+      margin-top: 10px;
     }
     &.select-year_of_birth{
       width: 49.5%;
-      margin: 0;
+      margin: 10px 0 0;
     }
     .tip, .plaintext-field{
       color: $font;
@@ -113,12 +116,15 @@
     margin: 0 0 20px;
     padding: 15px;
     background-color: #f6fffc;
-    box-shadow: 0px 1px 4px 0px	#d4f8af;
-    border: 0;
+    box-shadow: 0px 1px 4px 0px rgba(55, 197, 145, 0.36);
+    border: 0 !important;
+    color: $font !important;
+    
     .message-title{
       font-size: 14px;
       margin: 0;
-      padding: 0;
+      padding: 0;    
+      font-weight: normal;
     }
     .message-copy{
       padding: 0;
@@ -139,23 +145,44 @@
     box-shadow: 0px 1px 4px 0px	#ffd2d1;
     border-bottom: none;
   }
-  .submission-success{
-    background: #f6fffc;
-    box-shadow: 0px 1px 4px 0px #d4f8af;
+  .submission-success, .account-activation.success{
+    background-color: #f6fffc !important;
+    box-shadow: 0px 1px 4px 0px rgba(55, 197, 145, 0.36);
     border: none;
+    .message-title{
+      color: #1cac77;
+    }
   }
 
   // sign in other ways
   .section-title.lines{
     margin: 30px 0 0;
+    
     .text{
       font-size: 16px;
       color: $title;
+      background: none;
     }
     &::after{
       background: none;
       height: 0;
       border-bottom: 1px dashed $primary;
+      width:130px;
+    }
+    &::before{
+      position: absolute;
+      right: 0;
+      top: 50%;
+      width: 130px;
+      height: 1px;
+      content: '';
+      z-index: 5;
+      border-bottom: 1px dashed $blue;
+    }
+    @media screen and (max-width:576px){
+      &::before, &::after{
+        width: 50px;
+      }
     }
   } 
 

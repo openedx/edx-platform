@@ -56,6 +56,7 @@
       .main-cta a.register{
         @extend %btn-my-primary;
         margin-right: 10px;
+        line-height: 34px;
       }
 
       .main-cta span.disabled, 
@@ -63,6 +64,7 @@
         @extend %btn-my-disable;
         margin-right: 10px;
         margin-top: 0;
+        line-height: 34px;
       }
 
       
@@ -167,7 +169,7 @@
       background: #fff;
       box-shadow: 0px -1px 4px 0px $border;
       position: absolute;
-      bottom: 38px;
+      bottom: 44px;
       left: -90px;
       display: none;
       p+p{
@@ -188,8 +190,10 @@
         left: 85px;
         bottom: -20px;
         font-size: 30px;
-        z-index: 100;
         stroke: #fff;
+        z-index: -1;
+        stroke: #47bfff;
+        stroke-width: 5px;
       }
       #wechat-qrcode{
         padding: 25px 30px;
@@ -256,8 +260,11 @@
     padding-top: 25px;
   }
 
-  .about-info div, .about-staff div{
+  .about-info div{
     margin-top: 20px;
+  }
+  .about-staff div{
+    margin-top: 10px;
   }
   
 
@@ -361,7 +368,7 @@
     color: $bule;
     font-size: 18px;
     font-weight: bold;
-    padding-top:30px;
+    padding-top:26px;
     display: block;
   }
   
@@ -417,7 +424,7 @@
 
 
 // video
-#player-container-id{
+.video-box .video-js{
   position: fixed;
   z-index: 101;
   top: 50%;
@@ -427,6 +434,13 @@
   width:800px;
   height: 450px;
 }
+.video-box .video-js.vjs-fullscreen{
+  top: 0;
+  left: 0;
+  margin-top: 0;
+  margin-left: 0;
+}	
+
 
 .about-cover{
   width: 100%;
@@ -505,6 +519,26 @@
   }
   .course-container{
     padding-top: 10px;
+  }
+  .my-theme-course-about{
+    .about-staff-block{
+      height: auto;
+      padding-left: 80px;
+    }
+    .about-staff div{
+      margin-top: 10px;
+    }
+    .about-staff-img{
+      width: 60px;
+      height: 60px;
+    }
+    .about-staff-name{
+      padding-top: 0;
+    }
+    .about-staff-intro{
+      margin-top: 3px;
+      display: inline-block;
+    }
   }
 }
 
