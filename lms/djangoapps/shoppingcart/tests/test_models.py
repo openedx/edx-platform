@@ -277,6 +277,7 @@ class OrderTest(ModuleStoreTestCase):
                 'orderId': 1,
                 'currency': 'usd',
                 'total': '40.00',
+                'revenue': '40.00',        # value for revenue field is same as total.
                 'products': [
                     {
                         'sku': u'CertificateItem.honor',
@@ -876,6 +877,7 @@ class CertificateItemTest(ModuleStoreTestCase):
                 'orderId': 1,
                 'currency': 'usd',
                 'total': '40.00',
+                'revenue': '40.00',        # value for revenue field is same as total.
                 'products': [
                     {
                         'sku': u'CertificateItem.verified',

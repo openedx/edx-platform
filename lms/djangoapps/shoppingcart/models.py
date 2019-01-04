@@ -524,6 +524,9 @@ class Order(models.Model):
             segment.track(self.user.id, event_name, {
                 'orderId': self.id,
                 'total': str(self.total_cost),
+                # For Rockerbox integration, we need a field named revenue since they cannot parse a field named total.
+                # TODO: DE-1188: Remove / move Rockerbox integration code.
+                'revenue': str(self.total_cost),
                 'currency': self.currency,
                 'products': [item.analytics_data() for item in orderitems]
             })
