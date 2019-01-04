@@ -246,6 +246,19 @@ def add_block_ids(payload):
                 ele['block_id'] = UsageKey.from_string(ele['module_id']).block_id
 
 
+def check_valid_usage_key(key):
+    """
+    Checks if block exists for UsageKey.
+
+    Args:
+        key (UsageKey) : Usage key of a block
+
+    Returns:
+        Boolean: True if key exists or false
+    """
+    return modulestore.has_item(key)
+
+
 def get_display_name_from_usage_key(key):
     """Return problem display name from given UsageKey."""
     return modulestore().get_item(key).display_name
