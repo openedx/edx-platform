@@ -214,9 +214,13 @@
   }
   .forum-nav-thread-list{
     border: none;
+    overflow: hidden;
     .forum-nav-thread{
       border: none;
     }
+  }
+  .forum-nav-thread-wrapper-1{
+    max-width: none;
   }
   .search-alert-content{
     text-align: center;
@@ -230,7 +234,12 @@
     border: none;
   }
 }
-
+.discussion .post-label, .discussion-article .posted-details, .discussion-post .post-context{
+  font-weight: normal;
+}
+.forum-nav-thread-link .forum-nav-thread-labels .post-label .icon{
+  vertical-align: text-top;
+}
 // add a discussion
 .discussion-body .discussion-column .new-post-article{
   margin-top: 0;

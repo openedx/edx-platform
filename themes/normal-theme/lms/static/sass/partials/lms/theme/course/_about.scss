@@ -260,8 +260,11 @@
     padding-top: 25px;
   }
 
-  .about-info div, .about-staff div{
+  .about-info div{
     margin-top: 20px;
+  }
+  .about-staff div{
+    margin-top: 10px;
   }
   
 
@@ -365,7 +368,7 @@
     color: $bule;
     font-size: 18px;
     font-weight: bold;
-    padding-top:30px;
+    padding-top:26px;
     display: block;
   }
   
@@ -519,11 +522,11 @@
   }
   .my-theme-course-about{
     .about-staff-block{
-      height: 130px;
+      height: auto;
       padding-left: 80px;
     }
     .about-staff div{
-      margin-top: 0;
+      margin-top: 10px;
     }
     .about-staff-img{
       width: 60px;
