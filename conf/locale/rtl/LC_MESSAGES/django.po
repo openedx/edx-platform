@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-01-02 15:30+0000\n"
-"PO-Revision-Date: 2019-01-02 15:30:42.381305\n"
+"POT-Creation-Date: 2019-01-06 20:37+0000\n"
+"PO-Revision-Date: 2019-01-06 20:37:15.635973\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -2394,8 +2394,9 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #: lms/templates/admin/user_api/accounts/cancel_retirement_action.html
-#: cms/templates/index.html lms/templates/help_modal.html
-#: lms/templates/manage_user_standing.html lms/templates/register-shib.html
+#: cms/templates/index.html cms/templates/videos_index_pagination.html
+#: lms/templates/help_modal.html lms/templates/manage_user_standing.html
+#: lms/templates/register-shib.html
 #: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 #: lms/templates/peer_grading/peer_grading_problem.html
@@ -2669,6 +2670,15 @@ msgstr "فاهس ذخوحخرثرف اشس رخ سخعقذث ذخوحخرثرف�
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid "Configure list of sources"
 msgstr "ذخربهلعقث مهسف خب سخعقذثس"
+
+#: common/lib/xmodule/xmodule/course_module.py
+#, python-brace-format
+msgid ""
+"The selected proctoring provider, {proctoring_provider}, is not a valid "
+"provider. Please select from one of {available_providers}."
+msgstr ""
+"فاث سثمثذفثي حقخذفخقهرل حقخدهيثق, {proctoring_provider}, هس رخف ش دشمهي "
+"حقخدهيثق. حمثشسث سثمثذف بقخو خرث خب {available_providers}."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "LTI Passports"
@@ -3487,6 +3497,19 @@ msgstr ""
 "ثرفثق فقعث خق بشمسث. هب فاهس دشمعث هس فقعث, حقخذفخقثي ثطشوس شقث ثرشزمثي هر "
 "غخعق ذخعقسث. رخفث فاشف ثرشزمهرل حقخذفخقثي ثطشوس صهمم شمسخ ثرشزمث فهوثي "
 "ثطشوس."
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Proctoring Provider"
+msgstr "حقخذفخقهرل حقخدهيثق"
+
+#: common/lib/xmodule/xmodule/course_module.py
+#, python-brace-format
+msgid ""
+"Enter the proctoring provider you want to use for this course run. Choose "
+"from the following options: {available_providers}."
+msgstr ""
+"ثرفثق فاث حقخذفخقهرل حقخدهيثق غخع صشرف فخ عسث بخق فاهس ذخعقسث قعر. ذاخخسث "
+"بقخو فاث بخممخصهرل خحفهخرس: {available_providers}."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Allow Opting Out of Proctored Exams"
@@ -6927,13 +6950,11 @@ msgstr "حقخذفخقثي ثطشو قثدهثص: {review_status}"
 #: lms/djangoapps/instructor/services.py
 #, python-brace-format
 msgid ""
-"A proctored exam attempt for {exam_name} in {course_name} by username: "
-"{student_username} was reviewed as {review_status} by the proctored exam "
-"review provider."
+"A proctored exam attempt for {exam_name} in {course_name} by username: {student_username} was reviewed as {review_status} by the proctored exam review provider.\n"
+"Review link: {review_url}"
 msgstr ""
-"ش حقخذفخقثي ثطشو شففثوحف بخق {exam_name} هر {course_name} زغ عسثقرشوث: "
-"{student_username} صشس قثدهثصثي شس {review_status} زغ فاث حقخذفخقثي ثطشو "
-"قثدهثص حقخدهيثق."
+"ش حقخذفخقثي ثطشو شففثوحف بخق {exam_name} هر {course_name} زغ عسثقرشوث: {student_username} صشس قثدهثصثي شس {review_status} زغ فاث حقخذفخقثي ثطشو قثدهثص حقخدهيثق.\n"
+"قثدهثص مهرن: {review_url}"
 
 #: lms/djangoapps/instructor/settings/common.py
 msgid "Your Platform Insights"
@@ -9789,6 +9810,7 @@ msgstr ""
 #: openedx/core/djangoapps/user_api/admin.py
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
+#: cms/templates/videos_index_pagination.html
 msgid "Cancel"
 msgstr "ذشرذثم"
 
@@ -9967,7 +9989,8 @@ msgstr "حقثدهثص فاهس قثدهسهخر"
 msgid "Auto log:"
 msgstr "شعفخ مخل:"
 
-#: lms/templates/wiki/history.html wiki/templates/wiki/history.html
+#: lms/templates/wiki/history.html cms/templates/videos_index_pagination.html
+#: wiki/templates/wiki/history.html
 msgid "Change"
 msgstr "ذاشرلث"
 
@@ -12827,6 +12850,10 @@ msgstr "يشفث شييثي"
 #, python-brace-format
 msgid "{course}_video_urls"
 msgstr "{course}_دهيثخ_عقمس"
+
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "A non zero postive integar is expected"
+msgstr "ش رخر ظثقخ حخسفهدث هرفثلشق هس ثطحثذفثي"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "unrequested"
@@ -20021,6 +20048,10 @@ msgstr "شممخصشرذث سثذفهخر"
 msgid "Student Special Exam Attempts"
 msgstr "سفعيثرف سحثذهشم ثطشو شففثوحفس"
 
+#: lms/templates/instructor/instructor_dashboard_2/special_exams.html
+msgid "Review Dashboard"
+msgstr "قثدهثص يشسازخشقي"
+
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View gradebook for enrolled learners"
 msgstr "دهثص لقشيثزخخن بخق ثرقخممثي مثشقرثقس"
@@ -25142,6 +25173,14 @@ msgstr "دهيثخ عحمخشيس"
 #: cms/templates/videos_index.html
 msgid "Course Video Settings"
 msgstr "ذخعقسث دهيثخ سثففهرلس"
+
+#: cms/templates/videos_index_pagination.html
+msgid "Changing.."
+msgstr "ذاشرلهرل.."
+
+#: cms/templates/videos_index_pagination.html
+msgid "Videos per page:"
+msgstr "دهيثخس حثق حشلث:"
 
 #: cms/templates/visibility_editor.html
 msgid "Access is not restricted"
