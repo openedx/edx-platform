@@ -12,14 +12,12 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 
 from lms.djangoapps.courseware.masquerade import get_course_masquerade, is_masquerading_as_specific_student
-from experiments.models import ExperimentData
 from openedx.core.djangoapps.config_model_utils.models import StackedConfigurationModel
+from openedx.core.djangoapps.config_model_utils.utils import is_in_holdback
 from openedx.features.content_type_gating.helpers import has_staff_roles
 from openedx.features.course_duration_limits.config import (
     CONTENT_TYPE_GATING_FLAG,
     FEATURE_BASED_ENROLLMENT_GLOBAL_KILL_FLAG,
-    EXPERIMENT_ID,
-    EXPERIMENT_DATA_HOLDBACK_KEY
 )
 from student.models import CourseEnrollment
 
@@ -109,18 +107,7 @@ class ContentTypeGatingConfig(StackedConfigurationModel):
                 return False
 
         # check if user is in holdback
-        is_in_holdback = False
-        if user and user.is_authenticated and (user_variable_represents_correct_user):
-            try:
-                holdback_value = ExperimentData.objects.get(
-                    user=user,
-                    experiment_id=EXPERIMENT_ID,
-                    key=EXPERIMENT_DATA_HOLDBACK_KEY,
-                ).value
-                is_in_holdback = holdback_value == 'True'
-            except ExperimentData.DoesNotExist:
-                pass
-        if is_in_holdback:
+        if user_variable_represents_correct_user and is_in_holdback(user):
             return False
 
         # enrollment might be None if the user isn't enrolled. In that case,

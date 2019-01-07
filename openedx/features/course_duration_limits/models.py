@@ -13,20 +13,18 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 
 from course_modes.models import CourseMode
-from experiments.models import ExperimentData
 from lms.djangoapps.courseware.masquerade import (
     get_course_masquerade,
     get_masquerade_role,
     is_masquerading_as_specific_student
 )
 from openedx.core.djangoapps.config_model_utils.models import StackedConfigurationModel
+from openedx.core.djangoapps.config_model_utils.utils import is_in_holdback
 from openedx.features.content_type_gating.helpers import has_staff_roles
 from openedx.features.content_type_gating.partitions import CONTENT_GATING_PARTITION_ID, CONTENT_TYPE_GATE_GROUP_IDS
 from openedx.features.course_duration_limits.config import (
     CONTENT_TYPE_GATING_FLAG,
     FEATURE_BASED_ENROLLMENT_GLOBAL_KILL_FLAG,
-    EXPERIMENT_ID,
-    EXPERIMENT_DATA_HOLDBACK_KEY
 )
 from student.models import CourseEnrollment
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
@@ -130,20 +128,10 @@ class CourseDurationLimitConfig(StackedConfigurationModel):
                 return False
 
         no_masquerade = get_course_masquerade(user, course_key) is None
-        is_in_holdback = False
         student_masquerade = is_masquerading_as_specific_student(user, course_key)
-        # TODO: clean up as part of REV-100
-        if user and user.username and (no_masquerade or student_masquerade):
-            try:
-                holdback_value = ExperimentData.objects.get(
-                    user=user,
-                    experiment_id=EXPERIMENT_ID,
-                    key=EXPERIMENT_DATA_HOLDBACK_KEY,
-                ).value
-                is_in_holdback = holdback_value == 'True'
-            except ExperimentData.DoesNotExist:
-                pass
-        if is_in_holdback:
+
+        # check if user is in holdback
+        if (no_masquerade or student_masquerade) and is_in_holdback(user):
             return False
 
         # enrollment might be None if the user isn't enrolled. In that case,
