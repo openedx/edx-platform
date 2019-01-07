@@ -12,8 +12,8 @@ from django.test import TestCase
 import pytest
 
 from student.models import (
-    get_all_retired_emails_by_email,
-    get_all_retired_usernames_by_username,
+    _get_all_retired_emails_by_email,
+    _get_all_retired_usernames_by_username,
     get_potentially_retired_user_by_username,
     get_potentially_retired_user_by_username_and_hash,
     get_retired_email_by_email,
@@ -110,7 +110,7 @@ def test_get_all_retired_usernames_by_username(retirement_user):
     Check that all salts are used for this method and return expected
     formats.
     """
-    hashed_usernames = list(get_all_retired_usernames_by_username(retirement_user.username))
+    hashed_usernames = list(_get_all_retired_usernames_by_username(retirement_user.username))
     assert len(hashed_usernames) == len(settings.RETIRED_USER_SALTS)
 
     for hashed_username in hashed_usernames:
@@ -185,7 +185,7 @@ def test_get_all_retired_email_by_email(retirement_user):
     Check that all salts are used for this method and return expected
     formats.
     """
-    hashed_emails = list(get_all_retired_emails_by_email(retirement_user.email))
+    hashed_emails = list(_get_all_retired_emails_by_email(retirement_user.email))
     assert len(hashed_emails) == len(settings.RETIRED_USER_SALTS)
 
     for hashed_email in hashed_emails:
