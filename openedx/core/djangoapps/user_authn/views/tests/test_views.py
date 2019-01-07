@@ -276,7 +276,7 @@ class UserAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
 
     @override_settings(FEATURES=FEATURES_WITH_FAILED_PASSWORD_RESET_EMAIL)
     def test_account_recovery_failure_email(self):
-        """Test that a password reset failure email notification is sent, when enabled."""
+        """Test that log message is added when email does not match any in the system."""
         # Log the user out
         self.client.logout()
 
@@ -289,6 +289,26 @@ class UserAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
                     LOGGER_NAME,
                     "WARNING", "Account recovery attempt via invalid secondary email '{email}'.".format(
                         email=bad_email
+                    )
+                )
+            )
+
+    @override_settings(FEATURES=FEATURES_WITH_FAILED_PASSWORD_RESET_EMAIL)
+    def test_account_recovery_failure_not_active(self):
+        """Test that log message is added when email does not match any active account recovery records."""
+        # Log the user out
+        self.client.logout()
+        self.account_recovery.is_active = False
+        self.account_recovery.save()
+
+        with LogCapture(LOGGER_NAME, level=logging.INFO) as logger:
+            response = self._recover_account(email=self.account_recovery.secondary_email)
+            self.assertEqual(response.status_code, 200)
+            logger.check(
+                (
+                    LOGGER_NAME,
+                    "WARNING", "Account recovery attempt via invalid secondary email '{email}'.".format(
+                        email=self.account_recovery.secondary_email
                     )
                 )
             )

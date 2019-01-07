@@ -210,3 +210,4 @@ class AccountRecoveryFactory(DjangoModelFactory):
 
     user = None
     secondary_email = factory.Sequence(u'robot+test+recovery+{0}@edx.org'.format)
+    is_active = True
