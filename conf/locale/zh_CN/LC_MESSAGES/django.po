@@ -10,7 +10,7 @@
 # Yi Li <y.li@eliteu.cn>, 2018
 # 陈滢冲 <yc.chen@eliteu.cn>, 2018
 # 家璧 刘 <jb.liu@eliteu.com.cn>, 2018
-# li ying <code@eliteu.cn>, 2018
+# li ying <code@eliteu.cn>, 2019
 #
 # #-#-#-#-#  django-studio.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/).
@@ -55,15 +55,15 @@
 # #-#-#-#-#  membership.po (0.1a)  #-#-#-#-#
 # #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/).
-# Copyright (C) 2019 EdX
+# Copyright (C) 2018 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2018.
 #
 # #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)
-# Copyright (C) 2019 edX
+# Copyright (C) 2018 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2018.
 #
 # Translators:
 # 微 李 <w.li@eliteu.com.cn>, 2018
@@ -74,7 +74,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-01-04 16:04+0800\n"
+"POT-Creation-Date: 2018-12-13 17:36+0800\n"
 "PO-Revision-Date: 2018-12-07 12:23+0000\n"
 "Last-Translator: li ying <code@eliteu.cn>, 2018\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)\n"
@@ -10520,9 +10520,8 @@ msgid ""
 msgstr "用户名只能包含罗字母（A-Z、a-z）、下划线数字（0-9）、下划线（_）、连字符（-）。"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid ""
-"Usernames can only contain letters, numerals, and @/./+/-/_ characters."
-msgstr "用户名只能包含字母、数字、“@/./+/-/_”字符。"
+msgid "Usernames can only contain letters, numerals, and @.+-_ characters."
+msgstr "用户名只能包含字母、数字、“@.+-_”字符。"
 
 #. Translators: This message is shown to users who attempt to create a new
 #. account using
@@ -16050,7 +16049,7 @@ msgstr "您已提交重新认证信息，认证完成后将会在您面板中显
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You have successfully verified your ID with edX"
-msgstr "您已经与edX成功验证了您的 ID！"
+msgstr "您已经与EliteMBA成功验证了您的 ID！"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Your current verification is effective until {date}."
@@ -26143,22 +26142,6 @@ msgid "Apple Pay"
 msgstr "Apple Pay"
 
 #: membership/models.py
-msgid "Apple Inpurasing"
-msgstr "苹果内购"
-
-#: membership/models.py
-msgid "WeChat App"
-msgstr "微信APP"
-
-#: membership/models.py
-msgid "WeChat H5"
-msgstr "微信H5"
-
-#: membership/models.py
-msgid "Alipay App"
-msgstr "支付宝APP"
-
-#: membership/models.py
 msgid "subscribe normal"
 msgstr "常规订阅"
 
@@ -26313,6 +26296,66 @@ msgid ""
 msgstr "*英荔教育保留所有课程的更新和最终解释权。"
 
 #: membership/templates/membership/index.html
+msgid "Become Eliteu Member"
+msgstr "成为英荔会员"
+
+#: membership/templates/membership/index.html
+msgid "Choose appropriate learning duration according to your needs"
+msgstr "根据您的需求选择合适的学习时长"
+
+#: membership/templates/membership/index.html
+msgid ""
+"Enjoy learning all courses in the Eliteu MBA school during the study "
+"period，You can join the new class online now!"
+msgstr "学习期内享有英荔商学院所有课程的学习权益，新课上线亦可马上加入学习"
+
+#: membership/templates/membership/index.html
+msgctxt "Membership"
+msgid "Full Year"
+msgstr "一年"
+
+#: membership/templates/membership/index.html
+msgid "average per month"
+msgstr "月均"
+
+#: membership/templates/membership/index.html
+msgid "Full-stack workplace practice"
+msgstr "全栈职场修炼"
+
+#: membership/templates/membership/index.html
+msgctxt "Membership"
+msgid "Half-Year"
+msgstr "半年"
+
+#: membership/templates/membership/index.html
+msgid "Improve Ability Efficiently"
+msgstr "能力高效提升"
+
+#: membership/templates/membership/index.html
+msgctxt "Membership"
+msgid "Three-Month"
+msgstr "三个月"
+
+#: membership/templates/membership/index.html
+msgid "A series of courses for learning"
+msgstr "系列课程畅学"
+
+#: membership/templates/membership/index.html
+msgctxt "Membership"
+msgid "One-Month"
+msgstr "一个月"
+
+#: membership/templates/membership/index.html
+msgid "Multiple-Course Experience"
+msgstr "多门课程体验"
+
+#: membership/templates/membership/index.html
+msgid ""
+"*Now sign up to enjoy the above offers. Please go to the purchase page for "
+"details."
+msgstr "*现在报名可享以上优惠，具体详情请前往购买页。"
+
+#: membership/templates/membership/index.html
 msgid "Best faculties ---- Elite Education"
 msgstr "超强师资 —— 精英式教学"
 
@@ -26417,66 +26460,6 @@ msgstr "原对外经济贸易大学校长、教授"
 #: membership/templates/membership/index.html
 msgid "View More"
 msgstr "查看更多"
-
-#: membership/templates/membership/index.html
-msgid "Become Eliteu Member"
-msgstr "成为英荔会员"
-
-#: membership/templates/membership/index.html
-msgid "Choose appropriate learning duration according to your needs"
-msgstr "根据您的需求选择合适的学习时长"
-
-#: membership/templates/membership/index.html
-msgid ""
-"Enjoy learning all courses in the Eliteu MBA school during the study "
-"period，You can join the new class online now!"
-msgstr "学习期内享有英荔商学院所有课程的学习权益，新课上线亦可马上加入学习"
-
-#: membership/templates/membership/index.html
-msgctxt "Membership"
-msgid "Full Year"
-msgstr "一年"
-
-#: membership/templates/membership/index.html
-msgid "average per month"
-msgstr "月均"
-
-#: membership/templates/membership/index.html
-msgid "Full-stack workplace practice"
-msgstr "全栈职场修炼"
-
-#: membership/templates/membership/index.html
-msgctxt "Membership"
-msgid "Half-Year"
-msgstr "半年"
-
-#: membership/templates/membership/index.html
-msgid "Improve Ability Efficiently"
-msgstr "能力高效提升"
-
-#: membership/templates/membership/index.html
-msgctxt "Membership"
-msgid "Three-Month"
-msgstr "三个月"
-
-#: membership/templates/membership/index.html
-msgid "A series of courses for learning"
-msgstr "系列课程畅学"
-
-#: membership/templates/membership/index.html
-msgctxt "Membership"
-msgid "One-Month"
-msgstr "一个月"
-
-#: membership/templates/membership/index.html
-msgid "Multiple-Course Experience"
-msgstr "多门课程体验"
-
-#: membership/templates/membership/index.html
-msgid ""
-"*Now sign up to enjoy the above offers. Please go to the purchase page for "
-"details."
-msgstr "*现在报名可享以上优惠，具体详情请前往购买页。"
 
 #: membership/templates/membership/index.html
 msgid ""

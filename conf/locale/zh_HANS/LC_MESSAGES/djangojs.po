@@ -42,20 +42,20 @@
 #
 # #-#-#-#-#  membership-js.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/).
-# Copyright (C) 2019 EdX
+# Copyright (C) 2018 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2018.
 #
 # Translators:
-# li ying <code@eliteu.cn>, 2019
+# li ying <code@eliteu.cn>, 2018
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-01-04 16:04+0800\n"
+"POT-Creation-Date: 2018-12-13 17:36+0800\n"
 "PO-Revision-Date: 2018-12-07 12:23+0000\n"
-"Last-Translator: li ying <code@eliteu.cn>, 2019\n"
+"Last-Translator: li ying <code@eliteu.cn>, 2018\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
@@ -5103,6 +5103,11 @@ msgstr "成绩"
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
 msgid "Profile"
 msgstr "个人主页"
+
+#: themes/normal-theme/lms/static/js/binding.js
+#, javascript-format
+msgid "%s s"
+msgstr ""
 
 #: themes/normal-theme/lms/static/js/binding.js
 msgid "Get the verification code"
@@ -10410,8 +10415,8 @@ msgid "Become a VIP member and watch all EliteMBA courses for free"
 msgstr "开通VIP会员，可免费观看英荔商学院全部课程。"
 
 #: membership/static/membership/js/card.js
-msgid "YYYY-MM-DD"
-msgstr "YYYY-MM-DD"
+msgid "DD/MM/YYYY"
+msgstr ""
 
 #: membership/static/membership/js/card.js
 msgid "Membership opened"
@@ -10426,8 +10431,8 @@ msgid "Remaining days"
 msgstr "剩余"
 
 #: membership/static/membership/js/card.js
-msgid "Duration:"
-msgstr "起止时间："
+msgid "Date:"
+msgstr ""
 
 #: membership/static/membership/js/card.js
 msgid "Opened on:"
@@ -10441,19 +10446,10 @@ msgstr "到期日期:"
 msgid "Membership expired"
 msgstr "会员已过期"
 
-#: membership/static/membership/js/card.js
-msgid "Renew"
-msgstr "续费"
-
 #: membership/static/membership/js/index.js
 msgid "Average per month"
 msgstr "月均"
 
 #: membership/static/membership/js/pay.js
-msgid "Failed to pay the payment"
-msgstr "调起支付失败"
-
-#: membership/static/membership/js/result.js
-#, javascript-format
-msgid "Return to EliteMBA in %s seconds"
-msgstr "%s 秒后返回英荔商学院"
+msgid "Return to EliteMBA in _ seconds"
+msgstr ""
