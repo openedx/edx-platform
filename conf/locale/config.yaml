@@ -139,6 +139,7 @@ ignore_dirs:
 # .tx/config file so that it will be pushed to and pulled from transifex.
 third_party:
     - wiki
+    - edx_proctoring_proctortrack
 
 
 # How should .po files be segmented?  See i18n/segment.py for details. Strings
