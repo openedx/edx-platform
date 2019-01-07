@@ -111,6 +111,7 @@
     background-image: url("/static/normal-theme/images/crown2.png");
     background-repeat: no-repeat;
     background-position: right 10px;
+    border-radius: 3px;
   }
   .status-verification .status-title{
     color: #fa7f2b;
@@ -118,6 +119,10 @@
     display: block;
     text-align: left;
     margin: 0 0 25px 0;
+    .fa{
+      vertical-align: text-top;
+      margin-right: 5px;
+    }
   }
   .status-verification .status-note{
     font-size: 14px;
