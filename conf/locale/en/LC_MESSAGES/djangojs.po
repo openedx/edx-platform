@@ -24,16 +24,16 @@
 #
 # #-#-#-#-#  membership-js.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2019 EdX
+# Copyright (C) 2018 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2019.
+# EdX Team <info@edx.org>, 2018.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-01-04 10:36+0800\n"
-"PO-Revision-Date: 2019-01-04 02:36:20.837438\n"
+"POT-Creation-Date: 2018-12-13 17:36+0800\n"
+"PO-Revision-Date: 2018-12-13 09:36:08.621139\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -5075,6 +5075,11 @@ msgstr ""
 
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
 msgid "Profile"
+msgstr ""
+
+#: themes/normal-theme/lms/static/js/binding.js
+#, javascript-format
+msgid "%s s"
 msgstr ""
 
 #: themes/normal-theme/lms/static/js/binding.js
@@ -10371,13 +10376,7 @@ msgid "Remaining days"
 msgstr ""
 
 #: membership/static/membership/js/card.js
-msgctxt "Membership"
-msgid "Opened:"
-msgstr ""
-
-#: membership/static/membership/js/card.js
-msgctxt "Membership"
-msgid "Expire:"
+msgid "Date:"
 msgstr ""
 
 #: membership/static/membership/js/card.js
@@ -10392,18 +10391,10 @@ msgstr ""
 msgid "Membership expired"
 msgstr ""
 
-#: membership/static/membership/js/card.js
-msgid "Renew"
-msgstr ""
-
 #: membership/static/membership/js/index.js
 msgid "Average per month"
 msgstr ""
 
 #: membership/static/membership/js/pay.js
-msgid "Failed to pay the payment"
-msgstr ""
-
-#: membership/static/membership/js/result.js
-msgid "Return to EliteMBA in {second} seconds"
+msgid "Return to EliteMBA in _ seconds"
 msgstr ""

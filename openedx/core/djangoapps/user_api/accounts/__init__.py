@@ -37,7 +37,7 @@ USERNAME_INVALID_CHARS_ASCII = _(
 # It is shown to users who attempt to create a new account using invalid characters
 # in the username.
 USERNAME_INVALID_CHARS_UNICODE = _(
-    u"Usernames can only contain letters, numerals, and @/./+/-/_ characters."
+    u"Usernames can only contain letters, numerals, and @.+-_ characters."
 )
 
 # Translators: This message is shown to users who attempt to create a new account using
