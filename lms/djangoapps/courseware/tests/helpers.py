@@ -355,7 +355,7 @@ def _create_mock_json_request(user, data, method='POST'):
     return request
 
 
-def get_expiration_banner_text(user, course):
+def get_expiration_banner_text(user, course, language='en-us'):
     """
     Get text for banner that messages user course expiration date
     for different tests that depend on it.
@@ -367,7 +367,6 @@ def get_expiration_banner_text(user, course):
     if upgrade_deadline is None or now() < upgrade_deadline:
         upgrade_deadline = enrollment.course_upgrade_deadline
 
-    language = get_language()
     language_is_es = language and language.split('-')[0].lower() == 'es'
     if language_is_es:
         formatted_expiration_date = strftime_localized(expiration_date, '%-d de %b. de %Y').lower()

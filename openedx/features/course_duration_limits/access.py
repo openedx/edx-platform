@@ -70,7 +70,7 @@ def get_user_course_expiration_date(user, course):
         return None
 
     enrollment = CourseEnrollment.get_enrollment(user, course.id)
-    if enrollment is None or enrollment.mode != 'audit':
+    if enrollment is None or enrollment.mode != CourseMode.AUDIT:
         return None
 
     try:
@@ -140,7 +140,7 @@ def register_course_expired_message(request, course):
         upgrade_deadline = enrollment.upgrade_deadline
         now = timezone.now()
         course_upgrade_deadline = enrollment.course_upgrade_deadline
-        if (not upgrade_deadline) or (now > upgrade_deadline):
+        if (not upgrade_deadline) or (upgrade_deadline < now):
             upgrade_deadline = course_upgrade_deadline
 
         expiration_message = _('{strong_open}Audit Access Expires {expiration_date}{strong_close}'
