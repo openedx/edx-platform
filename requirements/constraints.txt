@@ -15,6 +15,9 @@ six==1.11.0
 # Convert text markup to HTML; used in capa problems, forums, and course wikis; pin Markdown version as tests failed for its upgrade to latest release
 Markdown==2.6.11
 
+# 5.4.0 causes cms/djangoapps/api/v1/tests/test_views/test_course_runs.py::CourseRunViewSetTests::test_images_upload to fail
+pillow==5.3.0
+
 # required by edx-lint and pinned explicitly here because newer versions don't guarantee python 2 support.
 # Can be removed when we get to Python 3.
 pylint-plugin-utils==0.3

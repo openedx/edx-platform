@@ -60,7 +60,6 @@ botocore==1.8.17
 celery==3.1.25
 certifi==2018.11.29
 cffi==1.11.5
-charade==1.0.3            # via pysrt
 chardet==3.0.4
 click==7.0                # via user-util
 coreapi==2.3.3            # via django-rest-swagger, openapi-codec
@@ -199,7 +198,7 @@ pyjwt==1.5.2
 pymongo==2.9.1
 pynliner==0.8.0
 pyparsing==2.2.0
-pysrt==0.4.7
+pysrt==1.1.1
 python-dateutil==2.4.0
 python-levenshtein==0.12.0
 python-memcached==1.48
