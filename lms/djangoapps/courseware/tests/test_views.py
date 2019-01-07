@@ -1706,6 +1706,10 @@ class ProgressPageTests(ProgressPageBaseTests):
         CourseDurationLimitConfig.objects.create(enabled=False)
         user = UserFactory.create()
         self.assertTrue(self.client.login(username=user.username, password='test'))
+        CourseModeFactory.create(
+            course_id=self.course.id,
+            mode_slug=course_mode
+        )
         CourseEnrollmentFactory(user=user, course_id=self.course.id, mode=course_mode)
 
         response = self._get_progress_page()
