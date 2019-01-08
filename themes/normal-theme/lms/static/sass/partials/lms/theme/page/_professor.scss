@@ -109,8 +109,8 @@
 .professor-course{
   @extend %btn-my-primary;
   position: absolute;
-  top:30px;
-  right: 20px;
+  top: 0;
+  right: 10px;
   color: #fff !important;
   line-height: 36px !important;
   &:not(.btn):hover{
@@ -127,8 +127,9 @@
     display: none;
   }
   .professor-course{
-    top: 130px;
-    left: 100px;
+    top: unset;
     right: unset;
+    left: 80px;
+    bottom: 0;
   }
 }

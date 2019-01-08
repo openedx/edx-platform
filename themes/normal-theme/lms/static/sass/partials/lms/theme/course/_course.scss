@@ -128,6 +128,9 @@ body.view-in-course .wrapper-course-material .course-tabs{
   #expand-collapse-outline-all-button{  
     @extend %btn-my-white;
     background-color: rgba(182, 220, 254, 0.5);
+    span{
+      padding: 0;
+    }
   }
 }
 

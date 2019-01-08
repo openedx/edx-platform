@@ -43,6 +43,9 @@
   box-sizing: border-box;
 
 }
+.settings-language-form{
+  display: none;
+}
 
 // a
 a:not(.btn):hover, a:not(.btn):focus, a:visited:not(.btn):hover, a:visited:not(.btn):focus{
@@ -150,7 +153,7 @@ button:focus:not(:disabled), button:hover:not(:disabled), .btn-default{
   cursor: pointer;
   border: none;
   background: $primary;
-  border: 1px solid $primary;
+  border: 1px solid $primary !important;
   color: #fff;
   text-shadow: none;
   box-shadow: none;

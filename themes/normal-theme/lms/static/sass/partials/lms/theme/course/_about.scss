@@ -524,6 +524,8 @@
     .about-staff-block{
       height: auto;
       padding-left: 80px;
+      padding-bottom: 60px;
+      position: relative;
     }
     .about-staff div{
       margin-top: 10px;
@@ -539,9 +541,6 @@
       margin-top: 3px;
       display: inline-block;
     }
-  }
-  .professor-detail .about-staff-block{
-    height: 110px;
   }
 }
 
