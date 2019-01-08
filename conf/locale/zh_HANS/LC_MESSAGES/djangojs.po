@@ -10,7 +10,7 @@
 # 微 李 <w.li@eliteu.com.cn>, 2018
 # Yi Li <y.li@eliteu.cn>, 2018
 # 家璧 刘 <jb.liu@eliteu.com.cn>, 2018
-# li ying <code@eliteu.cn>, 2018
+# li ying <code@eliteu.cn>, 2019
 #
 # #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/).
@@ -4484,8 +4484,7 @@ msgid ""
 "%(currentProvider)s account does not have a linked %(platformName)s account."
 " To link your accounts, sign in now using your %(platformName)s password."
 msgstr ""
-"您已成功登录 %(currentProvider)s，但是您的 %(currentProvider)s 帐户尚无关联的 %(platformName)s"
-" 账号。要关联您的账号，请使用您的 %(platformName)s 密码登录。"
+"您已成功登录%(currentProvider)s，但是您的%(currentProvider)s帐户尚无关联的%(platformName)s账号。要关联您的账号，请使用您的%(platformName)s密码登录。"
 
 #: lms/static/js/student_account/views/RegisterView.js
 msgid "We couldn't create your account."
@@ -5107,7 +5106,7 @@ msgstr "个人主页"
 #: themes/normal-theme/lms/static/js/binding.js
 #, javascript-format
 msgid "%s s"
-msgstr ""
+msgstr "%s秒"
 
 #: themes/normal-theme/lms/static/js/binding.js
 msgid "Get the verification code"
