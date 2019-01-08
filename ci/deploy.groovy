@@ -11,6 +11,7 @@ def failPercentage = null
 def tags = null
 def themes = null
 def vars = ""
+def machine = null
 
 pipeline {
     agent any
@@ -22,7 +23,6 @@ pipeline {
         stage("Get parameters") {
             steps {
                 script {
-                    def machine = null
                     timeout(time: 2) {
                         // get parameters
                         if(env.GIT_BRANCH =~ "(master|hotfix).*"){
@@ -41,6 +41,9 @@ pipeline {
                             commitId = commitHashForBuild(build)
                         }
                         s3Download(file:"/tmp/${machine}.txt", bucket:'ltdps-jenkins', path:"edxapp_${machine}.txt", force:true)
+                        s3Download(file:"/tmp/${machine}_password.yml", bucket:'ltdps-jenkins', path:"${machine}_password.yml", force:true)
+                        s3Download(file:"/tmp/${machine}_host.yml", bucket:'ltdps-jenkins', path:"${machine}_host.yml", force:true)
+
                         def ipAddresses = readFile("/tmp/${machine}.txt").tokenize("\n")
                         def para = input message: 'choose machine, use all for full deployment',
                             parameters: [choice(choices: ["all"] + ipAddresses, description: "", name: 'ipAddress'),
@@ -67,24 +70,19 @@ pipeline {
                             tags = "deploy"
                         }
 
-//                        failPercentage = para['failPercentage'] as int
-//                        step = para['step'] as int
                         vars += "fail_percentage=${para['failPercentage']} serial_count=${para['step']} "
 
                         selectedIpAddress = para['ipAddress']
                         if (selectedIpAddress == 'all') {
                             selectedIpAddress = ipAddresses.join(",")
-                        } else {
-                            selectedIpAddress += ","
                         }
-                        vars += "EDXAPP_HOST=${selectedIpAddress} APP_HOST=${selectedIpAddress} "
 
                         if (commitId.contains('~')) {
                             commitId = env.GIT_BRANCH + commitId.substring(4)
                         } else if (commitId == 'HEAD') {
                             commitId = env.GIT_BRANCH
                         }
-                        vars += "edx_platform_version=${commitId} STATEFUL_HOST=54.255.229.123 "
+                        vars += "edx_platform_version=${commitId}"
                     }
                 }
             }
@@ -111,7 +109,8 @@ pipeline {
                     . /tmp/.venv/bin/activate
                     ansible-playbook --ssh-common-args='-o "StrictHostKeyChecking no"' \
                     -u ubuntu -i ${selectedIpAddress}, --key-file="/tmp/STAGING_SG.pem" \
-                    -e "${vars}" -t ${tags} lt_edxapp_with_worker.yml
+                    -e "${vars}" -e "@/tmp/${machine}_password.yml" -e "@/tmp/${machine}_host.yml" \
+                    -t ${tags} lt_edxapp_with_worker.yml
                     """
                 }
             }
