@@ -60,8 +60,16 @@ done
 current_branch_hash=`git rev-parse HEAD`
 
 if [ -z "${MAIN_COMMIT+x}" ]; then
-    # if commit is not set, get hash of current branch
-    MAIN_COMMIT="origin/master"
+    if [ -z ${TARGET_BRANCH+x} ]; then
+        # if commit is not set and no target branch, get hash of current branch
+        MAIN_COMMIT="origin/master"
+    else
+        if [[ $TARGET_BRANCH == origin/* ]]; then
+            MAIN_COMMIT=$TARGET_BRANCH
+        else
+            MAIN_COMMIT=origin/$TARGET_BRANCH
+        fi
+    fi
 fi
 
 merge_base_command="git merge-base $current_branch_hash $MAIN_COMMIT"
