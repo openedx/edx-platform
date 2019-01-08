@@ -1245,7 +1245,7 @@ EVENT_TRACKING_PROCESSORS = []
 #### PASSWORD POLICY SETTINGS #####
 AUTH_PASSWORD_VALIDATORS = [
     {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+        "NAME": "util.password_policy_validators.UserAttributeSimilarityValidator",
     },
     {
         "NAME": "util.password_policy_validators.MinimumLengthValidator",

@@ -1570,6 +1570,15 @@ msgid "%(num)d symbol"
 msgid_plural "%(num)d symbols"
 msgstr[0] "%(num)d符号"
 
+#: common/djangoapps/util/password_policy_validators.py
+#, python-format
+msgid "The password is too similar to the %(verbose_name)s."
+msgstr "密码与%(verbose_name)s太相似。"
+
+#: common/djangoapps/util/password_policy_validators.py
+msgid "Your password can't be too similar to your other personal information."
+msgstr "您的密码不能与您的其他个人信息太相似。"
+
 #: common/djangoapps/xblock_django/admin.py
 msgid ""
 "To disable the XBlock and prevent rendering in the LMS, leave \"Enabled\" "
