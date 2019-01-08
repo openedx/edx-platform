@@ -18,13 +18,9 @@ from lms.djangoapps.commerce.utils import EcommerceService
 from xmodule.partitions.partitions import UserPartition, UserPartitionError
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
-from openedx.features.content_type_gating.helpers import FULL_ACCESS, LIMITED_ACCESS
+from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID, FULL_ACCESS, LIMITED_ACCESS
 
 LOG = logging.getLogger(__name__)
-
-# Studio generates partition IDs starting at 100. There is already a manually generated
-# partition for Enrollment Track that uses ID 50, so we'll use 51.
-CONTENT_GATING_PARTITION_ID = 51
 
 
 def create_content_gating_partition(course):

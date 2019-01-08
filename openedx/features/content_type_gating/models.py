@@ -20,12 +20,13 @@ from lms.djangoapps.courseware.masquerade import (
 )
 from openedx.core.djangoapps.config_model_utils.models import StackedConfigurationModel
 from openedx.core.djangoapps.config_model_utils.utils import is_in_holdback
-from openedx.features.content_type_gating.helpers import FULL_ACCESS, has_staff_roles, LIMITED_ACCESS
+from openedx.features.content_type_gating.helpers import FULL_ACCESS, LIMITED_ACCESS
 from openedx.features.course_duration_limits.config import (
     CONTENT_TYPE_GATING_FLAG,
     FEATURE_BASED_ENROLLMENT_GLOBAL_KILL_FLAG,
 )
 from student.models import CourseEnrollment
+from student.role_helpers import has_staff_roles
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
 
 

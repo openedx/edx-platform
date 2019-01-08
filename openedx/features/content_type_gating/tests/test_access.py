@@ -35,11 +35,8 @@ from lms.djangoapps.courseware.tests.factories import (
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 from openedx.core.djangoapps.util.testing import TestConditionalContent
 from openedx.core.lib.url_utils import quote_slashes
-from openedx.features.content_type_gating.helpers import CONTENT_TYPE_GATE_GROUP_IDS
-from openedx.features.content_type_gating.partitions import (
-    CONTENT_GATING_PARTITION_ID,
-    ContentTypeGatingPartition
-)
+from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID, CONTENT_TYPE_GATE_GROUP_IDS
+from openedx.features.content_type_gating.partitions import ContentTypeGatingPartition
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.config import (
     EXPERIMENT_ID,

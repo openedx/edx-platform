@@ -3,7 +3,8 @@ from mock import Mock, patch
 
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from openedx.features.content_type_gating.partitions import create_content_gating_partition, CONTENT_GATING_PARTITION_ID
+from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID
+from openedx.features.content_type_gating.partitions import create_content_gating_partition
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from xmodule.partitions.partitions import UserPartitionError
 

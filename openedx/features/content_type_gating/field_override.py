@@ -5,7 +5,7 @@ students in the Unlocked Group of the ContentTypeGating partition.
 from django.conf import settings
 
 from lms.djangoapps.courseware.field_overrides import FieldOverrideProvider
-from openedx.features.content_type_gating.partitions import CONTENT_GATING_PARTITION_ID
+from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 
 
