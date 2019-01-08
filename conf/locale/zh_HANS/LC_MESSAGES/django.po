@@ -55,15 +55,15 @@
 # #-#-#-#-#  membership.po (0.1a)  #-#-#-#-#
 # #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/).
-# Copyright (C) 2018 EdX
+# Copyright (C) 2019 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 #
 # #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)
-# Copyright (C) 2018 edX
+# Copyright (C) 2019 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 #
 # Translators:
 # 微 李 <w.li@eliteu.com.cn>, 2018
@@ -74,7 +74,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-12-13 17:36+0800\n"
+"POT-Creation-Date: 2019-01-04 10:36+0800\n"
 "PO-Revision-Date: 2018-12-07 12:23+0000\n"
 "Last-Translator: li ying <code@eliteu.cn>, 2018\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)\n"
@@ -19014,6 +19014,13 @@ msgstr "重置你的 {platform_name} 密码"
 msgid "Invalid Password Reset Link"
 msgstr "无效的密码重置链接"
 
+#: lms/templates/registration/password_reset_confirm.html
+msgid ""
+"This password reset link is invalid. It may have been used already. To reset"
+" your password, go to the {start_link}sign-in{end_link} page and select "
+"{start_strong}Forgot password{end_strong}."
+msgstr ""
+
 #: lms/templates/registration/password_reset_done.html
 msgid "Password reset successful"
 msgstr "密码重设成功"
@@ -20322,7 +20329,7 @@ msgid ""
 "EliteMBA (www.EliteMBA.cn) is a sub-brand of Guangdong Elite International "
 "Education & Technology Co., Ltd. focusing on the development of MBA online "
 "classroom."
-msgstr "英荔商学院（www.EliteMBA.cn）是广东英荔国际教育科技有限公司旗下的商业管理类互联网课堂。"
+msgstr "英荔商学院（www.elitemba.cn）是广东英荔国际教育科技有限公司旗下的商业管理类互联网课堂。"
 
 #: themes/normal-theme/lms/templates/static_templates/about.html
 msgid ""
@@ -20651,7 +20658,7 @@ msgid ""
 "issues. EliteMBA reserves the right to suspend any part of the Service for "
 "any maintenance, upgrade or other purpose without prior notice."
 msgstr ""
-"英荔目前向用户提供英荔自主制作的一系列课程服务（包括但不限于课程视频、测验题目、考试、课程资料、笔记以及助教服务）。除非本使用协议另有其它明示规定，英荔增加或强化此服务的任何新功能，包括所推出的新产品，均受到本使用协议之规范。用户了解并同意，本服务仅依其当前所呈现的状况提供，对于任何用户信息或个人化设定之时效、删除、传递错误、未予储存或其它任何问题，英荔均不承担任何责任。英荔保留不经事先通知因维修保养、升级或其它目的而暂停本服务任何部分的权利。"
+"英荔目前向用户提供英荔自主制作的一系列课程服务（包括但不限于课程视频、测验题目、考试、课程资料、笔记以及助教服务）。除非本使用协议另有其它明示规定，英荔增加或强化此服务的任何新功能，包括所推出的新产品，均受到本使用协议之规范。用户了解并同意，本服务仅依其当前所呈现的状况提供，对于任何用户信息或个人化设定之失效、删除、传递错误、未予储存或其它任何问题，英荔均不承担任何责任。英荔保留不经事先通知因维修保养、升级或其它目的而暂停本服务任何部分的权利。"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -26142,6 +26149,22 @@ msgid "Apple Pay"
 msgstr "Apple Pay"
 
 #: membership/models.py
+msgid "Apple Inpurasing"
+msgstr ""
+
+#: membership/models.py
+msgid "WeChat App"
+msgstr ""
+
+#: membership/models.py
+msgid "WeChat H5"
+msgstr ""
+
+#: membership/models.py
+msgid "Alipay App"
+msgstr ""
+
+#: membership/models.py
 msgid "subscribe normal"
 msgstr "常规订阅"
 
@@ -26296,66 +26319,6 @@ msgid ""
 msgstr "*英荔教育保留所有课程的更新和最终解释权。"
 
 #: membership/templates/membership/index.html
-msgid "Become Eliteu Member"
-msgstr "成为英荔会员"
-
-#: membership/templates/membership/index.html
-msgid "Choose appropriate learning duration according to your needs"
-msgstr "根据您的需求选择合适的学习时长"
-
-#: membership/templates/membership/index.html
-msgid ""
-"Enjoy learning all courses in the Eliteu MBA school during the study "
-"period，You can join the new class online now!"
-msgstr "学习期内享有英荔商学院所有课程的学习权益，新课上线亦可马上加入学习"
-
-#: membership/templates/membership/index.html
-msgctxt "Membership"
-msgid "Full Year"
-msgstr "一年"
-
-#: membership/templates/membership/index.html
-msgid "average per month"
-msgstr "月均"
-
-#: membership/templates/membership/index.html
-msgid "Full-stack workplace practice"
-msgstr "全栈职场修炼"
-
-#: membership/templates/membership/index.html
-msgctxt "Membership"
-msgid "Half-Year"
-msgstr "半年"
-
-#: membership/templates/membership/index.html
-msgid "Improve Ability Efficiently"
-msgstr "能力高效提升"
-
-#: membership/templates/membership/index.html
-msgctxt "Membership"
-msgid "Three-Month"
-msgstr "三个月"
-
-#: membership/templates/membership/index.html
-msgid "A series of courses for learning"
-msgstr "系列课程畅学"
-
-#: membership/templates/membership/index.html
-msgctxt "Membership"
-msgid "One-Month"
-msgstr "一个月"
-
-#: membership/templates/membership/index.html
-msgid "Multiple-Course Experience"
-msgstr "多门课程体验"
-
-#: membership/templates/membership/index.html
-msgid ""
-"*Now sign up to enjoy the above offers. Please go to the purchase page for "
-"details."
-msgstr "*现在报名可享以上优惠，具体详情请前往购买页。"
-
-#: membership/templates/membership/index.html
 msgid "Best faculties ---- Elite Education"
 msgstr "超强师资 —— 精英式教学"
 
@@ -26460,6 +26423,66 @@ msgstr "原对外经济贸易大学校长、教授"
 #: membership/templates/membership/index.html
 msgid "View More"
 msgstr "查看更多"
+
+#: membership/templates/membership/index.html
+msgid "Become Eliteu Member"
+msgstr "成为英荔会员"
+
+#: membership/templates/membership/index.html
+msgid "Choose appropriate learning duration according to your needs"
+msgstr "根据您的需求选择合适的学习时长"
+
+#: membership/templates/membership/index.html
+msgid ""
+"Enjoy learning all courses in the Eliteu MBA school during the study "
+"period，You can join the new class online now!"
+msgstr "学习期内享有英荔商学院所有课程的学习权益，新课上线亦可马上加入学习"
+
+#: membership/templates/membership/index.html
+msgctxt "Membership"
+msgid "Full Year"
+msgstr "一年"
+
+#: membership/templates/membership/index.html
+msgid "average per month"
+msgstr "月均"
+
+#: membership/templates/membership/index.html
+msgid "Full-stack workplace practice"
+msgstr "全栈职场修炼"
+
+#: membership/templates/membership/index.html
+msgctxt "Membership"
+msgid "Half-Year"
+msgstr "半年"
+
+#: membership/templates/membership/index.html
+msgid "Improve Ability Efficiently"
+msgstr "能力高效提升"
+
+#: membership/templates/membership/index.html
+msgctxt "Membership"
+msgid "Three-Month"
+msgstr "三个月"
+
+#: membership/templates/membership/index.html
+msgid "A series of courses for learning"
+msgstr "系列课程畅学"
+
+#: membership/templates/membership/index.html
+msgctxt "Membership"
+msgid "One-Month"
+msgstr "一个月"
+
+#: membership/templates/membership/index.html
+msgid "Multiple-Course Experience"
+msgstr "多门课程体验"
+
+#: membership/templates/membership/index.html
+msgid ""
+"*Now sign up to enjoy the above offers. Please go to the purchase page for "
+"details."
+msgstr "*现在报名可享以上优惠，具体详情请前往购买页。"
 
 #: membership/templates/membership/index.html
 msgid ""
