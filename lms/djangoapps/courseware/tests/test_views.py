@@ -215,12 +215,13 @@ class IndexQueryTestCase(ModuleStoreTestCase):
     NUM_PROBLEMS = 20
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 10, 179),
-        (ModuleStoreEnum.Type.split, 4, 173),
+        (ModuleStoreEnum.Type.mongo, 10, 180),
+        (ModuleStoreEnum.Type.split, 4, 174),
     )
     @ddt.unpack
     def test_index_query_counts(self, store_type, expected_mongo_query_count, expected_mysql_query_count):
         # TODO: decrease query count as part of REVO-28
+        # TODO: decrease query count as part of REVEM-106
         ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         with self.store.default_store(store_type):
             course = CourseFactory.create()
@@ -1442,13 +1443,14 @@ class ProgressPageTests(ProgressPageBaseTests):
                 self.assertContains(resp, u"Download Your Certificate")
 
     @ddt.data(
-        (True, 56),
-        (False, 55)
+        (True, 57),
+        (False, 56)
     )
     @ddt.unpack
     def test_progress_queries_paced_courses(self, self_paced, query_count):
         """Test that query counts remain the same for self-paced and instructor-paced courses."""
         # TODO: decrease query count as part of REVO-28
+        # TODO: decrease query count as part of REVEM-106
         ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         self.setup_course(self_paced=self_paced)
         with self.assertNumQueries(query_count, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST), check_mongo_calls(1):
@@ -1456,11 +1458,12 @@ class ProgressPageTests(ProgressPageBaseTests):
 
     @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
     @ddt.data(
-        (False, 63, 43),
-        (True, 55, 39)
+        (False, 64, 44),
+        (True, 56, 40)
     )
     @ddt.unpack
     def test_progress_queries(self, enable_waffle, initial, subsequent):
+        # TODO: decrease query count as part of REVEM-106
         ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         self.setup_course()
         with grades_waffle().override(ASSUME_ZERO_GRADE_IF_ABSENT, active=enable_waffle):
