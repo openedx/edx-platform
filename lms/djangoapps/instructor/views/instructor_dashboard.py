@@ -310,13 +310,15 @@ def _section_e_commerce(course, access, paid_mode, coupons_enabled, reports_enab
 
 def _section_special_exams(course, access):
     """ Provide data for the corresponding dashboard section """
-    course_key = course.id
+    course_key = unicode(course.id)
+    from edx_proctoring.api import is_backend_dashboard_available
 
     section_data = {
         'section_key': 'special_exams',
         'section_display_name': _('Special Exams'),
         'access': access,
-        'course_id': unicode(course_key)
+        'course_id': course_key,
+        'show_dashboard': is_backend_dashboard_available(course_key),
     }
     return section_data
 

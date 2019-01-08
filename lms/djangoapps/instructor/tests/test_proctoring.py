@@ -3,8 +3,13 @@ Unit tests for Edx Proctoring feature flag in new instructor dashboard.
 """
 
 import ddt
+from django.apps import apps
 from django.conf import settings
 from django.urls import reverse
+
+from edx_proctoring.api import create_exam
+from edx_proctoring.backends.tests.test_backend import TestBackendProvider
+
 from mock import patch
 from six import text_type
 
@@ -89,7 +94,9 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
         # verify that proctoring tab is visible for course instructor
         CourseStaffRole(self.course.id).remove_users(self.instructor)
         CourseInstructorRole(self.course.id).add_users(self.instructor)
-        self._assert_proctoring_tab_is_available()
+        response = self._assert_proctoring_tab_is_available()
+        # the default backend does not support the review dashboard
+        self.assertNotIn('Review Dashboard', response.content)
 
     @ddt.data(
         (True, False),
@@ -130,6 +137,24 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
         self.assertNotIn(self.proctoring_link, response.content)
         self.assertNotIn('Allowance Section', response.content)
 
+    def test_review_dashboard(self):
+        """
+        The exam review dashboard will appear for backends that support the feature
+        """
+        self.setup_course(True, True)
+        backend = TestBackendProvider()
+        config = apps.get_app_config('edx_proctoring')
+        with patch.object(config, 'backends', {'test': backend}):
+            create_exam(
+                course_id=self.course.id,
+                content_id='test_content',
+                exam_name='Final Test Exam',
+                time_limit_mins=10,
+                backend='test',
+            )
+            response = self._assert_proctoring_tab_is_available()
+            self.assertIn('Review Dashboard', response.content)
+
     def _assert_proctoring_tab_is_available(self):
         """
         Asserts that proctoring tab is available for logged in user.
@@ -137,3 +162,4 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
         response = self.client.get(self.url)
         self.assertIn(self.proctoring_link, response.content)
         self.assertIn('Allowance Section', response.content)
+        return response
