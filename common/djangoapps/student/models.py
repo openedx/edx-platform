@@ -329,11 +329,22 @@ def get_potentially_retired_user_by_username(username):
     if not potential_users:
         raise User.DoesNotExist()
 
-    # If there are 2, one of two things should be true:
-    # - The user we want is un-retired and has the same case-match username
-    # - Or retired one was the case-match
+    # For a brief period, users were able to retire accounts and make another account with
+    # the same differently-cased username, like "testuser" and "TestUser".
+    # If there are two users found, return the one that's the *actual* case-matching username,
+    # whether retired or not.
     if len(potential_users) == 2:
-        return potential_users[0] if potential_users[0].username == username else potential_users[1]
+        # Figure out which user has been retired.
+        if potential_users[0].username.startswith(settings.RETIRED_USERNAME_PREFIX):
+            retired = potential_users[0]
+            active = potential_users[1]
+        else:
+            retired = potential_users[1]
+            active = potential_users[0]
+
+        # If the active (non-retired) user's username doesn't *exactly* match (including case),
+        # then the retired account must be the one that exactly matches.
+        return active if active.username == username else retired
 
     # We should have, at most, a retired username and an active one with a username
     # differing only by case. If there are more we need to disambiguate them by hand.

@@ -14,6 +14,7 @@ import pytest
 from student.models import (
     get_all_retired_emails_by_email,
     get_all_retired_usernames_by_username,
+    get_potentially_retired_user_by_username,
     get_potentially_retired_user_by_username_and_hash,
     get_retired_email_by_email,
     get_retired_username_by_username,
@@ -55,6 +56,17 @@ def retirement_status(retirement_user):  # pylint: disable=redefined-outer-name
     status = UserRetirementStatus.create_retirement(retirement_user)
     status.save()
     return status
+
+
+@pytest.fixture
+def two_users_same_username_different_case(retirement_status):
+    user1 = UserFactory.create(username='TestUser')
+    user2 = UserFactory.create(username='testuser')
+    UserRetirementStatus = apps.get_model('user_api', 'UserRetirementStatus')
+    status = UserRetirementStatus.create_retirement(user1)
+    user1.username = status.retired_username
+    user1.save()
+    return status, user1, user2
 
 
 def check_username_against_fmt(hashed_username):
@@ -181,6 +193,17 @@ def test_get_all_retired_email_by_email(retirement_user):
 
     # Make sure hashes are unique
     assert len(hashed_emails) == len(set(hashed_emails))
+
+
+def test_get_correct_user_varying_by_case_only(two_users_same_username_different_case):
+    """
+    Check that two users - one retired, one active - with the same username except for case can be found.
+    """
+    retired_status, retired_user, active_user = two_users_same_username_different_case
+    first_user = get_potentially_retired_user_by_username(retired_status.original_username)
+    second_user = get_potentially_retired_user_by_username(active_user.username)
+    assert first_user.username != second_user.username
+    assert second_user.username == active_user.username
 
 
 def test_get_potentially_retired_user_username_match(retirement_user):
