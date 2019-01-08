@@ -7,36 +7,24 @@ of audit learners.
 
 import logging
 
-from course_modes.models import CourseMode
-
 import crum
 from django.apps import apps
-from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 from web_fragments.fragment import Fragment
 
+from course_modes.models import CourseMode
 from lms.djangoapps.commerce.utils import EcommerceService
-from lms.djangoapps.courseware.masquerade import (
-    get_course_masquerade,
-    is_masquerading_as_specific_student,
-    get_masquerading_user_group,
-)
-from xmodule.partitions.partitions import Group, UserPartition, UserPartitionError, ENROLLMENT_TRACK_PARTITION_ID
+from xmodule.partitions.partitions import UserPartition, UserPartitionError
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
+from openedx.features.content_type_gating.helpers import FULL_ACCESS, LIMITED_ACCESS
 
 LOG = logging.getLogger(__name__)
 
 # Studio generates partition IDs starting at 100. There is already a manually generated
 # partition for Enrollment Track that uses ID 50, so we'll use 51.
 CONTENT_GATING_PARTITION_ID = 51
-
-
-CONTENT_TYPE_GATE_GROUP_IDS = {
-    'limited_access': 1,
-    'full_access': 2,
-}
 
 
 def create_content_gating_partition(course):
@@ -124,9 +112,6 @@ class ContentTypeGatingPartitionScheme(object):
     the gated content despite not being verified users.
     """
 
-    LIMITED_ACCESS = Group(CONTENT_TYPE_GATE_GROUP_IDS['limited_access'], 'Limited-access Users')
-    FULL_ACCESS = Group(CONTENT_TYPE_GATE_GROUP_IDS['full_access'], 'Full-access Users')
-
     read_only = True
 
     @classmethod
@@ -135,29 +120,12 @@ class ContentTypeGatingPartitionScheme(object):
         Returns the Group for the specified user.
         """
 
-        # First, check if we have to deal with masquerading.
-        # If the current user is masquerading as a specific student, use the
-        # same logic as normal to return that student's group. If the current
-        # user is masquerading as a generic student in a specific group, then
-        # return that group.
-        course_masquerade = get_course_masquerade(user, course_key)
-        if course_masquerade and not is_masquerading_as_specific_student(user, course_key):
-            masquerade_group = get_masquerading_user_group(course_key, user, user_partition)
-            if masquerade_group is not None:
-                return masquerade_group
-            else:
-                audit_mode_id = settings.COURSE_ENROLLMENT_MODES.get(CourseMode.AUDIT, {}).get('id')
-                if course_masquerade.user_partition_id == ENROLLMENT_TRACK_PARTITION_ID:
-                    if course_masquerade.group_id != audit_mode_id:
-                        return cls.FULL_ACCESS
-                    else:
-                        return cls.LIMITED_ACCESS
-
         # For now, treat everyone as a Full-access user, until we have the rest of the
         # feature gating logic in place.
 
-        if not ContentTypeGatingConfig.enabled_for_enrollment(user=user, course_key=course_key):
-            return cls.FULL_ACCESS
+        if not ContentTypeGatingConfig.enabled_for_enrollment(user=user, course_key=course_key,
+                                                              user_partition=user_partition):
+            return FULL_ACCESS
 
         # If CONTENT_TYPE_GATING is enabled use the following logic to determine whether a user should have FULL_ACCESS
         # or LIMITED_ACCESS
@@ -168,7 +136,7 @@ class ContentTypeGatingPartitionScheme(object):
 
         # If there is no verified mode, all users are granted FULL_ACCESS
         if not course_mode.has_verified_mode(modes_dict):
-            return cls.FULL_ACCESS
+            return FULL_ACCESS
 
         course_enrollment = apps.get_model('student.CourseEnrollment')
 
@@ -188,15 +156,15 @@ class ContentTypeGatingPartitionScheme(object):
                     mode_slug,
                     course_key,
                 )
-                return cls.FULL_ACCESS
+                return FULL_ACCESS
 
             if mode_slug == CourseMode.AUDIT:
-                return cls.LIMITED_ACCESS
+                return LIMITED_ACCESS
             else:
-                return cls.FULL_ACCESS
+                return FULL_ACCESS
         else:
             # Unenrolled users don't get gated content
-            return cls.LIMITED_ACCESS
+            return LIMITED_ACCESS
 
     @classmethod
     def create_user_partition(cls, id, name, description, groups=None, parameters=None, active=True):  # pylint: disable=redefined-builtin, invalid-name, unused-argument
@@ -219,8 +187,8 @@ class ContentTypeGatingPartitionScheme(object):
             unicode(name),
             unicode(description),
             [
-                cls.LIMITED_ACCESS,
-                cls.FULL_ACCESS,
+                LIMITED_ACCESS,
+                FULL_ACCESS,
             ],
             cls,
             parameters,

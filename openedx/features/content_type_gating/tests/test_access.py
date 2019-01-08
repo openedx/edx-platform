@@ -35,9 +35,9 @@ from lms.djangoapps.courseware.tests.factories import (
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 from openedx.core.djangoapps.util.testing import TestConditionalContent
 from openedx.core.lib.url_utils import quote_slashes
+from openedx.features.content_type_gating.helpers import CONTENT_TYPE_GATE_GROUP_IDS
 from openedx.features.content_type_gating.partitions import (
     CONTENT_GATING_PARTITION_ID,
-    CONTENT_TYPE_GATE_GROUP_IDS,
     ContentTypeGatingPartition
 )
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
@@ -224,8 +224,8 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
             graded=True,
             group_access={
                 CONTENT_GATING_PARTITION_ID: [
-                    settings.CONTENT_TYPE_GATE_GROUP_IDS['limited_access'],
-                    settings.CONTENT_TYPE_GATE_GROUP_IDS['full_access']
+                    CONTENT_TYPE_GATE_GROUP_IDS['limited_access'],
+                    CONTENT_TYPE_GATE_GROUP_IDS['full_access']
                 ]
             },
         )
