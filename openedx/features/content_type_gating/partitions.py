@@ -182,11 +182,12 @@ class ContentTypeGatingPartitionScheme(object):
             )
             if course_mode is None:
                 LOG.error(
-                    "User %s is in an unknown CourseMode '%s'"
+                    "User %r is in an unknown CourseMode %r"
                     " for course %s. Granting full access to content for this user",
                     user.username,
                     mode_slug,
                     course_key,
+                    exc_info=True,
                 )
                 return cls.FULL_ACCESS
 
