@@ -56,12 +56,15 @@ case "${TEST_SUITE}" in
         case "$SHARD" in
             "all")
                 paver test_system -s lms --disable_capture ${PAVER_ARGS} ${PARALLEL} 2> lms-tests.log
+                mv reports/.coverage reports/.coverage.lms
                 ;;
             [1-9])
                 paver test_system -s lms --disable_capture --eval-attr="shard==$SHARD" ${PAVER_ARGS} ${PARALLEL} 2> lms-tests.${SHARD}.log
+                mv reports/.coverage reports/.coverage.lms.${SHARD}
                 ;;
             10|"noshard")
                 paver test_system -s lms --disable_capture --eval-attr="shard>=$SHARD or not shard" ${PAVER_ARGS} ${PARALLEL} 2> lms-tests.10.log
+                mv reports/.coverage reports/.coverage.lms.10
                 ;;
             *)
                 # If no shard is specified, rather than running all tests, create an empty xunit file. This is a
@@ -78,12 +81,15 @@ case "${TEST_SUITE}" in
         case "$SHARD" in
             "all")
                 paver test_system -s cms --disable_capture ${PAVER_ARGS} ${PARALLEL} 2> cms-tests.log
+                mv reports/.coverage reports/.coverage.cms
                 ;;
             1)
                 paver test_system -s cms --disable_capture --eval-attr="shard==$SHARD" ${PAVER_ARGS} 2> cms-tests.${SHARD}.log
+                mv reports/.coverage reports/.coverage.cms.${SHARD}
                 ;;
             2|"noshard")
                 paver test_system -s cms --disable_capture --eval-attr="shard>=$SHARD or not shard" ${PAVER_ARGS} 2> cms-tests.2.log
+                mv reports/.coverage reports/.coverage.cms.2
                 ;;
             *)
                 # If no shard is specified, rather than running all tests, create an empty xunit file. This is a
@@ -100,12 +106,15 @@ case "${TEST_SUITE}" in
         case "$SHARD" in
             "all")
                 paver test_lib --disable_capture ${PAVER_ARGS} ${PARALLEL} 2> common-tests.log
+                mv reports/.coverage reports/.coverage.commonlib
                 ;;
             [1-2])
                 paver test_lib -l common/lib/xmodule --disable_capture --eval-attr="shard==$SHARD" ${PAVER_ARGS} 2> common-tests.${SHARD}.log
+                mv reports/.coverage reports/.coverage.commonlib.${SHARD}
                 ;;
             3|"noshard")
                 paver test_lib --disable_capture --eval-attr="shard>=$SHARD or not shard" ${PAVER_ARGS} 2> common-tests.3.log
+                mv reports/.coverage reports/.coverage.commonlib.3
                 ;;
             *)
                 # If no shard is specified, rather than running all tests, create an empty xunit file. This is a
