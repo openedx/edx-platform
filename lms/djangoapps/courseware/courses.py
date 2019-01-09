@@ -490,10 +490,9 @@ def sort_by_start_date(courses):
     """
     courses = sorted(
         courses,
-        key=lambda course: (course.has_ended(), course.start is None, course.start),
+        key=lambda course: (course.start, course.id),
         reverse=True if settings.FEATURES.get('ENABLE_COURSE_SORTING_BY_START_DATE_DESC') else False
     )
-
 
     return courses
 
