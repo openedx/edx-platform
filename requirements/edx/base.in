@@ -105,7 +105,7 @@ Markdown                            # Convert text markup to HTML; used in capa 
 mongoengine==0.10.0                 # Object-document mapper for MongoDB, used in the LMS dashboard
 MySQL-python                        # Driver for the default production relational database
 newrelic                            # New Relic agent for performance monitoring
-nodeenv==1.1.1                      # Utility for managing Node.js environments; we use this for deployments and testing
+nodeenv==1.3.3                      # Utility for managing Node.js environments; we use this for deployments and testing
 numpy==1.6.2                        # Fast numeric array computation, used in some problem types
 oauthlib                            # OAuth specification support for authenticating via LTI or other Open edX services
 pdfminer                            # Used in shoppingcart for extracting/parsing pdf text
