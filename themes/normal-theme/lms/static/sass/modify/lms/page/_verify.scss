@@ -123,6 +123,7 @@
         outline: none;
     }
 }
+
 .verification-process .carousel .wrapper-task .controls .control .action.action-do{
     background-color: #b6dcfe;
     border-radius: 30px;
@@ -136,6 +137,15 @@
     .icon{
         padding: 0;
     }
+}
+.verification-process .carousel .wrapper-task .controls .control .action.action-redo{
+    background-color: #b6dcfe;
+    border-radius: 30px;
+    border: solid 1px #346ca3;
+    padding: 19px 37px;
+    line-height: 20px;
+    color: #346ca3;
+    font-weight: 400;
 }
 .fa-camera{
     vertical-align: middle;

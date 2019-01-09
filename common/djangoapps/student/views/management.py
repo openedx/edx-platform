@@ -21,7 +21,7 @@ from django.core.validators import ValidationError, validate_email
 from django.db import transaction
 from django.db.models.signals import post_save
 from django.dispatch import Signal, receiver
-from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
+from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.template.context_processors import csrf
 from django.template.response import TemplateResponse
@@ -923,6 +923,16 @@ def password_reset_confirm_wrapper(request, uidb36=None, token=None):
             user.save()
 
     return response
+
+
+def password_reset_change_wrapper(request, uidb36=None, token=None):
+    """
+    Redirect to password_reset_confirm
+    """
+    return HttpResponseRedirect(reverse('password_reset_confirm', kwargs={
+        'uidb36': uidb36,
+        'token': token,
+    }))
 
 
 def validate_new_email(user, new_email):

@@ -6,13 +6,13 @@ Created on May 13, 2014
 
 import json
 
-from ..utils import parse_qs
-from .oauth import BaseOAuth2
+from social_core.utils import parse_qs
+from social_core.backends.oauth import BaseOAuth2
 
 
 class QQOAuth2(BaseOAuth2):
     name = 'qq'
-    ID_KEY = 'unioid'
+    ID_KEY = 'unionid'
     AUTHORIZE_URL = 'https://graph.qq.com/oauth2.0/authorize'
     ACCESS_TOKEN_URL = 'https://graph.qq.com/oauth2.0/token'
     AUTHORIZATION_URL = 'https://graph.qq.com/oauth2.0/authorize'
@@ -53,7 +53,7 @@ class QQOAuth2(BaseOAuth2):
         })
         content = response.content.decode()
         data = json.loads(content[10:-3])
-        return data['openid']
+        return data['unionid']
 
     def user_data(self, access_token, *args, **kwargs):
         openid = self.get_openid(access_token)
@@ -64,7 +64,7 @@ class QQOAuth2(BaseOAuth2):
                 'openid': openid
             }
         )
-        response['openid'] = openid
+        response['unionid'] = openid
         return response
 
     def request_access_token(self, url, data, *args, **kwargs):

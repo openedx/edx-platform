@@ -2627,7 +2627,7 @@ POLICY_CHANGE_TASK_RATE_LIMIT = '300/h'
 #### PASSWORD POLICY SETTINGS #####
 AUTH_PASSWORD_VALIDATORS = [
     {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+        "NAME": "util.password_policy_validators.UserAttributeSimilarityValidator",
     },
     {
         "NAME": "util.password_policy_validators.MinimumLengthValidator",
@@ -2958,7 +2958,7 @@ INVOICE_PAYMENT_INSTRUCTIONS = "This is where you can\nput directions on how peo
 # Used by django-countries
 COUNTRIES_OVERRIDE = {
     # Taiwan is specifically not translated to avoid it being translated as "Taiwan (Province of China)"
-    "TW": "Taiwan",
+    # "TW": "Taiwan",
     'XK': _('Kosovo'),
 }
 
