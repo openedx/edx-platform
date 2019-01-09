@@ -20338,7 +20338,7 @@ msgid ""
 "EliteMBA (www.EliteMBA.cn) is a sub-brand of Guangdong Elite International "
 "Education & Technology Co., Ltd. focusing on the development of MBA online "
 "classroom."
-msgstr "英荔商学院（www.elitemba.cn）是广东英荔国际教育科技有限公司旗下的商业管理类互联网课堂。"
+msgstr "英荔商学院（www.EliteMBA.cn）是广东英荔国际教育科技有限公司旗下的商业管理类互联网课堂。"
 
 #: themes/normal-theme/lms/templates/static_templates/about.html
 msgid ""
