@@ -109,6 +109,10 @@
     &:disabled{
       @extend %btn-my-disable;
     }
+    &:focus{
+      border: 1px solid $primary;
+    }
+
   }
 
   // notification

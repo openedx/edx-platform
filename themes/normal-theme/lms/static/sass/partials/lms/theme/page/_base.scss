@@ -153,7 +153,7 @@ button:focus:not(:disabled), button:hover:not(:disabled), .btn-default{
   cursor: pointer;
   border: none;
   background: $primary;
-  border: 1px solid $primary !important;
+  border: 1px solid $primary;
   color: #fff;
   text-shadow: none;
   box-shadow: none;
