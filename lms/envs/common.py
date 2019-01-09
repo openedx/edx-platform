@@ -398,6 +398,9 @@ FEATURES = {
 
     # Whether to display the account deletion section the account settings page
     'ENABLE_ACCOUNT_DELETION': True,
+
+    # Disable bulk email send from random different addresses when 'False'
+    'BULK_EMAIL_FROM_DIFFERENT_ADDRESSES': False,
 }
 
 # Settings for the course reviews tool template and identification key, set either to None to disable course reviews
