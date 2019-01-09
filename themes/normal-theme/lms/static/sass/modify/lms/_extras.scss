@@ -5,10 +5,11 @@
 // to add any custom rules that you need. You can also import
 // partials directly into this file so that you can break your
 // rules into modular pieces.
-@import 'certificates';
+
 
 @charset 'utf-8';
-
+@import './variables';
+@import 'certificates';
 @import './page/base';
 @import './page/iconfont';
 
@@ -33,8 +34,8 @@
 @import './course/test';
 @import './course/courseVideo';
 
-@import './footer-page/about_us';
-@import './footer-page/contact';
-@import './footer-page/join_us';
-@import './footer-page/user_agreement';
-@import './footer-page/manual';
+@import './footer/about_us';
+@import './footer/contact';
+@import './footer/join_us';
+@import './footer/user_agreement';
+@import './footer/manual';
