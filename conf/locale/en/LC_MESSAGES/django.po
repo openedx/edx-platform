@@ -31,22 +31,22 @@
 # #-#-#-#-#  membership.po (0.1a)  #-#-#-#-#
 # #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2018 EdX
+# Copyright (C) 2019 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 #
 # #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2018 edX
+# Copyright (C) 2019 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-12-13 17:36+0800\n"
-"PO-Revision-Date: 2018-12-13 09:36:08.605105\n"
+"POT-Creation-Date: 2019-01-04 10:36+0800\n"
+"PO-Revision-Date: 2019-01-04 02:36:20.822484\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -18661,6 +18661,13 @@ msgstr ""
 msgid "Invalid Password Reset Link"
 msgstr ""
 
+#: lms/templates/registration/password_reset_confirm.html
+msgid ""
+"This password reset link is invalid. It may have been used already. To reset"
+" your password, go to the {start_link}sign-in{end_link} page and select "
+"{start_strong}Forgot password{end_strong}."
+msgstr ""
+
 #: lms/templates/registration/password_reset_done.html
 msgid "Password reset successful"
 msgstr ""
@@ -25622,6 +25629,22 @@ msgid "Apple Pay"
 msgstr ""
 
 #: membership/models.py
+msgid "Apple Inpurasing"
+msgstr ""
+
+#: membership/models.py
+msgid "WeChat App"
+msgstr ""
+
+#: membership/models.py
+msgid "WeChat H5"
+msgstr ""
+
+#: membership/models.py
+msgid "Alipay App"
+msgstr ""
+
+#: membership/models.py
 msgid "subscribe normal"
 msgstr ""
 
@@ -25776,66 +25799,6 @@ msgid ""
 msgstr ""
 
 #: membership/templates/membership/index.html
-msgid "Become Eliteu Member"
-msgstr ""
-
-#: membership/templates/membership/index.html
-msgid "Choose appropriate learning duration according to your needs"
-msgstr ""
-
-#: membership/templates/membership/index.html
-msgid ""
-"Enjoy learning all courses in the Eliteu MBA school during the study "
-"period，You can join the new class online now!"
-msgstr ""
-
-#: membership/templates/membership/index.html
-msgctxt "Membership"
-msgid "Full Year"
-msgstr ""
-
-#: membership/templates/membership/index.html
-msgid "average per month"
-msgstr ""
-
-#: membership/templates/membership/index.html
-msgid "Full-stack workplace practice"
-msgstr ""
-
-#: membership/templates/membership/index.html
-msgctxt "Membership"
-msgid "Half-Year"
-msgstr ""
-
-#: membership/templates/membership/index.html
-msgid "Improve Ability Efficiently"
-msgstr ""
-
-#: membership/templates/membership/index.html
-msgctxt "Membership"
-msgid "Three-Month"
-msgstr ""
-
-#: membership/templates/membership/index.html
-msgid "A series of courses for learning"
-msgstr ""
-
-#: membership/templates/membership/index.html
-msgctxt "Membership"
-msgid "One-Month"
-msgstr ""
-
-#: membership/templates/membership/index.html
-msgid "Multiple-Course Experience"
-msgstr ""
-
-#: membership/templates/membership/index.html
-msgid ""
-"*Now sign up to enjoy the above offers. Please go to the purchase page for "
-"details."
-msgstr ""
-
-#: membership/templates/membership/index.html
 msgid "Best faculties ---- Elite Education"
 msgstr ""
 
@@ -25939,6 +25902,66 @@ msgstr ""
 
 #: membership/templates/membership/index.html
 msgid "View More"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Become Eliteu Member"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Choose appropriate learning duration according to your needs"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid ""
+"Enjoy learning all courses in the Eliteu MBA school during the study "
+"period，You can join the new class online now!"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgctxt "Membership"
+msgid "Full Year"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "average per month"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Full-stack workplace practice"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgctxt "Membership"
+msgid "Half-Year"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Improve Ability Efficiently"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgctxt "Membership"
+msgid "Three-Month"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "A series of courses for learning"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgctxt "Membership"
+msgid "One-Month"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Multiple-Course Experience"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid ""
+"*Now sign up to enjoy the above offers. Please go to the purchase page for "
+"details."
 msgstr ""
 
 #: membership/templates/membership/index.html

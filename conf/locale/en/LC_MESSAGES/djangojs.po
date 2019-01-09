@@ -24,16 +24,16 @@
 #
 # #-#-#-#-#  membership-js.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2018 EdX
+# Copyright (C) 2019 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-12-13 17:36+0800\n"
-"PO-Revision-Date: 2018-12-13 09:36:08.621139\n"
+"POT-Creation-Date: 2019-01-04 16:04+0800\n"
+"PO-Revision-Date: 2019-01-04 08:04:48.237651\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -10360,7 +10360,7 @@ msgid "Become a VIP member and watch all EliteMBA courses for free"
 msgstr ""
 
 #: membership/static/membership/js/card.js
-msgid "DD/MM/YYYY"
+msgid "YYYY-MM-DD"
 msgstr ""
 
 #: membership/static/membership/js/card.js
@@ -10376,7 +10376,7 @@ msgid "Remaining days"
 msgstr ""
 
 #: membership/static/membership/js/card.js
-msgid "Date:"
+msgid "Duration:"
 msgstr ""
 
 #: membership/static/membership/js/card.js
@@ -10391,10 +10391,19 @@ msgstr ""
 msgid "Membership expired"
 msgstr ""
 
+#: membership/static/membership/js/card.js
+msgid "Renew"
+msgstr ""
+
 #: membership/static/membership/js/index.js
 msgid "Average per month"
 msgstr ""
 
 #: membership/static/membership/js/pay.js
-msgid "Return to EliteMBA in _ seconds"
+msgid "Failed to pay the payment"
+msgstr ""
+
+#: membership/static/membership/js/result.js
+#, javascript-format
+msgid "Return to EliteMBA in %s seconds"
 msgstr ""
