@@ -14871,18 +14871,18 @@ msgstr "Filtre :"
 #. Translators: This is a menu option for showing all forum threads unfiltered
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Show all posts"
-msgstr ""
+msgstr "afficher tous les messages"
 
 #. Translators: This is a menu option for showing only unread forum threads
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Unread posts"
-msgstr ""
+msgstr "messages non lus"
 
 #. Translators: This is a menu option for showing only unanswered forum
 #. question threads
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Unanswered posts"
-msgstr ""
+msgstr "messages sans réponses"
 
 #. Translators: This is a menu option for showing only forum threads flagged
 #. for abuse

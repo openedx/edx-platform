@@ -120,7 +120,9 @@
     "Add URLs for additional versions": "Adicionar URLs para vers\u00f5es adicionais", 
     "Add a Chapter": "Adicionar um Cap\u00edtulo", 
     "Add a New Cohort": "Adicionar um novo grupo", 
+    "Add a Post": "adicionar uma postagem", 
     "Add a Response": "Adicionar resposta", 
+    "Add a clear and descriptive title to encourage participation. (Required)": "Adicione um t\u00edtulo claro e descritivo para incentivar a participa\u00e7\u00e3o. (Requeridos)", 
     "Add a comment": "Adicionar coment\u00e1rio", 
     "Add another group": "Adicionar outro grupo", 
     "Add language": "Adicionar idioma", 
@@ -131,6 +133,7 @@
     "Add your first content group": "Adicione seu primeiro grupo de conte\u00fado", 
     "Add your first group configuration": "Adicione sua primeira configura\u00e7\u00e3o de grupo", 
     "Add your first textbook": "Acrescentar seu primeiro livro-texto", 
+    "Add your post to a relevant topic to help others find it. (Required)": "Adicione sua postagem a um t\u00f3pico relevante para ajudar outras pessoas a encontr\u00e1-lo. (Requeridos)", 
     "Add {role} Access": "Adicionar acesso de {role}", 
     "Adding": "Adicionando", 
     "Adding the selected course to your cart": "Adicionando o curso selecionado ao seu carrinho", 
@@ -877,6 +880,7 @@
     "Please verify that your webcam is connected and that you have allowed your browser to access it.": "Verifique se a sua webcam est\u00e1 conectada e se o seu navegador tem permiss\u00e3o para acess\u00e1-la.", 
     "Post": "Enviar", 
     "Post body": "Corpo da publica\u00e7\u00e3o", 
+    "Post type": "Tipo de postagem", 
     "Poster": "Poster", 
     "Practice Proctored": "Pr\u00e1tica supervisionada", 
     "Practice proctored Exam": "Exame Pr\u00e1tico Supervisionado", 
@@ -908,6 +912,7 @@
     "Publishing": "Publicando", 
     "Publishing Status": "Situa\u00e7\u00e3o de Publica\u00e7\u00e3o", 
     "Question": "Pergunta", 
+    "Questions raise issues that need answers. Discussions share ideas and start conversations. (Required)": "Perguntas levantam quest\u00f5es que precisam de respostas. As discuss\u00f5es compartilham ideias e iniciam conversas. (Requeridos)", 
     "Queued": "Em lista de espera.", 
     "Reason": "Raz\u00e3o", 
     "Reason field should not be left blank.": "O campo de motivo n\u00e3o deve ser deixado em branco.", 
@@ -1225,6 +1230,7 @@
     "Tools": "Ferramentas", 
     "Top": "Topo", 
     "Topic": "T\u00f3picos", 
+    "Topic area": "\u00e1rea de t\u00f3picos", 
     "Topics": "T\u00f3picos", 
     "Total": "Total", 
     "Total Number": "N\u00famero Total", 
@@ -1423,6 +1429,7 @@
     "Your message must have a subject.": "A sua mensagem deve ter um t\u00edtulo.", 
     "Your policy changes have been saved.": "As altera\u00e7\u00f5es na pol\u00edtica foram salvas.", 
     "Your post will be discarded.": "Sua publica\u00e7\u00e3o ser\u00e1 descartada.", 
+    "Your question or idea (required)": "Sua pergunta ou ideia (obrigat\u00f3rio)", 
     "Your request could not be completed. Reload the page and try again.": "Seu pedido n\u00e3o p\u00f4de ser conclu\u00eddo. Recarregue a p\u00e1gina e tente novamente.", 
     "Your team could not be created.": "Sua equipe n\u00e3o p\u00f4de ser criada.", 
     "Your team could not be updated.": "Sua equipe n\u00e3o p\u00f4de ser atualizada.", 
@@ -1455,6 +1462,7 @@
     "delete chapter": "excluir cap\u00edtulo", 
     "delete group": "excluir grupo", 
     "discussion": "discuss\u00e3o", 
+    "discussion posted %(time_ago)s by %(author)s": "discuss\u00e3o postada %(time_ago)s by %(author)s", 
     "dragging": "arrastando", 
     "dragging out of slider": "Arrastando para fora da barra deslizante", 
     "dropped in slider": "solta na barra deslizante", 
@@ -1509,9 +1517,17 @@
       "{numPresent} aluno j\u00e1 estava no grupo", 
       "{numPresent} alunos j\u00e1 faziam parte do grupo"
     ], 
+    "{numResponses} response": [
+      "{numResponses} resposta", 
+      "{numResponses} respostas"
+    ], 
     "{numUsersAdded} student has been added to this cohort": [
       "{numUsersAdded} aluno foi adicionado ao grupo", 
       "{numUsersAdded} alunos foram adicionados ao grupo"
+    ], 
+    "{numVotes} Vote": [
+      "{numVotes} voto", 
+      "{numVotes} votos"
     ], 
     "{platform_name} learners can see my:": "Estudantes do {platform_name} podem visualizar meu:", 
     "\u2026": "\u2026"
