@@ -47,7 +47,7 @@
 # EdX Team <info@edx.org>, 2019.
 #
 # Translators:
-# li ying <code@eliteu.cn>, 2018
+# li ying <code@eliteu.cn>, 2019
 #
 msgid ""
 msgstr ""
@@ -55,7 +55,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
 "POT-Creation-Date: 2019-01-04 16:04+0800\n"
 "PO-Revision-Date: 2018-12-07 12:23+0000\n"
-"Last-Translator: li ying <code@eliteu.cn>, 2018\n"
+"Last-Translator: li ying <code@eliteu.cn>, 2019\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
@@ -10415,7 +10415,7 @@ msgstr "开通VIP会员，可免费观看英荔商学院全部课程。"
 
 #: membership/static/membership/js/card.js
 msgid "YYYY-MM-DD"
-msgstr ""
+msgstr "YYYY-MM-DD"
 
 #: membership/static/membership/js/card.js
 msgid "Membership opened"
@@ -10431,7 +10431,7 @@ msgstr "剩余"
 
 #: membership/static/membership/js/card.js
 msgid "Duration:"
-msgstr ""
+msgstr "起止时间："
 
 #: membership/static/membership/js/card.js
 msgid "Opened on:"
@@ -10447,7 +10447,7 @@ msgstr "会员已过期"
 
 #: membership/static/membership/js/card.js
 msgid "Renew"
-msgstr ""
+msgstr "续费"
 
 #: membership/static/membership/js/index.js
 msgid "Average per month"
@@ -10455,9 +10455,9 @@ msgstr "月均"
 
 #: membership/static/membership/js/pay.js
 msgid "Failed to pay the payment"
-msgstr ""
+msgstr "调起支付失败"
 
 #: membership/static/membership/js/result.js
 #, javascript-format
 msgid "Return to EliteMBA in %s seconds"
-msgstr ""
+msgstr "%s 秒后返回英荔商学院"
