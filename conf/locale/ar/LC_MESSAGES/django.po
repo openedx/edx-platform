@@ -15593,7 +15593,7 @@ msgstr "الفلترة:"
 #. Translators: This is a menu option for showing all forum threads unfiltered
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Show all posts"
-msgstr ""
+msgstr "عرض كل المشاركات"
 
 #. Translators: This is a menu option for showing only unread forum threads
 #: lms/templates/discussion/_thread_list_template.html

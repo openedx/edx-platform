@@ -6629,13 +6629,13 @@ msgstr "كافّة المجموعات "
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-edit.underscore
 msgid ""
 "Add a clear and descriptive title to encourage participation. (Required)"
-msgstr ""
+msgstr "أضف عنوانًا واضحًا وصفيًا لتشجيع المشاركة. (مطلوب)"
 
 #: common/static/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
 msgid "Your question or idea (required)"
-msgstr ""
+msgstr "سؤالك أو فكرتك (مطلوب)"
 
 #: common/static/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/common/templates/discussion/new-post.underscore
@@ -6872,7 +6872,7 @@ msgstr "إضافة تعليق "
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-show.underscore
 #, python-format
 msgid "discussion posted %(time_ago)s by %(author)s"
-msgstr ""
+msgstr "مناقشة نشرت %(time_ago)s by %(author)s"
 
 #: common/static/common/templates/discussion/thread-show.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-show.underscore
@@ -6919,7 +6919,7 @@ msgstr "نوع المنشور"
 msgid ""
 "Questions raise issues that need answers. Discussions share ideas and start "
 "conversations. (Required)"
-msgstr ""
+msgstr "ثير الأسئلة المشكلات التي تحتاج إلى إجابات.المناقشات تبادل الأفكار وبدء المحادثات. (مطلوب)"
 
 #: common/static/common/templates/discussion/thread-type.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-type.underscore
@@ -6955,7 +6955,7 @@ msgstr "منطقة الموضوع"
 #: test_root/staticfiles/common/templates/discussion/topic.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/topic.underscore
 msgid "Add your post to a relevant topic to help others find it. (Required)"
-msgstr ""
+msgstr "ضف مشاركتك إلى موضوع ذي صلة لمساعدة الآخرين في العثور عليه. (مطلوب)"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 #: test_root/staticfiles/discussion/templates/discussion-home.underscore

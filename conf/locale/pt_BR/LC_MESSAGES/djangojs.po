@@ -2234,8 +2234,8 @@ msgstr[1] ""
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "{numVotes} Vote"
 msgid_plural "{numVotes} Votes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{numVotes} voto"
+msgstr[1] "{numVotes} votos"
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid ""
@@ -2364,8 +2364,8 @@ msgstr[1] ""
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "{numResponses} response"
 msgid_plural "{numResponses} responses"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{numResponses} resposta"
+msgstr[1] "{numResponses} respostas"
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "Showing all responses"
@@ -6423,7 +6423,7 @@ msgstr ""
 #: test_root/staticfiles/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
 msgid "Add a Post"
-msgstr ""
+msgstr "adicionar uma postagem"
 
 #: common/static/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/common/templates/discussion/new-post.underscore
@@ -6451,13 +6451,13 @@ msgstr "Todos os grupos"
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-edit.underscore
 msgid ""
 "Add a clear and descriptive title to encourage participation. (Required)"
-msgstr ""
+msgstr "Adicione um título claro e descritivo para incentivar a participação. (Requeridos)"
 
 #: common/static/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
 msgid "Your question or idea (required)"
-msgstr ""
+msgstr "Sua pergunta ou ideia (obrigatório)"
 
 #: common/static/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/common/templates/discussion/new-post.underscore
@@ -6690,7 +6690,7 @@ msgstr "Adicionar comentário"
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-show.underscore
 #, python-format
 msgid "discussion posted %(time_ago)s by %(author)s"
-msgstr ""
+msgstr "discussão postada %(time_ago)s by %(author)s"
 
 #: common/static/common/templates/discussion/thread-show.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-show.underscore
@@ -6729,7 +6729,7 @@ msgstr "Este post está visível para todos."
 #: test_root/staticfiles/common/templates/discussion/thread-type.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-type.underscore
 msgid "Post type"
-msgstr ""
+msgstr "Tipo de postagem"
 
 #: common/static/common/templates/discussion/thread-type.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-type.underscore
@@ -6737,7 +6737,7 @@ msgstr ""
 msgid ""
 "Questions raise issues that need answers. Discussions share ideas and start "
 "conversations. (Required)"
-msgstr ""
+msgstr "Perguntas levantam questões que precisam de respostas. As discussões compartilham ideias e iniciam conversas. (Requeridos)"
 
 #: common/static/common/templates/discussion/thread-type.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-type.underscore
@@ -6767,13 +6767,13 @@ msgstr ""
 #: test_root/staticfiles/common/templates/discussion/topic.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/topic.underscore
 msgid "Topic area"
-msgstr ""
+msgstr "área de tópicos"
 
 #: common/static/common/templates/discussion/topic.underscore
 #: test_root/staticfiles/common/templates/discussion/topic.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/topic.underscore
 msgid "Add your post to a relevant topic to help others find it. (Required)"
-msgstr ""
+msgstr "Adicione sua postagem a um tópico relevante para ajudar outras pessoas a encontrá-lo. (Requeridos)"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 #: test_root/staticfiles/discussion/templates/discussion-home.underscore

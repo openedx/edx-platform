@@ -2191,7 +2191,7 @@ msgstr[0] ""
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "{numVotes} Vote"
 msgid_plural "{numVotes} Votes"
-msgstr[0] ""
+msgstr[0] "{numVotes} 票"
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid ""
@@ -2319,7 +2319,7 @@ msgstr[0] ""
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "{numResponses} response"
 msgid_plural "{numResponses} responses"
-msgstr[0] ""
+msgstr[0] "{numResponses} 回复"
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "Showing all responses"
@@ -6172,7 +6172,7 @@ msgstr ""
 #: test_root/staticfiles/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
 msgid "Add a Post"
-msgstr ""
+msgstr "添加一个讨论帖"
 
 #: common/static/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/common/templates/discussion/new-post.underscore
@@ -6200,13 +6200,13 @@ msgstr "所有分组"
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-edit.underscore
 msgid ""
 "Add a clear and descriptive title to encourage participation. (Required)"
-msgstr ""
+msgstr "添加清晰的描述性标题以鼓励参与。 （必填）"
 
 #: common/static/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
 msgid "Your question or idea (required)"
-msgstr ""
+msgstr "你的问题或想法（必填）"
 
 #: common/static/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/common/templates/discussion/new-post.underscore
@@ -6438,7 +6438,7 @@ msgstr "添加评论"
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-show.underscore
 #, python-format
 msgid "discussion posted %(time_ago)s by %(author)s"
-msgstr ""
+msgstr "讨论发布 %(time_ago)s by %(author)s"
 
 #: common/static/common/templates/discussion/thread-show.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-show.underscore
@@ -6477,7 +6477,7 @@ msgstr "此帖对所有人可见。"
 #: test_root/staticfiles/common/templates/discussion/thread-type.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-type.underscore
 msgid "Post type"
-msgstr ""
+msgstr "邮寄类型"
 
 #: common/static/common/templates/discussion/thread-type.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-type.underscore
@@ -6485,7 +6485,7 @@ msgstr ""
 msgid ""
 "Questions raise issues that need answers. Discussions share ideas and start "
 "conversations. (Required)"
-msgstr ""
+msgstr "问题提出了需要答案的问题。讨论分享想法并开始对话。 （必填）"
 
 #: common/static/common/templates/discussion/thread-type.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-type.underscore
@@ -6515,13 +6515,13 @@ msgstr "添加一条回复："
 #: test_root/staticfiles/common/templates/discussion/topic.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/topic.underscore
 msgid "Topic area"
-msgstr ""
+msgstr "主题区"
 
 #: common/static/common/templates/discussion/topic.underscore
 #: test_root/staticfiles/common/templates/discussion/topic.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/topic.underscore
 msgid "Add your post to a relevant topic to help others find it. (Required)"
-msgstr ""
+msgstr "将您的帖子添加到相关主题以帮助其他人找到它。 （必填）"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 #: test_root/staticfiles/discussion/templates/discussion-home.underscore
