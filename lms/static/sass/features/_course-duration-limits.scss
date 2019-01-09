@@ -1,0 +1,33 @@
+.course-expiration-message {
+    background-color: #d9edf7;
+    border: 1px solid darken(#d9edf7, 7%);
+    border-radius: 2px;
+    box-sizing: border-box;
+    color: #31708f;
+    line-height: 1.5;
+    margin: $baseline auto;
+    padding: 20px;
+
+    a:not(.btn) {
+        color: #245269;
+        font-weight: bold;
+        text-decoration: underline;
+
+        &:hover{
+            color: darken(#245269, 7%);
+            text-decoration: underline;
+        }
+    }
+
+    & + .page-content{
+        margin-top: 0;
+        padding-top: 0;
+        font-size: 44px !important;
+    }
+}
+.course-content .course-expiration-message{
+    max-width: $text-width-readability-max;
+}
+#discussion-container .course-expiration-message {
+    margin: $baseline 40px;
+}

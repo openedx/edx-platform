@@ -45,6 +45,7 @@ from django_comment_client.utils import (
 from django_comment_common.models import CourseDiscussionSettings
 from django_comment_common.utils import ThreadContext, get_course_discussion_settings, set_course_discussion_settings
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
+from openedx.features.course_duration_limits.access import generate_course_expired_fragment
 from student.models import CourseEnrollment
 from util.json_request import JsonResponse, expect_json
 from xmodule.modulestore.django import modulestore
@@ -718,6 +719,10 @@ class DiscussionBoardFragmentView(EdxFragmentView):
                 else None
             )
             context = _create_discussion_board_context(request, base_context, thread=thread)
+            course_expiration_fragment = generate_course_expired_fragment(request.user, context['course'])
+            context.update({
+                'course_expiration_fragment': course_expiration_fragment,
+            })
             if profile_page_context:
                 # EDUCATOR-2119: styles are hard to reconcile if the profile page isn't also a fragment
                 html = render_to_string('discussion/discussion_profile_page.html', profile_page_context)

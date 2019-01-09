@@ -12,7 +12,7 @@ from mock import patch
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.features.course_duration_limits.access import (
-    register_course_expired_message,
+    generate_course_expired_message,
     get_user_course_expiration_date,
 )
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
@@ -31,7 +31,6 @@ class TestAccess(CacheIsolationTestCase):
         CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=UTC))
         DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
 
-    @patch('openedx.features.course_duration_limits.access.PageLevelMessages')
     @ddt.data(
         *itertools.product(
             ['en-us', 'es-419'],
@@ -39,7 +38,7 @@ class TestAccess(CacheIsolationTestCase):
         )
     )
     @ddt.unpack
-    def test_register_course_expired_message(self, language, offsets, mock_messages):
+    def test_generate_course_expired_message(self, language, offsets):
         now = timezone.now()
         schedule_offset, course_offset = offsets
 
@@ -78,19 +77,11 @@ class TestAccess(CacheIsolationTestCase):
                 enrollment=enrollment,
                 upgrade_deadline=schedule_upgrade_deadline,
             )
-            request = RequestFactory().get('/courseware')
-            request.user = enrollment.user
 
             duration_limit_upgrade_deadline = get_user_course_expiration_date(enrollment.user, enrollment.course)
             self.assertIsNotNone(duration_limit_upgrade_deadline)
 
-            register_course_expired_message(request, enrollment.course)
-            self.assertEqual(
-                mock_messages.register_info_message.call_count,
-                1
-            )
-
-            message = str(mock_messages.register_info_message.call_args[0][1])
+            message = generate_course_expired_message(enrollment.user, enrollment.course)
 
             self.assertIn(format_date(duration_limit_upgrade_deadline), message)
 
