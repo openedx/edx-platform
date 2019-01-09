@@ -37,6 +37,7 @@
     @extend %btn-my-primary;
     vertical-align: inherit;
     margin-left: 5px;
+    line-height: 34px;
   }
   .u-field-title{
     color: $primary;
@@ -45,6 +46,7 @@
   }
   .u-field-value{
     vertical-align: inherit;
+    margin-left: 0;
     select{
       width: 230px;
     }

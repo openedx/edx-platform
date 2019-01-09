@@ -352,7 +352,8 @@
   .about-staff-block{
     position: relative;
     padding-left: 150px;
-    height: 110px;
+    height: auto;
+    min-height: 110px;
   }
   .about-staff-img{  
     position: absolute;
@@ -523,7 +524,9 @@
   .my-theme-course-about{
     .about-staff-block{
       height: auto;
+      min-height: unset;
       padding-left: 80px;
+      position: relative;
     }
     .about-staff div{
       margin-top: 10px;
@@ -539,9 +542,6 @@
       margin-top: 3px;
       display: inline-block;
     }
-  }
-  .professor-detail .about-staff-block{
-    height: 110px;
   }
 }
 

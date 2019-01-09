@@ -43,6 +43,9 @@
   box-sizing: border-box;
 
 }
+.settings-language-form{
+  display: none;
+}
 
 // a
 a:not(.btn):hover, a:not(.btn):focus, a:visited:not(.btn):hover, a:visited:not(.btn):focus{
