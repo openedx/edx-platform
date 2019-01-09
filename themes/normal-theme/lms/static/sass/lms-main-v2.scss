@@ -1,0 +1,14 @@
+// ------------------------------
+// LMS main styling
+// Version 2 - introduces the Pattern Library
+
+// NOTE: This is the left-to-right (LTR) configured style compile.
+// It should mirror lms-main-v2-rtl w/ the exception of bi-app references.
+
+
+// Load the RTL version of the edX Pattern Library
+
+
+@import './default/lms-main-v2';
+@import './modify/lms/extras';
+@import './modify/lms/course/course_search';

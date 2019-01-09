@@ -236,13 +236,13 @@
     cursor: pointer;
   }
   .about-tab-active {
-    border-bottom: 2px solid $bule;
+    border-bottom: 2px solid $primary;
     color: $primary;
   }
 }
 
 .my-theme-course-about{
-  font-family: $font-family-sans-serif;
+  font-family: $font-family;
   font-size: 14px;
   color: $font;
   line-height: 1.8;
@@ -366,7 +366,7 @@
     margin-right: 25px;
   }
   .about-staff-name{ 
-    color: $bule;
+    color: $primary;
     font-size: 18px;
     font-weight: bold;
     padding-top:26px;

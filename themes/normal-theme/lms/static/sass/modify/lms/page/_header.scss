@@ -38,7 +38,7 @@
   }
 }
 
-@include media-breakpoint-down(md) {  
+@media screen and (max-width:992px){ 
   .global-header .hamburger-menu{ 
     left: 5%;
   }
