@@ -4,7 +4,6 @@ from codejail.safe_exec import safe_exec as codejail_safe_exec
 from codejail.safe_exec import not_safe_exec as codejail_not_safe_exec
 from codejail.safe_exec import json_safe, SafeExecException
 from . import lazymod
-from dogapi import dog_stats_api
 from six import text_type
 
 import hashlib
@@ -74,7 +73,6 @@ def update_hash(hasher, obj):
         hasher.update(repr(obj))
 
 
-@dog_stats_api.timed('capa.safe_exec.time')
 def safe_exec(
     code,
     globals_dict,

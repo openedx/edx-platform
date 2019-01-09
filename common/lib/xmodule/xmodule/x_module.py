@@ -37,7 +37,6 @@ from xmodule.util.xmodule_django import add_webpack_to_fragment
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.asides import AsideUsageKeyV2, AsideDefinitionKeyV2
 from xmodule.exceptions import UndefinedContext
-import dogstats_wrapper as dog_stats_api
 
 from openedx.core.djangolib.markup import HTML
 
@@ -516,14 +515,6 @@ class XModuleMixin(XModuleFields, XBlock):
             child = super(XModuleMixin, self).get_child(usage_id)
         except ItemNotFoundError:
             log.warning(u'Unable to load item %s, skipping', usage_id)
-            dog_stats_api.increment(
-                "xmodule.item_not_found_error",
-                tags=[
-                    u"course_id:{}".format(usage_id.course_key),
-                    u"block_type:{}".format(usage_id.block_type),
-                    u"parent_block_type:{}".format(self.location.block_type),
-                ]
-            )
             return None
 
         if child is None:
@@ -1090,12 +1081,6 @@ class XModuleDescriptor(HTMLSnippet, ResourceTemplates, XModuleMixin):
 
     @classmethod
     def _translate(cls, key):
-        'VS[compat]'
-        if key in cls.metadata_translations:
-            dog_stats_api.increment(
-                DEPRECATION_VSCOMPAT_EVENT,
-                tags=["location:xmodule_descriptor_translate"]
-            )
         return cls.metadata_translations.get(key, key)
 
     # ================================= XML PARSING ============================
@@ -1351,13 +1336,6 @@ class MetricsMixin(object):
                 u'block_type:{}'.format(block.scope_ids.block_type),
                 u'block_family:{}'.format(block.entry_point),
             ]
-            dog_stats_api.increment(XMODULE_METRIC_NAME, tags=tags, sample_rate=XMODULE_METRIC_SAMPLE_RATE)
-            dog_stats_api.histogram(
-                XMODULE_DURATION_METRIC_NAME,
-                duration,
-                tags=tags,
-                sample_rate=XMODULE_METRIC_SAMPLE_RATE,
-            )
             log.debug(
                 "%.3fs - render %s.%s (%s)",
                 duration,
@@ -1388,13 +1366,6 @@ class MetricsMixin(object):
                 u'block_type:{}'.format(block.scope_ids.block_type),
                 u'block_family:{}'.format(block.entry_point),
             ]
-            dog_stats_api.increment(XMODULE_METRIC_NAME, tags=tags, sample_rate=XMODULE_METRIC_SAMPLE_RATE)
-            dog_stats_api.histogram(
-                XMODULE_DURATION_METRIC_NAME,
-                duration,
-                tags=tags,
-                sample_rate=XMODULE_METRIC_SAMPLE_RATE
-            )
             log.debug(
                 "%.3fs - handle %s.%s (%s)",
                 duration,

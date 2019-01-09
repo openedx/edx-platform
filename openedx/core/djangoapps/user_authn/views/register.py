@@ -6,7 +6,6 @@ import datetime
 import json
 import logging
 
-import dogstats_wrapper as dog_stats_api
 from django.conf import settings
 from django.contrib.auth import login as django_login
 from django.contrib.auth.models import User
@@ -192,8 +191,6 @@ def create_account_with_params(request, params):
             enable_notifications(user)
         except Exception:  # pylint: disable=broad-except
             log.exception("Enable discussion notifications failed for user {id}.".format(id=user.id))
-
-    dog_stats_api.increment("common.student.account_created")
 
     _track_user_registration(user, profile, params, third_party_provider)
 
