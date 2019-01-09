@@ -160,7 +160,7 @@ class AccountRecoveryForm(PasswordResetFormNoActive):
         email = self.cleaned_data["email"]
         # The line below contains the only change, getting users via AccountRecovery
         self.users_cache = User.objects.filter(
-            id__in=AccountRecovery.objects.filter(secondary_email__iexact=email).values_list('user')
+            id__in=AccountRecovery.objects.filter(secondary_email__iexact=email, is_active=True).values_list('user')
         )
 
         if not len(self.users_cache):

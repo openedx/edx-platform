@@ -759,7 +759,7 @@ def account_recovery_request_handler(request):
 
             # Check if a user exists with the given secondary email, if so then invalidate the existing oauth tokens.
             user = user if user.is_authenticated else User.objects.get(
-                id=AccountRecovery.objects.get(secondary_email__iexact=email).user.id
+                id=AccountRecovery.objects.get_active(secondary_email__iexact=email).user.id
             )
             destroy_oauth_tokens(user)
         except UserNotFound:

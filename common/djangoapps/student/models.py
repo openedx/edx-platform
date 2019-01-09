@@ -2700,6 +2700,31 @@ class LogoutViewConfiguration(ConfigurationModel):
         return u'Logout view configuration: {enabled}'.format(enabled=self.enabled)
 
 
+class AccountRecoveryManager(models.Manager):
+    """
+    Custom Manager for AccountRecovery model
+    """
+
+    def get_active(self, **filters):
+        """
+        Return only active AccountRecovery record after applying the given filters.
+
+        Arguments:
+            filters (**kwargs): Filter parameters for AccountRecovery records.
+
+        Returns:
+            AccountRecovery: AccountRecovery object with is_active=true
+        """
+        filters['is_active'] = True
+        return super(AccountRecoveryManager, self).get_queryset().get(**filters)
+
+    def activate(self):
+        """
+        Set is_active flag to True.
+        """
+        super(AccountRecoveryManager, self).get_queryset().update(is_active=True)
+
+
 class AccountRecovery(models.Model):
     """
     Model for storing information for user's account recovery in case of access loss.
@@ -2716,3 +2741,5 @@ class AccountRecovery(models.Model):
 
     class Meta(object):
         db_table = "auth_accountrecovery"
+
+    objects = AccountRecoveryManager()
