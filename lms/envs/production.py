@@ -49,9 +49,6 @@ with codecs.open(CONFIG_FILE, encoding='utf-8') as f:
 # SERVICE_VARIANT specifies name of the variant used
 SERVICE_VARIANT = os.environ.get('SERVICE_VARIANT', None)
 
-# This can be removed after Yaml config has launched successfully
-CONFIG_ROOT = path(os.environ.get('CONFIG_ROOT', ENV_ROOT))
-
 # CONFIG_PREFIX used to derive various queue names, was formerly used to locate JSON configuration files.
 CONFIG_PREFIX = SERVICE_VARIANT + "." if SERVICE_VARIANT else ""
 
