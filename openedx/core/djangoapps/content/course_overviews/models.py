@@ -187,7 +187,7 @@ class CourseOverview(TimeStampedModel):
         course_overview.enrollment_start = course.enrollment_start
         course_overview.enrollment_end = course.enrollment_end
         course_overview.enrollment_domain = course.enrollment_domain
-        course_overview.invitation_only = course.invitation_only
+        course_overview.invitation_only = course.has_invitation
         course_overview.max_student_enrollments_allowed = max_student_enrollments_allowed
 
         course_overview.catalog_visibility = course.catalog_visibility
@@ -435,6 +435,13 @@ class CourseOverview(TimeStampedModel):
         Returns whether the course has marketing url.
         """
         return settings.FEATURES.get('ENABLE_MKTG_SITE') and bool(self.marketing_url)
+
+    @property
+    def has_invitation(self):
+        """
+        Returns True if either default value or course level value is True.
+        """
+        return settings.FEATURES.get('COURSE_DEFAULT_INVITE_ONLY') or self.invitation_only
 
     def has_social_sharing_url(self):
         """

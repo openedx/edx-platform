@@ -40,7 +40,7 @@ class CourseSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
     enrollment_end = serializers.DateTimeField(format=None)
     course_start = serializers.DateTimeField(source="start", format=None)
     course_end = serializers.DateTimeField(source="end", format=None)
-    invite_only = serializers.BooleanField(source="invitation_only")
+    invite_only = serializers.BooleanField(source="has_invitation")
     course_modes = serializers.SerializerMethodField()
 
     def __init__(self, *args, **kwargs):

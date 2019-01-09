@@ -319,6 +319,9 @@ FEATURES = {
 
     # Set this to true to make API docs available at /api-docs/.
     'ENABLE_API_DOCS': False,
+
+    # Set this to manage the default value across all courses in a given deployment
+    'COURSE_DEFAULT_INVITE_ONLY': False,
 }
 
 ENABLE_JASMINE = False
