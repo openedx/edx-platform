@@ -6,6 +6,10 @@ body.view-in-course .wiki-wrapper{
   box-shadow: 0px 1px 4px 0px $border;
   border: none;
   max-width: 1200px;
+  .entry-title{
+    font-size: 18px;
+    font-weight: normal;
+  }
 }
 
 // header
@@ -232,9 +236,7 @@ textarea, form#wiki_revision .CodeMirror, input[type="text"]{
 // modify wiki
 .wiki.history{
   .entry-title{
-    font-size: 18px;
     line-height: 1.5;
-    color: $title;
   }
   .lead{
     margin-bottom: 20px;
@@ -317,8 +319,6 @@ textarea, form#wiki_revision .CodeMirror, input[type="text"]{
     display: inline-block;
   }
   .main-article .entry-title{
-    font-size: 18px;
-    font-weight: normal;
     border: none;
     margin-bottom: 10px;
   }
