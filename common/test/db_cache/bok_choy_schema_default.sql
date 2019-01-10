@@ -2182,7 +2182,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=511 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=512 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -5808,6 +5808,8 @@ CREATE TABLE `verify_student_softwaresecurephotoverification` (
   `copy_id_photo_from_id` int(11) DEFAULT NULL,
   `reviewing_user_id` int(11) DEFAULT NULL,
   `user_id` int(11) NOT NULL,
+  `expiry_date` datetime(6) DEFAULT NULL,
+  `expiry_email_date` datetime(6) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `D01dce17b91c9382bd80d4be23a3e0cf` (`copy_id_photo_from_id`),
   KEY `verify_studen_reviewing_user_id_727fae1d0bcf8aaf_fk_auth_user_id` (`reviewing_user_id`),
@@ -5817,6 +5819,8 @@ CREATE TABLE `verify_student_softwaresecurephotoverification` (
   KEY `verify_student_softwaresecurephotoverification_afd1a1a8` (`updated_at`),
   KEY `verify_student_softwaresecurephotoverification_ebf78b51` (`display`),
   KEY `verify_student_softwaresecurephotoverification_22bb6ff9` (`submitted_at`),
+  KEY `verify_student_softwaresecu_expiry_date_5c297927` (`expiry_date`),
+  KEY `verify_student_softwaresecu_expiry_email_date_6ae6d6c9` (`expiry_email_date`),
   CONSTRAINT `D01dce17b91c9382bd80d4be23a3e0cf` FOREIGN KEY (`copy_id_photo_from_id`) REFERENCES `verify_student_softwaresecurephotoverification` (`id`),
   CONSTRAINT `verify_student_softwarese_reviewing_user_id_55fd003a_fk` FOREIGN KEY (`reviewing_user_id`) REFERENCES `auth_user` (`id`),
   CONSTRAINT `verify_student_softwarese_user_id_66ca4f6d_fk` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
