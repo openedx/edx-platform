@@ -29,8 +29,7 @@ from lms.djangoapps.courseware.tests.factories import (
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
-from openedx.features.content_type_gating.helpers import CONTENT_TYPE_GATE_GROUP_IDS
-from openedx.features.content_type_gating.partitions import CONTENT_GATING_PARTITION_ID
+from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID, CONTENT_TYPE_GATE_GROUP_IDS
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date, MIN_DURATION, MAX_DURATION
 from openedx.features.course_duration_limits.config import EXPERIMENT_ID, EXPERIMENT_DATA_HOLDBACK_KEY
 from openedx.features.course_experience.tests.views.helpers import add_course_mode

@@ -7,11 +7,20 @@ from datetime import datetime, timedelta
 from logging import getLogger
 
 from django.conf import settings
+from django.utils.translation import ugettext as _
 from pytz import UTC
 
 from courseware.access_response import AccessResponse, StartDateError
-from courseware.masquerade import get_course_masquerade, is_masquerading_as_student
+from courseware.masquerade import (
+    get_course_masquerade,
+    is_masquerading_as_specific_student,
+    is_masquerading_as_student
+)
+from crum import get_current_request
+from openedx.core.djangoapps.util.user_messages import PageLevelMessages
+from openedx.core.djangolib.markup import HTML
 from openedx.features.course_experience import COURSE_PRE_START_ACCESS_FLAG
+from student.role_helpers import has_staff_roles
 from student.roles import CourseBetaTesterRole
 from xmodule.util.xmodule_django import get_current_request_hostname
 
@@ -61,16 +70,29 @@ def check_start_date(user, days_early_for_beta, start, course_key):
         AccessResponse: Either ACCESS_GRANTED or StartDateError.
     """
     start_dates_disabled = settings.FEATURES['DISABLE_START_DATES']
-    if start_dates_disabled and not is_masquerading_as_student(user, course_key):
+    masquerading_as_student = is_masquerading_as_student(user, course_key)
+    masquerading_as_specific_student = is_masquerading_as_specific_student(user, course_key)
+
+    if start_dates_disabled and not masquerading_as_student:
         return ACCESS_GRANTED
     else:
         now = datetime.now(UTC)
-        if start is None or in_preview_mode() or get_course_masquerade(user, course_key):
+        if start is None or in_preview_mode():
             return ACCESS_GRANTED
 
         effective_start = adjust_start_date(user, days_early_for_beta, start, course_key)
         if now > effective_start:
             return ACCESS_GRANTED
+
+        if get_course_masquerade(user, course_key):
+            if masquerading_as_student or (masquerading_as_specific_student and not has_staff_roles(user, course_key)):
+                request = get_current_request()
+                PageLevelMessages.register_warning_message(
+                    request,
+                    HTML(_('This user does not have access to this content due to the content start date')),
+                    once_only=True
+                )
+                return ACCESS_GRANTED
 
         return StartDateError(start)
 

@@ -11,7 +11,7 @@ from operator import itemgetter
 from contentstore.utils import reverse_course_url, reverse_usage_url
 from contentstore.course_group_config import GroupConfiguration, CONTENT_GROUP_CONFIGURATION_NAME
 from contentstore.tests.utils import CourseTestCase
-from openedx.features.content_type_gating.partitions import CONTENT_GATING_PARTITION_ID
+from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID
 from xmodule.partitions.partitions import Group, UserPartition, ENROLLMENT_TRACK_PARTITION_ID
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.validation import StudioValidation, StudioValidationMessage
