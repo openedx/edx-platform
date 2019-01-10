@@ -68,6 +68,7 @@ cssutils==1.0.2           # via pynliner
 ddt==1.2.0
 decorator==4.3.0          # via dogapi, pycontracts
 defusedxml==0.4.1
+django-aliyun-oss2-storage==0.1.5
 django-appconf==1.0.2     # via django-statici18n
 django-babel-underscore==0.5.2
 django-babel==0.6.2       # via django-babel-underscore
