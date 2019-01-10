@@ -4,7 +4,7 @@
 #
 #    make upgrade
 #
-git+https://github.com/ipython/ipython.git@1ba246d740cd242e377d722630a909d85433c313#egg-ipython==5.0.0
+-e git+https://github.com/ipython/ipython.git@1ba246d740cd242e377d722630a909d85433c313#egg-ipython==5.0.0
 -e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
 -e common/lib/calc
 -e common/lib/capa
