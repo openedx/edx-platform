@@ -17,6 +17,7 @@ from .common import *
 
 from openedx.core.lib.derived import derive_settings  # pylint: disable=wrong-import-order
 from openedx.core.lib.logsettings import get_logger_config  # pylint: disable=wrong-import-order
+from django.core.exceptions import ImproperlyConfigured # pylint: disable=wrong-import-order
 
 def get_env_setting(setting):
     """ Get the environment setting or return exception """
