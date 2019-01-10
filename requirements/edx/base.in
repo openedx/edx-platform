@@ -81,6 +81,7 @@ edx-milestones
 edx-oauth2-provider
 edx-organizations
 edx-proctoring>=1.5.0
+edx-proctoring-proctortrack
 edx-rest-api-client
 edx-search
 edx-submissions
