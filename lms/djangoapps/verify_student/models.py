@@ -536,6 +536,13 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
     IMAGE_LINK_DURATION = 5 * 60 * 60 * 24  # 5 days in seconds
     copy_id_photo_from = models.ForeignKey("self", null=True, blank=True, on_delete=models.CASCADE)
 
+    # Fields for functionality of sending email when verification expires
+    # expiry_date: The date when the SoftwareSecurePhotoVerification will expire
+    # expiry_email_date: This field is used to maintain a check for learners to which email
+    # to notify for expired verification is already sent.
+    expiry_date = models.DateTimeField(null=True, blank=True, db_index=True)
+    expiry_email_date = models.DateTimeField(null=True, blank=True, db_index=True)
+
     @classmethod
     def get_initial_verification(cls, user, earliest_allowed_date=None):
         """Get initial verification for a user with the 'photo_id_key'.
