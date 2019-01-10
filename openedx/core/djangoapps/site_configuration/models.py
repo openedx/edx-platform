@@ -59,6 +59,10 @@ class SiteConfiguration(models.Model):
         # fix for a bug with some pages requiring uppercase platform_name variable
         self.values['PLATFORM_NAME'] = self.values.get('platform_name', '')
 
+        # Set the default language code for new sites if missing
+        # TODO: Move it to somewhere else like in AMC
+        self.values['LANGUAGE_CODE'] = self.values.get('LANGUAGE_CODE', 'en')
+
         super(SiteConfiguration, self).save(**kwargs)
 
         # recompile SASS on every save
