@@ -31,6 +31,14 @@ from .common import *
 from openedx.core.lib.derived import derive_settings  # pylint: disable=wrong-import-order
 from openedx.core.lib.logsettings import get_logger_config  # pylint: disable=wrong-import-order
 
+def get_env_setting(setting):
+    """ Get the environment setting or return exception """
+    try:
+        return os.environ[setting]
+    except KeyError:
+        error_msg = "Set the %s env variable" % setting
+        raise ImproperlyConfigured(error_msg)
+
 # A file path to a YAML file from which to load all the configuration for the edx platform
 CONFIG_FILE = get_env_setting('LMS_CFG')
 
