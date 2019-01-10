@@ -70,7 +70,7 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
         self.instructor.save()
 
         # verify that proctoring tab is visible for global staff
-        self._assert_proctoring_tab_is_available()
+        self._assert_proctoring_tab_available(True)
 
     @ddt.data(
         (True, False),
@@ -89,14 +89,12 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
 
         # verify that proctoring tab is visible for course staff
         CourseStaffRole(self.course.id).add_users(self.instructor)
-        self._assert_proctoring_tab_is_available()
+        self._assert_proctoring_tab_available(True)
 
         # verify that proctoring tab is visible for course instructor
         CourseStaffRole(self.course.id).remove_users(self.instructor)
         CourseInstructorRole(self.course.id).add_users(self.instructor)
-        response = self._assert_proctoring_tab_is_available()
-        # the default backend does not support the review dashboard
-        self.assertNotIn('Review Dashboard', response.content)
+        self._assert_proctoring_tab_available(True)
 
     @ddt.data(
         (True, False),
@@ -112,10 +110,7 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
 
         self.instructor.is_staff = False
         self.instructor.save()
-
-        response = self.client.get(self.url)
-        self.assertNotIn(self.proctoring_link, response.content)
-        self.assertNotIn('Allowance Section', response.content)
+        self._assert_proctoring_tab_available(False)
 
     @patch.dict(settings.FEATURES, {'ENABLE_SPECIAL_EXAMS': False})
     @ddt.data(
@@ -132,16 +127,17 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
 
         self.instructor.is_staff = True
         self.instructor.save()
-
-        response = self.client.get(self.url)
-        self.assertNotIn(self.proctoring_link, response.content)
-        self.assertNotIn('Allowance Section', response.content)
+        self._assert_proctoring_tab_available(False)
 
     def test_review_dashboard(self):
         """
         The exam review dashboard will appear for backends that support the feature
         """
         self.setup_course(True, True)
+        response = self.client.get(self.url)
+        # the default backend does not support the review dashboard
+        self.assertNotIn('Review Dashboard', response.content)
+
         backend = TestBackendProvider()
         config = apps.get_app_config('edx_proctoring')
         with patch.object(config, 'backends', {'test': backend}):
@@ -152,14 +148,14 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
                 time_limit_mins=10,
                 backend='test',
             )
-            response = self._assert_proctoring_tab_is_available()
+            response = self.client.get(self.url)
             self.assertIn('Review Dashboard', response.content)
 
-    def _assert_proctoring_tab_is_available(self):
+    def _assert_proctoring_tab_available(self, available):
         """
-        Asserts that proctoring tab is available for logged in user.
+        Asserts that proctoring tab is/is not available for logged in user.
         """
+        func = self.assertIn if available else self.assertNotIn
         response = self.client.get(self.url)
-        self.assertIn(self.proctoring_link, response.content)
-        self.assertIn('Allowance Section', response.content)
-        return response
+        func(self.proctoring_link, response.content)
+        func('proctoring-wrapper', response.content)
