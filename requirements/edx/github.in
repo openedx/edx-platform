@@ -61,7 +61,6 @@
 # Python libraries to install directly from github
 
 # Third-party:
-git+https://github.com/ipython/ipython.git@1ba246d740cd242e377d722630a909d85433c313#egg-ipython==5.0.0
 -e git+https://github.com/jazzband/django-pipeline.git@d068a019169c9de5ee20ece041a6dea236422852#egg=django-pipeline==1.5.3
 -e git+https://github.com/edx/django-wiki.git@v0.0.20#egg=django-wiki
 -e git+https://github.com/edx/django-openid-auth.git@0.15.1#egg=django-openid-auth==0.15.1
