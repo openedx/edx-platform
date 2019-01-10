@@ -242,7 +242,7 @@ class Command(BaseCommand):
                     # since they should have been converted to use enrollment tracks instead.
                     # Taken from contentstore/views/course.py.remove_content_or_experiment_group
                     usages = GroupConfiguration.get_partitions_usage_info(module_store, course)
-                    used = group_id in usages
+                    used = group_id in usages[partition.id]
                     if used:
                         errors.append("Content group '%s' is in use and cannot be deleted."
                                       % partition_to_delete.group_id)

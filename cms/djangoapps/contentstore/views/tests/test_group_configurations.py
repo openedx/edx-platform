@@ -9,9 +9,10 @@ from mock import patch
 from operator import itemgetter
 
 from contentstore.utils import reverse_course_url, reverse_usage_url
-from contentstore.course_group_config import GroupConfiguration, CONTENT_GROUP_CONFIGURATION_NAME
+from contentstore.course_group_config import GroupConfiguration, CONTENT_GROUP_CONFIGURATION_NAME, ENROLLMENT_SCHEME
 from contentstore.tests.utils import CourseTestCase
 from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID
+from openedx.features.content_type_gating.partitions import CONTENT_TYPE_GATING_SCHEME
 from xmodule.partitions.partitions import Group, UserPartition, ENROLLMENT_TRACK_PARTITION_ID
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.validation import StudioValidation, StudioValidationMessage
@@ -650,7 +651,7 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
         self.assertEqual(len(user_partititons), 2)
         self.assertEqual(user_partititons[0].name, 'Name 0')
 
-    @ddt.data('content_type_gate', 'enrollment_track')
+    @ddt.data(CONTENT_TYPE_GATING_SCHEME, ENROLLMENT_SCHEME)
     def test_cannot_create_restricted_group_configuration(self, scheme_id):
         """
         Test that you cannot create a restricted group configuration.
@@ -665,8 +666,8 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
         self.assertEqual(response.status_code, 400)
 
     @ddt.data(
-        ('content_type_gate', CONTENT_GATING_PARTITION_ID),
-        ('enrollment_track', ENROLLMENT_TRACK_PARTITION_ID),
+        (CONTENT_TYPE_GATING_SCHEME, CONTENT_GATING_PARTITION_ID),
+        (ENROLLMENT_SCHEME, ENROLLMENT_TRACK_PARTITION_ID),
     )
     @ddt.unpack
     def test_cannot_edit_restricted_group_configuration(self, scheme_id, partition_id):
@@ -1119,6 +1120,48 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
 
         actual = GroupConfiguration.get_content_groups_items_usage_info(self.store, self.course)
         self.assertEqual(actual.keys(), [0])
+
+    def test_can_handle_duplicate_group_ids(self):
+        # Create the user partitions
+        self.course.user_partitions = [
+            UserPartition(
+                id=0,
+                name='Cohort user partition 1',
+                scheme=UserPartition.get_scheme('cohort'),
+                description='Cohorted user partition',
+                groups=[
+                    Group(id=2, name="Group 1A"),
+                    Group(id=3, name="Group 1B"),
+                ],
+            ),
+            UserPartition(
+                id=1,
+                name='Cohort user partition 2',
+                scheme=UserPartition.get_scheme('cohort'),
+                description='Random user partition',
+                groups=[
+                    Group(id=2, name="Group 2A"),
+                    Group(id=3, name="Group 2B"),
+                ],
+            ),
+        ]
+        self.store.update_item(self.course, ModuleStoreEnum.UserID.test)
+
+        # Assign group access rules for multiple partitions, one of which is a cohorted partition
+        self._create_problem_with_content_group(0, 2, name_suffix='0')
+        self._create_problem_with_content_group(1, 3, name_suffix='1')
+
+        # This used to cause an exception since the code assumed that
+        # only one partition would be available.
+        actual = GroupConfiguration.get_partitions_usage_info(self.store, self.course)
+        self.assertEqual(actual.keys(), [0, 1])
+        self.assertEqual(actual[0].keys(), [2])
+        self.assertEqual(actual[1].keys(), [3])
+
+        actual = GroupConfiguration.get_content_groups_items_usage_info(self.store, self.course)
+        self.assertEqual(actual.keys(), [0, 1])
+        self.assertEqual(actual[0].keys(), [2])
+        self.assertEqual(actual[1].keys(), [3])
 
 
 class GroupConfigurationsValidationTestCase(CourseTestCase, HelperMethods):

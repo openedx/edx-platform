@@ -22,6 +22,8 @@ from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITIO
 
 LOG = logging.getLogger(__name__)
 
+CONTENT_TYPE_GATING_SCHEME = "content_type_gate"
+
 
 def create_content_gating_partition(course):
     """
@@ -34,9 +36,12 @@ def create_content_gating_partition(course):
         return None
 
     try:
-        content_gate_scheme = UserPartition.get_scheme("content_type_gate")
+        content_gate_scheme = UserPartition.get_scheme(CONTENT_TYPE_GATING_SCHEME)
     except UserPartitionError:
-        LOG.warning("No 'content_type_gate' scheme registered, ContentTypeGatingPartitionScheme will not be created.")
+        LOG.warning(
+            "No %r scheme registered, ContentTypeGatingPartitionScheme will not be created.",
+            CONTENT_TYPE_GATING_SCHEME
+        )
         return None
 
     used_ids = set(p.id for p in course.user_partitions)
@@ -45,11 +50,11 @@ def create_content_gating_partition(course):
         # partition with id 51, it will collide with the Content Gating Partition. We'll catch that here, and
         # then fix the course content as needed (or get the course team to).
         LOG.warning(
-            "Can't add 'content_type_gate' partition, as ID {id} is assigned to {partition} in course {course}.".format(
-                id=CONTENT_GATING_PARTITION_ID,
-                partition=_get_partition_from_id(course.user_partitions, CONTENT_GATING_PARTITION_ID).name,
-                course=unicode(course.id)
-            )
+            "Can't add %r partition, as ID %r is assigned to %r in course %s.",
+            CONTENT_TYPE_GATING_SCHEME,
+            CONTENT_GATING_PARTITION_ID,
+            _get_partition_from_id(course.user_partitions, CONTENT_GATING_PARTITION_ID).name,
+            unicode(course.id),
         )
         return None
 
