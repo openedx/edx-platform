@@ -275,6 +275,32 @@
     margin: 0;
   }
 }
+
+.dashboard-notifications{
+  text-align: center;
+
+  .activation-message-container{
+    min-width: 0;
+    display: inline-block;
+    width: auto;
+    padding-top: 20px;
+  }
+  .account-activation.success{
+    background-color: #f6fffc !important;
+    box-shadow: 0px 1px 4px 0px rgba(55, 197, 145, 0.36);
+    border: none;
+    padding: 0 26px 0 10px;
+    .message-title, .message-copy{
+      color: $font;
+      display: inline-block;
+      margin-bottom: 0;
+      font-weight: normal;
+    }
+    .message-copy::before{
+      margin-top: 0;
+    }
+  }
+} 
 .dashboard .main-container .my-courses .course .details .course-actions .action{
   display: none;
 }

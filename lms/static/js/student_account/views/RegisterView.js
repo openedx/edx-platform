@@ -176,6 +176,7 @@
                         inputTipSelectorsHidden = ['tip error hidden', 'tip tip-input hidden'],
                         onInputFocus = function() {
                             // Apply on focus styles to input
+                            // In safari, when first go to page A, then go to page B, and return to page A. Page A will not refresh.
                             $(this).find('label').addClass('focus-in')
                                 .removeClass('focus-out');
 
@@ -278,12 +279,6 @@
                     // In chrome, after remember password, remove default username and password.
                     $('#register-username').attr('autocomplete', 'off');
                     $('#register-password').attr('autocomplete', 'new-password');
-
-                    // In safari, when first go to page A, then go to page B, and return to page A. Page A will not refresh.
-                    window.addEventListener('popstate', function() {
-                        $('#main').click();
-                    }, false);
-                    
                     
                 },
 
