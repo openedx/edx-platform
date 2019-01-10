@@ -23,6 +23,7 @@ from openedx.core.release import RELEASE_LINE
 # Unlike in prod, we use the JSON files stored in this repo.
 # This is a convenience for ensuring (a) that we can consistently find the files
 # and (b) that the files are the same in Jenkins as in local dev.
+
 if 'BOK_CHOY_HOSTNAME' in os.environ:
     os.environ['SERVICE_VARIANT'] = 'bok_choy_docker'
 else:
