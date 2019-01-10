@@ -831,7 +831,7 @@ def _update_pagination_context(request):
     """
     Updates session with posted value
     """
-    error_msg = _(u'A non zero postive integar is expected')
+    error_msg = _(u'A non zero positive integer is expected')
     try:
         videos_per_page = int(request.POST.get('value'))
         if videos_per_page <= 0:
