@@ -1,5 +1,7 @@
 """ Overrides for Docker-based devstack. """
 
+from openedx.core.lib.derived import derive_settings  # pylint: disable=wrong-import-order
+
 from .devstack import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
 # Docker does not support the syslog socket at /dev/log. Rely on the console.
@@ -79,3 +81,7 @@ COURSE_CATALOG_API_URL = 'http://edx.devstack.discovery:18381/api/v1/'
 # Uncomment the lines below if you'd like to see SQL statements in your devstack LMS log.
 # LOGGING['handlers']['console']['level'] = 'DEBUG'
 # LOGGING['loggers']['django.db.backends'] = {'handlers': ['console'], 'level': 'DEBUG', 'propagate': False}
+
+########################## Derive Any Derived Settings  #######################
+
+derive_settings(__name__)
