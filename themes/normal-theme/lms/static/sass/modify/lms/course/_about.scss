@@ -124,6 +124,7 @@
           float: none;
           margin: 0;
           padding: 0;
+          font-family: $font-family;
           &:hover{
             opacity: 1;
           }
@@ -447,6 +448,10 @@
   margin-left: 0;
 }	
 
+.video-js .vjs-control:focus{
+  text-shadow: none;
+  box-shadow: none;
+}
 
 .about-cover{
   width: 100%;
@@ -456,13 +461,19 @@
   top: 0;
   left: 0;
   z-index: 100;
+  &:hover{
+    .fa-my-close{
+      opacity: 1;
+    }
+  }
 
   .fa-my-close{
     position: absolute;
     top: 10%;
     right: 10%;
-    transform: scale(2);
+    transform: scale(1.2);
     cursor: pointer;
+    opacity: 0.4;
   }
 }
 
@@ -547,6 +558,9 @@
       margin-top: 3px;
       display: inline-block;
     }
+  }
+  .about-cover .fa-my-close{
+    transform: scale(1);
   }
 }
 
