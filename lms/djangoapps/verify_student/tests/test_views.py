@@ -1764,6 +1764,17 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         """
         Test for verification passed.
         """
+        expiry_date = datetime.now(pytz.UTC) + timedelta(
+            days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
+        )
+        verification = SoftwareSecurePhotoVerification.objects.create(user=self.user)
+        verification.mark_ready()
+        verification.submit()
+        verification.approve()
+        verification.expiry_date = datetime.now(pytz.UTC)
+        verification.expiry_email_date = datetime.now(pytz.UTC)
+        verification.save()
+
         data = {
             "EdX-ID": self.receipt_id,
             "Result": "PASS",
@@ -1778,7 +1789,11 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
             HTTP_DATE='testdate'
         )
         attempt = SoftwareSecurePhotoVerification.objects.get(receipt_id=self.receipt_id)
+        old_verification = SoftwareSecurePhotoVerification.objects.get(pk=verification.pk)
         self.assertEqual(attempt.status, u'approved')
+        self.assertEqual(attempt.expiry_date.date(), expiry_date.date())
+        self.assertIsNone(old_verification.expiry_date)
+        self.assertIsNone(old_verification.expiry_email_date)
         self.assertEquals(response.content, 'OK!')
         self.assertEqual(len(mail.outbox), 1)
 
