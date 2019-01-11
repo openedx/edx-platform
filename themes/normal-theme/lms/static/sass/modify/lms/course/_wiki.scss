@@ -6,6 +6,10 @@ body.view-in-course .wiki-wrapper{
   box-shadow: 0px 1px 4px 0px $border;
   border: none;
   max-width: 1200px;
+  .entry-title{
+    font-size: 18px;
+    font-weight: normal;
+  }
 }
 
 // header
@@ -229,6 +233,54 @@ textarea, form#wiki_revision .CodeMirror, input[type="text"]{
   background: #fff;
 }
 
+// modify wiki
+.wiki.history{
+  .entry-title{
+    line-height: 1.5;
+  }
+  .lead{
+    margin-bottom: 20px;
+  }
+  .pull-right{
+    margin: 0 !important;
+  }
+  .previewRevisionButton{
+    vertical-align: middle !important;
+  }
+  .modal .modal-header p{
+    margin: 5px 12px 10px;
+  }
+  .fa-info-circle{
+    vertical-align: middle;
+  }
+}
+
+// delete a wiki 
+.wiki-wrapper section.wiki .delete{
+  .page-header{
+    font-size: 18px;
+    font-weight: normal;
+  }
+  .lead{
+    padding: 0 20px;
+  }
+  form{
+    padding: 0 20px 20px;
+  }
+  #div_id_confirm{
+    margin: 10px 0;
+    label{
+      font-size: 14px;
+    }
+  }
+  #hint_id_purge{
+    display: inline-block;
+    width: 90%;
+    vertical-align: text-top;
+    margin: 2px 0 0 10px;
+  }
+}
+
 @media screen and (max-width:767px){
   .wiki-wrapper section.wiki{
     .main-article{
@@ -265,6 +317,17 @@ textarea, form#wiki_revision .CodeMirror, input[type="text"]{
   }
   .controls{
     display: inline-block;
+  }
+  .main-article .entry-title{
+    border: none;
+    margin-bottom: 10px;
+  }
+  .page-header{
+    padding: 0;
+    margin-bottom: 15px;
+  }
+  #id_owner_username{
+    vertical-align: inherit;
   }
 }
 

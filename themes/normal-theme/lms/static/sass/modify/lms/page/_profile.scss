@@ -223,7 +223,7 @@
     box-shadow: none;
   }
   .card-logo{
-    background-image: url("../images/certificates/red-certificate.png");
+    background-image: url('/static/normal-theme/images/certificates/red-certificate.png') !important;
   }
   .card-title{
     font-weight: normal;
@@ -260,3 +260,9 @@
     }
   }
 }
+
+/*
+.verification-process .pay-and-verify .tip .is-expandable .title-expand, .verification-process .incourse-reverify .tip .is-expandable .title-expand, .verification-process .reverify .tip .is-expandable .title-expand{
+  color: #fff !important;
+}
+*/
