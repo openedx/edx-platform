@@ -135,4 +135,7 @@
     <% if( form === 'login' && name === 'password' ) { %>
         <button type="button" class="forgot-password field-link"><%- gettext("Forgot password?") %></button>
     <% } %>
+    <% if( form === 'login' && name === 'password' ) { %>
+        <button type="button" class="account-recovery field-link"><%- gettext("Lost account access?") %></button>
+    <% } %>
 </div>
