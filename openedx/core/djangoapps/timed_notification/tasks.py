@@ -1,7 +1,10 @@
 import logging
 from datetime import datetime, timedelta, date
 from pytz import utc
-from openedx.core.djangoapps.timed_notification.core import send_course_notification_email, get_course_first_chapter_link
+from openedx.core.djangoapps.timed_notification.core import \
+    send_course_notification_email, \
+    get_course_link, \
+    get_course_first_chapter_link
 from lms.djangoapps.branding import get_visible_courses
 from common.lib.mandrill_client.client import MandrillClient
 from nodebb.helpers import get_community_url
@@ -28,6 +31,7 @@ def task_course_notifications():
         context = {}
         course_name = course.display_name
         course_discussion_url = "{}/category/{}".format(settings.NODEBB_ENDPOINT, get_community_url(course.id))
+        course_url = get_course_link(course_id=course.id)
 
         # create context when 7 days left to course start
         if course_start_date - timedelta(days=7) == date_now:
