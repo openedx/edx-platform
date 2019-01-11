@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-01-04 16:04+0800\n"
-"PO-Revision-Date: 2019-01-04 08:04:48.237651\n"
+"POT-Creation-Date: 2019-01-04 10:36+0800\n"
+"PO-Revision-Date: 2019-01-04 02:36:20.837438\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -10360,7 +10360,7 @@ msgid "Become a VIP member and watch all EliteMBA courses for free"
 msgstr ""
 
 #: membership/static/membership/js/card.js
-msgid "YYYY-MM-DD"
+msgid "DD/MM/YYYY"
 msgstr ""
 
 #: membership/static/membership/js/card.js
@@ -10376,7 +10376,13 @@ msgid "Remaining days"
 msgstr ""
 
 #: membership/static/membership/js/card.js
-msgid "Duration:"
+msgctxt "Membership"
+msgid "Opened:"
+msgstr ""
+
+#: membership/static/membership/js/card.js
+msgctxt "Membership"
+msgid "Expire:"
 msgstr ""
 
 #: membership/static/membership/js/card.js
@@ -10404,6 +10410,5 @@ msgid "Failed to pay the payment"
 msgstr ""
 
 #: membership/static/membership/js/result.js
-#, javascript-format
-msgid "Return to EliteMBA in %s seconds"
+msgid "Return to EliteMBA in {second} seconds"
 msgstr ""
