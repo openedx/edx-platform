@@ -74,7 +74,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-01-11 14:07+0800\n"
+"POT-Creation-Date: 2019-01-04 10:36+0800\n"
 "PO-Revision-Date: 2018-12-07 12:23+0000\n"
 "Last-Translator: li ying <code@eliteu.cn>, 2019\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)\n"
@@ -10682,9 +10682,9 @@ msgstr "请提供有效的用户名或包含“”的URL"
 #: openedx/core/djangoapps/user_api/accounts/views.py
 #: openedx/core/djangoapps/user_authn/views/login.py
 msgid ""
-"This account has been temporarily locked due to excessive login failures. "
-"Try again later."
-msgstr "由于登录失败次数过多，该账户暂时被锁定，请稍后再试。"
+"Due to multiple login failures, the account is temporarily locked. Please "
+"try again after 15 minutes."
+msgstr "由于登录失败次数过多，该账号暂时被锁定，请于15分钟后再次尝试登录。"
 
 #: openedx/core/djangoapps/user_api/accounts/views.py
 #: openedx/core/djangoapps/user_authn/views/login.py
@@ -11229,10 +11229,9 @@ msgstr "如果您对分享您的数据有顾虑，请联系您的{enterprise_cus
 msgid ""
 "We are sorry, you are not authorized to access {platform_name} via this "
 "channel. Please contact your learning administrator or manager in order to "
-"access {platform_name}.{line_break}{line_break}Error "
-"Details:{line_break}{error_message}"
+"access {platform_name}.{line_break}{line_break}"
 msgstr ""
-"非常抱歉，您无权通过此渠道访问{platform_name}。请向您的学习管理员或协调员寻求帮助访问{platform_name}。{line_break}{line_break}错误详情：{line_break}{error_message}"
+"非常抱歉，您无权通过此渠道访问{platform_name}。请向您的学习管理员或协调员寻求帮助访问{platform_name}。{line_break}{line_break}"
 
 #: openedx/features/enterprise_support/utils.py
 #, python-brace-format
