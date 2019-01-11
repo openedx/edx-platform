@@ -200,9 +200,14 @@
       }
     }
 
-    .share-weixin:hover{
+    .share-weixin{
       .qrcode-block{
         display: block;
+      }
+    }
+    .share-weixin.hidden{
+      .qrcode-block{
+        display: none;
       }
     }
   }

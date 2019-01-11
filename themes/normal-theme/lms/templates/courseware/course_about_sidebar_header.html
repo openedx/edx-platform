@@ -105,9 +105,9 @@ import urllib
         <span class="icon fa-my fa-my-qzone" aria-hidden="true"></span><span class="sr">${_("qq")}</span>
       </a>
 
-      <a class="share share-weixin">
+      <a onClick=""  class="share share-weixin">
         <span class="icon fa-my fa-my-weixin" aria-hidden="true"></span><span class="sr">${_("weixin")}</span>
-        <div class="qrcode-block">
+        <div class="qrcode-block hidden">
             <div class="qrcode-text">
                 <p>${_(u"WeChat Scan Code")}</p>
                 <p>${_(u"Share your experience by clicking the button on the above right corner of the screen")}</p>
@@ -117,8 +117,6 @@ import urllib
         </div>
         
       </a>
-      
-        
       <script src="/static/normal-theme/js/certificates/qrcode.js"></script>
       <script type="text/javascript">
         new QRCode(document.getElementById("wechat-qrcode"), {
@@ -126,6 +124,25 @@ import urllib
             width: 130,
             height: 130,
         });
+        
+        if (/(iPhone|iPad|iPod|iOS)/i.test(navigator.userAgent)) {
+            $('body').click(function(e){
+                if (!$('.qrcode-block').hasClass('hidden') && !($(e.target).hasClass('share-weixin') || $(e.target).hasClass('fa-my-weixin')) && $(e.target).parents('.qrcode-block').length <= 0){
+                    $('.qrcode-block').addClass('hidden')
+                }
+            })
+            $('.share-weixin').click(function(){
+                $('.qrcode-block').removeClass('hidden');
+            })
+            document.body.addEventListener('touchstart',function(){},false);
+            document.body.style = 'cursor:pointer;'
+        } else {
+            $('.share-weixin').hover(function(){
+                $('.qrcode-block').removeClass('hidden')
+            },function(){
+                $('.qrcode-block').addClass('hidden')
+            })
+        }
       </script>
   </div>
   % endif
