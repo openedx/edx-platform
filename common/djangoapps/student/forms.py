@@ -43,7 +43,7 @@ def send_password_reset_email_for_user(user, request):
         'reset_link': '{protocol}://{site}{link}'.format(
             protocol='https' if request.is_secure() else 'http',
             site=configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME),
-            link=reverse('password_reset_confirm', kwargs={
+            link=reverse('password_reset_change', kwargs={
                 'uidb36': int_to_base36(user.id),
                 'token': default_token_generator.make_token(user),
             }),

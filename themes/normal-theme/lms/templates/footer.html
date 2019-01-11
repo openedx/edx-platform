@@ -86,7 +86,7 @@ binding = remind_users_to_bind_phones(request)
       <div>${_(u"WeChat Scan Code")}<br />${_(u"Get the Coupon")}</div>
     </div>
   </div>
-  <div class="footer-text">© 2018 ${_(u"Guangdong Elite International Education & Technology Co., Ltd.    All Rights Reserved")} <a href="http://www.miitbeian.gov.cn" target="_blank">粤ICP备13044168号-5</a></div>
+  <div class="footer-text">© ${datetime.now(pytz.timezone(settings.TIME_ZONE)).year} ${_(u"Guangdong Elite International Education & Technology Co., Ltd.    All Rights Reserved")} <a href="http://www.miitbeian.gov.cn" target="_blank">粤ICP备13044168号-5</a></div>
 </div>
 <div class="phone-dialog" style="display:none;">
   <div class="dialog-mask">

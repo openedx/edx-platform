@@ -53,7 +53,7 @@ class QQOAuth2(BaseOAuth2):
         })
         content = response.content.decode()
         data = json.loads(content[10:-3])
-        return data['openid']
+        return data['unionid']
 
     def user_data(self, access_token, *args, **kwargs):
         openid = self.get_openid(access_token)
@@ -64,7 +64,7 @@ class QQOAuth2(BaseOAuth2):
                 'openid': openid
             }
         )
-        response['openid'] = openid
+        response['unionid'] = openid
         return response
 
     def request_access_token(self, url, data, *args, **kwargs):

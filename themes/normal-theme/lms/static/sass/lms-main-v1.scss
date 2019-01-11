@@ -1,0 +1,20 @@
+// LMS - CSS application architecture
+// Version 1 styling (pre-Pattern Library)
+// ====================
+
+@import './default/lms-main-v1';
+@import './modify/lms/extras';
+
+@import './modify/lms/page/login';
+@import './modify/lms/page/home';
+@import './modify/lms/page/search';
+@import './modify/lms/page/dashboard';
+@import './modify/lms/page/professor';
+
+@import './modify/lms/course/about';
+
+@import './modify/lms/footer/about_us';
+@import './modify/lms/footer/contact';
+@import './modify/lms/footer/join_us';
+@import './modify/lms/footer/user_agreement';
+@import './modify/lms/footer/manual';

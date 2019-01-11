@@ -10,6 +10,7 @@ this file from your theme's repository.
 <%namespace name='static' file='static_content.html'/>
 <%include file="${static.get_template_path(relative_path='header/header.html')}"  args="online_help_token=online_help_token"  />
 <%block name="head_extra">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0,minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <meta content="telephone=no,email=no" name="format-detection" />
 </%block>
