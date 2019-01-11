@@ -38,7 +38,8 @@ def task_course_notifications():
             template = MandrillClient.COURSE_EARLY_WELCOME_TEMPLATE
             context = {
                 'course_name': course_name,
-                'course_discussion_URL': course_discussion_url
+                'course_discussion_URL': course_discussion_url,
+                'course_url': course_url
             }
 
         # create context when when 2 days left to course start
@@ -46,7 +47,8 @@ def task_course_notifications():
             template = MandrillClient.COURSE_START_REMINDER_TEMPLATE
             context = {
                 'course_name': course_name,
-                'course_discussion_URL': course_discussion_url
+                'course_discussion_URL': course_discussion_url,
+                'course_url': course_url
             }
 
         # create context on the day the course starts
