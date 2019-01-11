@@ -60,3 +60,5 @@ try:
 except ImportError:
     log.info("Sentry Module Import Error")
 
+# CourseSearch
+SEARCH_SORT = ENV_TOKENS.get('SEARCH_SORT', None)

@@ -50,7 +50,7 @@
       color: #ccd1d9;
     }
     .error .label-text{
-      color: #D8353E;
+      color: #b20610;
     }
     input, select, textarea{
       font-size: 14px;
@@ -109,6 +109,10 @@
     &:disabled{
       @extend %btn-my-disable;
     }
+    &:focus{
+      border: 1px solid $primary;
+    }
+
   }
 
   // notification
@@ -198,11 +202,14 @@
     }
     .icon{
       background: none;
+      top: 0;
+      bottom: 0;
       .icon-image{
         width: 50px;
         height: 50px;
         max-width: 50px;
         max-height: 50px;
+        margin-top: 0;
     
       }
     }

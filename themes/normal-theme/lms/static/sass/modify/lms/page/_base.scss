@@ -1,12 +1,17 @@
 *{  
   box-sizing: content-box;
 }
+*:not(.fa){
+  font-family: $font-family !important;
+  -webkit-font-smoothing: unset !important;
+}
 // 页面padding-left & padding-right只在.window-wrap .content-wrapper添加
 .window-wrap{  
   display: -webkit-flex;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  height: 100vh;
 
   .content-wrapper{ 
     margin: 0 auto;
@@ -42,6 +47,9 @@
   width: 96%;
   box-sizing: border-box;
 
+}
+.settings-language-form{
+  display: none;
 }
 
 // a
@@ -109,7 +117,7 @@ textarea:focus, input[type="text"]:focus, input[type="url"]:focus, input[type="e
   box-shadow: none;
   border: 1px solid $primary;
   outline: none;
-  @include media-breakpoint-down(sm){
+  @media screen and (max-width:1200px){
     &{
       box-shadow: none;
       border: 1px solid $primary;
@@ -154,7 +162,7 @@ button:focus:not(:disabled), button:hover:not(:disabled), .btn-default{
   color: #fff;
   text-shadow: none;
   box-shadow: none;
-  font-family: $font-family-sans-serif;
+  font-family: $font-family;
   outline: none;
 
   &:hover,&:focus, &:active, &:visited{
@@ -182,7 +190,7 @@ button:focus:not(:disabled), button:hover:not(:disabled), .btn-default{
   color: $primary;
   border: 1px solid $primary;
   text-shadow: none;
-  font-family: $font-family-sans-serif;
+  font-family: $font-family;
   outline: none;
 
   &:hover, &:focus &:active, &:visited{
@@ -211,7 +219,7 @@ button:focus:not(:disabled), button:hover:not(:disabled), .btn-default{
   cursor: not-allowed;
   text-decoration: none;
   text-shadow: none;
-  font-family: $font-family-sans-serif;
+  font-family: $font-family;
 
   &:hover,&:focus, &:active, &:visited{
     background: #f5f7fa;
@@ -240,6 +248,7 @@ button:focus:not(:disabled), button:hover:not(:disabled), .btn-default{
     cursor: pointer;
   }
 }
+
 
 .eliteu-message-tips{
   background-color: #ffffff;

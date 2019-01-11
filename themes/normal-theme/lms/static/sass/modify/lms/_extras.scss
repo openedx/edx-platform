@@ -7,9 +7,24 @@
 // rules into modular pieces.
 
 
+@charset 'utf-8';
 @import './variables';
+@import './page/base';
+@import './page/iconfont';
+
+@import './page/header';
 @import './page/footer';
-body{
-  font-family: $font-family-sans-serif;
-}
-@import './course/course_search';
+
+@import './course/course';
+
+@import './page/validate';
+@import './page/verify';
+
+
+
+
+
+
+
+
+

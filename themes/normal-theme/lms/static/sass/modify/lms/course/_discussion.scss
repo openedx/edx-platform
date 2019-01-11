@@ -281,3 +281,14 @@
     border-top: 0;
   }
 } 
+
+.discussion-post .post-header-content .post-title,
+.discussion-response .response-header-content .username{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.discussion-response .response-header-content .username{
+  max-width: 180px;
+  display: inline-block;
+}

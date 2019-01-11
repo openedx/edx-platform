@@ -86,6 +86,7 @@ decorator==4.3.0
 defusedxml==0.4.1
 dicttoxml==1.7.4
 diff-cover==0.9.8
+django-aliyun-oss2-storage==0.1.5
 django-appconf==1.0.2
 django-babel-underscore==0.5.2
 django-babel==0.6.2

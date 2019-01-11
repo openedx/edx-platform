@@ -68,6 +68,7 @@ cssutils==1.0.2           # via pynliner
 ddt==1.2.0
 decorator==4.3.0          # via dogapi, pycontracts
 defusedxml==0.4.1
+django-aliyun-oss2-storage==0.1.5
 django-appconf==1.0.2     # via django-statici18n
 django-babel-underscore==0.5.2
 django-babel==0.6.2       # via django-babel-underscore
@@ -128,7 +129,8 @@ edx-opaque-keys[django]==0.4.4
 edx-organizations==1.0.0
 edx-proctoring==1.4.0
 edx-rest-api-client==1.8.2
-edx-search==1.2.1
+# edx-search==1.2.1
+-e git+https://github.com/e-ducation/edx-search.git@1.2.1-sorting#egg=edx-search==1.2.1
 edx-submissions==2.0.12
 edx-user-state-client==1.0.4
 edxval==0.1.21
