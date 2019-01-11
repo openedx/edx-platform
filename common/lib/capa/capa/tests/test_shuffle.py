@@ -2,6 +2,7 @@
 
 import unittest
 import textwrap
+from ddt import ddt, idata
 
 from capa.tests.helpers import test_capa_system, new_loncapa_problem
 from capa.responsetypes import LoncapaProblemError
@@ -305,3 +306,112 @@ class CapaShuffleTest(unittest.TestCase):
 
         with self.assertRaisesRegexp(LoncapaProblemError, "shuffle and answer-pool"):
             new_loncapa_problem(xml_str)
+
+
+def allowed_tags_generator():
+    for tag in [
+        'checkboxtextgroup',
+        'radiotextgroup',
+    ]:
+        yield tag
+
+
+@ddt
+class CapaChoiceTextResponseShuffleTest(unittest.TestCase):
+    """Capa ChoiceTextResponse problem tests for shuffling."""
+
+    def setUp(self):
+        super(CapaChoiceTextResponseShuffleTest, self).setUp()
+        self.system = test_capa_system()
+
+    @idata(allowed_tags_generator())
+    def test_shuffle_4_choices(self, option_group):
+        xml_str = textwrap.dedent("""
+            <problem>
+            Which one is 3rd NATO phonetic alphabet and how many occurances of character 'a' it has?
+            <choicetextresponse>
+              <{option_group} shuffle="true">
+                <choice correct="false">Alpha <numtolerance_input answer="2" /></choice>
+                <choice correct="false">Bravo <numtolerance_input answer="3" /></choice>
+                <choice correct="true">Charlie <numtolerance_input answer="1" /></choice>
+                <choice correct="false">Delta <numtolerance_input answer="4" /></choice>
+              </{option_group}>
+            </choicetextresponse>
+            </problem>
+        """.format(option_group=option_group))
+        problem = new_loncapa_problem(xml_str, seed=0)
+        # shuffling 4 choices with seed of 0 yields: Bravo Alpha Charlie Delta
+        # Check that the choices are shuffled
+        the_html = problem.get_html()
+        self.assertRegexpMatches(the_html, r"<div>.*\[.*'Bravo '.*'Alpha '.*'Charlie '.*'Delta '.*\].*</div>")
+        # Check that choice name masking is enabled and that unmasking works
+        response = problem.responders.values()[0]
+        self.assertFalse(response.has_mask())
+        self.assertEqual(
+            response.unmask_order(),
+            ['1_2_1_choiceinput_1bc', '1_2_1_choiceinput_0bc', '1_2_1_choiceinput_2bc', '1_2_1_choiceinput_3bc']
+        )
+        self.assertEqual(the_html, problem.get_html(), 'should be able to call get_html() twice')
+
+    @idata(allowed_tags_generator())
+    def test_shuffle_false(self, option_group):
+        xml_str = textwrap.dedent("""
+            <problem>
+            Which one is 3rd NATO phonetic alphabet and how many occurances of character 'a' it has?
+            <choicetextresponse>
+              <{option_group} shuffle="false">
+                <choice correct="false">Alpha <numtolerance_input answer="2" /></choice>
+                <choice correct="false">Bravo <numtolerance_input answer="3" /></choice>
+                <choice correct="true">Charlie <numtolerance_input answer="1" /></choice>
+                <choice correct="false">Delta <numtolerance_input answer="4" /></choice>
+              </{option_group}>
+            </choicetextresponse>
+            </problem>
+        """.format(option_group=option_group))
+        problem = new_loncapa_problem(xml_str)
+        the_html = problem.get_html()
+        self.assertRegexpMatches(the_html, r"<div>.*\[.*'Alpha '.*'Bravo '.*'Charlie '.*'Delta '.*\].*</div>")
+        response = problem.responders.values()[0]
+        self.assertFalse(response.has_mask())
+        self.assertFalse(response.has_shuffle())
+
+    @idata(allowed_tags_generator())
+    def test_without_shuffle(self, option_group):
+        xml_str = textwrap.dedent("""
+            <problem>
+            Which one is 3rd NATO phonetic alphabet and how many occurances of character 'a' it has?
+            <choicetextresponse>
+              <{option_group}>
+                <choice correct="false">Alpha <numtolerance_input answer="2" /></choice>
+                <choice correct="false">Bravo <numtolerance_input answer="3" /></choice>
+                <choice correct="true">Charlie <numtolerance_input answer="1" /></choice>
+                <choice correct="false">Delta <numtolerance_input answer="4" /></choice>
+              </{option_group}>
+            </choicetextresponse>
+            </problem>
+        """.format(option_group=option_group))
+        problem = new_loncapa_problem(xml_str)
+        the_html = problem.get_html()
+        self.assertRegexpMatches(the_html, r"<div>.*\[.*'Alpha '.*'Bravo '.*'Charlie '.*'Delta '.*\].*</div>")
+        response = problem.responders.values()[0]
+        self.assertFalse(response.has_mask())
+        self.assertFalse(response.has_shuffle())
+
+    @idata(allowed_tags_generator())
+    def test_shuffle_different_seed(self, option_group):
+        xml_str = textwrap.dedent("""
+            <problem>
+            Which one is 3rd NATO phonetic alphabet and how many occurances of character 'a' it has?
+            <choicetextresponse>
+              <{option_group} shuffle="true">
+                <choice correct="false">Alpha <numtolerance_input answer="2" /></choice>
+                <choice correct="false">Bravo <numtolerance_input answer="3" /></choice>
+                <choice correct="true">Charlie <numtolerance_input answer="1" /></choice>
+                <choice correct="false">Delta <numtolerance_input answer="4" /></choice>
+              </{option_group}>
+            </choicetextresponse>
+            </problem>
+        """.format(option_group=option_group))
+        problem = new_loncapa_problem(xml_str, seed=341)  # yields D A B C
+        the_html = problem.get_html()
+        self.assertRegexpMatches(the_html, r"<div>.*\[.*'Delta '.*'Alpha '.*'Bravo '.*'Charlie '.*\].*</div>")

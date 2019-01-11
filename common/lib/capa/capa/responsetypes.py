@@ -963,8 +963,102 @@ class ChoiceResponse(LoncapaResponse):
 #-----------------------------------------------------------------------------
 
 
+class MultipleChoiceShuffleMixin(object):
+
+    def get_shuffleable_choicegroups(self, tree):
+        # The tree is already pared down to this multiple choice response so this query just
+        # gets the first child choicegroup which is marked shuffleable (i.e. no leading //)
+        group_selector = '|'.join(self.allowed_inputfields)
+        choicegroups = tree.xpath('({choicegroup_field})[@shuffle="true"]'.format(choicegroup_field=group_selector))
+        return choicegroups
+
+    def do_shuffle(self, tree, problem):
+        """
+        For a choicegroup with shuffle="true", shuffles the choices in-place in the given tree
+        based on the seed. Otherwise does nothing.
+        Raises LoncapaProblemError if both shuffle and answer-pool are active:
+        a problem should use one or the other but not both.
+        Does nothing if the tree has already been processed.
+        """
+        choicegroups = self.get_shuffleable_choicegroups(tree)
+        if choicegroups:
+            choicegroup = choicegroups[0]
+            if choicegroup.get('answer-pool') is not None:
+                _ = self.capa_system.i18n.ugettext
+                # Translators: 'shuffle' and 'answer-pool' are attribute names and should not be translated.
+                msg = _("Do not use shuffle and answer-pool at the same time")
+                raise LoncapaProblemError(msg)
+            # Note in the response that shuffling is done.
+            # Both to avoid double-processing, and to feed the logs.
+            if self.has_shuffle():
+                return
+            self._has_shuffle = True  # pylint: disable=attribute-defined-outside-init
+            # Move elements from tree to list for shuffling, then put them back.
+            ordering = list(choicegroup.getchildren())
+            for choice in ordering:
+                choicegroup.remove(choice)
+            ordering = self.shuffle_choices(ordering, self.get_rng(problem))
+            for choice in ordering:
+                choicegroup.append(choice)
+
+    def shuffle_choices(self, choices, rng):
+        """
+        Returns a list of choice nodes with the shuffling done,
+        using the provided random number generator.
+        Choices with 'fixed'='true' are held back from the shuffle.
+        """
+        # Separate out a list of the stuff to be shuffled
+        # vs. the head/tail of fixed==true choices to be held back from the shuffle.
+        # Rare corner case: A fixed==true choice "island" in the middle is lumped in
+        # with the tail group of fixed choices.
+        # Slightly tricky one-pass implementation using a state machine
+        head = []
+        middle = []  # only this one gets shuffled
+        tail = []
+        at_head = True
+        for choice in choices:
+            if at_head and choice.get('fixed') == 'true':
+                head.append(choice)
+                continue
+            at_head = False
+            if choice.get('fixed') == 'true':
+                tail.append(choice)
+            else:
+                middle.append(choice)
+        rng.shuffle(middle)
+        return head + middle + tail
+
+    def get_rng(self, problem):
+        """
+        Get the random number generator to be shared by responses
+        of the problem, creating it on the problem if needed.
+        """
+        # Multiple questions in a problem share one random number generator (rng) object
+        # stored on the problem. If each question got its own rng, the structure of multiple
+        # questions within a problem could appear predictable to the student,
+        # e.g. (c) keeps being the correct choice. This is due to the seed being
+        # defined at the problem level, so the multiple rng's would be seeded the same.
+        # The name _shared_rng begins with an _ to suggest that it is not a facility
+        # for general use.
+        # pylint: disable=protected-access
+        if not hasattr(problem, '_shared_rng'):
+            problem._shared_rng = random.Random(self.context['seed'])
+        return problem._shared_rng
+
+    def unmask_order(self):
+        """
+        Returns a list of the choice names in the order displayed to the user,
+        using the regular (non-masked) names.
+        """
+        # With masking disabled, this computation remains interesting to see
+        # the displayed order, even though there is no unmasking.
+        group_selector = '|'.join(self.allowed_inputfields)
+        choices = self.xml.xpath('({choicegroup_field})/choice'.format(choicegroup_field=group_selector))
+        return [choice.get("name") for choice in choices]
+
+
 @registry.register
-class MultipleChoiceResponse(LoncapaResponse):
+class MultipleChoiceResponse(LoncapaResponse, MultipleChoiceShuffleMixin):
     """
     Multiple Choice Response
     The shuffle and answer-pool features on this class enable permuting and
@@ -1187,91 +1281,6 @@ class MultipleChoiceResponse(LoncapaResponse):
         #     raise LoncapaProblemError(msg)
         # return self._mask_dict[name]  # TODO: this is not defined
         raise NotImplementedError()
-
-    def unmask_order(self):
-        """
-        Returns a list of the choice names in the order displayed to the user,
-        using the regular (non-masked) names.
-        """
-        # With masking disabled, this computation remains interesting to see
-        # the displayed order, even though there is no unmasking.
-        choices = self.xml.xpath('choicegroup/choice')
-        return [choice.get("name") for choice in choices]
-
-    def do_shuffle(self, tree, problem):
-        """
-        For a choicegroup with shuffle="true", shuffles the choices in-place in the given tree
-        based on the seed. Otherwise does nothing.
-        Raises LoncapaProblemError if both shuffle and answer-pool are active:
-        a problem should use one or the other but not both.
-        Does nothing if the tree has already been processed.
-        """
-        # The tree is already pared down to this <multichoiceresponse> so this query just
-        # gets the child choicegroup (i.e. no leading //)
-        choicegroups = tree.xpath('choicegroup[@shuffle="true"]')
-        if choicegroups:
-            choicegroup = choicegroups[0]
-            if choicegroup.get('answer-pool') is not None:
-                _ = self.capa_system.i18n.ugettext
-                # Translators: 'shuffle' and 'answer-pool' are attribute names and should not be translated.
-                msg = _("Do not use shuffle and answer-pool at the same time")
-                raise LoncapaProblemError(msg)
-            # Note in the response that shuffling is done.
-            # Both to avoid double-processing, and to feed the logs.
-            if self.has_shuffle():
-                return
-            self._has_shuffle = True  # pylint: disable=attribute-defined-outside-init
-            # Move elements from tree to list for shuffling, then put them back.
-            ordering = list(choicegroup.getchildren())
-            for choice in ordering:
-                choicegroup.remove(choice)
-            ordering = self.shuffle_choices(ordering, self.get_rng(problem))
-            for choice in ordering:
-                choicegroup.append(choice)
-
-    def shuffle_choices(self, choices, rng):
-        """
-        Returns a list of choice nodes with the shuffling done,
-        using the provided random number generator.
-        Choices with 'fixed'='true' are held back from the shuffle.
-        """
-        # Separate out a list of the stuff to be shuffled
-        # vs. the head/tail of fixed==true choices to be held back from the shuffle.
-        # Rare corner case: A fixed==true choice "island" in the middle is lumped in
-        # with the tail group of fixed choices.
-        # Slightly tricky one-pass implementation using a state machine
-        head = []
-        middle = []  # only this one gets shuffled
-        tail = []
-        at_head = True
-        for choice in choices:
-            if at_head and choice.get('fixed') == 'true':
-                head.append(choice)
-                continue
-            at_head = False
-            if choice.get('fixed') == 'true':
-                tail.append(choice)
-            else:
-                middle.append(choice)
-        rng.shuffle(middle)
-        return head + middle + tail
-
-    def get_rng(self, problem):
-        """
-        Get the random number generator to be shared by responses
-        of the problem, creating it on the problem if needed.
-        """
-        # Multiple questions in a problem share one random number generator (rng) object
-        # stored on the problem. If each question got its own rng, the structure of multiple
-        # questions within a problem could appear predictable to the student,
-        # e.g. (c) keeps being the correct choice. This is due to the seed being
-        # defined at the problem level, so the multiple rng's would be seeded the same.
-        # The name _shared_rng begins with an _ to suggest that it is not a facility
-        # for general use.
-        # pylint: disable=protected-access
-        if not hasattr(problem, '_shared_rng'):
-            problem._shared_rng = random.Random(self.context['seed'])
-        return problem._shared_rng
 
     def do_answer_pool(self, tree, problem):
         """
@@ -3563,7 +3572,7 @@ class AnnotationResponse(LoncapaResponse):
 
 
 @registry.register
-class ChoiceTextResponse(LoncapaResponse):
+class ChoiceTextResponse(LoncapaResponse, MultipleChoiceShuffleMixin):
     """
     Allows for multiple choice responses with text inputs
     Desired semantics match those of NumericalResponse and
@@ -3709,6 +3718,12 @@ class ChoiceTextResponse(LoncapaResponse):
                     self.answer_id + "_choiceinput_" + str(index) +
                     "_numtolerance_input_" + str(ind)
                 )
+
+    def late_transforms(self, problem):
+        """
+        Rearrangements run late in the __init__ process.
+        """
+        self.do_shuffle(self.xml, problem)
 
     def get_score(self, student_answers):
         """
