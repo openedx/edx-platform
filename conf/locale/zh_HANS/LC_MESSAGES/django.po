@@ -29,10 +29,10 @@
 #
 # Translators:
 # 微 李 <w.li@eliteu.com.cn>, 2018
-# 家璧 刘 <jb.liu@eliteu.com.cn>, 2018
 # 婕 高 <j.gao@eliteu.cn>, 2018
 # Yi Li <y.li@eliteu.cn>, 2018
 # li ying <code@eliteu.cn>, 2019
+# 家璧 刘 <jb.liu@eliteu.com.cn>, 2019
 #
 # #-#-#-#-#  mako-studio.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)
@@ -74,7 +74,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-01-04 16:04+0800\n"
+"POT-Creation-Date: 2019-01-11 14:07+0800\n"
 "PO-Revision-Date: 2018-12-07 12:23+0000\n"
 "Last-Translator: li ying <code@eliteu.cn>, 2019\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)\n"
@@ -16194,7 +16194,7 @@ msgstr "当前认证状态：待处理"
 msgid ""
 "Your edX ID verification is pending. Your verification information has been "
 "submitted and will be reviewed shortly."
-msgstr "您的edX身份认证正在进行中，您的认证信息已提交，我们会尽快审查您的认证。"
+msgstr "您的身份认证正在进行中，您的认证信息已提交，我们会尽快审查您的认证。"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Current Verification Status: Denied"
@@ -19029,6 +19029,8 @@ msgid ""
 " your password, go to the {start_link}sign-in{end_link} page and select "
 "{start_strong}Forgot password{end_strong}."
 msgstr ""
+"密码重置链接无效。此链接可能已被使用。如需重置您的密码，请进入{start_link}注册页面{end_link} "
+"并点击{start_strong}忘记密码{end_strong}。"
 
 #: lms/templates/registration/password_reset_done.html
 msgid "Password reset successful"
@@ -26163,7 +26165,7 @@ msgstr "苹果内购"
 
 #: membership/models.py
 msgid "WeChat App"
-msgstr "微信"
+msgstr "微信APP"
 
 #: membership/models.py
 msgid "WeChat H5"
