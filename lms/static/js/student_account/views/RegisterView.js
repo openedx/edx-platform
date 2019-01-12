@@ -273,7 +273,7 @@
                             handleInputBehavior($input);
                         }
                     });
-                    setTimeout(handleAutocomplete, 1000);
+                    // setTimeout(handleAutocomplete, 1000);
 
                     // In chrome, after remember password, remove default username and password.
                     $('#register-username').attr('autocomplete', 'off');
