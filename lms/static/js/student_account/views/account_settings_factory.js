@@ -48,7 +48,7 @@
             if (syncLearnerProfileData && enterpriseName) {
                 aboutSectionMessageType = 'info';
                 aboutSectionMessage = HtmlUtils.interpolateHtml(
-                    gettext('Your profile settings are managed by {enterprise_name}. Contact your administrator or {link_start}edX Support{link_end} for help.'),  // eslint-disable-line max-len
+                    gettext('Your profile settings are managed by {enterprise_name}. Contact your administrator or {link_start}EliteMBA Support{link_end} for help.'),  // eslint-disable-line max-len
                     {
                         enterprise_name: enterpriseName,
                         link_start: HtmlUtils.HTML(
