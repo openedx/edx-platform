@@ -26,17 +26,13 @@ from six import text_type
       else:
           course_date_string = ''
       %>
-      % if course.advertised_start is not None:
-          <div class="course-date" aria-hidden="true">${_("Starts")}: ${course.advertised_start}</div>
-      % else:
-          <div class="course-date localized_datetime"
-               aria-hidden="true"
-               data-format="shortDate"
-               data-datetime="${course_date_string}"
-               data-language="${LANGUAGE_CODE}"
-               data-string="${_("Starts: {date}")}">
-          </div>
-      % endif
+      <div class="course-date localized_datetime"
+           aria-hidden="true"
+           data-format="shortDate"
+           data-datetime="${course_date_string}"
+           data-language="${LANGUAGE_CODE}"
+           data-string="${_("Starts: {date}")}">
+      </div>
     </div>
     <div class="sr">
       <ul>
