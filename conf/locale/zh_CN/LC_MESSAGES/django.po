@@ -12132,6 +12132,14 @@ msgstr "修习要求"
 msgid "Details"
 msgstr "细节"
 
+#. #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
+#. Translators: this is a verb describing the action of viewing more details
+#: cms/templates/studio_xblock_wrapper.html
+#: lms/templates/wiki/includes/article_menu.html
+#: wiki/templates/wiki/includes/article_menu.html
+msgid "View"
+msgstr "阅览"
+
 #: cms/templates/maintenance/_force_publish_course.html
 #: lms/templates/problem.html lms/templates/shoppingcart/shopping_cart.html
 #: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview-language-fragment.html
@@ -14923,7 +14931,6 @@ msgid "Electronic Certificate"
 msgstr "电子证书"
 
 #: lms/templates/certificates/verify.html
-#: lms/templates/wiki/includes/article_menu.html
 msgctxt "Certificate"
 msgid "View"
 msgstr "点击查看"
@@ -24691,13 +24698,6 @@ msgstr "设置访问限制"
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."
 msgstr "本块包含多个组件。"
-
-#. #-#-#-#-#  mako-studio.po (0.1a)  #-#-#-#-#
-#. Translators: this is a verb describing the action of viewing more details
-#: cms/templates/studio_xblock_wrapper.html
-#: wiki/templates/wiki/includes/article_menu.html
-msgid "View"
-msgstr "阅览"
 
 #: cms/templates/textbooks.html
 msgid "New Textbook"
