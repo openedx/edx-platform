@@ -27,7 +27,7 @@
     <h2><%- gettext("Sign In") %></h2>
 <% } %>
 
-<form id="login" class="login-form" tabindex="-1" method="POST">
+<form id="login" class="login-form" autocomplete="off" tabindex="-1" method="POST">
 
     <p class="sr">
         <% if ( context.providers.length > 0 && !context.currentProvider || context.hasSecondaryProviders ) { %>
