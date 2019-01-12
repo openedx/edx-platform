@@ -22,6 +22,13 @@ from django.conf import settings
 %>
 <nav class="nav-links" aria-label=${_("Supplemental Links")}>
   <div class="main">
+  % if allows_login:
+    % if can_discover_courses:
+      <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
+        <a class="${'active ' if reverse('courses') in request.path else ''}tab-nav-link" href="/courses">${_('Explore courses')}</a>
+      </div>
+    %endif
+  % endif
   % if settings.FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION'):
       <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
         <a class="${'active ' if reverse('membership') in request.path else ''}tab-nav-link" href="${reverse('membership')}">
@@ -48,13 +55,6 @@ from django.conf import settings
     <div class="mobile-nav-item hidden-mobile nav-item">
       <a href="${marketing_link('SCHOOLS')}">${_("Schools")}</a>
     </div>
-  % endif
-  % if allows_login:
-    % if can_discover_courses:
-      <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
-        <a class="${'active ' if reverse('courses') in request.path else ''}tab-nav-link" href="/courses">${_('Explore courses')}</a>
-      </div>
-    %endif
   % endif
   </div>
   <div class="secondary">

@@ -127,8 +127,8 @@ def _check_excessive_login_attempts(user):
     """
     if user and LoginFailures.is_feature_enabled():
         if LoginFailures.is_user_locked_out(user):
-            raise AuthFailedError(_('This account has been temporarily locked due '
-                                    'to excessive login failures. Try again later.'))
+            raise AuthFailedError(_('Due to multiple login failures, the account is temporarily locked.'
+                                    ' Please try again after 15 minutes.'))
 
 
 def _check_forced_password_reset(user):

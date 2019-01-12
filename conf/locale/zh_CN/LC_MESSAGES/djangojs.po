@@ -53,7 +53,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-01-11 14:07+0800\n"
+"POT-Creation-Date: 2019-01-04 10:36+0800\n"
 "PO-Revision-Date: 2018-12-07 12:23+0000\n"
 "Last-Translator: li ying <code@eliteu.cn>, 2019\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)\n"
@@ -10414,24 +10414,30 @@ msgid "Become a VIP member and watch all EliteMBA courses for free"
 msgstr "开通VIP会员，可免费观看英荔商学院全部课程。"
 
 #: membership/static/membership/js/card.js
-msgid "YYYY-MM-DD"
-msgstr "YYYY-MM-DD"
+msgid "DD/MM/YYYY"
+msgstr ""
 
 #: membership/static/membership/js/card.js
-msgid "Membership opened:"
-msgstr "已开通："
+msgid "Membership opened"
+msgstr ""
 
 #: membership/static/membership/js/card.js
 msgid "day"
 msgstr "天"
 
 #: membership/static/membership/js/card.js
-msgid "Remaining days:"
-msgstr "剩余："
+msgid "Remaining days"
+msgstr ""
 
 #: membership/static/membership/js/card.js
-msgid "Duration:"
-msgstr "起止时间："
+msgctxt "Membership"
+msgid "Opened:"
+msgstr ""
+
+#: membership/static/membership/js/card.js
+msgctxt "Membership"
+msgid "Expire:"
+msgstr ""
 
 #: membership/static/membership/js/card.js
 msgid "Opened on:"
@@ -10442,8 +10448,8 @@ msgid "Expire on:"
 msgstr "到期日期："
 
 #: membership/static/membership/js/card.js
-msgid "Membership expired:"
-msgstr "会员已过期："
+msgid "Membership expired"
+msgstr ""
 
 #: membership/static/membership/js/card.js
 msgid "Renew"
@@ -10458,6 +10464,5 @@ msgid "Failed to pay the payment"
 msgstr "调起支付失败"
 
 #: membership/static/membership/js/result.js
-#, javascript-format
-msgid "Return to EliteMBA in %s seconds"
-msgstr "%s 秒后返回英荔商学院"
+msgid "Return to EliteMBA in {second} seconds"
+msgstr ""

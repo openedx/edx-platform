@@ -10472,8 +10472,8 @@ msgstr ""
 #: openedx/core/djangoapps/user_api/accounts/views.py
 #: openedx/core/djangoapps/user_authn/views/login.py
 msgid ""
-"This account has been temporarily locked due to excessive login failures. "
-"Try again later."
+"Due to multiple login failures, the account is temporarily locked. Please "
+"try again after 15 minutes."
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/views.py
@@ -11010,8 +11010,7 @@ msgstr ""
 msgid ""
 "We are sorry, you are not authorized to access {platform_name} via this "
 "channel. Please contact your learning administrator or manager in order to "
-"access {platform_name}.{line_break}{line_break}Error "
-"Details:{line_break}{error_message}"
+"access {platform_name}.{line_break}{line_break}"
 msgstr ""
 
 #: openedx/features/enterprise_support/utils.py

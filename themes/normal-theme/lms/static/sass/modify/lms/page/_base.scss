@@ -1,17 +1,19 @@
 *{  
   box-sizing: content-box;
+  font-family: $font-family;
+  -webkit-font-smoothing: unset;
 }
-*:not(.fa){
+p, h1, h2, h3, h4, h5, h6{
   font-family: $font-family !important;
   -webkit-font-smoothing: unset !important;
 }
+
 // 页面padding-left & padding-right只在.window-wrap .content-wrapper添加
 .window-wrap{  
   display: -webkit-flex;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  height: 100vh;
 
   .content-wrapper{ 
     margin: 0 auto;
