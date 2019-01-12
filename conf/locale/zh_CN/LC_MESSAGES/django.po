@@ -5092,7 +5092,6 @@ msgstr "{platform_name} 借由证书承认已完成修习课程，该课之修�
 #. protect published content
 #: lms/djangoapps/certificates/views/webview.py
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
-#: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "All rights reserved"
 msgstr "保留所有权利"
 
@@ -11257,6 +11256,14 @@ msgid ""
 msgstr ""
 "欢迎来到新学员账号页面，提供更多账号信息方便其他学员查看。您也可以选择只显示部分内容。{learn_more_link_start}了解更多内容{learn_more_link_end}"
 
+#: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+msgid ","
+msgstr "，"
+
+#: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+msgid "All rights reserved."
+msgstr "保留所有权利。"
+
 #: themes/normal-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #, python-format
 msgid ""
@@ -12128,7 +12135,6 @@ msgstr "细节"
 #. #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
 #. Translators: this is a verb describing the action of viewing more details
 #: cms/templates/studio_xblock_wrapper.html
-#: lms/templates/certificates/verify.html
 #: lms/templates/wiki/includes/article_menu.html
 #: wiki/templates/wiki/includes/article_menu.html
 msgid "View"
@@ -12373,12 +12379,12 @@ msgid "LEARN MORE"
 msgstr "了解更多"
 
 #: lms/templates/course.html
-msgid "Starts"
-msgstr "开始"
-
-#: lms/templates/course.html
 msgid "Starts: {date}"
 msgstr "开课日期: {date}"
+
+#: lms/templates/course.html
+msgid "Starts"
+msgstr "开始"
 
 #: lms/templates/courses_list.html
 msgid "View all Courses"
@@ -14924,6 +14930,11 @@ msgstr "发证时间"
 msgid "Electronic Certificate"
 msgstr "电子证书"
 
+#: lms/templates/certificates/verify.html
+msgctxt "Certificate"
+msgid "View"
+msgstr "点击查看"
+
 #: lms/templates/commerce/checkout_cancel.html
 msgid "Checkout Cancelled"
 msgstr "付款已取消"
@@ -15724,6 +15735,7 @@ msgid "There are no students enrolled in this course."
 msgstr "本课程无学生选课"
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
+#: lms/templates/emails/activation_email.txt
 #: lms/templates/emails/business_order_confirmation_email.txt
 #: lms/templates/emails/order_confirmation_email.txt
 msgid "Hi {name},"
@@ -20462,7 +20474,7 @@ msgid ""
 "referred to as 'User') must carefully read these terms and agree to this "
 "statement before accepting EliteMBA service."
 msgstr ""
-"英荔教育（www.elitemba.cn）的产品及服务由广东英荔国际教育科技有限公司（以下简称“英荔”或“我们”）提供。本免责声明（以下简称“本声明”）适用于英荔的网站、在计算机/手机/平板电脑或其它设备上使用的英荔的应用程序和其它产品及服务。英荔用户（以下简称“用户”）在接受英荔服务之前，请务必仔细阅读本条款并同意本声明"
+"英荔商学院（www.EliteMBA.cn）的产品及服务由广东英荔国际教育科技有限公司（以下简称“英荔”或“我们”）提供。本免责声明（以下简称“本声明”）适用于英荔的网站、在计算机/手机/平板电脑或其它设备上使用的英荔的应用程序和其它产品及服务。英荔用户（以下简称“用户”）在接受英荔服务之前，请务必仔细阅读本条款并同意本声明"
 
 #: themes/normal-theme/lms/templates/static_templates/disclaimer.html
 #: themes/normal-theme/lms/templates/static_templates/honor.html
@@ -20603,7 +20615,7 @@ msgstr "附则"
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 msgid ""
 "EliteMBA reserves the rights to interpret, modify and update the Disclaimer."
-msgstr "对免责声明的解释、修改及更新权均属于英荔教育所有。"
+msgstr "对免责声明的解释、修改及更新权均属于英荔所有。"
 
 #: themes/normal-theme/lms/templates/static_templates/disclaimer.html
 #: themes/normal-theme/lms/templates/static_templates/honor.html
@@ -20640,7 +20652,7 @@ msgid ""
 "published by EliteMBA related to those services. All of the aforementioned "
 "guidelines and rules shall be considered as a part of this Agreement."
 msgstr ""
-"英荔教育（www.elitemba.cn）的产品及服务由广东英荔国际教育科技有限公司（以下简称“英荔”或“我们”）提供。本使用协议（以下简称“使用协议”）适用于英荔的网站、在计算机/手机/平板电脑或其它设备上使用的英荔的应用程序和其它产品及服务。使用协议的内容可由英荔不定期修改、变更。一旦变动产生，我们将随即于使用协议上公布并更新生效日期。修改后的使用协议一旦公布即有效代替原来的使用协议。您应定期查看以了解更新后的服务条款，若您继续使用我们的服务即构成您对本服务条款及其任何更新版本的同意。此外，当英荔用户使用英荔特殊服务（包括但不限于除网站基本服务外的其他具时效性的市场活动服务）时，英荔用户应遵守英荔随时公布的与该服务相关的指引和规则。前述所有的指引和规则，均构成本使用协议的一部分。"
+"英荔商学院（www.EliteMBA.cn）的产品及服务由广东英荔国际教育科技有限公司（以下简称“英荔”或“我们”）提供。本使用协议（以下简称“使用协议”）适用于英荔的网站、在计算机/手机/平板电脑或其它设备上使用的英荔的应用程序和其它产品及服务。使用协议的内容可由英荔不定期修改、变更。一旦变动产生，我们将随即于使用协议上公布并更新生效日期。修改后的使用协议一旦公布即有效代替原来的使用协议。您应定期查看以了解更新后的服务条款，若您继续使用我们的服务即构成您对本服务条款及其任何更新版本的同意。此外，当英荔用户使用英荔特殊服务（包括但不限于除网站基本服务外的其他具时效性的市场活动服务）时，英荔用户应遵守英荔随时公布的与该服务相关的指引和规则。前述所有的指引和规则，均构成本使用协议的一部分。"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -21412,7 +21424,7 @@ msgid ""
 "users with the requested services. This policy explains the data collection "
 "and use under these circumstances."
 msgstr ""
-"英荔教育（www.elitemba.cn）的产品及服务由广东英荔国际教育科技有限公司（以下简称“英荔”或“我们”）提供。本隐私政策（以下简称“本政策”）适用于英荔的网站、在计算机/手机/平板电脑或其它设备上使用的英荔的应用程序和其它产品及服务。英荔非常重视对英荔用户（以下简称“用户”）个人隐私的保护，有时候我们需要某些信息才能为用户提供请求的服务，本政策解释了这些情况下的数据收集和使用情况。"
+"英荔商学院（www.EliteMBA.cn）的产品及服务由广东英荔国际教育科技有限公司（以下简称“英荔”或“我们”）提供。本隐私政策（以下简称“本政策”）适用于英荔的网站、在计算机/手机/平板电脑或其它设备上使用的英荔的应用程序和其它产品及服务。英荔非常重视对英荔用户（以下简称“用户”）个人隐私的保护，有时候我们需要某些信息才能为用户提供请求的服务，本政策解释了这些情况下的数据收集和使用情况。"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/privacy.html
@@ -21632,7 +21644,7 @@ msgid ""
 "referred to as 'User') must carefully read these terms and agree to this "
 "statement before accepting EliteMBA service."
 msgstr ""
-"英荔教育（www.elitemba.cn）的产品及服务由广东英荔国际教育科技有限公司（以下简称“英荔”或“我们”）提供。本免责声明（以下简称“本声明”）适用于英荔的网站、在计算机/手机/平板电脑或其它设备上使用的英荔的应用程序和其它产品及服务。英荔用户（以下简称“用户”）在接受英荔服务之前，请务必仔细阅读本条款并同意本声明"
+"英荔商学院（www.EliteMBA.cn）的产品及服务由广东英荔国际教育科技有限公司（以下简称“英荔”或“我们”）提供。本免责声明（以下简称“本声明”）适用于英荔的网站、在计算机/手机/平板电脑或其它设备上使用的英荔的应用程序和其它产品及服务。英荔用户（以下简称“用户”）在接受英荔服务之前，请务必仔细阅读本条款并同意本声明"
 
 #: themes/normal-theme/lms/templates/static_templates/join_us.html
 msgid "Join us"
