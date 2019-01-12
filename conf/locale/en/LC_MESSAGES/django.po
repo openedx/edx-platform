@@ -5002,7 +5002,6 @@ msgstr ""
 #. protect published content
 #: lms/djangoapps/certificates/views/webview.py
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
-#: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "All rights reserved"
 msgstr ""
 
@@ -11036,6 +11035,14 @@ msgid ""
 "profile. {learn_more_link_start}Learn more{learn_more_link_end}"
 msgstr ""
 
+#: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+msgid ","
+msgstr ""
+
+#: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+msgid "All rights reserved."
+msgstr ""
+
 #: themes/normal-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #, python-format
 msgid ""
@@ -11891,15 +11898,6 @@ msgstr ""
 msgid "Details"
 msgstr ""
 
-#. #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
-#. Translators: this is a verb describing the action of viewing more details
-#: cms/templates/studio_xblock_wrapper.html
-#: lms/templates/certificates/verify.html
-#: lms/templates/wiki/includes/article_menu.html
-#: wiki/templates/wiki/includes/article_menu.html
-msgid "View"
-msgstr ""
-
 #: cms/templates/maintenance/_force_publish_course.html
 #: lms/templates/problem.html lms/templates/shoppingcart/shopping_cart.html
 #: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview-language-fragment.html
@@ -12141,11 +12139,11 @@ msgid "LEARN MORE"
 msgstr ""
 
 #: lms/templates/course.html
-msgid "Starts"
+msgid "Starts: {date}"
 msgstr ""
 
 #: lms/templates/course.html
-msgid "Starts: {date}"
+msgid "Starts"
 msgstr ""
 
 #: lms/templates/courses_list.html
@@ -14619,6 +14617,12 @@ msgstr ""
 msgid "Electronic Certificate"
 msgstr ""
 
+#: lms/templates/certificates/verify.html
+#: lms/templates/wiki/includes/article_menu.html
+msgctxt "Certificate"
+msgid "View"
+msgstr ""
+
 #: lms/templates/commerce/checkout_cancel.html
 msgid "Checkout Cancelled"
 msgstr ""
@@ -15417,6 +15421,7 @@ msgid "There are no students enrolled in this course."
 msgstr ""
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
+#: lms/templates/emails/activation_email.txt
 #: lms/templates/emails/business_order_confirmation_email.txt
 #: lms/templates/emails/order_confirmation_email.txt
 msgid "Hi {name},"
@@ -24169,6 +24174,13 @@ msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."
+msgstr ""
+
+#. #-#-#-#-#  mako-studio.po (0.1a)  #-#-#-#-#
+#. Translators: this is a verb describing the action of viewing more details
+#: cms/templates/studio_xblock_wrapper.html
+#: wiki/templates/wiki/includes/article_menu.html
+msgid "View"
 msgstr ""
 
 #: cms/templates/textbooks.html

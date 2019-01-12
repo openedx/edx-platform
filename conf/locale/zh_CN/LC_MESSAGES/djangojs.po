@@ -2216,7 +2216,7 @@ msgstr "%(field)s 最多只能有 %(count)d 个字符。"
 
 #: common/static/common/js/utils/edx.utils.validate.js
 msgid "Please enter your %(field)s."
-msgstr "请输入您的 %(field)s."
+msgstr "请输入您的%(field)s。"
 
 #: common/static/js/capa/drag_and_drop/base_image.js
 msgid "Drop target image"

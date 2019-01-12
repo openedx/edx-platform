@@ -1,6 +1,7 @@
 <%inherit file="../main.html" />
 <%!
 from django.utils.translation import ugettext as _
+from django.utils.translation import pgettext
 %>
 <%namespace name='static' file='/static_content.html'/>
 
@@ -63,7 +64,7 @@ from django.utils.translation import ugettext as _
     </li>
     <li>
       <span>${_(u"Electronic Certificate")}</span>
-      <span><a href="${cert_web_url}">${_(u"View")}</a></span>
+      <span><a href="${cert_web_url}">${pgettext("Certificate", "View")}</a></span>
     </li>
   </ul>
 </div>
