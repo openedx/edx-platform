@@ -1,6 +1,7 @@
 """
 A class used for defining and running test suites
 """
+from __future__ import print_function
 import sys
 import subprocess
 
@@ -38,7 +39,7 @@ class TestSuite(object):
 
         i.e. Checking for and defining required directories.
         """
-        print "\nSetting up for {suite_name}".format(suite_name=self.root)
+        print("\nSetting up for {suite_name}".format(suite_name=self.root))
         self.failed_suites = []
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -51,7 +52,7 @@ class TestSuite(object):
 
         i.e. Cleaning mongo after the lms tests run.
         """
-        print "\nCleaning up after {suite_name}".format(suite_name=self.root)
+        print("\nCleaning up after {suite_name}".format(suite_name=self.root))
 
     @property
     def cmd(self):
@@ -127,7 +128,7 @@ class TestSuite(object):
         else:
             msg = colorize('green', "\n\n{bar}\nNo test failures ".format(bar="=" * 48))
 
-        print msg
+        print(msg)
 
     def run(self):
         """

@@ -1,6 +1,7 @@
 """
 Common utility functions useful throughout the contentstore
 """
+from __future__ import print_function
 
 import logging
 from datetime import datetime
@@ -93,7 +94,7 @@ def _remove_instructors(course_key):
     """
     In the django layer, remove all the user/groups permissions associated with this course
     """
-    print 'removing User permissions from course....'
+    print('removing User permissions from course....')
 
     try:
         remove_all_instructors(course_key)

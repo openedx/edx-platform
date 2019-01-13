@@ -1,6 +1,7 @@
 """
 Test the heartbeat
 """
+from __future__ import print_function
 import json
 
 from django.urls import reverse
@@ -24,7 +25,7 @@ class HeartbeatTestCase(ModuleStoreTestCase):
 
     def test_success(self):
         response = self.client.get(self.heartbeat_url + '?extended')
-        print response
+        print(response)
 
         self.assertEqual(response.status_code, 200)
 

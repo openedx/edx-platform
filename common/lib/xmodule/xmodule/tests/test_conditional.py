@@ -1,3 +1,4 @@
+from __future__ import print_function
 import json
 import unittest
 
@@ -178,7 +179,7 @@ class ConditionalModuleBasicTest(unittest.TestCase):
         modules['cond_module'].save()
         modules['source_module'].is_attempted = "false"
         ajax = json.loads(modules['cond_module'].handle_ajax('', ''))
-        print "ajax: ", ajax
+        print("ajax: ", ajax)
         fragments = ajax['fragments']
         self.assertFalse(any(['This is a secret' in item['content'] for item in fragments]))
 
@@ -186,7 +187,7 @@ class ConditionalModuleBasicTest(unittest.TestCase):
         modules['source_module'].is_attempted = "true"
         ajax = json.loads(modules['cond_module'].handle_ajax('', ''))
         modules['cond_module'].save()
-        print "post-attempt ajax: ", ajax
+        print("post-attempt ajax: ", ajax)
         fragments = ajax['fragments']
         self.assertTrue(any(['This is a secret' in item['content'] for item in fragments]))
 
@@ -232,7 +233,7 @@ class ConditionalModuleXmlTest(unittest.TestCase):
 
     def get_course(self, name):
         """Get a test course by directory name.  If there's more than one, error."""
-        print "Importing {0}".format(name)
+        print("Importing {0}".format(name))
 
         modulestore = XMLModuleStore(DATA_DIR, source_dirs=[name])
         courses = modulestore.get_courses()
@@ -243,11 +244,11 @@ class ConditionalModuleXmlTest(unittest.TestCase):
     def test_conditional_module(self):
         """Make sure that conditional module works"""
 
-        print "Starting import"
+        print("Starting import")
         course = self.get_course('conditional_and_poll')
 
-        print "Course: ", course
-        print "id: ", course.id
+        print("Course: ", course)
+        print("id: ", course.id)
 
         def inner_get_module(descriptor):
             if isinstance(descriptor, BlockUsageLocator):
@@ -269,13 +270,13 @@ class ConditionalModuleXmlTest(unittest.TestCase):
         self.test_system.get_module = inner_get_module
 
         module = inner_get_module(location)
-        print "module: ", module
-        print "module children: ", module.get_children()
-        print "module display items (children): ", module.get_display_items()
+        print("module: ", module)
+        print("module children: ", module.get_children())
+        print("module display items (children): ", module.get_display_items())
 
         html = module.render(STUDENT_VIEW).content
-        print "html type: ", type(html)
-        print "html: ", html
+        print("html type: ", type(html))
+        print("html: ", html)
         html_expect = module.xmodule_runtime.render_template(
             'conditional_ajax.html',
             {
@@ -288,11 +289,11 @@ class ConditionalModuleXmlTest(unittest.TestCase):
         self.assertEqual(html, html_expect)
 
         gdi = module.get_display_items()
-        print "gdi=", gdi
+        print("gdi=", gdi)
 
         ajax = json.loads(module.handle_ajax('', ''))
         module.save()
-        print "ajax: ", ajax
+        print("ajax: ", ajax)
         fragments = ajax['fragments']
         self.assertFalse(any(['This is a secret' in item['content'] for item in fragments]))
 
@@ -304,7 +305,7 @@ class ConditionalModuleXmlTest(unittest.TestCase):
 
         ajax = json.loads(module.handle_ajax('', ''))
         module.save()
-        print "post-attempt ajax: ", ajax
+        print("post-attempt ajax: ", ajax)
         fragments = ajax['fragments']
         self.assertTrue(any(['This is a secret' in item['content'] for item in fragments]))
 

@@ -1,4 +1,5 @@
 """Tests the capa shuffle and name-masking."""
+from __future__ import print_function
 
 import unittest
 import textwrap
@@ -276,7 +277,7 @@ class CapaShuffleTest(unittest.TestCase):
         orig_html = problem.get_html()
         self.assertEqual(orig_html, problem.get_html(), 'should be able to call get_html() twice')
         html = orig_html.replace('\n', ' ')  # avoid headaches with .* matching
-        print html
+        print(html)
         self.assertRegexpMatches(html, r"<div>.*\[.*'Banana'.*'Apple'.*'Chocolate'.*'Donut'.*\].*</div>.*" +
                                        r"<div>.*\[.*'C'.*'A'.*'D'.*'B'.*\].*</div>")
         # Look at the responses in their authored order

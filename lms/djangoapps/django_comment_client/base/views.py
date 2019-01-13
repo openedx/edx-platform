@@ -1,3 +1,4 @@
+from __future__ import print_function
 import functools
 import json
 import logging
@@ -769,7 +770,7 @@ def upload(request, course_id):  # ajax upload file to a question or answer
     except exceptions.PermissionDenied, err:
         error = unicode(err)
     except Exception, err:
-        print err
+        print(err)
         logging.critical(unicode(err))
         error = _('Error uploading file. Please contact the site administrator. Thank you.')
 

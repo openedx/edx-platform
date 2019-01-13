@@ -1,4 +1,5 @@
 """ Tests for DiscussionXBLock"""
+from __future__ import print_function
 from collections import namedtuple
 import ddt
 import itertools
@@ -108,7 +109,7 @@ class DiscussionXBlockImportExportTests(TestCase):
             self.assertEqual(block.discussion_category, category_pair.value)
             self.assertEqual(block.discussion_target, target_pair.value)
         except AssertionError:
-            print xblock_xml
+            print(xblock_xml)
             raise
 
     @mock.patch(DISCUSSION_XBLOCK_LOCATION + ".load_definition_xml")
@@ -140,7 +141,7 @@ class DiscussionXBlockImportExportTests(TestCase):
             self.assertEqual(block.discussion_category, category_pair.value)
             self.assertEqual(block.discussion_target, target_pair.value)
         except AssertionError:
-            print xblock_xml, xblock_definition_xml
+            print(xblock_xml, xblock_definition_xml)
             raise
 
     def test_export_default_discussion_id(self):
