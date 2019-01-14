@@ -22,6 +22,8 @@ ${_("We could not verify your identity for the {assessment} assessment in the {c
 ${_("To go to the courseware, select the following link:")}
 ${course_link}
 
+${_('If the link is not clickable, try copying and pasting it into the address bar of your web browser, and press "Enter" key to open the page')}
+
 ${_("If you have any questions, you can contact student support at {support_link}.").format(support_link=support_link)}
 
 ${_("Thanks,")}

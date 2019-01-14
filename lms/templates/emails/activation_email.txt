@@ -11,6 +11,8 @@ https://${ site }/activate/${ key }
 http://${ site }/activate/${ key }
 % endif
 
+${_('If the link is not clickable, try copying and pasting it into the address bar of your web browser, and press "Enter" key to open the page')}
+
 ${_("Enjoy learning with {platform_name}.").format(platform_name=platform_name)}
 
 ${_("The {platform_name} Team").format(platform_name=platform_name)}
