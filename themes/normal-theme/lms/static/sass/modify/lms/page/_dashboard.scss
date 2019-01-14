@@ -132,7 +132,7 @@
     text-align: left;
     padding: 0;
   }
-  .status-verification a span{
+  .status-verification a span, .status-verification.is-denied .action-reverify{
     display: inline-block;
     padding: 8px 15px;
     background-color: rgba(255,228,209,0.3);
@@ -142,11 +142,13 @@
     font-size: 14px;
     margin-top: 30px;
     cursor: pointer;
+    box-shadow: none;
+
+    &:hover{
+      background: rgba(255, 218, 191, 0.46);
+    }
   }
 
-  .status-verification a span:hover{
-    background: rgba(255, 218, 191, 0.46);
-  }
   .status-is-vip{
     background: #f6fffc;
     border: none !important;
