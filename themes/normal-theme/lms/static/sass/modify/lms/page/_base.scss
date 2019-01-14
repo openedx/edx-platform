@@ -78,7 +78,14 @@ select{
   background: url("/static/normal-theme/images/select.png") no-repeat scroll right center #fff;
   background-size: 15px;
 }
+
 select::-ms-expand { display: none; }
+/*
+select::-ms-value{
+  background-color: #fff;
+  color: $font;
+}
+*/
 
 // input
 input::-webkit-input-placeholder, .form-control::-webkit-input-placeholder{

@@ -225,6 +225,15 @@
   }
 }
 
+
+#password-reset-confirm-container{
+  margin-top: 50px;
+}
+#password-reset-confirm-form{
+  padding-top: 0;
+}
+
+
 @media screen and (max-width:768px){
   .login-register .button-oa2-weixin{
     display: none;
