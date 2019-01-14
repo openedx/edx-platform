@@ -9,7 +9,9 @@ from datetime import datetime
 
 import ddt
 from django.core.urlresolvers import reverse
+from freezegun import freeze_time
 from mock import MagicMock, patch
+from opaque_keys.edx.locator import BlockUsageLocator
 from pytz import UTC
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -23,7 +25,10 @@ from lms.djangoapps.grades.config.waffle import WRITABLE_GRADEBOOK, waffle_flags
 from lms.djangoapps.grades.course_data import CourseData
 from lms.djangoapps.grades.course_grade import CourseGrade
 from lms.djangoapps.grades.models import (
+    BlockRecord,
+    BlockRecordList,
     PersistentSubsectionGrade,
+    PersistentSubsectionGradeOverride,
     PersistentSubsectionGradeOverrideHistory
 )
 from lms.djangoapps.grades.subsection_grade import ReadSubsectionGrade
@@ -1204,3 +1209,234 @@ class GradebookBulkUpdateViewTest(GradebookViewTestBase):
                 self.assertIsNotNone(audit_item.created)
                 self.assertEqual(audit_item.feature, PersistentSubsectionGradeOverrideHistory.GRADEBOOK)
                 self.assertEqual(audit_item.action, PersistentSubsectionGradeOverrideHistory.CREATE_OR_UPDATE)
+
+
+@ddt.ddt
+class SubsectionGradeViewTest(GradebookViewTestBase):
+    """ Test for the audit api call """
+    @classmethod
+    def setUpClass(cls):
+        super(SubsectionGradeViewTest, cls).setUpClass()
+        cls.namespaced_url = 'grades_api:v1:course_grade_overrides'
+        cls.locator_a = BlockUsageLocator(
+            course_key=cls.course_key,
+            block_type='problem',
+            block_id='block_id_a'
+        )
+        cls.locator_b = BlockUsageLocator(
+            course_key=cls.course_key,
+            block_type='problem',
+            block_id='block_id_b'
+        )
+        cls.record_a = BlockRecord(locator=cls.locator_a, weight=1, raw_possible=10, graded=False)
+        cls.record_b = BlockRecord(locator=cls.locator_b, weight=1, raw_possible=10, graded=True)
+        cls.block_records = BlockRecordList([cls.record_a, cls.record_b], cls.course_key)
+        cls.usage_key = cls.subsections[cls.chapter_1.location][0].location
+        cls.user_id = 12345
+        cls.params = {
+            "user_id": cls.user_id,
+            "usage_key": cls.usage_key,
+            "course_version": "deadbeef",
+            "subtree_edited_timestamp": "2016-08-01 18:53:24.354741Z",
+            "earned_all": 6.0,
+            "possible_all": 12.0,
+            "earned_graded": 6.0,
+            "possible_graded": 8.0,
+            "visible_blocks": cls.block_records,
+            "first_attempted": datetime(2000, 1, 1, 12, 30, 45, tzinfo=UTC),
+        }
+        cls.grade = PersistentSubsectionGrade.update_or_create_grade(**cls.params)
+
+    def get_url(self, subsection_id=None, user_id=None):  # pylint: disable=arguments-differ
+        """
+        Helper function to create the course gradebook API url.
+        """
+        base_url = reverse(
+            self.namespaced_url,
+            kwargs={
+                'subsection_id': subsection_id or self.subsection_id,
+            }
+        )
+        return "{0}?user_id={1}".format(base_url, user_id or self.user_id)
+
+    @ddt.data(
+        'login_staff',
+        'login_course_admin',
+        'login_course_staff',
+    )
+    def test_no_override(self, login_method):
+        getattr(self, login_method)()
+
+        resp = self.client.get(
+            self.get_url(subsection_id=self.usage_key)
+        )
+
+        expected_data = {
+            'original_grade': OrderedDict([
+                ('earned_all', 6.0),
+                ('possible_all', 12.0),
+                ('earned_graded', 6.0),
+                ('possible_graded', 8.0)
+            ]),
+            'user_id': 12345,
+            'override': None,
+            'course_id': text_type(self.course_key),
+            'subsection_id': text_type(self.usage_key),
+            'history': []
+        }
+
+        self.assertEqual(expected_data, resp.data)
+
+    @ddt.data(
+        'login_staff',
+        'login_course_admin',
+        'login_course_staff',
+    )
+    def test_with_override_no_history(self, login_method):
+        getattr(self, login_method)()
+
+        override = PersistentSubsectionGradeOverride.objects.create(
+            grade=self.grade,
+            earned_all_override=0.0,
+            possible_all_override=12.0,
+            earned_graded_override=0.0,
+            possible_graded_override=8.0
+        )
+
+        resp = self.client.get(
+            self.get_url(subsection_id=self.usage_key)
+        )
+
+        expected_data = {
+            'original_grade': OrderedDict([
+                ('earned_all', 6.0),
+                ('possible_all', 12.0),
+                ('earned_graded', 6.0),
+                ('possible_graded', 8.0)
+            ]),
+            'user_id': 12345,
+            'override': OrderedDict([
+                ('earned_all_override', 0.0),
+                ('possible_all_override', 12.0),
+                ('earned_graded_override', 0.0),
+                ('possible_graded_override', 8.0)
+            ]),
+            'course_id': text_type(self.course_key),
+            'subsection_id': text_type(self.usage_key),
+            'history': []
+        }
+
+        self.assertEqual(expected_data, resp.data)
+
+    @ddt.data(
+        'login_staff',
+        'login_course_admin',
+        'login_course_staff',
+    )
+    @freeze_time('2019-01-01')
+    def test_with_override_with_history(self, login_method):
+        getattr(self, login_method)()
+
+        override = PersistentSubsectionGradeOverride.update_or_create_override(
+            requesting_user=self.global_staff,
+            subsection_grade_model=self.grade,
+            earned_all_override=0.0,
+            earned_graded_override=0.0,
+            feature=PersistentSubsectionGradeOverrideHistory.GRADEBOOK,
+        )
+
+        resp = self.client.get(
+            self.get_url(subsection_id=self.usage_key)
+        )
+
+        expected_data = {
+            'original_grade': OrderedDict([
+                ('earned_all', 6.0),
+                ('possible_all', 12.0),
+                ('earned_graded', 6.0),
+                ('possible_graded', 8.0)
+            ]),
+            'user_id': 12345,
+            'override': OrderedDict([
+                ('earned_all_override', 0.0),
+                ('possible_all_override', 12.0),
+                ('earned_graded_override', 0.0),
+                ('possible_graded_override', 8.0)
+            ]),
+            'course_id': text_type(self.course_key),
+            'subsection_id': text_type(self.usage_key),
+            'history': [{
+                'user': self.global_staff.username,
+                'comments': None,
+                'created': '2019-01-01T00:00:00Z',
+                'feature': 'GRADEBOOK',
+                'action': 'CREATEORUPDATE'
+            }]
+        }
+
+        self.assertEqual(expected_data, resp.data)
+
+    @ddt.data(
+        'login_staff',
+    )
+    def test_with_invalid_format_subsection_id(self, login_method):
+        getattr(self, login_method)()
+
+        resp = self.client.get(
+            self.get_url(subsection_id='notAValidSubectionId')
+        )
+
+        self.assertEqual(status.HTTP_404_NOT_FOUND, resp.status_code)
+
+    @ddt.data(
+        'login_staff',
+    )
+    def test_with_invalid_format_user_id(self, login_method):
+        getattr(self, login_method)()
+
+        resp = self.client.get(
+            self.get_url(subsection_id=self.usage_key, user_id='notAnIntegerUserId')
+        )
+
+        self.assertEqual(status.HTTP_404_NOT_FOUND, resp.status_code)
+
+    @ddt.data(
+        'login_staff',
+        'login_course_admin',
+        'login_course_staff',
+    )
+    def test_with_valid_subsection_id_and_valid_user_id_but_no_record(self, login_method):
+        getattr(self, login_method)()
+
+        override = PersistentSubsectionGradeOverride.update_or_create_override(
+            requesting_user=self.global_staff,
+            subsection_grade_model=self.grade,
+            earned_all_override=0.0,
+            earned_graded_override=0.0,
+            feature=PersistentSubsectionGradeOverrideHistory.GRADEBOOK,
+        )
+
+        resp = self.client.get(
+            self.get_url(subsection_id=self.usage_key, user_id=6789)
+        )
+
+        expected_data = {
+            'original_grade': None,
+            'user_id': 6789,
+            'override': None,
+            'course_id': None,
+            'subsection_id': text_type(self.usage_key),
+            'history': []
+        }
+
+        self.assertEqual(expected_data, resp.data)
+
+    def test_with_unauthorized_user(self):
+        student = UserFactory(username='dummy', password='test')
+        self.client.login(username=student.username, password='test')
+
+        resp = self.client.get(
+            self.get_url(subsection_id=self.usage_key)
+        )
+
+        self.assertEqual(status.HTTP_403_FORBIDDEN, resp.status_code)
