@@ -23,6 +23,6 @@ ${_("This is to confirm that you changed the e-mail associated with "
     % endif
 % endif
 
-${_('If the link is not clickable, try copying and pasting it into the address bar of your web browser, and press "Enter" key to open the page')}
+${_('(If the link is not clickable, try copying and pasting it into the address bar of your web browser, and press "Enter" key to open the page)')}
 
 ${_("We keep a log of old e-mails, so if this request was unintentional, we can investigate.")}
