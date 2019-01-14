@@ -6,6 +6,8 @@ ${_("Your payment was successful. You will see the charge below on your next cre
 
 % if marketing_link('FAQ'):
 ${_("If you have billing questions, please read the FAQ ({faq_url}) or contact {billing_email}.").format(billing_email=payment_support_email, faq_url=marketing_link('FAQ'))}
+
+${_('If the link is not clickable, try copying and pasting it into the address bar of your web browser, and press "Enter" key to open the page')}
 % else:
 ${_("If you have billing questions, please contact {billing_email}.").format(billing_email=payment_support_email)}
 % endif

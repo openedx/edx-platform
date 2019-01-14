@@ -5,5 +5,7 @@ ${_("Review ID Verification Photos")}
 
 review_url: ${review_url}
 
+${_('If the link is not clickable, try copying and pasting it into the address bar of your web browser, and press "Enter" key to open the page')}
+
 ${_("Thank you,")}
 ${_("The {platform_name} team").format(platform_name=platform_name)}
