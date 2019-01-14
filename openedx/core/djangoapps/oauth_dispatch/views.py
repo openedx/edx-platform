@@ -84,12 +84,21 @@ class _DispatchingView(View):
         else:
             return request.POST.get('client_id')
 
-
+class NewTokenView(dot_views.TokenView):
+    @classmethod
+    def get_server(cls):
+        """
+        Return an instance of `server_class` initialized with a `validator_class`
+        object
+        """
+        server_class = cls.get_server_class()
+        validator_class = cls.get_validator_class()
+        return server_class(request_validator = validator_class(),token_expires_in=200)
 class AccessTokenView(RatelimitMixin, _DispatchingView):
     """
     Handle access token requests.
     """
-    dot_view = dot_views.TokenView
+    dot_view = NewTokenView
     dop_view = dop_views.AccessTokenView
     ratelimit_key = 'openedx.core.djangoapps.util.ratelimit.real_ip'
     ratelimit_rate = settings.RATELIMIT_RATE
