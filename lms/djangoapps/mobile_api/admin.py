@@ -13,7 +13,7 @@ admin.site.register(IgnoreMobileAvailableFlagConfig, ConfigurationModelAdmin)
 
 class AppVersionConfigAdmin(admin.ModelAdmin):
     """ Admin class for AppVersionConfig model """
-    fields = ('platform', 'version', 'expire_at', 'enabled')
+    fields = ('platform', 'version', 'expire_at', 'enabled', 'is_audited')
     list_filter = ['platform']
 
     class Meta(object):
