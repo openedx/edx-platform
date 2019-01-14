@@ -147,11 +147,9 @@ def update_third_party_auth_context_for_enterprise(request, context, enterprise_
         context['data']['third_party_auth']['errorMessage'] = Text(_(
             u'We are sorry, you are not authorized to access {platform_name} via this channel. '
             u'Please contact your learning administrator or manager in order to access {platform_name}.'
-            u'{line_break}{line_break}'
-            u'Error Details:{line_break}{error_message}')
+            u'{line_break}{line_break}')
         ).format(
             platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
-            error_message=context['data']['third_party_auth']['errorMessage'],
             line_break=HTML('<br/>')
         )
 

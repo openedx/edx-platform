@@ -16,7 +16,7 @@
         <h2><%- gettext("Sign in to continue learning") %></h2>
     <% } %>
     <p>
-        <%- gettext("You already have an edX account with your {enterprise_name} email address.").replace(/{enterprise_name}/g, context.enterpriseName) %>
+        <%- gettext("You already have an EliteMBA account with your {enterprise_name} email address.").replace(/{enterprise_name}/g, context.enterpriseName) %>
         <% if (context.syncLearnerProfileData) {
             %><%- gettext("Going forward, your account information will be updated and maintained by {enterprise_name}.").replace(/{enterprise_name}/g, context.enterpriseName) %>
         <% } %>

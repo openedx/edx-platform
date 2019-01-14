@@ -818,9 +818,9 @@ def course_about(request, course_id):
             professional_mode = modes.get(CourseMode.PROFESSIONAL, '') or \
                 modes.get(CourseMode.NO_ID_PROFESSIONAL_MODE, '')
             if professional_mode.sku:
-                ecommerce_checkout_link = ecomm_service.get_checkout_page_url(professional_mode.sku)
+                ecommerce_checkout_link = ecomm_service.get_checkout_page_url(professional_mode.sku, username=request.user.username)
             if professional_mode.bulk_sku:
-                ecommerce_bulk_checkout_link = ecomm_service.get_checkout_page_url(professional_mode.bulk_sku)
+                ecommerce_bulk_checkout_link = ecomm_service.get_checkout_page_url(professional_mode.bulk_sku, username=request.user.username)
 
         registration_price, course_price = get_course_prices(course)
 
@@ -1745,8 +1745,8 @@ def financial_assistance_form(request):
                 'placeholder': '',
                 'name': 'mktg-permission',
                 'label': _(
-                    'I allow edX to use the information provided in this application '
-                    '(except for financial information) for edX marketing purposes.'
+                    'I allow EliteMBA to use the information provided in this application '
+                    '(except for financial information) for EliteMBA marketing purposes.'
                 ),
                 'defaultValue': '',
                 'type': 'checkbox',

@@ -239,7 +239,7 @@ class CourseFields(object):
         scope=Scope.settings
     )
     display_name = String(
-        help=_("Enter the name of the course as it should appear in the edX.org course list."),
+        help=_("Enter the name of the course as it should appear in the EliteMBA.cn course list."),
         default="Empty",
         display_name=_("Course Display Name"),
         scope=Scope.settings
@@ -308,7 +308,7 @@ class CourseFields(object):
     is_new = Boolean(
         display_name=_("Course Is New"),
         help=_(
-            "Enter true or false. If true, the course appears in the list of new courses on edx.org, and a New! "
+            "Enter true or false. If true, the course appears in the list of new courses on EliteMBA.cn, and a New! "
             "badge temporarily appears next to the course image."
         ),
         scope=Scope.settings
@@ -321,7 +321,7 @@ class CourseFields(object):
     )
     video_upload_pipeline = Dict(
         display_name=_("Video Upload Credentials"),
-        help=_("Enter the unique identifier for your course's video files provided by edX."),
+        help=_("Enter the unique identifier for your course's video files provided by EliteMBA."),
         scope=Scope.settings
     )
     no_grade = Boolean(
@@ -365,7 +365,7 @@ class CourseFields(object):
             # Translators: Custom Courses for edX (CCX) is an edX feature for re-using course content. CCX Coach is
             # a role created by a course Instructor to enable a person (the "Coach") to manage the custom course for
             # his students.
-            "Allow course instructors to assign CCX Coach roles, and allow coaches to manage Custom Courses on edX."
+            "Allow course instructors to assign CCX Coach roles, and allow coaches to manage Custom Courses on EliteMBA."
             " When false, Custom Courses cannot be created, but existing Custom Courses will be preserved."
         ),
         default=False,
@@ -606,7 +606,7 @@ class CourseFields(object):
     allow_public_wiki_access = Boolean(
         display_name=_("Allow Public Wiki Access"),
         help=_(
-            "Enter true or false. If true, edX users can view the course wiki even "
+            "Enter true or false. If true, EliteMBA users can view the course wiki even "
             "if they're not enrolled in the course."
         ),
         default=False,

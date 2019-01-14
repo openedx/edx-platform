@@ -108,7 +108,7 @@ def get_footer(is_secure=True):
         "legal_links": _footer_legal_links(),
         "edx_org_link": {
             "url": "https://www.edx.org/?utm_medium=affiliate_partner&utm_source=opensource-partner&utm_content=open-edx-partner-footer-link&utm_campaign=open-edx-footer",
-            "text": _("Take free online courses at edX.org"),
+            "text": _("Take free online courses at EliteMBA.cn"),
         },
     }
 
