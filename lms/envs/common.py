@@ -521,6 +521,7 @@ OAUTH2_DEFAULT_SCOPES = {
 }
 
 OAUTH2_PROVIDER = {
+    'ACCESS_TOKEN_EXPIRE_SECONDS': 60 * 60 * 24 * 365,
     'OAUTH2_VALIDATOR_CLASS': 'openedx.core.djangoapps.oauth_dispatch.dot_overrides.validators.EdxOAuth2Validator',
     # 3 months and then we expire refresh tokens using edx_clear_expired_tokens (length is mobile app driven)
     'REFRESH_TOKEN_EXPIRE_SECONDS': 7776000,

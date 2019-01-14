@@ -94,7 +94,8 @@ class NewTokenView(dot_views.TokenView):
         """
         server_class = cls.get_server_class()
         validator_class = cls.get_validator_class()
-        return server_class(request_validator=validator_class(), token_expires_in=200)
+        return server_class(request_validator=validator_class(),
+                            token_expires_in=settings.OAUTH2_PROVIDER['ACCESS_TOKEN_EXPIRE_SECONDS'])
 
 
 class AccessTokenView(RatelimitMixin, _DispatchingView):
