@@ -54,6 +54,7 @@ git+https://github.com/edx/xblock-utils.git@v1.1.1#egg=xblock-utils==1.1.1
 -e git+https://github.com/MarCnu/pdfXBlock.git#egg=pdfXBlock
 -e git+https://github.com/solashirai/crowdsourcehinter.git#egg=crowdsourcehinter
 -e git+https://github.com/pmitros/FeedbackXBlock.git#egg=FeedbackXBlock
+parsel==1.2.0
 -e git+https://github.com/edx-solutions/xblock-image-explorer.git#egg=xblock-image-explorer
 -e git+https://github.com/raccoongang/xblock-in-video-quiz.git@invquiz-rg#egg=xblock-in-video-quiz
 -e git+https://github.com/raccoongang/xblock-free-text-response.git@v0.2.1#egg=xblock-free-text-response==0.2.1
