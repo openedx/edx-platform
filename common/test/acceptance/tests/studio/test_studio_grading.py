@@ -115,6 +115,7 @@ class GradingPageTest(StudioCourseTest):
             And I delete a grade
             Then I see I now have "2" grades
         """
+        # Test
         length = self.grading_page.total_number_of_grades
         self.grading_page.click_add_grade()
         self.assertTrue(self.grading_page.is_grade_added(length))
