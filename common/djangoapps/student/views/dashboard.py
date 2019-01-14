@@ -652,7 +652,7 @@ def student_dashboard(request):
                 recovery_email_activation_message = Text(
                     _(
                         "Recovery email is not activated yet. "
-                        "Kindly visit your email and follow the instructions to activate it."
+                        "Please visit your email and follow the instructions to activate it."
                     )
                 )
 
