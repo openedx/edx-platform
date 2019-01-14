@@ -34,7 +34,7 @@
 -e git+https://github.com/solashirai/crowdsourcehinter.git#egg=crowdsourcehinter
 
 # Feedback xblock
--e git+https://github.com/pmitros/FeedbackXBlock.git#egg=FeedbackXBlock
+-e git+https://github.com/raccoongang/FeedbackXBlock.git@v0.0.1#egg=xblock-feedback==0.0.1
 
 # Image Explorer xblock
 parsel==1.2.0
