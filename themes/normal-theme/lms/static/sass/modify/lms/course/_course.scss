@@ -336,6 +336,11 @@ body.view-in-course .wrapper-preview-menu, .wrapper-preview-menu{
   font-weight: normal;
   color: $font;
 }
-.course-bookmarks .bookmarks-results-list .bookmarks-results-list-item:hover{
-  opacity: 1;
-}
+.course-bookmarks .bookmarks-results-list{
+  .fa-arrow-right{
+    display: none;
+  }
+  .bookmarks-results-list-item:hover{
+    opacity: 1;
+  }
+} 
