@@ -16182,9 +16182,7 @@ msgstr ""
 #: lms/templates/emails/reverification_processed.txt
 msgid ""
 "(If the link is not clickable, try copying and pasting it into the address "
-"bar of your web browser, and press \"Enter\" key to open the page), try "
-"copying and pasting it into the address bar of your web browser, and press "
-"\"Enter\" key to open the page"
+"bar of your web browser, and press \"Enter\" key to open the page)"
 msgstr ""
 
 #: lms/templates/emails/activation_email.txt

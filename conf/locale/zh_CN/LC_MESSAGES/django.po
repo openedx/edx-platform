@@ -16500,9 +16500,7 @@ msgstr "注册差不多完成啦！点击链接激活您的账号，体验{platf
 #: lms/templates/emails/reverification_processed.txt
 msgid ""
 "(If the link is not clickable, try copying and pasting it into the address "
-"bar of your web browser, and press \"Enter\" key to open the page), try "
-"copying and pasting it into the address bar of your web browser, and press "
-"\"Enter\" key to open the page"
+"bar of your web browser, and press \"Enter\" key to open the page)"
 msgstr "（如链接点击无效，请手动复制链接并粘贴到浏览器地址栏中，然后按“回车”打开页面即可）"
 
 #: lms/templates/emails/activation_email.txt
