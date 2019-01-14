@@ -84,6 +84,7 @@ class _DispatchingView(View):
         else:
             return request.POST.get('client_id')
 
+
 class NewTokenView(dot_views.TokenView):
     @classmethod
     def get_server(cls):
@@ -93,7 +94,9 @@ class NewTokenView(dot_views.TokenView):
         """
         server_class = cls.get_server_class()
         validator_class = cls.get_validator_class()
-        return server_class(request_validator = validator_class(),token_expires_in=200)
+        return server_class(request_validator=validator_class(), token_expires_in=200)
+
+
 class AccessTokenView(RatelimitMixin, _DispatchingView):
     """
     Handle access token requests.
