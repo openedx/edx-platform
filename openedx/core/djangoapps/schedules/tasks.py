@@ -1,6 +1,7 @@
 import datetime
 import logging
 
+import json
 from celery import task
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -122,12 +123,18 @@ class ScheduleMessageBaseTask(LoggedTask):
 
         # If no target date was provided, then enqueue tasks from the current date
         if target_day_str is None:
-            return self.enqueue(
-                site,
-                now(),
-                day_offset,
-                override_recipient_email,
-            )
+            if isinstance(day_offset, basestring):
+                day_offset_list = json.loads(day_offset)
+            else:
+                day_offset_list = [day_offset]
+
+            for offset in day_offset_list:
+                return self.enqueue(
+                    site,
+                    now(),
+                    offset,
+                    override_recipient_email,
+                )
 
         # Otherwise, process the batched tasks
         with emulate_http_request(site=site):
