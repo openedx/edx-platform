@@ -45,8 +45,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-01-12 12:02+0800\n"
-"PO-Revision-Date: 2019-01-12 04:02:32.061507\n"
+"POT-Creation-Date: 2019-01-14 10:06+0800\n"
+"PO-Revision-Date: 2019-01-14 02:06:46.408129\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -16172,6 +16172,17 @@ msgid ""
 "You're almost there! Use the link to activate your account to access "
 "engaging, high-quality {platform_name} courses. Note that you will not be "
 "able to log back into your account until you have activated it."
+msgstr ""
+
+#: lms/templates/emails/activation_email.txt
+#: lms/templates/emails/confirm_email_change.txt
+#: lms/templates/emails/failed_verification_email.txt
+#: lms/templates/emails/order_confirmation_email.txt
+#: lms/templates/emails/photo_submission_review.txt
+#: lms/templates/emails/reverification_processed.txt
+msgid ""
+"If the link is not clickable, try copying and pasting it into the address "
+"bar of your web browser, and press \"Enter\" key to open the page"
 msgstr ""
 
 #: lms/templates/emails/activation_email.txt

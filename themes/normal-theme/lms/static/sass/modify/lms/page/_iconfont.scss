@@ -49,7 +49,8 @@ $icon-width: 18px;
 .fa-arrow-right:before,
 .fa-exclamation-circle:before,
 .account-activation.success.aa-icon .message-copy::before,
-.fa-camera:before
+.fa-camera:before,
+.account-activation.info.aa-icon .message-copy::before
 {
   content: '';
   display: inline-block;
@@ -262,6 +263,11 @@ $icon-width: 18px;
   padding: 0;
   margin-top: 3px;
 }
+.account-activation.info.aa-icon .message-copy::before{
+  background-position: calcP(4, 5);
+  padding: 0;
+}
+
 .fa-camera:before{
   background-position: calcP(10, 3)
 }
