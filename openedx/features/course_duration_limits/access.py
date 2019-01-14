@@ -23,7 +23,7 @@ from openedx.features.course_duration_limits.models import CourseDurationLimitCo
 from web_fragments.fragment import Fragment
 
 MIN_DURATION = timedelta(weeks=4)
-MAX_DURATION = timedelta(weeks=12)
+MAX_DURATION = timedelta(weeks=18)
 
 
 class AuditExpiredError(AccessError):
