@@ -74,7 +74,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-01-12 12:02+0800\n"
+"POT-Creation-Date: 2019-01-14 10:06+0800\n"
 "PO-Revision-Date: 2018-12-07 12:23+0000\n"
 "Last-Translator: li ying <code@eliteu.cn>, 2019\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)\n"
@@ -884,7 +884,7 @@ msgstr "{html_start} 此账号已被激活。{html_end}"
 #: common/djangoapps/student/views/management.py
 #, python-brace-format
 msgid "{html_start}Success{html_end} You have activated your account."
-msgstr "{html_start} 成功 {html_end} 您已激活您的账号。"
+msgstr "{html_start} 成功！ {html_end} 您已激活您的账号。"
 
 #: common/djangoapps/student/views/management.py
 #, python-brace-format
@@ -16493,6 +16493,17 @@ msgid ""
 msgstr "注册差不多完成啦！点击链接激活您的账号，体验{platform_name}的精品课程。注意，您必须激活账号才可以登录。"
 
 #: lms/templates/emails/activation_email.txt
+#: lms/templates/emails/confirm_email_change.txt
+#: lms/templates/emails/failed_verification_email.txt
+#: lms/templates/emails/order_confirmation_email.txt
+#: lms/templates/emails/photo_submission_review.txt
+#: lms/templates/emails/reverification_processed.txt
+msgid ""
+"If the link is not clickable, try copying and pasting it into the address "
+"bar of your web browser, and press \"Enter\" key to open the page"
+msgstr "如链接点击无效，请手动复制链接并粘贴到浏览器地址栏中，然后按“回车”打开页面即可"
+
+#: lms/templates/emails/activation_email.txt
 msgid "Enjoy learning with {platform_name}."
 msgstr "享受您在{platform_name}上的学习之旅。"
 
@@ -20843,7 +20854,7 @@ msgstr "八、用户行为"
 msgid ""
 "The User agrees that the Service will not be used for any illegal or "
 "improper activities, including but not limited to the following:"
-msgstr "用户同意将不会利用本服务进行任何违法或不正当的活动，包括但不限于下列行为∶"
+msgstr "用户同意将不会利用本服务进行任何违法或不正当的活动，包括但不限于下列行为："
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
