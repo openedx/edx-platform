@@ -86,6 +86,9 @@ def get_experiment_user_metadata_context(course, user):
                     courses_not_started = 0
                     courses_in_progress = 0
                     courses_completed = 0
+                    is_discounted = None
+                    full_price = 0
+                    discounted_price = 0
                     program_data = meter.engaged_programs[0]
                     program_data = ProgramDataExtender(program_data, user, mobile_only=False).extend()
                     program_orgs = program_data.get('credit_backing_organizations')
@@ -97,6 +100,11 @@ def get_experiment_user_metadata_context(course, user):
                         courses_not_started = progress.get('not_started')
                         courses_in_progress = progress.get('in_progress')
                         courses_completed = progress.get('completed')
+                    if program_data.get('discount_data'):
+                        discount_data = program_data.get('discount_data')
+                        is_discounted = discount_data.get('is_discounted')
+                        full_price = discount_data.get('total_incl_tax_excl_discounts')
+                        discounted_price = discount_data.get('total_incl_tax')
                     program_key = {
                         'uuid': program_data.get('uuid'),
                         'title': program_data.get('title'),
@@ -105,6 +113,9 @@ def get_experiment_user_metadata_context(course, user):
                         'courses_not_started': courses_not_started,
                         'courses_in_progress': courses_in_progress,
                         'courses_completed': courses_completed,
+                        'is_discounted': is_discounted,
+                        'full_price': full_price,
+                        'discounted_price': discounted_price,
                     }
             # TODO: clean up as part of REVEM-106 (END)
     except CourseEnrollment.DoesNotExist:
