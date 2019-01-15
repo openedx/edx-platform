@@ -112,7 +112,7 @@
     background-repeat: no-repeat;
     background-position: right 10px;
     border-radius: 3px;
-    &.is-denied{
+    &.is-denied, &.is-accepted{
       background-image: none;
     }
   }
