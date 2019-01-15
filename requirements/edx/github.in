@@ -84,6 +84,7 @@
 
 # Why a django-celery fork? To add Django 1.11 compatibility to the abandoned repo.
 # This dependency will be removed by the Celery 4 upgrade: https://openedx.atlassian.net/browse/PLAT-1684
+# When upgrading, check compatibility with community-configured settings.CELERYBEAT_SCHEDULES, cf https://github.com/edx/edx-platform/pull/19047
 -e git+https://github.com/edx/django-celery.git@756cb57aad765cb2b0d37372c1855b8f5f37e6b0#egg=django-celery==3.2.1+edx.2
 
 # Our libraries:
