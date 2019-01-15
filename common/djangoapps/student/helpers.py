@@ -415,6 +415,8 @@ def authenticate_new_user(request, username, password):
     password = normalize_password(password)
     backend = load_backend(NEW_USER_AUTH_BACKEND)
     user = backend.authenticate(request=request, username=username, password=password)
+    if not user:
+        log.warning("Unable to authenticate user: {username}".format(username=username))
     user.backend = NEW_USER_AUTH_BACKEND
     return user
 
