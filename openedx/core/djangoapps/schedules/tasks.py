@@ -1,7 +1,6 @@
 import datetime
 import logging
 
-import json
 from celery import task
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -123,8 +122,8 @@ class ScheduleMessageBaseTask(LoggedTask):
 
         # If no target date was provided, then enqueue tasks from the current date
         if target_day_str is None:
-            if isinstance(day_offset, basestring):
-                day_offset_list = json.loads(day_offset)
+            if isinstance(day_offset, list):
+                day_offset_list = day_offset
             else:
                 day_offset_list = [day_offset]
 
