@@ -26401,7 +26401,7 @@ msgstr "萧柏春 博士"
 msgid ""
 "Lifetime Professor and Dean of Management Major in School of Business, Long "
 "Island University - C. W. Post, USA"
-msgstr "改为 美国长岛大学商学院管理系主任，终身教授"
+msgstr "美国长岛大学商学院管理系主任，终身教授"
 
 #: membership/templates/membership/index.html
 msgid "Dr. Lloyd E. Shefsky"
