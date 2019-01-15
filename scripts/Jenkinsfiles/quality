@@ -9,21 +9,28 @@ def runQualityTests() {
             if (SHARD == "4") {
                 git_shallow_clone = false
                 git_extensions.add([$class: 'WipeWorkspace'])
-                refspec = refspec + " +refs/heads/master:refs/remotes/origin/master"
+                refspec = refspec + " +refs/heads/${TARGET_BRANCH}:refs/remotes/origin/${TARGET_BRANCH}"
             }
         } else {
-            git_branch = 'master'
-            refspec = "+refs/heads/master:refs/remotes/origin/master"
+            git_branch = "${BRANCH_NAME}"
+            refspec = "+refs/heads/${BRANCH_NAME}:refs/remotes/origin/${BRANCH_NAME}"
         }
         git_extensions.add([$class: 'CloneOption', honorRefspec: true, noTags: true, shallow: git_shallow_clone ])
 
         checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: git_branch]],
             doGenerateSubmoduleConfigurations: false, extensions: git_extensions, submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'jenkins-worker',
-            refspec: refspec,
-            url: 'git@github.com:edx/edx-platform.git']]]
+            refspec: refspec, url: "git@github.com:edx/${REPO_NAME}.git"]]]
 
         sh "bash scripts/all-tests.sh"
         stash includes: '**/reports/**/*', name: "${TEST_SUITE}-${SHARD}-reports"
+    }
+}
+
+def getTargetBranch(job_name) {
+    if (env.ghprbTargetBranch) {
+        return env.ghprbTargetBranch
+    } else {
+        return "${BRANCH_NAME}"
     }
 }
 
@@ -50,10 +57,13 @@ pipeline {
                     build job: 'github-build-status',
                         parameters: [
                             string(name: 'GIT_SHA', value: commit_sha),
-                            string(name: 'GITHUB_ORG', value: 'edx'), string(name: 'GITHUB_REPO', value: 'edx-platform'),
+                            string(name: 'GITHUB_ORG', value: 'edx'),
+                            string(name: 'GITHUB_REPO', value: "${REPO_NAME}"),
                             string(name: 'TARGET_URL', value: "${BUILD_URL}"),
-                            string(name: 'DESCRIPTION', value: 'Pending'), string(name: 'CONTEXT', value: 'jenkins/quality'),
-                            string(name: 'CREATE_DEPLOYMENT', value: 'false'), string(name: 'BUILD_STATUS', value: 'pending')
+                            string(name: 'DESCRIPTION', value: 'Pending'),
+                            string(name: 'CONTEXT', value: 'jenkins/quality'),
+                            string(name: 'CREATE_DEPLOYMENT', value: 'false'),
+                            string(name: 'BUILD_STATUS', value: 'pending')
                         ],
                         propagate: false, wait: false
                 }
@@ -123,6 +133,7 @@ pipeline {
                     environment {
                         TEST_SUITE = "quality"
                         SHARD = 4
+                        TARGET_BRANCH = getTargetBranch("${JOB_NAME}")
                     }
                     steps {
                         script {
@@ -154,7 +165,7 @@ pipeline {
                         honorRefspec: true, noTags: true, shallow: false], [$class: 'WipeWorkspace']], submoduleCfg: [],
                         userRemoteConfigs: [[credentialsId: 'jenkins-worker',
                         refspec: "+refs/heads/${ghprbTargetBranch}:refs/remotes/origin/${ghprbTargetBranch} +refs/pull/${ghprbPullId}/*:refs/remotes/origin/pr/${ghprbPullId}/*",
-                        url: 'git@github.com:edx/edx-platform.git']]]
+                        url: "git@github.com:edx/${REPO_NAME}.git"]]]
                     unstash 'quality-1-reports'
                     unstash 'quality-2-reports'
                     unstash 'quality-3-reports'
@@ -209,10 +220,13 @@ pipeline {
                         commit_sha = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
                         build job: 'github-build-status', parameters: [
                                 string(name: 'GIT_SHA', value: commit_sha),
-                                string(name: 'GITHUB_ORG', value: 'edx'), string(name: 'GITHUB_REPO', value: 'edx-platform'),
+                                string(name: 'GITHUB_ORG', value: 'edx'),
+                                string(name: 'GITHUB_REPO', value: "${REPO_NAME}"),
                                 string(name: 'TARGET_URL', value: "${BUILD_URL}"),
-                                string(name: 'DESCRIPTION', value: build_description), string(name: 'CONTEXT', value: 'jenkins/quality'),
-                                string(name: 'CREATE_DEPLOYMENT', value: create_deployment), string(name: 'BUILD_STATUS', value: build_status)
+                                string(name: 'DESCRIPTION', value: build_description),
+                                string(name: 'CONTEXT', value: 'jenkins/quality'),
+                                string(name: 'CREATE_DEPLOYMENT', value: create_deployment),
+                                string(name: 'BUILD_STATUS', value: build_status)
                             ],
                             propagate: false, wait: false
 

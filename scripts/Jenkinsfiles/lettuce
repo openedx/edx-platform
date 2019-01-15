@@ -4,14 +4,14 @@ def runLettuceTests() {
         git_branch = "${ghprbActualCommit}"
         git_refspec = "+refs/pull/${ghprbPullId}/*:refs/remotes/origin/pr/${ghprbPullId}/*"
     } else {
-        git_branch = 'master'
-        git_refspec = "+refs/heads/master:refs/remotes/origin/master"
+        git_branch = "${BRANCH_NAME}"
+        git_refspec = "+refs/heads/${BRANCH_NAME}:refs/remotes/origin/${BRANCH_NAME}"
     }
     sshagent(credentials: ['jenkins-worker', 'jenkins-worker-pem'], ignoreMissing: true) {
         checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: git_branch]],
             doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', honorRefspec: true,
             noTags: true, shallow: true]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'jenkins-worker',
-            refspec: git_refspec, url: 'git@github.com:edx/edx-platform.git']]]
+            refspec: git_refspec, url: "git@github.com:edx/${REPO_NAME}.git"]]]
         console_output = sh(returnStdout: true, script: 'bash scripts/all-tests.sh').trim()
         dir('stdout') {
             writeFile file: "${TEST_SUITE}-stdout.log", text: console_output
@@ -42,10 +42,13 @@ pipeline {
                     build job: 'github-build-status',
                         parameters: [
                             string(name: 'GIT_SHA', value: commit_sha),
-                            string(name: 'GITHUB_ORG', value: 'edx'), string(name: 'GITHUB_REPO', value: 'edx-platform'),
+                            string(name: 'GITHUB_ORG', value: 'edx'),
+                            string(name: 'GITHUB_REPO', value: "${REPO_NAME}"),
                             string(name: 'TARGET_URL', value: "${BUILD_URL}"),
-                            string(name: 'DESCRIPTION', value: 'Pending'), string(name: 'CONTEXT', value: 'jenkins/lettuce'),
-                            string(name: 'CREATE_DEPLOYMENT', value: 'false'), string(name: 'BUILD_STATUS', value: 'pending')
+                            string(name: 'DESCRIPTION', value: 'Pending'),
+                            string(name: 'CONTEXT', value: 'jenkins/lettuce'),
+                            string(name: 'CREATE_DEPLOYMENT', value: 'false'),
+                            string(name: 'BUILD_STATUS', value: 'pending')
                         ],
                         propagate: false, wait: false
                 }
@@ -115,10 +118,13 @@ pipeline {
                     build job: 'github-build-status',
                         parameters: [
                             string(name: 'GIT_SHA', value: commit_sha),
-                            string(name: 'GITHUB_ORG', value: 'edx'), string(name: 'GITHUB_REPO', value: 'edx-platform'),
+                            string(name: 'GITHUB_ORG', value: 'edx'),
+                            string(name: 'GITHUB_REPO', value: "${REPO_NAME}"),
                             string(name: 'TARGET_URL', value: "${BUILD_URL}"),
-                            string(name: 'DESCRIPTION', value: build_description), string(name: 'CONTEXT', value: 'jenkins/lettuce'),
-                            string(name: 'CREATE_DEPLOYMENT', value: create_deployment), string(name: 'BUILD_STATUS', value: build_status)
+                            string(name: 'DESCRIPTION', value: build_description),
+                            string(name: 'CONTEXT', value: 'jenkins/lettuce'),
+                            string(name: 'CREATE_DEPLOYMENT', value: create_deployment),
+                            string(name: 'BUILD_STATUS', value: build_status)
                         ],
                         propagate: false, wait: false
 
