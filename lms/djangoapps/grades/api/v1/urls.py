@@ -38,4 +38,9 @@ urlpatterns = [
         gradebook_views.CourseGradingView.as_view(),
         name='course_gradebook_grading_info'
     ),
+    url(
+        r'^subsection/(?P<subsection_id>.*)/$',
+        gradebook_views.SubsectionGradeView.as_view(),
+        name='course_grade_overrides'
+    ),
 ]
