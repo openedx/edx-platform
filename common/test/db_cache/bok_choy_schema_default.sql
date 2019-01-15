@@ -2182,7 +2182,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=512 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=513 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -4215,6 +4215,7 @@ CREATE TABLE `sap_success_factors_sapsuccessfactorsglobalconfiguration` (
   `oauth_api_path` varchar(255) NOT NULL,
   `provider_id` varchar(100) NOT NULL,
   `changed_by_id` int(11) DEFAULT NULL,
+  `search_student_api_path` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `sap_success_facto_changed_by_id_1afac95cc5c52140_fk_auth_user_id` (`changed_by_id`),
   CONSTRAINT `sap_success_factors_sapsu_changed_by_id_e3241cc9_fk` FOREIGN KEY (`changed_by_id`) REFERENCES `auth_user` (`id`)
