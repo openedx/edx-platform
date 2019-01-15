@@ -45,8 +45,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-01-04 10:36+0800\n"
-"PO-Revision-Date: 2019-01-04 02:36:20.822484\n"
+"POT-Creation-Date: 2019-01-14 10:06+0800\n"
+"PO-Revision-Date: 2019-01-14 02:06:46.408129\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -2596,7 +2596,8 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter the name of the course as it should appear in the edX.org course list."
+"Enter the name of the course as it should appear in the EliteMBA.cn course "
+"list."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -2694,7 +2695,8 @@ msgstr ""
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Enter true or false. If true, the course appears in the list of new courses "
-"on edx.org, and a New! badge temporarily appears next to the course image."
+"on EliteMBA.cn, and a New! badge temporarily appears next to the course "
+"image."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -2713,7 +2715,8 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter the unique identifier for your course's video files provided by edX."
+"Enter the unique identifier for your course's video files provided by "
+"EliteMBA."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -2778,8 +2781,8 @@ msgstr ""
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Allow course instructors to assign CCX Coach roles, and allow coaches to "
-"manage Custom Courses on edX. When false, Custom Courses cannot be created, "
-"but existing Custom Courses will be preserved."
+"manage Custom Courses on EliteMBA. When false, Custom Courses cannot be "
+"created, but existing Custom Courses will be preserved."
 msgstr ""
 
 #. Translators: Custom Courses for edX (CCX) is an edX feature for re-using
@@ -3055,8 +3058,8 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter true or false. If true, edX users can view the course wiki even if "
-"they're not enrolled in the course."
+"Enter true or false. If true, EliteMBA users can view the course wiki even "
+"if they're not enrolled in the course."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -4608,7 +4611,7 @@ msgid "Please check the syntax of your entry."
 msgstr ""
 
 #: lms/djangoapps/branding/api.py
-msgid "Take free online courses at edX.org"
+msgid "Take free online courses at EliteMBA.cn"
 msgstr ""
 
 #. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
@@ -4999,7 +5002,6 @@ msgstr ""
 #. protect published content
 #: lms/djangoapps/certificates/views/webview.py
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
-#: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "All rights reserved"
 msgstr ""
 
@@ -5755,8 +5757,8 @@ msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
 msgid ""
-"I allow edX to use the information provided in this application (except for "
-"financial information) for edX marketing purposes."
+"I allow EliteMBA to use the information provided in this application (except"
+" for financial information) for EliteMBA marketing purposes."
 msgstr ""
 
 #: lms/djangoapps/dashboard/git_import.py
@@ -9534,7 +9536,7 @@ msgid "Our mailing address is"
 msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_head.html
-msgid "edX Email"
+msgid "EliteMBA Email"
 msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.html
@@ -10472,8 +10474,8 @@ msgstr ""
 #: openedx/core/djangoapps/user_api/accounts/views.py
 #: openedx/core/djangoapps/user_authn/views/login.py
 msgid ""
-"This account has been temporarily locked due to excessive login failures. "
-"Try again later."
+"Due to multiple login failures, the account is temporarily locked. Please "
+"try again after 15 minutes."
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/views.py
@@ -11010,8 +11012,7 @@ msgstr ""
 msgid ""
 "We are sorry, you are not authorized to access {platform_name} via this "
 "channel. Please contact your learning administrator or manager in order to "
-"access {platform_name}.{line_break}{line_break}Error "
-"Details:{line_break}{error_message}"
+"access {platform_name}.{line_break}{line_break}"
 msgstr ""
 
 #: openedx/features/enterprise_support/utils.py
@@ -11034,18 +11035,27 @@ msgid ""
 "profile. {learn_more_link_start}Learn more{learn_more_link_end}"
 msgstr ""
 
-#: themes/normal-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
-#, python-format
-msgid ""
-"Remember when you enrolled in %(course_name)s, and other courses on edX.org?"
-" We do, and we’re glad to have you! Come see what everyone is learning."
+#: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+msgid ","
+msgstr ""
+
+#: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+msgid "All rights reserved."
 msgstr ""
 
 #: themes/normal-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #, python-format
 msgid ""
-"Remember when you enrolled in %(course_name)s on edX.org? We do, and we’re "
-"glad to have you! Come see what everyone is learning."
+"Remember when you enrolled in %(course_name)s, and other courses on "
+"EliteMBA.cn? We do, and we’re glad to have you! Come see what everyone is "
+"learning."
+msgstr ""
+
+#: themes/normal-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
+#, python-format
+msgid ""
+"Remember when you enrolled in %(course_name)s on EliteMBA.cn? We do, and "
+"we’re glad to have you! Come see what everyone is learning."
 msgstr ""
 
 #: cms/djangoapps/api/v1/serializers/course_runs.py
@@ -11891,7 +11901,6 @@ msgstr ""
 #. #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
 #. Translators: this is a verb describing the action of viewing more details
 #: cms/templates/studio_xblock_wrapper.html
-#: lms/templates/certificates/verify.html
 #: lms/templates/wiki/includes/article_menu.html
 #: wiki/templates/wiki/includes/article_menu.html
 msgid "View"
@@ -12138,11 +12147,11 @@ msgid "LEARN MORE"
 msgstr ""
 
 #: lms/templates/course.html
-msgid "Starts"
+msgid "Starts: {date}"
 msgstr ""
 
 #: lms/templates/course.html
-msgid "Starts: {date}"
+msgid "Starts"
 msgstr ""
 
 #: lms/templates/courses_list.html
@@ -14581,7 +14590,7 @@ msgid ""
 msgstr ""
 
 #: lms/templates/certificates/valid.html
-msgid "About edX Certificates"
+msgid "About EliteMBA Certificates"
 msgstr ""
 
 #: lms/templates/certificates/verify.html
@@ -14614,6 +14623,11 @@ msgstr ""
 
 #: lms/templates/certificates/verify.html
 msgid "Electronic Certificate"
+msgstr ""
+
+#: lms/templates/certificates/verify.html
+msgctxt "Certificate"
+msgid "View"
 msgstr ""
 
 #: lms/templates/commerce/checkout_cancel.html
@@ -15414,6 +15428,7 @@ msgid "There are no students enrolled in this course."
 msgstr ""
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
+#: lms/templates/emails/activation_email.txt
 #: lms/templates/emails/business_order_confirmation_email.txt
 #: lms/templates/emails/order_confirmation_email.txt
 msgid "Hi {name},"
@@ -15743,7 +15758,7 @@ msgid ""
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "You have successfully verified your ID with edX"
+msgid "EliteMBA has verified your identity!"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -15865,8 +15880,8 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Your edX verification has been approved. Your verification is effective for "
-"one year after submission."
+"Your EliteMBA verification has been approved. Your verification is effective"
+" for one year after submission."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
@@ -15875,8 +15890,8 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Your edX ID verification is pending. Your verification information has been "
-"submitted and will be reviewed shortly."
+"Your EliteMBA ID verification is pending. Your verification information has "
+"been submitted and will be reviewed shortly."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
@@ -16157,6 +16172,17 @@ msgid ""
 "You're almost there! Use the link to activate your account to access "
 "engaging, high-quality {platform_name} courses. Note that you will not be "
 "able to log back into your account until you have activated it."
+msgstr ""
+
+#: lms/templates/emails/activation_email.txt
+#: lms/templates/emails/confirm_email_change.txt
+#: lms/templates/emails/failed_verification_email.txt
+#: lms/templates/emails/order_confirmation_email.txt
+#: lms/templates/emails/photo_submission_review.txt
+#: lms/templates/emails/reverification_processed.txt
+msgid ""
+"(If the link is not clickable, try copying and pasting it into the address "
+"bar of your web browser, and press \"Enter\" key to open the page)"
 msgstr ""
 
 #: lms/templates/emails/activation_email.txt
@@ -16655,14 +16681,14 @@ msgid "A Note to Learners"
 msgstr ""
 
 #: lms/templates/financial-assistance/financial-assistance.html
-msgid "Dear edX Learner,"
+msgid "Dear EliteMBA Learner,"
 msgstr ""
 
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid ""
-"EdX Financial Assistance is a program we created to give learners in all "
-"financial circumstances a chance to earn a Verified Certificate upon "
-"successful completion of an edX course."
+"EliteMBA Financial Assistance is a program we created to give learners in "
+"all financial circumstances a chance to earn a Verified Certificate upon "
+"successful completion of an EliteMBA course."
 msgstr ""
 
 #: lms/templates/financial-assistance/financial-assistance.html
@@ -16674,24 +16700,25 @@ msgstr ""
 
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid ""
-"In order to be eligible for edX Financial Assistance, you must demonstrate "
-"that paying the Verified Certificate fee would cause you economic hardship. "
-"To apply, you will be asked to answer a few questions about why you are "
-"applying and how the Verified Certificate will benefit you."
+"In order to be eligible for EliteMBA Financial Assistance, you must "
+"demonstrate that paying the Verified Certificate fee would cause you "
+"economic hardship. To apply, you will be asked to answer a few questions "
+"about why you are applying and how the Verified Certificate will benefit "
+"you."
 msgstr ""
 
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid ""
 "If your application is approved, we'll give you instructions for verifying "
-"your identity on edx.org so you can start working toward completing your edX"
-" course."
+"your identity on EliteMBA.cn so you can start working toward completing your"
+" EliteMBA course."
 msgstr ""
 
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid ""
-"EdX is committed to making it possible for you to take high quality courses "
-"from leading institutions regardless of your financial situation, earn a "
-"Verified Certificate, and share your success with others."
+"EliteMBA is committed to making it possible for you to take high quality "
+"courses from leading institutions regardless of your financial situation, "
+"earn a Verified Certificate, and share your success with others."
 msgstr ""
 
 #: lms/templates/financial-assistance/financial-assistance.html
@@ -19565,7 +19592,7 @@ msgid ""
 msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
-msgid "{learner_name}, edX Learner"
+msgid "{learner_name}, EliteMBA Learner"
 msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
@@ -20178,7 +20205,7 @@ msgid ""
 "of Elite. As the content publisher, it is the responsibility of the content "
 "to be published. All the disputes arising from the published content shall "
 "be the legal and joint responsibility of the publisher of the content. "
-"Eliteu does not assume any legal and joint responsibility. "
+"EliteMBA does not assume any legal and joint responsibility. "
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/disclaimer.html
@@ -21204,8 +21231,8 @@ msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/join_us.html
 msgid ""
-"Eliteu pays attention to employee development and attaches importance to the"
-" power of communication. We continue to learn, inspire each other, and "
+"EliteMBA pays attention to employee development and attaches importance to "
+"the power of communication. We continue to learn, inspire each other, and "
 "constantly discover industry inspiration at work, and open our eyes as a "
 "whole community. Here, work is an organic combination of enjoyment and hard "
 "work."
@@ -23728,7 +23755,7 @@ msgid "Last day students can enroll."
 msgstr ""
 
 #: cms/templates/settings.html
-msgid "Contact your edX partner manager to update these settings."
+msgid "Contact your EliteMBA partner manager to update these settings."
 msgstr ""
 
 #: cms/templates/settings.html
@@ -25794,7 +25821,7 @@ msgstr ""
 
 #: membership/templates/membership/index.html
 msgid ""
-"*All course updates reserved to Eliteu and Eliteu has the final "
+"*All course updates reserved to EliteMBA and EliteMBA has the final "
 "interpretation."
 msgstr ""
 
@@ -25905,7 +25932,7 @@ msgid "View More"
 msgstr ""
 
 #: membership/templates/membership/index.html
-msgid "Become Eliteu Member"
+msgid "Become EliteMBA Member"
 msgstr ""
 
 #: membership/templates/membership/index.html
@@ -25914,7 +25941,7 @@ msgstr ""
 
 #: membership/templates/membership/index.html
 msgid ""
-"Enjoy learning all courses in the Eliteu MBA school during the study "
+"Enjoy learning all courses in the EliteMBA MBA school during the study "
 "period，You can join the new class online now!"
 msgstr ""
 
@@ -25966,7 +25993,8 @@ msgstr ""
 
 #: membership/templates/membership/index.html
 msgid ""
-"Enjoy learning all courses in the Eliteu MBA school during the study period"
+"Enjoy learning all courses in the EliteMBA MBA school during the study "
+"period"
 msgstr ""
 
 #: membership/templates/membership/index.html
@@ -26000,25 +26028,25 @@ msgstr ""
 #: membership/templates/membership/index.html
 msgid ""
 "There is a gap called self-discipline outside of 8 hours. Start with the "
-"Eliteu and become a self-disciplined full-stack workplace!"
+"EliteMBA and become a self-disciplined full-stack workplace!"
 msgstr ""
 
 #: membership/templates/membership/index.html
-msgid "Eliteu Theory"
+msgid "EliteMBA Theory"
 msgstr ""
 
 #: membership/templates/membership/result.html
 #: membership/templates/membership/wechat_paying.html
-msgid "Eliteu MBA school cashier"
+msgid "EliteMBA school cashier"
 msgstr ""
 
 #: membership/templates/membership/result.html
-msgid "Eliteu MBA school cashier payment success"
+msgid "EliteMBA school cashier payment success"
 msgstr ""
 
 #: membership/templates/membership/result.html
 #: membership/templates/membership/wechat_paying.html
-msgid "Return to Eliteu MBA school in 3 seconds"
+msgid "Return to EliteMBA school in 3 seconds"
 msgstr ""
 
 #: membership/templates/membership/result.html

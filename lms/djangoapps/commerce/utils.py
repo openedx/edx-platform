@@ -114,6 +114,7 @@ class EcommerceService(object):
         """
         program_uuid = kwargs.get('program_uuid')
         enterprise_catalog_uuid = kwargs.get('catalog')
+        username = kwargs.get('username')
         query_params = {'sku': skus}
         if enterprise_catalog_uuid:
             query_params.update({'catalog': enterprise_catalog_uuid})
@@ -126,6 +127,11 @@ class EcommerceService(object):
             url = '{url}&bundle={program_uuid}'.format(
                 url=url,
                 program_uuid=program_uuid
+            )
+        if username:
+            url = '{url}&username={username}'.format(
+                url=url,
+                username=username
             )
         return url
 

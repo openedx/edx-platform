@@ -30,9 +30,9 @@ var _certificates = function (data) {
         ctx.fillStyle = '#205179';
         // 英文判断
         if (course.length > 36){
-            ctx.font = "400 28px 'Open Sans','Helvetica Neue',Helvetica,Arial,sans-serif";
+            ctx.font = "400 30px 'Open Sans','Helvetica Neue',Helvetica,Arial,sans-serif";
         }else{
-            ctx.font = "400 34px 'Open Sans','Helvetica Neue',Helvetica,Arial,sans-serif";
+            ctx.font = "400 38px 'Open Sans','Helvetica Neue',Helvetica,Arial,sans-serif";
         }
         ctx.fillText(this.course, 137, 424);
         ctx.font = "400 18px 'Open Sans','Helvetica Neue',Helvetica,Arial,sans-serif";

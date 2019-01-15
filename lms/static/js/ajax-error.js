@@ -1,7 +1,7 @@
 $(document).ajaxError(function(event, jXHR) {
     if (jXHR.status === 403) {
         var message = gettext(
-            'You have been logged out of your edX account. ' +
+            'You have been logged out of your EliteMBA account. ' +
             'Click Okay to log in again now. ' +
             'Click Cancel to stay on this page ' +
             '(you must log in again to save your work).'
