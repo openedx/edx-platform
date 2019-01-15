@@ -62,3 +62,6 @@ except ImportError:
 
 # CourseSearch
 SEARCH_SORT = ENV_TOKENS.get('SEARCH_SORT', None)
+
+# App Version
+MOBILE_APP_USER_AGENT_REGEXES = ENV_TOKENS.get('MOBILE_APP_USER_AGENT_REGEXES', None)
