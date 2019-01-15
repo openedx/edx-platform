@@ -6,7 +6,10 @@
 
 .course-wrapper .course-content{
   main{
-    padding: 20px 30px;
+    padding: 0;
+  }
+  #main > .xblock{
+    padding: 20px;
   }
   .vert-mod .vert{
     border-bottom: 1px dashed $border;
@@ -223,7 +226,7 @@
 
 @media screen and (max-width:576px){
   .course-wrapper{
-    .course-content main{
+    #main > .xblock{
       padding: 20px 15px;
     }
   } 

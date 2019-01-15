@@ -112,6 +112,9 @@
     background-repeat: no-repeat;
     background-position: right 10px;
     border-radius: 3px;
+    &.is-denied{
+      background-image: none;
+    }
   }
   .status-verification .status-title{
     color: #fa7f2b;
