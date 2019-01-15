@@ -84,10 +84,12 @@
       padding-right: 10px;
       box-sizing: border-box;
       margin-top: 10px;
+      vertical-align: bottom;
     }
     &.select-year_of_birth{
       width: 49.5%;
       margin: 10px 0 0;
+      vertical-align: bottom;
     }
     .tip, .plaintext-field{
       color: $font;

@@ -80,12 +80,10 @@ select{
 }
 
 select::-ms-expand { display: none; }
-/*
 select::-ms-value{
-  background-color: #fff;
+  background: transparent;
   color: $font;
 }
-*/
 
 // input
 input::-webkit-input-placeholder, .form-control::-webkit-input-placeholder{
