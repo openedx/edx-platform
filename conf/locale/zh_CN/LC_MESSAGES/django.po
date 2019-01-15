@@ -29,9 +29,9 @@
 #
 # Translators:
 # 微 李 <w.li@eliteu.com.cn>, 2018
+# 家璧 刘 <jb.liu@eliteu.com.cn>, 2018
 # 婕 高 <j.gao@eliteu.cn>, 2018
 # Yi Li <y.li@eliteu.cn>, 2018
-# 家璧 刘 <jb.liu@eliteu.com.cn>, 2019
 # li ying <code@eliteu.cn>, 2019
 #
 # #-#-#-#-#  mako-studio.po (0.1a)  #-#-#-#-#
@@ -74,7 +74,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-01-14 10:06+0800\n"
+"POT-Creation-Date: 2019-01-15 19:13+0800\n"
 "PO-Revision-Date: 2018-12-07 12:23+0000\n"
 "Last-Translator: li ying <code@eliteu.cn>, 2019\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)\n"
@@ -2841,7 +2841,7 @@ msgid ""
 "Enter true or false. If true, students can create discussion posts that are "
 "anonymous to other students. This setting does not make posts anonymous to "
 "course staff."
-msgstr "输入 true 或者 false。如果输入为 true ，学生可以创建对其它学生匿名的讨论帖。这个设置不能对课程工作人员匿名发帖。"
+msgstr "输入 true 或者 false。如果输入为 true ，学生可以创建对其他学生匿名的讨论帖。这个设置不能对课程工作人员匿名发帖。"
 
 #: common/lib/xmodule/xmodule/course_module.py
 #: common/lib/xmodule/xmodule/library_root_xblock.py
@@ -5091,7 +5091,6 @@ msgstr "{platform_name} 借由证书承认已完成修习课程，该课之修�
 #. Translators:  'All rights reserved' is a legal term used in copyrighting to
 #. protect published content
 #: lms/djangoapps/certificates/views/webview.py
-#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 msgid "All rights reserved"
 msgstr "保留所有权利"
 
@@ -8584,6 +8583,7 @@ msgid "Review ID Verification Photos For {username}"
 msgstr "查看{username}的身份验证照片"
 
 #: lms/envs/common.py lms/templates/certificates/verify.html
+#: themes/normal-theme/lms/templates/footer.html
 #: themes/normal-theme/lms/templates/static_templates/about.html
 #: membership/templates/membership/index.html
 msgid "EliteMBA"
@@ -9719,6 +9719,16 @@ msgstr "在平台官方应用商店下载iOS App"
 #: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "Download the Android app on the Google Play Store"
 msgstr "在Google Play商店下载安卓App"
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+msgid ","
+msgstr "，"
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+msgid "All rights reserved."
+msgstr "保留所有权利。"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
@@ -11255,14 +11265,6 @@ msgid ""
 "profile. {learn_more_link_start}Learn more{learn_more_link_end}"
 msgstr ""
 "欢迎来到新学员账号页面，提供更多账号信息方便其他学员查看。您也可以选择只显示部分内容。{learn_more_link_start}了解更多内容{learn_more_link_end}"
-
-#: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-msgid ","
-msgstr "，"
-
-#: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-msgid "All rights reserved."
-msgstr "保留所有权利。"
 
 #: themes/normal-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #, python-format
@@ -16711,10 +16713,6 @@ msgid "Resubmit Verification: {reverify_url}"
 msgstr "重新认证: {reverify_url}"
 
 #: lms/templates/emails/failed_verification_email.txt
-msgid "ID Verification FAQ: {faq_url}"
-msgstr "身份ID验证FAQ：{faq_url}"
-
-#: lms/templates/emails/failed_verification_email.txt
 #: lms/templates/emails/order_confirmation_email.txt
 #: lms/templates/emails/passed_verification_email.txt
 #: lms/templates/emails/photo_submission_confirmation.txt
@@ -18993,6 +18991,14 @@ msgid ""
 " and actively seek change."
 msgstr "我们希望把国内外成功的商业管理经验和智慧传授给更多不安于现状且积极求变的弄潮儿。"
 
+#: lms/templates/professors/index.html
+msgid ""
+"We sincerely invite all elite professors, scholars and experts who have been"
+" deeply involved in business management disciplines to develop more "
+"outstanding business talents by transforming intangible wisdom into a "
+"collectible course."
+msgstr "我们诚挚地向所有深耕于商业管理学科的精英教授、学者和专家发出邀请，让我们共同将无形的智慧实化为可典藏的课程，以此培养更多杰出的商业人才。"
+
 #: lms/templates/provider/authorize.html
 msgid ""
 "{start_strong}{application_name}{end_strong} would like to access your data "
@@ -19058,7 +19064,7 @@ msgid ""
 " your password, go to the {start_link}sign-in{end_link} page and select "
 "{start_strong}Forgot password{end_strong}."
 msgstr ""
-"密码重置链接无效。此链接可能已被使用。如需重置您的密码，请进入{start_link}注册页面{end_link} "
+"密码重置链接无效。此链接可能已被使用。如需重置您的密码，请进入{start_link}登录页面{end_link} "
 "并点击{start_strong}忘记密码{end_strong}。"
 
 #: lms/templates/registration/password_reset_done.html
@@ -20257,14 +20263,8 @@ msgid "Schools & Partners"
 msgstr "学校 & 伙伴"
 
 #: themes/normal-theme/lms/templates/footer.html
-msgid "Reform·Innovation·Future"
-msgstr "变革 • 创新 • 未来"
-
-#: themes/normal-theme/lms/templates/footer.html
-#: themes/normal-theme/lms/templates/static_templates/contact.html
-#: membership/templates/membership/card.html
-msgid "Elite Education"
-msgstr "英荔教育"
+msgid "Learn to Change·Change to Progress"
+msgstr "学则变 · 变则进 —— 英荔商学院"
 
 #: themes/normal-theme/lms/templates/footer.html
 #: themes/normal-theme/lms/templates/static_templates/about.html
@@ -20388,10 +20388,17 @@ msgid ""
 "effective means of transmission and increase the reach of knowledge. Here, "
 "we would like to offer sincere invitations to experts and professors, and "
 "look forward to creating and introducing more high-quality curriculum "
-"resources, so that knowledge can generate more value in a diverse world. For"
-" course cooperation, please contact"
+"resources, so that knowledge can generate more value in a diverse world. "
 msgstr ""
-"尽己所能地向更多学习者传递知识是教育者们的共同追求。英荔期望为教育者提供更有效的传递途径，增加知识的触及范围。在此，向各位专家、教授发出诚挚的开课邀请，期待创造、引入更多优质的课程资源，让知识在多元的世界产生更多元的价值。课程合作请联系"
+"尽己所能地向更多学习者传递知识是教育者们的共同追求。英荔期望为教育者提供更有效的传递途径，增加知识的触及范围。在此，向各位专家、教授发出诚挚的开课邀请，期待创造、引入更多优质的课程资源，让知识在多元的世界产生更多元的价值。"
+
+#: themes/normal-theme/lms/templates/static_templates/about.html
+msgid "For course cooperation, please contact: "
+msgstr "课程合作请联系："
+
+#: themes/normal-theme/lms/templates/static_templates/about.html
+msgid "."
+msgstr "。"
 
 #: themes/normal-theme/lms/templates/static_templates/about.html
 msgid "Education should guide society, not chase society"
@@ -20414,10 +20421,9 @@ msgstr "我们的使命"
 
 #: themes/normal-theme/lms/templates/static_templates/about.html
 msgid ""
-"Providing an inspiring and innovative educational experience that enables "
-"learners to have a convenient and inclusive learning environment that "
-"promotes the success of their professional and personal development."
-msgstr "提供启发和创新的教育体验，使学习者有一个便捷和包容的学习环境，促进他们职业和个人发展的成功。"
+"Providing individuals, organizations with the knowledge, technology and "
+"platform for lifelong learning."
+msgstr "为个人和组织提供终身学习的知识、技术与平台。"
 
 #: themes/normal-theme/lms/templates/static_templates/about.html
 msgid "Our Vision"
@@ -20426,6 +20432,11 @@ msgstr "我们的愿景"
 #: themes/normal-theme/lms/templates/static_templates/about.html
 msgid "To become a reputable brand of digital education in China."
 msgstr "成为中国享有声誉的数字化教育品牌。"
+
+#: themes/normal-theme/lms/templates/static_templates/contact.html
+#: membership/templates/membership/card.html
+msgid "Elite Education"
+msgstr "英荔教育"
 
 #: themes/normal-theme/lms/templates/static_templates/contact.html
 msgid ""
@@ -20442,8 +20453,8 @@ msgid "Course Cooperation"
 msgstr "课程合作"
 
 #: themes/normal-theme/lms/templates/static_templates/contact.html
-msgid "Contact: Miss Huang"
-msgstr "联系人：黄小姐"
+msgid "Contact: Mr. Chen"
+msgstr "联系人：陈小姐"
 
 #: themes/normal-theme/lms/templates/static_templates/contact.html
 msgid "Human Resources and Recruitment"
@@ -20462,8 +20473,12 @@ msgid "Business Cooperation"
 msgstr "商务合作"
 
 #: themes/normal-theme/lms/templates/static_templates/contact.html
-msgid "General Information"
-msgstr "综合资讯"
+msgid "Enterprise Procurement"
+msgstr "企业采购"
+
+#: themes/normal-theme/lms/templates/static_templates/contact.html
+msgid "Contact: Ms. Liao"
+msgstr "联系人：廖小姐"
 
 #: themes/normal-theme/lms/templates/static_templates/contact.html
 msgid "System Bugs"
@@ -20485,7 +20500,7 @@ msgid ""
 "referred to as 'User') must carefully read these terms and agree to this "
 "statement before accepting EliteMBA service."
 msgstr ""
-"英荔商学院（www.EliteMBA.cn）的产品及服务由广东英荔国际教育科技有限公司（以下简称“英荔”或“我们”）提供。本免责声明（以下简称“本声明”）适用于英荔的网站、在计算机/手机/平板电脑或其它设备上使用的英荔的应用程序和其它产品及服务。英荔用户（以下简称“用户”）在接受英荔服务之前，请务必仔细阅读本条款并同意本声明"
+"英荔商学院（www.EliteMBA.cn）的产品及服务由广东英荔国际教育科技有限公司（以下简称“英荔”或“我们”）提供。本免责声明（以下简称“本声明”）适用于英荔的网站、在计算机/手机/平板电脑或其他设备上使用的英荔的应用程序和其他产品及服务。英荔用户（以下简称“用户”）在接受英荔服务之前，请务必仔细阅读本条款并同意本声明"
 
 #: themes/normal-theme/lms/templates/static_templates/disclaimer.html
 #: themes/normal-theme/lms/templates/static_templates/honor.html
@@ -20663,7 +20678,7 @@ msgid ""
 "published by EliteMBA related to those services. All of the aforementioned "
 "guidelines and rules shall be considered as a part of this Agreement."
 msgstr ""
-"英荔商学院（www.EliteMBA.cn）的产品及服务由广东英荔国际教育科技有限公司（以下简称“英荔”或“我们”）提供。本使用协议（以下简称“使用协议”）适用于英荔的网站、在计算机/手机/平板电脑或其它设备上使用的英荔的应用程序和其它产品及服务。使用协议的内容可由英荔不定期修改、变更。一旦变动产生，我们将随即于使用协议上公布并更新生效日期。修改后的使用协议一旦公布即有效代替原来的使用协议。您应定期查看以了解更新后的服务条款，若您继续使用我们的服务即构成您对本服务条款及其任何更新版本的同意。此外，当英荔用户使用英荔特殊服务（包括但不限于除网站基本服务外的其他具时效性的市场活动服务）时，英荔用户应遵守英荔随时公布的与该服务相关的指引和规则。前述所有的指引和规则，均构成本使用协议的一部分。"
+"英荔商学院（www.EliteMBA.cn）的产品及服务由广东英荔国际教育科技有限公司（以下简称“英荔”或“我们”）提供。本使用协议（以下简称“使用协议”）适用于英荔的网站、在计算机/手机/平板电脑或其他设备上使用的英荔的应用程序和其他产品及服务。使用协议的内容可由英荔不定期修改、变更。一旦变动产生，我们将随即于使用协议上公布并更新生效日期。修改后的使用协议一旦公布即有效代替原来的使用协议。您应定期查看以了解更新后的服务条款，若您继续使用我们的服务即构成您对本服务条款及其任何更新版本的同意。此外，当英荔用户使用英荔特殊服务（包括但不限于除网站基本服务外的其他具时效性的市场活动服务）时，英荔用户应遵守英荔随时公布的与该服务相关的指引和规则。前述所有的指引和规则，均构成本使用协议的一部分。"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -20698,7 +20713,7 @@ msgid ""
 "issues. EliteMBA reserves the right to suspend any part of the Service for "
 "any maintenance, upgrade or other purpose without prior notice."
 msgstr ""
-"英荔目前向用户提供英荔自主制作的一系列课程服务（包括但不限于课程视频、测验题目、考试、课程资料、笔记以及助教服务）。除非本使用协议另有其它明示规定，英荔增加或强化此服务的任何新功能，包括所推出的新产品，均受到本使用协议之规范。用户了解并同意，本服务仅依其当前所呈现的状况提供，对于任何用户信息或个人化设定之失效、删除、传递错误、未予储存或其它任何问题，英荔均不承担任何责任。英荔保留不经事先通知因维修保养、升级或其它目的而暂停本服务任何部分的权利。"
+"英荔目前向用户提供英荔自主制作的一系列课程服务（包括但不限于课程视频、测验题目、考试、课程资料、笔记以及助教服务）。除非本使用协议另有其他明示规定，英荔增加或强化此服务的任何新功能，包括所推出的新产品，均受到本使用协议之规范。用户了解并同意，本服务仅依其当前所呈现的状况提供，对于任何用户信息或个人化设定之失效、删除、传递错误、未予储存或其他任何问题，英荔均不承担任何责任。英荔保留不经事先通知因维修保养、升级或其他目的而暂停本服务任何部分的权利。"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -20724,7 +20739,7 @@ msgid ""
 "laws and regulations, EliteMBA may terminate to offer service to the User at"
 " any time without prior notice. "
 msgstr ""
-"同时如果英荔有理由认为用户的任何行为，包括但不限于用户的任何言论和其它行为违反或可能违反国家法律和法规的任何规定，英荔可在任何时候不经任何事先通知终止向用户提供服务。"
+"同时，如果英荔有理由认为用户的任何行为，包括但不限于用户的任何言论和其他行为违反或可能违反国家法律和法规的任何规定，英荔可在任何时候不经任何事先通知终止向用户提供服务。"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -20744,7 +20759,7 @@ msgid ""
 "to suspend or terminate the User's account and refuse the User to use all or"
 " any part of the Service now and in the future.  "
 msgstr ""
-"为能使用本服务，用户同意以下事项：依本服务提示填写正确的注册账号（邮箱地址及/或手机号）、密码，并确保今后更新的登录账号、头像等资料的有效性和合法性。若用户提供任何违法、不道德或英荔认为不适合在本网站上展示的资料；或者英荔有理由怀疑用户的资料属于程序或恶意操作，英荔有权暂停或终止用户的账号，并拒绝用户于现在和未来使用本服务之全部或任何部分。"
+"为能使用本服务，用户同意以下事项：依本服务提示填写正确的注册账号（邮箱地址及/或手机号）、密码，并确保今后更新的登录账号、头像等资料的有效性和合法性。若用户提供任何违法、不道德或英荔认为不适合在本网站上展示的资料，或者英荔有理由怀疑用户的资料属于程序或恶意操作，英荔有权暂停或终止用户的账号，并拒绝用户于现在和未来使用本服务之全部或任何部分。"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 msgid ""
@@ -20765,11 +20780,11 @@ msgstr "五、用户账号、密码及安全"
 msgid ""
 "After completing the registration process for this service and successfully "
 "registered, the User can log in to the account of EliteMBA (hereinafter "
-"referred to as the ‘account’) using their email address and or mobile number"
+"referred to as the ‘account’) using their email address and/or mobile number"
 " and password. Users are responsible for protecting the security of their "
 "accounts."
 msgstr ""
-"完成本服务的注册程序并成功注册之后，用户可使用其邮箱地址及或手机号码和密码，登录到用户在英荔的账号（以下简称“账号”）。用户须承担保障自己账号安全的责任。"
+"完成本服务的注册程序并成功注册之后，用户可使用其邮箱地址及/或手机号码和密码，登录到用户在英荔的账号（以下简称“账号”）。用户须承担保障自己账号安全的责任。"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -20783,7 +20798,7 @@ msgstr "用户应对所有使用的密码及账号的活动负全部责任。用
 msgid ""
 "1. Upon the occurrence of noticing any unauthorized account activity or "
 "other security issue, User shall contact and notify E-ducation immediately. "
-msgstr "1.  用户的英荔账号遭到未获授权的使用，或者发生其它任何安全问题时，用户将立即通知英荔；"
+msgstr "1.  用户的英荔账号遭到未获授权的使用，或者发生其他任何安全问题时，用户将立即通知英荔；"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -20814,7 +20829,7 @@ msgid ""
 "The registration information provided by the User and certain other "
 "information about the User retained by the company will be subject to the "
 "laws of China's privacy and the company's Privacy Policy."
-msgstr "用户提供的登记资料及英荔保留的有关用户的若干其它资料将受到中国有关隐私的法律和本公司《隐私政策》之规范。"
+msgstr "用户提供的登记资料及英荔保留的有关用户的若干其他资料将受到中国有关隐私的法律和本公司《隐私政策》之规范。"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -20841,7 +20856,7 @@ msgid ""
 "User from using this service, to keep relevant record and report to "
 "authorities concerned."
 msgstr ""
-"根据有关法律法规，英荔在此郑重提醒用户注意，任何经由本服务而发布、上传的文字、资讯、资料、照片、图形、视讯、信息或其它资料（以下简称“内容 "
+"根据有关法律法规，英荔在此郑重提醒用户注意，任何经由本服务而发布、上传的文字、资讯、资料、照片、图形、视讯、信息或其他资料（以下简称“内容 "
 "”），无论系公开还是私下传送，均由内容提供者承担责任。英荔仅为用户提供内容存储空间，无法控制经由本服务传送之内容，因此不保证内容的正确性、完整性或品质。用户已预知使用本服务时，可能会接触到令人不快、不适当或令人厌恶之内容。在任何情况下，英荔均不为任何内容负责，但英荔有权依法停止传输任何前述内容并采取相应行动，包括但不限于暂停用户使用本服务的全部或部分，保存有关记录，并向有关机关报告。"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
@@ -20861,7 +20876,7 @@ msgstr "用户同意将不会利用本服务进行任何违法或不正当的活
 msgid ""
 "1. Publish or otherwise transmit information that contains one of the "
 "following:"
-msgstr "1.  发布或以其它方式传送含有下列内容之一的信息："
+msgstr "1.  发布或以其他方式传送含有下列内容之一的信息："
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 msgid "Opposing to the basic principles established by the Constitution;"
@@ -20916,14 +20931,14 @@ msgid ""
 "Contains false, fraudulent, harmful, coercive, infringing on the privacy of "
 "others, harassment, infringement, slander, vulgarity, jealousy, or other "
 "morally offensive content;"
-msgstr "含有虚假、诈骗、有害、胁迫、侵害他人隐私、骚扰、侵害、中伤、粗俗、猥亵、或其它道德上令人反感的内容；"
+msgstr "含有虚假、诈骗、有害、胁迫、侵害他人隐私、骚扰、侵害、中伤、粗俗、猥亵、或其他道德上令人反感的内容；"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
 msgid ""
 "Contains other content restricted or prohibited by Chinese laws, "
 "regulations, rules, regulations, and any legally binding norm;"
-msgstr "含有中国法律、法规、规章、条例以及任何具有法律效力之规范所限制或禁止的其它内容的；"
+msgstr "含有中国法律、法规、规章、条例以及任何具有法律效力之规范所限制或禁止的其他内容的；"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 msgid ""
@@ -20952,7 +20967,7 @@ msgid ""
 "under a confidentiality contract)"
 msgstr ""
 "4.  "
-"将依据任何法律或合约或法定关系（例如由于雇佣关系和依据保密合约所得知或揭露之内部资料、专属及机密资料）知悉但无权传送之任何内容加以发布、发送电子邮件或以其它方式传送；"
+"将依据任何法律或合约或法定关系（例如由于雇佣关系和依据保密合约所得知或揭露之内部资料、专属及机密资料）知悉但无权传送之任何内容加以发布、发送电子邮件或以其他方式传送；"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -20960,7 +20975,7 @@ msgid ""
 "5. Publish or otherwise transmit the content of copyrights, patents, "
 "trademarks, trade secrets, or other proprietary rights (hereinafter referred"
 " to as ‘exclusive rights’) that infringe upon others;"
-msgstr "5.  将侵害他人著作权、专利权、商标权、商业秘密、或其它专属权利（以下简称“专属权利”）之内容加以发布或以其它方式传送；"
+msgstr "5.  将侵害他人著作权、专利权、商标权、商业秘密、或其他专属权利（以下简称“专属权利”）之内容加以发布或以其他方式传送；"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -20969,7 +20984,7 @@ msgid ""
 "material, 'spam', 'spamming', 'chain mail', 'direct sales' or any other form"
 " of persuasive material;"
 msgstr ""
-"6.  将任何广告信函、促销资料、“垃圾邮件”、“滥发信件”、“连锁信件”、“直销”或其它任何形式的劝诱资料加以发布、发送或以其它方式传送；"
+"6.  将任何广告信函、促销资料、“垃圾邮件”、“滥发信件”、“连锁信件”、“直销”或其他任何形式的劝诱资料加以发布、发送或以其他方式传送；"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -20981,7 +20996,7 @@ msgid ""
 "any computer software, hardware or communication equipment;"
 msgstr ""
 "7.  "
-"将设计目的在于干扰、破坏或限制任何计算机软件、硬件或通讯设备功能之计算机病毒（包括但不限于木马程序、蠕虫、定时炸弹、删除蝇（以下简称“病毒”）或其它计算机代码、档案和程序之任何资料，加以发布、发送或以其它方式传送；"
+"将设计目的在于干扰、破坏或限制任何计算机软件、硬件或通讯设备功能之计算机病毒（包括但不限于木马程序、蠕虫、定时炸弹、删除蝇（以下简称“病毒”）或其他计算机代码、档案和程序之任何资料，加以发布、发送或以其他方式传送；"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 msgid ""
@@ -20993,7 +21008,7 @@ msgstr "8.  干扰或破坏本服务或与本服务相连线之服务器和网
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
 msgid "9. Tracking, cyber manhunting or harassing others in any other ways;"
-msgstr "9.  跟踪、人肉搜索或以其它方式骚扰他人；"
+msgstr "9.  跟踪、人肉搜索或以其他方式骚扰他人；"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -21008,7 +21023,7 @@ msgid ""
 "11. Intercept, tamper with, collect, store or delete personal information, "
 "on-site mail or other data  without legal authorization, or use such "
 "information for any illegal or improper purpose. "
-msgstr "11.  未经合法授权而截获、篡改、收集、储存或删除他人个人信息、站内邮件或其它数据资料，或将获知的此类资料用于任何非法或不正当目的。"
+msgstr "11.  未经合法授权而截获、篡改、收集、储存或删除他人个人信息、站内邮件或其他数据资料，或将获知的此类资料用于任何非法或不正当目的。"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 msgid ""
@@ -21020,7 +21035,7 @@ msgid ""
 "provided by the Service that violates these Terms or any other content that "
 "is controversial to EliteMBA."
 msgstr ""
-"用户已认可英荔未对用户的使用行为进行全面控制，用户使用任何内容时，包括依赖前述内容之正确性、完整性或实用性时，用户同意将自行加以判断并承担所有风险，而不依赖于英荔。但英荔依其自行之考虑，可拒绝和删除经由本服务提供之违反本条款的或其它引起英荔异议的任何内容。"
+"用户已认可英荔未对用户的使用行为进行全面控制，用户使用任何内容时，包括依赖前述内容之正确性、完整性或实用性时，用户同意将自行加以判断并承担所有风险，而不依赖于英荔。但英荔依其自行之考虑，可拒绝和删除经由本服务提供之违反本条款的或其他引起英荔异议的任何内容。"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -21053,7 +21068,7 @@ msgstr "4.  保护英荔、其用户及公众之权利、财产或个人安全
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 msgid "5. Other conditions that EliteMBA deems necessary."
-msgstr "5.  其它英荔认为有必要的情况。"
+msgstr "5.  其他英荔认为有必要的情况。"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -21112,7 +21127,7 @@ msgid ""
 "other partners and employees from damage and assume all legal liabilities "
 "arising therefrom."
 msgstr ""
-"由于用户通过本服务提供、发布或传送之内容、用户与本服务连线、用户违反本使用协议、或用户侵害他人任何权利因而衍生或导致任何第三人提出任何索赔或请求，包括合理的律师费，用户同意赔偿英荔及其子公司、关联企业、高级职员、代理人、品牌共有人或其它合作伙伴及员工，并使其免受损害，"
+"由于用户通过本服务提供、发布或传送之内容、用户与本服务连线、用户违反本使用协议、或用户侵害他人任何权利因而衍生或导致任何第三人提出任何索赔或请求，包括合理的律师费，用户同意赔偿英荔及其子公司、关联企业、高级职员、代理人、品牌共有人或其他合作伙伴及员工，并使其免受损害，"
 " 并承担由此引发的全部法律责任。"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
@@ -21126,7 +21141,7 @@ msgid ""
 "The User agrees not to copy, copy, sell, resell or use it for any other "
 "commercial purpose for the use or acquisition of any part of the Service or "
 "the Service."
-msgstr "用户同意不对本服务任何部分或本服务之使用或获得，进行复制、拷贝、出售、转售或用于任何其它商业目的。"
+msgstr "用户同意不对本服务任何部分或本服务之使用或获得，进行复制、拷贝、出售、转售或用于任何其他商业目的。"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -21139,7 +21154,7 @@ msgid ""
 "The User agrees that EliteMBA shall be liable for any information, "
 "communication materials and other content posted or transmitted through the "
 "Service, if it is deleted or not stored."
-msgstr "通过本服务发布或传送之任何信息、通讯资料和其它内容，如被删除或未予储存，用户同意英荔毋须承担任何责任。"
+msgstr "通过本服务发布或传送之任何信息、通讯资料和其他内容，如被删除或未予储存，用户同意英荔毋须承担任何责任。"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -21198,7 +21213,7 @@ msgid ""
 "foregoing transactions or the aforementioned advertisers and other third "
 "parties."
 msgstr ""
-"用户通过本网站与广告商及其他第三方进行任何形式的通讯或商业往来，或参与促销活动，包含相关商品或服务之付款及交付，以及达成的其它任何相关条款、条件、保证或声明，完全为用户与广告商及其他第三方之间之行为。用户因前述任何交易或前述广告商及其他第三方而遭受的任何性质的损失或损害，英荔对此不负任何法律责任。"
+"用户通过本网站与广告商及其他第三方进行任何形式的通讯或商业往来，或参与促销活动，包含相关商品或服务之付款及交付，以及达成的其他任何相关条款、条件、保证或声明，完全为用户与广告商及其他第三方之间之行为。用户因前述任何交易或前述广告商及其他第三方而遭受的任何性质的损失或损害，英荔对此不负任何法律责任。"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -21225,7 +21240,7 @@ msgid ""
 "rights in the software. The User agrees to use the Service through the "
 "interface provided by EliteMBA and not in any other way."
 msgstr ""
-"用户也了解并同意，经由本服务或广告商向用户呈现之赞助广告或信息所包含之内容，亦受到著作权、商标权、服务商标、专利权或其它专属权利之法律保护。未经英荔或广告商明示授权，用户不得修改、出租、出借、出售、散布本服务或软件之任何部份或全部，或据以制作衍生著作，或使用擅自修改后的软件，包括但不限于为了未经授权而使用本服务之目的。英荔仅授予用户个人、不可移转及非专属之使用权，使用户得于单机计算机使用其软件之目的码，但用户不得（并不得允许任何第三人）复制、修改、创作衍生著作、进行还原工程、反向组译，或以其它方式发现原始码，或出售、转让、再授权或提供软件设定担保，或以其它方式移转软件之任何权利。用户同意将通过由英荔所提供的界面而非任何其它途径使用本服务。"
+"用户也了解并同意，经由本服务或广告商向用户呈现之赞助广告或信息所包含之内容，亦受到著作权、商标权、服务商标、专利权或其他专属权利之法律保护。未经英荔或广告商明示授权，用户不得修改、出租、出借、出售、散布本服务或软件之任何部份或全部，或据以制作衍生著作，或使用擅自修改后的软件，包括但不限于为了未经授权而使用本服务之目的。英荔仅授予用户个人、不可移转及非专属之使用权，使用户得于单机计算机使用其软件之目的码，但用户不得（并不得允许任何第三人）复制、修改、创作衍生著作、进行还原工程、反向组译，或以其他方式发现原始码，或出售、转让、再授权或提供软件设定担保，或以其他方式移转软件之任何权利。用户同意将通过由英荔所提供的界面而非任何其他途径使用本服务。"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -21267,7 +21282,7 @@ msgstr "3.  任何第三方在本服务中所作之声明或行为；"
 msgid ""
 "4. Other matters related to the Service, except as explicitely provided in "
 "this Agreement of Use;"
-msgstr "4.  与本服务相关的其它事宜，但本使用协议有明确规定的除外；"
+msgstr "4.  与本服务相关的其他事宜，但本使用协议有明确规定的除外；"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -21291,7 +21306,7 @@ msgid ""
 "consent of EliteMBA, or to indicate that the User has the right to display, "
 "use or otherwise process the EliteMBA Mark."
 msgstr ""
-"英荔教育、英荔以及其它英荔注册商标、标志及产品、服务名称，均为英荔公司之商标（以下简称“英荔标记”）。未经英荔事先书面同意，用户同意不将英荔标记以任何方式展示或使用或作其它处理，或表示用户有权展示、使用或另行处理英荔标记。"
+"英荔教育、英荔以及其他英荔注册商标、标志及产品、服务名称，均为英荔公司之商标（以下简称“英荔标记”）。未经英荔事先书面同意，用户同意不将英荔标记以任何方式展示或使用或作其他处理，或表示用户有权展示、使用或另行处理英荔标记。"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -21381,7 +21396,7 @@ msgid ""
 "binding on both parties."
 msgstr ""
 "2.  "
-"本使用协议及用户与英荔之关系，均受到中华人民共和国法律管辖。用户与英荔就本服务、本使用协议或其它有关事项发生的争议，应首先友好协商解决，协商不成时应提请中国国际经济贸易仲裁委员会仲裁，仲裁裁决是终局性的，对双方均有约束力；"
+"本使用协议及用户与英荔之关系，均受到中华人民共和国法律管辖。用户与英荔就本服务、本使用协议或其他有关事项发生的争议，应首先友好协商解决，协商不成时应提请中国国际经济贸易仲裁委员会仲裁，仲裁裁决是终局性的，对双方均有约束力；"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -21400,7 +21415,7 @@ msgid ""
 "provisions of this User Agreement shall remain in full force;"
 msgstr ""
 "4.  "
-"倘本使用协议之任何规定因与中华人民共和国法律抵触而无效，用户依然同意应依照法律，努力使该规定所反映之当事人意向具备效力，且本使用协议其它规定仍应具有完整的效力；"
+"倘本使用协议之任何规定因与中华人民共和国法律抵触而无效，用户依然同意应依照法律，努力使该规定所反映之当事人意向具备效力，且本使用协议其他规定仍应具有完整的效力；"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -21435,7 +21450,7 @@ msgid ""
 "users with the requested services. This policy explains the data collection "
 "and use under these circumstances."
 msgstr ""
-"英荔商学院（www.EliteMBA.cn）的产品及服务由广东英荔国际教育科技有限公司（以下简称“英荔”或“我们”）提供。本隐私政策（以下简称“本政策”）适用于英荔的网站、在计算机/手机/平板电脑或其它设备上使用的英荔的应用程序和其它产品及服务。英荔非常重视对英荔用户（以下简称“用户”）个人隐私的保护，有时候我们需要某些信息才能为用户提供请求的服务，本政策解释了这些情况下的数据收集和使用情况。"
+"英荔商学院（www.EliteMBA.cn）的产品及服务由广东英荔国际教育科技有限公司（以下简称“英荔”或“我们”）提供。本隐私政策（以下简称“本政策”）适用于英荔的网站、在计算机/手机/平板电脑或其他设备上使用的英荔的应用程序和其他产品及服务。英荔非常重视对英荔用户（以下简称“用户”）个人隐私的保护，有时候我们需要某些信息才能为用户提供请求的服务，本政策解释了这些情况下的数据收集和使用情况。"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/privacy.html
@@ -21655,32 +21670,34 @@ msgid ""
 "referred to as 'User') must carefully read these terms and agree to this "
 "statement before accepting EliteMBA service."
 msgstr ""
-"英荔商学院（www.EliteMBA.cn）的产品及服务由广东英荔国际教育科技有限公司（以下简称“英荔”或“我们”）提供。本免责声明（以下简称“本声明”）适用于英荔的网站、在计算机/手机/平板电脑或其它设备上使用的英荔的应用程序和其它产品及服务。英荔用户（以下简称“用户”）在接受英荔服务之前，请务必仔细阅读本条款并同意本声明"
+"英荔商学院（www.EliteMBA.cn）的产品及服务由广东英荔国际教育科技有限公司（以下简称“英荔”或“我们”）提供。本免责声明（以下简称“本声明”）适用于英荔的网站、在计算机/手机/平板电脑或其他设备上使用的英荔的应用程序和其他产品及服务。英荔用户（以下简称“用户”）在接受英荔服务之前，请务必仔细阅读本条款并同意本声明"
 
 #: themes/normal-theme/lms/templates/static_templates/join_us.html
 msgid "Join us"
 msgstr "加入我们"
 
 #: themes/normal-theme/lms/templates/static_templates/join_us.html
-msgid "Let Yourself be More Valuable"
-msgstr "成为更有价值的自己"
+msgid "Become a Lecturer"
+msgstr "成为英荔讲师"
 
 #: themes/normal-theme/lms/templates/static_templates/join_us.html
 msgid ""
-"EliteMBA pays attention to employee development and attaches importance to "
-"the power of communication. We continue to learn, inspire each other, and "
-"constantly discover industry inspiration at work, and open our eyes as a "
-"whole community. Here, work is an organic combination of enjoyment and hard "
-"work."
+"Standing on the platform, educators can impart wisdom to learners. EliteMBA "
+"completely breaks the geographical restrictions of teaching and learning and"
+" provides a broader platform for educators. We sincerely invite all elite "
+"professors, scholars and experts who have been deeply involved in business "
+"management disciplines to develop more outstanding business talents by "
+"transforming intangible wisdom into a collectible course."
 msgstr ""
-"英荔关注员工发展，重视交流的力量。作为一个整体，我们不断学习，相互启发，在工作中不断发现行业灵感，大开眼界。在这里，工作是享受与拼搏的有机结合。"
+"站上讲台，教育者得以向学习者传授智慧。英荔彻底打破教与学的地理限制，为教育者提供更广阔的讲台。我们诚挚地向所有深耕于商业管理学科的精英教授、学者和专家发出邀请，让我们共同将无形的智慧实化为可典藏的课程，以此培养更多杰出的商业人才。"
 
 #: themes/normal-theme/lms/templates/static_templates/join_us.html
-msgid ""
-"We will release job information as soon as possible, so stay tuned. Of "
-"course, this does not mean that we want to miss any future members. Feel "
-"free to contact us through email directly."
-msgstr "职位信息整理中，我们将尽快发布，敬请期待。当然，这并不意味着我们愿意错过任何一位未来的成员，欢迎直接邮件联系"
+msgid "Please contact"
+msgstr "请直接邮件联系"
+
+#: themes/normal-theme/lms/templates/static_templates/join_us.html
+msgid "directly or call 400-931-8118."
+msgstr "或致电400-931-8118。"
 
 #: themes/normal-theme/lms/templates/static_templates/privacy.html
 #: themes/normal-theme/lms/templates/static_templates/privacy_policy.html
@@ -21708,7 +21725,7 @@ msgid ""
 "regulations, EliteMBA may terminate the offer to the User at any time "
 "without prior notice service."
 msgstr ""
-"同时如果英荔有理由认为用户的任何行为，包括但不限于用户的任何言论和其它行为违反或可能违反国家法律和法规的任何规定，英荔可在任何时候不经任何事先通知终止向用户提供服务。"
+"同时，如果英荔有理由认为用户的任何行为，包括但不限于用户的任何言论和其他行为违反或可能违反国家法律和法规的任何规定，英荔可在任何时候不经任何事先通知终止向用户提供服务。"
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
 msgid ""
@@ -21728,7 +21745,7 @@ msgid ""
 "Content containing false, fraudulent, harmful, coercive, infringing on the "
 "privacy of others, harassment, infringement, slander, vulgarity, jealousy, "
 "or other morally offensive content;"
-msgstr "含有虚假、诈骗、有害、胁迫、侵害他人隐私、骚扰、侵害、中伤、粗俗、猥亵、或其它道德上令人反感的内容；"
+msgstr "含有虚假、诈骗、有害、胁迫、侵害他人隐私、骚扰、侵害、中伤、粗俗、猥亵、或其他道德上令人反感的内容；"
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
 msgid "Contains content that is not suitable for display in EliteMBA;"
@@ -21751,7 +21768,7 @@ msgid ""
 "Service and any other announcements in EliteMBA and other content that "
 "contradicts EliteMBA's rights and interests. "
 msgstr ""
-"用户已认可英荔未对用户的使用行为进行全面控制，用户使用任何内容时，包括依赖前述内容之正确性、完整性或实用性时，用户同意将自行加以判断并承担所有风险，而不依赖于英荔。但英荔依其自行之考虑，可拒绝和删除经由本服务提供之违反本条款的或其它引起英荔异议的任何内容。"
+"用户已认可英荔未对用户的使用行为进行全面控制，用户使用任何内容时，包括依赖前述内容之正确性、完整性或实用性时，用户同意将自行加以判断并承担所有风险，而不依赖于英荔。但英荔依其自行之考虑，可拒绝和删除经由本服务提供之违反本条款的或其他引起英荔异议的任何内容。"
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
 msgid "3. Respond to any claims made by third parties; "
@@ -21759,7 +21776,7 @@ msgstr "3.  回应任何第三人提出的权利主张；"
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
 msgid "5. Other situations that the EliteMBA considers necessary."
-msgstr "5.  其它英荔认为有必要的情况。"
+msgstr "5.  其他英荔认为有必要的情况。"
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
 msgid ""
@@ -21777,7 +21794,7 @@ msgid ""
 " or other partners and employees from damage and assume all legal "
 "liabilities arising therefrom. "
 msgstr ""
-"由于用户通过本服务提供、发布或传送之内容、用户与本服务连线、用户违反本使用协议、或用户侵害他人任何权利因而衍生或导致任何第三人提出任何索赔或请求，包括合理的律师费，用户同意赔偿英荔及其子公司、关联企业、高级职员、代理人、品牌共有人或其它合作伙伴及员工，并使其免受损害，"
+"由于用户通过本服务提供、发布或传送之内容、用户与本服务连线、用户违反本使用协议、或用户侵害他人任何权利因而衍生或导致任何第三人提出任何索赔或请求，包括合理的律师费，用户同意赔偿英荔及其子公司、关联企业、高级职员、代理人、品牌共有人或其他合作伙伴及员工，并使其免受损害，"
 " 并承担由此引发的全部法律责任。"
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -21789,7 +21806,7 @@ msgid ""
 "consent of Elite, or to indicate that the User has the right to display, use"
 " or otherwise process the Trademark."
 msgstr ""
-"英荔教育、英荔以及其它英荔注册商标、标志及产品、服务名称，均为英荔公司之商标（以下简称“英荔标记”）。未经英荔事先书面同意，用户同意不将英荔标记以任何方式展示或使用或作其它处理，或表示用户有权展示、使用或另行处理英荔标记。"
+"英荔教育、英荔以及其他英荔注册商标、标志及产品、服务名称，均为英荔公司之商标（以下简称“英荔标记”）。未经英荔事先书面同意，用户同意不将英荔标记以任何方式展示或使用或作其他处理，或表示用户有权展示、使用或另行处理英荔标记。"
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
 msgid ""
@@ -23927,7 +23944,7 @@ msgstr "课程团队成员中员工角色是课程的共同作者。他们对课
 msgid ""
 "Admins are course team members who can add and remove other course team "
 "members."
-msgstr "管理员是课程团队成员中可以添加和移除其它课程团队成员的用户。"
+msgstr "管理员是课程团队成员中可以添加和移除其他课程团队成员的用户。"
 
 #: cms/templates/manage_users.html
 msgid ""
@@ -26223,6 +26240,10 @@ msgstr "英荔商学院VIP会员"
 #: membership/templates/membership/card.html
 msgid "View Introduction"
 msgstr "查看介绍"
+
+#: membership/templates/membership/card.html
+msgid "Select a course"
+msgstr "加入课程"
 
 #: membership/templates/membership/card.html
 msgid "Choose a payment method"

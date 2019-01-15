@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-01-12 12:02+0800\n"
-"PO-Revision-Date: 2019-01-12 04:02:32.080000\n"
+"POT-Creation-Date: 2019-01-15 19:13+0800\n"
+"PO-Revision-Date: 2019-01-15 11:13:08.364765\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -10365,31 +10365,15 @@ msgid "YYYY-MM-DD"
 msgstr ""
 
 #: membership/static/membership/js/card.js
-msgid "Membership opened:"
+msgid "Open date:"
 msgstr ""
 
 #: membership/static/membership/js/card.js
-msgid "day"
+msgid "Expire:"
 msgstr ""
 
 #: membership/static/membership/js/card.js
-msgid "Remaining days:"
-msgstr ""
-
-#: membership/static/membership/js/card.js
-msgid "Duration:"
-msgstr ""
-
-#: membership/static/membership/js/card.js
-msgid "Opened on:"
-msgstr ""
-
-#: membership/static/membership/js/card.js
-msgid "Expire on:"
-msgstr ""
-
-#: membership/static/membership/js/card.js
-msgid "Membership expired:"
+msgid "Last open date:"
 msgstr ""
 
 #: membership/static/membership/js/card.js
