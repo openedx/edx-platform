@@ -759,15 +759,15 @@ def course_about(request, course_id):
     if not can_self_enroll_in_course(course_key):
         return redirect(reverse('dashboard'))
 
+    # If user needs to be redirected to course home then redirect
+    if _course_home_redirect_enabled():
+        return redirect(reverse(course_home_url_name(course_key), args=[text_type(course_key)]))
+
     with modulestore().bulk_operations(course_key):
         permission = get_permission_for_course_about()
         course = get_course_with_access(request.user, permission, course_key)
         course_details = CourseDetails.populate(course)
         modes = CourseMode.modes_for_course_dict(course_key)
-
-        if configuration_helpers.get_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
-            return redirect(reverse(course_home_url_name(course.id), args=[text_type(course.id)]))
-
         registered = registered_for_course(course, request.user)
 
         staff_access = bool(has_access(request.user, 'staff', course))
@@ -1136,6 +1136,21 @@ def _credit_course_requirements(course_key, student):
         'eligibility_status': eligibility_status,
         'requirements': requirement_statuses,
     }
+
+
+def _course_home_redirect_enabled():
+    """
+    Return True value if user needs to be redirected to course home based on value of
+    `ENABLE_MKTG_SITE` and `ENABLE_COURSE_HOME_REDIRECT feature` flags
+
+    Returns: boolean True or False
+    """
+    if configuration_helpers.get_value(
+            'ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)
+    ) and configuration_helpers.get_value(
+        'ENABLE_COURSE_HOME_REDIRECT', settings.FEATURES.get('ENABLE_COURSE_HOME_REDIRECT', True)
+    ):
+        return True
 
 
 @login_required
