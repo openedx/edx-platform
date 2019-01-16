@@ -2,10 +2,9 @@ import logging
 
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 from django.contrib.sites.models import Site
 
-from cms.djangoapps.course_creators.models import CourseCreator
 import lms.lib.comment_client as cc
 from organizations.models import Organization
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
@@ -20,7 +19,14 @@ class Command(BaseCommand):
            " Keeps the superusers and the default site"
 
     def handle(self, *args, **options):
-        # delete course creator permissions
+        """
+        Delete course creator permissions.
+        """
+        if settings.ROOT_URLCONF == 'lms.urls':
+            # TODO: Not important, but cool: Fix the weird dependency and make it work in LMS.
+            raise CommandError('Run this command only from CMS, it cannot be run from within LMS.')
+
+        from course_creators.models import CourseCreator  # Keep this import local to avoid errors.
         CourseCreator.objects.all().delete()
         CourseAccessRole.objects.all().delete()
 
