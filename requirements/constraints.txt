@@ -24,3 +24,9 @@ splinter==0.9.0
 
 # transifex-client 0.13.5 requires urllib3<1.24, but requests will pull in urllib3==1.24 (https://github.com/transifex/transifex-client/pull/241/files)
 urllib3<1.24
+
+# Bumping requests-oauthlib to 1.2 updates oauthlib to 3.0.0, which changes a response code in certain cases
+# This causes a test to fail. Before fixing, we would need to make sure mobile apps are functional with this change
+# See https://github.com/oauthlib/oauthlib/issues/264 for more context
+requests-oauthlib==1.1.0
+oauthlib==2.1.0
