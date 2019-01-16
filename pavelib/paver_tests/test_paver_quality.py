@@ -1,6 +1,7 @@
 """
 Tests for paver quality tasks
 """
+from __future__ import print_function
 import os
 import shutil
 import tempfile
@@ -319,7 +320,7 @@ class TestPaverRunQuality(PaverTestCase):
             with self.assertRaises(SystemExit):
                 pavelib.quality.run_quality("")
                 self.assertRaises(BuildFailure)
-        print self._mock_paver_sh.mock_calls
+        print(self._mock_paver_sh.mock_calls)
 
         # Test that pylint is called
         _mock_pylint_violations.assert_called_once_with(clean=False)

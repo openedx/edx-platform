@@ -2,6 +2,7 @@
 Tests the ``notify_credentials`` management command.
 """
 from __future__ import absolute_import, unicode_literals
+from __future__ import print_function
 
 from datetime import datetime
 import mock
@@ -39,7 +40,7 @@ class TestNotifyCredentials(TestCase):
             self.cert2 = GeneratedCertificateFactory(user=self.user, course_id='course-v1:edX+Test+2')
         with freeze_time(datetime(2017, 3, 1)):
             self.cert3 = GeneratedCertificateFactory(user=self.user, course_id='course-v1:testX+Test+3')
-        print('self.cert1.modified_date', self.cert1.modified_date)
+        print(('self.cert1.modified_date', self.cert1.modified_date))
 
         # No factory for these
         with freeze_time(datetime(2017, 1, 1)):
@@ -51,7 +52,7 @@ class TestNotifyCredentials(TestCase):
         with freeze_time(datetime(2017, 3, 1)):
             self.grade3 = PersistentCourseGrade.objects.create(user_id=self.user.id, course_id='course-v1:testX+Test+3',
                                                                percent_grade=1)
-        print('self.grade1.modified', self.grade1.modified)
+        print(('self.grade1.modified', self.grade1.modified))
 
     @mock.patch(COMMAND_MODULE + '.Command.send_notifications')
     def test_course_args(self, mock_send):

@@ -2,6 +2,7 @@
 """
 Unit tests for instructor.enrollment methods.
 """
+from __future__ import print_function
 
 import json
 from abc import ABCMeta
@@ -92,17 +93,17 @@ class TestEnrollmentChangeBase(CacheIsolationTestCase):
                 `email` is an email string
         """
         # initialize & check before
-        print "checking initialization..."
+        print("checking initialization...")
         eobjs = before_ideal.create_user(self.course_key)
         before = EmailEnrollmentState(self.course_key, eobjs.email)
         self.assertEqual(before, before_ideal)
 
         # do action
-        print "running action..."
+        print("running action...")
         action(eobjs.email)
 
         # check after
-        print "checking effects..."
+        print("checking effects...")
         after = EmailEnrollmentState(self.course_key, eobjs.email)
         self.assertEqual(after, after_ideal)
 

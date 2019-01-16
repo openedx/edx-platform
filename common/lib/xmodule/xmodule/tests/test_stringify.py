@@ -1,6 +1,7 @@
 """
 Tests stringify functions used in xmodule html
 """
+from __future__ import print_function
 from lxml import etree
 from openedx.core.lib.tests import attr
 from xmodule.stringify import stringify_children
@@ -38,8 +39,8 @@ def test_stringify_again():
     xml = etree.fromstring(html)
     out = stringify_children(xml)
 
-    print "output:"
-    print out
+    print("output:")
+    print(out)
 
     # Tracking strange content repeating bug
     # Should appear once

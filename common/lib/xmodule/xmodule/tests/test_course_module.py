@@ -1,4 +1,5 @@
 """Tests the course modules and their functions"""
+from __future__ import print_function
 import ddt
 import unittest
 from datetime import datetime, timedelta
@@ -214,7 +215,7 @@ class IsNewCourseTestCase(unittest.TestCase):
         for a, b, assertion in dates:
             a_score = get_dummy_course(start=a[0], announcement=a[1], advertised_start=a[2]).sorting_score
             b_score = get_dummy_course(start=b[0], announcement=b[1], advertised_start=b[2]).sorting_score
-            print "Comparing %s to %s" % (a, b)
+            print("Comparing %s to %s" % (a, b))
             assertion(a_score, b_score)
 
     start_advertised_settings = [

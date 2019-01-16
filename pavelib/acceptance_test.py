@@ -1,6 +1,7 @@
 """
 Acceptance test tasks
 """
+from __future__ import print_function
 from optparse import make_option
 
 from paver.easy import cmdopts, needs
@@ -52,13 +53,13 @@ def test_acceptance(options, passthrough_options):
             'red',
             'No system specified, running tests for both cms and lms.'
         )
-        print msg
+        print(msg)
     if opts['default_store'] not in ['draft', 'split']:
         msg = colorize(
             'red',
             'No modulestore specified, running tests for both draft and split.'
         )
-        print msg
+        print(msg)
 
     suite = AcceptanceTestSuite('{} acceptance'.format(opts['system']), **opts)
     suite.run()

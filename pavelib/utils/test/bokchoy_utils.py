@@ -1,6 +1,7 @@
 """
 Helper functions for bok_choy test tasks
 """
+from __future__ import print_function
 import httplib
 import os
 import subprocess
@@ -36,7 +37,7 @@ def start_servers(options):
         """
         Starts a single server.
         """
-        print cmd, logfile
+        print(cmd, logfile)
         run_background_process(cmd, out_log=logfile, err_log=logfile, cwd=cwd)
 
     for service, info in Env.BOK_CHOY_SERVERS.iteritems():
@@ -115,7 +116,7 @@ def wait_for_test_servers():
                 "red",
                 "Could not contact {} test server".format(service)
             )
-            print msg
+            print(msg)
             sys.exit(1)
 
 
@@ -172,7 +173,7 @@ def check_mongo():
     """
     if not is_mongo_running():
         msg = colorize('red', "Mongo is not running locally.")
-        print msg
+        print(msg)
         sys.exit(1)
 
 
@@ -184,7 +185,7 @@ def check_memcache():
     """
     if not is_memcache_running():
         msg = colorize('red', "Memcache is not running locally.")
-        print msg
+        print(msg)
         sys.exit(1)
 
 
@@ -199,7 +200,7 @@ def check_mysql():
         return
     if not is_mysql_running():
         msg = colorize('red', "MySQL is not running locally.")
-        print msg
+        print(msg)
         sys.exit(1)
 
 

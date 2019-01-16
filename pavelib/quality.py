@@ -3,6 +3,7 @@
 """
 Check code quality using pycodestyle, pylint, and diff_quality.
 """
+from __future__ import print_function
 import json
 import os
 import re
@@ -109,7 +110,7 @@ def find_fixme(options):
         num_fixme += _count_pylint_violations(
             "{report_dir}/pylint_fixme.report".format(report_dir=report_dir))
 
-    print "Number of pylint fixmes: " + str(num_fixme)
+    print("Number of pylint fixmes: " + str(num_fixme))
 
 
 def _get_pylint_violations(systems=ALL_SYSTEMS.split(','), errors_only=False, clean=True):
@@ -177,7 +178,7 @@ def run_pylint(options):
 
     # Print number of violations to log
     violations_count_str = "Number of pylint violations: " + str(num_violations)
-    print violations_count_str
+    print(violations_count_str)
 
     # Also write the number of violations to a file
     with open(Env.METRICS_DIR / "pylint", "w") as f:
@@ -294,8 +295,8 @@ def run_pep8(options):  # pylint: disable=unused-argument
 
     # Print number of violations to log
     violations_count_str = "Number of PEP 8 violations: {count}".format(count=count)
-    print violations_count_str
-    print violations_list
+    print(violations_count_str)
+    print(violations_list)
 
     # Also write the number of violations to a file
     with open(Env.METRICS_DIR / "pep8", "w") as f:
@@ -327,7 +328,7 @@ def run_complexity():
     Env.METRICS_DIR.makedirs_p()
     _prepare_report_dir(complexity_report_dir)
 
-    print "--> Calculating cyclomatic complexity of python files..."
+    print("--> Calculating cyclomatic complexity of python files...")
     try:
         sh(
             "radon cc {system_string} --total-average > {complexity_report}".format(
@@ -340,11 +341,11 @@ def run_complexity():
             complexity_metric,
             (Env.METRICS_DIR / "python_complexity")
         )
-        print "--> Python cyclomatic complexity report complete."
-        print "radon cyclomatic complexity score: {metric}".format(metric=str(complexity_metric))
+        print("--> Python cyclomatic complexity report complete.")
+        print("radon cyclomatic complexity score: {metric}".format(metric=str(complexity_metric)))
 
     except BuildFailure:
-        print "FAILURE: Unable to calculate python-only code-complexity."
+        print("FAILURE: Unable to calculate python-only code-complexity.")
 
 
 @task
@@ -820,7 +821,7 @@ def run_quality(options):
     _, upper_violations_limit, _, _ = _parse_pylint_options(options)
 
     # Print total number of violations to log
-    print _lint_output('pylint', count, violations_list, limit=upper_violations_limit)
+    print(_lint_output('pylint', count, violations_list, limit=upper_violations_limit))
     if count > upper_violations_limit > -1:
         diff_quality_pass = False
         failure_reasons.append('Too many total violations.')

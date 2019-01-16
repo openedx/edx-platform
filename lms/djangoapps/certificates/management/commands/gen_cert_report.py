@@ -1,6 +1,7 @@
 """
 Generate a report of certificate statuses
 """
+from __future__ import print_function
 
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
@@ -56,7 +57,7 @@ class Command(BaseCommand):
 
         # find students who are active
         # number of enrolled students = downloadable + notpassing
-        print "Looking up certificate states for {0}".format(options['course'])
+        print("Looking up certificate states for {0}".format(options['course']))
         enrolled_current = User.objects.filter(
             courseenrollment__course_id=course_id,
             courseenrollment__is_active=True
@@ -113,14 +114,14 @@ class Command(BaseCommand):
         )
 
         # print the heading for the report
-        print "{:>26}".format("course ID"),
-        print ' '.join(["{:>16}".format(heading) for heading in status_headings])
+        print("{:>26}".format("course ID"), end=' ')
+        print(' '.join(["{:>16}".format(heading) for heading in status_headings]))
 
         # print the report
-        print "{0:>26}".format(text_type(course_id)),
+        print("{0:>26}".format(text_type(course_id)), end=' ')
         for heading in status_headings:
             if heading in cert_data[course_id]:
-                print "{:>16}".format(cert_data[course_id][heading]),
+                print("{:>16}".format(cert_data[course_id][heading]), end=' ')
             else:
-                print " " * 16,
-        print
+                print(" " * 16, end=' ')
+        print()

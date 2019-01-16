@@ -4,9 +4,10 @@
 Group Configuration Tests.
 """
 import json
+from operator import itemgetter
+
 import ddt
 from mock import patch
-from operator import itemgetter
 
 from contentstore.utils import reverse_course_url, reverse_usage_url
 from contentstore.course_group_config import GroupConfiguration, CONTENT_GROUP_CONFIGURATION_NAME, ENROLLMENT_SCHEME
