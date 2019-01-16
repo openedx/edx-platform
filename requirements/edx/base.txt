@@ -93,7 +93,7 @@ django-require==1.0.11
 django-rest-swagger==2.2.0
 django-sekizai==0.10.0
 django-ses==0.8.4
-django-simple-history==2.6.0
+django-simple-history==2.7.0
 django-splash==0.2.2
 django-statici18n==1.4.0
 django-storages==1.4.1
@@ -117,14 +117,14 @@ edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
 edx-django-utils==1.0.3
 edx-drf-extensions==2.0.1
-edx-enterprise==1.2.3
+edx-enterprise==1.2.5
 edx-i18n-tools==0.4.6
 edx-milestones==0.1.13
 edx-oauth2-provider==1.2.2
 edx-opaque-keys[django]==0.4.4
 edx-organizations==1.0.0
 edx-proctoring-proctortrack==1.0.0
-edx-proctoring==1.5.5
+edx-proctoring==1.5.6
 edx-rest-api-client==1.9.2
 edx-search==1.2.1
 edx-submissions==2.0.12
@@ -169,7 +169,7 @@ mock==1.0.1
 mongoengine==0.10.0
 mysql-python==1.2.5
 networkx==1.7
-newrelic==4.8.0.110
+newrelic==4.10.0.112
 nltk==3.4
 nodeenv==1.1.1
 numpy==1.6.2
@@ -208,7 +208,7 @@ pytz==2018.9
 pyuca==1.1
 pyyaml==3.13
 redis==2.10.6
-reportlab==3.5.12
+reportlab==3.5.13
 requests-oauthlib==1.1.0
 requests==2.21.0
 rest-condition==1.0.3
@@ -228,7 +228,7 @@ social-auth-app-django==2.1.0
 social-auth-core==1.7.0
 sorl-thumbnail==12.3
 sortedcontainers==0.9.2
-soupsieve==1.6.2          # via beautifulsoup4
+soupsieve==1.7.1          # via beautifulsoup4
 sqlparse==0.2.4
 stevedore==1.10.0
 sympy==0.7.1
