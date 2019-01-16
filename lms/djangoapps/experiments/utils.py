@@ -1,12 +1,8 @@
 from student.models import CourseEnrollment
 from django_comment_common.models import Role
+from course_modes.models import get_cosmetic_verified_display_price
 from courseware.access import has_staff_access_to_preview_mode
-from course_modes.models import (
-    get_cosmetic_verified_display_price
-)
-from courseware.date_summary import (
-    verified_upgrade_deadline_link, verified_upgrade_link_is_valid
-)
+from courseware.date_summary import verified_upgrade_deadline_link, verified_upgrade_link_is_valid
 from xmodule.partitions.partitions_service import get_user_partition_groups, get_all_partitions_for_course
 from crum import get_current_request
 from openedx.core.djangoapps.programs.utils import ProgramDataExtender, ProgramProgressMeter
