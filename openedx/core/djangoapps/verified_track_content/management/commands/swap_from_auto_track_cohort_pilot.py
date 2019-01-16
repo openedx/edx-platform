@@ -55,7 +55,7 @@ class Command(BaseCommand):
             raise CommandError("No audit_cohort_names set for MigrateVerifiedTrackCohortsSetting with ID: '%s'"
                                % verified_track_cohorts_setting.id)
 
-        print("Running for MigrateVerifiedTrackCohortsSetting with old_course_key='%s' and rerun_course_key='%s'" % \
+        print("Running for MigrateVerifiedTrackCohortsSetting with old_course_key='%s' and rerun_course_key='%s'" %
               (verified_track_cohorts_setting.old_course_key, verified_track_cohorts_setting.rerun_course_key))
 
         # Get the CourseUserGroup IDs for the audit course names from the old course

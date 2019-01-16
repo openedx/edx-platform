@@ -167,7 +167,7 @@ def _get_block_types_from_json_file(xblock_json_file):
         try:
             json_data = json.loads(json_file.read())
         except ValueError as e:
-            print('xBlock configuration file does not match the expected layout and is ' \
+            print('xBlock configuration file does not match the expected layout and is '
                   'missing "data" list: %s' % xblock_json_file)
             sys.exit(text_type(e))
         if 'data' in json_data:
@@ -176,7 +176,7 @@ def _get_block_types_from_json_file(xblock_json_file):
                 type_set.add(xblock['name'])
             return type_set
         else:
-            print('xBlock configuration file does not match the expected layout and is ' \
+            print('xBlock configuration file does not match the expected layout and is '
                   'missing "data" list: %s' % xblock_json_file)
             sys.exit(2)
 
