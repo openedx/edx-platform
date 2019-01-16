@@ -45,8 +45,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-01-15 19:13+0800\n"
-"PO-Revision-Date: 2019-01-15 11:13:08.347745\n"
+"POT-Creation-Date: 2019-01-16 11:52+0800\n"
+"PO-Revision-Date: 2019-01-16 03:52:57.524849\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -20019,6 +20019,7 @@ msgid "For course cooperation, please contact: "
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/about.html
+#: themes/normal-theme/lms/templates/static_templates/join_us.html
 msgid "."
 msgstr ""
 
@@ -21238,6 +21239,26 @@ msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/join_us.html
 msgid "Join us"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/static_templates/join_us.html
+msgid "Let Yourself be More Valuable"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/static_templates/join_us.html
+msgid ""
+"EliteMBA pays attention to employee development and attaches importance to "
+"the power of communication. We continue to learn, inspire each other, and "
+"constantly discover industry inspiration at work, and open our eyes as a "
+"whole community. Here, work is an organic combination of enjoyment and hard "
+"work."
+msgstr ""
+
+#: themes/normal-theme/lms/templates/static_templates/join_us.html
+msgid ""
+"We will release job information as soon as possible, so stay tuned. Of "
+"course, this does not mean that we want to miss any future members. Feel "
+"free to contact us through email directly"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/join_us.html

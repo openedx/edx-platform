@@ -31,7 +31,6 @@
 # 微 李 <w.li@eliteu.com.cn>, 2018
 # 家璧 刘 <jb.liu@eliteu.com.cn>, 2018
 # 婕 高 <j.gao@eliteu.cn>, 2018
-# Yi Li <y.li@eliteu.cn>, 2018
 # li ying <code@eliteu.cn>, 2019
 #
 # #-#-#-#-#  mako-studio.po (0.1a)  #-#-#-#-#
@@ -74,7 +73,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-01-15 19:13+0800\n"
+"POT-Creation-Date: 2019-01-16 12:00+0800\n"
 "PO-Revision-Date: 2018-12-07 12:23+0000\n"
 "Last-Translator: li ying <code@eliteu.cn>, 2019\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)\n"
@@ -10751,7 +10750,7 @@ msgstr "username@domain.com"
 #: openedx/core/djangoapps/user_api/api.py
 #, python-brace-format
 msgid "The email address you used to register with {platform_name}"
-msgstr "您在{platform_name}上注册的E-mail"
+msgstr "您在{platform_name}上注册的邮箱"
 
 #: openedx/core/djangoapps/user_api/api.py lms/templates/login.html
 msgid "Remember me"
@@ -11015,7 +11014,7 @@ msgid ""
 "an email, check your spam folders or <a href=\"{support_url}\">contact "
 "{platform} Support</a>."
 msgstr ""
-"如需登录，请先激活您的账号，<br /><br />我们会发送激活链接至 "
+"如需登录，请先激活您的账号。<br /><br />我们会发送激活链接至 "
 "<strong>{email}</strong>。如果您未收到邮件，请查看邮箱的垃圾箱或 <a "
 "href=\"{support_url}\">联系{platform}的技术支持</a>。"
 
@@ -20264,7 +20263,7 @@ msgstr "学校 & 伙伴"
 
 #: themes/normal-theme/lms/templates/footer.html
 msgid "Learn to Change·Change to Progress"
-msgstr "学则变 · 变则进 —— 英荔商学院"
+msgstr "学则变 · 变则进"
 
 #: themes/normal-theme/lms/templates/footer.html
 #: themes/normal-theme/lms/templates/static_templates/about.html
@@ -20397,6 +20396,7 @@ msgid "For course cooperation, please contact: "
 msgstr "课程合作请联系："
 
 #: themes/normal-theme/lms/templates/static_templates/about.html
+#: themes/normal-theme/lms/templates/static_templates/join_us.html
 msgid "."
 msgstr "。"
 
@@ -20454,7 +20454,7 @@ msgstr "课程合作"
 
 #: themes/normal-theme/lms/templates/static_templates/contact.html
 msgid "Contact: Mr. Chen"
-msgstr "联系人：陈小姐"
+msgstr "联系人：陈先生"
 
 #: themes/normal-theme/lms/templates/static_templates/contact.html
 msgid "Human Resources and Recruitment"
@@ -21675,6 +21675,27 @@ msgstr ""
 #: themes/normal-theme/lms/templates/static_templates/join_us.html
 msgid "Join us"
 msgstr "加入我们"
+
+#: themes/normal-theme/lms/templates/static_templates/join_us.html
+msgid "Let Yourself be More Valuable"
+msgstr "成为更有价值的自己"
+
+#: themes/normal-theme/lms/templates/static_templates/join_us.html
+msgid ""
+"EliteMBA pays attention to employee development and attaches importance to "
+"the power of communication. We continue to learn, inspire each other, and "
+"constantly discover industry inspiration at work, and open our eyes as a "
+"whole community. Here, work is an organic combination of enjoyment and hard "
+"work."
+msgstr ""
+"英荔关注员工发展，重视交流的力量。作为一个整体，我们不断学习，相互启发，在工作中不断发现行业灵感，大开眼界。在这里，工作是享受与拼搏的有机结合。"
+
+#: themes/normal-theme/lms/templates/static_templates/join_us.html
+msgid ""
+"We will release job information as soon as possible, so stay tuned. Of "
+"course, this does not mean that we want to miss any future members. Feel "
+"free to contact us through email directly"
+msgstr "职位信息整理中，我们将尽快发布，敬请期待。当然，这并不意味着我们愿意错过任何一位未来的成员，欢迎直接邮件联系"
 
 #: themes/normal-theme/lms/templates/static_templates/join_us.html
 msgid "Become a Lecturer"
@@ -26250,8 +26271,12 @@ msgid "Choose a payment method"
 msgstr "选择支付方式"
 
 #: membership/templates/membership/card.html
-msgid "Membership Subscription Period"
-msgstr "订阅会员有效期"
+msgid "Membership Valid in "
+msgstr "会员有限期："
+
+#: membership/templates/membership/card.html
+msgid "days"
+msgstr "天"
 
 #: membership/templates/membership/card.html
 msgid "Tuition:"

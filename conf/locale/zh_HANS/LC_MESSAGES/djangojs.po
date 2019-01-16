@@ -53,7 +53,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-01-15 19:13+0800\n"
+"POT-Creation-Date: 2019-01-16 12:00+0800\n"
 "PO-Revision-Date: 2018-12-07 12:23+0000\n"
 "Last-Translator: li ying <code@eliteu.cn>, 2019\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)\n"
@@ -4501,7 +4501,7 @@ msgstr "（必填项）"
 
 #: lms/static/js/student_account/views/RegisterView.js
 msgid "You've successfully signed into %(currentProvider)s."
-msgstr "您已成功登录%(currentProvider)s。"
+msgstr "您已成功授权%(currentProvider)s登录。"
 
 #: lms/static/js/student_account/views/RegisterView.js
 msgid ""
