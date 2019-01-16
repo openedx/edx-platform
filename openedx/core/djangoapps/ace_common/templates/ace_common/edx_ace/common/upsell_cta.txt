@@ -6,5 +6,5 @@
     certificate. Upgrade by {{ user_schedule_upgrade_deadline_time }}.
 {% endblocktrans %}
 
-{% trans "Upgrade Now" %} <{% with_link_tracking upsell_link %}>
+{% trans "Upgrade Now" as tmsg %} {{ tmsg | force_escape }} <{% with_link_tracking upsell_link %}>
 {% endif %}

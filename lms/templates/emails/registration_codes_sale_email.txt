@@ -1,4 +1,5 @@
 ## mako
+<%page expression_filter="h"/>
 <%! from django.utils.translation import ugettext as _ %>
 
 ${_("Thank you for purchasing enrollments in {course_name}.").format(course_name=course.display_name)}

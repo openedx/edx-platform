@@ -1,15 +1,17 @@
 {% extends "main_django.html" %}
 {% load i18n staticfiles %}
 
-{% block title %}{% trans "Signed Out" %} | {{ block.super }}{% endblock %}
+{% block title %}{% trans "Signed Out" as tmsg %} | {{ tmsg | force_escape }} | {{ block.super }}{% endblock %}
 
 {% block body %}
-    <h1>{% trans "You have signed out." %}</h1>
+    <h1>{% trans "You have signed out." as tmsg %} | {{ tmsg | force_escape }}</h1>
 
     <p style="text-align: center; margin-bottom: 20px;">
+        {% filter force_escape %}
         {% blocktrans trimmed %}
           If you are not redirected within 5 seconds, <a href="{{ target }}">click here to go to the home page</a>.
         {% endblocktrans %}
+        {%endfilter%}
     </p>
 
     <div id="iframeContainer" style="visibility: hidden" data-redirect-url="{{ target }}">

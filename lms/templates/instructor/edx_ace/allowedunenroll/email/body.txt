@@ -1,6 +1,6 @@
-{% load i18n %}{% autoescape off %}{% blocktrans %}Dear Student,{% endblocktrans %}
+{% load i18n %}{% autoescape off %}{% filter force_escape %}{% blocktrans %}Dear Student,{% endblocktrans %}{%endfilter%}
 
-{% blocktrans %}You have been unenrolled from the course {{ course_name }} by a member of the course staff. Please disregard the invitation previously sent.{% endblocktrans %}
+{% filter force_escape %}{% blocktrans %}You have been unenrolled from the course {{ course_name }} by a member of the course staff. Please disregard the invitation previously sent.{% endblocktrans %}{%endfilter%}
 
 ----
-{% blocktrans %}This email was automatically sent from {{ site_name }} to {{ email_address }}{% endblocktrans %}{% endautoescape %}
+{% filter force_escape %}{% blocktrans %}This email was automatically sent from {{ site_name }} to {{ email_address }}{% endblocktrans %}{% endautoescape %}{%endfilter%}

@@ -1,7 +1,7 @@
 {% extends "wiki/base.html" %}
 {% load wiki_tags i18n sekizai_tags %}
 
-{% block pagetitle %}{% trans "Add new article" %}{% endblock %}
+{% block pagetitle %}{% trans "Add new article" as tmsg %}{{tmsg|force_escape}}{% endblock %}
 
 {% block wiki_contents %}
 
@@ -26,7 +26,7 @@
   <article class="main-article new-article">
 
     {% include "wiki/includes/editormedia.html" %}
-    <h1 class="page-header">{% trans "Add new article" %}</h1>
+    <h1 class="page-header">{% trans "Add new article" as tmsg%}{{tmsg|force_escape}}</h1>
 
     <form method="POST" class="form-horizontal">
       {% wiki_form create_form %}

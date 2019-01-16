@@ -3,18 +3,22 @@
 
 This is the RED theme!
 {% if course_ids|length > 1 %}
+{% filter force_escape %}
 {% blocktrans trimmed %}
     Remember when you enrolled in {{ course_name }}, and other courses on edX.org? We do, and we’re glad
     to have you! Come see what everyone is learning.
 {% endblocktrans %}
+{%endfilter%}
 
-{% trans "Start learning now" %} <{% with_link_tracking dashboard_url %}>
+{% trans "Start learning now" as tmsg%}{{tmsg|force_escape}} <{% with_link_tracking dashboard_url %}>
 {% else %}
+{% filter force_escape %}
 {% blocktrans trimmed %}
     Remember when you enrolled in {{ course_name }} on edX.org? We do, and we’re glad
     to have you! Come see what everyone is learning.
 {% endblocktrans %}
+{%endfilter%}
 
-{% trans "Start learning now" %} <{% with_link_tracking course_url %}>
+{% trans "Start learning now" as tmsg%}{{tmsg|force_escape}} <{% with_link_tracking course_url %}>
 {% endif %}
 {% include "ace_common/edx_ace/common/upsell_cta.txt"%}

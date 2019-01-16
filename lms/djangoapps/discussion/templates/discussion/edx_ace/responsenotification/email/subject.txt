@@ -1,3 +1,4 @@
 {% load i18n %}
-
+{% filter force_escape %}
 {% blocktrans %}Response to {{ thread_title }}{% endblocktrans %}
+{% endfilter %}

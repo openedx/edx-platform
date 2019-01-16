@@ -1,3 +1,4 @@
+<%page expression_filter="h"/>
 <%! from django.utils.translation import ugettext as _ %>
 % if full_name is not UNDEFINED and full_name is not None:
 ${_(u"Hi {name},").format(name=full_name)}

@@ -13,7 +13,7 @@
     {{ comment_body }}
 </div>
 
-<a href="{{ post_link }}"> {% trans "View discussion" %} </a>
+<a href="{{ post_link }}"> {% trans View discussion" as tmsg %}{{tmsg|force_escape}} </a>
 {% endblock %}
 
 {% block google_analytics_pixel %}

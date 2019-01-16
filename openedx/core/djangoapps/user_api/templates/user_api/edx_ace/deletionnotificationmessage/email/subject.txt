@@ -1,5 +1,5 @@
 {% autoescape off %}
 {% load i18n %}
 
-{% blocktrans %}Your Account Has Been Queued For Deletion{% endblocktrans %}
+{% blocktrans %}{% filter force_escape %}Your Account Has Been Queued For Deletion{% endblocktrans %}{%endfilter%}
 {% endautoescape %}

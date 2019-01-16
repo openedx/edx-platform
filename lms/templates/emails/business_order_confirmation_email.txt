@@ -1,5 +1,8 @@
 ## mako
-<%! from django.utils.translation import ugettext as _ %>
+<%page expression_filter="h"/>
+<%! from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
+%>
 <p>
 ${_("Hi {name},").format(name=recipient_name)}
 </p>
@@ -9,9 +12,9 @@ ${_("Thank you for your purchase of ")} <b> ${course_names} </b>
 %if recipient_type == 'user':
 <p>${_("Your payment was successful.")}</p>
 % if marketing_link('FAQ'):
-<p>${_("If you have billing questions, please read the FAQ ({faq_url}) or contact {billing_email}.").format(billing_email=payment_support_email, faq_url=marketing_link('FAQ'))}</p>
+<p>${Text(_("If you have billing questions, please read the FAQ ({faq_url}) or contact {billing_email}.")).format(billing_email=HTML(payment_support_email), faq_url=HTML(marketing_link('FAQ')))}</p>
 % else:
-<p>${_("If you have billing questions, please contact {billing_email}.").format(billing_email=payment_support_email)}</p>
+<p>${Text(_("If you have billing questions, please contact {billing_email}.")).format(billing_email=HTML(payment_support_email))}</p>
 % endif
 
 %elif recipient_type == 'company_contact':
@@ -91,11 +94,11 @@ ${payment_email_signature}
 ## Translators: please translate the text inside [[ ]]. This is meant as a template for course teams to use.
 <p>${_("Your redeem url is: [[Enter Redeem URL here from the attached CSV]]")}</p>
 
-<p>${_("(1) Register for an account at {site_name}").format(site_name=u"<a href='https://{sn}'>https://{sn}</a>".format(sn=site_name))}<br>
+<p>${Text(_("(1) Register for an account at {site_name}")).format(site_name=HTML(u"<a href='https://{sn}'>https://{sn}</a>").format(sn=site_name))}<br>
 ${_("(2) Once registered, copy the redeem URL and paste it in your web browser.")}<br>
 ${_("(3) On the enrollment confirmation page, Click the 'Activate Enrollment Code' button. This will show the enrollment confirmation.")}<br>
-${_("(4) You should be able to click on 'view course' button or see your course on your student dashboard at {url}").format(
-	 url=u"<a href='https://{dashboard_url}'>https://{dashboard_url}</a>".format(dashboard_url=dashboard_url)
+${Text(_("(4) You should be able to click on 'view course' button or see your course on your student dashboard at {url}")).format(
+	 url=HTML(u"<a href='https://{dashboard_url}'>https://{dashboard_url}</a>").format(dashboard_url=HTML(dashboard_url))
 )}<br>
 ${_("(5) Course materials will not be available until the course start date.")}</p>
 
