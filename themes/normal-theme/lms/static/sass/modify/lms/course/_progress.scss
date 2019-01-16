@@ -35,14 +35,22 @@ body.view-in-course .profile-wrapper{
       color: #aab2bd;
     }
     .sections>div{
+      p{
+        font-weight: normal;
+      }
       .hd{
         font-weight: normal;
+        border-right: none;
+        span{
+          color: #aab2bd;
+        }
       }
       .scores{
         margin: 0;
         color: $font;
         font-size: 14px;
       }
+      
       .hd-3{
         padding-left: 20px;
       }

@@ -82,11 +82,15 @@
 .wrapper-messages-primary .message.message-status.course-status-certavailable .actions-primary .action-certificate .btn{
   @extend %btn-my-primary;
   background: #40A24D !important;
-  border: none;
+  border: 1px solid #40A24D;
+  line-height: 34px;
   .copy{
     margin-right: 0;
     vertical-align: unset;
     font-weight: normal;
+  }
+  &:hover,&:focus, &:active, &:visited{
+    border: 1px solid #40A24D;
   }
 }
 
@@ -172,6 +176,7 @@
 
   .search-field-wrapper .search-button, .cancel-button{
     width: 60px;
+    background: $primary;
     &:hover, &:focus, &:active, &:hover:hover, &:hover:focus, &:hover:active{
       background: $primary;
       opacity: 0.95;
