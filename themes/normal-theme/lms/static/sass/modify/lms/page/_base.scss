@@ -102,6 +102,9 @@ input::-ms-clear{
   width: 0;
   height: 0;
 }
+.form-control:focus{
+  box-shadow: none;
+}
 
 // ul
 ol, ul, dl{
@@ -177,6 +180,7 @@ button:focus:not(:disabled), button:hover:not(:disabled), .btn-default{
     opacity: 0.95;
     box-shadow: none;
     color: #fff;
+    border: 1px solid $primary;
   }
 }
 

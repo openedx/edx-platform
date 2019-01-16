@@ -131,6 +131,11 @@ body.view-in-course .wrapper-course-material .course-tabs{
     span{
       padding: 0;
     }
+    &:hover, &:focus{
+      outline: none;
+      box-shadow: none;
+      background-color: rgba(182, 220, 254, 0.5);
+    }
   }
 }
 
@@ -242,6 +247,7 @@ body.view-in-course .wrapper-course-material .course-tabs{
   border-radius: 3px;
   border: none;
   background: rgba(182, 220, 254, 0.1);
+  cursor: pointer;
 
   p{
     margin: 0;
