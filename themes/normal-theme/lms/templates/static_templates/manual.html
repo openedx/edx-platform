@@ -39,8 +39,8 @@
     var content = '';
     var active = 0;
     for (var i = 0; i < data_m.length; i++){
-        tab = tab + '<div class="manual-tab" onclick="showBlock(' + i + ')">' + data_m[i].title + '</div>';
-        content = content + '<div class="manual-block" style="display:none"><p class="ques-title">' + data_m[i].title + '</p>' + '<p class="ques-answer">' + data_m[i].answer + '</p></div>';
+        tab = tab + '<div class="manual-tab" onclick="showBlock(' + i + ')">' + gettext(data_m[i].title) + '</div>';
+        content = content + '<div class="manual-block" style="display:none"><p class="ques-title">' + gettext(data_m[i].title) + '</p>' + '<p class="ques-answer">' + gettext(data_m[i].answer) + '</p></div>';
     }
     $('.manual-tabs')[0].innerHTML = tab;
     $('.manual-content')[0].innerHTML = content;
