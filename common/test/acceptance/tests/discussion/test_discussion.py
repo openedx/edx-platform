@@ -3,6 +3,7 @@ Tests for discussion pages
 """
 
 import datetime
+import time
 from unittest import skip
 from uuid import uuid4
 
@@ -961,6 +962,9 @@ class DiscussionEditorPreviewTest(UniqueCourseTest):
         self.page.visit()
         self.page.click_new_post_button()
 
+        # sleep/wait added to allow Major MathJax a11y files to load
+        time.sleep(5)
+
     def test_text_rendering(self):
         """When I type plain text into the editor, it should be rendered as plain text in the preview box"""
         self.page.set_new_post_editor_value("Some plain text")
@@ -998,6 +1002,21 @@ class DiscussionEditorPreviewTest(UniqueCourseTest):
             '$$e[n]=d_2$$'
         )
         self.assertEqual(self.page.get_new_post_preview_text(), 'Text line 1\nText line 2')
+
+    def test_inline_mathjax_rendering_in_order(self):
+        """
+        Tests the order of Post body content when inline Mathjax is used.
+
+        With inline mathjax expressions, the text content doesn't break into new lines at the places of
+        mathjax expressions.
+        """
+        self.page.set_new_post_editor_value(
+            'Text line 1 \n'
+            '$e[n]=d_1$ \n'
+            'Text line 2 \n'
+            '$e[n]=d_2$'
+        )
+        self.assertEqual(self.page.get_new_post_preview_text('.wmd-preview > p'), 'Text line 1 Text line 2')
 
     def test_mathjax_not_rendered_after_post_cancel(self):
         """

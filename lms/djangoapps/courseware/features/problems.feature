@@ -22,8 +22,8 @@ Feature: LMS.Answer problems
         | radio             | correct       | always        |
         | radio             | incorrect     | always        |
         | numerical         | incorrect     | always        |
-        | formula           | correct       | always        |
-        | formula           | incorrect     | always        |
+        #| formula           | correct       | always        |
+        #| formula           | incorrect     | always        |
         | script            | correct       | always        |
         | script            | incorrect     | always        |
         | radio_text        | correct       | always        |
@@ -49,7 +49,7 @@ Feature: LMS.Answer problems
         #| radio             | incorrect     | never           |
         #| string            | incorrect     | never           |
         | numerical         | incorrect     | never           |
-        | formula           | incorrect     | never           |
+        #| formula           | incorrect     | never           |
         # TE-572 failing intermittently
         #| script            | incorrect     | never           |
         | radio_text        | incorrect     | never           |
@@ -69,7 +69,7 @@ Feature: LMS.Answer problems
         | radio             | correct       | never           |
         #| string            | correct       | never           |
         | numerical         | correct       | never           |
-        | formula           | correct       | never           |
+        #| formula           | correct       | never           |
         | script            | correct       | never           |
         | radio_text        | correct       | never           |
         | checkbox_text     | correct       | never           |
@@ -129,8 +129,8 @@ Feature: LMS.Answer problems
         | radio             | incorrect     | 0/1 point (ungraded)  | 0/1 point (ungraded)   |
         | numerical         | correct       | 1/1 point (ungraded)  | 0/1 point (ungraded)   |
         | numerical         | incorrect     | 0/1 point (ungraded)  | 0/1 point (ungraded)   |
-        | formula           | correct       | 1/1 point (ungraded)  | 0/1 point (ungraded)   |
-        | formula           | incorrect     | 0/1 point (ungraded)  | 0/1 point (ungraded)   |
+        #| formula           | correct       | 1/1 point (ungraded)  | 0/1 point (ungraded)   |
+        #| formula           | incorrect     | 0/1 point (ungraded)  | 0/1 point (ungraded)   |
         | script            | correct       | 2/2 points (ungraded) | 0/2 points (ungraded)  |
         | script            | incorrect     | 0/2 points (ungraded) | 0/2 points (ungraded)  |
         | image             | correct       | 1/1 point (ungraded)  | 0/1 point (ungraded)   |
@@ -155,8 +155,8 @@ Feature: LMS.Answer problems
         | radio             | incorrect     | 0/1 point (ungraded)   | 0/1 point (ungraded)   | never         |
         | numerical         | correct       | 1/1 point (ungraded)   | 0/1 point (ungraded)   | never         |
         | numerical         | incorrect     | 0/1 point (ungraded)   | 0/1 point (ungraded)   | never         |
-        | formula           | correct       | 1/1 point (ungraded)   | 0/1 point (ungraded)   | never         |
-        | formula           | incorrect     | 0/1 point (ungraded)   | 0/1 point (ungraded)   | never         |
+        #| formula           | correct       | 1/1 point (ungraded)   | 0/1 point (ungraded)   | never         |
+        #| formula           | incorrect     | 0/1 point (ungraded)   | 0/1 point (ungraded)   | never         |
         | script            | correct       | 2/2 points (ungraded)  | 0/2 points (ungraded)  | never         |
         | script            | incorrect     | 0/2 points (ungraded)  | 0/2 points (ungraded)  | never         |
         | image             | correct       | 1/1 point (ungraded)   | 0/1 point (ungraded)   | never         |
@@ -189,8 +189,8 @@ Feature: LMS.Answer problems
         #| string          | incorrect          | correct          |
         | numerical       | correct            | incorrect        |
         | numerical       | incorrect          | correct          |
-        | formula         | correct            | incorrect        |
-        | formula         | incorrect          | correct          |
+        #| formula         | correct            | incorrect        |
+        #| formula         | incorrect          | correct          |
         | script          | correct            | incorrect        |
         | script          | incorrect          | correct          |
 
