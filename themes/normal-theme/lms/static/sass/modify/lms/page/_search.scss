@@ -34,7 +34,9 @@
     border: none;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
-
+    &:hover, &:focus &:active, &:visited{
+      border: none;
+    }
   }
   .loading-spinner{
     top: 0;

@@ -5,6 +5,7 @@
   overflow: inherit;
   z-index: 100;
   height: 60px;
+  padding: 0 20px;
 
   .main-header{
     max-width: 1200px;
@@ -39,6 +40,9 @@
 }
 
 @media screen and (max-width:992px){ 
+  .window-wrap .global-header{
+    padding: 0;
+  }
   .global-header .hamburger-menu{ 
     left: 5%;
   }
