@@ -468,7 +468,6 @@ class TestPartitionService(PartitionServiceBaseClass):
     """
     shard = 2
 
-
     def test_get_group(self):
         """
         Test that a partition group is assigned to a user.
