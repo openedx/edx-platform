@@ -4,11 +4,136 @@
 
 <%block name="pagetitle">${_(u"Manual")}</%block>
 
-<main id="main" aria-label="Content" tabindex="-1">
-    <div class="manual-container">
-        <div class="manual-content">
-            <img src="/static/images/abouts/waiting-icon.png" />
-            <p>${_(u"Coming Soon")}</p>
-        </div>
-    </div>
-</main>
+
+<style>
+.manu-container{
+    position: relative;
+    padding: 20px 10px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+/* tab */
+.manual-tabs{
+    position: absolute;
+    width: 260px;
+    top: 20px;
+    left: 10px;
+    border: 1px solid #eeeeee;
+    border-radius: 3px;
+    font-size: 14px;
+    color: #2E313C;
+}
+.manual-tabs-fixed{
+    position: fixed;
+    top: 20px;
+    left: unset;
+}
+.manual-tab{
+    height: 46px;
+    line-height: 46px;
+    border-bottom: 1px solid #eeeeee;
+    padding-left: 20px;
+    cursor: pointer;
+}
+.manual-tab:first-child{
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
+.manual-tab-active{
+    background: #4788C7;
+    color: #fff;
+}
+
+/* content */
+.manual-content{
+    margin-left: 275px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+.manual-block{
+    border: 1px solid #eeeeee;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 3px;
+}
+.ques-title{
+    color: #2E313C;
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+.ques-answer{
+    color: #656D78;
+    font-size: 14px;
+    margin: 0;
+}
+@media screen and (max-width:546px){
+    .manual-tabs{
+    display: none;
+    }
+    .manual-content{
+    margin-left: 0;
+    }
+}
+</style>
+<div class="manu-container">
+<div class="manual-tabs"></div>
+<div class="manual-content"></div>
+</div>
+<script>
+    var data_m = [
+        {
+        title: '如何了解课程?',
+        answer: '点击课程进入详情页，观看课程简介视频，浏览课程简介、导师简介及课程大纲等。'
+        },{
+        title: '如何加入会员？', 
+        answer: '进入“会员资格”页，选择适合您的学习时长及支付方式，支付成功后便可在会员期限内享受所有课程的学习权益。',
+        },{
+        title: '如何查看已购买的会员期限？', 
+        answer: '进入“会员资格”页，可查看会员已开通时间及剩余时间。',
+        },{
+        title: '会员如何选课？', 
+        answer: '进入“发现课程”页，直接选择或通过搜索关键字的方式选择您感兴趣的课程，点击“VIP会员免费选修此课程”，即为选课成功。',
+        },{
+        title: '非会员如何购买单课？', 
+        answer: '进入“发现课程”页，直接选择或通过搜索关键字的方式选择您感兴趣的课程，点击“选修此课程”，支付成功后即可开始学习该门课程。',
+        },{
+        title: '如何开始学习？', 
+        answer: '点击网页右上角个人头像进入“课程面板-查看课程”，可浏览课程简介；点击“开始学习课程”，可观看课程视频，提交课后习题。',
+        },{
+        title: '如何参与课程讨论？', 
+        answer: '进入“课程面板-查看课程”页，点击“讨论”，可以查看讨论帖、参与讨论及接收讨论帖更新。',
+        },{
+        title: '如何查看和下载课程讲义？', 
+        answer: '进入“课程面板-查看课程”页，在右侧找到“课程讲义”，可查看讲义内容并下载。',
+        }
+    ];
+    var tab = '';
+    var content = '';
+    var active = 0;
+    for (var i = 0; i < data_m.length; i++){
+        tab = tab + '<div class="manual-tab" onclick="showBlock(' + i + ')">' + data_m[i].title + '</div>';
+        content = content + '<div class="manual-block" id="' + i + '"><p class="ques-title">' + data_m[i].title + '</p>' + '<p class="ques-answer">' + data_m[i].answer + '</p></div>';
+    }
+    $('.manual-tabs')[0].innerHTML = tab;
+    $('.manual-content')[0].innerHTML = content;
+    $('.manual-tab')[active].classList.add('manual-tab-active');
+
+    function showBlock(index){
+        $('.manual-tab')[active].classList.remove('manual-tab-active');
+        $('.manual-tab')[index].classList.add('manual-tab-active');
+        active = index;
+        var height = $('.manual-block')[index].offsetTop + 40;
+        $('html, body').animate({ scrollTop: height + 'px'}, 500)
+    }
+    window.onscroll = function(){
+        var height = document.documentElement.scrollTop;
+        if (height > 60) {
+            $('.manual-tabs')[0].classList.add('manual-tabs-fixed');
+        } else {
+            $('.manual-tabs')[0].classList.remove('manual-tabs-fixed');
+        }
+    }
+</script>
+

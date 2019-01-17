@@ -50,7 +50,8 @@ $icon-width: 18px;
 .fa-exclamation-circle:before,
 .account-activation.success.aa-icon .message-copy::before,
 .fa-camera:before,
-.account-activation.info.aa-icon .message-copy::before
+.account-activation.info.aa-icon .message-copy::before,
+.fa-asterisk:before
 {
   content: '';
   display: inline-block;
@@ -270,6 +271,9 @@ $icon-width: 18px;
 
 .fa-camera:before{
   background-position: calcP(10, 3)
+}
+.fa-asterisk:before{
+  background-position: calcP(7, 5)
 }
 
 // 2. 课程详情页的新icon
