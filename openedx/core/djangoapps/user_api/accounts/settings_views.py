@@ -178,7 +178,9 @@ def get_user_orders(user):
                 'number': order['number'],
                 'price': order['total_excl_tax'],
                 'order_date': strftime_localized(date_placed, 'SHORT_DATE'),
-                'receipt_url': EcommerceService().get_receipt_page_url(order['number']),
+                'receipt_url': '{url}&username={username}'.format(
+                    url=EcommerceService().get_receipt_page_url(order['number']),
+                    username=user.username),
                 'lines': order['lines'],
             }
             user_orders.append(order_data)
