@@ -69,12 +69,21 @@
 # 嘉杰 李 <jj.li@eliteu.com.cn>, 2018
 # li ying <code@eliteu.cn>, 2019
 #
+# #-#-#-#-#  eliteu.po (0.1a)  #-#-#-#-#
+# edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)
+# Copyright (C) 2019 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2019.
+#
+# Translators:
+# li ying <code@eliteu.cn>, 2019
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-01-16 12:00+0800\n"
-"PO-Revision-Date: 2018-12-07 12:23+0000\n"
+"POT-Creation-Date: 2019-01-16 03:55+0000\n"
+"PO-Revision-Date: 2019-01-17 09:35+0000\n"
 "Last-Translator: li ying <code@eliteu.cn>, 2019\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)\n"
 "Language: zh_CN\n"
@@ -10568,7 +10577,7 @@ msgstr "{username}已经被注册了。请更换用户名重试。"
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 #, python-brace-format
 msgid "Username must be between {min} and {max} characters long."
-msgstr "用户名字符数{min}到{max} 位。"
+msgstr "用户名字符数{min}到{max}位。"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 #, python-brace-format
@@ -26271,12 +26280,8 @@ msgid "Choose a payment method"
 msgstr "选择支付方式"
 
 #: membership/templates/membership/card.html
-msgid "Membership Valid in "
-msgstr "会员有限期："
-
-#: membership/templates/membership/card.html
-msgid "days"
-msgstr "天"
+msgid "Membership Subscription Period"
+msgstr "订阅会员有效期"
 
 #: membership/templates/membership/card.html
 msgid "Tuition:"
@@ -26310,7 +26315,7 @@ msgstr "遇到问题?"
 
 #: membership/templates/membership/index.html
 msgid "Prestige EMBA courses in America"
-msgstr "美国名校EMAB精华课程"
+msgstr "美国名校EliteMBA精华课程"
 
 #: membership/templates/membership/index.html
 msgid "Six Course Specializations of Elite MBA School"
@@ -26652,3 +26657,6 @@ msgstr "以完成支付"
 #: membership/templates/membership/wechat_paying.html
 msgid "Payment Success"
 msgstr "支付成功"
+
+msgid "email address"
+msgstr "电子邮件"
