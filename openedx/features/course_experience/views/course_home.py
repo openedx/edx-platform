@@ -159,6 +159,8 @@ class CourseHomeFragmentView(EdxFragmentView):
                 request, course_id=course_id, user_is_enrolled=False, **kwargs
             )
             course_sock_fragment = CourseSockFragmentView().render_to_fragment(request, course=course, **kwargs)
+            if allow_public:
+                handouts_html = self._get_course_handouts(request, course)
         else:
             # Redirect the user to the dashboard if they are not enrolled and
             # this is a course that does not support direct enrollment.

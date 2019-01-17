@@ -41,7 +41,7 @@ from survey.utils import is_survey_required_and_unanswered
 from util.date_utils import strftime_localized
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.x_module import STUDENT_VIEW
+from xmodule.x_module import STUDENT_VIEW, PUBLIC_VIEW
 
 log = logging.getLogger(__name__)
 
@@ -365,7 +365,10 @@ def get_course_info_section(request, user, course, section_key):
     html = ''
     if info_module is not None:
         try:
-            html = info_module.render(STUDENT_VIEW).content.strip()
+            if user.is_authenticated():
+                html = info_module.render(STUDENT_VIEW).content.strip()
+            else:
+                html = info_module.render(PUBLIC_VIEW).content.strip()
         except Exception:  # pylint: disable=broad-except
             html = render_to_string('courseware/error-message.html', None)
             log.exception(
