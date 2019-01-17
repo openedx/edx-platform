@@ -247,12 +247,14 @@ body.view-in-course .wrapper-course-material .course-tabs{
   border-radius: 3px;
   border: none;
   background: rgba(182, 220, 254, 0.1);
-  cursor: pointer;
 
   p{
     margin: 0;
     line-height: 2;
     color: $font;
+  }
+  .dismiss-message{
+    cursor: pointer;
   }
   .dismiss-message .btn-link:focus{
     outline: none;

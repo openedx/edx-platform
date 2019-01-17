@@ -171,26 +171,8 @@ from six import string_types
           %endif
         %elif in_cart:
           <span class="add-to-cart">
-            ${_('This course is in your <a>cart</a>.').format(cart_link=cart_link)}
+            ${_('This course is in your <a href="{cart_link}">cart</a>.').format(cart_link=cart_link)}
           </span>
-          <script>
-            $('.add-to-cart').click(function(){
-              $.ajax({
-                type: 'get',
-                url: '/api/v1/vip/info',
-                success: function(res){
-                  console.log(res);
-                  if (res.data.status) {
-                    
-                    // $("#class_enroll_form").submit();
-                    // event.preventDefault();
-                  } else {
-                    // window.location.href = cart_link;
-                  }
-                }
-              })
-            });
-          </script>
         % elif is_course_full:
           <span class="register disabled">
             ${_("Course is full")}
