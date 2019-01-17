@@ -71,6 +71,7 @@
     font-size: 14px;
     color: $title;
     padding: 1px 0 20px;
+    margin: 0;
   }
   .footer-line{
     width: 65.5%;
@@ -83,7 +84,7 @@
 
   // 3. 左侧app按钮
   .logo{
-    width: 120px;
+    height: 30px;
   }
   .slogan{
     margin: 10px 0 25px;
@@ -136,6 +137,7 @@
   }
   .footer-icon svg{
     fill: $primary;
+    vertical-align: initial;
   }
 
   // Wechat

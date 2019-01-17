@@ -31,7 +31,7 @@
                                 this.showNotification({
                                     type: 'confirmation',
                                     title: StringUtils.interpolate(
-                                        gettext("This course uses automatic cohorting for verified track learners. You cannot disable cohorts, and you cannot rename the manual cohort named '{verifiedCohortName}'. To change the configuration for verified track cohorts, contact your edX partner manager."),  // eslint-disable-line max-len
+                                        gettext("This course uses automatic cohorting for verified track learners. You cannot disable cohorts, and you cannot rename the manual cohort named '{verifiedCohortName}'. To change the configuration for verified track cohorts, contact your EliteMBA partner manager."),  // eslint-disable-line max-len
                                         {verifiedCohortName: verifiedCohortName}
                                     )
                                 });

@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-01-04 16:04+0800\n"
-"PO-Revision-Date: 2019-01-04 08:04:48.237651\n"
+"POT-Creation-Date: 2019-01-15 19:13+0800\n"
+"PO-Revision-Date: 2019-01-15 11:13:08.364765\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -2918,9 +2918,9 @@ msgstr ""
 
 #: lms/static/js/ajax-error.js
 msgid ""
-"You have been logged out of your edX account. Click Okay to log in again "
-"now. Click Cancel to stay on this page (you must log in again to save your "
-"work)."
+"You have been logged out of your EliteMBA account. Click Okay to log in "
+"again now. Click Cancel to stay on this page (you must log in again to save "
+"your work)."
 msgstr ""
 
 #: lms/static/js/api_admin/views/catalog_preview.js
@@ -3449,7 +3449,7 @@ msgid ""
 "This course uses automatic cohorting for verified track learners. You cannot"
 " disable cohorts, and you cannot rename the manual cohort named "
 "'{verifiedCohortName}'. To change the configuration for verified track "
-"cohorts, contact your edX partner manager."
+"cohorts, contact your EliteMBA partner manager."
 msgstr ""
 
 #: lms/static/js/groups/views/verified_track_settings_notification.js
@@ -4485,7 +4485,7 @@ msgstr ""
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
 "Your profile settings are managed by {enterprise_name}. Contact your "
-"administrator or {link_start}edX Support{link_end} for help."
+"administrator or {link_start}EliteMBA Support{link_end} for help."
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -8083,7 +8083,8 @@ msgstr ""
 
 #: lms/templates/student_account/login.underscore
 msgid ""
-"You already have an edX account with your {enterprise_name} email address."
+"You already have an EliteMBA account with your {enterprise_name} email "
+"address."
 msgstr ""
 
 #: lms/templates/student_account/login.underscore
@@ -10364,31 +10365,15 @@ msgid "YYYY-MM-DD"
 msgstr ""
 
 #: membership/static/membership/js/card.js
-msgid "Membership opened"
+msgid "Open date:"
 msgstr ""
 
 #: membership/static/membership/js/card.js
-msgid "day"
+msgid "Expire:"
 msgstr ""
 
 #: membership/static/membership/js/card.js
-msgid "Remaining days"
-msgstr ""
-
-#: membership/static/membership/js/card.js
-msgid "Duration:"
-msgstr ""
-
-#: membership/static/membership/js/card.js
-msgid "Opened on:"
-msgstr ""
-
-#: membership/static/membership/js/card.js
-msgid "Expire on:"
-msgstr ""
-
-#: membership/static/membership/js/card.js
-msgid "Membership expired"
+msgid "Last open date:"
 msgstr ""
 
 #: membership/static/membership/js/card.js

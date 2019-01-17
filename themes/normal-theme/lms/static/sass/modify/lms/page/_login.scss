@@ -84,10 +84,12 @@
       padding-right: 10px;
       box-sizing: border-box;
       margin-top: 10px;
+      vertical-align: bottom;
     }
     &.select-year_of_birth{
       width: 49.5%;
       margin: 10px 0 0;
+      vertical-align: bottom;
     }
     .tip, .plaintext-field{
       color: $font;
@@ -224,6 +226,15 @@
     }
   }
 }
+
+
+#password-reset-confirm-container{
+  margin-top: 50px;
+}
+#password-reset-confirm-form{
+  padding-top: 0;
+}
+
 
 @media screen and (max-width:768px){
   .login-register .button-oa2-weixin{

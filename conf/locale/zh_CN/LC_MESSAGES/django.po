@@ -31,7 +31,6 @@
 # 微 李 <w.li@eliteu.com.cn>, 2018
 # 家璧 刘 <jb.liu@eliteu.com.cn>, 2018
 # 婕 高 <j.gao@eliteu.cn>, 2018
-# Yi Li <y.li@eliteu.cn>, 2018
 # li ying <code@eliteu.cn>, 2019
 #
 # #-#-#-#-#  mako-studio.po (0.1a)  #-#-#-#-#
@@ -41,7 +40,7 @@
 # EdX Team <info@edx.org>, 2019.
 #
 # Translators:
-# li ying <code@eliteu.cn>, 2018
+# li ying <code@eliteu.cn>, 2019
 #
 # #-#-#-#-#  wiki.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)
@@ -74,7 +73,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-01-04 16:04+0800\n"
+"POT-Creation-Date: 2019-01-16 12:00+0800\n"
 "PO-Revision-Date: 2018-12-07 12:23+0000\n"
 "Last-Translator: li ying <code@eliteu.cn>, 2019\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)\n"
@@ -245,7 +244,7 @@ msgstr "身份证件验证挂起"
 
 #: common/djangoapps/course_modes/helpers.py
 msgid "You're enrolled as a verified student"
-msgstr "你正作为已认证的学生选修"
+msgstr "您正作为已认证的学生选修"
 
 #: common/djangoapps/course_modes/helpers.py lms/envs/common.py
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
@@ -270,7 +269,7 @@ msgstr "诚信准则"
 
 #: common/djangoapps/course_modes/helpers.py
 msgid "You're enrolled as a professional education student"
-msgstr "你已作为专业教育学生选修"
+msgstr "您已作为专业教育学生选修"
 
 #: common/djangoapps/course_modes/helpers.py
 msgid "Professional Ed"
@@ -366,7 +365,7 @@ msgstr "在课程结束前的时间段，其中一门课程模式将到期"
 #: common/djangoapps/course_modes/views.py
 #, python-brace-format
 msgid "Congratulations!  You are now enrolled in {course_name}"
-msgstr "恭喜！你已经选修了{course_name}"
+msgstr "恭喜！您已经选修了{course_name}"
 
 #: common/djangoapps/course_modes/views.py
 msgid "Enrollment is closed"
@@ -434,7 +433,7 @@ msgstr "未存储原始密码，因此无法查看此用户的密码。"
 msgid ""
 "That e-mail address doesn't have an associated user account. Are you sure "
 "you've registered?"
-msgstr "该电子邮件地址不具有相关联的用户帐户。你确定你已经注册？"
+msgstr "该电子邮件地址不具有相关联的用户帐户。您确定您已经注册？"
 
 #: common/djangoapps/student/forms.py
 msgid ""
@@ -452,7 +451,7 @@ msgstr "需要正确的邮件格式"
 
 #: common/djangoapps/student/forms.py
 msgid "Your legal name must be a minimum of two characters long"
-msgstr "你的合法名字必须至少包含两个字符的长度"
+msgstr "您的合法名字必须至少包含两个字符的长度"
 
 #: common/djangoapps/student/forms.py
 #, python-format
@@ -469,19 +468,19 @@ msgstr "需要以上学历"
 
 #: common/djangoapps/student/forms.py
 msgid "Your gender is required"
-msgstr "你的性别是必填项"
+msgstr "您的性别是必填项"
 
 #: common/djangoapps/student/forms.py
 msgid "Your year of birth is required"
-msgstr "你的出生年份是必填项"
+msgstr "您的出生年份是必填项"
 
 #: common/djangoapps/student/forms.py
 msgid "Your mailing address is required"
-msgstr "你的邮件地址是必填项"
+msgstr "您的邮件地址是必填项"
 
 #: common/djangoapps/student/forms.py
 msgid "A description of your goals is required"
-msgstr "你的目标描述是必填项"
+msgstr "您的目标描述是必填项"
 
 #: common/djangoapps/student/forms.py
 msgid "A city is required"
@@ -513,12 +512,12 @@ msgstr "看起来像现有的帐户 {email} 。使用不同的电子邮件地址
 #: common/djangoapps/student/helpers.py
 #, python-brace-format
 msgid "An account with the Public Username '{username}' already exists."
-msgstr "公开用户名'{username}'对应的账户已存在。"
+msgstr "公开用户名'{username}'对应的账号已存在。"
 
 #: common/djangoapps/student/helpers.py
 #, python-brace-format
 msgid "An account with the Email '{email}' already exists."
-msgstr "电子邮件'{email}'对应的账户已存在。"
+msgstr "电子邮件'{email}'对应的账号已存在。"
 
 #: common/djangoapps/student/management/commands/manage_group.py
 msgid "Removed group: \"{}\""
@@ -597,7 +596,7 @@ msgstr "设置用户\"{}\"的不可用密码"
 
 #: common/djangoapps/student/management/commands/manage_user.py
 msgid "Created new profile for user: \"{}\""
-msgstr "已创建新账户：\"{}\""
+msgstr "已创建新账号：\"{}\""
 
 #: common/djangoapps/student/management/commands/manage_user.py
 msgid "Could not find a group named \"{}\" - skipping."
@@ -618,11 +617,11 @@ msgstr "把用户 \"{username}\" 从{group_names}组中移除"
 msgid ""
 "Your account has been disabled. If you believe this was done in error, "
 "please contact us at {support_email}"
-msgstr "您的账户已经被禁用。如果您有任何疑问请联系我们{support_email}"
+msgstr "您的账号已经被禁用。如果您有任何疑问请联系我们{support_email}"
 
 #: common/djangoapps/student/middleware.py
 msgid "Disabled Account"
-msgstr "已停用的账户"
+msgstr "已停用的账号"
 
 #: common/djangoapps/student/models.py
 msgid "Male"
@@ -804,7 +803,7 @@ msgstr "您查找的课程将在{date}后开课。"
 #: common/djangoapps/student/views/dashboard.py
 #, python-brace-format
 msgid "The course you are looking for is closed for enrollment as of {date}."
-msgstr "你搜索的课程登记关闭时间截止至 {date}。"
+msgstr "您搜索的课程登记关闭时间截止至 {date}。"
 
 #: common/djangoapps/student/views/management.py
 msgid "No inactive user with this e-mail exists"
@@ -856,15 +855,15 @@ msgstr "用户名 {} 不存在"
 
 #: common/djangoapps/student/views/management.py
 msgid "Successfully disabled {}'s account"
-msgstr "成功停用{}的账户"
+msgstr "成功停用{}的账号"
 
 #: common/djangoapps/student/views/management.py
 msgid "Successfully reenabled {}'s account"
-msgstr "成功重新启用{}的账户"
+msgstr "成功重新启用{}的账号"
 
 #: common/djangoapps/student/views/management.py
 msgid "Unexpected account status"
-msgstr "异常的账户状态"
+msgstr "异常的账号状态"
 
 #: common/djangoapps/student/views/management.py
 #, python-brace-format
@@ -873,18 +872,18 @@ msgid ""
 "wrong, please <a href=\"{support_url}\">contact support</a> to resolve this "
 "issue."
 msgstr ""
-"{html_start} 你的账户无法激活 {html_end} 什么地方发生错误了, 请<a "
+"{html_start} 您的账号无法激活 {html_end} 什么地方发生错误了, 请<a "
 "href=\"{support_url}\">联系支持</a> 解决此问题。"
 
 #: common/djangoapps/student/views/management.py
 #, python-brace-format
 msgid "{html_start}This account has already been activated.{html_end}"
-msgstr "{html_start} 此账户已被激活。{html_end}"
+msgstr "{html_start} 此账号已被激活。{html_end}"
 
 #: common/djangoapps/student/views/management.py
 #, python-brace-format
 msgid "{html_start}Success{html_end} You have activated your account."
-msgstr "{html_start} 成功 {html_end} 你已激活你的账户。"
+msgstr "{html_start} 成功！ {html_end} 您已激活您的账号。"
 
 #: common/djangoapps/student/views/management.py
 #, python-brace-format
@@ -973,7 +972,7 @@ msgstr ""
 msgid ""
 "If this option is selected, users will not be required to confirm their "
 "email, and their account will be activated immediately upon registration."
-msgstr "如果选择该选项，用户将不会被要求验证他们的邮箱，他们的账户将在注册后立刻被激活。"
+msgstr "如果选择该选项，用户将不会被要求验证他们的邮箱，他们的账号将在注册后立刻被激活。"
 
 #: common/djangoapps/third_party_auth/models.py
 msgid ""
@@ -1011,7 +1010,7 @@ msgid ""
 "edX user account on each SSO login. The user will be notified if the email "
 "address associated with their account is changed as a part of this "
 "synchronization."
-msgstr "在每次SSO登录中，将来自身份provider程序的用户账户数据与edX用户账号相同步。当修改绑定邮箱时，用户会收到通知。"
+msgstr "在每次SSO登录中，将来自身份provider程序的用户账号数据与edX用户账号相同步。当修改绑定邮箱时，用户会收到通知。"
 
 #: common/djangoapps/third_party_auth/models.py
 msgid "The Site that this SAML configuration belongs to."
@@ -1429,7 +1428,7 @@ msgstr[0] "这个密码太短了，它必须包含至少%(min_length)d个字符�
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
-msgstr[0] "你的密码必须至少包含%(min_length)d个字符。"
+msgstr[0] "您的密码必须至少包含%(min_length)d个字符。"
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-format
@@ -2270,7 +2269,7 @@ msgid ""
 "contact moocsupport@mathworks.com"
 msgstr ""
 "输入 "
-"MATLAB讬管服务提供MathWorks公司的API密钥。这个密钥被授予通过本课程的指定时间独家使用。请不要共享的API密钥与其他课程，并立即通知MathWorks公司，如果你认为密钥被暴露或损害。为了获得一个关键的课程，或报告的问题，请联系moocsupport@mathworks.com"
+"MATLAB讬管服务提供MathWorks公司的API密钥。这个密钥被授予通过本课程的指定时间独家使用。请不要共享的API密钥与其他课程，并立即通知MathWorks公司，如果您认为密钥被暴露或损害。为了获得一个关键的课程，或报告的问题，请联系moocsupport@mathworks.com"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #: lms/templates/admin/user_api/accounts/cancel_retirement_action.html
@@ -2370,7 +2369,7 @@ msgstr "在重新检查问题之前必须把它重置。"
 #: common/lib/xmodule/xmodule/capa_base.py
 #, python-brace-format
 msgid "You must wait at least {wait} seconds between submissions."
-msgstr "在两次发布之间你至少需要等待{wait}秒。"
+msgstr "在两次发布之间您至少需要等待{wait}秒。"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #, python-brace-format
@@ -2403,7 +2402,7 @@ msgstr "问题在保存之前需要重置。"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Your answers have been saved."
-msgstr "你的答案已保存。"
+msgstr "您的答案已保存。"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #, python-brace-format
@@ -2436,13 +2435,13 @@ msgstr "回答问题后才能够重新评定。"
 msgid ""
 "We're sorry, there was an error with processing your request. Please try "
 "reloading your page and trying again."
-msgstr "很抱歉，在处理你的请求时出现错误。请重新加载你的页面并再次尝试操作。"
+msgstr "很抱歉，在处理您的请求时出现错误。请重新加载您的页面并再次尝试操作。"
 
 #: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
 "The state of this problem has changed since you loaded this page. Please "
 "refresh your page."
-msgstr "该问题的描述在你加载本页面之后已经发生变化了。请刷新你的页面。"
+msgstr "该问题的描述在您加载本页面之后已经发生变化了。请刷新您的页面。"
 
 #: common/lib/xmodule/xmodule/capa_module.py
 msgid "Answer ID"
@@ -2525,7 +2524,7 @@ msgstr "配置来源列表"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "LTI Passports"
-msgstr "LTI 账户"
+msgstr "LTI 账号"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
@@ -2608,8 +2607,9 @@ msgstr "输入对或错。当输入为对时，学生可以造课程中看到计
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter the name of the course as it should appear in the edX.org course list."
-msgstr "输入应当出现在 edX.org 课程列表中的课程名称。"
+"Enter the name of the course as it should appear in the EliteMBA.cn course "
+"list."
+msgstr "输入应当出现在 EliteMBA.cn 课程列表中的课程名称。"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Display Name"
@@ -2715,9 +2715,10 @@ msgstr "新课程"
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Enter true or false. If true, the course appears in the list of new courses "
-"on edx.org, and a New! badge temporarily appears next to the course image."
+"on EliteMBA.cn, and a New! badge temporarily appears next to the course "
+"image."
 msgstr ""
-"输入true或者false。如果输入true，课程会出现在edx.org的新课程列表中，并且在课程图片旁边会出现一个New!样式的临时图标。"
+"输入true或者false。如果输入true，课程会出现在EliteMBA.cn的新课程列表中，并且在课程图片旁边会出现一个New!样式的临时图标。"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Mobile Course Available"
@@ -2735,8 +2736,9 @@ msgstr "视频上传凭据"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter the unique identifier for your course's video files provided by edX."
-msgstr "请为edX提供给您的课程视频文件输入唯一标识符。"
+"Enter the unique identifier for your course's video files provided by "
+"EliteMBA."
+msgstr "请为EliteMBA提供给您的课程视频文件输入唯一标识符。"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Not Graded"
@@ -2800,10 +2802,10 @@ msgstr "启用CCX"
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Allow course instructors to assign CCX Coach roles, and allow coaches to "
-"manage Custom Courses on edX. When false, Custom Courses cannot be created, "
-"but existing Custom Courses will be preserved."
+"manage Custom Courses on EliteMBA. When false, Custom Courses cannot be "
+"created, but existing Custom Courses will be preserved."
 msgstr ""
-"允许课程的主讲老师指派CCX指导角色，并允许指导们在edX上管理自定义课程。当值为“false”时，将不能创建自定义课程，但已有的自定义课程将会保留。"
+"允许课程的主讲老师指派CCX指导角色，并允许指导们在EliteMBA上管理自定义课程。当值为“false”时，将不能创建自定义课程，但已有的自定义课程将会保留。"
 
 #. Translators: Custom Courses for edX (CCX) is an edX feature for re-using
 #. course content.
@@ -2838,7 +2840,7 @@ msgid ""
 "Enter true or false. If true, students can create discussion posts that are "
 "anonymous to other students. This setting does not make posts anonymous to "
 "course staff."
-msgstr "输入 true 或者 false。如果输入为 true ，学生可以创建对其它学生匿名的讨论帖。这个设置不能对课程工作人员匿名发帖。"
+msgstr "输入 true 或者 false。如果输入为 true ，学生可以创建对其他学生匿名的讨论帖。这个设置不能对课程工作人员匿名发帖。"
 
 #: common/lib/xmodule/xmodule/course_module.py
 #: common/lib/xmodule/xmodule/library_root_xblock.py
@@ -2931,7 +2933,7 @@ msgid ""
 "Files & Uploads page. You can also set the course image on the Settings & "
 "Details page."
 msgstr ""
-"编辑课程图片文件的名字。你必须在Files & Uploads页面上传这个文件。你也可以在 Settings & Details页面设置课程图片。"
+"编辑课程图片文件的名字。您必须在Files & Uploads页面上传这个文件。您也可以在 Settings & Details页面设置课程图片。"
 
 #: common/lib/xmodule/xmodule/course_module.py cms/templates/settings.html
 msgid "Course Banner Image"
@@ -3057,7 +3059,7 @@ msgid ""
 "setting overrides the organization that you entered when you created the "
 "course. To use the organization that you entered when you created the "
 "course, enter null."
-msgstr "输入你想在课程中出现的课程安排。此设置将覆盖你在创建课程时输入的课程安排。要使用你在创建课程时输入的课程安排，请输入空值。"
+msgstr "输入您想在课程中出现的课程安排。此设置将覆盖您在创建课程时输入的课程安排。要使用您在创建课程时输入的课程安排，请输入空值。"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Number Display String"
@@ -3069,7 +3071,7 @@ msgid ""
 "overrides the course number that you entered when you created the course. To"
 " use the course number that you entered when you created the course, enter "
 "null."
-msgstr "输入你想在课程中出现的课程编号。此设置将覆盖你在创建课程时输入的课程编号。要使用你在创建课程时输入的课程编号，请输入空值。"
+msgstr "输入您想在课程中出现的课程编号。此设置将覆盖您在创建课程时输入的课程编号。要使用您在创建课程时输入的课程编号，请输入空值。"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Maximum Student Enrollment"
@@ -3087,9 +3089,9 @@ msgstr "允许公共 Wiki 访问"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter true or false. If true, edX users can view the course wiki even if "
-"they're not enrolled in the course."
-msgstr "输入true或false。如果为true，edX用户即使未选修该课程也可以查看课程Wiki 。"
+"Enter true or false. If true, EliteMBA users can view the course wiki even "
+"if they're not enrolled in the course."
+msgstr "输入true或false。如果为true，EliteMBA用户即使未选修该课程也可以查看课程Wiki 。"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Invitation Only"
@@ -3226,7 +3228,7 @@ msgid ""
 "Enter true or false. If this value is true, proctored exams are enabled in "
 "your course. Note that enabling proctored exams will also enable timed "
 "exams."
-msgstr "输入 true 或 false。如果该值为true，监考的考试是在你的课程启用。请注意，使监考考试也将启动 限时考试。"
+msgstr "输入 true 或 false。如果该值为true，监考的考试是在您的课程启用。请注意，使监考考试也将启动 限时考试。"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Allow Opting Out of Proctored Exams"
@@ -3306,7 +3308,7 @@ msgstr "可分段先修之要求"
 msgid ""
 "Enter true or false. If this value is true, you can hide a subsection until "
 "learners earn a minimum score in another, prerequisite subsection."
-msgstr "输入 true 或 false。如果该值为 true，你可以隐藏某分段，直到学习者获得最低分数为止。"
+msgstr "输入 true 或 false。如果该值为 true，您可以隐藏某分段，直到学习者获得最低分数为止。"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Learning Information"
@@ -3587,7 +3589,7 @@ msgid ""
 "Settings page.<br />See {docs_anchor_open}the edX LTI "
 "documentation{anchor_close} for more details on this setting."
 msgstr ""
-"输入外部LTI提供商提供的LTI编号。该值必须和你的LTI账户里高级设置里的LTI编号相同。<br />关于该设置的更多信息请访问 "
+"输入外部LTI提供商提供的LTI编号。该值必须和您的LTI账号里高级设置里的LTI编号相同。<br />关于该设置的更多信息请访问 "
 "{docs_anchor_open}LTI 文档{anchor_close} "
 
 #: common/lib/xmodule/xmodule/lti_module.py
@@ -3617,7 +3619,7 @@ msgid ""
 "{docs_anchor_open}the edX LTI documentation{anchor_close} for more details "
 "on this setting."
 msgstr ""
-"任意自定义的参数都要添加键/值且成对，例如你要打开的电子书的页面或者这个组件的背景颜色。<br "
+"任意自定义的参数都要添加键/值且成对，例如您要打开的电子书的页面或者这个组件的背景颜色。<br "
 "/>这项设置的更多信息请查看{docs_anchor_open}edX LTI文档{anchor_close} "
 
 #: common/lib/xmodule/xmodule/lti_module.py
@@ -3631,7 +3633,7 @@ msgid ""
 "in the current page. This setting is only used when Hide External Tool is "
 "set to False.  "
 msgstr ""
-"如果你想要学生通过点击一个链接在一个新窗口中打开LTI工具，选择True。如果你想要在当前页面的一个IFrame中打开LTI内容，选择False。这个设置只有在"
+"如果您想要学生通过点击一个链接在一个新窗口中打开LTI工具，选择True。如果您想要在当前页面的一个IFrame中打开LTI内容，选择False。这个设置只有在"
 " 隐藏外部工具 设置为False的时候才能使用。"
 
 #: common/lib/xmodule/xmodule/lti_module.py
@@ -3802,7 +3804,7 @@ msgid ""
 "problems in your course. Valid values are \"always\", \"onreset\", "
 "\"never\", and \"per_student\"."
 msgstr ""
-"指定隐含变量值多久会发生问题是采随机系统默认。此设定应设为“从不”，除非你打算提供一个Python script "
+"指定隐含变量值多久会发生问题是采随机系统默认。此设定应设为“从不”，除非您打算提供一个Python script "
 "来随机辨识您的课程中大部分问题。有效字段为“永远”，“当reset 时”，“从不”，以及“每名学生”。"
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
@@ -3918,7 +3920,7 @@ msgid ""
 "settings. All existing problems are affected when this course-wide setting "
 "is changed."
 msgstr ""
-"输入true或false。为true时，课程中的问题总是默认显示一个“重置”按钮，你可以在每个问题的设置中重设。当该课程范围内的设置改变时，所有已存在的问题都将受影响。"
+"输入true或false。为true时，课程中的问题总是默认显示一个“重置”按钮，您可以在每个问题的设置中重设。当该课程范围内的设置改变时，所有已存在的问题都将受影响。"
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Enable Student Notes"
@@ -4540,7 +4542,7 @@ msgid ""
 "%(platform_name)s account from %(old_email)s to %(new_email)s. If this is "
 "correct, please confirm your new e-mail address by visiting:"
 msgstr ""
-"我们收到了您需要将%(platform_name)s 账户的电子邮件关联由 %(old_email)s 变更为 %(new_email)s "
+"我们收到了您需要将%(platform_name)s 账号的电子邮件关联由 %(old_email)s 变更为 %(new_email)s "
 "的请求。如果该请求无误，请访问如下网页确认您的新电子邮件地址："
 
 #: common/templates/student/edx_ace/emailchange/email/body.html
@@ -4555,12 +4557,12 @@ msgid ""
 " any more email from us. Please do not reply to this e-mail; if you require "
 "assistance, check the help section of the %(platform_name)s web site."
 msgstr ""
-"如果您没发出过该请求，您可以忽略该邮件；你将不会收到其他任何我们的电子邮件。请不要回复此电子邮件；如果您需要帮助，请访问%(platform_name)s网站。"
+"如果您没发出过该请求，您可以忽略该邮件；您将不会收到其他任何我们的电子邮件。请不要回复此电子邮件；如果您需要帮助，请访问%(platform_name)s网站。"
 
 #: common/templates/student/edx_ace/emailchange/email/subject.txt
 #, python-format
 msgid "Request to change %(platform_name)s account e-mail"
-msgstr "变更%(platform_name)s账户电子邮件的请求"
+msgstr "变更%(platform_name)s账号电子邮件的请求"
 
 #: common/templates/student/edx_ace/passwordreset/email/body.html
 #: lms/templates/forgot_password_modal.html
@@ -4593,7 +4595,7 @@ msgstr "如果您没有申请作出更改，请忽略此邮件。"
 msgid ""
 "If you didn't request this change, you can disregard this email - we have "
 "not yet reset your password."
-msgstr "如果你没有请求该变更，请忽略本邮件——我们尚未重置你的密码。"
+msgstr "如果您没有请求该变更，请忽略本邮件——我们尚未重置您的密码。"
 
 #: common/templates/student/edx_ace/passwordreset/email/body.html
 msgid "Change my Password"
@@ -4667,7 +4669,7 @@ msgid ""
 "comma, and the slug of a badge class you have created that has the issuing "
 "component 'openedx__course'. For example: 3,enrolled_3_courses"
 msgstr ""
-"在每一行上，列出为了获得徽章的已完成课程的数目、一个逗号以及你创建的具有发行组件“openedx__course”的徽章类别标语。例如：3, "
+"在每一行上，列出为了获得徽章的已完成课程的数目、一个逗号以及您创建的具有发行组件“openedx__course”的徽章类别标语。例如：3, "
 "已登记_3_个课程"
 
 #: lms/djangoapps/badges/models.py
@@ -4676,7 +4678,7 @@ msgid ""
 "comma, and the slug of a badge class you have created that has the issuing "
 "component 'openedx__course'. For example: 3,enrolled_3_courses"
 msgstr ""
-"在每一行上，列出为了获得徽章的已登记课程的数目、一个逗号以及你创建的具有发行组件“openedx__course”的徽章类别标语。例如：3, "
+"在每一行上，列出为了获得徽章的已登记课程的数目、一个逗号以及您创建的具有发行组件“openedx__course”的徽章类别标语。例如：3, "
 "已登记_3_个课程"
 
 #: lms/djangoapps/badges/models.py
@@ -4687,15 +4689,15 @@ msgid ""
 "learner needs to complete to be awarded the badge. For example: "
 "slug_for_compsci_courses_group_badge,course-v1:CompSci+Course+First,course-v1:CompsSci+Course+Second"
 msgstr ""
-"每一行都是以逗号分隔的列表。每一行的第一项是你创建的具有发行组件“openedx__course”的徽章类别标语。每一行的其余项是学员为了获得徽章需要完成的课程要领。例如：slug_for_compsci_courses_group_badge,course-v1:CompSci+Course+First,course-v1:CompsSci+Course+Second"
+"每一行都是以逗号分隔的列表。每一行的第一项是您创建的具有发行组件“openedx__course”的徽章类别标语。每一行的其余项是学员为了获得徽章需要完成的课程要领。例如：slug_for_compsci_courses_group_badge,course-v1:CompSci+Course+First,course-v1:CompsSci+Course+Second"
 
 #: lms/djangoapps/badges/models.py
 msgid "Please check the syntax of your entry."
-msgstr "请检查你的条目的句法。"
+msgstr "请检查您的条目的句法。"
 
 #: lms/djangoapps/branding/api.py
-msgid "Take free online courses at edX.org"
-msgstr "在edX.org上学习免费课程"
+msgid "Take free online courses at EliteMBA.cn"
+msgstr "在EliteMBA.cn上学习免费课程"
 
 #. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
 #. Please do not translate any of these trademarks and company names.
@@ -4837,7 +4839,7 @@ msgstr "CCX指导"
 msgid ""
 "A CCX can only be created on this course through an external service. "
 "Contact a course admin to give you access."
-msgstr "CCX 仅可以通过外部服务在此课程上创建。联系课程管理员授予你访问权限。"
+msgstr "CCX 仅可以通过外部服务在此课程上创建。联系课程管理员授予您访问权限。"
 
 #: lms/djangoapps/ccx/utils.py
 #, python-brace-format
@@ -4846,7 +4848,7 @@ msgstr "此门课已额满:人数限制为 {max_student_enrollments_allowed}"
 
 #: lms/djangoapps/ccx/views.py
 msgid "You must be a CCX Coach to access this view."
-msgstr "你需要成为CCX指导才能访问该视图。"
+msgstr "您需要成为CCX指导才能访问该视图。"
 
 #: lms/djangoapps/ccx/views.py
 msgid "You must be the coach for this ccx to access this view"
@@ -5088,8 +5090,6 @@ msgstr "{platform_name} 借由证书承认已完成修习课程，该课之修�
 #. Translators:  'All rights reserved' is a legal term used in copyrighting to
 #. protect published content
 #: lms/djangoapps/certificates/views/webview.py
-#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
-#: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "All rights reserved"
 msgstr "保留所有权利"
 
@@ -5229,7 +5229,7 @@ msgstr "关于 {user_name} 证书的更多信息："
 #: lms/djangoapps/certificates/views/webview.py
 #, python-brace-format
 msgid "{fullname}, you earned a certificate!"
-msgstr "{fullname}，你已经取得证书！"
+msgstr "{fullname}，您已经取得证书！"
 
 #. Translators: This line congratulates the user and instructs them to share
 #. their accomplishment on social networks
@@ -5561,7 +5561,7 @@ msgstr "学习新知识、磨炼新技能、获取认证证书，好机会不容
 msgid ""
 "You are still eligible to upgrade to a Verified Certificate! Pursue it to "
 "highlight the knowledge and skills you gain in this course."
-msgstr "你仍有资格升级至合格证书！继续努力精进您从这个课程所获的知识和技能。"
+msgstr "您仍有资格升级至合格证书！继续努力精进您从这个课程所获的知识和技能。"
 
 #. Translators: This describes the time by which the user
 #. should upgrade to the verified track. 'date' will be
@@ -5833,18 +5833,18 @@ msgstr "请告诉我们关于您的学习或专业目标。一份这门课的认
 msgid ""
 "Tell us about your plans for this course. What steps will you take to help "
 "you complete the course work and receive a certificate?"
-msgstr "告诉我们有关于你计画的这门课程。你会采取什么措施来帮助您完成课程学习，并获得证书？"
+msgstr "告诉我们有关于您计画的这门课程。您会采取什么措施来帮助您完成课程学习，并获得证书？"
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "Use between 250 and 500 words or so in your response."
-msgstr "你的回应字数应在250到500字之间。"
+msgstr "您的回应字数应在250到500字之间。"
 
 #: lms/djangoapps/courseware/views/views.py
 msgid ""
 "Select the course for which you want to earn a verified certificate. If the "
 "course does not appear in the list, make sure that you have enrolled in the "
 "audit track for the course."
-msgstr "选择您想要获得修课证明之课程。如果课程没出现在列表中，请确认你已经注册及追踪该课程。"
+msgstr "选择您想要获得修课证明之课程。如果课程没出现在列表中，请确认您已经注册及追踪该课程。"
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "Specify your annual household income in US Dollars."
@@ -5852,9 +5852,9 @@ msgstr "说明您以美金计算之家庭年收入。"
 
 #: lms/djangoapps/courseware/views/views.py
 msgid ""
-"I allow edX to use the information provided in this application (except for "
-"financial information) for edX marketing purposes."
-msgstr "我同意edX使用此申请中所提供之资讯(除财务资讯)作为edX销售之目的。"
+"I allow EliteMBA to use the information provided in this application (except"
+" for financial information) for EliteMBA marketing purposes."
+msgstr "我同意EliteMBA.cn使用此申请中所提供之资讯(除财务资讯)作为edX销售之目的。"
 
 #: lms/djangoapps/dashboard/git_import.py
 #, python-brace-format
@@ -5897,7 +5897,7 @@ msgstr "指定的远程分支无效。"
 #. doesn't exist, or there is a problem changing to it.
 #: lms/djangoapps/dashboard/git_import.py
 msgid "Unable to switch to specified branch. Please check your branch name."
-msgstr "无法切换到指定的分支。请检查你的分支名。"
+msgstr "无法切换到指定的分支。请检查您的分支名。"
 
 #: lms/djangoapps/dashboard/management/commands/git_add_course.py
 msgid ""
@@ -6232,7 +6232,7 @@ msgstr "向Sailthru报告入学申请的费用以美分计。"
 msgid ""
 "Optional lms url scheme + host used to construct urls for content library, "
 "e.g. https://courses.edx.org."
-msgstr "可选LMS URL方案 + 用于构建内容库的主URL，例如：ttps://courses.edx.org。"
+msgstr "可选LMS URL方案 + 用于构建内容库的主URL，例如：https://courses.edx.org。"
 
 #: lms/djangoapps/email_marketing/models.py
 msgid ""
@@ -6325,7 +6325,7 @@ msgstr "发现一处与给定标识发生的冲突，请使用其他标识"
 msgid ""
 "Make sure that the file you upload is in CSV format with no extraneous "
 "characters or rows."
-msgstr "确认你上传的CSV格式的文件里不包含无关的字符或行。"
+msgstr "确认您上传的CSV格式的文件里不包含无关的字符或行。"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Could not read uploaded file."
@@ -6851,7 +6851,7 @@ msgstr "编号为({coupon_id})的优惠券更新成功"
 msgid ""
 "The code ({code}) that you have tried to define is already in use as a "
 "registration code"
-msgstr "你试图定义的这个卡号 ({code})已经被注册码使用了"
+msgstr "您试图定义的这个卡号 ({code})已经被注册码使用了"
 
 #: lms/djangoapps/instructor/views/coupons.py
 msgid "Please Enter the Integer Value for Coupon Discount"
@@ -7571,7 +7571,7 @@ msgstr "注册课程：{course_name}"
 #, python-brace-format
 msgid ""
 "Please visit your {link_start}dashboard{link_end} to see your new course."
-msgstr "请前往你的{link_start}课程面板{link_end}查看新课程。"
+msgstr "请前往您的{link_start}课程面板{link_end}查看新课程。"
 
 #: lms/djangoapps/shoppingcart/models.py
 #, python-brace-format
@@ -7602,7 +7602,7 @@ msgstr "您可以取消注册课程，并在开课后14天收到全额退费。"
 msgid ""
 "If you haven't verified your identity yet, please start the verification "
 "process ({verification_url})."
-msgstr "如果你还没有验证你的身份，请立即开始验证过程吧({verification_url})。"
+msgstr "如果您还没有验证您的身份，请立即开始验证过程吧({verification_url})。"
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid ""
@@ -7925,7 +7925,7 @@ msgstr ""
 msgid ""
 "Insufficient funds in the account. Possible action: retry with another form "
 "of payment."
-msgstr "账户中的资金不足。可能的解决方法：重试另一种付款方式。"
+msgstr "账号中的资金不足。可能的解决方法：重试另一种付款方式。"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "Stolen or lost card."
@@ -7970,7 +7970,7 @@ msgstr "此客户符合於处理者的黑名单格上。"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "Account frozen. Possible action: retry with another form of payment."
-msgstr "账户被冻结。可能的解决方法：尝试另一种付款方式。"
+msgstr "账号被冻结。可能的解决方法：尝试另一种付款方式。"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
@@ -8014,7 +8014,7 @@ msgstr "付款被拒绝。可能的解决方法：重试另一种付款方式。
 msgid ""
 "There is a problem with the information in your CyberSource account.  Please"
 " let us know at {0}"
-msgstr "此问题可能与您的CyberSource账户信息有关。请通知我们{0}"
+msgstr "此问题可能与您的CyberSource账号信息有关。请通知我们{0}"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "The requested capture amount exceeds the originally authorized amount."
@@ -8077,7 +8077,7 @@ msgid ""
 msgstr ""
 "\n"
 "扣费／预授权申请信息已经提交到支付系统，不可撤销。\n"
-"或者，你所请求的交易类型是不可撤销的。\n"
+"或者，您所请求的交易类型是不可撤销的。\n"
 " "
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
@@ -8297,7 +8297,7 @@ msgstr "成功"
 
 #: lms/djangoapps/shoppingcart/views.py
 msgid "You do not have permission to view this page."
-msgstr "你没有访问此页面的权限。"
+msgstr "您没有访问此页面的权限。"
 
 #: lms/djangoapps/support/views/index.py
 msgid "View and regenerate certificates."
@@ -8448,7 +8448,7 @@ msgstr "提供的课程编号{course_id}无效。"
 
 #: lms/djangoapps/teams/views.py
 msgid "You are already in a team in this course."
-msgstr "你已经加入了该课程中的一个小组。"
+msgstr "您已经加入了该课程中的一个小组。"
 
 #: lms/djangoapps/teams/views.py
 msgid "username or team_id must be specified."
@@ -8522,11 +8522,11 @@ msgstr "拍摄"
 
 #: lms/djangoapps/verify_student/views.py
 msgid "Take a photo of your ID"
-msgstr "拍摄一张你身份证件的照片"
+msgstr "拍摄一张您身份证件的照片"
 
 #: lms/djangoapps/verify_student/views.py
 msgid "Review your info"
-msgstr "审核你的信息"
+msgstr "审核您的信息"
 
 #: lms/djangoapps/verify_student/views.py
 msgid "Enrollment confirmation"
@@ -8582,6 +8582,7 @@ msgid "Review ID Verification Photos For {username}"
 msgstr "查看{username}的身份验证照片"
 
 #: lms/envs/common.py lms/templates/certificates/verify.html
+#: themes/normal-theme/lms/templates/footer.html
 #: themes/normal-theme/lms/templates/static_templates/about.html
 #: membership/templates/membership/index.html
 msgid "EliteMBA"
@@ -8782,7 +8783,7 @@ msgstr "开始。请访问 https://%(site_name)s"
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
 msgid "The login information for your account follows:"
-msgstr "您的账户登录信息如下:"
+msgstr "您的账号登录信息如下:"
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
@@ -8817,7 +8818,7 @@ msgstr "欢迎 %(course_name)s"
 msgid ""
 "To get started, please visit https://%(site_name)s. The login information "
 "for your account follows."
-msgstr "开始。请访问https://%(site_name)s 。您的账户登录信息如下。"
+msgstr "开始。请访问https://%(site_name)s 。您的账号登录信息如下。"
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/subject.txt
 #: lms/templates/instructor/edx_ace/enrollenrolled/email/subject.txt
@@ -8945,13 +8946,13 @@ msgstr "完成您的注册"
 msgid ""
 "Once you have registered and activated your account, you will see "
 "%(course_name)s listed on your dashboard."
-msgstr "一旦您完成注册并已激活了您的账户，您将在课程面板中见到 %(course_name)s。"
+msgstr "一旦您完成注册并已激活了您的账号，您将在课程面板中见到 %(course_name)s。"
 
 #: lms/templates/instructor/edx_ace/allowedenroll/email/body.html
 msgid ""
 "Once you have registered and activated your account, you will be able to "
 "access this course:"
-msgstr "一旦您完成注册并已激活了账户，您将可以访问该课程："
+msgstr "一旦您完成注册并已激活了账号，您将可以访问该课程："
 
 #: lms/templates/instructor/edx_ace/allowedenroll/email/body.html
 #: lms/templates/instructor/edx_ace/allowedenroll/email/body.txt
@@ -8981,14 +8982,14 @@ msgid ""
 "To finish your registration, please visit %(registration_url)s and fill out "
 "the registration form making sure to use %(email_address)s in the Email "
 "field."
-msgstr "要完成你的注册，请访问%(registration_url)s填写注册表格，并确保将 %(email_address)s填写在电子邮件中。"
+msgstr "要完成您的注册，请访问%(registration_url)s填写注册表格，并确保将 %(email_address)s填写在电子邮件中。"
 
 #: lms/templates/instructor/edx_ace/allowedenroll/email/body.txt
 #, python-format
 msgid ""
 "Once you have registered and activated your account, visit "
 "%(course_about_url)s to join this course."
-msgstr "一旦您完成注册并已激活了您的账户，请访问%(course_about_url)s以加入该课程。"
+msgstr "一旦您完成注册并已激活了您的账号，请访问%(course_about_url)s以加入该课程。"
 
 #: lms/templates/instructor/edx_ace/allowedenroll/email/subject.txt
 #, python-format
@@ -9000,7 +9001,7 @@ msgstr "您已被邀请注册%(course_name)s"
 #: lms/templates/instructor/edx_ace/enrolledunenroll/email/subject.txt
 #, python-format
 msgid "You have been unenrolled from %(course_name)s"
-msgstr "你已从课程%(course_name)s中被移除。"
+msgstr "您已从课程%(course_name)s中被移除。"
 
 #: lms/templates/instructor/edx_ace/allowedunenroll/email/body.html
 #: lms/templates/instructor/edx_ace/allowedunenroll/email/body.txt
@@ -9022,7 +9023,7 @@ msgid ""
 "                "
 msgstr ""
 "\n"
-"你已从课程%(course_name)s中被移除。"
+"您已从课程%(course_name)s中被移除。"
 
 #: lms/templates/instructor/edx_ace/enrolledunenroll/email/body.html
 #: lms/templates/instructor/edx_ace/enrolledunenroll/email/body.txt
@@ -9032,7 +9033,7 @@ msgid ""
 "of the course staff. This course will no longer appear on your %(site_name)s"
 " dashboard."
 msgstr ""
-"你已被课程工作人员加入到了%(site_name)s上的%(course_name)s。该课程应会立即出现在你的%(site_name)s课程面板中。"
+"您已被课程工作人员加入到了%(site_name)s上的%(course_name)s。该课程应会立即出现在您的%(site_name)s课程面板中。"
 
 #: lms/templates/instructor/edx_ace/enrolledunenroll/email/body.html
 #: lms/templates/instructor/edx_ace/enrolledunenroll/email/body.txt
@@ -9067,7 +9068,7 @@ msgid ""
 "the course staff. This course will now appear on your %(site_name)s "
 "dashboard."
 msgstr ""
-"你已被课程工作人员加入到了%(site_name)s上的%(course_name)s中。该课程应会立即出现在你的%(site_name)s课程面板中。"
+"您已被课程工作人员加入到了%(site_name)s上的%(course_name)s中。该课程应会立即出现在您的%(site_name)s课程面板中。"
 
 #: lms/templates/instructor/edx_ace/enrollenrolled/email/body.html
 msgid "Access the Course Materials Now"
@@ -9099,8 +9100,8 @@ msgid ""
 "by a member of the course staff. This course will remain on your dashboard, "
 "but you will no longer be part of the beta testing group."
 msgstr ""
-"你在%(site_name)s上的%(course_name)s课程的 Beta "
-"测试员身份已被课程教员移除。该课程仍将显示在你的课程面板中，但你已不再是 Beta 测试组的一员。"
+"您在%(site_name)s上的%(course_name)s课程的 Beta "
+"测试员身份已被课程教员移除。该课程仍将显示在您的课程面板中，但您已不再是 Beta 测试组的一员。"
 
 #: lms/templates/instructor/edx_ace/removebetatester/email/subject.txt
 #, python-format
@@ -9134,7 +9135,7 @@ msgstr "授权"
 #: lms/templates/oauth2_provider/authorize.html
 msgid ""
 "The above application requests the following permissions from your account:"
-msgstr "以上应用需要您账户进行以下授权："
+msgstr "以上应用需要您账号进行以下授权："
 
 #: lms/templates/oauth2_provider/authorize.html
 msgid ""
@@ -9720,12 +9721,22 @@ msgstr "在Google Play商店下载安卓App"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+msgid ","
+msgstr "，"
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+msgid "All rights reserved."
+msgstr "保留所有权利。"
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "Our mailing address is"
 msgstr "我们的邮箱地址"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_head.html
-msgid "edX Email"
-msgstr "edX邮箱地址"
+msgid "EliteMBA Email"
+msgstr "英荔商学院邮箱"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.html
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.txt
@@ -9760,7 +9771,7 @@ msgstr "组织地址"
 
 #: openedx/core/djangoapps/api_admin/forms.py
 msgid "Describe what your application does."
-msgstr "描述你的应用的功能。"
+msgstr "描述您的应用的功能。"
 
 #: openedx/core/djangoapps/api_admin/forms.py
 msgid "The URL of your organization's website."
@@ -9962,7 +9973,7 @@ msgstr "学分评定资格"
 #: openedx/core/djangoapps/credit/email_utils.py
 #, python-brace-format
 msgid "You are eligible for credit from {providers_string}"
-msgstr "你有资格获得 {providers_string} 的学分"
+msgstr "您有资格获得 {providers_string} 的学分"
 
 #. Translators: The join of two university names (e.g., Harvard and MIT).
 #: openedx/core/djangoapps/credit/email_utils.py
@@ -10153,7 +10164,7 @@ msgstr "课程{course}的黑名单国家： {country}"
 msgid ""
 "You have already created an account using an external login like WebAuth or "
 "Shibboleth. Please contact {tech_support_email} for support."
-msgstr "你已经创建使用外部登录类似的WebAuth或Shibboleth的帐户。请联系{tech_support_email}支持。"
+msgstr "您已经创建使用外部登录类似的WebAuth或Shibboleth的帐户。请联系{tech_support_email}支持。"
 
 #: openedx/core/djangoapps/external_auth/views.py
 msgid ""
@@ -10190,7 +10201,7 @@ msgid ""
 "to the email address associated with this account. Thank you for helping us "
 "keep your data safe."
 msgstr ""
-"{strong_tag_open}我们最近更改了密码要求{strong_tag_close}{break_line_tag}您当前的密码不符合新的安全要求。我们刚刚发送了一个密码重置消息到与这个账户相关联的电子邮件地址。感谢您帮助我们保护您的数据安全。"
+"{strong_tag_open}我们最近更改了密码要求{strong_tag_close}{break_line_tag}您当前的密码不符合新的安全要求。我们刚刚发送了一个密码重置消息到与这个账号相关联的电子邮件地址。感谢您帮助我们保护您的数据安全。"
 
 #: openedx/core/djangoapps/password_policy/compliance.py
 #, python-brace-format
@@ -10203,7 +10214,7 @@ msgid ""
 msgstr ""
 "{strong_tag_open}要求的行动:请更新您的密码{strong_tag_close}{break_line_tag}自 "
 "{deadline}起, "
-"{platform_name}将要求所有的学员有复杂的密码。您当前的密码不满足这些要求。要重置密码，去{anchor_tag_open}账户设置{anchor_tag_close}。"
+"{platform_name}将要求所有的学员有复杂的密码。您当前的密码不满足这些要求。要重置密码，去{anchor_tag_open}账号设置{anchor_tag_close}。"
 
 #: openedx/core/djangoapps/profile_images/images.py
 #, python-brace-format
@@ -10620,7 +10631,7 @@ msgstr "'{field_name}'字段无法编辑."
 #: openedx/core/djangoapps/user_authn/views/auto_auth.py
 #: openedx/core/djangoapps/user_authn/views/deprecated.py
 msgid "Account creation not allowed."
-msgstr "禁止创建账户"
+msgstr "禁止创建账号"
 
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the State/Province/Region in which they
@@ -10682,9 +10693,9 @@ msgstr "请提供有效的用户名或包含“”的URL"
 #: openedx/core/djangoapps/user_api/accounts/views.py
 #: openedx/core/djangoapps/user_authn/views/login.py
 msgid ""
-"This account has been temporarily locked due to excessive login failures. "
-"Try again later."
-msgstr "由于登录失败次数过多，该账户暂时被锁定，请稍后再试。"
+"Due to multiple login failures, the account is temporarily locked. Please "
+"try again after 15 minutes."
+msgstr "由于登录失败次数过多，该账号暂时被锁定，请于15分钟后再次尝试登录。"
 
 #: openedx/core/djangoapps/user_api/accounts/views.py
 #: openedx/core/djangoapps/user_authn/views/login.py
@@ -10739,7 +10750,7 @@ msgstr "username@domain.com"
 #: openedx/core/djangoapps/user_api/api.py
 #, python-brace-format
 msgid "The email address you used to register with {platform_name}"
-msgstr "您在{platform_name}上注册的E-mail"
+msgstr "您在{platform_name}上注册的邮箱"
 
 #: openedx/core/djangoapps/user_api/api.py lms/templates/login.html
 msgid "Remember me"
@@ -10966,7 +10977,7 @@ msgstr "不允许修改账号。"
 msgid ""
 "You've successfully logged into your {provider_name} account, but this "
 "account isn't linked with an {platform_name} account yet."
-msgstr "你已成功登录{provider_name}帐户，但该帐号尚未与{platform_name}帐户关联。"
+msgstr "您已成功登录{provider_name}帐户，但该账号尚未与{platform_name}帐户关联。"
 
 #: openedx/core/djangoapps/user_authn/views/login.py
 #, python-brace-format
@@ -10975,7 +10986,7 @@ msgid ""
 "below, and then link your {platform_name} account with {provider_name} from "
 "your dashboard."
 msgstr ""
-"用你的{platform_name}用户名和密码登陆{platform_name}，然后从课程面板页面关联{platform_name}账户和{provider_name}。"
+"用您的{platform_name}用户名和密码登陆{platform_name}，然后从课程面板页面关联{platform_name}账号和{provider_name}。"
 
 #: openedx/core/djangoapps/user_authn/views/login.py
 #, python-brace-format
@@ -10993,7 +11004,7 @@ msgid ""
 "Your password has expired due to password policy on this account. You must "
 "reset your password before you can log in again. Please click the \"Forgot "
 "Password\" link on this page to reset your password before logging in again."
-msgstr "由于账户安全政策，您的密码已经失效。您须重置密码以再次登录。请点击页面上的“忘记密码”来重置您的密码以重新登录。"
+msgstr "由于账号安全政策，您的密码已经失效。您须重置密码以再次登录。请点击页面上的“忘记密码”来重置您的密码以重新登录。"
 
 #: openedx/core/djangoapps/user_authn/views/login.py
 #, python-brace-format
@@ -11003,7 +11014,7 @@ msgid ""
 "an email, check your spam folders or <a href=\"{support_url}\">contact "
 "{platform} Support</a>."
 msgstr ""
-"如需登录，请先激活您的账号，<br /><br />我们会发送激活链接至 "
+"如需登录，请先激活您的账号。<br /><br />我们会发送激活链接至 "
 "<strong>{email}</strong>。如果您未收到邮件，请查看邮箱的垃圾箱或 <a "
 "href=\"{support_url}\">联系{platform}的技术支持</a>。"
 
@@ -11153,7 +11164,7 @@ msgstr "访问{course_name} 于 {expiration_date}过期"
 #: openedx/features/course_duration_limits/access.py
 #, python-brace-format
 msgid "Access to the course you were lookingfor expired on {expiration_date}"
-msgstr "你查找的课程于 {expiration_date}已过期"
+msgstr "您查找的课程于 {expiration_date}已过期"
 
 #: openedx/features/course_experience/plugins.py
 #: cms/templates/widgets/header.html
@@ -11229,17 +11240,16 @@ msgstr "如果您对分享您的数据有顾虑，请联系您的{enterprise_cus
 msgid ""
 "We are sorry, you are not authorized to access {platform_name} via this "
 "channel. Please contact your learning administrator or manager in order to "
-"access {platform_name}.{line_break}{line_break}Error "
-"Details:{line_break}{error_message}"
+"access {platform_name}.{line_break}{line_break}"
 msgstr ""
-"非常抱歉，您无权通过此渠道访问{platform_name}。请向您的学习管理员或协调员寻求帮助访问{platform_name}。{line_break}{line_break}错误详情：{line_break}{error_message}"
+"非常抱歉，您无权通过此渠道访问{platform_name}。请向您的学习管理员或协调员寻求帮助访问{platform_name}。{line_break}{line_break}"
 
 #: openedx/features/enterprise_support/utils.py
 #, python-brace-format
 msgid ""
 "Thank you for joining {platform_name}. Just a couple steps before you start "
 "learning!"
-msgstr "感谢你加入{platform_name}，请根据步骤来开启您的学习之旅！"
+msgstr "感谢您加入{platform_name}，请根据步骤来开启您的学习之旅！"
 
 #: openedx/features/enterprise_support/utils.py
 #: lms/templates/peer_grading/peer_grading_problem.html
@@ -11258,16 +11268,18 @@ msgstr ""
 #: themes/normal-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #, python-format
 msgid ""
-"Remember when you enrolled in %(course_name)s, and other courses on edX.org?"
-" We do, and we’re glad to have you! Come see what everyone is learning."
-msgstr "您还记得在edX上报名了%(course_name)s和其他课程吗？很高兴您选择了我们的课程！赶紧来看看大家都在学习什么吧。"
+"Remember when you enrolled in %(course_name)s, and other courses on "
+"EliteMBA.cn? We do, and we’re glad to have you! Come see what everyone is "
+"learning."
+msgstr ""
+"您还记得在EliteMBA.cn上报名了%(course_name)s和其他课程吗？很高兴您选择了我们的课程！赶紧来看看大家都在学习什么吧。"
 
 #: themes/normal-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #, python-format
 msgid ""
-"Remember when you enrolled in %(course_name)s on edX.org? We do, and we’re "
-"glad to have you! Come see what everyone is learning."
-msgstr "您还记得在edX上报名了%(course_name)s课程吗？很高兴您选择了我们的课程！赶紧来看看大家都在学习什么吧。"
+"Remember when you enrolled in %(course_name)s on EliteMBA.cn? We do, and "
+"we’re glad to have you! Come see what everyone is learning."
+msgstr "您还记得在EliteMBA.cn上报名了%(course_name)s课程吗？很高兴您选择了我们的课程！赶紧来看看大家都在学习什么吧。"
 
 #: cms/djangoapps/api/v1/serializers/course_runs.py
 msgid "Course team user does not exist"
@@ -11551,7 +11563,7 @@ msgid ""
 "You must link this course to an organization in order to continue. "
 "Organization you selected does not exist in the system, you will need to add"
 " it to the system"
-msgstr "你为了继续必须将此课程链接到一个机构。你选择了不存在于系统中的机构，你需要将此机构新增到系统"
+msgstr "您为了继续必须将此课程链接到一个机构。您选择了不存在于系统中的机构，您需要将此机构新增到系统"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "Invalid prerequisite course key"
@@ -11559,7 +11571,7 @@ msgstr "先修课程标识无效"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "An error occurred while trying to save your tabs"
-msgstr "当你尝试保存书签时发生错误"
+msgstr "当您尝试保存书签时发生错误"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "Tabs Exception"
@@ -11690,7 +11702,7 @@ msgid ""
 "There is already a library defined with the same organization and library "
 "code. Please change your library code so that it is unique within your "
 "organization."
-msgstr "已经存在一个具有相同机构和知识库编号的知识库，请更改你的知识库编号以保证其在您的机构中是唯一的。"
+msgstr "已经存在一个具有相同机构和知识库编号的知识库，请更改您的知识库编号以保证其在您的机构中是唯一的。"
 
 #: cms/djangoapps/contentstore/views/preview.py
 #, python-brace-format
@@ -11767,7 +11779,7 @@ msgstr "“角色”未指定。"
 #: cms/djangoapps/contentstore/views/user.py
 #, python-brace-format
 msgid "User {email} has registered but has not yet activated his/her account."
-msgstr "用户{email}已注册但尚未激活其账户。"
+msgstr "用户{email}已注册但尚未激活其账号。"
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "Invalid `role` specified."
@@ -12124,7 +12136,6 @@ msgstr "细节"
 #. #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
 #. Translators: this is a verb describing the action of viewing more details
 #: cms/templates/studio_xblock_wrapper.html
-#: lms/templates/certificates/verify.html
 #: lms/templates/wiki/includes/article_menu.html
 #: wiki/templates/wiki/includes/article_menu.html
 msgid "View"
@@ -12150,7 +12161,7 @@ msgstr "选择语言"
 #: cms/templates/widgets/header.html lms/templates/user_dropdown.html
 #: lms/templates/header/user_dropdown.html
 msgid "Account"
-msgstr "账户"
+msgstr "账号"
 
 #: cms/templates/widgets/header.html
 #: lms/templates/header/navbar-authenticated.html
@@ -12272,11 +12283,11 @@ msgstr "使用者反馈意见"
 msgid ""
 "The email associated with your {platform_name} account has changed from "
 "{old_email} to {new_email}."
-msgstr "与你账户 {platform_name} 相关联的电子邮件地址由 {old_email} 修改为  {new_email}。"
+msgstr "与您账号 {platform_name} 相关联的电子邮件地址由 {old_email} 修改为  {new_email}。"
 
 #: common/templates/emails/sync_learner_profile_data_email_change_body.txt
 msgid "No action is needed on your part."
-msgstr "你不需要进行任何操作。"
+msgstr "您不需要进行任何操作。"
 
 #: common/templates/emails/sync_learner_profile_data_email_change_body.txt
 msgid ""
@@ -12286,7 +12297,7 @@ msgstr "如果此更改有误，请联系{link_start}{platform_name}客户支持
 
 #: common/templates/emails/sync_learner_profile_data_email_change_subject.txt
 msgid "Your {platform_name} account email has been updated"
-msgstr "你的 {platform_name} 账户电子邮件已更新"
+msgstr "您的 {platform_name} 账号电子邮件已更新"
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_board_fragment.html
 msgid "Add a Post"
@@ -12360,7 +12371,7 @@ msgstr "收藏此页"
 
 #: lms/templates/conditional_module.html
 msgid "You do not have access to this dependency module."
-msgstr "你无权访问此依赖模块。"
+msgstr "您无权访问此依赖模块。"
 
 #: lms/templates/course.html
 #: openedx/features/journals/templates/journals/bundle_card.html
@@ -12369,12 +12380,12 @@ msgid "LEARN MORE"
 msgstr "了解更多"
 
 #: lms/templates/course.html
-msgid "Starts"
-msgstr "开始"
-
-#: lms/templates/course.html
 msgid "Starts: {date}"
 msgstr "开课日期: {date}"
+
+#: lms/templates/course.html
+msgid "Starts"
+msgstr "开始"
 
 #: lms/templates/courses_list.html
 msgid "View all Courses"
@@ -12418,7 +12429,7 @@ msgstr "清空搜索结果"
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Account Status Info"
-msgstr "账户状态信息"
+msgstr "账号状态信息"
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Order History"
@@ -12491,7 +12502,7 @@ msgstr "您可以在{link_start}课程面板{link_end}看到您的新邮箱地�
 
 #: lms/templates/email_exists.html
 msgid "An account with the new e-mail address already exists."
-msgstr "该邮箱地址已被另一个账户使用。"
+msgstr "该邮箱地址已被另一个账号使用。"
 
 #: lms/templates/enroll_staff.html
 msgid "You should Register before trying to access the Unit"
@@ -12796,8 +12807,8 @@ msgid ""
 "You can now start learning with {platform_name} by logging in with your <a "
 "rel=\"external\" href=\"http://openid.net/\">OpenID account</a>."
 msgstr ""
-"你现在可以登录您的 <a rel=\"external\" "
-"href=\"http://openid.net/\">OpenID账户</a>开始学习{platform_name}上的课程。"
+"您现在可以登录您的 <a rel=\"external\" "
+"href=\"http://openid.net/\">OpenID账号</a>开始学习{platform_name}上的课程。"
 
 #: lms/templates/login-sidebar.html
 msgid "Not Enrolled?"
@@ -12814,7 +12825,7 @@ msgstr "需要帮助？"
 
 #: lms/templates/login-sidebar.html
 msgid "Looking for help signing in or with your {platform_name} account?"
-msgstr "寻找关于登录或者您的 {platform_name} 账户的帮助？"
+msgstr "寻找关于登录或者您的 {platform_name} 账号的帮助？"
 
 #: lms/templates/login-sidebar.html
 msgid "View our help section for answers to commonly asked questions."
@@ -12822,11 +12833,11 @@ msgstr "查看帮助部分来获得常见问题的解答。"
 
 #: lms/templates/login.html
 msgid "Log into your {platform_name} Account"
-msgstr "登录进入您的{platform_name}账户"
+msgstr "登录进入您的{platform_name}账号"
 
 #: lms/templates/login.html
 msgid "Log into My {platform_name} Account"
-msgstr "登录我的{platform_name}账户"
+msgstr "登录我的{platform_name}账号"
 
 #: lms/templates/login.html
 msgid "Access My Courses"
@@ -12836,7 +12847,7 @@ msgstr "进入我的课程"
 #: lms/templates/register.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Processing your account information"
-msgstr "正在处理您的帐户信息"
+msgstr "正在处理您的账号信息"
 
 #: lms/templates/login.html wiki/templates/wiki/accounts/login.html
 msgid "Please log in"
@@ -12844,11 +12855,11 @@ msgstr "请登录"
 
 #: lms/templates/login.html
 msgid "to access your account and courses"
-msgstr "来访问您的账户和课程"
+msgstr "来访问您的账号和课程"
 
 #: lms/templates/login.html
 msgid "We're Sorry, {platform_name} accounts are unavailable currently"
-msgstr "我们很遗憾，{platform_name} 账户现在无法使用"
+msgstr "我们很遗憾，{platform_name} 账号现在无法使用"
 
 #: lms/templates/login.html
 msgid "We couldn't log you in."
@@ -12860,7 +12871,7 @@ msgstr "您的邮箱或密码不正确"
 
 #: lms/templates/login.html
 msgid "An error occurred when signing you in to {platform_name}."
-msgstr "你注册 {platform_name} 时发生了一个错误。"
+msgstr "您注册 {platform_name} 时发生了一个错误。"
 
 #: lms/templates/login.html
 msgid ""
@@ -12868,12 +12879,12 @@ msgid ""
 "account. Required fields are noted by <strong class=\"indicator\">bold text "
 "and an asterisk (*)</strong>."
 msgstr ""
-"请提供下面的信息以登录进入您的 {platform_name} 账户，必须填写的信息已经被 <strong "
+"请提供下面的信息以登录进入您的 {platform_name} 账号，必须填写的信息已经被 <strong "
 "class=\"indicator\">加粗和用 (*)标出</strong>。"
 
 #: lms/templates/login.html
 msgid "Account Preferences"
-msgstr "账户参数"
+msgstr "账号参数"
 
 #: lms/templates/login.html
 msgid "Sign in with {provider_name}"
@@ -12916,7 +12927,7 @@ msgstr "点击来启动"
 
 #: lms/templates/manage_user_standing.html
 msgid "Manage student accounts"
-msgstr "管理学生账户"
+msgstr "管理学生账号"
 
 #: lms/templates/manage_user_standing.html
 msgid "Username:"
@@ -12944,11 +12955,11 @@ msgstr "查看用户资料"
 
 #: lms/templates/manage_user_standing.html
 msgid "Disable Account"
-msgstr "停用账户"
+msgstr "停用账号"
 
 #: lms/templates/manage_user_standing.html
 msgid "Reenable Account"
-msgstr "重新启用账户"
+msgstr "重新启用账号"
 
 #: lms/templates/manage_user_standing.html
 msgid "Remove Profile Image"
@@ -12956,7 +12967,7 @@ msgstr "删除用户资料照片"
 
 #: lms/templates/manage_user_standing.html
 msgid "Students whose accounts have been disabled"
-msgstr "学生帐户已被停用"
+msgstr "学生账号已被停用"
 
 #: lms/templates/manage_user_standing.html
 msgid "(reload your page to refresh)"
@@ -13024,7 +13035,7 @@ msgstr "您正在以 {i_start}{user_name}{i_end} 身份查看课程。"
 #: lms/templates/problem.html
 msgid "You have used {num_used} of {num_total} attempt"
 msgid_plural "You have used {num_used} of {num_total} attempts"
-msgstr[0] "你已经尝试了{num_used}次（总共可以尝试{num_total}次）"
+msgstr[0] "您已经尝试了{num_used}次（总共可以尝试{num_total}次）"
 
 #: lms/templates/problem.html
 msgid ""
@@ -13094,12 +13105,12 @@ msgstr "在处理您的注册信息时发生了下列错误："
 #: lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Sign up with {provider_name}"
-msgstr "使用 {provider_name} 帐号登录"
+msgstr "使用 {provider_name} 账号登录"
 
 #: lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Create your own {platform_name} account below"
-msgstr "在下面创建您的 {platform_name} 帐号"
+msgstr "在下面创建您的 {platform_name} 账号"
 
 #: lms/templates/register-form.html lms/templates/register-shib.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -13114,7 +13125,7 @@ msgstr "必需的字段已经被<strong class=\"indicator\">粗体和星号(*)</
 #: lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "You've successfully signed in with {selected_provider}."
-msgstr "您已成功地以{selected_provider}账户登录。"
+msgstr "您已成功地以{selected_provider}账号登录。"
 
 #: lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -13126,7 +13137,7 @@ msgstr "您只需再多提供一点信息就可以开始在{platform_name}学习
 #: lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Please complete the following fields to register for an account. "
-msgstr "请将以下字段补充完整以完成账户注册。"
+msgstr "请将以下字段补充完整以完成账号注册。"
 
 #: lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -13183,7 +13194,7 @@ msgstr "请告诉我们您注册 {platform_name}的原因"
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Account Acknowledgements"
-msgstr "账户致谢"
+msgstr "账号致谢"
 
 #: lms/templates/register-form.html lms/templates/register-shib.html
 #: lms/templates/signup_modal.html
@@ -13210,7 +13221,7 @@ msgstr "注册"
 #: lms/templates/register-form.html lms/templates/signup_modal.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Create My Account"
-msgstr "创建我的账户"
+msgstr "创建我的账号"
 
 #: lms/templates/register-shib.html
 #: themes/stanford-style/lms/templates/register-shib.html
@@ -13220,7 +13231,7 @@ msgstr "{platform_name}偏好设置"
 #: lms/templates/register-shib.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Update my {platform_name} Account"
-msgstr "更新我的{platform_name}账户"
+msgstr "更新我的{platform_name}账号"
 
 #: lms/templates/register-shib.html
 #: themes/stanford-style/lms/templates/register-shib.html
@@ -13235,7 +13246,7 @@ msgstr "输入用户昵称"
 #: lms/templates/register-shib.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Update My Account"
-msgstr "更新我的账户"
+msgstr "更新我的账号"
 
 #: lms/templates/register-sidebar.html
 #: themes/stanford-style/lms/templates/register-sidebar.html
@@ -13279,7 +13290,7 @@ msgid ""
 "spam folder and mark {platform_name} emails as 'not spam'. At "
 "{platform_name}, we communicate mostly through email."
 msgstr ""
-"加入 {platform_name} 过程中，您将收到一封说明账户激活方法的电子邮件。如未收到邮件，请检查您的垃圾邮件文件夹并将 "
+"加入 {platform_name} 过程中，您将收到一封说明账号激活方法的电子邮件。如未收到邮件，请检查您的垃圾邮件文件夹并将 "
 "{platform_name} 邮件标记为“非垃圾邮件”。在 {platform_name}，电子邮件为主要沟通方式。"
 
 #: lms/templates/register-sidebar.html
@@ -13304,7 +13315,7 @@ msgstr "{platform_name}注册"
 
 #: lms/templates/register.html
 msgid "Create My {platform_name} Account"
-msgstr "创建我的{platform_name}账户"
+msgstr "创建我的{platform_name}账号"
 
 #: lms/templates/register.html
 msgid "Welcome!"
@@ -13312,7 +13323,7 @@ msgstr "欢迎！"
 
 #: lms/templates/register.html
 msgid "Register below to create your {platform_name} account"
-msgstr "在下面注册来创建您在 {platform_name}的账户"
+msgstr "在下面注册来创建您在 {platform_name}的账号"
 
 #: lms/templates/resubscribe.html
 msgid "Re-subscribe Successful!"
@@ -13375,7 +13386,7 @@ msgstr "注册加入{platform_name}的目标"
 
 #: lms/templates/signup_modal.html
 msgid "Already have an account?"
-msgstr "已有账户？"
+msgstr "已有账号？"
 
 #: lms/templates/signup_modal.html
 msgid "Login."
@@ -13730,7 +13741,7 @@ msgstr "未找到可播放的视频源。"
 msgid ""
 "Your browser does not support this video format. Try using a different "
 "browser."
-msgstr "你的浏览器不支持此视频格式，请更换浏览器再尝试。"
+msgstr "您的浏览器不支持此视频格式，请更换浏览器再尝试。"
 
 #: lms/templates/video.html
 msgid "Downloads and transcripts"
@@ -13794,7 +13805,7 @@ msgid ""
 "status of your API access request."
 msgstr ""
 "正在处理您访问 {platform_name} 课程目录 API "
-"的请求。处理完成后，你写在用户资料中的电子邮箱将收到一条信息。你也可以返回到此页面查看你的 API 访问申请的状态。"
+"的请求。处理完成后，您写在用户资料中的电子邮箱将收到一条信息。您也可以返回到此页面查看您的 API 访问申请的状态。"
 
 #. Translators: "platform_name" is the name of this Open edX installation.
 #. "api_support_email_link" is HTML for a link to email the API support staff.
@@ -13833,7 +13844,7 @@ msgstr "重新定向 URL"
 msgid ""
 "If you would like to regenerate your API client information, please use the "
 "form below."
-msgstr "如果你想要重新生成你的 API 客户端信息，请使用以下表格。"
+msgstr "如果您想要重新生成您的 API 客户端信息，请使用以下表格。"
 
 #: lms/templates/api_admin/status.html
 msgid "Generate API client credentials"
@@ -13912,7 +13923,7 @@ msgid ""
 "client ID."
 msgstr ""
 "要访问API，您需要创建一个 {platform_name} "
-"应用程序的用户账户（非个人使用）。您将通过这个账户获得访问我们的API请求页面{request_url}的权限。在该页上，您必须完成API请求表单，其中包括对API的计划用途的描述。您提供给{platform_name}的任何账户和注册信息必须准确及保证时效，并且您同意在做任何更改时及时通知我们。{platform_name_capitalized}将审查您的API请求表单，并在得到{platform_name}的全权批准后，为您提供获取API共享秘密和客户ID的说明。"
+"应用程序的用户账号（非个人使用）。您将通过这个账号获得访问我们的API请求页面{request_url}的权限。在该页上，您必须完成API请求表单，其中包括对API的计划用途的描述。您提供给{platform_name}的任何账号和注册信息必须准确及保证时效，并且您同意在做任何更改时及时通知我们。{platform_name_capitalized}将审查您的API请求表单，并在得到{platform_name}的全权批准后，为您提供获取API共享秘密和客户ID的说明。"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Permissible Use"
@@ -13934,7 +13945,7 @@ msgid ""
 "credentials anywhere other than on the {platform_name} website at "
 "{platform_url}."
 msgstr ""
-"你同意使用API只交付内容的目的是通过API访问(“API内容”)到您自己的网站,移动站点、应用,博客、电子邮件分发列表,或社交媒体属性(“您的应用程序”)或另一个商业用途,您描述的访问请求,{platform_name}在个案基础上批准。{platform_name_capitalized}可能会监视您对api的使用，以遵守条款，如果您试图绕过或超过{platform_name}设置的要求和限制，则可能会拒绝您的访问或关闭您的集成。除了在{platform_name}网站{platform_url}上，您的应用程序或其他已批准使用的API或API内容不得提示您的最终用户提供其{platform_name}用户名、密码或其他{platform_name}用户凭证。"
+"您同意使用API只交付内容的目的是通过API访问(“API内容”)到您自己的网站,移动站点、应用,博客、电子邮件分发列表,或社交媒体属性(“您的应用程序”)或另一个商业用途,您描述的访问请求,{platform_name}在个案基础上批准。{platform_name_capitalized}可能会监视您对api的使用，以遵守条款，如果您试图绕过或超过{platform_name}设置的要求和限制，则可能会拒绝您的访问或关闭您的集成。除了在{platform_name}网站{platform_url}上，您的应用程序或其他已批准使用的API或API内容不得提示您的最终用户提供其{platform_name}用户名、密码或其他{platform_name}用户凭证。"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Prohibited Uses and Activities"
@@ -13989,7 +14000,7 @@ msgstr "变更或去除包含在或出现在 API 或任何 API Content 中的任
 msgid ""
 "sublicensing, re-distributing, renting, selling or leasing access to the "
 "APIs or your client secret to any third party;"
-msgstr "对 API 访问权限或你的客户密码进行许可转让、再分发、出租、销售或租赁给任何第三方；"
+msgstr "对 API 访问权限或您的客户密码进行许可转让、再分发、出租、销售或租赁给任何第三方；"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -14054,11 +14065,11 @@ msgid ""
 "distribute or modify the APIs or any API Content (including adaptation, "
 "editing, excerpting, or creating derivative works)."
 msgstr ""
-"你确认并同意 API 和所有 API Content 都包含 {platform_name} 及其合作伙伴的有价值的知识产权。API 和所有 API "
+"您确认并同意 API 和所有 API Content 都包含 {platform_name} 及其合作伙伴的有价值的知识产权。API 和所有 API "
 "Content 均受美国和外国的版权、商标及其他法律的保护。如果未明确授权，则保留对 API 和 API Content 的所有权利。使用 API "
-"或任何 API Content 并不意味着你拥有 API 或 API Content 的任何权利的所有权。你不得声称或试图声称你拥有 API 或任何 "
-"API Content 的所有权，或误传你个人、你的公司或你的应用程序是来源于任何 API Content。你不得以你个人名义或以任何第三方的名义，对 "
-"API Content 进行整体或部分修改、创作派生作品或尝试使用、注册或以任何方式利用。你不得分发或修改 API 或任何 API "
+"或任何 API Content 并不意味着您拥有 API 或 API Content 的任何权利的所有权。您不得声称或试图声称您拥有 API 或任何 "
+"API Content 的所有权，或误传您个人、您的公司或您的应用程序是来源于任何 API Content。您不得以您个人名义或以任何第三方的名义，对 "
+"API Content 进行整体或部分修改、创作派生作品或尝试使用、注册或以任何方式利用。您不得分发或修改 API 或任何 API "
 "Content（包括改编、编辑、引用或创作派生作品）。"
 
 #: lms/templates/api_admin/terms_of_service.html
@@ -14078,7 +14089,7 @@ msgid ""
 "other entities providing information, API Content or services for the APIs, "
 "the course instructors and their staffs."
 msgstr ""
-"所有出现在API、API内容或通过API提供的服务上的名称、标识和印章(“商标”)均为其各自所有者的财产。您不得删除、更改或模糊包含或伴随API内容的任何版权、商标或其他专有权利通知。如果任何{platform_name}参与者(如以下定义)或其他第三方撤销访问拥有者的API内容或控制{platform_name}参与者或第三方,包括但不限于任何商标,您必须确保从您的应用程序和你的网络、系统和服务器被删除的所有API内容属于{platform_name}参与者或第三方是合理可行的。“{platform_name_capitalized}参与者”是指麻省理工学院、哈佛大学以及其他为API、课程讲师及其工作人员提供信息、API内容或服务的实体。"
+"所有出现在API、API内容或通过API提供的服务上的名称、标识和印章(“商标”)均为其各自所有者的财产。您不得删除、更改或模糊包含或伴随API内容的任何版权、商标或其他专有权利通知。如果任何{platform_name}参与者(如以下定义)或其他第三方撤销访问拥有者的API内容或控制{platform_name}参与者或第三方,包括但不限于任何商标,您必须确保从您的应用程序和您的网络、系统和服务器被删除的所有API内容属于{platform_name}参与者或第三方是合理可行的。“{platform_name_capitalized}参与者”是指麻省理工学院、哈佛大学以及其他为API、课程讲师及其工作人员提供信息、API内容或服务的实体。"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -14091,7 +14102,7 @@ msgid ""
 "content, in whole or in part, in any form and in any media formats and "
 "through any media channels (now known or hereafter developed)."
 msgstr ""
-"针对你提交给 {platform_name} 的与你使用 API 或任何 API Content 有关的任何内容而言，可据此认为你授予 "
+"针对您提交给 {platform_name} 的与您使用 API 或任何 API Content 有关的任何内容而言，可据此认为您授予 "
 "{platform_name} "
 "一个世界范围的、非独有、可转让、可分配、可转发许可、全部付讫、免版税、无期限、不可撤销的权力，并许可持有、转让、展示、执行、复制、修改、分配、再分配、再许可，以及以任何形式和用任何媒体格式并通过任何媒体渠道（现在已知的或今后开发的）使用、提供和利用此内容的部分或全部。"
 
@@ -14213,7 +14224,7 @@ msgid ""
 "DOWNLOAD OR USE OF SUCH INFORMATION, MATERIALS OR DATA, UNLESS OTHERWISE "
 "EXPRESSLY PROVIDED FOR IN THE {platform_name} PRIVACY POLICY."
 msgstr ""
-"使用API、API内容和从API获得或通过API获得的任何服务都由您自己承担风险。访问或下载信息、材料或数据通过api在自己的判断力和风险,并且你将单独负责任何损害你的财数据产(包括你的电脑系统)或损失的数据结果下载或使用这些信息,资料或数据,除非另有明确规定{platform_name}隐私政策。"
+"使用API、API内容和从API获得或通过API获得的任何服务都由您自己承担风险。访问或下载信息、材料或数据通过api在自己的判断力和风险,并且您将单独负责任何损害您的财数据产(包括您的电脑系统)或损失的数据结果下载或使用这些信息,资料或数据,除非另有明确规定{platform_name}隐私政策。"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -14225,7 +14236,7 @@ msgid ""
 "INFORMATION OBTAINED FROM OR THROUGH THE APIS, WHETHER YOUR CLAIM IS BASED "
 "IN CONTRACT, TORT, STATUTORY OR OTHER LAW."
 msgstr ""
-"适用法律允许的最大程度,你同意{platform_name}和{platform_name}的参与者将会承担你的任何损失或损害赔偿,实际或间接引起的或有关条款,或你(或任何第三方的)使用或无法使用API或任何API的内容,或者你的依赖来自或通过API的信息,你的要求是否在合同,侵权,法定或其他法律。"
+"适用法律允许的最大程度,您同意{platform_name}和{platform_name}的参与者将会承担您的任何损失或损害赔偿,实际或间接引起的或有关条款,或您(或任何第三方的)使用或无法使用API或任何API的内容,或者您的依赖来自或通过API的信息,您的要求是否在合同,侵权,法定或其他法律。"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -14250,7 +14261,7 @@ msgid ""
 " OR ALL OF THE ABOVE DISCLAIMERS, EXCLUSIONS, OR LIMITATIONS MAY NOT APPLY "
 "TO YOU, AND YOU MIGHT HAVE ADDITIONAL RIGHTS."
 msgstr ""
-"某些州级法律不允许限制默示担保或不允许排除或限制某些损害赔偿。如果这些法律对你适用，部分或全部上诉免责声明、除外条款或限制可能对你不适用，因此你可能拥有额外权利。"
+"某些州级法律不允许限制默示担保或不允许排除或限制某些损害赔偿。如果这些法律对您适用，部分或全部上诉免责声明、除外条款或限制可能对您不适用，因此您可能拥有额外权利。"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -14278,7 +14289,7 @@ msgid ""
 "{platform_name} or one of the {platform_name} Participants will provide you "
 "with written notice of such claim, action or demand."
 msgstr ""
-"在适用法律所允许的最大程度上,你同意保护,免责和赔偿{platform_name}和{platform_name}参与者,和各自的子公司,子公司、官员、教师、学生、同伴、董事会成员、代理和员工从和反对任何第三方索赔、行动或要求引起的,产生的或以任何方式与你使用API和任何API的内容,包括任何类型和性质的任何和所有索赔、损失、损害赔偿(实际的和相应的)、诉讼、判决、诉讼费用和律师费所产生的任何责任或费用。在这种情况下，{platform_name}或{platform_name}参与者之一将向您提供此类索赔、行动或要求的书面通知。"
+"在适用法律所允许的最大程度上,您同意保护,免责和赔偿{platform_name}和{platform_name}参与者,和各自的子公司,子公司、官员、教师、学生、同伴、董事会成员、代理和员工从和反对任何第三方索赔、行动或要求引起的,产生的或以任何方式与您使用API和任何API的内容,包括任何类型和性质的任何和所有索赔、损失、损害赔偿(实际的和相应的)、诉讼、判决、诉讼费用和律师费所产生的任何责任或费用。在这种情况下，{platform_name}或{platform_name}参与者之一将向您提供此类索赔、行动或要求的书面通知。"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "General Legal Terms"
@@ -14300,11 +14311,11 @@ msgid ""
 "you by {platform_name} under these Terms, {platform_name} may notify you via"
 " the email address associated with your {platform_name} account."
 msgstr ""
-"此条款构成你和 {platform_name} 之间与你使用 API 和 API Content 有关的完整协议，取代你和 "
-"{platform_name} 之间与你使用 API 和 API Content 有关的所有事先协议。{platform_name} "
+"此条款构成您和 {platform_name} 之间与您使用 API 和 API Content 有关的完整协议，取代您和 "
+"{platform_name} 之间与您使用 API 和 API Content 有关的所有事先协议。{platform_name} "
 "未能行使或执行此条款的任何权利或规定并不得构成对此类权利或规定的弃权。如果具有合法管辖权的法院发现此条款的任何规定无效，但是各方一致同意法院应按照该条规定尽量让相关方的意愿生效，且此条款的其他规定仍然全面有效和生效。此条款不影响任何第三方受益权或任何代理、合作伙伴或合资企业。根据这些条款由"
-" {platform_name} 为你提供的任何通知，{platform_name} 均可通过与你的 {platform_name} "
-"帐户关联的电子邮箱地址通知你。"
+" {platform_name} 为您提供的任何通知，{platform_name} 均可通过与您的 {platform_name} "
+"账号关联的电子邮箱地址通知您。"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -14321,7 +14332,7 @@ msgid ""
 "still be allowed to apply for injunctive remedies (or an equivalent type of "
 "urgent legal relief) in any jurisdiction."
 msgstr ""
-"您同意，条款、api以及因条款或api而产生的或与之相关的任何索赔或争议将受马萨诸塞州法律管辖，不包括其法律条款冲突。你同意所有此类索赔和纠纷将会听到和解决只在联邦和州法院位于剑桥,马萨诸塞州,美国。为此目的，您同意上述法院对您的个人管辖权，并且您放弃并同意不对这些法院的此类诉讼提出任何异议(包括对缺乏适当管辖权、地点或论坛不便的任何辩护或异议)。尽管有上述规定，您同意{platform_name}仍可在任何司法管辖区申请禁令救济(或同等类型的紧急法律救济)。"
+"您同意，条款、api以及因条款或api而产生的或与之相关的任何索赔或争议将受马萨诸塞州法律管辖，不包括其法律条款冲突。您同意所有此类索赔和纠纷将会听到和解决只在联邦和州法院位于剑桥,马萨诸塞州,美国。为此目的，您同意上述法院对您的个人管辖权，并且您放弃并同意不对这些法院的此类诉讼提出任何异议(包括对缺乏适当管辖权、地点或论坛不便的任何辩护或异议)。尽管有上述规定，您同意{platform_name}仍可在任何司法管辖区申请禁令救济(或同等类型的紧急法律救济)。"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Termination"
@@ -14346,7 +14357,7 @@ msgid ""
 "{platform_name} Participants will have any liability to you for such an "
 "action."
 msgstr ""
-"{platform_name_capitalized}和{platform_name}参与者保留权利在任何时候决定取消,延迟,重新安排或通过{platform_name}改变任何API或API的格式内容提供,或停止提供API或API的任何部分或全部内容或相关服务,你同意{platform_name}和{platform_name}的参与者将有责任对你采取这样的行动。"
+"{platform_name_capitalized}和{platform_name}参与者保留权利在任何时候决定取消,延迟,重新安排或通过{platform_name}改变任何API或API的格式内容提供,或停止提供API或API的任何部分或全部内容或相关服务,您同意{platform_name}和{platform_name}的参与者将有责任对您采取这样的行动。"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -14577,7 +14588,7 @@ msgstr "CCX指导仪表盘"
 
 #: lms/templates/ccx/coach_dashboard.html
 msgid "Name your CCX"
-msgstr "为你的CCX命名"
+msgstr "为您的CCX命名"
 
 #: lms/templates/ccx/coach_dashboard.html
 msgid "Create a new Custom Course for edX"
@@ -14638,7 +14649,7 @@ msgid ""
 "registered for {platform_name} will not be enrolled, but will be allowed to "
 "enroll once they make an account."
 msgstr ""
-"如果此选项{em_start}未选{em_end}，尚未注册 {platform_name} 的用户将不能入选，但只要他们注册了帐户即可入选。"
+"如果此选项{em_start}未选{em_end}，尚未注册 {platform_name} 的用户将不能入选，但只要他们注册了账号即可入选。"
 
 #: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -14716,7 +14727,7 @@ msgstr "设置日期"
 
 #: lms/templates/ccx/schedule.html
 msgid "You have unsaved changes."
-msgstr "你还有未保存的更改。"
+msgstr "您还有未保存的更改。"
 
 #: lms/templates/ccx/schedule.html
 msgid "There was an error saving changes."
@@ -14885,8 +14896,8 @@ msgid ""
 msgstr "如果所有信息正确但问题仍然存在，请联系技术支持团队。"
 
 #: lms/templates/certificates/valid.html
-msgid "About edX Certificates"
-msgstr "关于edX证书"
+msgid "About EliteMBA Certificates"
+msgstr "关于EliteMBA证书"
 
 #: lms/templates/certificates/verify.html
 msgid "Trustworthy Certificate"
@@ -14920,6 +14931,11 @@ msgstr "发证时间"
 msgid "Electronic Certificate"
 msgstr "电子证书"
 
+#: lms/templates/certificates/verify.html
+msgctxt "Certificate"
+msgid "View"
+msgstr "点击查看"
+
 #: lms/templates/commerce/checkout_cancel.html
 msgid "Checkout Cancelled"
 msgstr "付款已取消"
@@ -14939,7 +14955,7 @@ msgid ""
 "An error has occurred with your payment. <b>You have not been charged.</b> "
 "Please try to submit your payment again. If this problem persists, contact "
 "{email}."
-msgstr "你的付款出现一个错误。<b>你尚未付款。</b>请重试再次付款。如果此问题仍然存在，请联系 {email}。"
+msgstr "您的付款出现一个错误。<b>您尚未付款。</b>请重试再次付款。如果此问题仍然存在，请联系 {email}。"
 
 #: lms/templates/commerce/checkout_receipt.html
 msgid "Loading Order Data..."
@@ -15046,7 +15062,7 @@ msgid ""
 "Highlight your new knowledge and skills with a verified certificate. Use "
 "this valuable credential to improve your job prospects and advance your "
 "career, or highlight your certificate in school applications."
-msgstr "用您的认证证书突出您的新知识和技能。使用这件有价值的凭证来改善你的就业前景，推进您的职业发展，或者在申请学校时突出您的证书。"
+msgstr "用您的认证证书突出您的新知识和技能。使用这件有价值的凭证来改善您的就业前景，推进您的职业发展，或者在申请学校时突出您的证书。"
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
@@ -15140,7 +15156,7 @@ msgid ""
 " enroll button again. Please visit the {start_help_tag}help page{end_tag} "
 "for a possible solution."
 msgstr ""
-"当前登录用户帐号无权限入选此课程。您可能需要在{start_logout_tag}退出登录{end_tag}后重试选课按钮。请访问{start_help_tag}帮助页面{end_tag}了解可能的解决方案。"
+"当前登录用户账号无权限入选此课程。您可能需要在{start_logout_tag}退出登录{end_tag}后重试选课按钮。请访问{start_help_tag}帮助页面{end_tag}了解可能的解决方案。"
 
 #: lms/templates/courseware/course_about.html
 #: themes/normal-theme/lms/templates/courseware/course_about.html
@@ -15255,7 +15271,7 @@ msgstr "我刚通过 {account}：{url} 选修了 {number} {title}"
 msgid ""
 "A wonderful course is rare to find and must be shared! I'm taking {title} on"
 " EliteMBA. Check it out! {url}"
-msgstr "难得的优质好课绝不能独享，我正在学习英荔商学院的{title}，你也看看吧！{url}"
+msgstr "难得的优质好课绝不能独享，我正在学习英荔商学院的{title}，您也看看吧！{url}"
 
 #: lms/templates/courseware/course_about_sidebar_header.html
 #: themes/normal-theme/lms/templates/courseware/course_about_sidebar_header.html
@@ -15271,7 +15287,7 @@ msgstr "我刚通过 {platform} {url} 选修了 {number} {title}"
 #: themes/normal-theme/lms/templates/courseware/course_about_sidebar_header.html
 #: themes/stanford-style/lms/templates/courseware/course_about_sidebar_header.html
 msgid "Tweet that you've enrolled in this course"
-msgstr "在 Tweet 发布你已登记此课程的消息"
+msgstr "在 Tweet 发布您已登记此课程的消息"
 
 #: lms/templates/courseware/course_about_sidebar_header.html
 #: themes/normal-theme/lms/templates/courseware/course_about_sidebar_header.html
@@ -15501,7 +15517,7 @@ msgstr "职场冲击"
 
 #: lms/templates/courseware/program_marketing.html
 msgid "What You'll Learn"
-msgstr "你将学到"
+msgstr "您将学到"
 
 #: lms/templates/courseware/program_marketing.html
 msgid "Average Length"
@@ -15720,6 +15736,7 @@ msgid "There are no students enrolled in this course."
 msgstr "本课程无学生选课"
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
+#: lms/templates/emails/activation_email.txt
 #: lms/templates/emails/business_order_confirmation_email.txt
 #: lms/templates/emails/order_confirmation_email.txt
 msgid "Hi {name},"
@@ -15826,7 +15843,7 @@ msgid ""
 "identified you as being connected with one of those countries, please let us"
 " know by contacting {email}."
 msgstr ""
-"由于向你颁发你的{cert_name_short}需要遵从美国对伊朗、古巴、叙利亚和苏丹的严格禁运政策，你的已认证的{cert_name_long}正处在等待确认状态。如果你认为我们的系统错误地将你与上述国家相关联，请联系{email}让我们了解相关情况。"
+"由于向您颁发您的{cert_name_short}需要遵从美国对伊朗、古巴、叙利亚和苏丹的严格禁运政策，您的已认证的{cert_name_long}正处在等待确认状态。如果您认为我们的系统错误地将您与上述国家相关联，请联系{email}让我们了解相关情况。"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid ""
@@ -15890,7 +15907,7 @@ msgid ""
 "{cert_name_long} was generated, we could not grant you a verified "
 "{cert_name_short}. An honor code {cert_name_short} has been granted instead."
 msgstr ""
-"由于在生成你的{cert_name_long}时我们没有一套你的有效的身份认证照片，因此无法授予你认证的{cert_name_short}；我们已授予你标有诚信准则的{cert_name_short}"
+"由于在生成您的{cert_name_long}时我们没有一套您的有效的身份认证照片，因此无法授予您认证的{cert_name_short}；我们已授予您标有诚信准则的{cert_name_short}"
 " 。"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -16012,7 +16029,7 @@ msgid ""
 "holder{contact_link_end} to request payment, or you can "
 "{unenroll_link_start}unenroll{unenroll_link_end} from this course"
 msgstr ""
-"由于尚未收到你的付款，你将无法访问该课程。你可以{contact_link_start}联系账户持有人{contact_link_end}请求付款，也可以{unenroll_link_start}放弃选修{unenroll_link_end}该课程"
+"由于尚未收到您的付款，您将无法访问该课程。您可以{contact_link_start}联系账号持有人{contact_link_end}请求付款，也可以{unenroll_link_start}放弃选修{unenroll_link_end}该课程"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Verification not yet complete."
@@ -16021,7 +16038,7 @@ msgstr "认证尚不完整"
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You only have {days} day left to verify for this course."
 msgid_plural "You only have {days} days left to verify for this course."
-msgstr[0] "你还有 {days} 天时间认证此课程。"
+msgstr[0] "您还有 {days} 天时间认证此课程。"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Almost there!"
@@ -16057,8 +16074,8 @@ msgid ""
 msgstr "您已提交重新认证信息，认证完成后将会在您面板中显示一条消息（一般1-2天内完成）。"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "You have successfully verified your ID with edX"
-msgstr "您已经与EliteMBA成功验证了您的 ID！"
+msgid "EliteMBA has verified your identity!"
+msgstr "英荔已经成功验证了您的身份！"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Your current verification is effective until {date}."
@@ -16096,11 +16113,11 @@ msgstr ""
 msgid ""
 "You have completed this course and are eligible to purchase course credit. "
 "Select <strong>Get Credit</strong> to get started."
-msgstr "你已完成此课程并有资格购买课程学分。选择<strong>获得学分</strong>开始。"
+msgstr "您已完成此课程并有资格购买课程学分。选择<strong>获得学分</strong>开始。"
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid "You are now eligible for credit from {provider}. Congratulations!"
-msgstr "现在，你有资格从 {provider} 获得学分。恭喜你！"
+msgstr "现在，您有资格从 {provider} 获得学分。恭喜您！"
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid "Get Credit"
@@ -16114,7 +16131,7 @@ msgid ""
 "Thank you for your payment. To receive course credit, you must now request "
 "credit at the {link_to_provider_site} website. Select <b>Request Credit</b> "
 "to get started."
-msgstr "感谢你的付款。要获得课程学分，你现在必须在 {link_to_provider_site} 网站申请学分。选择<b>申请学分</b>开始。"
+msgstr "感谢您的付款。要获得课程学分，您现在必须在 {link_to_provider_site} 网站申请学分。选择<b>申请学分</b>开始。"
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid "Request Credit"
@@ -16124,7 +16141,7 @@ msgstr "申请学分"
 msgid ""
 "{provider_name} has received your course credit request. We will update you "
 "when credit processing is complete."
-msgstr "{provider_name} 已收到你的课程学分申请。完成学分处理后我们将通知你。"
+msgstr "{provider_name} 已收到您的课程学分申请。完成学分处理后我们将通知您。"
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid "View Details"
@@ -16140,7 +16157,7 @@ msgid ""
 " credit. To see your course credit, visit the {link_to_provider_site} "
 "website."
 msgstr ""
-"<b>恭喜你！</b> {provider_name} 已批准你的课程学分申请。要查看你的课程学分，请访问 "
+"<b>恭喜您！</b> {provider_name} 已批准您的课程学分申请。要查看您的课程学分，请访问 "
 "{link_to_provider_site} 网站。"
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
@@ -16151,7 +16168,7 @@ msgstr "查看认证"
 msgid ""
 "{provider_name} did not approve your request for course credit. For more "
 "information, contact {link_to_provider_site} directly."
-msgstr "{provider_name} 未批准你的课程学分申请。欲了解更多信息，请直接联系 {link_to_provider_site}。"
+msgstr "{provider_name} 未批准您的课程学分申请。欲了解更多信息，请直接联系 {link_to_provider_site}。"
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
@@ -16182,9 +16199,9 @@ msgstr "当前认证状态：已批准"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Your edX verification has been approved. Your verification is effective for "
-"one year after submission."
-msgstr "您的edX认证已通过，提交后一年内有效。"
+"Your EliteMBA verification has been approved. Your verification is effective"
+" for one year after submission."
+msgstr "您的EliteMBA认证已通过，提交后一年内有效。"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Current Verification Status: Pending"
@@ -16192,9 +16209,9 @@ msgstr "当前认证状态：待处理"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Your edX ID verification is pending. Your verification information has been "
-"submitted and will be reviewed shortly."
-msgstr "您的edX身份认证正在进行中，您的认证信息已提交，我们会尽快审查您的认证。"
+"Your EliteMBA ID verification is pending. Your verification information has "
+"been submitted and will be reviewed shortly."
+msgstr "您的身份认证正在进行中，您的认证信息已提交，我们会尽快审查您的认证。"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Current Verification Status: Denied"
@@ -16228,7 +16245,7 @@ msgstr "您的认证已过期，您必须在您课程的认证截止日期前提
 
 #: lms/templates/dashboard/_dashboard_third_party_error.html
 msgid "Could Not Link Accounts"
-msgstr "无法关联账户"
+msgstr "无法关联账号"
 
 #. Translators: this message is displayed when a user tries to link their
 #. account with a third-party authentication provider (for example, Google or
@@ -16241,7 +16258,7 @@ msgstr "无法关联账户"
 msgid ""
 "The {provider_name} account you selected is already linked to another "
 "{platform_name} account."
-msgstr "你选择的 {provider_name}账户已经和{platform_name}账户相关联。"
+msgstr "您选择的 {provider_name}账号已经和{platform_name}账号相关联。"
 
 #: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
@@ -16459,7 +16476,7 @@ msgstr "在此课或者未来的课程中突出重要信息以便日后回顾。
 msgid ""
 "Get started by making a note in something you just read, like "
 "{section_link}."
-msgstr "开始,在你刚读的东西,如{section_link}。"
+msgstr "开始,在您刚读的东西,如{section_link}。"
 
 #: lms/templates/edxnotes/toggle_notes.html
 msgid "Hide notes"
@@ -16475,6 +16492,17 @@ msgid ""
 "engaging, high-quality {platform_name} courses. Note that you will not be "
 "able to log back into your account until you have activated it."
 msgstr "注册差不多完成啦！点击链接激活您的账号，体验{platform_name}的精品课程。注意，您必须激活账号才可以登录。"
+
+#: lms/templates/emails/activation_email.txt
+#: lms/templates/emails/confirm_email_change.txt
+#: lms/templates/emails/failed_verification_email.txt
+#: lms/templates/emails/order_confirmation_email.txt
+#: lms/templates/emails/photo_submission_review.txt
+#: lms/templates/emails/reverification_processed.txt
+msgid ""
+"(If the link is not clickable, try copying and pasting it into the address "
+"bar of your web browser, and press \"Enter\" key to open the page)"
+msgstr "（如链接点击无效，请手动复制链接并粘贴到浏览器地址栏中，然后按“回车”打开页面即可）"
 
 #: lms/templates/emails/activation_email.txt
 msgid "Enjoy learning with {platform_name}."
@@ -16618,7 +16646,7 @@ msgstr "您的兑换URL是：[[在此输入从附件CSV中找到的兑换链接]
 
 #: lms/templates/emails/business_order_confirmation_email.txt
 msgid "(1) Register for an account at {site_name}"
-msgstr "(1) 在 {site_name}注册一个账户"
+msgstr "(1) 在 {site_name}注册一个账号"
 
 #: lms/templates/emails/business_order_confirmation_email.txt
 msgid ""
@@ -16635,7 +16663,7 @@ msgstr "(3) 在选课确认页面，点击“激活选课码”按钮，您将�
 msgid ""
 "(4) You should be able to click on 'view course' button or see your course "
 "on your student dashboard at {url}"
-msgstr "(4)您可以点击“查看课程”按钮或者通过{url} 处的学生课程面板查看你的课程。"
+msgstr "(4)您可以点击“查看课程”按钮或者通过{url} 处的学生课程面板查看您的课程。"
 
 #: lms/templates/emails/business_order_confirmation_email.txt
 msgid ""
@@ -16655,8 +16683,8 @@ msgid ""
 "{platform_name} from {old_email} to {new_email}. If you did not make this "
 "request, please contact us immediately. Contact information is listed at:"
 msgstr ""
-"这封邮件是为了确认你和 {platform_name} 之间的电子邮件关联由 {old_email} 变更为 "
-"{new_email}。如果你并没有发出该请求，请立即联系我们。联系信息已在以下页面中列出："
+"这封邮件是为了确认您和 {platform_name} 之间的电子邮件关联由 {old_email} 变更为 "
+"{new_email}。如果您并没有发出该请求，请立即联系我们。联系信息已在以下页面中列出："
 
 #: lms/templates/emails/confirm_email_change.txt
 #: themes/stanford-style/lms/templates/emails/confirm_email_change.txt
@@ -16667,7 +16695,7 @@ msgstr "我们保存着旧电子邮件信息的日志，所以如果该请求并
 
 #: lms/templates/emails/email_change_subject.txt
 msgid "Request to change {platform_name} account e-mail"
-msgstr "变更 {platform_name} 账户电子邮件的请求"
+msgstr "变更 {platform_name} 账号电子邮件的请求"
 
 #: lms/templates/emails/failed_verification_email.txt
 msgid ""
@@ -16677,15 +16705,11 @@ msgstr "对不起！您为ID验证提供的照片没有通过，原因（或多�
 
 #: lms/templates/emails/failed_verification_email.txt
 msgid "The photo(s) of you:"
-msgstr "你的照片(多张)："
+msgstr "您的照片(多张)："
 
 #: lms/templates/emails/failed_verification_email.txt
 msgid "Resubmit Verification: {reverify_url}"
 msgstr "重新认证: {reverify_url}"
-
-#: lms/templates/emails/failed_verification_email.txt
-msgid "ID Verification FAQ: {faq_url}"
-msgstr "身份ID验证FAQ：{faq_url}"
 
 #: lms/templates/emails/failed_verification_email.txt
 #: lms/templates/emails/order_confirmation_email.txt
@@ -16707,7 +16731,7 @@ msgstr "{platform_name}团队"
 msgid ""
 "Your payment was successful. You will see the charge below on your next "
 "credit or debit card statement under the company name {merchant_name}."
-msgstr "你已付款成功。你最近一期的信用卡或储蓄卡结单将会包括来自公司名{merchant_name}的扣款。"
+msgstr "您已付款成功。您最近一期的信用卡或储蓄卡结单将会包括来自公司名{merchant_name}的扣款。"
 
 #: lms/templates/emails/order_confirmation_email.txt
 msgid "Your order number is: {order_number}"
@@ -16715,16 +16739,16 @@ msgstr "您的订单号为：{order_number}"
 
 #: lms/templates/emails/passed_verification_email.txt
 msgid "Hi {full_name}"
-msgstr " {full_name} 你好"
+msgstr " {full_name} 您好"
 
 #: lms/templates/emails/passed_verification_email.txt
 msgid "Congratulations! Your ID verification process was successful."
-msgstr "恭喜你的身份ID认证成功。"
+msgstr "恭喜您的身份ID认证成功。"
 
 #: lms/templates/emails/passed_verification_email.txt
 msgid ""
 "Your verification is effective for one year. It will expire on {expiry_date}"
-msgstr "您的验证有效期为一年。它将在{expiry_date}上过期"
+msgstr "您的验证有效期为一年。它将在{expiry_date}过期"
 
 #: lms/templates/emails/photo_submission_confirmation.txt
 msgid "Hi {full_name},"
@@ -16797,7 +16821,7 @@ msgstr "附件CSV文件中的html链接"
 msgid ""
 "After you enroll, you can see the course on your student dashboard. You can "
 "see course materials after the course start date."
-msgstr "在你选课之后，你可以在你的学生课程面板中看到该课程。在课程开始后，你就可以看到课程的相关资料。"
+msgstr "在您选课之后，您可以在您的学生课程面板中看到该课程。在课程开始后，您就可以看到课程的相关资料。"
 
 #. Translators: please translate the text inside [[ ]]. This is meant as a
 #. template for course teams to use.
@@ -16809,7 +16833,7 @@ msgid ""
 "[[Your Signature]]"
 msgstr ""
 "诚挚的，\n"
-"[[你的签名]]"
+"[[您的签名]]"
 
 #: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
 msgid "INVOICE"
@@ -16896,16 +16920,16 @@ msgid ""
 msgstr ""
 "我们无法为您在课程 "
 "{course_name}中的评估{assessment}验证身份。您已经使用了{allowed_attempts}次允许的中的{used_attempts}"
-" 试图验证你的身份。"
+" 试图验证您的身份。"
 
 #: lms/templates/emails/reverification_processed.txt
 msgid ""
 "You must verify your identity before the assessment closes on {due_date}."
-msgstr "你必须核实你的身份在评估关闭{due_date}。"
+msgstr "您必须核实您的身份在评估关闭{due_date}。"
 
 #: lms/templates/emails/reverification_processed.txt
 msgid "To try to verify your identity again, select the following link:"
-msgstr "尝试再次核实你的身份,选择下面的链接:"
+msgstr "尝试再次核实您的身份,选择下面的链接:"
 
 #: lms/templates/emails/reverification_processed.txt
 msgid ""
@@ -16963,7 +16987,7 @@ msgstr "感谢您报名{course_names}，希望您学习旅途愉快。"
 
 #: lms/templates/enrollment/course_enrollment_message.html
 msgid "Thank you for enrolling in:"
-msgstr "感谢你报名："
+msgstr "感谢您报名："
 
 #: lms/templates/enrollment/course_enrollment_message.html
 msgid "We hope you enjoy the course."
@@ -16990,46 +17014,48 @@ msgid "A Note to Learners"
 msgstr "学员须知"
 
 #: lms/templates/financial-assistance/financial-assistance.html
-msgid "Dear edX Learner,"
-msgstr "亲爱的 edX 学员："
+msgid "Dear EliteMBA Learner,"
+msgstr "亲爱的 EliteMBA 学员："
 
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid ""
-"EdX Financial Assistance is a program we created to give learners in all "
-"financial circumstances a chance to earn a Verified Certificate upon "
-"successful completion of an edX course."
-msgstr "edX 经济援助项目旨在让各种经济状况的学员都有一个在成功完成 edX 课程后获得验证证书的机会。"
+"EliteMBA Financial Assistance is a program we created to give learners in "
+"all financial circumstances a chance to earn a Verified Certificate upon "
+"successful completion of an EliteMBA course."
+msgstr "EliteMBA 经济援助项目旨在让各种经济状况的学员都有一个在成功完成 EliteMBA 课程后获得验证证书的机会。"
 
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid ""
 "If you are interested in working toward a Verified Certificate, but cannot "
 "afford to pay the fee, please apply now. Please note that financial "
 "assistance is limited and may not be awarded to all eligible candidates."
-msgstr "如果你对获得验证证书感兴趣但无法承担费用，请现在就来提出申请。请注意，经济援助是有限的且可能无法授予所有符合条件的申请者。"
+msgstr "如果您对获得验证证书感兴趣但无法承担费用，请现在就来提出申请。请注意，经济援助是有限的且可能无法授予所有符合条件的申请者。"
 
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid ""
-"In order to be eligible for edX Financial Assistance, you must demonstrate "
-"that paying the Verified Certificate fee would cause you economic hardship. "
-"To apply, you will be asked to answer a few questions about why you are "
-"applying and how the Verified Certificate will benefit you."
+"In order to be eligible for EliteMBA Financial Assistance, you must "
+"demonstrate that paying the Verified Certificate fee would cause you "
+"economic hardship. To apply, you will be asked to answer a few questions "
+"about why you are applying and how the Verified Certificate will benefit "
+"you."
 msgstr ""
-"要符合 edX "
-"经济援助的资格条件，你必须证明支付验证证书费用会导致你经济困难。为了进行申请，你可能会被要求回答一些关于你为何申请验证证书以及验证证书会给你带来哪些好处的问题。"
+"要符合 EliteMBA "
+"经济援助的资格条件，您必须证明支付验证证书费用会导致您经济困难。为了进行申请，您可能会被要求回答一些关于您为何申请验证证书以及验证证书会给您带来哪些好处的问题。"
 
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid ""
 "If your application is approved, we'll give you instructions for verifying "
-"your identity on edx.org so you can start working toward completing your edX"
-" course."
-msgstr "如果你的申请被批准，我们将为你提供在 edx.org 上验证你的身份的相关说明，以便你可以开始着手完成你的 edx 课程。"
+"your identity on EliteMBA.cn so you can start working toward completing your"
+" EliteMBA course."
+msgstr ""
+"如果您的申请被批准，我们将为您提供在 EliteMBA.cn 上验证您的身份的相关说明，以便您可以开始着手完成您的 EliteMBA 课程。"
 
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid ""
-"EdX is committed to making it possible for you to take high quality courses "
-"from leading institutions regardless of your financial situation, earn a "
-"Verified Certificate, and share your success with others."
-msgstr "无论你的经济状况如何，EdX 都致力于让你从各领先机构获得高质量的课程，让你获得验证证书并与他人分享你的成功。"
+"EliteMBA is committed to making it possible for you to take high quality "
+"courses from leading institutions regardless of your financial situation, "
+"earn a Verified Certificate, and share your success with others."
+msgstr "无论您的经济状况如何，EliteMBA 都致力于让您从各领先机构获得高质量的课程，让您获得验证证书并与他人分享您的成功。"
 
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid "Sincerely, Anant"
@@ -17059,7 +17085,7 @@ msgid ""
 "{begin_strong}Warning:{end_strong} Your browser is not fully supported. We "
 "strongly recommend using {chrome_link} or {ff_link}."
 msgstr ""
-"{begin_strong}警告：{end_strong}并不完全支持你的浏览器。我们强烈推荐使用 {chrome_link} 或 {ff_link}。"
+"{begin_strong}警告：{end_strong}并不完全支持您的浏览器。我们强烈推荐使用 {chrome_link} 或 {ff_link}。"
 
 #: lms/templates/header/navbar-authenticated.html
 #: lms/templates/learner_dashboard/programs.html
@@ -17196,7 +17222,7 @@ msgstr "允许学生发行的证书"
 msgid ""
 "You must successfully generate example certificates before you enable "
 "student-generated certificates."
-msgstr "前你必须成功地生成示例证书使学生证书。"
+msgstr "前您必须成功地生成示例证书使学生证书。"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Generate Certificates"
@@ -17240,7 +17266,7 @@ msgstr "重新生成证书"
 msgid ""
 "To regenerate certificates for your course, choose the learners who will "
 "receive regenerated certificates and click Regenerate Certificates."
-msgstr "要重新生成你的课程证书，请选择将要接收重新生成证书的学员并单击“重新生成证书”。"
+msgstr "要重新生成您的课程证书，请选择将要接收重新生成证书的学员并单击“重新生成证书”。"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Choose learner types for regeneration"
@@ -17285,7 +17311,7 @@ msgid ""
 " a certificate but have been given an exception by the course team. After "
 "you add learners to the exception list, click Generate Exception "
 "Certificates below."
-msgstr "为无资格获得证书但获得课程组例外批准的学员设置生成证书的特殊处理。在你将学员添加至特殊处理列表后，请单击以下“生成特例证书”。"
+msgstr "为无资格获得证书但获得课程组例外批准的学员设置生成证书的特殊处理。在您将学员添加至特殊处理列表后，请单击以下“生成特例证书”。"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Invalidate Certificates"
@@ -18160,7 +18186,7 @@ msgstr "批量添加Beta测试员"
 msgid ""
 "Note: Users must have an activated {platform_name} account before they can "
 "be enrolled as beta testers."
-msgstr "注：用户必须首先拥有已激活的{platform_name}账户方可成为Beta测试员。"
+msgstr "注：用户必须首先拥有已激活的{platform_name}账号方可成为Beta测试员。"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -18381,7 +18407,7 @@ msgstr "每个条形图显示该问题的成绩分布区间"
 msgid ""
 "You can click on any of the bars to list the students that attempted the "
 "problem, along with the grades they received."
-msgstr "你可以点击任一每个条形图去查看所有尝试回答问题的学生名单以及他们获得的成绩"
+msgstr "您可以点击任一每个条形图去查看所有尝试回答问题的学生名单以及他们获得的成绩"
 
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Download Problem Data for all Problems as a CSV"
@@ -18882,7 +18908,7 @@ msgstr "已经准备好进行评分！"
 msgid ""
 "You have finished learning to grade, which means that you are now ready to "
 "start grading."
-msgstr "您已完成了评分学习，这意味着现在你可以开始评分了。"
+msgstr "您已完成了评分学习，这意味着现在您可以开始评分了。"
 
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Start Grading!"
@@ -18964,6 +18990,14 @@ msgid ""
 " and actively seek change."
 msgstr "我们希望把国内外成功的商业管理经验和智慧传授给更多不安于现状且积极求变的弄潮儿。"
 
+#: lms/templates/professors/index.html
+msgid ""
+"We sincerely invite all elite professors, scholars and experts who have been"
+" deeply involved in business management disciplines to develop more "
+"outstanding business talents by transforming intangible wisdom into a "
+"collectible course."
+msgstr "我们诚挚地向所有深耕于商业管理学科的精英教授、学者和专家发出邀请，让我们共同将无形的智慧实化为可典藏的课程，以此培养更多杰出的商业人才。"
+
 #: lms/templates/provider/authorize.html
 msgid ""
 "{start_strong}{application_name}{end_strong} would like to access your data "
@@ -19013,11 +19047,11 @@ msgstr "密码重置已完成"
 #: lms/templates/registration/password_reset_complete.html
 msgid ""
 "Your password has been reset. {start_link}Sign-in to your account.{end_link}"
-msgstr "你的密码已重置。{start_link}登录你的帐号。{end_link}"
+msgstr "您的密码已重置。{start_link}登录您的账号。{end_link}"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Reset Your {platform_name} Password"
-msgstr "重置你的 {platform_name} 密码"
+msgstr "重置您的 {platform_name} 密码"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Invalid Password Reset Link"
@@ -19029,6 +19063,8 @@ msgid ""
 " your password, go to the {start_link}sign-in{end_link} page and select "
 "{start_strong}Forgot password{end_strong}."
 msgstr ""
+"密码重置链接无效。此链接可能已被使用。如需重置您的密码，请进入{start_link}登录页面{end_link} "
+"并点击{start_strong}忘记密码{end_strong}。"
 
 #: lms/templates/registration/password_reset_done.html
 msgid "Password reset successful"
@@ -19103,7 +19139,7 @@ msgstr "下载CSV数据"
 #: lms/templates/shoppingcart/download_report.html
 msgid ""
 "There was an error in your date input.  It should be formatted as YYYY-MM-DD"
-msgstr "你输入的日期有误。其格式应为YYYY-MM-DD"
+msgstr "您输入的日期有误。其格式应为YYYY-MM-DD"
 
 #: lms/templates/shoppingcart/download_report.html
 msgid "These reports are delimited by start and end dates."
@@ -19175,7 +19211,7 @@ msgid ""
 "Please send each professional one of these unique registration codes to "
 "enroll into the course. The confirmation/receipt email you will receive has "
 "an example email template with directions for the individuals enrolling."
-msgstr "请将每个专业的其中一个独特的注册码注册到课程。确认/收据邮件你会收到一个电子邮件模板示例说明个人报名。"
+msgstr "请将每个专业的其中一个独特的注册码注册到课程。确认/收据邮件您会收到一个电子邮件模板示例说明个人报名。"
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Enrollment Link"
@@ -19288,7 +19324,7 @@ msgstr "{course_number} {course_title}封面图片"
 #: lms/templates/shoppingcart/registration_code_receipt.html
 #: lms/templates/shoppingcart/registration_code_redemption.html
 msgid "Confirm your enrollment for: {span_start}course dates{span_end}"
-msgstr "确认你的选课：{span_start}课程日期{span_end}"
+msgstr "确认您的选课：{span_start}课程日期{span_end}"
 
 #: lms/templates/shoppingcart/registration_code_receipt.html
 msgid "{course_name}"
@@ -19301,21 +19337,21 @@ msgid ""
 "Check your {link_start}course dashboard{link_end} to see if you're enrolled "
 "in the course, or contact your company's administrator."
 msgstr ""
-"你点击的这个选课码的链接已经使用过了。检查你的{link_start}课程面板{link_end}查看你是否已经注册了这们课程，或者联系你公司的管理员。"
+"您点击的这个选课码的链接已经使用过了。检查您的{link_start}课程面板{link_end}查看您是否已经注册了这们课程，或者联系您公司的管理员。"
 
 #: lms/templates/shoppingcart/registration_code_receipt.html
 #: lms/templates/shoppingcart/registration_code_redemption.html
 msgid ""
 "You have successfully enrolled in {course_name}. This course has now been "
 "added to your dashboard."
-msgstr "你已经成功的选修了 {course_name}，这门课程现已添加到你的课程面板中。"
+msgstr "您已经成功的选修了 {course_name}，这门课程现已添加到您的课程面板中。"
 
 #: lms/templates/shoppingcart/registration_code_receipt.html
 #: lms/templates/shoppingcart/registration_code_redemption.html
 msgid ""
 "You're already enrolled for this course. Visit your "
 "{link_start}dashboard{link_end} to see the course."
-msgstr "你已经选修了这门课程，请前往你的{link_start}课程面板{link_end}查看该课程。"
+msgstr "您已经选修了这门课程，请前往您的{link_start}课程面板{link_end}查看该课程。"
 
 #: lms/templates/shoppingcart/registration_code_receipt.html
 msgid "The course you are enrolling for is full."
@@ -19521,7 +19557,7 @@ msgstr " 目前{platform_name}平台的服务器已经超负荷"
 
 #: lms/templates/student_account/account_settings.html
 msgid "Account Settings"
-msgstr "账户设置"
+msgstr "账号设置"
 
 #: lms/templates/student_account/account_settings.html
 msgid "Mobile"
@@ -19709,7 +19745,7 @@ msgstr "这门课程申请认证证书的截止日期已经过了。"
 
 #: lms/templates/verify_student/pay_and_verify.html
 msgid "Upgrade Your Enrollment For {course_name}."
-msgstr "为{course_name}更新你的选课信息。"
+msgstr "为{course_name}更新您的选课信息。"
 
 #: lms/templates/verify_student/pay_and_verify.html
 msgid "Receipt For {course_name}"
@@ -19734,7 +19770,7 @@ msgid ""
 "{strong_start}webcam is plugged in, turned on, and allowed to function in "
 "your web browser (commonly adjustable in your browser settings).{strong_end}"
 msgstr ""
-"请确认您的浏览器已更新至{strong_start}{a_start}最新的可用版本{a_end}{strong_end}。同时，请确保您的{strong_start}网络摄像头已插好、已开启且在你的网络浏览器(通常可在您的浏览器设置中进行调节)中可正常使用。{strong_end}"
+"请确认您的浏览器已更新至{strong_start}{a_start}最新的可用版本{a_end}{strong_end}。同时，请确保您的{strong_start}网络摄像头已插好、已开启且在您的网络浏览器(通常可在您的浏览器设置中进行调节)中可正常使用。{strong_end}"
 
 #: lms/templates/verify_student/reverify.html
 msgid "Re-Verification"
@@ -19932,8 +19968,8 @@ msgid ""
 msgstr "证书在我的简历上添了一笔 - 努力的收获让我离梦想的事业更近一部！"
 
 #: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
-msgid "{learner_name}, edX Learner"
-msgstr "{learner_name}，edX学员"
+msgid "{learner_name}, EliteMBA Learner"
+msgstr "{learner_name}，EliteMBA学员"
 
 #: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
 msgid ""
@@ -20043,7 +20079,7 @@ msgstr "我的统计数据（Beta）"
 #. their edX account.
 #: openedx/features/learner_profile/static/learner_profile/templates/third_party_auth.html
 msgid "Connected Accounts"
-msgstr "已关联的帐号"
+msgstr "已关联的账号"
 
 #: openedx/features/learner_profile/static/learner_profile/templates/third_party_auth.html
 msgid "Linked"
@@ -20226,14 +20262,8 @@ msgid "Schools & Partners"
 msgstr "学校 & 伙伴"
 
 #: themes/normal-theme/lms/templates/footer.html
-msgid "Reform·Innovation·Future"
-msgstr "变革 • 创新 • 未来"
-
-#: themes/normal-theme/lms/templates/footer.html
-#: themes/normal-theme/lms/templates/static_templates/contact.html
-#: membership/templates/membership/card.html
-msgid "Elite Education"
-msgstr "英荔教育"
+msgid "Learn to Change·Change to Progress"
+msgstr "学则变 · 变则进"
 
 #: themes/normal-theme/lms/templates/footer.html
 #: themes/normal-theme/lms/templates/static_templates/about.html
@@ -20317,7 +20347,7 @@ msgstr "学则变 · 变则进 —— 英荔商学院"
 #. untranslated. See http://open.edx.org for more information.
 #: themes/normal-theme/lms/templates/index_overlay.html
 msgid "Enjoy high-value MBA curriculum with ￥99.84 monthly payment!"
-msgstr "月均99.84元 畅学高价值MBA课程！"
+msgstr "月均99.84元，畅学高价值MBA课程！"
 
 #: themes/normal-theme/lms/templates/certificates/_accomplishment-banner.html
 msgid "Download Certificate"
@@ -20357,10 +20387,18 @@ msgid ""
 "effective means of transmission and increase the reach of knowledge. Here, "
 "we would like to offer sincere invitations to experts and professors, and "
 "look forward to creating and introducing more high-quality curriculum "
-"resources, so that knowledge can generate more value in a diverse world. For"
-" course cooperation, please contact"
+"resources, so that knowledge can generate more value in a diverse world. "
 msgstr ""
-"尽己所能地向更多学习者传递知识是教育者们的共同追求。英荔期望为教育者提供更有效的传递途径，增加知识的触及范围。在此，向各位专家、教授发出诚挚的开课邀请，期待创造、引入更多优质的课程资源，让知识在多元的世界产生更多元的价值。课程合作请联系"
+"尽己所能地向更多学习者传递知识是教育者们的共同追求。英荔期望为教育者提供更有效的传递途径，增加知识的触及范围。在此，向各位专家、教授发出诚挚的开课邀请，期待创造、引入更多优质的课程资源，让知识在多元的世界产生更多元的价值。"
+
+#: themes/normal-theme/lms/templates/static_templates/about.html
+msgid "For course cooperation, please contact: "
+msgstr "课程合作请联系："
+
+#: themes/normal-theme/lms/templates/static_templates/about.html
+#: themes/normal-theme/lms/templates/static_templates/join_us.html
+msgid "."
+msgstr "。"
 
 #: themes/normal-theme/lms/templates/static_templates/about.html
 msgid "Education should guide society, not chase society"
@@ -20383,10 +20421,9 @@ msgstr "我们的使命"
 
 #: themes/normal-theme/lms/templates/static_templates/about.html
 msgid ""
-"Providing an inspiring and innovative educational experience that enables "
-"learners to have a convenient and inclusive learning environment that "
-"promotes the success of their professional and personal development."
-msgstr "提供启发和创新的教育体验，使学习者有一个便捷和包容的学习环境，促进他们职业和个人发展的成功。"
+"Providing individuals, organizations with the knowledge, technology and "
+"platform for lifelong learning."
+msgstr "为个人和组织提供终身学习的知识、技术与平台。"
 
 #: themes/normal-theme/lms/templates/static_templates/about.html
 msgid "Our Vision"
@@ -20395,6 +20432,11 @@ msgstr "我们的愿景"
 #: themes/normal-theme/lms/templates/static_templates/about.html
 msgid "To become a reputable brand of digital education in China."
 msgstr "成为中国享有声誉的数字化教育品牌。"
+
+#: themes/normal-theme/lms/templates/static_templates/contact.html
+#: membership/templates/membership/card.html
+msgid "Elite Education"
+msgstr "英荔教育"
 
 #: themes/normal-theme/lms/templates/static_templates/contact.html
 msgid ""
@@ -20411,8 +20453,8 @@ msgid "Course Cooperation"
 msgstr "课程合作"
 
 #: themes/normal-theme/lms/templates/static_templates/contact.html
-msgid "Contact: Miss Huang"
-msgstr "联系人：黄小姐"
+msgid "Contact: Mr. Chen"
+msgstr "联系人：陈先生"
 
 #: themes/normal-theme/lms/templates/static_templates/contact.html
 msgid "Human Resources and Recruitment"
@@ -20431,8 +20473,12 @@ msgid "Business Cooperation"
 msgstr "商务合作"
 
 #: themes/normal-theme/lms/templates/static_templates/contact.html
-msgid "General Information"
-msgstr "综合资讯"
+msgid "Enterprise Procurement"
+msgstr "企业采购"
+
+#: themes/normal-theme/lms/templates/static_templates/contact.html
+msgid "Contact: Ms. Liao"
+msgstr "联系人：廖小姐"
 
 #: themes/normal-theme/lms/templates/static_templates/contact.html
 msgid "System Bugs"
@@ -20454,7 +20500,7 @@ msgid ""
 "referred to as 'User') must carefully read these terms and agree to this "
 "statement before accepting EliteMBA service."
 msgstr ""
-"英荔教育（www.elitemba.cn）的产品及服务由广东英荔国际教育科技有限公司（以下简称“英荔”或“我们”）提供。本免责声明（以下简称“本声明”）适用于英荔的网站、在计算机/手机/平板电脑或其它设备上使用的英荔的应用程序和其它产品及服务。英荔用户（以下简称“用户”）在接受英荔服务之前，请务必仔细阅读本条款并同意本声明"
+"英荔商学院（www.EliteMBA.cn）的产品及服务由广东英荔国际教育科技有限公司（以下简称“英荔”或“我们”）提供。本免责声明（以下简称“本声明”）适用于英荔的网站、在计算机/手机/平板电脑或其他设备上使用的英荔的应用程序和其他产品及服务。英荔用户（以下简称“用户”）在接受英荔服务之前，请务必仔细阅读本条款并同意本声明"
 
 #: themes/normal-theme/lms/templates/static_templates/disclaimer.html
 #: themes/normal-theme/lms/templates/static_templates/honor.html
@@ -20559,7 +20605,7 @@ msgid ""
 "of Elite. As the content publisher, it is the responsibility of the content "
 "to be published. All the disputes arising from the published content shall "
 "be the legal and joint responsibility of the publisher of the content. "
-"Eliteu does not assume any legal and joint responsibility. "
+"EliteMBA does not assume any legal and joint responsibility. "
 msgstr ""
 "2.  "
 "用户在英荔发表的内容（包含但不限于英荔目前各产品功能里的内容）仅表明其个人的立场和观点，并不代表英荔的立场或观点。作为内容的发表者，需自行对所发表内容负责，因所发表内容引发的一切纠纷，由该内容的发表者承担全部法律及连带责任。英荔不承担任何法律及连带责任。"
@@ -20595,7 +20641,7 @@ msgstr "附则"
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 msgid ""
 "EliteMBA reserves the rights to interpret, modify and update the Disclaimer."
-msgstr "对免责声明的解释、修改及更新权均属于英荔教育所有。"
+msgstr "对免责声明的解释、修改及更新权均属于英荔所有。"
 
 #: themes/normal-theme/lms/templates/static_templates/disclaimer.html
 #: themes/normal-theme/lms/templates/static_templates/honor.html
@@ -20632,7 +20678,7 @@ msgid ""
 "published by EliteMBA related to those services. All of the aforementioned "
 "guidelines and rules shall be considered as a part of this Agreement."
 msgstr ""
-"英荔教育（www.elitemba.cn）的产品及服务由广东英荔国际教育科技有限公司（以下简称“英荔”或“我们”）提供。本使用协议（以下简称“使用协议”）适用于英荔的网站、在计算机/手机/平板电脑或其它设备上使用的英荔的应用程序和其它产品及服务。使用协议的内容可由英荔不定期修改、变更。一旦变动产生，我们将随即于使用协议上公布并更新生效日期。修改后的使用协议一旦公布即有效代替原来的使用协议。您应定期查看以了解更新后的服务条款，若您继续使用我们的服务即构成您对本服务条款及其任何更新版本的同意。此外，当英荔用户使用英荔特殊服务（包括但不限于除网站基本服务外的其他具时效性的市场活动服务）时，英荔用户应遵守英荔随时公布的与该服务相关的指引和规则。前述所有的指引和规则，均构成本使用协议的一部分。"
+"英荔商学院（www.EliteMBA.cn）的产品及服务由广东英荔国际教育科技有限公司（以下简称“英荔”或“我们”）提供。本使用协议（以下简称“使用协议”）适用于英荔的网站、在计算机/手机/平板电脑或其他设备上使用的英荔的应用程序和其他产品及服务。使用协议的内容可由英荔不定期修改、变更。一旦变动产生，我们将随即于使用协议上公布并更新生效日期。修改后的使用协议一旦公布即有效代替原来的使用协议。您应定期查看以了解更新后的服务条款，若您继续使用我们的服务即构成您对本服务条款及其任何更新版本的同意。此外，当英荔用户使用英荔特殊服务（包括但不限于除网站基本服务外的其他具时效性的市场活动服务）时，英荔用户应遵守英荔随时公布的与该服务相关的指引和规则。前述所有的指引和规则，均构成本使用协议的一部分。"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -20667,7 +20713,7 @@ msgid ""
 "issues. EliteMBA reserves the right to suspend any part of the Service for "
 "any maintenance, upgrade or other purpose without prior notice."
 msgstr ""
-"英荔目前向用户提供英荔自主制作的一系列课程服务（包括但不限于课程视频、测验题目、考试、课程资料、笔记以及助教服务）。除非本使用协议另有其它明示规定，英荔增加或强化此服务的任何新功能，包括所推出的新产品，均受到本使用协议之规范。用户了解并同意，本服务仅依其当前所呈现的状况提供，对于任何用户信息或个人化设定之失效、删除、传递错误、未予储存或其它任何问题，英荔均不承担任何责任。英荔保留不经事先通知因维修保养、升级或其它目的而暂停本服务任何部分的权利。"
+"英荔目前向用户提供英荔自主制作的一系列课程服务（包括但不限于课程视频、测验题目、考试、课程资料、笔记以及助教服务）。除非本使用协议另有其他明示规定，英荔增加或强化此服务的任何新功能，包括所推出的新产品，均受到本使用协议之规范。用户了解并同意，本服务仅依其当前所呈现的状况提供，对于任何用户信息或个人化设定之失效、删除、传递错误、未予储存或其他任何问题，英荔均不承担任何责任。英荔保留不经事先通知因维修保养、升级或其他目的而暂停本服务任何部分的权利。"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -20693,7 +20739,7 @@ msgid ""
 "laws and regulations, EliteMBA may terminate to offer service to the User at"
 " any time without prior notice. "
 msgstr ""
-"同时如果英荔有理由认为用户的任何行为，包括但不限于用户的任何言论和其它行为违反或可能违反国家法律和法规的任何规定，英荔可在任何时候不经任何事先通知终止向用户提供服务。"
+"同时，如果英荔有理由认为用户的任何行为，包括但不限于用户的任何言论和其他行为违反或可能违反国家法律和法规的任何规定，英荔可在任何时候不经任何事先通知终止向用户提供服务。"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -20713,7 +20759,7 @@ msgid ""
 "to suspend or terminate the User's account and refuse the User to use all or"
 " any part of the Service now and in the future.  "
 msgstr ""
-"为能使用本服务，用户同意以下事项：依本服务提示填写正确的注册账号（邮箱地址及/或手机号）、密码，并确保今后更新的登录账号、头像等资料的有效性和合法性。若用户提供任何违法、不道德或英荔认为不适合在本网站上展示的资料；或者英荔有理由怀疑用户的资料属于程序或恶意操作，英荔有权暂停或终止用户的帐号，并拒绝用户于现在和未来使用本服务之全部或任何部分。"
+"为了能使用本服务，用户同意以下事项：依本服务提示填写正确的注册账号（邮箱地址及/或手机号）、密码，并确保今后更新的登录账号、头像等资料的有效性和合法性。若用户提供任何违法、不道德或英荔认为不适合在本网站上展示的资料，或者英荔有理由怀疑用户的资料属于程序或恶意操作，英荔有权暂停或终止用户的账号，并拒绝用户于现在和未来使用本服务之全部或任何部分。"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 msgid ""
@@ -20727,32 +20773,32 @@ msgstr ""
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
 msgid "V. User Accounts, Passwords and Security"
-msgstr "五、用户帐号、密码及安全"
+msgstr "五、用户账号、密码及安全"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
 msgid ""
 "After completing the registration process for this service and successfully "
 "registered, the User can log in to the account of EliteMBA (hereinafter "
-"referred to as the ‘account’) using their email address and or mobile number"
+"referred to as the ‘account’) using their email address and/or mobile number"
 " and password. Users are responsible for protecting the security of their "
 "accounts."
 msgstr ""
-"完成本服务的注册程序并成功注册之后，用户可使用其邮箱地址及或手机号码和密码，登录到用户在英荔的帐号（以下简称“帐号”）。用户须承担保障自己帐号安全的责任。"
+"完成本服务的注册程序并成功注册之后，用户可使用其邮箱地址及/或手机号码和密码，登录到用户在英荔的账号（以下简称“账号”）。用户须承担保障自己账号安全的责任。"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
 msgid ""
 "The user is solely responsible for all passwords used and the activities of "
 "the account. User agrees:"
-msgstr "用户应对所有使用的密码及帐号的活动负全部责任。用户同意："
+msgstr "用户应对所有使用的密码及账号的活动负全部责任。用户同意："
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
 msgid ""
 "1. Upon the occurrence of noticing any unauthorized account activity or "
 "other security issue, User shall contact and notify E-ducation immediately. "
-msgstr "1.  用户的英荔帐号遭到未获授权的使用，或者发生其它任何安全问题时，用户将立即通知英荔；"
+msgstr "1.  用户的英荔账号遭到未获授权的使用，或者发生其他任何安全问题时，用户将立即通知英荔；"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -20760,7 +20806,7 @@ msgid ""
 "2. If the user does not keep his/her own account number and password, and "
 "therefore any loss or damage caused by the User, EliteMBA cannot and will "
 "not bear any responsibility;"
-msgstr "2.  如果用户未保管好自己的帐号和密码，因此而产生的任何损失或损害，英荔无法也不承担任何责任；"
+msgstr "2.  如果用户未保管好自己的账号和密码，因此而产生的任何损失或损害，英荔无法也不承担任何责任；"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -20770,7 +20816,7 @@ msgid ""
 "Elite or any other third party due to the failure by the User in securing "
 "their own Account and password, the aforementioned User shall take full "
 "responsible."
-msgstr "3.  每个用户都要对其帐号中的所有行为和事件负全责。如果用户未保管好自己的帐号和密码而对用户、英荔或第三方造成的损害，用户将负全部责任。"
+msgstr "3.  每个用户都要对其账号中的所有行为和事件负全责。如果用户未保管好自己的账号和密码而对用户、英荔或第三方造成的损害，用户将负全部责任。"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -20783,7 +20829,7 @@ msgid ""
 "The registration information provided by the User and certain other "
 "information about the User retained by the company will be subject to the "
 "laws of China's privacy and the company's Privacy Policy."
-msgstr "用户提供的登记资料及英荔保留的有关用户的若干其它资料将受到中国有关隐私的法律和本公司《隐私政策》之规范。"
+msgstr "用户提供的登记资料及英荔保留的有关用户的若干其他资料将受到中国有关隐私的法律和本公司《隐私政策》之规范。"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -20810,7 +20856,7 @@ msgid ""
 "User from using this service, to keep relevant record and report to "
 "authorities concerned."
 msgstr ""
-"根据有关法律法规，英荔在此郑重提醒用户注意，任何经由本服务而发布、上传的文字、资讯、资料、照片、图形、视讯、信息或其它资料（以下简称“内容 "
+"根据有关法律法规，英荔在此郑重提醒用户注意，任何经由本服务而发布、上传的文字、资讯、资料、照片、图形、视讯、信息或其他资料（以下简称“内容 "
 "”），无论系公开还是私下传送，均由内容提供者承担责任。英荔仅为用户提供内容存储空间，无法控制经由本服务传送之内容，因此不保证内容的正确性、完整性或品质。用户已预知使用本服务时，可能会接触到令人不快、不适当或令人厌恶之内容。在任何情况下，英荔均不为任何内容负责，但英荔有权依法停止传输任何前述内容并采取相应行动，包括但不限于暂停用户使用本服务的全部或部分，保存有关记录，并向有关机关报告。"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
@@ -20823,14 +20869,14 @@ msgstr "八、用户行为"
 msgid ""
 "The User agrees that the Service will not be used for any illegal or "
 "improper activities, including but not limited to the following:"
-msgstr "用户同意将不会利用本服务进行任何违法或不正当的活动，包括但不限于下列行为∶"
+msgstr "用户同意将不会利用本服务进行任何违法或不正当的活动，包括但不限于下列行为："
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
 msgid ""
 "1. Publish or otherwise transmit information that contains one of the "
 "following:"
-msgstr "1.  发布或以其它方式传送含有下列内容之一的信息："
+msgstr "1.  发布或以其他方式传送含有下列内容之一的信息："
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 msgid "Opposing to the basic principles established by the Constitution;"
@@ -20885,14 +20931,14 @@ msgid ""
 "Contains false, fraudulent, harmful, coercive, infringing on the privacy of "
 "others, harassment, infringement, slander, vulgarity, jealousy, or other "
 "morally offensive content;"
-msgstr "含有虚假、诈骗、有害、胁迫、侵害他人隐私、骚扰、侵害、中伤、粗俗、猥亵、或其它道德上令人反感的内容；"
+msgstr "含有虚假、诈骗、有害、胁迫、侵害他人隐私、骚扰、侵害、中伤、粗俗、猥亵、或其他道德上令人反感的内容；"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
 msgid ""
 "Contains other content restricted or prohibited by Chinese laws, "
 "regulations, rules, regulations, and any legally binding norm;"
-msgstr "含有中国法律、法规、规章、条例以及任何具有法律效力之规范所限制或禁止的其它内容的；"
+msgstr "含有中国法律、法规、规章、条例以及任何具有法律效力之规范所限制或禁止的其他内容的；"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 msgid ""
@@ -20921,7 +20967,7 @@ msgid ""
 "under a confidentiality contract)"
 msgstr ""
 "4.  "
-"将依据任何法律或合约或法定关系（例如由于雇佣关系和依据保密合约所得知或揭露之内部资料、专属及机密资料）知悉但无权传送之任何内容加以发布、发送电子邮件或以其它方式传送；"
+"将依据任何法律或合约或法定关系（例如由于雇佣关系和依据保密合约所得知或揭露之内部资料、专属及机密资料）知悉但无权传送之任何内容加以发布、发送电子邮件或以其他方式传送；"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -20929,7 +20975,7 @@ msgid ""
 "5. Publish or otherwise transmit the content of copyrights, patents, "
 "trademarks, trade secrets, or other proprietary rights (hereinafter referred"
 " to as ‘exclusive rights’) that infringe upon others;"
-msgstr "5.  将侵害他人著作权、专利权、商标权、商业秘密、或其它专属权利（以下简称“专属权利”）之内容加以发布或以其它方式传送；"
+msgstr "5.  将侵害他人著作权、专利权、商标权、商业秘密、或其他专属权利（以下简称“专属权利”）之内容加以发布或以其他方式传送；"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -20938,7 +20984,7 @@ msgid ""
 "material, 'spam', 'spamming', 'chain mail', 'direct sales' or any other form"
 " of persuasive material;"
 msgstr ""
-"6.  将任何广告信函、促销资料、“垃圾邮件”、“滥发信件”、“连锁信件”、“直销”或其它任何形式的劝诱资料加以发布、发送或以其它方式传送；"
+"6.  将任何广告信函、促销资料、“垃圾邮件”、“滥发信件”、“连锁信件”、“直销”或其他任何形式的劝诱资料加以发布、发送或以其他方式传送；"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -20950,7 +20996,7 @@ msgid ""
 "any computer software, hardware or communication equipment;"
 msgstr ""
 "7.  "
-"将设计目的在于干扰、破坏或限制任何计算机软件、硬件或通讯设备功能之计算机病毒（包括但不限于木马程序、蠕虫、定时炸弹、删除蝇（以下简称“病毒”）或其它计算机代码、档案和程序之任何资料，加以发布、发送或以其它方式传送；"
+"将设计目的在于干扰、破坏或限制任何计算机软件、硬件或通讯设备功能之计算机病毒（包括但不限于木马程序、蠕虫、定时炸弹、删除蝇（以下简称“病毒”）或其他计算机代码、档案和程序之任何资料，加以发布、发送或以其他方式传送；"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 msgid ""
@@ -20962,7 +21008,7 @@ msgstr "8.  干扰或破坏本服务或与本服务相连线之服务器和网
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
 msgid "9. Tracking, cyber manhunting or harassing others in any other ways;"
-msgstr "9.  跟踪、人肉搜索或以其它方式骚扰他人；"
+msgstr "9.  跟踪、人肉搜索或以其他方式骚扰他人；"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -20977,7 +21023,7 @@ msgid ""
 "11. Intercept, tamper with, collect, store or delete personal information, "
 "on-site mail or other data  without legal authorization, or use such "
 "information for any illegal or improper purpose. "
-msgstr "11.  未经合法授权而截获、篡改、收集、储存或删除他人个人信息、站内邮件或其它数据资料，或将获知的此类资料用于任何非法或不正当目的。"
+msgstr "11.  未经合法授权而截获、篡改、收集、储存或删除他人个人信息、站内邮件或其他数据资料，或将获知的此类资料用于任何非法或不正当目的。"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 msgid ""
@@ -20989,7 +21035,7 @@ msgid ""
 "provided by the Service that violates these Terms or any other content that "
 "is controversial to EliteMBA."
 msgstr ""
-"用户已认可英荔未对用户的使用行为进行全面控制，用户使用任何内容时，包括依赖前述内容之正确性、完整性或实用性时，用户同意将自行加以判断并承担所有风险，而不依赖于英荔。但英荔依其自行之考虑，可拒绝和删除经由本服务提供之违反本条款的或其它引起英荔异议的任何内容。"
+"用户已认可英荔未对用户的使用行为进行全面控制，用户使用任何内容时，包括依赖前述内容之正确性、完整性或实用性时，用户同意将自行加以判断并承担所有风险，而不依赖于英荔。但英荔依其自行之考虑，可拒绝和删除经由本服务提供之违反本条款的或其他引起英荔异议的任何内容。"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -21022,7 +21068,7 @@ msgstr "4.  保护英荔、其用户及公众之权利、财产或个人安全
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 msgid "5. Other conditions that EliteMBA deems necessary."
-msgstr "5.  其它英荔认为有必要的情况。"
+msgstr "5.  其他英荔认为有必要的情况。"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -21081,7 +21127,7 @@ msgid ""
 "other partners and employees from damage and assume all legal liabilities "
 "arising therefrom."
 msgstr ""
-"由于用户通过本服务提供、发布或传送之内容、用户与本服务连线、用户违反本使用协议、或用户侵害他人任何权利因而衍生或导致任何第三人提出任何索赔或请求，包括合理的律师费，用户同意赔偿英荔及其子公司、关联企业、高级职员、代理人、品牌共有人或其它合作伙伴及员工，并使其免受损害，"
+"由于用户通过本服务提供、发布或传送之内容、用户与本服务连线、用户违反本使用协议、或用户侵害他人任何权利因而衍生或导致任何第三人提出任何索赔或请求，包括合理的律师费，用户同意赔偿英荔及其子公司、关联企业、高级职员、代理人、品牌共有人或其他合作伙伴及员工，并使其免受损害，"
 " 并承担由此引发的全部法律责任。"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
@@ -21095,7 +21141,7 @@ msgid ""
 "The User agrees not to copy, copy, sell, resell or use it for any other "
 "commercial purpose for the use or acquisition of any part of the Service or "
 "the Service."
-msgstr "用户同意不对本服务任何部分或本服务之使用或获得，进行复制、拷贝、出售、转售或用于任何其它商业目的。"
+msgstr "用户同意不对本服务任何部分或本服务之使用或获得，进行复制、拷贝、出售、转售或用于任何其他商业目的。"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -21108,7 +21154,7 @@ msgid ""
 "The User agrees that EliteMBA shall be liable for any information, "
 "communication materials and other content posted or transmitted through the "
 "Service, if it is deleted or not stored."
-msgstr "通过本服务发布或传送之任何信息、通讯资料和其它内容，如被删除或未予储存，用户同意英荔毋须承担任何责任。"
+msgstr "通过本服务发布或传送之任何信息、通讯资料和其他内容，如被删除或未予储存，用户同意英荔毋须承担任何责任。"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -21147,7 +21193,7 @@ msgid ""
 "related data and files are closed or deleted, EliteMBA does not assume any "
 "liability to the User or any third party."
 msgstr ""
-"用户同意英荔基于其自行之考虑，因任何理由（包含但不限于长期对账号无任何操作，或英荔认为用户已经违反本使用协议的文字及精神）终止用户的帐号或本服务之使用（或服务之任何部分），并将用户在本服务内任何内容加以移除并删除。用户同意依本使用协议任何规定提供之本服务，无需进行事先通知即可中断或终止，用户承认并同意，英荔可立即关闭或删除用户的帐号及用户帐号中所有相关信息及文件，及/或禁止继续使用前述文件或本服务。此外，用户同意若本服务之使用被中断或终止或用户的帐号及相关信息和文件被关闭或删除，英荔对用户或任何第三人均不承担任何责任。"
+"用户同意英荔基于其自行之考虑，因任何理由（包含但不限于长期对账号无任何操作，或英荔认为用户已经违反本使用协议的文字及精神）终止用户的账号或本服务之使用（或服务之任何部分），并将用户在本服务内任何内容加以移除并删除。用户同意依本使用协议任何规定提供之本服务，无需进行事先通知即可中断或终止，用户承认并同意，英荔可立即关闭或删除用户的账号及用户账号中所有相关信息及文件，及/或禁止继续使用前述文件或本服务。此外，用户同意若本服务之使用被中断或终止或用户的账号及相关信息和文件被关闭或删除，英荔对用户或任何第三人均不承担任何责任。"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -21167,7 +21213,7 @@ msgid ""
 "foregoing transactions or the aforementioned advertisers and other third "
 "parties."
 msgstr ""
-"用户通过本网站与广告商及其他第三方进行任何形式的通讯或商业往来，或参与促销活动，包含相关商品或服务之付款及交付，以及达成的其它任何相关条款、条件、保证或声明，完全为用户与广告商及其他第三方之间之行为。用户因前述任何交易或前述广告商及其他第三方而遭受的任何性质的损失或损害，英荔对此不负任何法律责任。"
+"用户通过本网站与广告商及其他第三方进行任何形式的通讯或商业往来，或参与促销活动，包含相关商品或服务之付款及交付，以及达成的其他任何相关条款、条件、保证或声明，完全为用户与广告商及其他第三方之间之行为。用户因前述任何交易或前述广告商及其他第三方而遭受的任何性质的损失或损害，英荔对此不负任何法律责任。"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -21194,7 +21240,7 @@ msgid ""
 "rights in the software. The User agrees to use the Service through the "
 "interface provided by EliteMBA and not in any other way."
 msgstr ""
-"用户也了解并同意，经由本服务或广告商向用户呈现之赞助广告或信息所包含之内容，亦受到著作权、商标权、服务商标、专利权或其它专属权利之法律保护。未经英荔或广告商明示授权，用户不得修改、出租、出借、出售、散布本服务或软件之任何部份或全部，或据以制作衍生著作，或使用擅自修改后的软件，包括但不限于为了未经授权而使用本服务之目的。英荔仅授予用户个人、不可移转及非专属之使用权，使用户得于单机计算机使用其软件之目的码，但用户不得（并不得允许任何第三人）复制、修改、创作衍生著作、进行还原工程、反向组译，或以其它方式发现原始码，或出售、转让、再授权或提供软件设定担保，或以其它方式移转软件之任何权利。用户同意将通过由英荔所提供的界面而非任何其它途径使用本服务。"
+"用户也了解并同意，经由本服务或广告商向用户呈现之赞助广告或信息所包含之内容，亦受到著作权、商标权、服务商标、专利权或其他专属权利之法律保护。未经英荔或广告商明示授权，用户不得修改、出租、出借、出售、散布本服务或软件之任何部份或全部，或据以制作衍生著作，或使用擅自修改后的软件，包括但不限于为了未经授权而使用本服务之目的。英荔仅授予用户个人、不可移转及非专属之使用权，使用户得于单机计算机使用其软件之目的码，但用户不得（并不得允许任何第三人）复制、修改、创作衍生著作、进行还原工程、反向组译，或以其他方式发现原始码，或出售、转让、再授权或提供软件设定担保，或以其他方式移转软件之任何权利。用户同意将通过由英荔所提供的界面而非任何其他途径使用本服务。"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -21236,7 +21282,7 @@ msgstr "3.  任何第三方在本服务中所作之声明或行为；"
 msgid ""
 "4. Other matters related to the Service, except as explicitely provided in "
 "this Agreement of Use;"
-msgstr "4.  与本服务相关的其它事宜，但本使用协议有明确规定的除外；"
+msgstr "4.  与本服务相关的其他事宜，但本使用协议有明确规定的除外；"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -21260,7 +21306,7 @@ msgid ""
 "consent of EliteMBA, or to indicate that the User has the right to display, "
 "use or otherwise process the EliteMBA Mark."
 msgstr ""
-"英荔教育、英荔以及其它英荔注册商标、标志及产品、服务名称，均为英荔公司之商标（以下简称“英荔标记”）。未经英荔事先书面同意，用户同意不将英荔标记以任何方式展示或使用或作其它处理，或表示用户有权展示、使用或另行处理英荔标记。"
+"英荔教育、英荔商学院、英荔以及其他英荔注册商标、标志及产品、服务名称，均为英荔公司之商标（以下简称“英荔标记”）。未经英荔事先书面同意，用户同意不将英荔标记以任何方式展示或使用或作其他处理，或表示用户有权展示、使用或另行处理英荔标记。"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -21305,7 +21351,7 @@ msgid ""
 "appropriate circumstances, EliteMBA may, at its discretion, terminate the "
 "account of the User who infringes or violates the rights of others."
 msgstr ""
-"英荔尊重他人的任何权利（包括知识产权），同时也要求我们的使用者也尊重他人之权利。英荔在适当情况下，可自行决定终止侵害或违反他人权利之使用者的帐号。"
+"英荔尊重他人的任何权利（包括知识产权），同时也要求我们的使用者也尊重他人之权利。英荔在适当情况下，可自行决定终止侵害或违反他人权利之使用者的账号。"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 msgid ""
@@ -21350,7 +21396,7 @@ msgid ""
 "binding on both parties."
 msgstr ""
 "2.  "
-"本使用协议及用户与英荔之关系，均受到中华人民共和国法律管辖。用户与英荔就本服务、本使用协议或其它有关事项发生的争议，应首先友好协商解决，协商不成时应提请中国国际经济贸易仲裁委员会仲裁，仲裁裁决是终局性的，对双方均有约束力；"
+"本使用协议及用户与英荔之关系，均受到中华人民共和国法律管辖。用户与英荔就本服务、本使用协议或其他有关事项发生的争议，应首先友好协商解决，协商不成时应提请中国国际经济贸易仲裁委员会仲裁，仲裁裁决是终局性的，对双方均有约束力；"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -21369,7 +21415,7 @@ msgid ""
 "provisions of this User Agreement shall remain in full force;"
 msgstr ""
 "4.  "
-"倘本使用协议之任何规定因与中华人民共和国法律抵触而无效，用户依然同意应依照法律，努力使该规定所反映之当事人意向具备效力，且本使用协议其它规定仍应具有完整的效力；"
+"倘本使用协议之任何规定因与中华人民共和国法律抵触而无效，用户依然同意应依照法律，努力使该规定所反映之当事人意向具备效力，且本使用协议其他规定仍应具有完整的效力；"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -21404,7 +21450,7 @@ msgid ""
 "users with the requested services. This policy explains the data collection "
 "and use under these circumstances."
 msgstr ""
-"英荔教育（www.elitemba.cn）的产品及服务由广东英荔国际教育科技有限公司（以下简称“英荔”或“我们”）提供。本隐私政策（以下简称“本政策”）适用于英荔的网站、在计算机/手机/平板电脑或其它设备上使用的英荔的应用程序和其它产品及服务。英荔非常重视对英荔用户（以下简称“用户”）个人隐私的保护，有时候我们需要某些信息才能为用户提供请求的服务，本政策解释了这些情况下的数据收集和使用情况。"
+"英荔商学院（www.EliteMBA.cn）的产品及服务由广东英荔国际教育科技有限公司（以下简称“英荔”或“我们”）提供。本隐私政策（以下简称“本政策”）适用于英荔的网站、在计算机/手机/平板电脑或其他设备上使用的英荔的应用程序和其他产品及服务。英荔非常重视对英荔用户（以下简称“用户”）个人隐私的保护，有时候我们需要某些信息才能为用户提供请求的服务，本政策解释了这些情况下的数据收集和使用情况。"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/privacy.html
@@ -21572,7 +21618,7 @@ msgid ""
 " of the User's password or sharing the registered account with others, or "
 "the leakage of other personal information that is not caused by EliteMBA "
 "reasons; "
-msgstr "1.  由于用户将用户密码告知他人或与他人共享注册帐户，由此导致的任何个人信息的泄漏，或其他非因英荔原因导致的个人信息的泄漏；"
+msgstr "1.  由于用户将用户密码告知他人或与他人共享注册账号，由此导致的任何个人信息的泄漏，或其他非因英荔原因导致的个人信息的泄漏；"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/privacy.html
@@ -21624,7 +21670,7 @@ msgid ""
 "referred to as 'User') must carefully read these terms and agree to this "
 "statement before accepting EliteMBA service."
 msgstr ""
-"英荔教育（www.elitemba.cn）的产品及服务由广东英荔国际教育科技有限公司（以下简称“英荔”或“我们”）提供。本免责声明（以下简称“本声明”）适用于英荔的网站、在计算机/手机/平板电脑或其它设备上使用的英荔的应用程序和其它产品及服务。英荔用户（以下简称“用户”）在接受英荔服务之前，请务必仔细阅读本条款并同意本声明"
+"英荔商学院（www.EliteMBA.cn）的产品及服务由广东英荔国际教育科技有限公司（以下简称“英荔”或“我们”）提供。本免责声明（以下简称“本声明”）适用于英荔的网站、在计算机/手机/平板电脑或其他设备上使用的英荔的应用程序和其他产品及服务。英荔用户（以下简称“用户”）在接受英荔服务之前，请务必仔细阅读本条款并同意本声明"
 
 #: themes/normal-theme/lms/templates/static_templates/join_us.html
 msgid "Join us"
@@ -21636,8 +21682,8 @@ msgstr "成为更有价值的自己"
 
 #: themes/normal-theme/lms/templates/static_templates/join_us.html
 msgid ""
-"Eliteu pays attention to employee development and attaches importance to the"
-" power of communication. We continue to learn, inspire each other, and "
+"EliteMBA pays attention to employee development and attaches importance to "
+"the power of communication. We continue to learn, inspire each other, and "
 "constantly discover industry inspiration at work, and open our eyes as a "
 "whole community. Here, work is an organic combination of enjoyment and hard "
 "work."
@@ -21648,8 +21694,31 @@ msgstr ""
 msgid ""
 "We will release job information as soon as possible, so stay tuned. Of "
 "course, this does not mean that we want to miss any future members. Feel "
-"free to contact us through email directly."
+"free to contact us through email directly"
 msgstr "职位信息整理中，我们将尽快发布，敬请期待。当然，这并不意味着我们愿意错过任何一位未来的成员，欢迎直接邮件联系"
+
+#: themes/normal-theme/lms/templates/static_templates/join_us.html
+msgid "Become a Lecturer"
+msgstr "成为英荔讲师"
+
+#: themes/normal-theme/lms/templates/static_templates/join_us.html
+msgid ""
+"Standing on the platform, educators can impart wisdom to learners. EliteMBA "
+"completely breaks the geographical restrictions of teaching and learning and"
+" provides a broader platform for educators. We sincerely invite all elite "
+"professors, scholars and experts who have been deeply involved in business "
+"management disciplines to develop more outstanding business talents by "
+"transforming intangible wisdom into a collectible course."
+msgstr ""
+"站上讲台，教育者得以向学习者传授智慧。英荔彻底打破教与学的地理限制，为教育者提供更广阔的讲台。我们诚挚地向所有深耕于商业管理学科的精英教授、学者和专家发出邀请，让我们共同将无形的智慧实化为可典藏的课程，以此培养更多杰出的商业人才。"
+
+#: themes/normal-theme/lms/templates/static_templates/join_us.html
+msgid "Please contact"
+msgstr "请直接邮件联系"
+
+#: themes/normal-theme/lms/templates/static_templates/join_us.html
+msgid "directly or call 400-931-8118."
+msgstr "或致电400-931-8118。"
 
 #: themes/normal-theme/lms/templates/static_templates/privacy.html
 #: themes/normal-theme/lms/templates/static_templates/privacy_policy.html
@@ -21677,7 +21746,7 @@ msgid ""
 "regulations, EliteMBA may terminate the offer to the User at any time "
 "without prior notice service."
 msgstr ""
-"同时如果英荔有理由认为用户的任何行为，包括但不限于用户的任何言论和其它行为违反或可能违反国家法律和法规的任何规定，英荔可在任何时候不经任何事先通知终止向用户提供服务。"
+"同时，如果英荔有理由认为用户的任何行为，包括但不限于用户的任何言论和其他行为违反或可能违反国家法律和法规的任何规定，英荔可在任何时候不经任何事先通知终止向用户提供服务。"
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
 msgid ""
@@ -21697,7 +21766,7 @@ msgid ""
 "Content containing false, fraudulent, harmful, coercive, infringing on the "
 "privacy of others, harassment, infringement, slander, vulgarity, jealousy, "
 "or other morally offensive content;"
-msgstr "含有虚假、诈骗、有害、胁迫、侵害他人隐私、骚扰、侵害、中伤、粗俗、猥亵、或其它道德上令人反感的内容；"
+msgstr "含有虚假、诈骗、有害、胁迫、侵害他人隐私、骚扰、侵害、中伤、粗俗、猥亵、或其他道德上令人反感的内容；"
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
 msgid "Contains content that is not suitable for display in EliteMBA;"
@@ -21720,7 +21789,7 @@ msgid ""
 "Service and any other announcements in EliteMBA and other content that "
 "contradicts EliteMBA's rights and interests. "
 msgstr ""
-"用户已认可英荔未对用户的使用行为进行全面控制，用户使用任何内容时，包括依赖前述内容之正确性、完整性或实用性时，用户同意将自行加以判断并承担所有风险，而不依赖于英荔。但英荔依其自行之考虑，可拒绝和删除经由本服务提供之违反本条款的或其它引起英荔异议的任何内容。"
+"用户已认可英荔未对用户的使用行为进行全面控制，用户使用任何内容时，包括依赖前述内容之正确性、完整性或实用性时，用户同意将自行加以判断并承担所有风险，而不依赖于英荔。但英荔依其自行之考虑，可拒绝和删除经由本服务提供之违反本条款的或其他引起英荔异议的任何内容。"
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
 msgid "3. Respond to any claims made by third parties; "
@@ -21728,7 +21797,7 @@ msgstr "3.  回应任何第三人提出的权利主张；"
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
 msgid "5. Other situations that the EliteMBA considers necessary."
-msgstr "5.  其它英荔认为有必要的情况。"
+msgstr "5.  其他英荔认为有必要的情况。"
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
 msgid ""
@@ -21746,7 +21815,7 @@ msgid ""
 " or other partners and employees from damage and assume all legal "
 "liabilities arising therefrom. "
 msgstr ""
-"由于用户通过本服务提供、发布或传送之内容、用户与本服务连线、用户违反本使用协议、或用户侵害他人任何权利因而衍生或导致任何第三人提出任何索赔或请求，包括合理的律师费，用户同意赔偿英荔及其子公司、关联企业、高级职员、代理人、品牌共有人或其它合作伙伴及员工，并使其免受损害，"
+"由于用户通过本服务提供、发布或传送之内容、用户与本服务连线、用户违反本使用协议、或用户侵害他人任何权利因而衍生或导致任何第三人提出任何索赔或请求，包括合理的律师费，用户同意赔偿英荔及其子公司、关联企业、高级职员、代理人、品牌共有人或其他合作伙伴及员工，并使其免受损害，"
 " 并承担由此引发的全部法律责任。"
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -21758,7 +21827,7 @@ msgid ""
 "consent of Elite, or to indicate that the User has the right to display, use"
 " or otherwise process the Trademark."
 msgstr ""
-"英荔教育、英荔以及其它英荔注册商标、标志及产品、服务名称，均为英荔公司之商标（以下简称“英荔标记”）。未经英荔事先书面同意，用户同意不将英荔标记以任何方式展示或使用或作其它处理，或表示用户有权展示、使用或另行处理英荔标记。"
+"英荔教育、英荔以及其他英荔注册商标、标志及产品、服务名称，均为英荔公司之商标（以下简称“英荔标记”）。未经英荔事先书面同意，用户同意不将英荔标记以任何方式展示或使用或作其他处理，或表示用户有权展示、使用或另行处理英荔标记。"
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
 msgid ""
@@ -21833,7 +21902,7 @@ msgid ""
 "Change your life and start learning today by activating your {platform_name}"
 " account. Click on the link below or copy and paste it into your browser's "
 "address bar."
-msgstr "激活您的{platform_name}账户，从今天起开始学习，并以此改变你的生活。点击下面的链接或复制并粘贴到您浏览器的地址栏。"
+msgstr "激活您的{platform_name}账号，从今天起开始学习，并以此改变您的生活。点击下面的链接或复制并粘贴到您浏览器的地址栏。"
 
 #: themes/stanford-style/lms/templates/emails/activation_email.txt
 #: themes/stanford-style/lms/templates/emails/email_change.txt
@@ -21842,7 +21911,7 @@ msgid ""
 " any more email from us. Please do not reply to this e-mail; if you require "
 "assistance, check the about section of the {platform_name} Courses web site."
 msgstr ""
-"如果你没发出过该请求，你不需要做任何事情；你将不会收到其他任何电子邮件。请不要回复此电子邮件；如果你需要帮助，请访问 {platform_name} "
+"如果您没发出过该请求，您不需要做任何事情；您将不会收到其他任何电子邮件。请不要回复此电子邮件；如果您需要帮助，请访问 {platform_name} "
 "课程网站。"
 
 #: themes/stanford-style/lms/templates/emails/confirm_email_change.txt
@@ -21851,8 +21920,8 @@ msgid ""
 "{platform_name} from {old_email} to {new_email}. If you did not make this "
 "request, please contact us at"
 msgstr ""
-"这封邮件是为了确认你和 {platform_name} 之间的电子邮件关联由 {old_email} 变更为 "
-"{new_email}。如果你并没有发出该请求，请通过下列地址联系我们："
+"这封邮件是为了确认您和 {platform_name} 之间的电子邮件关联由 {old_email} 变更为 "
+"{new_email}。如果您并没有发出该请求，请通过下列地址联系我们："
 
 #: themes/stanford-style/lms/templates/emails/email_change.txt
 msgid ""
@@ -21860,7 +21929,7 @@ msgid ""
 "{platform_name} account from {old_email} to {new_email}. If this is correct,"
 " please confirm your new e-mail address by visiting:"
 msgstr ""
-"我们收到了您需要将 {platform_name} 账户的电子邮件关联由 {old_email} 变更为 {new_email} "
+"我们收到了您需要将 {platform_name} 账号的电子邮件关联由 {old_email} 变更为 {new_email} "
 "的请求。如果该请求无误，请访问如下网页确认您的新电子邮件地址："
 
 #: themes/stanford-style/lms/templates/emails/reject_name_change.txt
@@ -21869,8 +21938,8 @@ msgid ""
 "name from {old_name} to {new_name}. If you need further assistance, please "
 "e-mail the tech support at {email}"
 msgstr ""
-"我们很抱歉。我们的员工没有批准你的请求改变你的名字从{old_name} "
-"{new_name}。如果你需要进一步的协助,请电子邮件的技术支持{email}"
+"我们很抱歉。我们的员工没有批准您的请求改变您的名字从{old_name} "
+"{new_name}。如果您需要进一步的协助,请电子邮件的技术支持{email}"
 
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Put your Terms of Service here!"
@@ -21929,17 +21998,17 @@ msgstr "Studio开放政策"
 #: cms/templates/activation_active.html cms/templates/activation_complete.html
 #: cms/templates/activation_invalid.html
 msgid "{studio_name} Account Activation"
-msgstr "{studio_name}账户激活"
+msgstr "{studio_name}账号激活"
 
 #: cms/templates/activation_active.html
 msgid "Your account is already active"
-msgstr "您的账户已经激活"
+msgstr "您的账号已经激活"
 
 #: cms/templates/activation_active.html
 msgid ""
 "This account, set up using {email}, has already been activated. Please sign "
 "in to start working within {studio_name}."
-msgstr "通过{email}注册的这个账户已被激活，请登录以开始在{studio_name}中工作。"
+msgstr "通过{email}注册的这个账号已被激活，请登录以开始在{studio_name}中工作。"
 
 #: cms/templates/activation_active.html cms/templates/activation_complete.html
 msgid "Sign into {studio_name}"
@@ -21947,17 +22016,17 @@ msgstr "登录{studio_name}"
 
 #: cms/templates/activation_complete.html
 msgid "Your account activation is complete!"
-msgstr "您的账户激活已经完成！"
+msgstr "您的账号激活已经完成！"
 
 #: cms/templates/activation_complete.html
 msgid ""
 "Thank you for activating your account. You may now sign in and start using "
 "{studio_name} to author courses."
-msgstr "谢谢您激活了您的账户，您现在可以登录 {studio_name}并开始创建课程了。"
+msgstr "谢谢您激活了您的账号，您现在可以登录 {studio_name}并开始创建课程了。"
 
 #: cms/templates/activation_invalid.html
 msgid "Your account activation is invalid"
-msgstr "您的账户激活是无效的"
+msgstr "您的账号激活是无效的"
 
 #: cms/templates/activation_invalid.html
 msgid ""
@@ -22356,7 +22425,7 @@ msgstr "该课程使用了不再支持的特性。"
 
 #: cms/templates/course_outline.html
 msgid "You must delete or replace the following components."
-msgstr "你必须删除或替换下面这些组件。"
+msgstr "您必须删除或替换下面这些组件。"
 
 #: cms/templates/course_outline.html
 msgid "Unsupported Components"
@@ -23126,7 +23195,7 @@ msgid ""
 "incremental release when it makes sense. And with co-authors, you can have a"
 " whole team building a course, together."
 msgstr ""
-"{studio_name}的工作方式与您熟知的网页应用类似，只是您还需要了解一下如何创建课程。您可以根据需要在网页上一次性地发布信息，或者采用增量式的发布形式。如果您有合作者，你们还可以作为一个团队来共同创建课程。"
+"{studio_name}的工作方式与您熟知的网页应用类似，只是您还需要了解一下如何创建课程。您可以根据需要在网页上一次性地发布信息，或者采用增量式的发布形式。如果您有合作者，您们还可以作为一个团队来共同创建课程。"
 
 #: cms/templates/howitworks.html
 msgid "Instant Changes"
@@ -23170,7 +23239,7 @@ msgstr "注册并开始打造您自己的{platform_name}课程"
 
 #: cms/templates/howitworks.html
 msgid "Already have a {studio_name} Account? Sign In"
-msgstr "已经有一个{studio_name}账户？请登录"
+msgstr "已经有一个{studio_name}账号？请登录"
 
 #: cms/templates/howitworks.html
 msgid "Outlining Your Course"
@@ -23834,7 +23903,7 @@ msgstr "登录{studio_name}"
 
 #: cms/templates/login.html
 msgid "Don't have a {studio_name} Account? Sign up!"
-msgstr "还没有{studio_name}账户？现在就注册！"
+msgstr "还没有{studio_name}账号？现在就注册！"
 
 #: cms/templates/login.html
 msgid "Required Information to Sign In to {studio_name}"
@@ -23876,7 +23945,7 @@ msgstr "向该课程添加团队成员"
 msgid ""
 "Adding team members makes course authoring collaborative. Users must be "
 "signed up for {studio_name} and have an active account."
-msgstr "添加团队成员使得课程编写可以协作完成，用户必须已经注册了{studio_name}并拥有一个已激活的账户。"
+msgstr "添加团队成员使得课程编写可以协作完成，用户必须已经注册了{studio_name}并拥有一个已激活的账号。"
 
 #: cms/templates/manage_users.html
 msgid "Add a New Team Member"
@@ -23896,7 +23965,7 @@ msgstr "课程团队成员中员工角色是课程的共同作者。他们对课
 msgid ""
 "Admins are course team members who can add and remove other course team "
 "members."
-msgstr "管理员是课程团队成员中可以添加和移除其它课程团队成员的用户。"
+msgstr "管理员是课程团队成员中可以添加和移除其他课程团队成员的用户。"
 
 #: cms/templates/manage_users.html
 msgid ""
@@ -23943,7 +24012,7 @@ msgstr "添加更多用户到该知识库中"
 msgid ""
 "Grant other members of your course team access to this library. New library "
 "users must have an active {studio_name} account."
-msgstr "向您课程团队的其他成员授予该知识库的访问权限。新的知识库用户必须有一个已激活的{studio_name}账户。"
+msgstr "向您课程团队的其他成员授予该知识库的访问权限。新的知识库用户必须有一个已激活的{studio_name}账号。"
 
 #: cms/templates/manage_users_lib.html
 msgid "Add a New User"
@@ -23986,7 +24055,7 @@ msgstr "注册{studio_name}"
 
 #: cms/templates/register.html
 msgid "Already have a {studio_name} Account? Sign in"
-msgstr "已经有一个{studio_name}账户了？请登录"
+msgstr "已经有一个{studio_name}账号了？请登录"
 
 #: cms/templates/register.html
 msgid ""
@@ -24018,7 +24087,7 @@ msgstr "我同意{a_start}服务条约{a_end}"
 
 #: cms/templates/register.html
 msgid "Create My Account &amp; Start Authoring Courses"
-msgstr "创建我的账户＆开始创建课程"
+msgstr "创建我的账号＆开始创建课程"
 
 #: cms/templates/register.html
 msgid "Common {studio_name} Questions"
@@ -24169,7 +24238,7 @@ msgid ""
 "Instructor-paced courses progress at the pace that the course author sets. "
 "You can configure release dates for course content and due dates for "
 "assignments."
-msgstr "教师教学课程的进度可以由该课程作者设置。你可以为该课程设置课程内容发布时间及停止观看时间。"
+msgstr "教师教学课程的进度可以由该课程作者设置。您可以为该课程设置课程内容发布时间及停止观看时间。"
 
 #: cms/templates/settings.html
 msgid "Self-Paced"
@@ -24239,8 +24308,8 @@ msgid "Last day students can enroll."
 msgstr "学生可以选课的最后一天。"
 
 #: cms/templates/settings.html
-msgid "Contact your edX partner manager to update these settings."
-msgstr "联系您的edX合作经理以更新这些设置项。"
+msgid "Contact your EliteMBA partner manager to update these settings."
+msgstr "联系您的EliteMBA合作经理以更新这些设置项。"
 
 #: cms/templates/settings.html
 msgid "Enrollment End Time"
@@ -24252,7 +24321,7 @@ msgstr "课程详情"
 
 #: cms/templates/settings.html
 msgid "Provide useful information about your course"
-msgstr "提供有关你的课程的有用信息"
+msgstr "提供有关您的课程的有用信息"
 
 #: cms/templates/settings.html
 msgid ""
@@ -24801,7 +24870,7 @@ msgstr "此组已不存在，请选择其他分组并撤销访问限制。"
 msgid ""
 "Thank you for signing up for {studio_name}! To activate your account, please"
 " copy and paste this address into your web browser's address bar:"
-msgstr "感谢您注册{studio_name}！要激活您的账户，请复制并粘贴下面的网址到您的浏览器的地址栏："
+msgstr "感谢您注册{studio_name}！要激活您的账号，请复制并粘贴下面的网址到您的浏览器的地址栏："
 
 #: cms/templates/emails/activation_email.txt
 msgid ""
@@ -24813,7 +24882,7 @@ msgstr ""
 
 #: cms/templates/emails/activation_email_subject.txt
 msgid "Your account for {studio_name}"
-msgstr "您的{studio_name}账户"
+msgstr "您的{studio_name}账号"
 
 #: cms/templates/emails/course_creator_admin_subject.txt
 msgid "{email} has requested {studio_name} course creator privileges on edge"
@@ -24889,15 +24958,15 @@ msgstr "维护面板"
 
 #: cms/templates/registration/activation_complete.html
 msgid "Thanks for activating your account."
-msgstr "谢谢您激活账户。"
+msgstr "谢谢您激活账号。"
 
 #: cms/templates/registration/activation_complete.html
 msgid "This account has already been activated."
-msgstr "本账户已经被激活"
+msgstr "本账号已经被激活"
 
 #: cms/templates/registration/activation_complete.html
 msgid "Visit your {link_start}dashboard{link_end} to see your courses."
-msgstr "访问你的{link_start}课程面板{link_end}来查看课程。"
+msgstr "访问您的{link_start}课程面板{link_end}来查看课程。"
 
 #: cms/templates/registration/activation_complete.html
 msgid "You can now {link_start}sign in{link_end}."
@@ -24924,7 +24993,7 @@ msgstr "返回到{link_start}主页{link_end}。"
 msgid ""
 "We've sent an email message to {email} with instructions for activating your"
 " account."
-msgstr "我们已向您的邮箱{email}发送了一封邮件，其中包含有关激活帐户的说明"
+msgstr "我们已向您的邮箱{email}发送了一封邮件，其中包含有关激活账号的说明"
 
 #: cms/templates/widgets/footer.html
 msgid "Policies"
@@ -24978,7 +25047,7 @@ msgstr "语言首选项"
 
 #: cms/templates/widgets/header.html
 msgid "Account Navigation"
-msgstr "账户导航"
+msgstr "账号导航"
 
 #: cms/templates/widgets/header.html
 msgid "Contextual Online Help"
@@ -25094,7 +25163,7 @@ msgstr "概要"
 #: wiki/forms.py
 msgid ""
 "Give a short reason for your edit, which will be stated in the revision log."
-msgstr "给出你编辑本文章的简短说明，它将会被写入修订日志中。"
+msgstr "给出您编辑本文章的简短说明，它将会被写入修订日志中。"
 
 #: wiki/forms.py
 msgid ""
@@ -25117,7 +25186,7 @@ msgid ""
 "alphanumeric characters and - or _. Note that you cannot change the slug "
 "after creating the article."
 msgstr ""
-"这个地址将用于定位你的文档。请使用由数字、字母、－（减号）、_（下划线）组成的字符串。注意：一旦文档创建完毕将不能再对此固定链接地址进行修改。"
+"这个地址将用于定位您的文档。请使用由数字、字母、－（减号）、_（下划线）组成的字符串。注意：一旦文档创建完毕将不能再对此固定链接地址进行修改。"
 
 #: wiki/forms.py
 msgid "Write a brief message for the article's history log."
@@ -25150,12 +25219,12 @@ msgid ""
 "Purge the article: Completely remove it (and all its contents) with no undo."
 " Purging is a good idea if you want to free the slug such that users can "
 "create new articles in its place."
-msgstr "清除文档：完全删除它(以及其中的内容)且无法恢复。当你需要释放该固定链接地址以便可以创建一个新文档继承使用该固定链接地址时选择清除操作。"
+msgstr "清除文档：完全删除它(以及其中的内容)且无法恢复。当您需要释放该固定链接地址以便可以创建一个新文档继承使用该固定链接地址时选择清除操作。"
 
 #: wiki/forms.py wiki/plugins/attachments/forms.py
 #: wiki/plugins/images/forms.py
 msgid "You are not sure enough!"
-msgstr "你还不够确定！"
+msgstr "您还不够确定！"
 
 #: wiki/forms.py
 msgid "While you tried to delete this article, it was modified. TAKE CARE!"
@@ -25201,7 +25270,7 @@ msgstr "文档的权限设置已更新。"
 
 #: wiki/forms.py
 msgid "Your permission settings were unchanged, so nothing saved."
-msgstr "你的权限设置没有变更，不需要保存。"
+msgstr "您的权限设置没有变更，不需要保存。"
 
 #: wiki/forms.py
 msgid "No user with that username"
@@ -25232,7 +25301,7 @@ msgstr "当前版本"
 msgid ""
 "The revision being displayed for this article. If you need to do a roll-"
 "back, simply change the value of this field."
-msgstr "显示该文档的对应版本。如果你需要回滚到历史版本，请修改空格里的值。"
+msgstr "显示该文档的对应版本。如果您需要回滚到历史版本，请修改空格里的值。"
 
 #: wiki/models/article.py
 msgid "modified"
@@ -25345,7 +25414,7 @@ msgstr "一个插件被变更"
 msgid ""
 "The revision being displayed for this plugin.If you need to do a roll-back, "
 "simply change the value of this field."
-msgstr "显示插件修订版本信息。如果你需要回滚到历史版本，请修改此处的值。"
+msgstr "显示插件修订版本信息。如果您需要回滚到历史版本，请修改此处的值。"
 
 #: wiki/models/urlpath.py
 msgid "Cache lookup value for articles"
@@ -25369,7 +25438,7 @@ msgstr "URL路径"
 
 #: wiki/models/urlpath.py
 msgid "Sorry but you cannot have a root article with a slug."
-msgstr "抱歉，你无法对根文档设置固定链接地址。"
+msgstr "抱歉，您无法对根文档设置固定链接地址。"
 
 #: wiki/models/urlpath.py
 msgid "A non-root note must always have a slug."
@@ -25390,7 +25459,7 @@ msgstr ""
 "丢失父链接的文档\n"
 "===============================\n"
 "\n"
-"该子文档的父链接已经被删除。你可以可以重新为他们寻找一个新的链接点。"
+"该子文档的父链接已经被删除。您可以可以重新为他们寻找一个新的链接点。"
 
 #: wiki/models/urlpath.py
 msgid "Lost and found"
@@ -25446,13 +25515,13 @@ msgstr "%s已经成功添加。"
 #: wiki/plugins/attachments/views.py
 #, python-format
 msgid "Your file could not be saved: %s"
-msgstr "你的文件无法被保存：%s"
+msgstr "您的文件无法被保存：%s"
 
 #: wiki/plugins/attachments/views.py
 msgid ""
 "Your file could not be saved, probably because of a permission error on the "
 "web server."
-msgstr "你的文件无法被保存，可能是由于或者Web服务器的权限异常。"
+msgstr "您的文件无法被保存，可能是由于或者Web服务器的权限异常。"
 
 #: wiki/plugins/attachments/views.py
 #, python-format
@@ -25463,7 +25532,7 @@ msgstr "%s上传成功并覆盖原有附件。"
 msgid ""
 "Your new file will automatically be renamed to match the file already "
 "present. Files with different extensions are not allowed."
-msgstr "你的新文件将被自动重命名以匹配已经存在的文件。不允许使用不同的文件扩展名。"
+msgstr "您的新文件将被自动重命名以匹配已经存在的文件。不允许使用不同的文件扩展名。"
 
 #: wiki/plugins/attachments/views.py
 #, python-format
@@ -25787,7 +25856,7 @@ msgstr "添加图片"
 
 #: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
 msgid "You do not have permissions to add images."
-msgstr "你没有权限添加图片"
+msgstr "您没有权限添加图片"
 
 #: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
 msgid "How to use images"
@@ -25839,11 +25908,11 @@ msgstr "接收关于该文档编辑的电子邮件"
 
 #: wiki/plugins/notifications/forms.py
 msgid "Your notification settings were updated."
-msgstr "你的通知设置已经更新。"
+msgstr "您的通知设置已经更新。"
 
 #: wiki/plugins/notifications/forms.py
 msgid "Your notification settings were unchanged, so nothing saved."
-msgstr "你的通知设置没有变更，因此无需保存。"
+msgstr "您的通知设置没有变更，因此无需保存。"
 
 #: wiki/plugins/notifications/models.py
 #, python-format
@@ -25952,7 +26021,7 @@ msgstr "没有日志信息"
 
 #: wiki/templates/wiki/permission_denied.html
 msgid "Sorry, you don't have permission to view this page."
-msgstr "抱歉，你没有权限访问该页面"
+msgstr "抱歉，您没有权限访问该页面"
 
 #: wiki/templates/wiki/preview_inline.html
 msgid "Previewing revision"
@@ -26043,7 +26112,7 @@ msgstr "下面的新文章"
 
 #: wiki/views/accounts.py
 msgid "You are now sign up... and now you can sign in!"
-msgstr "您正在注册……现在你可以登录了！"
+msgstr "您正在注册……现在您可以登录了！"
 
 #: wiki/views/accounts.py
 msgid "You are no longer logged in. Bye bye!"
@@ -26163,7 +26232,7 @@ msgstr "苹果内购"
 
 #: membership/models.py
 msgid "WeChat App"
-msgstr "微信"
+msgstr "微信APP"
 
 #: membership/models.py
 msgid "WeChat H5"
@@ -26194,12 +26263,20 @@ msgid "View Introduction"
 msgstr "查看介绍"
 
 #: membership/templates/membership/card.html
+msgid "Select a course"
+msgstr "加入课程"
+
+#: membership/templates/membership/card.html
 msgid "Choose a payment method"
 msgstr "选择支付方式"
 
 #: membership/templates/membership/card.html
-msgid "Membership Subscription Period"
-msgstr "订阅会员有效期"
+msgid "Membership Valid in "
+msgstr "会员有限期："
+
+#: membership/templates/membership/card.html
+msgid "days"
+msgstr "天"
 
 #: membership/templates/membership/card.html
 msgid "Tuition:"
@@ -26241,7 +26318,7 @@ msgstr "英荔商学院六大课程方向"
 
 #: membership/templates/membership/index.html
 msgid "Activate your all-round business gene, you alone are a team!"
-msgstr "激活全能商业基因，你就是一个团队"
+msgstr "激活全能商业基因，您就是一个团队"
 
 #: membership/templates/membership/index.html
 msgid "Business Administration"
@@ -26323,9 +26400,9 @@ msgstr "美国波士顿学院经济学博士"
 
 #: membership/templates/membership/index.html
 msgid ""
-"*All course updates reserved to Eliteu and Eliteu has the final "
+"*All course updates reserved to EliteMBA and EliteMBA has the final "
 "interpretation."
-msgstr "*英荔教育保留所有课程的更新和最终解释权。"
+msgstr "*英荔商学院保留所有课程的更新和最终解释权。"
 
 #: membership/templates/membership/index.html
 msgid "Best faculties ---- Elite Education"
@@ -26349,7 +26426,7 @@ msgstr "萧柏春 博士"
 msgid ""
 "Lifetime Professor and Dean of Management Major in School of Business, Long "
 "Island University - C. W. Post, USA"
-msgstr "美国长岛大学Post分校商学院管理系终身教授、系主任"
+msgstr "美国长岛大学商学院管理系主任，终身教授"
 
 #: membership/templates/membership/index.html
 msgid "Dr. Lloyd E. Shefsky"
@@ -26379,7 +26456,7 @@ msgstr "杨威 博士"
 msgid ""
 "Lifetime Professor in School of Business,  Long Island University - C. W. "
 "Post, USA"
-msgstr "美国长岛大学Post分校商学院终身教授"
+msgstr "美国长岛大学商学院终身教授"
 
 #: membership/templates/membership/index.html
 msgid "Dr. Weichun Zhu"
@@ -26399,7 +26476,7 @@ msgstr "汪嘉旻 博士"
 msgid ""
 "Lifetime Professor of Information Management & Technology, Long Island "
 "University - C. W. Post, USA"
-msgstr "美国长岛大学Post分校管理信息系统专业终身教授"
+msgstr "美国长岛大学商学院管理信息系统专业终身教授"
 
 #: membership/templates/membership/index.html
 msgid "Dr. Tianning Li"
@@ -26434,8 +26511,8 @@ msgid "View More"
 msgstr "查看更多"
 
 #: membership/templates/membership/index.html
-msgid "Become Eliteu Member"
-msgstr "成为英荔会员"
+msgid "Become EliteMBA Member"
+msgstr "成为英荔商学院会员"
 
 #: membership/templates/membership/index.html
 msgid "Choose appropriate learning duration according to your needs"
@@ -26443,7 +26520,7 @@ msgstr "根据您的需求选择合适的学习时长"
 
 #: membership/templates/membership/index.html
 msgid ""
-"Enjoy learning all courses in the Eliteu MBA school during the study "
+"Enjoy learning all courses in the EliteMBA MBA school during the study "
 "period，You can join the new class online now!"
 msgstr "学习期内享有英荔商学院所有课程的学习权益，新课上线亦可马上加入学习"
 
@@ -26495,7 +26572,8 @@ msgstr "*现在报名可享以上优惠，具体详情请前往购买页。"
 
 #: membership/templates/membership/index.html
 msgid ""
-"Enjoy learning all courses in the Eliteu MBA school during the study period"
+"Enjoy learning all courses in the EliteMBA MBA school during the study "
+"period"
 msgstr "学习期内享有英荔商学院所有课程的学习权益"
 
 #: membership/templates/membership/index.html
@@ -26529,25 +26607,25 @@ msgstr "加入会员"
 #: membership/templates/membership/index.html
 msgid ""
 "There is a gap called self-discipline outside of 8 hours. Start with the "
-"Eliteu and become a self-disciplined full-stack workplace!"
+"EliteMBA and become a self-disciplined full-stack workplace!"
 msgstr "有一种差距，叫8小时以外的自律，和英荔一起出发，成为自律的全栈职场人！"
 
 #: membership/templates/membership/index.html
-msgid "Eliteu Theory"
+msgid "EliteMBA Theory"
 msgstr "英荔说"
 
 #: membership/templates/membership/result.html
 #: membership/templates/membership/wechat_paying.html
-msgid "Eliteu MBA school cashier"
+msgid "EliteMBA school cashier"
 msgstr "英荔商学院收银台"
 
 #: membership/templates/membership/result.html
-msgid "Eliteu MBA school cashier payment success"
+msgid "EliteMBA school cashier payment success"
 msgstr "英荔商学院收银台支付成功"
 
 #: membership/templates/membership/result.html
 #: membership/templates/membership/wechat_paying.html
-msgid "Return to Eliteu MBA school in 3 seconds"
+msgid "Return to EliteMBA school in 3 seconds"
 msgstr "3秒后返回英荔商学院"
 
 #: membership/templates/membership/result.html

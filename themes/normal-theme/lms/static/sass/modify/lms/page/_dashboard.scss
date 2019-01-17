@@ -82,11 +82,15 @@
 .wrapper-messages-primary .message.message-status.course-status-certavailable .actions-primary .action-certificate .btn{
   @extend %btn-my-primary;
   background: #40A24D !important;
-  border: none;
+  border: 1px solid #40A24D;
+  line-height: 34px;
   .copy{
     margin-right: 0;
     vertical-align: unset;
     font-weight: normal;
+  }
+  &:hover,&:focus, &:active, &:visited{
+    border: 1px solid #40A24D;
   }
 }
 
@@ -112,6 +116,9 @@
     background-repeat: no-repeat;
     background-position: right 10px;
     border-radius: 3px;
+    &.is-denied, &.is-accepted{
+      background-image: none;
+    }
   }
   .status-verification .status-title{
     color: #fa7f2b;
@@ -132,7 +139,7 @@
     text-align: left;
     padding: 0;
   }
-  .status-verification a span{
+  .status-verification a span, .status-verification.is-denied .action-reverify{
     display: inline-block;
     padding: 8px 15px;
     background-color: rgba(255,228,209,0.3);
@@ -142,11 +149,13 @@
     font-size: 14px;
     margin-top: 30px;
     cursor: pointer;
+    box-shadow: none;
+
+    &:hover{
+      background: rgba(255, 218, 191, 0.46);
+    }
   }
 
-  .status-verification a span:hover{
-    background: rgba(255, 218, 191, 0.46);
-  }
   .status-is-vip{
     background: #f6fffc;
     border: none !important;
@@ -167,6 +176,7 @@
 
   .search-field-wrapper .search-button, .cancel-button{
     width: 60px;
+    background: $primary;
     &:hover, &:focus, &:active, &:hover:hover, &:hover:focus, &:hover:active{
       background: $primary;
       opacity: 0.95;
@@ -285,7 +295,7 @@
     width: auto;
     padding-top: 20px;
   }
-  .account-activation.success{
+  .account-activation, .account-activation.success{
     background-color: #f6fffc !important;
     box-shadow: 0px 1px 4px 0px rgba(55, 197, 145, 0.36);
     border: none;

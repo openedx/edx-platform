@@ -9,12 +9,12 @@ from django.utils.translation import ugettext as _
     %if verification_status == 'approved':
         <li class="status status-verification is-accepted">
             <span class="title status-title">${_("Current Verification Status: Approved")}</span>
-            <p class="status-note">${_("Your edX verification has been approved. Your verification is effective for one year after submission.")}</p>
+            <p class="status-note">${_("Your EliteMBA verification has been approved. Your verification is effective for one year after submission.")}</p>
         </li>
     %elif verification_status == 'pending':
         <li class="status status-verification is-pending">
             <span class="title status-title">${_("Current Verification Status: Pending")}</span>
-            <p class="status-note">${_("Your edX ID verification is pending. Your verification information has been submitted and will be reviewed shortly.")}</p>
+            <p class="status-note">${_("Your EliteMBA ID verification is pending. Your verification information has been submitted and will be reviewed shortly.")}</p>
         </li>
     %elif verification_status in ['denied','must_reverify', 'must_retry']:
         <li class="status status-verification is-denied">

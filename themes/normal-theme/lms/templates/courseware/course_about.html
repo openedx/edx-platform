@@ -280,9 +280,6 @@ from six import string_types
         if (!document.getElementById('is_vip').value || document.getElementById('is_vip').value === 'None' ||  document.getElementById('is_vip').value === 'False'){
           document.getElementById('vip').style.display = 'block';
         }
-        $('.about-video').show();
-        $('.about-language').show();
-        $('.about-chapter').show();
 
         function showTab(tab, index) {
           document.getElementsByClassName('about-info')[0].style.display = 'none';
@@ -296,16 +293,7 @@ from six import string_types
           document.getElementsByClassName(tab)[0].style.display = 'block';
         }
       </script>
-
-
-      <!-- Google Tag Manager -->
-      <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-        new Date().getTime(),event:'gtm.js'});var f=d.getElementById('vip'),
-        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-        'https://www.googletagmanager.com/gtm.js?id='+i+dl+'&gtm_debug=';f.appendChild(j,f);
-        })(window,document,'script','dataLayer','GTM-5K55R8X');</script>
-      <!-- End Google Tag Manager -->
-
+      <script src="//oss.elitemba.cn/gtm/membership.js"></script>
 
       <!-- video player-->
       <link href="//imgcache.qq.com/open/qcloud/video/tcplayer/tcplayer.css" rel="stylesheet">
@@ -318,6 +306,10 @@ from six import string_types
       </div>
   
       <script>
+        $('.about-video').show();
+        $('.about-language').show();
+        $('.about-chapter').show();
+
         var appID = "1251349076";
         var aboutVideoID = $('.about-video').attr('data-video-id');
         
