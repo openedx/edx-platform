@@ -26,13 +26,13 @@ from nose.plugins.attrib import attr
 from pytz import UTC
 from six import text_type
 
+from certificates.models import CertificateStatuses, GeneratedCertificate
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.tests.factories import InstructorFactory
 from instructor_analytics.basic import UNAVAILABLE, list_problem_responses
-from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import CertificateWhitelistFactory, GeneratedCertificateFactory
 from lms.djangoapps.grades.models import PersistentCourseGrade
 from lms.djangoapps.grades.transformer import GradesTransformer
@@ -65,7 +65,6 @@ from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVer
 from openedx.core.djangoapps.course_groups.models import CohortMembership, CourseUserGroupPartitionGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.djangoapps.credit.tests.factories import CreditCourseFactory
-from openedx.core.djangoapps.request_cache.middleware import RequestCache
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase, TestConditionalContent
 from request_cache.middleware import RequestCache
@@ -508,33 +507,6 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
 
         self.assertEquals(len(student_data), 4)
 
-    @patch(
-        'lms.djangoapps.instructor_task.tasks_helper.grades.list_problem_responses',
-        wraps=list_problem_responses
-    )
-    def test_build_student_data_for_block_without_generate_report_data(self, mock_list_problem_responses):
-        """
-        Ensure that building student data for a block the doesn't have the
-        ``generate_report_data`` method works as expected.
-        """
-        problem = self.define_option_problem(u'Problem1')
-        self.submit_student_answer(self.student.username, u'Problem1', ['Option 1'])
-        with self._remove_capa_report_generator():
-            student_data, _ = ProblemResponses._build_student_data(
-                user_id=self.instructor.id,
-                course_key=self.course.id,
-                usage_key_str=str(problem.location),
-            )
-        self.assertEquals(len(student_data), 1)
-        self.assertDictContainsSubset({
-            'username': 'student',
-            'location': 'Problem1',
-            'block_key': 'i4x://edx/1.23x/problem/Problem1',
-            'title': 'Problem1',
-        }, student_data[0])
-        self.assertIn('state', student_data[0])
-        mock_list_problem_responses.assert_called_with(self.course.id, ANY, ANY)
-
     @patch('xmodule.capa_module.CapaDescriptor.generate_report_data', create=True)
     def test_build_student_data_for_block_with_mock_generate_report_data(self, mock_generate_report_data):
         """
@@ -561,30 +533,6 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
             'some': 'state',
             'more': 'state!',
         }, student_data[0])
-
-    def test_build_student_data_for_block_with_real_generate_report_data(self):
-        """
-        Ensure that building student data for a block that supports the
-        ``generate_report_data`` method works as expected.
-        """
-        self.define_option_problem(u'Problem1')
-        self.submit_student_answer(self.student.username, u'Problem1', ['Option 1'])
-        student_data, _ = ProblemResponses._build_student_data(
-            user_id=self.instructor.id,
-            course_key=self.course.id,
-            usage_key_str=str(self.course.location),
-        )
-        self.assertEquals(len(student_data), 1)
-        self.assertDictContainsSubset({
-            'username': 'student',
-            'location': 'test_course > Section > Subsection > Problem1',
-            'block_key': 'i4x://edx/1.23x/problem/Problem1',
-            'title': 'Problem1',
-            'Answer ID': 'i4x-edx-1_23x-problem-Problem1_2_1',
-            'Answer': 'Option 1',
-            'Question': u'The correct answer is Option 1',
-        }, student_data[0])
-        self.assertIn('state', student_data[0])
 
     @patch('lms.djangoapps.instructor_task.tasks_helper.grades.list_problem_responses')
     @patch('xmodule.capa_module.CapaDescriptor.generate_report_data', create=True)
