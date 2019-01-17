@@ -21,7 +21,7 @@ from ..signals.handlers import (
 )
 from ..signals.signals import PROBLEM_RAW_SCORE_CHANGED
 
-UUID_REGEX = re.compile(ur'%(hex)s{8}-%(hex)s{4}-%(hex)s{4}-%(hex)s{4}-%(hex)s{12}' % {'hex': u'[0-9a-f]'})
+UUID_REGEX = re.compile(u'%(hex)s{8}-%(hex)s{4}-%(hex)s{4}-%(hex)s{4}-%(hex)s{12}' % {'hex': u'[0-9a-f]'})
 
 FROZEN_NOW_DATETIME = datetime.now().replace(tzinfo=pytz.UTC)
 FROZEN_NOW_TIMESTAMP = to_timestamp(FROZEN_NOW_DATETIME)
