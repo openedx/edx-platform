@@ -55,7 +55,10 @@ from ..entrance_exams import (
     user_can_skip_entrance_exam,
     user_has_passed_entrance_exam
 )
-from ..masquerade import setup_masquerade
+from ..masquerade import (
+    setup_masquerade,
+    check_content_start_date_for_masquerade_user
+)
 from ..model_data import FieldDataCache
 from ..module_render import get_module_for_descriptor, toc_for_course
 
@@ -181,6 +184,9 @@ class CoursewareIndex(View):
                 self._redirect_if_not_requested_section()
                 self._save_positions()
                 self._prefetch_and_bind_section()
+
+            check_content_start_date_for_masquerade_user(self.course_key, self.effective_user, request,
+                                                         self.course.start, self.chapter.start, self.section.start)
 
         if not request.user.is_authenticated:
             qs = urllib.urlencode({

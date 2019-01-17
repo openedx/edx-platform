@@ -8,6 +8,7 @@ from datetime import datetime
 
 import branding
 import pytz
+from crum import get_current_request
 from openedx.features.course_duration_limits.access import AuditExpiredError
 from courseware.access import has_access
 from courseware.access_response import StartDateError, MilestoneAccessError
@@ -19,6 +20,7 @@ from courseware.date_summary import (
     VerifiedUpgradeDeadlineDate,
     CertificateAvailableDate
 )
+from courseware.masquerade import check_content_start_date_for_masquerade_user
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module
 from django.conf import settings
@@ -131,6 +133,9 @@ def check_course_access(course, user, action, check_if_enrolled=False, check_sur
     # Allow staff full access to the course even if not enrolled
     if has_access(user, 'staff', course.id):
         return
+
+    request = get_current_request()
+    check_content_start_date_for_masquerade_user(course.id, user, request, course.start)
 
     access_response = has_access(user, action, course, course.id)
     if not access_response:
