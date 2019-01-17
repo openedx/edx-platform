@@ -180,7 +180,7 @@ class PDFInvoice(object):
         """
         try:
             img = Image.open(img_path)
-        except IOError, ex:
+        except IOError as ex:
             log.exception(u'Pdf unable to open the image file: %s', str(ex))
             img = None
 

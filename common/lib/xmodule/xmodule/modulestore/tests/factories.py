@@ -196,7 +196,7 @@ class ToyCourseFactory(SampleCourseFactory):
             'graded': True,
             'discussion_topics': {"General": {"id": "i4x-edX-toy-course-2012_Fall"}},
             'graceperiod': datetime.timedelta(days=2, seconds=21599),
-            'start': datetime.datetime(2015, 07, 17, 12, tzinfo=pytz.utc),
+            'start': datetime.datetime(2015, 7, 17, 12, tzinfo=pytz.utc),
             'xml_attributes': {"filename": ["course/2012_Fall.xml", "course/2012_Fall.xml"]},
             'pdf_textbooks': [
                 {

@@ -54,7 +54,7 @@ def parse_xreply(xreply):
     """
     try:
         xreply = json.loads(xreply)
-    except ValueError, err:
+    except ValueError as err:
         log.error(err)
         return (1, 'unexpected reply from server')
 
@@ -135,11 +135,11 @@ class XQueueInterface(object):
             response = self.session.post(
                 url, data=data, files=files, timeout=(CONNECT_TIMEOUT, READ_TIMEOUT)
             )
-        except requests.exceptions.ConnectionError, err:
+        except requests.exceptions.ConnectionError as err:
             log.error(err)
             return (1, 'cannot connect to server')
 
-        except requests.exceptions.ReadTimeout, err:
+        except requests.exceptions.ReadTimeout as err:
             log.error(err)
             return (1, 'failed to read from the server')
 

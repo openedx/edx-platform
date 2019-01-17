@@ -150,7 +150,7 @@ def node_prereqs_installation():
         # the forked process has returned
         proc = subprocess.Popen(npm_command, stderr=npm_log_file)
         proc.wait()
-    except BuildFailure, error_text:
+    except BuildFailure as error_text:
         if cb_error_text in error_text:
             print("npm install error detected. Retrying...")
             proc = subprocess.Popen(npm_command, stderr=npm_log_file)

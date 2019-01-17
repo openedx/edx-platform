@@ -442,7 +442,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
             for mode in ["honor", "verified"]:
                 CourseModeFactory(mode_slug=mode, course_id=self.course.id)
 
-            self.course.enrollment_end = datetime(2015, 01, 01)
+            self.course.enrollment_end = datetime(2015, 1, 1)
             modulestore().update_item(self.course, self.user.id)
 
             url = reverse('course_modes_choose', args=[unicode(self.course.id)])

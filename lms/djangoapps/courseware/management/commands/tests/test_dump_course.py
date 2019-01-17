@@ -97,7 +97,7 @@ class CommandsTestBase(SharedModuleStoreTestCase):
 
         try:
             output = self.call_command('dump_course_structure', *args, **kwargs)
-        except TypeError, exception:
+        except TypeError as exception:
             self.fail(exception)
 
         dump = json.loads(output)

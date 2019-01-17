@@ -28,8 +28,8 @@ from ..views import LOG_MESSAGE_CREATE, LOG_MESSAGE_DELETE
 from .helpers import make_image_file
 
 TEST_PASSWORD = "test"
-TEST_UPLOAD_DT = datetime.datetime(2002, 1, 9, 15, 43, 01, tzinfo=UTC)
-TEST_UPLOAD_DT2 = datetime.datetime(2003, 1, 9, 15, 43, 01, tzinfo=UTC)
+TEST_UPLOAD_DT = datetime.datetime(2002, 1, 9, 15, 43, 1, tzinfo=UTC)
+TEST_UPLOAD_DT2 = datetime.datetime(2003, 1, 9, 15, 43, 1, tzinfo=UTC)
 
 
 class ProfileImageEndpointMixin(UserSettingsEventTestMixin):
