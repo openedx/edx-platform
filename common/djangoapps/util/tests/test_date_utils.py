@@ -128,7 +128,8 @@ class StrftimeLocalizedTest(unittest.TestCase):
         ("%I:%M:%S %p", "04:41:17 PM"),
         ("%A at %-I%P", "Thursday at 4pm"),
     )
-    def test_usual_strftime_behavior(self, (fmt, expected)):
+    def test_usual_strftime_behavior(self, fmt_expected):
+        (fmt, expected) = fmt_expected
         dtime = datetime(2013, 02, 14, 16, 41, 17)
         self.assertEqual(expected, strftime_localized(dtime, fmt))
         # strftime doesn't like Unicode, so do the work in UTF8.
@@ -141,7 +142,8 @@ class StrftimeLocalizedTest(unittest.TestCase):
         ("DAY_AND_TIME", "Thursday at 4pm"),
         ("%x %X!", "Feb 14, 2013 04:41:17 PM!"),
     )
-    def test_shortcuts(self, (fmt, expected)):
+    def test_shortcuts(self, fmt_expected):
+        (fmt, expected) = fmt_expected
         dtime = datetime(2013, 02, 14, 16, 41, 17)
         self.assertEqual(expected, strftime_localized(dtime, fmt))
 
@@ -159,7 +161,8 @@ class StrftimeLocalizedTest(unittest.TestCase):
         ("TIME", "04:41:17 XXpmXX"),
         ("%x %X!", "XXfebXX 14, 2013 04:41:17 XXpmXX!"),
     )
-    def test_translated_words(self, (fmt, expected)):
+    def test_translated_words(self, fmt_expected):
+        (fmt, expected) = fmt_expected
         dtime = datetime(2013, 02, 14, 16, 41, 17)
         self.assertEqual(expected, strftime_localized(dtime, fmt))
 
@@ -178,7 +181,8 @@ class StrftimeLocalizedTest(unittest.TestCase):
         ("The time is: %X", "The time is: 16h.41m.17s"),
         ("%x %X", "date(2013.02.14) 16h.41m.17s"),
     )
-    def test_translated_formats(self, (fmt, expected)):
+    def test_translated_formats(self, fmt_expected):
+        (fmt, expected) = fmt_expected
         dtime = datetime(2013, 02, 14, 16, 41, 17)
         self.assertEqual(expected, strftime_localized(dtime, fmt))
 
@@ -190,7 +194,8 @@ class StrftimeLocalizedTest(unittest.TestCase):
         ("SHORT_DATE", "Feb 14, 2013"),
         ("TIME", "04:41:17 PM"),
     )
-    def test_recursion_protection(self, (fmt, expected)):
+    def test_recursion_protection(self, fmt_expected):
+        (fmt, expected) = fmt_expected
         dtime = datetime(2013, 02, 14, 16, 41, 17)
         self.assertEqual(expected, strftime_localized(dtime, fmt))
 

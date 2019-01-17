@@ -80,7 +80,7 @@ class AddComponentTest(NestedVerticalTest):
 
     def add_and_verify(self, menu_index, expected_ordering):
         self.do_action_and_verify(
-            lambda (container): add_discussion(container, menu_index),
+            lambda container: add_discussion(container, menu_index),
             expected_ordering
         )
 
@@ -120,7 +120,7 @@ class DuplicateComponentTest(NestedVerticalTest):
 
     def duplicate_and_verify(self, source_index, expected_ordering):
         self.do_action_and_verify(
-            lambda (container): container.duplicate(source_index),
+            lambda container: container.duplicate(source_index),
             expected_ordering
         )
 
@@ -166,7 +166,7 @@ class DeleteComponentTest(NestedVerticalTest):
 
     def delete_and_verify(self, source_index, expected_ordering):
         self.do_action_and_verify(
-            lambda (container): container.delete(source_index),
+            lambda container: container.delete(source_index),
             expected_ordering
         )
 

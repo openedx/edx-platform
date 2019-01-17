@@ -25,7 +25,8 @@ class FormatHtmlTest(unittest.TestCase):
         (u"Stop & Shop", u"Stop &amp; Shop"),
         (u"<a>нтмℓ-єѕ¢αρє∂</a>", u"&lt;a&gt;нтмℓ-єѕ¢αρє∂&lt;/a&gt;"),
     )
-    def test_simple(self, (before, after)):
+    def test_simple(self, before_after):
+        (before, after) = before_after
         self.assertEqual(unicode(Text(_(before))), after)
         self.assertEqual(unicode(Text(before)), after)
 
