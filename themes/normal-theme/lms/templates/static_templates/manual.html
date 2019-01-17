@@ -3,80 +3,6 @@
 <%inherit file="../main.html" />
 
 <%block name="pagetitle">${_(u"Manual")}</%block>
-
-
-<style>
-.manu-container{
-    position: relative;
-    padding: 20px 10px;
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    box-sizing: border-box;
-}
-/* tab */
-.manual-tabs{
-    position: absolute;
-    width: 260px;
-    top: 20px;
-    left: 10px;
-    border: 1px solid #eeeeee;
-    border-radius: 3px;
-    font-size: 14px;
-    color: #2E313C;
-}
-.manual-tabs-fixed{
-    position: fixed;
-    top: 20px;
-    left: unset;
-}
-.manual-tab{
-    height: 46px;
-    line-height: 46px;
-    border-bottom: 1px solid #eeeeee;
-    padding-left: 20px;
-    cursor: pointer;
-}
-.manual-tab:first-child{
-    border-top-left-radius: 3px;
-    border-top-right-radius: 3px;
-}
-.manual-tab-active{
-    background: #4788C7;
-    color: #fff;
-}
-
-/* content */
-.manual-content{
-    margin-left: 275px;
-    font-size: 14px;
-    line-height: 1.5;
-}
-.manual-block{
-    border: 1px solid #eeeeee;
-    padding: 20px;
-    margin-bottom: 20px;
-    border-radius: 3px;
-}
-.ques-title{
-    color: #2E313C;
-    font-size: 16px;
-    margin-bottom: 5px;
-}
-.ques-answer{
-    color: #656D78;
-    font-size: 14px;
-    margin: 0;
-}
-@media screen and (max-width:546px){
-    .manual-tabs{
-    display: none;
-    }
-    .manual-content{
-    margin-left: 0;
-    }
-}
-</style>
 <div class="manu-container">
 <div class="manual-tabs"></div>
 <div class="manual-content"></div>
@@ -124,7 +50,7 @@
     function showBlock(index){
         $('.manual-tab')[active].classList.remove('manual-tab-active');
         $('.manual-block')[active].style.display = 'none';
-        
+
         $('.manual-tab')[index].classList.add('manual-tab-active');
         $('.manual-block')[index].style.display = 'block';
         
