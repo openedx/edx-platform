@@ -81,7 +81,10 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
                 max_count = block_structure.get_xblock_field(block_key, 'max_count')
 
                 # Retrieve "selected" json from LMS MySQL database.
-                state_dict = get_student_module_as_dict(usage_info.user, usage_info.course_key, block_key)
+                if not usage_info.user.is_authenticated():
+                    state_dict = {}
+                else:
+                    state_dict = get_student_module_as_dict(usage_info.user, usage_info.course_key, block_key)
                 for selected_block in state_dict.get('selected', []):
                     # Add all selected entries for this user for this
                     # library module to the selected list.
@@ -96,7 +99,8 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
                 selected = block_keys['selected']
 
                 # Save back any changes
-                if any(block_keys[changed] for changed in ('invalid', 'overlimit', 'added')):
+                if usage_info.user.is_authenticated() and any(block_keys[changed]
+                                                              for changed in ('invalid', 'overlimit', 'added')):
                     state_dict['selected'] = list(selected)
                     StudentModule.objects.update_or_create(
                         student=usage_info.user,
