@@ -41,12 +41,18 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2019.
 #
+# #-#-#-#-#  eliteu.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2019 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2019.
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-01-16 11:52+0800\n"
-"PO-Revision-Date: 2019-01-16 03:52:57.524849\n"
+"POT-Creation-Date: 2019-01-16 03:55+0000\n"
+"PO-Revision-Date: 2019-01-16 03:56:48.343537\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -26114,4 +26120,7 @@ msgstr ""
 
 #: membership/templates/membership/wechat_paying.html
 msgid "Payment Success"
+msgstr ""
+
+msgid "email address"
 msgstr ""
