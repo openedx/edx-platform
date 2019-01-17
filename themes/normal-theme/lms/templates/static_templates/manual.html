@@ -114,19 +114,26 @@
     var active = 0;
     for (var i = 0; i < data_m.length; i++){
         tab = tab + '<div class="manual-tab" onclick="showBlock(' + i + ')">' + data_m[i].title + '</div>';
-        content = content + '<div class="manual-block" id="' + i + '"><p class="ques-title">' + data_m[i].title + '</p>' + '<p class="ques-answer">' + data_m[i].answer + '</p></div>';
+        content = content + '<div class="manual-block" style="display:none"><p class="ques-title">' + data_m[i].title + '</p>' + '<p class="ques-answer">' + data_m[i].answer + '</p></div>';
     }
     $('.manual-tabs')[0].innerHTML = tab;
     $('.manual-content')[0].innerHTML = content;
+    $('.manual-block')[active].style.display = 'block';
     $('.manual-tab')[active].classList.add('manual-tab-active');
 
     function showBlock(index){
         $('.manual-tab')[active].classList.remove('manual-tab-active');
+        $('.manual-block')[active].style.display = 'none';
+        
         $('.manual-tab')[index].classList.add('manual-tab-active');
+        $('.manual-block')[index].style.display = 'block';
+        
         active = index;
-        var height = $('.manual-block')[index].offsetTop + 40;
-        $('html, body').animate({ scrollTop: height + 'px'}, 500)
+        
+        // var height = $('.manual-block')[index].offsetTop + 40;
+        // $('html, body').animate({ scrollTop: height + 'px'}, 500)
     }
+    /*
     window.onscroll = function(){
         var height = document.documentElement.scrollTop;
         if (height > 60) {
@@ -135,5 +142,6 @@
             $('.manual-tabs')[0].classList.remove('manual-tabs-fixed');
         }
     }
+    */
 </script>
 

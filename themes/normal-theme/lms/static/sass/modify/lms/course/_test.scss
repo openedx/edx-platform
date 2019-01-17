@@ -135,6 +135,9 @@
       border-top: none;
       font-size: 14px;
     }
+    &.general .icon{
+      margin-right: 10px;
+    }
   }
   
   .notification.success .icon, .notification.error .icon, .notification.warning .icon{
@@ -142,7 +145,7 @@
   }
   .notification .notification-message{
     font-size: 14px;
-    margin-top: 3px;
+    line-height: 25px;
   }
   .choicegroup .indicator-container{
     display: none;
