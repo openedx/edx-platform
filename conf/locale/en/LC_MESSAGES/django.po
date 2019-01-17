@@ -45,8 +45,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-01-14 10:06+0800\n"
-"PO-Revision-Date: 2019-01-14 02:06:46.408129\n"
+"POT-Creation-Date: 2019-01-16 11:52+0800\n"
+"PO-Revision-Date: 2019-01-16 03:52:57.524849\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -5001,7 +5001,6 @@ msgstr ""
 #. Translators:  'All rights reserved' is a legal term used in copyrighting to
 #. protect published content
 #: lms/djangoapps/certificates/views/webview.py
-#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 msgid "All rights reserved"
 msgstr ""
 
@@ -8414,6 +8413,7 @@ msgid "Review ID Verification Photos For {username}"
 msgstr ""
 
 #: lms/envs/common.py lms/templates/certificates/verify.html
+#: themes/normal-theme/lms/templates/footer.html
 #: themes/normal-theme/lms/templates/static_templates/about.html
 #: membership/templates/membership/index.html
 msgid "EliteMBA"
@@ -9528,6 +9528,16 @@ msgstr ""
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "Download the Android app on the Google Play Store"
+msgstr ""
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+msgid ","
+msgstr ""
+
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+msgid "All rights reserved."
 msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
@@ -11033,14 +11043,6 @@ msgid ""
 "Welcome to the new learner profile page. Your full profile now displays more"
 " information to other learners. You can instead choose to display a limited "
 "profile. {learn_more_link_start}Learn more{learn_more_link_end}"
-msgstr ""
-
-#: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-msgid ","
-msgstr ""
-
-#: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-msgid "All rights reserved."
 msgstr ""
 
 #: themes/normal-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
@@ -16181,8 +16183,8 @@ msgstr ""
 #: lms/templates/emails/photo_submission_review.txt
 #: lms/templates/emails/reverification_processed.txt
 msgid ""
-"If the link is not clickable, try copying and pasting it into the address "
-"bar of your web browser, and press \"Enter\" key to open the page"
+"(If the link is not clickable, try copying and pasting it into the address "
+"bar of your web browser, and press \"Enter\" key to open the page)"
 msgstr ""
 
 #: lms/templates/emails/activation_email.txt
@@ -16388,10 +16390,6 @@ msgstr ""
 
 #: lms/templates/emails/failed_verification_email.txt
 msgid "Resubmit Verification: {reverify_url}"
-msgstr ""
-
-#: lms/templates/emails/failed_verification_email.txt
-msgid "ID Verification FAQ: {faq_url}"
 msgstr ""
 
 #: lms/templates/emails/failed_verification_email.txt
@@ -18629,6 +18627,14 @@ msgid ""
 " and actively seek change."
 msgstr ""
 
+#: lms/templates/professors/index.html
+msgid ""
+"We sincerely invite all elite professors, scholars and experts who have been"
+" deeply involved in business management disciplines to develop more "
+"outstanding business talents by transforming intangible wisdom into a "
+"collectible course."
+msgstr ""
+
 #: lms/templates/provider/authorize.html
 msgid ""
 "{start_strong}{application_name}{end_strong} would like to access your data "
@@ -19881,13 +19887,7 @@ msgid "Schools & Partners"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/footer.html
-msgid "Reform·Innovation·Future"
-msgstr ""
-
-#: themes/normal-theme/lms/templates/footer.html
-#: themes/normal-theme/lms/templates/static_templates/contact.html
-#: membership/templates/membership/card.html
-msgid "Elite Education"
+msgid "Learn to Change·Change to Progress"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/footer.html
@@ -20011,8 +20011,16 @@ msgid ""
 "effective means of transmission and increase the reach of knowledge. Here, "
 "we would like to offer sincere invitations to experts and professors, and "
 "look forward to creating and introducing more high-quality curriculum "
-"resources, so that knowledge can generate more value in a diverse world. For"
-" course cooperation, please contact"
+"resources, so that knowledge can generate more value in a diverse world. "
+msgstr ""
+
+#: themes/normal-theme/lms/templates/static_templates/about.html
+msgid "For course cooperation, please contact: "
+msgstr ""
+
+#: themes/normal-theme/lms/templates/static_templates/about.html
+#: themes/normal-theme/lms/templates/static_templates/join_us.html
+msgid "."
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/about.html
@@ -20035,9 +20043,8 @@ msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/about.html
 msgid ""
-"Providing an inspiring and innovative educational experience that enables "
-"learners to have a convenient and inclusive learning environment that "
-"promotes the success of their professional and personal development."
+"Providing individuals, organizations with the knowledge, technology and "
+"platform for lifelong learning."
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/about.html
@@ -20046,6 +20053,11 @@ msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/about.html
 msgid "To become a reputable brand of digital education in China."
+msgstr ""
+
+#: themes/normal-theme/lms/templates/static_templates/contact.html
+#: membership/templates/membership/card.html
+msgid "Elite Education"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/contact.html
@@ -20063,7 +20075,7 @@ msgid "Course Cooperation"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/contact.html
-msgid "Contact: Miss Huang"
+msgid "Contact: Mr. Chen"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/contact.html
@@ -20083,7 +20095,11 @@ msgid "Business Cooperation"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/contact.html
-msgid "General Information"
+msgid "Enterprise Procurement"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/static_templates/contact.html
+msgid "Contact: Ms. Liao"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/contact.html
@@ -20369,7 +20385,7 @@ msgstr ""
 msgid ""
 "After completing the registration process for this service and successfully "
 "registered, the User can log in to the account of EliteMBA (hereinafter "
-"referred to as the ‘account’) using their email address and or mobile number"
+"referred to as the ‘account’) using their email address and/or mobile number"
 " and password. Users are responsible for protecting the security of their "
 "accounts."
 msgstr ""
@@ -21242,7 +21258,29 @@ msgstr ""
 msgid ""
 "We will release job information as soon as possible, so stay tuned. Of "
 "course, this does not mean that we want to miss any future members. Feel "
-"free to contact us through email directly."
+"free to contact us through email directly"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/static_templates/join_us.html
+msgid "Become a Lecturer"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/static_templates/join_us.html
+msgid ""
+"Standing on the platform, educators can impart wisdom to learners. EliteMBA "
+"completely breaks the geographical restrictions of teaching and learning and"
+" provides a broader platform for educators. We sincerely invite all elite "
+"professors, scholars and experts who have been deeply involved in business "
+"management disciplines to develop more outstanding business talents by "
+"transforming intangible wisdom into a collectible course."
+msgstr ""
+
+#: themes/normal-theme/lms/templates/static_templates/join_us.html
+msgid "Please contact"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/static_templates/join_us.html
+msgid "directly or call 400-931-8118."
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/privacy.html
@@ -25689,6 +25727,10 @@ msgstr ""
 
 #: membership/templates/membership/card.html
 msgid "View Introduction"
+msgstr ""
+
+#: membership/templates/membership/card.html
+msgid "Select a course"
 msgstr ""
 
 #: membership/templates/membership/card.html

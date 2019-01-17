@@ -80,12 +80,10 @@ select{
 }
 
 select::-ms-expand { display: none; }
-/*
 select::-ms-value{
-  background-color: #fff;
+  background: transparent;
   color: $font;
 }
-*/
 
 // input
 input::-webkit-input-placeholder, .form-control::-webkit-input-placeholder{
@@ -100,10 +98,12 @@ input:-moz-placeholder, .form-control:-moz-placeholder{
 input:-ms-input-placeholder, .form-control:-ms-input-placeholder{
   color:#ccd1d9;
 }
-
-// h1,h2..
-h1,h2,h3,h4,h5,h6{
-  -webkit-font-smoothing: unset;
+input::-ms-clear{
+  width: 0;
+  height: 0;
+}
+.form-control:focus{
+  box-shadow: none;
 }
 
 // ul
@@ -180,6 +180,7 @@ button:focus:not(:disabled), button:hover:not(:disabled), .btn-default{
     opacity: 0.95;
     box-shadow: none;
     color: #fff;
+    border: 1px solid $primary;
   }
 }
 

@@ -243,6 +243,9 @@ textarea, form#wiki_revision .CodeMirror, input[type="text"]{
   }
   .pull-right{
     margin: 0 !important;
+    input{
+      vertical-align: middle;
+    }
   }
   .previewRevisionButton{
     vertical-align: middle !important;

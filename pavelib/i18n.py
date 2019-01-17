@@ -498,6 +498,8 @@ def i18n_push():
     sh("paver i18n_third_party")
     sh("i18n_tool validate")
     sh("i18n_tool generate --strict")
+    sh("python manage.py cms compilejsi18n")
+    sh("python manage.py lms compilejsi18n")
 
     msg = colorize(
             'green',
@@ -505,6 +507,6 @@ def i18n_push():
         )
     print msg
 
-    con = raw_input("Are you finish code checking (y/n)? ")
+    con = raw_input("Are you want to replace all sources in transifex (y/n)? ")
     if con.lower() == 'y':
         sh("tx push -s -t -l zh_CN")
