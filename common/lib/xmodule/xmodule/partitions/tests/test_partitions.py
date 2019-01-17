@@ -468,73 +468,6 @@ class TestPartitionService(PartitionServiceBaseClass):
     """
     shard = 2
 
-    def test_get_user_group_id_for_partition(self):
-        # assign the first group to be returned
-        user_partition_id = self.user_partition.id
-        groups = self.user_partition.groups
-        self.user_partition.scheme.current_group = groups[0]
-
-        # get a group assigned to the user
-        group1_id = self.partition_service.get_user_group_id_for_partition(self.user, user_partition_id)
-        self.assertEqual(group1_id, groups[0].id)
-
-        # switch to the second group and verify that it is returned for the user
-        self.user_partition.scheme.current_group = groups[1]
-        group2_id = self.partition_service.get_user_group_id_for_partition(self.user, user_partition_id)
-        self.assertEqual(group2_id, groups[1].id)
-
-    def test_caching(self):
-        username = "psvc_cache_user"
-        user_partition_id = self.user_partition.id
-        shared_cache = {}
-
-        # Two MockPartitionService objects that share the same cache:
-        ps_shared_cache_1 = self._create_service(username, shared_cache)
-        ps_shared_cache_2 = self._create_service(username, shared_cache)
-
-        # A MockPartitionService with its own local cache
-        ps_diff_cache = self._create_service(username, {})
-
-        # A MockPartitionService that never uses caching.
-        ps_uncached = self._create_service(username)
-
-        # Set the group we expect users to be placed into
-        first_group = self.user_partition.groups[0]
-        self.user_partition.scheme.current_group = first_group
-
-        # Make sure our partition services all return the right thing, but skip
-        # ps_shared_cache_2 so we can see if its cache got updated anyway.
-        for part_svc in [ps_shared_cache_1, ps_diff_cache, ps_uncached]:
-            self.assertEqual(
-                first_group.id,
-                part_svc.get_user_group_id_for_partition(self.user, user_partition_id)
-            )
-
-        # Now select a new target group
-        second_group = self.user_partition.groups[1]
-        self.user_partition.scheme.current_group = second_group
-
-        # Both of the shared cache entries should return the old value, even
-        # ps_shared_cache_2, which was never asked for the value the first time
-        # Likewise, our separately cached piece should return the original answer
-        for part_svc in [ps_shared_cache_1, ps_shared_cache_2, ps_diff_cache]:
-            self.assertEqual(
-                first_group.id,
-                part_svc.get_user_group_id_for_partition(self.user, user_partition_id)
-            )
-
-        # Our uncached service should be accurate.
-        self.assertEqual(
-            second_group.id,
-            ps_uncached.get_user_group_id_for_partition(self.user, user_partition_id)
-        )
-
-        # And a newly created service should see the right thing
-        ps_new_cache = self._create_service(username, {})
-        self.assertEqual(
-            second_group.id,
-            ps_new_cache.get_user_group_id_for_partition(self.user, user_partition_id)
-        )
 
     def test_get_group(self):
         """
@@ -569,44 +502,6 @@ class TestGetCourseUserPartitions(PartitionServiceBaseClass):
         Enable or disable the feature flag for the enrollment track user partition.
         """
         FEATURES['ENABLE_ENROLLMENT_TRACK_USER_PARTITION'] = enable
-
-    def test_enrollment_track_partition_added(self):
-        """
-        Test that the dynamic enrollment track scheme is added if there is no conflict with the user partition ID.
-        """
-        all_partitions = get_all_partitions_for_course(self.course)
-        self.assertEqual(2, len(all_partitions))
-        self.assertEqual(self.TEST_SCHEME_NAME, all_partitions[0].scheme.name)
-        enrollment_track_partition = all_partitions[1]
-        self.assertEqual(self.ENROLLMENT_TRACK_SCHEME_NAME, enrollment_track_partition.scheme.name)
-        self.assertEqual(unicode(self.course.id), enrollment_track_partition.parameters['course_id'])
-        self.assertEqual(ENROLLMENT_TRACK_PARTITION_ID, enrollment_track_partition.id)
-
-    def test_enrollment_track_partition_not_added_if_conflict(self):
-        """
-        Test that the dynamic enrollment track scheme is NOT added if a UserPartition exists with that ID.
-        """
-        self.user_partition = UserPartition(
-            ENROLLMENT_TRACK_PARTITION_ID,
-            self.TEST_NAME,
-            self.TEST_DESCRIPTION,
-            self.TEST_GROUPS,
-            self.non_random_scheme,
-            self.TEST_PARAMETERS,
-        )
-        self.course.user_partitions = [self.user_partition]
-        all_partitions = get_all_partitions_for_course(self.course)
-        self.assertEqual(1, len(all_partitions))
-        self.assertEqual(self.TEST_SCHEME_NAME, all_partitions[0].scheme.name)
-
-    def test_enrollment_track_partition_not_added_if_disabled(self):
-        """
-        Test that the dynamic enrollment track scheme is NOT added if the settings FEATURE flag is disabled.
-        """
-        TestGetCourseUserPartitions._enable_enrollment_track_partition(False)
-        all_partitions = get_all_partitions_for_course(self.course)
-        self.assertEqual(1, len(all_partitions))
-        self.assertEqual(self.TEST_SCHEME_NAME, all_partitions[0].scheme.name)
 
     def test_filter_inactive_user_partitions(self):
         """
