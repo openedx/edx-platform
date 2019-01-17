@@ -138,7 +138,7 @@ from six import string_types
               else:
                 href_class = "register"
             %>
-            <a href="${reg_href}" class="${href_class}" data-is-subscribe-pay="${is_subscribe_pay}">
+            <a href="#" class="${href_class}" data-is-subscribe-pay="${is_subscribe_pay}">
               %if registration_price > 0:
                 ${_("Enroll {price}").format(price=course_price)}
               %else:
@@ -222,7 +222,7 @@ from six import string_types
               else:
                 href_class = "register"
             %>
-            <a href="${reg_href}" class="${href_class}" data-is-subscribe-pay="${is_subscribe_pay}">
+            <a href="#" class="${href_class}" data-is-subscribe-pay="${is_subscribe_pay}">
               %if registration_price > 0:
                   ${_("Enroll {price}").format(price=course_price)}
               %else:
@@ -493,3 +493,20 @@ from six import string_types
 <%static:require_module_async module_name="js/dateutil_factory" class_name="DateUtilFactory">
     DateUtilFactory.transform(iterationKey=".localized_datetime");
 </%static:require_module_async>
+
+<script>
+  $('.add-to-cart').click(function(){
+    $.ajax({
+      type: 'get',
+      url: '/api/v1/vip/info',
+      success: function(res){
+        if (res.data.status) {
+          $("#class_enroll_form").submit();
+          event.preventDefault();
+        } else {
+          window.location.href = "${ecommerce_checkout_link}";
+        }
+      }
+    })
+  });
+</script>
