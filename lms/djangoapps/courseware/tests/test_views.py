@@ -19,7 +19,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.urls import reverse, reverse_lazy
 from django.http import Http404, HttpResponseBadRequest
 from django.test import TestCase
-from django.test.client import Client, RequestFactory
+from django.test.client import Client
 from django.test.utils import override_settings
 from freezegun import freeze_time
 from milestones.tests.utils import MilestonesTestCaseMixin
@@ -40,7 +40,7 @@ from course_modes.tests.factories import CourseModeFactory
 from courseware.access_utils import check_course_open_for_learner
 from courseware.model_data import FieldDataCache, set_score
 from courseware.module_render import get_module, handle_xblock_callback
-from courseware.tests.factories import GlobalStaffFactory, StudentModuleFactory
+from courseware.tests.factories import GlobalStaffFactory, StudentModuleFactory, RequestFactoryNoCsrf
 from courseware.tests.helpers import get_expiration_banner_text
 from courseware.testutils import RenderXBlockTestMixin
 from courseware.url_helpers import get_redirect_url
@@ -2156,7 +2156,7 @@ class VerifyCourseKeyDecoratorTests(TestCase):
     def setUp(self):
         super(VerifyCourseKeyDecoratorTests, self).setUp()
 
-        self.request = RequestFactory().get("foo")
+        self.request = RequestFactoryNoCsrf().get("foo")
         self.valid_course_id = "edX/test/1"
         self.invalid_course_id = "edX/"
 
@@ -2494,7 +2494,7 @@ class TestIndexViewCompleteOnView(ModuleStoreTestCase, CompletionWaffleTestMixin
         """
         # pylint:disable=attribute-defined-outside-init
 
-        self.request_factory = RequestFactory()
+        self.request_factory = RequestFactoryNoCsrf()
         self.user = UserFactory()
 
         with modulestore().default_store(default_store):
@@ -2860,7 +2860,7 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaf
         self.assertIn('data-enable-completion-on-view-service="true"', response.content)
         self.assertIn('data-mark-completed-on-view-after-delay', response.content)
 
-        request = RequestFactory().post(
+        request = RequestFactoryNoCsrf().post(
             '/',
             data=json.dumps({"completion": 1}),
             content_type='application/json',
