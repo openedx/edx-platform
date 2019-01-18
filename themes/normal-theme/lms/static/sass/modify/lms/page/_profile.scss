@@ -26,7 +26,7 @@
   background: rgba(182, 220, 254, 0.1);
   margin-top: 20px;
   box-sizing: border-box;
-  padding: 8px 20px;
+  padding: 8px 20px 0;
   display: block;
   border-radius: 3px;
 
@@ -52,7 +52,8 @@
     }
   }
   .u-field-message{
-    margin-top: 4px;
+    margin: 2px 0 6px;
+    line-height: 23px;
   }
 }
 
