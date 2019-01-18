@@ -252,6 +252,7 @@
   }
   .phone-number.error{
     border: 1px solid #fe8c97;
+    display: flex;
     .phone-code{
       border: 1px solid transparent;
       border-right: 1px solid #e6e9ed;
@@ -478,6 +479,9 @@
     height: auto;
     .phone-input-box{
       width: 55vw;
+    }
+    .phone-number.error{
+      display: flex;
     }
     .qrcode-input-box{
       width: 36vw;
