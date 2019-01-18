@@ -41,6 +41,9 @@
     .fa{
       vertical-align: middle;
     }
+    .fa-save:before{
+      transform: scale(0.95);
+    }
     ol li{
       border: 0;
       &:not(:last-child){
@@ -168,6 +171,9 @@
   .feedback-hint-incorrect,.feedback-hint-partially-correct, .feedback-hint-correct{
     margin-top: 15px;
   }
+  .explanation-title{
+    line-height: 1.5;
+  }
   
 
 
@@ -235,5 +241,9 @@
     #main > .xblock{
       padding: 20px 15px;
     }
-  } 
+  }
+  .xblock .xmodule_display.xmodule_CapaModule div.problem .action .problem-action-button-wrapper:first-child .problem-action-btn{
+    padding: 10px 10px 10px 0;
+    margin-left: -6px;
+  }
 }
