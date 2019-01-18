@@ -96,6 +96,7 @@
                 color: #fa7f2b;
             }
             p{
+                line-height: normal;
                 color: #fa7f2b;
             }
         }
@@ -173,7 +174,7 @@
         margin-right: 0;
     }
 }
-@media screen and (max-width:576px){
+@media screen and (max-width:770px){
     #orders-tab{
         padding: 10px 15px;
     }
@@ -336,4 +337,7 @@
 }
 .u-field .message-success{
     vertical-align: sub;
+}
+.account-settings-sections #aboutTabSections-tabpanel .section .account-settings-section-body .u-field .u-field-message .u-field-message-notification{
+    padding: 38px 0 0 74px;
 }
