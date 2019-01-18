@@ -500,7 +500,11 @@ from six import string_types
       type: 'get',
       url: '/api/v1/vip/info',
       success: function(res){
-        if (res.data.status) {
+          if (res.code == -1) {
+          window.location.href = "${reverse('register_user')}";
+        } else if (res.data.status == -1) {
+            location.href = "${reverse('register_user')}";
+        } else if (res.data.status) {
           $("#class_enroll_form").submit();
           event.preventDefault();
         } else {
