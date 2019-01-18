@@ -148,12 +148,19 @@
         display: none;
       }
     }
+    .u-field.mode-placeholder:hover{
+      border: 2px solid transparent;
+    }
   }
 
 
   .wrapper-profile-section-container-two{
     padding-left: 30px;
 
+    .u-field-textarea.editable-toggle.mode-edit{
+      padding-left: 0;
+      padding-right: 0;
+    }
     .wrapper-u-field .u-field-header .u-field-title,.u-field-title{
       font-size: 16px;
       color: $title;
