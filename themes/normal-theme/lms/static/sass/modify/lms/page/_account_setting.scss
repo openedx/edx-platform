@@ -193,6 +193,9 @@
     .account-settings-sections #ordersTabSections-tabpanel .u-field-order{
         padding-bottom: 50px;
         flex-wrap: wrap;
+        &:first-child{
+            padding-bottom: 20px;
+        }
     }
     .u-field-order-lines{
         padding-top: 10px;
@@ -248,8 +251,8 @@
     cursor: pointer;
     a.u-field-link {
         @extend %btn-my-primary;
-        height: 20px;
-        line-height: 20px;
+        height: 34px;
+        line-height: 34px;
         box-sizing: content-box;
         padding: 8px 15px;
         width: 100%;
