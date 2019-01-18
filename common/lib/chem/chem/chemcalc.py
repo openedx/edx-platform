@@ -1,11 +1,14 @@
-from __future__ import division
-
+from __future__ import absolute_import, division
 from fractions import Fraction
 
 import markupsafe
 import nltk
 from nltk.tree import Tree
 from pyparsing import Literal, OneOrMore, ParseException, StringEnd
+from six.moves import map
+from six.moves import range
+from six.moves import zip
+from functools import reduce
 
 
 ARROWS = ('<->', '->')
@@ -22,10 +25,10 @@ elements = ['Ac', 'Ag', 'Al', 'Am', 'Ar', 'As', 'At', 'Au', 'B', 'Ba', 'Be',
             'Ru', 'S', 'Sb', 'Sc', 'Se', 'Sg', 'Si', 'Sm', 'Sn', 'Sr', 'Ta',
             'Tb', 'Tc', 'Te', 'Th', 'Ti', 'Tl', 'Tm', 'U', 'Uuo', 'Uup',
             'Uus', 'Uut', 'V', 'W', 'Xe', 'Y', 'Yb', 'Zn', 'Zr']
-digits = map(str, range(10))
+digits = list(map(str, list(range(10))))
 symbols = list("[](){}^+-/")
 phases = ["(s)", "(l)", "(g)", "(aq)"]
-tokens = reduce(lambda a, b: a ^ b, map(Literal, elements + digits + symbols + phases))
+tokens = reduce(lambda a, b: a ^ b, list(map(Literal, elements + digits + symbols + phases)))
 tokenizer = OneOrMore(tokens) + StringEnd()
 
 # HTML, Text are temporarily copied from openedx.core.djangolib.markup
@@ -263,7 +266,7 @@ def _get_final_tree(s):
     try:
         tokenized = tokenizer.parseString(s)
         parsed = parser.parse(tokenized)
-        merged = _merge_children(parsed.next(), {'S', 'group'})
+        merged = _merge_children(next(parsed), {'S', 'group'})
         final = _clean_parse_tree(merged)
         return final
     except StopIteration:
@@ -354,11 +357,11 @@ def divide_chemical_expression(s1, s2, ignore_state=False):
 
     # order of factors and phases must mirror the order of multimolecules,
     # use 'decorate, sort, undecorate' pattern
-    treedic['1 cleaned_mm_list'], treedic['1 factors'], treedic['1 phases'] = zip(
-        *sorted(zip(treedic['1 cleaned_mm_list'], treedic['1 factors'], treedic['1 phases'])))
+    treedic['1 cleaned_mm_list'], treedic['1 factors'], treedic['1 phases'] = list(zip(
+        *sorted(zip(treedic['1 cleaned_mm_list'], treedic['1 factors'], treedic['1 phases']))))
 
-    treedic['2 cleaned_mm_list'], treedic['2 factors'], treedic['2 phases'] = zip(
-        *sorted(zip(treedic['2 cleaned_mm_list'], treedic['2 factors'], treedic['2 phases'])))
+    treedic['2 cleaned_mm_list'], treedic['2 factors'], treedic['2 phases'] = list(zip(
+        *sorted(zip(treedic['2 cleaned_mm_list'], treedic['2 factors'], treedic['2 phases']))))
 
     # check if expressions are correct without factors
     if not _check_equality(treedic['1 cleaned_mm_list'], treedic['2 cleaned_mm_list']):
