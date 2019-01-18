@@ -2,6 +2,7 @@
 Tests to verify that CorrectMap behaves correctly
 """
 
+from __future__ import absolute_import
 import unittest
 from capa.correctmap import CorrectMap
 import datetime

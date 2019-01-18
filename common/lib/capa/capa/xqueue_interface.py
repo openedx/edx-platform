@@ -1,11 +1,13 @@
 #
 #  LMS Interface to external queueing system (xqueue)
 #
+from __future__ import absolute_import
 import hashlib
 import json
 import logging
 
 import requests
+import six
 
 
 log = logging.getLogger(__name__)
@@ -54,7 +56,7 @@ def parse_xreply(xreply):
     """
     try:
         xreply = json.loads(xreply)
-    except ValueError, err:
+    except ValueError as err:
         log.error(err)
         return (1, 'unexpected reply from server')
 
@@ -70,7 +72,7 @@ class XQueueInterface(object):
     """
 
     def __init__(self, url, django_auth, requests_auth=None):
-        self.url = unicode(url)
+        self.url = six.text_type(url)
         self.auth = django_auth
         self.session = requests.Session()
         self.session.auth = requests_auth
@@ -135,11 +137,11 @@ class XQueueInterface(object):
             response = self.session.post(
                 url, data=data, files=files, timeout=(CONNECT_TIMEOUT, READ_TIMEOUT)
             )
-        except requests.exceptions.ConnectionError, err:
+        except requests.exceptions.ConnectionError as err:
             log.error(err)
             return (1, 'cannot connect to server')
 
-        except requests.exceptions.ReadTimeout, err:
+        except requests.exceptions.ReadTimeout as err:
             log.error(err)
             return (1, 'failed to read from the server')
 

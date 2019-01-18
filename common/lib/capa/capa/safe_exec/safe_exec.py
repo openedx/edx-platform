@@ -1,5 +1,6 @@
 """Capa's specialized use of codejail.safe_exec."""
 
+from __future__ import absolute_import
 from codejail.safe_exec import safe_exec as codejail_safe_exec
 from codejail.safe_exec import not_safe_exec as codejail_not_safe_exec
 from codejail.safe_exec import json_safe, SafeExecException
@@ -136,6 +137,7 @@ def safe_exec(
         exec_fn = codejail_safe_exec
 
     # Run the code!  Results are side effects in globals_dict.
+    ex = None
     try:
         exec_fn(
             code_prolog + LAZY_IMPORTS + code, globals_dict,
@@ -143,6 +145,7 @@ def safe_exec(
         )
     except SafeExecException as e:
         emsg = text_type(e)
+        ex = e
     else:
         emsg = None
 
@@ -154,4 +157,4 @@ def safe_exec(
 
     # If an exception happened, raise it now.
     if emsg:
-        raise e
+        raise ex

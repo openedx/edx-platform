@@ -1,6 +1,7 @@
 """
 CAPA HTML rendering tests.
 """
+from __future__ import absolute_import
 import textwrap
 import unittest
 

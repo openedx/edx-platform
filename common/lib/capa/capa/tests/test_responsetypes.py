@@ -3,6 +3,7 @@
 Tests of responsetypes
 """
 
+from __future__ import absolute_import
 from cStringIO import StringIO
 from datetime import datetime
 import json
@@ -42,6 +43,7 @@ from capa.tests.response_xml_factory import (
 )
 from capa.util import convert_files_to_filenames
 from capa.xqueue_interface import dateformat
+import six
 
 
 class ResponseTest(unittest.TestCase):
@@ -572,8 +574,8 @@ class FormulaResponseTest(ResponseTest):
             tolerance="1%",
             answer="x"
         )
-        self.assertTrue(problem.responders.values()[0].validate_answer('14*x'))
-        self.assertFalse(problem.responders.values()[0].validate_answer('3*y+2*x'))
+        self.assertTrue(list(problem.responders.values())[0].validate_answer('14*x'))
+        self.assertFalse(list(problem.responders.values())[0].validate_answer('3*y+2*x'))
 
 
 class StringResponseTest(ResponseTest):  # pylint: disable=missing-docstring
@@ -698,18 +700,18 @@ class StringResponseTest(ResponseTest):  # pylint: disable=missing-docstring
             b) regexp is saved to xml and is read in python as repr of that string
             So  a\d in front-end editor will become a\\\\d in xml,  so it will match a1 as student answer.
         """
-        problem = self.build_problem(answer=ur"5\\æ", case_sensitive=False, regexp=True)
-        self.assert_grade(problem, ur"5\æ", "correct")
+        problem = self.build_problem(answer=u"5\\æ", case_sensitive=False, regexp=True)
+        self.assert_grade(problem, u"5\æ", "correct")
 
         problem = self.build_problem(answer=u"5\\\\æ", case_sensitive=False, regexp=True)
-        self.assert_grade(problem, ur"5\æ", "correct")
+        self.assert_grade(problem, u"5\æ", "correct")
 
     def test_backslash(self):
         problem = self.build_problem(answer=u"a\\\\c1", case_sensitive=False, regexp=True)
-        self.assert_grade(problem, ur"a\c1", "correct")
+        self.assert_grade(problem, u"a\c1", "correct")
 
     def test_special_chars(self):
-        problem = self.build_problem(answer=ur"a \s1", case_sensitive=False, regexp=True)
+        problem = self.build_problem(answer=u"a \s1", case_sensitive=False, regexp=True)
         self.assert_grade(problem, u"a  1", "correct")
 
     def test_case_sensitive(self):
@@ -1349,7 +1351,7 @@ class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-docstring
         Test `get_score` is working for additional answers.
         """
         problem = self.build_problem(answer='100', additional_answers={'1': ''})
-        responder = problem.responders.values()[0]
+        responder = list(problem.responders.values())[0]
 
         # Check primary answer.
         new_cmap = responder.get_score({'1_2_1': '100'})
@@ -1648,14 +1650,14 @@ class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-docstring
     def test_compare_answer(self):
         """Tests the answer compare function."""
         problem = self.build_problem(answer="42")
-        responder = problem.responders.values()[0]
+        responder = list(problem.responders.values())[0]
         self.assertTrue(responder.compare_answer('48', '8*6'))
         self.assertFalse(responder.compare_answer('48', '9*5'))
 
     def test_validate_answer(self):
         """Tests the answer validation function."""
         problem = self.build_problem(answer="42")
-        responder = problem.responders.values()[0]
+        responder = list(problem.responders.values())[0]
         self.assertTrue(responder.validate_answer('23.5'))
         self.assertFalse(responder.validate_answer('fish'))
 
@@ -2365,10 +2367,10 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-docstring
 
         correct_map = problem.grade_answers(input_dict)
 
-        self.assertNotEqual(problem.student_answers.keys(), correct_order)
+        self.assertNotEqual(list(problem.student_answers.keys()), correct_order)
 
         # euqal to correct order after sorting at get_score
-        self.assertListEqual(problem.responders.values()[0].context['idset'], correct_order)
+        self.assertListEqual(list(problem.responders.values())[0].context['idset'], correct_order)
 
         self.assertEqual(correct_map.get_correctness('1_2_1'), 'correct')
         self.assertEqual(correct_map.get_correctness('1_2_9'), 'correct')
@@ -2719,7 +2721,7 @@ class ChoiceTextResponseTest(ResponseTest):
         radiotextgroup.
         """
 
-        for name, inputs in self.TEST_INPUTS.iteritems():
+        for name, inputs in six.iteritems(self.TEST_INPUTS):
             # Turn submission into the form expected when grading this problem.
             submission = self._make_answer_dict(inputs)
             # Lookup the problem_name, and the whether this test problem
@@ -2799,7 +2801,7 @@ class ChoiceTextResponseTest(ResponseTest):
             "checkbox_2_choices_2_inputs": checkbox_two_choices_two_inputs
         }
 
-        for name, inputs in inputs.iteritems():
+        for name, inputs in six.iteritems(inputs):
             submission = self._make_answer_dict(inputs)
             # Load the test problem's name and desired correctness
             problem_name, correctness = scenarios[name]
