@@ -82,7 +82,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-01-16 03:55+0000\n"
+"POT-Creation-Date: 2019-01-18 04:19+0000\n"
 "PO-Revision-Date: 2019-01-17 09:35+0000\n"
 "Last-Translator: li ying <code@eliteu.cn>, 2019\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)\n"
@@ -925,6 +925,10 @@ msgstr "重置密码操作发生错误。请再尝试一次。"
 #: common/djangoapps/student/views/management.py
 msgid "Valid e-mail address required."
 msgstr "需要有效的电子邮件地址"
+
+#: common/djangoapps/student/views/management.py
+msgid "E-mail address has been used."
+msgstr "邮件地址已被使用。"
 
 #: common/djangoapps/student/views/management.py
 msgid "Old email is the same as the new email."
@@ -15937,7 +15941,6 @@ msgstr "选修为："
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/normal-theme/lms/templates/static_templates/help.html
-#: themes/normal-theme/lms/templates/static_templates/manual.html
 msgid "Coming Soon"
 msgstr "即将上线"
 
@@ -26280,8 +26283,12 @@ msgid "Choose a payment method"
 msgstr "选择支付方式"
 
 #: membership/templates/membership/card.html
-msgid "Membership Subscription Period"
-msgstr "订阅会员有效期"
+msgid "Membership Valid in "
+msgstr "会员有效期："
+
+#: membership/templates/membership/card.html
+msgid "days"
+msgstr "天"
 
 #: membership/templates/membership/card.html
 msgid "Tuition:"

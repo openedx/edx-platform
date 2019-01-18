@@ -51,8 +51,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-01-16 03:55+0000\n"
-"PO-Revision-Date: 2019-01-16 03:56:48.343537\n"
+"POT-Creation-Date: 2019-01-18 04:19+0000\n"
+"PO-Revision-Date: 2019-01-18 04:19:48.646202\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -889,6 +889,10 @@ msgstr ""
 
 #: common/djangoapps/student/views/management.py
 msgid "Valid e-mail address required."
+msgstr ""
+
+#: common/djangoapps/student/views/management.py
+msgid "E-mail address has been used."
 msgstr ""
 
 #: common/djangoapps/student/views/management.py
@@ -15620,7 +15624,6 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: themes/normal-theme/lms/templates/static_templates/help.html
-#: themes/normal-theme/lms/templates/static_templates/manual.html
 msgid "Coming Soon"
 msgstr ""
 
@@ -25744,7 +25747,11 @@ msgid "Choose a payment method"
 msgstr ""
 
 #: membership/templates/membership/card.html
-msgid "Membership Subscription Period"
+msgid "Membership Valid in "
+msgstr ""
+
+#: membership/templates/membership/card.html
+msgid "days"
 msgstr ""
 
 #: membership/templates/membership/card.html
