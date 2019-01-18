@@ -60,9 +60,10 @@ import urllib
         weibostr = urllib.urlencode(weibo_dict)
         weibourl = "http://service.weibo.com/share/share.php?" + weibostr
 
-        qzone_dict = {'url': course_url, 'desc': share_text, 'title': course.display_name_with_default_escaped}
+        pics = 'https://oss.elitemba.cn/web_static/imgs/mba_logo.png'
+        qzone_dict = {'desc': share_text, 'title': course.display_name_with_default_escaped, 'pics': pics}
         qzonestr = urllib.urlencode(qzone_dict)
-        qzoneurl = "https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?" + qzonestr
+        qzoneurl = "https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?" + qzonestr+'&url='+course_url
 
         weixin_url = request.build_absolute_uri()
         tweet_action = u"http://twitter.com/intent/tweet?" + tweetstr
