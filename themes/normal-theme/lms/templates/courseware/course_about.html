@@ -302,7 +302,7 @@ from six import string_types
         <span class="fa-my fa-my-close"></span>
       </div>
       <div class="video-box" style="display: none">
-        <video id="player-container-id" preload="auto" playsinline webkit-playinline x5-playinline></video>
+        <video id="player-container-id" preload="auto" playsinline webkit-playinline></video>
       </div>
   
       <script>
@@ -318,8 +318,8 @@ from six import string_types
           var videoID = e.getAttribute('data-video-id');
           if (player){
             player.loadVideoByID({
-              fileID: videoID, // 请传入需要播放的视频 filID 必须
-              appID: appID, // 请传入点播账号的 appID 必须
+              fileID: videoID,
+              appID: appID,
               autoplay: true,
             });
           } else {
@@ -500,7 +500,9 @@ from six import string_types
       type: 'get',
       url: '/api/v1/vip/info',
       success: function(res){
-        if (res.data.status) {
+        if (res.code == -1) {
+          window.location.href = "${reverse('register_user')}";
+        } else if (res.data.status) {
           $("#class_enroll_form").submit();
           event.preventDefault();
         } else {

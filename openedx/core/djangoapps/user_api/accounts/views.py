@@ -581,7 +581,7 @@ class PhoneBindingViewSet(ViewSet):
         设置验证码
         '''
         code_key = self.verify_code_key.format(**key)
-        code = cache.get(code_key) or random.randint(100000, 999999)  # 6位验证码
+        code = random.randint(100000, 999999)  # 6位验证码
         cache.set(code_key, str(code), self.verify_code_timeout)
         return code
 

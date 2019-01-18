@@ -234,7 +234,20 @@
 #password-reset-confirm-form{
   padding-top: 0;
 }
+.checkbox-optional_fields_toggle{
 
+  #toggle_optional_fields{
+    margin: 0;
+    vertical-align: middle;
+    margin-right: 5px;
+  }
+  label{
+    .label-text{
+      vertical-align: middle;
+    }
+  }
+
+} 
 
 @media screen and (max-width:768px){
   .login-register .button-oa2-weixin{
