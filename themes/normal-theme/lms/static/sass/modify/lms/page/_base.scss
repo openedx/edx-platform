@@ -134,9 +134,12 @@ textarea:focus, input[type="text"]:focus, input[type="url"]:focus, input[type="e
   }
 }
 
-// button
-// button样式
-// 底色蓝，字体白按钮
+a,a:hover,a:active,a:visited,a:link,a:focus{
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  -webkit-tap-highlight-color:transparent;
+  outline:none;
+  text-decoration: none;
+}
 input[type="submit"], input[type="button"], button, .button{
   -webkit-font-smoothing: unset;
   box-shadow: none;
@@ -154,6 +157,9 @@ button:focus:not(:disabled), button:hover:not(:disabled), .btn-default{
   background-image: none;
   background-color: transparent;
 }
+// button
+// button样式
+// 底色蓝，字体白按钮
 %btn-my-primary{
   display: inline-block;
   width: auto;
@@ -232,8 +238,9 @@ button:focus:not(:disabled), button:hover:not(:disabled), .btn-default{
   font-family: $font-family;
 
   &:hover,&:focus, &:active, &:visited{
-    background: #f5f7fa;
-    color: #aab2bd;
+    background: #f5f7fa !important;
+    color: #aab2bd !important;
+    border: 1px solid #e6e9ed !important;
   }
 }
 

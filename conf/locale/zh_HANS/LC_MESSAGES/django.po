@@ -26513,6 +26513,22 @@ msgid "Professor of Economics in Davidson College"
 msgstr "美国戴维森学院经济学教授"
 
 #: membership/templates/membership/index.html
+msgid "Dr. Elia Kacapyr"
+msgstr "伊利亚·卡克皮尔 博士"
+
+#: membership/templates/membership/index.html
+msgid "Professor of Economics, Ithaca College, USA"
+msgstr "美国伊萨卡学院经济学教授"
+
+#: membership/templates/membership/index.html
+msgid "Dr. Robert Graham"
+msgstr "罗伯特·格雷厄姆 博士"
+
+#: membership/templates/membership/index.html
+msgid "Professor of Economics, Hanover College, USA"
+msgstr "美国汉诺威学院经济学教授"
+
+#: membership/templates/membership/index.html
 msgid ""
 "Prior President and Professor of the University of International Business "
 "and Economics"

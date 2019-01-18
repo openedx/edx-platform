@@ -51,7 +51,8 @@ $icon-width: 18px;
 .account-activation.success.aa-icon .message-copy::before,
 .fa-camera:before,
 .account-activation.info.aa-icon .message-copy::before,
-.fa-asterisk:before
+.fa-asterisk:before,
+.fa-refresh:before
 {
   content: '';
   display: inline-block;
@@ -275,7 +276,10 @@ $icon-width: 18px;
 .fa-asterisk:before{
   background-position: calcP(7, 5)
 }
-
+.fa-refresh:before{
+  background-position: calcP(9, 3);
+  transform: scale(0.85);
+}
 // 2. 课程详情页的新icon
 // http://0.0.0.0:18000/courses/course-v1:edX+E2E-101+course/about
 .fa-my{

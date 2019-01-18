@@ -25977,6 +25977,22 @@ msgid "Professor of Economics in Davidson College"
 msgstr ""
 
 #: membership/templates/membership/index.html
+msgid "Dr. Elia Kacapyr"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Professor of Economics, Ithaca College, USA"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Dr. Robert Graham"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Professor of Economics, Hanover College, USA"
+msgstr ""
+
+#: membership/templates/membership/index.html
 msgid ""
 "Prior President and Professor of the University of International Business "
 "and Economics"
