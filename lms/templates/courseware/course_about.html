@@ -427,7 +427,7 @@ from six import string_types
       url: '/api/v1/vip/info',
       success: function(res){
         if (res.code == -1) {
-            window.location.href = "${reverse('register_user')}";
+          window.location.href = "${reverse('register_user')}";
         } else if (res.data.status) {
           $("#class_enroll_form").submit();
           event.preventDefault();
