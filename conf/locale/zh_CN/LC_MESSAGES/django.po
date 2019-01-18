@@ -26322,7 +26322,7 @@ msgstr "遇到问题?"
 
 #: membership/templates/membership/index.html
 msgid "Prestige EMBA courses in America"
-msgstr "美国名校EliteMBA精华课程"
+msgstr "美国名校MBA精华课程"
 
 #: membership/templates/membership/index.html
 msgid "Six Course Specializations of Elite MBA School"
