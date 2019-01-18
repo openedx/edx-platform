@@ -944,6 +944,10 @@ def validate_new_email(user, new_email):
         validate_email(new_email)
     except ValidationError:
         raise ValueError(_('Valid e-mail address required.'))
+    
+    exists = User.objects.filter(email=new_email).exists()
+    if exists:
+        raise ValueError(_('E-mail address has been used.'))
 
     if new_email == user.email:
         raise ValueError(_('Old email is the same as the new email.'))
