@@ -42,17 +42,19 @@ class CustomSettings(models.Model):
         :return:
             get seo tags for course
         """
-        title, description, keywords, robots = "", "", "", ""
+        title, description, keywords, robots, utm_params = "", "", "", "", {}
         if self.seo_tags:
             _json_tags = json.loads(self.seo_tags)
             title = _json_tags.get("title", title)
             description = _json_tags.get("description", description)
             keywords = _json_tags.get("keywords", keywords)
             robots = _json_tags.get("robots", robots)
+            utm_params = {key: _json_tags[key] for key in _json_tags.keys() if 'utm_' in key}
 
         return {
             "title": title,
             "description": description,
             "keywords": keywords,
-            "robots": robots
+            "robots": robots,
+            "utm_params": utm_params
         }

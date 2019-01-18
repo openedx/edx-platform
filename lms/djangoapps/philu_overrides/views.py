@@ -34,7 +34,7 @@ from lms.djangoapps.courseware.access import has_access, _can_enroll_courselike
 from lms.djangoapps.courseware.courses import get_courses, sort_by_start_date, get_course_by_id, sort_by_announcement
 from lms.djangoapps.courseware.views.views import get_last_accessed_courseware
 from lms.djangoapps.onboarding.helpers import reorder_registration_form_fields, get_alquity_community_url
-from lms.djangoapps.philu_api.helpers import get_course_custom_settings
+from lms.djangoapps.philu_api.helpers import get_course_custom_settings, get_social_sharing_urls
 from lms.djangoapps.student_account.views import _local_server_get, _get_form_descriptions, _external_auth_intercept, \
     _third_party_auth_context
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -622,6 +622,14 @@ def course_about(request, course_id):
         custom_settings = get_course_custom_settings(course.id)
         meta_tags = custom_settings.get_course_meta_tags()
 
+        meta_tags['description'] = meta_tags['description'] or course_details.short_description
+        meta_tags['title'] = meta_tags['title'] or course.display_name
+
+        if course_details.banner_image_name != 'images_course_image.jpg':
+            meta_tags['image'] = settings.LMS_ROOT_URL + course_details.banner_image_asset_path
+
+        social_sharing_urls = get_social_sharing_urls(request.build_absolute_uri(), meta_tags)
+
         context = {
             'course': course,
             'course_details': course_details,
@@ -645,7 +653,8 @@ def course_about(request, course_id):
             'pre_requisite_courses': pre_requisite_courses,
             'course_image_urls': overview.image_urls,
             'meta_tags': meta_tags,
-            'is_alquity': is_alquity
+            'is_alquity': is_alquity,
+            'social_sharing_urls': social_sharing_urls
         }
         inject_coursetalk_keys_into_context(context, course_key)
 
