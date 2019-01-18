@@ -476,12 +476,12 @@ class TestPartitionService(PartitionServiceBaseClass):
 
         # get a group assigned to the user
         group1_id = self.partition_service.get_user_group_id_for_partition(self.user, user_partition_id)
-        self.assertEqual(group1_id, groups[0].id)
+        assert group1_id == groups[0].id
 
         # switch to the second group and verify that it is returned for the user
         self.user_partition.scheme.current_group = groups[1]
         group2_id = self.partition_service.get_user_group_id_for_partition(self.user, user_partition_id)
-        self.assertEqual(group2_id, groups[1].id)
+        assert group2_id == groups[1].id
 
     def test_caching(self):
         username = "psvc_cache_user"

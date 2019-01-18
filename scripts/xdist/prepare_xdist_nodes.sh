@@ -13,7 +13,7 @@ do
     container_reqs_cmd="ssh -o StrictHostKeyChecking=no ubuntu@$ip 'cd /edx/app/edxapp;
     git clone --branch master --depth 1 --no-tags -q https://github.com/edx/edx-platform.git; cd edx-platform;
     git fetch --depth=1 --no-tags -q origin ${XDIST_GIT_BRANCH}; git checkout -q ${XDIST_GIT_BRANCH};
-    source /edx/app/edxapp/edxapp_env; pip install -qr requirements/edx/testing.txt' & "
+    source /edx/app/edxapp/edxapp_env; pip install -qr requirements/edx/testing.txt; mkdir reports' & "
 
     cmd=$cmd$container_reqs_cmd
 done
