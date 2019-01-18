@@ -13,20 +13,11 @@
             href="{% with_link_tracking course_url %}"
         {% endif %}
     {% endif %}
-    style="
-        color: #ffffff;
-        text-decoration: none;
-        border-radius: 4px;
-        -webkit-border-radius: 4px;
-        -moz-border-radius: 4px;
-        background-color: #960909;
-        border-top: 12px solid #960909;
-        border-bottom: 12px solid #960909;
-        border-right: 50px solid #960909;
-        border-left: 50px solid #960909;
-        display: inline-block;
-    ">
+    >
         {# old email clients require the use of the font tag :( #}
-        <font color="#ffffff"><b>{{ course_cta_text }}</b></font>
+        <font><b>{% with_link_tracking course_cta_url %}</b></font>
     </a>
 </p>
+<p>
+    {% trans '(If the link is not clickable, try copying and pasting it into the address bar of your web browser, and press "Enter" key to open the page)' %}
+</p>    
