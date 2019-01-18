@@ -44,7 +44,7 @@ from shoppingcart.models import CourseRegistrationCode
 from student.views import is_course_blocked
 from util.views import ensure_valid_course_key
 from xmodule.modulestore.django import modulestore
-from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
+from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PRIVATE
 from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
 from .views import CourseTabView
 from ..access import has_access
@@ -189,20 +189,24 @@ class CoursewareIndex(View):
                 'email_opt_in': False,
             })
 
-            PageLevelMessages.register_warning_message(
-                request,
-                Text(_("You are not signed in. To see additional course content, {sign_in_link} or "
-                       "{register_link}, and enroll in this course.")).format(
-                    sign_in_link=HTML('<a href="{url}">{sign_in_label}</a>').format(
-                        sign_in_label=_('sign in'),
-                        url='{}?{}'.format(reverse('signin_user'), qs),
-                    ),
-                    register_link=HTML('<a href="/{url}">{register_label}</a>').format(
-                        register_label=_('register'),
-                        url='{}?{}'.format(reverse('register_user'), qs),
-                    ),
+            unenrolled_access_flag = COURSE_ENABLE_UNENROLLED_ACCESS_FLAG.is_enabled(self.course.id)
+            allow_anonymous = unenrolled_access_flag and self.course.course_visibility != COURSE_VISIBILITY_PRIVATE
+
+            if not allow_anonymous:
+                PageLevelMessages.register_warning_message(
+                    request,
+                    Text(_("You are not signed in. To see additional course content, {sign_in_link} or "
+                        "{register_link}, and enroll in this course.")).format(
+                        sign_in_link=HTML('<a href="{url}">{sign_in_label}</a>').format(
+                            sign_in_label=_('sign in'),
+                            url='{}?{}'.format(reverse('signin_user'), qs),
+                        ),
+                        register_link=HTML('<a href="/{url}">{register_label}</a>').format(
+                            register_label=_('register'),
+                            url='{}?{}'.format(reverse('register_user'), qs),
+                        ),
+                    )
                 )
-            )
 
         return render_to_response('courseware/courseware.html', self._create_courseware_context(request))
 

@@ -531,7 +531,11 @@ class CourseTabView(EdxFragmentView):
         """
         Register messages to be shown to the user if they have limited access.
         """
-        if request.user.is_anonymous:
+        unenrolled_access_flag = COURSE_ENABLE_UNENROLLED_ACCESS_FLAG.is_enabled(course_key)
+        course = get_course(course_key)
+        allow_anonymous = unenrolled_access_flag and course.course_visibility != COURSE_VISIBILITY_PRIVATE
+
+        if request.user.is_anonymous and not allow_anonymous:
             PageLevelMessages.register_warning_message(
                 request,
                 Text(_("To see course content, {sign_in_link} or {register_link}.")).format(
@@ -546,7 +550,7 @@ class CourseTabView(EdxFragmentView):
                 )
             )
         else:
-            if not CourseEnrollment.is_enrolled(request.user, course_key):
+            if not CourseEnrollment.is_enrolled(request.user, course_key) and not allow_anonymous:
                 # Only show enroll button if course is open for enrollment.
                 if course_open_for_self_enrollment(course_key):
                     enroll_message = _('You must be enrolled in the course to see course content. \

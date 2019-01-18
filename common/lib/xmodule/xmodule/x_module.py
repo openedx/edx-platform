@@ -72,7 +72,9 @@ STUDIO_VIEW = 'studio_view'
 # Views that present a "preview" view of an xblock (as opposed to an editing view).
 PREVIEW_VIEWS = [STUDENT_VIEW, PUBLIC_VIEW, AUTHOR_VIEW]
 
-DEFAULT_PUBLIC_VIEW_MESSAGE = u'Please enroll to view this content.'
+DEFAULT_PUBLIC_VIEW_MESSAGE = u'''
+%s is only accessible to enrolled learners. Sign in or register, and enroll in this course to view it.
+'''
 
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
 #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
@@ -766,7 +768,13 @@ class XModuleMixin(XModuleFields, XBlock):
             u'<span class="icon icon-alert fa fa fa-warning" aria-hidden="true"></span>'
             u'<div class="message-content">{}</div></div></div>'
         )
-        return Fragment(alert_html.format(DEFAULT_PUBLIC_VIEW_MESSAGE))
+
+        if self.display_name:
+            display_text = DEFAULT_PUBLIC_VIEW_MESSAGE %self.display_name
+        else:
+            display_text = DEFAULT_PUBLIC_VIEW_MESSAGE %"This content"
+
+        return Fragment(alert_html.format(display_text))
 
 
 class ProxyAttribute(object):

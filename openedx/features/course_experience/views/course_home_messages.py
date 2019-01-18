@@ -25,8 +25,9 @@ from lms.djangoapps.course_goals.api import (
 from lms.djangoapps.course_goals.models import GOAL_KEY_CHOICES
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangolib.markup import HTML, Text
-from openedx.features.course_experience import CourseHomeMessages
+from openedx.features.course_experience import CourseHomeMessages, COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from student.models import CourseEnrollment
+from xmodule.course_module import COURSE_VISIBILITY_PRIVATE
 
 
 class CourseHomeMessageFragmentView(EdxFragmentView):
@@ -107,7 +108,10 @@ def _register_course_home_messages(request, course, user_access, course_start_da
     """
     Register messages to be shown in the course home content page.
     """
-    if user_access['is_anonymous']:
+    unenrolled_access_flag = COURSE_ENABLE_UNENROLLED_ACCESS_FLAG.is_enabled(course.id)
+    allow_anonymous = unenrolled_access_flag and course.course_visibility != COURSE_VISIBILITY_PRIVATE
+
+    if user_access['is_anonymous'] and not allow_anonymous:
         CourseHomeMessages.register_info_message(
             request,
             Text(_(
@@ -125,18 +129,19 @@ def _register_course_home_messages(request, course, user_access, course_start_da
             title=Text(_('You must be enrolled in the course to see course content.'))
         )
     if not user_access['is_anonymous'] and not user_access['is_staff'] and not user_access['is_enrolled']:
-        CourseHomeMessages.register_info_message(
-            request,
-            Text(_(
-                '{open_enroll_link}Enroll now{close_enroll_link} to access the full course.'
-            )).format(
-                open_enroll_link='',
-                close_enroll_link=''
-            ),
-            title=Text(_('Welcome to {course_display_name}')).format(
-                course_display_name=course.display_name
+        if not allow_anonymous:
+            CourseHomeMessages.register_info_message(
+                request,
+                Text(_(
+                    '{open_enroll_link}Enroll now{close_enroll_link} to access the full course.'
+                )).format(
+                    open_enroll_link='',
+                    close_enroll_link=''
+                ),
+                title=Text(_('Welcome to {course_display_name}')).format(
+                    course_display_name=course.display_name
+                )
             )
-        )
 
 
 def _register_course_goal_message(request, course):
