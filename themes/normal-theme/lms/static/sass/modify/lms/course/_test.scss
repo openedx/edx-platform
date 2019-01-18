@@ -234,7 +234,19 @@
     position: relative;
     top: 5px;
   }
+
+  // 解析
+  .detail-solution{
+    line-height: 1.5;
+  }
+  .solution-span{
+    position: static !important;
+    >span{
+      margin: 8px 0 50px 0 !important;
+    }
+  }
 }
+
 
 @media screen and (max-width:576px){
   .course-wrapper{
