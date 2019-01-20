@@ -355,7 +355,7 @@ def _create_mock_json_request(user, data, method='POST'):
     return request
 
 
-def get_expiration_banner_text(user, course, language='en'):
+def get_expiration_banner_text(user, course, language='en-us'):
     """
     Get text for banner that messages user course expiration date
     for different tests that depend on it.
@@ -367,17 +367,17 @@ def get_expiration_banner_text(user, course, language='en'):
     if upgrade_deadline is None or now() < upgrade_deadline:
         upgrade_deadline = enrollment.course_upgrade_deadline
 
-    date_string = '<span class="localized-datetime" data-format="shortDate" \
-        data-datetime="{formatted_date}" data-language="{language}">{formatted_date}</span>'
-    formatted_expiration_date = date_string.format(
-        language=language,
-        formatted_date=strftime_localized(expiration_date, '%b. %-d, %Y')
-    )
+    language_is_es = language and language.split('-')[0].lower() == 'es'
+    if language_is_es:
+        formatted_expiration_date = strftime_localized(expiration_date, '%-d de %b. de %Y').lower()
+    else:
+        formatted_expiration_date = strftime_localized(expiration_date, '%b. %-d, %Y')
+
     if upgrade_deadline:
-        formatted_upgrade_deadline = date_string.format(
-            language=language,
-            formatted_date=strftime_localized(upgrade_deadline, '%b. %-d, %Y')
-        )
+        if language_is_es:
+            formatted_upgrade_deadline = strftime_localized(upgrade_deadline, '%-d de %b. de %Y').lower()
+        else:
+            formatted_upgrade_deadline = strftime_localized(upgrade_deadline, '%b. %-d, %Y')
 
         bannerText = '<strong>Audit Access Expires {expiration_date}</strong><br>\
                      You lose all access to this course, including your progress, on {expiration_date}.\
