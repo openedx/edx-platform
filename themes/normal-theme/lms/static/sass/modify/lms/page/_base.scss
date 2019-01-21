@@ -290,3 +290,14 @@ button:focus:not(:disabled), button:hover:not(:disabled), .btn-default{
       vertical-align: middle;
   }
 }
+
+
+// after update email
+.container.activation .message{
+  margin-top: 40px;
+
+  h1.invalid{
+      background: none;
+      border: none;
+  }
+}
