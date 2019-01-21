@@ -339,5 +339,10 @@
     vertical-align: sub;
 }
 .account-settings-sections #aboutTabSections-tabpanel .section .account-settings-section-body .u-field .u-field-message .u-field-message-notification{
-    padding: 38px 0 0 74px;
+    padding: 38px 0 0 80px;
+}
+@media screen and (max-width:991px){
+    .account-settings-sections #aboutTabSections-tabpanel .section .account-settings-section-body .u-field .u-field-message .u-field-message-notification{
+        padding: 38px 0 0 0;
+    }
 }
