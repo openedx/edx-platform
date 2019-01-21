@@ -4,6 +4,8 @@
         var template = [
             '<button class="control add-fullscreen" aria-disabled="false" title="',
             gettext('Fill browser'),
+            '" aria-label="',
+            gettext('Fill browser'),
             '">',
             '<span class="icon fa fa-arrows-alt" aria-hidden="true"></span>',
             '</button>'
