@@ -268,6 +268,8 @@ $icon-width: 18px;
 .account-activation.info.aa-icon .message-copy::before{
   background-position: calcP(4, 5);
   padding: 0;
+  top: 3px;
+  left: -20px;
 }
 
 .fa-camera:before{
