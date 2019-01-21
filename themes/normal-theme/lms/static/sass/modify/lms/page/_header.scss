@@ -19,7 +19,13 @@
     height: 34px;
   }
   .header-logo .course-header{
-    margin: 13px 0 0 20px;
+    margin: 14px 0 0 20px;
+    .course-name{
+      max-width: 180px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
   }
   a.help-link{
     display: none;
@@ -37,8 +43,21 @@
     @extend %btn-my-white;
     margin-top: 2px;
   }
+  .username{
+    max-width: 200px;
+    display: inline-block;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    vertical-align: middle;
+  }
 }
 
+@media screen and (max-width: 1150px){
+  .window-wrap .global-header .header-logo .course-header{
+    display: none;
+  }
+}
 @media screen and (max-width:992px){ 
   .window-wrap .global-header{
     padding: 0;
