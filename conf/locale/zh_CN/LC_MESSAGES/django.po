@@ -10569,7 +10569,7 @@ msgstr "“{email}”邮箱地址无效。"
 msgid ""
 "It looks like {email_address} belongs to an existing account. Try again with"
 " a different email address."
-msgstr "{email_address} 已经被注册了。请更换E-mail重试。"
+msgstr "{email_address} 已经被注册了。请更换电子邮件重试。"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 #, python-brace-format
@@ -11277,6 +11277,18 @@ msgid ""
 "profile. {learn_more_link_start}Learn more{learn_more_link_end}"
 msgstr ""
 "欢迎来到新学员账号页面，提供更多账号信息方便其他学员查看。您也可以选择只显示部分内容。{learn_more_link_start}了解更多内容{learn_more_link_end}"
+
+#: themes/normal-theme/lms/templates/ace_common/edx_ace/common/return_to_course_cta.html
+#: lms/templates/emails/activation_email.txt
+#: lms/templates/emails/confirm_email_change.txt
+#: lms/templates/emails/failed_verification_email.txt
+#: lms/templates/emails/order_confirmation_email.txt
+#: lms/templates/emails/photo_submission_review.txt
+#: lms/templates/emails/reverification_processed.txt
+msgid ""
+"(If the link is not clickable, try copying and pasting it into the address "
+"bar of your web browser, and press \"Enter\" key to open the page)"
+msgstr "（如链接点击无效，请手动复制链接并粘贴到浏览器地址栏中，然后按“回车”打开页面即可）"
 
 #: themes/normal-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #, python-format
@@ -16504,17 +16516,6 @@ msgid ""
 "engaging, high-quality {platform_name} courses. Note that you will not be "
 "able to log back into your account until you have activated it."
 msgstr "注册差不多完成啦！点击链接激活您的账号，体验{platform_name}的精品课程。注意，您必须激活账号才可以登录。"
-
-#: lms/templates/emails/activation_email.txt
-#: lms/templates/emails/confirm_email_change.txt
-#: lms/templates/emails/failed_verification_email.txt
-#: lms/templates/emails/order_confirmation_email.txt
-#: lms/templates/emails/photo_submission_review.txt
-#: lms/templates/emails/reverification_processed.txt
-msgid ""
-"(If the link is not clickable, try copying and pasting it into the address "
-"bar of your web browser, and press \"Enter\" key to open the page)"
-msgstr "（如链接点击无效，请手动复制链接并粘贴到浏览器地址栏中，然后按“回车”打开页面即可）"
 
 #: lms/templates/emails/activation_email.txt
 msgid "Enjoy learning with {platform_name}."
@@ -26322,7 +26323,7 @@ msgstr "遇到问题?"
 
 #: membership/templates/membership/index.html
 msgid "Prestige EMBA courses in America"
-msgstr "美国名校EliteMBA精华课程"
+msgstr "美国名校MBA精华课程"
 
 #: membership/templates/membership/index.html
 msgid "Six Course Specializations of Elite MBA School"
