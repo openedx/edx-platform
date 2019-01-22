@@ -209,11 +209,12 @@ button:focus:not(:disabled), button:hover:not(:disabled), .btn-default{
   font-family: $font-family;
   outline: none;
 
-  &:hover, &:focus, &:active, &:visited{
+  &:hover, &:focus, &:active, &:visited, &:active:not(:disabled), &:focus:not(:disabled){
     background: #f7fbfe;
     color: $primary;
     text-decoration: none;
     border: 1px solid $primary;
+    box-shadow: none;
   }
 }
 
