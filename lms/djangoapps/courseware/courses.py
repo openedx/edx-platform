@@ -35,6 +35,7 @@ from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from opaque_keys.edx.keys import UsageKey
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.lib.api.view_utils import LazySequence
 from path import Path as path
 from six import text_type
 from static_replace import replace_static_urls
@@ -451,8 +452,7 @@ def get_course_syllabus_section(course, section_key):
 
 def get_courses(user, org=None, filter_=None):
     """
-    Returns a list of courses available, sorted by course.number and optionally
-    filtered by org code (case-insensitive).
+    Return a LazySequence of courses available, optionally filtered by org code (case-insensitive).
     """
     courses = branding.get_visible_courses(org=org, filter_=filter_)
 
@@ -461,9 +461,10 @@ def get_courses(user, org=None, filter_=None):
         settings.COURSE_CATALOG_VISIBILITY_PERMISSION
     )
 
-    courses = [c for c in courses if has_access(user, permission_name, c)]
-
-    return courses
+    return LazySequence(
+        (c for c in courses if has_access(user, permission_name, c)),
+        est_len=courses.count()
+    )
 
 
 def get_permission_for_course_about():

@@ -356,7 +356,9 @@ class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, Sear
         res = self.verify_response(params={'search_term': 'unique search term'})
         self.assertIn('results', res.data)
         self.assertNotEqual(res.data['results'], [])
-        self.assertEqual(res.data['pagination']['count'], 1)  # Should list a single course
+        # Returns a count of 3 courses because that's the estimate before filtering
+        self.assertEqual(res.data['pagination']['count'], 3)
+        self.assertEqual(len(res.data['results']), 1)  # Should return a single course
 
     def test_too_many_courses(self):
         """
@@ -390,7 +392,7 @@ class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, Sear
         self.setup_user(self.audit_user)
 
         # These query counts were found empirically
-        query_counts = [1266, 349, 349, 349, 349, 349, 349, 349, 349, 349, 322]
+        query_counts = [174, 196, 226, 256, 286, 316, 346, 376, 406, 436, 331]
         ordered_course_ids = sorted([str(cid) for cid in (course_ids + [c.id for c in self.courses])])
 
         self.clear_caches()
