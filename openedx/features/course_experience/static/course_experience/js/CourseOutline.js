@@ -2,12 +2,19 @@
 
 import { keys } from 'edx-ui-toolkit/js/utils/constants';
 
+
 // @TODO: Figure out how to make webpack handle default exports when libraryTarget: 'window'
 export class CourseOutline {  // eslint-disable-line import/prefer-default-export
   constructor() {
+    if(!Array.from){
+      Array.from = function(iterable){
+          return [].slice.call(new Uint8Array(iterable));
+      }
+    }
+
     const focusable = [...document.querySelectorAll('.outline-item.focusable')];
 
-    focusable.forEach(el => el.addEventListener('keydown', (event) => {
+    focusable.forEach(el => $(el).bind('keydown', (event) => {
       const index = focusable.indexOf(event.target);
 
       switch (event.key) {  // eslint-disable-line default-case
@@ -23,7 +30,7 @@ export class CourseOutline {  // eslint-disable-line import/prefer-default-expor
     }));
 
     [...document.querySelectorAll('a:not([href^="#"])')]
-      .forEach(link => link.addEventListener('click', (event) => {
+      .forEach(link => $(link).bind('click', (event) => {
         Logger.log(
           'edx.ui.lms.link_clicked',
           {
@@ -54,11 +61,11 @@ export class CourseOutline {  // eslint-disable-line import/prefer-default-expor
       sectionToggleButton.setAttribute('aria-expanded', 'false');
     }
 
-    [...document.querySelectorAll(('.accordion'))]
-      .forEach((accordion) => {
-        const sections = Array.prototype.slice.call(accordion.querySelectorAll('.accordion-trigger'));
+    // [...document.querySelectorAll(('.accordion'))]
+      // .forEach((accordion) => {
+        //const sections = Array.prototype.slice.call(accordion.querySelectorAll('.accordion-trigger'));
 
-        sections.forEach(section => section.addEventListener('click', (event) => {
+        $('.accordion .accordion-trigger').bind('click', (event) => {
           const sectionToggleButton = event.currentTarget;
           if (sectionToggleButton.classList.contains('accordion-trigger')) {
             const isExpanded = sectionToggleButton.getAttribute('aria-expanded') === 'true';
@@ -69,13 +76,13 @@ export class CourseOutline {  // eslint-disable-line import/prefer-default-expor
             }
             event.stopImmediatePropagation();
           }
-        }));
-      });
+        });
+      // });
 
     const toggleAllButton = document.querySelector('#expand-collapse-outline-all-button');
     const toggleAllSpan = document.querySelector('#expand-collapse-outline-all-span');
     const extraPaddingClass = 'expand-collapse-outline-all-extra-padding';
-    toggleAllButton.addEventListener('click', (event) => {
+    $(toggleAllButton).bind('click', (event) => {
       const toggleAllExpanded = toggleAllButton.getAttribute('aria-expanded') === 'true';
       let sectionAction;
       if (toggleAllExpanded) {

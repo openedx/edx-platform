@@ -20,6 +20,9 @@ body.view-in-course .container .course-wrapper{
 }
 
 // 去除光标焦点
+.xmodule_display.xmodule_VideoModule .video{
+  margin: 0;
+}
 .xmodule_display.xmodule_VideoModule .video .video-wrapper .video-controls .control{  
   outline: none;
 }
