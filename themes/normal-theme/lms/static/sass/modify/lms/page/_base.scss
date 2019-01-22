@@ -1,11 +1,11 @@
 *{  
   box-sizing: content-box;
   font-family: $font-family;
-  -webkit-font-smoothing: unset;
+  -webkit-font-smoothing: auto;
 }
 p, h1, h2, h3, h4, h5, h6, label{
   font-family: $font-family !important;
-  -webkit-font-smoothing: unset !important;
+  -webkit-font-smoothing: auto !important;
 }
 
 // 页面padding-left & padding-right只在.window-wrap .content-wrapper添加
@@ -209,10 +209,11 @@ button:focus:not(:disabled), button:hover:not(:disabled), .btn-default{
   font-family: $font-family;
   outline: none;
 
-  &:hover, &:focus &:active, &:visited{
+  &:hover, &:focus, &:active, &:visited{
     background: #f7fbfe;
     color: $primary;
     text-decoration: none;
+    border: 1px solid $primary;
   }
 }
 

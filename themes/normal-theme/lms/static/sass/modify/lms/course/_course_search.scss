@@ -2,7 +2,13 @@
 #course-container .page-content{
   padding: 20px;
 }
+.breadcrumbs .nav-item{
+  margin-left: 0;
+}
 .search-results{
+  p{
+    margin: 0;
+  }
   .search-results-item{
     padding: 15px;
     margin-bottom: 0;
@@ -41,7 +47,8 @@
   }
 } 
 
-.page-header-search{
+.content-wrapper .page-header .page-header-search{
+  margin-right: 0;
   .field-input{
     padding: 0 10px;
     height: 34px;
@@ -51,10 +58,14 @@
     border: 1px solid $primary;
     border-top-left-radius: 3px;
     border-bottom-left-radius: 3px;
+    vertical-align: middle;
+    outline: none;
   }
   .search-button{
     border-top-left-radius: 0 !important;
     border-bottom-left-radius: 0 !important;
+    vertical-align: top;
+    margin-left: -4px;
   }
 }
 

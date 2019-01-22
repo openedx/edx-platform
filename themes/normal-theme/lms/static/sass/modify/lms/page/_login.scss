@@ -45,12 +45,17 @@
         padding-left: 12px;
         columns: $note;
       }
+      &.success{
+        color: $green;
+      }
     }
     .focus-out .label-text, .focus-out .label-optional{
       color: #ccd1d9;
+      font-weight: normal;
     }
-    .error .label-text{
-      color: #b20610;
+    .error .label-text, span.error{
+      color: $red;
+      font-weight: normal;
     }
     input, select, textarea{
       font-size: 14px;
@@ -63,6 +68,9 @@
         border: 1px solid $primary;
         box-shadow: 0px 1px 2px 0px $border;
         outline: none;
+      }
+      &.error{
+        border: 1px solid $red;
       }
     }
     select{
@@ -147,10 +155,11 @@
       }
     }
   }
-  .submission-error{
+  .submission-error, .paragon__alert-danger{
     background-color: #fff6f6;
     box-shadow: 0px 1px 4px 0px	#ffd2d1;
     border-bottom: none;
+    border-radius: 3px;
   }
   .submission-success, .account-activation.success{
     background-color: #f6fffc !important;
@@ -231,7 +240,25 @@
 
 #password-reset-confirm-container{
   margin-top: 50px;
+  .paragon__fa-icon-spacing{
+    display: none;
+  }
+  .paragon__alert-danger .alert-dialog{
+    padding: 15px;
+    color: $font;
+  }
+  .paragon__invalid-feedback{
+    color: $red;
+    font-size: 14px;
+  }
+  .paragon__fa, .paragon__sr-only{
+    display: none;
+  }
+  .paragon__is-invalid{
+    border: 1px solid $red;
+  }
 }
+
 #password-reset-confirm-form{
   padding-top: 0;
 }
