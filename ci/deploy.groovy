@@ -10,7 +10,7 @@ def step = null
 def failPercentage = null
 def tags = null
 def themes = null
-def vars = ""
+def vars = "LT_KEY_FILE=/root/.ssh/id_rsa "
 def machine = null
 
 pipeline {
@@ -50,24 +50,27 @@ pipeline {
                                          string(defaultValue: '1', description: "", name: 'step', trim: true),
                                          string(defaultValue: '10', description: "", name: 'failPercentage', trim: true)]
 
-                        def contents = input message: 'Content you want to deploy, platform/theme/all, and themes name, split by `,`, empty for all themes',
-                            parameters: [choice(choices: ["all", "themes", "platform"], description: "", name: 'repo'),
+                        def contents = input message: 'Content you want to deploy, all/theme. Optionally theme name, split by `,`,(stage only allow one theme) empty for all themes',
+                            parameters: [choice(choices: ["full", "themes"], description: "", name: 'repo'),
                                          string(defaultValue: '', description: "", name: 'themes', trim: true)]
 
                         themes = contents['themes'].tokenize(',')
+
                         if(themes){
-                            vars += "DEPLOY_THEMES=${themes} "
+                            if(machine == 'stage') {
+                                writeFile file: "/tmp/themes.yml", text: """LT_THEMES:\n  - {name: 'triboo', repo: "git@github.com:Learningtribes/triboo-theme.git", version: "${themes[0]}"}"""
+                            } else {
+                                vars += "DEPLOY_THEMES=${themes} "
+                            }
                         }
 
                         def repo = contents['repo']
 
                         // post process parameters
-                        if(repo == 'all'){
-                            tags = "deploy,assets"
-                        } else if (repo == 'themes') {
-                            tags = "assets"
-                        } else {
+                        if(repo == 'full'){
                             tags = "deploy"
+                        } else {
+                            tags = "assets"
                         }
 
                         vars += "fail_percentage=${para['failPercentage']} serial_count=${para['step']} "
@@ -109,7 +112,7 @@ pipeline {
                     . /tmp/.venv/bin/activate
                     ansible-playbook --ssh-common-args='-o "StrictHostKeyChecking no"' \
                     -u ubuntu -i ${selectedIpAddress}, --key-file="/tmp/STAGING_SG.pem" \
-                    -e "${vars}" -e "@/tmp/${machine}_password.yml" -e "@/tmp/${machine}_host.yml" \
+                    -e "${vars}" -e "@/tmp/themes.yml" -e "@/tmp/${machine}_password.yml" -e "@/tmp/${machine}_host.yml" \
                     -t ${tags} lt_edxapp_with_worker.yml
                     """
                 }
