@@ -306,6 +306,7 @@
     border: 1px solid #e6e9ed;
     float: left;
     margin-right: 10px;
+    border-radius: 2px;
     &.error{
       border: 1px solid #fe8c97;
     }
@@ -327,8 +328,9 @@
     text-align: center;
     font-size: 14px;
     background-color: #f5f7fa;
-    border: solid 0px #ccd1d9;
+    border: solid 1px #ccd1d9;
     color: #ccd1d9;
+    box-sizing: border-box;
     &.active{
       background-color: #4788c7;
       color: #fff;
@@ -485,7 +487,7 @@
     }
     .qrcode-input-box{
       width: 36vw;
-      margin-right: 4vw；
+      margin-right: 4vw;
     }
     .get-qrcode-btn{
       width: 30vw;
