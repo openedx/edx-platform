@@ -1267,14 +1267,14 @@ class TestProctoringRendering(SharedModuleStoreTestCase):
             CourseMode.VERIFIED,
             False,
             'verified',
-            'Your proctoring session was reviewed and passed all requirements',
+            'Your proctoring session was reviewed successfully',
             False
         ),
         (
             CourseMode.VERIFIED,
             False,
             'rejected',
-            'Your proctoring session was reviewed and did not pass requirements',
+            'Your proctoring session was reviewed, but did not pass all requirements',
             True
         ),
         (
