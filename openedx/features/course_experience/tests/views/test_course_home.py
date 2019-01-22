@@ -38,6 +38,7 @@ from lms.djangoapps.courseware.tests.factories import (
     GlobalStaffFactory,
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
 from openedx.features.course_duration_limits.config import EXPERIMENT_ID
@@ -721,6 +722,46 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         response = self.client.get(url)
         bannerText = get_expiration_banner_text(self.staff_user, self.course)
         self.assertNotContains(response, bannerText, html=True)
+
+    @mock.patch("util.date_utils.strftime_localized")
+    @mock.patch("openedx.features.course_duration_limits.access.get_date_string")
+    def test_course_expiration_banner_with_unicode(self, mock_strftime_localized, mock_get_date_string):
+        """
+        Ensure that switching to other languages that have unicode in their
+        date representations will not cause the course home page to 404.
+        """
+        fake_unicode_start_time = u"üñîçø∂é_ßtå®t_tîµé"
+        mock_strftime_localized.return_value = fake_unicode_start_time
+        date_string = u'<span class="localized-datetime" data-format="shortDate" \
+        data-datetime="{formatted_date}" data-language="{language}">{formatted_date}</span>'
+        mock_get_date_string.return_value = unicode(date_string)
+
+        config = CourseDurationLimitConfig(
+            course=CourseOverview.get_from_id(self.course.id),
+            enabled=True,
+            enabled_as_of=datetime(2018, 1, 1)
+        )
+        config.save()
+        url = course_home_url(self.course)
+        user = self.create_user_for_course(self.course, CourseUserType.UNENROLLED)
+        CourseEnrollment.enroll(user, self.course.id)
+
+        language = 'zh-cn'
+        DarkLangConfig(
+            released_languages=language,
+            changed_by=user,
+            enabled=True
+        ).save()
+
+        response = self.client.get(url, HTTP_ACCEPT_LANGUAGE=language)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Language'], language)
+
+        # Check that if the string is incorrectly not marked as unicode we still get the error
+        with mock.patch("openedx.features.course_duration_limits.access.get_date_string",
+                        return_value=date_string):
+            response = self.client.get(url, HTTP_ACCEPT_LANGUAGE=language)
+            self.assertEqual(response.status_code, 404)
 
     @override_waffle_flag(COURSE_PRE_START_ACCESS_FLAG, active=True)
     @override_waffle_flag(ENABLE_COURSE_GOALS, active=True)
