@@ -464,7 +464,8 @@ def get_courses(user, org=None, filter_=None):
             'modes',
             queryset=CourseMode.objects.exclude(mode_slug__in=CourseMode.CREDIT_MODES),
             to_attr='selectable_modes',
-        )
+        ),
+        'image_set',
     )
 
     permission_name = configuration_helpers.get_value(
