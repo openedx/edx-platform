@@ -392,12 +392,13 @@ class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, Sear
         self.setup_user(self.audit_user)
 
         # These query counts were found empirically
-        query_counts = [174, 196, 226, 256, 286, 316, 346, 376, 406, 436, 331]
+        query_counts = [122, 140, 170, 200, 230, 260, 290, 320, 350, 380, 327]
         ordered_course_ids = sorted([str(cid) for cid in (course_ids + [c.id for c in self.courses])])
 
         self.clear_caches()
 
         for page in range(1, 12):
+            RequestCache.clear_all_namespaces()
             with self.assertNumQueries(query_counts[page - 1]):
                 response = self.verify_response(params={'page': page, 'page_size': 30})
 
