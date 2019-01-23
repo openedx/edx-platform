@@ -908,9 +908,9 @@ function(VideoPlayer) {
 
                 it('set video speed to the new speed', function() {
                     VideoPlayer.prototype.onSpeedChange.call(state, '0.75', false);
-                    expect(state.setSpeed).toHaveBeenCalledWith('0.75');
+                    expect(state.setSpeed).toHaveBeenCalledWith(0.75);
                     expect(state.videoPlayer.setPlaybackRate)
-                        .toHaveBeenCalledWith('0.75');
+                        .toHaveBeenCalledWith(0.75);
                 });
             });
         });
