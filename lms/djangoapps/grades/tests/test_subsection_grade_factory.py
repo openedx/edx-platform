@@ -114,7 +114,14 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
                 self.subsection_grade_factory.create(self.sequence)
         self.assertEqual(mock_read_saved_grade.called, feature_flag and course_setting)
 
-    def test_update_with_override(self):
+    @ddt.data(
+        (0, None),
+        (None, 3),
+        (None, None),
+        (0, 3),
+    )
+    @ddt.unpack
+    def test_update_with_override(self, graded_earned_override, graded_possible_override):
         """
         Tests that when a PersistentSubsectionGradeOverride exists, the update()
         method returns a CreateSubsectionGrade with scores that account
@@ -134,8 +141,9 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
         PersistentSubsectionGradeOverride.update_or_create_override(
             UserFactory(),
             persistent_grade,
-            earned_graded_override=0,
+            earned_graded_override=graded_earned_override,
             earned_all_override=0,
+            possible_graded_override=graded_possible_override,
             feature=PersistentSubsectionGradeOverrideHistory.GRADEBOOK,
         )
 
@@ -143,4 +151,8 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
         # the subsection grade returned should be 0/3 due to the override.
         with mock_get_score(2, 3):
             grade = self.subsection_grade_factory.update(self.sequence)
-            self.assert_grade(grade, 0, 3)
+            self.assert_grade(
+                grade,
+                graded_earned_override or persistent_grade.earned_graded,
+                graded_possible_override or persistent_grade.possible_graded
+            )
