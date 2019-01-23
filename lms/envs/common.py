@@ -3236,6 +3236,9 @@ AUDIT_CERT_CUTOFF_DATE = None
 CREDENTIALS_SERVICE_USERNAME = 'credentials_service_user'
 CREDENTIALS_GENERATION_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
 
+# Queue to use for award program certificates
+PROGRAM_CERTIFICATES_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
+
 # Settings for Comprehensive Theming app
 
 # See https://github.com/edx/edx-django-sites-extensions for more info

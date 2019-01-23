@@ -101,7 +101,7 @@ def award_program_certificate(client, username, program_uuid, visible_date):
     })
 
 
-@task(bind=True, ignore_result=True, routing_key=ROUTING_KEY)
+@task(bind=True, ignore_result=True, routing_key=settings.PROGRAM_CERTIFICATES_ROUTING_KEY)
 def award_program_certificates(self, username):
     """
     This task is designed to be called whenever a student's completion status
