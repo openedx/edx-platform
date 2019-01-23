@@ -23,7 +23,9 @@ from courseware.date_summary import (
 from courseware.masquerade import check_content_start_date_for_masquerade_user
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module
+from course_modes.models import CourseMode
 from django.conf import settings
+from django.db.models import Prefetch
 from django.urls import reverse
 from django.http import Http404, QueryDict
 from enrollment.api import get_course_enrollment_details
@@ -454,7 +456,16 @@ def get_courses(user, org=None, filter_=None):
     """
     Return a LazySequence of courses available, optionally filtered by org code (case-insensitive).
     """
-    courses = branding.get_visible_courses(org=org, filter_=filter_)
+    courses = branding.get_visible_courses(
+        org=org,
+        filter_=filter_,
+    ).prefetch_related(
+        Prefetch(
+            'modes',
+            queryset=CourseMode.objects.exclude(mode_slug__in=CourseMode.CREDIT_MODES),
+            to_attr='selectable_modes',
+        )
+    )
 
     permission_name = configuration_helpers.get_value(
         'COURSE_CATALOG_VISIBILITY_PERMISSION',
