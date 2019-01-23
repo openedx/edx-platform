@@ -17,9 +17,13 @@ class SettingsConfig(AppConfig):
     plugin_app = {
         PluginSettings.CONFIG: {
             ProjectType.LMS: {
+                SettingsType.COMMON: {PluginSettings.RELATIVE_PATH: u'settings.common'},
+                SettingsType.AWS: {PluginSettings.RELATIVE_PATH: u'settings.aws_lms'},
                 SettingsType.DEVSTACK: {PluginSettings.RELATIVE_PATH: u'settings.devstack_lms'},
             },
             ProjectType.CMS: {
+                SettingsType.COMMON: {PluginSettings.RELATIVE_PATH: u'settings.common'},
+                SettingsType.AWS: {PluginSettings.RELATIVE_PATH: u'settings.aws_cms'},
                 SettingsType.DEVSTACK: {PluginSettings.RELATIVE_PATH: u'settings.devstack_cms'},
             }
         }
