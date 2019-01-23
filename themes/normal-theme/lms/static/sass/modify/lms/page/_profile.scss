@@ -160,6 +160,7 @@
     .u-field-textarea.editable-toggle.mode-edit{
       padding-left: 0;
       padding-right: 0;
+      margin-top: 0;
     }
     .wrapper-u-field .u-field-header .u-field-title,.u-field-title{
       font-size: 16px;
@@ -170,6 +171,9 @@
     .u-field-value{
       color: $font;
       font-size: 14px;
+      textarea{
+        border-radius: 3px !important;
+      }
     }
     .u-field-textarea{
       padding-left: 0;
@@ -215,6 +219,9 @@
     }
     .u-field.mode-placeholder:hover{
       border: 1px solid $border;
+      .u-field-title, .u-field-value{
+        color: $primary;
+      }
     }
     .btn-brand .icon:only-child{
       margin-right: 0;
