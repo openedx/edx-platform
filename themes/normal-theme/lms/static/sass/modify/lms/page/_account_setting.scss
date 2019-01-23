@@ -80,13 +80,16 @@
             }
         }
         .account-deletion-details .btn-outline-primary{
-            height: 34px;
-            line-height: 34px;
-            font-size: 14px;
-            padding: 0 63px;
-            background-color: #4788c7;
-            border-radius: 2px;
-            color: #fff;
+            @extend %btn-my-primary;
+            padding: 0 60px !important;
+            // height: 34px;
+            // line-height: 34px;
+            // font-size: 14px;
+            // padding: 0 63px;
+            // background-color: #4788c7;
+            // border-radius: 2px;
+            // color: #fff;
+            // font-weight: normal;
         }
         .paragon__alert-danger{
             background-color: rgba(255, 228, 209, 0.64);
@@ -132,6 +135,11 @@
     /* letter-spacing: 0.1px; */
     color: #346ca3;
 }
+// .account-settings-sections [disabled].u-field-message-help-password{
+//     border: solid 0px #ccd1d9;
+//     background:  #f5f7fa;
+//     color: #ccd1d9;
+// }
 .account-settings-sections .u-field-value.field select{
     box-sizing: border-box;
     height: 34px;
@@ -151,6 +159,12 @@
     font-size: 14px;
     color: #346ca3;
     padding: 7.5px 14px;
+    font-weight: normal;
+}
+.account-settings-sections .section .account-settings-section-body .u-field .field [disabled].u-field-link{
+    border: solid 1px #ccd1d9;
+    background:  #f5f7fa;
+    color: #ccd1d9;
 }
 .account-settings-sections .section .account-settings-section-body .u-field .field select{
     padding: 0 30px 0 15px;
@@ -172,6 +186,11 @@
     margin-right: 2%;
     &:last-child{
         margin-right: 0;
+    }
+}
+@media screen and (max-width:991px){
+    .wrapper-account-settings .wrapper-header .header-title{
+        padding-left: 22px;
     }
 }
 @media screen and (max-width:770px){
@@ -211,6 +230,7 @@
         min-height: 70px;
         display: inline-block;
         padding: 0;
+        line-height: 1.5em;
     }
     .u-field-link{
         color: #346ca3;
@@ -330,7 +350,85 @@
     }
 }
 .account-settings-sections .section .account-deletion-details .paragon__modal-open .paragon__btn:not(.cancel-btn){
-    padding: 11px 14px;
+    @extend %btn-my-primary;
+    // padding: 11px 14px;
+}
+.account-settings-sections .section .account-deletion-details .paragon__modal-open [disabled].paragon__btn:not(.cancel-btn){
+    border: solid 1px #ccd1d9;
+    background:  #f5f7fa;
+    color: #ccd1d9;
+
+}
+.account-settings-sections .section .account-deletion-details .modal-alert .alert-content .alert-title{
+    color: #fa7f2b;
+    font-size: 16px;
+    font-weight: normal;
+}
+.account-settings-sections .section .account-deletion-details .paragon__modal-open .next-steps{
+    font-weight: normal;
+    color: #656d78;
+    font-size: 14px;
+}
+.account-settings-sections .section .account-deletion-details .paragon__modal-open .paragon__modal-title{
+    font-size: 16px;
+    color: #2e313c;
+    font-weight: normal;
+}
+.delete-confirmation-wrapper .paragon__modal-open:focus .paragon__modal-dialog{
+    box-shadow: none;
+}
+.paragon__modal-open,.paragon__modal-dialog:focus{
+    outline: none;
+    box-shadow: none;
+}
+.paragon__modal-dialog{
+    box-shadow: 0px 3px 6px 0px 
+		rgba(46, 49, 60, 0.41);
+}
+.paragon__form-group{
+    #label-asInput1{
+       color: #2e313c;
+       font-size: 14px;  
+    }
+    #asInput1{
+        background-color: #ffffff;
+        border-radius: 2px;
+        border: solid 1px #e6e9ed;
+        outline: none;
+        box-shadow: none;
+        &:focus{
+            box-shadow: 0px 1px 2px 0px 
+                #b6dcfe;
+            border-radius: 2px;
+            border: solid 1px #4788c7;
+
+        }
+    }
+    #error-asInput1{
+        color: #d8353e;
+        font-size: 14px;
+    }
+}
+.paragon__modal-body .paragon__alert-warning{
+    background-color: #fffaf6;
+	box-shadow: 0px 1px 4px 0px 
+		#ffe4d1;
+	border-radius: 3px;
+    border: solid 1px #ffe4d1;
+    padding-top: 24px;
+    padding-bottom: 24px;
+    
+    #delete-confirmation-body-warning-icon{
+        color: #fa7f2b;  
+    }
+    p{
+       font-size: 14px;
+       color: #656d78; 
+       padding-top: 20px;
+       line-height: 1.5em;
+       margin: 0;
+       font-weight: normal;
+    }
 }
 .u-field-message-notification .fa-check{
     vertical-align: sub;
