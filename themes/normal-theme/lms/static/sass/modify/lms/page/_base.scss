@@ -250,6 +250,9 @@ button:focus:not(:disabled), button:hover:not(:disabled), .btn-default{
 .page-banner{
   padding: 0 10px;
 }
+.alert:not(.pattern-library-shim){
+  min-width: 0;
+}
 .alert-warning, .page-banner .alert.alert-warning{
   background: #fffaf6;
   border: 1px solid #ffe4d1;
@@ -258,7 +261,7 @@ button:focus:not(:disabled), button:hover:not(:disabled), .btn-default{
   color: $font;
   
   .icon-alert{
-    margin-top: 5px;
+    margin-top: 1px;
     margin-right: 10px;
     color: #ffe4d1;
   }

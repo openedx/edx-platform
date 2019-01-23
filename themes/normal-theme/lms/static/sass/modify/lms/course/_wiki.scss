@@ -47,6 +47,9 @@ body.view-in-course .wiki-wrapper{
   border: none;
   height: auto;
   text-shadow: none;
+  &:hover, &:focus, &:active, &:visited{
+    border: none;
+  }
 }
 
 
@@ -166,13 +169,28 @@ body.view-in-course .wiki-wrapper{
 }
 
 .wiki-wrapper{
+  // tip
+  .paragon__fade.paragon__show{
+    background-color: rgba(255, 242, 211, 0.4);
+    border-radius: 3px;
+    border: solid 1px #fff2d3;
+    margin: 20px;
+    color: #635634;
+  }
   .paragon__alert-dismissible .paragon__close{
     padding: 8px 12px;
     background: none;
-    &:hover{
+    opacity: 0.4;
+    &:hover, &:focus, &:active, &:visited{
       background: none;
+      box-shadow: none;
+      border: none;
+      opacity: 1;
     }
-  }
+    span{
+      display: none;
+    }
+  } 
 }
 // edit a wiki page
 .wiki-wrapper section.wiki .main-article{
