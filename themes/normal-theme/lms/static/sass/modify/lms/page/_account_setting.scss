@@ -82,14 +82,6 @@
         .account-deletion-details .btn-outline-primary{
             @extend %btn-my-primary;
             padding: 0 60px !important;
-            // height: 34px;
-            // line-height: 34px;
-            // font-size: 14px;
-            // padding: 0 63px;
-            // background-color: #4788c7;
-            // border-radius: 2px;
-            // color: #fff;
-            // font-weight: normal;
         }
         .paragon__alert-danger{
             background-color: rgba(255, 228, 209, 0.64);
@@ -135,11 +127,6 @@
     /* letter-spacing: 0.1px; */
     color: #346ca3;
 }
-// .account-settings-sections [disabled].u-field-message-help-password{
-//     border: solid 0px #ccd1d9;
-//     background:  #f5f7fa;
-//     color: #ccd1d9;
-// }
 .account-settings-sections .u-field-value.field select{
     box-sizing: border-box;
     height: 34px;
