@@ -411,7 +411,6 @@ class GradebookViewTest(GradebookViewTestBase):
             OrderedDict([
                 ('attempted', True),
                 ('category', 'Homework'),
-                ('is_graded', True),
                 ('label', 'HW 01'),
                 ('module_id', text_type(self.subsections[self.chapter_1.location][0].location)),
                 ('percent', 0.5),
@@ -422,7 +421,6 @@ class GradebookViewTest(GradebookViewTestBase):
             OrderedDict([
                 ('attempted', True),
                 ('category', 'Lab'),
-                ('is_graded', True),
                 ('label', 'Lab 01'),
                 ('module_id', text_type(self.subsections[self.chapter_1.location][1].location)),
                 ('percent', 0.5),
@@ -433,7 +431,6 @@ class GradebookViewTest(GradebookViewTestBase):
             OrderedDict([
                 ('attempted', True),
                 ('category', 'Homework'),
-                ('is_graded', True),
                 ('label', 'HW 02'),
                 ('module_id', text_type(self.subsections[self.chapter_2.location][0].location)),
                 ('percent', 0.5),
@@ -444,7 +441,6 @@ class GradebookViewTest(GradebookViewTestBase):
             OrderedDict([
                 ('attempted', True),
                 ('category', 'Lab'),
-                ('is_graded', True),
                 ('label', 'Lab 02'),
                 ('module_id', text_type(self.subsections[self.chapter_2.location][1].location)),
                 ('percent', 0.5),
