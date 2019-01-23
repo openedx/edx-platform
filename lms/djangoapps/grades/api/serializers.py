@@ -38,7 +38,6 @@ class SectionBreakdownSerializer(serializers.Serializer):
     category = serializers.CharField()
     is_graded = serializers.BooleanField()
     label = serializers.CharField()
-    letter_grade = serializers.CharField()
     module_id = serializers.CharField()
     percent = serializers.FloatField()
     score_earned = serializers.FloatField()
@@ -50,15 +49,9 @@ class StudentGradebookEntrySerializer(serializers.Serializer):
     """
     Serializer for student gradebook entry.
     """
-    course_id = serializers.CharField()
-    email = serializers.CharField()
     user_id = serializers.IntegerField()
     username = serializers.CharField()
-    full_name = serializers.CharField()
-    passed = serializers.BooleanField()
     percent = serializers.FloatField()
-    letter_grade = serializers.CharField()
-    progress_page_url = serializers.CharField()
     section_breakdown = SectionBreakdownSerializer(many=True)
 
 

@@ -403,7 +403,7 @@ class GradebookViewTest(GradebookViewTestBase):
         course_grade.subsection_grade = lambda key: self.mock_subsection_grades[key]
         return course_grade
 
-    def expected_subsection_grades(self, letter_grade=None):
+    def expected_subsection_grades(self):
         """
         Helper function to generate expected subsection detail results.
         """
@@ -413,7 +413,6 @@ class GradebookViewTest(GradebookViewTestBase):
                 ('category', 'Homework'),
                 ('is_graded', True),
                 ('label', 'HW 01'),
-                ('letter_grade', letter_grade),
                 ('module_id', text_type(self.subsections[self.chapter_1.location][0].location)),
                 ('percent', 0.5),
                 ('score_earned', 1.0),
@@ -425,7 +424,6 @@ class GradebookViewTest(GradebookViewTestBase):
                 ('category', 'Lab'),
                 ('is_graded', True),
                 ('label', 'Lab 01'),
-                ('letter_grade', letter_grade),
                 ('module_id', text_type(self.subsections[self.chapter_1.location][1].location)),
                 ('percent', 0.5),
                 ('score_earned', 1.0),
@@ -437,7 +435,6 @@ class GradebookViewTest(GradebookViewTestBase):
                 ('category', 'Homework'),
                 ('is_graded', True),
                 ('label', 'HW 02'),
-                ('letter_grade', letter_grade),
                 ('module_id', text_type(self.subsections[self.chapter_2.location][0].location)),
                 ('percent', 0.5),
                 ('score_earned', 1.0),
@@ -449,7 +446,6 @@ class GradebookViewTest(GradebookViewTestBase):
                 ('category', 'Lab'),
                 ('is_graded', True),
                 ('label', 'Lab 02'),
-                ('letter_grade', letter_grade),
                 ('module_id', text_type(self.subsections[self.chapter_2.location][1].location)),
                 ('percent', 0.5),
                 ('score_earned', 1.0),
@@ -465,33 +461,15 @@ class GradebookViewTest(GradebookViewTestBase):
         """
         expected_results = [
             OrderedDict([
-                ('course_id', text_type(self.course.id)),
-                ('email', self.student.email),
                 ('user_id', self.student.id),
                 ('username', self.student.username),
-                ('full_name', self.student.get_full_name()),
-                ('passed', True),
                 ('percent', 0.85),
-                ('letter_grade', 'A'),
-                ('progress_page_url', reverse(
-                    'student_progress',
-                    kwargs=dict(course_id=text_type(self.course.id), student_id=self.student.id)
-                )),
-                ('section_breakdown', self.expected_subsection_grades(letter_grade='A')),
+                ('section_breakdown', self.expected_subsection_grades()),
             ]),
             OrderedDict([
-                ('course_id', text_type(self.course.id)),
-                ('email', self.other_student.email),
                 ('user_id', self.other_student.id),
                 ('username', self.other_student.username),
-                ('full_name', self.other_student.get_full_name()),
-                ('passed', False),
                 ('percent', 0.45),
-                ('letter_grade', None),
-                ('progress_page_url', reverse(
-                    'student_progress',
-                    kwargs=dict(course_id=text_type(self.course.id), student_id=self.other_student.id)
-                )),
                 ('section_breakdown', self.expected_subsection_grades()),
             ]),
         ]
@@ -571,8 +549,8 @@ class GradebookViewTest(GradebookViewTestBase):
     def test_gradebook_data_for_course(self, login_method):
         with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
             mock_grade.side_effect = [
-                self.mock_course_grade(self.student, passed=True, letter_grade='A', percent=0.85),
-                self.mock_course_grade(self.other_student, passed=False, letter_grade=None, percent=0.45),
+                self.mock_course_grade(self.student, passed=True, percent=0.85),
+                self.mock_course_grade(self.other_student, passed=False, percent=0.45),
             ]
 
             with override_waffle_flag(self.waffle_flag, active=True):
@@ -589,7 +567,7 @@ class GradebookViewTest(GradebookViewTestBase):
     )
     def test_gradebook_data_for_single_learner(self, login_method):
         with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
-            mock_grade.return_value = self.mock_course_grade(self.student, passed=True, letter_grade='A', percent=0.85)
+            mock_grade.return_value = self.mock_course_grade(self.student, passed=True, percent=0.85)
 
             with override_waffle_flag(self.waffle_flag, active=True):
                 getattr(self, login_method)()
@@ -597,19 +575,10 @@ class GradebookViewTest(GradebookViewTestBase):
                     self.get_url(course_key=self.course.id, username=self.student.username)
                 )
                 expected_results = OrderedDict([
-                    ('course_id', text_type(self.course.id)),
-                    ('email', self.student.email),
                     ('user_id', self.student.id),
                     ('username', self.student.username),
-                    ('full_name', self.student.get_full_name()),
-                    ('passed', True),
                     ('percent', 0.85),
-                    ('letter_grade', 'A'),
-                    ('progress_page_url', reverse(
-                        'student_progress',
-                        kwargs=dict(course_id=text_type(self.course.id), student_id=self.student.id)
-                    )),
-                    ('section_breakdown', self.expected_subsection_grades(letter_grade='A')),
+                    ('section_breakdown', self.expected_subsection_grades()),
                 ])
 
                 self.assertEqual(status.HTTP_200_OK, resp.status_code)
@@ -628,7 +597,7 @@ class GradebookViewTest(GradebookViewTestBase):
         user's subsection, we still get data including a non-zero possible score.
         """
         with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
-            course_grade = self.mock_course_grade(self.student, passed=True, letter_grade='A', percent=0.85)
+            course_grade = self.mock_course_grade(self.student, passed=True, percent=0.85)
 
             mock_override = MagicMock(
                 earned_all_override=1.0,
@@ -683,19 +652,10 @@ class GradebookViewTest(GradebookViewTestBase):
                     self.get_url(course_key=self.course.id, username=self.student.username)
                 )
                 expected_results = OrderedDict([
-                    ('course_id', text_type(self.course.id)),
-                    ('email', self.student.email),
                     ('user_id', self.student.id),
                     ('username', self.student.username),
-                    ('full_name', self.student.get_full_name()),
-                    ('passed', True),
                     ('percent', 0.85),
-                    ('letter_grade', 'A'),
-                    ('progress_page_url', reverse(
-                        'student_progress',
-                        kwargs=dict(course_id=text_type(self.course.id), student_id=self.student.id)
-                    )),
-                    ('section_breakdown', self.expected_subsection_grades(letter_grade='A')),
+                    ('section_breakdown', self.expected_subsection_grades()),
                 ])
 
                 self.assertEqual(status.HTTP_200_OK, resp.status_code)
@@ -710,7 +670,7 @@ class GradebookViewTest(GradebookViewTestBase):
     def test_gradebook_data_filter_username_contains(self, login_method):
         with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
             mock_grade.return_value = self.mock_course_grade(
-                self.other_student, passed=True, letter_grade='A', percent=0.85
+                self.other_student, passed=True, percent=0.85
             )
 
             with override_waffle_flag(self.waffle_flag, active=True):
@@ -720,19 +680,10 @@ class GradebookViewTest(GradebookViewTestBase):
                 )
                 expected_results = [
                     OrderedDict([
-                        ('course_id', text_type(self.course.id)),
-                        ('email', self.other_student.email),
                         ('user_id', self.other_student.id),
                         ('username', self.other_student.username),
-                        ('full_name', self.other_student.get_full_name()),
-                        ('passed', True),
                         ('percent', 0.85),
-                        ('letter_grade', 'A'),
-                        ('progress_page_url', reverse(
-                            'student_progress',
-                            kwargs=dict(course_id=text_type(self.course.id), student_id=self.other_student.id)
-                        )),
-                        ('section_breakdown', self.expected_subsection_grades(letter_grade='A')),
+                        ('section_breakdown', self.expected_subsection_grades()),
                     ]),
                 ]
 
@@ -750,7 +701,7 @@ class GradebookViewTest(GradebookViewTestBase):
     def test_gradebook_data_filter_username_contains_no_match(self, login_method):
         with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
             mock_grade.return_value = self.mock_course_grade(
-                self.other_student, passed=True, letter_grade='A', percent=0.85
+                self.other_student, passed=True, percent=0.85
             )
 
             with override_waffle_flag(self.waffle_flag, active=True):
@@ -767,7 +718,7 @@ class GradebookViewTest(GradebookViewTestBase):
     )
     def test_filter_cohort_id_and_enrollment_mode(self, login_method):
         with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
-            mock_grade.return_value = self.mock_course_grade(self.student, passed=True, letter_grade='A', percent=0.85)
+            mock_grade.return_value = self.mock_course_grade(self.student, passed=True, percent=0.85)
 
             cohort = CohortFactory(course_id=self.course.id, name="TestCohort", users=[self.student])
             with override_waffle_flag(self.waffle_flag, active=True):
@@ -781,19 +732,10 @@ class GradebookViewTest(GradebookViewTestBase):
 
                 expected_results = [
                     OrderedDict([
-                        ('course_id', text_type(self.course.id)),
-                        ('email', self.student.email),
                         ('user_id', self.student.id),
                         ('username', self.student.username),
-                        ('full_name', self.student.get_full_name()),
-                        ('passed', True),
                         ('percent', 0.85),
-                        ('letter_grade', 'A'),
-                        ('progress_page_url', reverse(
-                            'student_progress',
-                            kwargs=dict(course_id=text_type(self.course.id), student_id=self.student.id)
-                        )),
-                        ('section_breakdown', self.expected_subsection_grades(letter_grade='A')),
+                        ('section_breakdown', self.expected_subsection_grades()),
                     ]),
                 ]
 
@@ -810,7 +752,7 @@ class GradebookViewTest(GradebookViewTestBase):
     )
     def test_filter_cohort_id_does_not_exist(self, login_method):
         with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
-            mock_grade.return_value = self.mock_course_grade(self.student, passed=True, letter_grade='A', percent=0.85)
+            mock_grade.return_value = self.mock_course_grade(self.student, passed=True, percent=0.85)
 
             empty_cohort = CohortFactory(course_id=self.course.id, name="TestCohort", users=[])
             with override_waffle_flag(self.waffle_flag, active=True):
@@ -828,8 +770,8 @@ class GradebookViewTest(GradebookViewTestBase):
     def test_filter_enrollment_mode(self, login_method):
         with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
             mock_grade.side_effect = [
-                self.mock_course_grade(self.student, passed=True, letter_grade='A', percent=0.85),
-                self.mock_course_grade(self.other_student, passed=False, letter_grade=None, percent=0.45),
+                self.mock_course_grade(self.student, passed=True, percent=0.85),
+                self.mock_course_grade(self.other_student, passed=False, percent=0.45),
             ]
 
             # Enroll a verified student, for whom data should not be returned.
@@ -856,8 +798,8 @@ class GradebookViewTest(GradebookViewTestBase):
     def test_filter_enrollment_mode_no_students(self, login_method):
         with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
             mock_grade.side_effect = [
-                self.mock_course_grade(self.student, passed=True, letter_grade='A', percent=0.85),
-                self.mock_course_grade(self.other_student, passed=False, letter_grade=None, percent=0.45),
+                self.mock_course_grade(self.student, passed=True, percent=0.85),
+                self.mock_course_grade(self.other_student, passed=False, percent=0.45),
             ]
 
             with override_waffle_flag(self.waffle_flag, active=True):
@@ -877,7 +819,7 @@ class GradebookViewTest(GradebookViewTestBase):
             mocked_course_grades = []
             for user in users:
                 self._create_user_enrollments(user)
-                mocked_course_grades.append(self.mock_course_grade(user, passed=True, letter_grade='A', percent=0.85))
+                mocked_course_grades.append(self.mock_course_grade(user, passed=True, percent=0.85))
 
             mock_grade.side_effect = mocked_course_grades
 
