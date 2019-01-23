@@ -109,53 +109,8 @@ course_mode_class = course_mode if course_mode else ''
     }
     var _timer = setInterval(function(){
         if($('#qrcode img').attr('src') != undefined){
-            // console.log($('#qrcode img').attr('src'))
             clearInterval(_timer);
             _draw()
         }
-    },100)
-
-    // $(document).ready(function () {
-    //     var data = {
-    //         username: '${accomplishment_copy_name}',
-    //         course: '${accomplishment_copy_course_name}',
-    //         course_id: '${course_number}',
-    //         dateTime: '${certificate_date_issued_title}',
-    //         date: '${certificate_date_issued}',
-    //         verifyTitle: gettext('验证地址'),
-    //         verifyAdress: url,
-    //         langulage: '${user_language_or_default}'
-    //     }
-    //     var bg = document.querySelector('#bg').src;
-    //     var list = document.querySelector('#img-list .signature');
-    //     var img = [], flag = 0, mulitImg = [];
-    //     for (var i = 0; i < list.length; i++) {
-    //         mulitImg.push(list[i].src);
-    //     }
-    //     mulitImg.push(bg);
-    //     var imgTotal = mulitImg.length;
-    //     for (var i = 0; i < imgTotal; i++) {
-    //         img[i] = new Image()
-    //         img[i].src = mulitImg[i]
-    //         img[i].onload = function () {
-    //             //第i张图片加载完成
-    //             flag++
-    //             if (flag == imgTotal) {
-    //                 //全部加载完成
-    //                 console.log('加载完全')
-    //                 _certificates(data)
-    //             }
-    //         }
-    //     }
-    //     // var i = 0;
-    //     // setTimeout(() => {
-            
-    //     // }, 1500);
-    //     // $('#img-list .signature').load(function(){
-    //     //     i++;
-    //     //     if (i == $('#img-list .signature').length){
-    //     //         _certificates(data)
-    //     //     }
-    //     // })
-    // })    
+    },100)  
 </script>
