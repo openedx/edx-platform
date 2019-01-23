@@ -25,6 +25,7 @@ from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.courseware.views.views import CourseTabView
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.util.maintenance_banner import add_maintenance_banner
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
 from student.models import CourseEnrollment
@@ -153,7 +154,10 @@ class CourseHomeFragmentView(EdxFragmentView):
             course_sock_fragment = CourseSockFragmentView().render_to_fragment(request, course=course, **kwargs)
             has_visited_course, resume_course_url = self._get_resume_course_info(request, course_id)
             handouts_html = self._get_course_handouts(request, course)
-            course_expiration_fragment = generate_course_expired_fragment(request.user, course)
+            course_expiration_fragment = generate_course_expired_fragment(
+                request.user,
+                CourseOverview.get_from_id(course.id)
+            )
         elif allow_public_outline or allow_public:
             outline_fragment = CourseOutlineFragmentView().render_to_fragment(
                 request, course_id=course_id, user_is_enrolled=False, **kwargs

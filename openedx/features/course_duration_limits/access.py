@@ -62,7 +62,9 @@ def get_user_course_expiration_date(user, course):
     """
     access_duration = MIN_DURATION
 
-    if not CourseMode.verified_mode_for_course(course.id, include_expired=True):
+    verified_mode = CourseMode.verified_mode_for_course(course=course, include_expired=True)
+
+    if not verified_mode:
         return None
 
     enrollment = CourseEnrollment.get_enrollment(user, course.id)
