@@ -348,7 +348,6 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
         * passed: Boolean representing whether the course has been
                   passed according to the course's grading policy.
         * percent: A float representing the overall grade for the course
-        * letter_grade: A letter grade as defined in grading policy (e.g. 'A' 'B' 'C' for 6.002x) or None
         * progress_page_url: A link to the user's progress page.
         * section_breakdown: A list of subsection grade details, as specified below.
 
@@ -372,7 +371,6 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
             "full_name": "",
             "passed": false,
             "percent": 0.36,
-            "letter_grade": null,
             "progress_page_url": "/courses/course-v1:edX+DemoX+Demo_Course/progress/9/",
             "section_breakdown": [
                 {
@@ -389,7 +387,6 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
                     "is_average": false,
                     "is_manually_graded": false,
                     "label": null,
-                    "letter_grade": null,
                     "module_id": "block-v1:edX+DemoX+Demo_Course+type@sequential+block@edx_introduction",
                     "percent": 0.0,
                     "score_earned": 0.0,
@@ -456,7 +453,6 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
                 'category': subsection_grade.format,
                 'is_graded': subsection_grade.graded,
                 'label': short_label,
-                'letter_grade': course_grade.letter_grade,
                 'module_id': text_type(subsection_grade.location),
                 'percent': subsection_grade.percent_graded,
                 'score_earned': score_earned,
