@@ -181,21 +181,33 @@
   p{
     font-size: 14px;
   }
-  .choicegroup label{
-    background: rgba(245, 247, 250, 0.4);
-    border: none;
-    border: 1px solid transparent;
-    font-size: 14px;
-    &:hover{
-      border: 1px solid $primary;
+  .choicegroup{
+    label{
+      background: rgba(245, 247, 250, 0.4);
+      border: none;
+      border: 1px solid transparent;
+      font-size: 14px;
+      &:hover{
+        border: 1px solid $primary;
+      }
+      &.choicegroup_correct{
+        border: 1px solid #57aa01;
+      }
+      &.choicegroup_incorrect{
+        border: 1px solid #ff6d7a;
+      }
     }
-    &.choicegroup_correct{
-      border: 1px solid #57aa01;
+
+    input[type="checkbox"]{
+      @extend %input-my-checkbox;
+      top: 9px;
     }
-    &.choicegroup_incorrect{
-      border: 1px solid #ff6d7a;
+
+    input[type="radio"]{
+      @extend %input-my-radio;
+      top: 9px;
     }
-  }
+  } 
   .choicegroup .status .status-icon{
     position: absolute;
     margin-left: 5px;
@@ -241,6 +253,7 @@
   }
   .solution-span{
     position: static !important;
+    margin-top: 10px;
     >span{
       margin: 8px 0 50px 0 !important;
     }
@@ -257,5 +270,11 @@
   .xblock .xmodule_display.xmodule_CapaModule div.problem .action .problem-action-button-wrapper:first-child .problem-action-btn{
     padding: 10px 10px 10px 0;
     margin-left: -6px;
+  }
+  .problem-action-buttons-wrapper{
+    margin-bottom: 10px;
+  }
+  .xmodule_display.xmodule_CapaModule div.problem .action .submit-attempt-container{
+    padding-bottom: 15px;
   }
 }

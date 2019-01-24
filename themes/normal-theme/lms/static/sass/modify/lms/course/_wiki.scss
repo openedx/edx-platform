@@ -10,6 +10,11 @@ body.view-in-course .wiki-wrapper{
     font-size: 18px;
     font-weight: normal;
   }
+  h1{
+    font-weight: normal;
+    font-size: 18px;
+    margin-bottom: 20px;
+  }
 }
 
 // header
@@ -150,48 +155,6 @@ body.view-in-course .wiki-wrapper{
 }
 
 // other wiki page
-// add a wiki 
-.wiki-wrapper section.wiki .new-article{
-  padding: 0;
-  padding: 10px 30px;
-
-  h1{
-    line-height: 35px;
-    font-weight: normal;
-    font-size: 18px;
-  }
-  #hint_id_slug, #hint_id_summary{
-    font-size: 14px;
-  }
-  .form-horizontal{
-    padding: 0 30px 40px;
-  }
-}
-
-.wiki-wrapper{
-  // tip
-  .paragon__fade.paragon__show{
-    background-color: rgba(255, 242, 211, 0.4);
-    border-radius: 3px;
-    border: solid 1px #fff2d3;
-    margin: 20px;
-    color: #635634;
-  }
-  .paragon__alert-dismissible .paragon__close{
-    padding: 8px 12px;
-    background: none;
-    opacity: 0.4;
-    &:hover, &:focus, &:active, &:visited{
-      background: none;
-      box-shadow: none;
-      border: none;
-      opacity: 1;
-    }
-    span{
-      display: none;
-    }
-  } 
-}
 // edit a wiki page
 .wiki-wrapper section.wiki .main-article{
   padding: 20px;
@@ -250,6 +213,50 @@ textarea, form#wiki_revision .CodeMirror, input[type="text"]{
   box-shadow: none;
   border: 1px solid #e6e9ed;
   background: #fff;
+}
+
+// add a wiki 
+.wiki-wrapper section.wiki .new-article{
+  padding: 0;
+  width: 100%;
+
+  h1{
+    line-height: 35px;
+    font-weight: normal;
+    font-size: 18px;
+  }
+  #hint_id_slug, #hint_id_summary{
+    font-size: 14px;
+  }
+  .form-horizontal{
+    padding: 0 30px 40px;
+  }
+}
+
+.wiki-wrapper{
+  // tip
+  .paragon__fade.paragon__show{
+    background-color: rgba(255, 242, 211, 0.4);
+    border-radius: 3px;
+    border: solid 1px #fff2d3;
+    margin: 20px;
+    padding: 10px 15px;
+    color: #635634;
+  }
+  .paragon__alert-dismissible .paragon__close{
+    padding: 6px 15px;
+    background: none;
+    opacity: 0.4;
+    &:hover, &:focus, &:active, &:visited{
+      background: none;
+      box-shadow: none;
+      border: none;
+      opacity: 1;
+    }
+    span{
+      display: none;
+    }
+  } 
 }
 
 // modify wiki
@@ -353,3 +360,14 @@ textarea, form#wiki_revision .CodeMirror, input[type="text"]{
   }
 }
 
+
+// alert no permission
+.wiki-wrapper section.wiki .alert{
+  background-color: rgba(255, 228, 209, 0.64);
+	border-radius: 3px;
+  border: solid 1px rgba(250, 127, 43, 0.33);
+  padding: 10px 15px;
+  font-size: 14px;
+  color: $font;
+  margin: 0 20px 20px;
+}
