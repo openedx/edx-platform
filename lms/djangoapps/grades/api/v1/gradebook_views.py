@@ -364,14 +364,9 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
         enabled for this course.
     **Example GET Response**
         {
-            "course_id": "course-v1:edX+DemoX+Demo_Course",
-            "email": "staff@example.com",
             "user_id": 9,
             "username": "staff",
-            "full_name": "",
-            "passed": false,
             "percent": 0.36,
-            "progress_page_url": "/courses/course-v1:edX+DemoX+Demo_Course/progress/9/",
             "section_breakdown": [
                 {
                     "are_grades_published": true,
@@ -381,7 +376,6 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
                     "comment": "",
                     "detail": "",
                     "displayed_value": "0.00",
-                    "is_graded": false,
                     "grade_description": "(0.00/0.00)",
                     "is_ag": false,
                     "is_average": false,
@@ -451,7 +445,6 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
             breakdown.append({
                 'attempted': attempted,
                 'category': subsection_grade.format,
-                'is_graded': subsection_grade.graded,
                 'label': short_label,
                 'module_id': text_type(subsection_grade.location),
                 'percent': subsection_grade.percent_graded,

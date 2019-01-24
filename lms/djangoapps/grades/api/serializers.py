@@ -36,7 +36,6 @@ class SectionBreakdownSerializer(serializers.Serializer):
     """
     attempted = serializers.BooleanField()
     category = serializers.CharField()
-    is_graded = serializers.BooleanField()
     label = serializers.CharField()
     module_id = serializers.CharField()
     percent = serializers.FloatField()
