@@ -77,6 +77,7 @@ def send_account_recovery_email_for_user(user, request, email=None):
     message_context = get_base_template_context(site)
     message_context.update({
         'request': request,  # Used by google_analytics_tracking_pixel
+        'email': email,
         'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
         'reset_link': '{protocol}://{site}{link}?is_account_recovery=true'.format(
             protocol='https' if request.is_secure() else 'http',
