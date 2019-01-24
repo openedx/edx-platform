@@ -128,18 +128,42 @@ ol, ul, dl{
   width: 20px;
   background-size: 300px;
   background-image: url("/static/normal-theme/images/iconfont.png");
-  background-position: -60px -180px;
+  background-position: 0 -180px;
   -webkit-appearance: none;
   border: none !important;
   transform: scale(0.8);
   cursor: pointer;
   margin: 0 2px 0 0;
+  transform: scale(0.8);
   &:checked{
     background-position: -80px -180px;
     box-shadow: none;
   }
   &:focus{
     box-shadow: none;
+    outline: none;
+  }
+}
+%input-my-radio{
+  display: inline-block;
+  height: 20px !important;
+  width: 20px;
+  background-size: 300px;
+  background-image: url("/static/normal-theme/images/iconfont.png");
+  background-position: 0 -200px;
+  -webkit-appearance: none;
+  border: none !important;
+  transform: scale(0.8);
+  cursor: pointer;
+  margin: 0 2px 0 0;
+  transform: scale(0.8);
+  &:checked{
+    background-position: -80px -200px;
+    box-shadow: none;
+  }
+  &:focus{
+    box-shadow: none;
+    outline: none;
   }
 }
 
