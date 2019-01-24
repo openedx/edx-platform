@@ -8,7 +8,6 @@
 # 嘉杰 李 <jj.li@eliteu.com.cn>, 2018
 # 婕 高 <j.gao@eliteu.cn>, 2018
 # 微 李 <w.li@eliteu.com.cn>, 2018
-# Yi Li <y.li@eliteu.cn>, 2018
 # 家璧 刘 <jb.liu@eliteu.com.cn>, 2018
 # li ying <code@eliteu.cn>, 2019
 #
@@ -53,7 +52,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-01-16 12:00+0800\n"
+"POT-Creation-Date: 2019-01-15 19:13+0800\n"
 "PO-Revision-Date: 2018-12-07 12:23+0000\n"
 "Last-Translator: li ying <code@eliteu.cn>, 2019\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)\n"
@@ -4350,7 +4349,7 @@ msgstr "请注意：删除账号及个人数据的操作将不可撤销。英荔
 msgid ""
 "Once your account is deleted, you cannot use it to take courses on the "
 "EliteMBA app, elitemba.cn, or any other site hosted by EliteMBA."
-msgstr "一旦删除了账号，您将无法在英荔商学院 App、elitemba.cn或其他任何由英荔商学院托管的站点上学习课程。"
+msgstr "一旦删除了账号，您将无法在英荔商学院App、elitemba.cn或其他任何由英荔商学院托管的站点上学习课程。"
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 #: lms/static/js/student_account/views/account_settings_factory.js

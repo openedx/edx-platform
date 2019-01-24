@@ -10965,7 +10965,7 @@ msgstr "马上帮您删除账号，包括从邮箱地址列表中移除您的邮
 msgid ""
 "This is an informational email only. If you did not initiate this request, "
 "please contact %(contact_email)s."
-msgstr "这是一封信息邮件，如果您没有发起此申请，请联系%(contact_email)s。"
+msgstr "这是一封信息邮件，如果您没有发起此申请，请联系 %(contact_email)s。"
 
 #: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.html
 #: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt
@@ -15825,7 +15825,7 @@ msgstr "我们希望您享受这门课程，我们希望在{platform_name}的新
 #: lms/templates/emails/activation_email.txt
 #: lms/templates/emails/order_confirmation_email.txt
 msgid "The {platform_name} Team"
-msgstr " {platform_name} 团队"
+msgstr "{platform_name} 团队"
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 msgid ""
@@ -16531,7 +16531,7 @@ msgstr "如需帮助，请使用我们的网站表格{support_url} 或发邮件�
 msgid ""
 "This email message was automatically sent by {lms_url} because someone "
 "attempted to create an account on {platform_name} using this email address."
-msgstr "这是一封由{lms_url} 自动发送的邮件，通知您有人使用此邮箱地址注册{platform_name} 账号。"
+msgstr "这是一封由{lms_url}自动发送的邮件，通知您有人使用此邮箱地址注册{platform_name}账号。"
 
 #: lms/templates/emails/activation_email_subject.txt
 msgid "Action Required: Activate your {platform_name} account"
@@ -20426,7 +20426,7 @@ msgid ""
 "knowledge input, the motivation for pursuing wisdom and solving practical "
 "problems."
 msgstr ""
-"教育家蔡元培先生说：“教育应指导社会，而不是追逐社会”。英荔摒弃追逐社会的模式，倡导学习者自我实现和引领社会的精神。英荔课堂没有生搬硬套的知识灌输，只有寻求智慧和解决实际问题的动力。"
+"教育家蔡元培先生说：“教育应指导社会，而不是追逐社会。”英荔摒弃追逐社会的模式，倡导学习者自我实现和引领社会的精神。英荔课堂没有生搬硬套的知识灌输，只有寻求智慧和解决实际问题的动力。"
 
 #: themes/normal-theme/lms/templates/static_templates/about.html
 msgid "Our Mission"
@@ -20869,8 +20869,7 @@ msgid ""
 "User from using this service, to keep relevant record and report to "
 "authorities concerned."
 msgstr ""
-"根据有关法律法规，英荔在此郑重提醒用户注意，任何经由本服务而发布、上传的文字、资讯、资料、照片、图形、视讯、信息或其他资料（以下简称“内容 "
-"”），无论系公开还是私下传送，均由内容提供者承担责任。英荔仅为用户提供内容存储空间，无法控制经由本服务传送之内容，因此不保证内容的正确性、完整性或品质。用户已预知使用本服务时，可能会接触到令人不快、不适当或令人厌恶之内容。在任何情况下，英荔均不为任何内容负责，但英荔有权依法停止传输任何前述内容并采取相应行动，包括但不限于暂停用户使用本服务的全部或部分，保存有关记录，并向有关机关报告。"
+"根据有关法律法规，英荔在此郑重提醒用户注意，任何经由本服务而发布、上传的文字、资讯、资料、照片、图形、视讯、信息或其他资料（以下简称“内容”），无论系公开还是私下传送，均由内容提供者承担责任。英荔仅为用户提供内容存储空间，无法控制经由本服务传送之内容，因此不保证内容的正确性、完整性或品质。用户已预知使用本服务时，可能会接触到令人不快、不适当或令人厌恶之内容。在任何情况下，英荔均不为任何内容负责，但英荔有权依法停止传输任何前述内容并采取相应行动，包括但不限于暂停用户使用本服务的全部或部分，保存有关记录，并向有关机关报告。"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
@@ -21566,7 +21565,7 @@ msgstr "英荔不会未经用户的允许将这些信息与第三方共享，本
 #: themes/normal-theme/lms/templates/static_templates/privacy.html
 #: themes/normal-theme/lms/templates/static_templates/privacy_policy.html
 msgid "III.Use of Cookie"
-msgstr "三、COOKIE的使用"
+msgstr "三、COOKIE 的使用"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/privacy.html
@@ -21587,7 +21586,7 @@ msgid ""
 "EliteMBA will use cookies sometimes to capture the websites to learn which "
 "websites are popular in order to provide better services to User when they "
 "are visiting E-ducation."
-msgstr "英荔有时会使用 Cookie 以便知道哪些网页受欢迎，使用户在访问英荔时能得到更好的服务。Cookie不会跟踪个人信息。"
+msgstr "英荔有时会使用 Cookie 以便知道哪些网页受欢迎，使用户在访问英荔时能得到更好的服务。Cookie 不会跟踪个人信息。"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/normal-theme/lms/templates/static_templates/privacy.html
@@ -26439,7 +26438,7 @@ msgstr "萧柏春 博士"
 msgid ""
 "Lifetime Professor and Dean of Management Major in School of Business, Long "
 "Island University - C. W. Post, USA"
-msgstr "美国长岛大学商学院管理系主任，终身教授"
+msgstr "美国长岛大学商学院管理系主任、终身教授"
 
 #: membership/templates/membership/index.html
 msgid "Dr. Lloyd E. Shefsky"
@@ -26449,7 +26448,7 @@ msgstr "谢洛德 博士"
 msgid ""
 "Clinical Professor, Founder and Co-director of the Center for Family "
 "Enterprises in Kellogg School of Management at Northwestern University, USA"
-msgstr "原美国西北大学凯洛格商学院家族企业中心创始人，创业专业教授"
+msgstr "原美国西北大学凯洛格商学院家族企业中心创始人、创业专业教授"
 
 #: membership/templates/membership/index.html
 msgid "Prof. Tim Smithe"
