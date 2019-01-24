@@ -167,6 +167,7 @@
       color: $title;
       font-weight: normal;
       margin-bottom: 10px;
+      -webkit-font-smoothing: unset;
     }
     .u-field-value{
       color: $font;
@@ -177,7 +178,6 @@
     }
     .u-field-textarea{
       padding-left: 0;
-      margin-top: 15px;
     }
     .learner-achievements .learner-message{
       border: 1px solid #e6e9ed;
@@ -219,7 +219,7 @@
     }
     .u-field.mode-placeholder:hover{
       border: 1px solid $border;
-      .u-field-title, .u-field-value{
+      .u-field-title, span{
         color: $primary;
       }
     }
