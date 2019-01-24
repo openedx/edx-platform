@@ -218,5 +218,5 @@ edx-sga==0.6.2
 # Redis version
 redis==2.10.6
 
-# Completion - using custom.txt for Github branch
-# edx-completion==0.1.10
+# Completion
+edx-completion==0.1.10
