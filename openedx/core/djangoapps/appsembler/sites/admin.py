@@ -2,7 +2,8 @@ from django.contrib.auth.models import User
 from hijack_admin.admin import HijackUserAdminMixin
 from ratelimitbackend import admin
 from student.admin import UserAdmin
-from .models import AlternativeDomain
+
+from openedx.core.djangoapps.appsembler.sites.models import AlternativeDomain
 
 
 class HijackableUserAdmin(UserAdmin, HijackUserAdminMixin):

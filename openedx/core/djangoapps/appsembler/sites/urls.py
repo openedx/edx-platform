@@ -1,8 +1,17 @@
 from django.conf import settings
 from django.conf.urls import url, include
 from rest_framework.routers import DefaultRouter
-from .api import SiteConfigurationViewSet, SiteViewSet, FileUploadView, SiteCreateView,\
-    UsernameAvailabilityView, DomainAvailabilityView, CustomDomainView, DomainSwitchView
+
+from openedx.core.djangoapps.appsembler.sites.api import (
+    SiteConfigurationViewSet,
+    SiteViewSet,
+    FileUploadView,
+    SiteCreateView,
+    UsernameAvailabilityView,
+    DomainAvailabilityView,
+    CustomDomainView,
+    DomainSwitchView,
+)
 
 # Create a router and register our viewsets with it.
 router = DefaultRouter()

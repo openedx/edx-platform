@@ -1,8 +1,9 @@
 from xmodule import course_module
 
-from . import mixins
+from openedx.core.djangoapps.appsembler.msft_lp import mixins
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 

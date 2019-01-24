@@ -7,8 +7,8 @@ from organizations.models import Organization
 
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.appsembler.sites.tasks import clone_course
-from .models import AlternativeDomain
-from .utils import sass_to_dict, dict_to_sass, bootstrap_site
+from openedx.core.djangoapps.appsembler.sites.models import AlternativeDomain
+from openedx.core.djangoapps.appsembler.sites.utils import sass_to_dict, dict_to_sass, bootstrap_site
 
 
 class SASSDictField(serializers.DictField):

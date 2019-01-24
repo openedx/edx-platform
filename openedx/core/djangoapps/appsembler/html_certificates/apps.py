@@ -7,4 +7,4 @@ class HtmlCertificatesAppConfig(AppConfig):
     label = 'html_certificates'
 
     def ready(self):
-        from . import signals  # pylint: disable=unused-variable
+        from openedx.core.djangoapps.appsembler.html_certificates import signals  # pylint: disable=unused-variable

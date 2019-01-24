@@ -4,8 +4,7 @@ from organizations.tests.factories import UserFactory, OrganizationFactory
 from rest_framework.test import APIRequestFactory
 
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
-
-from ..permissions import AMCAdminPermission
+from openedx.core.djangoapps.appsembler.sites.permissions import AMCAdminPermission
 
 
 class AMCAdminPermissionsTestCase(TestCase):

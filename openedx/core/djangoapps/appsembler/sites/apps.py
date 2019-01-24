@@ -8,6 +8,6 @@ class SitesConfig(AppConfig):
     label = 'appsembler_sites'
 
     def ready(self):
-        from .models import patched_clear_site_cache
+        from openedx.core.djangoapps.appsembler.sites.models import patched_clear_site_cache
 
         pre_save.connect(patched_clear_site_cache, sender='site_configuration.SiteConfiguration')

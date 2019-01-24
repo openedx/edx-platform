@@ -1,6 +1,6 @@
 from django.conf.urls import url
 
-from .api import (
+from openedx.core.djangoapps.appsembler.tpa_admin.api import (
     SAMLConfigurationViewSet,
     SAMLConfigurationSiteDetail,
     SAMLProviderConfigViewSet,

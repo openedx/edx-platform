@@ -6,7 +6,6 @@ from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.http.request import split_domain_port
 from django.contrib.sites.models import Site, SiteManager, SITE_CACHE
-from django.core.exceptions import ImproperlyConfigured
 import django
 
 cache = caches['general']

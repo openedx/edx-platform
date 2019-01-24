@@ -3,7 +3,7 @@ from django.core.cache import cache, caches
 from django.contrib.redirects.models import Redirect
 from django.shortcuts import redirect
 
-from .models import AlternativeDomain
+from openedx.core.djangoapps.appsembler.sites.models import AlternativeDomain
 
 import logging
 log = logging.getLogger(__name__)

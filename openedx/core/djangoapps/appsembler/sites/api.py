@@ -17,11 +17,16 @@ from openedx.core.lib.api.authentication import (
     OAuth2AuthenticationAllowInactiveUser,
 )
 
-from .models import AlternativeDomain
-from .permissions import AMCAdminPermission
-from .serializers import SiteConfigurationSerializer, SiteConfigurationListSerializer, SiteSerializer, \
-    RegistrationSerializer, AlternativeDomainSerializer
-from .utils import delete_site
+from openedx.core.djangoapps.appsembler.sites.models import AlternativeDomain
+from openedx.core.djangoapps.appsembler.sites.permissions import AMCAdminPermission
+from openedx.core.djangoapps.appsembler.sites.serializers import (
+    SiteConfigurationSerializer,
+    SiteConfigurationListSerializer,
+    SiteSerializer,
+    RegistrationSerializer,
+    AlternativeDomainSerializer,
+)
+from openedx.core.djangoapps.appsembler.sites.utils import delete_site
 
 
 class SiteViewSet(viewsets.ReadOnlyModelViewSet):

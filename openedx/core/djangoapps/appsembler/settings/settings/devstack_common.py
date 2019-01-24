@@ -18,7 +18,6 @@ def plugin_settings(settings):
 
     settings.INSTALLED_APPS += (
         'django_extensions',
-        'openedx.core.djangoapps.appsembler.msft_lp',
     )
 
     # Those are usually hardcoded in devstack.py for some reason
