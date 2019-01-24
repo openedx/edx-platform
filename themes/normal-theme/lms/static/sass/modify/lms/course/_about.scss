@@ -518,6 +518,17 @@
     margin-top: -216px;
     margin-left: -384px;
   }
+  @media only screen and (orientation:landscape) { 
+    /*横屏*/
+    .video-box #player-container-id{
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      margin-top: 0;
+      margin-left: 0;
+    }
+  } 
 }
 
 @media screen and (max-width:576px){
@@ -582,4 +593,7 @@
     margin-left: -160px;
   }
 }
+
+
+
 
