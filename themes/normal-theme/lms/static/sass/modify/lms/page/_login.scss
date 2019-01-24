@@ -73,6 +73,10 @@
         border: 1px solid $red;
       }
     }
+    input.checkbox{
+      vertical-align: bottom;
+      @extend %input-my-checkbox;
+    }
     select{
       background: url("/static/normal-theme/images/select.png") no-repeat scroll right center #fff;
       background-size: 15px;
@@ -263,12 +267,6 @@
   padding-top: 0;
 }
 .checkbox-optional_fields_toggle{
-
-  #toggle_optional_fields{
-    margin: 0;
-    vertical-align: middle;
-    margin-right: 5px;
-  }
   label{
     .label-text{
       vertical-align: middle;

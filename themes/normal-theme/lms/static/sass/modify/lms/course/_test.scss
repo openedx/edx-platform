@@ -241,6 +241,7 @@
   }
   .solution-span{
     position: static !important;
+    margin-top: 10px;
     >span{
       margin: 8px 0 50px 0 !important;
     }
@@ -257,5 +258,11 @@
   .xblock .xmodule_display.xmodule_CapaModule div.problem .action .problem-action-button-wrapper:first-child .problem-action-btn{
     padding: 10px 10px 10px 0;
     margin-left: -6px;
+  }
+  .problem-action-buttons-wrapper{
+    margin-bottom: 10px;
+  }
+  .xmodule_display.xmodule_CapaModule div.problem .action .submit-attempt-container{
+    padding-bottom: 15px;
   }
 }

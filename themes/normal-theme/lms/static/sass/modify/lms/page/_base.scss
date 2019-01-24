@@ -1,11 +1,11 @@
 *{  
   box-sizing: content-box;
   font-family: $font-family;
-  -webkit-font-smoothing: auto;
+  -webkit-font-smoothing: unset;
 }
 p, h1, h2, h3, h4, h5, h6, label{
   font-family: $font-family !important;
-  -webkit-font-smoothing: auto !important;
+  -webkit-font-smoothing: unset !important;
 }
 
 // 页面padding-left & padding-right只在.window-wrap .content-wrapper添加
@@ -122,6 +122,27 @@ ol, ul, dl{
   width: 230px;
   box-sizing: border-box;
 }
+%input-my-checkbox{
+  display: inline-block;
+  height: 20px !important;
+  width: 20px;
+  background-size: 300px;
+  background-image: url("/static/normal-theme/images/iconfont.png");
+  background-position: -60px -180px;
+  -webkit-appearance: none;
+  border: none !important;
+  transform: scale(0.8);
+  cursor: pointer;
+  margin: 0 2px 0 0;
+  &:checked{
+    background-position: -80px -180px;
+    box-shadow: none;
+  }
+  &:focus{
+    box-shadow: none;
+  }
+}
+
 textarea:focus, input[type="text"]:focus, input[type="url"]:focus, input[type="email"]:focus, input[type="password"]:focus, input[type="tel"]:focus{  
   box-shadow: none;
   border: 1px solid $primary;
@@ -140,6 +161,8 @@ a,a:hover,a:active,a:visited,a:link,a:focus{
   outline:none;
   text-decoration: none;
 }
+
+// button
 input[type="submit"], input[type="button"], button, .button{
   -webkit-font-smoothing: unset;
   box-shadow: none;
@@ -157,8 +180,7 @@ button:focus:not(:disabled), button:hover:not(:disabled), .btn-default{
   background-image: none;
   background-color: transparent;
 }
-// button
-// button样式
+
 // 底色蓝，字体白按钮
 %btn-my-primary{
   display: inline-block;

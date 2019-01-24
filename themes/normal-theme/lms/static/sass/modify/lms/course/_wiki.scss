@@ -10,6 +10,11 @@ body.view-in-course .wiki-wrapper{
     font-size: 18px;
     font-weight: normal;
   }
+  h1{
+    font-weight: normal;
+    font-size: 18px;
+    margin-bottom: 20px;
+  }
 }
 
 // header
@@ -353,3 +358,14 @@ textarea, form#wiki_revision .CodeMirror, input[type="text"]{
   }
 }
 
+
+// alert no permission
+.wiki-wrapper section.wiki .alert{
+  background-color: rgba(255, 228, 209, 0.64);
+	border-radius: 3px;
+  border: solid 1px rgba(250, 127, 43, 0.33);
+  padding: 15px;
+  font-size: 14px;
+  color: $font;
+  margin: 0 20px 20px;
+}

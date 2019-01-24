@@ -511,12 +511,12 @@
     }
   }
   #player-container-id{
-    width: 100%;
-    height: 50%;
-    top: 25%;
-    left: 0;
-    margin-top: 0;
-    margin-left: 0;
+    width: 768px;
+    height: 432px;
+    top: 50%;
+    left: 50%;
+    margin-top: -216px;
+    margin-left: -384px;
   }
 }
 
@@ -561,6 +561,25 @@
   }
   .about-cover .fa-my-close{
     transform: scale(1);
+  }
+  #player-container-id{
+    width: 352px;
+    height: 198px;
+    top: 50%;
+    left: 50%;
+    margin-top: -99px;
+    margin-left: -176px;
+  }
+}
+
+@media screen and (max-width:320px){
+  #player-container-id{
+    width: 320px;
+    height: 180px;
+    top: 50%;
+    left: 50%;
+    margin-top: -90px;
+    margin-left: -160px;
   }
 }
 
