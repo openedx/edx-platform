@@ -179,6 +179,9 @@
     .u-field-textarea{
       padding-left: 0;
     }
+    .profile-private-message{
+      padding-left: 0;
+    }
     .learner-achievements .learner-message{
       border: 1px solid #e6e9ed;
       background: #fff;
@@ -262,12 +265,17 @@
   .view-profile .wrapper-profile-section-container-two{
     padding-left: 0;
   }
+  .certificate-card .card-content{
+    margin-top: 0;
+  }
 }
 
 @media screen and (max-width:576px){
   .view-profile .profile-self .wrapper-profile-field-account-privacy {
-    padding: 5px;
-
+    padding: 8px 10px 0;
+    .u-field-value select{
+      width: 120px;
+    }
     .wrapper-profile-records button{
       margin-top: 5px;
       margin-left: 0;
@@ -277,6 +285,7 @@
       margin-left: 0;
     }
   }
+  
 }
 
 /*
