@@ -175,7 +175,7 @@
         margin-right: 0;
     }
 }
-@media screen and (max-width:991px){
+@media screen and (max-width:1200px){
     .wrapper-account-settings .wrapper-header .header-title{
         padding-left: 22px;
     }
@@ -426,8 +426,40 @@
 .account-settings-sections #aboutTabSections-tabpanel .section .account-settings-section-body .u-field .u-field-message .u-field-message-notification{
     padding: 38px 0 0 80px;
 }
+
 @media screen and (max-width:991px){
     .account-settings-sections #aboutTabSections-tabpanel .section .account-settings-section-body .u-field .u-field-message .u-field-message-notification{
         padding: 38px 0 0 0;
+    }
+    .account-settings-section-body.ordersTabSections-section-body div:nth-of-type(2) {
+        display: none;
+    }
+}
+@media screen and (max-width:568px){
+    .account-settings-sections #ordersTabSections-tabpanel .u-field-order{
+        padding-bottom: 70px;
+    }
+    .account-settings-sections #ordersTabSections-tabpanel .section .account-settings-section-body .u-field .u-field-order span.u-field-order-date{
+        display: none;
+    }
+    .account-settings-sections #ordersTabSections-tabpanel .section .account-settings-section-body .u-field .u-field-order span.u-field-order-price{
+        display: none;
+    }
+    .account-settings-sections #ordersTabSections-tabpanel .section .account-settings-section-body .u-field .u-field-order .u-field-order-lines{
+        display: block;
+    }
+    .account-settings-sections #ordersTabSections-tabpanel .section .account-settings-section-body .u-field .u-field-order .u-field-order-lines span.u-field-order-number{
+        display: block;
+    }
+    .account-settings-sections #ordersTabSections-tabpanel .section .account-settings-section-body .u-field .u-field-order .u-field-order-lines span.u-field-order-date{
+        display: block;
+    }
+    .account-settings-sections #ordersTabSections-tabpanel .section .account-settings-section-body .u-field .u-field-order .u-field-order-lines span.u-field-order-price{
+        display: block;
+    }
+    .account-settings-sections #ordersTabSections-tabpanel .section .account-settings-section-body .u-field-order-link{
+        left: 0;
+        right: 40px;
+        bottom: 20px;
     }
 }
