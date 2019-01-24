@@ -240,10 +240,11 @@ textarea, form#wiki_revision .CodeMirror, input[type="text"]{
     border-radius: 3px;
     border: solid 1px #fff2d3;
     margin: 20px;
+    padding: 10px 15px;
     color: #635634;
   }
   .paragon__alert-dismissible .paragon__close{
-    padding: 8px 12px;
+    padding: 6px 15px;
     background: none;
     opacity: 0.4;
     &:hover, &:focus, &:active, &:visited{
