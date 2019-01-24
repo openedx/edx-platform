@@ -74,8 +74,22 @@
       }
     }
     input.checkbox{
-      vertical-align: bottom;
+      vertical-align: middle;
       @extend %input-my-checkbox;
+    }
+    &.checkbox-remember{
+      label{
+        display: inline-block;
+        vertical-align: middle;
+        &:after{
+          display: none;
+        }
+      }
+      .label-text{
+        line-height: 1;
+        display: inline-block;
+        // vertical-align: middle;
+      }
     }
     select{
       background: url("/static/normal-theme/images/select.png") no-repeat scroll right center #fff;
@@ -295,4 +309,9 @@
       }
     }
   } 
+}
+.login-register .form-field input.checkbox + label{
+  display: inline-block;
+  margin: 0;
+  line-height: 1;
 }
