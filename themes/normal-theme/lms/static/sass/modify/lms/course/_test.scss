@@ -181,21 +181,33 @@
   p{
     font-size: 14px;
   }
-  .choicegroup label{
-    background: rgba(245, 247, 250, 0.4);
-    border: none;
-    border: 1px solid transparent;
-    font-size: 14px;
-    &:hover{
-      border: 1px solid $primary;
+  .choicegroup{
+    label{
+      background: rgba(245, 247, 250, 0.4);
+      border: none;
+      border: 1px solid transparent;
+      font-size: 14px;
+      &:hover{
+        border: 1px solid $primary;
+      }
+      &.choicegroup_correct{
+        border: 1px solid #57aa01;
+      }
+      &.choicegroup_incorrect{
+        border: 1px solid #ff6d7a;
+      }
     }
-    &.choicegroup_correct{
-      border: 1px solid #57aa01;
+
+    input[type="checkbox"]{
+      @extend %input-my-checkbox;
+      top: 9px;
     }
-    &.choicegroup_incorrect{
-      border: 1px solid #ff6d7a;
+
+    input[type="radio"]{
+      @extend %input-my-radio;
+      top: 9px;
     }
-  }
+  } 
   .choicegroup .status .status-icon{
     position: absolute;
     margin-left: 5px;
