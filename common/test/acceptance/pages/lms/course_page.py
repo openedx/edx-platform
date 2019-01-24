@@ -39,3 +39,39 @@ class CoursePage(PageObject):
         """
         tab_nav = TabNavPage(self.browser)
         return tab_name in tab_nav.tab_names
+
+    def wait_for_mathjax(self, timeout=15):
+        """
+        Wait for the MathJax startup files to load, unless the timeout occurs.
+        """
+        def has_mathjax_loaded():
+            """
+            Checks if the MathJax startup sequence has completed.
+            """
+            return self.browser.execute_script(
+                "return typeof(MathJax)!='undefined' && MathJax.isReady==true"
+            )
+
+        self.wait_for(
+            promise_check_func=has_mathjax_loaded,
+            description='Waiting to load MathJax',
+            timeout=timeout
+        )
+
+    def wait_for_mathjax_operations(self, timeout=10):
+        """
+        Wait for the MathJax operations to complete, unless the timeout occurs.
+        """
+        def have_mathjax_operations_completed():
+            """
+            Checks if the MathJax hub queue has any running and pending operations.
+            """
+            return self.browser.execute_script(
+                "return MathJax.Hub.queue.running==0 && MathJax.Hub.queue.queue.length==0"
+                " && MathJax.Hub.queue.pending==0"
+            )
+        self.wait_for(
+            promise_check_func=have_mathjax_operations_completed,
+            description='Waiting for MathJax Operations to finish',
+            timeout=timeout
+        )

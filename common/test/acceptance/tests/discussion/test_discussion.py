@@ -3,7 +3,6 @@ Tests for discussion pages
 """
 
 import datetime
-import time
 from unittest import skip
 from uuid import uuid4
 
@@ -961,13 +960,12 @@ class DiscussionEditorPreviewTest(UniqueCourseTest):
         self.page = DiscussionTabHomePage(self.browser, self.course_id)
         self.page.visit()
         self.page.click_new_post_button()
-
-        # sleep/wait added to allow Major MathJax a11y files to load
-        time.sleep(5)
+        self.page.wait_for_mathjax()
 
     def test_text_rendering(self):
         """When I type plain text into the editor, it should be rendered as plain text in the preview box"""
         self.page.set_new_post_editor_value("Some plain text")
+        self.page.wait_for_mathjax_operations()
         self.assertEqual(self.page.get_new_post_preview_value(), "<p>Some plain text</p>")
 
     def test_markdown_rendering(self):
@@ -978,6 +976,7 @@ class DiscussionEditorPreviewTest(UniqueCourseTest):
             "- line 1\n"
             "- line 2"
         )
+        self.page.wait_for_mathjax_operations()
 
         self.assertEqual(self.page.get_new_post_preview_value(), (
             "<p>Some markdown</p>\n"
@@ -1001,6 +1000,7 @@ class DiscussionEditorPreviewTest(UniqueCourseTest):
             'Text line 2 \n'
             '$$e[n]=d_2$$'
         )
+        self.page.wait_for_mathjax_operations()
         self.assertEqual(self.page.get_new_post_preview_text(), 'Text line 1\nText line 2')
 
     def test_inline_mathjax_rendering_in_order(self):
@@ -1016,6 +1016,7 @@ class DiscussionEditorPreviewTest(UniqueCourseTest):
             'Text line 2 \n'
             '$e[n]=d_2$'
         )
+        self.page.wait_for_mathjax_operations()
         self.assertEqual(self.page.get_new_post_preview_text('.wmd-preview > p'), 'Text line 1 Text line 2')
 
     def test_mathjax_not_rendered_after_post_cancel(self):
@@ -1031,6 +1032,7 @@ class DiscussionEditorPreviewTest(UniqueCourseTest):
             r'\tau_g(\omega) = - \frac{d}{d\omega}\phi(\omega) \hspace{2em} (1) '
             r'\end{equation}'
         )
+        self.page.wait_for_mathjax_operations()
         self.assertIsNotNone(self.page.get_new_post_preview_text())
         self.page.click_element(".cancel")
         alert = get_modal_alert(self.browser)
