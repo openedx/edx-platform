@@ -3,6 +3,9 @@
   font-family: $font-family;
   -webkit-font-smoothing: unset;
 }
+body{
+  display: flex;
+}
 p, h1, h2, h3, h4, h5, h6, label{
   font-family: $font-family !important;
   -webkit-font-smoothing: unset !important;
@@ -14,6 +17,7 @@ p, h1, h2, h3, h4, h5, h6, label{
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  width: 100%;
 
   .content-wrapper{ 
     margin: 0 auto;
