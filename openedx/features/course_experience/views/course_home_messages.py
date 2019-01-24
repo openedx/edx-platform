@@ -27,7 +27,7 @@ from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_experience import CourseHomeMessages, COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from student.models import CourseEnrollment
-from xmodule.course_module import COURSE_VISIBILITY_PRIVATE
+from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
 
 
 class CourseHomeMessageFragmentView(EdxFragmentView):
@@ -109,7 +109,7 @@ def _register_course_home_messages(request, course, user_access, course_start_da
     Register messages to be shown in the course home content page.
     """
     unenrolled_access_flag = COURSE_ENABLE_UNENROLLED_ACCESS_FLAG.is_enabled(course.id)
-    allow_anonymous = unenrolled_access_flag and course.course_visibility != COURSE_VISIBILITY_PRIVATE
+    allow_anonymous = unenrolled_access_flag and course.course_visibility == COURSE_VISIBILITY_PUBLIC
 
     if user_access['is_anonymous'] and not allow_anonymous:
         CourseHomeMessages.register_info_message(

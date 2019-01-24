@@ -105,7 +105,7 @@ from util.cache import cache, cache_if_anonymous
 from util.db import outer_atomic
 from util.milestones_helpers import get_prerequisite_courses_display
 from util.views import _record_feedback_in_zendesk, ensure_valid_course_key, ensure_valid_usage_key
-from xmodule.course_module import COURSE_VISIBILITY_PRIVATE
+from xmodule.course_module import COURSE_VISIBILITY_PRIVATE, COURSE_VISIBILITY_PUBLIC
 from web_fragments.fragment import Fragment
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
@@ -533,7 +533,7 @@ class CourseTabView(EdxFragmentView):
         """
         unenrolled_access_flag = COURSE_ENABLE_UNENROLLED_ACCESS_FLAG.is_enabled(course_key)
         course = get_course(course_key)
-        allow_anonymous = unenrolled_access_flag and course.course_visibility != COURSE_VISIBILITY_PRIVATE
+        allow_anonymous = unenrolled_access_flag and course.course_visibility == COURSE_VISIBILITY_PUBLIC
 
         if request.user.is_anonymous and not allow_anonymous:
             PageLevelMessages.register_warning_message(

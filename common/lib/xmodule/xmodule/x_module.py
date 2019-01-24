@@ -73,7 +73,7 @@ STUDIO_VIEW = 'studio_view'
 PREVIEW_VIEWS = [STUDENT_VIEW, PUBLIC_VIEW, AUTHOR_VIEW]
 
 DEFAULT_PUBLIC_VIEW_MESSAGE = u'''
-%s is only accessible to enrolled learners. Sign in or register, and enroll in this course to view it.
+This content is only accessible to enrolled learners. Sign in or register, and enroll in this course to view it.
 '''
 
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
@@ -770,9 +770,14 @@ class XModuleMixin(XModuleFields, XBlock):
         )
 
         if self.display_name:
-            display_text = DEFAULT_PUBLIC_VIEW_MESSAGE %self.display_name
+            display_text = _(
+                "{display_name} is only accessible to enrolled learners."
+                " Sign in or register, and enroll in this course to view it."
+                ).format(
+                    display_name=self.display_name
+                )
         else:
-            display_text = DEFAULT_PUBLIC_VIEW_MESSAGE %"This content"
+            display_text = _(DEFAULT_PUBLIC_VIEW_MESSAGE)
 
         return Fragment(alert_html.format(display_text))
 

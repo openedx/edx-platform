@@ -44,7 +44,7 @@ from shoppingcart.models import CourseRegistrationCode
 from student.views import is_course_blocked
 from util.views import ensure_valid_course_key
 from xmodule.modulestore.django import modulestore
-from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PRIVATE
+from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
 from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
 from .views import CourseTabView
 from ..access import has_access
@@ -190,7 +190,7 @@ class CoursewareIndex(View):
             })
 
             unenrolled_access_flag = COURSE_ENABLE_UNENROLLED_ACCESS_FLAG.is_enabled(self.course.id)
-            allow_anonymous = unenrolled_access_flag and self.course.course_visibility != COURSE_VISIBILITY_PRIVATE
+            allow_anonymous = unenrolled_access_flag and self.course.course_visibility == COURSE_VISIBILITY_PUBLIC
 
             if not allow_anonymous:
                 PageLevelMessages.register_warning_message(
