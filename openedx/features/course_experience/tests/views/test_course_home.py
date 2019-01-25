@@ -734,7 +734,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         mock_strftime_localized.return_value = fake_unicode_start_time
         date_string = u'<span class="localized-datetime" data-format="shortDate" \
         data-datetime="{formatted_date}" data-language="{language}">{formatted_date}</span>'
-        mock_get_date_string.return_value = unicode(date_string)
+        mock_get_date_string.return_value = date_string
 
         config = CourseDurationLimitConfig(
             course=CourseOverview.get_from_id(self.course.id),
@@ -759,7 +759,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
 
         # Check that if the string is incorrectly not marked as unicode we still get the error
         with mock.patch("openedx.features.course_duration_limits.access.get_date_string",
-                        return_value=date_string):
+                        return_value=str(date_string)):
             response = self.client.get(url, HTTP_ACCEPT_LANGUAGE=language)
             self.assertEqual(response.status_code, 404)
 
