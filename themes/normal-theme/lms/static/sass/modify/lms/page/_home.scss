@@ -60,6 +60,7 @@
     height: 48px;
     border: none;
     width: 100px;
+    z-index: 1;
     background: $primary;
     .fa-search:before{
       transform: scale(1.5);
