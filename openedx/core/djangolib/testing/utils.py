@@ -73,9 +73,6 @@ class CacheIsolationMixin(object):
                     'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
                     'LOCATION': cache_name,
                     'KEY_FUNCTION': 'util.memcache.safe_key',
-                    'OPTIONS': {
-                        'MAX_ENTRIES': 1000,
-                    },
                 } for cache_name in cls.ENABLED_CACHES
             })
 

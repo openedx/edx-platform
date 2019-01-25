@@ -10,7 +10,6 @@ from django.utils import timezone
 from mock import Mock
 import pytz
 
-from edx_django_utils.cache import RequestCache
 from opaque_keys.edx.locator import CourseLocator
 from openedx.core.djangoapps.config_model_utils.models import Provenance
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
@@ -267,13 +266,9 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
         global_config = CourseDurationLimitConfig(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         global_config.save()
 
-        RequestCache.clear_all_namespaces()
-
         # Check that the global value is not retrieved from cache after save
         with self.assertNumQueries(1):
             self.assertTrue(CourseDurationLimitConfig.current().enabled)
-
-        RequestCache.clear_all_namespaces()
 
         # Check that the global value can be retrieved from cache after read
         with self.assertNumQueries(0):
@@ -281,8 +276,6 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
 
         global_config.enabled = False
         global_config.save()
-
-        RequestCache.clear_all_namespaces()
 
         # Check that the global value in cache was deleted on save
         with self.assertNumQueries(1):
@@ -293,13 +286,9 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
         site_config = CourseDurationLimitConfig(site=site_cfg.site, enabled=True, enabled_as_of=datetime(2018, 1, 1))
         site_config.save()
 
-        RequestCache.clear_all_namespaces()
-
         # Check that the site value is not retrieved from cache after save
         with self.assertNumQueries(1):
             self.assertTrue(CourseDurationLimitConfig.current(site=site_cfg.site).enabled)
-
-        RequestCache.clear_all_namespaces()
 
         # Check that the site value can be retrieved from cache after read
         with self.assertNumQueries(0):
@@ -308,16 +297,12 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
         site_config.enabled = False
         site_config.save()
 
-        RequestCache.clear_all_namespaces()
-
         # Check that the site value in cache was deleted on save
         with self.assertNumQueries(1):
             self.assertFalse(CourseDurationLimitConfig.current(site=site_cfg.site).enabled)
 
         global_config = CourseDurationLimitConfig(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         global_config.save()
-
-        RequestCache.clear_all_namespaces()
 
         # Check that the site value is not updated in cache by changing the global value
         with self.assertNumQueries(0):
@@ -329,13 +314,9 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
         org_config = CourseDurationLimitConfig(org=course.org, enabled=True, enabled_as_of=datetime(2018, 1, 1))
         org_config.save()
 
-        RequestCache.clear_all_namespaces()
-
         # Check that the org value is not retrieved from cache after save
         with self.assertNumQueries(2):
             self.assertTrue(CourseDurationLimitConfig.current(org=course.org).enabled)
-
-        RequestCache.clear_all_namespaces()
 
         # Check that the org value can be retrieved from cache after read
         with self.assertNumQueries(0):
@@ -344,8 +325,6 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
         org_config.enabled = False
         org_config.save()
 
-        RequestCache.clear_all_namespaces()
-
         # Check that the org value in cache was deleted on save
         with self.assertNumQueries(2):
             self.assertFalse(CourseDurationLimitConfig.current(org=course.org).enabled)
@@ -353,16 +332,12 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
         global_config = CourseDurationLimitConfig(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         global_config.save()
 
-        RequestCache.clear_all_namespaces()
-
         # Check that the org value is not updated in cache by changing the global value
         with self.assertNumQueries(0):
             self.assertFalse(CourseDurationLimitConfig.current(org=course.org).enabled)
 
         site_config = CourseDurationLimitConfig(site=site_cfg.site, enabled=True, enabled_as_of=datetime(2018, 1, 1))
         site_config.save()
-
-        RequestCache.clear_all_namespaces()
 
         # Check that the org value is not updated in cache by changing the site value
         with self.assertNumQueries(0):
@@ -374,13 +349,9 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
         course_config = CourseDurationLimitConfig(course=course, enabled=True, enabled_as_of=datetime(2018, 1, 1))
         course_config.save()
 
-        RequestCache.clear_all_namespaces()
-
         # Check that the org value is not retrieved from cache after save
         with self.assertNumQueries(2):
             self.assertTrue(CourseDurationLimitConfig.current(course_key=course.id).enabled)
-
-        RequestCache.clear_all_namespaces()
 
         # Check that the org value can be retrieved from cache after read
         with self.assertNumQueries(0):
@@ -389,16 +360,12 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
         course_config.enabled = False
         course_config.save()
 
-        RequestCache.clear_all_namespaces()
-
         # Check that the org value in cache was deleted on save
         with self.assertNumQueries(2):
             self.assertFalse(CourseDurationLimitConfig.current(course_key=course.id).enabled)
 
         global_config = CourseDurationLimitConfig(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         global_config.save()
-
-        RequestCache.clear_all_namespaces()
 
         # Check that the org value is not updated in cache by changing the global value
         with self.assertNumQueries(0):
@@ -407,16 +374,12 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
         site_config = CourseDurationLimitConfig(site=site_cfg.site, enabled=True, enabled_as_of=datetime(2018, 1, 1))
         site_config.save()
 
-        RequestCache.clear_all_namespaces()
-
         # Check that the org value is not updated in cache by changing the site value
         with self.assertNumQueries(0):
             self.assertFalse(CourseDurationLimitConfig.current(course_key=course.id).enabled)
 
         org_config = CourseDurationLimitConfig(org=course.org, enabled=True, enabled_as_of=datetime(2018, 1, 1))
         org_config.save()
-
-        RequestCache.clear_all_namespaces()
 
         # Check that the org value is not updated in cache by changing the site value
         with self.assertNumQueries(0):
