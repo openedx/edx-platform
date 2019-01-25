@@ -231,6 +231,43 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         self.assertIn(expected_gradebook_url, response.content)
         self.assertIn('View Gradebook', response.content)
 
+    GRADEBOOK_LEARNER_COUNT_MESSAGE = (
+        'Note: This feature is available only to courses with a small number ' +
+        'of enrolled learners.'
+    )
+
+    def test_gradebook_learner_count_message(self):
+        """
+        Test that, when the writable gradebook featue is NOT enabled, there IS
+        a message that the feature is only available for courses with small
+        numbers of learners.
+        """
+        response = self.client.get(self.url)
+        self.assertIn(
+            self.GRADEBOOK_LEARNER_COUNT_MESSAGE,
+            response.content
+        )
+        self.assertIn('View Gradebook', response.content)
+
+    @patch(
+        'lms.djangoapps.instructor.views.instructor_dashboard.settings.WRITABLE_GRADEBOOK_URL',
+        'http://gradebook.local.edx.org'
+    )
+    def test_no_gradebook_learner_count_message(self):
+        """
+        Test that, when the writable gradebook featue IS enabled, there is NOT
+        a message that the feature is only available for courses with small
+        numbers of learners.
+        """
+        waffle_flag = waffle_flags()[WRITABLE_GRADEBOOK]
+        with override_waffle_flag(waffle_flag, active=True):
+            response = self.client.get(self.url)
+        self.assertNotIn(
+            TestInstructorDashboard.GRADEBOOK_LEARNER_COUNT_MESSAGE,
+            response.content
+        )
+        self.assertIn('View Gradebook', response.content)
+
     def test_default_currency_in_the_html_response(self):
         """
         Test that checks the default currency_symbol ($) in the response
