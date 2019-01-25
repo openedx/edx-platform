@@ -42,8 +42,8 @@
 # EdX Team <info@edx.org>, 2019.
 #
 # #-#-#-#-#  eliteu.po (0.1a)  #-#-#-#-#
-# edX translation file
-# Copyright (C) 2019 edX
+# edX translation file.
+# Copyright (C) 2019 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2019.
 #
@@ -51,16 +51,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-01-18 04:19+0000\n"
-"PO-Revision-Date: 2019-01-18 04:19:48.646202\n"
+"POT-Creation-Date: 2019-01-24 03:59+0000\n"
+"PO-Revision-Date: 2019-01-24 04:00:16.839550\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 1.3\n"
+"#-#-#-#-#  eliteu.po (0.1a)  #-#-#-#-#\n"
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: 'Discussion' refers to the tab in the courseware that leads to
@@ -892,11 +893,11 @@ msgid "Valid e-mail address required."
 msgstr ""
 
 #: common/djangoapps/student/views/management.py
-msgid "E-mail address has been used."
+msgid "Old email is the same as the new email."
 msgstr ""
 
 #: common/djangoapps/student/views/management.py
-msgid "Old email is the same as the new email."
+msgid "E-mail address has been used."
 msgstr ""
 
 #: common/djangoapps/student/views/management.py
@@ -11055,6 +11056,18 @@ msgid ""
 "profile. {learn_more_link_start}Learn more{learn_more_link_end}"
 msgstr ""
 
+#: themes/normal-theme/lms/templates/ace_common/edx_ace/common/return_to_course_cta.html
+#: lms/templates/emails/activation_email.txt
+#: lms/templates/emails/confirm_email_change.txt
+#: lms/templates/emails/failed_verification_email.txt
+#: lms/templates/emails/order_confirmation_email.txt
+#: lms/templates/emails/photo_submission_review.txt
+#: lms/templates/emails/reverification_processed.txt
+msgid ""
+"(If the link is not clickable, try copying and pasting it into the address "
+"bar of your web browser, and press \"Enter\" key to open the page)"
+msgstr ""
+
 #: themes/normal-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #, python-format
 msgid ""
@@ -16183,17 +16196,6 @@ msgid ""
 "You're almost there! Use the link to activate your account to access "
 "engaging, high-quality {platform_name} courses. Note that you will not be "
 "able to log back into your account until you have activated it."
-msgstr ""
-
-#: lms/templates/emails/activation_email.txt
-#: lms/templates/emails/confirm_email_change.txt
-#: lms/templates/emails/failed_verification_email.txt
-#: lms/templates/emails/order_confirmation_email.txt
-#: lms/templates/emails/photo_submission_review.txt
-#: lms/templates/emails/reverification_processed.txt
-msgid ""
-"(If the link is not clickable, try copying and pasting it into the address "
-"bar of your web browser, and press \"Enter\" key to open the page)"
 msgstr ""
 
 #: lms/templates/emails/activation_email.txt

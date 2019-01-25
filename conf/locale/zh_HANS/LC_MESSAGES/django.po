@@ -70,8 +70,8 @@
 # li ying <code@eliteu.cn>, 2019
 #
 # #-#-#-#-#  eliteu.po (0.1a)  #-#-#-#-#
-# edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)
-# Copyright (C) 2019 edX
+# edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/).
+# Copyright (C) 2019 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2019.
 #
@@ -82,7 +82,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-01-18 04:19+0000\n"
+"POT-Creation-Date: 2019-01-24 03:59+0000\n"
 "PO-Revision-Date: 2019-01-17 09:35+0000\n"
 "Last-Translator: li ying <code@eliteu.cn>, 2019\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)\n"
@@ -92,6 +92,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "Generated-By: Babel 1.3\n"
+"#-#-#-#-#  eliteu.po (0.1a)  #-#-#-#-#\n"
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: 'Discussion' refers to the tab in the courseware that leads to
@@ -927,12 +928,12 @@ msgid "Valid e-mail address required."
 msgstr "需要有效的电子邮件地址"
 
 #: common/djangoapps/student/views/management.py
-msgid "E-mail address has been used."
-msgstr "邮件地址已被使用。"
-
-#: common/djangoapps/student/views/management.py
 msgid "Old email is the same as the new email."
 msgstr "新邮件地址与旧邮件地址相同。"
+
+#: common/djangoapps/student/views/management.py
+msgid "E-mail address has been used."
+msgstr "邮件地址已被使用。"
 
 #: common/djangoapps/student/views/management.py
 msgid "Unable to send email activation link. Please try again later."
@@ -16525,7 +16526,7 @@ msgstr "享受您在{platform_name}上的学习之旅。"
 msgid ""
 "If you need help, please use our web form at {support_url} or email "
 "{support_email}."
-msgstr "如需帮助，请使用我们的网站表格{support_url} 或发邮件至{support_email} 。"
+msgstr "如需帮助，请使用我们的网站{support_url} 或发邮件至{support_email} 。"
 
 #: lms/templates/emails/activation_email.txt
 msgid ""
@@ -21576,7 +21577,7 @@ msgid ""
 "but users can often modify their browser settings to reject cookies based on"
 " their needs."
 msgstr ""
-"使用 Cookie 能帮助用户实现联机体验的个性化，用户可以接受或拒绝 Cookie ，大多数 Web 浏览器会自动接受 "
+"使用 Cookie 能帮助用户实现联机体验的个性化，用户可以接受或拒绝 Cookie，大多数 Web 浏览器会自动接受 "
 "Cookie，但用户通常可根据自己的需要来修改浏览器的设置以拒绝 Cookie。"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
