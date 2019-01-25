@@ -553,6 +553,7 @@ def render_html_view(request, user_id, course_id):
     custom_template = None
     custom_template_language = None
     if settings.FEATURES.get('CUSTOM_CERTIFICATE_TEMPLATES_ENABLED', False):
+        log.info("Custom certificate for course {course_id}".format(course_id=course_id))
         custom_template, custom_template_language = _get_custom_template_and_language(
             course.id,
             user_certificate.mode,
@@ -564,6 +565,9 @@ def render_html_view(request, user_id, course_id):
     # the language associated with the template.
     user_language = translation.get_language()
     certificate_language = custom_template_language if custom_template else user_language
+
+    log.info("certificate language is: {language} for the course:{course_key}".format(language=certificate_language,
+                                                                                      course_key=course_key))
 
     # Generate the certificate context in the correct language, then render the template.
     with translation.override(certificate_language):
@@ -639,7 +643,8 @@ def _get_catalog_data_for_course(course_key):
             except ValueError:
                 log.exception('Error occurred while parsing course run details')
         catalog_data['content_language'] = course_run_data.get('content_language')
-
+    log.info("catalog data received for course:{course_key} is : {catalog_data}".format(course_key=course_key,
+                                                                                        catalog_data=catalog_data))
     return catalog_data
 
 
@@ -649,6 +654,9 @@ def _get_custom_template_and_language(course_id, course_mode, course_language):
     combination, along with the language that should be used to render that template.
     """
     closest_released_language = get_closest_released_language(course_language) if course_language else None
+    log.info("closest released language for {course_id} is {closest_released_language} and course language was:"
+             " {course_language}".format(course_id=course_id, closest_released_language=closest_released_language,
+                                         course_language=course_language))
     template = get_certificate_template(course_id, course_mode, closest_released_language)
 
     if template and template.language:
