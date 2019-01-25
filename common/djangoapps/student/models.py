@@ -426,9 +426,15 @@ class UserProfile(models.Model):
     meta = models.TextField(blank=True)  # JSON dictionary for future expansion
     courseware = models.CharField(blank=True, max_length=255, default='course.xml')
 
+    # Language is deprecated and no longer used. Old rows exist that have
+    # user-entered free form text values (ex. "English"), some of which have
+    # non-ASCII values. You probably want UserPreference version of this, which
+    # stores the user's preferred language code. See openedx/core/djangoapps/lang_pref
+    # for more information.
+    language = models.CharField(blank=True, max_length=255, db_index=True)
+
     # Location is no longer used, but is held here for backwards compatibility
     # for users imported from our first class.
-    language = models.CharField(blank=True, max_length=255, db_index=True)
     location = models.CharField(blank=True, max_length=255, db_index=True)
 
     # Optional demographic data we started capturing from Fall 2012

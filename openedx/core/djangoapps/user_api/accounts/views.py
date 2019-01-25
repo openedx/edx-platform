@@ -10,6 +10,7 @@ from functools import wraps
 
 import pytz
 from consent.models import DataSharingConsent
+from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model, logout
 from django.contrib.sites.models import Site
 from django.core.cache import cache
@@ -39,6 +40,7 @@ from openedx.core.djangoapps.ace_common.template_context import get_base_templat
 from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
 from openedx.core.djangoapps.credit.models import CreditRequirementStatus, CreditRequest
 from openedx.core.djangoapps.course_groups.models import UnregisteredLearnerCohortAssignments
+from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.profile_images.images import remove_profile_images
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_names, set_has_profile_image
 from openedx.core.djangolib.oauth2_retirement_utils import retire_dot_oauth2_models, retire_dop_oauth2_models
@@ -404,9 +406,14 @@ class DeactivateLogoutView(APIView):
                     site = Site.objects.get_current()
                     notification_context = get_base_template_context(site)
                     notification_context.update({'full_name': request.user.profile.name})
+                    language_code = request.user.preferences.model.get_value(
+                        request.user,
+                        LANGUAGE_KEY,
+                        default=settings.LANGUAGE_CODE
+                    )
                     notification = DeletionNotificationMessage().personalize(
                         recipient=Recipient(username='', email_address=user_email),
-                        language=request.user.profile.language,
+                        language=language_code,
                         user_context=notification_context,
                     )
                     ace.send(notification)
