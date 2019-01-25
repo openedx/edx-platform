@@ -231,12 +231,12 @@ class TestGetCourseListExtras(CourseListTestMixin, ModuleStoreTestCase):
 
     def test_no_courses(self):
         courses = self._make_api_call(self.honor_user, self.honor_user)
-        self.assertEqual(len(list(courses)), 0)
+        self.assertEqual(len(courses), 0)
 
     def test_hidden_course_for_honor(self):
         self.create_course(visible_to_staff_only=True)
         courses = self._make_api_call(self.honor_user, self.honor_user)
-        self.assertEqual(len(list(courses)), 0)
+        self.assertEqual(len(courses), 0)
 
     def test_hidden_course_for_staff(self):
         self.create_course(visible_to_staff_only=True)

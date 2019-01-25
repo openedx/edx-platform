@@ -1,7 +1,6 @@
 """
 Utilities related to API views
 """
-from collections import Sequence
 from django.core.exceptions import NON_FIELD_ERRORS, ObjectDoesNotExist, ValidationError
 from django.http import Http404
 from django.utils.translation import ugettext as _
@@ -206,100 +205,3 @@ class RetrievePatchAPIView(RetrieveModelMixin, UpdateModelMixin, GenericAPIView)
                 # PATCH requests where the object does not exist should still
                 # return a 404 response.
                 raise
-
-
-class LazySequence(Sequence):
-    """
-    This class provides an immutable Sequence interface on top of an existing
-    iterable.
-
-    It is immutable, and accepts an estimated length in order to support __len__
-    without exhausting the underlying sequence
-    """
-    def __init__(self, iterable, est_len=None):  # pylint: disable=super-init-not-called
-        self.iterable = iterable
-        self.est_len = est_len
-        self._data = []
-        self._exhausted = False
-
-    def __len__(self):
-        # Return the actual data length if we know it exactly (because
-        # the underlying sequence is exhausted), or it's greater than
-        # the initial estimated length
-        if len(self._data) > self.est_len or self._exhausted:
-            return len(self._data)
-        else:
-            return self.est_len
-
-    def __iter__(self):
-        # Yield all the known data first
-        for item in self._data:
-            yield item
-
-        # Capture and yield data from the underlying iterator
-        # until it is exhausted
-        while True:
-            try:
-                item = next(self.iterable)
-                self._data.append(item)
-                yield item
-            except StopIteration:
-                self._exhausted = True
-                return
-
-    def __getitem__(self, index):
-        if isinstance(index, int):
-            # For a single index, if we haven't already loaded enough
-            # data, we can load data until we have enough, and then
-            # return the value from the loaded data
-            if index < 0:
-                raise IndexError("Negative indexes aren't supported")
-
-            while len(self._data) <= index:
-                try:
-                    self._data.append(next(self.iterable))
-                except StopIteration:
-                    self._exhausted = True
-                    raise IndexError("Underlying sequence exhausted")
-
-            return self._data[index]
-        elif isinstance(index, slice):
-            # For a slice, we can load data until we reach 'stop'.
-            # Once we have data including 'stop', then we can use
-            # the underlying list to actually understand the mechanics
-            # of the slicing operation.
-            if index.start is not None and index.start < 0:
-                raise IndexError("Negative indexes aren't supported")
-            if index.stop is not None and index.stop < 0:
-                raise IndexError("Negative indexes aren't supported")
-
-            if index.step is not None and index.step < 0:
-                largest_value = index.start + 1
-            else:
-                largest_value = index.stop
-
-            if largest_value is not None:
-                while len(self._data) <= largest_value:
-                    try:
-                        self._data.append(next(self.iterable))
-                    except StopIteration:
-                        self._exhausted = True
-                        break
-            else:
-                self._data.extend(self.iterable)
-            return self._data[index]
-        else:
-            raise TypeError("Unsupported index type")
-
-    def __repr__(self):
-        if self._exhausted:
-            return "LazySequence({!r}, {!r})".format(
-                self._data,
-                self.est_len,
-            )
-        else:
-            return "LazySequence(itertools.chain({!r}, {!r}), {!r})".format(
-                self._data,
-                self.iterable,
-                self.est_len,
-            )

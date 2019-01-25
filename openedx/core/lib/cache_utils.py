@@ -9,7 +9,6 @@ import zlib
 
 from django.utils.encoding import force_text
 from edx_django_utils.cache import RequestCache
-import wrapt
 
 
 def request_cached(namespace=None, arg_map_function=None, request_cache_getter=None):
@@ -48,32 +47,38 @@ def request_cached(namespace=None, arg_map_function=None, request_cache_getter=N
               cache the value it returns, and return that cached value for subsequent calls with the
               same args/kwargs within a single request.
     """
-    @wrapt.decorator
-    def decorator(wrapped, instance, args, kwargs):
+    def decorator(f):
         """
         Arguments:
-            args, kwargs: values passed into the wrapped function
+            f (func): the function to wrap
         """
-        # Check to see if we have a result in cache.  If not, invoke our wrapped
-        # function.  Cache and return the result to the caller.
-        if request_cache_getter:
-            request_cache = request_cache_getter(args if instance is None else (instance,) + args, kwargs)
-        else:
-            request_cache = RequestCache(namespace)
+        @functools.wraps(f)
+        def _decorator(*args, **kwargs):
+            """
+            Arguments:
+                args, kwargs: values passed into the wrapped function
+            """
+            # Check to see if we have a result in cache.  If not, invoke our wrapped
+            # function.  Cache and return the result to the caller.
+            if request_cache_getter:
+                request_cache = request_cache_getter(args, kwargs)
+            else:
+                request_cache = RequestCache(namespace)
 
-        if request_cache:
-            cache_key = _func_call_cache_key(wrapped, arg_map_function, *args, **kwargs)
-            cached_response = request_cache.get_cached_response(cache_key)
-            if cached_response.is_found:
-                return cached_response.value
+            if request_cache:
+                cache_key = _func_call_cache_key(f, arg_map_function, *args, **kwargs)
+                cached_response = request_cache.get_cached_response(cache_key)
+                if cached_response.is_found:
+                    return cached_response.value
 
-        result = wrapped(*args, **kwargs)
+            result = f(*args, **kwargs)
 
-        if request_cache:
-            request_cache.set(cache_key, result)
+            if request_cache:
+                request_cache.set(cache_key, result)
 
-        return result
+            return result
 
+        return _decorator
     return decorator
 
 
