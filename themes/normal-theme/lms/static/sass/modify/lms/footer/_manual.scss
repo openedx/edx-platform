@@ -44,7 +44,7 @@
     border: 1px solid #eeeeee;
     border-radius: 3px;
     font-size: 14px;
-    color: #2E313C;
+    color: $title;
 }
 .manual-tabs-fixed{
     position: fixed;
@@ -83,6 +83,7 @@
         color: $title;
         font-size: 16px;
         margin-bottom: 5px;
+        font-weight: bold;
     }
     .ques-answer{
         color: $font;
