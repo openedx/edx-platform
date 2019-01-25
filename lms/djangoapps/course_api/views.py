@@ -10,6 +10,7 @@ from rest_framework.throttling import UserRateThrottle
 
 from edx_rest_framework_extensions.paginators import NamespacedPageNumberPagination
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
+from openedx.core.lib.api.view_utils import LazySequence
 
 from . import USE_RATE_LIMIT_2_FOR_COURSE_LIST_API, USE_RATE_LIMIT_10_FOR_COURSE_LIST_API
 from .api import course_detail, list_courses
@@ -243,7 +244,7 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
 
     def get_queryset(self):
         """
-        Return a list of courses visible to the user.
+        Yield courses visible to the user.
         """
         form = CourseListGetForm(self.request.query_params, initial={'requesting_user': self.request.user})
         if not form.is_valid():
@@ -264,9 +265,12 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
             size=self.results_size_infinity,
         )
 
-        search_courses_ids = {course['data']['id']: True for course in search_courses['results']}
+        search_courses_ids = {course['data']['id'] for course in search_courses['results']}
 
-        return [
-            course for course in db_courses
-            if unicode(course.id) in search_courses_ids
-        ]
+        return LazySequence(
+            (
+                course for course in db_courses
+                if unicode(course.id) in search_courses_ids
+            ),
+            est_len=len(db_courses)
+        )
