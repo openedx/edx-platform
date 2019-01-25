@@ -88,7 +88,7 @@ class ContentTypeGatingPartition(UserPartition):
 
         request = crum.get_current_request()
         frag = Fragment(render_to_string('content_type_gating/access_denied_message.html', {
-            'mobile_app': is_request_from_mobile_app(request),
+            'mobile_app': request and is_request_from_mobile_app(request),
             'ecommerce_checkout_link': ecommerce_checkout_link,
             'min_price': str(verified_mode.min_price)
         }))

@@ -96,3 +96,30 @@ class TestContentTypeGatingPartition(CacheIsolationTestCase):
             fragment = partition.access_denied_fragment(mock_block, global_staff, 'test_group', 'test_allowed_group')
 
         self.assertIsNotNone(fragment)
+
+    def test_acess_denied_fragment_for_null_request(self):
+        """
+        Verifies the access denied fragment is visible when HTTP request is not available.
+
+        Given the HTTP request instance is None
+        Then set the mobile_app context variable to False
+        And the fragment should be created successfully
+        """
+        mock_request = None
+        mock_course = Mock(id=self.course_key, user_partitions={})
+        mock_block = Mock(scope_ids=Mock(usage_id=Mock(course_key=mock_course.id)))
+        CourseModeFactory.create(course_id=mock_course.id, mode_slug='verified')
+        global_staff = GlobalStaffFactory.create()
+        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
+        partition = create_content_gating_partition(mock_course)
+
+        with patch(
+            'crum.get_current_request',
+            return_value=mock_request
+        ), patch(
+            'openedx.features.content_type_gating.partitions.ContentTypeGatingPartition._is_audit_enrollment',
+            return_value=True
+        ):
+            fragment = partition.access_denied_fragment(mock_block, global_staff, 'test_group', 'test_allowed_group')
+
+        self.assertIsNotNone(fragment)
