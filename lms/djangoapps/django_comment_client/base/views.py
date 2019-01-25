@@ -228,7 +228,7 @@ def _get_excerpt(body, max_len=None):
 
     excerpt = strip_tags(body).replace('\n', '').replace('\r', '')
     if len(excerpt) > max_len:
-        excerpt = '{}...'.format(excerpt[:max_len])
+        excerpt = u'{}...'.format(excerpt[:max_len])
     return excerpt
 
 
