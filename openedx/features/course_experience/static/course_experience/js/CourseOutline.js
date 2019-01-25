@@ -1,4 +1,4 @@
-/* globals Logger */
+/* globals gettext, Logger */
 
 import { keys } from 'edx-ui-toolkit/js/utils/constants';
 
@@ -82,12 +82,12 @@ export class CourseOutline {  // eslint-disable-line import/prefer-default-expor
         toggleAllButton.setAttribute('aria-expanded', 'false');
         sectionAction = collapseSection;
         toggleAllSpan.classList.add(extraPaddingClass);
-        toggleAllSpan.innerText = 'Expand All';
+        toggleAllSpan.innerText = gettext('Expand All');
       } else {
         toggleAllButton.setAttribute('aria-expanded', 'true');
         sectionAction = expandSection;
         toggleAllSpan.classList.remove(extraPaddingClass);
-        toggleAllSpan.innerText = 'Collapse All';
+        toggleAllSpan.innerText = gettext('Collapse All');
       }
       const sections = Array.prototype.slice.call(document.querySelectorAll('.accordion-trigger'));
       sections.forEach((sectionToggleButton) => {
