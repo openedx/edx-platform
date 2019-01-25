@@ -47,11 +47,13 @@ def update_course_schedules(self, **kwargs):
     new_upgrade_deadline = deserialize(kwargs['new_upgrade_deadline_str'])
 
     try:
-        Schedule.objects.filter(enrollment__course_id=course_key).update(
+        number_of_updated_records = Schedule.objects.filter(enrollment__course_id=course_key).update(
             start=new_start_date,
             upgrade_deadline=new_upgrade_deadline
         )
+        LOG.info("Number of schedule records updated: %d", number_of_updated_records)
     except Exception as exc:
+        LOG.exception("A broader exception to debug EDUCATOR-3965")
         if not isinstance(exc, KNOWN_RETRY_ERRORS):
             LOG.exception("Unexpected failure: task id: %s, kwargs=%s".format(self.request.id, kwargs))
         raise self.retry(kwargs=kwargs, exc=exc)
