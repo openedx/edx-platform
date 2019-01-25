@@ -242,12 +242,6 @@ if settings.FEATURES.get('CERTIFICATES_HTML_VIEW'):
 urlpatterns.append(url(r'^maintenance/', include('maintenance.urls', namespace='maintenance')))
 
 if settings.DEBUG:
-    try:
-        from .urls_dev import urlpatterns as dev_urlpatterns
-        urlpatterns += dev_urlpatterns
-    except ImportError:
-        pass
-
     urlpatterns += static(
         settings.VIDEO_IMAGE_SETTINGS['STORAGE_KWARGS']['base_url'],
         document_root=settings.VIDEO_IMAGE_SETTINGS['STORAGE_KWARGS']['location']
