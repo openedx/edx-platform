@@ -1,6 +1,6 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/).
-# Copyright (C) 2018 EdX
+# Copyright (C) 2019 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -44,7 +44,7 @@
 # Zakaria <zakaria.braksa@gmail.com>, 2015
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/).
-# Copyright (C) 2018 EdX
+# Copyright (C) 2019 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -78,7 +78,7 @@
 # soliman osman <solimanosman@windowslive.com>, 2014-2015
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)
-# Copyright (C) 2018 edX
+# Copyright (C) 2019 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -107,7 +107,7 @@
 # سيف المنايا <m2fahad9@gmail.com>, 2015
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)
-# Copyright (C) 2018 edX
+# Copyright (C) 2019 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -138,8 +138,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-12-30 20:42+0000\n"
-"PO-Revision-Date: 2018-12-09 20:43+0000\n"
+"POT-Creation-Date: 2019-01-20 20:42+0000\n"
+"PO-Revision-Date: 2019-01-16 20:19+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
 "Language: ar\n"
@@ -4952,6 +4952,12 @@ msgid "Preferred Language"
 msgstr "اللغة المفضّلة"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+msgid ""
+"We've sent a confirmation message to {new_secondary_email_address}. Click "
+"the link in the message to update your secondary email address."
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Social Media Links"
 msgstr ""
 
@@ -9704,6 +9710,10 @@ msgstr "تصغير/تكبير هذه وحدات %(xblock_type)s"
 #: cms/templates/js/course-outline.underscore
 msgid "Display Name"
 msgstr "اسم العرض"
+
+#: cms/templates/js/course-outline.underscore
+msgid "Proctoring Settings"
+msgstr ""
 
 #: cms/templates/js/course-outline.underscore
 msgid "Configure"

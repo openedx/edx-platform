@@ -1,6 +1,6 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from French (http://www.transifex.com/open-edx/edx-platform/language/fr/).
-# Copyright (C) 2018 EdX
+# Copyright (C) 2019 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -70,7 +70,7 @@
 # d6910e756eb8532754192e6021dc9f83, 2014-2015
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from French (http://www.transifex.com/open-edx/edx-platform/language/fr/).
-# Copyright (C) 2018 EdX
+# Copyright (C) 2019 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -118,7 +118,7 @@
 # d6910e756eb8532754192e6021dc9f83, 2015
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from French (http://www.transifex.com/open-edx/edx-platform/language/fr/)
-# Copyright (C) 2018 edX
+# Copyright (C) 2019 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -150,7 +150,7 @@
 # Steven BERNARD <steven.bernard@u-paris2.fr>, 2014
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from French (http://www.transifex.com/open-edx/edx-platform/language/fr/)
-# Copyright (C) 2018 edX
+# Copyright (C) 2019 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -172,15 +172,16 @@
 # romain couturat <romain.couturat@fun-mooc.fr>, 2016
 # Steven BERNARD <steven.bernard@u-paris2.fr>, 2014
 # Tala Aoun <talaaoun@gmail.com>, 2016
+# willyedoo <willyedoo@gmail.com>, 2019
 # d6910e756eb8532754192e6021dc9f83, 2015
 # d6910e756eb8532754192e6021dc9f83, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-12-30 20:42+0000\n"
-"PO-Revision-Date: 2018-12-09 20:43+0000\n"
-"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
+"POT-Creation-Date: 2019-01-20 20:42+0000\n"
+"PO-Revision-Date: 2019-01-25 15:54+0000\n"
+"Last-Translator: willyedoo <willyedoo@gmail.com>\n"
 "Language-Team: French (http://www.transifex.com/open-edx/edx-platform/language/fr/)\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -5052,6 +5053,12 @@ msgid "Preferred Language"
 msgstr "Langue préférée"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+msgid ""
+"We've sent a confirmation message to {new_secondary_email_address}. Click "
+"the link in the message to update your secondary email address."
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Social Media Links"
 msgstr "Liens vers les réseaux sociaux"
 
@@ -9862,6 +9869,10 @@ msgstr "Déplier/Replier ce %(xblock_type)s"
 #: cms/templates/js/course-outline.underscore
 msgid "Display Name"
 msgstr "Nom d'affichage"
+
+#: cms/templates/js/course-outline.underscore
+msgid "Proctoring Settings"
+msgstr ""
 
 #: cms/templates/js/course-outline.underscore
 msgid "Configure"

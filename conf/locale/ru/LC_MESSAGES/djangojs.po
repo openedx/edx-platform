@@ -1,6 +1,6 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/).
-# Copyright (C) 2018 EdX
+# Copyright (C) 2019 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -67,7 +67,7 @@
 # Yana Lovyagina <yana.lovyagina@raccoongang.com>, 2016
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/).
-# Copyright (C) 2018 EdX
+# Copyright (C) 2019 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -104,7 +104,7 @@
 # Павел Жилкин, 2018
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)
-# Copyright (C) 2018 edX
+# Copyright (C) 2019 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -133,7 +133,7 @@
 # Yana Lovyagina <yana.lovyagina@raccoongang.com>, 2016
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)
-# Copyright (C) 2018 edX
+# Copyright (C) 2019 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -160,8 +160,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-12-30 20:42+0000\n"
-"PO-Revision-Date: 2018-12-09 20:43+0000\n"
+"POT-Creation-Date: 2019-01-20 20:42+0000\n"
+"PO-Revision-Date: 2019-01-16 20:19+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
 "Language: ru\n"
@@ -5125,6 +5125,12 @@ msgid "Preferred Language"
 msgstr "Предпочитаемый язык"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+msgid ""
+"We've sent a confirmation message to {new_secondary_email_address}. Click "
+"the link in the message to update your secondary email address."
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Social Media Links"
 msgstr "Ссылки на социальные сети"
 
@@ -9978,6 +9984,10 @@ msgstr "Свернуть / развернуть %(xblock_type)s"
 #: cms/templates/js/course-outline.underscore
 msgid "Display Name"
 msgstr "Отображаемое название"
+
+#: cms/templates/js/course-outline.underscore
+msgid "Proctoring Settings"
+msgstr ""
 
 #: cms/templates/js/course-outline.underscore
 msgid "Configure"
