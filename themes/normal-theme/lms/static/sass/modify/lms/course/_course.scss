@@ -90,7 +90,7 @@ body.view-in-course .wrapper-course-material .course-tabs{
     .page-header-main .page-title{  
       font-size: 18px;
       margin: 0;
-      line-height: 38px;
+      line-height: 36px;
       color:$title;
       font-weight: normal;
     }
@@ -99,8 +99,10 @@ body.view-in-course .wrapper-course-material .course-tabs{
       vertical-align: inherit;
     }
     .input-group .field-input{
-      height: 16px;
+      box-sizing: border-box;
+      height: 36px;
       font-size: 14px;
+      padding: 0 15px;
       color: $font;
       border: 1px solid $primary;
       border-top-left-radius: 3px;
@@ -132,8 +134,6 @@ body.view-in-course .wrapper-course-material .course-tabs{
       padding: 0;
     }
     &:hover, &:focus{
-      outline: none;
-      box-shadow: none;
       background-color: rgba(182, 220, 254, 0.5);
     }
   }

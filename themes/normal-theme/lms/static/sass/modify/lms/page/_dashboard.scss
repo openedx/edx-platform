@@ -49,7 +49,6 @@
     
     .wrapper-course-details .wrapper-course-actions .enter-course{
       @extend %btn-my-primary;
-      line-height: 34px;
     }
 
     a.enter-course-blocked.course-target-link{
@@ -83,13 +82,12 @@
   @extend %btn-my-primary;
   background: #40A24D !important;
   border: 1px solid #40A24D;
-  line-height: 34px;
   .copy{
     margin-right: 0;
     vertical-align: unset;
     font-weight: normal;
   }
-  &:hover,&:focus, &:active, &:visited{
+  &:hover,&:focus, &:active, &:visited, &:active:not(:disabled), &:focus:not(:disabled){
     border: 1px solid #40A24D;
   }
 }

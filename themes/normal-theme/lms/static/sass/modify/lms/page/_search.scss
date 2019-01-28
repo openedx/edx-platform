@@ -30,13 +30,8 @@
   }
   .discovery-submit{
     @extend %btn-my-primary;
-    height: 36px;
-    border: none;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
-    &:hover, &:focus, &:active, &:visited{
-      border: none !important;
-    }
   }
   .loading-spinner{
     top: 0;

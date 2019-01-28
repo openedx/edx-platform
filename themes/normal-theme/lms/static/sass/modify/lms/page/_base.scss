@@ -211,13 +211,14 @@ button:focus:not(:disabled), button:hover:not(:disabled), .btn-default{
 
 // 底色蓝，字体白按钮
 %btn-my-primary{
+  box-sizing: border-box;
   display: inline-block;
   width: auto;
   padding: 0 20px !important;
   font-size: 14px;
   letter-spacing: 0.3px;
   height: 36px;
-  line-height: 36px;
+  line-height: 34px !important;
   border-radius: 3px;
   font-weight: normal;
   cursor: pointer;
@@ -230,8 +231,9 @@ button:focus:not(:disabled), button:hover:not(:disabled), .btn-default{
   font-family: $font-family;
   outline: none;
 
-  &:hover,&:focus, &:active, &:visited{
+  &:hover,&:focus, &:active, &:visited, &:hover:not(:disabled), &:active:not(:disabled), &:focus:not(:disabled){
     background: $primary;
+    background-image: none;
     text-decoration: none;
     opacity: 0.95;
     box-shadow: none;
@@ -243,13 +245,14 @@ button:focus:not(:disabled), button:hover:not(:disabled), .btn-default{
 
 // 底色白，字体蓝
 %btn-my-white{
+  box-sizing: border-box;
   display: inline-block;
   width: auto;
   padding: 0 20px !important;
   font-size: 14px;
   letter-spacing: 0.3px;
   height: 36px;
-  line-height: 36px;
+  line-height: 34px !important;
   border-radius: 3px;
   cursor: pointer;
   background: #fff;
@@ -258,9 +261,11 @@ button:focus:not(:disabled), button:hover:not(:disabled), .btn-default{
   text-shadow: none;
   font-family: $font-family;
   outline: none;
+  box-shadow: none;
 
-  &:hover, &:focus, &:active, &:visited, &:active:not(:disabled), &:focus:not(:disabled){
+  &:hover, &:focus, &:active, &:visited, &:hover:not(:disabled), &:active:not(:disabled), &:focus:not(:disabled){
     background: #f7fbfe;
+    background-image: none;
     color: $primary;
     text-decoration: none;
     border: 1px solid $primary;
@@ -271,15 +276,15 @@ button:focus:not(:disabled), button:hover:not(:disabled), .btn-default{
 
 // 底色灰，字体深灰，不可点击按钮
 %btn-my-disable{
+  box-sizing: border-box;
   display: inline-block;
   width: auto;
   padding: 0 20px;
   font-size: 14px;
   letter-spacing: 0.3px;
   height: 36px;
-  line-height: 36px;
+  line-height: 34px !important;
   border-radius: 3px;
-
   border: none;
   background: #f5f7fa;
   color: #aab2bd;
@@ -289,70 +294,10 @@ button:focus:not(:disabled), button:hover:not(:disabled), .btn-default{
   text-shadow: none;
   font-family: $font-family;
 
-  &:hover,&:focus, &:active, &:visited{
+  &:hover,&:focus, &:active, &:visited, &:hover:not(:disabled),&:active:not(:disabled), &:focus:not(:disabled){
     background: #f5f7fa !important;
+    background-image: none;
     color: #aab2bd !important;
     border: 1px solid #e6e9ed !important;
-  }
-}
-
-// alert-warning
-.page-banner{
-  padding: 0 10px;
-}
-.alert:not(.pattern-library-shim){
-  min-width: 0;
-}
-.alert-warning, .page-banner .alert.alert-warning{
-  background: #fffaf6;
-  border: 1px solid #ffe4d1;
-  box-shadow: 0px 1px 4px 0px	#ffe4d1;
-  font-size: 14px;
-  color: $font;
-  
-  .icon-alert{
-    margin-top: 1px;
-    margin-right: 10px;
-    color: #ffe4d1;
-  }
-  .btn-link{
-    border: 0;
-    cursor: pointer;
-  }
-}
-
-
-.eliteu-message-tips{
-  background-color: #ffffff;
-  box-shadow: 0px 4px 12px 0px 
-    rgba(0, 0, 0, 0.15);
-  border-radius: 4px;
-  border: solid 1px #e6e9ed;
-  padding: 9px 16px;
-  position: absolute;
-  left: 50%;
-  top: 20%;
-  display: block;
-  font-size: 14px;
-  color: #2e313c;
-  transform: translate(-50%,0);
-  .fa{
-      &:before{
-          vertical-align: middle;
-      }
-  }
-  span{
-      vertical-align: middle;
-  }
-}
-
-
-// after update email
-.container.activation .message{
-  margin-top: 40px;
-
-  h1.invalid{
-      background: none;
-      border: none;
   }
 }

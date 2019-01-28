@@ -50,8 +50,9 @@
 .content-wrapper .page-header .page-header-search{
   margin-right: 0;
   .field-input{
-    padding: 0 10px;
-    height: 34px;
+    box-sizing: border-box;
+    padding: 0 15px;
+    height: 36px;
     font-size: 14px;
     position: relative;
     top: -1px;

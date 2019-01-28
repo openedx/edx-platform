@@ -80,13 +80,8 @@
             }
         }
         .account-deletion-details .btn-outline-primary{
-            height: 34px;
-            line-height: 34px;
-            font-size: 14px;
-            padding: 0 63px;
-            background-color: #4788c7;
-            border-radius: 2px;
-            color: #fff;
+            @extend %btn-my-primary;
+            padding: 0 63px !important;
         }
         .paragon__alert-danger{
             background-color: rgba(255, 228, 209, 0.64);
@@ -251,9 +246,6 @@
     cursor: pointer;
     a.u-field-link {
         @extend %btn-my-primary;
-        height: 34px;
-        line-height: 34px;
-        box-sizing: content-box;
         padding: 8px 15px;
         width: 100%;
     }
