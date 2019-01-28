@@ -881,6 +881,8 @@ class ProblemMetaGradedTest(ProblemsTest):
     """
     TestCase Class to verify that the graded variable is passed
     """
+    shard = 23
+
     def get_problem(self):
         """
         Problem structure
@@ -911,6 +913,8 @@ class ProblemMetaUngradedTest(ProblemsTest):
     """
     TestCase Class to verify that the ungraded variable is passed
     """
+    shard = 23
+
     def get_problem(self):
         """
         Problem structure
@@ -941,6 +945,8 @@ class FormulaProblemTest(ProblemsTest):
     """
     Test Class to verify the formula problem on LMS.
     """
+    shard = 23
+
     def setUp(self):
         """
         Setup the test suite to verify various behaviors involving formula problem type.
@@ -1037,6 +1043,7 @@ class FormulaProblemRandomizeTest(ProblemsTest):
     """
     Test Class to verify the formula problem on LMS with Randomization enabled.
     """
+    shard = 23
 
     def setUp(self):
         """

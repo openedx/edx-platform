@@ -18,6 +18,8 @@ class TestCohortHelp(ContainerBase, CohortTestMixin):
     """
     Tests help links in Cohort page
     """
+    shard = 2
+
     def setUp(self, is_staff=True):
         super(TestCohortHelp, self).setUp(is_staff=is_staff)
         self.enable_cohorting(self.course_fixture)
@@ -82,6 +84,7 @@ class InstructorDashboardHelp(BaseInstructorDashboardTest):
     """
     Tests opening help from the general Help button in the instructor dashboard.
     """
+    shard = 2
 
     def setUp(self):
         super(InstructorDashboardHelp, self).setUp()

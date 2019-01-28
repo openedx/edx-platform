@@ -15,6 +15,8 @@ class MatlabProblemTest(ProblemsTest):
     """
     Tests that verify matlab problem "Run Code".
     """
+    shard = 11
+
     def get_problem(self):
         """
         Create a matlab problem for the test.

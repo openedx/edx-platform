@@ -4,8 +4,6 @@ End-to-end tests for the main LMS Dashboard (aka, Student Dashboard).
 """
 import datetime
 
-import pytest
-
 from common.test.acceptance.fixtures.course import CourseFixture
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.dashboard import DashboardPage
@@ -359,6 +357,7 @@ class LmsDashboardCourseUnEnrollDialogMessageTest(BaseLmsDashboardTestMultiple):
     """
         Class to test lms student dashboard unenroll dialog messages.
     """
+    shard = 23
 
     def test_audit_course_run_unenroll_dialog_msg(self):
         """
@@ -399,11 +398,11 @@ class LmsDashboardCourseUnEnrollDialogMessageTest(BaseLmsDashboardTestMultiple):
         self.assertEqual(dialog_message['refund-info'][0], expected_refund_message)
 
 
-@pytest.mark.a11y
 class LmsDashboardA11yTest(BaseLmsDashboardTestMultiple):
     """
     Class to test lms student dashboard accessibility.
     """
+    a11y = True
 
     def test_dashboard_course_listings_a11y(self):
         """

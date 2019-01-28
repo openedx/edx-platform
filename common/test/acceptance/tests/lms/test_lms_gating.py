@@ -24,6 +24,8 @@ class GatingTest(UniqueCourseTest):
     STUDENT_USERNAME = "STUDENT_TESTER"
     STUDENT_EMAIL = "student101@example.com"
 
+    shard = 23
+
     def setUp(self):
         super(GatingTest, self).setUp()
 
