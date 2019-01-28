@@ -85,9 +85,6 @@ from openedx.features.portfolio_project import INCLUDE_PORTFOLIO_UPSELL_MODAL
     %endif
 
     <div id="currency_data" value="${currency_data}"></div>
-    <script type="application/json" id="bundle-data">
-        ${bundle_data | n, dump_js_escaped_json}
-    </script>
     <div class="container">
        % if INCLUDE_UPSELL_MODAL.is_enabled():
             ${static.renderReact(
