@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-01-02 15:30+0000\n"
-"PO-Revision-Date: 2019-01-02 15:30:42.102744\n"
+"POT-Creation-Date: 2019-01-28 06:42+0000\n"
+"PO-Revision-Date: 2019-01-28 06:42:59.019914\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -4499,7 +4499,7 @@ msgstr ""
 msgid ""
 "{paragraphStart}You entered {boldStart}{email}{boldEnd}. If this email "
 "address is associated with your {platform_name} account, we will send a "
-"message with password reset instructions to this email "
+"message with password recovery instructions to this email "
 "address.{paragraphEnd}{paragraphStart}If you do not receive a password reset"
 " message, verify that you entered the correct email address, or check your "
 "spam folder.{paragraphEnd}{paragraphStart}If you need further assistance, "
@@ -4558,7 +4558,7 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Secondary Email Address"
+msgid "Recovery Address"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -7985,20 +7985,6 @@ msgstr ""
 msgid "Reset Password"
 msgstr ""
 
-#: lms/templates/student_account/account_recovery.underscore
-msgid "Account Recovery"
-msgstr ""
-
-#: lms/templates/student_account/account_recovery.underscore
-msgid ""
-"Please enter your secondary email address below and we will send you "
-"instructions for recovering your account and setting a new password."
-msgstr ""
-
-#: lms/templates/student_account/account_recovery.underscore
-msgid "Recover my account"
-msgstr ""
-
 #: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
 msgstr ""
@@ -8008,7 +7994,7 @@ msgid "An error occurred. Please reload the page."
 msgstr ""
 
 #: lms/templates/student_account/form_field.underscore
-msgid "Forgot password?"
+msgid "Need help logging in?"
 msgstr ""
 
 #: lms/templates/student_account/hinted_login.underscore
@@ -8121,12 +8107,12 @@ msgstr ""
 
 #: lms/templates/student_account/password_reset.underscore
 msgid ""
-"Please enter your email address below and we will send you instructions for "
-"setting a new password."
+"Please enter your registration or recovery email address below and we will "
+"send you an email with instructions."
 msgstr ""
 
 #: lms/templates/student_account/password_reset.underscore
-msgid "Reset my password"
+msgid "Recover my password"
 msgstr ""
 
 #: lms/templates/student_account/register.underscore
@@ -9203,6 +9189,10 @@ msgstr ""
 
 #: cms/templates/js/course-outline.underscore
 msgid "Display Name"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
+msgid "Proctoring Settings"
 msgstr ""
 
 #: cms/templates/js/course-outline.underscore
