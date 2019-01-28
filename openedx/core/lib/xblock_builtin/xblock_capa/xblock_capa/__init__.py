@@ -118,12 +118,6 @@ class CapaXBlock(XBlock, CapaFields, CapaMixin, StudioEditableXBlockMixin, XmlPa
     # edited in the cms
     @classmethod
     def backcompat_paths(cls, path):
-        import dogstats_wrapper as dog_stats_api
-        from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT
-        dog_stats_api.increment(
-            DEPRECATION_VSCOMPAT_EVENT,
-            tags=["location:capa_descriptor_backcompat_paths"]
-        )
         return [
             'problems/' + path[8:],
             path[8:],
