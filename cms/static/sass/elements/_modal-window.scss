@@ -303,7 +303,18 @@
     }
   }
 
-
+  /* XBlock editor has its own tabs, so:
+     * hide the default header
+     * let the XBlock determine its own editor content height.
+   */
+  .modal-editor.xblock-editor-has-tabs {
+    .modal-header {
+      display: none;
+    }
+    .modal-content {
+      height: auto;
+    }
+  }
 
   // specific modal overrides
   // ------------------------

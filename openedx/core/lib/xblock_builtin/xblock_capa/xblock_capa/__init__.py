@@ -4,7 +4,8 @@ CAPA Problems XBlock
 """
 import json
 import logging
-import re
+import os
+
 import sys
 
 from lxml import etree
@@ -13,13 +14,13 @@ from django.conf import settings
 from django.core.cache import cache as django_cache
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.urls import reverse
-from django.utils.translation import gettext_noop as _
 from requests.auth import HTTPBasicAuth
 from six import text_type
 from webob import Response
 from webob.multidict import MultiDict
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
+from xblock.fields import Boolean, Dict, Float, Integer, Scope, String, XMLString
 from xblockutils.resources import ResourceLoader
 from xblockutils.studio_editable import StudioEditableXBlockMixin
 
@@ -29,11 +30,14 @@ from capa.xqueue_interface import XQueueInterface
 from openedx.core.lib.xblock_builtin import get_css_dependencies, get_js_dependencies
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError, ProcessingError
+from xmodule.fields import Date, Timedelta, ScoreField
+from xmodule.graders import ShowCorrectness
 from xmodule.raw_module import RawDescriptor
 from xmodule.xml_module import XmlParserMixin
-from xmodule.util.misc import escape_html_characters
+from xmodule.x_module import ResourceTemplates
 from xmodule.util.sandboxing import get_python_lib_zip, can_execute_unsafe_code
-from .capa_base import CapaFields, CapaMixin, ComplexEncoder
+from .capa_base import _, Randomization, CapaMixin, ComplexEncoder
+from .capa_base_constants import RANDOMIZATION, SHOWANSWER
 
 
 log = logging.getLogger(__name__)
@@ -43,75 +47,178 @@ loader = ResourceLoader(__name__)  # pylint: disable=invalid-name
 @XBlock.wants('user')
 @XBlock.needs('i18n')
 @XBlock.needs('request')
-class CapaXBlock(XBlock, CapaFields, CapaMixin, StudioEditableXBlockMixin, XmlParserMixin):
+class CapaXBlock(XBlock, CapaMixin, ResourceTemplates, XmlParserMixin, StudioEditableXBlockMixin):
     """
     An XBlock implementing LonCapa format problems, by way of
     capa.capa_problem.LoncapaProblem
     """
+    display_name = String(
+        display_name=_("Display Name"),
+        help=_("The display name for this component."),
+        scope=Scope.settings,
+        # it'd be nice to have a useful default but it screws up other things; so,
+        # use display_name_with_default for those
+        default=_("Blank Advanced Problem")
+    )
+    attempts = Integer(
+        help=_("Number of attempts taken by the student on this problem"),
+        default=0,
+        scope=Scope.user_state
+    )
+    max_attempts = Integer(
+        display_name=_("Maximum Attempts"),
+        help=_("Defines the number of times a student can try to answer this problem. "
+               "If the value is not set, infinite attempts are allowed."),
+        values={"min": 0}, scope=Scope.settings
+    )
+    due = Date(help=_("Date that this problem is due by"), scope=Scope.settings)
+    graceperiod = Timedelta(
+        help=_("Amount of time after the due date that submissions will be accepted"),
+        scope=Scope.settings
+    )
+    show_correctness = String(
+        display_name=_("Show Results"),
+        help=_("Defines when to show whether a learner's answer to the problem is correct. "
+               "Configured on the subsection."),
+        scope=Scope.settings,
+        default=ShowCorrectness.ALWAYS,
+        values=[
+            {"display_name": _("Always"), "value": ShowCorrectness.ALWAYS},
+            {"display_name": _("Never"), "value": ShowCorrectness.NEVER},
+            {"display_name": _("Past Due"), "value": ShowCorrectness.PAST_DUE},
+        ],
+    )
+    showanswer = String(
+        display_name=_("Show Answer"),
+        help=_("Defines when to show the answer to the problem. "
+               "A default value can be set in Advanced Settings."),
+        scope=Scope.settings,
+        default=SHOWANSWER.FINISHED,
+        values=[
+            {"display_name": _("Always"), "value": SHOWANSWER.ALWAYS},
+            {"display_name": _("Answered"), "value": SHOWANSWER.ANSWERED},
+            {"display_name": _("Attempted"), "value": SHOWANSWER.ATTEMPTED},
+            {"display_name": _("Closed"), "value": SHOWANSWER.CLOSED},
+            {"display_name": _("Finished"), "value": SHOWANSWER.FINISHED},
+            {"display_name": _("Correct or Past Due"), "value": SHOWANSWER.CORRECT_OR_PAST_DUE},
+            {"display_name": _("Past Due"), "value": SHOWANSWER.PAST_DUE},
+            {"display_name": _("Never"), "value": SHOWANSWER.NEVER}]
+    )
+    force_save_button = Boolean(
+        help=_("Whether to force the save button to appear on the page"),
+        scope=Scope.settings,
+        default=False
+    )
+    reset_key = "DEFAULT_SHOW_RESET_BUTTON"
+    default_reset_button = getattr(settings, reset_key) if hasattr(settings, reset_key) else False
+    show_reset_button = Boolean(
+        display_name=_("Show Reset Button"),
+        help=_("Determines whether a 'Reset' button is shown so the user may reset their answer. "
+               "A default value can be set in Advanced Settings."),
+        scope=Scope.settings,
+        default=default_reset_button
+    )
+    rerandomize = Randomization(
+        display_name=_("Randomization"),
+        help=_(
+            'Defines when to randomize the variables specified in the associated Python script. '
+            'For problems that do not randomize values, specify \"Never\". '
+        ),
+        default=RANDOMIZATION.NEVER,
+        scope=Scope.settings,
+        values=[
+            {"display_name": _("Always"), "value": RANDOMIZATION.ALWAYS},
+            {"display_name": _("On Reset"), "value": RANDOMIZATION.ONRESET},
+            {"display_name": _("Never"), "value": RANDOMIZATION.NEVER},
+            {"display_name": _("Per Student"), "value": RANDOMIZATION.PER_STUDENT}
+        ]
+    )
+    data = XMLString(
+        help=_("XML data for the problem"),
+        scope=Scope.content,
+        enforce_type=settings.FEATURES.get('ENABLE_XBLOCK_XML_VALIDATION', True),
+        default="<problem></problem>"
+    )
+    correct_map = Dict(help=_("Dictionary with the correctness of current student answers"),
+                       scope=Scope.user_state, default={})
+    input_state = Dict(help=_("Dictionary for maintaining the state of inputtypes"), scope=Scope.user_state)
+    student_answers = Dict(help=_("Dictionary with the current student responses"), scope=Scope.user_state)
+
+    # enforce_type is set to False here because this field is saved as a dict in the database.
+    score = ScoreField(help=_("Dictionary with the current student score"), scope=Scope.user_state, enforce_type=False)
+    has_saved_answers = Boolean(help=_("Whether or not the answers have been saved since last submit"),
+                                scope=Scope.user_state, default=False)
+    done = Boolean(help=_("Whether the student has answered the problem"), scope=Scope.user_state, default=False)
+    seed = Integer(help=_("Random seed for this student"), scope=Scope.user_state)
+    last_submission_time = Date(help=_("Last submission time"), scope=Scope.user_state)
+    submission_wait_seconds = Integer(
+        display_name=_("Timer Between Attempts"),
+        help=_("Seconds a student must wait between submissions for a problem with multiple attempts."),
+        scope=Scope.settings,
+        default=0)
+    weight = Float(
+        display_name=_("Problem Weight"),
+        help=_("Defines the number of points each problem is worth. "
+               "If the value is not set, each response field in the problem is worth one point."),
+        values={"min": 0, "step": .1},
+        scope=Scope.settings
+    )
+    markdown = String(help=_("Markdown source of this module"), default=None, scope=Scope.settings)
+    source_code = String(
+        help=_("Source code for LaTeX and Word problems. This feature is not well-supported."),
+        scope=Scope.settings
+    )
+    use_latex_compiler = Boolean(
+        help=_("Enable LaTeX templates?"),
+        default=False,
+        scope=Scope.settings
+    )
+    matlab_api_key = String(
+        display_name=_("Matlab API key"),
+        help=_("Enter the API key provided by MathWorks for accessing the MATLAB Hosted Service. "
+               "This key is granted for exclusive use by this course for the specified duration. "
+               "Please do not share the API key with other courses and notify MathWorks immediately "
+               "if you believe the key is exposed or compromised. To obtain a key for your course, "
+               "or to report an issue, please contact moocsupport@mathworks.com"),
+        scope=Scope.settings
+    )
+
     INDEX_CONTENT_TYPE = 'CAPA'
     icon_class = 'problem'
 
+    template_dir_name = 'problem'
+    template_packages = [__name__]
+
     editable_fields = [
         "display_name",
+        "matlab_api_key",
         "max_attempts",
+        "weight",
+        "rerandomize",
         "showanswer",
         "show_reset_button",
-        "rerandomize",
-        "data",
         "submission_wait_seconds",
-        "weight",
-        "source_code",
-        "use_latex_compiler",
-        "matlab_api_key",
     ]
 
-    has_author_view = True
+    studio_tabs_fields = [
+        'data',
+        'markdown',
+        "source_code",
+        "use_latex_compiler",
+    ]
+
+    tabs_templates_dir = os.path.join('templates', 'studio')
+    studio_tabs = [
+        'editor',
+    ]
 
     # The capa format specifies that what we call max_attempts in the code
     # is the attribute `attempts`. This will do that conversion
     metadata_translations = dict(RawDescriptor.metadata_translations)
     metadata_translations['attempts'] = 'max_attempts'
 
-    # TODO from CapaModule
-    '''
-    # Have copied these files into ./common/static/common/js
-    # Need to find a place that can be shared by xmodules and this XBlock.
-    js = {
-        'js': [
-            resource_string(__name__, 'js/src/javascript_loader.js'),
-            resource_string(__name__, 'js/src/collapsible.js'),
-        ]
-    }
-    css = {'scss': [resource_string(__name__, 'css/capa/display.scss')]}
-    '''
-
     # TODO from CapaDescriptor
     '''
-    resources_dir = None
-
-    show_in_read_only_mode = True
-    template_dir_name = 'problem'
-    mako_template = "widgets/problem-edit.html"
-
-    from pkg_resources import resource_string
-    js = {'js': [resource_string(__name__, 'js/src/problem/edit.js')]}
-    js_module_name = "MarkdownEditingDescriptor"
-    css = {
-        'scss': [
-            resource_string(__name__, 'css/editor/edit.scss'),
-        ]
-    }
-
-    @classmethod
-    def filter_templates(cls, template, course):
-        """
-        Filter template that contains 'latex' from templates.
-
-        Show them only if use_latex_compiler is set to True in
-        course settings.
-        """
-        return 'latex' not in template['template_id'] or course.use_latex_compiler
-
     # VS[compat]
     # TODO (cpennington): Delete this method once all fall 2012 course are being
     # edited in the cms
@@ -156,14 +263,27 @@ class CapaXBlock(XBlock, CapaFields, CapaMixin, StudioEditableXBlockMixin, XmlPa
 
     '''
 
+    @classmethod
+    def get_template_dir(cls):
+        return os.path.join('templates', cls.template_dir_name)
+
+    @classmethod
+    def filter_templates(cls, template, course):
+        """
+        Filter template that contains 'latex' from templates.
+
+        Show them only if use_latex_compiler is set to True in
+        course settings.
+        """
+        return 'latex' not in template['template_id'] or course.use_latex_compiler
+
     def student_view(self, context=None):  # pylint: disable=unused-argument
         """
-        Return a fragment with the html from this XBlock
+        Return a fragment with the HTML/JS/CSS from this XBlock
 
-        Doesn't yet add any of the javascript to the fragment, nor the css.
-        Also doesn't expect any javascript binding, yet.
+        When run within the Studio environment, Studio-related JS/CSS assets are loaded.
 
-        Makes no use of the context parameter
+        Makes no use of the context parameter.
         """
         fragment = Fragment()
         for css_file in get_css_dependencies('style-capa'):
@@ -174,26 +294,30 @@ class CapaXBlock(XBlock, CapaFields, CapaMixin, StudioEditableXBlockMixin, XmlPa
         fragment.initialize_js('CapaXBlock')
         return fragment
 
-    def author_view(self, context=None):
+    def studio_editor_tab_view(self, context=None):
         """
-        Renders the Studio preview view.
+        :param context: The context template is using.
+        :return: A rendered HTML for editor template.
         """
-        log.debug("CapaXBlock.author_view")
+        template_name = 'editor.html'
+        template_path = os.path.join(self.tabs_templates_dir, template_name)
+
         if context is None:
             context = {}
         context.update({
+            'data': self.data,
             'markdown': self.markdown,
-            'enable_markdown': self.markdown is not None,
             'enable_latex_compiler': self.use_latex_compiler,
+            'is_latex_problem': (self.use_latex_compiler and self.source_code),
         })
-        return self.student_view(context)
+        return loader.render_django_template(template_path, context=context)
 
     @property
     def ajax_url(self):
         """
         Returns the URL for the ajax handler.
         """
-        return self.runtime.handler_url(self, 'ajax_handler')
+        return self.runtime.handler_url(self, 'ajax_handler', '', '').rstrip('/?')
 
     @XBlock.handler
     def ajax_handler(self, request, suffix=None):
@@ -456,7 +580,7 @@ class CapaXBlock(XBlock, CapaFields, CapaMixin, StudioEditableXBlockMixin, XmlPa
         """
         Replace the static URLs in the given html content.
         """
-        # TODO: Refactor CAPA rendering so we don't need this?
+        # TODO: Move these into runtime?
         return static_replace.replace_static_urls(
             text=html,
             data_directory=getattr(self, 'data_dir', None),
@@ -468,7 +592,7 @@ class CapaXBlock(XBlock, CapaFields, CapaMixin, StudioEditableXBlockMixin, XmlPa
         """
         Replace the course URLs in the given html content.
         """
-        # TODO: Refactor CAPA rendering so we don't need this?
+        # TODO: Move these into runtime?
         return static_replace.replace_course_urls(
             text=html,
             course_key=self.runtime.course_id
@@ -478,12 +602,13 @@ class CapaXBlock(XBlock, CapaFields, CapaMixin, StudioEditableXBlockMixin, XmlPa
         """
         Replace the course URLs in the given html content.
         """
-        # TODO: Refactor CAPA rendering so we don't need this?
+        # TODO: Move these into runtime?
         course_id = self.runtime.course_id
+        jump_to_id_base_url = reverse('jump_to_id', kwargs={'course_id': text_type(course_id), 'module_id': ''})
         return static_replace.replace_jump_to_id_urls(
             text=html,
             course_id=course_id,
-            jump_to_id_base_url=reverse('jump_to_id', kwargs={'course_id': text_type(course_id), 'module_id': ''})
+            jump_to_id_base_url=jump_to_id_base_url,
         )
 
     @property

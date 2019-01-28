@@ -323,6 +323,9 @@ FEATURES = {
 
 ENABLE_JASMINE = False
 
+# Used with XQueue
+XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5  # seconds
+
 ############################# SOCIAL MEDIA SHARING #############################
 SOCIAL_SHARING_SETTINGS = {
     # Note: Ensure 'CUSTOM_COURSE_URLS' has a matching value in lms/envs/common.py
@@ -723,6 +726,12 @@ PIPELINE_UGLIFYJS_BINARY = 'node_modules/.bin/uglifyjs'
 from openedx.core.lib.rooted_paths import rooted_glob
 
 PIPELINE_CSS = {
+    'style-capa': {
+        'source_filenames': [
+            'common/css/capa-studio.css',
+        ],
+        'output_filename': 'common/css/capa.css',
+    },
     'style-vendor': {
         'source_filenames': [
             'css/vendor/normalize.css',
@@ -818,12 +827,23 @@ base_vendor_js = [
     'common/js/vendor/require.js'
 ]
 
+capa_js = (
+    rooted_glob(COMMON_ROOT / 'static', 'common/js/javascript_loader.js') +
+    rooted_glob(COMMON_ROOT / 'static', 'common/js/collapsible.js') +
+    rooted_glob(COMMON_ROOT / 'static', 'common/js/capa/*.js') +
+    rooted_glob(COMMON_ROOT / 'static', 'common/js/capa/studio/*.js')
+)
+
 # test_order: Determines the position of this chunk of javascript on
 # the jasmine test page
 PIPELINE_JS = {
     'base_vendor': {
         'source_filenames': base_vendor_js,
         'output_filename': 'js/cms-base-vendor.js',
+    },
+    'capa': {
+        'source_filenames': capa_js,
+        'output_filename': 'js/capa.js',
     },
     'module-js': {
         'source_filenames': (

@@ -1,0 +1,160 @@
+{% load static %}
+{% load i18n %}
+<div class="wrapper-comp-editor{% if is_latex_problem %} latex-problem{% endif %}" id="problem-editor-tab">
+<section class="problem-editor editor">
+    <div class="row">
+        {% if markdown %}
+        <div class="editor-bar">
+            <ul class="format-buttons">
+                <li>
+                    <button type="button" class="header-button" data-tooltip="{% trans 'Heading' %}">
+                        <span class="problem-editor-icon heading3">
+                            <img class="icon" src="{% static 'images/cms-editor_heading.png' %}" alt="{% trans 'Insert a heading' %}">
+                        </span>
+                    </button>
+                </li>
+                <li>
+                    <button type="button" class="multiple-choice-button" data-tooltip="{% trans 'Multiple Choice' %}">
+                        <span class="problem-editor-icon multiple-choice">
+                            <img class="icon" src="{% static 'images/cms-editor_radio.png' %}" alt="{% trans 'Add a multiple choice question' %}">
+                        </span>
+                    </button>
+                </li>
+                <li>
+                    <button type="button" class="checks-button" data-tooltip="{% trans 'Checkboxes' %}">
+                        <span class="problem-editor-icon checks">
+                            <img class="icon" src="{% static 'images/cms-editor_checkbox.png' %}" alt="{% trans 'Add a question with checkboxes' %}">
+                        </span>
+                    </button>
+                </li>
+                <li>
+                    <button type="button" class="string-button" data-tooltip="{% trans 'Text Input' %}">
+                        <span class="problem-editor-icon string">
+                            <img class="icon" src="{% static 'images/cms-editor_text.png' %}" alt="{% trans 'Insert a text response' %}">
+                        </span>
+                    </button>
+                </li>
+                <li>
+                    <button type="button" class="number-button" data-tooltip="{% trans 'Numerical Input' %}">
+                        <span class="problem-editor-icon number">
+                            <img class="icon" src="{% static 'images/cms-editor_number.png' %}" alt="{% trans 'Insert a numerical response' %}">
+                        </span>
+                    </button>
+                </li>
+                <li>
+                    <button type="button" class="dropdown-button" data-tooltip="{% trans 'Dropdown' %}">
+                        <span class="problem-editor-icon dropdown">
+                            <img class="icon" src="{% static 'images/cms-editor_dropdown.png' %}" alt="{% trans 'Insert a dropdown response' %}">
+                        </span>
+                    </button>
+                </li>
+                <li>
+                    <button type="button" class="explanation-button" data-tooltip="{% trans 'Explanation' %}">
+                        <span class="problem-editor-icon explanation">
+                            <img class="icon" src="{% static 'images/cms-editor_explanation.png' %}" alt="{% trans 'Add an explanation for this question' %}">
+                        </span>
+                    </button>
+                </li>
+            </ul>
+            <ul class="editor-tabs">
+                <li><button type="button" class="xml-tab advanced-toggle" data-tab="xml">{% trans 'Advanced Editor' %}</button></li>
+                <li><button type="button" class="cheatsheet-toggle" data-tooltip="{% trans 'Toggle Cheatsheet' %}">?</button></li>
+            </ul>
+        </div>
+        <ul><li data-field-name="markdown" data-cast="string">
+            <textarea id="xb-field-edit-markdown" class="markdown-box field-data-control">{{ markdown }}</textarea>
+        </li></ul>
+        {% endif %}
+        <ul><li data-field-name="data" data-cast="string">
+            <textarea id="xb-field-edit-data" class="xml-box field-data-control" rows="8" cols="40">{{ data }}</textarea>
+        </li></ul>
+    </div>
+</section>
+<script type="application/javascript">
+    CapaXBlockMarkdownEditor($('#problem-editor-tab'));
+</script>
+<script type="text/template" id="simple-editor-cheatsheet">
+    <article class="simple-editor-cheatsheet">
+        <div class="cheatsheet-wrapper">
+            <div class="row">
+                <h6>{% trans 'Heading' %}</h6>
+                <div class="col sample heading-1">
+                    <img class="icon" src="{% static 'images/cms-editor_heading.png' %}" alt="{% trans 'Insert a heading' %}">
+                </div>
+                <div class="col">
+<pre><code>H3
+=====
+</pre>
+                </div>
+            </div>
+            <div class="row">
+                <h6>{% trans 'Multiple Choice' %}</h6>
+                <div class="col sample multiple-choice">
+                    <img class="icon" src="{% static 'images/cms-editor_radio.png' %}" alt="{% trans 'Add a multiple choice question' %}">
+                </div>
+                <div class="col">
+<pre><code>( ) red
+( ) green
+(x) blue</code></pre>
+                </div>
+            </div>
+            <div class="row">
+                <h6>{% trans 'Checkboxes' %}</h6>
+                <div class="col sample check-multiple">
+                    <img class="icon" src="{% static 'images/cms-editor_checkbox.png' %}" alt="{% trans 'Add a question with checkboxes' %}">
+                </div>
+                <div class="col">
+<pre><code>[x] earth
+[ ] wind
+[x] water</code></pre>
+                </div>
+            </div>
+            <div class="row">
+                <h6>{% trans 'Text Input' %}</h6>
+                <div class="col sample string-response">
+                    <img class="icon" src="{% static 'images/cms-editor_text.png' %}" alt="{% trans 'Insert a text response' %}">
+                </div>
+                <div class="col">
+                    <pre><code>= dog
+or= cat
+or= mouse</code></pre>
+                </div>
+            </div>
+            <div class="row">
+                <h6>{% trans 'Numerical Input' %}</h6>
+                <div class="col sample numerical-response">
+                    <img class="icon" src="{% static 'images/cms-editor_number.png' %}" alt="{% trans 'Insert a numerical response' %}">
+                </div>
+                <div class="col">
+                    <pre><code>= 3.14 +- 2%</code></pre>
+                    <pre><code>= [3.14, 3.15)</code></pre>
+                </div>
+            </div>
+            <div class="row">
+                <h6>{% trans 'Dropdown' %}</h6>
+                <div class="col sample option-reponse">
+                    <img class="icon" src="{% static 'images/cms-editor_dropdown.png' %}" alt="{% trans 'Insert a dropdown response' %}">
+                </div>
+                <div class="col">
+                    <pre><code>[[wrong, (right)]]</code></pre>
+                </div>
+            </div>
+            <div class="row">
+                <h6>{% trans 'Label' %}</h6>
+                <div class="col">
+                    <pre><code>&gt;&gt;What is the capital of Argentina?&lt;&lt;</code></pre>
+                </div>
+            </div>
+            <div class="row">
+                <h6>{% trans 'Explanation' %}</h6>
+                <div class="col sample explanation">
+                    <img class="icon" src="{% static 'images/cms-editor_explanation.png' %}" alt="{% trans 'Add an explanation for this question' %}">
+                </div>
+                <div class="col">
+                    <pre><code>[explanation] A short explanation of the answer. [explanation]</code></pre>
+                </div>
+            </div>
+        </div>
+    </article>
+</script>
+</div>

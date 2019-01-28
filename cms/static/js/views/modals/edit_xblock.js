@@ -79,7 +79,7 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/modals/base_mod
                 // Update the modal's header
                 if (editorView.hasCustomTabs()) {
                     // Hide the modal's header as the custom editor provides its own
-                    this.$('.modal-header').hide();
+                    this.$('.modal-editor').addClass('xblock-editor-has-tabs');
 
                     // Update the custom editor's title
                     editorView.$('.component-name').text(title);

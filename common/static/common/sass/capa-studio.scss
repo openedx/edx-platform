@@ -1,8 +1,93 @@
+@import 'capa';
+
+// This is copied from common/lib/xmodule/xmodule/css/editor/edit.scss
+.editor {
+  position: relative;
+
+  .row {
+    position: relative;
+  }
+
+  .editor-bar {
+    @include clearfix();
+    @include linear-gradient(top, #d4dee8, #c9d5e2);
+
+    position: relative;
+    padding: ($baseline/4);
+    border-bottom-color: #a5aaaf;
+
+    button {
+      display: inline-block;
+
+      @include float(left);
+
+      padding: 3px ($baseline/2) 5px;
+      margin-left: 7px;
+      border: 0;
+      border-radius: 2px;
+      background: transparent;
+
+      .icon {
+        height: 21px;
+      }
+
+      &:hover,
+      &:focus {
+        background: rgba(255, 255, 255, .5);
+      }
+    }
+  }
+
+  .editor-tabs {
+    position: absolute;
+    top: 10px;
+
+    @include right(10px);
+    @include text-align(left);
+    @include direction();
+
+    li {
+      @include float(left);
+      @include margin-right($baseline/4);
+
+      &:last-child {
+        @include margin-right(0);
+      }
+    }
+
+    .tab {
+      display: block;
+      height: 24px;
+      padding: 7px 20px 3px;
+      border: 1px solid #a5aaaf;
+      border-radius: 3px 3px 0 0;
+
+      @include linear-gradient(top, $transparent 87%, rgba(0, 0, 0, .06));
+
+      background-color: #e5ecf3;
+      font-size: 13px;
+      color: #3c3c3c;
+      box-shadow: 1px -1px 1px rgba(0, 0, 0, .05);
+
+      &.current {
+        background: $white;
+        border-bottom-color: $white;
+      }
+    }
+  }
+}
+
+// +Variables - Capa Problem editor
+// ================================
+$link-color: #565d64;
+$lightGrey: #e5ecf3;
+$darkGrey: #a5aaaf;
+$body-color: $white;
+
 .editor-bar {
   .editor-tabs {
     .advanced-toggle {
       height: auto;
-      margin-top: -4px;
       padding: 3px 9px;
       font-size: 12px;
       color: $link-color;
@@ -46,7 +131,7 @@
   width: 0;
   border-radius: 0 3px 3px 0;
 
-  @include linear-gradient(left, $shadow-l1, $transparent 4px);
+  @include linear-gradient(left, $lightGrey, $transparent 4px);
 
   background-color: $white;
   overflow: hidden;
@@ -106,10 +191,25 @@
   }
 }
 
-.problem-editor {
+// cheatsheet appears alongside the Capa XBlock simple editor
+.cheatsheet-is-shown {
+  #xblock-editor .editor_content_wrapper {
+    overflow: visible;
+  }
+  .simple-editor-cheatsheet {
+    height: 404px;
+  }
+}
+
+#problem-editor-tab .problem-editor {
   // adding padding to simple editor only - adjacent selector is needed since there are no toggles for CodeMirror
   .markdown-box + .CodeMirror {
     padding: 10px;
+  }
+
+  ul {
+    padding: 0;
+    margin: 0;
   }
 }
 
