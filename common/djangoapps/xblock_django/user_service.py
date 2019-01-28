@@ -26,13 +26,6 @@ class DjangoXBlockUserService(UserService):
         if self._django_user:
             self._django_user.user_is_staff = kwargs.get('user_is_staff', False)
 
-    @property
-    def django_user(self):
-        """
-        Return the django user object.
-        """
-        return self._django_user
-
     def get_current_user(self):
         """
         Returns the currently-logged in user, as an instance of XBlockUser
@@ -44,6 +37,18 @@ class DjangoXBlockUserService(UserService):
         Returns True if the currently-logged in user is a global staff user.
         """
         return self.get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF)
+
+    def get_user_id(self):
+        """
+        Returns the currently-logged-in user's numeric user ID.
+        """
+        return self.get_current_user().opt_attrs.get(ATTR_KEY_USER_ID)
+
+    def get_username(self):
+        """
+        Returns the currently-logged-in user's username.
+        """
+        return self.get_current_user().opt_attrs.get(ATTR_KEY_USERNAME)
 
     def get_anonymous_user_id(self, username, course_id):
         """
@@ -57,7 +62,7 @@ class DjangoXBlockUserService(UserService):
             A unique anonymous_user_id for (user, course) pair.
             None if a non-staff user requests someone else's data.
         """
-        if not (self.user_is_staff() or self.get_current_user().username == username):
+        if not (self.user_is_staff() or self.get_username() == username):
             return None
 
         try:

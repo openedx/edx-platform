@@ -319,24 +319,17 @@ class CapaXBlock(XBlock, CapaFields, CapaMixin, StudioEditableXBlockMixin, XmlPa
         return self.display_name
 
     @property
-    def _user(self):
-        """
-        Returns the current user object.
-        """
-        user_service = self.runtime.service(self, 'user')
-        return user_service.django_user if user_service else None
-
-    @property
     def anonymous_student_id(self):
         """
         Returns the anonymous user ID for the current user+course.
         """
         user_service = self.runtime.service(self, 'user')
-        user = self._user
-        return user_service.get_anonymous_user_id(
-                user.username,
-                str(self.runtime.course_id),
-        ) if (user_service and user) else None
+        if user_service:
+            return user_service.get_anonymous_user_id(
+                user_service.get_username(),
+                text_type(self.runtime.course_id),
+            )
+        return None
 
     @property
     def user_is_staff(self):
@@ -347,14 +340,21 @@ class CapaXBlock(XBlock, CapaFields, CapaMixin, StudioEditableXBlockMixin, XmlPa
         return user_service.user_is_staff() if user_service else None
 
     @property
+    def _user_id(self):
+        """
+        Returns the current numeric user ID
+        """
+        user_service = self.runtime.service(self, 'user')
+        return user_service.get_user_id() if user_service else None
+
+    @property
     def block_seed(self):
         """
         Returns the randomization seed.
 
         Uncertain why we need a block-level seed, when there is a user_state seed too?
         """
-        user = self._user
-        return user.id if user else 0
+        return self._user_id or 0
 
     @property
     def cache(self):
@@ -400,7 +400,7 @@ class CapaXBlock(XBlock, CapaFields, CapaMixin, StudioEditableXBlockMixin, XmlPa
                 'xqueue_callback',
                 kwargs=dict(
                     course_id=text_type(self.runtime.course_id),
-                    userid=str(self._user.id),
+                    userid=text_type(self._user_id),
                     mod_id=text_type(self.location),
                     dispatch=dispatch
                 ),
