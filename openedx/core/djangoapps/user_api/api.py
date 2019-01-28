@@ -829,13 +829,14 @@ class RegistrationFormFactory(object):
             user_agreement_url = marketing_link("USER_AGREEMENT")
             disclaimer_url = marketing_link("DISCLAIMER")
 
+            By creating an account, you agree to abide by EliteMBA's User Agreement, Disclaimer and Private Policy
+
             label = Text(_(
-                u"By creating an account with {platform_name}, you agree \
-                  to abide by our {platform_name} \
+                u"By creating an account, you agree \
+                  to abide by EliteMBA's \
                   {user_agreement_link_start}{user_agreement}{user_agreement_link_end}, {disclaimer_link_start}{disclaimer}{disclaimer_link_end} \
-                  and agree to our {privacy_policy_link_start}Privacy Policy{privacy_policy_link_end}."
+                  and {privacy_policy_link_start}Privacy Policy{privacy_policy_link_end}."
             )).format(
-                platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
                 terms_of_service=terms_label,
                 user_agreement=_(u"User Agreement"),
                 disclaimer=_(u"Disclaimer"),
@@ -848,6 +849,26 @@ class RegistrationFormFactory(object):
                 privacy_policy_link_start=HTML("<a href='{pp_url}' target='_blank'>").format(pp_url=pp_link),
                 privacy_policy_link_end=HTML("</a>"),
             )
+
+            # label = Text(_(
+            #     u"By creating an account with {platform_name}, you agree \
+            #       to abide by our {platform_name} \
+            #       {user_agreement_link_start}{user_agreement}{user_agreement_link_end}, {disclaimer_link_start}{disclaimer}{disclaimer_link_end} \
+            #       and agree to our {privacy_policy_link_start}Privacy Policy{privacy_policy_link_end}."
+            # )).format(
+            #     platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
+            #     terms_of_service=terms_label,
+            #     user_agreement=_(u"User Agreement"),
+            #     disclaimer=_(u"Disclaimer"),
+            #     user_agreement_link_start=HTML("<a href='{user_agreement_url}' target='_blank'>").format(
+            #         user_agreement_url=user_agreement_url),
+            #     user_agreement_link_end=HTML("</a>"),
+            #     disclaimer_link_start=HTML("<a href='{disclaimer_url}' target='_blank'>").format(
+            #         disclaimer_url=disclaimer_url),
+            #     disclaimer_link_end=HTML("</a>"),
+            #     privacy_policy_link_start=HTML("<a href='{pp_url}' target='_blank'>").format(pp_url=pp_link),
+            #     privacy_policy_link_end=HTML("</a>"),
+            # )
 
         form_desc.add_field(
             "honor_code",

@@ -4289,7 +4289,7 @@ msgstr "确认密码"
 
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
 msgid "Passwords do not match."
-msgstr "密码错误"
+msgstr "两次密码输入不一致"
 
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
 msgid "Reset My Password"

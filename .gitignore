@@ -50,6 +50,7 @@ codekit-config.json
 *.po
 *.prob
 *.dup
+!eliteu.po
 !django.po
 !django.mo
 !djangojs.po
