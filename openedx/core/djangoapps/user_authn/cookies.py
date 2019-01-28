@@ -259,6 +259,14 @@ def _create_and_set_jwt_cookies(response, request, cookie_settings, user=None, r
     if settings.FEATURES.get('DISABLE_SET_JWT_COOKIES_FOR_TESTS', False):
         return
 
+    # For Ironwood, we don't set JWK settings by default.  Make sure we don't fail trying
+    # to use empty settings.  This means by default, micro-frontends won't work, but Ironwood
+    # has none.  Also, OAuth scopes won't work, but that is still a new and specialized feature.
+    # Installations that need them can create JWKs and add them to the settings.
+    private_signing_jwk = settings.JWT_AUTH['JWT_PRIVATE_SIGNING_JWK']
+    if private_signing_jwk == "None" or not private_signing_jwk:
+        return
+
     # For security reasons, the JWT that is embedded inside the cookie expires
     # much sooner than the cookie itself, per the following setting.
     expires_in = settings.JWT_AUTH['JWT_IN_COOKIE_EXPIRATION']
