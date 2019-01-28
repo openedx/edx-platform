@@ -19,7 +19,7 @@
         };
 
     this.Problem = (function() {
-        function Problem(element) {
+        function Problem(element, runtime) {
             var that = this;
             this.hint_button = function() {
                 return Problem.prototype.hint_button.apply(that, arguments);
@@ -129,11 +129,13 @@
             this.bind = function() {
                 return Problem.prototype.bind.apply(that, arguments);
             };
-            this.el = $(element).find('.problems-wrapper');
+            this.element = $(element);
+            this.el = this.element.find('.problems-wrapper');
             this.id = this.el.data('problem-id');
             this.element_id = this.el.attr('id');
             this.url = this.el.data('url');
             this.content = this.el.data('content');
+            this.runtime = runtime;
 
             // has_timed_out and has_response are used to ensure that
             // we wait a minimum of ~ 1s before transitioning the submit
@@ -321,7 +323,7 @@
 
         Problem.prototype.poll = function(previousTimeout, focusCallback) {
             var that = this;
-            return $.postWithPrefix('' + this.url + '/problem_get', function(response) {
+            return $.postWithPrefix(this.runtime.handlerUrl(this.element, 'problem_get'), function(response) {
                 var newTimeout;
                 // If queueing status changed, then render
                 that.new_queued_items = $(response.html).find('.xqueue');
@@ -388,7 +390,7 @@
                     return typeof focusCallback === 'function' ? focusCallback() : void 0;
                 });
             } else {
-                return $.postWithPrefix('' + this.url + '/problem_get', function(response) {
+                return $.postWithPrefix(this.runtime.handlerUrl(this.element, 'problem_get'), function(response) {
                     that.el.html(response.html);
                     return JavascriptLoader.executeModuleScripts(that.el, function() {
                         that.setupInputTypes();
@@ -700,15 +702,12 @@
             });
         };
 
-        // TODO this needs modification to deal with javascript responses; perhaps we
-        // need something where responsetypes can define their own behavior when show
-        // is called.
         Problem.prototype.show = function() {
             var that = this;
             Logger.log('problem_show', {
                 problem: this.id
             });
-            return $.postWithPrefix('' + this.url + '/problem_show', function(response) {
+            return $.postWithPrefix(this.runtime.handlerUrl(this.element, 'problem_show'), '{}', function(response) {
                 var answers;
                 answers = response.answers;
                 $.each(answers, function(key, value) {
@@ -1299,10 +1298,11 @@
             } else {
                 nextIndex = parseInt(hintIndex, 10) + 1;
             }
-            return $.postWithPrefix('' + this.url + '/hint_button', {
+
+            return $.postWithPrefix(this.runtime.handlerUrl(this.element, 'hint_button'), JSON.stringify({
                 hint_index: nextIndex,
                 input_id: this.id
-            }, function(response) {
+            }), function(response) {
                 var hintMsgContainer;
                 if (response.success) {
                     hintMsgContainer = that.$('.problem-hint .notification-message');
@@ -1328,5 +1328,5 @@
 
 function CapaXBlock(runtime, element) {
     'use strict';
-    var xblock = new Problem(element);
+    var xblock = new Problem(element, runtime);
 }

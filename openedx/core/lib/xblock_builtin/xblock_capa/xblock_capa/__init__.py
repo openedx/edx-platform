@@ -200,8 +200,6 @@ class CapaXBlock(XBlock, CapaFields, CapaMixin, StudioEditableXBlockMixin, XmlPa
         """
         XBlock handler that wraps `handle_ajax`
         """
-        # TODO: copied from x_module.XModule: reimplement and simplify.
-        # Do we need all the webob stuff?
         class FileObjForWebobFiles(object):
             """
             Turn Webob cgi.FieldStorage uploaded files into pure file objects.
@@ -217,8 +215,8 @@ class CapaXBlock(XBlock, CapaFields, CapaMixin, StudioEditableXBlockMixin, XmlPa
             def __getattr__(self, name):
                 return getattr(self.file, name)
 
-        # WebOb requests have multiple entries for uploaded files.  handle_ajax
-        # expects a single entry as a list.
+        # WebOb requests have multiple entries for uploaded files.
+        # handle_ajax expects a single entry as a list.
         request_post = MultiDict(request.POST)
         for key in set(request.POST.iterkeys()):
             if hasattr(request.POST[key], "file"):
@@ -229,22 +227,17 @@ class CapaXBlock(XBlock, CapaFields, CapaMixin, StudioEditableXBlockMixin, XmlPa
 
     def handle_ajax(self, dispatch, request_post):
         """
-        This is called by courseware.module_render, to handle an AJAX call.
+        This is called by courseware.module_render, and to handle AJAX calls.
 
         Returns a json dictionary:
         { 'progress_changed' : True/False,
           'progress' : 'none'/'in_progress'/'done',
           <other request-specific values here > }
         """
-        # TODO: split these handlers into separate XBlock.handlers?
-        log.debug("CapaXBlock.handle_ajax")
         handlers = {
-            'hint_button': self.hint_button,
-            'problem_get': self.get_problem,
             'problem_check': self.submit_problem,
             'problem_reset': self.reset_problem,
             'problem_save': self.save_problem,
-            'problem_show': self.get_answer,
             'score_update': self.update_score,
             'input_ajax': self.handle_input_ajax,
             'ungraded_response': self.handle_ungraded_response
@@ -304,6 +297,39 @@ class CapaXBlock(XBlock, CapaFields, CapaMixin, StudioEditableXBlockMixin, XmlPa
         })
 
         return json.dumps(result, cls=ComplexEncoder)
+
+    @XBlock.json_handler
+    def hint_button(self, data, suffix=None):  # pylint: disable=unused-argument
+        """
+        Hint button handler, returns new html using hint_index from the client.
+        """
+        hint_index = int(data.get('hint_index', 0))
+        return self.get_demand_hint(hint_index)
+
+    @XBlock.json_handler
+    def problem_get(self, data, suffix=None):  # pylint: disable=unused-argument
+        """
+        Return results of get_problem_html, as a simple dict for json-ing.
+        { 'html': <the-html> }
+
+        Used if we want to reconfirm we have the right thing e.g. after
+        several AJAX calls.
+        """
+        return {'html': self.get_problem_html(encapsulate=False, submit_notification=True)}
+
+    @XBlock.json_handler
+    def problem_show(self, data, suffix=None):  # pylint: disable=unused-argument
+        """
+        For the "show answer" button.
+
+        Returns the answers and rendered "correct status span" HTML:
+            {'answers' : answers, 'correct_status_html': correct_status_span_html}.
+            The "correct status span" HTML is injected beside the correct answers
+            for radio button and checkmark problems, so that there is a visual
+            indication of the correct answers that is not solely based on color
+            (and also screen reader text).
+        """
+        return self.get_answer()
 
     @property
     def display_name_with_default(self):

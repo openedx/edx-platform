@@ -839,13 +839,6 @@ class CapaMixin(ScorableXBlockMixin):
         # vs. simply calling sub() many times as we have here.
         return html
 
-    def hint_button(self, data):
-        """
-        Hint button handler, returns new html using hint_index from the client.
-        """
-        hint_index = int(data['hint_index'])
-        return self.get_demand_hint(hint_index)
-
     def is_past_due(self):
         """
         Is it now past this problem's due date, including grace period?
@@ -993,7 +986,7 @@ class CapaMixin(ScorableXBlockMixin):
         self.set_state_from_lcp()
         return response
 
-    def get_answer(self, _data):
+    def get_answer(self):
         """
         For the "show answer" button.
 
@@ -1034,17 +1027,6 @@ class CapaMixin(ScorableXBlockMixin):
                 {'status': Status('correct', self.runtime.service(self, "i18n").ugettext)}
             )
         }
-
-    # Figure out if we should move these to capa_problem?
-    def get_problem(self, _data):
-        """
-        Return results of get_problem_html, as a simple dict for json-ing.
-        { 'html': <the-html> }
-
-        Used if we want to reconfirm we have the right thing e.g. after
-        several AJAX calls.
-        """
-        return {'html': self.get_problem_html(encapsulate=False, submit_notification=True)}
 
     @staticmethod
     def make_dict_of_responses(data):
