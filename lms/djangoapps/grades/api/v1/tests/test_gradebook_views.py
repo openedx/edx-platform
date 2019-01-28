@@ -29,7 +29,11 @@ from lms.djangoapps.grades.models import (
     BlockRecordList,
     PersistentSubsectionGrade,
     PersistentSubsectionGradeOverride,
-    PersistentSubsectionGradeOverrideHistory
+    PersistentSubsectionGradeOverrideHistory,
+)
+from lms.djangoapps.certificates.models import (
+    GeneratedCertificate,
+    CertificateStatuses,
 )
 from lms.djangoapps.grades.subsection_grade import ReadSubsectionGrade
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
@@ -1147,6 +1151,48 @@ class GradebookBulkUpdateViewTest(GradebookViewTestBase):
                 self.assertIsNotNone(audit_item.created)
                 self.assertEqual(audit_item.feature, PersistentSubsectionGradeOverrideHistory.GRADEBOOK)
                 self.assertEqual(audit_item.action, PersistentSubsectionGradeOverrideHistory.CREATE_OR_UPDATE)
+
+    def test_update_failing_grade(self):
+        """
+        Test that when we update a user's grade to failing, their certificate is marked notpassing
+        """
+        with override_waffle_flag(self.waffle_flag, active=True):
+            GeneratedCertificate.eligible_certificates.create(
+                user=self.student,
+                course_id=self.course.id,
+                status=CertificateStatuses.downloadable,
+            )
+            self.login_staff()
+            post_data = [
+                {
+                    'user_id': self.student.id,
+                    'usage_id': text_type(self.subsections[self.chapter_1.location][0].location),
+                    'grade': {
+                        'earned_all_override': 0,
+                        'possible_all_override': 3,
+                        'earned_graded_override': 0,
+                        'possible_graded_override': 2,
+                    },
+                },
+                {
+                    'user_id': self.student.id,
+                    'usage_id': text_type(self.subsections[self.chapter_1.location][1].location),
+                    'grade': {
+                        'earned_all_override': 0,
+                        'possible_all_override': 4,
+                        'earned_graded_override': 0,
+                        'possible_graded_override': 4,
+                    },
+                }
+            ]
+            resp = self.client.post(
+                self.get_url(),
+                data=json.dumps(post_data),
+                content_type='application/json',
+            )
+            self.assertEqual(status.HTTP_202_ACCEPTED, resp.status_code)
+            cert = GeneratedCertificate.certificate_for_student(self.student, self.course.id)
+            self.assertEqual(cert.status, CertificateStatuses.notpassing)
 
 
 @ddt.ddt
