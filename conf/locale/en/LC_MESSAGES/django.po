@@ -26147,5 +26147,8 @@ msgstr ""
 msgid "Payment Success"
 msgstr ""
 
-msgid "email address"
+msgid "English"
+msgstr ""
+
+msgid "Chinese"
 msgstr ""

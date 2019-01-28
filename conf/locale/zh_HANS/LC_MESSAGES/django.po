@@ -16526,13 +16526,13 @@ msgstr "享受您在{platform_name}上的学习之旅。"
 msgid ""
 "If you need help, please use our web form at {support_url} or email "
 "{support_email}."
-msgstr "如需帮助，请使用我们的网站{support_url} 或发邮件至{support_email} 。"
+msgstr "如需帮助，请访问我们的网站{support_url} 或发邮件至{support_email} 。"
 
 #: lms/templates/emails/activation_email.txt
 msgid ""
 "This email message was automatically sent by {lms_url} because someone "
 "attempted to create an account on {platform_name} using this email address."
-msgstr "这是一封由{lms_url}自动发送的邮件，通知您有人使用此邮箱地址注册{platform_name}账号。"
+msgstr "这是一封由{lms_url} 自动发送的邮件，通知您有人使用此邮箱地址注册{platform_name}账号。"
 
 #: lms/templates/emails/activation_email_subject.txt
 msgid "Action Required: Activate your {platform_name} account"
@@ -26682,5 +26682,8 @@ msgstr "以完成支付"
 msgid "Payment Success"
 msgstr "支付成功"
 
-msgid "email address"
-msgstr "电子邮件"
+msgid "English"
+msgstr "英语"
+
+msgid "Chinese"
+msgstr "中文"
