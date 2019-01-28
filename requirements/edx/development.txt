@@ -71,6 +71,7 @@ cffi==1.11.5
 chardet==3.0.4
 click-log==0.1.8
 click==7.0
+code-annotations==0.2.3
 colorama==0.4.1
 configparser==3.7.1
 constantly==15.1.0
@@ -321,7 +322,7 @@ sphinx==1.8.4
 sphinxcontrib-websupport==1.1.0  # via sphinx
 splinter==0.9.0
 sqlparse==0.2.4
-stevedore==1.10.0
+stevedore==1.30.0
 sure==1.4.11
 sympy==0.7.1
 testfixtures==6.5.0
