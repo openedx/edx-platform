@@ -75,7 +75,7 @@ def _reserve_task(course_id, task_type, task_key, task_input, requester):
     """
 
     if _task_is_running(course_id, task_type, task_key):
-        log.warning("Duplicate task found for task_type %s and task_key %s", task_type, task_key)
+        log.warning(u"Duplicate task found for task_type %s and task_key %s", task_type, task_key)
         error_message = generate_already_running_error_message(task_type)
         raise AlreadyRunningError(error_message)
 
@@ -85,7 +85,7 @@ def _reserve_task(course_id, task_type, task_key, task_input, requester):
         most_recent_id = "None found"
     finally:
         log.warning(
-            "No duplicate tasks found: task_type %s, task_key %s, and most recent task_id = %s",
+            u"No duplicate tasks found: task_type %s, task_key %s, and most recent task_id = %s",
             task_type,
             task_key,
             most_recent_id
@@ -118,7 +118,7 @@ def generate_already_running_error_message(task_type):
     if report_types.get(task_type):
 
         message = _(
-            "The {report_type} report is being created. "
+            u"The {report_type} report is being created. "
             "To view the status of the report, see Pending Tasks below. "
             "You will be able to download the report when it is complete."
         ).format(report_type=report_types.get(task_type))
@@ -213,20 +213,20 @@ def _update_instructor_task(instructor_task, task_result):
     elif result_state in [PROGRESS, SUCCESS]:
         # construct a status message directly from the task result's result:
         # it needs to go back with the entry passed in.
-        log.info("background task (%s), state %s:  result: %s", task_id, result_state, returned_result)
+        log.info(u"background task (%s), state %s:  result: %s", task_id, result_state, returned_result)
         task_output = InstructorTask.create_output_for_success(returned_result)
     elif result_state == FAILURE:
         # on failure, the result's result contains the exception that caused the failure
         exception = returned_result
         traceback = result_traceback if result_traceback is not None else ''
-        log.warning("background task (%s) failed: %s %s", task_id, returned_result, traceback)
+        log.warning(u"background task (%s) failed: %s %s", task_id, returned_result, traceback)
         task_output = InstructorTask.create_output_for_failure(exception, result_traceback)
     elif result_state == REVOKED:
         # on revocation, the result's result doesn't contain anything
         # but we cannot rely on the worker thread to set this status,
         # so we set it here.
         entry_needs_saving = True
-        log.warning("background task (%s) revoked.", task_id)
+        log.warning(u"background task (%s) revoked.", task_id)
         task_output = InstructorTask.create_output_for_revoked()
 
     # save progress and state into the entry, even if it's not being saved:
@@ -256,7 +256,7 @@ def _handle_instructor_task_failure(instructor_task, error):
     """
     Do required operations if task creation was not complete.
     """
-    log.info("instructor task (%s) failed, result: %s", instructor_task.task_id, text_type(error))
+    log.info(u"instructor task (%s) failed, result: %s", instructor_task.task_id, text_type(error))
     _update_instructor_task_state(instructor_task, FAILURE, text_type(error))
 
     raise QueueConnectionError()
@@ -273,7 +273,7 @@ def get_updated_instructor_task(task_id):
     try:
         instructor_task = InstructorTask.objects.get(task_id=task_id)
     except InstructorTask.DoesNotExist:
-        log.warning("query for InstructorTask status failed: task_id=(%s) not found", task_id)
+        log.warning(u"query for InstructorTask status failed: task_id=(%s) not found", task_id)
         return None
 
     # if the task is not already known to be done, then we need to query

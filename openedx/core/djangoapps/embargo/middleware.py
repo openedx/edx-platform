@@ -87,7 +87,7 @@ class EmbargoMiddleware(object):
             log.info(
                 (
                     u"User %s was blocked from accessing %s "
-                    u"because IP address %s is blacklisted."
+                    "because IP address %s is blacklisted."  # pylint: disable=unicode-format-string
                 ), request.user.id, request.path, ip_address
             )
 
@@ -106,7 +106,7 @@ class EmbargoMiddleware(object):
             log.info(
                 (
                     u"User %s was allowed access to %s because "
-                    u"IP address %s is whitelisted."
+                    "IP address %s is whitelisted."  # pylint: disable=unicode-format-string
                 ),
                 request.user.id, request.path, ip_address
             )

@@ -53,4 +53,4 @@ def show_reference_template(request, template):
 
         return render_to_response(template, context)
     except TemplateDoesNotExist:
-        return HttpResponseNotFound('Missing template {template}'.format(template=bleach.clean(template, strip=True)))
+        return HttpResponseNotFound(u'Missing template {template}'.format(template=bleach.clean(template, strip=True)))

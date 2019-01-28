@@ -133,10 +133,10 @@ class CreditService(object):
         # table. This will be to help debug any issues that might
         # arise in production
         log_msg = (
-            'set_credit_requirement_status was called with '
-            'user_id={user_id}, course_key_or_id={course_key_or_id} '
-            'req_namespace={req_namespace}, req_name={req_name}, '
-            'status={status}, reason={reason}'.format(
+            u'set_credit_requirement_status was called with '
+            'user_id={user_id}, course_key_or_id={course_key_or_id} '  # pylint: disable=unicode-format-string
+            'req_namespace={req_namespace}, req_name={req_name}, '  # pylint: disable=unicode-format-string
+            'status={status}, reason={reason}'.format(  # pylint: disable=unicode-format-string
                 user_id=user_id,
                 course_key_or_id=course_key_or_id,
                 req_namespace=req_namespace,
@@ -189,9 +189,9 @@ class CreditService(object):
         # table. This will be to help debug any issues that might
         # arise in production
         log_msg = (
-            'remove_credit_requirement_status was called with '
-            'user_id={user_id}, course_key_or_id={course_key_or_id} '
-            'req_namespace={req_namespace}, req_name={req_name}, '.format(
+            u'remove_credit_requirement_status was called with '
+            'user_id={user_id}, course_key_or_id={course_key_or_id} '  # pylint: disable=unicode-format-string
+            'req_namespace={req_namespace}, req_name={req_name}, '.format(  # pylint: disable=unicode-format-string
                 user_id=user_id,
                 course_key_or_id=course_key_or_id,
                 req_namespace=req_namespace,

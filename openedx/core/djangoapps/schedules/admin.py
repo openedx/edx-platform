@@ -34,14 +34,14 @@ def _set_experience(db_name, human_name, modeladmin, request, queryset):
     ).update(
         experience_type=db_name
     )
-    modeladmin.message_user(request, "{} schedule(s) were changed to use the {} experience".format(rows_updated, human_name))
+    modeladmin.message_user(request, u"{} schedule(s) were changed to use the {} experience".format(rows_updated, human_name))
 
 
 # Generate a list of all "set_experience_to_X" actions
 experience_actions = []
 for (db_name, human_name) in models.ScheduleExperience.EXPERIENCES:
     partial = functools.partial(_set_experience, db_name, human_name)
-    partial.short_description = "Convert the selected schedules to the {} experience".format(human_name)
+    partial.short_description = u"Convert the selected schedules to the {} experience".format(human_name)
     partial.__name__ = "set_experience_to_{}".format(db_name)
     experience_actions.append(partial)
 
@@ -128,12 +128,12 @@ class ScheduleAdmin(admin.ModelAdmin):
 
     def deactivate_schedules(self, request, queryset):
         rows_updated = queryset.update(active=False)
-        self.message_user(request, "{} schedule(s) were deactivated".format(rows_updated))
+        self.message_user(request, u"{} schedule(s) were deactivated".format(rows_updated))
     deactivate_schedules.short_description = "Deactivate selected schedules"
 
     def activate_schedules(self, request, queryset):
         rows_updated = queryset.update(active=True)
-        self.message_user(request, "{} schedule(s) were activated".format(rows_updated))
+        self.message_user(request, u"{} schedule(s) were activated".format(rows_updated))
     activate_schedules.short_description = "Activate selected schedules"
 
     def experience_display(self, obj):

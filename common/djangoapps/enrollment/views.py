@@ -204,7 +204,7 @@ class EnrollmentView(APIView, ApiKeyPermissionMixIn):
                 data={
                     "message": (
                         u"An error occurred while retrieving enrollments for user "
-                        u"'{username}' in course '{course_id}'"
+                        "'{username}' in course '{course_id}'"  # pylint: disable=unicode-format-string
                     ).format(username=username, course_id=course_id)
                 }
             )
@@ -835,7 +835,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 data={
                     "message": (
                         u"An error occurred while creating the new course enrollment for user "
-                        u"'{username}' in course '{course_id}'"
+                        "'{username}' in course '{course_id}'"  # pylint: disable=unicode-format-string
                     ).format(username=username, course_id=course_id)
                 }
             )

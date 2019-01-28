@@ -46,7 +46,7 @@ def safe_parse_date(date):
     Since this is used solely for ordering purposes, use today's date as a default
     """
     try:
-        return datetime.strptime(date, '%B %d, %Y')
+        return datetime.strptime(date, u'%B %d, %Y')
     except ValueError:  # occurs for ill-formatted date values
         return datetime.today()
 

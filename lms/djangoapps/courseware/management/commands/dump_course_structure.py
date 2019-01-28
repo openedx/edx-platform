@@ -1,3 +1,4 @@
+# pylint: disable=unicode-format-string
 """
 Dump the structure of a course as a JSON object.
 

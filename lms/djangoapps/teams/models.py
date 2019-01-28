@@ -198,7 +198,7 @@ class CourseTeamMembership(models.Model):
                 # Allow it *only* if the current value is None.
                 if current_value is not None:
                     raise ImmutableMembershipFieldException(
-                        "Field %r shouldn't change from %r to %r" % (name, current_value, value)
+                        u"Field %r shouldn't change from %r to %r" % (name, current_value, value)
                     )
         super(CourseTeamMembership, self).__setattr__(name, value)
 

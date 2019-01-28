@@ -27,7 +27,7 @@ MAX_RETRIES = 11
 @task(bind=True, ignore_result=True, routing_key=ROUTING_KEY)
 def send_grade_to_credentials(self, username, course_run_key, verified, letter_grade, percent_grade):
     """ Celery task to notify the Credentials IDA of a grade change via POST. """
-    logger.info('Running task send_grade_to_credentials for username %s and course %s', username, course_run_key)
+    logger.info(u'Running task send_grade_to_credentials for username %s and course %s', username, course_run_key)
 
     countdown = 2 ** self.request.retries
     course_key = CourseKey.from_string(course_run_key)
@@ -46,8 +46,8 @@ def send_grade_to_credentials(self, username, course_run_key, verified, letter_g
             'verified': verified,
         })
 
-        logger.info('Sent grade for course %s to user %s', course_run_key, username)
+        logger.info(u'Sent grade for course %s to user %s', course_run_key, username)
 
     except Exception as exc:
-        logger.exception('Failed to send grade for course %s to user %s', course_run_key, username)
+        logger.exception(u'Failed to send grade for course %s to user %s', course_run_key, username)
         raise self.retry(exc=exc, countdown=countdown, max_retries=MAX_RETRIES)

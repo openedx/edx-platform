@@ -74,7 +74,7 @@ class TestGetPrograms(CacheIsolationTestCase):
         # empty list and log a warning.
         self.assertEqual(get_programs(self.site), [])
         mock_warning.assert_called_once_with(
-            'Failed to get program UUIDs from the cache for site {}.'.format(self.site.domain)
+            u'Failed to get program UUIDs from the cache for site {}.'.format(self.site.domain)
         )
         mock_warning.reset_mock()
 
@@ -95,7 +95,7 @@ class TestGetPrograms(CacheIsolationTestCase):
         )
         mock_info.assert_called_with('Failed to get details for 1 programs. Retrying.')
         mock_warning.assert_called_with(
-            'Failed to get details for program {uuid} from the cache.'.format(uuid=programs[2]['uuid'])
+            u'Failed to get details for program {uuid} from the cache.'.format(uuid=programs[2]['uuid'])
         )
         mock_warning.reset_mock()
 
@@ -169,7 +169,7 @@ class TestGetPrograms(CacheIsolationTestCase):
 
         self.assertEqual(get_programs(self.site, uuid=expected_uuid), None)
         mock_warning.assert_called_once_with(
-            'Failed to get details for program {uuid} from the cache.'.format(uuid=expected_uuid)
+            u'Failed to get details for program {uuid} from the cache.'.format(uuid=expected_uuid)
         )
         mock_warning.reset_mock()
 
@@ -226,7 +226,7 @@ class TestGetPathways(CacheIsolationTestCase):
         )
         mock_info.assert_called_with('Failed to get details for 1 pathways. Retrying.')
         mock_warning.assert_called_with(
-            'Failed to get details for credit pathway {id} from the cache.'.format(id=pathways[2]['id'])
+            u'Failed to get details for credit pathway {id} from the cache.'.format(id=pathways[2]['id'])
         )
         mock_warning.reset_mock()
 
@@ -300,7 +300,7 @@ class TestGetPathways(CacheIsolationTestCase):
 
         self.assertEqual(get_pathways(self.site, pathway_id=expected_id), None)
         mock_warning.assert_called_once_with(
-            'Failed to get details for credit pathway {id} from the cache.'.format(id=expected_id)
+            u'Failed to get details for credit pathway {id} from the cache.'.format(id=expected_id)
         )
         mock_warning.reset_mock()
 
@@ -433,7 +433,7 @@ class TestGetCourseRuns(CatalogIntegrationMixin, TestCase):
 
         data = get_course_runs()
         mock_log_error.any_call(
-            'Catalog service user with username [%s] does not exist. Course runs will not be retrieved.',
+            u'Catalog service user with username [%s] does not exist. Course runs will not be retrieved.',
             catalog_integration.service_username,
         )
         self.assertFalse(mock_get_edx_api_data.called)

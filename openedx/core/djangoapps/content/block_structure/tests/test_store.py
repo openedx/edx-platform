@@ -41,7 +41,7 @@ class TestBlockStructureStore(UsageKeyFactoryMixin, ChildrenMapTestMixin, CacheI
                 self.block_key_factory(0),
                 transformer,
                 key='test',
-                value='{} val'.format(transformer.name()),
+                value=u'{} val'.format(transformer.name()),
             )
 
     @ddt.data(True, False)

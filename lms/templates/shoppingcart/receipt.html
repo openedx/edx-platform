@@ -35,7 +35,7 @@ from openedx.core.lib.courses import course_image_url
           <a href="${dashboard_url}" class="blue pull-right">${_("View Dashboard")} <span class="icon fa fa-caret-right" aria-hidden="true"></span></a>
           <span class="mt-7">
             ${_(u"You have successfully been enrolled for {course_names}. "
-                u"The following receipt has been emailed to {receipient_emails}").format(
+                "The following receipt has been emailed to {receipient_emails}").format(
                   course_names=u"<b>{course_names}</b>".format(
                     course_names=escape(appended_course_names)
                   ),

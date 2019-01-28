@@ -90,7 +90,7 @@ class CourseQualityView(DeveloperErrorViewMixin, GenericAPIView):
             if log_time:
                 start_time = time.time()
                 output = func(*args)
-                log.info('[%s] completed in [%f]', func.__name__, (time.time() - start_time))
+                log.info(u'[%s] completed in [%f]', func.__name__, (time.time() - start_time))
             else:
                 output = func(*args)
             return output

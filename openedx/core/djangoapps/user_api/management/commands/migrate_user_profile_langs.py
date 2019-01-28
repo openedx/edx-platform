@@ -61,14 +61,14 @@ class Command(BaseCommand):
         langs += DarkLangConfig.current().released_languages_list
 
         if new_lang_code not in langs:
-            raise CommandError('{} is not a configured language code in settings.LANGUAGES '
+            raise CommandError(u'{} is not a configured language code in settings.LANGUAGES '
                                'or the current DarkLangConfig.'.format(new_lang_code))
 
         max_id = UserPreference.objects.all().aggregate(Max('id'))['id__max']
 
-        print('Updating user language preferences from {} to {}. '
-              'Start id is {}, current max id is {}. '
-              'Chunk size is of {}'.format(old_lang_code, new_lang_code, start, max_id, chunk_size))
+        print(u'Updating user language preferences from {} to {}. '
+              u'Start id is {}, current max id is {}. '
+              u'Chunk size is of {}'.format(old_lang_code, new_lang_code, start, max_id, chunk_size))
 
         updated_count = 0
 
@@ -88,7 +88,7 @@ class Command(BaseCommand):
 
             updated_count += curr
 
-            print('Updated rows {} to {}, {} rows affected'.format(start, end - 1, curr))
+            print(u'Updated rows {} to {}, {} rows affected'.format(start, end - 1, curr))
 
             if end >= max_id:
                 break

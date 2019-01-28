@@ -48,11 +48,11 @@ EMAIL_INVALID_MSG = _(u'"{email}" is not a valid email address.')
 # account using an username/email associated with an existing account.
 EMAIL_CONFLICT_MSG = _(
     u"It looks like {email_address} belongs to an existing account. "
-    u"Try again with a different email address."
+    "Try again with a different email address."
 )
 USERNAME_CONFLICT_MSG = _(
     u"It looks like {username} belongs to an existing account. "
-    u"Try again with a different username."
+    "Try again with a different username."
 )
 
 # Translators: This message is shown to users who enter a username/email/password

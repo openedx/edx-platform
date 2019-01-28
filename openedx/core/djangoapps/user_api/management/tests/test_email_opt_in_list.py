@@ -396,7 +396,7 @@ class EmailOptInListTest(ModuleStoreTestCase):
                 reader = csv.DictReader(output_file, fieldnames=self.OUTPUT_FIELD_NAMES)
                 rows = [row for row in reader]
         except IOError:
-            self.fail("Could not find or open output file at '{path}'".format(path=output_path))
+            self.fail(u"Could not find or open output file at '{path}'".format(path=output_path))
 
         # Return the output as a list of dictionaries
         return rows

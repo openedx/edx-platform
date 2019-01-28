@@ -1,7 +1,6 @@
 """
 This file contains view functions for wrapping the django-wiki.
 """
-import cgi
 import logging
 import re
 
@@ -15,6 +14,7 @@ from wiki.models import Article, URLPath
 from course_wiki.utils import course_wiki_slug
 from courseware.courses import get_course_by_id
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangolib.markup import Text
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 
 log = logging.getLogger(__name__)
@@ -73,12 +73,12 @@ def course_wiki_redirect(request, course_id, wiki_path=""):  # pylint: disable=u
             # recerate it.
             urlpath.delete()
 
-        content = cgi.escape(
+        content = Text(
             # Translators: this string includes wiki markup.  Leave the ** and the _ alone.
-            _("This is the wiki for **{organization}**'s _{course_name}_.").format(
-                organization=course.display_org_with_default,
-                course_name=course.display_name_with_default_escaped,
-            )
+            _(u"This is the wiki for **{organization}**'s _{course_name}_.")
+        ).format(
+            organization=course.display_org_with_default,
+            course_name=course.display_name_with_default,
         )
         urlpath = URLPath.create_article(
             root,
@@ -113,7 +113,7 @@ def get_or_create_root():
         pass
 
     starting_content = "\n".join((
-        _("Welcome to the {platform_name} Wiki").format(
+        _(u"Welcome to the {platform_name} Wiki").format(
             platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
         ),
         "===",

@@ -187,7 +187,7 @@ class TestLibraries(LibraryTestCase):
         # Create many blocks in the library and add them to a course:
         for num in range(8):
             ItemFactory.create(
-                data="This is #{}".format(num + 1),
+                data=u"This is #{}".format(num + 1),
                 category="html", parent_location=self.library.location, user_id=self.user.id, publish_item=False
             )
 

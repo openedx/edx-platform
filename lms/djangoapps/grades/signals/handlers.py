@@ -146,7 +146,7 @@ def score_published_handler(sender, block, user, raw_earned, raw_possible, only_
                 update_score = False
                 log.warning(
                     u"Grades: Rescore is not higher than previous: "
-                    u"user: {}, block: {}, previous: {}/{}, new: {}/{} ".format(
+                    "user: {}, block: {}, previous: {}/{}, new: {}/{} ".format(  # pylint: disable=unicode-format-string
                         user, block.location, prev_raw_earned, prev_raw_possible, raw_earned, raw_possible,
                     )
                 )

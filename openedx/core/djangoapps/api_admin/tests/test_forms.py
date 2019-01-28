@@ -33,7 +33,7 @@ class ViewersWidgetTest(TestCase):
         """
         dummy_string_value = 'staff, verified'
         input_field_name = 'viewers'
-        expected_widget_html = '<input type="text" name="{input_field_name}" value="{serialized_value}" />'.format(
+        expected_widget_html = u'<input type="text" name="{input_field_name}" value="{serialized_value}" />'.format(
             input_field_name=input_field_name,
             serialized_value=dummy_string_value,
         )

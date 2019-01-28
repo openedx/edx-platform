@@ -429,7 +429,7 @@ class TestNonStandardCourseStructure(MobileAPITestCase, TestVideoAPIMixin, Miles
 @ddt.ddt
 class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin,
                            TestVideoAPIMixin, MilestonesTestCaseMixin):
-    """
+    u"""
     Tests for /api/mobile/{api_version}/video_outlines/courses/{course_id}..
     """
     REVERSE_INFO = {'name': 'video-summary-list', 'params': ['course_id', 'api_version']}
@@ -982,7 +982,7 @@ class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileCour
 @ddt.ddt
 class TestTranscriptsDetail(TestVideoAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin,
                             TestVideoAPIMixin, MilestonesTestCaseMixin):
-    """
+    u"""
     Tests for /api/mobile/{api_version}/video_outlines/transcripts/{course_id}..
     """
     REVERSE_INFO = {'name': 'video-transcripts-detail', 'params': ['course_id', 'api_version']}

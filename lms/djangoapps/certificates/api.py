@@ -214,7 +214,7 @@ def regenerate_user_certificates(student, course_key, course=None,
 
     generate_pdf = not has_html_certificates_enabled(course)
     log.info(
-        "Started regenerating certificates for user %s in course %s with generate_pdf status: %s",
+        u"Started regenerating certificates for user %s in course %s with generate_pdf status: %s",
         student.username, unicode(course_key), generate_pdf
     )
 
@@ -445,7 +445,7 @@ def _certificate_download_url(user_id, course_id):
         return user_certificate.download_url
     except GeneratedCertificate.DoesNotExist:
         log.critical(
-            'Unable to lookup certificate\n'
+            u'Unable to lookup certificate\n'
             'user id: %d\n'
             'course: %s', user_id, unicode(course_id)
         )

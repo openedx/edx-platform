@@ -499,9 +499,9 @@ def _credit_statuses(user, course_enrollments):
                 status["error"] = True
                 log.error(
                     u"Could not find credit provider associated with credit enrollment "
-                    u"for user %s in course %s.  The user will not be able to see his or her "
-                    u"credit request status on the student dashboard.  This attribute should "
-                    u"have been set when the user purchased credit in the course.",
+                    "for user %s in course %s.  The user will not be able to see his or her "  # pylint: disable=unicode-format-string
+                    "credit request status on the student dashboard.  This attribute should "
+                    "have been set when the user purchased credit in the course.",
                     user.id, course_key
                 )
             else:

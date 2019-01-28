@@ -512,7 +512,7 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
                     CourseOverview.get_all_courses(filter_=filter_)
                 },
                 expected_courses,
-                "testing CourseOverview.get_all_courses with filter_={}"
+                u"testing CourseOverview.get_all_courses with filter_={}"
                 .format(filter_),
             )
 

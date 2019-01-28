@@ -488,4 +488,4 @@ def get_empty_preference_message(preference_key):
     """
     Returns the validation message shown for an empty preference.
     """
-    return "Preference '{preference_key}' cannot be set to an empty value.".format(preference_key=preference_key)
+    return u"Preference '{preference_key}' cannot be set to an empty value.".format(preference_key=preference_key)

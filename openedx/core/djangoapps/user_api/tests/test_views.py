@@ -131,7 +131,7 @@ class UserApiTestCase(UserAPITestCase):
         self.users = [
             UserFactory.create(
                 email="test{0}@test.org".format(i),
-                profile__name="Test {0}".format(i)
+                profile__name=u"Test {0}".format(i)
             )
             for i in range(5)
         ]
@@ -829,7 +829,7 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
             {
                 "email": [{
                     "user_message": (
-                        "It looks like {} belongs to an existing account. "
+                        u"It looks like {} belongs to an existing account. "
                         "Try again with a different email address."
                     ).format(
                         self.EMAIL
@@ -871,7 +871,7 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
             {
                 "email": [{
                     "user_message": (
-                        "It looks like {} belongs to an existing account. "
+                        u"It looks like {} belongs to an existing account. "
                         "Try again with a different email address."
                     ).format(
                         self.EMAIL
@@ -913,7 +913,7 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
             {
                 "username": [{
                     "user_message": (
-                        "It looks like {} belongs to an existing account. "
+                        u"It looks like {} belongs to an existing account. "
                         "Try again with a different username."
                     ).format(
                         self.USERNAME
@@ -950,7 +950,7 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
             {
                 "email": [{
                     "user_message": (
-                        "It looks like {} belongs to an existing account. "
+                        u"It looks like {} belongs to an existing account. "
                         "Try again with a different email address."
                     ).format(
                         self.EMAIL
@@ -1023,7 +1023,7 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
             {
                 "email": [{
                     "user_message": (
-                        "It looks like {} belongs to an existing account. "
+                        u"It looks like {} belongs to an existing account. "
                         "Try again with a different email address."
                     ).format(
                         self.EMAIL
@@ -1096,7 +1096,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             "default": False
         }
     ]
-    link_template = "<a href='/honor' target='_blank'>{link_label}</a>"
+    link_template = u"<a href='/honor' target='_blank'>{link_label}</a>"
 
     def setUp(self):
         super(RegistrationViewTest, self).setUp()
@@ -1668,16 +1668,16 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
     @mock.patch.dict(settings.FEATURES, {"ENABLE_MKTG_SITE": True})
     def test_registration_honor_code_mktg_site_enabled(self):
         link_template = "<a href='https://www.test.com/honor' target='_blank'>{link_label}</a>"
-        link_template2 = "<a href='#' target='_blank'>{link_label}</a>"
+        link_template2 = u"<a href='#' target='_blank'>{link_label}</a>"
         link_label = "Terms of Service and Honor Code"
         link_label2 = "Privacy Policy"
         self._assert_reg_field(
             {"honor_code": "required"},
             {
                 "label": (u"By creating an account with {platform_name}, you agree {spacing}"
-                          u"to abide by our {platform_name} {spacing}"
-                          u"{link_label} {spacing}"
-                          u"and agree to our {link_label2}.").format(
+                          "to abide by our {platform_name} {spacing}"  # pylint: disable=unicode-format-string
+                          "{link_label} {spacing}"  # pylint: disable=unicode-format-string
+                          "and agree to our {link_label2}.").format(  # pylint: disable=unicode-format-string
                     platform_name=settings.PLATFORM_NAME,
                     link_label=link_template.format(link_label=link_label),
                     link_label2=link_template2.format(link_label=link_label2),
@@ -1706,9 +1706,9 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             {"honor_code": "required"},
             {
                 "label": (u"By creating an account with {platform_name}, you agree {spacing}"
-                          u"to abide by our {platform_name} {spacing}"
-                          u"{link_label} {spacing}"
-                          u"and agree to our {link_label2}.").format(
+                          "to abide by our {platform_name} {spacing}"  # pylint: disable=unicode-format-string
+                          "{link_label} {spacing}"  # pylint: disable=unicode-format-string
+                          "and agree to our {link_label2}.").format(  # pylint: disable=unicode-format-string
                     platform_name=settings.PLATFORM_NAME,
                     link_label=self.link_template.format(link_label=link_label),
                     link_label2=link_template.format(link_label=link_label2),
@@ -1737,7 +1737,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         # Honor code field should say ONLY honor code,
         # not "terms of service and honor code"
         link_label = 'Honor Code'
-        link_template = "<a href='https://www.test.com/honor' target='_blank'>{link_label}</a>"
+        link_template = u"<a href='https://www.test.com/honor' target='_blank'>{link_label}</a>"
         self._assert_reg_field(
             {"honor_code": "required", "terms_of_service": "required"},
             {
@@ -1760,7 +1760,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
 
         # Terms of service field should also be present
         link_label = "Terms of Service"
-        link_template = "<a href='https://www.test.com/tos' target='_blank'>{link_label}</a>"
+        link_template = u"<a href='https://www.test.com/tos' target='_blank'>{link_label}</a>"
         self._assert_reg_field(
             {"honor_code": "required", "terms_of_service": "required"},
             {
@@ -1808,7 +1808,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
 
         link_label = 'Terms of Service'
         # Terms of service field should also be present
-        link_template = "<a href='/tos' target='_blank'>{link_label}</a>"
+        link_template = u"<a href='/tos' target='_blank'>{link_label}</a>"
         self._assert_reg_field(
             {"honor_code": "required", "terms_of_service": "required"},
             {
@@ -2184,7 +2184,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             {
                 "email": [{
                     "user_message": (
-                        "It looks like {} belongs to an existing account. "
+                        u"It looks like {} belongs to an existing account. "
                         "Try again with a different email address."
                     ).format(
                         self.EMAIL
@@ -2219,7 +2219,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             {
                 "username": [{
                     "user_message": (
-                        "It looks like {} belongs to an existing account. "
+                        u"It looks like {} belongs to an existing account. "
                         "Try again with a different username."
                     ).format(
                         self.USERNAME
@@ -2254,7 +2254,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             {
                 "username": [{
                     "user_message": (
-                        "It looks like {} belongs to an existing account. "
+                        u"It looks like {} belongs to an existing account. "
                         "Try again with a different username."
                     ).format(
                         self.USERNAME
@@ -2262,7 +2262,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 }],
                 "email": [{
                     "user_message": (
-                        "It looks like {} belongs to an existing account. "
+                        u"It looks like {} belongs to an existing account. "
                         "Try again with a different email address."
                     ).format(
                         self.EMAIL
@@ -2330,7 +2330,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
     def _assert_fields_match(self, actual_field, expected_field):
         self.assertIsNot(
             actual_field, None,
-            msg="Could not find field {name}".format(name=expected_field["name"])
+            msg=u"Could not find field {name}".format(name=expected_field["name"])
         )
 
         for key, value in expected_field.iteritems():
@@ -2535,7 +2535,7 @@ class ThirdPartyRegistrationTestMixin(ThirdPartyOAuthTestMixin, CacheIsolationTe
         response = self.client.post(self.url, data)
         self._assert_access_token_error(
             response,
-            "An access_token is required when passing value ({}) for provider.".format(self.BACKEND)
+            u"An access_token is required when passing value ({}) for provider.".format(self.BACKEND)
         )
         self._verify_user_existence(user_exists=False, social_link_exists=False)
 

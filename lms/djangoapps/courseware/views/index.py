@@ -197,13 +197,13 @@ class CoursewareIndex(View):
 
             PageLevelMessages.register_warning_message(
                 request,
-                Text(_("You are not signed in. To see additional course content, {sign_in_link} or "
-                       "{register_link}, and enroll in this course.")).format(
-                    sign_in_link=HTML('<a href="{url}">{sign_in_label}</a>').format(
+                Text(_(u"You are not signed in. To see additional course content, {sign_in_link} or "
+                       "{register_link}, and enroll in this course.")).format(  # pylint: disable=unicode-format-string
+                    sign_in_link=HTML(u'<a href="{url}">{sign_in_label}</a>').format(
                         sign_in_label=_('sign in'),
                         url='{}?{}'.format(reverse('signin_user'), qs),
                     ),
-                    register_link=HTML('<a href="/{url}">{register_label}</a>').format(
+                    register_link=HTML(u'<a href="/{url}">{register_label}</a>').format(
                         register_label=_('register'),
                         url='{}?{}'.format(reverse('register_user'), qs),
                     ),

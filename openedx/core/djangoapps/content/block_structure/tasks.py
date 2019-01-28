@@ -102,18 +102,18 @@ def _call_and_retry_if_needed(self, api_method, **kwargs):
     except NO_RETRY_TASKS:
         # Known unrecoverable errors
         log.exception(
-            "BlockStructure: %s encountered unrecoverable error in course %s, task_id %s",
+            u"BlockStructure: %s encountered unrecoverable error in course %s, task_id %s",
             self.__name__,
             kwargs.get('course_id'),
             self.request.id,
         )
         raise
     except RETRY_TASKS as exc:
-        log.exception("%s encountered expected error, retrying.", self.__name__)
+        log.exception(u"%s encountered expected error, retrying.", self.__name__)
         raise self.retry(kwargs=kwargs, exc=exc)
     except Exception as exc:
         log.exception(
-            "BlockStructure: %s encountered unknown error in course %s, task_id %s. Retry #%d",
+            u"BlockStructure: %s encountered unknown error in course %s, task_id %s. Retry #%d",
             self.__name__,
             kwargs.get('course_id'),
             self.request.id,

@@ -482,7 +482,7 @@ class DivisionSchemeTest(BaseDividedDiscussionTest, BaseDiscussionMixin):
         refresh_thread_page()
         self.assertEquals(
             self.thread_page.get_group_visibility_label(),
-            "This post is visible only to {}.".format("Audit")
+            u"This post is visible only to {}.".format("Audit")
         )
 
         # Disable dividing discussions and verify that the post now shows as visible to everyone.

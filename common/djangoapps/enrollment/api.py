@@ -447,7 +447,7 @@ def validate_course_mode(course_id, mode, is_active=None, include_expired=False)
     if mode not in available_modes:
         msg = (
             u"Specified course mode '{mode}' unavailable for course {course_id}.  "
-            u"Available modes were: {available}"
+            "Available modes were: {available}"  # pylint: disable=unicode-format-string
         ).format(
             mode=mode,
             course_id=course_id,

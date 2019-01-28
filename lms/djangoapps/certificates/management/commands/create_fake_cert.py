@@ -100,8 +100,8 @@ class Command(BaseCommand):
         if created:
             LOGGER.info(
                 u"Created certificate for user %s in course %s "
-                u"with mode %s, status %s, "
-                u"and grade %s",
+                "with mode %s, status %s, "  # pylint: disable=unicode-format-string
+                "and grade %s",  # pylint: disable=unicode-format-string
                 user.id, text_type(course_key),
                 cert_mode, status, grade
             )
@@ -109,8 +109,8 @@ class Command(BaseCommand):
         else:
             LOGGER.info(
                 u"Updated certificate for user %s in course %s "
-                u"with mode %s, status %s, "
-                u"and grade %s",
+                "with mode %s, status %s, "  # pylint: disable=unicode-format-string
+                "and grade %s",  # pylint: disable=unicode-format-string
                 user.id, text_type(course_key),
                 cert_mode, status, grade
             )

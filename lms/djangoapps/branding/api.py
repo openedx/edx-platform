@@ -123,8 +123,8 @@ def _footer_copyright():
         # Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
         # Please do not translate any of these trademarks and company names.
         u"\u00A9 {org_name}.  All rights reserved except where noted.  "
-        u"EdX, Open edX and their respective logos are trademarks "
-        u"or registered trademarks of edX Inc."
+        "EdX, Open edX and their respective logos are trademarks "
+        "or registered trademarks of edX Inc."
     ).format(org_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME))
 
 
@@ -206,7 +206,7 @@ def _footer_navigation_links():
         for link_name, link_url, link_title in [
             ("about", marketing_link("ABOUT"), _("About")),
             ("enterprise", marketing_link("ENTERPRISE"),
-             _("{platform_name} for Business").format(platform_name=platform_name)),
+             _(u"{platform_name} for Business").format(platform_name=platform_name)),
             ("blog", marketing_link("BLOG"), _("Blog")),
             ("news", marketing_link("NEWS"), _("News")),
             ("help-center", settings.SUPPORT_SITE_LINK, _("Help Center")),
@@ -262,7 +262,7 @@ def _footer_business_links():
         for link_name, link_url, link_title in [
             ("about", marketing_link("ABOUT"), _("About")),
             ("enterprise", marketing_link("ENTERPRISE"),
-             _("{platform_name} for Business").format(platform_name=platform_name)),
+             _(u"{platform_name} for Business").format(platform_name=platform_name)),
             ("affiliates", marketing_link("AFFILIATES"), _("Affiliates")),
             ("openedx", _footer_openedx_link()["url"], _("Open edX")),
             ("careers", marketing_link("CAREERS"), _("Careers")),
@@ -320,7 +320,7 @@ def _footer_mobile_links(is_secure):
             {
                 "name": "apple",
                 "title": _(
-                    "Download the {platform_name} mobile app from the Apple App Store"
+                    u"Download the {platform_name} mobile app from the Apple App Store"
                 ).format(platform_name=platform_name),
                 "url": settings.MOBILE_STORE_URLS.get('apple', '#'),
                 "image": _absolute_url_staticfile(is_secure, 'images/app/app_store_badge_135x40.svg'),
@@ -328,7 +328,7 @@ def _footer_mobile_links(is_secure):
             {
                 "name": "google",
                 "title": _(
-                    "Download the {platform_name} mobile app from Google Play"
+                    u"Download the {platform_name} mobile app from Google Play"
                 ).format(platform_name=platform_name),
                 "url": settings.MOBILE_STORE_URLS.get('google', '#'),
                 "image": _absolute_url_staticfile(is_secure, 'images/app/google_play_badge_45.png'),
@@ -367,7 +367,7 @@ def _footer_logo_img(is_secure):
         # We can log when this happens:
         default_logo = "images/logo.png"
         log.info(
-            "Failed to find footer logo at '%s', using '%s' instead",
+            u"Failed to find footer logo at '%s', using '%s' instead",
             logo_name,
             default_logo,
         )

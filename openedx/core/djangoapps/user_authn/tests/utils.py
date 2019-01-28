@@ -84,12 +84,12 @@ class AuthAndScopesTestMixin(object):
         elif auth_type == AuthType.oauth:
             if not token:
                 token = self._create_oauth_token(requesting_user)
-            auth_header = "Bearer {0}".format(token)
+            auth_header = u"Bearer {0}".format(token)
         else:
             assert auth_type in JWT_AUTH_TYPES
             if not token:
                 token = self._create_jwt_token(requesting_user, auth_type)
-            auth_header = "JWT {0}".format(token)
+            auth_header = u"JWT {0}".format(token)
 
         extra = dict(HTTP_AUTHORIZATION=auth_header) if auth_header else {}
         return self.client.get(

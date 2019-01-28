@@ -1,3 +1,4 @@
+# pylint: disable=unicode-format-string
 # -*- coding: utf-8 -*-
 """
 Tests for js_utils.py

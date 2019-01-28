@@ -522,7 +522,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
                     StudioValidationMessage.ERROR,
                     _(
                         u"This course does not support content libraries. "
-                        u"Contact your system administrator for more information."
+                        "Contact your system administrator for more information."
                     )
                 )
             )

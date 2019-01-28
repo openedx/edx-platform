@@ -532,14 +532,14 @@ class LoginTest(CacheIsolationTestCase):
         try:
             response_dict = json.loads(response.content)
         except ValueError:
-            self.fail("Could not parse response content as JSON: %s"
+            self.fail(u"Could not parse response content as JSON: %s"
                       % str(response.content))
 
         if success is not None:
             self.assertEqual(response_dict['success'], success)
 
         if value is not None:
-            msg = ("'%s' did not contain '%s'" %
+            msg = (u"'%s' did not contain '%s'" %
                    (unicode(response_dict['value']), unicode(value)))
             self.assertIn(value, response_dict['value'], msg)
 

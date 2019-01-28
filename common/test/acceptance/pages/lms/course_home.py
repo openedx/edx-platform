@@ -161,7 +161,7 @@ class CourseOutlinePage(PageObject):
         try:
             subsection_index = subsection_titles.index(text_type(subsection_title))
         except ValueError:
-            raise ValueError("Could not find subsection '{0}' in section '{1}'".format(
+            raise ValueError(u"Could not find subsection '{0}' in section '{1}'".format(
                 subsection_title, section_title
             ))
 
@@ -189,11 +189,11 @@ class CourseOutlinePage(PageObject):
         try:
             section_title = self._section_titles()[section_index]
         except IndexError:
-            raise ValueError("Section index '{0}' is out of range.".format(section_index))
+            raise ValueError(u"Section index '{0}' is out of range.".format(section_index))
         try:
             subsection_title = self._subsection_titles(section_index)[subsection_index]
         except IndexError:
-            raise ValueError("Subsection index '{0}' in section index '{1}' is out of range.".format(
+            raise ValueError(u"Subsection index '{0}' in section index '{1}' is out of range.".format(
                 subsection_index, section_index
             ))
 
@@ -206,7 +206,7 @@ class CourseOutlinePage(PageObject):
         try:
             section_index = self._section_titles().index(section_title)
         except ValueError:
-            raise ValueError("Could not find section '{0}'".format(section_title))
+            raise ValueError(u"Could not find section '{0}'".format(section_title))
 
         return section_index
 
@@ -253,7 +253,7 @@ class CourseOutlinePage(PageObject):
         self.wait_for(
             promise_check_func=lambda: courseware_page.nav.is_on_section(
                 section_title, subsection_title),
-            description="Waiting for course page with section '{0}' and subsection '{1}'".format(
+            description=u"Waiting for course page with section '{0}' and subsection '{1}'".format(
                 section_title, subsection_title)
         )
 

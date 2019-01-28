@@ -62,7 +62,7 @@ class Command(BaseCommand):
                 only_course_keys.append(CourseKey.from_string(course_key_str))
             except InvalidKeyError:
                 raise CommandError(
-                    '"{course_key_str}" is not a valid course key.'.format(
+                    u'"{course_key_str}" is not a valid course key.'.format(
                         course_key_str=course_key_str
                     )
                 )
@@ -97,18 +97,18 @@ class Command(BaseCommand):
                 LOGGER.info(
                     (
                         u"Re-submitted certificate for user %s "
-                        u"in course '%s'"
+                        "in course '%s'"  # pylint: disable=unicode-format-string
                     ), user.id, course_key
                 )
             else:
                 LOGGER.error(
                     (
                         u"Could not find course for course key '%s'.  "
-                        u"Certificate for user %s will not be resubmitted."
+                        "Certificate for user %s will not be resubmitted."  # pylint: disable=unicode-format-string
                     ), course_key, user.id
                 )
 
-        LOGGER.info("Finished resubmitting %s certificate tasks", resubmit_count)
+        LOGGER.info(u"Finished resubmitting %s certificate tasks", resubmit_count)
 
     def _load_course_with_cache(self, course_key, course_cache):
         """Retrieve the course, then cache it to avoid Mongo queries. """

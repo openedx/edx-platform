@@ -837,7 +837,7 @@ class MatlabTest(unittest.TestCase):
 
     def test_rendering_with_invalid_queue_msg(self):
         self.the_input.queue_msg = (u"<div class='matlabResponse'><div style='white-space:pre' class='commandWindowOutput'>"
-                                    u"\nans =\n\n\u0002\n\n</div><ul></ul></div>")
+                                    "\nans =\n\n\u0002\n\n</div><ul></ul></div>")  # pylint: disable=unicode-format-string
         context = self.the_input._get_render_context()  # pylint: disable=protected-access
 
         self.maxDiff = None

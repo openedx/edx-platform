@@ -35,7 +35,7 @@ class Course(object):
         except CourseOverview.DoesNotExist:
             # NOTE (CCB): Ideally, the course modes table should only contain data for courses that exist in
             # modulestore. If that is not the case, say for local development/testing, carry on without failure.
-            log.warning('Failed to retrieve CourseOverview for [%s]. Using empty course name.', course_id)
+            log.warning(u'Failed to retrieve CourseOverview for [%s]. Using empty course name.', course_id)
             return None
 
     def get_mode_display_name(self, mode):
@@ -105,7 +105,7 @@ class Course(object):
         try:
             course_id = CourseKey.from_string(unicode(course_id))
         except InvalidKeyError:
-            log.debug('[%s] is not a valid course key.', course_id)
+            log.debug(u'[%s] is not a valid course key.', course_id)
             raise ValueError
 
         course_modes = CourseMode.objects.filter(course_id=course_id)

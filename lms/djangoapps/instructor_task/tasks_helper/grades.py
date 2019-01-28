@@ -585,7 +585,7 @@ class ProblemGradeReport(object):
                 for scorable_block in subsection_info['scored_descendants']:
                     header_name = (
                         u"{assignment_type} {subsection_index}: "
-                        u"{subsection_name} - {scorable_block_name}"
+                        "{subsection_name} - {scorable_block_name}"  # pylint: disable=unicode-format-string
                     ).format(
                         scorable_block_name=scorable_block.display_name,
                         assignment_type=assignment_type_name,

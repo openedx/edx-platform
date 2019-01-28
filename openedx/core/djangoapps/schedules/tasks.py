@@ -51,11 +51,11 @@ def update_course_schedules(self, **kwargs):
             start=new_start_date,
             upgrade_deadline=new_upgrade_deadline
         )
-        LOG.info("Number of schedule records updated: %d", number_of_updated_records)
+        LOG.info(u"Number of schedule records updated: %d", number_of_updated_records)
     except Exception as exc:
-        LOG.exception("A broader exception to debug EDUCATOR-3965")
+        LOG.exception(u"A broader exception to debug EDUCATOR-3965")
         if not isinstance(exc, KNOWN_RETRY_ERRORS):
-            LOG.exception("Unexpected failure: task id: %s, kwargs=%s".format(self.request.id, kwargs))
+            LOG.exception(u"Unexpected failure: task id: %s, kwargs=%s".format(self.request.id, kwargs))
         raise self.retry(kwargs=kwargs, exc=exc)
 
 
@@ -91,11 +91,11 @@ class ScheduleMessageBaseTask(LoggedTask):
         current_date = resolvers._get_datetime_beginning_of_day(current_date)
 
         if not cls.is_enqueue_enabled(site):
-            cls.log_info('Message queuing disabled for site %s', site.domain)
+            cls.log_info(u'Message queuing disabled for site %s', site.domain)
             return
 
         target_date = current_date + datetime.timedelta(days=day_offset)
-        cls.log_info('Target date = %s', target_date.isoformat())
+        cls.log_info(u'Target date = %s', target_date.isoformat())
         for bin in range(cls.num_bins):
             task_args = (
                 site.id,
@@ -104,7 +104,7 @@ class ScheduleMessageBaseTask(LoggedTask):
                 bin,
                 override_recipient_email,
             )
-            cls.log_info('Launching task with args = %r', task_args)
+            cls.log_info(u'Launching task with args = %r', task_args)
             cls().apply_async(
                 task_args,
                 retry=False,
@@ -207,7 +207,7 @@ def _schedule_send(msg_str, site_id, delivery_config_var, log_prefix):
         user = User.objects.get(username=msg.recipient.username)
         with emulate_http_request(site=site, user=user):
             _annonate_send_task_for_monitoring(msg)
-            LOG.debug('%s: Sending message = %s', log_prefix, msg_str)
+            LOG.debug(u'%s: Sending message = %s', log_prefix, msg_str)
             ace.send(msg)
             _track_message_sent(site, user, msg)
 
@@ -252,7 +252,7 @@ def _is_delivery_enabled(site, delivery_config_var, log_prefix):
     if getattr(ScheduleConfig.current(site), delivery_config_var, False):
         return True
     else:
-        LOG.info('%s: Message delivery disabled for site %s', log_prefix, site.domain)
+        LOG.info(u'%s: Message delivery disabled for site %s', log_prefix, site.domain)
 
 
 def _annotate_for_monitoring(message_type, site, bin_num, target_day_str, day_offset):

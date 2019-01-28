@@ -168,7 +168,7 @@ UNVERIFIED_CERT_DATA = CertData(
     CertificateStatuses.unverified,
     _('Certificate unavailable'),
     _(
-        'You have not received a certificate because you do not have a current {platform_name} '
+        u'You have not received a certificate because you do not have a current {platform_name} '
         'verified identity.'
     ).format(platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)),
     download_url=None,
@@ -529,12 +529,12 @@ class CourseTabView(EdxFragmentView):
         if request.user.is_anonymous:
             PageLevelMessages.register_warning_message(
                 request,
-                Text(_("To see course content, {sign_in_link} or {register_link}.")).format(
-                    sign_in_link=HTML('<a href="/login?next={current_url}">{sign_in_label}</a>').format(
+                Text(_(u"To see course content, {sign_in_link} or {register_link}.")).format(
+                    sign_in_link=HTML(u'<a href="/login?next={current_url}">{sign_in_label}</a>').format(
                         sign_in_label=_("sign in"),
                         current_url=urlquote_plus(request.path),
                     ),
-                    register_link=HTML('<a href="/register?next={current_url}">{register_label}</a>').format(
+                    register_link=HTML(u'<a href="/register?next={current_url}">{register_label}</a>').format(
                         register_label=_("register"),
                         current_url=urlquote_plus(request.path),
                     ),
@@ -544,7 +544,7 @@ class CourseTabView(EdxFragmentView):
             if not CourseEnrollment.is_enrolled(request.user, course_key):
                 # Only show enroll button if course is open for enrollment.
                 if course_open_for_self_enrollment(course_key):
-                    enroll_message = _('You must be enrolled in the course to see course content. \
+                    enroll_message = _(u'You must be enrolled in the course to see course content. \
                             {enroll_link_start}Enroll now{enroll_link_end}.')
                     PageLevelMessages.register_warning_message(
                         request,
@@ -1195,9 +1195,9 @@ def submission_history(request, course_id, student_username, location):
 
     if len(scores) != len(history_entries):
         log.warning(
-            "Mismatch when fetching scores for student "
-            "history for course %s, user %s, xblock %s. "
-            "%d scores were found, and %d history entries were found. "
+            u"Mismatch when fetching scores for student "
+            "history for course %s, user %s, xblock %s. "  # pylint: disable=unicode-format-string
+            "%d scores were found, and %d history entries were found. "  # pylint: disable=unicode-format-string
             "Matching scores to history entries by date for display.",
             course_id,
             student_username,
@@ -1240,7 +1240,7 @@ def get_static_tab_fragment(request, course, tab):
         request.user, request, loc, field_data_cache, static_asset_path=course.static_asset_path, course=course
     )
 
-    logging.debug('course_module = %s', tab_module)
+    logging.debug(u'course_module = %s', tab_module)
 
     fragment = Fragment()
     if tab_module is not None:
@@ -1388,7 +1388,7 @@ def generate_user_cert(request, course_id):
     if not request.user.is_authenticated:
         log.info(u"Anon user trying to generate certificate for %s", course_id)
         return HttpResponseBadRequest(
-            _('You must be signed in to {platform_name} to create a certificate.').format(
+            _(u'You must be signed in to {platform_name} to create a certificate.').format(
                 platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
             )
         )
@@ -1464,7 +1464,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
     requested_view = request.GET.get('view', 'student_view')
     if requested_view != 'student_view':
         return HttpResponseBadRequest(
-            "Rendering of the xblock view '{}' is not supported.".format(bleach.clean(requested_view, strip=True))
+            u"Rendering of the xblock view '{}' is not supported.".format(bleach.clean(requested_view, strip=True))
         )
 
     with modulestore().bulk_operations(course_key):
@@ -1509,8 +1509,8 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
 # Translators: "percent_sign" is the symbol "%". "platform_name" is a
 # string identifying the name of this installation, such as "edX".
 FINANCIAL_ASSISTANCE_HEADER = _(
-    '{platform_name} now offers financial assistance for learners who want to earn Verified Certificates but'
-    ' who may not be able to pay the Verified Certificate fee. Eligible learners may receive up to 90{percent_sign} off'
+    u'{platform_name} now offers financial assistance for learners who want to earn Verified Certificates but'
+    u' who may not be able to pay the Verified Certificate fee. Eligible learners may receive up to 90{percent_sign} off'
     ' the Verified Certificate fee for a course.\nTo apply for financial assistance, enroll in the'
     ' audit track for a course that offers Verified Certificates, and then complete this application.'
     ' Note that you must complete a separate application for each course you take.\n We plan to use this'

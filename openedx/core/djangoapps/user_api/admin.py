@@ -102,7 +102,7 @@ class UserRetirementStatusAdmin(admin.ModelAdmin):
         try:
             if obj.current_state.state_name == 'PENDING':
                 return format_html(
-                    '<a class="button" href="{}">{}</a>&nbsp;',
+                    u'<a class="button" href="{}">{}</a>&nbsp;',
                     reverse('admin:cancel-retirement', args=[obj.pk]),
                     _('Cancel')
                 )
@@ -190,7 +190,7 @@ class UserRetirementPartnerReportingStatusAdmin(admin.ModelAdmin):
         if rows_updated == 1:
             message_bit = "one user was"
         else:
-            message_bit = "%s users were" % rows_updated
-        self.message_user(request, "%s successfully reset." % message_bit)
+            message_bit = u"%s users were" % rows_updated
+        self.message_user(request, u"%s successfully reset." % message_bit)
 
     reset_state.short_description = 'Reset is_being_processed to False'

@@ -39,7 +39,7 @@ class XQueueAddToQueueError(Exception):
     def __unicode__(self):
         return (
             u"Could not add certificate to the XQueue.  "
-            u"The error code was '{code}' and the message was '{msg}'."
+            "The error code was '{code}' and the message was '{msg}'."  # pylint: disable=unicode-format-string
         ).format(
             code=self.error_code,
             msg=self.error_msg
@@ -129,8 +129,8 @@ class XQueueCertInterface(object):
             LOGGER.info(
                 (
                     u"Found an existing certificate entry for student %s "
-                    u"in course '%s' "
-                    u"with status '%s' while regenerating certificates. "
+                    "in course '%s' "
+                    "with status '%s' while regenerating certificates. "
                 ),
                 student.id,
                 unicode(course_id),
@@ -143,7 +143,7 @@ class XQueueCertInterface(object):
             LOGGER.info(
                 (
                     u"The certificate status for student %s "
-                    u"in course '%s' has been changed to '%s'."
+                    "in course '%s' has been changed to '%s'."
                 ),
                 student.id,
                 unicode(course_id),
@@ -216,8 +216,8 @@ class XQueueCertInterface(object):
             LOGGER.warning(
                 (
                     u"Cannot create certificate generation task for user %s "
-                    u"in the course '%s'; "
-                    u"certificates are not allowed for CCX courses."
+                    "in the course '%s'; "  # pylint: disable=unicode-format-string
+                    "certificates are not allowed for CCX courses."
                 ),
                 student.id,
                 unicode(course_id)
@@ -244,8 +244,8 @@ class XQueueCertInterface(object):
             LOGGER.warning(
                 (
                     u"Cannot create certificate generation task for user %s "
-                    u"in the course '%s'; "
-                    u"the certificate status '%s' is not one of %s."
+                    "in the course '%s'; "  # pylint: disable=unicode-format-string
+                    "the certificate status '%s' is not one of %s."  # pylint: disable=unicode-format-string
                 ),
                 student.id,
                 unicode(course_id),
@@ -296,10 +296,10 @@ class XQueueCertInterface(object):
         LOGGER.info(
             (
                 u"Certificate generated for student %s in the course: %s with template: %s. "
-                u"given template: %s, "
-                u"user is verified: %s, "
-                u"mode is verified: %s,"
-                u"generate_pdf is: %s"
+                "given template: %s, "  # pylint: disable=unicode-format-string
+                "user is verified: %s, "  # pylint: disable=unicode-format-string
+                "mode is verified: %s,"  # pylint: disable=unicode-format-string
+                "generate_pdf is: %s"  # pylint: disable=unicode-format-string
             ),
             student.username,
             unicode(course_id),
@@ -328,10 +328,10 @@ class XQueueCertInterface(object):
             LOGGER.info(
                 (
                     u"Could not retrieve grade for student %s "
-                    u"in the course '%s' "
-                    u"because an exception occurred while parsing the "
-                    u"grade contents '%s' as HTML. "
-                    u"The exception was: '%s'"
+                    "in the course '%s' "  # pylint: disable=unicode-format-string
+                    "because an exception occurred while parsing the "
+                    "grade contents '%s' as HTML. "  # pylint: disable=unicode-format-string
+                    "The exception was: '%s'"  # pylint: disable=unicode-format-string
                 ),
                 student.id,
                 unicode(course_id),
@@ -373,8 +373,8 @@ class XQueueCertInterface(object):
             LOGGER.info(
                 (
                     u"Student %s does not have a grade for '%s', "
-                    u"so their certificate status has been set to '%s'. "
-                    u"No certificate generation task was sent to the XQueue."
+                    "so their certificate status has been set to '%s'. "  # pylint: disable=unicode-format-string
+                    "No certificate generation task was sent to the XQueue."
                 ),
                 student.id,
                 unicode(course_id),
@@ -408,8 +408,8 @@ class XQueueCertInterface(object):
             LOGGER.info(
                 (
                     u"User %s has a verified enrollment in course %s "
-                    u"but is missing ID verification. "
-                    u"Certificate status has been set to unverified"
+                    "but is missing ID verification. "
+                    "Certificate status has been set to unverified"
                 ),
                 student.id,
                 unicode(course_id),
@@ -457,17 +457,17 @@ class XQueueCertInterface(object):
                 LOGGER.critical(
                     (
                         u"Could not add certificate task to XQueue.  "
-                        u"The course was '%s' and the student was '%s'."
-                        u"The certificate task status has been marked as 'error' "
-                        u"and can be re-submitted with a management command."
+                        "The course was '%s' and the student was '%s'."  # pylint: disable=unicode-format-string
+                        "The certificate task status has been marked as 'error' "
+                        "and can be re-submitted with a management command."
                     ), course_id, student.id
                 )
             else:
                 LOGGER.info(
                     (
                         u"The certificate status has been set to '%s'.  "
-                        u"Sent a certificate grading task to the XQueue "
-                        u"with the key '%s'. "
+                        "Sent a certificate grading task to the XQueue "
+                        "with the key '%s'. "  # pylint: disable=unicode-format-string
                     ),
                     cert.status,
                     key
@@ -531,8 +531,8 @@ class XQueueCertInterface(object):
             LOGGER.critical(
                 (
                     u"Could not add example certificate with uuid '%s' to XQueue.  "
-                    u"The exception was %s.  "
-                    u"The example certificate has been marked with status 'error'."
+                    "The exception was %s.  "  # pylint: disable=unicode-format-string
+                    "The example certificate has been marked with status 'error'."
                 ), example_cert.uuid, unicode(exc)
             )
 

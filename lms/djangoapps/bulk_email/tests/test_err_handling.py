@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# pylint: disable=unicode-format-string
 """
 Unit tests for handling email sending errors
 """

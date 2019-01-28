@@ -219,7 +219,7 @@ class AssetIndexPageStudioFrontend(CoursePage):
         """Delete the asset with the specified name."""
         names = self.asset_files_names
         if name not in names:
-            raise LookupError('Asset with filename {} not found.'.format(name))
+            raise LookupError(u'Asset with filename {} not found.'.format(name))
         delete_buttons = self.asset_delete_buttons
         assets = dict(zip(names, delete_buttons))
         # Now click the link in that row

@@ -115,8 +115,8 @@ class TestPaverDatabaseTasks(MockS3Mixin, PaverTestCase):
             # Make sure that the local cache files are used - NOT downloaded from s3
             self.assertFalse(_mock_get_file.called)
         calls = [
-            call('{}/scripts/reset-test-db.sh --calculate_migrations'.format(Env.REPO_ROOT)),
-            call('{}/scripts/reset-test-db.sh --use-existing-db'.format(Env.REPO_ROOT))
+            call(u'{}/scripts/reset-test-db.sh --calculate_migrations'.format(Env.REPO_ROOT)),
+            call(u'{}/scripts/reset-test-db.sh --use-existing-db'.format(Env.REPO_ROOT))
         ]
         _mock_sh.assert_has_calls(calls)
 
@@ -156,8 +156,8 @@ class TestPaverDatabaseTasks(MockS3Mixin, PaverTestCase):
                 'moto_test_bucket', self.fingerprint_filename, db_utils.CACHE_FOLDER
             )
         calls = [
-            call('{}/scripts/reset-test-db.sh --calculate_migrations'.format(Env.REPO_ROOT)),
-            call('{}/scripts/reset-test-db.sh --use-existing-db'.format(Env.REPO_ROOT))
+            call(u'{}/scripts/reset-test-db.sh --calculate_migrations'.format(Env.REPO_ROOT)),
+            call(u'{}/scripts/reset-test-db.sh --use-existing-db'.format(Env.REPO_ROOT))
         ]
         _mock_sh.assert_has_calls(calls)
 
@@ -184,8 +184,8 @@ class TestPaverDatabaseTasks(MockS3Mixin, PaverTestCase):
 
         database.update_local_bokchoy_db_from_s3()  # pylint: disable=no-value-for-parameter
         calls = [
-            call('{}/scripts/reset-test-db.sh --calculate_migrations'.format(Env.REPO_ROOT)),
-            call('{}/scripts/reset-test-db.sh --rebuild_cache --use-existing-db'.format(Env.REPO_ROOT))
+            call(u'{}/scripts/reset-test-db.sh --calculate_migrations'.format(Env.REPO_ROOT)),
+            call(u'{}/scripts/reset-test-db.sh --rebuild_cache --use-existing-db'.format(Env.REPO_ROOT))
         ]
         _mock_sh.assert_has_calls(calls)
 

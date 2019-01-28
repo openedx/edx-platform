@@ -89,7 +89,7 @@ class CourseMode(models.Model):
         verbose_name=_(u"Upgrade Deadline"),
         help_text=_(
             u"OPTIONAL: After this date/time, users will no longer be able to enroll in this mode. "
-            u"Leave this blank if users can enroll in this mode until enrollment closes for the course."
+            "Leave this blank if users can enroll in this mode until enrollment closes for the course."
         ),
         db_column='expiration_datetime',
     )
@@ -120,7 +120,7 @@ class CourseMode(models.Model):
         verbose_name="SKU",
         help_text=_(
             u"OPTIONAL: This is the SKU (stock keeping unit) of this mode in the external ecommerce service.  "
-            u"Leave this blank if the course has not yet been migrated to the ecommerce service."
+            "Leave this blank if the course has not yet been migrated to the ecommerce service."
         )
     )
 

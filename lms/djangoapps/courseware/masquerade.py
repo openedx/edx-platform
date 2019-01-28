@@ -86,7 +86,7 @@ def handle_ajax(request, course_key_string):
             return JsonResponse({
                 'success': False,
                 'error': _(
-                    'There is no user with the username or email address "{user_identifier}" '
+                    u'There is no user with the username or email address u"{user_identifier}" '
                     'enrolled in this course.'
                 ).format(user_identifier=user_name)
             })

@@ -201,7 +201,7 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
 
     def test_get_students_problem_grades_csv(self):
 
-        tooltip = 'P1.2.1 Q1 - 3382 Students (100%: 1/1 questions)'
+        tooltip = u'P1.2.1 Q1 - 3382 Students (100%: 1/1 questions)'
         attributes = '?module_id=' + text_type(self.item.location) + '&tooltip=' + tooltip + '&csv=true'
         request = self.request_factory.get(reverse('get_students_problem_grades') + attributes)
 

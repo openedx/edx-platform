@@ -259,7 +259,7 @@ class UserMappingViewAPITests(TpaAPITestCase):
         if access_token == 'valid-token':
             access_token = token.token
 
-        response = self.client.get(url, HTTP_AUTHORIZATION='Bearer {}'.format(access_token))
+        response = self.client.get(url, HTTP_AUTHORIZATION=u'Bearer {}'.format(access_token))
         self._verify_response(response, expect_code, expect_data)
 
     @ddt.data(

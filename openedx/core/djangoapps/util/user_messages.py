@@ -164,7 +164,7 @@ class UserMessageCollection():
             for __, type in UserMessageType.__members__.items():
                 if type.value is level:
                     return type
-            raise 'Unable to find UserMessageType for level {level}'.format(level=level)
+            raise u'Unable to find UserMessageType for level {level}'.format(level=level)
 
         def _create_user_message(message):
             """
@@ -200,9 +200,9 @@ class PageLevelMessages(UserMessageCollection):
             title_area = ''
         if dismissable:
             dismiss_button = HTML(
-                '<div class="message-actions">'
+                u'<div class="message-actions">'
                 '<button class="btn-link action-dismiss">'
-                '<span class="sr">{dismiss_text}</span>'
+                '<span class="sr">{dismiss_text}</span>'  # pylint: disable=unicode-format-string
                 '<span class="icon fa fa-times" aria-hidden="true"></span></button>'
                 '</div>'
             ).format(
@@ -212,7 +212,7 @@ class PageLevelMessages(UserMessageCollection):
             dismiss_button = ''
         return Text('{title_area}{body_area}{dismiss_button}').format(
             title_area=title_area,
-            body_area=HTML('<div class="message-content">{body_html}</div>').format(
+            body_area=HTML(u'<div class="message-content">{body_html}</div>').format(
                 body_html=body_html,
             ),
             dismiss_button=dismiss_button,

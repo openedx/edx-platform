@@ -181,8 +181,8 @@ class CertificateWhitelist(models.Model):
                 'user_name': unicode(item.user.username),
                 'user_email': unicode(item.user.email),
                 'course_id': unicode(item.course_id),
-                'created': item.created.strftime("%B %d, %Y"),
-                'certificate_generated': certificate_generated and certificate_generated.strftime("%B %d, %Y"),
+                'created': item.created.strftime(u"%B %d, %Y"),
+                'certificate_generated': certificate_generated and certificate_generated.strftime(u"%B %d, %Y"),
                 'notes': unicode(item.notes or ''),
             })
         return result
@@ -480,7 +480,7 @@ class CertificateInvalidation(TimeStampedModel):
                 'id': certificate_invalidation.id,
                 'user': certificate_invalidation.generated_certificate.user.username,
                 'invalidated_by': certificate_invalidation.invalidated_by.username,
-                'created': certificate_invalidation.created.strftime("%B %d, %Y"),
+                u'created': certificate_invalidation.created.strftime(u"%B %d, %Y"),
                 'notes': certificate_invalidation.notes,
             })
         return data
@@ -735,8 +735,8 @@ class ExampleCertificate(TimeStampedModel):
         max_length=255,
         help_text=_(
             u"A human-readable description of the example certificate.  "
-            u"For example, 'verified' or 'honor' to differentiate between "
-            u"two types of certificates."
+            "For example, 'verified' or 'honor' to differentiate between "
+            "two types of certificates."
         )
     )
 
@@ -750,8 +750,8 @@ class ExampleCertificate(TimeStampedModel):
         unique=True,
         help_text=_(
             u"A unique identifier for the example certificate.  "
-            u"This is used when we receive a response from the queue "
-            u"to determine which example certificate was processed."
+            "This is used when we receive a response from the queue "
+            "to determine which example certificate was processed."
         )
     )
 
@@ -761,9 +761,9 @@ class ExampleCertificate(TimeStampedModel):
         db_index=True,
         help_text=_(
             u"An access key for the example certificate.  "
-            u"This is used when we receive a response from the queue "
-            u"to validate that the sender is the same entity we asked "
-            u"to generate the certificate."
+            "This is used when we receive a response from the queue "
+            "to validate that the sender is the same entity we asked "
+            "to generate the certificate."
         )
     )
 
@@ -883,25 +883,25 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
         default=False,
         help_text=(
             u"Allow students to generate their own certificates for the course. "
-            u"Enabling this does NOT affect usage of the management command used "
-            u"for batch certificate generation."
+            "Enabling this does NOT affect usage of the management command used "
+            "for batch certificate generation."
         )
     )
     language_specific_templates_enabled = models.BooleanField(
         default=False,
         help_text=(
             u"Render translated certificates rather than using the platform's "
-            u"default language. Available translations are controlled by the "
-            u"certificate template."
+            "default language. Available translations are controlled by the "
+            "certificate template."
         )
     )
     include_hours_of_effort = models.NullBooleanField(
         default=None,
         help_text=(
             u"Display estimated time to complete the course, which is equal to the maximum hours of effort per week "
-            u"times the length of the course in weeks. This attribute will only be displayed in a certificate when the "
-            u"attributes 'Weeks to complete' and 'Max effort' have been provided for the course run and its certificate "
-            u"template includes Hours of Effort."
+            "times the length of the course in weeks. This attribute will only be displayed in a certificate when the "
+            "attributes 'Weeks to complete' and 'Max effort' have been provided for the course run and its certificate "
+            "template includes Hours of Effort."
         )
     )
 

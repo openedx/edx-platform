@@ -81,7 +81,7 @@ class TestUserInfoApi(MobileAPITestCase, MobileAuthTestMixin):
 @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
 class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTestMixin,
                             MobileCourseAccessTestMixin, MilestonesTestCaseMixin):
-    """
+    u"""
     Tests for /api/mobile/{api_version}/users/<user_name>/course_enrollments/
     """
     REVERSE_INFO = {'name': 'courseenrollment-detail', 'params': ['username', 'api_version']}
@@ -435,7 +435,7 @@ class CourseStatusAPITestCase(MobileAPITestCase):
 @attr(shard=9)
 class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin,
                           MobileCourseAccessTestMixin, MilestonesTestCaseMixin):
-    """
+    u"""
     Tests for GET of /api/mobile/v0.5/users/<user_name>/course_status_info/{course_id}
     """
     def test_success(self):
@@ -455,7 +455,7 @@ class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin,
 @attr(shard=9)
 class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin,
                             MobileCourseAccessTestMixin, MilestonesTestCaseMixin):
-    """
+    u"""
     Tests for PATCH of /api/mobile/v0.5/users/<user_name>/course_status_info/{course_id}
     """
     def url_method(self, url, **kwargs):  # pylint: disable=arguments-differ

@@ -45,7 +45,7 @@ class SSLClientTest(ModuleStoreTestCase):
     Tests SSL Authentication code sections of external_auth
     """
 
-    AUTH_DN = '/C=US/ST=Massachusetts/O=Massachusetts Institute of Technology/OU=Client CA v1/CN={0}/emailAddress={1}'
+    AUTH_DN = u'/C=US/ST=Massachusetts/O=Massachusetts Institute of Technology/OU=Client CA v1/CN={0}/emailAddress={1}'
     USER_NAME = 'test_user_ssl'
     USER_EMAIL = 'test_user_ssl@EDX.ORG'
     MOCK_URL = '/'
@@ -98,7 +98,7 @@ class SSLClientTest(ModuleStoreTestCase):
         try:
             ExternalAuthMap.objects.get(external_id=self.USER_EMAIL)
         except ExternalAuthMap.DoesNotExist, ex:
-            self.fail('User did not get properly added to external auth map, exception was {0}'.format(str(ex)))
+            self.fail(u'User did not get properly added to external auth map, exception was {0}'.format(str(ex)))
 
         with self.assertRaises(User.DoesNotExist):
             User.objects.get(email=self.USER_EMAIL)
@@ -117,7 +117,7 @@ class SSLClientTest(ModuleStoreTestCase):
         try:
             ExternalAuthMap.objects.get(external_id=self.USER_EMAIL)
         except ExternalAuthMap.DoesNotExist, ex:
-            self.fail('User did not get properly added to external auth map, exception was {0}'.format(str(ex)))
+            self.fail(u'User did not get properly added to external auth map, exception was {0}'.format(str(ex)))
 
         with self.assertRaises(User.DoesNotExist):
             User.objects.get(email=self.USER_EMAIL)
@@ -136,11 +136,11 @@ class SSLClientTest(ModuleStoreTestCase):
         try:
             ExternalAuthMap.objects.get(external_id=self.USER_EMAIL)
         except ExternalAuthMap.DoesNotExist, ex:
-            self.fail('User did not get properly added to external auth map, exception was {0}'.format(str(ex)))
+            self.fail(u'User did not get properly added to external auth map, exception was {0}'.format(str(ex)))
         try:
             User.objects.get(email=self.USER_EMAIL)
         except ExternalAuthMap.DoesNotExist, ex:
-            self.fail('User did not get properly added to internal users, exception was {0}'.format(str(ex)))
+            self.fail(u'User did not get properly added to internal users, exception was {0}'.format(str(ex)))
 
     @skip_unless_cms
     @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH_IMMEDIATE_SIGNUP)
@@ -162,11 +162,11 @@ class SSLClientTest(ModuleStoreTestCase):
         try:
             ExternalAuthMap.objects.get(external_id=self.USER_EMAIL)
         except ExternalAuthMap.DoesNotExist, ex:
-            self.fail('User did not get properly added to external auth map, exception was {0}'.format(str(ex)))
+            self.fail(u'User did not get properly added to external auth map, exception was {0}'.format(str(ex)))
         try:
             User.objects.get(email=self.USER_EMAIL)
         except ExternalAuthMap.DoesNotExist, ex:
-            self.fail('User did not get properly added to internal users, exception was {0}'.format(str(ex)))
+            self.fail(u'User did not get properly added to internal users, exception was {0}'.format(str(ex)))
 
     @skip_unless_lms
     @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH_IMMEDIATE_SIGNUP)
@@ -323,11 +323,11 @@ class SSLClientTest(ModuleStoreTestCase):
         try:
             ExternalAuthMap.objects.get(external_id=self.USER_EMAIL)
         except ExternalAuthMap.DoesNotExist, ex:
-            self.fail('User did not get properly added to external auth map, exception was {0}'.format(str(ex)))
+            self.fail(u'User did not get properly added to external auth map, exception was {0}'.format(str(ex)))
         try:
             User.objects.get(email=self.USER_EMAIL)
         except ExternalAuthMap.DoesNotExist, ex:
-            self.fail('User did not get properly added to internal users, exception was {0}'.format(str(ex)))
+            self.fail(u'User did not get properly added to internal users, exception was {0}'.format(str(ex)))
         self.assertEqual(1, len(ExternalAuthMap.objects.all()))
 
         self.assertTrue(self.mock.called)

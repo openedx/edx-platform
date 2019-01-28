@@ -1,4 +1,4 @@
-"""
+u"""
 Library for quickly accessing basic course metadata.
 
 The rationale behind this app is that loading course metadata from the Split

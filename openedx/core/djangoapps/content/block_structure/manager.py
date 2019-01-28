@@ -68,7 +68,7 @@ class BlockStructureManager(object):
             # as part of the transformation.
             if starting_block_usage_key not in block_structure:
                 raise UsageKeyNotInBlockStructure(
-                    "The requested usage_key '{0}' is not found in the block_structure with root '{1}'",
+                    u"The requested usage_key '{0}' is not found in the block_structure with root '{1}'",
                     unicode(starting_block_usage_key),
                     unicode(self.root_block_usage_key),
                 )

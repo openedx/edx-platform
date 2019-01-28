@@ -141,7 +141,7 @@ def _write_chunk(request, courselike_key):
         if not course_dir.isdir():
             os.mkdir(course_dir)
 
-        logging.debug('importing course to {0}'.format(temp_filepath))
+        logging.debug(u'importing course to {0}'.format(temp_filepath))
 
         # Get upload chunks byte ranges
         try:
@@ -198,7 +198,7 @@ def _write_chunk(request, courselike_key):
                 }]
             })
 
-        log.info("Course import %s: Upload complete", courselike_key)
+        log.info(u"Course import %s: Upload complete", courselike_key)
         with open(temp_filepath, 'rb') as local_file:
             django_file = File(local_file)
             storage_path = course_import_export_storage.save(u'olx_import/' + filename, django_file)
@@ -210,7 +210,7 @@ def _write_chunk(request, courselike_key):
         _save_request_status(request, courselike_string, -1)
         if course_dir.isdir():
             shutil.rmtree(course_dir)
-            log.info("Course import %s: Temp data cleared", courselike_key)
+            log.info(u"Course import %s: Temp data cleared", courselike_key)
 
         log.exception(
             "error importing course"
@@ -277,7 +277,7 @@ def send_tarball(tarball, size):
     """
     wrapper = FileWrapper(tarball, settings.COURSE_EXPORT_DOWNLOAD_CHUNK_SIZE)
     response = StreamingHttpResponse(wrapper, content_type='application/x-tgz')
-    response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(tarball.name.encode('utf-8'))
+    response['Content-Disposition'] = u'attachment; filename=%s' % os.path.basename(tarball.name.encode('utf-8'))
     response['Content-Length'] = size
     return response
 
@@ -375,7 +375,7 @@ def export_status_handler(request, course_key_string):
             output_url = reverse_course_url('export_output_handler', course_key)
         elif isinstance(artifact.file.storage, S3BotoStorage):
             filename = os.path.basename(artifact.file.name).encode('utf-8')
-            disposition = 'attachment; filename="{}"'.format(filename)
+            disposition = u'attachment; filename="{}"'.format(filename)
             output_url = artifact.file.storage.url(artifact.file.name, response_headers={
                 'response-content-disposition': disposition,
                 'response-content-encoding': 'application/octet-stream',

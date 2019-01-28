@@ -320,8 +320,8 @@ class TestMigrateTranscripts(ModuleStoreTestCase):
 
         if all_courses:
             mock_logger.info.assert_called_with(
-                ('[Transcript Migration] Courses(total): %s, Courses(migrated): %s, '
-                 'Courses(non-migrated): %s, Courses(migration-in-process): %s'),
+                (u'[Transcript Migration] Courses(total): %s, Courses(migrated): %s, '
+                 u'Courses(non-migrated): %s, Courses(migration-in-process): %s'),
                 2, 0, 2, batch_size
             )
 

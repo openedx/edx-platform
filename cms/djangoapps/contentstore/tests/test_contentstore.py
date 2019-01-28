@@ -161,7 +161,7 @@ class ImportRequiredTestCases(ContentStoreTestCase):
 
         # Test course export does not fail
         root_dir = path(mkdtemp_clean())
-        print('Exporting to tempdir = {0}'.format(root_dir))
+        print(u'Exporting to tempdir = {0}'.format(root_dir))
         export_course_to_xml(self.store, content_store, course.id, root_dir, u'test_export')
 
         filesystem = OSFS(text_type(root_dir / 'test_export/static'))
@@ -260,7 +260,7 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         # now export the course to a tempdir and test that it contains files 'updates.html' and 'updates.items.json'
         # with same content as in course 'info' directory
         root_dir = path(mkdtemp_clean())
-        print('Exporting to tempdir = {0}'.format(root_dir))
+        print(u'Exporting to tempdir = {0}'.format(root_dir))
         export_course_to_xml(self.store, content_store, course.id, root_dir, u'test_export')
 
         # check that exported course has files 'updates.html' and 'updates.items.json'
@@ -318,7 +318,7 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         course_id = self.import_and_populate_course()
 
         root_dir = path(mkdtemp_clean())
-        print('Exporting to tempdir = {0}'.format(root_dir))
+        print(u'Exporting to tempdir = {0}'.format(root_dir))
 
         # export out to a tempdir
         export_course_to_xml(self.store, content_store, course_id, root_dir, u'test_export')
@@ -420,7 +420,7 @@ class ImportRequiredTestCases(ContentStoreTestCase):
 
         root_dir = path(mkdtemp_clean())
 
-        print('Exporting to tempdir = {0}'.format(root_dir))
+        print(u'Exporting to tempdir = {0}'.format(root_dir))
 
         # export out to a tempdir
         export_course_to_xml(self.store, content_store, course_id, root_dir, u'test_export')
@@ -446,7 +446,7 @@ class ImportRequiredTestCases(ContentStoreTestCase):
 
         root_dir = path(mkdtemp_clean())
 
-        print('Exporting to tempdir = {0}'.format(root_dir))
+        print(u'Exporting to tempdir = {0}'.format(root_dir))
 
         # export out to a tempdir
         export_course_to_xml(self.store, content_store, course_id, root_dir, u'test_export')
@@ -546,7 +546,7 @@ class ImportRequiredTestCases(ContentStoreTestCase):
 
         root_dir = path(mkdtemp_clean())
 
-        print('Exporting to tempdir = {0}'.format(root_dir))
+        print(u'Exporting to tempdir = {0}'.format(root_dir))
         export_course_to_xml(self.store, None, course_id, root_dir, u'test_export_no_content_store')
 
         # Delete the course from module store and reimport it
@@ -719,7 +719,7 @@ class MiscCourseTests(ContentStoreTestCase):
 
         # Now export the course to a tempdir and test that it contains assets. The export should pass
         root_dir = path(mkdtemp_clean())
-        print('Exporting to tempdir = {0}'.format(root_dir))
+        print(u'Exporting to tempdir = {0}'.format(root_dir))
         export_course_to_xml(self.store, content_store, self.course.id, root_dir, u'test_export')
 
         filesystem = OSFS(root_dir / 'test_export/static')
@@ -779,7 +779,7 @@ class MiscCourseTests(ContentStoreTestCase):
 
         # Now export the course to a tempdir and test that it contains assets.
         root_dir = path(mkdtemp_clean())
-        print('Exporting to tempdir = {0}'.format(root_dir))
+        print(u'Exporting to tempdir = {0}'.format(root_dir))
         export_course_to_xml(self.store, content_store, self.course.id, root_dir, u'test_export')
 
         # Verify that asset have been overwritten during export.
@@ -1908,7 +1908,7 @@ class RerunCourseTest(ContentStoreTestCase):
 
     def get_unsucceeded_course_action_elements(self, html, course_key):
         """Returns the elements in the unsucceeded course action section that have the given course_key"""
-        return html.cssselect('.courses-processing li[data-course-key="{}"]'.format(text_type(course_key)))
+        return html.cssselect(u'.courses-processing li[data-course-key="{}"]'.format(text_type(course_key)))
 
     def assertInCourseListing(self, course_key):
         """

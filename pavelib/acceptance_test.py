@@ -61,5 +61,5 @@ def test_acceptance(options, passthrough_options):
         )
         print(msg)
 
-    suite = AcceptanceTestSuite('{} acceptance'.format(opts['system']), **opts)
+    suite = AcceptanceTestSuite(u'{} acceptance'.format(opts['system']), **opts)
     suite.run()

@@ -79,8 +79,8 @@ class BadgrBackend(BadgeBackend):
         except HTTPError:
             LOGGER.error(
                 u"Encountered an error when contacting the Badgr-Server. Request sent to %r with headers %r.\n"
-                u"and data values %r\n"
-                u"Response status was %s.\n%s",
+                "and data values %r\n"
+                "Response status was %s.\n%s",
                 response.request.url, response.request.headers,
                 data,
                 response.status_code, response.content
@@ -98,7 +98,7 @@ class BadgrBackend(BadgeBackend):
         if not content_type:
             raise ValueError(
                 u"Could not determine content-type of image! Make sure it is a properly named .png file. "
-                u"Filename was: {}".format(image.name)
+                "Filename was: {}".format(image.name)
             )
         files = {'image': (image.name, image, content_type)}
         data = {
@@ -159,7 +159,7 @@ class BadgrBackend(BadgeBackend):
         """
         Headers to send along with the request-- used for authentication.
         """
-        return {'Authorization': 'Token {}'.format(settings.BADGR_API_TOKEN)}
+        return {'Authorization': u'Token {}'.format(settings.BADGR_API_TOKEN)}
 
     def _ensure_badge_created(self, badge_class):
         """

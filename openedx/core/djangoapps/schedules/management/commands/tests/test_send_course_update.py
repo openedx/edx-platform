@@ -50,7 +50,7 @@ class TestSendCourseUpdate(ScheduleUpsellTestMixin, ScheduleSendEmailTestMixin, 
         super(TestSendCourseUpdate, self).setUp()
         self.highlights_patcher = patch('openedx.core.djangoapps.schedules.resolvers.get_week_highlights')
         mock_highlights = self.highlights_patcher.start()
-        mock_highlights.return_value = ['Highlight {}'.format(num + 1) for num in range(3)]
+        mock_highlights.return_value = [u'Highlight {}'.format(num + 1) for num in range(3)]
         self.addCleanup(self.stop_highlights_patcher)
 
     def stop_highlights_patcher(self):

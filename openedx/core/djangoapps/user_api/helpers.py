@@ -55,8 +55,8 @@ def intercept_errors(api_error, ignore_errors=None):
                     if isinstance(ex, ignored):
                         msg = (
                             u"A handled error occurred when calling '{func_name}' "
-                            u"with arguments '{args}' and keyword arguments '{kwargs}': "
-                            u"{exception}"
+                            "with arguments '{args}' and keyword arguments '{kwargs}': "  # pylint: disable=unicode-format-string
+                            "{exception}"  # pylint: disable=unicode-format-string
                         ).format(
                             func_name=func.func_name,
                             args=args,
@@ -71,8 +71,8 @@ def intercept_errors(api_error, ignore_errors=None):
                 # Otherwise, log the error and raise the API-specific error
                 msg = (
                     u"An unexpected error occurred when calling '{func_name}' "
-                    u"with arguments '{args}' and keyword arguments '{kwargs}' from {caller}: "
-                    u"{exception}"
+                    "with arguments '{args}' and keyword arguments '{kwargs}' from {caller}: "  # pylint: disable=unicode-format-string
+                    "{exception}"  # pylint: disable=unicode-format-string
                 ).format(
                     func_name=func.func_name,
                     args=args,
@@ -268,7 +268,7 @@ class FormDescription(object):
                 if key in allowed_restrictions:
                     field_dict["restrictions"][key] = val
                 else:
-                    msg = "Restriction '{restriction}' is not allowed for field type '{field_type}'".format(
+                    msg = u"Restriction '{restriction}' is not allowed for field type '{field_type}'".format(
                         restriction=key,
                         field_type=field_type
                     )

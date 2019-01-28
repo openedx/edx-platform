@@ -40,7 +40,7 @@ class Command(BaseCommand):
         try:
             user = user_from_str(options['email'])
         except User.DoesNotExist:
-            raise CommandError("No user found identified by {}".format(options['email']))
+            raise CommandError(u"No user found identified by {}".format(options['email']))
 
         return course_key, user.id, options['org'], options['course'], options['run']
 

@@ -366,7 +366,7 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
     def test_get_info_for_broken_output(self):
         # check for non-JSON task_output
         instructor_task = self._create_success_entry()
-        instructor_task.task_output = "{ bad"
+        instructor_task.task_output = u"{ bad"
         succeeded, message = get_task_completion_info(instructor_task)
         self.assertFalse(succeeded)
         self.assertEquals(message, "No parsable status information available")
@@ -382,7 +382,7 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
     def test_get_info_for_broken_input(self):
         # check for non-JSON task_input, but then just ignore it
         instructor_task = self._create_success_entry()
-        instructor_task.task_input = "{ bad"
+        instructor_task.task_input = u"{ bad"
         succeeded, message = get_task_completion_info(instructor_task)
         self.assertFalse(succeeded)
         self.assertEquals(message, "Status: rescored 2 of 3 (out of 5)")

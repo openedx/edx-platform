@@ -106,13 +106,13 @@ class ApiAccessRequest(TimeStampedModel):
 
     def approve(self):
         """Approve this request."""
-        log.info('Approving API request from user [%s].', self.user.id)
+        log.info(u'Approving API request from user [%s].', self.user.id)
         self.status = self.APPROVED
         self.save()
 
     def deny(self):
         """Deny this request."""
-        log.info('Denying API request from user [%s].', self.user.id)
+        log.info(u'Denying API request from user [%s].', self.user.id)
         self.status = self.DENIED
         self.save()
 
@@ -161,14 +161,14 @@ def _send_new_pending_email(instance):
     message = render_to_string('api_admin/api_access_request_email_new_request.txt', context)
     try:
         send_mail(
-            _('API access request from {company}').format(company=instance.company_name),
+            _(u'API access request from {company}').format(company=instance.company_name),
             message,
             settings.API_ACCESS_FROM_EMAIL,
             [settings.API_ACCESS_MANAGER_EMAIL],
             fail_silently=False
         )
     except SMTPException:
-        log.exception('Error sending API user notification email for request [%s].', instance.id)
+        log.exception(u'Error sending API user notification email for request [%s].', instance.id)
 
 
 def _send_decision_email(instance):
@@ -204,7 +204,7 @@ def _send_decision_email(instance):
         )
         instance.contacted = True
     except SMTPException:
-        log.exception('Error sending API user notification email for request [%s].', instance.id)
+        log.exception(u'Error sending API user notification email for request [%s].', instance.id)
 
 
 class Catalog(models.Model):

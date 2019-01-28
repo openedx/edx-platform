@@ -54,9 +54,9 @@ class SiteConfiguration(models.Model):
             try:
                 return self.values.get(name, default)
             except AttributeError as error:
-                logger.exception('Invalid JSON data. \n [%s]', error)
+                logger.exception(u'Invalid JSON data. \n [%s]', error)
         else:
-            logger.info("Site Configuration is not enabled for site (%s).", self.site)
+            logger.info(u"Site Configuration is not enabled for site (%s).", self.site)
 
         return default
 

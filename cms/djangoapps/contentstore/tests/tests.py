@@ -144,7 +144,7 @@ class AuthTestCase(ContentStoreTestCase):
             reverse('signup'),
         )
         for page in pages:
-            print("Checking '{0}'".format(page))
+            print(u"Checking '{0}'".format(page))
             self.check_page_get(page, 200)
 
     def test_create_account_errors(self):
@@ -268,7 +268,7 @@ class AuthTestCase(ContentStoreTestCase):
         # Not logged in.  Should redirect to login.
         print('Not logged in')
         for page in auth_pages:
-            print("Checking '{0}'".format(page))
+            print(u"Checking '{0}'".format(page))
             self.check_page_get(page, expected=302)
 
         # Logged in should work.
@@ -276,7 +276,7 @@ class AuthTestCase(ContentStoreTestCase):
 
         print('Logged in')
         for page in simple_auth_pages:
-            print("Checking '{0}'".format(page))
+            print(u"Checking '{0}'".format(page))
             self.check_page_get(page, expected=200)
 
     def test_index_auth(self):

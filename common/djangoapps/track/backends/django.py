@@ -52,8 +52,8 @@ class TrackingLog(models.Model):
     def __unicode__(self):
         fmt = (
             u"[{self.time}] {self.username}@{self.ip}: "
-            u"{self.event_source}| {self.event_type} | "
-            u"{self.page} | {self.event}"
+            "{self.event_source}| {self.event_type} | "  # pylint: disable=unicode-format-string
+            "{self.page} | {self.event}"  # pylint: disable=unicode-format-string
         )
         return fmt.format(self=self)
 

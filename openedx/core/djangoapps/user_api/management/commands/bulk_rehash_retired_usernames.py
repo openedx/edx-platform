@@ -55,7 +55,7 @@ class Command(BaseCommand):
             # match:
             if old_retired_username == new_retired_username:
                 print(
-                    'Skipping UserRetirementStatus ID {} / User ID {} because the hash would not change.'.format(
+                    u'Skipping UserRetirementStatus ID {} / User ID {} because the hash would not change.'.format(
                         retirement.id,
                         retirement.user.id,
                     )
@@ -63,8 +63,8 @@ class Command(BaseCommand):
             # Found an username to update
             else:
                 print(
-                    'Updating UserRetirementStatus ID {} / User ID {} '
-                    'to rehash their retired username: {} -> {}'.format(
+                    u'Updating UserRetirementStatus ID {} / User ID {} '
+                    u'to rehash their retired username: {} -> {}'.format(
                         retirement.id,
                         retirement.user.id,
                         old_retired_username,
@@ -86,7 +86,7 @@ class Command(BaseCommand):
                         except comment_client.utils.CommentClientRequestError as e:
                             if e.status_code != 404:
                                 print(
-                                    'UserRetirementStatus ID {} User ID {} failed to rename in forums: {}'.format(
+                                    u'UserRetirementStatus ID {} User ID {} failed to rename in forums: {}'.format(
                                         retirement.id, retirement.user.id, text_type(e)
                                     )
                                 )
@@ -102,7 +102,7 @@ class Command(BaseCommand):
                             retirement.save()
                     except Exception as exc:  # pylint: disable=broad-except
                         print(
-                            'UserRetirementStatus ID {} User ID {} failed rename'.format(
+                            u'UserRetirementStatus ID {} User ID {} failed rename'.format(
                                 retirement.id, retirement.user.id
                             )
                         )
@@ -112,10 +112,10 @@ class Command(BaseCommand):
         if failed_retirements:
             print('------------------------------------------------------------')
             print(
-                'FAILED! {} retirements failed to rehash. Retirement IDs:\n{}'.format(
+                u'FAILED! {} retirements failed to rehash. Retirement IDs:\n{}'.format(
                     len(failed_retirements),
                     '\n'.join([text_type(r.id) for r in failed_retirements])
                 )
             )
         else:
-            print('Success! {} retirements examined.'.format(len(retirements)))
+            print(u'Success! {} retirements examined.'.format(len(retirements)))

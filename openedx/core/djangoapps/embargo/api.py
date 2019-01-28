@@ -84,8 +84,8 @@ def check_course_access(course_key, user=None, ip_address=None, url=None):
             log.info(
                 (
                     u"Blocking user %s from accessing course %s at %s "
-                    u"because the user's IP address %s appears to be "
-                    u"located in %s."
+                    "because the user's IP address %s appears to be "
+                    "located in %s."
                 ),
                 getattr(user, 'id', '<Not Authenticated>'),
                 course_key,
@@ -104,7 +104,7 @@ def check_course_access(course_key, user=None, ip_address=None, url=None):
             log.info(
                 (
                     u"Blocking user %s from accessing course %s at %s "
-                    u"because the user's profile country is %s."
+                    "because the user's profile country is %s."
                 ),
                 user.id, course_key, url, user_country_from_profile
             )

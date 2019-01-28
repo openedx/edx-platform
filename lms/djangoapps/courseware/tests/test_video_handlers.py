@@ -214,7 +214,7 @@ class TestTranscriptAvailableTranslationsDispatch(TestVideo):
     Tests for `available_translations` dispatch.
     """
     srt_file = _create_srt_file()
-    DATA = """
+    DATA = u"""
         <video show_captions="true"
         display_name="A Name"
         >
@@ -373,7 +373,7 @@ class TestTranscriptAvailableTranslationsBumperDispatch(TestVideo):
     Tests for `available_translations_bumper` dispatch.
     """
     srt_file = _create_srt_file()
-    DATA = """
+    DATA = u"""
         <video show_captions="true"
         display_name="A Name"
         >
@@ -549,7 +549,7 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
     """
 
     srt_file = _create_srt_file()
-    DATA = """
+    DATA = u"""
         <video
             show_captions="true"
             display_name="A Name"
@@ -829,7 +829,7 @@ class TestStudioTranscriptTranslationGetDispatch(TestVideo):
     Tests for `translation` dispatch GET HTTP method.
     """
     srt_file = _create_srt_file()
-    DATA = """
+    DATA = u"""
         <video show_captions="true"
         display_name="A Name"
         >
@@ -838,7 +838,7 @@ class TestStudioTranscriptTranslationGetDispatch(TestVideo):
             <transcript language="uk" src="{}"/>
             <transcript language="zh" src="{}"/>
         </video>
-    """.format(os.path.split(srt_file.name)[1], u"塞.srt".encode('utf8'))
+    """.format(os.path.split(srt_file.name)[1], u"塞.srt")
 
     MODEL_DATA = {'data': DATA}
 
@@ -864,7 +864,7 @@ class TestStudioTranscriptTranslationGetDispatch(TestVideo):
         self.assertEqual(response.headers["Content-Type"], "application/x-subrip; charset=utf-8")
         self.assertEqual(
             response.headers["Content-Disposition"],
-            'attachment; filename="uk_{}"'.format(filename)
+            u'attachment; filename="uk_{}"'.format(filename)
         )
         self.assertEqual(response.headers["Content-Language"], "uk")
 
@@ -1125,7 +1125,7 @@ class TestGetTranscript(TestVideo):
     Make sure that `get_transcript` method works correctly
     """
     srt_file = _create_srt_file()
-    DATA = """
+    DATA = u"""
         <video show_captions="true"
         display_name="A Name"
         >
@@ -1134,7 +1134,7 @@ class TestGetTranscript(TestVideo):
             <transcript language="uk" src="{}"/>
             <transcript language="zh" src="{}"/>
         </video>
-    """.format(os.path.split(srt_file.name)[1], u"塞.srt".encode('utf8'))
+    """.format(os.path.split(srt_file.name)[1], u"塞.srt")
 
     MODEL_DATA = {
         'data': DATA

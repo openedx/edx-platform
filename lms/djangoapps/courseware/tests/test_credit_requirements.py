@@ -88,7 +88,7 @@ class ProgressPageCreditRequirementsTest(SharedModuleStoreTestCase):
         self.assertContains(response, "Upcoming")
         self.assertContains(
             response,
-            "{}, you have not yet met the requirements for credit".format(self.USER_FULL_NAME)
+            u"{}, you have not yet met the requirements for credit".format(self.USER_FULL_NAME)
         )
 
     def test_credit_requirements_eligible(self):
@@ -115,13 +115,13 @@ class ProgressPageCreditRequirementsTest(SharedModuleStoreTestCase):
         self.assertContains(response, self.VERIFICATION_REQ_DISPLAY)
         self.assertContains(
             response,
-            "{}, you have met the requirements for credit in this course.".format(self.USER_FULL_NAME)
+            u"{}, you have met the requirements for credit in this course.".format(self.USER_FULL_NAME)
         )
-        self.assertContains(response, "Completed by {date}")
+        self.assertContains(response, u"Completed by {date}")
 
         credit_requirements = credit_api.get_credit_requirement_status(self.course.id, self.user.username)
         for requirement in credit_requirements:
-            self.assertContains(response, requirement['status_date'].strftime('%Y-%m-%d %H:%M'))
+            self.assertContains(response, requirement['status_date'].strftime('%Y-%m-%d %H:%M'))  # pylint: disable=unicode-format-string,line-too-long
         self.assertNotContains(response, "95%")
 
     def test_credit_requirements_not_eligible(self):
@@ -141,7 +141,7 @@ class ProgressPageCreditRequirementsTest(SharedModuleStoreTestCase):
         self.assertContains(response, self.VERIFICATION_REQ_DISPLAY)
         self.assertContains(
             response,
-            "{}, you are no longer eligible for credit in this course.".format(self.USER_FULL_NAME)
+            u"{}, you are no longer eligible for credit in this course.".format(self.USER_FULL_NAME)
         )
         self.assertContains(response, "Verification Failed")
 

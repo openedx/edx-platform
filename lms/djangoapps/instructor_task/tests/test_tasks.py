@@ -433,7 +433,7 @@ class TestRescoreInstructorTask(TestInstructorTasks):
         entry = InstructorTask.objects.get(id=task_entry.id)
         output = json.loads(entry.task_output)
         self.assertEquals(output['exception'], "UpdateProblemModuleStateError")
-        self.assertEquals(output['message'], "Specified module {0} of type {1} does not support rescoring.".format(
+        self.assertEquals(output['message'], u"Specified module {0} of type {1} does not support rescoring.".format(
             self.location,
             mock_instance.__class__,
         ))

@@ -55,28 +55,28 @@ def _do_third_party_auth(request):
     except User.DoesNotExist:
         AUDIT_LOG.info(
             u"Login failed - user with username {username} has no social auth "
-            "with backend_name {backend_name}".format(
+            "with backend_name {backend_name}".format(  # pylint: disable=unicode-format-string
                 username=username, backend_name=backend_name)
         )
         message = _(
-            "You've successfully logged into your {provider_name} account, "
-            "but this account isn't linked with an {platform_name} account yet."
+            u"You've successfully logged into your {provider_name} account, "
+            "but this account isn't linked with an {platform_name} account yet."  # pylint: disable=unicode-format-string
         ).format(
             platform_name=platform_name,
             provider_name=requested_provider.name,
         )
         message += "<br/><br/>"
         message += _(
-            "Use your {platform_name} username and password to log into {platform_name} below, "
-            "and then link your {platform_name} account with {provider_name} from your dashboard."
+            u"Use your {platform_name} username and password to log into {platform_name} below, "
+            "and then link your {platform_name} account with {provider_name} from your dashboard."  # pylint: disable=unicode-format-string
         ).format(
             platform_name=platform_name,
             provider_name=requested_provider.name,
         )
         message += "<br/><br/>"
         message += Text(_(
-            "If you don't have an {platform_name} account yet, "
-            "click {register_label_strong} at the top of the page."
+            u"If you don't have an {platform_name} account yet, "
+            "click {register_label_strong} at the top of the page."  # pylint: disable=unicode-format-string
         )).format(
             platform_name=platform_name,
             register_label_strong=HTML('<strong>{register_text}</strong>').format(
@@ -159,10 +159,10 @@ def _generate_not_activated_message(user):
         settings.PLATFORM_NAME
     )
 
-    not_activated_msg_template = _('In order to sign in, you need to activate your account.<br /><br />'
-                                   'We just sent an activation link to <strong>{email}</strong>.  If '
+    not_activated_msg_template = _(u'In order to sign in, you need to activate your account.<br /><br />'
+                                   'We just sent an activation link to <strong>{email}</strong>.  If '  # pylint: disable=unicode-format-string
                                    'you do not receive an email, check your spam folders or '
-                                   '<a href="{support_url}">contact {platform} Support</a>.')
+                                   '<a href="{support_url}">contact {platform} Support</a>.')  # pylint: disable=unicode-format-string
 
     not_activated_message = not_activated_msg_template.format(
         email=user.email,

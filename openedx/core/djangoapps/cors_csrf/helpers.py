@@ -33,8 +33,8 @@ def is_cross_domain_request_allowed(request):
         if not request.is_secure():
             log.debug(
                 u"Request is not secure, so we cannot send the CSRF token. "
-                u"For testing purposes, you can disable this check by setting "
-                u"`CORS_ALLOW_INSECURE` to True in the settings"
+                "For testing purposes, you can disable this check by setting "
+                "`CORS_ALLOW_INSECURE` to True in the settings"
             )
             return False
 
@@ -59,15 +59,15 @@ def is_cross_domain_request_allowed(request):
             log.info(
                 (
                     u"Domain '%s' is not on the cross domain whitelist.  "
-                    u"Add the domain to `CORS_ORIGIN_WHITELIST` or set "
-                    u"`CORS_ORIGIN_ALLOW_ALL` to True in the settings."
+                    "Add the domain to `CORS_ORIGIN_WHITELIST` or set "
+                    "`CORS_ORIGIN_ALLOW_ALL` to True in the settings."
                 ), referer_hostname
             )
         else:
             log.debug(
                 (
                     u"Domain '%s' is the same as the hostname in the request, "
-                    u"so we are not going to treat it as a cross-domain request."
+                    "so we are not going to treat it as a cross-domain request."
                 ), referer_hostname
             )
         return False

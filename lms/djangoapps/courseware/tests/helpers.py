@@ -172,13 +172,13 @@ class LoginEnrollmentTestCase(TestCase):
         self.user = self.activate_user(self.email)
         self.login(self.email, self.password)
 
-    def assert_request_status_code(self, status_code, url, method="GET", **kwargs):
+    def assert_request_status_code(self, status_code, url, method="GET", **kwargs):  # pylint: disable=unicode-format-string,line-too-long
         make_request = getattr(self.client, method.lower())
         response = make_request(url, **kwargs)
         self.assertEqual(
             response.status_code, status_code,
-            "{method} request to {url} returned status code {actual}, "
-            "expected status code {expected}".format(
+            u"{method} request to {url} returned status code {actual}, "
+            "expected status code {expected}".format(  # pylint: disable=unicode-format-string
                 method=method, url=url,
                 actual=response.status_code, expected=status_code
             )

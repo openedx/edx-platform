@@ -24,8 +24,7 @@ class TestImport(ModuleStoreTestCase):
         directory = tempfile.mkdtemp(dir=content_dir)
         os.makedirs(os.path.join(directory, "course"))
         with open(os.path.join(directory, "course.xml"), "w+") as f:
-            f.write('<course url_name="{0.run}" org="{0.org}" '
-                    'course="{0.course}"/>'.format(course_id))
+            f.write(u'<course url_name="{0.run}" org="{0.org}" course="{0.course}"/>'.format(course_id))
 
         with open(os.path.join(directory, "course", "{0.run}.xml".format(course_id)), "w+") as f:
             f.write('<course><chapter name="Test Chapter"></chapter></course>')

@@ -141,7 +141,7 @@ class GradingPageTest(StudioCourseTest):
         self.assertIn(
             '0-3',
             grade_ranges,
-            'expected range: 0-3, not found in grade ranges:{}'.format(grade_ranges)
+            u'expected range: 0-3, not found in grade ranges:{}'.format(grade_ranges)
         )
 
     def test_settings_are_persisted_on_save_only(self):

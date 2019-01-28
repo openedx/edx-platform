@@ -1675,19 +1675,19 @@ class CourseEnrollment(models.Model):
         except HttpClientError:
             log.warning(
                 u"Encountered HttpClientError while getting order details from ecommerce. "
-                u"Order={number} and user {user}".format(number=order_number, user=self.user.id))
+                "Order={number} and user {user}".format(number=order_number, user=self.user.id))  # pylint: disable=unicode-format-string
             return None
 
         except HttpServerError:
             log.warning(
                 u"Encountered HttpServerError while getting order details from ecommerce. "
-                u"Order={number} and user {user}".format(number=order_number, user=self.user.id))
+                "Order={number} and user {user}".format(number=order_number, user=self.user.id))  # pylint: disable=unicode-format-string
             return None
 
         except SlumberBaseException:
             log.warning(
                 u"Encountered an error while getting order details from ecommerce. "
-                u"Order={number} and user {user}".format(number=order_number, user=self.user.id))
+                "Order={number} and user {user}".format(number=order_number, user=self.user.id))  # pylint: disable=unicode-format-string
             return None
 
         refund_window_start_date = max(
@@ -2325,7 +2325,7 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
     company_identifier = models.TextField(
         help_text=_(
             u"The company identifier for the LinkedIn Add-to-Profile button "
-            u"e.g 0_0dPSPyS070e0HsE9HNz_13_d11_"
+            "e.g 0_0dPSPyS070e0HsE9HNz_13_d11_"  # pylint: disable=unicode-format-string
         )
     )
 
@@ -2338,8 +2338,8 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
         blank=True,
         help_text=_(
             u"Short identifier for the LinkedIn partner used in the tracking code.  "
-            u"(Example: 'edx')  "
-            u"If no value is provided, tracking codes will not be sent to LinkedIn."
+            "(Example: 'edx')  "  # pylint: disable=unicode-format-string
+            "If no value is provided, tracking codes will not be sent to LinkedIn."
         )
     )
 

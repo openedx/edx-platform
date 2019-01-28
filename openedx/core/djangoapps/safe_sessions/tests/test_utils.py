@@ -120,7 +120,7 @@ class TestSafeSessionsLogMixin(object):
         was not equal to user at response
         """
         with self.assert_logged_with_message(
-            "SafeCookieData user at request '{}' does not match user at response: '{}'".format(
+            u"SafeCookieData user at request '{}' does not match user at response: '{}'".format(
                 user_at_request, user_at_response
             ),
             log_level=log_level,
@@ -134,7 +134,7 @@ class TestSafeSessionsLogMixin(object):
         was not equal to user at session
         """
         with self.assert_logged_with_message(
-            "SafeCookieData user at request '{}' does not match user in session: '{}'".format(
+            u"SafeCookieData user at request '{}' does not match user in session: '{}'".format(
                 user_at_request, user_in_session
             ),
             log_level='warning',

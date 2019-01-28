@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# pylint: disable=unicode-format-string
 """Tests for LTI Xmodule LTIv2.0 functional logic."""
 import datetime
 import textwrap
@@ -81,13 +82,13 @@ class LTI20RESTResultServiceTest(LogicTest):
     BAD_DISPATCH_INPUTS = [
         None,
         u"",
-        u"abcd"
-        u"notuser/abcd"
-        u"user/"
-        u"user//"
-        u"user/gbere/"
-        u"user/gbere/xsdf"
-        u"user/ಠ益ಠ"  # not alphanumeric
+        "abcd"
+        "notuser/abcd"
+        "user/"
+        "user//"
+        "user/gbere/"
+        "user/gbere/xsdf"
+        "user/ಠ益ಠ"  # not alphanumeric
     ]
 
     def test_lti20_rest_bad_dispatch(self):

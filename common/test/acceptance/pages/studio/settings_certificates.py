@@ -196,7 +196,7 @@ class CertificateSectionPage(CertificatesPage):
 
         :return:
         """
-        self.selector = prefix + ' .certificates-list-item-{}'.format(index)
+        self.selector = prefix + u' .certificates-list-item-{}'.format(index)
         self.index = index
 
         super(CertificateSectionPage, self).__init__(container.browser, **container.course_info)
@@ -446,7 +446,7 @@ class SignatorySectionPage(CertificatesPage):
         """
         Return selector fo signatory container
         """
-        selector = self.prefix + ' .signatory-{}-view-{}'.format(self.mode, self.index)
+        selector = self.prefix + u' .signatory-{}-view-{}'.format(self.mode, self.index)
         return ' '.join([selector, css])
 
     def find_css(self, css_selector):

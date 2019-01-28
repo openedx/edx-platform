@@ -32,7 +32,7 @@ def clean_test_files():
     # This find command removes all the *.pyc files that aren't in the .git
     # directory.  See this blog post for more details:
     # http://nedbatchelder.com/blog/201505/be_careful_deleting_files_around_git.html
-    sh(r"find . -name '.git' -prune -o -name '*.pyc' -exec rm {} \;")
+    sh(r"find . -name '.git' -prune -o -name '*.pyc' -exec rm {} \;")  # pylint: disable=unicode-format-string
     sh("rm -rf test_root/log/auto_screenshots/*")
     sh("rm -rf /tmp/mako_[cl]ms")
 
@@ -55,7 +55,7 @@ def clean_dir(directory):
     """
     # We delete the files but preserve the directory structure
     # so that coverage.py has a place to put the reports.
-    sh('find {dir} -type f -delete'.format(dir=directory))
+    sh(u'find {dir} -type f -delete'.format(dir=directory))
 
 
 @task
@@ -84,7 +84,7 @@ def clean_mongo():
     """
     Clean mongo test databases
     """
-    sh("mongo {host}:{port} {repo_root}/scripts/delete-mongo-test-dbs.js".format(
+    sh(u"mongo {host}:{port} {repo_root}/scripts/delete-mongo-test-dbs.js".format(
         host=Env.MONGO_HOST,
         port=MONGO_PORT_NUM,
         repo_root=Env.REPO_ROOT,
@@ -112,7 +112,7 @@ def check_firefox_version():
         if firefox_ver < MINIMUM_FIREFOX_VERSION:
             raise Exception(
                 'Required firefox version not found.\n'
-                'Expected: {expected_version}; Actual: {actual_version}.\n\n'
+                u'Expected: {expected_version}; Actual: {actual_version}.\n\n'
                 'Make sure that the edx.devstack.firefox container is up-to-date and running\n'
                 '\t{expected_version}'.format(
                     actual_version=firefox_ver,
@@ -136,9 +136,9 @@ def check_firefox_version():
     if firefox_ver < MINIMUM_FIREFOX_VERSION:
         raise Exception(
             'Required firefox version not found.\n'
-            'Expected: {expected_version}; Actual: {actual_version}.\n\n'
+            u'Expected: {expected_version}; Actual: {actual_version}.\n\n'
             'As the vagrant user in devstack, run the following:\n\n'
-            '\t$ sudo wget -O /tmp/firefox_42.deb {debian_path}\n'
+            u'\t$ sudo wget -O /tmp/firefox_42.deb {debian_path}\n'
             '\t$ sudo apt-get remove firefox\n\n'
             '\t$ sudo gdebi -nq /tmp/firefox_42.deb\n\n'
             'Confirm the new version:\n'

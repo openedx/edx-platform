@@ -77,7 +77,7 @@ def _find_matching_button(category, component_type):
     """
 
     # The tab shows buttons for the given category
-    buttons = world.css_find('div.new-component-{} button'.format(category))
+    buttons = world.css_find(u'div.new-component-{} button'.format(category))
 
     # Find the button whose text matches what you're looking for
     matched_buttons = [btn for btn in buttons if btn.text == component_type]

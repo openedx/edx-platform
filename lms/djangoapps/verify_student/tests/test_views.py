@@ -983,9 +983,9 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         response_dict = self._get_page_data(response)
         for req, displayed in response_dict['requirements'].iteritems():
             if req in requirements:
-                self.assertTrue(displayed, msg="Expected '{req}' requirement to be displayed".format(req=req))
+                self.assertTrue(displayed, msg=u"Expected '{req}' requirement to be displayed".format(req=req))
             else:
-                self.assertFalse(displayed, msg="Expected '{req}' requirement to be hidden".format(req=req))
+                self.assertFalse(displayed, msg=u"Expected '{req}' requirement to be hidden".format(req=req))
 
     def _assert_course_details(self, response, course_key, display_name, url):
         """Check the course information on the page. """
@@ -1629,7 +1629,7 @@ class TestSubmitPhotosForVerification(TestCase):
         """
         if expect_email:
             # Verify that photo submission confirmation email was sent
-            subject = _("{platform_name} ID Verification Photos Received").format(
+            subject = _(u"{platform_name} ID Verification Photos Received").format(
                 platform_name=settings.PLATFORM_NAME
             )
             self.assertEqual(len(mail.outbox), 1)

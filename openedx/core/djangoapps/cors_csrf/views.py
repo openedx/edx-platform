@@ -60,8 +60,8 @@ def xdomain_proxy(request):  # pylint: disable=unused-argument
     if not allowed_domains:
         log.warning(
             u"No whitelist configured for cross-domain proxy. "
-            u"You can configure the whitelist in Django Admin "
-            u"using the XDomainProxyConfiguration model."
+            "You can configure the whitelist in Django Admin "
+            "using the XDomainProxyConfiguration model."
         )
         return HttpResponseNotFound()
 

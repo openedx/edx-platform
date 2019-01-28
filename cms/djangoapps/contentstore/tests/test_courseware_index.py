@@ -675,7 +675,7 @@ class TestLargeCourseDeletions(MixedWithOptionsTestCase):
             self._do_test_large_course_deletion(store, load_factor)
         except:  # pylint: disable=bare-except
             # Catch any exception here to see when we fail
-            print("Failed with load_factor of {}".format(load_factor))
+            print(u"Failed with load_factor of {}".format(load_factor))
 
     @skip(("This test is to see how we handle very large courses, to ensure that the delete"
            "procedure works smoothly - too long to run during the normal course of things"))

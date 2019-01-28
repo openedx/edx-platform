@@ -97,12 +97,12 @@ def openid_login_complete(request,
         oid_backend = openid_auth.OpenIDBackend()
         details = oid_backend._extract_user_details(openid_response)  # pylint: disable=protected-access
 
-        log.debug('openid success, details=%s', details)
+        log.debug(u'openid success, details=%s', details)
 
         url = getattr(settings, 'OPENID_SSO_SERVER_URL', None)
         external_domain = "{0}{1}".format(OPENID_DOMAIN_PREFIX, url)
-        fullname = '%s %s' % (details.get('first_name', ''),
-                              details.get('last_name', ''))
+        fullname = u'%s %s' % (details.get('first_name', ''),
+                               details.get('last_name', ''))
 
         return _external_login_or_signup(
             request,
@@ -174,9 +174,9 @@ def _external_login_or_signup(request,
                         # otherwise, there must have been an error, b/c we've already linked a user with these external
                         # creds
                         failure_msg = _(
-                            "You have already created an account using "
+                            u"You have already created an account using "
                             "an external login like WebAuth or Shibboleth. "
-                            "Please contact {tech_support_email} for support."
+                            "Please contact {tech_support_email} for support."  # pylint: disable=unicode-format-string
                         ).format(
                             tech_support_email=get_value('email_from_address', settings.TECH_SUPPORT_EMAIL),
                         )

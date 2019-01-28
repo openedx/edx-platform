@@ -62,7 +62,7 @@ class AccessTokenLoginMixin(object):
 
         return self.client.post(
             self.login_with_access_token_url,
-            HTTP_AUTHORIZATION="Bearer {0}".format(access_token if access_token else self.access_token)
+            HTTP_AUTHORIZATION=u"Bearer {0}".format(access_token if access_token else self.access_token)
         )
 
     def _assert_access_token_is_valid(self, access_token=None):
@@ -464,7 +464,7 @@ class TestAuthorizationView(_DispatchingViewTestCase):
         # is the application name specified?
         self.assertContains(
             response,
-            "Authorize {name}".format(name=self.dot_app.name)
+            u"Authorize {name}".format(name=self.dot_app.name)
         )
 
         # are the cancel and allow buttons on the page?

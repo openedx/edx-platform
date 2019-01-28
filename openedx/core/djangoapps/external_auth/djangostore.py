@@ -45,7 +45,7 @@ class DjangoOpenIDStore(OpenIDStore):
     def storeAssociation(self, server_url, assoc):
         key = get_url_key(server_url)
 
-        log.info('storeAssociation {0}'.format(key))
+        log.info(u'storeAssociation {0}'.format(key))
 
         associations = cache.get(key, {})
         associations[assoc.handle] = assoc
@@ -55,7 +55,7 @@ class DjangoOpenIDStore(OpenIDStore):
     def getAssociation(self, server_url, handle=None):
         key = get_url_key(server_url)
 
-        log.info('getAssociation {0}'.format(key))
+        log.info(u'getAssociation {0}'.format(key))
 
         associations = cache.get(key, {})
 
@@ -84,7 +84,7 @@ class DjangoOpenIDStore(OpenIDStore):
     def removeAssociation(self, server_url, handle):
         key = get_url_key(server_url)
 
-        log.info('removeAssociation {0}'.format(key))
+        log.info(u'removeAssociation {0}'.format(key))
 
         associations = cache.get(key, {})
 
@@ -105,7 +105,7 @@ class DjangoOpenIDStore(OpenIDStore):
     def useNonce(self, server_url, timestamp, salt):
         key = get_nonce_key(server_url, timestamp, salt)
 
-        log.info('useNonce {0}'.format(key))
+        log.info(u'useNonce {0}'.format(key))
 
         if abs(timestamp - time.time()) > nonce.SKEW:
             return False

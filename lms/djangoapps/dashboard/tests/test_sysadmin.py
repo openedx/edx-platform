@@ -186,7 +186,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         # Regex of first 3 columns of course information table row for
         # test course loaded from git. Would not have sha1 if
         # git_info_for_course failed.
-        table_re = re.compile(r"""
+        table_re = re.compile(ur"""
             <tr>\s+
             <td>edX\sAuthor\sCourse</td>\s+  # expected test git course name
             <td>course-v1:MITx\+edx4edx\+edx4edx</td>\s+  # expected test git course_id
@@ -323,7 +323,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
                 )
             )
             self.assertIn(
-                'Page {} of 2'.format(expected),
+                u'Page {} of 2'.format(expected),
                 response.content
             )
 

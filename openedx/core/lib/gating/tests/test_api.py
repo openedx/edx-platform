@@ -282,7 +282,7 @@ class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
         completed,
         expected_completion_percentage
     ):
-        """
+        u"""
         Test if gating_api.get_subsection_completion_percentage returns expected completion percentage
         when only a single component in a vertical/unit
 
@@ -295,7 +295,7 @@ class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
         component = ItemFactory.create(
             parent_location=self.vertical.location,
             category=component_type,
-            display_name='{} block'.format(component_type)
+            display_name=u'{} block'.format(component_type)
         )
 
         with patch.object(BlockCompletion, 'get_course_completions') as course_block_completions_mock:

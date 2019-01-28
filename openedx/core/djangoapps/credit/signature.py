@@ -1,4 +1,4 @@
-"""
+u"""
 Calculate digital signatures for messages sent to/from credit providers,
 using a shared secret key.
 

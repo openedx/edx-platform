@@ -250,7 +250,7 @@ class GetItemTest(ItemTest):
             html,
             # The instance of the wrapper class will have an auto-generated ID. Allow any
             # characters after wrapper.
-            r'"/container/{}" class="action-button">\s*<span class="action-button-text">View</span>'.format(
+            ur'"/container/{}" class="action-button">\s*<span class="action-button-text">View</span>'.format(
                 wrapper_usage_key
             )
         )
@@ -640,10 +640,10 @@ class DuplicateHelper(object):
                 return duplicated_item.display_name == original_item.category
             return duplicated_item.display_name == original_item.display_name
         if original_item.display_name is not None:
-            return duplicated_item.display_name == "Duplicate of '{display_name}'".format(
+            return duplicated_item.display_name == u"Duplicate of '{display_name}'".format(
                 display_name=original_item.display_name
             )
-        return duplicated_item.display_name == "Duplicate of {display_name}".format(
+        return duplicated_item.display_name == u"Duplicate of {display_name}".format(
             display_name=original_item.category
         )
 
@@ -983,7 +983,7 @@ class TestMoveItem(ItemTest):
         self.assertEqual(response.status_code, 400)
         response = json.loads(response.content)
 
-        expected_error = 'You can not move {usage_key} at an invalid index ({target_index}).'.format(
+        expected_error = u'You can not move {usage_key} at an invalid index ({target_index}).'.format(
             usage_key=self.html_usage_key,
             target_index=parent_children_length + 10
         )
@@ -1000,7 +1000,7 @@ class TestMoveItem(ItemTest):
         self.assertEqual(response.status_code, 400)
         response = json.loads(response.content)
 
-        expected_error = 'You can not move {source_type} into {target_type}.'.format(
+        expected_error = u'You can not move {source_type} into {target_type}.'.format(
             source_type=self.html_usage_key.block_type,
             target_type=self.seq_usage_key.block_type
         )
@@ -1145,7 +1145,7 @@ class TestMoveItem(ItemTest):
         self.assertEqual(response.status_code, 400)
         response = json.loads(response.content)
 
-        error = 'You must provide target_index ({target_index}) as an integer.'.format(target_index=target_index)
+        error = u'You must provide target_index ({target_index}) as an integer.'.format(target_index=target_index)
         self.assertEqual(response['error'], error)
         new_parent_loc = self.store.get_parent_location(self.html_usage_key)
         self.assertEqual(new_parent_loc, parent_loc)
@@ -1242,7 +1242,7 @@ class TestMoveItem(ItemTest):
         insert_at = 0
         self.assert_move_item(self.html_usage_key, self.vert2_usage_key, insert_at)
         mock_logger.info.assert_called_with(
-            'MOVE: %s moved from %s to %s at %d index',
+            u'MOVE: %s moved from %s to %s at %d index',
             unicode(self.html_usage_key),
             unicode(self.vert_usage_key),
             unicode(self.vert2_usage_key),

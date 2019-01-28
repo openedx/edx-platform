@@ -223,7 +223,7 @@ class ShibSPTest(CacheIsolationTestCase):
         """
         inactive_user = UserFactory.create(email='inactive@stanford.edu')
         if not log_user_string:
-            log_user_string = "user.id: {}".format(inactive_user.id)
+            log_user_string = u"user.id: {}".format(inactive_user.id)
         inactive_user.is_active = False
         inactive_user.save()
         request = self.request_factory.get('/shib-login')

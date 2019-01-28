@@ -187,7 +187,7 @@ class _AssertNumQueriesContext(CaptureQueriesContext):
         executed = len(filtered_queries)
         self.test_case.assertEqual(
             executed, self.num,
-            "%d queries executed, %d expected\nCaptured queries were:\n%s" % (
+            u"%d queries executed, %d expected\nCaptured queries were:\n%s" % (
                 executed, self.num,
                 '\n'.join(
                     query['sql'] for query in filtered_queries

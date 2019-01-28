@@ -30,7 +30,7 @@ def locked(expiry_seconds, key):
         def wrapper(*args, **kwargs):
             cache_key = '{}-{}'.format(func.__name__, kwargs[key])
             if cache.add(cache_key, "true", expiry_seconds):
-                log.info('Locking task in cache with key: %s for %s seconds', cache_key, expiry_seconds)
+                log.info(u'Locking task in cache with key: %s for %s seconds', cache_key, expiry_seconds)
                 return func(*args, **kwargs)
         return wrapper
     return task_decorator
@@ -119,7 +119,7 @@ def handle_grading_policy_changed(sender, **kwargs):
         'event_transaction_type': unicode(get_event_transaction_type()),
     }
     result = compute_all_grades_for_course.apply_async(kwargs=kwargs, countdown=GRADING_POLICY_COUNTDOWN_SECONDS)
-    log.info("Grades: Created {task_name}[{task_id}] with arguments {kwargs}".format(
+    log.info(u"Grades: Created {task_name}[{task_id}] with arguments {kwargs}".format(
         task_name=compute_all_grades_for_course.name,
         task_id=result.task_id,
         kwargs=kwargs,

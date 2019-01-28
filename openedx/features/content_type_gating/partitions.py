@@ -45,7 +45,7 @@ def create_content_gating_partition(course):
         content_gate_scheme = UserPartition.get_scheme(CONTENT_TYPE_GATING_SCHEME)
     except UserPartitionError:
         LOG.warning(
-            "No %r scheme registered, ContentTypeGatingPartitionScheme will not be created.",
+            u"No %r scheme registered, ContentTypeGatingPartitionScheme will not be created.",
             CONTENT_TYPE_GATING_SCHEME
         )
         return None
@@ -56,7 +56,7 @@ def create_content_gating_partition(course):
         # partition with id 51, it will collide with the Content Gating Partition. We'll catch that here, and
         # then fix the course content as needed (or get the course team to).
         LOG.warning(
-            "Can't add %r partition, as ID %r is assigned to %r in course %s.",
+            u"Can't add %r partition, as ID %r is assigned to %r in course %s.",
             CONTENT_TYPE_GATING_SCHEME,
             CONTENT_GATING_PARTITION_ID,
             _get_partition_from_id(course.user_partitions, CONTENT_GATING_PARTITION_ID).name,
@@ -197,8 +197,8 @@ class ContentTypeGatingPartitionScheme(object):
             )
             if course_mode is None:
                 LOG.error(
-                    "User %s is in an unknown CourseMode '%s'"
-                    " for course %s. Granting full access to content for this user",
+                    u"User %s is in an unknown CourseMode '%s'"
+                    " for course %s. Granting full access to content for this user",  # pylint: disable=unicode-format-string
                     user.username,
                     mode_slug,
                     course_key,

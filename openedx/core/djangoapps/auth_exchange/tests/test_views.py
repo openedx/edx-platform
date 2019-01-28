@@ -181,7 +181,7 @@ class TestLoginWithAccessTokenView(TestCase):
         Calls the login_with_access_token endpoint and verifies the response given the expected values.
         """
         url = reverse("login_with_access_token")
-        response = self.client.post(url, HTTP_AUTHORIZATION="Bearer {0}".format(access_token))
+        response = self.client.post(url, HTTP_AUTHORIZATION=u"Bearer {0}".format(access_token))
         self.assertEqual(response.status_code, expected_status_code)
         if expected_cookie_name:
             self.assertIn(expected_cookie_name, response.cookies)

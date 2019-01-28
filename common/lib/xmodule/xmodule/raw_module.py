@@ -33,7 +33,7 @@ class RawDescriptor(XmlDescriptor, XMLEditingDescriptor):
             line, offset = err.position
             msg = (
                 u"Unable to create xml for module {loc}. "
-                u"Context: '{context}'"
+                "Context: '{context}'"  # pylint: disable=unicode-format-string
             ).format(
                 context=lines[line - 1][offset - 40:offset + 40],
                 loc=self.location,

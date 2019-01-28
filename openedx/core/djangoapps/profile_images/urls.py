@@ -1,3 +1,4 @@
+# pylint: disable=unicode-format-string
 """
 Defines the URL routes for this app.
 

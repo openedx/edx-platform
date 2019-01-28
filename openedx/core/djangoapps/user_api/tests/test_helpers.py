@@ -59,9 +59,9 @@ class InterceptErrorsTest(TestCase):
         exception = 'openedx.core.djangoapps.user_api.tests.test_helpers.FakeInputException'
         expected_log_msg = (
             u"An unexpected error occurred when calling 'intercepted_function' with arguments '()' and "
-            u"keyword arguments '{{'raise_error': <class '{}'>}}' "
-            u"from File \"{}\", line XXX, in test_logs_errors\n"
-            u"    intercepted_function(raise_error=FakeInputException): FakeInputException()"
+            "keyword arguments '{{'raise_error': <class '{}'>}}' "  # pylint: disable=unicode-format-string
+            "from File \"{}\", line XXX, in test_logs_errors\n"  # pylint: disable=unicode-format-string
+            "    intercepted_function(raise_error=FakeInputException): FakeInputException()"  # pylint: disable=unicode-format-string
         ).format(exception, __file__.rstrip('c'))
 
         # Verify that the raised exception has the error message

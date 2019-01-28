@@ -86,7 +86,7 @@ class CourseAccessMessageViewTest(CacheIsolationTestCase, UrlResetMixin):
             response.status_code, expected_status,
             msg=(
                 u"Unexpected status code when loading '{url}': "
-                u"expected {expected} but got {actual}"
+                "expected {expected} but got {actual}"  # pylint: disable=unicode-format-string
             ).format(
                 url=url,
                 expected=expected_status,

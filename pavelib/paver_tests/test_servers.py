@@ -1,3 +1,4 @@
+# pylint: disable=unicode-format-string
 """Unit tests for the Paver server tasks."""
 
 import ddt
@@ -167,7 +168,7 @@ class TestPaverServerTasks(PaverTestCase):
         settings = options.get("settings", Env.DEVSTACK_SETTINGS)
         call_task("pavelib.servers.update_db", options=options)
         # pylint: disable=line-too-long
-        db_command = "NO_EDXAPP_SUDO=1 EDX_PLATFORM_SETTINGS_OVERRIDE={settings} /edx/bin/edxapp-migrate-{server} --traceback --pythonpath=. "
+        db_command = u"NO_EDXAPP_SUDO=1 EDX_PLATFORM_SETTINGS_OVERRIDE={settings} /edx/bin/edxapp-migrate-{server} --traceback --pythonpath=. "
         self.assertEquals(
             self.task_messages,
             [
@@ -192,8 +193,8 @@ class TestPaverServerTasks(PaverTestCase):
         self.assertEquals(
             self.task_messages,
             [
-                "echo 'import {system}.envs.{settings}' "
-                "| python manage.py {system} --settings={settings} shell --plain --pythonpath=.".format(
+                u"echo 'import {system}.envs.{settings}' "
+                "| python manage.py {system} --settings={settings} shell --plain --pythonpath=.".format(  # pylint: disable=unicode-format-string
                     system=system, settings=settings
                 ),
             ]

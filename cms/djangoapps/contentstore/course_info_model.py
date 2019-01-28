@@ -1,3 +1,4 @@
+# pylint: disable=unicode-format-string
 """
 Views for viewing, adding, updating and deleting course updates.
 

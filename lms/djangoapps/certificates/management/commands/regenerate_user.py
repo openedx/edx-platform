@@ -63,7 +63,7 @@ class Command(BaseCommand):
         LOGGER.info(
             (
                 u"Starting to create tasks to regenerate certificates "
-                u"with arguments %s and options %s"
+                "with arguments %s and options %s"  # pylint: disable=unicode-format-string
             ),
             text_type(args),
             text_type(cleaned_options)
@@ -84,7 +84,7 @@ class Command(BaseCommand):
             LOGGER.info(
                 (
                     u"Adding task to the XQueue to generate a certificate "
-                    u"for student %s in course '%s'."
+                    "for student %s in course '%s'."  # pylint: disable=unicode-format-string
                 ),
                 student.id,
                 course_id
@@ -109,8 +109,8 @@ class Command(BaseCommand):
             LOGGER.info(
                 (
                     u"Added a certificate regeneration task to the XQueue "
-                    u"for student %s in course '%s'. "
-                    u"The new certificate status is '%s'."
+                    "for student %s in course '%s'. "  # pylint: disable=unicode-format-string
+                    "The new certificate status is '%s'."  # pylint: disable=unicode-format-string
                 ),
                 student.id,
                 text_type(course_id),
@@ -121,8 +121,8 @@ class Command(BaseCommand):
             LOGGER.info(
                 (
                     u"Skipping certificate generation for "
-                    u"student %s in course '%s' "
-                    u"because the noop flag is set."
+                    "student %s in course '%s' "  # pylint: disable=unicode-format-string
+                    "because the noop flag is set."
                 ),
                 student.id,
                 text_type(course_id)
@@ -131,7 +131,7 @@ class Command(BaseCommand):
         LOGGER.info(
             (
                 u"Finished regenerating certificates command for "
-                u"user %s and course '%s'."
+                "user %s and course '%s'."  # pylint: disable=unicode-format-string
             ),
             student.id,
             text_type(course_id)

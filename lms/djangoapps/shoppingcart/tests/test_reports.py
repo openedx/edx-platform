@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+# pylint: disable=unicode-format-string
 """
 Tests for the Shopping Cart Models
 """
@@ -242,7 +242,7 @@ class ItemizedPurchaseReportTest(ModuleStoreTestCase):
         """
         # delete the matching annotation
         self.annotation.delete()
-        self.assertEqual(u"", self.reg.csv_report_comments)
+        self.assertEqual("", self.reg.csv_report_comments)
 
     def test_paidcourseregistrationannotation_unicode(self):
         """

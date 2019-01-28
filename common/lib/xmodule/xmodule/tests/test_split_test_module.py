@@ -488,7 +488,7 @@ class SplitTestModuleStudioTest(SplitTestModuleTest):
         verify_validation_message(
             validation.messages[0],
             u"The experiment uses a deleted group configuration. "
-            u"Select a valid group configuration or delete this experiment.",
+            "Select a valid group configuration or delete this experiment.",
             StudioValidationMessage.ERROR
         )
         verify_summary_message(
@@ -510,7 +510,7 @@ class SplitTestModuleStudioTest(SplitTestModuleTest):
         verify_validation_message(
             validation.messages[0],
             u"The experiment uses a group configuration that is not supported for experiments. "
-            u"Select a valid group configuration or delete this experiment.",
+            "Select a valid group configuration or delete this experiment.",
             StudioValidationMessage.ERROR
         )
         verify_summary_message(

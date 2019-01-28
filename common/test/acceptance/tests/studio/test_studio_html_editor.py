@@ -150,7 +150,7 @@ class HTMLComponentEditorTests(ContainerBase):
                   --></style>
                   ""
         """
-        content = '<p class="title">pages</p><style><!-- .title { color: red; } --></style>'
+        content = u'<p class="title">pages</p><style><!-- .title { color: red; } --></style>'
 
         # Add HTML Text type component
         self._add_component('Text')

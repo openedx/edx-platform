@@ -122,7 +122,7 @@ class TestActivateAccount(TestCase):
         self.login()
         expected_message = (
             u"Check your {email_start}{email}{email_end} inbox for an account activation link from "
-            u"{platform_name}. If you need help, contact {link_start}{platform_name} Support{link_end}."
+            "{platform_name}. If you need help, contact {link_start}{platform_name} Support{link_end}."  # pylint: disable=unicode-format-string
         ).format(
             platform_name=self.platform_name,
             email_start="<strong>",

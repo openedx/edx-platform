@@ -147,7 +147,7 @@ class RestrictedCourse(models.Model):
         default=False,
         help_text=ugettext_lazy(
             u"Allow users who enrolled in an allowed country "
-            u"to access restricted courses from excluded countries."
+            "to access restricted courses from excluded countries."
         )
     )
 
@@ -419,9 +419,9 @@ class CountryAccessRule(models.Model):
         default=BLACKLIST_RULE,
         help_text=ugettext_lazy(
             u"Whether to include or exclude the given course. "
-            u"If whitelist countries are specified, then ONLY users from whitelisted countries "
-            u"will be able to access the course.  If blacklist countries are specified, then "
-            u"users from blacklisted countries will NOT be able to access the course."
+            "If whitelist countries are specified, then ONLY users from whitelisted countries "
+            "will be able to access the course.  If blacklist countries are specified, then "
+            "users from blacklisted countries will NOT be able to access the course."
         )
     )
 
@@ -525,7 +525,7 @@ class CountryAccessRule(models.Model):
         """Invalidate the cache. """
         cache_key = cls.CACHE_KEY.format(course_key=course_key)
         cache.delete(cache_key)
-        log.info("Invalidated country access list for course %s", course_key)
+        log.info(u"Invalidated country access list for course %s", course_key)
 
     class Meta(object):
         """a course can be added with either black or white list.  """
