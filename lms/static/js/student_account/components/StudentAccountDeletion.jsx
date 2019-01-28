@@ -41,8 +41,8 @@ export class StudentAccountDeletion extends React.Component {
     const loseAccessText = StringUtils.interpolate(
       gettext('You may also lose access to verified certificates and other program credentials. If you want to make a copy of these for your records before proceeding with deletion, follow the instructions for {htmlStart}printing or downloading a certificate{htmlEnd}.'),
       {
-        htmlStart: '',
-        htmlEnd: '',
+        htmlStart: '<a href="/dashboard" target="_blank">',
+        htmlEnd: '</a>',
       },
     );
 

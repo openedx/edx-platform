@@ -10862,16 +10862,15 @@ msgstr "您必须同意接受{platform_name}的{terms_of_service}"
 #: openedx/core/djangoapps/user_api/api.py
 #, python-brace-format
 msgid ""
-"By creating an account with {platform_name}, you agree                   to "
-"abide by our {platform_name}                   "
+"By creating an account, you agree                   to abide by EliteMBA's"
+"                   "
 "{user_agreement_link_start}{user_agreement}{user_agreement_link_end}, "
 "{disclaimer_link_start}{disclaimer}{disclaimer_link_end}                   "
-"and agree to our {privacy_policy_link_start}Privacy "
-"Policy{privacy_policy_link_end}."
+"and {privacy_policy_link_start}Privacy Policy{privacy_policy_link_end}."
 msgstr ""
-"注册{platform_name}即表示同意遵守{platform_name} "
-"{user_agreement_link_start}{user_agreement}{user_agreement_link_end}, "
-"{disclaimer_link_start}{disclaimer}{disclaimer_link_end}和{privacy_policy_link_start}隐私政策{privacy_policy_link_end}。"
+"注册即表示同意遵守英荔商学院的{user_agreement_link_start}{user_agreement}{user_agreement_link_end}、"
+" "
+"{disclaimer_link_start}{disclaimer}{disclaimer_link_end}和{privacy_policy_link_start}隐私政策{privacy_policy_link_end}"
 
 #: openedx/core/djangoapps/user_api/api.py
 #: lms/templates/static_templates/user_agreement.html
@@ -20319,8 +20318,8 @@ msgid "WeChat Scan Code"
 msgstr "微信扫一扫"
 
 #: themes/normal-theme/lms/templates/footer.html
-msgid "Get the Coupon"
-msgstr "获取课程优惠券"
+msgid "Scan via Wechat to Follow Course Updates"
+msgstr "关注名师开课动态"
 
 #: themes/normal-theme/lms/templates/footer.html
 msgid ""
@@ -21009,7 +21008,7 @@ msgid ""
 "any computer software, hardware or communication equipment;"
 msgstr ""
 "7.  "
-"将设计目的在于干扰、破坏或限制任何计算机软件、硬件或通讯设备功能之计算机病毒（包括但不限于木马程序、蠕虫、定时炸弹、删除蝇（以下简称“病毒”）或其他计算机代码、档案和程序之任何资料，加以发布、发送或以其他方式传送；"
+"将设计目的在于干扰、破坏或限制任何计算机软件、硬件或通讯设备功能之计算机病毒（包括但不限于木马程序、蠕虫、定时炸弹、删除器“Cancelbot”，以下简称“病毒”）或其他计算机代码、档案和程序之任何资料，加以发布、发送或以其他方式传送；"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 msgid ""
@@ -26681,6 +26680,9 @@ msgstr "以完成支付"
 #: membership/templates/membership/wechat_paying.html
 msgid "Payment Success"
 msgstr "支付成功"
+
+msgid "email address"
+msgstr "邮箱"
 
 msgid "English"
 msgstr "英语"
