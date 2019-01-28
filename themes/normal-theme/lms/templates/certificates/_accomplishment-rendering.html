@@ -74,8 +74,7 @@ course_mode_class = course_mode if course_mode else ''
         correctLevel: QRCode.CorrectLevel.H
     }
     var qrcode = new QRCode(document.getElementById("qrcode"), data);
-
-    $(document).ready(function () {
+    var _draw = function(){
         var data = {
             username: '${accomplishment_copy_name}',
             course: '${accomplishment_copy_course_name}',
@@ -107,15 +106,11 @@ course_mode_class = course_mode if course_mode else ''
                 }
             }
         }
-        // var i = 0;
-        // setTimeout(() => {
-            
-        // }, 1500);
-        // $('#img-list .signature').load(function(){
-        //     i++;
-        //     if (i == $('#img-list .signature').length){
-        //         _certificates(data)
-        //     }
-        // })
-    })    
+    }
+    var _timer = setInterval(function(){
+        if($('#qrcode img').attr('src') != undefined){
+            clearInterval(_timer);
+            _draw()
+        }
+    },100)  
 </script>

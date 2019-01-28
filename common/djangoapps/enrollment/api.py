@@ -14,6 +14,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from course_modes.models import CourseMode
 from enrollment import errors
+from enrollment.errors import UserNotFoundError
 
 log = logging.getLogger(__name__)
 
@@ -211,6 +212,15 @@ def add_enrollment(user_id, course_id, mode=None, is_active=True, enrollment_att
 
         if settings.FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION', False) and not is_ecommerce_request:
             from membership.models import VIPCourseEnrollment
+            from student.models import User
+
+            if user is None:
+                try:
+                    user = User.objects.get(username=user_id)
+                except User.DoesNotExist:
+                    msg = u"Not user with username '{username}' found.".format(username=user_id)
+                    log.warn(msg)
+                    raise UserNotFoundError(msg)
 
             course_key = CourseKey.from_string(course_id)
             can_vip_enroll = VIPCourseEnrollment.can_vip_enroll(user, course_key)
