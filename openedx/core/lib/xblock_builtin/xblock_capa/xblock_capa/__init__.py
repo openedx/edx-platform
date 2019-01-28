@@ -27,7 +27,6 @@ import static_replace
 from capa import responsetypes
 from capa.xqueue_interface import XQueueInterface
 from openedx.core.lib.xblock_builtin import get_css_dependencies, get_js_dependencies
-from student.models import anonymous_id_for_user
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.raw_module import RawDescriptor
@@ -355,6 +354,7 @@ class CapaXBlock(XBlock, CapaFields, CapaMixin, StudioEditableXBlockMixin, XmlPa
         """
         Returns the anonymous user ID for the current user+course.
         """
+        from student.models import anonymous_id_for_user
         user = self._user
         if user:
             return anonymous_id_for_user(user, self.runtime.course_id)

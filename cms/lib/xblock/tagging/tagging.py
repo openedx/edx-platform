@@ -10,6 +10,7 @@ from xblock.core import XBlock, XBlockAside
 from xblock.fields import Dict, Scope
 
 from edxmako.shortcuts import render_to_string
+from openedx.core.lib.xblock_builtin.xblock_capa.xblock_capa import CapaXBlock
 from xmodule.x_module import AUTHOR_VIEW
 
 _ = lambda text: text
@@ -43,7 +44,6 @@ class StructuredTagsAside(XBlockAside):
         Display the tag selector with specific categories and allowed values,
         depending on the context.
         """
-        from openedx.core.lib.xblock_builtin.xblock_capa.xblock_capa import CapaXBlock
         if isinstance(block, CapaXBlock):
             tags = []
             for tag in self.get_available_tags():
