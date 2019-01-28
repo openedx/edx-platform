@@ -364,11 +364,6 @@ class CapaXBlock(XBlock, CapaFields, CapaMixin, StudioEditableXBlockMixin, XmlPa
         return django_cache
 
     @property
-    def node_path(self):
-        """Return the configured node path."""
-        return settings.NODE_PATH
-
-    @property
     def xqueue_interface(self):
         """
         Returns a dict containing XqueueInterface object, as well as parameters
