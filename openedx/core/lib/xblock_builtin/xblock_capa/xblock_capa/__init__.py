@@ -165,9 +165,11 @@ class CapaXBlock(XBlock, CapaFields, CapaMixin, StudioEditableXBlockMixin, XmlPa
 
         Makes no use of the context parameter
         """
-        log.debug("CapaXBlock.student_view")
         fragment = Fragment()
-        self.add_resource_urls(fragment)
+        for css_file in get_css_dependencies('style-capa'):
+            fragment.add_css_url(staticfiles_storage.url(css_file))
+        for js_file in get_js_dependencies('capa'):
+            fragment.add_javascript_url(staticfiles_storage.url(js_file))
         fragment.add_content(self.get_html())
         fragment.initialize_js('CapaXBlock')
         return fragment
@@ -185,31 +187,6 @@ class CapaXBlock(XBlock, CapaFields, CapaMixin, StudioEditableXBlockMixin, XmlPa
             'enable_latex_compiler': self.use_latex_compiler,
         })
         return self.student_view(context)
-
-    @staticmethod
-    def css_dependencies():
-        """
-        Returns list of CSS files that this XBlock depends on.
-        """
-        return get_css_dependencies('style-capa')
-
-    @staticmethod
-    def js_dependencies():
-        """
-        Returns list of JS files that this XBlock depends on.
-        """
-        return get_js_dependencies('capa')
-
-    def add_resource_urls(self, fragment):
-        """
-        Adds URLs for static resources that this XBlock depends on to `fragment`.
-        """
-        for css_file in self.css_dependencies():
-            fragment.add_css_url(staticfiles_storage.url(css_file))
-
-        # Body dependencies
-        for js_file in self.js_dependencies():
-            fragment.add_javascript_url(staticfiles_storage.url(js_file))
 
     @property
     def ajax_url(self):
