@@ -354,12 +354,12 @@ class CapaXBlock(XBlock, CapaFields, CapaMixin, StudioEditableXBlockMixin, XmlPa
         """
         Returns the anonymous user ID for the current user+course.
         """
-        from student.models import anonymous_id_for_user
+        user_service = self.runtime.service(self, 'user')
         user = self._user
-        if user:
-            return anonymous_id_for_user(user, self.runtime.course_id)
-        else:
-            return None
+        return user_service.get_anonymous_user_id(
+                user.username,
+                str(self.runtime.course_id),
+        ) if (user_service and user) else None
 
     @property
     def user_is_staff(self):
@@ -583,7 +583,7 @@ class CapaXBlock(XBlock, CapaFields, CapaMixin, StudioEditableXBlockMixin, XmlPa
             return
         capa_system = LoncapaSystem(
             ajax_url=None,
-            anonymous_student_id=self.anonymous_user_id,
+            anonymous_student_id=self.anonymous_student_id,
             cache=None,
             can_execute_unsafe_code=lambda: None,
             get_python_lib_zip=self.get_python_lib_zip,

@@ -41,7 +41,7 @@ class DjangoXBlockUserService(UserService):
 
     def user_is_staff(self):
         """
-        Returns true if the currently-logged in user is a staff user.
+        Returns True if the currently-logged in user is a global staff user.
         """
         return self.get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF)
 
@@ -55,9 +55,9 @@ class DjangoXBlockUserService(UserService):
 
         Returns:
             A unique anonymous_user_id for (user, course) pair.
-            None for Non-staff users.
+            None if a non-staff user requests someone else's data.
         """
-        if not self.user_is_staff():
+        if not (self.user_is_staff() or self.get_current_user().username == username):
             return None
 
         try:
