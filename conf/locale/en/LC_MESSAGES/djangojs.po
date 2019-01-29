@@ -4283,8 +4283,8 @@ msgstr ""
 msgid ""
 "You may also lose access to verified certificates and other program "
 "credentials. If you want to make a copy of these for your records before "
-"proceeding with deletion, follow the instructions for {htmlStart}printing or"
-" downloading a certificate{htmlEnd}."
+"proceeding with deletion, please go to {htmlStart}Dashboard{htmlEnd} to view"
+" your certificates."
 msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx

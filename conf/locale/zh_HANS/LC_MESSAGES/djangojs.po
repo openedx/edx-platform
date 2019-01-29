@@ -4304,10 +4304,10 @@ msgstr "错误："
 msgid ""
 "You may also lose access to verified certificates and other program "
 "credentials. If you want to make a copy of these for your records before "
-"proceeding with deletion, follow the instructions for {htmlStart}printing or"
-" downloading a certificate{htmlEnd}."
+"proceeding with deletion, please go to {htmlStart}Dashboard{htmlEnd} to view"
+" your certificates."
 msgstr ""
-"您可能也将无法访问已认证的证书和其他专业课程的证书。如果您希望在操作删除前对这些文件进行备份，请根据指引{htmlStart}打印或下载证书{htmlEnd}。"
+"您可能也将无法访问已认证的证书和其他专业课程的证书。如果您希望在操作删除前对这些文件进行备份，请到{htmlStart}课程面板{htmlEnd}查看您获得的证书。"
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
