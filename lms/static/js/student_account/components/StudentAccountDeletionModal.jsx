@@ -94,7 +94,7 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
     } = this.state;
     const { onClose } = this.props;
     const loseAccessText = StringUtils.interpolate(
-      gettext('You may also lose access to verified certificates and other program credentials. If you want to make a copy of these for your records before proceeding with deletion, follow the instructions for {htmlStart}printing or downloading a certificate{htmlEnd}.'),
+      gettext('You may also lose access to verified certificates and other program credentials. If you want to make a copy of these for your records before proceeding with deletion, please go to {htmlStart}Dashboard{htmlEnd} to view your certificates.'),
       {
         htmlStart: '<a href="/dashboard" target="_blank">',
         htmlEnd: '</a>',
