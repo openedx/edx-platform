@@ -33,6 +33,7 @@ $icon-width: 18px;
 .fa-thumbs-up:before,
 .fa-calendar:before,
 .fa-envelope:before,
+.fa-envelope-o:before,
 .fa-reorder:before,
 .fa-star:before,
 .fa-flag:before,
@@ -152,7 +153,7 @@ $icon-width: 18px;
     background-position: calcP(8, 2);
   }
 }
-.fa-envelope:before{
+.fa-envelope:before, .fa-envelope-o:before{
   background-position: calcP(9, 4)
 }
 .fa-reorder:before, .fa-bars:before{

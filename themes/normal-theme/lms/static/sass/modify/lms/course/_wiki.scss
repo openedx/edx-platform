@@ -49,12 +49,6 @@ body.view-in-course .wiki-wrapper{
 .container .wiki-wrapper #main section.wiki a.add-article-btn{
   @extend %btn-my-primary;
   margin: 0;
-  border: none;
-  height: auto;
-  text-shadow: none;
-  &:hover, &:focus, &:active, &:visited{
-    border: none;
-  }
 }
 
 
@@ -171,33 +165,15 @@ body.view-in-course .wiki-wrapper{
   .btn.btn-primary{
     @extend %btn-my-primary;
     span{ display: none; }
-
-    &:hover:not(:disabled){
-      box-shadow: none;
-      background-image: none;
-    }
   }
   a.btn{
     @extend %btn-my-white;
     vertical-align: top;
     span{ display: none; }
-
-    &:hover:not(:disabled){
-      box-shadow: none;
-      background-image: none;
-      background: #f7fbfe;
-    }
   }
   .btn.btn-danger{
     @extend %btn-my-white;
-    box-shadow: none;
     span{ display: none;}
-
-    &:hover:not(:disabled){
-      box-shadow: none;
-      background-image: none;
-      background: #f7fbfe;
-    }
   }
   .CodeMirror{
     background: #fff;

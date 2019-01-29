@@ -257,9 +257,6 @@
     cursor: pointer;
     a.u-field-link {
         @extend %btn-my-primary;
-        height: 34px;
-        line-height: 34px;
-        box-sizing: content-box;
         padding: 8px 15px;
         width: 100%;
     }

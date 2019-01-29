@@ -11,10 +11,10 @@
 // header
 .content-wrapper .discussion-board >.page-header{
   .has-breadcrumbs .breadcrumbs{
-    margin-bottom: 0;
     font-size: 18px;
-    margin-left: 4px;
     color: $title;
+    margin: 0;
+    line-height: 36px;
 
     .all-topics{
       border: none;
@@ -45,7 +45,6 @@
     }
     .search-button{
       @extend %btn-my-primary;
-      line-height: 0;
       border-top-left-radius: 0;
       border-bottom-left-radius: 0;
       margin-left: 0;
@@ -54,7 +53,6 @@
 
   .btn-outline-primary{
     @extend %btn-my-primary;
-    line-height: 0;
     margin-left: 10px;
     vertical-align: inherit;
   }

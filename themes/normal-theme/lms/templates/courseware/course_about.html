@@ -329,12 +329,13 @@ from six import string_types
               autoplay: true,
             });
           }
-          
           $('.about-cover').show();
           $('.video-box').show();
+          $('body').css('overflow', 'hidden');
         }
 
         function closeVideo(){
+          $('body').css('overflow', 'auto');
           $('.about-cover').hide();
           $('.video-box').hide();
           player.pause();
