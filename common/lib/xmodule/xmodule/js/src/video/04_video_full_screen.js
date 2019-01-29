@@ -100,7 +100,8 @@
             if (isFullScreen) {
                 this.resizer
                 .delta
-                .substract(height, 'height')
+                // .substract(height, 'height')
+                .substract(53.5, 'height') // fix 4719 bug
                 .setMode('both');
             } else {
                 this.resizer
