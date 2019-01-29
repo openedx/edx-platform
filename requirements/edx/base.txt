@@ -218,6 +218,3 @@ edx-sga==0.6.2
 
 # Redis version
 redis==2.10.6
-
-# Completion
-edx-completion==0.1.10
