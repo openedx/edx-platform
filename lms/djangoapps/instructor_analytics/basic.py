@@ -395,7 +395,7 @@ def coupon_codes_features(features, coupons_list, course_id):
     return [extract_coupon(coupon, features) for coupon in coupons_list]
 
 
-def list_problem_responses(course_key, problem_location):
+def list_problem_responses(course_key, problem_location, limit_responses=None):
     """
     Return responses to a given problem as a dict.
 
@@ -410,7 +410,10 @@ def list_problem_responses(course_key, problem_location):
     where `state` represents a student's response to the problem
     identified by `problem_location`.
     """
-    problem_key = UsageKey.from_string(problem_location)
+    if isinstance(problem_location, UsageKey):
+        problem_key = problem_location
+    else:
+        problem_key = UsageKey.from_string(problem_location)
     # Are we dealing with an "old-style" problem location?
     run = problem_key.run
     if not run:
@@ -423,6 +426,8 @@ def list_problem_responses(course_key, problem_location):
         module_state_key=problem_key
     )
     smdat = smdat.order_by('student')
+    if limit_responses is not None:
+        smdat = smdat[:limit_responses]
 
     return [
         {'username': response.student.username, 'state': response.state}

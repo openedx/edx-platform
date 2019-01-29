@@ -231,12 +231,12 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
         factory = OptionResponseXMLFactory()
         factory_args = self._option_problem_factory_args()
         problem_xml = factory.build_xml(**factory_args)
-        ItemFactory.create(parent_location=parent.location,
-                           parent=parent,
-                           category="problem",
-                           display_name=problem_url_name,
-                           data=problem_xml,
-                           **kwargs)
+        return ItemFactory.create(parent_location=parent.location,
+                                  parent=parent,
+                                  category="problem",
+                                  display_name=problem_url_name,
+                                  data=problem_xml,
+                                  **kwargs)
 
     def redefine_option_problem(self, problem_url_name, correct_answer=OPTION_1, num_inputs=1, num_responses=2):
         """Change the problem definition so the answer is Option 2"""
