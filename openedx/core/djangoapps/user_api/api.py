@@ -5,6 +5,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse
 from django.utils.translation import ugettext as _
+from django.utils.translation import pgettext
 from django_countries import countries
 
 import accounts
@@ -40,7 +41,7 @@ def get_password_reset_form():
 
     # Translators: This label appears above a field on the password reset
     # form meant to hold the user's email address.
-    email_label = _(u"Email")
+    email_label = pgettext("Register and Login", u"Email")
 
     # Translators: This example email address is used as a placeholder in
     # a field on the password reset form meant to hold the user's email address.
@@ -313,7 +314,7 @@ class RegistrationFormFactory(object):
         """
         # Translators: This label appears above a field on the registration form
         # meant to hold the user's email address.
-        email_label = _(u"Email")
+        email_label = pgettext("Register and Login", u"Email")
 
         # Translators: These instructions appear on the registration form, immediately
         # below a field meant to hold the user's email address.

@@ -6442,11 +6442,7 @@ msgid "User ID"
 msgstr "用户ID"
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
-#. Translators: This label appears above a field on the password reset
-#. form meant to hold the user's email address.
 #. Translators: This label appears above a field on the login form
-#. meant to hold the user's email address.
-#. Translators: This label appears above a field on the registration form
 #. meant to hold the user's email address.
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
@@ -10748,6 +10744,15 @@ msgstr "成功"
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Actions"
 msgstr "操作"
+
+#. Translators: This label appears above a field on the password reset
+#. form meant to hold the user's email address.
+#. Translators: This label appears above a field on the registration form
+#. meant to hold the user's email address.
+#: openedx/core/djangoapps/user_api/api.py
+msgctxt "Register and Login"
+msgid "Email"
+msgstr "邮箱"
 
 #. Translators: This example email address is used as a placeholder in
 #. a field on the password reset form meant to hold the user's email address.
@@ -26685,7 +26690,7 @@ msgid "email address"
 msgstr "邮箱"
 
 msgid "English"
-msgstr "英语"
+msgstr "英文"
 
 msgid "Chinese"
 msgstr "中文"
