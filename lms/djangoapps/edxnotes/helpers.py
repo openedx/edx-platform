@@ -16,7 +16,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 from opaque_keys.edx.keys import UsageKey
-from provider.oauth2.models import Client
+from oauth2_provider.models import Application
 from requests.exceptions import RequestException
 
 from courseware.access import has_access
@@ -52,14 +52,15 @@ def get_edxnotes_id_token(user):
     """
     Returns generated ID Token for edxnotes.
     """
-    # TODO: Use the system's JWT_AUDIENCE and JWT_SECRET_KEY instead of client ID and name.
     try:
-        client = Client.objects.get(name=CLIENT_NAME)
-    except Client.DoesNotExist:
+        notes_application = Application.objects.get(name=CLIENT_NAME)
+    except Application.DoesNotExist:
         raise ImproperlyConfigured(
             'OAuth2 Client with name [{}] does not exist.'.format(CLIENT_NAME)
         )
-    return create_jwt_for_user(user, secret=client.client_secret, aud=client.client_id)
+    return create_jwt_for_user(
+        user, secret=notes_application.client_secret, aud=notes_application.client_id
+    )
 
 
 def get_token_url(course_id):
@@ -246,7 +247,7 @@ def get_module_context(course, item):
     """
     item_dict = {
         'location': unicode(item.location),
-        'display_name': item.display_name_with_default_escaped,
+        'display_name': item.display_name_with_default,
     }
     if item.category == 'chapter' and item.get_parent():
         # course is a locator w/o branch and version
@@ -425,7 +426,7 @@ def get_course_position(course_module):
     urlargs['chapter'] = chapter.url_name
     if course_module.position is not None:
         return {
-            'display_name': chapter.display_name_with_default_escaped,
+            'display_name': chapter.display_name_with_default,
             'url': reverse('courseware_chapter', kwargs=urlargs),
         }
 
@@ -437,7 +438,7 @@ def get_course_position(course_module):
 
     urlargs['section'] = section.url_name
     return {
-        'display_name': section.display_name_with_default_escaped,
+        'display_name': section.display_name_with_default,
         'url': reverse('courseware_section', kwargs=urlargs)
     }
 
