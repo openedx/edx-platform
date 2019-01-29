@@ -60,12 +60,25 @@
 }
 
 // 未激活邮件，购买课程
-#pay-and-verify-container{
+.verification-process .carousel #pay-and-verify-container{
   .wrapper-view{
     background-color: #ffffff;
     box-shadow: 0px 1px 4px 0px $border;
     border-radius: 3px;
-    padding: 30px 20px 25px;
+    padding: 30px 20px;
+    .container{
+      padding: 0;
+      margin: 0;
+      width: 100%;
+      p{
+        text-align: left;
+        line-height: 1;
+        color: $font;
+      }
+    }
+  }
+  .review.view{
+    box-shadow: none;
   }
   h2{
     font-size: 14px;
@@ -75,7 +88,7 @@
   h3{
     font-size: 14px;
     color: $title;
-    padding: 30px 0 20px;
+    padding: 30px 0 15px;
     border-top: 1px solid $border;
     margin-top: 30px;
   }
@@ -83,16 +96,21 @@
     display: block;
     text-align: center;
     color: $title;
+    font-weight: normal;
     padding: 15px 0;
+    font-size: 14px;
   }
   .instruction{
     padding-left: 0;
     p{
       text-align: center;
+      font-weight: normal;
     }
   } 
   .activate-info{
     color: $font;
+    font-size: 14px;
+    font-weight: normal;
   }
   .fa-envelope-o{
     vertical-align: middle;
