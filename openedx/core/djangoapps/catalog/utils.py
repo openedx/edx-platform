@@ -13,9 +13,13 @@ from pytz import UTC
 
 from entitlements.utils import is_course_run_entitlement_fulfillable
 from openedx.core.constants import COURSE_PUBLISHED
-from openedx.core.djangoapps.catalog.cache import (PATHWAY_CACHE_KEY_TPL, PROGRAM_CACHE_KEY_TPL,
-                                                   SITE_PATHWAY_IDS_CACHE_KEY_TPL,
-                                                   SITE_PROGRAM_UUIDS_CACHE_KEY_TPL)
+from openedx.core.djangoapps.catalog.cache import (
+    COURSE_PROGRAMS_CACHE_KEY_TPL,
+    PATHWAY_CACHE_KEY_TPL,
+    PROGRAM_CACHE_KEY_TPL,
+    SITE_PATHWAY_IDS_CACHE_KEY_TPL,
+    SITE_PROGRAM_UUIDS_CACHE_KEY_TPL
+)
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.lib.edx_api_utils import get_edx_api_data
@@ -75,21 +79,23 @@ def check_catalog_integration_and_get_user(error_message_field):
         return None, catalog_integration
 
 
-def get_programs(site, uuid=None):
+def get_programs(site=None, uuid=None, course=None):  # pylint: disable=redefined-outer-name
     """Read programs from the cache.
 
     The cache is populated by a management command, cache_programs.
 
-    Arguments:
-        site (Site): django.contrib.sites.models object
-
     Keyword Arguments:
+        site (Site): django.contrib.sites.models object
         uuid (string): UUID identifying a specific program to read from the cache.
+        course (string): course id identifying a specific course run to read from the cache.
 
     Returns:
         list of dict, representing programs.
         dict, if a specific program is requested.
     """
+    if len([arg for arg in (site, uuid, course) if arg is not None]) != 1:
+        raise TypeError('get_programs takes exactly one argument')
+
     missing_details_msg_tpl = u'Failed to get details for program {uuid} from the cache.'
 
     if uuid:
@@ -98,9 +104,14 @@ def get_programs(site, uuid=None):
             logger.warning(missing_details_msg_tpl.format(uuid=uuid))
 
         return program
-    uuids = cache.get(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=site.domain), [])
-    if not uuids:
-        logger.warning(u'Failed to get program UUIDs from the cache for site {}.'.format(site.domain))
+    elif course:
+        uuids = cache.get(COURSE_PROGRAMS_CACHE_KEY_TPL.format(course_run_id=course))
+        if not uuids:
+            logger.warning(missing_details_msg_tpl.format(course=course))
+    else:
+        uuids = cache.get(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=site.domain), [])
+        if not uuids:
+            logger.warning(u'Failed to get program UUIDs from the cache for site {}.'.format(site.domain))
 
     programs = cache.get_many([PROGRAM_CACHE_KEY_TPL.format(uuid=uuid) for uuid in uuids])
     programs = list(programs.values())

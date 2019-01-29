@@ -167,7 +167,7 @@ class TestGetPrograms(CacheIsolationTestCase):
         expected_program = ProgramFactory()
         expected_uuid = expected_program['uuid']
 
-        self.assertEqual(get_programs(self.site, uuid=expected_uuid), None)
+        self.assertEqual(get_programs(uuid=expected_uuid), None)
         mock_warning.assert_called_once_with(
             u'Failed to get details for program {uuid} from the cache.'.format(uuid=expected_uuid)
         )
@@ -179,7 +179,7 @@ class TestGetPrograms(CacheIsolationTestCase):
             None
         )
 
-        actual_program = get_programs(self.site, uuid=expected_uuid)
+        actual_program = get_programs(uuid=expected_uuid)
         self.assertEqual(actual_program, expected_program)
         self.assertFalse(mock_warning.called)
 
