@@ -3,8 +3,6 @@ Helpers methods for site configuration.
 """
 from django.conf import settings
 
-from microsite_configuration import microsite
-
 
 def get_current_site_configuration():
     """
@@ -22,9 +20,9 @@ def get_current_site_configuration():
     # Import is placed here to avoid model import at project startup.
     from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
     try:
-        return getattr(site, "configuration", None)
+        return getattr(site, "configuration", SiteConfiguration(site=site, enabled=True))
     except SiteConfiguration.DoesNotExist:
-        return None
+        return SiteConfiguration(site=site, enabled=True)
 
 
 def is_site_configuration_enabled():
@@ -107,12 +105,8 @@ def get_value(val_name, default=None, **kwargs):
         Configuration/Microsite value for the given key.
     """
 
-    if is_site_configuration_enabled():
-        # Retrieve the requested field/value from the site configuration
-        configuration_value = get_configuration_value(val_name, default=default)
-    else:
-        # Retrieve the requested field/value from the microsite configuration
-        configuration_value = microsite.get_value(val_name, default=default, **kwargs)
+    # Retrieve the requested field/value from the site configuration
+    configuration_value = get_configuration_value(val_name, default=default)
 
     # Attempt to perform a dictionary update using the provided default
     # This will fail if either the default or the microsite value is not a dictionary
@@ -145,10 +139,7 @@ def get_dict(name, default=None):
     """
     default = default or {}
 
-    if is_site_configuration_enabled():
-        return get_configuration_dict(name, default)
-    else:
-        return microsite.get_dict(name, default)
+    return get_configuration_dict(name, default)
 
 
 def has_override_value(name):
@@ -162,10 +153,7 @@ def has_override_value(name):
     Returns:
         (bool): True if given key is present in the configuration.
     """
-    if is_site_configuration_enabled():
-        return has_configuration_override(name)
-    else:
-        return microsite.has_override_value(name)
+    return has_configuration_override(name)
 
 
 def get_value_for_org(org, val_name, default=None):
@@ -183,13 +171,9 @@ def get_value_for_org(org, val_name, default=None):
 
     """
     # Here we first look for the asked org inside site configuration, and if org is not present in site configuration
-    # then we go ahead and look it inside microsite configuration.
     # Import is placed here to avoid model import at project startup.
     from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
-    if SiteConfiguration.has_org(org):
-        return SiteConfiguration.get_value_for_org(org, val_name, default)
-    else:
-        return microsite.get_value_for_org(org, val_name, default)
+    return SiteConfiguration.get_value_for_org(org, val_name, default)
 
 
 def get_current_site_orgs():
@@ -218,9 +202,8 @@ def get_all_orgs():
     # Import is placed here to avoid model import at project startup.
     from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
     site_configuration_orgs = SiteConfiguration.get_all_orgs()
-    microsite_orgs = microsite.get_all_orgs()
 
-    return site_configuration_orgs.union(microsite_orgs)
+    return site_configuration_orgs
 
 
 def page_title_breadcrumbs(*crumbs, **kwargs):

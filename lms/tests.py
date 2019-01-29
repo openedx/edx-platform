@@ -10,7 +10,6 @@ from mock import patch
 from six import text_type
 
 from edxmako import LOOKUP, add_lookup
-from microsite_configuration import microsite
 from openedx.features.course_experience import course_home_url_name
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -44,14 +43,9 @@ class TemplateLookupTests(TestCase):
     """
 
     def test_add_lookup_to_main(self):
-        """Test that any template directories added are not cleared when microsites are enabled."""
+        """Test that any template directories added are not cleared."""
 
         add_lookup('main', 'external_module', __name__)
-        directories = LOOKUP['main'].directories
-        self.assertEqual(len([directory for directory in directories if 'external_module' in directory]), 1)
-
-        # This should not clear the directories list
-        microsite.enable_microsites(log)
         directories = LOOKUP['main'].directories
         self.assertEqual(len([directory for directory in directories if 'external_module' in directory]), 1)
 

@@ -64,13 +64,6 @@ FEATURES_WITH_CUSTOM_CERTS_ENABLED = {
 FEATURES_WITH_CUSTOM_CERTS_ENABLED.update(FEATURES_WITH_CERTS_ENABLED)
 
 
-def _fake_is_request_in_microsite():
-    """
-    Mocked version of microsite helper method to always return true
-    """
-    return True
-
-
 class CommonCertificatesTestCase(ModuleStoreTestCase):
     """
     Common setUp and utility methods for Certificate tests
@@ -278,117 +271,6 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         )
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-    def test_linkedin_share_microsites(self):
-        """
-        Test: LinkedIn share URL should be visible when called from within a microsite.
-        """
-        self._add_course_certificates(count=1, signatory_count=1, is_active=True)
-        test_url = get_certificate_url(course_id=self.cert.course_id, uuid=self.cert.verify_uuid)
-        response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
-        self.assertEqual(response.status_code, 200)
-        # the linkedIn share URL with appropriate parameters should be present
-        params = OrderedDict([
-            ('_ed', settings.MICROSITE_CONFIGURATION['test_site']['LINKEDIN_COMPANY_ID'],),
-            ('pfCertificationName', '{platform_name} Honor Code Certificate for {course_name}'.format(
-                platform_name=settings.MICROSITE_CONFIGURATION['test_site']['platform_name'],
-                course_name=self.course.display_name,
-            ),),
-            ('pfCertificationUrl', 'http://' + settings.MICROSITE_TEST_HOSTNAME + test_url,),
-        ])
-        self.assertIn(
-            js_escaped_string(self.linkedin_url.format(params=urlencode(params))),
-            response.content
-        )
-
-    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-    @patch.dict("django.conf.settings.SOCIAL_SHARING_SETTINGS", {"CERTIFICATE_FACEBOOK": True})
-    def test_facebook_share_microsites(self):
-        """
-        Test: Facebook share URL should be visible when web cert called from within a white label
-        site and it should use white label site's FACEBOOK_APP_ID.
-        """
-        self._add_course_certificates(count=1, signatory_count=1, is_active=True)
-        test_url = get_certificate_url(course_id=self.cert.course_id, uuid=self.cert.verify_uuid)
-        response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
-        self.assertEqual(response.status_code, 200)
-        self.assertIn("Post on Facebook", response.content)
-        self.assertIn(settings.MICROSITE_CONFIGURATION['test_site']['FACEBOOK_APP_ID'], response.content)
-
-    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-    @ddt.data(
-        (False, False, False),
-        (False, False, True),
-        (False, True, True),
-        (True, True, True),
-        (True, True, False),
-    )
-    @ddt.unpack
-    def test_social_sharing_availablity_microsites(self, facebook_sharing, twitter_sharing, linkedin_sharing):
-        """
-        Test: Facebook, Twitter and LinkedIn sharing availability for microsites.
-        """
-        self._add_course_certificates(count=1, signatory_count=1, is_active=True)
-        test_url = get_certificate_url(course_id=self.cert.course_id, uuid=self.cert.verify_uuid)
-        social_sharing_settings = dict(
-            CERTIFICATE_FACEBOOK=facebook_sharing,
-            CERTIFICATE_TWITTER=twitter_sharing,
-            CERTIFICATE_LINKEDIN=linkedin_sharing,
-        )
-        with patch("django.conf.settings.MICROSITE_CONFIGURATION", {
-            "test_site": dict(
-                settings.MICROSITE_CONFIGURATION['test_site'],
-                SOCIAL_SHARING_SETTINGS=social_sharing_settings,
-            )
-        }):
-            response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
-            self.assertEqual(response.status_code, 200)
-            self.assertEqual("Post on Facebook" in response.content, facebook_sharing)
-            self.assertEqual("Share on Twitter" in response.content, twitter_sharing)
-            self.assertEqual("Add to LinkedIn Profile" in response.content, linkedin_sharing)
-
-    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-    def test_facebook_default_text_microsites(self):
-        """
-        Test: Facebook sharing default text for microsites.
-        """
-        self._add_course_certificates(count=1, signatory_count=1, is_active=True)
-        test_url = get_certificate_url(course_id=self.cert.course_id, uuid=self.cert.verify_uuid)
-        facebook_text = "Facebook text on Test Site"
-        social_sharing_settings = dict(
-            CERTIFICATE_FACEBOOK=True,
-            CERTIFICATE_FACEBOOK_TEXT=facebook_text,
-        )
-        with patch("django.conf.settings.MICROSITE_CONFIGURATION", {
-            "test_site": dict(
-                settings.MICROSITE_CONFIGURATION['test_site'],
-                SOCIAL_SHARING_SETTINGS=social_sharing_settings,
-            )
-        }):
-            response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
-            self.assertContains(response, facebook_text)
-
-    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-    def test_twitter_default_text_microsites(self):
-        """
-        Test: Twitter sharing default text for microsites.
-        """
-        self._add_course_certificates(count=1, signatory_count=1, is_active=True)
-        test_url = get_certificate_url(course_id=self.cert.course_id, uuid=self.cert.verify_uuid)
-        twitter_text = "Twitter text on Test Site"
-        social_sharing_settings = dict(
-            CERTIFICATE_TWITTER=True,
-            CERTIFICATE_TWITTER_TEXT=twitter_text,
-        )
-        with patch("django.conf.settings.MICROSITE_CONFIGURATION", {
-            "test_site": dict(
-                settings.MICROSITE_CONFIGURATION['test_site'],
-                SOCIAL_SHARING_SETTINGS=social_sharing_settings,
-            )
-        }):
-            response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
-            self.assertContains(response, twitter_text)
-
-    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_rendering_course_organization_data(self):
         """
         Test: organization data should render on certificate web view if course has organization.
@@ -545,7 +427,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             "Add to Mozilla Backpack",
             response.content
         )
-        # Test item from microsite info
+        # Test item from info
         self.assertIn(
             "http://www.test-site.org/about-us",
             response.content
@@ -1632,102 +1514,6 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         self.assertContains(
             response,
             settings.MICROSITE_CONFIGURATION['test_site']["urls"]['TOS_AND_HONOR'],
-        )
-
-    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-    @patch.dict("django.conf.settings.MICROSITE_CONFIGURATION", {
-        "test_site": dict(
-            settings.MICROSITE_CONFIGURATION['test_site'],
-            urls=dict(
-                ABOUT=None,
-                PRIVACY=None,
-                TOS_AND_HONOR=None,
-            ),
-        )
-    })
-    def test_certificate_branding_without_microsite_urls(self):
-        """
-        Test that links from MKTG_URL_LINK_MAP setting are used if corresponding microsite urls are not present.
-        microsite configuration.
-        """
-        self._add_course_certificates(count=1, signatory_count=1, is_active=True)
-        self.course.save()
-        self.store.update_item(self.course, self.user.id)
-        configuration = CertificateHtmlViewConfiguration.get_config()
-        test_url = get_certificate_url(
-            user_id=self.user.id,
-            course_id=unicode(self.course.id)
-        )
-        response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
-        # ABOUT is not present in MICROSITE_CONFIGURATION['test_site']["urls"],
-        #  so web certificate will use MKTG_URL_LINK_MAP['ABOUT'] url.
-        self.assertContains(
-            response,
-            settings.MKTG_URL_LINK_MAP['ABOUT'],
-        )
-        # PRIVACY is not present in MICROSITE_CONFIGURATION['test_site']["urls"],
-        # so web certificate will use MKTG_URL_LINK_MAP['PRIVACY'] url.
-        self.assertContains(
-            response,
-            settings.MKTG_URL_LINK_MAP['PRIVACY'],
-        )
-        # TOS_AND_HONOR is not present in MICROSITE_CONFIGURATION['test_site']["urls"] or MKTG_URL_LINK_MAP,
-        # so web certificate will use CertificateHtmlViewConfiguration url.
-        self.assertContains(
-            response,
-            configuration['microsites']['test-site']['company_tos_url'],
-        )
-
-    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-    @patch.dict("django.conf.settings.MICROSITE_CONFIGURATION", {
-        "test_site": dict(
-            settings.MICROSITE_CONFIGURATION['test_site'],
-            urls=dict(
-                ABOUT=None,
-                PRIVACY=None,
-                TOS_AND_HONOR=None,
-            ),
-        )
-    })
-    @patch.dict("django.conf.settings.MKTG_URL_LINK_MAP", {
-        'ABOUT': None,
-        'PRIVACY': None,
-        'TOS_AND_HONOR': None,
-    })
-    def test_certificate_without_branding_urls(self):
-        """
-        Test that links from CertificateHtmlViewConfiguration are used if
-        corresponding microsite or marketing urls are not present.
-        """
-        self._add_course_certificates(count=1, signatory_count=1, is_active=True)
-
-        self.course.save()
-        self.store.update_item(self.course, self.user.id)
-        configuration = CertificateHtmlViewConfiguration.get_config()
-
-        test_url = get_certificate_url(
-            user_id=self.user.id,
-            course_id=unicode(self.course.id)
-        )
-        response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
-
-        # ABOUT is not present in MICROSITE_CONFIGURATION['test_site']["urls"] or MKTG_URL_LINK_MAP,
-        #  so web certificate will use CertificateHtmlViewConfiguration url.
-        self.assertContains(
-            response,
-            configuration['microsites']['test-site']['company_about_url'],
-        )
-        # PRIVACY is not present in MICROSITE_CONFIGURATION['test_site']["urls"] or MKTG_URL_LINK_MAP,
-        # so web certificate will use CertificateHtmlViewConfiguration url.
-        self.assertContains(
-            response,
-            configuration['microsites']['test-site']['company_privacy_url'],
-        )
-        # TOS_AND_HONOR is not present in MICROSITE_CONFIGURATION['test_site']["urls"] or MKTG_URL_LINK_MAP,
-        # so web certificate will use CertificateHtmlViewConfiguration url.
-        self.assertContains(
-            response,
-            configuration['microsites']['test-site']['company_tos_url'],
         )
 
 

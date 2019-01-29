@@ -4,8 +4,8 @@ from factory.fuzzy import FuzzyInteger, FuzzyText
 from factory.django import DjangoModelFactory
 from oauth2_provider.models import get_application_model
 
-from microsite_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.api_admin.models import ApiAccessRequest, Catalog
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from student.tests.factories import UserFactory
 
 
