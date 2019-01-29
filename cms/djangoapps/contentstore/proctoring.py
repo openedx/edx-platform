@@ -76,7 +76,8 @@ def register_special_exams(course_key):
             'time_limit_mins': timed_exam.default_time_limit_minutes,
             'due_date': timed_exam.due,
             'is_proctored': timed_exam.is_proctored_exam,
-            'is_practice_exam': timed_exam.is_practice_exam,
+            # backends that support onboarding exams will treat onboarding exams as practice
+            'is_practice_exam': timed_exam.is_practice_exam or timed_exam.is_onboarding_exam,
             'is_active': True,
             'hide_after_due': timed_exam.hide_after_due,
             'backend': course.proctoring_provider,
@@ -106,7 +107,7 @@ def register_special_exams(course_key):
         }
 
         # only create/update exam policy for the proctored exams
-        if timed_exam.is_proctored_exam and not timed_exam.is_practice_exam:
+        if timed_exam.is_proctored_exam and not timed_exam.is_practice_exam and not timed_exam.is_onboarding_exam:
             try:
                 update_review_policy(**exam_review_policy_metadata)
             except ProctoredExamReviewPolicyNotFoundException:

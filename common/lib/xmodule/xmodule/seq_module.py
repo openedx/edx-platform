@@ -125,6 +125,15 @@ class ProctoringFields(object):
         scope=Scope.settings,
     )
 
+    is_onboarding_exam = Boolean(
+        display_name=_("Is Onboarding Exam"),
+        help=_(
+            "This setting indicates whether this exam is an onboarding exam."
+        ),
+        default=False,
+        scope=Scope.settings,
+    )
+
     def _get_course(self):
         """
         Return course by course id.
