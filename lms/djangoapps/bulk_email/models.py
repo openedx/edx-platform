@@ -435,6 +435,16 @@ class CourseAuthorization(models.Model):
         return u"Course '{}': Instructor Email {}Enabled".format(text_type(self.course_id), not_en)
 
 
+# .. feature_toggle_name: require_course_email_auth
+# .. feature_toggle_type: ConfigurationModel
+# .. feature_toggle_default: True (enabled)
+# .. feature_toggle_description: If the flag is enabled, course-specific authorization is required, and the course_id is either not provided or not authorixed, the feature is not available.
+# .. feature_toggle_category: bulk email
+# .. feature_toggle_use_cases: Open edX option,
+# .. feature_toggle_expiration_date: None
+# .. feature_toggle_warnings: None
+# .. feature_toggle_tickets: None
+# .. feature_toggle_status: supported
 class BulkEmailFlag(ConfigurationModel):
     """
     Enables site-wide configuration for the bulk_email feature.
