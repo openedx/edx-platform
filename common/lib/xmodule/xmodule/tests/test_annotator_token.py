@@ -17,9 +17,9 @@ class TokenRetriever(unittest.TestCase):
         Test for the token generator. Give an a random username and secret token,
         it should create the properly encoded string of text.
         """
-        expected = "eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJpc3N1ZWRBdCI6ICIyMDE0LTAyLTI3VDE3OjAwOjQyLjQwNjQ0MSswOjAwIiwgImNvbnN1bWVyS2V5IjogImZha2Vfc2VjcmV0IiwgInVzZXJJZCI6ICJ1c2VybmFtZSIsICJ0dGwiOiA4NjQwMH0.Dx1PoF-7mqBOOSGDMZ9R_s3oaaLRPnn6CJgGGF2A5CQ"
-        response = retrieve_token("username", "fake_secret")
+        expected = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE1NDg4NTUxNzYsImQiOnsiaXNzdWVkQXQiOiIyMDE5LTAxLTMwVDA4OjMyOjU2LjE1ODYzMS01OjAwIiwiY29uc3VtZXJLZXkiOiJmYWtlX3NlY3JldCIsInVzZXJJZCI6InVzZXJuYW1lIiwidWlkIjoidXNlcm5hbWUiLCJ0dGwiOjg2NDAwfSwidiI6MH0.tuzOcvKEEOW6V7FLlSr_CS_LbYBX_dvdxOWzXquivIU"
+        response = retrieve_token("useremail", "userid", "fake_secret")
 
-        # because the middle hashes are dependent on time, conly the header and footer are checked for secret key
+        # because the middle hashes are dependent on time, only the header and footer are checked for secret key
         self.assertEqual(expected.split('.')[0], response.split('.')[0])
         self.assertNotEqual(expected.split('.')[2], response.split('.')[2])

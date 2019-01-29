@@ -33,7 +33,7 @@ def notes(request, course_id):
         'notes': notes,
         'student': student,
         'storage': storage,
-        'token': retrieve_token(student.email, course.annotation_token_secret),
+        'token': retrieve_token(student.email, student.id, course.annotation_token_secret),
         'default_tab': 'myNotes',
     }
 

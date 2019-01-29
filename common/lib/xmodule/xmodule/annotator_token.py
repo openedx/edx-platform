@@ -10,7 +10,7 @@ import datetime
 from firebase_token_generator import create_token
 
 
-def retrieve_token(userid, secret):
+def retrieve_token(useremail, userid, secret):
     '''
     Return a token for the backend of annotations.
     It uses the course id to retrieve a variable that contains the secret
@@ -20,14 +20,15 @@ def retrieve_token(userid, secret):
     '''
 
     # the following five lines of code allows you to include the default timezone in the iso format
-    # for more information: http://stackoverflow.com/questions/3401428/how-to-get-an-isoformat-datetime-string-including-the-default-timezone
+    # for more information:
+    # http://stackoverflow.com/questions/3401428/how-to-get-an-isoformat-datetime-string-including-the-default-timezone
     dtnow = datetime.datetime.now()
     dtutcnow = datetime.datetime.utcnow()
     delta = dtnow - dtutcnow
     newhour, newmin = divmod((delta.days * 24 * 60 * 60 + delta.seconds + 30) // 60, 60)
     newtime = "%s%+02d:%02d" % (dtnow.isoformat(), newhour, newmin)
-    # uses the issued time (UTC plus timezone), the consumer key and the user's email to maintain a
+    # uses the issued time (UTC plus timezone), the consumer key, the user's email and the user's id to maintain a
     # federated system in the annotation backend server
-    custom_data = {"issuedAt": newtime, "consumerKey": secret, "userId": userid, "ttl": 86400}
+    custom_data = {"issuedAt": newtime, "consumerKey": secret, "userId": useremail, "uid": userid, "ttl": 86400}
     newtoken = create_token(secret, custom_data)
     return newtoken
