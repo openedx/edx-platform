@@ -330,6 +330,17 @@ class GeneratedCertificate(models.Model):
 
         self.save()
 
+    def mark_notpassing(self, grade):
+        """
+        Invalidates a Generated Certificate by marking it as not passing
+        """
+        self.verify_uuid = ''
+        self.download_uuid = ''
+        self.download_url = ''
+        self.grade = grade
+        self.status = CertificateStatuses.notpassing
+        self.save()
+
     def is_valid(self):
         """
         Return True if certificate is valid else return False.
