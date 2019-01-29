@@ -4,4 +4,3 @@
 nick: edx
 oeps: {}
 openedx-release: {ref: release}
-track-pulls: true
