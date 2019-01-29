@@ -176,6 +176,8 @@ FEATURES = {
     # in sync with the ones in lms/envs/common.py
     'ENABLE_DISCUSSION_SERVICE': True,
     'ENABLE_TEXTBOOK': True,
+
+    # .. documented_elsewhere_name: ENABLE_STUDENT_NOTES
     'ENABLE_STUDENT_NOTES': True,
 
     # DO NOT SET TO True IN THIS FILE
