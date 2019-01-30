@@ -72,7 +72,7 @@
       width: 100%;
       p{
         text-align: left;
-        line-height: 1;
+        line-height: 1.5;
         color: $font;
       }
     }
@@ -84,6 +84,7 @@
     font-size: 14px;
     color: $font;
     margin: 0;
+    font-weight: normal;
   }
   h3{
     font-size: 14px;
@@ -91,6 +92,8 @@
     padding: 30px 0 15px;
     border-top: 1px solid $border;
     margin-top: 30px;
+    font-weight: normal;
+    line-height: 1.5;
   }
   .course-title{
     display: block;
@@ -111,9 +114,10 @@
     color: $font;
     font-size: 14px;
     font-weight: normal;
+    line-height: 1.5;
   }
   .fa-envelope-o{
-    vertical-align: middle;
+    vertical-align: sub;
     margin-right: 10px;
   }
 }
