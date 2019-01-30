@@ -1,22 +1,23 @@
 # This code-annotations configuration file supports OEP-17, Feature Toggles.
 
-source_path: ../
+source_path: ./
 report_path: reports
 safelist_path: .annotation_safe_list.yml
 coverage_target: 50.0
 annotations:
-    ".. feature_toggle_name:":
-    ".. feature_toggle_type:":
+  feature_toggle:
+    - ".. feature_toggle_name:":
+    - ".. feature_toggle_type:":
         choices: [switch, rollout, group, ConfigurationModel, feature_flag]
-    ".. feature_toggle_default:":
-    ".. feature_toggle_description:":
-    ".. feature_toggle_category:":
-    ".. feature_toggle_use_cases:":
+    - ".. feature_toggle_default:":
+    - ".. feature_toggle_description:":
+    - ".. feature_toggle_category:":
+    - ".. feature_toggle_use_cases:":
         choices: [incremental_release, launch_date, monitored_rollout, graceful_degradation, beta_testing, vip, opt_out, open_edx]
-    ".. feature_toggle_expiration_date:":
-    ".. feature_toggle_warnings:":
-    ".. feature_toggle_tickets:":
-    ".. feature_toggle_status:":
+    - ".. feature_toggle_expiration_date:":
+    - ".. feature_toggle_warnings:":
+    - ".. feature_toggle_tickets:":
+    - ".. feature_toggle_status:":
 extensions:
     python:
         - py
