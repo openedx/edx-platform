@@ -134,8 +134,7 @@ def index(request, extra_context=None, user=AnonymousUser()):
     """
     Render the edX main page.
 
-    extra_context is used to allow immediate display of certain modal windows, eg signup,
-    as used by external_auth.
+    extra_context is used to allow immediate display of certain modal windows, eg signup.
     """
     if extra_context is None:
         extra_context = {}

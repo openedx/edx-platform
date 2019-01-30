@@ -20,8 +20,6 @@ from ratelimitbackend.exceptions import RateLimitException
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies, refresh_jwt_cookies
 from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
-import openedx.core.djangoapps.external_auth.views
-from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
@@ -103,22 +101,6 @@ def _get_user_by_email(request):
             AUDIT_LOG.warning(u"Login failed - Unknown user email")
         else:
             AUDIT_LOG.warning(u"Login failed - Unknown user email: {0}".format(email))
-
-
-def _check_shib_redirect(user):
-    """
-    See if the user has a linked shibboleth account, if so, redirect the user to shib-login.
-    This behavior is pretty much like what gmail does for shibboleth.  Try entering some @stanford.edu
-    address into the Gmail login.
-    """
-    if settings.FEATURES.get('AUTH_USE_SHIB') and user:
-        try:
-            eamap = ExternalAuthMap.objects.get(user=user)
-            if eamap.external_domain.startswith(openedx.core.djangoapps.external_auth.views.SHIBBOLETH_DOMAIN_PREFIX):
-                raise AuthFailedError('', redirect=reverse('shib-login'))
-        except ExternalAuthMap.DoesNotExist:
-            # This is actually the common case, logging in user without external linked login
-            AUDIT_LOG.info(u"User %s w/o external auth attempting login", user)
 
 
 def _check_excessive_login_attempts(user):
@@ -347,7 +329,6 @@ def login_user(request):
         else:
             email_user = _get_user_by_email(request)
 
-        _check_shib_redirect(email_user)
         _check_excessive_login_attempts(email_user)
 
         possibly_authenticated_user = email_user

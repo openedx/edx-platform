@@ -108,19 +108,6 @@ FEATURES = {
 
     'DISABLE_LOGIN_BUTTON': False,  # used in systems where login is automatic, eg MIT SSL
 
-    # extrernal access methods
-    'AUTH_USE_OPENID': False,
-    'AUTH_USE_CERTIFICATES': False,
-    'AUTH_USE_OPENID_PROVIDER': False,
-    # Even though external_auth is in common, shib assumes the LMS views / urls, so it should only be enabled
-    # in LMS
-    'AUTH_USE_SHIB': False,
-    'AUTH_USE_CAS': False,
-
-    # This flag disables the requirement of having to agree to the TOS for users registering
-    # with Shib.  Feature was requested by Stanford's office of general counsel
-    'SHIB_DISABLE_TOS': False,
-
     # Toggles OAuth2 authentication provider
     'ENABLE_OAUTH2_PROVIDER': False,
 
@@ -136,9 +123,6 @@ FEATURES = {
 
     # Set to hide the courses list on the Learner Dashboard if they are not enrolled in any courses yet.
     'HIDE_DASHBOARD_COURSES_UNTIL_ACTIVATED': False,
-
-    # Enables ability to restrict enrollment in specific courses by the user account login method
-    'RESTRICT_ENROLL_BY_REG_METHOD': False,
 
     # enable analytics server.
     # WARNING: THIS SHOULD ALWAYS BE SET TO FALSE UNDER NORMAL
@@ -2068,10 +2052,6 @@ INSTALLED_APPS = [
     # Student support tools
     'support',
 
-    # External auth (OpenID, shib)
-    'openedx.core.djangoapps.external_auth',
-    'django_openid_auth',
-
     # django-oauth2-provider (deprecated)
     'provider',
     'provider.oauth2',
@@ -2473,19 +2453,6 @@ if FEATURES.get('CLASS_DASHBOARD'):
 ################ Enable credit eligibility feature ####################
 ENABLE_CREDIT_ELIGIBILITY = True
 FEATURES['ENABLE_CREDIT_ELIGIBILITY'] = ENABLE_CREDIT_ELIGIBILITY
-
-######################## CAS authentication ###########################
-
-if FEATURES.get('AUTH_USE_CAS'):
-    CAS_SERVER_URL = 'https://provide_your_cas_url_here'
-    AUTHENTICATION_BACKENDS = [
-        'django.contrib.auth.backends.ModelBackend',
-        'django_cas.backends.CASBackend',
-    ]
-
-    INSTALLED_APPS.append('django_cas')
-
-    MIDDLEWARE_CLASSES.append('django_cas.middleware.CASMiddleware')
 
 ############# Cross-domain requests #################
 

@@ -382,26 +382,6 @@ SSL_AUTH_DN_FORMAT_STRING = ENV_TOKENS.get(
     u"/C=US/ST=Massachusetts/O=Massachusetts Institute of Technology/OU=Client CA v1/CN={0}/emailAddress={1}"
 )
 
-# Django CAS external authentication settings
-CAS_EXTRA_LOGIN_PARAMS = ENV_TOKENS.get("CAS_EXTRA_LOGIN_PARAMS", None)
-if FEATURES.get('AUTH_USE_CAS'):
-    CAS_SERVER_URL = ENV_TOKENS.get("CAS_SERVER_URL", None)
-    AUTHENTICATION_BACKENDS = [
-        'django.contrib.auth.backends.ModelBackend',
-        'django_cas.backends.CASBackend',
-    ]
-
-    INSTALLED_APPS.append('django_cas')
-
-    MIDDLEWARE_CLASSES.append('django_cas.middleware.CASMiddleware')
-    CAS_ATTRIBUTE_CALLBACK = ENV_TOKENS.get('CAS_ATTRIBUTE_CALLBACK', None)
-    if CAS_ATTRIBUTE_CALLBACK:
-        import importlib
-        CAS_USER_DETAILS_RESOLVER = getattr(
-            importlib.import_module(CAS_ATTRIBUTE_CALLBACK['module']),
-            CAS_ATTRIBUTE_CALLBACK['function']
-        )
-
 # Video Caching. Pairing country codes with CDN URLs.
 # Example: {'CN': 'http://api.xuetangx.com/edx/video?s3_url='}
 VIDEO_CDN_URL = ENV_TOKENS.get('VIDEO_CDN_URL', {})

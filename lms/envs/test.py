@@ -251,15 +251,6 @@ THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS = {
     },
 }
 
-################################## OPENID #####################################
-FEATURES['AUTH_USE_OPENID'] = True
-FEATURES['AUTH_USE_OPENID_PROVIDER'] = True
-
-################################## SHIB #######################################
-FEATURES['AUTH_USE_SHIB'] = True
-FEATURES['SHIB_DISABLE_TOS'] = True
-FEATURES['RESTRICT_ENROLL_BY_REG_METHOD'] = True
-
 OPENID_CREATE_USERS = False
 OPENID_UPDATE_DETAILS_FROM_SREG = True
 OPENID_USE_AS_ADMIN_LOGIN = False

@@ -3,7 +3,6 @@
 import json
 import unittest
 from datetime import datetime
-from importlib import import_module
 import unicodedata
 
 import ddt
@@ -19,12 +18,10 @@ from django.contrib.auth.hashers import make_password
 
 from django_comment_common.models import ForumsConfig
 from notification_prefs import NOTIFICATION_PREF_KEY
-from openedx.core.djangoapps.user_authn.views.deprecated import create_account
 from openedx.core.djangoapps.user_authn.views.register import (
     REGISTRATION_AFFILIATE_ID, REGISTRATION_UTM_CREATED_AT, REGISTRATION_UTM_PARAMETERS,
     _skip_activation_email,
 )
-from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.user_api.accounts import (
@@ -280,63 +277,6 @@ class TestCreateAccount(SiteMixin, TestCase):
         profile = self.create_account_and_fetch_profile()
         self.assertIsNone(profile.year_of_birth)
 
-    def base_extauth_bypass_sending_activation_email(self, bypass_activation_email):
-        """
-        Tests user creation without sending activation email when
-        doing external auth
-        """
-
-        request = self.request_factory.post(self.url, self.params)
-        request.site = self.site
-        # now indicate we are doing ext_auth by setting 'ExternalAuthMap' in the session.
-        request.session = import_module(settings.SESSION_ENGINE).SessionStore()  # empty session
-        extauth = ExternalAuthMap(external_id='withmap@stanford.edu',
-                                  external_email='withmap@stanford.edu',
-                                  internal_password=self.params['password'],
-                                  external_domain='shib:https://idp.stanford.edu/')
-        request.session['ExternalAuthMap'] = extauth
-        request.user = AnonymousUser()
-
-        with mock.patch('edxmako.request_context.get_current_request', return_value=request):
-            with mock.patch('django.core.mail.send_mail') as mock_send_mail:
-                create_account(request)
-
-        # check that send_mail is called
-        if bypass_activation_email:
-            self.assertFalse(mock_send_mail.called)
-        else:
-            self.assertTrue(mock_send_mail.called)
-
-    @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
-    @mock.patch.dict(settings.FEATURES,
-                     {'BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH': True, 'AUTOMATIC_AUTH_FOR_TESTING': False})
-    def test_extauth_bypass_sending_activation_email_with_bypass(self):
-        """
-        Tests user creation without sending activation email when
-        settings.FEATURES['BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH']=True and doing external auth
-        """
-        self.base_extauth_bypass_sending_activation_email(True)
-
-    @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
-    @mock.patch.dict(settings.FEATURES,
-                     {'BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH': False, 'AUTOMATIC_AUTH_FOR_TESTING': False})
-    def test_extauth_bypass_sending_activation_email_without_bypass_1(self):
-        """
-        Tests user creation without sending activation email when
-        settings.FEATURES['BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH']=False and doing external auth
-        """
-        self.base_extauth_bypass_sending_activation_email(False)
-
-    @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
-    @mock.patch.dict(settings.FEATURES, {'BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH': False,
-                                         'AUTOMATIC_AUTH_FOR_TESTING': False, 'SKIP_EMAIL_VALIDATION': True})
-    def test_extauth_bypass_sending_activation_email_without_bypass_2(self):
-        """
-        Tests user creation without sending activation email when
-        settings.FEATURES['BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH']=False and doing external auth
-        """
-        self.base_extauth_bypass_sending_activation_email(True)
-
     @ddt.data(True, False)
     def test_discussions_email_digest_pref(self, digest_enabled):
         with mock.patch.dict("student.models.settings.FEATURES", {"ENABLE_DISCUSSION_EMAIL_DIGEST": digest_enabled}):
@@ -491,59 +431,37 @@ class TestCreateAccount(SiteMixin, TestCase):
 
     @ddt.data(
         (
-            False, False, get_mock_pipeline_data(),
+            False, get_mock_pipeline_data(),
             {
                 'SKIP_EMAIL_VALIDATION': False, 'AUTOMATIC_AUTH_FOR_TESTING': False,
-                'BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH': False,
             },
             False  # Do not skip activation email for normal scenario.
         ),
         (
-            False, False, get_mock_pipeline_data(),
+            False, get_mock_pipeline_data(),
             {
                 'SKIP_EMAIL_VALIDATION': True, 'AUTOMATIC_AUTH_FOR_TESTING': False,
-                'BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH': False,
             },
             True  # Skip activation email when `SKIP_EMAIL_VALIDATION` FEATURE flag is active.
         ),
         (
-            False, False, get_mock_pipeline_data(),
+            False, get_mock_pipeline_data(),
             {
                 'SKIP_EMAIL_VALIDATION': False, 'AUTOMATIC_AUTH_FOR_TESTING': True,
-                'BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH': False,
             },
             True  # Skip activation email when `AUTOMATIC_AUTH_FOR_TESTING` FEATURE flag is active.
         ),
         (
-            True, False, get_mock_pipeline_data(),
+            True, get_mock_pipeline_data(),
             {
                 'SKIP_EMAIL_VALIDATION': False, 'AUTOMATIC_AUTH_FOR_TESTING': False,
-                'BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH': True,
-            },
-            True  # Skip activation email for external auth scenario.
-        ),
-        (
-            False, False, get_mock_pipeline_data(),
-            {
-                'SKIP_EMAIL_VALIDATION': False, 'AUTOMATIC_AUTH_FOR_TESTING': False,
-                'BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH': True,
-            },
-            False  # Do not skip activation email when `BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH` feature flag is set
-                   # but it is not external auth scenario.
-        ),
-        (
-            False, True, get_mock_pipeline_data(),
-            {
-                'SKIP_EMAIL_VALIDATION': False, 'AUTOMATIC_AUTH_FOR_TESTING': False,
-                'BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH': False,
             },
             True  # Skip activation email if `skip_email_verification` is set for third party authentication.
         ),
         (
-            False, False, get_mock_pipeline_data(email='invalid@yopmail.com'),
+            False, get_mock_pipeline_data(email='invalid@yopmail.com'),
             {
                 'SKIP_EMAIL_VALIDATION': False, 'AUTOMATIC_AUTH_FOR_TESTING': False,
-                'BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH': False,
             },
             False  # Send activation email when `skip_email_verification` is not set.
         )
@@ -551,7 +469,7 @@ class TestCreateAccount(SiteMixin, TestCase):
     @ddt.unpack
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_should_skip_activation_email(
-            self, do_external_auth, skip_email_verification, running_pipeline, feature_overrides, expected,
+            self, skip_email_verification, running_pipeline, feature_overrides, expected,
     ):
         """
         Test `skip_activation_email` works as expected.
@@ -564,7 +482,6 @@ class TestCreateAccount(SiteMixin, TestCase):
         with override_settings(FEATURES=dict(settings.FEATURES, **feature_overrides)):
             result = _skip_activation_email(
                 user=user,
-                do_external_auth=do_external_auth,
                 running_pipeline=running_pipeline,
                 third_party_provider=third_party_provider
             )
