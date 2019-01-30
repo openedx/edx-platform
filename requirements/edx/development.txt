@@ -349,7 +349,6 @@ webencodings==0.5.1
 webob==1.8.5
 werkzeug==0.14.1
 wrapt==1.10.5
-xblock-review==1.1.5
 xblock-utils==1.2.0
 xblock==1.2.2
 xmltodict==0.11.0
