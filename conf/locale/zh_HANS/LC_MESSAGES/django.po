@@ -21841,7 +21841,7 @@ msgid ""
 "consent of Elite, or to indicate that the User has the right to display, use"
 " or otherwise process the Trademark."
 msgstr ""
-"英荔教育、英荔以及其他英荔注册商标、标志及产品、服务名称，均为英荔公司之商标（以下简称“英荔标记”）。未经英荔事先书面同意，用户同意不将英荔标记以任何方式展示或使用或作其他处理，或表示用户有权展示、使用或另行处理英荔标记。"
+"英荔教育、英荔商学院、英荔以及其他英荔注册商标、标志及产品、服务名称，均为英荔公司之商标（以下简称“英荔标记”）。未经英荔事先书面同意，用户同意不将英荔标记以任何方式展示或使用或作其他处理，或表示用户有权展示、使用或另行处理英荔标记。"
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
 msgid ""
