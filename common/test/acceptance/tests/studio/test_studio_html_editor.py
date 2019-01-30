@@ -14,6 +14,8 @@ class HTMLComponentEditorTests(ContainerBase):
     Feature: CMS.Component Adding
     As a course author, I want to be able to add and edit HTML component
     """
+    shard = 18
+
     def setUp(self, is_staff=True):
         """
         Create a course with a section, subsection, and unit to which to add the component.

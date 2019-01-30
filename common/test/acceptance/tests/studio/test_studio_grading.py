@@ -11,6 +11,7 @@ class GradingPageTest(StudioCourseTest):
     """
     Bockchoy tests to add/edit grade settings in studio.
     """
+    shard = 13
 
     url = None
     GRACE_FIELD_CSS = "#course-grading-graceperiod"

@@ -1870,6 +1870,7 @@ class SelfPacedOutlineTest(CourseOutlineTest):
 
 class CourseStatusOutlineTest(CourseOutlineTest):
     """Test the course outline status section."""
+    shard = 6
 
     def setUp(self):
         super(CourseStatusOutlineTest, self).setUp()

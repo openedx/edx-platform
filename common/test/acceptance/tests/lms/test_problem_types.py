@@ -643,6 +643,7 @@ class AnnotationProblemTypeTest(AnnotationProblemTypeBase, ProblemTypeTestMixin)
     """
     Standard tests for the Annotation Problem Type
     """
+    shard = 24
     pass
 
 
@@ -691,6 +692,8 @@ class CheckboxProblemTypeTest(CheckboxProblemTypeBase, ProblemTypeTestMixin, Cha
     """
     Standard tests for the Checkbox Problem Type
     """
+    shard = 24
+
     def test_can_show_answer(self):
         """
         Scenario: Verifies that show answer button is working as expected.
@@ -788,6 +791,8 @@ class MultipleChoiceProblemTypeTest(MultipleChoiceProblemTypeBase, ProblemTypeTe
     """
     Standard tests for the Multiple Choice Problem Type
     """
+    shard = 24
+
     def test_can_show_answer(self):
         """
         Scenario: Verifies that show answer button is working as expected.
@@ -822,6 +827,7 @@ class MultipleChoiceProblemResetCorrectnessAfterChangingAnswerTest(MultipleChoic
     """
     Tests for Multiple choice problem with changing answers
     """
+    shard = 24
 
     @ddt.data(['correct', '1/1 point (ungraded)'], ['incorrect', '0/1 point (ungraded)'])
     @ddt.unpack
@@ -870,6 +876,8 @@ class MultipleChoiceProblemTypeTestNonRandomized(MultipleChoiceProblemTypeBase, 
     """
     Tests for non-randomized multiple choice problem
     """
+    shard = 24
+
     def get_problem(self):
         """
         Creates a {problem_type} problem
@@ -1064,6 +1072,7 @@ class RadioProblemTypeTest(RadioProblemTypeBase, ProblemTypeTestMixin):
     """
     Standard tests for the Multiple Radio Problem Type
     """
+    shard = 24
     pass
 
 
@@ -1072,6 +1081,7 @@ class RadioProblemResetCorrectnessAfterChangingAnswerTest(RadioProblemTypeBase):
     """
     Tests for Radio problem with changing answers
     """
+    shard = 24
 
     @ddt.data(['correct', '1/1 point (ungraded)'], ['incorrect', '0/1 point (ungraded)'])
     @ddt.unpack
@@ -1119,6 +1129,7 @@ class RadioProblemTypeTestNonRandomized(RadioProblemTypeBase, NonRandomizedProbl
     """
     Tests for non-randomized radio problem
     """
+    shard = 24
 
     def get_problem(self):
         """
@@ -1172,6 +1183,7 @@ class DropdownProblemTypeTest(DropDownProblemTypeBase, ProblemTypeTestMixin, Cha
     """
     Standard tests for the Dropdown Problem Type
     """
+    shard = 24
     pass
 
 
@@ -1180,6 +1192,7 @@ class DropDownProblemTypeTestNonRandomized(DropDownProblemTypeBase, NonRandomize
     """
     Tests for non-randomized Dropdown problem
     """
+    shard = 24
 
     def get_problem(self):
         """
@@ -1254,6 +1267,7 @@ class StringProblemTypeTest(StringProblemTypeBase, ProblemTypeTestMixin):
     """
     Standard tests for the String Problem Type
     """
+    shard = 24
     pass
 
 
@@ -1325,7 +1339,8 @@ class NumericalProblemTypeTest(NumericalProblemTypeBase, ProblemTypeTestMixin, C
     """
     Standard tests for the Numerical Problem Type
     """
-    @attr(shard=12)
+    shard = 12
+
     def test_error_input_gentle_alert(self):
         """
         Scenario: I can answer a problem with erroneous input and will see a gentle alert
@@ -1356,6 +1371,7 @@ class NumericalProblemTypeTestNonRandomized(NumericalProblemTypeBase, NonRandomi
     """
     Tests for non-randomized Numerical problem
     """
+    shard = 12
 
     def get_problem(self):
         """
@@ -1463,6 +1479,7 @@ class FormulaProblemTypeTest(FormulaProblemTypeBase, ProblemTypeTestMixin, Chang
     """
     Standard tests for the Formula Problem Type
     """
+    shard = 24
     pass
 
 
@@ -1470,6 +1487,7 @@ class FormulaProblemTypeTestNonRandomized(FormulaProblemTypeBase, NonRandomizedP
     """
     Tests for non-randomized Formula problem
     """
+    shard = 24
 
     def get_problem(self):
         """
@@ -1565,6 +1583,7 @@ class ScriptProblemTypeTest(ScriptProblemTypeBase, ProblemTypeTestMixin):
     """
     Standard tests for the Script Problem Type
     """
+    shard = 24
     pass
 
 
@@ -1573,6 +1592,7 @@ class ScriptProblemResetAfterAnswerTest(ScriptProblemTypeBase):
     """
     Test Script problem by resetting answers
     """
+    shard = 24
 
     @ddt.data(['correct', 'incorrect'], ['incorrect', 'correct'])
     @ddt.unpack
@@ -1618,6 +1638,7 @@ class ScriptProblemTypeTestNonRandomized(ScriptProblemTypeBase, NonRandomizedPro
     """
     Tests for non-randomized Script problem
     """
+    shard = 24
 
     def get_problem(self):
         """
@@ -1704,7 +1725,8 @@ class CodeProblemTypeTest(CodeProblemTypeBase, ProblemTypeTestMixin):
     """
     Standard tests for the Code Problem Type
     """
-    @attr(shard=12)
+    shard = 12
+
     def test_answer_incorrectly(self):
         """
         Overridden for script test because the testing grader always responds
@@ -1712,7 +1734,6 @@ class CodeProblemTypeTest(CodeProblemTypeBase, ProblemTypeTestMixin):
         """
         pass
 
-    @attr(shard=12)
     def test_submit_blank_answer(self):
         """
         Overridden for script test because the testing grader always responds
@@ -1720,7 +1741,6 @@ class CodeProblemTypeTest(CodeProblemTypeBase, ProblemTypeTestMixin):
         """
         pass
 
-    @attr(shard=12)
     def test_cant_submit_blank_answer(self):
         """
         Overridden for script test because the testing grader always responds
@@ -1728,7 +1748,6 @@ class CodeProblemTypeTest(CodeProblemTypeBase, ProblemTypeTestMixin):
         """
         pass
 
-    @attr(shard=12)
     def wait_for_status(self, status):
         """
         Overridden for script test because the testing grader always responds
@@ -1846,6 +1865,7 @@ class RadioTextProblemTypeTest(RadioTextProblemTypeBase, ProblemTypeTestMixin):
     """
     Standard tests for the Radio Text Problem Type
     """
+    shard = 24
     pass
 
 
@@ -1854,6 +1874,7 @@ class RadioTextProblemResetCorrectnessAfterChangingAnswerTest(RadioTextProblemTy
     """
     Tests for Radio Text problem with changing answers
     """
+    shard = 24
 
     @ddt.data(['correct', '1/1 point (ungraded)'], ['incorrect', '0/1 point (ungraded)'])
     @ddt.unpack
@@ -1901,6 +1922,7 @@ class RadioTextProblemTypeTestNonRandomized(RadioTextProblemTypeBase, NonRandomi
     """
     Tests for non-randomized Radio text problem
     """
+    shard = 24
 
     def get_problem(self):
         """

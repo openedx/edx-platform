@@ -90,6 +90,8 @@ class BulkEmailTest(BaseInstructorDashboardTest):
     """
     End-to-end tests for bulk emailing from instructor dash.
     """
+    shard = 23
+
     def setUp(self):
         super(BulkEmailTest, self).setUp()
         self.course_fixture = CourseFixture(**self.course_info).install()
@@ -239,6 +241,7 @@ class BatchBetaTestersTest(BaseInstructorDashboardTest):
     """
     End-to-end tests for Batch beta testers functionality.
     """
+    shard = 23
 
     def setUp(self):
         super(BatchBetaTestersTest, self).setUp()
@@ -697,6 +700,8 @@ class DataDownloadsWithMultipleRoleTests(BaseInstructorDashboardTest):
     """
     Bok Choy tests for the "Data Downloads" tab with multiple user roles.
     """
+    shard = 23
+
     def setUp(self):
         super(DataDownloadsWithMultipleRoleTests, self).setUp()
         self.course_fixture = CourseFixture(**self.course_info).install()
@@ -1449,6 +1454,8 @@ class StudentAdminTest(BaseInstructorDashboardTest):
     SUBSECTION_NAME = 'Test Subsection 1'
     UNIT_NAME = 'Test Unit 1'
     PROBLEM_NAME = 'Test Problem 1'
+
+    shard = 23
 
     def setUp(self):
         super(StudentAdminTest, self).setUp()

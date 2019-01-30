@@ -1,6 +1,4 @@
 """Acceptance tests for LMS-hosted Programs pages"""
-import pytest
-
 from common.test.acceptance.fixtures.catalog import CatalogFixture, CatalogIntegrationMixin
 from common.test.acceptance.fixtures.course import CourseFixture
 from common.test.acceptance.fixtures.programs import ProgramsConfigMixin
@@ -109,9 +107,10 @@ class ProgramListingPageTest(ProgramPageBase):
         self.assertFalse(self.listing_page.are_cards_present)
 
 
-@pytest.mark.a11y
 class ProgramListingPageA11yTest(ProgramPageBase):
     """Test program listing page accessibility."""
+    a11y = True
+
     def setUp(self):
         super(ProgramListingPageA11yTest, self).setUp()
 
@@ -154,9 +153,10 @@ class ProgramListingPageA11yTest(ProgramPageBase):
         self.listing_page.a11y_audit.check_for_accessibility_errors()
 
 
-@pytest.mark.a11y
 class ProgramDetailsPageA11yTest(ProgramPageBase):
     """Test program details page accessibility."""
+    a11y = True
+
     def setUp(self):
         super(ProgramDetailsPageA11yTest, self).setUp()
 

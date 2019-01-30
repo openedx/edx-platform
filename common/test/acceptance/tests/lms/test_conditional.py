@@ -15,6 +15,7 @@ class ConditionalTest(UniqueCourseTest):
     """
     Test the conditional module in the lms.
     """
+    shard = 23
 
     def setUp(self):
         super(ConditionalTest, self).setUp()

@@ -154,6 +154,7 @@ class VideoHLSEventsTest(VideoEventsTestMixin):
     """
     Test video player event emission for HLS video
     """
+    shard = 16
 
     def test_event_data_for_hls(self):
         """

@@ -6,8 +6,6 @@ from contextlib import contextmanager
 from datetime import datetime
 from unittest import skip
 
-import pytest
-
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.common.logout import LogoutPage
 from common.test.acceptance.pages.lms.account_settings import AccountSettingsPage
@@ -679,11 +677,11 @@ class DifferentUserLearnerProfilePageTest(LearnerProfileTestMixin, AcceptanceTes
         badge.close_modal()
 
 
-@pytest.mark.a11y
 class LearnerProfileA11yTest(LearnerProfileTestMixin, AcceptanceTest):
     """
     Class to test learner profile accessibility.
     """
+    a11y = True
 
     def test_editable_learner_profile_a11y(self):
         """

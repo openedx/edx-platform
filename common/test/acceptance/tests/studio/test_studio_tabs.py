@@ -9,6 +9,7 @@ class PagesTest(StudioCourseTest):
     """
     Test that Pages functionality is working properly on studio side
     """
+    shard = 23
 
     def setUp(self, is_staff=True):  # pylint: disable=arguments-differ
         """
