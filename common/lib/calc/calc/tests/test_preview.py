@@ -3,6 +3,7 @@
 Unit tests for preview.py
 """
 
+from __future__ import absolute_import
 import unittest
 from calc import preview
 import pyparsing
