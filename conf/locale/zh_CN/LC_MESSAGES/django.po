@@ -6441,12 +6441,9 @@ msgstr "已报名学员的资料"
 msgid "User ID"
 msgstr "用户ID"
 
-#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
-#. Translators: This label appears above a field on the login form
-#. meant to hold the user's email address.
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
-#: openedx/core/djangoapps/user_api/api.py lms/templates/ccx/enrollment.html
+#: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 msgid "Email"
 msgstr "电子邮件"
@@ -10566,7 +10563,7 @@ msgstr "“{email}”邮箱地址无效。"
 msgid ""
 "It looks like {email_address} belongs to an existing account. Try again with"
 " a different email address."
-msgstr "{email_address} 已经被注册了。请更换电子邮件重试。"
+msgstr "{email_address} 已经被注册了。请更换邮箱重试。"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 #, python-brace-format
@@ -10747,6 +10744,8 @@ msgstr "操作"
 
 #. Translators: This label appears above a field on the password reset
 #. form meant to hold the user's email address.
+#. Translators: This label appears above a field on the login form
+#. meant to hold the user's email address.
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's email address.
 #: openedx/core/djangoapps/user_api/api.py
@@ -10873,9 +10872,7 @@ msgid ""
 "{disclaimer_link_start}{disclaimer}{disclaimer_link_end}                   "
 "and {privacy_policy_link_start}Privacy Policy{privacy_policy_link_end}."
 msgstr ""
-"注册即表示同意遵守英荔商学院的{user_agreement_link_start}{user_agreement}{user_agreement_link_end}、"
-" "
-"{disclaimer_link_start}{disclaimer}{disclaimer_link_end}和{privacy_policy_link_start}隐私政策{privacy_policy_link_end}"
+"注册即表示同意遵守英荔商学院的{user_agreement_link_start}{user_agreement}{user_agreement_link_end}、{disclaimer_link_start}{disclaimer}{disclaimer_link_end}和{privacy_policy_link_start}隐私政策{privacy_policy_link_end}"
 
 #: openedx/core/djangoapps/user_api/api.py
 #: lms/templates/static_templates/user_agreement.html
