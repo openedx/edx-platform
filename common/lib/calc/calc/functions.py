@@ -4,6 +4,7 @@ Provide the mathematical functions that numpy doesn't.
 Specifically, the secant/cosecant/cotangents and their inverses and
 hyperbolic counterparts
 """
+from __future__ import absolute_import
 import numpy
 
 
