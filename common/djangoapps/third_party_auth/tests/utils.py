@@ -135,6 +135,6 @@ def prepare_saml_response_from_xml(xml, relay_state='testshib'):
     """
     b64encoded_xml = b64encode(xml)
     return 'RelayState={relay_state}&SAMLResponse={saml_response}'.format(
-        relay_state=OneLogin_Saml2_Utils.case_sensitive_urlencode(relay_state),
-        saml_response=OneLogin_Saml2_Utils.case_sensitive_urlencode(b64encoded_xml)
+        relay_state=OneLogin_Saml2_Utils.escape_url(relay_state),
+        saml_response=OneLogin_Saml2_Utils.escape_url(b64encoded_xml)
     )

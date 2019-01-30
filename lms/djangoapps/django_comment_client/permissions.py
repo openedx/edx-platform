@@ -147,7 +147,7 @@ def _check_conditions_permissions(user, permissions, course_id, content, user_gr
                         or user_group_id is None
                         or content_user_group is None
                         or user_group_id != content_user_group):
-                        return False
+                    return False
             return has_permission(user, per, course_id=course_id)
         elif isinstance(per, list) and operator in ["and", "or"]:
             results = [test(user, x, operator="and") for x in per]

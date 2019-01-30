@@ -477,15 +477,15 @@ class MongoContentStore(ContentStore):
         # which can be `uploadDate`, `displayname`,
         # TODO: uncomment this line once this index in prod is cleaned up. See OPS-2863 for tracking clean up.
         #  create_collection_index(
-            #  self.fs_files,
-            #  [
-                #  ('_id.tag', pymongo.ASCENDING),
-                #  ('_id.org', pymongo.ASCENDING),
-                #  ('_id.course', pymongo.ASCENDING),
-                #  ('_id.category', pymongo.ASCENDING)
-            #  ],
-            #  sparse=True,
-            #  background=True
+        #      self.fs_files,
+        #      [
+        #          ('_id.tag', pymongo.ASCENDING),
+        #          ('_id.org', pymongo.ASCENDING),
+        #          ('_id.course', pymongo.ASCENDING),
+        #          ('_id.category', pymongo.ASCENDING)
+        #      ],
+        #      sparse=True,
+        #      background=True
         #  )
         create_collection_index(
             self.fs_files,

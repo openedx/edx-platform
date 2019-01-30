@@ -34,7 +34,7 @@ boto==2.39.0                        # Deprecated version of the AWS SDK; we shou
 boto3==1.4.8                        # Amazon Web Services SDK for Python
 botocore==1.8.17                    # via boto3, s3transfer
 celery==3.1.25                      # Asynchronous task execution library
-defusedxml==0.4.1                   # XML bomb protection for common XML parsers
+defusedxml
 Django==1.11.18                     # Web application framework
 django-babel-underscore             # underscore template extractor for django-babel (internationalization utilities)
 django-config-models>=0.2.2         # Configuration models for Django allowing config management with auditing
@@ -126,7 +126,7 @@ pynliner                            # Inlines CSS styles into HTML for email not
 python-dateutil==2.4
 python-Levenshtein
 python-openid
-python-saml==2.4.0
+python3-saml
 pyuca==1.1                          # For more accurate sorting of translated country names in django-countries
 reportlab                           # Used for shopping cart's pdf invoice/receipt generation
 rest-condition                      # DRF's recommendation for supporting complex permissions
