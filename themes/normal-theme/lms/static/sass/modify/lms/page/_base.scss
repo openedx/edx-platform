@@ -190,6 +190,12 @@ a,a:hover,a:active,a:visited,a:link,a:focus{
   text-decoration: none;
 }
 
+.register a{
+  &:hover,&:focus, &:active, &:visited{
+    border: none;
+  }
+}
+
 // button
 input[type="submit"], input[type="button"], button, .button{
   -webkit-font-smoothing: unset;
