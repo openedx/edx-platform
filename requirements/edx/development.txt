@@ -202,7 +202,7 @@ libsass==0.10.0
 linecache2==1.0.0
 loremipsum==1.0.5
 lxml==3.8.0
-mailsnake==1.6.2
+mailsnake==1.6.4
 mako==1.0.2
 mando==0.6.4
 markdown==2.6.11
