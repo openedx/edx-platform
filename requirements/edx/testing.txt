@@ -68,7 +68,7 @@ chardet==3.0.4
 click-log==0.1.8          # via edx-lint
 click==7.0
 colorama==0.4.1           # via radon
-configparser==3.7.1       # via flake8, pylint
+configparser==3.7.1       # via entrypoints, flake8, pylint
 constantly==15.1.0        # via twisted
 coreapi==2.3.3
 coreschema==0.0.4
@@ -145,6 +145,7 @@ edx-submissions==2.1.1
 edx-user-state-client==1.0.4
 edxval==1.1.25
 elasticsearch==1.9.0
+entrypoints==0.3          # via flake8
 enum34==1.1.6
 event-tracking==0.2.7
 execnet==1.5.0            # via pytest-xdist
@@ -156,7 +157,7 @@ filelock==3.0.10          # via tox
 firebase-token-generator==1.3.2
 fixtures==3.0.0           # via testtools
 flake8-polyfill==1.0.2    # via radon
-flake8==3.6.0             # via flake8-polyfill
+flake8==3.7.1             # via flake8-polyfill
 flask==1.0.2              # via moto
 freezegun==0.3.11
 fs-s3fs==0.1.8
@@ -221,7 +222,7 @@ path.py==8.2.1
 pathlib2==2.3.3           # via pytest, pytest-django
 pathtools==0.1.2
 paver==1.3.4
-pbr==5.1.1
+pbr==5.1.2
 pdfminer==20140328
 piexif==1.0.2
 pillow==5.4.1
@@ -232,15 +233,15 @@ py2neo==3.1.2
 py==1.7.0                 # via pytest, tox
 pyasn1-modules==0.2.4     # via service-identity
 pyasn1==0.4.5             # via pyasn1-modules, service-identity
-pycodestyle==2.4.0
+pycodestyle==2.5.0
 pycontracts==1.7.1
 pycountry==1.20
 pycparser==2.19
 pycryptodomex==3.4.7
 pydispatcher==2.0.5       # via scrapy
-pyflakes==2.0.0           # via flake8
+pyflakes==2.1.0           # via flake8
 pygments==2.3.1
-pygraphviz==1.1
+pygraphviz==1.5
 pyjwkest==1.3.2
 pyjwt==1.5.2
 pylint-celery==0.3        # via edx-lint
@@ -316,6 +317,7 @@ tox==3.7.0
 traceback2==1.4.0         # via testtools, unittest2
 transifex-client==0.13.5
 twisted==16.6.0           # via pa11ycrawler, scrapy
+typing==3.6.6             # via flake8
 unicodecsv==0.14.1
 unidecode==1.0.23         # via python-slugify
 unittest2==1.1.0          # via testtools
