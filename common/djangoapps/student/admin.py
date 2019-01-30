@@ -150,27 +150,23 @@ class LinkedInAddToProfileConfigurationAdmin(admin.ModelAdmin):
 
 class CourseEnrollmentForm(forms.ModelForm):
 
-    def __init__(self, *args, **kwargs):
-        # If args is a QueryDict, then the ModelForm addition request came in as a POST with a course ID string.
-        # Change the course ID string to a CourseLocator object by copying the QueryDict to make it mutable.
-        if args and 'course' in args[0] and isinstance(args[0], QueryDict):
-            args_copy = args[0].copy()
+    def __init__(self, data=None, *args, **kwargs):
+        # This code should be safe to remove once
+        # https://github.com/edx/opaque-keys/commit/5b5119979a7d5f186350a92b4b5748c3d4bcc92f
+        # is released and the correct opaque-keys version is used in edx-platform.
+        try:
+            # If data has _mutable attribute is a POST QuerDict and we have to update it.
+            data._mutable = True
+        except AttributeError:
+            pass
+
+        if data and data.get('course'):
             try:
-                args_copy['course'] = CourseKey.from_string(args_copy['course'])
+                data['course'] = CourseKey.from_string(data['course'])
             except InvalidKeyError:
-                raise forms.ValidationError("Cannot make a valid CourseKey from id {}!".format(args_copy['course']))
-            args = [args_copy]
+                raise forms.ValidationError("Cannot make a valid CourseKey from id {}!".format(data['course']))
 
-        super(CourseEnrollmentForm, self).__init__(*args, **kwargs)
-
-        if self.data.get('course'):
-            try:
-                self.data['course'] = CourseKey.from_string(self.data['course'])
-            except AttributeError:
-                # Change the course ID string to a CourseLocator.
-                # On a POST request, self.data is a QueryDict and is immutable - so this code will fail.
-                # However, the args copy above before the super() call handles this case.
-                pass
+        super(CourseEnrollmentForm, self).__init__(data, *args, **kwargs)
 
     def clean_course_id(self):
         course_id = self.cleaned_data['course']
@@ -184,6 +180,15 @@ class CourseEnrollmentForm(forms.ModelForm):
 
         return course_key
 
+    def save(self, *args, **kwargs):
+        course_enrollment = super(CourseEnrollmentForm, self).save(commit=False)
+        user = self.cleaned_data['user']
+        course_overview = self.cleaned_data['course']
+        enrollment = CourseEnrollment.get_or_create_enrollment(user, course_overview.id)
+        course_enrollment.id = enrollment.id
+        course_enrollment.created = enrollment.created
+        return course_enrollment
+
     class Meta:
         model = CourseEnrollment
         fields = '__all__'
@@ -194,7 +199,7 @@ class CourseEnrollmentAdmin(admin.ModelAdmin):
     """ Admin interface for the CourseEnrollment model. """
     list_display = ('id', 'course_id', 'mode', 'user', 'is_active',)
     list_filter = ('mode', 'is_active',)
-    raw_id_fields = ('user',)
+    raw_id_fields = ('user', 'course')
     search_fields = ('course__id', 'mode', 'user__username',)
     form = CourseEnrollmentForm
 
