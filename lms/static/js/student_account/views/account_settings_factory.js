@@ -88,7 +88,7 @@
 
             secondaryEmailFieldData = {
                 model: userAccountModel,
-                title: gettext('Recovery Address'),
+                title: gettext('Recovery Email Address'),
                 valueAttribute: 'secondary_email',
                 helpMessage: gettext('You may access your account when single-sign on is not available.'),
                 persistChanges: true
