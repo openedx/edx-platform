@@ -104,6 +104,16 @@ FEATURES = {
 
     'ENABLE_MASQUERADE': True,  # allow course staff to change to student view of courseware
 
+    # .. feature_toggle_name: ENABLE_SYSADMIN_DASHBOARD
+    # .. feature_toggle_type: feature_flag
+    # .. feature_toggle_default: False
+    # .. feature_toggle_description: enables dashboard at /syadmin/ for django staff, to import and delete courses, users
+    # .. feature_toggle_category: admin
+    # .. feature_toggle_use_cases: open_edx
+    # .. feature_toggle_expiration_date: None
+    # .. feature_toggle_warnings: some views are not performant when there are more than 100 courses
+    # .. feature_toggle_tickets: None
+    # .. feature_toggle_status: unsupported
     'ENABLE_SYSADMIN_DASHBOARD': False,  # sysadmin dashboard, to see what courses are loaded, to delete & load courses
 
     'DISABLE_LOGIN_BUTTON': False,  # used in systems where login is automatic, eg MIT SSL
