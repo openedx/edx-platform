@@ -20,6 +20,16 @@ CONTENT_TYPE_GATING_FLAG = WaffleFlag(
     flag_undefined_default=False
 )
 
+# .. feature_toggle_name: global_kill_switch
+# .. feature_toggle_type: switch
+# .. feature_toggle_default: False
+# .. feature_toggle_description: Global kill switch for feature based enrollment.  To turn on the kill switch (and turn off both course duration gating and content type gating) enable a waffle flag named: 'content_type_gating.global_kill_switch'
+# .. feature_toggle_category: feature based enrollment
+# .. feature_toggle_use_cases: open_edx, vip
+# .. feature_toggle_expiration_date: None
+# .. feature_toggle_warnings: None
+# .. feature_toggle_tickets: REVE-154
+# .. feature_toggle_status: supported
 FEATURE_BASED_ENROLLMENT_GLOBAL_KILL_FLAG = WaffleFlag(
     waffle_namespace=WAFFLE_FLAG_NAMESPACE,
     flag_name=u'global_kill_switch',
