@@ -103,9 +103,10 @@ FEATURES = {
     # .. feature_toggle_name: ENABLE_SYSADMIN_DASHBOARD
     # .. feature_toggle_type: feature_flag
     # .. feature_toggle_default: False
-    # .. feature_toggle_description: enables dashboard at /syadmin/ for django staff, to import and delete courses, users
+    # .. feature_toggle_description: enables dashboard at /syadmin/ for django staff, for seeing overview of system status, for deleting and loading courses, for seeing log of git imports of courseware.
     # .. feature_toggle_category: admin
     # .. feature_toggle_use_cases: open_edx
+    # .. feature_toggle_creation_date: 2013-12-12
     # .. feature_toggle_expiration_date: None
     # .. feature_toggle_warnings: some views are not performant when there are more than 100 courses
     # .. feature_toggle_tickets: None
