@@ -1025,7 +1025,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                 course_queries.append(course_query)
             query = {'$or': course_queries}
         elif course_org_filter:
-                query['_id.org'] = course_org_filter
+            query['_id.org'] = course_org_filter
 
         course_records = self.collection.find(query, {'metadata': True})
 
