@@ -170,7 +170,7 @@ freezegun==0.3.11
 fs-s3fs==0.1.8
 fs==2.0.18
 funcsigs==1.0.2
-functools32==3.2.3.post2
+functools32==3.2.3.post2 ; python_version == "2.7"
 future==0.17.1
 futures==3.2.0 ; python_version == "2.7"
 fuzzywuzzy==0.17.0
