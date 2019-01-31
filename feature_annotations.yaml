@@ -17,6 +17,7 @@ annotations:
     - ".. feature_toggle_category:":
     - ".. feature_toggle_use_cases:":
         choices: [incremental_release, launch_date, monitored_rollout, graceful_degradation, beta_testing, vip, opt_out, open_edx]
+    - ".. feature_toggle_creation_date:":
     - ".. feature_toggle_expiration_date:":
     - ".. feature_toggle_warnings:":
     - ".. feature_toggle_tickets:":
