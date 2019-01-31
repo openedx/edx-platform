@@ -9,8 +9,11 @@ from django.utils.translation import ugettext_lazy as _
 OAUTH_ENFORCE_SECURE = False
 
 # disable caching in dev environment
-for cache_key in CACHES.keys():
-    CACHES[cache_key]['BACKEND'] = 'django.core.cache.backends.dummy.DummyCache'
+# NOTE: Disabling cache breaks things like Celery subtasks
+if not FEATURES.get("ENABLE_DEVSTACK_CACHES"):
+    print('\nDISABLING CACHES...')
+    for cache_key in CACHES.keys():
+        CACHES[cache_key]['BACKEND'] = 'django.core.cache.backends.dummy.DummyCache'
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
@@ -141,6 +144,18 @@ DEFAULT_MODE_NAME_FROM_SLUG = _(DEFAULT_COURSE_MODE_SLUG.capitalize())
 
 CUSTOM_DOMAINS_REDIRECT_CACHE_TIMEOUT = None  # The length of time we cache Redirect model data
 CUSTOM_DOMAINS_REDIRECT_CACHE_KEY_PREFIX = 'custom_domains_redirects'
+
+# Webpack loader needed by Figures
+if 'webpack_loader' not in INSTALLED_APPS:
+    INSTALLED_APPS += ('webpack_loader',)
+
+# Enable Figures if it is included
+if 'figures' in INSTALLED_APPS:
+    import figures
+    figures.update_settings(
+        WEBPACK_LOADER,
+        CELERYBEAT_SCHEDULE,
+        ENV_TOKENS.get('FIGURES', {}))
 
 try:
     from .private import *

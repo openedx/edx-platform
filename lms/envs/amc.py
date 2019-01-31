@@ -147,3 +147,19 @@ CUSTOM_DOMAINS_REDIRECT_CACHE_KEY_PREFIX = 'custom_domains_redirects'
 # Settings for Tahoe API
 #
 INSTALLED_APPS += ('openedx.core.djangoapps.appsembler.api',)
+
+#
+# Support for Figures
+#
+
+# Webpack loader needed by Figures
+if 'webpack_loader' not in INSTALLED_APPS:
+    INSTALLED_APPS += ('webpack_loader',)
+
+# Enable Figures if it is included
+if 'figures' in INSTALLED_APPS:
+    import figures
+    figures.update_settings(
+        WEBPACK_LOADER,
+        CELERYBEAT_SCHEDULE,
+        ENV_TOKENS.get('FIGURES', {}))
