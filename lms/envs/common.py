@@ -92,6 +92,7 @@ FEATURES = {
     # .. feature_toggle_description: Enables the Student Notes API and UI.
     # .. feature_toggle_category: ????
     # .. feature_toggle_use_cases: open_edx
+    # .. feature_toggle_creation_date: 2014-11-13
     # .. feature_toggle_expiration_date: None
     # .. feature_toggle_warnings: None
     # .. feature_toggle_tickets: TNL-659
