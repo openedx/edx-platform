@@ -94,7 +94,7 @@ FEATURES = {
     # .. feature_toggle_use_cases: open_edx
     # .. feature_toggle_expiration_date: None
     # .. feature_toggle_warnings: None
-    # .. feature_toggle_tickets: ????
+    # .. feature_toggle_tickets: TNL-659
     # .. feature_toggle_status: supported
     'ENABLE_STUDENT_NOTES': True,
 
