@@ -23,6 +23,7 @@ class ApplicationFactory(DjangoModelFactory):
     client_secret = 'some_secret'
     client_type = 'confidential'
     authorization_grant_type = 'Client credentials'
+    name = FuzzyText(prefix='name', length=8)
 
 
 class ApplicationAccessFactory(DjangoModelFactory):
