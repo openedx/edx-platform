@@ -96,26 +96,27 @@ def server_track(request, event_type, event, page=None):
     except:
         username = "anonymous"
 
-    if isinstance(event, basestring) and event:
-       try:
-           event = json.loads(event)
-       except ValueError:
-           pass  # Don't decode, but pass the string as is
-
-    context_override = dict()
-    context_override.update(eventtracker.get_tracker().resolve_context())
-    context_override.update({
-        'page': page,
-        'event_source': 'server',
-        'username': username
-    })
+    # define output:
+    event = {
+        "username": username,
+        "ip": _get_request_ip(request),
+        "referer": _get_request_header(request, 'HTTP_REFERER'),
+        "accept_language": _get_request_header(request, 'HTTP_ACCEPT_LANGUAGE'),
+        "event_source": "server",
+        "event_type": event_type,
+        "event": event,
+        "agent": _get_request_header(request, 'HTTP_USER_AGENT').decode('latin1'),
+        "page": page,
+        "time": datetime.datetime.utcnow(),
+        "host": _get_request_header(request, 'SERVER_NAME'),
+        "context": eventtracker.get_tracker().resolve_context(),
+    }
 
     # Some duplicated fields are passed into event-tracking via the context by track.middleware.
     # Remove them from the event here since they are captured elsewhere.
     shim.remove_shim_context(event)
 
-    with eventtracker.get_tracker().context('edx.course.server', context_override):
-        eventtracker.emit(name=event_type, data=event)
+    log_event(event)
 
 
 def task_track(request_info, task_info, event_type, event, page=None):
