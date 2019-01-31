@@ -21,3 +21,4 @@ annotations:
 extensions:
     python:
         - py
+xrst_template: doc.rst.j2
