@@ -243,6 +243,7 @@ web-fragments==0.2.2
 webencodings==0.5.1       # via html5lib
 webob==1.8.5              # via xblock
 wrapt==1.10.5
+xblock-review==1.1.5
 xblock-utils==1.2.0
 xblock==1.2.2
 zendesk==1.1.1
