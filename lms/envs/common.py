@@ -85,7 +85,18 @@ FEATURES = {
     # in sync with the corresponding ones in cms/envs/common.py
     'ENABLE_DISCUSSION_SERVICE': True,
     'ENABLE_TEXTBOOK': True,
-    'ENABLE_STUDENT_NOTES': True,  # enables the student notes API and UI.
+
+    # .. feature_toggle_name: ENABLE_STUDENT_NOTES
+    # .. feature_toggle_type: feature_flag
+    # .. feature_toggle_default: True
+    # .. feature_toggle_description: Enables the Student Notes API and UI.
+    # .. feature_toggle_category: ????
+    # .. feature_toggle_use_cases: ????
+    # .. feature_toggle_expiration_date: None
+    # .. feature_toggle_warnings: None
+    # .. feature_toggle_tickets: ????
+    # .. feature_toggle_status: supported
+    'ENABLE_STUDENT_NOTES': True,
 
     # discussion home panel, which includes a subscription on/off setting for discussion digest emails.
     # this should remain off in production until digest notifications are online.
