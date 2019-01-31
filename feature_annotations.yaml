@@ -6,7 +6,7 @@ safelist_path: .annotation_safe_list.yml
 coverage_target: 50.0
 annotations:
   documented_elsewhere:
-    - ".. feature_toggle_name:":
+    - ".. documented_elsewhere_name:":
     - ".. documented_elsewhere:":
   feature_toggle:
     - ".. feature_toggle_name:":
