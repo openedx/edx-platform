@@ -1857,7 +1857,6 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         # Build an update set with potentially multiple embedded fields.
         updates_by_type = {}
         for asset_type, assets in assets_by_type.iteritems():
-            updates_by_type[self._make_mongo_asset_key(asset_type)] = assets.as_list()
             updates_by_type[self._make_mongo_asset_key(asset_type)] = reduce(iadd, assets._lists, [])
 
         # Update the document.
