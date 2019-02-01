@@ -53,12 +53,12 @@ class HelperMethods(object):
         sequential = ItemFactory.create(
             category='sequential',
             parent_location=self.course.location,
-            display_name='Test Subsection {}'.format(name_suffix)
+            display_name=u'Test Subsection {}'.format(name_suffix)
         )
         vertical = ItemFactory.create(
             category='vertical',
             parent_location=sequential.location,
-            display_name='Test Unit {}'.format(name_suffix)
+            display_name=u'Test Unit {}'.format(name_suffix)
         )
         c0_url = self.course.id.make_usage_key("vertical", "split_test_cond0")
         c1_url = self.course.id.make_usage_key("vertical", "split_test_cond1")
@@ -122,14 +122,14 @@ class HelperMethods(object):
             subsection = ItemFactory.create(
                 category='sequential',
                 parent_location=self.course.location,
-                display_name="Test Subsection {}".format(name_suffix)
+                display_name=u"Test Subsection {}".format(name_suffix)
             )
             vertical_parent_location = subsection.location
 
         vertical = ItemFactory.create(
             category='vertical',
             parent_location=vertical_parent_location,
-            display_name="Test Unit {}".format(name_suffix)
+            display_name=u"Test Unit {}".format(name_suffix)
         )
 
         problem = ItemFactory.create(
@@ -226,7 +226,7 @@ class GroupConfigurationsBaseTestCase(object):
         Test invalid json handling.
         """
         # No property name.
-        invalid_json = "{u'name': 'Test Name', []}"
+        invalid_json = u"{u'name': 'Test Name', []}"
 
         response = self.client.post(
             self._url(),

@@ -64,19 +64,19 @@ class Command(BaseCommand):
                 course_key = text_type(options['course_key'])
             course_key = CourseKey.from_string(course_key)
         except InvalidKeyError:
-            raise CommandError('Invalid course_key: {}'.format(options['course_key']))
+            raise CommandError(u'Invalid course_key: {}'.format(options['course_key']))
 
         if not modulestore().get_course(course_key):
-            raise CommandError('Course not found: {}'.format(options['course_key']))
+            raise CommandError(u'Course not found: {}'.format(options['course_key']))
 
-        print('Preparing to delete course %s from module store....' % options['course_key'])
+        print(u'Preparing to delete course %s from module store....' % options['course_key'])
 
-        if query_yes_no('Are you sure you want to delete course {}?'.format(course_key), default='no'):
-            if query_yes_no('Are you sure? This action cannot be undone!', default='no'):
+        if query_yes_no(u'Are you sure you want to delete course {}?'.format(course_key), default='no'):
+            if query_yes_no(u'Are you sure? This action cannot be undone!', default='no'):
                 delete_course(course_key, ModuleStoreEnum.UserID.mgmt_command, options['keep_instructors'])
 
                 if options['remove_assets']:
                     contentstore().delete_all_course_assets(course_key)
-                    print('Deleted assets for course'.format(course_key))
+                    print(u'Deleted assets for course'.format(course_key))
 
-                print('Deleted course {}'.format(course_key))
+                print(u'Deleted course {}'.format(course_key))

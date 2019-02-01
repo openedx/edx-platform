@@ -300,13 +300,13 @@ class ScrapeVideoThumbnailsTestCase(CourseTestCase):
         scrape_youtube_thumbnail(course_id, video1_edx_video_id, 'test-yt-id')
         if is_success:
             mock_logger.info.assert_called_with(
-                'VIDEOS: Scraping youtube video thumbnail for edx_video_id [%s] in course [%s]',
+                u'VIDEOS: Scraping youtube video thumbnail for edx_video_id [%s] in course [%s]',
                 video1_edx_video_id,
                 course_id
             )
         else:
             mock_logger.info.assert_called_with(
-                'VIDEOS: Scraping youtube video thumbnail failed for edx_video_id [%s] in course [%s] with error: %s',
+                u'VIDEOS: Scraping youtube video thumbnail failed for edx_video_id [%s] in course [%s] with error: %s',
                 video1_edx_video_id,
                 course_id,
                 'This image file must be larger than 2 KB.'
@@ -316,21 +316,21 @@ class ScrapeVideoThumbnailsTestCase(CourseTestCase):
         (
             None,
             'image/jpeg',
-            'This image file must be larger than {image_min_size}.'.format(
+            u'This image file must be larger than {image_min_size}.'.format(
                 image_min_size=settings.VIDEO_IMAGE_MIN_FILE_SIZE_KB
             )
         ),
         (
             'dummy-content',
             None,
-            'This image file type is not supported. Supported file types are {supported_file_formats}.'.format(
+            u'This image file type is not supported. Supported file types are {supported_file_formats}.'.format(
                 supported_file_formats=settings.VIDEO_IMAGE_SUPPORTED_FILE_FORMATS.keys()
             )
         ),
         (
             None,
             None,
-            'This image file type is not supported. Supported file types are {supported_file_formats}.'.format(
+            u'This image file type is not supported. Supported file types are {supported_file_formats}.'.format(
                 supported_file_formats=settings.VIDEO_IMAGE_SUPPORTED_FILE_FORMATS.keys()
             )
         ),
@@ -361,7 +361,7 @@ class ScrapeVideoThumbnailsTestCase(CourseTestCase):
         scrape_youtube_thumbnail(course_id, video1_edx_video_id, 'test-yt-id')
 
         mock_logger.info.assert_called_with(
-            'VIDEOS: Scraping youtube video thumbnail failed for edx_video_id [%s] in course [%s] with error: %s',
+            u'VIDEOS: Scraping youtube video thumbnail failed for edx_video_id [%s] in course [%s] with error: %s',
             video1_edx_video_id,
             course_id,
             error_message

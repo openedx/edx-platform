@@ -134,7 +134,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         self.assertIsNotNone(content)
 
         # make sure course.static_asset_path is correct
-        print("static_asset_path = {0}".format(course.static_asset_path))
+        print(u"static_asset_path = {0}".format(course.static_asset_path))
         self.assertEqual(course.static_asset_path, 'test_import_course')
 
     def test_asset_import_nostatic(self):
@@ -173,7 +173,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
 
     def test_tab_name_imports_correctly(self):
         _module_store, _content_store, course = self.load_test_import_course()
-        print("course tabs = {0}".format(course.tabs))
+        print(u"course tabs = {0}".format(course.tabs))
         self.assertEqual(course.tabs[2]['name'], 'Syllabus')
 
     def test_import_performance_mongo(self):

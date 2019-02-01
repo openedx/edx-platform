@@ -449,7 +449,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
         )
         self.assertEqual(response.status_code, 400)
         response = json.loads(response.content)
-        self.assertEqual(response['error'], 'The file name for %s must contain only ASCII characters.' % file_name)
+        self.assertEqual(response['error'], u'The file name for %s must contain only ASCII characters.' % file_name)
 
     @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
     @patch('boto.s3.key.Key')
@@ -726,7 +726,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
         )
 
         mock_logger.info.assert_called_with(
-            'VIDEOS: Video status update with id [%s], status [%s] and message [%s]',
+            u'VIDEOS: Video status update with id [%s], status [%s] and message [%s]',
             edx_video_id,
             'upload_failed',
             'server down'
@@ -935,7 +935,7 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
             {
                 'extension': '.tiff'
             },
-            'This image file type is not supported. Supported file types are {supported_file_formats}.'.format(
+            u'This image file type is not supported. Supported file types are {supported_file_formats}.'.format(
                 supported_file_formats=settings.VIDEO_IMAGE_SUPPORTED_FILE_FORMATS.keys()
             )
         ),
@@ -944,7 +944,7 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
             {
                 'size': settings.VIDEO_IMAGE_SETTINGS['VIDEO_IMAGE_MAX_BYTES'] + 10
             },
-            'This image file must be smaller than {image_max_size}.'.format(
+            u'This image file must be smaller than {image_max_size}.'.format(
                 image_max_size=settings.VIDEO_IMAGE_MAX_FILE_SIZE_MB
             )
         ),
@@ -952,7 +952,7 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
             {
                 'size': settings.VIDEO_IMAGE_SETTINGS['VIDEO_IMAGE_MIN_BYTES'] - 10
             },
-            'This image file must be larger than {image_min_size}.'.format(
+            u'This image file must be larger than {image_min_size}.'.format(
                 image_min_size=settings.VIDEO_IMAGE_MIN_FILE_SIZE_KB
             )
         ),
@@ -962,7 +962,7 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
                 'width': 16,  # 16x9
                 'height': 9
             },
-            'Recommended image resolution is {image_file_max_width}x{image_file_max_height}. The minimum resolution is {image_file_min_width}x{image_file_min_height}.'.format(
+            u'Recommended image resolution is {image_file_max_width}x{image_file_max_height}. The minimum resolution is {image_file_min_width}x{image_file_min_height}.'.format(
                 image_file_max_width=settings.VIDEO_IMAGE_MAX_WIDTH,
                 image_file_max_height=settings.VIDEO_IMAGE_MAX_HEIGHT,
                 image_file_min_width=settings.VIDEO_IMAGE_MIN_WIDTH,
@@ -974,7 +974,7 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
                 'width': settings.VIDEO_IMAGE_MIN_WIDTH - 10,
                 'height': settings.VIDEO_IMAGE_MIN_HEIGHT
             },
-            'Recommended image resolution is {image_file_max_width}x{image_file_max_height}. The minimum resolution is {image_file_min_width}x{image_file_min_height}.'.format(
+            u'Recommended image resolution is {image_file_max_width}x{image_file_max_height}. The minimum resolution is {image_file_min_width}x{image_file_min_height}.'.format(
                 image_file_max_width=settings.VIDEO_IMAGE_MAX_WIDTH,
                 image_file_max_height=settings.VIDEO_IMAGE_MAX_HEIGHT,
                 image_file_min_width=settings.VIDEO_IMAGE_MIN_WIDTH,
@@ -1032,7 +1032,7 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
                 'width': settings.VIDEO_IMAGE_MIN_WIDTH + 100,
                 'height': settings.VIDEO_IMAGE_MIN_HEIGHT + 200
             },
-            'This image file must have an aspect ratio of {video_image_aspect_ratio_text}.'.format(
+            u'This image file must have an aspect ratio of {video_image_aspect_ratio_text}.'.format(
                 video_image_aspect_ratio_text=settings.VIDEO_IMAGE_ASPECT_RATIO_TEXT
             )
         ),
@@ -1411,7 +1411,7 @@ class VideoUrlsCsvTestCase(VideoUploadTestMixin, CourseTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response["Content-Disposition"],
-            "attachment; filename={course}_video_urls.csv".format(course=self.course.id.course)
+            u"attachment; filename={course}_video_urls.csv".format(course=self.course.id.course)
         )
         response_reader = StringIO(response.content)
         reader = csv.DictReader(response_reader, dialect=csv.excel)
@@ -1419,7 +1419,7 @@ class VideoUrlsCsvTestCase(VideoUploadTestMixin, CourseTestCase):
             reader.fieldnames,
             (
                 ["Name", "Duration", "Date Added", "Video ID", "Status"] +
-                ["{} URL".format(profile) for profile in expected_profiles]
+                [u"{} URL".format(profile) for profile in expected_profiles]
             )
         )
         rows = list(reader)
@@ -1436,7 +1436,7 @@ class VideoUrlsCsvTestCase(VideoUploadTestMixin, CourseTestCase):
             self.assertEqual(response_video["Video ID"], original_video["edx_video_id"])
             self.assertEqual(response_video["Status"], convert_video_status(original_video))
             for profile in expected_profiles:
-                response_profile_url = response_video["{} URL".format(profile)]
+                response_profile_url = response_video[u"{} URL".format(profile)]
                 original_encoded_for_profile = next(
                     (
                         original_encoded
@@ -1468,5 +1468,5 @@ class VideoUrlsCsvTestCase(VideoUploadTestMixin, CourseTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response["Content-Disposition"],
-            "attachment; filename=video_urls.csv; filename*=utf-8''n%C3%B3n-%C3%A4scii_video_urls.csv"
+            u"attachment; filename=video_urls.csv; filename*=utf-8''n%C3%B3n-%C3%A4scii_video_urls.csv"
         )

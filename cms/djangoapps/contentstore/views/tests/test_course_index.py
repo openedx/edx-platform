@@ -529,7 +529,7 @@ class TestCourseOutline(CourseTestCase):
                 ItemFactory.create(
                     parent_location=self.vertical.location,
                     category=block_type,
-                    display_name='{} Problem'.format(block_type)
+                    display_name=u'{} Problem'.format(block_type)
                 )
 
             if not publish:
@@ -546,7 +546,7 @@ class TestCourseOutline(CourseTestCase):
             expected_blocks.append(
                 [
                     reverse_usage_url('container_handler', self.vertical.location),
-                    '{} Problem'.format(block_type)
+                    u'{} Problem'.format(block_type)
                 ]
             )
 

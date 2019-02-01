@@ -361,4 +361,4 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         }
         response = self.client.post(url, data, format='json')
         assert response.status_code == 400
-        assert response.data == {'run': ['Course run {key} already exists'.format(key=course_run.id)]}
+        assert response.data == {'run': [u'Course run {key} already exists'.format(key=course_run.id)]}
