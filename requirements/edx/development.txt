@@ -247,7 +247,7 @@ pyasn1-modules==0.2.4
 pyasn1==0.4.5
 pycodestyle==2.5.0
 pycontracts==1.7.1
-pycountry==1.20
+pycountry==18.12.8
 pycparser==2.19
 pycryptodomex==3.4.7
 pydispatcher==2.0.5

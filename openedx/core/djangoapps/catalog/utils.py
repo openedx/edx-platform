@@ -263,8 +263,8 @@ def get_localized_price_text(price, request):
     # Override default user_currency if location is available
     if user_location and get_currency_data:
         currency_data = get_currency_data()
-        user_country = pycountry.countries.get(alpha2=user_location)
-        user_currency = currency_data.get(user_country.alpha3, user_currency)
+        user_country = pycountry.countries.get(alpha_2=user_location)
+        user_currency = currency_data.get(user_country.alpha_3, user_currency)
 
     return format_price(
         price=(price * user_currency['rate']),

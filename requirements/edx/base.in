@@ -114,7 +114,7 @@ piexif==1.0.2                       # Exif image metadata manipulation, used in 
 Pillow                              # Image manipulation library; used for course assets, profile images, invoice PDFs, etc.
 py2neo<4.0.0                       # Used to communicate with Neo4j, which is used internally for modulestore inspection
 PyContracts==1.7.1
-pycountry==1.20
+pycountry
 pycryptodomex==3.4.7
 pygments                            # Used to support colors in paver command output
 pygraphviz                          # No longer in use?  Optional dependency of networkx, from edx-sandbox/shared.in
