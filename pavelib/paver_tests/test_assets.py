@@ -147,7 +147,7 @@ class TestPaverThemeAssetTasks(PaverTestCase):
             )
             if force:
                 expected_messages.append(
-                    'rm -rf {test_theme_dir}/lms/static/css/*.css'.format(test_theme_dir=str(TEST_THEME_DIR))
+                    u'rm -rf {test_theme_dir}/lms/static/css/*.css'.format(test_theme_dir=str(TEST_THEME_DIR))
                 )
             expected_messages.append(
                 u'libsass {test_theme_dir}/lms/static/sass'.format(test_theme_dir=str(TEST_THEME_DIR))
@@ -345,7 +345,7 @@ class TestCollectAssets(PaverTestCase):
         """
         for i, sys in enumerate(systems):
             msg = self.task_messages[i]
-            self.assertTrue(msg.startswith('python manage.py {}'.format(sys)))
+            self.assertTrue(msg.startswith(u'python manage.py {}'.format(sys)))
             self.assertIn(' collectstatic ', msg)
             self.assertIn('--settings={}'.format(Env.DEVSTACK_SETTINGS), msg)
             self.assertTrue(msg.endswith(' {}'.format(log_location)))
@@ -372,7 +372,7 @@ class TestUpdateAssetsTask(PaverTestCase):
         call_task('pavelib.assets.update_assets', args=cmd_args)
         self.assertTrue(
             self._is_substring_in_list(self.task_messages, expected_substring),
-            msg="{substring} not found in messages".format(substring=expected_substring)
+            msg=u"{substring} not found in messages".format(substring=expected_substring)
         )
 
     def _is_substring_in_list(self, messages_list, expected_substring):
