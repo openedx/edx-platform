@@ -20,6 +20,7 @@ import pymongo
 import re
 import sys
 from uuid import uuid4
+from operator import iadd
 
 from bson.son import SON
 from contracts import contract, new_contract
@@ -1857,6 +1858,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         updates_by_type = {}
         for asset_type, assets in assets_by_type.iteritems():
             updates_by_type[self._make_mongo_asset_key(asset_type)] = assets.as_list()
+            updates_by_type[self._make_mongo_asset_key(asset_type)] = reduce(iadd, assets._lists, [])
 
         # Update the document.
         self.asset_collection.update(
