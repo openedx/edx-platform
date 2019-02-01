@@ -142,7 +142,7 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
             UserFactory(),
             persistent_grade,
             earned_graded_override=earned_graded_override,
-            earned_all_override=0,
+            earned_all_override=earned_graded_override,
             possible_graded_override=possible_graded_override,
             feature=PersistentSubsectionGradeOverrideHistory.GRADEBOOK,
         )
@@ -151,8 +151,10 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
         # the subsection grade returned should be 0/3 due to the override.
         with mock_get_score(2, 3):
             grade = self.subsection_grade_factory.update(self.sequence)
-            self.assert_grade(
-                grade,
-                earned_graded_override or persistent_grade.earned_graded,
-                possible_graded_override or persistent_grade.possible_graded
-            )
+            expected_earned = earned_graded_override
+            if earned_graded_override is None:
+                expected_earned = persistent_grade.earned_graded
+            expected_possible = possible_graded_override
+            if possible_graded_override is None:
+                expected_possible = persistent_grade.possible_graded
+            self.assert_grade(grade, expected_earned, expected_possible)
