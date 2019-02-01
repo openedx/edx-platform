@@ -72,7 +72,7 @@ from student.helpers import (
     cert_info,
     generate_activation_email_context,
 )
-from student.message_types import EmailChange, PasswordReset
+from student.message_types import EmailChange, PasswordReset, RecoveryEmailCreate
 from student.models import (
     AccountRecovery,
     CourseEnrollment,
@@ -1034,7 +1034,6 @@ def do_email_change_request(user, new_email, activation_key=None, secondary_emai
     message_context.update({
         'old_email': user.email,
         'new_email': new_email,
-        'is_secondary_email_change_request': secondary_email_change_request,
         'confirm_link': '{protocol}://{site}{link}'.format(
             protocol='https' if use_https else 'http',
             site=configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME),
@@ -1042,11 +1041,18 @@ def do_email_change_request(user, new_email, activation_key=None, secondary_emai
         ),
     })
 
-    msg = EmailChange().personalize(
-        recipient=Recipient(user.username, new_email),
-        language=preferences_api.get_user_preference(user, LANGUAGE_KEY),
-        user_context=message_context,
-    )
+    if secondary_email_change_request:
+        msg = RecoveryEmailCreate().personalize(
+            recipient=Recipient(user.username, new_email),
+            language=preferences_api.get_user_preference(user, LANGUAGE_KEY),
+            user_context=message_context,
+        )
+    else:
+        msg = EmailChange().personalize(
+            recipient=Recipient(user.username, new_email),
+            language=preferences_api.get_user_preference(user, LANGUAGE_KEY),
+            user_context=message_context,
+        )
 
     try:
         ace.send(msg)

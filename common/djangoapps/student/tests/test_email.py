@@ -653,18 +653,15 @@ class SecondaryEmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, Ca
         self.do_secondary_email_change(self.user, new_email, registration_key)
 
         self._assert_email(
-            subject=u'Request to change édX account secondary e-mail',
+            subject=u'Confirm your recovery email for édX',
             body_fragments=[
-                u'We received a request to change the secondary e-mail associated with',
-                u'your édX account to {new_email}.'.format(
+                u'You\'ve registered this recovery email address for édX.'.format(
                     new_email=new_email,
                 ),
-                u'If this is correct, please confirm your new secondary e-mail address by visiting:',
+                u'If you set this email address, click "confirm email."',
+                u'If you didn\'t request this change, you can disregard this email.',
                 u'http://edx.org/activate_secondary_email/{key}'.format(key=registration_key),
-                u'If you didn\'t request this, you don\'t need to do anything;',
-                u'you won\'t receive any more email from us.',
-                u'Please do not reply to this e-mail; if you require assistance,',
-                u'check the help section of the édX web site.',
+
             ],
         )
 

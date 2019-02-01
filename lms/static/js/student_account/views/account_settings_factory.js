@@ -90,7 +90,7 @@
                 model: userAccountModel,
                 title: gettext('Recovery Email Address'),
                 valueAttribute: 'secondary_email',
-                helpMessage: gettext('You may access your account when single-sign on is not available.'),
+                helpMessage: gettext('You may access your account with this address if single-sign on or access to your primary email is not available.'),  // eslint-disable-line max-len
                 persistChanges: true
             };
 
