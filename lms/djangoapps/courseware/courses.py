@@ -77,7 +77,7 @@ def get_course_by_id(course_key, depth=0):
     if course:
         return course
     else:
-        raise Http404("Course not found: {}.".format(unicode(course_key)))
+        raise Http404(u"Course not found: {}.".format(unicode(course_key)))
 
 
 def get_course_with_access(user, action, course_key, depth=0, check_if_enrolled=False, check_survey_complete=True):
