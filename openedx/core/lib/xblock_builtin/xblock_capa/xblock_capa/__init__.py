@@ -13,7 +13,7 @@ from lxml import etree
 from django.conf import settings
 from django.core.cache import cache as django_cache
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.urls import NoReverseMatch, reverse
+from django.urls import reverse
 from requests.auth import HTTPBasicAuth
 from six import text_type
 from webob import Response
@@ -24,7 +24,6 @@ from xblock.fields import Boolean, Dict, Float, Integer, Scope, String, XMLStrin
 from xblockutils.resources import ResourceLoader
 from xblockutils.studio_editable import StudioEditableXBlockMixin
 
-import static_replace
 from capa import responsetypes
 from capa.xqueue_interface import XQueueInterface
 from openedx.core.lib.xblock_builtin import get_css_dependencies, get_js_dependencies
@@ -575,45 +574,6 @@ class CapaXBlock(XBlock, CapaMixin, ResourceTemplates, XmlParserMixin, StudioEdi
             'default_queuename': xqueue_default_queuename.replace(' ', '_'),
             'waittime': settings.XQUEUE_WAITTIME_BETWEEN_REQUESTS
         }
-
-    def replace_static_urls(self, html):
-        """
-        Replace the static URLs in the given html content.
-        """
-        # TODO: Move these into runtime?
-        return static_replace.replace_static_urls(
-            text=html,
-            data_directory=getattr(self, 'data_dir', None),
-            course_id=self.runtime.course_id,
-            static_asset_path=self.static_asset_path,
-        )
-
-    def replace_course_urls(self, html):
-        """
-        Replace the course URLs in the given html content.
-        """
-        # TODO: Move these into runtime?
-        return static_replace.replace_course_urls(
-            text=html,
-            course_key=self.runtime.course_id
-        )
-
-    def replace_jump_to_id_urls(self, html):
-        """
-        Replace the course URLs in the given html content.
-        """
-        # TODO: Move these into runtime?
-        course_id = self.runtime.course_id
-        try:
-            jump_to_id_base_url = reverse('jump_to_id', kwargs={'course_id': text_type(course_id), 'module_id': ''})
-        except NoReverseMatch:
-            return html
-        
-        return static_replace.replace_jump_to_id_urls(
-            text=html,
-            course_id=course_id,
-            jump_to_id_base_url=jump_to_id_base_url,
-        )
 
     @property
     def problem_types(self):

@@ -8,6 +8,7 @@ from contracts import contract, new_contract
 from functools import partial
 from lxml import etree
 from collections import namedtuple
+from django.urls import NoReverseMatch, reverse
 from pkg_resources import (
     resource_exists,
     resource_listdir,
@@ -38,6 +39,7 @@ from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.asides import AsideUsageKeyV2, AsideDefinitionKeyV2
 from xmodule.exceptions import UndefinedContext
 
+import static_replace
 from openedx.core.djangolib.markup import HTML
 
 log = logging.getLogger(__name__)
@@ -1861,6 +1863,47 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
         if callable(service):
             return service(block)
         return service
+
+    def replace_static_urls(self, html, static_asset_path, data_dir=None):
+        """
+        Replace the static URLs in the given html content.
+        """
+        return static_replace.replace_static_urls(
+            text=html,
+            data_directory=data_dir,
+            course_id=self.course_id,
+            static_asset_path=static_asset_path,
+        )
+
+    def replace_course_urls(self, html):
+        """
+        Replace the course URLs in the given html content.
+        """
+        return static_replace.replace_course_urls(
+            text=html,
+            course_key=self.course_id
+        )
+
+    def replace_jump_to_id_urls(self, html):
+        """
+        Replace the "jump to module" URLs in the given html content.
+
+        """
+        course_id = self.course_id
+
+        try:
+            # NOTE: The 'module_id' will get assigned in the replacement function, we just
+            # need to specify something to get the reverse() to work.
+            jump_to_id_base_url = reverse('jump_to_id', kwargs={'course_id': text_type(course_id), 'module_id': ''})
+        except NoReverseMatch:
+            # 'jump_to_id' is not present in cms.urls
+            return html
+
+        return static_replace.replace_jump_to_id_urls(
+            text=html,
+            course_id=course_id,
+            jump_to_id_base_url=jump_to_id_base_url,
+        )
 
 
 class CombinedSystem(object):

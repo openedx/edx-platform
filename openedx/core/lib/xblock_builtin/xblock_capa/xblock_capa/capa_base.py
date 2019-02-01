@@ -614,9 +614,14 @@ class CapaMixin(ScorableXBlockMixin):
 
         # Now do all the substitutions which the LMS module_render normally does, but
         # we need to do here explicitly since we can get called for our HTML via AJAX
-        html = self.replace_static_urls(html)
-        html = self.replace_course_urls(html)
-        html = self.replace_jump_to_id_urls(html)
+        html = self.runtime.replace_static_urls(html,
+                                                static_asset_path=self.static_asset_path,
+                                                data_dir=getattr(self, 'data_dir', None))
+        if self.runtime.replace_course_urls:
+            html = self.runtime.replace_course_urls(html)
+
+        if self.runtime.replace_jump_to_id_urls:
+            html = self.runtime.replace_jump_to_id_urls(html)
 
         return html
 
