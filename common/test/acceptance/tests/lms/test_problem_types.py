@@ -51,7 +51,7 @@ class ProblemTypeTestBaseMeta(ABCMeta):
         ]
 
         for required_attr in required_attrs:
-            msg = ('{} is a required attribute for {}').format(
+            msg = (u'{} is a required attribute for {}').format(
                 required_attr, str(cls)
             )
 
@@ -126,7 +126,7 @@ class ProblemTypeTestBase(ProblemsTest, EventsTestMixin):
         Args:
             status: one of ("correct", "incorrect", "unanswered", "submitted")
         """
-        msg = "Wait for status to be {}".format(status)
+        msg = u"Wait for status to be {}".format(status)
         selector = ', '.join(self.status_indicators[status])
         self.problem_page.wait_for_element_visibility(selector, msg)
 
@@ -536,9 +536,9 @@ class ProblemNeverShowCorrectnessMixin(object):
         # Problem progress text depends on points possible
         possible = 'possible (ungraded, results hidden)'
         if self.problem_points == 1:
-            problem_progress = '1 point {}'.format(possible)
+            problem_progress = u'1 point {}'.format(possible)
         else:
-            problem_progress = '{} points {}'.format(self.problem_points, possible)
+            problem_progress = u'{} points {}'.format(self.problem_points, possible)
 
         # Make sure we're looking at the right problem
         self.problem_page.wait_for(
@@ -994,7 +994,7 @@ class MultipleChoiceProblemTypeTestMultipleAttempt(MultipleChoiceProblemTypeBase
         for attempts_used in range(3):
             self.assertEqual(
                 self.problem_page.submission_feedback,
-                "You have used {} of 3 attempts".format(str(attempts_used)),
+                u"You have used {} of 3 attempts".format(str(attempts_used)),
                 "All 3 attempts are not available"
             )
             if attempts_used == 2:
@@ -1777,7 +1777,7 @@ class ChoiceTextProblemTypeTestBase(ProblemTypeTestBase):
         Selects the nth (where n == input_num) choice of the problem.
         """
         self.problem_page.q(
-            css='div.problem input.ctinput[type="{}"]'.format(self.choice_type)
+            css=u'div.problem input.ctinput[type="{}"]'.format(self.choice_type)
         ).nth(input_num).click()
 
     def _fill_input_text(self, value, input_num):

@@ -178,7 +178,7 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
     @wait_for_js
     def is_response_editor_visible(self, response_id):
         """Returns true if the response editor is present, false otherwise"""
-        return self.is_element_visible(".response_{} .edit-post-body".format(response_id))
+        return self.is_element_visible(u".response_{} .edit-post-body".format(response_id))
 
     @wait_for_js
     def is_discussion_body_visible(self):
@@ -201,27 +201,27 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
     def is_response_visible(self, comment_id):
         """Returns true if the response is viewable onscreen"""
         self.wait_for_ajax()
-        return self.is_element_visible(".response_{} .response-body".format(comment_id))
+        return self.is_element_visible(u".response_{} .response-body".format(comment_id))
 
     def is_response_editable(self, response_id):
         """Returns true if the edit response button is present, false otherwise"""
-        with self.secondary_action_menu_open(".response_{} .discussion-response".format(response_id)):
-            return self.is_element_visible(".response_{} .discussion-response .action-edit".format(response_id))
+        with self.secondary_action_menu_open(u".response_{} .discussion-response".format(response_id)):
+            return self.is_element_visible(u".response_{} .discussion-response .action-edit".format(response_id))
 
     def is_response_deletable(self, response_id):
         """
         Returns true if the delete response button is present, false otherwise
         """
-        with self.secondary_action_menu_open(".response_{} .discussion-response".format(response_id)):
-            return self.is_element_visible(".response_{} .discussion-response .action-delete".format(response_id))
+        with self.secondary_action_menu_open(u".response_{} .discussion-response".format(response_id)):
+            return self.is_element_visible(u".response_{} .discussion-response .action-delete".format(response_id))
 
     def get_response_body(self, response_id):
         return self._get_element_text(".response_{} .response-body".format(response_id))
 
     def start_response_edit(self, response_id):
         """Click the edit button for the response, loading the editing view"""
-        with self.secondary_action_menu_open(".response_{} .discussion-response".format(response_id)):
-            self._find_within(".response_{} .discussion-response .action-edit".format(response_id)).first.click()
+        with self.secondary_action_menu_open(u".response_{} .discussion-response".format(response_id)):
+            self._find_within(u".response_{} .discussion-response .action-edit".format(response_id)).first.click()
             EmptyPromise(
                 lambda: self.is_response_editor_visible(response_id),
                 "Response edit started"
@@ -237,26 +237,26 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
         vote_count_element = self.browser.find_element_by_css_selector(vote_count_css)
         # To get the vote count, one must hover over the element first.
         hover(self.browser, vote_count_element)
-        return self._get_element_text(".response_{} .discussion-response .action-vote .vote-count".format(response_id))
+        return self._get_element_text(u".response_{} .discussion-response .action-vote .vote-count".format(response_id))
 
     def vote_response(self, response_id):
         current_count = self.get_response_vote_count(response_id)
-        self._find_within(".response_{} .discussion-response .action-vote".format(response_id)).first.click()
+        self._find_within(u".response_{} .discussion-response .action-vote".format(response_id)).first.click()
         self.wait_for(
             lambda: current_count != self.get_response_vote_count(response_id),
-            description="Vote updated for {response_id}".format(response_id=response_id)
+            description=u"Vote updated for {response_id}".format(response_id=response_id)
         )
 
     def cannot_vote_response(self, response_id):
         """Assert that the voting button is not visible on this response"""
-        return not self.is_element_visible(".response_{} .discussion-response .action-vote".format(response_id))
+        return not self.is_element_visible(u".response_{} .discussion-response .action-vote".format(response_id))
 
     def is_response_reported(self, response_id):
         return self.is_element_visible(".response_{} .discussion-response .post-label-reported".format(response_id))
 
     def report_response(self, response_id):
         with self.secondary_action_menu_open(".response_{} .discussion-response".format(response_id)):
-            self._find_within(".response_{} .discussion-response .action-report".format(response_id)).first.click()
+            self._find_within(u".response_{} .discussion-response .action-report".format(response_id)).first.click()
             self.wait_for_ajax()
             EmptyPromise(
                 lambda: self.is_response_reported(response_id),
@@ -265,7 +265,7 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
 
     def cannot_report_response(self, response_id):
         """Assert that the reporting button is not visible on this response"""
-        return not self.is_element_visible(".response_{} .discussion-response .action-report".format(response_id))
+        return not self.is_element_visible(u".response_{} .discussion-response .action-report".format(response_id))
 
     def is_response_endorsed(self, response_id):
         return "endorsed" in self._get_element_text(".response_{} .discussion-response .posted-details".format(response_id))
@@ -280,7 +280,7 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
 
     def set_response_editor_value(self, response_id, new_body):
         """Replace the contents of the response editor"""
-        self._find_within(".response_{} .discussion-response .wmd-input".format(response_id)).fill(new_body)
+        self._find_within(u".response_{} .discussion-response .wmd-input".format(response_id)).fill(new_body)
 
     def verify_link_editor_error_messages_shown(self):
         """
@@ -322,7 +322,7 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
             was successfully updated, False otherwise.
             """
             self._find_within(
-                ".response_{} .discussion-response .post-update".format(
+                u".response_{} .discussion-response .post-update".format(
                     response_id
                 )
             ).first.click()
@@ -337,13 +337,13 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
 
     def is_show_comments_visible(self, response_id):
         """Returns true if the "show comments" link is visible for a response"""
-        return self.is_element_visible(".response_{} .action-show-comments".format(response_id))
+        return self.is_element_visible(u".response_{} .action-show-comments".format(response_id))
 
     def show_comments(self, response_id):
         """Click the "show comments" link for a response"""
-        self._find_within(".response_{} .action-show-comments".format(response_id)).first.click()
+        self._find_within(u".response_{} .action-show-comments".format(response_id)).first.click()
         EmptyPromise(
-            lambda: self.is_element_visible(".response_{} .comments".format(response_id)),
+            lambda: self.is_element_visible(u".response_{} .comments".format(response_id)),
             "Comments shown"
         ).fulfill()
 
@@ -353,7 +353,7 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
 
     def is_comment_visible(self, comment_id):
         """Returns true if the comment is viewable onscreen"""
-        return self.is_element_visible("#comment_{} .response-body".format(comment_id))
+        return self.is_element_visible(u"#comment_{} .response-body".format(comment_id))
 
     def get_comment_body(self, comment_id):
         return self._get_element_text("#comment_{} .response-body".format(comment_id))
@@ -361,12 +361,12 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
     def is_comment_deletable(self, comment_id):
         """Returns true if the delete comment button is present, false otherwise"""
         with self.secondary_action_menu_open("#comment_{}".format(comment_id)):
-            return self.is_element_visible("#comment_{} .action-delete".format(comment_id))
+            return self.is_element_visible(u"#comment_{} .action-delete".format(comment_id))
 
     def delete_comment(self, comment_id):
         with self.handle_alert():
             with self.secondary_action_menu_open("#comment_{}".format(comment_id)):
-                self._find_within("#comment_{} .action-delete".format(comment_id)).first.click()
+                self._find_within(u"#comment_{} .action-delete".format(comment_id)).first.click()
         EmptyPromise(
             lambda: not self.is_comment_visible(comment_id),
             "Deleted comment was removed"
@@ -375,7 +375,7 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
     def is_comment_editable(self, comment_id):
         """Returns true if the edit comment button is present, false otherwise"""
         with self.secondary_action_menu_open("#comment_{}".format(comment_id)):
-            return self.is_element_visible("#comment_{} .action-edit".format(comment_id))
+            return self.is_element_visible(u"#comment_{} .action-edit".format(comment_id))
 
     def is_comment_editor_visible(self, comment_id):
         """Returns true if the comment editor is present, false otherwise"""
@@ -388,7 +388,7 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
         """Click the edit button for the comment, loading the editing view"""
         old_body = self.get_comment_body(comment_id)
         with self.secondary_action_menu_open("#comment_{}".format(comment_id)):
-            self._find_within("#comment_{} .action-edit".format(comment_id)).first.click()
+            self._find_within(u"#comment_{} .action-edit".format(comment_id)).first.click()
             EmptyPromise(
                 lambda: (
                     self.is_comment_editor_visible(comment_id) and
@@ -400,11 +400,11 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
 
     def set_comment_editor_value(self, comment_id, new_body):
         """Replace the contents of the comment editor"""
-        self._find_within("#comment_{} .wmd-input".format(comment_id)).fill(new_body)
+        self._find_within(u"#comment_{} .wmd-input".format(comment_id)).fill(new_body)
 
     def submit_comment_edit(self, comment_id, new_comment_body):
         """Click the submit button on the comment editor"""
-        self._find_within("#comment_{} .post-update".format(comment_id)).first.click()
+        self._find_within(u"#comment_{} .post-update".format(comment_id)).first.click()
         self.wait_for_ajax()
         EmptyPromise(
             lambda: (
@@ -417,7 +417,7 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
 
     def cancel_comment_edit(self, comment_id, original_body):
         """Click the cancel button on the comment editor"""
-        self._find_within("#comment_{} .post-cancel".format(comment_id)).first.click()
+        self._find_within(u"#comment_{} .post-cancel".format(comment_id)).first.click()
         EmptyPromise(
             lambda: (
                 not self.is_comment_editor_visible(comment_id) and
@@ -459,7 +459,7 @@ class DiscussionSortPreferencePage(CoursePage):
         """
         Change the option of sorting by clicking on new option.
         """
-        self.q(css=".forum-nav-sort-control option[value='{0}']".format(sort_by)).click()
+        self.q(css=u".forum-nav-sort-control option[value='{0}']".format(sort_by)).click()
         # Click initiates an ajax call, waiting for it to complete
         self.wait_for_ajax()
 
@@ -475,7 +475,7 @@ class DiscussionTabSingleThreadPage(CoursePage):
         super(DiscussionTabSingleThreadPage, self).__init__(browser, course_id)
         self.thread_page = DiscussionThreadPage(
             browser,
-            "body.discussion .discussion-article[data-id='{thread_id}']".format(thread_id=thread_id)
+            u"body.discussion .discussion-article[data-id='{thread_id}']".format(thread_id=thread_id)
         )
         self.url_path = "discussion/forum/{discussion_id}/threads/{thread_id}".format(
             discussion_id=discussion_id, thread_id=thread_id
@@ -526,7 +526,7 @@ class InlineDiscussionPage(PageObject, DiscussionPageMixin):
     def __init__(self, browser, discussion_id):
         super(InlineDiscussionPage, self).__init__(browser)
         self.root_selector = (
-            ".discussion-module[data-discussion-id='{discussion_id}'] ".format(
+            u".discussion-module[data-discussion-id='{discussion_id}'] ".format(
                 discussion_id=discussion_id
             )
         )
@@ -561,8 +561,8 @@ class InlineDiscussionPage(PageObject, DiscussionPageMixin):
 
     def click_element(self, selector):
         self.wait_for_element_presence(
-            "{discussion} {selector}".format(discussion=self.root_selector, selector=selector),
-            "{selector} is visible".format(selector=selector)
+            u"{discussion} {selector}".format(discussion=self.root_selector, selector=selector),
+            u"{selector} is visible".format(selector=selector)
         )
         self._find_within(selector).click()
 
@@ -582,7 +582,7 @@ class InlineDiscussionPage(PageObject, DiscussionPageMixin):
         Clicks the link for the specified thread to show the detailed view.
         """
         self.wait_for_element_presence('.forum-nav-thread-link', 'Thread list has loaded')
-        thread_selector = ".forum-nav-thread[data-id='{thread_id}'] .forum-nav-thread-link".format(thread_id=thread_id)
+        thread_selector = u".forum-nav-thread[data-id='{thread_id}'] .forum-nav-thread-link".format(thread_id=thread_id)
         self._find_within(thread_selector).first.click()
         self.thread_page = InlineDiscussionThreadPage(self.browser, thread_id)  # pylint: disable=attribute-defined-outside-init
         self.thread_page.wait_for_page()
@@ -595,7 +595,7 @@ class InlineDiscussionThreadPage(DiscussionThreadPage):
     def __init__(self, browser, thread_id):
         super(InlineDiscussionThreadPage, self).__init__(
             browser,
-            ".discussion-module .discussion-article[data-id='{thread_id}']".format(thread_id=thread_id)
+            u".discussion-module .discussion-article[data-id='{thread_id}']".format(thread_id=thread_id)
         )
 
     def is_thread_anonymous(self):
@@ -699,7 +699,7 @@ class DiscussionTabHomePage(CoursePage, DiscussionPageMixin):
             return self.q(css=".search-alert").filter(lambda elem: text in elem.text)
 
         for alert_id in _match_messages(text).attrs("id"):
-            self.q(css="{}#{} .dismiss".format(self.ALERT_SELECTOR, alert_id)).click()
+            self.q(css=u"{}#{} .dismiss".format(self.ALERT_SELECTOR, alert_id)).click()
         EmptyPromise(
             lambda: _match_messages(text).results == [],
             "waiting for dismissed alerts to disappear"

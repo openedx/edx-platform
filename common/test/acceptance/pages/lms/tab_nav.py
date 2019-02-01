@@ -29,7 +29,7 @@ class TabNavPage(PageObject):
         """
 
         if tab_name not in ['Course', 'Home', 'Discussion', 'Wiki', 'Progress']:
-            self.warning("'{0}' is not a valid tab name".format(tab_name))
+            self.warning(u"'{0}' is not a valid tab name".format(tab_name))
 
         # The only identifier for individual tabs is the link href
         # so we find the tab with `tab_name` in its text.
@@ -38,7 +38,7 @@ class TabNavPage(PageObject):
         if tab_css is not None:
             self.q(css=tab_css).first.click()
         else:
-            self.warning("No tabs found for '{0}'".format(tab_name))
+            self.warning(u"No tabs found for '{0}'".format(tab_name))
 
         self.wait_for_page()
         self._is_on_tab_promise(tab_name).fulfill()
@@ -74,9 +74,9 @@ class TabNavPage(PageObject):
             return None
         else:
             if self.is_using_boostrap_style_tabs():
-                return 'ul.navbar-nav li:nth-of-type({0}) a'.format(tab_index + 1)
+                return u'ul.navbar-nav li:nth-of-type({0}) a'.format(tab_index + 1)
             else:
-                return 'ol.course-tabs li:nth-of-type({0}) a'.format(tab_index + 1)
+                return u'ol.course-tabs li:nth-of-type({0}) a'.format(tab_index + 1)
 
     @property
     def tab_names(self):
@@ -122,7 +122,7 @@ class TabNavPage(PageObject):
         # Use the private version of _is_on_tab to skip the page check
         return EmptyPromise(
             lambda: self._is_on_tab(tab_name),
-            "{0} is the current tab".format(tab_name)
+            u"{0} is the current tab".format(tab_name)
         )
 
     def has_new_post_button_visible_on_tab(self):

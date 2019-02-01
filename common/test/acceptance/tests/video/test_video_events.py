@@ -46,10 +46,10 @@ class VideoEventsTestMixin(EventsTestMixin, VideoBaseTest):
 
     def assert_field_type(self, event_dict, field, field_type):
         """Assert that a particular `field` in the `event_dict` has a particular type"""
-        self.assertIn(field, event_dict, '{0} not found in the root of the event'.format(field))
+        self.assertIn(field, event_dict, u'{0} not found in the root of the event'.format(field))
         self.assertTrue(
             isinstance(event_dict[field], field_type),
-            'Expected "{key}" to be a "{field_type}", but it has the value "{value}" of type "{t}"'.format(
+            u'Expected "{key}" to be a "{field_type}", but it has the value "{value}" of type "{t}"'.format(
                 key=field,
                 value=event_dict[field],
                 t=type(event_dict[field]),
@@ -123,7 +123,7 @@ class VideoEventsTest(VideoEventsTestMixin):
         )
         for field in dynamic_string_fields:
             self.assert_field_type(load_video_event, field, basestring)
-            self.assertIn(field, load_video_event, '{0} not found in the root of the event'.format(field))
+            self.assertIn(field, load_video_event, u'{0} not found in the root of the event'.format(field))
             del load_video_event[field]
 
         # A weak assertion for the timestamp as well
@@ -360,7 +360,7 @@ class VideoBumperEventsTest(VideoEventsTestMixin):
         )
         for field in dynamic_string_fields:
             self.assert_field_type(load_video_event, field, basestring)
-            self.assertIn(field, load_video_event, '{0} not found in the root of the event'.format(field))
+            self.assertIn(field, load_video_event, u'{0} not found in the root of the event'.format(field))
             del load_video_event[field]
 
         # A weak assertion for the timestamp as well

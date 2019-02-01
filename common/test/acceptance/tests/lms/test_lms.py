@@ -263,8 +263,8 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
         """
         Create a new user with a unique name and email.
         """
-        username = "test_{uuid}".format(uuid=self.unique_id[0:6])
-        email = "{user}@example.com".format(user=username)
+        username = u"test_{uuid}".format(uuid=self.unique_id[0:6])
+        email = u"{user}@example.com".format(user=username)
         password = "password"
 
         # Create the user (automatically logs us in)
@@ -306,8 +306,8 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
         self.register_page.visit()
 
         # Fill in the form and submit it
-        username = "test_{uuid}".format(uuid=self.unique_id[0:6])
-        email = "{user}@example.com".format(user=username)
+        username = u"test_{uuid}".format(uuid=self.unique_id[0:6])
+        email = u"{user}@example.com".format(user=username)
         self.register_page.register(
             email=email,
             password="password",
@@ -329,8 +329,8 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
         # Don't agree to the terms of service / honor code.
         # Don't specify a country code, which is required.
         # Don't specify a favorite movie.
-        username = "test_{uuid}".format(uuid=self.unique_id[0:6])
-        email = "{user}@example.com".format(user=username)
+        username = u"test_{uuid}".format(uuid=self.unique_id[0:6])
+        email = u"{user}@example.com".format(user=username)
         self.register_page.register(
             email=email,
             password="password",
@@ -721,7 +721,7 @@ class PDFTextBooksTabTest(UniqueCourseTest):
 
         # Add PDF textbooks to course fixture.
         for i in range(1, 3):
-            course_fix.add_textbook("PDF Book {}".format(i), [{"title": "Chapter Of Book {}".format(i), "url": ""}])
+            course_fix.add_textbook(u"PDF Book {}".format(i), [{"title": u"Chapter Of Book {}".format(i), "url": ""}])
 
         course_fix.install()
 
@@ -736,7 +736,7 @@ class PDFTextBooksTabTest(UniqueCourseTest):
 
         # Verify each PDF textbook tab by visiting, it will fail if correct tab is not loaded.
         for i in range(1, 3):
-            self.tab_nav.go_to_tab("PDF Book {}".format(i))
+            self.tab_nav.go_to_tab(u"PDF Book {}".format(i))
 
 
 @attr(shard=1)

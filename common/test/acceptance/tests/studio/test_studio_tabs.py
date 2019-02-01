@@ -106,7 +106,7 @@ class PagesTest(StudioCourseTest):
         self.assertEqual(
             static_tab_titles,
             ['Empty', 'First'],
-            'Order should be:["Empty", "First] but getting {} from the page'.format(static_tab_titles)
+            u'Order should be:["Empty", "First] but getting {} from the page'.format(static_tab_titles)
         )
 
     def test_user_can_reorder_builtin_tabs(self):

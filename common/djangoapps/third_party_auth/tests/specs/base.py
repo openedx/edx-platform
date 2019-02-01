@@ -63,7 +63,10 @@ class HelperMixin(object):
         """
         self.assertEqual(200, response.status_code)
         # Check that the correct provider was selected.
-        self.assertIn('successfully signed in with <strong>%s</strong>' % self.provider.name, response.content)
+        self.assertIn(
+            u'successfully signed in with <strong>%s</strong>' % self.provider.name,
+            response.content.decode(response.charset)
+        )
         # Expect that each truthy value we've prepopulated the register form
         # with is actually present.
         form_field_data = self.provider.get_register_form_data(pipeline_kwargs)
@@ -120,8 +123,8 @@ class HelperMixin(object):
         """Asserts failure on /login for missing social auth looks right."""
         self.assertEqual(403, response.status_code)
         self.assertIn(
-            "successfully logged into your %s account, but this account isn&#39;t linked" % self.provider.name,
-            response.content
+            u"successfully logged into your %s account, but this account isn&#39;t linked" % self.provider.name,
+            response.content.decode(response.charset)
         )
 
     def assert_json_failure_response_is_username_collision(self, response):
