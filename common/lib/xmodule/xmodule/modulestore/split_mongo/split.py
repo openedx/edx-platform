@@ -2863,7 +2863,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             asset_idx = all_assets.find(asset_key)
 
             all_assets_updated = update_function(all_assets, asset_idx)
-            new_structure['assets'][asset_type] = list(all_assets_updated)
+            new_structure['assets'][asset_type] = all_assets_updated.as_list()
 
             # update index if appropriate and structures
             self.update_structure(asset_key.course_key, new_structure)
@@ -2894,7 +2894,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             )
 
             for asset_type, assets in assets_by_type.iteritems():
-                new_structure['assets'][asset_type] = list(assets)
+                new_structure['assets'][asset_type] = assets.as_list()
 
             # update index if appropriate and structures
             self.update_structure(course_key, new_structure)
