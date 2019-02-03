@@ -28,12 +28,18 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2019.
 #
+# #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2019 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2019.
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-01-02 15:30+0000\n"
-"PO-Revision-Date: 2019-01-02 15:30:42.381305\n"
+"POT-Creation-Date: 2019-02-03 20:37+0000\n"
+"PO-Revision-Date: 2019-02-03 20:37:39.601634\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -908,6 +914,14 @@ msgstr ""
 "Gö tö {link_start}ýöür Àççöünt Séttïngs{link_end}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: common/djangoapps/student/views/dashboard.py
+msgid ""
+"Recovery email is not activated yet. Kindly visit your email and follow the "
+"instructions to activate it."
+msgstr ""
+"Réçövérý émäïl ïs nöt äçtïvätéd ýét. Kïndlý vïsït ýöür émäïl änd föllöw thé "
+"ïnstrüçtïöns tö äçtïväté ït. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: common/djangoapps/student/views/dashboard.py
 #, python-brace-format
 msgid "The course you are looking for does not start until {date}."
 msgstr ""
@@ -1056,16 +1070,6 @@ msgstr ""
 msgid "Error in resetting your password. Please try again."
 msgstr ""
 "Érrör ïn réséttïng ýöür pässwörd. Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
-
-#: common/djangoapps/student/views/management.py
-msgid "Password creation unsuccessful"
-msgstr "Pässwörd çréätïön ünsüççéssfül Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: common/djangoapps/student/views/management.py
-msgid "Error in creating your password. Please try again."
-msgstr ""
-"Érrör ïn çréätïng ýöür pässwörd. Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α#"
 
 #: common/djangoapps/student/views/management.py
@@ -2729,8 +2733,9 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #: lms/templates/admin/user_api/accounts/cancel_retirement_action.html
-#: cms/templates/index.html lms/templates/help_modal.html
-#: lms/templates/manage_user_standing.html lms/templates/register-shib.html
+#: cms/templates/index.html cms/templates/videos_index_pagination.html
+#: lms/templates/help_modal.html lms/templates/manage_user_standing.html
+#: lms/templates/register-shib.html
 #: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 #: lms/templates/peer_grading/peer_grading_problem.html
@@ -3046,6 +3051,16 @@ msgstr ""
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid "Configure list of sources"
 msgstr "Çönfïgüré lïst öf söürçés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+#, python-brace-format
+msgid ""
+"The selected proctoring provider, {proctoring_provider}, is not a valid "
+"provider. Please select from one of {available_providers}."
+msgstr ""
+"Thé séléçtéd pröçtörïng prövïdér, {proctoring_provider}, ïs nöt ä välïd "
+"prövïdér. Pléäsé séléçt fröm öné öf {available_providers}. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢#"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "LTI Passports"
@@ -3866,6 +3881,8 @@ msgstr ""
 msgid "Course Visibility In Catalog"
 msgstr "Çöürsé Vïsïßïlïtý Ìn Çätälög Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
+#. Translators: the quoted words 'both', 'about', and 'none' must be
+#. left untranslated.  Leave them as English words.
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Defines the access permissions for showing the course in the course catalog."
@@ -3880,22 +3897,6 @@ msgstr ""
 " ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
 "ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
 "ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ η#"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Both"
-msgstr "Böth Ⱡ'σяєм ι#"
-
-#: common/lib/xmodule/xmodule/course_module.py lms/djangoapps/branding/api.py
-#: lms/templates/footer.html lms/templates/static_templates/about.html
-#: themes/red-theme/lms/templates/footer.html
-#: themes/stanford-style/lms/templates/footer.html
-#: themes/stanford-style/lms/templates/static_templates/about.html
-msgid "About"
-msgstr "Àßöüt Ⱡ'σяєм ιρѕ#"
-
-#: common/lib/xmodule/xmodule/course_module.py cms/templates/settings.html
-msgid "None"
-msgstr "Nöné Ⱡ'σяєм ι#"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Entrance Exam Enabled"
@@ -4018,6 +4019,19 @@ msgstr ""
 "¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт"
 " єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
 "¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Proctoring Provider"
+msgstr "Pröçtörïng Prövïdér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+#, python-brace-format
+msgid ""
+"Enter the proctoring provider you want to use for this course run. Choose "
+"from the following options: {available_providers}."
+msgstr ""
+"Éntér thé pröçtörïng prövïdér ýöü wänt tö üsé för thïs çöürsé rün. Çhöösé "
+"fröm thé föllöwïng öptïöns: {available_providers}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Allow Opting Out of Proctored Exams"
@@ -4157,6 +4171,8 @@ msgstr ""
 "Çöürsé Vïsïßïlïtý För Ûnénrölléd Léärnérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
 
+#. Translators: the quoted words 'private', 'public_outline', and 'public'
+#. must be left untranslated.  Leave them as English words.
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Defines the access permissions for unenrolled learners. This can be set to "
@@ -4171,18 +4187,6 @@ msgstr ""
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
 "ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
 "ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂#"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "private"
-msgstr "prïväté Ⱡ'σяєм ιρѕυм #"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "public_outline"
-msgstr "püßlïç_öütlïné Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "public"
-msgstr "püßlïç Ⱡ'σяєм ιρѕυ#"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Instructor"
@@ -5813,22 +5817,32 @@ msgstr ""
 #: common/templates/student/edx_ace/accountrecovery/email/body.html
 #: common/templates/student/edx_ace/accountrecovery/email/body.txt
 msgid ""
-"If you didn't request this change, you can disregard this email - we have "
-"not yet created your password."
+"We've restored access to your edX account using the recovery email you "
+"provided at registration."
 msgstr ""
-"Ìf ýöü dïdn't réqüést thïs çhängé, ýöü çän dïsrégärd thïs émäïl - wé hävé "
-"nöt ýét çréätéd ýöür pässwörd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+"Wé'vé réstöréd äççéss tö ýöür édX äççöünt üsïng thé réçövérý émäïl ýöü "
+"prövïdéd ät régïsträtïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: common/templates/student/edx_ace/accountrecovery/email/body.html
-msgid "Create my Password"
-msgstr "Çréäté mý Pässwörd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
-
 #: common/templates/student/edx_ace/accountrecovery/email/body.txt
-#: common/templates/student/edx_ace/passwordreset/email/body.txt
-msgid "Please go to the following page and choose a new password:"
+#, python-format
+msgid ""
+"Once you've created a password [below], you will be able to log in to edX "
+"with this email (%(email)s) and your new password."
 msgstr ""
-"Pléäsé gö tö thé föllöwïng pägé änd çhöösé ä néw pässwörd: Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+"Önçé ýöü'vé çréätéd ä pässwörd [ßélöw], ýöü wïll ßé äßlé tö lög ïn tö édX "
+"wïth thïs émäïl (%(email)s) änd ýöür néw pässwörd. Ⱡ'σяєм ιρѕυм #"
+
+#: common/templates/student/edx_ace/accountrecovery/email/body.html
+#: common/templates/student/edx_ace/accountrecovery/email/body.txt
+#: common/templates/student/edx_ace/passwordreset/email/body.html
+#: common/templates/student/edx_ace/passwordreset/email/body.txt
+msgid ""
+"If you didn't request this change, you can disregard this email - we have "
+"not yet reset your password."
+msgstr ""
+"Ìf ýöü dïdn't réqüést thïs çhängé, ýöü çän dïsrégärd thïs émäïl - wé hävé "
+"nöt ýét rését ýöür pässwörd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: common/templates/student/edx_ace/accountrecovery/email/body.txt
 #: common/templates/student/edx_ace/passwordreset/email/body.txt
@@ -5843,8 +5857,9 @@ msgstr "Thé %(platform_name)s Téäm Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: common/templates/student/edx_ace/accountrecovery/email/subject.txt
 #, python-format
-msgid "Create password on %(platform_name)s"
-msgstr "Çréäté pässwörd ön %(platform_name)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+msgid "Password creation on %(platform_name)s"
+msgstr ""
+"Pässwörd çréätïön ön %(platform_name)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
 #: common/templates/student/edx_ace/emailchange/email/body.html
 msgid "Email Change"
@@ -5954,17 +5969,14 @@ msgstr ""
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: common/templates/student/edx_ace/passwordreset/email/body.html
-#: common/templates/student/edx_ace/passwordreset/email/body.txt
-msgid ""
-"If you didn't request this change, you can disregard this email - we have "
-"not yet reset your password."
-msgstr ""
-"Ìf ýöü dïdn't réqüést thïs çhängé, ýöü çän dïsrégärd thïs émäïl - wé hävé "
-"nöt ýét rését ýöür pässwörd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#: common/templates/student/edx_ace/passwordreset/email/body.html
 msgid "Change my Password"
 msgstr "Çhängé mý Pässwörd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: common/templates/student/edx_ace/passwordreset/email/body.txt
+msgid "Please go to the following page and choose a new password:"
+msgstr ""
+"Pléäsé gö tö thé föllöwïng pägé änd çhöösé ä néw pässwörd: Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: common/templates/student/edx_ace/passwordreset/email/subject.txt
 #, python-format
@@ -6142,6 +6154,14 @@ msgstr "Médïä Kït Ⱡ'σяєм ιρѕυм ∂σł#"
 #: lms/djangoapps/branding/api.py lms/templates/static_templates/donate.html
 msgid "Donate"
 msgstr "Dönäté Ⱡ'σяєм ιρѕυ#"
+
+#: lms/djangoapps/branding/api.py lms/templates/footer.html
+#: lms/templates/static_templates/about.html
+#: themes/red-theme/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/static_templates/about.html
+msgid "About"
+msgstr "Àßöüt Ⱡ'σяєм ιρѕ#"
 
 #: lms/djangoapps/branding/api.py
 #, python-brace-format
@@ -7252,6 +7272,15 @@ msgstr ""
 
 #: lms/djangoapps/courseware/masquerade.py
 msgid ""
+"This user does not have access to this content because"
+"                         the content start date is in the future"
+msgstr ""
+"Thïs üsér döés nöt hävé äççéss tö thïs çöntént ßéçäüsé"
+"                         thé çöntént stärt däté ïs ïn thé fütüré Ⱡ'σяєм "
+"ιρѕυм #"
+
+#: lms/djangoapps/courseware/masquerade.py
+msgid ""
 "This type of component cannot be shown while viewing the course as a "
 "specific student."
 msgstr ""
@@ -8059,13 +8088,11 @@ msgstr ""
 #: lms/djangoapps/instructor/services.py
 #, python-brace-format
 msgid ""
-"A proctored exam attempt for {exam_name} in {course_name} by username: "
-"{student_username} was reviewed as {review_status} by the proctored exam "
-"review provider."
+"A proctored exam attempt for {exam_name} in {course_name} by username: {student_username} was reviewed as {review_status} by the proctored exam review provider.\n"
+"Review link: {review_url}"
 msgstr ""
-"À pröçtöréd éxäm ättémpt för {exam_name} ïn {course_name} ßý üsérnämé: "
-"{student_username} wäs révïéwéd äs {review_status} ßý thé pröçtöréd éxäm "
-"révïéw prövïdér. Ⱡ'σяєм ιρѕυм ∂σł#"
+"À pröçtöréd éxäm ättémpt för {exam_name} ïn {course_name} ßý üsérnämé: {student_username} wäs révïéwéd äs {review_status} ßý thé pröçtöréd éxäm révïéw prövïdér.\n"
+"Révïéw lïnk: {review_url} #"
 
 #: lms/djangoapps/instructor/settings/common.py
 msgid "Your Platform Insights"
@@ -11335,6 +11362,7 @@ msgstr ""
 #: openedx/core/djangoapps/user_api/admin.py
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
+#: cms/templates/videos_index_pagination.html
 msgid "Cancel"
 msgstr "Çänçél Ⱡ'σяєм ιρѕυ#"
 
@@ -11532,7 +11560,8 @@ msgstr "Prévïéw thïs révïsïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт
 msgid "Auto log:"
 msgstr "Àütö lög: Ⱡ'σяєм ιρѕυм ∂σł#"
 
-#: lms/templates/wiki/history.html wiki/templates/wiki/history.html
+#: lms/templates/wiki/history.html cms/templates/videos_index_pagination.html
+#: wiki/templates/wiki/history.html
 msgid "Change"
 msgstr "Çhängé Ⱡ'σяєм ιρѕυ#"
 
@@ -13272,21 +13301,6 @@ msgstr ""
 "Thé émäïl äddréss ýöü üséd tö régïstér wïth {platform_name} Ⱡ'σяєм ιρѕυм "
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
-#. Translators: This label appears above a field on the password reset
-#. form meant to hold the user's email address.
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Secondary email"
-msgstr "Séçöndärý émäïl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#: openedx/core/djangoapps/user_api/api.py
-#, python-brace-format
-msgid ""
-"Secondary email address you registered with {platform_name} using account "
-"settings page"
-msgstr ""
-"Séçöndärý émäïl äddréss ýöü régïstéréd wïth {platform_name} üsïng äççöünt "
-"séttïngs pägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
-
 #: openedx/core/djangoapps/user_api/api.py lms/templates/login.html
 msgid "Remember me"
 msgstr "Rémémßér mé Ⱡ'σяєм ιρѕυм ∂σłσя #"
@@ -14829,6 +14843,12 @@ msgstr "Däté Àddéd Ⱡ'σяєм ιρѕυм ∂σłσ#"
 #, python-brace-format
 msgid "{course}_video_urls"
 msgstr "{course}_vïdéö_ürls Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "A non zero positive integer is expected"
+msgstr ""
+"À nön zérö pösïtïvé ïntégér ïs éxpéçtéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "unrequested"
@@ -17012,15 +17032,6 @@ msgstr "{num} öf {total} Ⱡ'σяєм ιρѕυм ∂σłσ#"
 msgid "Your words were:"
 msgstr "Ýöür wörds wéré: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
-#: lms/templates/account_recovery/password_create_confirm.html
-msgid "Create Your {platform_name} Password"
-msgstr ""
-"Çréäté Ýöür {platform_name} Pässwörd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
-
-#: lms/templates/account_recovery/password_create_confirm.html
-msgid "Invalid Password Create Link"
-msgstr "Ìnvälïd Pässwörd Çréäté Lïnk Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
-
 #: lms/templates/api_admin/api_access_request_form.html
 msgid "API Access Request"
 msgstr "ÀPÌ Àççéss Réqüést Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
@@ -18751,6 +18762,39 @@ msgstr ""
 "яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα "
 "ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι "
 "σƒƒ#"
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"Audit this course for free and have access to course materials and "
+"discussions forums. {b_start}This track does not include graded "
+"assignments.{b_end}"
+msgstr ""
+"Àüdït thïs çöürsé för fréé änd hävé äççéss tö çöürsé mätérïäls änd "
+"dïsçüssïöns förüms. {b_start}Thïs träçk döés nöt ïnçlüdé grädéd "
+"ässïgnménts.{b_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg "
+"єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт "
+"єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт "
+"αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη "
+"νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт "
+"σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт "
+"αηιм ι∂ єѕт ł#"
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"Audit this course for free and have access to course materials and "
+"discussions forums. {b_start}This track does not include unlimited course "
+"access.{b_end}"
+msgstr ""
+"Àüdït thïs çöürsé för fréé änd hävé äççéss tö çöürsé mätérïäls änd "
+"dïsçüssïöns förüms. {b_start}Thïs träçk döés nöt ïnçlüdé ünlïmïtéd çöürsé "
+"äççéss.{b_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, "
+"ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм "
+"α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ "
+"єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє"
+" νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
+"¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂#"
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
@@ -22987,11 +23031,19 @@ msgstr "Àllöwänçé Séçtïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α
 msgid "Student Special Exam Attempts"
 msgstr "Stüdént Spéçïäl Éxäm Àttémpts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
+#: lms/templates/instructor/instructor_dashboard_2/special_exams.html
+msgid "Review Dashboard"
+msgstr "Révïéw Däshßöärd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View gradebook for enrolled learners"
 msgstr ""
 "Vïéw grädéßöök för énrölléd léärnérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "View Gradebook"
+msgstr "Vïéw Grädéßöök Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
@@ -23000,10 +23052,6 @@ msgid ""
 msgstr ""
 "Nöté: Thïs féätüré ïs äväïläßlé önlý tö çöürsés wïth ä smäll nümßér öf "
 "énrölléd léärnérs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "View Gradebook"
-msgstr "Vïéw Grädéßöök Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View a specific learner's enrollment status"
@@ -28665,6 +28713,10 @@ msgid "Prerequisite Course"
 msgstr "Préréqüïsïté Çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: cms/templates/settings.html
+msgid "None"
+msgstr "Nöné Ⱡ'σяєм ι#"
+
+#: cms/templates/settings.html
 msgid "Course that students must complete before beginning this course"
 msgstr ""
 "Çöürsé thät stüdénts müst çömplété ßéföré ßégïnnïng thïs çöürsé Ⱡ'σяєм ιρѕυм"
@@ -29013,6 +29065,14 @@ msgstr "Vïdéö Ûplöäds Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 #: cms/templates/videos_index.html
 msgid "Course Video Settings"
 msgstr "Çöürsé Vïdéö Séttïngs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: cms/templates/videos_index_pagination.html
+msgid "Changing.."
+msgstr "Çhängïng.. Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: cms/templates/videos_index_pagination.html
+msgid "Videos per page:"
+msgstr "Vïdéös pér pägé: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: cms/templates/visibility_editor.html
 msgid "Access is not restricted"
@@ -30726,3 +30786,33 @@ msgid ""
 msgstr ""
 "À néw révïsïön wäs çréätéd: Mérgé ßétwéén Révïsïön #%(r1)d änd Révïsïön "
 "#%(r2)d Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
+
+#: edx_proctoring_proctortrack/backends/proctortrack_rest.py
+msgid ""
+"Click on the \"Start System Check\" link below to download and run the "
+"proctoring software."
+msgstr ""
+"Çlïçk ön thé \"Stärt Sýstém Çhéçk\" lïnk ßélöw tö döwnlöäd änd rün thé "
+"pröçtörïng söftwäré. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: edx_proctoring_proctortrack/backends/proctortrack_rest.py
+msgid ""
+"Once you have verified your identity and reviewed the exam guidelines in "
+"Proctortrack, you will be redirected back to this page."
+msgstr ""
+"Önçé ýöü hävé vérïfïéd ýöür ïdéntïtý änd révïéwéd thé éxäm güïdélïnés ïn "
+"Pröçtörträçk, ýöü wïll ßé rédïréçtéd ßäçk tö thïs pägé. Ⱡ'σя#"
+
+#: edx_proctoring_proctortrack/backends/proctortrack_rest.py
+msgid ""
+"To confirm that proctoring has started, make sure your webcam feed and the "
+"blue Proctortrack box are both visible on your screen."
+msgstr ""
+"Tö çönfïrm thät pröçtörïng häs stärtéd, mäké süré ýöür wéßçäm fééd änd thé "
+"ßlüé Pröçtörträçk ßöx äré ßöth vïsïßlé ön ýöür sçréén. Ⱡ'σ#"
+
+#: edx_proctoring_proctortrack/backends/proctortrack_rest.py
+msgid "Click on the \"Start Proctored Exam\" button below to continue."
+msgstr ""
+"Çlïçk ön thé \"Stärt Pröçtöréd Éxäm\" ßüttön ßélöw tö çöntïnüé. Ⱡ'σяєм ιρѕυм"
+" ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
