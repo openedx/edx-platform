@@ -185,6 +185,19 @@ class User(models.Model):
                 raise
         self._update_from_response(response)
 
+    def retire(self, retired_username):
+        url = _url_for_retire(self.id)
+        params = {'retired_username': retired_username}
+
+        perform_request(
+            'post',
+            url,
+            params,
+            raw=True,
+            metric_action='user.retire',
+            metric_tags=self._metric_tags
+        )
+
 
 def get_user_social_stats(user_id, course_id, end_date=None, thread_type=None, thread_ids=None):
     """ Queries cs_comments_service for social_stats """
@@ -266,3 +279,10 @@ def _url_for_read(user_id):
     Returns cs_comments_service url endpoint to mark thread as read for given user_id
     """
     return "{prefix}/users/{user_id}/read".format(prefix=settings.PREFIX, user_id=user_id)
+
+
+def _url_for_retire(user_id):
+    """
+    Returns cs_comments_service url endpoint to retire a user (remove all post content, etc.)
+    """
+    return "{prefix}/users/{user_id}/retire".format(prefix=settings.PREFIX, user_id=user_id)
