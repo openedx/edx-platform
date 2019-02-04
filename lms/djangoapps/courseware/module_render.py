@@ -16,20 +16,19 @@ from completion import waffle as completion_waffle
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
+from django.middleware.csrf import CsrfViewMiddleware
 from django.core.context_processors import csrf
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, HttpResponseForbidden
+from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
 from edx_proctoring.services import ProctoringService
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from requests.auth import HTTPBasicAuth
-from rest_framework.views import APIView
-from rest_framework.authentication import SessionAuthentication
-from rest_framework_oauth.authentication import OAuth2Authentication
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import APIException
 from xblock.core import XBlock
 from xblock.django.request import django_to_webob_request, webob_to_django_response
 from xblock.exceptions import NoSuchHandlerError, NoSuchViewError
@@ -59,6 +58,7 @@ from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.credit.services import CreditService
 from openedx.core.djangoapps.monitoring_utils import set_custom_metrics_for_course_key, set_monitoring_transaction_name
 from openedx.core.djangoapps.util.user_utils import SystemUser
+from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.license import wrap_with_license
 from openedx.core.lib.url_utils import quote_slashes, unquote_slashes
 from openedx.core.lib.xblock_utils import request_token as xblock_request_token
@@ -562,6 +562,11 @@ def get_module_system_for_user(
             block_key=block.scope_ids.usage_id,
             completion=event['completion'],
         )
+        CourseModuleCompletion.objects.get_or_create(
+            user_id=user.id,
+            course_id=course_id,
+            content_id=unicode(block.scope_ids.usage_id),
+        )
 
     def handle_deprecated_progress_event(block, event):
         """
@@ -583,15 +588,14 @@ def get_module_system_for_user(
         if not user_id:
             return
 
-        if not completion_waffle.waffle().is_enabled(completion_waffle.ENABLE_COMPLETION_TRACKING):
-            CourseModuleCompletion.objects.get_or_create(
-                user_id=user_id,
-                course_id=course_id,
-                content_id=unicode(descriptor.location)
-            )
-        else:
+        CourseModuleCompletion.objects.get_or_create(
+            user_id=user_id,
+            course_id=course_id,
+            content_id=unicode(descriptor.location)
+        )
+        if completion_waffle.waffle().is_enabled(completion_waffle.ENABLE_COMPLETION_TRACKING):
             if user_id != user.id:
-                log.warning("{} tried to submit a completion on behalf of {}".format(user, requested_user_id))
+                log.warning("{} tried to submit a completion on behalf of {}".format(user, user_id))
                 return
             BlockCompletion.objects.submit_completion(
                 user=user,
@@ -967,32 +971,64 @@ def handle_xblock_callback_noauth(request, course_id, usage_id, handler, suffix=
         return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course=course)
 
 
-class XblockCallbackView(APIView):
+@csrf_exempt
+@xframe_options_exempt
+def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
     """
-    Class-based view for extensions. This is where AJAX calls go.
+    Generic view for extensions. This is where AJAX calls go.
 
-    Return 403 error if the user is not logged in. Raises Http404 if
-    the location and course_id do not identify a valid module, the module is
-    not accessible by the user, or the module raises NotFoundError. If the
-    module raises any other error, it will escape this function.
+    Arguments:
+        request (Request): Django request.
+        course_id (str): Course containing the block
+        usage_id (str)
+        handler (str)
+        suffix (str)
+
+    Raises:
+        HttpResponseForbidden: If the request method is not `GET` and user is not authenticated.
+        Http404: If the course is not found in the modulestore.
     """
-    authentication_classes = (SessionAuthentication, OAuth2Authentication,)
-    permission_classes = (IsAuthenticated,)
+    # In this case, we are using Session based authentication, so we need to check CSRF token.
+    if request.user and request.user.is_authenticated():
+        error = CsrfViewMiddleware().process_view(request, None, (), {})
+        if error:
+            return error
 
-    def get(self, request, course_id, usage_id, handler, suffix=None):
-        return _get_course_and_invoke_handler(request, course_id, usage_id, handler, suffix)
+    else:
+        authentication_classes = (OAuth2AuthenticationAllowInactiveUser,)
+        authenticators = [auth() for auth in authentication_classes]
 
-    def post(self, request, course_id, usage_id, handler, suffix=None):
-        return _get_course_and_invoke_handler(request, course_id, usage_id, handler, suffix)
+        for authenticator in authenticators:
+            try:
+                user_auth_tuple = authenticator.authenticate(request)
+            except APIException:
+                log.exception(
+                    "XBlock handler %r failed to authenticate with %s", handler, authenticator.__class__.__name__
+                )
+            else:
+                if user_auth_tuple is not None:
+                    request.user, _ = user_auth_tuple
+                    break
 
-    def put(self, request, course_id, usage_id, handler, suffix=None):
-        return _get_course_and_invoke_handler(request, course_id, usage_id, handler, suffix)
+    # NOTE (CCB): Allow anonymous GET calls (e.g. for transcripts). Modifying this view is simpler than updating
+    # the XBlocks to use `handle_xblock_callback_noauth`, which is practically identical to this view.
+    if request.method != 'GET' and not (request.user and request.user.is_authenticated()):
+        return HttpResponseForbidden()
 
-    def patch(self, request, course_id, usage_id, handler, suffix=None):
-        return _get_course_and_invoke_handler(request, course_id, usage_id, handler, suffix)
+    request.user.known = request.user.is_authenticated()
 
-    def delete(self, request, course_id, usage_id, handler, suffix=None):
-        return _get_course_and_invoke_handler(request, course_id, usage_id, handler, suffix)
+    try:
+        course_key = CourseKey.from_string(course_id)
+    except InvalidKeyError:
+        raise Http404('{} is not a valid course key'.format(course_id))
+
+    with modulestore().bulk_operations(course_key):
+        try:
+            course = modulestore().get_course(course_key)
+        except ItemNotFoundError:
+            raise Http404('{} does not exist in the modulestore'.format(course_id))
+
+        return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course=course)
 
 
 def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_info=False, course=None):

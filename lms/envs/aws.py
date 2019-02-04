@@ -272,6 +272,12 @@ BULK_EMAIL_ROUTING_KEY_SMALL_JOBS = ENV_TOKENS.get('BULK_EMAIL_ROUTING_KEY_SMALL
 # Queue to use for updating persistent grades
 RECALCULATE_GRADES_ROUTING_KEY = ENV_TOKENS.get('RECALCULATE_GRADES_ROUTING_KEY', LOW_PRIORITY_QUEUE)
 
+# Queue to use for updating persistent social engagements
+RECALCULATE_SOCIAL_ENGAGEMENT_ROUTING_KEY = ENV_TOKENS.get(
+    'RECALCULATE_SOCIAL_ENGAGEMENT_ROUTING_KEY',
+    LOW_PRIORITY_QUEUE
+)
+
 # Message expiry time in seconds
 CELERY_EVENT_QUEUE_TTL = ENV_TOKENS.get('CELERY_EVENT_QUEUE_TTL', None)
 
@@ -876,7 +882,6 @@ if FEATURES.get('EDX_SOLUTIONS_API'):
         'social_engagement',
         'gradebook',
         'progress',
-        'completion_api',
         'edx_solutions_projects',
         'edx_solutions_organizations',
         'mobileapps',
@@ -1167,4 +1172,19 @@ COURSEGRAPH_JOB_QUEUE = ENV_TOKENS.get('COURSEGRAPH_JOB_QUEUE', LOW_PRIORITY_QUE
 PARENTAL_CONSENT_AGE_LIMIT = ENV_TOKENS.get(
     'PARENTAL_CONSENT_AGE_LIMIT',
     PARENTAL_CONSENT_AGE_LIMIT
+)
+
+########################## Settings for Completion API #####################
+
+# If using openedx-completion-aggregator, large instances may find that
+# updating the aggregated completion data after each XBlock is completed
+# generates too much database activity. In that case, this should be set
+# to True, and a daily/hourly cron job should be set up to update the
+# completion aggregation data asynchronously using the run_aggregator_service
+# management command.
+COMPLETION_AGGREGATOR_ASYNC_AGGREGATION = ENV_TOKENS.get('COMPLETION_AGGREGATOR_ASYNC_AGGREGATION', False)
+COMPLETION_BY_VIEWING_DELAY_MS = ENV_TOKENS.get('COMPLETION_BY_VIEWING_DELAY_MS', COMPLETION_BY_VIEWING_DELAY_MS)
+COMPLETION_VIDEO_COMPLETE_PERCENTAGE = ENV_TOKENS.get(
+    'COMPLETION_VIDEO_COMPLETE_PERCENTAGE',
+    COMPLETION_VIDEO_COMPLETE_PERCENTAGE,
 )

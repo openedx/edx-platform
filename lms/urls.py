@@ -10,7 +10,6 @@ from django.views.generic.base import RedirectView
 from ratelimitbackend import admin
 
 from courseware.views.index import CoursewareIndex
-from courseware.module_render import XblockCallbackView
 from courseware.views.views import CourseTabView, EnrollStaffView, StaticCourseTabView
 from django_comment_common.models import ForumsConfig
 from openedx.core.djangoapps.auth_exchange.views import LoginWithAccessTokenView
@@ -134,7 +133,7 @@ if settings.FEATURES["ENABLE_MOBILE_REST_API"]:
 if settings.FEATURES.get('EDX_SOLUTIONS_API'):
     urlpatterns += (
         url(r'^api/server/', include('edx_solutions_api_integration.urls')),
-        url(r'^api/completion/v0/', include('lms.djangoapps.completion_api.urls')),
+        url(r'^api/completion/v0/', include('completion_aggregator.api.v0.urls'))
     )
 
 # COMPLETION
@@ -143,6 +142,12 @@ urlpatterns += (
     url(r'^api/completion/', include('completion.api.urls', namespace='completion')),
     url(r'^api/completion-aggregator/', include('completion_aggregator.urls')),
 )
+
+# USER MANAGER API
+urlpatterns += (
+    url(r'^api/user_manager/', include('user_manager.api.urls', namespace='user-manager-api')),
+)
+
 
 # OPEN EDX USER API
 # mattdrayer: Please note that the user_api declaration must follow
@@ -246,7 +251,7 @@ urlpatterns += (
             course_key=settings.COURSE_ID_PATTERN,
             usage_key=settings.USAGE_ID_PATTERN,
         ),
-        XblockCallbackView.as_view(),
+        'courseware.module_render.handle_xblock_callback',
         name='xblock_handler',
     ),
     url(
@@ -538,6 +543,9 @@ urlpatterns += (
         'lms.djangoapps.discussion.views.course_discussions_settings_handler',
         name='course_discussions_settings',
     ),
+
+    # Cohorts management API
+    url(r'^api/cohorts/', include('openedx.core.djangoapps.course_groups.urls', namespace='api_cohorts')),
 
     # Cohorts management
     url(

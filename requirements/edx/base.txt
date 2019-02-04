@@ -38,7 +38,7 @@ django-method-override==0.1.0
 django-user-tasks==0.1.4
 # We need a fix to DRF 3.2.x, for now use it from our own cherry-picked repo
 git+https://github.com/edx/django-rest-framework.git@3c72cb5ee5baebc4328947371195eae2077197b0#egg=djangorestframework==3.2.3
-django==1.8.18
+django==1.8.19
 django-waffle==0.12.0
 djangorestframework-jwt==1.8.0
 djangorestframework-oauth==1.1.0
@@ -94,7 +94,7 @@ django-memcached-hashring==0.1.2
 python-openid==2.2.5
 python-dateutil==2.1
 social-auth-app-django==1.2.0
-social-auth-core==1.4.0
+social-auth-core==1.7.0
 pytz==2016.7
 pysrt==0.4.7
 PyYAML==3.12
@@ -210,7 +210,7 @@ py2neo==3.1.2
 
 # Support for plugins
 web-fragments==0.2.2
-xblock==1.2.0
+xblock>=1.2.2,<1.3
 
 # Third Party XBlocks
 edx-sga==0.6.2
@@ -219,4 +219,4 @@ edx-sga==0.6.2
 redis==2.10.6
 
 # Completion
-edx-completion==0.1.6
+edx-completion==0.1.10

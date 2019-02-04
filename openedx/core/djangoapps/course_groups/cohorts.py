@@ -654,3 +654,20 @@ def _get_cohort_settings_from_modulestore(course):
         'cohorted_discussions': list(course.cohorted_discussions),
         'always_cohort_inline_discussions': course.always_cohort_inline_discussions
     }
+
+
+def get_cohort_user_ids(user_id, course_key, **kwargs):
+    """
+    Get cohort from course identified by `course_key` in which member `user_id` is present
+    and return list of all its members' ids.
+    """
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return None
+
+    cohort = get_cohort(user, course_key, **kwargs)
+    try:
+        return cohort.users.values_list('id', flat=True)
+    except AttributeError:
+        return None

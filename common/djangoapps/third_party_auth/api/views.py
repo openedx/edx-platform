@@ -83,7 +83,6 @@ class UserView(APIView):
         OAuth2AuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
-    throttle_classes = [ProviderSustainedThrottle, ProviderBurstThrottle]
 
     def get(self, request, username):
         """Create, read, or update enrollment information for a user.
@@ -121,7 +120,8 @@ class UserView(APIView):
         # In the future this can be trivially modified to return the inactive/disconnected providers as well.
 
         return Response({
-            "active": active_providers
+            "active": active_providers,
+            "account_active": user.is_active,
         })
 
     def get_provider_data(self, assoc, is_unprivileged):

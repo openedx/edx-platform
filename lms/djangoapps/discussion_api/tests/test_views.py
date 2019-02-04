@@ -9,12 +9,16 @@ import ddt
 import httpretty
 import mock
 from django.core.urlresolvers import reverse
+from edx_oauth2_provider.tests.factories import ClientFactory, AccessTokenFactory
 from nose.plugins.attrib import attr
+from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from rest_framework.parsers import JSONParser
-from rest_framework.test import APIClient
+from rest_framework.test import APIClient, APITestCase
 
 from common.test.utils import disable_signal
+from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
 from discussion_api import api
 from discussion_api.tests.utils import (
     CommentsServiceMockMixin,
@@ -23,7 +27,10 @@ from discussion_api.tests.utils import (
     make_minimal_cs_thread,
     make_paginated_api_response
 )
-from django_comment_client.tests.utils import ForumsEnableMixin
+from django_comment_client.tests.utils import ForumsEnableMixin, config_course_discussions, topic_name_to_id
+from django_comment_common.models import CourseDiscussionSettings, Role
+from django_comment_common.utils import seed_permissions_roles
+from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_storage
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import PatchMediaTypeMixin, UrlResetMixin
@@ -1699,3 +1706,431 @@ class CommentViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase
             expected_profile_data = self.get_expected_user_profile(response_comment['author'])
             response_users = response_comment['users']
             self.assertEqual(expected_profile_data, response_users[response_comment['author']])
+
+
+@ddt.ddt
+class CourseDiscussionSettingsAPIViewTest(APITestCase, UrlResetMixin, ModuleStoreTestCase):
+    """
+    Test the course discussion settings handler API endpoint.
+    """
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def setUp(self):
+        super(CourseDiscussionSettingsAPIViewTest, self).setUp()
+        self.course = CourseFactory.create(
+            org="x",
+            course="y",
+            run="z",
+            start=datetime.now(UTC),
+            discussion_topics={"Test Topic": {"id": "test_topic"}}
+        )
+        self.path = reverse('discussion_course_settings', kwargs={'course_id': unicode(self.course.id)})
+        self.password = 'edx'
+        self.user = UserFactory(username='staff', password=self.password, is_staff=True)
+
+    def _get_oauth_headers(self, user):
+        """Return the OAuth headers for testing OAuth authentication"""
+        access_token = AccessTokenFactory.create(user=user, client=ClientFactory()).token
+        headers = {
+            'HTTP_AUTHORIZATION': 'Bearer ' + access_token
+        }
+        return headers
+
+    def _login_as_staff(self):
+        """Log the client in as the staff."""
+        self.client.login(username=self.user.username, password=self.password)
+
+    def _create_divided_discussions(self):
+        """Create some divided discussions for testing."""
+        divided_inline_discussions = ['Topic A', ]
+        divided_course_wide_discussions = ['Topic B', ]
+        divided_discussions = divided_inline_discussions + divided_course_wide_discussions
+
+        ItemFactory.create(
+            parent_location=self.course.location,
+            category='discussion',
+            discussion_id=topic_name_to_id(self.course, 'Topic A'),
+            discussion_category='Chapter',
+            discussion_target='Discussion',
+            start=datetime.now()
+        )
+        discussion_topics = {
+            "Topic B": {"id": "Topic B"},
+        }
+        config_course_cohorts(self.course, is_cohorted=True)
+        config_course_discussions(
+            self.course,
+            discussion_topics=discussion_topics,
+            divided_discussions=divided_discussions
+        )
+        return divided_inline_discussions, divided_course_wide_discussions
+
+    def _get_expected_response(self):
+        """Return the default expected response before any changes to the discussion settings."""
+        return {
+            u'always_divide_inline_discussions': False,
+            u'divided_inline_discussions': [],
+            u'divided_course_wide_discussions': [],
+            u'id': 1,
+            u'division_scheme': u'cohort',
+            u'available_division_schemes': [u'cohort']
+        }
+
+    def patch_request(self, data, headers=None):
+        headers = headers if headers else {}
+        return self.client.patch(self.path, json.dumps(data), content_type='application/merge-patch+json', **headers)
+
+    def _assert_current_settings(self, expected_response):
+        """Validate the current discussion settings against the expected response."""
+        response = self.client.get(self.path)
+        self.assertEqual(response.status_code, 200)
+        content = json.loads(response.content)
+        self.assertEqual(content, expected_response)
+
+    def _assert_patched_settings(self, data, expected_response):
+        """Validate the patched settings against the expected response."""
+        response = self.patch_request(data)
+        self.assertEqual(response.status_code, 204)
+        self._assert_current_settings(expected_response)
+
+    @ddt.data('get', 'patch')
+    def test_authentication_required(self, method):
+        """Test and verify that authentication is required for this endpoint."""
+        self.client.logout()
+        response = getattr(self.client, method)(self.path)
+        self.assertEqual(response.status_code, 401)
+
+    @ddt.data(
+        {'is_staff': False, 'get_status': 403, 'put_status': 403},
+        {'is_staff': True, 'get_status': 200, 'put_status': 204},
+    )
+    @ddt.unpack
+    def test_oauth(self, is_staff, get_status, put_status):
+        """Test that OAuth authentication works for this endpoint."""
+        user = UserFactory(is_staff=is_staff)
+        headers = self._get_oauth_headers(user)
+        self.client.logout()
+
+        response = self.client.get(self.path, **headers)
+        self.assertEqual(response.status_code, get_status)
+
+        response = self.patch_request(
+            {'always_divide_inline_discussions': True}, headers
+        )
+        self.assertEqual(response.status_code, put_status)
+
+    def test_non_existent_course_id(self):
+        """Test the response when this endpoint is passed a non-existent course id."""
+        self._login_as_staff()
+        response = self.client.get(
+            reverse('discussion_course_settings', kwargs={
+                'course_id': 'a/b/c'
+            })
+        )
+        self.assertEqual(response.status_code, 404)
+
+    def test_get_settings(self):
+        """Test the current discussion settings against the expected response."""
+        divided_inline_discussions, divided_course_wide_discussions = self._create_divided_discussions()
+        self._login_as_staff()
+        response = self.client.get(self.path)
+        self.assertEqual(response.status_code, 200)
+        expected_response = self._get_expected_response()
+        expected_response['divided_course_wide_discussions'] = [
+            topic_name_to_id(self.course, name) for name in divided_course_wide_discussions
+        ]
+        expected_response['divided_inline_discussions'] = [
+            topic_name_to_id(self.course, name) for name in divided_inline_discussions
+        ]
+        content = json.loads(response.content)
+        self.assertEqual(content, expected_response)
+
+    def test_available_schemes(self):
+        """Test the available division schemes against the expected response."""
+        config_course_cohorts(self.course, is_cohorted=False)
+        self._login_as_staff()
+        expected_response = self._get_expected_response()
+        expected_response['available_division_schemes'] = []
+        self._assert_current_settings(expected_response)
+
+        CourseModeFactory.create(course_id=self.course.id, mode_slug=CourseMode.AUDIT)
+        CourseModeFactory.create(course_id=self.course.id, mode_slug=CourseMode.VERIFIED)
+
+        expected_response['available_division_schemes'] = [CourseDiscussionSettings.ENROLLMENT_TRACK]
+        self._assert_current_settings(expected_response)
+
+        config_course_cohorts(self.course, is_cohorted=True)
+        expected_response['available_division_schemes'] = [
+            CourseDiscussionSettings.COHORT, CourseDiscussionSettings.ENROLLMENT_TRACK
+        ]
+        self._assert_current_settings(expected_response)
+
+    def test_empty_body_patch_request(self):
+        """Test the response status code on sending a PATCH request with an empty body or missing fields."""
+        self._login_as_staff()
+        response = self.patch_request("")
+        self.assertEqual(response.status_code, 400)
+
+        response = self.patch_request({})
+        self.assertEqual(response.status_code, 400)
+
+    @ddt.data(
+        {'abc': 123},
+        {'divided_course_wide_discussions': 3},
+        {'divided_inline_discussions': 'a'},
+        {'always_divide_inline_discussions': ['a']},
+    )
+    def test_invalid_body_parameters(self, body):
+        """Test the response status code on sending a PATCH request with parameters having incorrect types."""
+        self._login_as_staff()
+        response = self.patch_request(body)
+        self.assertEqual(response.status_code, 400)
+
+    def test_update_always_divide_inline_discussion_settings(self):
+        """Test whether the 'always_divide_inline_discussions' setting is updated."""
+        config_course_cohorts(self.course, is_cohorted=True)
+        self._login_as_staff()
+        expected_response = self._get_expected_response()
+        self._assert_current_settings(expected_response)
+        expected_response['always_divide_inline_discussions'] = True
+
+        self._assert_patched_settings({'always_divide_inline_discussions': True}, expected_response)
+
+    def test_update_course_wide_discussion_settings(self):
+        """Test whether the 'divided_course_wide_discussions' setting is updated."""
+        discussion_topics = {
+            'Topic B': {'id': 'Topic B'}
+        }
+        config_course_cohorts(self.course, is_cohorted=True)
+        config_course_discussions(self.course, discussion_topics=discussion_topics)
+        expected_response = self._get_expected_response()
+        self._login_as_staff()
+        self._assert_current_settings(expected_response)
+        expected_response['divided_course_wide_discussions'] = [
+            topic_name_to_id(self.course, "Topic B")
+        ]
+        self._assert_patched_settings(
+            {'divided_course_wide_discussions': [topic_name_to_id(self.course, "Topic B")]},
+            expected_response
+        )
+        expected_response['divided_course_wide_discussions'] = []
+        self._assert_patched_settings(
+            {'divided_course_wide_discussions': []},
+            expected_response
+        )
+
+    def test_update_inline_discussion_settings(self):
+        """Test whether the 'divided_inline_discussions' setting is updated."""
+        config_course_cohorts(self.course, is_cohorted=True)
+        self._login_as_staff()
+        expected_response = self._get_expected_response()
+        self._assert_current_settings(expected_response)
+
+        now = datetime.now()
+        ItemFactory.create(
+            parent_location=self.course.location,
+            category='discussion',
+            discussion_id='Topic_A',
+            discussion_category='Chapter',
+            discussion_target='Discussion',
+            start=now
+        )
+        expected_response['divided_inline_discussions'] = ['Topic_A', ]
+        self._assert_patched_settings({'divided_inline_discussions': ['Topic_A']}, expected_response)
+
+        expected_response['divided_inline_discussions'] = []
+        self._assert_patched_settings({'divided_inline_discussions': []}, expected_response)
+
+    def test_update_division_scheme(self):
+        """Test whether the 'division_scheme' setting is updated."""
+        config_course_cohorts(self.course, is_cohorted=True)
+        self._login_as_staff()
+        expected_response = self._get_expected_response()
+        self._assert_current_settings(expected_response)
+        expected_response['division_scheme'] = 'none'
+        self._assert_patched_settings({'division_scheme': 'none'}, expected_response)
+
+
+@ddt.ddt
+class CourseDiscussionRolesAPIViewTest(APITestCase, UrlResetMixin, ModuleStoreTestCase):
+    """
+    Test the course discussion roles management endpoint.
+    """
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def setUp(self):
+        super(CourseDiscussionRolesAPIViewTest, self).setUp()
+        self.course = CourseFactory.create(
+            org="x",
+            course="y",
+            run="z",
+            start=datetime.now(UTC),
+        )
+        self.password = 'edx'
+        self.user = UserFactory(username='staff', password=self.password, is_staff=True)
+        course_key = CourseKey.from_string('x/y/z')
+        seed_permissions_roles(course_key)
+
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def path(self, course_id=None, role=None):
+        """Return the URL path to the endpoint based on the provided arguments."""
+        course_id = unicode(self.course.id) if course_id is None else course_id
+        role = 'Moderator' if role is None else role
+        return reverse(
+            'discussion_course_roles',
+            kwargs={'course_id': course_id, 'rolename': role}
+        )
+
+    def _get_oauth_headers(self, user):
+        """Return the OAuth headers for testing OAuth authentication."""
+        access_token = AccessTokenFactory.create(user=user, client=ClientFactory()).token
+        headers = {
+            'HTTP_AUTHORIZATION': 'Bearer ' + access_token
+        }
+        return headers
+
+    def _login_as_staff(self):
+        """Log the client is as the staff user."""
+        self.client.login(username=self.user.username, password=self.password)
+
+    def _create_and_enroll_users(self, count):
+        """Create 'count' number of users and enroll them in self.course."""
+        users = []
+        for _ in range(count):
+            user = UserFactory()
+            CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
+            users.append(user)
+        return users
+
+    def _add_users_to_role(self, users, rolename):
+        """Add the given users to the given role."""
+        role = Role.objects.get(name=rolename, course_id=self.course.id)
+        for user in users:
+            role.users.add(user)
+
+    def post(self, role, user_id, action):
+        """Make a POST request to the endpoint using the provided parameters."""
+        self._login_as_staff()
+        return self.client.post(self.path(role=role), {'user_id': user_id, 'action': action})
+
+    @ddt.data('get', 'post')
+    def test_authentication_required(self, method):
+        """Test and verify that authentication is required for this endpoint."""
+        self.client.logout()
+        response = getattr(self.client, method)(self.path())
+        self.assertEqual(response.status_code, 401)
+
+    def test_oauth(self):
+        """Test that OAuth authentication works for this endpoint."""
+        oauth_headers = self._get_oauth_headers(self.user)
+        self.client.logout()
+        response = self.client.get(self.path(), **oauth_headers)
+        self.assertEqual(response.status_code, 200)
+        body = {'user_id': 'staff', 'action': 'allow'}
+        response = self.client.post(self.path(), body, format='json', **oauth_headers)
+        self.assertEqual(response.status_code, 200)
+
+    @ddt.data(
+        {'username': 'u1', 'is_staff': False, 'expected_status': 403},
+        {'username': 'u2', 'is_staff': True, 'expected_status': 200},
+    )
+    @ddt.unpack
+    def test_staff_permission_required(self, username, is_staff, expected_status):
+        """Test and verify that only users with staff permission can access this endpoint."""
+        UserFactory(username=username, password='edx', is_staff=is_staff)
+        self.client.login(username=username, password='edx')
+        response = self.client.get(self.path())
+        self.assertEqual(response.status_code, expected_status)
+
+        response = self.client.post(self.path(), {'user_id': username, 'action': 'allow'}, format='json')
+        self.assertEqual(response.status_code, expected_status)
+
+    def test_non_existent_course_id(self):
+        """Test the response when the endpoint URL contains a non-existent course id."""
+        self._login_as_staff()
+        path = self.path(course_id='a/b/c')
+        response = self.client.get(path)
+
+        self.assertEqual(response.status_code, 404)
+
+        response = self.client.post(path)
+        self.assertEqual(response.status_code, 404)
+
+    def test_non_existent_course_role(self):
+        """Test the response when the endpoint URL contains a non-existent role."""
+        self._login_as_staff()
+        path = self.path(role='A')
+        response = self.client.get(path)
+
+        self.assertEqual(response.status_code, 400)
+
+        response = self.client.post(path)
+        self.assertEqual(response.status_code, 400)
+
+    @ddt.data(
+        {'role': 'Moderator', 'count': 0},
+        {'role': 'Moderator', 'count': 1},
+        {'role': 'Community TA', 'count': 3},
+    )
+    @ddt.unpack
+    def test_get_role_members(self, role, count):
+        """Test the get role members endpoint response."""
+        config_course_cohorts(self.course, is_cohorted=True)
+        users = self._create_and_enroll_users(count=count)
+
+        self._add_users_to_role(users, role)
+        self._login_as_staff()
+        response = self.client.get(self.path(role=role))
+
+        self.assertEqual(response.status_code, 200)
+
+        content = json.loads(response.content)
+        self.assertEqual(content['course_id'], 'x/y/z')
+        self.assertEqual(len(content['results']), count)
+        expected_fields = ('username', 'email', 'first_name', 'last_name', 'group_name')
+        for item in content['results']:
+            for expected_field in expected_fields:
+                self.assertIn(expected_field, item)
+        self.assertEqual(content['division_scheme'], 'cohort')
+
+    def test_post_missing_body(self):
+        """Test the response with a POST request without a body."""
+        self._login_as_staff()
+        response = self.client.post(self.path())
+        self.assertEqual(response.status_code, 400)
+
+    @ddt.data(
+        {'a': 1},
+        {'user_id': 'xyz', 'action': 'allow'},
+        {'user_id': 'staff', 'action': 123},
+    )
+    def test_missing_or_invalid_parameters(self, body):
+        """
+        Test the response when the POST request has missing required parameters or
+        invalid values for the required parameters.
+        """
+        self._login_as_staff()
+        response = self.client.post(self.path(), body)
+        self.assertEqual(response.status_code, 400)
+
+        response = self.client.post(self.path(), body, format='json')
+        self.assertEqual(response.status_code, 400)
+
+    @ddt.data(
+        {'action': 'allow', 'user_in_role': False},
+        {'action': 'allow', 'user_in_role': True},
+        {'action': 'revoke', 'user_in_role': False},
+        {'action': 'revoke', 'user_in_role': True}
+    )
+    @ddt.unpack
+    def test_post_update_user_role(self, action, user_in_role):
+        """Test the response when updating the user's role"""
+        users = self._create_and_enroll_users(count=1)
+        user = users[0]
+        role = 'Moderator'
+        if user_in_role:
+            self._add_users_to_role(users, role)
+
+        response = self.post(role, user.username, action)
+        self.assertEqual(response.status_code, 200)
+        content = json.loads(response.content)
+        assertion = self.assertTrue if action == 'allow' else self.assertFalse
+        assertion(any(user.username in x['username'] for x in content['results']))
