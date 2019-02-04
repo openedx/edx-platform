@@ -8,8 +8,9 @@
 # pin when possible.  Writing an issue against the offending project and
 # linking to it here is good.
 
-# functools32 is a backport which can only be installed on Python 2.7
+# These packages are backports which can only be installed on Python 2.7
 functools32 ; python_version == "2.7"
+futures ; python_version == "2.7"
 
 # six is at 1.12.0, but transifex-client requires ==1.11.0
 # https://github.com/transifex/transifex-client/issues/252
@@ -25,7 +26,7 @@ pylint-plugin-utils==0.3
 # Browser driver used by lettuce - pinned because splinter==0.10.0 breaks lettuce tests.  EDUCATOR-3795
 splinter==0.9.0
 
-# transifex-client 0.13.5 requires urllib3<1.24, but requests will pull in urllib3==1.24 (https://github.com/transifex/transifex-client/pull/241/files)
+# transifex-client 0.13.6 requires urllib3<1.24, but requests will pull in urllib3==1.24 (https://github.com/transifex/transifex-client/pull/241/files)
 urllib3<1.24
 
 # Bumping requests-oauthlib to 1.2 updates oauthlib to 3.0.0, which changes a response code in certain cases

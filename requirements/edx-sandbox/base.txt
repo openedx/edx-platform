@@ -13,7 +13,7 @@ backports-abc==0.5        # via tornado
 cffi==1.11.5
 cryptography==2.5
 enum34==1.1.6
-futures==3.2.0            # via tornado
+futures==3.2.0 ; python_version == "2.7"  # via tornado
 ipaddress==1.0.22
 lxml==3.8.0
 markupsafe==1.1.0
