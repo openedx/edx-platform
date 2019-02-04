@@ -58,7 +58,7 @@ class TestCourseExportOlx(ModuleStoreTestCase):
         course = CourseFactory.create(default_store=store_type)
         self.assertTrue(
             modulestore().has_course(course.id),
-            "Could not find course in {}".format(store_type)
+            u"Could not find course in {}".format(store_type)
         )
         return course.id
 

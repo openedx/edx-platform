@@ -6,7 +6,7 @@
 from lettuce import step, world
 from openedx.core.lib.tests.tools import assert_equal, assert_in  # pylint: disable=no-name-in-module
 
-CSS_FOR_TAB_ELEMENT = "li[data-tab-id='{0}'] input.toggle-checkbox"
+CSS_FOR_TAB_ELEMENT = u"li[data-tab-id='{0}'] input.toggle-checkbox"
 
 
 @step(u'I go to the pages page$')

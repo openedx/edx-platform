@@ -31,14 +31,14 @@ class Command(BaseCommand):
         try:
             course_key = CourseKey.from_string(options['course_id'])
         except InvalidKeyError:
-            raise CommandError("Invalid course_key: '%s'." % options['course_id'])
+            raise CommandError(u"Invalid course_key: '%s'." % options['course_id'])
 
         if not modulestore().get_course(course_key):
-            raise CommandError("Course with %s key not found." % options['course_id'])
+            raise CommandError(u"Course with %s key not found." % options['course_id'])
 
         output_path = options['output_path']
 
-        print("Exporting course id = {0} to {1}".format(course_key, output_path))
+        print(u"Exporting course id = {0} to {1}".format(course_key, output_path))
 
         if not output_path.endswith('/'):
             output_path += '/'

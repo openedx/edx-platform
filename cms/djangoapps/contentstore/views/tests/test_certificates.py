@@ -151,8 +151,8 @@ class CertificatesBaseTestCase(object):
         Test invalid json handling.
         """
         # Invalid JSON.
-        invalid_json = "{u'name': 'Test Name', u'description': 'Test description'," \
-                       " u'version': " + str(CERTIFICATE_SCHEMA_VERSION) + ", []}"
+        invalid_json = u"{u'name': 'Test Name', u'description': 'Test description'," \
+                       u" u'version': " + str(CERTIFICATE_SCHEMA_VERSION) + ", []}"
 
         response = self.client.post(
             self._url(),

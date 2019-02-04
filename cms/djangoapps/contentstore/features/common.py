@@ -49,7 +49,7 @@ def i_press_the_category_delete_icon(_step, category):
     elif category == 'subsection':
         css = 'a.action.delete-subsection-button'
     else:
-        assert False, 'Invalid category: %s' % category
+        assert False, u'Invalid category: %s' % category
     world.css_click(css)
 
 
@@ -93,7 +93,7 @@ def press_the_notification_button(_step, name):
     # the "Save" button at the UI level.
     # Instead, we use JavaScript to reliably click
     # the button.
-    btn_css = 'div#page-notification button.action-%s' % name.lower()
+    btn_css = u'div#page-notification button.action-%s' % name.lower()
     world.trigger_event(btn_css, event='focus')
     world.browser.execute_script("$('{}').click()".format(btn_css))
     world.wait_for_ajax_complete()
@@ -299,7 +299,7 @@ def _do_studio_prompt_action(intent, action):
 
     world.wait_for_present('div.wrapper-prompt.is-shown#prompt-{}'.format(intent))
 
-    action_css = 'li.nav-item > button.action-{}'.format(action)
+    action_css = u'li.nav-item > button.action-{}'.format(action)
     world.trigger_event(action_css, event='focus')
     world.browser.execute_script("$('{}').click()".format(action_css))
 
@@ -334,7 +334,7 @@ def type_in_codemirror(index, text, find_prefix="$"):
 
 def get_codemirror_value(index=0, find_prefix="$"):
     return world.browser.driver.execute_script(
-        """
+        u"""
         return {find_prefix}('div.CodeMirror:eq({index})').get(0).CodeMirror.getValue();
         """.format(index=index, find_prefix=find_prefix)
     )
@@ -351,7 +351,7 @@ def upload_file(filename, sub_path=''):
     # The file upload dialog is a faux modal, a div that takes over the display
     attach_file(filename, sub_path)
     modal_css = 'div.wrapper-modal-window-assetupload'
-    button_css = '{} .action-upload'.format(modal_css)
+    button_css = u'{} .action-upload'.format(modal_css)
     world.css_click(button_css)
 
     # Clicking the Upload button triggers an AJAX POST.

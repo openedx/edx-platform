@@ -97,7 +97,7 @@ def reorder_tabs_handler(course_item, request):
         tab = get_tab_by_tab_id_locator(old_tab_list, tab_id_locator)
         if tab is None:
             return JsonResponse(
-                {"error": "Tab with id_locator '{0}' does not exist.".format(tab_id_locator)}, status=400
+                {"error": u"Tab with id_locator '{0}' does not exist.".format(tab_id_locator)}, status=400
             )
         new_tab_list.append(tab)
 
@@ -111,7 +111,7 @@ def reorder_tabs_handler(course_item, request):
         CourseTabList.validate_tabs(new_tab_list)
     except InvalidTabsException, exception:
         return JsonResponse(
-            {"error": "New list of tabs is not valid: {0}.".format(str(exception))}, status=400
+            {"error": u"New list of tabs is not valid: {0}.".format(str(exception))}, status=400
         )
 
     # persist the new order of the tabs
@@ -133,7 +133,7 @@ def edit_tab_handler(course_item, request):
     tab = get_tab_by_tab_id_locator(course_item.tabs, tab_id_locator)
     if tab is None:
         return JsonResponse(
-            {"error": "Tab with id_locator '{0}' does not exist.".format(tab_id_locator)}, status=400
+            {"error": u"Tab with id_locator '{0}' does not exist.".format(tab_id_locator)}, status=400
         )
 
     if 'is_hidden' in request.json:
@@ -141,7 +141,7 @@ def edit_tab_handler(course_item, request):
         tab.is_hidden = request.json['is_hidden']
         modulestore().update_item(course_item, request.user.id)
     else:
-        raise NotImplementedError('Unsupported request to edit tab: {0}'.format(request.json))
+        raise NotImplementedError(u'Unsupported request to edit tab: {0}'.format(request.json))
 
     return JsonResponse()
 

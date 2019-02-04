@@ -80,7 +80,7 @@ def image_is_jpeg_or_png(value):
     content_type = value.content_type
     if content_type not in IMAGE_TYPES.keys():
         raise serializers.ValidationError(
-            'Only JPEG and PNG image types are supported. {} is not valid'.format(content_type))
+            u'Only JPEG and PNG image types are supported. {} is not valid'.format(content_type))
 
 
 class CourseRunImageField(serializers.ImageField):
@@ -169,7 +169,7 @@ class CourseRunRerunSerializer(CourseRunSerializerCommonFieldsMixin, CourseRunTe
         with store.default_store('split'):
             new_course_run_key = store.make_course_key(course_run_key.org, course_run_key.course, value)
         if store.has_course(new_course_run_key, ignore_case=True):
-            raise serializers.ValidationError('Course run {key} already exists'.format(key=new_course_run_key))
+            raise serializers.ValidationError(u'Course run {key} already exists'.format(key=new_course_run_key))
         return value
 
     def update(self, instance, validated_data):

@@ -165,12 +165,12 @@ def _create_library(request):
     except KeyError as error:
         log.exception("Unable to create library - missing required JSON key.")
         return JsonResponseBadRequest({
-            "ErrMsg": _("Unable to create library - missing required field '{field}'").format(field=text_type(error))
+            "ErrMsg": _(u"Unable to create library - missing required field '{field}'").format(field=text_type(error))
         })
     except InvalidKeyError as error:
         log.exception("Unable to create library - invalid key.")
         return JsonResponseBadRequest({
-            "ErrMsg": _("Unable to create library '{name}'.\n\n{err}").format(name=display_name, err=text_type(error))
+            "ErrMsg": _(u"Unable to create library '{name}'.\n\n{err}").format(name=display_name, err=text_type(error))
         })
     except DuplicateCourseError:
         log.exception("Unable to create library - one already exists with the same key.")

@@ -203,7 +203,7 @@ class CourseMetadata(object):
                 if hasattr(descriptor, key) and getattr(descriptor, key) != val:
                     key_values[key] = descriptor.fields[key].from_json(val)
             except (TypeError, ValueError) as err:
-                raise ValueError(_("Incorrect format for field '{name}'. {detailed_message}").format(
+                raise ValueError(_(u"Incorrect format for field '{name}'. {detailed_message}").format(
                     name=model['display_name'], detailed_message=text_type(err)))
 
         return cls.update_from_dict(key_values, descriptor, user)

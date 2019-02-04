@@ -836,7 +836,7 @@ class TestCheckTranscripts(BaseTranscripts):
     """
     def test_success_download_nonyoutube(self):
         subs_id = str(uuid4())
-        self.item.data = textwrap.dedent("""
+        self.item.data = textwrap.dedent(u"""
             <video youtube="" sub="{}">
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.mp4"/>
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.webm"/>
@@ -1030,7 +1030,7 @@ class TestCheckTranscripts(BaseTranscripts):
         usage_key = self._get_usage_key(resp)
         subs_id = str(uuid4())
         item = modulestore().get_item(usage_key)
-        item.data = textwrap.dedent("""
+        item.data = textwrap.dedent(u"""
             <not_video youtube="" sub="{}">
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.mp4"/>
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.webm"/>

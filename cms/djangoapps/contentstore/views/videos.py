@@ -220,7 +220,7 @@ def video_images_handler(request, course_key_string, edx_video_id=None):
     with closing(image_file):
         image_url = update_video_image(edx_video_id, course_key_string, image_file, image_file.name)
         LOGGER.info(
-            'VIDEOS: Video image uploaded for edx_video_id [%s] in course [%s]', edx_video_id, course_key_string
+            u'VIDEOS: Video image uploaded for edx_video_id [%s] in course [%s]', edx_video_id, course_key_string
         )
 
     return JsonResponse({'image_url': image_url})
@@ -256,17 +256,17 @@ def validate_transcript_preferences(provider, cielo24_fidelity, cielo24_turnarou
 
                 # Validate transcription turnaround
                 if cielo24_turnaround not in transcription_plans[provider]['turnaround']:
-                    error = 'Invalid cielo24 turnaround {}.'.format(cielo24_turnaround)
+                    error = u'Invalid cielo24 turnaround {}.'.format(cielo24_turnaround)
                     return error, preferences
 
                 # Validate transcription languages
                 supported_languages = transcription_plans[provider]['fidelity'][cielo24_fidelity]['languages']
                 if video_source_language not in supported_languages:
-                    error = 'Unsupported source language {}.'.format(video_source_language)
+                    error = u'Unsupported source language {}.'.format(video_source_language)
                     return error, preferences
 
                 if not len(preferred_languages) or not (set(preferred_languages) <= set(supported_languages.keys())):
-                    error = 'Invalid languages {}.'.format(preferred_languages)
+                    error = u'Invalid languages {}.'.format(preferred_languages)
                     return error, preferences
 
                 # Validated Cielo24 preferences
@@ -277,23 +277,23 @@ def validate_transcript_preferences(provider, cielo24_fidelity, cielo24_turnarou
                     'preferred_languages': preferred_languages,
                 }
             else:
-                error = 'Invalid cielo24 fidelity {}.'.format(cielo24_fidelity)
+                error = u'Invalid cielo24 fidelity {}.'.format(cielo24_fidelity)
         elif provider == TranscriptProvider.THREE_PLAY_MEDIA:
 
             # Validate transcription turnaround
             if three_play_turnaround not in transcription_plans[provider]['turnaround']:
-                error = 'Invalid 3play turnaround {}.'.format(three_play_turnaround)
+                error = u'Invalid 3play turnaround {}.'.format(three_play_turnaround)
                 return error, preferences
 
             # Validate transcription languages
             valid_translations_map = transcription_plans[provider]['translations']
             if video_source_language not in valid_translations_map.keys():
-                error = 'Unsupported source language {}.'.format(video_source_language)
+                error = u'Unsupported source language {}.'.format(video_source_language)
                 return error, preferences
 
             valid_target_languages = valid_translations_map[video_source_language]
             if not len(preferred_languages) or not (set(preferred_languages) <= set(valid_target_languages)):
-                error = 'Invalid languages {}.'.format(preferred_languages)
+                error = u'Invalid languages {}.'.format(preferred_languages)
                 return error, preferences
 
             # Validated 3PlayMedia preferences
@@ -303,7 +303,7 @@ def validate_transcript_preferences(provider, cielo24_fidelity, cielo24_turnarou
                 'preferred_languages': preferred_languages,
             }
     else:
-        error = 'Invalid provider {}.'.format(provider)
+        error = u'Invalid provider {}.'.format(provider)
 
     return error, preferences
 
@@ -370,7 +370,7 @@ def video_encodings_download(request, course_key_string):
         # Translators: This is the header for a CSV file column
         # containing URLs for video encodings for the named profile
         # (e.g. desktop, mobile high quality, mobile low quality)
-        return _("{profile_name} URL").format(profile_name=profile)
+        return _(u"{profile_name} URL").format(profile_name=profile)
 
     profile_whitelist = VideoUploadConfig.get_profile_whitelist()
     videos, __ = _get_videos(course)
@@ -471,7 +471,7 @@ def convert_video_status(video, is_video_encodes_ready=False):
     if video['status'] == 'upload' and (now - video['created']) > timedelta(hours=MAX_UPLOAD_HOURS):
         new_status = 'upload_failed'
         status = StatusDisplayStrings.get(new_status)
-        message = 'Video with id [%s] is still in upload after [%s] hours, setting status to [%s]' % (
+        message = u'Video with id [%s] is still in upload after [%s] hours, setting status to [%s]' % (
             video['edx_video_id'], MAX_UPLOAD_HOURS, new_status
         )
         send_video_status_update([
@@ -710,7 +710,7 @@ def videos_post(course, request):
         try:
             file_name.encode('ascii')
         except UnicodeEncodeError:
-            error_msg = 'The file name for %s must contain only ASCII characters.' % file_name
+            error_msg = u'The file name for %s must contain only ASCII characters.' % file_name
             return JsonResponse({'error': error_msg}, status=400)
 
         edx_video_id = unicode(uuid4())
@@ -791,7 +791,7 @@ def send_video_status_update(updates):
     for update in updates:
         update_video_status(update.get('edxVideoId'), update.get('status'))
         LOGGER.info(
-            'VIDEOS: Video status update with id [%s], status [%s] and message [%s]',
+            u'VIDEOS: Video status update with id [%s], status [%s] and message [%s]',
             update.get('edxVideoId'),
             update.get('status'),
             update.get('message')

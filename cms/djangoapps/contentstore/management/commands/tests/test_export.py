@@ -51,7 +51,7 @@ class TestCourseExport(ModuleStoreTestCase):
         course_id = unicode(course.id)
         self.assertTrue(
             modulestore().has_course(course.id),
-            "Could not find course in {}".format(store)
+            u"Could not find course in {}".format(store)
         )
         # Test `export` management command with invalid course_id
         errstring = "Invalid course_key: 'InvalidCourseID'."
