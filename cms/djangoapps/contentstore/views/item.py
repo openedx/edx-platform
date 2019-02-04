@@ -11,7 +11,7 @@ from uuid import uuid4
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods
@@ -51,6 +51,7 @@ from help_tokens.core import HelpUrlExpert
 from models.settings.course_grading import CourseGradingModel
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
 from openedx.core.djangoapps.waffle_utils import WaffleSwitch
+from openedx.core.djangoapps.bookmarks import api as bookmarks_api
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.xblock_utils import request_token, wrap_xblock
 from static_replace import replace_static_urls
@@ -940,6 +941,12 @@ def _delete_item(usage_key, user):
             store.update_item(course, user.id)
 
         store.delete_item(usage_key, user.id)
+
+        # Delete user bookmark
+        try:
+            bookmarks_api.delete_bookmark(user=user, usage_key=usage_key)
+        except ObjectDoesNotExist:
+            log.info(_(u'Bookmark with usage_key: {usage_key} does not exist.').format(usage_key=usage_key))
 
 
 @login_required
