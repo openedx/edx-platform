@@ -13,6 +13,7 @@ from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 from openedx.core.djangoapps.user_api.course_tag import api as user_course_tag_api
 from openedx.core.lib.url_utils import quote_slashes
 from openedx.core.lib.xblock_utils import xblock_local_resource_url, wrap_xblock_aside
+import static_replace
 from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore.django import ModuleI18nService, modulestore
 from xmodule.partitions.partitions_service import PartitionService
@@ -128,7 +129,55 @@ class UserTagsService(object):
         )
 
 
-class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
+class StaticUrlsRuntimeMixin(object):
+    """
+    Mixin for the LMS and Studio runtime classes which provides methods for properly replacing static, course, and
+    jump-to URLs present in XBlock content.
+    """
+
+    def replace_static_urls(self, html, static_asset_path, data_dir=None):
+        """
+        Replace the static URLs in the given html content.
+        """
+        return static_replace.replace_static_urls(
+            text=html,
+            data_directory=data_dir,
+            course_id=self.course_id,
+            static_asset_path=static_asset_path,
+        )
+
+    def replace_course_urls(self, html):
+        """
+        Replace the course URLs in the given html content.
+        """
+        return static_replace.replace_course_urls(
+            text=html,
+            course_key=self.course_id
+        )
+
+    def replace_jump_to_id_urls(self, html):
+        """
+        Replace the "jump to module" URLs in the given html content.
+
+        """
+        course_id = self.course_id
+
+        try:
+            # NOTE: The 'module_id' will get assigned in the replacement function, we just
+            # need to specify something to get the reverse() to work.
+            jump_to_id_base_url = reverse('jump_to_id', kwargs={'course_id': text_type(course_id), 'module_id': ''})
+        except NoReverseMatch:
+            # 'jump_to_id' is not present in cms.urls
+            return html
+
+        return static_replace.replace_jump_to_id_urls(
+            text=html,
+            course_id=course_id,
+            jump_to_id_base_url=jump_to_id_base_url,
+        )
+
+
+class LmsModuleSystem(StaticUrlsRuntimeMixin, ModuleSystem):  # pylint: disable=abstract-method
     """
     ModuleSystem specialized to the LMS
     """
