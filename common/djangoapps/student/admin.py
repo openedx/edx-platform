@@ -254,6 +254,7 @@ class UserProfileInline(admin.StackedInline):
     model = UserProfile
     can_delete = False
     verbose_name_plural = _('User profile')
+    exclude = ('display_name',)
 
 
 class AccountRecoveryInline(admin.StackedInline):
