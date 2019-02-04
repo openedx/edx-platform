@@ -318,7 +318,7 @@
                 });
 
                 // On Sequence change, destroy any existing polling thread
-                // for queued submissions, see ../capa/display.js
+                // for queued submissions, see capa/display.js
                 if (window.queuePollerID) {
                     window.clearTimeout(window.queuePollerID);
                     delete window.queuePollerID;

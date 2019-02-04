@@ -14,7 +14,7 @@ from mako.lookup import TemplateLookup
 from path import Path as path
 
 from calc import UndefinedVariable
-from capa.capa_problem import LoncapaProblem
+from xblock_capa.lib.capa_problem import LoncapaProblem
 
 logging.basicConfig(format="%(levelname)s %(message)s")
 log = logging.getLogger('capa.checker')

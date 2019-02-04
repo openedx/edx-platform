@@ -52,7 +52,7 @@ class WebCertificateTestMixin(object):
         """
         Mock the "send to XQueue" method to return either success or an error.
         """
-        symbol = 'capa.xqueue_interface.XQueueInterface.send_to_queue'
+        symbol = 'xblock_capa.lib.xqueue_interface.XQueueInterface.send_to_queue'
         with patch(symbol) as mock_send_to_queue:
             if is_successful:
                 mock_send_to_queue.return_value = (0, "Successfully queued")

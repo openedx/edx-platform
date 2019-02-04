@@ -9,7 +9,7 @@ from django.test.client import RequestFactory
 from mock import patch
 from six import text_type
 
-from capa.tests.response_xml_factory import StringResponseXMLFactory
+from xblock_capa.tests.response_xml_factory import StringResponseXMLFactory
 from class_dashboard.dashboard_data import (
     get_array_section_has_problem,
     get_d3_problem_grade_distrib,

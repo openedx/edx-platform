@@ -25,6 +25,9 @@ setup(
     description='XBlock - CAPA Problems',
     install_requires=[
         'XBlock',
+        "setuptools",
+        "lxml",
+        "pytz"
     ],
     entry_points={
         'xblock.v1': [

@@ -3,7 +3,7 @@ Base file for Grades tests
 """
 from crum import set_current_request
 
-from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
+from xblock_capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from openedx.core.djangolib.testing.utils import get_mock_request
 from student.models import CourseEnrollment

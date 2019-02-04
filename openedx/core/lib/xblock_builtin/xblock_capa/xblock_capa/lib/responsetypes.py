@@ -1,5 +1,5 @@
 #
-# File:   courseware/capa/responsetypes.py
+# File:   xblock_capa/lib/responsetypes.py
 #
 """
 Problem response evaluation.  Handles checking of student responses,
@@ -36,8 +36,8 @@ from pytz import UTC
 from shapely.geometry import MultiPoint, Point
 from six import text_type
 
-import capa.safe_exec as safe_exec
-import capa.xqueue_interface as xqueue_interface
+import xblock_capa.lib.safe_exec as safe_exec
+import xblock_capa.lib.xqueue_interface as xqueue_interface
 # specific library imports
 from calc import UndefinedVariable, UnmatchedParenthesis, evaluator
 from cmath import isnan
@@ -2037,7 +2037,7 @@ class StringResponse(LoncapaResponse):
                 regexp = re.compile('^' + '|'.join(expected) + '$', flags=flags | re.UNICODE)
                 result = re.search(regexp, given)
             except Exception as err:
-                msg = u'[courseware.capa.responsetypes.stringresponse] {error}: {message}'.format(
+                msg = u'[xblock_capa.lib.responsetypes.stringresponse] {error}: {message}'.format(
                     error=_('error'),
                     message=text_type(err)
                 )
@@ -2152,7 +2152,7 @@ class CustomResponse(LoncapaResponse):
 
         if not self.code:
             if answer is None:
-                log.error("[courseware.capa.responsetypes.customresponse] missing"
+                log.error("[xblock_capa.lib.responsetypes.customresponse] missing"
                           " code checking script! id=%s", self.id)
                 self.code = ''
             else:
@@ -2181,7 +2181,7 @@ class CustomResponse(LoncapaResponse):
             # ordered list of answers
             submission = [student_answers[k] for k in idset]
         except Exception as err:
-            msg = u"[courseware.capa.responsetypes.customresponse] {message}\n idset = {idset}, error = {err}".format(
+            msg = u"[xblock_capa.lib.responsetypes.customresponse] {message}\n idset = {idset}, error = {err}".format(
                 message=_("error getting student answer from {student_answers}").format(
                     student_answers=student_answers,
                 ),
@@ -2190,7 +2190,7 @@ class CustomResponse(LoncapaResponse):
             )
 
             log.error(
-                "[courseware.capa.responsetypes.customresponse] error getting"
+                "[xblock_capa.lib.responsetypes.customresponse] error getting"
                 " student answer from %s"
                 "\n idset = %s, error = %s",
                 student_answers, idset, err
@@ -2313,7 +2313,7 @@ class CustomResponse(LoncapaResponse):
             except Exception as err:  # pylint: disable=broad-except
                 self._handle_exec_exception(err)
             log.debug(
-                "[courseware.capa.responsetypes.customresponse.get_score] ret = %s",
+                "[xblock_capa.lib.responsetypes.customresponse.get_score] ret = %s",
                 ret
             )
             if isinstance(ret, dict):
@@ -2682,7 +2682,7 @@ class CodeResponse(LoncapaResponse):
 
         # Generate header
         queuekey = xqueue_interface.make_hashkey(
-            str(self.capa_system.seed) + qtime + anonymous_student_id + self.answer_id
+            str(self.capa_system.seed) + qtime + str(anonymous_student_id) + self.answer_id
         )
         callback_url = self.capa_system.xqueue['construct_callback']()
         xheader = xqueue_interface.make_xheader(
@@ -3353,7 +3353,7 @@ class ImageResponse(LoncapaResponse):
                     image_input_id=aid,
                     user_input=given
                 )
-                raise Exception('[capamodule.capa.responsetypes.imageinput] ' + msg)
+                raise Exception('[xblock_capa.lib.responsetypes.imageinput] ' + msg)
 
             (ans_x, ans_y) = [int(x) for x in acoords.groups()]
 
@@ -3373,7 +3373,7 @@ class ImageResponse(LoncapaResponse):
                         msg = _('Error in problem specification! Cannot parse rectangle in {sr_coords}').format(
                             sr_coords=etree.tostring(self.ielements[aid], pretty_print=True)
                         )
-                        raise Exception('[capamodule.capa.responsetypes.imageinput] ' + msg)
+                        raise Exception('[xblock_capa.lib.responsetypes.imageinput] ' + msg)
 
                     (llx, lly, urx, ury) = [int(x) for x in sr_coords.groups()]
 

@@ -534,11 +534,11 @@ MAKO_MODULE_DIR = os.path.join(tempfile.gettempdir(), 'mako_lms')
 MAKO_TEMPLATE_DIRS_BASE = [
     PROJECT_ROOT / 'templates',
     COMMON_ROOT / 'templates',
-    COMMON_ROOT / 'lib' / 'capa' / 'capa' / 'templates',
     COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates',
     OPENEDX_ROOT / 'core' / 'djangoapps' / 'cors_csrf' / 'templates',
     OPENEDX_ROOT / 'core' / 'djangoapps' / 'dark_lang' / 'templates',
     OPENEDX_ROOT / 'core' / 'lib' / 'license' / 'templates',
+    OPENEDX_ROOT / 'core' / 'lib' / 'xblock_builtin' / 'xblock_capa' / 'xblock_capa' / 'lib' / 'templates',
     OPENEDX_ROOT / 'features' / 'course_experience' / 'templates',
 ]
 
@@ -602,9 +602,9 @@ TEMPLATES = [
         'DIRS': [
             PROJECT_ROOT / "templates",
             COMMON_ROOT / 'templates',
-            COMMON_ROOT / 'lib' / 'capa' / 'capa' / 'templates',
             COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates',
             COMMON_ROOT / 'static',  # required to statically include common Underscore templates
+            OPENEDX_ROOT / 'core' / 'lib' / 'xblock_builtin' / 'xblock_capa' / 'xblock_capa' / 'lib' / 'templates',
         ],
         # Options specific to this backend.
         'OPTIONS': {

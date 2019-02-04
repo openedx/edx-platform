@@ -160,7 +160,7 @@ def enter_xml_in_advanced_problem(_step, text):
 @world.absorb
 def verify_setting_entry(setting, display_name, value, explicitly_set):
     """
-    Verify the capa module fields are set as expected in the
+    Verify the xblock_capa fields are set as expected in the
     Advanced Settings editor.
 
     Parameters

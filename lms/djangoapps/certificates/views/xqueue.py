@@ -11,7 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from opaque_keys.edx.keys import CourseKey
 
-from capa.xqueue_interface import XQUEUE_METRIC_NAME
+from xblock_capa.lib.xqueue_interface import XQUEUE_METRIC_NAME
 from lms.djangoapps.certificates.api import generate_user_certificates
 from lms.djangoapps.certificates.models import (
     CertificateStatuses,

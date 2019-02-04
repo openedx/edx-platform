@@ -34,7 +34,7 @@ from xblock.fields import Scope, String
 
 import courseware.views.views as views
 import shoppingcart
-from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
+from xblock_capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.access_utils import check_course_open_for_learner
@@ -2199,7 +2199,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
         mock_tracker = analytics_patcher.start()
         self.addCleanup(analytics_patcher.stop)
 
-        with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_send_to_queue:
+        with patch('xblock_capa.lib.xqueue_interface.XQueueInterface.send_to_queue') as mock_send_to_queue:
             mock_send_to_queue.return_value = (0, "Successfully queued")
 
             resp = self.client.post(self.url)

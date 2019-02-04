@@ -5,7 +5,7 @@ from django.urls import reverse
 from mock import Mock, patch
 from crum import set_current_request
 
-from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
+from xblock_capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from courseware.entrance_exams import (
     course_has_entrance_exam,
     get_entrance_exam_content,

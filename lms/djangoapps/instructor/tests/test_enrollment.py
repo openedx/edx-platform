@@ -18,7 +18,7 @@ from opaque_keys.edx.locator import CourseLocator
 from six import text_type
 from crum import set_current_request
 
-from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
+from xblock_capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from courseware.models import StudentModule
 from grades.subsection_grade_factory import SubsectionGradeFactory
 from grades.tests.utils import answer_problem

@@ -9,7 +9,7 @@ class NotFoundError(Exception):
 class ProcessingError(Exception):
     '''
     An error occurred while processing a request to the XModule.
-    For example: if an exception occurs while checking a capa problem.
+    For example: if an exception occurs while checking a xblock_capa problem.
     '''
     pass
 

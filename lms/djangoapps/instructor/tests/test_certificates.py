@@ -14,7 +14,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from django.test.utils import override_settings
 
-from capa.xqueue_interface import XQueueInterface
+from xblock_capa.lib.xqueue_interface import XQueueInterface
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,

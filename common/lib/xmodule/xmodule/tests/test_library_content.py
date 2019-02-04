@@ -88,7 +88,7 @@ class LibraryContentModuleTestMixin(object):
 
     def _create_capa_problems(self):
         """
-        Helper function to create a set of capa problems to test against.
+        Helper function to create a set of xblock_capa problems to test against.
 
         Creates four blocks total.
         """
@@ -175,7 +175,7 @@ class LibraryContentModuleTestMixin(object):
         self.assertEqual(StudioValidationMessage.WARNING, result.summary.type)
         self.assertIn("only 4 matching problems", result.summary.text)
 
-        # Add some capa problems so we can check problem type validation messages
+        # Add some xblock_capa problems so we can check problem type validation messages
         self.lc_block.max_count = 1
         self._create_capa_problems()
         self.lc_block.refresh_children()

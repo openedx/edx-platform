@@ -14,7 +14,7 @@ import textwrap
 
 from lettuce import world
 
-from capa.tests.response_xml_factory import (
+from xblock_capa.tests.response_xml_factory import (
     ChoiceResponseXMLFactory,
     ChoiceTextResponseXMLFactory,
     CodeResponseXMLFactory,
@@ -28,7 +28,7 @@ from capa.tests.response_xml_factory import (
 )
 from common import section_location
 
-# Factories from capa.tests.response_xml_factory that we will use
+# Factories from xblock_capa.tests.response_xml_factory that we will use
 # to generate the problem XML, with the keyword args used to configure
 # the output.
 # 'correct', 'incorrect', and 'unanswered' keys are lists of CSS selectors
@@ -357,7 +357,7 @@ def add_problem_to_course(course, problem_type, extra_meta=None):
 
     assert problem_type in PROBLEM_DICT
 
-    # Generate the problem XML using capa.tests.response_xml_factory
+    # Generate the problem XML using xblock_capa.tests.response_xml_factory
     factory_dict = PROBLEM_DICT[problem_type]
     problem_xml = factory_dict['factory'].build_xml(**factory_dict['kwargs'])
     metadata = {'rerandomize': 'always'} if 'metadata' not in factory_dict else factory_dict['metadata']

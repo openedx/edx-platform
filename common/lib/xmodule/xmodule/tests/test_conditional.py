@@ -182,7 +182,7 @@ class ConditionalModuleBasicTest(unittest.TestCase):
         fragments = ajax['fragments']
         self.assertFalse(any(['This is a secret' in item['content'] for item in fragments]))
 
-        # now change state of the capa problem to make it completed
+        # now change state of the xblock_capa problem to make it completed
         modules['source_module'].is_attempted = "true"
         ajax = json.loads(modules['cond_module'].handle_ajax('', ''))
         modules['cond_module'].save()
@@ -295,7 +295,7 @@ class ConditionalModuleXmlTest(unittest.TestCase):
         fragments = ajax['fragments']
         self.assertFalse(any(['This is a secret' in item['content'] for item in fragments]))
 
-        # Now change state of the capa problem to make it completed
+        # Now change state of the xblock_capa problem to make it completed
         inner_module = inner_get_module(location.replace(category="problem", name='choiceprob'))
         inner_module.attempts = 1
         # Save our modifications to the underlying KeyValueStore so they can be persisted

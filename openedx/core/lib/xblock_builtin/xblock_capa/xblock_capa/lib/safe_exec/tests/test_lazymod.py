@@ -3,7 +3,7 @@
 import sys
 import unittest
 
-from capa.safe_exec.lazymod import LazyModule
+from xblock_capa.lib.safe_exec.lazymod import LazyModule
 
 
 class ModuleIsolation(object):

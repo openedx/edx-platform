@@ -29,12 +29,12 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.ui import WebDriverWait
 
-from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.common import BASE_URL
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from openedx.core.lib.tests.assertions.events import EventMatchTolerates, assert_event_matches, is_matching_event
 from openedx.core.release import RELEASE_LINE, doc_version
+from xblock_capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from xmodule.partitions.partitions import UserPartition
 
 MAX_EVENTS_IN_FAILURE_OUTPUT = 20

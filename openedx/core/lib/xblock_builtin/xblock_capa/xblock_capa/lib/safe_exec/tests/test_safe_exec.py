@@ -10,7 +10,7 @@ import unittest
 import pytest
 from six import text_type
 
-from capa.safe_exec import safe_exec, update_hash
+from xblock_capa.lib.safe_exec import safe_exec, update_hash
 from codejail.safe_exec import SafeExecException
 from codejail.jail_code import is_configured
 

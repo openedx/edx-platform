@@ -12,7 +12,7 @@ import pytest
 from selenium.webdriver import ActionChains
 from bok_choy.promise import BrokenPromise
 
-from capa.tests.response_xml_factory import (
+from xblock_capa.tests.response_xml_factory import (
     AnnotationResponseXMLFactory,
     ChoiceResponseXMLFactory,
     ChoiceTextResponseXMLFactory,
@@ -27,6 +27,7 @@ from capa.tests.response_xml_factory import (
     StringResponseXMLFactory,
     SymbolicResponseXMLFactory
 )
+
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.lms.problem import ProblemPage
 from common.test.acceptance.tests.helpers import EventsTestMixin, select_option_by_text
@@ -111,7 +112,7 @@ class ProblemTypeTestBase(ProblemsTest, EventsTestMixin):
         """
         Creates a {problem_type} problem
         """
-        # Generate the problem XML using capa.tests.response_xml_factory
+        # Generate the problem XML using xblock_capa.tests.response_xml_factory
         return XBlockFixtureDesc(
             'problem',
             self.problem_name,
@@ -719,7 +720,7 @@ class CheckboxProblemTypeTestNonRandomized(CheckboxProblemTypeBase, NonRandomize
         """
         Creates a {problem_type} problem
         """
-        # Generate the problem XML using capa.tests.response_xml_factory
+        # Generate the problem XML using xblock_capa.tests.response_xml_factory
         return XBlockFixtureDesc(
             'problem',
             self.problem_name,
@@ -882,7 +883,7 @@ class MultipleChoiceProblemTypeTestNonRandomized(MultipleChoiceProblemTypeBase, 
         """
         Creates a {problem_type} problem
         """
-        # Generate the problem XML using capa.tests.response_xml_factory
+        # Generate the problem XML using xblock_capa.tests.response_xml_factory
         return XBlockFixtureDesc(
             'problem',
             self.problem_name,
@@ -919,7 +920,7 @@ class MultipleChoiceProblemTypeTestOneAttempt(MultipleChoiceProblemTypeBase):
         """
         Creates a {problem_type} problem
         """
-        # Generate the problem XML using capa.tests.response_xml_factory
+        # Generate the problem XML using xblock_capa.tests.response_xml_factory
         return XBlockFixtureDesc(
             'problem',
             self.problem_name,
@@ -949,7 +950,7 @@ class MultipleChoiceProblemTypeTestMultipleAttempt(MultipleChoiceProblemTypeBase
         """
         Creates a {problem_type} problem
         """
-        # Generate the problem XML using capa.tests.response_xml_factory
+        # Generate the problem XML using xblock_capa.tests.response_xml_factory
         return XBlockFixtureDesc(
             'problem',
             self.problem_name,
@@ -1135,7 +1136,7 @@ class RadioProblemTypeTestNonRandomized(RadioProblemTypeBase, NonRandomizedProbl
         """
         Creates a {problem_type} problem
         """
-        # Generate the problem XML using capa.tests.response_xml_factory
+        # Generate the problem XML using xblock_capa.tests.response_xml_factory
         return XBlockFixtureDesc(
             'problem',
             self.problem_name,
@@ -1198,7 +1199,7 @@ class DropDownProblemTypeTestNonRandomized(DropDownProblemTypeBase, NonRandomize
         """
         Creates a {problem_type} problem
         """
-        # Generate the problem XML using capa.tests.response_xml_factory
+        # Generate the problem XML using xblock_capa.tests.response_xml_factory
         return XBlockFixtureDesc(
             'problem',
             self.problem_name,
@@ -1377,7 +1378,7 @@ class NumericalProblemTypeTestNonRandomized(NumericalProblemTypeBase, NonRandomi
         """
         Creates a {problem_type} problem
         """
-        # Generate the problem XML using capa.tests.response_xml_factory
+        # Generate the problem XML using xblock_capa.tests.response_xml_factory
         return XBlockFixtureDesc(
             'problem',
             self.problem_name,
@@ -1395,7 +1396,7 @@ class NumericalProblemTypeTestViewAnswer(NumericalProblemTypeBase):
         """
         Creates a {problem_type} problem
         """
-        # Generate the problem XML using capa.tests.response_xml_factory
+        # Generate the problem XML using xblock_capa.tests.response_xml_factory
         return XBlockFixtureDesc(
             'problem',
             self.problem_name,
@@ -1493,7 +1494,7 @@ class FormulaProblemTypeTestNonRandomized(FormulaProblemTypeBase, NonRandomizedP
         """
         Creates a {problem_type} problem
         """
-        # Generate the problem XML using capa.tests.response_xml_factory
+        # Generate the problem XML using xblock_capa.tests.response_xml_factory
         return XBlockFixtureDesc(
             'problem',
             self.problem_name,
@@ -1644,7 +1645,7 @@ class ScriptProblemTypeTestNonRandomized(ScriptProblemTypeBase, NonRandomizedPro
         """
         Creates a {problem_type} problem
         """
-        # Generate the problem XML using capa.tests.response_xml_factory
+        # Generate the problem XML using xblock_capa.tests.response_xml_factory
         return XBlockFixtureDesc(
             'problem',
             self.problem_name,
@@ -1928,7 +1929,7 @@ class RadioTextProblemTypeTestNonRandomized(RadioTextProblemTypeBase, NonRandomi
         """
         Creates a {problem_type} problem
         """
-        # Generate the problem XML using capa.tests.response_xml_factory
+        # Generate the problem XML using xblock_capa.tests.response_xml_factory
         return XBlockFixtureDesc(
             'problem',
             self.problem_name,
@@ -1995,7 +1996,7 @@ class CheckboxTextProblemTypeTestNonRandomized(CheckboxTextProblemTypeBase, NonR
         """
         Creates a {problem_type} problem
         """
-        # Generate the problem XML using capa.tests.response_xml_factory
+        # Generate the problem XML using xblock_capa.tests.response_xml_factory
         return XBlockFixtureDesc(
             'problem',
             self.problem_name,
@@ -2068,7 +2069,7 @@ class ImageProblemTypeTestNonRandomized(ImageProblemTypeBase, NonRandomizedProbl
         """
         Creates a {problem_type} problem
         """
-        # Generate the problem XML using capa.tests.response_xml_factory
+        # Generate the problem XML using xblock_capa.tests.response_xml_factory
         return XBlockFixtureDesc(
             'problem',
             self.problem_name,

@@ -5,9 +5,10 @@ CAPA Problems XBlock
 import json
 import logging
 import os
-
+import re
 import sys
 
+from fs.osfs import OSFS
 from lxml import etree
 
 from django.conf import settings
@@ -21,22 +22,26 @@ from webob.multidict import MultiDict
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Boolean, Dict, Float, Integer, Scope, String, XMLString
+from xblock.mixins import IndexInfoMixin
 from xblockutils.resources import ResourceLoader
 from xblockutils.studio_editable import StudioEditableXBlockMixin
 
-from capa import responsetypes
-from capa.xqueue_interface import XQueueInterface
 from openedx.core.lib.xblock_builtin import get_css_dependencies, get_js_dependencies
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.fields import Date, Timedelta, ScoreField
 from xmodule.graders import ShowCorrectness
 from xmodule.raw_module import RawDescriptor
+from xmodule.util.misc import escape_html_characters
 from xmodule.xml_module import XmlParserMixin
 from xmodule.x_module import ResourceTemplates
 from xmodule.util.sandboxing import get_python_lib_zip, can_execute_unsafe_code
+
 from .capa_base import _, Randomization, CapaMixin, ComplexEncoder
 from .capa_base_constants import RANDOMIZATION, SHOWANSWER
+from xblock_capa.lib import responsetypes
+from xblock_capa.lib.capa_problem import LoncapaProblem, LoncapaSystem
+from xblock_capa.lib.xqueue_interface import XQueueInterface
 
 
 log = logging.getLogger(__name__)
@@ -46,10 +51,10 @@ loader = ResourceLoader(__name__)  # pylint: disable=invalid-name
 @XBlock.wants('user')
 @XBlock.needs('i18n')
 @XBlock.needs('request')
-class CapaXBlock(XBlock, CapaMixin, ResourceTemplates, XmlParserMixin, StudioEditableXBlockMixin):
+class CapaXBlock(XBlock, CapaMixin, ResourceTemplates, XmlParserMixin, IndexInfoMixin, StudioEditableXBlockMixin):
     """
     An XBlock implementing LonCapa format problems, by way of
-    capa.capa_problem.LoncapaProblem
+    xblock_capa.lib.capa_problem.LoncapaProblem
     """
     display_name = String(
         display_name=_("Display Name"),
@@ -216,8 +221,16 @@ class CapaXBlock(XBlock, CapaMixin, ResourceTemplates, XmlParserMixin, StudioEdi
     metadata_translations = dict(RawDescriptor.metadata_translations)
     metadata_translations['attempts'] = 'max_attempts'
 
-    # TODO from CapaDescriptor
-    '''
+    def __init__(self, *args, **kwargs):
+        """
+        Parses the provided XML data to ensure that bad data does not make it into the modulestore.
+
+        Raises lxml.etree.XMLSyntaxError if bad XML is provided.
+        """
+        super(CapaXBlock, self).__init__(*args, **kwargs)
+
+        etree.XML(self.data)
+
     # VS[compat]
     # TODO (cpennington): Delete this method once all fall 2012 course are being
     # edited in the cms
@@ -230,9 +243,9 @@ class CapaXBlock(XBlock, CapaMixin, ResourceTemplates, XmlParserMixin, StudioEdi
 
     def index_dictionary(self):
         """
-        Return dictionary prepared with module content and type for indexing.
+        Return dictionary prepared with module content and type for search indexing.
         """
-        xblock_body = super(CapaDescriptor, self).index_dictionary()
+        xblock_body = super(CapaXBlock, self).index_dictionary()
         # Removing solutions and hints, as well as script and style
         capa_content = re.sub(
             re.compile(
@@ -259,8 +272,6 @@ class CapaXBlock(XBlock, CapaMixin, ResourceTemplates, XmlParserMixin, StudioEdi
         xblock_body["content_type"] = self.INDEX_CONTENT_TYPE
         xblock_body["problem_types"] = list(self.problem_types)
         return xblock_body
-
-    '''
 
     @classmethod
     def get_template_dir(cls):
@@ -455,6 +466,20 @@ class CapaXBlock(XBlock, CapaMixin, ResourceTemplates, XmlParserMixin, StudioEdi
         return self.get_answer()
 
     @property
+    def location(self):
+        """
+        Returns this block's location (usage_key).
+        """
+        return self.scope_ids.usage_id
+
+    @property
+    def category(self):
+        """
+        Returns this block's category (AKA block_type).
+        """
+        return self.scope_ids.block_type
+
+    @property
     def display_name_with_default(self):
         """
         Constructs the display name for a CAPA problem.
@@ -463,7 +488,7 @@ class CapaXBlock(XBlock, CapaMixin, ResourceTemplates, XmlParserMixin, StudioEdi
         else fall back to problem category.
         """
         if self.display_name is None or not self.display_name.strip():
-            return self.location.block_type
+            return self.category
 
         return self.display_name
 
@@ -500,9 +525,8 @@ class CapaXBlock(XBlock, CapaMixin, ResourceTemplates, XmlParserMixin, StudioEdi
     def block_seed(self):
         """
         Returns the randomization seed.
-
-        Uncertain why we need a block-level seed, when there is a user_state seed too?
         """
+        # FIXME Uncertain why we need a block-level seed, when there is a user_state seed too?
         return self._user_id or 0
 
     @property
@@ -549,7 +573,8 @@ class CapaXBlock(XBlock, CapaMixin, ResourceTemplates, XmlParserMixin, StudioEdi
                     dispatch=dispatch
                 ),
             )
-            xqueue_callback_url_prefix = get_xqueue_callback_url_prefix(self.runtime.request)
+            request = self.runtime.service(self, 'request')
+            xqueue_callback_url_prefix = get_xqueue_callback_url_prefix(request)
             return xqueue_callback_url_prefix + relative_xqueue_callback_url
 
         # Default queuename is course-specific and is derived from the course that
@@ -586,6 +611,24 @@ class CapaXBlock(XBlock, CapaMixin, ResourceTemplates, XmlParserMixin, StudioEdi
         registered_tags = responsetypes.registry.registered_tags()
         return {node.tag for node in tree.iter() if node.tag in registered_tags}
 
+    @property
+    def _filestore(self):
+        """
+        Creates an os filestore.
+
+        Formerly handled by the CachingDescriptorSystem
+        """
+        # FIXME -- where should this method live?
+        if self.location.course_key.course:
+            course_key = self.location.course_key
+            # FIXME Is settings.DATA_DIR the same as the modulestore().fs_root?
+            root = settings.DATA_DIR / course_key.org / course_key.course / course_key.run
+        else:
+            root = settings.DATA_DIR / str(self.location.structure['_id'])
+        root.makedirs_p()  # create directory if it doesn't exist
+
+        return OSFS(root)
+
     def can_execute_unsafe_code(self):
         """Pass through to xmodule.util.sandboxing method."""
         return can_execute_unsafe_code(self.runtime.course_id)
@@ -612,7 +655,6 @@ class CapaXBlock(XBlock, CapaMixin, ResourceTemplates, XmlParserMixin, StudioEdi
         """
         Return the problem's max score
         """
-        from capa.capa_problem import LoncapaProblem, LoncapaSystem
         capa_system = LoncapaSystem(
             ajax_url=None,
             anonymous_student_id=None,
@@ -620,7 +662,7 @@ class CapaXBlock(XBlock, CapaMixin, ResourceTemplates, XmlParserMixin, StudioEdi
             can_execute_unsafe_code=None,
             get_python_lib_zip=None,
             DEBUG=None,
-            filestore=self.runtime.resources_fs,
+            filestore=self._filestore,
             i18n=self.runtime.service(self, "i18n"),
             node_path=None,
             render_template=None,
@@ -660,8 +702,7 @@ class CapaXBlock(XBlock, CapaMixin, ResourceTemplates, XmlParserMixin, StudioEdi
             })
         """
 
-        from capa.capa_problem import LoncapaProblem, LoncapaSystem
-
+        log.error("CATEGORY: %s", self.category)
         if self.category != 'problem':
             raise NotImplementedError()
 
@@ -675,7 +716,7 @@ class CapaXBlock(XBlock, CapaMixin, ResourceTemplates, XmlParserMixin, StudioEdi
             can_execute_unsafe_code=lambda: None,
             get_python_lib_zip=self.get_python_lib_zip,
             DEBUG=None,
-            filestore=self.runtime.resources_fs,
+            filestore=self._filestore,
             i18n=self.runtime.service(self, "i18n"),
             node_path=None,
             render_template=None,

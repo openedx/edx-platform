@@ -15,19 +15,21 @@ from pytz import utc
 from django.utils.encoding import smart_text
 from six import text_type
 
-from capa.capa_problem import LoncapaProblem, LoncapaSystem
-from capa.inputtypes import Status
-from capa.responsetypes import StudentInputError, ResponseError, LoncapaProblemError
-from capa.util import convert_files_to_filenames, get_inner_html_from_xpath
 from xblock.fields import String
 from xblock.scorable import ScorableXBlockMixin, Score
+
+from openedx.core.djangolib.markup import HTML, Text
 from xmodule.exceptions import NotFoundError
 from xmodule.graders import ShowCorrectness
 from xmodule.progress import Progress
 
+from xblock_capa.lib.capa_problem import LoncapaProblem, LoncapaSystem
+from xblock_capa.lib.inputtypes import Status
+from xblock_capa.lib.responsetypes import StudentInputError, ResponseError, LoncapaProblemError
+from xblock_capa.lib.util import convert_files_to_filenames, get_inner_html_from_xpath
+
 from .capa_base_constants import RANDOMIZATION, SHOWANSWER
 
-from openedx.core.djangolib.markup import HTML, Text
 
 log = logging.getLogger("edx.courseware")
 
@@ -195,7 +197,7 @@ class CapaMixin(ScorableXBlockMixin):
             can_execute_unsafe_code=self.can_execute_unsafe_code,
             get_python_lib_zip=self.get_python_lib_zip,
             DEBUG=settings.DEBUG,
-            filestore=self.runtime.resources_fs,
+            filestore=self._filestore,
             i18n=self.runtime.service(self, "i18n"),
             node_path=getattr(settings, 'NODE_PATH', None),
             render_template=self.runtime.render_template,
@@ -411,7 +413,7 @@ class CapaMixin(ScorableXBlockMixin):
         # TODO (vshnayder): another switch on DEBUG.
         if settings.DEBUG:
             msg = HTML(
-                u'[courseware.capa.capa_module] <font size="+1" color="red">'
+                u'[xblock_capa] <font size="+1" color="red">'
                 u'Failed to generate HTML for problem {url}</font>'
             ).format(
                     url=text_type(self.location)
@@ -439,7 +441,7 @@ class CapaMixin(ScorableXBlockMixin):
                         student_answers.pop(answer_id)
 
             # Next, generate a fresh LoncapaProblem
-            self.lcp = self.new_lcp(None)
+            self._lcp = None
             self.set_state_from_lcp()
             self.set_score(self.score_from_lcp())
             # Prepend a scary warning to the student
@@ -619,7 +621,6 @@ class CapaMixin(ScorableXBlockMixin):
                                                 data_dir=getattr(self, 'data_dir', None))
         if self.runtime.replace_course_urls:
             html = self.runtime.replace_course_urls(html)
-
         if self.runtime.replace_jump_to_id_urls:
             html = self.runtime.replace_jump_to_id_urls(html)
 
@@ -877,8 +878,10 @@ class CapaMixin(ScorableXBlockMixin):
         new_answers = dict()
         for answer_id in answers:
             try:
-                answer_content = self.replace_static_urls(answers[answer_id])
-                answer_content = self.replace_jump_to_id_urls(answer_content)
+                answer_content = self.runtime.replace_static_urls(answers[answer_id],
+                                                                  static_asset_path=self.static_asset_path,
+                                                                  data_dir=getattr(self, 'data_dir', None))
+                answer_content = self.runtime.replace_jump_to_id_urls(answer_content)
                 new_answer = {answer_id: answer_content}
             except TypeError:
                 log.debug(u'Unable to perform URL substitution on answers[%s]: %s',
@@ -1397,7 +1400,7 @@ class CapaMixin(ScorableXBlockMixin):
             self.choose_new_seed()
 
         # Generate a new problem with either the previous seed or a new seed
-        self.lcp = self.new_lcp(None)
+        self._lcp = None
 
         # Pull in the new problem seed
         self.set_state_from_lcp()

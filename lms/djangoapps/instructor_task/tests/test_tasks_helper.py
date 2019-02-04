@@ -17,7 +17,7 @@ from datetime import datetime, timedelta
 
 import ddt
 import unicodecsv
-from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
+from xblock_capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.tests.factories import InstructorFactory
@@ -2659,7 +2659,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
 
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task') as mock_current_task:
             mock_current_task.return_value = current_task
-            with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_queue:
+            with patch('xblock_capa.lib.xqueue_interface.XQueueInterface.send_to_queue') as mock_queue:
                 mock_queue.return_value = (0, "Successfully queued")
                 result = generate_students_certificates(
                     None, None, self.course.id, task_input, 'certificates generated'

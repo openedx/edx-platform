@@ -1027,7 +1027,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         self.cert.status = CertificateStatuses.unavailable
         self.cert.save()
         request_certificate_url = reverse('request_certificate')
-        with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_queue:
+        with patch('xblock_capa.lib.xqueue_interface.XQueueInterface.send_to_queue') as mock_queue:
             mock_queue.return_value = (0, "Successfully queued")
             with mock_passing_grade():
                 response = self.client.post(request_certificate_url, {'course_id': unicode(self.course.id)})

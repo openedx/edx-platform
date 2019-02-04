@@ -8,7 +8,7 @@ from time import time
 from django.utils.translation import ugettext_noop
 from opaque_keys.edx.keys import UsageKey
 
-from capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
+from xblock_capa.lib.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
 from courseware.courses import get_course_by_id, get_problems_in_section
 from courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from courseware.models import StudentModule

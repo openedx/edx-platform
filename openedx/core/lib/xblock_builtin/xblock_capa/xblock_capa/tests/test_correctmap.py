@@ -3,8 +3,9 @@ Tests to verify that CorrectMap behaves correctly
 """
 
 import unittest
-from capa.correctmap import CorrectMap
 import datetime
+
+from xblock_capa.lib.correctmap import CorrectMap
 
 
 class CorrectMapTest(unittest.TestCase):

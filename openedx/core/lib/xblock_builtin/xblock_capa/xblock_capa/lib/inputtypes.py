@@ -1,5 +1,5 @@
 #
-# File:   courseware/capa/inputtypes.py
+# File:   xblock_capa/lib/inputtypes.py
 #
 
 """
@@ -54,7 +54,7 @@ from six import text_type
 
 import xqueue_interface
 from calc.preview import latex_preview
-from capa.xqueue_interface import XQUEUE_TIMEOUT
+from xblock_capa.lib.xqueue_interface import XQUEUE_TIMEOUT
 from chem import chemcalc
 from openedx.core.djangolib.markup import HTML, Text
 from xmodule.stringify import stringify_children
@@ -543,7 +543,7 @@ class ChoiceGroup(InputTypeBase):
                 choices.append((choice.get("name"), text))
             else:
                 if choice.tag != 'compoundhint':
-                    msg = Text('[capa.inputtypes.extract_choices] {error_message}').format(
+                    msg = Text('[xblock_capa.lib.inputtypes.extract_choices] {error_message}').format(
                         error_message=Text(
                             # Translators: '<choice>' and '<compoundhint>' are tag names and should not be translated.
                             _('Expected a <choice> or <compoundhint> tag; got {given_tag} instead')).format(

@@ -3,7 +3,7 @@ Asynchronous tasks related to the Course Blocks sub-application.
 """
 import logging
 
-from capa.responsetypes import LoncapaProblemError
+from xblock_capa.lib.responsetypes import LoncapaProblemError
 from celery.task import task
 from django.conf import settings
 from lxml.etree import XMLSyntaxError

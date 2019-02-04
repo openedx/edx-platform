@@ -19,7 +19,7 @@ from django.utils.timezone import now
 from mock import patch
 from six import text_type
 
-from capa.tests.response_xml_factory import (
+from xblock_capa.tests.response_xml_factory import (
     CodeResponseXMLFactory,
     CustomResponseXMLFactory,
     OptionResponseXMLFactory,

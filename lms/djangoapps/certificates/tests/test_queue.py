@@ -13,11 +13,11 @@ from mock import Mock, patch
 from opaque_keys.edx.locator import CourseLocator
 
 # It is really unfortunate that we are using the XQueue client
-# code from the capa library.  In the future, we should move this
+# code from the xblock_capa library.  In the future, we should move this
 # into a shared library.  We import it here so we can mock it
 # and verify that items are being correctly added to the queue
 # in our `XQueueCertInterface` implementation.
-from capa.xqueue_interface import XQueueInterface
+from xblock_capa.lib.xqueue_interface import XQueueInterface
 from lms.djangoapps.certificates.models import CertificateStatuses, ExampleCertificate, ExampleCertificateSet, GeneratedCertificate
 from lms.djangoapps.certificates.queue import XQueueCertInterface
 from lms.djangoapps.certificates.tests.factories import CertificateWhitelistFactory, GeneratedCertificateFactory

@@ -48,7 +48,6 @@ setup(
     install_requires=[
         'setuptools',
         'docopt',
-        'capa',
         'path.py',
         'webob',
         'edx-opaque-keys>=0.4.0,<1.0.0',

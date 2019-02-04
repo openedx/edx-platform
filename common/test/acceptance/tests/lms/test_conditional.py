@@ -2,13 +2,13 @@
 Bok choy acceptance tests for conditionals in the LMS
 """
 
-from capa.tests.response_xml_factory import StringResponseXMLFactory
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.conditional import POLL_ANSWER, ConditionalPage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.problem import ProblemPage
 from common.test.acceptance.tests.helpers import UniqueCourseTest
+from xblock_capa.tests.response_xml_factory import StringResponseXMLFactory
 
 
 class ConditionalTest(UniqueCourseTest):

@@ -5,8 +5,8 @@ Tests the logic of the "answer-pool" attribute, e.g.
 
 import unittest
 import textwrap
-from capa.tests.helpers import test_capa_system, new_loncapa_problem
-from capa.responsetypes import LoncapaProblemError
+from xblock_capa.lib.responsetypes import LoncapaProblemError
+from xblock_capa.tests.helpers import test_capa_system, new_loncapa_problem
 
 
 class CapaAnswerPoolTest(unittest.TestCase):

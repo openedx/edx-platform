@@ -18,7 +18,7 @@ from opaque_keys.edx.locations import Location
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
-from capa.tests.response_xml_factory import OptionResponseXMLFactory
+from xblock_capa.tests.response_xml_factory import OptionResponseXMLFactory
 from courseware.model_data import StudentModule
 from courseware.tests.tests import LoginEnrollmentTestCase
 from lms.djangoapps.instructor_task.api_helper import encode_problem_and_student_input

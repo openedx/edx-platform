@@ -8,12 +8,13 @@ import os.path
 import fs.osfs
 import six
 
-from capa.capa_problem import LoncapaProblem, LoncapaSystem
-from capa.inputtypes import Status
 from mock import Mock, MagicMock
 from mako.lookup import TemplateLookup
-
 import xml.sax.saxutils as saxutils
+
+from xblock_capa.lib.capa_problem import LoncapaProblem, LoncapaSystem
+from xblock_capa.lib.inputtypes import Status
+
 
 TEST_DIR = os.path.dirname(os.path.realpath(__file__))
 
@@ -23,7 +24,7 @@ def get_template(template_name):
     Return template for a capa inputtype.
     """
     return TemplateLookup(
-        directories=[Path(__file__).dirname().dirname() / 'templates'],
+        directories=[Path(__file__).dirname().dirname() / 'lib' / 'templates'],
         default_filters=['decode.utf8']
     ).get_template(template_name)
 

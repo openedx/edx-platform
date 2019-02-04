@@ -2,8 +2,8 @@ from lxml import etree
 import unittest
 import xml.sax.saxutils as saxutils
 
-from capa.tests.helpers import test_capa_system
-from capa import customrender
+from xblock_capa.lib import customrender
+from xblock_capa.tests.helpers import test_capa_system
 
 # just a handy shortcut
 lookup_tag = customrender.registry.get_class_for_tag

@@ -17,7 +17,7 @@ from django.utils.translation import ugettext as _
 from mock import MagicMock, patch
 from opaque_keys.edx.keys import CourseKey
 
-from capa.tests.response_xml_factory import StringResponseXMLFactory
+from xblock_capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware.courses import get_course_by_id
 from courseware.tabs import get_course_tab_list
 from courseware.tests.factories import StudentModuleFactory

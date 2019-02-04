@@ -13,7 +13,7 @@ from django.test import TestCase
 from mock import patch
 from pytz import UTC
 
-from capa.tests.response_xml_factory import OptionResponseXMLFactory
+from xblock_capa.tests.response_xml_factory import OptionResponseXMLFactory
 from courseware.masquerade import CourseMasquerade, MasqueradingKeyValueStore, get_masquerading_user_group
 from courseware.tests.factories import StaffFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase, masquerade_as_group_member

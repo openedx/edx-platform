@@ -18,7 +18,7 @@ from webob import Response
 from xblock.core import XBlock
 from xblock.fields import Integer, List, Scope, String
 
-from capa.responsetypes import registry
+from xblock_capa.lib.responsetypes import registry
 from xmodule.studio_editable import StudioEditableDescriptor, StudioEditableModule
 from xmodule.validation import StudioValidation, StudioValidationMessage
 from xmodule.x_module import STUDENT_VIEW, XModule
@@ -44,7 +44,7 @@ def _get_human_name(problem_class):
 
 def _get_capa_types():
     """
-    Gets capa types tags and labels
+    Gets xblock_capa types tags and labels
     """
     capa_types = {tag: _get_human_name(registry.get_class_for_tag(tag)) for tag in registry.registered_tags()}
 

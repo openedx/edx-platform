@@ -6,12 +6,11 @@ import json
 import unittest
 from collections import OrderedDict
 
-from capa.inputtypes import Status
-from capa.tests.helpers import capa_render_template
 from lxml import etree
 from mako import exceptions
 from openedx.core.djangolib.markup import HTML
-
+from xblock_capa.lib.inputtypes import Status
+from xblock_capa.tests.helpers import capa_render_template
 from xmodule.stringify import stringify_children
 
 

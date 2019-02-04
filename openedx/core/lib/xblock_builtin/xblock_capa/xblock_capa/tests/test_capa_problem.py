@@ -10,8 +10,8 @@ from markupsafe import Markup
 from mock import patch
 import unittest
 
-from capa.tests.helpers import new_loncapa_problem
 from openedx.core.djangolib.markup import HTML
+from xblock_capa.tests.helpers import new_loncapa_problem
 
 
 @ddt.ddt

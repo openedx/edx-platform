@@ -11,7 +11,7 @@ from django.test.client import RequestFactory
 from lxml.etree import ParserError, XMLSyntaxError
 from requests.auth import HTTPBasicAuth
 
-from capa.xqueue_interface import XQueueInterface, make_hashkey, make_xheader
+from xblock_capa.lib.xqueue_interface import XQueueInterface, make_hashkey, make_xheader
 from lms.djangoapps.certificates.models import CertificateStatuses as status
 from lms.djangoapps.certificates.models import (
     CertificateWhitelist,

@@ -1,5 +1,5 @@
 #
-# File:   capa/capa_problem.py
+# File:   xblock_capa/lib/capa_problem.py
 #
 # Nomenclature:
 #
@@ -10,7 +10,7 @@
 """
 Main module which shows problems (of "capa" type).
 
-This is used by capa_module.
+This is used by xblock_capa.
 """
 
 import logging
@@ -24,13 +24,13 @@ from xml.sax.saxutils import unescape
 from lxml import etree
 from pytz import UTC
 
-import capa.customrender as customrender
-import capa.inputtypes as inputtypes
-import capa.responsetypes as responsetypes
-import capa.xqueue_interface as xqueue_interface
-from capa.correctmap import CorrectMap
-from capa.safe_exec import safe_exec
-from capa.util import contextualize_text, convert_files_to_filenames
+import xblock_capa.lib.customrender as customrender
+import xblock_capa.lib.inputtypes as inputtypes
+import xblock_capa.lib.responsetypes as responsetypes
+import xblock_capa.lib.xqueue_interface as xqueue_interface
+from xblock_capa.lib.correctmap import CorrectMap
+from xblock_capa.lib.safe_exec import safe_exec
+from xblock_capa.lib.util import contextualize_text, convert_files_to_filenames
 from openedx.core.djangolib.markup import HTML, Text
 from xmodule.stringify import stringify_children
 
@@ -386,7 +386,7 @@ class LoncapaProblem(object):
 
     def grade_answers(self, answers):
         """
-        Grade student responses.  Called by capa_module.submit_problem.
+        Grade student responses.  Called by xblock_capa.submit_problem.
 
         `answers` is a dict of all the entries from request.POST, but with the first part
         of each key removed (the string before the first "_").
@@ -435,6 +435,7 @@ class LoncapaProblem(object):
 
         Calls the Response for each question in this problem, to do the actual grading.
         """
+
         # old CorrectMap
         oldcmap = self.correct_map
 
