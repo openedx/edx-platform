@@ -92,6 +92,8 @@ def pre_save_callback(sender, instance, **kwargs):  # pylint: disable=unused-arg
 class VerifiedTrackCohortedCourse(models.Model):
     """
     Tracks which courses have verified track auto-cohorting enabled.
+
+    .. no_pii:
     """
     course_key = CourseKeyField(
         max_length=255, db_index=True, unique=True,
@@ -154,6 +156,8 @@ def invalidate_verified_track_cache(sender, **kwargs):   # pylint: disable=unuse
 class MigrateVerifiedTrackCohortsSetting(ConfigurationModel):
     """
     Configuration for the swap_from_auto_track_cohorts management command.
+
+    .. no_pii:
     """
     class Meta(object):
         app_label = "verified_track_content"

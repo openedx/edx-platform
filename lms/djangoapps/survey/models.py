@@ -24,6 +24,8 @@ class SurveyForm(TimeStampedModel):
     that is presented to the end user. A SurveyForm is not tied to
     a particular run of a course, to allow for sharing of Surveys
     across courses
+
+    .. no_pii:
     """
     name = models.CharField(max_length=255, db_index=True, unique=True)
     form = models.TextField()
@@ -164,6 +166,10 @@ class SurveyForm(TimeStampedModel):
 class SurveyAnswer(TimeStampedModel):
     """
     Model for the answers that a user gives for a particular form in a course
+
+    .. pii: These are free-form questions asked by course authors. Types below are current as of Feb 2019, new ones could be added. "other" PII currently includes "company", "job title", and "work experience".
+    .. pii_types: name, location, other
+    .. pii_retirement: retained
     """
     user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
     form = models.ForeignKey(SurveyForm, db_index=True, on_delete=models.CASCADE)

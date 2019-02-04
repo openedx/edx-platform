@@ -7,7 +7,11 @@ from django.db.models.fields import PositiveIntegerField, TextField
 
 
 class CourseAssetCacheTtlConfig(ConfigurationModel):
-    """Configuration for the TTL of course assets."""
+    """
+    Configuration for the TTL of course assets.
+
+    .. no_pii:
+    """
 
     class Meta(object):
         app_label = 'contentserver'
@@ -30,7 +34,11 @@ class CourseAssetCacheTtlConfig(ConfigurationModel):
 
 
 class CdnUserAgentsConfig(ConfigurationModel):
-    """Configuration for the user agents we expect to see from CDNs."""
+    """
+    Configuration for the user agents we expect to see from CDNs.
+
+    .. no_pii:
+    """
 
     class Meta(object):
         app_label = 'contentserver'

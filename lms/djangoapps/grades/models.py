@@ -131,6 +131,8 @@ class VisibleBlocks(models.Model):
     This state is represented using an array of BlockRecord, stored
     in the blocks_json field. A hash of this json array is used for lookup
     purposes.
+
+    .. no_pii:
     """
     blocks_json = models.TextField()
     hashed = models.CharField(max_length=100, unique=True)
@@ -259,6 +261,8 @@ class VisibleBlocks(models.Model):
 class PersistentSubsectionGrade(TimeStampedModel):
     """
     A django model tracking persistent grades at the subsection level.
+
+    .. no_pii:
     """
 
     class Meta(object):
@@ -492,6 +496,8 @@ class PersistentSubsectionGrade(TimeStampedModel):
 class PersistentCourseGrade(TimeStampedModel):
     """
     A django model tracking persistent course grades.
+
+    .. no_pii:
     """
 
     class Meta(object):
@@ -626,6 +632,8 @@ class PersistentCourseGrade(TimeStampedModel):
 class PersistentSubsectionGradeOverride(models.Model):
     """
     A django model tracking persistent grades overrides at the subsection level.
+
+    .. no_pii:
     """
     class Meta(object):
         app_label = "grades"
@@ -732,6 +740,8 @@ class PersistentSubsectionGradeOverride(models.Model):
 class PersistentSubsectionGradeOverrideHistory(models.Model):
     """
     A django model tracking persistent grades override audit records.
+
+    .. no_pii:
     """
     PROCTORING = 'PROCTORING'
     GRADEBOOK = 'GRADEBOOK'

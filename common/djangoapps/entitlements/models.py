@@ -26,6 +26,8 @@ log = logging.getLogger("common.entitlements.models")
 class CourseEntitlementPolicy(models.Model):
     """
     Represents the Entitlement's policy for expiration, refunds, and regaining a used certificate
+
+    .. no_pii:
     """
 
     DEFAULT_EXPIRATION_PERIOD_DAYS = 730
@@ -146,6 +148,8 @@ class CourseEntitlementPolicy(models.Model):
 class CourseEntitlement(TimeStampedModel):
     """
     Represents a Student's Entitlement to a Course Run for a given Course.
+
+    .. no_pii:
     """
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     uuid = models.UUIDField(default=uuid_tools.uuid4, editable=False, unique=True)
@@ -442,6 +446,8 @@ class CourseEntitlement(TimeStampedModel):
 class CourseEntitlementSupportDetail(TimeStampedModel):
     """
     Table recording support interactions with an entitlement
+
+    .. no_pii:
     """
     # Reasons deprecated
     LEAVE_SESSION = 'LEAVE'

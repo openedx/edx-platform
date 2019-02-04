@@ -24,6 +24,8 @@ class BrandingInfoConfig(ConfigurationModel):
                     "logo_tag": "Video hosted by XuetangX.com"
             }
         }
+
+    .. no_pii:
     """
     class Meta(ConfigurationModel.Meta):
         app_label = "branding"
@@ -57,6 +59,8 @@ class BrandingApiConfig(ConfigurationModel):
     When this flag is disabled, the api will return 404.
 
     When the flag is enabled, the api will returns the valid reponse.
+
+    .. no_pii:
     """
     class Meta(ConfigurationModel.Meta):
         app_label = "branding"

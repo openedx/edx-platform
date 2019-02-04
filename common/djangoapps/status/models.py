@@ -13,6 +13,8 @@ from opaque_keys.edx.django.models import CourseKeyField
 class GlobalStatusMessage(ConfigurationModel):
     """
     Model that represents the current status message.
+
+    .. no_pii:
     """
     message = models.TextField(
         blank=True,
@@ -54,6 +56,8 @@ class CourseMessage(models.Model):
 
     This is not a ConfigurationModel because using it's not designed to support multiple configurations at once,
     which would be problematic if separate courses need separate error messages.
+
+    .. no_pii:
     """
     global_message = models.ForeignKey(GlobalStatusMessage, on_delete=models.CASCADE)
     course_key = CourseKeyField(max_length=255, blank=True, db_index=True)

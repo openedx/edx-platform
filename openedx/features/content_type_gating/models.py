@@ -34,6 +34,8 @@ from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
 class ContentTypeGatingConfig(StackedConfigurationModel):
     """
     A ConfigurationModel used to manage configuration for Content Type Gating (Feature Based Enrollments).
+
+    .. no_pii:
     """
 
     STACKABLE_FIELDS = ('enabled', 'enabled_as_of', 'studio_override_enabled')

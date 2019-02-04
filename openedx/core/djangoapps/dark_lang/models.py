@@ -8,6 +8,8 @@ from django.db import models
 class DarkLangConfig(ConfigurationModel):
     """
     Configuration for the dark_lang django app.
+
+    .. no_pii:
     """
     released_languages = models.TextField(
         blank=True,

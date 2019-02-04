@@ -38,6 +38,8 @@ class CreditProvider(TimeStampedModel):
     includes a `url` where the student will be sent when he/she will try to
     get credit for course. Eligibility duration will be use to set duration
     for which credit eligible message appears on dashboard.
+
+    .. no_pii:
     """
     provider_id = models.CharField(
         max_length=255,
@@ -213,6 +215,8 @@ def invalidate_provider_cache(sender, **kwargs):  # pylint: disable=unused-argum
 class CreditCourse(models.Model):
     """
     Model for tracking a credit course.
+
+    .. no_pii:
     """
 
     course_key = CourseKeyField(max_length=255, db_index=True, unique=True)
@@ -282,6 +286,8 @@ class CreditRequirement(TimeStampedModel):
     The 'display_name' field stores the display name of the requirement.
     The 'criteria' field dictionary provides additional information, clients
     may need to determine whether a user has satisfied the requirement.
+
+    .. no_pii:
     """
 
     course = models.ForeignKey(CreditCourse, related_name="credit_requirements", on_delete=models.CASCADE)
@@ -418,6 +424,7 @@ class CreditRequirementStatus(TimeStampedModel):
 
     In case (3), no CreditRequirementStatus record will exist for the requirement and user.
 
+    .. no_pii:
     """
 
     REQUIREMENT_STATUS_CHOICES = (
@@ -527,14 +534,20 @@ class CreditRequirementStatus(TimeStampedModel):
 
 
 def default_deadline_for_credit_eligibility():
-    """ The default deadline to use when creating a new CreditEligibility model. """
+    """
+    The default deadline to use when creating a new CreditEligibility model.
+    """
     return datetime.datetime.now(pytz.UTC) + datetime.timedelta(
         days=getattr(settings, "CREDIT_ELIGIBILITY_EXPIRATION_DAYS", 365)
     )
 
 
 class CreditEligibility(TimeStampedModel):
-    """ A record of a user's eligibility for credit for a specific course. """
+    """
+    A record of a user's eligibility for credit for a specific course.
+
+    .. no_pii:
+    """
     username = models.CharField(max_length=255, db_index=True)
     course = models.ForeignKey(CreditCourse, related_name="eligibilities", on_delete=models.CASCADE)
 
@@ -645,6 +658,8 @@ class CreditRequest(TimeStampedModel):
     at the time the request is made.  If the user re-issues the request
     (perhaps because the user did not finish filling in forms on the credit provider's site),
     the request record will be updated, but the UUID will remain the same.
+
+    .. no_pii:
     """
 
     uuid = models.CharField(max_length=32, unique=True, db_index=True)
@@ -760,7 +775,11 @@ class CreditRequest(TimeStampedModel):
 
 
 class CreditConfig(ConfigurationModel):
-    """ Manage credit configuration """
+    """
+    Manage credit configuration
+
+    .. no_pii:
+    """
     CACHE_KEY = 'credit.providers.api.data'
 
     cache_ttl = models.PositiveIntegerField(

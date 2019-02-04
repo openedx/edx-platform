@@ -7,7 +7,11 @@ from django.utils.translation import ugettext_lazy as _
 
 
 class CommerceConfiguration(ConfigurationModel):
-    """ Commerce configuration """
+    """
+    Commerce configuration
+
+    .. no_pii:
+    """
 
     class Meta(object):
         app_label = "commerce"

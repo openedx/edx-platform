@@ -14,6 +14,8 @@ class MobileApiConfig(ConfigurationModel):
 
     The order in which the comma-separated list of names of profiles are given
     is in priority order.
+
+    .. no_pii:
     """
     video_profiles = models.TextField(
         blank=True,
@@ -34,6 +36,8 @@ class MobileApiConfig(ConfigurationModel):
 class AppVersionConfig(models.Model):
     """
     Configuration for mobile app versions available.
+
+    .. no_pii:
     """
     PLATFORM_CHOICES = tuple([
         (platform, platform)
@@ -90,6 +94,8 @@ class IgnoreMobileAvailableFlagConfig(ConfigurationModel):  # pylint: disable=W5
     Enabling this configuration will cause the mobile_available flag check in
     access.py._is_descriptor_mobile_available to ignore the mobile_available
     flag.
+
+    .. no_pii:
     """
 
     class Meta(object):

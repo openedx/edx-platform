@@ -22,6 +22,8 @@ class CourseUserGroup(models.Model):
     This model represents groups of users in a course.  Groups may have different types,
     which may be treated specially.  For example, a user can be in at most one cohort per
     course, and cohorts are used to split up the forums by group.
+
+    .. no_pii:
     """
     class Meta(object):
         unique_together = (('name', 'course_id'), )
@@ -67,8 +69,11 @@ class CourseUserGroup(models.Model):
 
 
 class CohortMembership(models.Model):
-    """Used internally to enforce our particular definition of uniqueness"""
+    """
+    Used internally to enforce our particular definition of uniqueness.
 
+    .. no_pii:
+    """
     course_user_group = models.ForeignKey(CourseUserGroup, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     course_id = CourseKeyField(max_length=255)
@@ -143,6 +148,8 @@ def remove_user_from_cohort(sender, instance, **kwargs):  # pylint: disable=unus
 class CourseUserGroupPartitionGroup(models.Model):
     """
     Create User Partition Info.
+
+    .. no_pii:
     """
     course_user_group = models.OneToOneField(CourseUserGroup, on_delete=models.CASCADE)
     partition_id = models.IntegerField(
@@ -159,6 +166,8 @@ class CourseCohortsSettings(models.Model):
     """
     This model represents cohort settings for courses.
     The only non-deprecated fields are `is_cohorted` and `course_id`.
+
+    .. no_pii:
     """
     is_cohorted = models.BooleanField(default=False)
 
@@ -197,6 +206,8 @@ class CourseCohortsSettings(models.Model):
 class CourseCohort(models.Model):
     """
     This model represents cohort related info.
+
+    .. no_pii:
     """
     course_user_group = models.OneToOneField(CourseUserGroup, unique=True, related_name='cohort',
                                              on_delete=models.CASCADE)
@@ -231,6 +242,10 @@ class CourseCohort(models.Model):
 class UnregisteredLearnerCohortAssignments(DeletableByUserValue, models.Model):
     """
     Tracks the assignment of an unregistered learner to a course's cohort.
+
+    .. pii: The email field stores PII.
+    .. pii_types: email_address
+    .. pii_retirement: local_api
     """
     # pylint: disable=model-missing-unicode
     class Meta(object):

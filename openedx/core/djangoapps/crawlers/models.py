@@ -8,7 +8,11 @@ from django.db import models
 
 
 class CrawlersConfig(ConfigurationModel):
-    """Configuration for the crawlers django app."""
+    """
+    Configuration for the crawlers django app.
+
+    .. no_pii:
+    """
     class Meta(object):
         app_label = "crawlers"
 

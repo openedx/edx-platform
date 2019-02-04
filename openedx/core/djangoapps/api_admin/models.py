@@ -22,7 +22,13 @@ log = logging.getLogger(__name__)
 
 
 class ApiAccessRequest(TimeStampedModel):
-    """Model to track API access for a user."""
+    """
+    Model to track API access for a user.
+
+    .. pii: Stores a website, company name, company address for this user
+    .. pii_types: location, external_service, other
+    .. pii_retirement: local_api
+    """
 
     PENDING = 'pending'
     DENIED = 'denied'
@@ -121,7 +127,11 @@ class ApiAccessRequest(TimeStampedModel):
 
 
 class ApiAccessConfig(ConfigurationModel):
-    """Configuration for API management."""
+    """
+    Configuration for API management.
+
+    .. no_pii:
+    """
 
     def __unicode__(self):
         return u'ApiAccessConfig [enabled={}]'.format(self.enabled)
@@ -208,7 +218,11 @@ def _send_decision_email(instance):
 
 
 class Catalog(models.Model):
-    """A (non-Django-managed) model for Catalogs in the course discovery service."""
+    """
+    A (non-Django-managed) model for Catalogs in the course discovery service.
+
+    .. no_pii:
+    """
 
     id = models.IntegerField(primary_key=True)  # pylint: disable=invalid-name
     name = models.CharField(max_length=255, null=False, blank=False)

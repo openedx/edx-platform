@@ -260,6 +260,9 @@ def _track_user_login(user, request):
     """
     Sends a tracking event for a successful login.
     """
+    # .. pii: Username and email are sent to Segment here. Retired directly through Segment API call in Tubular.
+    # .. pii_types: email_address, username
+    # .. pii_retirement: third_party
     segment.identify(
         user.id,
         {
