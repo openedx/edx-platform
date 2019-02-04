@@ -109,10 +109,15 @@ def _create_jwt(
         'exp': exp,
         'iat': iat,
         'iss': settings.JWT_AUTH['JWT_ISSUER'],
-        'preferred_username': user.username,
         'scopes': scopes,
+        # TODO: Enable support of multiple versions.
+        #       - Dict with "v1": "1.1.0"?  Why is this a setting?
+        #       - Add requested JWT version as metric.
         'version': settings.JWT_AUTH['JWT_SUPPORTED_VERSION'],
-        'sub': anonymous_id_for_user(user, None),
+        # TODO: Move username behind a scope for v2
+        'preferred_username': user.username,
+        # TODO: Change value of sub for v2, and drop use of anonymous_id_for_user
+        'sub': user.id,  # anonymous_id_for_user(user, None),
         'filters': filters or [],
         'is_restricted': is_restricted,
         'email_verified': user.is_active,
@@ -182,6 +187,8 @@ def _attach_profile_claim(payload, user):
         'name': name,
         'family_name': user.last_name,
         'given_name': user.first_name,
+        # TODO: Make role available elsewhere so it isn't packaged in a scope with PII and non-PII claims.
+        #   For backward compatibility, it should be ok to leave this duplicated here.
         'administrator': user.is_staff,
     })
 

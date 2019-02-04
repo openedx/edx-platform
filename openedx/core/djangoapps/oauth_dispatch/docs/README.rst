@@ -28,15 +28,14 @@ Provider code
   * Its `Access Token View`_ returns JWTs as access tokens when a JWT token_type
     is requested.
 
-  * It uses an edX custom JwtBuilder_ implementation to create the JWT.
+  * It uses a custom function create_jwt_from_token_ to create the JWT.
 
-* The JwtBuilder_ uses the pyjwkest_ library for implementation of `JSON Web
-  Signature (JWS)`_ and other crypto to build and sign JWT tokens.
+* The function create_jwt_from_token_ uses the pyjwkest_ library for implementation of `JSON Web Signature (JWS)`_ and other crypto to build and sign JWT tokens.
 
 .. _oauth_dispatch: https://github.com/edx/edx-platform/tree/master/openedx/core/djangoapps/oauth_dispatch
 .. _validator module: https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/oauth_dispatch/dot_overrides/validators.py
 .. _Access Token View: https://github.com/edx/edx-platform/blob/d21a09828072504bc97a2e05883c1241e3a35da9/openedx/core/djangoapps/oauth_dispatch/views.py#L89
-.. _JwtBuilder: https://github.com/edx/edx-platform/blob/d21a09828072504bc97a2e05883c1241e3a35da9/openedx/core/lib/token_utils.py#L15
+.. _create_jwt_from_token: https://github.com/edx/edx-platform/blob/9a0812fcdea5e023637b8b2030abd7ae5de5b07d/openedx/core/djangoapps/oauth_dispatch/jwt.py#L42-L56
 .. _pyjwkest: https://github.com/IdentityPython/pyjwkest
 .. _JSON Web Signature (JWS): https://tools.ietf.org/html/draft-ietf-jose-json-web-signature-41
 
