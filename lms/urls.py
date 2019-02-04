@@ -1094,3 +1094,7 @@ if settings.FEATURES.get('ENABLE_API_DOCS'):
     ]
 
 urlpatterns.extend(plugin_urls.get_patterns(plugin_constants.ProjectType.LMS))
+
+urlpatterns += (
+    url(r'^tinymce/', include('tinymce.urls')),
+)

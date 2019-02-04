@@ -4,6 +4,7 @@
 # security reasons.
 
 import mimetypes
+import logging
 
 from django.conf import settings
 from django.http import Http404, HttpResponseNotFound, HttpResponseServerError
@@ -11,12 +12,17 @@ from django.shortcuts import redirect
 from django.template import TemplateDoesNotExist
 from django.utils.safestring import mark_safe
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django.contrib.sites.models import Site
 
 from mako.exceptions import TopLevelLookupException
 from edxmako.shortcuts import render_to_response, render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from util.cache import cache_if_anonymous
 from util.views import fix_crum_request
+
+from info_pages.models import InfoPage
+
+log = logging.getLogger(__name__)
 
 valid_templates = []
 
@@ -36,7 +42,6 @@ def index(request, template):
 
 
 @ensure_csrf_cookie
-@cache_if_anonymous()
 def render(request, template):
     """
     This view function renders the template sent without checking that it
@@ -45,6 +50,39 @@ def render(request, template):
 
     url(r'^jobs$', 'static_template_view.views.render', {'template': 'jobs.html'}, name="jobs")
     """
+
+    current_site = Site.objects.get_current(request)
+
+    extra_select = {
+        'lang_order': '''
+            CASE
+                WHEN language_code = '{request_lang}' THEN 1
+                WHEN language_code = '{default_lang}' THEN 2
+                ELSE 3
+            END
+        '''.format(
+            request_lang=request.LANGUAGE_CODE,
+            default_lang=settings.LANGUAGE_CODE
+        )
+    }
+
+    qs = InfoPage.objects.language('all').filter(
+        page=template,
+        site=current_site
+    ).extra(select=extra_select, order_by=['lang_order'])
+
+    if qs:
+        page = qs.first()
+
+        log.info(
+            'Geting page "{page}" with language "{lang}" from "{db}"'.format(
+                page=page.page,
+                lang=page.language_code,
+                db=page.from_db.im_self
+            )
+        )
+
+        return render_to_response('info_pages/infopage.html', {'page': page})
 
     # Guess content type from file extension
     content_type, __ = mimetypes.guess_type(template)

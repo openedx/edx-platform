@@ -48,3 +48,7 @@ parsel==1.2.0
 
 # Recommender xblock
 -e git+https://github.com/raccoongang/RecommenderXBlock.git@v1.4.1#egg=recommender-xblock==1.4.1
+
+# Info pages requirements
+django-tinymce==2.8.0
+django-hvad==1.8.0
