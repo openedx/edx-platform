@@ -99,7 +99,7 @@ class InstructorTask(models.Model):
 
         # check length of task_input, and return an exception if it's too long:
         if len(json_task_input) > 265:
-            fmt = 'Task input longer than 265: "{input}" for "{task}" of "{course}"'
+            fmt = u'Task input longer than 265: "{input}" for "{task}" of "{course}"'
             msg = fmt.format(input=json_task_input, task=task_type, course=course_id)
             raise ValueError(msg)
 
@@ -135,7 +135,7 @@ class InstructorTask(models.Model):
         # will fit in the column.  In the meantime, just return an exception.
         json_output = json.dumps(returned_result)
         if len(json_output) > 1023:
-            raise ValueError("Length of task output is too long: {0}".format(json_output))
+            raise ValueError(u"Length of task output is too long: {0}".format(json_output))
         return json_output
 
     @staticmethod

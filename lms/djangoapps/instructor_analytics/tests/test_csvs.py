@@ -16,7 +16,7 @@ class TestAnalyticsCSVS(TestCase):
 
         res = create_csv_response('robot.csv', header, datarows)
         self.assertEqual(res['Content-Type'], 'text/csv')
-        self.assertEqual(res['Content-Disposition'], 'attachment; filename={0}'.format('robot.csv'))
+        self.assertEqual(res['Content-Disposition'], u'attachment; filename={0}'.format('robot.csv'))
         self.assertEqual(res.content.strip(), '"Name","Email"')
 
     def test_create_csv_response(self):
@@ -25,7 +25,7 @@ class TestAnalyticsCSVS(TestCase):
 
         res = create_csv_response('robot.csv', header, datarows)
         self.assertEqual(res['Content-Type'], 'text/csv')
-        self.assertEqual(res['Content-Disposition'], 'attachment; filename={0}'.format('robot.csv'))
+        self.assertEqual(res['Content-Disposition'], u'attachment; filename={0}'.format('robot.csv'))
         self.assertEqual(res.content.strip(), '"Name","Email"\r\n"Jim","jim@edy.org"\r\n"Jake","jake@edy.org"\r\n"Jeeves","jeeves@edy.org"')
 
     def test_create_csv_response_empty(self):
@@ -34,7 +34,7 @@ class TestAnalyticsCSVS(TestCase):
 
         res = create_csv_response('robot.csv', header, datarows)
         self.assertEqual(res['Content-Type'], 'text/csv')
-        self.assertEqual(res['Content-Disposition'], 'attachment; filename={0}'.format('robot.csv'))
+        self.assertEqual(res['Content-Disposition'], u'attachment; filename={0}'.format('robot.csv'))
         self.assertEqual(res.content.strip(), '')
 
 
@@ -79,7 +79,7 @@ class TestAnalyticsFormatDictlist(TestCase):
 
         res = create_csv_response('robot.csv', header, datarows)
         self.assertEqual(res['Content-Type'], 'text/csv')
-        self.assertEqual(res['Content-Disposition'], 'attachment; filename={0}'.format('robot.csv'))
+        self.assertEqual(res['Content-Disposition'], u'attachment; filename={0}'.format('robot.csv'))
         self.assertEqual(res.content.strip(), '"Name","Email"\r\n"Jim","jim@edy.org"\r\n"Jake","jake@edy.org"\r\n"Jeeves","jeeves@edy.org"')
 
 

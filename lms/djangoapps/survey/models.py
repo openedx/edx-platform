@@ -11,6 +11,7 @@ from lxml import etree
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 
+from openedx.core.djangolib.markup import HTML
 from student.models import User
 from survey.exceptions import SurveyFormNameAlreadyExists, SurveyFormNotFound
 
@@ -52,8 +53,8 @@ class SurveyForm(TimeStampedModel):
         try:
             fields = cls.get_field_names_from_html(html)
         except Exception as ex:
-            log.exception("Cannot parse SurveyForm html: {}".format(ex))
-            raise ValidationError("Cannot parse SurveyForm as HTML: {}".format(ex))
+            log.exception(u"Cannot parse SurveyForm html: {}".format(ex))
+            raise ValidationError(u"Cannot parse SurveyForm as HTML: {}".format(ex))
 
         if not len(fields):
             raise ValidationError("SurveyForms must contain at least one form input field")
@@ -146,7 +147,7 @@ class SurveyForm(TimeStampedModel):
         # make sure the form is wrap in some outer single element
         # otherwise lxml can't parse it
         # NOTE: This wrapping doesn't change the ability to query it
-        tree = etree.fromstring(u'<div>{}</div>'.format(html))
+        tree = etree.fromstring(HTML(u'<div>{}</div>').format(HTML(html)))
 
         input_fields = (
             tree.findall('.//input') + tree.findall('.//select') +

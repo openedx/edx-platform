@@ -48,9 +48,9 @@ class Command(BaseCommand):
                 len(failed_emails),
                 total_emails
             ))
-            log.error('Failed emails:{}'.format(pformat(failed_emails)))
+            log.error(u'Failed emails:{}'.format(pformat(failed_emails)))
         else:
-            log.info('Successfully generated manual verification for {} emails.'.format(total_emails))
+            log.info(u'Successfully generated manual verification for {} emails.'.format(total_emails))
 
     def _generate_manual_verification_from_file(self, email_ids_file):
         """

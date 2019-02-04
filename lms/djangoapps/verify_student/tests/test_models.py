@@ -234,7 +234,7 @@ class TestPhotoVerification(TestVerification, MockS3Mixin, ModuleStoreTestCase):
                 self.assertEqual(attempt.status, "must_retry")
                 logger.check(
                     ('lms.djangoapps.verify_student.models', 'ERROR',
-                     'Software Secure submission failed for user %s, setting status to must_retry'
+                     u'Software Secure submission failed for user %s, setting status to must_retry'
                      % attempt.user.username))
 
     @mock.patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})

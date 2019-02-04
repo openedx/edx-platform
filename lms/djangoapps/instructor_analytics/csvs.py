@@ -21,7 +21,7 @@ def create_csv_response(filename, header, datarows):
 
     """
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename={0}'.format(filename)
+    response['Content-Disposition'] = u'attachment; filename={0}'.format(filename)
     csvwriter = csv.writer(
         response,
         dialect='excel',

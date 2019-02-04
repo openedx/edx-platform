@@ -667,7 +667,7 @@ class TestSendBetaRoleEmail(CacheIsolationTestCase):
 
     def test_bad_action(self):
         bad_action = 'beta_tester'
-        error_msg = "Unexpected action received '{}' - expected 'add' or 'remove'".format(bad_action)
+        error_msg = u"Unexpected action received '{}' - expected 'add' or 'remove'".format(bad_action)
         with self.assertRaisesRegexp(ValueError, error_msg):
             send_beta_role_email(bad_action, self.user, self.email_params)
 
