@@ -651,8 +651,10 @@ derived_collection_entry('DEFAULT_TEMPLATE_ENGINE', 'DIRS')
 ###############################################################################################
 
 AUTHENTICATION_BACKENDS = [
+    'rules.permissions.ObjectPermissionBackend',
     'openedx.core.djangoapps.oauth_dispatch.dot_overrides.backends.EdxRateLimitedAllowAllUsersModelBackend'
 ]
+
 STUDENT_FILEUPLOAD_MAX_SIZE = 4 * 1000 * 1000  # 4 MB
 MAX_FILEUPLOADS_PER_INPUT = 20
 
@@ -2238,6 +2240,9 @@ INSTALLED_APPS = [
 
     # additional release utilities to ease automation
     'release_util',
+
+    # rule-based authorization
+    'rules.apps.AutodiscoverRulesConfig',
 
     # Customized celery tasks, including persisting failed tasks so they can
     # be retried
