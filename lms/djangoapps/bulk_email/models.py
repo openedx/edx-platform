@@ -132,7 +132,7 @@ class Target(models.Model):
                 )
             )
         else:
-            raise ValueError("Unrecognized target type {}".format(self.target_type))
+            raise ValueError(u"Unrecognized target type {}".format(self.target_type))
 
 
 class CohortTarget(Target):
@@ -170,10 +170,10 @@ class CohortTarget(Target):
             cohort = get_cohort_by_name(name=cohort_name, course_key=course_id)
         except CourseUserGroup.DoesNotExist:
             raise ValueError(
-                "Cohort {cohort} does not exist in course {course_id}".format(
+                u"Cohort {cohort} does not exist in course {course_id}".format(
                     cohort=cohort_name,
                     course_id=course_id
-                )
+                ).encode('utf8')
             )
         return cohort
 
@@ -199,10 +199,10 @@ class CourseModeTarget(Target):
 
     def long_display(self):
         course_mode = self.track
-        long_course_mode_display = 'Course mode: {}'.format(course_mode.mode_display_name)
+        long_course_mode_display = u'Course mode: {}'.format(course_mode.mode_display_name)
         if course_mode.mode_slug not in CourseMode.AUDIT_MODES:
-            mode_currency = 'Currency: {}'.format(course_mode.currency)
-            long_course_mode_display = '{}, {}'.format(long_course_mode_display, mode_currency)
+            mode_currency = u'Currency: {}'.format(course_mode.currency)
+            long_course_mode_display = u'{}, {}'.format(long_course_mode_display, mode_currency)
         return long_course_mode_display
 
     @classmethod
@@ -216,10 +216,10 @@ class CourseModeTarget(Target):
             validate_course_mode(unicode(course_id), mode_slug, include_expired=True)
         except CourseModeNotFoundError:
             raise ValueError(
-                "Track {track} does not exist in course {course_id}".format(
+                u"Track {track} does not exist in course {course_id}".format(
                     track=mode_slug,
                     course_id=course_id
-                )
+                ).encode('utf8')
             )
 
 
@@ -257,8 +257,8 @@ class CourseEmail(Email):
             target_split = target.split(':', 1)
             # Ensure our desired target exists
             if target_split[0] not in EMAIL_TARGETS:
-                fmt = 'Course email being sent to unrecognized target: "{target}" for "{course}", subject "{subject}"'
-                msg = fmt.format(target=target, course=course_id, subject=subject)
+                fmt = u'Course email being sent to unrecognized target: "{target}" for "{course}", subject "{subject}"'
+                msg = fmt.format(target=target, course=course_id, subject=subject).encode('utf8')
                 raise ValueError(msg)
             elif target_split[0] == SEND_TO_COHORT:
                 # target_split[1] will contain the cohort name

@@ -12,6 +12,7 @@ from uuid import uuid4
 import mongoengine
 from django.conf import settings
 from django.urls import reverse
+from django.utils.html import escape
 from django.test.client import Client
 from django.test.utils import override_settings
 from pytz import UTC
@@ -156,7 +157,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
 
         # Create git loaded course
         response = self._add_edx4edx()
-        self.assertIn(text_type(GitImportErrorNoDir(settings.GIT_REPO_DIR)),
+        self.assertIn(escape(text_type(GitImportErrorNoDir(settings.GIT_REPO_DIR))),
                       response.content.decode('UTF-8'))
 
     def test_mongo_course_add_delete(self):
@@ -186,7 +187,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         # Regex of first 3 columns of course information table row for
         # test course loaded from git. Would not have sha1 if
         # git_info_for_course failed.
-        table_re = re.compile(r"""
+        table_re = re.compile(ur"""
             <tr>\s+
             <td>edX\sAuthor\sCourse</td>\s+  # expected test git course name
             <td>course-v1:MITx\+edx4edx\+edx4edx</td>\s+  # expected test git course_id
@@ -323,8 +324,8 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
                 )
             )
             self.assertIn(
-                'Page {} of 2'.format(expected),
-                response.content
+                u'Page {} of 2'.format(expected),
+                response.content.decode(response.charset)
             )
 
         CourseImportLog.objects.delete()

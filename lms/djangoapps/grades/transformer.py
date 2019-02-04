@@ -150,7 +150,7 @@ class GradesTransformer(BlockStructureTransformer):
         max_score = module.max_score()
         block_structure.set_transformer_block_field(module.location, cls, 'max_score', max_score)
         if max_score is None:
-            log.warning("GradesTransformer: max_score is None for {}".format(module.location))
+            log.warning(u"GradesTransformer: max_score is None for {}".format(module.location))
 
     @classmethod
     def _collect_grading_policy_hash(cls, block_structure):

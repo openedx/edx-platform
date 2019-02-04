@@ -73,7 +73,7 @@ class SplitTestBase(SharedModuleStoreTestCase):
         return ItemFactory.create(
             parent_location=parent.location,
             category="video",
-            display_name="Group {} Sees This Video".format(group),
+            display_name=u"Group {} Sees This Video".format(group),
         )
 
     def _problem(self, parent, group):
@@ -84,7 +84,7 @@ class SplitTestBase(SharedModuleStoreTestCase):
         return ItemFactory.create(
             parent_location=parent.location,
             category="problem",
-            display_name="Group {} Sees This Problem".format(group),
+            display_name=u"Group {} Sees This Problem".format(group),
             data="<h1>No Problem Defined Yet!</h1>",
         )
 
@@ -96,8 +96,8 @@ class SplitTestBase(SharedModuleStoreTestCase):
         return ItemFactory.create(
             parent_location=parent.location,
             category="html",
-            display_name="Group {} Sees This HTML".format(group),
-            data="Some HTML for group {}".format(group),
+            display_name=u"Group {} Sees This HTML".format(group),
+            data=u"Some HTML for group {}".format(group),
         )
 
     def test_split_test_0(self):
@@ -125,7 +125,10 @@ class SplitTestBase(SharedModuleStoreTestCase):
         content = resp.content
 
         # Assert we see the proper icon in the top display
-        self.assertIn('<button class="{} inactive nav-item tab"'.format(self.ICON_CLASSES[user_tag]), content)
+        self.assertIn(
+            u'<button class="{} inactive nav-item tab"'.format(self.ICON_CLASSES[user_tag]),
+            content.decode(resp.charset)
+        )
         # And proper tooltips
         for tooltip in self.TOOLTIPS[user_tag]:
             self.assertIn(tooltip, content)

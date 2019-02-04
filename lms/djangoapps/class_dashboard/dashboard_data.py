@@ -280,7 +280,7 @@ def get_d3_sequential_open_distrib(course_id):
                 'module_url': text_type(subsection.location),
             })
             subsection = {
-                'xValue': "SS {0}".format(c_subsection),
+                'xValue': u"SS {0}".format(c_subsection),
                 'stackData': stack_data,
             }
             data.append(subsection)

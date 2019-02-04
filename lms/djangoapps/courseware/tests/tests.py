@@ -111,7 +111,7 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
         response = self.client.get(url, follow=True)
 
         if response.status_code != 200:
-            self.fail('Status %d for page %s' %
+            self.fail(u'Status %d for page %s' %
                       (response.status_code, descriptor.location))
 
         if expect_redirect:

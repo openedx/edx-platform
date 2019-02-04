@@ -328,10 +328,10 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn(
-            'To access course materials, you must score {}% or higher'.format(minimum_score_pct),
-            resp.content
+            u'To access course materials, you must score {}% or higher'.format(minimum_score_pct),
+            resp.content.decode(resp.charset)
         )
-        self.assertIn('Your current score is 20%.', resp.content)
+        self.assertIn(u'Your current score is 20%.', resp.content.decode(resp.charset))
 
     def test_entrance_exam_requirement_message_hidden(self):
         """
@@ -377,7 +377,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
 
         resp = self.client.get(url)
         self.assertNotIn('To access course materials, you must score', resp.content)
-        self.assertIn('Your score is 100%. You have passed the entrance exam.', resp.content)
+        self.assertIn(u'Your score is 100%. You have passed the entrance exam.', resp.content.decode(resp.charset))
         self.assertIn('Lesson 1', resp.content)
 
     def test_entrance_exam_gating(self):

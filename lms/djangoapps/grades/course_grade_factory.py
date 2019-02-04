@@ -124,7 +124,7 @@ class CourseGradeFactory(object):
             # Keep marching on even if this student couldn't be graded for
             # some reason, but log it for future reference.
             log.exception(
-                'Cannot grade student %s in course %s because of exception: %s',
+                u'Cannot grade student %s in course %s because of exception: %s',
                 user.id,
                 course_data.course_key,
                 text_type(exc)

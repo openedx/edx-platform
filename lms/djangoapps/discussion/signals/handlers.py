@@ -43,16 +43,16 @@ def update_discussions_on_course_publish(sender, course_key, **kwargs):  # pylin
 def send_discussion_email_notification(sender, user, post, **kwargs):
     current_site = get_current_site()
     if current_site is None:
-        log.info('Discussion: No current site, not sending notification about post: %s.', post.id)
+        log.info(u'Discussion: No current site, not sending notification about post: %s.', post.id)
         return
 
     try:
         if not current_site.configuration.get_value(ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY, False):
-            log_message = 'Discussion: notifications not enabled for site: %s. Not sending message about post: %s.'
+            log_message = u'Discussion: notifications not enabled for site: %s. Not sending message about post: %s.'
             log.info(log_message, current_site, post.id)
             return
     except SiteConfiguration.DoesNotExist:
-        log_message = 'Discussion: No SiteConfiguration for site %s. Not sending message about post: %s.'
+        log_message = u'Discussion: No SiteConfiguration for site %s. Not sending message about post: %s.'
         log.info(log_message, current_site, post.id)
         return
 

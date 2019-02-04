@@ -87,7 +87,7 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         for line in response.content.split('\n'):
             if tabname in line and 'active' in line:
                 return
-        raise AssertionError("assertTabActive failed: {} not active".format(tabname))
+        raise AssertionError(u"assertTabActive failed: {} not active".format(tabname))
 
     def assertTabInactive(self, tabname, response):
         ''' Check if the progress tab is active in the tab set '''

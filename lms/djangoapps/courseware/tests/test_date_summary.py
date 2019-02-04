@@ -181,7 +181,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
                 '<div class="date-summary date-summary-todays-date">',
                 '<span class="hd hd-6 heading localized-datetime"',
                 'data-datetime="2015-01-02 00:00:00+00:00"',
-                'data-string="Today is {date}"',
+                u'data-string="Today is {date}"',
                 'data-timezone="None"'
             ]
             url = reverse(url_name, args=(course.id,))
@@ -209,7 +209,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
                 '<div class="date-summary date-summary-todays-date">',
                 '<span class="hd hd-6 heading localized-datetime"',
                 'data-datetime="2015-01-02 00:00:00+00:00"',
-                'data-string="Today is {date}"',
+                u'data-string="Today is {date}"',
                 'data-timezone="America/Los_Angeles"'
             ]
             for html in html_elements:
@@ -235,7 +235,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             url = reverse(url_name, args=(course.id,))
             response = self.client.get(url, follow=True)
             html_elements = [
-                'data-string="in 1 day - {date}"',
+                u'data-string="in 1 day - {date}"',
                 'data-datetime="2015-01-03 00:00:00+00:00"'
             ]
             for html in html_elements:
@@ -255,7 +255,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             url = reverse(url_name, args=(course.id,))
             response = self.client.get(url, follow=True)
             html_elements = [
-                'data-string="in 1 day - {date}"',
+                u'data-string="in 1 day - {date}"',
                 'data-datetime="2015-01-03 00:00:00+00:00"',
                 'data-timezone="America/Los_Angeles"'
             ]
@@ -436,8 +436,8 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             self.assertEqual(block.link, '')
 
     @ddt.data(
-        (-1, '1 day ago - {date}'),
-        (1, 'in 1 day - {date}')
+        (-1, u'1 day ago - {date}'),
+        (1, u'in 1 day - {date}')
     )
     @ddt.unpack
     def test_render_date_string_past(self, delta, expected_date_string):
@@ -599,7 +599,7 @@ class TestScheduleOverrides(SharedModuleStoreTestCase):
             'Don\'t miss the opportunity to highlight your new knowledge and skills by earning a verified'
             ' certificate.'
         )
-        self.assertEqual(upgrade_date_summary.relative_datestring, 'by {date}')
+        self.assertEqual(upgrade_date_summary.relative_datestring, u'by {date}')
 
     @override_waffle_flag(CREATE_SCHEDULE_WAFFLE_FLAG, True)
     def test_date_with_self_paced_with_enrollment_after_course_start(self):

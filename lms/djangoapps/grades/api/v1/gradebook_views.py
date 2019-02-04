@@ -684,7 +684,7 @@ class GradebookBulkUpdateView(GradeViewMixin, PaginatedAPIView):
                         user_id=requested_user_id,
                         usage_id=requested_usage_id,
                         success=False,
-                        reason='usage_key {} does not exist in this course.'.format(usage_key)
+                        reason=u'usage_key {} does not exist in this course.'.format(usage_key)
                     ))
                     continue
 
@@ -760,7 +760,7 @@ class GradebookBulkUpdateView(GradeViewMixin, PaginatedAPIView):
     ):
 
         log.info(
-            'Grades: Bulk_Update, UpdatedByUser: %s, User: %s, Usage: %s, Grade: %s, GradeOverride: %s, Success: %s',
+            u'Grades: Bulk_Update, UpdatedByUser: %s, User: %s, Usage: %s, Grade: %s, GradeOverride: %s, Success: %s',
             request_user.id,
             user_id,
             usage_id,

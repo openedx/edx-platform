@@ -610,7 +610,7 @@ def get_module_system_for_user(
         else:
             requested_user_id = event.get('user_id', user.id)
             if requested_user_id != user.id:
-                log.warning("{} tried to submit a completion on behalf of {}".format(user, requested_user_id))
+                log.warning(u"{} tried to submit a completion on behalf of {}".format(user, requested_user_id))
                 return
 
             # If blocks explicitly declare support for the new completion API,
@@ -834,7 +834,7 @@ def get_module_system_for_user(
         try:
             position = int(position)
         except (ValueError, TypeError):
-            log.exception('Non-integer %r passed as position.', position)
+            log.exception(u'Non-integer %r passed as position.', position)
             position = None
 
     system.set('position', position)
@@ -935,7 +935,7 @@ def load_single_xblock(request, user_id, course_id, usage_key_string, course=Non
     )
     instance = get_module(user, request, usage_key, field_data_cache, grade_bucket_type='xqueue', course=course)
     if instance is None:
-        msg = "No module {0} for user {1}--access denied?".format(usage_key_string, user)
+        msg = u"No module {0} for user {1}--access denied?".format(usage_key_string, user)
         log.debug(msg)
         raise Http404
     return instance
@@ -1033,7 +1033,7 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
                 user_auth_tuple = authenticator.authenticate(request)
             except APIException:
                 log.exception(
-                    "XBlock handler %r failed to authenticate with %s", handler, authenticator.__class__.__name__
+                    u"XBlock handler %r failed to authenticate with %s", handler, authenticator.__class__.__name__
                 )
             else:
                 if user_auth_tuple is not None:
@@ -1050,13 +1050,13 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
     try:
         course_key = CourseKey.from_string(course_id)
     except InvalidKeyError:
-        raise Http404('{} is not a valid course key'.format(course_id))
+        raise Http404(u'{} is not a valid course key'.format(course_id))
 
     with modulestore().bulk_operations(course_key):
         try:
             course = modulestore().get_course(course_key)
         except ItemNotFoundError:
-            raise Http404('{} does not exist in the modulestore'.format(course_id))
+            raise Http404(u'{} does not exist in the modulestore'.format(course_id))
 
         return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course=course)
 
@@ -1080,7 +1080,7 @@ def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_inf
         descriptor_orig_usage_key, descriptor_orig_version = modulestore().get_block_original_usage(usage_key)
     except ItemNotFoundError:
         log.warn(
-            "Invalid location for course id %s: %s",
+            u"Invalid location for course id %s: %s",
             usage_key.course_key,
             usage_key
         )
@@ -1118,7 +1118,7 @@ def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_inf
     if instance is None:
         # Either permissions just changed, or someone is trying to be clever
         # and load something they shouldn't have access to.
-        log.debug("No module %s for user %s -- access denied?", usage_key, user)
+        log.debug(u"No module %s for user %s -- access denied?", usage_key, user)
         raise Http404
 
     return (instance, tracking_context)
@@ -1191,7 +1191,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
                     resp = append_data_to_webob_response(resp, ee_data)
 
         except NoSuchHandlerError:
-            log.exception("XBlock %s attempted to access missing handler %r", instance, handler)
+            log.exception(u"XBlock %s attempted to access missing handler %r", instance, handler)
             raise Http404
 
         # If we can't find the module, respond with a 404
@@ -1251,7 +1251,7 @@ def xblock_view(request, course_id, usage_id, view_name):
         try:
             fragment = instance.render(view_name, context=request.GET)
         except NoSuchViewError:
-            log.exception("Attempt to render missing view on %s: %s", instance, view_name)
+            log.exception(u"Attempt to render missing view on %s: %s", instance, view_name)
             raise Http404
 
         hashed_resources = OrderedDict()
@@ -1278,14 +1278,14 @@ def _check_files_limits(files):
 
         # Check number of files submitted
         if len(inputfiles) > settings.MAX_FILEUPLOADS_PER_INPUT:
-            msg = 'Submission aborted! Maximum %d files may be submitted at once' % \
+            msg = u'Submission aborted! Maximum %d files may be submitted at once' % \
                   settings.MAX_FILEUPLOADS_PER_INPUT
             return msg
 
         # Check file sizes
         for inputfile in inputfiles:
             if inputfile.size > settings.STUDENT_FILEUPLOAD_MAX_SIZE:  # Bytes
-                msg = 'Submission aborted! Your file "%s" is too large (max size: %d MB)' % \
+                msg = u'Submission aborted! Your file "%s" is too large (max size: %d MB)' % \
                       (inputfile.name, settings.STUDENT_FILEUPLOAD_MAX_SIZE / (1000 ** 2))
                 return msg
 

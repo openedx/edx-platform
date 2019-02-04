@@ -224,7 +224,7 @@ class TestEmailErrors(ModuleStoreTestCase):
             email = CourseEmail.create(  # pylint: disable=unused-variable
                 self.course.id,
                 self.instructor,
-                ["{}:IDONTEXIST".format(target_type)],
+                [u"{}:IDONTEXIST".format(target_type)],
                 "re: subject",
                 "dummy body goes here"
             )

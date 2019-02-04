@@ -12,6 +12,6 @@ class CcxFactory(DjangoModelFactory):  # pylint: disable=missing-docstring
     class Meta(object):
         model = CustomCourseForEdX
 
-    display_name = Sequence(lambda n: 'Test CCX #{0}'.format(n))  # pylint: disable=unnecessary-lambda
+    display_name = Sequence(lambda n: u'Test CCX #{0}'.format(n))  # pylint: disable=unnecessary-lambda
     id = None  # pylint: disable=invalid-name
     coach = SubFactory(UserFactory)

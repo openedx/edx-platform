@@ -504,7 +504,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         """
         Tests the VideoModule get_html where a edx_video_id is given but a video is not found
         """
-        SOURCE_XML = """
+        SOURCE_XML = u"""
             <video show_captions="true"
             display_name="A Name"
             sub="a_sub_file.srt.sjson" source="{source}"
@@ -730,7 +730,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         Create expected context and get actual context returned by `get_html` method.
         """
         # make sure the urls for the various encodings are included as part of the alternative sources.
-        SOURCE_XML = """
+        SOURCE_XML = u"""
             <video show_captions="true"
             display_name="A Name"
             sub="a_sub_file.srt.sjson" source="{source}"
@@ -1071,7 +1071,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         metadata = {
             'html5_sources': ['http://youtu.be/3_yD_cEKoCk.mp4'] + data['hls'],
         }
-        video_xml = '<video display_name="Video" edx_video_id="12345-67890" youtube_id_1_0="{}">[]</video>'.format(
+        video_xml = u'<video display_name="Video" edx_video_id="12345-67890" youtube_id_1_0="{}">[]</video>'.format(
             data['youtube']
         )
         DEPRECATE_YOUTUBE_FLAG = waffle_flags()[DEPRECATE_YOUTUBE]
@@ -1079,7 +1079,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             with override_flag(DEPRECATE_YOUTUBE_FLAG.namespaced_flag_name, active=data['waffle_enabled']):
                 self.initialize_module(data=video_xml, metadata=metadata)
                 context = self.item_descriptor.render(STUDENT_VIEW).content
-                self.assertIn('"prioritizeHls": {}'.format(data['result']), context)
+                self.assertIn(u'"prioritizeHls": {}'.format(data['result']), context)
 
 
 @attr(shard=7)
@@ -1627,7 +1627,7 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
         )
 
         actual = self.descriptor.definition_to_xml(resource_fs=self.file_system)
-        expected_str = """
+        expected_str = u"""
             <video download_video="false" url_name="SampleProblem" transcripts='{transcripts}'>
                 <video_asset client_video_id="test_client_video_id" duration="111.0" image="">
                     <encoded_video profile="mobile" url="http://example.com/video" file_size="222" bitrate="333"/>
@@ -1781,7 +1781,7 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
             EXPORT_IMPORT_STATIC_DIR
         )
 
-        xml_data = """
+        xml_data = u"""
             <video edx_video_id='{edx_video_id}' sub='{sub_id}' transcripts='{transcripts}'>
                 <video_asset client_video_id="test_client_video_id" duration="111.0">
                     <encoded_video profile="mobile" url="http://example.com/video" file_size="222" bitrate="333"/>
@@ -1868,7 +1868,7 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
         edx_video_id = 'test_edx_video_id'
         val_transcript_language_code = 'es'
         val_transcript_provider = 'Cielo24'
-        xml_data = """
+        xml_data = u"""
         <video edx_video_id='{edx_video_id}'>
             <video_asset client_video_id="test_client_video_id" duration="111.0">
                 <transcripts>
@@ -2003,7 +2003,7 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
                 module_system.resources_fs,
                 EXPORT_IMPORT_STATIC_DIR
             )
-            xml_data += " sub='{sub_id}'".format(
+            xml_data += u" sub='{sub_id}'".format(
                 sub_id=sub_id
             )
 
@@ -2015,7 +2015,7 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
                 module_system.resources_fs,
                 EXPORT_IMPORT_STATIC_DIR
             )
-            xml_data += " transcripts='{transcripts}'".format(
+            xml_data += u" transcripts='{transcripts}'".format(
                 transcripts=json.dumps(external_transcripts),
             )
 

@@ -182,7 +182,7 @@ class RegenerateCertificatesTest(CertificateManagementTest):
         self.course.issue_badges = issue_badges
         self.store.update_item(self.course, None)
 
-        args = '-u {} -c {}'.format(self.user.email, text_type(key))
+        args = u'-u {} -c {}'.format(self.user.email, text_type(key))
         call_command(self.command, *args.split(' '))
 
         xqueue.return_value.regen_cert.assert_called_with(
@@ -208,7 +208,7 @@ class RegenerateCertificatesTest(CertificateManagementTest):
         key = self.course.location.course_key
         self._create_cert(key, self.user, CertificateStatuses.downloadable)
 
-        args = '-u {} -c {} --insecure'.format(self.user.email, text_type(key))
+        args = u'-u {} -c {} --insecure'.format(self.user.email, text_type(key))
         call_command(self.command, *args.split(' '))
 
         certificate = GeneratedCertificate.eligible_certificates.get(
@@ -246,7 +246,7 @@ class UngenerateCertificatesTest(CertificateManagementTest):
         self._create_cert(key, self.user, CertificateStatuses.unavailable)
 
         with mock_passing_grade():
-            args = '-c {} --insecure'.format(text_type(key))
+            args = u'-c {} --insecure'.format(text_type(key))
             call_command(self.command, *args.split(' '))
 
         self.assertTrue(mock_send_to_queue.called)

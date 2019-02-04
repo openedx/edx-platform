@@ -28,7 +28,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if len(args) != 1:
-            raise CommandError('Must called with arguments: {}'.format(self.args))
+            raise CommandError(u'Must called with arguments: {}'.format(self.args))
 
         xml_module_store = XMLModuleStore(
             data_dir=settings.DATA_DIR,

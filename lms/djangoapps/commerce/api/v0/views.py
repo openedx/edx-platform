@@ -79,7 +79,7 @@ class BasketsView(APIView):
             except Exception:  # pylint: disable=broad-except
                 # log the error, return silently
                 log.exception(
-                    'Failed to handle marketing opt-in flag: user="%s", course="%s"', user.username, course_key
+                    u'Failed to handle marketing opt-in flag: user="%s", course="%s"', user.username, course_key
                 )
 
     def post(self, request, *args, **kwargs):
