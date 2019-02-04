@@ -2962,52 +2962,45 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
     # The value is one of: 'all_users', 'private'
     "default_visibility": "all_users",
 
-    # The list of all fields that can be shared with other users
-    "shareable_fields": [
-        'username',
-        'profile_image',
-        'country',
-        'time_zone',
-        'date_joined',
-        'language_proficiencies',
-        'bio',
-        'social_links',
-        'account_privacy',
-        # Not an actual field, but used to signal whether badges should be public.
-        'accomplishments_shared',
-    ],
-
     # The list of account fields that are always public
     "public_fields": [
-        'username',
-        'profile_image',
         'account_privacy',
+        'profile_image',
+        'username',
     ],
+}
 
-    # The list of account fields that are visible only to staff and users viewing their own profiles
-    "admin_fields": [
-        "username",
+# The list of all fields that can be shared with other users
+ACCOUNT_VISIBILITY_CONFIGURATION["shareable_fields"] = (
+    ACCOUNT_VISIBILITY_CONFIGURATION["public_fields"] + [
+        'bio',
+        'country',
+        'date_joined',
+        'language_proficiencies',
+        "level_of_education",
+        'social_links',
+        'time_zone',
+
+        # Not an actual field, but used to signal whether badges should be public.
+        'accomplishments_shared',
+    ]
+)
+
+# The list of account fields that are visible only to staff and users viewing their own profiles
+ACCOUNT_VISIBILITY_CONFIGURATION["admin_fields"] = (
+    ACCOUNT_VISIBILITY_CONFIGURATION["shareable_fields"] + [
         "email",
-        "is_active",
-        "bio",
-        "country",
-        "date_joined",
-        "profile_image",
-        "language_proficiencies",
-        "social_links",
-        "name",
+        "extended_profile",
         "gender",
         "goals",
-        "year_of_birth",
-        "level_of_education",
+        "is_active",
         "mailing_address",
+        "name",
         "requires_parental_consent",
-        "account_privacy",
-        "accomplishments_shared",
-        "extended_profile",
         "secondary_email",
+        "year_of_birth",
     ]
-}
+)
 
 # The current list of social platforms to be shown to the user.
 #

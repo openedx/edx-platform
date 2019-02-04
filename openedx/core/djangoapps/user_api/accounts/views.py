@@ -212,8 +212,12 @@ class AccountViewSet(ViewSet):
 
             * username: The username associated with the account.
             * year_of_birth: The year the user was born, as an integer, or null.
+
             * account_privacy: The user's setting for sharing her personal
-              profile. Possible values are "all_users" or "private".
+              profile. Possible values are "all_users", "private", or "custom".
+              If "custom", the user has selectively chosen a subset of shareable
+              fields to make visible to others via the User Preferences API.
+
             * accomplishments_shared: Signals whether badges are enabled on the
               platform and should be fetched.
 
@@ -223,7 +227,7 @@ class AccountViewSet(ViewSet):
 
             If a user who does not have "is_staff" access requests account
             information for a different user, only a subset of these fields is
-            returned. The returns fields depend on the
+            returned. The returned fields depend on the
             ACCOUNT_VISIBILITY_CONFIGURATION configuration setting and the
             visibility preference of the user for whom data is requested.
 

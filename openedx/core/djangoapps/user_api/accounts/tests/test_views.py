@@ -24,16 +24,18 @@ from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_un
 from student.models import PendingEmailChange, UserProfile
 from student.tests.factories import TEST_PASSWORD, UserFactory
 
-from .. import ALL_USERS_VISIBILITY, PRIVATE_VISIBILITY
+from .. import ALL_USERS_VISIBILITY, PRIVATE_VISIBILITY, CUSTOM_VISIBILITY
 
 
 TEST_PROFILE_IMAGE_UPLOADED_AT = datetime.datetime(2002, 1, 9, 15, 43, 1, tzinfo=pytz.UTC)
-
 
 # this is used in one test to check the behavior of profile image url
 # generation with a relative url in the config.
 TEST_PROFILE_IMAGE_BACKEND = deepcopy(settings.PROFILE_IMAGE_BACKEND)
 TEST_PROFILE_IMAGE_BACKEND['options']['base_url'] = '/profile-images/'
+
+TEST_BIO_VALUE = u"Tired mother of twins"
+TEST_LANGUAGE_PROFICIENCY_CODE = u"hi"
 
 
 class UserAPITestCase(APITestCase):
@@ -107,9 +109,9 @@ class UserAPITestCase(APITestCase):
         legacy_profile.goals = "world peace"
         legacy_profile.mailing_address = "Park Ave"
         legacy_profile.gender = "f"
-        legacy_profile.bio = "Tired mother of twins"
+        legacy_profile.bio = TEST_BIO_VALUE
         legacy_profile.profile_image_uploaded_at = TEST_PROFILE_IMAGE_UPLOADED_AT
-        legacy_profile.language_proficiencies.create(code='en')
+        legacy_profile.language_proficiencies.create(code=TEST_LANGUAGE_PROFICIENCY_CODE)
         legacy_profile.save()
 
     def _verify_profile_image_data(self, data, has_profile_image):
@@ -213,53 +215,87 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
 
         self.url = reverse("accounts_api", kwargs={'username': self.user.username})
 
+    def _set_user_age_to_10_years(self, user):
+        """
+        Sets the given user's age to 10.
+        Returns the calculated year of birth.
+        """
+        legacy_profile = UserProfile.objects.get(id=user.id)
+        current_year = datetime.datetime.now().year
+        year_of_birth = current_year - 10
+        legacy_profile.year_of_birth = year_of_birth
+        legacy_profile.save()
+        return year_of_birth
+
     def _verify_full_shareable_account_response(self, response, account_privacy=None, badges_enabled=False):
         """
         Verify that the shareable fields from the account are returned
         """
         data = response.data
-        self.assertEqual(10, len(data))
-        self.assertEqual(self.user.username, data["username"])
-        self.assertEqual("US", data["country"])
-        self._verify_profile_image_data(data, True)
-        self.assertIsNone(data["time_zone"])
-        self.assertEqual([{"code": "en"}], data["language_proficiencies"])
-        self.assertEqual("Tired mother of twins", data["bio"])
+        self.assertEqual(11, len(data))
+
+        # public fields (3)
         self.assertEqual(account_privacy, data["account_privacy"])
+        self._verify_profile_image_data(data, True)
+        self.assertEqual(self.user.username, data["username"])
+
+        # additional shareable fields (8)
+        self.assertEqual(TEST_BIO_VALUE, data["bio"])
+        self.assertEqual("US", data["country"])
+        self.assertIsNotNone(data["date_joined"])
+        self.assertEqual([{"code": TEST_LANGUAGE_PROFICIENCY_CODE}], data["language_proficiencies"])
+        self.assertEqual("m", data["level_of_education"])
+        self.assertIsNotNone(data["social_links"])
+        self.assertIsNone(data["time_zone"])
         self.assertEqual(badges_enabled, data['accomplishments_shared'])
 
-    def _verify_private_account_response(self, response, requires_parental_consent=False, account_privacy=None):
+    def _verify_private_account_response(self, response, requires_parental_consent=False):
         """
         Verify that only the public fields are returned if a user does not want to share account fields
         """
         data = response.data
         self.assertEqual(3, len(data))
-        self.assertEqual(self.user.username, data["username"])
+        self.assertEqual(PRIVATE_VISIBILITY, data["account_privacy"])
         self._verify_profile_image_data(data, not requires_parental_consent)
-        self.assertEqual(account_privacy, data["account_privacy"])
+        self.assertEqual(self.user.username, data["username"])
 
-    def _verify_full_account_response(self, response, requires_parental_consent=False):
+    def _verify_full_account_response(self, response, requires_parental_consent=False, year_of_birth=2000):
         """
         Verify that all account fields are returned (even those that are not shareable).
         """
         data = response.data
-        self.assertEqual(20, len(data))
-        self.assertEqual(self.user.username, data["username"])
-        self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
-        self.assertEqual("US", data["country"])
-        self.assertEqual("f", data["gender"])
-        self.assertEqual(2000, data["year_of_birth"])
-        self.assertEqual("m", data["level_of_education"])
-        self.assertEqual("world peace", data["goals"])
-        self.assertEqual("Park Ave", data['mailing_address'])
-        self.assertEqual(self.user.email, data["email"])
-        self.assertTrue(data["is_active"])
-        self.assertIsNotNone(data["date_joined"])
-        self.assertEqual("Tired mother of twins", data["bio"])
+        self.assertEqual(21, len(data))
+
+        # public fields (3)
+        expected_account_privacy = (
+            PRIVATE_VISIBILITY if requires_parental_consent else
+            UserPreference.get_value(self.user, 'account_privacy')
+        )
+        self.assertEqual(expected_account_privacy, data["account_privacy"])
         self._verify_profile_image_data(data, not requires_parental_consent)
+        self.assertEqual(self.user.username, data["username"])
+
+        # additional shareable fields (8)
+        self.assertEqual(TEST_BIO_VALUE, data["bio"])
+        self.assertEqual("US", data["country"])
+        self.assertIsNotNone(data["date_joined"])
+        self.assertEqual([{"code": TEST_LANGUAGE_PROFICIENCY_CODE}], data["language_proficiencies"])
+        self.assertEqual("m", data["level_of_education"])
+        self.assertIsNotNone(data["social_links"])
+        self.assertEqual(UserPreference.get_value(self.user, 'time_zone'), data["time_zone"])
+        self.assertIsNotNone(data["accomplishments_shared"])
+
+        # additional admin fields (10)
+        self.assertEqual(self.user.email, data["email"])
+        self.assertIsNotNone(data["extended_profile"])
+        self.assertEqual("f", data["gender"])
+        self.assertEqual("world peace", data["goals"])
+        self.assertTrue(data["is_active"])
+        self.assertEqual("Park Ave", data['mailing_address'])
+        self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
         self.assertEquals(requires_parental_consent, data["requires_parental_consent"])
-        self.assertEqual([{"code": "en"}], data["language_proficiencies"])
-        self.assertEqual(UserPreference.get_value(self.user, 'account_privacy'), data["account_privacy"])
+        self.assertIsNone(data["secondary_email"])
+        self.assertEqual(year_of_birth, data["year_of_birth"])
 
     def test_anonymous_access(self):
         """
@@ -318,7 +354,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         self.create_mock_profile(self.user)
         with self.assertNumQueries(22):
             response = self.send_get(self.different_client)
-        self._verify_private_account_response(response, account_privacy=PRIVATE_VISIBILITY)
+        self._verify_private_account_response(response)
 
     @mock.patch.dict(settings.FEATURES, {'ENABLE_OPENBADGES': True})
     @ddt.data(
@@ -339,7 +375,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
             Confirms that private fields are private, and public/shareable fields are public/shareable
             """
             if preference_visibility == PRIVATE_VISIBILITY:
-                self._verify_private_account_response(response, account_privacy=PRIVATE_VISIBILITY)
+                self._verify_private_account_response(response)
             else:
                 self._verify_full_shareable_account_response(response, ALL_USERS_VISIBILITY, badges_enabled=True)
 
@@ -359,6 +395,70 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         response = self.send_get(client, query_parameters='view=shared')
         verify_fields_visible_to_all_users(response)
 
+    @ddt.data(
+        ("client", "user"),
+        ("staff_client", "staff_user"),
+        ("different_client", "different_user"),
+    )
+    @ddt.unpack
+    def test_custom_visibility_over_age(self, api_client, requesting_username):
+        self.create_mock_profile(self.user)
+        # set user's custom visibility preferences
+        set_user_preference(self.user, ACCOUNT_VISIBILITY_PREF_KEY, CUSTOM_VISIBILITY)
+        shared_fields = ("bio", "language_proficiencies")
+        for field_name in shared_fields:
+            set_user_preference(self.user, "visibility.{}".format(field_name), ALL_USERS_VISIBILITY)
+
+        # make API request
+        client = self.login_client(api_client, requesting_username)
+        response = self.send_get(client)
+
+        # verify response
+        if requesting_username == "different_user":
+            data = response.data
+            self.assertEqual(5, len(data))
+
+            # public fields
+            self.assertEqual(self.user.username, data["username"])
+            self.assertEqual(UserPreference.get_value(self.user, 'account_privacy'), data["account_privacy"])
+            self._verify_profile_image_data(data, has_profile_image=True)
+
+            # custom shared fields
+            self.assertEqual(TEST_BIO_VALUE, data["bio"])
+            self.assertEqual([{"code": TEST_LANGUAGE_PROFICIENCY_CODE}], data["language_proficiencies"])
+        else:
+            self._verify_full_account_response(response)
+
+    @ddt.data(
+        ("client", "user"),
+        ("staff_client", "staff_user"),
+        ("different_client", "different_user"),
+    )
+    @ddt.unpack
+    def test_custom_visibility_under_age(self, api_client, requesting_username):
+        self.create_mock_profile(self.user)
+        year_of_birth = self._set_user_age_to_10_years(self.user)
+
+        # set user's custom visibility preferences
+        set_user_preference(self.user, ACCOUNT_VISIBILITY_PREF_KEY, CUSTOM_VISIBILITY)
+        shared_fields = ("bio", "language_proficiencies")
+        for field_name in shared_fields:
+            set_user_preference(self.user, "visibility.{}".format(field_name), ALL_USERS_VISIBILITY)
+
+        # make API request
+        client = self.login_client(api_client, requesting_username)
+        response = self.send_get(client)
+
+        # verify response
+        if requesting_username == "different_user":
+            self._verify_private_account_response(response, requires_parental_consent=True)
+        else:
+            self._verify_full_account_response(
+                response,
+                requires_parental_consent=True,
+                year_of_birth=year_of_birth,
+            )
+
     def test_get_account_default(self):
         """
         Test that a client (logged in) can get her own account information (using default legacy profile information,
@@ -372,7 +472,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
             with self.assertNumQueries(queries):
                 response = self.send_get(self.client)
             data = response.data
-            self.assertEqual(20, len(data))
+            self.assertEqual(21, len(data))
             self.assertEqual(self.user.username, data["username"])
             self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
             for empty_field in ("year_of_birth", "level_of_education", "mailing_address", "bio"):
@@ -387,6 +487,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
             self.assertTrue(data["requires_parental_consent"])
             self.assertEqual([], data["language_proficiencies"])
             self.assertEqual(PRIVATE_VISIBILITY, data["account_privacy"])
+            self.assertIsNone(data["time_zone"])
             # Badges aren't on by default, so should not be present.
             self.assertEqual(False, data["accomplishments_shared"])
 
@@ -771,22 +872,18 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         """
         client = self.login_client(api_client, requesting_username)
 
-        # Set the user to be ten years old with a public profile
-        legacy_profile = UserProfile.objects.get(id=self.user.id)
-        current_year = datetime.datetime.now().year
-        legacy_profile.year_of_birth = current_year - 10
-        legacy_profile.save()
+        year_of_birth = self._set_user_age_to_10_years(self.user)
         set_user_preference(self.user, ACCOUNT_VISIBILITY_PREF_KEY, ALL_USERS_VISIBILITY)
 
         # Verify that the default view is still private (except for clients with full access)
         response = self.send_get(client)
         if has_full_access:
             data = response.data
-            self.assertEqual(20, len(data))
+            self.assertEqual(21, len(data))
             self.assertEqual(self.user.username, data["username"])
             self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
             self.assertEqual(self.user.email, data["email"])
-            self.assertEqual(current_year - 10, data["year_of_birth"])
+            self.assertEqual(year_of_birth, data["year_of_birth"])
             for empty_field in ("country", "level_of_education", "mailing_address", "bio"):
                 self.assertIsNone(data[empty_field])
             self.assertEqual("m", data["gender"])
@@ -797,15 +894,11 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
             self.assertTrue(data["requires_parental_consent"])
             self.assertEqual(PRIVATE_VISIBILITY, data["account_privacy"])
         else:
-            self._verify_private_account_response(
-                response, requires_parental_consent=True, account_privacy=PRIVATE_VISIBILITY
-            )
+            self._verify_private_account_response(response, requires_parental_consent=True)
 
         # Verify that the shared view is still private
         response = self.send_get(client, query_parameters='view=shared')
-        self._verify_private_account_response(
-            response, requires_parental_consent=True, account_privacy=PRIVATE_VISIBILITY
-        )
+        self._verify_private_account_response(response, requires_parental_consent=True)
 
 
 @skip_unless_lms
