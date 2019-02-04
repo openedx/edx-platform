@@ -21,7 +21,7 @@ def runBokchoyTests() {
 }
 
 def bokchoyTestCleanup() {
-    archiveArtifacts allowEmptyArchive: true, artifacts: 'test_root/log/**/*.log,stdout/*.log'
+    archiveArtifacts allowEmptyArchive: true, artifacts: 'test_root/log/**/*.log,test_root/log/**/*.png,stdout/*.log'
     junit '**/reports/bok_choy/**/xunit.xml'
 }
 
