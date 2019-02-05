@@ -346,7 +346,6 @@ disable =
 	using-cmp-argument,
 	xrange-builtin,
 	zip-builtin-not-iterating,
-	unicode-format-string,
 	native-string,
 
 [REPORTS]
@@ -447,4 +446,4 @@ int-import-graph =
 [EXCEPTIONS]
 overgeneral-exceptions = Exception
 
-# 4285ece9aa125ff8efc6f77ed6d34579e65e2d96
+# ddfc2b6fc6acff4fdfcc76ecb982aa840035d86f
