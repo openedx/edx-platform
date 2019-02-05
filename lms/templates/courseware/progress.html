@@ -5,6 +5,7 @@
 <%!
 from course_modes.models import CourseMode
 from lms.djangoapps.certificates.models import CertificateStatuses
+from lms.djangoapps.grades.models import PersistentSubsectionGradeOverrideHistory
 from django.utils.translation import ugettext as _
 from openedx.core.djangolib.markup import HTML, Text
 from django.urls import reverse
@@ -168,10 +169,10 @@ username = get_enterprise_learner_generic_name(request) or student.username
                                 %for section in chapter['sections']:
                                     <div>
                                         <%
-                                        earned = section.all_total.earned
-                                        total = section.all_total.possible
+                                        earned = section.graded_total.earned
+                                        total = section.graded_total.possible
 
-                                        percentageString = "{0:.0%}".format(section.percent_graded) if earned > 0 and total > 0 else ""
+                                        percentageString = "{0:.0%}".format(section.percent_graded) if total > 0 or earned > 0 else ""
                                         %>
                                         <h4 class="hd hd-4">
                                             <a href="${reverse('courseware_section', kwargs=dict(course_id=text_type(course.id), chapter=chapter['url_name'], section=section.url_name))}">
@@ -196,7 +197,8 @@ username = get_enterprise_learner_generic_name(request) or student.username
                                         </p>
                                         <p class="override-notice">
                                             %if section.override is not None:
-                                                %if section.format is not None and section.format == "Exam":
+                                                <%last_override_history = section.override.get_history().order_by('created').last()%>
+                                                %if (not last_override_history or last_override_history.feature == PersistentSubsectionGradeOverrideHistory.PROCTORING) and section.format == "Exam" and earned == 0:
                                                     ${_("Suspicious activity detected during proctored exam review. Exam score 0.")}
                                                 %else:
                                                     ${_("Section grade has been overridden.")}
