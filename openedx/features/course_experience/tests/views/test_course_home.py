@@ -747,7 +747,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         user = self.create_user_for_course(self.course, CourseUserType.UNENROLLED)
         CourseEnrollment.enroll(user, self.course.id)
 
-        language = 'zh-cn'
+        language = 'eo'
         DarkLangConfig(
             released_languages=language,
             changed_by=user,
@@ -760,7 +760,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
 
         # Check that if the string is incorrectly not marked as unicode we still get the error
         with mock.patch("openedx.features.course_duration_limits.access.get_date_string",
-                        return_value=str(date_string)):
+                        return_value=date_string.encode('utf-8')):
             response = self.client.get(url, HTTP_ACCEPT_LANGUAGE=language)
             self.assertEqual(response.status_code, 500)
 

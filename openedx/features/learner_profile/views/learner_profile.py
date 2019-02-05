@@ -55,9 +55,9 @@ def learner_profile(request, username):
                 SHOW_PROFILE_MESSAGE.is_enabled() and
                 request.COOKIES.get('profile-message-viewed', '') != 'True'):
             message_text = Text(_(
-                'Welcome to the new learner profile page. Your full profile now displays more '
-                'information to other learners. You can instead choose to display a limited '
-                'profile. {learn_more_link_start}Learn more{learn_more_link_end}'
+                u'Welcome to the new learner profile page. Your full profile now displays more '
+                u'information to other learners. You can instead choose to display a limited '
+                u'profile. {learn_more_link_start}Learn more{learn_more_link_end}'
             )).format(
                 learn_more_link_start=HTML(
                     '<a href="https://edx.readthedocs.io/projects/open-edx-learner-guide/en/'

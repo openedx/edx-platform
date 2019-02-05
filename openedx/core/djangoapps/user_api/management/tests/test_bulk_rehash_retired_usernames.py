@@ -73,7 +73,7 @@ def test_successful_rehash(retire_user_forums, capsys):
     assert retire_user_forums.call_count == 2
 
     for user in users_skipped:
-        assert "User ID {} because the hash would not change.".format(user.id) in output
+        assert u"User ID {} because the hash would not change.".format(user.id) in output
 
     expected_username_calls = []
     for user in users_needing_rehash:
@@ -87,7 +87,7 @@ def test_successful_rehash(retire_user_forums, capsys):
         )
         expected_username_calls.append(call(new_retired_username))
 
-        assert "User ID {} to rehash their retired username".format(user.id) in output
+        assert u"User ID {} to rehash their retired username".format(user.id) in output
         assert new_retired_username == user.username
         assert new_retired_username == retirement.retired_username
 
@@ -111,7 +111,7 @@ def test_forums_failed(retire_user_forums, capsys):
     assert retire_user_forums.call_count == 2
 
     for user in users_skipped:
-        assert "User ID {} because the hash would not change.".format(user.id) in output
+        assert u"User ID {} because the hash would not change.".format(user.id) in output
 
     expected_username_calls = []
     for user in users_needing_rehash:
@@ -125,7 +125,7 @@ def test_forums_failed(retire_user_forums, capsys):
         )
         expected_username_calls.append(call(new_retired_username))
 
-        assert "User ID {} to rehash their retired username".format(user.id) in output
+        assert u"User ID {} to rehash their retired username".format(user.id) in output
         # Confirm that the usernames are *not* updated, due to the forums error
         assert new_retired_username != user.username
         assert new_retired_username != retirement.retired_username
@@ -151,7 +151,7 @@ def test_forums_404(retire_user_forums, capsys):
     assert retire_user_forums.call_count == 2
 
     for user in users_skipped:
-        assert "User ID {} because the hash would not change.".format(user.id) in output
+        assert u"User ID {} because the hash would not change.".format(user.id) in output
 
     expected_username_calls = []
     for user in users_needing_rehash:
@@ -165,7 +165,7 @@ def test_forums_404(retire_user_forums, capsys):
         )
         expected_username_calls.append(call(new_retired_username))
 
-        assert "User ID {} to rehash their retired username".format(user.id) in output
+        assert u"User ID {} to rehash their retired username".format(user.id) in output
         # Confirm that the usernames *are* updated, since this is a non-blocking forums error
         assert new_retired_username == user.username
         assert new_retired_username == retirement.retired_username

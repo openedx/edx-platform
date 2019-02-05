@@ -24,6 +24,7 @@ from web_fragments.fragment import Fragment
 
 MIN_DURATION = timedelta(weeks=4)
 MAX_DURATION = timedelta(weeks=18)
+EXPIRATION_DATE_FORMAT_STR = u'%b. %-d, %Y'
 
 
 class AuditExpiredError(AccessError):
@@ -34,7 +35,7 @@ class AuditExpiredError(AccessError):
         error_code = "audit_expired"
         developer_message = u"User {} had access to {} until {}".format(user, course, expiration_date)
         language = get_language()
-        expiration_date = strftime_localized(expiration_date, u'%b. %-d, %Y')
+        expiration_date = strftime_localized(expiration_date, EXPIRATION_DATE_FORMAT_STR)
         user_message = _(u"Access expired on {expiration_date}").format(expiration_date=expiration_date)
         try:
             course_name = CourseOverview.get_from_id(course.id).display_name_with_default
@@ -131,7 +132,7 @@ def generate_course_expired_message(user, course):
         upgrade_message = _('This learner does not have access to this course. '
                             u'Their access expired on {expiration_date}.')
         return HTML(upgrade_message).format(
-            expiration_date=strftime_localized(expiration_date, u'%b. %-d, %Y')
+            expiration_date=strftime_localized(expiration_date, EXPIRATION_DATE_FORMAT_STR)
         )
     else:
         enrollment = CourseEnrollment.get_enrollment(user, course.id)
@@ -161,14 +162,14 @@ def generate_course_expired_message(user, course):
         date_string = get_date_string()
         formatted_expiration_date = date_string.format(
             language=language,
-            formatted_date=expiration_date.strftime(u'%b %-d, %Y'),
-            formatted_date_localized=strftime_localized(expiration_date, u'%b %-d, %Y')
+            formatted_date=expiration_date.strftime(EXPIRATION_DATE_FORMAT_STR),
+            formatted_date_localized=strftime_localized(expiration_date, EXPIRATION_DATE_FORMAT_STR)
         )
         if using_upgrade_messaging:
             formatted_upgrade_deadline = date_string.format(
                 language=language,
-                formatted_date=upgrade_deadline.strftime(u'%b %-d, %Y'),
-                formatted_date_localized=strftime_localized(upgrade_deadline, u'%b %-d, %Y')
+                formatted_date=upgrade_deadline.strftime(EXPIRATION_DATE_FORMAT_STR),
+                formatted_date_localized=strftime_localized(upgrade_deadline, EXPIRATION_DATE_FORMAT_STR)
             )
 
             return HTML(full_message).format(

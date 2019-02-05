@@ -143,8 +143,8 @@ class TranscriptMigrationSetting(ConfigurationModel):
     """
     def __unicode__(self):
         return (
-            "[TranscriptMigrationSetting] Courses {courses} with update if already present as {force}"
-            " and commit as {commit}"
+            u"[TranscriptMigrationSetting] Courses {courses} with update if already present as {force}"
+            u" and commit as {commit}"
         ).format(
             courses='ALL' if self.all_courses else self.course_ids,
             force=self.force_update,

@@ -54,7 +54,7 @@ def format_expiration_date(expiration_date):
         date=datetime.strptime(expiration_date, '%Y-%m-%d').date(),
         time=time.max
     )
-    return expiration_datetime.strftime("%b %d %Y")
+    return expiration_datetime.strftime(u"%b %d %Y")
 
 
 def has_access_expired(expiration_date):

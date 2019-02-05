@@ -93,7 +93,7 @@ class TestPreferencesAPI(UserAPITestCase):
         # Log in the client and do the GET.
         client = self.login_client(api_client, user)
         response = self.send_get(client)
-        self.assertEqual({"dict_pref": "{'int_key': 10}", "string_pref": "value", "time_zone": "Asia/Tokyo"},
+        self.assertEqual({"dict_pref": "{'int_key': 10}", "string_pref": "value", "time_zone": "Asia/Tokyo"},  # pylint: disable=unicode-format-string
                          response.data)
 
     @ddt.data(
@@ -196,7 +196,7 @@ class TestPreferencesAPI(UserAPITestCase):
         # Verify that GET returns the updated preferences
         response = self.send_get(self.client)
         expected_preferences = {
-            "dict_pref": "{'int_key': 10}",
+            "dict_pref": "{'int_key': 10}",  # pylint: disable=unicode-format-string
             "string_pref": "updated_value",
             "new_pref": "new_value",
             "time_zone": "Europe/London",
@@ -254,10 +254,10 @@ class TestPreferencesAPI(UserAPITestCase):
         # Verify that GET returns the original preferences
         response = self.send_get(self.client)
         expected_preferences = {
-            u"dict_pref": u"{'int_key': 10}",
-            u"string_pref": u"value",
-            u"extra_pref": u"extra_value",
-            u"time_zone": u"Pacific/Midway",
+            "dict_pref": u"{'int_key': 10}",
+            "string_pref": u"value",
+            "extra_pref": u"extra_value",
+            "time_zone": u"Pacific/Midway",
         }
         self.assertEqual(expected_preferences, response.data)
 
@@ -450,7 +450,7 @@ class TestPreferencesDetailAPI(UserAPITestCase):
         set_user_preference(self.user, "dict_pref", {"int_key": 10})
         self._set_url("dict_pref")
         response = self.send_get(client)
-        self.assertEqual("{'int_key': 10}", response.data)
+        self.assertEqual(u"{'int_key': 10}", response.data)
 
     def test_create_preference(self):
         """

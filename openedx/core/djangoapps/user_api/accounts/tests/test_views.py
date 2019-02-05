@@ -620,7 +620,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
                 "This field is not editable via this API", data["field_errors"][field_name]["developer_message"]
             )
             self.assertEqual(
-                "The '{0}' field cannot be edited.".format(field_name), data["field_errors"][field_name]["user_message"]
+                u"The '{0}' field cannot be edited.".format(field_name), data["field_errors"][field_name]["user_message"]
             )
 
         for field_name in ["username", "date_joined", "is_active", "profile_image", "requires_parental_consent"]:
@@ -680,7 +680,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
             """
             self.assertEqual(3, len(change_info))
             self.assertEqual(old_name, change_info[0])
-            self.assertEqual("Name change requested through account API by {}".format(requester), change_info[1])
+            self.assertEqual(u"Name change requested through account API by {}".format(requester), change_info[1])
             self.assertIsNotNone(change_info[2])
             # Verify the new name was also stored.
             get_response = self.send_get(self.client)

@@ -55,28 +55,28 @@ def _do_third_party_auth(request):
     except User.DoesNotExist:
         AUDIT_LOG.info(
             u"Login failed - user with username {username} has no social auth "
-            "with backend_name {backend_name}".format(
+            u"with backend_name {backend_name}".format(
                 username=username, backend_name=backend_name)
         )
         message = _(
-            "You've successfully logged into your {provider_name} account, "
-            "but this account isn't linked with an {platform_name} account yet."
+            u"You've successfully logged into your {provider_name} account, "
+            u"but this account isn't linked with an {platform_name} account yet."
         ).format(
             platform_name=platform_name,
             provider_name=requested_provider.name,
         )
         message += "<br/><br/>"
         message += _(
-            "Use your {platform_name} username and password to log into {platform_name} below, "
-            "and then link your {platform_name} account with {provider_name} from your dashboard."
+            u"Use your {platform_name} username and password to log into {platform_name} below, "
+            u"and then link your {platform_name} account with {provider_name} from your dashboard."
         ).format(
             platform_name=platform_name,
             provider_name=requested_provider.name,
         )
         message += "<br/><br/>"
         message += Text(_(
-            "If you don't have an {platform_name} account yet, "
-            "click {register_label_strong} at the top of the page."
+            u"If you don't have an {platform_name} account yet, "
+            u"click {register_label_strong} at the top of the page."
         )).format(
             platform_name=platform_name,
             register_label_strong=HTML('<strong>{register_text}</strong>').format(
@@ -159,10 +159,10 @@ def _generate_not_activated_message(user):
         settings.PLATFORM_NAME
     )
 
-    not_activated_msg_template = _('In order to sign in, you need to activate your account.<br /><br />'
-                                   'We just sent an activation link to <strong>{email}</strong>.  If '
-                                   'you do not receive an email, check your spam folders or '
-                                   '<a href="{support_url}">contact {platform} Support</a>.')
+    not_activated_msg_template = _(u'In order to sign in, you need to activate your account.<br /><br />'
+                                   u'We just sent an activation link to <strong>{email}</strong>.  If '
+                                   u'you do not receive an email, check your spam folders or '
+                                   u'<a href="{support_url}">contact {platform} Support</a>.')
 
     not_activated_message = not_activated_msg_template.format(
         email=user.email,
