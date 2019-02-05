@@ -87,6 +87,7 @@ class CourseEnrollmentsApiListSerializer(CourseEnrollmentSerializer):
     Serializes CourseEnrollment model and returns a subset of fields returned
     by the CourseEnrollmentSerializer.
     """
+    course_id = serializers.CharField(source='course_overview.id')
 
     def __init__(self, *args, **kwargs):
         super(CourseEnrollmentsApiListSerializer, self).__init__(*args, **kwargs)

@@ -21,6 +21,7 @@ from course_modes.models import CourseMode
 from enrollment import api
 from enrollment.errors import CourseEnrollmentError, CourseEnrollmentExistsError, CourseModeNotFoundError
 from enrollment.forms import CourseEnrollmentsApiListForm
+from enrollment.paginators import CourseEnrollmentsApiListPagination
 from enrollment.serializers import CourseEnrollmentsApiListSerializer
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cross_domain
@@ -36,7 +37,7 @@ from openedx.core.lib.exceptions import CourseNotFoundError
 from openedx.core.lib.log_utils import audit_log
 from openedx.features.enterprise_support.api import EnterpriseApiClient, EnterpriseApiException, enterprise_enabled
 from student.auth import user_has_role
-from student.models import User, CourseEnrollment
+from student.models import CourseEnrollment, User
 from student.roles import CourseStaffRole, GlobalStaff
 from util.disable_rate_limit import can_disable_rate_limit
 
@@ -743,12 +744,6 @@ class CourseEnrollmentsApiListView(DeveloperErrorViewMixin, ListAPIView):
 
             The HTTP 200 response has the following values.
 
-            * count: The number of course enrollments matching the request.
-
-            * num_pages: The total number of pages in the result.
-
-            * current_page: The current page number.
-
             * results: A list of the course enrollments matching the request.
 
                 * created: Date and time when the course enrollment was created.
@@ -763,8 +758,6 @@ class CourseEnrollmentsApiListView(DeveloperErrorViewMixin, ListAPIView):
 
             * next: The URL to the next page of results, or null if this is the
               last page.
-
-            * start: The list index of the first item in the response.
 
             * previous: The URL to the next page of results, or null if this
               is the first page.
@@ -785,9 +778,10 @@ class CourseEnrollmentsApiListView(DeveloperErrorViewMixin, ListAPIView):
         OAuth2AuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
-    permission_classes = IsAdminUser,
-    throttle_classes = EnrollmentUserThrottle,
+    permission_classes = (IsAdminUser, )
+    throttle_classes = (EnrollmentUserThrottle, )
     serializer_class = CourseEnrollmentsApiListSerializer
+    pagination_class = CourseEnrollmentsApiListPagination
 
     def get_queryset(self):
         """

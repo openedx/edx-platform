@@ -1243,13 +1243,13 @@ class EnrollmentCrossDomainTest(ModuleStoreTestCase):
         )
 
 
-@attr(shard=3)
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class CourseEnrollmentsApiListTest(APITestCase, ModuleStoreTestCase):
     """
     Test the course enrollments api list endpoint.
     """
+    shard = 3
     CREATED_DATA = datetime.datetime(2018, 1, 1, 0, 0, 1, tzinfo=pytz.UTC)
 
     def setUp(self):
@@ -1329,12 +1329,18 @@ class CourseEnrollmentsApiListTest(APITestCase, ModuleStoreTestCase):
         self.url = reverse('courseenrollmentsapilist')
 
     def _login_as_staff(self):
+        """Login as the staff user."""
         self.client.login(username=self.staff_user.username, password='edx')
 
     def _make_request(self, query_params=None):
+        """Make a request to the course enrollments list endpoint."""
         return self.client.get(self.url, query_params)
 
     def _assert_list_of_enrollments(self, query_params=None, expected_status=status.HTTP_200_OK, error_fields=None):
+        """
+        Make a request to the CourseEnrolllmentApiList endpoint and run assertions on the response
+        using the optional parameters 'query_params', 'expected_status' and 'error_fields'.
+        """
         response = self._make_request(query_params)
         self.assertEqual(response.status_code, expected_status)
         content = json.loads(response.content)
@@ -1359,7 +1365,8 @@ class CourseEnrollmentsApiListTest(APITestCase, ModuleStoreTestCase):
         ({'course_id': '1', 'username': 'staff'}, ['course_id', ]),
         ({'username': '1*2'}, ['username', ]),
         ({'username': '1*2', 'course_id': 'org.0/course_0/Run_0'}, ['username', ]),
-        ({'username': '1*2', 'course_id': '1'}, ['username', 'course_id'])
+        ({'username': '1*2', 'course_id': '1'}, ['username', 'course_id']),
+        ({'username': ','.join(str(x) for x in range(201))}, ['username', ])
     )
     @ddt.unpack
     def test_query_string_parameters_invalid_errors(self, query_params, error_fields):

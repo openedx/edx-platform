@@ -1,3 +1,6 @@
+"""
+Forms for validating user input to the Course Enrollment related views.
+"""
 from django.core.exceptions import ValidationError
 from django.forms import CharField, Form
 
@@ -11,6 +14,7 @@ class CourseEnrollmentsApiListForm(Form):
     """
     A form that validates the query string parameters for the CourseEnrollmentsApiListView.
     """
+    MAX_USERNAME_COUNT = 200
     username = CharField(required=False)
     course_id = CharField(required=False)
 
@@ -33,6 +37,13 @@ class CourseEnrollmentsApiListForm(Form):
         usernames_csv_string = self.cleaned_data.get('username')
         if usernames_csv_string:
             usernames = usernames_csv_string.split(',')
+            if len(usernames) > self.MAX_USERNAME_COUNT:
+                raise ValidationError(
+                    "Too many usernames in a single request - {}. A maximum of {} is allowed".format(
+                        len(usernames),
+                        self.MAX_USERNAME_COUNT,
+                    )
+                )
             for username in usernames:
                 student_forms.validate_username(username)
             return usernames
