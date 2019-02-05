@@ -61,7 +61,7 @@ class AccessTokenExchangeTestMixin(ThirdPartyOAuthTestMixin):
         for field in ["access_token", "client_id"]:
             data = dict(self.data)
             del data[field]
-            self._assert_error(data, "invalid_request", "{} is required".format(field))
+            self._assert_error(data, "invalid_request", u"{} is required".format(field))
 
     def test_invalid_client(self):
         self.data["client_id"] = "nonexistent_client"
@@ -77,7 +77,7 @@ class AccessTokenExchangeTestMixin(ThirdPartyOAuthTestMixin):
         self._assert_error(
             self.data,
             "invalid_client",
-            "{}_confidential is not a public client".format(self.client_id),
+            u"{}_confidential is not a public client".format(self.client_id),
         )
 
     def test_inactive_user(self):

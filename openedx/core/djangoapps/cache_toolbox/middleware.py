@@ -107,7 +107,7 @@ class CacheBackedAuthenticationMiddleware(AuthenticationMiddleware):
             request.user = User.get_cached(session_user_id)
             if request.user.id != session_user_id:
                 log.error(
-                    "CacheBackedAuthenticationMiddleware cached user '%s' does not match requested user '%s'.",
+                    u"CacheBackedAuthenticationMiddleware cached user '%s' does not match requested user '%s'.",
                     request.user.id,
                     session_user_id,
                 )

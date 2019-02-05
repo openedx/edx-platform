@@ -1057,7 +1057,7 @@ class AddUsersToCohortTestCase(CohortViewsTestCase):
         """
         unknown = "unknown_user"
         response_dict = self.request_add_users_to_cohort(
-            " {} {}\t{}, \r\n{}".format(
+            u" {} {}\t{}, \r\n{}".format(
                 unknown,
                 self.cohort1_users[0].username,
                 self.cohort2_users[0].username,
@@ -1194,7 +1194,7 @@ class RemoveUserFromCohortTestCase(CohortViewsTestCase):
             username,
             response_dict,
             cohort,
-            expected_error_msg='No user \'{0}\''.format(username)
+            expected_error_msg=u'No user \'{0}\''.format(username)
         )
 
     def test_can_remove_user_not_in_cohort(self):

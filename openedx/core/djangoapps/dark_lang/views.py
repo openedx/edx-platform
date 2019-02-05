@@ -94,7 +94,7 @@ class PreviewLanguageFragmentView(EdxFragmentView):
         set_user_preference(request.user, DARK_LANGUAGE_KEY, preview_language)
         PageLevelMessages.register_success_message(
             request,
-            _('Language set to {preview_language}').format(
+            _(u'Language set to {preview_language}').format(
                 preview_language=preview_language
             )
         )

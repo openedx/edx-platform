@@ -228,7 +228,7 @@ class DarkLangMiddlewareTests(CacheIsolationTestCase):
 
         self.assertAcceptEquals(
             'es-419;q=1.0',
-            self.process_middleware_request(accept='{};q=1.0, pt;q=0.5'.format(latin_america_code))
+            self.process_middleware_request(accept=b'{};q=1.0, pt;q=0.5'.format(latin_america_code))
         )
 
     def assert_session_lang_equals(self, value, session):

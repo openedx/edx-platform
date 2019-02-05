@@ -500,7 +500,7 @@ class ProgramDataExtender(object):
                 try:
                     self.course_overview = CourseOverview.get_from_id(self.course_run_key)
                 except CourseOverview.DoesNotExist:
-                    log.warning('Failed to get course overview for course run key: %s',
+                    log.warning(u'Failed to get course overview for course run key: %s',
                                 self.course_run.get('key'),
                                 exec_info=True)
                 else:
@@ -695,7 +695,7 @@ class ProgramDataExtender(object):
                     'variant': bundle_variant
                 })
             except (ConnectionError, SlumberBaseException, Timeout):
-                log.exception('Failed to get discount price for following product SKUs: %s ', ', '.join(skus))
+                log.exception(u'Failed to get discount price for following product SKUs: %s ', ', '.join(skus))
                 self.data.update({
                     'discount_data': {'is_discounted': False}
                 })

@@ -109,7 +109,7 @@ class BlockStructureStore(object):
         bs_model = self._get_model(root_block_usage_key)
         self._cache.delete(self._encode_root_cache_key(bs_model))
         bs_model.delete()
-        logger.info("BlockStructure: Deleted from cache and store; %s.", bs_model)
+        logger.info(u"BlockStructure: Deleted from cache and store; %s.", bs_model)
 
     def is_up_to_date(self, root_block_usage_key, modulestore):
         """
@@ -158,7 +158,7 @@ class BlockStructureStore(object):
         """
         cache_key = self._encode_root_cache_key(bs_model)
         self._cache.set(cache_key, serialized_data, timeout=config.cache_timeout_in_seconds())
-        logger.info("BlockStructure: Added to cache; %s, size: %d", bs_model, len(serialized_data))
+        logger.info(u"BlockStructure: Added to cache; %s, size: %d", bs_model, len(serialized_data))
 
     def _get_from_cache(self, bs_model):
         """
@@ -171,7 +171,7 @@ class BlockStructureStore(object):
         serialized_data = self._cache.get(cache_key)
 
         if not serialized_data:
-            logger.info("BlockStructure: Not found in cache; %s.", bs_model)
+            logger.info(u"BlockStructure: Not found in cache; %s.", bs_model)
             raise BlockStructureNotFound(bs_model.data_usage_key)
         return serialized_data
 

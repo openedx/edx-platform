@@ -30,8 +30,7 @@ def runchecks(include_extended=False):
                 'message': message
             }
         except ImportError as e:
-            raise ImproperlyConfigured('Error importing module %s: "%s"' % (module, e))
+            raise ImproperlyConfigured(u'Error importing module %s: "%s"' % (module, e))
         except AttributeError:
-            raise ImproperlyConfigured('Module "%s" does not define a "%s" callable' % (module, attr))
-
+            raise ImproperlyConfigured(u'Module "%s" does not define a "%s" callable' % (module, attr))
     return response_dict
