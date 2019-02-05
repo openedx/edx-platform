@@ -835,26 +835,38 @@ ECOMMERCE_SERVICE_WORKER_USERNAME = __config__.get(
 
 ##### Custom Courses for EdX #####
 if FEATURES.get('CUSTOM_COURSES_EDX'):
-    INSTALLED_APPS += ['lms.djangoapps.ccx', 'openedx.core.djangoapps.ccxcon.apps.CCXConnectorConfig']
-    MODULESTORE_FIELD_OVERRIDE_PROVIDERS += (
-        'lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider',
-    )
+
+    
+    # We have to check if this has been added yet until aws.py is removed because otherwise falling back to aws.py may
+    # add a duplicate to this list
+    if 'lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider' not in MODULESTORE_FIELD_OVERRIDE_PROVIDERS:
+        MODULESTORE_FIELD_OVERRIDE_PROVIDERS += ('lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider')
+    
 CCX_MAX_STUDENTS_ALLOWED = __config__.get('CCX_MAX_STUDENTS_ALLOWED', CCX_MAX_STUDENTS_ALLOWED)
 
 ##### Individual Due Date Extensions #####
 if FEATURES.get('INDIVIDUAL_DUE_DATES'):
-    FIELD_OVERRIDE_PROVIDERS += (
-        'courseware.student_field_overrides.IndividualStudentOverrideProvider',
-    )
+    
+    # We have to check if this has been added yet until aws.py is removed because otherwise falling back to aws.py may
+    # add a duplicate to this list
+    if 'courseware.student_field_overrides.IndividualStudentOverrideProvider' not in FIELD_OVERRIDE_PROVIDERS:
+        FIELD_OVERRIDE_PROVIDERS += ('courseware.student_field_overrides.IndividualStudentOverrideProvider')
+    
 
 ##### Self-Paced Course Due Dates #####
-XBLOCK_FIELD_DATA_WRAPPERS += (
-    'lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap',
-)
+if 'lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap' not in XBLOCK_FIELD_DATA_WRAPPERS:
+    
+    # We have to check if this has been added yet until aws.py is removed because otherwise falling back to aws.py may
+    # add a duplicate to this list
+    XBLOCK_FIELD_DATA_WRAPPERS += ('lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap')
 
-MODULESTORE_FIELD_OVERRIDE_PROVIDERS += (
-    'courseware.self_paced_overrides.SelfPacedDateOverrideProvider',
-)
+
+if 'courseware.self_paced_overrides.SelfPacedDateOverrideProvider' not in MODULESTORE_FIELD_OVERRIDE_PROVIDERS:
+    
+    # We have to check if this has been added yet until aws.py is removed because otherwise falling back to aws.py may
+    # add a duplicate to this list
+    MODULESTORE_FIELD_OVERRIDE_PROVIDERS += ('courseware.self_paced_overrides.SelfPacedDateOverrideProvider')
+
 
 # PROFILE IMAGE CONFIG
 PROFILE_IMAGE_BACKEND = __config__.get('PROFILE_IMAGE_BACKEND', PROFILE_IMAGE_BACKEND)

@@ -108,7 +108,8 @@ if STATIC_URL_BASE:
     STATIC_URL = STATIC_URL_BASE.encode('ascii')
     if not STATIC_URL.endswith("/"):
         STATIC_URL += "/"
-    STATIC_URL += 'studio/'
+    if not STATIC_URL.endswith("studio/"):
+        STATIC_URL += "studio/"
 
 # DEFAULT_COURSE_ABOUT_IMAGE_URL specifies the default image to show for courses that don't provide one
 DEFAULT_COURSE_ABOUT_IMAGE_URL = __config__.get('DEFAULT_COURSE_ABOUT_IMAGE_URL', DEFAULT_COURSE_ABOUT_IMAGE_URL)
@@ -611,7 +612,7 @@ COURSE_ENROLLMENT_MODES = __config__.get('COURSE_ENROLLMENT_MODES', COURSE_ENROL
 # after aws.py is removed, we should remove these lines.
 
 from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants  # pylint: disable=wrong-import-order, wrong-import-position
-plugin_settings.add_plugins("lms.envs.aws", plugin_constants.ProjectType.CMS, plugin_constants.SettingsType.DEPRECATED_AWS)
+plugin_settings.add_plugins("cms.envs.aws", plugin_constants.ProjectType.CMS, plugin_constants.SettingsType.DEPRECATED_AWS)
 
 # We continue to load production.py over aws.py
 from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants  # pylint: disable=wrong-import-order, wrong-import-position
