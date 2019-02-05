@@ -24,7 +24,7 @@ nose==1.3.7               # via matplotlib
 numpy==1.6.2
 pycparser==2.19
 pyparsing==2.2.0
-python-dateutil==2.7.5    # via matplotlib
+python-dateutil==2.8.0    # via matplotlib
 scipy==0.14.0
 singledispatch==3.4.0.3
 six==1.11.0

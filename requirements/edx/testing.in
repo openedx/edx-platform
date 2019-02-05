@@ -30,7 +30,6 @@ freezegun                 # Allows tests to mock the output of assorted datetime
 httpretty                 # Library for mocking HTTP requests, used in many tests
 isort                     # For checking and fixing the order of imports
 moto==0.3.1               # Lets tests mock AWS access via the boto library
-pa11ycrawler              # Python crawler (using Scrapy) that uses Pa11y to check accessibility of pages as it crawls
 pycodestyle               # Checker for compliance with the Python style guide (PEP 8)
 polib                     # Library for manipulating gettext translation files, used to test paver i18n commands
 pyquery                   # jQuery-like API for retrieving fragments of HTML and XML files in tests
@@ -52,3 +51,4 @@ transifex-client          # Command-line interface for the Transifex localizatio
 
 # Deprecated acceptance testing framework
 -e git+https://github.com/edx/lettuce.git@7a04591c78ac56dac3eb3e91ca94b15cce844133#egg=lettuce==0.2.23+edx.1
+-e git+https://github.com/edx/pa11ycrawler.git@youngstrom/reqs-pin#egg=pa11ycrawler-mike
