@@ -4,7 +4,7 @@ import sys
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.cache import cache
-from django.core.management import BaseCommand
+from django.core.management import BaseCommand, CommandError
 
 from openedx.core.djangoapps.catalog.cache import (
     PATHWAY_CACHE_KEY_TPL,
@@ -93,7 +93,7 @@ class Command(BaseCommand):
         if failure:
             # This will fail a Jenkins job running this command, letting site
             # operators know that there was a problem.
-            sys.exit(1)
+            raise CommandError("Caching program information failed")
 
     def get_site_program_uuids(self, client, site):
         failure = False
