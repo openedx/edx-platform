@@ -49,22 +49,22 @@ def setup_acceptance_db():
 
         # Copy the cached database to the test root directory
         for db_alias in DBS:
-            sh("cp {db_cache} {db}".format(db_cache=DB_CACHES[db_alias], db=DBS[db_alias]))
+            sh(u"cp {db_cache} {db}".format(db_cache=DB_CACHES[db_alias], db=DBS[db_alias]))
 
         # Run migrations to update the db, starting from its cached state
         for db_alias in sorted(DBS):
             # pylint: disable=line-too-long
-            sh("./manage.py lms --settings {} migrate --traceback --noinput --fake-initial --database {}".format(settings, db_alias))
-            sh("./manage.py cms --settings {} migrate --traceback --noinput --fake-initial --database {}".format(settings, db_alias))
+            sh(u"./manage.py lms --settings {} migrate --traceback --noinput --fake-initial --database {}".format(settings, db_alias))
+            sh(u"./manage.py cms --settings {} migrate --traceback --noinput --fake-initial --database {}".format(settings, db_alias))
     else:
         # If no cached database exists, migrate then create the cache
         for db_alias in sorted(DBS.keys()):
-            sh("./manage.py lms --settings {} migrate --traceback --noinput --database {}".format(settings, db_alias))
-            sh("./manage.py cms --settings {} migrate --traceback --noinput --database {}".format(settings, db_alias))
+            sh(u"./manage.py lms --settings {} migrate --traceback --noinput --database {}".format(settings, db_alias))
+            sh(u"./manage.py cms --settings {} migrate --traceback --noinput --database {}".format(settings, db_alias))
 
         # Create the cache if it doesn't already exist
         for db_alias in DBS.keys():
-            sh("cp {db} {db_cache}".format(db_cache=DB_CACHES[db_alias], db=DBS[db_alias]))
+            sh(u"cp {db} {db_cache}".format(db_cache=DB_CACHES[db_alias], db=DBS[db_alias]))
 
 
 class AcceptanceTest(TestSuite):
@@ -95,7 +95,7 @@ class AcceptanceTest(TestSuite):
 
         lettuce_host = ['LETTUCE_HOST={}'.format(Env.SERVER_HOST)] if Env.USING_DOCKER else []
         report_file = self.report_dir / "{}.xml".format(self.system)
-        report_args = ["--xunit-file {}".format(report_file)]
+        report_args = [u"--xunit-file {}".format(report_file)]
         return lettuce_host + [
             # set DBUS_SESSION_BUS_ADDRESS to avoid hangs on Chrome
             "DBUS_SESSION_BUS_ADDRESS=/dev/null",
@@ -150,7 +150,7 @@ class AcceptanceTestSuite(TestSuite):
             for default_store in stores:
                 kwargs['system'] = system
                 kwargs['default_store'] = default_store
-                self.subsuites.append(AcceptanceTest('{} acceptance using {}'.format(system, default_store), **kwargs))
+                self.subsuites.append(AcceptanceTest(u'{} acceptance using {}'.format(system, default_store), **kwargs))
 
     def __enter__(self):
         super(AcceptanceTestSuite, self).__enter__()

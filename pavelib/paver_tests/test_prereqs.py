@@ -30,7 +30,7 @@ class TestPaverPrereqInstall(unittest.TestCase):
         self.assertEqual(
             pavelib.prereqs.no_prereq_install(),
             expected_val,
-            'NO_PREREQ_INSTALL is set to {}, but we read it as {}'.format(
+            u'NO_PREREQ_INSTALL is set to {}, but we read it as {}'.format(
                 set_val, expected_val),
         )
 

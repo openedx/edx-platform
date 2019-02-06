@@ -121,7 +121,7 @@ def prereq_cache(cache_name, paths, install_func):
             post_install_hash = compute_fingerprint(paths)
             cache_file.write(post_install_hash)
     else:
-        print('{cache} unchanged, skipping...'.format(cache=cache_name))
+        print(u'{cache} unchanged, skipping...'.format(cache=cache_name))
 
 
 def node_prereqs_installation():
@@ -157,7 +157,7 @@ def node_prereqs_installation():
             proc.wait()
         else:
             raise BuildFailure(error_text)
-    print("Successfully installed NPM packages. Log found at {}".format(
+    print(u"Successfully installed NPM packages. Log found at {}".format(
         npm_log_file_path
     ))
 
@@ -173,7 +173,7 @@ def python_prereqs_installation():
 def pip_install_req_file(req_file):
     """Pip install the requirements file."""
     pip_cmd = 'pip install -q --disable-pip-version-check --exists-action w'
-    sh("{pip_cmd} -r {req_file}".format(pip_cmd=pip_cmd, req_file=req_file))
+    sh(u"{pip_cmd} -r {req_file}".format(pip_cmd=pip_cmd, req_file=req_file))
 
 
 @task
@@ -243,7 +243,7 @@ def uninstall_python_packages():
         for package_name in PACKAGES_TO_UNINSTALL:
             if package_in_frozen(package_name, frozen):
                 # Uninstall the pacakge
-                sh("pip uninstall --disable-pip-version-check -y {}".format(package_name))
+                sh(u"pip uninstall --disable-pip-version-check -y {}".format(package_name))
                 uninstalled = True
         if not uninstalled:
             break
@@ -337,7 +337,7 @@ def install_prereqs():
 
 def log_installed_python_prereqs():
     """  Logs output of pip freeze for debugging. """
-    sh("pip freeze > {}".format(Env.GEN_LOG_DIR + "/pip_freeze.log"))
+    sh(u"pip freeze > {}".format(Env.GEN_LOG_DIR + "/pip_freeze.log"))
     return
 
 

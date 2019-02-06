@@ -42,13 +42,13 @@ def start_servers(options):
 
     for service, info in Env.BOK_CHOY_SERVERS.iteritems():
         address = "0.0.0.0:{}".format(info['port'])
-        cmd = ("DEFAULT_STORE={default_store} ").format(default_store=options.default_store)
+        cmd = (u"DEFAULT_STORE={default_store} ").format(default_store=options.default_store)
         if coveragerc:
-            cmd += ("coverage run --rcfile={coveragerc} -m ").format(coveragerc=coveragerc)
+            cmd += (u"coverage run --rcfile={coveragerc} -m ").format(coveragerc=coveragerc)
         else:
             cmd += "python -m "
         cmd += (
-            "manage {service} --settings {settings} runserver "
+            u"manage {service} --settings {settings} runserver "
             "{address} --traceback --noreload".format(
                 service=service,
                 settings=Env.SETTINGS,
@@ -59,7 +59,7 @@ def start_servers(options):
 
     for service, info in Env.BOK_CHOY_STUBS.iteritems():
         cmd = (
-            "python -m stubs.start {service} {port} "
+            u"python -m stubs.start {service} {port} "
             "{config}".format(
                 service=service,
                 port=info['port'],
@@ -74,7 +74,7 @@ def wait_for_server(server, port):
     Wait for a server to respond with status 200
     """
     print(
-        "Checking server {server} on port {port}".format(
+        u"Checking server {server} on port {port}".format(
             server=server,
             port=port,
         )
@@ -114,7 +114,7 @@ def wait_for_test_servers():
         if not ready:
             msg = colorize(
                 "red",
-                "Could not contact {} test server".format(service)
+                u"Could not contact {} test server".format(service)
             )
             print(msg)
             sys.exit(1)
@@ -126,7 +126,7 @@ def is_mongo_running():
     """
     # The mongo command will connect to the service,
     # failing with a non-zero exit code if it cannot connect.
-    output = os.popen('mongo --host {} --eval "print(\'running\')"'.format(Env.MONGO_HOST)).read()
+    output = os.popen(u'mongo --host {} --eval "print(\'running\')"'.format(Env.MONGO_HOST)).read()
     return output and "running" in output
 
 
@@ -158,7 +158,7 @@ def clear_mongo():
     Clears mongo database.
     """
     sh(
-        "mongo --host {} {} --eval 'db.dropDatabase()' > /dev/null".format(
+        u"mongo --host {} {} --eval 'db.dropDatabase()' > /dev/null".format(
             Env.MONGO_HOST,
             Env.BOK_CHOY_MONGO_DATABASE,
         )

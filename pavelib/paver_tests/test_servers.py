@@ -48,7 +48,7 @@ EXPECTED_PRINT_SETTINGS_COMMAND = [
 ]
 EXPECTED_WEBPACK_COMMAND = (
     u"NODE_ENV={node_env} STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms} "
-    "$(npm bin)/webpack --config={webpack_config_path}"
+    u"$(npm bin)/webpack --config={webpack_config_path}"
 )
 
 
@@ -167,7 +167,7 @@ class TestPaverServerTasks(PaverTestCase):
         settings = options.get("settings", Env.DEVSTACK_SETTINGS)
         call_task("pavelib.servers.update_db", options=options)
         # pylint: disable=line-too-long
-        db_command = "NO_EDXAPP_SUDO=1 EDX_PLATFORM_SETTINGS_OVERRIDE={settings} /edx/bin/edxapp-migrate-{server} --traceback --pythonpath=. "
+        db_command = u"NO_EDXAPP_SUDO=1 EDX_PLATFORM_SETTINGS_OVERRIDE={settings} /edx/bin/edxapp-migrate-{server} --traceback --pythonpath=. "
         self.assertEquals(
             self.task_messages,
             [
@@ -192,8 +192,8 @@ class TestPaverServerTasks(PaverTestCase):
         self.assertEquals(
             self.task_messages,
             [
-                "echo 'import {system}.envs.{settings}' "
-                "| python manage.py {system} --settings={settings} shell --plain --pythonpath=.".format(
+                u"echo 'import {system}.envs.{settings}' "
+                u"| python manage.py {system} --settings={settings} shell --plain --pythonpath=.".format(
                     system=system, settings=settings
                 ),
             ]

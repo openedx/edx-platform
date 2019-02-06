@@ -131,9 +131,9 @@ def i18n_validate_transifex_config():
     if not config.isfile or config.getsize == 0:
         msg = colorize(
             'red',
-            "Cannot connect to Transifex, config file is missing"
-            " or empty: {config} \nSee "
-            "http://help.transifex.com/features/client/#transifexrc \n".format(
+            u"Cannot connect to Transifex, config file is missing"
+            u" or empty: {config} \nSee "
+            u"http://help.transifex.com/features/client/#transifexrc \n".format(
                 config=config,
             )
         )
