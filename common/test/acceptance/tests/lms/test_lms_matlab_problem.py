@@ -21,7 +21,7 @@ class MatlabProblemTest(ProblemsTest):
         """
         Create a matlab problem for the test.
         """
-        problem_data = dedent("""
+        problem_data = dedent(u"""
             <problem markdown="null">
                   <text>
                     <p>

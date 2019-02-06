@@ -113,7 +113,7 @@ class UsersPageMixin(PageObject):
 
     def modal_dialog_text(self, dialog_type):
         """ Gets modal dialog text """
-        return self.q(css='.prompt.{dialog_type} .message'.format(dialog_type=dialog_type)).text[0]
+        return self.q(css=u'.prompt.{dialog_type} .message'.format(dialog_type=dialog_type)).text[0]
 
     def wait_until_no_loading_indicator(self):
         """
@@ -204,7 +204,7 @@ class UserWrapper(PageObject):
     def __init__(self, browser, email):
         super(UserWrapper, self).__init__(browser)
         self.email = email
-        self.selector = '.user-list .user-item[data-email="{}"]'.format(self.email)
+        self.selector = u'.user-list .user-item[data-email="{}"]'.format(self.email)
 
     def is_browser_on_page(self):
         """
@@ -216,7 +216,7 @@ class UserWrapper(PageObject):
         """
         Return `selector`, but limited to this particular user entry's context
         """
-        return '{} {}'.format(self.selector, selector)
+        return u'{} {}'.format(self.selector, selector)
 
     @property
     def name(self):

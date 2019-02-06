@@ -104,7 +104,7 @@ class ActivationEmailTests(CacheIsolationTestCase):
         u"high-quality {platform} courses".format(platform=settings.PLATFORM_NAME),
         "http://edx.org/activate/",
         (
-            "please use our web form at "
+            u"please use our web form at "
             u"{support_url} ".format(support_url=settings.SUPPORT_SITE_LINK)
         )
     ]

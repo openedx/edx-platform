@@ -56,8 +56,8 @@ class TeamsTabBase(EventsTestMixin, ForumsConfigMixin, UniqueCourseTest):
             team = {
                 'course_id': self.course_id,
                 'topic_id': topic['id'],
-                'name': 'Team {}'.format(i),
-                'description': 'Description {}'.format(i),
+                'name': u'Team {}'.format(i),
+                'description': u'Description {}'.format(i),
                 'language': 'aa',
                 'country': 'AF'
             }
@@ -623,7 +623,7 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         self.assertEqual(search_results_page.header_name, 'Team Search')
         self.assertEqual(
             search_results_page.header_description,
-            'Showing results for "{search_query}"'.format(search_query=search_query)
+            u'Showing results for "{search_query}"'.format(search_query=search_query)
         )
 
     def verify_on_page(self, teams_page, page_num, total_teams, pagination_header_text, footer_visible):
@@ -916,7 +916,7 @@ class TeamFormActions(TeamsTabBase):
             title='Create a New Team',
             description='Create a new team if you can\'t find an existing team to join, '
                         'or if you would like to learn with friends you know.',
-            breadcrumbs='All Topics {topic_name}'.format(topic_name=self.topic['name'])
+            breadcrumbs=u'All Topics {topic_name}'.format(topic_name=self.topic['name'])
         )
 
     def verify_and_navigate_to_edit_team_page(self):
@@ -933,7 +933,7 @@ class TeamFormActions(TeamsTabBase):
             title='Edit Team',
             description='If you make significant changes, make sure you notify '
                         'members of the team before making these changes.',
-            breadcrumbs='All Topics {topic_name} {team_name}'.format(
+            breadcrumbs=u'All Topics {topic_name} {team_name}'.format(
                 topic_name=self.topic['name'],
                 team_name=self.team['name']
             )

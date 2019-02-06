@@ -386,7 +386,7 @@ class CourseEntitlement(TimeStampedModel):
                 mode=entitlement.mode
             )
         except CourseEnrollmentException:
-            log.exception('Login for Course Entitlement {uuid} failed'.format(uuid=entitlement.uuid))
+            log.exception(u'Login for Course Entitlement {uuid} failed'.format(uuid=entitlement.uuid))
             return False
 
         entitlement.set_enrollment(enrollment)
@@ -432,7 +432,7 @@ class CourseEntitlement(TimeStampedModel):
         if not refund_successful:
             # This state is achieved in most cases by a failure in the ecommerce service to process the refund.
             log.warn(
-                'Entitlement Refund failed for Course Entitlement [%s], alert User',
+                u'Entitlement Refund failed for Course Entitlement [%s], alert User',
                 self.uuid
             )
             # Force Transaction reset with an Integrity error exception, this will revert all previous transactions

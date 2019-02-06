@@ -999,7 +999,7 @@ class CertificatesTest(BaseInstructorDashboardTest):
         self.certificates_section.add_certificate_exception(self.user_name, '')
 
         self.assertIn(
-            '{user} already in exception list.'.format(user=self.user_name),
+            u'{user} already in exception list.'.format(user=self.user_name),
             self.certificates_section.message.text
         )
 
@@ -1046,7 +1046,7 @@ class CertificatesTest(BaseInstructorDashboardTest):
         self.certificates_section.wait_for_ajax()
 
         self.assertIn(
-            "{user} does not exist in the LMS. Please check your spelling and retry.".format(user=invalid_user),
+            u"{user} does not exist in the LMS. Please check your spelling and retry.".format(user=invalid_user),
             self.certificates_section.message.text
         )
 
@@ -1079,7 +1079,7 @@ class CertificatesTest(BaseInstructorDashboardTest):
         self.certificates_section.wait_for_ajax()
 
         self.assertIn(
-            "{user} is not enrolled in this course. Please check your spelling and retry.".format(user=new_user),
+            u"{user} is not enrolled in this course. Please check your spelling and retry.".format(user=new_user),
             self.certificates_section.message.text
         )
 
@@ -1217,7 +1217,7 @@ class CertificateInvalidationTest(BaseInstructorDashboardTest):
 
         # Validate success message
         self.assertIn(
-            "Certificate has been successfully invalidated for {user}.".format(user=self.student_name),
+            u"Certificate has been successfully invalidated for {user}.".format(user=self.student_name),
             self.certificates_section.certificate_invalidation_message.text
         )
 

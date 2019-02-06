@@ -76,7 +76,7 @@ class ProblemClarificationTest(ProblemsTest):
         """
         Create a problem with a <clarification>
         """
-        xml = dedent("""
+        xml = dedent(u"""
             <problem markdown="null">
                 <text>
                     <p>
@@ -705,7 +705,7 @@ class ProblemQuestionDescriptionTest(ProblemsTest):
         """
         Create a problem with question and description.
         """
-        xml = dedent("""
+        xml = dedent(u"""
             <problem>
                 <choiceresponse>
                     <label>Eggplant is a _____?</label>

@@ -48,7 +48,7 @@ class NestedVerticalTest(ContainerBase):
         self.group_a_item_1_action_index = 0
         self.group_a_item_2_action_index = 1
 
-        self.duplicate_label = "Duplicate of '{0}'"
+        self.duplicate_label = u"Duplicate of '{0}'"
         self.discussion_label = "Discussion"
 
         course_fixture.add_children(
@@ -286,7 +286,7 @@ class BaseGroupConfigurationsTest(ContainerBase):
             self.assertEqual("Access is not restricted", visibility_editor.current_groups_message)
         else:
             self.assertEqual(
-                "Access is restricted to: {groups}".format(groups=expected_current_groups),
+                u"Access is restricted to: {groups}".format(groups=expected_current_groups),
                 visibility_editor.current_groups_message
             )
 
@@ -1236,8 +1236,8 @@ class MoveComponentTest(ContainerBase):
         }
         self.source_component_display_name = 'HTML 11'
         self.source_xblock_category = 'component'
-        self.message_move = 'Success! "{display_name}" has been moved.'
-        self.message_undo = 'Move cancelled. "{display_name}" has been moved back to its original location.'
+        self.message_move = u'Success! "{display_name}" has been moved.'
+        self.message_undo = u'Move cancelled. "{display_name}" has been moved back to its original location.'
 
     def populate_course_fixture(self, course_fixture):
         """

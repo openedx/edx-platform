@@ -58,7 +58,7 @@ def skip_if_browser(browser):
         @functools.wraps(test_function)
         def wrapper(self, *args, **kwargs):
             if self.browser.name == browser:
-                raise SkipTest('Skipping as this test will not work with {}'.format(browser))
+                raise SkipTest(u'Skipping as this test will not work with {}'.format(browser))
             test_function(self, *args, **kwargs)
         return wrapper
     return decorator
@@ -102,7 +102,7 @@ def is_focused_on_element(browser, selector):
     """
     Check if the focus is on the element that matches the selector.
     """
-    return browser.execute_script("return $('{}').is(':focus')".format(selector))
+    return browser.execute_script(u"return $('{}').is(':focus')".format(selector))
 
 
 def load_data_str(rel_path):
@@ -159,7 +159,7 @@ def disable_css_animations(page):
     """
     Disable CSS3 animations, transitions, transforms.
     """
-    page.browser.execute_script("""
+    page.browser.execute_script(u"""
         var id = 'no-transitions';
 
         // if styles were already added, just do nothing.
@@ -236,7 +236,7 @@ def select_option_by_text(select_browser_query, option_text, focus_out=False):
         except StaleElementReferenceException:
             return False
 
-    msg = 'Selected option {}'.format(option_text)
+    msg = u'Selected option {}'.format(option_text)
     EmptyPromise(lambda: select_option(select_browser_query, option_text), msg).fulfill()
 
 
@@ -350,7 +350,7 @@ def get_element_padding(page, selector):
         progress_page.get_element_padding('.wrapper-msg.wrapper-auto-cert')
 
     """
-    js_script = """
+    js_script = u"""
         var $element = $('%(selector)s');
 
         element_padding = {
@@ -380,7 +380,7 @@ def create_multiple_choice_xml(correct_choice=2, num_choices=4):
     choices[correct_choice] = True
 
     choice_names = ['choice_{}'.format(index) for index in range(num_choices)]
-    question_text = 'The correct answer is Choice {}'.format(correct_choice)
+    question_text = u'The correct answer is Choice {}'.format(correct_choice)
 
     return MultipleChoiceResponseXMLFactory().build_xml(
         question_text=question_text,
@@ -434,7 +434,7 @@ def assert_opened_help_link_is_correct(test, url):
     # Check that the URL loads. Can't do this in the browser because it might
     # be loading a "Maze Found" missing content page.
     response = requests.get(url)
-    test.assertEqual(response.status_code, 200, "URL {!r} returned {}".format(url, response.status_code))
+    test.assertEqual(response.status_code, 200, u"URL {!r} returned {}".format(url, response.status_code))
 
 
 EDX_BOOKS = {
@@ -560,7 +560,7 @@ class EventsTestMixin(TestCase):
             # This is a bit of a hack, Promise calls str(description), so I set the description to an object with a
             # custom __str__ and have it do some intelligent stuff to generate a helpful error message.
             CollectedEventsDescription(
-                'Waiting for {number_of_matches} events to match the filter:\n{event_filter}'.format(
+                u'Waiting for {number_of_matches} events to match the filter:\n{event_filter}'.format(
                     number_of_matches=number_of_matches,
                     event_filter=self.event_filter_to_descriptive_string(event_filter),
                 ),
@@ -855,7 +855,7 @@ class YouTubeStubConfig(object):
 
         if not response.ok:
             raise YouTubeConfigError(
-                'YouTube Server Configuration Failed. URL {0}, Configuration Data: {1}, Status was {2}'.format(
+                u'YouTube Server Configuration Failed. URL {0}, Configuration Data: {1}, Status was {2}'.format(
                     youtube_stub_config_url, config, response.status_code))
 
     @classmethod
@@ -873,7 +873,7 @@ class YouTubeStubConfig(object):
 
         if not response.ok:
             raise YouTubeConfigError(
-                'YouTube Server Configuration Failed. URL: {0} Status was {1}'.format(
+                u'YouTube Server Configuration Failed. URL: {0} Status was {1}'.format(
                     youtube_stub_config_url, response.status_code))
 
     @classmethod

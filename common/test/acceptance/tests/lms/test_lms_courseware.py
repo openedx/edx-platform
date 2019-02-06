@@ -113,9 +113,9 @@ class CoursewareTest(UniqueCourseTest):
         """
         xblocks = self.course_fix.get_nested_xblocks(category="problem")
         for index in range(1, len(xblocks) + 1):
-            test_section_title = 'Test Section {}'.format(index)
-            test_subsection_title = 'Test Subsection {}'.format(index)
-            test_unit_title = 'Test Problem {}'.format(index)
+            test_section_title = u'Test Section {}'.format(index)
+            test_subsection_title = u'Test Subsection {}'.format(index)
+            test_unit_title = u'Test Problem {}'.format(index)
             self.course_home_page.visit()
             self.course_home_page.outline.go_to_section(test_section_title, test_subsection_title)
             course_nav = self.courseware_page.nav
