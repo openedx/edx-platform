@@ -813,7 +813,7 @@ class RegistrationView(APIView):
 
         terms_link = marketing_link("TOS")
 
-        if configuration_helpers.get_value('combine_privacy_and_tos', True):
+        if configuration_helpers.get_value('combine_privacy_and_tos', False):
             terms_label = _(u"Terms of Service and Privacy Policy")
             terms_text = _(u"Review the Terms of Service and Privacy Policy")
         else:
