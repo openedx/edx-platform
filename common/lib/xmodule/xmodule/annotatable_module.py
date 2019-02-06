@@ -25,7 +25,7 @@ class AnnotatableFields(object):
         <annotatable>
             <instructions>
                 <p>Enter your (optional) instructions for the exercise in HTML format.</p>
-                <p>Annotations are specified by an <code>{anotation_tag}</code> tag which may may have the following attributes:</p>
+                <p>Annotations are specified by an <code>{annotation_tag}</code> tag which may may have the following attributes:</p>
                 <ul class="instructions-template">
                     <li><code>title</code> (optional). Title of the annotation. Defaults to <i>Commentary</i> if omitted.</li>
                     <li><code>body</code> (<b>required</b>). Text of the annotation.</li>

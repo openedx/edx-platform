@@ -167,7 +167,9 @@
             e.preventDefault();
             if (!$(this.markdown_editor.getWrapperElement()).parent().find('.simple-editor-cheatsheet')[0]) {
                 this.cheatsheet = $($('#simple-editor-cheatsheet').html());
-                $(this.markdown_editor.getWrapperElement()).after(this.cheatsheet);
+                $(this.markdown_editor.getWrapperElement()).after(  // xss-lint: disable=javascript-jquery-insertion
+                    this.cheatsheet
+                );
             }
             this.toggleCheatsheetVisibility();
             return setTimeout((function() {

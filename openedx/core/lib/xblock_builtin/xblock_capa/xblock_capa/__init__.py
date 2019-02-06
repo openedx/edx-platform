@@ -46,6 +46,7 @@ from xblock_capa.lib.xqueue_interface import XQueueInterface
 
 log = logging.getLogger(__name__)
 loader = ResourceLoader(__name__)  # pylint: disable=invalid-name
+FEATURES = getattr(settings, 'FEATURES', {})
 
 
 @XBlock.wants('user')
@@ -140,7 +141,7 @@ class CapaXBlock(XBlock, CapaMixin, ResourceTemplates, XmlParserMixin, IndexInfo
     data = XMLString(
         help=_("XML data for the problem"),
         scope=Scope.content,
-        enforce_type=settings.FEATURES.get('ENABLE_XBLOCK_XML_VALIDATION', True),
+        enforce_type=FEATURES.get('ENABLE_XBLOCK_XML_VALIDATION', True),
         default="<problem></problem>"
     )
     correct_map = Dict(help=_("Dictionary with the correctness of current student answers"),

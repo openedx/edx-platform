@@ -14,7 +14,9 @@
             '></div>'
         );
 
-            $('#inputtype_' + state.problemId).before(state.containerEl);
+            $('#inputtype_' + state.problemId).before(  // xss-lint: disable=javascript-jquery-insertion
+                state.containerEl
+            );
         }
     }); // End-of: define([], function () {
 }(RequireJS.requirejs, RequireJS.require, RequireJS.define)); // End-of: (function (requirejs, require, define) {
