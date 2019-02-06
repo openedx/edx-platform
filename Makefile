@@ -1,5 +1,5 @@
 # Do things in edx-platform
-.PHONY: clean extract_translations help pull_translations push_translations requirements upgrade
+.PHONY: clean extract_translations help pull pull_translations push_translations requirements shell upgrade
 
 # Careful with mktemp syntax: it has to work on Mac and Ubuntu, which have differences.
 PRIVATE_FILES := $(shell mktemp -u /tmp/private_files.XXXXXX)
@@ -37,8 +37,18 @@ pull_translations: ## pull translations from Transifex
 detect_changed_source_translations: ## check if translation files are up-to-date
 	i18n_tool changed
 
+pull: ## update the Docker image used by "make shell"
+	docker pull edxops/edxapp:latest
+
 requirements: ## install development environment requirements
 	pip install -qr requirements/edx/development.txt --exists-action w
+
+shell: ## launch a bash shell in a Docker container with all edx-platform dependencies installed
+	docker run -it -e "NO_PYTHON_UNINSTALL=1" -e "PIP_INDEX_URL=https://pypi.python.org/simple" -e TERM \
+	-v `pwd`:/edx/app/edxapp/edx-platform:cached \
+	-v edxapp_lms_assets:/edx/var/edxapp/staticfiles/ \
+	-v edxapp_node_modules:/edx/app/edxapp/edx-platform/node_modules \
+	edxops/edxapp:latest /edx/app/edxapp/devstack.sh open
 
 # Order is very important in this list: files must appear after everything they include!
 REQ_FILES = \
