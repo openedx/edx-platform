@@ -312,7 +312,7 @@ class CourseMode(models.Model):
 
     @classmethod
     @request_cached(CACHE_NAMESPACE)
-    def modes_for_course(cls, course_id, include_expired=False, only_selectable=True):
+    def modes_for_course(cls, course_id=None, include_expired=False, only_selectable=True, course=None):
         """
         Returns a list of the non-expired modes for a given course id
 
@@ -330,11 +330,25 @@ class CourseMode(models.Model):
                 aren't available to users until they complete the course, so
                 they are hidden in track selection.)
 
+            course (CourseOverview): The course to select course modes from.
+
         Returns:
             list of `Mode` tuples
 
         """
-        found_course_modes = cls.objects.filter(course_id=course_id)
+        if course_id is None and course is None:
+            raise ValueError("One of course_id or course must not be None.")
+
+        if course is not None and not isinstance(course, CourseOverview):
+            # CourseModules don't have the data needed to pull related modes,
+            # so we'll fall back on course_id-based lookup instead
+            course_id = course.id
+            course = None
+
+        if course_id is not None:
+            found_course_modes = cls.objects.filter(course_id=course_id)
+        else:
+            found_course_modes = course.modes
 
         # Filter out expired course modes if include_expired is not set
         if not include_expired:
@@ -347,7 +361,10 @@ class CourseMode(models.Model):
         # we exclude them from the list if we're only looking for selectable modes
         # (e.g. on the track selection page or in the payment/verification flows).
         if only_selectable:
-            found_course_modes = found_course_modes.exclude(mode_slug__in=cls.CREDIT_MODES)
+            if course is not None and hasattr(course, 'selectable_modes'):
+                found_course_modes = course.selectable_modes
+            else:
+                found_course_modes = found_course_modes.exclude(mode_slug__in=cls.CREDIT_MODES)
 
         modes = ([mode.to_tuple() for mode in found_course_modes])
         if not modes:
@@ -356,7 +373,7 @@ class CourseMode(models.Model):
         return modes
 
     @classmethod
-    def modes_for_course_dict(cls, course_id, modes=None, **kwargs):
+    def modes_for_course_dict(cls, course_id=None, modes=None, **kwargs):
         """Returns the non-expired modes for a particular course.
 
         Arguments:
@@ -418,7 +435,7 @@ class CourseMode(models.Model):
             return None
 
     @classmethod
-    def verified_mode_for_course(cls, course_id, modes=None, include_expired=False):
+    def verified_mode_for_course(cls, course_id=None, modes=None, include_expired=False, course=None):
         """Find a verified mode for a particular course.
 
         Since we have multiple modes that can go through the verify flow,
@@ -439,7 +456,12 @@ class CourseMode(models.Model):
             Mode or None
 
         """
-        modes_dict = cls.modes_for_course_dict(course_id, modes=modes, include_expired=include_expired)
+        modes_dict = cls.modes_for_course_dict(
+            course_id=course_id,
+            modes=modes,
+            include_expired=include_expired,
+            course=course
+        )
         verified_mode = modes_dict.get('verified', None)
         professional_mode = modes_dict.get('professional', None)
         # we prefer professional over verify
@@ -703,7 +725,7 @@ class CourseMode(models.Model):
         Takes a mode model and turns it into a model named tuple.
 
         Returns:
-            A 'Model' namedtuple with all the same attributes as the model.
+            A 'Mode' namedtuple with all the same attributes as the model.
 
         """
         return Mode(

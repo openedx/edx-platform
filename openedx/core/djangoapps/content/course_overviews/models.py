@@ -409,7 +409,8 @@ class CourseOverview(TimeStampedModel):
         migrate and test switching to display_name_with_default, which is no
         longer escaped.
         """
-        return block_metadata_utils.display_name_with_default_escaped(self)
+        # pylint: disable=line-too-long
+        return block_metadata_utils.display_name_with_default_escaped(self)  # xss-lint: disable=python-deprecated-display-name
 
     @property
     def dashboard_start_display(self):
@@ -560,7 +561,7 @@ class CourseOverview(TimeStampedModel):
     @classmethod
     def get_all_courses(cls, orgs=None, filter_=None):
         """
-        Returns all CourseOverview objects in the database.
+        Return a queryset containing all CourseOverview objects in the database.
 
         Arguments:
             orgs (list[string]): Optional parameter that allows case-insensitive
