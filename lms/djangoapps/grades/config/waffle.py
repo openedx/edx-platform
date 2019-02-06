@@ -41,10 +41,10 @@ def waffle_flags():
             ENFORCE_FREEZE_GRADE_AFTER_COURSE_END,
             flag_undefined_default=True,
         ),
-        # By default, do not enable a gradebook with writable grades.  Can be enabled on per-course basis.
+        # Have this course override flag so we can selectively turn off the gradebook for courses.
         WRITABLE_GRADEBOOK: CourseWaffleFlag(
             namespace,
             WRITABLE_GRADEBOOK,
-            flag_undefined_default=False,
+            flag_undefined_default=True,
         ),
     }
