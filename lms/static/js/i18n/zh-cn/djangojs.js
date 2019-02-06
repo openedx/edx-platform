@@ -103,7 +103,9 @@
     "Add Country": "\u6dfb\u52a0\u56fd\u5bb6", 
     "Add Students": "\u6dfb\u52a0\u5b66\u751f", 
     "Add a New Cohort": "\u6dfb\u52a0\u65b0\u7fa4\u7ec4", 
+    "Add a Post": "\u6dfb\u52a0\u4e00\u4e2a\u8ba8\u8bba\u5e16", 
     "Add a Response": "\u6dfb\u52a0\u56de\u590d", 
+    "Add a clear and descriptive title to encourage participation. (Required)": "\u6dfb\u52a0\u6e05\u6670\u7684\u63cf\u8ff0\u6027\u6807\u9898\u4ee5\u9f13\u52b1\u53c2\u4e0e\u3002 \uff08\u5fc5\u586b\uff09", 
     "Add a comment": "\u6dfb\u52a0\u8bc4\u8bba", 
     "Add a response:": "\u6dfb\u52a0\u4e00\u6761\u56de\u590d\uff1a", 
     "Add language": "\u6dfb\u52a0\u8bed\u8a00", 
@@ -111,6 +113,7 @@
     "Add students to this cohort": "\u5c06\u5b66\u751f\u52a0\u5165\u5230\u8be5\u7fa4\u7ec4\u4e2d", 
     "Add to Dictionary": "\u52a0\u5165\u5230\u5b57\u5178", 
     "Add to Exception List": "\u6dfb\u52a0\u5230\u7279\u6b8a\u5904\u7406\u5217\u8868", 
+    "Add your post to a relevant topic to help others find it. (Required)": "\u5c06\u60a8\u7684\u5e16\u5b50\u6dfb\u52a0\u5230\u76f8\u5173\u4e3b\u9898\u4ee5\u5e2e\u52a9\u5176\u4ed6\u4eba\u627e\u5230\u5b83\u3002 \uff08\u5fc5\u586b\uff09", 
     "Adding": "\u6b63\u5728\u6dfb\u52a0", 
     "Adding the selected course to your cart": "\u6b63\u5728\u5c06\u60a8\u6240\u9009\u7684\u8bfe\u7a0b\u6dfb\u52a0\u5230\u60a8\u7684\u8d2d\u7269\u8f66", 
     "Additional Information": "\u5176\u4ed6\u4fe1\u606f", 
@@ -768,6 +771,7 @@
     "Please verify that you have uploaded a valid image (PNG and JPEG).": "\u8bf7\u9a8c\u8bc1\u60a8\u5df2\u4e0a\u4f20\u4e86\u4e00\u5f20\u6709\u6548\u7684\u56fe\u7247(PNG\u6216JPEG\u683c\u5f0f)\u3002", 
     "Please verify that your webcam is connected and that you have allowed your browser to access it.": "\u8bf7\u68c0\u67e5\u60a8\u7684\u6444\u50cf\u5934\u5df2\u8fde\u63a5\u5e76\u4e14\u5141\u8bb8\u6d4f\u89c8\u5668\u4f7f\u7528\u5b83\u3002", 
     "Post body": "\u5e16\u5b50\u5185\u5bb9", 
+    "Post type": "\u90ae\u5bc4\u7c7b\u578b", 
     "Poster": "\u5c01\u9762", 
     "Pre": "Pre \u6807\u7b7e", 
     "Preferred Language": "\u9996\u9009\u8bed\u8a00", 
@@ -793,6 +797,7 @@
     "Publish": "\u53d1\u5e03", 
     "Publishing": "\u6b63\u5728\u53d1\u5e03", 
     "Question": "\u95ee\u9898", 
+    "Questions raise issues that need answers. Discussions share ideas and start conversations. (Required)": "\u95ee\u9898\u63d0\u51fa\u4e86\u9700\u8981\u7b54\u6848\u7684\u95ee\u9898\u3002\u8ba8\u8bba\u5206\u4eab\u60f3\u6cd5\u5e76\u5f00\u59cb\u5bf9\u8bdd\u3002 \uff08\u5fc5\u586b\uff09", 
     "Queued": "\u5df2\u6392\u961f", 
     "Reason": "\u539f\u56e0", 
     "Reason field should not be left blank.": "\u539f\u56e0\u4e0d\u80fd\u4e3a\u7a7a\u3002", 
@@ -1078,6 +1083,7 @@
     "Tools": "\u5de5\u5177", 
     "Top": "\u9876\u7aef", 
     "Topic": "\u4e3b\u9898", 
+    "Topic area": "\u4e3b\u9898\u533a", 
     "Topics": "\u4e3b\u9898", 
     "Total": "\u603b\u8ba1", 
     "Transcript will be displayed when you start playing the video.": "\u5f53\u4f60\u5f00\u59cb\u64ad\u653e\u89c6\u9891\u65f6\u5c06\u663e\u793a\u5b57\u5e55\u3002", 
@@ -1135,6 +1141,7 @@
     "Upset Learner": "\u611f\u5230\u4e0d\u6ee1\u610f\u7684\u5b66\u751f", 
     "Url": "URL", 
     "Use my institution/campus credentials": "\u4f7f\u7528\u6211\u7684\u673a\u6784/\u6821\u56ed\u5e10\u53f7", 
+    "Use the All Topics menu to find specific topics.": "\u4f7f\u7528\u201c\u6240\u6709\u4e3b\u9898\u201d\u83dc\u5355\u67e5\u627e\u7279\u5b9a\u4e3b\u9898\u3002", 
     "Use the retake photo button if you are not pleased with your photo": "\u5982\u679c\u60a8\u5bf9\u7167\u7247\u4e0d\u6ee1\u610f\uff0c\u8bf7\u4f7f\u7528\u91cd\u62cd\u6309\u94ae\u91cd\u65b0\u62cd\u4e00\u5f20\u7167\u7247", 
     "Use your webcam to take a photo of your ID. We will match this photo with the photo of your face and the name on your account.": "\u8bf7\u7528\u6444\u50cf\u5934\u62cd\u6444\u4e00\u5f20\u60a8\u8eab\u4efd\u8bc1\u4ef6\u7684\u7167\u7247\uff0c\u6211\u4eec\u5c06\u67e5\u770b\u8be5\u7167\u7247\u662f\u5426\u4e0e\u60a8\u7684\u9762\u90e8\u7167\u7247\u53ca\u60a8\u5728\u8d26\u6237\u4e2d\u586b\u5199\u7684\u59d3\u540d\u5339\u914d\u3002", 
     "Use your webcam to take a photo of your face. We will match this photo with the photo on your ID.": "\u8bf7\u7528\u6444\u50cf\u5934\u62cd\u6444\u4e00\u5f20\u60a8\u7684\u9762\u90e8\u7167\u7247\uff0c\u6211\u4eec\u5c06\u5bf9\u6bd4\u8be5\u7167\u7247\u4e0e\u60a8\u8eab\u4efd\u8bc1\u4ef6\u4e0a\u7684\u7167\u7247\u3002", 
@@ -1257,6 +1264,7 @@
     "Your message must have a subject.": "\u60a8\u7684\u6d88\u606f\u5fc5\u987b\u6709\u4e00\u4e2a\u6807\u9898\u3002", 
     "Your policy changes have been saved.": "\u60a8\u7684\u7b56\u7565\u53d8\u66f4\u5df2\u4fdd\u5b58\u3002", 
     "Your post will be discarded.": "\u60a8\u7684\u5e16\u5b50\u5c06\u88ab\u64a4\u9500\u3002", 
+    "Your question or idea (required)": "\u4f60\u7684\u95ee\u9898\u6216\u60f3\u6cd5\uff08\u5fc5\u586b\uff09", 
     "Your request could not be completed. Reload the page and try again.": "\u60a8\u7684\u8bf7\u6c42\u65e0\u6cd5\u5b8c\u6210\u3002\u5237\u65b0\u9875\u9762\uff0c\u7136\u540e\u91cd\u8bd5\u3002", 
     "Your request could not be completed. Reload the page and try again. If the issue persists, click the Help tab to report the problem.": "\u60a8\u7684\u8bf7\u6c42\u65e0\u6cd5\u5b8c\u6210\u3002\u91cd\u65b0\u52a0\u8f7d\u9875\u9762\u5e76\u91cd\u8bd5\u3002\u5982\u679c\u95ee\u9898\u4ecd\u7136\u5b58\u5728\uff0c\u70b9\u51fb\u201c\u5e2e\u52a9\u201d\u9009\u9879\u62a5\u544a\u95ee\u9898\u3002", 
     "Your team could not be created.": "\u65e0\u6cd5\u521b\u5efa\u60a8\u7684\u56e2\u961f\u3002", 
@@ -1284,6 +1292,7 @@
     "correct": "\u6b63\u786e", 
     "course id": "\u8bfe\u7a0bID", 
     "discussion": "\u8ba8\u8bba", 
+    "discussion posted %(time_ago)s by %(author)s": "\u8ba8\u8bba\u53d1\u5e03 %(time_ago)s by %(author)s", 
     "dragging": "\u62d6\u62fd", 
     "dragging out of slider": "\u62d6\u62fd\u51fa\u6ed1\u5757\u533a\u57df", 
     "dropped in slider": "\u5728\u6ed1\u5757\u4e2d\u653e\u4e0b", 
@@ -1333,8 +1342,14 @@
     "{numPresent} student was already in the cohort": [
       "{numPresent} \u4e2a\u5b66\u751f\u5df2\u5728\u6b64\u961f\u5217"
     ], 
+    "{numResponses} response": [
+      "{numResponses} \u56de\u590d"
+    ], 
     "{numUsersAdded} student has been added to this cohort": [
       "{numUsersAdded} \u4e2a\u5b66\u751f\u5df2\u6dfb\u52a0\u81f3\u6b64\u961f\u5217"
+    ], 
+    "{numVotes} Vote": [
+      "{numVotes} \u7968"
     ], 
     "{organization}\\'s logo": "{organization}\\'s \u7684\u6807\u8bc6", 
     "{platform_name} learners can see my:": "\u5bf9{platform_name}\u7528\u6237\u53ef\u89c1\uff1a", 

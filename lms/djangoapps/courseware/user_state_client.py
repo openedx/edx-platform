@@ -271,15 +271,26 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         evt_time = time()
 
         for usage_key, state in block_keys_to_state.items():
-            student_module, created = StudentModule.objects.get_or_create(
-                student=user,
-                course_id=usage_key.course_key,
-                module_state_key=usage_key,
-                defaults={
-                    'state': json.dumps(state),
-                    'module_type': usage_key.block_type,
-                },
-            )
+            try:
+                student_module, created = StudentModule.objects.get_or_create(
+                    student=user,
+                    course_id=usage_key.course_key,
+                    module_state_key=usage_key,
+                    defaults={
+                        'state': json.dumps(state),
+                        'module_type': usage_key.block_type,
+                    },
+                )
+            except IntegrityError:
+                # PLAT-1109 - Until we switch to read committed, we cannot rely
+                # on get_or_create to be able to see rows created in another
+                # process. This seems to happen frequently, and ignoring it is the
+                # best course of action for now
+                log.warning(
+                    "set_many: IntegrityError for student {} - course_id {} - usage key {}".format(
+                        user, repr(unicode(usage_key.course_key)), usage_key
+                    ))
+                return
 
             num_fields_before = num_fields_after = num_new_fields_set = len(state)
             num_fields_updated = 0
