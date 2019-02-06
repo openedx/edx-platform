@@ -128,7 +128,8 @@ class StartDateError(AccessError):
             user_message = _(u"Course has not started")
         else:
             developer_message = u"Course does not start until {}".format(start_date)
-            user_message = _(u"Course does not start until {}").format("{:%B %d, %Y}".format(start_date))
+            user_message = _(u"Course does not start until {}"
+                             .format(u"{:%B %d, %Y}".format(start_date)))
         super(StartDateError, self).__init__(error_code, developer_message, user_message)
 
 

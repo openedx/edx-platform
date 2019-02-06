@@ -211,7 +211,7 @@ class TestGetCourseListMultipleCourses(CourseListTestMixin, ModuleStoreTestCase)
             self.assertEquals(
                 {course.id for course in filtered_courses},
                 {course.id for course in expected_courses},
-                "testing course_api.api.list_courses with filter_={}".format(filter_),
+                u"testing course_api.api.list_courses with filter_={}".format(filter_),
             )
 
 

@@ -1641,7 +1641,7 @@ class CreateThreadTest(
                 self.assertNotIn("group_id", actual_post_data)
         except ValidationError as ex:
             if not expected_error:
-                self.fail("Unexpected validation error: {}".format(ex))
+                self.fail(u"Unexpected validation error: {}".format(ex))
 
     def test_following(self):
         self.register_post_thread_response({"id": "test_id", "username": self.user.username})

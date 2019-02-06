@@ -225,8 +225,8 @@ class ViewsTestCaseMixin(object):
                 parent_location=self.course.location,
                 category='discussion',
                 discussion_id='id_module_{}'.format(i),
-                discussion_category='Category {}'.format(i),
-                discussion_target='Discussion {}'.format(i)
+                discussion_category=u'Category {}'.format(i),
+                discussion_target=u'Discussion {}'.format(i)
             )
 
         # seed the forums permissions and roles
@@ -2297,7 +2297,7 @@ class ForumThreadViewedEventTransformerTestCase(ForumsEnableMixin, UrlResetMixin
             topic_id=self.category.discussion_id,
         )
         self.assertEqual(event_trans_2['event'].get('category_id'), self.category.discussion_id)
-        full_category_name = '{0} / {1}'.format(self.category.discussion_category, self.category.discussion_target)
+        full_category_name = u'{0} / {1}'.format(self.category.discussion_category, self.category.discussion_target)
         self.assertEqual(event_trans_2['event'].get('category_name'), full_category_name)
 
     def test_roles(self):

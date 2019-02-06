@@ -168,7 +168,7 @@ def has_access(user, action, obj, course_key=None):
 
     # Passing an unknown object here is a coding error, so rather than
     # returning a default, complain.
-    raise TypeError("Unknown object type in has_access(): '{0}'"
+    raise TypeError(u"Unknown object type in has_access(): '{0}'"
                     .format(type(obj)))
 
 
@@ -273,7 +273,7 @@ def _can_enroll_courselike(user, courselike):
         if cea and cea.valid_for_user(user):
             return ACCESS_GRANTED
         elif cea:
-            debug("Deny: CEA was already consumed by a different user {} and can't be used again by {}".format(
+            debug(u"Deny: CEA was already consumed by a different user {} and can't be used again by {}".format(
                 cea.user.id,
                 user.id,
             ))
@@ -474,7 +474,7 @@ def _has_group_access(descriptor, user, course_key):
                     partitions.append(partition)
             else:
                 log.debug(
-                    "Skipping partition with ID %s in course %s because it is no longer active",
+                    u"Skipping partition with ID %s in course %s because it is no longer active",
                     partition.id, course_key
                 )
         except NoSuchUserPartitionError:
@@ -640,7 +640,7 @@ def _has_access_string(user, action, perm):
         Checks for staff access
         """
         if perm != 'global':
-            debug("Deny: invalid permission '%s'", perm)
+            debug(u"Deny: invalid permission '%s'", perm)
             return ACCESS_DENIED
         return ACCESS_GRANTED if GlobalStaff().has_user(user) else ACCESS_DENIED
 
@@ -672,7 +672,7 @@ def _dispatch(table, action, user, obj):
     """
     if action in table:
         result = table[action]()
-        debug("%s user %s, object %s, action %s",
+        debug(u"%s user %s, object %s, action %s",
               'ALLOWED' if result else 'DENIED',
               user,
               text_type(obj.location) if isinstance(obj, XBlock) else str(obj),
@@ -741,7 +741,7 @@ def _has_access_to_course(user, access_level, course_key):
         return ACCESS_GRANTED
 
     if access_level not in ('staff', 'instructor'):
-        log.debug("Error in access._has_access_to_course access_level=%s unknown", access_level)
+        log.debug(u"Error in access._has_access_to_course access_level=%s unknown", access_level)
         debug("Deny: unknown access level")
         return ACCESS_DENIED
 

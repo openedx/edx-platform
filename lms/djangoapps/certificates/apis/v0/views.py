@@ -96,7 +96,7 @@ class CertificatesDetailView(GenericAPIView):
         try:
             course_key = CourseKey.from_string(course_id)
         except InvalidKeyError:
-            log.warning('Course ID string "%s" is not valid', course_id)
+            log.warning(u'Course ID string "%s" is not valid', course_id)
             return Response(
                 status=404,
                 data={'error_code': 'course_id_not_valid'}

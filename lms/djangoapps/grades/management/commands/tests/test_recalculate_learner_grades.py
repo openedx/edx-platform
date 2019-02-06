@@ -12,7 +12,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 
-DATE_FORMAT = "%Y-%m-%d %H:%M"
+DATE_FORMAT = u"%Y-%m-%d %H:%M"
 
 
 class TestRecalculateLearnerGrades(HasCourseWithProblemsMixin, ModuleStoreTestCase):

@@ -61,7 +61,7 @@ class ThreadListGetForm(_PaginationForm):
         try:
             return CourseLocator.from_string(value)
         except InvalidKeyError:
-            raise ValidationError("'{}' is not a valid course id".format(value))
+            raise ValidationError(u"'{}' is not a valid course id".format(value))
 
     def clean_following(self):
         """Validate following"""
@@ -78,7 +78,7 @@ class ThreadListGetForm(_PaginationForm):
         )
         if exclusive_params_count > 1:
             raise ValidationError(
-                "The following query parameters are mutually exclusive: {}".format(
+                u"The following query parameters are mutually exclusive: {}".format(
                     ", ".join(self.EXCLUSIVE_PARAMS)
                 )
             )

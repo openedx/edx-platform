@@ -494,7 +494,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         # Construct the link according the following scenarios and verify its presence in the response:
         #      (1) shopping cart is enabled and the user is not logged in
         #      (2) shopping cart is enabled and the user is logged in
-        href = '<a href="{uri_stem}?sku={sku}" class="add-to-cart">'.format(
+        href = u'<a href="{uri_stem}?sku={sku}" class="add-to-cart">'.format(
             uri_stem=configuration.basket_checkout_page,
             sku=sku,
         )
@@ -502,7 +502,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         # Generate the course about page content
         response = self.client.get(reverse('about_course', args=[unicode(course.id)]))
         self.assertEqual(response.status_code, 200)
-        self.assertIn(href, response.content)
+        self.assertIn(href, response.content.decode(response.charset))
 
     @ddt.data(True, False)
     def test_ecommerce_checkout(self, is_anonymous):
@@ -2320,7 +2320,7 @@ class ViewCheckerBlock(XBlock):
         A student_view that asserts that the ``state`` field for this block
         matches the block's usage_id.
         """
-        msg = "{} != {}".format(self.state, self.scope_ids.usage_id)
+        msg = u"{} != {}".format(self.state, self.scope_ids.usage_id)
         assert self.state == unicode(self.scope_ids.usage_id), msg
         fragments = self.runtime.render_children(self)
         result = Fragment(

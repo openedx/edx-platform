@@ -195,7 +195,7 @@ class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreT
             self.assertEquals(
                 {course['course_id'] for course in response.data['results']},
                 {unicode(course.id) for course in expected_courses},
-                "testing course_api.views.CourseListView with filter_={}".format(filter_),
+                u"testing course_api.views.CourseListView with filter_={}".format(filter_),
             )
 
 

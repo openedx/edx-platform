@@ -120,7 +120,7 @@ def has_required_keys(xblock):
     for key in ('discussion_id', 'discussion_category', 'discussion_target'):
         if getattr(xblock, key, None) is None:
             log.debug(
-                "Required key '%s' not in discussion %s, leaving out of category map",
+                u"Required key '%s' not in discussion %s, leaving out of category map",
                 key,
                 xblock.location
             )
@@ -692,7 +692,7 @@ def extend_content(content):
             roles = dict(('name', role.name.lower()) for role in user.roles.filter(course_id=content['course_id']))
         except User.DoesNotExist:
             log.error(
-                'User ID %s in comment content %s but not in our DB.',
+                u'User ID %s in comment content %s but not in our DB.',
                 content.get('user_id'),
                 content.get('id')
             )
@@ -774,7 +774,7 @@ def prepare_content(content, course_key, is_staff=False, discussion_division_ena
                 endorser = User.objects.get(pk=endorsement["user_id"])
             except User.DoesNotExist:
                 log.error(
-                    "User ID %s in endorsement for comment %s but not in our DB.",
+                    u"User ID %s in endorsement for comment %s but not in our DB.",
                     content.get('user_id'),
                     content.get('id')
                 )

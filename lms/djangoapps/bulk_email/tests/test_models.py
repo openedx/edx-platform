@@ -129,7 +129,7 @@ class CourseEmailTest(ModuleStoreTestCase):
         target = email.targets.all()[0]
         self.assertEqual(target.target_type, SEND_TO_TRACK)
         self.assertEqual(target.short_display(), 'track-{}'.format(free_mode))
-        self.assertEqual(target.long_display(), 'Course mode: {}'.format(mode_display_name))
+        self.assertEqual(target.long_display(), u'Course mode: {}'.format(mode_display_name))
 
     def test_cohort_target(self):
         course_id = CourseKey.from_string('abc/123/doremi')
@@ -232,7 +232,7 @@ class CourseEmailTemplateTest(TestCase):
         template = CourseEmailTemplate.get_template()
         context = self._add_xss_fields(self._get_sample_html_context())
         message = template.render_htmltext(
-            "Dear %%USER_FULLNAME%%, thanks for enrolling in %%COURSE_DISPLAY_NAME%%.", context
+            u"Dear %%USER_FULLNAME%%, thanks for enrolling in %%COURSE_DISPLAY_NAME%%.", context
         )
         self.assertNotIn("<script>", message)
         self.assertIn("&lt;script&gt;alert(&#39;Course Title!&#39;);&lt;/alert&gt;", message)
@@ -247,7 +247,7 @@ class CourseEmailTemplateTest(TestCase):
         template = CourseEmailTemplate.get_template()
         context = self._add_xss_fields(self._get_sample_plain_context())
         message = template.render_plaintext(
-            "Dear %%USER_FULLNAME%%, thanks for enrolling in %%COURSE_DISPLAY_NAME%%.", context
+            u"Dear %%USER_FULLNAME%%, thanks for enrolling in %%COURSE_DISPLAY_NAME%%.", context
         )
         self.assertNotIn("&lt;script&gt;", message)
         self.assertIn(context['course_title'], message)
