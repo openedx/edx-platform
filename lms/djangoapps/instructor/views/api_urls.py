@@ -17,8 +17,6 @@ urlpatterns = patterns(
         'lms.djangoapps.instructor.views.api.modify_access', name="modify_access"),
     url(r'^bulk_beta_modify_access$',
         'lms.djangoapps.instructor.views.api.bulk_beta_modify_access', name="bulk_beta_modify_access"),
-    url(r'^get_problem_responses$',
-        'lms.djangoapps.instructor.views.api.get_problem_responses', name="get_problem_responses"),
     url(r'^get_grading_config$',
         'lms.djangoapps.instructor.views.api.get_grading_config', name="get_grading_config"),
     url(r'^get_students_features(?P<csv>/csv)?$',
@@ -63,8 +61,6 @@ urlpatterns = patterns(
         name="mark_student_can_skip_entrance_exam"
     ),
 
-    url(r'^list_instructor_tasks$',
-        'lms.djangoapps.instructor.views.api.list_instructor_tasks', name="list_instructor_tasks"),
     url(r'^list_background_email_tasks$',
         'lms.djangoapps.instructor.views.api.list_background_email_tasks', name="list_background_email_tasks"),
     url(r'^list_email_content$',
@@ -89,8 +85,6 @@ urlpatterns = patterns(
         'lms.djangoapps.instructor.views.api.get_proctored_exam_results', name="get_proctored_exam_results"),
 
     # Grade downloads...
-    url(r'^list_report_downloads$',
-        'lms.djangoapps.instructor.views.api.list_report_downloads', name="list_report_downloads"),
     url(r'calculate_grades_csv$',
         'lms.djangoapps.instructor.views.api.calculate_grades_csv', name="calculate_grades_csv"),
     url(r'problem_grade_report$',

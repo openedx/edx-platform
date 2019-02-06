@@ -6602,13 +6602,13 @@ msgstr "Todos los Grupos"
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-edit.underscore
 msgid ""
 "Add a clear and descriptive title to encourage participation. (Required)"
-msgstr ""
+msgstr "Agregue un título claro y descriptivo para fomentar la participación. (Necesario)"
 
 #: common/static/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
 msgid "Your question or idea (required)"
-msgstr ""
+msgstr "Tu pregunta o idea (requerida)"
 
 #: common/static/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/common/templates/discussion/new-post.underscore
@@ -6841,7 +6841,7 @@ msgstr "Añadir un comentario"
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-show.underscore
 #, python-format
 msgid "discussion posted %(time_ago)s by %(author)s"
-msgstr ""
+msgstr "discusión publicada %(time_ago)s by %(author)s"
 
 #: common/static/common/templates/discussion/thread-show.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-show.underscore
@@ -6926,7 +6926,7 @@ msgstr "Área Temática"
 #: test_root/staticfiles/common/templates/discussion/topic.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/topic.underscore
 msgid "Add your post to a relevant topic to help others find it. (Required)"
-msgstr ""
+msgstr "Agrega tu publicación a un tema relevante para ayudar a otros a encontrarla. (Necesario)"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 #: test_root/staticfiles/discussion/templates/discussion-home.underscore

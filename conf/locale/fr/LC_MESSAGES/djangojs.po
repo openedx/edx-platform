@@ -6565,13 +6565,13 @@ msgstr "Tous les groupes"
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-edit.underscore
 msgid ""
 "Add a clear and descriptive title to encourage participation. (Required)"
-msgstr ""
+msgstr "Ajoutez un titre clair et descriptif pour encourager la participation. (Champs obligatoires)"
 
 #: common/static/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
 msgid "Your question or idea (required)"
-msgstr ""
+msgstr "Votre question ou idée (obligatoire)"
 
 #: common/static/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/common/templates/discussion/new-post.underscore
@@ -6804,7 +6804,7 @@ msgstr "Ajouter un commentaire"
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-show.underscore
 #, python-format
 msgid "discussion posted %(time_ago)s by %(author)s"
-msgstr ""
+msgstr "discussion postée %(time_ago)s by %(author)s"
 
 #: common/static/common/templates/discussion/thread-show.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-show.underscore
@@ -6851,7 +6851,7 @@ msgstr "Type de message"
 msgid ""
 "Questions raise issues that need answers. Discussions share ideas and start "
 "conversations. (Required)"
-msgstr ""
+msgstr "Les questions soulèvent des questions qui nécessitent des réponses.Les discussions échangent des idées et entament des conversations. (Champs obligatoires)"
 
 #: common/static/common/templates/discussion/thread-type.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-type.underscore
@@ -6881,13 +6881,13 @@ msgstr "Ajouter une réponse"
 #: test_root/staticfiles/common/templates/discussion/topic.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/topic.underscore
 msgid "Topic area"
-msgstr ""
+msgstr "domaine"
 
 #: common/static/common/templates/discussion/topic.underscore
 #: test_root/staticfiles/common/templates/discussion/topic.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/topic.underscore
 msgid "Add your post to a relevant topic to help others find it. (Required)"
-msgstr ""
+msgstr "Ajoutez votre message à un sujet pertinent pour aider les autres à le trouver. (Champs obligatoires)"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 #: test_root/staticfiles/discussion/templates/discussion-home.underscore
