@@ -5,7 +5,12 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 describe('Problem', function() {
-  const problem_content_default = readFixtures('problem_content.html');
+  const problem_content_default = readFixtures('common/js/fixtures/problem_content.html'),
+        mock_runtime = {
+        handlerUrl: function(el, path) {
+            return '/problem/Problem1/' + path;
+        }
+  };
 
   beforeEach(function() {
     // Stub MathJax
@@ -25,11 +30,11 @@ describe('Problem', function() {
     // this msg is coming from the stubRequests function else clause.
     jasmine.stubRequests();
 
-    loadFixtures('problem.html');
+    loadFixtures('common/js/fixtures/problem.html');
 
     spyOn(Logger, 'log');
     spyOn($.fn, 'load').and.callFake(function(url, callback) {
-      $(this).html(readFixtures('problem_content.html'));
+      $(this).html(readFixtures('common/js/fixtures/problem_content.html'));
       return callback();
     });
   });
@@ -38,20 +43,20 @@ describe('Problem', function() {
 
     it('set the element from html', function() {
       this.problem999 = new Problem((`\
-<section class='xblock xblock-student_view xmodule_display xmodule_CapaModule' data-type='Problem'> \
+<section class='xblock xblock-student_view xblock-student_view-problem' data-type='Problem'> \
 <section id='problem_999' \
 class='problems-wrapper' \
 data-problem-id='i4x://edX/999/problem/Quiz' \
 data-url='/problem/quiz/'> \
 </section> \
 </section>\
-`)
-      );
+`),
+      mock_runtime);
       expect(this.problem999.element_id).toBe('problem_999');
     });
 
     it('set the element from loadFixtures', function() {
-      this.problem1 = new Problem($('.xblock-student_view'));
+      this.problem1 = new Problem($('.xblock-student_view'), mock_runtime);
       expect(this.problem1.element_id).toBe('problem_1');
     });
   });
@@ -60,7 +65,7 @@ data-url='/problem/quiz/'> \
     beforeEach(function() {
       spyOn(window, 'update_schematics');
       MathJax.Hub.getAllJax.and.returnValue([this.stubbedJax]);
-      this.problem = new Problem($('.xblock-student_view'));
+      this.problem = new Problem($('.xblock-student_view'), mock_runtime);
     });
 
     it('set mathjax typeset', () => expect(MathJax.Hub.Queue).toHaveBeenCalled());
@@ -96,8 +101,8 @@ data-url='/problem/quiz/'> \
     beforeEach(function() {
       spyOn(window, 'update_schematics');
       MathJax.Hub.getAllJax.and.returnValue([this.stubbedJax]);
-      this.problem = new Problem($('.xblock-student_view'));
-      return $(this).html(readFixtures('problem_content_1240.html'));
+      this.problem = new Problem($('.xblock-student_view'), mock_runtime);
+      return $(this).html(readFixtures('common/js/fixtures/problem_content_1240.html'));
     });
 
     it('bind the submit button', function() {
@@ -112,7 +117,7 @@ data-url='/problem/quiz/'> \
 
   describe('renderProgressState', function() {
     beforeEach(function() {
-      this.problem = new Problem($('.xblock-student_view'));
+      this.problem = new Problem($('.xblock-student_view'), mock_runtime);
     });
 
     const testProgessData = function(problem, score, total_possible, attempts, graded, expected_progress_after_render) {
@@ -210,7 +215,7 @@ data-url='/problem/quiz/'> \
 
   describe('render', function() {
     beforeEach(function() {
-      this.problem = new Problem($('.xblock-student_view'));
+      this.problem = new Problem($('.xblock-student_view'), mock_runtime);
       this.bind = this.problem.bind;
       spyOn(this.problem, 'bind');
     });
@@ -249,7 +254,7 @@ data-url='/problem/quiz/'> \
     beforeEach(function() {
       // Insert an input of type file outside of the problem.
       $('.xblock-student_view').after('<input type="file" />');
-      this.problem = new Problem($('.xblock-student_view'));
+      this.problem = new Problem($('.xblock-student_view'), mock_runtime);
       spyOn(this.problem, 'submit');
     });
 
@@ -261,7 +266,7 @@ data-url='/problem/quiz/'> \
 
   describe('submit', function() {
     beforeEach(function() {
-      this.problem = new Problem($('.xblock-student_view'));
+      this.problem = new Problem($('.xblock-student_view'), mock_runtime);
       this.problem.answers = 'foo=1&bar=2';
     });
 
@@ -378,7 +383,7 @@ data-url='/problem/quiz/'> \
   describe('submit button on problems', function() {
 
     beforeEach(function() {
-      this.problem = new Problem($('.xblock-student_view'));
+      this.problem = new Problem($('.xblock-student_view'), mock_runtime);
       this.submitDisabled = disabled => {
         if (disabled) {
           expect(this.problem.submitButton).toHaveAttr('disabled');
@@ -398,8 +403,8 @@ data-url='/problem/quiz/'> \
     );
 
     describe('some advanced tests for submit button', function() {
-      const radioButtonProblemHtml = readFixtures('radiobutton_problem.html');
-      const checkboxProblemHtml = readFixtures('checkbox_problem.html');
+      const radioButtonProblemHtml = readFixtures('common/js/fixtures/radiobutton_problem.html');
+      const checkboxProblemHtml = readFixtures('common/js/fixtures/checkbox_problem.html');
 
       it('should become enabled after a checkbox is checked', function() {
         $('#input_example_1').replaceWith(checkboxProblemHtml);
@@ -465,7 +470,7 @@ data-url='/problem/quiz/'> \
 
   describe('reset', function() {
     beforeEach(function() {
-      this.problem = new Problem($('.xblock-student_view'));
+      this.problem = new Problem($('.xblock-student_view'), mock_runtime);
     });
 
     it('log the problem_reset event', function() {
@@ -552,7 +557,7 @@ data-url='/problem/quiz/'> \
 
   describe('show problem with column in id', function() {
     beforeEach(function () {
-      this.problem = new Problem($('.xblock-student_view'));
+      this.problem = new Problem($('.xblock-student_view'), mock_runtime);
       this.problem.el.prepend('<div id="answer_1_1:11" /><div id="answer_1_2:12" />');
     });
 
@@ -587,7 +592,7 @@ data-url='/problem/quiz/'> \
 
   describe('show', function() {
     beforeEach(function() {
-      this.problem = new Problem($('.xblock-student_view'));
+      this.problem = new Problem($('.xblock-student_view'), mock_runtime);
       this.problem.el.prepend('<div id="answer_1_1" /><div id="answer_1_2" />');
     });
 
@@ -678,7 +683,7 @@ data-url='/problem/quiz/'> \
 
       describe('imageinput', function() {
         let el, height, width;
-        const imageinput_html = readFixtures('imageinput.underscore');
+        const imageinput_html = readFixtures('common/js/fixtures/imageinput.underscore');
 
         const DEFAULTS = {
           id: '12345',
@@ -687,7 +692,7 @@ data-url='/problem/quiz/'> \
         };
 
         beforeEach(function() {
-          this.problem = new Problem($('.xblock-student_view'));
+          this.problem = new Problem($('.xblock-student_view'), mock_runtime);
           this.problem.el.prepend(_.template(imageinput_html)(DEFAULTS));
         });
 
@@ -848,7 +853,7 @@ data-url='/problem/quiz/'> \
 
   describe('save', function() {
     beforeEach(function() {
-      this.problem = new Problem($('.xblock-student_view'));
+      this.problem = new Problem($('.xblock-student_view'), mock_runtime);
       this.problem.answers = 'foo=1&bar=2';
     });
 
@@ -923,7 +928,7 @@ data-url='/problem/quiz/'> \
 
   describe('refreshMath', function() {
     beforeEach(function() {
-      this.problem = new Problem($('.xblock-student_view'));
+      this.problem = new Problem($('.xblock-student_view'), mock_runtime);
       $('#input_example_1').val('E=mc^2');
       this.problem.refreshMath({target: $('#input_example_1').get(0)});
     });
@@ -936,7 +941,7 @@ data-url='/problem/quiz/'> \
 
   describe('updateMathML', function() {
     beforeEach(function() {
-      this.problem = new Problem($('.xblock-student_view'));
+      this.problem = new Problem($('.xblock-student_view'), mock_runtime);
       this.stubbedJax.root.toMathML.and.returnValue('<MathML>');
     });
 
@@ -964,7 +969,7 @@ data-url='/problem/quiz/'> \
 
   describe('refreshAnswers', function() {
     beforeEach(function() {
-      this.problem = new Problem($('.xblock-student_view'));
+      this.problem = new Problem($('.xblock-student_view'), mock_runtime);
       this.problem.el.html(`\
 <textarea class="CodeMirror" />
 <input id="input_1_1" name="input_1_1" class="schematic" value="one" />
@@ -990,10 +995,10 @@ data-url='/problem/quiz/'> \
   });
 
   describe('multiple JsInput in single problem', function() {
-    const jsinput_html = readFixtures('jsinput_problem.html');
+    const jsinput_html = readFixtures('common/js/fixtures/jsinput_problem.html');
 
     beforeEach(function() {
-      this.problem = new Problem($('.xblock-student_view'));
+      this.problem = new Problem($('.xblock-student_view'), mock_runtime);
       this.problem.render(jsinput_html);
     });
 
@@ -1004,12 +1009,12 @@ data-url='/problem/quiz/'> \
   });
 
   describe('Submitting an xqueue-graded problem', function() {
-    const matlabinput_html = readFixtures('matlabinput_problem.html');
+    const matlabinput_html = readFixtures('common/js/fixtures/matlabinput_problem.html');
 
     beforeEach(function() {
       spyOn($, 'postWithPrefix').and.callFake((url, callback) => callback({html: matlabinput_html}));
       jasmine.clock().install();
-      this.problem = new Problem($('.xblock-student_view'));
+      this.problem = new Problem($('.xblock-student_view'), mock_runtime);
       spyOn(this.problem, 'poll').and.callThrough();
       this.problem.render(matlabinput_html);
     });
@@ -1038,11 +1043,11 @@ data-url='/problem/quiz/'> \
   });
 
   describe('codeinput problem', function() {
-    const codeinputProblemHtml = readFixtures('codeinput_problem.html');
+    const codeinputProblemHtml = readFixtures('common/js/fixtures/codeinput_problem.html');
 
     beforeEach(function() {
       spyOn($, 'postWithPrefix').and.callFake((url, callback) => callback({html: codeinputProblemHtml}));
-      this.problem = new Problem($('.xblock-student_view'));
+      this.problem = new Problem($('.xblock-student_view'), mock_runtime);
       this.problem.render(codeinputProblemHtml);
     });
 
@@ -1064,11 +1069,11 @@ data-url='/problem/quiz/'> \
 
   describe('show answer button', function() {
 
-    const radioButtonProblemHtml = readFixtures('radiobutton_problem.html');
-    const checkboxProblemHtml = readFixtures('checkbox_problem.html');
+    const radioButtonProblemHtml = readFixtures('common/js/fixtures/radiobutton_problem.html');
+    const checkboxProblemHtml = readFixtures('common/js/fixtures/checkbox_problem.html');
 
     beforeEach(function() {
-      this.problem = new Problem($('.xblock-student_view'));
+      this.problem = new Problem($('.xblock-student_view'), mock_runtime);
 
       this.checkAssertionsAfterClickingAnotherOption = () => {
         // verify that 'show answer button is no longer disabled'

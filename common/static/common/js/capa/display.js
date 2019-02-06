@@ -707,7 +707,7 @@
             Logger.log('problem_show', {
                 problem: this.id
             });
-            return $.postWithPrefix(this.runtime.handlerUrl(this.element, 'problem_show'), '{}', function(response) {
+            return $.postWithPrefix(this.runtime.handlerUrl(this.element, 'problem_show'), function(response) {
                 var answers;
                 answers = response.answers;
                 $.each(answers, function(key, value) {

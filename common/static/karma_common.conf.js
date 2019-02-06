@@ -27,6 +27,7 @@ var options = {
         {pattern: 'js/vendor/URI.min.js', included: true},
         {pattern: 'js/test/add_ajax_prefix.js', included: true},
         {pattern: 'js/test/i18n.js', included: true},
+        {pattern: 'js/vendor/CodeMirror/codemirror.js', included: true},
 
         {pattern: 'common/js/vendor/underscore.js', included: true},
         {pattern: 'common/js/vendor/underscore.string.js', included: true},
@@ -52,19 +53,26 @@ var options = {
         {pattern: 'common/js/xblock/core.js', included: true},
         {pattern: 'common/js/xblock/runtime.v1.js', included: true},
         {pattern: 'common/js/discussion/**/*.js', included: true},
+        {pattern: 'common/js/capa/*.js', included: true},
+        {pattern: 'common/js/capa/**/*.js', included: true},
         {pattern: 'js/capa/src/**/*.js', included: true},
+        {pattern: 'common/js/javascript_loader.js', included: true},
+        {pattern: 'common/js/collapsible.js', included: true},
         {pattern: 'js/src/**/*.js', included: true}
     ],
 
     specFiles: [
         {pattern: 'common/js/spec/xblock/*.js', included: true},
         {pattern: 'common/js/spec/discussion/**/*spec.js', included: true},
+        {pattern: 'common/js/spec/helper.js', included: true, ignoreCoverage: true},
+        {pattern: 'common/js/spec/capa/*.js', included: true},
         {pattern: 'js/**/*spec.js', included: true}
     ],
 
     fixtureFiles: [
         {pattern: 'js/fixtures/**/*.html'},
         {pattern: 'js/capa/fixtures/**/*.html'},
+        {pattern: 'common/js/fixtures/*.*'},
         {pattern: 'common/templates/**/*.underscore'}
     ]
 };

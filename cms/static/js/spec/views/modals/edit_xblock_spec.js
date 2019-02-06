@@ -174,7 +174,7 @@ describe('EditXBlockModal', function() {
             it('hides the modal\'s header', function() {
                 var requests = AjaxHelpers.requests(this);
                 modal = showModal(requests, mockCustomTabsHtml);
-                expect(modal.$('.modal-header')).toBeHidden();
+                expect(modal.$('.modal-editor')).toHaveClass('xblock-editor-has-tabs');
             });
 
             it('shows the correct title', function() {

@@ -1,14 +1,14 @@
 describe('MarkdownEditingDescriptor', function() {
   describe('save stores the correct data', function() {
     it('saves markdown from markdown editor', function() {
-      loadFixtures('problem-with-markdown.html');
+      loadFixtures('common/js/fixtures/problem-with-markdown.html');
       this.descriptor = new MarkdownEditingDescriptor($('.problem-editor'));
       const saveResult = this.descriptor.save();
       expect(saveResult.metadata.markdown).toEqual('markdown');
       expect(saveResult.data).toXMLEqual('<problem>\n  <p>markdown</p>\n</problem>');
     });
     it('clears markdown when xml editor is selected', function() {
-      loadFixtures('problem-with-markdown.html');
+      loadFixtures('common/js/fixtures/problem-with-markdown.html');
       this.descriptor = new MarkdownEditingDescriptor($('.problem-editor'));
       this.descriptor.createXMLEditor('replace with markdown');
       const saveResult = this.descriptor.save();
@@ -16,7 +16,7 @@ describe('MarkdownEditingDescriptor', function() {
       expect(saveResult.data).toEqual('replace with markdown');
     });
     it('saves xml from the xml editor', function() {
-      loadFixtures('problem-without-markdown.html');
+      loadFixtures('common/js/fixtures/problem-without-markdown.html');
       this.descriptor = new MarkdownEditingDescriptor($('.problem-editor'));
       const saveResult = this.descriptor.save();
       expect(saveResult.nullout).toEqual(['markdown']);
@@ -26,7 +26,7 @@ describe('MarkdownEditingDescriptor', function() {
 
   describe('advanced editor opens correctly', () =>
     it('click on advanced editor should work', function() {
-      loadFixtures('problem-with-markdown.html');
+      loadFixtures('common/js/fixtures/problem-with-markdown.html');
       this.descriptor = new MarkdownEditingDescriptor($('.problem-editor'));
       spyOn(this.descriptor, 'confirmConversionToXml').and.returnValue(true);
       expect(this.descriptor.confirmConversionToXml).not.toHaveBeenCalled();
