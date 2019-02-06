@@ -416,7 +416,7 @@ class CapaMixin(ScorableXBlockMixin):
                 u'[xblock_capa] <font size="+1" color="red">'
                 u'Failed to generate HTML for problem {url}</font>'
             ).format(
-                    url=text_type(self.location)
+                url=text_type(self.location)
             )
             msg += HTML(u'<p>Error:</p><p><pre>{msg}</pre></p>').format(msg=text_type(err))
             msg += HTML(u'<p><pre>{tb}</pre></p>').format(tb=traceback.format_exc())

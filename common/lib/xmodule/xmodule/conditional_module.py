@@ -14,6 +14,7 @@ from opaque_keys.edx.locator import BlockUsageLocator
 from web_fragments.fragment import Fragment
 from xblock.fields import ReferenceList, Scope, String
 
+from openedx.core.djangolib.markup import HTML, Text
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.studio_editable import StudioEditableDescriptor, StudioEditableModule
@@ -335,8 +336,8 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor, StudioEditabl
                 self.runtime.add_block_as_child_node(child, xml_object)
 
         if self.show_tag_list:
-            show_str = u'<{tag_name} sources="{sources}" />'.format(
-                tag_name='show', sources=';'.join(text_type(location) for location in self.show_tag_list))
+            show_str = HTML(u'<{tag_name} sources="{sources}" />').format(
+                tag_name=Text('show'), sources=Text(';'.join(text_type(location) for location in self.show_tag_list)))
             xml_object.append(etree.fromstring(show_str))
 
         # Overwrite the original sources attribute with the value from sources_list, as

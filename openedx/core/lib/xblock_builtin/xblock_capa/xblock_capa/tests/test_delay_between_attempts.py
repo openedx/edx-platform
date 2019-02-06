@@ -25,7 +25,6 @@ import xmodule
 from .test_capa_xblock import CapaFactory
 
 
-
 class CapaFactoryWithDelay(CapaFactory):
     """
     Create problem modules class, specialized for delay_between_attempts

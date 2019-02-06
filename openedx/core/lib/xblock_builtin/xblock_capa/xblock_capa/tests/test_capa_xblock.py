@@ -118,7 +118,7 @@ class CapaFactory(object):
 
         if not scope_ids:
             scope_ids = ScopeIds(None, 'problem', location, location)
-            
+
         if xml is None:
             xml = cls.sample_problem_xml
         field_data = {'data': xml}
@@ -136,7 +136,7 @@ class CapaFactory(object):
             **kwargs)
 
     @classmethod
-    def _create_xblock(cls, 
+    def _create_xblock(cls,
                        field_data,
                        scope_ids,
                        correct=False,

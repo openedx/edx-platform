@@ -16,7 +16,7 @@ from lxml import etree
 from pkg_resources import resource_string
 from xblock.fields import Boolean, Dict, List, Scope, String
 
-from openedx.core.djangolib.markup import Text
+from openedx.core.djangolib.markup import HTML, Text
 from xmodule.mako_module import MakoModuleDescriptor
 from xmodule.stringify import stringify_children
 from xmodule.x_module import XModule
@@ -213,7 +213,7 @@ class PollDescriptor(PollFields, MakoModuleDescriptor, XmlDescriptor):
 
     def definition_to_xml(self, resource_fs):
         """Return an xml element representing to this definition."""
-        poll_str = u'<{tag_name}>{text}</{tag_name}>'.format(
+        poll_str = HTML(u'<{tag_name}>{text}</{tag_name}>').format(
             tag_name=self._tag_name, text=self.question)
         xml_object = etree.fromstring(poll_str)
         xml_object.set('display_name', self.display_name)
@@ -221,7 +221,7 @@ class PollDescriptor(PollFields, MakoModuleDescriptor, XmlDescriptor):
         def add_child(xml_obj, answer):
             # Escape answer text before adding to xml tree.
             answer_text = unicode(Text(answer['text']))
-            child_str = u'<{tag_name} id="{id}">{text}</{tag_name}>'.format(
+            child_str = HTML(u'<{tag_name} id="{id}">{text}</{tag_name}>').format(
                 tag_name=self._child_tag_name, id=answer['id'],
                 text=answer_text)
             child_node = etree.fromstring(child_str)
