@@ -12,15 +12,12 @@ def runLettuceTests() {
             doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', honorRefspec: true,
             noTags: true, shallow: true]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'jenkins-worker',
             refspec: git_refspec, url: "git@github.com:edx/${REPO_NAME}.git"]]]
-        console_output = sh(returnStdout: true, script: 'bash scripts/all-tests.sh').trim()
-        dir('stdout') {
-            writeFile file: "${TEST_SUITE}-stdout.log", text: console_output
-        }
+        sh 'bash scripts/all-tests.sh'
     }
 }
 
 def lettuceTestCleanup() {
-    archiveArtifacts allowEmptyArchive: true, artifacts: 'test_root/log/**/*.log,stdout/*.log,*.log'
+    archiveArtifacts allowEmptyArchive: true, artifacts: 'test_root/log/**/*.log,*.log'
     junit '**/reports/acceptance/*.xml'
 }
 
