@@ -173,6 +173,7 @@ class ProblemPage(PageObject):
         Click the Reset button.
         """
         click_css(self, '.problem .reset', require_notification=False)
+        self.wait_for_ajax()
 
     def click_show(self):
         """
