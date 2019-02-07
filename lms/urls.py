@@ -747,6 +747,10 @@ if settings.FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
     ]
 
 urlpatterns += [
+    url(r'^bulk_email/', include('bulk_email.urls')),
+]
+
+urlpatterns += [
     url(
         r'^courses/{}/tab/(?P<tab_type>[^/]+)/$'.format(
             settings.COURSE_ID_PATTERN,

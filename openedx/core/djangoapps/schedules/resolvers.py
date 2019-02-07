@@ -13,6 +13,8 @@ from edx_ace.recipient import Recipient
 from edx_django_utils.monitoring import function_trace, set_custom_metric
 
 from courseware.date_summary import verified_upgrade_deadline_link, verified_upgrade_link_is_valid
+from lms.djangoapps.notification_prefs.views import UsernameCipher
+from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_SHOW_UNSUBSCRIBE_WAFFLE_SWITCH
 from openedx.core.djangoapps.schedules.content_highlights import get_week_highlights
 from openedx.core.djangoapps.schedules.exceptions import CourseUpdateDoesNotExist
 from openedx.core.djangoapps.schedules.models import Schedule, ScheduleExperience
@@ -358,6 +360,14 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
                 )
                 # continue to the next schedule, don't yield an email for this one
             else:
+                unsubscribe_url = None
+                if (COURSE_UPDATE_SHOW_UNSUBSCRIBE_WAFFLE_SWITCH.is_enabled() and
+                        'bulk_email_optout' in settings.ACE_ENABLED_POLICIES):
+                    unsubscribe_url = reverse('bulk_email_opt_out', kwargs={
+                        'token': UsernameCipher.encrypt(user.username),
+                        'course_id': str(enrollment.course_id),
+                    })
+
                 template_context.update({
                     'course_name': schedule.enrollment.course.display_name,
                     'course_url': _get_trackable_course_home_url(enrollment.course_id),
@@ -367,6 +377,7 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
 
                     # This is used by the bulk email optout policy
                     'course_ids': [str(enrollment.course_id)],
+                    'unsubscribe_url': unsubscribe_url,
                 })
                 template_context.update(_get_upsell_information_for_schedule(user, schedule))
 

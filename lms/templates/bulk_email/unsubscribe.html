@@ -1,0 +1,48 @@
+<%page expression_filter="h" />
+<%inherit file="../main.html" />
+<%!
+    from openedx.core.djangolib.markup import Text
+    from django.utils.translation import ugettext as _
+%>
+<%def name="header()">
+%if confirmed:
+    ${Text(_("Unsubscribe Successful"))}
+%elif cancelled:
+    ${Text(_("Unsubscribe Cancelled"))}
+%else:
+    ${Text(_("Confirm Unsubscribe"))}
+%endif
+</%def>
+
+<%block name="pagetitle">${header()}</%block>
+<section class="container unsubscribe">
+
+  <section class="message">
+    <h1>
+      <%block name="pageheader">${header()}</%block>
+    </h1>
+    <p>
+      <%block name="pagecontent">
+      %if confirmed:
+        ${Text(_("You have been unsubscribed from emails for {course}.")).format(
+            course=course.display_name_with_default
+         )}
+      %elif cancelled:
+        ${Text(_("You have not been unsubscribed from emails for {course}.")).format(
+            course=course.display_name_with_default
+         )}
+      %else:
+        ${Text(_("Do you want to unsubscribe from emails for {course}?")).format(
+            course=course.display_name_with_default
+         )}
+        <br /><br />
+        <form method="post">
+          <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
+          <button name="submit" value="confirm" type="submit">${Text(_('Unsubscribe'))}</button>
+          <button name="submit" value="cancel" type="submit">${Text(_('Cancel'))}</button>
+        </form>
+      %endif
+      </%block>
+    </p>
+  </section>
+</section>

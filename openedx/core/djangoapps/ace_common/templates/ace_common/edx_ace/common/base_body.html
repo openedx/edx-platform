@@ -175,6 +175,13 @@
                             {{ contact_mailing_address }}
                         </td>
                     </tr>
+                    {% if unsubscribe_url %}
+                        <tr>
+                            <td>
+                                <a href="{% with_link_tracking unsubscribe_url %}">{% trans "Unsubscribe from these emails." %}</a>
+                            </td>
+                        </tr>
+                    {% endif %}
                 </table>
             </td>
         </tr>
