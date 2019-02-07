@@ -270,7 +270,8 @@ def _create_and_set_jwt_cookies(response, request, cookie_settings, user=None, r
         )
     else:
         access_token = create_dot_access_token(
-            request, user, oauth_application, expires_in=expires_in, scopes=['email', 'profile'],
+            # Note: Scopes for JWT cookies do not require additional permissions
+            request, user, oauth_application, expires_in=expires_in, scopes=['user_id', 'email', 'profile'],
         )
     jwt = create_jwt_from_token(access_token, DOTAdapter(), use_asymmetric_key=True)
     jwt_header_and_payload, jwt_signature = _parse_jwt(jwt)

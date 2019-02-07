@@ -75,7 +75,7 @@ class CookieTests(TestCase):
         if can_recreate:
             jwt_string = self.request.COOKIES[cookies_api.jwt_cookies.jwt_cookie_name()]
             jwt = jwt_decode_handler(jwt_string)
-            self.assertEqual(jwt['scopes'], ['email', 'profile'])
+            self.assertEqual(jwt['scopes'], ['user_id', 'email', 'profile'])
 
     def _assert_cookies_present(self, response, expected_cookies):
         """ Verify all expected_cookies are present in the response. """
