@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 5.7.23, for Linux (x86_64)
+-- MySQL dump 10.13  Distrib 5.6.32, for debian-linux-gnu (x86_64)
 --
--- Host: edx.devstack.mysql    Database: edxtest
+-- Host: localhost    Database: edxtest
 -- ------------------------------------------------------
--- Server version	5.6.41
+-- Server version	5.6.32-1+deb.sury.org~xenial+0.1
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -34,4 +34,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-02-06  8:02:54
+-- Dump completed on 2019-02-06 11:21:05
