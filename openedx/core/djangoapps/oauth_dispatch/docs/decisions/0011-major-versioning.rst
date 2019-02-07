@@ -6,6 +6,64 @@ Status
 
 Draft
 
+Temporary Implementation Notes
+------------------------------
+
+This idea is being put on hold because it is hard to implement.  Here are some notes
+about the implementation in case we ever decide to revive this:
+
+JWT Changes:
+- sub: changing meaning (does anything care internally?)
+- username: must add to scope requested and authorized.  where and how?
+- profile: retire? leave alone to shrink our problems?
+- copy role out of profile - shouldn't require a major version change.
+
+Places to encapsulate JWT details:
+- frontend-auth library
+- ... ?
+- Note: The fewer pieces of code that care what the JWT looks like, the better.
+
+Django Settings:
+    Retire:
+    - JWT_SUPPORTED_VERSION
+    New:
+    - JWT_SUPPORTED_MAJOR_VERSION
+        - System-wide setting for requested major version, used in the following places:
+            - edx-rest-api-client get access token for server-to-server calls.
+            - DOTAccessTokenExchangeView get access token (???)
+            - LMS _create_and_set_jwt_cookies
+        - Used for rollout. Assumes all backends support new+old major version before switching.
+    Future (Never?):
+    - JWT_SUPPORTED_VERSIONS
+        - Could be added if we ever need config to switch between minor versions.
+        - Minor versions should just be additive, and this should not be needed.
+        - Doesn't make sense to do this before it is needed.
+
+LMS
+- _create_and_set_jwt_cookies (use JWT_SUPPORTED_MAJOR_VERSION)
+- AccessTokenView: add support for v=X parameter
+- *** create_jwt_for_user (does this need to support multiple versions???)
+    - ...
+
+API Gateway
+- Who uses this? Do we need to add /oauth2/v2/access_token?
+- https://github.com/edx/api-manager/blob/master/swagger/api.yaml#L28
+
+Backend Services
+- Rest Client
+    - Caller requests access token with major version (use JWT_SUPPORTED_MAJOR_VERSION)
+        - Callee needs to support all major versions of token
+    - https://github.com/edx/edx-rest-api-client/blob/7ed2a833691d2fdf3a4fbc9189ee5c4443bd892b/edx_rest_api_client/client.py#L68
+- DRF Extensions
+    - Removing version check
+    - https://github.com/edx/edx-drf-extensions/pull/63
+
+DOTAccessTokenExchangeView
+- Calls create access token (use JWT_SUPPORTED_MAJOR_VERSION)
+- https://github.com/edx/edx-platform/blob/3353e7425e57b8a308318f2feac35c5b0b5dbdaf/openedx/core/djangoapps/auth_exchange/views.py#L109-L114
+
+
+
 Context
 -------
 
@@ -40,3 +98,4 @@ Using the URL path for major versions is documented in the `edX REST API Convent
 
 .. _edX REST API Conventions: https://openedx.atlassian.net/wiki/spaces/AC/pages/18350757/edX+REST+API+Conventions#edXRESTAPIConventions-6.Version
 .. _oauth2 URL comments in the LMS urls.py: https://github.com/edx/edx-platform/blob/f75dff1ec710ad7101a966b22977305370d7abdd/lms/urls.py#L883-L889
+

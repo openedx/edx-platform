@@ -108,10 +108,20 @@ class AccessTokenView(RatelimitMixin, _DispatchingView):
 
         return response
 
+    def _get_requested_jwt_major_version(self, request):
+        """ Get the requested major version of the JWT from the request. """
+        major_version = request.POST.get('v')
+        if major_version is not None:
+            if major_version.isnumeric():
+                major_version = int(major_version)
+            else:
+                raise TypeError("Requested version v=%s must be numeric." % major_version)
+
     def _build_jwt_response_from_access_token_response(self, request, response):
         """ Builds the content of the response, including the JWT token. """
         token_dict = json.loads(response.content)
-        jwt = create_jwt_from_token(token_dict, self.get_adapter(request))
+        requested_major_version = self._get_requested_jwt_major_version(request)
+        jwt = create_jwt_from_token(token_dict, self.get_adapter(request), requested_major_version)
         token_dict.update({
             'access_token': jwt,
             'token_type': 'JWT',

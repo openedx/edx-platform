@@ -39,13 +39,14 @@ def create_jwt_for_user(user, secret=None, aud=None, additional_claims=None):
     )
 
 
-def create_jwt_from_token(token_dict, oauth_adapter, use_asymmetric_key=None):
+def create_jwt_from_token(token_dict, oauth_adapter, requested_major_version, use_asymmetric_key=None):
     """
     Returns a JWT created from the given access token.
 
     Arguments:
         token_dict (dict): An access token structure as returned from an
             underlying OAuth provider.
+        requested_major_version (int): The requested major version of the JWT.
 
     Deprecated Arguments (to be removed):
         oauth_adapter (DOPAdapter|DOTAdapter): An OAuth adapter that will
@@ -62,6 +63,7 @@ def create_jwt_from_token(token_dict, oauth_adapter, use_asymmetric_key=None):
         access_token.user,
         scopes=token_dict['scope'].split(' '),
         expires_in=token_dict['expires_in'],
+        requested_major_version=requested_major_version,
         use_asymmetric_key=use_asymmetric_key,
         is_restricted=oauth_adapter.is_client_restricted(client),
         filters=oauth_adapter.get_authorization_filters(client),
@@ -76,6 +78,7 @@ def _create_jwt(
     filters=None,
     aud=None,
     additional_claims=None,
+    requested_major_version=None,
     use_asymmetric_key=None,
     secret=None,
 ):
@@ -99,6 +102,7 @@ def _create_jwt(
             ENFORCE_JWT_SCOPES is enabled and the OAuth client is restricted.
         secret (string): Overrides configured JWT secret (signing) key.
     """
+    # TODO: Document and use requested_major_version
     use_asymmetric_key = _get_use_asymmetric_key_value(is_restricted, use_asymmetric_key)
     scopes = scopes or ['email', 'profile']
     iat, exp = _compute_time_fields(expires_in)

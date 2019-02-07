@@ -272,7 +272,8 @@ def _create_and_set_jwt_cookies(response, request, cookie_settings, user=None, r
         access_token = create_dot_access_token(
             request, user, oauth_application, expires_in=expires_in, scopes=['email', 'profile'],
         )
-    jwt = create_jwt_from_token(access_token, DOTAdapter(), use_asymmetric_key=True)
+    requested_major_version = settings.JWT_AUTH['JWT_SUPPORTED_MAJOR_VERSION']
+    jwt = create_jwt_from_token(access_token, DOTAdapter(), requested_major_version, use_asymmetric_key=True)
     jwt_header_and_payload, jwt_signature = _parse_jwt(jwt)
     _set_jwt_cookies(
         response,
