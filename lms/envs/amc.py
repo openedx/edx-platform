@@ -32,7 +32,7 @@ DEFAULT_TEMPLATE_ENGINE['OPTIONS']['context_processors'] += (
 MANDRILL_API_KEY = AUTH_TOKENS.get("MANDRILL_API_KEY")
 
 if MANDRILL_API_KEY:
-    EMAIL_BACKEND = ENV_TOKENS.get('EMAIL_BACKEND', 'anymail.backends.mandrill.MandrillBackend')
+    EMAIL_BACKEND = ENV_TOKENS.get('EMAIL_BACKEND', 'anymail.backends.mandrill.EmailBackend')
     ANYMAIL = {
         "MANDRILL_API_KEY": MANDRILL_API_KEY,
     }
