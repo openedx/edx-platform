@@ -391,6 +391,10 @@ class TestCohorts(ModuleStoreTestCase):
         Anonymous user is not assigned to any cohort group.
         """
         course = modulestore().get_course(self.toy_course_key)
+
+        # verify cohorts is None when course is not cohorted
+        self.assertIsNone(cohorts.get_cohort(AnonymousUser(), course.id))
+
         config_course_cohorts(
             course,
             is_cohorted=True,

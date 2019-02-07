@@ -25,6 +25,7 @@ from web_fragments.fragment import Fragment
 
 from edxmako.shortcuts import render_to_response, render_to_string
 
+from lms.djangoapps.courseware.courses import allow_public_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from lms.djangoapps.gating.api import get_entrance_exam_score_ratio, get_entrance_exam_usage_key
@@ -195,20 +196,23 @@ class CoursewareIndex(View):
                 'email_opt_in': False,
             })
 
-            PageLevelMessages.register_warning_message(
-                request,
-                Text(_(u"You are not signed in. To see additional course content, {sign_in_link} or "
-                       u"{register_link}, and enroll in this course.")).format(
-                    sign_in_link=HTML(u'<a href="{url}">{sign_in_label}</a>').format(
-                        sign_in_label=_('sign in'),
-                        url='{}?{}'.format(reverse('signin_user'), qs),
-                    ),
-                    register_link=HTML(u'<a href="/{url}">{register_label}</a>').format(
-                        register_label=_('register'),
-                        url='{}?{}'.format(reverse('register_user'), qs),
-                    ),
+            allow_anonymous = allow_public_access(self.course, [COURSE_VISIBILITY_PUBLIC])
+
+            if not allow_anonymous:
+                PageLevelMessages.register_warning_message(
+                    request,
+                    Text(_("You are not signed in. To see additional course content, {sign_in_link} or "
+                           "{register_link}, and enroll in this course.")).format(
+                        sign_in_link=HTML('<a href="{url}">{sign_in_label}</a>').format(
+                            sign_in_label=_('sign in'),
+                            url='{}?{}'.format(reverse('signin_user'), qs),
+                        ),
+                        register_link=HTML('<a href="/{url}">{register_label}</a>').format(
+                            register_label=_('register'),
+                            url='{}?{}'.format(reverse('register_user'), qs),
+                        ),
+                    )
                 )
-            )
 
         return render_to_response('courseware/courseware.html', self._create_courseware_context(request))
 

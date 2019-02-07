@@ -313,12 +313,13 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         self.assertContains(response, TEST_CHAPTER_NAME, count=(1 if expected_course_outline else 0))
 
         # Verify that the expected message is shown to the user
-        self.assertContains(
-            response, 'To see course content', count=(1 if is_anonymous else 0)
-        )
-        self.assertContains(response, '<div class="user-messages"', count=(1 if expected_enroll_message else 0))
-        if expected_enroll_message:
-            self.assertContains(response, 'You must be enrolled in the course to see course content.')
+        if not enable_unenrolled_access or course_visibility != COURSE_VISIBILITY_PUBLIC:
+            self.assertContains(
+                response, 'To see course content', count=(1 if is_anonymous else 0)
+            )
+            self.assertContains(response, '<div class="user-messages"', count=(1 if expected_enroll_message else 0))
+            if expected_enroll_message:
+                self.assertContains(response, 'You must be enrolled in the course to see course content.')
 
     @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
     @override_waffle_flag(SHOW_REVIEWS_TOOL_FLAG, active=True)

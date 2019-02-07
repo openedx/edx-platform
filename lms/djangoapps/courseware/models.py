@@ -161,6 +161,18 @@ class StudentModule(models.Model):
             module_states = module_states.filter(student_id=student_id)
         return module_states
 
+    @classmethod
+    def save_state(cls, student, course_id, module_state_key, defaults):
+        if not student.is_authenticated():
+            return
+        else:
+            cls.objects.update_or_create(
+                student=student,
+                course_id=course_id,
+                module_state_key=module_state_key,
+                defaults=defaults,
+            )
+
 
 class BaseStudentModuleHistory(models.Model):
     """Abstract class containing most fields used by any class
