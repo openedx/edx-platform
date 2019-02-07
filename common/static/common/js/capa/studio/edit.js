@@ -213,6 +213,12 @@
                     this.markdown_input.closest('li').addClass('is-set');
                     this.xml_data_input.closest('li').addClass('is-set');
                 }
+                return {
+                    data: data,
+                    metadata: {
+                        markdown: markdown
+                    }
+                };
             } else {
                 // Using xml data editor, so clear out any markdown.
                 var markdown = "",
@@ -224,6 +230,10 @@
                     this.markdown_input.closest('li').addClass('is-set');
                     this.xml_data_input.closest('li').addClass('is-set');
                 }
+                return {
+                    data: data,
+                    nullout: ['markdown']
+                };
             }
         };
 

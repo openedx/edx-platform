@@ -2,7 +2,7 @@
 // for all sorts of markdown.
 describe('Markdown to xml extended hint dropdown', function() {
   it('produces xml', function() {
-    const data = MarkdownEditingDescriptor.markdownToXml(`\
+    const data = CapaMarkdownEditor.markdownToXml(`\
 Translation between Dropdown and ________ is straightforward.
 
 [[
@@ -64,7 +64,7 @@ Clowns have funny _________ to make people laugh.
   });
 
   it('produces xml with demand hint', function() {
-    const data = MarkdownEditingDescriptor.markdownToXml(`\
+    const data = CapaMarkdownEditor.markdownToXml(`\
 Translation between Dropdown and ________ is straightforward.
 
 [[
@@ -101,7 +101,7 @@ Translation between Dropdown and ________ is straightforward.
   });
 
   it('produces xml with single-line markdown syntax', function() {
-    const data = MarkdownEditingDescriptor.markdownToXml(`\
+    const data = CapaMarkdownEditor.markdownToXml(`\
 A Question ________ is answered.
 
 [[(Right), Wrong 1, Wrong 2]]
@@ -124,7 +124,7 @@ A Question ________ is answered.
   });
 
   it('produces xml with fewer newlines', function() {
-    const data = MarkdownEditingDescriptor.markdownToXml(`\
+    const data = CapaMarkdownEditor.markdownToXml(`\
 >>q1<<
 [[ (aa) 	 {{ hint1 }}
    bb
@@ -149,7 +149,7 @@ A Question ________ is answered.
   });
 
   it('produces xml even with lots of whitespace', function() {
-    const data = MarkdownEditingDescriptor.markdownToXml(`\
+    const data = CapaMarkdownEditor.markdownToXml(`\
 >>q1<<
 [[
 
@@ -182,7 +182,7 @@ A Question ________ is answered.
 
 describe('Markdown to xml extended hint checkbox', function() {
   it('produces xml', function() {
-    const data = MarkdownEditingDescriptor.markdownToXml(`\
+    const data = CapaMarkdownEditor.markdownToXml(`\
 >>Select all the fruits from the list<<
 
 [x] Apple     	 	 {{ selected: You're right that apple is a fruit. }, {unselected: Remember that apple is also a fruit.}}
@@ -259,7 +259,7 @@ describe('Markdown to xml extended hint checkbox', function() {
   });
 
   it('produces xml also with demand hints', function() {
-    const data = MarkdownEditingDescriptor.markdownToXml(`\
+    const data = CapaMarkdownEditor.markdownToXml(`\
 >>Select all the fruits from the list<<
 
 [x] Apple     	 	 {{ selected: You're right that apple is a fruit. }, {unselected: Remember that apple is also a fruit.}}
@@ -346,7 +346,7 @@ describe('Markdown to xml extended hint checkbox', function() {
 
 describe('Markdown to xml extended hint multiple choice', function() {
   it('produces xml', function() {
-    const data = MarkdownEditingDescriptor.markdownToXml(`\
+    const data = CapaMarkdownEditor.markdownToXml(`\
 >>Select the fruit from the list<<
 
 () Mushroom	  	 {{ Mushroom is a fungus, not a fruit.}}
@@ -393,7 +393,7 @@ describe('Markdown to xml extended hint multiple choice', function() {
   });
 
   it('produces xml with demand hints', function() {
-      const data = MarkdownEditingDescriptor.markdownToXml(`\
+      const data = CapaMarkdownEditor.markdownToXml(`\
 >>Select the fruit from the list<<
 
 () Mushroom	  	 {{ Mushroom is a fungus, not a fruit.}}
@@ -455,7 +455,7 @@ describe('Markdown to xml extended hint multiple choice', function() {
 
 describe('Markdown to xml extended hint text input', function() {
   it('produces xml', function() {
-    const data = MarkdownEditingDescriptor.markdownToXml(`>>In which country would you find the city of Paris?<<
+    const data = CapaMarkdownEditor.markdownToXml(`>>In which country would you find the city of Paris?<<
 = France		{{ BRAVO::Viva la France! }}
 \
 `);
@@ -473,7 +473,7 @@ describe('Markdown to xml extended hint text input', function() {
   });
 
   it('produces xml with or=', function() {
-    const data = MarkdownEditingDescriptor.markdownToXml(`>>Where Paris?<<
+    const data = CapaMarkdownEditor.markdownToXml(`>>Where Paris?<<
 = France		{{ BRAVO::hint1}}
 or= USA			{{   meh::hint2  }}
 \
@@ -494,7 +494,7 @@ or= USA			{{   meh::hint2  }}
   });
 
   it('produces xml with not=', function() {
-    const data = MarkdownEditingDescriptor.markdownToXml(`>>Revenge is a dish best served<<
+    const data = CapaMarkdownEditor.markdownToXml(`>>Revenge is a dish best served<<
 = cold {{khaaaaaan!}}
 not= warm {{feedback2}}
 \
@@ -514,7 +514,7 @@ not= warm {{feedback2}}
   });
 
   it('produces xml with s=', function() {
-    const data = MarkdownEditingDescriptor.markdownToXml(`>>q<<
+    const data = CapaMarkdownEditor.markdownToXml(`>>q<<
 s= 2 {{feedback1}}
 \
 `);
@@ -532,7 +532,7 @@ s= 2 {{feedback1}}
   });
 
   it('produces xml with = and or= and not=', function() {
-    const data = MarkdownEditingDescriptor.markdownToXml(`>>q<<
+    const data = CapaMarkdownEditor.markdownToXml(`>>q<<
 = aaa
 or= bbb {{feedback1}}
 not= no {{feedback2}}
@@ -556,7 +556,7 @@ or= ccc
   });
 
   it('produces xml with s= and or=', function() {
-    const data = MarkdownEditingDescriptor.markdownToXml(`>>q<<
+    const data = CapaMarkdownEditor.markdownToXml(`>>q<<
 s= 2 {{feedback1}}
 or= bbb {{feedback2}}
 or= ccc
@@ -579,7 +579,7 @@ or= ccc
   });
 
   it('produces xml with each = making a new question', function() {
-    const data = MarkdownEditingDescriptor.markdownToXml(`\
+    const data = CapaMarkdownEditor.markdownToXml(`\
 >>q<<
 = aaa
 or= bbb
@@ -600,7 +600,7 @@ s= ccc\
   });
 
   it('produces xml with each = making a new question amid blank lines and paragraphs', function() {
-    const data = MarkdownEditingDescriptor.markdownToXml(`\
+    const data = CapaMarkdownEditor.markdownToXml(`\
 paragraph
 >>q<<
 = aaa
@@ -628,7 +628,7 @@ paragraph 2
   });
 
   it('produces xml without a question when or= is just hung out there by itself', function() {
-    const data = MarkdownEditingDescriptor.markdownToXml(`\
+    const data = CapaMarkdownEditor.markdownToXml(`\
 paragraph
 >>q<<
 or= aaa
@@ -646,7 +646,7 @@ paragraph 2
   });
 
   it('produces xml with each = with feedback making a new question', function() {
-    const data = MarkdownEditingDescriptor.markdownToXml(`\
+    const data = CapaMarkdownEditor.markdownToXml(`\
 >>q<<
 s= aaa
 or= bbb {{feedback1}}
@@ -671,7 +671,7 @@ or= bbb {{feedback1}}
   });
 
   it('produces xml with demand hints', function() {
-    const data = MarkdownEditingDescriptor.markdownToXml(`>>Where Paris?<<
+    const data = CapaMarkdownEditor.markdownToXml(`>>Where Paris?<<
 = France		{{ BRAVO::hint1 }}
 
 || There are actually two countries with cities named Paris. ||
@@ -697,7 +697,7 @@ or= bbb {{feedback1}}
 
 describe('Markdown to xml extended hint numeric input', function() {
   it('produces xml', function() {
-    const data = MarkdownEditingDescriptor.markdownToXml(`\
+    const data = CapaMarkdownEditor.markdownToXml(`\
 >>Enter the numerical value of Pi:<<
 = 3.14159 +- .02   {{ Pie for everyone!   }}
 
@@ -735,7 +735,7 @@ describe('Markdown to xml extended hint numeric input', function() {
   // The output xml here shows some of the quirks of how historical markdown parsing does or does not put
   // in blank lines.
   it('numeric input with hints and demand hints', function() {
-    const data = MarkdownEditingDescriptor.markdownToXml(`\
+    const data = CapaMarkdownEditor.markdownToXml(`\
 >>text1<<
 = 1   {{ hint1  }}
 || hintA ||
@@ -770,7 +770,7 @@ describe('Markdown to xml extended hint numeric input', function() {
 
 describe('Markdown to xml extended hint with multiline hints', () =>
   it('produces xml', function() {
-    const data = MarkdownEditingDescriptor.markdownToXml(`\
+    const data = CapaMarkdownEditor.markdownToXml(`\
 >>Checkboxes<<
 
 [x] A {{
@@ -886,7 +886,7 @@ hint
 
 describe('Markdown to xml extended hint with tricky syntax cases', function() {
   it('produces xml with unicode', function() {
-    const data = MarkdownEditingDescriptor.markdownToXml(`\
+    const data = CapaMarkdownEditor.markdownToXml(`\
 >>á and Ø<<
 
 (x) Ø{{Ø}}
@@ -915,7 +915,7 @@ describe('Markdown to xml extended hint with tricky syntax cases', function() {
   });
 
   it('produces xml with quote-type characters', function() {
-    const data = MarkdownEditingDescriptor.markdownToXml(`\
+    const data = CapaMarkdownEditor.markdownToXml(`\
 >>"quotes" aren't \`fun\`<<
 () "hello" {{ isn't }}
 (x) "isn't"  {{ "hello" }}
@@ -939,7 +939,7 @@ describe('Markdown to xml extended hint with tricky syntax cases', function() {
   });
 
   it('produces xml with almost but not quite multiple choice syntax', function() {
-    const data = MarkdownEditingDescriptor.markdownToXml(`\
+    const data = CapaMarkdownEditor.markdownToXml(`\
 >>q1<<
 this (x)
 () a  {{ (hint) }}
@@ -966,7 +966,7 @@ that (y)\
 
   // An incomplete checkbox hint passes through to cue the author
   it('produce xml with almost but not quite checkboxgroup syntax', function() {
-    const data = MarkdownEditingDescriptor.markdownToXml(`\
+    const data = CapaMarkdownEditor.markdownToXml(`\
 >>q1<<
 this [x]
 [ ] a [square]
@@ -1007,7 +1007,7 @@ that []\
 ]]\
 `;
     markdown = markdown.replace(/\n/g, '\r\n');  // make DOS line endings
-    const data = MarkdownEditingDescriptor.markdownToXml(markdown);
+    const data = CapaMarkdownEditor.markdownToXml(markdown);
     expect(data).toXMLEqual(`\
 <problem>
 <optionresponse>

@@ -1,15 +1,15 @@
-describe('MarkdownEditingDescriptor', function() {
+describe('CapaMarkdownEditor', function() {
   describe('save stores the correct data', function() {
     it('saves markdown from markdown editor', function() {
       loadFixtures('common/js/fixtures/problem-with-markdown.html');
-      this.descriptor = new MarkdownEditingDescriptor($('.problem-editor'));
+      this.descriptor = new CapaMarkdownEditor($('.problem-editor'));
       const saveResult = this.descriptor.save();
       expect(saveResult.metadata.markdown).toEqual('markdown');
       expect(saveResult.data).toXMLEqual('<problem>\n  <p>markdown</p>\n</problem>');
     });
     it('clears markdown when xml editor is selected', function() {
       loadFixtures('common/js/fixtures/problem-with-markdown.html');
-      this.descriptor = new MarkdownEditingDescriptor($('.problem-editor'));
+      this.descriptor = new CapaMarkdownEditor($('.problem-editor'));
       this.descriptor.createXMLEditor('replace with markdown');
       const saveResult = this.descriptor.save();
       expect(saveResult.nullout).toEqual(['markdown']);
@@ -17,7 +17,7 @@ describe('MarkdownEditingDescriptor', function() {
     });
     it('saves xml from the xml editor', function() {
       loadFixtures('common/js/fixtures/problem-without-markdown.html');
-      this.descriptor = new MarkdownEditingDescriptor($('.problem-editor'));
+      this.descriptor = new CapaMarkdownEditor($('.problem-editor'));
       const saveResult = this.descriptor.save();
       expect(saveResult.nullout).toEqual(['markdown']);
       expect(saveResult.data).toEqual('xml only');
@@ -27,7 +27,7 @@ describe('MarkdownEditingDescriptor', function() {
   describe('advanced editor opens correctly', () =>
     it('click on advanced editor should work', function() {
       loadFixtures('common/js/fixtures/problem-with-markdown.html');
-      this.descriptor = new MarkdownEditingDescriptor($('.problem-editor'));
+      this.descriptor = new CapaMarkdownEditor($('.problem-editor'));
       spyOn(this.descriptor, 'confirmConversionToXml').and.returnValue(true);
       expect(this.descriptor.confirmConversionToXml).not.toHaveBeenCalled();
       const e = jasmine.createSpyObj('e', [ 'preventDefault' ]);
@@ -40,23 +40,23 @@ describe('MarkdownEditingDescriptor', function() {
 
   describe('insertMultipleChoice', function() {
     it('inserts the template if selection is empty', function() {
-      const revisedSelection = MarkdownEditingDescriptor.insertMultipleChoice('');
-      expect(revisedSelection).toEqual(MarkdownEditingDescriptor.multipleChoiceTemplate);
+      const revisedSelection = CapaMarkdownEditor.insertMultipleChoice('');
+      expect(revisedSelection).toEqual(CapaMarkdownEditor.multipleChoiceTemplate);
     });
     it('wraps existing text', function() {
-      const revisedSelection = MarkdownEditingDescriptor.insertMultipleChoice('foo\nbar');
+      const revisedSelection = CapaMarkdownEditor.insertMultipleChoice('foo\nbar');
       expect(revisedSelection).toEqual('( ) foo\n( ) bar\n');
     });
     it('recognizes x as a selection if there is non-whitespace after x', function() {
-      const revisedSelection = MarkdownEditingDescriptor.insertMultipleChoice('a\nx b\nc\nx \nd\n x e');
+      const revisedSelection = CapaMarkdownEditor.insertMultipleChoice('a\nx b\nc\nx \nd\n x e');
       expect(revisedSelection).toEqual('( ) a\n(x) b\n( ) c\n( ) x \n( ) d\n(x) e\n');
     });
     it('recognizes x as a selection if it is first non whitespace and has whitespace with other non-whitespace', function() {
-      const revisedSelection = MarkdownEditingDescriptor.insertMultipleChoice(' x correct\n x \nex post facto\nb x c\nx c\nxxp');
+      const revisedSelection = CapaMarkdownEditor.insertMultipleChoice(' x correct\n x \nex post facto\nb x c\nx c\nxxp');
       expect(revisedSelection).toEqual('(x) correct\n( )  x \n( ) ex post facto\n( ) b x c\n(x) c\n( ) xxp\n');
     });
     it('removes multiple newlines but not last one', function() {
-      const revisedSelection = MarkdownEditingDescriptor.insertMultipleChoice('a\nx b\n\n\nc\n');
+      const revisedSelection = CapaMarkdownEditor.insertMultipleChoice('a\nx b\n\n\nc\n');
       expect(revisedSelection).toEqual('( ) a\n(x) b\n( ) c\n');
     });
   });
@@ -64,78 +64,78 @@ describe('MarkdownEditingDescriptor', function() {
   describe('insertCheckboxChoice', function() {
     // Note, shares code with insertMultipleChoice. Therefore only doing smoke test.
     it('inserts the template if selection is empty', function() {
-      const revisedSelection = MarkdownEditingDescriptor.insertCheckboxChoice('');
-      expect(revisedSelection).toEqual(MarkdownEditingDescriptor.checkboxChoiceTemplate);
+      const revisedSelection = CapaMarkdownEditor.insertCheckboxChoice('');
+      expect(revisedSelection).toEqual(CapaMarkdownEditor.checkboxChoiceTemplate);
     });
     it('wraps existing text', function() {
-      const revisedSelection = MarkdownEditingDescriptor.insertCheckboxChoice('foo\nbar');
+      const revisedSelection = CapaMarkdownEditor.insertCheckboxChoice('foo\nbar');
       expect(revisedSelection).toEqual('[ ] foo\n[ ] bar\n');
     });
   });
 
   describe('insertStringInput', function() {
     it('inserts the template if selection is empty', function() {
-      const revisedSelection = MarkdownEditingDescriptor.insertStringInput('');
-      expect(revisedSelection).toEqual(MarkdownEditingDescriptor.stringInputTemplate);
+      const revisedSelection = CapaMarkdownEditor.insertStringInput('');
+      expect(revisedSelection).toEqual(CapaMarkdownEditor.stringInputTemplate);
     });
     it('wraps existing text', function() {
-      const revisedSelection = MarkdownEditingDescriptor.insertStringInput('my text');
+      const revisedSelection = CapaMarkdownEditor.insertStringInput('my text');
       expect(revisedSelection).toEqual('= my text');
     });
   });
 
   describe('insertNumberInput', function() {
     it('inserts the template if selection is empty', function() {
-      const revisedSelection = MarkdownEditingDescriptor.insertNumberInput('');
-      expect(revisedSelection).toEqual(MarkdownEditingDescriptor.numberInputTemplate);
+      const revisedSelection = CapaMarkdownEditor.insertNumberInput('');
+      expect(revisedSelection).toEqual(CapaMarkdownEditor.numberInputTemplate);
     });
     it('wraps existing text', function() {
-      const revisedSelection = MarkdownEditingDescriptor.insertNumberInput('my text');
+      const revisedSelection = CapaMarkdownEditor.insertNumberInput('my text');
       expect(revisedSelection).toEqual('= my text');
     });
   });
 
   describe('insertSelect', function() {
     it('inserts the template if selection is empty', function() {
-      const revisedSelection = MarkdownEditingDescriptor.insertSelect('');
-      expect(revisedSelection).toEqual(MarkdownEditingDescriptor.selectTemplate);
+      const revisedSelection = CapaMarkdownEditor.insertSelect('');
+      expect(revisedSelection).toEqual(CapaMarkdownEditor.selectTemplate);
     });
     it('wraps existing text', function() {
-      const revisedSelection = MarkdownEditingDescriptor.insertSelect('my text');
+      const revisedSelection = CapaMarkdownEditor.insertSelect('my text');
       expect(revisedSelection).toEqual('[[my text]]');
     });
   });
 
   describe('insertHeader', function() {
     it('inserts the template if selection is empty', function() {
-      const revisedSelection = MarkdownEditingDescriptor.insertHeader('');
-      expect(revisedSelection).toEqual(MarkdownEditingDescriptor.headerTemplate);
+      const revisedSelection = CapaMarkdownEditor.insertHeader('');
+      expect(revisedSelection).toEqual(CapaMarkdownEditor.headerTemplate);
     });
     it('wraps existing text', function() {
-      const revisedSelection = MarkdownEditingDescriptor.insertHeader('my text');
+      const revisedSelection = CapaMarkdownEditor.insertHeader('my text');
       expect(revisedSelection).toEqual('my text\n====\n');
     });
   });
 
   describe('insertExplanation', function() {
     it('inserts the template if selection is empty', function() {
-      const revisedSelection = MarkdownEditingDescriptor.insertExplanation('');
-      expect(revisedSelection).toEqual(MarkdownEditingDescriptor.explanationTemplate);
+      const revisedSelection = CapaMarkdownEditor.insertExplanation('');
+      expect(revisedSelection).toEqual(CapaMarkdownEditor.explanationTemplate);
     });
     it('wraps existing text', function() {
-      const revisedSelection = MarkdownEditingDescriptor.insertExplanation('my text');
+      const revisedSelection = CapaMarkdownEditor.insertExplanation('my text');
       expect(revisedSelection).toEqual('[explanation]\nmy text\n[explanation]');
     });
   });
 
   describe('markdownToXml', function() {
     it('converts raw text to paragraph', function() {
-      const data = MarkdownEditingDescriptor.markdownToXml('foo');
+      const data = CapaMarkdownEditor.markdownToXml('foo');
       expect(data).toXMLEqual('<problem>\n  <p>foo</p>\n</problem>');
     });
     // test default templates
     it('converts numerical response to xml', function() {
-      const data = MarkdownEditingDescriptor.markdownToXml(`A numerical response problem accepts a line of text input from the student, and evaluates the input for correctness based on its numerical value.
+      const data = CapaMarkdownEditor.markdownToXml(`A numerical response problem accepts a line of text input from the student, and evaluates the input for correctness based on its numerical value.
 
 The answer is correct if it is within a specified numerical tolerance of the expected answer.
 
@@ -206,7 +206,7 @@ If you look at your hand, you can count that you have five fingers.
 </problem>`);
     });
     it('will convert 0 as a numerical response (instead of string response)', function() {
-      const data =  MarkdownEditingDescriptor.markdownToXml(`\
+      const data =  CapaMarkdownEditor.markdownToXml(`\
 Enter 0 with a tolerance:
 = 0 +- .02\
 `);
@@ -221,7 +221,7 @@ Enter 0 with a tolerance:
 </problem>`);
     });
     it('markup with additional answer does not break numerical response', function() {
-      const data =  MarkdownEditingDescriptor.markdownToXml(`\
+      const data =  CapaMarkdownEditor.markdownToXml(`\
 Enter 1 with a tolerance:
 = 1 +- .02
 or= 2\
@@ -238,7 +238,7 @@ or= 2\
       );
     });
     it('markup for numerical with multiple additional answers renders correctly', function() {
-      const data =  MarkdownEditingDescriptor.markdownToXml(`\
+      const data =  CapaMarkdownEditor.markdownToXml(`\
 Enter 1 with a tolerance:
 = 1 +- .02
 or= 2
@@ -257,7 +257,7 @@ or= 3\
       );
     });
     it('Do not render ranged/tolerance/alphabetical additional answers for numerical response', function() {
-      const data =  MarkdownEditingDescriptor.markdownToXml(`\
+      const data =  CapaMarkdownEditor.markdownToXml(`\
 Enter 1 with a tolerance:
 = 1 +- .02
 or= 2
@@ -279,7 +279,7 @@ or= 7\
       );
     });
     it('markup with feedback renders correctly in additional answer for numerical response', function() {
-      const data =  MarkdownEditingDescriptor.markdownToXml(`\
+      const data =  CapaMarkdownEditor.markdownToXml(`\
 Enter 1 with a tolerance:
 = 100 +- .02 {{ main feedback }}
 or= 10 {{ additional feedback }}\
@@ -299,7 +299,7 @@ or= 10 {{ additional feedback }}\
       );
     });
     it('converts multiple choice to xml', function() {
-      const data = MarkdownEditingDescriptor.markdownToXml(`A multiple choice problem presents radio buttons for student input. Students can only select a single option presented. Multiple Choice questions have been the subject of many areas of research due to the early invention and adoption of bubble sheets.
+      const data = CapaMarkdownEditor.markdownToXml(`A multiple choice problem presents radio buttons for student input. Students can only select a single option presented. Multiple Choice questions have been the subject of many areas of research due to the early invention and adoption of bubble sheets.
 
 One of the main elements that goes into a good multiple choice question is the existence of good distractors. That is, each of the alternate responses presented to the student should be the result of a plausible mistake that a student might make.
 
@@ -338,7 +338,7 @@ The release of the iPod allowed consumers to carry their entire music library wi
 </problem>`);
     });
     it('converts multiple choice shuffle to xml', function() {
-      const data = MarkdownEditingDescriptor.markdownToXml(`A multiple choice problem presents radio buttons for student input. Students can only select a single option presented. Multiple Choice questions have been the subject of many areas of research due to the early invention and adoption of bubble sheets.
+      const data = CapaMarkdownEditor.markdownToXml(`A multiple choice problem presents radio buttons for student input. Students can only select a single option presented. Multiple Choice questions have been the subject of many areas of research due to the early invention and adoption of bubble sheets.
 
 One of the main elements that goes into a good multiple choice question is the existence of good distractors. That is, each of the alternate responses presented to the student should be the result of a plausible mistake that a student might make.
 
@@ -379,7 +379,7 @@ The release of the iPod allowed consumers to carry their entire music library wi
     });
 
     it('converts a series of multiplechoice to xml', function() {
-      const data = MarkdownEditingDescriptor.markdownToXml(`bleh
+      const data = CapaMarkdownEditor.markdownToXml(`bleh
 (!x) a
 () b
 () c
@@ -431,7 +431,7 @@ When the student is ready, the explanation appears.
     });
 
     it('converts OptionResponse to xml', function() {
-      const data = MarkdownEditingDescriptor.markdownToXml(`OptionResponse gives a limited set of options for students to respond with, and presents those options in a format that encourages them to search for a specific answer rather than being immediately presented with options from which to recognize the correct answer.
+      const data = CapaMarkdownEditor.markdownToXml(`OptionResponse gives a limited set of options for students to respond with, and presents those options in a format that encourages them to search for a specific answer rather than being immediately presented with options from which to recognize the correct answer.
 
 The answer options and the identification of the correct answer is defined in the <b>optioninput</b> tag.
 
@@ -459,7 +459,7 @@ Multiple Choice also allows students to select from a variety of pre-written res
 </problem>`);
     });
     it('converts StringResponse to xml', function() {
-      const data = MarkdownEditingDescriptor.markdownToXml(`A string response problem accepts a line of text input from the student, and evaluates the input for correctness based on an expected answer within each input box.
+      const data = CapaMarkdownEditor.markdownToXml(`A string response problem accepts a line of text input from the student, and evaluates the input for correctness based on an expected answer within each input box.
 
 The answer is correct if it matches every character of the expected answer. This can be a problem with international spelling, dates, or anything where the format of the answer is not clear.
 
@@ -487,7 +487,7 @@ Lansing is the capital of Michigan, although it is not Michgan's largest city, o
 </problem>`);
     });
     it('converts StringResponse with regular expression to xml', function() {
-      const data = MarkdownEditingDescriptor.markdownToXml(`Who lead the civil right movement in the United States of America?
+      const data = CapaMarkdownEditor.markdownToXml(`Who lead the civil right movement in the United States of America?
 = | \w*\.?\s*Luther King\s*.*
 
 [Explanation]
@@ -509,7 +509,7 @@ Test Explanation.
 </problem>`);
     });
     it('converts StringResponse with multiple answers to xml', function() {
-      const data = MarkdownEditingDescriptor.markdownToXml(`Who lead the civil right movement in the United States of America?
+      const data = CapaMarkdownEditor.markdownToXml(`Who lead the civil right movement in the United States of America?
 = Dr. Martin Luther King Jr.
 or= Doctor Martin Luther King Junior
 or= Martin Luther King
@@ -537,7 +537,7 @@ Test Explanation.
 </problem>`);
     });
     it('converts StringResponse with multiple answers and regular expressions to xml', function() {
-      const data = MarkdownEditingDescriptor.markdownToXml(`Write a number from 1 to 4.
+      const data = CapaMarkdownEditor.markdownToXml(`Write a number from 1 to 4.
 =| ^One$
 or= two
 or= ^thre+
@@ -566,7 +566,7 @@ Test Explanation.
     });
     // test labels
     it('converts markdown labels to label attributes', function() {
-      const data = MarkdownEditingDescriptor.markdownToXml(`>>Who lead the civil right movement in the United States of America?<<
+      const data = CapaMarkdownEditor.markdownToXml(`>>Who lead the civil right movement in the United States of America?<<
 = | \w*\.?\s*Luther King\s*.*
 
 [Explanation]
@@ -588,7 +588,7 @@ Test Explanation.
 </problem>`);
     });
     it('handles multiple questions with labels', function() {
-      const data = MarkdownEditingDescriptor.markdownToXml(`\
+      const data = CapaMarkdownEditor.markdownToXml(`\
 France is a country in Europe.
 
 >>What is the capital of France?<<
@@ -625,7 +625,7 @@ Germany is a country in Europe, too.
 </problem>`);
     });
     it('tests multiple questions with only one label', function() {
-      const data = MarkdownEditingDescriptor.markdownToXml(`\
+      const data = CapaMarkdownEditor.markdownToXml(`\
 France is a country in Europe.
 
 >>What is the capital of France?<<
@@ -663,7 +663,7 @@ What is the capital of Germany?
     });
 
     it('adds labels to formulae', function() {
-      const data = MarkdownEditingDescriptor.markdownToXml(`\
+      const data = CapaMarkdownEditor.markdownToXml(`\
 >>Enter the numerical value of Pi:<<
 = 3.14159 +- .02\
 `);
@@ -680,7 +680,7 @@ What is the capital of Germany?
 
     // test oddities
     it('converts headers and oddities to xml', function() {
-      const data = MarkdownEditingDescriptor.markdownToXml(`Not a header
+      const data = CapaMarkdownEditor.markdownToXml(`Not a header
 A header
 ==============
 
@@ -791,7 +791,7 @@ Code should be nicely monospaced.
     });
 
     it('can separate responsetypes based on ---', function() {
-      const data = MarkdownEditingDescriptor.markdownToXml(`\
+      const data = CapaMarkdownEditor.markdownToXml(`\
 Multiple choice problems allow learners to select only one option. Learners can see all the options along with the problem text.
 
 >>Which of the following countries has the largest population?<<
@@ -873,7 +873,7 @@ Urdu, Marathi, and French are all Indo-European languages, while Finnish and Hun
     });
 
     it('can separate other things based on ---', function() {
-      const data = MarkdownEditingDescriptor.markdownToXml(`\
+      const data = CapaMarkdownEditor.markdownToXml(`\
 Multiple choice problems allow learners to select only one option. Learners can see all the options along with the problem text.
 
 ---
@@ -921,7 +921,7 @@ The population of Germany is approximately 81 million.
     });
 
     it('can do separation if spaces are present around ---', function() {
-      const data = MarkdownEditingDescriptor.markdownToXml(`\
+      const data = CapaMarkdownEditor.markdownToXml(`\
 >>The following languages are in the Indo-European family:||There are three correct choices.<<
 [x] Urdu
 [ ] Finnish
@@ -968,7 +968,7 @@ The population of Germany is approximately 81 million.
     });
 
     it('can extract question description', function() {
-      const data = MarkdownEditingDescriptor.markdownToXml(`\
+      const data = CapaMarkdownEditor.markdownToXml(`\
 >>The following languages are in the Indo-European family:||Choose wisely.<<
 [x] Urdu
 [ ] Finnish
@@ -994,7 +994,7 @@ The population of Germany is approximately 81 million.
     });
 
     it('can handle question and description spanned across multiple lines', function() {
-      const data = MarkdownEditingDescriptor.markdownToXml(`\
+      const data = CapaMarkdownEditor.markdownToXml(`\
 >>The following languages
 are in the
 Indo-European family:
@@ -1022,7 +1022,7 @@ third
     });
 
     it('will not add empty description', function() {
-      const data = MarkdownEditingDescriptor.markdownToXml(`\
+      const data = CapaMarkdownEditor.markdownToXml(`\
 >>The following languages are in the Indo-European family:||<<
 [x] Urdu
 [ ] Finnish\
