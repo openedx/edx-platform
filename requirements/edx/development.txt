@@ -352,7 +352,6 @@ webencodings==0.5.1
 webob==1.8.5
 werkzeug==0.14.1
 wrapt==1.10.5
-xblock-utils==1.2.0
 # FIXME: https://github.com/edx/xblock-utils/pull/52
 -e git+https://github.com/open-craft/xblock-utils.git@jazzar/editor-tabs#egg=xblock-utils==1.3.0
 xblock==1.2.2
