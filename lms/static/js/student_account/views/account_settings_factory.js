@@ -28,7 +28,8 @@
             edxSupportUrl,
             extendedProfileFields,
             displayAccountDeletion,
-            isSecondaryEmailFeatureEnabled
+            isSecondaryEmailFeatureEnabled,
+            betaLanguage
         ) {
             var $accountSettingsElement, userAccountModel, userPreferencesModel, aboutSectionsData,
                 accountsSectionData, ordersSectionData, accountSettingsView, showAccountSettingsPage,
@@ -36,7 +37,8 @@
                 emailFieldView, secondaryEmailFieldView, socialFields, accountDeletionFields, platformData,
                 aboutSectionMessageType, aboutSectionMessage, fullnameFieldView, countryFieldView,
                 fullNameFieldData, emailFieldData, secondaryEmailFieldData, countryFieldData, additionalFields,
-                fieldItem, emailFieldViewIndex;
+                fieldItem, emailFieldViewIndex, focusId,
+                tabIndex = 0;
 
             $accountSettingsElement = $('.wrapper-account-settings');
 
@@ -418,15 +420,24 @@
                     accountsTabSections: accountsSectionData,
                     ordersTabSections: ordersSectionData
                 },
-                userPreferencesModel: userPreferencesModel
+                userPreferencesModel: userPreferencesModel,
+                betaLanguage: betaLanguage
             });
 
             accountSettingsView.render();
-            if( $.cookie('focus_id')) {
-                $($.cookie('focus_id')).attr({"tabindex": 0});
-                $($.cookie('focus_id')).focus();
+            focusId = $.cookie('focus_id');
+            if (focusId) {
+                if (~focusId.indexOf('beta-language')) {
+                    tabIndex = -1;
+
+                    // Scroll to top of selected element
+                    $('html, body').animate({
+                        scrollTop: $(focusId).offset().top
+                    }, 'slow');
+                }
+                $(focusId).attr({tabindex: tabIndex}).focus();
                 // Deleting the cookie
-                document.cookie = "focus_id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/account;";
+                document.cookie = 'focus_id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/account;';
             }
             showAccountSettingsPage = function() {
                 // Record that the account settings page was viewed.
