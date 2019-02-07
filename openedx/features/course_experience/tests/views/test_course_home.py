@@ -10,6 +10,9 @@ from student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+from xmodule.modulestore.django import modulestore
+
+from courseware.courses import get_course_info_usage_key
 
 from .test_course_updates import create_course_update, remove_course_updates
 
@@ -99,16 +102,25 @@ class TestCourseHomePage(SharedModuleStoreTestCase):
         response = self.client.get(url)
         self.assertContains(response, TEST_COURSE_UPDATES_TOOL, status_code=200)
 
-    @skip("This test verifies the query counts on Home Page. It is flaky. Will see after ginkgo release.")
     def test_queries(self):
         """
         Verify that the view's query count doesn't regress.
         """
+
+        # NOTE: This change is only for edx-solutions and will pick Open edX changes when
+        # rebasing to Hawthorn release.
+        # Deletes course updates block to avoid extra call(s) to mongo db.
+        updates_usage_key = get_course_info_usage_key(self.course, 'updates')
+        try:
+            modulestore().delete_item(updates_usage_key, self.user.id)
+        except ValueError:
+            pass
+
         # Pre-fetch the view to populate any caches
         course_home_url(self.course)
 
         # Fetch the view and verify the query counts
-        with self.assertNumQueries(44, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
-            with check_mongo_calls(5):
+        with self.assertNumQueries(39, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
+            with check_mongo_calls(4):
                 url = course_home_url(self.course)
                 self.client.get(url)
