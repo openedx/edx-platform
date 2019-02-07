@@ -37,8 +37,8 @@ from xmodule.xml_module import XmlParserMixin
 from xmodule.x_module import ResourceTemplates
 from xmodule.util.sandboxing import get_python_lib_zip, can_execute_unsafe_code
 
-from .capa_base import _, Randomization, CapaMixin, ComplexEncoder
-from .capa_base_constants import RANDOMIZATION, SHOWANSWER
+from xblock_capa.capa_base import _, Randomization, CapaMixin, ComplexEncoder
+from xblock_capa.capa_base_constants import RANDOMIZATION, SHOWANSWER
 from xblock_capa.lib import responsetypes
 from xblock_capa.lib.capa_problem import LoncapaProblem, LoncapaSystem
 from xblock_capa.lib.xqueue_interface import XQueueInterface
@@ -49,7 +49,7 @@ loader = ResourceLoader(__name__)  # pylint: disable=invalid-name
 FEATURES = getattr(settings, 'FEATURES', {})
 
 
-@XBlock.wants('user')
+@XBlock.wants('user')  # pylint: disable=abstract-method
 @XBlock.needs('i18n')
 @XBlock.needs('request')
 class CapaXBlock(XBlock, CapaMixin, ResourceTemplates, XmlParserMixin, IndexInfoMixin, StudioEditableXBlockMixin):

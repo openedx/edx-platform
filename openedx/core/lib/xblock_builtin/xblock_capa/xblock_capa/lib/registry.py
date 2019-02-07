@@ -21,7 +21,7 @@ class TagRegistry(object):
         """
 
         # Do all checks and complain before changing any state.
-        if len(cls.tags) == 0:
+        if not cls.tags:
             raise ValueError("No tags specified for class {0}".format(cls.__name__))
 
         for tag in cls.tags:

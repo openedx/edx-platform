@@ -1,5 +1,8 @@
-from lxml import etree
+"""
+Tests for the capa response XML factories.
+"""
 from abc import ABCMeta, abstractmethod
+from lxml import etree
 
 
 class ResponseXMLFactory(object):
@@ -533,11 +536,13 @@ class FormulaResponseXMLFactory(ResponseXMLFactory):
     def create_input_element(self, **kwargs):
         return ResponseXMLFactory.textline_input_xml(**kwargs)
 
-    def _sample_str(self, sample_dict, num_samples, tolerance):
-        # Loncapa uses a special format for sample strings:
-        # "x,y,z@4,5,3:10,12,8#4" means plug in values for (x,y,z)
-        # from within the box defined by points (4,5,3) and (10,12,8)
-        # The "#4" means to repeat 4 times.
+    def _sample_str(self, sample_dict, num_samples, _tolerance):
+        """
+        Loncapa uses a special format for sample strings:
+        "x,y,z@4,5,3:10,12,8#4" means plug in values for (x,y,z)
+        from within the box defined by points (4,5,3) and (10,12,8)
+        The "#4" means to repeat 4 times.
+        """
         low_range_vals = [str(f[0]) for f in sample_dict.values()]
         high_range_vals = [str(f[1]) for f in sample_dict.values()]
         sample_str = (

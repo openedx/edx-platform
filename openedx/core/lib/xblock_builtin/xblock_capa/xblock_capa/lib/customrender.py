@@ -23,21 +23,21 @@ registry = TagRegistry()
 
 
 class MathRenderer(object):
+    """
+    Render math using latex-like formatting.
+
+    Examples:
+
+    <math>$\displaystyle U(r)=4 U_0 $</math>
+    <math>$r_0$</math>
+
+    We convert these to [mathjax]...[/mathjax] and [mathjaxinline]...[/mathjaxinline]
+
+    TODO: use shorter tags (but this will require converting problem XML files!)
+    """
     tags = ['math']
 
     def __init__(self, system, xml):
-        r"""
-        Render math using latex-like formatting.
-
-        Examples:
-
-        <math>$\displaystyle U(r)=4 U_0 $</math>
-        <math>$r_0$</math>
-
-        We convert these to [mathjax]...[/mathjax] and [mathjaxinline]...[/mathjaxinline]
-
-        TODO: use shorter tags (but this will require converting problem XML files!)
-        """
         self.system = system
         self.xml = xml
 
@@ -58,7 +58,7 @@ class MathRenderer(object):
             self.mathstr, saxutils.escape(self.xml.tail))
         try:
             xhtml = etree.XML(html)
-        except Exception as err:
+        except Exception as err:  # pylint: disable=broad-except
             if self.system.DEBUG:
                 msg = '<html><div class="inline-error"><p>Error %s</p>' % (
                     str(err).replace('<', '&lt;'))

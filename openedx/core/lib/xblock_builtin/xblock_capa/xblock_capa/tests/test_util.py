@@ -14,7 +14,7 @@ class UtilTest(unittest.TestCase):
         super(UtilTest, self).setUp()
         self.system = test_capa_system()
 
-    def test_compare_with_tolerance(self):
+    def test_compare_with_tolerance(self):  # pylint: disable=too-many-statements
         # Test default tolerance '0.001%' (it is relative)
         result = compare_with_tolerance(100.0, 100.0)
         self.assertTrue(result)

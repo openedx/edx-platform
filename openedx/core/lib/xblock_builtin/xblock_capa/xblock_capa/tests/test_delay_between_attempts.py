@@ -8,21 +8,15 @@ submissions" setting is set to different values
 """
 
 import unittest
-import textwrap
 import datetime
 
-from mock import Mock
 from pytz import UTC
 
-from xblock_capa import CapaXBlock
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
-from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
-from xblock.runtime import Runtime
-from xblock.scorable import Score
 import xmodule
 
-from .test_capa_xblock import CapaFactory
+from xblock_capa.tests.test_capa_xblock import CapaFactory
 
 
 class CapaFactoryWithDelay(CapaFactory):
@@ -34,20 +28,21 @@ class CapaFactoryWithDelay(CapaFactory):
     """
 
     @classmethod
-    def input_key(cls, input_num=2):
+    def input_key(cls, response_num=1, input_num=2):
         """
         Return the input key to use when passing GET parameters
         """
-        return "input_" + cls.answer_key(input_num)
+        return "input_" + cls.answer_key(response_num, input_num)
 
     @classmethod
-    def answer_key(cls, input_num=2):
+    def answer_key(cls, response_num=1, input_num=2):
         """
         Return the key stored in the capa problem answer dict
         """
         return (
-            "%s_%d_1" % (
+            "%s_%d_%d" % (
                 "-".join(['i4x', 'edX', 'capa_test', 'problem', 'SampleProblem%d' % cls.num]),
+                response_num,
                 input_num,
             )
         )
@@ -59,7 +54,8 @@ class CapaFactoryWithDelay(CapaFactory):
         attempts=None,
         correct=False,
         last_submission_time=None,
-        submission_wait_seconds=None
+        submission_wait_seconds=None,
+        **kwargs,
     ):
         """
         Optional parameters here are cut down to what we actually use vs. the regular CapaFactory.
@@ -67,7 +63,9 @@ class CapaFactoryWithDelay(CapaFactory):
         course_id = CourseLocator('edX', 'capa_test', 'run', deprecated=True)
         location = BlockUsageLocator(course_id,
                                      'problem', 'SampleProblem{0}'.format(cls.next_num()), deprecated=True)
+        scope_ids = ScopeIds(None, 'problem', location, location)
         field_data = {'data': cls.sample_problem_xml, 'weight': 1}
+        field_data.update(kwargs)
 
         if max_attempts is not None:
             field_data['max_attempts'] = max_attempts
@@ -81,7 +79,7 @@ class CapaFactoryWithDelay(CapaFactory):
             # since everything else is a string.
             field_data['attempts'] = int(attempts)
 
-        return cls._create_xblock(field_data=field_data, location=location, correct=correct)
+        return cls._create_xblock(field_data=field_data, scope_ids=scope_ids, correct=correct)
 
 
 class XModuleQuizAttemptsDelayTest(unittest.TestCase):
@@ -160,7 +158,10 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
         )
         # You should get a dialog that tells you to wait 2 minutes
         # Also, the number of attempts should not be incremented
-        self.assertRegexpMatches(result['success'], r"You must wait at least 3 minutes between submissions. 2 minutes remaining\..*")
+        self.assertRegexpMatches(
+            result['success'],
+            r"You must wait at least 3 minutes between submissions. 2 minutes remaining\..*",
+        )
         self.assertEqual(xblock.attempts, num_attempts)
 
     def test_submit_quiz_1_second_too_soon(self):
@@ -174,7 +175,10 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
         )
         # You should get a dialog that tells you to wait 2 minutes
         # Also, the number of attempts should not be incremented
-        self.assertRegexpMatches(result['success'], r"You must wait at least 3 minutes between submissions. 1 second remaining\..*")
+        self.assertRegexpMatches(
+            result['success'],
+            r"You must wait at least 3 minutes between submissions. 1 second remaining\..*",
+        )
         self.assertEqual(xblock.attempts, num_attempts)
 
     def test_submit_quiz_as_soon_as_allowed(self):
@@ -239,7 +243,10 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
         )
         # You should get a dialog that tells you to wait 2 minutes
         # Also, the number of attempts should not be incremented
-        self.assertRegexpMatches(result['success'], r"You must wait at least 2 hours between submissions. 2 minutes 1 second remaining\..*")
+        self.assertRegexpMatches(
+            result['success'],
+            r"You must wait at least 2 hours between submissions. 2 minutes 1 second remaining\..*",
+        )
         self.assertEqual(xblock.attempts, num_attempts)
 
     def test_submit_quiz_with_involved_pretty_print(self):
@@ -253,7 +260,11 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
         )
         # You should get a dialog that tells you to wait 2 minutes
         # Also, the number of attempts should not be incremented
-        self.assertRegexpMatches(result['success'], r"You must wait at least 2 hours 1 minute 3 seconds between submissions. 1 hour 2 minutes 59 seconds remaining\..*")
+        self.assertRegexpMatches(
+            result['success'],
+            r"You must wait at least 2 hours 1 minute 3 seconds between submissions. 1 hour 2 minutes 59 seconds"
+             " remaining\..*",
+        )
         self.assertEqual(xblock.attempts, num_attempts)
 
     def test_submit_quiz_with_nonplural_pretty_print(self):
@@ -267,5 +278,8 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
         )
         # You should get a dialog that tells you to wait 2 minutes
         # Also, the number of attempts should not be incremented
-        self.assertRegexpMatches(result['success'], r"You must wait at least 1 minute between submissions. 1 minute remaining\..*")
+        self.assertRegexpMatches(
+            result['success'],
+            r"You must wait at least 1 minute between submissions. 1 minute remaining\..*",
+        )
         self.assertEqual(xblock.attempts, num_attempts)

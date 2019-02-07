@@ -1,6 +1,9 @@
-from lxml import etree
+"""
+Tests for the custom renderers.
+"""
 import unittest
 import xml.sax.saxutils as saxutils
+from lxml import etree
 
 from xblock_capa.lib import customrender
 from xblock_capa.tests.helpers import test_capa_system
@@ -14,7 +17,7 @@ def extract_context(xml):
     Given an xml element corresponding to the output of test_capa_system.render_template, get back the
     original context
     """
-    return eval(xml.text)
+    return eval(xml.text)  # pylint: disable=eval-used
 
 
 def quote_attr(s):
@@ -62,6 +65,9 @@ class MathRenderTest(unittest.TestCase):
     '''
 
     def check_parse(self, latex_in, mathjax_out):
+        """
+        Ensure the provided latex parses as expected.
+        """
         xml_str = """<math>{tex}</math>""".format(tex=latex_in)
         element = etree.fromstring(xml_str)
 

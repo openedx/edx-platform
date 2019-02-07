@@ -113,7 +113,10 @@ class CapaShuffleTest(unittest.TestCase):
         problem = new_loncapa_problem(xml_str, seed=0)  # yields: C E A B D F
         # Donut -> Zonut to show that there is not some hidden alphabetic ordering going on
         the_html = problem.get_html()
-        self.assertRegexpMatches(the_html, r"<div>.*\[.*'Chocolate'.*'Eggplant'.*'Apple'.*'Banana'.*'Zonut'.*'Filet Mignon'.*\].*</div>")
+        self.assertRegexpMatches(
+            the_html,
+            r"<div>.*\[.*'Chocolate'.*'Eggplant'.*'Apple'.*'Banana'.*'Zonut'.*'Filet Mignon'.*\].*</div>"
+        )
 
     def test_shuffle_false(self):
         xml_str = textwrap.dedent("""

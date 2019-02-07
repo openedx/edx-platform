@@ -7,11 +7,11 @@ from cStringIO import StringIO
 from datetime import datetime
 import json
 import os
-import pyparsing
 import random
 import textwrap
 import unittest
 import zipfile
+import pyparsing
 
 import mock
 from pytz import UTC
@@ -46,7 +46,7 @@ from xblock_capa.tests.response_xml_factory import (
 class ResponseTest(unittest.TestCase):
     """Base class for tests of capa responses."""
 
-    xml_factory_class = None
+    xml_factory_class = None  # pylint: disable=not-callable
 
     # If something is wrong, show it to us.
     maxDiff = None
@@ -56,11 +56,11 @@ class ResponseTest(unittest.TestCase):
         if self.xml_factory_class:
             self.xml_factory = self.xml_factory_class()
 
-    def build_problem(self, capa_system=None, **kwargs):  # pylint: disable=missing-docstring
+    def build_problem(self, capa_system=None, **kwargs):
         xml = self.xml_factory.build_xml(**kwargs)
         return new_loncapa_problem(xml, capa_system=capa_system)
 
-    def assert_grade(self, problem, submission, expected_correctness, msg=None):  # pylint: disable=missing-docstring
+    def assert_grade(self, problem, submission, expected_correctness, msg=None):
         input_dict = {'1_2_1': submission}
         correct_map = problem.grade_answers(input_dict)
         if msg is None:
@@ -68,7 +68,7 @@ class ResponseTest(unittest.TestCase):
         else:
             self.assertEquals(correct_map.get_correctness('1_2_1'), expected_correctness, msg)
 
-    def assert_answer_format(self, problem):  # pylint: disable=missing-docstring
+    def assert_answer_format(self, problem):
         answers = problem.get_question_answers()
         self.assertIsNotNone(answers['1_2_1'])
 
@@ -1006,10 +1006,12 @@ class CodeResponseTest(ResponseTest):  # pylint: disable=missing-docstring
             self.problem.correct_map.update(old_cmap)  # Deep copy
 
             self.problem.update_score(xserver_msgs[correctness], queuekey=0)
-            self.assertEquals(self.problem.correct_map.get_dict(), old_cmap.get_dict())  # Deep comparison
+            # Deep comparison
+            self.assertEquals(self.problem.correct_map.get_dict(), old_cmap.get_dict())
 
             for answer_id in answer_ids:
-                self.assertTrue(self.problem.correct_map.is_queued(answer_id))  # Should be still queued, since message undelivered
+                # Should be still queued, since message undelivered
+                self.assertTrue(self.problem.correct_map.is_queued(answer_id))
 
         # Correct queuekey, state should be updated
         for correctness in ['correct', 'incorrect']:
@@ -1020,16 +1022,19 @@ class CodeResponseTest(ResponseTest):  # pylint: disable=missing-docstring
                 new_cmap = CorrectMap()
                 new_cmap.update(old_cmap)
                 npoints = 1 if correctness == 'correct' else 0
-                new_cmap.set(answer_id=answer_id, npoints=npoints, correctness=correctness, msg=grader_msg, queuestate=None)
+                new_cmap.set(answer_id=answer_id, npoints=npoints, correctness=correctness, msg=grader_msg,
+                             queuestate=None)
 
                 self.problem.update_score(xserver_msgs[correctness], queuekey=1000 + i)
                 self.assertEquals(self.problem.correct_map.get_dict(), new_cmap.get_dict())
 
                 for j, test_id in enumerate(answer_ids):
                     if j == i:
-                        self.assertFalse(self.problem.correct_map.is_queued(test_id))  # Should be dequeued, message delivered
+                        # Should be dequeued, message delivered
+                        self.assertFalse(self.problem.correct_map.is_queued(test_id))
                     else:
-                        self.assertTrue(self.problem.correct_map.is_queued(test_id))  # Should be queued, message undelivered
+                        # Should be queued, message undelivered
+                        self.assertTrue(self.problem.correct_map.is_queued(test_id))
 
     def test_recentmost_queuetime(self):
         '''
@@ -1574,7 +1579,7 @@ class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-docstring
         )
 
     @mock.patch('xblock_capa.lib.responsetypes.log')
-    def test_responsetype_i18n(self, mock_log):
+    def test_responsetype_i18n(self, _mock_log):
         """Test that LoncapaSystem has an i18n that works."""
         staff_ans = "clearly bad syntax )[+1e"
         problem = self.build_problem(answer=staff_ans, tolerance=1e-3)
@@ -1633,6 +1638,7 @@ class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-docstring
         ]
 
         with mock.patch('xblock_capa.lib.responsetypes.evaluator') as mock_eval:
+            err = None
             for err, msg_regex in errors:
 
                 def evaluator_side_effect(_, __, math_string):
@@ -2306,7 +2312,7 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-docstring
             num = my_helper.seventeen()
             """)
         capa_system = test_capa_system()
-        capa_system.get_python_lib_zip = lambda: zipstring.getvalue()
+        capa_system.get_python_lib_zip = zipstring.getvalue
         problem = self.build_problem(script=script, capa_system=capa_system)
         self.assertEqual(problem.context['num'], 17)
 
@@ -2410,7 +2416,10 @@ class SchematicResponseTest(ResponseTest):
 
     def test_check_function_randomization(self):
         # The check function should get a random seed from the problem.
-        script = "correct = ['correct' if (submission[0]['num'] == {code}) else 'incorrect']".format(code=self._get_random_number_code())
+        script = "correct = ['correct' if (submission[0]['num'] == {code}) else 'incorrect']".format(
+            code=self._get_random_number_code()
+        )
+
         problem = self.build_problem(answer=script)
 
         submission_dict = {'num': self._get_random_number_result(problem.seed)}

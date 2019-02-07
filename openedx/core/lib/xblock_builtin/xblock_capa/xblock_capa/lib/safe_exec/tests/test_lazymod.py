@@ -26,6 +26,9 @@ class ModuleIsolation(object):
 
 
 class TestLazyMod(unittest.TestCase):
+    """
+    Test lazy module imports.
+    """
 
     def setUp(self):
         super(TestLazyMod, self).setUp()

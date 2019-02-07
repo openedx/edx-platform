@@ -507,7 +507,10 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
         the_html = problem.get_html()
         without_new_lines = the_html.replace("\n", "")
 
-        self.assertRegexpMatches(without_new_lines, r"<targetedfeedback explanation-id=\"feedbackC\".*solution explanation")
+        self.assertRegexpMatches(
+            without_new_lines,
+            r"<targetedfeedback explanation-id=\"feedbackC\".*solution explanation"
+        )
         self.assertNotRegexpMatches(without_new_lines, r"<div>\{.*'1_solution_1'.*\}</div>")
         self.assertNotRegexpMatches(without_new_lines, r"feedback1|feedback3")
 
@@ -569,7 +572,10 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
         the_html = problem.get_html()
         without_new_lines = the_html.replace("\n", "")
 
-        self.assertNotRegexpMatches(without_new_lines, r"<targetedfeedback explanation-id=\"feedbackC\".*solution explanation")
+        self.assertNotRegexpMatches(
+            without_new_lines,
+            r"<targetedfeedback explanation-id=\"feedbackC\".*solution explanation"
+        )
         self.assertRegexpMatches(without_new_lines, r"<div>\{.*'1_solution_1'.*\}</div>")
         self.assertNotRegexpMatches(without_new_lines, r"feedback1|feedback3|feedbackC")
 

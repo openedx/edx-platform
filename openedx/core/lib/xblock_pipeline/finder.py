@@ -38,14 +38,14 @@ class XBlockPackageStorage(Storage):
         """
         return resource_filename(self.module, os.path.join(self.base_dir, name))
 
-    def exists(self, path):
+    def exists(self, name):
         """
         Returns True if the specified path exists.
         """
         if self.base_dir is None:
             return False
 
-        return resource_exists(self.module, os.path.join(self.base_dir, path))
+        return resource_exists(self.module, os.path.join(self.base_dir, name))
 
     def listdir(self, path):
         """

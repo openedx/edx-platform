@@ -16,6 +16,8 @@ from codejail.jail_code import is_configured
 
 
 class TestSafeExec(unittest.TestCase):
+    """ Test safe_exec functions"""
+
     def test_set_values(self):
         g = {}
         safe_exec("a = 17", g)
@@ -74,6 +76,8 @@ class TestSafeExec(unittest.TestCase):
 
 
 class TestSafeOrNot(unittest.TestCase):
+    """Safe execution tests"""
+
     def test_cant_do_something_forbidden(self):
         # Can't test for forbiddenness if CodeJail isn't configured for python.
         if not is_configured("python"):
@@ -149,7 +153,7 @@ class TestSafeExecCaching(unittest.TestCase):
 
         # The exception should be in the cache now.
         self.assertEqual(len(cache), 1)
-        cache_exc_msg, cache_globals = cache.values()[0]
+        cache_exc_msg, _cache_globals = cache.values()[0]
         self.assertIn("ZeroDivisionError", cache_exc_msg)
 
         # Change the value stored in the cache, the result should change.

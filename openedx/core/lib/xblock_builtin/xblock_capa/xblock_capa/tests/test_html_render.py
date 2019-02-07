@@ -4,9 +4,9 @@ CAPA HTML rendering tests.
 import textwrap
 import unittest
 
+import os
 import ddt
 import mock
-import os
 # Changes formatting of empty elements; import here to avoid test order dependence
 import xmodule.modulestore.xml  # pylint: disable=unused-import
 from lxml import etree
@@ -305,6 +305,9 @@ class CapaHtmlRenderTest(unittest.TestCase):
         self.assertRegexpMatches(the_html, r"<div/>")
 
     def _create_test_file(self, path, content_str):
+        """
+        Creates a test file in the Capa systen filestore.
+        """
         test_fp = self.capa_system.filestore.open(path, "w")
         test_fp.write(content_str)
         test_fp.close()

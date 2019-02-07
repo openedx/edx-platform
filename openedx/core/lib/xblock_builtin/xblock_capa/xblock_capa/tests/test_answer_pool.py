@@ -113,7 +113,10 @@ class CapaAnswerPoolTest(unittest.TestCase):
 
         problem = new_loncapa_problem(xml_str)
         the_html = problem.get_html()
-        self.assertRegexpMatches(the_html, r"<div>.*\[.*'wrong-1'.*'wrong-2'.*'correct-1'.*'wrong-3'.*'wrong-4'.*'correct-2'.*\].*</div>")
+        self.assertRegexpMatches(
+            the_html,
+            r"<div>.*\[.*'wrong-1'.*'wrong-2'.*'correct-1'.*'wrong-3'.*'wrong-4'.*'correct-2'.*\].*</div>"
+        )
         self.assertRegexpMatches(the_html, r"<div>\{.*'1_solution_1'.*'1_solution_2'.*\}</div>")
         self.assertEqual(the_html, problem.get_html(), 'should be able to call get_html() twice')
         # Check about masking
@@ -159,7 +162,10 @@ class CapaAnswerPoolTest(unittest.TestCase):
 
         problem = new_loncapa_problem(xml_str)
         the_html = problem.get_html()
-        self.assertRegexpMatches(the_html, r"<div>.*\[.*'wrong-1'.*'wrong-2'.*'correct-1'.*'wrong-3'.*'wrong-4'.*'correct-2'.*\].*</div>")
+        self.assertRegexpMatches(
+            the_html,
+            r"<div>.*\[.*'wrong-1'.*'wrong-2'.*'correct-1'.*'wrong-3'.*'wrong-4'.*'correct-2'.*\].*</div>"
+        )
         self.assertRegexpMatches(the_html, r"<div>\{.*'1_solution_1'.*'1_solution_2'.*\}</div>")
         response = problem.responders.values()[0]
         self.assertFalse(response.has_mask())
@@ -277,7 +283,10 @@ class CapaAnswerPoolTest(unittest.TestCase):
 
         problem = new_loncapa_problem(xml_str, seed=723)
         the_html = problem.get_html()
-        self.assertRegexpMatches(the_html, r"<div>.*\[.*'correct-2'.*'wrong-1'.*'wrong-2'.*.*'wrong-3'.*'wrong-4'.*\].*</div>")
+        self.assertRegexpMatches(
+            the_html,
+            r"<div>.*\[.*'correct-2'.*'wrong-1'.*'wrong-2'.*.*'wrong-3'.*'wrong-4'.*\].*</div>",
+        )
         self.assertRegexpMatches(the_html, r"<div>\{.*'1_solution_2'.*\}</div>")
         response = problem.responders.values()[0]
         self.assertFalse(response.has_mask())

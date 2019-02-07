@@ -4,11 +4,11 @@ Utility functions for capa.
 import re
 from decimal import Decimal
 
+from cmath import isinf, isnan
 import bleach
 from lxml import etree
 
 from calc import evaluator
-from cmath import isinf, isnan
 from openedx.core.djangolib.markup import HTML
 
 

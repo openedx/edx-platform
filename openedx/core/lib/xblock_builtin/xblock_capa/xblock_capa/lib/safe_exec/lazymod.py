@@ -36,7 +36,7 @@ class LazyModule(object):
             try:
                 subname = '%s.%s' % (self.__name__, name)
                 __import__(subname)
-                submod = getattr(mod, name)
+                _ = getattr(mod, name)
             except ImportError:
                 raise AttributeError("'module' object has no attribute %r" % name)
             self.__dict__[name] = LazyModule(subname)

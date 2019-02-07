@@ -90,20 +90,20 @@ class LoncapaSystem(object):
     See :class:`ModuleSystem` for documentation of other attributes.
 
     """
-    def __init__(                                       # pylint: disable=invalid-name
+    def __init__(
         self,
         ajax_url,
         anonymous_student_id,
         cache,
         can_execute_unsafe_code,
         get_python_lib_zip,
-        DEBUG,                                          # pylint: disable=invalid-name
+        DEBUG,
         filestore,
         i18n,
         node_path,
         render_template,
         seed,      # Why do we do this if we have self.seed?
-        STATIC_URL,                                     # pylint: disable=invalid-name
+        STATIC_URL,
         xqueue,
         matlab_api_key=None
     ):
@@ -121,6 +121,7 @@ class LoncapaSystem(object):
         self.STATIC_URL = STATIC_URL                    # pylint: disable=invalid-name
         self.xqueue = xqueue
         self.matlab_api_key = matlab_api_key
+        self.correct_map = None
 
 
 class LoncapaProblem(object):
@@ -254,7 +255,7 @@ class LoncapaProblem(object):
                     correct_option = option_name
                 child_options.append("'" + option_name + "'")
 
-            if len(child_options) > 0:
+            if child_options:
                 options_string = '(' + ','.join(child_options) + ')'
                 optioninput.attrib.update({'options': options_string})
                 if correct_option:
@@ -471,7 +472,7 @@ class LoncapaProblem(object):
         """
         # dict of (id, correct_answer)
         answer_map = dict()
-        for response in self.responders.keys():
+        for response in self.responders:
             results = self.responder_answers[response]
             answer_map.update(results)
 
@@ -1058,7 +1059,7 @@ class LoncapaProblem(object):
             # get responder answers (do this only once, since there may be a performance cost,
             # eg with externalresponse)
             self.responder_answers = {}
-            for response in self.responders.keys():
+            for response in self.responders:
                 try:
                     self.responder_answers[response] = self.responders[response].get_answers()
                 except:

@@ -1,6 +1,6 @@
-#
-#  LMS Interface to external queueing system (xqueue)
-#
+"""
+LMS Interface to external queueing system (xqueue)
+"""
 import hashlib
 import json
 import logging
@@ -91,7 +91,7 @@ class XQueueInterface(object):
 
         # log the send to xqueue
         header_info = json.loads(header)
-        queue_name = header_info.get('queue_name', u'')
+        _ = header_info.get('queue_name', u'')
 
         # Attempt to send to queue
         (error, msg) = self._send_to_queue(header, body, files_to_upload)
@@ -112,6 +112,9 @@ class XQueueInterface(object):
         return (error, msg)
 
     def _login(self):
+        """
+        Login to xqueue
+        """
         payload = {
             'username': self.auth['username'],
             'password': self.auth['password']
@@ -119,6 +122,9 @@ class XQueueInterface(object):
         return self._http_post(self.url + '/xqueue/login/', payload)
 
     def _send_to_queue(self, header, body, files_to_upload):
+        """
+        Post files to xqueue.
+        """
         payload = {
             'xqueue_header': header,
             'xqueue_body': body
@@ -131,6 +137,9 @@ class XQueueInterface(object):
         return self._http_post(self.url + '/xqueue/submit/', payload, files=files)
 
     def _http_post(self, url, data, files=None):
+        """
+        Handle post, and catch and classify response and errors.
+        """
         try:
             response = self.session.post(
                 url, data=data, files=files, timeout=(CONNECT_TIMEOUT, READ_TIMEOUT)

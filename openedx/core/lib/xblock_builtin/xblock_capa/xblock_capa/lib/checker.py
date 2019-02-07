@@ -21,6 +21,9 @@ log = logging.getLogger('capa.checker')
 
 
 class DemoSystem(object):
+    """
+    Acts as a mock system for LoncapaProblem.
+    """
     def __init__(self):
         self.lookup = TemplateLookup(directories=[path(__file__).dirname() / 'templates'])
         self.DEBUG = True
@@ -33,6 +36,9 @@ class DemoSystem(object):
 
 
 def main():
+    """
+    Check the provided problem files.
+    """
     parser = argparse.ArgumentParser(description='Check Problem Files')
     parser.add_argument("command", choices=['test', 'show'])  # Watch? Render? Open?
     parser.add_argument("files", nargs="+", type=argparse.FileType('r'))
@@ -50,8 +56,8 @@ def main():
         log.info("Opening {0}".format(problem_file.name))
 
         try:
-            problem = LoncapaProblem(problem_file, "fakeid", seed=args.seed, system=system)
-        except Exception as ex:
+            problem = LoncapaProblem(problem_file, "fakeid", seed=args.seed, capa_system=system)
+        except Exception as ex:  # pylint: disable=broad-except
             log.error("Could not parse file {0}".format(problem_file.name))
             log.exception(ex)
             continue
@@ -85,7 +91,7 @@ def command_test(problem):
                             "captured stdout from {0}".format(problem))
         log_captured_output(sys.stderr,
                             "captured stderr from {0}".format(problem))
-    except Exception as e:
+    except Exception as e:  # pylint: disable=broad-except
         log.exception(e)
     finally:
         sys.stdout, sys.stderr = old_stdout, old_stderr
@@ -144,7 +150,7 @@ def check_that_suggested_answers_work(problem):
             for question_id, result in sorted(real_results.items()):
                 if result != 'correct':
                     log.error("  {0} = {1}".format(question_id, real_answers[question_id]))
-        except Exception as ex:
+        except Exception as ex:  # pylint: disable=broad-except
             log.error("Uncaught error in {0}".format(problem))
             log.exception(ex)
 

@@ -8,7 +8,6 @@ from contracts import contract, new_contract
 from functools import partial
 from lxml import etree
 from collections import namedtuple
-from django.urls import NoReverseMatch, reverse
 from pkg_resources import (
     resource_exists,
     resource_listdir,

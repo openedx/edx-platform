@@ -1,14 +1,14 @@
 """
 Test capa problem.
 """
-import ddt
 import textwrap
 
 import six
+import unittest
+import ddt
 from lxml import etree
 from markupsafe import Markup
 from mock import patch
-import unittest
 
 from openedx.core.djangolib.markup import HTML
 from xblock_capa.tests.helpers import new_loncapa_problem

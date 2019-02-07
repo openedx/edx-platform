@@ -1,16 +1,16 @@
 """Tools for helping with testing capa."""
 
 import gettext
-from path import Path
 import os
 import os.path
+import xml.sax.saxutils as saxutils
+from path import Path
 
 import fs.osfs
 import six
 
 from mock import Mock, MagicMock
 from mako.lookup import TemplateLookup
-import xml.sax.saxutils as saxutils
 
 from xblock_capa.lib.capa_problem import LoncapaProblem, LoncapaSystem
 from xblock_capa.lib.inputtypes import Status
@@ -23,8 +23,9 @@ def get_template(template_name):
     """
     Return template for a capa inputtype.
     """
+    template_dir = Path(__file__).dirname().dirname()
     return TemplateLookup(
-        directories=[Path(__file__).dirname().dirname() / 'lib' / 'templates'],
+        directories=[template_dir / 'lib' / 'templates'],   # pylint: disable=no-value-for-parameter
         default_filters=['decode.utf8']
     ).get_template(template_name)
 
@@ -86,7 +87,7 @@ def mock_capa_module():
     """
     capa response types needs just two things from the capa_module: location and track_function.
     """
-    def mock_location_text(self):
+    def mock_location_text(_self):
         """
         Mock implementation of __unicode__ or __str__ for the module's location.
         """

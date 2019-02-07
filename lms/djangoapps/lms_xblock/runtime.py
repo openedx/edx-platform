@@ -1,9 +1,11 @@
 """
 Module implementing `xblock.runtime.Runtime` functionality for the LMS
 """
+from six import text_type
+
 from completion.services import CompletionService
 from django.conf import settings
-from django.urls import reverse
+from django.urls import NoReverseMatch, reverse
 from edx_django_utils.cache import DEFAULT_REQUEST_CACHE
 import xblock.reference.plugins
 

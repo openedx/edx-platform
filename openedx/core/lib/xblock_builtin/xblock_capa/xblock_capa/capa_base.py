@@ -11,8 +11,8 @@ import sys
 import traceback
 
 from django.conf import settings
-from pytz import utc
 from django.utils.encoding import smart_text
+from pytz import utc
 from six import text_type
 
 from xblock.fields import String
@@ -23,12 +23,11 @@ from xmodule.exceptions import NotFoundError
 from xmodule.graders import ShowCorrectness
 from xmodule.progress import Progress
 
+from xblock_capa.capa_base_constants import RANDOMIZATION, SHOWANSWER
 from xblock_capa.lib.capa_problem import LoncapaProblem, LoncapaSystem
 from xblock_capa.lib.inputtypes import Status
 from xblock_capa.lib.responsetypes import StudentInputError, ResponseError, LoncapaProblemError
 from xblock_capa.lib.util import convert_files_to_filenames, get_inner_html_from_xpath
-
-from .capa_base_constants import RANDOMIZATION, SHOWANSWER
 
 
 log = logging.getLogger("edx.courseware")
@@ -76,7 +75,7 @@ class ComplexEncoder(json.JSONEncoder):
     """
     Extend the JSON encoder to correctly handle complex numbers
     """
-    def default(self, obj):  # pylint: disable=method-hidden
+    def default(self, obj):  # pylint: disable=method-hidden,arguments-differ
         """
         Print a nicely formatted complex number, or default to the JSON encoder
         """
@@ -484,10 +483,10 @@ class CapaMixin(ScorableXBlockMixin):
         # hint_index is the index of the last hint that will be displayed in this rendering,
         # so add 1 to check if others exist.
         if hint_index is None:
-            should_enable = len(demand_hints) > 0
+            should_enable = bool(demand_hints)
         else:
-            should_enable = len(demand_hints) > 0 and hint_index + 1 < len(demand_hints)
-        return len(demand_hints) > 0, should_enable
+            should_enable = bool(demand_hints) and hint_index + 1 < len(demand_hints)
+        return bool(demand_hints), should_enable
 
     def get_demand_hint(self, hint_index):
         """
@@ -700,7 +699,9 @@ class CapaMixin(ScorableXBlockMixin):
                 'correcthint', 'regexphint', 'additional_answer', 'stringequalhint', 'compoundhint',
                 'stringequalhint']
         for tag in tags:
-            html = re.sub(r'<%s.*?>.*?</%s>' % (tag, tag), '', html, flags=re.DOTALL)  # xss-lint: disable=python-interpolate-html
+            html = re.sub(r'<%s.*?>.*?</%s>' % (tag, tag),  # xss-lint: disable=python-interpolate-html
+                          '', html, flags=re.DOTALL)
+
             # Some of these tags span multiple lines
         # Note: could probably speed this up by calling sub() once with a big regex
         # vs. simply calling sub() many times as we have here.
@@ -1016,7 +1017,6 @@ class CapaMixin(ScorableXBlockMixin):
         answers_without_files = convert_files_to_filenames(answers)
         event_info['answers'] = answers_without_files
 
-        metric_name = u'capa.check_problem.{}'.format
         # Can override current time
         current_time = datetime.datetime.now(utc)
         if override_time is not False:
@@ -1462,7 +1462,7 @@ class CapaMixin(ScorableXBlockMixin):
         try:
             self.update_correctness()
             calculated_score = self.calculate_score()
-        except (StudentInputError, ResponseError, LoncapaProblemError) as inst:
+        except (StudentInputError, ResponseError, LoncapaProblemError):
             log.warning("Input error in capa_module:problem_rescore", exc_info=True)
             event_info['failure'] = 'input_error'
             self.track_function_unmask('problem_rescore_fail', event_info)

@@ -52,11 +52,11 @@ import pyparsing
 from lxml import etree
 from six import text_type
 
-import xqueue_interface
 from calc.preview import latex_preview
-from xblock_capa.lib.xqueue_interface import XQUEUE_TIMEOUT
 from chem import chemcalc
 from openedx.core.djangolib.markup import HTML, Text
+from xblock_capa.lib import xqueue_interface
+from xblock_capa.lib.xqueue_interface import XQUEUE_TIMEOUT
 from xmodule.stringify import stringify_children
 
 from .registry import TagRegistry
@@ -249,7 +249,7 @@ class InputTypeBase(object):
             # super().__init__, and are isolated from changes to the input
             # constructor interface.
             self.setup()
-        except Exception as err:
+        except Exception as err:  # pylint: disable=broad-except
             # Something went wrong: add xml to message, but keep the traceback
             msg = u"Error in xml '{x}': {err} ".format(
                 x=etree.tostring(xml), err=text_type(err))
@@ -378,8 +378,8 @@ class InputTypeBase(object):
         try:
             output = etree.XML(html)
         except etree.XMLSyntaxError as ex:
-            # If `html` contains attrs with no values, like `controls` in <audio controls src='smth'/>,
-            # XML parser will raise exception, so wee fallback to html5parser, which will set empty "" values for such attrs.
+            # If `html` contains attrs with no values, like `controls` in <audio controls src='smth'/>, XML parser will
+            # raise exception, so we fallback to html5parser, which will set empty "" values for such attrs.
             try:
                 output = html5lib.parseFragment(html, treebuilder='lxml', namespaceHTMLElements=False)[0]
             except IndexError:
@@ -780,6 +780,10 @@ class CodeInput(InputTypeBase):
             Attribute('tabsize', 4, transform=int),
         ]
 
+    def __init__(*args, **kwargs):
+        super(CodeInput, self).__init__(*args, **kwargs)
+        self.queue_len = 0
+
     def setup_code_response_rendering(self):
         """
         Implement special logic: handle queueing state, and default input.
@@ -896,7 +900,8 @@ class MatlabInput(CodeInput):
 
         Args:
             - queue_msg (str) - message returned from the queue. The message to be rendered
-            - queuekey (str) - a key passed to the queue. Will be matched up to verify that this is the response we're waiting for
+            - queuekey (str) - a key passed to the queue.
+              Will be matched up to verify that this is the response we're waiting for.
 
         Returns:
             nothing
@@ -927,7 +932,8 @@ class MatlabInput(CodeInput):
         _ = self.capa_system.i18n.ugettext
 
         queue_msg = self.queue_msg
-        if len(self.queue_msg) > 0:  # An empty string cannot be parsed as XML but is okay to include in the template.
+        if len(self.queue_msg) > 0:  # pylint disable=len-as-condition
+            # An empty string cannot be parsed as XML but is okay to include in the template.
             try:
                 etree.XML(HTML(u'<div>{0}</div>').format(HTML(self.queue_msg)))
             except etree.XMLSyntaxError:
@@ -1213,7 +1219,7 @@ class ChemicalEquationInput(InputTypeBase):
             result['preview'] = chemcalc.render_to_html(formula)
         except pyparsing.ParseException as err:
             result['error'] = _("Couldn't parse formula: {error_msg}").format(error_msg=err.msg)
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             # this is unexpected, so log
             log.warning(
                 "Error while previewing chemical formula", exc_info=True)
@@ -1263,13 +1269,13 @@ class FormulaEquationInput(InputTypeBase):
                 static_url=self.capa_system.STATIC_URL),
         }
 
-    def handle_ajax(self, dispatch, get):
+    def handle_ajax(self, dispatch, request_post):
         """
         Since we only have formcalc preview this input, check to see if it
         matches the corresponding dispatch and send it through if it does
         """
         if dispatch == 'preview_formcalc':
-            return self.preview_formcalc(get)
+            return self.preview_formcalc(request_post)
         return {}
 
     def preview_formcalc(self, get):
@@ -1304,7 +1310,7 @@ class FormulaEquationInput(InputTypeBase):
         except pyparsing.ParseException:
             result['error'] = _("Sorry, couldn't parse formula")
             result['formula'] = formula
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             # this is unexpected, so log
             log.warning(
                 "Error while previewing formula", exc_info=True
@@ -1351,6 +1357,7 @@ class DragAndDropInput(InputTypeBase):
                     'can_reuse': smth}.
             """
             tag_attrs = dict()
+            # pylint: disable=protected-access
             tag_attrs['draggable'] = {
                 'id': Attribute._sentinel,
                 'label': "", 'icon': "",
@@ -1364,6 +1371,7 @@ class DragAndDropInput(InputTypeBase):
                 'w': Attribute._sentinel,
                 'h': Attribute._sentinel
             }
+            # pylint: enable=protected-access
 
             dic = dict()
 
@@ -1530,7 +1538,9 @@ class AnnotationInput(InputTypeBase):
                 They are the ones who, at the public assembly, had put savage derangement [ate] into my thinking
                 [phrenes] |89 on that day when I myself deprived Achilles of his honorific portion [geras]
             </text>
-            <comment>Agamemnon says that ate or 'derangement' was the cause of his actions: why could Zeus say the same thing?</comment>
+            <comment>
+                Agamemnon says that ate or 'derangement' was the cause of his actions: why could Zeus say the same?
+            </comment>
             <comment_prompt>Type a commentary below:</comment_prompt>
             <tag_prompt>Select one tag:</tag_prompt>
             <options>

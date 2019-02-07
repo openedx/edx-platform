@@ -7,37 +7,37 @@ Tests of the Capa XBlock
 
 import datetime
 import json
-import random
-import requests
 import os
+import random
 import textwrap
 import unittest
+import requests
 
 import ddt
 from django.test.utils import override_settings
 from django.utils.encoding import smart_text
 from edx_user_state_client.interface import XBlockUserState
 from lxml import etree
-from mock import Mock, patch, DEFAULT, PropertyMock
+from mock import Mock, patch, DEFAULT
+from pytz import UTC
 import six
 import webob
 from webob.multidict import MultiDict
 
 import xmodule
 from xmodule.tests import DATA_DIR
-from xblock_capa.lib import responsetypes
-from xblock_capa.lib.responsetypes import (StudentInputError, LoncapaProblemError, ResponseError)
-from xblock_capa.lib.xqueue_interface import XQueueInterface
-from xblock_capa import CapaXBlock, ComplexEncoder
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from xblock.scorable import Score
 
-from pytz import UTC
 from lms_xblock.runtime import LmsModuleSystem
+from xblock_capa import CapaXBlock, ComplexEncoder
+from xblock_capa.capa_base_constants import RANDOMIZATION, SHOWANSWER
+from xblock_capa.lib import responsetypes
 from xblock_capa.lib.correctmap import CorrectMap
-from ..capa_base_constants import RANDOMIZATION, SHOWANSWER
+from xblock_capa.lib.responsetypes import (StudentInputError, LoncapaProblemError, ResponseError)
+from xblock_capa.lib.xqueue_interface import XQueueInterface
 
 
 class CapaFactory(object):
@@ -142,7 +142,7 @@ class CapaFactory(object):
                        correct=False,
                        override_get_score=True,
                        create_loncapa_problem=True,
-                       **kwargs):
+                       **_kwargs):
         """
         Returns a new CapaXBlock with the requested field data, and a runtime suitable for testing.
         """
@@ -179,7 +179,7 @@ class CapaFactory(object):
         # XModule generates the module seed on creation, but CapaXBlock waits until LoncapaProblem object created, and
         # updates the seed as a side effect.  So to avoid modifying a lot of existing tests, we trigger that update now.
         if create_loncapa_problem:
-            xblock.lcp
+            xblock.lcp  # pylint: disable=pointless-statement
 
         return xblock
 
@@ -342,7 +342,8 @@ class CapaXBlockTest(unittest.TestCase):
         }, True, True),
     )
     @ddt.unpack
-    def test_showanswer_hide_correctness(self, problem_data, answer_available_no_attempt, answer_available_after_attempt):
+    def test_showanswer_hide_correctness(self, problem_data, answer_available_no_attempt,
+                                         answer_available_after_attempt):
         """
         Ensure that the answer will not be shown when correctness is being hidden.
         """
@@ -747,7 +748,7 @@ class CapaXBlockTest(unittest.TestCase):
 
         # Expect that we get a dict with "input" stripped from key names
         # and that we get the same values back
-        for key in result.keys():
+        for key in result:
             original_key = "input_" + key
             self.assertIn(original_key, valid_get_dict, "Output dict should have key %s" % original_key)
             self.assertEqual(valid_get_dict[original_key], result[key])
@@ -902,7 +903,6 @@ class CapaXBlockTest(unittest.TestCase):
     @patch('xblock_capa.XQueueInterface._http_post')
     def test_submit_problem_with_files(self, mock_http_post):
         # Check a problem with uploaded files, using the submit_problem API.
-        # pylint: disable=protected-access
 
         # The files we'll be uploading.
         fnames = ["prog1.py", "prog2.py", "prog3.py"]
@@ -944,7 +944,7 @@ class CapaXBlockTest(unittest.TestCase):
         # pylint: enable=line-too-long
 
         self.assertEqual(mock_http_post.call_count, 1)
-        _, kwargs = mock_http_post.call_args  # pylint: disable=unpacking-non-sequence
+        _, kwargs = mock_http_post.call_args
         self.assertItemsEqual(fpaths, kwargs['files'].keys())
         for fpath, fileobj in kwargs['files'].iteritems():
             self.assertEqual(fpath, fileobj.name)
@@ -952,7 +952,6 @@ class CapaXBlockTest(unittest.TestCase):
     @patch('xblock_capa.XQueueInterface._http_post')
     def test_submit_problem_with_files_as_xblock(self, mock_http_post):
         # Check a problem with uploaded files, using the XBlock API.
-        # pylint: disable=protected-access
 
         # The files we'll be uploading.
         fnames = ["prog1.py", "prog2.py", "prog3.py"]
@@ -976,7 +975,7 @@ class CapaXBlockTest(unittest.TestCase):
         module.handle('ajax_handler', request, 'problem_check')
 
         self.assertEqual(mock_http_post.call_count, 1)
-        _, kwargs = mock_http_post.call_args  # pylint: disable=unpacking-non-sequence
+        _, kwargs = mock_http_post.call_args
         self.assertItemsEqual(fnames, kwargs['files'].keys())
         for fpath, fileobj in kwargs['files'].iteritems():
             self.assertEqual(fpath, fileobj.name)
@@ -2041,7 +2040,7 @@ class CapaXBlockTest(unittest.TestCase):
         url = module.runtime.handler_url(module, 'problem_get')
         request = webob.Request.blank(url, POST="{}", content_type='multipart/form-data')
         response = module.problem_get(request)
-        self.assertEquals(response.json, {'html': "<div>Test Template HTML</div>"})
+        self.assertEquals(response.json, {'html': "<div>Test Template HTML</div>"})  # pylint: disable=no-member
 
     # Standard question with shuffle="true" used by a few tests
     common_shuffle_xml = textwrap.dedent("""
@@ -2109,7 +2108,7 @@ class CapaXBlockTest(unittest.TestCase):
         module.submit_problem(get_request_dict)
         # On rescore, state/student_answers should use unmasked names
         with patch.object(module.runtime, 'track_function') as mock_track_function:
-            module.rescore_problem(only_if_higher=False)
+            module.rescore(only_if_higher=False)
             mock_call = mock_track_function.mock_calls[0]
             event_info = mock_call[1][1]
             self.assertEquals(mock_call[1][0], 'problem_rescore')
@@ -3307,6 +3306,7 @@ class TestCapaXBlockReportGeneration(unittest.TestCase):
     """
 
     def setUp(self):
+        super(TestCapaXBlockReportGeneration, self).setUp()
         self.find_question_label_patcher = patch(
             'xblock_capa.lib.capa_problem.LoncapaProblem.find_question_label',
             lambda self, answer_id: answer_id

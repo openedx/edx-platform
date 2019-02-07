@@ -8,7 +8,6 @@ of a variety of types.
 Used by capa_problem.py
 """
 
-# pylint: disable=attribute-defined-outside-init
 # standard library imports
 import abc
 # TODO: Refactor this code and fix this issue.
@@ -20,12 +19,13 @@ import numbers
 import random
 import re
 import sys
+from sys import float_info
 import textwrap
 import traceback
 from collections import namedtuple
 from datetime import datetime
-from sys import float_info
 
+from cmath import isnan
 import html5lib
 import numpy
 import requests
@@ -40,7 +40,6 @@ import xblock_capa.lib.safe_exec as safe_exec
 import xblock_capa.lib.xqueue_interface as xqueue_interface
 # specific library imports
 from calc import UndefinedVariable, UnmatchedParenthesis, evaluator
-from cmath import isnan
 from openedx.core.djangolib.markup import HTML, Text
 
 from . import correctmap
@@ -1323,7 +1322,7 @@ class MultipleChoiceResponse(LoncapaResponse):
             # Filter out solutions that don't correspond to the correct answer we selected to show
             # Note that this means that if the user simply provides a <solution> tag, nothing is filtered
             solutionset = choicegroup.xpath('../following-sibling::solutionset')
-            if len(solutionset) != 0:
+            if solutionset:
                 solutionset = solutionset[0]
                 solutions = solutionset.xpath('./solution')
                 for solution in solutions:
@@ -1386,8 +1385,10 @@ class MultipleChoiceResponse(LoncapaResponse):
 
 
 @registry.register
-class TrueFalseResponse(MultipleChoiceResponse):
-
+class TrueFalseResponse(MultipleChoiceResponse):  # pylint: disable=abstract-method
+    """
+    Multiple choice problem with True/False possible answers.
+    """
     human_name = _('True/False Choice')
     tags = ['truefalseresponse']
 
@@ -1571,7 +1572,7 @@ class NumericalResponse(LoncapaResponse):
 
         return correct_ans
 
-    def get_score(self, student_answers):
+    def get_score(self, student_answers):  # pylint: disable=too-many-statements
         """
         Grade a numeric response.
         """
@@ -2125,7 +2126,9 @@ class CustomResponse(LoncapaResponse):
                 # actual function that will re-execute the original script,
                 # and invoke the function with the data needed.
                 def make_check_function(script_code, cfn):
+                    # Wraps the check function
                     def check_function(expect, ans, **kwargs):
+                        # Function that executes the python code
                         extra_args = "".join(", {0}={0}".format(k) for k in kwargs)
                         code = (
                             script_code + "\n" +
@@ -2267,7 +2270,7 @@ class CustomResponse(LoncapaResponse):
         correct_map = CorrectMap()
         correct_map.set_overall_message(overall_message)
 
-        for k in range(len(idset)):
+        for k in range(len(idset)):  # pylint: disable=consider-using-enumerate
             max_points = self.maxpoints[idset[k]]
             if grade_decimals:
                 npoints = max_points * grade_decimals[k]
@@ -2282,9 +2285,9 @@ class CustomResponse(LoncapaResponse):
                             npoints=npoints)
         return correct_map
 
-    def execute_check_function(self, idset, submission):
+    def execute_check_function(self, idset, submission):  # pylint: disable=too-many-statements
         # exec the check function
-        if isinstance(self.code, basestring):
+        if isinstance(self.code, basestring):  # pylint: disable=too-many-nested-blocks
             try:
                 safe_exec.safe_exec(
                     self.code,
@@ -3152,7 +3155,7 @@ class FormulaResponse(LoncapaResponse):
         variables = samples.split('@')[0].split(',')
         numsamples = int(samples.split('@')[1].split('#')[1])
         sranges = zip(*map(lambda x: map(float, x.split(",")),
-                           samples.split('@')[1].split('#')[0].split(':')))
+                           samples.split('@')[1].split('#')[0].split(':')))  # pylint: disable=deprecated-lambda
         ranges = dict(zip(variables, sranges))
 
         out = []
