@@ -14,7 +14,7 @@ file and check it in at the same time as your model changes. To do that,
 import json
 import logging
 
-import ipaddr
+import ipaddress
 from config_models.models import ConfigurationModel
 from django.core.cache import cache
 from django.urls import reverse
@@ -684,7 +684,7 @@ class IPFilter(ConfigurationModel):
         """
 
         def __init__(self, ips):
-            self.networks = [ipaddr.IPNetwork(ip) for ip in ips]
+            self.networks = [ipaddress.ip_network(ip) for ip in ips]
 
         def __iter__(self):
             for network in self.networks:
@@ -692,12 +692,12 @@ class IPFilter(ConfigurationModel):
 
         def __contains__(self, ip_addr):
             try:
-                ip_addr = ipaddr.IPAddress(ip_addr)
+                ip_addr = ipaddress.ip_address(ip_addr)
             except ValueError:
                 return False
 
             for network in self.networks:
-                if network.Contains(ip_addr):
+                if ip_addr in network:
                     return True
 
             return False

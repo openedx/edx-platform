@@ -96,7 +96,7 @@ glob2                               # Enhanced glob module, used in openedx.core
 gunicorn==19.0
 help-tokens
 html5lib                            # HTML parser, used for capa problems
-ipaddr==2.1.11                      # Ip network support for Embargo feature
+ipaddress                           # Ip network support for Embargo feature
 jsonfield                           # Django model field for validated JSON; used in several apps
 mailsnake                           # Needed for mailchimp (mailing djangoapp)
 mako==1.0.2                         # Primary template language used for server-side page rendering

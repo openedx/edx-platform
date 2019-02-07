@@ -177,7 +177,6 @@ httpretty==0.9.6
 idna==2.8
 incremental==17.5.0       # via twisted
 inflect==2.1.0
-ipaddr==2.1.11
 ipaddress==1.0.22
 isodate==0.6.0
 isort==4.3.4
