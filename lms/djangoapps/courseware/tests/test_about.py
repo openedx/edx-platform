@@ -3,6 +3,7 @@ Test the about xblock
 """
 import datetime
 import ddt
+import mock
 import pytz
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
@@ -16,14 +17,22 @@ from waffle.testutils import override_switch
 from course_modes.models import CourseMode
 from lms.djangoapps.ccx.tests.factories import CcxFactory
 from openedx.core.lib.tests import attr
+from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.features.course_experience.waffle import WAFFLE_NAMESPACE as COURSE_EXPERIENCE_WAFFLE_NAMESPACE
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
+from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from shoppingcart.models import Order, PaidCourseRegistration
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory, CourseEnrollmentAllowedFactory, UserFactory
 from track.tests import EventTrackingTestCase
 from util.milestones_helpers import get_prerequisite_courses_display, set_prerequisite_courses
-from xmodule.course_module import CATALOG_VISIBILITY_ABOUT, CATALOG_VISIBILITY_NONE
+from xmodule.course_module import (
+    CATALOG_VISIBILITY_ABOUT,
+    CATALOG_VISIBILITY_NONE,
+    COURSE_VISIBILITY_PRIVATE,
+    COURSE_VISIBILITY_PUBLIC_OUTLINE,
+    COURSE_VISIBILITY_PUBLIC
+)
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_MIXED_MODULESTORE,
     TEST_DATA_SPLIT_MODULESTORE,
@@ -41,6 +50,7 @@ REG_STR = "<form id=\"class_enroll_form\" method=\"post\" data-remote=\"true\" a
 SHIB_ERROR_STR = "The currently logged-in user account does not have permission to enroll in this course."
 
 
+@ddt.ddt
 @attr(shard=1)
 class AboutTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase, EventTrackingTestCase, MilestonesTestCaseMixin):
     """
@@ -221,6 +231,27 @@ class AboutTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase, EventTra
         url = reverse('about_course', args=[unicode(pre_requisite_course.id)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
+
+    @ddt.data(
+        [COURSE_VISIBILITY_PRIVATE],
+        [COURSE_VISIBILITY_PUBLIC_OUTLINE],
+        [COURSE_VISIBILITY_PUBLIC],
+    )
+    @ddt.unpack
+    def test_about_page_public_view(self, course_visibility):
+        """
+        Assert that anonymous or unenrolled users see View Course option
+        when unenrolled access flag is set
+        """
+        with mock.patch('xmodule.course_module.CourseDescriptor.course_visibility', course_visibility):
+            with override_waffle_flag(COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, active=True):
+                url = reverse('about_course', args=[text_type(self.course.id)])
+                resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        if course_visibility == COURSE_VISIBILITY_PUBLIC or course_visibility == COURSE_VISIBILITY_PUBLIC_OUTLINE:
+            self.assertIn("View Course", resp.content)
+        else:
+            self.assertIn("Enroll in", resp.content)
 
 
 @attr(shard=1)

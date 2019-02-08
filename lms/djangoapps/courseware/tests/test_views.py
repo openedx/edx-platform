@@ -2472,6 +2472,10 @@ class TestIndexView(ModuleStoreTestCase):
                     self.assertIn('xblock-public_view-vertical', response.content)
                     self.assertIn('xblock-public_view-html', response.content)
                     self.assertIn('xblock-public_view-video', response.content)
+                    if user_type == CourseUserType.ANONYMOUS and course_visibility == COURSE_VISIBILITY_PRIVATE:
+                        self.assertIn('To see course content', response.content)
+                    if user_type == CourseUserType.UNENROLLED and course_visibility == COURSE_VISIBILITY_PRIVATE:
+                        self.assertIn('You must be enrolled', response.content)
                 else:
                     self.assertIn('data-save-position="true"', response.content)
                     self.assertIn('data-show-completion="true"', response.content)

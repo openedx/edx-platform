@@ -38,6 +38,7 @@ from opaque_keys.edx.keys import UsageKey
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.api.view_utils import LazySequence
+from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from path import Path as path
 from six import text_type
 from static_replace import replace_static_urls
@@ -643,3 +644,13 @@ def get_course_chapter_ids(course_key):
         log.exception('Failed to retrieve course from modulestore.')
         return []
     return [unicode(chapter_key) for chapter_key in chapter_keys if chapter_key.block_type == 'chapter']
+
+
+def allow_public_access(course, visibilities):
+    """
+    This checks if the unenrolled access waffle flag for the course is set
+    and the course visibility matches any of the input visibilities.
+    """
+    unenrolled_access_flag = COURSE_ENABLE_UNENROLLED_ACCESS_FLAG.is_enabled(course.id)
+    allow_access = unenrolled_access_flag and course.course_visibility in visibilities
+    return allow_access
