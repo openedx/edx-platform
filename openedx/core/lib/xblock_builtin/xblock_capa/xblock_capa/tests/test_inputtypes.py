@@ -1413,7 +1413,7 @@ class DragAndDropTest(unittest.TestCase):
                              "icon": "", "target_fields": []},
                             {"can_reuse": "", "label": "cc", "id": "name_with_icon",
                              "icon": "/dummy-static/images/cc.jpg", "target_fields": []},
-                            {"can_reuse": "", "label": "arrow-left", "id": "with_icon", 
+                            {"can_reuse": "", "label": "arrow-left", "id": "with_icon",
                              "icon": "/dummy-static/images/arrow-left.png", "target_fields": []},
                             {"can_reuse": "", "label": "Label2", "id": "5",
                              "icon": "", "target_fields": []},

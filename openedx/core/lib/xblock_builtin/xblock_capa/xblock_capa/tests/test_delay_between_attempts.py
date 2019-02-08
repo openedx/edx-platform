@@ -55,8 +55,7 @@ class CapaFactoryWithDelay(CapaFactory):
         correct=False,
         last_submission_time=None,
         submission_wait_seconds=None,
-        **kwargs,
-    ):
+        **kwargs):
         """
         Optional parameters here are cut down to what we actually use vs. the regular CapaFactory.
         """
@@ -263,7 +262,7 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
         self.assertRegexpMatches(
             result['success'],
             r"You must wait at least 2 hours 1 minute 3 seconds between submissions. 1 hour 2 minutes 59 seconds"
-             " remaining\..*",
+            r" remaining\..*",
         )
         self.assertEqual(xblock.attempts, num_attempts)
 

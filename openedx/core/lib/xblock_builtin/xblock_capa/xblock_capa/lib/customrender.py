@@ -23,7 +23,7 @@ registry = TagRegistry()
 
 
 class MathRenderer(object):
-    """
+    '''
     Render math using latex-like formatting.
 
     Examples:
@@ -34,7 +34,7 @@ class MathRenderer(object):
     We convert these to [mathjax]...[/mathjax] and [mathjaxinline]...[/mathjaxinline]
 
     TODO: use shorter tags (but this will require converting problem XML files!)
-    """
+    '''
     tags = ['math']
 
     def __init__(self, system, xml):
