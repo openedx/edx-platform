@@ -86,7 +86,10 @@ class ProgramProgressMeter(object):
         self.user = user
         self.mobile_only = mobile_only
 
-        self.enrollments = enrollments or list(CourseEnrollment.enrollments_for_user(self.user))
+        enrolls = []
+        if user.is_authenticated():
+            enrolls = list(CourseEnrollment.enrollments_for_user(self.user))
+        self.enrollments = enrollments or enrolls
         self.enrollments.sort(key=lambda e: e.created, reverse=True)
 
         self.enrolled_run_modes = {}

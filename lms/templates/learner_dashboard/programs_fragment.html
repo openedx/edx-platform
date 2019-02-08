@@ -19,7 +19,8 @@ from openedx.core.djangolib.js_utils import (
 ProgramListFactory({
     marketingUrl: '${marketing_url | n, js_escaped_string}',
     programsData: ${programs | n, dump_js_escaped_json},
-    userProgress: ${progress | n, dump_js_escaped_json}
+    userProgress: ${progress | n, dump_js_escaped_json},
+    isMarketing: ${is_marketing | n, dump_js_escaped_json}
 });
 </%static:webpack>
 </%block>

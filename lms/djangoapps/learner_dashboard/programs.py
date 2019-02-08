@@ -6,7 +6,7 @@ import json
 from django.http import Http404
 from django.template.loader import render_to_string
 from django.utils.translation import get_language_bidi
-from django.urls import reverse
+from django.urls import reverse, resolve
 
 from web_fragments.fragment import Fragment
 
@@ -42,12 +42,20 @@ class ProgramsFragmentView(EdxFragmentView):
         if not programs_config.enabled or not user.is_authenticated:
             raise Http404
 
+        match = resolve(request.path)
+        is_marketing = match and match.url_name == 'programs'
+
         meter = ProgramProgressMeter(request.site, user, mobile_only=mobile_only)
+
+        programs = is_marketing and meter.programs or meter.engaged_programs
+        mktg_url = lambda p: reverse('program_marketing_view', kwargs={'program_uuid': p['uuid']})
+        [p.update({'marketing_page_url': mktg_url(p)}) for p in programs]
 
         context = {
             'marketing_url': get_program_marketing_url(programs_config),
-            'programs': meter.engaged_programs,
-            'progress': meter.progress()
+            'programs': programs,
+            'progress': meter.progress(programs),
+            'is_marketing': is_marketing
         }
         html = render_to_string('learner_dashboard/programs_fragment.html', context)
         programs_fragment = Fragment(html)

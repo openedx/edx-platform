@@ -29,12 +29,14 @@ class ProgramCardView extends Backbone.View {
         uuid: this.model.get('uuid'),
       });
     }
+    this.isMarketing = data.context.isMarketing;
     this.render();
   }
 
   render() {
     const orgList = this.model.get('authoring_organizations').map(org => gettext(org.key));
     const data = $.extend(
+      {isMarketing: this.isMarketing},
       this.model.toJSON(),
       this.getProgramProgress(),
       { orgList: orgList.join(' ') },

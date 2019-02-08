@@ -12,6 +12,7 @@ class ProgramModel extends Backbone.Model {
         subtitle: data.subtitle,
         authoring_organizations: data.authoring_organizations,
         detailUrl: data.detail_url,
+        marketingUrl: data.marketing_page_url,
         xsmallBannerUrl: data.banner_image['x-small'].url,
         smallBannerUrl: data.banner_image.small.url,
         mediumBannerUrl: data.banner_image.medium.url,

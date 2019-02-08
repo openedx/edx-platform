@@ -50,7 +50,7 @@
       </div>
     </div>
 <% } %>
-<a href="<%- detailUrl %>" class="card-link">
+<a href="<% if (isMarketing) { %><%- marketingUrl %><% } else { %><%- detailUrl %><% } %>" class="card-link">
     <div class="banner-image-container">
         <picture>
             <source srcset="<%- xsmallBannerUrl %>" media="(max-width: <%- breakpoints.max.xsmall %>)">
