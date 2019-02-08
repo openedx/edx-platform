@@ -759,7 +759,7 @@ def _get_xsscommitlint_count(filename):
 @task
 @needs('pavelib.prereqs.install_python_prereqs')
 @timed
-def run_pii_check(options):
+def run_pii_check(options):  # pylint: disable=unused-argument
     """
     Guarantee that all Django models are PII-annotated.
     """

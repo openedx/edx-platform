@@ -164,6 +164,7 @@ class SurveyForm(TimeStampedModel):
 
 
 class SurveyAnswer(TimeStampedModel):
+    # pylint: disable=line-too-long
     """
     Model for the answers that a user gives for a particular form in a course
 

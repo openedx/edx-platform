@@ -62,8 +62,8 @@ class BadgeClass(models.Model):
     image = models.ImageField(upload_to='badge_classes', validators=[validate_badge_image])
 
     def __unicode__(self):
-        return u"<Badge '{slug}' for '{issuing_component}'>".format(
-            slug=self.slug, issuing_component=self.issuing_component
+        return HTML(u"<Badge '{slug}' for '{issuing_component}'>").format(
+            slug=HTML(self.slug), issuing_component=HTML(self.issuing_component)
         )
 
     @classmethod
@@ -154,9 +154,10 @@ class BadgeAssertion(TimeStampedModel):
     assertion_url = models.URLField()
 
     def __unicode__(self):
-        return u"<{username} Badge Assertion for {slug} for {issuing_component}".format(
-            username=self.user.username, slug=self.badge_class.slug,
-            issuing_component=self.badge_class.issuing_component,
+        return HTML(u"<{username} Badge Assertion for {slug} for {issuing_component}").format(
+            username=HTML(self.user.username),
+            slug=HTML(self.badge_class.slug),
+            issuing_component=HTML(self.badge_class.issuing_component),
         )
 
     @classmethod
@@ -204,9 +205,9 @@ class CourseCompleteImageConfiguration(models.Model):
     )
 
     def __unicode__(self):
-        return u"<CourseCompleteImageConfiguration for '{mode}'{default}>".format(
-            mode=self.mode,
-            default=u" (default)" if self.default else u''
+        return HTML(u"<CourseCompleteImageConfiguration for '{mode}'{default}>").format(
+            mode=HTML(self.mode),
+            default=HTML(u" (default)") if self.default else HTML(u'')
         )
 
     def clean(self):

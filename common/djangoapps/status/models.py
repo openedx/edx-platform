@@ -9,6 +9,8 @@ from django.core.cache import cache
 from django.db import models
 from opaque_keys.edx.django.models import CourseKeyField
 
+from openedx.core.djangolib.markup import HTML
+
 
 class GlobalStatusMessage(ConfigurationModel):
     """
@@ -39,7 +41,7 @@ class GlobalStatusMessage(ConfigurationModel):
                 course_home_message = self.coursemessage_set.get(course_key=course_key)
                 # Don't override the message if course_home_message is blank.
                 if course_home_message:
-                    msg = u"{} <br /> {}".format(msg, course_home_message.message)
+                    msg = HTML(u"{} <br /> {}").format(HTML(msg), HTML(course_home_message.message))
             except CourseMessage.DoesNotExist:
                 # We don't have a course-specific message, so pass.
                 pass
