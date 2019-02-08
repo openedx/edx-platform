@@ -209,8 +209,7 @@ def update_account_settings(requesting_user, update, username=None):
                 "user_message": text_type(err)
             }
         else:
-            account_recovery.secondary_email = update["secondary_email"]
-            account_recovery.save()
+            account_recovery.update_recovery_email(update["secondary_email"])
 
     # If the user asked to change full name, validate it
     if changing_full_name:

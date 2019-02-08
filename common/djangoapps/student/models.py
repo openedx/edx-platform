@@ -2750,3 +2750,14 @@ class AccountRecovery(models.Model):
         db_table = "auth_accountrecovery"
 
     objects = AccountRecoveryManager()
+
+    def update_recovery_email(self, email):
+        """
+        Update the secondary email address on the instance to the email in the argument.
+
+        Arguments:
+            email (str): New email address to be set as the secondary email address.
+        """
+        self.secondary_email = email
+        self.is_active = False
+        self.save()
