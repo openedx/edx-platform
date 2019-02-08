@@ -231,6 +231,7 @@ class CapaXBlock(XBlock, CapaMixin, ResourceTemplates, XmlParserMixin, IndexInfo
         super(CapaXBlock, self).__init__(*args, **kwargs)
 
         etree.XML(self.data)
+        self.location = self.scope_ids.usage_id
 
     # VS[compat]
     # TODO (cpennington): Delete this method once all fall 2012 course are being
@@ -465,20 +466,6 @@ class CapaXBlock(XBlock, CapaMixin, ResourceTemplates, XmlParserMixin, IndexInfo
             (and also screen reader text).
         """
         return self.get_answer()
-
-    @property
-    def location(self):
-        """
-        Returns this block's location (usage_key).
-        """
-        return self.scope_ids.usage_id
-
-    @property
-    def category(self):
-        """
-        Returns this block's category (AKA block_type).
-        """
-        return self.scope_ids.block_type
 
     @property
     def display_name_with_default(self):
