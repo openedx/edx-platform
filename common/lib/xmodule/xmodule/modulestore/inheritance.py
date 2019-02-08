@@ -51,6 +51,12 @@ class InheritanceMixin(XBlockMixin):
         default=False,
         scope=Scope.settings,
     )
+    icon = Integer(
+        display_name=_("Icon"),
+        default=0,
+        help=_("XBlock Icon ID"),
+        scope=Scope.settings,
+    )
     course_edit_method = String(
         display_name=_("Course Editor"),
         help=_("Enter the method by which this course is edited (\"XML\" or \"Studio\")."),

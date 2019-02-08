@@ -492,7 +492,8 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                 'id': text_type(usage_id),
                 'bookmarked': is_bookmarked,
                 'path': " > ".join(display_names + [item.display_name_with_default]),
-                'graded': item.graded
+                'graded': item.graded,
+                'icon': item.icon,
             }
 
             if is_user_authenticated:

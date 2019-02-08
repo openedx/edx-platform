@@ -17,7 +17,8 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         AbstractEditor, BaseDateEditor,
         ReleaseDateEditor, DueDateEditor, GradingEditor, PublishEditor, AbstractVisibilityEditor,
         StaffLockEditor, UnitAccessEditor, ContentVisibilityEditor, TimedExaminationPreferenceEditor,
-        AccessEditor, ShowCorrectnessEditor, HighlightsEditor, HighlightsEnableXBlockModal, HighlightsEnableEditor;
+        AccessEditor, ShowCorrectnessEditor, HighlightsEditor, HighlightsEnableXBlockModal, HighlightsEnableEditor,
+        IconEditor;
 
     CourseOutlineXBlockModal = BaseModal.extend({
         events: _.extend({}, BaseModal.prototype.events, {
@@ -1026,6 +1027,28 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         }
     });
 
+    IconEditor = BaseDateEditor.extend({
+        fieldName: 'icon',
+        templateName: 'icon-editor',
+
+        hasChanges: function() {
+            return this.model.get("icon") !== parseInt(this.$('#icon').val());
+        },
+
+        getValue: function () {
+            return (parseInt(this.$('#icon').val()));
+        },
+
+        getRequestData: function () {
+            return this.hasChanges() ? {
+                publish: 'republish',
+                metadata: {
+                    'icon': this.getValue()
+                }
+            } : {};
+        }
+    });
+
     return {
         getModal: function(type, xblockInfo, options) {
             if (type === 'edit') {
@@ -1050,7 +1073,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 editors: []
             };
             if (xblockInfo.isVertical()) {
-                editors = [StaffLockEditor, UnitAccessEditor];
+                editors = [StaffLockEditor, UnitAccessEditor, IconEditor];
             } else {
                 tabs = [
                     {

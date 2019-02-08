@@ -1,0 +1,8 @@
+<h3 class="modal-section-title">Select icon</h3>
+<select id="icon">
+  <option value="0" <% if (xblockInfo.get("icon") === 0) { %> selected <% } %> ><%- gettext('Default') %></option>
+  <option value="1" <% if (xblockInfo.get("icon") === 1) { %> selected <% } %> ><%- gettext('Other') %></option>
+  <option value="2" <% if (xblockInfo.get("icon") === 2) { %> selected <% } %> ><%- gettext('Problem') %></option>
+  <option value="3" <% if (xblockInfo.get("icon") === 3) { %> selected <% } %> ><%- gettext('Vertical') %></option>
+  <option value="4" <% if (xblockInfo.get("icon") === 4) { %> selected <% } %> ><%- gettext('Video') %></option>
+</select>
