@@ -14,6 +14,7 @@ describe('CourseOutlinePage', function() {
         selectVisibilitySettings, selectAdvancedSettings, createMockCourseJSON, createMockSectionJSON,
         createMockSubsectionJSON, verifyTypePublishable, mockCourseJSON, mockEmptyCourseJSON, setSelfPaced,
         mockSingleSectionCourseJSON, createMockVerticalJSON, createMockIndexJSON, mockCourseEntranceExamJSON,
+        selectOnboardingExam,
         mockOutlinePage = readFixtures('templates/mock/mock-course-outline-page.underscore'),
         mockRerunNotification = readFixtures('templates/mock/mock-course-rerun-notification.underscore');
 
@@ -1025,6 +1026,12 @@ describe('CourseOutlinePage', function() {
             $('.field-time-limit input').trigger('focusout');
         };
 
+        selectOnboardingExam = function(time_limit) {
+            $('input.onboarding_exam').prop('checked', true).trigger('change');
+            $('.field-time-limit input').val(time_limit);
+            $('.field-time-limit input').trigger('focusout');
+        };
+
         selectPrerequisite = function() {
             $('#is_prereq').prop('checked', true).trigger('change');
         };
@@ -1070,7 +1077,8 @@ describe('CourseOutlinePage', function() {
                 is_time_limited: false,
                 exam_review_rules: '',
                 is_proctored_enabled: false,
-                default_time_limit_minutes: null
+                default_time_limit_minutes: null,
+                is_onboarding_exam: false
             }
         };
 
@@ -1274,7 +1282,8 @@ describe('CourseOutlinePage', function() {
                     is_practice_exam: false,
                     is_proctored_enabled: false,
                     default_time_limit_minutes: 150,
-                    hide_after_due: true
+                    hide_after_due: true,
+                    is_onboarding_exam: false,
                 }
             });
             expect(requests[0].requestHeaders['X-HTTP-Method-Override']).toBe('PATCH');
@@ -1337,6 +1346,96 @@ describe('CourseOutlinePage', function() {
             checkOptionFieldVisibility(true, false);
 
             $('.wrapper-modal-window .action-save').click();
+        });
+
+        it('can select the onboarding exam when a course supports onboarding', function () {
+            var mockCourseWithSpecialExamJSON = createMockCourseJSON({}, [
+                createMockSectionJSON({
+                    has_changes: true,
+                    enable_proctored_exams: true,
+                    enable_timed_exams: true
+
+                }, [
+                    createMockSubsectionJSON({
+                        has_changes: true,
+                        is_time_limited: true,
+                        is_practice_exam: true,
+                        is_proctored_exam: true,
+                        default_time_limit_minutes: 150,
+                        supports_onboarding: true,
+                    }, [
+                    ])
+                ])
+            ]);
+
+            createCourseOutlinePage(this, mockCourseWithSpecialExamJSON, false);
+            outlinePage.$('.outline-subsection .configure-button').click();
+            setEditModalValues('7/9/2014', '7/10/2014', 'Lab');
+            selectVisibilitySettings();
+            setContentVisibility('staff_only');
+            selectAdvancedSettings();
+            selectOnboardingExam('00:30');
+
+            // time limit should be visible, review rules should be hidden
+            checkOptionFieldVisibility(true, false);
+
+            $('.wrapper-modal-window .action-save').click();
+        });
+
+        it('does not show practice exam option when course supports onboarding', function() {
+            var mockCourseWithSpecialExamJSON = createMockCourseJSON({}, [
+                createMockSectionJSON({
+                    has_changes: true,
+                    enable_proctored_exams: true,
+                    enable_timed_exams: true
+
+                }, [
+                    createMockSubsectionJSON({
+                        has_changes: true,
+                        is_time_limited: true,
+                        is_practice_exam: true,
+                        is_proctored_exam: true,
+                        default_time_limit_minutes: 150,
+                        supports_onboarding: true,
+                    }, [
+                    ])
+                ])
+            ]);
+
+            createCourseOutlinePage(this, mockCourseWithSpecialExamJSON, false);
+            outlinePage.$('.outline-subsection .configure-button').click();
+            selectAdvancedSettings();
+            expect($('input.practice_exam')).not.toExist();
+            expect($('input.onboarding_exam')).toExist();
+            expect($('.field-time-limit input').val()).toBe('02:30');
+        });
+
+        it('does not show onboarding exam option when course does not support onboarding', function() {
+            var mockCourseWithSpecialExamJSON = createMockCourseJSON({}, [
+                createMockSectionJSON({
+                    has_changes: true,
+                    enable_proctored_exams: true,
+                    enable_timed_exams: true
+
+                }, [
+                    createMockSubsectionJSON({
+                        has_changes: true,
+                        is_time_limited: true,
+                        is_practice_exam: true,
+                        is_proctored_exam: true,
+                        default_time_limit_minutes: 150,
+                        supports_onboarding: false,
+                    }, [
+                    ])
+                ])
+            ]);
+
+            createCourseOutlinePage(this, mockCourseWithSpecialExamJSON, false);
+            outlinePage.$('.outline-subsection .configure-button').click();
+            selectAdvancedSettings();
+            expect($('input.practice_exam')).toExist();
+            expect($('input.onboarding_exam')).not.toExist();
+            expect($('.field-time-limit input').val()).toBe('02:30');
         });
 
         it('can select the timed exam', function() {
@@ -1522,6 +1621,36 @@ describe('CourseOutlinePage', function() {
             expect($('input.proctored_exam').is(':checked')).toBe(true);
             expect($('input.no_special_exam').is(':checked')).toBe(false);
             expect($('input.practice_exam').is(':checked')).toBe(false);
+            expect($('.field-time-limit input').val()).toBe('02:30');
+        });
+
+        it('can show a saved onboarding exam correctly', function() {
+            var mockCourseWithSpecialExamJSON = createMockCourseJSON({}, [
+                createMockSectionJSON({
+                    has_changes: true,
+                    enable_proctored_exams: true,
+                    enable_timed_exams: true
+
+                }, [
+                    createMockSubsectionJSON({
+                        has_changes: true,
+                        is_time_limited: true,
+                        is_practice_exam: false,
+                        is_proctored_exam: true,
+                        default_time_limit_minutes: 150,
+                        supports_onboarding: true,
+                        is_onboarding_exam: true
+                    }, [
+                    ])
+                ])
+            ]);
+            createCourseOutlinePage(this, mockCourseWithSpecialExamJSON, false);
+            outlinePage.$('.outline-subsection .configure-button').click();
+            selectAdvancedSettings();
+            expect($('input.timed_exam').is(':checked')).toBe(false);
+            expect($('input.proctored_exam').is(':checked')).toBe(false);
+            expect($('input.no_special_exam').is(':checked')).toBe(false);
+            expect($('input.onboarding_exam').is(':checked')).toBe(true);
             expect($('.field-time-limit input').val()).toBe('02:30');
         });
 
