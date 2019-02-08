@@ -18,7 +18,7 @@ from openedx.core.djangoapps.schedules.resolvers import (
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleConfigFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory, SiteConfigurationFactory
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
+from openedx.core.djangolib.testing.utils import CacheIsolationMixin, CacheIsolationTestCase, skip_unless_lms
 from student.tests.factories import CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -99,7 +99,7 @@ class TestBinnedSchedulesBaseResolver(SchedulesResolverTestMixin, CacheIsolation
             "Can't test schedules if the app isn't installed")
 @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
 @freeze_time('2017-08-01 01:00:00', tz_offset=0, tick=False)
-class TestCourseUpdateResolver(SchedulesResolverTestMixin, CacheIsolationTestCase, ModuleStoreTestCase):
+class TestCourseUpdateResolver(SchedulesResolverTestMixin, CacheIsolationMixin, ModuleStoreTestCase):
     """
     Tests the CourseUpdateResolver.
     """
