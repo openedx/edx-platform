@@ -99,7 +99,7 @@ class TestBinnedSchedulesBaseResolver(SchedulesResolverTestMixin, CacheIsolation
             "Can't test schedules if the app isn't installed")
 @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
 @freeze_time('2017-08-01 01:00:00', tz_offset=0, tick=False)
-class TestCourseUpdateResolver(SchedulesResolverTestMixin, ModuleStoreTestCase):
+class TestCourseUpdateResolver(SchedulesResolverTestMixin, CacheIsolationTestCase, ModuleStoreTestCase):
     """
     Tests the CourseUpdateResolver.
     """
