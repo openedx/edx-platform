@@ -137,7 +137,7 @@ class UserReadOnlySerializer(serializers.Serializer):
                         user_profile, user, self.context.get('request')
                     ),
                     "language_proficiencies": LanguageProficiencySerializer(
-                        user_profile.language_proficiencies.all(), many=True
+                        user_profile.language_proficiencies.all().order_by('code'), many=True
                     ).data,
                     "name": user_profile.name,
                     "gender": AccountLegacyProfileSerializer.convert_empty_to_None(user_profile.gender),
@@ -150,7 +150,7 @@ class UserReadOnlySerializer(serializers.Serializer):
                     "requires_parental_consent": user_profile.requires_parental_consent(),
                     "account_privacy": get_profile_visibility(user_profile, user, self.configuration),
                     "social_links": SocialLinkSerializer(
-                        user_profile.social_links.all(), many=True
+                        user_profile.social_links.all().order_by('platform'), many=True
                     ).data,
                     "extended_profile": get_extended_profile(user_profile),
                 }
@@ -306,6 +306,49 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
         """
         return AccountLegacyProfileSerializer.get_profile_image(user_profile, user_profile.user)
 
+    def _update_social_links(self, instance, requested_social_links):
+        """
+        Update the given profile instance's social links as requested.
+        """
+        try:
+            new_social_links = []
+            deleted_social_platforms = []
+            for requested_link_data in requested_social_links:
+                requested_platform = requested_link_data['platform']
+                requested_link_url = requested_link_data['social_link']
+                validate_social_link(requested_platform, requested_link_url)
+                formatted_link = format_social_link(requested_platform, requested_link_url)
+                if not formatted_link:
+                    deleted_social_platforms.append(requested_platform)
+                else:
+                    new_social_links.append(
+                        SocialLink(user_profile=instance, platform=requested_platform, social_link=formatted_link)
+                    )
+
+            platforms_of_new_social_links = [s.platform for s in new_social_links]
+            current_social_links = list(instance.social_links.all())
+            unreplaced_social_links = [
+                social_link for social_link in current_social_links
+                if social_link.platform not in platforms_of_new_social_links
+            ]
+            pruned_unreplaced_social_links = [
+                social_link for social_link in unreplaced_social_links
+                if social_link.platform not in deleted_social_platforms
+            ]
+            merged_social_links = new_social_links + pruned_unreplaced_social_links
+
+            instance.social_links.all().delete()
+            instance.social_links.bulk_create(merged_social_links)
+
+        except ValueError as err:
+            # If we have encountered any validation errors, return them to the user.
+            raise errors.AccountValidationError({
+                'social_links': {
+                    "developer_message": u"Error when adding new social link: '{}'".format(text_type(err)),
+                    "user_message": text_type(err)
+                }
+            })
+
     def update(self, instance, validated_data):
         """
         Update the profile, including nested fields.
@@ -333,38 +376,11 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
             ])
 
         # Update the user's social links
-        social_link_data = self._kwargs['data']['social_links'] if 'social_links' in self._kwargs['data'] else None
-        if social_link_data and len(social_link_data) > 0:
-            new_social_link = social_link_data[0]
-            current_social_links = list(instance.social_links.all())
-            instance.social_links.all().delete()
-
-            try:
-                # Add the new social link with correct formatting
-                validate_social_link(new_social_link['platform'], new_social_link['social_link'])
-                formatted_link = format_social_link(new_social_link['platform'], new_social_link['social_link'])
-                instance.social_links.bulk_create([
-                    SocialLink(user_profile=instance, platform=new_social_link['platform'], social_link=formatted_link)
-                ])
-            except ValueError as err:
-                # If we have encountered any validation errors, return them to the user.
-                raise errors.AccountValidationError({
-                    'social_links': {
-                        "developer_message": u"Error thrown from adding new social link: '{}'".format(text_type(err)),
-                        "user_message": text_type(err)
-                    }
-                })
-
-            # Add back old links unless overridden by new link
-            for current_social_link in current_social_links:
-                if current_social_link.platform != new_social_link['platform']:
-                    instance.social_links.bulk_create([
-                        SocialLink(user_profile=instance, platform=current_social_link.platform,
-                                   social_link=current_social_link.social_link)
-                    ])
+        requested_social_links = self._kwargs['data'].get('social_links')
+        if requested_social_links:
+            self._update_social_links(instance, requested_social_links)
 
         instance.save()
-
         return instance
 
 

@@ -159,6 +159,74 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, Retireme
         with self.assertRaises(UserNotFound):
             update_account_settings(self.user, {})
 
+    def test_get_empty_social_links(self):
+        account_settings = get_account_settings(self.default_request)[0]
+        self.assertEqual(account_settings['social_links'], [])
+
+    def test_set_single_social_link(self):
+        social_links = [
+            dict(platform="facebook", social_link="https://www.facebook.com/{}".format(self.user.username))
+        ]
+        update_account_settings(self.user, {"social_links": social_links})
+        account_settings = get_account_settings(self.default_request)[0]
+        self.assertEqual(account_settings['social_links'], social_links)
+
+    def test_set_multiple_social_links(self):
+        social_links = [
+            dict(platform="facebook", social_link="https://www.facebook.com/{}".format(self.user.username)),
+            dict(platform="twitter", social_link="https://www.twitter.com/{}".format(self.user.username)),
+        ]
+        update_account_settings(self.user, {"social_links": social_links})
+        account_settings = get_account_settings(self.default_request)[0]
+        self.assertEqual(account_settings['social_links'], social_links)
+
+    def test_add_social_links(self):
+        original_social_links = [
+            dict(platform="facebook", social_link="https://www.facebook.com/{}".format(self.user.username))
+        ]
+        update_account_settings(self.user, {"social_links": original_social_links})
+
+        extra_social_links = [
+            dict(platform="twitter", social_link="https://www.twitter.com/{}".format(self.user.username)),
+            dict(platform="linkedin", social_link="https://www.linkedin.com/in/{}".format(self.user.username)),
+        ]
+        update_account_settings(self.user, {"social_links": extra_social_links})
+
+        account_settings = get_account_settings(self.default_request)[0]
+        self.assertEqual(
+            account_settings['social_links'],
+            sorted(original_social_links + extra_social_links, key=lambda s: s['platform']),
+        )
+
+    def test_replace_social_links(self):
+        original_facebook_link = dict(platform="facebook", social_link="https://www.facebook.com/myself")
+        original_twitter_link = dict(platform="twitter", social_link="https://www.twitter.com/myself")
+        update_account_settings(self.user, {"social_links": [original_facebook_link, original_twitter_link]})
+
+        modified_facebook_link = dict(platform="facebook", social_link="https://www.facebook.com/new_me")
+        update_account_settings(self.user, {"social_links": [modified_facebook_link]})
+
+        account_settings = get_account_settings(self.default_request)[0]
+        self.assertEqual(account_settings['social_links'], [modified_facebook_link, original_twitter_link])
+
+    def test_remove_social_link(self):
+        original_facebook_link = dict(platform="facebook", social_link="https://www.facebook.com/myself")
+        original_twitter_link = dict(platform="twitter", social_link="https://www.twitter.com/myself")
+        update_account_settings(self.user, {"social_links": [original_facebook_link, original_twitter_link]})
+
+        removed_facebook_link = dict(platform="facebook", social_link="")
+        update_account_settings(self.user, {"social_links": [removed_facebook_link]})
+
+        account_settings = get_account_settings(self.default_request)[0]
+        self.assertEqual(account_settings['social_links'], [original_twitter_link])
+
+    def test_unsupported_social_link_platform(self):
+        social_links = [
+            dict(platform="unsupported", social_link="https://www.unsupported.com/{}".format(self.user.username))
+        ]
+        with self.assertRaises(AccountUpdateError):
+            update_account_settings(self.user, {"social_links": social_links})
+
     def test_update_error_validating(self):
         """Test that AccountValidationError is thrown if incorrect values are supplied."""
         with self.assertRaises(AccountValidationError):
