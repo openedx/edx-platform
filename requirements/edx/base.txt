@@ -144,7 +144,6 @@ help-tokens==1.0.3
 html5lib==1.0.1
 httplib2==0.12.0          # via oauth2, zendesk
 idna==2.8
-ipaddr==2.1.11
 ipaddress==1.0.22
 isodate==0.6.0            # via python3-saml
 itypes==1.1.0             # via coreapi
