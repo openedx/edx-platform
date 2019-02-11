@@ -606,7 +606,7 @@ class MatlabTest(unittest.TestCase):
             self.assertEqual(context, expected)
 
     @patch('xblock_capa.lib.inputtypes.time.time', return_value=10)
-    def test_rendering_while_queued(self):
+    def test_rendering_while_queued(self, _time):
         state = {
             'value': 'print "good evening"',
             'status': 'incomplete',
@@ -643,6 +643,7 @@ class MatlabTest(unittest.TestCase):
         data = {'submission': 'x = 1234;'}
         response = self.the_input.handle_ajax("plot", data)
 
+        test_capa_system().xqueue['interface'].send_to_queue.return_value = (0, 'success')
         test_capa_system().xqueue['interface'].send_to_queue.assert_called_with(header=ANY, body=ANY)
 
         self.assertTrue(response['success'])
@@ -660,7 +661,7 @@ class MatlabTest(unittest.TestCase):
         self.assertNotIn('queuestate', self.the_input.input_state)
 
     @patch('xblock_capa.lib.inputtypes.time.time', return_value=10)
-    def test_ungraded_response_success(self):
+    def test_ungraded_response_success(self, _time):
         queuekey = 'abcd'
         input_state = {'queuekey': queuekey, 'queuestate': 'queued', 'queuetime': 5}
         state = {'value': 'print "good evening"',
@@ -679,7 +680,7 @@ class MatlabTest(unittest.TestCase):
         self.assertEqual(input_state['queue_msg'], inner_msg)
 
     @patch('xblock_capa.lib.inputtypes.time.time', return_value=10)
-    def test_ungraded_response_key_mismatch(self):
+    def test_ungraded_response_key_mismatch(self, _time):
         queuekey = 'abcd'
         input_state = {'queuekey': queuekey, 'queuestate': 'queued', 'queuetime': 5}
         state = {'value': 'print "good evening"',
@@ -698,7 +699,7 @@ class MatlabTest(unittest.TestCase):
         self.assertNotIn('queue_msg', input_state)
 
     @patch('xblock_capa.lib.inputtypes.time.time', return_value=20)
-    def test_matlab_response_timeout_not_exceeded(self):
+    def test_matlab_response_timeout_not_exceeded(self, _time):
 
         state = {'input_state': {'queuestate': 'queued', 'queuetime': 5}}
         elt = etree.fromstring(self.xml)
@@ -707,7 +708,7 @@ class MatlabTest(unittest.TestCase):
         self.assertEqual(the_input.status, 'queued')
 
     @patch('xblock_capa.lib.inputtypes.time.time', return_value=45)
-    def test_matlab_response_timeout_exceeded(self):
+    def test_matlab_response_timeout_exceeded(self, _time):
 
         state = {'input_state': {'queuestate': 'queued', 'queuetime': 5}}
         elt = etree.fromstring(self.xml)
@@ -717,7 +718,7 @@ class MatlabTest(unittest.TestCase):
         self.assertEqual(the_input.msg, 'No response from Xqueue within {} seconds. Aborted.'.format(XQUEUE_TIMEOUT))
 
     @patch('xblock_capa.lib.inputtypes.time.time', return_value=20)
-    def test_matlab_response_migration_of_queuetime(self):
+    def test_matlab_response_migration_of_queuetime(self, _time):
         """
         Test if problem was saved before queuetime was introduced.
         """
@@ -835,7 +836,6 @@ class MatlabTest(unittest.TestCase):
 
         the_input = self.input_class(test_capa_system(), elt, state)
         context = the_input._get_render_context()  # pylint: disable=protected-access
-        self.maxDiff = None
         expected = fromstring(u'\n<div class="matlabResponse"><div class="commandWindowOutput" style="white-space: pre;"> <strong>if</strong> Conditionally execute statements.\nThe general form of the <strong>if</strong> statement is\n\n   <strong>if</strong> expression\n     statements\n   ELSEIF expression\n     statements\n   ELSE\n statements\n   END\n\nThe statements are executed if the real part of the expression \nhas all non-zero elements. The ELSE and ELSEIF parts are optional.\nZero or more ELSEIF parts can be used as well as nested <strong>if</strong>\'s.\nThe expression is usually of the form expr rop expr where \nrop is ==, &lt;, &gt;, &lt;=, &gt;=, or ~=.\n<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjAAAAGkCAIAAACgj==">\n\nExample\n   if I == J\n A(I,J) = 2;\n   elseif abs(I-J) == 1\n     A(I,J) = -1;\n   else\n     A(I,J) = 0;\n   end\n\nSee also <a>relop</a>, <a>else</a>, <a>elseif</a>, <a>end</a>, <a>for</a>, <a>while</a>, <a>switch</a>.\n\nReference page in Help browser\n <a>doc if</a>\n\n</div><ul></ul></div>\n')  # pylint: disable=line-too-long
         received = fromstring(context['queue_msg'])
         html_tree_equal(received, expected)
@@ -845,7 +845,6 @@ class MatlabTest(unittest.TestCase):
                                     u"\nans =\n\n\u0002\n\n</div><ul></ul></div>")
         context = self.the_input._get_render_context()  # pylint: disable=protected-access
 
-        self.maxDiff = None
         prob_id = 'prob_1_2'
         expected = {
             'STATIC_URL': '/dummy-static/',
@@ -1515,7 +1514,6 @@ class AnnotationInputTest(unittest.TestCase):
             'describedby_html': DESCRIBEDBY.format(status_id=prob_id)
         }
 
-        self.maxDiff = None
         self.assertDictEqual(context, expected)
 
 

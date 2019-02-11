@@ -107,7 +107,16 @@ class CapaXBlock(XBlock, CapaMixin, ResourceTemplates, XmlParserMixin, IndexInfo
             {"display_name": _("Finished"), "value": SHOWANSWER.FINISHED},
             {"display_name": _("Correct or Past Due"), "value": SHOWANSWER.CORRECT_OR_PAST_DUE},
             {"display_name": _("Past Due"), "value": SHOWANSWER.PAST_DUE},
-            {"display_name": _("Never"), "value": SHOWANSWER.NEVER}]
+            {"display_name": _("Never"), "value": SHOWANSWER.NEVER},
+            {"display_name": _("After Some Number of Attempts"), "value": SHOWANSWER.AFTER_SOME_NUMBER_OF_ATTEMPTS},
+        ]
+    )
+    attempts_before_showanswer_button = Integer(
+        display_name=_("Show Answer: Number of Attempts"),
+        help=_("Number of times the student must attempt to answer the question before the Show Answer button appears."),
+        values={"min": 0},
+        default=0,
+        scope=Scope.settings,
     )
     force_save_button = Boolean(
         help=_("Whether to force the save button to appear on the page"),
@@ -468,6 +477,13 @@ class CapaXBlock(XBlock, CapaMixin, ResourceTemplates, XmlParserMixin, IndexInfo
         return self.get_answer()
 
     @property
+    def category(self):
+        """
+        Returns this block's category (AKA block_type).
+        """
+        return self.scope_ids.block_type
+
+    @property
     def display_name_with_default(self):
         """
         Constructs the display name for a CAPA problem.
@@ -690,7 +706,6 @@ class CapaXBlock(XBlock, CapaMixin, ResourceTemplates, XmlParserMixin, IndexInfo
             })
         """
 
-        log.error("CATEGORY: %s", self.category)
         if self.category != 'problem':
             raise NotImplementedError()
 

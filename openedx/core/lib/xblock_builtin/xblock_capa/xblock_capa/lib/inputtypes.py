@@ -240,6 +240,7 @@ class InputTypeBase(object):
                                                                                  msg=HTML(self.msg))
 
         self.status = state.get('status', 'unanswered')
+        self.queue_len = 0
 
         try:
             # Pre-parse and process all the declared requirements.
@@ -779,10 +780,6 @@ class CodeInput(InputTypeBase):
             # Template expects tabsize to be an int it can do math with
             Attribute('tabsize', 4, transform=int),
         ]
-
-    def __init__(*args, **kwargs):
-        super(CodeInput, self).__init__(*args, **kwargs)
-        self.queue_len = 0
 
     def setup_code_response_rendering(self):
         """

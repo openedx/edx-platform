@@ -42,8 +42,8 @@ class CapaFactoryWithDelay(CapaFactory):
         return (
             "%s_%d_%d" % (
                 "-".join(['i4x', 'edX', 'capa_test', 'problem', 'SampleProblem%d' % cls.num]),
-                response_num,
                 input_num,
+                response_num,
             )
         )
 

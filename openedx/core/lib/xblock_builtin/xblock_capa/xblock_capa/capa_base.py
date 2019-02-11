@@ -780,6 +780,11 @@ class CapaMixin(ScorableXBlockMixin):
             return self.is_correct() or self.is_past_due()
         elif self.showanswer == SHOWANSWER.PAST_DUE:
             return self.is_past_due()
+        elif self.showanswer == SHOWANSWER.AFTER_SOME_NUMBER_OF_ATTEMPTS:
+            required_attempts = self.attempts_before_showanswer_button
+            if self.max_attempts and required_attempts >= self.max_attempts:
+                required_attempts = self.max_attempts
+            return self.attempts >= required_attempts
         elif self.showanswer == SHOWANSWER.ALWAYS:
             return True
 
