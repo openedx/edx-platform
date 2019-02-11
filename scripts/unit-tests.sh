@@ -101,9 +101,6 @@ case "${TEST_SUITE}" in
                 ;;
         esac
         ;;
-        echo 'DOUBLE CHECKING THE PIP FREEZE OUTPUT AFTER RUNNING TESTS:'
-        pip freeze
-        echo 'DONE'
 
     "commonlib-unit")
         case "$SHARD" in
@@ -130,3 +127,6 @@ case "${TEST_SUITE}" in
         esac
         ;;
 esac
+echo 'DOUBLE CHECKING THE PIP FREEZE OUTPUT AFTER RUNNING TESTS:'
+pip freeze
+echo 'DONE'
