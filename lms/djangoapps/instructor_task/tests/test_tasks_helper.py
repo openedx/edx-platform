@@ -32,6 +32,7 @@ import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
+from courseware.models import StudentModule
 from courseware.tests.factories import InstructorFactory
 from instructor_analytics.basic import UNAVAILABLE, list_problem_responses
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
@@ -478,6 +479,7 @@ class TestTeamGradeReport(InstructorGradeReportTestCase):
 
 
 # pylint: disable=protected-access
+@ddt.ddt
 class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
     """
     Tests that generation of CSV files listing student answers to a
@@ -518,7 +520,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         student_data, _ = ProblemResponses._build_student_data(
             user_id=self.instructor.id,
             course_key=self.course.id,
-            usage_key_str=str(self.course.location),
+            usage_key_str_list=[str(self.course.location)],
         )
 
         self.assertEquals(len(student_data), 4)
@@ -538,12 +540,12 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
             student_data, _ = ProblemResponses._build_student_data(
                 user_id=self.instructor.id,
                 course_key=self.course.id,
-                usage_key_str=str(problem.location),
+                usage_key_str_list=[str(problem.location)],
             )
         self.assertEquals(len(student_data), 1)
         self.assertDictContainsSubset({
             'username': 'student',
-            'location': 'Problem1',
+            'location': 'test_course > Section > Subsection > Problem1',
             'block_key': 'i4x://edx/1.23x/problem/Problem1',
             'title': 'Problem1',
         }, student_data[0])
@@ -567,7 +569,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         student_data, _ = ProblemResponses._build_student_data(
             user_id=self.instructor.id,
             course_key=self.course.id,
-            usage_key_str=str(self.course.location),
+            usage_key_str_list=[str(self.course.location)],
         )
         self.assertEquals(len(student_data), 2)
         self.assertDictContainsSubset({
@@ -598,7 +600,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         student_data, _ = ProblemResponses._build_student_data(
             user_id=self.instructor.id,
             course_key=self.course.id,
-            usage_key_str=str(self.course.location),
+            usage_key_str_list=[str(self.course.location)],
         )
         self.assertEquals(len(student_data), 1)
         self.assertDictContainsSubset({
@@ -612,6 +614,66 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
             'Question': u'The correct answer is Option 1',
         }, student_data[0])
         self.assertIn('state', student_data[0])
+
+    def test_build_student_data_for_multiple_problems(self):
+        """
+        Ensure that building student data works when supplied multiple usage keys.
+        """
+        problem1 = self.define_option_problem(u'Problem1')
+        problem2 = self.define_option_problem(u'Problem2')
+        self.submit_student_answer(self.student.username, u'Problem1', ['Option 1'])
+        self.submit_student_answer(self.student.username, u'Problem2', ['Option 1'])
+        student_data, _ = ProblemResponses._build_student_data(
+            user_id=self.instructor.id,
+            course_key=self.course.id,
+            usage_key_str_list=[str(problem1.location), str(problem2.location)],
+        )
+        self.assertEquals(len(student_data), 2)
+        for idx in range(1, 3):
+            self.assertDictContainsSubset({
+                'username': 'student',
+                'location': u'test_course > Section > Subsection > Problem{}'.format(idx),
+                'block_key': 'i4x://edx/1.23x/problem/Problem{}'.format(idx),
+                'title': u'Problem{}'.format(idx),
+                'Answer ID': 'i4x-edx-1_23x-problem-Problem{}_2_1'.format(idx),
+                'Answer': u'Option 1',
+                'Correct Answer': u'Option 1',
+                'Question': u'The correct answer is Option 1',
+            }, student_data[idx - 1])
+            self.assertIn('state', student_data[idx - 1])
+
+    @ddt.data(
+        (['problem'], 5),
+        (['other'], 0),
+        (['problem', 'test-category'], 10),
+        (None, 10),
+    )
+    @ddt.unpack
+    def test_build_student_data_with_filter(self, filters, filtered_count):
+        """
+        Ensure that building student data works when supplied multiple usage keys.
+        """
+        for idx in range(1, 6):
+            self.define_option_problem(u'Problem{}'.format(idx))
+            item = ItemFactory.create(
+                parent_location=self.problem_section.location,
+                parent=self.problem_section,
+                category="test-category",
+                display_name=u"Item{}".format(idx),
+                data=''
+            )
+            StudentModule.save_state(self.student, self.course.id, item.location, {})
+
+        for idx in range(1, 6):
+            self.submit_student_answer(self.student.username, u'Problem{}'.format(idx), ['Option 1'])
+
+        student_data, _ = ProblemResponses._build_student_data(
+            user_id=self.instructor.id,
+            course_key=self.course.id,
+            usage_key_str_list=[str(self.course.location)],
+            filter_types=filters,
+        )
+        self.assertEquals(len(student_data), filtered_count)
 
     @patch('lms.djangoapps.instructor_task.tasks_helper.grades.list_problem_responses')
     @patch('xmodule.capa_module.ProblemBlock.generate_report_data', create=True)
@@ -629,14 +691,14 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         ProblemResponses._build_student_data(
             user_id=self.instructor.id,
             course_key=self.course.id,
-            usage_key_str=str(problem.location),
+            usage_key_str_list=[str(problem.location)],
         )
         mock_generate_report_data.assert_called_with(ANY, ANY)
         mock_list_problem_responses.assert_called_with(self.course.id, ANY, ANY)
 
     def test_success(self):
         task_input = {
-            'problem_location': str(self.course.location),
+            'problem_locations': str(self.course.location),
             'user_id': self.instructor.id
         }
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
