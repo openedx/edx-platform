@@ -17,6 +17,7 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.urls import reverse
 from requests.auth import HTTPBasicAuth
 from six import text_type
+from opaque_keys.edx.keys import UsageKey
 from webob import Response
 from webob.multidict import MultiDict
 from web_fragments.fragment import Fragment
@@ -27,13 +28,14 @@ from xblockutils.resources import ResourceLoader
 from xblockutils.studio_editable import StudioEditableXBlockMixin
 
 from openedx.core.lib.xblock_builtin import get_css_dependencies, get_js_dependencies
+from xmodule.modulestore.inheritance import own_metadata
 from xmodule.contentstore.django import contentstore
-from xmodule.exceptions import NotFoundError, ProcessingError
+from xmodule.exceptions import NotFoundError, ProcessingError, SerializationError
 from xmodule.fields import Date, Timedelta, ScoreField
 from xmodule.graders import ShowCorrectness
 from xmodule.raw_module import RawDescriptor
 from xmodule.util.misc import escape_html_characters
-from xmodule.xml_module import XmlParserMixin
+from xmodule.xml_module import name_to_pathname, serialize_field, XmlParserMixin
 from xmodule.x_module import ResourceTemplates
 from xmodule.util.sandboxing import get_python_lib_zip, can_execute_unsafe_code
 
@@ -240,7 +242,6 @@ class CapaXBlock(XBlock, CapaMixin, ResourceTemplates, XmlParserMixin, IndexInfo
         super(CapaXBlock, self).__init__(*args, **kwargs)
 
         etree.XML(self.data)
-        self.location = self.scope_ids.usage_id
 
     # VS[compat]
     # TODO (cpennington): Delete this method once all fall 2012 course are being
@@ -482,6 +483,22 @@ class CapaXBlock(XBlock, CapaMixin, ResourceTemplates, XmlParserMixin, IndexInfo
         Returns this block's category (AKA block_type).
         """
         return self.scope_ids.block_type
+
+    @property
+    def location(self):
+        return self.scope_ids.usage_id
+
+    @location.setter
+    def location(self, value):
+        assert isinstance(value, UsageKey)
+        self.scope_ids = self.scope_ids._replace(
+            def_id=value,
+            usage_id=value,
+        )
+
+    @property
+    def url_name(self):
+        return self.location.block_id
 
     @property
     def display_name_with_default(self):
@@ -826,10 +843,98 @@ class CapaXBlock(XBlock, CapaMixin, ResourceTemplates, XmlParserMixin, IndexInfo
             )
             return
 
+        block.data = etree.tostring(definition_xml, pretty_print=True)
+
         metadata = cls.load_metadata(definition_xml)
         # TODO: this was copied from DiscussionXBlock, but I don't think CAPA xblocks use policy?
-        cls.apply_policy(metadata, runtime.get_policy(block.scope_ids.usage_id))
+        #cls.apply_policy(metadata, runtime.get_policy(block.scope_ids.usage_id))
 
         for field_name, value in metadata.iteritems():
             if field_name in block.fields:
                 setattr(block, field_name, value)
+
+    def add_xml_to_node(self, node):
+        """
+        Mostly copied from XmlParserMixin.add_xml_to_node
+        """
+        xml_object = etree.Element("unknown")
+
+        for aside in self.runtime.get_asides(self):
+            if aside.needs_serialization():
+                aside_node = etree.Element("unknown_root", nsmap=XML_NAMESPACES)
+                aside.add_xml_to_node(aside_node)
+                xml_object.append(aside_node)
+
+        # Set the tag on both nodes so we get the file path right.
+        xml_object.tag = self.category
+        node.tag = self.category
+
+        not_to_clean_fields = self.metadata_to_not_to_clean.get(self.category, ())
+
+        # Add the non-inherited metadata
+        for attr in sorted(own_metadata(self)):
+            # don't want e.g. data_dir
+            if (attr not in self.metadata_to_strip
+                    and attr not in self.metadata_to_export_to_policy
+                    and attr not in not_to_clean_fields):
+                val = serialize_field(self._field_data.get(self, attr))
+                try:
+                    xml_object.set(attr, val)
+                except Exception:
+                    logging.exception(
+                        u'Failed to serialize metadata attribute %s with value %s in module %s. This could mean data loss!!!',
+                        attr, val, self.url_name
+                    )
+
+        for key, value in self.xml_attributes.items():
+            if key not in self.metadata_to_strip:
+                xml_object.set(key, serialize_field(value))
+
+        # Store problem markdown and data
+        xml_object.set('markdown', serialize_field(self.markdown))
+
+        # Borrowed from RawDescriptor
+        try:
+            data_node = etree.fromstring(self.data)
+            xml_object.extend(list(data_node))
+        except etree.XMLSyntaxError as err:
+            # Can't recover here, so just add some info and
+            # re-raise
+            lines = self.data.split('\n')
+            line, offset = err.position
+            msg = (
+                u"Unable to create xml for module {loc}. "
+                u"Context: '{context}'"
+            ).format(
+                context=lines[line - 1][offset - 40:offset + 40],
+                loc=self.location,
+            )
+            raise SerializationError(self.location, msg)
+
+        if self.export_to_file():
+            # Write the definition to a file
+            url_path = name_to_pathname(self.url_name)
+            # if folder is course then create file with name {course_run}.xml
+            filepath = self._format_filepath(
+                self.category,
+                self.location.run if self.category == 'course' else url_path,
+            )
+            self.runtime.export_fs.makedirs(os.path.dirname(filepath), recreate=True)
+            with self.runtime.export_fs.open(filepath, 'wb') as fileobj:
+                etree.ElementTree(xml_object).write(fileobj, pretty_print=True, encoding='utf-8')
+        else:
+            # Write all attributes from xml_object onto node
+            node.clear()
+            node.tag = xml_object.tag
+            node.text = xml_object.text
+            node.tail = xml_object.tail
+            node.attrib.update(xml_object.attrib)
+            node.extend(xml_object)
+
+        node.set('url_name', self.url_name)
+
+        # Special case for course pointers:
+        if self.category == 'course':
+            # add org and course attributes on the pointer tag
+            node.set('org', self.location.org)
+            node.set('course', self.location.course)
