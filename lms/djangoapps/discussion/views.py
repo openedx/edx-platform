@@ -739,11 +739,13 @@ class DiscussionBoardFragmentView(EdxFragmentView):
             return fragment
         except cc.utils.CommentClientMaintenanceError:
             log.warning('Forum is in maintenance mode')
-            html = render_to_response('discussion/maintenance_fragment.html', {
+            html = render_to_string('discussion/maintenance_fragment.html', {
                 'disable_courseware_js': True,
                 'uses_pattern_library': True,
             })
-            return Fragment(html)
+            fragment = Fragment(html)
+            self.add_fragment_resource_urls(fragment)
+            return fragment
 
     def vendor_js_dependencies(self):
         """
