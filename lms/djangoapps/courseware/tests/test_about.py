@@ -16,7 +16,6 @@ from waffle.testutils import override_switch
 
 from course_modes.models import CourseMode
 from lms.djangoapps.ccx.tests.factories import CcxFactory
-from openedx.core.lib.tests import attr
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.features.course_experience.waffle import WAFFLE_NAMESPACE as COURSE_EXPERIENCE_WAFFLE_NAMESPACE
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
@@ -51,7 +50,6 @@ SHIB_ERROR_STR = "The currently logged-in user account does not have permission 
 
 
 @ddt.ddt
-@attr(shard=1)
 class AboutTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase, EventTrackingTestCase, MilestonesTestCaseMixin):
     """
     Tests about xblock.
@@ -254,7 +252,6 @@ class AboutTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase, EventTra
             self.assertIn("Enroll in", resp.content)
 
 
-@attr(shard=1)
 class AboutTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Tests for the course about page
@@ -302,7 +299,6 @@ class AboutTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.assertIn(self.xml_data, resp.content)
 
 
-@attr(shard=1)
 class AboutWithCappedEnrollmentsTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
     """
     This test case will check the About page when a course has a capped enrollment
@@ -349,7 +345,6 @@ class AboutWithCappedEnrollmentsTestCase(LoginEnrollmentTestCase, SharedModuleSt
         self.assertNotIn(REG_STR, resp.content)
 
 
-@attr(shard=1)
 class AboutWithInvitationOnly(SharedModuleStoreTestCase):
     """
     This test case will check the About page when a course is invitation only.
@@ -395,7 +390,6 @@ class AboutWithInvitationOnly(SharedModuleStoreTestCase):
         self.assertIn(REG_STR, resp.content)
 
 
-@attr(shard=1)
 @patch.dict(settings.FEATURES, {'RESTRICT_ENROLL_BY_REG_METHOD': True})
 class AboutTestCaseShibCourse(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
     """
@@ -436,7 +430,6 @@ class AboutTestCaseShibCourse(LoginEnrollmentTestCase, SharedModuleStoreTestCase
         self.assertIn(REG_STR, resp.content)
 
 
-@attr(shard=1)
 class AboutWithClosedEnrollment(ModuleStoreTestCase):
     """
     This test case will check the About page for a course that has enrollment start/end
@@ -479,7 +472,6 @@ class AboutWithClosedEnrollment(ModuleStoreTestCase):
         self.assertNotIn('<span class="important-dates-item-text">$10</span>', resp.content)
 
 
-@attr(shard=1)
 @ddt.ddt
 class AboutSidebarHTMLTestCase(SharedModuleStoreTestCase):
     """
@@ -523,7 +515,6 @@ class AboutSidebarHTMLTestCase(SharedModuleStoreTestCase):
                 self.assertNotIn('<section class="about-sidebar-html">', resp.content)
 
 
-@attr(shard=1)
 @patch.dict(settings.FEATURES, {'ENABLE_SHOPPING_CART': True})
 @patch.dict(settings.FEATURES, {'ENABLE_PAID_COURSE_REGISTRATION': True})
 class AboutPurchaseCourseTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):

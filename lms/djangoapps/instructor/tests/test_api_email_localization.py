@@ -22,7 +22,6 @@ class TestInstructorAPIEnrollmentEmailLocalization(SharedModuleStoreTestCase):
     Test whether the enroll, unenroll and beta role emails are sent in the
     proper language, i.e: the student's language.
     """
-    shard = 1
 
     @classmethod
     def setUpClass(cls):

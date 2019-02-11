@@ -25,7 +25,6 @@ class CertificatesRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestCase,
     """
     Test for the Certificates REST APIs
     """
-    shard = 4
     now = timezone.now()
     default_scopes = CertificatesDetailView.required_scopes
 

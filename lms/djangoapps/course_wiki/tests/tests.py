@@ -16,7 +16,6 @@ class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCas
     """
     Tests for wiki course redirection.
     """
-    shard = 1
 
     def setUp(self):
         super(WikiRedirectTestCase, self).setUp()

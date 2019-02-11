@@ -30,7 +30,6 @@ class TestOverrideDataTransformer(ModuleStoreTestCase):
     """
     Test proper behavior for OverrideDataTransformer
     """
-    shard = 4
 
     @classmethod
     def setUpClass(cls):

@@ -72,7 +72,6 @@ class TestRescoringTask(TestIntegrationTask):
 
     Exercises real problems with a minimum of patching.
     """
-    shard = 3
 
     def setUp(self):
         super(TestRescoringTask, self).setUp()

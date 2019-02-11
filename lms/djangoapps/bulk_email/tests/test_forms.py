@@ -14,7 +14,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 class CourseAuthorizationFormTest(ModuleStoreTestCase):
     """Test the CourseAuthorizationAdminForm form for Mongo-backed courses."""
-    shard = 1
 
     def setUp(self):
         super(CourseAuthorizationFormTest, self).setUp()

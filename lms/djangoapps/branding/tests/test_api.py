@@ -14,7 +14,6 @@ from edxmako.shortcuts import marketing_link
 
 class TestHeader(TestCase):
     """Test API end-point for retrieving the header. """
-    shard = 4
 
     def test_cdn_urls_for_logo(self):
         # Ordinarily, we'd use `override_settings()` to override STATIC_URL,
@@ -42,7 +41,6 @@ class TestHeader(TestCase):
 
 
 class TestFooter(TestCase):
-    shard = 4
     maxDiff = None
     """Test retrieving the footer. """
     @mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True})

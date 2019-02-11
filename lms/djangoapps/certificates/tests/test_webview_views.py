@@ -246,7 +246,6 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
     """
     Tests for the certificates web/html views
     """
-    shard = 1
 
     def setUp(self):
         super(CertificatesViewsTests, self).setUp()
@@ -1715,7 +1714,6 @@ class CertificateEventTests(CommonCertificatesTestCase, EventTrackingTestCase):
     """
     Test events emitted by certificate handling.
     """
-    shard = 1
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_certificate_evidence_event_emitted(self):

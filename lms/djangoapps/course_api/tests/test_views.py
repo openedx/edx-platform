@@ -16,7 +16,6 @@ from search.tests.utils import SearcherMixin
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from edx_django_utils.cache import RequestCache
-from openedx.core.lib.tests import attr
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
@@ -62,7 +61,6 @@ class CourseApiTestViewMixin(CourseApiFactoryMixin):
         return response
 
 
-@attr(shard=9)
 @ddt.ddt
 class CourseListViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase):
     """
@@ -144,7 +142,6 @@ class CourseListViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase):
         self.assert_throttle_configured_correctly(user_scope, throws_exception, expected_rate)
 
 
-@attr(shard=9)
 class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreTestCase):
     """
     Test responses returned from CourseListView (with tests that modify the
@@ -206,7 +203,6 @@ class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreT
             )
 
 
-@attr(shard=9)
 class CourseDetailViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase):
     """
     Test responses returned from CourseDetailView.
@@ -274,7 +270,6 @@ class CourseDetailViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase
         self.assertEquals(response.status_code, 400)
 
 
-@attr(shard=9)
 @override_settings(ELASTIC_FIELD_MAPPINGS={
     'start_date': {'type': 'date'},
     'enrollment_start': {'type': 'date'},

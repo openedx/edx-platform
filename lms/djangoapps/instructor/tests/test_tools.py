@@ -18,7 +18,6 @@ from six import text_type
 
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from lms.djangoapps.ccx.tests.test_overrides import inject_field_overrides
-from openedx.core.lib.tests import attr
 from student.tests.factories import UserFactory
 from xmodule.fields import Date
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
@@ -29,7 +28,6 @@ from ..views import tools
 DATE_FIELD = Date()
 
 
-@attr(shard=1)
 class TestDashboardError(unittest.TestCase):
     """
     Test DashboardError exceptions.
@@ -40,7 +38,6 @@ class TestDashboardError(unittest.TestCase):
         self.assertEqual(response, {'error': 'Oh noes!'})
 
 
-@attr(shard=1)
 class TestHandleDashboardError(unittest.TestCase):
     """
     Test handle_dashboard_error decorator.
@@ -69,7 +66,6 @@ class TestHandleDashboardError(unittest.TestCase):
         self.assertEqual(view(None, None), "Oh yes!")
 
 
-@attr(shard=1)
 class TestRequireStudentIdentifier(TestCase):
     """
     Test require_student_from_identifier()
@@ -92,7 +88,6 @@ class TestRequireStudentIdentifier(TestCase):
             tools.require_student_from_identifier("invalid")
 
 
-@attr(shard=1)
 class TestParseDatetime(unittest.TestCase):
     """
     Test date parsing.
@@ -107,7 +102,6 @@ class TestParseDatetime(unittest.TestCase):
             tools.parse_datetime('foo')
 
 
-@attr(shard=1)
 class TestFindUnit(SharedModuleStoreTestCase):
     """
     Test the find_unit function.
@@ -137,7 +131,6 @@ class TestFindUnit(SharedModuleStoreTestCase):
             tools.find_unit(self.course, url)
 
 
-@attr(shard=1)
 class TestGetUnitsWithDueDate(ModuleStoreTestCase):
     """
     Test the get_units_with_due_date function.
@@ -175,7 +168,6 @@ class TestGetUnitsWithDueDate(ModuleStoreTestCase):
             urls((self.week1, self.week2)))
 
 
-@attr(shard=1)
 class TestTitleOrUrl(unittest.TestCase):
     """
     Test the title_or_url funciton.
@@ -199,7 +191,6 @@ class TestTitleOrUrl(unittest.TestCase):
         self.assertEquals(tools.title_or_url(unit), u'test:hello')
 
 
-@attr(shard=1)
 @override_settings(
     FIELD_OVERRIDE_PROVIDERS=(
         'lms.djangoapps.courseware.student_field_overrides.IndividualStudentOverrideProvider',),
@@ -279,7 +270,6 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
         self.assertEqual(self.week1.due, self.due)
 
 
-@attr(shard=1)
 class TestDataDumps(ModuleStoreTestCase):
     """
     Test data dumps for reporting.
@@ -361,7 +351,6 @@ def msk_from_problem_urlname(course_id, urlname, block_type='problem'):
     return course_id.make_usage_key(block_type, urlname)
 
 
-@attr(shard=1)
 class TestStudentFromIdentifier(TestCase):
     """
     Test get_student_from_identifier()

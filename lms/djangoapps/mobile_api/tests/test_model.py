@@ -15,7 +15,6 @@ class TestAppVersionConfigModel(TestCase):
     """
     Tests for app version configuration model
     """
-    shard = 4
 
     def set_app_version_config(self):
         """ Creates configuration data for platform versions """
@@ -90,7 +89,6 @@ class TestMobileApiConfig(TestCase):
     """
     Tests MobileAPIConfig
     """
-    shard = 4
 
     def test_video_profile_list(self):
         """Check that video_profiles config is returned in order as a list"""

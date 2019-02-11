@@ -14,7 +14,6 @@ class UserPrefContextProcessorUnitTest(ModuleStoreTestCase):
     """
     Unit test for courseware context_processor
     """
-    shard = 4
 
     def setUp(self):
         super(UserPrefContextProcessorUnitTest, self).setUp()

@@ -37,7 +37,6 @@ from lms.djangoapps.ccx.views import get_date
 from lms.djangoapps.grades.tasks import compute_all_grades_for_course
 from lms.djangoapps.instructor.access import allow_access, list_with_level
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.lib.tests import attr
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from student.roles import CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
@@ -167,7 +166,6 @@ class TestAdminAccessCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         self.assertEqual(response.status_code, 403)
 
 
-@attr(shard=7)
 @override_settings(
     XBLOCK_FIELD_DATA_WRAPPERS=['lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap'],
     MODULESTORE_FIELD_OVERRIDE_PROVIDERS=['ccx.overrides.CustomCoursesForEdxOverrideProvider'],
@@ -282,7 +280,6 @@ class TestCCXProgressChanges(CcxTestCase, LoginEnrollmentTestCase):
         self.assert_progress_summary(ccx_course_key, due)
 
 
-@attr(shard=7)
 @override_settings(
     XBLOCK_FIELD_DATA_WRAPPERS=['lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap'],
     MODULESTORE_FIELD_OVERRIDE_PROVIDERS=['ccx.overrides.CustomCoursesForEdxOverrideProvider'],
@@ -839,7 +836,6 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         )
 
 
-@attr(shard=7)
 class TestCoachDashboardSchedule(CcxTestCase, LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Tests of the CCX Coach Dashboard which need to modify the course content.
@@ -981,7 +977,6 @@ def patched_get_children(self, usage_key_filter=None):
     return list(iter_children())
 
 
-@attr(shard=7)
 @override_settings(
     XBLOCK_FIELD_DATA_WRAPPERS=['lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap'],
     MODULESTORE_FIELD_OVERRIDE_PROVIDERS=['ccx.overrides.CustomCoursesForEdxOverrideProvider'],

@@ -61,7 +61,6 @@ class OrderTest(ModuleStoreTestCase):
     Test shopping cart orders (e.g., cart contains various items,
     order is taken through various pieces of cart state, etc.)
     """
-    shard = 3
 
     def setUp(self):
         super(OrderTest, self).setUp()
@@ -493,7 +492,6 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
     """
     Paid Course Registration Tests.
     """
-    shard = 3
 
     def setUp(self):
         super(PaidCourseRegistrationTest, self).setUp()

@@ -19,7 +19,6 @@ class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTe
     """
     All tests for the views.py file
     """
-    shard = 1
     STUDENT_INFO = [('view@test.com', 'foo')]
 
     @classmethod

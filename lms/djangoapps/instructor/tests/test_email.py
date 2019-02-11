@@ -20,7 +20,6 @@ class TestNewInstructorDashboardEmailViewMongoBacked(SharedModuleStoreTestCase):
     Check for email view on the new instructor dashboard
     for Mongo-backed courses
     """
-    shard = 1
 
     @classmethod
     def setUpClass(cls):
@@ -115,7 +114,6 @@ class TestNewInstructorDashboardEmailViewXMLBacked(SharedModuleStoreTestCase):
     """
 
     MODULESTORE = TEST_DATA_MIXED_MODULESTORE
-    shard = 1
 
     @classmethod
     def setUpClass(cls):

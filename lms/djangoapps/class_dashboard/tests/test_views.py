@@ -17,7 +17,6 @@ class TestViews(ModuleStoreTestCase):
     """
     Tests related to class_dashboard/views.py
     """
-    shard = 1
 
     def setUp(self):
         super(TestViews, self).setUp()

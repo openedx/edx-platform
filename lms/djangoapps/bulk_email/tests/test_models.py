@@ -21,14 +21,12 @@ from bulk_email.models import (
 )
 from course_modes.models import CourseMode
 from openedx.core.djangoapps.course_groups.models import CourseCohort
-from openedx.core.lib.tests import attr
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @ddt.ddt
-@attr(shard=1)
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class CourseEmailTest(ModuleStoreTestCase):
     """Test the CourseEmail model."""
@@ -146,7 +144,6 @@ class CourseEmailTest(ModuleStoreTestCase):
         self.assertEqual(target.long_display(), 'Cohort: test cohort')
 
 
-@attr(shard=1)
 class NoCourseEmailTemplateTest(TestCase):
     """Test the CourseEmailTemplate model without loading the template data."""
 
@@ -155,7 +152,6 @@ class NoCourseEmailTemplateTest(TestCase):
             CourseEmailTemplate.get_template()
 
 
-@attr(shard=1)
 class CourseEmailTemplateTest(TestCase):
     """Test the CourseEmailTemplate model."""
 
@@ -254,7 +250,6 @@ class CourseEmailTemplateTest(TestCase):
         self.assertIn(context['name'], message)
 
 
-@attr(shard=1)
 class CourseAuthorizationTest(TestCase):
     """Test the CourseAuthorization model."""
 

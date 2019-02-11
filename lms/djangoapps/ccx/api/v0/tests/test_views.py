@@ -166,7 +166,6 @@ class CcxListTest(CcxRestApiTest):
     Test for the CCX REST APIs
     """
     ENABLED_SIGNALS = ['course_published']
-    shard = 9
 
     @classmethod
     def setUpClass(cls):
@@ -877,7 +876,6 @@ class CcxDetailTest(CcxRestApiTest):
     Test for the CCX REST APIs
     """
     ENABLED_SIGNALS = ['course_published']
-    shard = 9
 
     def setUp(self):
         """

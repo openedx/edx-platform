@@ -10,7 +10,6 @@ from ..models import Course
 @ddt.ddt
 class CourseTests(TestCase):
     """ Tests for Course model. """
-    shard = 4
 
     def setUp(self):
         super(CourseTests, self).setUp()

@@ -22,7 +22,6 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
     """
     TEST_PARTITION_ID = 0
     TRANSFORMER_CLASS_TO_TEST = UserPartitionTransformer
-    shard = 3
 
     def setUp(self):
         """

@@ -12,7 +12,6 @@ from student.tests.factories import UserFactory
 
 class TestAnalyticsDistributions(TestCase):
     '''Test analytics distribution gathering.'''
-    shard = 4
 
     def setUp(self):
         super(TestAnalyticsDistributions, self).setUp()
@@ -76,7 +75,6 @@ class TestAnalyticsDistributions(TestCase):
 
 class TestAnalyticsDistributionsNoData(TestCase):
     '''Test analytics distribution gathering.'''
-    shard = 4
 
     def setUp(self):
         super(TestAnalyticsDistributionsNoData, self).setUp()

@@ -13,7 +13,6 @@ class TestUtils(TestCase):
     """
     The test case class covering the all the utils functions
     """
-    shard = 4
 
     @ddt.data('path1/', '/path1/path2/', '/', '')
     def test_strip_course_id(self, path):

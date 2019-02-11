@@ -21,7 +21,6 @@ class TestSites(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     This is testing of the Site Configuration feature
     """
-    shard = 1
     STUDENT_INFO = [('view@test.com', 'foo'), ('view2@test.com', 'foo')]
     ENABLED_SIGNALS = ['course_published']
 

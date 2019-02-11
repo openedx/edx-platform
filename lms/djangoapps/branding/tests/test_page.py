@@ -17,7 +17,6 @@ from branding.views import index
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
-from openedx.core.lib.tests import attr
 from util.milestones_helpers import set_prerequisite_courses
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -37,7 +36,6 @@ def mock_render_to_response(*args, **kwargs):
 RENDER_MOCK = Mock(side_effect=mock_render_to_response)
 
 
-@attr(shard=1)
 class AnonymousIndexPageTest(ModuleStoreTestCase):
     """
     Tests that anonymous users can access the '/' page,  Need courses with start date
@@ -109,7 +107,6 @@ class AnonymousIndexPageTest(ModuleStoreTestCase):
         self.assertEqual(response._headers.get("location")[1], "/login")  # pylint: disable=protected-access
 
 
-@attr(shard=1)
 class PreRequisiteCourseCatalog(ModuleStoreTestCase, LoginEnrollmentTestCase, MilestonesTestCaseMixin):
     """
     Test to simulate and verify fix for disappearing courses in
@@ -155,7 +152,6 @@ class PreRequisiteCourseCatalog(ModuleStoreTestCase, LoginEnrollmentTestCase, Mi
         self.assertIn('course that has pre requisite', resp.content)
 
 
-@attr(shard=1)
 class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
     """
     Test for Index page course cards sorting
@@ -290,7 +286,6 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         self.assertEqual(context['courses'][2].id, self.course_with_default_start_date.id)
 
 
-@attr(shard=1)
 class IndexPageProgramsTests(SiteMixin, ModuleStoreTestCase):
     """
     Tests for Programs List in Marketing Pages.

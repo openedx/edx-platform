@@ -1007,7 +1007,6 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
     """
     Test the problem report on a course that has split tests.
     """
-    shard = 3
     OPTION_1 = 'Option 1'
     OPTION_2 = 'Option 2'
 
@@ -2131,7 +2130,6 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
     """
     Test certificate generation task works.
     """
-    shard = 3
 
     ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
 

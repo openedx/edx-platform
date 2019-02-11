@@ -25,7 +25,6 @@ from mobile_api.utils import API_V05, API_V1
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, remove_user_from_cohort
 from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
-from openedx.core.lib.tests import attr
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import ItemFactory
 from xmodule.partitions.partitions import Group, UserPartition
@@ -208,7 +207,6 @@ class TestVideoAPIMixin(object):
         return sub_block_a, sub_block_b
 
 
-@attr(shard=9)
 @ddt.ddt
 class TestNonStandardCourseStructure(MobileAPITestCase, TestVideoAPIMixin, MilestonesTestCaseMixin):
     """
@@ -425,7 +423,6 @@ class TestNonStandardCourseStructure(MobileAPITestCase, TestVideoAPIMixin, Miles
         )
 
 
-@attr(shard=9)
 @ddt.ddt
 class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin,
                            TestVideoAPIMixin, MilestonesTestCaseMixin):
@@ -978,7 +975,6 @@ class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileCour
         self.assertItemsEqual(course_outline[0]['summary']['transcripts'].keys(), expected_transcripts)
 
 
-@attr(shard=9)
 @ddt.ddt
 class TestTranscriptsDetail(TestVideoAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin,
                             TestVideoAPIMixin, MilestonesTestCaseMixin):

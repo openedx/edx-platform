@@ -34,7 +34,6 @@ class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCa
     """
     Test the bulk enrollment endpoint
     """
-    shard = 4
 
     USERNAME = "Bob"
     EMAIL = "bob@example.com"

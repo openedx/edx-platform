@@ -43,7 +43,6 @@ class TestEmailErrors(ModuleStoreTestCase):
     """
     Test that errors from sending email are handled properly.
     """
-    shard = 1
 
     ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
 

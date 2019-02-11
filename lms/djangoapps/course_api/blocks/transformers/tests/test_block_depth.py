@@ -19,7 +19,6 @@ class BlockDepthTransformerTestCase(TestCase, ChildrenMapTestMixin):
     """
     Test behavior of BlockDepthTransformer
     """
-    shard = 4
 
     @ddt.data(
         (0, [], [], []),

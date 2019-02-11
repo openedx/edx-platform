@@ -21,7 +21,6 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
     """
     Check for E-commerce view on the new instructor dashboard
     """
-    shard = 1
 
     @classmethod
     def setUpClass(cls):

@@ -10,7 +10,6 @@ from openedx.core.djangoapps.site_configuration.tests.test_util import with_site
 
 class MarketingSiteViewTests(TestCase):
     """ Tests for the marketing site views """
-    shard = 4
 
     def _test_view(self, view_name, mimetype):
         """

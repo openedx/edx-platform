@@ -8,7 +8,6 @@ from six import text_type
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware.tests.factories import StudentModuleFactory
 from lms.djangoapps.grades.tasks import compute_all_grades_for_course
-from openedx.core.lib.tests import attr
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -16,7 +15,6 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 USER_COUNT = 11
 
 
-@attr(shard=1)
 class TestGradebook(SharedModuleStoreTestCase):
     """
     Test functionality of the spoc gradebook. Sets up a course with assignments and
@@ -85,7 +83,6 @@ class TestGradebook(SharedModuleStoreTestCase):
         self.assertEquals(self.response.status_code, 200)
 
 
-@attr(shard=1)
 class TestDefaultGradingPolicy(TestGradebook):
     """
     Tests that the grading policy is properly applied for all users in the course
@@ -111,7 +108,6 @@ class TestDefaultGradingPolicy(TestGradebook):
         self.assertEquals(293, self.response.content.count('grade_None'))
 
 
-@attr(shard=1)
 class TestLetterCutoffPolicy(TestGradebook):
     """
     Tests advanced grading policy (with letter grade cutoffs). Includes tests of

@@ -38,7 +38,6 @@ from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory, config_course_cohorts
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
-from openedx.core.lib.tests import attr
 from student.roles import CourseStaffRole
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
@@ -47,7 +46,6 @@ from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, 
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, ToyCourseFactory
 
 
-@attr(shard=1)
 class DictionaryTestCase(TestCase):
     def test_extract(self):
         d = {'cats': 'meow', 'dogs': 'woof'}
@@ -66,7 +64,6 @@ class DictionaryTestCase(TestCase):
         self.assertEqual(utils.strip_blank(d), expected)
 
 
-@attr(shard=1)
 class AccessUtilsTestCase(ModuleStoreTestCase):
     """
     Base testcase class for access and roles for the
@@ -122,7 +119,6 @@ class AccessUtilsTestCase(ModuleStoreTestCase):
 
 
 @ddt.ddt
-@attr(shard=1)
 class CoursewareContextTestCase(ModuleStoreTestCase):
     """
     Base testcase class for courseware context for the
@@ -228,7 +224,6 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
         self.assertEqual(len(utils.get_accessible_discussion_xblocks(course, self.user)), expected_discussion_xblocks)
 
 
-@attr(shard=3)
 class CachedDiscussionIdMapTestCase(ModuleStoreTestCase):
     """
     Tests that using the cache of discussion id mappings has the same behavior as searching through the course.
@@ -364,7 +359,6 @@ class CategoryMapTestMixin(object):
         )
 
 
-@attr(shard=1)
 class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
     """
     Base testcase class for discussion categories for the
@@ -1052,7 +1046,6 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         )
 
 
-@attr(shard=1)
 class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase):
     """
     Tests `get_discussion_category_map` on discussion xblocks which are
@@ -1428,7 +1421,6 @@ class IsCommentableDividedTestCase(ModuleStoreTestCase):
         self.assertTrue(utils.is_commentable_divided(course.id, "random"))
 
 
-@attr(shard=1)
 class GroupIdForUserTestCase(ModuleStoreTestCase):
     """ Test the get_group_id_for_user method. """
 
@@ -1475,7 +1467,6 @@ class GroupIdForUserTestCase(ModuleStoreTestCase):
         )
 
 
-@attr(shard=1)
 class CourseDiscussionDivisionEnabledTestCase(ModuleStoreTestCase):
     """ Test the course_discussion_division_enabled and available_division_schemes methods. """
 
@@ -1522,7 +1513,6 @@ class CourseDiscussionDivisionEnabledTestCase(ModuleStoreTestCase):
         self.assertEqual([CourseDiscussionSettings.ENROLLMENT_TRACK], utils.available_division_schemes(self.course.id))
 
 
-@attr(shard=1)
 class GroupNameTestCase(ModuleStoreTestCase):
     """ Test the get_group_name and get_group_names_by_id methods. """
 

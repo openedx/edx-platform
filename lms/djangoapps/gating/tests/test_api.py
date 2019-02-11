@@ -61,7 +61,6 @@ class TestEvaluatePrerequisite(GatingTestCase, MilestonesTestCaseMixin):
     """
     Tests for the evaluate_prerequisite function
     """
-    shard = 3
 
     def setUp(self):
         super(TestEvaluatePrerequisite, self).setUp()

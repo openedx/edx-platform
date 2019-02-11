@@ -13,7 +13,6 @@ class CourseCompleteTestCase(ModuleStoreTestCase):
     """
     Tests for the course completion helper functions.
     """
-    shard = 4
 
     def setUp(self):
         super(CourseCompleteTestCase, self).setUp()

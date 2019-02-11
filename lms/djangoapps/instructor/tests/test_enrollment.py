@@ -35,7 +35,6 @@ from lms.djangoapps.instructor.enrollment import (
 )
 from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, get_mock_request
-from openedx.core.lib.tests import attr
 from student.models import CourseEnrollment, CourseEnrollmentAllowed, anonymous_id_for_user
 from student.roles import CourseCcxCoachRole
 from student.tests.factories import AdminFactory, UserFactory
@@ -44,7 +43,6 @@ from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, 
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
-@attr(shard=1)
 class TestSettableEnrollmentState(CacheIsolationTestCase):
     """ Test the basis class for enrollment tests. """
     def setUp(self):
@@ -108,7 +106,6 @@ class TestEnrollmentChangeBase(CacheIsolationTestCase):
         self.assertEqual(after, after_ideal)
 
 
-@attr(shard=1)
 class TestInstructorEnrollDB(TestEnrollmentChangeBase):
     """ Test instructor.enrollment.enroll_email """
     def test_enroll(self):
@@ -226,7 +223,6 @@ class TestInstructorEnrollDB(TestEnrollmentChangeBase):
         return self._run_state_change_test(before_ideal, after_ideal, action)
 
 
-@attr(shard=1)
 class TestInstructorUnenrollDB(TestEnrollmentChangeBase):
     """ Test instructor.enrollment.unenroll_email """
     def test_unenroll(self):
@@ -306,7 +302,6 @@ class TestInstructorUnenrollDB(TestEnrollmentChangeBase):
         return self._run_state_change_test(before_ideal, after_ideal, action)
 
 
-@attr(shard=1)
 class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
     """ Test student module manipulations. """
     @classmethod
@@ -654,7 +649,6 @@ class SettableEnrollmentState(EmailEnrollmentState):
             return EnrollmentObjects(email, None, None, None)
 
 
-@attr(shard=1)
 class TestSendBetaRoleEmail(CacheIsolationTestCase):
     """
     Test edge cases for `send_beta_role_email`
@@ -672,7 +666,6 @@ class TestSendBetaRoleEmail(CacheIsolationTestCase):
             send_beta_role_email(bad_action, self.user, self.email_params)
 
 
-@attr(shard=1)
 class TestGetEmailParamsCCX(SharedModuleStoreTestCase):
     """
     Test what URLs the function get_email_params for CCX student enrollment.
@@ -721,7 +714,6 @@ class TestGetEmailParamsCCX(SharedModuleStoreTestCase):
         self.assertEqual(result['course_url'], self.course_url)
 
 
-@attr(shard=1)
 class TestGetEmailParams(SharedModuleStoreTestCase):
     """
     Test what URLs the function get_email_params returns under different
@@ -764,7 +756,6 @@ class TestGetEmailParams(SharedModuleStoreTestCase):
         self.assertEqual(result['course_url'], self.course_url)
 
 
-@attr(shard=1)
 @ddt.ddt
 class TestRenderMessageToString(EmailTemplateTagMixin, SharedModuleStoreTestCase):
     """

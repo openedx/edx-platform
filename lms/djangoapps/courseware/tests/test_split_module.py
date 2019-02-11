@@ -24,7 +24,6 @@ class SplitTestBase(SharedModuleStoreTestCase):
     ICON_CLASSES = None
     TOOLTIPS = None
     VISIBLE_CONTENT = None
-    shard = 1
 
     @classmethod
     def setUpClass(cls):
@@ -289,7 +288,6 @@ class SplitTestPosition(SharedModuleStoreTestCase):
     """
     Check that we can change positions in a course with partitions defined
     """
-    shard = 1
 
     @classmethod
     def setUpClass(cls):

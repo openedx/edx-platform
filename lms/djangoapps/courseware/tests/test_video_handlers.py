@@ -16,7 +16,6 @@ from webob import Request, Response
 
 from common.test.utils import normalize_repr
 from openedx.core.djangoapps.contentserver.caching import del_cached_content
-from openedx.core.lib.tests import attr
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
@@ -131,7 +130,6 @@ def attach_bumper_transcript(item, filename, lang="en"):
     item.video_bumper["transcripts"][lang] = filename
 
 
-@attr(shard=1)
 class TestVideo(BaseTestXmodule):
     """Integration tests: web client + mongo."""
     CATEGORY = "video"
@@ -205,7 +203,6 @@ class TestVideo(BaseTestXmodule):
         super(TestVideo, self).tearDown()
 
 
-@attr(shard=1)
 @ddt.ddt
 class TestTranscriptAvailableTranslationsDispatch(TestVideo):
     """
@@ -364,7 +361,6 @@ class TestTranscriptAvailableTranslationsDispatch(TestVideo):
         self.assertEqual(response.status_code, 404)
 
 
-@attr(shard=1)
 @ddt.ddt
 class TestTranscriptAvailableTranslationsBumperDispatch(TestVideo):
     """
@@ -539,7 +535,6 @@ class TestTranscriptDownloadDispatch(TestVideo):
             self.assertEqual(response.headers[attribute], value)
 
 
-@attr(shard=1)
 @ddt.ddt
 class TestTranscriptTranslationGetDispatch(TestVideo):
     """
@@ -821,7 +816,6 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
         self.assertEqual(response.status_code, 404)
 
 
-@attr(shard=1)
 class TestStudioTranscriptTranslationGetDispatch(TestVideo):
     """
     Test Studio video handler that provide translation transcripts.
@@ -880,7 +874,6 @@ class TestStudioTranscriptTranslationGetDispatch(TestVideo):
         self.assertEqual(response.headers["Content-Language"], "zh")
 
 
-@attr(shard=1)
 @ddt.ddt
 class TestStudioTranscriptTranslationPostDispatch(TestVideo):
     """
@@ -987,7 +980,6 @@ class TestStudioTranscriptTranslationPostDispatch(TestVideo):
         )
 
 
-@attr(shard=1)
 @ddt.ddt
 class TestStudioTranscriptTranslationDeleteDispatch(TestVideo):
     """
@@ -1119,7 +1111,6 @@ class TestStudioTranscriptTranslationDeleteDispatch(TestVideo):
         self.assertFalse(_check_asset(self.item_descriptor.location, sub_file_name))
 
 
-@attr(shard=1)
 class TestGetTranscript(TestVideo):
     """
     Make sure that `get_transcript` method works correctly

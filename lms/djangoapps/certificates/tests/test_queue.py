@@ -33,7 +33,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 @override_settings(CERT_QUEUE='certificates')
 class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
     """Test the "add to queue" operation of the XQueue interface. """
-    shard = 1
 
     def setUp(self):
         super(XQueueCertInterfaceAddCertificateTest, self).setUp()
@@ -281,7 +280,6 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
 @override_settings(CERT_QUEUE='certificates')
 class XQueueCertInterfaceExampleCertificateTest(TestCase):
     """Tests for the XQueue interface for certificate generation. """
-    shard = 1
 
     COURSE_KEY = CourseLocator(org='test', course='test', run='test')
 

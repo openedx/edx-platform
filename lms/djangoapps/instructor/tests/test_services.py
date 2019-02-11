@@ -20,7 +20,6 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
     """
     Tests for the InstructorService
     """
-    shard = 1
 
     @classmethod
     def setUpClass(cls):

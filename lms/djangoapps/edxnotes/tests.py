@@ -29,7 +29,6 @@ from edxnotes.plugins import EdxNotesTab
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory
 from openedx.core.djangoapps.user_api.models import RetirementState, UserRetirementStatus
-from openedx.core.lib.tests import attr
 from student.tests.factories import CourseEnrollmentFactory, SuperuserFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -90,7 +89,6 @@ class TestProblem(object):
         return "original_get_html"
 
 
-@attr(shard=3)
 @skipUnless(settings.FEATURES["ENABLE_EDXNOTES"], "EdxNotes feature needs to be enabled.")
 class EdxNotesDecoratorTest(ModuleStoreTestCase):
     """
@@ -186,7 +184,6 @@ class EdxNotesDecoratorTest(ModuleStoreTestCase):
         assert problem.get_html() == "original_get_html"
 
 
-@attr(shard=3)
 @skipUnless(settings.FEATURES["ENABLE_EDXNOTES"], "EdxNotes feature needs to be enabled.")
 @ddt.ddt
 class EdxNotesHelpersTest(ModuleStoreTestCase):
@@ -954,7 +951,6 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         verify_url(previous_url, previous_api_url)
 
 
-@attr(shard=3)
 @skipUnless(settings.FEATURES["ENABLE_EDXNOTES"], "EdxNotes feature needs to be enabled.")
 @ddt.ddt
 class EdxNotesViewsTest(ModuleStoreTestCase):
@@ -1150,7 +1146,6 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 400)
 
 
-@attr(shard=3)
 class EdxNotesRetireAPITest(ModuleStoreTestCase):
     """
     Tests for EdxNotes retirement API.
@@ -1264,7 +1259,6 @@ class EdxNotesRetireAPITest(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 500)
 
 
-@attr(shard=3)
 @skipUnless(settings.FEATURES["ENABLE_EDXNOTES"], "EdxNotes feature needs to be enabled.")
 @ddt.ddt
 class EdxNotesPluginTest(ModuleStoreTestCase):

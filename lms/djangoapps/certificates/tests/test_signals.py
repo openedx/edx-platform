@@ -26,7 +26,6 @@ class SelfGeneratedCertsSignalTest(ModuleStoreTestCase):
     """
     Tests for enabling/disabling self-generated certificates according to course-pacing.
     """
-    shard = 4
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
@@ -54,7 +53,6 @@ class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
     """
     Tests for whitelisted student auto-certificate generation
     """
-    shard = 4
 
     def setUp(self):
         super(WhitelistGeneratedCertificatesTest, self).setUp()
@@ -135,7 +133,6 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
     """
     Tests for certificate generation task firing on passing grade receipt
     """
-    shard = 4
 
     def setUp(self):
         super(PassingGradeCertsTest, self).setUp()
@@ -229,7 +226,6 @@ class FailingGradeCertsTest(ModuleStoreTestCase):
     and that the signal has no effect on the cert status if the cert has a non-passing
     status
     """
-    shard = 4
 
     def setUp(self):
         super(FailingGradeCertsTest, self).setUp()
@@ -285,7 +281,6 @@ class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
     """
     Tests for certificate generation task firing on learner verification
     """
-    shard = 4
 
     def setUp(self):
         super(LearnerTrackChangeCertsTest, self).setUp()
@@ -358,7 +353,6 @@ class CertificateGenerationTaskTest(ModuleStoreTestCase):
     """
     Tests for certificate generation task.
     """
-    shard = 4
 
     def setUp(self):
         super(CertificateGenerationTaskTest, self).setUp()
