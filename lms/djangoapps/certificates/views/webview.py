@@ -660,10 +660,15 @@ def _get_custom_template_and_language(course_id, course_mode, course_language):
     template = get_certificate_template(course_id, course_mode, closest_released_language)
 
     if template and template.language:
+        log.info("Returning template for course: {course_id} and template language is {language}".format(
+            course_id=course_id, language=template.language))
         return (template, closest_released_language)
     elif template:
+        log.info("Returning template for course: {course_id} and template language is returned from settings"
+                 " {language}".format(course_id=course_id, language=settings.LANGUAGE_CODE))
         return (template, settings.LANGUAGE_CODE)
     else:
+        log.info("No template found for course: {course_id}" .format(course_id=course_id))
         return (None, None)
 
 
