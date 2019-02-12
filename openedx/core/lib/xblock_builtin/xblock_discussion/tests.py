@@ -59,7 +59,6 @@ class DiscussionXBlockImportExportTests(TestCase):
     Import and export tests
     """
     DISCUSSION_XBLOCK_LOCATION = "openedx.core.lib.xblock_builtin.xblock_discussion.xblock_discussion.DiscussionXBlock"
-    shard = 2
 
     def setUp(self):
         """

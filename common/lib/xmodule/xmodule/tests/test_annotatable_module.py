@@ -14,7 +14,6 @@ from . import get_test_system
 
 
 class AnnotatableModuleTestCase(unittest.TestCase):
-    shard = 1
     sample_xml = '''
         <annotatable display_name="Iliad">
             <instructions>Read the text.</instructions>

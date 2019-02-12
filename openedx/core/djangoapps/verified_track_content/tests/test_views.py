@@ -21,7 +21,6 @@ class CohortingSettingsTestCase(SharedModuleStoreTestCase):
     """
     Tests the `cohort_discussion_topics` view.
     """
-    shard = 2
 
     @classmethod
     def setUpClass(cls):

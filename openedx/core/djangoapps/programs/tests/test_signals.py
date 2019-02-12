@@ -29,7 +29,6 @@ class CertAwardedReceiverTest(TestCase):
     """
     Tests for the `handle_course_cert_awarded` signal handler function.
     """
-    shard = 2
 
     @property
     def signal_kwargs(self):
@@ -91,7 +90,6 @@ class CertChangedReceiverTest(TestCase):
     """
     Tests for the `handle_course_cert_changed` signal handler function.
     """
-    shard = 2
 
     def setUp(self):
         super(CertChangedReceiverTest, self).setUp()

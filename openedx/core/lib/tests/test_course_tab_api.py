@@ -12,7 +12,6 @@ class TestCourseTabApi(TestCase):
     """
     Unit tests for the course tab plugin API
     """
-    shard = 2
 
     def test_get_plugin(self):
         """

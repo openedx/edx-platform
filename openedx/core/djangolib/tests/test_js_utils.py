@@ -15,7 +15,6 @@ class TestJSUtils(TestCase):
     """
     Test JS utils
     """
-    shard = 2
 
     class NoDefaultEncoding(object):
         """

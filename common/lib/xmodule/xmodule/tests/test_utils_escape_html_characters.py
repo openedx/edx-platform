@@ -7,7 +7,6 @@ class UtilHtmlEscapeTests(TestCase):
     """
     Tests for methods exposed in util/misc
     """
-    shard = 1
 
     final_content = " This is a paragraph. "
 

@@ -46,7 +46,6 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
     """
     Tests for CourseOverview model.
     """
-    shard = 3
     TODAY = timezone.now()
     LAST_MONTH = 'last_month'
     LAST_WEEK = 'last_week'
@@ -564,7 +563,6 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
     Course thumbnail generation tests.
     """
     ENABLED_SIGNALS = ['course_published']
-    shard = 3
 
     def setUp(self):
         """Create an active CourseOverviewImageConfig with non-default values."""
@@ -1042,7 +1040,6 @@ class CourseOverviewTabTestCase(ModuleStoreTestCase):
     """
     Tests for CourseOverviewTab model.
     """
-    shard = 3
 
     ENABLED_SIGNALS = ['course_published']
 

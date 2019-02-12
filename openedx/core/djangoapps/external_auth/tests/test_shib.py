@@ -81,7 +81,6 @@ class ShibSPTest(CacheIsolationTestCase):
     Tests for the Shibboleth SP, which communicates via request.META
     (Apache environment variables set by mod_shib)
     """
-    shard = 3
 
     ENABLED_CACHES = ['default']
 

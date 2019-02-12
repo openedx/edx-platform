@@ -63,7 +63,6 @@ class TestSortedAssetList(unittest.TestCase):
     """
     Tests the SortedAssetList class.
     """
-    shard = 1
 
     def setUp(self):
         super(TestSortedAssetList, self).setUp()
@@ -92,7 +91,6 @@ class TestMongoAssetMetadataStorage(TestCase):
     """
     Tests for storing/querying course asset metadata.
     """
-    shard = 1
     XML_MODULESTORE_MAP = {
         'XML_MODULESTORE_BUILDER': XmlModulestoreBuilder(),
         'MIXED_MODULESTORE_BUILDER': MixedModulestoreBuilder([('xml', XmlModulestoreBuilder())])

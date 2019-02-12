@@ -65,7 +65,6 @@ class DummySystem(ImportSystem):
 
 class BaseCourseTestCase(TestCase):
     '''Make sure module imports work properly, including for malformed inputs'''
-    shard = 1
 
     @staticmethod
     def get_system(load_error_modules=True, library=False):
@@ -99,7 +98,6 @@ class PureXBlockImportTest(BaseCourseTestCase):
     """
     Tests of import pure XBlocks (not XModules) from xml
     """
-    shard = 1
 
     def assert_xblocks_are_good(self, block):
         """Assert a number of conditions that must be true for `block` to be good."""
@@ -127,7 +125,6 @@ class PureXBlockImportTest(BaseCourseTestCase):
 
 
 class ImportTestCase(BaseCourseTestCase):
-    shard = 1
     date = Date()
 
     def test_fallback(self):

@@ -121,7 +121,6 @@ class _MockValCannotCreateError(Exception):
 
 class VideoModuleTest(LogicTest):
     """Logic tests for Video Xmodule."""
-    shard = 1
     descriptor_class = VideoDescriptor
 
     raw_field_data = {
@@ -203,7 +202,6 @@ class VideoDescriptorTestBase(unittest.TestCase):
     """
     Base class for tests for VideoDescriptor
     """
-    shard = 1
 
     def setUp(self):
         super(VideoDescriptorTestBase, self).setUp()
@@ -229,7 +227,6 @@ class TestCreateYoutubeString(VideoDescriptorTestBase):
     """
     Checks that create_youtube_string correcty extracts information from Video descriptor.
     """
-    shard = 1
 
     def test_create_youtube_string(self):
         """
@@ -257,7 +254,6 @@ class TestCreateYouTubeUrl(VideoDescriptorTestBase):
     """
     Tests for helper method `create_youtube_url`.
     """
-    shard = 1
 
     def test_create_youtube_url_unicode(self):
         """
@@ -272,7 +268,6 @@ class VideoDescriptorImportTestCase(TestCase):
     """
     Make sure that VideoDescriptor can import an old XML-based video correctly.
     """
-    shard = 1
 
     def assert_attributes_equal(self, video, attrs):
         """
@@ -702,7 +697,6 @@ class VideoExportTestCase(VideoDescriptorTestBase):
     """
     Make sure that VideoDescriptor can export itself to XML correctly.
     """
-    shard = 1
 
     def setUp(self):
         super(VideoExportTestCase, self).setUp()
@@ -860,7 +854,6 @@ class VideoDescriptorStudentViewDataTestCase(unittest.TestCase):
     """
     Make sure that VideoDescriptor returns the expected student_view_data.
     """
-    shard = 1
 
     VIDEO_URL_1 = 'http://www.example.com/source_low.mp4'
     VIDEO_URL_2 = 'http://www.example.com/source_med.mp4'
@@ -1013,7 +1006,6 @@ class VideoDescriptorIndexingTestCase(unittest.TestCase):
     """
     Make sure that VideoDescriptor can format data for indexing as expected.
     """
-    shard = 1
 
     def test_video_with_no_subs_index_dictionary(self):
         """

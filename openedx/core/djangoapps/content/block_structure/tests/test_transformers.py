@@ -16,7 +16,6 @@ class TestBlockStructureTransformers(ChildrenMapTestMixin, TestCase):
     """
     Test class for testing BlockStructureTransformers
     """
-    shard = 2
 
     class UnregisteredTransformer(MockTransformer):
         """

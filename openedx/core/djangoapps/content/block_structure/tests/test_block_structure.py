@@ -22,7 +22,6 @@ class TestBlockStructure(TestCase, ChildrenMapTestMixin):
     """
     Tests for BlockStructure
     """
-    shard = 2
 
     @ddt.data(
         [],
@@ -52,7 +51,6 @@ class TestBlockStructureData(TestCase, ChildrenMapTestMixin):
     """
     Tests for BlockStructureBlockData and BlockStructureModulestoreData
     """
-    shard = 2
 
     def test_non_versioned_transformer(self):
         class TestNonVersionedTransformer(MockTransformer):

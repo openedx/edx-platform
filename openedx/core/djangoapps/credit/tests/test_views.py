@@ -26,7 +26,6 @@ from openedx.core.djangoapps.credit.tests.factories import (
 )
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from openedx.core.lib.tests import attr
 from student.tests.factories import UserFactory, AdminFactory
 from util.date_utils import to_timestamp
 
@@ -108,7 +107,6 @@ class ReadOnlyMixin(object):
         self.assertEqual(response.status_code, 405)
 
 
-@attr(shard=2)
 @skip_unless_lms
 class CreditCourseViewSetTests(AuthMixin, UserMixin, TestCase):
     """ Tests for the CreditCourse endpoints.
@@ -270,7 +268,6 @@ class CreditCourseViewSetTests(AuthMixin, UserMixin, TestCase):
         self.assertTrue(credit_course.enabled)
 
 
-@attr(shard=2)
 @ddt.ddt
 @skip_unless_lms
 class CreditProviderViewSetTests(ApiTestCaseMixin, ReadOnlyMixin, AuthMixin, UserMixin, TestCase):
@@ -315,7 +312,6 @@ class CreditProviderViewSetTests(ApiTestCaseMixin, ReadOnlyMixin, AuthMixin, Use
         self.assertEqual(response.data, CreditProviderSerializer(self.bayside).data)
 
 
-@attr(shard=2)
 @skip_unless_lms
 class CreditProviderRequestCreateViewTests(ApiTestCaseMixin, UserMixin, TestCase):
     """ Tests for CreditProviderRequestCreateView. """
@@ -464,7 +460,6 @@ class CreditProviderRequestCreateViewTests(ApiTestCaseMixin, UserMixin, TestCase
         self.assertEqual(response.status_code, 400)
 
 
-@attr(shard=2)
 @ddt.ddt
 @skip_unless_lms
 class CreditProviderCallbackViewTests(UserMixin, TestCase):
@@ -622,7 +617,6 @@ class CreditProviderCallbackViewTests(UserMixin, TestCase):
             self.assertEqual(response.status_code, 403)
 
 
-@attr(shard=2)
 @ddt.ddt
 @skip_unless_lms
 class CreditEligibilityViewTests(AuthMixin, UserMixin, ReadOnlyMixin, TestCase):

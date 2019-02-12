@@ -18,7 +18,6 @@ class CourseDetailsTestCase(ModuleStoreTestCase):
     """
     Tests the first course settings page (course dates, overview, etc.).
     """
-    shard = 2
 
     def setUp(self):
         super(CourseDetailsTestCase, self).setUp()

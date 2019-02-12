@@ -15,7 +15,6 @@ from ..courses import course_image_url
 @ddt.ddt
 class CourseImageTestCase(ModuleStoreTestCase):
     """Tests for course image URLs."""
-    shard = 2
 
     def verify_url(self, expected_url, actual_url):
         """

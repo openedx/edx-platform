@@ -33,7 +33,6 @@ class TestCohortSignals(TestCase):
     """
     Test cases to validate event emissions for various cohort-related workflows
     """
-    shard = 2
 
     def setUp(self):
         super(TestCohortSignals, self).setUp()
@@ -140,7 +139,6 @@ class TestCohorts(ModuleStoreTestCase):
     Test the cohorts feature
     """
     MODULESTORE = TEST_DATA_MIXED_MODULESTORE
-    shard = 2
 
     def setUp(self):
         """
@@ -750,7 +748,6 @@ class TestCohortsAndPartitionGroups(ModuleStoreTestCase):
     Test Cohorts and Partitions Groups.
     """
     MODULESTORE = TEST_DATA_MIXED_MODULESTORE
-    shard = 2
 
     def setUp(self):
         """

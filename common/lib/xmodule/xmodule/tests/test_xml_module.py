@@ -64,7 +64,6 @@ class InheritingFieldDataTest(unittest.TestCase):
     """
     Tests of InheritingFieldData.
     """
-    shard = 1
 
     class TestableInheritingXBlock(XmlDescriptor):
         """
@@ -228,7 +227,6 @@ class InheritingFieldDataTest(unittest.TestCase):
 
 
 class EditableMetadataFieldsTest(unittest.TestCase):
-    shard = 1
 
     def test_display_name_field(self):
         editable_fields = self.get_xml_editable_fields(DictFieldData({}))
@@ -372,7 +370,6 @@ class EditableMetadataFieldsTest(unittest.TestCase):
 
 class TestSerialize(unittest.TestCase):
     """ Tests the serialize, method, which is not dependent on type. """
-    shard = 1
 
     def test_serialize(self):
         assert serialize_field(None) == 'null'
@@ -392,7 +389,6 @@ class TestSerialize(unittest.TestCase):
 
 
 class TestDeserialize(unittest.TestCase):
-    shard = 1
 
     def assertDeserializeEqual(self, expected, arg):
         """
@@ -417,7 +413,6 @@ class TestDeserialize(unittest.TestCase):
 class TestDeserializeInteger(TestDeserialize):
     """ Tests deserialize as related to Integer type. """
 
-    shard = 1
     field_type = Integer
 
     def test_deserialize(self):
@@ -442,7 +437,6 @@ class TestDeserializeInteger(TestDeserialize):
 
 class TestDeserializeFloat(TestDeserialize):
     """ Tests deserialize as related to Float type. """
-    shard = 1
 
     field_type = Float
 
@@ -466,7 +460,6 @@ class TestDeserializeFloat(TestDeserialize):
 
 class TestDeserializeBoolean(TestDeserialize):
     """ Tests deserialize as related to Boolean type. """
-    shard = 1
 
     field_type = Boolean
 
@@ -492,7 +485,6 @@ class TestDeserializeBoolean(TestDeserialize):
 
 class TestDeserializeString(TestDeserialize):
     """ Tests deserialize as related to String type. """
-    shard = 1
 
     field_type = String
 
@@ -511,7 +503,6 @@ class TestDeserializeString(TestDeserialize):
 
 class TestDeserializeAny(TestDeserialize):
     """ Tests deserialize as related to Any type. """
-    shard = 1
 
     field_type = Any
 
@@ -528,7 +519,6 @@ class TestDeserializeAny(TestDeserialize):
 
 class TestDeserializeList(TestDeserialize):
     """ Tests deserialize as related to List type. """
-    shard = 1
 
     field_type = List
 
@@ -546,7 +536,6 @@ class TestDeserializeList(TestDeserialize):
 
 class TestDeserializeDate(TestDeserialize):
     """ Tests deserialize as related to Date type. """
-    shard = 1
 
     field_type = Date
 
@@ -558,7 +547,6 @@ class TestDeserializeDate(TestDeserialize):
 
 class TestDeserializeTimedelta(TestDeserialize):
     """ Tests deserialize as related to Timedelta type. """
-    shard = 1
 
     field_type = Timedelta
 
@@ -576,7 +564,6 @@ class TestDeserializeTimedelta(TestDeserialize):
 
 class TestDeserializeRelativeTime(TestDeserialize):
     """ Tests deserialize as related to Timedelta type. """
-    shard = 1
 
     field_type = RelativeTime
 
@@ -598,7 +585,6 @@ class TestDeserializeRelativeTime(TestDeserialize):
 
 
 class TestXmlAttributes(XModuleXmlImportTest):
-    shard = 1
 
     def test_unknown_attribute(self):
         assert not hasattr(CourseDescriptor, 'unknown_attr')

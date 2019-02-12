@@ -24,7 +24,6 @@ class TestLibraryRoot(MixedSplitTestCase):
     """
     Basic unit tests for LibraryRoot (library_root_xblock.py)
     """
-    shard = 1
 
     def test_library_author_view(self):
         """

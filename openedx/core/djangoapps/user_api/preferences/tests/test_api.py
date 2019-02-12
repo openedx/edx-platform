@@ -47,7 +47,6 @@ class TestPreferenceAPI(CacheIsolationTestCase):
     are not specified.
     """
     password = "test"
-    shard = 2
 
     def setUp(self):
         super(TestPreferenceAPI, self).setUp()
@@ -335,7 +334,6 @@ class UpdateEmailOptInTests(ModuleStoreTestCase):
     USERNAME = u'claire-underwood'
     PASSWORD = u'ṕáśśẃőŕd'
     EMAIL = u'claire+underwood@example.com'
-    shard = 2
 
     @ddt.data(
         # Check that a 27 year old can opt-in

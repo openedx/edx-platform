@@ -16,7 +16,6 @@ from openedx.core.djangolib.markup import HTML, Text, strip_all_tags_but_br
 @ddt.ddt
 class FormatHtmlTest(unittest.TestCase):
     """Test that we can format plain strings and HTML into them properly."""
-    shard = 2
 
     @ddt.data(
         (u"hello", u"hello"),

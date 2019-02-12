@@ -7,7 +7,6 @@ class UtilDjangoTests(TestCase):
     """
     Tests for methods exposed in util/django
     """
-    shard = 1
 
     def test_get_current_request(self):
         """

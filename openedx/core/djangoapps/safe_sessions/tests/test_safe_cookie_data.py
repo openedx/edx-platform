@@ -18,7 +18,6 @@ class TestSafeCookieData(TestSafeSessionsLogMixin, TestCase):
     """
     Test class for SafeCookieData
     """
-    shard = 2
 
     def setUp(self):
         super(TestSafeCookieData, self).setUp()

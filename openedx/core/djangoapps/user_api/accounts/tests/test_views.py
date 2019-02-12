@@ -145,7 +145,6 @@ class TestOwnUsernameAPI(CacheIsolationTestCase, UserAPITestCase):
     """
     Unit tests for the Accounts API.
     """
-    shard = 2
 
     ENABLED_CACHES = ['default']
 
@@ -204,7 +203,6 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
     """
     Unit tests for the Accounts API.
     """
-    shard = 2
 
     ENABLED_CACHES = ['default']
 
@@ -813,7 +811,6 @@ class TestAccountAPITransactions(TransactionTestCase):
     """
     Tests the transactional behavior of the account API
     """
-    shard = 2
 
     def setUp(self):
         super(TestAccountAPITransactions, self).setUp()

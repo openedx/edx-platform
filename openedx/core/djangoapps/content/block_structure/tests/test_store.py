@@ -18,7 +18,6 @@ class TestBlockStructureStore(UsageKeyFactoryMixin, ChildrenMapTestMixin, CacheI
     Tests for BlockStructureStore
     """
     ENABLED_CACHES = ['default']
-    shard = 2
 
     def setUp(self):
         super(TestBlockStructureStore, self).setUp()

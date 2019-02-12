@@ -68,7 +68,6 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
     GET /api/bookmarks/v1/bookmarks/?course_id={course_id1}
     POST /api/bookmarks/v1/bookmarks
     """
-    shard = 9
 
     @ddt.data(
         (1, False),
@@ -372,7 +371,6 @@ class BookmarksDetailViewTests(BookmarksViewsTestsBase):
     """
     This contains the tests for GET & DELETE methods of bookmark.views.BookmarksDetailView class
     """
-    shard = 9
 
     @ddt.data(
         ('', False),

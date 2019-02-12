@@ -15,7 +15,6 @@ class XBlockCacheTaskTests(BookmarksTestsBase):
     """
     Test the XBlockCache model.
     """
-    shard = 9
 
     def setUp(self):
         super(XBlockCacheTaskTests, self).setUp()
