@@ -19990,7 +19990,7 @@ msgid ""
 " reports that you save outside of this page or that you send or receive in "
 "email expire after five minutes."
 msgstr ""
-"{strong_start}Note<strong_endb>: Afin de protéger les données des "
+"{strong_start}Note{strong_end}: Afin de protéger les données des "
 "apprenants, les liens pour les rapports que vous sauvegarder à l'extérieur "
 "de cette page ou que vous envoyez or que vous recevez dans un courriel "
 "expirent après cinq minutes."
@@ -26472,7 +26472,7 @@ msgstr ""
 
 #: cms/templates/registration/activation_invalid.html
 msgid "Return to the {link_start}home page{link_end}."
-msgstr "Retour à la {link_start}page d'accueil{link_start}."
+msgstr "Retour à la {link_start}page d'accueil{link_end}."
 
 #: cms/templates/registration/reg_complete.html
 msgid ""

@@ -4488,7 +4488,7 @@ msgstr ""
 msgid ""
 "Delete student '<%- student_id %>'s state on problem '<%- problem_id %>'?"
 msgstr ""
-"Supprimer l'état de l'étudiant '<%= student_id %>' pour le problème '<%= "
+"Supprimer l'état de l'étudiant '<%- student_id %>' pour le problème '<%- "
 "problem_id %>'?"
 
 #: lms/static/js/instructor_dashboard/student_admin.js
@@ -4497,8 +4497,8 @@ msgid ""
 " %>'. Make sure that the problem and student identifiers are complete and "
 "correct."
 msgstr ""
-"Erreur lors de la suppression de l'état de l'étudiant '<%= student_id %>' "
-"pour le problème '<%= problem_id %>'. Vérifiez qu'il n'y ait pas d'erreur "
+"Erreur lors de la suppression de l'état de l'étudiant '<%- student_id %>' "
+"pour le problème '<%- problem_id %>'. Vérifiez qu'il n'y ait pas d'erreur "
 "dans les identifiants du problème et de l'étudiant."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
@@ -4511,8 +4511,8 @@ msgid ""
 "student_id %>'. Make sure that the problem and student identifiers are "
 "complete and correct."
 msgstr ""
-"Erreur dans la récupération de l'historique du problème '<%= problem_id %>' "
-"pour l'étudiant '<%= student_id %>'. Vérifiez qu'il n'y ait pas d'erreur "
+"Erreur dans la récupération de l'historique du problème '<%- problem_id %>' "
+"pour l'étudiant '<%- student_id %>'. Vérifiez qu'il n'y ait pas d'erreur "
 "dans les identifiants du problème et de l'étudiant."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
@@ -4581,7 +4581,7 @@ msgid ""
 " Click the 'Show Task Status' button to see the status of the task."
 msgstr ""
 "Démarrage de la tâche consistant à réinitialiser les tentatives pour le "
-"problème '<%= problem_id %>' effectué avec succès. Cliquez sur le bouton "
+"problème '<%- problem_id %>' effectué avec succès. Cliquez sur le bouton "
 "'Montrer l'état de la tâche' pour voir l'état de la tâche."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
@@ -4591,7 +4591,7 @@ msgid ""
 "correct."
 msgstr ""
 "Erreur dans la réinitialisation des essais de tous les étudiants pour le "
-"problème '<%= problem_id %>'. Vérifiez que l'identifiant du problème est "
+"problème '<%- problem_id %>'. Vérifiez que l'identifiant du problème est "
 "complet et correct."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
@@ -4606,7 +4606,7 @@ msgid ""
 "'<%- student_id %>'. Click the 'Show Task Status' button to see the status "
 "of the task."
 msgstr ""
-"Le recalcul du score du problème '<%= problem_id %>' de l'étudiant '<%= "
+"Le recalcul du score du problème '<%- problem_id %>' de l'étudiant '<%= "
 "student_id %>' a commencé. Cliquez sur le bouton 'Montrer l'état de la "
 "tâche' pour voir l'état de la tâche."
 
@@ -4666,7 +4666,7 @@ msgstr ""
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Rescore problem '<%- problem_id %>' for all students?"
 msgstr ""
-"Recalculer le score du problème '<%= problem_id %>' pour tous les étudiants?"
+"Recalculer le score du problème '<%- problem_id %>' pour tous les étudiants?"
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -5010,7 +5010,7 @@ msgstr ""
 "{strongStart}Avertissement : la suppression du compte est permanente. "
 "{strongEnd} Veuillez lire attentivement les informations ci-dessus avant de "
 "poursuivre. Ceci est une action irréversible et {strongStart}vous ne pourrez"
-" plus utiliser la même adresse courriel sur EDUlib.{StrongEnd}"
+" plus utiliser la même adresse courriel sur EDUlib.{strongEnd}"
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid "We’re sorry to see you go!"
@@ -11324,7 +11324,7 @@ msgstr "Compte"
 msgid ""
 "This action updates the {provider} information for your entire organization."
 msgstr ""
-"Cette action met à jour les informations de {fournisseur} pour l'ensemble de"
+"Cette action met à jour les informations de {provider} pour l'ensemble de"
 " votre organisation."
 
 #: cms/templates/js/transcript-organization-credentials.underscore

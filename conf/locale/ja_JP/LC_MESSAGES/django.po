@@ -16785,7 +16785,7 @@ msgid ""
 "{allowed_attempts} attempts to verify your identity."
 msgstr ""
 "{course_name}講座の{assessment}評価用の本人確認ができませんでした。全{allowed_attempts}回のうち "
-"{course_name}回、本人認証を試しました。"
+"{used_attempts}回、本人認証を試しました。"
 
 #: lms/templates/emails/reverification_processed.txt
 msgid ""
@@ -16804,7 +16804,7 @@ msgid ""
 "longer possible."
 msgstr ""
 "{course_name}講座の{assessment}評価用の本人認証ができませんでした。本人認証の全{allowed_attempts}回のうち "
-"{course_name}回試行したため、これ以上認証できません。"
+"{used_attempts}回試行したため、これ以上認証できません。"
 
 #: lms/templates/emails/reverification_processed.txt
 msgid "To go to the courseware, select the following link:"
@@ -20692,7 +20692,7 @@ msgid ""
 "the {link_start}Advanced Settings page{link_end}, locate the \"Advanced "
 "Module List\" setting, and then delete the following modules from the list."
 msgstr ""
-"エラーを避けるために、 {platform_names} "
+"エラーを避けるために、 {platform_name} "
 "はサポート対象外の機能を講座の詳細設定から削除することを強くおすすめします。これを実行するには、{link_start}詳細設定{link_end} "
 "を開き、\"詳細モジュール一覧\"を表示し、その一覧から以下のモジュールを削除してください。"
 
