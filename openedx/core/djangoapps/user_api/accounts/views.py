@@ -47,6 +47,7 @@ from openedx.core.djangolib.oauth2_retirement_utils import retire_dot_oauth2_mod
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.api.parsers import MergePatchParser
 from student.models import (
+    AccountRecovery,
     CourseEnrollment,
     ManualEnrollmentAudit,
     PendingNameChange,
@@ -412,6 +413,7 @@ class DeactivateLogoutView(APIView):
                 # Delete OAuth tokens associated with the user.
                 retire_dop_oauth2_models(request.user)
                 retire_dot_oauth2_models(request.user)
+                AccountRecovery.retire_recovery_email(request.user.id)
 
                 try:
                     # Send notification email to user
