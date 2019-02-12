@@ -1,39 +1,39 @@
 # #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2018 EdX
+# Copyright (C) 2019 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 # 
 # #-#-#-#-#  django-studio.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2018 EdX
+# Copyright (C) 2019 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 # 
 # #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2018 edX
+# Copyright (C) 2019 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 # 
 # #-#-#-#-#  mako-studio.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2018 edX
+# Copyright (C) 2019 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 # 
 # #-#-#-#-#  wiki.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2018 edX
+# Copyright (C) 2019 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-09-12 18:00+0000\n"
-"PO-Revision-Date: 2018-09-12 18:00:49.656393\n"
+"POT-Creation-Date: 2019-02-12 21:34+0000\n"
+"PO-Revision-Date: 2019-02-12 21:34:19.923873\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -9068,7 +9068,7 @@ msgstr "سعزسذقهزث فخ فاث {platform_name} غخعفعزث ذاشرر
 msgid "Kosovo"
 msgstr "نخسخدخ"
 
-#: lms/templates/appsembler_api/set_password_email.html
+#: lms/templates/appsembler/emails/set_password_email.html
 #, python-format
 msgid ""
 "You're receiving this e-mail because an account has been created for you on "
@@ -9077,7 +9077,7 @@ msgstr ""
 "غخع'قث قثذثهدهرل فاهس ث-وشهم زثذشعسث شر شذذخعرف اشس زثثر ذقثشفثي بخق غخع خر "
 "%(site_name)s."
 
-#: lms/templates/appsembler_api/set_password_email.html
+#: lms/templates/appsembler/emails/set_password_email.html
 msgid ""
 "Please click on the following link to choose a new password and activate "
 "your account:"
@@ -9085,18 +9085,18 @@ msgstr ""
 "حمثشسث ذمهذن خر فاث بخممخصهرل مهرن فخ ذاخخسث ش رثص حشسسصخقي شري شذفهدشفث "
 "غخعق شذذخعرف:"
 
-#: lms/templates/appsembler_api/set_password_email.html
+#: lms/templates/appsembler/emails/set_password_email.html
 #: lms/templates/registration/password_reset_email.html
 msgid "Thanks for using our site!"
 msgstr "فاشرنس بخق عسهرل خعق سهفث!"
 
-#: lms/templates/appsembler_api/set_password_email.html
+#: lms/templates/appsembler/emails/set_password_email.html
 #: lms/templates/registration/password_reset_email.html
 #, python-format
 msgid "The %(platform_name)s Team"
 msgstr "فاث %(platform_name)s فثشو"
 
-#: lms/templates/appsembler_api/set_password_subject.txt
+#: lms/templates/appsembler/emails/set_password_subject.txt
 msgid "Activate Your Account"
 msgstr "شذفهدشفث غخعق شذذخعرف"
 
@@ -9701,6 +9701,18 @@ msgid ""
 msgstr ""
 "ه, شري وغ ذخوحشرغ, شذذثحف فاث {link_start}{platform_name} شحه فثقوس خب "
 "سثقدهذث{link_end}."
+
+#: openedx/core/djangoapps/appsembler/msft_lp/mixins.py
+msgid "Is a Microsoft Course"
+msgstr "هس ش وهذقخسخبف ذخعقسث"
+
+#: openedx/core/djangoapps/appsembler/msft_lp/mixins.py
+msgid ""
+"Set to true if is a microsoft course, so the learners can get access to MSFT"
+" certification"
+msgstr ""
+"سثف فخ فقعث هب هس ش وهذقخسخبف ذخعقسث, سخ فاث مثشقرثقس ذشر لثف شذذثسس فخ وسبف"
+" ذثقفهبهذشفهخر"
 
 #: openedx/core/djangoapps/bookmarks/views.py
 msgid "An error has occurred. Please try again."

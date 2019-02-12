@@ -1,39 +1,39 @@
 # #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2018 EdX
+# Copyright (C) 2019 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 # 
 # #-#-#-#-#  django-studio.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2018 EdX
+# Copyright (C) 2019 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 # 
 # #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2018 edX
+# Copyright (C) 2019 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 # 
 # #-#-#-#-#  mako-studio.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2018 edX
+# Copyright (C) 2019 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 # 
 # #-#-#-#-#  wiki.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2018 edX
+# Copyright (C) 2019 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-09-12 18:00+0000\n"
-"PO-Revision-Date: 2018-09-12 18:00:49.656393\n"
+"POT-Creation-Date: 2019-02-12 21:34+0000\n"
+"PO-Revision-Date: 2019-02-12 21:34:19.923873\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -10502,7 +10502,7 @@ msgstr ""
 msgid "Kosovo"
 msgstr "Kösövö Ⱡ'σяєм ιρѕυ#"
 
-#: lms/templates/appsembler_api/set_password_email.html
+#: lms/templates/appsembler/emails/set_password_email.html
 #, python-format
 msgid ""
 "You're receiving this e-mail because an account has been created for you on "
@@ -10511,7 +10511,7 @@ msgstr ""
 "Ýöü'ré réçéïvïng thïs é-mäïl ßéçäüsé än äççöünt häs ßéén çréätéd för ýöü ön "
 "%(site_name)s. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
-#: lms/templates/appsembler_api/set_password_email.html
+#: lms/templates/appsembler/emails/set_password_email.html
 msgid ""
 "Please click on the following link to choose a new password and activate "
 "your account:"
@@ -10519,18 +10519,18 @@ msgstr ""
 "Pléäsé çlïçk ön thé föllöwïng lïnk tö çhöösé ä néw pässwörd änd äçtïväté "
 "ýöür äççöünt: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
-#: lms/templates/appsembler_api/set_password_email.html
+#: lms/templates/appsembler/emails/set_password_email.html
 #: lms/templates/registration/password_reset_email.html
 msgid "Thanks for using our site!"
 msgstr "Thänks för üsïng öür sïté! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
-#: lms/templates/appsembler_api/set_password_email.html
+#: lms/templates/appsembler/emails/set_password_email.html
 #: lms/templates/registration/password_reset_email.html
 #, python-format
 msgid "The %(platform_name)s Team"
 msgstr "Thé %(platform_name)s Téäm Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
-#: lms/templates/appsembler_api/set_password_subject.txt
+#: lms/templates/appsembler/emails/set_password_subject.txt
 msgid "Activate Your Account"
 msgstr "Àçtïväté Ýöür Àççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
@@ -11192,6 +11192,18 @@ msgid ""
 msgstr ""
 "Ì, änd mý çömpäný, äççépt thé {link_start}{platform_name} ÀPÌ Térms öf "
 "Sérvïçé{link_end}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: openedx/core/djangoapps/appsembler/msft_lp/mixins.py
+msgid "Is a Microsoft Course"
+msgstr "Ìs ä Mïçrösöft Çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: openedx/core/djangoapps/appsembler/msft_lp/mixins.py
+msgid ""
+"Set to true if is a microsoft course, so the learners can get access to MSFT"
+" certification"
+msgstr ""
+"Sét tö trüé ïf ïs ä mïçrösöft çöürsé, sö thé léärnérs çän gét äççéss tö MSFT"
+" çértïfïçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: openedx/core/djangoapps/bookmarks/views.py
 msgid "An error has occurred. Please try again."

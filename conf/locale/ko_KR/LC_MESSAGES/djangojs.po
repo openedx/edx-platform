@@ -1,6 +1,6 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Korean (Korea) (http://www.transifex.com/open-edx/edx-platform/language/ko_KR/).
-# Copyright (C) 2018 EdX
+# Copyright (C) 2019 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -16,7 +16,7 @@
 # kmooc <shevious@gmail.com>, 2016-2017
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2018 EdX
+# Copyright (C) 2019 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -33,7 +33,7 @@
 # kmooc <shevious@gmail.com>, 2016
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2018 edX
+# Copyright (C) 2019 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -49,7 +49,7 @@
 # kmooc <shevious@gmail.com>, 2016-2017
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2018 edX
+# Copyright (C) 2019 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -66,9 +66,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-09-09 20:42+0000\n"
-"PO-Revision-Date: 2018-09-05 04:57+0000\n"
-"Last-Translator: eddie94 <myeddie@naver.com>\n"
+"POT-Creation-Date: 2019-02-10 20:42+0000\n"
+"PO-Revision-Date: 2019-02-10 20:45+0000\n"
+"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/open-edx/edx-platform/language/ko_KR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -3866,6 +3866,16 @@ msgstr "학습자의 이메일 주소나 아이디를 입력하세요."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
+"Error getting enrollment status for '<%- student_id %>'. Make sure that the "
+"student identifier is spelled correctly."
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid "Retrieving enrollment status..."
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
 "Error getting student progress url for '<%- student_id %>'. Make sure that "
 "the student identifier is spelled correctly."
 msgstr ""
@@ -4322,6 +4332,19 @@ msgid "Before proceeding, please {htmlStart}activate your account{htmlEnd}."
 msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid ""
+"{htmlStart}Want to change your email, name, or password instead?{htmlEnd}"
+msgstr ""
+
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid ""
+"{strongStart}Warning: Account deletion is permanent.{strongEnd} Please read "
+"the above carefully before proceeding. This is an irreversible action, and "
+"{strongStart}you will no longer be able to use the same email on "
+"edX.{strongEnd}"
+msgstr ""
+
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid "We’re sorry to see you go!"
 msgstr ""
 
@@ -4436,7 +4459,7 @@ msgstr ""
 msgid ""
 "{paragraphStart}You entered {boldStart}{email}{boldEnd}. If this email "
 "address is associated with your {platform_name} account, we will send a "
-"message with password reset instructions to this email "
+"message with password recovery instructions to this email "
 "address.{paragraphEnd}{paragraphStart}If you do not receive a password reset"
 " message, verify that you entered the correct email address, or check your "
 "spam folder.{paragraphEnd}{paragraphStart}If you need further assistance, "
@@ -4492,6 +4515,16 @@ msgstr ""
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
 "You receive messages from {platform_name} and course teams at this address."
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Recovery Email Address"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid ""
+"You may access your account with this address if single-sign on or access to"
+" your primary email is not available."
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -4586,6 +4619,12 @@ msgstr "출생연도"
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Preferred Language"
 msgstr "선호하는 언어"
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid ""
+"We've sent a confirmation message to {new_secondary_email_address}. Click "
+"the link in the message to update your secondary email address."
+msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Social Media Links"
@@ -4706,6 +4745,18 @@ msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_view.js
 msgid "Order History"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_view.js
+msgid ""
+"You have set your language to {beta_language}, which is currently not fully "
+"translated. You can help us translate this language fully by joining the "
+"Transifex community and adding translations from English for learners that "
+"speak {beta_language}."
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_view.js
+msgid "Help Translate into {beta_language}"
 msgstr ""
 
 #: lms/static/js/verify_student/views/image_input_view.js
@@ -5053,10 +5104,6 @@ msgstr ""
 
 #: cms/static/js/base.js
 msgid "This link will open in a modal window"
-msgstr ""
-
-#: cms/static/js/certificates/collections/certificates.js
-msgid "Could not parse certificate JSON. %(message)s"
 msgstr ""
 
 #: cms/static/js/certificates/models/certificate.js
@@ -5814,7 +5861,11 @@ msgid "Visibility"
 msgstr ""
 
 #: cms/static/js/views/modals/edit_xblock.js
-msgid "Editing: %(title)s"
+msgid "Editing: {title}"
+msgstr ""
+
+#: cms/static/js/views/modals/edit_xblock.js
+msgid "Plugins"
 msgstr ""
 
 #: cms/static/js/views/modals/edit_xblock.js
@@ -5931,7 +5982,7 @@ msgid ""
 "If the unit was previously published and released to students, any changes "
 "you made to the unit when it was hidden will now be visible to students. Do "
 "you want to proceed?"
-msgstr "비공개 상태에서 변경된 내용이 학습자에게 보일 것입니다. 계속 하시겠습니까?"
+msgstr ""
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Making Visible to Students"
@@ -6182,7 +6233,7 @@ msgstr ""
 
 #: cms/static/js/views/video/transcripts/file_uploader.js
 msgid "Please select a file in .srt format."
-msgstr ".srt 파일을 선택해 주세요."
+msgstr ""
 
 #: cms/static/js/views/video/transcripts/file_uploader.js
 msgid "Error: Uploading failed."
@@ -6959,7 +7010,7 @@ msgid "Password Status"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/templates/manage_user.underscore
-msgid "Disable Account"
+msgid "Toggle Account Password (Usable/Unusable)"
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
@@ -7208,13 +7259,29 @@ msgid "Mark Exam As Completed"
 msgstr ""
 
 #: lms/templates/courseware/proctored-exam-status.underscore
-msgid "timed"
+msgid "a timed exam"
+msgstr ""
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "The timer on the right shows the time remaining in the exam."
 msgstr ""
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid ""
 "To receive credit for problems, you must select \"Submit\" for each problem "
 "before you select \"End My Exam\"."
+msgstr ""
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show More"
+msgstr ""
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show Less"
+msgstr ""
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Exam timer and end exam button"
 msgstr ""
 
 #: lms/templates/courseware/proctored-exam-status.underscore
@@ -7896,6 +7963,10 @@ msgid "Reset Password"
 msgstr "비밀번호 재설정"
 
 #: lms/templates/student_account/account_settings.underscore
+msgid "Switch Language Back"
+msgstr ""
+
+#: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
 msgstr "계정 설정"
 
@@ -7904,7 +7975,7 @@ msgid "An error occurred. Please reload the page."
 msgstr ""
 
 #: lms/templates/student_account/form_field.underscore
-msgid "Forgot password?"
+msgid "Need help logging in?"
 msgstr ""
 
 #: lms/templates/student_account/hinted_login.underscore
@@ -8017,13 +8088,13 @@ msgstr ""
 
 #: lms/templates/student_account/password_reset.underscore
 msgid ""
-"Please enter your email address below and we will send you instructions for "
-"setting a new password."
+"Please enter your log-in or recovery email address below and we will send "
+"you an email with instructions."
 msgstr ""
 
 #: lms/templates/student_account/password_reset.underscore
-msgid "Reset my password"
-msgstr "비밀번호 재설정"
+msgid "Recover my password"
+msgstr ""
 
 #: lms/templates/student_account/register.underscore
 msgid "Already have an {platformName} account?"
@@ -9079,6 +9150,10 @@ msgid "Ungraded"
 msgstr ""
 
 #: cms/templates/js/course-outline.underscore
+msgid "Onboarding Exam"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
 msgid "Practice proctored Exam"
 msgstr ""
 
@@ -9098,6 +9173,10 @@ msgstr ""
 
 #: cms/templates/js/course-outline.underscore
 msgid "Display Name"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
+msgid "Proctoring Settings"
 msgstr ""
 
 #: cms/templates/js/course-outline.underscore
@@ -9778,6 +9857,10 @@ msgid ""
 msgstr ""
 
 #: cms/templates/js/show-textbook.underscore
+msgid "PDF Chapters"
+msgstr ""
+
+#: cms/templates/js/show-textbook.underscore
 msgid "View Live"
 msgstr ""
 
@@ -9927,6 +10010,18 @@ msgid ""
 "Proctored exams are timed and they record video of each learner taking the "
 "exam. The videos are then reviewed to ensure that learners follow all "
 "examination rules."
+msgstr ""
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "Onboarding"
+msgstr ""
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"Use Onboarding to introduce learners to proctoring, verify their identity, "
+"and create an onboarding profile. Learners must complete the onboarding "
+"profile step prior to taking a proctored exam. Profile reviews take 2+ "
+"business days."
 msgstr ""
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
