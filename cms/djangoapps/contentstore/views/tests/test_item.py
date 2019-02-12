@@ -127,7 +127,6 @@ class ItemTest(CourseTestCase):
 @ddt.ddt
 class GetItemTest(ItemTest):
     """Tests for '/xblock' GET url."""
-    shard = 1
 
     def _get_preview(self, usage_key, data=None):
         """ Makes a request to xblock preview handler """
@@ -472,7 +471,6 @@ class GetItemTest(ItemTest):
 @ddt.ddt
 class DeleteItem(ItemTest):
     """Tests for '/xblock' DELETE url."""
-    shard = 1
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_delete_static_page(self, store):
@@ -490,7 +488,6 @@ class TestCreateItem(ItemTest):
     """
     Test the create_item handler thoroughly
     """
-    shard = 1
 
     def test_create_nicely(self):
         """
@@ -667,7 +664,6 @@ class TestDuplicateItem(ItemTest, DuplicateHelper):
     """
     Test the duplicate method.
     """
-    shard = 1
 
     def setUp(self):
         """ Creates the test course structure and a few components to 'duplicate'. """
@@ -775,7 +771,6 @@ class TestMoveItem(ItemTest):
     """
     Tests for move item.
     """
-    shard = 1
 
     def setUp(self):
         """
@@ -1328,7 +1323,6 @@ class TestDuplicateItemWithAsides(ItemTest, DuplicateHelper):
     """
     Test the duplicate method for blocks with asides.
     """
-    shard = 1
 
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
@@ -1392,7 +1386,6 @@ class TestEditItemSetup(ItemTest):
     """
     Setup for xblock update tests.
     """
-    shard = 1
 
     def setUp(self):
         """ Creates the test course structure and a couple problems to 'edit'. """
@@ -1425,7 +1418,6 @@ class TestEditItem(TestEditItemSetup):
     """
     Test xblock update.
     """
-    shard = 1
 
     def test_delete_field(self):
         """
@@ -1892,7 +1884,6 @@ class TestEditItemSplitMongo(TestEditItemSetup):
     """
     Tests for EditItem running on top of the SplitMongoModuleStore.
     """
-    shard = 1
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def test_editing_view_wrappers(self):
@@ -1914,7 +1905,6 @@ class TestEditSplitModule(ItemTest):
     """
     Tests around editing instances of the split_test module.
     """
-    shard = 1
 
     def setUp(self):
         super(TestEditSplitModule, self).setUp()
@@ -2138,7 +2128,6 @@ class TestEditSplitModule(ItemTest):
 @ddt.ddt
 class TestComponentHandler(TestCase):
     """Tests for component handler api"""
-    shard = 1
 
     def setUp(self):
         super(TestComponentHandler, self).setUp()
@@ -2238,7 +2227,6 @@ class TestComponentTemplates(CourseTestCase):
     """
     Unit tests for the generation of the component templates for a course.
     """
-    shard = 1
 
     def setUp(self):
         super(TestComponentTemplates, self).setUp()
@@ -2474,7 +2462,6 @@ class TestXBlockInfo(ItemTest):
     """
     Unit tests for XBlock's outline handling.
     """
-    shard = 1
 
     def setUp(self):
         super(TestXBlockInfo, self).setUp()
@@ -2832,7 +2819,6 @@ class TestLibraryXBlockInfo(ModuleStoreTestCase):
     """
     Unit tests for XBlock Info for XBlocks in a content library
     """
-    shard = 1
 
     def setUp(self):
         super(TestLibraryXBlockInfo, self).setUp()
@@ -2883,7 +2869,6 @@ class TestLibraryXBlockCreation(ItemTest):
     """
     Tests the adding of XBlocks to Library
     """
-    shard = 1
 
     def test_add_xblock(self):
         """
@@ -2921,7 +2906,6 @@ class TestXBlockPublishingInfo(ItemTest):
     """
     Unit tests for XBlock's outline handling.
     """
-    shard = 1
     FIRST_SUBSECTION_PATH = [0]
     FIRST_UNIT_PATH = [0, 0]
     SECOND_UNIT_PATH = [0, 1]
