@@ -1,3 +1,6 @@
+"""
+Contains configuration for schedules app
+"""
 from openedx.core.djangoapps.waffle_utils import WaffleFlagNamespace, CourseWaffleFlag, WaffleFlag
 
 
