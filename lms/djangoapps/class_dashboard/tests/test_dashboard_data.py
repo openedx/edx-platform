@@ -35,7 +35,6 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
     """
     Tests related to class_dashboard/dashboard_data.py
     """
-    shard = 6
 
     @classmethod
     def setUpClass(cls):

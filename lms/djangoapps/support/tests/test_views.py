@@ -93,7 +93,6 @@ class SupportViewAccessTests(SupportViewTestCase):
     """
     Tests for access control of support views.
     """
-    shard = 3
 
     @ddt.data(*(
         (url_name, role, has_access)

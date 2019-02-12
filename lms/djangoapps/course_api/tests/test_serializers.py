@@ -29,7 +29,6 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
     expected_mongo_calls = 0
     maxDiff = 5000  # long enough to show mismatched dicts, in case of error
     serializer_class = CourseSerializer
-    shard = 3
 
     ENABLED_SIGNALS = ['course_published']
 

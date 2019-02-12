@@ -31,7 +31,6 @@ class ReportTypeTests(ModuleStoreTestCase):
     """
     Tests for the models used to generate certificate status reports
     """
-    shard = 4
     FIVE_MINS = datetime.timedelta(minutes=5)
 
     @patch('student.models.CourseEnrollment.refund_cutoff_date')
@@ -165,7 +164,6 @@ class ItemizedPurchaseReportTest(ModuleStoreTestCase):
     """
     Tests for the models used to generate itemized purchase reports
     """
-    shard = 4
     FIVE_MINS = datetime.timedelta(minutes=5)
     TEST_ANNOTATION = u'Ba\xfc\u5305'
 

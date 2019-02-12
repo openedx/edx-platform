@@ -34,7 +34,6 @@ class GradesServiceTests(ModuleStoreTestCase):
     """
     Tests for the Grades service
     """
-    shard = 4
 
     def setUp(self):
         super(GradesServiceTests, self).setUp()

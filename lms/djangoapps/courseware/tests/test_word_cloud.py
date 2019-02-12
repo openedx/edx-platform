@@ -12,7 +12,6 @@ from .helpers import BaseTestXmodule
 class TestWordCloud(BaseTestXmodule):
     """Integration test for word cloud xmodule."""
     CATEGORY = "word_cloud"
-    shard = 1
 
     def _get_resource_url(self, item):
         """

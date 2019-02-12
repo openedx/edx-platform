@@ -76,7 +76,6 @@ def my_update_subtask_status(entry_id, current_task_id, new_subtask_status):
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
     """Tests instructor task that send bulk email."""
-    shard = 5
 
     def setUp(self):
         super(TestBulkEmailInstructorTask, self).setUp()

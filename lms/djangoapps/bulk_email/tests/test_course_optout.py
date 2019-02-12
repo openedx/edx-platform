@@ -27,7 +27,6 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
     """
     Test that optouts are referenced in sending course email.
     """
-    shard = 1
 
     def setUp(self):
         super(TestOptoutCourseEmails, self).setUp()
@@ -122,7 +121,6 @@ class TestACEOptoutCourseEmails(ModuleStoreTestCase):
     """
     Test that optouts are referenced in sending course email.
     """
-    shard = 1
 
     def setUp(self):
         super(TestACEOptoutCourseEmails, self).setUp()

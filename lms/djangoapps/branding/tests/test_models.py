@@ -11,7 +11,6 @@ class BrandingInfoConfigTest(TestCase):
     """
     Test the BrandingInfoConfig model.
     """
-    shard = 1
 
     def setUp(self):
         super(BrandingInfoConfigTest, self).setUp()

@@ -14,7 +14,6 @@ class TestBlockCountsTransformer(ModuleStoreTestCase):
     """
     Test behavior of BlockCountsTransformer
     """
-    shard = 4
 
     def setUp(self):
         super(TestBlockCountsTransformer, self).setUp()

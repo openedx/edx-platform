@@ -36,14 +36,12 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
-from openedx.core.lib.tests import attr
 from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, UPGRADE_DEADLINE_MESSAGE, CourseHomeMessages
 from student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=1)
 @ddt.ddt
 class CourseDateSummaryTest(SharedModuleStoreTestCase):
     """Tests for course date summary blocks."""
@@ -450,7 +448,6 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             self.assertEqual(block.relative_datestring, expected_date_string)
 
 
-@attr(shard=1)
 @ddt.ddt
 class TestDateAlerts(SharedModuleStoreTestCase):
     """
@@ -567,7 +564,6 @@ class TestDateAlerts(SharedModuleStoreTestCase):
 
 
 @ddt.ddt
-@attr(shard=1)
 class TestScheduleOverrides(SharedModuleStoreTestCase):
 
     def setUp(self):

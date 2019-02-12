@@ -51,7 +51,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 class TestAnalyticsBasic(ModuleStoreTestCase):
     """ Test basic analytics functions. """
-    shard = 3
 
     def setUp(self):
         super(TestAnalyticsBasic, self).setUp()

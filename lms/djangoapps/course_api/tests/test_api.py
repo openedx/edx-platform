@@ -22,7 +22,6 @@ class CourseApiTestMixin(CourseApiFactoryMixin):
     """
     Establish basic functionality for Course API tests
     """
-    shard = 4
 
     @classmethod
     def setUpClass(cls):
@@ -58,7 +57,6 @@ class TestGetCourseDetail(CourseDetailTestMixin, SharedModuleStoreTestCase):
     """
     Test course_detail api function
     """
-    shard = 4
 
     @classmethod
     def setUpClass(cls):
@@ -94,7 +92,6 @@ class CourseListTestMixin(CourseApiTestMixin):
     """
     Common behavior for list_courses tests
     """
-    shard = 4
 
     def _make_api_call(self, requesting_user, specified_user, org=None, filter_=None):
         """
@@ -118,7 +115,6 @@ class TestGetCourseList(CourseListTestMixin, SharedModuleStoreTestCase):
     """
     Test the behavior of the `list_courses` api function.
     """
-    shard = 4
     ENABLED_SIGNALS = ['course_published']
 
     @classmethod
@@ -161,7 +157,6 @@ class TestGetCourseListMultipleCourses(CourseListTestMixin, ModuleStoreTestCase)
     Test the behavior of the `list_courses` api function (with tests that
     modify the courseware).
     """
-    shard = 4
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
@@ -220,7 +215,6 @@ class TestGetCourseListExtras(CourseListTestMixin, ModuleStoreTestCase):
     Tests of course_list api function that require alternative configurations
     of created courses.
     """
-    shard = 4
     ENABLED_SIGNALS = ['course_published']
 
     @classmethod

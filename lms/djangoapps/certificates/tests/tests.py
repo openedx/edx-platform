@@ -28,7 +28,6 @@ class CertificatesModelTest(ModuleStoreTestCase, MilestonesTestCaseMixin):
     """
     Tests for the GeneratedCertificate model
     """
-    shard = 1
 
     def setUp(self):
         super(CertificatesModelTest, self).setUp()

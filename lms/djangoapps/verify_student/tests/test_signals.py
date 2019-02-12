@@ -19,7 +19,6 @@ class VerificationDeadlineSignalTest(ModuleStoreTestCase):
     """
     Tests for the VerificationDeadline signal
     """
-    shard = 4
 
     def setUp(self):
         super(VerificationDeadlineSignalTest, self).setUp()
@@ -57,7 +56,6 @@ class RetirementSignalTest(ModuleStoreTestCase):
     """
     Tests for the VerificationDeadline signal
     """
-    shard = 4
 
     def _create_entry(self):
         """

@@ -14,7 +14,6 @@ class RoleClassTestCase(ModuleStoreTestCase):
     Tests for roles of the comment client service integration
     """
     MODULESTORE = TEST_DATA_MIXED_MODULESTORE
-    shard = 1
 
     def setUp(self):
         super(RoleClassTestCase, self).setUp()
@@ -55,7 +54,6 @@ class PermissionClassTestCase(TestCase):
     """
     Tests for permissions of the comment client service integration
     """
-    shard = 1
 
     def setUp(self):
         super(PermissionClassTestCase, self).setUp()

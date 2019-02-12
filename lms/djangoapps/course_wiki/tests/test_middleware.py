@@ -13,7 +13,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 class TestWikiAccessMiddleware(ModuleStoreTestCase):
     """Tests for WikiAccessMiddleware."""
-    shard = 1
 
     def setUp(self):
         """Test setup."""

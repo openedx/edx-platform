@@ -186,7 +186,6 @@ class LtiLaunchTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCa
     the tests defined in RenderXBlockTestMixin.
     """
     SUCCESS_ENROLLED_STAFF_MONGO_COUNT = 9
-    shard = 3
 
     def get_response(self, usage_key, url_encoded_params=None):
         """

@@ -31,7 +31,6 @@ class TestDiscussionXBlock(XModuleRenderingTestBase):
     Base class for tests
     """
 
-    shard = 4
     PATCH_DJANGO_USER = True
 
     def setUp(self):
@@ -85,7 +84,6 @@ class TestGetDjangoUser(TestDiscussionXBlock):
     Tests for the django_user property.
     """
 
-    shard = 4
     PATCH_DJANGO_USER = False
 
     def setUp(self):
@@ -123,7 +121,6 @@ class TestViews(TestDiscussionXBlock):
     """
     Tests for student_view and author_view.
     """
-    shard = 4
 
     def setUp(self):
         """
@@ -210,7 +207,6 @@ class TestTemplates(TestDiscussionXBlock):
     """
     Tests rendering of templates.
     """
-    shard = 4
 
     def test_has_permission(self):
         """
@@ -256,7 +252,6 @@ class TestXBlockInCourse(SharedModuleStoreTestCase):
     """
     Test the discussion xblock as rendered in the course and course API.
     """
-    shard = 4
 
     @classmethod
     def setUpClass(cls):
@@ -380,7 +375,6 @@ class TestXBlockQueryLoad(SharedModuleStoreTestCase):
     """
     Test the number of queries executed when rendering the XBlock.
     """
-    shard = 4
 
     def test_permissions_query_load(self):
         """

@@ -123,7 +123,6 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
     """
     Ensures that the recalculate subsection grade task functions as expected when run.
     """
-    shard = 4
     ENABLED_SIGNALS = ['course_published', 'pre_publish']
 
     def setUp(self):
@@ -420,7 +419,6 @@ class ComputeGradesForCourseTest(HasCourseWithProblemsMixin, ModuleStoreTestCase
     """
     Test compute_grades_for_course_v2 task.
     """
-    shard = 4
 
     ENABLED_SIGNALS = ['course_published', 'pre_publish']
 

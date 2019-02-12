@@ -34,7 +34,6 @@ COURSE_KEY2 = CourseKey.from_string('edx/history/2')
 @ddt.ddt
 class TeamMembershipTest(SharedModuleStoreTestCase):
     """Tests for the TeamMembership model."""
-    shard = 4
 
     def setUp(self):
         """
@@ -117,7 +116,6 @@ class TeamMembershipTest(SharedModuleStoreTestCase):
 @ddt.ddt
 class TeamSignalsTest(EventTestMixin, SharedModuleStoreTestCase):
     """Tests for handling of team-related signals."""
-    shard = 4
 
     SIGNALS = {
         'thread_created': thread_created,

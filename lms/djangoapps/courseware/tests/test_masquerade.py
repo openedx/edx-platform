@@ -22,7 +22,6 @@ from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference, set_user_preference
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
-from openedx.core.lib.tests import attr
 from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
@@ -166,7 +165,6 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(200, masquerade_as_group_member(self.test_user, self.course, partition_id, group_id))
 
 
-@attr(shard=1)
 class NormalStudentVisibilityTest(MasqueradeTestCase):
     """
     Verify the course displays as expected for a "normal" student (to ensure test setup is correct).
@@ -221,7 +219,6 @@ class StaffMasqueradeTestCase(MasqueradeTestCase):
         return response
 
 
-@attr(shard=1)
 class TestStaffMasqueradeAsStudent(StaffMasqueradeTestCase):
     """
     Check for staff being able to masquerade as student.
@@ -260,7 +257,6 @@ class TestStaffMasqueradeAsStudent(StaffMasqueradeTestCase):
 
 
 @ddt.ddt
-@attr(shard=1)
 class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmissionTestMixin):
     """
     Check for staff being able to masquerade as a specific student.
@@ -455,7 +451,6 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         self.assertIn("2 of 2 possible points", masquerade_progress)
 
 
-@attr(shard=1)
 class TestGetMasqueradingGroupId(StaffMasqueradeTestCase):
     """
     Check for staff being able to masquerade as belonging to a group.

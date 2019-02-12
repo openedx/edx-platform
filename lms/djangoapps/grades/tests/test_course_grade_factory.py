@@ -247,7 +247,6 @@ class TestGradeIteration(SharedModuleStoreTestCase):
     """
     COURSE_NUM = "1000"
     COURSE_NAME = "grading_test_course"
-    shard = 1
 
     @classmethod
     def setUpClass(cls):

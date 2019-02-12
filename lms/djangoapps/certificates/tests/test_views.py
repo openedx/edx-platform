@@ -39,7 +39,6 @@ FEATURES_WITH_CUSTOM_CERTS_ENABLED.update(FEATURES_WITH_CERTS_ENABLED)
 @ddt.ddt
 class UpdateExampleCertificateViewTest(CacheIsolationTestCase):
     """Tests for the XQueue callback that updates example certificates. """
-    shard = 1
 
     COURSE_KEY = CourseLocator(org='test', course='test', run='test')
 
@@ -184,7 +183,6 @@ class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
     """
     Tests for the microsite certificates web/html views
     """
-    shard = 1
 
     def setUp(self):
         super(MicrositeCertificatesViewsTests, self).setUp()

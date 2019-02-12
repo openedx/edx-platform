@@ -21,7 +21,6 @@ class UsernameTestMixin(object):
     """
     Tests the username Form field.
     """
-    shard = 4
 
     def test_no_user_param_anonymous_access(self):
         self.set_up_data(AnonymousUser())
@@ -39,7 +38,6 @@ class TestCourseListGetForm(FormTestMixin, UsernameTestMixin, SharedModuleStoreT
     """
     Tests for CourseListGetForm
     """
-    shard = 4
     FORM_CLASS = CourseListGetForm
 
     @classmethod
@@ -105,7 +103,6 @@ class TestCourseDetailGetForm(FormTestMixin, UsernameTestMixin, SharedModuleStor
     """
     Tests for CourseDetailGetForm
     """
-    shard = 4
     FORM_CLASS = CourseDetailGetForm
 
     @classmethod

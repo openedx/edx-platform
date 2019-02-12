@@ -52,7 +52,6 @@ class TestScoredBlockTypes(TestCase):
     """
     Tests for the possibly_scored function.
     """
-    shard = 4
     possibly_scored_block_types = {
         'course', 'chapter', 'sequential', 'vertical',
         'library_content', 'split_test', 'conditional', 'library', 'randomize',
@@ -75,7 +74,6 @@ class TestGetScore(TestCase):
     """
     Tests for get_score
     """
-    shard = 4
     display_name = 'test_name'
     location = 'test_location'
 
@@ -228,7 +226,6 @@ class TestWeightedScore(TestCase):
     """
     Tests the helper method: weighted_score
     """
-    shard = 4
 
     @ddt.data(
         (0, 0, 1),
@@ -270,7 +267,6 @@ class TestInternalGetGraded(TestCase):
     """
     Tests the internal helper method: _get_explicit_graded
     """
-    shard = 4
 
     def _create_block(self, explicit_graded_value):
         """
@@ -311,7 +307,6 @@ class TestInternalGetScoreFromBlock(TestCase):
     """
     Tests the internal helper method: _get_score_from_persisted_or_latest_block
     """
-    shard = 4
 
     def _create_block(self, raw_possible):
         """

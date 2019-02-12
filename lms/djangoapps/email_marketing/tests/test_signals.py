@@ -68,7 +68,6 @@ class EmailMarketingTests(TestCase):
     """
     Tests for the EmailMarketing signals and tasks classes.
     """
-    shard = 4
 
     def setUp(self):
         update_email_marketing_config(enabled=False)
@@ -604,7 +603,6 @@ class SailthruTests(TestCase):
     """
     Tests for the Sailthru tasks class.
     """
-    shard = 4
 
     def setUp(self):
         super(SailthruTests, self).setUp()

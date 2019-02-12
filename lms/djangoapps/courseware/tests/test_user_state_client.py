@@ -17,7 +17,6 @@ class TestDjangoUserStateClient(UserStateClientTestBase, ModuleStoreTestCase):
     Tests of the DjangoUserStateClient backend.
     It reuses all tests from :class:`~UserStateClientTestBase`.
     """
-    shard = 4
     __test__ = True
     # Tell Django to clean out all databases, not just default
     multi_db = True

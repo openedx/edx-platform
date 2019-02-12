@@ -14,7 +14,6 @@ from django.utils import translation
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from openedx.core.lib.tests import attr
 from student.tests.factories import UserFactory
 
 
@@ -70,7 +69,6 @@ class BaseI18nTestCase(CacheIsolationTestCase):
         self.client.login(username=self.user.username, password=self.pwd)
 
 
-@attr(shard=1)
 class I18nTestCase(BaseI18nTestCase):
     """
     Tests for i18n
@@ -104,7 +102,6 @@ class I18nTestCase(BaseI18nTestCase):
         self.assert_tag_has_attr(response.content, "body", "class", "rtl")
 
 
-@attr(shard=1)
 class I18nRegressionTests(BaseI18nTestCase):
     """
     Tests for i18n
@@ -159,7 +156,6 @@ class I18nRegressionTests(BaseI18nTestCase):
         self.assert_tag_has_attr(response.content, "html", "lang", site_lang)
 
 
-@attr(shard=1)
 class I18nLangPrefTests(BaseI18nTestCase):
     """
     Regression tests of language presented to the user, when they

@@ -48,7 +48,6 @@ def load_serialized_data(response, key):
 @mock.patch(PROGRAMS_UTILS_MODULE + '.get_programs')
 class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
     """Unit tests for the program listing page."""
-    shard = 4
     maxDiff = None
     password = 'test'
     url = reverse_lazy('program_listing_view')
@@ -185,7 +184,6 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
 @mock.patch(PROGRAMS_UTILS_MODULE + '.get_programs')
 class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, SharedModuleStoreTestCase):
     """Unit tests for the program details page."""
-    shard = 4
     program_uuid = str(uuid4())
     password = 'test'
     url = reverse_lazy('program_details_view', kwargs={'program_uuid': program_uuid})

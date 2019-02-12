@@ -75,7 +75,6 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
     """
     Test shopping cart view under various states
     """
-    shard = 3
 
     @classmethod
     def setUpClass(cls):

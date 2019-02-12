@@ -52,7 +52,6 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
     """
     Tests for the instructor dashboard (not legacy).
     """
-    shard = 3
 
     def setUp(self):
         """

@@ -23,7 +23,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class VerifiedUpgradeToolTest(SharedModuleStoreTestCase):
-    shard = 3
 
     @classmethod
     def setUpClass(cls):

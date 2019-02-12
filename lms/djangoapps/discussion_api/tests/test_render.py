@@ -16,7 +16,6 @@ def _add_p_tags(raw_body):
 @ddt.ddt
 class RenderBodyTest(TestCase):
     """Tests for render_body"""
-    shard = 8
 
     def test_empty(self):
         self.assertEqual(render_body(""), "")

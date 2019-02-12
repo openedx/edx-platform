@@ -16,7 +16,6 @@ class PaymentFakeViewTest(TestCase):
     Test that the fake payment view interacts
     correctly with the shopping cart.
     """
-    shard = 4
 
     def setUp(self):
         super(PaymentFakeViewTest, self).setUp()

@@ -31,7 +31,6 @@ class TestCourseRegistrationCodeStatus(SharedModuleStoreTestCase):
     """
     Test registration code status.
     """
-    shard = 1
 
     @classmethod
     def setUpClass(cls):

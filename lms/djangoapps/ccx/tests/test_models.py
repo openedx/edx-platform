@@ -22,7 +22,6 @@ class TestCCX(ModuleStoreTestCase):
     """
 
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
-    shard = 7
 
     def setUp(self):
         """common setup for all tests"""

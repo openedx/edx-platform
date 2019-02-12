@@ -10,7 +10,6 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 class SendMessageHandlerTestCase(TestCase):
-    shard = 4
 
     def setUp(self):
         self.sender = mock.Mock()

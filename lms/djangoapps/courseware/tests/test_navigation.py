@@ -23,7 +23,6 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Check that navigation state is saved properly.
     """
-    shard = 1
     STUDENT_INFO = [('view@test.com', 'foo'), ('view2@test.com', 'foo')]
 
     @classmethod

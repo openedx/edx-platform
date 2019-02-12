@@ -61,7 +61,6 @@ from openedx.core.djangoapps.credit.api import set_credit_requirement_status, se
 from openedx.core.djangoapps.credit.models import CreditCourse
 from openedx.core.lib.courses import course_image_url
 from openedx.core.lib.gating import api as gating_api
-from openedx.core.lib.tests import attr
 from openedx.core.lib.url_utils import quote_slashes
 from student.models import anonymous_id_for_user
 from verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
@@ -170,7 +169,6 @@ class XBlockWithoutCompletionAPI(XBlock):
         return self.runtime.publish(self, 'progress', {})
 
 
-@attr(shard=1)
 @ddt.ddt
 class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -505,7 +503,6 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(hash_resource(resources), 'a76e27c8e80ca3efd7ce743093aa59e0')
 
 
-@attr(shard=1)
 @ddt.ddt
 class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -905,7 +902,6 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
             BlockCompletion.objects.get(block_key=block.scope_ids.usage_id)
 
 
-@attr(shard=1)
 @ddt.ddt
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_XBLOCK_VIEW_ENDPOINT': True})
 class TestXBlockView(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
@@ -964,7 +960,6 @@ class TestXBlockView(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEquals(401, response.status_code)
 
 
-@attr(shard=1)
 @ddt.ddt
 class TestTOC(ModuleStoreTestCase):
     """Check the Table of Contents for a course"""
@@ -1070,7 +1065,6 @@ class TestTOC(ModuleStoreTestCase):
             self.assertEquals(actual['next_of_active_section']['url_name'], 'video_123456789012')
 
 
-@attr(shard=1)
 @ddt.ddt
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
 class TestProctoringRendering(SharedModuleStoreTestCase):
@@ -1408,7 +1402,6 @@ class TestProctoringRendering(SharedModuleStoreTestCase):
         return None
 
 
-@attr(shard=1)
 class TestGatedSubsectionRendering(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
     @classmethod
     def setUpClass(cls):
@@ -1491,7 +1484,6 @@ class TestGatedSubsectionRendering(SharedModuleStoreTestCase, MilestonesTestCase
         self.assertIsNone(actual['next_of_active_section'])
 
 
-@attr(shard=1)
 @ddt.ddt
 class TestHtmlModifiers(ModuleStoreTestCase):
     """
@@ -1655,7 +1647,6 @@ class XBlockWithJsonInitData(XBlock):
         return frag
 
 
-@attr(shard=1)
 @ddt.ddt
 class JsonInitDataTest(ModuleStoreTestCase):
     """Tests for JSON data injected into the JS init function."""
@@ -1740,7 +1731,6 @@ class ViewInStudioTest(ModuleStoreTestCase):
         self.child_module = self._get_module(course.id, child_descriptor, child_descriptor.location)
 
 
-@attr(shard=1)
 class MongoViewInStudioTest(ViewInStudioTest):
     """Test the 'View in Studio' link visibility in a mongo backed course."""
 
@@ -1769,7 +1759,6 @@ class MongoViewInStudioTest(ViewInStudioTest):
         self.assertNotIn('View Unit in Studio', result_fragment.content)
 
 
-@attr(shard=1)
 class MixedViewInStudioTest(ViewInStudioTest):
     """Test the 'View in Studio' link visibility in a mixed mongo backed course."""
 
@@ -1801,7 +1790,6 @@ class DetachedXBlock(XBlock):
         return frag
 
 
-@attr(shard=1)
 @patch.dict('django.conf.settings.FEATURES', {'DISPLAY_DEBUG_INFO_TO_STAFF': True, 'DISPLAY_HISTOGRAMS_TO_STAFF': True})
 @patch('courseware.module_render.has_access', Mock(return_value=True, autospec=True))
 class TestStaffDebugInfo(SharedModuleStoreTestCase):
@@ -1948,7 +1936,6 @@ PER_STUDENT_ANONYMIZED_DESCRIPTORS = sorted(set(
 ), key=str)
 
 
-@attr(shard=1)
 @ddt.ddt
 class TestAnonymousStudentId(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -2031,7 +2018,6 @@ class TestAnonymousStudentId(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
         )
 
 
-@attr(shard=1)
 @patch('track.views.tracker', autospec=True)
 class TestModuleTrackingContext(SharedModuleStoreTestCase):
     """
@@ -2150,7 +2136,6 @@ class TestModuleTrackingContext(SharedModuleStoreTestCase):
             self.assertEqual(module_info['original_usage_version'], unicode(original_usage_version))
 
 
-@attr(shard=1)
 class TestXmoduleRuntimeEvent(TestSubmittingProblems):
     """
     Inherit from TestSubmittingProblems to get functionality that set up a course and problems structure
@@ -2220,7 +2205,6 @@ class TestXmoduleRuntimeEvent(TestSubmittingProblems):
             send_mock.assert_called_with(**expected_signal_kwargs)
 
 
-@attr(shard=1)
 class TestRebindModule(TestSubmittingProblems):
     """
     Tests to verify the functionality of rebinding a module.
@@ -2297,7 +2281,6 @@ class TestRebindModule(TestSubmittingProblems):
         self.assertEqual(module.descriptor.scope_ids.user_id, user2.id)
 
 
-@attr(shard=1)
 @ddt.ddt
 class TestEventPublishing(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -2336,7 +2319,6 @@ class TestEventPublishing(ModuleStoreTestCase, LoginEnrollmentTestCase):
         mock_track_function.return_value.assert_called_once_with(event_type, event)
 
 
-@attr(shard=1)
 @ddt.ddt
 class LMSXBlockServiceBindingTest(SharedModuleStoreTestCase):
     """
@@ -2427,7 +2409,6 @@ BLOCK_TYPES = ['xblock', 'xmodule']
 USER_NUMBERS = range(2)
 
 
-@attr(shard=1)
 @ddt.ddt
 class TestFilteredChildren(SharedModuleStoreTestCase):
     """
@@ -2582,7 +2563,6 @@ class TestFilteredChildren(SharedModuleStoreTestCase):
         self.assertEquals(set(child_usage_ids), set(child.scope_ids.usage_id for child in block.get_children()))
 
 
-@attr(shard=1)
 @ddt.ddt
 class TestDisabledXBlockTypes(ModuleStoreTestCase):
     """

@@ -19,7 +19,6 @@ class SurveyModelsTests(TestCase):
     """
     All tests for the Survey models.py file
     """
-    shard = 4
 
     def setUp(self):
         """

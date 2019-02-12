@@ -53,7 +53,6 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
     __test__ = False
     # Tell Django to clean out all databases, not just default
     multi_db = True
-    shard = 7
 
     # TEST_DATA must be overridden by subclasses
     TEST_DATA = None

@@ -21,7 +21,6 @@ class TestOptoutCourseEmailsBySignal(ModuleStoreTestCase):
     """
     Tests that the force_optout_all signal receiver opts the user out of course emails
     """
-    shard = 1
 
     def setUp(self):
         super(TestOptoutCourseEmailsBySignal, self).setUp()

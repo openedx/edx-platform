@@ -34,7 +34,6 @@ class CyberSource2Test(TestCase):
     to be configured a certain way.
 
     """
-    shard = 4
 
     COST = "10.00"
     CALLBACK_URL = "/test_callback_url"

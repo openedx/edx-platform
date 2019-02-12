@@ -25,7 +25,6 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
     """
     Check for Proctoring view on the new instructor dashboard
     """
-    shard = 1
 
     @classmethod
     def setUpClass(cls):

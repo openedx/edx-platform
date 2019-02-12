@@ -25,7 +25,6 @@ class TestGatedContent(MilestonesTestCaseMixin, SharedModuleStoreTestCase):
     Base TestCase class for setting up a basic course structure
     and testing the gating feature
     """
-    shard = 3
 
     @classmethod
     def setUpClass(cls):

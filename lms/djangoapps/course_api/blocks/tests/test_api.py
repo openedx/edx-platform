@@ -27,7 +27,6 @@ class TestGetBlocks(SharedModuleStoreTestCase):
     """
     Tests for the get_blocks function
     """
-    shard = 4
 
     @classmethod
     def setUpClass(cls):
@@ -117,7 +116,6 @@ class TestGetBlocksMobileHack(SharedModuleStoreTestCase):
     """
     Tests that requests from the mobile app don't receive empty containers.
     """
-    shard = 4
 
     @classmethod
     def setUpClass(cls):
@@ -165,7 +163,6 @@ class TestGetBlocksQueryCountsBase(SharedModuleStoreTestCase):
     """
     Base for the get_blocks tests.
     """
-    shard = 4
 
     ENABLED_SIGNALS = ['course_published']
 
@@ -198,7 +195,6 @@ class TestGetBlocksQueryCounts(TestGetBlocksQueryCountsBase):
     """
     Tests query counts for the get_blocks function.
     """
-    shard = 4
 
     @ddt.data(
         *product(
@@ -247,7 +243,6 @@ class TestQueryCountsWithIndividualOverrideProvider(TestGetBlocksQueryCountsBase
     """
     Tests query counts for the get_blocks function when IndividualStudentOverrideProvider is set.
     """
-    shard = 4
 
     @ddt.data(
         *product(

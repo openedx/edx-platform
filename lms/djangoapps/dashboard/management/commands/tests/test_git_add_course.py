@@ -51,7 +51,6 @@ class TestGitAddCourse(SharedModuleStoreTestCase):
     """
     Tests the git_add_course management command for proper functions.
     """
-    shard = 3
     TEST_REPO = 'https://github.com/mitocw/edx4edx_lite.git'
     TEST_COURSE = 'MITx/edx4edx/edx4edx'
     TEST_BRANCH = 'testing_do_not_delete'

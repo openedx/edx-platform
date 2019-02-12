@@ -34,7 +34,6 @@ class BlockRecordListTestCase(TestCase):
     """
     Verify the behavior of BlockRecordList, particularly around edge cases
     """
-    shard = 4
 
     def setUp(self):
         super(BlockRecordListTestCase, self).setUp()
@@ -92,7 +91,6 @@ class BlockRecordTest(GradesModelTestCase):
     """
     Test the BlockRecord model.
     """
-    shard = 4
 
     def test_creation(self):
         """
@@ -132,7 +130,6 @@ class VisibleBlocksTest(GradesModelTestCase):
     """
     Test the VisibleBlocks model.
     """
-    shard = 4
 
     def setUp(self):
         super(VisibleBlocksTest, self).setUp()
@@ -206,7 +203,6 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
     """
     Test the PersistentSubsectionGrade model.
     """
-    shard = 4
 
     def setUp(self):
         super(PersistentSubsectionGradeTest, self).setUp()
@@ -359,7 +355,6 @@ class PersistentCourseGradesTest(GradesModelTestCase):
     """
     Tests the PersistentCourseGrade model.
     """
-    shard = 4
 
     def setUp(self):
         super(PersistentCourseGradesTest, self).setUp()

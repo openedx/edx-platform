@@ -13,7 +13,6 @@ from badges.tests.factories import BadgeAssertionFactory, CourseCompleteImageCon
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from course_modes.models import CourseMode
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
-from openedx.core.lib.tests import attr
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
@@ -60,7 +59,6 @@ class CertificateManagementTest(ModuleStoreTestCase):
         self.assertEqual(cert.status, expected_status)
 
 
-@attr(shard=1)
 @ddt.ddt
 class ResubmitErrorCertificatesTest(CertificateManagementTest):
     """Tests for the resubmit_error_certificates management command. """
@@ -149,7 +147,6 @@ class ResubmitErrorCertificatesTest(CertificateManagementTest):
 
 
 @ddt.ddt
-@attr(shard=1)
 class RegenerateCertificatesTest(CertificateManagementTest):
     """
     Tests for regenerating certificates.
@@ -219,7 +216,6 @@ class RegenerateCertificatesTest(CertificateManagementTest):
         self.assertFalse(mock_send_to_queue.called)
 
 
-@attr(shard=1)
 class UngenerateCertificatesTest(CertificateManagementTest):
     """
     Tests for generating certificates.

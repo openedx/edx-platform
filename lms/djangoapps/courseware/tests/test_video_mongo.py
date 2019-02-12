@@ -34,7 +34,6 @@ from mock import MagicMock, Mock, patch
 from path import Path as path
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from openedx.core.lib.tests import attr
 from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
 from openedx.core.djangoapps.video_pipeline.config.waffle import waffle_flags, DEPRECATE_YOUTUBE
 from waffle.testutils import override_flag
@@ -75,7 +74,6 @@ I am overwatch.
 TRANSCRIPT_FILE_SJSON_DATA = """{\n   "start": [10],\n   "end": [100],\n   "text": ["Hi, welcome to edxval."]\n}"""
 
 
-@attr(shard=7)
 class TestVideoYouTube(TestVideo):
     METADATA = {}
 
@@ -141,7 +139,6 @@ class TestVideoYouTube(TestVideo):
         )
 
 
-@attr(shard=7)
 class TestVideoNonYouTube(TestVideo):
     """Integration tests: web client + mongo."""
     DATA = """
@@ -224,7 +221,6 @@ class TestVideoNonYouTube(TestVideo):
         )
 
 
-@attr(shard=7)
 @ddt.ddt
 class TestGetHtmlMethod(BaseTestXmodule):
     '''
@@ -1082,7 +1078,6 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 self.assertIn(u'"prioritizeHls": {}'.format(data['result']), context)
 
 
-@attr(shard=7)
 @ddt.ddt
 class TestVideoDescriptorInitialization(BaseTestXmodule):
     """
@@ -1241,7 +1236,6 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
         self.assertEqual(context['transcripts_basic_tab_metadata']['video_url']['value'], video_url)
 
 
-@attr(shard=7)
 @ddt.ddt
 class TestEditorSavedMethod(BaseTestXmodule):
     """
@@ -1541,7 +1535,6 @@ class TestVideoDescriptorStudentViewJson(CacheIsolationTestCase):
         self.assertItemsEqual(student_view_response['transcripts'].keys(), expected_transcripts)
 
 
-@attr(shard=7)
 @ddt.ddt
 class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
     """

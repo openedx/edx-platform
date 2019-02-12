@@ -26,7 +26,6 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
     """
     ContentLibraryTransformer Test
     """
-    shard = 4
     TRANSFORMER_CLASS_TO_TEST = ContentLibraryTransformer
 
     def setUp(self):

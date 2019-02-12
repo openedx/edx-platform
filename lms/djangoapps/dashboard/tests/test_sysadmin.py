@@ -123,7 +123,6 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
     """
     Check that importing into the mongo module store works
     """
-    shard = 1
 
     @classmethod
     def tearDownClass(cls):

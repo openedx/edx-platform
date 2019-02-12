@@ -38,7 +38,6 @@ def update_commerce_config(enabled=False, checkout_page='/test_basket/add/'):
 
 class AuditLogTests(TestCase):
     """Tests of the commerce audit logging helper."""
-    shard = 4
 
     @patch('openedx.core.lib.log_utils.log')
     def test_log_message(self, mock_log):
@@ -54,7 +53,6 @@ class AuditLogTests(TestCase):
 @ddt.ddt
 class EcommerceServiceTests(TestCase):
     """Tests for the EcommerceService helper class."""
-    shard = 4
 
     def setUp(self):
         self.request_factory = RequestFactory()
@@ -185,7 +183,6 @@ class EcommerceServiceTests(TestCase):
 @skip_unless_lms
 class RefundUtilMethodTests(ModuleStoreTestCase):
     """Tests for Refund Utilities"""
-    shard = 4
 
     def setUp(self):
         super(RefundUtilMethodTests, self).setUp()

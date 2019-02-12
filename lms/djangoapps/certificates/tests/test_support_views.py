@@ -26,7 +26,6 @@ class CertificateSupportTestCase(ModuleStoreTestCase):
     """
     Base class for tests of the certificate support views.
     """
-    shard = 4
 
     SUPPORT_USERNAME = "support"
     SUPPORT_EMAIL = "support@example.com"
@@ -92,7 +91,6 @@ class CertificateSearchTests(CertificateSupportTestCase):
     """
     Tests for the certificate search end-point used by the support team.
     """
-    shard = 4
 
     def setUp(self):
         """
@@ -229,7 +227,6 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
     """
     Tests for the certificate regeneration end-point used by the support team.
     """
-    shard = 4
 
     def setUp(self):
         """
@@ -412,7 +409,6 @@ class CertificateGenerateTests(CertificateSupportTestCase):
     """
     Tests for the certificate generation end-point used by the support team.
     """
-    shard = 4
 
     def setUp(self):
         """

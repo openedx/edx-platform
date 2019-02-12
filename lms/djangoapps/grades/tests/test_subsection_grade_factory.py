@@ -28,7 +28,6 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
     persistent grades are functioning as expected, and that the flag to
     enable saving subsection grades blocks/enables that feature as expected.
     """
-    shard = 4
 
     def assert_grade(self, grade, expected_earned, expected_possible):
         """
