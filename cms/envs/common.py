@@ -141,6 +141,8 @@ from lms.envs.common import (
     RETIREMENT_SERVICE_WORKER_USERNAME,
     RETIREMENT_STATES,
 
+    IDA_LOGOUT_URI_LIST,
+
     # Methods to derive settings
     _make_mako_template_dirs,
     _make_locale_paths,
