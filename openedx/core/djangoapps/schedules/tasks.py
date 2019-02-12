@@ -40,20 +40,18 @@ UPGRADE_REMINDER_LOG_PREFIX = 'Upgrade Reminder'
 COURSE_UPDATE_LOG_PREFIX = 'Course Update'
 
 
-@task(base=LoggedPersistOnFailureTask, bind=True, default_retry_delay=30, routing_key=ROUTING_KEY)
+@task(base=LoggedPersistOnFailureTask, bind=True, default_retry_delay=30)
 def update_course_schedules(self, **kwargs):
     course_key = CourseKey.from_string(kwargs['course_id'])
     new_start_date = deserialize(kwargs['new_start_date_str'])
     new_upgrade_deadline = deserialize(kwargs['new_upgrade_deadline_str'])
 
     try:
-        number_of_updated_records = Schedule.objects.filter(enrollment__course_id=course_key).update(
+        Schedule.objects.filter(enrollment__course_id=course_key).update(
             start=new_start_date,
             upgrade_deadline=new_upgrade_deadline
         )
-        LOG.info("Number of schedule records updated: %d", number_of_updated_records)
     except Exception as exc:
-        LOG.exception("A broader exception to debug EDUCATOR-3965")
         if not isinstance(exc, KNOWN_RETRY_ERRORS):
             LOG.exception("Unexpected failure: task id: %s, kwargs=%s".format(self.request.id, kwargs))
         raise self.retry(kwargs=kwargs, exc=exc)
