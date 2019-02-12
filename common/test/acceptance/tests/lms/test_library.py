@@ -99,8 +99,7 @@ class LibraryContentTestBase(UniqueCourseTest):
         editor.save()
         self._go_to_unit_page(change_login=False)
         unit_page.wait_for_page()
-        unit_page.publish_action.click()
-        unit_page.wait_for_ajax()
+        unit_page.publish()
         self.assertIn("Published and Live", unit_page.publish_title)
 
     @property
