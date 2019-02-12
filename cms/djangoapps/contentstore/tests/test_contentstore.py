@@ -2200,7 +2200,7 @@ class EntryPageTestCase(TestCase):
 
     def test_logout(self):
         # Logout redirects.
-        self._test_page("/logout", 302)
+        self._test_page("/logout", 200)
 
     @override_switch(
         '{}.{}'.format(waffle.WAFFLE_NAMESPACE, waffle.ENABLE_ACCESSIBILITY_POLICY_PAGE),
