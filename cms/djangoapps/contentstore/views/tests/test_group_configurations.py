@@ -171,7 +171,6 @@ class GroupConfigurationsBaseTestCase(object):
     """
     Mixin with base test cases for the group configurations.
     """
-    shard = 1
 
     def _remove_ids(self, content):
         """
@@ -246,7 +245,6 @@ class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurations
     """
     Test cases for group_configurations_list_handler.
     """
-    shard = 1
 
     def _url(self):
         """
@@ -353,8 +351,6 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
     """
     Test cases for group_configurations_detail_handler.
     """
-
-    shard = 1
     ID = 0
 
     def _url(self, cid=-1):
@@ -693,7 +689,6 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
     """
     Tests for usage information of configurations and content groups.
     """
-    shard = 1
 
     def _get_user_partition(self, scheme):
         """
@@ -1169,7 +1164,6 @@ class GroupConfigurationsValidationTestCase(CourseTestCase, HelperMethods):
     """
     Tests for validation in Group Configurations.
     """
-    shard = 1
 
     @patch('xmodule.split_test_module.SplitTestDescriptor.validate_split_test')
     def verify_validation_add_usage_info(self, expected_result, mocked_message, mocked_validation_messages):

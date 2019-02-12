@@ -106,7 +106,6 @@ class CertificatesBaseTestCase(object):
     """
     Mixin with base test cases for the certificates.
     """
-    shard = 1
 
     def _remove_ids(self, content):
         """
@@ -200,7 +199,6 @@ class CertificatesListHandlerTestCase(
     """
     Test cases for certificates_list_handler.
     """
-    shard = 1
 
     def setUp(self):
         """
@@ -428,8 +426,6 @@ class CertificatesDetailHandlerTestCase(
     """
     Test cases for CertificatesDetailHandlerTestCase.
     """
-    shard = 1
-
     _id = 0
 
     def setUp(self):  # pylint: disable=arguments-differ

@@ -92,7 +92,6 @@ class ImportRequiredTestCases(ContentStoreTestCase):
     """
     Tests which legitimately need to import a course
     """
-    shard = 1
 
     def test_no_static_link_rewrites_on_import(self):
         course_items = import_course_from_xml(
@@ -611,7 +610,6 @@ class MiscCourseTests(ContentStoreTestCase):
     """
     Tests that rely on the toy courses.
     """
-    shard = 1
 
     def setUp(self):
         super(MiscCourseTests, self).setUp()
@@ -1160,7 +1158,6 @@ class ContentStoreTest(ContentStoreTestCase):
     """
     Tests for the CMS ContentStore application.
     """
-    shard = 1
     duplicate_course_error = ("There is already a course defined with the same organization and course number. "
                               "Please change either organization or course number to be unique.")
 
@@ -1809,7 +1806,6 @@ class ContentStoreTest(ContentStoreTestCase):
 
 class MetadataSaveTestCase(ContentStoreTestCase):
     """Test that metadata is correctly cached and decached."""
-    shard = 1
 
     def setUp(self):
         super(MetadataSaveTestCase, self).setUp()
@@ -1871,7 +1867,6 @@ class RerunCourseTest(ContentStoreTestCase):
     """
     Tests for Rerunning a course via the view handler
     """
-    shard = 1
 
     def setUp(self):
         super(RerunCourseTest, self).setUp()
@@ -2139,7 +2134,6 @@ class ContentLicenseTest(ContentStoreTestCase):
     """
     Tests around content licenses
     """
-    shard = 1
 
     def test_course_license_export(self):
         content_store = contentstore()
@@ -2179,7 +2173,6 @@ class EntryPageTestCase(TestCase):
     """
     Tests entry pages that aren't specific to a course.
     """
-    shard = 1
 
     def setUp(self):
         super(EntryPageTestCase, self).setUp()
@@ -2215,7 +2208,6 @@ class SigninPageTestCase(TestCase):
     important to make sure that the script is functional independently of any
     other script.
     """
-    shard = 1
 
     def test_csrf_token_is_present_in_form(self):
         # Expected html:
