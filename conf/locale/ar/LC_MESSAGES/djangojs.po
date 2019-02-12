@@ -1,6 +1,6 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/).
-# Copyright (C) 2018 EdX
+# Copyright (C) 2019 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -44,7 +44,7 @@
 # Zakaria <zakaria.braksa@gmail.com>, 2015
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/).
-# Copyright (C) 2018 EdX
+# Copyright (C) 2019 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -78,7 +78,7 @@
 # soliman osman <solimanosman@windowslive.com>, 2014-2015
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)
-# Copyright (C) 2018 edX
+# Copyright (C) 2019 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -107,7 +107,7 @@
 # سيف المنايا <m2fahad9@gmail.com>, 2015
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)
-# Copyright (C) 2018 edX
+# Copyright (C) 2019 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -138,8 +138,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-12-30 20:42+0000\n"
-"PO-Revision-Date: 2018-12-09 20:43+0000\n"
+"POT-Creation-Date: 2019-02-03 20:42+0000\n"
+"PO-Revision-Date: 2019-01-16 20:19+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
 "Language: ar\n"
@@ -4787,7 +4787,7 @@ msgstr "يُرجى تفقّد بريدك الإلكتروني"
 msgid ""
 "{paragraphStart}You entered {boldStart}{email}{boldEnd}. If this email "
 "address is associated with your {platform_name} account, we will send a "
-"message with password reset instructions to this email "
+"message with password recovery instructions to this email "
 "address.{paragraphEnd}{paragraphStart}If you do not receive a password reset"
 " message, verify that you entered the correct email address, or check your "
 "spam folder.{paragraphEnd}{paragraphStart}If you need further assistance, "
@@ -4848,7 +4848,7 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Secondary Email Address"
+msgid "Recovery Address"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -4950,6 +4950,12 @@ msgstr "سنة الميلاد"
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Preferred Language"
 msgstr "اللغة المفضّلة"
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid ""
+"We've sent a confirmation message to {new_secondary_email_address}. Click "
+"the link in the message to update your secondary email address."
+msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Social Media Links"
@@ -7684,12 +7690,28 @@ msgid "timed"
 msgstr "مؤقّت"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
+msgid "The timer on the right shows the time remaining in the exam."
+msgstr ""
+
+#: lms/templates/courseware/proctored-exam-status.underscore
 msgid ""
 "To receive credit for problems, you must select \"Submit\" for each problem "
 "before you select \"End My Exam\"."
 msgstr ""
 "من أجل الحصول على نقاط في مسألة معينة عليك اختيار \"إرسال\" لكل مسألة قبل "
 "احتيار \"انه الامتحان\"."
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show More"
+msgstr ""
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show Less"
+msgstr ""
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Exam timer and end exam button"
+msgstr ""
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "End My Exam"
@@ -8398,20 +8420,6 @@ msgstr "تغيير عنوان بريدي الإلكتروني"
 msgid "Reset Password"
 msgstr "تغيير كلمة المرور"
 
-#: lms/templates/student_account/account_recovery.underscore
-msgid "Account Recovery"
-msgstr ""
-
-#: lms/templates/student_account/account_recovery.underscore
-msgid ""
-"Please enter your secondary email address below and we will send you "
-"instructions for recovering your account and setting a new password."
-msgstr ""
-
-#: lms/templates/student_account/account_recovery.underscore
-msgid "Recover my account"
-msgstr ""
-
 #: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
 msgstr "إعدادات الحساب"
@@ -8421,8 +8429,8 @@ msgid "An error occurred. Please reload the page."
 msgstr "نأسف لحدوث خطأ. يُرجى إعادة فتح الصفحة."
 
 #: lms/templates/student_account/form_field.underscore
-msgid "Forgot password?"
-msgstr "هل نسيت كلمة المرور؟"
+msgid "Need help logging in?"
+msgstr ""
 
 #: lms/templates/student_account/hinted_login.underscore
 #, python-format
@@ -8536,15 +8544,13 @@ msgstr "المساعدة بخصوص كلمة المرور"
 
 #: lms/templates/student_account/password_reset.underscore
 msgid ""
-"Please enter your email address below and we will send you instructions for "
-"setting a new password."
+"Please enter your registration or recovery email address below and we will "
+"send you an email with instructions."
 msgstr ""
-"يُرجى إدخال عنوان بريدك الإلكتروني أدناه، وسنرسل لك تعليمات إعادة ضبط كلمة "
-"مرور جديدة."
 
 #: lms/templates/student_account/password_reset.underscore
-msgid "Reset my password"
-msgstr "تغيير كلمة المرور"
+msgid "Recover my password"
+msgstr ""
 
 #: lms/templates/student_account/register.underscore
 msgid "Already have an {platformName} account?"
@@ -9704,6 +9710,10 @@ msgstr "تصغير/تكبير هذه وحدات %(xblock_type)s"
 #: cms/templates/js/course-outline.underscore
 msgid "Display Name"
 msgstr "اسم العرض"
+
+#: cms/templates/js/course-outline.underscore
+msgid "Proctoring Settings"
+msgstr ""
 
 #: cms/templates/js/course-outline.underscore
 msgid "Configure"

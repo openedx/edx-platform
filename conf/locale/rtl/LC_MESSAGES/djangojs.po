@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-01-02 15:30+0000\n"
-"PO-Revision-Date: 2019-01-02 15:30:42.102744\n"
+"POT-Creation-Date: 2019-02-10 20:37+0000\n"
+"PO-Revision-Date: 2019-02-10 20:37:29.479377\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -4758,7 +4758,7 @@ msgstr "ذاثذن غخعق ثوشهم"
 msgid ""
 "{paragraphStart}You entered {boldStart}{email}{boldEnd}. If this email "
 "address is associated with your {platform_name} account, we will send a "
-"message with password reset instructions to this email "
+"message with password recovery instructions to this email "
 "address.{paragraphEnd}{paragraphStart}If you do not receive a password reset"
 " message, verify that you entered the correct email address, or check your "
 "spam folder.{paragraphEnd}{paragraphStart}If you need further assistance, "
@@ -4766,7 +4766,7 @@ msgid ""
 msgstr ""
 "{paragraphStart}غخع ثرفثقثي {boldStart}{email}{boldEnd}. هب فاهس ثوشهم "
 "شييقثسس هس شسسخذهشفثي صهفا غخعق {platform_name} شذذخعرف, صث صهمم سثري ش "
-"وثسسشلث صهفا حشسسصخقي قثسثف هرسفقعذفهخرس فخ فاهس ثوشهم "
+"وثسسشلث صهفا حشسسصخقي قثذخدثقغ هرسفقعذفهخرس فخ فاهس ثوشهم "
 "شييقثسس.{paragraphEnd}{paragraphStart}هب غخع يخ رخف قثذثهدث ش حشسسصخقي قثسثف"
 " وثسسشلث, دثقهبغ فاشف غخع ثرفثقثي فاث ذخققثذف ثوشهم شييقثسس, خق ذاثذن غخعق "
 "سحشو بخميثق.{paragraphEnd}{paragraphStart}هب غخع رثثي بعقفاثق شسسهسفشرذث, "
@@ -4834,12 +4834,16 @@ msgstr ""
 "غخع قثذثهدث وثسسشلثس بقخو {platform_name} شري ذخعقسث فثشوس شف فاهس شييقثسس."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Secondary Email Address"
-msgstr "سثذخريشقغ ثوشهم شييقثسس"
+msgid "Recovery Email Address"
+msgstr "قثذخدثقغ ثوشهم شييقثسس"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid "You may access your account when single-sign on is not available."
-msgstr "غخع وشغ شذذثسس غخعق شذذخعرف صاثر سهرلمث-سهلر خر هس رخف شدشهمشزمث."
+msgid ""
+"You may access your account with this address if single-sign on or access to"
+" your primary email is not available."
+msgstr ""
+"غخع وشغ شذذثسس غخعق شذذخعرف صهفا فاهس شييقثسس هب سهرلمث-سهلر خر خق شذذثسس فخ"
+" غخعق حقهوشقغ ثوشهم هس رخف شدشهمشزمث."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
@@ -5088,6 +5092,22 @@ msgstr "شذذخعرف هربخقوشفهخر"
 #: lms/static/js/student_account/views/account_settings_view.js
 msgid "Order History"
 msgstr "خقيثق اهسفخقغ"
+
+#: lms/static/js/student_account/views/account_settings_view.js
+msgid ""
+"You have set your language to {beta_language}, which is currently not fully "
+"translated. You can help us translate this language fully by joining the "
+"Transifex community and adding translations from English for learners that "
+"speak {beta_language}."
+msgstr ""
+"غخع اشدث سثف غخعق مشرلعشلث فخ {beta_language}, صاهذا هس ذعققثرفمغ رخف بعممغ "
+"فقشرسمشفثي. غخع ذشر اثمح عس فقشرسمشفث فاهس مشرلعشلث بعممغ زغ تخهرهرل فاث "
+"فقشرسهبثط ذخووعرهفغ شري شييهرل فقشرسمشفهخرس بقخو ثرلمهسا بخق مثشقرثقس فاشف "
+"سحثشن {beta_language}."
+
+#: lms/static/js/student_account/views/account_settings_view.js
+msgid "Help Translate into {beta_language}"
+msgstr "اثمح فقشرسمشفث هرفخ {beta_language}"
 
 #: lms/static/js/verify_student/views/image_input_view.js
 msgid "Image Upload Error"
@@ -7731,8 +7751,12 @@ msgid "Mark Exam As Completed"
 msgstr "وشقن ثطشو شس ذخوحمثفثي"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
-msgid "timed"
-msgstr "فهوثي"
+msgid "a timed exam"
+msgstr "ش فهوثي ثطشو"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "The timer on the right shows the time remaining in the exam."
+msgstr "فاث فهوثق خر فاث قهلاف ساخصس فاث فهوث قثوشهرهرل هر فاث ثطشو."
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid ""
@@ -7741,6 +7765,18 @@ msgid ""
 msgstr ""
 "فخ قثذثهدث ذقثيهف بخق حقخزمثوس, غخع وعسف سثمثذف \"سعزوهف\" بخق ثشذا حقخزمثو "
 "زثبخقث غخع سثمثذف \"ثري وغ ثطشو\"."
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show More"
+msgstr "ساخص وخقث"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show Less"
+msgstr "ساخص مثسس"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Exam timer and end exam button"
+msgstr "ثطشو فهوثق شري ثري ثطشو زعففخر"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "End My Exam"
@@ -8461,21 +8497,9 @@ msgstr "ذاشرلث وغ ثوشهم شييقثسس"
 msgid "Reset Password"
 msgstr "قثسثف حشسسصخقي"
 
-#: lms/templates/student_account/account_recovery.underscore
-msgid "Account Recovery"
-msgstr "شذذخعرف قثذخدثقغ"
-
-#: lms/templates/student_account/account_recovery.underscore
-msgid ""
-"Please enter your secondary email address below and we will send you "
-"instructions for recovering your account and setting a new password."
-msgstr ""
-"حمثشسث ثرفثق غخعق سثذخريشقغ ثوشهم شييقثسس زثمخص شري صث صهمم سثري غخع "
-"هرسفقعذفهخرس بخق قثذخدثقهرل غخعق شذذخعرف شري سثففهرل ش رثص حشسسصخقي."
-
-#: lms/templates/student_account/account_recovery.underscore
-msgid "Recover my account"
-msgstr "قثذخدثق وغ شذذخعرف"
+#: lms/templates/student_account/account_settings.underscore
+msgid "Switch Language Back"
+msgstr "سصهفذا مشرلعشلث زشذن"
 
 #: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
@@ -8486,8 +8510,8 @@ msgid "An error occurred. Please reload the page."
 msgstr "شر ثققخق خذذعققثي. حمثشسث قثمخشي فاث حشلث."
 
 #: lms/templates/student_account/form_field.underscore
-msgid "Forgot password?"
-msgstr "بخقلخف حشسسصخقي?"
+msgid "Need help logging in?"
+msgstr "رثثي اثمح مخللهرل هر?"
 
 #: lms/templates/student_account/hinted_login.underscore
 #, python-format
@@ -8606,15 +8630,15 @@ msgstr "حشسسصخقي شسسهسفشرذث"
 
 #: lms/templates/student_account/password_reset.underscore
 msgid ""
-"Please enter your email address below and we will send you instructions for "
-"setting a new password."
+"Please enter your log-in or recovery email address below and we will send "
+"you an email with instructions."
 msgstr ""
-"حمثشسث ثرفثق غخعق ثوشهم شييقثسس زثمخص شري صث صهمم سثري غخع هرسفقعذفهخرس بخق "
-"سثففهرل ش رثص حشسسصخقي."
+"حمثشسث ثرفثق غخعق مخل-هر خق قثذخدثقغ ثوشهم شييقثسس زثمخص شري صث صهمم سثري "
+"غخع شر ثوشهم صهفا هرسفقعذفهخرس."
 
 #: lms/templates/student_account/password_reset.underscore
-msgid "Reset my password"
-msgstr "قثسثف وغ حشسسصخقي"
+msgid "Recover my password"
+msgstr "قثذخدثق وغ حشسسصخقي"
 
 #: lms/templates/student_account/register.underscore
 msgid "Already have an {platformName} account?"
@@ -9773,6 +9797,10 @@ msgid "Ungraded"
 msgstr "عرلقشيثي"
 
 #: cms/templates/js/course-outline.underscore
+msgid "Onboarding Exam"
+msgstr "خرزخشقيهرل ثطشو"
+
+#: cms/templates/js/course-outline.underscore
 msgid "Practice proctored Exam"
 msgstr "حقشذفهذث حقخذفخقثي ثطشو"
 
@@ -9793,6 +9821,10 @@ msgstr "ذخممشحسث/ثطحشري فاهس %(xblock_type)s"
 #: cms/templates/js/course-outline.underscore
 msgid "Display Name"
 msgstr "يهسحمشغ رشوث"
+
+#: cms/templates/js/course-outline.underscore
+msgid "Proctoring Settings"
+msgstr "حقخذفخقهرل سثففهرلس"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Configure"
@@ -10690,6 +10722,22 @@ msgstr ""
 "حقخذفخقثي ثطشوس شقث فهوثي شري فاثغ قثذخقي دهيثخ خب ثشذا مثشقرثق فشنهرل فاث "
 "ثطشو. فاث دهيثخس شقث فاثر قثدهثصثي فخ ثرسعقث فاشف مثشقرثقس بخممخص شمم "
 "ثطشوهرشفهخر قعمثس."
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "Onboarding"
+msgstr "خرزخشقيهرل"
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"Use Onboarding to introduce learners to proctoring, verify their identity, "
+"and create an onboarding profile. Learners must complete the onboarding "
+"profile step prior to taking a proctored exam. Profile reviews take 2+ "
+"business days."
+msgstr ""
+"عسث خرزخشقيهرل فخ هرفقخيعذث مثشقرثقس فخ حقخذفخقهرل, دثقهبغ فاثهق هيثرفهفغ, "
+"شري ذقثشفث شر خرزخشقيهرل حقخبهمث. مثشقرثقس وعسف ذخوحمثفث فاث خرزخشقيهرل "
+"حقخبهمث سفثح حقهخق فخ فشنهرل ش حقخذفخقثي ثطشو. حقخبهمث قثدهثصس فشنث 2+ "
+"زعسهرثسس يشغس."
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Practice Proctored"
