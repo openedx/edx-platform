@@ -899,6 +899,7 @@ LANGUAGES = (
     ('fi-fi', u'Suomi (Suomi)'),  # Finnish (Finland)
     ('fil', u'Filipino'),  # Filipino
     ('fr', u'Français'),  # French
+    ('fr-ca', u'Français (Canada)'),  # French (Canada)
     ('gl', u'Galego'),  # Galician
     ('gu', u'ગુજરાતી'),  # Gujarati
     ('he', u'עברית'),  # Hebrew
