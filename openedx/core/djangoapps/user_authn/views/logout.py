@@ -38,6 +38,14 @@ class LogoutView(TemplateView):
         """
         return self.get(request, *args, **kwargs)
 
+    def post(self, request, *args, **kwargs):
+        """
+        Proxy to the GET handler.
+
+        TODO: remove GET as an allowed method, and update all callers to use POST.
+        """
+        return self.get(request, *args, **kwargs)
+
     @property
     def target(self):
         """
