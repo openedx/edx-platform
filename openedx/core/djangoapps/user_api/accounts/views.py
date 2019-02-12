@@ -126,6 +126,14 @@ class AccountViewSet(ViewSet):
 
             PATCH /api/user/v1/accounts/{username}/{"key":"value"} "application/merge-patch+json"
 
+        **Notes for PATCH requests to /accounts endpoints**
+            * Requested updates to social_links are automatically merged with
+              previously set links. That is, any newly introduced platforms are
+              add to the previous list. Updated links to pre-existing platforms
+              replace their values in the previous list. Pre-existing platforms
+              can be removed by setting the value of the social_link to an
+              empty string ("").
+
         **Response Values for GET requests to the /me endpoint**
             If the user is not logged in, an HTTP 401 "Not Authorized" response
             is returned.
@@ -196,8 +204,8 @@ class AccountViewSet(ViewSet):
 
             * requires_parental_consent: True if the user is a minor
               requiring parental consent.
-            * social_links: Array of social links. Each
-              preference is a JSON object with the following keys:
+            * social_links: Array of social links, sorted alphabetically by
+              "platform". Each preference is a JSON object with the following keys:
 
                 * "platform": A particular social platform, ex: 'facebook'
                 * "social_link": The link to the user's profile on the particular platform
