@@ -238,7 +238,7 @@ class BookmarksTest(BookmarksTestMixin):
         container_page.wait_for_page()
 
         self.assertEqual(container_page.name, modified_name)
-        container_page.publish_action.click()
+        container_page.publish()
 
     def test_bookmark_button(self):
         """

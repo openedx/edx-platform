@@ -185,8 +185,8 @@ class ContainerPage(PageObject, HelpMixin):
         """
         Publishes the container.
         """
-        self.publish_action.click()
-        self.wait_for_ajax()
+        self.scroll_to_element('.action-publish')
+        click_css(self, '.action-publish', 0, require_notification=False)
 
     def discard_changes(self):
         """
