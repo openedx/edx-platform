@@ -107,7 +107,6 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
     """
     Tests for the VerticalBlock.
     """
-    shard = 1
 
     def assert_bookmark_info(self, assertion, content):
         """

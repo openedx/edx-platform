@@ -29,7 +29,6 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
     """
     Unit tests for getting the list of courses for a logged in user
     """
-    shard = 3
     PASSWORD = 'test'
 
     def setUp(self):

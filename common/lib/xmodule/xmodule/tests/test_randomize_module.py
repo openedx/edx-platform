@@ -23,7 +23,6 @@ _NEXT_WEEK = _TODAY + timedelta(days=7)
 
 class RandomizeModuleTestCase(unittest.TestCase):
     """Make sure the randomize module works"""
-    shard = 1
 
     def setUp(self):
         """

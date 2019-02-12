@@ -37,7 +37,6 @@ class TestXblockUtils(SharedModuleStoreTestCase):
     """
     Tests for xblock utility functions.
     """
-    shard = 2
 
     @classmethod
     def setUpClass(cls):

@@ -207,7 +207,6 @@ class CreditRequirementApiTests(CreditApiTestBase):
     """
     Test Python API for credit requirements and eligibility.
     """
-    shard = 2
 
     @ddt.data(
         [
@@ -878,7 +877,6 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
     """
     Test Python API for credit provider integration.
     """
-    shard = 2
 
     USER_INFO = {
         "username": "bob",
@@ -1208,7 +1206,6 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
 @ddt.ddt
 class CourseApiTests(CreditApiTestBase):
     """Test Python API for course product information."""
-    shard = 2
 
     def setUp(self):
         super(CourseApiTests, self).setUp()

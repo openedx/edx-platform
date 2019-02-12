@@ -58,7 +58,6 @@ from openedx.core.djangoapps.user_api.errors import (
     UserNotFound
 )
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from openedx.core.lib.tests import attr
 from student.models import PendingEmailChange
 from student.tests.factories import UserFactory
 from student.tests.tests import UserSettingsEventTestMixin
@@ -69,7 +68,6 @@ def mock_render_to_string(template_name, context):
     return str((template_name, sorted(iteritems(context))))
 
 
-@attr(shard=2)
 @skip_unless_lms
 class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, RetirementTestCase):
     """
@@ -373,7 +371,6 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, Retireme
         verify_event_emitted([], [{"code": "en"}, {"code": "fr"}])
 
 
-@attr(shard=2)
 @patch('openedx.core.djangoapps.user_api.accounts.image_helpers._PROFILE_IMAGE_SIZES', [50, 10])
 @patch.dict(
     'django.conf.settings.PROFILE_IMAGE_SIZES_MAP',
@@ -444,7 +441,6 @@ class AccountSettingsOnCreationTest(TestCase):
         self.assertEqual(expected_user_password, user.password)
 
 
-@attr(shard=2)
 @pytest.mark.django_db
 def test_create_account_duplicate_email(django_db_use_migrations):
     """
@@ -470,7 +466,6 @@ def test_create_account_duplicate_email(django_db_use_migrations):
             create_account('different_user', password, email)
 
 
-@attr(shard=2)
 @ddt.ddt
 class AccountCreationActivationAndPasswordChangeTest(TestCase):
     """
@@ -613,7 +608,6 @@ class AccountCreationActivationAndPasswordChangeTest(TestCase):
         self.assertEqual(response.status_code, 403)
 
 
-@attr(shard=2)
 @ddt.ddt
 class AccountCreationUnicodeUsernameTest(TestCase):
     """

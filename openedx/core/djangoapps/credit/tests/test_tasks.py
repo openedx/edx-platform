@@ -23,7 +23,6 @@ class TestTaskExecution(ModuleStoreTestCase):
     allows us to ensure that when the listener is executed, it is done as
     expected.
     """
-    shard = 2
 
     def mocked_set_credit_requirements(course_key, requirements):  # pylint: disable=no-self-argument, unused-argument
         """Used as a side effect when mocking method credit api method

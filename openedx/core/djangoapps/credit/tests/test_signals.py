@@ -32,7 +32,6 @@ class TestMinGradedRequirementStatus(ModuleStoreTestCase):
     """
     VALID_DUE_DATE = datetime.now(pytz.UTC) + timedelta(days=20)
     EXPIRED_DUE_DATE = datetime.now(pytz.UTC) - timedelta(days=20)
-    shard = 2
 
     DATES = {
         'valid': VALID_DUE_DATE,

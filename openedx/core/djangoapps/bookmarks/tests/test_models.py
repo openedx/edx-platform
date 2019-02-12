@@ -229,7 +229,6 @@ class BookmarkModelTests(BookmarksTestsBase):
     """
     Test the Bookmark model.
     """
-    shard = 9
 
     def setUp(self):
         super(BookmarkModelTests, self).setUp()
@@ -415,7 +414,6 @@ class XBlockCacheModelTest(ModuleStoreTestCase):
     """
     Test the XBlockCache model.
     """
-    shard = 9
     COURSE_KEY = CourseLocator(org='test', course='test', run='test')
     CHAPTER1_USAGE_KEY = BlockUsageLocator(COURSE_KEY, block_type='chapter', block_id='chapter1')
     SECTION1_USAGE_KEY = BlockUsageLocator(COURSE_KEY, block_type='section', block_id='section1')

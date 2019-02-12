@@ -57,7 +57,6 @@ UTILS_MODULE = 'openedx.core.djangoapps.programs.utils'
 @mock.patch(UTILS_MODULE + '.get_programs')
 class TestProgramProgressMeter(TestCase):
     """Tests of the program progress utility class."""
-    shard = 2
 
     def setUp(self):
         super(TestProgramProgressMeter, self).setUp()

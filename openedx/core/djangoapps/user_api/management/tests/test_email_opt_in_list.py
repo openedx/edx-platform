@@ -27,7 +27,6 @@ from openedx.core.djangolib.testing.utils import skip_unless_lms
 @skip_unless_lms
 class EmailOptInListTest(ModuleStoreTestCase):
     """Tests for the email opt-in list management command. """
-    shard = 2
     USER_USERNAME = "test_user"
     USER_FIRST_NAME = u"Ṫëṡẗ"
     USER_LAST_NAME = u"Űśéŕ"

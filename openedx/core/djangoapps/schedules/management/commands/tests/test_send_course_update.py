@@ -31,7 +31,6 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
     "Can't test schedules if the app isn't installed",
 )
 class TestSendCourseUpdate(ScheduleUpsellTestMixin, ScheduleSendEmailTestMixin, ModuleStoreTestCase):
-    shard = 6
     __test__ = True
 
     # pylint: disable=protected-access

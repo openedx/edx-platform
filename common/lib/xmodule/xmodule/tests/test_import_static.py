@@ -14,7 +14,6 @@ from xmodule.modulestore.tests.utils import (
 
 class IgnoredFilesTestCase(unittest.TestCase):
     "Tests for ignored files"
-    shard = 1
     course_dir = DATA_DIR / "course_ignore"
     dict_list = [DOT_FILES_DICT, TILDA_FILES_DICT]
 

@@ -22,7 +22,6 @@ class ProfileImageUrlTestCase(TestCase):
     """
     Tests for profile image URL generation helpers.
     """
-    shard = 2
 
     def setUp(self):
         super(ProfileImageUrlTestCase, self).setUp()

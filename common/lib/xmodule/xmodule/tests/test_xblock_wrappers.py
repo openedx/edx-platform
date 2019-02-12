@@ -265,7 +265,6 @@ class XBlockWrapperTestMixin(object):
     You can create an actual test case by inheriting from this class and UnitTest,
     and implement skip_if_invalid and check_property.
     """
-    shard = 1
 
     def skip_if_invalid(self, descriptor_cls):
         """
@@ -324,7 +323,6 @@ class TestStudentView(XBlockWrapperTestMixin, TestCase):
     """
     This tests that student_view and XModule.get_html produce the same results.
     """
-    shard = 1
 
     def skip_if_invalid(self, descriptor_cls):
         pure_xblock_class = issubclass(descriptor_cls, XBlock) and not issubclass(descriptor_cls, XModuleDescriptor)
@@ -349,7 +347,6 @@ class TestStudioView(XBlockWrapperTestMixin, TestCase):
     """
     This tests that studio_view and XModuleDescriptor.get_html produce the same results
     """
-    shard = 1
 
     def skip_if_invalid(self, descriptor_cls):
         if descriptor_cls in NOT_STUDIO_EDITABLE:
@@ -375,7 +372,6 @@ class TestXModuleHandler(TestCase):
     """
     Tests that the xmodule_handler function correctly wraps handle_ajax
     """
-    shard = 1
 
     def setUp(self):
         super(TestXModuleHandler, self).setUp()
@@ -416,7 +412,6 @@ class TestXmlExport(XBlockWrapperTestMixin, TestCase):
     """
     This tests that XModuleDescriptor.export_course_to_xml and add_xml_to_node produce the same results.
     """
-    shard = 1
 
     def skip_if_invalid(self, descriptor_cls):
         if descriptor_cls.add_xml_to_node != XModuleDescriptor.add_xml_to_node:
@@ -440,7 +435,6 @@ class TestPublicView(XBlockWrapperTestMixin, TestCase):
     """
     This tests that default public_view shows the correct message.
     """
-    shard = 1
 
     def skip_if_invalid(self, descriptor_cls):
         pure_xblock_class = issubclass(descriptor_cls, XBlock) and not issubclass(descriptor_cls, XModuleDescriptor)

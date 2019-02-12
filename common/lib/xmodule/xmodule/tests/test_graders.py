@@ -19,7 +19,6 @@ class GradesheetTest(unittest.TestCase):
     """
     Tests the aggregate_scores method
     """
-    shard = 1
 
     def test_weighted_grading(self):
         scores = []
@@ -82,7 +81,6 @@ class GraderTest(unittest.TestCase):
     """
     Tests grader implementations
     """
-    shard = 1
 
     empty_gradesheet = {
     }
@@ -332,7 +330,6 @@ class ShowCorrectnessTest(unittest.TestCase):
     """
     Tests the correctness_available method
     """
-    shard = 1
 
     def setUp(self):
         super(ShowCorrectnessTest, self).setUp()

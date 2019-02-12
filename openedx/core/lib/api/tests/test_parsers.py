@@ -15,7 +15,6 @@ class TestTypedFileUploadParser(APITestCase):
     """
     Tests that verify the behavior of TypedFileUploadParser
     """
-    shard = 2
 
     def setUp(self):
         super(TestTypedFileUploadParser, self).setUp()

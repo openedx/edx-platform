@@ -13,7 +13,6 @@ CREDENTIALS_PUBLIC_SERVICE_URL = 'https://credentials.example.com'
 @skip_unless_lms
 class TestCredentialsApiConfig(CredentialsApiConfigMixin, TestCase):
     """Tests covering the CredentialsApiConfig model."""
-    shard = 2
 
     @override_settings(
         CREDENTIALS_INTERNAL_SERVICE_URL=CREDENTIALS_INTERNAL_SERVICE_URL,

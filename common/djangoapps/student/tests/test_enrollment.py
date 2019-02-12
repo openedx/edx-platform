@@ -31,7 +31,6 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
     Test student enrollment, especially with different course modes.
     """
 
-    shard = 3
     USERNAME = "Bob"
     EMAIL = "bob@example.com"
     PASSWORD = "edx"

@@ -298,7 +298,6 @@ class UserAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
 @ddt.ddt
 class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleStoreTestCase):
     """ Tests for the student account views that update the user's account information. """
-    shard = 7
     USERNAME = "bob"
     EMAIL = "bob@example.com"
     PASSWORD = u"password"

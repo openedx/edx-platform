@@ -35,7 +35,6 @@ class TestXMLModuleStore(TestCase):
     """
     Test around the XML modulestore
     """
-    shard = 2
 
     @patch('xmodule.tabs.CourseTabList.initialize_default', Mock())
     def test_unicode_chars_in_xml_content(self):
@@ -143,7 +142,6 @@ class TestXMLModuleStore(TestCase):
 
 
 class TestModuleStoreIgnore(TestXMLModuleStore):
-    shard = 2
     course_dir = DATA_DIR / "course_ignore"
 
     def setUp(self):

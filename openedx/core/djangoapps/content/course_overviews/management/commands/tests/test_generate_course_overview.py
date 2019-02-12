@@ -15,7 +15,6 @@ class TestGenerateCourseOverview(ModuleStoreTestCase):
     """
     Tests course overview management command.
     """
-    shard = 2
 
     def setUp(self):
         """

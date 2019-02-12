@@ -34,7 +34,6 @@ class EmbargoMiddlewareAccessTests(UrlResetMixin, ModuleStoreTestCase):
     PASSWORD = 'secret'
 
     URLCONF_MODULES = ['openedx.core.djangoapps.embargo']
-    shard = 3
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):

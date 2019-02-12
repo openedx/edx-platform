@@ -64,7 +64,6 @@ class JournalIndexViewTest(SiteMixin, ModuleStoreTestCase):
     """
     Tests for Journals Listing in Marketing Pages.
     """
-    shard = 1
 
     def setUp(self):
         super(JournalIndexViewTest, self).setUp()

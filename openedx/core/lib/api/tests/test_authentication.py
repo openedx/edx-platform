@@ -77,7 +77,6 @@ urlpatterns = [
 @override_settings(ROOT_URLCONF=__name__)
 class OAuth2Tests(TestCase):
     """OAuth 2.0 authentication"""
-    shard = 2
 
     def setUp(self):
         super(OAuth2Tests, self).setUp()

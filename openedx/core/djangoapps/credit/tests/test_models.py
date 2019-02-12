@@ -38,7 +38,6 @@ class CreditEligibilityModelTests(TestCase):
     """
     Tests for credit models used to track credit eligibility.
     """
-    shard = 2
 
     def setUp(self):
         super(CreditEligibilityModelTests, self).setUp()

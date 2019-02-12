@@ -23,7 +23,6 @@ class TestSafeSessionProcessRequest(TestSafeSessionsLogMixin, TestCase):
     """
     Test class for SafeSessionMiddleware.process_request
     """
-    shard = 2
 
     def setUp(self):
         super(TestSafeSessionProcessRequest, self).setUp()
@@ -127,7 +126,6 @@ class TestSafeSessionProcessResponse(TestSafeSessionsLogMixin, TestCase):
     """
     Test class for SafeSessionMiddleware.process_response
     """
-    shard = 2
 
     def setUp(self):
         super(TestSafeSessionProcessResponse, self).setUp()
@@ -233,7 +231,6 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
     Test class for SafeSessionMiddleware, testing both
     process_request and process_response.
     """
-    shard = 2
 
     def setUp(self):
         super(TestSafeSessionMiddleware, self).setUp()

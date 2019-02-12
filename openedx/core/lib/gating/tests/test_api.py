@@ -22,7 +22,6 @@ class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
     """
     Tests for the gating API
     """
-    shard = 2
 
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
