@@ -11324,8 +11324,8 @@ msgstr "Compte"
 msgid ""
 "This action updates the {provider} information for your entire organization."
 msgstr ""
-"Cette action met à jour les informations de {provider} pour l'ensemble de"
-" votre organisation."
+"Cette action met à jour les informations de {provider} pour l'ensemble de "
+"votre organisation."
 
 #: cms/templates/js/transcript-organization-credentials.underscore
 msgid "Enter the account information for your organization."
