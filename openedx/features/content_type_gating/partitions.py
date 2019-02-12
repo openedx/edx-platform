@@ -181,8 +181,8 @@ class ContentTypeGatingPartitionScheme(object):
         modes = course_mode.modes_for_course(course_key, include_expired=True, only_selectable=False)
         modes_dict = {mode.slug: mode for mode in modes}
 
-        # If there is no verified mode, all users are granted FULL_ACCESS
-        if not course_mode.has_verified_mode(modes_dict):
+        # If there aren't both verified and audit modes, all users are granted FULL_ACCESS
+        if not (course_mode.AUDIT in modes_dict and course_mode.VERIFIED in modes_dict):
             return FULL_ACCESS
 
         course_enrollment = apps.get_model('student.CourseEnrollment')

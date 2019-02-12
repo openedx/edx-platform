@@ -5,6 +5,7 @@ and course access based on these limits.
 """
 from datetime import timedelta
 
+from django.apps import apps
 from django.utils import timezone
 from django.utils.translation import get_language, ugettext as _
 
@@ -62,9 +63,12 @@ def get_user_course_expiration_date(user, course):
     """
     access_duration = MIN_DURATION
 
-    verified_mode = CourseMode.verified_mode_for_course(course=course, include_expired=True)
+    course_mode = apps.get_model('course_modes.CourseMode')
+    modes = course_mode.modes_for_course(course.id, include_expired=True, only_selectable=False)
+    modes_dict = {mode.slug: mode for mode in modes}
 
-    if not verified_mode:
+    # Only enforce time limits in courses with both an audit and verified mode
+    if not (course_mode.AUDIT in modes_dict and course_mode.VERIFIED in modes_dict):
         return None
 
     enrollment = CourseEnrollment.get_enrollment(user, course.id)
