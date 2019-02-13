@@ -142,6 +142,7 @@ class CourseMode(models.Model):
     AUDIT = 'audit'
     NO_ID_PROFESSIONAL_MODE = 'no-id-professional'
     CREDIT_MODE = 'credit'
+    MASTERS = 'masters'
 
     DEFAULT_MODE = Mode(
         settings.COURSE_MODE_DEFAULTS['slug'],
@@ -156,19 +157,19 @@ class CourseMode(models.Model):
     )
     DEFAULT_MODE_SLUG = settings.COURSE_MODE_DEFAULTS['slug']
 
-    ALL_MODES = [AUDIT, CREDIT_MODE, HONOR, NO_ID_PROFESSIONAL_MODE, PROFESSIONAL, VERIFIED, ]
+    ALL_MODES = [AUDIT, CREDIT_MODE, HONOR, NO_ID_PROFESSIONAL_MODE, PROFESSIONAL, VERIFIED, MASTERS, ]
 
     # Modes utilized for audit/free enrollments
     AUDIT_MODES = [AUDIT, HONOR]
 
     # Modes that allow a student to pursue a verified certificate
-    VERIFIED_MODES = [VERIFIED, PROFESSIONAL]
+    VERIFIED_MODES = [VERIFIED, PROFESSIONAL, MASTERS]
 
     # Modes that allow a student to pursue a non-verified certificate
     NON_VERIFIED_MODES = [HONOR, AUDIT, NO_ID_PROFESSIONAL_MODE]
 
     # Modes that allow a student to earn credit with a university partner
-    CREDIT_MODES = [CREDIT_MODE]
+    CREDIT_MODES = [CREDIT_MODE, MASTERS]
 
     # Modes that are eligible to purchase credit
     CREDIT_ELIGIBLE_MODES = [VERIFIED, PROFESSIONAL, NO_ID_PROFESSIONAL_MODE]
