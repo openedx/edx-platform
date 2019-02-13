@@ -300,7 +300,7 @@ class FieldData(object):
         try:
             return self.fields[field_name]
         except KeyError:
-            raise AttributeError("Field {0} does not exist".format(field_name))
+            raise AttributeError(u"Field {0} does not exist".format(field_name))
 
     def __setattr__(self, field_name, field_value):
         if self._is_own_field(field_name):
@@ -747,7 +747,7 @@ class BlockStructureBlockData(BlockStructure):
         its current version number.
         """
         if transformer.WRITE_VERSION == 0:
-            raise TransformerException('Version attributes are not set on transformer {0}.', transformer.name())
+            raise TransformerException(u'Version attributes are not set on transformer {0}.', transformer.name())
         self.set_transformer_data(transformer, TRANSFORMER_VERSION_KEY, transformer.WRITE_VERSION)
 
     def _get_or_create_block(self, usage_key):

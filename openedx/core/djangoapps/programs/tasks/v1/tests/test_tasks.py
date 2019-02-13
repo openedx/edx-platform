@@ -319,7 +319,7 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
 
         self.assertEqual(mock_award_program_certificate.call_count, 3)
         mock_warning.assert_called_once_with(
-            'Failed to award certificate for program {uuid} to user {username}.'.format(
+            u'Failed to award certificate for program {uuid} to user {username}.'.format(
                 uuid=1,
                 username=self.student.username)
         )

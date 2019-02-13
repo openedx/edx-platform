@@ -60,7 +60,7 @@ class BlockStructureTransformers(object):
         unregistered_transformers = TransformerRegistry.find_unregistered(transformers)
         if unregistered_transformers:
             raise TransformerException(
-                "The following requested transformers are not registered: {}".format(unregistered_transformers)
+                u"The following requested transformers are not registered: {}".format(unregistered_transformers)
             )
 
         for transformer in transformers:
@@ -100,7 +100,7 @@ class BlockStructureTransformers(object):
 
         if outdated_transformers:
             raise TransformerDataIncompatible(
-                "Collected Block Structure data for the following transformers is outdated: '%s'.",
+                u"Collected Block Structure data for the following transformers is outdated: '%s'.",
                 [(transformer.name(), transformer.READ_VERSION) for transformer in outdated_transformers],
             )
         return True

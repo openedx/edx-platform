@@ -143,7 +143,7 @@ class ApiAccessRequestSignalTests(TestCase):
 
         # Verify that initial save logs email errors properly
         mock_model_log_exception.assert_called_once_with(
-            'Error sending API user notification email for request [%s].', self.api_access_request.id
+            u'Error sending API user notification email for request [%s].', self.api_access_request.id
         )
         # Verify object saved
         self.assertIsNotNone(self.api_access_request.id)
@@ -153,7 +153,7 @@ class ApiAccessRequestSignalTests(TestCase):
                 self.api_access_request.approve()
         # Verify that updating request status logs email errors properly
         mock_model_log_exception.assert_called_once_with(
-            'Error sending API user notification email for request [%s].', self.api_access_request.id
+            u'Error sending API user notification email for request [%s].', self.api_access_request.id
         )
         # Verify object saved
         self.assertEqual(self.api_access_request.status, ApiAccessRequest.APPROVED)

@@ -217,7 +217,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         self.assertEqual(resp.status_code, 206)  # HTTP_206_PARTIAL_CONTENT
         self.assertEqual(
             resp['Content-Range'],
-            'bytes {first}-{last}/{length}'.format(
+            b'bytes {first}-{last}/{length}'.format(
                 first=0, last=self.length_unlocked - 1,
                 length=self.length_unlocked
             )
@@ -236,7 +236,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
             first=first_byte, last=last_byte))
 
         self.assertEqual(resp.status_code, 206)  # HTTP_206_PARTIAL_CONTENT
-        self.assertEqual(resp['Content-Range'], 'bytes {first}-{last}/{length}'.format(
+        self.assertEqual(resp['Content-Range'], b'bytes {first}-{last}/{length}'.format(
             first=first_byte, last=last_byte, length=self.length_unlocked))
         self.assertEqual(resp['Content-Length'], str(last_byte - first_byte + 1))
 
@@ -246,7 +246,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         """
         first_byte = self.length_unlocked / 4
         last_byte = self.length_unlocked / 2
-        resp = self.client.get(self.url_unlocked, HTTP_RANGE='bytes={first}-{last}, -100'.format(
+        resp = self.client.get(self.url_unlocked, HTTP_RANGE=b'bytes={first}-{last}, -100'.format(
             first=first_byte, last=last_byte))
 
         self.assertEqual(resp.status_code, 200)
