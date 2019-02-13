@@ -113,17 +113,16 @@ class ProgressPageBaseTest(UniqueCourseTest):
     def _logged_in_session(self, staff=False):
         """
         Ensure that the user is logged in and out appropriately at the beginning
-        and end of the current test.
+        and end of the current test.  But if there's an error, don't log out
+        before capturing a screenshot.
         """
         self.logout_page.visit()
-        try:
-            if staff:
-                auto_auth(self.browser, "STAFF_TESTER", "staff101@example.com", True, self.course_id)
-            else:
-                auto_auth(self.browser, self.USERNAME, self.EMAIL, False, self.course_id)
-            yield
-        finally:
-            self.logout_page.visit()
+        if staff:
+            auto_auth(self.browser, "STAFF_TESTER", "staff101@example.com", True, self.course_id)
+        else:
+            auto_auth(self.browser, self.USERNAME, self.EMAIL, False, self.course_id)
+        yield
+        self.logout_page.visit()
 
 
 @ddt.ddt
