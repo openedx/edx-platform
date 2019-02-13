@@ -274,16 +274,13 @@ def _footer_business_links(language=settings.LANGUAGE_CODE):
         ("about", (marketing_link("ABOUT"), _("About"))),
         ("enterprise", (marketing_link("ENTERPRISE"),
          _("{platform_name} for Business").format(platform_name=platform_name))),
-        ("news", (marketing_link("NEWS"), _("News"))),
     ]
 
     if language == settings.LANGUAGE_CODE:
-        links.insert(_find_position_of_link(links, 'enterprise'),
-                     ('affiliates', (marketing_link("AFFILIATES"), _("Affiliates"))))
-        links.insert(_find_position_of_link(links, 'affiliates'),
-                     ('openedx', (_footer_openedx_link()["url"], _("Open edX"))))
-        links.insert(_find_position_of_link(links, 'openedx'),
-                     ('careers', (marketing_link("CAREERS"), _("Careers"))))
+        links.append(('affiliates', (marketing_link("AFFILIATES"), _("Affiliates"))))
+        links.append(('openedx', (_footer_openedx_link()["url"], _("Open edX"))))
+        links.append(('careers', (marketing_link("CAREERS"), _("Careers"))))
+        links.append(("news", (marketing_link("NEWS"), _("News"))))
 
     return [
         {
@@ -303,7 +300,6 @@ def _footer_more_info_links(language=settings.LANGUAGE_CODE):
         ("terms_of_service_and_honor_code", (marketing_link("TOS_AND_HONOR"), _("Terms of Service & Honor Code"))),
         ("privacy_policy", (marketing_link("PRIVACY"), _("Privacy Policy"))),
         ("accessibility_policy", (marketing_link("ACCESSIBILITY"), _("Accessibility Policy"))),
-        ("sitemap", (marketing_link("SITE_MAP"), _("Sitemap"))),
     ]
 
     # Backwards compatibility: If a combined "terms of service and honor code"
@@ -316,8 +312,8 @@ def _footer_more_info_links(language=settings.LANGUAGE_CODE):
         ])
 
     if language == settings.LANGUAGE_CODE:
-        position = _find_position_of_link(links, 'accessibility_policy')
-        links.insert(position, ("trademarks", (marketing_link("TRADEMARKS"), _("Trademark Policy"))))
+        links.append(("trademarks", (marketing_link("TRADEMARKS"), _("Trademark Policy"))))
+        links.append(("sitemap", (marketing_link("SITE_MAP"), _("Sitemap"))))
 
     return [
         {
