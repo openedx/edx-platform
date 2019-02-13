@@ -66,6 +66,10 @@ LMS_ENROLLMENT_API_PATH = "/api/enrollment/v1/"
 # This setting is used when a site does not define its own choices via site configuration
 MANUAL_ENROLLMENT_ROLE_CHOICES = ['Learner', 'Support', 'Partner']
 
+# List of logout URIs for each IDA that the learner should be logged out of when they logout of the LMS. Only applies to
+# IDA for which the social auth flow uses DOT (Django OAuth Toolkit).
+IDA_LOGOUT_URI_LIST = []
+
 # Features
 FEATURES = {
     'DISPLAY_DEBUG_INFO_TO_STAFF': True,

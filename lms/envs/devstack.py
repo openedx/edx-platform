@@ -24,6 +24,10 @@ HTTPS = 'off'
 LMS_ROOT_URL = "http://localhost:8000"
 LMS_INTERNAL_ROOT_URL = LMS_ROOT_URL
 ENTERPRISE_API_URL = LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/'
+IDA_LOGOUT_URI_LIST = [
+    'http://localhost:18130/logout/',  # ecommerce
+    'http://localhost:18150/logout/',  # credentials
+]
 
 ################################ LOGGERS ######################################
 
