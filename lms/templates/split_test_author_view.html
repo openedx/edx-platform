@@ -1,5 +1,6 @@
-<%page expression_filter="h"/>
-<%! from django.utils.translation import ugettext as _ %>
+<%! from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
+%>
 
 <%
 split_test = context.get('split_test')
@@ -12,8 +13,8 @@ show_link = group_configuration_url is not None
     <div class="xblock-message information">
         <p>
             <span class="message-text">
-                ${_("This content experiment uses group configuration '{group_configuration_name}'.").format(
-                    group_configuration_name="<a href='{}'>{}</a>".format(group_configuration_url, user_partition.name) if show_link else user_partition.name
+                ${Text(_("This content experiment uses group configuration '{group_configuration_name}'.")).format(
+                    group_configuration_name=HTML("<a href='{}'>{}</a>".format(group_configuration_url, user_partition.name)) if show_link else user_partition.name
                 )}
             </span>
         </p>
@@ -23,13 +24,13 @@ show_link = group_configuration_url is not None
 
 % if is_root:
     <div class="wrapper-groups is-active">
-        <h3 class="sr">${_("Active Groups")}</h3>
+        <h3 class="sr">${Text({}).format(_("Active Groups"))}</h3>
         ${active_groups_preview}
     </div>
 
     % if inactive_groups_preview:
         <div class="wrapper-groups is-inactive">
-            <h3 class="title">${_("Inactive Groups")}</h3>
+            <h3 class="title">${Text({}).format(_("Inactive Groups"))}</h3>
             ${inactive_groups_preview}
         </div>
     % endif

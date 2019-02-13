@@ -470,7 +470,8 @@ def send_mail_to_student(student, param_dict, language=None):
         'enrolled_unenroll': EnrolledUnenroll,
         'remove_beta_tester': RemoveBetaTester,
     }
-
+    # from pdb import set_trace
+    # set_trace()
     message_class = ace_emails_dict[message_type]
     message = message_class().personalize(
         recipient=Recipient(username='', email_address=student),

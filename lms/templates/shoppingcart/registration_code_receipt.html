@@ -1,5 +1,6 @@
 <%!
 from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
 from django.urls import reverse
 from six import text_type
 from openedx.core.lib.courses import course_image_url
@@ -28,9 +29,9 @@ from openedx.features.course_experience import course_home_url_name
       </div>
       <div class="enrollment-details">
         <div class="sub-title">
-          ${_("Confirm your enrollment for: {span_start}course dates{span_end}").format(
-              span_start='<span class="course-date-label">',
-              span_end='</span>'
+          ${Text(_("Confirm your enrollment for: {span_start}course dates{span_end}")).format(
+              span_start=HTML('<span class="course-date-label">'),
+              span_end=HTML('</span>')
             )}
           <div class="clearfix"></div>
         </div>
@@ -43,22 +44,22 @@ from openedx.features.course_experience import course_home_url_name
         <div>
           <p class="enrollment-text">
             % if reg_code_already_redeemed:
-              ${_("You've clicked a link for an enrollment code that has already been used."
+              ${Text(_("You've clicked a link for an enrollment code that has already been used."
               " Check your {link_start}course dashboard{link_end} to see if you're enrolled in the course,"
               " or contact your company's administrator."
-              ).format(
-                link_start=u'<a href="{url}">'.format(url=reverse('dashboard')),
-                link_end='</a>'
+              )).format(
+                link_start=HTML(u'<a href="{url}">'.format(url=reverse('dashboard'))),
+                link_end=HTML('</a>')
               )}
             % elif redemption_success:
               ${_("You have successfully enrolled in {course_name}."
               " This course has now been added to your dashboard.").format(course_name=course.display_name) | h}
             % elif registered_for_course:
-              ${_("You're already enrolled for this course."
+              ${Text(_("You're already enrolled for this course."
               " Visit your {link_start}dashboard{link_end} to see the course."
-              ).format(
-                link_start=u'<a href="{url}">'.format(url=reverse('dashboard')),
-                link_end='</a>'
+              )).format(
+                link_start=HTML(u'<a href="{url}">').format(url=reverse('dashboard')),
+                link_end=HTML('</a>')
               )}
             % elif course_full:
               ${_("The course you are enrolling for is full.")}

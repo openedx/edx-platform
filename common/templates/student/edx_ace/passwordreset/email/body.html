@@ -26,13 +26,13 @@
                 </p>
             {% else %}
                 <p style="color: rgba(0,0,0,.75);">
-                    {% trans "If you didn't request this change, you can disregard this email - we have not yet reset your password."as tmsg %}{{ tmsg | force_escape }}
+                    {% trans "If you didn't request this change, you can disregard this email - we have not yet reset your password." as tmsg %}{{ tmsg | force_escape }}
                     <br />
                 </p>
 
                 {% trans "Change my Password" as course_cta_text %}
 
-                {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text | force_escape course_cta_url=reset_link %}
+                {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text course_cta_url=reset_link %}
             {% endif %}
         </td>
     </tr>

@@ -40,7 +40,7 @@
                 {% filter force_escape %}
                 {% blocktrans asvar course_cta_text %}Visit {{ course_name }}{% endblocktrans %}
                 {%endfilter%}
-                {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text | force_escape course_cta_url=course_about_url %}
+                {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text course_cta_url=course_about_url %}
             {% else %}
                 <p style="color: rgba(0,0,0,.75);">
                     {% filter force_escape %}
@@ -51,7 +51,7 @@
                 {% filter force_escape %}
                 {% blocktrans asvar course_cta_text %}Visit {{ site_name }}{% endblocktrans %}
                 {% endfilter %}
-                {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text | force_escape course_cta_url=course_url %}
+                {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text course_cta_url=course_url %}
             {% endif %}
 
             <p style="color: rgba(0,0,0,.75);">

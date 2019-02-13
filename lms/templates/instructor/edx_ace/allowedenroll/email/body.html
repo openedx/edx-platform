@@ -38,7 +38,7 @@
             </p>
 
             {% trans "Finish Your Registration" as button_cta_text %}
-            {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=button_cta_text|force_escape course_cta_url=registration_url %}
+            {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=button_cta_text course_cta_url=registration_url %}
 
             <p style="color: rgba(0,0,0,.75);">
                 {% if auto_enroll %}

@@ -1,7 +1,7 @@
-<%page expression_filter="h"/>
 <%namespace name='static' file='/static_content.html'/>
 <%!
 from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import Text
 from django.template.defaultfilters import escapejs
 from six import text_type
 %>
@@ -24,11 +24,11 @@ ${block_content}
 %  endif
 %  if not disable_staff_debug_info:
 <div class="wrap-instructor-info">
-  <a class="instructor-info-action" href="#${element_id}_debug" rel="leanModal" id="${element_id}_trig">${_("Staff Debug Info")}</a>
+  <a class="instructor-info-action" href="#${element_id}_debug" rel="leanModal" id="${element_id}_trig">${Text("{}").format(_("Staff Debug Info<"))}</a>
 
   %  if settings.FEATURES.get('ENABLE_STUDENT_HISTORY_VIEW') and \
     location.block_type == 'problem':
-    <a class="instructor-info-action" href="#${element_id}_history" rel="leanModal" id="${element_id}_history_trig">${_("Submission history")}</a>
+    <a class="instructor-info-action" href="#${element_id}_history" rel="leanModal" id="${element_id}_history_trig">${Text("{}").format(_("Submission history"))}</a>
   %  endif
 </div>
 %  endif
@@ -36,17 +36,17 @@ ${block_content}
 <div aria-hidden="true" role="dialog" tabindex="-1" id="${element_id}_xqa-modal" class="modal xqa-modal">
   <div class="inner-wrapper">
     <header>
-      <h2>${_("{platform_name} Content Quality Assessment").format(platform_name=settings.PLATFORM_NAME)}</h2>
+      <h2>${Text(_("{platform_name} Content Quality Assessment")).format(platform_name=settings.PLATFORM_NAME)}</h2>
     </header>
 
     <form id="${element_id}_xqa_form" class="xqa_form">
-      <label for="${element_id}_xqa_entry">${_("Comment")}</label>
-      <input tabindex="0" id="${element_id}_xqa_entry" type="text" placeholder="${_('comment')}">
-      <label for="${element_id}_xqa_tag">${_("Tag")}</label>
+      <label for="${element_id}_xqa_entry">${Text("{}").format(_("Comment"))}</label>
+      <input tabindex="0" id="${element_id}_xqa_entry" type="text" placeholder="${Text('{}').format(_('comment'))}">
+      <label for="${element_id}_xqa_tag">${Text("{}").format(_("Tag"))}</label>
       <span style="color:black;vertical-align: -10pt">${_('Optional tag (eg "done" or "broken"):') + '&nbsp; '}      </span>
-      <input id="${element_id}_xqa_tag" type="text" placeholder="${_('tag')}" style="width:80px;display:inline">
+      <input id="${element_id}_xqa_tag" type="text" placeholder="${Text('{}').format(_('tag'))}" style="width:80px;display:inline">
       <div class="submit">
-        <button name="submit" type="submit">${_('Add comment')}</button>
+        <button name="submit" type="submit">${Text("{}").format(_('Add comment'))}</button>
       </div>
       <hr>
       <div id="${element_id}_xqa_log_data"></div>
@@ -58,19 +58,19 @@ ${block_content}
 <div aria-hidden="true" role="dialog" tabindex="-1" class="modal staff-modal" id="${element_id}_debug" >
   <div class="inner-wrapper">
     <header>
-      <h2>${_('Staff Debug:')} ${dict(fields)['display_name']}</h2>
+      <h2>${Text("{}").format(_('Staff Debug:'))} ${dict(fields)['display_name']}</h2>
     </header>
 
     <hr />
     <div class="staff_actions">
-      <h3>${_('Actions')}</h3>
+      <h3>${Text("{}").format(_('Actions'))}</h3>
       <div>
-        <label for="sd_fu_${location.block_id | h}">${_('Username')}:</label>
+        <label for="sd_fu_${location.block_id | h}">${Text("{}").format(_('Username'))}:</label>
         <input type="text" tabindex="0" id="sd_fu_${location.block_id | h}" placeholder="${user.username}"/>
       </div>
       % if can_override_problem_score:
       <div>
-        <label for="sd_fs_${location.block_id | h}">${_('Score (for override only)')}:</label>
+        <label for="sd_fs_${location.block_id | h}">${Text("{}").format(_('Score (for override only)'))}:</label>
         <input type="text" tabindex="0" id="sd_fs_${location.block_id | h}" placeholder="0"/>
         <label for="sd_fs_${location.block_id | h}"> / ${max_problem_score}</label>
       </div>
@@ -78,19 +78,19 @@ ${block_content}
       <div data-location="${location | h}" data-location-name="${location.block_id | h}">
         [
         % if can_reset_attempts:
-        <button type="button" class="btn-link staff-debug-reset">${_('Reset Learner\'s Attempts to Zero')}</button>
+        <button type="button" class="btn-link staff-debug-reset">${Text("{}").format(_('Reset Learner\'s Attempts to Zero'))}</button>
         |
         % endif
-        <button type="button" class="btn-link staff-debug-sdelete">${_('Delete Learner\'s State')}</button>
+        <button type="button" class="btn-link staff-debug-sdelete">${Text("{}").format(_('Delete Learner\'s State'))}</button>
         % if can_rescore_problem:
         |
-        <button type="button" class="btn-link staff-debug-rescore">${_('Rescore Learner\'s Submission')}</button>
+        <button type="button" class="btn-link staff-debug-rescore">${Text("{}").format(_('Rescore Learner\'s Submission'))}</button>
         |
-        <button type="button" class="btn-link staff-debug-rescore-if-higher">${_('Rescore Only If Score Improves')}</button>
+        <button type="button" class="btn-link staff-debug-rescore-if-higher">${Text("{}").format(_('Rescore Only If Score Improves'))}</button>
         |
         % endif
         % if can_override_problem_score:
-        <button type="button" class="btn-link staff-debug-override-score">${_('Override Score')}</button>
+        <button type="button" class="btn-link staff-debug-override-score">${Text("{}").format(_('Override Score'))}</button>
         % endif
         ]
       </div>
@@ -102,7 +102,7 @@ ${block_content}
       location = ${text_type(location) | h}
 
       <table summary="${_('Module Fields')}">
-        <tr><th>${_('Module Fields')}</th></tr>
+        <tr><th>${Text("{}").format(_('Module Fields'))}</th></tr>
         %for name, field in fields:
         <tr><td style="width:25%">${name}</td><td><pre style="display:inline-block; margin: 0;">${field | h}</pre></td></tr>
         %endfor
@@ -124,14 +124,14 @@ ${block_content}
 <div aria-hidden="true" role="dialog" tabindex="-1" class="modal history-modal" id="${element_id}_history">
   <div class="inner-wrapper">
     <header>
-      <h2>${_("Submission History Viewer")}</h2>
+      <h2>${Text("{}").format(_("Submission History Viewer"))}</h2>
     </header>
     <form id="${element_id}_history_form">
-      <label for="${element_id}_history_student_username">${_("User:")}</label>
+      <label for="${element_id}_history_student_username">${Text("{}").format(_("User:"))}</label>
       <input tabindex="0" id="${element_id}_history_student_username" type="text" placeholder=""/>
       <input type="hidden" id="${element_id}_history_location" value="${location | h}"/>
       <div class="submit">
-        <button name="submit" type="submit">${_("View History")}</button>
+        <button name="submit" type="submit">${Text("{}").format(_("View History"))}</button>
       </div>
     </form>
 
