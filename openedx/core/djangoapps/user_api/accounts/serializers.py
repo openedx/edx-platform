@@ -24,8 +24,8 @@ from openedx.core.djangoapps.user_api.serializers import ReadOnlyFieldsSerialize
 from student.models import UserProfile, LanguageProficiency, SocialLink
 
 from . import (
-    NAME_MIN_LENGTH, ACCOUNT_VISIBILITY_PREF_KEY, PRIVATE_VISIBILITY,
-    ALL_USERS_VISIBILITY,
+    NAME_MIN_LENGTH, ACCOUNT_VISIBILITY_PREF_KEY, PRIVATE_VISIBILITY, CUSTOM_VISIBILITY,
+    ALL_USERS_VISIBILITY, VISIBILITY_PREFIX
 )
 from .image_helpers import get_profile_image_urls_for_user
 from .utils import validate_social_link, format_social_link
@@ -467,37 +467,53 @@ def get_extended_profile(user_profile):
     return extended_profile
 
 
-def get_profile_visibility(user_profile, user, configuration=None):
+def get_profile_visibility(user_profile, user, configuration):
     """
     Returns the visibility level for the specified user profile.
     """
     if user_profile.requires_parental_consent():
         return PRIVATE_VISIBILITY
 
-    if not configuration:
-        configuration = settings.ACCOUNT_VISIBILITY_CONFIGURATION
-
     # Calling UserPreference directly because the requesting user may be different from existing_user
     # (and does not have to be is_staff).
     profile_privacy = UserPreference.get_value(user, ACCOUNT_VISIBILITY_PREF_KEY)
-    return profile_privacy if profile_privacy else configuration.get('default_visibility')
+    if profile_privacy:
+        return profile_privacy
+    else:
+        return configuration.get('default_visibility')
 
 
 def _visible_fields(user_profile, user, configuration=None):
     """
-    Return what fields should be visible based on user settings
+    Return what fields should be visible based on user's preferences
 
     :param user_profile: User profile object
     :param user: User object
     :param configuration: A visibility configuration dictionary.
     :return: whitelist List of fields to be shown
     """
-
     if not configuration:
         configuration = settings.ACCOUNT_VISIBILITY_CONFIGURATION
 
     profile_visibility = get_profile_visibility(user_profile, user, configuration)
     if profile_visibility == ALL_USERS_VISIBILITY:
         return configuration.get('shareable_fields')
+
+    elif profile_visibility == CUSTOM_VISIBILITY:
+        return _visible_fields_from_custom_preferences(user, configuration)
+
     else:
         return configuration.get('public_fields')
+
+
+def _visible_fields_from_custom_preferences(user, configuration):
+    """
+    Returns all fields that are marked to be shared with other users in the
+    given user's preferences. Includes fields that are always public.
+    """
+    preferences = UserPreference.get_all_preferences(user)
+    fields_shared_with_all_users = [
+        field_name for field_name in configuration.get('shareable_fields')
+        if preferences.get('{}{}'.format(VISIBILITY_PREFIX, field_name)) == 'all_users'
+    ]
+    return set(fields_shared_with_all_users + configuration.get('public_fields'))
