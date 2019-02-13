@@ -2385,28 +2385,28 @@ SOCIAL_MEDIA_FOOTER_DISPLAY = {
         # translate this the way that Facebook advertises in your language.
         "title": _("Facebook"),
         "icon": "fa-facebook-square",
-        "action": _("Like {platform_name} on Facebook")
+        "action": _(u"Like {platform_name} on Facebook")
     },
     "twitter": {
         # Translators: This is the website name of www.twitter.com.  Please
         # translate this the way that Twitter advertises in your language.
         "title": _("Twitter"),
         "icon": "fa-twitter-square",
-        "action": _("Follow {platform_name} on Twitter")
+        "action": _(u"Follow {platform_name} on Twitter")
     },
     "linkedin": {
         # Translators: This is the website name of www.linkedin.com.  Please
         # translate this the way that LinkedIn advertises in your language.
         "title": _("LinkedIn"),
         "icon": "fa-linkedin-square",
-        "action": _("Follow {platform_name} on LinkedIn")
+        "action": _(u"Follow {platform_name} on LinkedIn")
     },
     "google_plus": {
         # Translators: This is the website name of plus.google.com.  Please
         # translate this the way that Google+ advertises in your language.
         "title": _("Google+"),
         "icon": "fa-google-plus-square",
-        "action": _("Follow {platform_name} on Google+")
+        "action": _(u"Follow {platform_name} on Google+")
     },
     "tumblr": {
         # Translators: This is the website name of www.tumblr.com.  Please
@@ -2425,7 +2425,7 @@ SOCIAL_MEDIA_FOOTER_DISPLAY = {
         # translate this the way that Reddit advertises in your language.
         "title": _("Reddit"),
         "icon": "fa-reddit-square",
-        "action": _("Subscribe to the {platform_name} subreddit"),
+        "action": _(u"Subscribe to the {platform_name} subreddit"),
     },
     "vk": {
         # Translators: This is the website name of https://vk.com.  Please
@@ -2444,7 +2444,7 @@ SOCIAL_MEDIA_FOOTER_DISPLAY = {
         # translate this the way that YouTube advertises in your language.
         "title": _("Youtube"),
         "icon": "fa-youtube-square",
-        "action": _("Subscribe to the {platform_name} YouTube channel")
+        "action": _(u"Subscribe to the {platform_name} YouTube channel")
     }
 }
 
@@ -3321,11 +3321,11 @@ ENTERPRISE_CUSTOMER_LOGO_IMAGE_SIZE = 512   # Enterprise logo image size limit i
 
 ENTERPRISE_PLATFORM_WELCOME_TEMPLATE = _(u'Welcome to {platform_name}.')
 ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE = _(
-    'You have left the {start_bold}{enterprise_name}{end_bold} website and are now on the {platform_name} site. '
-    '{enterprise_name} has partnered with {platform_name} to offer you high-quality, always available learning '
-    'programs to help you advance your knowledge and career. '
-    '{line_break}Please note that {platform_name} has a different {privacy_policy_link_start}Privacy Policy'
-    '{privacy_policy_link_end} from {enterprise_name}.'
+    u'You have left the {start_bold}{enterprise_name}{end_bold} website and are now on the {platform_name} site. '
+    u'{enterprise_name} has partnered with {platform_name} to offer you high-quality, always available learning '
+    u'programs to help you advance your knowledge and career. '
+    u'{line_break}Please note that {platform_name} has a different {privacy_policy_link_start}Privacy Policy'
+    u'{privacy_policy_link_end} from {enterprise_name}.'
 )
 ENTERPRISE_TAGLINE = ''
 ENTERPRISE_EXCLUDED_REGISTRATION_FIELDS = {

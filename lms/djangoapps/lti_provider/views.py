@@ -76,7 +76,7 @@ def lti_launch(request, course_id, usage_id):
         course_key, usage_key = parse_course_and_usage_keys(course_id, usage_id)
     except InvalidKeyError:
         log.error(
-            'Invalid course key %s or usage key %s from request %s',
+            u'Invalid course key %s or usage key %s from request %s',
             course_id,
             usage_id,
             request

@@ -45,9 +45,9 @@ class TestDashboard(SharedModuleStoreTestCase):
                 "max_team_size": 10,
                 "topics": [
                     {
-                        "name": "Topic {}".format(topic_id),
+                        "name": u"Topic {}".format(topic_id),
                         "id": topic_id,
-                        "description": "Description for topic {}".format(topic_id)
+                        "description": u"Description for topic {}".format(topic_id)
                     }
                     for topic_id in range(cls.NUM_TOPICS)
                 ]
@@ -177,19 +177,17 @@ class TestDashboard(SharedModuleStoreTestCase):
         # Check that initially list of user teams in course one is empty
         course_one_teams_url = reverse('teams_dashboard', args=[self.course.id])
         response = self.client.get(course_one_teams_url)
-        self.assertIn('"teams": {"count": 0', response.content)
-
+        self.assertIn('"teams": {"count": 0', response.content)  # pylint: disable=unicode-format-string
         # Add user to a course one team
         course_one_team.add_user(self.user)
 
         # Check that list of user teams in course one is not empty, it is one now
         response = self.client.get(course_one_teams_url)
-        self.assertIn('"teams": {"count": 1', response.content)
-
+        self.assertIn('"teams": {"count": 1', response.content)  # pylint: disable=unicode-format-string
         # Check that list of user teams in course two is still empty
         course_two_teams_url = reverse('teams_dashboard', args=[course_two.id])
         response = self.client.get(course_two_teams_url)
-        self.assertIn('"teams": {"count": 0', response.content)
+        self.assertIn('"teams": {"count": 0', response.content)  # pylint: disable=unicode-format-string
 
 
 class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
@@ -207,7 +205,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
                     {
                         'id': 'topic_{}'.format(i),
                         'name': name,
-                        'description': 'Description for topic {}.'.format(i)
+                        'description': u'Description for topic {}.'.format(i)
                     } for i, name in enumerate([u'Sólar power', 'Wind Power', 'Nuclear Power', 'Coal Power'])
                 ]
             }
@@ -405,10 +403,10 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
         self.assertEqual(
             expected_status,
             response.status_code,
-            msg="Expected status {expected} but got {actual}: {content}".format(
+            msg=u"Expected status {expected} but got {actual}: {content}".format(
                 expected=expected_status,
                 actual=response.status_code,
-                content=response.content,
+                content=response.content.decode(response.charset),
             )
         )
 

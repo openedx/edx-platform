@@ -36,7 +36,7 @@ def load_serialized_data(response, key):
     """
     Extract and deserialize serialized data from the response.
     """
-    pattern = re.compile(r'{key}: (?P<data>\[.*\])'.format(key=key))
+    pattern = re.compile(ur'{key}: (?P<data>\[.*\])'.format(key=key))
     match = pattern.search(response.content)
     serialized = match.group('data')
 
@@ -213,7 +213,7 @@ class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, Shared
         self.assertContains(response, 'programData')
         self.assertContains(response, 'urls')
         self.assertContains(response,
-                            '"program_record_url": "{}/records/programs/'.format(CREDENTIALS_PUBLIC_SERVICE_URL))
+                            u'"program_record_url": "{}/records/programs/'.format(CREDENTIALS_PUBLIC_SERVICE_URL))
         self.assertContains(response, 'program_listing_url')
         self.assertContains(response, self.program_data['title'])
         self.assert_programs_tab_present(response)

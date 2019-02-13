@@ -87,14 +87,14 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         """
         Returns expected dashboard enrollment message with link to Insights.
         """
-        return 'Enrollment data is now available in <a href="http://example.com/courses/{}" ' \
+        return u'Enrollment data is now available in <a href="http://example.com/courses/{}" ' \
                'target="_blank">Example</a>.'.format(text_type(self.course.id))
 
     def get_dashboard_analytics_message(self):
         """
         Returns expected dashboard demographic message with link to Insights.
         """
-        return 'For analytics about your course, go to <a href="http://example.com/courses/{}" ' \
+        return u'For analytics about your course, go to <a href="http://example.com/courses/{}" ' \
                'target="_blank">Example</a>.'.format(text_type(self.course.id))
 
     def test_instructor_tab(self):
@@ -319,7 +319,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         self.assertIn('<th scope="row">Professional</th>', response.content)
 
         # dashboard link hidden
-        self.assertNotIn(self.get_dashboard_enrollment_message(), response.content)
+        self.assertNotIn(self.get_dashboard_enrollment_message(), response.content.decode(response.charset))
 
     @patch.dict(settings.FEATURES, {'DISPLAY_ANALYTICS_ENROLLMENTS': True})
     @override_settings(ANALYTICS_DASHBOARD_URL='')
@@ -352,7 +352,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
 
         # link to dashboard shown
         expected_message = self.get_dashboard_enrollment_message()
-        self.assertIn(expected_message, response.content)
+        self.assertIn(expected_message, response.content.decode(response.charset))
 
     @override_settings(ANALYTICS_DASHBOARD_URL='')
     @override_settings(ANALYTICS_DASHBOARD_NAME='')
@@ -376,7 +376,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
 
         # link to dashboard shown
         expected_message = self.get_dashboard_analytics_message()
-        self.assertIn(expected_message, response.content)
+        self.assertIn(expected_message, response.content.decode(response.charset))
 
     def add_course_to_user_cart(self, cart, course_key):
         """
@@ -573,7 +573,7 @@ class TestInstructorDashboardPerformance(ModuleStoreTestCase, LoginEnrollmentTes
             problem = ItemFactory.create(
                 category="problem",
                 parent=vertical,
-                display_name="A Problem Block %d" % i,
+                display_name=u"A Problem Block %d" % i,
                 weight=1,
                 publish_item=False,
                 metadata={'rerandomize': 'always'},

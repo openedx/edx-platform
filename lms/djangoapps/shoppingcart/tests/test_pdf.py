@@ -58,7 +58,7 @@ class TestPdfFile(unittest.TestCase):
         return the dictionary with the dummy data
         """
         return {
-            'item_description': 'Course %s Description' % index,
+            'item_description': u'Course %s Description' % index,
             'quantity': index,
             'list_price': 10,
             'discount': discount,

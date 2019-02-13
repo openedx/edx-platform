@@ -184,7 +184,7 @@ class XmlHandlingTest(TestCase):
     methods in outcomes.py
     """
 
-    response_xml = """
+    response_xml = u"""
         <imsx_POXEnvelopeResponse xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
           <imsx_POXHeader>
             <imsx_POXResponseHeaderInfo>

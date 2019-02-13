@@ -379,7 +379,7 @@ if "TRACKING_IGNORE_URL_PATTERNS" in ENV_TOKENS:
 SSL_AUTH_EMAIL_DOMAIN = ENV_TOKENS.get("SSL_AUTH_EMAIL_DOMAIN", "MIT.EDU")
 SSL_AUTH_DN_FORMAT_STRING = ENV_TOKENS.get(
     "SSL_AUTH_DN_FORMAT_STRING",
-    "/C=US/ST=Massachusetts/O=Massachusetts Institute of Technology/OU=Client CA v1/CN={0}/emailAddress={1}"
+    u"/C=US/ST=Massachusetts/O=Massachusetts Institute of Technology/OU=Client CA v1/CN={0}/emailAddress={1}"
 )
 
 # Django CAS external authentication settings

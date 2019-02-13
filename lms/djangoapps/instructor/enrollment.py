@@ -44,6 +44,7 @@ from student.models import (
     anonymous_id_for_user,
     is_email_retired,
 )
+from openedx.core.djangolib.markup import Text
 from submissions import api as sub_api  # installed from the edx-submissions repository
 from submissions.models import score_set
 from track.event_transaction_utils import (
@@ -223,7 +224,7 @@ def send_beta_role_email(action, user, email_params):
         email_params['email_address'] = user.email
         email_params['full_name'] = user.profile.name
     else:
-        raise ValueError("Unexpected action received '{}' - expected 'add' or 'remove'".format(action))
+        raise ValueError(u"Unexpected action received '{}' - expected 'add' or 'remove'".format(action))
     trying_to_add_inactive_user = not user.is_active and action == 'add'
     if not trying_to_add_inactive_user:
         send_mail_to_student(user.email, email_params, language=get_user_email_language(user))
@@ -274,7 +275,7 @@ def reset_student_attempts(course_id, student, module_state_key, requesting_user
                 submission_cleared = True
     except ItemNotFoundError:
         block = None
-        log.warning("Could not find %s in modulestore when attempting to reset attempts.", module_state_key)
+        log.warning(u"Could not find %s in modulestore when attempting to reset attempts.", module_state_key)
 
     # Reset the student's score in the submissions API, if xblock.clear_student_state has not done so already.
     # We need to do this before retrieving the `StudentModule` model, because a score may exist with no student module.
@@ -375,7 +376,7 @@ def get_email_params(course, auto_enroll, secure=True, course_key=None, display_
 
     protocol = 'https' if secure else 'http'
     course_key = course_key or text_type(course.id)
-    display_name = display_name or course.display_name_with_default_escaped
+    display_name = display_name or Text(course.display_name_with_default)
 
     stripped_site_name = configuration_helpers.get_value(
         'SITE_NAME',
@@ -449,7 +450,7 @@ def send_mail_to_student(student, param_dict, language=None):
     if 'display_name' in param_dict:
         param_dict['course_name'] = param_dict['display_name']
     elif 'course' in param_dict:
-        param_dict['course_name'] = param_dict['course'].display_name_with_default
+        param_dict['course_name'] = Text(param_dict['course'].display_name_with_default)
 
     param_dict['site_name'] = configuration_helpers.get_value(
         'SITE_NAME',
