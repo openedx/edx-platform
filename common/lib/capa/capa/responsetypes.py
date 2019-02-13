@@ -658,6 +658,7 @@ class ChoiceResponse(LoncapaResponse):
     choices must be given names. This behavior seems like a leaky abstraction,
     and it'd be nice to change this at some point.
 
+    TODO: add shuffling to Choice/Checkboxes response type.
     """
     human_name = _('Checkboxes')
     tags = ['choiceresponse']
