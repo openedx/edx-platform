@@ -9,7 +9,6 @@ from unittest import skip
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.common.logout import LogoutPage
 from common.test.acceptance.pages.lms.account_settings import AccountSettingsPage
-from common.test.acceptance.pages.lms.dashboard import DashboardPage
 from common.test.acceptance.pages.lms.learner_profile import LearnerProfilePage
 from common.test.acceptance.tests.helpers import AcceptanceTest, EventsTestMixin
 
@@ -267,25 +266,6 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, AcceptanceTest):
         self.browser.refresh()
         profile_page.wait_for_page()
         self.verify_profile_page_is_private(profile_page)
-
-    def test_dashboard_learner_profile_link(self):
-        """
-        Scenario: Verify that my profile link is present on dashboard page and we can navigate to correct page.
-
-        Given that I am a registered user.
-        When I go to Dashboard page.
-        And I click on username dropdown.
-        Then I see Profile link in the dropdown menu.
-        When I click on Profile link.
-        Then I will be navigated to Profile page.
-        """
-        username, __ = self.log_in_as_unique_user()
-        dashboard_page = DashboardPage(self.browser)
-        dashboard_page.visit()
-        self.assertIn('Profile', dashboard_page.tabs_link_text)
-        dashboard_page.click_my_profile_link()
-        my_profile_page = LearnerProfilePage(self.browser, username)
-        my_profile_page.wait_for_page()
 
     def test_fields_on_my_private_profile(self):
         """
