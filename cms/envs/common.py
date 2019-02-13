@@ -623,6 +623,10 @@ ELASTIC_SEARCH_CONFIG = [
     }
 ]
 
+# List of logout URIs for each IDA that the learner should be logged out of when they logout of
+# Studio. Only applies to IDA for which the social auth flow uses DOT (Django OAuth Toolkit).
+IDA_LOGOUT_URI_LIST = []
+
 # These are standard regexes for pulling out info like course_ids, usage_ids, etc.
 # They are used so that URLs with deprecated-format strings still work.
 from lms.envs.common import (
