@@ -14,3 +14,6 @@ SHOW_PROFILE_MESSAGE = WaffleFlag(WAFFLE_FLAG_NAMESPACE, 'show_message')
 
 # Waffle flag to show achievements on the learner profile.
 SHOW_ACHIEVEMENTS_FLAG = WaffleFlag(WAFFLE_FLAG_NAMESPACE, 'show_achievements', flag_undefined_default=True)
+
+# Waffle flag to redirect to another learner profile experience.
+REDIRECT_TO_PROFILE_MICROFRONTEND = WaffleFlag(WAFFLE_FLAG_NAMESPACE, 'redirect_to_microfrontend')

@@ -2452,6 +2452,11 @@ MOBILE_STORE_URLS = {
     'google': '#'
 }
 
+################# Learner Profile ##################
+
+# TODO (DEPR-TODO)
+PROFILE_MICROFRONTEND_URL_BASE = "http://localhost:18000/profile-spa/"
+
 ################# Student Verification #################
 VERIFY_STUDENT = {
     "DAYS_GOOD_FOR": 365,  # How many days is a verficiation good for?
