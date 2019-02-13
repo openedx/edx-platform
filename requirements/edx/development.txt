@@ -8,7 +8,6 @@
 -e common/lib/calc
 -e common/lib/capa
 -e common/lib/chem
--e git+https://github.com/doctoryes/code_block_timer.git@f3d0629f086bcc649c3c77f4bc5b9c2c8172c3bf#egg=code_block_timer
 -e git+https://github.com/edx/codejail.git@a320d43ce6b9c93b17636b2491f724d9e433be47#egg=codejail
 git+https://github.com/solashirai/crowdsourcehinter.git@518605f0a95190949fe77bd39158450639e2e1dc#egg=crowdsourcehinter-xblock==0.1
 git+https://github.com/mitodl/django-cas.git@afac57bc523f145ae826f4ed3d4fa8b2c86c5364#egg=django-cas==2.1.1
