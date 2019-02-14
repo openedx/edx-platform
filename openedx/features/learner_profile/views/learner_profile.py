@@ -48,7 +48,7 @@ def learner_profile(request, username):
         GET /account/profile
     """
     if REDIRECT_TO_PROFILE_MICROFRONTEND.is_enabled():
-        profile_microfrontend_url = "{}{}".format(settings.PROFILE_MICROFRONTEND_URL_BASE, username)
+        profile_microfrontend_url = "{}{}".format(settings.PROFILE_MICROFRONTEND_URL, username)
         return redirect(profile_microfrontend_url)
 
     try:

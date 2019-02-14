@@ -116,12 +116,12 @@ class LearnerProfileViewTest(UrlResetMixin, ModuleStoreTestCase):
             self.assertIn(attribute, response.content)
 
     def test_redirect_view(self):
-        profile_url_base = "http://profile-spa/"
-        with override_settings(PROFILE_MICROFRONTEND_URL_BASE=profile_url_base):
+        profile_url = "http://profile-spa/abc/"
+        with override_settings(PROFILE_MICROFRONTEND_URL=profile_url):
             with override_waffle_flag(REDIRECT_TO_PROFILE_MICROFRONTEND, active=True):
                 profile_path = reverse('learner_profile', kwargs={'username': self.USERNAME})
                 response = self.client.get(path=profile_path)
-                self.assertRedirects(response, profile_url_base + self.USERNAME, target_status_code=404)
+                self.assertRedirects(response, profile_url + self.USERNAME, target_status_code=404)
 
     def test_records_link(self):
         profile_path = reverse('learner_profile', kwargs={'username': self.USERNAME})

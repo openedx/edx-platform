@@ -2452,11 +2452,6 @@ MOBILE_STORE_URLS = {
     'google': '#'
 }
 
-################# Learner Profile ##################
-
-# TODO (DEPR-TODO)
-PROFILE_MICROFRONTEND_URL_BASE = "http://localhost:18000/profile-spa/"
-
 ################# Student Verification #################
 VERIFY_STUDENT = {
     "DAYS_GOOD_FOR": 365,  # How many days is a verficiation good for?
@@ -3460,10 +3455,16 @@ RETIREMENT_STATES = [
     'COMPLETE',
 ]
 
-############## Settings for Writable Gradebook  #########################
+############## Settings for Microfrontends  #########################
 # If running a Gradebook container locally,
 # modify lms/envs/private.py to give it a non-null value
 WRITABLE_GRADEBOOK_URL = None
+
+# TODO (DEPR-17)
+# This URL value is needed to redirect the old profile page to a new
+# micro-frontend based implementation. Once the old implementation is
+# completely removed and this redirect is no longer needed, we can remove this.
+PROFILE_MICROFRONTEND_URL = "http://some.profile.spa/u/"
 
 ############### Settings for django-fernet-fields ##################
 FERNET_KEYS = [

@@ -307,9 +307,6 @@ ACTIVATION_EMAIL_SUPPORT_LINK = ENV_TOKENS.get(
 # Mobile store URL overrides
 MOBILE_STORE_URLS = ENV_TOKENS.get('MOBILE_STORE_URLS', MOBILE_STORE_URLS)
 
-# Learner Profile URL overrides
-PROFILE_MICROFRONTEND_URL_BASE = ENV_TOKENS.get('PROFILE_MICROFRONTEND_URL_BASE', PROFILE_MICROFRONTEND_URL_BASE)
-
 # Timezone overrides
 TIME_ZONE = ENV_TOKENS.get('CELERY_TIMEZONE', CELERY_TIMEZONE)
 
@@ -1101,8 +1098,9 @@ RETIREMENT_STATES = ENV_TOKENS.get('RETIREMENT_STATES', RETIREMENT_STATES)
 ############## Settings for Course Enrollment Modes ######################
 COURSE_ENROLLMENT_MODES = ENV_TOKENS.get('COURSE_ENROLLMENT_MODES', COURSE_ENROLLMENT_MODES)
 
-############## Settings for Writable Gradebook  #########################
+############## Settings for Microfrontend URLS  #########################
 WRITABLE_GRADEBOOK_URL = ENV_TOKENS.get('WRITABLE_GRADEBOOK_URL', WRITABLE_GRADEBOOK_URL)
+PROFILE_MICROFRONTEND_URL = ENV_TOKENS.get('PROFILE_MICROFRONTEND_URL', PROFILE_MICROFRONTEND_URL)
 
 ############################### Plugin Settings ###############################
 
