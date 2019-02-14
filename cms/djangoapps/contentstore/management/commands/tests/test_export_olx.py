@@ -2,20 +2,20 @@
 Tests for exporting OLX content.
 """
 
-import ddt
-from path import Path as path
 import shutil
-from StringIO import StringIO
 import tarfile
-from tempfile import mkdtemp
 import unittest
+from StringIO import StringIO
+from tempfile import mkdtemp
 
+import ddt
 from django.core.management import CommandError, call_command
+from path import Path as path
 
-from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class TestArgParsingCourseExportOlx(unittest.TestCase):
