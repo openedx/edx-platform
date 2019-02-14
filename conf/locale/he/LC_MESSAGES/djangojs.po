@@ -72,8 +72,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-02-03 20:42+0000\n"
-"PO-Revision-Date: 2019-01-16 20:19+0000\n"
+"POT-Creation-Date: 2019-02-10 20:42+0000\n"
+"PO-Revision-Date: 2019-02-10 20:45+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)\n"
 "Language: he\n"
@@ -4693,11 +4693,13 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Recovery Address"
+msgid "Recovery Email Address"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid "You may access your account when single-sign on is not available."
+msgid ""
+"You may access your account with this address if single-sign on or access to"
+" your primary email is not available."
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -4927,6 +4929,18 @@ msgstr "פרטי חשבון"
 #: lms/static/js/student_account/views/account_settings_view.js
 msgid "Order History"
 msgstr "היסטוריית הזמנות"
+
+#: lms/static/js/student_account/views/account_settings_view.js
+msgid ""
+"You have set your language to {beta_language}, which is currently not fully "
+"translated. You can help us translate this language fully by joining the "
+"Transifex community and adding translations from English for learners that "
+"speak {beta_language}."
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_view.js
+msgid "Help Translate into {beta_language}"
+msgstr ""
 
 #: lms/static/js/verify_student/views/image_input_view.js
 msgid "Image Upload Error"
@@ -7500,8 +7514,8 @@ msgid "Mark Exam As Completed"
 msgstr "סמן מבחן כהושלם"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
-msgid "timed"
-msgstr "מתוזמן"
+msgid "a timed exam"
+msgstr ""
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "The timer on the right shows the time remaining in the exam."
@@ -8228,6 +8242,10 @@ msgid "Reset Password"
 msgstr "איפוס סיסמה"
 
 #: lms/templates/student_account/account_settings.underscore
+msgid "Switch Language Back"
+msgstr ""
+
+#: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
 msgstr "הגדרות חשבון"
 
@@ -8351,8 +8369,8 @@ msgstr "עזרה עם סיסמה"
 
 #: lms/templates/student_account/password_reset.underscore
 msgid ""
-"Please enter your registration or recovery email address below and we will "
-"send you an email with instructions."
+"Please enter your log-in or recovery email address below and we will send "
+"you an email with instructions."
 msgstr ""
 
 #: lms/templates/student_account/password_reset.underscore
@@ -9483,6 +9501,10 @@ msgid "Ungraded"
 msgstr "ללא ציון"
 
 #: cms/templates/js/course-outline.underscore
+msgid "Onboarding Exam"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
 msgid "Practice proctored Exam"
 msgstr "מבחן תרגול תחת פיקוח"
 
@@ -10365,6 +10387,18 @@ msgid ""
 msgstr ""
 "מבחנים תחת פיקוח מתוזמנים ומקליטים בוידאו כל תלמיד שנבחן. לאחר מכן, נסקרים "
 "סרטוני הווידאו על מנת להבטיח שהתלמידים יצייתו לכל כללי המבחן."
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "Onboarding"
+msgstr ""
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"Use Onboarding to introduce learners to proctoring, verify their identity, "
+"and create an onboarding profile. Learners must complete the onboarding "
+"profile step prior to taking a proctored exam. Profile reviews take 2+ "
+"business days."
+msgstr ""
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Practice Proctored"

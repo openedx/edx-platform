@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-02-10 20:37+0000\n"
-"PO-Revision-Date: 2019-02-10 20:37:29.682667\n"
+"POT-Creation-Date: 2019-02-14 19:50+0000\n"
+"PO-Revision-Date: 2019-02-14 19:50:19.005272\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -5343,10 +5343,6 @@ msgstr "شزخعف"
 msgid "{platform_name} for Business"
 msgstr "{platform_name} بخق زعسهرثسس"
 
-#: lms/djangoapps/branding/api.py themes/red-theme/lms/templates/footer.html
-msgid "News"
-msgstr "رثصس"
-
 #: lms/djangoapps/branding/api.py lms/templates/static_templates/contact.html
 #: themes/red-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/footer.html
@@ -5359,6 +5355,10 @@ msgstr "ذخرفشذف"
 #: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "Careers"
 msgstr "ذشقثثقس"
+
+#: lms/djangoapps/branding/api.py themes/red-theme/lms/templates/footer.html
+msgid "News"
+msgstr "رثصس"
 
 #: lms/djangoapps/branding/api.py lms/djangoapps/certificates/views/webview.py
 #: themes/edx.org/lms/templates/certificates/_accomplishment-footer.html
@@ -5382,10 +5382,6 @@ msgstr "حقهدشذغ حخمهذغ"
 msgid "Accessibility Policy"
 msgstr "شذذثسسهزهمهفغ حخمهذغ"
 
-#: lms/djangoapps/branding/api.py
-msgid "Sitemap"
-msgstr "سهفثوشح"
-
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This is a legal document users must agree to
 #. in order to register a new account.
@@ -5396,6 +5392,10 @@ msgstr "سهفثوشح"
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Terms of Service"
 msgstr "فثقوس خب سثقدهذث"
+
+#: lms/djangoapps/branding/api.py
+msgid "Sitemap"
+msgstr "سهفثوشح"
 
 #: lms/djangoapps/branding/api.py
 msgid "Affiliates"
@@ -9859,7 +9859,6 @@ msgstr ""
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: cms/templates/videos_index_pagination.html
-#: lms/templates/bulk_email/unsubscribe.html
 msgid "Cancel"
 msgstr "ذشرذثم"
 
@@ -10424,10 +10423,6 @@ msgstr "يخصرمخشي فاث شريقخهي شحح خر فاث لخخلمث �
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "Our mailing address is"
 msgstr "خعق وشهمهرل شييقثسس هس"
-
-#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
-msgid "Unsubscribe from these emails."
-msgstr "عرسعزسذقهزث بقخو فاثسث ثوشهمس."
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_head.html
 msgid "edX Email"
@@ -15700,34 +15695,6 @@ msgstr "ذشفشمخل سثشقذا"
 msgid "Enter a username to view catalogs belonging to that user."
 msgstr "ثرفثق ش عسثقرشوث فخ دهثص ذشفشمخلس زثمخرلهرل فخ فاشف عسثق."
 
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Unsubscribe Successful"
-msgstr "عرسعزسذقهزث سعذذثسسبعم"
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Unsubscribe Cancelled"
-msgstr "عرسعزسذقهزث ذشرذثممثي"
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Confirm Unsubscribe"
-msgstr "ذخربهقو عرسعزسذقهزث"
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "You have been unsubscribed from emails for {course}."
-msgstr "غخع اشدث زثثر عرسعزسذقهزثي بقخو ثوشهمس بخق {course}."
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "You have not been unsubscribed from emails for {course}."
-msgstr "غخع اشدث رخف زثثر عرسعزسذقهزثي بقخو ثوشهمس بخق {course}."
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Do you want to unsubscribe from emails for {course}?"
-msgstr "يخ غخع صشرف فخ عرسعزسذقهزث بقخو ثوشهمس بخق {course}?"
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Unsubscribe"
-msgstr "عرسعزسذقهزث"
-
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Open Calculator"
 msgstr "خحثر ذشمذعمشفخق"
@@ -18541,14 +18508,6 @@ msgid "Journals"
 msgstr "تخعقرشمس"
 
 #: lms/templates/header/navbar-authenticated.html
-#: lms/templates/header/user_dropdown.html
-#: lms/templates/navigation/navbar-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Profile"
-msgstr "حقخبهمث"
-
-#: lms/templates/header/navbar-authenticated.html
 msgid "Discover New"
 msgstr "يهسذخدثق رثص"
 
@@ -18585,6 +18544,10 @@ msgstr "سذاخخمس"
 #: lms/templates/header/user_dropdown.html
 msgid "Resume your last course"
 msgstr "قثسعوث غخعق مشسف ذخعقسث"
+
+#: lms/templates/header/user_dropdown.html
+msgid "Profile"
+msgstr "حقخبهمث"
 
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
