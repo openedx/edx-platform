@@ -5,6 +5,7 @@
 Check code quality using pycodestyle, pylint, and diff_quality.
 """
 from __future__ import print_function
+import io
 import json
 import os
 import re
@@ -44,7 +45,7 @@ def write_junit_xml(name, message=None):
     }
     Env.QUALITY_DIR.makedirs_p()
     filename = Env.QUALITY_DIR / '{}.xml'.format(name)
-    with open(filename, 'w') as f:
+    with io.open(filename, 'w') as f:
         f.write(JUNIT_XML_TEMPLATE.format(**data))
 
 
@@ -150,7 +151,7 @@ def _get_pylint_violations(systems=ALL_SYSTEMS.split(','), errors_only=False, cl
             )
 
         num_violations += _count_pylint_violations(system_report)
-        with open(system_report) as report_contents:
+        with io.open(system_report) as report_contents:
             violations_list.extend(report_contents)
 
     # Print number of violations to log
@@ -178,11 +179,14 @@ def run_pylint(options):
     num_violations, _ = _get_pylint_violations(systems, errors)
 
     # Print number of violations to log
-    violations_count_str = "Number of pylint violations: " + str(num_violations)
+    violations_count_str = "Number of pylint violations in {}:  {}\n".format(
+        ','.join(systems), str(num_violations)
+    )
     print(violations_count_str)
 
     # Also write the number of violations to a file
-    with open(Env.METRICS_DIR / "pylint", "w") as f:
+    pylint_section_filename = "pylint.section.{}".format(".".join(systems))
+    with io.open(Env.METRICS_DIR / pylint_section_filename, "w") as f:
         f.write(violations_count_str)
 
     # Fail when number of violations is less than the lower limit,
@@ -240,7 +244,7 @@ def _count_pylint_violations(report_file):
     # More examples can be found in the unit tests for this method
     pylint_pattern = re.compile(r".(\d+):\ \[(\D\d+.+\]).")
 
-    for line in open(report_file):
+    for line in io.open(report_file):
         violation_list_for_line = pylint_pattern.split(line)
         # If the string is parsed into four parts, then we've found a violation. Example of split parts:
         # test file, line number, violation name, violation details
@@ -276,7 +280,7 @@ def _pep8_violations(report_file):
     """
     Returns the list of all PEP 8 violations in the given report_file.
     """
-    with open(report_file) as f:
+    with io.open(report_file) as f:
         return f.readlines()
 
 
@@ -300,7 +304,7 @@ def run_pep8(options):  # pylint: disable=unused-argument
     print(violations_list)
 
     # Also write the number of violations to a file
-    with open(Env.METRICS_DIR / "pep8", "w") as f:
+    with io.open(Env.METRICS_DIR / "pep8", "w") as f:
         f.write(violations_count_str + '\n\n')
         f.write(violations_list)
 
@@ -634,7 +638,7 @@ def _write_metric(metric, filename):
     """
     Env.METRICS_DIR.makedirs_p()
 
-    with open(filename, "w") as metric_file:
+    with io.open(filename, "w") as metric_file:
         metric_file.write(str(metric))
 
 
@@ -661,7 +665,7 @@ def _get_report_contents(filename, report_name, last_line_only=False):
 
     """
     if os.path.isfile(filename):
-        with open(filename, 'r') as report_file:
+        with io.open(filename, 'r') as report_file:
             if last_line_only:
                 lines = report_file.readlines()
                 for line in reversed(lines):

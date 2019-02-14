@@ -190,6 +190,7 @@ pipeline {
                     unstash 'quality-2-reports'
                     unstash 'quality-3-reports'
                     unstash 'quality-4-reports'
+                    sh "cat reports/metrics/pylint.section.* > reports/metrics/pylint; rm reports/metrics/pylint.section.*;"
                     // Check for warnings
                     warnings canComputeNew: false, canResolveRelativePaths: false, canRunOnFailed: true, categoriesPattern: '',
                         defaultEncoding: '', excludePattern: '', healthy: '', includePattern: '', messagesPattern: '',
