@@ -341,6 +341,8 @@ def _track_user_registration(user, profile, params, third_party_provider):
             "edx.bi.user.account.registered",
             {
                 'category': 'conversion',
+                # ..pii: Learner email is sent to Segment in following line and will be associated with analytics data.
+                'email': user.email,
                 'label': params.get('course_id'),
                 'provider': third_party_provider.name if third_party_provider else None
             },
