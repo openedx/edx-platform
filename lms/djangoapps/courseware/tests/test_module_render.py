@@ -2155,12 +2155,13 @@ class TestXmoduleRuntimeEvent(TestSubmittingProblems):
         field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
             self.course.id, user, self.course, depth=2)
 
-        return render.get_module(  # pylint: disable=protected-access
+        module = render.get_module(  # pylint: disable=protected-access
             user,
             mock_request,
             self.problem.location,
             field_data_cache,
-        )._xmodule
+        )
+        return getattr(module, '_xmodule', module)
 
     def set_module_grade_using_publish(self, grade_dict):
         """Publish the user's grade, takes grade_dict as input"""
@@ -2228,12 +2229,13 @@ class TestRebindModule(TestSubmittingProblems):
         if item is None:
             item = self.lti
 
-        return render.get_module(  # pylint: disable=protected-access
+        module = render.get_module(  # pylint: disable=protected-access
             user,
             mock_request,
             item.location,
             field_data_cache,
-        )._xmodule
+        )
+        return getattr(module, '_xmodule', module)
 
     def test_rebind_module_to_new_users(self):
         module = self.get_module_for_user(self.user, self.problem)
@@ -2583,11 +2585,11 @@ class TestDisabledXBlockTypes(ModuleStoreTestCase):
         """Tests that the list of disabled xblocks can dynamically update."""
         with self.store.default_store(default_ms):
             course = CourseFactory()
-            item_usage_id = self._verify_descriptor('problem', course, 'CapaDescriptorWithMixins')
+            item_usage_id = self._verify_descriptor('problem', course, 'CapaXBlockWithMixins')
             XBlockConfiguration(name='problem', enabled=False).save()
 
             # First verify that the cached value is used until there is a new request cache.
-            self._verify_descriptor('problem', course, 'CapaDescriptorWithMixins', item_usage_id)
+            self._verify_descriptor('problem', course, 'CapaXBlockWithMixins', item_usage_id)
 
             # Now simulate a new request cache.
             self.store.request_cache.data.clear()

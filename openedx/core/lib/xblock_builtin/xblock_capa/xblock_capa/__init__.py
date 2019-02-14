@@ -7,6 +7,7 @@ import logging
 import os
 import re
 import sys
+import warnings
 
 from fs.osfs import OSFS
 from lxml import etree
@@ -324,16 +325,30 @@ class CapaXBlock(XBlock, CapaMixin, ResourceTemplates, XmlParserMixin, StudioEdi
         return loader.render_django_template(template_path, context=context)
 
     @property
+    def descriptor(self):
+        """
+        Returns this CapaXBlock.
+
+        Added to maintain backward compatibility with other areas of the code that still think this XBlock is an
+XModule.
+        """
+        warnings.warn("CapaXBlock.descriptor is deprecated, because it is no longer an XModule!"
+                      " Please use the CapaXBlock itself instead.", DeprecationWarning)
+        return self
+
+    @property
     def ajax_url(self):
         """
         Returns the URL for the ajax handler.
         """
-        return self.runtime.handler_url(self, 'ajax_handler', '', '').rstrip('/?')
+        return self.runtime.handler_url(self, 'xmodule_handler', '', '').rstrip('/?')
 
     @XBlock.handler
-    def ajax_handler(self, request, suffix=None):
+    def xmodule_handler(self, request, suffix=None):
         """
         XBlock handler that wraps `handle_ajax`
+
+        Note: we've kept the name `xmodule_handler` to preserve test behaviour.
         """
         class FileObjForWebobFiles(object):
             """
