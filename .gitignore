@@ -84,7 +84,7 @@ test_root/paver_logs/
 test_root/uploads/
 django-pyfs
 .tox/
-common/test/db_cache/bok_choy_*.yaml
+common/test/db_cache/*
 
 ### Installation artifacts
 *.egg-info
