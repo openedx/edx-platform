@@ -88,17 +88,21 @@ class CapaMixin(ScorableXBlockMixin):
     """
         Core logic for Capa Problem, which can be used by XModules or XBlocks.
     """
-    def __init__(self, *args, **kwargs):
-        super(CapaMixin, self).__init__(*args, **kwargs)
 
+    @property
+    def close_date(self):
+        """
+        Returns the date the problem is closed for submissions,
+        taking the due date and grace period into account.
+        """
         due_date = self.due
 
         if self.graceperiod is not None and due_date:
-            self.close_date = due_date + self.graceperiod
+            close_date = due_date + self.graceperiod
         else:
-            self.close_date = due_date
+            close_date = due_date
 
-        self._lcp = None
+        return close_date
 
     @property
     def lcp(self):
@@ -107,6 +111,9 @@ class CapaMixin(ScorableXBlockMixin):
 
         Side-effect: updates the seed and score fields if not already set.
         """
+        if not hasattr(self, '_lcp'):
+            self._lcp = None
+
         if self._lcp is None:
 
             if self.seed is None:

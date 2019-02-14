@@ -23,7 +23,6 @@ from webob.multidict import MultiDict
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Boolean, Dict, Float, Integer, Scope, String, XMLString
-from xblock.mixins import IndexInfoMixin
 from xblockutils.resources import ResourceLoader
 from xblockutils.studio_editable import StudioEditableXBlockMixin
 
@@ -54,7 +53,7 @@ FEATURES = getattr(settings, 'FEATURES', {})
 @XBlock.wants('user')  # pylint: disable=abstract-method
 @XBlock.needs('i18n')
 @XBlock.needs('request')
-class CapaXBlock(XBlock, CapaMixin, ResourceTemplates, XmlParserMixin, IndexInfoMixin, StudioEditableXBlockMixin):
+class CapaXBlock(XBlock, CapaMixin, ResourceTemplates, XmlParserMixin, StudioEditableXBlockMixin):
     """
     An XBlock implementing LonCapa format problems, by way of
     xblock_capa.lib.capa_problem.LoncapaProblem
@@ -232,16 +231,6 @@ class CapaXBlock(XBlock, CapaMixin, ResourceTemplates, XmlParserMixin, IndexInfo
     # is the attribute `attempts`. This will do that conversion
     metadata_translations = dict(RawDescriptor.metadata_translations)
     metadata_translations['attempts'] = 'max_attempts'
-
-    def __init__(self, *args, **kwargs):
-        """
-        Parses the provided XML data to ensure that bad data does not make it into the modulestore.
-
-        Raises lxml.etree.XMLSyntaxError if bad XML is provided.
-        """
-        super(CapaXBlock, self).__init__(*args, **kwargs)
-
-        etree.XML(self.data)
 
     # VS[compat]
     # TODO (cpennington): Delete this method once all fall 2012 course are being

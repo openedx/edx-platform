@@ -40,7 +40,7 @@ from openedx.core.lib.tempdir import mkdtemp_clean
 from student import auth
 from student.models import CourseEnrollment
 from student.roles import CourseCreatorRole, CourseInstructorRole
-from xmodule.capa_module import CapaDescriptor
+from xblock_capa import CapaXBlock
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.utils import empty_asset_trashcan, restore_asset_from_trashcan
@@ -1534,11 +1534,8 @@ class ContentStoreTest(ContentStoreTestCase):
         payload = parse_json(resp)
         problem_loc = UsageKey.from_string(payload['locator'])
         problem = self.store.get_item(problem_loc)
-        # should be a CapaDescriptor
-        self.assertIsInstance(problem, CapaDescriptor, "New problem is not a CapaDescriptor")
-        context = problem.get_context()
-        self.assertIn('markdown', context, "markdown is missing from context")
-        self.assertNotIn('markdown', problem.editable_metadata_fields, "Markdown slipped into the editable metadata fields")
+        self.assertIsInstance(problem, CapaXBlock, "New problem is not a CapaXBlock")
+        self.assertNotIn('markdown', problem.editable_fields, "Markdown slipped into the editable fields")
 
     def test_cms_imported_course_walkthrough(self):
         """
