@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-02-10 20:37+0000\n"
-"PO-Revision-Date: 2019-02-10 20:37:29.682667\n"
+"POT-Creation-Date: 2019-02-14 18:48+0000\n"
+"PO-Revision-Date: 2019-02-14 18:48:48.258505\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -6215,10 +6215,6 @@ msgstr "Àßöüt Ⱡ'σяєм ιρѕ#"
 msgid "{platform_name} for Business"
 msgstr "{platform_name} för Büsïnéss Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
-#: lms/djangoapps/branding/api.py themes/red-theme/lms/templates/footer.html
-msgid "News"
-msgstr "Néws Ⱡ'σяєм ι#"
-
 #: lms/djangoapps/branding/api.py lms/templates/static_templates/contact.html
 #: themes/red-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/footer.html
@@ -6231,6 +6227,10 @@ msgstr "Çöntäçt Ⱡ'σяєм ιρѕυм #"
 #: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "Careers"
 msgstr "Çäréérs Ⱡ'σяєм ιρѕυм #"
+
+#: lms/djangoapps/branding/api.py themes/red-theme/lms/templates/footer.html
+msgid "News"
+msgstr "Néws Ⱡ'σяєм ι#"
 
 #: lms/djangoapps/branding/api.py lms/djangoapps/certificates/views/webview.py
 #: themes/edx.org/lms/templates/certificates/_accomplishment-footer.html
@@ -6254,10 +6254,6 @@ msgstr "Prïväçý Pölïçý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 msgid "Accessibility Policy"
 msgstr "Àççéssïßïlïtý Pölïçý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
-#: lms/djangoapps/branding/api.py
-msgid "Sitemap"
-msgstr "Sïtémäp Ⱡ'σяєм ιρѕυм #"
-
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This is a legal document users must agree to
 #. in order to register a new account.
@@ -6268,6 +6264,10 @@ msgstr "Sïtémäp Ⱡ'σяєм ιρѕυм #"
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Terms of Service"
 msgstr "Térms öf Sérvïçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: lms/djangoapps/branding/api.py
+msgid "Sitemap"
+msgstr "Sïtémäp Ⱡ'σяєм ιρѕυм #"
 
 #: lms/djangoapps/branding/api.py
 msgid "Affiliates"
@@ -11403,7 +11403,6 @@ msgstr ""
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: cms/templates/videos_index_pagination.html
-#: lms/templates/bulk_email/unsubscribe.html
 msgid "Cancel"
 msgstr "Çänçél Ⱡ'σяєм ιρѕυ#"
 
@@ -12009,10 +12008,6 @@ msgstr ""
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "Our mailing address is"
 msgstr "Öür mäïlïng äddréss ïs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
-
-#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
-msgid "Unsubscribe from these emails."
-msgstr "Ûnsüßsçrïßé fröm thésé émäïls. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_head.html
 msgid "edX Email"
@@ -17996,40 +17991,6 @@ msgstr ""
 "Éntér ä üsérnämé tö vïéw çätälögs ßélöngïng tö thät üsér. Ⱡ'σяєм ιρѕυм ∂σłσя"
 " ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Unsubscribe Successful"
-msgstr "Ûnsüßsçrïßé Süççéssfül Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Unsubscribe Cancelled"
-msgstr "Ûnsüßsçrïßé Çänçélléd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Confirm Unsubscribe"
-msgstr "Çönfïrm Ûnsüßsçrïßé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "You have been unsubscribed from emails for {course}."
-msgstr ""
-"Ýöü hävé ßéén ünsüßsçrïßéd fröm émäïls för {course}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "You have not been unsubscribed from emails for {course}."
-msgstr ""
-"Ýöü hävé nöt ßéén ünsüßsçrïßéd fröm émäïls för {course}. Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Do you want to unsubscribe from emails for {course}?"
-msgstr ""
-"Dö ýöü wänt tö ünsüßsçrïßé fröm émäïls för {course}? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Unsubscribe"
-msgstr "Ûnsüßsçrïßé Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Open Calculator"
 msgstr "Öpén Çälçülätör Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
@@ -21265,14 +21226,6 @@ msgid "Journals"
 msgstr "Jöürnäls Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/templates/header/navbar-authenticated.html
-#: lms/templates/header/user_dropdown.html
-#: lms/templates/navigation/navbar-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Profile"
-msgstr "Pröfïlé Ⱡ'σяєм ιρѕυм #"
-
-#: lms/templates/header/navbar-authenticated.html
 msgid "Discover New"
 msgstr "Dïsçövér Néw Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
@@ -21309,6 +21262,10 @@ msgstr "Sçhööls Ⱡ'σяєм ιρѕυм #"
 #: lms/templates/header/user_dropdown.html
 msgid "Resume your last course"
 msgstr "Résümé ýöür läst çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: lms/templates/header/user_dropdown.html
+msgid "Profile"
+msgstr "Pröfïlé Ⱡ'σяєм ιρѕυм #"
 
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html

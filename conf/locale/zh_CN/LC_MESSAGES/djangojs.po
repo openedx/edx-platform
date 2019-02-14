@@ -210,8 +210,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-02-03 20:42+0000\n"
-"PO-Revision-Date: 2019-01-16 20:19+0000\n"
+"POT-Creation-Date: 2019-02-10 20:42+0000\n"
+"PO-Revision-Date: 2019-02-10 20:45+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
 "Language: zh_CN\n"
@@ -4748,12 +4748,14 @@ msgid ""
 msgstr "此邮箱用于接收来自{platform_name}和课程团队的信息。"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Recovery Address"
+msgid "Recovery Email Address"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid "You may access your account when single-sign on is not available."
-msgstr "如果单点登录不可用，您可以访问自己的账号。"
+msgid ""
+"You may access your account with this address if single-sign on or access to"
+" your primary email is not available."
+msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
@@ -4976,6 +4978,18 @@ msgstr "账号信息"
 #: lms/static/js/student_account/views/account_settings_view.js
 msgid "Order History"
 msgstr "订单记录"
+
+#: lms/static/js/student_account/views/account_settings_view.js
+msgid ""
+"You have set your language to {beta_language}, which is currently not fully "
+"translated. You can help us translate this language fully by joining the "
+"Transifex community and adding translations from English for learners that "
+"speak {beta_language}."
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_view.js
+msgid "Help Translate into {beta_language}"
+msgstr ""
 
 #: lms/static/js/verify_student/views/image_input_view.js
 msgid "Image Upload Error"
@@ -7497,8 +7511,8 @@ msgid "Mark Exam As Completed"
 msgstr "标记考试完成"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
-msgid "timed"
-msgstr "定时"
+msgid "a timed exam"
+msgstr ""
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "The timer on the right shows the time remaining in the exam."
@@ -8205,6 +8219,10 @@ msgid "Reset Password"
 msgstr "重设密码"
 
 #: lms/templates/student_account/account_settings.underscore
+msgid "Switch Language Back"
+msgstr ""
+
+#: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
 msgstr "账号设置"
 
@@ -8326,8 +8344,8 @@ msgstr "密码帮助"
 
 #: lms/templates/student_account/password_reset.underscore
 msgid ""
-"Please enter your registration or recovery email address below and we will "
-"send you an email with instructions."
+"Please enter your log-in or recovery email address below and we will send "
+"you an email with instructions."
 msgstr ""
 
 #: lms/templates/student_account/password_reset.underscore
@@ -9396,6 +9414,10 @@ msgid "Ungraded"
 msgstr "未分级"
 
 #: cms/templates/js/course-outline.underscore
+msgid "Onboarding Exam"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
 msgid "Practice proctored Exam"
 msgstr "模拟监考"
 
@@ -10256,6 +10278,18 @@ msgid ""
 "exam. The videos are then reviewed to ensure that learners follow all "
 "examination rules."
 msgstr "监考下的考试是计时的，并且每个学生的考试过程将被录像。录像将被审核以确保学生遵守了考试纪律。"
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "Onboarding"
+msgstr ""
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"Use Onboarding to introduce learners to proctoring, verify their identity, "
+"and create an onboarding profile. Learners must complete the onboarding "
+"profile step prior to taking a proctored exam. Profile reviews take 2+ "
+"business days."
+msgstr ""
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Practice Proctored"

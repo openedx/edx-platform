@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-02-10 20:37+0000\n"
-"PO-Revision-Date: 2019-02-10 20:37:29.682667\n"
+"POT-Creation-Date: 2019-02-14 18:48+0000\n"
+"PO-Revision-Date: 2019-02-14 18:48:48.258505\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -4778,10 +4778,6 @@ msgstr ""
 msgid "{platform_name} for Business"
 msgstr ""
 
-#: lms/djangoapps/branding/api.py themes/red-theme/lms/templates/footer.html
-msgid "News"
-msgstr ""
-
 #: lms/djangoapps/branding/api.py lms/templates/static_templates/contact.html
 #: themes/red-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/footer.html
@@ -4793,6 +4789,10 @@ msgstr ""
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "Careers"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py themes/red-theme/lms/templates/footer.html
+msgid "News"
 msgstr ""
 
 #: lms/djangoapps/branding/api.py lms/djangoapps/certificates/views/webview.py
@@ -4817,10 +4817,6 @@ msgstr ""
 msgid "Accessibility Policy"
 msgstr ""
 
-#: lms/djangoapps/branding/api.py
-msgid "Sitemap"
-msgstr ""
-
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This is a legal document users must agree to
 #. in order to register a new account.
@@ -4830,6 +4826,10 @@ msgstr ""
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Terms of Service"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py
+msgid "Sitemap"
 msgstr ""
 
 #: lms/djangoapps/branding/api.py
@@ -8901,7 +8901,6 @@ msgstr ""
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: cms/templates/videos_index_pagination.html
-#: lms/templates/bulk_email/unsubscribe.html
 msgid "Cancel"
 msgstr ""
 
@@ -9443,10 +9442,6 @@ msgstr ""
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "Our mailing address is"
-msgstr ""
-
-#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
-msgid "Unsubscribe from these emails."
 msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_head.html
@@ -14086,34 +14081,6 @@ msgstr ""
 msgid "Enter a username to view catalogs belonging to that user."
 msgstr ""
 
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Unsubscribe Successful"
-msgstr ""
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Unsubscribe Cancelled"
-msgstr ""
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Confirm Unsubscribe"
-msgstr ""
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "You have been unsubscribed from emails for {course}."
-msgstr ""
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "You have not been unsubscribed from emails for {course}."
-msgstr ""
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Do you want to unsubscribe from emails for {course}?"
-msgstr ""
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Unsubscribe"
-msgstr ""
-
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Open Calculator"
 msgstr ""
@@ -16642,14 +16609,6 @@ msgid "Journals"
 msgstr ""
 
 #: lms/templates/header/navbar-authenticated.html
-#: lms/templates/header/user_dropdown.html
-#: lms/templates/navigation/navbar-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Profile"
-msgstr ""
-
-#: lms/templates/header/navbar-authenticated.html
 msgid "Discover New"
 msgstr ""
 
@@ -16685,6 +16644,10 @@ msgstr ""
 
 #: lms/templates/header/user_dropdown.html
 msgid "Resume your last course"
+msgstr ""
+
+#: lms/templates/header/user_dropdown.html
+msgid "Profile"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
