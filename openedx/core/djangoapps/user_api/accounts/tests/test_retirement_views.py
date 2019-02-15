@@ -64,6 +64,7 @@ from student.models import (
     UserProfile,
     get_retired_username_by_username,
     get_retired_email_by_email,
+    AccountRecovery,
 )
 from student.tests.factories import (
     ContentTypeFactory,
@@ -71,7 +72,8 @@ from student.tests.factories import (
     PendingEmailChangeFactory,
     PermissionFactory,
     SuperuserFactory,
-    UserFactory
+    UserFactory,
+    AccountRecoveryFactory,
 )
 
 from ..views import AccountRetirementView, USER_PROFILE_PII
@@ -220,6 +222,24 @@ class TestDeactivateLogout(RetirementTestCase):
         self.assertEqual(len(mail.outbox), 1)
         # ensure that it's been sent to the correct email address
         self.assertIn(self.test_user.email, mail.outbox[0].to)
+
+    def test_user_can_deactivate_secondary_email(self):
+        """
+        Verify that if a user has a secondary/recovery email that record will be deleted
+        if the user requests a retirement
+        """
+        # Create secondary/recovery email for test user
+        AccountRecoveryFactory(user=self.test_user)
+        # Assert that there is an secondary/recovery email for test user
+        self.assertEqual(len(AccountRecovery.objects.filter(user_id=self.test_user.id)), 1)
+
+        self.client.login(username=self.test_user.username, password=self.test_password)
+        headers = build_jwt_headers(self.test_user)
+        response = self.client.post(self.url, self.build_post(self.test_password), **headers)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        # Assert that there is no longer a secondary/recovery email for test user
+        self.assertEqual(len(AccountRecovery.objects.filter(user_id=self.test_user.id)), 0)
 
     def test_password_mismatch(self):
         """
