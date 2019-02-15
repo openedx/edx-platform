@@ -2,24 +2,24 @@
 <!-- ${width}  = 300   -->
 <!-- ${height} = 400   -->
 
-<div class="imageinput capa_inputtype" id="inputtype_<%=_.escape(id)%>">
+<div class="imageinput capa_inputtype" id="inputtype_<%= _.escape(id) %>">
     <input
         type="hidden"
         class="imageinput"
         src=""
-        name="input_<%=_.escape(id)%>"
-        id="input_<%=_.escape(id)%>"
+        name="input_<%= _.escape(id) %>"
+        id="input_<%= _.escape(id) %>"
         value=""
     />
 
     <div style="position:relative;">
         <div
-            id="imageinput_<%=_.escape(id)%>"
-            style="width: <%=_.escape(width)%>px; height: <%=_.escape(height)%>px; position: relative; left: 0; top: 0; visibility: hidden;"
+            id="imageinput_<%= _.escape(id) %>"
+            style="width: <%= _.escape(width) %>px; height: <%= _.escape(height) %>px; position: relative; left: 0; top: 0; visibility: hidden;"
         >
             <!-- image will go here -->
         </div>
-        <div id="answer_<%=_.escape(id)%>" data-width="100" data-height="100"></div>
+        <div id="answer_<%= _.escape(id) %>" data-width="100" data-height="100"></div>
     </div>
 
 
@@ -27,8 +27,8 @@
         <span
             class="unanswered"
             style="display: inline-block;"
-            id="status_<%=_.escape(id)%>"
-            aria-describedby="input_<%=_.escape(id)%>"
+            id="status_<%= _.escape(id) %>"
+            aria-describedby="input_<%= _.escape(id) %>"
         >
             <span class="sr">Status: unanswered</span>
         </span>
