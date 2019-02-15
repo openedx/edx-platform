@@ -36,7 +36,7 @@ class Command(BaseCommand):
         currentusername2,desiredusername2
 
     Example usage:
-        $ ./manage.py lms bulk_change_username learner_courses_to_recalculate.csv
+        $ ./manage.py lms bulk_change_username usernames_to_rename.csv
     """
     help = "Updates all users' usernames in all edxapp tables that store username"
 
