@@ -51,7 +51,7 @@ class EdxNotesTestMixin(UniqueCourseTest):
                         XBlockFixtureDesc(
                             "html",
                             "Test HTML 1",
-                            data="""
+                            data=u"""
                                 <p><span class="{}">Annotate this!</span></p>
                                 <p>Annotate this</p>
                             """.format(self.selector)

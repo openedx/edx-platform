@@ -209,8 +209,10 @@ def _footer_navigation_links(language=settings.LANGUAGE_CODE):
     platform_name = configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)
     links = [
         ("about", (marketing_link("ABOUT"), _("About"))),
-        ("enterprise", (marketing_link("ENTERPRISE"),
-                        _("{platform_name} for Business").format(platform_name=platform_name))),
+        ("enterprise", (
+            marketing_link("ENTERPRISE"),
+            _(u"{platform_name} for Business").format(platform_name=platform_name)
+        )),
         ("blog", (marketing_link("BLOG"), _("Blog"))),
         ("help-center", (settings.SUPPORT_SITE_LINK, _("Help Center"))),
         ("contact", (reverse("support:contact_us"), _("Contact"))),
@@ -272,8 +274,10 @@ def _footer_business_links(language=settings.LANGUAGE_CODE):
     platform_name = configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)
     links = [
         ("about", (marketing_link("ABOUT"), _("About"))),
-        ("enterprise", (marketing_link("ENTERPRISE"),
-         _("{platform_name} for Business").format(platform_name=platform_name))),
+        ("enterprise", (
+            marketing_link("ENTERPRISE"),
+            _(u"{platform_name} for Business").format(platform_name=platform_name)
+        )),
     ]
 
     if language == settings.LANGUAGE_CODE:

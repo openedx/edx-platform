@@ -57,7 +57,7 @@ class Command(BaseCommand):
             if retirement.user.email != old_retired_email:
                 print(
                     u'WARNING: Skipping UserRetirementStatus ID {} / User ID {} because the user does not appear to '
-                    'have a retired email address: {}.'.format(
+                    u'have a retired email address: {}.'.format(
                         retirement.id,
                         retirement.user.id,
                         retirement.user.email,

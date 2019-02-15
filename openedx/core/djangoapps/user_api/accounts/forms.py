@@ -25,7 +25,7 @@ class RetirementQueueDeletionForm(forms.Form):
                 # Translators: 'current_state' is a string from an enumerated list indicating the learner's retirement
                 # state. Example: FORUMS_COMPLETE
                 u"Retirement requests can only be cancelled for users in the PENDING state."
-                " Current request state for '{original_username}': {current_state}".format(
+                u" Current request state for '{original_username}': {current_state}".format(
                     original_username=retirement.original_username,
                     current_state=retirement.current_state.state_name
                 )

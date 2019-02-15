@@ -97,7 +97,7 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
         self.user.profile.save()
         self.client.login(username=self.user.username, password='foo')
         self.request = RequestFactory().request()
-        self.linkedin_url = 'http://www.linkedin.com/profile/add?{params}'
+        self.linkedin_url = u'http://www.linkedin.com/profile/add?{params}'
 
         self.cert = GeneratedCertificateFactory.create(
             user=self.user,
@@ -129,7 +129,7 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
                 'name': 'Signatory_Name ' + str(i),
                 'title': 'Signatory_Title ' + str(i),
                 'organization': 'Signatory_Organization ' + str(i),
-                'signature_image_path': '/static/certificates/images/demo-sig{}.png'.format(i),
+                'signature_image_path': u'/static/certificates/images/demo-sig{}.png'.format(i),
                 'id': i
             } for i in xrange(signatory_count)
 
@@ -141,7 +141,7 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
                 'name': 'Name ' + str(i),
                 'description': 'Description ' + str(i),
                 'course_title': 'course_title_' + str(i),
-                'org_logo_path': '/t4x/orgX/testX/asset/org-logo-{}.png'.format(i),
+                'org_logo_path': u'/t4x/orgX/testX/asset/org-logo-{}.png'.format(i),
                 'signatories': signatories,
                 'version': 1,
                 'is_active': is_active
@@ -190,7 +190,7 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
             <html>
             <body>
                 lang: ${LANGUAGE_CODE}
-                course name: """ + template_name + """
+                course name: """ + template_name + u"""
                 mode: ${course_mode}
                 ${accomplishment_copy_course_description}
                 ${twitter_url}
@@ -266,10 +266,10 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         self.assertEqual(response.status_code, 200)
         params = OrderedDict([
             ('_ed', '0_0dPSPyS070e0HsE9HNz_13_d11_',),
-            ('pfCertificationName', '{platform_name} Honor Code Certificate for {course_name}'.format(
-                platform_name=settings.PLATFORM_NAME.encode('utf-8'),
+            ('pfCertificationName', u'{platform_name} Honor Code Certificate for {course_name}'.format(
+                platform_name=settings.PLATFORM_NAME,
                 course_name=self.course.display_name,
-            ),),
+            ).encode('utf-8'),),
             ('pfCertificationUrl', self.request.build_absolute_uri(test_url),),
         ])
         self.assertIn(
@@ -289,10 +289,10 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         # the linkedIn share URL with appropriate parameters should be present
         params = OrderedDict([
             ('_ed', settings.MICROSITE_CONFIGURATION['test_site']['LINKEDIN_COMPANY_ID'],),
-            ('pfCertificationName', '{platform_name} Honor Code Certificate for {course_name}'.format(
+            ('pfCertificationName', u'{platform_name} Honor Code Certificate for {course_name}'.format(
                 platform_name=settings.MICROSITE_CONFIGURATION['test_site']['platform_name'],
                 course_name=self.course.display_name,
-            ),),
+            ).encode('utf-8'),),
             ('pfCertificationUrl', 'http://' + settings.MICROSITE_TEST_HOSTNAME + test_url,),
         ])
         self.assertIn(

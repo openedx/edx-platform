@@ -163,7 +163,7 @@ def _write_chunk(request, courselike_key):
             if size < int(content_range['start']):
                 _save_request_status(request, courselike_string, -1)
                 log.warning(
-                    "Reported range %s does not match size downloaded so far %s",
+                    u"Reported range %s does not match size downloaded so far %s",
                     content_range['start'],
                     size
                 )

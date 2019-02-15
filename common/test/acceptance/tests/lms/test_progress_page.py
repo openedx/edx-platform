@@ -321,10 +321,10 @@ class SubsectionGradingPolicyTest(SubsectionGradingPolicyBase):
 
     def test_subsection_grading_policy_on_progress_page(self):
         with self._logged_in_session():
-            self._check_scores_and_page_text([(0, 1), (0, 1)], (0, 2), "Homework 1 - Test Subsection 1 - 0% (0/2)")
+            self._check_scores_and_page_text([(0, 1), (0, 1)], (0, 2), u"Homework 1 - Test Subsection 1 - 0% (0/2)")
             self.courseware_page.visit()
             self._answer_problem_correctly()
-            self._check_scores_and_page_text([(1, 1), (0, 1)], (1, 2), "Homework 1 - Test Subsection 1 - 50% (1/2)")
+            self._check_scores_and_page_text([(1, 1), (0, 1)], (1, 2), u"Homework 1 - Test Subsection 1 - 50% (1/2)")
 
         self._set_policy_for_subsection("Not Graded")
 
@@ -337,7 +337,7 @@ class SubsectionGradingPolicyTest(SubsectionGradingPolicyBase):
         self._set_policy_for_subsection("Homework")
 
         with self._logged_in_session():
-            self._check_scores_and_page_text([(1, 1), (0, 1)], (1, 2), "Homework 1 - Test Subsection 1 - 50% (1/2)")
+            self._check_scores_and_page_text([(1, 1), (0, 1)], (1, 2), u"Homework 1 - Test Subsection 1 - 50% (1/2)")
 
 
 class SubsectionGradingPolicyA11yTest(SubsectionGradingPolicyBase):
