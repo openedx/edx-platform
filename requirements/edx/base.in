@@ -148,5 +148,6 @@ unicodecsv                          # Easier support for CSV files with unicode 
 user-util                           # Functionality for retiring users (GDPR compliance)
 web-fragments                       # Provides the ability to render fragments of web pages
 XBlock                              # Courseware component architecture
-xblock-utils                        # Provides utilities used by the Discussion XBlock
+# FIXME: https://github.com/edx/xblock-utils/pull/52
+-e git+https://github.com/open-craft/xblock-utils.git@jazzar/editor-tabs#egg=xblock-utils==1.3.0
 zendesk                             # Python API for the Zendesk customer support system
