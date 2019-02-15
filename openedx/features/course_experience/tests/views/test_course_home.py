@@ -844,6 +844,51 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         self.assertContains(response, TEST_COURSE_GOAL_UPDATE_FIELD)
         self.assertNotContains(response, TEST_COURSE_GOAL_UPDATE_FIELD_HIDDEN)
 
+    #TODO SE-760
+    @override_waffle_flag(COURSE_PRE_START_ACCESS_FLAG, active=True)
+    def test_course_messaging_for_public_course(self):
+        """
+        Ensure that the following use cases work as expected for public courses
+
+        1) Anonymous users are not shown a course message asking them to enroll
+        2) Unenrolled users are not shown a course message asking them to enroll
+        3) Unenrolled users are shown a course message asking them to enroll for courses that allow
+           self-enrollment
+        """
+
+        from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
+        from student.models import CourseEnrollmentAllowed
+
+        TEST_COURSE_ANONYMOUS_MESSAGE = 'You must be enrolled in the course to see course content.'
+        enable_unenrolled_access = True
+
+        with mock.patch('xmodule.course_module.CourseDescriptor.course_visibility', COURSE_VISIBILITY_PUBLIC):
+            with override_waffle_flag(COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, enable_unenrolled_access):
+                # Anonymous users are not shown a course message asking them to enroll
+                url = course_home_url(self.course)
+                response = self.client.get(url)
+                self.assertContains(response, TEST_COURSE_HOME_MESSAGE)
+                self.assertNotContains(response, TEST_COURSE_ANONYMOUS_MESSAGE)
+
+                # Unenrolled users are not shown a course message asking them to enroll
+                user = self.create_user_for_course(self.course, CourseUserType.UNENROLLED)
+                url = course_home_url(self.course)
+                response = self.client.get(url)
+                self.assertContains(response, TEST_COURSE_HOME_MESSAGE)
+                self.assertNotContains(response, TEST_COURSE_HOME_MESSAGE_UNENROLLED)
+                self.assertNotContains(response, TEST_COURSE_ANONYMOUS_MESSAGE)
+
+                # Unenrolled users are shown a course message asking them to enroll for courses that allow
+                # self-enrollment
+                user = self.create_user_for_course(self.course, CourseUserType.UNENROLLED)
+                # Enable self enrollment
+                CourseEnrollmentAllowed.objects.create(email=user.email, course_id=self.course.id)
+                url = course_home_url(self.course)
+                response = self.client.get(url)
+                self.assertContains(response, TEST_COURSE_HOME_MESSAGE)
+                self.assertContains(response, TEST_COURSE_HOME_MESSAGE_UNENROLLED)
+                self.assertContains(response, TEST_COURSE_ANONYMOUS_MESSAGE)
+
 
 class CourseHomeFragmentViewTests(ModuleStoreTestCase):
     """
