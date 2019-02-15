@@ -279,7 +279,7 @@ def grade_histogram(module_id):
     from django.db import connection
     cursor = connection.cursor()
 
-    query = """\
+    query = u"""\
         SELECT courseware_studentmodule.grade,
         COUNT(courseware_studentmodule.student_id)
         FROM courseware_studentmodule

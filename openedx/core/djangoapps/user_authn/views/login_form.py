@@ -88,7 +88,7 @@ def login_and_registration_form(request, initial_mode="login"):
                 third_party_auth_hint = provider_id
                 initial_mode = "hinted_login"
         except (KeyError, ValueError, IndexError) as ex:
-            log.exception("Unknown tpa_hint provider: %s", ex)
+            log.exception(u"Unknown tpa_hint provider: %s", ex)
 
     # We are defaulting to true because all themes should now be using the newer page.
     if is_request_in_themed_site() and not configuration_helpers.get_value('ENABLE_COMBINED_LOGIN_REGISTRATION', True):

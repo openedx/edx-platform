@@ -30,6 +30,6 @@ class Command(BaseCommand):
         setting = options.get('setting')
 
         if not hasattr(settings, setting):
-            raise CommandError('%s not found in settings.' % setting)
+            raise CommandError(u'%s not found in settings.' % setting)
 
         print(getattr(settings, setting))

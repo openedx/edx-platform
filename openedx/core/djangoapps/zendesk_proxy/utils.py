@@ -22,7 +22,7 @@ def create_zendesk_ticket(requester_name, requester_email, subject, body, custom
     """
     def _std_error_message(details, payload):
         """Internal helper to standardize error message. This allows for simpler splunk alerts."""
-        return 'zendesk_proxy action required\n{}\nNo ticket created for payload {}'.format(details, payload)
+        return u'zendesk_proxy action required\n{}\nNo ticket created for payload {}'.format(details, payload)
 
     if tags:
         # Remove duplicates from tags list
@@ -55,7 +55,7 @@ def create_zendesk_ticket(requester_name, requester_email, subject, body, custom
     url = urljoin(settings.ZENDESK_URL, '/api/v2/tickets.json')
     headers = {
         'content-type': 'application/json',
-        'Authorization': "Bearer {}".format(settings.ZENDESK_OAUTH_ACCESS_TOKEN),
+        'Authorization': u"Bearer {}".format(settings.ZENDESK_OAUTH_ACCESS_TOKEN),
     }
 
     try:
@@ -63,11 +63,11 @@ def create_zendesk_ticket(requester_name, requester_email, subject, body, custom
 
         # Check for HTTP codes other than 201 (Created)
         if response.status_code == status.HTTP_201_CREATED:
-            log.debug('Successfully created ticket for {}'.format(requester_email))
+            log.debug(u'Successfully created ticket for {}'.format(requester_email))
         else:
             log.error(
                 _std_error_message(
-                    'Unexpected response: {} - {}'.format(response.status_code, response.content),
+                    u'Unexpected response: {} - {}'.format(response.status_code, response.content),
                     payload
                 )
             )

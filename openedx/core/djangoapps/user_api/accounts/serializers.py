@@ -90,7 +90,7 @@ class UserReadOnlySerializer(serializers.Serializer):
             user_profile = user.profile
         except ObjectDoesNotExist:
             user_profile = None
-            LOGGER.warning("user profile for the user [%s] does not exist", user.username)
+            LOGGER.warning(u"user profile for the user [%s] does not exist", user.username)
 
         try:
             account_recovery = user.account_recovery
@@ -222,7 +222,7 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
         """ Enforce minimum length for name. """
         if len(new_name) < NAME_MIN_LENGTH:
             raise serializers.ValidationError(
-                "The name field must be at least {} characters long.".format(NAME_MIN_LENGTH)
+                u"The name field must be at least {} characters long.".format(NAME_MIN_LENGTH)
             )
         return new_name
 

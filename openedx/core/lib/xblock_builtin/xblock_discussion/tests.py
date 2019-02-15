@@ -21,7 +21,7 @@ def attribute_pair_repr(self):
     Custom string representation for the AttributePair namedtuple which is
     consistent between test runs.
     """
-    return '<AttributePair name={}>'.format(self.name)
+    return u'<AttributePair name={}>'.format(self.name)
 
 
 AttributePair = namedtuple("AttributePair", ["name", "value"])
@@ -86,7 +86,7 @@ class DiscussionXBlockImportExportTests(TestCase):
         """
         Test that xblock export XML format can be parsed preserving field values
         """
-        xblock_xml = """
+        xblock_xml = u"""
         <discussion
             url_name="82bb87a2d22240b1adac2dfcc1e7e5e4" xblock-family="xblock.v1"
             {id_attr}="{id_value}"
@@ -119,7 +119,7 @@ class DiscussionXBlockImportExportTests(TestCase):
         Test that legacy export XML format can be parsed preserving field values
         """
         xblock_xml = """<discussion url_name="82bb87a2d22240b1adac2dfcc1e7e5e4"/>"""
-        xblock_definition_xml = """
+        xblock_definition_xml = u"""
         <discussion
             {id_attr}="{id_value}"
             {category_attr}="{category_value}"

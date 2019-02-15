@@ -72,12 +72,12 @@ def set_user_preview_site_theme(request, preview_site_theme):
             set_user_preference(request.user, PREVIEW_SITE_THEME_PREFERENCE_KEY, preview_site_theme_name)
             PageLevelMessages.register_success_message(
                 request,
-                _('Site theme changed to {site_theme}'.format(site_theme=preview_site_theme_name))
+                _(u'Site theme changed to {site_theme}').format(site_theme=preview_site_theme_name)
             )
         else:
             PageLevelMessages.register_error_message(
                 request,
-                _('Theme {site_theme} does not exist'.format(site_theme=preview_site_theme_name))
+                _(u'Theme {site_theme} does not exist').format(site_theme=preview_site_theme_name)
             )
     else:
         delete_user_preference(request.user, PREVIEW_SITE_THEME_PREFERENCE_KEY)

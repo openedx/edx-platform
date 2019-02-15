@@ -44,7 +44,7 @@ class FormatHtmlTest(unittest.TestCase):
         # Sometimes, you have plain text, with html inserted, and the html has
         # plain text inserted.  It gets twisty...
         out = Text(_(u"Send {start}email{end}")).format(
-            start=HTML("<a href='mailto:{email}'>").format(email="A&B"),
+            start=HTML(u"<a href='mailto:{email}'>").format(email="A&B"),
             end=HTML("</a>"),
         )
         self.assertEqual(
@@ -55,7 +55,7 @@ class FormatHtmlTest(unittest.TestCase):
     def test_mako(self):
         # The default_filters used here have to match the ones in edxmako.
         template = Template(
-            """
+            u"""
                 <%!
                 from django.utils.translation import ugettext as _
 
@@ -70,13 +70,13 @@ class FormatHtmlTest(unittest.TestCase):
 
     def test_ungettext(self):
         for i in [1, 2]:
-            out = Text(ungettext("1 & {}", "2 & {}", i)).format(HTML("<>"))
-            self.assertEqual(out, "{} &amp; <>".format(i))
+            out = Text(ungettext(u"1 & {}", "2 & {}", i)).format(HTML(u"<>"))
+            self.assertEqual(out, u"{} &amp; <>".format(i))
 
     def test_strip_all_tags_but_br_filter(self):
         """ Verify filter removes every tags except br """
         template = Template(
-            """
+            u"""
                 <%page expression_filter="h"/>
                 <%!
                 from openedx.core.djangolib.markup import strip_all_tags_but_br
