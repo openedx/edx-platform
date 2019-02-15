@@ -29,7 +29,11 @@
 
         // Standard longform + shortfom pattern.
         el.find('.longform').hide();
-        el.find('.shortform').append(linkTop, linkBottom);
+        edx.HtmlUtils.append(el.find('.shortform'), edx.StringUtils.interpolate(
+            '{linkTop}{linkBottom}', { 
+            linkTop: linkTop,
+            linkBottom: linkBottom,
+        }));
 
         // Custom longform + shortform text pattern.
         short_custom = el.find('.shortform-custom');
@@ -40,7 +44,10 @@
 
             open_text = $(elt).data('open-text');
             close_text = $(elt).data('close-text');
-            $(elt).append("<a href='#' class='full-custom'>" + open_text + '</a>');
+            edx.HtmlUtils.append($(elt), edx.StringUtils.interpolate(
+                "<a href='#' class='full-custom'>{text}</a>", {
+                text: open_text,
+            }));
 
             $(elt).find('.full-custom').click(function(event) {
                 Collapsible.toggleFull(event, open_text, close_text);

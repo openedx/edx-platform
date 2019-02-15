@@ -5,7 +5,7 @@ describe('CapaMarkdownEditor', function() {
       this.descriptor = new CapaMarkdownEditor($('.problem-editor'));
       const saveResult = this.descriptor.save();
       expect(saveResult.metadata.markdown).toEqual('markdown');
-      expect(saveResult.data).toXMLEqual('<problem>\n  <p>markdown</p>\n</problem>');
+      expect(String(saveResult.data)).toXMLEqual('<problem>\n  <p>markdown</p>\n</problem>');
     });
     it('clears markdown when xml editor is selected', function() {
       loadFixtures('common/js/fixtures/problem-with-markdown.html');

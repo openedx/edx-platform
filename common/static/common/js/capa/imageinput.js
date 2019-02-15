@@ -13,15 +13,9 @@
  * ~ Chinese Proverb
  */
 
-window.ImageInput = (function($, undefined) {
-    var ImageInput = ImageInputConstructor;
-
-    ImageInput.prototype = {
-        constructor: ImageInputConstructor,
-        clickHandler: clickHandler
-    };
-
-    return ImageInput;
+window.ImageInput = (function($) {
+    'use strict';
+    var ImageInput;
 
     function ImageInputConstructor(elementId) {
         this.el = $('#imageinput_' + elementId);
@@ -53,4 +47,11 @@ window.ImageInput = (function($, undefined) {
 
         this.inputEl.val(result);
     }
+
+    ImageInput = ImageInputConstructor;
+    ImageInput.prototype = {
+        constructor: ImageInputConstructor,
+        clickHandler: clickHandler
+    };
+    return ImageInput;
 }).call(this, window.jQuery);

@@ -1,4 +1,4 @@
-/* global MathJax, Collapsible, interpolate, JavascriptLoader, Logger, CodeMirror */
+/* global MathJax, Collapsible, interpolate, edx, JavascriptLoader, Logger, CodeMirror */
 // Note: this code was originally converted from CoffeeScript, and thus follows some
 // coding conventions that are discouraged by eslint. Some warnings have been suppressed
 // to avoid substantial rewriting of the code. Allow the eslint suppressions to exceed
@@ -279,6 +279,7 @@
                     );
                 }
             }
+            // xss-lint: disable=javascript-interpolate
             progress = interpolate(
                 progressTemplate, {
                     earned: curScore,
@@ -381,7 +382,7 @@
         Problem.prototype.render = function(content, focusCallback) {
             var that = this;
             if (content) {
-                this.el.html(content);
+                edx.HtmlUtils.setHtml(this.el, edx.HtmlUtils.HTML(content));
                 return JavascriptLoader.executeModuleScripts(this.el, function() {
                     that.setupInputTypes();
                     that.bind();
@@ -391,7 +392,7 @@
                 });
             } else {
                 return $.postWithPrefix(this.runtime.handlerUrl(this.element, 'problem_get'), function(response) {
-                    that.el.html(response.html);
+                    edx.HtmlUtils.setHtml(that.el, edx.HtmlUtils.HTML(response.html));
                     return JavascriptLoader.executeModuleScripts(that.el, function() {
                         that.setupInputTypes();
                         that.bind();
@@ -562,11 +563,12 @@
                                 }
                             ));
                         }
-                        fd.append(element.id, file);
+                        edx.HtmlUtils.append(fd, edx.HtmlUtils.HTML(element.id + file));
                     }
                     if (element.files.length === 0) {
                         fileNotSelected = true;
-                        fd.append(element.id, ''); // In case we want to allow submissions with no file
+                        // In case we want to allow submissions with no file
+                        edx.HtmlUtils.append(fd, edx.HtmlUtils.HTML(element.id + ''));
                     }
                     if (requiredFiles.length !== 0) {
                         requiredFilesNotSubmitted = true;
@@ -577,7 +579,7 @@
                         ));
                     }
                 } else {
-                    fd.append(element.id, element.value);
+                    edx.HtmlUtils.append(fd, edx.HtmlUtils.HTML(element.id + element.value));
                 }
             });
             if (fileNotSelected) {
@@ -586,7 +588,7 @@
             errorHtml = '<ul>\n';
             for (i = 0, len = errors.length; i < len; i++) {
                 error = errors[i];
-                errorHtml += '<li>' + error + '</li>\n';
+                errorHtml += edx.StringUtils.interpolate('<li>{error}</li>\n', {error: error});
             }
             errorHtml += '</ul>';
             this.gentle_alert(errorHtml);
@@ -708,8 +710,7 @@
                 problem: this.id
             });
             return $.postWithPrefix(this.runtime.handlerUrl(this.element, 'problem_show'), function(response) {
-                var answers;
-                answers = response.answers;
+                var answers = response.answers;
                 $.each(answers, function(key, value) {
                     var safeKey = key.replace(':', '\\:'); // fix for courses which use url_names with colons, e.g. problem:question1
                     var answer;
@@ -734,6 +735,7 @@
                         // TODO remove the above once everything is extracted into its own
                         // inputtype functions.
                     }
+                    return {};
                 });
                 that.el.find('.capa_inputtype').each(function(index, inputtype) {
                     var classes, cls, display, showMethod, i, len, results;
@@ -1181,7 +1183,7 @@
                             types[key](context, value);
                         }
                     });
-                    container.html(canvas);
+                    edx.HtmlUtils.setHtml(container, edx.HtmlUtils.HTML(canvas));
                 } else {
                     console.log('Answer is absent for image input with id=' + id); // eslint-disable-line no-console
                 }
@@ -1328,5 +1330,5 @@
 
 function CapaXBlock(runtime, element) {
     'use strict';
-    var xblock = new Problem(element, runtime);
+    return new this.Problem(element, runtime);
 }

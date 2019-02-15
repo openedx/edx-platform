@@ -1,3 +1,7 @@
+<%page expression_filter="h"/>
+<%!
+from openedx.core.djangolib.js_utils import js_escaped_string
+%>
 <section id="textbox_${id}" class="capa_inputtype cminput">
 <div class="script_placeholder" data-src="${matlab_editor_js}"></div>
 <textarea 
@@ -14,7 +18,7 @@
  % if hidden:
   style="display:none;"
  % endif
-  >${value|h}</textarea>
+  >${value}</textarea>
 
   <div class="grader-status" tabindex="-1">
 
@@ -34,10 +38,10 @@
   <span id="answer_${id}"></span>
 
   <div class="external-grader-message" aria-live="polite">
-    ${msg|n}
+    ${msg}
   </div>
   <div class="ungraded-matlab-result" aria-live="polite">
-    ${queue_msg|n}
+    ${queue_msg}
   </div>
 
   % if button_enabled:
@@ -52,8 +56,9 @@
           if($(parent_elt).find('.capa_alert').length) {
               $(parent_elt).find('.capa_alert').remove();
           }
-          var alert_elem = $("<div>" + msg + "</div>");
+          var alert_elem = $(edx.HtmlUtils.interpolateHtml("<div>{msg}</div>", {msg:  msg}));
           alert_elem.addClass('capa_alert').addClass('is-fading-in');
+          // xss-lint: disable=javascript-jquery-insertion
           $(parent_elt).find('.action').after(alert_elem);
       };
 
@@ -61,7 +66,7 @@
       var plot = function(event) {
           var problem_elt = $(event.target).closest('.problems-wrapper');
           url = $(event.target).closest('.problems-wrapper').data('url');
-          input_id = "${id}";
+          input_id = "${id|n, js_escaped_string}";
 
           // save the codemirror text to the textarea
           // since there could be multiple codemirror instances on the page,
@@ -69,7 +74,7 @@
           $('.CodeMirror').each(function(i, el){
               el.CodeMirror.save();
           });
-          var input = $("#input_${id}");
+          var input = $("#input_${id|n, js_escaped_string}");
 
           // pull out the coded text
           submission = input.val();
@@ -83,13 +88,13 @@
                    var external_grader_msg = $(response.html).find(".external-grader-message").html();
                    var result_elem = $(problem_elt).find(".ungraded-matlab-result");
                    result_elem.addClass("is-fading-in");
-                   result_elem.html(new_result_elem);
+                   edx.HtmlUtils.setHtml(result_elem, new_result_elem);
                    var external_grader_msg_elem = $(problem_elt).find(".external-grader-message");
                    external_grader_msg_elem.addClass("is-fading-in");
-                   external_grader_msg_elem.html(external_grader_msg);
+                   edx.HtmlUtils.setHtml(external_grader_msg_elem, external_grader_msg);
                    // If we have a message about waiting for the external grader.
                    if (external_grader_msg.trim()) {
-                        result_elem.html('');
+                        edx.HtmlUtils.setHtml(result_elem, '');
                         // Setup the polling for the next round
                         var next_timeout = prev_timeout * 2;
                         // The XML parsing that capa uses doesn't handle the greater-than symbol properly here, so we are forced to work around it.
@@ -128,7 +133,7 @@
           // save the answer
           $.postWithPrefix(url + '/problem_save', answer, save_callback);
       };
-      $('#plot_${id}').click(plot);
+      $('#plot_${id|n, js_escaped_string}').click(plot);
 
     });
   </script>

@@ -1,3 +1,4 @@
+<%page expression_filter="h"/>
 <%! from openedx.core.djangolib.markup import HTML %>
 <div id="inputtype_${id}" class="capa_inputtype">
     <div class="drag_and_drop_problem_div" id="drag_and_drop_div_${id}"
@@ -14,7 +15,7 @@
     % endif
 
 
-    <input type="text" name="input_${id}" id="input_${id}" aria-describedby="answer_${id}" value="${value|h}"
+    <input type="text" name="input_${id}" id="input_${id}" aria-describedby="answer_${id}" value="${value}"
     style="display:none;"/>
 
 

@@ -5,7 +5,38 @@
  * ~ Donald Knuth
  */
 
-(function($, ImageInput, undefined) {
+(function($, ImageInput) {
+    'use strict';
+
+    // Instead of storing an image, and then including it in the template via
+    // the <img /> tag, we will generate one on the fly.
+    //
+    // Create a simple image from a canvas. The canvas is filled by a colored
+    // rectangle.
+    function createTestImage(id, width, height, fillStyle) {
+        var canvas, ctx, img;
+
+        canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+
+        ctx = canvas.getContext('2d');
+        ctx.fillStyle = fillStyle;
+        ctx.fillRect(0, 0, width, height);
+
+        img = document.createElement('img');
+        img.src = canvas.toDataURL('image/png');
+        img.id = id;
+
+        return img;
+    }
+
+    // Strip the trailing 'px' substring from a CSS string containing the
+    // `left` and `top` properties of an element's style.
+    function stripPx(str) {
+        return str.substring(0, str.length - 2);
+    }
+
     describe('ImageInput', function() {
         var state;
 
@@ -103,33 +134,4 @@
             );
         });
     });
-
-    // Instead of storing an image, and then including it in the template via
-    // the <img /> tag, we will generate one on the fly.
-    //
-    // Create a simple image from a canvas. The canvas is filled by a colored
-    // rectangle.
-    function createTestImage(id, width, height, fillStyle) {
-        var canvas, ctx, img;
-
-        canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
-
-        ctx = canvas.getContext('2d');
-        ctx.fillStyle = fillStyle;
-        ctx.fillRect(0, 0, width, height);
-
-        img = document.createElement('img');
-        img.src = canvas.toDataURL('image/png');
-        img.id = id;
-
-        return img;
-    }
-
-    // Strip the trailing 'px' substring from a CSS string containing the
-    // `left` and `top` properties of an element's style.
-    function stripPx(str) {
-        return str.substring(0, str.length - 2);
-    }
 }).call(this, window.jQuery, window.ImageInput);

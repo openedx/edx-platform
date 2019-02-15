@@ -1797,7 +1797,7 @@ class ChoiceTextGroup(InputTypeBase):
                 msg = Text("[capa.inputtypes.extract_choices] {0}").format(
                     # Translators: a "tag" is an XML element, such as "<b>" in HTML
                     Text(_("Expected a {expected_tag} tag; got {given_tag} instead")).format(
-                        expected_tag="<choice>",
+                        expected_tag=Text("<choice>"),
                         given_tag=choice.tag,
                     )
                 )

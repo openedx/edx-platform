@@ -1,3 +1,4 @@
+<%page expression_filter="h"/>
 <%! from xblock_capa.lib.util import remove_markup
 from django.utils.translation import ugettext as _
 from openedx.core.djangolib.markup import HTML
@@ -39,7 +40,7 @@ from openedx.core.djangolib.markup import HTML
                 % else:
                     <% my_id = content_node.get('contents','') %>
                     <% my_val = value.get(my_id,'') %>
-                    <input class="ctinput" type="text" name="${content_node['contents']}" id="${content_node['contents']}" value="${my_val|h}"/>
+                    <input class="ctinput" type="text" name="${content_node['contents']}" id="${content_node['contents']}" value="${my_val}"/>
                 %endif
                 <span class="mock_label">
                     ${content_node['tail_text']}
@@ -52,7 +53,7 @@ from openedx.core.djangolib.markup import HTML
         % endfor
         <span id="answer_${id}"></span>
     </fieldset>
-        <input class= "choicetextvalue" type="hidden"  name="input_${id}{}" id="input_${id}" value="${value|h}" />
+        <input class= "choicetextvalue" type="hidden"  name="input_${id}{}" id="input_${id}" value="${value}" />
 
     <div class="indicator-container">
     % if input_type == 'checkbox' or not element_checked:

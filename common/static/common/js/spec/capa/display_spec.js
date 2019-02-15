@@ -42,7 +42,7 @@ describe('Problem', function() {
   describe('constructor', function() {
 
     it('set the element from html', function() {
-      this.problem999 = new Problem((`\
+      this.problem999 = new Problem(("\
 <section class='xblock xblock-student_view xblock-student_view-problem' data-type='Problem'> \
 <section id='problem_999' \
 class='problems-wrapper' \
@@ -50,7 +50,7 @@ data-problem-id='i4x://edX/999/problem/Quiz' \
 data-url='/problem/quiz/'> \
 </section> \
 </section>\
-`),
+"),
       mock_runtime);
       expect(this.problem999.element_id).toBe('problem_999');
     });

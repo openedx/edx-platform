@@ -7,7 +7,6 @@
 (function() {
     'use strict';
     this.CapaMarkdownEditor = (function() {
-
         var MarkdownEditingDescriptor = function(element) {
             var that = this;
             this.toggleCheatsheetVisibility = function() {
@@ -29,7 +28,7 @@
             this.element = element;
             this.xml_data_input = $(this.element.find('.xml-box'));
             this.markdown_input = $(this.element.find('.markdown-box'));
-            this.save_button = this.element.closest('.xblock-editor').find('.save-button')
+            this.save_button = this.element.closest('.xblock-editor').find('.save-button');
             if (this.markdown_input.length !== 0) {
                 this.markdown_editor = CodeMirror.fromTextArea(this.markdown_input[0], {
                     lineWrapping: true,
@@ -203,9 +202,10 @@
          the markdown and data fields.
          */
         MarkdownEditingDescriptor.prototype.save = function() {
+            var markdown, data;
             if (this.current_editor === this.markdown_editor) {
-                var markdown = this.markdown_editor.getValue(),
-                    data = MarkdownEditingDescriptor.markdownToXml(markdown);
+                markdown = this.markdown_editor.getValue();
+                data = MarkdownEditingDescriptor.markdownToXml(markdown);
                 if (markdown !== this.markdown_input.val()) {
                     this.markdown_input.val(markdown);
                     this.xml_data_input.val(data);
@@ -221,10 +221,10 @@
                 };
             } else {
                 // Using xml data editor, so clear out any markdown.
-                var markdown = "",
-                    data = this.current_editor.getValue();
+                markdown = '';
+                data = this.current_editor.getValue();
                 if (data !== this.xml_data_input.val()) {
-                    this.markdown_input.val("");
+                    this.markdown_input.val('');
                     this.xml_data_input.val(data);
 
                     this.markdown_input.closest('li').addClass('is-set');
@@ -336,13 +336,19 @@
                 // <label>question</label> <description>description</description>
                 xml = xml.replace(/>>([^]+?)<</gm, function(match, questionText) {
                     var result = questionText.split('||'),
-                        label = '<label>' + result[0] + '</label>\n';
+                        label = edx.StringUtils.interpolate(
+                            '<label>{label}</label>\n', {
+                                label: result[0]
+                            });
 
                     // don't add empty <description> tag
                     if (result.length === 1 || !result[1]) {
                         return label;
                     }
-                    return label + '<description>' + result[1] + '</description>\n';
+                    return label + edx.StringUtils.interpolate(
+                        '<description>{description}</description>\n', {
+                            description: result[1]
+                        });
                 });
 
                 // Pull out demand hints,  || a hint ||
@@ -353,8 +359,10 @@
                     for (i = 0; i < options.length; i += 1) {
                         inner = /\s*\|\|(.*?)\|\|/.exec(options[i]);
                         if (inner) {
-                            // xss-lint: disable=javascript-concat-html
-                            demandhints += '  <hint>' + inner[1].trim() + '</hint>\n';
+                            demandhints += edx.StringUtils.interpolate(
+                                '  <hint>{hint}</hint>\n', {
+                                    hint: inner[1].trim()
+                                });
                         }
                     }
                     return '';
@@ -434,7 +442,10 @@
                             optiontag += correct[1];
                         }
                         optiontag += '">';
-                        return '\n<optionresponse>\n' + optiontag + '</optioninput>\n</optionresponse>\n\n';
+                        return edx.StringUtils.interpolate(
+                            '\n<optionresponse>\n{optiontag}</optioninput>\n</optionresponse>\n\n', {
+                                optiontag: optiontag
+                            });
                     }
 
                     // new style  [[ many-lines ]]
@@ -451,14 +462,24 @@
                                 if (label) {
                                     label = ' label="' + label + '"';
                                 }
-                                hintstr = ' <optionhint' + label + '>' + textHint.hint + '</optionhint>';
+                                hintstr = edx.StringUtils.interpolate(
+                                    ' <optionhint{label}>{hint}</optionhint>', {
+                                        label: label,
+                                        hint: textHint.hint
+                                    });
                             }
-                            optionlines += '    <option' + correctstr + '>' + textHint.nothint + hintstr +
-                                '</option>\n';
+                            optionlines += edx.StringUtils.interpolate(
+                                '    <option{correct}>{nothint}{hint}</option>\n', {
+                                    correct: correctstr,
+                                    nothint: textHint.nothint,
+                                    hint: hintstr
+                                });
                         }
                     }
-                    return '\n<optionresponse>\n  <optioninput>\n' + optionlines +
-                        '  </optioninput>\n</optionresponse>\n\n';
+                    return edx.StringUtils.interpolate(
+                        '\n<optionresponse>\n  <optioninput>\n{options}</optioninput>\n</optionresponse>\n\n', {
+                            options: optionlines
+                        });
                 });
 
                 // multiple choice questions
@@ -486,9 +507,18 @@
                             hint = extractHint(value);
                             if (hint.hint) {
                                 value = hint.nothint;
-                                value = value + ' <choicehint' + hint.labelassign + '>' + hint.hint + '</choicehint>';
+                                value += edx.StringUtils.interpolate(
+                                    ' <choicehint{label}>{hint}</choicehint>', {
+                                        label: hint.labelassign,
+                                        hint: hint.hint
+                                    });
                             }
-                            choices += '    <choice correct="' + correct + '"' + fixed + '>' + value + '</choice>\n';
+                            choices += edx.StringUtils.interpolate(
+                                '    <choice correct="{correct}"{fixed}>{value}</choice>\n', {
+                                    correct: correct,
+                                    fixed: fixed,
+                                    value: value
+                                });
                         }
                     }
                     result = '<multiplechoiceresponse>\n';
@@ -524,8 +554,11 @@
                                 // lone case of hint text processing outside of extractHint, since syntax here is unique
                                 hintbody = abhint[2];
                                 hintbody = hintbody.replace('&lf;', '\n').trim();
-                                endHints += '    <compoundhint value="' + abhint[1].trim() + '">' + hintbody +
-                                    '</compoundhint>\n';
+                                endHints += edx.StringUtils.interpolate(
+                                    '    <compoundhint value="{value}">{hint}</compoundhint>\n', {
+                                        value: abhint[1].trim(),
+                                        hint: hintbody
+                                    });
                                 continue;  // bail
                             }
 
@@ -543,13 +576,17 @@
                                 // checkbox choicehints get their own line, since there can be two of them
                                 // <choicehint selected="true">You’re right that apple is a fruit.</choicehint>
                                 if (select) {
-                                    hints += '\n      <choicehint selected="true">' + select[2].trim() +
-                                        '</choicehint>';
+                                    hints += edx.StringUtils.interpolate(
+                                            '\n      <choicehint selected="true">{hint}</choicehint>', {
+                                                hint: select[2].trim()
+                                            });
                                 }
                                 select = /{\s*(u|unselected):((.|\n)*?)}/i.exec(inner);
                                 if (select) {
-                                    hints += '\n      <choicehint selected="false">' + select[2].trim() +
-                                        '</choicehint>';
+                                    hints += edx.StringUtils.interpolate(
+                                        '\n      <choicehint selected="false">{hint}</choicehint>', {
+                                            hint: select[2].trim()
+                                        });
                                 }
 
                                 // Blank out the original text only if the specific "selected" syntax is found
@@ -558,7 +595,12 @@
                                     value = hint.nothint;
                                 }
                             }
-                            groupString += '    <choice correct="' + correct + '">' + value + hints + '</choice>\n';
+                            groupString += edx.StringUtils.interpolate(
+                                '    <choice correct="{correct}">{value}{hints}</choice>\n', {
+                                    correct: correct,
+                                    value: value,
+                                    hints: hints
+                                });
                         }
                     }
 
@@ -610,27 +652,32 @@
                             hintLine = '';
                             if (textHint.hint) {
                                 firstAnswer = textHint.nothint;
-                                // xss-lint: disable=javascript-concat-html
-                                hintLine = '  <correcthint' + textHint.labelassign + '>' +
-                                // xss-lint: disable=javascript-concat-html
-                                    textHint.hint + '</correcthint>\n';
+                                hintLine = edx.StringUtils.interpolate(
+                                    '<correcthint{label}>{hint}</correcthint>\n', {
+                                        label: textHint.labelassign,
+                                        hint: textHint.hint
+                                    });
                             }
 
                             // Range case
                             if (isRangeToleranceCase(firstAnswer)) {
                                 // [5, 7) or (5, 7), or (1.2345 * (2+3), 7*4 ]  - range tolerance case
                                 // = (5*2)*3 should not be used as range tolerance
-                                // xss-lint: disable=javascript-concat-html
-                                numericalResponseString = '<numericalresponse answer="' + firstAnswer + '">\n';
+                                numericalResponseString = edx.StringUtils.interpolate(
+                                    '<numericalresponse answer="{answer}">\n', {
+                                        answer: firstAnswer
+                                    });
                             } else {
                                 answerData = getAnswerData(firstAnswer);
-                                // xss-lint: disable=javascript-concat-html
-                                numericalResponseString = '<numericalresponse answer="' + answerData.answer + '">\n';
+                                numericalResponseString = edx.StringUtils.interpolate(
+                                    '<numericalresponse answer="{answer}">\n', {
+                                        answer: answerData.answer
+                                    });
                                 if (answerData.default) {
-                                    // xss-lint: disable=javascript-concat-html
-                                    numericalResponseString += '  <responseparam type="tolerance" default="' +
-                                    // xss-lint: disable=javascript-concat-html
-                                        answerData.default + '" />\n';
+                                    numericalResponseString += edx.StringUtils.interpolate(
+                                        '  <responseparam type="tolerance" default="{default}" />\n', {
+                                            default: answerData.default
+                                        });
                                 }
                             }
 
@@ -653,18 +700,18 @@
                                     }
 
                                     if (additionalTextHint.hint) {
-                                        // xss-lint: disable=javascript-concat-html
-                                        additionalHintLine = '<correcthint' +
-                                            // xss-lint: disable=javascript-concat-html
-                                            additionalTextHint.labelassign + '>' +
-                                            // xss-lint: disable=javascript-concat-html
-                                            additionalTextHint.hint + '</correcthint>';
+                                        additionalHintLine = edx.StringUtils.interpolate(
+                                            '<correcthint{label}>{hint}</correcthint>', {
+                                                label: additionalTextHint.labelassign,
+                                                hint: additionalTextHint.hint
+                                            });
                                     }
 
-                                    // xss-lint: disable=javascript-concat-html
-                                    additionalAnswerString += '  <additional_answer answer="' + orMatch[1] + '">';
-                                    additionalAnswerString += additionalHintLine;
-                                    additionalAnswerString += '</additional_answer>\n';
+                                    additionalAnswerString += edx.StringUtils.interpolate(
+                                        '  <additional_answer answer="{answer}">{hint}</additional_answer>\n', {
+                                            answer: orMatch[1],
+                                            hint: additionalHintLine
+                                        });
                                 }
                             }
 
@@ -673,9 +720,10 @@
                                 numericalResponseString += additionalAnswerString;
                             }
 
-                            numericalResponseString += '  <formulaequationinput />\n';
-                            numericalResponseString += hintLine;
-                            numericalResponseString += '</numericalresponse>\n\n';
+                            numericalResponseString += edx.StringUtils.interpolate(
+                                '  <formulaequationinput />\n{hint}</numericalresponse>\n\n', {
+                                    hint: hintLine
+                                });
 
                             return numericalResponseString;
                         },
@@ -692,10 +740,18 @@
                                 typ = ' type="ci regexp"';
                                 firstAnswer = firstAnswer.slice(1).trim();
                             }
-                            string = '<stringresponse answer="' + firstAnswer + '"' + typ + ' >\n';
+                            string = edx.StringUtils.interpolate(
+                                '<stringresponse answer="{answer}"{type} >\n', {
+                                    answer: firstAnswer,
+                                    type: typ
+                                });
+
                             if (textHint.hint) {
-                                string += '  <correcthint' + textHint.labelassign + '>' +
-                                    textHint.hint + '</correcthint>\n';
+                                string += edx.StringUtils.interpolate(
+                                    '  <correcthint{label}>{hint}</correcthint>\n', {
+                                        label: textHint.labelassign,
+                                        hint: textHint.hint
+                                    });
                             }
 
                             // Subsequent cases are not= or or=
@@ -703,17 +759,28 @@
                                 textHint = extractHint(values[i]);
                                 notMatch = /^not\=\s*(.*)/.exec(textHint.nothint);
                                 if (notMatch) {
-                                    string += '  <stringequalhint answer="' + notMatch[1] + '"' +
-                                        textHint.labelassign + '>' + textHint.hint + '</stringequalhint>\n';
+                                    string += edx.StringUtils.interpolate(
+                                        '  <stringequalhint answer="{answer}"{label}>{hint}</stringequalhint>\n', {
+                                            answer: notMatch[1],
+                                            label: textHint.labelassign,
+                                            hint: textHint.hint
+                                        });
+
                                     continue;
                                 }
                                 orMatch = /^or\=\s*(.*)/.exec(textHint.nothint);
                                 if (orMatch) {
                                     // additional_answer with answer= attribute
-                                    string += '  <additional_answer answer="' + orMatch[1] + '">';
+                                    string += edx.StringUtils.interpolate(
+                                        '  <additional_answer answer="{answer}">', {
+                                            answer: orMatch[1]
+                                        });
                                     if (textHint.hint) {
-                                        string += '<correcthint' + textHint.labelassign + '>' +
-                                            textHint.hint + '</correcthint>';
+                                        string += edx.StringUtils.interpolate(
+                                            '<correcthint{label}>{hint}</correcthint>', {
+                                                label: textHint.labelassign,
+                                                hint: textHint.hint
+                                            });
                                     }
                                     string += '</additional_answer>\n';
                                 }
@@ -730,13 +797,19 @@
 
                 // replace explanations
                 xml = xml.replace(/\[explanation\]\n?([^\]]*)\[\/?explanation\]/gmi, function(match, p1) {
-                    return '<solution>\n<div class="detailed-solution">\n' +
-                        gettext('Explanation') + '\n\n' + p1 + '\n</div>\n</solution>';
+                    return edx.StringUtils.interpolate(
+                        '<solution>\n<div class="detailed-solution">\n{label}\n\n{explanation}\n</div>\n</solution>', {
+                            label: gettext('Explanation'),
+                            explanation: p1
+                        });
                 });
 
                 // replace code blocks
                 xml = xml.replace(/\[code\]\n?([^\]]*)\[\/?code\]/gmi, function(match, p1) {
-                    return '<pre><code>' + p1 + '</code></pre>';
+                    return edx.StringUtils.interpolate(
+                        '<pre><code>{code}</code></pre>', {
+                            code: p1
+                        });
                 });
 
                 // split scripts and preformatted sections, and wrap paragraphs
@@ -774,8 +847,9 @@
                 responseTypesSelector = responseTypes.join(', ');
 
                 // make temporary xml
-                // xss-lint: disable=javascript-concat-html
-                $xml = $($.parseXML('<prob>' + xml + '</prob>'));
+                $xml = $($.parseXML(
+                    edx.StringUtils.interpolate('<prob>{xml}</prob>', {xml: xml})
+                ));
                 responseType = $xml.find(responseTypesSelector);
 
                 // convert if there is only one responsetype
@@ -823,12 +897,17 @@
             });
             finalDemandHints = '';
             if (demandHintTags.length) {
-                // xss-lint: disable=javascript-concat-html
-                finalDemandHints = '\n<demandhint>\n' + demandHintTags.join('') + '</demandhint>';
+                finalDemandHints = edx.StringUtils.interpolate(
+                    '\n<demandhint>\n{hints}</demandhint>', {
+                        hints: demandHintTags.join('')
+                    });
             }
             // make all responsetypes descendants of a single problem element
-            // xss-lint: disable=javascript-concat-html
-            finalXml = '<problem>\n' + responseTypesXML.join('\n\n') + finalDemandHints + '\n</problem>';
+            finalXml = edx.StringUtils.interpolate(
+                '<problem>\n{responses}{hints}\n</problem>', {
+                    responses: responseTypesXML.join('\n\n'),
+                    hints: finalDemandHints
+                });
             return finalXml;
         };
 
@@ -838,5 +917,5 @@
 
 function CapaXBlockMarkdownEditor(element) {
     'use strict';
-    new CapaMarkdownEditor(element);
+    return new this.CapaMarkdownEditor(element);
 }

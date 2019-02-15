@@ -1,3 +1,4 @@
+<%page expression_filter="h"/>
 <%! from openedx.core.djangolib.markup import HTML %>
 <section id="inputtype_${id}" class="capa_inputtype" >
      <table><tr><td height='600'>
@@ -16,7 +17,7 @@
     <div class="${status.classname}" id="status_${id}">
     % endif
 
-  <input type="text" name="input_${id}" id="input_${id}" aria-describedby="answer_${id}" value="${value|h}"
+  <input type="text" name="input_${id}" id="input_${id}" aria-describedby="answer_${id}" value="${value}"
       style="display:none;"
    />
 

@@ -13,6 +13,7 @@ from cgi import escape as cgi_escape
 
 from lxml import etree
 
+from openedx.core.djangolib.markup import HTML
 from .registry import TagRegistry
 
 log = logging.getLogger(__name__)
@@ -23,7 +24,7 @@ registry = TagRegistry()
 
 
 class MathRenderer(object):
-    '''
+    """
     Render math using latex-like formatting.
 
     Examples:
@@ -34,7 +35,8 @@ class MathRenderer(object):
     We convert these to [mathjax]...[/mathjax] and [mathjaxinline]...[/mathjaxinline]
 
     TODO: use shorter tags (but this will require converting problem XML files!)
-    '''
+    """  # nopep8
+    # pep8 raises W605 invalid escape sequence '\d' for the above docstring, but we need it to be an accurate example
     tags = ['math']
 
     def __init__(self, system, xml):
@@ -53,18 +55,20 @@ class MathRenderer(object):
         """
         Return the contents of this tag, rendered to html, as an etree element.
         """
-        # TODO: why are there nested html tags here??  Why are there html tags at all, in fact?
-        html = '<html><html>%s</html><html>%s</html></html>' % (
-            self.mathstr, saxutils.escape(self.xml.tail))
+        html = HTML('<div><div>{math}</div><div>{xml}</div></div>').format(
+            math=self.mathstr, xml=saxutils.escape(self.xml.tail),
+        )
         try:
             xhtml = etree.XML(html)
         except Exception as err:  # pylint: disable=broad-except
             if self.system.DEBUG:
-                msg = '<html><div class="inline-error"><p>Error %s</p>' % (
-                    str(err).replace('<', '&lt;'))
-                msg += ('<p>Failed to construct math expression from <pre>%s</pre></p>' %
-                        html.replace('<', '&lt;'))
-                msg += "</div></html>"
+                msg = HTML('<div><div class="inline-error">'
+                           '<p>Error {err}</p>'
+                           '<p>Failed to construct math expression from <pre>{html}</pre></p>'
+                           '</div></div>').format(
+                    err=HTML(str(err)),
+                    html=Text(html),
+                )
                 log.error(msg)
                 return etree.XML(msg)
             else:
@@ -116,19 +120,21 @@ class TargetedFeedbackRenderer(object):
         """
         Return the contents of this tag, rendered to html, as an etree element.
         """
-        html = '<section class="targeted-feedback-span"><span>{}</span></section>'.format(etree.tostring(self.xml))
+        html = HTML('<section class="targeted-feedback-span"><span>{}</span></section>').format(
+            etree.tostring(self.xml)
+        )
         try:
             xhtml = etree.XML(html)
         except Exception as err:  # pylint: disable=broad-except
             if self.system.DEBUG:
-                msg = """
+                msg = HTML("""
                     <html>
                       <div class="inline-error">
                         <p>Error {err}</p>
                         <p>Failed to construct targeted feedback from <pre>{html}</pre></p>
                       </div>
                     </html>
-                """.format(err=cgi_escape(err), html=cgi_escape(html))
+                """).format(err=cgi_escape(err), html=cgi_escape(html))
                 log.error(msg)
                 return etree.XML(msg)
             else:

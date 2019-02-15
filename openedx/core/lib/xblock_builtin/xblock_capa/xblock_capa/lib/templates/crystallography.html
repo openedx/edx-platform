@@ -1,3 +1,4 @@
+<%page expression_filter="h"/>
 <%! from openedx.core.djangolib.markup import HTML %>
 <section id="inputtype_${id}" class="capa_inputtype" >
     <div class="crystalography_problem" style="width:${width};height:${height}"></div>
@@ -14,7 +15,7 @@
         <div class="status ${status.classname}" id="status_${id}">
     % endif
 
-    <input type="text" name="input_${id}" aria-describedby="answer_${id}" id="input_${id}" value="${value|h}" style="display:none;"/>
+    <input type="text" name="input_${id}" aria-describedby="answer_${id}" id="input_${id}" value="${value}" style="display:none;"/>
 
     <%include file="status_span.html" args="status=status, status_id=id"/>
 
