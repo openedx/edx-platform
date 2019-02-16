@@ -108,9 +108,9 @@ def _register_course_home_messages(request, course, user_access, course_start_da
     """
     from lms.djangoapps.courseware.courses import allow_public_access
     from courseware.courses import course_open_for_self_enrollment
-    from xmodule.course_module import COURSE_VISIBILITY_PRIVATE, COURSE_VISIBILITY_PUBLIC_OUTLINE, COURSE_VISIBILITY_PUBLIC
+    from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
 
-    is_course_public = allow_public_access(course, [COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE])
+    is_course_public = allow_public_access(course, [COURSE_VISIBILITY_PUBLIC])
     is_self_enrollment_allowed = course_open_for_self_enrollment(course.id)
 
     if is_course_public and not is_self_enrollment_allowed:
