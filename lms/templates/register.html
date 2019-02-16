@@ -1,9 +1,9 @@
-<%page expression_filter="h"/>
 <%inherit file="main.html" />
 <%namespace name='static' file='static_content.html'/>
 <%namespace file='main.html' import="login_query"/>
 <%!
 from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
 from django.urls import reverse
 from django.utils import html
 from django_countries import countries
@@ -14,7 +14,7 @@ from third_party_auth import pipeline, provider
 import calendar
 %>
 
-<%block name="pagetitle">${_("Register for {platform_name}").format(platform_name=platform_name)}</%block>
+<%block name="pagetitle">${Text(_("Register for {platform_name}")).format(platform_name=platform_name)}</%block>
 
 <%block name="bodyclass">view-register</%block>
 
@@ -87,13 +87,13 @@ import calendar
           removeClass('is-disabled').
           attr('aria-disabled', false).
           prop('disabled', false).
-          html("${_('Create My {platform_name} Account').format(platform_name=platform_name)}");
+          html("${Text(_('Create My {platform_name} Account')).format(platform_name=platform_name)}");
       }
       else {
         $submitButton.
           addClass('is-disabled').
           prop('disabled', true).
-          text("${_('Processing your account information')}");
+          text("${Text(_('Processing your account information'))}");
       }
     }
   </script>
@@ -102,8 +102,8 @@ import calendar
 <section class="introduction">
   <header>
     <h1 class="title">
-      <span class="title-super">${_("Welcome!")}</span>
-      <span class="title-sub">${_("Register below to create your {platform_name} account").format(platform_name=platform_name)}</span>
+      <span class="title-super">${Text(_("Welcome!"))}</span>
+      <span class="title-sub">${Text(_("Register below to create your {platform_name} account")).format(platform_name=platform_name)}</span>
     </h1>
   </header>
 </section>
