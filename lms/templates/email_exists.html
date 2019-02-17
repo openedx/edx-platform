@@ -1,16 +1,20 @@
 
-<%! from django.utils.translation import ugettext as _ %>
+<%! from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
+%>
 
 <%inherit file="main.html" />
 
 <section class="container activation">
 
   <section class="message">
-    <h1 class="invalid">${_("E-mail change failed")}</h1>
+    <h1 class="invalid">${Text(_("E-mail change failed"))}</h1>
     <hr class="horizontal-divider">
 
-    <p>${_("An account with the new e-mail address already exists.")}</p>
+    <p>${Text(_("An account with the new e-mail address already exists."))}</p>
 
-    <p>${_("Go back to the {link_start}home page{link_end}.").format(link_start='<a href="/">', link_end='</a>')}</p>
+    <p>${Text(_("Go back to the {link_start}home page{link_end}.")).format(
+        link_start=HTML('<a href="/">'),
+            link_end=HTML('</a>'))}</p>
   </section>
 </section>
