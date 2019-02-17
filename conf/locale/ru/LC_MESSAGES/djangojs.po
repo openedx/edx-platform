@@ -162,7 +162,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-02-10 20:42+0000\n"
+"POT-Creation-Date: 2019-02-15 10:46+0000\n"
 "PO-Revision-Date: 2019-02-10 20:45+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
@@ -5537,6 +5537,14 @@ msgstr ""
 msgid "There was an error updating your goal."
 msgstr ""
 
+#: lms/templates/ccx/schedule.underscore
+msgid "Expand All"
+msgstr "Развернуть всё"
+
+#: lms/templates/ccx/schedule.underscore
+msgid "Collapse All"
+msgstr "Свернуть все"
+
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result"
 msgid_plural "{total_results} results"
@@ -7734,14 +7742,6 @@ msgstr ""
 #: lms/templates/api_admin/catalog-results.underscore
 msgid "This catalog's courses:"
 msgstr "Курсы в данном каталоге:"
-
-#: lms/templates/ccx/schedule.underscore
-msgid "Expand All"
-msgstr "Развернуть всё"
-
-#: lms/templates/ccx/schedule.underscore
-msgid "Collapse All"
-msgstr "Свернуть все"
 
 #: lms/templates/ccx/schedule.underscore
 msgid "Start Date"

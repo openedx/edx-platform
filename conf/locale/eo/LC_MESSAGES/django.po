@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-02-14 19:50+0000\n"
-"PO-Revision-Date: 2019-02-14 19:50:19.005272\n"
+"POT-Creation-Date: 2019-02-17 20:37+0000\n"
+"PO-Revision-Date: 2019-02-17 20:37:37.850416\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -24942,6 +24942,10 @@ msgstr "Pägé Föötér Ⱡ'σяєм ιρѕυм ∂σłσя #"
 #: themes/edx.org/lms/templates/footer.html
 msgid "edX Home Page"
 msgstr "édX Hömé Pägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: themes/edx.org/lms/templates/footer.html
+msgid "Connect"
+msgstr "Çönnéçt Ⱡ'σяєм ιρѕυм #"
 
 #: themes/edx.org/lms/templates/footer.html
 msgid "© 2012–{year} edX Inc. "

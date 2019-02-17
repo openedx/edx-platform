@@ -242,7 +242,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-02-10 20:42+0000\n"
+"POT-Creation-Date: 2019-02-15 10:46+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Miguel Bonilla <mbonilla@edx.org>, 2019\n"
 "Language-Team: Spanish (Latin America) (https://www.transifex.com/open-edx/teams/6205/es_419/)\n"
@@ -5670,10 +5670,6 @@ msgstr "Acerca de"
 msgid "{platform_name} for Business"
 msgstr "{platform_name} para Negocios"
 
-#: lms/djangoapps/branding/api.py themes/red-theme/lms/templates/footer.html
-msgid "News"
-msgstr "Noticias"
-
 #: lms/djangoapps/branding/api.py lms/templates/static_templates/contact.html
 #: themes/red-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/footer.html
@@ -5686,6 +5682,10 @@ msgstr "Contacto"
 #: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "Careers"
 msgstr "Carreras"
+
+#: lms/djangoapps/branding/api.py themes/red-theme/lms/templates/footer.html
+msgid "News"
+msgstr "Noticias"
 
 #: lms/djangoapps/branding/api.py lms/djangoapps/certificates/views/webview.py
 #: themes/edx.org/lms/templates/certificates/_accomplishment-footer.html
@@ -5709,10 +5709,6 @@ msgstr "Política de privacidad"
 msgid "Accessibility Policy"
 msgstr "Políticas de Accesibilidad"
 
-#: lms/djangoapps/branding/api.py
-msgid "Sitemap"
-msgstr "Mapa del Sitio"
-
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This is a legal document users must agree to
 #. in order to register a new account.
@@ -5723,6 +5719,10 @@ msgstr "Mapa del Sitio"
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Terms of Service"
 msgstr "Términos del servicio"
+
+#: lms/djangoapps/branding/api.py
+msgid "Sitemap"
+msgstr "Mapa del Sitio"
 
 #: lms/djangoapps/branding/api.py
 msgid "Affiliates"
@@ -10836,10 +10836,6 @@ msgstr "Descárgate la app Android en la Google Play Store"
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "Our mailing address is"
 msgstr "Nuestra dirección de correo es"
-
-#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
-msgid "Unsubscribe from these emails."
-msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_head.html
 msgid "edX Email"
@@ -16199,34 +16195,6 @@ msgstr ""
 "Ingresa un nombre de usuario para ver los catálogos que pertenecen a dicho "
 "usuario"
 
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Unsubscribe Successful"
-msgstr ""
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Unsubscribe Cancelled"
-msgstr ""
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Confirm Unsubscribe"
-msgstr ""
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "You have been unsubscribed from emails for {course}."
-msgstr ""
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "You have not been unsubscribed from emails for {course}."
-msgstr ""
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Do you want to unsubscribe from emails for {course}?"
-msgstr ""
-
-#: lms/templates/bulk_email/unsubscribe.html
-msgid "Unsubscribe"
-msgstr ""
-
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Open Calculator"
 msgstr "Abrir Calculadora"
@@ -19096,14 +19064,6 @@ msgid "Journals"
 msgstr "Registros diario"
 
 #: lms/templates/header/navbar-authenticated.html
-#: lms/templates/header/user_dropdown.html
-#: lms/templates/navigation/navbar-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Profile"
-msgstr "Perfil"
-
-#: lms/templates/header/navbar-authenticated.html
 msgid "Discover New"
 msgstr "Encontrar curso"
 
@@ -19140,6 +19100,10 @@ msgstr "Instituciones"
 #: lms/templates/header/user_dropdown.html
 msgid "Resume your last course"
 msgstr "Reanudar su último curso"
+
+#: lms/templates/header/user_dropdown.html
+msgid "Profile"
+msgstr "Perfil"
 
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -22438,6 +22402,10 @@ msgstr "Pie de Página"
 #: themes/edx.org/lms/templates/footer.html
 msgid "edX Home Page"
 msgstr "Página Principal de edX"
+
+#: themes/edx.org/lms/templates/footer.html
+msgid "Connect"
+msgstr ""
 
 #: themes/edx.org/lms/templates/footer.html
 msgid "© 2012–{year} edX Inc. "

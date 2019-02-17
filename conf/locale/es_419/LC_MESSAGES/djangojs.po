@@ -150,7 +150,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-02-10 20:42+0000\n"
+"POT-Creation-Date: 2019-02-15 10:46+0000\n"
 "PO-Revision-Date: 2019-02-10 20:45+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -5587,6 +5587,14 @@ msgstr "Ha actualizado exitosamente su objetivo."
 msgid "There was an error updating your goal."
 msgstr "Hubo un error actualizando su objetivo."
 
+#: lms/templates/ccx/schedule.underscore
+msgid "Expand All"
+msgstr "Expandir todo"
+
+#: lms/templates/ccx/schedule.underscore
+msgid "Collapse All"
+msgstr "Colapsar todo"
+
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result"
 msgid_plural "{total_results} results"
@@ -7846,14 +7854,6 @@ msgstr ""
 #: lms/templates/api_admin/catalog-results.underscore
 msgid "This catalog's courses:"
 msgstr "Los cursos de este catálogo:"
-
-#: lms/templates/ccx/schedule.underscore
-msgid "Expand All"
-msgstr "Expandir todo"
-
-#: lms/templates/ccx/schedule.underscore
-msgid "Collapse All"
-msgstr "Colapsar todo"
 
 #: lms/templates/ccx/schedule.underscore
 msgid "Start Date"
