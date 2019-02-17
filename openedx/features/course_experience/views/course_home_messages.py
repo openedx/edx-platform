@@ -165,7 +165,6 @@ def _register_course_home_messages(request, course, user_access, course_start_da
                 )
             )
 
-
 def _register_course_goal_message(request, course):
     """
     Register a message to let a learner specify a course goal.
