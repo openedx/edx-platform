@@ -105,6 +105,7 @@ class CourseHomeMessageFragmentView(EdxFragmentView):
         html = render_to_string('course_experience/course-messages-fragment.html', context)
         return Fragment(html)
 
+
 def _register_course_home_messages(request, course, user_access, course_start_data):
     """
     Register messages to be shown in the course home content page.
@@ -159,6 +160,7 @@ def _register_course_home_messages(request, course, user_access, course_start_da
                     course_display_name=course.display_name
                 )
             )
+
 
 def _register_course_goal_message(request, course):
     """
