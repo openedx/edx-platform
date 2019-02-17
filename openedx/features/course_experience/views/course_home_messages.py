@@ -27,6 +27,9 @@ from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_experience import CourseHomeMessages
 from student.models import CourseEnrollment
+from lms.djangoapps.courseware.courses import allow_public_access
+from courseware.courses import course_open_for_self_enrollment
+from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
 
 
 class CourseHomeMessageFragmentView(EdxFragmentView):
@@ -106,9 +109,6 @@ def _register_course_home_messages(request, course, user_access, course_start_da
     """
     Register messages to be shown in the course home content page.
     """
-    from lms.djangoapps.courseware.courses import allow_public_access
-    from courseware.courses import course_open_for_self_enrollment
-    from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
 
     is_course_public = allow_public_access(course, [COURSE_VISIBILITY_PUBLIC])
     is_self_enrollment_allowed = course_open_for_self_enrollment(course.id)
