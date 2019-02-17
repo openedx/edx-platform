@@ -9,7 +9,7 @@ from student.roles import CourseCreatorRole
 def intercom(request):
     data = {'show_intercom_widget': False}
 
-    intercom_app_id = settings.INTERCOM_APP_ID
+    intercom_app_id = getattr(settings, 'INTERCOM_APP_ID', None)
     if not intercom_app_id:
         return data
 
