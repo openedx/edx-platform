@@ -8,7 +8,7 @@ from django.http.request import split_domain_port
 from django.contrib.sites.models import Site, SiteManager, SITE_CACHE
 import django
 
-cache = caches['general']
+cache = caches['default']
 
 
 def _cache_key_for_site_id(site_id):
