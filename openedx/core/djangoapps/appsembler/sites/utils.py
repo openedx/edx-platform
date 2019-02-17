@@ -7,9 +7,8 @@ import sass
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
-from django.contrib.staticfiles.templatetags.staticfiles import static
-from organizations.api import add_organization
-from organizations.models import UserOrganizationMapping, Organization
+from organizations import api as org_api
+from organizations import models as org_models
 
 from openedx.core.djangoapps.theming.models import SiteTheme
 
@@ -143,12 +142,12 @@ def bootstrap_site(site, org_data=None, user_email=None):
     site.configuration_id = site_config.id
     # temp workarounds while old staging is still up and running
     if organization_slug:
-        organization_data = add_organization({
+        organization_data = org_api.add_organization({
             'name': organization_slug,
             'short_name': organization_slug,
             'edx_uuid': org_data.get('edx_uuid')
         })
-        organization = Organization.objects.get(id=organization_data.get('id'))
+        organization = org_models.Organization.objects.get(id=organization_data.get('id'))
         organization.sites.add(site)
         site_config.values['course_org_filter'] = organization_slug
         site_config.save()
@@ -156,7 +155,7 @@ def bootstrap_site(site, org_data=None, user_email=None):
         organization = {}
     if user_email:
         user = User.objects.get(email=user_email)
-        UserOrganizationMapping.objects.create(user=user, organization=organization, is_amc_admin=True)
+        org_models.UserOrganizationMapping.objects.create(user=user, organization=organization, is_amc_admin=True)
     else:
         user = {}
     return organization, site, user
