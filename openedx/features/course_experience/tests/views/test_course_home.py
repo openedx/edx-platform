@@ -4,6 +4,10 @@ Tests for the course home page.
 """
 from datetime import datetime, timedelta
 
+import pytz
+from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
+from student.models import CourseEnrollmentAllowed
+
 import ddt
 import mock
 from django.conf import settings
@@ -844,7 +848,6 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         self.assertContains(response, TEST_COURSE_GOAL_UPDATE_FIELD)
         self.assertNotContains(response, TEST_COURSE_GOAL_UPDATE_FIELD_HIDDEN)
 
-    #TODO SE-760
     @override_waffle_flag(COURSE_PRE_START_ACCESS_FLAG, active=True)
     def test_course_messaging_for_public_course(self):
         """
@@ -855,11 +858,6 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         3) Unenrolled users are shown a course message asking them to enroll for courses that allow
            self-enrollment
         """
-
-        import pytz
-        from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
-        from student.models import CourseEnrollmentAllowed
-
         TEST_COURSE_ANONYMOUS_MESSAGE = 'You must be enrolled in the course to see course content.'
         enable_unenrolled_access = True
 
