@@ -113,11 +113,6 @@ def _register_course_home_messages(request, course, user_access, course_start_da
     is_course_public = allow_public_access(course, [COURSE_VISIBILITY_PUBLIC])
     is_self_enrollment_allowed = course_open_for_self_enrollment(course.id)
 
-    if is_course_public and not is_self_enrollment_allowed:
-        if user_access['is_anonymous']:
-            pass
-        if not user_access['is_enrolled']:
-            pass
     if is_course_public and is_self_enrollment_allowed:
         if not user_access['is_anonymous'] and not user_access['is_staff'] and not user_access['is_enrolled']:
             CourseHomeMessages.register_info_message(
