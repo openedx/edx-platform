@@ -26,7 +26,7 @@ export class CourseOrLibraryListing extends React.Component {
 
     var filteredItems = this.props.items.filter(function(i) {
         var nameMatch = i.display_name.toLowerCase().includes(searchString);
-        var keyMatch = (i.org + "/" + i.number + "/" + i.run).toLowerCase().includes(searchString);
+        var keyMatch = (i.org + "/" + i.number + "/" + (i.run || "")).toLowerCase().includes(searchString);
         return nameMatch || keyMatch;
     });
 
