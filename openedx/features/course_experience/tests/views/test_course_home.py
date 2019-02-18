@@ -342,7 +342,6 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         if not is_enrolled and enabled_unenrolled_access:
             self.assertContains(response, 'You must be enrolled in the course to see course content.')
 
-
     @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
     @override_waffle_flag(SHOW_REVIEWS_TOOL_FLAG, active=True)
     @ddt.data(
@@ -865,6 +864,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         response = self.client.get(course_home_url(verifiable_course))
         self.assertContains(response, TEST_COURSE_GOAL_UPDATE_FIELD)
         self.assertNotContains(response, TEST_COURSE_GOAL_UPDATE_FIELD_HIDDEN)
+
 
 class CourseHomeFragmentViewTests(ModuleStoreTestCase):
     """
