@@ -102,41 +102,68 @@ class CourseHomeMessageFragmentView(EdxFragmentView):
         html = render_to_string('course_experience/course-messages-fragment.html', context)
         return Fragment(html)
 
-
 def _register_course_home_messages(request, course, user_access, course_start_data):
     """
     Register messages to be shown in the course home content page.
     """
-    if user_access['is_anonymous']:
-        CourseHomeMessages.register_info_message(
-            request,
-            Text(_(
-                u'{sign_in_link} or {register_link} and then enroll in this course.'
-            )).format(
-                sign_in_link=HTML(u'<a href="/login?next={current_url}">{sign_in_label}</a>').format(
-                    sign_in_label=_('Sign in'),
-                    current_url=urlquote_plus(request.path),
+    from lms.djangoapps.courseware.courses import allow_public_access
+    from courseware.courses import course_open_for_self_enrollment
+    from xmodule.course_module import COURSE_VISIBILITY_PRIVATE, COURSE_VISIBILITY_PUBLIC_OUTLINE, COURSE_VISIBILITY_PUBLIC
+
+    is_course_public = allow_public_access(course, [COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE])
+    is_self_enrollment_allowed = course_open_for_self_enrollment(course.id)
+
+    if is_course_public and not is_self_enrollment_allowed:
+        if user_access['is_anonymous']:
+            pass
+        if not user_access['is_enrolled']:
+            pass
+    if is_course_public and is_self_enrollment_allowed:
+        if not user_access['is_anonymous'] and not user_access['is_staff'] and not user_access['is_enrolled']:
+            CourseHomeMessages.register_info_message(
+                request,
+                Text(_(
+                    '{open_enroll_link}Enroll now{close_enroll_link} to access the full course.'
+                )).format(
+                    open_enroll_link=HTML('<button class="enroll-btn btn-link">'),
+                    close_enroll_link=HTML('</button>')
                 ),
-                register_link=HTML(u'<a href="/register?next={current_url}">{register_label}</a>').format(
-                    register_label=_('register'),
-                    current_url=urlquote_plus(request.path),
+                title=Text(_('Welcome to {course_display_name}')).format(
+                    course_display_name=course.display_name
                 )
-            ),
-            title=Text(_('You must be enrolled in the course to see course content.'))
-        )
-    if not user_access['is_anonymous'] and not user_access['is_staff'] and not user_access['is_enrolled']:
-        CourseHomeMessages.register_info_message(
-            request,
-            Text(_(
-                u'{open_enroll_link}Enroll now{close_enroll_link} to access the full course.'
-            )).format(
-                open_enroll_link=HTML('<button class="enroll-btn btn-link">'),
-                close_enroll_link=HTML('</button>')
-            ),
-            title=Text(_(u'Welcome to {course_display_name}')).format(
-                course_display_name=course.display_name
             )
-        )
+
+    if not is_course_public:
+        if user_access['is_anonymous']:
+            CourseHomeMessages.register_info_message(
+                request,
+                Text(_(
+                    '{sign_in_link} or {register_link} and then enroll in this course.'
+                )).format(
+                    sign_in_link=HTML('<a href="/login?next={current_url}">{sign_in_label}</a>').format(
+                        sign_in_label=_('Sign in'),
+                        current_url=urlquote_plus(request.path),
+                    ),
+                    register_link=HTML('<a href="/register?next={current_url}">{register_label}</a>').format(
+                        register_label=_('register'),
+                        current_url=urlquote_plus(request.path),
+                    )
+                ),
+                title=Text(_('You must be enrolled in the course to see course content.'))
+            )
+        if not user_access['is_anonymous'] and not user_access['is_staff'] and not user_access['is_enrolled']:
+            CourseHomeMessages.register_info_message(
+                request,
+                Text(_(
+                    '{open_enroll_link}Enroll now{close_enroll_link} to access the full course.'
+                )).format(
+                    open_enroll_link=HTML('<button class="enroll-btn btn-link">'),
+                    close_enroll_link=HTML('</button>')
+                ),
+                title=Text(_('Welcome to {course_display_name}')).format(
+                    course_display_name=course.display_name
+                )
+            )
 
 
 def _register_course_goal_message(request, course):

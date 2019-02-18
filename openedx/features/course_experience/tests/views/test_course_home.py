@@ -856,6 +856,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
            self-enrollment
         """
 
+        import pytz
         from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
         from student.models import CourseEnrollmentAllowed
 
@@ -867,27 +868,27 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
                 # Anonymous users are not shown a course message asking them to enroll
                 url = course_home_url(self.course)
                 response = self.client.get(url)
-                self.assertContains(response, TEST_COURSE_HOME_MESSAGE)
                 self.assertNotContains(response, TEST_COURSE_ANONYMOUS_MESSAGE)
 
-                # Unenrolled users are not shown a course message asking them to enroll
+                # Unenrolled users are not shown a course message asking them to enroll for courses
+                # that do not allow self-enrollment
                 user = self.create_user_for_course(self.course, CourseUserType.UNENROLLED)
-                url = course_home_url(self.course)
+                # Closed course
+                now = datetime.now().replace(tzinfo=pytz.UTC)
+                start = now + timedelta(days=1)
+                end = now + timedelta(days=2)
+                course = CourseFactory(enrollment_start=start, enrollment_end=end)
+                url = course_home_url(course)
                 response = self.client.get(url)
-                self.assertContains(response, TEST_COURSE_HOME_MESSAGE)
                 self.assertNotContains(response, TEST_COURSE_HOME_MESSAGE_UNENROLLED)
                 self.assertNotContains(response, TEST_COURSE_ANONYMOUS_MESSAGE)
 
                 # Unenrolled users are shown a course message asking them to enroll for courses that allow
                 # self-enrollment
                 user = self.create_user_for_course(self.course, CourseUserType.UNENROLLED)
-                # Enable self enrollment
-                CourseEnrollmentAllowed.objects.create(email=user.email, course_id=self.course.id)
                 url = course_home_url(self.course)
                 response = self.client.get(url)
-                self.assertContains(response, TEST_COURSE_HOME_MESSAGE)
                 self.assertContains(response, TEST_COURSE_HOME_MESSAGE_UNENROLLED)
-                self.assertContains(response, TEST_COURSE_ANONYMOUS_MESSAGE)
 
 
 class CourseHomeFragmentViewTests(ModuleStoreTestCase):
