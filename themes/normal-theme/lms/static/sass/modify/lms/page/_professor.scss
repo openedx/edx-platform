@@ -50,6 +50,7 @@
   min-width: 280px;
   line-height: 1.5;
   vertical-align: middle;
+  cursor: pointer;
 }
 .professor-block img{
   width: 130px;
@@ -68,7 +69,6 @@
   bottom: 10px;
   right: 10px;
   color: $primary;
-  cursor: pointer;
 }
 .professor-block a span{
   transform: scale(0.6);
