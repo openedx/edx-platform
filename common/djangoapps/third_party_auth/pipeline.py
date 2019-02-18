@@ -78,6 +78,8 @@ from social_core.pipeline import partial
 from social_core.pipeline.social_auth import associate_by_email
 
 from edxmako.shortcuts import render_to_string
+
+from util.json_request import JsonResponse
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_authn import cookies as user_authn_cookies
 from lms.djangoapps.verify_student.models import SSOVerification
@@ -626,6 +628,9 @@ def set_logged_in_cookies(backend=None, user=None, strategy=None, auth_entry=Non
 
     """
     if not is_api(auth_entry) and user is not None and user.is_authenticated:
+        if not user.has_usable_password():
+            msg = "Your account is disabled"
+            return JsonResponse(msg, status=403)
         request = strategy.request if strategy else None
         # n.b. for new users, user.is_active may be False at this point; set the cookie anyways.
         if request is not None:

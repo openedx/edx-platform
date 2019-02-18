@@ -37,13 +37,13 @@ class Command(BaseCommand):
                 original_email=email_address
             )
         except UserRetirementStatus.DoesNotExist:
-            raise CommandError("No retirement request with email address '{}' exists.".format(email_address))
+            raise CommandError(u"No retirement request with email address '{}' exists.".format(email_address))
 
         # Check if the user has started the retirement process -or- not.
         if retirement_status.current_state.state_name != 'PENDING':
             raise CommandError(
-                "Retirement requests can only be cancelled for users in the PENDING state."
-                " Current request state for '{}': {}".format(
+                u"Retirement requests can only be cancelled for users in the PENDING state."
+                u" Current request state for '{}': {}".format(
                     email_address,
                     retirement_status.current_state.state_name
                 )
@@ -58,4 +58,4 @@ class Command(BaseCommand):
         # No need to delete the accompanying "permanent" retirement request record - it gets done via Django signal.
         retirement_status.delete()
 
-        print("Successfully cancelled retirement request for user with email address '{}'.".format(email_address))
+        print(u"Successfully cancelled retirement request for user with email address '{}'.".format(email_address))

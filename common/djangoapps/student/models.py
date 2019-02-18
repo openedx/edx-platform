@@ -2735,6 +2735,10 @@ class AccountRecoveryManager(models.Manager):
 class AccountRecovery(models.Model):
     """
     Model for storing information for user's account recovery in case of access loss.
+
+    .. pii: the field named secondary_email contains pii, retired in the `DeactivateLogoutView`
+    .. pii_types: email_address
+    .. pii_retirement: local_api
     """
     user = models.OneToOneField(User, related_name='account_recovery', on_delete=models.CASCADE)
     secondary_email = models.EmailField(
@@ -2761,3 +2765,22 @@ class AccountRecovery(models.Model):
         self.secondary_email = email
         self.is_active = False
         self.save()
+
+    @classmethod
+    def retire_recovery_email(cls, user_id):
+        """
+        Retire user's recovery/secondary email as part of GDPR Phase I.
+        Returns 'True'
+
+        If an AccountRecovery record is found for this user it will be deleted,
+        if it is not found it is assumed this table has no PII for the given user.
+
+        :param user_id: int
+        :return: bool
+        """
+        try:
+            cls.objects.get(user_id=user_id).delete()
+        except cls.DoesNotExist:
+            pass
+
+        return True

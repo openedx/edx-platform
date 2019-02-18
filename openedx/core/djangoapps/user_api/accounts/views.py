@@ -47,6 +47,7 @@ from openedx.core.djangolib.oauth2_retirement_utils import retire_dot_oauth2_mod
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.api.parsers import MergePatchParser
 from student.models import (
+    AccountRecovery,
     CourseEnrollment,
     ManualEnrollmentAudit,
     PendingNameChange,
@@ -412,6 +413,7 @@ class DeactivateLogoutView(APIView):
                 # Delete OAuth tokens associated with the user.
                 retire_dop_oauth2_models(request.user)
                 retire_dot_oauth2_models(request.user)
+                AccountRecovery.retire_recovery_email(request.user.id)
 
                 try:
                     # Send notification email to user
@@ -609,9 +611,9 @@ class AccountRetirementPartnerReportView(ViewSet):
         # to disambiguate them in Python, which will respect case in the comparison.
         if len(usernames) != len(retirement_statuses_clean):
             return Response(
-                '{} original_usernames given, {} found!\n'
-                'Given usernames:\n{}\n'
-                'Found UserRetirementReportingStatuses:\n{}'.format(
+                u'{} original_usernames given, {} found!\n'
+                u'Given usernames:\n{}\n'
+                u'Found UserRetirementReportingStatuses:\n{}'.format(
                     len(usernames),
                     len(retirement_statuses_clean),
                     usernames,
@@ -654,7 +656,7 @@ class AccountRetirementStatusView(ViewSet):
             state_objs = RetirementState.objects.filter(state_name__in=states)
             if state_objs.count() != len(states):
                 found = [s.state_name for s in state_objs]
-                raise RetirementStateError('Unknown state. Requested: {} Found: {}'.format(states, found))
+                raise RetirementStateError(u'Unknown state. Requested: {} Found: {}'.format(states, found))
 
             earliest_datetime = datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=cool_off_days)
 
@@ -671,7 +673,7 @@ class AccountRetirementStatusView(ViewSet):
         except ValueError:
             return Response('Invalid cool_off_days, should be integer.', status=status.HTTP_400_BAD_REQUEST)
         except KeyError as exc:
-            return Response('Missing required parameter: {}'.format(text_type(exc)), status=status.HTTP_400_BAD_REQUEST)
+            return Response(u'Missing required parameter: {}'.format(text_type(exc)), status=status.HTTP_400_BAD_REQUEST)
         except RetirementStateError as exc:
             return Response(text_type(exc), status=status.HTTP_400_BAD_REQUEST)
 
@@ -710,9 +712,9 @@ class AccountRetirementStatusView(ViewSet):
             return Response(serializer.data)
         # This should only occur on the datetime conversion of the start / end dates.
         except ValueError as exc:
-            return Response('Invalid start or end date: {}'.format(text_type(exc)), status=status.HTTP_400_BAD_REQUEST)
+            return Response(u'Invalid start or end date: {}'.format(text_type(exc)), status=status.HTTP_400_BAD_REQUEST)
         except KeyError as exc:
-            return Response('Missing required parameter: {}'.format(text_type(exc)), status=status.HTTP_400_BAD_REQUEST)
+            return Response(u'Missing required parameter: {}'.format(text_type(exc)), status=status.HTTP_400_BAD_REQUEST)
         except RetirementState.DoesNotExist:
             return Response('Unknown retirement state.', status=status.HTTP_400_BAD_REQUEST)
         except RetirementStateError as exc:

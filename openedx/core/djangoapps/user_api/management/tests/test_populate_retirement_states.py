@@ -85,7 +85,7 @@ def test_out_of_order_start_state(settings):
     del settings.RETIREMENT_STATES[0]
     settings.RETIREMENT_STATES.insert(4, 'PENDING')
 
-    with pytest.raises(CommandError, match=r'{} must be the first state'.format(START_STATE)):
+    with pytest.raises(CommandError, match=ur'{} must be the first state'.format(START_STATE)):
         call_command('populate_retirement_states')
 
 

@@ -20,6 +20,7 @@ from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_lin
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.url_utils import quote_slashes
+from openedx.features.course_duration_limits.access import EXPIRATION_DATE_FORMAT_STR
 from student.models import Registration, CourseEnrollment
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.date_utils import strftime_localized
@@ -370,14 +371,14 @@ def get_expiration_banner_text(user, course, language='en'):
         data-datetime="{formatted_date}" data-language="{language}">{formatted_date_localized}</span>'
     formatted_expiration_date = date_string.format(
         language=language,
-        formatted_date=expiration_date.strftime(u'%b %-d, %Y'),
-        formatted_date_localized=strftime_localized(expiration_date, u'%b %-d, %Y')
+        formatted_date=expiration_date.strftime(EXPIRATION_DATE_FORMAT_STR),
+        formatted_date_localized=strftime_localized(expiration_date, EXPIRATION_DATE_FORMAT_STR)
     )
     if upgrade_deadline:
         formatted_upgrade_deadline = date_string.format(
             language=language,
-            formatted_date=upgrade_deadline.strftime(u'%b %-d, %Y'),
-            formatted_date_localized=strftime_localized(upgrade_deadline, u'%b %-d, %Y')
+            formatted_date=upgrade_deadline.strftime(EXPIRATION_DATE_FORMAT_STR),
+            formatted_date_localized=strftime_localized(upgrade_deadline, EXPIRATION_DATE_FORMAT_STR)
         )
 
         bannerText = u'<strong>Audit Access Expires {expiration_date}</strong><br>\

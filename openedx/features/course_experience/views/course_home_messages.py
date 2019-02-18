@@ -178,7 +178,7 @@ def _register_course_goal_message(request, course):
     course_goal_options = get_course_goal_options()
     goal_choices_html = Text(_(
         'To start, set a course goal by selecting the option below that best describes '
-        'your learning plan. {goal_options_container}'
+        u'your learning plan. {goal_options_container}'
     )).format(
         goal_options_container=HTML('<div class="row goal-options-container">')
     )
@@ -188,11 +188,11 @@ def _register_course_goal_message(request, course):
         '{initial_tag}{choice}{closing_tag}'
     ).format(
         initial_tag=HTML(
-            '<div tabindex="0" aria-label="{aria_label_choice}" class="goal-option dismissible" '
+            u'<div tabindex="0" aria-label="{aria_label_choice}" class="goal-option dismissible" '
             'data-choice="{goal_key}">'
         ).format(
             goal_key=GOAL_KEY_CHOICES.unsure,
-            aria_label_choice=Text(_("Set goal to: {choice}")).format(
+            aria_label_choice=Text(_(u"Set goal to: {choice}")).format(
                 choice=course_goal_options[GOAL_KEY_CHOICES.unsure],
             ),
         ),
@@ -211,11 +211,11 @@ def _register_course_goal_message(request, course):
             '{initial_tag}{goal_text}{closing_tag}'
         ).format(
             initial_tag=HTML(
-                '<button tabindex="0" aria-label="{aria_label_choice}" class="goal-option btn-outline-primary" '
+                u'<button tabindex="0" aria-label="{aria_label_choice}" class="goal-option btn-outline-primary" '
                 'data-choice="{goal_key}">'
             ).format(
                 goal_key=goal_key,
-                aria_label_choice=Text(_("Set goal to: {goal_text}")).format(
+                aria_label_choice=Text(_(u"Set goal to: {goal_text}")).format(
                     goal_text=Text(_(goal_text))
                 )
             ),
@@ -229,7 +229,7 @@ def _register_course_goal_message(request, course):
             goal_choices_html=goal_choices_html,
             closing_tag=HTML('</div>')
         ),
-        title=Text(_('Welcome to {course_display_name}')).format(
+        title=Text(_(u'Welcome to {course_display_name}')).format(
             course_display_name=course.display_name
         )
     )

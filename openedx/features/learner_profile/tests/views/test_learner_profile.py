@@ -114,7 +114,7 @@ class LearnerProfileViewTest(UrlResetMixin, ModuleStoreTestCase):
     def test_records_link(self):
         profile_path = reverse('learner_profile', kwargs={'username': self.USERNAME})
         response = self.client.get(path=profile_path)
-        self.assertContains(response, '<a href="{}/records/">'.format(CREDENTIALS_PUBLIC_SERVICE_URL))
+        self.assertContains(response, u'<a href="{}/records/">'.format(CREDENTIALS_PUBLIC_SERVICE_URL))
 
     def test_undefined_profile_page(self):
         """
@@ -146,7 +146,7 @@ class LearnerProfileViewTest(UrlResetMixin, ModuleStoreTestCase):
 
         response = self.client.get('/u/{username}'.format(username=self.user.username))
 
-        self.assertContains(response, 'card certificate-card mode-{cert_mode}'.format(cert_mode=cert_mode))
+        self.assertContains(response, u'card certificate-card mode-{cert_mode}'.format(cert_mode=cert_mode))
 
     @ddt.data(
         ['downloadable', True],
@@ -167,9 +167,9 @@ class LearnerProfileViewTest(UrlResetMixin, ModuleStoreTestCase):
         response = self.client.get('/u/{username}'.format(username=self.user.username))
 
         if is_passed_status:
-            self.assertContains(response, 'card certificate-card mode-{cert_mode}'.format(cert_mode=cert.mode))
+            self.assertContains(response, u'card certificate-card mode-{cert_mode}'.format(cert_mode=cert.mode))
         else:
-            self.assertNotContains(response, 'card certificate-card mode-{cert_mode}'.format(cert_mode=cert.mode))
+            self.assertNotContains(response, u'card certificate-card mode-{cert_mode}'.format(cert_mode=cert.mode))
 
     def test_certificate_for_missing_course(self):
         """
@@ -181,7 +181,7 @@ class LearnerProfileViewTest(UrlResetMixin, ModuleStoreTestCase):
 
         response = self.client.get('/u/{username}'.format(username=self.user.username))
 
-        self.assertNotContains(response, 'card certificate-card mode-{cert_mode}'.format(cert_mode=cert.mode))
+        self.assertNotContains(response, u'card certificate-card mode-{cert_mode}'.format(cert_mode=cert.mode))
 
     @ddt.data(True, False)
     def test_no_certificate_visibility(self, own_profile):
@@ -221,4 +221,4 @@ class LearnerProfileViewTest(UrlResetMixin, ModuleStoreTestCase):
 
         response = self.client.get('/u/{username}'.format(username=self.user.username))
 
-        self.assertNotContains(response, 'card certificate-card mode-{cert_mode}'.format(cert_mode=cert.mode))
+        self.assertNotContains(response, u'card certificate-card mode-{cert_mode}'.format(cert_mode=cert.mode))

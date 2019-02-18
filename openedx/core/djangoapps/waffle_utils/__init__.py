@@ -414,7 +414,7 @@ class CourseWaffleFlag(WaffleFlag):
             checking waffle.
         """
         # validate arguments
-        assert issubclass(type(course_key), CourseKey), "The course_key '{}' must be a CourseKey.".format(
+        assert issubclass(type(course_key), CourseKey), u"The course_key '{}' must be a CourseKey.".format(
             str(course_key)
         )
 
