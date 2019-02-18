@@ -127,10 +127,11 @@ class CourseHomeFragmentView(EdxFragmentView):
             'is_staff': has_access(request.user, 'staff', course_key),
         }
 
+        allow_anonymous = COURSE_ENABLE_UNENROLLED_ACCESS_FLAG.is_enabled(course_key)
         course_access = {
             'allow_anonymous': COURSE_ENABLE_UNENROLLED_ACCESS_FLAG.is_enabled(course_key),
-            'is_public': allow_anonymous and course.course_visibility == COURSE_VISIBILITY_PUBLIC,
-            'is_public_outline': allow_anonymous and course.course_visibility == COURSE_VISIBILITY_PUBLIC_OUTLINE,
+            'allow_public': allow_anonymous and course.course_visibility == COURSE_VISIBILITY_PUBLIC,
+            'allow_public_outline': allow_anonymous and course.course_visibility == COURSE_VISIBILITY_PUBLIC_OUTLINE,
             'allow_enrollment': course_open_for_self_enrollment(course.id)
         }
 
