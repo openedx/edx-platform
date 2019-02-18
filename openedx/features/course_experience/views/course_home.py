@@ -131,7 +131,7 @@ class CourseHomeFragmentView(EdxFragmentView):
             'allow_anonymous': COURSE_ENABLE_UNENROLLED_ACCESS_FLAG.is_enabled(course_key),
             'is_public': allow_anonymous and course.course_visibility == COURSE_VISIBILITY_PUBLIC,
             'is_public_outline': allow_anonymous and course.course_visibility == COURSE_VISIBILITY_PUBLIC_OUTLINE,
-            'allow_enrollment':course_open_for_self_enrollment(course.id)
+            'allow_enrollment': course_open_for_self_enrollment(course.id)
         }
 
         # Set all the fragments
