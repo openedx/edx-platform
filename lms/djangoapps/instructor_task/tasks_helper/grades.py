@@ -528,6 +528,23 @@ class ProblemGradeReport(object):
 
 class ProblemResponses(object):
 
+    @staticmethod
+    def _build_block_base_path(block):
+        """
+        Return the display names of the blocks that lie above the supplied block in hierarchy.
+
+        Arguments:
+            block: a single block
+
+        Returns:
+            List[str]: a list of display names of blocks starting from the root block (Course)
+        """
+        path = []
+        while block.parent:
+            block = block.get_parent()
+            path.append(block.display_name)
+        return path[::-1]
+
     @classmethod
     def _build_problem_list(cls, course_blocks, root, path=None):
         """
@@ -586,6 +603,7 @@ class ProblemResponses(object):
         student_data_keys = set()
 
         with store.bulk_operations(course_key):
+            base_path = cls._build_block_base_path(store.get_item(usage_key))
             for title, path, block_key in cls._build_problem_list(course_blocks, usage_key):
                 # Chapter and sequential blocks are filtered out since they include state
                 # which isn't useful for this report.
@@ -600,26 +618,32 @@ class ProblemResponses(object):
                 if hasattr(block, 'generate_report_data'):
                     try:
                         user_state_iterator = user_state_client.iter_all_for_block(block_key)
-                        generated_report_data = {
-                            username: state
-                            for username, state in
-                            block.generate_report_data(user_state_iterator, max_count)
-                        }
+                        generated_report_data = dict()
+                        for username, state in block.generate_report_data(user_state_iterator, max_count):
+                            generated_report_data.setdefault(username, []).append(state)
                     except NotImplementedError:
                         pass
 
-                responses = list_problem_responses(course_key, block_key, max_count)
+                responses = []
 
-                student_data += responses
-                for response in responses:
+                for response in list_problem_responses(course_key, block_key, max_count):
                     response['title'] = title
                     # A human-readable location for the current block
-                    response['location'] = ' > '.join(path)
+                    response['location'] = ' > '.join(base_path + path)
                     # A machine-friendly location for the current block
                     response['block_key'] = str(block_key)
-                    user_data = generated_report_data.get(response['username'], {})
-                    response.update(user_data)
-                    student_data_keys = student_data_keys.union(user_data.keys())
+                    user_states = generated_report_data.get(response['username'], [])
+                    if user_states:
+                        for user_state in user_states:
+                            user_response = response.copy()
+                            user_response.update(user_state)
+                            student_data_keys = student_data_keys.union(user_state.keys())
+                            responses.append(user_response)
+                    else:
+                        responses.append(response)
+
+                student_data += responses
+
                 if max_count is not None:
                     max_count -= len(responses)
                     if max_count <= 0:
