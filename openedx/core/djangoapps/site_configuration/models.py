@@ -200,6 +200,8 @@ class SiteConfiguration(models.Model):
     def _sass_var_override(self, path):
         if 'branding-basics' in path:
             return [(path, self._formatted_sass_variables())]
+        if 'customer-sass-input' in path:
+            return [(path, self.values.get('customer_sass_input', ''))]
         return None
 
     def _get_initial_microsite_values(self):
