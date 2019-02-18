@@ -27,8 +27,6 @@ from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_experience import CourseHomeMessages
 from student.models import CourseEnrollment
-from lms.djangoapps.courseware.courses import allow_public_access
-from courseware.courses import course_open_for_self_enrollment
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
 
 
@@ -49,8 +47,17 @@ class CourseHomeMessageFragmentView(EdxFragmentView):
         'is_enrolled': True if the user is enrolled in the course, False otherwise
         'is_staff': True if the user is a staff member of the course, False otherwise
     }
+
+    course_access = {
+        'allow_anonymous': True if course allows anonymous user access, False otherwise
+        'is_public': True if course allows public access, False otherwise
+        'is_public_outline': True if course outline is enabled for public access,
+                                False otherwise
+        'allow_enrollment': True if course allows self-enrollment, False otherwise
+    }
+
     """
-    def render_to_fragment(self, request, course_id, user_access, **kwargs):
+    def render_to_fragment(self, request, course_id, user_access, course_access, **kwargs):
         """
         Renders a course message fragment for the specified course.
         """
@@ -70,7 +77,7 @@ class CourseHomeMessageFragmentView(EdxFragmentView):
         }
 
         # Register the course home messages to be loaded on the page
-        _register_course_home_messages(request, course, user_access, course_start_data)
+        _register_course_home_messages(request, course, user_access, course_access, course_start_data)
 
         # Register course date alerts
         for course_date_block in get_course_date_blocks(course, request.user):
@@ -106,15 +113,11 @@ class CourseHomeMessageFragmentView(EdxFragmentView):
         return Fragment(html)
 
 
-def _register_course_home_messages(request, course, user_access, course_start_data):
+def _register_course_home_messages(request, course, user_access, course_access, course_start_data):
     """
     Register messages to be shown in the course home content page.
     """
-
-    is_course_public = allow_public_access(course, [COURSE_VISIBILITY_PUBLIC])
-    is_self_enrollment_allowed = course_open_for_self_enrollment(course.id)
-
-    if is_course_public and is_self_enrollment_allowed:
+    if course_access['is_public'] and course_access['allow_enrollment']:
         if not user_access['is_anonymous'] and not user_access['is_staff'] and not user_access['is_enrolled']:
             CourseHomeMessages.register_info_message(
                 request,
@@ -129,7 +132,7 @@ def _register_course_home_messages(request, course, user_access, course_start_da
                 )
             )
 
-    if not is_course_public:
+    if not course_access['is_public']:
         if user_access['is_anonymous']:
             CourseHomeMessages.register_info_message(
                 request,
