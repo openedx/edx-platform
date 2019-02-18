@@ -117,6 +117,12 @@ def _register_course_home_messages(request, course, user_access, course_access, 
     """
     Register messages to be shown in the course home content page.
     """
+    if course_access['is_public'] and not course_access['allow_enrollment']:
+        CourseHomeMessages.register_info_message(
+            request,
+            Text(_('You must be enrolled in the course to see course content.'))
+        )
+
     if course_access['is_public'] and course_access['allow_enrollment']:
         if not user_access['is_anonymous'] and not user_access['is_staff'] and not user_access['is_enrolled']:
             CourseHomeMessages.register_info_message(
