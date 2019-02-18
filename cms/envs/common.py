@@ -1250,7 +1250,7 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "util.password_policy_validators.MinimumLengthValidator",
         "OPTIONS": {
-            "min_length": 2
+            "min_length": 6
         }
     },
     {
