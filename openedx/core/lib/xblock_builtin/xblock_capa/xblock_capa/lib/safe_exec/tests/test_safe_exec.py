@@ -163,7 +163,7 @@ class TestSafeExecCaching(unittest.TestCase):
             safe_exec(code, g, cache=DictCache(cache))
 
         self.assertEqual(len(cache), 1)
-        cache_exc_msg, cache_globals = cache.values()[0]
+        cache_exc_msg, _cache_globals = cache.values()[0]
         self.assertEqual("Hey there!", cache_exc_msg)
 
         # Change it again, now no exception!

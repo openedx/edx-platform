@@ -1,4 +1,7 @@
 <%page expression_filter="h"/>
+<%
+from openedx.core.djangolib.markup import HTML, Text
+%>
 <%! from openedx.core.djangolib.markup import HTML %>
 <div class="annotation-input">
 <div class="script_placeholder" data-src="${STATIC_URL}js/capa/annotationinput.js"/>
@@ -12,13 +15,13 @@
 </div>
 <div class="annotation-body">
 
-    <div class="block block-highlight">${text}</div>
-    <div class="block block-comment">${comment}</div>
+    <div class="block block-highlight">${HTML(text)}</div>
+    <div class="block block-comment">${HTML(comment)}</div>
 
-    <div class="block">${comment_prompt}</div>
-    <textarea class="comment" id="input_${id}_comment" name="input_${id}_comment" aria-describedby="answer_${id}">${comment_value}</textarea>
+    <div class="block">${HTML(comment_prompt)}</div>
+    <textarea class="comment" id="input_${id}_comment" name="input_${id}_comment" aria-describedby="answer_${id}">${HTML(comment_value)}</textarea>
 
-    <div class="block" id="label_${id}">${tag_prompt}</div>
+    <div class="block" id="label_${id}">${HTML(tag_prompt)}</div>
     <ul class="tags">
     % for option in options:
         <li>
@@ -35,7 +38,7 @@
                 selected
             % endif
             " data-id="${option['id']}">
-                ${option['description']}
+                ${HTML(option['description'])}
             </span>
         </li>
     % endfor
@@ -44,7 +47,7 @@
     % if debug:
     <div class="debug-value">
         Rendered with value:<br/>
-        <pre>${value}</pre>
+        <pre>${Text(value)}</pre>
         Current input value:<br/>
         <input type="text" class="value" name="input_${id}" id="input_${id}" value="${value}" />
     </div>

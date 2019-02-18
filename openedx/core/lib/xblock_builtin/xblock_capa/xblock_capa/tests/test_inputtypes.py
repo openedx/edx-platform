@@ -841,8 +841,9 @@ class MatlabTest(unittest.TestCase):
         html_tree_equal(received, expected)
 
     def test_rendering_with_invalid_queue_msg(self):
-        self.the_input.queue_msg = (u"<div class='matlabResponse'><div style='white-space:pre' class='commandWindowOutput'>"
-                                    u"\nans =\n\n\u0002\n\n</div><ul></ul></div>")
+        self.the_input.queue_msg = (
+            u"<div class='matlabResponse'><div style='white-space:pre' class='commandWindowOutput'>"
+            u"\nans =\n\n\u0002\n\n</div><ul></ul></div>")
         context = self.the_input._get_render_context()  # pylint: disable=protected-access
 
         prob_id = 'prob_1_2'

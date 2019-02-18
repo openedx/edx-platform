@@ -1,3 +1,4 @@
+/* eslint-disable no-class */
 /*
  * decaffeinate suggestions:
  * DS207: Consider shorter variations of null checks

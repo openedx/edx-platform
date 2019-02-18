@@ -1,8 +1,9 @@
-(function(undefined) {
+/* globals Collapsible */
+(function(this) {
     'use strict';
 
     describe('Collapsible', function() {
-        var $el, html, html_custom,
+        var $el, html, htmlCustom,
             initialize = function(template) {
                 setFixtures(template);
                 $el = $('.collapsible');
@@ -23,7 +24,7 @@
                         '<p>longform is visible</p>' +
                     '</div>' +
                 '</section>';
-            html_custom = '' +
+            htmlCustom = '' +
                 '<section class="collapsible">' +
                     '<div ' +
                         'class="shortform-custom" ' +
@@ -47,7 +48,7 @@
             });
 
             it('Custom container initialized correctly', function() {
-                initialize(html_custom);
+                initialize(htmlCustom);
 
                 expect($el.find('.shortform-custom')).toContainElement('.full-custom');
                 expect($el.find('.full-custom')).toHaveText('Show shortform-custom');
@@ -60,13 +61,9 @@
             var assertChanges = function(state, anchorsElClass, showText, hideText) {
                 var anchors, text;
 
-                if (state == null) {
-                    state = 'closed';
-                }
-
                 anchors = $el.find('.' + anchorsElClass);
 
-                if (state === 'closed') {
+                if ((state === null) || (state === 'closed')) {
                     expect($el.find('.longform')).toBeHidden();
                     expect($el).not.toHaveClass('open');
                     text = showText;
@@ -108,7 +105,7 @@
             it('Custom container', function() {
                 var event;
 
-                initialize(html_custom);
+                initialize(htmlCustom);
 
                 event = jQuery.Event('click', {
                     target: $el.find('.full-custom').get(0)

@@ -164,6 +164,7 @@ class CapaFactory(object):
             field_data=DictFieldData(field_data),
             scope_ids=scope_ids,
         )
+        xblock.validate()
 
         if override_get_score:
             if correct:
@@ -907,7 +908,7 @@ class CapaXBlockTest(unittest.TestCase):
         # The files we'll be uploading.
         fnames = ["prog1.py", "prog2.py", "prog3.py"]
         fpaths = [os.path.join(DATA_DIR, "capa", fname) for fname in fnames]
-        fileobjs = [open(fpath) for fpath in fpaths]
+        fileobjs = [open(fpath) for fpath in fpaths]  # pylint: disable=open-builtin
         for fileobj in fileobjs:
             self.addCleanup(fileobj.close)
 
@@ -956,7 +957,7 @@ class CapaXBlockTest(unittest.TestCase):
         # The files we'll be uploading.
         fnames = ["prog1.py", "prog2.py", "prog3.py"]
         fpaths = [os.path.join(DATA_DIR, "capa", fname) for fname in fnames]
-        fileobjs = [open(fpath) for fpath in fpaths]
+        fileobjs = [open(fpath) for fpath in fpaths]  # pylint: disable=open-builtin
         for fileobj in fileobjs:
             self.addCleanup(fileobj.close)
 
@@ -972,7 +973,7 @@ class CapaXBlockTest(unittest.TestCase):
         post_data.append((CapaFactoryWithFiles.input_key(response_num=3), 'None'))
         request = webob.Request.blank("/some/fake/url", POST=post_data, content_type='multipart/form-data')
 
-        module.handle('ajax_handler', request, 'problem_check')
+        module.handle('xmodule_handler', request, 'problem_check')
 
         self.assertEqual(mock_http_post.call_count, 1)
         _, kwargs = mock_http_post.call_args
@@ -3237,7 +3238,7 @@ class TestProblemCheckTracking(unittest.TestCase):
     def test_file_inputs(self, mock_http_post):
         fnames = ["prog1.py", "prog2.py", "prog3.py"]
         fpaths = [os.path.join(DATA_DIR, "capa", fname) for fname in fnames]
-        fileobjs = [open(fpath) for fpath in fpaths]
+        fileobjs = [open(fpath) for fpath in fpaths]  # pylint: disable=open-builtin
         for fileobj in fileobjs:
             self.addCleanup(fileobj.close)
 

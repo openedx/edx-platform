@@ -250,7 +250,7 @@ class InputTypeBase(object):
             # super().__init__, and are isolated from changes to the input
             # constructor interface.
             self.setup()
-        except Exception as err:  # pylint: disable=broad-except
+        except Exception as err:
             # Something went wrong: add xml to message, but keep the traceback
             msg = u"Error in xml '{x}': {err} ".format(
                 x=etree.tostring(xml), err=text_type(err))
@@ -929,7 +929,7 @@ class MatlabInput(CodeInput):
         _ = self.capa_system.i18n.ugettext
 
         queue_msg = self.queue_msg
-        if len(self.queue_msg) > 0:  # pylint disable=len-as-condition
+        if len(self.queue_msg) > 0:  # pylint: disable=len-as-condition
             # An empty string cannot be parsed as XML but is okay to include in the template.
             try:
                 etree.XML(HTML(u'<div>{0}</div>').format(HTML(self.queue_msg)))
@@ -1266,13 +1266,13 @@ class FormulaEquationInput(InputTypeBase):
                 static_url=self.capa_system.STATIC_URL),
         }
 
-    def handle_ajax(self, dispatch, request_post):
+    def handle_ajax(self, dispatch, data):
         """
         Since we only have formcalc preview this input, check to see if it
         matches the corresponding dispatch and send it through if it does
         """
         if dispatch == 'preview_formcalc':
-            return self.preview_formcalc(request_post)
+            return self.preview_formcalc(data)
         return {}
 
     def preview_formcalc(self, get):

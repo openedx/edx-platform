@@ -23,9 +23,9 @@ def get_template(template_name):
     """
     Return template for a capa inputtype.
     """
-    template_dir = Path(__file__).dirname().dirname()
+    template_dir = Path(__file__).dirname().dirname()   # pylint: disable=no-value-for-parameter
     return TemplateLookup(
-        directories=[template_dir / 'lib' / 'templates'],   # pylint: disable=no-value-for-parameter
+        directories=[template_dir / 'lib' / 'templates'],
         default_filters=['decode.utf8']
     ).get_template(template_name)
 
@@ -117,6 +117,6 @@ def load_fixture(relpath):
     in the same directory as the test file.
     """
     abspath = os.path.join(os.path.dirname(__file__), 'test_files', relpath)
-    with open(abspath) as fixture_file:
+    with open(abspath) as fixture_file:  # pylint: disable=open-builtin
         contents = fixture_file.read()
     return contents.decode('utf8')

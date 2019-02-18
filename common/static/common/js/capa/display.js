@@ -18,7 +18,7 @@
             return -1;
         };
 
-    this.Problem = (function() {
+    var Problem = (function() {
         function Problem(element, runtime) {
             var that = this;
             this.hint_button = function() {
@@ -1325,7 +1325,9 @@
         };
 
         return Problem;
-    }).call(this);
+    })();
+
+    this.Problem = Problem;
 }).call(this);
 
 function CapaXBlock(runtime, element) {

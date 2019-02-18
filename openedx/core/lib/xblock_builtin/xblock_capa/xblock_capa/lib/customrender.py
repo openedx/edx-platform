@@ -13,7 +13,7 @@ from cgi import escape as cgi_escape
 
 from lxml import etree
 
-from openedx.core.djangolib.markup import HTML
+from openedx.core.djangolib.markup import HTML, Text
 from .registry import TagRegistry
 
 log = logging.getLogger(__name__)
@@ -24,7 +24,7 @@ registry = TagRegistry()
 
 
 class MathRenderer(object):
-    """
+    r"""
     Render math using latex-like formatting.
 
     Examples:
@@ -121,7 +121,7 @@ class TargetedFeedbackRenderer(object):
         Return the contents of this tag, rendered to html, as an etree element.
         """
         html = HTML('<section class="targeted-feedback-span"><span>{}</span></section>').format(
-            etree.tostring(self.xml)
+            HTML(etree.tostring(self.xml))
         )
         try:
             xhtml = etree.XML(html)

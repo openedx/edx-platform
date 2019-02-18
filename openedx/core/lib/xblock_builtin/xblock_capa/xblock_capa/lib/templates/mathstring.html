@@ -1,9 +1,12 @@
 <%page expression_filter="h"/>
+<%
+from openedx.core.djangolib.markup import HTML
+%>
 <section class="math-string">
  % if isinline:
    <span>[mathjaxinline]${mathstr}[/mathjaxinline]</span>
  % else:
     <span>[mathjax]${mathstr}[/mathjax]</span>
  % endif
-    <span>${tail}</span>
+    <span>${HTML(tail)}</span>
 </section>

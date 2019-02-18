@@ -345,7 +345,7 @@ class LoncapaResponse(object):
         # This can lead to early-exit if the hint is blank.
         if not hint_log:
             # .text can be None when node has immediate children nodes
-            if hint_node is None or (hint_node.text is None and len(hint_node.getchildren()) == 0):
+            if hint_node is None or (hint_node.text is None and not hint_node.getchildren()):
                 return ''
             hint_text = get_inner_html_from_xpath(hint_node)
             if not hint_text:
@@ -1026,7 +1026,7 @@ class MultipleChoiceResponse(LoncapaResponse):
                 if contextualize_text(choice.get('correct'), self.context).lower() == 'partial'
             ]
 
-    def get_extended_hints(self, student_answer_dict, new_cmap):
+    def get_extended_hints(self, student_answers, new_cmap):
         """
         Extract any hints in a <choicegroup> matching the student's answers
         <choicegroup label="What is your favorite color?" type="MultipleChoice">
@@ -1036,8 +1036,8 @@ class MultipleChoiceResponse(LoncapaResponse):
           ...
         Any hint text is installed in the new_cmap.
         """
-        if self.answer_id in student_answer_dict:
-            student_answer = student_answer_dict[self.answer_id]
+        if self.answer_id in student_answers:
+            student_answer = student_answers[self.answer_id]
 
             # Warning: mostly student_answer is a string, but sometimes it is a list of strings.
             if isinstance(student_answer, list):
@@ -1384,8 +1384,8 @@ class MultipleChoiceResponse(LoncapaResponse):
         return (solution_id, subset_choices)
 
 
-@registry.register
-class TrueFalseResponse(MultipleChoiceResponse):  # pylint: disable=abstract-method
+@registry.register  # pylint: disable=abstract-method
+class TrueFalseResponse(MultipleChoiceResponse):
     """
     Multiple choice problem with True/False possible answers.
     """
@@ -2126,9 +2126,9 @@ class CustomResponse(LoncapaResponse):
                 # actual function that will re-execute the original script,
                 # and invoke the function with the data needed.
                 def make_check_function(script_code, cfn):
-                    # Wraps the check function
+                    """ Wraps the check function """
                     def check_function(expect, ans, **kwargs):
-                        # Function that executes the python code
+                        """Function that executes the python code"""
                         extra_args = "".join(", {0}={0}".format(k) for k in kwargs)
                         code = (
                             script_code + "\n" +
@@ -3154,8 +3154,8 @@ class FormulaResponse(LoncapaResponse):
         """
         variables = samples.split('@')[0].split(',')
         numsamples = int(samples.split('@')[1].split('#')[1])
-        sranges = zip(*map(lambda x: map(float, x.split(",")),
-                           samples.split('@')[1].split('#')[0].split(':')))  # pylint: disable=deprecated-lambda
+        sranges = zip(*map(lambda x: map(float, x.split(",")),  # pylint: disable=deprecated-lambda
+                           samples.split('@')[1].split('#')[0].split(':')))
         ranges = dict(zip(variables, sranges))
 
         out = []

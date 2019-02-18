@@ -22,7 +22,7 @@ from opaque_keys.edx.keys import UsageKey
 from webob import Response
 from webob.multidict import MultiDict
 from web_fragments.fragment import Fragment
-from xblock.core import XBlock
+from xblock.core import XBlock, XML_NAMESPACES
 from xblock.fields import Boolean, Dict, Float, Integer, Scope, String, XMLString
 from xblockutils.resources import ResourceLoader
 from xblockutils.studio_editable import StudioEditableXBlockMixin
@@ -115,7 +115,9 @@ class CapaXBlock(XBlock, CapaMixin, ResourceTemplates, XmlParserMixin, StudioEdi
     )
     attempts_before_showanswer_button = Integer(
         display_name=_("Show Answer: Number of Attempts"),
-        help=_("Number of times the student must attempt to answer the question before the Show Answer button appears."),
+        help=_(
+            "Number of times the student must attempt to answer the question before the Show Answer button appears."
+        ),
         values={"min": 0},
         default=0,
         scope=Scope.settings,
@@ -232,6 +234,15 @@ class CapaXBlock(XBlock, CapaMixin, ResourceTemplates, XmlParserMixin, StudioEdi
     # is the attribute `attempts`. This will do that conversion
     metadata_translations = dict(RawDescriptor.metadata_translations)
     metadata_translations['attempts'] = 'max_attempts'
+
+    def validate(self):
+        """
+        Ensure that data XML is valid.
+
+        Raises etree.XMLSyntaxError if invalid.
+        """
+        super(CapaXBlock, self).validate()
+        etree.XML(self.data)
 
     # VS[compat]
     # TODO (cpennington): Delete this method once all fall 2012 course are being
@@ -372,10 +383,10 @@ XModule.
             if hasattr(request.POST[key], "file"):
                 request_post[key] = map(FileObjForWebobFiles, request.POST.getall(key))
 
-        response_data = self.handle_ajax(suffix, request_post)
+        response_data = self.handle_ajax(dispatch=suffix, data=request_post)
         return Response(response_data, content_type='application/json', charset='UTF-8')
 
-    def handle_ajax(self, dispatch, request_post):
+    def handle_ajax(self, dispatch, data):
         """
         This is called by courseware.module_render, and to handle AJAX calls.
 
@@ -412,7 +423,7 @@ XModule.
         before_attempts = self.attempts
 
         try:
-            result = handlers[dispatch](request_post)
+            result = handlers[dispatch](data)
 
         except NotFoundError:
             log.info(
@@ -884,10 +895,10 @@ XModule.
                 val = serialize_field(self._field_data.get(self, attr))
                 try:
                     xml_object.set(attr, val)
-                except Exception:
+                except Exception:  # pylint: disable=broad-except
                     logging.exception(
-                        u'Failed to serialize metadata attribute %s with value %s in module %s. This could mean data loss!!!',
-                        attr, val, self.url_name
+                        u'Failed to serialize metadata attribute %s with value %s in module %s. '
+                        u'This could mean data loss!!!', attr, val, self.url_name
                     )
 
         for key, value in self.xml_attributes.items():

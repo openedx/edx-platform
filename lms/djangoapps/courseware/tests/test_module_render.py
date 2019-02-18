@@ -2155,7 +2155,7 @@ class TestXmoduleRuntimeEvent(TestSubmittingProblems):
         field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
             self.course.id, user, self.course, depth=2)
 
-        module = render.get_module(  # pylint: disable=protected-access
+        module = render.get_module(
             user,
             mock_request,
             self.problem.location,
@@ -2229,7 +2229,7 @@ class TestRebindModule(TestSubmittingProblems):
         if item is None:
             item = self.lti
 
-        module = render.get_module(  # pylint: disable=protected-access
+        module = render.get_module(
             user,
             mock_request,
             item.location,

@@ -56,7 +56,7 @@ def main():
         log.info("Opening {0}".format(problem_file.name))
 
         try:
-            problem = LoncapaProblem(problem_file, "fakeid", seed=args.seed, capa_system=system)
+            problem = LoncapaProblem(problem_file, "fakeid", seed=args.seed, capa_system=system, capa_module=None)
         except Exception as ex:  # pylint: disable=broad-except
             log.error("Could not parse file {0}".format(problem_file.name))
             log.exception(ex)

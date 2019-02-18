@@ -1,4 +1,7 @@
 <%page expression_filter="h"/>
+<%!
+from openedx.core.djangolib.markup import HTML
+%>
 <%! from openedx.core.djangolib.markup import HTML %>
 <div id="inputtype_${id}" class="capa_inputtype">
     <div class="drag_and_drop_problem_div" id="drag_and_drop_div_${id}"
@@ -6,7 +9,7 @@
     </div>
 
     <div class="drag_and_drop_problem_json" id="drag_and_drop_json_${id}"
-        style="display:none;">${drag_and_drop_json}</div>
+        style="display:none;">${HTML(drag_and_drop_json)}</div>
 
     <div class="script_placeholder" data-src="${STATIC_URL}js/capa/drag_and_drop.js"></div>
 

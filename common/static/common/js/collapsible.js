@@ -1,18 +1,12 @@
-(function(undefined) {
+(function() {
     'use strict';
-
     // [module Collapsible]
     //
     // [description]
     //     Set of library functions that provide a simple way to add
     //     collapsible functionality to elements.
-    this.Collapsible = {
-        setCollapsibles: setCollapsibles,
-        toggleFull: toggleFull,
-        toggleHint: toggleHint
-    };
 
-    return;
+    var Collapsible = {};
 
     // [function setCollapsibles]
     //
@@ -22,7 +16,7 @@
     // [params]
     //     el: container
     function setCollapsibles(el) {
-        var linkBottom, linkTop, short_custom;
+        var linkBottom, linkTop, shortCustom;
 
         linkTop = '<a href="#" class="full full-top">See full output</a>';
         linkBottom = '<a href="#" class="full full-bottom">See full output</a>';
@@ -30,27 +24,29 @@
         // Standard longform + shortfom pattern.
         el.find('.longform').hide();
         edx.HtmlUtils.append(el.find('.shortform'), edx.StringUtils.interpolate(
-            '{linkTop}{linkBottom}', { 
-            linkTop: linkTop,
-            linkBottom: linkBottom,
-        }));
+                '{linkTop}{linkBottom}', {
+                linkTop: linkTop,
+                linkBottom: linkBottom
+            })
+        );
 
         // Custom longform + shortform text pattern.
-        short_custom = el.find('.shortform-custom');
+        shortCustom = el.find('.shortform-custom');
 
         // Set up each one individually.
-        short_custom.each(function(index, elt) {
-            var close_text, open_text;
+        shortCustom.each(function(index, elt) {
+            var closeText, openText;
 
-            open_text = $(elt).data('open-text');
-            close_text = $(elt).data('close-text');
+            openText = $(elt).data('open-text');
+            closeText = $(elt).data('close-text');
             edx.HtmlUtils.append($(elt), edx.StringUtils.interpolate(
-                "<a href='#' class='full-custom'>{text}</a>", {
-                text: open_text,
-            }));
+                    "<a href='#' class='full-custom'>{text}</a>", {
+                    text: openText
+                })
+            );
 
             $(elt).find('.full-custom').click(function(event) {
-                Collapsible.toggleFull(event, open_text, close_text);
+                Collapsible.toggleFull(event, openText, closeText);
             });
         });
 
@@ -72,12 +68,12 @@
     // [params]
     //     event: jQuery event object associated with the event that
     //         triggered this callback function.
-    //     open_text: text that should be displayed when the collapsible
+    //     openText: text that should be displayed when the collapsible
     //         is open.
-    //     close_text: text that should be displayed when the collapsible
+    //     closeText: text that should be displayed when the collapsible
     //         is closed.
-    function toggleFull(event, open_text, close_text) {
-        var $el, new_text, parent;
+    function toggleFull(event, openText, closeText) {
+        var $el, newText, parent;
 
         event.preventDefault();
 
@@ -85,10 +81,10 @@
         parent.siblings().slideToggle();
         parent.parent().toggleClass('open');
 
-        if ($(event.target).text() === open_text) {
-            new_text = close_text;
+        if ($(event.target).text() === openText) {
+            newText = closeText;
         } else {
-            new_text = open_text;
+            newText = openText;
         }
 
         if ($(event.target).hasClass('full')) {
@@ -97,7 +93,7 @@
             $el = $(event.target);
         }
 
-        $el.text(new_text);
+        $el.text(newText);
     }
 
     // [function toggleHint]
@@ -111,7 +107,17 @@
     function toggleHint(event) {
         event.preventDefault();
 
-        $(event.target).parent().siblings().slideToggle();
-        $(event.target).parent().parent().toggleClass('open');
+        $(event.target).parent().siblings()
+            .slideToggle();
+        $(event.target).parent().parent()
+            .toggleClass('open');
     }
+
+    Collapsible.setCollapsibles = setCollapsibles;
+    Collapsible.toggleFull = toggleFull;
+    Collapsible.toggleHint = toggleHint;
+
+    this.Collapsible = Collapsible;
+    return;
+
 }).call(this);

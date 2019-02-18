@@ -1,3 +1,4 @@
+/* eslint-disable no-const */
 // This file tests the parsing of  extended-hints, double bracket sections {{ .. }}
 // for all sorts of markdown.
 describe('Markdown to xml extended hint dropdown', function() {

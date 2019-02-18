@@ -169,6 +169,7 @@ class LoncapaProblem(object):
 
         self.student_answers = state.get('student_answers', {})
         self.has_saved_answers = state.get('has_saved_answers', False)
+        self.correct_map = CorrectMap()
         if 'correct_map' in state:
             self.correct_map.set_dict(state['correct_map'])
         self.done = state.get('done', False)
@@ -492,7 +493,7 @@ class LoncapaProblem(object):
         get_question_answers may only return a subset of these.
         """
         answer_ids = []
-        for response in self.responders.keys():
+        for response in self.responders:
             results = self.responder_answers[response]
             answer_ids.append(results.keys())
         return answer_ids
@@ -674,7 +675,7 @@ class LoncapaProblem(object):
             # Filter out targetedfeedback that doesn't correspond to the answer the student selected
             # Note: following-sibling will grab all following siblings, so we just want the first in the list
             targetedfeedbackset = mult_choice_response.xpath('./following-sibling::targetedfeedbackset')
-            if len(targetedfeedbackset) != 0:
+            if targetedfeedbackset:
                 targetedfeedbackset = targetedfeedbackset[0]
                 targetedfeedbacks = targetedfeedbackset.xpath('./targetedfeedback')
                 # find the legend by id in choicegroup.html for aria-describedby
@@ -760,7 +761,7 @@ class LoncapaProblem(object):
                 try:
                     # open using LoncapaSystem OSFS filestore
                     ifp = self.capa_system.filestore.open(filename)
-                except Exception as err:
+                except Exception as err:  # pylint: disable=broad-except
                     log.warning(
                         'Error %s in problem xml include: %s',
                         err,
@@ -778,7 +779,7 @@ class LoncapaProblem(object):
                 try:
                     # read in and convert to XML
                     incxml = etree.XML(ifp.read())
-                except Exception as err:
+                except Exception as err:  # pylint: disable=broad-except
                     log.warning(
                         'Error %s in problem xml include: %s',
                         err,
@@ -815,19 +816,19 @@ class LoncapaProblem(object):
         # find additional comma-separated modules search path
         path = []
 
-        for dir in raw_path:
-            if not dir:
+        for script_dir in raw_path:
+            if not script_dir:
                 continue
 
             # path is an absolute path or a path relative to the data dir
-            dir = os.path.join(self.capa_system.filestore.root_path, dir)
+            script_dir = os.path.join(self.capa_system.filestore.root_path, script_dir)
             # Check that we are within the filestore tree.
-            reldir = os.path.relpath(dir, self.capa_system.filestore.root_path)
+            reldir = os.path.relpath(script_dir, self.capa_system.filestore.root_path)
             if ".." in reldir:
-                log.warning("Ignoring Python directory outside of course: %r", dir)
+                log.warning("Ignoring Python directory outside of course: %r", script_dir)
                 continue
 
-            abs_dir = os.path.normpath(dir)
+            abs_dir = os.path.normpath(script_dir)
             path.append(abs_dir)
 
         return path

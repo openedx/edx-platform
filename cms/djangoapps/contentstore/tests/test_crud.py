@@ -1,3 +1,6 @@
+"""
+Unit tests for XBlock creation/deletion.
+"""
 from xblock_capa import CapaXBlock
 from xmodule import templates
 from xmodule.course_module import CourseDescriptor

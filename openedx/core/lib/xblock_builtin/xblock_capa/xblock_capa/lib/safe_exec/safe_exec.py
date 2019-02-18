@@ -41,7 +41,7 @@ lazymod_py_file = lazymod.__file__
 if lazymod_py_file.endswith("c"):
     lazymod_py_file = lazymod_py_file[:-1]
 
-lazymod_py = open(lazymod_py_file).read()
+lazymod_py = open(lazymod_py_file).read()  # pylint: disable=open-builtin
 
 LAZY_IMPORTS = [lazymod_py]
 for name, modname in ASSUMED_IMPORTS:

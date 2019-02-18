@@ -46,7 +46,7 @@ from xblock_capa.tests.response_xml_factory import (
 class ResponseTest(unittest.TestCase):
     """Base class for tests of capa responses."""
 
-    xml_factory_class = None  # pylint: disable=not-callable
+    xml_factory_class = None
 
     # If something is wrong, show it to us.
     maxDiff = None
@@ -54,7 +54,7 @@ class ResponseTest(unittest.TestCase):
     def setUp(self):
         super(ResponseTest, self).setUp()
         if self.xml_factory_class:
-            self.xml_factory = self.xml_factory_class()
+            self.xml_factory = self.xml_factory_class()  # pylint: disable=not-callable
 
     def build_problem(self, capa_system=None, **kwargs):
         xml = self.xml_factory.build_xml(**kwargs)
@@ -1071,7 +1071,7 @@ class CodeResponseTest(ResponseTest):  # pylint: disable=missing-docstring
         Test whether file objects are converted to filenames without altering other structures
         '''
         problem_file = os.path.join(os.path.dirname(__file__), "test_files/filename_convert_test.txt")
-        with open(problem_file) as fp:
+        with open(problem_file) as fp:  # pylint: disable=open-builtin
             answers_with_file = {'1_2_1': 'String-based answer',
                                  '1_3_1': ['answer1', 'answer2', 'answer3'],
                                  '1_4_1': [fp, fp]}

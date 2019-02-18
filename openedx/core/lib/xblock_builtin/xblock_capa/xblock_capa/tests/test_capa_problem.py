@@ -6,6 +6,7 @@ import textwrap
 import six
 import unittest
 import ddt
+
 from lxml import etree
 from markupsafe import Markup
 from mock import patch
