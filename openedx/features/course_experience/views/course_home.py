@@ -8,6 +8,7 @@ from django.template.loader import render_to_string
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
+from courseware.courses import course_open_for_self_enrollment
 from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
 
@@ -126,9 +127,12 @@ class CourseHomeFragmentView(EdxFragmentView):
             'is_staff': has_access(request.user, 'staff', course_key),
         }
 
-        allow_anonymous = COURSE_ENABLE_UNENROLLED_ACCESS_FLAG.is_enabled(course_key)
-        allow_public = allow_anonymous and course.course_visibility == COURSE_VISIBILITY_PUBLIC
-        allow_public_outline = allow_anonymous and course.course_visibility == COURSE_VISIBILITY_PUBLIC_OUTLINE
+        course_access = {
+            'allow_anonymous': COURSE_ENABLE_UNENROLLED_ACCESS_FLAG.is_enabled(course_key),
+            'is_public': allow_anonymous and course.course_visibility == COURSE_VISIBILITY_PUBLIC,
+            'is_public_outline': allow_anonymous and course.course_visibility == COURSE_VISIBILITY_PUBLIC_OUTLINE,
+            'allow_enrollment':course_open_for_self_enrollment(course.id)
+        }
 
         # Set all the fragments
         outline_fragment = None
@@ -158,12 +162,12 @@ class CourseHomeFragmentView(EdxFragmentView):
                 request.user,
                 CourseOverview.get_from_id(course.id)
             )
-        elif allow_public_outline or allow_public:
+        elif course_access['allow_public_outline'] or course_access['allow_public']:
             outline_fragment = CourseOutlineFragmentView().render_to_fragment(
                 request, course_id=course_id, user_is_enrolled=False, **kwargs
             )
             course_sock_fragment = CourseSockFragmentView().render_to_fragment(request, course=course, **kwargs)
-            if allow_public:
+            if course_access['allow_public']:
                 handouts_html = self._get_course_handouts(request, course)
         else:
             # Redirect the user to the dashboard if they are not enrolled and
@@ -186,7 +190,7 @@ class CourseHomeFragmentView(EdxFragmentView):
 
         # Grab the course home messages fragment to render any relevant django messages
         course_home_message_fragment = CourseHomeMessageFragmentView().render_to_fragment(
-            request, course_id=course_id, user_access=user_access, **kwargs
+            request, course_id=course_id, user_access=user_access, course_access=course_access, **kwargs
         )
 
         # Get info for upgrade messaging
