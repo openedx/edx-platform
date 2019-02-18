@@ -325,6 +325,24 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
             if expected_enroll_message:
                 self.assertContains(response, 'You must be enrolled in the course to see course content.')
 
+        # Verify that anonymous users are not show a message to enroll on a public course
+        if is_anonymous and course_visibility == COURSE_VISIBILITY_PUBLIC:
+            self.assertNotContains(response, 'You must be enrolled in the course to see course content.')
+
+        # Verify that unenrolled users are not shown an enroll message for public courses
+        if not is_enrolled and course_visibility == COURSE_VISIBILITY_PUBLIC:
+            self.assertNotContains(response, 'You must be enrolled in the course to see course content.')
+
+        # Verify that unenrolled users are not shown an enroll message for courses
+        # that do not allow self-enrollment
+        if not is_enrolled and not enabled_unenrolled_access:
+            self.assertNotContains(response, 'You must be enrolled in the course to see course content.')
+
+        # Verify that unenrolled users are shown an enroll for courses that allow self-enrollment
+        if not is_enrolled and enabled_unenrolled_access:
+            self.assertContains(response, 'You must be enrolled in the course to see course content.')
+
+
     @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
     @override_waffle_flag(SHOW_REVIEWS_TOOL_FLAG, active=True)
     @ddt.data(
@@ -847,47 +865,6 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         response = self.client.get(course_home_url(verifiable_course))
         self.assertContains(response, TEST_COURSE_GOAL_UPDATE_FIELD)
         self.assertNotContains(response, TEST_COURSE_GOAL_UPDATE_FIELD_HIDDEN)
-
-    @override_waffle_flag(COURSE_PRE_START_ACCESS_FLAG, active=True)
-    def test_course_messaging_for_public_course(self):
-        """
-        Ensure that the following use cases work as expected for public courses
-
-        1) Anonymous users are not shown a course message asking them to enroll
-        2) Unenrolled users are not shown a course message asking them to enroll
-        3) Unenrolled users are shown a course message asking them to enroll for courses that allow
-           self-enrollment
-        """
-        TEST_COURSE_ANONYMOUS_MESSAGE = 'You must be enrolled in the course to see course content.'
-        enable_unenrolled_access = True
-
-        with mock.patch('xmodule.course_module.CourseDescriptor.course_visibility', COURSE_VISIBILITY_PUBLIC):
-            with override_waffle_flag(COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, enable_unenrolled_access):
-                # Anonymous users are not shown a course message asking them to enroll
-                url = course_home_url(self.course)
-                response = self.client.get(url)
-                self.assertNotContains(response, TEST_COURSE_ANONYMOUS_MESSAGE)
-
-                # Unenrolled users are not shown a course message asking them to enroll for courses
-                # that do not allow self-enrollment
-                user = self.create_user_for_course(self.course, CourseUserType.UNENROLLED)
-                # Closed course
-                now = datetime.now().replace(tzinfo=pytz.UTC)
-                start = now + timedelta(days=1)
-                end = now + timedelta(days=2)
-                course = CourseFactory(enrollment_start=start, enrollment_end=end)
-                url = course_home_url(course)
-                response = self.client.get(url)
-                self.assertNotContains(response, TEST_COURSE_HOME_MESSAGE_UNENROLLED)
-                self.assertNotContains(response, TEST_COURSE_ANONYMOUS_MESSAGE)
-
-                # Unenrolled users are shown a course message asking them to enroll for courses that allow
-                # self-enrollment
-                user = self.create_user_for_course(self.course, CourseUserType.UNENROLLED)
-                url = course_home_url(self.course)
-                response = self.client.get(url)
-                self.assertContains(response, TEST_COURSE_HOME_MESSAGE_UNENROLLED)
-
 
 class CourseHomeFragmentViewTests(ModuleStoreTestCase):
     """
