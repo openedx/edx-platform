@@ -345,8 +345,7 @@ sys.path.append(PROJECT_ROOT / 'djangoapps')
 sys.path.append(COMMON_ROOT / 'djangoapps')
 
 # For geolocation ip database
-GEOIP_PATH = REPO_ROOT / "common/static/data/geoip/GeoIP.dat"
-GEOIPV6_PATH = REPO_ROOT / "common/static/data/geoip/GeoIPv6.dat"
+GEOIP_PATH = REPO_ROOT / "common/static/data/geoip/GeoLite2-Country.mmdb"
 
 ############################# TEMPLATE CONFIGURATION #############################
 # Mako templating
