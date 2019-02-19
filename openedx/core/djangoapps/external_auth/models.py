@@ -16,6 +16,10 @@ from django.db import models
 class ExternalAuthMap(models.Model):
     """
     Model class for external auth.
+
+    .. pii: Contains PII used in mapping external auth. Unused and empty on edx.org.
+    .. pii_types: name, email_address, password, external_service
+    .. pii_retirement: retained
     """
     class Meta(object):
         app_label = "external_auth"

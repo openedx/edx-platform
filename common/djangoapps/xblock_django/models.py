@@ -10,6 +10,8 @@ from django.utils.translation import ugettext_lazy as _
 class XBlockConfiguration(ConfigurationModel):
     """
     XBlock configuration used by both LMS and Studio, and not specific to a particular template.
+
+    .. no_pii:
     """
 
     KEY_FIELDS = ('name',)  # xblock name is unique
@@ -33,6 +35,8 @@ class XBlockConfiguration(ConfigurationModel):
 class XBlockStudioConfigurationFlag(ConfigurationModel):
     """
     Enables site-wide Studio configuration for XBlocks.
+
+    .. no_pii:
     """
 
     class Meta(object):
@@ -47,6 +51,8 @@ class XBlockStudioConfigurationFlag(ConfigurationModel):
 class XBlockStudioConfiguration(ConfigurationModel):
     """
     Studio editing configuration for a specific XBlock/template combination.
+
+    .. no_pii:
     """
     KEY_FIELDS = ('name', 'template')  # xblock name/template combination is unique
 

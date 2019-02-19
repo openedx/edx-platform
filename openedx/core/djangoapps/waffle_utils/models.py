@@ -14,6 +14,8 @@ from openedx.core.lib.cache_utils import request_cached
 class WaffleFlagCourseOverrideModel(ConfigurationModel):
     """
     Used to force a waffle flag on or off for a course.
+
+    .. no_pii:
     """
     OVERRIDE_CHOICES = Choices(('on', _('Force On')), ('off', _('Force Off')))
     ALL_CHOICES = OVERRIDE_CHOICES + Choices('unset')

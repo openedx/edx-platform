@@ -10,5 +10,7 @@ class GradeReportSetting(ConfigurationModel):
     """
     Sets the batch size used when running grade reports
     with multiple celery workers.
+
+    .. no_pii:
     """
     batch_size = IntegerField(default=100)

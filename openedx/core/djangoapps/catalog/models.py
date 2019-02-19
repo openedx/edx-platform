@@ -9,7 +9,11 @@ from openedx.core.djangoapps.site_configuration import helpers
 
 
 class CatalogIntegration(ConfigurationModel):
-    """Manages configuration for connecting to the catalog service and using its API."""
+    """
+    Manages configuration for connecting to the catalog service and using its API.
+
+    .. no_pii:
+    """
     API_NAME = 'catalog'
     CACHE_KEY = 'catalog.api.data'
 

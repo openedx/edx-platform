@@ -34,6 +34,8 @@ from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
 class CourseDurationLimitConfig(StackedConfigurationModel):
     """
     Configuration to manage the Course Duration Limit facility.
+
+    .. no_pii:
     """
 
     STACKABLE_FIELDS = ('enabled', 'enabled_as_of')

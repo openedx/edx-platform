@@ -16,7 +16,9 @@ from eventtracking import tracker
 
 
 def track(user_id, event_name, properties=None, context=None):
-    """Wrapper for emitting Segment track event, including augmenting context information from middleware."""
+    """
+    Wrapper for emitting Segment track event, including augmenting context information from middleware.
+    """
 
     if event_name is not None and hasattr(settings, 'LMS_SEGMENT_KEY') and settings.LMS_SEGMENT_KEY:
         properties = properties or {}
@@ -60,7 +62,9 @@ def track(user_id, event_name, properties=None, context=None):
 
 
 def identify(user_id, properties, context=None):
-    """Wrapper for emitting Segment identify event."""
+    """
+    Wrapper for emitting Segment identify event.
+    """
     if hasattr(settings, 'LMS_SEGMENT_KEY') and settings.LMS_SEGMENT_KEY:
         segment_context = dict(context) if context else {}
         analytics.identify(user_id, properties, segment_context)

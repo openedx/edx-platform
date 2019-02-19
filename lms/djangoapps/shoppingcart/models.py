@@ -110,6 +110,10 @@ class Order(models.Model):
     This is the model for an order.  Before purchase, an Order and its related OrderItems are used
     as the shopping cart.
     FOR ANY USER, THERE SHOULD ONLY EVER BE ZERO OR ONE ORDER WITH STATUS='cart'.
+
+    .. pii: Contains many PII fields in an app edx.org does not currently use. "other" data is payment information.
+    .. pii_types: name, location, email_address, other
+    .. pii_retirement: retained
     """
     class Meta(object):
         app_label = "shoppingcart"
@@ -639,6 +643,8 @@ class OrderItem(TimeStampedModel):
 
     Each implementation of OrderItem should provide its own purchased_callback as
     a method.
+
+    .. no_pii:
     """
     class Meta(object):
         app_label = "shoppingcart"
@@ -824,6 +830,10 @@ class Invoice(TimeStampedModel):
     This table capture all the information needed to support "invoicing"
     which is when a user wants to purchase Registration Codes,
     but will not do so via a Credit Card transaction.
+
+    .. pii: Contains many PII fields in an app edx.org does not currently use
+    .. pii_types: name, location, email_address
+    .. pii_retirement: retained
     """
     class Meta(object):
         app_label = "shoppingcart"
@@ -996,6 +1006,7 @@ class InvoiceTransaction(TimeStampedModel):
        create a transaction with a negative amount to represent
        the refund.
 
+    .. no_pii:
     """
     class Meta(object):
         app_label = "shoppingcart"
@@ -1086,6 +1097,8 @@ class InvoiceItem(TimeStampedModel):
     there might be an invoice item representing 10 registration
     codes for the DemoX course.
 
+
+    .. no_pii:
     """
     class Meta(object):
         app_label = "shoppingcart"
@@ -1130,6 +1143,7 @@ class CourseRegistrationCodeInvoiceItem(InvoiceItem):
     This is an invoice item that represents a payment for
     a course registration.
 
+    .. no_pii:
     """
     class Meta(object):
         app_label = "shoppingcart"
@@ -1166,6 +1180,7 @@ class InvoiceHistory(models.Model):
     transaction, so the history record is created only
     if the invoice change is successfully persisted.
 
+    .. no_pii:
     """
     timestamp = models.DateTimeField(auto_now_add=True, db_index=True)
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)
@@ -1225,6 +1240,8 @@ class CourseRegistrationCode(models.Model):
     """
     This table contains registration codes
     With registration code, a user can register for a course for free
+
+    .. no_pii:
     """
     class Meta(object):
         app_label = "shoppingcart"
@@ -1263,6 +1280,8 @@ class CourseRegistrationCode(models.Model):
 class RegistrationCodeRedemption(models.Model):
     """
     This model contains the registration-code redemption info
+
+    .. no_pii:
     """
     class Meta(object):
         app_label = "shoppingcart"
@@ -1323,6 +1342,8 @@ class Coupon(models.Model):
     """
     This table contains coupon codes
     A user can get a discount offer on course if provide coupon code
+
+    .. no_pii:
     """
     class Meta(object):
         app_label = "shoppingcart"
@@ -1350,6 +1371,8 @@ class Coupon(models.Model):
 class CouponRedemption(models.Model):
     """
     This table contain coupon redemption info
+
+    .. no_pii:
     """
     class Meta(object):
         app_label = "shoppingcart"
@@ -1466,6 +1489,8 @@ class CouponRedemption(models.Model):
 class PaidCourseRegistration(OrderItem):
     """
     This is an inventory item for paying for a course registration
+
+    .. no_pii:
     """
     class Meta(object):
         app_label = "shoppingcart"
@@ -1660,6 +1685,8 @@ class CourseRegCodeItem(OrderItem):
     """
     This is an inventory item for paying for
     generating course registration codes
+
+    .. no_pii:
     """
     class Meta(object):
         app_label = "shoppingcart"
@@ -1827,6 +1854,8 @@ class CourseRegCodeItemAnnotation(models.Model):
     generates report for the paid courses, each report item must contain the payment account associated with a course.
     And unfortunately we didn't have the concept of a "SKU" or stock item where we could keep this association,
     so this is to retrofit it.
+
+    .. no_pii:
     """
     class Meta(object):
         app_label = "shoppingcart"
@@ -1844,6 +1873,8 @@ class PaidCourseRegistrationAnnotation(models.Model):
     generates report for the paid courses, each report item must contain the payment account associated with a course.
     And unfortunately we didn't have the concept of a "SKU" or stock item where we could keep this association,
     so this is to retrofit it.
+
+    .. no_pii:
     """
     class Meta(object):
         app_label = "shoppingcart"
@@ -1858,6 +1889,8 @@ class PaidCourseRegistrationAnnotation(models.Model):
 class CertificateItem(OrderItem):
     """
     This is an inventory item for purchasing certificates
+
+    .. no_pii:
     """
     class Meta(object):
         app_label = "shoppingcart"
@@ -2082,16 +2115,23 @@ class CertificateItem(OrderItem):
 
 
 class DonationConfiguration(ConfigurationModel):
-    """Configure whether donations are enabled on the site."""
+    """
+    Configure whether donations are enabled on the site.
+
+    .. no_pii:
+    """
     class Meta(ConfigurationModel.Meta):
         app_label = "shoppingcart"
 
 
 class Donation(OrderItem):
-    """A donation made by a user.
+    """
+    A donation made by a user.
 
     Donations can be made for a specific course or to the organization as a whole.
     Users can choose the donation amount.
+
+    .. no_pii:
     """
 
     class Meta(object):

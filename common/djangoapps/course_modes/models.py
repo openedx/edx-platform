@@ -38,6 +38,7 @@ class CourseMode(models.Model):
     """
     We would like to offer a course in a variety of modes.
 
+    .. no_pii:
     """
     class Meta(object):
         app_label = "course_modes"
@@ -819,6 +820,8 @@ class CourseModesArchive(models.Model):
     separate model, because there is a uniqueness contraint on (course_mode, course_id)
     field pair in CourseModes. Having a separate table allows us to have an audit trail of any changes
     such as course price changes
+
+    .. no_pii:
     """
     class Meta(object):
         app_label = "course_modes"
@@ -852,6 +855,8 @@ class CourseModesArchive(models.Model):
 class CourseModeExpirationConfig(ConfigurationModel):
     """
     Configuration for time period from end of course to auto-expire a course mode.
+
+    .. no_pii:
     """
     class Meta(object):
         app_label = "course_modes"

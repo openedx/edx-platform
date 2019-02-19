@@ -58,6 +58,8 @@ class InstructorTask(models.Model):
     `requester` stores id of user who submitted the task
     `created` stores date that entry was first created
     `updated` stores date that entry was last modified
+
+    .. no_pii:
     """
     class Meta(object):
         app_label = "instructor_task"

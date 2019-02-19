@@ -101,6 +101,8 @@ class CourseActionUIState(CourseActionState):
 class CourseRerunState(CourseActionUIState):
     """
     A concrete django model for maintaining state specifically for the Action Course Reruns.
+
+    .. no_pii:
     """
     class Meta(object):
         """

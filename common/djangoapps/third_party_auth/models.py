@@ -86,6 +86,8 @@ class AuthNotConfigured(SocialAuthBaseException):
 class ProviderConfig(ConfigurationModel):
     """
     Abstract Base Class for configuring a third_party_auth provider
+
+    .. no_pii:
     """
     KEY_FIELDS = ('slug',)
 
@@ -327,6 +329,8 @@ class OAuth2ProviderConfig(ProviderConfig):
     """
     Configuration Entry for an OAuth2 based provider.
     Also works for OAuth1 providers.
+
+    .. no_pii:
     """
     prefix = 'oa2'
     backend_name = models.CharField(
@@ -381,6 +385,8 @@ class SAMLConfiguration(ConfigurationModel):
     General configuration required for this edX instance to act as a SAML
     Service Provider and allow users to authenticate via third party SAML
     Identity Providers (IdPs)
+
+    .. no_pii:
     """
     KEY_FIELDS = ('site_id', 'slug')
     site = models.ForeignKey(
@@ -523,6 +529,8 @@ def active_saml_configurations_filter():
 class SAMLProviderConfig(ProviderConfig):
     """
     Configuration Entry for a SAML/Shibboleth provider.
+
+    .. no_pii:
     """
     prefix = 'saml'
     backend_name = models.CharField(
@@ -704,6 +712,8 @@ class SAMLProviderData(models.Model):
     Data about a SAML IdP that is fetched automatically by 'manage.py saml pull'
 
     This data is only required during the actual authentication process.
+
+    .. no_pii:
     """
     cache_timeout = 600
     fetched_at = models.DateTimeField(db_index=True, null=False)
@@ -754,6 +764,8 @@ class LTIProviderConfig(ProviderConfig):
     Configuration required for this edX instance to act as a LTI
     Tool Provider and allow users to authenticate and be enrolled in a
     course via third party LTI Tool Consumers.
+
+    .. no_pii:
     """
     prefix = 'lti'
     backend_name = 'lti'
@@ -844,6 +856,8 @@ class ProviderApiPermissions(models.Model):
     This model links OAuth2 client with provider Id.
 
     It gives permission for a OAuth2 client to access the information under certain IdPs.
+
+    .. no_pii:
     """
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     provider_id = models.CharField(

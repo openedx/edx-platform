@@ -93,6 +93,10 @@ class IDVerificationAttempt(StatusModel):
     Each IDVerificationAttempt represents a Student's attempt to establish
     their identity through one of several methods that inherit from this Model,
     including PhotoVerification and SSOVerification.
+
+    .. pii: The User's name is stored in this and sub-models
+    .. pii_types: name
+    .. pii_retirement: retained
     """
     STATUS = Choices('created', 'ready', 'submitted', 'must_retry', 'approved', 'denied')
     user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
@@ -142,6 +146,10 @@ class ManualVerification(IDVerificationAttempt):
     """
     Each ManualVerification represents a user's verification that bypasses the need for
     any other verification.
+
+    .. pii: The User's name is stored in the parent model
+    .. pii_types: name
+    .. pii_retirement: retained
     """
 
     reason = models.CharField(
@@ -173,6 +181,8 @@ class SSOVerification(IDVerificationAttempt):
     Each SSOVerification represents a Student's attempt to establish their identity
     by signing in with SSO. ID verification through SSO bypasses the need for
     photo verification.
+
+    .. no_pii:
     """
 
     OAUTH2 = 'third_party_auth.models.OAuth2ProviderConfig'
@@ -254,6 +264,10 @@ class PhotoVerification(IDVerificationAttempt):
         attempt.status == PhotoVerification.STATUS.created
         attempt.status == "created"
         pending_requests = PhotoVerification.submitted.all()
+
+    .. pii: The User's name is stored in the parent model, this one stores links to face and photo ID images
+    .. pii_types: name, image
+    .. pii_retirement: retained
     """
     ######################## Fields Set During Creation ########################
     # See class docstring for description of status states
@@ -526,6 +540,10 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
 
     Note: this model handles *inital* verifications (which you must perform
     at the time you register for a verified cert).
+
+    .. pii: The User's name is stored in the parent model, this one stores links to face and photo ID images
+    .. pii_types: name, image
+    .. pii_retirement: retained
     """
     # This is a base64.urlsafe_encode(rsa_encrypt(photo_id_aes_key), ss_pub_key)
     # So first we generate a random AES-256 key to encrypt our photo ID with.
@@ -909,6 +927,8 @@ class VerificationDeadline(TimeStampedModel):
     If no verification deadline record exists for a course,
     then that course does not have a deadline.  This means that users
     can submit photos at any time.
+
+    .. no_pii:
     """
     class Meta(object):
         app_label = "verify_student"

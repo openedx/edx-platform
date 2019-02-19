@@ -27,6 +27,8 @@ log = logging.getLogger(__name__)
 class Email(models.Model):
     """
     Abstract base class for common information for an email.
+
+    .. no_pii:
     """
     sender = models.ForeignKey(User, default=1, blank=True, null=True, on_delete=models.CASCADE)
     slug = models.CharField(max_length=128, db_index=True)
@@ -65,6 +67,8 @@ class Target(models.Model):
     SEND_TO_COHORT), then explicitly call the method on self.cohorttarget, which is created
     by django as part of this inheritance setup. These calls require pylint disable no-member in
     several locations in this class.
+
+    .. no_pii:
     """
     target_type = models.CharField(max_length=64, choices=EMAIL_TARGET_CHOICES)
 
@@ -138,6 +142,8 @@ class Target(models.Model):
 class CohortTarget(Target):
     """
     Subclass of Target, specifically referring to a cohort.
+
+    .. no_pii:
     """
     cohort = models.ForeignKey('course_groups.CourseUserGroup', on_delete=models.CASCADE)
 
@@ -181,6 +187,8 @@ class CohortTarget(Target):
 class CourseModeTarget(Target):
     """
     Subclass of Target, specifically for course modes.
+
+    .. no_pii:
     """
     track = models.ForeignKey('course_modes.CourseMode', on_delete=models.CASCADE)
 
@@ -226,6 +234,8 @@ class CourseModeTarget(Target):
 class CourseEmail(Email):
     """
     Stores information for an email to a course.
+
+    .. no_pii:
     """
     class Meta(object):
         app_label = "bulk_email"
@@ -302,6 +312,8 @@ class CourseEmail(Email):
 class Optout(models.Model):
     """
     Stores users that have opted out of receiving emails from a course.
+
+    .. no_pii:
     """
     # Allowing null=True to support data migration from email->user.
     # We need to first create the 'user' column with some sort of default in order to run the data migration,
@@ -327,6 +339,8 @@ class CourseEmailTemplate(models.Model):
     Initialization takes place in a migration that in turn loads a fixture.
     The admin console interface disables add and delete operations.
     Validation is handled in the CourseEmailTemplateForm class.
+
+    .. no_pii:
     """
     class Meta(object):
         app_label = "bulk_email"
@@ -407,6 +421,8 @@ class CourseEmailTemplate(models.Model):
 class CourseAuthorization(models.Model):
     """
     Enable the course email feature on a course-by-course basis.
+
+    .. no_pii:
     """
     class Meta(object):
         app_label = "bulk_email"
@@ -442,6 +458,8 @@ class BulkEmailFlag(ConfigurationModel):
     Staff can only send bulk email for a course if all the following conditions are true:
     1. BulkEmailFlag is enabled.
     2. Course-specific authorization not required, or course authorized to use bulk email.
+
+    .. no_pii:
     """
     # boolean field 'enabled' inherited from parent ConfigurationModel
     require_course_email_auth = models.BooleanField(default=True)

@@ -40,6 +40,8 @@ class CourseOverview(TimeStampedModel):
         user dashboard (enrolled courses)
         course catalog (courses to enroll in)
         course about (meta data about the course)
+
+    .. no_pii:
     """
 
     class Meta(object):
@@ -707,6 +709,8 @@ class CourseOverview(TimeStampedModel):
 class CourseOverviewTab(models.Model):
     """
     Model for storing and caching tabs information of a course.
+
+    .. no_pii:
     """
     tab_id = models.CharField(max_length=50)
     course_overview = models.ForeignKey(CourseOverview, db_index=True, related_name="tabs", on_delete=models.CASCADE)
@@ -779,6 +783,8 @@ class CourseOverviewImageSet(TimeStampedModel):
        process to do it, and it can happen in a follow-on PR if anyone is
        interested in extending this functionality.
 
+
+    .. no_pii:
     """
     course_overview = models.OneToOneField(CourseOverview, db_index=True, related_name="image_set",
                                            on_delete=models.CASCADE)
@@ -860,6 +866,8 @@ class CourseOverviewImageConfig(ConfigurationModel):
     to take effect. You might want to do this if you're doing precise theming of
     your install of edx-platform... but really, you probably don't want to do this
     at all at the moment, given how new this is. :-P
+
+    .. no_pii:
     """
     # Small thumbnail, for things like the student dashboard
     small_width = models.IntegerField(default=375)

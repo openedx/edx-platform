@@ -335,6 +335,9 @@ def _track_user_registration(user, profile, params, third_party_provider):
                 }
             })
 
+        # .. pii: Many pieces of PII are sent to Segment here. Retired directly through Segment API call in Tubular.
+        # .. pii_types: email_address, username, name, birth_date, location, gender
+        # .. pii_retirement: third_party
         segment.identify(*identity_args)
         segment.track(
             user.id,

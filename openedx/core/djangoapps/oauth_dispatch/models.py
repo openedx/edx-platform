@@ -12,6 +12,7 @@ from organizations.models import Organization
 from pytz import utc
 
 from openedx.core.djangoapps.oauth_dispatch.toggles import ENFORCE_JWT_SCOPES
+from openedx.core.djangolib.markup import HTML
 from openedx.core.lib.request_utils import get_request_or_stub
 
 
@@ -22,6 +23,8 @@ class RestrictedApplication(models.Model):
 
     A restricted Application will only get expired token/JWT payloads
     so that they cannot be used to call into APIs.
+
+    .. no_pii:
     """
 
     application = models.ForeignKey(oauth2_settings.APPLICATION_MODEL, null=False, on_delete=models.CASCADE)
@@ -33,8 +36,8 @@ class RestrictedApplication(models.Model):
         """
         Return a unicode representation of this object
         """
-        return u"<RestrictedApplication '{name}'>".format(
-            name=self.application.name
+        return HTML(u"<RestrictedApplication '{name}'>").format(
+            name=HTML(self.application.name)
         )
 
     @classmethod
@@ -56,6 +59,8 @@ class RestrictedApplication(models.Model):
 class ApplicationAccess(models.Model):
     """
     Specifies access control information for the associated Application.
+
+    .. no_pii:
     """
 
     application = models.OneToOneField(oauth2_settings.APPLICATION_MODEL, related_name='access')
@@ -89,6 +94,8 @@ class ApplicationOrganization(models.Model):
 
     See openedx/core/djangoapps/oauth_dispatch/docs/decisions/0007-include-organizations-in-tokens.rst
     for the intended use of this model.
+
+    .. no_pii:
     """
     RELATION_TYPE_CONTENT_ORG = 'content_org'
     RELATION_TYPES = (
