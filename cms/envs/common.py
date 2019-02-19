@@ -1172,6 +1172,7 @@ INSTALLED_APPS = [
     'openedx.features.course_duration_limits',
     'openedx.features.content_type_gating',
     'experiments',
+    'openedx.core.djangoapps.user_roles',
 ]
 
 
