@@ -918,7 +918,7 @@ def run_diff_quality(
             )
         )
         return True
-    except BuildFailure, error_message:
+    except BuildFailure as error_message:
         if is_percentage_failure(error_message):
             return False
         else:

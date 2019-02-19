@@ -770,9 +770,9 @@ def upload(request, course_id):  # ajax upload file to a question or answer
             max_file_size=cc_settings.MAX_UPLOAD_FILE_SIZE
         )
 
-    except exceptions.PermissionDenied, err:
+    except exceptions.PermissionDenied as err:
         error = unicode(err)
-    except Exception, err:      # pylint: disable=broad-except
+    except Exception as err:      # pylint: disable=broad-except
         print(err)
         logging.critical(unicode(err))
         error = _('Error uploading file. Please contact the site administrator. Thank you.')

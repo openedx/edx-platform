@@ -489,7 +489,7 @@ class ProfileImageTestMixin(object):
     Mixin with utility methods for user profile image
     """
 
-    TEST_PROFILE_IMAGE_UPLOADED_AT = datetime(2002, 1, 9, 15, 43, 01, tzinfo=UTC)
+    TEST_PROFILE_IMAGE_UPLOADED_AT = datetime(2002, 1, 9, 15, 43, 1, tzinfo=UTC)
 
     def create_profile_image(self, user, storage):
         """
