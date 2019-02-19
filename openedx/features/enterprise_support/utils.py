@@ -296,7 +296,7 @@ class CoursePageShareWeixinGetSign(object):
             'nonceStr': self.__create_nonce_str(),
             'jsapi_ticket': self.getJsApiTicket(),
             'timestamp': self.__create_timestamp(),
-            'url': request.url
+            'url': request.build_absolute_uri()
         }
 
     def __create_nonce_str(self):
@@ -306,12 +306,16 @@ class CoursePageShareWeixinGetSign(object):
         return int(time.time())
 
     def sign(self):
-        string = '&'.join(['%s=%s' % (key.lower(), self.ret[key]) for key in sorted(self.ret)])
-        print string
-        self.ret['signature'] = hashlib.sha1(string).hexdigest()
-        return self.ret
+        try:
+            string = '&'.join(['%s=%s' % (key.lower(), self.ret[key]) for key in sorted(self.ret)])
+            print string
+            self.ret['signature'] = hashlib.sha1(string).hexdigest()
+            return self.ret
+        except Exception as err:
+            self.ret['signature'] = ''
+            return self.ret
 
-    def getJsApiTicket(self, request, *args, **kwargs):
+    def getJsApiTicket(self):
         try:
             weixin_JS_SDK_sign = 'weixin_JS_SDK_sign'
             weixin_JS_SDK_sign = cache.get(weixin_JS_SDK_sign, self.Genweixin_JS_SDK_sign())
