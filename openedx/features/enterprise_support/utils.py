@@ -310,9 +310,11 @@ class CoursePageShareWeixinGetSign(object):
             string = '&'.join(['%s=%s' % (key.lower(), self.ret[key]) for key in sorted(self.ret)])
             print string
             self.ret['signature'] = hashlib.sha1(string).hexdigest()
+            self.ret['appId'] = self.appId
             return self.ret
         except Exception as err:
             self.ret['signature'] = ''
+            self.ret['appId'] = self.appId
             return self.ret
 
     def getJsApiTicket(self):
