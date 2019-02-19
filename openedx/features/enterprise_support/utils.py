@@ -1,7 +1,11 @@
 from __future__ import unicode_literals
 
+import time
+import random
+import string
 import hashlib
 import json
+import requests
 
 import six
 from django.core.cache import cache
@@ -277,3 +281,68 @@ def remind_users_to_bind_phones(request):
             return False
     except Exception as err:
         return False
+
+
+class CoursePageShareWeixinGetSign(object):
+    """
+    Return JS-SDK signature for weixin.
+    """
+
+    def __init__(self, request):
+        self.appId = settings.WEIXINAPPID
+        self.appSecret = settings.WEIXINAPPSECRET
+
+        self.ret = {
+            'nonceStr': self.__create_nonce_str(),
+            'jsapi_ticket': self.getJsApiTicket(),
+            'timestamp': self.__create_timestamp(),
+            'url': request.url
+        }
+
+    def __create_nonce_str(self):
+        return ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(15))
+
+    def __create_timestamp(self):
+        return int(time.time())
+
+    def sign(self):
+        string = '&'.join(['%s=%s' % (key.lower(), self.ret[key]) for key in sorted(self.ret)])
+        print string
+        self.ret['signature'] = hashlib.sha1(string).hexdigest()
+        return self.ret
+
+    def getJsApiTicket(self, request, *args, **kwargs):
+        try:
+            weixin_JS_SDK_sign = 'weixin_JS_SDK_sign'
+            weixin_JS_SDK_sign = cache.get(weixin_JS_SDK_sign, self.Genweixin_JS_SDK_sign())
+            return weixin_JS_SDK_sign
+        except Exception as err:
+            return ''
+
+    def Genweixin_JS_SDK_sign(self):
+        try:
+            cache_key = 'weixin_access_toen'
+            weixin_access_toen = cache.get(cache_key, self.get_weixin_access_toen())
+
+            payload = {'access_token': weixin_access_toen, 'type': 'jsapi'}
+            weixin_JS_SDK_sign = requests.get('https://api.weixin.qq.com/cgi-bin/ticket/getticket',
+                                              params=payload).json().get('ticket', '')
+            if not weixin_JS_SDK_sign:
+                raise Exception
+            cache.set('weixin_JS_SDK_sign', weixin_JS_SDK_sign, 7000)
+            return weixin_JS_SDK_sign
+
+        except Exception as err:
+            raise
+
+    def get_weixin_access_toen(self):
+        try:
+            payload = {'grant_type': 'client_credential', 'appid': self.appId, 'secret': self.appSecret}
+            weixin_access_toen = requests.get('https://api.weixin.qq.com/cgi-bin/token', params=payload).json().get(
+                'access_token', '')
+            if not weixin_access_toen:
+                raise Exception
+            cache.set('weixin_access_toen', weixin_access_toen, 7000)
+            return weixin_access_toen
+        except Exception as err:
+            raise
