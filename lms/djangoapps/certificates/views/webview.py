@@ -662,7 +662,8 @@ def _get_custom_template_and_language(course_id, course_mode, course_language):
     if template and template.language:
         return (template, closest_released_language)
     elif template:
-        return (template, settings.LANGUAGE_CODE)
+        user_language = translation.get_language()
+        return (template, user_language)
     else:
         return (None, None)
 
