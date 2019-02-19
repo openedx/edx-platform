@@ -245,6 +245,7 @@ such that the value can be defined later than this assignment (file load order).
 
         AuthListWidget.prototype.modify_member_access = function(uniqueStudentIdentifier, action, cb) {
             var authlistwidgetmemberaccess = this;
+            var callback = (typeof cb === 'function') && cb || function() {};
             return $.ajax({
                 type: 'POST',
                 dataType: 'json',
@@ -255,10 +256,16 @@ such that the value can be defined later than this assignment (file load order).
                     action: action
                 },
                 success: function(data) {
+                    if (data.userDoesNotExist) {
+                        return statusAjaxError(function() {
+                            authlistwidgetmemberaccess.clear_input();
+                            return callback(gettext('User "' + data.unique_student_identifier + '" does not exist'));
+                        })();
+                    }
                     return authlistwidgetmemberaccess.member_response(data);
                 },
                 error: statusAjaxError(function() {
-                    return typeof cb === 'function' ? cb(gettext("Error changing user's permissions.")) : undefined;
+                    return callback(gettext("Error changing user's permissions."));
                 })
             });
         };
