@@ -5,6 +5,8 @@ import datetime
 import ddt
 import mock
 
+from django.test import override_settings
+
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.certificates.api import is_passing_status
 from lms.envs.test import CREDENTIALS_PUBLIC_SERVICE_URL
@@ -13,7 +15,9 @@ from django.conf import settings
 from django.urls import reverse
 from django.test.client import RequestFactory
 from opaque_keys.edx.locator import CourseLocator
+from openedx.features.learner_profile import REDIRECT_TO_PROFILE_MICROFRONTEND
 from openedx.features.learner_profile.views.learner_profile import learner_profile_context
+from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -110,6 +114,14 @@ class LearnerProfileViewTest(UrlResetMixin, ModuleStoreTestCase):
 
         for attribute in self.CONTEXT_DATA:
             self.assertIn(attribute, response.content)
+
+    def test_redirect_view(self):
+        profile_url = "http://profile-spa/abc/"
+        with override_settings(PROFILE_MICROFRONTEND_URL=profile_url):
+            with override_waffle_flag(REDIRECT_TO_PROFILE_MICROFRONTEND, active=True):
+                profile_path = reverse('learner_profile', kwargs={'username': self.USERNAME})
+                response = self.client.get(path=profile_path)
+                self.assertRedirects(response, profile_url + self.USERNAME, target_status_code=404)
 
     def test_records_link(self):
         profile_path = reverse('learner_profile', kwargs={'username': self.USERNAME})
