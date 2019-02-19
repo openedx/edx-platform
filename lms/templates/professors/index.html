@@ -24,9 +24,12 @@
             var list = res.results;
             var elem = '';
             for ( var i = 0; i < list.length; i++ ){
-                elem = elem + '<div class="professor-block"><img src="' + list[i].avatar + '" /><div class="professor-name">' + list[i].name + '</div><div>' + list[i].description + '</div><a href="/professors/' + list[i].id + '">详情<span class="fa-my fa-my-arrow"></span></a></div>';
+                elem = elem + '<div class="professor-block" onclick="goToPage(' + list[i].id + ')"><img src="' + list[i].avatar + '" /><div class="professor-name">' + list[i].name + '</div><div>' + list[i].description + '</div><a>详情<span class="fa-my fa-my-arrow"></span></a></div>';
             }
             document.getElementById('professor-list').innerHTML = elem;
         }
-    })
+    });
+    function goToPage(id){
+        window.location.href = "/professors/" + id;
+    }
 </script>

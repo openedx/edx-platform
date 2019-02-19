@@ -60,8 +60,8 @@
 }
 
 // 未激活邮件，购买课程
-.verification-process .carousel #pay-and-verify-container{
-  .wrapper-view{
+.verification-process .carousel #wrapper-review{
+  &.wrapper-view{
     background-color: #ffffff;
     box-shadow: 0px 1px 4px 0px $border;
     border-radius: 3px;
