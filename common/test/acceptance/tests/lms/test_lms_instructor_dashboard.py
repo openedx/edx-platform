@@ -726,6 +726,7 @@ class DataDownloadsWithMultipleRoleTests(BaseInstructorDashboardTest):
         data_download_section = instructor_dashboard_page.select_data_download()
 
         data_download_section.enrolled_student_profile_button.click()
+        instructor_dashboard_page.wait_for_ajax()
         student_profile_info = data_download_section.student_profile_information
 
         self.assertNotIn(student_profile_info, [u'', u'Loading'])
