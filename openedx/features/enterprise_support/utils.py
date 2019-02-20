@@ -283,12 +283,12 @@ def remind_users_to_bind_phones(request):
         return False
 
 
-class CoursePageShareWeixinGetSign(object):
+class GetWeixinsign(object):
     """
     Return JS-SDK signature for weixin.
     """
 
-    def __init__(self, request):
+    def __init__(self, url):
         self.appId = settings.WEIXINAPPID
         self.appSecret = settings.WEIXINAPPSECRET
 
@@ -296,7 +296,7 @@ class CoursePageShareWeixinGetSign(object):
             'nonceStr': self.__create_nonce_str(),
             'jsapi_ticket': self.getJsApiTicket(),
             'timestamp': self.__create_timestamp(),
-            'url': request.build_absolute_uri()
+            'url': url
         }
 
     def __create_nonce_str(self):
@@ -323,7 +323,7 @@ class CoursePageShareWeixinGetSign(object):
             weixin_JS_SDK_sign = cache.get(weixin_JS_SDK_sign, self.Genweixin_JS_SDK_sign())
             return weixin_JS_SDK_sign
         except Exception as err:
-            return ''
+            raise
 
     def Genweixin_JS_SDK_sign(self):
         try:

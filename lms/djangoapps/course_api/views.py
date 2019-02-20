@@ -5,11 +5,15 @@ Course API Views
 import search
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.http import HttpResponse
+from rest_framework.views import APIView
+from rest_framework.response import Response
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.throttling import UserRateThrottle
 
 from edx_rest_framework_extensions.paginators import NamespacedPageNumberPagination
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
+from openedx.features.enterprise_support.utils import GetWeixinsign
 
 from . import USE_RATE_LIMIT_2_FOR_COURSE_LIST_API, USE_RATE_LIMIT_10_FOR_COURSE_LIST_API
 from .api import course_detail, list_courses
@@ -270,3 +274,18 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
             course for course in db_courses
             if unicode(course.id) in search_courses_ids
         ]
+
+
+@view_auth_classes(is_authenticated=False)
+class CoursePageShareWeixinGetSign(APIView):
+
+    def post(self, request, format=None):
+        """
+            Return JS-SDK signature for weixin.
+            """
+
+        try:
+            url = request.POST['url']
+            return Response(GetWeixinsign(url).sign())
+        except Exception as e:
+            return HttpResponse(content=getattr(e, 'message', str(e)), status=400)
