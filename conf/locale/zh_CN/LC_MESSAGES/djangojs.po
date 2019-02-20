@@ -210,7 +210,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-02-10 20:42+0000\n"
+"POT-Creation-Date: 2019-02-17 20:42+0000\n"
 "PO-Revision-Date: 2019-02-10 20:45+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
@@ -5229,6 +5229,14 @@ msgstr "您已成功更新目标。"
 msgid "There was an error updating your goal."
 msgstr "更新目标时出错。"
 
+#: lms/templates/ccx/schedule.underscore
+msgid "Expand All"
+msgstr "展开全部"
+
+#: lms/templates/ccx/schedule.underscore
+msgid "Collapse All"
+msgstr "折叠全部"
+
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result"
 msgid_plural "{total_results} results"
@@ -7360,14 +7368,6 @@ msgstr "在获取这个目录的预览结果时发生错误。请检查您的指
 #: lms/templates/api_admin/catalog-results.underscore
 msgid "This catalog's courses:"
 msgstr "此目录下的课程："
-
-#: lms/templates/ccx/schedule.underscore
-msgid "Expand All"
-msgstr "展开全部"
-
-#: lms/templates/ccx/schedule.underscore
-msgid "Collapse All"
-msgstr "折叠全部"
 
 #: lms/templates/ccx/schedule.underscore
 msgid "Start Date"
