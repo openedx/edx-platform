@@ -67,6 +67,7 @@ def format_certificate_for_user(username, cert):
             # NOTE: the download URL is not currently being set for webview certificates.
             # In the future, we can update this to construct a URL to the webview certificate
             # for courses that have this feature enabled.
+            "is_pdf_certificate": bool(cert.download_url),
             "download_url": (
                 cert.download_url or get_certificate_url(cert.user.id, cert.course_id)
                 if cert.status == CertificateStatuses.downloadable
