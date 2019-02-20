@@ -46,7 +46,10 @@ def reset_tokens(username):
     Create and return new tokens, or extend existing ones to one year in the future.
     """
     client = Client.objects.get(url=settings.FEATURES['AMC_APP_URL'])
-    user = User.objects.get(Q(email=username) | Q(username=username))
+    if isinstance(username, User):
+        user = username
+    else:
+        user = User.objects.get(Q(email=username) | Q(username=username))
 
     try:
         access = AccessToken.objects.get(user=user, client=client)
@@ -85,7 +88,10 @@ def make_amc_admin(username, org_name):
       - Reset access and reset tokens, and set the expire one year ahead.
       - Return the recent tokens.
     """
-    user = User.objects.get(Q(email=username) | Q(username=username))
+    if isinstance(username, User):
+        user = username
+    else:
+        user = User.objects.get(Q(email=username) | Q(username=username))
     org = get_organization_by_name(org_name)
     site = get_site_by_organization(org)
 
