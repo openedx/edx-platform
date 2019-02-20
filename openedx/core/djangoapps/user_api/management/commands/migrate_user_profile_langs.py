@@ -99,8 +99,4 @@ class Command(BaseCommand):
             end += chunk_size
             sleep(sleep_time_secs)
 
-        print('Finished! Updated {} total preferences from {} to {}'.format(
-            updated_count,
-            old_lang_code,
-            new_lang_code
-        ))
+        print('Finished! Updated {} total preferences from {} to {}'.format(updated_count, old_lang_code, new_lang_code))

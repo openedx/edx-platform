@@ -211,26 +211,6 @@ class ProgramFactory(DictFactoryBase):
     weeks_to_complete = fake.random_int(1, 45)
 
 
-class ProgramDescriptionFactory(DictFactoryBase):
-    uuid = factory.Faker('uuid4')
-    title = factory.Faker('catch_phrase')
-    type = factory.Faker('word')
-    marketing_slug = factory.Faker('slug')
-    marketing_url = factory.Faker('url')
-    number_of_courses = fake.random_int(1, 10)  # pylint: disable=no-member
-
-    @classmethod
-    def from_program(cls, program):
-        return cls.create(
-            uuid=program['uuid'],
-            title=program['title'],
-            type=program['type'],
-            marketing_slug=program['marketing_slug'],
-            marketing_url=program['marketing_url'],
-            number_of_courses=len(program['courses']),
-        )
-
-
 class ProgramTypeFactory(DictFactoryBase):
     name = factory.Faker('word')
     logo_image = factory.LazyFunction(generate_sized_stdimage)

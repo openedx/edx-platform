@@ -15,8 +15,7 @@ class StubCatalogServiceHandler(StubHttpRequestHandler):
             r'/api/v1/programs/$': self.program_list,
             r'/api/v1/programs/([0-9a-f-]+)/$': self.program_detail,
             r'/api/v1/program_types/$': self.program_types,
-            r'/api/v1/pathways/$': self.pathways,
-            r'/api/v1/course_runs/$': self.course_runs,
+            r'/api/v1/pathways/$': self.pathways
         }
 
         if self.match_pattern(pattern_handlers):
@@ -52,10 +51,6 @@ class StubCatalogServiceHandler(StubHttpRequestHandler):
     def pathways(self):
         pathways = self.server.config.get('catalog.pathways', [])
         self.send_json_response(pathways)
-
-    def course_runs(self):
-        course_runs = self.server.config.get('catalog.course_runs', {'results': [], 'next': None})
-        self.send_json_response(course_runs)
 
 
 class StubCatalogService(StubHttpService):
