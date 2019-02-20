@@ -1,7 +1,5 @@
-from datetime import timedelta
 import json
 from itertools import izip
-from provider.utils import now
 
 import cssutils
 import os
@@ -41,16 +39,11 @@ def get_site_by_organization(org):
     return org.sites.all()[0]
 
 
-def reset_tokens(username):
+def reset_tokens(user):
     """
     Create and return new tokens, or extend existing ones to one year in the future.
     """
     client = Client.objects.get(url=settings.FEATURES['AMC_APP_URL'])
-    if isinstance(username, User):
-        user = username
-    else:
-        user = User.objects.get(Q(email=username) | Q(username=username))
-
     try:
         access = AccessToken.objects.get(user=user, client=client)
     except AccessToken.DoesNotExist:
@@ -80,7 +73,18 @@ def reset_tokens(username):
     }
 
 
-def make_amc_admin(username, org_name):
+def get_single_user_organization(user):
+    """
+    Finds the single organization the user is associated with.
+
+    If there's more than one, an exception is thrown.
+    """
+    uom, _ = UserOrganizationMapping.objects.get(user=user)
+    return uom.organization
+
+
+
+def make_amc_admin(user, org_name):
     """
     Make a user AMC admin with the following steps:
 
@@ -88,10 +92,6 @@ def make_amc_admin(username, org_name):
       - Reset access and reset tokens, and set the expire one year ahead.
       - Return the recent tokens.
     """
-    if isinstance(username, User):
-        user = username
-    else:
-        user = User.objects.get(Q(email=username) | Q(username=username))
     org = get_organization_by_name(org_name)
     site = get_site_by_organization(org)
 
@@ -105,7 +105,11 @@ def make_amc_admin(username, org_name):
     usm.is_amc_admin = True
     usm.save()
 
-    return reset_tokens(username)
+    return {
+        'user_email': user.email,
+        'organization_name': org.name,
+        'tokens': reset_tokens(user),
+    }
 
 
 def get_initial_sass_variables():
