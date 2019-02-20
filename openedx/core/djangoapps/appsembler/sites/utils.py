@@ -30,20 +30,56 @@ def get_lms_link_from_course_key(base_lms_url, course_key):
     return site_domain
 
 
-def get_organization_by_name(org_name):
-    return Organization.objects.get(Q(name=org_name) | Q(short_name=org_name))
-
-
 def get_site_by_organization(org):
+    """
+    Get the site matching the organization, throws an error if there's more than one site.
+    """
     assert org.sites.count() == 1, 'Should have one and only one site.'
     return org.sites.all()[0]
 
 
-def reset_tokens(user):
+def get_amc_oauth_client():
+    """
+    Return the AMC OAuth2 Client model instance.
+    """
+    return Client.objects.get(url=settings.FEATURES['AMC_APP_URL'])
+
+
+def get_amc_tokens(user):
+    """
+    Return the the access and refresh token with expiry date in a dict.
+    """
+
+    client = get_amc_oauth_client()
+    tokens = {
+        'access_token': '',
+        'access_expires': '',
+        'refresh_token': '',
+    }
+
+    try:
+        access = AccessToken.objects.get(user=user, client=client)
+        tokens.update({
+            'access_token': access.token,
+            'access_expires': access.expires,
+        })
+    except AccessToken.DoesNotExist:
+        return tokens
+
+    try:
+        refresh = RefreshToken.objects.get(user=user, access_token=access, client=client)
+        tokens['refresh_token'] = refresh.token
+    except RefreshToken.DoesNotExist:
+        pass
+
+    return tokens
+
+
+def reset_amc_tokens(user):
     """
     Create and return new tokens, or extend existing ones to one year in the future.
     """
-    client = Client.objects.get(url=settings.FEATURES['AMC_APP_URL'])
+    client = get_amc_oauth_client()
     try:
         access = AccessToken.objects.get(user=user, client=client)
     except AccessToken.DoesNotExist:
@@ -67,10 +103,7 @@ def reset_tokens(user):
     refresh.expired = True
     refresh.save()
 
-    return {
-        'access_token': access.token,
-        'refresh_token': refresh.token,
-    }
+    return get_amc_tokens(user)
 
 
 def get_single_user_organization(user):
@@ -79,9 +112,8 @@ def get_single_user_organization(user):
 
     If there's more than one, an exception is thrown.
     """
-    uom, _ = UserOrganizationMapping.objects.get(user=user)
+    uom = UserOrganizationMapping.objects.get(user=user)
     return uom.organization
-
 
 
 def make_amc_admin(user, org_name):
@@ -92,7 +124,7 @@ def make_amc_admin(user, org_name):
       - Reset access and reset tokens, and set the expire one year ahead.
       - Return the recent tokens.
     """
-    org = get_organization_by_name(org_name)
+    org = Organization.objects.get(Q(name=org_name) | Q(short_name=org_name))
     site = get_site_by_organization(org)
 
     uom, _ = UserOrganizationMapping.objects.get_or_create(user=user, organization=org)
@@ -108,7 +140,7 @@ def make_amc_admin(user, org_name):
     return {
         'user_email': user.email,
         'organization_name': org.name,
-        'tokens': reset_tokens(user),
+        'tokens': reset_amc_tokens(user),
     }
 
 
