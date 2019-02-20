@@ -18,7 +18,7 @@ LOG = logging.getLogger(__name__)
 class Command(BaseCommand):
     """
     Support "fixing" schedules that currently have start dates prior to the course start date.
-    
+
     This can happen if a course start date is moved into the future and the corresponding schedules are not updated for any reason.
     """
 
