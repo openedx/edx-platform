@@ -13,8 +13,7 @@ class CatalogFixture(object):
     """
     Interface to set up mock responses from the Catalog stub server.
     """
-    @classmethod
-    def install_programs(cls, programs):
+    def install_programs(self, programs):
         """
         Stub the discovery service's program list and detail API endpoints.
 
@@ -41,8 +40,7 @@ class CatalogFixture(object):
             data={key: json.dumps(uuids)},
         )
 
-    @classmethod
-    def install_pathways(cls, pathways):
+    def install_pathways(self, pathways):
         """
         Stub the discovery service's credit pathways API endpoint
 
@@ -54,8 +52,7 @@ class CatalogFixture(object):
             data={'catalog.pathways': json.dumps({'results': pathways, 'next': None})}
         )
 
-    @classmethod
-    def install_program_types(cls, program_types):
+    def install_program_types(self, program_types):
         """
         Stub the discovery service's program type list API endpoints.
 
@@ -67,25 +64,10 @@ class CatalogFixture(object):
             data={'catalog.programs_types': json.dumps(program_types)},
         )
 
-    @classmethod
-    def install_course_runs(cls, course_runs):
-        """
-        Stub the discovery service's course run list API endpoints.
-
-        Arguments:
-            course_runs (list): A list of course runs. List endpoint will be stubbed using data from this list.
-        """
-        requests.put(
-            '{}/set_config'.format(CATALOG_STUB_URL),
-            data={'catalog.course_runs': json.dumps({'results': course_runs, 'next': None})}
-        )
-
 
 class CatalogIntegrationMixin(object):
     """Mixin providing a method used to configure the catalog integration."""
-
-    @classmethod
-    def set_catalog_integration(cls, is_enabled=False, service_username=None):
+    def set_catalog_integration(self, is_enabled=False, service_username=None):
         """Use this to change the catalog integration config model during tests."""
         ConfigModelFixture('/config/catalog', {
             'enabled': is_enabled,

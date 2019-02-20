@@ -4,14 +4,13 @@ import sys
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.cache import cache
-from django.core.management import BaseCommand, CommandError
+from django.core.management import BaseCommand
 
 from openedx.core.djangoapps.catalog.cache import (
-    COURSE_PROGRAMS_CACHE_KEY_TPL,
     PATHWAY_CACHE_KEY_TPL,
     PROGRAM_CACHE_KEY_TPL,
     SITE_PATHWAY_IDS_CACHE_KEY_TPL,
-    SITE_PROGRAM_UUIDS_CACHE_KEY_TPL,
+    SITE_PROGRAM_UUIDS_CACHE_KEY_TPL
 )
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.catalog.utils import create_catalog_api_client
@@ -47,7 +46,6 @@ class Command(BaseCommand):
 
         programs = {}
         pathways = {}
-        courses = {}
         for site in Site.objects.all():
             site_config = getattr(site, 'configuration', None)
             if site_config is None or not site_config.get_value('COURSE_CATALOG_API_URL'):
@@ -62,19 +60,12 @@ class Command(BaseCommand):
             new_pathways, pathways_failed = self.get_pathways(client, site)
             new_pathways, new_programs, pathway_processing_failed = self.process_pathways(site, new_pathways,
                                                                                           new_programs)
-            new_courses, courses_failed = self.get_courses(client, site)
 
-            failure = any([
-                program_uuids_failed,
-                program_details_failed,
-                pathways_failed,
-                pathway_processing_failed,
-                courses_failed,
-            ])
+            if program_uuids_failed or program_details_failed or pathways_failed or pathway_processing_failed:
+                failure = True
 
             programs.update(new_programs)
             pathways.update(new_pathways)
-            courses.update(new_courses)
 
             logger.info(u'Caching UUIDs for {total} programs for site {site_name}.'.format(
                 total=len(uuids),
@@ -99,15 +90,10 @@ class Command(BaseCommand):
             successful_pathways=successful_pathways))
         cache.set_many(pathways, None)
 
-        successful_courses = len(courses)
-        logger.info('Caching programs uuids for {successful_courses} courses.'.format(
-            successful_courses=successful_courses))
-        cache.set_many(courses, None)
-
         if failure:
             # This will fail a Jenkins job running this command, letting site
             # operators know that there was a problem.
-            raise CommandError("Caching program information failed")
+            sys.exit(1)
 
     def get_site_program_uuids(self, client, site):
         failure = False
@@ -202,31 +188,3 @@ class Command(BaseCommand):
                 logger.exception(u'Failed to process pathways for {domain}'.format(domain=site.domain))
                 failure = True
         return processed_pathways, programs, failure
-
-    def get_courses(self, client, site):
-        """
-        Get all courses for the current client
-        """
-        failure = False
-        courses = {}
-        try:
-            logger.info('Requesting courses for {domain}.'.format(domain=site.domain))
-            next_page = 1
-            while next_page:
-                new_courses = client.course_runs.get(exclude_utm=1, page=next_page)
-                courses.update({
-                    COURSE_PROGRAMS_CACHE_KEY_TPL.format(course_run_id=cr['key']):
-                    [pu['uuid'] for pu in cr['programs']]
-                    for cr in new_courses['results']
-                })
-
-                next_page = next_page + 1 if new_courses['next'] else None
-        except:  # pylint: disable=bare-except
-            logger.exception('Failed to retrieve courses for site: {domain}.'.format(domain=site.domain))
-            failure = True
-
-        logger.info('Received {total} courses for site {domain}'.format(
-            total=len(courses),
-            domain=site.domain
-        ))
-        return courses, failure

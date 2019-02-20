@@ -814,7 +814,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
 
         mocked_get_video.side_effect = side_effect
 
-        source_xml = """
+        SOURCE_XML = """
             <video show_captions="true"
             display_name="A Name"
             sub="a_sub_file.srt.sjson" source="{source}"
@@ -875,7 +875,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         initial_context['metadata']['duration'] = None
 
         for data in cases:
-            DATA = source_xml.format(
+            DATA = SOURCE_XML.format(
                 download_video=data['download_video'],
                 source=data['source'],
                 sources=data['sources'],
