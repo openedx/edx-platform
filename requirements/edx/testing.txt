@@ -334,7 +334,7 @@ virtualenv==16.4.0        # via tox
 voluptuous==0.11.5
 w3lib==1.20.0             # via parsel, scrapy
 watchdog==0.9.0
-web-fragments==0.2.2
+web-fragments==0.3.0
 webencodings==0.5.1
 webob==1.8.5
 werkzeug==0.14.1          # via flask
