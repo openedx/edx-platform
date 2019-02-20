@@ -6338,16 +6338,9 @@ msgstr ""
 msgid "User ID"
 msgstr ""
 
-#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
-#. Translators: This label appears above a field on the password reset
-#. form meant to hold the user's email address.
-#. Translators: This label appears above a field on the login form
-#. meant to hold the user's email address.
-#. Translators: This label appears above a field on the registration form
-#. meant to hold the user's email address.
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
-#: openedx/core/djangoapps/user_api/api.py lms/templates/ccx/enrollment.html
+#: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 msgid "Email"
 msgstr ""
@@ -10537,6 +10530,17 @@ msgstr ""
 msgid "Actions"
 msgstr ""
 
+#. Translators: This label appears above a field on the password reset
+#. form meant to hold the user's email address.
+#. Translators: This label appears above a field on the login form
+#. meant to hold the user's email address.
+#. Translators: This label appears above a field on the registration form
+#. meant to hold the user's email address.
+#: openedx/core/djangoapps/user_api/api.py
+msgctxt "Register and Login"
+msgid "Email"
+msgstr ""
+
 #. Translators: This example email address is used as a placeholder in
 #. a field on the password reset form meant to hold the user's email address.
 #. Translators: This example email address is used as a placeholder in
@@ -10648,12 +10652,11 @@ msgstr ""
 #: openedx/core/djangoapps/user_api/api.py
 #, python-brace-format
 msgid ""
-"By creating an account with {platform_name}, you agree                   to "
-"abide by our {platform_name}                   "
+"By creating an account, you agree                   to abide by EliteMBA's"
+"                   "
 "{user_agreement_link_start}{user_agreement}{user_agreement_link_end}, "
 "{disclaimer_link_start}{disclaimer}{disclaimer_link_end}                   "
-"and agree to our {privacy_policy_link_start}Privacy "
-"Policy{privacy_policy_link_end}."
+"and {privacy_policy_link_start}Privacy Policy{privacy_policy_link_end}."
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/api.py
@@ -19941,7 +19944,7 @@ msgid "WeChat Scan Code"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/footer.html
-msgid "Get the Coupon"
+msgid "Scan via Wechat to Follow Course Updates"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/footer.html
@@ -26145,6 +26148,9 @@ msgstr ""
 
 #: membership/templates/membership/wechat_paying.html
 msgid "Payment Success"
+msgstr ""
+
+msgid "email address"
 msgstr ""
 
 msgid "English"

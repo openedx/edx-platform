@@ -5,6 +5,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse
 from django.utils.translation import ugettext as _
+from django.utils.translation import pgettext
 from django_countries import countries
 
 import accounts
@@ -40,7 +41,7 @@ def get_password_reset_form():
 
     # Translators: This label appears above a field on the password reset
     # form meant to hold the user's email address.
-    email_label = _(u"Email")
+    email_label = pgettext("Register and Login", u"Email")
 
     # Translators: This example email address is used as a placeholder in
     # a field on the password reset form meant to hold the user's email address.
@@ -86,7 +87,7 @@ def get_login_session_form(request):
 
     # Translators: This label appears above a field on the login form
     # meant to hold the user's email address.
-    email_label = _(u"Email")
+    email_label = pgettext("Register and Login", u"Email")
 
     # Translators: This example email address is used as a placeholder in
     # a field on the login form meant to hold the user's email address.
@@ -313,7 +314,7 @@ class RegistrationFormFactory(object):
         """
         # Translators: This label appears above a field on the registration form
         # meant to hold the user's email address.
-        email_label = _(u"Email")
+        email_label = pgettext("Register and Login", u"Email")
 
         # Translators: These instructions appear on the registration form, immediately
         # below a field meant to hold the user's email address.
@@ -830,12 +831,11 @@ class RegistrationFormFactory(object):
             disclaimer_url = marketing_link("DISCLAIMER")
 
             label = Text(_(
-                u"By creating an account with {platform_name}, you agree \
-                  to abide by our {platform_name} \
+                u"By creating an account, you agree \
+                  to abide by EliteMBA's \
                   {user_agreement_link_start}{user_agreement}{user_agreement_link_end}, {disclaimer_link_start}{disclaimer}{disclaimer_link_end} \
-                  and agree to our {privacy_policy_link_start}Privacy Policy{privacy_policy_link_end}."
+                  and {privacy_policy_link_start}Privacy Policy{privacy_policy_link_end}."
             )).format(
-                platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
                 terms_of_service=terms_label,
                 user_agreement=_(u"User Agreement"),
                 disclaimer=_(u"Disclaimer"),
@@ -848,6 +848,26 @@ class RegistrationFormFactory(object):
                 privacy_policy_link_start=HTML("<a href='{pp_url}' target='_blank'>").format(pp_url=pp_link),
                 privacy_policy_link_end=HTML("</a>"),
             )
+
+            # label = Text(_(
+            #     u"By creating an account with {platform_name}, you agree \
+            #       to abide by our {platform_name} \
+            #       {user_agreement_link_start}{user_agreement}{user_agreement_link_end}, {disclaimer_link_start}{disclaimer}{disclaimer_link_end} \
+            #       and agree to our {privacy_policy_link_start}Privacy Policy{privacy_policy_link_end}."
+            # )).format(
+            #     platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
+            #     terms_of_service=terms_label,
+            #     user_agreement=_(u"User Agreement"),
+            #     disclaimer=_(u"Disclaimer"),
+            #     user_agreement_link_start=HTML("<a href='{user_agreement_url}' target='_blank'>").format(
+            #         user_agreement_url=user_agreement_url),
+            #     user_agreement_link_end=HTML("</a>"),
+            #     disclaimer_link_start=HTML("<a href='{disclaimer_url}' target='_blank'>").format(
+            #         disclaimer_url=disclaimer_url),
+            #     disclaimer_link_end=HTML("</a>"),
+            #     privacy_policy_link_start=HTML("<a href='{pp_url}' target='_blank'>").format(pp_url=pp_link),
+            #     privacy_policy_link_end=HTML("</a>"),
+            # )
 
         form_desc.add_field(
             "honor_code",

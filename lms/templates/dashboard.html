@@ -136,7 +136,7 @@ from student.models import CourseEnrollment
                     getattr(settings, 'SOCIAL_SHARING_SETTINGS', {})
                 )
             %>
-              % for dashboard_index, enrollment in enumerate(set(course_entitlements + course_enrollments)):
+              % for dashboard_index, enrollment in enumerate(sorted(set(course_entitlements + course_enrollments), key=lambda x: x.created, reverse=True)):
               <%
                 # Check if the course run is an entitlement and if it has an associated session
                 entitlement = enrollment if isinstance(enrollment, CourseEntitlement) else None

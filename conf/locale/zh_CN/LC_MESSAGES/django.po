@@ -6441,16 +6441,9 @@ msgstr "已报名学员的资料"
 msgid "User ID"
 msgstr "用户ID"
 
-#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
-#. Translators: This label appears above a field on the password reset
-#. form meant to hold the user's email address.
-#. Translators: This label appears above a field on the login form
-#. meant to hold the user's email address.
-#. Translators: This label appears above a field on the registration form
-#. meant to hold the user's email address.
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
-#: openedx/core/djangoapps/user_api/api.py lms/templates/ccx/enrollment.html
+#: lms/templates/ccx/enrollment.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 msgid "Email"
 msgstr "电子邮件"
@@ -10570,7 +10563,7 @@ msgstr "“{email}”邮箱地址无效。"
 msgid ""
 "It looks like {email_address} belongs to an existing account. Try again with"
 " a different email address."
-msgstr "{email_address} 已经被注册了。请更换电子邮件重试。"
+msgstr "{email_address} 已经被注册了。请更换邮箱重试。"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 #, python-brace-format
@@ -10749,6 +10742,17 @@ msgstr "成功"
 msgid "Actions"
 msgstr "操作"
 
+#. Translators: This label appears above a field on the password reset
+#. form meant to hold the user's email address.
+#. Translators: This label appears above a field on the login form
+#. meant to hold the user's email address.
+#. Translators: This label appears above a field on the registration form
+#. meant to hold the user's email address.
+#: openedx/core/djangoapps/user_api/api.py
+msgctxt "Register and Login"
+msgid "Email"
+msgstr "邮箱"
+
 #. Translators: This example email address is used as a placeholder in
 #. a field on the password reset form meant to hold the user's email address.
 #. Translators: This example email address is used as a placeholder in
@@ -10862,16 +10866,13 @@ msgstr "您必须同意接受{platform_name}的{terms_of_service}"
 #: openedx/core/djangoapps/user_api/api.py
 #, python-brace-format
 msgid ""
-"By creating an account with {platform_name}, you agree                   to "
-"abide by our {platform_name}                   "
+"By creating an account, you agree                   to abide by EliteMBA's"
+"                   "
 "{user_agreement_link_start}{user_agreement}{user_agreement_link_end}, "
 "{disclaimer_link_start}{disclaimer}{disclaimer_link_end}                   "
-"and agree to our {privacy_policy_link_start}Privacy "
-"Policy{privacy_policy_link_end}."
+"and {privacy_policy_link_start}Privacy Policy{privacy_policy_link_end}."
 msgstr ""
-"注册{platform_name}即表示同意遵守{platform_name} "
-"{user_agreement_link_start}{user_agreement}{user_agreement_link_end}, "
-"{disclaimer_link_start}{disclaimer}{disclaimer_link_end}和{privacy_policy_link_start}隐私政策{privacy_policy_link_end}。"
+"注册即表示同意遵守英荔商学院的{user_agreement_link_start}{user_agreement}{user_agreement_link_end}、{disclaimer_link_start}{disclaimer}{disclaimer_link_end}和{privacy_policy_link_start}隐私政策{privacy_policy_link_end}"
 
 #: openedx/core/djangoapps/user_api/api.py
 #: lms/templates/static_templates/user_agreement.html
@@ -20319,8 +20320,8 @@ msgid "WeChat Scan Code"
 msgstr "微信扫一扫"
 
 #: themes/normal-theme/lms/templates/footer.html
-msgid "Get the Coupon"
-msgstr "获取课程优惠券"
+msgid "Scan via Wechat to Follow Course Updates"
+msgstr "关注名师开课动态"
 
 #: themes/normal-theme/lms/templates/footer.html
 msgid ""
@@ -21009,7 +21010,7 @@ msgid ""
 "any computer software, hardware or communication equipment;"
 msgstr ""
 "7.  "
-"将设计目的在于干扰、破坏或限制任何计算机软件、硬件或通讯设备功能之计算机病毒（包括但不限于木马程序、蠕虫、定时炸弹、删除蝇（以下简称“病毒”）或其他计算机代码、档案和程序之任何资料，加以发布、发送或以其他方式传送；"
+"将设计目的在于干扰、破坏或限制任何计算机软件、硬件或通讯设备功能之计算机病毒（包括但不限于木马程序、蠕虫、定时炸弹、删除器“Cancelbot”，以下简称“病毒”）或其他计算机代码、档案和程序之任何资料，加以发布、发送或以其他方式传送；"
 
 #: themes/normal-theme/lms/templates/static_templates/honor.html
 msgid ""
@@ -21840,7 +21841,7 @@ msgid ""
 "consent of Elite, or to indicate that the User has the right to display, use"
 " or otherwise process the Trademark."
 msgstr ""
-"英荔教育、英荔以及其他英荔注册商标、标志及产品、服务名称，均为英荔公司之商标（以下简称“英荔标记”）。未经英荔事先书面同意，用户同意不将英荔标记以任何方式展示或使用或作其他处理，或表示用户有权展示、使用或另行处理英荔标记。"
+"英荔教育、英荔商学院、英荔以及其他英荔注册商标、标志及产品、服务名称，均为英荔公司之商标（以下简称“英荔标记”）。未经英荔事先书面同意，用户同意不将英荔标记以任何方式展示或使用或作其他处理，或表示用户有权展示、使用或另行处理英荔标记。"
 
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
 msgid ""
@@ -25100,7 +25101,7 @@ msgstr "插入一个下拉式的回应"
 
 #: cms/templates/widgets/problem-edit.html
 msgid "Explanation"
-msgstr "解释"
+msgstr "解析"
 
 #: cms/templates/widgets/problem-edit.html
 msgid "Add an explanation for this question"
@@ -26682,8 +26683,11 @@ msgstr "以完成支付"
 msgid "Payment Success"
 msgstr "支付成功"
 
+msgid "email address"
+msgstr "邮箱"
+
 msgid "English"
-msgstr "英语"
+msgstr "英文"
 
 msgid "Chinese"
 msgstr "中文"
