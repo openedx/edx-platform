@@ -3,7 +3,7 @@ import logging
 
 from django.core.management.base import BaseCommand
 
-from openedx.core.djangoapps.appsembler.sites.utils import reset_tokens, ensure_amc_site_admin
+from openedx.core.djangoapps.appsembler.sites.utils import make_amc_admin, reset_tokens
 
 
 log = logging.getLogger(__name__)
@@ -23,10 +23,10 @@ class Command(BaseCommand):
                             help='Username or email for the AMC admin.')
         parser.add_argument('-o', '--org',
                             action='store',
-                            dest='commit',
+                            dest='org',
                             help='The organization name or short name.')
 
-    def handle(self, user, org):
-        tokens = reset_tokens(user, org)
-        ensure_amc_site_admin(user, org)
+    def handle(self, *args, **options):
+        make_amc_admin(user=options['user'], org_name=options['org'])
+        tokens = reset_tokens(user=options['user'])
         self.stdout.write(json.dumps(tokens))

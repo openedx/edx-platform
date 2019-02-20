@@ -41,21 +41,18 @@ def get_site_by_organization(org):
     return org.sites.all()[0]
 
 
-def reset_tokens(user, org_name):
-    client = Client.objects.get(url=settings.APPSEMBLER_FEATURES['AMC_APP_URL'])
-
-    u = User.objects.get(Q(email=user) | Q(username=user))
-    org = get_organization_by_name(org_name)
-    site = get_site_by_organization(org)
-
-    UserOrganizationMapping.objects.get_or_create(user=u, organization=org)
-    UserSiteMapping.objects.get_or_create(user=u, site=site)
+def reset_tokens(username):
+    """
+    Create and return new tokens, or extend existing ones to one year in the future.
+    """
+    client = Client.objects.get(url=settings.FEATURES['AMC_APP_URL'])
+    user = User.objects.get(Q(email=username) | Q(username=username))
 
     try:
-        access = AccessToken.objects.get(user=u, client=client)
+        access = AccessToken.objects.get(user=user, client=client)
     except AccessToken.DoesNotExist:
         access = AccessToken.objects.create(
-            user=u,
+            user=user,
             client=client,
         )
 
@@ -63,10 +60,10 @@ def reset_tokens(user, org_name):
     access.save()
 
     try:
-        refresh = RefreshToken.objects.get(user=u, access_token=access, client=client)
+        refresh = RefreshToken.objects.get(user=user, access_token=access, client=client)
     except RefreshToken.DoesNotExist:
         refresh = RefreshToken.objects.create(
-            user=u,
+            user=user,
             client=client,
             access_token=access,
         )
@@ -80,20 +77,29 @@ def reset_tokens(user, org_name):
     }
 
 
-def ensure_amc_site_admin(user, org_name):
-    u = User.objects.get(Q(email=user) | Q(username=user))
+def make_amc_admin(username, org_name):
+    """
+    Make a user AMC admin with the following steps:
+
+      - Reset organization and association.
+      - Reset access and reset tokens, and set the expire one year ahead.
+      - Return the recent tokens.
+    """
+    user = User.objects.get(Q(email=username) | Q(username=username))
     org = get_organization_by_name(org_name)
     site = get_site_by_organization(org)
 
-    uom, _ = UserOrganizationMapping.objects.get_or_create(user=u, organization=org)
+    uom, _ = UserOrganizationMapping.objects.get_or_create(user=user, organization=org)
     uom.is_active = True
     uom.is_amc_admin = True
     uom.save()
 
-    usm, _ = UserSiteMapping.objects.get_or_create(user=u, site=site)
+    usm, _ = UserSiteMapping.objects.get_or_create(user=user, site=site)
     usm.is_active = True
     usm.is_amc_admin = True
     usm.save()
+
+    return reset_tokens(username)
 
 
 def get_initial_sass_variables():
