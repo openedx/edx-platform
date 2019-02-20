@@ -3,9 +3,13 @@ Grade service
 """
 from datetime import datetime
 
+from django.contrib.auth import get_user_model
 import pytz
 from six import text_type
 
+from lms.djangoapps.courseware.courses import get_course
+from lms.djangoapps.grades.course_data import CourseData
+from lms.djangoapps.grades.subsection_grade import CreateSubsectionGrade
 from lms.djangoapps.utils import _get_key
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from track.event_transaction_utils import create_new_event_transaction_id, set_event_transaction_type
@@ -19,6 +23,9 @@ from .models import (
     PersistentSubsectionGradeOverrideHistory
 )
 from .signals.signals import SUBSECTION_OVERRIDE_CHANGED
+
+
+USER_MODEL = get_user_model()
 
 
 class GradesService(object):
@@ -55,21 +62,29 @@ class GradesService(object):
 
         return PersistentSubsectionGradeOverride.get_override(user_id, usage_key)
 
-    def override_subsection_grade(self, user_id, course_key_or_id, usage_key_or_id, earned_all=None,
-                                  earned_graded=None):
+    def override_subsection_grade(
+            self, user_id, course_key_or_id, usage_key_or_id, earned_all=None, earned_graded=None
+    ):
         """
-        Override subsection grade (the PersistentSubsectionGrade model must already exist)
+        Creates a PersistentSubsectionGradeOverride corresponding to the given
+        user, course, and usage_key.
+        Will also create a ``PersistentSubsectionGrade`` for this (user, course, usage_key)
+        if none currently exists.
 
-        Fires off a recalculate_subsection_grade async task to update the PersistentSubsectionGrade table. Will not
-        override earned_all or earned_graded value if they are None. Both default to None.
+        Fires off a recalculate_subsection_grade async task to update the PersistentCourseGrade table.
+        Will not override ``earned_all`` or ``earned_graded`` value if they are ``None``.
+        Both of these parameters have ``None`` as their default value.
         """
         course_key = _get_key(course_key_or_id, CourseKey)
         usage_key = _get_key(usage_key_or_id, UsageKey)
 
-        grade = PersistentSubsectionGrade.read_grade(
-            user_id=user_id,
-            usage_key=usage_key
-        )
+        try:
+            grade = PersistentSubsectionGrade.read_grade(
+                user_id=user_id,
+                usage_key=usage_key
+            )
+        except PersistentSubsectionGrade.DoesNotExist:
+            grade = self._create_subsection_grade(user_id, course_key, usage_key)
 
         override = PersistentSubsectionGradeOverride.update_or_create_override(
             requesting_user=None,
@@ -83,8 +98,8 @@ class GradesService(object):
         create_new_event_transaction_id()
         set_event_transaction_type(SUBSECTION_OVERRIDE_EVENT_TYPE)
 
-        # Signal will trigger subsection recalculation which will call PersistentSubsectionGrade.update_or_create_grade
-        # which will use the above override to update the grade before writing to the table.
+        # This will eventually trigger a re-computation of the course grade,
+        # taking the new PersistentSubsectionGradeOverride into account.
         SUBSECTION_OVERRIDE_CHANGED.send(
             sender=None,
             user_id=user_id,
@@ -142,3 +157,17 @@ class GradesService(object):
         """Convienence function to return the state of the CourseWaffleFlag REJECTED_EXAM_OVERRIDES_GRADE"""
         course_key = _get_key(course_key_or_id, CourseKey)
         return waffle_flags()[REJECTED_EXAM_OVERRIDES_GRADE].is_enabled(course_key)
+
+    def _create_subsection_grade(self, user_id, course_key, usage_key):
+        """
+        Given a user_id, course_key, and subsection usage_key,
+        creates a new ``PersistentSubsectionGrade``.
+        """
+        course = get_course(course_key, depth=None)
+        subsection = course.get_child(usage_key)
+        if not subsection:
+            raise Exception('Subsection with given usage_key does not exist.')
+        user = USER_MODEL.objects.get(id=user_id)
+        course_data = CourseData(user, course=course)
+        subsection_grade = CreateSubsectionGrade(subsection, course_data.structure, {}, {})
+        return subsection_grade.update_or_create_model(user, force_update_subsections=True)
