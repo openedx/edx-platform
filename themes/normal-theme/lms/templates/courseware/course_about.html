@@ -514,13 +514,13 @@ from six import string_types
 <script>
 
   var ua = navigator.userAgent;
-  if(/micromessenger/i.test(ua)){
+  // if(/micromessenger/i.test(ua)){
     // 1.2动态加载wx-sdk
     var head = document.getElementsByTagName('head')[0];
     var script = document.createElement('script');
     script.src = '//res2.wx.qq.com/open/js/jweixin-1.4.0.js ';
     head.appendChild(script);
-    var url = location.href.split('#')[0];
+    var url = location.href.split('://')[1].split('#')[0];
         // 1.3 获取签名信息
     $.ajax({
         url: '/api/courses/v1/getweixinsign',
@@ -543,7 +543,7 @@ from six import string_types
                 var wxShareImg = 'https://www.elitemba.cn/static/images/favicon.ico';
                 var obj = {
                     title: document.title,
-                    link: window.location.href,
+                    link: url,
                     imgUrl: wxShareImg,
                     desc: ''
                 };
@@ -555,5 +555,5 @@ from six import string_types
         }
     })
  
-}
+// }
 </script>
