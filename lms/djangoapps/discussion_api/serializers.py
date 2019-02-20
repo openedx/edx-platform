@@ -9,16 +9,23 @@ from django.core.exceptions import ValidationError
 from django.urls import reverse
 from rest_framework import serializers
 
+from discussion.views import get_divided_discussions
 from discussion_api.permissions import NON_UPDATABLE_COMMENT_FIELDS, NON_UPDATABLE_THREAD_FIELDS, get_editable_fields
 from discussion_api.render import render_body
-from django_comment_client.utils import is_comment_too_deep
-from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_MODERATOR, Role
+from django_comment_client.utils import is_comment_too_deep, get_group_id_for_user, get_group_name
+from django_comment_common.models import (
+    FORUM_ROLE_ADMINISTRATOR,
+    FORUM_ROLE_COMMUNITY_TA,
+    FORUM_ROLE_MODERATOR,
+    Role,
+)
 from django_comment_common.utils import get_course_discussion_settings
 from lms.djangoapps.django_comment_client.utils import course_discussion_division_enabled, get_group_names_by_id
 from lms.lib.comment_client.comment import Comment
 from lms.lib.comment_client.thread import Thread
 from lms.lib.comment_client.user import User as CommentClientUser
 from lms.lib.comment_client.utils import CommentClientRequestError
+from student.models import get_user_by_username_or_email
 
 
 def get_context(course, request, thread=None):
@@ -430,6 +437,174 @@ class DiscussionTopicSerializer(serializers.Serializer):
         if not obj.children:
             return []
         return [DiscussionTopicSerializer(child).data for child in obj.children]
+
+    def create(self, validated_data):
+        """
+        Overriden create abstract method
+        """
+        pass
+
+    def update(self, instance, validated_data):
+        """
+        Overriden update abstract method
+        """
+        pass
+
+
+class DiscussionSettingsSerializer(serializers.Serializer):
+    """
+    Serializer for course discussion settings.
+    """
+    divided_course_wide_discussions = serializers.ListField(
+        child=serializers.CharField(),
+    )
+    divided_inline_discussions = serializers.ListField(
+        child=serializers.CharField(),
+    )
+    always_divide_inline_discussions = serializers.BooleanField()
+    division_scheme = serializers.CharField()
+
+    def __init__(self, *args, **kwargs):
+        self.course = kwargs.pop('course')
+        self.discussion_settings = kwargs.pop('discussion_settings')
+        super(DiscussionSettingsSerializer, self).__init__(*args, **kwargs)
+
+    def validate(self, attrs):
+        """
+        Validate the fields in combination.
+        """
+        if not any(field in attrs for field in self.fields):
+            raise ValidationError('Bad request')
+
+        settings_to_change = {}
+        divided_course_wide_discussions, divided_inline_discussions = get_divided_discussions(
+            self.course, self.discussion_settings
+        )
+
+        if any(item in attrs for item in ('divided_course_wide_discussions', 'divided_inline_discussions')):
+            divided_course_wide_discussions = attrs.get(
+                'divided_course_wide_discussions',
+                divided_course_wide_discussions
+            )
+            divided_inline_discussions = attrs.get('divided_inline_discussions', divided_inline_discussions)
+            settings_to_change['divided_discussions'] = divided_course_wide_discussions + divided_inline_discussions
+
+        for item in ('always_divide_inline_discussions', 'division_scheme'):
+            if item in attrs:
+                settings_to_change[item] = attrs[item]
+        attrs['settings_to_change'] = settings_to_change
+        return attrs
+
+    def create(self, validated_data):
+        """
+        Overriden create abstract method
+        """
+        pass
+
+    def update(self, instance, validated_data):
+        """
+        Overriden update abstract method
+        """
+        pass
+
+
+class DiscussionRolesSerializer(serializers.Serializer):
+    """
+    Serializer for course discussion roles.
+    """
+
+    ACTION_CHOICES = (
+        ('allow', 'allow'),
+        ('revoke', 'revoke')
+    )
+    action = serializers.ChoiceField(ACTION_CHOICES)
+    user_id = serializers.CharField()
+
+    def __init__(self, *args, **kwargs):
+        super(DiscussionRolesSerializer, self).__init__(*args, **kwargs)
+        self.user = None
+
+    def validate_user_id(self, user_id):
+        try:
+            self.user = get_user_by_username_or_email(user_id)
+            return user_id
+        except DjangoUser.DoesNotExist:
+            raise ValidationError("'{}' is not a valid student identifier".format(user_id))
+
+    def validate(self, attrs):
+        """Validate the data at an object level."""
+
+        # Store the user object to avoid fetching it again.
+        if hasattr(self, 'user'):
+            attrs['user'] = self.user
+        return attrs
+
+    def create(self, validated_data):
+        """
+        Overriden create abstract method
+        """
+        pass
+
+    def update(self, instance, validated_data):
+        """
+        Overriden update abstract method
+        """
+        pass
+
+
+class DiscussionRolesMemberSerializer(serializers.Serializer):
+    """
+    Serializer for course discussion roles member data.
+    """
+    username = serializers.CharField()
+    email = serializers.EmailField()
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+    group_name = serializers.SerializerMethodField()
+
+    def __init__(self, *args, **kwargs):
+        super(DiscussionRolesMemberSerializer, self).__init__(*args, **kwargs)
+        self.course_discussion_settings = self.context['course_discussion_settings']
+
+    def get_group_name(self, instance):
+        """Return the group name of the user."""
+        group_id = get_group_id_for_user(instance, self.course_discussion_settings)
+        group_name = get_group_name(group_id, self.course_discussion_settings)
+        return group_name
+
+    def create(self, validated_data):
+        """
+        Overriden create abstract method
+        """
+        pass
+
+    def update(self, instance, validated_data):
+        """
+        Overriden update abstract method
+        """
+        pass
+
+
+class DiscussionRolesListSerializer(serializers.Serializer):
+    """
+    Serializer for course discussion roles member list.
+    """
+    course_id = serializers.CharField()
+    results = serializers.SerializerMethodField()
+    division_scheme = serializers.SerializerMethodField()
+
+    def get_results(self, obj):
+        """Return the nested serializer data representing a list of member users."""
+        context = {
+            'course_id': obj['course_id'],
+            'course_discussion_settings': self.context['course_discussion_settings']
+        }
+        serializer = DiscussionRolesMemberSerializer(obj['users'], context=context, many=True)
+        return serializer.data
+
+    def get_division_scheme(self, obj):  # pylint: disable=unused-argument
+        """Return the division scheme for the course."""
+        return self.context['course_discussion_settings'].division_scheme
 
     def create(self, validated_data):
         """
