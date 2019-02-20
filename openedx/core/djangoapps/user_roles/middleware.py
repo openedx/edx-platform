@@ -11,6 +11,7 @@ from edx_rest_framework_extensions.auth.jwt.cookies import (
     jwt_cookie_name,
 )
 from edx_rest_framework_extensions.auth.jwt.decoder import jwt_decode_handler
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 
 log = logging.getLogger(__name__)
 USE_JWT_COOKIE_HEADER = 'HTTP_USE_JWT_COOKIE'
@@ -30,26 +31,31 @@ class JwtAuthCookieRoleMiddleware(object):
         """
         Reconstitute the full JWT and add a new cookie on the request object.
         """
-
-        jwt_cookie = request.COOKIES[jwt_cookie_name()]
+        user = request.user
+        jwt_cookie = request.COOKIES.get(jwt_cookie_name(), None)
         if not jwt_cookie:
             return
 
         decoded_jwt = jwt_decode_handler(jwt_cookie)
+        if not request.user.is_authenticated:
+            user = JwtAuthentication().authenticate_credentials(decoded_jwt)
+
         roles_claim = decoded_jwt.get('roles')
+        if not roles_claim:
+            return
         role_cache_data = {}
 
         for role_data in roles_claim:
             role, object_type, object_key = role_data.split(':')
             mapped_role = ROLE_MAPPING[role]
-            if mapped_role and not request.user.groups.filter(name=mapped_role).exists():
-                group = Group.objects.get_or_create(name=mapped_role)
-                request.user.groups.add(group)
+            if mapped_role and not user.groups.filter(name=mapped_role).exists():
+                group, _ = Group.objects.get_or_create(name=mapped_role)
+                group.user_set.add(user)
 
             if role not in role_cache_data:
                 role_cache_data[role] = []
 
             role_cache_data[role].append(object_key)
 
-        role_cache_key = '{user_id}:role_metadata'.format(user_id=request.user.id)
+        role_cache_key = '{user_id}:role_metadata'.format(user_id=user.id)
         cache.set(role_cache_key, role_cache_data)
