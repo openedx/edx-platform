@@ -25101,7 +25101,7 @@ msgstr "插入一个下拉式的回应"
 
 #: cms/templates/widgets/problem-edit.html
 msgid "Explanation"
-msgstr "解释"
+msgstr "解析"
 
 #: cms/templates/widgets/problem-edit.html
 msgid "Add an explanation for this question"
