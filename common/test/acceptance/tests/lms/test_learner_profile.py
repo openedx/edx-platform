@@ -398,31 +398,6 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, AcceptanceTest):
 
         self.assert_default_image_has_public_access(profile_page)
 
-    def test_user_can_upload_the_profile_image_with_success(self):
-        """
-        Scenario: Upload profile image works correctly.
-
-        Given that I am on my profile page with public access
-        And I can see default image
-        When I move my cursor to the image
-        Then i can see the upload/remove image text
-        When i upload new image via file uploader
-        Then i can see the changed image
-        And i can also see the latest image after reload.
-        """
-        username, user_id = self.log_in_as_unique_user()
-        profile_page = self.visit_profile_page(username, privacy=self.PRIVACY_PUBLIC)
-
-        self.assert_default_image_has_public_access(profile_page)
-
-        with self.verify_pref_change_event_during(
-            username, user_id, 'profile_image_uploaded_at', table='auth_userprofile'
-        ):
-            profile_page.upload_file(filename='image.jpg')
-        self.assertTrue(profile_page.image_upload_success)
-        profile_page.visit()
-        self.assertTrue(profile_page.image_upload_success)
-
     def test_user_can_see_error_for_exceeding_max_file_size_limit(self):
         """
         Scenario: Upload profile image does not work for > 1MB image file.
