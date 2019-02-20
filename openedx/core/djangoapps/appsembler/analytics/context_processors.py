@@ -7,8 +7,8 @@ from student.roles import CourseCreatorRole
 
 def google_analytics(request):
     data = {
-        'GOOGLE_ANALYTICS_APP_ID': settings.GOOGLE_ANALYTICS_APP_ID,
-        'SHOW_GOOGLE_ANALYTICS': settings.GOOGLE_ANALYTICS_APP_ID,
+        'GOOGLE_ANALYTICS_APP_ID': getattr(settings, 'GOOGLE_ANALYTICS_APP_ID', None),
+        'SHOW_GOOGLE_ANALYTICS': getattr(settings, 'GOOGLE_ANALYTICS_APP_ID', None),
     }
 
     user = request.user
@@ -21,16 +21,17 @@ def google_analytics(request):
 
 def mixpanel(request):
     data = {
-        'MIXPANEL_APP_ID': settings.MIXPANEL_APP_ID,
-        'SHOW_MIXPANEL': settings.MIXPANEL_APP_ID,
+        'MIXPANEL_APP_ID': getattr(settings, 'MIXPANEL_APP_ID', None),
+        'SHOW_MIXPANEL': getattr(settings, 'MIXPANEL_APP_ID', None),
     }
     return data
 
 
 def hubspot(request):
     user = request.user
+    hubspot_portal_id = getattr(settings, 'HUBSPOT_PORTAL_ID', None)
     data = {
-        'HUBSPOT_PORTAL_ID': settings.HUBSPOT_PORTAL_ID,
-        'SHOW_HUBSPOT': settings.HUBSPOT_PORTAL_ID and user.is_authenticated() and user_has_role(user, CourseCreatorRole()),
+        'HUBSPOT_PORTAL_ID': hubspot_portal_id,
+        'SHOW_HUBSPOT': hubspot_portal_id and user.is_authenticated() and user_has_role(user, CourseCreatorRole()),
     }
     return data

@@ -16,10 +16,28 @@ from jsonfield.fields import JSONField
 from model_utils.models import TimeStampedModel
 
 from storages.backends.s3boto import S3BotoStorage
-from openedx.core.djangoapps.appsembler.sites.utils import get_initial_sass_variables, get_initial_page_elements, \
-    compile_sass
 
 logger = getLogger(__name__)  # pylint: disable=invalid-name
+
+
+def get_initial_sass_variables():
+    """
+    Proxy to `utils.get_initial_sass_variables` to avoid test-time Django errors.
+
+    # TODO: Fix Site Configuration and Organizations hacks. https://github.com/appsembler/edx-platform/issues/329
+    """
+    from openedx.core.djangoapps.appsembler.sites import utils
+    return utils.get_initial_sass_variables
+
+
+def get_initial_page_elements():
+    """
+    Proxy to `utils.get_initial_page_elements` to avoid test-time Django errors.
+
+    # TODO: Fix Site Configuration and Organizations hacks. https://github.com/appsembler/edx-platform/issues/329
+    """
+    from openedx.core.djangoapps.appsembler.sites import utils
+    return utils.get_initial_page_elements
 
 
 class SiteConfiguration(models.Model):
@@ -143,6 +161,9 @@ class SiteConfiguration(models.Model):
         super(SiteConfiguration, self).delete(using=using)
 
     def compile_microsite_sass(self):
+        # Proxy to `utils.get_initial_page_elements` to avoid test-time Django errors.
+        # TODO: Fix Site Configuration and Organizations hacks. https://github.com/appsembler/edx-platform/issues/329
+        from openedx.core.djangoapps.appsembler.sites.utils import compile_sass
         css_output = compile_sass('main.scss', custom_branding=self._sass_var_override)
         file_name = self.get_value('css_overrides_file')
         if settings.USE_S3_FOR_CUSTOMER_THEMES:

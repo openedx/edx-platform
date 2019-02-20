@@ -12,7 +12,7 @@ log = logging.getLogger(__name__)
 class CustomDomainsRedirectMiddleware(object):
 
     def process_request(self, request):
-        cache_general = caches['general']
+        cache_general = caches['default']
         hostname = request.get_host()
         if hostname.endswith(settings.SITE_NAME):
             cache_key = '{prefix}-{site}'.format(prefix=settings.CUSTOM_DOMAINS_REDIRECT_CACHE_KEY_PREFIX, site=hostname)

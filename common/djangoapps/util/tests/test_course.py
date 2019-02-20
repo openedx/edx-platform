@@ -68,7 +68,7 @@ class TestCourseSharingLinks(ModuleStoreTestCase):
         (True, True, 'test_social_sharing_url'),
         (False, True, 'test_marketing_url'),
         (True, False, 'test_social_sharing_url'),
-        (False, False, '{}/courses/course-v1:test_org+test_number+test_run/about'.format(settings.LMS_ROOT_URL)),
+        (False, False, '{}/courses/course-v1:test_org+test_number+test_run/about'.format('http://test_org.localhost:8000')),
     )
     @ddt.unpack
     def test_sharing_link_with_settings(self, enable_social_sharing, enable_mktg_site, expected_course_sharing_link):
@@ -86,7 +86,7 @@ class TestCourseSharingLinks(ModuleStoreTestCase):
         (['marketing_url'], 'test_social_sharing_url'),
         (
             ['social_sharing_url', 'marketing_url'],
-            '{}/courses/course-v1:test_org+test_number+test_run/about'.format(settings.LMS_ROOT_URL)
+            '{}/courses/course-v1:test_org+test_number+test_run/about'.format('http://test_org.localhost:8000')
         ),
     )
     @ddt.unpack
@@ -110,7 +110,7 @@ class TestCourseSharingLinks(ModuleStoreTestCase):
         (True, 'test_social_sharing_url'),
         (
             False,
-            '{}/courses/course-v1:test_org+test_number+test_run/about'.format(settings.LMS_ROOT_URL)
+            '{}/courses/course-v1:test_org+test_number+test_run/about'.format('http://test_org.localhost:8000')
         ),
     )
     @ddt.unpack
