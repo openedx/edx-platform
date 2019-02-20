@@ -20,7 +20,7 @@ var sslaConfig = {
         return '';
     },
     popupMainContentMessageFailed: function() {
-        return '<a style="font-family: \'Open Sans\', Arial, sans-serif; font-size: 14px; color: #3384CA;" onclick="parent.ssla.ssla.popupManually();" href="#">Click here to open the content experience.</a>';
+        return '<div style="background-color:rgb(250,250,250); width: 100%; height: 100%"> <p style="font-family: \'Open Sans\', Arial, sans-serif; font-size: 14px; color: #000000; padding-top: 54px;">It looks like your browser settings has pop-ups disabled. <br>The content takes place in a new window.</p> <br><br> <button onclick="parent.ssla.ssla.popupManually();" style="background-color: #3385C7; color: white; padding: 1rem 2rem; font-family: \'Open Sans\', Arial, sans-serif; font-size: 14px; border-width: 0; font-weight: 700; border-color: #2s6a9f; border-radius: 5px;">Launch pop-up to continue</button></div>';
     },
     popupWindowParams: "status=1,toolbar=1,scrollbars=yes,resizable=yes,alwaysRaised=1"
 };
