@@ -512,9 +512,8 @@ from six import string_types
   });
 </script>
 <script>
-
   var ua = navigator.userAgent;
-  // if(/micromessenger/i.test(ua)){
+  if(/micromessenger/i.test(ua)){
     // 1.2动态加载wx-sdk
     var head = document.getElementsByTagName('head')[0];
     var script = document.createElement('script');
@@ -529,7 +528,7 @@ from six import string_types
         success: function (response) {
             // 1.4配置wx-sdk config
             wx.config({
-              debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+              // debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
               appId: response.appId,
               timestamp: response.timestamp, // 必填，生成签名的时间戳
               nonceStr: response.nonceStr, // 必填，生成签名的随机串
@@ -555,5 +554,5 @@ from six import string_types
         }
     })
  
-// }
+}
 </script>
