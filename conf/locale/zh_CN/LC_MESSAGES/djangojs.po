@@ -4408,10 +4408,8 @@ msgstr "很遗憾您要离开！您的账号将很快被删除。"
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
 "Account deletion, including removal from email lists, may take a few weeks "
-"to fully process through our system. If you want to opt-out of emails before"
-" then, please unsubscribe from the footer of any email."
-msgstr ""
-"删除账号包括从邮箱列表中移除您的邮箱地址，我们的系统可能需要耗时数周才能完成处理。如果在此期间您不希望收到邮件，请从任意邮件的页脚取消订阅。"
+"to fully process through our system."
+msgstr "删除账号包括从邮箱列表中移除您的邮箱地址，我们的系统可能需要耗时数周才能完成处理。"
 
 #: lms/static/js/student_account/tos_modal.js
 msgid "Terms of Service and Honor Code"

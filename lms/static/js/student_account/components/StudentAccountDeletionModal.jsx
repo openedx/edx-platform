@@ -180,7 +180,7 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
         <Modal
           title={gettext('We\'re sorry to see you go! Your account will be deleted shortly.')}
           renderHeaderCloseButton={false}
-          body={gettext('Account deletion, including removal from email lists, may take a few weeks to fully process through our system. If you want to opt-out of emails before then, please unsubscribe from the footer of any email.')}
+          body={gettext('Account deletion, including removal from email lists, may take a few weeks to fully process through our system.')}
           onClose={this.handleConfirmationModalClose}
           aria-live="polite"
           closeText={gettext('Close')}
