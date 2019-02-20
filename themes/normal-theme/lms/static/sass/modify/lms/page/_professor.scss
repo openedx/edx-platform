@@ -127,10 +127,10 @@
     display: none;
   }
   .professor-course{
-    top: unset;
-    right: unset;
     left: 80px;
     bottom: 0;
+    top: inherit;
+    right: inherit;
   }
   .professor-detail .about-staff-block{
     padding-bottom: 60px;
