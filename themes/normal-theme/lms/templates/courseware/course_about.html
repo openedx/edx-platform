@@ -109,7 +109,6 @@ from six import string_types
 <%block name="pagetitle">${course.display_name_with_default_escaped}</%block>
 
 <section class="course-info">
-
   <%block name="course_about_header">
   <header class="course-profile">
     <input type="hidden" id="is_vip" value="${is_vip}"/>
@@ -511,4 +510,50 @@ from six import string_types
       }
     })
   });
+</script>
+<script>
+
+  var ua = navigator.userAgent;
+  if(/micromessenger/i.test(ua)){
+    // 1.2动态加载wx-sdk
+    var head = document.getElementsByTagName('head')[0];
+    var script = document.createElement('script');
+    script.src = '//res2.wx.qq.com/open/js/jweixin-1.4.0.js ';
+    head.appendChild(script);
+    var url = location.href.split('#')[0];
+        // 1.3 获取签名信息
+    $.ajax({
+        url: '/api/courses/v1/getweixinsign',
+        type: 'POST',
+        data: { 'url': url },
+        success: function (response) {
+            // 1.4配置wx-sdk config
+            wx.config({
+              debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+              appId: response.appId,
+              timestamp: response.timestamp, // 必填，生成签名的时间戳
+              nonceStr: response.nonceStr, // 必填，生成签名的随机串
+              signature: response.signature,// 必填，签名，见附录1
+              jsApiList: ['updateAppMessageShareData', 'updateTimelineShareData', 'onMenuShareWeibo'] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
+            });
+            
+            // 1.5 配置个性化设置
+            // 确保分享的图片都是设置的图片，而不是微信默认抓取的
+            wx.ready(function(){
+                var wxShareImg = 'https://www.elitemba.cn/static/images/favicon.ico';
+                var obj = {
+                    title: document.title,
+                    link: window.location.href,
+                    imgUrl: wxShareImg,
+                    desc: '自定义描述'
+                };
+                
+                wx.updateAppMessageShareData(obj)
+                wx.updateTimelineShareData(obj)
+                wx.onMenuShareWeibo(obj)
+            })
+        }
+    })
+ 
+}
 </script>
