@@ -1,11 +1,15 @@
 """ Calculation of Miller indices """
 
+from __future__ import absolute_import
 import decimal
 import fractions as fr
 import json
 import math
 
 import numpy as np
+from six.moves import map
+from six.moves import range
+from functools import reduce
 
 
 def lcm(a, b):
@@ -101,7 +105,7 @@ def sub_miller(segments):
         fract.numerator * math.fabs(common_denominator) / fract.denominator
         for fract in fracts
     ])
-    return'(' + ','.join(map(str, map(decimal.Decimal, miller_indices))) + ')'
+    return'(' + ','.join(map(str, list(map(decimal.Decimal, miller_indices)))) + ')'
 
 
 def miller(points):
@@ -147,7 +151,7 @@ def miller(points):
     N = np.cross(points[1] - points[0], points[2] - points[0])
     O = np.array([0, 0, 0])
     P = points[0]  # point of plane
-    Ccs = map(np.array, [[1.0, 0, 0], [0, 1.0, 0], [0, 0, 1.0]])
+    Ccs = list(map(np.array, [[1.0, 0, 0], [0, 1.0, 0], [0, 0, 1.0]]))
     segments = ([
         np.dot(P - O, N) / np.dot(ort, N) if np.dot(ort, N) != 0
         else np.nan for ort in Ccs
@@ -256,7 +260,7 @@ def grade(user_input, correct_answer):
     if user_answer['lattice'] != correct_answer['lattice']:
         return False
 
-    points = [map(float, p) for p in user_answer['points']]
+    points = [list(map(float, p)) for p in user_answer['points']]
 
     if len(points) < 3:
         return False
