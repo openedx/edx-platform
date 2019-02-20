@@ -85,3 +85,9 @@ if FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION', False):
 ######################## Professors ###########################
 if FEATURES.get('ENABLE_PROFESSORS'):
     INSTALLED_APPS.append('professors')
+
+############################ WEIXINAPPID_AND_WEIXINAPPSECRET #########################
+WEIXINAPPID = ''
+WEIXINAPPSECRET = ''
+WEIXINAPPID = ENV_TOKENS.get('WEIXINAPPID', WEIXINAPPID)
+WEIXINAPPSECRET = ENV_TOKENS.get('WEIXINAPPSECRET', WEIXINAPPSECRET)
