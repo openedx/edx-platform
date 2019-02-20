@@ -1,5 +1,7 @@
+from datetime import timedelta
 import json
 from itertools import izip
+from provider.utils import now
 
 import cssutils
 import os
@@ -7,9 +9,11 @@ import sass
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
-from django.contrib.staticfiles.templatetags.staticfiles import static
+from django.db.models.query import Q
+from provider.oauth2.models import AccessToken, RefreshToken, Client
+
 from organizations.api import add_organization
-from organizations.models import UserOrganizationMapping, Organization
+from organizations.models import UserOrganizationMapping, Organization, UserSiteMapping
 
 from openedx.core.djangoapps.theming.models import SiteTheme
 
@@ -26,6 +30,70 @@ def get_lms_link_from_course_key(base_lms_url, course_key):
         site_domain = "{}.{}".format(course_key.org, base_lms_url)
 
     return site_domain
+
+
+def get_organization_by_name(org_name):
+    return Organization.objects.get(Q(name=org_name) | Q(short_name=org_name))
+
+
+def get_site_by_organization(org):
+    assert org.sites.count() == 1, 'Should have one and only one site.'
+    return org.sites.all()[0]
+
+
+def reset_tokens(user, org_name):
+    client = Client.objects.get(url=settings.APPSEMBLER_FEATURES['AMC_APP_URL'])
+
+    u = User.objects.get(Q(email=user) | Q(username=user))
+    org = get_organization_by_name(org_name)
+    site = get_site_by_organization(org)
+
+    UserOrganizationMapping.objects.get_or_create(user=u, organization=org)
+    UserSiteMapping.objects.get_or_create(user=u, site=site)
+
+    try:
+        access = AccessToken.objects.get(user=u, client=client)
+    except AccessToken.DoesNotExist:
+        access = AccessToken.objects.create(
+            user=u,
+            client=client,
+        )
+
+    access.expires = access.client.get_default_token_expiry()
+    access.save()
+
+    try:
+        refresh = RefreshToken.objects.get(user=u, access_token=access, client=client)
+    except RefreshToken.DoesNotExist:
+        refresh = RefreshToken.objects.create(
+            user=u,
+            client=client,
+            access_token=access,
+        )
+
+    refresh.expired = True
+    refresh.save()
+
+    return {
+        'access_token': access.token,
+        'refresh_token': refresh.token,
+    }
+
+
+def ensure_amc_site_admin(user, org_name):
+    u = User.objects.get(Q(email=user) | Q(username=user))
+    org = get_organization_by_name(org_name)
+    site = get_site_by_organization(org)
+
+    uom, _ = UserOrganizationMapping.objects.get_or_create(user=u, organization=org)
+    uom.is_active = True
+    uom.is_amc_admin = True
+    uom.save()
+
+    usm, _ = UserSiteMapping.objects.get_or_create(user=u, site=site)
+    usm.is_active = True
+    usm.is_amc_admin = True
+    usm.save()
 
 
 def get_initial_sass_variables():
