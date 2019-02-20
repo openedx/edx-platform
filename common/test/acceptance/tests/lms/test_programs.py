@@ -11,7 +11,8 @@ from openedx.core.djangoapps.catalog.tests.factories import (
     CourseRunFactory,
     PathwayFactory,
     ProgramFactory,
-    ProgramTypeFactory
+    ProgramTypeFactory,
+    ProgramDescriptionFactory,
 )
 
 
@@ -24,6 +25,12 @@ class ProgramPageBase(ProgramsConfigMixin, CatalogIntegrationMixin, UniqueCourse
 
         self.programs = ProgramFactory.create_batch(3)
         self.pathways = PathwayFactory.create_batch(3)
+        self.course_runs = [
+            CourseRunFactory.create(programs=[ProgramDescriptionFactory.from_program(program)], **course_run)
+            for program in self.programs
+            for course in program['courses']
+            for course_run in course['course_runs']
+        ]
         for pathway in self.pathways:
             self.programs += pathway['programs']
 
@@ -51,18 +58,28 @@ class ProgramPageBase(ProgramsConfigMixin, CatalogIntegrationMixin, UniqueCourse
         program_type = ProgramTypeFactory()
         return ProgramFactory(courses=[course], type=program_type['name'])
 
-    def stub_catalog_api(self, programs, pathways):
+    def stub_catalog_api(self, programs=None, pathways=None, course_runs=None):
         """
         Stub the discovery service's program list and detail API endpoints, as well as
         the credit pathway list endpoint.
         """
         self.set_catalog_integration(is_enabled=True, service_username=self.username)
-        CatalogFixture().install_programs(programs)
+
+        if programs is None:
+            programs = self.programs
+
+        CatalogFixture.install_programs(programs)
 
         program_types = [program['type'] for program in programs]
-        CatalogFixture().install_program_types(program_types)
+        CatalogFixture.install_program_types(program_types)
 
-        CatalogFixture().install_pathways(pathways)
+        if pathways is None:
+            pathways = self.pathways
+        CatalogFixture.install_pathways(pathways)
+
+        if course_runs is None:
+            course_runs = self.course_runs
+        CatalogFixture.install_course_runs(course_runs)
 
     def cache_programs(self):
         """
@@ -84,7 +101,7 @@ class ProgramListingPageTest(ProgramPageBase):
     def test_no_enrollments(self):
         """Verify that no cards appear when the user has no enrollments."""
         self.auth(enroll=False)
-        self.stub_catalog_api(self.programs, self.pathways)
+        self.stub_catalog_api()
         self.cache_programs()
 
         self.listing_page.visit()
@@ -98,7 +115,7 @@ class ProgramListingPageTest(ProgramPageBase):
         but none are included in an active program.
         """
         self.auth()
-        self.stub_catalog_api(self.programs, self.pathways)
+        self.stub_catalog_api()
         self.cache_programs()
 
         self.listing_page.visit()
@@ -126,7 +143,15 @@ class ProgramListingPageA11yTest(ProgramPageBase):
             ]
         })
         self.auth(enroll=False)
-        self.stub_catalog_api(programs=[self.program], pathways=[])
+        self.stub_catalog_api(
+            programs=[self.program],
+            pathways=[],
+            course_runs=[
+                CourseRunFactory.create(programs=[ProgramDescriptionFactory.from_program(self.program)], **course_run)
+                for course in self.program['courses']
+                for course_run in course['course_runs']
+            ]
+        )
         self.cache_programs()
 
         self.listing_page.visit()
@@ -143,7 +168,15 @@ class ProgramListingPageA11yTest(ProgramPageBase):
             ]
         })
         self.auth()
-        self.stub_catalog_api(programs=[self.program], pathways=[])
+        self.stub_catalog_api(
+            programs=[self.program],
+            pathways=[],
+            course_runs=[
+                CourseRunFactory.create(programs=[ProgramDescriptionFactory.from_program(self.program)], **course_run)
+                for course in self.program['courses']
+                for course_run in course['course_runs']
+            ]
+        )
         self.cache_programs()
 
         self.listing_page.visit()
@@ -173,7 +206,15 @@ class ProgramDetailsPageA11yTest(ProgramPageBase):
             ]
         })
         self.auth()
-        self.stub_catalog_api(programs=[self.program], pathways=[])
+        self.stub_catalog_api(
+            programs=[self.program],
+            pathways=[],
+            course_runs=[
+                CourseRunFactory.create(programs=[ProgramDescriptionFactory.from_program(self.program)], **course_run)
+                for course in self.program['courses']
+                for course_run in course['course_runs']
+            ]
+        )
         self.cache_programs()
 
         self.details_page.visit()
