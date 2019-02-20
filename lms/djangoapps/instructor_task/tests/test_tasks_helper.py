@@ -17,6 +17,11 @@ from datetime import datetime, timedelta
 
 import ddt
 import unicodecsv
+from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
+from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
+from courseware.model_data import StudentModule
+from courseware.tests.factories import InstructorFactory
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
@@ -464,6 +469,7 @@ class TestTeamGradeReport(InstructorGradeReportTestCase):
 
 
 # pylint: disable=protected-access
+@ddt.ddt
 class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
     """
     Tests that generation of CSV files listing student answers to a
@@ -502,7 +508,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         student_data, _ = ProblemResponses._build_student_data(
             user_id=self.instructor.id,
             course_key=self.course.id,
-            usage_key_str=str(self.course.location),
+            usage_key_str_list=[str(self.course.location)],
         )
 
         self.assertEquals(len(student_data), 4)
@@ -524,7 +530,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         student_data, _ = ProblemResponses._build_student_data(
             user_id=self.instructor.id,
             course_key=self.course.id,
-            usage_key_str=str(self.course.location),
+            usage_key_str_list=[str(self.course.location)],
         )
         self.assertEquals(len(student_data), 2)
         self.assertDictContainsSubset({
@@ -561,14 +567,14 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         ProblemResponses._build_student_data(
             user_id=self.instructor.id,
             course_key=self.course.id,
-            usage_key_str=str(problem.location),
+            usage_key_str_list=[str(problem.location)],
         )
         mock_generate_report_data.assert_called_with(ANY, ANY)
         mock_list_problem_responses.assert_called_with(self.course.id, ANY, ANY)
 
     def test_success(self):
         task_input = {
-            'problem_location': str(self.course.location),
+            'problem_locations': str(self.course.location),
             'user_id': self.instructor.id
         }
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):

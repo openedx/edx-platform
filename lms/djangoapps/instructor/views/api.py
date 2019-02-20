@@ -984,29 +984,33 @@ class ProblemResponseReport(DeveloperErrorViewMixin, APIView):
         to a given problem.
         """
         course_key = CourseKey.from_string(course_id)
-        problem_location = request.POST.get('problem_location', '')
+        # A comma-separated list of problem locations
+        problem_locations = request.POST.get('problem_location', '')
+        # A comma-separated list of block types
+        problem_types_filter = request.POST.get('problem_types_filter', '')
         report_type = _('problem responses')
 
         try:
-            problem_key = UsageKey.from_string(problem_location)
-            # Are we dealing with an "old-style" problem location?
-            run = problem_key.run
-            if not run:
-                problem_key = UsageKey.from_string(problem_location).map_into_course(course_key)
-            if problem_key.course_key != course_key:
-                raise InvalidKeyError(type(problem_key), problem_key)
+            for problem_location in problem_locations.split(','):
+                problem_key = UsageKey.from_string(problem_location)
+                # Are we dealing with an "old-style" problem location?
+                run = problem_key.run
+                if not run:
+                    problem_key = problem_key.map_into_course(course_key)
+                if problem_key.course_key != course_key:
+                    raise InvalidKeyError(type(problem_key), problem_key)
         except InvalidKeyError:
             return JsonResponseBadRequest(_("Could not find problem with this location."))
 
         try:
-            lms.djangoapps.instructor_task.api.submit_calculate_problem_responses_csv(
-                request, course_key, problem_location
+            task = lms.djangoapps.instructor_task.api.submit_calculate_problem_responses_csv(
+                request, course_key, problem_locations, problem_types_filter,
             )
             success_status = _(
                 "The problem responses report is being created."
                 " To view the status of the report, see Pending Tasks below."
             )
-            return JsonResponse({"status": success_status})
+            return JsonResponse({"status": success_status, "task_id": task.task_id})
         except AlreadyRunningError:
             already_running_status = _(
                 "A problem responses report generation task is already in progress. "
