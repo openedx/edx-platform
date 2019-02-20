@@ -35,8 +35,8 @@ class CourseGoal(models.Model):
     def __unicode__(self):
         return 'CourseGoal: {user} set goal to {goal} for course {course}'.format(
             user=self.user.username,
+            goal=self.goal_key,
             course=self.course_key,
-            goal_key=self.goal_key,
         )
 
     class Meta:
