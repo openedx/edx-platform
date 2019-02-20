@@ -40,6 +40,8 @@ class EmbargoedCourse(models.Model):
     Enable course embargo on a course-by-course basis.
 
     Deprecated by `RestrictedCourse`
+
+    .. no_pii:
     """
     objects = NoneToEmptyManager()
 
@@ -74,6 +76,8 @@ class EmbargoedState(ConfigurationModel):
     Register countries to be embargoed.
 
     Deprecated by `Country`.
+
+    .. no_pii:
     """
     # The countries to embargo
     embargoed_countries = models.TextField(
@@ -95,7 +99,8 @@ class EmbargoedState(ConfigurationModel):
 
 
 class RestrictedCourse(models.Model):
-    """Course with access restrictions.
+    """
+    Course with access restrictions.
 
     Restricted courses can block users at two points:
 
@@ -110,6 +115,7 @@ class RestrictedCourse(models.Model):
     messages to users when they are blocked.
     These displayed on pages served by the embargo app.
 
+    .. no_pii:
     """
     COURSE_LIST_CACHE_KEY = 'embargo.restricted_courses'
     MESSAGE_URL_CACHE_KEY = 'embargo.message_url_path.{access_point}.{course_key}'
@@ -370,6 +376,7 @@ class Country(models.Model):
     There is a data migration that creates entries for
     each country code.
 
+    .. no_pii:
     """
     country = CountryField(
         db_index=True, unique=True,
@@ -403,6 +410,7 @@ class CountryAccessRule(models.Model):
     2) From the initial list, remove all blacklisted countries
     for the course.
 
+    .. no_pii:
     """
 
     WHITELIST_RULE = 'whitelist'
@@ -579,7 +587,11 @@ post_delete.connect(invalidate_country_rule_cache, sender=RestrictedCourse)
 
 
 class CourseAccessRuleHistory(models.Model):
-    """History of course access rule changes. """
+    """
+    History of course access rule changes.
+
+    .. no_pii:
+    """
     # pylint: disable=model-missing-unicode
 
     timestamp = models.DateTimeField(db_index=True, auto_now_add=True)
@@ -667,6 +679,8 @@ post_delete.connect(CourseAccessRuleHistory.snapshot_post_delete_receiver, sende
 class IPFilter(ConfigurationModel):
     """
     Register specific IP addresses to explicitly block or unblock.
+
+    .. no_pii:
     """
     whitelist = models.TextField(
         blank=True,

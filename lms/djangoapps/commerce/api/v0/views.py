@@ -56,7 +56,7 @@ class BasketsView(APIView):
         try:
             course_key = CourseKey.from_string(course_id)
             courses.get_course(course_key)
-        except (InvalidKeyError, ValueError)as ex:
+        except (InvalidKeyError, ValueError) as ex:
             log.exception(u'Unable to locate course matching %s.', course_id)
             return False, None, text_type(ex)
 

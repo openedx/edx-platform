@@ -56,7 +56,7 @@
                 <% var online_proctoring_rules = xblockInfo.get('online_proctoring_rules'); %>
                 <p class='field-message' id='review-rules-description'>
                 <% if (online_proctoring_rules) { %>
-                    % // xss-lint: disable=underscore-not-escaped %>
+                    <% // xss-lint: disable=underscore-not-escaped %>
                     <%= edx.HtmlUtils.interpolateHtml(
                         gettext('Specify any rules or rule exceptions that the proctoring review team should enforce when reviewing the videos. For example, you could specify that calculators are allowed. These specified rules are visible to learners before the learners start the exam, along with the {linkStart}general proctored exam rules{linkEnd}.'),
                         {

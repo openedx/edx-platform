@@ -9,6 +9,8 @@ class WhitelistedRssUrl(TimeStampedModel):
     """
     Model for persisting RSS feed URLs which are whitelisted
     for proxying via this rss_proxy djangoapp.
+
+    .. no_pii:
     """
     url = models.CharField(max_length=255, unique=True, db_index=True)
 

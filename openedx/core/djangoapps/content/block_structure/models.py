@@ -124,6 +124,8 @@ def _storage_error_handling(bs_model, operation, is_read_operation=False):
 class BlockStructureModel(TimeStampedModel):
     """
     Model for storing Block Structure information.
+
+    .. no_pii:
     """
     VERSION_FIELDS = [
         u'data_version',

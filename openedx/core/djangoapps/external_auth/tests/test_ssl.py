@@ -7,6 +7,8 @@ import copy
 from unittest import skip
 from mock import Mock, patch
 
+from six import text_type
+
 from django.conf import settings
 from django.contrib.auth import SESSION_KEY
 from django.contrib.auth.models import AnonymousUser, User
@@ -97,7 +99,7 @@ class SSLClientTest(ModuleStoreTestCase):
         self.assertIn('<form role="form" id="register-form" method="post"', response.content)
         try:
             ExternalAuthMap.objects.get(external_id=self.USER_EMAIL)
-        except ExternalAuthMap.DoesNotExist, ex:
+        except ExternalAuthMap.DoesNotExist as ex:
             self.fail(u'User did not get properly added to external auth map, exception was {0}'.format(str(ex)))
 
         with self.assertRaises(User.DoesNotExist):
@@ -116,7 +118,7 @@ class SSLClientTest(ModuleStoreTestCase):
 
         try:
             ExternalAuthMap.objects.get(external_id=self.USER_EMAIL)
-        except ExternalAuthMap.DoesNotExist, ex:
+        except ExternalAuthMap.DoesNotExist as ex:
             self.fail(u'User did not get properly added to external auth map, exception was {0}'.format(str(ex)))
 
         with self.assertRaises(User.DoesNotExist):
@@ -135,11 +137,11 @@ class SSLClientTest(ModuleStoreTestCase):
         # Assert our user exists in both eamap and Users, and that we are logged in
         try:
             ExternalAuthMap.objects.get(external_id=self.USER_EMAIL)
-        except ExternalAuthMap.DoesNotExist, ex:
+        except ExternalAuthMap.DoesNotExist as ex:
             self.fail(u'User did not get properly added to external auth map, exception was {0}'.format(str(ex)))
         try:
             User.objects.get(email=self.USER_EMAIL)
-        except ExternalAuthMap.DoesNotExist, ex:
+        except ExternalAuthMap.DoesNotExist as ex:
             self.fail(u'User did not get properly added to internal users, exception was {0}'.format(str(ex)))
 
     @skip_unless_cms
@@ -161,11 +163,11 @@ class SSLClientTest(ModuleStoreTestCase):
         # Assert our user exists in both eamap and Users, and that we are logged in
         try:
             ExternalAuthMap.objects.get(external_id=self.USER_EMAIL)
-        except ExternalAuthMap.DoesNotExist, ex:
+        except ExternalAuthMap.DoesNotExist as ex:
             self.fail(u'User did not get properly added to external auth map, exception was {0}'.format(str(ex)))
         try:
             User.objects.get(email=self.USER_EMAIL)
-        except ExternalAuthMap.DoesNotExist, ex:
+        except ExternalAuthMap.DoesNotExist as ex:
             self.fail(u'User did not get properly added to internal users, exception was {0}'.format(str(ex)))
 
     @skip_unless_lms
@@ -322,11 +324,11 @@ class SSLClientTest(ModuleStoreTestCase):
         # Assert our user exists in both eamap and Users
         try:
             ExternalAuthMap.objects.get(external_id=self.USER_EMAIL)
-        except ExternalAuthMap.DoesNotExist, ex:
+        except ExternalAuthMap.DoesNotExist as ex:
             self.fail(u'User did not get properly added to external auth map, exception was {0}'.format(str(ex)))
         try:
             User.objects.get(email=self.USER_EMAIL)
-        except ExternalAuthMap.DoesNotExist, ex:
+        except ExternalAuthMap.DoesNotExist as ex:
             self.fail(u'User did not get properly added to internal users, exception was {0}'.format(str(ex)))
         self.assertEqual(1, len(ExternalAuthMap.objects.all()))
 
@@ -382,7 +384,7 @@ class SSLClientTest(ModuleStoreTestCase):
         CourseEnrollment.enroll(user, course.id)
 
         CourseStaffRole(course.id).add_users(user)
-        course_private_url = reverse('course_handler', args=(unicode(course.id),))
+        course_private_url = reverse('course_handler', args=(text_type(course.id),))
         self.assertNotIn(SESSION_KEY, self.client.session)
 
         response = self.client.get(

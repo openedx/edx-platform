@@ -21,6 +21,8 @@ send_user_notification = Signal(providing_args=["user", "state"])
 class CourseCreator(models.Model):
     """
     Creates the database table model.
+
+    .. no_pii:
     """
     UNREQUESTED = 'unrequested'
     PENDING = 'pending'

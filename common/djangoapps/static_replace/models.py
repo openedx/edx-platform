@@ -7,7 +7,11 @@ from django.db.models.fields import TextField
 
 
 class AssetBaseUrlConfig(ConfigurationModel):
-    """Configuration for the base URL used for static assets."""
+    """
+    Configuration for the base URL used for static assets.
+
+    .. no_pii:
+    """
 
     class Meta(object):
         app_label = 'static_replace'
@@ -30,7 +34,11 @@ class AssetBaseUrlConfig(ConfigurationModel):
 
 
 class AssetExcludedExtensionsConfig(ConfigurationModel):
-    """Configuration for the the excluded file extensions when canonicalizing static asset paths."""
+    """
+    Configuration for the the excluded file extensions when canonicalizing static asset paths.
+
+    .. no_pii:
+    """
 
     class Meta(object):
         app_label = 'static_replace'

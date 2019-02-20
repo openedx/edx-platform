@@ -7,7 +7,11 @@ from django.utils.translation import ugettext_lazy as _
 
 
 class EmailMarketingConfiguration(ConfigurationModel):
-    """ Email marketing configuration """
+    """
+    Email marketing configuration
+
+    .. no_pii:
+    """
 
     class Meta(object):
         app_label = "email_marketing"

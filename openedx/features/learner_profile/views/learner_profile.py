@@ -7,7 +7,7 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
 from django.http import Http404
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, redirect
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods
 from django_countries import countries
@@ -23,7 +23,7 @@ from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.journals.api import journals_enabled
 from student.models import User
 
-from .. import SHOW_PROFILE_MESSAGE
+from .. import SHOW_PROFILE_MESSAGE, REDIRECT_TO_PROFILE_MICROFRONTEND
 
 from learner_achievements import LearnerAchievementsFragmentView
 
@@ -47,6 +47,10 @@ def learner_profile(request, username):
     Example usage:
         GET /account/profile
     """
+    if REDIRECT_TO_PROFILE_MICROFRONTEND.is_enabled():
+        profile_microfrontend_url = "{}{}".format(settings.PROFILE_MICROFRONTEND_URL, username)
+        return redirect(profile_microfrontend_url)
+
     try:
         context = learner_profile_context(request, username, request.user.is_staff)
         # TODO: LEARNER-2554: 09/2017: Remove message and cookie logic when we no longer want this message

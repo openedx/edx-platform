@@ -33,7 +33,11 @@ class RetirementStateError(Exception):
 
 
 class UserPreference(models.Model):
-    """A user's preference, stored as generic text to be processed by client"""
+    """
+    A user's preference, stored as generic text to be processed by client
+
+    .. no_pii: Stores arbitrary key/value pairs, currently none are PII. If that changes, update this annotation.
+    """
     KEY_REGEX = r"[-_a-zA-Z0-9]+"
     user = models.ForeignKey(User, db_index=True, related_name="preferences", on_delete=models.CASCADE)
     key = models.CharField(max_length=255, db_index=True, validators=[RegexValidator(KEY_REGEX)])
@@ -112,6 +116,8 @@ class UserCourseTag(models.Model):
     """
     Per-course user tags, to be used by various things that want to store tags about
     the user.  Added initially to store assignment to experimental groups.
+
+    .. no_pii: Stores arbitrary key/value pairs about users, but does not currently store any PII. This may change!
     """
     user = models.ForeignKey(User, db_index=True, related_name="+", on_delete=models.CASCADE)
     key = models.CharField(max_length=255, db_index=True)
@@ -128,6 +134,9 @@ class UserOrgTag(TimeStampedModel, DeletableByUserValue):  # pylint: disable=mod
 
     Allows settings to be configured at an organization level.
 
+    .. pii: Does not strictly store PII, but maintains the email-optin flag and so is retired in AccountRetirementView.
+    .. pii_types: other
+    .. pii_retirement: local_api
     """
     user = models.ForeignKey(User, db_index=True, related_name="+", on_delete=models.CASCADE)
     key = models.CharField(max_length=255, db_index=True)
@@ -142,6 +151,8 @@ class RetirementState(models.Model):
     """
     Stores the list and ordering of the steps of retirement, this should almost never change
     as updating it can break the retirement process of users already in the queue.
+
+    .. no_pii:
     """
     state_name = models.CharField(max_length=30, unique=True)
     state_execution_order = models.SmallIntegerField(unique=True)
@@ -174,6 +185,10 @@ class UserRetirementPartnerReportingStatus(TimeStampedModel):
     and asynchronous, timeline than LMS retirement and only impacts a subset of learners
     so it maintains a queue. This queue is populated as part of the LMS retirement
     process.
+
+    .. pii: Contains a retiring user's name, username, and email. Retired in AccountRetirementPartnerReportView.
+    .. pii_types: name, username, email_address
+    .. pii_retirement: local_api
     """
     user = models.OneToOneField(User)
     original_username = models.CharField(max_length=150, db_index=True)
@@ -197,6 +212,8 @@ class UserRetirementRequest(TimeStampedModel):
     Records and perists every user retirement request.
     Users that have requested to cancel their retirement before retirement begins can be removed.
     All other retired users persist in this table forever.
+
+    .. no_pii:
     """
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
@@ -227,6 +244,10 @@ class UserRetirementRequest(TimeStampedModel):
 class UserRetirementStatus(TimeStampedModel):
     """
     Tracks the progress of a user's retirement request
+
+    .. pii: Contains a retiring user's name, username, and email. Retired in AccountRetirementStatusView.cleanup().
+    .. pii_types: name, username, email_address
+    .. pii_retirement: local_api
     """
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     original_username = models.CharField(max_length=150, db_index=True)

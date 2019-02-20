@@ -109,7 +109,7 @@ def reorder_tabs_handler(course_item, request):
     # validate the tabs to make sure everything is Ok (e.g., did the client try to reorder unmovable tabs?)
     try:
         CourseTabList.validate_tabs(new_tab_list)
-    except InvalidTabsException, exception:
+    except InvalidTabsException as exception:
         return JsonResponse(
             {"error": u"New list of tabs is not valid: {0}.".format(str(exception))}, status=400
         )

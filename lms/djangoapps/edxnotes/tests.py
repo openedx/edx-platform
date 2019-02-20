@@ -671,13 +671,13 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                 u"quote": u"quote text1",
                 u"text": u"text1",
                 u"usage_id": unicode(self.html_module_1.location),
-                u"updated": datetime(2016, 01, 26, 8, 5, 16, 00000).isoformat(),
+                u"updated": datetime(2016, 1, 26, 8, 5, 16, 00000).isoformat(),
             },
             {
                 u"quote": u"quote text2",
                 u"text": u"text2",
                 u"usage_id": unicode(self.html_module_2.location),
-                u"updated": datetime(2016, 01, 26, 9, 6, 17, 00000).isoformat(),
+                u"updated": datetime(2016, 1, 26, 9, 6, 17, 00000).isoformat(),
             },
         ]
 
@@ -695,7 +695,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                     u'text': u'text1',
                     u'quote': u'quote text1',
                     u'usage_id': unicode(self.html_module_1.location),
-                    u'updated': datetime(2016, 01, 26, 8, 5, 16)
+                    u'updated': datetime(2016, 1, 26, 8, 5, 16)
                 },
                 {
                     'section': {},
@@ -708,7 +708,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                     u'text': u'text2',
                     u'quote': u'quote text2',
                     u'usage_id': unicode(self.html_module_2.location),
-                    u'updated': datetime(2016, 01, 26, 9, 6, 17)
+                    u'updated': datetime(2016, 1, 26, 9, 6, 17)
                 }
             ],
             helpers.preprocess_collection(self.user, self.course, initial_collection)

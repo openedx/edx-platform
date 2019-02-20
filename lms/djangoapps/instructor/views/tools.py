@@ -48,7 +48,7 @@ def handle_dashboard_error(view):
         """
         try:
             return view(request, course_id=course_id)
-        except DashboardError, error:
+        except DashboardError as error:
             return error.response()
 
     return wrapper

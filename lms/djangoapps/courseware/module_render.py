@@ -285,7 +285,7 @@ def _add_timed_exam_info(user, course, section, section_context):
                 unicode(course.id),
                 unicode(section.location)
             )
-        except Exception, ex:  # pylint: disable=broad-except
+        except Exception as ex:  # pylint: disable=broad-except
             # safety net in case something blows up in edx_proctoring
             # as this is just informational descriptions, it is better
             # to log and continue (which is safe) than to have it be an
