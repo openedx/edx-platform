@@ -357,6 +357,8 @@ class Courses(SysadminDashboardView):
             info = [output_json['commit'],
                     output_json['date'],
                     output_json['author'], ]
+        except OSError as error:
+            log.warning(text_type(u"Error fetching git data: %s - %s"), text_type(cdir), text_type(error))
         except (ValueError, subprocess.CalledProcessError):
             pass
 
