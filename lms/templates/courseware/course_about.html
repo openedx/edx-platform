@@ -243,7 +243,7 @@ from six import string_types
                   <%
                      course_date_string = course_start_date.strftime('%Y-%m-%dT%H:%M:%S%z')
                   %>
-                  <span class="important-dates-item-text start-date localized_datetime" data-format="shortDate" data-datetime="${course_date_string}"></span>
+                  <span class="important-dates-item-text start-date localized_datetime" data-format="shortDate" data-datetime="${course_date_string}" data-language="${LANGUAGE_CODE}"></span>
               % endif
             </li>
           % endif
@@ -263,7 +263,7 @@ from six import string_types
                     <%
                         course_date_string = course_end_date.strftime('%Y-%m-%dT%H:%M:%S%z')
                     %>
-                    <span class="important-dates-item-text final-date localized_datetime" data-format="shortDate" data-datetime="${course_date_string}"></span>
+                    <span class="important-dates-item-text final-date localized_datetime" data-format="shortDate" data-datetime="${course_date_string}" data-language="${LANGUAGE_CODE}"></span>
                   % endif
             </li>
             % endif
