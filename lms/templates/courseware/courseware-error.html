@@ -21,8 +21,8 @@ from openedx.core.djangolib.markup import HTML, Text
 <section class="container">
   <section class="outside-app">
     <h1>
-      ${_('There has been an error on the {platform_name} servers').format(
-          platform_name=u'<span class="edx">{}</span>'.format(static.get_platform_name())
+      ${Text(_('There has been an error on the {platform_name} servers')).format(
+          platform_name=HTML(u'<span class="edx">{}</span>').format(static.get_platform_name())
       )}
     </h1>
     <p>

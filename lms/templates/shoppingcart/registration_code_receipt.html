@@ -26,7 +26,7 @@ from openedx.features.course_experience import course_home_url_name
               course_number=course.display_number_with_default,
               course_title=course.display_name_with_default_escaped,
             )}"/>
-      </div>
+      </div>adsfafd
       <div class="enrollment-details">
         <div class="sub-title">
           ${Text(_("Confirm your enrollment for: {span_start}course dates{span_end}")).format(
@@ -48,7 +48,7 @@ from openedx.features.course_experience import course_home_url_name
               " Check your {link_start}course dashboard{link_end} to see if you're enrolled in the course,"
               " or contact your company's administrator."
               )).format(
-                link_start=HTML(u'<a href="{url}">'.format(url=reverse('dashboard'))),
+                link_start=HTML(u'<a href="{url}">').format(url=reverse('dashboard')),
                 link_end=HTML('</a>')
               )}
             % elif redemption_success:

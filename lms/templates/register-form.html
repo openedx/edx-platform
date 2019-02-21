@@ -58,7 +58,7 @@ from student.models import UserProfile
 
   <p class="instructions">
     ## Translators: selected_provider is the name of an external, third-party user authentication service (like Google or LinkedIn).
-    ${Text(_("You've successfully signed in with {selected_provider}.")).format(selected_provider=HTML('<strong>%s</strong>' % selected_provider))}<br />
+    ${Text(_("You've successfully signed in with {selected_provider}.")).format(selected_provider=HTML('<strong>{selected_provider}</strong>').format(selected_provider=selected_provider))}<br />
     ${Text(_("We just need a little more information before you start learning with {platform_name}.")).format(platform_name=settings.PLATFORM_NAME)}
   </p>
 

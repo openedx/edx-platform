@@ -1,7 +1,7 @@
-<%page expression_filter="h"/>
 <%!
 from django.urls import reverse
 from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import Text
 from six import text_type
 %>
 
@@ -18,7 +18,7 @@ def _message(reqm, message):
             <p class="conditional-message">${_message(reqm, message)}</p>
         % else:
             <p class="conditional-message">
-                ${_("You do not have access to this dependency module.")}
+                ${Text(_("You do not have access to this dependency module."))}
             </p>
         % endif
     % endfor

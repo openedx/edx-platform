@@ -4,6 +4,7 @@
 <%namespace file='main.html' import="login_query"/>
 <%!
 from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
 from django.urls import reverse
 from django.utils import html
 from django_countries import countries
@@ -109,7 +110,9 @@ import calendar
       </div>
 
       <p class="instructions">
-        ${_('Required fields are noted by <strong class="indicator">bold text and an asterisk (*)</strong>.')}
+        ${Text(_('Required fields are noted by {strong_start}bold text and an asterisk (*){strong_end}.')). \
+          format(strong_start=HTML('<strong class="indicator">'),
+                strong_end=HTML('</strong>'))}
       </p>
 
       <fieldset class="group group-form group-form-requiredinformation">
@@ -160,9 +163,9 @@ import calendar
 
             <div class="field required checkbox" id="field-tos">
               <input id="tos-yes" type="checkbox" name="terms_of_service" value="true" required aria-required="true" />
-              <label for="tos-yes">${_('I agree to the {link_start}Terms of Service{link_end}').format(
-                link_start='<a href="{url}" class="new-vp">'.format(url=marketing_link('TOS')),
-                link_end='</a>')}</label>
+              <label for="tos-yes">${Text(_('I agree to the {link_start}Terms of Service{link_end}')).format(
+                link_start=HTML('<a href="{url}" class="new-vp">').format(url=marketing_link('TOS')),
+                link_end=HTML('</a>'))}</label>
             </div>
 
             % endif
@@ -172,9 +175,9 @@ import calendar
               <%
                 honor_code_path = marketing_link('HONOR')
               %>
-              <label for="honorcode-yes">${_('I agree to the {link_start}Honor Code{link_end}').format(
-                link_start='<a href="{url}" class="new-vp">'.format(url=honor_code_path),
-                link_end='</a>')}</label>
+              <label for="honorcode-yes">${Text(_('I agree to the {link_start}Honor Code{link_end}')).format(
+                link_start=HTML('<a href="{url}" class="new-vp">').format(url=honor_code_path),
+                link_end=HTML('</a>'))}</label>
             </div>
           </li>
         </ol>

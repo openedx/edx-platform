@@ -5,6 +5,7 @@
 from django.urls import reverse
 from edxmako.shortcuts import marketing_link
 from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
 from django.utils.translation import ungettext
 from openedx.core.lib.courses import course_image_url
 %>
@@ -172,14 +173,16 @@ from openedx.core.lib.courses import course_image_url
                       ${form_html}
                     </div>
                     <p id="payment_business_helper_text">
-                        ${_('After this purchase is complete, {username} will be enrolled in this course.').format(username=u'<br/><b>{username}</b>'.format(username=order.user.username))}
+                        ${Text(_('After this purchase is complete, {username} will be enrolled in this course.')).format( \
+                        username=HTML(u'<br/><b>{username}</b>').format(username=order.user.username))}
                     </p>
                   </div>
                % else:
                   <div name="payment" aria-describedby="payment_helper_text">
                     ${form_html}
                     <p id="payment_helper_text">
-                        ${_('After this purchase is complete, {username} will be enrolled in this course.').format(username=u'<br/><b>{username}</b>'.format(username=order.user.username))}
+                        ${Text(_('After this purchase is complete, {username} will be enrolled in this course.')).format( \
+                        username=HTML(u'<br/><b>{username}</b>').format(username=order.user.username))}
                     </p>
                   </div>
                   <div name="billing" class="hidden">
