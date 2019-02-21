@@ -70,7 +70,7 @@ cffi==1.12.1
 chardet==3.0.4
 click-log==0.1.8
 click==7.0
-code-annotations==0.2.3
+code-annotations==0.2.4
 colorama==0.4.1
 configparser==3.7.1
 constantly==15.1.0

@@ -5,9 +5,11 @@
 Check code quality using pycodestyle, pylint, and diff_quality.
 """
 from __future__ import print_function
+import io
 import json
 import os
 import re
+import six
 from datetime import datetime
 from xml.sax.saxutils import quoteattr
 
@@ -325,8 +327,7 @@ def run_complexity():
     complexity_report_dir = (Env.REPORT_DIR / "complexity")
     complexity_report = complexity_report_dir / "python_complexity.log"
 
-    # Ensure directory structure is in place: metrics dir, and an empty complexity report dir.
-    Env.METRICS_DIR.makedirs_p()
+    # Ensure an empty complexity report dir is in place.
     _prepare_report_dir(complexity_report_dir)
 
     print("--> Calculating cyclomatic complexity of python files...")
@@ -635,7 +636,7 @@ def _write_metric(metric, filename):
     Env.METRICS_DIR.makedirs_p()
 
     with open(filename, "w") as metric_file:
-        metric_file.write(str(metric))
+        metric_file.write(six.text_type(metric))
 
 
 def _prepare_report_dir(dir_name):
@@ -756,27 +757,71 @@ def _get_xsscommitlint_count(filename):
         return None
 
 
+def _extract_missing_pii_annotations(filename):
+    """
+    Returns the number of uncovered models from the stdout report of django_find_annotations.
+
+    Arguments:
+        filename: Filename where stdout of django_find_annotations was captured.
+
+    Returns:
+        Number of uncovered models.
+    """
+    uncovered_models = None
+    if os.path.isfile(filename):
+        with io.open(filename, 'r') as report_file:
+            lines = report_file.readlines()
+            uncovered_regex = re.compile(r'^Coverage found ([\d]+) uncovered')
+            for line in lines:
+                uncovered_match = uncovered_regex.match(line)
+                if uncovered_match:
+                    uncovered_models = int(uncovered_match.groups()[0])
+                    break
+    else:
+        fail_quality('pii', u'FAILURE: Log file could not be found: {}'.format(filename))
+
+    return uncovered_models
+
+
 @task
 @needs('pavelib.prereqs.install_python_prereqs')
+@cmdopts([
+    ("report-dir=", "r", "Directory in which to put PII reports"),
+])
 @timed
 def run_pii_check(options):  # pylint: disable=unused-argument
     """
     Guarantee that all Django models are PII-annotated.
     """
+    pii_report_name = 'pii'
+    default_report_dir = (Env.REPORT_DIR / pii_report_name)
+    report_dir = getattr(options, 'report_dir', default_report_dir)
+    output_file = os.path.join(report_dir, 'pii_check_{}.report')
+    uncovered_model_counts = []
     for env_name, env_settings_file in (("CMS", "cms.envs.test"), ("LMS", "lms.envs.test")):
         try:
             print()
             print("Running {} PII Annotation check and report".format(env_name))
             print("-" * 45)
+            run_output_file = six.text_type(output_file).format(env_name.lower())
             sh(
+                "mkdir -p {} && "
                 "export DJANGO_SETTINGS_MODULE={}; "
                 "code_annotations django_find_annotations "
-                "--config_file .pii_annotations.yml --report_path pii_report/ "
-                "--lint --report --coverage".format(env_settings_file)
+                "--config_file .pii_annotations.yml --report_path {} --app_name {} "
+                "--lint --report --coverage | tee {}".format(
+                    report_dir, env_settings_file, report_dir, env_name.lower(), run_output_file
+                )
             )
+            uncovered_model_counts.append(_extract_missing_pii_annotations(run_output_file))
 
         except BuildFailure as error_message:
-            fail_quality('pii_check', 'FAILURE: {}'.format(error_message))
+            fail_quality(pii_report_name, 'FAILURE: {}'.format(error_message))
+
+    uncovered_count = max(uncovered_model_counts)
+    if uncovered_count is None:
+        uncovered_count = 0
+    _write_metric(uncovered_count, (Env.METRICS_DIR / pii_report_name))
 
     return True
 

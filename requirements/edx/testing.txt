@@ -68,7 +68,7 @@ cffi==1.12.1
 chardet==3.0.4
 click-log==0.1.8          # via edx-lint
 click==7.0
-code-annotations==0.2.3
+code-annotations==0.2.4
 colorama==0.4.1           # via radon
 configparser==3.7.1       # via entrypoints, flake8, pylint
 constantly==15.1.0        # via twisted
