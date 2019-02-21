@@ -162,6 +162,11 @@ class Env(object):
             'port': 8091,
             'log': BOK_CHOY_LOG_DIR / "bok_choy_catalog.log",
         },
+
+        'lti': {
+            'port': 8765,
+            'log': BOK_CHOY_LOG_DIR / "bok_choy_lti.log",
+        },
     }
 
     # Mongo databases that will be dropped before/after the tests run

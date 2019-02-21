@@ -7,7 +7,6 @@ import re
 from bok_choy.page_object import PageObject, unguarded
 from bok_choy.promise import EmptyPromise
 from selenium.webdriver.common.action_chains import ActionChains
-
 from common.test.acceptance.pages.lms import BASE_URL
 from common.test.acceptance.pages.lms.bookmarks import BookmarksPage
 from common.test.acceptance.pages.lms.completion import CompletionOnViewMixin
@@ -374,6 +373,83 @@ class CoursewarePage(CoursePage, CompletionOnViewMixin):
             return self.q(css='.your_words strong').text
         else:
             return self.q(css='.your_words').text[0]
+
+    def is_error_message_present(self):
+        """ Check if LTI error is shown """
+        return self.q(css=".error_message").is_present()
+
+    def is_iframe_present(self):
+        """ Check if LTI iframe is present"""
+        return self.q(css=".ltiLaunchFrame").is_present()
+
+    def is_launch_url_present(self):
+        """ Check if LTI launch link is present"""
+        return self.q(css=".link_lti_new_window").is_present()
+
+    def go_to_lti_container(self):
+        """ Switch to LTI container"""
+        self.scroll_to_element('.problem-header')
+        iframe_name = self.q(css='.ltiLaunchFrame').attrs("name")[0]
+        self.browser.switch_to.frame(iframe_name)
+
+    @property
+    def get_role_selector(self):
+        """
+        Find and return role selector
+        """
+        self.wait_for_element_visibility(
+            '.action-preview-select',
+            'Role selector element is available'
+        )
+        return self.q(css='.action-preview-select')
+
+    def get_elem_text(self, elem_css):
+        """
+        Find the element with CSS selector given in the argument and return its text
+        """
+        self.wait_for_element_visibility(
+            elem_css,
+            'problem score element is visible'
+        )
+        return self.q(css=elem_css).text[0]
+
+    def is_lti_component_present(self, elem_css):
+        """ Check if LTI component element with given CSS selector is present"""
+        return self.q(css=elem_css).is_present()
+
+
+class LTIContentIframe(CoursePage):
+    """
+    LTIContentIframe info
+    """
+
+    def is_browser_on_page(self):
+        return self.q(css=".result").present
+
+    def submit_lti_answer(self, button_css):
+        """ Click on Submit button"""
+        self.wait_for_element_presence(button_css, "Button element not present.")
+        self.q(css=button_css).first.click()
+
+    @property
+    def lti_content(self):
+        """ return LTI content"""
+        self.wait_for_element_presence(".result", "Result element not present.")
+        content = self.q(css=".result").text[0]
+        return content
+
+    @property
+    def get_user_role(self):
+        """
+        return logged in user role text from lti iframe contents(i.e staff or learner)
+        """
+        return self.q(css="h5").text[0]
+
+    def switch_to_default(self):
+        """
+        Switches to default page
+        """
+        self.browser.switch_to_default_content()
 
 
 class CoursewareSequentialTabPage(CoursePage):

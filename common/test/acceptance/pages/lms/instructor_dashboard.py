@@ -1304,6 +1304,27 @@ class StudentAdminPage(PageObject):
 
         return EmptyPromise(check_func, "Waiting for student admin task to complete.").fulfill()
 
+    def click_grade_book_link(self):
+        self.wait_for_element_presence('.gradebook-link', "Grade book link is not present.")
+        self.q(css='.gradebook-link').first.click()
+
+
+class GradeBookPage(StudentAdminPage):
+    """
+    Grade Book section of the Instructor dashboard.
+    """
+    url = None
+
+    def is_browser_on_page(self):
+        """
+        Confirms grade book section is present
+        """
+        return self.q(css='.grade-table').present
+
+    def get_value_in_the_grade_book(self, title, index):
+        """Find the element with given CSS selector, index and return its text"""
+        return self.q(css='.grade-table td[title^="{}"]'.format(title)).text[index]
+
 
 class StudentSpecificAdmin(StudentAdminPage):
     """
