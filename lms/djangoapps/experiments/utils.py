@@ -191,3 +191,15 @@ def get_experiment_user_metadata_context(course, user):
         'program_key_fields': program_key,
         # TODO: clean up as part of REVEM-199 (END)
     }
+
+
+#TODO START: Clean up REVEM-205
+def get_experiment_dashboard_metadata_context(enrollments):
+    """
+    Given a list of enrollments return a dict of course ids with their prices.
+    Utility function for experimental metadata. See experiments/dashboard_metadata.html.
+    :param enrollments:
+    :return: dict of courses: course price for dashboard metadata
+    """
+    return {str(enrollment.course): enrollment.course_price for enrollment in enrollments}
+#TODO END: Clean up REVEM-205
