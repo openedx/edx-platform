@@ -104,8 +104,8 @@ EXPECTED_CSV_HEADER = (
     '"code","redeem_code_url","course_id","company_name","created_by","redeemed_by","invoice_id","purchaser",'
     '"customer_reference_number","internal_reference"'
 )
-EXPECTED_COUPON_CSV_HEADER = '"Coupon Code","Course Id","% Discount","Description","Expiration Date",' \
-                             '"Is Active","Code Redeemed Count","Total Discounted Seats","Total Discounted Amount"'
+EXPECTED_COUPON_CSV_HEADER = u'"Coupon Code","Course Id","% Discount","Description","Expiration Date",' \
+                             u'"Is Active","Code Redeemed Count","Total Discounted Seats","Total Discounted Amount"'
 
 # ddt data for test cases involving reports
 REPORTS_DATA = (

@@ -446,8 +446,8 @@ def _certificate_download_url(user_id, course_id):
     except GeneratedCertificate.DoesNotExist:
         log.critical(
             u'Unable to lookup certificate\n'
-            'user id: %d\n'
-            'course: %s', user_id, unicode(course_id)
+            u'user id: %d\n'
+            u'course: %s', user_id, unicode(course_id)
         )
     return ''
 
@@ -509,8 +509,8 @@ def get_certificate_template(course_key, mode, language):
         )
         template = get_language_specific_template_or_default(language, org_mode_and_key_templates, course_key)
         if template:
-            log.info("Template retrieved for course based on the course_key:{course_key}, mode:{mode} "
-                     "and org_id:{org_id}".format(course_key=course_key, mode=mode, org_id=org_id))
+            log.info(u"Template retrieved for course based on the course_key:{course_key}, mode:{mode} "
+                     u"and org_id:{org_id}".format(course_key=course_key, mode=mode, org_id=org_id))
 
     # since no template matched that course_key, only consider templates with empty course_key
     empty_course_key_templates = active_templates.filter(course_key=CourseKeyField.Empty)
@@ -521,8 +521,8 @@ def get_certificate_template(course_key, mode, language):
         )
         template = get_language_specific_template_or_default(language, org_and_mode_templates, course_key)
         if template:
-            log.info("Template retrieved for course:{course_key} based on the mode:{mode} "
-                     "and org_id:{org_id}".format(course_key=course_key, mode=mode, org_id=org_id))
+            log.info(u"Template retrieved for course:{course_key} based on the mode:{mode} "
+                     u"and org_id:{org_id}".format(course_key=course_key, mode=mode, org_id=org_id))
     if not template and org_id:  # get template by only org
         org_templates = empty_course_key_templates.filter(
             organization_id=org_id,
@@ -530,7 +530,7 @@ def get_certificate_template(course_key, mode, language):
         )
         template = get_language_specific_template_or_default(language, org_templates, course_key)
         if template:
-            log.info("Template retrieved for course:{course_key} and org_id:{org_id}".
+            log.info(u"Template retrieved for course:{course_key} and org_id:{org_id}".
                      format(course_key=course_key, org_id=org_id))
     if not template and mode:  # get template by only mode
         mode_templates = empty_course_key_templates.filter(
@@ -539,8 +539,8 @@ def get_certificate_template(course_key, mode, language):
         )
         template = get_language_specific_template_or_default(language, mode_templates, course_key)
         if template:
-            log.info("Template retrieved for course:{course_key} based on the mode:{mode} "
-                     "and org_id:{org_id}".format(course_key=course_key, mode=mode, org_id=org_id))
+            log.info(u"Template retrieved for course:{course_key} based on the mode:{mode} "
+                     u"and org_id:{org_id}".format(course_key=course_key, mode=mode, org_id=org_id))
     return template if template else None
 
 
@@ -551,16 +551,21 @@ def get_language_specific_template_or_default(language, templates, course_key):
     Returns default templates If no language matches, or language passed is None
     """
     two_letter_language = _get_two_letter_language_code(language)
-    log.info("Retrieved two letter language is {two_letter_language} for the language:{language} and "
-             "course:{course_key}".format(two_letter_language=two_letter_language, language=language,
-                                          course_key=course_key))
+    log.info(
+        u"Retrieved two letter language is {two_letter_language} for the language:{language} and "
+        u"course:{course_key}".format(
+            two_letter_language=two_letter_language,
+            language=language,
+            course_key=course_key
+        )
+    )
 
     language_or_default_templates = list(templates.filter(Q(language=two_letter_language)
                                                           | Q(language=None) | Q(language='')))
     language_specific_template = get_language_specific_template(two_letter_language,
                                                                 language_or_default_templates, course_key)
     if language_specific_template:
-        log.info("Returning languages: {language} specific template for course:{course_key}".
+        log.info(u"Returning languages: {language} specific template for course:{course_key}".
                  format(course_key=course_key, language=language))
         return language_specific_template
     else:
@@ -577,11 +582,11 @@ def get_language_specific_template(language, templates, course_key):
     """
     for template in templates:
         if template.language == language:
-            log.info("{language} language specific template found for course:{course_key}".
+            log.info(u"{language} language specific template found for course:{course_key}".
                      format(language=language, course_key=course_key))
             return template
 
-    log.info("{language} language specific template not found for course:{course_key}".
+    log.info(u"{language} language specific template not found for course:{course_key}".
              format(language=language, course_key=course_key))
     return None
 

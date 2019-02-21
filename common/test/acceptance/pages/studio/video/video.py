@@ -439,7 +439,7 @@ class VideoComponentPage(VideoPage):
 
             self.q(css='#{}'.format(field_id)).fill(field_value)
         elif field_type == 'select':
-            self.q(css='select[name="{0}"] option[value="{1}"]'.format(field_name, field_value)).first.click()
+            self.q(css=u'select[name="{0}"] option[value="{1}"]'.format(field_name, field_value)).first.click()
 
     def verify_field_value(self, field_name, field_value):
         """

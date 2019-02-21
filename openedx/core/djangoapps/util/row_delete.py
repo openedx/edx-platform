@@ -33,7 +33,7 @@ def delete_rows(model_mgr,
     # The "as id" below fools Django raw query into thinking the primary key is being queried.
     # It's necessary because Django will throw an exception if the raw SQL does not query the primary key.
     min_max_ids = model_mgr.raw(
-        'SELECT MIN({}) as id, MAX({}) as max_id FROM {}'.format(primary_id_name, primary_id_name, table_name)
+        u'SELECT MIN({}) as id, MAX({}) as max_id FROM {}'.format(primary_id_name, primary_id_name, table_name)
     )[0]
     min_id = min_max_ids.id
     max_id = min_max_ids.max_id

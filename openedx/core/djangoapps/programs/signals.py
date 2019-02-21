@@ -84,12 +84,12 @@ def handle_course_cert_changed(sender, user, course_key, mode, status, **kwargs)
     verbose = kwargs.get('verbose', False)
     if verbose:
         msg = u"Starting handle_course_cert_changed with params: "\
-            "sender [{sender}], "\
-            "user [{username}], "\
-            "course_key [{course_key}], "\
-            "mode [{mode}], "\
-            "status [{status}], "\
-            "kwargs [{kw}]"\
+            u"sender [{sender}], "\
+            u"user [{username}], "\
+            u"course_key [{course_key}], "\
+            u"mode [{mode}], "\
+            u"status [{status}], "\
+            u"kwargs [{kw}]"\
             .format(
                 sender=sender,
                 username=getattr(user, 'username', None),

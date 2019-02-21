@@ -293,12 +293,12 @@ class LazySequence(Sequence):
 
     def __repr__(self):
         if self._exhausted:
-            return "LazySequence({!r}, {!r})".format(
+            return u"LazySequence({!r}, {!r})".format(
                 self._data,
                 self.est_len,
             )
         else:
-            return "LazySequence(itertools.chain({!r}, {!r}), {!r})".format(
+            return u"LazySequence(itertools.chain({!r}, {!r}), {!r})".format(
                 self._data,
                 self.iterable,
                 self.est_len,

@@ -7,7 +7,6 @@ load-plugins+=,caniusepython3.pylint_checker
 [MESSAGES CONTROL]
 # Disable unicode-format-string until we can agree to turn it on.
 disable+ =
-    unicode-format-string,
     native-string,
 
 [BASIC]

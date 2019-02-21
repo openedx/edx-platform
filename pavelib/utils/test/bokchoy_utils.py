@@ -49,7 +49,7 @@ def start_servers(options):
             cmd += "python -m "
         cmd += (
             u"manage {service} --settings {settings} runserver "
-            "{address} --traceback --noreload".format(
+            u"{address} --traceback --noreload".format(
                 service=service,
                 settings=Env.SETTINGS,
                 address=address,

@@ -47,13 +47,13 @@ def send_grade_if_interesting(user, course_run_key, mode, status, letter_grade, 
 
     if verbose:
         msg = u"Starting send_grade_if_interesting with params: "\
-            "user [{username}], "\
-            "course_run_key [{key}], "\
-            "mode [{mode}], "\
-            "status [{status}], "\
-            "letter_grade [{letter_grade}], "\
-            "percent_grade [{percent_grade}], "\
-            "verbose [{verbose}]"\
+            u"user [{username}], "\
+            u"course_run_key [{key}], "\
+            u"mode [{mode}], "\
+            u"status [{status}], "\
+            u"letter_grade [{letter_grade}], "\
+            u"percent_grade [{percent_grade}], "\
+            u"verbose [{verbose}]"\
             .format(
                 username=getattr(user, 'username', None),
                 key=str(course_run_key),

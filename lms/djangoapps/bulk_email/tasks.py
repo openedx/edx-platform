@@ -517,7 +517,7 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
                 total_recipients_failed += 1
                 log.info(
                     u"BulkEmail ==> Email address %s contains non-ascii characters. Skipping sending "
-                    "email to %s, EmailId: %s ",
+                    u"email to %s, EmailId: %s ",
                     email,
                     current_recipient['profile__name'],
                     email_id

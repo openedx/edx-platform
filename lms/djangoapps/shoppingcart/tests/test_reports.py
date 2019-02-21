@@ -106,7 +106,7 @@ class ReportTypeTests(ModuleStoreTestCase):
         second_refund.refund_requested_time = self.test_time
         second_refund.save()
 
-        self.CORRECT_REFUND_REPORT_CSV = dedent("""
+        self.CORRECT_REFUND_REPORT_CSV = dedent(b"""
             Order Number,Customer Name,Date of Original Transaction,Date of Refund,Amount of Refund,Service Fees (if any)
             3,King Bowsér,{time_str},{time_str},40.00,0.00
             4,Súsan Smith,{time_str},{time_str},40.00,0.00
@@ -203,7 +203,7 @@ class ItemizedPurchaseReportTest(ModuleStoreTestCase):
         cert.refund_requested_time = self.now
         cert.save()
 
-        self.CORRECT_CSV = dedent("""
+        self.CORRECT_CSV = dedent(b"""
             Purchase Time,Order ID,Status,Quantity,Unit Cost,Total Cost,Currency,Description,Comments
             {time_str},1,purchased,1,40.00,40.00,usd,Registration for Course: Robot Super Course,Ba\xc3\xbc\xe5\x8c\x85
             {time_str},1,purchased,1,40.00,40.00,usd,verified cert for course Robot Super Course,
