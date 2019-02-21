@@ -159,3 +159,6 @@ MODULESTORE = convert_module_store_setting_if_needed(MODULESTORE)
 
 # Dummy secret key for dev
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
+
+# The default Advanced Module List for every course
+COURSE_ADVANCED_MODULES = ENV_TOKENS.get('COURSE_ADVANCED_MODULES', ['openassessment'])

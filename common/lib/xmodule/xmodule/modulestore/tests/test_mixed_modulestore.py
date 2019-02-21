@@ -38,7 +38,7 @@ from xblock.runtime import DictKeyValueStore, KvsFieldData
 from xblock.test.tools import TestRuntime
 
 if not settings.configured:
-    settings.configure()
+    settings.configure(COURSE_ADVANCED_MODULES=[])
 
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator, LibraryLocator

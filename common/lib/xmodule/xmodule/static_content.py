@@ -237,6 +237,7 @@ def main():
         pass
     settings.configure(
         INSTALLED_APPS=installed_apps,
+        COURSE_ADVANCED_MODULES=[]
     )
     django.setup()
 

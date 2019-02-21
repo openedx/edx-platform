@@ -17,7 +17,7 @@ from django.conf import settings
 # This configuration must be executed BEFORE any additional Django imports. Otherwise, the imports may fail due to
 # Django not being configured properly. This mostly applies to tests.
 if not settings.configured:
-    settings.configure()
+    settings.configure(COURSE_ADVANCED_MODULES=[])
 
 from django.core.cache import caches, InvalidCacheBackendError
 import django.dispatch

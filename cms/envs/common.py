@@ -1341,6 +1341,7 @@ ADVANCED_PROBLEM_TYPES = [
         'boilerplate_name': None
     }
 ]
+COURSE_ADVANCED_MODULES = []
 
 
 # Files and Uploads type filter values
