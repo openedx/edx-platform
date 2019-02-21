@@ -519,7 +519,7 @@ from six import string_types
     var script = document.createElement('script');
     script.src = '//res2.wx.qq.com/open/js/jweixin-1.4.0.js ';
     head.appendChild(script);
-    var url = location.href.split('://')[1].split('#')[0];
+    var url = location.href.split('#')[0];
     // 获取签名信息
     $.ajax({
         url: '/api/courses/v1/getweixinsign',
