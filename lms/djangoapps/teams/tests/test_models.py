@@ -184,10 +184,11 @@ class TeamSignalsTest(EventTestMixin, SharedModuleStoreTestCase):
         )
     )
     @ddt.unpack
-    def test_signals(self, signal_name, (user, should_update)):
+    def test_signals(self, signal_name, user_should_update):
         """Test that `last_activity_at` is correctly updated when team-related
         signals are sent.
         """
+        (user, should_update) = user_should_update
         with self.assert_last_activity_updated(should_update):
             user = getattr(self, user)
             signal = self.SIGNALS[signal_name]

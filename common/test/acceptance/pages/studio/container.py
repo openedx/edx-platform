@@ -691,7 +691,7 @@ class XBlockWrapper(PageObject):
         return self.q(css=self._bounded_selector('span.message-text a')).first.text[0]
 
 
-def _click_edit(page_object, button_css, view_css, bounded_selector=lambda(x): x):
+def _click_edit(page_object, button_css, view_css, bounded_selector=lambda x: x):
     """
     Click on the first editing button found and wait for the Studio editor to be present.
     """

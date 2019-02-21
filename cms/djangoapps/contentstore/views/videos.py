@@ -580,7 +580,7 @@ def get_all_transcript_languages():
     all_languages_dict = dict(settings.ALL_LANGUAGES, **third_party_transcription_languages)
     # Return combined system settings and 3rd party transcript languages.
     all_languages = []
-    for key, value in sorted(all_languages_dict.iteritems(), key=lambda (k, v): v):
+    for key, value in sorted(all_languages_dict.iteritems(), key=lambda k_v: k_v[1]):
         all_languages.append({
             'language_code': key,
             'language_text': value
