@@ -1293,6 +1293,12 @@ def do_email_change_request(user, new_email, activation_key=None):
         settings.DEFAULT_FROM_EMAIL
     )
     try:
+        email_showname = configuration_helpers.get_value('email_from_showname', settings.DEFAULT_FROM_EMAIL_SHOW_NAME)
+        from_address = "{} <{}>".format(email_showname, from_address)
+    except AttributeError:
+        pass
+
+    try:
         mail.send_mail(subject, message, from_address, [pec.new_email])
     except Exception:
         log.error(u'Unable to send email activation link to user from "%s"', from_address, exc_info=True)

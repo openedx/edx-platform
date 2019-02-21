@@ -831,3 +831,4 @@ def _statsd_tag(course_title):
     The tag also gets modified by our dogstats_wrapper code.
     """
     return u"course_email:{0}".format(course_title)
+

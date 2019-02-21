@@ -11,7 +11,6 @@ from datetime import datetime
 import pytz
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.mail import send_mail
 from django.urls import reverse
 from django.utils.translation import override as override_language
 from six import text_type
@@ -40,6 +39,7 @@ from track.event_transaction_utils import (
     get_event_transaction_id,
     set_event_transaction_type
 )
+from util.email_utils import send_mail_with_alias as send_mail
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 

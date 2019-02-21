@@ -12,7 +12,6 @@ import analytics
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.core.mail import send_mail
 from django.urls import reverse
 from django.db import transaction
 from django.http import Http404, HttpResponse, HttpResponseBadRequest
@@ -49,6 +48,7 @@ from openedx.core.lib.log_utils import audit_log
 from shoppingcart.models import CertificateItem, Order
 from shoppingcart.processors import get_purchase_endpoint, get_signed_purchase_params
 from student.models import CourseEnrollment
+from util.email_utils import send_mail_with_alias as send_mail
 from util.db import outer_atomic
 from util.json_request import JsonResponse
 from xmodule.modulestore.django import modulestore

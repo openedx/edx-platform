@@ -362,16 +362,20 @@ class EmailChangeRequestTests(EventTestMixin, CacheIsolationTestCase):
         old_email = self.user.email
         new_email = "valid@example.com"
         registration_key = "test registration key"
+        settings.DEFAULT_FROM_EMAIL_SHOW_NAME = "Triboo"
         self.assertIsNone(self.do_email_change(self.user, new_email, registration_key))
         context = {
             'key': registration_key,
             'old_email': old_email,
             'new_email': new_email
         }
+        from_email = configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
+        alias = configuration_helpers.get_value('email_from_showname', settings.DEFAULT_FROM_EMAIL_SHOW_NAME)
+        from_email = "{0} <{1}>".format(alias, from_email)
         send_mail.assert_called_with(
             mock_render_to_string('emails/email_change_subject.txt', context),
             mock_render_to_string('emails/email_change.txt', context),
-            configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL),
+            from_email,
             [new_email]
         )
         self.assert_event_emitted(

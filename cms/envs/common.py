@@ -145,6 +145,10 @@ from lms.envs.common import (
     # Methods to derive settings
     _make_mako_template_dirs,
     _make_locale_paths,
+
+    # bulk emails
+    BULK_EMAIL_DEFAULT_RETRY_DELAY,
+    BULK_EMAIL_MAX_RETRIES,
 )
 from path import Path as path
 

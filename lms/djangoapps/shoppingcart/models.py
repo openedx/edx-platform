@@ -18,7 +18,6 @@ from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.mail import send_mail
 from django.core.mail.message import EmailMessage
 from django.urls import reverse
 from django.db import models, transaction
@@ -40,6 +39,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from shoppingcart.pdf import PDFInvoice
 from student.models import CourseEnrollment, EnrollStatusChange
 from student.signals import UNENROLL_DONE
+from util.email_utils import send_mail_with_alias as send_mail
 from util.query import use_read_replica_if_available
 from xmodule.modulestore.django import modulestore
 

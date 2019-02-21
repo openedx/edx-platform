@@ -1,6 +1,6 @@
 <%! from django.utils.translation import ugettext as _ %>
 <p>
-${_("Hi {name},").format(name=recipient_name)}
+${_("Hi")} ${recipient_name}，
 </p>
 <p>
 ${_("Thank you for your purchase of ")} <b> ${course_names} </b>

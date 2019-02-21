@@ -30,7 +30,7 @@
           <td class="cn-content">
             <p>
                 % if full_name is not UNDEFINED and full_name is not None:
-                    ${_(u"Hi {name},").format(name=full_name)}
+                    ${_("Hi")} ${full_name}，
                 % else:
                     ${_(u"Hi,")}
                 % endif
