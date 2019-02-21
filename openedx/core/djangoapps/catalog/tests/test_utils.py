@@ -72,7 +72,7 @@ class TestGetPrograms(CacheIsolationTestCase):
 
         # When called before UUIDs are cached, the function should return an
         # empty list and log a warning.
-        self.assertEqual(get_programs(self.site), [])
+        self.assertEqual(get_programs(site=self.site), [])
         mock_warning.assert_called_once_with(
             u'Failed to get program UUIDs from the cache for site {}.'.format(self.site.domain)
         )
@@ -85,7 +85,7 @@ class TestGetPrograms(CacheIsolationTestCase):
             None
         )
 
-        actual_programs = get_programs(self.site)
+        actual_programs = get_programs(site=self.site)
 
         # The 2 cached programs should be returned while info and warning
         # messages should be logged for the missing one.
@@ -113,7 +113,7 @@ class TestGetPrograms(CacheIsolationTestCase):
         }
         cache.set_many(all_programs, None)
 
-        actual_programs = get_programs(self.site)
+        actual_programs = get_programs(site=self.site)
 
         # All 3 programs should be returned.
         self.assertEqual(
@@ -147,7 +147,7 @@ class TestGetPrograms(CacheIsolationTestCase):
         mock_cache.get.return_value = [program['uuid'] for program in programs]
         mock_cache.get_many.side_effect = fake_get_many
 
-        actual_programs = get_programs(self.site)
+        actual_programs = get_programs(site=self.site)
 
         # All 3 cached programs should be returned. An info message should be
         # logged about the one that was initially missing, but the code should
@@ -167,7 +167,7 @@ class TestGetPrograms(CacheIsolationTestCase):
         expected_program = ProgramFactory()
         expected_uuid = expected_program['uuid']
 
-        self.assertEqual(get_programs(self.site, uuid=expected_uuid), None)
+        self.assertEqual(get_programs(uuid=expected_uuid), None)
         mock_warning.assert_called_once_with(
             u'Failed to get details for program {uuid} from the cache.'.format(uuid=expected_uuid)
         )
@@ -179,7 +179,7 @@ class TestGetPrograms(CacheIsolationTestCase):
             None
         )
 
-        actual_program = get_programs(self.site, uuid=expected_uuid)
+        actual_program = get_programs(uuid=expected_uuid)
         self.assertEqual(actual_program, expected_program)
         self.assertFalse(mock_warning.called)
 
