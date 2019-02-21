@@ -35,7 +35,7 @@ from openedx.core.lib.courses import course_image_url
         </div>
         <div class="course-title">
           <h1>
-            ${course.display_name | h}
+            ${course.display_name}
           </h1>
         </div>
         <hr>
@@ -57,7 +57,7 @@ from openedx.core.lib.courses import course_image_url
                 "This course has now been added to your dashboard."
               ).format(
                 course_name=course.display_name,
-              ) | h}
+              )}
             % elif registered_for_course:
               ${Text(_(
                 "You're already enrolled for this course. "
@@ -77,7 +77,7 @@ from openedx.core.lib.courses import course_image_url
               ).format(
                 course_name=course.display_name,
                 site_name=site_name,
-              ) | h}
+              )}
             % endif
           </p>
         </div>
