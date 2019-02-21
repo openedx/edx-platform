@@ -373,7 +373,7 @@ docstring-min-length = 5
 
 [FORMAT]
 max-line-length = 120
-ignore-long-lines = ^\s*(# )?<?https?://\S+>?$
+ignore-long-lines = ^\s*(# )?((<?https?://\S+>?)|(\.\. pii: .*))$
 single-line-if-stmt = no
 no-space-check = trailing-comma,dict-separator
 max-module-lines = 1000
@@ -446,4 +446,4 @@ int-import-graph =
 [EXCEPTIONS]
 overgeneral-exceptions = Exception
 
-# ddfc2b6fc6acff4fdfcc76ecb982aa840035d86f
+# bb786547d45a1ec1adda9b687d900083dd57603b
