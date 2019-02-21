@@ -150,3 +150,4 @@ web-fragments                       # Provides the ability to render fragments o
 XBlock                              # Courseware component architecture
 xblock-utils                        # Provides utilities used by the Discussion XBlock
 zendesk                             # Python API for the Zendesk customer support system
+geoip2==2.9.0                       # Python API for the GeoIP web services and databases
