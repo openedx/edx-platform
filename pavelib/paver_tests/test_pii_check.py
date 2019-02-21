@@ -1,7 +1,7 @@
 """
 Tests for Paver's PII checker task.
 """
-from io import open
+import io
 import six
 from mock import patch
 from paver.easy import call_task
@@ -31,4 +31,4 @@ def test_pii_check_report_dir_override(mock_paver_sh, mock_needs, tmpdir):
     assert any(['cms.envs.test' in call for call in mock_calls])
     assert all([six.text_type(report_dir) in call for call in mock_calls])
     metrics_file = Env.METRICS_DIR / 'pii'
-    assert open(metrics_file, 'r').read() == '66'
+    assert io.open(metrics_file, 'r').read() == '66'

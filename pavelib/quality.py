@@ -808,9 +808,9 @@ def run_pii_check(options):  # pylint: disable=unused-argument
                 "mkdir -p {} && "
                 "export DJANGO_SETTINGS_MODULE={}; "
                 "code_annotations django_find_annotations "
-                "--config_file .pii_annotations.yml --report_path {} "
+                "--config_file .pii_annotations.yml --report_path {} --app_name {} "
                 "--lint --report --coverage | tee {}".format(
-                    report_dir, env_settings_file, report_dir, run_output_file
+                    report_dir, env_settings_file, report_dir, env_name.lower(), run_output_file
                 )
             )
             uncovered_model_counts.append(_extract_missing_pii_annotations(run_output_file))
