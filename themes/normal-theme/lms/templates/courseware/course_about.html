@@ -532,7 +532,15 @@ from six import string_types
               timestamp: response.timestamp,
               nonceStr: response.nonceStr,
               signature: response.signature,
-              jsApiList: ['updateAppMessageShareData', 'updateTimelineShareData', 'onMenuShareWeibo']
+              jsApiList: [
+                'updateAppMessageShareData', 
+                'updateTimelineShareData', 
+                'onMenuShareWeibo',
+                'onMenuShareTimeline',
+                'onMenuShareAppMessage',
+                'onMenuShareQQ',
+                'onMenuShareQZone'
+              ]
             });
             
             // 配置个性化设置
@@ -548,6 +556,10 @@ from six import string_types
                 wx.updateAppMessageShareData(obj)
                 wx.updateTimelineShareData(obj)
                 wx.onMenuShareWeibo(obj)
+                wx.onMenuShareTimeline(obj);
+                wx.onMenuShareAppMessage(obj);
+                wx.onMenuShareQQ(obj);
+                wx.onMenuShareQZone(obj);
             })
         }
     })
