@@ -120,7 +120,7 @@ edx-milestones==0.1.13
 edx-oauth2-provider==1.2.2
 edx-opaque-keys[django]==0.4.4
 edx-organizations==1.0.1
-edx-proctoring-proctortrack==1.0.1
+edx-proctoring-proctortrack==1.0.2
 edx-proctoring==1.5.14
 edx-rest-api-client==1.9.2
 edx-search==1.2.1
@@ -236,7 +236,7 @@ urllib3==1.23
 user-util==0.1.5
 voluptuous==0.11.5
 watchdog==0.9.0
-web-fragments==0.2.2
+web-fragments==0.3.0
 webencodings==0.5.1       # via html5lib
 webob==1.8.5              # via xblock
 wrapt==1.10.5
