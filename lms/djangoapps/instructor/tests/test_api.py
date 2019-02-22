@@ -2670,6 +2670,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         status = res_json['status']
         self.assertIn('is being created', status)
         self.assertNotIn('already in progress', status)
+        self.assertIn("task_id", res_json)
 
     @valid_problem_location
     def test_get_problem_responses_already_running(self):
