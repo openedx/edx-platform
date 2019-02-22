@@ -141,7 +141,7 @@ sailthru-client==2.2.3              # For Sailthru integration
 Shapely==1.2.16                     # Geometry library, used for image click regions in capa
 six                                 # Utilities for supporting Python 2 & 3 in the same codebase
 sorl-thumbnail==12.3                # Image thumbnail management
-sortedcontainers==0.9.2             # Provides SortedListWithKey, used for lists of XBlock assets
+sortedcontainers                    # Provides SortedKeyList, used for lists of XBlock assets
 sqlparse                            # Required by Django to run migrations.RunSQL
 stevedore                           # Support for runtime plugins, used for XBlocks and edx-platform Django app plugins
 unicodecsv                          # Easier support for CSV files with unicode text
