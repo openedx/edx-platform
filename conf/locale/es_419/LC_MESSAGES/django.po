@@ -46,6 +46,7 @@
 # Matt Tuchfarber <matt@tuchfarber.com>, 2018
 # Miguel Bonilla <mbonilla@edx.org>, 2018
 # MarnyLopez, 2014
+# Muhammad Adeel Khan <adeel@edx.org>, 2019
 # Natalia, 2013
 # Natalia, 2013-2014,2018
 # Ned Batchelder <ned@edx.org>, 2016
@@ -12186,7 +12187,7 @@ msgid ""
 "please contact %(contact_email)s."
 msgstr ""
 "Este es un correo electrónico solo de información. Si usted no inició esta "
-"solicitud, por favor contacte%(contact_email)s."
+"solicitud, por favor contacte %(contact_email)s."
 
 #: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.html
 #: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt

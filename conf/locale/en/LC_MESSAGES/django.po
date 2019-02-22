@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-02-20 10:53+0000\n"
-"PO-Revision-Date: 2019-02-20 10:53:43.506775\n"
+"POT-Creation-Date: 2019-02-22 07:52+0000\n"
+"PO-Revision-Date: 2019-02-22 07:52:03.110366\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -16824,6 +16824,10 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Professional"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Master's"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
