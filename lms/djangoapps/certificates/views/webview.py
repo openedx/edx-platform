@@ -659,7 +659,8 @@ def _get_custom_template_and_language(course_id, course_mode, course_language):
     Return the custom certificate template, if any, that should be rendered for the provided course/mode/language
     combination, along with the language that should be used to render that template.
     """
-    closest_released_language = get_closest_released_language(course_language) if course_language else None
+    user_language = translation.get_language()
+    closest_released_language = get_closest_released_language(course_language) if course_language else user_language
     log.info(
         u"closest released language for %s is %s and course language was: %s",
         course_id,
@@ -673,9 +674,8 @@ def _get_custom_template_and_language(course_id, course_mode, course_language):
             course_id=course_id, language=template.language))
         return (template, closest_released_language)
     elif template:
-        user_language = translation.get_language()
-        log.info("Returning template for course: {course_id} and template language is returned from settings"
-                 " {language}".format(course_id=course_id, language=user_language))
+        log.info("Returning template for course: {course_id} and template language is user language {language}".
+                 format(course_id=course_id, language=user_language))
         return (template, user_language)
     else:
         log.info("No template found for course: {course_id}" .format(course_id=course_id))
