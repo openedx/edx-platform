@@ -7,6 +7,7 @@ from rest_framework_swagger.views import get_swagger_view
 
 import contentstore.views
 from cms.djangoapps.contentstore.views.organization import OrganizationListView
+from courseware.module_render import handle_xblock_callback, xqueue_callback
 import openedx.core.djangoapps.common_views.xblock
 import openedx.core.djangoapps.debug.views
 import openedx.core.djangoapps.external_auth.views
@@ -52,6 +53,13 @@ urlpatterns = [
         contentstore.views.component_handler, name='component_handler'),
     url(r'^xblock/resource/(?P<block_type>[^/]*)/(?P<uri>.*)$',
         openedx.core.djangoapps.common_views.xblock.xblock_resource, name='xblock_resource_url'),
+    url(r'^courses/(?P<course_id>.*?)/xblock/(?P<usage_id>.*?)/handler/(?P<handler>[^/]*)(?:/(?P<suffix>.*))?$',
+        handle_xblock_callback, name='xblock_handler'),
+    url(
+        r'^courses/(?P<course_id>.*?)/xqueue/(?P<userid>[^/]*)/(?P<mod_id>.*?)/(?P<dispatch>[^/]*)$',
+        xqueue_callback,
+        name='xqueue_callback',
+    ),
     url(r'^not_found$', contentstore.views.not_found, name='not_found'),
     url(r'^server_error$', contentstore.views.server_error, name='server_error'),
     url(r'^organizations$', OrganizationListView.as_view(), name='organizations'),

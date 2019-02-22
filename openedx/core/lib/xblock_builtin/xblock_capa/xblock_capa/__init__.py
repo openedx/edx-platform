@@ -241,8 +241,8 @@ class CapaXBlock(XBlock, CapaMixin, ResourceTemplates, XmlParserMixin, StudioEdi
 
         Raises etree.XMLSyntaxError if invalid.
         """
-        super(CapaXBlock, self).validate()
         etree.XML(self.data)
+        return super(CapaXBlock, self).validate()
 
     # VS[compat]
     # TODO (cpennington): Delete this method once all fall 2012 course are being
@@ -906,7 +906,8 @@ XModule.
                 xml_object.set(key, serialize_field(value))
 
         # Store problem markdown and data
-        xml_object.set('markdown', serialize_field(self.markdown))
+        if self.markdown:
+            xml_object.set('markdown', serialize_field(self.markdown))
 
         # Borrowed from RawDescriptor
         try:

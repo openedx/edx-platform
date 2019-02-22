@@ -60,9 +60,9 @@ class DjangoXBlockUserService(UserService):
 
         Returns:
             A unique anonymous_user_id for (user, course) pair.
-            None if a non-staff user requests someone else's data.
+            None for non-staff users.
         """
-        if not (self.user_is_staff() or self.get_username() == username):
+        if not self.user_is_staff():
             return None
 
         try:
