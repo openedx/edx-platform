@@ -333,7 +333,7 @@ class SafeSessionMiddleware(SessionMiddleware):
                 _mark_cookie_for_deletion(request)
 
         if _is_cookie_marked_for_deletion(request):
-            _delete_cookie(response)  # Step 4
+            _delete_cookie(request, response)  # Step 4
 
         return response
 
@@ -454,11 +454,15 @@ def _is_cookie_present(response):
     )
 
 
-def _delete_cookie(response):
+def _delete_cookie(request, response):
     """
     Delete the cookie by setting the expiration to a date in the past,
     while maintaining the domain, secure, and httponly settings.
     """
+    log.warning(
+        u"SafeCookieData is deleting session cookie for user %d",
+        request.user.id
+    )
     response.set_cookie(
         settings.SESSION_COOKIE_NAME,
         max_age=0,
