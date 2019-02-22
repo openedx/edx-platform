@@ -290,7 +290,7 @@ from openedx.core.djangolib.markup import HTML, Text
     % endif
 
     % for item, course in shoppingcart_items:
-      % if loop.index > 0
+      % if loop.index > 0:
         <hr>
       %endif
       <div class="user-data">
