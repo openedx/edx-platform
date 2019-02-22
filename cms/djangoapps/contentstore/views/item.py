@@ -943,10 +943,7 @@ def _delete_item(usage_key, user):
         store.delete_item(usage_key, user.id)
 
         # Delete user bookmark
-        try:
-            bookmarks_api.delete_bookmark(user=user, usage_key=usage_key)
-        except ObjectDoesNotExist:
-            log.info(_(u'Bookmark with usage_key: {usage_key} does not exist.').format(usage_key=usage_key))
+        bookmarks_api.delete_bookmarks(usage_key=usage_key)
 
 
 @login_required

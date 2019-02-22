@@ -156,6 +156,18 @@ def delete_bookmark(user, usage_key):
     _track_event('edx.bookmark.removed', bookmark)
 
 
+def delete_bookmarks(usage_key):
+    """
+    Delete all bookmarks for usage_key.
+
+    Arguments:
+        usage_key (UsageKey): The usage_key of the bookmarks.
+    """
+    bookmarks = Bookmark.objects.filter(usage_key=usage_key)
+    [_track_event('edx.bookmark.removed', b) for b in bookmarks]
+    bookmarks.delete()
+
+
 def _track_event(event_name, bookmark):
     """
     Emit events for a bookmark.
