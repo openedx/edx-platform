@@ -52,7 +52,9 @@ class TestPaverAssetTasks(PaverTestCase):
         expected_messages = []
         if force:
             expected_messages.append('rm -rf common/static/css/*.css')
+            expected_messages.append('rm -rf common/static/common/css/*.css')
         expected_messages.append('libsass common/static/sass')
+        expected_messages.append('libsass common/static/common/sass')
 
         if "lms" in system:
             if force:
@@ -124,7 +126,9 @@ class TestPaverThemeAssetTasks(PaverTestCase):
         expected_messages = []
         if force:
             expected_messages.append(u'rm -rf common/static/css/*.css')
+            expected_messages.append(u'rm -rf common/static/common/css/*.css')
         expected_messages.append(u'libsass common/static/sass')
+        expected_messages.append(u'libsass common/static/common/sass')
 
         if 'lms' in system:
             expected_messages.append(u'mkdir_p ' + repr(TEST_THEME_DIR / 'lms/static/css'))
@@ -204,6 +208,7 @@ class TestPaverWatchAssetTasks(TestCase):
     def setUp(self):
         self.expected_sass_directories = [
             path('common/static/sass'),
+            path('common/static/common/sass'),
             path('common/static'),
             path('node_modules/@edx'),
             path('node_modules'),
