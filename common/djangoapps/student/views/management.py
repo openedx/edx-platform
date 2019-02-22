@@ -974,8 +974,9 @@ def validate_secondary_email(account_recovery, new_email):
     """
     Enforce valid email addresses.
     """
+
     from openedx.core.djangoapps.user_api.accounts.api import get_email_validation_error, \
-        get_email_existence_validation_error, get_secondary_email_validation_error
+        get_secondary_email_validation_error
 
     if get_email_validation_error(new_email):
         raise ValueError(_('Valid e-mail address required.'))
@@ -987,10 +988,13 @@ def validate_secondary_email(account_recovery, new_email):
     if new_email == account_recovery.user.email:
         raise ValueError(_('Cannot be same as your sign in email address.'))
 
-    # Make sure that secondary email address is not same as any of the primary emails.
-    message = get_email_existence_validation_error(new_email)
-    if message:
-        raise ValueError(message)
+    # Make sure that secondary email address is not same as any of the primary emails currently in use or retired
+    if email_exists_or_retired(new_email):
+        raise ValueError(
+            _("It looks like {email} belongs to an existing account. Try again with a different email address.").format(
+                email=new_email
+            )
+        )
 
     message = get_secondary_email_validation_error(new_email)
     if message:
