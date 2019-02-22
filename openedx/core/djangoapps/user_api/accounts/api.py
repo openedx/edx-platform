@@ -9,6 +9,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from django.core.validators import validate_email, ValidationError
 from django.http import HttpResponseForbidden
+from openedx.core.djangoapps.profile_images.tasks import delete_profile_images
 from openedx.core.djangoapps.user_api.preferences.api import update_user_preferences
 from openedx.core.djangoapps.user_api.errors import PreferenceValidationError
 
@@ -16,6 +17,8 @@ from student.models import User, UserProfile, Registration
 from student import forms as student_forms
 from student import views as student_views
 from util.model_utils import emit_setting_changed_event
+from lms.lib.comment_client.user import User as CCUser
+from lms.lib.comment_client.utils import CommentClientRequestError
 
 from openedx.core.lib.api.view_utils import add_serializer_errors
 
@@ -533,3 +536,42 @@ def _validate_email(email):
         raise AccountEmailInvalid(
             u"Email '{email}' format is not valid".format(email=email)
         )
+
+
+def retire_user_comments(user):
+    """
+    Retire the user's discussion comments
+    """
+    try:
+        CCUser.from_django_user(user).retire('Deleted user')
+    except CommentClientRequestError as e:
+        # Ignore error if discussion user does not exist
+        if e.status_code != 404:
+            raise
+
+
+@intercept_errors(UserAPIInternalError, ignore_errors=[UserAPIRequestError])
+def delete_users(users):
+    """
+    Delete the users and their data in related records.
+
+    Related records include the following:
+    1. models with a ForeignKey relationship to User (with on_delete=CASCADE).
+    2. models with indirect relationship to User (i.e. through another model, or with on_delete other than CASCADE)
+    3. files belonging to the user.
+
+    Arguments:
+        users: An iterable of 'User' objects.
+
+    Returns:
+        None
+
+    Raises:
+        UserAPIInternalError
+    """
+    for user in users:
+        retire_user_comments(user)
+
+    delete_profile_images.delay(users)
+
+    users.delete()

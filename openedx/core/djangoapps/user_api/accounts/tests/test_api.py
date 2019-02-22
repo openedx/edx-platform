@@ -7,7 +7,7 @@ import re
 import ddt
 from dateutil.parser import parse as parse_datetime
 
-from mock import Mock, patch
+from mock import Mock, patch, call
 from django.test import TestCase
 from nose.plugins.attrib import attr
 from nose.tools import raises
@@ -25,7 +25,8 @@ from ...errors import (
     AccountUserAlreadyExists, AccountUsernameInvalid, AccountEmailInvalid, AccountPasswordInvalid, AccountRequestError
 )
 from ..api import (
-    get_account_settings, update_account_settings, create_account, activate_account, request_password_change
+    get_account_settings, update_account_settings, create_account, activate_account, request_password_change,
+    delete_users
 )
 from .. import USERNAME_MAX_LENGTH, EMAIL_MAX_LENGTH, PASSWORD_MAX_LENGTH, PRIVATE_VISIBILITY
 
@@ -490,3 +491,37 @@ class AccountCreationUnicodeUsernameTest(TestCase):
                 self.fail(u'The API should accept Unicode username `{unicode_username}`.'.format(
                     unicode_username=unicode_username,
                 ))
+
+
+@attr(shard=2)
+@ddt.ddt
+class UserDeletionTest(TestCase):
+    """
+    Test cases for deleting a user
+    """
+
+    @skip_unless_lms
+    @patch('openedx.core.djangoapps.user_api.accounts.api.CCUser')
+    @patch('openedx.core.djangoapps.user_api.accounts.api.delete_profile_images')
+    def test_delete_user(self, mock_delete_profile_images, mock_ccuser):
+        user1 = UserFactory.create(password='secret')
+        user2 = UserFactory.create(password='secret')
+
+        users_qs = User.objects.filter(username__in=[user1.username, user2.username])
+
+        # Delete the users
+        delete_users(users_qs)
+
+        # Verify that the comments of the users are retired
+        mock_ccuser.from_django_user.assert_has_calls([
+            call(user1),
+            call().retire('Deleted user'),
+            call(user2),
+            call().retire('Deleted user'),
+        ])
+
+        # Verify that the delete_profile_images task is called
+        mock_delete_profile_images.delay.assert_called_with(users_qs)
+
+        # Verify that the user objects have been deleted
+        self.assertEqual(User.objects.filter(username__in=[user1.username, user2.username]).count(), 0)
