@@ -96,7 +96,7 @@ def search_certificates(request):
         cert["course_key"] = unicode(cert["course_key"])
         cert["created"] = cert["created"].isoformat()
         cert["modified"] = cert["modified"].isoformat()
-        cert["regenerate"] = True
+        cert["regenerate"] = not cert['is_pdf_certificate']
 
     course_id = urllib.quote_plus(request.GET.get("course_id", ""), safe=':/')
     if course_id:

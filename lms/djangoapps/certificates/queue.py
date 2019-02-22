@@ -137,6 +137,12 @@ class XQueueCertInterface(object):
                 certificate.status
             )
 
+            if certificate.download_url:
+                self._log_pdf_cert_generation_discontinued_warning(
+                    student.id, course_id, certificate.status, certificate.download_url
+                )
+                return None
+
             certificate.status = status.unavailable
             certificate.save()
 
@@ -237,8 +243,15 @@ class XQueueCertInterface(object):
             status.unverified,
         ]
 
-        cert_status = certificate_status_for_student(student, course_id)['status']
+        cert_status_dict = certificate_status_for_student(student, course_id)
+        cert_status = cert_status_dict.get('status')
+        download_url = cert_status_dict.get('download_url')
         cert = None
+        if download_url:
+            self._log_pdf_cert_generation_discontinued_warning(
+                student.id, course_id, cert_status, download_url
+            )
+            return None
 
         if cert_status not in valid_statuses:
             LOGGER.warning(
@@ -585,3 +598,19 @@ class XQueueCertInterface(object):
             exc = XQueueAddToQueueError(error, msg)
             LOGGER.critical(unicode(exc))
             raise exc
+
+    def _log_pdf_cert_generation_discontinued_warning(self, student_id, course_id, cert_status, download_url):
+        """Logs PDF certificate generation discontinued warning."""
+        LOGGER.warning(
+            (
+                u"PDF certificate generation discontinued, canceling "
+                u"PDF certificate generation for student %s "
+                u"in course '%s' "
+                u"with status '%s' "
+                u"and download_url '%s'."
+            ),
+            student_id,
+            unicode(course_id),
+            cert_status,
+            download_url
+        )
