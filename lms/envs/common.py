@@ -1222,6 +1222,9 @@ MIDDLEWARE_CLASSES = [
     'edx_django_utils.cache.middleware.RequestCacheMiddleware',
     'edx_django_utils.monitoring.middleware.MonitoringCustomMetricsMiddleware',
 
+    # Cookie monitoring
+    'openedx.core.lib.request_utils.CookieMetricsMiddleware',
+
     'mobile_api.middleware.AppVersionUpgrade',
     'openedx.core.djangoapps.header_control.middleware.HeaderControlMiddleware',
     'microsite_configuration.middleware.MicrositeMiddleware',
