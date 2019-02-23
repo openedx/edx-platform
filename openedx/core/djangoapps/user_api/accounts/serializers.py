@@ -90,7 +90,7 @@ class UserReadOnlySerializer(serializers.Serializer):
             user_profile = user.profile
         except ObjectDoesNotExist:
             user_profile = None
-            LOGGER.warning(u"user profile for the user [%s] does not exist", user.username)
+            LOGGER.warning("user profile for the user [%s] does not exist", user.username)
 
         try:
             account_recovery = user.account_recovery
@@ -222,7 +222,7 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
         """ Enforce minimum length for name. """
         if len(new_name) < NAME_MIN_LENGTH:
             raise serializers.ValidationError(
-                u"The name field must be at least {} characters long.".format(NAME_MIN_LENGTH)
+                "The name field must be at least {} characters long.".format(NAME_MIN_LENGTH)
             )
         return new_name
 
@@ -286,7 +286,7 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
         urls = get_profile_image_urls_for_user(user, request)
         data.update({
             '{image_key_prefix}_{size}'.format(image_key_prefix=PROFILE_IMAGE_KEY_PREFIX, size=size_display_name): url
-            for size_display_name, url in urls.items()
+            for size_display_name, url in list(urls.items())
         })
         return data
 
@@ -344,7 +344,7 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
             # If we have encountered any validation errors, return them to the user.
             raise errors.AccountValidationError({
                 'social_links': {
-                    "developer_message": u"Error when adding new social link: '{}'".format(text_type(err)),
+                    "developer_message": "Error when adding new social link: '{}'".format(text_type(err)),
                     "user_message": text_type(err)
                 }
             })

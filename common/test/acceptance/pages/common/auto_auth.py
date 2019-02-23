@@ -3,7 +3,7 @@ Auto-auth page (used to automatically log in during testing).
 """
 import json
 import os
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from bok_choy.page_object import PageObject, unguarded
 
@@ -86,7 +86,7 @@ class AutoAuthPage(PageObject):
         Construct the URL.
         """
         url = AUTH_BASE_URL + "/auto_auth"
-        query_str = urllib.urlencode(self._params)
+        query_str = urllib.parse.urlencode(self._params)
 
         if query_str:
             url += "?" + query_str

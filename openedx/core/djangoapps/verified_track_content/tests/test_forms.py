@@ -22,7 +22,7 @@ class TestVerifiedTrackCourseForm(SharedModuleStoreTestCase):
 
     def test_form_validation_success(self):
         form_data = {
-            'course_key': unicode(self.course.id), 'verified_cohort_name': 'Verified Learners', 'enabled': True
+            'course_key': str(self.course.id), 'verified_cohort_name': 'Verified Learners', 'enabled': True
         }
         form = VerifiedTrackCourseForm(data=form_data)
         self.assertTrue(form.is_valid())

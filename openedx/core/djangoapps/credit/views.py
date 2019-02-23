@@ -1,7 +1,7 @@
 """
 Views for the credit Django app.
 """
-from __future__ import unicode_literals
+
 
 import datetime
 import logging
@@ -158,7 +158,7 @@ class CreditEligibilityView(generics.ListAPIView):
             raise ValidationError(
                 {'detail': 'Both the course_key and username querystring parameters must be supplied.'})
 
-        course_key = unicode(course_key)
+        course_key = str(course_key)
 
         try:
             course_key = CourseKey.from_string(course_key)

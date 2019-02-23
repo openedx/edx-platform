@@ -47,11 +47,11 @@ class CourseAccessMessageViewTest(CacheIsolationTestCase, UrlResetMixin):
     def setUp(self):
         super(CourseAccessMessageViewTest, self).setUp()
 
-    @ddt.data(*messages.ENROLL_MESSAGES.keys())
+    @ddt.data(*list(messages.ENROLL_MESSAGES.keys()))
     def test_enrollment_messages(self, msg_key):
         self._load_page('enrollment', msg_key)
 
-    @ddt.data(*messages.COURSEWARE_MESSAGES.keys())
+    @ddt.data(*list(messages.COURSEWARE_MESSAGES.keys()))
     def test_courseware_messages(self, msg_key):
         self._load_page('courseware', msg_key)
 
@@ -85,8 +85,8 @@ class CourseAccessMessageViewTest(CacheIsolationTestCase, UrlResetMixin):
         self.assertEqual(
             response.status_code, expected_status,
             msg=(
-                u"Unexpected status code when loading '{url}': "
-                u"expected {expected} but got {actual}"
+                "Unexpected status code when loading '{url}': "
+                "expected {expected} but got {actual}"
             ).format(
                 url=url,
                 expected=expected_status,

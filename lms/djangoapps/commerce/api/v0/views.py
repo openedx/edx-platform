@@ -51,20 +51,20 @@ class BasketsView(APIView):
         course_id = request.data.get('course_id')
 
         if not course_id:
-            return False, None, u'Field course_id is missing.'
+            return False, None, 'Field course_id is missing.'
 
         try:
             course_key = CourseKey.from_string(course_id)
             courses.get_course(course_key)
         except (InvalidKeyError, ValueError) as ex:
-            log.exception(u'Unable to locate course matching %s.', course_id)
+            log.exception('Unable to locate course matching %s.', course_id)
             return False, None, text_type(ex)
 
         return True, course_key, None
 
     def _enroll(self, course_key, user, mode=CourseMode.DEFAULT_MODE_SLUG):
         """ Enroll the user in the course. """
-        add_enrollment(user.username, unicode(course_key), mode)
+        add_enrollment(user.username, str(course_key), mode)
 
     def _handle_marketing_opt_in(self, request, course_key, user):
         """
@@ -79,7 +79,7 @@ class BasketsView(APIView):
             except Exception:  # pylint: disable=broad-except
                 # log the error, return silently
                 log.exception(
-                    u'Failed to handle marketing opt-in flag: user="%s", course="%s"', user.username, course_key
+                    'Failed to handle marketing opt-in flag: user="%s", course="%s"', user.username, course_key
                 )
 
     def post(self, request, *args, **kwargs):
@@ -97,7 +97,7 @@ class BasketsView(APIView):
             return embargo_response
 
         # Don't do anything if an enrollment already exists
-        course_id = unicode(course_key)
+        course_id = str(course_key)
         enrollment = CourseEnrollment.get_enrollment(user, course_key)
         if enrollment and enrollment.is_active:
             msg = Messages.ENROLLMENT_EXISTS.format(course_id=course_id, username=user.username)
@@ -107,7 +107,7 @@ class BasketsView(APIView):
         course = courses.get_course(course_key)
         if CourseEnrollment.is_enrollment_closed(user, course):
             msg = Messages.ENROLLMENT_CLOSED.format(course_id=course_id)
-            log.info(u'Unable to enroll user %s in closed course %s.', user.id, course_id)
+            log.info('Unable to enroll user %s in closed course %s.', user.id, course_id)
             return DetailResponse(msg, status=HTTP_406_NOT_ACCEPTABLE)
 
         # If there is no audit or honor course mode, this most likely
@@ -120,7 +120,7 @@ class BasketsView(APIView):
         if CourseEntitlement.check_for_existing_entitlement_and_enroll(user=user, course_run_key=course_key):
             return JsonResponse(
                 {
-                    'redirect_destination': reverse('courseware', args=[unicode(course_id)]),
+                    'redirect_destination': reverse('courseware', args=[str(course_id)]),
                 },
             )
 

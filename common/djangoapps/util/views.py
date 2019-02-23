@@ -80,7 +80,7 @@ def require_global_staff(func):
             return func(request, *args, **kwargs)
         else:
             return HttpResponseForbidden(
-                u"Must be {platform_name} staff to perform this action.".format(
+                "Must be {platform_name} staff to perform this action.".format(
                     platform_name=settings.PLATFORM_NAME
                 )
             )
@@ -166,7 +166,7 @@ def calculate(request):
     try:
         result = calc.evaluator({}, {}, equation)
     except:
-        event = {'error': map(str, sys.exc_info()),
+        event = {'error': list(map(str, sys.exc_info())),
                  'equation': equation}
         track.views.server_track(request, 'error:calc', event, page='calc')
         return HttpResponse(json.dumps({'result': 'Invalid syntax'}))
@@ -268,7 +268,7 @@ def _format_zendesk_custom_fields(context):
     Ignore any keys that have not been configured in `ZENDESK_CUSTOM_FIELDS`.
     """
     custom_fields = []
-    for key, val, in settings.ZENDESK_CUSTOM_FIELDS.items():
+    for key, val, in list(settings.ZENDESK_CUSTOM_FIELDS.items()):
         if key in context:
             custom_fields.append({"id": val, "value": context[key]})
 
@@ -306,8 +306,8 @@ def _record_feedback_in_zendesk(
     zendesk_api = _ZendeskApi()
 
     additional_info_string = (
-        u"Additional information:\n\n" +
-        u"\n".join(u"%s: %s" % (key, value) for (key, value) in additional_info.items() if value is not None)
+        "Additional information:\n\n" +
+        "\n".join("%s: %s" % (key, value) for (key, value) in list(additional_info.items()) if value is not None)
     )
 
     # Tag all issues with LMS to distinguish channel in Zendesk; requested by student support team

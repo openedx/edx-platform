@@ -71,7 +71,7 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
         self.student = self.request.user
         self.client.login(username=self.student.username, password="test")
         CourseEnrollment.enroll(self.student, self.course.id)
-        self.instructor = UserFactory.create(is_staff=True, username=u'test_instructor', password=u'test')
+        self.instructor = UserFactory.create(is_staff=True, username='test_instructor', password='test')
         self.refresh_course()
 
     @patch('lms.djangoapps.grades.events.tracker')
@@ -85,11 +85,11 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
                 mock_call(
                     events.PROBLEM_SUBMITTED_EVENT_TYPE,
                     {
-                        'user_id': unicode(self.student.id),
+                        'user_id': str(self.student.id),
                         'event_transaction_id': event_transaction_id,
                         'event_transaction_type': events.PROBLEM_SUBMITTED_EVENT_TYPE,
-                        'course_id': unicode(self.course.id),
-                        'problem_id': unicode(self.problem.location),
+                        'course_id': str(self.course.id),
+                        'problem_id': str(self.problem.location),
                         'weighted_earned': 2.0,
                         'weighted_possible': 2.0,
                     },
@@ -97,15 +97,15 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
                 mock_call(
                     events.COURSE_GRADE_CALCULATED,
                     {
-                        'course_version': unicode(course.course_version),
+                        'course_version': str(course.course_version),
                         'percent_grade': 0.02,
-                        'grading_policy_hash': u'ChVp0lHGQGCevD0t4njna/C44zQ=',
-                        'user_id': unicode(self.student.id),
-                        'letter_grade': u'',
+                        'grading_policy_hash': 'ChVp0lHGQGCevD0t4njna/C44zQ=',
+                        'user_id': str(self.student.id),
+                        'letter_grade': '',
                         'event_transaction_id': event_transaction_id,
                         'event_transaction_type': events.PROBLEM_SUBMITTED_EVENT_TYPE,
-                        'course_id': unicode(self.course.id),
-                        'course_edited_timestamp': unicode(course.subtree_edited_on),
+                        'course_id': str(self.course.id),
+                        'course_edited_timestamp': str(course.subtree_edited_on),
                     }
                 ),
             ],
@@ -126,10 +126,10 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
         enrollment_tracker.emit.assert_called_with(
             events.STATE_DELETED_EVENT_TYPE,
             {
-                'user_id': unicode(self.student.id),
-                'course_id': unicode(self.course.id),
-                'problem_id': unicode(self.problem.location),
-                'instructor_id': unicode(self.instructor.id),
+                'user_id': str(self.student.id),
+                'course_id': str(self.course.id),
+                'problem_id': str(self.problem.location),
+                'instructor_id': str(self.instructor.id),
                 'event_transaction_id': event_transaction_id,
                 'event_transaction_type': events.STATE_DELETED_EVENT_TYPE,
             }
@@ -139,14 +139,14 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
             events.COURSE_GRADE_CALCULATED,
             {
                 'percent_grade': 0.0,
-                'grading_policy_hash': u'ChVp0lHGQGCevD0t4njna/C44zQ=',
-                'user_id': unicode(self.student.id),
-                'letter_grade': u'',
+                'grading_policy_hash': 'ChVp0lHGQGCevD0t4njna/C44zQ=',
+                'user_id': str(self.student.id),
+                'letter_grade': '',
                 'event_transaction_id': event_transaction_id,
                 'event_transaction_type': events.STATE_DELETED_EVENT_TYPE,
-                'course_id': unicode(self.course.id),
-                'course_edited_timestamp': unicode(course.subtree_edited_on),
-                'course_version': unicode(course.course_version),
+                'course_id': str(self.course.id),
+                'course_edited_timestamp': str(course.subtree_edited_on),
+                'course_version': str(course.course_version),
             }
         )
 
@@ -175,7 +175,7 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
         for args in events_tracker.get_tracker().context.call_args_list:
             self.assertEqual(
                 args[0][1],
-                {'course_id': unicode(self.course.id), 'org_id': unicode(self.course.org)}
+                {'course_id': str(self.course.id), 'org_id': str(self.course.org)}
             )
 
         event_transaction_id = events_tracker.emit.mock_calls[0][1][1]['event_transaction_id']
@@ -184,13 +184,13 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
                 mock_call(
                     events.GRADES_RESCORE_EVENT_TYPE,
                     {
-                        'course_id': unicode(self.course.id),
-                        'user_id': unicode(self.student.id),
-                        'problem_id': unicode(self.problem.location),
+                        'course_id': str(self.course.id),
+                        'user_id': str(self.student.id),
+                        'problem_id': str(self.problem.location),
                         'new_weighted_earned': 2,
                         'new_weighted_possible': 2,
                         'only_if_higher': False,
-                        'instructor_id': unicode(self.instructor.id),
+                        'instructor_id': str(self.instructor.id),
                         'event_transaction_id': event_transaction_id,
                         'event_transaction_type': events.GRADES_RESCORE_EVENT_TYPE,
                     },
@@ -198,15 +198,15 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
                 mock_call(
                     events.COURSE_GRADE_CALCULATED,
                     {
-                        'course_version': unicode(course.course_version),
+                        'course_version': str(course.course_version),
                         'percent_grade': 0.02,
-                        'grading_policy_hash': u'ChVp0lHGQGCevD0t4njna/C44zQ=',
-                        'user_id': unicode(self.student.id),
-                        'letter_grade': u'',
+                        'grading_policy_hash': 'ChVp0lHGQGCevD0t4njna/C44zQ=',
+                        'user_id': str(self.student.id),
+                        'letter_grade': '',
                         'event_transaction_id': event_transaction_id,
                         'event_transaction_type': events.GRADES_RESCORE_EVENT_TYPE,
-                        'course_id': unicode(self.course.id),
-                        'course_edited_timestamp': unicode(course.subtree_edited_on),
+                        'course_id': str(self.course.id),
+                        'course_edited_timestamp': str(course.subtree_edited_on),
                     },
                 ),
             ],

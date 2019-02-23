@@ -40,7 +40,7 @@ class Command(BaseCommand):
             user = User.objects.get(username=username)
         except User.DoesNotExist:
             logger.exception(
-                u'Failed to create API client. Service user {username} does not exist.'.format(username=username)
+                'Failed to create API client. Service user {username} does not exist.'.format(username=username)
             )
             raise
 
@@ -49,7 +49,7 @@ class Command(BaseCommand):
         for site in Site.objects.all():
             site_config = getattr(site, 'configuration', None)
             if site_config is None or not site_config.get_value('COURSE_CATALOG_API_URL'):
-                logger.info(u'Skipping site {domain}. No configuration.'.format(domain=site.domain))
+                logger.info('Skipping site {domain}. No configuration.'.format(domain=site.domain))
                 cache.set(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=site.domain), [], None)
                 cache.set(SITE_PATHWAY_IDS_CACHE_KEY_TPL.format(domain=site.domain), [], None)
                 continue
@@ -67,26 +67,26 @@ class Command(BaseCommand):
             programs.update(new_programs)
             pathways.update(new_pathways)
 
-            logger.info(u'Caching UUIDs for {total} programs for site {site_name}.'.format(
+            logger.info('Caching UUIDs for {total} programs for site {site_name}.'.format(
                 total=len(uuids),
                 site_name=site.domain,
             ))
             cache.set(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=site.domain), uuids, None)
 
-            pathway_ids = new_pathways.keys()
-            logger.info(u'Caching ids for {total} pathways for site {site_name}.'.format(
+            pathway_ids = list(new_pathways.keys())
+            logger.info('Caching ids for {total} pathways for site {site_name}.'.format(
                 total=len(pathway_ids),
                 site_name=site.domain,
             ))
             cache.set(SITE_PATHWAY_IDS_CACHE_KEY_TPL.format(domain=site.domain), pathway_ids, None)
 
         successful_programs = len(programs)
-        logger.info(u'Caching details for {successful_programs} programs.'.format(
+        logger.info('Caching details for {successful_programs} programs.'.format(
             successful_programs=successful_programs))
         cache.set_many(programs, None)
 
         successful_pathways = len(pathways)
-        logger.info(u'Caching details for {successful_pathways} pathways.'.format(
+        logger.info('Caching details for {successful_pathways} pathways.'.format(
             successful_pathways=successful_pathways))
         cache.set_many(pathways, None)
 
@@ -105,13 +105,13 @@ class Command(BaseCommand):
                 'uuids_only': 1,
             }
 
-            logger.info(u'Requesting program UUIDs for {domain}.'.format(domain=site.domain))
+            logger.info('Requesting program UUIDs for {domain}.'.format(domain=site.domain))
             uuids = client.programs.get(**querystring)
         except:  # pylint: disable=bare-except
-            logger.exception(u'Failed to retrieve program UUIDs for site: {domain}.'.format(domain=site.domain))
+            logger.exception('Failed to retrieve program UUIDs for site: {domain}.'.format(domain=site.domain))
             failure = True
 
-        logger.info(u'Received {total} UUIDs for site {domain}'.format(
+        logger.info('Received {total} UUIDs for site {domain}'.format(
             total=len(uuids),
             domain=site.domain
         ))
@@ -123,13 +123,13 @@ class Command(BaseCommand):
         for uuid in uuids:
             try:
                 cache_key = PROGRAM_CACHE_KEY_TPL.format(uuid=uuid)
-                logger.info(u'Requesting details for program {uuid}.'.format(uuid=uuid))
+                logger.info('Requesting details for program {uuid}.'.format(uuid=uuid))
                 program = client.programs(uuid).get(exclude_utm=1)
                 # pathways get added in process_pathways
                 program['pathway_ids'] = []
                 programs[cache_key] = program
             except:  # pylint: disable=bare-except
-                logger.exception(u'Failed to retrieve details for program {uuid}.'.format(uuid=uuid))
+                logger.exception('Failed to retrieve details for program {uuid}.'.format(uuid=uuid))
                 failure = True
                 continue
         return programs, failure
@@ -140,7 +140,7 @@ class Command(BaseCommand):
         """
         pathways = []
         failure = False
-        logger.info(u'Requesting pathways for {domain}.'.format(domain=site.domain))
+        logger.info('Requesting pathways for {domain}.'.format(domain=site.domain))
         try:
             next_page = 1
             while next_page:
@@ -150,11 +150,11 @@ class Command(BaseCommand):
 
         except:  # pylint: disable=bare-except
             logger.exception(
-                msg=u'Failed to retrieve pathways for site: {domain}.'.format(domain=site.domain),
+                msg='Failed to retrieve pathways for site: {domain}.'.format(domain=site.domain),
             )
             failure = True
 
-        logger.info(u'Received {total} pathways for site {domain}'.format(
+        logger.info('Received {total} pathways for site {domain}'.format(
             total=len(pathways),
             domain=site.domain
         ))
@@ -185,6 +185,6 @@ class Command(BaseCommand):
                 del pathway['programs']
                 pathway['program_uuids'] = uuids
             except:  # pylint: disable=bare-except
-                logger.exception(u'Failed to process pathways for {domain}'.format(domain=site.domain))
+                logger.exception('Failed to process pathways for {domain}'.format(domain=site.domain))
                 failure = True
         return processed_pathways, programs, failure

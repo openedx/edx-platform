@@ -1,5 +1,5 @@
 import logging
-from exceptions import SerializationError
+from .exceptions import SerializationError
 
 from lxml import etree
 from xblock.fields import Scope, String
@@ -51,8 +51,8 @@ class RawDescriptor(XmlDescriptor, XMLEditingDescriptor):
             lines = self.data.split('\n')
             line, offset = err.position
             msg = (
-                u"Unable to create xml for module {loc}. "
-                u"Context: '{context}'"
+                "Unable to create xml for module {loc}. "
+                "Context: '{context}'"
             ).format(
                 context=lines[line - 1][offset - 40:offset + 40],
                 loc=self.location,
@@ -71,7 +71,7 @@ class EmptyDataRawDescriptor(XmlDescriptor, XMLEditingDescriptor):
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
-        if len(xml_object) == 0 and len(xml_object.items()) == 0:
+        if len(xml_object) == 0 and len(list(xml_object.items())) == 0:
             return {'data': ''}, []
         return {'data': etree.tostring(xml_object, pretty_print=True, encoding='unicode')}, []
 

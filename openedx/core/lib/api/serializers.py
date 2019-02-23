@@ -46,14 +46,14 @@ class CourseKeyField(serializers.Field):
 
     def to_representation(self, data):
         """Convert a course key to unicode. """
-        return unicode(data)
+        return str(data)
 
     def to_internal_value(self, data):
         """Convert unicode to a course key. """
         try:
             return CourseKey.from_string(data)
         except InvalidKeyError as ex:
-            raise serializers.ValidationError(u"Invalid course key: {msg}".format(msg=ex.msg))
+            raise serializers.ValidationError("Invalid course key: {msg}".format(msg=ex.msg))
 
 
 class UsageKeyField(serializers.Field):
@@ -61,11 +61,11 @@ class UsageKeyField(serializers.Field):
 
     def to_representation(self, data):
         """Convert a usage key to unicode. """
-        return unicode(data)
+        return str(data)
 
     def to_internal_value(self, data):
         """Convert unicode to a usage key. """
         try:
             return UsageKey.from_string(data)
         except InvalidKeyError as ex:
-            raise serializers.ValidationError(u"Invalid usage key: {msg}".format(msg=ex.msg))
+            raise serializers.ValidationError("Invalid usage key: {msg}".format(msg=ex.msg))

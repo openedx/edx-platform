@@ -43,9 +43,9 @@ class SAMLMetadataTest(SAMLTestCase):
         self.enable_saml()
         self.check_metadata_contacts(
             xml=self._fetch_metadata(),
-            tech_name=u"{} Support".format(settings.PLATFORM_NAME),
+            tech_name="{} Support".format(settings.PLATFORM_NAME),
             tech_email="technical@example.com",
-            support_name=u"{} Support".format(settings.PLATFORM_NAME),
+            support_name="{} Support".format(settings.PLATFORM_NAME),
             support_email="technical@example.com"
         )
 

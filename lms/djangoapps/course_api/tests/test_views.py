@@ -196,10 +196,10 @@ class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreT
             if filter_:
                 params.update(filter_)
             response = self.verify_response(params=params)
-            self.assertEquals(
+            self.assertEqual(
                 {course['course_id'] for course in response.data['results']},
-                {unicode(course.id) for course in expected_courses},
-                u"testing course_api.views.CourseListView with filter_={}".format(filter_),
+                {str(course.id) for course in expected_courses},
+                "testing course_api.views.CourseListView with filter_={}".format(filter_),
             )
 
 
@@ -212,7 +212,7 @@ class CourseDetailViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase
     def setUpClass(cls):
         super(CourseDetailViewTestCase, cls).setUpClass()
         cls.course = cls.create_course()
-        cls.hidden_course = cls.create_course(course=u'hidden', visible_to_staff_only=True)
+        cls.hidden_course = cls.create_course(course='hidden', visible_to_staff_only=True)
         cls.url = reverse('course-detail', kwargs={'course_key_string': cls.course.id})
         cls.hidden_url = reverse('course-detail', kwargs={'course_key_string': cls.hidden_course.id})
         cls.nonexistent_url = reverse('course-detail', kwargs={'course_key_string': 'edX/nope/Fall_2014'})
@@ -267,7 +267,7 @@ class CourseDetailViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase
         request.query_params = {}
         request.user = self.staff_user
         response = CourseDetailView().dispatch(request, course_key_string='a:b:c')
-        self.assertEquals(response.status_code, 400)
+        self.assertEqual(response.status_code, 400)
 
 
 @override_settings(ELASTIC_FIELD_MAPPINGS={

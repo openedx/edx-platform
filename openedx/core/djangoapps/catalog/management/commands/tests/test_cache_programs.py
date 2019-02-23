@@ -162,7 +162,7 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
         # and aren't hashable. We've already verified that all programs came out
         # of the cache above, so all we need to do here is verify the accuracy of
         # the data itself.
-        for key, program in cached_programs.items():
+        for key, program in list(cached_programs.items()):
             # cached programs have a pathways field added to them, remove before comparing
             del program['pathway_ids']
             self.assertEqual(program, programs[key])
@@ -192,7 +192,7 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
         call_command('cache_programs')
 
         cached_pathway_keys = cache.get(SITE_PATHWAY_IDS_CACHE_KEY_TPL.format(domain=self.site_domain))
-        pathway_keys = pathways.keys()
+        pathway_keys = list(pathways.keys())
         self.assertEqual(
             set(cached_pathway_keys),
             set(pathway_keys)
@@ -208,7 +208,7 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
         # and aren't hashable. We've already verified that all pathways came out
         # of the cache above, so all we need to do here is verify the accuracy of
         # the data itself.
-        for key, pathway in cached_pathways.items():
+        for key, pathway in list(cached_pathways.items()):
             # cached pathways store just program uuids instead of the full programs, transform before comparing
             pathways[key]['program_uuids'] = [program['uuid'] for program in pathways[key]['programs']]
             del pathways[key]['programs']
@@ -244,7 +244,7 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
         pathways_dict = {
             PATHWAY_CACHE_KEY_TPL.format(id=pathway['id']): pathway for pathway in pathways
         }
-        pathway_keys = pathways_dict.keys()
+        pathway_keys = list(pathways_dict.keys())
 
         cached_pathway_keys = cache.get(SITE_PATHWAY_IDS_CACHE_KEY_TPL.format(domain=self.site_domain))
         self.assertEqual(
@@ -262,7 +262,7 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
         # and aren't hashable. We've already verified that all pathways came out
         # of the cache above, so all we need to do here is verify the accuracy of
         # the data itself.
-        for key, pathway in cached_pathways.items():
+        for key, pathway in list(cached_pathways.items()):
             # cached pathways store just program uuids instead of the full programs, transform before comparing
             pathways_dict[key]['program_uuids'] = [program['uuid'] for program in pathways_dict[key]['programs']]
             del pathways_dict[key]['programs']
@@ -357,7 +357,7 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
             set(partial_programs)
         )
 
-        for key, program in cached_programs.items():
+        for key, program in list(cached_programs.items()):
             # cached programs have a pathways field added to them, remove before comparing
             del program['pathway_ids']
             self.assertEqual(program, partial_programs[key])

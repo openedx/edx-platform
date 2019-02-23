@@ -47,4 +47,4 @@ class ExportAllCourses(ModuleStoreTestCase):
         courses, failed_export_courses = export_courses_to_output_path(self.temp_dir)
         self.assertEqual(len(courses), 2)
         self.assertEqual(len(failed_export_courses), 1)
-        self.assertEqual(failed_export_courses[0], unicode(second_course_id))
+        self.assertEqual(failed_export_courses[0], str(second_course_id))

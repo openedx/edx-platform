@@ -2,7 +2,7 @@
 """
 Tests of XML export
 """
-from __future__ import print_function
+
 
 import ddt
 import lxml.etree
@@ -75,14 +75,14 @@ class RoundTripTestCase(unittest.TestCase):
     @mock.patch('xmodule.video_module.video_module.edxval_api', None)
     @mock.patch('xmodule.course_module.requests.get')
     @ddt.data(
-        u"toy",
-        u"simple",
-        u"conditional_and_poll",
-        u"conditional",
-        u"self_assessment",
-        u"test_exam_registration",
-        u"word_cloud",
-        u"pure_xblock",
+        "toy",
+        "simple",
+        "conditional_and_poll",
+        "conditional",
+        "self_assessment",
+        "test_exam_registration",
+        "word_cloud",
+        "pure_xblock",
     )
     @XBlock.register_temp_plugin(PureXBlock, 'pure')
     def test_export_roundtrip(self, course_dir, mock_get):
@@ -104,7 +104,7 @@ class RoundTripTestCase(unittest.TestCase):
         initial_import = XMLModuleStore(root_dir, source_dirs=[course_dir], xblock_mixins=(XModuleMixin,))
 
         courses = initial_import.get_courses()
-        self.assertEquals(len(courses), 1)
+        self.assertEqual(len(courses), 1)
         initial_course = courses[0]
 
         # export to the same directory--that way things like the custom_tags/ folder
@@ -122,7 +122,7 @@ class RoundTripTestCase(unittest.TestCase):
         second_import = XMLModuleStore(root_dir, source_dirs=[course_dir], xblock_mixins=(XModuleMixin,))
 
         courses2 = second_import.get_courses()
-        self.assertEquals(len(courses2), 1)
+        self.assertEqual(len(courses2), 1)
         exported_course = courses2[0]
 
         print("Checking course equality")
@@ -133,17 +133,17 @@ class RoundTripTestCase(unittest.TestCase):
         strip_filenames(exported_course)
 
         self.assertTrue(blocks_are_equivalent(initial_course, exported_course))
-        self.assertEquals(initial_course.id, exported_course.id)
+        self.assertEqual(initial_course.id, exported_course.id)
         course_id = initial_course.id
 
         print("Checking key equality")
         self.assertItemsEqual(
-            initial_import.modules[course_id].keys(),
-            second_import.modules[course_id].keys()
+            list(initial_import.modules[course_id].keys()),
+            list(second_import.modules[course_id].keys())
         )
 
         print("Checking module equality")
-        for location in initial_import.modules[course_id].keys():
+        for location in list(initial_import.modules[course_id].keys()):
             print(("Checking", location))
             self.assertTrue(blocks_are_equivalent(
                 initial_import.modules[course_id][location],
@@ -220,10 +220,10 @@ class TestEdxJsonEncoder(unittest.TestCase):
         """
 
         # Initializing a lazy text object with Unicode
-        unicode_text = u"Your 𝓟𝓵𝓪𝓽𝓯𝓸𝓻𝓶 Name Here"
+        unicode_text = "Your 𝓟𝓵𝓪𝓽𝓯𝓸𝓻𝓶 Name Here"
         lazy_text = ugettext_lazy(unicode_text)
 
-        self.assertEquals(
+        self.assertEqual(
             unicode_text,
             self.encoder.default(lazy_text)
         )

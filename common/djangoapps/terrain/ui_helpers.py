@@ -5,7 +5,7 @@ import platform
 import re
 import time
 from textwrap import dedent
-from urllib import quote_plus
+from urllib.parse import quote_plus
 
 # django_url is assigned late in the process of loading lettuce,
 # so we import this as a module, and then read django_url from
@@ -73,12 +73,12 @@ def wait(seconds):
 
 @world.absorb
 def wait_for_js_to_load():
-    for test, req in REQUIREJS_WAIT.items():
+    for test, req in list(REQUIREJS_WAIT.items()):
         if test.search(world.browser.title):
             world.wait_for_requirejs(req)
             break
 
-    for test, req in TRUTHY_WAIT.items():
+    for test, req in list(TRUTHY_WAIT.items()):
         if test.search(world.browser.title):
             for var in req:
                 world.wait_for_js_variable_truthy(var)

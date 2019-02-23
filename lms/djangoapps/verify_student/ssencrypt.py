@@ -15,7 +15,7 @@ An RSA private key can be in any of the following formats:
 * PKCS#1 RSAPrivateKey DER SEQUENCE (binary or PEM encoding)
 * PKCS#8 PrivateKeyInfo DER SEQUENCE (binary or PEM encoding)
 """
-from __future__ import division
+
 
 import base64
 import binascii
@@ -149,12 +149,12 @@ def has_valid_signature(method, headers_dict, body_dict, access_key, secret_key)
 
     if post_access_key != access_key:
         log.error("Posted access key does not match ours")
-        log.debug(u"Their access: %s; Our access: %s", post_access_key, access_key)
+        log.debug("Their access: %s; Our access: %s", post_access_key, access_key)
         return False
 
     if post_signature != expected_signature:
         log.error("Posted signature does not match expected")
-        log.debug(u"Their sig: %s; Expected: %s", post_signature, expected_signature)
+        log.debug("Their sig: %s; Expected: %s", post_signature, expected_signature)
         return False
 
     return True
@@ -169,7 +169,7 @@ def generate_signed_message(method, headers_dict, body_dict, access_key, secret_
     # hmac needs a byte string for it's starting key, can't be unicode.
     hashed = hmac.new(secret_key.encode('utf-8'), message, sha256)
     signature = binascii.b2a_base64(hashed.digest()).rstrip('\n')
-    authorization_header = u"SSI {}:{}".format(access_key, signature)
+    authorization_header = "SSI {}:{}".format(access_key, signature)
 
     message += '\n'
     return message, signature, authorization_header
@@ -213,14 +213,14 @@ def body_string(body_dict, prefix=""):
         if isinstance(value, (list, tuple)):
             for i, arr in enumerate(value):
                 if isinstance(arr, dict):
-                    body_list.append(body_string(arr, u"{}.{}.".format(key, i)))
+                    body_list.append(body_string(arr, "{}.{}.".format(key, i)))
                 else:
-                    body_list.append(u"{}.{}:{}\n".format(key, i, arr).encode('utf-8'))
+                    body_list.append("{}.{}:{}\n".format(key, i, arr).encode('utf-8'))
         elif isinstance(value, dict):
             body_list.append(body_string(value, key + ":"))
         else:
             if value is None:
                 value = "null"
-            body_list.append(u"{}{}:{}\n".format(prefix, key, value).encode('utf-8'))
+            body_list.append("{}{}:{}\n".format(prefix, key, value).encode('utf-8'))
 
     return "".join(body_list)  # Note that trailing \n's are important

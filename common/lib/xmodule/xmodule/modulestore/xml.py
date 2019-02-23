@@ -8,7 +8,7 @@ import sys
 import glob
 
 from collections import defaultdict
-from cStringIO import StringIO
+from io import StringIO
 from fs.osfs import OSFS
 from importlib import import_module
 from lxml import etree
@@ -133,9 +133,9 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                     # put it in the error tracker--content folks need to see it.
 
                     if tag in need_uniq_names:
-                        error_tracker(u"PROBLEM: no name of any kind specified for {tag}.  Student "
-                                      u"state will not be properly tracked for this module.  Problem xml:"
-                                      u" '{xml}...'".format(tag=tag, xml=xml[:100]))
+                        error_tracker("PROBLEM: no name of any kind specified for {tag}.  Student "
+                                      "state will not be properly tracked for this module.  Problem xml:"
+                                      " '{xml}...'".format(tag=tag, xml=xml[:100]))
                     else:
                         # TODO (vshnayder): We may want to enable this once course repos are cleaned up.
                         # (or we may want to give up on the requirement for non-state-relevant issues...)
@@ -148,8 +148,8 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                     # doesn't store state, don't complain about things that are
                     # hashed.
                     if tag in need_uniq_names:
-                        msg = (u"Non-unique url_name in xml.  This may break state tracking for content."
-                               u"  url_name={0}.  Content={1}".format(url_name, xml[:100]))
+                        msg = ("Non-unique url_name in xml.  This may break state tracking for content."
+                               "  url_name={0}.  Content={1}".format(url_name, xml[:100]))
                         error_tracker("PROBLEM: " + msg)
                         log.warning(msg)
                         # Just set name to fallback_name--if there are multiple things with the same fallback name,
@@ -190,14 +190,14 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 msg = "Error loading from xml. %s"
                 log.warning(
                     msg,
-                    unicode(err)[:200],
+                    str(err)[:200],
                     # Normally, we don't want lots of exception traces in our logs from common
                     # content problems.  But if you're debugging the xml loading code itself,
                     # uncomment the next line.
                     # exc_info=True
                 )
 
-                msg = msg % (unicode(err)[:200])
+                msg = msg % (str(err)[:200])
 
                 self.error_tracker(msg)
                 err_msg = msg + "\n" + exc_info_to_str(sys.exc_info())
@@ -230,7 +230,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
             descriptor.save()
             return descriptor
 
-        render_template = lambda template, context: u''
+        render_template = lambda template, context: ''
 
         # TODO (vshnayder): we are somewhat architecturally confused in the loading code:
         # load_item should actually be get_instance, because it expects the course-specific
@@ -277,7 +277,7 @@ class CourseLocationManager(OpaqueKeyReader, AsideKeyGenerator):
     def create_definition(self, block_type, slug=None):
         assert block_type is not None
         if slug is None:
-            slug = 'autogen_{}_{}'.format(block_type, self.autogen_ids.next())
+            slug = 'autogen_{}_{}'.format(block_type, next(self.autogen_ids))
         return self.course_id.make_usage_key(block_type, slug)
 
     def get_definition_id(self, usage_id):
@@ -387,7 +387,7 @@ class XMLModuleStore(ModuleStoreReadBase):
             course_descriptor = self.load_course(course_dir, course_ids, errorlog.tracker, target_course_id)
         except Exception as exc:  # pylint: disable=broad-except
             msg = "ERROR: Failed to load courselike '{0}': {1}".format(
-                course_dir.encode("utf-8"), unicode(exc)
+                course_dir.encode("utf-8"), str(exc)
             )
             log.exception(msg)
             errorlog.tracker(msg)
@@ -651,7 +651,7 @@ class XMLModuleStore(ModuleStoreReadBase):
                             try:
                                 # get and update data field in xblock runtime
                                 module = system.load_item(loc)
-                                for key, value in data_content.iteritems():
+                                for key, value in data_content.items():
                                     setattr(module, key, value)
                                 module.save()
                             except ItemNotFoundError:
@@ -694,8 +694,8 @@ class XMLModuleStore(ModuleStoreReadBase):
                         self.modules[course_descriptor.id][module.scope_ids.usage_id] = module
                 except Exception as exc:  # pylint: disable=broad-except
                     logging.exception("Failed to load %s. Skipping... \
-                            Exception: %s", filepath, unicode(exc))
-                    system.error_tracker("ERROR: " + unicode(exc))
+                            Exception: %s", filepath, str(exc))
+                    system.error_tracker("ERROR: " + str(exc))
 
     def has_item(self, usage_key):
         """
@@ -769,7 +769,7 @@ class XMLModuleStore(ModuleStoreReadBase):
                 for fields in [settings, content, qualifiers]
             )
 
-        for mod_loc, module in self.modules[course_id].iteritems():
+        for mod_loc, module in self.modules[course_id].items():
             if _block_matches_all(mod_loc, module):
                 items.append(module)
 
@@ -796,7 +796,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         Returns a list of course descriptors.  If there were errors on loading,
         some of these may be ErrorDescriptors instead.
         """
-        return self.courses.values()
+        return list(self.courses.values())
 
     def get_course_summaries(self, **kwargs):
         """
@@ -860,7 +860,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         A context manager for temporarily setting the branch value for the store to the given branch_setting.
         """
         if branch_setting != ModuleStoreEnum.Branch.published_only:
-            raise ValueError(u"Cannot set branch setting to {} on a ReadOnly store".format(branch_setting))
+            raise ValueError("Cannot set branch setting to {} on a ReadOnly store".format(branch_setting))
         yield
 
     def _find_course_asset(self, asset_key):
@@ -918,7 +918,7 @@ class LibraryXMLModuleStore(XMLModuleStore):
         This should change in the future, but as XBlocks don't have this KVS, we have to patch it
         here manually.
         """
-        init_dict = {key: getattr(library_descriptor, key) for key in library_descriptor.fields.keys()}
+        init_dict = {key: getattr(library_descriptor, key) for key in list(library_descriptor.fields.keys())}
         # if set, invalidate '_unwrapped_field_data' so it will be reset
         # the next time it will be called
         lazy.invalidate(library_descriptor, '_unwrapped_field_data')

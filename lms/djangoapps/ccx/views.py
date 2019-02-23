@@ -7,7 +7,7 @@ import functools
 import json
 import logging
 from copy import deepcopy
-from cStringIO import StringIO
+from io import StringIO
 
 import pytz
 from ccx_keys.locator import CCXLocator
@@ -123,7 +123,7 @@ def dashboard(request, course, ccx=None):
         if ccx:
             url = reverse(
                 'ccx_coach_dashboard',
-                kwargs={'course_id': CCXLocator.from_course_locator(course.id, unicode(ccx.id))}
+                kwargs={'course_id': CCXLocator.from_course_locator(course.id, str(ccx.id))}
             )
             return redirect(url)
 
@@ -134,7 +134,7 @@ def dashboard(request, course, ccx=None):
     context.update(get_ccx_creation_dict(course))
 
     if ccx:
-        ccx_locator = CCXLocator.from_course_locator(course.id, unicode(ccx.id))
+        ccx_locator = CCXLocator.from_course_locator(course.id, str(ccx.id))
         # At this point we are done with verification that current user is ccx coach.
         assign_staff_role_to_ccx(ccx_locator, request.user, course.id)
         schedule = get_ccx_schedule(course, ccx)
@@ -211,7 +211,7 @@ def create_ccx(request, course, ccx=None):
             for vertical in sequential.get_children():
                 override_field_for_ccx(ccx, vertical, hidden, True)
 
-    ccx_id = CCXLocator.from_course_locator(course.id, unicode(ccx.id))
+    ccx_id = CCXLocator.from_course_locator(course.id, str(ccx.id))
 
     # Create forum roles
     seed_permissions_roles(ccx_id)
@@ -236,10 +236,10 @@ def create_ccx(request, course, ccx=None):
     # using CCX object as sender here.
     responses = SignalHandler.course_published.send(
         sender=ccx,
-        course_key=CCXLocator.from_course_locator(course.id, unicode(ccx.id))
+        course_key=CCXLocator.from_course_locator(course.id, str(ccx.id))
     )
     for rec, response in responses:
-        log.info(u'Signal fired when course is published. Receiver: %s. Response: %s', rec, response)
+        log.info('Signal fired when course is published. Receiver: %s. Response: %s', rec, response)
 
     return redirect(url)
 
@@ -298,7 +298,7 @@ def save_ccx(request, course, ccx=None):
 
             children = unit.get('children', None)
             # For a vertical, override start and due dates of all its problems.
-            if unit.get('category', None) == u'vertical':
+            if unit.get('category', None) == 'vertical':
                 for component in block.get_children():
                     # override start and due date of problem (Copy dates of vertical into problems)
                     if start:
@@ -335,10 +335,10 @@ def save_ccx(request, course, ccx=None):
     # using CCX object as sender here.
     responses = SignalHandler.course_published.send(
         sender=ccx,
-        course_key=CCXLocator.from_course_locator(course.id, unicode(ccx.id))
+        course_key=CCXLocator.from_course_locator(course.id, str(ccx.id))
     )
     for rec, response in responses:
-        log.info(u'Signal fired when course is published. Receiver: %s. Response: %s', rec, response)
+        log.info('Signal fired when course is published. Receiver: %s. Response: %s', rec, response)
 
     return HttpResponse(
         json.dumps({
@@ -364,14 +364,14 @@ def set_grading_policy(request, course, ccx=None):
     # using CCX object as sender here.
     responses = SignalHandler.course_published.send(
         sender=ccx,
-        course_key=CCXLocator.from_course_locator(course.id, unicode(ccx.id))
+        course_key=CCXLocator.from_course_locator(course.id, str(ccx.id))
     )
     for rec, response in responses:
-        log.info(u'Signal fired when course is published. Receiver: %s. Response: %s', rec, response)
+        log.info('Signal fired when course is published. Receiver: %s. Response: %s', rec, response)
 
     url = reverse(
         'ccx_coach_dashboard',
-        kwargs={'course_id': CCXLocator.from_course_locator(course.id, unicode(ccx.id))}
+        kwargs={'course_id': CCXLocator.from_course_locator(course.id, str(ccx.id))}
     )
     return redirect(url)
 
@@ -470,7 +470,7 @@ def ccx_students_management(request, course, ccx=None):
 
     action, identifiers = get_enrollment_action_and_identifiers(request)
     email_students = 'email-students' in request.POST
-    course_key = CCXLocator.from_course_locator(course.id, unicode(ccx.id))
+    course_key = CCXLocator.from_course_locator(course.id, str(ccx.id))
     email_params = get_email_params(course, auto_enroll=True, course_key=course_key, display_name=ccx.display_name)
 
     errors = ccx_students_enrolling_center(action, identifiers, email_students, course_key, email_params, ccx.coach)
@@ -493,7 +493,7 @@ def ccx_gradebook(request, course, ccx=None):
     if not ccx:
         raise Http404
 
-    ccx_key = CCXLocator.from_course_locator(course.id, unicode(ccx.id))
+    ccx_key = CCXLocator.from_course_locator(course.id, str(ccx.id))
     with ccx_course(ccx_key) as course:
         student_info, page = get_grade_book_page(request, course, course_key=ccx_key)
 
@@ -505,7 +505,7 @@ def ccx_gradebook(request, course, ccx=None):
             'course_id': course.id,
             'staff_access': request.user.is_staff,
             'ordered_grades': sorted(
-                course.grade_cutoffs.items(), key=lambda i: i[1], reverse=True),
+                list(course.grade_cutoffs.items()), key=lambda i: i[1], reverse=True),
         })
 
 
@@ -520,7 +520,7 @@ def ccx_grades_csv(request, course, ccx=None):
     if not ccx:
         raise Http404
 
-    ccx_key = CCXLocator.from_course_locator(course.id, unicode(ccx.id))
+    ccx_key = CCXLocator.from_course_locator(course.id, str(ccx.id))
     with ccx_course(ccx_key) as course:
 
         enrolled_students = User.objects.filter(
@@ -539,12 +539,12 @@ def ccx_grades_csv(request, course, ccx=None):
                     # Encode the header row in utf-8 encoding in case there are
                     # unicode characters
                     header = [section['label'].encode('utf-8')
-                              for section in course_grade.summary[u'section_breakdown']]
+                              for section in course_grade.summary['section_breakdown']]
                     rows.append(["id", "email", "username", "grade"] + header)
 
                 percents = {
                     section['label']: section.get('percent', 0.0)
-                    for section in course_grade.summary[u'section_breakdown']
+                    for section in course_grade.summary['section_breakdown']
                     if 'label' in section
                 }
 

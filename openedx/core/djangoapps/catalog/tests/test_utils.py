@@ -74,7 +74,7 @@ class TestGetPrograms(CacheIsolationTestCase):
         # empty list and log a warning.
         self.assertEqual(get_programs(self.site), [])
         mock_warning.assert_called_once_with(
-            u'Failed to get program UUIDs from the cache for site {}.'.format(self.site.domain)
+            'Failed to get program UUIDs from the cache for site {}.'.format(self.site.domain)
         )
         mock_warning.reset_mock()
 
@@ -91,11 +91,11 @@ class TestGetPrograms(CacheIsolationTestCase):
         # messages should be logged for the missing one.
         self.assertEqual(
             set(program['uuid'] for program in actual_programs),
-            set(program['uuid'] for program in partial_programs.values())
+            set(program['uuid'] for program in list(partial_programs.values()))
         )
         mock_info.assert_called_with('Failed to get details for 1 programs. Retrying.')
         mock_warning.assert_called_with(
-            u'Failed to get details for program {uuid} from the cache.'.format(uuid=programs[2]['uuid'])
+            'Failed to get details for program {uuid} from the cache.'.format(uuid=programs[2]['uuid'])
         )
         mock_warning.reset_mock()
 
@@ -118,7 +118,7 @@ class TestGetPrograms(CacheIsolationTestCase):
         # All 3 programs should be returned.
         self.assertEqual(
             set(program['uuid'] for program in actual_programs),
-            set(program['uuid'] for program in all_programs.values())
+            set(program['uuid'] for program in list(all_programs.values()))
         )
         self.assertFalse(mock_warning.called)
 
@@ -154,7 +154,7 @@ class TestGetPrograms(CacheIsolationTestCase):
         # be able to stitch together all the details.
         self.assertEqual(
             set(program['uuid'] for program in actual_programs),
-            set(program['uuid'] for program in all_programs.values())
+            set(program['uuid'] for program in list(all_programs.values()))
         )
         self.assertFalse(mock_warning.called)
         mock_info.assert_called_with('Failed to get details for 1 programs. Retrying.')
@@ -169,7 +169,7 @@ class TestGetPrograms(CacheIsolationTestCase):
 
         self.assertEqual(get_programs(self.site, uuid=expected_uuid), None)
         mock_warning.assert_called_once_with(
-            u'Failed to get details for program {uuid} from the cache.'.format(uuid=expected_uuid)
+            'Failed to get details for program {uuid} from the cache.'.format(uuid=expected_uuid)
         )
         mock_warning.reset_mock()
 
@@ -222,11 +222,11 @@ class TestGetPathways(CacheIsolationTestCase):
         # messages should be logged for the missing one.
         self.assertEqual(
             set(pathway['id'] for pathway in actual_pathways),
-            set(pathway['id'] for pathway in partial_pathways.values())
+            set(pathway['id'] for pathway in list(partial_pathways.values()))
         )
         mock_info.assert_called_with('Failed to get details for 1 pathways. Retrying.')
         mock_warning.assert_called_with(
-            u'Failed to get details for credit pathway {id} from the cache.'.format(id=pathways[2]['id'])
+            'Failed to get details for credit pathway {id} from the cache.'.format(id=pathways[2]['id'])
         )
         mock_warning.reset_mock()
 
@@ -249,7 +249,7 @@ class TestGetPathways(CacheIsolationTestCase):
         # All 3 pathways should be returned.
         self.assertEqual(
             set(pathway['id'] for pathway in actual_pathways),
-            set(pathway['id'] for pathway in all_pathways.values())
+            set(pathway['id'] for pathway in list(all_pathways.values()))
         )
         self.assertFalse(mock_warning.called)
 
@@ -285,7 +285,7 @@ class TestGetPathways(CacheIsolationTestCase):
         # be able to stitch together all the details.
         self.assertEqual(
             set(pathway['id'] for pathway in actual_pathways),
-            set(pathway['id'] for pathway in all_pathways.values())
+            set(pathway['id'] for pathway in list(all_pathways.values()))
         )
         self.assertFalse(mock_warning.called)
         mock_info.assert_called_with('Failed to get details for 1 pathways. Retrying.')
@@ -300,7 +300,7 @@ class TestGetPathways(CacheIsolationTestCase):
 
         self.assertEqual(get_pathways(self.site, pathway_id=expected_id), None)
         mock_warning.assert_called_once_with(
-            u'Failed to get details for credit pathway {id} from the cache.'.format(id=expected_id)
+            'Failed to get details for credit pathway {id} from the cache.'.format(id=expected_id)
         )
         mock_warning.reset_mock()
 
@@ -368,8 +368,8 @@ class TestGetLocalizedPriceText(TestCase):
     """
     def test_localized_string(self, mock_get_currency_data):
         currency_data = {
-            "BEL": {"rate": 0.835621, "code": "EUR", "symbol": u"\u20ac"},
-            "GBR": {"rate": 0.737822, "code": "GBP", "symbol": u"\u00a3"},
+            "BEL": {"rate": 0.835621, "code": "EUR", "symbol": "\u20ac"},
+            "GBR": {"rate": 0.737822, "code": "GBP", "symbol": "\u00a3"},
             "CAN": {"rate": 2, "code": "CAD", "symbol": "$"},
         }
         mock_get_currency_data.return_value = currency_data
@@ -433,7 +433,7 @@ class TestGetCourseRuns(CatalogIntegrationMixin, TestCase):
 
         data = get_course_runs()
         mock_log_error.any_call(
-            u'Catalog service user with username [%s] does not exist. Course runs will not be retrieved.',
+            'Catalog service user with username [%s] does not exist. Course runs will not be retrieved.',
             catalog_integration.service_username,
         )
         self.assertFalse(mock_get_edx_api_data.called)
@@ -513,7 +513,7 @@ class TestSessionEntitlement(CatalogIntegrationMixin, TestCase):
         course_overview = CourseOverviewFactory.create(id=course_key, start=self.tomorrow)
         CourseModeFactory.create(mode_slug=CourseMode.VERIFIED, min_price=100, course_id=course_overview.id)
         course_enrollment = CourseEnrollmentFactory(
-            user=self.user, course_id=unicode(course_overview.id), mode=CourseMode.VERIFIED
+            user=self.user, course_id=str(course_overview.id), mode=CourseMode.VERIFIED
         )
         entitlement = CourseEntitlementFactory(
             user=self.user, enrollment_course_run=course_enrollment, mode=CourseMode.VERIFIED
@@ -538,7 +538,7 @@ class TestSessionEntitlement(CatalogIntegrationMixin, TestCase):
             expiration_datetime=now() - timedelta(days=1)
         )
         course_enrollment = CourseEnrollmentFactory(
-            user=self.user, course_id=unicode(course_overview.id), mode=CourseMode.VERIFIED
+            user=self.user, course_id=str(course_overview.id), mode=CourseMode.VERIFIED
         )
         entitlement = CourseEntitlementFactory(
             user=self.user, enrollment_course_run=course_enrollment, mode=CourseMode.VERIFIED
@@ -564,7 +564,7 @@ class TestSessionEntitlement(CatalogIntegrationMixin, TestCase):
             expiration_datetime=now() - timedelta(days=1)
         )
         course_enrollment = CourseEnrollmentFactory(
-            user=self.user, course_id=unicode(course_overview.id), mode=CourseMode.VERIFIED
+            user=self.user, course_id=str(course_overview.id), mode=CourseMode.VERIFIED
         )
         entitlement = CourseEntitlementFactory(
             user=self.user, enrollment_course_run=course_enrollment, mode=CourseMode.VERIFIED

@@ -29,7 +29,7 @@ class TestSyncCourseRunsCommand(ModuleStoreTestCase):
         self.course_overview = CourseOverview.get_from_id(self.course.id)
         # create a catalog course run with the same course id.
         self.catalog_course_run = CourseRunFactory(
-            key=unicode(self.course.id),
+            key=str(self.course.id),
             marketing_url='test_marketing_url',
             eligible_for_financial_aid=False
         )
@@ -74,7 +74,7 @@ class TestSyncCourseRunsCommand(ModuleStoreTestCase):
         call_command('sync_course_runs')
 
         mock_log_info.assert_any_call(
-            u'[sync_course_runs] course overview record not found for course run: %s',
+            '[sync_course_runs] course overview record not found for course run: %s',
             nonexistent_course_run['key'],
         )
         updated_marketing_url = CourseOverview.objects.get(id=self.course.id).marketing_url
@@ -88,8 +88,8 @@ class TestSyncCourseRunsCommand(ModuleStoreTestCase):
         def _assert_logs(num_updates):
             mock_log_info.assert_any_call('[sync_course_runs] Fetching course runs from catalog service.')
             mock_log_info.assert_any_call(
-                u'[sync_course_runs] course runs found in catalog: %d, course runs found in course overview: %d,'
-                u' course runs not found in course overview: %d, course overviews updated: %d',
+                '[sync_course_runs] course runs found in catalog: %d, course runs found in course overview: %d,'
+                ' course runs not found in course overview: %d, course overviews updated: %d',
                 3,
                 1,
                 2,

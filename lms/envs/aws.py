@@ -180,7 +180,7 @@ LMS_INTERNAL_ROOT_URL = ENV_TOKENS.get('LMS_INTERNAL_ROOT_URL', LMS_ROOT_URL)
 IDA_LOGOUT_URI_LIST = ENV_TOKENS.get('IDA_LOGOUT_URI_LIST', [])
 
 ENV_FEATURES = ENV_TOKENS.get('FEATURES', {})
-for feature, value in ENV_FEATURES.items():
+for feature, value in list(ENV_FEATURES.items()):
     FEATURES[feature] = value
 
 CMS_BASE = ENV_TOKENS.get('CMS_BASE', 'studio.edx.org')
@@ -274,7 +274,7 @@ CELERY_QUEUES.update(
     {
         alternate: {}
         for alternate in ALTERNATE_QUEUES
-        if alternate not in CELERY_QUEUES.keys()
+        if alternate not in list(CELERY_QUEUES.keys())
     }
 )
 
@@ -359,10 +359,10 @@ GIT_IMPORT_STATIC = ENV_TOKENS.get('GIT_IMPORT_STATIC', True)
 GIT_IMPORT_PYTHON_LIB = ENV_TOKENS.get('GIT_IMPORT_PYTHON_LIB', True)
 PYTHON_LIB_FILENAME = ENV_TOKENS.get('PYTHON_LIB_FILENAME', 'python_lib.zip')
 
-for name, value in ENV_TOKENS.get("CODE_JAIL", {}).items():
+for name, value in list(ENV_TOKENS.get("CODE_JAIL", {}).items()):
     oldvalue = CODE_JAIL.get(name)
     if isinstance(oldvalue, dict):
-        for subname, subvalue in value.items():
+        for subname, subvalue in list(value.items()):
             oldvalue[subname] = subvalue
     else:
         CODE_JAIL[name] = value
@@ -379,7 +379,7 @@ if "TRACKING_IGNORE_URL_PATTERNS" in ENV_TOKENS:
 SSL_AUTH_EMAIL_DOMAIN = ENV_TOKENS.get("SSL_AUTH_EMAIL_DOMAIN", "MIT.EDU")
 SSL_AUTH_DN_FORMAT_STRING = ENV_TOKENS.get(
     "SSL_AUTH_DN_FORMAT_STRING",
-    u"/C=US/ST=Massachusetts/O=Massachusetts Institute of Technology/OU=Client CA v1/CN={0}/emailAddress={1}"
+    "/C=US/ST=Massachusetts/O=Massachusetts Institute of Technology/OU=Client CA v1/CN={0}/emailAddress={1}"
 )
 
 # Django CAS external authentication settings
@@ -545,7 +545,7 @@ DATABASES = AUTH_TOKENS['DATABASES']
 # The normal database user does not have enough permissions to run migrations.
 # Migrations are run with separate credentials, given as DB_MIGRATION_*
 # environment variables
-for name, database in DATABASES.items():
+for name, database in list(DATABASES.items()):
     if name != 'read_replica':
         database.update({
             'ENGINE': os.environ.get('DB_MIGRATION_ENGINE', database['ENGINE']),

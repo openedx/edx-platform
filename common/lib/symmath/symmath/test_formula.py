@@ -6,7 +6,7 @@ import unittest
 
 from lxml import etree
 
-import formula
+from . import formula
 
 
 def stripXML(xml):

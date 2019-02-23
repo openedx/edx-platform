@@ -220,7 +220,7 @@ class _MergedGroupAccess(object):
         Returns:
             bool: Whether said user has group access.
         """
-        for partition_id, allowed_group_ids in self._access.iteritems():
+        for partition_id, allowed_group_ids in self._access.items():
 
             # If the user is not assigned to a group for this partition,
             # deny access.

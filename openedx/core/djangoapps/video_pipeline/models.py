@@ -78,7 +78,7 @@ class VideoUploadsEnabledByDefault(ConfigurationModel):
 
     def __unicode__(self):
         current_model = VideoUploadsEnabledByDefault.current()
-        return u"VideoUploadsEnabledByDefault: enabled {is_enabled}".format(
+        return "VideoUploadsEnabledByDefault: enabled {is_enabled}".format(
             is_enabled=current_model.is_enabled()
         )
 
@@ -99,7 +99,7 @@ class CourseVideoUploadsEnabledByDefault(ConfigurationModel):
         if self.enabled:
             not_en = ""
 
-        return u"Course '{course_key}': Video Uploads {not_enabled}Enabled by default.".format(
-            course_key=unicode(self.course_id),
+        return "Course '{course_key}': Video Uploads {not_enabled}Enabled by default.".format(
+            course_key=str(self.course_id),
             not_enabled=not_en
         )

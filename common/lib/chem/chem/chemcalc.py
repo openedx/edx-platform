@@ -1,4 +1,4 @@
-from __future__ import absolute_import, division
+
 from fractions import Fraction
 
 import markupsafe
@@ -229,9 +229,9 @@ def render_to_html(eq):
         Turn text arrows into pretty ones
         """
         if arrow == '->':
-            return HTML(u'\u2192')
+            return HTML('\u2192')
         if arrow == '<->':
-            return HTML(u'\u2194')
+            return HTML('\u2194')
 
         # this won't be reached unless we add more arrow types, but keep it to avoid explosions when
         # that happens. HTML-escape this unknown arrow just in case.
@@ -247,7 +247,7 @@ def render_to_html(eq):
             return err(ex)
 
     def spanify(s):
-        return HTML(u'<span class="math">{0}</span>').format(s)
+        return HTML('<span class="math">{0}</span>').format(s)
 
     left, arrow, right = split_on_arrow(eq)
     if arrow == '':

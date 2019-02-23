@@ -17,4 +17,4 @@ class WhitelistedRssUrlTests(TestCase):
         """
         Test the unicode function returns the url
         """
-        self.assertEqual(unicode(self.whitelisted_rss_url), self.whitelisted_rss_url.url)
+        self.assertEqual(str(self.whitelisted_rss_url), self.whitelisted_rss_url.url)

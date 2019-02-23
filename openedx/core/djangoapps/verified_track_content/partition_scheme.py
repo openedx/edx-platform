@@ -45,7 +45,7 @@ class EnrollmentTrackUserPartition(UserPartition):
             return []
 
         return [
-            Group(ENROLLMENT_GROUP_IDS[mode.slug]["id"], unicode(mode.name))
+            Group(ENROLLMENT_GROUP_IDS[mode.slug]["id"], str(mode.name))
             for mode in CourseMode.modes_for_course(course_key, include_expired=True)
         ]
 
@@ -92,7 +92,7 @@ class EnrollmentTrackPartitionScheme(object):
                 course_mode = CourseMode.verified_mode_for_course(course_key, include_expired=True)
             if not course_mode:
                 course_mode = CourseMode.DEFAULT_MODE
-            return Group(ENROLLMENT_GROUP_IDS[course_mode.slug]["id"], unicode(course_mode.name))
+            return Group(ENROLLMENT_GROUP_IDS[course_mode.slug]["id"], str(course_mode.name))
         else:
             return None
 
@@ -112,7 +112,7 @@ class EnrollmentTrackPartitionScheme(object):
         Any group access rule referencing inactive partitions will be ignored
         when performing access checks.
         """
-        return EnrollmentTrackUserPartition(id, unicode(name), unicode(description), [], cls, parameters, active)
+        return EnrollmentTrackUserPartition(id, str(name), str(description), [], cls, parameters, active)
 
 
 def is_course_using_cohort_instead(course_key):

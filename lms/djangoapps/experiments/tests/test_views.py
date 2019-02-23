@@ -1,4 +1,4 @@
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import unittest
 
 from django.conf import settings
@@ -63,18 +63,18 @@ class ExperimentDataViewSetTests(APITestCase):
         ExperimentDataFactory(user=user)
         data = ExperimentDataFactory.create_batch(3, user=user, experiment_id=experiment_id)
 
-        qs = urllib.urlencode({'experiment_id': experiment_id})
+        qs = urllib.parse.urlencode({'experiment_id': experiment_id})
         response = self.client.get('{url}?{qs}'.format(url=url, qs=qs))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['results'], ExperimentDataSerializer(data, many=True).data)
 
         datum = data[0]
-        qs = urllib.urlencode({'key': datum.key})
+        qs = urllib.parse.urlencode({'key': datum.key})
         response = self.client.get('{url}?{qs}'.format(url=url, qs=qs))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['results'], ExperimentDataSerializer([datum], many=True).data)
 
-        qs = urllib.urlencode({'experiment_id': experiment_id, 'key': datum.key})
+        qs = urllib.parse.urlencode({'experiment_id': experiment_id, 'key': datum.key})
         response = self.client.get('{url}?{qs}'.format(url=url, qs=qs))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['results'], ExperimentDataSerializer([datum], many=True).data)

@@ -34,7 +34,7 @@ class SiteConfiguration(models.Model):
     )
 
     def __unicode__(self):
-        return u"<SiteConfiguration: {site} >".format(site=self.site)  # xss-lint: disable=python-wrap-html
+        return "<SiteConfiguration: {site} >".format(site=self.site)  # xss-lint: disable=python-wrap-html
 
     def __repr__(self):
         return self.__unicode__()
@@ -56,9 +56,9 @@ class SiteConfiguration(models.Model):
             try:
                 return self.values.get(name, default)
             except AttributeError as error:
-                logger.exception(u'Invalid JSON data. \n [%s]', error)
+                logger.exception('Invalid JSON data. \n [%s]', error)
         else:
-            logger.info(u"Site Configuration is not enabled for site (%s).", self.site)
+            logger.info("Site Configuration is not enabled for site (%s).", self.site)
 
         return default
 
@@ -159,7 +159,7 @@ class SiteConfigurationHistory(TimeStampedModel):
 
     def __unicode__(self):
         # pylint: disable=line-too-long
-        return u"<SiteConfigurationHistory: {site}, Last Modified: {modified} >".format(  # xss-lint: disable=python-wrap-html
+        return "<SiteConfigurationHistory: {site}, Last Modified: {modified} >".format(  # xss-lint: disable=python-wrap-html
             modified=self.modified,
             site=self.site,
         )

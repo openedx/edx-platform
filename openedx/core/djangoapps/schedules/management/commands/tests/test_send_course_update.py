@@ -40,7 +40,7 @@ class TestSendCourseUpdate(ScheduleUpsellTestMixin, ScheduleSendEmailTestMixin, 
     command = nudge.Command
     deliver_config = 'deliver_course_update'
     enqueue_config = 'enqueue_course_update'
-    expected_offsets = range(-7, -77, -7)
+    expected_offsets = list(range(-7, -77, -7))
     experience_type = ScheduleExperience.EXPERIENCES.course_updates
 
     queries_deadline_for_each_course = True
@@ -49,7 +49,7 @@ class TestSendCourseUpdate(ScheduleUpsellTestMixin, ScheduleSendEmailTestMixin, 
         super(TestSendCourseUpdate, self).setUp()
         self.highlights_patcher = patch('openedx.core.djangoapps.schedules.resolvers.get_week_highlights')
         mock_highlights = self.highlights_patcher.start()
-        mock_highlights.return_value = [u'Highlight {}'.format(num + 1) for num in range(3)]
+        mock_highlights.return_value = ['Highlight {}'.format(num + 1) for num in range(3)]
         self.addCleanup(self.stop_highlights_patcher)
 
     def stop_highlights_patcher(self):
@@ -76,9 +76,9 @@ class TestSendCourseUpdate(ScheduleUpsellTestMixin, ScheduleSendEmailTestMixin, 
 
         course = CourseFactory(highlights_enabled_for_messaging=True, self_paced=True)
         with self.store.bulk_operations(course.id):
-            ItemFactory.create(parent=course, category='chapter', highlights=[u'highlights'])
+            ItemFactory.create(parent=course, category='chapter', highlights=['highlights'])
 
-        enrollment = CourseEnrollmentFactory(course_id=course.id, user=self.user, mode=u'audit')
+        enrollment = CourseEnrollmentFactory(course_id=course.id, user=self.user, mode='audit')
         self.assertEqual(enrollment.schedule.get_experience_type(), ScheduleExperience.EXPERIENCES.course_updates)
 
         _, offset, target_day, _ = self._get_dates(offset=self.expected_offsets[0])

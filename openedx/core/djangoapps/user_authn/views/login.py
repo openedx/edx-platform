@@ -54,29 +54,29 @@ def _do_third_party_auth(request):
         return pipeline.get_authenticated_user(requested_provider, username, third_party_uid)
     except User.DoesNotExist:
         AUDIT_LOG.info(
-            u"Login failed - user with username {username} has no social auth "
-            u"with backend_name {backend_name}".format(
+            "Login failed - user with username {username} has no social auth "
+            "with backend_name {backend_name}".format(
                 username=username, backend_name=backend_name)
         )
         message = _(
-            u"You've successfully logged into your {provider_name} account, "
-            u"but this account isn't linked with an {platform_name} account yet."
+            "You've successfully logged into your {provider_name} account, "
+            "but this account isn't linked with an {platform_name} account yet."
         ).format(
             platform_name=platform_name,
             provider_name=requested_provider.name,
         )
         message += "<br/><br/>"
         message += _(
-            u"Use your {platform_name} username and password to log into {platform_name} below, "
-            u"and then link your {platform_name} account with {provider_name} from your dashboard."
+            "Use your {platform_name} username and password to log into {platform_name} below, "
+            "and then link your {platform_name} account with {provider_name} from your dashboard."
         ).format(
             platform_name=platform_name,
             provider_name=requested_provider.name,
         )
         message += "<br/><br/>"
         message += Text(_(
-            u"If you don't have an {platform_name} account yet, "
-            u"click {register_label_strong} at the top of the page."
+            "If you don't have an {platform_name} account yet, "
+            "click {register_label_strong} at the top of the page."
         )).format(
             platform_name=platform_name,
             register_label_strong=HTML('<strong>{register_text}</strong>').format(
@@ -100,9 +100,9 @@ def _get_user_by_email(request):
         return User.objects.get(email=email)
     except User.DoesNotExist:
         if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
-            AUDIT_LOG.warning(u"Login failed - Unknown user email")
+            AUDIT_LOG.warning("Login failed - Unknown user email")
         else:
-            AUDIT_LOG.warning(u"Login failed - Unknown user email: {0}".format(email))
+            AUDIT_LOG.warning("Login failed - Unknown user email: {0}".format(email))
 
 
 def _check_shib_redirect(user):
@@ -118,7 +118,7 @@ def _check_shib_redirect(user):
                 raise AuthFailedError('', redirect=reverse('shib-login'))
         except ExternalAuthMap.DoesNotExist:
             # This is actually the common case, logging in user without external linked login
-            AUDIT_LOG.info(u"User %s w/o external auth attempting login", user)
+            AUDIT_LOG.info("User %s w/o external auth attempting login", user)
 
 
 def _check_excessive_login_attempts(user):
@@ -159,10 +159,10 @@ def _generate_not_activated_message(user):
         settings.PLATFORM_NAME
     )
 
-    not_activated_msg_template = _(u'In order to sign in, you need to activate your account.<br /><br />'
-                                   u'We just sent an activation link to <strong>{email}</strong>.  If '
-                                   u'you do not receive an email, check your spam folders or '
-                                   u'<a href="{support_url}">contact {platform} Support</a>.')
+    not_activated_msg_template = _('In order to sign in, you need to activate your account.<br /><br />'
+                                   'We just sent an activation link to <strong>{email}</strong>.  If '
+                                   'you do not receive an email, check your spam folders or '
+                                   '<a href="{support_url}">contact {platform} Support</a>.')
 
     not_activated_message = not_activated_msg_template.format(
         email=user.email,
@@ -180,11 +180,11 @@ def _log_and_raise_inactive_user_auth_error(unauthenticated_user):
     """
     if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
         AUDIT_LOG.warning(
-            u"Login failed - Account not active for user.id: {0}, resending activation".format(
+            "Login failed - Account not active for user.id: {0}, resending activation".format(
                 unauthenticated_user.id)
         )
     else:
-        AUDIT_LOG.warning(u"Login failed - Account not active for user {0}, resending activation".format(
+        AUDIT_LOG.warning("Login failed - Account not active for user {0}, resending activation".format(
             unauthenticated_user.username)
         )
 
@@ -229,9 +229,9 @@ def _handle_failed_authentication(user):
         # doesn't exist, and doesn't have a corresponding password
         if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
             loggable_id = user.id if user else "<unknown>"
-            AUDIT_LOG.warning(u"Login failed - password for user.id: {0} is invalid".format(loggable_id))
+            AUDIT_LOG.warning("Login failed - password for user.id: {0} is invalid".format(loggable_id))
         else:
-            AUDIT_LOG.warning(u"Login failed - password for {0} is invalid".format(user.email))
+            AUDIT_LOG.warning("Login failed - password for {0} is invalid".format(user.email))
 
     raise AuthFailedError(_('Email or password is incorrect.'))
 

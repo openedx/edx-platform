@@ -9,22 +9,22 @@ class JournalsConfig(AppConfig):
     """
     Application Configuration for Journals.
     """
-    name = u'openedx.features.journals'
+    name = 'openedx.features.journals'
 
     plugin_app = {
         PluginURLs.CONFIG: {
             ProjectType.LMS: {
-                PluginURLs.NAMESPACE: u'',
+                PluginURLs.NAMESPACE: '',
                 PluginURLs.REGEX: r'^journals/',
-                PluginURLs.RELATIVE_PATH: u'urls',
+                PluginURLs.RELATIVE_PATH: 'urls',
             }
         },
         PluginSettings.CONFIG: {
             ProjectType.LMS: {
-                SettingsType.AWS: {PluginSettings.RELATIVE_PATH: u'settings.aws'},
-                SettingsType.COMMON: {PluginSettings.RELATIVE_PATH: u'settings.common'},
-                SettingsType.DEVSTACK: {PluginSettings.RELATIVE_PATH: u'settings.devstack'},
-                SettingsType.TEST: {PluginSettings.RELATIVE_PATH: u'settings.test'},
+                SettingsType.AWS: {PluginSettings.RELATIVE_PATH: 'settings.aws'},
+                SettingsType.COMMON: {PluginSettings.RELATIVE_PATH: 'settings.common'},
+                SettingsType.DEVSTACK: {PluginSettings.RELATIVE_PATH: 'settings.devstack'},
+                SettingsType.TEST: {PluginSettings.RELATIVE_PATH: 'settings.test'},
             }
         }
     }

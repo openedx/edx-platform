@@ -76,7 +76,7 @@ class SemanticSectionDescriptor(XModuleDescriptor):
                              .format(xml_object.tag))
 
         if len(xml_object) == 1:
-            for (key, val) in xml_object.items():
+            for (key, val) in list(xml_object.items()):
                 xml_object[0].set(key, val)
 
             return system.process_xml(etree.tostring(xml_object[0]))

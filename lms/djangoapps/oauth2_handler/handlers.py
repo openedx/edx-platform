@@ -209,7 +209,7 @@ class CourseAccessHandler(object):
             if not GlobalStaff().has_user(user):
                 course_keys = [course_key for course_key in course_keys if has_access(user, access_type, course_key)]
 
-            course_ids = [unicode(course_key) for course_key in course_keys]
+            course_ids = [str(course_key) for course_key in course_keys]
 
             cache.set(key, course_ids, self.COURSE_CACHE_TIMEOUT)
 

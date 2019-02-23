@@ -3,7 +3,7 @@ Defines asynchronous celery task for sending email notification (through edx-ace
 pertaining to new discussion forum comments.
 """
 import logging
-from urlparse import urljoin
+from urllib.parse import urljoin
 
 from celery import task
 from django.conf import settings
@@ -46,7 +46,7 @@ def update_discussions_map(context):
     course_key = CourseKey.from_string(context['course_id'])
     discussion_blocks = get_accessible_discussion_xblocks_by_course_id(course_key, include_all=True)
     discussions_id_map = {
-        discussion_block.discussion_id: unicode(discussion_block.location)
+        discussion_block.discussion_id: str(discussion_block.location)
         for discussion_block in discussion_blocks
     }
     DiscussionsIdMapping.update_mapping(course_key, discussions_id_map)
@@ -70,7 +70,7 @@ def send_ace_message(context):
                 _get_course_language(context['course_id']),
                 message_context
             )
-            log.info(u'Sending forum comment email notification with context %s', message_context)
+            log.info('Sending forum comment email notification with context %s', message_context)
             ace.send(message)
             _track_notification_sent(message, context)
 
@@ -83,10 +83,10 @@ def _track_notification_sent(message, context):
         'app_label': 'discussion',
         'name': 'responsenotification',  # This is 'Campaign' in GA
         'language': message.language,
-        'uuid': unicode(message.uuid),
-        'send_uuid': unicode(message.send_uuid),
+        'uuid': str(message.uuid),
+        'send_uuid': str(message.send_uuid),
         'thread_id': context['thread_id'],
-        'course_id': unicode(context['course_id']),
+        'course_id': str(context['course_id']),
         'thread_created_at': date.deserialize(context['thread_created_at']),
         'nonInteraction': 1,
     }
@@ -126,7 +126,7 @@ def _is_first_comment(comment_id, thread_id):
         return first_comment.get('id') == comment_id
     else:
         log.info(
-            u"EDUCATOR-3385: No child exists for thread_id %s | course_id %s | username %s ",
+            "EDUCATOR-3385: No child exists for thread_id %s | course_id %s | username %s ",
             thread.get('id'),
             thread['course_id'],
             thread['username']

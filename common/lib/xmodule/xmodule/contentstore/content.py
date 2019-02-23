@@ -13,9 +13,9 @@ VERSIONED_ASSETS_PATTERN = r'/assets/courseware/(v[\d]/)?([a-f0-9]{32})'
 
 import os
 import logging
-import StringIO
-from urlparse import urlparse, urlunparse, parse_qsl
-from urllib import urlencode, quote_plus
+import io
+from urllib.parse import urlparse, urlunparse, parse_qsl
+from urllib.parse import urlencode, quote_plus
 
 from opaque_keys.edx.locator import AssetLocator
 from opaque_keys.edx.keys import CourseKey, AssetKey
@@ -57,13 +57,13 @@ class StaticContent(object):
 
         name_root, ext = os.path.splitext(original_name)
         if not ext == extension:
-            name_root = name_root + ext.replace(u'.', u'-')
+            name_root = name_root + ext.replace('.', '-')
 
         if dimensions:
             width, height = dimensions  # pylint: disable=unpacking-non-sequence
             name_root += "-{}x{}".format(width, height)
 
-        return u"{name_root}{extension}".format(
+        return "{name_root}{extension}".format(
             name_root=name_root,
             extension=extension,
         )
@@ -117,7 +117,7 @@ class StaticContent(object):
         the actual /c4x/... path which the client needs to reference static content
         """
         if location is not None:
-            return u"/static/{name}".format(name=location.block_id)
+            return "/static/{name}".format(name=location.block_id)
         else:
             return None
 
@@ -181,7 +181,7 @@ class StaticContent(object):
 
         structure_version = 'v{}'.format(STATIC_CONTENT_VERSION)
 
-        return u'{}/{}/{}{}'.format(VERSIONED_ASSETS_PREFIX, structure_version, version, path)
+        return '{}/{}/{}{}'.format(VERSIONED_ASSETS_PREFIX, structure_version, version, path)
 
     @staticmethod
     def get_asset_key_from_path(course_key, path):
@@ -300,7 +300,7 @@ class StaticContent(object):
         Legacy code expects the serialized asset key to start w/ a slash; so, do that in one place
         :param asset_key:
         """
-        url = unicode(asset_key)
+        url = str(asset_key)
         if not url.startswith('/'):
             url = '/' + url  # TODO - re-address this once LMS-11198 is tackled.
         return url
@@ -417,10 +417,10 @@ class ContentStore(object):
                 # for svg simply store the provided svg file, since vector graphics should be good enough
                 # for downscaling client-side
                 if tempfile_path is None:
-                    thumbnail_file = StringIO.StringIO(content.data)
+                    thumbnail_file = io.StringIO(content.data)
                 else:
                     with open(tempfile_path) as f:
-                        thumbnail_file = StringIO.StringIO(f.read())
+                        thumbnail_file = io.StringIO(f.read())
                 thumbnail_content = StaticContent(thumbnail_file_location, thumbnail_name,
                                                   'image/svg+xml', thumbnail_file)
                 self.save(thumbnail_content)
@@ -430,13 +430,13 @@ class ContentStore(object):
                 # the max-height/width to be whatever you pass in as 'size'
                 # @todo: move the thumbnail size to a configuration setting?!?
                 if tempfile_path is None:
-                    source = StringIO.StringIO(content.data)
+                    source = io.StringIO(content.data)
                 else:
                     source = tempfile_path
 
                 # We use the context manager here to avoid leaking the inner file descriptor
                 # of the Image object -- this way it gets closed after we're done with using it.
-                thumbnail_file = StringIO.StringIO()
+                thumbnail_file = io.StringIO()
                 with Image.open(source) as image:
                     # I've seen some exceptions from the PIL library when trying to save palletted
                     # PNG files to JPEG. Per the google-universe, they suggest converting to RGB first.
@@ -458,7 +458,7 @@ class ContentStore(object):
         except Exception as exc:  # pylint: disable=broad-except
             # log and continue as thumbnails are generally considered as optional
             logging.exception(
-                u"Failed to generate thumbnail for {0}. Exception: {1}".format(content.location, str(exc))
+                "Failed to generate thumbnail for {0}. Exception: {1}".format(content.location, str(exc))
             )
 
         return thumbnail_content, thumbnail_file_location

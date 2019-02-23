@@ -14,8 +14,8 @@ from lxml import etree
 new_contract('AssetKey', AssetKey)
 new_contract('CourseKey', CourseKey)
 new_contract('datetime', datetime)
-new_contract('basestring', basestring)
-new_contract('long', long)
+new_contract('basestring', str)
+new_contract('long', int)
 new_contract('AssetElement', lambda x: isinstance(x, etree._Element) and x.tag == "asset")  # pylint: disable=protected-access
 new_contract('AssetsElement', lambda x: isinstance(x, etree._Element) and x.tag == "assets")  # pylint: disable=protected-access
 
@@ -45,10 +45,10 @@ class AssetMetadata(object):
     ASSET_XML_TAG = 'asset'
 
     # Top-level directory name in exported course XML which holds asset metadata.
-    EXPORTED_ASSET_DIR = u'assets'
+    EXPORTED_ASSET_DIR = 'assets'
 
     # Filename of all asset metadata exported as XML.
-    EXPORTED_ASSET_FILENAME = u'assets.xml'
+    EXPORTED_ASSET_FILENAME = 'assets.xml'
 
     @contract(asset_id='AssetKey',
               pathname='basestring|None', internal_name='basestring|None',
@@ -123,7 +123,7 @@ class AssetMetadata(object):
         Arguments:
             attr_dict: Prop, val dictionary of all attributes to set.
         """
-        for attr, val in attr_dict.iteritems():
+        for attr, val in attr_dict.items():
             if attr in self.ATTRS_ALLOWED_TO_UPDATE:
                 setattr(self, attr, val)
             else:
@@ -233,7 +233,7 @@ class AssetMetadata(object):
             elif isinstance(value, dict):
                 value = json.dumps(value)
             else:
-                value = unicode(value)
+                value = str(value)
             child.text = value
 
     @staticmethod
@@ -299,4 +299,4 @@ class CourseAssetsFromStorage(object):
         """
         Iterates over the items of the asset dict.
         """
-        return self.asset_md.iteritems()
+        return iter(self.asset_md.items())

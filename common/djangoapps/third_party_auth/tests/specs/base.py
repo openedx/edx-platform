@@ -64,7 +64,7 @@ class HelperMixin(object):
         self.assertEqual(200, response.status_code)
         # Check that the correct provider was selected.
         self.assertIn(
-            u'successfully signed in with <strong>%s</strong>' % self.provider.name,
+            'successfully signed in with <strong>%s</strong>' % self.provider.name,
             response.content.decode(response.charset)
         )
         # Expect that each truthy value we've prepopulated the register form
@@ -123,7 +123,7 @@ class HelperMixin(object):
         """Asserts failure on /login for missing social auth looks right."""
         self.assertEqual(403, response.status_code)
         self.assertIn(
-            u"successfully logged into your %s account, but this account isn&#39;t linked" % self.provider.name,
+            "successfully logged into your %s account, but this account isn&#39;t linked" % self.provider.name,
             response.content.decode(response.charset)
         )
 
@@ -371,7 +371,7 @@ class IntegrationTestMixin(testutil.TestCase, test.TestCase, HelperMixin):
         self.assertEqual(form_fields['email']['defaultValue'], self.USER_EMAIL)
         self.assertEqual(form_fields['name']['defaultValue'], self.USER_NAME)
         self.assertEqual(form_fields['username']['defaultValue'], self.USER_USERNAME)
-        for field_name, value in extra_defaults.items():
+        for field_name, value in list(extra_defaults.items()):
             self.assertEqual(form_fields[field_name]['defaultValue'], value)
         registration_values = {
             'email': 'email-edited@tpa-test.none',
@@ -764,11 +764,11 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
 
     def test_first_party_auth_trumps_third_party_auth_and_fails_when_credentials_bad(self):
         self.assert_first_party_auth_trumps_third_party_auth(
-            email='user@example.com', password=u'password', success=False)
+            email='user@example.com', password='password', success=False)
 
     def test_first_party_auth_trumps_third_party_auth_and_succeeds_when_credentials_good(self):
         self.assert_first_party_auth_trumps_third_party_auth(
-            email='user@example.com', password=u'password', success=True)
+            email='user@example.com', password='password', success=True)
 
     def test_pipeline_redirects_to_requested_url(self):
         requested_redirect_url = 'foo'  # something different from '/dashboard'

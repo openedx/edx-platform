@@ -11,5 +11,5 @@ def strip_course_id(path):
     The utility function to help remove the fake
     course ID from the url path
     """
-    course_id = unicode(FAKE_COURSE_KEY)
+    course_id = str(FAKE_COURSE_KEY)
     return path.split(course_id)[0]

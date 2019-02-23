@@ -211,7 +211,7 @@ class ForumsConfig(ConfigurationModel):
         """
         Simple representation so the admin screen looks less ugly.
         """
-        return u"ForumsConfig: timeout={}".format(self.connection_timeout)
+        return "ForumsConfig: timeout={}".format(self.connection_timeout)
 
 
 class CourseDiscussionSettings(models.Model):

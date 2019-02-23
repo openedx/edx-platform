@@ -208,7 +208,7 @@ class InternationalizationTest(ModuleStoreTestCase):
 
         resp = self.client.get_html('/home/')
         self.assertContains(resp,
-                            u'<h1 class="page-header">𝓢𝓽𝓾𝓭𝓲𝓸 Home</h1>',
+                            '<h1 class="page-header">𝓢𝓽𝓾𝓭𝓲𝓸 Home</h1>',
                             status_code=200,
                             html=True)
 
@@ -224,7 +224,7 @@ class InternationalizationTest(ModuleStoreTestCase):
         )
 
         self.assertContains(resp,
-                            u'<h1 class="page-header">𝓢𝓽𝓾𝓭𝓲𝓸 Home</h1>',
+                            '<h1 class="page-header">𝓢𝓽𝓾𝓭𝓲𝓸 Home</h1>',
                             status_code=200,
                             html=True)
 
@@ -249,9 +249,9 @@ class InternationalizationTest(ModuleStoreTestCase):
         )
 
         TEST_STRING = (
-            u'<h1 class="title-1">'
-            u'My \xc7\xf6\xfcrs\xe9s L#'
-            u'</h1>'
+            '<h1 class="title-1">'
+            'My \xc7\xf6\xfcrs\xe9s L#'
+            '</h1>'
         )
 
         self.assertContains(resp,

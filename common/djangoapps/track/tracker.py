@@ -41,7 +41,7 @@ def _initialize_backends_from_django_settings():
 
     config = getattr(settings, 'TRACKING_BACKENDS', {})
 
-    for name, values in config.iteritems():
+    for name, values in config.items():
         # Ignore empty values to turn-off default tracker backends
         if values:
             engine = values['ENGINE']
@@ -86,7 +86,7 @@ def send(event):
 
     """
 
-    for name, backend in backends.iteritems():
+    for name, backend in backends.items():
         backend.send(event)
 
 

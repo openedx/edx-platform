@@ -19,7 +19,7 @@ from courseware.tabs import get_course_tab_list
 from courseware.tests.factories import InstructorFactory
 from django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
 from django_comment_client.tests.factories import RoleFactory
-from django_comment_client.tests.unicode import UnicodeTestMixin
+from django_comment_client.tests.str import UnicodeTestMixin
 from django_comment_client.tests.utils import config_course_discussions, topic_name_to_id
 from django_comment_common.models import (
     CourseDiscussionSettings,
@@ -96,7 +96,7 @@ class AccessUtilsTestCase(ModuleStoreTestCase):
 
     def test_get_role_ids(self):
         ret = utils.get_role_ids(self.course_id)
-        expected = {u'Moderator': [3], u'Community TA': [4, 5]}
+        expected = {'Moderator': [3], 'Community TA': [4, 5]}
         self.assertEqual(ret, expected)
 
     def test_has_discussion_privileges(self):
@@ -687,7 +687,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
     def test_start_date_filter(self):
         now = datetime.datetime.now()
         self.create_discussion("Chapter 1", "Discussion 1", start=now)
-        self.create_discussion("Chapter 1", u"Discussion 2 обсуждение", start=self.later)
+        self.create_discussion("Chapter 1", "Discussion 2 обсуждение", start=self.later)
         self.create_discussion("Chapter 2", "Discussion", start=now)
         self.create_discussion("Chapter 2 / Section 1 / Subsection 1", "Discussion", start=self.later)
         self.create_discussion("Chapter 2 / Section 1 / Subsection 2", "Discussion", start=self.later)

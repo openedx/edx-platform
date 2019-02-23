@@ -9,7 +9,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
 
-from course_updates import get_ordered_updates
+from .course_updates import get_ordered_updates
 from courseware.courses import get_course_with_access
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.user_api.course_tag.api import set_course_tag, get_course_tag
@@ -34,7 +34,7 @@ class WelcomeMessageFragmentView(EdxFragmentView):
             return None
 
         dismiss_url = reverse(
-            'openedx.course_experience.dismiss_welcome_message', kwargs={'course_id': unicode(course_key)}
+            'openedx.course_experience.dismiss_welcome_message', kwargs={'course_id': str(course_key)}
         )
 
         context = {

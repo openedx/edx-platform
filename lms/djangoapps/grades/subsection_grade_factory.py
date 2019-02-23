@@ -35,7 +35,7 @@ class SubsectionGradeFactory(object):
         If read_only is True, doesn't save any updates to the grades.
         """
         self._log_event(
-            log.debug, u"create, read_only: {0}, subsection: {1}".format(read_only, subsection.location), subsection,
+            log.debug, "create, read_only: {0}, subsection: {1}".format(read_only, subsection.location), subsection,
         )
 
         subsection_grade = self._get_bulk_cached_grade(subsection)
@@ -59,7 +59,7 @@ class SubsectionGradeFactory(object):
         Bulk creates all the unsaved subsection_grades to this point.
         """
         CreateSubsectionGrade.bulk_create_models(
-            self.student, self._unsaved_subsection_grades.values(), self.course_data.course_key
+            self.student, list(self._unsaved_subsection_grades.values()), self.course_data.course_key
         )
         self._unsaved_subsection_grades.clear()
 
@@ -67,7 +67,7 @@ class SubsectionGradeFactory(object):
         """
         Updates the SubsectionGrade object for the student and subsection.
         """
-        self._log_event(log.debug, u"update, subsection: {}".format(subsection.location), subsection)
+        self._log_event(log.debug, "update, subsection: {}".format(subsection.location), subsection)
 
         calculated_grade = CreateSubsectionGrade(
             subsection, self.course_data.structure, self._submissions_scores, self._csm_scores,
@@ -154,7 +154,7 @@ class SubsectionGradeFactory(object):
         """
         Logs the given statement, for this instance.
         """
-        log_func(u"Grades: SGF.{}, course: {}, version: {}, edit: {}, user: {}".format(
+        log_func("Grades: SGF.{}, course: {}, version: {}, edit: {}, user: {}".format(
             log_statement,
             self.course_data.course_key,
             getattr(subsection, 'course_version', None),

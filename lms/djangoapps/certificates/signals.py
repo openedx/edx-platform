@@ -39,7 +39,7 @@ def _update_cert_settings_on_pacing_change(sender, updated_course_overview, **kw
         updated_course_overview.id,
         updated_course_overview.self_paced,
     )
-    log.info(u'Certificate Generation Setting Toggled for {course_id} via pacing change'.format(
+    log.info('Certificate Generation Setting Toggled for {course_id} via pacing change'.format(
         course_id=updated_course_overview.id
     ))
 
@@ -51,7 +51,7 @@ def _listen_for_certificate_whitelist_append(sender, instance, **kwargs):  # pyl
         return
 
     fire_ungenerated_certificate_task(instance.user, instance.course_id)
-    log.info(u'Certificate generation task initiated for {user} : {course} via whitelist'.format(
+    log.info('Certificate generation task initiated for {user} : {course} via whitelist'.format(
         user=instance.user.id,
         course=instance.course_id
     ))
@@ -68,7 +68,7 @@ def _listen_for_passing_grade(sender, user, course_id, **kwargs):  # pylint: dis
         return
 
     if fire_ungenerated_certificate_task(user, course_id):
-        log.info(u'Certificate generation task initiated for {user} : {course} via passing grade'.format(
+        log.info('Certificate generation task initiated for {user} : {course} via passing grade'.format(
             user=user.id,
             course=course_id
         ))
@@ -85,7 +85,7 @@ def _listen_for_failing_grade(sender, user, course_id, grade, **kwargs):  # pyli
     if cert is not None:
         if CertificateStatuses.is_passing_status(cert.status):
             cert.mark_notpassing(grade)
-            log.info(u'Certificate marked not passing for {user} : {course} via failing grade'.format(
+            log.info('Certificate marked not passing for {user} : {course} via failing grade'.format(
                 user=user.id,
                 course=course_id
             ))
@@ -108,8 +108,8 @@ def _listen_for_id_verification_status_changed(sender, user, **kwargs):  # pylin
         if grade_factory.read(user=user, course=enrollment.course_overview).passed:
             if fire_ungenerated_certificate_task(user, enrollment.course_id, expected_verification_status):
                 message = (
-                    u'Certificate generation task initiated for {user} : {course} via track change ' +
-                    u'with verification status of {status}'
+                    'Certificate generation task initiated for {user} : {course} via track change ' +
+                    'with verification status of {status}'
                 )
                 log.info(message.format(
                     user=user.id,
@@ -155,10 +155,10 @@ def fire_ungenerated_certificate_task(user, course_key, expected_verification_st
 
     if generate_learner_certificate:
         kwargs = {
-            'student': unicode(user.id),
-            'course_key': unicode(course_key)
+            'student': str(user.id),
+            'course_key': str(course_key)
         }
         if expected_verification_status:
-            kwargs['expected_verification_status'] = unicode(expected_verification_status)
+            kwargs['expected_verification_status'] = str(expected_verification_status)
         generate_certificate.apply_async(countdown=CERTIFICATE_DELAY_SECONDS, kwargs=kwargs)
         return True

@@ -5,7 +5,7 @@ Tests for Shibboleth Authentication
 """
 import unittest
 from importlib import import_module
-from urllib import urlencode
+from urllib.parse import urlencode
 
 from ddt import ddt, data
 from django.conf import settings
@@ -108,9 +108,9 @@ class ShibSPTest(CacheIsolationTestCase):
         """Asserts that shibboleth login attempt is being logged"""
         remote_user = _flatten_to_ascii(remote_user)  # django usernames have to be ascii
         method_name, args, _kwargs = audit_log_call
-        self.assertEquals(method_name, 'info')
-        self.assertEquals(len(args), 1)
-        self.assertIn(u'logged in via Shibboleth', args[0])
+        self.assertEqual(method_name, 'info')
+        self.assertEqual(len(args), 1)
+        self.assertIn('logged in via Shibboleth', args[0])
         self.assertIn(remote_user, args[0])
 
     @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
@@ -169,51 +169,51 @@ class ShibSPTest(CacheIsolationTestCase):
 
                 if idp == "https://idp.stanford.edu/" and remote_user == 'withmap@stanford.edu':
                     self.assertRedirects(response, '/dashboard')
-                    self.assertEquals(int(self.client.session['_auth_user_id']), user_w_map.id)
+                    self.assertEqual(int(self.client.session['_auth_user_id']), user_w_map.id)
                     # verify logging:
-                    self.assertEquals(len(audit_log_calls), 2)
+                    self.assertEqual(len(audit_log_calls), 2)
                     self._assert_shib_login_is_logged(audit_log_calls[0], remote_user)
                     method_name, args, _kwargs = audit_log_calls[1]
-                    self.assertEquals(method_name, 'info')
-                    self.assertEquals(len(args), 1)
-                    self.assertIn(u'Login success', args[0])
+                    self.assertEqual(method_name, 'info')
+                    self.assertEqual(len(args), 1)
+                    self.assertIn('Login success', args[0])
                     self.assertIn(remote_user, args[0])
                 elif idp == "https://idp.stanford.edu/" and remote_user == 'inactive@stanford.edu':
                     self.assertEqual(response.status_code, 403)
                     self.assertIn("Account not yet activated: please look for link in your email", response.content)
                     # verify logging:
-                    self.assertEquals(len(audit_log_calls), 2)
+                    self.assertEqual(len(audit_log_calls), 2)
                     self._assert_shib_login_is_logged(audit_log_calls[0], remote_user)
                     method_name, args, _kwargs = audit_log_calls[1]
-                    self.assertEquals(method_name, 'warning')
-                    self.assertEquals(len(args), 1)
-                    self.assertIn(u'is not active after external login', args[0])
+                    self.assertEqual(method_name, 'warning')
+                    self.assertEqual(len(args), 1)
+                    self.assertIn('is not active after external login', args[0])
                     # self.assertEquals(remote_user, args[1])
                 elif idp == "https://idp.stanford.edu/" and remote_user == 'womap@stanford.edu':
                     self.assertIsNotNone(ExternalAuthMap.objects.get(user=user_wo_map))
                     self.assertRedirects(response, '/dashboard')
-                    self.assertEquals(int(self.client.session['_auth_user_id']), user_wo_map.id)
+                    self.assertEqual(int(self.client.session['_auth_user_id']), user_wo_map.id)
                     # verify logging:
-                    self.assertEquals(len(audit_log_calls), 2)
+                    self.assertEqual(len(audit_log_calls), 2)
                     self._assert_shib_login_is_logged(audit_log_calls[0], remote_user)
                     method_name, args, _kwargs = audit_log_calls[1]
-                    self.assertEquals(method_name, 'info')
-                    self.assertEquals(len(args), 1)
-                    self.assertIn(u'Login success', args[0])
+                    self.assertEqual(method_name, 'info')
+                    self.assertEqual(len(args), 1)
+                    self.assertIn('Login success', args[0])
                     self.assertIn(remote_user, args[0])
                 elif idp == "https://someother.idp.com/" and remote_user in \
                             ['withmap@stanford.edu', 'womap@stanford.edu', 'inactive@stanford.edu']:
                     self.assertEqual(response.status_code, 403)
                     self.assertIn("You have already created an account using an external login", response.content)
                     # no audit logging calls
-                    self.assertEquals(len(audit_log_calls), 0)
+                    self.assertEqual(len(audit_log_calls), 0)
                 else:
                     self.assertEqual(response.status_code, 200)
                     self.assertContains(response,
-                                        (u"Preferences for {platform_name}"
+                                        ("Preferences for {platform_name}"
                                          .format(platform_name=settings.PLATFORM_NAME)))
                     # no audit logging calls
-                    self.assertEquals(len(audit_log_calls), 0)
+                    self.assertEqual(len(audit_log_calls), 0)
 
     def _test_auto_activate_user_with_flag(self, log_user_string="inactive@stanford.edu"):
         """
@@ -222,7 +222,7 @@ class ShibSPTest(CacheIsolationTestCase):
         """
         inactive_user = UserFactory.create(email='inactive@stanford.edu')
         if not log_user_string:
-            log_user_string = u"user.id: {}".format(inactive_user.id)
+            log_user_string = "user.id: {}".format(inactive_user.id)
         inactive_user.is_active = False
         inactive_user.save()
         request = self.request_factory.get('/shib-login')
@@ -245,12 +245,12 @@ class ShibSPTest(CacheIsolationTestCase):
         self.assertEqual(request.user, inactive_user)
         self.assertEqual(response['Location'], '/dashboard')
         # verify logging:
-        self.assertEquals(len(audit_log_calls), 3)
+        self.assertEqual(len(audit_log_calls), 3)
         self._assert_shib_login_is_logged(audit_log_calls[0], log_user_string)
         method_name, args, _kwargs = audit_log_calls[2]
-        self.assertEquals(method_name, 'info')
-        self.assertEquals(len(args), 1)
-        self.assertIn(u'Login success', args[0])
+        self.assertEqual(method_name, 'info')
+        self.assertEqual(len(args), 1)
+        self.assertIn('Login success', args[0])
         self.assertIn(log_user_string, args[0])
 
     @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
@@ -281,7 +281,7 @@ class ShibSPTest(CacheIsolationTestCase):
         # identity k/v pairs will show up in request.META
         response = client.get(path='/shib-login/', data={}, follow=False, **identity)
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         mail_input_html = '<input class="" id="email" type="email" name="email"'
         if not identity.get('mail'):
             self.assertContains(response, mail_input_html)
@@ -310,12 +310,12 @@ class ShibSPTest(CacheIsolationTestCase):
         self.client.get(path='/shib-login/', data={}, follow=False, **identity)
         # Then we have the user answer the registration form
         # These are unicode because request.POST returns unicode
-        postvars = {'email': u'post_email@stanford.edu',
-                    'username': u'post_username',  # django usernames can't be unicode
-                    'password': u'post_pássword',
-                    'name': u'post_náme',
-                    'terms_of_service': u'true',
-                    'honor_code': u'true'}
+        postvars = {'email': 'post_email@stanford.edu',
+                    'username': 'post_username',  # django usernames can't be unicode
+                    'password': 'post_pássword',
+                    'name': 'post_náme',
+                    'terms_of_service': 'true',
+                    'honor_code': 'true'}
 
         with patch('openedx.core.djangoapps.user_authn.views.register.AUDIT_LOG') as mock_audit_log:
             self.client.post('/create_account', data=postvars)
@@ -324,25 +324,25 @@ class ShibSPTest(CacheIsolationTestCase):
 
         # verify logging of login happening during account creation:
         audit_log_calls = mock_audit_log.method_calls
-        self.assertEquals(len(audit_log_calls), 3)
+        self.assertEqual(len(audit_log_calls), 3)
         method_name, args, _kwargs = audit_log_calls[0]
-        self.assertEquals(method_name, 'info')
-        self.assertEquals(len(args), 2)
-        self.assertIn(u'User registered with external_auth', args[0])
-        self.assertEquals(u'post_username', args[1])
+        self.assertEqual(method_name, 'info')
+        self.assertEqual(len(args), 2)
+        self.assertIn('User registered with external_auth', args[0])
+        self.assertEqual('post_username', args[1])
 
         method_name, args, _kwargs = audit_log_calls[1]
-        self.assertEquals(method_name, 'info')
-        self.assertEquals(len(args), 3)
-        self.assertIn(u'Updated ExternalAuthMap for ', args[0])
-        self.assertEquals(u'post_username', args[1])
-        self.assertEquals(u'test_user@stanford.edu', args[2].external_id)
+        self.assertEqual(method_name, 'info')
+        self.assertEqual(len(args), 3)
+        self.assertIn('Updated ExternalAuthMap for ', args[0])
+        self.assertEqual('post_username', args[1])
+        self.assertEqual('test_user@stanford.edu', args[2].external_id)
 
         method_name, args, _kwargs = audit_log_calls[2]
-        self.assertEquals(method_name, 'info')
-        self.assertEquals(len(args), 1)
-        self.assertIn(u'Login success on new account creation', args[0])
-        self.assertIn(u'post_username', args[0])
+        self.assertEqual(method_name, 'info')
+        self.assertEqual(len(args), 1)
+        self.assertIn('Login success on new account creation', args[0])
+        self.assertIn('post_username', args[0])
 
         user = User.objects.get(id=self.client.session['_auth_user_id'])
 
@@ -366,7 +366,7 @@ class ShibSPTest(CacheIsolationTestCase):
                 self.assertEqual(profile.name, postvars['name'])
             else:
                 self.assertEqual(profile.name, external_name.strip())
-                self.assertNotIn(u';', profile.name)
+                self.assertNotIn(';', profile.name)
         else:
             self.assertEqual(profile.name, self.client.session['ExternalAuthMap'].external_name)
             self.assertEqual(profile.name, identity.get('displayName').decode('utf-8'))
@@ -585,16 +585,16 @@ class ShibUtilFnTest(TestCase):
     Tests util functions in shib module
     """
     def test__flatten_to_ascii(self):
-        DIACRITIC = u"àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸåÅçÇ"  # pylint: disable=invalid-name
+        DIACRITIC = "àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸåÅçÇ"  # pylint: disable=invalid-name
         STR_DIACRI = "àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸåÅçÇ"  # pylint: disable=invalid-name
-        FLATTENED = u"aeiouAEIOUaeiouyAEIOUYaeiouAEIOUanoANOaeiouyAEIOUYaAcC"  # pylint: disable=invalid-name
+        FLATTENED = "aeiouAEIOUaeiouyAEIOUYaeiouAEIOUanoANOaeiouyAEIOUYaAcC"  # pylint: disable=invalid-name
         self.assertEqual(_flatten_to_ascii('jasön'), 'jason')  # umlaut
         self.assertEqual(_flatten_to_ascii('Jason包'), 'Jason')  # mandarin, so it just gets dropped
         self.assertEqual(_flatten_to_ascii('abc'), 'abc')  # pass through
 
         unicode_test = _flatten_to_ascii(DIACRITIC)
         self.assertEqual(unicode_test, FLATTENED)
-        self.assertIsInstance(unicode_test, unicode)
+        self.assertIsInstance(unicode_test, str)
 
         str_test = _flatten_to_ascii(STR_DIACRI)
         self.assertEqual(str_test, FLATTENED)

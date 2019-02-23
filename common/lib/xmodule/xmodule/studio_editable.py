@@ -27,7 +27,7 @@ class StudioEditableBlock(object):
             fragment.add_fragment_resources(rendered_child)
 
             contents.append({
-                'id': unicode(child.location),
+                'id': str(child.location),
                 'content': rendered_child.content
             })
 

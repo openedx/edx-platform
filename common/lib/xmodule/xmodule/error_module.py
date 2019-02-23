@@ -78,7 +78,7 @@ class ErrorDescriptor(ErrorFields, XModuleDescriptor):
     resources_dir = None
 
     def get_html(self):
-        return u''
+        return ''
 
     @classmethod
     def _construct(cls, system, contents, error_msg, location, for_parent=None):
@@ -111,7 +111,7 @@ class ErrorDescriptor(ErrorFields, XModuleDescriptor):
 
         # real metadata stays in the content, but add a display name
         field_data = DictFieldData({
-            'error_msg': unicode(error_msg),
+            'error_msg': str(error_msg),
             'contents': contents,
             'location': location,
             'category': 'error'

@@ -64,7 +64,7 @@ def course_group_check(user, course_key):
     from lms.djangoapps.certificates.models import CertificateStatuses
     config = CourseEventBadgesConfiguration.current().course_group_settings
     awards = []
-    for slug, keys in config.items():
+    for slug, keys in list(config.items()):
         if course_key in keys:
             certs = user.generatedcertificate_set.filter(
                 status__in=CertificateStatuses.PASSED_STATUSES,

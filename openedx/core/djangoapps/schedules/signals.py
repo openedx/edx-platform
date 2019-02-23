@@ -39,7 +39,7 @@ def create_schedule(sender, **kwargs):  # pylint: disable=unused-argument
         if schedule_details:
             log.debug(
                 'Schedules: created a new schedule starting at ' +
-                u'%s with an upgrade deadline of %s and experience type: %s',
+                '%s with an upgrade deadline of %s and experience type: %s',
                 schedule_details['content_availability_date'],
                 schedule_details['upgrade_deadline'],
                 ScheduleExperience.EXPERIENCES[schedule_details['experience_type']]
@@ -47,7 +47,7 @@ def create_schedule(sender, **kwargs):  # pylint: disable=unused-argument
     except Exception:  # pylint: disable=broad-except
         # We do not want to block the creation of a CourseEnrollment because of an error in creating a Schedule.
         # No Schedule is acceptable, but no CourseEnrollment is not.
-        log.exception(u'Encountered error in creating a Schedule for CourseEnrollment for user {} in course {}'.format(
+        log.exception('Encountered error in creating a Schedule for CourseEnrollment for user {} in course {}'.format(
             enrollment.user.id if (enrollment and enrollment.user) else None,
             enrollment.course_id if enrollment else None
         ))
@@ -64,7 +64,7 @@ def update_schedules_on_course_start_changed(sender, updated_course_overview, pr
     )
     update_course_schedules.apply_async(
         kwargs=dict(
-            course_id=unicode(updated_course_overview.id),
+            course_id=str(updated_course_overview.id),
             new_start_date_str=date.serialize(updated_course_overview.start),
             new_upgrade_deadline_str=date.serialize(upgrade_deadline),
         ),
@@ -140,7 +140,7 @@ def _should_randomly_suppress_schedule_creation(
             user_id=enrollment.user.id,
             event_name='edx.bi.schedule.suppressed',
             properties={
-                'course_id': unicode(enrollment.course_id),
+                'course_id': str(enrollment.course_id),
                 'experience_type': experience_type,
                 'upgrade_deadline': upgrade_deadline_str,
                 'content_availability_date': content_availability_date.isoformat(),

@@ -6,8 +6,8 @@ import itertools
 import json
 import unittest
 from datetime import datetime, timedelta
-from HTMLParser import HTMLParser
-from urllib import quote, urlencode
+from html.parser import HTMLParser
+from urllib.parse import quote, urlencode
 from uuid import uuid4
 from crum import set_current_request
 from markupsafe import escape
@@ -108,7 +108,7 @@ class TestJumpTo(ModuleStoreTestCase):
         location = self.course_key.make_usage_key(None, 'NoSuchPlace')
         # This is fragile, but unfortunately the problem is that within the LMS we
         # can't use the reverse calls from the CMS
-        jumpto_url = '{0}/{1}/jump_to/{2}'.format('/courses', unicode(self.course_key), unicode(location))
+        jumpto_url = '{0}/{1}/jump_to/{2}'.format('/courses', str(self.course_key), str(location))
         response = self.client.get(jumpto_url)
         self.assertEqual(response.status_code, 404)
 
@@ -117,15 +117,15 @@ class TestJumpTo(ModuleStoreTestCase):
         chapter = ItemFactory.create(category='chapter', parent_location=course.location)
         section = ItemFactory.create(category='sequential', parent_location=chapter.location)
         expected = '/courses/{course_id}/courseware/{chapter_id}/{section_id}/?{activate_block_id}'.format(
-            course_id=unicode(course.id),
+            course_id=str(course.id),
             chapter_id=chapter.url_name,
             section_id=section.url_name,
-            activate_block_id=urlencode({'activate_block_id': unicode(section.location)})
+            activate_block_id=urlencode({'activate_block_id': str(section.location)})
         )
         jumpto_url = '{0}/{1}/jump_to/{2}'.format(
             '/courses',
-            unicode(course.id),
-            unicode(section.location),
+            str(course.id),
+            str(section.location),
         )
         response = self.client.get(jumpto_url)
         self.assertRedirects(response, expected, status_code=302, target_status_code=302)
@@ -140,29 +140,29 @@ class TestJumpTo(ModuleStoreTestCase):
         module2 = ItemFactory.create(category='html', parent_location=vertical2.location)
 
         expected = '/courses/{course_id}/courseware/{chapter_id}/{section_id}/1?{activate_block_id}'.format(
-            course_id=unicode(course.id),
+            course_id=str(course.id),
             chapter_id=chapter.url_name,
             section_id=section.url_name,
-            activate_block_id=urlencode({'activate_block_id': unicode(module1.location)})
+            activate_block_id=urlencode({'activate_block_id': str(module1.location)})
         )
         jumpto_url = '{0}/{1}/jump_to/{2}'.format(
             '/courses',
-            unicode(course.id),
-            unicode(module1.location),
+            str(course.id),
+            str(module1.location),
         )
         response = self.client.get(jumpto_url)
         self.assertRedirects(response, expected, status_code=302, target_status_code=302)
 
         expected = '/courses/{course_id}/courseware/{chapter_id}/{section_id}/2?{activate_block_id}'.format(
-            course_id=unicode(course.id),
+            course_id=str(course.id),
             chapter_id=chapter.url_name,
             section_id=section.url_name,
-            activate_block_id=urlencode({'activate_block_id': unicode(module2.location)})
+            activate_block_id=urlencode({'activate_block_id': str(module2.location)})
         )
         jumpto_url = '{0}/{1}/jump_to/{2}'.format(
             '/courses',
-            unicode(course.id),
-            unicode(module2.location),
+            str(course.id),
+            str(module2.location),
         )
         response = self.client.get(jumpto_url)
         self.assertRedirects(response, expected, status_code=302, target_status_code=302)
@@ -182,15 +182,15 @@ class TestJumpTo(ModuleStoreTestCase):
         # internal position of module2 will be 1_2 (2nd item withing 1st item)
 
         expected = '/courses/{course_id}/courseware/{chapter_id}/{section_id}/1?{activate_block_id}'.format(
-            course_id=unicode(course.id),
+            course_id=str(course.id),
             chapter_id=chapter.url_name,
             section_id=section.url_name,
-            activate_block_id=urlencode({'activate_block_id': unicode(module2.location)})
+            activate_block_id=urlencode({'activate_block_id': str(module2.location)})
         )
         jumpto_url = '{0}/{1}/jump_to/{2}'.format(
             '/courses',
-            unicode(course.id),
-            unicode(module2.location),
+            str(course.id),
+            str(module2.location),
         )
         response = self.client.get(jumpto_url)
         self.assertRedirects(response, expected, status_code=302, target_status_code=302)
@@ -198,7 +198,7 @@ class TestJumpTo(ModuleStoreTestCase):
     def test_jumpto_id_invalid_location(self):
         location = BlockUsageLocator(CourseLocator('edX', 'toy', 'NoSuchPlace', deprecated=True),
                                      None, None, deprecated=True)
-        jumpto_url = '{0}/{1}/jump_to_id/{2}'.format('/courses', unicode(self.course_key), unicode(location))
+        jumpto_url = '{0}/{1}/jump_to_id/{2}'.format('/courses', str(self.course_key), str(location))
         response = self.client.get(jumpto_url)
         self.assertEqual(response.status_code, 404)
 
@@ -237,9 +237,9 @@ class IndexQueryTestCase(ModuleStoreTestCase):
                 url = reverse(
                     'courseware_section',
                     kwargs={
-                        'course_id': unicode(course.id),
-                        'chapter': unicode(chapter.location.block_id),
-                        'section': unicode(section.location.block_id),
+                        'course_id': str(course.id),
+                        'chapter': str(chapter.location.block_id),
+                        'section': str(section.location.block_id),
                     }
                 )
                 response = self.client.get(url)
@@ -259,7 +259,7 @@ class ViewsTestCase(ModuleStoreTestCase):
 
     def setUp(self):
         super(ViewsTestCase, self).setUp()
-        self.course = CourseFactory.create(display_name=u'teꜱᴛ course', run="Testing_course")
+        self.course = CourseFactory.create(display_name='teꜱᴛ course', run="Testing_course")
         with self.store.bulk_operations(self.course.id):
             self.chapter = ItemFactory.create(
                 category='chapter',
@@ -310,7 +310,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         chapter = 'Overview'
         self.chapter_url = '%s/%s/%s' % ('/courses', self.course_key, chapter)
 
-        self.org = u"ꜱᴛᴀʀᴋ ɪɴᴅᴜꜱᴛʀɪᴇꜱ"
+        self.org = "ꜱᴛᴀʀᴋ ɪɴᴅᴜꜱᴛʀɪᴇꜱ"
         self.org_html = "<p>'+Stark/Industries+'</p>"
 
         self.assertTrue(self.client.login(username=self.user.username, password=TEST_PASSWORD))
@@ -320,15 +320,15 @@ class ViewsTestCase(ModuleStoreTestCase):
 
     def test_index_success(self):
         response = self._verify_index_response()
-        self.assertIn(unicode(self.problem2.location), response.content.decode("utf-8"))
+        self.assertIn(str(self.problem2.location), response.content.decode("utf-8"))
 
         # re-access to the main course page redirects to last accessed view.
-        url = reverse('courseware', kwargs={'course_id': unicode(self.course_key)})
+        url = reverse('courseware', kwargs={'course_id': str(self.course_key)})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 302)
         response = self.client.get(response.url)
-        self.assertNotIn(unicode(self.problem.location), response.content.decode("utf-8"))
-        self.assertIn(unicode(self.problem2.location), response.content.decode("utf-8"))
+        self.assertNotIn(str(self.problem.location), response.content.decode("utf-8"))
+        self.assertIn(str(self.problem2.location), response.content.decode("utf-8"))
 
     def test_index_nonexistent_chapter(self):
         self._verify_index_response(expected_response_code=404, chapter_name='non-existent')
@@ -356,9 +356,9 @@ class ViewsTestCase(ModuleStoreTestCase):
         url = reverse(
             'courseware_section',
             kwargs={
-                'course_id': unicode(self.course_key),
-                'chapter': unicode(self.chapter.location.block_id) if chapter_name is None else chapter_name,
-                'section': unicode(self.section2.location.block_id) if section_name is None else section_name,
+                'course_id': str(self.course_key),
+                'chapter': str(self.chapter.location.block_id) if chapter_name is None else chapter_name,
+                'section': str(self.section2.location.block_id) if section_name is None else section_name,
             }
         )
         response = self.client.get(url)
@@ -377,7 +377,7 @@ class ViewsTestCase(ModuleStoreTestCase):
 
         url = reverse(
             'courseware_chapter',
-            kwargs={'course_id': unicode(self.course.id), 'chapter': unicode(self.chapter.location.block_id)},
+            kwargs={'course_id': str(self.course.id), 'chapter': str(self.chapter.location.block_id)},
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -399,14 +399,14 @@ class ViewsTestCase(ModuleStoreTestCase):
         courseware_url = reverse(
             'courseware_section',
             kwargs={
-                'course_id': unicode(self.course_key),
-                'chapter': unicode(self.chapter.location.block_id),
-                'section': unicode(self.section.location.block_id),
+                'course_id': str(self.course_key),
+                'chapter': str(self.chapter.location.block_id),
+                'section': str(self.section.location.block_id),
             }
         )
         # create the url for enroll_staff view
         enroll_url = "{enroll_url}?next={courseware_url}".format(
-            enroll_url=reverse('enroll_staff', kwargs={'course_id': unicode(self.course.id)}),
+            enroll_url=reverse('enroll_staff', kwargs={'course_id': str(self.course.id)}),
             courseware_url=courseware_url
         )
         return courseware_url, enroll_url
@@ -430,7 +430,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         if enrollment:
             self.assertRedirects(response, courseware_url)
         else:
-            self.assertRedirects(response, '/courses/{}/about'.format(unicode(self.course_key)))
+            self.assertRedirects(response, '/courses/{}/about'.format(str(self.course_key)))
 
     def test_enroll_staff_with_invalid_data(self):
         """
@@ -441,7 +441,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         __, enroll_url = self._create_url_for_enroll_staff()
         response = self.client.post(enroll_url, data={'test': "test"})
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, '/courses/{}/about'.format(unicode(self.course_key)))
+        self.assertRedirects(response, '/courses/{}/about'.format(str(self.course_key)))
 
     @unittest.skipUnless(settings.FEATURES.get('ENABLE_SHOPPING_CART'), "Shopping Cart not enabled in settings")
     @patch.dict(settings.FEATURES, {'ENABLE_PAID_COURSE_REGISTRATION': True})
@@ -451,20 +451,20 @@ class ViewsTestCase(ModuleStoreTestCase):
         course = CourseFactory.create(org="new", number="unenrolled", display_name="course")
 
         self.client.logout()
-        response = self.client.get(reverse('about_course', args=[unicode(course.id)]))
+        response = self.client.get(reverse('about_course', args=[str(course.id)]))
         self.assertEqual(response.status_code, 200)
         self.assertNotIn(in_cart_span, response.content)
 
         # authenticated user with nothing in cart
         self.assertTrue(self.client.login(username=self.user.username, password=TEST_PASSWORD))
-        response = self.client.get(reverse('about_course', args=[unicode(course.id)]))
+        response = self.client.get(reverse('about_course', args=[str(course.id)]))
         self.assertEqual(response.status_code, 200)
         self.assertNotIn(in_cart_span, response.content)
 
         # now add the course to the cart
         cart = shoppingcart.models.Order.get_cart_for_user(self.user)
         shoppingcart.models.PaidCourseRegistration.add_to_order(cart, course.id)
-        response = self.client.get(reverse('about_course', args=[unicode(course.id)]))
+        response = self.client.get(reverse('about_course', args=[str(course.id)]))
         self.assertEqual(response.status_code, 200)
         self.assertIn(in_cart_span, response.content)
 
@@ -490,13 +490,13 @@ class ViewsTestCase(ModuleStoreTestCase):
         # Construct the link according the following scenarios and verify its presence in the response:
         #      (1) shopping cart is enabled and the user is not logged in
         #      (2) shopping cart is enabled and the user is logged in
-        href = u'<a href="{uri_stem}?sku={sku}" class="add-to-cart">'.format(
+        href = '<a href="{uri_stem}?sku={sku}" class="add-to-cart">'.format(
             uri_stem=configuration.basket_checkout_page,
             sku=sku,
         )
 
         # Generate the course about page content
-        response = self.client.get(reverse('about_course', args=[unicode(course.id)]))
+        response = self.client.get(reverse('about_course', args=[str(course.id)]))
         self.assertEqual(response.status_code, 200)
         self.assertIn(href, response.content.decode(response.charset))
 
@@ -530,7 +530,7 @@ class ViewsTestCase(ModuleStoreTestCase):
     def test_get_redirect_url(self):
         # test the course location
         self.assertEqual(
-            u'/courses/{course_key}/courseware?{activate_block_id}'.format(
+            '/courses/{course_key}/courseware?{activate_block_id}'.format(
                 course_key=text_type(self.course_key),
                 activate_block_id=urlencode({'activate_block_id': text_type(self.course.location)})
             ),
@@ -538,7 +538,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         )
         # test a section location
         self.assertEqual(
-            u'/courses/{course_key}/courseware/Chapter_1/Sequential_1/?{activate_block_id}'.format(
+            '/courses/{course_key}/courseware/Chapter_1/Sequential_1/?{activate_block_id}'.format(
                 course_key=text_type(self.course_key),
                 activate_block_id=urlencode({'activate_block_id': text_type(self.section.location)})
             ),
@@ -556,7 +556,7 @@ class ViewsTestCase(ModuleStoreTestCase):
     def test_index_invalid_position(self):
         request_url = '/'.join([
             '/courses',
-            unicode(self.course.id),
+            str(self.course.id),
             'courseware',
             self.chapter.location.block_id,
             self.section.location.block_id,
@@ -569,7 +569,7 @@ class ViewsTestCase(ModuleStoreTestCase):
     def test_unicode_handling_in_url(self):
         url_parts = [
             '/courses',
-            unicode(self.course.id),
+            str(self.course.id),
             'courseware',
             self.chapter.location.block_id,
             self.section.location.block_id,
@@ -578,7 +578,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         self.assertTrue(self.client.login(username=self.user.username, password=TEST_PASSWORD))
         for idx, val in enumerate(url_parts):
             url_parts_copy = url_parts[:]
-            url_parts_copy[idx] = val + u'χ'
+            url_parts_copy[idx] = val + 'χ'
             request_url = '/'.join(url_parts_copy)
             response = self.client.get(request_url)
             self.assertEqual(response.status_code, 404)
@@ -587,7 +587,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         # TODO add a test for invalid location
         # TODO add a test for no data *
         response = self.client.get(reverse('jump_to', args=['foo/bar/baz', 'baz']))
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
     def verify_end_date(self, course_id, expected_end_text=None):
         """
@@ -597,7 +597,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         If `expected_end_text` is None, verifies that the about page *does not* contain the text
         "Classes End".
         """
-        result = self.client.get(reverse('about_course', args=[unicode(course_id)]))
+        result = self.client.get(reverse('about_course', args=[str(course_id)]))
         if expected_end_text is not None:
             self.assertContains(result, "Classes End")
             self.assertContains(result, expected_end_text)
@@ -611,9 +611,9 @@ class ViewsTestCase(ModuleStoreTestCase):
         self.assertTrue(self.client.login(username=admin.username, password='test'))
 
         url = reverse('submission_history', kwargs={
-            'course_id': unicode(self.course_key),
+            'course_id': str(self.course_key),
             'student_username': 'dummy',
-            'location': unicode(self.problem.location),
+            'location': str(self.problem.location),
         })
         response = self.client.get(url)
         # Tests that we do not get an "Invalid x" response when passing correct arguments to view
@@ -627,7 +627,7 @@ class ViewsTestCase(ModuleStoreTestCase):
 
         # try it with an existing user and a malicious location
         url = reverse('submission_history', kwargs={
-            'course_id': unicode(self.course_key),
+            'course_id': str(self.course_key),
             'student_username': 'dummy',
             'location': '<script>alert("hello");</script>'
         })
@@ -636,7 +636,7 @@ class ViewsTestCase(ModuleStoreTestCase):
 
         # try it with a malicious user and a non-existent location
         url = reverse('submission_history', kwargs={
-            'course_id': unicode(self.course_key),
+            'course_id': str(self.course_key),
             'student_username': '<script>alert("hello");</script>',
             'location': 'dummy'
         })
@@ -669,9 +669,9 @@ class ViewsTestCase(ModuleStoreTestCase):
         set_score(admin.id, usage_key, 3, 3)
 
         url = reverse('submission_history', kwargs={
-            'course_id': unicode(self.course_key),
+            'course_id': str(self.course_key),
             'student_username': admin.username,
-            'location': unicode(usage_key),
+            'location': str(usage_key),
         })
         response = self.client.get(url)
         response_content = HTMLParser().unescape(response.content.decode('utf-8'))
@@ -710,9 +710,9 @@ class ViewsTestCase(ModuleStoreTestCase):
                     state={'field_a': 'x', 'field_b': 'y'}
                 )
                 url = reverse('submission_history', kwargs={
-                    'course_id': unicode(course_key),
+                    'course_id': str(course_key),
                     'student_username': admin.username,
-                    'location': unicode(usage_key),
+                    'location': str(usage_key),
                 })
                 response = client.get(url)
                 response_content = HTMLParser().unescape(response.content)
@@ -836,7 +836,7 @@ class ViewsTestCase(ModuleStoreTestCase):
     @patch.object(views, '_record_feedback_in_zendesk')
     def test_submit_financial_assistance_request(self, mock_record_feedback):
         username = self.user.username
-        course = unicode(self.course_key)
+        course = str(self.course_key)
         legal_name = 'Jesse Pinkman'
         country = 'United States'
         income = '1234567890'
@@ -862,7 +862,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         mocked_kwargs = mock_record_feedback.call_args[1]
         group_name = mocked_kwargs['group_name']
         require_update = mocked_kwargs['require_update']
-        private_comment = '\n'.join(additional_info.values())
+        private_comment = '\n'.join(list(additional_info.values()))
         for info in (country, income, reason_for_applying, goals, effort, username, legal_name, course):
             self.assertIn(info, private_comment)
 
@@ -870,7 +870,7 @@ class ViewsTestCase(ModuleStoreTestCase):
 
         self.assertEqual(
             ticket_subject,
-            u'Financial assistance request for learner {username} in course {course}'.format(
+            'Financial assistance request for learner {username} in course {course}'.format(
                 username=username,
                 course=self.course.display_name
             )
@@ -884,7 +884,7 @@ class ViewsTestCase(ModuleStoreTestCase):
     def test_zendesk_submission_failed(self, _mock_record_feedback):
         response = self._submit_financial_assistance_form({
             'username': self.user.username,
-            'course': unicode(self.course.id),
+            'course': str(self.course.id),
             'name': '',
             'email': '',
             'country': '',
@@ -918,7 +918,7 @@ class ViewsTestCase(ModuleStoreTestCase):
 
     @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
     def test_bypass_course_info(self):
-        course_id = unicode(self.course_key)
+        course_id = str(self.course_key)
 
         self.assertFalse(self.course.bypass_home)
 
@@ -947,9 +947,9 @@ class ViewsTestCase(ModuleStoreTestCase):
         returning a render_to_string, so we will render via the courseware URL in order to include
         the needed context
         """
-        course_id = quote(unicode(self.course.id).encode("utf-8"))
+        course_id = quote(str(self.course.id).encode("utf-8"))
         response = self.client.get(
-            reverse('courseware', args=[unicode(course_id)]),
+            reverse('courseware', args=[str(course_id)]),
             follow=True
         )
         test_responses = [
@@ -973,7 +973,7 @@ class TestProgramMarketingView(SharedModuleStoreTestCase):
         super(TestProgramMarketingView, cls).setUpClass()
 
         modulestore_course = CourseFactory()
-        course_run = CourseRunFactory(key=unicode(modulestore_course.id))
+        course_run = CourseRunFactory(key=str(modulestore_course.id))
         course = CatalogCourseFactory(course_runs=[course_run])
 
         cls.data = ProgramFactory(
@@ -1068,14 +1068,14 @@ class BaseDueDateTests(ModuleStoreTestCase):
 
     def test_format_date(self):
         # due date with no time
-        course = self.set_up_course(due_date_display_format=u"%b %d %y")
+        course = self.set_up_course(due_date_display_format="%b %d %y")
         response = self.get_response(course)
         self.assertContains(response, self.time_with_tz)
 
     def test_format_invalid(self):
         # improperly formatted due_date_display_format falls through to default
         # (value of show_timezone does not matter-- setting to False to make that clear).
-        course = self.set_up_course(due_date_display_format=u"%%%", show_timezone=False)
+        course = self.set_up_course(due_date_display_format="%%%", show_timezone=False)
         response = self.get_response(course)
         self.assertNotContains(response, "%%%")
         self.assertContains(response, self.time_with_tz)
@@ -1089,7 +1089,7 @@ class TestProgressDueDate(BaseDueDateTests):
 
     def get_response(self, course):
         """ Returns the HTML for the progress page """
-        return self.client.get(reverse('progress', args=[unicode(course.id)]))
+        return self.client.get(reverse('progress', args=[str(course.id)]))
 
 
 # TODO: LEARNER-71: Delete entire TestAccordionDueDate class
@@ -1102,7 +1102,7 @@ class TestAccordionDueDate(BaseDueDateTests):
     def get_response(self, course):
         """ Returns the HTML for the accordion """
         return self.client.get(
-            reverse('courseware', args=[unicode(course.id)]),
+            reverse('courseware', args=[str(course.id)]),
             follow=True
         )
 
@@ -1156,7 +1156,7 @@ class StartDateTests(ModuleStoreTestCase):
         """
         Get the text of the /about page for the course.
         """
-        return self.client.get(reverse('about_course', args=[unicode(course_key)]))
+        return self.client.get(reverse('about_course', args=[str(course_key)]))
 
     @patch('util.date_utils.pgettext', fake_pgettext(translations={
         ("abbreviated month name", "Sep"): "SEPTEMBER",
@@ -1191,7 +1191,7 @@ class ProgressPageBaseTests(ModuleStoreTestCase):
         """Create the test course."""
         self.course = CourseFactory.create(
             start=datetime(2013, 9, 16, 7, 17, 28),
-            grade_cutoffs={u'çü†øƒƒ': 0.75, 'Pass': 0.5},
+            grade_cutoffs={'çü†øƒƒ': 0.75, 'Pass': 0.5},
             end=datetime.now(),
             certificate_available_date=datetime.now(UTC),
             **options
@@ -1212,7 +1212,7 @@ class ProgressPageBaseTests(ModuleStoreTestCase):
         Gets the progress page for the currently logged-in user.
         """
         resp = self.client.get(
-            reverse('progress', args=[unicode(self.course.id)])
+            reverse('progress', args=[str(self.course.id)])
         )
         self.assertEqual(resp.status_code, expected_status_code)
         return resp
@@ -1222,7 +1222,7 @@ class ProgressPageBaseTests(ModuleStoreTestCase):
         Gets the progress page for the user in the course.
         """
         resp = self.client.get(
-            reverse('student_progress', args=[unicode(self.course.id), self.user.id])
+            reverse('student_progress', args=[str(self.course.id), self.user.id])
         )
         self.assertEqual(resp.status_code, expected_status_code)
         return resp
@@ -1267,9 +1267,9 @@ class ProgressPageTests(ProgressPageBaseTests):
         for invalid_id in invalid_student_ids:
 
             resp = self.client.get(
-                reverse('student_progress', args=[unicode(self.course.id), invalid_id])
+                reverse('student_progress', args=[str(self.course.id), invalid_id])
             )
-            self.assertEquals(resp.status_code, 404)
+            self.assertEqual(resp.status_code, 404)
 
         # Assert that valid 'student_id' returns 200 status
         self._get_student_progress_page()
@@ -1380,9 +1380,9 @@ class ProgressPageTests(ProgressPageBaseTests):
 
                 resp = self._get_progress_page()
 
-                self.assertContains(resp, u"View Certificate")
+                self.assertContains(resp, "View Certificate")
 
-                self.assertContains(resp, u"earned a certificate for this course")
+                self.assertContains(resp, "earned a certificate for this course")
                 cert_url = certs_api.get_certificate_url(course_id=self.course.id, uuid=certificate.verify_uuid)
                 self.assertContains(resp, cert_url)
 
@@ -1391,8 +1391,8 @@ class ProgressPageTests(ProgressPageBaseTests):
                 self.store.update_item(self.course, self.user.id)
 
                 resp = self._get_progress_page()
-                self.assertNotContains(resp, u"View Your Certificate")
-                self.assertNotContains(resp, u"You can now view your certificate")
+                self.assertNotContains(resp, "View Your Certificate")
+                self.assertNotContains(resp, "You can now view your certificate")
                 self.assertContains(resp, "Your certificate is available")
                 self.assertContains(resp, "earned a certificate for this course.")
 
@@ -1429,7 +1429,7 @@ class ProgressPageTests(ProgressPageBaseTests):
                 course_grade.summary = {'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}}
 
                 resp = self._get_progress_page()
-                self.assertContains(resp, u"Download Your Certificate")
+                self.assertContains(resp, "Download Your Certificate")
 
     @ddt.data(
         (True, 56),
@@ -1547,7 +1547,7 @@ class ProgressPageTests(ProgressPageBaseTests):
                 }
 
                 resp = self._get_progress_page()
-                self.assertContains(resp, u"View Certificate")
+                self.assertContains(resp, "View Certificate")
                 self.assert_invalidate_certificate(generated_certificate)
 
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
@@ -1595,7 +1595,7 @@ class ProgressPageTests(ProgressPageBaseTests):
                 }
 
                 resp = self._get_progress_page()
-                self.assertContains(resp, u"View Certificate")
+                self.assertContains(resp, "View Certificate")
                 self.assert_invalidate_certificate(generated_certificate)
 
     @patch('lms.djangoapps.certificates.api.get_active_web_certificate', PropertyMock(return_value=True))
@@ -1619,7 +1619,7 @@ class ProgressPageTests(ProgressPageBaseTests):
                 course_grade.summary = {'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}}
 
                 resp = self._get_progress_page()
-                self.assertContains(resp, u'Download Your Certificate')
+                self.assertContains(resp, 'Download Your Certificate')
                 self.assert_invalidate_certificate(generated_certificate)
 
     @patch('courseware.views.views.is_course_passed', PropertyMock(return_value=True))
@@ -1641,7 +1641,7 @@ class ProgressPageTests(ProgressPageBaseTests):
 
             self.assertContains(
                 response,
-                u'You are enrolled in the audit track for this course. The audit track does not include a certificate.'
+                'You are enrolled in the audit track for this course. The audit track does not include a certificate.'
             )
 
     @ddt.data(
@@ -1726,7 +1726,7 @@ class ProgressPageTests(ProgressPageBaseTests):
 
             self.assertContains(
                 response,
-                u'You are enrolled in the honor track for this course. The honor track does not include a certificate.'
+                'You are enrolled in the honor track for this course. The honor track does not include a certificate.'
             )
 
     def test_invalidated_cert_data(self):
@@ -1824,11 +1824,11 @@ class ProgressPageTests(ProgressPageBaseTests):
         certificate.invalidate()
         resp = self._get_progress_page()
 
-        self.assertNotContains(resp, u'Request Certificate')
-        self.assertContains(resp, u'Your certificate has been invalidated')
-        self.assertContains(resp, u'Please contact your course team if you have any questions.')
-        self.assertNotContains(resp, u'View Your Certificate')
-        self.assertNotContains(resp, u'Download Your Certificate')
+        self.assertNotContains(resp, 'Request Certificate')
+        self.assertContains(resp, 'Your certificate has been invalidated')
+        self.assertContains(resp, 'Please contact your course team if you have any questions.')
+        self.assertNotContains(resp, 'View Your Certificate')
+        self.assertNotContains(resp, 'Download Your Certificate')
 
     def generate_certificate(self, url, mode):
         """ Dry method to generate certificate. """
@@ -2180,7 +2180,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
         )
         self.enrollment = CourseEnrollment.enroll(self.student, self.course.id, mode='honor')
         self.assertTrue(self.client.login(username=self.student, password=TEST_PASSWORD))
-        self.url = reverse('generate_user_cert', kwargs={'course_id': unicode(self.course.id)})
+        self.url = reverse('generate_user_cert', kwargs={'course_id': str(self.course.id)})
 
     def test_user_with_out_passing_grades(self):
         # If user has no grading then json will return failed message and badrequest code
@@ -2211,7 +2211,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
                 'edx.bi.user.certificate.generate',
                 {
                     'category': 'certificates',
-                    'label': unicode(self.course.id)
+                    'label': str(self.course.id)
                 },
             )
             mock_tracker.reset_mock()
@@ -2272,7 +2272,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
         self.client.logout()
         resp = self.client.post(self.url)
         self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
-        self.assertIn(u"You must be signed in to {platform_name} to create a certificate.".format(
+        self.assertIn("You must be signed in to {platform_name} to create a certificate.".format(
             platform_name=settings.PLATFORM_NAME
         ), resp.content.decode('utf-8'))
 
@@ -2290,7 +2290,7 @@ class ActivateIDCheckerBlock(XBlock):
         """
         result = Fragment()
         if 'activate_block_id' in context:
-            result.add_content(u"Activate Block ID: {block_id}</p>".format(block_id=context['activate_block_id']))
+            result.add_content("Activate Block ID: {block_id}</p>".format(block_id=context['activate_block_id']))
         return result
 
 
@@ -2307,12 +2307,12 @@ class ViewCheckerBlock(XBlock):
         A student_view that asserts that the ``state`` field for this block
         matches the block's usage_id.
         """
-        msg = u"{} != {}".format(self.state, self.scope_ids.usage_id)
-        assert self.state == unicode(self.scope_ids.usage_id), msg
+        msg = "{} != {}".format(self.state, self.scope_ids.usage_id)
+        assert self.state == str(self.scope_ids.usage_id), msg
         fragments = self.runtime.render_children(self)
         result = Fragment(
-            content=u"<p>ViewCheckerPassed: {}</p>\n{}".format(
-                unicode(self.scope_ids.usage_id),
+            content="<p>ViewCheckerPassed: {}</p>\n{}".format(
+                str(self.scope_ids.usage_id),
                 "\n".join(fragment.content for fragment in fragments),
             )
         )
@@ -2345,7 +2345,7 @@ class TestIndexView(ModuleStoreTestCase):
                 student=user,
                 course_id=course.id,
                 module_state_key=item.scope_ids.usage_id,
-                state=json.dumps({'state': unicode(item.scope_ids.usage_id)})
+                state=json.dumps({'state': str(item.scope_ids.usage_id)})
             )
 
         CourseOverview.load_from_module_store(course.id)
@@ -2356,7 +2356,7 @@ class TestIndexView(ModuleStoreTestCase):
             reverse(
                 'courseware_section',
                 kwargs={
-                    'course_id': unicode(course.id),
+                    'course_id': str(course.id),
                     'chapter': chapter.url_name,
                     'section': section.url_name,
                 }
@@ -2364,7 +2364,7 @@ class TestIndexView(ModuleStoreTestCase):
         )
 
         # Trigger the assertions embedded in the ViewCheckerBlocks
-        self.assertEquals(response.content.count("ViewCheckerPassed"), 3)
+        self.assertEqual(response.content.count("ViewCheckerPassed"), 3)
 
     @XBlock.register_temp_plugin(ActivateIDCheckerBlock, 'id_checker')
     def test_activate_block_id(self):
@@ -2385,7 +2385,7 @@ class TestIndexView(ModuleStoreTestCase):
             reverse(
                 'courseware_section',
                 kwargs={
-                    'course_id': unicode(course.id),
+                    'course_id': str(course.id),
                     'chapter': chapter.url_name,
                     'section': section.url_name,
                 }
@@ -2526,7 +2526,7 @@ class TestIndexViewCompleteOnView(ModuleStoreTestCase, CompletionWaffleTestMixin
         self.section_1_url = reverse(
             'courseware_section',
             kwargs={
-                'course_id': unicode(self.course.id),
+                'course_id': str(self.course.id),
                 'chapter': self.chapter.url_name,
                 'section': self.section_1.url_name,
             }
@@ -2535,7 +2535,7 @@ class TestIndexViewCompleteOnView(ModuleStoreTestCase, CompletionWaffleTestMixin
         self.section_2_url = reverse(
             'courseware_section',
             kwargs={
-                'course_id': unicode(self.course.id),
+                'course_id': str(self.course.id),
                 'chapter': self.chapter.url_name,
                 'section': self.section_2.url_name,
             }
@@ -2566,7 +2566,7 @@ class TestIndexViewCompleteOnView(ModuleStoreTestCase, CompletionWaffleTestMixin
 
         response = self.client.get(self.section_1_url)
         self.assertIn('data-mark-completed-on-view-after-delay', response.content)
-        self.assertEquals(response.content.count("data-mark-completed-on-view-after-delay"), 2)
+        self.assertEqual(response.content.count("data-mark-completed-on-view-after-delay"), 2)
 
         request = self.request_factory.post(
             '/',
@@ -2576,15 +2576,15 @@ class TestIndexViewCompleteOnView(ModuleStoreTestCase, CompletionWaffleTestMixin
         request.user = self.user
         response = handle_xblock_callback(
             request,
-            unicode(self.course.id),
-            quote_slashes(unicode(self.html_1_1.scope_ids.usage_id)),
+            str(self.course.id),
+            quote_slashes(str(self.html_1_1.scope_ids.usage_id)),
             'publish_completion',
         )
         self.assertEqual(json.loads(response.content), {'result': "ok"})
 
         response = self.client.get(self.section_1_url)
         self.assertIn('data-mark-completed-on-view-after-delay', response.content)
-        self.assertEquals(response.content.count("data-mark-completed-on-view-after-delay"), 1)
+        self.assertEqual(response.content.count("data-mark-completed-on-view-after-delay"), 1)
 
         request = self.request_factory.post(
             '/',
@@ -2594,8 +2594,8 @@ class TestIndexViewCompleteOnView(ModuleStoreTestCase, CompletionWaffleTestMixin
         request.user = self.user
         response = handle_xblock_callback(
             request,
-            unicode(self.course.id),
-            quote_slashes(unicode(self.html_1_2.scope_ids.usage_id)),
+            str(self.course.id),
+            quote_slashes(str(self.html_1_2.scope_ids.usage_id)),
             'publish_completion',
         )
         self.assertEqual(json.loads(response.content), {'result': "ok"})
@@ -2644,7 +2644,7 @@ class TestIndexViewWithVerticalPositions(ModuleStoreTestCase):
             reverse(
                 'courseware_position',
                 kwargs={
-                    'course_id': unicode(self.course.id),
+                    'course_id': str(self.course.id),
                     'chapter': self.chapter.url_name,
                     'section': self.section.url_name,
                     'position': input_position,
@@ -2714,13 +2714,13 @@ class TestIndexViewWithGating(ModuleStoreTestCase, MilestonesTestCaseMixin):
             reverse(
                 'courseware_section',
                 kwargs={
-                    'course_id': unicode(self.course.id),
+                    'course_id': str(self.course.id),
                     'chapter': self.chapter.url_name,
                     'section': self.gated_seq.url_name,
                 }
             )
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertIn("Content Locked", response.content)
 
 
@@ -2756,7 +2756,7 @@ class TestIndexViewWithCourseDurationLimits(ModuleStoreTestCase):
             reverse(
                 'courseware_section',
                 kwargs={
-                    'course_id': unicode(self.course.id),
+                    'course_id': str(self.course.id),
                     'chapter': self.chapter.url_name,
                     'section': self.sequential.url_name,
                 }
@@ -2782,7 +2782,7 @@ class TestIndexViewWithCourseDurationLimits(ModuleStoreTestCase):
             reverse(
                 'courseware_section',
                 kwargs={
-                    'course_id': unicode(self.course.id),
+                    'course_id': str(self.course.id),
                     'chapter': self.chapter.url_name,
                     'section': self.sequential.url_name,
                 }
@@ -2814,7 +2814,7 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaf
         """
         Overridable method to get the response from the endpoint that is being tested.
         """
-        url = reverse('render_xblock', kwargs={'usage_key_string': unicode(usage_key)})
+        url = reverse('render_xblock', kwargs={'usage_key_string': str(usage_key)})
         if url_encoded_params:
             url += '?' + url_encoded_params
         return self.client.get(url)
@@ -2853,8 +2853,8 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaf
         request.user = self.user
         response = handle_xblock_callback(
             request,
-            unicode(self.course.id),
-            quote_slashes(unicode(self.html_block.location)),
+            str(self.course.id),
+            quote_slashes(str(self.html_block.location)),
             'publish_completion',
         )
         self.assertEqual(response.status_code, 200)
@@ -2953,9 +2953,9 @@ class TestIndexViewCrawlerStudentStateWrites(SharedModuleStoreTestCase):
         url = reverse(
             'courseware_section',
             kwargs={
-                'course_id': unicode(self.course.id),
-                'chapter': unicode(self.chapter.location.block_id),
-                'section': unicode(self.section.location.block_id),
+                'course_id': str(self.course.id),
+                'chapter': str(self.chapter.location.block_id),
+                'section': str(self.section.location.block_id),
             }
         )
         response = self.client.get(url, HTTP_USER_AGENT=user_agent)
@@ -2984,7 +2984,7 @@ class EnterpriseConsentTestCase(EnterpriseTestConsentRequired, ModuleStoreTestCa
         # ENT-924: Temporary solution to replace sensitive SSO usernames.
         mock_enterprise_customer_for_request.return_value = None
 
-        course_id = unicode(self.course.id)
+        course_id = str(self.course.id)
         for url in (
                 reverse("courseware", kwargs=dict(course_id=course_id)),
                 reverse("progress", kwargs=dict(course_id=course_id)),

@@ -30,7 +30,7 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
 
     def setUp(self):
         super(TestOptoutCourseEmails, self).setUp()
-        course_title = u"ẗëṡẗ title ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ"
+        course_title = "ẗëṡẗ title ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ"
         self.course = CourseFactory.create(run='testcourse1', display_name=course_title)
         self.instructor = AdminFactory.create()
         self.student = UserFactory.create()
@@ -65,7 +65,7 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
         # This is a checkbox, so on the post of opting out (that is, an Un-check of the box),
         # the Post that is sent will not contain 'receive_emails'
         response = self.client.post(url, {'course_id': text_type(self.course.id)})
-        self.assertEquals(json.loads(response.content), {'success': True})
+        self.assertEqual(json.loads(response.content), {'success': True})
 
         self.client.logout()
 
@@ -79,7 +79,7 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
             'message': 'test message for all'
         }
         response = self.client.post(self.send_mail_url, test_email)
-        self.assertEquals(json.loads(response.content), self.success_content)
+        self.assertEqual(json.loads(response.content), self.success_content)
 
         # Assert that self.student.email not in mail.to, outbox should only contain "myself" target
         self.assertEqual(len(mail.outbox), 1)
@@ -91,7 +91,7 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
         """
         url = reverse('change_email_settings')
         response = self.client.post(url, {'course_id': text_type(self.course.id), 'receive_emails': 'on'})
-        self.assertEquals(json.loads(response.content), {'success': True})
+        self.assertEqual(json.loads(response.content), {'success': True})
 
         self.client.logout()
 
@@ -107,7 +107,7 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
             'message': 'test message for all'
         }
         response = self.client.post(self.send_mail_url, test_email)
-        self.assertEquals(json.loads(response.content), self.success_content)
+        self.assertEqual(json.loads(response.content), self.success_content)
 
         # Assert that self.student.email in mail.to, along with "myself" target
         self.assertEqual(len(mail.outbox), 2)
@@ -124,7 +124,7 @@ class TestACEOptoutCourseEmails(ModuleStoreTestCase):
 
     def setUp(self):
         super(TestACEOptoutCourseEmails, self).setUp()
-        course_title = u"ẗëṡẗ title ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ"
+        course_title = "ẗëṡẗ title ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ"
         self.course = CourseFactory.create(run='testcourse1', display_name=course_title)
         self.instructor = AdminFactory.create()
         self.student = UserFactory.create()
@@ -145,7 +145,7 @@ class TestACEOptoutCourseEmails(ModuleStoreTestCase):
             post_data['receive_emails'] = 'on'
 
         response = self.client.post(url, post_data)
-        self.assertEquals(json.loads(response.content), {'success': True})
+        self.assertEqual(json.loads(response.content), {'success': True})
 
     def test_policy_optedout(self):
         """

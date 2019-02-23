@@ -122,7 +122,7 @@ class MicrositeOrganizationMapping(models.Model):
 
     def __unicode__(self):
         """String conversion"""
-        return u'{microsite_key}: {organization}'.format(
+        return '{microsite_key}: {organization}'.format(
             microsite_key=self.microsite.key,
             organization=self.organization
         )
@@ -161,7 +161,7 @@ class MicrositeTemplate(models.Model):
 
     def __unicode__(self):
         """String conversion"""
-        return u'{microsite_key}: {template_uri}'.format(
+        return '{microsite_key}: {template_uri}'.format(
             microsite_key=self.microsite.key,
             template_uri=self.template_uri
         )

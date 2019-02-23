@@ -21,7 +21,7 @@ DEFAULT_FORCE_UPDATE = False
 
 
 def chunks(sequence, chunk_size):
-    return (sequence[index: index + chunk_size] for index in xrange(0, len(sequence), chunk_size))
+    return (sequence[index: index + chunk_size] for index in range(0, len(sequence), chunk_size))
 
 
 def _task_options(routing_key):
@@ -46,7 +46,7 @@ def enqueue_async_course_overview_update_tasks(
         course_keys = [CourseKey.from_string(id) for id in course_ids]
 
     for course_key_group in chunks(course_keys, chunk_size):
-        course_key_strings = [unicode(key) for key in course_key_group]
+        course_key_strings = [str(key) for key in course_key_group]
 
         options = _task_options(routing_key)
         async_course_overview_update.apply_async(

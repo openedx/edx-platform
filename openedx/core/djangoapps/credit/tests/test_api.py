@@ -75,7 +75,7 @@ class CreditApiTestBase(ModuleStoreTestCase):
     }
     THUMBNAIL_URL = "https://credit.example.com/logo.png"
 
-    PROVIDERS_LIST = [u'Hogwarts School of Witchcraft and Wizardry', u'Arizona State University']
+    PROVIDERS_LIST = ['Hogwarts School of Witchcraft and Wizardry', 'Arizona State University']
 
     COURSE_API_RESPONSE = {
         "id": "course-v1:Demo+Demox+Course",
@@ -195,7 +195,7 @@ class CreditApiTestBase(ModuleStoreTestCase):
         """ Mock GET requests to the ecommerce course API endpoint. """
         httpretty.reset()
         httpretty.register_uri(
-            httpretty.GET, '{}/courses/{}/?include_products=1'.format(TEST_API_URL, unicode(course_key)),
+            httpretty.GET, '{}/courses/{}/?include_products=1'.format(TEST_API_URL, str(course_key)),
             status=status,
             body=json.dumps(body), content_type='application/json',
         )
@@ -794,16 +794,16 @@ class CreditRequirementApiTests(CreditApiTestBase):
 
     @ddt.data(
         (
-            [u'Arizona State University'],
+            ['Arizona State University'],
             'credit from Arizona State University for',
             'You are eligible for credit from Arizona State University'),
         (
-            [u'Arizona State University', u'Hogwarts School of Witchcraft and Wizardry'],
+            ['Arizona State University', 'Hogwarts School of Witchcraft and Wizardry'],
             'credit from Arizona State University and Hogwarts School of Witchcraft and Wizardry for',
             'You are eligible for credit from Arizona State University and Hogwarts School of Witchcraft and Wizardry'
         ),
         (
-            [u'Arizona State University', u'Hogwarts School of Witchcraft and Wizardry', u'Charter Oak'],
+            ['Arizona State University', 'Hogwarts School of Witchcraft and Wizardry', 'Charter Oak'],
             'credit from Arizona State University, Hogwarts School of Witchcraft and Wizardry, and Charter Oak for',
             'You are eligible for credit from Arizona State University, Hogwarts School'
             ' of Witchcraft and Wizardry, and Charter Oak'
@@ -975,10 +975,10 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
         self.assertEqual(parameters['course_org'], self.course_key.org)
         self.assertEqual(parameters['course_num'], self.course_key.course)
         self.assertEqual(parameters['course_run'], self.course_key.run)
-        self.assertEqual(parameters['final_grade'], unicode(self.FINAL_GRADE))
+        self.assertEqual(parameters['final_grade'], str(self.FINAL_GRADE))
 
         # Validate user information
-        for key in self.USER_INFO.keys():
+        for key in list(self.USER_INFO.keys()):
             param_key = 'user_{key}'.format(key=key)
             self.assertIn(param_key, parameters)
             expected = '' if key == 'mailing_address' else self.USER_INFO[key]
@@ -997,7 +997,7 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
 
         # Initiate a credit request
         request = api.create_credit_request(self.course_key, self.PROVIDER_ID, self.USER_INFO['username'])
-        self.assertEqual(request['parameters']['final_grade'], u'0.33333')
+        self.assertEqual(request['parameters']['final_grade'], '0.33333')
 
     def test_create_credit_request_address_empty(self):
         """ Verify the mailing address is always empty. """
@@ -1125,7 +1125,7 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
         # Simulate users who registered accounts before the country field was introduced.
         # We need to manipulate the database directly because the country Django field
         # coerces None values to empty strings.
-        query = u"UPDATE auth_userprofile SET country = NULL WHERE id = %s"
+        query = "UPDATE auth_userprofile SET country = NULL WHERE id = %s"
         connection.cursor().execute(query, [str(self.user.profile.id)])
 
         # Request should include an empty country field

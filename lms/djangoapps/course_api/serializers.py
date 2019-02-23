@@ -2,7 +2,7 @@
 Course API Serializers.  Representing course catalog data
 """
 
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from django.urls import reverse
 from rest_framework import serializers
@@ -92,7 +92,7 @@ class CourseSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
         """
         base_url = '?'.join([
             reverse('blocks_in_course'),
-            urllib.urlencode({'course_id': course_overview.id}),
+            urllib.parse.urlencode({'course_id': course_overview.id}),
         ])
         return self.context['request'].build_absolute_uri(base_url)
 

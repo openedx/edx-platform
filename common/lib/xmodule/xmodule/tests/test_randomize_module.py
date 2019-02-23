@@ -73,7 +73,7 @@ class RandomizeModuleTestCase(unittest.TestCase):
         """ Check course/randomize module works fine """
 
         self.assertTrue(self.course.has_children)
-        self.assertEquals(len(self.course.get_children()), 2)
+        self.assertEqual(len(self.course.get_children()), 2)
 
         def inner_get_module(descriptor):
             """
@@ -93,7 +93,7 @@ class RandomizeModuleTestCase(unittest.TestCase):
         # Get randomize_descriptor from the course & verify its children
         randomize_descriptor = inner_get_module(self.course.id.make_usage_key('randomize', 'my_randomize'))
         self.assertTrue(randomize_descriptor.has_children)
-        self.assertEquals(len(randomize_descriptor.get_children()), 2)
+        self.assertEqual(len(randomize_descriptor.get_children()), 2)
 
         # Call RandomizeModule which will select an element from the list of available items
         randomize_module = RandomizeModule(
@@ -103,5 +103,5 @@ class RandomizeModuleTestCase(unittest.TestCase):
         )
 
         # Verify the selected child
-        self.assertEquals(len(randomize_module.get_child_descriptors()), 1, "No child is chosen")
+        self.assertEqual(len(randomize_module.get_child_descriptors()), 1, "No child is chosen")
         self.assertIn(randomize_module.child.display_name, ['A', 'B'], "Unwanted child selected")

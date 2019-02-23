@@ -100,7 +100,7 @@ class AnnotatableModule(AnnotatableFields, XModule):
             'problem': 'data-problem-id'
         }
 
-        for xml_key in attrs_map.keys():
+        for xml_key in list(attrs_map.keys()):
             if xml_key in el.attrib:
                 value = el.get(xml_key, '')
                 html_key = attrs_map[xml_key]
@@ -116,7 +116,7 @@ class AnnotatableModule(AnnotatableFields, XModule):
 
         el.tag = 'span'
 
-        for key in attr.keys():
+        for key in list(attr.keys()):
             el.set(key, attr[key]['value'])
             if '_delete' in attr[key] and attr[key]['_delete'] is not None:
                 delete_key = attr[key]['_delete']

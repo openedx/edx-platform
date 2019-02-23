@@ -84,11 +84,11 @@ class BlockRecordList(object):
         """
         list_of_block_dicts = [block._asdict() for block in self.blocks]
         for block_dict in list_of_block_dicts:
-            block_dict['locator'] = unicode(block_dict['locator'])  # BlockUsageLocator is not json-serializable
+            block_dict['locator'] = str(block_dict['locator'])  # BlockUsageLocator is not json-serializable
         data = {
-            u'blocks': list_of_block_dicts,
-            u'course_key': unicode(self.course_key),
-            u'version': self.version,
+            'blocks': list_of_block_dicts,
+            'course_key': str(self.course_key),
+            'version': self.version,
         }
         return json.dumps(
             data,
@@ -138,7 +138,7 @@ class VisibleBlocks(models.Model):
     hashed = models.CharField(max_length=100, unique=True)
     course_id = CourseKeyField(blank=False, max_length=255, db_index=True)
 
-    _CACHE_NAMESPACE = u"grades.models.VisibleBlocks"
+    _CACHE_NAMESPACE = "grades.models.VisibleBlocks"
 
     class Meta(object):
         app_label = "grades"
@@ -147,7 +147,7 @@ class VisibleBlocks(models.Model):
         """
         String representation of this model.
         """
-        return u"VisibleBlocks object - hash:{}, raw json:'{}'".format(self.hashed, self.blocks_json)
+        return "VisibleBlocks object - hash:{}, raw json:'{}'".format(self.hashed, self.blocks_json)
 
     @property
     def blocks(self):
@@ -194,7 +194,7 @@ class VisibleBlocks(models.Model):
         else:
             model, _ = cls.objects.get_or_create(
                 hashed=blocks.hash_value,
-                defaults={u'blocks_json': blocks.json_value, u'course_id': blocks.course_key},
+                defaults={'blocks_json': blocks.json_value, 'course_id': blocks.course_key},
             )
         return model
 
@@ -255,7 +255,7 @@ class VisibleBlocks(models.Model):
 
     @classmethod
     def _cache_key(cls, user_id, course_key):
-        return u"visible_blocks_cache.{}.{}".format(course_key, user_id)
+        return "visible_blocks_cache.{}.{}".format(course_key, user_id)
 
 
 class PersistentSubsectionGrade(TimeStampedModel):
@@ -297,8 +297,8 @@ class PersistentSubsectionGrade(TimeStampedModel):
     usage_key = UsageKeyField(blank=False, max_length=255)
 
     # Information relating to the state of content when grade was calculated
-    subtree_edited_timestamp = models.DateTimeField(u'Last content edit timestamp', blank=True, null=True)
-    course_version = models.CharField(u'Guid of latest course version', blank=True, max_length=255)
+    subtree_edited_timestamp = models.DateTimeField('Last content edit timestamp', blank=True, null=True)
+    course_version = models.CharField('Guid of latest course version', blank=True, max_length=255)
 
     # earned/possible refers to the number of points achieved and available to achieve.
     # graded refers to the subset of all problems that are marked as being graded.
@@ -316,7 +316,7 @@ class PersistentSubsectionGrade(TimeStampedModel):
     visible_blocks = models.ForeignKey(VisibleBlocks, db_column='visible_blocks_hash', to_field='hashed',
                                        on_delete=models.CASCADE)
 
-    _CACHE_NAMESPACE = u'grades.models.PersistentSubsectionGrade'
+    _CACHE_NAMESPACE = 'grades.models.PersistentSubsectionGrade'
 
     @property
     def full_usage_key(self):
@@ -334,7 +334,7 @@ class PersistentSubsectionGrade(TimeStampedModel):
         Returns a string representation of this model.
         """
         return (
-            u"{} user: {}, course version: {}, subsection: {} ({}). {}/{} graded, {}/{} all, first_attempted: {}"
+            "{} user: {}, course version: {}, subsection: {} ({}). {}/{} graded, {}/{} all, first_attempted: {}"
         ).format(
             type(self).__name__,
             self.user_id,
@@ -449,11 +449,11 @@ class PersistentSubsectionGrade(TimeStampedModel):
 
         PersistentSubsectionGradeOverride.prefetch(user_id, course_key)
 
-        map(cls._prepare_params, grade_params_iter)
+        list(map(cls._prepare_params, grade_params_iter))
         VisibleBlocks.bulk_get_or_create(
             user_id, course_key, [params['visible_blocks'] for params in grade_params_iter]
         )
-        map(cls._prepare_params_visible_blocks_id, grade_params_iter)
+        list(map(cls._prepare_params_visible_blocks_id, grade_params_iter))
 
         grades = [PersistentSubsectionGrade(**params) for params in grade_params_iter]
         grades = cls.objects.bulk_create(grades)
@@ -490,7 +490,7 @@ class PersistentSubsectionGrade(TimeStampedModel):
 
     @classmethod
     def _cache_key(cls, course_id):
-        return u"subsection_grades_cache.{}".format(course_id)
+        return "subsection_grades_cache.{}".format(course_id)
 
 
 class PersistentCourseGrade(TimeStampedModel):
@@ -523,30 +523,30 @@ class PersistentCourseGrade(TimeStampedModel):
     course_id = CourseKeyField(blank=False, max_length=255)
 
     # Information relating to the state of content when grade was calculated
-    course_edited_timestamp = models.DateTimeField(u'Last content edit timestamp', blank=True, null=True)
-    course_version = models.CharField(u'Course content version identifier', blank=True, max_length=255)
-    grading_policy_hash = models.CharField(u'Hash of grading policy', blank=False, max_length=255)
+    course_edited_timestamp = models.DateTimeField('Last content edit timestamp', blank=True, null=True)
+    course_version = models.CharField('Course content version identifier', blank=True, max_length=255)
+    grading_policy_hash = models.CharField('Hash of grading policy', blank=False, max_length=255)
 
     # Information about the course grade itself
     percent_grade = models.FloatField(blank=False)
-    letter_grade = models.CharField(u'Letter grade for course', blank=False, max_length=255)
+    letter_grade = models.CharField('Letter grade for course', blank=False, max_length=255)
 
     # Information related to course completion
-    passed_timestamp = models.DateTimeField(u'Date learner earned a passing grade', blank=True, null=True)
+    passed_timestamp = models.DateTimeField('Date learner earned a passing grade', blank=True, null=True)
 
-    _CACHE_NAMESPACE = u"grades.models.PersistentCourseGrade"
+    _CACHE_NAMESPACE = "grades.models.PersistentCourseGrade"
 
     def __unicode__(self):
         """
         Returns a string representation of this model.
         """
-        return u', '.join([
-            u"{} user: {}".format(type(self).__name__, self.user_id),
-            u"course version: {}".format(self.course_version),
-            u"grading policy: {}".format(self.grading_policy_hash),
-            u"percent grade: {}%".format(self.percent_grade),
-            u"letter grade: {}".format(self.letter_grade),
-            u"passed timestamp: {}".format(self.passed_timestamp),
+        return ', '.join([
+            "{} user: {}".format(type(self).__name__, self.user_id),
+            "course version: {}".format(self.course_version),
+            "grading policy: {}".format(self.grading_policy_hash),
+            "percent grade: {}%".format(self.percent_grade),
+            "letter grade: {}".format(self.letter_grade),
+            "passed timestamp: {}".format(self.passed_timestamp),
         ])
 
     @classmethod
@@ -622,7 +622,7 @@ class PersistentCourseGrade(TimeStampedModel):
 
     @classmethod
     def _cache_key(cls, course_id):
-        return u"grades_cache.{}".format(course_id)
+        return "grades_cache.{}".format(course_id)
 
     @staticmethod
     def _emit_grade_calculated_event(grade):
@@ -651,15 +651,15 @@ class PersistentSubsectionGradeOverride(models.Model):
     earned_graded_override = models.FloatField(null=True, blank=True)
     possible_graded_override = models.FloatField(null=True, blank=True)
 
-    _CACHE_NAMESPACE = u"grades.models.PersistentSubsectionGradeOverride"
+    _CACHE_NAMESPACE = "grades.models.PersistentSubsectionGradeOverride"
 
     def __unicode__(self):
-        return u', '.join([
-            u"{}".format(type(self).__name__),
-            u"earned_all_override: {}".format(self.earned_all_override),
-            u"possible_all_override: {}".format(self.possible_all_override),
-            u"earned_graded_override: {}".format(self.earned_graded_override),
-            u"possible_graded_override: {}".format(self.possible_graded_override),
+        return ', '.join([
+            "{}".format(type(self).__name__),
+            "earned_all_override: {}".format(self.earned_all_override),
+            "possible_all_override: {}".format(self.possible_all_override),
+            "earned_graded_override: {}".format(self.earned_graded_override),
+            "possible_graded_override: {}".format(self.possible_graded_override),
         ])
 
     def get_history(self):
@@ -729,7 +729,7 @@ class PersistentSubsectionGradeOverride(models.Model):
             'possible_graded_override': 'possible_graded',
         }
         cleaned_data = {}
-        for override_field_name, field_name in allowed_fields_and_defaults.items():
+        for override_field_name, field_name in list(allowed_fields_and_defaults.items()):
             cleaned_data[override_field_name] = override_data.get(
                 override_field_name,
                 getattr(subsection_grade_model, field_name)
@@ -780,7 +780,7 @@ class PersistentSubsectionGradeOverrideHistory(models.Model):
         String representation of this model.
         """
         return (
-            u"{} override_id: {}, user_id: {}, feature: {}, action: {}, created: {}"
+            "{} override_id: {}, user_id: {}, feature: {}, action: {}, created: {}"
         ).format(
             type(self).__name__,
             self.override_id,

@@ -56,19 +56,19 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
         self._test_html_content(
             self.child_container,
             expected_section_tag=(
-                u'<section class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" '
-                u'data-locator="{0}" data-course-key="{0.course_key}">'.format(self.child_container.location)
+                '<section class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" '
+                'data-locator="{0}" data-course-key="{0.course_key}">'.format(self.child_container.location)
             ),
             expected_breadcrumbs=(
-                ur'<a href="/course/{course}{section_parameters}" class="{classes}">\s*Week 1\s*</a>\s*'
-                ur'<a href="/course/{course}{subsection_parameters}" class="{classes}">\s*Lesson 1\s*</a>\s*'
-                ur'<a href="/container/{unit}" class="{classes}">\s*Unit\s*</a>'
+                r'<a href="/course/{course}{section_parameters}" class="{classes}">\s*Week 1\s*</a>\s*'
+                r'<a href="/course/{course}{subsection_parameters}" class="{classes}">\s*Lesson 1\s*</a>\s*'
+                r'<a href="/container/{unit}" class="{classes}">\s*Unit\s*</a>'
             ).format(
-                course=re.escape(unicode(self.course.id)),
-                unit=re.escape(unicode(self.vertical.location)),
+                course=re.escape(str(self.course.id)),
+                unit=re.escape(str(self.vertical.location)),
                 classes='navigation-item navigation-link navigation-parent',
-                section_parameters=re.escape(u'?show={}'.format(http.urlquote(self.chapter.location))),
-                subsection_parameters=re.escape(u'?show={}'.format(http.urlquote(self.sequential.location))),
+                section_parameters=re.escape('?show={}'.format(http.urlquote(self.chapter.location))),
+                subsection_parameters=re.escape('?show={}'.format(http.urlquote(self.sequential.location))),
             ),
         )
 
@@ -84,21 +84,21 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
             self._test_html_content(
                 xblock,
                 expected_section_tag=(
-                    u'<section class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" '
-                    u'data-locator="{0}" data-course-key="{0.course_key}">'.format(draft_container.location)
+                    '<section class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" '
+                    'data-locator="{0}" data-course-key="{0.course_key}">'.format(draft_container.location)
                 ),
                 expected_breadcrumbs=(
-                    ur'<a href="/course/{course}{section_parameters}" class="{classes}">\s*Week 1\s*</a>\s*'
-                    ur'<a href="/course/{course}{subsection_parameters}" class="{classes}">\s*Lesson 1\s*</a>\s*'
-                    ur'<a href="/container/{unit}" class="{classes}">\s*Unit\s*</a>\s*'
-                    ur'<a href="/container/{split_test}" class="{classes}">\s*Split Test\s*</a>'
+                    r'<a href="/course/{course}{section_parameters}" class="{classes}">\s*Week 1\s*</a>\s*'
+                    r'<a href="/course/{course}{subsection_parameters}" class="{classes}">\s*Lesson 1\s*</a>\s*'
+                    r'<a href="/container/{unit}" class="{classes}">\s*Unit\s*</a>\s*'
+                    r'<a href="/container/{split_test}" class="{classes}">\s*Split Test\s*</a>'
                 ).format(
-                    course=re.escape(unicode(self.course.id)),
-                    unit=re.escape(unicode(self.vertical.location)),
-                    split_test=re.escape(unicode(self.child_container.location)),
-                    classes=u'navigation-item navigation-link navigation-parent',
-                    section_parameters=re.escape(u'?show={}'.format(http.urlquote(self.chapter.location))),
-                    subsection_parameters=re.escape(u'?show={}'.format(http.urlquote(self.sequential.location))),
+                    course=re.escape(str(self.course.id)),
+                    unit=re.escape(str(self.vertical.location)),
+                    split_test=re.escape(str(self.child_container.location)),
+                    classes='navigation-item navigation-link navigation-parent',
+                    section_parameters=re.escape('?show={}'.format(http.urlquote(self.chapter.location))),
+                    subsection_parameters=re.escape('?show={}'.format(http.urlquote(self.sequential.location))),
                 ),
             )
 
@@ -117,7 +117,7 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
         """
         html = self.get_page_html(xblock)
         self.assertIn(expected_section_tag, html)
-        self.assertRegexpMatches(html, expected_breadcrumbs)
+        self.assertRegex(html, expected_breadcrumbs)
 
     def test_public_container_preview_html(self):
         """
@@ -223,6 +223,6 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
         # Check 200 response if 'usage_key_string' is correct
         response = views.container_handler(
             request=request,
-            usage_key_string=unicode(self.vertical.location)
+            usage_key_string=str(self.vertical.location)
         )
         self.assertEqual(response.status_code, 200)

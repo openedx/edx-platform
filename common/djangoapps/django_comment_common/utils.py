@@ -145,12 +145,12 @@ def set_course_discussion_settings(course_key, **kwargs):
         A CourseDiscussionSettings object.
     """
     fields = {
-        'division_scheme': basestring,
+        'division_scheme': str,
         'always_divide_inline_discussions': bool,
         'divided_discussions': list,
     }
     course_discussion_settings = get_course_discussion_settings(course_key)
-    for field, field_type in fields.items():
+    for field, field_type in list(fields.items()):
         if field in kwargs:
             if not isinstance(kwargs[field], field_type):
                 raise ValueError("Incorrect field type for `{}`. Type must be `{}`".format(field, field_type.__name__))

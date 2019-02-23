@@ -71,7 +71,7 @@ class CourseTabTest(ModuleStoreTestCase):
         request = RequestFactory().request()
         request.user = user
         all_tabs = get_course_tab_list(request, course)
-        return any([tab.name == u'My Notes' for tab in all_tabs])
+        return any([tab.name == 'My Notes' for tab in all_tabs])
 
     def test_course_tab_not_visible(self):
         # module not enabled in the course
@@ -208,7 +208,7 @@ class ApiTest(TestCase):
 
         note_dict = notes[0].as_dict()
         excluded_fields = ['id', 'user_id', 'created', 'updated']
-        note = dict([(k, v) for k, v in note_dict.items() if k not in excluded_fields])
+        note = dict([(k, v) for k, v in list(note_dict.items()) if k not in excluded_fields])
 
         resp = self.client.post(self.url('notes_api_notes'),
                                 json.dumps(note),
@@ -236,7 +236,7 @@ class ApiTest(TestCase):
         note_dict = notes[0].as_dict()
 
         excluded_fields = ['id', 'user_id', 'created', 'updated'] + ['ranges']
-        note = dict([(k, v) for k, v in note_dict.items() if k not in excluded_fields])
+        note = dict([(k, v) for k, v in list(note_dict.items()) if k not in excluded_fields])
 
         resp = self.client.post(self.url('notes_api_notes'),
                                 json.dumps(note),
@@ -443,6 +443,6 @@ class NoteTest(TestCase):
     def test_as_dict(self):
         note = models.Note(course_id=self.course_key, user=self.student)
         d = note.as_dict()
-        self.assertNotIsInstance(d, basestring)
+        self.assertNotIsInstance(d, str)
         self.assertEqual(d['user_id'], self.student.id)
         self.assertNotIn('course_id', d)

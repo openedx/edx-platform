@@ -13,7 +13,7 @@ class PluginsConfig(AppConfig):
     """
     Application Configuration for Plugins.
     """
-    name = u'openedx.core.djangoapps.plugins'
+    name = 'openedx.core.djangoapps.plugins'
 
     plugin_app = {}
 

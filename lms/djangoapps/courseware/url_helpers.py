@@ -1,7 +1,7 @@
 """
 Module to define url helpers functions
 """
-from urllib import urlencode
+from urllib.parse import urlencode
 
 from django.urls import reverse
 
@@ -32,13 +32,13 @@ def get_redirect_url(course_key, usage_key):
     # args provided by the redirect.
     # Rely on index to do all error handling and access control.
     if chapter is None:
-        redirect_url = reverse('courseware', args=(unicode(course_key), ))
+        redirect_url = reverse('courseware', args=(str(course_key), ))
     elif section is None:
-        redirect_url = reverse('courseware_chapter', args=(unicode(course_key), chapter))
+        redirect_url = reverse('courseware_chapter', args=(str(course_key), chapter))
     elif position is None:
         redirect_url = reverse(
             'courseware_section',
-            args=(unicode(course_key), chapter, section)
+            args=(str(course_key), chapter, section)
         )
     else:
         # Here we use the navigation_index from the position returned from
@@ -46,7 +46,7 @@ def get_redirect_url(course_key, usage_key):
         # moment
         redirect_url = reverse(
             'courseware_position',
-            args=(unicode(course_key), chapter, section, navigation_index(position))
+            args=(str(course_key), chapter, section, navigation_index(position))
         )
-    redirect_url += "?{}".format(urlencode({'activate_block_id': unicode(final_target_id)}))
+    redirect_url += "?{}".format(urlencode({'activate_block_id': str(final_target_id)}))
     return redirect_url

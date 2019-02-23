@@ -110,11 +110,11 @@ class TransactionManagersTestCase(TransactionTestCase):
         with outer_atomic():
             atomic()(do_nothing)()
 
-        with self.assertRaisesRegexp(TransactionManagementError, 'Cannot be inside an atomic block.'):
+        with self.assertRaisesRegex(TransactionManagementError, 'Cannot be inside an atomic block.'):
             with atomic():
                 outer_atomic()(do_nothing)()
 
-        with self.assertRaisesRegexp(TransactionManagementError, 'Cannot be inside an atomic block.'):
+        with self.assertRaisesRegex(TransactionManagementError, 'Cannot be inside an atomic block.'):
             with outer_atomic():
                 outer_atomic()(do_nothing)()
 
@@ -131,11 +131,11 @@ class TransactionManagersTestCase(TransactionTestCase):
 
         commit_on_success(read_committed=True)(do_nothing)()
 
-        with self.assertRaisesRegexp(TransactionManagementError, 'Cannot change isolation level when nested.'):
+        with self.assertRaisesRegex(TransactionManagementError, 'Cannot change isolation level when nested.'):
             with commit_on_success():
                 commit_on_success(read_committed=True)(do_nothing)()
 
-        with self.assertRaisesRegexp(TransactionManagementError, 'Cannot be inside an atomic block.'):
+        with self.assertRaisesRegex(TransactionManagementError, 'Cannot be inside an atomic block.'):
             with atomic():
                 commit_on_success(read_committed=True)(do_nothing)()
 
@@ -159,7 +159,7 @@ class TransactionManagersTestCase(TransactionTestCase):
             with atomic():
                 outer_atomic(name='pqr')(do_nothing)()  # Not enabled.
 
-            with self.assertRaisesRegexp(TransactionManagementError, 'Cannot be inside an atomic block.'):
+            with self.assertRaisesRegex(TransactionManagementError, 'Cannot be inside an atomic block.'):
                 with atomic():
                     outer_atomic(name='abc')(do_nothing)()
 
@@ -170,19 +170,19 @@ class TransactionManagersTestCase(TransactionTestCase):
             with atomic():
                 outer_atomic(name='pqr')(do_nothing)()  # Not enabled.
 
-            with self.assertRaisesRegexp(TransactionManagementError, 'Cannot be inside an atomic block.'):
+            with self.assertRaisesRegex(TransactionManagementError, 'Cannot be inside an atomic block.'):
                 with atomic():
                     outer_atomic(name='def')(do_nothing)()
 
-            with self.assertRaisesRegexp(TransactionManagementError, 'Cannot be inside an atomic block.'):
+            with self.assertRaisesRegex(TransactionManagementError, 'Cannot be inside an atomic block.'):
                 with outer_atomic():
                     outer_atomic(name='def')(do_nothing)()
 
-            with self.assertRaisesRegexp(TransactionManagementError, 'Cannot be inside an atomic block.'):
+            with self.assertRaisesRegex(TransactionManagementError, 'Cannot be inside an atomic block.'):
                 with atomic():
                     outer_atomic(name='abc')(do_nothing)()
 
-            with self.assertRaisesRegexp(TransactionManagementError, 'Cannot be inside an atomic block.'):
+            with self.assertRaisesRegex(TransactionManagementError, 'Cannot be inside an atomic block.'):
                 with outer_atomic():
                     outer_atomic(name='abc')(do_nothing)()
 
@@ -199,7 +199,7 @@ class GenerateIntIdTestCase(TestCase):
         minimum = 1
         maximum = times
         for __ in range(times):
-            self.assertIn(generate_int_id(minimum, maximum), range(minimum, maximum + 1))
+            self.assertIn(generate_int_id(minimum, maximum), list(range(minimum, maximum + 1)))
 
     @ddt.data(10)
     def test_used_ids(self, times):

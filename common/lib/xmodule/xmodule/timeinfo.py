@@ -24,7 +24,7 @@ class TimeInfo(object):
             self.display_due_date = None
 
         if grace_period_string_or_timedelta is not None and self.display_due_date:
-            if isinstance(grace_period_string_or_timedelta, basestring):
+            if isinstance(grace_period_string_or_timedelta, str):
                 try:
                     self.grace_period = TimeInfo._delta_standin.from_json(grace_period_string_or_timedelta)
                 except:

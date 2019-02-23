@@ -87,21 +87,21 @@ class EnrollmentSupportListView(GenericAPIView):
             reason = request.data['reason']
             enrollment = CourseEnrollment.objects.get(user=user, course_id=course_key)
             if enrollment.mode != old_mode:
-                return HttpResponseBadRequest(u'User {username} is not enrolled with mode {old_mode}.'.format(
+                return HttpResponseBadRequest('User {username} is not enrolled with mode {old_mode}.'.format(
                     username=user.username,
                     old_mode=old_mode
                 ))
             if new_mode == CourseMode.CREDIT_MODE:
-                return HttpResponseBadRequest(u'Enrollment cannot be changed to credit mode.')
+                return HttpResponseBadRequest('Enrollment cannot be changed to credit mode.')
         except KeyError as err:
-            return HttpResponseBadRequest(u'The field {} is required.'.format(text_type(err)))
+            return HttpResponseBadRequest('The field {} is required.'.format(text_type(err)))
         except InvalidKeyError:
-            return HttpResponseBadRequest(u'Could not parse course key.')
+            return HttpResponseBadRequest('Could not parse course key.')
         except (CourseEnrollment.DoesNotExist, User.DoesNotExist):
             return HttpResponseBadRequest(
-                u'Could not find enrollment for user {username} in course {course}.'.format(
+                'Could not find enrollment for user {username} in course {course}.'.format(
                     username=username_or_email,
-                    course=unicode(course_key)
+                    course=str(course_key)
                 )
             )
         try:

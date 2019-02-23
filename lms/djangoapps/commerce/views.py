@@ -55,7 +55,7 @@ def checkout_receipt(request):
     page_title = _('Receipt')
     is_payment_complete = True
     payment_support_email = configuration_helpers.get_value('payment_support_email', settings.PAYMENT_SUPPORT_EMAIL)
-    payment_support_link = HTML(u'<a href=\"mailto:{email}\">{email}</a>').format(email=payment_support_email)
+    payment_support_link = HTML('<a href=\"mailto:{email}\">{email}</a>').format(email=payment_support_email)
 
     is_cybersource = all(k in request.POST for k in ('signed_field_names', 'decision', 'reason_code'))
     if is_cybersource and request.POST['decision'] != 'ACCEPT':
@@ -73,13 +73,13 @@ def checkout_receipt(request):
         else:
             error_summary = _("A system error occurred while processing your payment. You have not been charged.")
             error_text = _("Please wait a few minutes and then try again.")
-        for_help_text = _(u"For help, contact {payment_support_link}.").format(payment_support_link=payment_support_link)
+        for_help_text = _("For help, contact {payment_support_link}.").format(payment_support_link=payment_support_link)
     else:
         # if anything goes wrong rendering the receipt, it indicates a problem fetching order data.
         error_summary = _("An error occurred while creating your receipt.")
         error_text = None  # nothing particularly helpful to say if this happens.
         for_help_text = _(
-            u"If your course does not appear on your dashboard, contact {payment_support_link}."
+            "If your course does not appear on your dashboard, contact {payment_support_link}."
         ).format(payment_support_link=payment_support_link)
 
     commerce_configuration = CommerceConfiguration.current()

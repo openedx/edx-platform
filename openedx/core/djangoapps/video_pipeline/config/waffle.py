@@ -15,7 +15,7 @@ def waffle_flags():
     """
     Returns the namespaced, cached, audited Waffle flags dictionary for Videos.
     """
-    namespace = WaffleFlagNamespace(name=WAFFLE_NAMESPACE, log_prefix=u'Videos: ')
+    namespace = WaffleFlagNamespace(name=WAFFLE_NAMESPACE, log_prefix='Videos: ')
     return {
         DEPRECATE_YOUTUBE: CourseWaffleFlag(
             waffle_namespace=namespace,

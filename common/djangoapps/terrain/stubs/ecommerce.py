@@ -3,7 +3,7 @@ Stub implementation of ecommerce service for acceptance tests
 """
 
 import re
-import urlparse
+import urllib.parse
 
 from .http import StubHttpRequestHandler, StubHttpService
 
@@ -22,7 +22,7 @@ class StubEcommerceServiceHandler(StubHttpRequestHandler):  # pylint: disable=mi
         """
         Find the correct handler method given the path info from the HTTP request.
         """
-        path = urlparse.urlparse(self.path).path
+        path = urllib.parse.urlparse(self.path).path
         for pattern in pattern_handlers:
             match = re.match(pattern, path)
             if match:

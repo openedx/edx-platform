@@ -3,7 +3,7 @@ Acceptance tests for Home Page (My Courses / My Libraries).
 """
 import datetime
 
-from base_studio_test import StudioCourseTest
+from .base_studio_test import StudioCourseTest
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.account_settings import AccountSettingsPage
 from common.test.acceptance.pages.studio.index import DashboardPage
@@ -43,12 +43,12 @@ class StudioLanguageTest(AcceptanceTest):
         Then I visit the student account settings page and I can see the language has been updated to 'Dummy Language'
         in both drop downs.
         """
-        dummy_language = u'Dummy Language (Esperanto)'
+        dummy_language = 'Dummy Language (Esperanto)'
         self.dashboard_page.visit()
         language_selector = self.dashboard_page.language_selector
         self.assertEqual(
             get_selected_option_text(language_selector),
-            u'English'
+            'English'
         )
 
         select_option_by_text(language_selector, dummy_language)
@@ -57,7 +57,7 @@ class StudioLanguageTest(AcceptanceTest):
         self.assertEqual(self.account_settings.value_for_dropdown_field('pref-lang'), dummy_language)
         self.assertEqual(
             get_selected_option_text(language_selector),
-            u'Dummy Language (Esperanto)'
+            'Dummy Language (Esperanto)'
         )
 
 

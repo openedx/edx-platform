@@ -76,7 +76,7 @@ class FindReleaseResourcesTest(unittest.TestCase):
     @mocked_i18n_open(TX_CONFIG_SIMPLE)
     def test_no_resources(self):
         errmsg = r"You need two release-\* resources defined to use this command."
-        with self.assertRaisesRegexp(ValueError, errmsg):
+        with self.assertRaisesRegex(ValueError, errmsg):
             pavelib.i18n.find_release_resources()
 
     @mocked_i18n_open(TX_CONFIG_SIMPLE, """\
@@ -88,7 +88,7 @@ class FindReleaseResourcesTest(unittest.TestCase):
         """)
     def test_one_resource(self):
         errmsg = r"Strange Transifex config! Found these release-\* resources:\nedx-platform.release-zebrawood"
-        with self.assertRaisesRegexp(ValueError, errmsg):
+        with self.assertRaisesRegex(ValueError, errmsg):
             pavelib.i18n.find_release_resources()
 
     @mocked_i18n_open(TX_CONFIG_RELEASE)
@@ -157,13 +157,13 @@ class TestI18nDummy(PaverTestCase):
         self.reset_task_messages()
         os.environ['NO_PREREQ_INSTALL'] = "true"
         call_task('pavelib.i18n.i18n_dummy', options={"settings": Env.TEST_SETTINGS})
-        self.assertEquals(
+        self.assertEqual(
             self.task_messages,
             [
-                u'i18n_tool extract',
-                u'i18n_tool dummy',
-                u'i18n_tool generate',
-                u'python manage.py lms --settings={} compilejsi18n'.format(Env.TEST_SETTINGS),
-                u'python manage.py cms --settings={} compilejsi18n'.format(Env.TEST_SETTINGS),
+                'i18n_tool extract',
+                'i18n_tool dummy',
+                'i18n_tool generate',
+                'python manage.py lms --settings={} compilejsi18n'.format(Env.TEST_SETTINGS),
+                'python manage.py cms --settings={} compilejsi18n'.format(Env.TEST_SETTINGS),
             ]
         )

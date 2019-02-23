@@ -35,7 +35,7 @@ class GroupFactory(DjangoModelFactory):
         model = Group
         django_get_or_create = ('name', )
 
-    name = factory.Sequence(u'group{0}'.format)
+    name = factory.Sequence('group{0}'.format)
 
 
 class UserStandingFactory(DjangoModelFactory):
@@ -53,11 +53,11 @@ class UserProfileFactory(DjangoModelFactory):
         django_get_or_create = ('user', )
 
     user = None
-    name = factory.LazyAttribute(u'{0.user.first_name} {0.user.last_name}'.format)
+    name = factory.LazyAttribute('{0.user.first_name} {0.user.last_name}'.format)
     level_of_education = None
-    gender = u'm'
+    gender = 'm'
     mailing_address = None
-    goals = u'Learn a lot'
+    goals = 'Learn a lot'
     allow_certificate = True
 
 
@@ -76,10 +76,10 @@ class UserFactory(DjangoModelFactory):
 
     _DEFAULT_PASSWORD = 'test'
 
-    username = factory.Sequence(u'robot{0}'.format)
-    email = factory.Sequence(u'robot+test+{0}@edx.org'.format)
+    username = factory.Sequence('robot{0}'.format)
+    email = factory.Sequence('robot+test+{0}@edx.org'.format)
     password = factory.PostGenerationMethodCall('set_password', _DEFAULT_PASSWORD)
-    first_name = factory.Sequence(u'Robot{0}'.format)
+    first_name = factory.Sequence('Robot{0}'.format)
     last_name = 'Test'
     is_staff = False
     is_active = True
@@ -102,7 +102,7 @@ class UserFactory(DjangoModelFactory):
         if extracted is None:
             return
 
-        if isinstance(extracted, basestring):
+        if isinstance(extracted, str):
             extracted = [extracted]
 
         for group_name in extracted:
@@ -132,7 +132,7 @@ class CourseEnrollmentFactory(DjangoModelFactory):
     def _create(cls, model_class, *args, **kwargs):
         manager = cls._get_manager(model_class)
         course_kwargs = {}
-        for key in kwargs.keys():
+        for key in list(kwargs.keys()):
             if key.startswith('course__'):
                 course_kwargs[key.split('__')[1]] = kwargs.pop(key)
 
@@ -140,7 +140,7 @@ class CourseEnrollmentFactory(DjangoModelFactory):
             course_id = kwargs.get('course_id')
             course_overview = None
             if course_id is not None:
-                if isinstance(course_id, basestring):
+                if isinstance(course_id, str):
                     course_id = CourseKey.from_string(course_id)
                     course_kwargs.setdefault('id', course_id)
 
@@ -184,8 +184,8 @@ class PendingEmailChangeFactory(DjangoModelFactory):
         model = PendingEmailChange
 
     user = factory.SubFactory(UserFactory)
-    new_email = factory.Sequence(u'new+email+{0}@edx.org'.format)
-    activation_key = factory.Sequence(u'{:0<30d}'.format)
+    new_email = factory.Sequence('new+email+{0}@edx.org'.format)
+    activation_key = factory.Sequence('{:0<30d}'.format)
 
 
 class ContentTypeFactory(DjangoModelFactory):
@@ -209,5 +209,5 @@ class AccountRecoveryFactory(DjangoModelFactory):
         django_get_or_create = ('user',)
 
     user = None
-    secondary_email = factory.Sequence(u'robot+test+recovery+{0}@edx.org'.format)
+    secondary_email = factory.Sequence('robot+test+recovery+{0}@edx.org'.format)
     is_active = True

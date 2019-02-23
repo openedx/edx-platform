@@ -50,7 +50,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         :return: Response
         """
         payload = {
-            "course_id": unicode(course_id or self.course.id)
+            "course_id": str(course_id or self.course.id)
         }
         if marketing_email_opt_in:
             payload["email_opt_in"] = True
@@ -247,7 +247,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         CourseEnrollment.enroll(self.user, self.course.id)
         CourseEnrollment.unenroll(self.user, self.course.id, True)
         self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course.id))
-        self.assertIsNotNone(get_enrollment(self.user.username, unicode(self.course.id)))
+        self.assertIsNotNone(get_enrollment(self.user.username, str(self.course.id)))
 
     @mock.patch('lms.djangoapps.commerce.api.v0.views.update_email_opt_in')
     @ddt.data(*itertools.product((False, True), (False, True), (False, True)))

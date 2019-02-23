@@ -52,7 +52,7 @@ class BookmarkSerializer(serializers.ModelSerializer):
         """
         Return the REST resource id: {username,usage_id}.
         """
-        return u"{0},{1}".format(bookmark.user.username, bookmark.usage_key)
+        return "{0},{1}".format(bookmark.user.username, bookmark.usage_key)
 
     def get_path(self, bookmark):
         """
@@ -60,5 +60,5 @@ class BookmarkSerializer(serializers.ModelSerializer):
         """
         path_items = [path_item._asdict() for path_item in bookmark.path]
         for path_item in path_items:
-            path_item['usage_key'] = unicode(path_item['usage_key'])
+            path_item['usage_key'] = str(path_item['usage_key'])
         return path_items

@@ -11,6 +11,7 @@ from django.test import TestCase
 from mock import patch
 
 from util.db import CommitOnSuccessManager, OuterAtomic
+import imp
 
 
 class UrlResetMixin(object):
@@ -40,7 +41,7 @@ class UrlResetMixin(object):
 
         for urlconf in urlconf_modules:
             if urlconf in sys.modules:
-                reload(sys.modules[urlconf])
+                imp.reload(sys.modules[urlconf])
         clear_url_caches()
 
         # Resolve a URL so that the new urlconf gets loaded

@@ -9,7 +9,7 @@ class Rule(object):
 class RuleSet(object):
     def __init__(self, **kwargs):
         self.rules = {}
-        for k, v in kwargs.items():
+        for k, v in list(kwargs.items()):
             self.rules[k] = Rule(v)
 
     def __getattr__(self, attr_name):

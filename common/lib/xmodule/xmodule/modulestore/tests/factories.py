@@ -1,7 +1,7 @@
 """
 Factories for use in tests of XBlocks.
 """
-from __future__ import print_function
+
 
 import datetime
 import functools
@@ -370,7 +370,7 @@ class ItemFactory(XModuleFactory):
                 template = clz.get_template(template_id)
                 assert template is not None
                 metadata.update(template.get('metadata', {}))
-                if not isinstance(data, basestring):
+                if not isinstance(data, str):
                     data.update(template.get('data'))
 
             # replace the display name with an optional parameter passed in from the caller
@@ -476,7 +476,7 @@ class StackTraceCounter(object):
                     safe_args.append('<un-repr-able value: {}'.format(exc))
 
             safe_kwargs = {}
-            for key, kwarg in kwargs.items():
+            for key, kwarg in list(kwargs.items()):
                 try:
                     safe_kwargs[key] = repr(kwarg)
                 except Exception as exc:
@@ -506,7 +506,7 @@ class StackTraceCounter(object):
         """
         Iterate over all unique captured stacks.
         """
-        return iter(sorted(self._stacks.keys(), key=lambda stack: (self.stack_calls(stack), stack), reverse=True))
+        return iter(sorted(list(self._stacks.keys()), key=lambda stack: (self.stack_calls(stack), stack), reverse=True))
 
     def __getitem__(self, stack):
         """
@@ -560,7 +560,7 @@ def check_sum_of_calls(object_, methods, maximum_calls, minimum_calls=1, include
     with patch.multiple(object_, **mocks):
         yield
 
-    call_count = sum(capture_fn.stack_counter.total_calls for capture_fn in mocks.values())
+    call_count = sum(capture_fn.stack_counter.total_calls for capture_fn in list(mocks.values()))
 
     # Assertion errors don't handle multi-line values, so pretty-print to std-out instead
     if not minimum_calls <= call_count <= maximum_calls:
@@ -569,7 +569,7 @@ def check_sum_of_calls(object_, methods, maximum_calls, minimum_calls=1, include
             maximum_calls,
             call_count,
         )]
-        for method_name, capture_fn in mocks.items():
+        for method_name, capture_fn in list(mocks.items()):
             stack_counter = capture_fn.stack_counter
             messages.append("{!r} was called {} times:\n".format(
                 method_name,
@@ -580,7 +580,7 @@ def check_sum_of_calls(object_, methods, maximum_calls, minimum_calls=1, include
                 messages.append("    " + "    ".join(traceback.format_list(stack)))
                 messages.append("\n\n")
                 if include_arguments:
-                    for (args, kwargs), count in stack_counter[stack].items():
+                    for (args, kwargs), count in list(stack_counter[stack].items()):
                         messages.append("      called {} times with:\n".format(count))
                         messages.append("      args: {}\n".format(args))
                         messages.append("      kwargs: {}\n\n".format(dict(kwargs)))

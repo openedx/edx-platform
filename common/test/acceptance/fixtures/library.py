@@ -35,7 +35,7 @@ class LibraryFixture(XBlockContainerFixture):
         """
         String representation of the library fixture, useful for debugging.
         """
-        return u"<LibraryFixture: org='{org}', number='{number}'>".format(**self.library_info)
+        return "<LibraryFixture: org='{org}', number='{number}'>".format(**self.library_info)
 
     def install(self):
         """
@@ -62,7 +62,7 @@ class LibraryFixture(XBlockContainerFixture):
         Return the locator string for the LibraryRoot XBlock that is the root of the library hierarchy.
         """
         lib_key = CourseKey.from_string(self._library_key)
-        return unicode(lib_key.make_usage_key('library', 'library'))
+        return str(lib_key.make_usage_key('library', 'library'))
 
     def _create_library(self):
         """
@@ -82,7 +82,7 @@ class LibraryFixture(XBlockContainerFixture):
                 err_msg = response.json().get('ErrMsg')
             except ValueError:
                 err_msg = "Unknown Error"
-            raise FixtureError(u"Could not create library {}. Status was {}, error was: {}".format(
+            raise FixtureError("Could not create library {}. Status was {}, error was: {}".format(
                 self.library_info, response.status_code, err_msg
             ))
 

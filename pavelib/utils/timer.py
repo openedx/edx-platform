@@ -56,7 +56,7 @@ def timed(wrapped, instance, args, kwargs):  # pylint: disable=unused-argument
                 'python_version': sys.version,
                 'task': "{}.{}".format(wrapped.__module__, wrapped.__name__),
                 'args': [repr(arg) for arg in args],
-                'kwargs': {key: repr(value) for key, value in kwargs.items()},
+                'kwargs': {key: repr(value) for key, value in list(kwargs.items())},
                 'started_at': start.isoformat(' '),
                 'ended_at': end.isoformat(' '),
                 'duration': (end - start).total_seconds(),

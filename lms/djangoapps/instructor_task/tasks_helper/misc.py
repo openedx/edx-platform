@@ -52,7 +52,7 @@ def upload_course_survey_report(_xmodule_instance_args, _entry_id, course_id, _t
 
     for survey_field_record in survey_answers_for_course:
         user_id = survey_field_record.user.id
-        if user_id not in user_survey_answers.keys():
+        if user_id not in list(user_survey_answers.keys()):
             user_survey_answers[user_id] = {
                 'username': survey_field_record.user.username,
                 'email': survey_field_record.user.email
@@ -64,7 +64,7 @@ def upload_course_survey_report(_xmodule_instance_args, _entry_id, course_id, _t
     header.extend(survey_fields)
     csv_rows = []
 
-    for user_id in user_survey_answers.keys():
+    for user_id in list(user_survey_answers.keys()):
         row = []
         row.append(user_id)
         row.append(user_survey_answers[user_id].get('username', ''))
@@ -228,7 +228,7 @@ def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, tas
             else status_dict[column_name]
             for column_name in output_header
         ]
-        for _cohort_name, status_dict in cohorts_status.iteritems()
+        for _cohort_name, status_dict in cohorts_status.items()
     ]
     output_rows.insert(0, output_header)
     upload_csv_to_report_store(output_rows, 'cohort_results', course_id, start_date)
@@ -249,21 +249,21 @@ def upload_ora2_data(
     num_attempted = 1
     num_total = 1
 
-    fmt = u'Task: {task_id}, InstructorTask ID: {entry_id}, Course: {course_id}, Input: {task_input}'
+    fmt = 'Task: {task_id}, InstructorTask ID: {entry_id}, Course: {course_id}, Input: {task_input}'
     task_info_string = fmt.format(
         task_id=_xmodule_instance_args.get('task_id') if _xmodule_instance_args is not None else None,
         entry_id=_entry_id,
         course_id=course_id,
         task_input=_task_input
     )
-    TASK_LOG.info(u'%s, Task type: %s, Starting task execution', task_info_string, action_name)
+    TASK_LOG.info('%s, Task type: %s, Starting task execution', task_info_string, action_name)
 
     task_progress = TaskProgress(action_name, num_total, start_time)
     task_progress.attempted = num_attempted
 
     curr_step = {'step': "Collecting responses"}
     TASK_LOG.info(
-        u'%s, Task type: %s, Current step: %s for all submissions',
+        '%s, Task type: %s, Current step: %s for all submissions',
         task_info_string,
         action_name,
         curr_step,
@@ -287,7 +287,7 @@ def upload_ora2_data(
     task_progress.succeeded = 1
     curr_step = {'step': "Uploading CSV"}
     TASK_LOG.info(
-        u'%s, Task type: %s, Current step: %s',
+        '%s, Task type: %s, Current step: %s',
         task_info_string,
         action_name,
         curr_step,
@@ -298,6 +298,6 @@ def upload_ora2_data(
 
     curr_step = {'step': 'Finalizing ORA data report'}
     task_progress.update_task_state(extra_meta=curr_step)
-    TASK_LOG.info(u'%s, Task type: %s, Upload complete.', task_info_string, action_name)
+    TASK_LOG.info('%s, Task type: %s, Upload complete.', task_info_string, action_name)
 
     return UPDATE_STATUS_SUCCEEDED

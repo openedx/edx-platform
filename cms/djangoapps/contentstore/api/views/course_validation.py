@@ -118,7 +118,7 @@ class CourseValidationView(DeveloperErrorViewMixin, GenericAPIView):
         ]
         assignments_with_dates_before_start = (
             [
-                {'id': unicode(a.location), 'display_name': a.display_name}
+                {'id': str(a.location), 'display_name': a.display_name}
                 for a in assignments_with_dates
                 if a.due < course.start
             ]
@@ -128,7 +128,7 @@ class CourseValidationView(DeveloperErrorViewMixin, GenericAPIView):
 
         assignments_with_dates_after_end = (
             [
-                {'id': unicode(a.location), 'display_name': a.display_name}
+                {'id': str(a.location), 'display_name': a.display_name}
                 for a in assignments_with_dates
                 if a.due > course.end
             ]
@@ -144,7 +144,7 @@ class CourseValidationView(DeveloperErrorViewMixin, GenericAPIView):
             ]
             assignments_with_dates_before_start = (
                 [
-                    {'id': unicode(a.location), 'display_name': a.display_name}
+                    {'id': str(a.location), 'display_name': a.display_name}
                     for a in assignments_with_dates
                     if a.due < course.start
                 ]
@@ -154,7 +154,7 @@ class CourseValidationView(DeveloperErrorViewMixin, GenericAPIView):
 
             assignments_with_dates_after_end = (
                 [
-                    {'id': unicode(a.location), 'display_name': a.display_name}
+                    {'id': str(a.location), 'display_name': a.display_name}
                     for a in assignments_with_dates
                     if a.due > course.end
                 ]
@@ -175,14 +175,14 @@ class CourseValidationView(DeveloperErrorViewMixin, GenericAPIView):
                     parent_unit = modulestore().get_item(ora.parent)
                     parent_assignment = modulestore().get_item(parent_unit.parent)
                     assignments_with_ora_dates_before_start.append({
-                        'id': unicode(parent_assignment.location),
+                        'id': str(parent_assignment.location),
                         'display_name': parent_assignment.display_name
                     })
                 if course.end and self._has_date_after_end(ora, course.end):
                     parent_unit = modulestore().get_item(ora.parent)
                     parent_assignment = modulestore().get_item(parent_unit.parent)
                     assignments_with_ora_dates_after_end.append({
-                        'id': unicode(parent_assignment.location),
+                        'id': str(parent_assignment.location),
                         'display_name': parent_assignment.display_name
                     })
 

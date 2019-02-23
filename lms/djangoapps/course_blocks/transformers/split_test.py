@@ -61,7 +61,7 @@ class SplitTestTransformer(FilteringTransformerMixin, BlockStructureTransformer)
             # Create dict of child location to group_id, using the
             # group_id_to_child field on the split_test module.
             child_to_group = {
-                xblock.group_id_to_child.get(unicode(group.id), None): group.id
+                xblock.group_id_to_child.get(str(group.id), None): group.id
                 for group in partition_for_this_block.groups
             }
 

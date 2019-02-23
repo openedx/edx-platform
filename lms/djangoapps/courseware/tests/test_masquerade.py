@@ -89,7 +89,7 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         url = reverse(
             'courseware_section',
             kwargs={
-                'course_id': unicode(self.course.id),
+                'course_id': str(self.course.id),
                 'chapter': self.chapter.location.block_id,
                 'section': self.sequential.location.block_id,
             }
@@ -103,7 +103,7 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         url = reverse(
             'info',
             kwargs={
-                'course_id': unicode(self.course.id),
+                'course_id': str(self.course.id),
             }
         )
         return self.client.get(url)
@@ -115,7 +115,7 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         url = reverse(
             'progress',
             kwargs={
-                'course_id': unicode(self.course.id),
+                'course_id': str(self.course.id),
             }
         )
         return self.client.get(url)
@@ -135,8 +135,8 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         problem_url = reverse(
             'xblock_handler',
             kwargs={
-                'course_id': unicode(self.course.id),
-                'usage_id': unicode(self.problem.location),
+                'course_id': str(self.course.id),
+                'usage_id': str(self.problem.location),
                 'handler': 'xmodule_handler',
                 'suffix': 'problem_get'
             }
@@ -207,7 +207,7 @@ class StaffMasqueradeTestCase(MasqueradeTestCase):
         masquerade_url = reverse(
             'masquerade_update',
             kwargs={
-                'course_key_string': unicode(self.course.id),
+                'course_key_string': str(self.course.id),
             }
         )
         response = self.client.post(
@@ -339,7 +339,7 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
 
     @ddt.data(
         'john',  # Non-unicode username
-        u'fôô@bar',  # Unicode username with @, which is what the ENABLE_UNICODE_USERNAME feature allows
+        'fôô@bar',  # Unicode username with @, which is what the ENABLE_UNICODE_USERNAME feature allows
     )
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_masquerade_as_specific_student(self, username):
@@ -355,32 +355,32 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         self.login(student.email, 'test')
         # Answer correctly as the student, and check progress.
         self.submit_answer('Correct', 'Correct')
-        self.assertEqual(self.get_progress_detail(), u'2/2')
+        self.assertEqual(self.get_progress_detail(), '2/2')
 
         # Log in as staff, and check the problem is unanswered.
         self.login_staff()
-        self.assertEqual(self.get_progress_detail(), u'0/2')
+        self.assertEqual(self.get_progress_detail(), '0/2')
 
         # Masquerade as the student, and check we can see the student state.
         self.update_masquerade(role='student', user_name=student.username)
-        self.assertEqual(self.get_progress_detail(), u'2/2')
+        self.assertEqual(self.get_progress_detail(), '2/2')
 
         # Temporarily override the student state.
         self.submit_answer('Correct', 'Incorrect')
-        self.assertEqual(self.get_progress_detail(), u'1/2')
+        self.assertEqual(self.get_progress_detail(), '1/2')
 
         # Reload the page and check we see the student state again.
         self.get_courseware_page()
-        self.assertEqual(self.get_progress_detail(), u'2/2')
+        self.assertEqual(self.get_progress_detail(), '2/2')
 
         # Become the staff user again, and check the problem is still unanswered.
         self.update_masquerade(role='staff')
-        self.assertEqual(self.get_progress_detail(), u'0/2')
+        self.assertEqual(self.get_progress_detail(), '0/2')
 
         # Verify the student state did not change.
         self.logout()
         self.login(student.email, 'test')
-        self.assertEqual(self.get_progress_detail(), u'2/2')
+        self.assertEqual(self.get_progress_detail(), '2/2')
 
     def test_masquerading_with_language_preference(self):
         """

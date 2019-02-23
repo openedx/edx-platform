@@ -22,6 +22,6 @@ def heartbeat(request):
                 status_code = 503  # 503 on any failure
     except Exception as e:
         status_code = 503
-        check_results = {'error': unicode(e)}
+        check_results = {'error': str(e)}
 
     return JsonResponse(check_results, status=status_code)

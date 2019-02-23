@@ -93,7 +93,7 @@ class MobileAPITestCase(ModuleStoreTestCase, APITestCase):
         """Base implementation that returns URL for endpoint that's being tested."""
         reverse_args = reverse_args or {}
         if 'course_id' in self.REVERSE_INFO['params']:
-            reverse_args.update({'course_id': unicode(kwargs.get('course_id', self.course.id))})
+            reverse_args.update({'course_id': str(kwargs.get('course_id', self.course.id))})
         if 'username' in self.REVERSE_INFO['params']:
             reverse_args.update({'username': kwargs.get('username', self.user.username)})
         if 'api_version' in self.REVERSE_INFO['params']:

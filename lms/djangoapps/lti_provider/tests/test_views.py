@@ -14,23 +14,23 @@ from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 LTI_DEFAULT_PARAMS = {
-    'roles': u'Instructor,urn:lti:instrole:ims/lis/Administrator',
-    'context_id': u'lti_launch_context_id',
-    'oauth_version': u'1.0',
-    'oauth_consumer_key': u'consumer_key',
-    'oauth_signature': u'OAuth Signature',
-    'oauth_signature_method': u'HMAC-SHA1',
-    'oauth_timestamp': u'OAuth Timestamp',
-    'oauth_nonce': u'OAuth Nonce',
-    'user_id': u'LTI_User',
+    'roles': 'Instructor,urn:lti:instrole:ims/lis/Administrator',
+    'context_id': 'lti_launch_context_id',
+    'oauth_version': '1.0',
+    'oauth_consumer_key': 'consumer_key',
+    'oauth_signature': 'OAuth Signature',
+    'oauth_signature_method': 'HMAC-SHA1',
+    'oauth_timestamp': 'OAuth Timestamp',
+    'oauth_nonce': 'OAuth Nonce',
+    'user_id': 'LTI_User',
 }
 
 LTI_OPTIONAL_PARAMS = {
-    'context_title': u'context title',
-    'context_label': u'context label',
-    'lis_result_sourcedid': u'result sourcedid',
-    'lis_outcome_service_url': u'outcome service URL',
-    'tool_consumer_instance_guid': u'consumer instance guid'
+    'context_title': 'context title',
+    'context_label': 'context label',
+    'lis_result_sourcedid': 'result sourcedid',
+    'lis_outcome_service_url': 'outcome service URL',
+    'tool_consumer_instance_guid': 'consumer instance guid'
 }
 
 COURSE_KEY = CourseLocator(org='some_org', course='some_course', run='some_run')
@@ -42,7 +42,7 @@ COURSE_PARAMS = {
 }
 
 
-ALL_PARAMS = dict(LTI_DEFAULT_PARAMS.items() + COURSE_PARAMS.items())
+ALL_PARAMS = dict(list(LTI_DEFAULT_PARAMS.items()) + list(COURSE_PARAMS.items()))
 
 
 def build_launch_request(extra_post_data=None, param_to_delete=None):
@@ -51,7 +51,7 @@ def build_launch_request(extra_post_data=None, param_to_delete=None):
     """
     if extra_post_data is None:
         extra_post_data = {}
-    post_data = dict(LTI_DEFAULT_PARAMS.items() + extra_post_data.items())
+    post_data = dict(list(LTI_DEFAULT_PARAMS.items()) + list(extra_post_data.items()))
     if param_to_delete:
         del post_data[param_to_delete]
     request = RequestFactory().post('/', data=post_data)
@@ -92,7 +92,7 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
         Verifies that the LTI launch succeeds when passed a valid request.
         """
         request = build_launch_request()
-        views.lti_launch(request, unicode(COURSE_KEY), unicode(USAGE_KEY))
+        views.lti_launch(request, str(COURSE_KEY), str(USAGE_KEY))
         render.assert_called_with(request, USAGE_KEY)
 
     @patch('lti_provider.views.render_courseware')
@@ -103,9 +103,9 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
         Verifies that the LTI launch succeeds when passed a valid request.
         """
         request = build_launch_request(extra_post_data=LTI_OPTIONAL_PARAMS)
-        views.lti_launch(request, unicode(COURSE_KEY), unicode(USAGE_KEY))
+        views.lti_launch(request, str(COURSE_KEY), str(USAGE_KEY))
         store_params.assert_called_with(
-            dict(ALL_PARAMS.items() + LTI_OPTIONAL_PARAMS.items()),
+            dict(list(ALL_PARAMS.items()) + list(LTI_OPTIONAL_PARAMS.items())),
             request.user,
             self.consumer
         )
@@ -120,8 +120,8 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
         request = build_launch_request()
         views.lti_launch(
             request,
-            unicode(COURSE_PARAMS['course_key']),
-            unicode(COURSE_PARAMS['usage_key'])
+            str(COURSE_PARAMS['course_key']),
+            str(COURSE_PARAMS['usage_key'])
         )
         store_params.assert_called_with(ALL_PARAMS, request.user, self.consumer)
 
@@ -176,7 +176,7 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
         consumer = models.LtiConsumer.objects.get(
             consumer_key=LTI_DEFAULT_PARAMS['oauth_consumer_key']
         )
-        self.assertEqual(consumer.instance_guid, u'consumer instance guid')
+        self.assertEqual(consumer.instance_guid, 'consumer instance guid')
 
 
 class LtiLaunchTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCase):
@@ -194,8 +194,8 @@ class LtiLaunchTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCa
         lti_launch_url = reverse(
             'lti_provider_launch',
             kwargs={
-                'course_id': unicode(self.course.id),
-                'usage_id': unicode(usage_key)
+                'course_id': str(self.course.id),
+                'usage_id': str(usage_key)
             }
         )
         if url_encoded_params:

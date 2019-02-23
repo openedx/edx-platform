@@ -11,7 +11,7 @@ by passing the --settings flag, you can specify what environment specific settin
 Any arguments not understood by this manage.py will be passed to django-admin.py
 """
 # pylint: disable=wrong-import-order, wrong-import-position
-from __future__ import absolute_import, print_function
+
 
 from openedx.core.lib.logsettings import log_python_warnings
 log_python_warnings()

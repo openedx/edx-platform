@@ -207,10 +207,10 @@ MKTG_URLS = ENV_TOKENS.get('MKTG_URLS', MKTG_URLS)
 MKTG_URL_LINK_MAP.update(ENV_TOKENS.get('MKTG_URL_LINK_MAP', {}))
 TECH_SUPPORT_EMAIL = ENV_TOKENS.get('TECH_SUPPORT_EMAIL', TECH_SUPPORT_EMAIL)
 
-for name, value in ENV_TOKENS.get("CODE_JAIL", {}).items():
+for name, value in list(ENV_TOKENS.get("CODE_JAIL", {}).items()):
     oldvalue = CODE_JAIL.get(name)
     if isinstance(oldvalue, dict):
-        for subname, subvalue in value.items():
+        for subname, subvalue in list(value.items()):
             oldvalue[subname] = subvalue
     else:
         CODE_JAIL[name] = value
@@ -245,7 +245,7 @@ USE_I18N = ENV_TOKENS.get('USE_I18N', USE_I18N)
 ALL_LANGUAGES = ENV_TOKENS.get('ALL_LANGUAGES', ALL_LANGUAGES)
 
 ENV_FEATURES = ENV_TOKENS.get('FEATURES', {})
-for feature, value in ENV_FEATURES.items():
+for feature, value in list(ENV_FEATURES.items()):
     FEATURES[feature] = value
 
 # Additional installed apps
@@ -367,7 +367,7 @@ DATABASES = AUTH_TOKENS['DATABASES']
 # The normal database user does not have enough permissions to run migrations.
 # Migrations are run with separate credentials, given as DB_MIGRATION_*
 # environment variables
-for name, database in DATABASES.items():
+for name, database in list(DATABASES.items()):
     if name != 'read_replica':
         database.update({
             'ENGINE': os.environ.get('DB_MIGRATION_ENGINE', database['ENGINE']),
@@ -434,7 +434,7 @@ CELERY_QUEUES.update(
     {
         alternate: {}
         for alternate in ALTERNATE_QUEUES
-        if alternate not in CELERY_QUEUES.keys()
+        if alternate not in list(CELERY_QUEUES.keys())
     }
 )
 

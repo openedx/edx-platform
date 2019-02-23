@@ -171,8 +171,8 @@ class LoginWithAccessTokenView(APIView):
 
         if not self._is_grant_password(request.auth):
             raise AuthenticationFailed({
-                u'error_code': u'non_supported_token',
-                u'developer_message': u'Only support DOT type access token with grant type password. '
+                'error_code': 'non_supported_token',
+                'developer_message': 'Only support DOT type access token with grant type password. '
             })
 
         login(request, request.user)  # login generates and stores the user's cookies in the session

@@ -20,7 +20,7 @@ class IgnoredFilesTestCase(unittest.TestCase):
     def setUp(self):
         super(IgnoredFilesTestCase, self).setUp()
         for dictionary in self.dict_list:
-            self.addCleanup(remove_temp_files_from_list, dictionary.keys(), self.course_dir / "static")
+            self.addCleanup(remove_temp_files_from_list, list(dictionary.keys()), self.course_dir / "static")
             add_temp_files_from_dict(dictionary, self.course_dir / "static")
 
     def test_sample_static_files(self):

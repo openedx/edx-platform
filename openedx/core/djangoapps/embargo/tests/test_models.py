@@ -27,9 +27,9 @@ class EmbargoModelsTest(CacheIsolationTestCase):
 
         # Now, course should be embargoed
         self.assertTrue(EmbargoedCourse.is_embargoed(course_id))
-        self.assertEquals(
-            unicode(cauth),
-            u"Course '{course_id}' is Embargoed".format(course_id=course_id)
+        self.assertEqual(
+            str(cauth),
+            "Course '{course_id}' is Embargoed".format(course_id=course_id)
         )
 
         # Unauthorize by explicitly setting email_enabled to False
@@ -37,9 +37,9 @@ class EmbargoModelsTest(CacheIsolationTestCase):
         cauth.save()
         # Test that course is now unauthorized
         self.assertFalse(EmbargoedCourse.is_embargoed(course_id))
-        self.assertEquals(
-            unicode(cauth),
-            u"Course '{course_id}' is Not Embargoed".format(course_id=course_id)
+        self.assertEqual(
+            str(cauth),
+            "Course '{course_id}' is Not Embargoed".format(course_id=course_id)
         )
 
     def test_state_embargo(self):
@@ -74,8 +74,8 @@ class EmbargoModelsTest(CacheIsolationTestCase):
             self.assertIn(state, currently_blocked)
 
     def test_ip_blocking(self):
-        whitelist = u'127.0.0.1'
-        blacklist = u'18.244.51.3'
+        whitelist = '127.0.0.1'
+        blacklist = '18.244.51.3'
 
         cwhitelist = IPFilter.current().whitelist_ips
         self.assertNotIn(whitelist, cwhitelist)
@@ -90,20 +90,20 @@ class EmbargoModelsTest(CacheIsolationTestCase):
         self.assertIn(blacklist, cblacklist)
 
     def test_ip_network_blocking(self):
-        whitelist = u'1.0.0.0/24'
-        blacklist = u'1.1.0.0/16'
+        whitelist = '1.0.0.0/24'
+        blacklist = '1.1.0.0/16'
 
         IPFilter(whitelist=whitelist, blacklist=blacklist).save()
 
         cwhitelist = IPFilter.current().whitelist_ips
-        self.assertIn(u'1.0.0.100', cwhitelist)
-        self.assertIn(u'1.0.0.10', cwhitelist)
-        self.assertNotIn(u'1.0.1.0', cwhitelist)
+        self.assertIn('1.0.0.100', cwhitelist)
+        self.assertIn('1.0.0.10', cwhitelist)
+        self.assertNotIn('1.0.1.0', cwhitelist)
         cblacklist = IPFilter.current().blacklist_ips
-        self.assertIn(u'1.1.0.0', cblacklist)
-        self.assertIn(u'1.1.0.1', cblacklist)
-        self.assertIn(u'1.1.1.0', cblacklist)
-        self.assertNotIn(u'1.2.0.0', cblacklist)
+        self.assertIn('1.1.0.0', cblacklist)
+        self.assertIn('1.1.0.1', cblacklist)
+        self.assertIn('1.1.1.0', cblacklist)
+        self.assertNotIn('1.2.0.0', cblacklist)
 
 
 class RestrictedCourseTest(CacheIsolationTestCase):
@@ -114,9 +114,9 @@ class RestrictedCourseTest(CacheIsolationTestCase):
     def test_unicode_values(self):
         course_id = CourseLocator('abc', '123', 'doremi')
         restricted_course = RestrictedCourse.objects.create(course_key=course_id)
-        self.assertEquals(
-            unicode(restricted_course),
-            unicode(course_id)
+        self.assertEqual(
+            str(restricted_course),
+            str(course_id)
         )
 
     def test_restricted_course_cache_with_save_delete(self):
@@ -166,7 +166,7 @@ class CountryTest(TestCase):
 
     def test_unicode_values(self):
         country = Country.objects.create(country='NZ')
-        self.assertEquals(unicode(country), "New Zealand (NZ)")
+        self.assertEqual(str(country), "New Zealand (NZ)")
 
 
 class CountryAccessRuleTest(CacheIsolationTestCase):
@@ -183,9 +183,9 @@ class CountryAccessRuleTest(CacheIsolationTestCase):
             country=country
         )
 
-        self.assertEquals(
-            unicode(access_rule),
-            u"Whitelist New Zealand (NZ) for {course_key}".format(course_key=course_id)
+        self.assertEqual(
+            str(access_rule),
+            "Whitelist New Zealand (NZ) for {course_key}".format(course_key=course_id)
         )
 
         course_id = CourseLocator('def', '123', 'doremi')
@@ -196,9 +196,9 @@ class CountryAccessRuleTest(CacheIsolationTestCase):
             country=country
         )
 
-        self.assertEquals(
-            unicode(access_rule),
-            u"Blacklist New Zealand (NZ) for {course_key}".format(course_key=course_id)
+        self.assertEqual(
+            str(access_rule),
+            "Blacklist New Zealand (NZ) for {course_key}".format(course_key=course_id)
         )
 
     def test_unique_together_constraint(self):

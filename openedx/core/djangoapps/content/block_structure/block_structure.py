@@ -145,7 +145,7 @@ class BlockStructure(object):
             iterator(UsageKey) - An iterator of the usage
             keys of all the blocks in the block structure.
         """
-        return self._block_relations.iterkeys()
+        return iter(self._block_relations.keys())
 
     #--- Block structure traversal methods ---#
 
@@ -300,7 +300,7 @@ class FieldData(object):
         try:
             return self.fields[field_name]
         except KeyError:
-            raise AttributeError(u"Field {0} does not exist".format(field_name))
+            raise AttributeError("Field {0} does not exist".format(field_name))
 
     def __setattr__(self, field_name, field_value):
         if self._is_own_field(field_name):
@@ -432,14 +432,14 @@ class BlockStructureBlockData(BlockStructure):
         Returns iterator of (UsageKey, BlockData) pairs for all
         blocks in the BlockStructure.
         """
-        return self._block_data_map.iteritems()
+        return iter(self._block_data_map.items())
 
     def itervalues(self):
         """
         Returns iterator of BlockData for all blocks in the
         BlockStructure.
         """
-        return self._block_data_map.itervalues()
+        return iter(self._block_data_map.values())
 
     def __getitem__(self, usage_key):
         """
@@ -747,7 +747,7 @@ class BlockStructureBlockData(BlockStructure):
         its current version number.
         """
         if transformer.WRITE_VERSION == 0:
-            raise TransformerException(u'Version attributes are not set on transformer {0}.', transformer.name())
+            raise TransformerException('Version attributes are not set on transformer {0}.', transformer.name())
         self.set_transformer_data(transformer, TRANSFORMER_VERSION_KEY, transformer.WRITE_VERSION)
 
     def _get_or_create_block(self, usage_key):
@@ -835,7 +835,7 @@ class BlockStructureModulestoreData(BlockStructureBlockData):
         Iterates through all instantiated xBlocks that were added and
         collects all xBlock fields that were requested.
         """
-        for xblock_usage_key, xblock in self._xblock_map.iteritems():
+        for xblock_usage_key, xblock in self._xblock_map.items():
             block_data = self._get_or_create_block(xblock_usage_key)
             for field_name in self._requested_xblock_fields:
                 self._set_xblock_field(block_data, xblock, field_name)

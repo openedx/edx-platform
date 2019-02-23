@@ -127,7 +127,7 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
                 for sequential in chapter.children:
                     self.assertIn(sequential.display_name, response_content)
                     if sequential.graded:
-                        self.assertIn(sequential.due.strftime(u'%Y-%m-%d %H:%M:%S'), response_content)
+                        self.assertIn(sequential.due.strftime('%Y-%m-%d %H:%M:%S'), response_content)
                         self.assertIn(sequential.format, response_content)
                     self.assertTrue(sequential.children)
                     for vertical in sequential.children:
@@ -212,7 +212,7 @@ class TestCourseOutlinePageWithPrerequisites(SharedModuleStoreTestCase, Mileston
             gating_block: (The prerequisite) The block that must be completed to get access to the gated block
         """
 
-        gating_api.add_prerequisite(self.course.id, unicode(gating_block.location))
+        gating_api.add_prerequisite(self.course.id, str(gating_block.location))
         gating_api.set_required_content(self.course.id, gated_block.location, gating_block.location, 100)
 
     def test_content_locked(self):
@@ -362,7 +362,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         """
         course_key = CourseKey.from_string(str(course.id))
         # Fake a visit to sequence2/vertical2
-        block_key = UsageKey.from_string(unicode(sequential.location))
+        block_key = UsageKey.from_string(str(sequential.location))
         completion = 1.0
         BlockCompletion.objects.submit_completion(
             user=self.user,
@@ -595,7 +595,7 @@ class TestCourseOutlinePreview(SharedModuleStoreTestCase):
         masquerade_url = reverse(
             'masquerade_update',
             kwargs={
-                'course_key_string': unicode(course.id),
+                'course_key_string': str(course.id),
             }
         )
         response = self.client.post(

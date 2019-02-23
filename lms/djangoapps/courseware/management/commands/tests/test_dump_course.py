@@ -5,7 +5,7 @@ Tests for Django management commands
 """
 
 import json
-from StringIO import StringIO
+from io import StringIO
 
 from six import text_type
 
@@ -57,7 +57,7 @@ class CommandsTestBase(SharedModuleStoreTestCase):
             org=unique_org,
             course='simple',
             run="run",
-            display_name=u'2012_Fáĺĺ',
+            display_name='2012_Fáĺĺ',
             modulestore=store
         )
 
@@ -101,7 +101,7 @@ class CommandsTestBase(SharedModuleStoreTestCase):
             self.fail(exception)
 
         dump = json.loads(output)
-        self.assertGreater(len(dump.values()), 0)
+        self.assertGreater(len(list(dump.values())), 0)
 
     def test_dump_course_structure(self):
         args = [text_type(self.test_course_key)]
@@ -112,7 +112,7 @@ class CommandsTestBase(SharedModuleStoreTestCase):
 
         # check that all elements in the course structure have metadata,
         # but not inherited metadata:
-        for element in dump.itervalues():
+        for element in dump.values():
             self.assertIn('metadata', element)
             self.assertIn('children', element)
             self.assertIn('category', element)
@@ -133,7 +133,7 @@ class CommandsTestBase(SharedModuleStoreTestCase):
         course_metadata = dump[video_id]['metadata']
         course_metadata.pop('edx_video_id', None)
         self.assertItemsEqual(
-            course_metadata.keys(),
+            list(course_metadata.keys()),
             ['download_video', 'youtube_id_0_75', 'youtube_id_1_0', 'youtube_id_1_25', 'youtube_id_1_5']
         )
         self.assertIn('youtube_id_1_0', dump[video_id]['metadata'])
@@ -149,7 +149,7 @@ class CommandsTestBase(SharedModuleStoreTestCase):
         dump = json.loads(output)
         # check that all elements in the course structure have inherited metadata,
         # and that it contains a particular value as well:
-        for element in dump.itervalues():
+        for element in dump.values():
             self.assertIn('metadata', element)
             self.assertIn('children', element)
             self.assertIn('category', element)
@@ -164,7 +164,7 @@ class CommandsTestBase(SharedModuleStoreTestCase):
         dump = json.loads(output)
         # check that all elements in the course structure have inherited metadata,
         # and that it contains a particular value as well:
-        for element in dump.itervalues():
+        for element in dump.values():
             self.assertIn('metadata', element)
             self.assertIn('children', element)
             self.assertIn('category', element)

@@ -46,7 +46,7 @@ def safe_parse_date(date):
     Since this is used solely for ordering purposes, use today's date as a default
     """
     try:
-        return datetime.strptime(date, u'%B %d, %Y')
+        return datetime.strptime(date, '%B %d, %Y')
     except ValueError:  # occurs for ill-formatted date values
         return datetime.today()
 
@@ -70,7 +70,7 @@ class CourseUpdatesView(CourseTabView):
         return USE_BOOTSTRAP_FLAG.is_enabled(course.id)
 
     def render_to_fragment(self, request, course=None, tab=None, **kwargs):
-        course_id = unicode(course.id)
+        course_id = str(course.id)
         updates_fragment_view = CourseUpdatesFragmentView()
         return updates_fragment_view.render_to_fragment(request, course_id=course_id, **kwargs)
 
@@ -86,7 +86,7 @@ class CourseUpdatesFragmentView(EdxFragmentView):
         course_key = CourseKey.from_string(course_id)
         course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
         course_url_name = default_course_url_name(course.id)
-        course_url = reverse(course_url_name, kwargs={'course_id': unicode(course.id)})
+        course_url = reverse(course_url_name, kwargs={'course_id': str(course.id)})
 
         ordered_updates = get_ordered_updates(request, course)
         plain_html_updates = ''

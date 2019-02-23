@@ -14,7 +14,7 @@ command likely cannot be re-used in the future because eventually we will need
 to clean out the UserRetirementStatus table.
 """
 
-from __future__ import print_function
+
 
 from django.conf import settings
 from django.db import transaction
@@ -56,8 +56,8 @@ class Command(BaseCommand):
             # Sanity check:
             if retirement.user.email != old_retired_email:
                 print(
-                    u'WARNING: Skipping UserRetirementStatus ID {} / User ID {} because the user does not appear to '
-                    u'have a retired email address: {}.'.format(
+                    'WARNING: Skipping UserRetirementStatus ID {} / User ID {} because the user does not appear to '
+                    'have a retired email address: {}.'.format(
                         retirement.id,
                         retirement.user.id,
                         retirement.user.email,
@@ -67,14 +67,14 @@ class Command(BaseCommand):
             # match:
             elif old_retired_email == new_retired_email:
                 print(
-                    u'Skipping UserRetirementStatus ID {} / User ID {} because the email hash would not change.'.format(
+                    'Skipping UserRetirementStatus ID {} / User ID {} because the email hash would not change.'.format(
                         retirement.id,
                         retirement.user.id,
                     )
                 )
             # Found an email to update:
             else:
-                print(u'Updating UserRetirementStatus ID {} / User ID {} to rehash their retired email: {} -> {}'.format(
+                print('Updating UserRetirementStatus ID {} / User ID {} to rehash their retired email: {} -> {}'.format(
                     retirement.id,
                     retirement.user.id,
                     old_retired_email,

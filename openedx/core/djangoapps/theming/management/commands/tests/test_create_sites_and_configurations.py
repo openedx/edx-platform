@@ -100,9 +100,9 @@ class TestCreateSiteAndConfiguration(TestCase):
         self.assertEqual(len(clients), len(SITES))
 
         if devstack:
-            ecommerce_url_fmt = u"http://ecommerce-{site_name}-{dns_name}.e2e.devstack:18130/"
+            ecommerce_url_fmt = "http://ecommerce-{site_name}-{dns_name}.e2e.devstack:18130/"
         else:
-            ecommerce_url_fmt = u"https://ecommerce-{site_name}-{dns_name}.sandbox.edx.org/"
+            ecommerce_url_fmt = "https://ecommerce-{site_name}-{dns_name}.sandbox.edx.org/"
 
         for client in clients:
             self.assertEqual(client.user.username, service_user[0].username)
@@ -140,9 +140,9 @@ class TestCreateSiteAndConfiguration(TestCase):
         self.assertEqual(len(clients), len(SITES))
 
         if devstack:
-            discovery_url_fmt = u"http://discovery-{site_name}-{dns_name}.e2e.devstack:18381/"
+            discovery_url_fmt = "http://discovery-{site_name}-{dns_name}.e2e.devstack:18381/"
         else:
-            discovery_url_fmt = u"https://discovery-{site_name}-{dns_name}.sandbox.edx.org/"
+            discovery_url_fmt = "https://discovery-{site_name}-{dns_name}.sandbox.edx.org/"
 
         for client in clients:
             self.assertEqual(client.user.username, service_user[0].username)

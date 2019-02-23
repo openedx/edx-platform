@@ -1,5 +1,5 @@
 """Tests the course modules and their functions"""
-from __future__ import print_function
+
 import ddt
 import unittest
 from datetime import datetime, timedelta
@@ -216,8 +216,8 @@ class IsNewCourseTestCase(unittest.TestCase):
 
     start_advertised_settings = [
         # start, advertised, result, is_still_default, date_time_result
-        ('2012-12-02T12:00', None, 'Dec 02, 2012', False, u'Dec 02, 2012 at 12:00 UTC'),
-        ('2012-12-02T12:00', '2011-11-01T12:00', 'Nov 01, 2011', False, u'Nov 01, 2011 at 12:00 UTC'),
+        ('2012-12-02T12:00', None, 'Dec 02, 2012', False, 'Dec 02, 2012 at 12:00 UTC'),
+        ('2012-12-02T12:00', '2011-11-01T12:00', 'Nov 01, 2011', False, 'Nov 01, 2011 at 12:00 UTC'),
         ('2012-12-02T12:00', 'Spring 2012', 'Spring 2012', False, 'Spring 2012'),
         ('2012-12-02T12:00', 'November, 2011', 'November, 2011', False, 'November, 2011'),
         (xmodule.course_module.CourseFields.start.default, None, 'TBD', True, 'TBD'),
@@ -290,7 +290,7 @@ class TeamsConfigurationTestCase(unittest.TestCase):
 
     def make_topic(self):
         """ Make a sample topic dictionary. """
-        next_num = self.count.next()
+        next_num = next(self.count)
         topic_id = "topic_id_{}".format(next_num)
         name = "Name {}".format(next_num)
         description = "Description {}".format(next_num)
@@ -444,7 +444,7 @@ class ProctoringProviderTestCase(unittest.TestCase):
         throws a ValueError with the correct error message.
         """
         provider = 'invalid-provider'
-        proctoring_provider_whitelist = [u'mock', u'mock_proctoring_without_rules']
+        proctoring_provider_whitelist = ['mock', 'mock_proctoring_without_rules']
 
         with self.assertRaises(ValueError) as context_manager:
             self.proctoring_provider.from_json(provider)

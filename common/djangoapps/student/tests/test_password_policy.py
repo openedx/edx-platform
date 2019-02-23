@@ -145,7 +145,7 @@ class TestPasswordPolicy(TestCase):
     ])
     def test_not_enough_numeric_characters(self):
         # The unicode ២ is the number 2 in Khmer and the ٧ is the Arabic-Indic number 7
-        self.url_params['password'] = u'thisShouldFail២٧'
+        self.url_params['password'] = 'thisShouldFail២٧'
         response = self.client.post(self.url, self.url_params)
         self.assertEqual(response.status_code, 400)
         obj = json.loads(response.content)
@@ -159,7 +159,7 @@ class TestPasswordPolicy(TestCase):
     ])
     def test_enough_numeric_characters(self):
         # The unicode ២ is the number 2 in Khmer
-        self.url_params['password'] = u'thisShouldPass២33'
+        self.url_params['password'] = 'thisShouldPass២33'
         response = self.client.post(self.url, self.url_params)
         self.assertEqual(response.status_code, 200)
         obj = json.loads(response.content)
@@ -182,7 +182,7 @@ class TestPasswordPolicy(TestCase):
         create_validator_config('util.password_policy_validators.AlphabeticValidator', {'min_alphabetic': 3})
     ])
     def test_enough_alphabetic_characters(self):
-        self.url_params['password'] = u'𝒯𝓗Ï𝓼𝒫å𝓼𝓼𝔼𝓼'
+        self.url_params['password'] = '𝒯𝓗Ï𝓼𝒫å𝓼𝓼𝔼𝓼'
         response = self.client.post(self.url, self.url_params)
         self.assertEqual(response.status_code, 200)
         obj = json.loads(response.content)
@@ -214,7 +214,7 @@ class TestPasswordPolicy(TestCase):
         create_validator_config('util.password_policy_validators.PunctuationValidator', {'min_punctuation': 3}),
     ])
     def test_multiple_errors_pass(self):
-        self.url_params['password'] = u'tH1s Sh0u!d P3#$!'
+        self.url_params['password'] = 'tH1s Sh0u!d P3#$!'
         response = self.client.post(self.url, self.url_params)
         self.assertEqual(response.status_code, 200)
         obj = json.loads(response.content)
@@ -248,7 +248,7 @@ class TestPasswordPolicy(TestCase):
         create_validator_config('util.password_policy_validators.MaximumLengthValidator', {'max_length': 75}),
     ])
     def test_with_unicode(self):
-        self.url_params['password'] = u'四節比分和七年前'
+        self.url_params['password'] = '四節比分和七年前'
         response = self.client.post(self.url, self.url_params)
         self.assertEqual(response.status_code, 200)
         obj = json.loads(response.content)
@@ -261,7 +261,7 @@ class TestPasswordPolicy(TestCase):
         """
         Tests that even if password policy is enforced, ext_auth registrations aren't subject to it
         """
-        self.url_params['password'] = u'aaa'  # shouldn't pass validation
+        self.url_params['password'] = 'aaa'  # shouldn't pass validation
         request = self.request_factory.post(self.url, self.url_params)
         request.site = SiteFactory.create()
         # now indicate we are doing ext_auth by setting 'ExternalAuthMap' in the session.
@@ -303,7 +303,7 @@ class TestUsernamePasswordNonmatch(TestCase):
         self.url_params['username'] = "foobar"
         self.url_params['password'] = "foobar"
         response = self.client.post(self.url, self.url_params)
-        self.assertEquals(response.status_code, 400)
+        self.assertEqual(response.status_code, 400)
         obj = json.loads(response.content)
         self.assertEqual(
             obj['value'],
@@ -317,6 +317,6 @@ class TestUsernamePasswordNonmatch(TestCase):
         self.url_params['username'] = "foobar"
         self.url_params['password'] = "nonmatch"
         response = self.client.post(self.url, self.url_params)
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         obj = json.loads(response.content)
         self.assertTrue(obj['success'])

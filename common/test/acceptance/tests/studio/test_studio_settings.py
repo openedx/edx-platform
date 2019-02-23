@@ -2,7 +2,7 @@
 """
 Acceptance tests for Studio's Setting pages
 """
-from __future__ import unicode_literals
+
 
 import os
 import random
@@ -131,7 +131,7 @@ class ContentGroupConfigurationTest(StudioCourseTest):
         """
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
-                u"user_partitions": [
+                "user_partitions": [
                     create_user_partition_json(
                         0,
                         'Configuration alpha,',
@@ -518,7 +518,7 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
         self.advanced_settings.wait_for_modal_load()
         self.check_modal_shows_correct_contents(['Course Display Name'])
         self.advanced_settings.refresh_and_wait_for_load()
-        self.assertEquals(
+        self.assertEqual(
             self.advanced_settings.get('Course Display Name'),
             course_display_name,
             'Wrong input for Course Display Name must not change its value'
@@ -540,7 +540,7 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
         self.check_modal_shows_correct_contents(['Course Display Name'])
         self.advanced_settings.refresh_and_wait_for_load()
 
-        self.assertEquals(
+        self.assertEqual(
             self.advanced_settings.get('Course Display Name'),
             course_display_name,
             'Wrong input for Course Display Name must not change its value'
@@ -560,8 +560,8 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
         self.check_modal_shows_correct_contents(self.type_fields)
         self.advanced_settings.refresh_and_wait_for_load()
 
-        for key, val in original_values_map.iteritems():
-            self.assertEquals(
+        for key, val in original_values_map.items():
+            self.assertEqual(
                 self.advanced_settings.get(key),
                 val,
                 'Wrong input for Advanced Settings Fields must not change its value'
@@ -583,8 +583,8 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
         self.advanced_settings.undo_changes_via_modal()
 
         # Check that changes are undone
-        for key, val in original_values_map.iteritems():
-            self.assertEquals(
+        for key, val in original_values_map.items():
+            self.assertEqual(
                 self.advanced_settings.get(key),
                 val,
                 'Undoing Should revert back to original value'
@@ -609,8 +609,8 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
         self.assertFalse(self.advanced_settings.is_validation_modal_present())
 
         # Iterate through the wrong values and make sure they're still displayed
-        for key, val in inputs.iteritems():
-            self.assertEquals(
+        for key, val in inputs.items():
+            self.assertEqual(
                 str(self.advanced_settings.get(key)),
                 str(val),
                 'manual change should keep: ' + str(val) + ', but is: ' + str(self.advanced_settings.get(key))
@@ -673,7 +673,7 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
         """
         expected_fields = self.advanced_settings.expected_settings_names
         displayed_fields = self.advanced_settings.displayed_settings_names
-        self.assertEquals(set(displayed_fields), set(expected_fields))
+        self.assertEqual(set(displayed_fields), set(expected_fields))
 
 
 @attr(shard=16)

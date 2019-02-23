@@ -54,7 +54,7 @@ class Command(BaseCommand):
         course_id = options['course_id']
         num_segments = options['num_segments']
 
-        log.info(u'Syncronizing email list for %s', course_id)
+        log.info('Syncronizing email list for %s', course_id)
 
         mailchimp = connect_mailchimp(key)
 
@@ -68,7 +68,7 @@ class Command(BaseCommand):
         exclude = subscribed.union(non_subscribed)
         to_subscribe = get_student_data(enrolled, exclude=exclude)
 
-        tag_names = set(chain.from_iterable(d.keys() for d in to_subscribe))
+        tag_names = set(chain.from_iterable(list(d.keys()) for d in to_subscribe))
         update_merge_tags(mailchimp, list_id, tag_names)
 
         subscribe_with_data(mailchimp, list_id, to_subscribe)
@@ -106,7 +106,7 @@ def verify_list(mailchimp, list_id, course_id):
 
     list_name = lists[0]['name']
 
-    log.debug(u'list name: %s', list_name)
+    log.debug('list name: %s', list_name)
 
     # check that we are connecting to the correct list
     parts = course_id.replace('_', ' ').replace('/', ' ').split()
@@ -283,7 +283,7 @@ def subscribe_with_data(mailchimp, list_id, user_data):
 
     Returns None
     """
-    format_entry = lambda e: {name_to_tag(k): v for k, v in e.iteritems()}
+    format_entry = lambda e: {name_to_tag(k): v for k, v in e.items()}
     formated_data = list(format_entry(e) for e in user_data)
 
     # send the updates in batches of a fixed size
@@ -294,7 +294,7 @@ def subscribe_with_data(mailchimp, list_id, user_data):
                                               update_existing=True)
 
         log.debug(
-            u"Added: %s Error on: %s", result['add_count'], result['error_count']
+            "Added: %s Error on: %s", result['add_count'], result['error_count']
         )
 
 
@@ -328,7 +328,7 @@ def make_segments(mailchimp, list_id, count, emails):
         chunks = list(chunk(emails, chunk_size))
 
         # create segments and add emails
-        for seg in xrange(count):
+        for seg in range(count):
             name = 'random_{0:002}'.format(seg)
             seg_id = mailchimp.listStaticSegmentAdd(id=list_id, name=name)
             for batch in chunk(chunks[seg], BATCH_SIZE):
@@ -354,5 +354,5 @@ def chunk(elist, size):
     Generator. Yields a list of size `size` of the given list `elist`,
     or a shorter list if at the end of the input.
     """
-    for i in xrange(0, len(elist), size):
+    for i in range(0, len(elist), size):
         yield elist[i:i + size]

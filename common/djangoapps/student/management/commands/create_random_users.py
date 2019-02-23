@@ -1,7 +1,7 @@
 """
 A script to create some dummy users
 """
-from __future__ import print_function
+
 import uuid
 
 from django.core.management.base import BaseCommand

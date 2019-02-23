@@ -11,7 +11,7 @@ class ContentstoreConfig(AppConfig):
     """
     Application Configuration for Contentstore.
     """
-    name = u'contentstore'
+    name = 'contentstore'
 
     def ready(self):
         """

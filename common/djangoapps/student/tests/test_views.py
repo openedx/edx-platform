@@ -140,13 +140,13 @@ class TestStudentDashboardUnenrollments(SharedModuleStoreTestCase):
         with patch('student.models.CourseEnrollment.refundable', return_value=True):
             response = self.client.get(reverse('course_run_refund_status', kwargs={'course_id': self.course.id}))
 
-        self.assertEquals(json.loads(response.content), {'course_refundable_status': True})
+        self.assertEqual(json.loads(response.content), {'course_refundable_status': True})
         self.assertEqual(response.status_code, 200)
 
         with patch('student.models.CourseEnrollment.refundable', return_value=False):
             response = self.client.get(reverse('course_run_refund_status', kwargs={'course_id': self.course.id}))
 
-        self.assertEquals(json.loads(response.content), {'course_refundable_status': False})
+        self.assertEqual(json.loads(response.content), {'course_refundable_status': False})
         self.assertEqual(response.status_code, 200)
 
     def test_course_run_refund_status_invalid_course_key(self):
@@ -156,7 +156,7 @@ class TestStudentDashboardUnenrollments(SharedModuleStoreTestCase):
                                                         InvalidKeyError during look up.')
             response = self.client.get(reverse('course_run_refund_status', kwargs={'course_id': self.course.id}))
 
-        self.assertEquals(json.loads(response.content), {'course_refundable_status': ''})
+        self.assertEqual(json.loads(response.content), {'course_refundable_status': ''})
         self.assertEqual(response.status_code, 406)
 
 
@@ -269,11 +269,11 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             org='edx',
             number='998',
             display_name='Test Course',
-            pre_requisite_courses=[unicode(self.pre_requisite_course.id)]
+            pre_requisite_courses=[str(self.pre_requisite_course.id)]
         )
         self.course_enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user)
 
-        set_prerequisite_courses(self.course.id, [unicode(self.pre_requisite_course.id)])
+        set_prerequisite_courses(self.course.id, [str(self.pre_requisite_course.id)])
         response = self.client.get(reverse('dashboard'))
         self.assertIn('<div class="prerequisites">', response.content)
 
@@ -301,7 +301,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         mock_course_overview.return_value = CourseOverviewFactory.create(start=self.TOMORROW, id=course_key)
         mock_course_runs.return_value = [
             {
-                'key': unicode(course_key),
+                'key': str(course_key),
                 'enrollment_end': str(self.TOMORROW),
                 'pacing_type': 'instructor_paced',
                 'type': 'verified',
@@ -309,7 +309,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             }
         ]
         mock_pseudo_session.return_value = {
-            'key': unicode(course_key),
+            'key': str(course_key),
             'type': 'verified'
         }
         response = self.client.get(self.path)
@@ -320,7 +320,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
 
         # If an entitlement has already been redeemed by the user for a course run, do not let the run be selectable
         enrollment = CourseEnrollmentFactory(
-            user=self.user, course_id=unicode(mock_course_overview.return_value.id), mode=CourseMode.VERIFIED
+            user=self.user, course_id=str(mock_course_overview.return_value.id), mode=CourseMode.VERIFIED
         )
         CourseEntitlementFactory.create(
             user=self.user, course_uuid=program['courses'][0]['uuid'], enrollment_course_run=enrollment
@@ -386,7 +386,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             start=self.TOMORROW, end=self.THREE_YEARS_FROM_NOW, self_paced=True, enrollment_end=self.THREE_YEARS_AGO
         )
         mock_course_overview.return_value = mocked_course_overview
-        course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=unicode(mocked_course_overview.id))
+        course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=str(mocked_course_overview.id))
         mock_course_runs.return_value = [
             {
                 'key': str(mocked_course_overview.id),
@@ -450,7 +450,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             start=self.TOMORROW, self_paced=True, enrollment_end=self.TOMORROW
         )
         mock_course_overview.return_value = mocked_course_overview
-        course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=unicode(mocked_course_overview.id))
+        course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=str(mocked_course_overview.id))
         mock_course_runs.return_value = [
             {
                 'key': str(mocked_course_overview.id),
@@ -462,7 +462,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         ]
         entitlement = CourseEntitlementFactory(user=self.user, enrollment_course_run=course_enrollment)
         program = ProgramFactory()
-        program['courses'][0]['course_runs'] = [{'key': unicode(mocked_course_overview.id)}]
+        program['courses'][0]['course_runs'] = [{'key': str(mocked_course_overview.id)}]
         program['courses'][0]['uuid'] = entitlement.course_uuid
         mock_get_programs.return_value = [program]
         response = self.client.get(self.path)
@@ -485,7 +485,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             start=self.TOMORROW, self_paced=True, enrollment_end=self.TOMORROW
         )
         mock_course_overview.return_value = mocked_course_overview
-        course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=unicode(mocked_course_overview.id), created=self.THREE_YEARS_AGO)
+        course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=str(mocked_course_overview.id), created=self.THREE_YEARS_AGO)
         mock_course_runs.return_value = [
             {
                 'key': str(mocked_course_overview.id),
@@ -497,7 +497,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         ]
         entitlement = CourseEntitlementFactory(user=self.user, enrollment_course_run=course_enrollment, created=self.THREE_YEARS_AGO)
         program = ProgramFactory()
-        program['courses'][0]['course_runs'] = [{'key': unicode(mocked_course_overview.id)}]
+        program['courses'][0]['course_runs'] = [{'key': str(mocked_course_overview.id)}]
         program['courses'][0]['uuid'] = entitlement.course_uuid
         mock_get_programs.return_value = [program]
         response = self.client.get(self.path)
@@ -518,7 +518,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         course_enrollment = CourseEnrollmentFactory(user=self.user)
         entitlement = CourseEntitlementFactory(user=self.user, enrollment_course_run=course_enrollment)
         course_runs = [{
-            'key': unicode(course_overview.id),
+            'key': str(course_overview.id),
             'uuid': entitlement.course_uuid
         }]
         mock_get_course_runs.return_value = course_runs
@@ -689,9 +689,9 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             ItemFactory.create(
                 category='video',
                 parent_location=course.location,
-                display_name='Video {0}'.format(unicode(number))
+                display_name='Video {0}'.format(str(number))
             ).location
-            for number in xrange(5)
+            for number in range(5)
         ]
 
         submit_completions_for_testing(self.user, course_key, block_keys)
@@ -801,9 +801,9 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
                     ItemFactory.create(
                         category='video',
                         parent_location=course.location,
-                        display_name='Video {0}'.format(unicode(number))
+                        display_name='Video {0}'.format(str(number))
                     ).location
-                    for number in xrange(5)
+                    for number in range(5)
                 ]
                 last_completed_block_string = str(block_keys[-1])
 

@@ -47,17 +47,17 @@ class TeamsTabBase(EventsTestMixin, ForumsConfigMixin, UniqueCourseTest):
 
     def create_topics(self, num_topics):
         """Create `num_topics` test topics."""
-        return [{u"description": i, u"name": i, u"id": i} for i in map(str, xrange(num_topics))]
+        return [{"description": i, "name": i, "id": i} for i in map(str, range(num_topics))]
 
     def create_teams(self, topic, num_teams, time_between_creation=0):
         """Create `num_teams` teams belonging to `topic`."""
         teams = []
-        for i in xrange(num_teams):
+        for i in range(num_teams):
             team = {
                 'course_id': self.course_id,
                 'topic_id': topic['id'],
-                'name': u'Team {}'.format(i),
-                'description': u'Description {}'.format(i),
+                'name': 'Team {}'.format(i),
+                'description': 'Description {}'.format(i),
                 'language': 'aa',
                 'country': 'AF'
             }
@@ -83,7 +83,7 @@ class TeamsTabBase(EventsTestMixin, ForumsConfigMixin, UniqueCourseTest):
         """Create `num_memberships` users and assign them to `team_id`. The
         last user created becomes the current user."""
         memberships = []
-        for __ in xrange(num_memberships):
+        for __ in range(num_memberships):
             user_info = AutoAuthPage(self.browser, course_id=self.course_id).visit().user_info
             memberships.append(user_info)
             self.create_membership(user_info['username'], team_id)
@@ -108,7 +108,7 @@ class TeamsTabBase(EventsTestMixin, ForumsConfigMixin, UniqueCourseTest):
         self.course_fixture = CourseFixture(**self.course_info)
         if configuration:
             self.course_fixture.add_advanced_settings(
-                {u"teams_configuration": {u"value": configuration}}
+                {"teams_configuration": {"value": configuration}}
             )
         self.course_fixture.install()
 
@@ -142,7 +142,7 @@ class TeamsTabBase(EventsTestMixin, ForumsConfigMixin, UniqueCourseTest):
 
         team_card_names = page.team_names
         team_card_descriptions = page.team_descriptions
-        map(assert_team_equal, expected_teams, team_card_names, team_card_descriptions)
+        list(map(assert_team_equal, expected_teams, team_card_names, team_card_descriptions))
 
     def verify_my_team_count(self, expected_number_of_teams):
         """ Verify the number of teams shown on "My Team". """
@@ -178,7 +178,7 @@ class TeamsTabTest(TeamsTabBase):
         When I view the course info page
         Then I should not see the Teams tab
         """
-        self.set_team_configuration({u"max_team_size": 10, u"topics": []})
+        self.set_team_configuration({"max_team_size": 10, "topics": []})
         self.verify_teams_present(False)
 
     def test_teams_enabled(self):
@@ -189,7 +189,7 @@ class TeamsTabTest(TeamsTabBase):
         Then I should see the Teams tab
         And the correct content should be on the page
         """
-        self.set_team_configuration({u"max_team_size": 10, u"topics": self.create_topics(1)})
+        self.set_team_configuration({"max_team_size": 10, "topics": self.create_topics(1)})
         self.verify_teams_present(True)
 
     def test_teams_enabled_global_staff(self):
@@ -202,7 +202,7 @@ class TeamsTabTest(TeamsTabBase):
         And the correct content should be on the page
         """
         self.set_team_configuration(
-            {u"max_team_size": 10, u"topics": self.create_topics(1)},
+            {"max_team_size": 10, "topics": self.create_topics(1)},
             enroll_in_course=False,
             global_staff=True
         )
@@ -222,7 +222,7 @@ class TeamsTabTest(TeamsTabBase):
         topics = self.create_topics(1)
         topic = topics[0]
         self.set_team_configuration(
-            {u'max_team_size': 10, u'topics': topics},
+            {'max_team_size': 10, 'topics': topics},
             global_staff=True
         )
         team = self.create_teams(topic, 1)[0]
@@ -241,7 +241,7 @@ class TeamsTabTest(TeamsTabBase):
         self.teams_page.wait_for_ajax()
         self.assertEqual(
             self.teams_page.warning_message,
-            u"Your request could not be completed. Reload the page and try again."
+            "Your request could not be completed. Reload the page and try again."
         )
 
     @ddt.data(
@@ -261,8 +261,8 @@ class TeamsTabTest(TeamsTabBase):
         topics = self.create_topics(1)
         topic = topics[0]
         self.set_team_configuration({
-            u'max_team_size': 10,
-            u'topics': topics
+            'max_team_size': 10,
+            'topics': topics
         })
         team = self.create_teams(topic, 1)[0]
         self.teams_page.visit()
@@ -295,7 +295,7 @@ class MyTeamsTest(TeamsTabBase):
 
     def setUp(self):
         super(MyTeamsTest, self).setUp()
-        self.topic = {u"name": u"Example Topic", u"id": "example_topic", u"description": "Description"}
+        self.topic = {"name": "Example Topic", "id": "example_topic", "description": "Description"}
         self.set_team_configuration({'course_id': self.course_id, 'max_team_size': 10, 'topics': [self.topic]})
         self.my_teams_page = MyTeamsPage(self.browser, self.course_id)
         self.page_viewed_event = {
@@ -320,7 +320,7 @@ class MyTeamsTest(TeamsTabBase):
         self.assertEqual(len(self.my_teams_page.team_cards), 0, msg='Expected to see no team cards')
         self.assertEqual(
             self.my_teams_page.q(css='.page-content-main').text,
-            [u'You are not currently a member of any team.']
+            ['You are not currently a member of any team.']
         )
 
     def test_member_of_a_team(self):
@@ -375,7 +375,7 @@ class BrowseTopicsTest(TeamsTabBase):
         Then I should see the paginated list of topics in that order
         """
         topics = self.create_topics(TOPICS_PER_PAGE + 1)
-        self.set_team_configuration({u"max_team_size": 100, u"topics": topics})
+        self.set_team_configuration({"max_team_size": 100, "topics": topics})
         for i, topic in enumerate(random.sample(topics, len(topics))):
             self.create_teams(topic, i)
             topic['team_count'] = i
@@ -400,7 +400,7 @@ class BrowseTopicsTest(TeamsTabBase):
         Then I should see the topics in the correct sorted order
         """
         topics = self.create_topics(3)
-        self.set_team_configuration({u"max_team_size": 100, u"topics": topics})
+        self.set_team_configuration({"max_team_size": 100, "topics": topics})
         self.topics_page.visit()
         self.topics_page.sort_topics_by('team_count')
         topic_name = self.topics_page.topic_names[-1]
@@ -428,7 +428,7 @@ class BrowseTopicsTest(TeamsTabBase):
         And I browse topics
         Then I should see a list of topics for the course
         """
-        self.set_team_configuration({u"max_team_size": 10, u"topics": self.create_topics(2)})
+        self.set_team_configuration({"max_team_size": 10, "topics": self.create_topics(2)})
         self.topics_page.visit()
         self.assertEqual(len(self.topics_page.topic_cards), 2)
         self.assertTrue(self.topics_page.get_pagination_header_text().startswith('Showing 1-2 out of 2 total'))
@@ -444,7 +444,7 @@ class BrowseTopicsTest(TeamsTabBase):
         And I browse topics
         Then I should see only the first 12 topics
         """
-        self.set_team_configuration({u"max_team_size": 10, u"topics": self.create_topics(20)})
+        self.set_team_configuration({"max_team_size": 10, "topics": self.create_topics(20)})
         self.topics_page.visit()
         self.assertEqual(len(self.topics_page.topic_cards), TOPICS_PER_PAGE)
         self.assertTrue(self.topics_page.get_pagination_header_text().startswith('Showing 1-12 out of 20 total'))
@@ -461,7 +461,7 @@ class BrowseTopicsTest(TeamsTabBase):
         And I enter a valid page number in the page number input
         Then I should see that page of topics
         """
-        self.set_team_configuration({u"max_team_size": 10, u"topics": self.create_topics(25)})
+        self.set_team_configuration({"max_team_size": 10, "topics": self.create_topics(25)})
         self.topics_page.visit()
         self.topics_page.go_to_page(3)
         self.assertEqual(len(self.topics_page.topic_cards), 1)
@@ -477,7 +477,7 @@ class BrowseTopicsTest(TeamsTabBase):
         And I enter an invalid page number in the page number input
         Then I should stay on the current page
         """
-        self.set_team_configuration({u"max_team_size": 10, u"topics": self.create_topics(13)})
+        self.set_team_configuration({"max_team_size": 10, "topics": self.create_topics(13)})
         self.topics_page.visit()
         self.topics_page.go_to_page(3)
         self.assertEqual(self.topics_page.get_current_page_number(), 1)
@@ -493,7 +493,7 @@ class BrowseTopicsTest(TeamsTabBase):
         When I press the previous page button
         Then I should move to the previous page
         """
-        self.set_team_configuration({u"max_team_size": 10, u"topics": self.create_topics(13)})
+        self.set_team_configuration({"max_team_size": 10, "topics": self.create_topics(13)})
         self.topics_page.visit()
         self.topics_page.press_next_page_button()
         self.assertEqual(len(self.topics_page.topic_cards), 1)
@@ -513,7 +513,7 @@ class BrowseTopicsTest(TeamsTabBase):
         And I should see the correct page header
         And I should not see a pagination footer
         """
-        self.set_team_configuration({u"max_team_size": 10, u"topics": self.create_topics(10)})
+        self.set_team_configuration({"max_team_size": 10, "topics": self.create_topics(10)})
         self.topics_page.visit()
         self.assertEqual(len(self.topics_page.topic_cards), 10)
         self.assertTrue(self.topics_page.get_pagination_header_text().startswith('Showing 1-10 out of 10 total'))
@@ -531,7 +531,7 @@ class BrowseTopicsTest(TeamsTabBase):
         """
         initial_description = "A" + " really" * 50 + " long description"
         self.set_team_configuration(
-            {u"max_team_size": 1, u"topics": [{"name": "", "id": "", "description": initial_description}]}
+            {"max_team_size": 1, "topics": [{"name": "", "id": "", "description": initial_description}]}
         )
         self.topics_page.visit()
         truncated_description = self.topics_page.topic_descriptions[0]
@@ -549,9 +549,9 @@ class BrowseTopicsTest(TeamsTabBase):
         And I click on the arrow link to view teams for the first topic
         Then I should be on the browse teams page
         """
-        topic = {u"name": u"Example Topic", u"id": u"example_topic", u"description": "Description"}
+        topic = {"name": "Example Topic", "id": "example_topic", "description": "Description"}
         self.set_team_configuration(
-            {u"max_team_size": 1, u"topics": [topic]}
+            {"max_team_size": 1, "topics": [topic]}
         )
         self.topics_page.visit()
         self.topics_page.browse_teams_for_topic('Example Topic')
@@ -567,9 +567,9 @@ class BrowseTopicsTest(TeamsTabBase):
         When I visit the browse topics page
         Then my browser should post a page viewed event
         """
-        topic = {u"name": u"Example Topic", u"id": u"example_topic", u"description": "Description"}
+        topic = {"name": "Example Topic", "id": "example_topic", "description": "Description"}
         self.set_team_configuration(
-            {u"max_team_size": 1, u"topics": [topic]}
+            {"max_team_size": 1, "topics": [topic]}
         )
         events = [{
             'event_type': 'edx.team.page_viewed',
@@ -593,7 +593,7 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
 
     def setUp(self):
         super(BrowseTeamsWithinTopicTest, self).setUp()
-        self.topic = {u"name": u"Example Topic", u"id": "example_topic", u"description": "Description"}
+        self.topic = {"name": "Example Topic", "id": "example_topic", "description": "Description"}
         self.max_team_size = 10
         self.set_team_configuration({
             'course_id': self.course_id,
@@ -623,7 +623,7 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         self.assertEqual(search_results_page.header_name, 'Team Search')
         self.assertEqual(
             search_results_page.header_description,
-            u'Showing results for "{search_query}"'.format(search_query=search_query)
+            'Showing results for "{search_query}"'.format(search_query=search_query)
         )
 
     def verify_on_page(self, teams_page, page_num, total_teams, pagination_header_text, footer_visible):
@@ -916,7 +916,7 @@ class TeamFormActions(TeamsTabBase):
             title='Create a New Team',
             description='Create a new team if you can\'t find an existing team to join, '
                         'or if you would like to learn with friends you know.',
-            breadcrumbs=u'All Topics {topic_name}'.format(topic_name=self.topic['name'])
+            breadcrumbs='All Topics {topic_name}'.format(topic_name=self.topic['name'])
         )
 
     def verify_and_navigate_to_edit_team_page(self):
@@ -933,7 +933,7 @@ class TeamFormActions(TeamsTabBase):
             title='Edit Team',
             description='If you make significant changes, make sure you notify '
                         'members of the team before making these changes.',
-            breadcrumbs=u'All Topics {topic_name} {team_name}'.format(
+            breadcrumbs='All Topics {topic_name} {team_name}'.format(
                 topic_name=self.topic['name'],
                 team_name=self.team['name']
             )
@@ -1630,7 +1630,7 @@ class TeamPageTest(TeamsTabBase):
 
     def setUp(self):
         super(TeamPageTest, self).setUp()
-        self.topic = {u"name": u"Example Topic", u"id": "example_topic", u"description": "Description"}
+        self.topic = {"name": "Example Topic", "id": "example_topic", "description": "Description"}
 
     def _set_team_configuration_and_membership(
             self,

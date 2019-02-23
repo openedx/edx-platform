@@ -68,7 +68,7 @@ class TestCourseListing(ModuleStoreTestCase):
         Just testing the functionality the view handler adds over the tasks tested in test_clone_course
         """
         response = self.client.ajax_post(self.course_create_rerun_url, {
-            'source_course_key': unicode(self.source_course_key),
+            'source_course_key': str(self.source_course_key),
             'org': self.source_course_key.org, 'course': self.source_course_key.course, 'run': 'copy',
             'display_name': 'not the same old name',
         })
@@ -138,7 +138,7 @@ class TestCourseListing(ModuleStoreTestCase):
             })
             self.assertEqual(response.status_code, 400)
             data = parse_json(response)
-            self.assertIn(u'Organization you selected does not exist in the system', data['error'])
+            self.assertIn('Organization you selected does not exist in the system', data['error'])
 
     @patch.dict('django.conf.settings.FEATURES', {'ORGANIZATIONS_APP': True})
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)

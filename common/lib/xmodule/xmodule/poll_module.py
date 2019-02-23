@@ -213,15 +213,15 @@ class PollDescriptor(PollFields, MakoModuleDescriptor, XmlDescriptor):
 
     def definition_to_xml(self, resource_fs):
         """Return an xml element representing to this definition."""
-        poll_str = u'<{tag_name}>{text}</{tag_name}>'.format(
+        poll_str = '<{tag_name}>{text}</{tag_name}>'.format(
             tag_name=self._tag_name, text=self.question)
         xml_object = etree.fromstring(poll_str)
         xml_object.set('display_name', self.display_name)
 
         def add_child(xml_obj, answer):
             # Escape answer text before adding to xml tree.
-            answer_text = unicode(Text(answer['text']))
-            child_str = u'<{tag_name} id="{id}">{text}</{tag_name}>'.format(
+            answer_text = str(Text(answer['text']))
+            child_str = '<{tag_name} id="{id}">{text}</{tag_name}>'.format(
                 tag_name=self._child_tag_name, id=answer['id'],
                 text=answer_text)
             child_node = etree.fromstring(child_str)

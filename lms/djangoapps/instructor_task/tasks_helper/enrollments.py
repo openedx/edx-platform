@@ -3,7 +3,7 @@ Instructor tasks related to enrollments.
 """
 import logging
 from datetime import datetime
-from StringIO import StringIO
+from io import StringIO
 from time import time
 
 from django.conf import settings
@@ -47,14 +47,14 @@ def upload_enrollment_report(_xmodule_instance_args, _entry_id, course_id, _task
     students_in_course = CourseEnrollment.objects.enrolled_and_dropped_out_users(course_id)
     task_progress = TaskProgress(action_name, students_in_course.count(), start_time)
 
-    fmt = u'Task: {task_id}, InstructorTask ID: {entry_id}, Course: {course_id}, Input: {task_input}'
+    fmt = 'Task: {task_id}, InstructorTask ID: {entry_id}, Course: {course_id}, Input: {task_input}'
     task_info_string = fmt.format(
         task_id=_xmodule_instance_args.get('task_id') if _xmodule_instance_args is not None else None,
         entry_id=_entry_id,
         course_id=course_id,
         task_input=_task_input
     )
-    TASK_LOG.info(u'%s, Task type: %s, Starting task execution', task_info_string, action_name)
+    TASK_LOG.info('%s, Task type: %s, Starting task execution', task_info_string, action_name)
 
     # Loop over all our students and build our CSV lists in memory
     rows = []
@@ -64,7 +64,7 @@ def upload_enrollment_report(_xmodule_instance_args, _entry_id, course_id, _task
     total_students = students_in_course.count()
     student_counter = 0
     TASK_LOG.info(
-        u'%s, Task type: %s, Current step: %s, generating detailed enrollment report for total students: %s',
+        '%s, Task type: %s, Current step: %s, generating detailed enrollment report for total students: %s',
         task_info_string,
         action_name,
         current_step,
@@ -81,7 +81,7 @@ def upload_enrollment_report(_xmodule_instance_args, _entry_id, course_id, _task
         student_counter += 1
         if student_counter % 100 == 0:
             TASK_LOG.info(
-                u'%s, Task type: %s, Current step: %s, gathering enrollment profile for students in progress: %s/%s',
+                '%s, Task type: %s, Current step: %s, gathering enrollment profile for students in progress: %s/%s',
                 task_info_string,
                 action_name,
                 current_step,
@@ -124,18 +124,18 @@ def upload_enrollment_report(_xmodule_instance_args, _entry_id, course_id, _task
         }
 
         if not header:
-            header = user_data.keys() + course_enrollment_data.keys() + payment_data.keys()
+            header = list(user_data.keys()) + list(course_enrollment_data.keys()) + list(payment_data.keys())
             display_headers = []
             for header_element in header:
                 # translate header into a localizable display string
                 display_headers.append(enrollment_report_headers.get(header_element, header_element))
             rows.append(display_headers)
 
-        rows.append(user_data.values() + course_enrollment_data.values() + payment_data.values())
+        rows.append(list(user_data.values()) + list(course_enrollment_data.values()) + list(payment_data.values()))
         task_progress.succeeded += 1
 
     TASK_LOG.info(
-        u'%s, Task type: %s, Current step: %s, Detailed enrollment report generated for students: %s/%s',
+        '%s, Task type: %s, Current step: %s, Detailed enrollment report generated for students: %s/%s',
         task_info_string,
         action_name,
         current_step,
@@ -146,13 +146,13 @@ def upload_enrollment_report(_xmodule_instance_args, _entry_id, course_id, _task
     # By this point, we've got the rows we're going to stuff into our CSV files.
     current_step = {'step': 'Uploading CSVs'}
     task_progress.update_task_state(extra_meta=current_step)
-    TASK_LOG.info(u'%s, Task type: %s, Current step: %s', task_info_string, action_name, current_step)
+    TASK_LOG.info('%s, Task type: %s, Current step: %s', task_info_string, action_name, current_step)
 
     # Perform the actual upload
     upload_csv_to_report_store(rows, 'enrollment_report', course_id, start_date, config_name='FINANCIAL_REPORTS')
 
     # One last update before we close out...
-    TASK_LOG.info(u'%s, Task type: %s, Finalizing detailed enrollment task', task_info_string, action_name)
+    TASK_LOG.info('%s, Task type: %s, Finalizing detailed enrollment task', task_info_string, action_name)
     return task_progress.update_task_state(extra_meta=current_step)
 
 
@@ -323,7 +323,7 @@ def upload_exec_summary_report(_xmodule_instance_args, _entry_id, course_id, _ta
 
     task_progress = TaskProgress(action_name, true_enrollment_count, start_time)
 
-    fmt = u'Task: {task_id}, InstructorTask ID: {entry_id}, Course: {course_id}, Input: {task_input}'
+    fmt = 'Task: {task_id}, InstructorTask ID: {entry_id}, Course: {course_id}, Input: {task_input}'
     task_info_string = fmt.format(
         task_id=_xmodule_instance_args.get('task_id') if _xmodule_instance_args is not None else None,
         entry_id=_entry_id,
@@ -331,11 +331,11 @@ def upload_exec_summary_report(_xmodule_instance_args, _entry_id, course_id, _ta
         task_input=_task_input
     )
 
-    TASK_LOG.info(u'%s, Task type: %s, Starting task execution', task_info_string, action_name)
+    TASK_LOG.info('%s, Task type: %s, Starting task execution', task_info_string, action_name)
     current_step = {'step': 'Gathering executive summary report information'}
 
     TASK_LOG.info(
-        u'%s, Task type: %s, Current step: %s, generating executive summary report',
+        '%s, Task type: %s, Current step: %s, generating executive summary report',
         task_info_string,
         action_name,
         current_step
@@ -357,13 +357,13 @@ def upload_exec_summary_report(_xmodule_instance_args, _entry_id, course_id, _ta
     # By this point, we've got the data that we need to generate html report.
     current_step = {'step': 'Uploading executive summary report HTML file'}
     task_progress.update_task_state(extra_meta=current_step)
-    TASK_LOG.info(u'%s, Task type: %s, Current step: %s', task_info_string, action_name, current_step)
+    TASK_LOG.info('%s, Task type: %s, Current step: %s', task_info_string, action_name, current_step)
 
     # Perform the actual upload
     _upload_exec_summary_to_store(data_dict, 'executive_report', course_id, report_generation_date)
     task_progress.succeeded += 1
     # One last update before we close out...
-    TASK_LOG.info(u'%s, Task type: %s, Finalizing executive summary report task', task_info_string, action_name)
+    TASK_LOG.info('%s, Task type: %s, Finalizing executive summary report task', task_info_string, action_name)
     return task_progress.update_task_state(extra_meta=current_step)
 
 
@@ -383,7 +383,7 @@ def _upload_exec_summary_to_store(data_dict, report_name, course_id, generated_a
 
     report_store.store(
         course_id,
-        u"{course_prefix}_{report_name}_{timestamp_str}.html".format(
+        "{course_prefix}_{report_name}_{timestamp_str}.html".format(
             course_prefix=course_filename_prefix_generator(course_id),
             report_name=report_name,
             timestamp_str=generated_at.strftime("%Y-%m-%d-%H%M")

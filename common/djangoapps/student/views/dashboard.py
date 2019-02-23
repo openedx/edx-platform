@@ -131,7 +131,7 @@ def _allow_donation(course_modes, course_id, enrollment):
             for course_id, modes in iteritems(CourseMode.all_modes_for_courses([course_id]))
         }
         log.error(
-            u'Can not find `%s` in course modes.`%s`. All modes: `%s`',
+            'Can not find `%s` in course modes.`%s`. All modes: `%s`',
             course_id,
             flat_unexpired_modes,
             flat_all_modes
@@ -326,7 +326,7 @@ def is_course_blocked(request, redeemed_registration_codes, course_key):
                 # disabling email notifications for unpaid registration courses
                 Optout.objects.get_or_create(user=request.user, course_id=course_key)
                 log.info(
-                    u"User %s (%s) opted out of receiving emails from course %s",
+                    "User %s (%s) opted out of receiving emails from course %s",
                     request.user.username,
                     request.user.email,
                     course_key,
@@ -464,7 +464,7 @@ def _credit_statuses(user, course_enrollments):
         for attribute in CourseEnrollmentAttribute.objects.filter(
             namespace="credit",
             name="provider_id",
-            enrollment__in=credit_enrollments.values()
+            enrollment__in=list(credit_enrollments.values())
         ).select_related("enrollment")
     }
 
@@ -498,10 +498,10 @@ def _credit_statuses(user, course_enrollments):
             if provider_id is None:
                 status["error"] = True
                 log.error(
-                    u"Could not find credit provider associated with credit enrollment "
-                    u"for user %s in course %s.  The user will not be able to see his or her "
-                    u"credit request status on the student dashboard.  This attribute should "
-                    u"have been set when the user purchased credit in the course.",
+                    "Could not find credit provider associated with credit enrollment "
+                    "for user %s in course %s.  The user will not be able to see his or her "
+                    "credit request status on the student dashboard.  This attribute should "
+                    "have been set when the user purchased credit in the course.",
                     user.id, course_key
                 )
             else:
@@ -687,12 +687,12 @@ def student_dashboard(request):
     inverted_programs = meter.invert_programs()
 
     urls, programs_data = {}, {}
-    bundles_on_dashboard_flag = WaffleFlag(WaffleFlagNamespace(name=u'student.experiments'), u'bundles_on_dashboard')
+    bundles_on_dashboard_flag = WaffleFlag(WaffleFlagNamespace(name='student.experiments'), 'bundles_on_dashboard')
 
     # TODO: Delete this code and the relevant HTML code after testing LEARNER-3072 is complete
-    if bundles_on_dashboard_flag.is_enabled() and inverted_programs and inverted_programs.items():
+    if bundles_on_dashboard_flag.is_enabled() and inverted_programs and list(inverted_programs.items()):
         if len(course_enrollments) < 4:
-            for program in inverted_programs.values():
+            for program in list(inverted_programs.values()):
                 try:
                     program_uuid = program[0]['uuid']
                     program_data = get_programs(request.site, uuid=program_uuid)

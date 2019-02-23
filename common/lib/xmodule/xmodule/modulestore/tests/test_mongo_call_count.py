@@ -107,7 +107,7 @@ class CountMongoCallsCourseTraversal(TestCase):
         if access_all_block_fields:
             # Read the fields on each block in order to ensure each block and its definition is loaded.
             for xblock in all_blocks:
-                for __, field in xblock.fields.iteritems():
+                for __, field in xblock.fields.items():
                     if field.is_set_on(xblock):
                         __ = field.read_from(xblock)
 

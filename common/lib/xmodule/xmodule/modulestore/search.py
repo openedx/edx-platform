@@ -138,7 +138,7 @@ def navigation_index(position):
     try:
         navigation_position = int(position.split('_', 1)[0])
     except (ValueError, TypeError):
-        LOGGER.exception(u'Bad position %r passed to navigation_index, will assume first position', position)
+        LOGGER.exception('Bad position %r passed to navigation_index, will assume first position', position)
         navigation_position = 1
 
     return navigation_position

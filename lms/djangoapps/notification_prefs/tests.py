@@ -35,14 +35,14 @@ class NotificationPrefViewTest(UrlResetMixin, TestCase):
             UserFactory.create(username="thisusernameissoveryverylong"):
             "AAAAAAAAAAAAAAAAAAAAAPECbYqPI7_W4mRF8LbTaHuHt3tNXPggZ1Bke-zDyEiZ",
             # Non-ASCII username
-            UserFactory.create(username=u"\u4e2d\u56fd"):
+            UserFactory.create(username="\u4e2d\u56fd"):
             "AAAAAAAAAAAAAAAAAAAAAMjfGAhZKIZsI3L-Z7nflTA="
         }
         self.request_factory = RequestFactory()
 
     def create_prefs(self):
         """Create all test preferences in the database"""
-        for (user, token) in self.tokens.items():
+        for (user, token) in list(self.tokens.items()):
             UserPreference.objects.create(user=user, key=NOTIFICATION_PREF_KEY, value=token)
 
     def assertPrefValid(self, user):
@@ -114,7 +114,7 @@ class NotificationPrefViewTest(UrlResetMixin, TestCase):
             self.assertEqual(response.status_code, 204)
             self.assertPrefValid(user)
 
-        for user in self.tokens.keys():
+        for user in list(self.tokens.keys()):
             test_user(user)
 
     def test_ajax_enable_already_enabled(self):
@@ -179,7 +179,7 @@ class NotificationPrefViewTest(UrlResetMixin, TestCase):
     def test_unsubscribe_invalid_token(self):
         def test_invalid_token(token, message):
             request = self.request_factory.get("dummy")
-            self.assertRaisesRegexp(Http404, "^{}$".format(message), set_subscription, request, token, False)
+            self.assertRaisesRegex(Http404, "^{}$".format(message), set_subscription, request, token, False)
 
         # Invalid base64 encoding
         test_invalid_token("ZOMG INVALID BASE64 CHARS!!!", "base64url")
@@ -218,7 +218,7 @@ class NotificationPrefViewTest(UrlResetMixin, TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertNotPrefExists(user)
 
-        for user in self.tokens.keys():
+        for user in list(self.tokens.keys()):
             test_user(user)
 
     def test_unsubscribe_twice(self):
@@ -239,5 +239,5 @@ class NotificationPrefViewTest(UrlResetMixin, TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertPrefValid(user)
 
-        for user in self.tokens.keys():
+        for user in list(self.tokens.keys()):
             test_user(user)

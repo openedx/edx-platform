@@ -139,9 +139,9 @@ class CourseUpdateTest(CourseTestCase):
             location.block_type,
             block_id=location.block_id
         )
-        update_date = u"January 23, 2014"
-        update_content = u"Hello world!"
-        update_data = u"<ol><li><h2>" + update_date + "</h2>" + update_content + "</li></ol>"
+        update_date = "January 23, 2014"
+        update_content = "Hello world!"
+        update_data = "<ol><li><h2>" + update_date + "</h2>" + update_content + "</li></ol>"
         course_updates.data = update_data
         modulestore().update_item(course_updates, self.user.id)
 
@@ -149,7 +149,7 @@ class CourseUpdateTest(CourseTestCase):
         course_update_url = self.create_update_url()
         resp = self.client.get_json(course_update_url)
         payload = json.loads(resp.content)
-        self.assertEqual(payload, [{u'date': update_date, u'content': update_content, u'id': 1}])
+        self.assertEqual(payload, [{'date': update_date, 'content': update_content, 'id': 1}])
         self.assertEqual(len(payload), 1)
 
         # test getting single update item
@@ -157,7 +157,7 @@ class CourseUpdateTest(CourseTestCase):
         first_update_url = self.create_update_url(provided_id=payload[0]['id'])
         resp = self.client.get_json(first_update_url)
         payload = json.loads(resp.content)
-        self.assertEqual(payload, {u'date': u'January 23, 2014', u'content': u'Hello world!', u'id': 1})
+        self.assertEqual(payload, {'date': 'January 23, 2014', 'content': 'Hello world!', 'id': 1})
         self.assertHTMLEqual(update_date, payload['date'])
         self.assertHTMLEqual(update_content, payload['content'])
 
@@ -173,29 +173,29 @@ class CourseUpdateTest(CourseTestCase):
         )
         self.assertHTMLEqual(update_content, json.loads(resp.content)['content'])
         course_updates = modulestore().get_item(location)
-        self.assertEqual(course_updates.items, [{u'date': update_date, u'content': update_content, u'id': 1}])
+        self.assertEqual(course_updates.items, [{'date': update_date, 'content': update_content, 'id': 1}])
         # course_updates 'data' field should not update automatically
         self.assertEqual(course_updates.data, '')
 
         # test delete course update item (soft delete)
         course_updates = modulestore().get_item(location)
-        self.assertEqual(course_updates.items, [{u'date': update_date, u'content': update_content, u'id': 1}])
+        self.assertEqual(course_updates.items, [{'date': update_date, 'content': update_content, 'id': 1}])
         # now try to delete first update item
         resp = self.client.delete(course_update_url + '1')
         self.assertEqual(json.loads(resp.content), [])
         # confirm that course update is soft deleted ('status' flag set to 'deleted') in db
         course_updates = modulestore().get_item(location)
         self.assertEqual(course_updates.items,
-                         [{u'date': update_date, u'content': update_content, u'id': 1, u'status': 'deleted'}])
+                         [{'date': update_date, 'content': update_content, 'id': 1, 'status': 'deleted'}])
 
         # now try to get deleted update
         resp = self.client.get_json(course_update_url + '1')
         payload = json.loads(resp.content)
-        self.assertEqual(payload.get('error'), u"Course update not found.")
+        self.assertEqual(payload.get('error'), "Course update not found.")
         self.assertEqual(resp.status_code, 404)
 
         # now check that course update don't munges html
-        update_content = u"""&lt;problem>
+        update_content = """&lt;problem>
                            &lt;p>&lt;/p>
                            &lt;multiplechoiceresponse>
                            <pre>&lt;problem>
@@ -246,7 +246,7 @@ class CourseUpdateTest(CourseTestCase):
         # create a course via the view handler
         self.client.ajax_post(course_update_url)
 
-        content = u"Sample update"
+        content = "Sample update"
         payload = {'content': content, 'date': 'January 8, 2013'}
         if send_push_notification:
             payload['push_notification_selected'] = True
@@ -270,13 +270,13 @@ class CourseUpdateTest(CourseTestCase):
 
         updates_location = self.course.id.make_usage_key('course_info', 'updates')
         self.assertTrue(isinstance(updates_location, UsageKey))
-        self.assertEqual(updates_location.block_id, u'updates')
+        self.assertEqual(updates_location.block_id, 'updates')
 
         # check posting on handouts
         handouts_location = self.course.id.make_usage_key('course_info', 'handouts')
         course_handouts_url = reverse_usage_url('xblock_handler', handouts_location)
 
-        content = u"Sample handout"
+        content = "Sample handout"
         payload = {'data': content}
         resp = self.client.ajax_post(course_handouts_url, payload)
 
@@ -303,7 +303,7 @@ class CourseUpdateTest(CourseTestCase):
     def test_notifications_sent_to_parse(self, mock_parse_push):
         PushNotificationConfig(enabled=True).save()
         self.post_course_update(send_push_notification=True)
-        self.assertEquals(mock_parse_push.alert.call_count, 2)
+        self.assertEqual(mock_parse_push.alert.call_count, 2)
 
     @override_settings(PARSE_KEYS={"APPLICATION_ID": "TEST_APPLICATION_ID", "REST_API_KEY": "TEST_REST_API_KEY"})
     @patch("contentstore.push_notification.log_exception")

@@ -337,14 +337,14 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
                     LOGGER.name,
                     'WARNING',
                     (
-                        u"PDF certificate generation discontinued, canceling "
-                        u"PDF certificate generation for student {student_id} "
-                        u"in course '{course_id}' "
-                        u"with status '{status}' "
-                        u"and download_url '{download_url}'."
+                        "PDF certificate generation discontinued, canceling "
+                        "PDF certificate generation for student {student_id} "
+                        "in course '{course_id}' "
+                        "with status '{status}' "
+                        "and download_url '{download_url}'."
                     ).format(
                         student_id=self.user_2.id,
-                        course_id=unicode(self.course.id),
+                        course_id=str(self.course.id),
                         status=CertificateStatuses.downloadable,
                         download_url=download_url
                     )
@@ -413,8 +413,8 @@ class XQueueCertInterfaceExampleCertificateTest(TestCase):
         expected_body = {
             'action': 'create',
             'username': cert.uuid,
-            'name': u'John Doë',
-            'course_id': unicode(self.COURSE_KEY),
+            'name': 'John Doë',
+            'course_id': str(self.COURSE_KEY),
             'template_pdf': 'test.pdf',
             'example_certificate': True
         }

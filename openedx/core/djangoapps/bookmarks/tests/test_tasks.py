@@ -135,8 +135,8 @@ class XBlockCacheTaskTests(BookmarksTestsBase):
         blocks_data = _calculate_course_xblocks_data(course.id)
 
         expected_cache_data = getattr(self, course_attr + '_expected_cache_data')
-        for usage_key, __ in expected_cache_data.items():
-            for path_index, path in enumerate(blocks_data[unicode(usage_key)]['paths']):
+        for usage_key, __ in list(expected_cache_data.items()):
+            for path_index, path in enumerate(blocks_data[str(usage_key)]['paths']):
                 for path_item_index, path_item in enumerate(path):
                     self.assertEqual(
                         path_item['usage_key'], expected_cache_data[usage_key][path_index][path_item_index]
@@ -157,7 +157,7 @@ class XBlockCacheTaskTests(BookmarksTestsBase):
             _update_xblocks_cache(course.id)
 
         expected_cache_data = getattr(self, course_attr + '_expected_cache_data')
-        for usage_key, __ in expected_cache_data.items():
+        for usage_key, __ in list(expected_cache_data.items()):
             xblock_cache = XBlockCache.objects.get(usage_key=usage_key)
             for path_index, path in enumerate(xblock_cache.paths):
                 for path_item_index, path_item in enumerate(path):
@@ -191,7 +191,7 @@ class XBlockCacheTaskTests(BookmarksTestsBase):
             }
         )
 
-        for usage_key, __ in self.course_expected_cache_data.items():
+        for usage_key, __ in list(self.course_expected_cache_data.items()):
             xblock_cache = XBlockCache.objects.get(usage_key=usage_key)
             for path_index, path in enumerate(xblock_cache.paths):
                 for path_item_index, path_item in enumerate(path):

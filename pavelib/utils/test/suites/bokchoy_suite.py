@@ -2,7 +2,7 @@
 """
 Class used for defining and running Bok Choy acceptance test suite
 """
-from __future__ import print_function
+
 import os
 from time import sleep
 from textwrap import dedent
@@ -49,7 +49,7 @@ def load_bok_choy_data(options):
     """
     print('Loading data from json fixtures in db_fixtures directory')
     sh(
-        u"DEFAULT_STORE={default_store}"
+        "DEFAULT_STORE={default_store}"
         " ./manage.py lms --settings {settings} loaddata --traceback"
         " common/test/db_fixtures/*.json".format(
             default_store=options.default_store,
@@ -74,11 +74,11 @@ def load_courses(options):
     `test_root/courses/`.
     """
     if 'imports_dir' in options:
-        msg = colorize('green', u"Importing courses from {}...".format(options.imports_dir))
+        msg = colorize('green', "Importing courses from {}...".format(options.imports_dir))
         print(msg)
 
         sh(
-            u"DEFAULT_STORE={default_store}"
+            "DEFAULT_STORE={default_store}"
             " ./manage.py cms --settings={settings} import {import_dir}".format(
                 default_store=options.default_store,
                 import_dir=options.imports_dir,
@@ -101,7 +101,7 @@ def update_fixtures():
     print(msg)
 
     sh(
-        u" ./manage.py lms --settings={settings} update_fixtures".format(
+        " ./manage.py lms --settings={settings} update_fixtures".format(
             settings=Env.SETTINGS
         )
     )
@@ -133,7 +133,7 @@ def get_test_course(options):
     print(msg)
 
     sh(
-        u'wget {tar_gz_file} -O {zipped_course}'.format(
+        'wget {tar_gz_file} -O {zipped_course}'.format(
             tar_gz_file=DEMO_COURSE_TAR_GZ,
             zipped_course=zipped_course,
         )
@@ -143,7 +143,7 @@ def get_test_course(options):
     print(msg)
 
     sh(
-        u'tar zxf {zipped_course} -C {courses_dir}'.format(
+        'tar zxf {zipped_course} -C {courses_dir}'.format(
             zipped_course=zipped_course,
             courses_dir=options.imports_dir,
         )
@@ -288,7 +288,7 @@ class BokChoyTestSuite(TestSuite):
             # Clean up data we created in the databases
             msg = colorize('green', "Cleaning up databases...")
             print(msg)
-            sh(u"./manage.py lms --settings {settings} flush --traceback --noinput".format(settings=Env.SETTINGS))
+            sh("./manage.py lms --settings {settings} flush --traceback --noinput".format(settings=Env.SETTINGS))
             clear_mongo()
 
     @property
@@ -301,7 +301,7 @@ class BokChoyTestSuite(TestSuite):
         if self.num_processes != 1:
             # Construct "multiprocess" pytest command
             command += [
-                u"-n {}".format(self.num_processes),
+                "-n {}".format(self.num_processes),
                 "--color=no",
             ]
         if self.verbosity < 1:
@@ -309,7 +309,7 @@ class BokChoyTestSuite(TestSuite):
         elif self.verbosity > 1:
             command.append("--verbose")
         if self.eval_attr:
-            command.append(u"-a '{}'".format(self.eval_attr))
+            command.append("-a '{}'".format(self.eval_attr))
 
         return command
 

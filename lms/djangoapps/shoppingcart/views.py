@@ -105,9 +105,9 @@ def add_course_to_cart(request, course_id):
     heavy lifting (logging, error checking, etc)
     """
 
-    assert isinstance(course_id, basestring)
+    assert isinstance(course_id, str)
     if not request.user.is_authenticated:
-        log.info(u"Anon user trying to add course %s to cart", course_id)
+        log.info("Anon user trying to add course %s to cart", course_id)
         return HttpResponseForbidden(_('You must be logged-in to add to a shopping cart'))
     cart = Order.get_cart_for_user(request.user)
     course_key = CourseKey.from_string(course_id)
@@ -117,10 +117,10 @@ def add_course_to_cart(request, course_id):
     except CourseDoesNotExistException:
         return HttpResponseNotFound(_('The course you requested does not exist.'))
     except ItemAlreadyInCartException:
-        return HttpResponseBadRequest(_(u'The course {course_id} is already in your cart.').format(course_id=course_id))
+        return HttpResponseBadRequest(_('The course {course_id} is already in your cart.').format(course_id=course_id))
     except AlreadyEnrolledInCourseException:
         return HttpResponseBadRequest(
-            _(u'You are already registered in course {course_id}.').format(course_id=course_id))
+            _('You are already registered in course {course_id}.').format(course_id=course_id))
     else:
         # in case a coupon redemption code has been applied, new items should also get a discount if applicable.
         order = paid_course_item.order
@@ -157,7 +157,7 @@ def update_user_cart(request):
         try:
             item = OrderItem.objects.get(id=item_id, status='cart')
         except OrderItem.DoesNotExist:
-            log.exception(u'Cart OrderItem id=%s DoesNotExist', item_id)
+            log.exception('Cart OrderItem id=%s DoesNotExist', item_id)
             return HttpResponseNotFound('Order item does not exist.')
 
         item.qty = qty
@@ -226,7 +226,7 @@ def clear_cart(request):
     if coupon_redemption:
         coupon_redemption.delete()
         log.info(
-            u'Coupon redemption entry removed for user %s for order %s',
+            'Coupon redemption entry removed for user %s for order %s',
             request.user,
             cart.id,
         )
@@ -246,7 +246,7 @@ def remove_item(request):
 
     if not len(items):
         log.exception(
-            u'Cannot remove cart OrderItem id=%s. DoesNotExist or item is already purchased',
+            'Cannot remove cart OrderItem id=%s. DoesNotExist or item is already purchased',
             item_id
         )
     else:
@@ -293,7 +293,7 @@ def use_code(request):
         try:
             course_reg = CourseRegistrationCode.objects.get(code=code)
         except CourseRegistrationCode.DoesNotExist:
-            return HttpResponseNotFound(_(u"Discount does not exist against code '{code}'.").format(code=code))
+            return HttpResponseNotFound(_("Discount does not exist against code '{code}'.").format(code=code))
 
         return use_registration_code(course_reg, request.user)
 
@@ -318,7 +318,7 @@ def get_reg_code_validity(registration_code, request, limiter):
         reg_code_already_redeemed = RegistrationCodeRedemption.is_registration_code_redeemed(registration_code)
     if not reg_code_is_valid:
         # tick the rate limiter counter
-        AUDIT_LOG.info(u"Redemption of a invalid RegistrationCode %s", registration_code)
+        AUDIT_LOG.info("Redemption of a invalid RegistrationCode %s", registration_code)
         limiter.tick_bad_request_counter(request)
         raise Http404()
 
@@ -463,17 +463,17 @@ def use_registration_code(course_reg, user):
     and redirects the user to the Registration code redemption page.
     """
     if not course_reg.is_valid:
-        log.warning(u"The enrollment code (%s) is no longer valid.", course_reg.code)
+        log.warning("The enrollment code (%s) is no longer valid.", course_reg.code)
         return HttpResponseBadRequest(
-            _(u"This enrollment code ({enrollment_code}) is no longer valid.").format(
+            _("This enrollment code ({enrollment_code}) is no longer valid.").format(
                 enrollment_code=course_reg.code
             )
         )
 
     if RegistrationCodeRedemption.is_registration_code_redeemed(course_reg.code):
-        log.warning(u"This enrollment code ({%s}) has already been used.", course_reg.code)
+        log.warning("This enrollment code ({%s}) has already been used.", course_reg.code)
         return HttpResponseBadRequest(
-            _(u"This enrollment code ({enrollment_code}) is not valid.").format(
+            _("This enrollment code ({enrollment_code}) is not valid.").format(
                 enrollment_code=course_reg.code
             )
         )
@@ -481,9 +481,9 @@ def use_registration_code(course_reg, user):
         cart = Order.get_cart_for_user(user)
         cart_items = cart.find_item_by_course_id(course_reg.course_id)
     except ItemNotFoundInCartException:
-        log.warning(u"Course item does not exist against registration code '%s'", course_reg.code)
+        log.warning("Course item does not exist against registration code '%s'", course_reg.code)
         return HttpResponseNotFound(
-            _(u"Code '{registration_code}' is not valid for any course in the shopping cart.").format(
+            _("Code '{registration_code}' is not valid for any course in the shopping cart.").format(
                 registration_code=course_reg.code
             )
         )
@@ -520,8 +520,8 @@ def use_coupon_code(coupons, user):
             return HttpResponseBadRequest(_("Only one coupon redemption is allowed against an order"))
 
     if not is_redemption_applied:
-        log.warning(u"Discount does not exist against code '%s'.", coupons[0].code)
-        return HttpResponseNotFound(_(u"Discount does not exist against code '{code}'.").format(code=coupons[0].code))
+        log.warning("Discount does not exist against code '%s'.", coupons[0].code)
+        return HttpResponseNotFound(_("Discount does not exist against code '{code}'.").format(code=coupons[0].code))
 
     return HttpResponse(
         json.dumps({'response': 'success', 'coupon_code_applied': True}),
@@ -565,7 +565,7 @@ def donate(request):
 
     # Check that required parameters are present and valid
     if amount is None:
-        msg = u"Request is missing required param 'amount'"
+        msg = "Request is missing required param 'amount'"
         log.error(msg)
         return HttpResponseBadRequest(msg)
     try:
@@ -588,7 +588,7 @@ def donate(request):
         try:
             course_id = CourseLocator.from_string(course_id)
         except InvalidKeyError:
-            msg = u"Request included an invalid course key: {course_key}".format(course_key=course_id)
+            msg = "Request included an invalid course key: {course_key}".format(course_key=course_id)
             log.error(msg)
             return HttpResponseBadRequest(msg)
 
@@ -601,11 +601,11 @@ def donate(request):
         Donation.add_to_order(cart, amount, course_id=course_id)
     except InvalidCartItem as ex:
         log.exception(
-            u"Could not create donation item for amount '%s' and course ID '%s'",
+            "Could not create donation item for amount '%s' and course ID '%s'",
             amount,
             course_id
         )
-        return HttpResponseBadRequest(unicode(ex))
+        return HttpResponseBadRequest(str(ex))
 
     # Start the purchase.
     # This will "lock" the purchase so the user can't change
@@ -621,7 +621,7 @@ def donate(request):
 
     # Add extra to make it easier to track transactions
     extra_data = [
-        unicode(course_id) if course_id else "",
+        str(course_id) if course_id else "",
         "donation_course" if course_id else "donation_general"
     ]
 
@@ -660,16 +660,16 @@ def _get_verify_flow_redirect(order):
         # this will choose the first.
         if cert_items.count() > 1:
             log.warning(
-                u"More than one certificate item in order %s; "
-                u"continuing with the payment/verification flow for "
-                u"the first order item (course %s).",
+                "More than one certificate item in order %s; "
+                "continuing with the payment/verification flow for "
+                "the first order item (course %s).",
                 order.id, cert_items[0].course_id
             )
 
         course_id = cert_items[0].course_id
         url = reverse(
             'verify_student_payment_confirmation',
-            kwargs={'course_id': unicode(course_id)}
+            kwargs={'course_id': str(course_id)}
         )
         # Add a query string param for the order ID
         # This allows the view to query for the receipt information later.
@@ -877,7 +877,7 @@ def _show_receipt_json(order):
                 'unit_cost': item.unit_cost,
                 'line_cost': item.line_cost,
                 'line_desc': item.line_desc,
-                'course_key': unicode(item.course_id)
+                'course_key': str(item.course_id)
             }
             for item in OrderItem.objects.filter(order=order).select_subclasses()
         ]
@@ -950,7 +950,7 @@ def _show_receipt_html(request, order):
         'currency': settings.PAID_COURSE_REGISTRATION_CURRENCY[0],
         'total_registration_codes': total_registration_codes,
         'reg_code_info_list': reg_code_info_list,
-        'order_purchase_date': order.purchase_time.strftime(u"%B %d, %Y"),
+        'order_purchase_date': order.purchase_time.strftime("%B %d, %Y"),
     }
 
     # We want to have the ability to override the default receipt page when
@@ -1022,8 +1022,8 @@ def csv_report(request):
         items = report.rows()
 
         response = HttpResponse(content_type='text/csv')
-        filename = u"purchases_report_{}.csv".format(datetime.datetime.now(pytz.UTC).strftime(u"%Y-%m-%d-%H-%M-%S"))
-        response['Content-Disposition'] = u'attachment; filename="{}"'.format(filename)
+        filename = "purchases_report_{}.csv".format(datetime.datetime.now(pytz.UTC).strftime("%Y-%m-%d-%H-%M-%S"))
+        response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
         report.write_csv(response)
         return response
 

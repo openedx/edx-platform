@@ -103,7 +103,7 @@ class StudentInputError(Exception):
 # Main base class for CAPA responsetypes
 
 
-class LoncapaResponse(object):
+class LoncapaResponse(object, metaclass=abc.ABCMeta):
     """
     Base class for CAPA responsetypes.  Each response type (ie a capa question,
     which is part of a capa problem) is represented as a subclass,
@@ -140,7 +140,6 @@ class LoncapaResponse(object):
       - hint_tag             : xhtml tag identifying hint associated with this response inside
                                hintgroup
     """
-    __metaclass__ = abc.ABCMeta  # abc = Abstract Base Class
 
     tags = None
     hint_tag = None
@@ -179,14 +178,14 @@ class LoncapaResponse(object):
         for abox in inputfields:
             if abox.tag not in self.allowed_inputfields:
                 msg = "%s: cannot have input field %s" % (
-                    unicode(self), abox.tag)
+                    str(self), abox.tag)
                 msg += "\nSee XML source line %s" % getattr(
                     xml, 'sourceline', '[unavailable]')
                 raise LoncapaProblemError(msg)
 
         if self.max_inputfields and len(inputfields) > self.max_inputfields:
             msg = "%s: cannot have more than %s input fields" % (
-                unicode(self), self.max_inputfields)
+                str(self), self.max_inputfields)
             msg += "\nSee XML source line %s" % getattr(
                 xml, 'sourceline', '[unavailable]')
             raise LoncapaProblemError(msg)
@@ -194,7 +193,7 @@ class LoncapaResponse(object):
         for prop in self.required_attributes:
             if not xml.get(prop):
                 msg = "Error in problem specification: %s missing required attribute %s" % (
-                    unicode(self), prop)
+                    str(self), prop)
                 msg += "\nSee XML source line %s" % getattr(
                     xml, 'sourceline', '[unavailable]')
                 raise LoncapaProblemError(msg)
@@ -258,7 +257,7 @@ class LoncapaResponse(object):
 
         response_index = response_id.split('_')[-1]
         # Translators: index here could be 1,2,3 and so on
-        response_label = _(u'Question {index}').format(index=response_index)
+        response_label = _('Question {index}').format(index=response_index)
 
         # wrap the content inside a section
         tree = etree.Element('div')
@@ -361,9 +360,9 @@ class LoncapaResponse(object):
         # Tricky: label None means output defaults, while '' means output empty label
         if label is None:
             if correct:
-                label = _(u'Correct:')
+                label = _('Correct:')
             else:
-                label = _(u'Incorrect:')
+                label = _('Incorrect:')
 
         # self.runtime.track_function('get_demand_hint', event_info)
         # This this "feedback hint" event
@@ -571,7 +570,7 @@ class LoncapaResponse(object):
         pass
 
     def __unicode__(self):
-        return u'LoncapaProblem Response %s' % self.xml.tag
+        return 'LoncapaProblem Response %s' % self.xml.tag
 
     def _render_response_msg_html(self, response_msg):
         """ Render a <div> for a message that applies to the entire response.
@@ -1455,10 +1454,10 @@ class OptionResponse(LoncapaResponse):
         Return student answers variable name if exist in context else None.
         """
         if aid in student_answers:
-            for key, val in self.context.iteritems():
+            for key, val in self.context.items():
                 # convert val into unicode because student answer always be a unicode string
                 # even it is a list, dict etc.
-                if unicode(val) == student_answers[aid]:
+                if str(val) == student_answers[aid]:
                     return '$' + key
         return None
 
@@ -1590,7 +1589,7 @@ class NumericalResponse(LoncapaResponse):
 
         _ = self.capa_system.i18n.ugettext
         general_exception = StudentInputError(
-            _(u"Could not interpret '{student_answer}' as a number.").format(student_answer=cgi.escape(student_answer))
+            _("Could not interpret '{student_answer}' as a number.").format(student_answer=cgi.escape(student_answer))
         )
 
         # Begin `evaluator` block
@@ -1619,7 +1618,7 @@ class NumericalResponse(LoncapaResponse):
                 raise general_exception
         except ParseException:
             raise StudentInputError(
-                _(u"Invalid math syntax: '{student_answer}'").format(student_answer=cgi.escape(student_answer))
+                _("Invalid math syntax: '{student_answer}'").format(student_answer=cgi.escape(student_answer))
             )
         except Exception:
             raise general_exception
@@ -1650,7 +1649,7 @@ class NumericalResponse(LoncapaResponse):
 
         if self.range_tolerance:
             if isinstance(student_float, complex):
-                raise StudentInputError(_(u"You may not use complex numbers in range tolerance problems"))
+                raise StudentInputError(_("You may not use complex numbers in range tolerance problems"))
             boundaries = []
             for inclusion, answer in zip(self.inclusion, self.answer_range):
                 boundary = self.get_staff_ans(answer)
@@ -2037,7 +2036,7 @@ class StringResponse(LoncapaResponse):
                 regexp = re.compile('^' + '|'.join(expected) + '$', flags=flags | re.UNICODE)
                 result = re.search(regexp, given)
             except Exception as err:
-                msg = u'[courseware.capa.responsetypes.stringresponse] {error}: {message}'.format(
+                msg = '[courseware.capa.responsetypes.stringresponse] {error}: {message}'.format(
                     error=_('error'),
                     message=text_type(err)
                 )
@@ -2170,7 +2169,7 @@ class CustomResponse(LoncapaResponse):
         """
         _ = self.capa_system.i18n.ugettext
 
-        log.debug('%s: student_answers=%s', unicode(self), student_answers)
+        log.debug('%s: student_answers=%s', str(self), student_answers)
 
         # ordered list of answer id's
         # sort the responses on the bases of the problem's position number
@@ -2181,7 +2180,7 @@ class CustomResponse(LoncapaResponse):
             # ordered list of answers
             submission = [student_answers[k] for k in idset]
         except Exception as err:
-            msg = u"[courseware.capa.responsetypes.customresponse] {message}\n idset = {idset}, error = {err}".format(
+            msg = "[courseware.capa.responsetypes.customresponse] {message}\n idset = {idset}, error = {err}".format(
                 message=_("error getting student answer from {student_answers}").format(
                     student_answers=student_answers,
                 ),
@@ -2206,7 +2205,7 @@ class CustomResponse(LoncapaResponse):
             # default to no error message on empty answer (to be consistent with other
             # responsetypes) but allow author to still have the old behavior by setting
             # empty_answer_err attribute
-            msg = (HTML(u'<span class="inline-error">{0}</span>').format(_(u'No answer entered!'))
+            msg = (HTML('<span class="inline-error">{0}</span>').format(_('No answer entered!'))
                    if self.xml.get('empty_answer_err') else '')
             return CorrectMap(idset[0], 'incorrect', msg=msg)
 
@@ -2284,7 +2283,7 @@ class CustomResponse(LoncapaResponse):
 
     def execute_check_function(self, idset, submission):
         # exec the check function
-        if isinstance(self.code, basestring):
+        if isinstance(self.code, str):
             try:
                 safe_exec.safe_exec(
                     self.code,
@@ -2554,7 +2553,7 @@ class SymbolicResponse(CustomResponse):
             log.error(traceback.format_exc())
             _ = self.capa_system.i18n.ugettext
             # Translators: 'SymbolicResponse' is a problem type and should not be translated.
-            msg = _(u"An error occurred with SymbolicResponse. The error was: {error_msg}").format(
+            msg = _("An error occurred with SymbolicResponse. The error was: {error_msg}").format(
                 error_msg=err,
             )
             raise Exception(msg)
@@ -2650,7 +2649,7 @@ class CodeResponse(LoncapaResponse):
             codeparam, 'initial_display', '')
         _ = self.capa_system.i18n.ugettext
         self.answer = find_with_default(codeparam, 'answer_display',
-                                        _(u'No answer provided.'))
+                                        _('No answer provided.'))
 
     def get_score(self, student_answers):
         _ = self.capa_system.i18n.ugettext
@@ -2669,7 +2668,7 @@ class CodeResponse(LoncapaResponse):
         if self.capa_system.xqueue is None:
             cmap = CorrectMap()
             cmap.set(self.answer_id, queuestate=None,
-                     msg=_(u'Error: No grader has been set up for this problem.'))
+                     msg=_('Error: No grader has been set up for this problem.'))
             return cmap
 
         # Prepare xqueue request
@@ -2897,7 +2896,7 @@ class ExternalResponse(LoncapaResponse):
             # no <answer> stanza; get code from <script>
             self.code = self.context['script_code']
             if not self.code:
-                msg = '%s: Missing answer script code for externalresponse' % unicode(
+                msg = '%s: Missing answer script code for externalresponse' % str(
                     self)
                 msg += "\nSee XML source line %s" % getattr(
                     self.xml, 'sourceline', '[unavailable]')
@@ -2972,8 +2971,8 @@ class ExternalResponse(LoncapaResponse):
         except Exception as err:  # pylint: disable=broad-except
             log.error('Error %s', err)
             if self.capa_system.DEBUG:
-                cmap.set_dict(dict(zip(sorted(
-                    self.answer_ids), ['incorrect'] * len(idset))))
+                cmap.set_dict(dict(list(zip(sorted(
+                    self.answer_ids), ['incorrect'] * len(idset)))))
                 cmap.set_property(
                     self.answer_ids[0], 'msg',
                     Text('<span class="inline-error">{}</span>').format(str(err))
@@ -3013,7 +3012,7 @@ class ExternalResponse(LoncapaResponse):
             log.error('Expected %s answers from external server, only got %s!',
                       len(self.answer_ids), len(exans))
             raise Exception('Short response from external server')
-        return dict(zip(self.answer_ids, exans))
+        return dict(list(zip(self.answer_ids, exans)))
 
 
 #-----------------------------------------------------------------------------
@@ -3151,9 +3150,8 @@ class FormulaResponse(LoncapaResponse):
         """
         variables = samples.split('@')[0].split(',')
         numsamples = int(samples.split('@')[1].split('#')[1])
-        sranges = zip(*map(lambda x: map(float, x.split(",")),
-                           samples.split('@')[1].split('#')[0].split(':')))
-        ranges = dict(zip(variables, sranges))
+        sranges = list(zip(*[list(map(float, x.split(","))) for x in samples.split('@')[1].split('#')[0].split(':')]))
+        ranges = dict(list(zip(variables, sranges)))
 
         out = []
         for _ in range(numsamples):
@@ -3286,7 +3284,7 @@ class SchematicResponse(LoncapaResponse):
             msg = _('Error in evaluating SchematicResponse. The error was: {error_msg}').format(error_msg=err)
             raise ResponseError(msg)
         cmap = CorrectMap()
-        cmap.set_dict(dict(zip(sorted(self.answer_ids), self.context['correct'])))
+        cmap.set_dict(dict(list(zip(sorted(self.answer_ids), self.context['correct']))))
         return cmap
 
     def get_answers(self):
@@ -3468,8 +3466,8 @@ class AnnotationResponse(LoncapaResponse):
         student_option = self._get_submitted_option_id(student_answer)
 
         scoring = self.scoring_map[self.answer_id]
-        is_valid = student_option is not None and student_option in scoring.keys(
-        )
+        is_valid = student_option is not None and student_option in list(scoring.keys(
+        ))
 
         (correctness, points) = ('incorrect', None)
         if is_valid:
@@ -3541,7 +3539,7 @@ class AnnotationResponse(LoncapaResponse):
             json_d = {}
 
         comment_value = json_d.get('comment', '')
-        if not isinstance(json_d, basestring):
+        if not isinstance(json_d, str):
             comment_value = ''
 
         options_value = json_d.get('options', [])
@@ -3849,7 +3847,7 @@ class ChoiceTextResponse(LoncapaResponse):
         """
         _ = self.capa_system.i18n.ugettext
         inputs_correct = True
-        for answer_name, answer_value in numtolerance_inputs.iteritems():
+        for answer_name, answer_value in numtolerance_inputs.items():
             # If `self.corrrect_inputs` does not contain an entry for
             # `answer_name`, this means that answer_name is a decoy
             # input's value, and validation of its numericality is the

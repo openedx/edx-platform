@@ -1,6 +1,6 @@
 """Tests of commerce utilities."""
 import json
-from urllib import urlencode
+from urllib.parse import urlencode
 
 import ddt
 import httpretty

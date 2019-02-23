@@ -88,7 +88,7 @@ class CourseActionUIStateManager(CourseActionStateManager):
 
         # update any additional fields in kwargs
         if kwargs:
-            for key, value in kwargs.iteritems():
+            for key, value in kwargs.items():
                 setattr(state_object, key, value)
 
         state_object.save()

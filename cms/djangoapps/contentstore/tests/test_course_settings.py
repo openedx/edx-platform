@@ -84,7 +84,7 @@ class CourseSettingsEncoderTest(CourseTestCase):
         jsondetails = json.dumps(details, cls=CourseSettingsEncoder)
         jsondetails = json.loads(jsondetails)
 
-        self.assertEquals(1, jsondetails['number'])
+        self.assertEqual(1, jsondetails['number'])
         self.assertEqual(jsondetails['string'], 'string')
 
 
@@ -171,7 +171,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
                 dt1 = date.from_json(encoded[field])
                 dt2 = details[field]
 
-                self.assertEqual(dt1, dt2, msg=u"{} != {} at {}".format(dt1, dt2, context))
+                self.assertEqual(dt1, dt2, msg="{} != {} at {}".format(dt1, dt2, context))
             else:
                 self.fail(field + " missing from encoded but in details at " + context)
         elif field in encoded and encoded[field] is not None:
@@ -197,7 +197,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         # update pre requisite courses with a new course keys
         pre_requisite_course = CourseFactory.create(org='edX', course='900', run='test_run')
         pre_requisite_course2 = CourseFactory.create(org='edX', course='902', run='test_run')
-        pre_requisite_course_keys = [unicode(pre_requisite_course.id), unicode(pre_requisite_course2.id)]
+        pre_requisite_course_keys = [str(pre_requisite_course.id), str(pre_requisite_course2.id)]
         course_detail_json['pre_requisite_courses'] = pre_requisite_course_keys
         self.client.ajax_post(url, course_detail_json)
 
@@ -227,7 +227,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
 
         # update pre requisite courses one valid and one invalid key
         pre_requisite_course = CourseFactory.create(org='edX', course='900', run='test_run')
-        pre_requisite_course_keys = [unicode(pre_requisite_course.id), 'invalid_key']
+        pre_requisite_course_keys = [str(pre_requisite_course.id), 'invalid_key']
         course_detail_json['pre_requisite_courses'] = pre_requisite_course_keys
         response = self.client.ajax_post(url, course_detail_json)
         self.assertEqual(400, response.status_code)
@@ -312,10 +312,10 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         }
         response = self.client.post(settings_details_url, data=json.dumps(data), content_type='application/json',
                                     HTTP_ACCEPT='application/json')
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         course = modulestore().get_course(self.course.id)
         self.assertTrue(course.entrance_exam_enabled)
-        self.assertEquals(course.entrance_exam_minimum_score_pct, .60)
+        self.assertEqual(course.entrance_exam_minimum_score_pct, .60)
 
         # Update the entrance exam
         data['entrance_exam_enabled'] = "true"
@@ -326,10 +326,10 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
             content_type='application/json',
             HTTP_ACCEPT='application/json'
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         course = modulestore().get_course(self.course.id)
         self.assertTrue(course.entrance_exam_enabled)
-        self.assertEquals(course.entrance_exam_minimum_score_pct, .80)
+        self.assertEqual(course.entrance_exam_minimum_score_pct, .80)
 
         self.assertTrue(milestones_helpers.any_unfulfilled_milestones(self.course.id, self.user.id),
                         msg='The entrance exam should be required.')
@@ -343,9 +343,9 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
             HTTP_ACCEPT='application/json'
         )
         course = modulestore().get_course(self.course.id)
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertFalse(course.entrance_exam_enabled)
-        self.assertEquals(course.entrance_exam_minimum_score_pct, None)
+        self.assertEqual(course.entrance_exam_minimum_score_pct, None)
 
         self.assertFalse(milestones_helpers.any_unfulfilled_milestones(self.course.id, self.user.id),
                          msg='The entrance exam should not be required anymore')
@@ -373,12 +373,12 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
             content_type='application/json',
             HTTP_ACCEPT='application/json'
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         course = modulestore().get_course(self.course.id)
         self.assertTrue(course.entrance_exam_enabled)
 
         # entrance_exam_minimum_score_pct is not present in the request so default value should be saved.
-        self.assertEquals(course.entrance_exam_minimum_score_pct, .5)
+        self.assertEqual(course.entrance_exam_minimum_score_pct, .5)
 
         #add entrance_exam_minimum_score_pct with empty value in json request.
         test_data_2 = {
@@ -399,10 +399,10 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
             content_type='application/json',
             HTTP_ACCEPT='application/json'
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         course = modulestore().get_course(self.course.id)
         self.assertTrue(course.entrance_exam_enabled)
-        self.assertEquals(course.entrance_exam_minimum_score_pct, .5)
+        self.assertEqual(course.entrance_exam_minimum_score_pct, .5)
 
     def test_editable_short_description_fetch(self):
         settings_details_url = get_url(self.course.id)
@@ -513,10 +513,10 @@ class CourseGradingTest(CourseTestCase):
             mock.call(
                 GRADING_POLICY_CHANGED_EVENT_TYPE,
                 {
-                    'course_id': unicode(self.course.id),
+                    'course_id': str(self.course.id),
                     'event_transaction_type': 'edx.grades.grading_policy_changed',
                     'grading_policy_hash': policy_hash,
-                    'user_id': unicode(self.user.id),
+                    'user_id': str(self.user.id),
                     'event_transaction_id': 'mockUUID',
                 }
             ) for policy_hash in (
@@ -562,10 +562,10 @@ class CourseGradingTest(CourseTestCase):
             mock.call(
                 GRADING_POLICY_CHANGED_EVENT_TYPE,
                 {
-                    'course_id': unicode(self.course.id),
+                    'course_id': str(self.course.id),
                     'event_transaction_type': 'edx.grades.grading_policy_changed',
                     'grading_policy_hash': policy_hash,
-                    'user_id': unicode(self.user.id),
+                    'user_id': str(self.user.id),
                     'event_transaction_id': 'mockUUID',
                 }
             ) for policy_hash in {grading_policy_1, grading_policy_2, grading_policy_3}
@@ -600,10 +600,10 @@ class CourseGradingTest(CourseTestCase):
             mock.call(
                 GRADING_POLICY_CHANGED_EVENT_TYPE,
                 {
-                    'course_id': unicode(self.course.id),
+                    'course_id': str(self.course.id),
                     'event_transaction_type': 'edx.grades.grading_policy_changed',
                     'grading_policy_hash': policy_hash,
-                    'user_id': unicode(self.user.id),
+                    'user_id': str(self.user.id),
                     'event_transaction_id': 'mockUUID',
                 }
             ) for policy_hash in (grading_policy_1, grading_policy_2, grading_policy_3)
@@ -677,10 +677,10 @@ class CourseGradingTest(CourseTestCase):
             mock.call(
                 GRADING_POLICY_CHANGED_EVENT_TYPE,
                 {
-                    'course_id': unicode(self.course.id),
+                    'course_id': str(self.course.id),
                     'event_transaction_type': 'edx.grades.grading_policy_changed',
                     'grading_policy_hash': policy_hash,
-                    'user_id': unicode(self.user.id),
+                    'user_id': str(self.user.id),
                     'event_transaction_id': 'mockUUID',
                 }
             ) for policy_hash in (grading_policy_1, grading_policy_2)
@@ -770,15 +770,15 @@ class CourseGradingTest(CourseTestCase):
         Test setting and getting section grades via the grade as url
         """
         grade_type_url = self.setup_test_set_get_section_grader_ajax()
-        response = self.client.ajax_post(grade_type_url, {'graderType': u'Homework'})
+        response = self.client.ajax_post(grade_type_url, {'graderType': 'Homework'})
         self.assertEqual(200, response.status_code)
         response = self.client.get_json(grade_type_url + '?fields=graderType')
-        self.assertEqual(json.loads(response.content).get('graderType'), u'Homework')
+        self.assertEqual(json.loads(response.content).get('graderType'), 'Homework')
         # and unset
-        response = self.client.ajax_post(grade_type_url, {'graderType': u'notgraded'})
+        response = self.client.ajax_post(grade_type_url, {'graderType': 'notgraded'})
         self.assertEqual(200, response.status_code)
         response = self.client.get_json(grade_type_url + '?fields=graderType')
-        self.assertEqual(json.loads(response.content).get('graderType'), u'notgraded')
+        self.assertEqual(json.loads(response.content).get('graderType'), 'notgraded')
 
     def _grading_policy_hash_for_course(self):
         return hash_grading_policy(modulestore().get_course(self.course.id).grading_policy)
@@ -1491,7 +1491,7 @@ id=\"course-enrollment-end-time\" value=\"\" placeholder=\"HH:MM\" autocomplete=
         """
         super(CourseEnrollmentEndFieldTest, self).setUp()
         self.course = CourseFactory.create(org='edX', number='dummy', display_name='Marketing Site Course')
-        self.course_details_url = reverse_course_url('settings_handler', unicode(self.course.id))
+        self.course_details_url = reverse_course_url('settings_handler', str(self.course.id))
 
     def _get_course_details_response(self, global_staff):
         """

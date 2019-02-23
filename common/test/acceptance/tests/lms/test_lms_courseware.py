@@ -113,9 +113,9 @@ class CoursewareTest(UniqueCourseTest):
         """
         xblocks = self.course_fix.get_nested_xblocks(category="problem")
         for index in range(1, len(xblocks) + 1):
-            test_section_title = u'Test Section {}'.format(index)
-            test_subsection_title = u'Test Subsection {}'.format(index)
-            test_unit_title = u'Test Problem {}'.format(index)
+            test_section_title = 'Test Section {}'.format(index)
+            test_subsection_title = 'Test Subsection {}'.format(index)
+            test_unit_title = 'Test Problem {}'.format(index)
             self.course_home_page.visit()
             self.course_home_page.outline.go_to_section(test_section_title, test_subsection_title)
             course_nav = self.courseware_page.nav
@@ -174,7 +174,7 @@ class ProctoredExamTest(UniqueCourseTest):
 
         # Add a verified mode to the course
         ModeCreationPage(
-            self.browser, self.course_id, mode_slug=u'verified', mode_display_name=u'Verified Certificate',
+            self.browser, self.course_id, mode_slug='verified', mode_display_name='Verified Certificate',
             min_price=10, suggested_prices='10,20'
         ).visit()
 
@@ -516,9 +516,9 @@ class CoursewareMultipleVerticalsTest(CoursewareMultipleVerticalsTestBase):
         Verifies that the navigation state is as expected.
         """
         self.assertTrue(self.courseware_page.nav.is_on_section(section_title, subsection_title))
-        self.assertEquals(self.courseware_page.sequential_position, subsection_position)
-        self.assertEquals(self.courseware_page.is_next_button_enabled, next_enabled)
-        self.assertEquals(self.courseware_page.is_previous_button_enabled, prev_enabled)
+        self.assertEqual(self.courseware_page.sequential_position, subsection_position)
+        self.assertEqual(self.courseware_page.is_next_button_enabled, next_enabled)
+        self.assertEqual(self.courseware_page.is_previous_button_enabled, prev_enabled)
 
     def test_tab_position(self):
         # test that using the position in the url direct to correct tab in courseware

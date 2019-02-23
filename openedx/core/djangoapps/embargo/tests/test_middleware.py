@@ -44,7 +44,7 @@ class EmbargoMiddlewareAccessTests(UrlResetMixin, ModuleStoreTestCase):
 
         self.courseware_url = reverse(
             'openedx.course_experience.course_home',
-            kwargs={'course_id': unicode(self.course.id)}
+            kwargs={'course_id': str(self.course.id)}
         )
         self.non_courseware_url = reverse('dashboard')
 
@@ -81,14 +81,14 @@ class EmbargoMiddlewareAccessTests(UrlResetMixin, ModuleStoreTestCase):
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     @ddt.data(
         # request_ip, blacklist, whitelist, is_enabled, allow_access
-        (u'173.194.123.35', ['173.194.123.35'], [], True, False),
-        (u'173.194.123.35', ['173.194.0.0/16'], [], True, False),
-        (u'173.194.123.35', ['127.0.0.0/32', '173.194.0.0/16'], [], True, False),
-        (u'173.195.10.20', ['173.194.0.0/16'], [], True, True),
-        (u'173.194.123.35', ['173.194.0.0/16'], ['173.194.0.0/16'], True, False),
-        (u'173.194.123.35', [], ['173.194.0.0/16'], True, True),
-        (u'192.178.2.3', [], ['173.194.0.0/16'], True, True),
-        (u'173.194.123.35', ['173.194.123.35'], [], False, True),
+        ('173.194.123.35', ['173.194.123.35'], [], True, False),
+        ('173.194.123.35', ['173.194.0.0/16'], [], True, False),
+        ('173.194.123.35', ['127.0.0.0/32', '173.194.0.0/16'], [], True, False),
+        ('173.195.10.20', ['173.194.0.0/16'], [], True, True),
+        ('173.194.123.35', ['173.194.0.0/16'], ['173.194.0.0/16'], True, False),
+        ('173.194.123.35', [], ['173.194.0.0/16'], True, True),
+        ('192.178.2.3', [], ['173.194.0.0/16'], True, True),
+        ('173.194.123.35', ['173.194.123.35'], [], False, True),
     )
     @ddt.unpack
     def test_ip_access_rules(self, request_ip, blacklist, whitelist, is_enabled, allow_access):
@@ -154,7 +154,7 @@ class EmbargoMiddlewareAccessTests(UrlResetMixin, ModuleStoreTestCase):
     def test_whitelist_ip_skips_country_access_checks(self):
         # Whitelist an IP address
         IPFilter.objects.create(
-            whitelist=u"192.168.10.20",
+            whitelist="192.168.10.20",
             enabled=True
         )
 
@@ -164,8 +164,8 @@ class EmbargoMiddlewareAccessTests(UrlResetMixin, ModuleStoreTestCase):
             # Make a request from the whitelisted IP address
             response = self.client.get(
                 self.courseware_url,
-                HTTP_X_FORWARDED_FOR=u"192.168.10.20",
-                REMOTE_ADDR=u"192.168.10.20"
+                HTTP_X_FORWARDED_FOR="192.168.10.20",
+                REMOTE_ADDR="192.168.10.20"
             )
 
         # Expect that we were still able to access the page,

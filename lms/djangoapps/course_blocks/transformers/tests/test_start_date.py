@@ -107,7 +107,7 @@ class StartDateTransformerTestCase(BlockParentsMapTestCase):
             expected_student_visible_blocks,
             blocks_with_differing_student_access
     ):
-        for idx, start_date_type in start_date_type_values.iteritems():
+        for idx, start_date_type in start_date_type_values.items():
             block = self.get_block(idx)
             block.start = self.StartDateType.start(start_date_type)
             update_block(block)

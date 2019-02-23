@@ -7,7 +7,7 @@ Event tracker backend that saves events to a Django database.
 # brought here for legacy support. It should be updated when the
 # schema changes or eventually deprecated.
 
-from __future__ import absolute_import
+
 
 import logging
 
@@ -57,9 +57,9 @@ class TrackingLog(models.Model):
 
     def __unicode__(self):
         fmt = (
-            u"[{self.time}] {self.username}@{self.ip}: "
-            u"{self.event_source}| {self.event_type} | "
-            u"{self.page} | {self.event}"
+            "[{self.time}] {self.username}@{self.ip}: "
+            "{self.event_source}| {self.event_type} | "
+            "{self.page} | {self.event}"
         )
         return fmt.format(self=self)
 

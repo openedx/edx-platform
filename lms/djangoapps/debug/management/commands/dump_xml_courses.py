@@ -7,7 +7,7 @@ each as a separate output file containing the json representation
 of each of its fields (including those fields that are set as default values).
 """
 
-from __future__ import print_function
+
 
 import json
 
@@ -28,7 +28,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if len(args) != 1:
-            raise CommandError(u'Must called with arguments: {}'.format(self.args))
+            raise CommandError('Must called with arguments: {}'.format(self.args))
 
         xml_module_store = XMLModuleStore(
             data_dir=settings.DATA_DIR,
@@ -40,12 +40,12 @@ class Command(BaseCommand):
 
         export_dir = path(args[0])
 
-        for course_id, course_modules in xml_module_store.modules.iteritems():
+        for course_id, course_modules in xml_module_store.modules.items():
             course_path = course_id.replace('/', '_')
-            for location, descriptor in course_modules.iteritems():
+            for location, descriptor in course_modules.items():
                 location_path = text_type(location).replace('/', '_')
                 data = {}
-                for field_name, field in descriptor.fields.iteritems():
+                for field_name, field in descriptor.fields.items():
                     try:
                         data[field_name] = field.read_json(descriptor)
                     except Exception as exc:  # pylint: disable=broad-except

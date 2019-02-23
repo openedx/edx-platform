@@ -1,4 +1,4 @@
-from __future__ import print_function
+
 import argparse
 import csv
 import json
@@ -247,7 +247,7 @@ def _get_block_summary_totals(course_data):
 
     for course in course_data:
         block_counts = course.get(BLOCK_COUNTS_KEY)
-        for count_label, value in block_counts.items():
+        for count_label, value in list(block_counts.items()):
             unique = 0
             if value > 0:
                 unique = 1
@@ -303,7 +303,7 @@ def write_course_block_detail_report(course_data):
         )
         detail_writer.writerow(['XBLOCK_TYPE_NAME', 'COURSE_NAME', 'COURSE_ID', 'COURSE_START', 'COURSE_END', 'NUM_XBLOCK_INSTANCES'])
         for course in course_data:
-            for block_type, count in course.get(BLOCK_COUNTS_KEY, []).items():
+            for block_type, count in list(course.get(BLOCK_COUNTS_KEY, []).items()):
                 if count > 0:
                     detail_writer.writerow([
                         block_type,

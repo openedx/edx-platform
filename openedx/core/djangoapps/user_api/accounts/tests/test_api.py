@@ -381,9 +381,9 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, Retireme
 class AccountSettingsOnCreationTest(TestCase):
     # pylint: disable=missing-docstring
 
-    USERNAME = u'frank-underwood'
-    PASSWORD = u'ṕáśśẃőŕd'
-    EMAIL = u'frank+underwood@example.com'
+    USERNAME = 'frank-underwood'
+    PASSWORD = 'ṕáśśẃőŕd'
+    EMAIL = 'frank+underwood@example.com'
 
     def test_create_account(self):
         # Create a new account, which should have empty account settings by default.
@@ -402,7 +402,7 @@ class AccountSettingsOnCreationTest(TestCase):
         self.assertEqual(account_settings, {
             'username': self.USERNAME,
             'email': self.EMAIL,
-            'name': u'',
+            'name': '',
             'gender': None,
             'goals': None,
             'is_active': False,
@@ -432,13 +432,13 @@ class AccountSettingsOnCreationTest(TestCase):
         """
         # Set user password to NFKD format so that we can test that it is normalized to
         # NFKC format upon account creation.
-        create_account(self.USERNAME, unicodedata.normalize('NFKD', u'Ṗŕệṿïệẅ Ṯệẍt'), self.EMAIL)
+        create_account(self.USERNAME, unicodedata.normalize('NFKD', 'Ṗŕệṿïệẅ Ṯệẍt'), self.EMAIL)
 
         user = User.objects.get(username=self.USERNAME)
 
         salt_val = user.password.split('$')[1]
 
-        expected_user_password = make_password(unicodedata.normalize('NFKC', u'Ṗŕệṿïệẅ Ṯệẍt'), salt_val)
+        expected_user_password = make_password(unicodedata.normalize('NFKC', 'Ṗŕệṿïệẅ Ṯệẍt'), salt_val)
         self.assertEqual(expected_user_password, user.password)
 
 
@@ -472,9 +472,9 @@ class AccountCreationActivationAndPasswordChangeTest(TestCase):
     """
     Test cases to cover the account initialization workflow
     """
-    USERNAME = u'claire-underwood'
-    PASSWORD = u'ṕáśśẃőŕd'
-    EMAIL = u'claire+underwood@example.com'
+    USERNAME = 'claire-underwood'
+    PASSWORD = 'ṕáśśẃőŕd'
+    EMAIL = 'claire+underwood@example.com'
 
     IS_SECURE = False
 
@@ -533,7 +533,7 @@ class AccountCreationActivationAndPasswordChangeTest(TestCase):
 
     def test_activate_account_invalid_key(self):
         with pytest.raises(UserNotAuthorized):
-            activate_account(u'invalid')
+            activate_account('invalid')
 
     def test_activate_account_prevent_auth_user_writes(self):
         activation_key = create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
@@ -614,8 +614,8 @@ class AccountCreationUnicodeUsernameTest(TestCase):
     """
     Test cases to cover the account initialization workflow
     """
-    PASSWORD = u'unicode-user-password'
-    EMAIL = u'unicode-user-username@example.com'
+    PASSWORD = 'unicode-user-password'
+    EMAIL = 'unicode-user-username@example.com'
 
     @ddt.data(*VALID_USERNAMES_UNICODE)
     def test_unicode_usernames(self, unicode_username):
@@ -627,6 +627,6 @@ class AccountCreationUnicodeUsernameTest(TestCase):
             try:
                 create_account(unicode_username, self.PASSWORD, self.EMAIL)
             except AccountUsernameInvalid:
-                self.fail(u'The API should accept Unicode username `{unicode_username}`.'.format(
+                self.fail('The API should accept Unicode username `{unicode_username}`.'.format(
                     unicode_username=unicode_username,
                 ))

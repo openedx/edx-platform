@@ -78,7 +78,7 @@ def status_before_must_be(*valid_start_statuses):
         def with_status_check(obj, *args, **kwargs):
             if obj.status not in valid_start_statuses:
                 exception_msg = (
-                    u"Error calling {} {}: status is '{}', must be one of: {}"
+                    "Error calling {} {}: status is '{}', must be one of: {}"
                 ).format(func, obj, obj.status, valid_start_statuses)
                 raise VerificationException(exception_msg)
             return func(obj, *args, **kwargs)
@@ -405,7 +405,7 @@ class PhotoVerification(IDVerificationAttempt):
         if self.status == "approved":
             return
 
-        log.info(u"Verification for user '{user_id}' approved by '{reviewer}'.".format(
+        log.info("Verification for user '{user_id}' approved by '{reviewer}'.".format(
             user_id=self.user, reviewer=user_id
         ))
         self.error_msg = ""  # reset, in case this attempt was denied before
@@ -456,7 +456,7 @@ class PhotoVerification(IDVerificationAttempt):
             lets you amend the error message in case there were additional
             details to be made.
         """
-        log.info(u"Verification for user '{user_id}' denied by '{reviewer}'.".format(
+        log.info("Verification for user '{user_id}' denied by '{reviewer}'.".format(
             user_id=self.user, reviewer=reviewing_user
         ))
         self.error_msg = error_msg
@@ -684,7 +684,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
                 self.save()
         except Exception:       # pylint: disable=broad-except
             log.exception(
-                u'Software Secure submission failed for user %s, setting status to must_retry',
+                'Software Secure submission failed for user %s, setting status to must_retry',
                 self.user.username
             )
             self.status = "must_retry"
@@ -730,9 +730,9 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
                 if parsed_error:
                     parsed_errors.append(parsed_error)
                 else:
-                    log.debug(u'Ignoring photo verification error message: %s', message)
+                    log.debug('Ignoring photo verification error message: %s', message)
         except Exception:   # pylint: disable=broad-except
-            log.exception(u'Failed to parse error message for SoftwareSecurePhotoVerification %d', self.pk)
+            log.exception('Failed to parse error message for SoftwareSecurePhotoVerification %d', self.pk)
 
         return parsed_errors
 
@@ -871,7 +871,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         headers, body = self.create_request()
 
         header_txt = "\n".join(
-            u"{}: {}".format(h, v) for h, v in sorted(headers.items())
+            "{}: {}".format(h, v) for h, v in sorted(headers.items())
         )
         body_txt = json.dumps(body, indent=2, sort_keys=True, ensure_ascii=False).encode('utf-8')
 
@@ -908,20 +908,20 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
             verify=False
         )
 
-        log.info(u"Sent request to Software Secure for receipt ID %s.", self.receipt_id)
+        log.info("Sent request to Software Secure for receipt ID %s.", self.receipt_id)
         if copy_id_photo_from is not None:
             log.info(
                 (
-                    u"Software Secure attempt with receipt ID %s used the same photo ID "
-                    u"data as the receipt with ID %s"
+                    "Software Secure attempt with receipt ID %s used the same photo ID "
+                    "data as the receipt with ID %s"
                 ),
                 self.receipt_id, copy_id_photo_from.receipt_id
             )
 
         log.debug("Headers:\n{}\n\n".format(headers))
         log.debug("Body:\n{}\n\n".format(body))
-        log.debug(u"Return code: {}".format(response.status_code))
-        log.debug(u"Return message:\n\n{}\n\n".format(response.text))
+        log.debug("Return code: {}".format(response.status_code))
+        log.debug("Return message:\n\n{}\n\n".format(response.text))
 
         return response
 
@@ -954,12 +954,12 @@ class VerificationDeadline(TimeStampedModel):
         max_length=255,
         db_index=True,
         unique=True,
-        help_text=ugettext_lazy(u"The course for which this deadline applies"),
+        help_text=ugettext_lazy("The course for which this deadline applies"),
     )
 
     deadline = models.DateTimeField(
         help_text=ugettext_lazy(
-            u"The datetime after which users are no longer allowed "
+            "The datetime after which users are no longer allowed "
             "to submit photos for verification."
         )
     )

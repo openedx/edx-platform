@@ -42,14 +42,14 @@ def i_confirm_with_ok(_step):
     world.browser.get_alert().accept()
 
 
-@step(u'I press the "([^"]*)" delete icon$')
+@step('I press the "([^"]*)" delete icon$')
 def i_press_the_category_delete_icon(_step, category):
     if category == 'section':
         css = 'a.action.delete-section-button'
     elif category == 'subsection':
         css = 'a.action.delete-subsection-button'
     else:
-        assert False, u'Invalid category: %s' % category
+        assert False, 'Invalid category: %s' % category
     world.css_click(css)
 
 
@@ -84,7 +84,7 @@ def select_new_course(_step, _whom):
     world.css_click(course_link_css)
 
 
-@step(u'I press the "([^"]*)" notification button$')
+@step('I press the "([^"]*)" notification button$')
 def press_the_notification_button(_step, name):
 
     # Because the notification uses a CSS transition,
@@ -93,7 +93,7 @@ def press_the_notification_button(_step, name):
     # the "Save" button at the UI level.
     # Instead, we use JavaScript to reliably click
     # the button.
-    btn_css = u'div#page-notification button.action-%s' % name.lower()
+    btn_css = 'div#page-notification button.action-%s' % name.lower()
     world.trigger_event(btn_css, event='focus')
     world.browser.execute_script("$('{}').click()".format(btn_css))
     world.wait_for_ajax_complete()
@@ -262,7 +262,7 @@ def wait_for_loading():
 
 
 @step('I have clicked the new unit button$')
-@step(u'I am in Studio editing a new unit$')
+@step('I am in Studio editing a new unit$')
 def edit_new_unit(step):
     step.given('I have populated a new course in Studio')
     create_unit_from_course_outline()
@@ -299,7 +299,7 @@ def _do_studio_prompt_action(intent, action):
 
     world.wait_for_present('div.wrapper-prompt.is-shown#prompt-{}'.format(intent))
 
-    action_css = u'li.nav-item > button.action-{}'.format(action)
+    action_css = 'li.nav-item > button.action-{}'.format(action)
     world.trigger_event(action_css, event='focus')
     world.browser.execute_script("$('{}').click()".format(action_css))
 
@@ -317,7 +317,7 @@ def confirm_the_prompt(_step):
     confirm_studio_prompt()
 
 
-@step(u'I am shown a prompt$')
+@step('I am shown a prompt$')
 def i_am_shown_a_notification(_step):
     assert world.is_css_present('.wrapper-prompt')
 
@@ -334,7 +334,7 @@ def type_in_codemirror(index, text, find_prefix="$"):
 
 def get_codemirror_value(index=0, find_prefix="$"):
     return world.browser.driver.execute_script(
-        u"""
+        """
         return {find_prefix}('div.CodeMirror:eq({index})').get(0).CodeMirror.getValue();
         """.format(index=index, find_prefix=find_prefix)
     )
@@ -351,7 +351,7 @@ def upload_file(filename, sub_path=''):
     # The file upload dialog is a faux modal, a div that takes over the display
     attach_file(filename, sub_path)
     modal_css = 'div.wrapper-modal-window-assetupload'
-    button_css = u'{} .action-upload'.format(modal_css)
+    button_css = '{} .action-upload'.format(modal_css)
     world.css_click(button_css)
 
     # Clicking the Upload button triggers an AJAX POST.
@@ -363,7 +363,7 @@ def upload_file(filename, sub_path=''):
     assert world.is_css_not_present(modal_css, wait_time=10)
 
 
-@step(u'"([^"]*)" logs in$')
+@step('"([^"]*)" logs in$')
 def other_user_login(step, name):
     step.given('I log out')
     world.visit('/')
@@ -382,7 +382,7 @@ def other_user_login(step, name):
     world.scenario_dict['USER'] = get_user(name + '@edx.org')
 
 
-@step(u'the user "([^"]*)" exists( as a course (admin|staff member|is_staff))?$')
+@step('the user "([^"]*)" exists( as a course (admin|staff member|is_staff))?$')
 def create_other_user(_step, name, has_extra_perms, role_name):
     email = name + '@edx.org'
     user = create_studio_user(uname=name, password="test", email=email)

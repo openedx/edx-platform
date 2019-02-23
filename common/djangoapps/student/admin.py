@@ -48,7 +48,7 @@ class CourseAccessRoleForm(forms.ModelForm):
         fields = '__all__'
 
     email = forms.EmailField(required=True)
-    COURSE_ACCESS_ROLES = [(role_name, role_name) for role_name in REGISTERED_ACCESS_ROLES.keys()]
+    COURSE_ACCESS_ROLES = [(role_name, role_name) for role_name in list(REGISTERED_ACCESS_ROLES.keys())]
     role = forms.ChoiceField(choices=COURSE_ACCESS_ROLES)
 
     def clean_course_id(self):
@@ -67,7 +67,7 @@ class CourseAccessRoleForm(forms.ModelForm):
             org_name = self.cleaned_data.get('course_id').org
             if org.lower() != org_name.lower():
                 raise forms.ValidationError(
-                    u"Org name {} is not valid. Valid name is {}.".format(
+                    "Org name {} is not valid. Valid name is {}.".format(
                         org, org_name
                     )
                 )
@@ -83,7 +83,7 @@ class CourseAccessRoleForm(forms.ModelForm):
             user = User.objects.get(email=email)
         except Exception:
             raise forms.ValidationError(
-                u"Email does not exist. Could not find {email}. Please re-enter email address".format(
+                "Email does not exist. Could not find {email}. Please re-enter email address".format(
                     email=email
                 )
             )

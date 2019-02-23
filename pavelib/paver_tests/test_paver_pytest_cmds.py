@@ -48,26 +48,26 @@ class TestPaverPytestCmd(unittest.TestCase):
                     processes = 1
 
                 if pytestSubclass == "SystemTestSuite":
-                    django_env_var_cmd = u"export DJANGO_SETTINGS_MODULE={}.envs.test".format(root)
+                    django_env_var_cmd = "export DJANGO_SETTINGS_MODULE={}.envs.test".format(root)
                 elif pytestSubclass == "LibTestSuite":
                     if 'pavelib/paver_tests' in test_id:
-                        django_env_var_cmd = u"export DJANGO_SETTINGS_MODULE={}.envs.test".format(root)
+                        django_env_var_cmd = "export DJANGO_SETTINGS_MODULE={}.envs.test".format(root)
                     else:
                         django_env_var_cmd = "export DJANGO_SETTINGS_MODULE='openedx.tests.settings'"
 
-                xdist_string = u'--tx {}*ssh="ubuntu@{} -o StrictHostKeyChecking=no"' \
+                xdist_string = '--tx {}*ssh="ubuntu@{} -o StrictHostKeyChecking=no"' \
                                '//python="source /edx/app/edxapp/edxapp_env; {}; python"' \
                                '//chdir="/edx/app/edxapp/edx-platform"' \
                                .format(processes, ip, django_env_var_cmd)
                 expected_statement.append(xdist_string)
             for rsync_dir in Env.rsync_dirs():
-                expected_statement.append(u'--rsyncdir {}'.format(rsync_dir))
+                expected_statement.append('--rsyncdir {}'.format(rsync_dir))
         else:
             if processes == -1:
                 expected_statement.append('-n auto')
                 expected_statement.append('--dist=loadscope')
             elif processes != 0:
-                expected_statement.append(u'-n {}'.format(processes))
+                expected_statement.append('-n {}'.format(processes))
                 expected_statement.append('--dist=loadscope')
 
         expected_statement.extend([

@@ -70,9 +70,9 @@ class LibraryToolsService(object):
             """ Basic information about the given block """
             orig_key, orig_version = self.store.get_block_original_usage(usage_key)
             return {
-                "usage_key": unicode(usage_key),
-                "original_usage_key": unicode(orig_key) if orig_key else None,
-                "original_usage_version": unicode(orig_version) if orig_version else None,
+                "usage_key": str(usage_key),
+                "original_usage_key": str(orig_key) if orig_key else None,
+                "original_usage_version": str(orig_version) if orig_version else None,
             }
 
         result_json = []
@@ -98,7 +98,7 @@ class LibraryToolsService(object):
         search_engine = SearchEngine.get_search_engine(index="library_index")
         if search_engine:
             filter_clause = {
-                "library": unicode(normalize_key_for_search(library.location.library_key)),
+                "library": str(normalize_key_for_search(library.location.library_key)),
                 "content_type": CapaDescriptor.INDEX_CONTENT_TYPE,
                 "problem_types": capa_type
             }
@@ -161,7 +161,7 @@ class LibraryToolsService(object):
             source_blocks.extend(library.children)
 
         with self.store.bulk_operations(dest_block.location.course_key):
-            dest_block.source_library_version = unicode(library.location.library_key.version_guid)
+            dest_block.source_library_version = str(library.location.library_key.version_guid)
             self.store.update_item(dest_block, user_id)
             head_validation = not version
             dest_block.children = self.store.copy_from_template(

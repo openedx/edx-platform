@@ -119,9 +119,9 @@ class VideoTranscripts(generics.RetrieveAPIView):
         try:
             content, filename, mimetype = get_transcript(video_descriptor, lang=lang)
         except NotFoundError:
-            raise Http404(u'Transcript not found for {}, lang: {}'.format(block_id, lang))
+            raise Http404('Transcript not found for {}, lang: {}'.format(block_id, lang))
 
         response = HttpResponse(content, content_type=mimetype)
-        response['Content-Disposition'] = u'attachment; filename="{}"'.format(filename)
+        response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
 
         return response

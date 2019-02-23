@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
+
 import datetime
 from tempfile import mkdtemp
 
@@ -82,7 +82,7 @@ class BaseCourseTestCase(TestCase):
             xblock_select=only_xmodules,
         )
         courses = modulestore.get_courses()
-        self.assertEquals(len(courses), 1)
+        self.assertEqual(len(courses), 1)
         return courses[0]
 
 
@@ -131,7 +131,7 @@ class ImportTestCase(BaseCourseTestCase):
         '''Check that malformed xml loads as an ErrorDescriptor.'''
 
         # Use an exotic character to also flush out Unicode issues.
-        bad_xml = u'''<sequential display_name="oops\N{SNOWMAN}"><video url="hi"></sequential>'''
+        bad_xml = '''<sequential display_name="oops\N{SNOWMAN}"><video url="hi"></sequential>'''
         system = self.get_system()
 
         descriptor = system.process_xml(bad_xml)
@@ -215,7 +215,7 @@ class ImportTestCase(BaseCourseTestCase):
 
         # Now export and check things
         file_system = OSFS(mkdtemp())
-        descriptor.runtime.export_fs = file_system.makedir(u'course', recreate=True)
+        descriptor.runtime.export_fs = file_system.makedir('course', recreate=True)
         node = etree.Element('unknown')
         descriptor.add_xml_to_node(node)
 
@@ -227,7 +227,7 @@ class ImportTestCase(BaseCourseTestCase):
         self.assertEqual(node.attrib['org'], ORG)
 
         # Does the course still have unicorns?
-        with descriptor.runtime.export_fs.open(u'course/{course_run}.xml'.format(course_run=course_run)) as f:
+        with descriptor.runtime.export_fs.open('course/{course_run}.xml'.format(course_run=course_run)) as f:
             course_xml = etree.fromstring(f.read())
 
         self.assertEqual(course_xml.attrib['unicorn'], unicorn_color)
@@ -241,7 +241,7 @@ class ImportTestCase(BaseCourseTestCase):
 
         # Does the chapter tag now have a due attribute?
         # hardcoded path to child
-        with descriptor.runtime.export_fs.open(u'chapter/ch.xml') as f:
+        with descriptor.runtime.export_fs.open('chapter/ch.xml') as f:
             chapter_xml = etree.fromstring(f.read())
         self.assertEqual(chapter_xml.tag, 'chapter')
         self.assertNotIn('due', chapter_xml.attrib)
@@ -527,7 +527,7 @@ class ImportTestCase(BaseCourseTestCase):
         # Not using get_courses because we need the modulestore object too afterward
         modulestore = XMLModuleStore(DATA_DIR, source_dirs=['toy'])
         courses = modulestore.get_courses()
-        self.assertEquals(len(courses), 1)
+        self.assertEqual(len(courses), 1)
         course = courses[0]
 
         print("course errors:")
@@ -536,20 +536,20 @@ class ImportTestCase(BaseCourseTestCase):
             print(err)
 
         chapters = course.get_children()
-        self.assertEquals(len(chapters), 5)
+        self.assertEqual(len(chapters), 5)
 
         ch2 = chapters[1]
-        self.assertEquals(ch2.url_name, "secret:magic")
+        self.assertEqual(ch2.url_name, "secret:magic")
 
         print("Ch2 location: ", ch2.location)
 
         also_ch2 = modulestore.get_item(ch2.location)
-        self.assertEquals(ch2, also_ch2)
+        self.assertEqual(ch2, also_ch2)
 
         print("making sure html loaded")
         loc = course.id.make_usage_key('html', 'secret:toylab')
         html = modulestore.get_item(loc)
-        self.assertEquals(html.display_name, "Toy lab")
+        self.assertEqual(html.display_name, "Toy lab")
 
     def test_unicode(self):
         """Check that courses with unicode characters in filenames and in
@@ -561,7 +561,7 @@ class ImportTestCase(BaseCourseTestCase):
         print("Starting import")
         modulestore = XMLModuleStore(DATA_DIR, source_dirs=['test_unicode'])
         courses = modulestore.get_courses()
-        self.assertEquals(len(courses), 1)
+        self.assertEqual(len(courses), 1)
         course = courses[0]
 
         print("course errors:")
@@ -626,9 +626,9 @@ class ImportTestCase(BaseCourseTestCase):
         self.assertEqual(
             module.answers,
             [
-                {'text': u'Yes', 'id': 'Yes'},
-                {'text': u'No', 'id': 'No'},
-                {'text': u"Don't know", 'id': 'Dont_know'}
+                {'text': 'Yes', 'id': 'Yes'},
+                {'text': 'No', 'id': 'No'},
+                {'text': "Don't know", 'id': 'Dont_know'}
             ]
         )
 

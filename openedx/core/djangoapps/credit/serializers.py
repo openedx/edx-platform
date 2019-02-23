@@ -1,6 +1,6 @@
 """ Credit API Serializers """
 
-from __future__ import unicode_literals
+
 
 import datetime
 import logging
@@ -47,7 +47,7 @@ class CreditEligibilitySerializer(serializers.ModelSerializer):
 
     def get_course_key(self, obj):
         """ Returns the course key associated with the course. """
-        return unicode(obj.course.course_key)
+        return str(obj.course.course_key)
 
     class Meta(object):
         model = CreditEligibility

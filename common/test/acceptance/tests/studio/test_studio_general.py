@@ -5,7 +5,7 @@ import uuid
 
 from selenium.webdriver.common.keys import Keys
 
-from base_studio_test import StudioCourseTest
+from .base_studio_test import StudioCourseTest
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.studio import LMS_URL

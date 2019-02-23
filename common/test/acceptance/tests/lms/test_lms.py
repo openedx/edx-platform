@@ -179,7 +179,7 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
         msg_text = self.login_page.wait_for_auth_status_message()
         self.assertIn("You have successfully signed into Dummy", msg_text)
         self.assertIn(
-            u"To link your accounts, sign in now using your édX password",
+            "To link your accounts, sign in now using your édX password",
             msg_text
         )
 
@@ -263,8 +263,8 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
         """
         Create a new user with a unique name and email.
         """
-        username = u"test_{uuid}".format(uuid=self.unique_id[0:6])
-        email = u"{user}@example.com".format(user=username)
+        username = "test_{uuid}".format(uuid=self.unique_id[0:6])
+        email = "{user}@example.com".format(user=username)
         password = "password"
 
         # Create the user (automatically logs us in)
@@ -306,8 +306,8 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
         self.register_page.visit()
 
         # Fill in the form and submit it
-        username = u"test_{uuid}".format(uuid=self.unique_id[0:6])
-        email = u"{user}@example.com".format(user=username)
+        username = "test_{uuid}".format(uuid=self.unique_id[0:6])
+        email = "{user}@example.com".format(user=username)
         self.register_page.register(
             email=email,
             password="password",
@@ -329,8 +329,8 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
         # Don't agree to the terms of service / honor code.
         # Don't specify a country code, which is required.
         # Don't specify a favorite movie.
-        username = u"test_{uuid}".format(uuid=self.unique_id[0:6])
-        email = u"{user}@example.com".format(user=username)
+        username = "test_{uuid}".format(uuid=self.unique_id[0:6])
+        email = "{user}@example.com".format(user=username)
         self.register_page.register(
             email=email,
             password="password",
@@ -339,9 +339,9 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
         )
         # Verify that the expected errors are displayed.
         errors = self.register_page.wait_for_errors()
-        self.assertIn(u'Please enter your Public Username.', errors)
-        self.assertIn(u'Select your country or region of residence.', errors)
-        self.assertIn(u'Please tell us your favorite movie.', errors)
+        self.assertIn('Please enter your Public Username.', errors)
+        self.assertIn('Select your country or region of residence.', errors)
+        self.assertIn('Please tell us your favorite movie.', errors)
 
     def test_toggle_to_login_form(self):
         self.register_page.visit().toggle_form()
@@ -429,7 +429,7 @@ class PayAndVerifyTest(EventsTestMixin, UniqueCourseTest):
         ModeCreationPage(self.browser, self.course_id).visit()
 
         # Add a verified mode to the course
-        ModeCreationPage(self.browser, self.course_id, mode_slug=u'verified', mode_display_name=u'Verified Certificate', min_price=10, suggested_prices='10,20').visit()
+        ModeCreationPage(self.browser, self.course_id, mode_slug='verified', mode_display_name='Verified Certificate', min_price=10, suggested_prices='10,20').visit()
 
     def test_deferred_verification_enrollment(self):
         # Create a user and log them in
@@ -721,7 +721,7 @@ class PDFTextBooksTabTest(UniqueCourseTest):
 
         # Add PDF textbooks to course fixture.
         for i in range(1, 3):
-            course_fix.add_textbook(u"PDF Book {}".format(i), [{"title": u"Chapter Of Book {}".format(i), "url": ""}])
+            course_fix.add_textbook("PDF Book {}".format(i), [{"title": "Chapter Of Book {}".format(i), "url": ""}])
 
         course_fix.install()
 
@@ -736,7 +736,7 @@ class PDFTextBooksTabTest(UniqueCourseTest):
 
         # Verify each PDF textbook tab by visiting, it will fail if correct tab is not loaded.
         for i in range(1, 3):
-            self.tab_nav.go_to_tab(u"PDF Book {}".format(i))
+            self.tab_nav.go_to_tab("PDF Book {}".format(i))
 
 
 @attr(shard=1)
@@ -797,12 +797,12 @@ class VisibleToStaffOnlyTest(UniqueCourseTest):
 
         self.course_home_page.outline.go_to_section("Test Section", "Subsection With Locked Unit")
         self.courseware_page.wait_for_page()
-        self.assertEqual([u'Unlocked Unit'], self.courseware_page.nav.sequence_items)
+        self.assertEqual(['Unlocked Unit'], self.courseware_page.nav.sequence_items)
 
         self.course_home_page.visit()
         self.course_home_page.outline.go_to_section("Test Section", "Unlocked Subsection")
         self.courseware_page.wait_for_page()
-        self.assertEqual([u'Test Unit'], self.courseware_page.nav.sequence_items)
+        self.assertEqual(['Test Unit'], self.courseware_page.nav.sequence_items)
 
 
 @attr(shard=1)
@@ -968,7 +968,7 @@ class EntranceExamTest(UniqueCourseTest):
         """
         # visit the course outline and make sure there is no "Entrance Exam" section.
         self.course_home_page.visit()
-        self.assertFalse('Entrance Exam' in self.course_home_page.outline.sections.keys())
+        self.assertFalse('Entrance Exam' in list(self.course_home_page.outline.sections.keys()))
 
         # Logout and login as a staff.
         LogoutPage(self.browser).visit()
@@ -985,7 +985,7 @@ class EntranceExamTest(UniqueCourseTest):
 
         # visit the course outline and make sure there is an "Entrance Exam" section.
         self.course_home_page.visit()
-        self.assertTrue('Entrance Exam' in self.course_home_page.outline.sections.keys())
+        self.assertTrue('Entrance Exam' in list(self.course_home_page.outline.sections.keys()))
 
     # TODO: TNL-6546: Remove test
     def test_entrance_exam_section_2(self):
@@ -1091,8 +1091,8 @@ class EnrollmentClosedRedirectTest(UniqueCourseTest):
         ModeCreationPage(
             self.browser,
             self.course_id,
-            mode_slug=u'verified',
-            mode_display_name=u'Verified Certificate',
+            mode_slug='verified',
+            mode_display_name='Verified Certificate',
             min_price=10,
             suggested_prices='10,20'
         ).visit()
@@ -1143,27 +1143,27 @@ class LMSLanguageTest(UniqueCourseTest):
         language_selector = self.dashboard_page.language_selector
         self.assertEqual(
             get_selected_option_text(language_selector),
-            u'English'
+            'English'
         )
 
         select_option_by_text(language_selector, 'Dummy Language (Esperanto)')
         self.dashboard_page.wait_for_ajax()
         self.account_settings.visit()
-        self.assertEqual(self.account_settings.value_for_dropdown_field('pref-lang'), u'Dummy Language (Esperanto)')
+        self.assertEqual(self.account_settings.value_for_dropdown_field('pref-lang'), 'Dummy Language (Esperanto)')
         self.assertEqual(
             get_selected_option_text(language_selector),
-            u'Dummy Language (Esperanto)'
+            'Dummy Language (Esperanto)'
         )
 
         # changed back to English language.
         select_option_by_text(language_selector, 'English')
         self.account_settings.wait_for_ajax()
-        self.assertEqual(self.account_settings.value_for_dropdown_field('pref-lang'), u'English')
+        self.assertEqual(self.account_settings.value_for_dropdown_field('pref-lang'), 'English')
 
         self.dashboard_page.visit()
         self.assertEqual(
             get_selected_option_text(language_selector),
-            u'English'
+            'English'
         )
 
 
@@ -1220,5 +1220,5 @@ class RegisterCourseTests(EventsTestMixin, UniqueCourseTest):
         self.dashboard_page.wait_for_page()
         self.assertTrue(self.dashboard_page.is_course_present(self.course_id))
         self.assert_matching_events_were_emitted(
-            event_filter={'name': u'edx.course.enrollment.activated', 'event_source': 'server'}
+            event_filter={'name': 'edx.course.enrollment.activated', 'event_source': 'server'}
         )

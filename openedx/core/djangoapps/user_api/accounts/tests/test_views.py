@@ -34,8 +34,8 @@ TEST_PROFILE_IMAGE_UPLOADED_AT = datetime.datetime(2002, 1, 9, 15, 43, 1, tzinfo
 TEST_PROFILE_IMAGE_BACKEND = deepcopy(settings.PROFILE_IMAGE_BACKEND)
 TEST_PROFILE_IMAGE_BACKEND['options']['base_url'] = '/profile-images/'
 
-TEST_BIO_VALUE = u"Tired mother of twins"
-TEST_LANGUAGE_PROFICIENCY_CODE = u"hi"
+TEST_BIO_VALUE = "Tired mother of twins"
+TEST_LANGUAGE_PROFICIENCY_CODE = "hi"
 
 
 class UserAPITestCase(APITestCase):
@@ -291,7 +291,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         self.assertTrue(data["is_active"])
         self.assertEqual("Park Ave", data['mailing_address'])
         self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
-        self.assertEquals(requires_parental_consent, data["requires_parental_consent"])
+        self.assertEqual(requires_parental_consent, data["requires_parental_consent"])
         self.assertIsNone(data["secondary_email"])
         self.assertEqual(year_of_birth, data["year_of_birth"])
 
@@ -544,18 +544,18 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         self.assertEqual(404, response.status_code)
 
     @ddt.data(
-        ("gender", "f", "not a gender", u'"not a gender" is not a valid choice.'),
-        ("level_of_education", "none", u"ȻħȺɍłɇs", u'"ȻħȺɍłɇs" is not a valid choice.'),
-        ("country", "GB", "XY", u'"XY" is not a valid choice.'),
-        ("year_of_birth", 2009, "not_an_int", u"A valid integer is required."),
-        ("name", "bob", "z" * 256, u"Ensure this value has at most 255 characters (it has 256)."),
-        ("name", u"ȻħȺɍłɇs", "z   ", u"The name field must be at least 2 characters long."),
+        ("gender", "f", "not a gender", '"not a gender" is not a valid choice.'),
+        ("level_of_education", "none", "ȻħȺɍłɇs", '"ȻħȺɍłɇs" is not a valid choice.'),
+        ("country", "GB", "XY", '"XY" is not a valid choice.'),
+        ("year_of_birth", 2009, "not_an_int", "A valid integer is required."),
+        ("name", "bob", "z" * 256, "Ensure this value has at most 255 characters (it has 256)."),
+        ("name", "ȻħȺɍłɇs", "z   ", "The name field must be at least 2 characters long."),
         ("goals", "Smell the roses"),
         ("mailing_address", "Sesame Street"),
         # Note that we store the raw data, so it is up to client to escape the HTML.
         (
-            "bio", u"<html>Lacrosse-playing superhero 壓是進界推日不復女</html>",
-            "z" * 3001, u"Ensure this value has at most 3000 characters (it has 3001)."
+            "bio", "<html>Lacrosse-playing superhero 壓是進界推日不復女</html>",
+            "z" * 3001, "Ensure this value has at most 3000 characters (it has 3001)."
         ),
         ("account_privacy", ALL_USERS_VISIBILITY),
         ("account_privacy", PRIVATE_VISIBILITY),
@@ -582,11 +582,11 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         if fails_validation_value:
             error_response = self.send_patch(client, {field: fails_validation_value}, expected_status=400)
             self.assertEqual(
-                u'This value is invalid.',
+                'This value is invalid.',
                 error_response.data["field_errors"][field]["user_message"]
             )
             self.assertEqual(
-                u"Value '{value}' is not valid for field '{field}': {messages}".format(
+                "Value '{value}' is not valid for field '{field}': {messages}".format(
                     value=fails_validation_value, field=field, messages=[developer_validation_message]
                 ),
                 error_response.data["field_errors"][field]["developer_message"]
@@ -620,7 +620,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
                 "This field is not editable via this API", data["field_errors"][field_name]["developer_message"]
             )
             self.assertEqual(
-                u"The '{0}' field cannot be edited.".format(field_name), data["field_errors"][field_name]["user_message"]
+                "The '{0}' field cannot be edited.".format(field_name), data["field_errors"][field_name]["user_message"]
             )
 
         for field_name in ["username", "date_joined", "is_active", "profile_image", "requires_parental_consent"]:
@@ -680,7 +680,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
             """
             self.assertEqual(3, len(change_info))
             self.assertEqual(old_name, change_info[0])
-            self.assertEqual(u"Name change requested through account API by {}".format(requester), change_info[1])
+            self.assertEqual("Name change requested through account API by {}".format(requester), change_info[1])
             self.assertIsNotNone(change_info[2])
             # Verify the new name was also stored.
             get_response = self.send_get(self.client)
@@ -790,24 +790,24 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
 
     @ddt.data(
         (
-            u"not_a_list",
-            {u'non_field_errors': [u'Expected a list of items but got type "unicode".']}
+            "not_a_list",
+            {'non_field_errors': ['Expected a list of items but got type "unicode".']}
         ),
         (
-            [u"not_a_JSON_object"],
-            [{u'non_field_errors': [u'Invalid data. Expected a dictionary, but got unicode.']}]
+            ["not_a_JSON_object"],
+            [{'non_field_errors': ['Invalid data. Expected a dictionary, but got unicode.']}]
         ),
         (
             [{}],
-            [{'code': [u'This field is required.']}]
+            [{'code': ['This field is required.']}]
         ),
         (
-            [{u"code": u"invalid_language_code"}],
-            [{'code': [u'"invalid_language_code" is not a valid choice.']}]
+            [{"code": "invalid_language_code"}],
+            [{'code': ['"invalid_language_code" is not a valid choice.']}]
         ),
         (
-            [{u"code": u"kw"}, {u"code": u"el"}, {u"code": u"kw"}],
-            [u'The language_proficiencies field must consist of unique languages.']
+            [{"code": "kw"}, {"code": "el"}, {"code": "kw"}],
+            ['The language_proficiencies field must consist of unique languages.']
         ),
     )
     @ddt.unpack
@@ -820,7 +820,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         response = self.send_patch(client, {"language_proficiencies": patch_value}, expected_status=400)
         self.assertEqual(
             response.data["field_errors"]["language_proficiencies"]["developer_message"],
-            u"Value '{patch_value}' is not valid for field 'language_proficiencies': {error_message}".format(
+            "Value '{patch_value}' is not valid for field 'language_proficiencies': {error_message}".format(
                 patch_value=patch_value,
                 error_message=expected_error_message
             )
@@ -931,4 +931,4 @@ class TestAccountAPITransactions(TransactionTestCase):
         response = self.client.get(self.url)
         data = response.data
         self.assertEqual(old_email, data["email"])
-        self.assertEqual(u"m", data["gender"])
+        self.assertEqual("m", data["gender"])

@@ -100,7 +100,7 @@ class CapaModule(CapaMixin, XModule):
                 self.scope_ids.user_id
             )
             _, _, traceback_obj = sys.exc_info()  # pylint: disable=redefined-outer-name
-            raise ProcessingError(not_found_error_message), None, traceback_obj
+            raise ProcessingError(not_found_error_message).with_traceback(traceback_obj)
 
         except Exception:
             log.exception(
@@ -110,7 +110,7 @@ class CapaModule(CapaMixin, XModule):
                 self.scope_ids.user_id
             )
             _, _, traceback_obj = sys.exc_info()  # pylint: disable=redefined-outer-name
-            raise ProcessingError(generic_error_message), None, traceback_obj
+            raise ProcessingError(generic_error_message).with_traceback(traceback_obj)
 
         after = self.get_progress()
         after_attempts = self.attempts
@@ -376,7 +376,7 @@ class CapaDescriptor(CapaFields, RawDescriptor):
                 extract_tree=False,
             )
 
-            for answer_id, orig_answers in lcp.student_answers.items():
+            for answer_id, orig_answers in list(lcp.student_answers.items()):
                 # Some types of problems have data in lcp.student_answers that isn't in lcp.problem_data.
                 # E.g. formulae do this to store the MathML version of the answer.
                 # We exclude these rows from the report because we only need the text-only answer.

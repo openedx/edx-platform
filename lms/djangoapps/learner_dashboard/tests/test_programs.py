@@ -4,7 +4,7 @@ Unit tests covering the program listing and detail pages.
 """
 import json
 import re
-from urlparse import urljoin
+from urllib.parse import urljoin
 from uuid import uuid4
 
 import mock
@@ -36,7 +36,7 @@ def load_serialized_data(response, key):
     """
     Extract and deserialize serialized data from the response.
     """
-    pattern = re.compile(ur'{key}: (?P<data>\[.*\])'.format(key=key))
+    pattern = re.compile(r'{key}: (?P<data>\[.*\])'.format(key=key))
     match = pattern.search(response.content)
     serialized = match.group('data')
 
@@ -57,7 +57,7 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         super(TestProgramListing, cls).setUpClass()
 
         cls.course = ModuleStoreCourseFactory()
-        course_run = CourseRunFactory(key=unicode(cls.course.id))
+        course_run = CourseRunFactory(key=str(cls.course.id))
         course = CourseFactory(course_runs=[course_run])
 
         cls.first_program = ProgramFactory(courses=[course])
@@ -193,7 +193,7 @@ class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, Shared
         super(TestProgramDetails, cls).setUpClass()
 
         modulestore_course = ModuleStoreCourseFactory()
-        course_run = CourseRunFactory(key=unicode(modulestore_course.id))
+        course_run = CourseRunFactory(key=str(modulestore_course.id))
         course = CourseFactory(course_runs=[course_run])
 
         cls.program_data = ProgramFactory(uuid=cls.program_uuid, courses=[course])
@@ -213,7 +213,7 @@ class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, Shared
         self.assertContains(response, 'programData')
         self.assertContains(response, 'urls')
         self.assertContains(response,
-                            u'"program_record_url": "{}/records/programs/'.format(CREDENTIALS_PUBLIC_SERVICE_URL))
+                            '"program_record_url": "{}/records/programs/'.format(CREDENTIALS_PUBLIC_SERVICE_URL))
         self.assertContains(response, 'program_listing_url')
         self.assertContains(response, self.program_data['title'])
         self.assert_programs_tab_present(response)

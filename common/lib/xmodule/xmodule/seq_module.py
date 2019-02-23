@@ -24,6 +24,7 @@ from .mako_module import MakoModuleDescriptor
 from .progress import Progress
 from .x_module import STUDENT_VIEW, PUBLIC_VIEW, XModule
 from .xml_module import XmlDescriptor
+from functools import reduce
 
 log = logging.getLogger(__name__)
 
@@ -211,7 +212,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         if dispatch == 'goto_position':
             # set position to default value if either 'position' argument not
             # found in request or it is a non-positive integer
-            position = data.get('position', u'1')
+            position = data.get('position', '1')
             if position.isdigit() and int(position) > 0:
                 self.position = int(position)
             else:
@@ -536,7 +537,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         """
         if not newrelic:
             return
-        newrelic.agent.add_custom_parameter('seq.block_id', unicode(self.location))
+        newrelic.agent.add_custom_parameter('seq.block_id', str(self.location))
         newrelic.agent.add_custom_parameter('seq.display_name', self.display_name or '')
         newrelic.agent.add_custom_parameter('seq.position', self.position)
         newrelic.agent.add_custom_parameter('seq.is_time_limited', self.is_time_limited)
@@ -560,7 +561,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
 
         # Count of all modules by block_type (e.g. "video": 2, "discussion": 4)
         block_counts = collections.Counter(usage_key.block_type for usage_key in all_item_keys)
-        for block_type, count in block_counts.items():
+        for block_type, count in list(block_counts.items()):
             newrelic.agent.add_custom_parameter('seq.block_counts.{}'.format(block_type), count)
 
     def _capture_current_unit_metrics(self, display_items):
@@ -575,14 +576,14 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         if 1 <= self.position <= len(display_items):
             # Basic info about the Unit...
             current = display_items[self.position - 1]
-            newrelic.agent.add_custom_parameter('seq.current.block_id', unicode(current.location))
+            newrelic.agent.add_custom_parameter('seq.current.block_id', str(current.location))
             newrelic.agent.add_custom_parameter('seq.current.display_name', current.display_name or '')
 
             # Examining all items inside the Unit (or split_test, conditional, etc.)
             child_locs = self._locations_in_subtree(current)
             newrelic.agent.add_custom_parameter('seq.current.num_items', len(child_locs))
             curr_block_counts = collections.Counter(usage_key.block_type for usage_key in child_locs)
-            for block_type, count in curr_block_counts.items():
+            for block_type, count in list(curr_block_counts.items()):
                 newrelic.agent.add_custom_parameter('seq.current.block_counts.{}'.format(block_type), count)
 
     def _time_limited_student_view(self):
@@ -691,7 +692,7 @@ class SequenceDescriptor(SequenceFields, ProctoringFields, MakoModuleDescriptor,
             except Exception as e:
                 log.exception("Unable to load child when parsing Sequence. Continuing...")
                 if system.error_tracker is not None:
-                    system.error_tracker(u"ERROR: {0}".format(e))
+                    system.error_tracker("ERROR: {0}".format(e))
                 continue
         return {}, children
 

@@ -5,7 +5,7 @@
 from lettuce import world
 from selenium.webdriver.common.keys import Keys
 
-from common import type_in_codemirror
+from .common import type_in_codemirror
 from openedx.core.lib.tests.tools import assert_equal, assert_in  # pylint: disable=no-name-in-module
 from terrain.steps import reload_the_page
 
@@ -77,7 +77,7 @@ def _find_matching_button(category, component_type):
     """
 
     # The tab shows buttons for the given category
-    buttons = world.css_find(u'div.new-component-{} button'.format(category))
+    buttons = world.css_find('div.new-component-{} button'.format(category))
 
     # Find the button whose text matches what you're looking for
     matched_buttons = [btn for btn in buttons if btn.text == component_type]

@@ -1,11 +1,11 @@
 import logging
 
-import settings
+from . import settings
 
-import models
+from . import models
 from eventtracking import tracker
 
-import utils
+from . import utils
 
 log = logging.getLogger(__name__)
 
@@ -69,7 +69,7 @@ class Thread(models.Model):
             'get',
             url,
             params,
-            metric_tags=[u'course_id:{}'.format(query_params['course_id'])],
+            metric_tags=['course_id:{}'.format(query_params['course_id'])],
             metric_action='thread.search',
             paged_results=True
         )
@@ -93,7 +93,7 @@ class Thread(models.Model):
                 }
             )
             log.info(
-                u'forum_text_search query="{search_query}" corrected_text="{corrected_text}" course_id={course_id} group_id={group_id} page={requested_page} total_results={total_results}'.format(
+                'forum_text_search query="{search_query}" corrected_text="{corrected_text}" course_id={course_id} group_id={group_id} page={requested_page} total_results={total_results}'.format(
                     search_query=search_query,
                     corrected_text=corrected_text,
                     course_id=course_id,
@@ -114,9 +114,9 @@ class Thread(models.Model):
     @classmethod
     def url_for_threads(cls, params={}):
         if params.get('commentable_id'):
-            return u"{prefix}/{commentable_id}/threads".format(prefix=settings.PREFIX, commentable_id=params['commentable_id'])
+            return "{prefix}/{commentable_id}/threads".format(prefix=settings.PREFIX, commentable_id=params['commentable_id'])
         else:
-            return u"{prefix}/threads".format(prefix=settings.PREFIX)
+            return "{prefix}/threads".format(prefix=settings.PREFIX)
 
     @classmethod
     def url_for_search_threads(cls, params={}):

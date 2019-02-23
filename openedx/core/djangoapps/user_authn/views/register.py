@@ -103,7 +103,7 @@ def create_account_with_params(request, params):
     """
     # Copy params so we can modify it; we can't just do dict(params) because if
     # params is request.POST, that results in a dict containing lists of values
-    params = dict(params.items())
+    params = dict(list(params.items()))
 
     # allow to define custom set of required/optional/hidden fields via configuration
     extra_fields = configuration_helpers.get_value(
@@ -127,7 +127,7 @@ def create_account_with_params(request, params):
     if is_third_party_auth_enabled and ('social_auth_provider' in params and not pipeline.running(request)):
         raise ValidationError(
             {'session_expired': [
-                _(u"Registration using {provider} has timed out.").format(
+                _("Registration using {provider} has timed out.").format(
                     provider=params.get('social_auth_provider'))
             ]}
         )
@@ -190,7 +190,7 @@ def create_account_with_params(request, params):
         try:
             enable_notifications(user)
         except Exception:  # pylint: disable=broad-except
-            log.exception(u"Enable discussion notifications failed for user {id}.".format(id=user.id))
+            log.exception("Enable discussion notifications failed for user {id}.".format(id=user.id))
 
     _track_user_registration(user, profile, params, third_party_provider)
 
@@ -208,7 +208,7 @@ def create_account_with_params(request, params):
     # TODO: there is no error checking here to see that the user actually logged in successfully,
     # and is not yet an active user.
     if new_user is not None:
-        AUDIT_LOG.info(u"Login success on new account creation - {0}".format(new_user.username))
+        AUDIT_LOG.info("Login success on new account creation - {0}".format(new_user.username))
 
     return new_user
 
@@ -233,7 +233,7 @@ def pre_account_creation_external_auth(request, params):
         if len(eamap.external_name.strip()) >= accounts_settings.NAME_MIN_LENGTH:
             params["name"] = eamap.external_name
         params["password"] = eamap.internal_password
-        log.debug(u'In create_account with external_auth: user = %s, email=%s', params["name"], params["email"])
+        log.debug('In create_account with external_auth: user = %s, email=%s', params["name"], params["email"])
 
     return do_external_auth, eamap
 
@@ -246,15 +246,15 @@ def post_account_creation_external_auth(do_external_auth, eamap, new_user):
         eamap.user = new_user
         eamap.dtsignup = datetime.datetime.now(UTC)
         eamap.save()
-        AUDIT_LOG.info(u"User registered with external_auth %s", new_user.username)
-        AUDIT_LOG.info(u'Updated ExternalAuthMap for %s to be %s', new_user.username, eamap)
+        AUDIT_LOG.info("User registered with external_auth %s", new_user.username)
+        AUDIT_LOG.info('Updated ExternalAuthMap for %s to be %s', new_user.username, eamap)
 
         if settings.FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'):
             log.info('bypassing activation email')
             new_user.is_active = True
             new_user.save()
             AUDIT_LOG.info(
-                u"Login activated on extauth account - {0} ({1})".format(new_user.username, new_user.email)
+                "Login activated on extauth account - {0} ({1})".format(new_user.username, new_user.email)
             )
 
 
@@ -282,7 +282,7 @@ def _link_user_to_third_party_provider(
         if not social_access_token:
             raise ValidationError({
                 'access_token': [
-                    _(u"An access_token is required when passing value ({}) for provider.").format(
+                    _("An access_token is required when passing value ({}) for provider.").format(
                         params['provider']
                     )
                 ]
@@ -395,7 +395,7 @@ def _skip_activation_email(user, do_external_auth, running_pipeline, third_party
     # log the cases where skip activation email flag is set, but email validity check fails
     if third_party_provider and third_party_provider.skip_email_verification and not valid_email:
         log.info(
-            u'[skip_email_verification=True][user=%s][pipeline-email=%s][identity_provider=%s][provider_type=%s] '
+            '[skip_email_verification=True][user=%s][pipeline-email=%s][identity_provider=%s][provider_type=%s] '
             'Account activation email sent as user\'s system email differs from SSO email.',
             user.email,
             sso_pipeline_email,

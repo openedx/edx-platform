@@ -16,11 +16,10 @@ from xmodule.graders import AggregatedScore, ShowCorrectness
 log = getLogger(__name__)
 
 
-class SubsectionGradeBase(object):
+class SubsectionGradeBase(object, metaclass=ABCMeta):
     """
     Abstract base class for Subsection Grades.
     """
-    __metaclass__ = ABCMeta
 
     def __init__(self, subsection):
         self.location = subsection.location
@@ -110,7 +109,7 @@ class ZeroSubsectionGrade(SubsectionGradeBase):
 
     @lazy
     def _aggregate_scores(self):
-        return graders.aggregate_scores(self.problem_scores.values())
+        return graders.aggregate_scores(list(self.problem_scores.values()))
 
     @lazy
     def problem_scores(self):
@@ -137,12 +136,11 @@ class ZeroSubsectionGrade(SubsectionGradeBase):
         return locations
 
 
-class NonZeroSubsectionGrade(SubsectionGradeBase):
+class NonZeroSubsectionGrade(SubsectionGradeBase, metaclass=ABCMeta):
     """
     Abstract base class for Subsection Grades with
     possibly NonZero values.
     """
-    __metaclass__ = ABCMeta
 
     def __init__(self, subsection, all_total, graded_total, override=None):
         super(NonZeroSubsectionGrade, self).__init__(subsection)
@@ -264,7 +262,7 @@ class CreateSubsectionGrade(NonZeroSubsectionGrade):
             if problem_score:
                 self.problem_scores[block_key] = problem_score
 
-        all_total, graded_total = graders.aggregate_scores(self.problem_scores.values())
+        all_total, graded_total = graders.aggregate_scores(list(self.problem_scores.values()))
 
         super(CreateSubsectionGrade, self).__init__(subsection, all_total, graded_total)
 
@@ -343,5 +341,5 @@ class CreateSubsectionGrade(NonZeroSubsectionGrade):
         return [
             BlockRecord(location, score.weight, score.raw_possible, score.graded)
             for location, score in
-            self.problem_scores.iteritems()
+            self.problem_scores.items()
         ]

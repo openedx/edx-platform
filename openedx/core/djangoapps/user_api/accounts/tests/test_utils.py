@@ -1,6 +1,6 @@
 """ Unit tests for custom UserProfile properties. """
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 import ddt
 from django.test import TestCase
@@ -125,7 +125,7 @@ class CompletionUtilsTestCase(SharedModuleStoreTestCase, CompletionWaffleTestMix
         )
         self.assertEqual(
             block_url,
-            u'test_url:9999/courses/{org}/{course}/{run}/jump_to/i4x://{org}/{course}/vertical/{vertical_id}'.format(
+            'test_url:9999/courses/{org}/{course}/{run}/jump_to/i4x://{org}/{course}/vertical/{vertical_id}'.format(
                 org=self.course.location.course_key.org,
                 course=self.course.location.course_key.course,
                 run=self.course.location.course_key.run,

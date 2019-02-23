@@ -1,12 +1,12 @@
 """
 Utility methods for the account settings.
 """
-from __future__ import unicode_literals
+
 
 import random
 import re
 import string
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 import waffle
 from django.conf import settings
@@ -140,7 +140,7 @@ def retrieve_last_sitewide_block_completed(user):
     candidate_block_key = None
     latest_date = None
     # Go through dict, find latest
-    for course, [modified_date, block_key] in latest_completions_by_course.items():
+    for course, [modified_date, block_key] in list(latest_completions_by_course.items()):
         if not current_site_configuration:
             # This is a edx.org
             if course.org in known_site_configs:
@@ -173,7 +173,7 @@ def retrieve_last_sitewide_block_completed(user):
     if not (lms_root and item):
         return
 
-    return u"{lms_root}/courses/{course_key}/jump_to/{location}".format(
+    return "{lms_root}/courses/{course_key}/jump_to/{location}".format(
         lms_root=lms_root,
         course_key=text_type(item.location.course_key),
         location=text_type(item.location),
@@ -190,7 +190,7 @@ def generate_password(length=12, chars=string.letters + string.digits):
     password = ''
     password += choice(string.digits)
     password += choice(string.letters)
-    password += ''.join([choice(chars) for _i in xrange(length - 2)])
+    password += ''.join([choice(chars) for _i in range(length - 2)])
     return password
 
 

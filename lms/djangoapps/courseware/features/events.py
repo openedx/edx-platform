@@ -69,13 +69,13 @@ def n_events_are_emitted(_step, count, event_type, event_source):
 
     assert_equals(cursor.count(), number_events)
 
-    event = cursor.next()
+    event = next(cursor)
 
     expected_field_values = {
         "username": world.scenario_dict['USER'].username,  # pylint: disable=no-member
         "event_type": event_type,
     }
-    for key, value in expected_field_values.iteritems():
+    for key, value in expected_field_values.items():
         assert_equals(event[key], value)
 
     for field in REQUIRED_EVENT_FIELDS:

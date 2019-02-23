@@ -2,7 +2,7 @@
 Unit tests for stub EdxNotes implementation.
 """
 import ddt
-import urlparse
+import urllib.parse
 import json
 import unittest
 import requests
@@ -29,7 +29,7 @@ class StubEdxNotesServiceTest(unittest.TestCase):
         """
         Returns a list of dummy notes.
         """
-        return [self._get_dummy_note(i) for i in xrange(count)]  # pylint: disable=unused-variable
+        return [self._get_dummy_note(i) for i in range(count)]  # pylint: disable=unused-variable
 
     def _get_dummy_note(self, uid=0):
         """
@@ -157,8 +157,8 @@ class StubEdxNotesServiceTest(unittest.TestCase):
         })
         self.assertTrue(response.ok)
         response = response.json()
-        parsed = urlparse.urlparse(url)
-        query_params = urlparse.parse_qs(parsed.query)
+        parsed = urllib.parse.urlparse(url)
+        query_params = urllib.parse.parse_qs(parsed.query)
         query_params['usage_id'].reverse()
         self.assertEqual(len(response), len(query_params['usage_id']))
         for index, usage_id in enumerate(query_params['usage_id']):
@@ -224,8 +224,8 @@ class StubEdxNotesServiceTest(unittest.TestCase):
             if url is None:
                 return None
 
-            parsed = urlparse.urlparse(url)
-            query_params = urlparse.parse_qs(parsed.query)
+            parsed = urllib.parse.urlparse(url)
+            query_params = urllib.parse.parse_qs(parsed.query)
 
             page = query_params["page"][0]
             return page if page is None else int(page)

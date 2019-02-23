@@ -127,7 +127,7 @@ class AnnotatableModuleTestCase(unittest.TestCase):
     def test_extract_instructions(self):
         xmltree = etree.fromstring(self.sample_xml)
 
-        expected_xml = u"<div>Read the text.</div>"
+        expected_xml = "<div>Read the text.</div>"
         actual_xml = self.annotatable._extract_instructions(xmltree)
         self.assertIsNotNone(actual_xml)
         self.assertEqual(expected_xml.strip(), actual_xml.strip())

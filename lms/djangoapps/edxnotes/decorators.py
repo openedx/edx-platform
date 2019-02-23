@@ -42,8 +42,8 @@ def edxnotes(cls):
                 ),
                 "params": {
                     # Use camelCase to name keys.
-                    "usageId": unicode(self.scope_ids.usage_id).encode("utf-8"),
-                    "courseId": unicode(self.runtime.course_id).encode("utf-8"),
+                    "usageId": str(self.scope_ids.usage_id).encode("utf-8"),
+                    "courseId": str(self.runtime.course_id).encode("utf-8"),
                     "token": get_edxnotes_id_token(user),
                     "tokenUrl": get_token_url(self.runtime.course_id),
                     "endpoint": get_public_endpoint(),

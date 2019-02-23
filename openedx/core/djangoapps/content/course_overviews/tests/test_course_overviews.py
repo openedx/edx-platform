@@ -1,7 +1,7 @@
 """
 Tests for course_overviews app.
 """
-from cStringIO import StringIO
+from io import StringIO
 import datetime
 import ddt
 import itertools
@@ -453,7 +453,7 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
             'openedx.core.djangoapps.content.course_overviews.models.CourseOverview.get_from_id'
         ) as mock_get_from_id:
             CourseOverview.update_select_courses(select_course_ids)
-            self.assertEquals(mock_get_from_id.call_count, len(select_course_ids))
+            self.assertEqual(mock_get_from_id.call_count, len(select_course_ids))
 
     def test_get_all_courses(self):
         course_ids = [CourseFactory.create(emit_signals=True).id for __ in range(3)]
@@ -472,7 +472,7 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
         org_courses = []  # list of lists of courses
         for index in range(3):
             org_courses.append([
-                CourseFactory.create(org='test_org_' + unicode(index), emit_signals=True)
+                CourseFactory.create(org='test_org_' + str(index), emit_signals=True)
                 for __ in range(3)
             ])
 
@@ -511,7 +511,7 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
                     CourseOverview.get_all_courses(filter_=filter_)
                 },
                 expected_courses,
-                u"testing CourseOverview.get_all_courses with filter_={}"
+                "testing CourseOverview.get_all_courses with filter_={}"
                 .format(filter_),
             )
 
@@ -716,14 +716,14 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
             elif modulestore_type == ModuleStoreEnum.Type.split:
                 expected_path_start = "/asset-v1:"
 
-            for url in overview.image_urls.values():
+            for url in list(overview.image_urls.values()):
                 self.assertTrue(url.startswith(expected_path_start))
 
             # Now enable the CDN...
             AssetBaseUrlConfig.objects.create(enabled=True, base_url='fakecdn.edx.org')
             expected_cdn_url = "//fakecdn.edx.org" + expected_path_start
 
-            for url in overview.image_urls.values():
+            for url in list(overview.image_urls.values()):
                 self.assertTrue(url.startswith(expected_cdn_url))
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
@@ -1061,7 +1061,7 @@ class CourseOverviewTabTestCase(ModuleStoreTestCase):
             # Update display name on the course descriptor
             # This fires a course_published signal, which should be caught in signals.py,
             # which should in turn load CourseOverview from modulestore.
-            course.display_name = u'Updated display name'
+            course.display_name = 'Updated display name'
             with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
                 self.store.update_item(course, ModuleStoreEnum.UserID.test)
 

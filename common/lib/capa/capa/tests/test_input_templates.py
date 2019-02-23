@@ -39,7 +39,7 @@ class TemplateTestCase(unittest.TestCase):
             ('desc-2', '<em>description</em> <mark>text</mark> 2')
         ]
     )
-    DESCRIPTION_IDS = ' '.join(DESCRIPTIONS.keys())
+    DESCRIPTION_IDS = ' '.join(list(DESCRIPTIONS.keys()))
     RESPONSE_DATA = {
         'label': 'question text 101',
         'descriptions': DESCRIPTIONS

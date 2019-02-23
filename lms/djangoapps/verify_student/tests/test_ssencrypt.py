@@ -76,7 +76,7 @@ def test_rsa():
 
 
 def test_rsa_unicode_data():
-    data = u'12345678901234567890123456789012'
+    data = '12345678901234567890123456789012'
     _assert_rsa(data, PUB_KEY_BYTES, PRIV_KEY_BYTES)
 
 

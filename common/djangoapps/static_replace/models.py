@@ -30,7 +30,7 @@ class AssetBaseUrlConfig(ConfigurationModel):
         return '<AssetBaseUrlConfig(base_url={})>'.format(self.get_base_url())
 
     def __unicode__(self):
-        return unicode(repr(self))
+        return str(repr(self))
 
 
 class AssetExcludedExtensionsConfig(ConfigurationModel):
@@ -53,10 +53,10 @@ class AssetExcludedExtensionsConfig(ConfigurationModel):
     def get_excluded_extensions(cls):
         """Gets the excluded file extensions when canonicalizing static asset paths"""
         add_period = lambda x: '.' + x
-        return map(add_period, cls.current().excluded_extensions.split())
+        return list(map(add_period, cls.current().excluded_extensions.split()))
 
     def __repr__(self):
         return '<AssetExcludedExtensionsConfig(extensions={})>'.format(self.get_excluded_extensions())
 
     def __unicode__(self):
-        return unicode(repr(self))
+        return str(repr(self))

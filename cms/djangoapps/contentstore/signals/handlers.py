@@ -30,7 +30,7 @@ def locked(expiry_seconds, key):
         def wrapper(*args, **kwargs):
             cache_key = '{}-{}'.format(func.__name__, kwargs[key])
             if cache.add(cache_key, "true", expiry_seconds):
-                log.info(u'Locking task in cache with key: %s for %s seconds', cache_key, expiry_seconds)
+                log.info('Locking task in cache with key: %s for %s seconds', cache_key, expiry_seconds)
                 return func(*args, **kwargs)
         return wrapper
     return task_decorator
@@ -62,7 +62,7 @@ def listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=
         # import here, because signal is registered at startup, but items in tasks are not yet able to be loaded
         from contentstore.tasks import update_search_index
 
-        update_search_index.delay(unicode(course_key), datetime.now(UTC).isoformat())
+        update_search_index.delay(str(course_key), datetime.now(UTC).isoformat())
 
 
 @receiver(SignalHandler.library_updated)
@@ -75,7 +75,7 @@ def listen_for_library_update(sender, library_key, **kwargs):  # pylint: disable
         # import here, because signal is registered at startup, but items in tasks are not yet able to be loaded
         from contentstore.tasks import update_library_index
 
-        update_library_index.delay(unicode(library_key), datetime.now(UTC).isoformat())
+        update_library_index.delay(str(library_key), datetime.now(UTC).isoformat())
 
 
 @receiver(SignalHandler.item_deleted)
@@ -113,13 +113,13 @@ def handle_grading_policy_changed(sender, **kwargs):
     Receives signal and kicks off celery task to recalculate grades
     """
     kwargs = {
-        'course_key': unicode(kwargs.get('course_key')),
-        'grading_policy_hash': unicode(kwargs.get('grading_policy_hash')),
-        'event_transaction_id': unicode(get_event_transaction_id()),
-        'event_transaction_type': unicode(get_event_transaction_type()),
+        'course_key': str(kwargs.get('course_key')),
+        'grading_policy_hash': str(kwargs.get('grading_policy_hash')),
+        'event_transaction_id': str(get_event_transaction_id()),
+        'event_transaction_type': str(get_event_transaction_type()),
     }
     result = compute_all_grades_for_course.apply_async(kwargs=kwargs, countdown=GRADING_POLICY_COUNTDOWN_SECONDS)
-    log.info(u"Grades: Created {task_name}[{task_id}] with arguments {kwargs}".format(
+    log.info("Grades: Created {task_name}[{task_id}] with arguments {kwargs}".format(
         task_name=compute_all_grades_for_course.name,
         task_id=result.task_id,
         kwargs=kwargs,

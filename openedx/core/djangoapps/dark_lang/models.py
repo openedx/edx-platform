@@ -25,7 +25,7 @@ class DarkLangConfig(ConfigurationModel):
     )
 
     def __unicode__(self):
-        return u"DarkLangConfig()"
+        return "DarkLangConfig()"
 
     @property
     def released_languages_list(self):

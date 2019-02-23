@@ -46,7 +46,7 @@ class CourseValidationViewTest(SharedModuleStoreTestCase, APITestCase):
             update_key.course_key,
             update_key.block_type,
             block_id=update_key.block_id,
-            fields=dict(data=u"<ol><li><h2>Date</h2>Hello world!</li></ol>"),
+            fields=dict(data="<ol><li><h2>Date</h2>Hello world!</li></ol>"),
         )
 
         section = ItemFactory.create(

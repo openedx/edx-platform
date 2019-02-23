@@ -19,9 +19,9 @@ class AccountSettingsTestMixin(EventsTestMixin, AcceptanceTest):
     Mixin with helper methods to test the account settings page.
     """
 
-    CHANGE_INITIATED_EVENT_NAME = u"edx.user.settings.change_initiated"
+    CHANGE_INITIATED_EVENT_NAME = "edx.user.settings.change_initiated"
     USER_SETTINGS_CHANGED_EVENT_NAME = 'edx.user.settings.changed'
-    ACCOUNT_SETTINGS_REFERER = u"/account/settings"
+    ACCOUNT_SETTINGS_REFERER = "/account/settings"
 
     shard = 23
 
@@ -286,11 +286,11 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
         Test behaviour of "Full Name" field.
         """
         self._test_text_field(
-            u'name',
-            u'Full Name',
+            'name',
+            'Full Name',
             self.full_name,
-            u'@',
-            [u'<h1>another name<h1>', u'<script>'],
+            '@',
+            ['<h1>another name<h1>', '<script>'],
             'Full Name cannot contain the following characters: < >',
             False
         )
@@ -299,15 +299,15 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
         """
         Test behaviour of "Email" field.
         """
-        email = u"test@example.com"
+        email = "test@example.com"
         username, user_id = self.log_in_as_unique_user(email=email)
         self.visit_account_settings_page()
         self._test_text_field(
-            u'email',
-            u'Email Address (Sign In)',
+            'email',
+            'Email Address (Sign In)',
             email,
-            u'test@example.com' + XSS_INJECTION,
-            [u'me@here.com', u'you@there.com'],
+            'test@example.com' + XSS_INJECTION,
+            ['me@here.com', 'you@there.com'],
             success_message='Click the link in the message to update your email address.',
             assert_after_reload=False
         )
@@ -333,10 +333,10 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
         Test behaviour of "Password" field.
         """
         self._test_link_field(
-            u'password',
-            u'Password',
-            u'Reset Your Password',
-            u'button',
+            'password',
+            'Password',
+            'Reset Your Password',
+            'button',
             success_message='Click the link in the message to reset your password.',
         )
 
@@ -355,10 +355,10 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
         Test behaviour of "Language" field.
         """
         self._test_dropdown_field(
-            u'pref-lang',
-            u'Language',
-            u'English',
-            [u'Dummy Language (Esperanto)', u'English'],
+            'pref-lang',
+            'Language',
+            'English',
+            ['Dummy Language (Esperanto)', 'English'],
             reloads_on_save=True,
         )
 
@@ -367,10 +367,10 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
         Test behaviour of "Education Completed" field.
         """
         self._test_dropdown_field(
-            u'level_of_education',
-            u'Education Completed',
-            u'',
-            [u'Bachelor\'s degree', u''],
+            'level_of_education',
+            'Education Completed',
+            '',
+            ['Bachelor\'s degree', ''],
         )
 
         actual_events = self.wait_for_events(event_filter=self.settings_changed_event_filter, number_of_matches=2)
@@ -387,10 +387,10 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
         Test behaviour of "Gender" field.
         """
         self._test_dropdown_field(
-            u'gender',
-            u'Gender',
-            u'',
-            [u'Female', u''],
+            'gender',
+            'Gender',
+            '',
+            ['Female', ''],
         )
 
         actual_events = self.wait_for_events(event_filter=self.settings_changed_event_filter, number_of_matches=2)
@@ -415,10 +415,10 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
         ]
         with self.assert_events_match_during(self.settings_changed_event_filter, expected_events):
             self._test_dropdown_field(
-                u'year_of_birth',
-                u'Year of Birth',
-                u'',
-                [u'1980', u''],
+                'year_of_birth',
+                'Year of Birth',
+                '',
+                ['1980', ''],
             )
 
     def test_country_field(self):
@@ -426,10 +426,10 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
         Test behaviour of "Country or Region" field.
         """
         self._test_dropdown_field(
-            u'country',
-            u'Country or Region of Residence',
-            u'',
-            [u'Pakistan', u'Palau'],
+            'country',
+            'Country or Region of Residence',
+            '',
+            ['Pakistan', 'Palau'],
         )
 
     def test_time_zone_field(self):
@@ -439,12 +439,12 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
         kiev_abbr, kiev_offset = self._get_time_zone_info('Europe/Kiev')
         pacific_abbr, pacific_offset = self._get_time_zone_info('US/Pacific')
         self._test_dropdown_field(
-            u'time_zone',
-            u'Time Zone',
-            u'Default (Local Time Zone)',
+            'time_zone',
+            'Time Zone',
+            'Default (Local Time Zone)',
             [
-                u'Europe/Kiev ({abbr}, UTC{offset})'.format(abbr=kiev_abbr, offset=kiev_offset),
-                u'US/Pacific ({abbr}, UTC{offset})'.format(abbr=pacific_abbr, offset=pacific_offset),
+                'Europe/Kiev ({abbr}, UTC{offset})'.format(abbr=kiev_abbr, offset=kiev_offset),
+                'US/Pacific ({abbr}, UTC{offset})'.format(abbr=pacific_abbr, offset=pacific_offset),
             ],
         )
 
@@ -463,11 +463,11 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
         Test behaviour of one of the social media links field.
         """
         self._test_text_field(
-            u'social_links',
-            u'Twitter Link',
+            'social_links',
+            'Twitter Link',
             self.social_link,
-            u'www.google.com/invalidlink',
-            [u'https://www.twitter.com/edX', self.social_link],
+            'www.google.com/invalidlink',
+            ['https://www.twitter.com/edX', self.social_link],
         )
 
     def test_linked_accounts(self):
@@ -507,12 +507,12 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
             'price': 'Cost:\n$100.00',
         }
 
-        for field_name, value in expected_order_data_first_row.iteritems():
+        for field_name, value in expected_order_data_first_row.items():
             self.assertEqual(
                 self.account_settings_page.get_value_of_order_history_row_item('order-Edx-123', field_name)[0], value
             )
 
-        for field_name, value in expected_order_data_second_row.iteritems():
+        for field_name, value in expected_order_data_second_row.items():
             self.assertEqual(
                 self.account_settings_page.get_value_of_order_history_row_item('order-Edx-123', field_name)[1], value
             )

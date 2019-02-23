@@ -29,7 +29,7 @@ class Model(object):
             return self.attributes[name]
         except KeyError:
             if self.retrieved or self.id is None:
-                raise AttributeError(u"Field {0} does not exist".format(name))
+                raise AttributeError("Field {0} does not exist".format(name))
             self.retrieve()
             return self.__getattr__(name)
 
@@ -41,12 +41,12 @@ class Model(object):
 
     def __getitem__(self, key):
         if key not in self.accessible_fields:
-            raise KeyError(u"Field {0} does not exist".format(key))
+            raise KeyError("Field {0} does not exist".format(key))
         return self.attributes.get(key)
 
     def __setitem__(self, key, value):
         if key not in self.accessible_fields + self.updatable_fields:
-            raise KeyError(u"Field {0} does not exist".format(key))
+            raise KeyError("Field {0} does not exist".format(key))
         self.attributes.__setitem__(key, value)
 
     def items(self, *args, **kwargs):
@@ -86,11 +86,11 @@ class Model(object):
         record the class name of the model.
         """
         tags = [
-            u'{}.{}:{}'.format(self.__class__.__name__, attr, self[attr])
+            '{}.{}:{}'.format(self.__class__.__name__, attr, self[attr])
             for attr in self.metric_tag_fields
             if attr in self.attributes
         ]
-        tags.append(u'model_class:{}'.format(self.__class__.__name__))
+        tags.append('model_class:{}'.format(self.__class__.__name__))
         return tags
 
     @classmethod
@@ -98,12 +98,12 @@ class Model(object):
         return cls(id=id)
 
     def _update_from_response(self, response_data):
-        for k, v in response_data.items():
+        for k, v in list(response_data.items()):
             if k in self.accessible_fields:
                 self.__setattr__(k, v)
             else:
                 log.warning(
-                    u"Unexpected field {field_name} in model {model_name}".format(
+                    "Unexpected field {field_name} in model {model_name}".format(
                         field_name=k,
                         model_name=self.__class__.__name__
                     )
@@ -172,11 +172,11 @@ class Model(object):
         if cls.base_url is None:
             raise CommentClientRequestError("Must provide base_url when using default url function")
         if action not in cls.DEFAULT_ACTIONS:
-            raise ValueError(u"Invalid action {0}. The supported action must be in {1}".format(action, str(cls.DEFAULT_ACTIONS)))
+            raise ValueError("Invalid action {0}. The supported action must be in {1}".format(action, str(cls.DEFAULT_ACTIONS)))
         elif action in cls.DEFAULT_ACTIONS_WITH_ID:
             try:
                 return cls.url_with_id(params)
             except KeyError:
-                raise CommentClientRequestError(u"Cannot perform action {0} without id".format(action))
+                raise CommentClientRequestError("Cannot perform action {0} without id".format(action))
         else:   # action must be in DEFAULT_ACTIONS_WITHOUT_ID now
             return cls.url_without_id()

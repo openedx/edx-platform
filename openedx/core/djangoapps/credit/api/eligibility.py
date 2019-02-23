@@ -175,12 +175,12 @@ def get_eligibilities_for_user(username, course_key=None):
     """
     eligibilities = CreditEligibility.get_user_eligibilities(username)
     if course_key:
-        course_key = CourseKey.from_string(unicode(course_key))
+        course_key = CourseKey.from_string(str(course_key))
         eligibilities = eligibilities.filter(course__course_key=course_key)
 
     return [
         {
-            "course_key": unicode(eligibility.course.course_key),
+            "course_key": str(eligibility.course.course_key),
             "deadline": eligibility.deadline,
         }
         for eligibility in eligibilities
@@ -216,8 +216,8 @@ def set_credit_requirement_status(user, course_key, req_namespace, req_name, sta
     # Do not allow students who have requested credit to change their eligibility
     if CreditRequest.get_user_request_status(user.username, course_key):
         log.info(
-            u'Refusing to set status of requirement with namespace "%s" and name "%s" because the '
-            u'user "%s" has already requested credit for the course "%s".',
+            'Refusing to set status of requirement with namespace "%s" and name "%s" because the '
+            'user "%s" has already requested credit for the course "%s".',
             req_namespace, req_name, user.username, course_key
         )
         return
@@ -226,8 +226,8 @@ def set_credit_requirement_status(user, course_key, req_namespace, req_name, sta
     eligible_before_update = CreditEligibility.is_user_eligible_for_credit(course_key, user.username)
     if eligible_before_update and status == 'failed':
         log.info(
-            u'Refusing to set status of requirement with namespace "%s" and name "%s" to "failed" because the '
-            u'user "%s" is already eligible for credit in the course "%s".',
+            'Refusing to set status of requirement with namespace "%s" and name "%s" to "failed" because the '
+            'user "%s" is already eligible for credit in the course "%s".',
             req_namespace, req_name, user.username, course_key
         )
         return
@@ -252,12 +252,12 @@ def set_credit_requirement_status(user, course_key, req_namespace, req_name, sta
     if req_to_update is None:
         log.error(
             (
-                u'Could not update credit requirement in course "%s" '
-                u'with namespace "%s" and name "%s" '
-                u'because the requirement does not exist. '
-                u'The user "%s" should have had his/her status updated to "%s".'
+                'Could not update credit requirement in course "%s" '
+                'with namespace "%s" and name "%s" '
+                'because the requirement does not exist. '
+                'The user "%s" should have had his/her status updated to "%s".'
             ),
-            unicode(course_key), req_namespace, req_name, user.username, status
+            str(course_key), req_namespace, req_name, user.username, status
         )
         return
 
@@ -307,11 +307,11 @@ def remove_credit_requirement_status(username, course_key, req_namespace, req_na
     if not req_to_remove:
         log.error(
             (
-                u'Could not remove credit requirement in course "%s" '
-                u'with namespace "%s" and name "%s" '
-                u'because the requirement does not exist. '
+                'Could not remove credit requirement in course "%s" '
+                'with namespace "%s" and name "%s" '
+                'because the requirement does not exist. '
             ),
-            unicode(course_key), req_namespace, req_name
+            str(course_key), req_namespace, req_name
         )
         return
 
@@ -425,7 +425,7 @@ def _validate_requirements(requirements):
 
         if invalid_params:
             invalid_requirements.append(
-                u"{requirement} has missing/invalid parameters: {params}".format(
+                "{requirement} has missing/invalid parameters: {params}".format(
                     requirement=requirement,
                     params=invalid_params,
                 )

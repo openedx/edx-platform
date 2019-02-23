@@ -94,7 +94,7 @@ class SurveyModelsTests(TestCase):
         """
         survey = self._create_test_survey()
         self.assertIsNotNone(survey)
-        self.assertEquals(unicode(survey), self.test_survey_name)
+        self.assertEqual(str(survey), self.test_survey_name)
 
     def test_create_form_with_malformed_html(self):
         """
@@ -136,7 +136,7 @@ class SurveyModelsTests(TestCase):
 
         survey = SurveyForm.get(self.test_survey_name)
         self.assertIsNotNone(survey)
-        self.assertEquals(survey.form, self.test_form_update)
+        self.assertEqual(survey.form, self.test_form_update)
 
     def test_survey_has_no_answers(self):
         """
@@ -144,7 +144,7 @@ class SurveyModelsTests(TestCase):
         """
 
         survey = self._create_test_survey()
-        self.assertEquals(len(survey.get_answers()), 0)
+        self.assertEqual(len(survey.get_answers()), 0)
 
     def test_user_has_no_answers(self):
         """
@@ -153,7 +153,7 @@ class SurveyModelsTests(TestCase):
 
         survey = self._create_test_survey()
         self.assertFalse(survey.has_user_answered_survey(self.student))
-        self.assertEquals(len(survey.get_answers()), 0)
+        self.assertEqual(len(survey.get_answers()), 0)
 
     @ddt.data(None, 'foo/bar/baz')
     def test_single_user_answers(self, course_id):
@@ -169,14 +169,14 @@ class SurveyModelsTests(TestCase):
         self.assertTrue(survey.has_user_answered_survey(self.student))
 
         all_answers = survey.get_answers()
-        self.assertEquals(len(all_answers.keys()), 1)
+        self.assertEqual(len(list(all_answers.keys())), 1)
         self.assertIn(self.student.id, all_answers)
-        self.assertEquals(all_answers[self.student.id], self.student_answers)
+        self.assertEqual(all_answers[self.student.id], self.student_answers)
 
         answers = survey.get_answers(self.student)
-        self.assertEquals(len(answers.keys()), 1)
+        self.assertEqual(len(list(answers.keys())), 1)
         self.assertIn(self.student.id, answers)
-        self.assertEquals(all_answers[self.student.id], self.student_answers)
+        self.assertEqual(all_answers[self.student.id], self.student_answers)
 
         # check that the course_id was set
 
@@ -187,7 +187,7 @@ class SurveyModelsTests(TestCase):
 
         for answer_obj in answer_objs:
             if course_id:
-                self.assertEquals(unicode(answer_obj.course_key), course_id)
+                self.assertEqual(str(answer_obj.course_key), course_id)
             else:
                 self.assertIsNone(answer_obj.course_key)
 
@@ -205,21 +205,21 @@ class SurveyModelsTests(TestCase):
         self.assertTrue(survey.has_user_answered_survey(self.student))
 
         all_answers = survey.get_answers()
-        self.assertEquals(len(all_answers.keys()), 2)
+        self.assertEqual(len(list(all_answers.keys())), 2)
         self.assertIn(self.student.id, all_answers)
         self.assertIn(self.student2.id, all_answers)
-        self.assertEquals(all_answers[self.student.id], self.student_answers)
-        self.assertEquals(all_answers[self.student2.id], self.student2_answers)
+        self.assertEqual(all_answers[self.student.id], self.student_answers)
+        self.assertEqual(all_answers[self.student2.id], self.student2_answers)
 
         answers = survey.get_answers(self.student)
-        self.assertEquals(len(answers.keys()), 1)
+        self.assertEqual(len(list(answers.keys())), 1)
         self.assertIn(self.student.id, answers)
-        self.assertEquals(answers[self.student.id], self.student_answers)
+        self.assertEqual(answers[self.student.id], self.student_answers)
 
         answers = survey.get_answers(self.student2)
-        self.assertEquals(len(answers.keys()), 1)
+        self.assertEqual(len(list(answers.keys())), 1)
         self.assertIn(self.student2.id, answers)
-        self.assertEquals(answers[self.student2.id], self.student2_answers)
+        self.assertEqual(answers[self.student2.id], self.student2_answers)
 
     def test_update_answers(self):
         """
@@ -232,25 +232,25 @@ class SurveyModelsTests(TestCase):
         survey.save_user_answers(self.student, self.student_answers, self.course_id)
 
         answers = survey.get_answers(self.student)
-        self.assertEquals(len(answers.keys()), 1)
+        self.assertEqual(len(list(answers.keys())), 1)
         self.assertIn(self.student.id, answers)
-        self.assertEquals(answers[self.student.id], self.student_answers)
+        self.assertEqual(answers[self.student.id], self.student_answers)
 
         # update
         survey.save_user_answers(self.student, self.student_answers_update, self.course_id)
 
         answers = survey.get_answers(self.student)
-        self.assertEquals(len(answers.keys()), 1)
+        self.assertEqual(len(list(answers.keys())), 1)
         self.assertIn(self.student.id, answers)
-        self.assertEquals(answers[self.student.id], self.student_answers_update)
+        self.assertEqual(answers[self.student.id], self.student_answers_update)
 
         # update with just a subset of the origin dataset
         survey.save_user_answers(self.student, self.student_answers_update2, self.course_id)
 
         answers = survey.get_answers(self.student)
-        self.assertEquals(len(answers.keys()), 1)
+        self.assertEqual(len(list(answers.keys())), 1)
         self.assertIn(self.student.id, answers)
-        self.assertEquals(answers[self.student.id], self.student_answers_update2)
+        self.assertEqual(answers[self.student.id], self.student_answers_update2)
 
     def test_limit_num_users(self):
         """
@@ -265,7 +265,7 @@ class SurveyModelsTests(TestCase):
         # even though we have 2 users submitted answers
         # limit the result set to just 1
         all_answers = survey.get_answers(limit_num_users=1)
-        self.assertEquals(len(all_answers.keys()), 1)
+        self.assertEqual(len(list(all_answers.keys())), 1)
 
     def test_get_field_names(self):
         """
@@ -293,8 +293,8 @@ class SurveyModelsTests(TestCase):
         self.assertTrue(retire_result)
         answers = survey.get_answers(self.student)
         blanked_out_student_answser = {key: '' for key in self.student_answers}
-        self.assertEquals(answers[self.student.id], blanked_out_student_answser)
-        self.assertEquals(survey.get_answers(self.student2)[self.student2.id], self.student2_answers)
+        self.assertEqual(answers[self.student.id], blanked_out_student_answser)
+        self.assertEqual(survey.get_answers(self.student2)[self.student2.id], self.student2_answers)
 
     def test_retire_user_not_exist(self):
         survey = self._create_test_survey()
@@ -305,4 +305,4 @@ class SurveyModelsTests(TestCase):
         retire_result = SurveyAnswer.retire_user(self.student2.id)
         self.assertFalse(retire_result)
         answers = survey.get_answers(self.student)
-        self.assertEquals(answers[self.student.id], self.student_answers)
+        self.assertEqual(answers[self.student.id], self.student_answers)

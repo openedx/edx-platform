@@ -71,15 +71,15 @@ class LmsSearchResultProcessorTestCase(ModuleStoreTestCase):
 
         srp = LmsSearchResultProcessor(
             {
-                "course": unicode(self.course.id),
-                "id": unicode(self.html.scope_ids.usage_id),
+                "course": str(self.course.id),
+                "id": str(self.html.scope_ids.usage_id),
                 "content": {"text": "This is the html text"}
             },
             "test"
         )
 
         self.assertEqual(
-            srp.url, "/courses/{}/jump_to/{}".format(unicode(self.course.id), unicode(self.html.scope_ids.usage_id)))
+            srp.url, "/courses/{}/jump_to/{}".format(str(self.course.id), str(self.html.scope_ids.usage_id)))
 
     def test_should_remove(self):
         """
@@ -87,8 +87,8 @@ class LmsSearchResultProcessorTestCase(ModuleStoreTestCase):
         """
         srp = LmsSearchResultProcessor(
             {
-                "course": unicode(self.course.id),
-                "id": unicode(self.html.scope_ids.usage_id),
+                "course": str(self.course.id),
+                "id": str(self.html.scope_ids.usage_id),
                 "content": {"text": "This is html test text"}
             },
             "test"

@@ -19,7 +19,7 @@ class ChangeUserAdminPage(PageObject):
         Returns the page URL for the page based on self.user_pk.
         """
 
-        return u'{base}/admin/auth/user/{user_pk}/'.format(
+        return '{base}/admin/auth/user/{user_pk}/'.format(
             base=BASE_URL,
             user_pk=self.user_pk,
         )

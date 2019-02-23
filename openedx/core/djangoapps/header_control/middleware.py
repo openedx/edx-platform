@@ -18,7 +18,7 @@ class HeaderControlMiddleware(object):
         for header in getattr(response, 'remove_headers', []):
             del response[header]
 
-        for header, value in getattr(response, 'force_headers', {}).iteritems():
+        for header, value in getattr(response, 'force_headers', {}).items():
             response[header] = value
 
         return response

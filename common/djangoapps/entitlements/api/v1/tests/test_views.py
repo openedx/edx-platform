@@ -316,7 +316,7 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
         entitlement_data = self._get_data_set(self.user, str(course_uuid))
         entitlement_data['email_opt_in'] = True
 
-        org = u'particularly'
+        org = 'particularly'
         mock_get_owners.return_value = [{'key': org}]
 
         response = self.client.post(
@@ -327,7 +327,7 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
         assert response.status_code == 201
 
         result_obj = UserOrgTag.objects.get(user=self.user, org=org, key='email-optin')
-        self.assertEqual(result_obj.value, u"True")
+        self.assertEqual(result_obj.value, "True")
 
     @patch("entitlements.api.v1.views.get_owners_for_course")
     def test_email_opt_in_multiple_orgs(self, mock_get_owners):
@@ -335,8 +335,8 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
         entitlement_data = self._get_data_set(self.user, str(course_uuid))
         entitlement_data['email_opt_in'] = True
 
-        org_1 = u'particularly'
-        org_2 = u'underwood'
+        org_1 = 'particularly'
+        org_2 = 'underwood'
         mock_get_owners.return_value = [{'key': org_1}, {'key': org_2}]
 
         response = self.client.post(
@@ -347,9 +347,9 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
         assert response.status_code == 201
 
         result_obj = UserOrgTag.objects.get(user=self.user, org=org_1, key='email-optin')
-        self.assertEqual(result_obj.value, u"True")
+        self.assertEqual(result_obj.value, "True")
         result_obj = UserOrgTag.objects.get(user=self.user, org=org_2, key='email-optin')
-        self.assertEqual(result_obj.value, u"True")
+        self.assertEqual(result_obj.value, "True")
 
     def test_add_entitlement_with_support_detail(self):
         """

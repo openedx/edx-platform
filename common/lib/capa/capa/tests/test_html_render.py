@@ -43,8 +43,8 @@ class CapaHtmlRenderTest(unittest.TestCase):
     def test_include_html(self):
         # Create a test file to include
         self._create_test_file(
-            u'test_include.xml',
-            u'<test>Test include</test>'
+            'test_include.xml',
+            '<test>Test include</test>'
         )
 
         # Generate some XML with an <include>
@@ -303,7 +303,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
 
         # Render the HTML
         the_html = problem.get_html()
-        self.assertRegexpMatches(the_html, r"<div>\s*</div>")
+        self.assertRegex(the_html, r"<div>\s*</div>")
 
     def _create_test_file(self, path, content_str):
         test_fp = self.capa_system.filestore.open(path, "w")

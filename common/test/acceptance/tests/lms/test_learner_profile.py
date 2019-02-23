@@ -18,15 +18,15 @@ class LearnerProfileTestMixin(EventsTestMixin):
     Mixin with helper methods for testing learner profile pages.
     """
 
-    PRIVACY_PUBLIC = u'all_users'
-    PRIVACY_PRIVATE = u'private'
+    PRIVACY_PUBLIC = 'all_users'
+    PRIVACY_PRIVATE = 'private'
 
     PUBLIC_PROFILE_FIELDS = ['username', 'country', 'language_proficiencies', 'bio']
     PRIVATE_PROFILE_FIELDS = ['username']
 
     PUBLIC_PROFILE_EDITABLE_FIELDS = ['country', 'language_proficiencies', 'bio']
 
-    USER_SETTINGS_CHANGED_EVENT_NAME = u"edx.user.settings.changed"
+    USER_SETTINGS_CHANGED_EVENT_NAME = "edx.user.settings.changed"
 
     def log_in_as_unique_user(self):
         """
@@ -130,7 +130,7 @@ class LearnerProfileTestMixin(EventsTestMixin):
                     'event': {
                         'user_id': int(profile_user_id),
                         'page': 'profile',
-                        'visibility': unicode(visibility)
+                        'visibility': str(visibility)
                     }
                 }
             ],

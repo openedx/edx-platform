@@ -46,8 +46,8 @@ class AbsoluteURLField(URLField):
         request = self.context.get('request', None)
 
         assert request is not None, (
-            u"`%s` requires the request in the serializer  context. "
-            u"Add `context={'request': request}` when instantiating the serializer." % self.__class__.__name__
+            "`%s` requires the request in the serializer  context. "
+            "Add `context={'request': request}` when instantiating the serializer." % self.__class__.__name__
         )
 
         if value.startswith(('http:', 'https:')):

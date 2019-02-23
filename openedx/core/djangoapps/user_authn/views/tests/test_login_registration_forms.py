@@ -1,6 +1,6 @@
 """Tests for the login and registration form rendering. """
 import unittest
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 import ddt
 from django.conf import settings
@@ -24,15 +24,15 @@ def _third_party_login_url(backend_name, auth_entry, redirect_url=None):
     if redirect_url:
         params.append(("next", redirect_url))
 
-    return u"{url}?{params}".format(
+    return "{url}?{params}".format(
         url=reverse("social:begin", kwargs={"backend": backend_name}),
-        params=urllib.urlencode(params)
+        params=urllib.parse.urlencode(params)
     )
 
 
 def _finish_auth_url(params):
     """ Construct the URL that follows login/registration if we are doing auto-enrollment """
-    return u"{}?{}".format(reverse('finish_auth'), urllib.urlencode(params))
+    return "{}?{}".format(reverse('finish_auth'), urllib.parse.urlencode(params))
 
 
 @ddt.ddt
@@ -55,7 +55,7 @@ class LoginFormTest(ThirdPartyAuthTestMixin, UrlResetMixin, SharedModuleStoreTes
         super(LoginFormTest, self).setUp()
 
         self.url = reverse("signin_user")
-        self.course_id = unicode(self.course.id)
+        self.course_id = str(self.course.id)
         self.courseware_url = reverse("courseware", args=[self.course_id])
         self.configure_google_provider(enabled=True, visible=True)
         self.configure_facebook_provider(enabled=True, visible=True)
@@ -96,7 +96,7 @@ class LoginFormTest(ThirdPartyAuthTestMixin, UrlResetMixin, SharedModuleStoreTes
         response = self.client.get(self.courseware_url, follow=True, HTTP_ACCEPT="text/html")
         self.assertRedirects(
             response,
-            u"{url}?next={redirect_url}".format(
+            "{url}?next={redirect_url}".format(
                 url=reverse("signin_user"),
                 redirect_url=self.courseware_url
             )
@@ -144,13 +144,13 @@ class LoginFormTest(ThirdPartyAuthTestMixin, UrlResetMixin, SharedModuleStoreTes
 
         # Verify that the parameters are sent on to the next page correctly
         post_login_handler = _finish_auth_url(params)
-        js_success_var = u'var nextUrl = "{}";'.format(post_login_handler)
+        js_success_var = 'var nextUrl = "{}";'.format(post_login_handler)
         self.assertContains(response, js_success_var)
 
         # Verify that the login link preserves the querystring params
-        login_link = u"{url}?{params}".format(
+        login_link = "{url}?{params}".format(
             url=reverse('signin_user'),
-            params=urllib.urlencode([('next', post_login_handler)])
+            params=urllib.parse.urlencode([('next', post_login_handler)])
         )
         self.assertContains(response, login_link)
 
@@ -172,7 +172,7 @@ class RegisterFormTest(ThirdPartyAuthTestMixin, UrlResetMixin, SharedModuleStore
         super(RegisterFormTest, self).setUp()
 
         self.url = reverse("register_user")
-        self.course_id = unicode(self.course.id)
+        self.course_id = str(self.course.id)
         self.configure_google_provider(enabled=True, visible=True)
         self.configure_facebook_provider(enabled=True, visible=True)
 
@@ -220,12 +220,12 @@ class RegisterFormTest(ThirdPartyAuthTestMixin, UrlResetMixin, SharedModuleStore
 
         # Verify that the parameters are sent on to the next page correctly
         post_login_handler = _finish_auth_url(params)
-        js_success_var = u'var nextUrl = "{}";'.format(post_login_handler)
+        js_success_var = 'var nextUrl = "{}";'.format(post_login_handler)
         self.assertContains(response, js_success_var)
 
         # Verify that the login link preserves the querystring params
-        login_link = u"{url}?{params}".format(
+        login_link = "{url}?{params}".format(
             url=reverse('signin_user'),
-            params=urllib.urlencode([('next', post_login_handler)])
+            params=urllib.parse.urlencode([('next', post_login_handler)])
         )
         self.assertContains(response, login_link)

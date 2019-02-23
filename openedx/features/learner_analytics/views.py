@@ -3,7 +3,7 @@ Learner analytics dashboard views
 """
 import logging
 import math
-import urllib
+import urllib.request, urllib.parse, urllib.error
 from datetime import datetime, timedelta
 
 import pytz
@@ -62,7 +62,7 @@ class LearnerAnalyticsView(View):
 
         course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
         course_url_name = default_course_url_name(course.id)
-        course_url = reverse(course_url_name, kwargs={'course_id': unicode(course.id)})
+        course_url = reverse(course_url_name, kwargs={'course_id': str(course.id)})
 
         is_verified = CourseEnrollment.is_enrolled_as_verified(request.user, course_key)
         has_access = is_verified or request.user.is_staff
@@ -139,7 +139,7 @@ class LearnerAnalyticsView(View):
         # answered_percent seems to be unused and it does not take into account assignment type weightings
         answered_percent = None
 
-        chapter_grades = course_grade.chapter_grades.values()
+        chapter_grades = list(course_grade.chapter_grades.values())
 
         for chapter in chapter_grades:
             # Note: this code exists on the progress page. We should be able to remove it going forward.
@@ -155,10 +155,10 @@ class LearnerAnalyticsView(View):
                         'total_possible': possible,
                         'passing_grade': passing_grade,
                         'display_name': subsection_grade.display_name,
-                        'location': unicode(subsection_grade.location),
+                        'location': str(subsection_grade.location),
                         'assigment_url': reverse('jump_to_id', kwargs={
-                            'course_id': unicode(course_key),
-                            'module_id': unicode(subsection_grade.location),
+                            'course_id': str(course_key),
+                            'module_id': str(subsection_grade.location),
                         })
                     })
                     if earned > 0:
@@ -236,11 +236,11 @@ class LearnerAnalyticsView(View):
             block_types_filter=['sequential']
         )
         assignment_blocks = []
-        for (location, block) in all_blocks['blocks'].iteritems():
+        for (location, block) in all_blocks['blocks'].items():
             if block.get('graded', False):
                 assignment_blocks.append(block)
                 block['due'] = block['due'].isoformat() if block.get('due') is not None else None
-                block['location'] = unicode(location)
+                block['location'] = str(location)
 
         return assignment_blocks
 
@@ -255,7 +255,7 @@ class LearnerAnalyticsView(View):
         activities = cache.get(cache_key)
 
         if not activities:
-            log.info(u'Weekly course activities for course {course_key} was not cached - fetching from Analytics API'
+            log.info('Weekly course activities for course {course_key} was not cached - fetching from Analytics API'
                      .format(course_key=course_key))
             weekly_course_activities = self.analytics_client.courses(course_key).activity()
 
@@ -281,15 +281,15 @@ class LearnerAnalyticsView(View):
         timeline = cache.get(cache_key)
 
         if not timeline:
-            log.info(u'Engagement timeline for course {course_key} was not cached - fetching from Analytics API'
+            log.info('Engagement timeline for course {course_key} was not cached - fetching from Analytics API'
                      .format(course_key=course_key))
 
             # TODO (LEARNER-3470): @jaebradley replace this once the Analytics client has an engagement timeline method
             url = '{base_url}/engagement_timelines/{username}?course_id={course_key}'\
                 .format(base_url=settings.ANALYTICS_API_URL,
                         username=username,
-                        course_key=urllib.quote_plus(unicode(course_key)))
-            headers = {'Authorization': u'Token {token}'.format(token=settings.ANALYTICS_API_KEY)}
+                        course_key=urllib.parse.quote_plus(str(course_key)))
+            headers = {'Authorization': 'Token {token}'.format(token=settings.ANALYTICS_API_KEY)}
             response = requests.get(url=url, headers=headers)
             data = response.json()
 

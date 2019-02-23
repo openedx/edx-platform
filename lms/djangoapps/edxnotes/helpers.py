@@ -3,10 +3,10 @@ Helper methods related to EdxNotes.
 """
 import json
 import logging
-import urlparse
+import urllib.parse
 from datetime import datetime
 from json import JSONEncoder
-from urllib import urlencode
+from urllib.parse import urlencode
 from uuid import uuid4
 
 import requests
@@ -57,7 +57,7 @@ def get_edxnotes_id_token(user):
         notes_application = Application.objects.get(name=CLIENT_NAME)
     except Application.DoesNotExist:
         raise ImproperlyConfigured(
-            u'OAuth2 Client with name [{}] does not exist.'.format(CLIENT_NAME)
+            'OAuth2 Client with name [{}] does not exist.'.format(CLIENT_NAME)
         )
     return create_jwt_for_user(
         user, secret=notes_application.client_secret, aud=notes_application.client_id
@@ -69,7 +69,7 @@ def get_token_url(course_id):
     Returns token url for the course.
     """
     return reverse("get_token", kwargs={
-        "course_id": unicode(course_id),
+        "course_id": str(course_id),
     })
 
 
@@ -91,7 +91,7 @@ def send_request(user, course_id, page, page_size, path="", text=None):
     url = get_internal_endpoint(path)
     params = {
         "user": anonymous_id_for_user(user, None),
-        "course_id": unicode(course_id).encode("utf-8"),
+        "course_id": str(course_id).encode("utf-8"),
         "page": page,
         "page_size": page_size,
     }
@@ -112,7 +112,7 @@ def send_request(user, course_id, page, page_size, path="", text=None):
             timeout=(settings.EDXNOTES_CONNECT_TIMEOUT, settings.EDXNOTES_READ_TIMEOUT)
         )
     except RequestException:
-        log.error(u"Failed to connect to edx-notes-api: url=%s, params=%s", url, str(params))
+        log.error("Failed to connect to edx-notes-api: url=%s, params=%s", url, str(params))
         raise EdxNotesServiceUnavailable(_("EdxNotes Service is unavailable. Please try again in a few minutes."))
 
     return response
@@ -143,7 +143,7 @@ def delete_all_notes_for_user(user):
             timeout=(settings.EDXNOTES_CONNECT_TIMEOUT, settings.EDXNOTES_READ_TIMEOUT)
         )
     except RequestException:
-        log.error(u"Failed to connect to edx-notes-api: url=%s, params=%s", url, str(headers))
+        log.error("Failed to connect to edx-notes-api: url=%s, params=%s", url, str(headers))
         raise EdxNotesServiceUnavailable(_("EdxNotes Service is unavailable. Please try again in a few minutes."))
 
     return response
@@ -168,7 +168,7 @@ def preprocess_collection(user, course, collection):
     with store.bulk_operations(course.id):
         for model in collection:
             update = {
-                u"updated": dateutil_parse(model["updated"]),
+                "updated": dateutil_parse(model["updated"]),
             }
 
             model.update(update)
@@ -185,22 +185,22 @@ def preprocess_collection(user, course, collection):
             try:
                 item = store.get_item(usage_key)
             except ItemNotFoundError:
-                log.debug(u"Module not found: %s", usage_key)
+                log.debug("Module not found: %s", usage_key)
                 continue
 
             if not has_access(user, "load", item, course_key=course.id):
-                log.debug(u"User %s does not have an access to %s", user, item)
+                log.debug("User %s does not have an access to %s", user, item)
                 continue
 
             unit = get_parent_unit(item)
             if unit is None:
-                log.debug(u"Unit not found: %s", usage_key)
+                log.debug("Unit not found: %s", usage_key)
                 continue
 
             if include_path_info:
                 section = unit.get_parent()
                 if not section:
-                    log.debug(u"Section not found: %s", usage_key)
+                    log.debug("Section not found: %s", usage_key)
                     continue
                 if section in cache:
                     usage_context = cache[section]
@@ -214,7 +214,7 @@ def preprocess_collection(user, course, collection):
 
                 chapter = section.get_parent()
                 if not chapter:
-                    log.debug(u"Chapter not found: %s", usage_key)
+                    log.debug("Chapter not found: %s", usage_key)
                     continue
                 if chapter in cache:
                     usage_context = cache[chapter]
@@ -247,7 +247,7 @@ def get_module_context(course, item):
     Returns dispay_name and url for the parent module.
     """
     item_dict = {
-        'location': unicode(item.location),
+        'location': str(item.location),
         'display_name': Text(item.display_name_with_default),
     }
     if item.category == 'chapter' and item.get_parent():
@@ -259,15 +259,15 @@ def get_module_context(course, item):
         section = item.get_parent()
         chapter = section.get_parent()
         # Position starts from 1, that's why we add 1.
-        position = get_index(unicode(item.location), section.children) + 1
+        position = get_index(str(item.location), section.children) + 1
         item_dict['url'] = reverse('courseware_position', kwargs={
-            'course_id': unicode(course.id),
+            'course_id': str(course.id),
             'chapter': chapter.url_name,
             'section': section.url_name,
             'position': position,
         })
     if item.category in ('chapter', 'sequential'):
-        item_dict['children'] = [unicode(child) for child in item.children]
+        item_dict['children'] = [str(child) for child in item.children]
 
     return item_dict
 
@@ -276,7 +276,7 @@ def get_index(usage_key, children):
     """
     Returns an index of the child with `usage_key`.
     """
-    children = [unicode(child) for child in children]
+    children = [str(child) for child in children]
     return children.index(usage_key)
 
 
@@ -304,8 +304,8 @@ def construct_pagination_urls(request, course_id, api_next_url, api_previous_url
             return None
 
         keys = ('page', 'page_size', 'text')
-        parsed = urlparse.urlparse(url)
-        query_params = urlparse.parse_qs(parsed.query)
+        parsed = urllib.parse.urlparse(url)
+        query_params = urllib.parse.parse_qs(parsed.query)
 
         encoded_query_params = urlencode({key: query_params.get(key)[0] for key in keys if key in query_params})
         return "{}?{}".format(request.build_absolute_uri(base_url), encoded_query_params)
@@ -344,14 +344,14 @@ def get_notes(request, course, page=DEFAULT_PAGE, page_size=DEFAULT_PAGE_SIZE, t
     try:
         collection = json.loads(response.content)
     except ValueError:
-        log.error(u"Invalid JSON response received from notes api: response_content=%s", response.content)
+        log.error("Invalid JSON response received from notes api: response_content=%s", response.content)
         raise EdxNotesParseError(_("Invalid JSON response received from notes api."))
 
     # Verify response dict structure
     expected_keys = ['total', 'rows', 'num_pages', 'start', 'next', 'previous', 'current_page']
-    keys = collection.keys()
+    keys = list(collection.keys())
     if not keys or not all(key in expected_keys for key in keys):
-        log.error(u"Incorrect data received from notes api: collection_data=%s", str(collection))
+        log.error("Incorrect data received from notes api: collection_data=%s", str(collection))
         raise EdxNotesParseError(_("Incorrect data received from notes api."))
 
     filtered_results = preprocess_collection(request.user, course, collection['rows'])
@@ -418,7 +418,7 @@ def get_course_position(course_module):
     If there is no current position in the course or chapter, then selects
     the first child.
     """
-    urlargs = {'course_id': unicode(course_module.id)}
+    urlargs = {'course_id': str(course_module.id)}
     chapter = get_current_child(course_module, min_depth=1)
     if chapter is None:
         log.debug("No chapter found when loading current position in course")

@@ -4,7 +4,7 @@ Parser and evaluator for FormulaResponse and NumericalResponse
 Uses pyparsing to parse. Main function as of now is evaluator().
 """
 
-from __future__ import absolute_import
+
 import math
 import numbers
 import operator
@@ -357,7 +357,7 @@ class ParseAugmenter(object):
         inner_number = Combine(inner_number)
 
         # SI suffixes and percent.
-        number_suffix = MatchFirst(Literal(k) for k in SUFFIXES.keys())
+        number_suffix = MatchFirst(Literal(k) for k in list(SUFFIXES.keys()))
 
         # 0.33k or 17
         plus_minus = Literal('+') | Literal('-')
@@ -440,7 +440,7 @@ class ParseAugmenter(object):
 
             node_name = node.getName()
             if node_name not in handle_actions:  # pragma: no cover
-                raise Exception(u"Unknown branch name '{}'".format(node_name))
+                raise Exception("Unknown branch name '{}'".format(node_name))
 
             action = handle_actions[node_name]
             handled_kids = [handle_node(k) for k in node]

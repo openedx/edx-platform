@@ -8,7 +8,7 @@ required by server-side events.
 To use, call "from track import segment", then call segment.track() or segment.identify().
 
 """
-from urlparse import urlunsplit
+from urllib.parse import urlunsplit
 
 import analytics
 from django.conf import settings

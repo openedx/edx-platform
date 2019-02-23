@@ -34,11 +34,11 @@ class FilenamePrefixGeneratorTestCase(TestCase):
     """
     @ddt.data(CourseLocator(org='foo', course='bar', run='baz'), CourseKey.from_string('foo/bar/baz'))
     def test_locators(self, course_key):
-        self.assertEqual(course_filename_prefix_generator(course_key), u'foo_bar_baz')
+        self.assertEqual(course_filename_prefix_generator(course_key), 'foo_bar_baz')
 
     @ddt.data(CourseLocator(org='foo', course='bar', run='baz'), CourseKey.from_string('foo/bar/baz'))
     def test_custom_separator(self, course_key):
-        self.assertEqual(course_filename_prefix_generator(course_key, separator='-'), u'foo-bar-baz')
+        self.assertEqual(course_filename_prefix_generator(course_key, separator='-'), 'foo-bar-baz')
 
 
 @ddt.ddt
@@ -64,12 +64,12 @@ class FilenameGeneratorTestCase(TestCase):
         Tests that the generator creates names based on course_id, base name, and date.
         """
         self.assertEqual(
-            u'foo_bar_baz_file_1974-06-22-010203',
+            'foo_bar_baz_file_1974-06-22-010203',
             course_and_time_based_filename_generator(course_key, 'file')
         )
 
         self.assertEqual(
-            u'foo_bar_baz_base_name_ø_1974-06-22-010203',
+            'foo_bar_baz_base_name_ø_1974-06-22-010203',
             course_and_time_based_filename_generator(course_key, ' base` name ø ')
         )
 
@@ -229,55 +229,55 @@ class TestUniversalNewlineIterator(TestCase):
     @ddt.data(1, 2, 999)
     def test_line_feeds(self, buffer_size):
         self.assertEqual(
-            [thing for thing in UniversalNewlineIterator(StringIO(u'foo\nbar\n'), buffer_size=buffer_size)],
+            [thing for thing in UniversalNewlineIterator(StringIO('foo\nbar\n'), buffer_size=buffer_size)],
             ['foo\n', 'bar\n']
         )
 
     @ddt.data(1, 2, 999)
     def test_carriage_returns(self, buffer_size):
         self.assertEqual(
-            [thing for thing in UniversalNewlineIterator(StringIO(u'foo\rbar\r'), buffer_size=buffer_size)],
+            [thing for thing in UniversalNewlineIterator(StringIO('foo\rbar\r'), buffer_size=buffer_size)],
             ['foo\n', 'bar\n']
         )
 
     @ddt.data(1, 2, 999)
     def test_carriage_returns_and_line_feeds(self, buffer_size):
         self.assertEqual(
-            [thing for thing in UniversalNewlineIterator(StringIO(u'foo\r\nbar\r\n'), buffer_size=buffer_size)],
+            [thing for thing in UniversalNewlineIterator(StringIO('foo\r\nbar\r\n'), buffer_size=buffer_size)],
             ['foo\n', 'bar\n']
         )
 
     @ddt.data(1, 2, 999)
     def test_no_trailing_newline(self, buffer_size):
         self.assertEqual(
-            [thing for thing in UniversalNewlineIterator(StringIO(u'foo\nbar'), buffer_size=buffer_size)],
+            [thing for thing in UniversalNewlineIterator(StringIO('foo\nbar'), buffer_size=buffer_size)],
             ['foo\n', 'bar']
         )
 
     @ddt.data(1, 2, 999)
     def test_only_one_line(self, buffer_size):
         self.assertEqual(
-            [thing for thing in UniversalNewlineIterator(StringIO(u'foo\n'), buffer_size=buffer_size)],
+            [thing for thing in UniversalNewlineIterator(StringIO('foo\n'), buffer_size=buffer_size)],
             ['foo\n']
         )
 
     @ddt.data(1, 2, 999)
     def test_only_one_line_no_trailing_newline(self, buffer_size):
         self.assertEqual(
-            [thing for thing in UniversalNewlineIterator(StringIO(u'foo'), buffer_size=buffer_size)],
+            [thing for thing in UniversalNewlineIterator(StringIO('foo'), buffer_size=buffer_size)],
             ['foo']
         )
 
     @ddt.data(1, 2, 999)
     def test_empty_file(self, buffer_size):
         self.assertEqual(
-            [thing for thing in UniversalNewlineIterator(StringIO(u''), buffer_size=buffer_size)],
+            [thing for thing in UniversalNewlineIterator(StringIO(''), buffer_size=buffer_size)],
             []
         )
 
     @ddt.data(1, 2, 999)
     def test_unicode_data(self, buffer_size):
         self.assertEqual(
-            [thing for thing in UniversalNewlineIterator(StringIO(u'héllø wo®ld'), buffer_size=buffer_size)],
-            [u'héllø wo®ld']
+            [thing for thing in UniversalNewlineIterator(StringIO('héllø wo®ld'), buffer_size=buffer_size)],
+            ['héllø wo®ld']
         )

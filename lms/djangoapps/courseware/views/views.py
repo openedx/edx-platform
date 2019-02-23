@@ -3,7 +3,7 @@ Courseware views functions
 """
 import json
 import logging
-import urllib
+import urllib.request, urllib.parse, urllib.error
 from collections import OrderedDict, namedtuple
 from datetime import datetime
 
@@ -174,7 +174,7 @@ UNVERIFIED_CERT_DATA = CertData(
     CertificateStatuses.unverified,
     _('Certificate unavailable'),
     _(
-        u'You have not received a certificate because you do not have a current {platform_name} '
+        'You have not received a certificate because you do not have a current {platform_name} '
         'verified identity.'
     ).format(platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)),
     download_url=None,
@@ -258,12 +258,12 @@ def jump_to_id(request, course_id, module_id):
 
     if len(items) == 0:
         raise Http404(
-            u"Could not find id: {0} in course_id: {1}. Referer: {2}".format(
+            "Could not find id: {0} in course_id: {1}. Referer: {2}".format(
                 module_id, course_id, request.META.get("HTTP_REFERER", "")
             ))
     if len(items) > 1:
         log.warning(
-            u"Multiple items found with id: %s in course_id: %s. Referer: %s. Using first: %s",
+            "Multiple items found with id: %s in course_id: %s. Referer: %s. Using first: %s",
             module_id,
             course_id,
             request.META.get("HTTP_REFERER", ""),
@@ -287,13 +287,13 @@ def jump_to(_request, course_id, location):
         course_key = CourseKey.from_string(course_id)
         usage_key = UsageKey.from_string(location).replace(course_key=course_key)
     except InvalidKeyError:
-        raise Http404(u"Invalid course_key or usage_key")
+        raise Http404("Invalid course_key or usage_key")
     try:
         redirect_url = get_redirect_url(course_key, usage_key)
     except ItemNotFoundError:
-        raise Http404(u"No data at this location: {0}".format(usage_key))
+        raise Http404("No data at this location: {0}".format(usage_key))
     except NoPathToItem:
-        raise Http404(u"This location is not in any class: {0}".format(usage_key))
+        raise Http404("This location is not in any class: {0}".format(usage_key))
 
     return redirect(redirect_url)
 
@@ -537,12 +537,12 @@ class CourseTabView(EdxFragmentView):
         if request.user.is_anonymous and not allow_anonymous:
             PageLevelMessages.register_warning_message(
                 request,
-                Text(_(u"To see course content, {sign_in_link} or {register_link}.")).format(
-                    sign_in_link=HTML(u'<a href="/login?next={current_url}">{sign_in_label}</a>').format(
+                Text(_("To see course content, {sign_in_link} or {register_link}.")).format(
+                    sign_in_link=HTML('<a href="/login?next={current_url}">{sign_in_label}</a>').format(
                         sign_in_label=_("sign in"),
                         current_url=urlquote_plus(request.path),
                     ),
-                    register_link=HTML(u'<a href="/register?next={current_url}">{register_label}</a>').format(
+                    register_link=HTML('<a href="/register?next={current_url}">{register_label}</a>').format(
                         register_label=_("register"),
                         current_url=urlquote_plus(request.path),
                     ),
@@ -552,7 +552,7 @@ class CourseTabView(EdxFragmentView):
             if not CourseEnrollment.is_enrolled(request.user, course.id) and not allow_anonymous:
                 # Only show enroll button if course is open for enrollment.
                 if course_open_for_self_enrollment(course.id):
-                    enroll_message = _(u'You must be enrolled in the course to see course content. \
+                    enroll_message = _('You must be enrolled in the course to see course content. \
                             {enroll_link_start}Enroll now{enroll_link_end}.')
                     PageLevelMessages.register_warning_message(
                         request,
@@ -569,7 +569,7 @@ class CourseTabView(EdxFragmentView):
 
     @staticmethod
     def handle_exceptions(request, course_key, course, exception):
-        u"""
+        """
         Handle exceptions raised when rendering a view.
         """
         if isinstance(exception, Redirect) or isinstance(exception, Http404):
@@ -578,7 +578,7 @@ class CourseTabView(EdxFragmentView):
             raise
         user = request.user
         log.exception(
-            u"Error in %s: user=%s, effective_user=%s, course=%s",
+            "Error in %s: user=%s, effective_user=%s, course=%s",
             request.path,
             getattr(user, 'real_user', user),
             user,
@@ -735,13 +735,13 @@ class EnrollStaffView(View):
         Either enrolls the user in course or redirects user to course about page
         depending upon the option (Enroll, Don't Enroll) chosen by the user.
         """
-        _next = urllib.quote_plus(request.GET.get('next', 'info'), safe='/:?=')
+        _next = urllib.parse.quote_plus(request.GET.get('next', 'info'), safe='/:?=')
         course_key = CourseKey.from_string(course_id)
         enroll = 'enroll' in request.POST
         if enroll:
             add_enrollment(request.user.username, course_id)
             log.info(
-                u"User %s enrolled in %s via `enroll_staff` view",
+                "User %s enrolled in %s via `enroll_staff` view",
                 request.user.username,
                 course_id
             )
@@ -802,7 +802,7 @@ def course_about(request, course_id):
                     shoppingcart.models.CourseRegCodeItem.contained_in_order(cart, course_key)
 
             reg_then_add_to_cart_link = "{reg_url}?course_id={course_id}&enrollment_action=add_to_cart".format(
-                reg_url=reverse('register_user'), course_id=urllib.quote(str(course_id))
+                reg_url=reverse('register_user'), course_id=urllib.parse.quote(str(course_id))
             )
 
         # If the ecommerce checkout flow is enabled and the mode of the course is
@@ -986,7 +986,7 @@ def _progress(request, course_key, student_id):
     # student instead of request.user in the rest of the function.
 
     course_grade = CourseGradeFactory().read(student, course)
-    courseware_summary = course_grade.chapter_grades.values()
+    courseware_summary = list(course_grade.chapter_grades.values())
 
     studio_url = get_studio_url(course, 'settings/grading')
     # checking certificate generation configuration
@@ -1176,7 +1176,7 @@ def submission_history(request, course_id, student_username, location):
     try:
         usage_key = UsageKey.from_string(location).map_into_course(course_key)
     except (InvalidKeyError, AssertionError):
-        return HttpResponse(escape(_(u'Invalid location.')))
+        return HttpResponse(escape(_('Invalid location.')))
 
     course = get_course_overview_with_access(request.user, 'load', course_key)
     staff_access = bool(has_access(request.user, 'staff', course))
@@ -1190,7 +1190,7 @@ def submission_history(request, course_id, student_username, location):
     try:
         history_entries = list(user_state_client.get_history(student_username, usage_key))
     except DjangoXBlockUserStateClient.DoesNotExist:
-        return HttpResponse(escape(_(u'User {username} has never accessed problem {location}').format(
+        return HttpResponse(escape(_('User {username} has never accessed problem {location}').format(
             username=student_username,
             location=location
         )))
@@ -1206,10 +1206,10 @@ def submission_history(request, course_id, student_username, location):
 
     if len(scores) != len(history_entries):
         log.warning(
-            u"Mismatch when fetching scores for student "
-            u"history for course %s, user %s, xblock %s. "
-            u"%d scores were found, and %d history entries were found. "
-            u"Matching scores to history entries by date for display.",
+            "Mismatch when fetching scores for student "
+            "history for course %s, user %s, xblock %s. "
+            "%d scores were found, and %d history entries were found. "
+            "Matching scores to history entries by date for display.",
             course_id,
             student_username,
             location,
@@ -1251,7 +1251,7 @@ def get_static_tab_fragment(request, course, tab):
         request.user, request, loc, field_data_cache, static_asset_path=course.static_asset_path, course=course
     )
 
-    logging.debug(u'course_module = %s', tab_module)
+    logging.debug('course_module = %s', tab_module)
 
     fragment = Fragment()
     if tab_module is not None:
@@ -1260,7 +1260,7 @@ def get_static_tab_fragment(request, course, tab):
         except Exception:  # pylint: disable=broad-except
             fragment.content = render_to_string('courseware/error-message.html', None)
             log.exception(
-                u"Error rendering course=%s, tab=%s", course, tab['url_slug']
+                "Error rendering course=%s, tab=%s", course, tab['url_slug']
             )
 
     return fragment
@@ -1397,9 +1397,9 @@ def generate_user_cert(request, course_id):
     """
 
     if not request.user.is_authenticated:
-        log.info(u"Anon user trying to generate certificate for %s", course_id)
+        log.info("Anon user trying to generate certificate for %s", course_id)
         return HttpResponseBadRequest(
-            _(u'You must be signed in to {platform_name} to create a certificate.').format(
+            _('You must be signed in to {platform_name} to create a certificate.').format(
                 platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
             )
         )
@@ -1412,13 +1412,13 @@ def generate_user_cert(request, course_id):
         return HttpResponseBadRequest(_("Course is not valid"))
 
     if not is_course_passed(student, course):
-        log.info(u"User %s has not passed the course: %s", student.username, course_id)
+        log.info("User %s has not passed the course: %s", student.username, course_id)
         return HttpResponseBadRequest(_("Your certificate will be available when you pass the course."))
 
     certificate_status = certs_api.certificate_downloadable_status(student, course.id)
 
     log.info(
-        u"User %s has requested for certificate in %s, current status: is_downloadable: %s, is_generating: %s",
+        "User %s has requested for certificate in %s, current status: is_downloadable: %s, is_generating: %s",
         student.username,
         course_id,
         certificate_status["is_downloadable"],
@@ -1475,7 +1475,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
     requested_view = request.GET.get('view', 'student_view')
     if requested_view != 'student_view':
         return HttpResponseBadRequest(
-            u"Rendering of the xblock view '{}' is not supported.".format(bleach.clean(requested_view, strip=True))
+            "Rendering of the xblock view '{}' is not supported.".format(bleach.clean(requested_view, strip=True))
         )
 
     with modulestore().bulk_operations(course_key):
@@ -1520,8 +1520,8 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
 # Translators: "percent_sign" is the symbol "%". "platform_name" is a
 # string identifying the name of this installation, such as "edX".
 FINANCIAL_ASSISTANCE_HEADER = _(
-    u'{platform_name} now offers financial assistance for learners who want to earn Verified Certificates but'
-    u' who may not be able to pay the Verified Certificate fee. Eligible learners may receive up to 90{percent_sign} off'
+    '{platform_name} now offers financial assistance for learners who want to earn Verified Certificates but'
+    ' who may not be able to pay the Verified Certificate fee. Eligible learners may receive up to 90{percent_sign} off'
     ' the Verified Certificate fee for a course.\nTo apply for financial assistance, enroll in the'
     ' audit track for a course that offers Verified Certificates, and then complete this application.'
     ' Note that you must complete a separate application for each course you take.\n We plan to use this'
@@ -1581,22 +1581,22 @@ def financial_assistance_request(request):
         ip_address = get_ip(request)
     except ValueError:
         # Thrown if JSON parsing fails
-        return HttpResponseBadRequest(u'Could not parse request JSON.')
+        return HttpResponseBadRequest('Could not parse request JSON.')
     except InvalidKeyError:
         # Thrown if course key parsing fails
-        return HttpResponseBadRequest(u'Could not parse request course key.')
+        return HttpResponseBadRequest('Could not parse request course key.')
     except KeyError as err:
         # Thrown if fields are missing
-        return HttpResponseBadRequest(u'The field {} is required.'.format(text_type(err)))
+        return HttpResponseBadRequest('The field {} is required.'.format(text_type(err)))
 
     zendesk_submitted = _record_feedback_in_zendesk(
         legal_name,
         email,
-        u'Financial assistance request for learner {username} in course {course_name}'.format(
+        'Financial assistance request for learner {username} in course {course_name}'.format(
             username=username,
             course_name=course.display_name
         ),
-        u'Financial Assistance Request',
+        'Financial Assistance Request',
         {'course_id': course_id},
         # Send the application as additional info on the ticket so
         # that it is not shown when support replies. This uses

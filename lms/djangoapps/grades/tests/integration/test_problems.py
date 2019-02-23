@@ -39,8 +39,8 @@ class TestMultipleProblemTypesSubsectionScores(SharedModuleStoreTestCase):
 
     def setUp(self):
         super(TestMultipleProblemTypesSubsectionScores, self).setUp()
-        password = u'test'
-        self.student = UserFactory.create(is_staff=False, username=u'test_student', password=password)
+        password = 'test'
+        self.student = UserFactory.create(is_staff=False, username='test_student', password=password)
         self.client.login(username=self.student.username, password=password)
         self.addCleanup(set_current_request, None)
         self.request = get_mock_request(self.student)
@@ -101,9 +101,9 @@ class TestVariedMetadata(ProblemSubmissionTestMixin, ModuleStoreTestCase):
     persisted score.
     """
     default_problem_metadata = {
-        u'graded': True,
-        u'weight': 2.5,
-        u'due': datetime.datetime(2099, 3, 15, 12, 30, 0, tzinfo=pytz.utc),
+        'graded': True,
+        'weight': 2.5,
+        'due': datetime.datetime(2099, 3, 15, 12, 30, 0, tzinfo=pytz.utc),
     }
 
     def setUp(self):
@@ -126,7 +126,7 @@ class TestVariedMetadata(ProblemSubmissionTestMixin, ModuleStoreTestCase):
                 category='vertical',
                 display_name='Test Vertical 1'
             )
-        self.problem_xml = u'''
+        self.problem_xml = '''
             <problem url_name="capa-optionresponse">
               <optionresponse>
                 <optioninput options="('Correct', 'Incorrect')" correct="Correct"></optioninput>
@@ -168,7 +168,7 @@ class TestVariedMetadata(ProblemSubmissionTestMixin, ModuleStoreTestCase):
         two) is submitted.
         """
 
-        self.submit_question_answer(u'problem', {u'2_1': u'Correct'})
+        self.submit_question_answer('problem', {'2_1': 'Correct'})
         course_structure = get_course_blocks(self.request.user, self.course.location)
         subsection_factory = SubsectionGradeFactory(
             self.request.user,
@@ -179,10 +179,10 @@ class TestVariedMetadata(ProblemSubmissionTestMixin, ModuleStoreTestCase):
 
     @ddt.data(
         ({}, 1.25, 2.5),
-        ({u'weight': 27}, 13.5, 27),
-        ({u'weight': 1.0}, 0.5, 1.0),
-        ({u'weight': 0.0}, 0.0, 0.0),
-        ({u'weight': None}, 1.0, 2.0),
+        ({'weight': 27}, 13.5, 27),
+        ({'weight': 1.0}, 0.5, 1.0),
+        ({'weight': 0.0}, 0.0, 0.0),
+        ({'weight': None}, 1.0, 2.0),
     )
     @ddt.unpack
     def test_weight_metadata_alterations(self, alterations, expected_earned, expected_possible):
@@ -192,8 +192,8 @@ class TestVariedMetadata(ProblemSubmissionTestMixin, ModuleStoreTestCase):
         self.assertEqual(score.all_total.possible, expected_possible)
 
     @ddt.data(
-        ({u'graded': True}, 1.25, 2.5),
-        ({u'graded': False}, 0.0, 0.0),
+        ({'graded': True}, 1.25, 2.5),
+        ({'graded': False}, 0.0, 0.0),
     )
     @ddt.unpack
     def test_graded_metadata_alterations(self, alterations, expected_earned, expected_possible):
@@ -272,11 +272,11 @@ class TestWeightedProblems(SharedModuleStoreTestCase):
             problem_score = subsection_grade.problem_scores[problem.location]
             self.assertEqual(type(expected_score.first_attempted), type(problem_score.first_attempted))
             expected_score.first_attempted = problem_score.first_attempted
-            self.assertEquals(problem_score, expected_score)
+            self.assertEqual(problem_score, expected_score)
 
         # verify subsection grades
-        self.assertEquals(subsection_grade.all_total.earned, expected_score.earned * len(self.problems))
-        self.assertEquals(subsection_grade.all_total.possible, expected_score.possible * len(self.problems))
+        self.assertEqual(subsection_grade.all_total.earned, expected_score.earned * len(self.problems))
+        self.assertEqual(subsection_grade.all_total.possible, expected_score.possible * len(self.problems))
 
     @ddt.data(
         *itertools.product(

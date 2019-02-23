@@ -67,8 +67,8 @@ def get_course_enrollments(user_id, include_inactive=False):
     if deleted:
         log.warning(
             (
-                u"Course enrollments for user %s reference "
-                u"courses that do not exist (this can occur if a course is deleted)."
+                "Course enrollments for user %s reference "
+                "courses that do not exist (this can occur if a course is deleted)."
             ), user_id,
         )
 
@@ -140,7 +140,7 @@ def create_course_enrollment(username, course_id, mode, is_active):
     try:
         user = User.objects.get(username=username)
     except User.DoesNotExist:
-        msg = u"Not user with username '{username}' found.".format(username=username)
+        msg = "Not user with username '{username}' found.".format(username=username)
         log.warn(msg)
         raise UserNotFoundError(msg)
 
@@ -178,7 +178,7 @@ def update_course_enrollment(username, course_id, mode=None, is_active=None):
     try:
         user = User.objects.get(username=username)
     except User.DoesNotExist:
-        msg = u"Not user with username '{username}' found.".format(username=username)
+        msg = "Not user with username '{username}' found.".format(username=username)
         log.warn(msg)
         raise UserNotFoundError(msg)
 
@@ -269,7 +269,7 @@ def _get_user(user_id):
     try:
         return User.objects.get(username=user_id)
     except User.DoesNotExist:
-        msg = u"Not user with username '{username}' found.".format(username=user_id)
+        msg = "Not user with username '{username}' found.".format(username=user_id)
         log.warn(msg)
         raise UserNotFoundError(msg)
 
@@ -292,17 +292,17 @@ def _invalid_attribute(attributes):
     invalid_attributes = []
     for attribute in attributes:
         if "namespace" not in attribute:
-            msg = u"'namespace' not in enrollment attribute"
+            msg = "'namespace' not in enrollment attribute"
             log.warn(msg)
             invalid_attributes.append("namespace")
             raise InvalidEnrollmentAttribute(msg)
         if "name" not in attribute:
-            msg = u"'name' not in enrollment attribute"
+            msg = "'name' not in enrollment attribute"
             log.warn(msg)
             invalid_attributes.append("name")
             raise InvalidEnrollmentAttribute(msg)
         if "value" not in attribute:
-            msg = u"'value' not in enrollment attribute"
+            msg = "'value' not in enrollment attribute"
             log.warn(msg)
             invalid_attributes.append("value")
             raise InvalidEnrollmentAttribute(msg)
@@ -333,7 +333,7 @@ def get_course_enrollment_info(course_id, include_expired=False):
     try:
         course = CourseOverview.get_from_id(course_key)
     except CourseOverview.DoesNotExist:
-        msg = u"Requested enrollment information for unknown course {course}".format(course=course_id)
+        msg = "Requested enrollment information for unknown course {course}".format(course=course_id)
         log.warning(msg)
         raise CourseNotFoundError(msg)
     else:

@@ -183,12 +183,12 @@ class CourseGradingModel(object):
         descriptor = modulestore().get_item(location)
         return {
             "graderType": descriptor.format if descriptor.format is not None else 'notgraded',
-            "location": unicode(location),
+            "location": str(location),
         }
 
     @staticmethod
     def update_section_grader_type(descriptor, grader_type, user):
-        if grader_type is not None and grader_type != u'notgraded':
+        if grader_type is not None and grader_type != 'notgraded':
             descriptor.format = grader_type
             descriptor.graded = True
         else:
@@ -256,12 +256,12 @@ class CourseGradingModel(object):
 def _grading_event_and_signal(course_key, user_id):
     name = GRADING_POLICY_CHANGED_EVENT_TYPE
     course = modulestore().get_course(course_key)
-    grading_policy_hash = unicode(hash_grading_policy(course.grading_policy))
+    grading_policy_hash = str(hash_grading_policy(course.grading_policy))
     data = {
-        "course_id": unicode(course_key),
-        "user_id": unicode(user_id),
+        "course_id": str(course_key),
+        "user_id": str(user_id),
         "grading_policy_hash": grading_policy_hash,
-        "event_transaction_id": unicode(create_new_event_transaction_id()),
+        "event_transaction_id": str(create_new_event_transaction_id()),
         "event_transaction_type": GRADING_POLICY_CHANGED_EVENT_TYPE,
     }
     tracker.emit(name, data)

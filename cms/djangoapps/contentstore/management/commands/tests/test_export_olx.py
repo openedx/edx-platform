@@ -5,7 +5,7 @@ Tests for exporting OLX content.
 import shutil
 import tarfile
 import unittest
-from StringIO import StringIO
+from io import StringIO
 from tempfile import mkdtemp
 
 import ddt
@@ -27,7 +27,7 @@ class TestArgParsingCourseExportOlx(unittest.TestCase):
         Test export command with no arguments
         """
         errstring = "Error: too few arguments"
-        with self.assertRaisesRegexp(CommandError, errstring):
+        with self.assertRaisesRegex(CommandError, errstring):
             call_command('export_olx')
 
 
@@ -42,7 +42,7 @@ class TestCourseExportOlx(ModuleStoreTestCase):
         Test export command with an invalid course key.
         """
         errstring = "Unparsable course_id"
-        with self.assertRaisesRegexp(CommandError, errstring):
+        with self.assertRaisesRegex(CommandError, errstring):
             call_command('export_olx', 'InvalidCourseID')
 
     def test_course_key_not_found(self):
@@ -50,7 +50,7 @@ class TestCourseExportOlx(ModuleStoreTestCase):
         Test export command with a valid course key that doesn't exist.
         """
         errstring = "Invalid course_id"
-        with self.assertRaisesRegexp(CommandError, errstring):
+        with self.assertRaisesRegex(CommandError, errstring):
             call_command('export_olx', 'x/y/z')
 
     def create_dummy_course(self, store_type):
@@ -58,7 +58,7 @@ class TestCourseExportOlx(ModuleStoreTestCase):
         course = CourseFactory.create(default_store=store_type)
         self.assertTrue(
             modulestore().has_course(course.id),
-            u"Could not find course in {}".format(store_type)
+            "Could not find course in {}".format(store_type)
         )
         return course.id
 
@@ -79,7 +79,7 @@ class TestCourseExportOlx(ModuleStoreTestCase):
         tmp_dir = path(mkdtemp())
         self.addCleanup(shutil.rmtree, tmp_dir)
         filename = tmp_dir / 'test.tar.gz'
-        call_command('export_olx', '--output', filename, unicode(test_course_key))
+        call_command('export_olx', '--output', filename, str(test_course_key))
         with tarfile.open(filename) as tar_file:
             self.check_export_file(tar_file, test_course_key)
 
@@ -87,7 +87,7 @@ class TestCourseExportOlx(ModuleStoreTestCase):
     def test_export_course_stdout(self, store_type):
         test_course_key = self.create_dummy_course(store_type)
         out = StringIO()
-        call_command('export_olx', unicode(test_course_key), stdout=out)
+        call_command('export_olx', str(test_course_key), stdout=out)
         out.seek(0)
         output = out.read()
         with tarfile.open(fileobj=StringIO(output)) as tar_file:

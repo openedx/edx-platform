@@ -132,8 +132,8 @@ class ResubmitErrorCertificatesTest(CertificateManagementTest):
             call_command(self.command)
 
     def test_invalid_course_key(self):
-        invalid_key = u"invalid/"
-        with self.assertRaisesRegexp(CommandError, invalid_key):
+        invalid_key = "invalid/"
+        with self.assertRaisesRegex(CommandError, invalid_key):
             call_command(self.command, course_key_list=[invalid_key])
 
     def test_course_does_not_exist(self):
@@ -179,7 +179,7 @@ class RegenerateCertificatesTest(CertificateManagementTest):
         self.course.issue_badges = issue_badges
         self.store.update_item(self.course, None)
 
-        args = u'-u {} -c {}'.format(self.user.email, text_type(key))
+        args = '-u {} -c {}'.format(self.user.email, text_type(key))
         call_command(self.command, *args.split(' '))
 
         xqueue.return_value.regen_cert.assert_called_with(
@@ -190,7 +190,7 @@ class RegenerateCertificatesTest(CertificateManagementTest):
             template_file=None,
             generate_pdf=True
         )
-        self.assertEquals(
+        self.assertEqual(
             bool(BadgeAssertion.objects.filter(user=self.user, badge_class=badge_class)), not issue_badges
         )
 
@@ -205,7 +205,7 @@ class RegenerateCertificatesTest(CertificateManagementTest):
         key = self.course.location.course_key
         self._create_cert(key, self.user, CertificateStatuses.downloadable)
 
-        args = u'-u {} -c {} --insecure'.format(self.user.email, text_type(key))
+        args = '-u {} -c {} --insecure'.format(self.user.email, text_type(key))
         call_command(self.command, *args.split(' '))
 
         certificate = GeneratedCertificate.eligible_certificates.get(
@@ -242,7 +242,7 @@ class UngenerateCertificatesTest(CertificateManagementTest):
         self._create_cert(key, self.user, CertificateStatuses.unavailable)
 
         with mock_passing_grade():
-            args = u'-c {} --insecure'.format(text_type(key))
+            args = '-c {} --insecure'.format(text_type(key))
             call_command(self.command, *args.split(' '))
 
         self.assertTrue(mock_send_to_queue.called)

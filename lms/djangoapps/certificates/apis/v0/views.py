@@ -96,7 +96,7 @@ class CertificatesDetailView(GenericAPIView):
         try:
             course_key = CourseKey.from_string(course_id)
         except InvalidKeyError:
-            log.warning(u'Course ID string "%s" is not valid', course_id)
+            log.warning('Course ID string "%s" is not valid', course_id)
             return Response(
                 status=404,
                 data={'error_code': 'course_id_not_valid'}
@@ -111,7 +111,7 @@ class CertificatesDetailView(GenericAPIView):
         return Response(
             {
                 "username": user_cert.get('username'),
-                "course_id": unicode(user_cert.get('course_key')),
+                "course_id": str(user_cert.get('course_key')),
                 "certificate_type": user_cert.get('type'),
                 "created_date": user_cert.get('created'),
                 "status": user_cert.get('status'),

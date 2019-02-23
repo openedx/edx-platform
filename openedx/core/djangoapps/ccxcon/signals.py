@@ -15,4 +15,4 @@ def _listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable
     # update the course information on ccxcon using celery
     # import here, because signal is registered at startup, but items in tasks are not yet able to be loaded
     from openedx.core.djangoapps.ccxcon import tasks
-    tasks.update_ccxcon.delay(unicode(course_key))
+    tasks.update_ccxcon.delay(str(course_key))

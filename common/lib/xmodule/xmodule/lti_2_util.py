@@ -8,7 +8,7 @@ import hashlib
 import json
 import logging
 import re
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 import mock
 from oauthlib.oauth1 import Client
@@ -106,22 +106,22 @@ class LTI20ModuleMixin(object):
         """
         sha1 = hashlib.sha1()
         sha1.update(request.body)
-        oauth_body_hash = unicode(base64.b64encode(sha1.digest()))
+        oauth_body_hash = str(base64.b64encode(sha1.digest()))
         log.debug("[LTI] oauth_body_hash = {}".format(oauth_body_hash))
         client_key, client_secret = self.get_client_key_secret()
         client = Client(client_key, client_secret)
         mock_request = mock.Mock(
-            uri=unicode(urllib.unquote(request.url)),
+            uri=str(urllib.parse.unquote(request.url)),
             headers=request.headers,
-            body=u"",
-            decoded_body=u"",
-            http_method=unicode(request.method),
+            body="",
+            decoded_body="",
+            http_method=str(request.method),
         )
         params = client.get_oauth_params(mock_request)
         mock_request.oauth_params = params
-        mock_request.oauth_params.append((u'oauth_body_hash', oauth_body_hash))
+        mock_request.oauth_params.append(('oauth_body_hash', oauth_body_hash))
         sig = client.get_oauth_signature(mock_request)
-        mock_request.oauth_params.append((u'oauth_signature', sig))
+        mock_request.oauth_params.append(('oauth_signature', sig))
 
         _, headers, _ = client._render(mock_request)  # pylint: disable=protected-access
         log.debug("\n\n#### COPY AND PASTE AUTHORIZATION HEADER ####\n{}\n####################################\n\n"
@@ -234,7 +234,7 @@ class LTI20ModuleMixin(object):
         """
         self.set_user_module_score(user, None, None, score_deleted=True)
 
-    def set_user_module_score(self, user, score, max_score, comment=u"", score_deleted=False):
+    def set_user_module_score(self, user, score, max_score, comment="", score_deleted=False):
         """
         Sets the module user state, including grades and comments, and also scoring in db's courseware_studentmodule
 

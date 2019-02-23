@@ -89,7 +89,7 @@ class CourseModeModelTest(TestCase):
 
         self.create_mode('verified', 'Verified Certificate', 10)
         modes = CourseMode.modes_for_course(self.course_key)
-        mode = Mode(u'verified', u'Verified Certificate', 10, '', 'usd', None, None, None, None)
+        mode = Mode('verified', 'Verified Certificate', 10, '', 'usd', None, None, None, None)
         self.assertEqual([mode], modes)
 
         modes_dict = CourseMode.modes_for_course_dict(self.course_key)
@@ -101,16 +101,16 @@ class CourseModeModelTest(TestCase):
         """
         Finding the modes when there's multiple modes
         """
-        mode1 = Mode(u'honor', u'Honor Code Certificate', 0, '', 'usd', None, None, None, None)
-        mode2 = Mode(u'verified', u'Verified Certificate', 10, '', 'usd', None, None, None, None)
+        mode1 = Mode('honor', 'Honor Code Certificate', 0, '', 'usd', None, None, None, None)
+        mode2 = Mode('verified', 'Verified Certificate', 10, '', 'usd', None, None, None, None)
         set_modes = [mode1, mode2]
         for mode in set_modes:
             self.create_mode(mode.slug, mode.name, mode.min_price, mode.suggested_prices)
 
         modes = CourseMode.modes_for_course(self.course_key)
         self.assertEqual(modes, set_modes)
-        self.assertEqual(mode1, CourseMode.mode_for_course(self.course_key, u'honor'))
-        self.assertEqual(mode2, CourseMode.mode_for_course(self.course_key, u'verified'))
+        self.assertEqual(mode1, CourseMode.mode_for_course(self.course_key, 'honor'))
+        self.assertEqual(mode2, CourseMode.mode_for_course(self.course_key, 'verified'))
         self.assertIsNone(CourseMode.mode_for_course(self.course_key, 'DNE'))
 
     def test_min_course_price_for_currency(self):
@@ -121,9 +121,9 @@ class CourseModeModelTest(TestCase):
         self.assertEqual(0, CourseMode.min_course_price_for_currency(self.course_key, 'usd'))
 
         # create some modes
-        mode1 = Mode(u'honor', u'Honor Code Certificate', 10, '', 'usd', None, None, None, None)
-        mode2 = Mode(u'verified', u'Verified Certificate', 20, '', 'usd', None, None, None, None)
-        mode3 = Mode(u'honor', u'Honor Code Certificate', 80, '', 'cny', None, None, None, None)
+        mode1 = Mode('honor', 'Honor Code Certificate', 10, '', 'usd', None, None, None, None)
+        mode2 = Mode('verified', 'Verified Certificate', 20, '', 'usd', None, None, None, None)
+        mode3 = Mode('honor', 'Honor Code Certificate', 80, '', 'cny', None, None, None, None)
         set_modes = [mode1, mode2, mode3]
         for mode in set_modes:
             self.create_mode(mode.slug, mode.name, mode.min_price, mode.suggested_prices, mode.currency)
@@ -138,7 +138,7 @@ class CourseModeModelTest(TestCase):
         modes = CourseMode.modes_for_course(self.course_key)
         self.assertEqual([CourseMode.DEFAULT_MODE], modes)
 
-        mode1 = Mode(u'honor', u'Honor Code Certificate', 0, '', 'usd', None, None, None, None)
+        mode1 = Mode('honor', 'Honor Code Certificate', 0, '', 'usd', None, None, None, None)
         self.create_mode(mode1.slug, mode1.name, mode1.min_price, mode1.suggested_prices)
         modes = CourseMode.modes_for_course(self.course_key)
         self.assertEqual([mode1], modes)
@@ -147,8 +147,8 @@ class CourseModeModelTest(TestCase):
         expired_mode.expiration_datetime = expiration_datetime
         expired_mode.save()
         expired_mode_value = Mode(
-            u'verified',
-            u'Verified Certificate',
+            'verified',
+            'Verified Certificate',
             10,
             '',
             'usd',
@@ -335,7 +335,7 @@ class CourseModeModelTest(TestCase):
             self.assertTrue(is_error_expected, "Did not expect a ValidationError to be thrown.")
             self.assertEqual(
                 exc.messages,
-                [u"Professional education modes are not allowed to have expiration_datetime set."],
+                ["Professional education modes are not allowed to have expiration_datetime set."],
             )
 
     @ddt.data(
@@ -398,11 +398,11 @@ class CourseModeModelTest(TestCase):
 
         # Check the selectable modes, which should exclude credit
         selectable_modes = CourseMode.modes_for_course_dict(self.course_key)
-        self.assertItemsEqual(selectable_modes.keys(), expected_selectable_modes)
+        self.assertItemsEqual(list(selectable_modes.keys()), expected_selectable_modes)
 
         # When we get all unexpired modes, we should see credit as well
         all_modes = CourseMode.modes_for_course_dict(self.course_key, only_selectable=False)
-        self.assertItemsEqual(all_modes.keys(), available_modes)
+        self.assertItemsEqual(list(all_modes.keys()), available_modes)
 
     def _enrollment_display_modes_dicts(self, dict_type):
         """
@@ -421,11 +421,11 @@ class CourseModeModelTest(TestCase):
                              'professional']
         }
         if dict_type in ['verify_need_to_verify', 'verify_submitted']:
-            return dict(zip(dict_keys, display_values.get('verify_need_to_verify')))
+            return dict(list(zip(dict_keys, display_values.get('verify_need_to_verify'))))
         elif dict_type is None or dict_type == 'dummy':
-            return dict(zip(dict_keys, display_values.get('verify_none')))
+            return dict(list(zip(dict_keys, display_values.get('verify_none'))))
         else:
-            return dict(zip(dict_keys, display_values.get(dict_type)))
+            return dict(list(zip(dict_keys, display_values.get(dict_type))))
 
     def test_expiration_datetime_explicitly_set(self):
         """ Verify that setting the expiration_date property sets the explicit flag. """

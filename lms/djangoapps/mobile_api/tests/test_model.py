@@ -96,7 +96,7 @@ class TestMobileApiConfig(TestCase):
         video_profile_list = MobileApiConfig.get_video_profiles()
         self.assertEqual(
             video_profile_list,
-            [u'mobile_low', u'mobile_high', u'youtube']
+            ['mobile_low', 'mobile_high', 'youtube']
         )
 
     def test_video_profile_list_with_whitespace(self):
@@ -105,7 +105,7 @@ class TestMobileApiConfig(TestCase):
         video_profile_list = MobileApiConfig.get_video_profiles()
         self.assertEqual(
             video_profile_list,
-            [u'mobile_low', u'mobile_high', u'youtube']
+            ['mobile_low', 'mobile_high', 'youtube']
         )
 
     def test_empty_video_profile(self):

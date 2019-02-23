@@ -47,15 +47,15 @@ class TestGetBlocks(SharedModuleStoreTestCase):
 
     def test_basic(self):
         blocks = get_blocks(self.request, self.course.location, self.user)
-        self.assertEquals(blocks['root'], unicode(self.course.location))
+        self.assertEqual(blocks['root'], str(self.course.location))
 
         # subtract for (1) the orphaned course About block and (2) the hidden Html block
-        self.assertEquals(len(blocks['blocks']), len(self.store.get_items(self.course.id)) - 2)
-        self.assertNotIn(unicode(self.html_block.location), blocks['blocks'])
+        self.assertEqual(len(blocks['blocks']), len(self.store.get_items(self.course.id)) - 2)
+        self.assertNotIn(str(self.html_block.location), blocks['blocks'])
 
     def test_no_user(self):
         blocks = get_blocks(self.request, self.course.location)
-        self.assertIn(unicode(self.html_block.location), blocks['blocks'])
+        self.assertIn(str(self.html_block.location), blocks['blocks'])
 
     def test_access_before_api_transformer_order(self):
         """
@@ -66,17 +66,17 @@ class TestGetBlocks(SharedModuleStoreTestCase):
         vertical_block = self.store.get_item(self.course.id.make_usage_key('vertical', 'vertical_x1a'))
         problem_block = self.store.get_item(self.course.id.make_usage_key('problem', 'problem_x1a_1'))
 
-        vertical_descendants = blocks['blocks'][unicode(vertical_block.location)]['descendants']
+        vertical_descendants = blocks['blocks'][str(vertical_block.location)]['descendants']
 
-        self.assertIn(unicode(problem_block.location), vertical_descendants)
-        self.assertNotIn(unicode(self.html_block.location), vertical_descendants)
+        self.assertIn(str(problem_block.location), vertical_descendants)
+        self.assertNotIn(str(self.html_block.location), vertical_descendants)
 
     def test_sub_structure(self):
         sequential_block = self.store.get_item(self.course.id.make_usage_key('sequential', 'sequential_y1'))
 
         blocks = get_blocks(self.request, sequential_block.location, self.user)
-        self.assertEquals(blocks['root'], unicode(sequential_block.location))
-        self.assertEquals(len(blocks['blocks']), 5)
+        self.assertEqual(blocks['root'], str(sequential_block.location))
+        self.assertEqual(len(blocks['blocks']), 5)
 
         for block_type, block_name, is_inside_of_structure in (
                 ('vertical', 'vertical_y1a', True),
@@ -86,18 +86,18 @@ class TestGetBlocks(SharedModuleStoreTestCase):
         ):
             block = self.store.get_item(self.course.id.make_usage_key(block_type, block_name))
             if is_inside_of_structure:
-                self.assertIn(unicode(block.location), blocks['blocks'])
+                self.assertIn(str(block.location), blocks['blocks'])
             else:
-                self.assertNotIn(unicode(block.location), blocks['blocks'])
+                self.assertNotIn(str(block.location), blocks['blocks'])
 
     def test_filtering_by_block_types(self):
         sequential_block = self.store.get_item(self.course.id.make_usage_key('sequential', 'sequential_y1'))
 
         # not filtered blocks
         blocks = get_blocks(self.request, sequential_block.location, self.user, requested_fields=['type'])
-        self.assertEquals(len(blocks['blocks']), 5)
+        self.assertEqual(len(blocks['blocks']), 5)
         found_not_problem = False
-        for block in blocks['blocks'].itervalues():
+        for block in blocks['blocks'].values():
             if block['type'] != 'problem':
                 found_not_problem = True
         self.assertTrue(found_not_problem)
@@ -105,8 +105,8 @@ class TestGetBlocks(SharedModuleStoreTestCase):
         # filtered blocks
         blocks = get_blocks(self.request, sequential_block.location, self.user,
                             block_types_filter=['problem'], requested_fields=['type'])
-        self.assertEquals(len(blocks['blocks']), 3)
-        for block in blocks['blocks'].itervalues():
+        self.assertEqual(len(blocks['blocks']), 3)
+        for block in blocks['blocks'].values():
             self.assertEqual(block['type'], 'problem')
 
 

@@ -18,7 +18,7 @@ from openedx.core.lib.cache_utils import request_cached
 from . import LOOKUP
 
 
-class TopLevelTemplateURI(unicode):
+class TopLevelTemplateURI(str):
     """
     A marker class for template URIs used to signal the template lookup infrastructure that the template corresponding
     to the URI should be looked up straight in the standard edx-platform location instead of trying to locate an
@@ -165,7 +165,7 @@ def save_lookups():
 
     """
     # Make a copy of the list of directories for each namespace.
-    namespace_dirs = {namespace: list(look.directories) for namespace, look in LOOKUP.items()}
+    namespace_dirs = {namespace: list(look.directories) for namespace, look in list(LOOKUP.items())}
 
     try:
         yield
@@ -174,6 +174,6 @@ def save_lookups():
         LOOKUP.clear()
 
         # Re-create the lookups from our saved list.
-        for namespace, directories in namespace_dirs.items():
+        for namespace, directories in list(namespace_dirs.items()):
             for directory in directories:
                 add_lookup(namespace, directory)

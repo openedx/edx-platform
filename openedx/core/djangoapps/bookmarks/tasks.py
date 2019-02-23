@@ -30,11 +30,11 @@ def _calculate_course_xblocks_data(course_key):
         while blocks_stack:
             current_block = blocks_stack.pop()
             children = current_block.get_children() if current_block.has_children else []
-            usage_id = unicode(current_block.scope_ids.usage_id)
+            usage_id = str(current_block.scope_ids.usage_id)
             block_info = {
                 'usage_key': current_block.scope_ids.usage_id,
                 'display_name': current_block.display_name_with_default,
-                'children_ids': [unicode(child.scope_ids.usage_id) for child in children]
+                'children_ids': [str(child.scope_ids.usage_id) for child in children]
             }
             blocks_info_dict[usage_id] = block_info
 
@@ -42,7 +42,7 @@ def _calculate_course_xblocks_data(course_key):
             blocks_stack.extend(children)
 
     # Set children
-    for block in blocks_info_dict.values():
+    for block in list(blocks_info_dict.values()):
         block.setdefault('children', [])
         for child_id in block['children_ids']:
             block['children'].append(blocks_info_dict[child_id])
@@ -58,7 +58,7 @@ def _calculate_course_xblocks_data(course_key):
         for child_block_info in block_info['children']:
             add_path_info(child_block_info, current_path + [block_info])
 
-    add_path_info(blocks_info_dict[unicode(course.scope_ids.usage_id)], [])
+    add_path_info(blocks_info_dict[str(course.scope_ids.usage_id)], [])
 
     return blocks_info_dict
 
@@ -115,7 +115,7 @@ def _update_xblocks_cache(course_key):
         """ Compare block_cache object with data and update if there are differences. """
         paths = _paths_from_data(block_data['paths'])
         if block_cache.display_name != block_data['display_name'] or not paths_equal(block_cache.paths, paths):
-            log.info(u'Updating XBlockCache with usage_key: %s', unicode(block_cache.usage_key))
+            log.info('Updating XBlockCache with usage_key: %s', str(block_cache.usage_key))
             block_cache.display_name = block_data['display_name']
             block_cache.paths = paths
             block_cache.save()
@@ -123,14 +123,14 @@ def _update_xblocks_cache(course_key):
     with transaction.atomic():
         block_caches = XBlockCache.objects.filter(course_key=course_key)
         for block_cache in block_caches:
-            block_data = blocks_data.pop(unicode(block_cache.usage_key), None)
+            block_data = blocks_data.pop(str(block_cache.usage_key), None)
             if block_data:
                 update_block_cache_if_needed(block_cache, block_data)
 
-    for block_data in blocks_data.values():
+    for block_data in list(blocks_data.values()):
         with transaction.atomic():
             paths = _paths_from_data(block_data['paths'])
-            log.info(u'Creating XBlockCache with usage_key: %s', unicode(block_data['usage_key']))
+            log.info('Creating XBlockCache with usage_key: %s', str(block_data['usage_key']))
             block_cache, created = XBlockCache.objects.get_or_create(usage_key=block_data['usage_key'], defaults={
                 'course_key': course_key,
                 'display_name': block_data['display_name'],
@@ -141,7 +141,7 @@ def _update_xblocks_cache(course_key):
                 update_block_cache_if_needed(block_cache, block_data)
 
 
-@task(name=u'openedx.core.djangoapps.bookmarks.tasks.update_xblock_cache')
+@task(name='openedx.core.djangoapps.bookmarks.tasks.update_xblock_cache')
 def update_xblocks_cache(course_id):
     """
     Update the XBlocks cache for a course.
@@ -151,10 +151,10 @@ def update_xblocks_cache(course_id):
     """
     # Ideally we'd like to accept a CourseLocator; however, CourseLocator is not JSON-serializable (by default) so
     # Celery's delayed tasks fail to start. For this reason, callers should pass the course key as a Unicode string.
-    if not isinstance(course_id, basestring):
-        raise ValueError(u'course_id must be a string. {} is not acceptable.'.format(type(course_id)))
+    if not isinstance(course_id, str):
+        raise ValueError('course_id must be a string. {} is not acceptable.'.format(type(course_id)))
 
     course_key = CourseKey.from_string(course_id)
-    log.info(u'Starting XBlockCaches update for course_key: %s', course_id)
+    log.info('Starting XBlockCaches update for course_key: %s', course_id)
     _update_xblocks_cache(course_key)
-    log.info(u'Ending XBlockCaches update for course_key: %s', course_id)
+    log.info('Ending XBlockCaches update for course_key: %s', course_id)

@@ -8,9 +8,9 @@ class HiddenModule(XModule):
 
     def get_html(self):
         if self.system.user_is_staff:
-            return u"ERROR: This module is unknown--students will not see it at all"
+            return "ERROR: This module is unknown--students will not see it at all"
         else:
-            return u""
+            return ""
 
 
 class HiddenDescriptor(RawDescriptor):

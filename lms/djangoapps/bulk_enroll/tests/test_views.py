@@ -55,7 +55,7 @@ class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCa
         )
 
         self.course = CourseFactory.create()
-        self.course_key = unicode(self.course.id)
+        self.course_key = str(self.course.id)
         self.enrolled_student = UserFactory(username='EnrolledStudent', first_name='Enrolled', last_name='Student')
         CourseEnrollment.enroll(
             self.enrolled_student,
@@ -365,7 +365,7 @@ class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCa
             'courses': self.course_key
         })
         self.assertEqual(response.status_code, 400)
-        self.assertIn(u'cohort {cohort_name} not found in course {course_id}.'.format(
+        self.assertIn('cohort {cohort_name} not found in course {course_id}.'.format(
             cohort_name='cohort1', course_id=self.course_key
         ), response.content)
 

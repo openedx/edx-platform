@@ -2,7 +2,7 @@
 VerticalBlock - an XBlock which renders its children in a column.
 """
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 from copy import copy
 import logging
@@ -19,6 +19,7 @@ from xmodule.studio_editable import StudioEditableBlock
 from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.x_module import STUDENT_VIEW, PUBLIC_VIEW, XModuleFields
 from xmodule.xml_module import XmlParserMixin
+from functools import reduce
 
 log = logging.getLogger(__name__)
 
@@ -100,8 +101,8 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
             fragment_context.update({
                 'show_bookmark_button': child_context.get('show_bookmark_button', not is_child_of_vertical),
                 'bookmarked': child_context['bookmarked'],
-                'bookmark_id': u"{},{}".format(
-                    child_context['username'], unicode(self.location)),  # pylint: disable=no-member
+                'bookmark_id': "{},{}".format(
+                    child_context['username'], str(self.location)),  # pylint: disable=no-member
             })
 
         fragment.add_content(self.system.render_template('vert_module.html', fragment_context))
@@ -169,7 +170,7 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
             except Exception as exc:  # pylint: disable=broad-except
                 log.exception("Unable to load child when parsing Vertical. Continuing...")
                 if system.error_tracker is not None:
-                    system.error_tracker(u"ERROR: {0}".format(exc))
+                    system.error_tracker("ERROR: {0}".format(exc))
                 continue
         return {}, children
 

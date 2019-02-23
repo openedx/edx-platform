@@ -4,7 +4,7 @@ Provide tests for git_add_course management command.
 import logging
 import os
 import shutil
-import StringIO
+import io
 import subprocess
 import unittest
 from uuid import uuid4
@@ -66,8 +66,8 @@ class TestGitAddCourse(SharedModuleStoreTestCase):
         """
         Convenience function for testing command failures
         """
-        with self.assertRaisesRegexp(CommandError, regex):
-            call_command('git_add_course', *args, stderr=StringIO.StringIO())
+        with self.assertRaisesRegex(CommandError, regex):
+            call_command('git_add_course', *args, stderr=io.StringIO())
 
     def test_command_args(self):
         """
@@ -81,7 +81,7 @@ class TestGitAddCourse(SharedModuleStoreTestCase):
             'blah', 'blah', 'blah', 'blah')
         # Not a valid path.
         self.assertCommandFailureRegexp(
-            u'Path {0} doesn\'t exist, please create it,'.format(self.git_repo_dir),
+            'Path {0} doesn\'t exist, please create it,'.format(self.git_repo_dir),
             'blah')
         # Test successful import from command
         if not os.path.isdir(self.git_repo_dir):
@@ -204,7 +204,7 @@ class TestGitAddCourse(SharedModuleStoreTestCase):
             git_import.add_repo('file://{0}'.format(bare_repo), None, None)
 
         # Get logger for checking strings in logs
-        output = StringIO.StringIO()
+        output = io.StringIO()
         test_log_handler = logging.StreamHandler(output)
         test_log_handler.setLevel(logging.DEBUG)
         glog = git_import.log

@@ -36,12 +36,12 @@ class TestProfEdVerification(ModuleStoreTestCase):
         self.urls = {
             'course_modes_choose': reverse(
                 'course_modes_choose',
-                args=[unicode(self.course_key)]
+                args=[str(self.course_key)]
             ),
 
             'verify_student_start_flow': reverse(
                 'verify_student_start_flow',
-                args=[unicode(self.course_key)]
+                args=[str(self.course_key)]
             ) + purchase_workflow,
         }
 

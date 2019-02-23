@@ -25,8 +25,8 @@ from xblock.field_data import FieldData
 from xmodule.modulestore.inheritance import InheritanceMixin
 
 NOTSET = object()
-ENABLED_OVERRIDE_PROVIDERS_KEY = u'courseware.field_overrides.enabled_providers.{course_id}'
-ENABLED_MODULESTORE_OVERRIDE_PROVIDERS_KEY = u'courseware.modulestore_field_overrides.enabled_providers.{course_id}'
+ENABLED_OVERRIDE_PROVIDERS_KEY = 'courseware.field_overrides.enabled_providers.{course_id}'
+ENABLED_MODULESTORE_OVERRIDE_PROVIDERS_KEY = 'courseware.modulestore_field_overrides.enabled_providers.{course_id}'
 
 
 def resolve_dotted(name):
@@ -89,7 +89,7 @@ def overrides_disabled():
     return bool(_OVERRIDES_DISABLED.disabled)
 
 
-class FieldOverrideProvider(object):
+class FieldOverrideProvider(object, metaclass=ABCMeta):
     """
     Abstract class which defines the interface that a `FieldOverrideProvider`
     must provide.  In general, providers should derive from this class, but
@@ -100,7 +100,6 @@ class FieldOverrideProvider(object):
     field overrides. To set overrides, there will be a domain specific API for
     the concrete override implementation being used.
     """
-    __metaclass__ = ABCMeta
 
     def __init__(self, user, fallback_field_data):
         self.user = user
@@ -185,7 +184,7 @@ class OverrideFieldData(FieldData):
         if course is None:
             cache_key = ENABLED_OVERRIDE_PROVIDERS_KEY.format(course_id='None')
         else:
-            cache_key = ENABLED_OVERRIDE_PROVIDERS_KEY.format(course_id=unicode(course.id))
+            cache_key = ENABLED_OVERRIDE_PROVIDERS_KEY.format(course_id=str(course.id))
         enabled_providers = request_cache.data.get(cache_key, NOTSET)
         if enabled_providers == NOTSET:
             enabled_providers = tuple(
@@ -232,7 +231,7 @@ class OverrideFieldData(FieldData):
             # If this is an inheritable field and an override is set above,
             # then we want to return False here, so the field_data uses the
             # override and not the original value for this block.
-            inheritable = InheritanceMixin.fields.keys()
+            inheritable = list(InheritanceMixin.fields.keys())
             if name in inheritable:
                 for ancestor in _lineage(block):
                     if self.get_override(ancestor, name) is not NOTSET:
@@ -247,7 +246,7 @@ class OverrideFieldData(FieldData):
         # The `default` method is overloaded by the field storage system to
         # also handle inheritance.
         if self.providers and not overrides_disabled():
-            inheritable = InheritanceMixin.fields.keys()
+            inheritable = list(InheritanceMixin.fields.keys())
             if name in inheritable:
                 for ancestor in _lineage(block):
                     value = self.get_override(ancestor, name)
@@ -292,7 +291,7 @@ class OverrideModulestoreFieldData(OverrideFieldData):
         Arguments:
             block: An XBlock
         """
-        course_id = unicode(block.location.course_key)
+        course_id = str(block.location.course_key)
         cache_key = ENABLED_MODULESTORE_OVERRIDE_PROVIDERS_KEY.format(course_id=course_id)
 
         request_cache = DEFAULT_REQUEST_CACHE

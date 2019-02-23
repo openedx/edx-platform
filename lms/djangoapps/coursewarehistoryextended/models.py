@@ -62,4 +62,4 @@ class StudentModuleHistoryExtended(BaseStudentModuleHistory):
         StudentModuleHistoryExtended.objects.filter(student_module=instance).all().delete()
 
     def __unicode__(self):
-        return unicode(repr(self))
+        return str(repr(self))

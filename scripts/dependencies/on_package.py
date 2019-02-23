@@ -12,13 +12,13 @@ formatted as shown in these examples:
 This script counts on scripts/dependencies/enumerate.sh having already
 been run in order to generate a dependency data file to work from.
 """
-from __future__ import absolute_import, print_function
+
 
 import os
 import re
 import sys
 
-pattern = re.compile(u'^{}'.format(sys.argv[1]))
+pattern = re.compile('^{}'.format(sys.argv[1]))
 
 data_path = 'reports/dependencies/dependencies.txt'
 if not os.path.exists(data_path):
@@ -30,6 +30,6 @@ with open(data_path, 'r') as f:
             continue
         if pattern.search(to_name) and not pattern.search(from_name):
             # We usually don't care about dependencies between modules in site-packages
-            if from_root.endswith(u'site-packages') and to_root.endswith(u'site-packages'):
+            if from_root.endswith('site-packages') and to_root.endswith('site-packages'):
                 continue
             print(dep)

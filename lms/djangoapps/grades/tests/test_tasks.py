@@ -90,8 +90,8 @@ class HasCourseWithProblemsMixin(object):
             ('weighted_possible', 2.0),
             ('user_id', self.user.id),
             ('anonymous_user_id', 5),
-            ('course_id', unicode(self.course.id)),
-            ('usage_id', unicode(self.problem.location)),
+            ('course_id', str(self.course.id)),
+            ('usage_id', str(self.problem.location)),
             ('only_if_higher', None),
             ('modified', self.frozen_now_datetime),
             ('score_db_table', ScoreDatabaseTableEnum.courseware_student_module),
@@ -101,14 +101,14 @@ class HasCourseWithProblemsMixin(object):
 
         self.recalculate_subsection_grade_kwargs = OrderedDict([
             ('user_id', self.user.id),
-            ('course_id', unicode(self.course.id)),
-            ('usage_id', unicode(self.problem.location)),
+            ('course_id', str(self.course.id)),
+            ('usage_id', str(self.problem.location)),
             ('anonymous_user_id', 5),
             ('only_if_higher', None),
             ('expected_modified_time', self.frozen_now_timestamp),
             ('score_deleted', False),
-            ('event_transaction_id', unicode(get_event_transaction_id())),
-            ('event_transaction_type', u'edx.grades.problem.submitted'),
+            ('event_transaction_id', str(get_event_transaction_id())),
+            ('event_transaction_type', 'edx.grades.problem.submitted'),
             ('score_db_table', ScoreDatabaseTableEnum.courseware_student_module),
         ])
 
@@ -146,7 +146,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
         self.set_up_course()
         send_args = self.problem_weighted_score_changed_kwargs
         local_task_args = self.recalculate_subsection_grade_kwargs.copy()
-        local_task_args['event_transaction_type'] = u'edx.grades.problem.submitted'
+        local_task_args['event_transaction_type'] = 'edx.grades.problem.submitted'
         local_task_args['force_update_subsections'] = False
         with self.mock_csm_get_score() and patch(
             'lms.djangoapps.grades.tasks.recalculate_subsection_grade_v3.apply_async',
@@ -172,7 +172,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
             side_effect=BlockStructureNotFound(self.course.location),
         ) as mock_block_structure_create:
             self._apply_recalculate_subsection_grade()
-            self.assertEquals(mock_block_structure_create.call_count, 1)
+            self.assertEqual(mock_block_structure_create.call_count, 1)
 
     @ddt.data(
         (ModuleStoreEnum.Type.mongo, 1, 36, True),
@@ -225,7 +225,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
 
         # Make sure the signal is sent for only the 2 accessible sequentials.
         self._apply_recalculate_subsection_grade()
-        self.assertEquals(mock_subsection_signal.call_count, 2)
+        self.assertEqual(mock_subsection_signal.call_count, 2)
         sequentials_signalled = {
             args[1]['subsection_grade'].location
             for args in mock_subsection_signal.call_args_list
@@ -273,7 +273,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
         self.set_up_course()
         mock_update.side_effect = [IntegrityError("WHAMMY"), None]
         self._apply_recalculate_subsection_grade()
-        self.assertEquals(mock_course_signal.call_count, 1)
+        self.assertEqual(mock_course_signal.call_count, 1)
 
     @patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade_v3.retry')
     @patch('lms.djangoapps.grades.subsection_grade_factory.SubsectionGradeFactory.update')
@@ -315,7 +315,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
 
         self._assert_retry_called(mock_retry)
         self.assertIn(
-            u"Grades: tasks._has_database_updated_with_new_score is False.",
+            "Grades: tasks._has_database_updated_with_new_score is False.",
             mock_log.info.call_args_list[0][0][0]
         )
 
@@ -353,7 +353,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
         else:
             self._assert_retry_called(mock_retry)
             self.assertIn(
-                u"Grades: tasks._has_database_updated_with_new_score is False.",
+                "Grades: tasks._has_database_updated_with_new_score is False.",
                 mock_log.info.call_args_list[0][0][0]
             )
 
@@ -405,7 +405,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
         number of arguments.
         """
         self.assertTrue(mock_retry.called)
-        self.assertEquals(len(mock_retry.call_args[1]['kwargs']), len(self.recalculate_subsection_grade_kwargs))
+        self.assertEqual(len(mock_retry.call_args[1]['kwargs']), len(self.recalculate_subsection_grade_kwargs))
 
     def _assert_retry_not_called(self, mock_retry):
         """
@@ -424,12 +424,12 @@ class ComputeGradesForCourseTest(HasCourseWithProblemsMixin, ModuleStoreTestCase
 
     def setUp(self):
         super(ComputeGradesForCourseTest, self).setUp()
-        self.users = [UserFactory.create() for _ in xrange(12)]
+        self.users = [UserFactory.create() for _ in range(12)]
         self.set_up_course()
         for user in self.users:
             CourseEnrollment.enroll(user, self.course.id)
 
-    @ddt.data(*xrange(0, 12, 3))
+    @ddt.data(*range(0, 12, 3))
     def test_behavior(self, batch_size):
         with mock_get_score(1, 2):
             result = compute_grades_for_course_v2.delay(
@@ -447,7 +447,7 @@ class ComputeGradesForCourseTest(HasCourseWithProblemsMixin, ModuleStoreTestCase
             min(batch_size, 8)  # No more than 8 due to offset
         )
 
-    @ddt.data(*xrange(1, 12, 3))
+    @ddt.data(*range(1, 12, 3))
     def test_course_task_args(self, test_batch_size):
         offset_expected = 0
         for course_key, offset, batch_size in _course_task_args(
@@ -513,13 +513,13 @@ class FreezeGradingAfterCourseEndTest(HasCourseWithProblemsMixin, ModuleStoreTes
     """
     def setUp(self):
         super(FreezeGradingAfterCourseEndTest, self).setUp()
-        self.users = [UserFactory.create() for _ in xrange(12)]
+        self.users = [UserFactory.create() for _ in range(12)]
         self.user = self.users[0]
         self.freeze_grade_flag = waffle_flags()[ENFORCE_FREEZE_GRADE_AFTER_COURSE_END]
 
     def _assert_log(self, mock_log, method_name):
         self.assertTrue(mock_log.info.called)
-        log_message = u"Attempted {} for course '%s', but grades are frozen.".format(method_name)
+        log_message = "Attempted {} for course '%s', but grades are frozen.".format(method_name)
         self.assertIn(
             log_message,
             mock_log.info.call_args_list[0][0][0]

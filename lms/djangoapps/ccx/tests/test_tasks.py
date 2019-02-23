@@ -51,7 +51,7 @@ class TestSendCCXCoursePublished(ModuleStoreTestCase):
         """
         Call the function under test
         """
-        send_ccx_course_published(unicode(course_key))
+        send_ccx_course_published(str(course_key))
 
     def test_signal_not_sent_for_ccx(self):
         """

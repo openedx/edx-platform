@@ -1,6 +1,6 @@
 # encoding: utf-8
 """Tests of Branding API """
-from __future__ import unicode_literals
+
 
 import mock
 from django.conf import settings
@@ -119,8 +119,8 @@ class TestFooter(TestCase):
                  'title': 'Accessibility Policy'},
                 {'url': 'https://edx.org/sitemap', 'name': 'sitemap', 'title': 'Sitemap'},
                 {'name': 'media_kit',
-                 'title': u'Media Kit',
-                 'url': u'https://edx.org/media-kit'}
+                 'title': 'Media Kit',
+                 'url': 'https://edx.org/media-kit'}
             ],
             'social_links': [
                 {'url': '#', 'action': 'Like \xe9dX on Facebook', 'name': 'facebook',

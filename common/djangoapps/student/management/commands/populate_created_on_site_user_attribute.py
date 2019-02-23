@@ -51,7 +51,7 @@ class Command(BaseCommand):
         except Site.DoesNotExist:
             question = "The site you specified is not configured as a Site in the system. " \
                        "Are you sure you want to continue? (y/n):"
-            if str(raw_input(question)).lower().strip()[0] != 'y':
+            if str(input(question)).lower().strip()[0] != 'y':
                 return
 
         for user_id in user_ids:

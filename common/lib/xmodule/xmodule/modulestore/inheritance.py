@@ -1,7 +1,7 @@
 """
 Support for inheritance of fields down an XBlock hierarchy.
 """
-from __future__ import absolute_import
+
 
 from django.conf import settings
 
@@ -244,7 +244,7 @@ def compute_inherited_metadata(descriptor):
     if descriptor.has_children:
         parent_metadata = descriptor.xblock_kvs.inherited_settings.copy()
         # add any of descriptor's explicitly set fields to the inheriting list
-        for field in InheritanceMixin.fields.values():
+        for field in list(InheritanceMixin.fields.values()):
             if field.is_set_on(descriptor):
                 # inherited_settings values are json repr
                 parent_metadata[field.name] = field.read_json(descriptor)
@@ -330,7 +330,7 @@ class InheritingFieldData(KvsFieldData):
 def inheriting_field_data(kvs):
     """Create an InheritanceFieldData that inherits the names in InheritanceMixin."""
     return InheritingFieldData(
-        inheritable_names=InheritanceMixin.fields.keys(),
+        inheritable_names=list(InheritanceMixin.fields.keys()),
         kvs=kvs,
     )
 

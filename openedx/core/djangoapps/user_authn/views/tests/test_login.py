@@ -67,25 +67,25 @@ class LoginTest(CacheIsolationTestCase):
         response, mock_audit_log = self._login_response('test@edx.org', 'test_password',
                                                         patched_audit_log='student.models.AUDIT_LOG')
         self._assert_response(response, success=True)
-        self._assert_audit_log(mock_audit_log, 'info', [u'Login success', u'test@edx.org'])
+        self._assert_audit_log(mock_audit_log, 'info', ['Login success', 'test@edx.org'])
 
     @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
     def test_login_success_no_pii(self):
         response, mock_audit_log = self._login_response('test@edx.org', 'test_password',
                                                         patched_audit_log='student.models.AUDIT_LOG')
         self._assert_response(response, success=True)
-        self._assert_audit_log(mock_audit_log, 'info', [u'Login success'])
-        self._assert_not_in_audit_log(mock_audit_log, 'info', [u'test@edx.org'])
+        self._assert_audit_log(mock_audit_log, 'info', ['Login success'])
+        self._assert_not_in_audit_log(mock_audit_log, 'info', ['test@edx.org'])
 
     def test_login_success_unicode_email(self):
-        unicode_email = u'test' + unichr(40960) + u'@edx.org'
+        unicode_email = 'test' + chr(40960) + '@edx.org'
         self.user.email = unicode_email
         self.user.save()
 
         response, mock_audit_log = self._login_response(unicode_email, 'test_password',
                                                         patched_audit_log='student.models.AUDIT_LOG')
         self._assert_response(response, success=True)
-        self._assert_audit_log(mock_audit_log, 'info', [u'Login success', unicode_email])
+        self._assert_audit_log(mock_audit_log, 'info', ['Login success', unicode_email])
 
     def test_last_login_updated(self):
         old_last_login = self.user.last_login
@@ -101,35 +101,35 @@ class LoginTest(CacheIsolationTestCase):
             assert old_last_login == self.user.last_login
 
     def test_login_fail_no_user_exists(self):
-        nonexistent_email = u'not_a_user@edx.org'
+        nonexistent_email = 'not_a_user@edx.org'
         response, mock_audit_log = self._login_response(
             nonexistent_email,
             'test_password',
         )
         self._assert_response(response, success=False,
                               value='Email or password is incorrect')
-        self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Unknown user email', nonexistent_email])
+        self._assert_audit_log(mock_audit_log, 'warning', ['Login failed', 'Unknown user email', nonexistent_email])
 
     def test_login_fail_incorrect_email(self):
-        nonexistent_email = u'not_a_user@edx.org'
+        nonexistent_email = 'not_a_user@edx.org'
         response, mock_audit_log = self._login_response(
             nonexistent_email,
             'test_password',
         )
         self._assert_response(response, success=False,
                               value='Email or password is incorrect')
-        self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Unknown user email', nonexistent_email])
+        self._assert_audit_log(mock_audit_log, 'warning', ['Login failed', 'Unknown user email', nonexistent_email])
 
     @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
     def test_login_fail_no_user_exists_no_pii(self):
-        nonexistent_email = u'not_a_user@edx.org'
+        nonexistent_email = 'not_a_user@edx.org'
         response, mock_audit_log = self._login_response(
             nonexistent_email,
             'test_password',
         )
         self._assert_response(response, success=False,
                               value='Email or password is incorrect')
-        self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Unknown user email'])
+        self._assert_audit_log(mock_audit_log, 'warning', ['Login failed', 'Unknown user email'])
         self._assert_not_in_audit_log(mock_audit_log, 'warning', [nonexistent_email])
 
     def test_login_fail_wrong_password(self):
@@ -140,7 +140,7 @@ class LoginTest(CacheIsolationTestCase):
         self._assert_response(response, success=False,
                               value='Email or password is incorrect')
         self._assert_audit_log(mock_audit_log, 'warning',
-                               [u'Login failed', u'password for', u'test@edx.org', u'invalid'])
+                               ['Login failed', 'password for', 'test@edx.org', 'invalid'])
 
     @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
     def test_login_fail_wrong_password_no_pii(self):
@@ -150,8 +150,8 @@ class LoginTest(CacheIsolationTestCase):
         )
         self._assert_response(response, success=False,
                               value='Email or password is incorrect')
-        self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'password for', u'invalid'])
-        self._assert_not_in_audit_log(mock_audit_log, 'warning', [u'test@edx.org'])
+        self._assert_audit_log(mock_audit_log, 'warning', ['Login failed', 'password for', 'invalid'])
+        self._assert_not_in_audit_log(mock_audit_log, 'warning', ['test@edx.org'])
 
     def test_login_not_activated(self):
         # De-activate the user
@@ -165,7 +165,7 @@ class LoginTest(CacheIsolationTestCase):
         )
         self._assert_response(response, success=False,
                               value="In order to sign in, you need to activate your account.")
-        self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Account not active for user'])
+        self._assert_audit_log(mock_audit_log, 'warning', ['Login failed', 'Account not active for user'])
 
     @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
     def test_login_not_activated_no_pii(self):
@@ -180,27 +180,27 @@ class LoginTest(CacheIsolationTestCase):
         )
         self._assert_response(response, success=False,
                               value="In order to sign in, you need to activate your account.")
-        self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Account not active for user'])
-        self._assert_not_in_audit_log(mock_audit_log, 'warning', [u'test'])
+        self._assert_audit_log(mock_audit_log, 'warning', ['Login failed', 'Account not active for user'])
+        self._assert_not_in_audit_log(mock_audit_log, 'warning', ['test'])
 
     def test_login_unicode_email(self):
-        unicode_email = u'test@edx.org' + unichr(40960)
+        unicode_email = 'test@edx.org' + chr(40960)
         response, mock_audit_log = self._login_response(
             unicode_email,
             'test_password',
         )
         self._assert_response(response, success=False)
-        self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', unicode_email])
+        self._assert_audit_log(mock_audit_log, 'warning', ['Login failed', unicode_email])
 
     def test_login_unicode_password(self):
-        unicode_password = u'test_password' + unichr(1972)
+        unicode_password = 'test_password' + chr(1972)
         response, mock_audit_log = self._login_response(
             'test@edx.org',
             unicode_password,
         )
         self._assert_response(response, success=False)
         self._assert_audit_log(mock_audit_log, 'warning',
-                               [u'Login failed', u'password for', u'test@edx.org', u'invalid'])
+                               ['Login failed', 'password for', 'test@edx.org', 'invalid'])
 
     def test_logout_logging(self):
         response, _ = self._login_response('test@edx.org', 'test_password')
@@ -209,7 +209,7 @@ class LoginTest(CacheIsolationTestCase):
         with patch('student.models.AUDIT_LOG') as mock_audit_log:
             response = self.client.post(logout_url)
         self.assertEqual(response.status_code, 200)
-        self._assert_audit_log(mock_audit_log, 'info', [u'Logout', u'test'])
+        self._assert_audit_log(mock_audit_log, 'info', ['Logout', 'test'])
 
     def test_login_user_info_cookie(self):
         response, _ = self._login_response('test@edx.org', 'test_password')
@@ -223,7 +223,7 @@ class LoginTest(CacheIsolationTestCase):
         self.assertEqual(user_info["username"], self.user.username)
 
         # Check that the URLs are absolute
-        for url in user_info["header_urls"].values():
+        for url in list(user_info["header_urls"].values()):
             self.assertIn("http://testserver/", url)
 
     def test_logout_deletes_mktg_cookies(self):
@@ -245,8 +245,8 @@ class LoginTest(CacheIsolationTestCase):
             self.assertIn("01-Jan-1970", cookie.get('expires'))
 
     @override_settings(
-        EDXMKTG_LOGGED_IN_COOKIE_NAME=u"unicode-logged-in",
-        EDXMKTG_USER_INFO_COOKIE_NAME=u"unicode-user-info",
+        EDXMKTG_LOGGED_IN_COOKIE_NAME="unicode-logged-in",
+        EDXMKTG_USER_INFO_COOKIE_NAME="unicode-user-info",
     )
     def test_unicode_mktg_cookie_names(self):
         # When logged in cookie names are loaded from JSON files, they may
@@ -269,14 +269,14 @@ class LoginTest(CacheIsolationTestCase):
         with patch('student.models.AUDIT_LOG') as mock_audit_log:
             response = self.client.post(logout_url)
         self.assertEqual(response.status_code, 200)
-        self._assert_audit_log(mock_audit_log, 'info', [u'Logout'])
-        self._assert_not_in_audit_log(mock_audit_log, 'info', [u'test'])
+        self._assert_audit_log(mock_audit_log, 'info', ['Logout'])
+        self._assert_not_in_audit_log(mock_audit_log, 'info', ['test'])
 
     def test_login_ratelimited_success(self):
         # Try (and fail) logging in with fewer attempts than the limit of 30
         # and verify that you can still successfully log in afterwards.
-        for i in xrange(20):
-            password = u'test_password{0}'.format(i)
+        for i in range(20):
+            password = 'test_password{0}'.format(i)
             response, _audit_log = self._login_response('test@edx.org', password)
             self._assert_response(response, success=False)
         # now try logging in with a valid password
@@ -286,8 +286,8 @@ class LoginTest(CacheIsolationTestCase):
     def test_login_ratelimited(self):
         # try logging in 30 times, the default limit in the number of failed
         # login attempts in one 5 minute period before the rate gets limited
-        for i in xrange(30):
-            password = u'test_password{0}'.format(i)
+        for i in range(30):
+            password = 'test_password{0}'.format(i)
             self._login_response('test@edx.org', password)
         # check to see if this response indicates that this was ratelimited
         response, _audit_log = self._login_response('test@edx.org', 'wrong_password')
@@ -489,12 +489,12 @@ class LoginTest(CacheIsolationTestCase):
 
     @ddt.data(
         ('test_password', 'test_password', True),
-        (unicodedata.normalize('NFKD', u'Ṗŕệṿïệẅ Ṯệẍt'),
-         unicodedata.normalize('NFKC', u'Ṗŕệṿïệẅ Ṯệẍt'), False),
-        (unicodedata.normalize('NFKC', u'Ṗŕệṿïệẅ Ṯệẍt'),
-         unicodedata.normalize('NFKD', u'Ṗŕệṿïệẅ Ṯệẍt'), True),
-        (unicodedata.normalize('NFKD', u'Ṗŕệṿïệẅ Ṯệẍt'),
-         unicodedata.normalize('NFKD', u'Ṗŕệṿïệẅ Ṯệẍt'), False),
+        (unicodedata.normalize('NFKD', 'Ṗŕệṿïệẅ Ṯệẍt'),
+         unicodedata.normalize('NFKC', 'Ṗŕệṿïệẅ Ṯệẍt'), False),
+        (unicodedata.normalize('NFKC', 'Ṗŕệṿïệẅ Ṯệẍt'),
+         unicodedata.normalize('NFKD', 'Ṗŕệṿïệẅ Ṯệẍt'), True),
+        (unicodedata.normalize('NFKD', 'Ṗŕệṿïệẅ Ṯệẍt'),
+         unicodedata.normalize('NFKD', 'Ṗŕệṿïệẅ Ṯệẍt'), False),
     )
     @ddt.unpack
     def test_password_unicode_normalization_login(self, password, password_entered, login_success):
@@ -535,15 +535,15 @@ class LoginTest(CacheIsolationTestCase):
         try:
             response_dict = json.loads(response.content)
         except ValueError:
-            self.fail(u"Could not parse response content as JSON: %s"
+            self.fail("Could not parse response content as JSON: %s"
                       % str(response.content))
 
         if success is not None:
             self.assertEqual(response_dict['success'], success)
 
         if value is not None:
-            msg = (u"'%s' did not contain '%s'" %
-                   (unicode(response_dict['value']), unicode(value)))
+            msg = ("'%s' did not contain '%s'" %
+                   (str(response_dict['value']), str(value)))
             self.assertIn(value, response_dict['value'], msg)
 
     def _assert_audit_log(self, mock_audit_log, level, log_strings):
@@ -552,8 +552,8 @@ class LoginTest(CacheIsolationTestCase):
         """
         method_calls = mock_audit_log.method_calls
         name, args, _kwargs = method_calls[-1]
-        self.assertEquals(name, level)
-        self.assertEquals(len(args), 1)
+        self.assertEqual(name, level)
+        self.assertEqual(len(args), 1)
         format_string = args[0]
         for log_string in log_strings:
             self.assertIn(log_string, format_string)
@@ -564,8 +564,8 @@ class LoginTest(CacheIsolationTestCase):
         """
         method_calls = mock_audit_log.method_calls
         name, args, _kwargs = method_calls[-1]
-        self.assertEquals(name, level)
-        self.assertEquals(len(args), 1)
+        self.assertEqual(name, level)
+        self.assertEqual(len(args), 1)
         format_string = args[0]
         for log_string in log_strings:
             self.assertNotIn(log_string, format_string)
@@ -636,7 +636,7 @@ class ExternalAuthShibTest(ModuleStoreTestCase):
         noshib_response = self.client.get(target_url, follow=True, HTTP_ACCEPT="text/html")
         self.assertEqual(noshib_response.redirect_chain[-1],
                          ('/login?next={url}'.format(url=target_url), 302))
-        self.assertContains(noshib_response, (u"Sign in or Register | {platform_name}"
+        self.assertContains(noshib_response, ("Sign in or Register | {platform_name}"
                                               .format(platform_name=settings.PLATFORM_NAME)))
         self.assertEqual(noshib_response.status_code, 200)
 

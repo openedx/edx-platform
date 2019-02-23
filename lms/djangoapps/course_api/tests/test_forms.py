@@ -3,7 +3,7 @@ Tests for Course API forms.
 """
 
 from itertools import product
-from urllib import urlencode
+from urllib.parse import urlencode
 
 import ddt
 from django.contrib.auth.models import AnonymousUser
@@ -125,7 +125,7 @@ class TestCourseDetailGetForm(FormTestMixin, UsernameTestMixin, SharedModuleStor
         self.form_data = QueryDict(
             urlencode({
                 'username': user.username,
-                'course_key': unicode(self.course.id),
+                'course_key': str(self.course.id),
             }),
             mutable=True,
         )

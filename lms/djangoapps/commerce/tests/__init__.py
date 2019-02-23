@@ -63,7 +63,7 @@ class EdxRestApiClientTest(TestCase):
                 }
             }
             expected_jwt = create_jwt_for_user(self.user, additional_claims=claims)
-            expected_header = u'JWT {}'.format(expected_jwt)
+            expected_header = 'JWT {}'.format(expected_jwt)
             self.assertEqual(actual_header, expected_header)
 
     @httpretty.activate
@@ -82,4 +82,4 @@ class EdxRestApiClientTest(TestCase):
             adding_headers={'Content-Type': JSON},
         )
         actual_object = ecommerce_api_client(self.user).baskets(1).order.get()
-        self.assertEqual(actual_object, {u"result": u"Préparatoire"})
+        self.assertEqual(actual_object, {"result": "Préparatoire"})

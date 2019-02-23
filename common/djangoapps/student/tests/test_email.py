@@ -48,7 +48,7 @@ def mock_render_to_string(template_name, context):
     """
     Return a string that encodes template_name and context
     """
-    return str((template_name, sorted(context.iteritems())))
+    return str((template_name, sorted(context.items())))
 
 
 def mock_render_to_response(template_name, context):
@@ -96,16 +96,16 @@ class ActivationEmailTests(CacheIsolationTestCase):
     Test sending of the activation email.
     """
 
-    ACTIVATION_SUBJECT = u"Action Required: Activate your {} account".format(settings.PLATFORM_NAME)
+    ACTIVATION_SUBJECT = "Action Required: Activate your {} account".format(settings.PLATFORM_NAME)
 
     # Text fragments we expect in the body of an email
     # sent from an OpenEdX installation.
     OPENEDX_FRAGMENTS = [
-        u"high-quality {platform} courses".format(platform=settings.PLATFORM_NAME),
+        "high-quality {platform} courses".format(platform=settings.PLATFORM_NAME),
         "http://edx.org/activate/",
         (
-            u"please use our web form at "
-            u"{support_url} ".format(support_url=settings.SUPPORT_SITE_LINK)
+            "please use our web form at "
+            "{support_url} ".format(support_url=settings.SUPPORT_SITE_LINK)
         )
     ]
 
@@ -134,7 +134,7 @@ class ActivationEmailTests(CacheIsolationTestCase):
         resp = self.client.post(url, params)
         self.assertEqual(
             resp.status_code, 200,
-            msg=u"Could not create account (status {status}). The response was {response}".format(
+            msg="Could not create account (status {status}). The response was {response}".format(
                 status=resp.status_code,
                 response=resp.content
             )
@@ -173,8 +173,8 @@ class ActivationEmailTests(CacheIsolationTestCase):
                         with patch('third_party_auth.is_enabled', return_value=True):
                             reg.skip_email_verification = True
                             inactive_user_view(request)
-                            self.assertEquals(user.is_active, True)
-                            self.assertEquals(email.called, False, msg='method should not have been called')
+                            self.assertEqual(user.is_active, True)
+                            self.assertEqual(email.called, False, msg='method should not have been called')
 
     @patch('student.tasks.log')
     def test_send_email_to_inactive_user(self, mock_log):
@@ -314,7 +314,7 @@ class EmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, CacheIsolat
         Assert that `response_data` indicates a failed request that returns `expected_error`
         """
         self.assertFalse(response_data['success'])
-        self.assertEquals(expected_error, response_data['error'])
+        self.assertEqual(expected_error, response_data['error'])
         self.assertFalse(self.user.email_user.called)
 
     @patch('student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
@@ -354,7 +354,7 @@ class EmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, CacheIsolat
         Test the return value if sending the email for the user to click fails.
         """
         send_mail.side_effect = [Exception, None]
-        with self.assertRaisesRegexp(ValueError, 'Unable to send email activation link. Please try again later.'):
+        with self.assertRaisesRegex(ValueError, 'Unable to send email activation link. Please try again later.'):
             self.do_email_change(self.user, "valid@email.com")
 
         self.assert_no_events_were_emitted()
@@ -370,24 +370,24 @@ class EmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, CacheIsolat
         self.do_email_change(self.user, new_email, registration_key)
 
         self._assert_email(
-            subject=u'Request to change édX account e-mail',
+            subject='Request to change édX account e-mail',
             body_fragments=[
-                u'We received a request to change the e-mail associated with',
-                u'your édX account from {old_email} to {new_email}.'.format(
+                'We received a request to change the e-mail associated with',
+                'your édX account from {old_email} to {new_email}.'.format(
                     old_email=old_email,
                     new_email=new_email,
                 ),
-                u'If this is correct, please confirm your new e-mail address by visiting:',
-                u'http://edx.org/email_confirm/{key}'.format(key=registration_key),
-                u'If you didn\'t request this, you don\'t need to do anything;',
-                u'you won\'t receive any more email from us.',
-                u'Please do not reply to this e-mail; if you require assistance,',
-                u'check the help section of the édX web site.',
+                'If this is correct, please confirm your new e-mail address by visiting:',
+                'http://edx.org/email_confirm/{key}'.format(key=registration_key),
+                'If you didn\'t request this, you don\'t need to do anything;',
+                'you won\'t receive any more email from us.',
+                'Please do not reply to this e-mail; if you require assistance,',
+                'check the help section of the édX web site.',
             ],
         )
 
         self.assert_event_emitted(
-            SETTING_CHANGE_INITIATED, user_id=self.user.id, setting=u'email', old=old_email, new=new_email
+            SETTING_CHANGE_INITIATED, user_id=self.user.id, setting='email', old=old_email, new=new_email
         )
 
     def _assert_email(self, subject, body_fragments):
@@ -442,9 +442,9 @@ class EmailChangeConfirmationTests(EmailTestMixin, CacheIsolationMixin, Transact
         """
         Assert that no changes to user, profile, or pending email have been made to the db
         """
-        self.assertEquals(self.user.email, User.objects.get(username=self.user.username).email)
-        self.assertEquals(self.profile.meta, UserProfile.objects.get(user=self.user).meta)
-        self.assertEquals(1, PendingEmailChange.objects.count())
+        self.assertEqual(self.user.email, User.objects.get(username=self.user.username).email)
+        self.assertEqual(self.profile.meta, UserProfile.objects.get(user=self.user).meta)
+        self.assertEqual(1, PendingEmailChange.objects.count())
 
     def assertFailedBeforeEmailing(self, email_user):
         """
@@ -463,7 +463,7 @@ class EmailChangeConfirmationTests(EmailTestMixin, CacheIsolationMixin, Transact
             generate the content
         """
         response = confirm_email_change(self.request, self.key)
-        self.assertEquals(
+        self.assertEqual(
             mock_render_to_response(expected_template, expected_context).content,
             response.content
         )
@@ -533,12 +533,12 @@ class EmailChangeConfirmationTests(EmailTestMixin, CacheIsolationMixin, Transact
         self.assertChangeEmailSent(email_user)
         meta = json.loads(UserProfile.objects.get(user=self.user).meta)
         self.assertIn('old_emails', meta)
-        self.assertEquals(self.user.email, meta['old_emails'][0][0])
-        self.assertEquals(
+        self.assertEqual(self.user.email, meta['old_emails'][0][0])
+        self.assertEqual(
             self.pending_change_request.new_email,
             User.objects.get(username=self.user.username).email
         )
-        self.assertEquals(0, PendingEmailChange.objects.count())
+        self.assertEqual(0, PendingEmailChange.objects.count())
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
     def test_prevent_auth_user_writes(self, email_user):  # pylint: disable=unused-argument
@@ -621,7 +621,7 @@ class SecondaryEmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, Ca
         Assert that `response_data` indicates a failed request that returns `expected_error`
         """
         self.assertFalse(response_data['success'])
-        self.assertEquals(expected_error, response_data['error'])
+        self.assertEqual(expected_error, response_data['error'])
         self.assertFalse(self.user.email_user.called)
 
     def test_invalid_emails(self):
@@ -638,7 +638,7 @@ class SecondaryEmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, Ca
         Test the return value if sending the email for the user to click fails.
         """
         send_mail.side_effect = [Exception, None]
-        with self.assertRaisesRegexp(ValueError, 'Unable to send email activation link. Please try again later.'):
+        with self.assertRaisesRegex(ValueError, 'Unable to send email activation link. Please try again later.'):
             self.do_secondary_email_change(self.user, "valid@email.com")
 
         self.assert_no_events_were_emitted()
@@ -653,14 +653,14 @@ class SecondaryEmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, Ca
         self.do_secondary_email_change(self.user, new_email, registration_key)
 
         self._assert_email(
-            subject=u'Confirm your recovery email for édX',
+            subject='Confirm your recovery email for édX',
             body_fragments=[
-                u'You\'ve registered this recovery email address for édX.'.format(
+                'You\'ve registered this recovery email address for édX.'.format(
                     new_email=new_email,
                 ),
-                u'If you set this email address, click "confirm email."',
-                u'If you didn\'t request this change, you can disregard this email.',
-                u'http://edx.org/activate_secondary_email/{key}'.format(key=registration_key),
+                'If you set this email address, click "confirm email."',
+                'If you didn\'t request this change, you can disregard this email.',
+                'http://edx.org/activate_secondary_email/{key}'.format(key=registration_key),
 
             ],
         )

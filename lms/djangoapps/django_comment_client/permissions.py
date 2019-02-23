@@ -100,7 +100,7 @@ def _check_condition(user, condition, content):
         try:
             commentable_id = content['commentable_id']
             request_cache_dict = DEFAULT_REQUEST_CACHE.data
-            cache_key = u"django_comment_client.check_team_member.{}.{}".format(user.id, commentable_id)
+            cache_key = "django_comment_client.check_team_member.{}.{}".format(user.id, commentable_id)
             if cache_key in request_cache_dict:
                 return request_cache_dict[cache_key]
             team = get_team(commentable_id)
@@ -134,7 +134,7 @@ def _check_conditions_permissions(user, permissions, course_id, content, user_gr
     """
 
     def test(user, per, operator="or"):
-        if isinstance(per, basestring):
+        if isinstance(per, str):
             if per in CONDITIONS:
                 return _check_condition(user, per, content)
             if 'group_' in per:
@@ -200,5 +200,5 @@ def check_permissions_by_view(user, course_id, content, name, group_id=None, con
     try:
         p = VIEW_PERMISSIONS[name]
     except KeyError:
-        logging.warning(u"Permission for view named %s does not exist in permissions.py", name)
+        logging.warning("Permission for view named %s does not exist in permissions.py", name)
     return _check_conditions_permissions(user, p, course_id, content, group_id, content_user_group)

@@ -9,11 +9,11 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_oauth.authentication import OAuth2Authentication
 
 
-OAUTH2_TOKEN_ERROR = u'token_error'
-OAUTH2_TOKEN_ERROR_EXPIRED = u'token_expired'
-OAUTH2_TOKEN_ERROR_MALFORMED = u'token_malformed'
-OAUTH2_TOKEN_ERROR_NONEXISTENT = u'token_nonexistent'
-OAUTH2_TOKEN_ERROR_NOT_PROVIDED = u'token_not_provided'
+OAUTH2_TOKEN_ERROR = 'token_error'
+OAUTH2_TOKEN_ERROR_EXPIRED = 'token_expired'
+OAUTH2_TOKEN_ERROR_MALFORMED = 'token_malformed'
+OAUTH2_TOKEN_ERROR_NONEXISTENT = 'token_nonexistent'
+OAUTH2_TOKEN_ERROR_NOT_PROVIDED = 'token_not_provided'
 
 
 log = logging.getLogger(__name__)
@@ -57,8 +57,8 @@ class OAuth2AuthenticationAllowInactiveUser(OAuth2Authentication):
                 else:
                     error_code = OAUTH2_TOKEN_ERROR
             raise AuthenticationFailed({
-                u'error_code': error_code,
-                u'developer_message': developer_message
+                'error_code': error_code,
+                'developer_message': developer_message
             })
 
     def authenticate_credentials(self, request, access_token):
@@ -72,13 +72,13 @@ class OAuth2AuthenticationAllowInactiveUser(OAuth2Authentication):
         token = self.get_access_token(access_token)
         if not token:
             raise AuthenticationFailed({
-                u'error_code': OAUTH2_TOKEN_ERROR_NONEXISTENT,
-                u'developer_message': u'The provided access token does not match any valid tokens.'
+                'error_code': OAUTH2_TOKEN_ERROR_NONEXISTENT,
+                'developer_message': 'The provided access token does not match any valid tokens.'
             })
         elif token.expires < django.utils.timezone.now():
             raise AuthenticationFailed({
-                u'error_code': OAUTH2_TOKEN_ERROR_EXPIRED,
-                u'developer_message': u'The provided access token has expired and is no longer valid.',
+                'error_code': OAUTH2_TOKEN_ERROR_EXPIRED,
+                'developer_message': 'The provided access token has expired and is no longer valid.',
             })
         else:
             return token.user, token

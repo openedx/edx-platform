@@ -22,7 +22,7 @@ class NoteChild(PageObject):
         """
         Return `selector`, but limited to this particular `NoteChild` context
         """
-        return u"{}#{} {}".format(
+        return "{}#{} {}".format(
             self.BODY_SELECTOR,
             self.item_id,
             selector,
@@ -101,7 +101,7 @@ class EdxNotesTagsGroup(NoteChild, EdxNotesGroupMixin):
         top_script = "return " + title_selector + ".getBoundingClientRect().top;"
         EmptyPromise(
             lambda: 8 < self.browser.execute_script(top_script) < 12,
-            u"Expected tag title '{}' to scroll to top, but was at location {}".format(
+            "Expected tag title '{}' to scroll to top, but was at location {}".format(
                 self.title, self.browser.execute_script(top_script)
             )
         ).fulfill()
@@ -177,7 +177,7 @@ class EdxNotesPageView(PageObject):
         try:
             return self.wait_for_page()
         except BrokenPromise:
-            raise PageLoadError(u"Timed out waiting to load page '{!r}'".format(self))
+            raise PageLoadError("Timed out waiting to load page '{!r}'".format(self))
 
     def is_browser_on_page(self):
         return all([
@@ -191,13 +191,13 @@ class EdxNotesPageView(PageObject):
         """
         Indicates if tab is closable or not.
         """
-        return self.q(css=u"{} .action-close".format(self.TAB_SELECTOR)).present
+        return self.q(css="{} .action-close".format(self.TAB_SELECTOR)).present
 
     def close(self):
         """
         Closes the tab.
         """
-        self.q(css=u"{} .action-close".format(self.TAB_SELECTOR)).first.click()
+        self.q(css="{} .action-close".format(self.TAB_SELECTOR)).first.click()
 
     @property
     def children(self):
@@ -296,7 +296,7 @@ class EdxNotesPage(CoursePage, PaginatedUIMixin):
         """
         tabs = self.q(css=".tabs .tab-label")
         if tabs:
-            return map(lambda x: x.replace("Current tab\n", ""), tabs.text)
+            return [x.replace("Current tab\n", "") for x in tabs.text]
         else:
             return None
 
@@ -652,7 +652,7 @@ class EdxNoteHighlight(NoteChild):
         label_exists = False
         EmptyPromise(
             lambda: len(self.q(css=self._bounded_selector("li.annotator-item > label.sr"))) > sr_index,
-            u"Expected more than '{}' sr labels".format(sr_index)
+            "Expected more than '{}' sr labels".format(sr_index)
         ).fulfill()
         annotator_field_label = self.q(css=self._bounded_selector("li.annotator-item > label.sr"))[sr_index]
         for_attrib_correct = annotator_field_label.get_attribute("for") == "annotator-field-" + str(field_index)

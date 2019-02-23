@@ -129,7 +129,7 @@ class SubmitFeedbackTest(EnterpriseServiceMockMixin, TestCase):
         the invalid field and an error message, and the Zendesk API should not
         have been invoked.
         """
-        filtered_fields = {k: v for (k, v) in fields.items() if k != omit_field}
+        filtered_fields = {k: v for (k, v) in list(fields.items()) if k != omit_field}
         resp = self._build_and_run_request(user, filtered_fields)
         self._assert_bad_request(resp, omit_field, zendesk_mock_class)
 

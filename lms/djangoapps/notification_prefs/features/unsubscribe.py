@@ -8,18 +8,18 @@ USERNAME = "robot"
 UNSUB_TOKEN = "av9E-14sAP1bVBRCPbrTHQ=="
 
 
-@step(u"I have notifications enabled")
+@step("I have notifications enabled")
 def enable_notifications(step_):
     user = User.objects.get(username=USERNAME)
     set_user_preference(user, NOTIFICATION_PREF_KEY, UNSUB_TOKEN)
 
 
-@step(u"I access my unsubscribe url")
+@step("I access my unsubscribe url")
 def access_unsubscribe_url(step_):
     world.visit("/notification_prefs/unsubscribe/{0}/".format(UNSUB_TOKEN))
 
 
-@step(u"my notifications should be disabled")
+@step("my notifications should be disabled")
 def notifications_should_be_disabled(step_):
     user = User.objects.get(username=USERNAME)
     assert not get_user_preference(user, NOTIFICATION_PREF_KEY)

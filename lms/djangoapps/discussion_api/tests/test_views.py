@@ -1,11 +1,11 @@
 """
 Tests for Discussion API views
 """
-from __future__ import unicode_literals
+
 
 import json
 from datetime import datetime
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 import ddt
 import httpretty
@@ -1842,12 +1842,12 @@ class CourseDiscussionSettingsAPIViewTest(APITestCase, UrlResetMixin, ModuleStor
     def _get_expected_response(self):
         """Return the default expected response before any changes to the discussion settings."""
         return {
-            u'always_divide_inline_discussions': False,
-            u'divided_inline_discussions': [],
-            u'divided_course_wide_discussions': [],
-            u'id': 1,
-            u'division_scheme': u'cohort',
-            u'available_division_schemes': [u'cohort']
+            'always_divide_inline_discussions': False,
+            'divided_inline_discussions': [],
+            'divided_course_wide_discussions': [],
+            'id': 1,
+            'division_scheme': 'cohort',
+            'available_division_schemes': ['cohort']
         }
 
     def patch_request(self, data, headers=None):

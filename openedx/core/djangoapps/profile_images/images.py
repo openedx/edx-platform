@@ -3,7 +3,7 @@ Image file manipulation functions related to profile images.
 """
 from collections import namedtuple
 from contextlib import closing
-from cStringIO import StringIO
+from io import StringIO
 
 import piexif
 from django.conf import settings
@@ -63,7 +63,7 @@ def create_profile_images(image_file, profile_image_names):
     image = _set_color_mode_to_rgb(original)
     image = _crop_image_to_square(image)
 
-    for size, name in profile_image_names.items():
+    for size, name in list(profile_image_names.items()):
         scaled = _scale_image(image, size)
         exif = _get_corrected_exif(scaled, original)
         with closing(_create_image_file(scaled, exif)) as scaled_image_file:
@@ -75,7 +75,7 @@ def remove_profile_images(profile_image_names):
     Physically remove the image files specified in `profile_image_names`
     """
     storage = get_profile_image_storage()
-    for name in profile_image_names.values():
+    for name in list(profile_image_names.values()):
         storage.delete(name)
 
 
@@ -92,25 +92,25 @@ def validate_uploaded_image(uploaded_file):
 
     if uploaded_file.size > settings.PROFILE_IMAGE_MAX_BYTES:
         file_upload_too_large = _(
-            u'The file must be smaller than {image_max_size} in size.'
+            'The file must be smaller than {image_max_size} in size.'
         ).format(
             image_max_size=_user_friendly_size(settings.PROFILE_IMAGE_MAX_BYTES)
         )
         raise ImageValidationError(file_upload_too_large)
     elif uploaded_file.size < settings.PROFILE_IMAGE_MIN_BYTES:
         file_upload_too_small = _(
-            u'The file must be at least {image_min_size} in size.'
+            'The file must be at least {image_min_size} in size.'
         ).format(
             image_min_size=_user_friendly_size(settings.PROFILE_IMAGE_MIN_BYTES)
         )
         raise ImageValidationError(file_upload_too_small)
 
     # check the file extension looks acceptable
-    filename = unicode(uploaded_file.name).lower()
+    filename = str(uploaded_file.name).lower()
     filetype = [ft for ft in IMAGE_TYPES if any(filename.endswith(ext) for ext in IMAGE_TYPES[ft].extensions)]
     if not filetype:
         file_upload_bad_type = _(
-            u'The file must be one of the following types: {valid_file_types}.'
+            'The file must be one of the following types: {valid_file_types}.'
         ).format(valid_file_types=_get_valid_file_types())
         raise ImageValidationError(file_upload_bad_type)
     filetype = filetype[0]
@@ -118,8 +118,8 @@ def validate_uploaded_image(uploaded_file):
     # check mimetype matches expected file type
     if uploaded_file.content_type not in IMAGE_TYPES[filetype].mimetypes:
         file_upload_bad_mimetype = _(
-            u'The Content-Type header for this file does not match '
-            u'the file data. The file may be corrupted.'
+            'The Content-Type header for this file does not match '
+            'the file data. The file may be corrupted.'
         )
         raise ImageValidationError(file_upload_bad_mimetype)
 
@@ -127,8 +127,8 @@ def validate_uploaded_image(uploaded_file):
     headers = IMAGE_TYPES[filetype].magic
     if uploaded_file.read(len(headers[0]) / 2).encode('hex') not in headers:
         file_upload_bad_ext = _(
-            u'The file name extension for this file does not match '
-            u'the file data. The file may be corrupted.'
+            'The file name extension for this file does not match '
+            'the file data. The file may be corrupted.'
         )
         raise ImageValidationError(file_upload_bad_ext)
     # avoid unexpected errors from subsequent modules expecting the fp to be at 0
@@ -223,7 +223,7 @@ def _get_valid_file_types():
     """
     Return comma separated string of valid file types.
     """
-    return ', '.join([', '.join(IMAGE_TYPES[ft].extensions) for ft in IMAGE_TYPES.keys()])
+    return ', '.join([', '.join(IMAGE_TYPES[ft].extensions) for ft in list(IMAGE_TYPES.keys())])
 
 
 def _user_friendly_size(size):
@@ -241,4 +241,4 @@ def _user_friendly_size(size):
     while size >= 1024 and i < len(units):
         size /= 1024
         i += 1
-    return u'{} {}'.format(size, units[i])
+    return '{} {}'.format(size, units[i])

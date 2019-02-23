@@ -1,5 +1,5 @@
 """Admin views for API managment."""
-from __future__ import absolute_import
+
 from config_models.admin import ConfigurationModelAdmin
 from django.contrib import admin
 from django.urls import reverse
@@ -32,9 +32,9 @@ class ApiAccessRequestAdmin(admin.ModelAdmin):
             },),
             ('Status', {
                 'description': Text(_(
-                    u'Once you have approved this request, go to {catalog_admin_url} to set up a catalog for this user.'
+                    'Once you have approved this request, go to {catalog_admin_url} to set up a catalog for this user.'
                 )).format(
-                    catalog_admin_url=HTML(u'<a href="{0}">{0}</a>').format(reverse('api_admin:catalog-search'))
+                    catalog_admin_url=HTML('<a href="{0}">{0}</a>').format(reverse('api_admin:catalog-search'))
                 ),
                 'fields': ('status',),
             }),

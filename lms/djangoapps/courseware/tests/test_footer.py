@@ -65,7 +65,7 @@ class TestFooter(TestCase):
     )
     def test_edx_footer_social_links(self):
         resp = self.client.get('/')
-        for name, url in self.SOCIAL_MEDIA_URLS.iteritems():
+        for name, url in self.SOCIAL_MEDIA_URLS.items():
             self.assertContains(resp, url)
             self.assertContains(resp, settings.SOCIAL_MEDIA_FOOTER_DISPLAY[name]['title'])
             self.assertContains(resp, settings.SOCIAL_MEDIA_FOOTER_DISPLAY[name]['icon'])

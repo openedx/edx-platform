@@ -152,12 +152,11 @@ new_contract("DjangoKeyValueStore", DjangoKeyValueStore)
 new_contract("DjangoKeyValueStore_Key", DjangoKeyValueStore.Key)
 
 
-class DjangoOrmFieldCache(object):
+class DjangoOrmFieldCache(object, metaclass=ABCMeta):
     """
     Baseclass for Scope-specific field cache objects that are based on
     single-row-per-field Django ORM objects.
     """
-    __metaclass__ = ABCMeta
 
     def __init__(self):
         self._cache = {}
@@ -235,7 +234,7 @@ class DjangoOrmFieldCache(object):
                     field_object.save(force_update=True)
 
             except DatabaseError:
-                log.exception(u"Saving field %r failed", kvs_key.field_name)
+                log.exception("Saving field %r failed", kvs_key.field_name)
                 raise KeyValueMultiSaveError(saved_fields)
 
             finally:
@@ -408,7 +407,7 @@ class UserStateCache(object):
                 objects to values to set.
         """
         pending_updates = defaultdict(dict)
-        for kvs_key, value in kv_dict.items():
+        for kvs_key, value in list(kv_dict.items()):
             cache_key = self._cache_key_for_kvs_key(kvs_key)
 
             pending_updates[cache_key][kvs_key.field_name] = value
@@ -419,7 +418,7 @@ class UserStateCache(object):
                 pending_updates
             )
         except DatabaseError:
-            log.exception(u"Saving user state failed for %s", self.user.username)
+            log.exception("Saving user state failed for %s", self.user.username)
             raise KeyValueMultiSaveError([])
         finally:
             self._cache.update(pending_updates)
@@ -730,7 +729,7 @@ class FieldDataCache(object):
         """
         if self.user.is_authenticated:
             self.scorable_locations.update(desc.location for desc in descriptors if desc.has_score)
-            for scope, fields in self._fields_to_cache(descriptors).items():
+            for scope, fields in list(self._fields_to_cache(descriptors).items()):
                 if scope not in self.cache:
                     continue
 
@@ -799,7 +798,7 @@ class FieldDataCache(object):
         """
         scope_map = defaultdict(set)
         for descriptor in descriptors:
-            for field in descriptor.fields.values():
+            for field in list(descriptor.fields.values()):
                 scope_map[field.scope].add(field)
         return scope_map
 
@@ -840,7 +839,7 @@ class FieldDataCache(object):
 
         saved_fields = []
         by_scope = defaultdict(dict)
-        for key, value in kv_dict.iteritems():
+        for key, value in kv_dict.items():
 
             if key.scope.user == UserScope.ONE and not self.user.is_anonymous:
                 # If we're getting user data, we expect that the key matches the
@@ -852,14 +851,14 @@ class FieldDataCache(object):
 
             by_scope[key.scope][key] = value
 
-        for scope, set_many_data in by_scope.iteritems():
+        for scope, set_many_data in by_scope.items():
             try:
                 self.cache[scope].set_many(set_many_data)
                 # If save is successful on these fields, add it to
                 # the list of successful saves
                 saved_fields.extend(key.field_name for key in set_many_data)
             except KeyValueMultiSaveError as exc:
-                log.exception(u'Error saving fields %r', [key.field_name for key in set_many_data])
+                log.exception('Error saving fields %r', [key.field_name for key in set_many_data])
                 raise KeyValueMultiSaveError(saved_fields + exc.saved_field_names)
 
     @contract(key=DjangoKeyValueStore.Key)
@@ -927,7 +926,7 @@ class FieldDataCache(object):
         return self.cache[key.scope].last_modified(key)
 
     def __len__(self):
-        return sum(len(cache) for cache in self.cache.values())
+        return sum(len(cache) for cache in list(self.cache.values()))
 
 
 class ScoresClient(object):
@@ -976,7 +975,7 @@ class ScoresClient(object):
         """
         if not self._has_fetched:
             raise ValueError(
-                u"Tried to fetch location {} from ScoresClient before fetch_scores() has run."
+                "Tried to fetch location {} from ScoresClient before fetch_scores() has run."
                 .format(location)
             )
         return self._locations_to_scores.get(location.replace(version=None, branch=None))
@@ -1008,8 +1007,8 @@ def set_score(user_id, usage_key, score, max_score):
     except IntegrityError:
         # log information for duplicate entry and get the record as above command failed.
         log.exception(
-            u'set_score: IntegrityError for student %s - course_id %s - usage_key %s having '
-            u'score %d and max_score %d',
+            'set_score: IntegrityError for student %s - course_id %s - usage_key %s having '
+            'score %d and max_score %d',
             str(user_id), usage_key.course_key, usage_key, score, max_score
         )
         student_module = StudentModule.objects.get(**kwargs)

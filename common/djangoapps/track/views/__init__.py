@@ -65,7 +65,7 @@ def user_track(request):
     data = _get_request_value(request, 'event', {})
     page = _get_request_value(request, 'page')
 
-    if isinstance(data, basestring) and len(data) > 0:
+    if isinstance(data, str) and len(data) > 0:
         try:
             data = json.loads(data)
         except ValueError:

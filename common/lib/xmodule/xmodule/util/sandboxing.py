@@ -24,7 +24,7 @@ def can_execute_unsafe_code(course_id):
     # To others using this: the code as-is is brittle and likely to be changed in the future,
     # as per the TODO, so please consider carefully before adding more values to COURSES_WITH_UNSAFE_CODE
     for regex in getattr(settings, 'COURSES_WITH_UNSAFE_CODE', []):
-        if re.match(regex, unicode(course_id)):
+        if re.match(regex, str(course_id)):
             return True
     return False
 

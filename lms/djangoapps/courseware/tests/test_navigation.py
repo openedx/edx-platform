@@ -86,7 +86,7 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         for line in response.content.split('\n'):
             if tabname in line and 'active' in line:
                 return
-        raise AssertionError(u"assertTabActive failed: {} not active".format(tabname))
+        raise AssertionError("assertTabActive failed: {} not active".format(tabname))
 
     def assertTabInactive(self, tabname, response):
         ''' Check if the progress tab is active in the tab set '''
@@ -120,8 +120,8 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
                 'chapter': 'Chrome',
                 'section': displayname,
             }))
-            self.assertEquals('course-tabs' in response.content, tabs)
-            self.assertEquals('course-navigation' in response.content, accordion)
+            self.assertEqual('course-tabs' in response.content, tabs)
+            self.assertEqual('course-navigation' in response.content, accordion)
 
         self.assertTabInactive('progress', response)
         self.assertTabActive('courseware', response)
@@ -146,7 +146,7 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
         # make sure we can access courseware immediately
         resp = self.client.get(reverse('dashboard'))
-        self.assertEquals(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 200)
 
         # then wait a bit and see if we get timed out
         time.sleep(2)

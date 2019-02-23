@@ -441,10 +441,10 @@ class DeactivateLogoutView(APIView):
                 logout(request)
             return Response(status=status.HTTP_204_NO_CONTENT)
         except KeyError:
-            return Response(u'Username not specified.', status=status.HTTP_404_NOT_FOUND)
+            return Response('Username not specified.', status=status.HTTP_404_NOT_FOUND)
         except user_model.DoesNotExist:
             return Response(
-                u'The user "{}" does not exist.'.format(request.user.username), status=status.HTTP_404_NOT_FOUND
+                'The user "{}" does not exist.'.format(request.user.username), status=status.HTTP_404_NOT_FOUND
             )
         except Exception as exc:  # pylint: disable=broad-except
             return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -469,7 +469,7 @@ class DeactivateLogoutView(APIView):
         except AuthFailedError as err:
             return Response(text_type(err), status=status.HTTP_403_FORBIDDEN)
         except Exception as err:  # pylint: disable=broad-except
-            return Response(u"Could not verify user password: {}".format(err), status=status.HTTP_400_BAD_REQUEST)
+            return Response("Could not verify user password: {}".format(err), status=status.HTTP_400_BAD_REQUEST)
 
     def _check_excessive_login_attempts(self, user):
         """
@@ -613,9 +613,9 @@ class AccountRetirementPartnerReportView(ViewSet):
         # to disambiguate them in Python, which will respect case in the comparison.
         if len(usernames) != len(retirement_statuses_clean):
             return Response(
-                u'{} original_usernames given, {} found!\n'
-                u'Given usernames:\n{}\n'
-                u'Found UserRetirementReportingStatuses:\n{}'.format(
+                '{} original_usernames given, {} found!\n'
+                'Given usernames:\n{}\n'
+                'Found UserRetirementReportingStatuses:\n{}'.format(
                     len(usernames),
                     len(retirement_statuses_clean),
                     usernames,
@@ -658,7 +658,7 @@ class AccountRetirementStatusView(ViewSet):
             state_objs = RetirementState.objects.filter(state_name__in=states)
             if state_objs.count() != len(states):
                 found = [s.state_name for s in state_objs]
-                raise RetirementStateError(u'Unknown state. Requested: {} Found: {}'.format(states, found))
+                raise RetirementStateError('Unknown state. Requested: {} Found: {}'.format(states, found))
 
             earliest_datetime = datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=cool_off_days)
 
@@ -675,7 +675,7 @@ class AccountRetirementStatusView(ViewSet):
         except ValueError:
             return Response('Invalid cool_off_days, should be integer.', status=status.HTTP_400_BAD_REQUEST)
         except KeyError as exc:
-            return Response(u'Missing required parameter: {}'.format(text_type(exc)), status=status.HTTP_400_BAD_REQUEST)
+            return Response('Missing required parameter: {}'.format(text_type(exc)), status=status.HTTP_400_BAD_REQUEST)
         except RetirementStateError as exc:
             return Response(text_type(exc), status=status.HTTP_400_BAD_REQUEST)
 
@@ -714,9 +714,9 @@ class AccountRetirementStatusView(ViewSet):
             return Response(serializer.data)
         # This should only occur on the datetime conversion of the start / end dates.
         except ValueError as exc:
-            return Response(u'Invalid start or end date: {}'.format(text_type(exc)), status=status.HTTP_400_BAD_REQUEST)
+            return Response('Invalid start or end date: {}'.format(text_type(exc)), status=status.HTTP_400_BAD_REQUEST)
         except KeyError as exc:
-            return Response(u'Missing required parameter: {}'.format(text_type(exc)), status=status.HTTP_400_BAD_REQUEST)
+            return Response('Missing required parameter: {}'.format(text_type(exc)), status=status.HTTP_400_BAD_REQUEST)
         except RetirementState.DoesNotExist:
             return Response('Unknown retirement state.', status=status.HTTP_400_BAD_REQUEST)
         except RetirementStateError as exc:

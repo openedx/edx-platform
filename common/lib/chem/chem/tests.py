@@ -1,4 +1,4 @@
-from __future__ import absolute_import, print_function
+
 import codecs
 import unittest
 from fractions import Fraction
@@ -223,119 +223,119 @@ class Test_Render_Equations(unittest.TestCase):
     def test_render1(self):
         test_string = "H2O + CO2"
         out = render_to_html(test_string)
-        correct = u'<span class="math">H<sub>2</sub>O+CO<sub>2</sub></span>'
+        correct = '<span class="math">H<sub>2</sub>O+CO<sub>2</sub></span>'
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
     def test_render_uncorrect_reaction(self):
         test_string = "O2C + OH2"
         out = render_to_html(test_string)
-        correct = u'<span class="math">O<sub>2</sub>C+OH<sub>2</sub></span>'
+        correct = '<span class="math">O<sub>2</sub>C+OH<sub>2</sub></span>'
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
     def test_render2(self):
         test_string = "CO2 + H2O + Fe(OH)3"
         out = render_to_html(test_string)
-        correct = u'<span class="math">CO<sub>2</sub>+H<sub>2</sub>O+Fe(OH)<sub>3</sub></span>'
+        correct = '<span class="math">CO<sub>2</sub>+H<sub>2</sub>O+Fe(OH)<sub>3</sub></span>'
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
     def test_render3(self):
         test_string = "3H2O + 2CO2"
         out = render_to_html(test_string)
-        correct = u'<span class="math">3H<sub>2</sub>O+2CO<sub>2</sub></span>'
+        correct = '<span class="math">3H<sub>2</sub>O+2CO<sub>2</sub></span>'
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
     def test_render4(self):
         test_string = "H^+ + OH^-"
         out = render_to_html(test_string)
-        correct = u'<span class="math">H<sup>+</sup>+OH<sup>-</sup></span>'
+        correct = '<span class="math">H<sup>+</sup>+OH<sup>-</sup></span>'
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
     def test_render5(self):
         test_string = "Fe(OH)^2- + (OH)^-"
         out = render_to_html(test_string)
-        correct = u'<span class="math">Fe(OH)<sup>2-</sup>+(OH)<sup>-</sup></span>'
+        correct = '<span class="math">Fe(OH)<sup>2-</sup>+(OH)<sup>-</sup></span>'
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
     def test_render6(self):
         test_string = "7/2H^+ + 3/5OH^-"
         out = render_to_html(test_string)
-        correct = u'<span class="math"><sup>7</sup>&frasl;<sub>2</sub>H<sup>+</sup>+<sup>3</sup>&frasl;<sub>5</sub>OH<sup>-</sup></span>'
+        correct = '<span class="math"><sup>7</sup>&frasl;<sub>2</sub>H<sup>+</sup>+<sup>3</sup>&frasl;<sub>5</sub>OH<sup>-</sup></span>'
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
     def test_render7(self):
         test_string = "5(H1H212)^70010- + 2H2O + 7/2HCl + H2O"
         out = render_to_html(test_string)
-        correct = u'<span class="math">5(H<sub>1</sub>H<sub>212</sub>)<sup>70010-</sup>+2H<sub>2</sub>O+<sup>7</sup>&frasl;<sub>2</sub>HCl+H<sub>2</sub>O</span>'
+        correct = '<span class="math">5(H<sub>1</sub>H<sub>212</sub>)<sup>70010-</sup>+2H<sub>2</sub>O+<sup>7</sup>&frasl;<sub>2</sub>HCl+H<sub>2</sub>O</span>'
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
     def test_render8(self):
         test_string = "H2O(s) + CO2"
         out = render_to_html(test_string)
-        correct = u'<span class="math">H<sub>2</sub>O(s)+CO<sub>2</sub></span>'
+        correct = '<span class="math">H<sub>2</sub>O(s)+CO<sub>2</sub></span>'
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
     def test_render9(self):
         test_string = "5[Ni(NH3)4]^2+ + 5/2SO4^2-"
         out = render_to_html(test_string)
-        correct = u'<span class="math">5[Ni(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup>+<sup>5</sup>&frasl;<sub>2</sub>SO<sub>4</sub><sup>2-</sup></span>'
+        correct = '<span class="math">5[Ni(NH<sub>3</sub>)<sub>4</sub>]<sup>2+</sup>+<sup>5</sup>&frasl;<sub>2</sub>SO<sub>4</sub><sup>2-</sup></span>'
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
     def test_render_error(self):
         test_string = "5.2H20"
         out = render_to_html(test_string)
-        correct = u'<span class="math"><span class="inline-error inline">5.2H20</span></span>'
+        correct = '<span class="math"><span class="inline-error inline">5.2H20</span></span>'
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
     def test_render_simple_round_brackets(self):
         test_string = "(Ar)"
         out = render_to_html(test_string)
-        correct = u'<span class="math">(Ar)</span>'
+        correct = '<span class="math">(Ar)</span>'
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
     def test_render_simple_square_brackets(self):
         test_string = "[Ar]"
         out = render_to_html(test_string)
-        correct = u'<span class="math">[Ar]</span>'
+        correct = '<span class="math">[Ar]</span>'
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
     def test_render_eq1(self):
         test_string = "H^+ + OH^- -> H2O"
         out = render_to_html(test_string)
-        correct = u'<span class="math">H<sup>+</sup>+OH<sup>-</sup>\u2192H<sub>2</sub>O</span>'
+        correct = '<span class="math">H<sup>+</sup>+OH<sup>-</sup>\u2192H<sub>2</sub>O</span>'
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
     def test_render_eq2(self):
         test_string = "H^+ + OH^- <-> H2O"
         out = render_to_html(test_string)
-        correct = u'<span class="math">H<sup>+</sup>+OH<sup>-</sup>\u2194H<sub>2</sub>O</span>'
+        correct = '<span class="math">H<sup>+</sup>+OH<sup>-</sup>\u2194H<sub>2</sub>O</span>'
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
     def test_render_eq3(self):
         test_string = "H^+ + OH^- <= H2O"   # unsupported arrow
         out = render_to_html(test_string)
-        correct = u'<span class="math"><span class="inline-error inline">H^+ + OH^- &lt;= H2O</span></span>'
+        correct = '<span class="math"><span class="inline-error inline">H^+ + OH^- &lt;= H2O</span></span>'
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
     def test_render_eq4(self):
         test_string = "[H^+] + OH^- <-> (H2O)"  # with brackets
         out = render_to_html(test_string)
-        correct = u'<span class="math">[H<sup>+</sup>]+OH<sup>-</sup>\u2194(H<sub>2</sub>O)</span>'
+        correct = '<span class="math">[H<sup>+</sup>]+OH<sup>-</sup>\u2194(H<sub>2</sub>O)</span>'
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
@@ -345,7 +345,7 @@ class Test_Render_Equations(unittest.TestCase):
         """
         test_string = "<script>f()</script>"
         out = render_to_html(test_string)
-        correct = u'<span class="math"><span class="inline-error inline">&lt;script&gt;f()&lt;/script&gt;</span></span>'
+        correct = '<span class="math"><span class="inline-error inline">&lt;script&gt;f()&lt;/script&gt;</span></span>'
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
@@ -464,21 +464,21 @@ class Test_Crystallography_Miller(unittest.TestCase):
         self.assertTrue(chem.miller.grade(user_input, {'miller': '(3,3,3)', 'lattice': 'bcc'}))
 
     def test_25(self):
-        user_input = u'{"lattice":"","points":[["0.00","0.00","0.01"],["1.00","1.00","0.01"],["0.00","1.00","1.00"]]}'
+        user_input = '{"lattice":"","points":[["0.00","0.00","0.01"],["1.00","1.00","0.01"],["0.00","1.00","1.00"]]}'
         self.assertTrue(chem.miller.grade(user_input, {'miller': '(1,-1,1)', 'lattice': ''}))
 
     def test_26(self):
-        user_input = u'{"lattice":"","points":[["0.00","0.01","0.00"],["1.00","0.00","0.00"],["0.00","0.00","1.00"]]}'
+        user_input = '{"lattice":"","points":[["0.00","0.01","0.00"],["1.00","0.00","0.00"],["0.00","0.00","1.00"]]}'
         self.assertTrue(chem.miller.grade(user_input, {'miller': '(0,-1,0)', 'lattice': ''}))
 
     def test_27(self):
         """ rounding to 0.35"""
-        user_input = u'{"lattice":"","points":[["0.33","0.00","0.00"],["0.00","0.33","0.00"],["0.00","0.00","0.33"]]}'
+        user_input = '{"lattice":"","points":[["0.33","0.00","0.00"],["0.00","0.33","0.00"],["0.00","0.00","0.33"]]}'
         self.assertTrue(chem.miller.grade(user_input, {'miller': '(3,3,3)', 'lattice': ''}))
 
     def test_28(self):
         """ rounding to 0.30"""
-        user_input = u'{"lattice":"","points":[["0.30","0.00","0.00"],["0.00","0.30","0.00"],["0.00","0.00","0.30"]]}'
+        user_input = '{"lattice":"","points":[["0.30","0.00","0.00"],["0.00","0.30","0.00"],["0.00","0.00","0.30"]]}'
         self.assertTrue(chem.miller.grade(user_input, {'miller': '(10,10,10)', 'lattice': ''}))
 
     def test_wrong_lattice(self):

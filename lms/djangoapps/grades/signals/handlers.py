@@ -145,8 +145,8 @@ def score_published_handler(sender, block, user, raw_earned, raw_possible, only_
             if not is_score_higher_or_equal(prev_raw_earned, prev_raw_possible, raw_earned, raw_possible):
                 update_score = False
                 log.warning(
-                    u"Grades: Rescore is not higher than previous: "
-                    u"user: {}, block: {}, previous: {}/{}, new: {}/{} ".format(
+                    "Grades: Rescore is not higher than previous: "
+                    "user: {}, block: {}, previous: {}/{}, new: {}/{} ".format(
                         user, block.location, prev_raw_earned, prev_raw_possible, raw_earned, raw_possible,
                     )
                 )
@@ -166,8 +166,8 @@ def score_published_handler(sender, block, user, raw_earned, raw_possible, only_
             raw_possible=raw_possible,
             weight=getattr(block, 'weight', None),
             user_id=user.id,
-            course_id=unicode(block.location.course_key),
-            usage_id=unicode(block.location),
+            course_id=str(block.location.course_key),
+            usage_id=str(block.location),
             only_if_higher=only_if_higher,
             modified=score_modified_time,
             score_db_table=ScoreDatabaseTableEnum.courseware_student_module,
@@ -224,8 +224,8 @@ def enqueue_subsection_update(sender, **kwargs):  # pylint: disable=unused-argum
             only_if_higher=kwargs.get('only_if_higher'),
             expected_modified_time=to_timestamp(kwargs['modified']),
             score_deleted=kwargs.get('score_deleted', False),
-            event_transaction_id=unicode(get_event_transaction_id()),
-            event_transaction_type=unicode(get_event_transaction_type()),
+            event_transaction_id=str(get_event_transaction_id()),
+            event_transaction_type=str(get_event_transaction_type()),
             score_db_table=kwargs['score_db_table'],
             force_update_subsections=kwargs.get('force_update_subsections', False),
         ),

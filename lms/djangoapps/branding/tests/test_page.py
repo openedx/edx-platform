@@ -78,7 +78,7 @@ class AnonymousIndexPageTest(ModuleStoreTestCase):
 
         # check to see that the override value is honored
         resp = self.client.get('/')
-        self.assertEquals(resp['X-Frame-Options'], 'ALLOW')
+        self.assertEqual(resp['X-Frame-Options'], 'ALLOW')
 
     def test_deny_x_frame_options(self):
         """
@@ -87,7 +87,7 @@ class AnonymousIndexPageTest(ModuleStoreTestCase):
 
         # check to see that the default setting is to DENY iframing
         resp = self.client.get('/')
-        self.assertEquals(resp['X-Frame-Options'], 'DENY')
+        self.assertEqual(resp['X-Frame-Options'], 'DENY')
 
     def test_edge_redirect_to_login(self):
         """
@@ -127,7 +127,7 @@ class PreRequisiteCourseCatalog(ModuleStoreTestCase, LoginEnrollmentTestCase, Mi
             emit_signals=True,
         )
 
-        pre_requisite_courses = [unicode(pre_requisite_course.id)]
+        pre_requisite_courses = [str(pre_requisite_course.id)]
 
         # for this failure to occur, the enrollment window needs to be in the past
         course = CourseFactory.create(

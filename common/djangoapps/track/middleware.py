@@ -137,7 +137,7 @@ class TrackMiddleware(object):
             'username': self.get_username(request),
             'ip': self.get_request_ip_address(request),
         }
-        for header_name, context_key in META_KEY_TO_CONTEXT_KEY.iteritems():
+        for header_name, context_key in META_KEY_TO_CONTEXT_KEY.items():
             # HTTP headers may contain Latin1 characters. Decoding using Latin1 encoding here
             # avoids encountering UnicodeDecodeError exceptions when these header strings are
             # output to tracking logs.

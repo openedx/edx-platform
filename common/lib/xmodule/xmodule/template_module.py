@@ -55,7 +55,7 @@ class CustomTagDescriptor(RawDescriptor):
                 raise Exception("Could not find impl attribute in customtag {0}"
                                 .format(self.location))
 
-        params = dict(xmltree.items())
+        params = dict(list(xmltree.items()))
 
         # cdodge: look up the template as a module
         template_loc = self.location.replace(category='custom_tag_template', name=template_name)

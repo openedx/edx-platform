@@ -2,7 +2,7 @@
 Tests for credit app views.
 """
 
-from __future__ import unicode_literals
+
 
 import datetime
 import json
@@ -120,7 +120,7 @@ class CreditCourseViewSetTests(AuthMixin, UserMixin, TestCase):
         """ Serializes a CreditCourse to a Python dict. """
 
         return {
-            'course_key': unicode(credit_course.course_key),
+            'course_key': str(credit_course.course_key),
             'enabled': credit_course.enabled
         }
 
@@ -187,7 +187,7 @@ class CreditCourseViewSetTests(AuthMixin, UserMixin, TestCase):
         """ Verify an API request created a new CreditCourse object. """
         enabled = True
         data = {
-            'course_key': unicode(course_id),
+            'course_key': str(course_id),
             'enabled': enabled
         }
 
@@ -205,7 +205,7 @@ class CreditCourseViewSetTests(AuthMixin, UserMixin, TestCase):
         course_id = 'a/b/c'
         enabled = True
         data = {
-            'course_key': unicode(course_id),
+            'course_key': str(course_id),
             'enabled': enabled
         }
 
@@ -217,7 +217,7 @@ class CreditCourseViewSetTests(AuthMixin, UserMixin, TestCase):
         course_id = 'd/e/f'
         enabled = True
         data = {
-            'course_key': unicode(course_id),
+            'course_key': str(course_id),
             'enabled': enabled
         }
 
@@ -330,7 +330,7 @@ class CreditProviderRequestCreateViewTests(ApiTestCaseMixin, UserMixin, TestCase
         """ Create a credit request for the given user and course. """
         data = {
             'username': username,
-            'course_key': unicode(course_id)
+            'course_key': str(course_id)
         }
         return self.client.post(self.path, json.dumps(data), content_type=JSON)
 
@@ -379,7 +379,7 @@ class CreditProviderRequestCreateViewTests(ApiTestCaseMixin, UserMixin, TestCase
         self.assertEqual(parameters['course_org'], course_key.org)
         self.assertEqual(parameters['course_num'], course_key.course)
         self.assertEqual(parameters['course_run'], course_key.run)
-        self.assertEqual(parameters['final_grade'], unicode(final_grade))
+        self.assertEqual(parameters['final_grade'], str(final_grade))
         self.assertEqual(parameters['user_username'], username)
         self.assertEqual(parameters['user_full_name'], self.user.get_full_name())
         self.assertEqual(parameters['user_mailing_address'], '')

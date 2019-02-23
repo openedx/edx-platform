@@ -39,9 +39,9 @@ def test_successful_dry_run(mock_logger):
         args = ['--dry_run', '--optout_csv_path={}'.format(tmp_csv_file)]
         call_command('bulk_user_org_email_optout', *args)
         assert mock_logger.call_count == 3
-        mock_logger.assert_any_call(u"Read %s opt-out rows from CSV file '%s'.", 3, tmp_csv_file)
+        mock_logger.assert_any_call("Read %s opt-out rows from CSV file '%s'.", 3, tmp_csv_file)
         mock_logger.assert_any_call(
-            u'Attempting opt-out for rows (%s, %s) through (%s, %s)...', '1', 'UniversityX', '3', 'StateUX'
+            'Attempting opt-out for rows (%s, %s) through (%s, %s)...', '1', 'UniversityX', '3', 'StateUX'
         )
         mock_logger.assert_any_call(
             'INSERT INTO user_api_userorgtag (`user_id`, `org`, `key`, `value`, `created`, `modified`) \

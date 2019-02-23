@@ -259,7 +259,7 @@ def capture_screenshot_for_step(step, when):
     if world.auto_capture_screenshots:
         scenario_num = step.scenario.feature.scenarios.index(step.scenario) + 1
         step_num = step.scenario.steps.index(step) + 1
-        step_func_name = step.defined_at.function.func_name
+        step_func_name = step.defined_at.function.__name__
         image_name = "{prefix:03d}__{num:03d}__{name}__{postfix}".format(
             prefix=scenario_num,
             num=step_num,

@@ -1,7 +1,7 @@
 # encoding: utf-8
 """Tests of Branding API views. """
 import json
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 import ddt
 import mock
@@ -126,7 +126,7 @@ class TestFooter(CacheIsolationTestCase):
 
     @ddt.data(
         ("en", "registered trademarks"),
-        ("eo", u"régïstéréd trädémärks"),  # Dummy language string
+        ("eo", "régïstéréd trädémärks"),  # Dummy language string
         ("unknown", "registered trademarks"),  # default to English
     )
     @ddt.unpack
@@ -254,9 +254,9 @@ class TestFooter(CacheIsolationTestCase):
         url = reverse("branding_footer")
 
         if params is not None:
-            url = u"{url}?{params}".format(
+            url = "{url}?{params}".format(
                 url=url,
-                params=urllib.urlencode(params)
+                params=urllib.parse.urlencode(params)
             )
 
         return self.client.get(url, HTTP_ACCEPT=accepts)
@@ -268,13 +268,13 @@ class TestFooter(CacheIsolationTestCase):
         self.assertIn('footer-language-selector', content)
 
         # Verify the correct language is selected
-        self.assertIn(u'<option value="{}" selected="selected">'.format(selected_language), content)
+        self.assertIn('<option value="{}" selected="selected">'.format(selected_language), content)
 
         # Verify the language choices
         for language in released_languages():
             if language.code == selected_language:
                 continue
-            self.assertIn(u'<option value="{}">'.format(language.code), content)
+            self.assertIn('<option value="{}">'.format(language.code), content)
 
 
 class TestIndex(SiteMixin, TestCase):

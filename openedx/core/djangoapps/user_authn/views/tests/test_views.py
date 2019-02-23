@@ -5,7 +5,7 @@ from http.cookies import SimpleCookie
 import logging
 import re
 from unittest import skipUnless
-from urllib import urlencode
+from urllib.parse import urlencode
 
 import ddt
 import mock
@@ -58,15 +58,15 @@ FEATURES_WITH_FAILED_PASSWORD_RESET_EMAIL['ENABLE_PASSWORD_RESET_FAILURE_EMAIL']
 class UserAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
     """ Tests for views that update the user's account information. """
 
-    USERNAME = u"heisenberg"
-    ALTERNATE_USERNAME = u"walt"
-    OLD_PASSWORD = u"ḅḷüëṡḳÿ"
-    NEW_PASSWORD = u"B🄸🄶B🄻🅄🄴"
-    OLD_EMAIL = u"walter@graymattertech.com"
-    NEW_EMAIL = u"walt@savewalterwhite.com"
+    USERNAME = "heisenberg"
+    ALTERNATE_USERNAME = "walt"
+    OLD_PASSWORD = "ḅḷüëṡḳÿ"
+    NEW_PASSWORD = "B🄸🄶B🄻🅄🄴"
+    OLD_EMAIL = "walter@graymattertech.com"
+    NEW_EMAIL = "walt@savewalterwhite.com"
 
     INVALID_ATTEMPTS = 100
-    INVALID_KEY = u"123abc"
+    INVALID_KEY = "123abc"
 
     URLCONF_MODULES = ['student_accounts.urls']
 
@@ -167,11 +167,11 @@ class UserAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
         html_body = sent_message.alternatives[0][0]
 
         for email_body in [text_body, html_body]:
-            msg = u'However, there is currently no user account associated with your email address: {email}'.format(
+            msg = 'However, there is currently no user account associated with your email address: {email}'.format(
                 email=bad_email
             )
 
-            assert u'reset for your user account at {}'.format(settings.PLATFORM_NAME) in email_body
+            assert 'reset for your user account at {}'.format(settings.PLATFORM_NAME) in email_body
             assert 'password_reset_confirm' not in email_body, 'The link should not be added if user was not found'
             assert msg in email_body
 
@@ -241,7 +241,7 @@ class UserAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
         self.client.logout()
 
         # Make many consecutive bad requests in an attempt to trigger the rate limiter
-        for __ in xrange(self.INVALID_ATTEMPTS):
+        for __ in range(self.INVALID_ATTEMPTS):
             self._change_password(email=self.NEW_EMAIL)
 
         response = self._change_password(email=self.NEW_EMAIL)
@@ -300,7 +300,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
     """ Tests for the student account views that update the user's account information. """
     USERNAME = "bob"
     EMAIL = "bob@example.com"
-    PASSWORD = u"password"
+    PASSWORD = "password"
 
     URLCONF_MODULES = ['openedx.core.djangoapps.embargo']
 
@@ -330,7 +330,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
     @ddt.unpack
     def test_login_and_registration_form(self, url_name, initial_mode):
         response = self.client.get(reverse(url_name))
-        expected_data = u'"initial_mode": "{mode}"'.format(mode=initial_mode)
+        expected_data = '"initial_mode": "{mode}"'.format(mode=initial_mode)
         self.assertContains(response, expected_data)
 
     @ddt.data("signin_user", "register_user")
@@ -569,10 +569,10 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
                 response = login_and_registration_form(request)
 
         expected_error_message = Text(_(
-            u'We are sorry, you are not authorized to access {platform_name} via this channel. '
-            u'Please contact your learning administrator or manager in order to access {platform_name}.'
-            u'{line_break}{line_break}'
-            u'Error Details:{line_break}{error_message}')
+            'We are sorry, you are not authorized to access {platform_name} via this channel. '
+            'Please contact your learning administrator or manager in order to access {platform_name}.'
+            '{line_break}{line_break}'
+            'Error Details:{line_break}{error_message}')
         ).format(
             platform_name=settings.PLATFORM_NAME,
             error_message=dummy_error_message,
@@ -593,7 +593,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         tpa_hint = self.hidden_enabled_provider.provider_id
         params = [("next", "/courses/something/?tpa_hint={0}".format(tpa_hint))]
         response = self.client.get(reverse('signin_user'), params, HTTP_ACCEPT="text/html")
-        self.assertContains(response, u'"third_party_auth_hint": "{0}"'.format(tpa_hint))
+        self.assertContains(response, '"third_party_auth_hint": "{0}"'.format(tpa_hint))
 
         tpa_hint = self.hidden_disabled_provider.provider_id
         params = [("next", "/courses/something/?tpa_hint={0}".format(tpa_hint))]
@@ -636,7 +636,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         tpa_hint = self.hidden_enabled_provider.provider_id
         params = [("next", "/courses/something/?tpa_hint={0}".format(tpa_hint))]
         response = self.client.get(reverse(url_name), params, HTTP_ACCEPT="text/html")
-        self.assertContains(response, u'"third_party_auth_hint": "{0}"'.format(tpa_hint))
+        self.assertContains(response, '"third_party_auth_hint": "{0}"'.format(tpa_hint))
 
         # Even disabled providers in the query string will override THIRD_PARTY_AUTH_HINT
         tpa_hint = self.hidden_disabled_provider.provider_id
@@ -689,7 +689,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
 
         response = self.client.get(reverse(url_name), HTTP_ACCEPT="text/html")
 
-        enterprise_sidebar_div_id = u'enterprise-content-container'
+        enterprise_sidebar_div_id = 'enterprise-content-container'
 
         if not ec_present:
             self.assertNotContains(response, text=enterprise_sidebar_div_id)
@@ -702,7 +702,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
                 line_break=HTML('<br/>'),
                 enterprise_name=ec_name,
                 platform_name=settings.PLATFORM_NAME,
-                privacy_policy_link_start=HTML(u"<a href='{pp_url}' target='_blank'>").format(
+                privacy_policy_link_start=HTML("<a href='{pp_url}' target='_blank'>").format(
                     pp_url=settings.MKTG_URLS.get('PRIVACY', 'https://www.edx.org/edx-privacy-policy')
                 ),
                 privacy_policy_link_end=HTML("</a>"),
@@ -768,7 +768,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
             auth_info['providers'] = []
         auth_info = dump_js_escaped_json(auth_info)
 
-        expected_data = u'"third_party_auth": {auth_info}'.format(
+        expected_data = '"third_party_auth": {auth_info}'.format(
             auth_info=auth_info
         )
         self.assertContains(response, expected_data)
@@ -795,14 +795,14 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         }
         auth_info = dump_js_escaped_json(auth_info)
 
-        expected_data = u'"third_party_auth": {auth_info}'.format(
+        expected_data = '"third_party_auth": {auth_info}'.format(
             auth_info=auth_info
         )
         self.assertContains(response, expected_data)
 
     def _third_party_login_url(self, backend_name, auth_entry, login_params):
         """Construct the login URL to start third party authentication. """
-        return u"{url}?auth_entry={auth_entry}&{param_str}".format(
+        return "{url}?auth_entry={auth_entry}&{param_str}".format(
             url=reverse("social:begin", kwargs={"backend": backend_name}),
             auth_entry=auth_entry,
             param_str=self._finish_auth_url_param(login_params),
@@ -864,5 +864,5 @@ class AccountCreationTestCaseWithSiteOverrides(SiteMixin, TestCase):
         ALLOW_PUBLIC_ACCOUNT_CREATION flag is turned off
         """
         response = self.client.get(reverse('signin_user'))
-        self.assertNotIn(u'<a class="btn-neutral" href="/register?next=%2Fdashboard">Register</a>',
+        self.assertNotIn('<a class="btn-neutral" href="/register?next=%2Fdashboard">Register</a>',
                          response.content.decode(response.charset))

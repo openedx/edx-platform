@@ -61,7 +61,7 @@ class ProfileImageEndpointMixin(UserSettingsEventTestMixin):
 
     def tearDown(self):
         super(ProfileImageEndpointMixin, self).tearDown()
-        for name in get_profile_image_names(self.user.username).values():
+        for name in list(get_profile_image_names(self.user.username).values()):
             self.storage.delete(name)
 
     def check_images(self, exist=True):
@@ -71,7 +71,7 @@ class ProfileImageEndpointMixin(UserSettingsEventTestMixin):
 
         If exist is False, make sure none of the images exist.
         """
-        for size, name in get_profile_image_names(self.user.username).items():
+        for size, name in list(get_profile_image_names(self.user.username).items()):
             if exist:
                 self.assertTrue(self.storage.exists(name))
                 with closing(Image.open(self.storage.path(name))) as img:
@@ -178,7 +178,7 @@ class ProfileImageViewPostTestCase(ProfileImageEndpointMixin, APITestCase):
             self.check_has_profile_image()
         mock_log.info.assert_called_once_with(
             LOG_MESSAGE_CREATE,
-            {'image_names': get_profile_image_names(self.user.username).values(), 'user_id': self.user.id}
+            {'image_names': list(get_profile_image_names(self.user.username).values()), 'user_id': self.user.id}
         )
         self.check_upload_event_emitted()
 
@@ -217,7 +217,7 @@ class ProfileImageViewPostTestCase(ProfileImageEndpointMixin, APITestCase):
             self.check_has_profile_image()
         mock_log.info.assert_called_once_with(
             LOG_MESSAGE_CREATE,
-            {'image_names': get_profile_image_names(self.user.username).values(), 'user_id': self.user.id}
+            {'image_names': list(get_profile_image_names(self.user.username).values()), 'user_id': self.user.id}
         )
         self.check_upload_event_emitted()
 
@@ -295,8 +295,8 @@ class ProfileImageViewPostTestCase(ProfileImageEndpointMixin, APITestCase):
         response = self.client.post(self.url, {}, format='multipart')
         self.check_response(
             response, 400,
-            expected_developer_message=u"No file provided for profile image",
-            expected_user_message=u"No file provided for profile image",
+            expected_developer_message="No file provided for profile image",
+            expected_user_message="No file provided for profile image",
         )
         self.check_images(False)
         self.check_has_profile_image(False)
@@ -311,8 +311,8 @@ class ProfileImageViewPostTestCase(ProfileImageEndpointMixin, APITestCase):
         response = self.client.post(self.url, {'file': 'not a file'}, format='multipart')
         self.check_response(
             response, 400,
-            expected_developer_message=u"No file provided for profile image",
-            expected_user_message=u"No file provided for profile image",
+            expected_developer_message="No file provided for profile image",
+            expected_user_message="No file provided for profile image",
         )
         self.check_images(False)
         self.check_has_profile_image(False)
@@ -327,13 +327,13 @@ class ProfileImageViewPostTestCase(ProfileImageEndpointMixin, APITestCase):
         with make_image_file() as image_file:
             with mock.patch(
                 'openedx.core.djangoapps.profile_images.views.validate_uploaded_image',
-                side_effect=ImageValidationError(u"test error message")
+                side_effect=ImageValidationError("test error message")
             ):
                 response = self.client.post(self.url, {'file': image_file}, format='multipart')
                 self.check_response(
                     response, 400,
-                    expected_developer_message=u"test error message",
-                    expected_user_message=u"test error message",
+                    expected_developer_message="test error message",
+                    expected_user_message="test error message",
                 )
                 self.check_images(False)
                 self.check_has_profile_image(False)
@@ -346,7 +346,7 @@ class ProfileImageViewPostTestCase(ProfileImageEndpointMixin, APITestCase):
         Test that when upload validation fails, the proper HTTP response and
         messages are returned.
         """
-        image_open.side_effect = [Exception(u"whoops"), None]
+        image_open.side_effect = [Exception("whoops"), None]
         with make_image_file() as image_file:
             with self.assertRaises(Exception):
                 self.client.post(self.url, {'file': image_file}, format='multipart')
@@ -400,7 +400,7 @@ class ProfileImageViewDeleteTestCase(ProfileImageEndpointMixin, APITestCase):
         self.check_has_profile_image(False)
         mock_log.info.assert_called_once_with(
             LOG_MESSAGE_DELETE,
-            {'image_names': get_profile_image_names(self.user.username).values(), 'user_id': self.user.id}
+            {'image_names': list(get_profile_image_names(self.user.username).values()), 'user_id': self.user.id}
         )
         self.check_remove_event_emitted()
 
@@ -435,7 +435,7 @@ class ProfileImageViewDeleteTestCase(ProfileImageEndpointMixin, APITestCase):
         self.check_has_profile_image(False)
         mock_log.info.assert_called_once_with(
             LOG_MESSAGE_DELETE,
-            {'image_names': get_profile_image_names(self.user.username).values(), 'user_id': self.user.id}
+            {'image_names': list(get_profile_image_names(self.user.username).values()), 'user_id': self.user.id}
         )
         self.check_remove_event_emitted()
 
@@ -445,7 +445,7 @@ class ProfileImageViewDeleteTestCase(ProfileImageEndpointMixin, APITestCase):
         Test that when remove validation fails, the proper HTTP response and
         messages are returned.
         """
-        user_profile_save.side_effect = [Exception(u"whoops"), None]
+        user_profile_save.side_effect = [Exception("whoops"), None]
         with self.assertRaises(Exception):
             self.client.delete(self.url)
         self.check_images(True)  # thumbnails should remain intact.

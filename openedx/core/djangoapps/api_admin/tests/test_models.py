@@ -60,7 +60,7 @@ class ApiAccessRequestTests(TestCase):
         self.assertIsNone(ApiAccessRequest.api_access_status(self.user))
 
     def test_unicode(self):
-        request_unicode = unicode(self.request)
+        request_unicode = str(self.request)
         self.assertIn(self.request.website, request_unicode)
         self.assertIn(self.request.status, request_unicode)
 
@@ -82,12 +82,12 @@ class ApiAccessConfigTests(TestCase):
 
     def test_unicode(self):
         self.assertEqual(
-            unicode(ApiAccessConfig(enabled=True)),
-            u'ApiAccessConfig [enabled=True]'
+            str(ApiAccessConfig(enabled=True)),
+            'ApiAccessConfig [enabled=True]'
         )
         self.assertEqual(
-            unicode(ApiAccessConfig(enabled=False)),
-            u'ApiAccessConfig [enabled=False]'
+            str(ApiAccessConfig(enabled=False)),
+            'ApiAccessConfig [enabled=False]'
         )
 
 
@@ -143,7 +143,7 @@ class ApiAccessRequestSignalTests(TestCase):
 
         # Verify that initial save logs email errors properly
         mock_model_log_exception.assert_called_once_with(
-            u'Error sending API user notification email for request [%s].', self.api_access_request.id
+            'Error sending API user notification email for request [%s].', self.api_access_request.id
         )
         # Verify object saved
         self.assertIsNotNone(self.api_access_request.id)
@@ -153,7 +153,7 @@ class ApiAccessRequestSignalTests(TestCase):
                 self.api_access_request.approve()
         # Verify that updating request status logs email errors properly
         mock_model_log_exception.assert_called_once_with(
-            u'Error sending API user notification email for request [%s].', self.api_access_request.id
+            'Error sending API user notification email for request [%s].', self.api_access_request.id
         )
         # Verify object saved
         self.assertEqual(self.api_access_request.status, ApiAccessRequest.APPROVED)

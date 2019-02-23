@@ -130,7 +130,7 @@ class TestRescoringTask(TestIntegrationTask):
         expected_subsection_grade = expected_score
 
         course_grade = CourseGradeFactory().read(user, self.course)
-        self.assertEquals(
+        self.assertEqual(
             course_grade.graded_subsections_by_format['Homework'][self.problem_section.location].graded_total.earned,
             expected_subsection_grade,
         )
@@ -287,7 +287,7 @@ class TestRescoringTask(TestIntegrationTask):
         self.submit_student_answer('u1', problem_url_name, [OPTION_1, OPTION_1])
 
         # return an input error as if it were a numerical response, with an embedded unicode character:
-        expected_message = u"Could not interpret '2/3\u03a9' as a number"
+        expected_message = "Could not interpret '2/3\u03a9' as a number"
         with patch('capa.capa_problem.LoncapaProblem.get_grade_from_current_answers') as mock_rescore:
             mock_rescore.side_effect = StudentInputError(expected_message)
             instructor_task = self.submit_rescore_all_student_answers('instructor', problem_url_name)
@@ -353,7 +353,7 @@ class TestRescoringTask(TestIntegrationTask):
         to not-equals).
         """
         factory = CustomResponseXMLFactory()
-        script = textwrap.dedent(u"""
+        script = textwrap.dedent("""
                 def check_func(expect, answer_given):
                     expected = str(random.randint(0, 100))
                     return {'ok': answer_given %s expected, 'msg': expected}
@@ -399,9 +399,9 @@ class TestRescoringTask(TestIntegrationTask):
             module = self.get_student_module(user.username, descriptor)
             state = json.loads(module.state)
             correct_map = state['correct_map']
-            log.info(u"Correct Map: %s", correct_map)
+            log.info("Correct Map: %s", correct_map)
             # only one response, so pull it out:
-            answer = correct_map.values()[0]['msg']
+            answer = list(correct_map.values())[0]['msg']
             self.submit_student_answer(user.username, problem_url_name, [answer, answer])
             # we should now get the problem right, with a second attempt:
             self.check_state(user, descriptor, 1, 1, expected_attempts=2)
@@ -469,12 +469,12 @@ class TestResetAttemptsTask(TestIntegrationTask):
                 self.submit_student_answer(username, problem_url_name, [OPTION_1, OPTION_1])
 
         for username in self.userlist:
-            self.assertEquals(self.get_num_attempts(username, descriptor), num_attempts)
+            self.assertEqual(self.get_num_attempts(username, descriptor), num_attempts)
 
         self.reset_problem_attempts('instructor', location)
 
         for username in self.userlist:
-            self.assertEquals(self.get_num_attempts(username, descriptor), 0)
+            self.assertEqual(self.get_num_attempts(username, descriptor), 0)
 
     def test_reset_failure(self):
         """Simulate a failure in resetting attempts on a problem"""
@@ -591,11 +591,11 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
             Arguments:
                 dicts: tuple of dicts
             """
-            return dict([item for d in dicts for item in d.items()])
+            return dict([item for d in dicts for item in list(d.items())])
 
         def user_partition_group(user):
             """Return a dict having single key with value equals to students group in partition"""
-            group_config_hdr_tpl = u'Experiment Group ({})'
+            group_config_hdr_tpl = 'Experiment Group ({})'
             return {
                 group_config_hdr_tpl.format(self.partition.name): self.partition.scheme.get_group_for_user(
                     self.course.id, user, self.partition
@@ -609,7 +609,7 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
                     grades,
                     user_partition_group(student)
                 )
-                for student_grades in students_grades for student, grades in student_grades.iteritems()
+                for student_grades in students_grades for student, grades in student_grades.items()
             ],
             ignore_other_columns=ignore_other_columns,
         )
@@ -637,14 +637,14 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
                 [
                     {
                         self.student_a: {
-                            u'Grade': '1.0',
-                            u'Homework': '1.0',
+                            'Grade': '1.0',
+                            'Homework': '1.0',
                         }
                     },
                     {
                         self.student_b: {
-                            u'Grade': '0.5',
-                            u'Homework': '0.5',
+                            'Grade': '0.5',
+                            'Homework': '0.5',
                         }
                     },
                 ],
@@ -670,14 +670,14 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
                 [
                     {
                         self.student_a: {
-                            u'Grade': '1.0',
-                            u'Homework': '1.0',
+                            'Grade': '1.0',
+                            'Homework': '1.0',
                         },
                     },
                     {
                         self.student_b: {
-                            u'Grade': '0.0',
-                            u'Homework': u'Not Attempted',
+                            'Grade': '0.0',
+                            'Homework': 'Not Attempted',
                         }
                     },
                 ],

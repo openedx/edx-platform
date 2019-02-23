@@ -82,7 +82,7 @@ def submit_answers(request, survey_name):
         return HttpResponseNotFound()
 
     answers = {}
-    for key in request.POST.keys():
+    for key in list(request.POST.keys()):
         # support multi-SELECT form values, by string concatenating them with a comma separator
         array_val = request.POST.getlist(key)
         answers[key] = request.POST[key] if len(array_val) == 0 else ','.join(array_val)
@@ -98,7 +98,7 @@ def submit_answers(request, survey_name):
     # scrub the answers to make sure nothing malicious from the user gets stored in
     # our database, e.g. JavaScript
     filtered_answers = {}
-    for answer_key in answers.keys():
+    for answer_key in list(answers.keys()):
         # only allow known input fields
         if answer_key in allowed_field_names:
             filtered_answers[answer_key] = escape(answers[answer_key])

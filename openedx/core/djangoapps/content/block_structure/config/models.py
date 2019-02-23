@@ -22,7 +22,7 @@ class BlockStructureConfiguration(ConfigurationModel):
     cache_timeout_in_seconds = IntegerField(blank=True, null=True, default=DEFAULT_CACHE_TIMEOUT_IN_SECONDS)
 
     def __unicode__(self):
-        return u"BlockStructureConfiguration: num_versions_to_keep: {}, cache_timeout_in_seconds: {}".format(
+        return "BlockStructureConfiguration: num_versions_to_keep: {}, cache_timeout_in_seconds: {}".format(
             self.num_versions_to_keep,
             self.cache_timeout_in_seconds,
         )

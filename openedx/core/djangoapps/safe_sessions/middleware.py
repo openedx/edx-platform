@@ -90,7 +90,7 @@ class SafeCookieData(object):
     checking its creation date using settings.SESSION_COOKIE_AGE.
     """
     CURRENT_VERSION = '1'
-    SEPARATOR = u"|"
+    SEPARATOR = "|"
 
     def __init__(self, version, session_id, key_salt, signature):
         """
@@ -146,12 +146,12 @@ class SafeCookieData(object):
             safe_cookie_data = SafeCookieData(*raw_cookie_components)
         except TypeError:
             raise SafeCookieError(
-                u"SafeCookieData BWC parse error: {0!r}.".format(safe_cookie_string)
+                "SafeCookieData BWC parse error: {0!r}.".format(safe_cookie_string)
             )
         else:
             if safe_cookie_data.version != cls.CURRENT_VERSION:
                 raise SafeCookieError(
-                    u"SafeCookieData version {0!r} is not supported. Current version is {1}.".format(
+                    "SafeCookieData version {0!r} is not supported. Current version is {1}.".format(
                         safe_cookie_data.version,
                         cls.CURRENT_VERSION,
                     ))
@@ -182,11 +182,11 @@ class SafeCookieData(object):
             unsigned_data = signing.loads(self.signature, salt=self.key_salt, max_age=settings.SESSION_COOKIE_AGE)
             if unsigned_data == self._compute_digest(user_id):
                 return True
-            log.error(u"SafeCookieData '%r' is not bound to user '%s'.", unicode(self), user_id)
+            log.error("SafeCookieData '%r' is not bound to user '%s'.", str(self), user_id)
         except signing.BadSignature as sig_error:
             log.error(
-                u"SafeCookieData signature error for cookie data {0!r}: {1}".format(  # pylint: disable=logging-format-interpolation
-                    unicode(self),
+                "SafeCookieData signature error for cookie data {0!r}: {1}".format(  # pylint: disable=logging-format-interpolation
+                    str(self),
                     text_type(sig_error),
                 )
             )
@@ -198,7 +198,7 @@ class SafeCookieData(object):
         """
         hash_func = sha256()
         for data_item in [self.version, self.session_id, user_id]:
-            hash_func.update(unicode(data_item))
+            hash_func.update(str(data_item))
             hash_func.update('|')
         return hash_func.hexdigest()
 
@@ -212,10 +212,10 @@ class SafeCookieData(object):
         # Compare against unicode(None) as well since the 'value'
         # property of a cookie automatically serializes None to a
         # string.
-        if not session_id or session_id == unicode(None):
+        if not session_id or session_id == str(None):
             # The session ID should always be valid in the cookie.
             raise SafeCookieError(
-                u"SafeCookieData not created due to invalid value for session_id '{}' for user_id '{}'.".format(
+                "SafeCookieData not created due to invalid value for session_id '{}' for user_id '{}'.".format(
                     session_id,
                     user_id,
                 ))
@@ -226,7 +226,7 @@ class SafeCookieData(object):
             # as some of the session requests are made as
             # Anonymous users.
             log.debug(
-                u"SafeCookieData received empty user_id '%s' for session_id '%s'.",
+                "SafeCookieData received empty user_id '%s' for session_id '%s'.",
                 user_id,
                 session_id,
             )
@@ -367,14 +367,14 @@ class SafeSessionMiddleware(SessionMiddleware):
                 # conditionally set the log level.
                 log_func = log.debug if request.user.id is None else log.warning
                 log_func(
-                    u"SafeCookieData user at request '{0}' does not match user at response: '{1}'".format(
+                    "SafeCookieData user at request '{0}' does not match user at response: '{1}'".format(
                         request.safe_cookie_verified_user_id,
                         request.user.id,
                     ),
                 )
             if request.safe_cookie_verified_user_id != userid_in_session:
                 log.warning(
-                    u"SafeCookieData user at request '{0}' does not match user in session: '{1}'".format(  # pylint: disable=logging-format-interpolation
+                    "SafeCookieData user at request '{0}' does not match user in session: '{1}'".format(  # pylint: disable=logging-format-interpolation
                         request.safe_cookie_verified_user_id,
                         userid_in_session,
                     ),
@@ -425,7 +425,7 @@ class SafeSessionMiddleware(SessionMiddleware):
         )
 
         # Update the cookie's value with the safe_cookie_data.
-        cookies[settings.SESSION_COOKIE_NAME] = unicode(safe_cookie_data)
+        cookies[settings.SESSION_COOKIE_NAME] = str(safe_cookie_data)
 
 
 def _mark_cookie_for_deletion(request):
@@ -460,7 +460,7 @@ def _delete_cookie(request, response):
     while maintaining the domain, secure, and httponly settings.
     """
     log.warning(
-        u"SafeCookieData is deleting session cookie for user %d",
+        "SafeCookieData is deleting session cookie for user %d",
         request.user.id
     )
     response.set_cookie(

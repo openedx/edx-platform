@@ -78,16 +78,16 @@ class MilestonesHelpersTestCase(ModuleStoreTestCase):
         self.assertEqual(len(response), 0)
 
     def test_add_course_milestone_returns_none_when_app_disabled(self):
-        response = milestones_helpers.add_course_milestone(unicode(self.course.id), 'requires', self.milestone)
+        response = milestones_helpers.add_course_milestone(str(self.course.id), 'requires', self.milestone)
         self.assertIsNone(response)
 
     def test_get_course_milestones_returns_none_when_app_disabled(self):
-        response = milestones_helpers.get_course_milestones(unicode(self.course.id))
+        response = milestones_helpers.get_course_milestones(str(self.course.id))
         self.assertEqual(len(response), 0)
 
     def test_add_course_content_milestone_returns_none_when_app_disabled(self):
         response = milestones_helpers.add_course_content_milestone(
-            unicode(self.course.id),
+            str(self.course.id),
             'i4x://any/content/id',
             'requires',
             self.milestone
@@ -96,7 +96,7 @@ class MilestonesHelpersTestCase(ModuleStoreTestCase):
 
     def test_get_course_content_milestones_returns_none_when_app_disabled(self):
         response = milestones_helpers.get_course_content_milestones(
-            unicode(self.course.id),
+            str(self.course.id),
             'i4x://doesnt/matter/for/this/test',
             'requires'
         )
@@ -111,7 +111,7 @@ class MilestonesHelpersTestCase(ModuleStoreTestCase):
         self.assertIn('ENTRANCE_EXAM', response)
 
     def test_get_course_milestones_fulfillment_paths_returns_none_when_app_disabled(self):
-        response = milestones_helpers.get_course_milestones_fulfillment_paths(unicode(self.course.id), self.user)
+        response = milestones_helpers.get_course_milestones_fulfillment_paths(str(self.course.id), self.user)
         self.assertIsNone(response)
 
     def test_add_user_milestone_returns_none_when_app_disabled(self):

@@ -101,7 +101,7 @@ class TestCreateAccount(SiteMixin, TestCase):
         self.params = {
             "username": self.username,
             "email": "test@example.org",
-            "password": u"testpass",
+            "password": "testpass",
             "name": "Test User",
             "honor_code": "true",
             "terms_of_service": "true",
@@ -138,14 +138,14 @@ class TestCreateAccount(SiteMixin, TestCase):
         """
         # Set user password to NFKD format so that we can test that it is normalized to
         # NFKC format upon account creation.
-        self.params['password'] = unicodedata.normalize('NFKD', u'Ṗŕệṿïệẅ Ṯệẍt')
+        self.params['password'] = unicodedata.normalize('NFKD', 'Ṗŕệṿïệẅ Ṯệẍt')
         response = self.client.post(self.url, self.params)
         self.assertEqual(response.status_code, 200)
 
         user = User.objects.get(username=self.username)
         salt_val = user.password.split('$')[1]
 
-        expected_user_password = make_password(unicodedata.normalize('NFKC', u'Ṗŕệṿïệẅ Ṯệẍt'), salt_val)
+        expected_user_password = make_password(unicodedata.normalize('NFKC', 'Ṗŕệṿïệẅ Ṯệẍt'), salt_val)
         self.assertEqual(expected_user_password, user.password)
 
     def test_marketing_cookie(self):
@@ -908,7 +908,7 @@ class TestUnicodeUsername(TestCase):
         # The word below reads "Omar II", in Arabic. It also contains a space and
         # an Eastern Arabic Number another option is to use the Esperanto fake
         # language but this was used instead to test non-western letters.
-        self.username = u'عمر ٢'
+        self.username = 'عمر ٢'
 
         self.url_params = {
             'username': self.username,
@@ -926,9 +926,9 @@ class TestUnicodeUsername(TestCase):
         """
         response = self.client.post(self.url, self.url_params)
 
-        self.assertEquals(response.status_code, 400)
+        self.assertEqual(response.status_code, 400)
         obj = json.loads(response.content)
-        self.assertEquals(USERNAME_INVALID_CHARS_ASCII, obj['value'])
+        self.assertEqual(USERNAME_INVALID_CHARS_ASCII, obj['value'])
 
         with self.assertRaises(User.DoesNotExist):
             User.objects.get(email=self.url_params['email'])
@@ -936,7 +936,7 @@ class TestUnicodeUsername(TestCase):
     @mock.patch.dict(settings.FEATURES, {'ENABLE_UNICODE_USERNAME': True})
     def test_with_feature_enabled(self):
         response = self.client.post(self.url, self.url_params)
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
         self.assertTrue(User.objects.get(email=self.url_params['email']))
 
@@ -950,10 +950,10 @@ class TestUnicodeUsername(TestCase):
         invalid_params['username'] = '**john**'
 
         response = self.client.post(self.url, invalid_params)
-        self.assertEquals(response.status_code, 400)
+        self.assertEqual(response.status_code, 400)
 
         obj = json.loads(response.content)
-        self.assertEquals(USERNAME_INVALID_CHARS_UNICODE, obj['value'])
+        self.assertEqual(USERNAME_INVALID_CHARS_UNICODE, obj['value'])
 
         with self.assertRaises(User.DoesNotExist):
             User.objects.get(email=self.url_params['email'])

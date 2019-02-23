@@ -36,7 +36,7 @@ class StudioCourseTest(UniqueCourseTest):
         )
         if self.test_xss:
             xss_injected_unique_id = XSS_INJECTION + self.unique_id
-            test_improper_escaping = {u"value": xss_injected_unique_id}
+            test_improper_escaping = {"value": xss_injected_unique_id}
             self.course_fixture.add_advanced_settings({
                 "advertised_start": test_improper_escaping,
                 "info_sidebar_name": test_improper_escaping,
@@ -144,7 +144,7 @@ class StudioLibraryTest(AcceptanceTest):
         fixture = LibraryFixture(
             'test_org',
             self.unique_id,
-            u'Test Library {}'.format(self.unique_id),
+            'Test Library {}'.format(self.unique_id),
         )
         self.populate_library_fixture(fixture)
         fixture.install()

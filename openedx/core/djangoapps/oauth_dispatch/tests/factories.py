@@ -19,7 +19,7 @@ class ApplicationFactory(DjangoModelFactory):
         model = Application
 
     user = factory.SubFactory(UserFactory)
-    client_id = factory.Sequence(u'client_{0}'.format)
+    client_id = factory.Sequence('client_{0}'.format)
     client_secret = 'some_secret'
     client_type = 'confidential'
     authorization_grant_type = 'Client credentials'

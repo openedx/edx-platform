@@ -146,7 +146,7 @@ class TestModuleStoreIgnore(TestXMLModuleStore):
 
     def setUp(self):
         super(TestModuleStoreIgnore, self).setUp()
-        self.addCleanup(remove_temp_files_from_list, TILDA_FILES_DICT.keys(), self.course_dir / "static")
+        self.addCleanup(remove_temp_files_from_list, list(TILDA_FILES_DICT.keys()), self.course_dir / "static")
         add_temp_files_from_dict(TILDA_FILES_DICT, self.course_dir / "static")
 
     @patch("xmodule.modulestore.xml.glob.glob", side_effect=glob_tildes_at_end)

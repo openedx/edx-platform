@@ -112,7 +112,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         self.assertIn('course_info/{}/updates'.format(self.course.id), found_course['course_updates'])
         self.assertIn('course_info/{}/handouts'.format(self.course.id), found_course['course_handouts'])
         self.assertIn('video_outlines/courses/{}'.format(self.course.id), found_course['video_outline'])
-        self.assertEqual(found_course['id'], unicode(self.course.id))
+        self.assertEqual(found_course['id'], str(self.course.id))
         self.assertEqual(courses[0]['mode'], CourseMode.DEFAULT_MODE_SLUG)
         self.assertEqual(courses[0]['course']['subscription_id'], self.course.clean_id(padding_char='_'))
 
@@ -142,7 +142,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         for course_index in range(num_courses):
             self.assertEqual(
                 response.data[course_index]['course']['id'],
-                unicode(courses[num_courses - course_index - 1].id)
+                str(courses[num_courses - course_index - 1].id)
             )
 
     @ddt.data(API_V05, API_V1)
@@ -156,7 +156,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
 
         course_with_prereq = CourseFactory.create(start=self.LAST_WEEK, mobile_available=True)
         prerequisite_course = CourseFactory.create()
-        set_prerequisite_courses(course_with_prereq.id, [unicode(prerequisite_course.id)])
+        set_prerequisite_courses(course_with_prereq.id, [str(prerequisite_course.id)])
 
         # Create list of courses with various expected courseware_access responses and corresponding expected codes
         courses = [
@@ -343,7 +343,7 @@ class TestUserEnrollmentCertificates(UrlResetMixin, MobileAPITestCase, Milestone
 
         response = self.api_response()
         certificate_data = response.data[0]['certificate']
-        self.assertEquals(certificate_data['url'], certificate_url)
+        self.assertEqual(certificate_data['url'], certificate_url)
 
     @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
     def test_no_certificate(self):
@@ -383,7 +383,7 @@ class TestUserEnrollmentCertificates(UrlResetMixin, MobileAPITestCase, Milestone
 
         response = self.api_response()
         certificate_data = response.data[0]['certificate']
-        self.assertRegexpMatches(
+        self.assertRegex(
             certificate_data['url'],
             r'http.*/certificates/user/{user_id}/course/{course_id}'.format(
                 user_id=self.user.id,
@@ -437,11 +437,11 @@ class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin,
         response = self.api_response()
         self.assertEqual(
             response.data["last_visited_module_id"],
-            unicode(self.sub_section.location)
+            str(self.sub_section.location)
         )
         self.assertEqual(
             response.data["last_visited_module_path"],
-            [unicode(module.location) for module in [self.sub_section, self.section, self.course]]
+            [str(module.location) for module in [self.sub_section, self.section, self.course]]
         )
 
 
@@ -456,10 +456,10 @@ class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin,
 
     def test_success(self):
         self.login_and_enroll()
-        response = self.api_response(data={"last_visited_module_id": unicode(self.other_unit.location)})
+        response = self.api_response(data={"last_visited_module_id": str(self.other_unit.location)})
         self.assertEqual(
             response.data["last_visited_module_id"],
-            unicode(self.other_sub_section.location)
+            str(self.other_sub_section.location)
         )
 
     def test_invalid_module(self):
@@ -484,7 +484,7 @@ class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin,
         past_date = datetime.datetime.now()
         response = self.api_response(
             data={
-                "last_visited_module_id": unicode(self.other_unit.location),
+                "last_visited_module_id": str(self.other_unit.location),
                 "modification_date": past_date.isoformat()
             },
             expected_response_code=400
@@ -502,18 +502,18 @@ class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin,
         self.login_and_enroll()
 
         # save something so we have an initial date
-        self.api_response(data={"last_visited_module_id": unicode(initial_unit.location)})
+        self.api_response(data={"last_visited_module_id": str(initial_unit.location)})
 
         # now actually update it
         response = self.api_response(
             data={
-                "last_visited_module_id": unicode(update_unit.location),
+                "last_visited_module_id": str(update_unit.location),
                 "modification_date": date.isoformat()
             }
         )
         self.assertEqual(
             response.data["last_visited_module_id"],
-            unicode(expected_subsection.location)
+            str(expected_subsection.location)
         )
 
     def test_old_date(self):
@@ -530,13 +530,13 @@ class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin,
         self.login_and_enroll()
         response = self.api_response(
             data={
-                "last_visited_module_id": unicode(self.other_unit.location),
+                "last_visited_module_id": str(self.other_unit.location),
                 "modification_date": timezone.now().isoformat()
             }
         )
         self.assertEqual(
             response.data["last_visited_module_id"],
-            unicode(self.other_sub_section.location)
+            str(self.other_sub_section.location)
         )
 
     def test_invalid_date(self):

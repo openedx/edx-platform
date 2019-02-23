@@ -102,9 +102,9 @@ class CohortViewsTestCase(ModuleStoreTestCase):
             user = self.staff_user
         request.user = user
         if cohort:
-            response = handler(request, unicode(course.id), cohort.id)
+            response = handler(request, str(course.id), cohort.id)
         else:
-            response = handler(request, unicode(course.id))
+            response = handler(request, str(course.id))
         self.assertEqual(response.status_code, expected_response_code)
         return json.loads(response.content)
 
@@ -113,14 +113,14 @@ class CohortViewsTestCase(ModuleStoreTestCase):
         Call a PUT on `handler` for a given `course` and return its response as a dict.
         Raise an exception if response status code is not as expected.
         """
-        if not isinstance(data, basestring):
+        if not isinstance(data, str):
             data = json.dumps(data or {})
         request = RequestFactory().put(path="dummy path", data=data, content_type="application/json")
         request.user = self.staff_user
         if cohort:
-            response = handler(request, unicode(course.id), cohort.id)
+            response = handler(request, str(course.id), cohort.id)
         else:
-            response = handler(request, unicode(course.id))
+            response = handler(request, str(course.id))
         self.assertEqual(response.status_code, expected_response_code)
         return json.loads(response.content)
 
@@ -129,15 +129,15 @@ class CohortViewsTestCase(ModuleStoreTestCase):
         Call a PATCH on `handler` for a given `course` and return its response as a dict.
         Raise an exception if response status code is not as expected.
         """
-        if not isinstance(data, basestring):
+        if not isinstance(data, str):
             data = json.dumps(data or {})
 
         request = RequestFactory().patch(path="dummy path", data=data, content_type="application/json")
         request.user = self.staff_user
         if cohort:
-            response = handler(request, unicode(course.id), cohort.id)
+            response = handler(request, str(course.id), cohort.id)
         else:
-            response = handler(request, unicode(course.id))
+            response = handler(request, str(course.id))
         self.assertEqual(response.status_code, expected_response_code)
         return json.loads(response.content)
 
@@ -160,8 +160,8 @@ class CourseCohortSettingsHandlerTestCase(CohortViewsTestCase):
         """
         Verify that we cannot access course_cohort_settings_handler if we're a non-staff user.
         """
-        self._verify_non_staff_cannot_access(course_cohort_settings_handler, "GET", [unicode(self.course.id)])
-        self._verify_non_staff_cannot_access(course_cohort_settings_handler, "PATCH", [unicode(self.course.id)])
+        self._verify_non_staff_cannot_access(course_cohort_settings_handler, "GET", [str(self.course.id)])
+        self._verify_non_staff_cannot_access(course_cohort_settings_handler, "PATCH", [str(self.course.id)])
 
     def test_update_is_cohorted_settings(self):
         """
@@ -284,8 +284,8 @@ class CohortHandlerTestCase(CohortViewsTestCase):
         """
         Verify that we cannot access cohort_handler if we're a non-staff user.
         """
-        self._verify_non_staff_cannot_access(cohort_handler, "POST", [unicode(self.course.id)])
-        self._verify_non_staff_cannot_access(cohort_handler, "PUT", [unicode(self.course.id)])
+        self._verify_non_staff_cannot_access(cohort_handler, "POST", [str(self.course.id)])
+        self._verify_non_staff_cannot_access(cohort_handler, "PUT", [str(self.course.id)])
 
     def test_course_writers(self):
         """
@@ -612,7 +612,7 @@ class UsersInCohortTestCase(CohortViewsTestCase):
         """
         request = RequestFactory().get("dummy_url", {"page": requested_page})
         request.user = self.staff_user
-        response = users_in_cohort(request, unicode(course.id), cohort.id)
+        response = users_in_cohort(request, str(course.id), cohort.id)
 
         if should_return_bad_request:
             self.assertEqual(response.status_code, 400)
@@ -642,7 +642,7 @@ class UsersInCohortTestCase(CohortViewsTestCase):
         Verify that non-staff users cannot access `check_users_in_cohort`.
         """
         cohort = CohortFactory(course_id=self.course.id, users=[])
-        self._verify_non_staff_cannot_access(users_in_cohort, "GET", [unicode(self.course.id), cohort.id])
+        self._verify_non_staff_cannot_access(users_in_cohort, "GET", [str(self.course.id), cohort.id])
 
     def test_no_users(self):
         """
@@ -751,10 +751,10 @@ class AddUsersToCohortTestCase(CohortViewsTestCase):
         if should_raise_404:
             self.assertRaises(
                 Http404,
-                lambda: add_users_to_cohort(request, unicode(course.id), cohort.id)
+                lambda: add_users_to_cohort(request, str(course.id), cohort.id)
             )
         else:
-            response = add_users_to_cohort(request, unicode(course.id), cohort.id)
+            response = add_users_to_cohort(request, str(course.id), cohort.id)
             self.assertEqual(response.status_code, 200)
 
             return json.loads(response.content)
@@ -817,7 +817,7 @@ class AddUsersToCohortTestCase(CohortViewsTestCase):
         self._verify_non_staff_cannot_access(
             add_users_to_cohort,
             "POST",
-            [unicode(self.course.id), cohort.id]
+            [str(self.course.id), cohort.id]
         )
 
     def test_empty(self):
@@ -1057,7 +1057,7 @@ class AddUsersToCohortTestCase(CohortViewsTestCase):
         """
         unknown = "unknown_user"
         response_dict = self.request_add_users_to_cohort(
-            u" {} {}\t{}, \r\n{}".format(
+            " {} {}\t{}, \r\n{}".format(
                 unknown,
                 self.cohort1_users[0].username,
                 self.cohort2_users[0].username,
@@ -1137,7 +1137,7 @@ class RemoveUserFromCohortTestCase(CohortViewsTestCase):
         else:
             request = RequestFactory().post("dummy_url")
         request.user = self.staff_user
-        response = remove_user_from_cohort(request, unicode(self.course.id), cohort.id)
+        response = remove_user_from_cohort(request, str(self.course.id), cohort.id)
         self.assertEqual(response.status_code, 200)
         return json.loads(response.content)
 
@@ -1163,7 +1163,7 @@ class RemoveUserFromCohortTestCase(CohortViewsTestCase):
         self._verify_non_staff_cannot_access(
             remove_user_from_cohort,
             "POST",
-            [unicode(self.course.id), cohort.id]
+            [str(self.course.id), cohort.id]
         )
 
     def test_no_username_given(self):
@@ -1194,7 +1194,7 @@ class RemoveUserFromCohortTestCase(CohortViewsTestCase):
             username,
             response_dict,
             cohort,
-            expected_error_msg=u'No user \'{0}\''.format(username)
+            expected_error_msg='No user \'{0}\''.format(username)
         )
 
     def test_can_remove_user_not_in_cohort(self):

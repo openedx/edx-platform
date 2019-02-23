@@ -177,4 +177,4 @@ class CourseDetailsTestCase(ModuleStoreTestCase):
             CourseDetails.update_about_video(self.course, video_value, self.user.id)
         self.assertEqual(CourseDetails.fetch_youtube_video_id(self.course.id), video_value)
         video_url = CourseDetails.fetch_video_url(self.course.id)
-        self.assertRegexpMatches(video_url, r'http://.*{}'.format(video_value))
+        self.assertRegex(video_url, r'http://.*{}'.format(video_value))

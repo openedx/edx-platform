@@ -2,7 +2,7 @@
 Test data created by CourseSerializer and CourseDetailSerializer
 """
 
-from __future__ import unicode_literals
+
 
 from datetime import datetime
 
@@ -38,20 +38,20 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
         self.honor_user = self.create_user('honor', is_staff=False)
         self.request_factory = APIRequestFactory()
 
-        image_path = u'/c4x/edX/toy/asset/just_a_test.jpg'
-        image_url = u'http://testserver' + image_path
+        image_path = '/c4x/edX/toy/asset/just_a_test.jpg'
+        image_url = 'http://testserver' + image_path
         self.expected_data = {
-            'id': u'edX/toy/2012_Fall',
-            'name': u'Toy Course',
-            'number': u'toy',
-            'org': u'edX',
-            'short_description': u'A course about toys.',
+            'id': 'edX/toy/2012_Fall',
+            'name': 'Toy Course',
+            'number': 'toy',
+            'org': 'edX',
+            'short_description': 'A course about toys.',
             'media': {
                 'course_image': {
                     'uri': image_path,
                 },
                 'course_video': {
-                    'uri': u'http://www.youtube.com/watch?v=test_youtube_id',
+                    'uri': 'http://www.youtube.com/watch?v=test_youtube_id',
                 },
                 'image': {
                     'raw': image_url,
@@ -59,21 +59,21 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
                     'large': image_url,
                 }
             },
-            'start': u'2015-07-17T12:00:00Z',
-            'start_type': u'timestamp',
-            'start_display': u'July 17, 2015',
-            'end': u'2015-09-19T18:00:00Z',
-            'enrollment_start': u'2015-06-15T00:00:00Z',
-            'enrollment_end': u'2015-07-15T00:00:00Z',
-            'blocks_url': u'http://testserver/api/courses/v1/blocks/?course_id=edX%2Ftoy%2F2012_Fall',
-            'effort': u'6 hours',
+            'start': '2015-07-17T12:00:00Z',
+            'start_type': 'timestamp',
+            'start_display': 'July 17, 2015',
+            'end': '2015-09-19T18:00:00Z',
+            'enrollment_start': '2015-06-15T00:00:00Z',
+            'enrollment_end': '2015-07-15T00:00:00Z',
+            'blocks_url': 'http://testserver/api/courses/v1/blocks/?course_id=edX%2Ftoy%2F2012_Fall',
+            'effort': '6 hours',
             'pacing': 'instructor',
             'mobile_available': True,
             'hidden': False,
             'invitation_only': False,
 
             # 'course_id' is a deprecated field, please use 'id' instead.
-            'course_id': u'edX/toy/2012_Fall',
+            'course_id': 'edX/toy/2012_Fall',
         }
 
     def _get_request(self, user=None):
@@ -102,29 +102,29 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
 
     def test_hidden(self):
         course = self.create_course(
-            course=u'custom',
+            course='custom',
             start=datetime(2015, 3, 15),
-            catalog_visibility=u'none'
+            catalog_visibility='none'
         )
         result = self._get_result(course)
         self.assertEqual(result['hidden'], True)
 
     def test_advertised_start(self):
         course = self.create_course(
-            course=u'custom',
+            course='custom',
             start=datetime(2015, 3, 15),
-            advertised_start=u'The Ides of March'
+            advertised_start='The Ides of March'
         )
         result = self._get_result(course)
-        self.assertEqual(result['course_id'], u'edX/custom/2012_Fall')
-        self.assertEqual(result['start_type'], u'string')
-        self.assertEqual(result['start_display'], u'The Ides of March')
+        self.assertEqual(result['course_id'], 'edX/custom/2012_Fall')
+        self.assertEqual(result['start_type'], 'string')
+        self.assertEqual(result['start_display'], 'The Ides of March')
 
     def test_empty_start(self):
-        course = self.create_course(start=DEFAULT_START_DATE, course=u'custom')
+        course = self.create_course(start=DEFAULT_START_DATE, course='custom')
         result = self._get_result(course)
-        self.assertEqual(result['course_id'], u'edX/custom/2012_Fall')
-        self.assertEqual(result['start_type'], u'empty')
+        self.assertEqual(result['course_id'], 'edX/custom/2012_Fall')
+        self.assertEqual(result['start_type'], 'empty')
         self.assertIsNone(result['start_display'])
 
     @ddt.unpack

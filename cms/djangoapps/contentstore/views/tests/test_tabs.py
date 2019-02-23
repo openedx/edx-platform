@@ -205,15 +205,15 @@ class PrimitiveTabEdit(ModuleStoreTestCase):
         with self.assertRaises(IndexError):
             tabs.primitive_delete(course, 6)
         tabs.primitive_delete(course, 2)
-        self.assertNotIn({u'type': u'textbooks'}, course.tabs)
+        self.assertNotIn({'type': 'textbooks'}, course.tabs)
         # Check that discussion has shifted up
-        self.assertEquals(course.tabs[2], {'type': 'discussion', 'name': 'Discussion'})
+        self.assertEqual(course.tabs[2], {'type': 'discussion', 'name': 'Discussion'})
 
     def test_insert(self):
         """Test primitive tab insertion."""
         course = CourseFactory.create()
         tabs.primitive_insert(course, 2, 'notes', 'aname')
-        self.assertEquals(course.tabs[2], {'type': 'notes', 'name': 'aname'})
+        self.assertEqual(course.tabs[2], {'type': 'notes', 'name': 'aname'})
         with self.assertRaises(ValueError):
             tabs.primitive_insert(course, 0, 'notes', 'aname')
         with self.assertRaises(ValueError):
@@ -224,4 +224,4 @@ class PrimitiveTabEdit(ModuleStoreTestCase):
         course = CourseFactory.create()
         tabs.primitive_insert(course, 3, 'notes', 'aname')
         course2 = modulestore().get_course(course.id)
-        self.assertEquals(course2.tabs[3], {'type': 'notes', 'name': 'aname'})
+        self.assertEqual(course2.tabs[3], {'type': 'notes', 'name': 'aname'})

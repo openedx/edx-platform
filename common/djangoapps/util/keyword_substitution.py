@@ -49,7 +49,7 @@ def substitute_keywords(string, user_id, context):
         '%%COURSE_END_DATE%%': lambda: context.get('course_end_date'),
     }
 
-    for key in KEYWORD_FUNCTION_MAP.keys():
+    for key in list(KEYWORD_FUNCTION_MAP.keys()):
         if key in string:
             substitutor = KEYWORD_FUNCTION_MAP[key]
             string = string.replace(key, substitutor())

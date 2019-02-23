@@ -41,7 +41,7 @@ class TestProctoredExams(ModuleStoreTestCase):
         Helper method to compare the sequence with the stored exam,
         which should just be a single one
         """
-        exams = get_all_exams_for_course(unicode(self.course.id))
+        exams = get_all_exams_for_course(str(self.course.id))
 
         self.assertEqual(len(exams), 1)
 
@@ -56,8 +56,8 @@ class TestProctoredExams(ModuleStoreTestCase):
             # the hide after due value only applies to timed exams
             self.assertEqual(exam['hide_after_due'], sequence.hide_after_due)
 
-        self.assertEqual(exam['course_id'], unicode(self.course.id))
-        self.assertEqual(exam['content_id'], unicode(sequence.location))
+        self.assertEqual(exam['course_id'], str(self.course.id))
+        self.assertEqual(exam['content_id'], str(sequence.location))
         self.assertEqual(exam['exam_name'], sequence.display_name)
         self.assertEqual(exam['time_limit_mins'], sequence.default_time_limit_minutes)
         self.assertEqual(exam['is_proctored'], sequence.is_proctored_exam)
@@ -164,7 +164,7 @@ class TestProctoredExams(ModuleStoreTestCase):
 
         listen_for_course_publish(self, self.course.id)
 
-        exams = get_all_exams_for_course(unicode(self.course.id))
+        exams = get_all_exams_for_course(str(self.course.id))
         self.assertEqual(len(exams), 1)
 
         sequence.is_time_limited = False
@@ -195,7 +195,7 @@ class TestProctoredExams(ModuleStoreTestCase):
 
         listen_for_course_publish(self, self.course.id)
 
-        exams = get_all_exams_for_course(unicode(self.course.id))
+        exams = get_all_exams_for_course(str(self.course.id))
         self.assertEqual(len(exams), 1)
 
         self.store.delete_item(chapter.location, self.user.id)
@@ -205,7 +205,7 @@ class TestProctoredExams(ModuleStoreTestCase):
 
         # look through exam table, the dangling exam
         # should be disabled
-        exams = get_all_exams_for_course(unicode(self.course.id))
+        exams = get_all_exams_for_course(str(self.course.id))
         self.assertEqual(len(exams), 1)
 
         exam = exams[0]
@@ -230,7 +230,7 @@ class TestProctoredExams(ModuleStoreTestCase):
 
         listen_for_course_publish(self, self.course.id)
 
-        exams = get_all_exams_for_course(unicode(self.course.id))
+        exams = get_all_exams_for_course(str(self.course.id))
         self.assertEqual(len(exams), 0)
 
     @ddt.data(
@@ -269,5 +269,5 @@ class TestProctoredExams(ModuleStoreTestCase):
 
         # there shouldn't be any exams because we haven't enabled that
         # advanced setting flag
-        exams = get_all_exams_for_course(unicode(self.course.id))
+        exams = get_all_exams_for_course(str(self.course.id))
         self.assertEqual(len(exams), expected_count)

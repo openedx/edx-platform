@@ -98,24 +98,24 @@ class GradeViewTestMixin(SharedModuleStoreTestCase):
         # create a problem for each type and minimum count needed by the grading policy
         # A section is not considered if the student answers less than "min_count" problems
         for grading_type, min_count in (("Homework", 12), ("Lab", 12), ("Midterm Exam", 1), ("Final Exam", 1)):
-            for num in xrange(min_count):
+            for num in range(min_count):
                 section = ItemFactory.create(
                     category='sequential',
                     parent_location=chapter.location,
                     due=datetime(2017, 12, 18, 11, 30, 00),
-                    display_name=u'Sequential {} {}'.format(grading_type, num),
+                    display_name='Sequential {} {}'.format(grading_type, num),
                     format=grading_type,
                     graded=True,
                 )
                 vertical = ItemFactory.create(
                     category='vertical',
                     parent_location=section.location,
-                    display_name=u'Vertical {} {}'.format(grading_type, num),
+                    display_name='Vertical {} {}'.format(grading_type, num),
                 )
                 ItemFactory.create(
                     category='problem',
                     parent_location=vertical.location,
-                    display_name=u'Problem {} {}'.format(grading_type, num),
+                    display_name='Problem {} {}'.format(grading_type, num),
                 )
 
         return course

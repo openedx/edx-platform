@@ -3,7 +3,7 @@ Declaration of CourseOverview model
 """
 import json
 import logging
-from urlparse import urlparse, urlunparse
+from urllib.parse import urlparse, urlunparse
 
 from django.conf import settings
 from django.db import models, transaction
@@ -149,10 +149,10 @@ class CourseOverview(TimeStampedModel):
 
         course_overview = cls.objects.filter(id=course.id)
         if course_overview.exists():
-            log.info(u'Updating course overview for %s.', unicode(course.id))
+            log.info('Updating course overview for %s.', str(course.id))
             course_overview = course_overview.first()
         else:
-            log.info(u'Creating course overview for %s.', unicode(course.id))
+            log.info('Creating course overview for %s.', str(course.id))
             course_overview = cls()
 
         course_overview.version = cls.VERSION
@@ -251,7 +251,7 @@ class CourseOverview(TimeStampedModel):
                     pass
                 except Exception:
                     log.exception(
-                        u"CourseOverview for course %s failed!",
+                        "CourseOverview for course %s failed!",
                         course_id,
                     )
                     raise
@@ -259,9 +259,9 @@ class CourseOverview(TimeStampedModel):
                 return course_overview
             elif course is not None:
                 raise IOError(
-                    u"Error while loading course {} from the module store: {}",
-                    unicode(course_id),
-                    course.error_msg if isinstance(course, ErrorDescriptor) else unicode(course)
+                    "Error while loading course {} from the module store: {}",
+                    str(course_id),
+                    course.error_msg if isinstance(course, ErrorDescriptor) else str(course)
                 )
             else:
                 raise cls.DoesNotExist()
@@ -481,11 +481,11 @@ class CourseOverview(TimeStampedModel):
         Returns the type of the course's 'start' field.
         """
         if self.advertised_start:
-            return u'string'
+            return 'string'
         elif self.start != DEFAULT_START_DATE:
-            return u'timestamp'
+            return 'timestamp'
         else:
-            return u'empty'
+            return 'empty'
 
     @property
     def start_display(self):
@@ -543,8 +543,8 @@ class CourseOverview(TimeStampedModel):
                 whether the requested CourseOverview objects should be
                 forcefully updated (i.e., re-synched with the modulestore).
         """
-        log.info(u'Generating course overview for %d courses.', len(course_keys))
-        log.debug(u'Generating course overview(s) for the following courses: %s', course_keys)
+        log.info('Generating course overview for %d courses.', len(course_keys))
+        log.debug('Generating course overview(s) for the following courses: %s', course_keys)
 
         action = CourseOverview.load_from_module_store if force_update else CourseOverview.get_from_id
 
@@ -553,8 +553,8 @@ class CourseOverview(TimeStampedModel):
                 action(course_key)
             except Exception as ex:  # pylint: disable=broad-except
                 log.exception(
-                    u'An error occurred while generating course overview for %s: %s',
-                    unicode(course_key),
+                    'An error occurred while generating course overview for %s: %s',
+                    str(course_key),
                     text_type(ex),
                 )
 
@@ -676,7 +676,7 @@ class CourseOverview(TimeStampedModel):
 
         return {
             resolution: self._apply_cdn_to_url(url, base_url)
-            for resolution, url in image_urls.items()
+            for resolution, url in list(image_urls.items())
         }
 
     def _apply_cdn_to_url(self, url, base_url):
@@ -703,7 +703,7 @@ class CourseOverview(TimeStampedModel):
 
     def __unicode__(self):
         """Represent ourselves with the course key."""
-        return unicode(self.id)
+        return str(self.id)
 
 
 class CourseOverviewTab(models.Model):
@@ -824,7 +824,7 @@ class CourseOverviewImageSet(TimeStampedModel):
                 image_set.large_url = create_course_image_thumbnail(course, config.large)
             except Exception:  # pylint: disable=broad-except
                 log.exception(
-                    u"Could not create thumbnail for course %s with image %s (small=%s), (large=%s)",
+                    "Could not create thumbnail for course %s with image %s (small=%s), (large=%s)",
                     course.id,
                     course.course_image,
                     config.small,
@@ -853,7 +853,7 @@ class CourseOverviewImageSet(TimeStampedModel):
             pass
 
     def __unicode__(self):
-        return u"CourseOverviewImageSet({}, small_url={}, large_url={})".format(
+        return "CourseOverviewImageSet({}, small_url={}, large_url={})".format(
             self.course_overview_id, self.small_url, self.large_url
         )
 
@@ -888,6 +888,6 @@ class CourseOverviewImageConfig(ConfigurationModel):
         return (self.large_width, self.large_height)
 
     def __unicode__(self):
-        return u"CourseOverviewImageConfig(enabled={}, small={}, large={})".format(
+        return "CourseOverviewImageConfig(enabled={}, small={}, large={})".format(
             self.enabled, self.small, self.large
         )

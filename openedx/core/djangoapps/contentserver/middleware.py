@@ -30,7 +30,7 @@ from .models import CourseAssetCacheTtlConfig, CdnUserAgentsConfig
 # TODO: Soon as we have a reasonable way to serialize/deserialize AssetKeys, we need
 # to change this file so instead of using course_id_partial, we're just using asset keys
 
-HTTP_DATE_FORMAT = u"%a, %d %b %Y %H:%M:%S GMT"
+HTTP_DATE_FORMAT = "%a, %d %b %Y %H:%M:%S GMT"
 
 
 class StaticContentServer(object):
@@ -133,18 +133,18 @@ class StaticContentServer(object):
                 except ValueError as exception:
                     # If the header field is syntactically invalid it should be ignored.
                     log.exception(
-                        u"%s in Range header: %s for content: %s", text_type(exception), header_value, unicode(loc)
+                        "%s in Range header: %s for content: %s", text_type(exception), header_value, str(loc)
                     )
                 else:
                     if unit != 'bytes':
                         # Only accept ranges in bytes
-                        log.warning(u"Unknown unit in Range header: %s for content: %s", header_value, text_type(loc))
+                        log.warning("Unknown unit in Range header: %s for content: %s", header_value, text_type(loc))
                     elif len(ranges) > 1:
                         # According to Http/1.1 spec content for multiple ranges should be sent as a multipart message.
                         # http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.16
                         # But we send back the full content.
                         log.warning(
-                            u"More than 1 ranges in Range header: %s for content: %s", header_value, text_type(loc)
+                            "More than 1 ranges in Range header: %s for content: %s", header_value, text_type(loc)
                         )
                     else:
                         first, last = ranges[0]
@@ -162,7 +162,7 @@ class StaticContentServer(object):
                                 newrelic.agent.add_custom_parameter('contentserver.ranged', True)
                         else:
                             log.warning(
-                                u"Cannot satisfy ranges in Range header: %s for content: %s",
+                                "Cannot satisfy ranges in Range header: %s for content: %s",
                                 header_value, text_type(loc)
                             )
                             return HttpResponse(status=416)  # Requested Range Not Satisfiable

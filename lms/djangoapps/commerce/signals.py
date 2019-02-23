@@ -1,7 +1,7 @@
 """
 Signal handling functions for use with external commerce service.
 """
-from __future__ import unicode_literals
+
 
 import logging
 

@@ -30,12 +30,12 @@ class StubHttpServiceTest(unittest.TestCase):
                 'test_key': 'test_val',
             },
             'test_empty_dict': {},
-            'test_unicode': u'\u2603 the snowman',
+            'test_unicode': '\u2603 the snowman',
             'test_none': None,
             'test_boolean': False
         }
 
-        for key, val in params.iteritems():
+        for key, val in params.items():
 
             # JSON-encode each parameter
             post_params = {key: json.dumps(val)}
@@ -43,7 +43,7 @@ class StubHttpServiceTest(unittest.TestCase):
             self.assertEqual(response.status_code, 200)
 
         # Check that the expected values were set in the configuration
-        for key, val in params.iteritems():
+        for key, val in params.items():
             self.assertEqual(self.server.config.get(key), val)
 
     def test_bad_json(self):
@@ -56,7 +56,7 @@ class StubHttpServiceTest(unittest.TestCase):
 
     def test_unicode_non_json(self):
         # Send unicode without json-encoding it
-        response = requests.put(self.url, data={'test_unicode': u'\u2603 the snowman'})
+        response = requests.put(self.url, data={'test_unicode': '\u2603 the snowman'})
         self.assertEqual(response.status_code, 400)
 
     def test_unknown_path(self):

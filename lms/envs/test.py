@@ -401,8 +401,8 @@ openid.oidutil.log = lambda message, level=0: None
 
 # Include a non-ascii character in PLATFORM_NAME and PLATFORM_DESCRIPTION to uncover possible
 # UnicodeEncodeErrors in tests. Also use lazy text to reveal possible json dumps errors
-PLATFORM_NAME = ugettext_lazy(u"édX")
-PLATFORM_DESCRIPTION = ugettext_lazy(u"Open édX Platform")
+PLATFORM_NAME = ugettext_lazy("édX")
+PLATFORM_DESCRIPTION = ugettext_lazy("Open édX Platform")
 
 SITE_NAME = "edx.org"
 

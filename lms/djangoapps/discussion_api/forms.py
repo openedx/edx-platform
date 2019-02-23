@@ -1,7 +1,7 @@
 """
 Discussion API forms
 """
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from django.core.exceptions import ValidationError
 from django.forms import BooleanField, CharField, ChoiceField, Form, IntegerField
@@ -67,7 +67,7 @@ class ThreadListGetForm(_PaginationForm):
         try:
             return CourseLocator.from_string(value)
         except InvalidKeyError:
-            raise ValidationError(u"'{}' is not a valid course id".format(value))
+            raise ValidationError("'{}' is not a valid course id".format(value))
 
     def clean_following(self):
         """Validate following"""
@@ -84,7 +84,7 @@ class ThreadListGetForm(_PaginationForm):
         )
         if exclusive_params_count > 1:
             raise ValidationError(
-                u"The following query parameters are mutually exclusive: {}".format(
+                "The following query parameters are mutually exclusive: {}".format(
                     ", ".join(self.EXCLUSIVE_PARAMS)
                 )
             )
@@ -165,7 +165,7 @@ class CourseDiscussionRolesForm(CourseDiscussionSettingsForm):
 
     def clean_rolename(self):
         """Validate the 'rolename' value."""
-        rolename = urllib.unquote(self.cleaned_data.get('rolename'))
+        rolename = urllib.parse.unquote(self.cleaned_data.get('rolename'))
         course_id = self.cleaned_data.get('course_key')
         if course_id and rolename:
             try:

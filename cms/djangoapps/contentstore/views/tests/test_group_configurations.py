@@ -21,17 +21,17 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
 
 GROUP_CONFIGURATION_JSON = {
-    u'name': u'Test name',
-    u'scheme': u'random',
-    u'description': u'Test description',
-    u'version': UserPartition.VERSION,
-    u'groups': [
+    'name': 'Test name',
+    'scheme': 'random',
+    'description': 'Test description',
+    'version': UserPartition.VERSION,
+    'groups': [
         {
-            u'name': u'Group A',
-            u'version': 1,
+            'name': 'Group A',
+            'version': 1,
         }, {
-            u'name': u'Group B',
-            u'version': 1,
+            'name': 'Group B',
+            'version': 1,
         },
     ],
 }
@@ -53,12 +53,12 @@ class HelperMethods(object):
         sequential = ItemFactory.create(
             category='sequential',
             parent_location=self.course.location,
-            display_name=u'Test Subsection {}'.format(name_suffix)
+            display_name='Test Subsection {}'.format(name_suffix)
         )
         vertical = ItemFactory.create(
             category='vertical',
             parent_location=sequential.location,
-            display_name=u'Test Unit {}'.format(name_suffix)
+            display_name='Test Unit {}'.format(name_suffix)
         )
         c0_url = self.course.id.make_usage_key("vertical", "split_test_cond0")
         c1_url = self.course.id.make_usage_key("vertical", "split_test_cond1")
@@ -67,7 +67,7 @@ class HelperMethods(object):
             category='split_test',
             parent_location=vertical.location,
             user_partition_id=cid,
-            display_name=u"Test Content Experiment {}{}".format(name_suffix, special_characters),
+            display_name="Test Content Experiment {}{}".format(name_suffix, special_characters),
             group_id_to_child={"0": c0_url, "1": c1_url, "2": c2_url}
         )
         ItemFactory.create(
@@ -94,7 +94,7 @@ class HelperMethods(object):
             problem = ItemFactory.create(
                 category='problem',
                 parent_location=c1_vertical.location,
-                display_name=u"Test Problem"
+                display_name="Test Problem"
             )
             self.client.ajax_post(
                 reverse_usage_url("xblock_handler", problem.location),
@@ -122,20 +122,20 @@ class HelperMethods(object):
             subsection = ItemFactory.create(
                 category='sequential',
                 parent_location=self.course.location,
-                display_name=u"Test Subsection {}".format(name_suffix)
+                display_name="Test Subsection {}".format(name_suffix)
             )
             vertical_parent_location = subsection.location
 
         vertical = ItemFactory.create(
             category='vertical',
             parent_location=vertical_parent_location,
-            display_name=u"Test Unit {}".format(name_suffix)
+            display_name="Test Unit {}".format(name_suffix)
         )
 
         problem = ItemFactory.create(
             category='problem',
             parent_location=vertical.location,
-            display_name=u"Test Problem {}{}".format(name_suffix, special_characters)
+            display_name="Test Problem {}{}".format(name_suffix, special_characters)
         )
 
         group_access_content = {'group_access': {cid: [group_id]}}
@@ -160,7 +160,7 @@ class HelperMethods(object):
                 i, 'Name ' + str(i), 'Description ' + str(i),
                 [Group(0, 'Group A'), Group(1, 'Group B'), Group(2, 'Group C')],
                 scheme=None, scheme_id=scheme_id
-            ) for i in xrange(count)
+            ) for i in range(count)
         ]
         self.course.user_partitions = partitions
         self.save_course()
@@ -191,17 +191,17 @@ class GroupConfigurationsBaseTestCase(object):
         bad_jsons = [
             # must have name of the configuration
             {
-                u'description': 'Test description',
-                u'groups': [
-                    {u'name': u'Group A'},
-                    {u'name': u'Group B'},
+                'description': 'Test description',
+                'groups': [
+                    {'name': 'Group A'},
+                    {'name': 'Group B'},
                 ],
             },
             # must have at least one group
             {
-                u'name': u'Test name',
-                u'description': u'Test description',
-                u'groups': [],
+                'name': 'Test name',
+                'description': 'Test description',
+                'groups': [],
             },
             # an empty json
             {},
@@ -225,7 +225,7 @@ class GroupConfigurationsBaseTestCase(object):
         Test invalid json handling.
         """
         # No property name.
-        invalid_json = u"{u'name': 'Test Name', []}"
+        invalid_json = "{u'name': 'Test Name', []}"
 
         response = self.client.post(
             self._url(),
@@ -288,16 +288,16 @@ class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurations
         Test that you can create a group configuration.
         """
         expected = {
-            u'description': u'Test description',
-            u'name': u'Test name',
-            u'scheme': u'random',
-            u'version': UserPartition.VERSION,
-            u'groups': [
-                {u'name': u'Group A', u'version': 1},
-                {u'name': u'Group B', u'version': 1},
+            'description': 'Test description',
+            'name': 'Test name',
+            'scheme': 'random',
+            'version': UserPartition.VERSION,
+            'groups': [
+                {'name': 'Group A', 'version': 1},
+                {'name': 'Group B', 'version': 1},
             ],
-            u'parameters': {},
-            u'active': True
+            'parameters': {},
+            'active': True
         }
         response = self.client.ajax_post(
             self._url(),
@@ -315,10 +315,10 @@ class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurations
         # Verify that user_partitions in the course contains the new group configuration.
         user_partititons = self.course.user_partitions
         self.assertEqual(len(user_partititons), 1)
-        self.assertEqual(user_partititons[0].name, u'Test name')
+        self.assertEqual(user_partititons[0].name, 'Test name')
         self.assertEqual(len(user_partititons[0].groups), 2)
-        self.assertEqual(user_partititons[0].groups[0].name, u'Group A')
-        self.assertEqual(user_partititons[0].groups[1].name, u'Group B')
+        self.assertEqual(user_partititons[0].groups[0].name, 'Group A')
+        self.assertEqual(user_partititons[0].groups[1].name, 'Group B')
         self.assertEqual(user_partititons[0].parameters, {})
 
     def test_lazily_creates_cohort_configuration(self):
@@ -338,7 +338,7 @@ class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurations
         """
         group_config = dict(GROUP_CONFIGURATION_JSON)
         group_config['scheme'] = scheme_id
-        group_config.setdefault('parameters', {})['course_id'] = unicode(self.course.id)
+        group_config.setdefault('parameters', {})['course_id'] = str(self.course.id)
         response = self.client.ajax_post(
             self._url(),
             data=group_config
@@ -369,17 +369,17 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
         PUT new content group.
         """
         expected = {
-            u'id': 666,
-            u'name': u'Test name',
-            u'scheme': u'cohort',
-            u'description': u'Test description',
-            u'version': UserPartition.VERSION,
-            u'groups': [
-                {u'id': 0, u'name': u'Group A', u'version': 1, u'usage': []},
-                {u'id': 1, u'name': u'Group B', u'version': 1, u'usage': []},
+            'id': 666,
+            'name': 'Test name',
+            'scheme': 'cohort',
+            'description': 'Test description',
+            'version': UserPartition.VERSION,
+            'groups': [
+                {'id': 0, 'name': 'Group A', 'version': 1, 'usage': []},
+                {'id': 1, 'name': 'Group B', 'version': 1, 'usage': []},
             ],
-            u'parameters': {},
-            u'active': True,
+            'parameters': {},
+            'active': True,
         }
         response = self.client.put(
             self._url(cid=666),
@@ -395,10 +395,10 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
         # Verify that user_partitions in the course contains the new group configuration.
         user_partitions = self.course.user_partitions
         self.assertEqual(len(user_partitions), 1)
-        self.assertEqual(user_partitions[0].name, u'Test name')
+        self.assertEqual(user_partitions[0].name, 'Test name')
         self.assertEqual(len(user_partitions[0].groups), 2)
-        self.assertEqual(user_partitions[0].groups[0].name, u'Group A')
-        self.assertEqual(user_partitions[0].groups[1].name, u'Group B')
+        self.assertEqual(user_partitions[0].groups[0].name, 'Group A')
+        self.assertEqual(user_partitions[0].groups[1].name, 'Group B')
         self.assertEqual(user_partitions[0].parameters, {})
 
     def test_can_edit_content_group(self):
@@ -409,17 +409,17 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
         self.save_course()
 
         expected = {
-            u'id': self.ID,
-            u'name': u'New Test name',
-            u'scheme': u'cohort',
-            u'description': u'New Test description',
-            u'version': UserPartition.VERSION,
-            u'groups': [
-                {u'id': 0, u'name': u'New Group Name', u'version': 1, u'usage': []},
-                {u'id': 2, u'name': u'Group C', u'version': 1, u'usage': []},
+            'id': self.ID,
+            'name': 'New Test name',
+            'scheme': 'cohort',
+            'description': 'New Test description',
+            'version': UserPartition.VERSION,
+            'groups': [
+                {'id': 0, 'name': 'New Group Name', 'version': 1, 'usage': []},
+                {'id': 2, 'name': 'Group C', 'version': 1, 'usage': []},
             ],
-            u'parameters': {},
-            u'active': True,
+            'parameters': {},
+            'active': True,
         }
 
         response = self.client.put(
@@ -437,10 +437,10 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
         user_partititons = self.course.user_partitions
 
         self.assertEqual(len(user_partititons), 1)
-        self.assertEqual(user_partititons[0].name, u'New Test name')
+        self.assertEqual(user_partititons[0].name, 'New Test name')
         self.assertEqual(len(user_partititons[0].groups), 2)
-        self.assertEqual(user_partititons[0].groups[0].name, u'New Group Name')
-        self.assertEqual(user_partititons[0].groups[1].name, u'Group C')
+        self.assertEqual(user_partititons[0].groups[0].name, 'New Group Name')
+        self.assertEqual(user_partititons[0].groups[1].name, 'Group C')
         self.assertEqual(user_partititons[0].parameters, {})
 
     def test_can_delete_content_group(self):
@@ -513,18 +513,18 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
         PUT new group configuration when no configurations exist in the course.
         """
         expected = {
-            u'id': 999,
-            u'name': u'Test name',
-            u'scheme': u'random',
-            u'description': u'Test description',
-            u'version': UserPartition.VERSION,
-            u'groups': [
-                {u'id': 0, u'name': u'Group A', u'version': 1},
-                {u'id': 1, u'name': u'Group B', u'version': 1},
+            'id': 999,
+            'name': 'Test name',
+            'scheme': 'random',
+            'description': 'Test description',
+            'version': UserPartition.VERSION,
+            'groups': [
+                {'id': 0, 'name': 'Group A', 'version': 1},
+                {'id': 1, 'name': 'Group B', 'version': 1},
             ],
-            u'usage': [],
-            u'parameters': {},
-            u'active': True,
+            'usage': [],
+            'parameters': {},
+            'active': True,
         }
 
         response = self.client.put(
@@ -540,10 +540,10 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
         # Verify that user_partitions in the course contains the new group configuration.
         user_partitions = self.course.user_partitions
         self.assertEqual(len(user_partitions), 1)
-        self.assertEqual(user_partitions[0].name, u'Test name')
+        self.assertEqual(user_partitions[0].name, 'Test name')
         self.assertEqual(len(user_partitions[0].groups), 2)
-        self.assertEqual(user_partitions[0].groups[0].name, u'Group A')
-        self.assertEqual(user_partitions[0].groups[1].name, u'Group B')
+        self.assertEqual(user_partitions[0].groups[0].name, 'Group A')
+        self.assertEqual(user_partitions[0].groups[1].name, 'Group B')
         self.assertEqual(user_partitions[0].parameters, {})
 
     def test_can_edit_group_configuration(self):
@@ -554,18 +554,18 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
         self.save_course()
 
         expected = {
-            u'id': self.ID,
-            u'name': u'New Test name',
-            u'scheme': u'random',
-            u'description': u'New Test description',
-            u'version': UserPartition.VERSION,
-            u'groups': [
-                {u'id': 0, u'name': u'New Group Name', u'version': 1},
-                {u'id': 2, u'name': u'Group C', u'version': 1},
+            'id': self.ID,
+            'name': 'New Test name',
+            'scheme': 'random',
+            'description': 'New Test description',
+            'version': UserPartition.VERSION,
+            'groups': [
+                {'id': 0, 'name': 'New Group Name', 'version': 1},
+                {'id': 2, 'name': 'Group C', 'version': 1},
             ],
-            u'usage': [],
-            u'parameters': {},
-            u'active': True,
+            'usage': [],
+            'parameters': {},
+            'active': True,
         }
 
         response = self.client.put(
@@ -583,10 +583,10 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
         user_partititons = self.course.user_partitions
 
         self.assertEqual(len(user_partititons), 1)
-        self.assertEqual(user_partititons[0].name, u'New Test name')
+        self.assertEqual(user_partititons[0].name, 'New Test name')
         self.assertEqual(len(user_partititons[0].groups), 2)
-        self.assertEqual(user_partititons[0].groups[0].name, u'New Group Name')
-        self.assertEqual(user_partititons[0].groups[1].name, u'Group C')
+        self.assertEqual(user_partititons[0].groups[0].name, 'New Group Name')
+        self.assertEqual(user_partititons[0].groups[1].name, 'Group C')
         self.assertEqual(user_partititons[0].parameters, {})
 
     def test_can_delete_group_configuration(self):
@@ -655,7 +655,7 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
         """
         group_config = dict(GROUP_CONFIGURATION_JSON)
         group_config['scheme'] = scheme_id
-        group_config.setdefault('parameters', {})['course_id'] = unicode(self.course.id)
+        group_config.setdefault('parameters', {})['course_id'] = str(self.course.id)
         response = self.client.ajax_post(
             self._url(),
             data=group_config
@@ -673,7 +673,7 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
         """
         group_config = dict(GROUP_CONFIGURATION_JSON)
         group_config['scheme'] = scheme_id
-        group_config.setdefault('parameters', {})['course_id'] = unicode(self.course.id)
+        group_config.setdefault('parameters', {})['course_id'] = str(self.course.id)
         response = self.client.put(
             self._url(cid=partition_id),
             data=json.dumps(group_config),
@@ -714,8 +714,8 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
                 {'id': 1, 'name': 'Group B', 'version': 1, 'usage': usage_for_group},
                 {'id': 2, 'name': 'Group C', 'version': 1, 'usage': []},
             ],
-            u'parameters': {},
-            u'active': True,
+            'parameters': {},
+            'active': True,
         }
 
     def test_content_group_not_used(self):
@@ -733,15 +733,15 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
         """
         self._add_user_partitions(count=1, scheme_id='cohort')
         vertical, __ = self._create_problem_with_content_group(
-            cid=0, group_id=1, name_suffix='0', special_characters=u"JOSÉ ANDRÉS"
+            cid=0, group_id=1, name_suffix='0', special_characters="JOSÉ ANDRÉS"
         )
 
         actual = self._get_user_partition('cohort')
         expected = self._get_expected_content_group(
             usage_for_group=[
                 {
-                    'url': u"/container/{}".format(vertical.location),
-                    'label': u"Test Unit 0 / Test Problem 0JOSÉ ANDRÉS"
+                    'url': "/container/{}".format(vertical.location),
+                    'label': "Test Unit 0 / Test Problem 0JOSÉ ANDRÉS"
                 }
             ]
         )
@@ -881,8 +881,8 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
                     }
                 ]},
             ],
-            u'parameters': {},
-            u'active': True,
+            'parameters': {},
+            'active': True,
         }
         actual = self._get_user_partition('cohort')
 
@@ -925,17 +925,17 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
             'groups': [
                 {'id': 0, 'name': 'Group', 'version': 1, 'usage': [
                     {
-                        'url': u"/container/{}".format(vertical.location),
-                        'label': u"Test Subsection 0 / Test Unit 0"
+                        'url': "/container/{}".format(vertical.location),
+                        'label': "Test Subsection 0 / Test Unit 0"
                     },
                     {
-                        'url': u"/container/{}".format(vertical.location),
-                        'label': u"Test Unit 0 / Test Problem 0"
+                        'url': "/container/{}".format(vertical.location),
+                        'label': "Test Unit 0 / Test Problem 0"
                     }
                 ]},
             ],
-            u'parameters': {},
-            u'active': True,
+            'parameters': {},
+            'active': True,
         }
 
         self.maxDiff = None
@@ -994,7 +994,7 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
          characters are being used in content experiment
         """
         self._add_user_partitions(count=1)
-        __, split_test, __ = self._create_content_experiment(cid=0, name_suffix='0', special_characters=u"JOSÉ ANDRÉS")
+        __, split_test, __ = self._create_content_experiment(cid=0, name_suffix='0', special_characters="JOSÉ ANDRÉS")
 
         actual = GroupConfiguration.get_split_test_partitions_with_usage(self.store, self.course, )
 
@@ -1011,7 +1011,7 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
             ],
             'usage': [{
                 'url': reverse_usage_url("container_handler", split_test.location),
-                'label': u"Test Unit 0 / Test Content Experiment 0JOSÉ ANDRÉS",
+                'label': "Test Unit 0 / Test Content Experiment 0JOSÉ ANDRÉS",
                 'validation': None,
             }],
             'parameters': {},
@@ -1112,10 +1112,10 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
         # This used to cause an exception since the code assumed that
         # only one partition would be available.
         actual = GroupConfiguration.get_partitions_usage_info(self.store, self.course)
-        self.assertEqual(actual.keys(), [0])
+        self.assertEqual(list(actual.keys()), [0])
 
         actual = GroupConfiguration.get_content_groups_items_usage_info(self.store, self.course)
-        self.assertEqual(actual.keys(), [0])
+        self.assertEqual(list(actual.keys()), [0])
 
     def test_can_handle_duplicate_group_ids(self):
         # Create the user partitions
@@ -1150,14 +1150,14 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
         # This used to cause an exception since the code assumed that
         # only one partition would be available.
         actual = GroupConfiguration.get_partitions_usage_info(self.store, self.course)
-        self.assertEqual(actual.keys(), [0, 1])
-        self.assertEqual(actual[0].keys(), [2])
-        self.assertEqual(actual[1].keys(), [3])
+        self.assertEqual(list(actual.keys()), [0, 1])
+        self.assertEqual(list(actual[0].keys()), [2])
+        self.assertEqual(list(actual[1].keys()), [3])
 
         actual = GroupConfiguration.get_content_groups_items_usage_info(self.store, self.course)
-        self.assertEqual(actual.keys(), [0, 1])
-        self.assertEqual(actual[0].keys(), [2])
-        self.assertEqual(actual[1].keys(), [3])
+        self.assertEqual(list(actual.keys()), [0, 1])
+        self.assertEqual(list(actual[0].keys()), [2])
+        self.assertEqual(list(actual[1].keys()), [3])
 
 
 class GroupConfigurationsValidationTestCase(CourseTestCase, HelperMethods):
@@ -1184,9 +1184,9 @@ class GroupConfigurationsValidationTestCase(CourseTestCase, HelperMethods):
         """
         Tests if validation message is present (error case).
         """
-        mocked_message = StudioValidationMessage(StudioValidationMessage.ERROR, u"Validation message")
+        mocked_message = StudioValidationMessage(StudioValidationMessage.ERROR, "Validation message")
         expected_result = StudioValidationMessage(
-            StudioValidationMessage.ERROR, u"This content experiment has issues that affect content visibility."
+            StudioValidationMessage.ERROR, "This content experiment has issues that affect content visibility."
         )
         self.verify_validation_add_usage_info(expected_result, mocked_message)  # pylint: disable=no-value-for-parameter
 
@@ -1194,9 +1194,9 @@ class GroupConfigurationsValidationTestCase(CourseTestCase, HelperMethods):
         """
         Tests if validation message is present (warning case).
         """
-        mocked_message = StudioValidationMessage(StudioValidationMessage.WARNING, u"Validation message")
+        mocked_message = StudioValidationMessage(StudioValidationMessage.WARNING, "Validation message")
         expected_result = StudioValidationMessage(
-            StudioValidationMessage.WARNING, u"This content experiment has issues that affect content visibility."
+            StudioValidationMessage.WARNING, "This content experiment has issues that affect content visibility."
         )
         self.verify_validation_add_usage_info(expected_result, mocked_message)  # pylint: disable=no-value-for-parameter
 
@@ -1225,9 +1225,9 @@ class GroupConfigurationsValidationTestCase(CourseTestCase, HelperMethods):
         """
         Tests if validation message is present when updating usage info.
         """
-        mocked_message = StudioValidationMessage(StudioValidationMessage.WARNING, u"Validation message")
+        mocked_message = StudioValidationMessage(StudioValidationMessage.WARNING, "Validation message")
         expected_result = StudioValidationMessage(
-            StudioValidationMessage.WARNING, u"This content experiment has issues that affect content visibility."
+            StudioValidationMessage.WARNING, "This content experiment has issues that affect content visibility."
         )
         # pylint: disable=no-value-for-parameter
         self.verify_validation_update_usage_info(expected_result, mocked_message)

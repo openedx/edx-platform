@@ -2,7 +2,7 @@
 Management command for compiling sass.
 """
 
-from __future__ import unicode_literals
+
 
 from django.core.management import BaseCommand, CommandError
 
@@ -103,7 +103,7 @@ class Command(BaseCommand):
                 raise CommandError("Invalid themes value, It must either be 'all' or 'no' or list of themes.")
         # Raise error if any of the given theme name is invalid
         # (theme name would be invalid if it does not exist in themes directory)
-        elif (not set(given_themes).issubset(available_themes.keys())) and is_comprehensive_theming_enabled():
+        elif (not set(given_themes).issubset(list(available_themes.keys()))) and is_comprehensive_theming_enabled():
             raise CommandError(
                 "Given themes '{themes}' do not exist inside any of the theme directories '{theme_dirs}'".format(
                     themes=", ".join(set(given_themes) - set(available_themes.keys())),
@@ -112,7 +112,7 @@ class Command(BaseCommand):
             )
 
         if "all" in given_themes:
-            themes = list(available_themes.itervalues())
+            themes = list(available_themes.values())
         elif "no" in given_themes:
             themes = []
         else:

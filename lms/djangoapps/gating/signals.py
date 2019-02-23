@@ -34,8 +34,8 @@ def evaluate_subsection_completion_milestones(**kwargs):
     evaluation of any milestone which can be completed.
     """
     instance = kwargs['instance']
-    course_id = unicode(instance.course_key)
-    block_id = unicode(instance.block_key)
+    course_id = str(instance.course_key)
+    block_id = str(instance.block_key)
     user_id = instance.user_id
     task_evaluate_subsection_completion_milestones(course_id, block_id, user_id)
 

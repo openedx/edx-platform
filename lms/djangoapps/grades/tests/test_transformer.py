@@ -32,15 +32,15 @@ class GradesTransformerTestCase(CourseStructureTestCase):
     ENABLED_SIGNALS = ['course_published']
 
     problem_metadata = {
-        u'graded': True,
-        u'weight': 1,
-        u'due': datetime.datetime(2099, 3, 15, 12, 30, 0, tzinfo=pytz.utc),
+        'graded': True,
+        'weight': 1,
+        'due': datetime.datetime(2099, 3, 15, 12, 30, 0, tzinfo=pytz.utc),
     }
 
     def setUp(self):
         super(GradesTransformerTestCase, self).setUp()
-        password = u'test'
-        self.student = UserFactory.create(is_staff=False, username=u'test_student', password=password)
+        password = 'test'
+        self.student = UserFactory.create(is_staff=False, username='test_student', password=password)
         self.client.login(username=self.student.username, password=password)
 
     def _update_course_grading_policy(self, course, grading_policy):
@@ -77,10 +77,10 @@ class GradesTransformerTestCase(CourseStructureTestCase):
             self.assertEqual(
                 expectations[field],
                 block_structure.get_xblock_field(usage_key, field),
-                msg=u'in field {},'.format(repr(field)),
+                msg='in field {},'.format(repr(field)),
             )
         self.assertIsNotNone(
-            block_structure.get_xblock_field(usage_key, u'subtree_edited_on'),
+            block_structure.get_xblock_field(usage_key, 'subtree_edited_on'),
         )
 
     def assert_collected_transformer_block_fields(self, block_structure, usage_key, transformer_class, **expectations):
@@ -97,7 +97,7 @@ class GradesTransformerTestCase(CourseStructureTestCase):
             self.assertEqual(
                 expectations[field],
                 block_structure.get_transformer_block_field(usage_key, transformer_class, field),
-                msg=u'in {} and field {}'.format(transformer_class, repr(field)),
+                msg='in {} and field {}'.format(transformer_class, repr(field)),
             )
 
     def build_course_with_problems(self, data='<problem></problem>', metadata=None):
@@ -113,18 +113,18 @@ class GradesTransformerTestCase(CourseStructureTestCase):
         # `CourseStructureTestCase.build_course` for details.
         return self.build_course([
             {
-                u'org': u'GradesTestOrg',
-                u'course': u'GB101',
-                u'run': u'cannonball',
-                u'metadata': {u'format': u'homework'},
-                u'#type': u'course',
-                u'#ref': u'course',
-                u'#children': [
+                'org': 'GradesTestOrg',
+                'course': 'GB101',
+                'run': 'cannonball',
+                'metadata': {'format': 'homework'},
+                '#type': 'course',
+                '#ref': 'course',
+                '#children': [
                     {
-                        u'metadata': metadata,
-                        u'#type': u'problem',
-                        u'#ref': u'problem',
-                        u'data': data,
+                        'metadata': metadata,
+                        '#type': 'problem',
+                        '#ref': 'problem',
+                        'data': data,
                     }
                 ]
             }
@@ -150,45 +150,45 @@ class GradesTransformerTestCase(CourseStructureTestCase):
         """
         return self.build_course([
             {
-                u'org': u'GradesTestOrg',
-                u'course': u'GB101',
-                u'run': u'cannonball',
-                u'metadata': {u'format': u'homework'},
-                u'#type': u'course',
-                u'#ref': u'course',
-                u'#children': [
+                'org': 'GradesTestOrg',
+                'course': 'GB101',
+                'run': 'cannonball',
+                'metadata': {'format': 'homework'},
+                '#type': 'course',
+                '#ref': 'course',
+                '#children': [
                     {
-                        u'#type': u'chapter',
-                        u'#ref': u'chapter',
-                        u'#children': [
+                        '#type': 'chapter',
+                        '#ref': 'chapter',
+                        '#children': [
                             {
-                                u'#type': u'sequential',
-                                u'#ref': 'sub_A',
-                                u'#children': [
+                                '#type': 'sequential',
+                                '#ref': 'sub_A',
+                                '#children': [
                                     {
-                                        u'#type': u'vertical',
-                                        u'#ref': 'vert_1',
-                                        u'#children': [
+                                        '#type': 'vertical',
+                                        '#ref': 'vert_1',
+                                        '#children': [
                                             {
-                                                u'#type': u'vertical',
-                                                u'#ref': u'vert_A11',
-                                                u'#children': [{u'#type': u'problem', u'#ref': u'prob_A1aa'}]
+                                                '#type': 'vertical',
+                                                '#ref': 'vert_A11',
+                                                '#children': [{'#type': 'problem', '#ref': 'prob_A1aa'}]
                                             },
                                         ]
                                     },
-                                    {u'#type': u'vertical', u'#ref': 'vert_2', '#parents': [u'vert_A11']},
+                                    {'#type': 'vertical', '#ref': 'vert_2', '#parents': ['vert_A11']},
                                 ]
                             },
                             {
-                                u'#type': u'sequential',
-                                u'#ref': u'sub_B',
-                                u'#children': [
-                                    {u'#type': u'vertical', u'#ref': 'vert_3', '#parents': ['sub_A']},
+                                '#type': 'sequential',
+                                '#ref': 'sub_B',
+                                '#children': [
+                                    {'#type': 'vertical', '#ref': 'vert_3', '#parents': ['sub_A']},
                                     {
-                                        u'#type': u'sequential',
-                                        u'#ref': 'sub_C',
+                                        '#type': 'sequential',
+                                        '#ref': 'sub_C',
                                         '#parents': ['sub_A'],
-                                        u'#children': [{u'#type': u'problem', u'#ref': u'prob_BCb'}]
+                                        '#children': [{'#type': 'problem', '#ref': 'prob_BCb'}]
                                     },
                                 ]
                             },
@@ -213,8 +213,8 @@ class GradesTransformerTestCase(CourseStructureTestCase):
             'prob_BCb': {'sub_A', 'sub_B', 'sub_C'},
         }
         blocks = self.build_complicated_hypothetical_course()
-        block_structure = get_course_blocks(self.student, blocks[u'course'].location, self.transformers)
-        for block_ref, expected_subsections in expected_subsections.iteritems():
+        block_structure = get_course_blocks(self.student, blocks['course'].location, self.transformers)
+        for block_ref, expected_subsections in expected_subsections.items():
             actual_subsections = block_structure.get_transformer_block_field(
                 blocks[block_ref].location,
                 self.TRANSFORMER_CLASS_TO_TEST,
@@ -224,19 +224,19 @@ class GradesTransformerTestCase(CourseStructureTestCase):
 
     def test_unscored_block_collection(self):
         blocks = self.build_course_with_problems()
-        block_structure = get_course_blocks(self.student, blocks[u'course'].location, self.transformers)
+        block_structure = get_course_blocks(self.student, blocks['course'].location, self.transformers)
         self.assert_collected_xblock_fields(
             block_structure,
-            blocks[u'course'].location,
+            blocks['course'].location,
             weight=None,
             graded=False,
             has_score=False,
             due=None,
-            format=u'homework',
+            format='homework',
         )
         self.assert_collected_transformer_block_fields(
             block_structure,
-            blocks[u'course'].location,
+            blocks['course'].location,
             self.TRANSFORMER_CLASS_TO_TEST,
             max_score=None,
             explicit_graded=None,
@@ -245,20 +245,20 @@ class GradesTransformerTestCase(CourseStructureTestCase):
     def test_grades_collected_basic(self):
 
         blocks = self.build_course_with_problems()
-        block_structure = get_course_blocks(self.student, blocks[u'course'].location, self.transformers)
+        block_structure = get_course_blocks(self.student, blocks['course'].location, self.transformers)
 
         self.assert_collected_xblock_fields(
             block_structure,
-            blocks[u'problem'].location,
-            weight=self.problem_metadata[u'weight'],
-            graded=self.problem_metadata[u'graded'],
+            blocks['problem'].location,
+            weight=self.problem_metadata['weight'],
+            graded=self.problem_metadata['graded'],
             has_score=True,
-            due=self.problem_metadata[u'due'],
+            due=self.problem_metadata['due'],
             format=None,
         )
         self.assert_collected_transformer_block_fields(
             block_structure,
-            blocks[u'problem'].location,
+            blocks['problem'].location,
             self.TRANSFORMER_CLASS_TO_TEST,
             max_score=0,
             explicit_graded=True,
@@ -267,15 +267,15 @@ class GradesTransformerTestCase(CourseStructureTestCase):
     @ddt.data(True, False, None)
     def test_graded_at_problem(self, graded):
         problem_metadata = {
-            u'has_score': True,
+            'has_score': True,
         }
         if graded is not None:
-            problem_metadata[u'graded'] = graded
+            problem_metadata['graded'] = graded
         blocks = self.build_course_with_problems(metadata=problem_metadata)
-        block_structure = get_course_blocks(self.student, blocks[u'course'].location, self.transformers)
+        block_structure = get_course_blocks(self.student, blocks['course'].location, self.transformers)
         self.assert_collected_transformer_block_fields(
             block_structure,
-            blocks[u'problem'].location,
+            blocks['problem'].location,
             self.TRANSFORMER_CLASS_TO_TEST,
             explicit_graded=graded,
         )
@@ -284,27 +284,27 @@ class GradesTransformerTestCase(CourseStructureTestCase):
         # Demonstrate that the problem data can by collected by the SystemUser
         # even if the block has access restrictions placed on it.
         problem_metadata = {
-            u'graded': True,
-            u'weight': 1,
-            u'due': datetime.datetime(2016, 10, 16, 0, 4, 0, tzinfo=pytz.utc),
-            u'visible_to_staff_only': True,
+            'graded': True,
+            'weight': 1,
+            'due': datetime.datetime(2016, 10, 16, 0, 4, 0, tzinfo=pytz.utc),
+            'visible_to_staff_only': True,
         }
 
         blocks = self.build_course_with_problems(metadata=problem_metadata)
-        block_structure = get_course_blocks(self.student, blocks[u'course'].location, self.transformers)
+        block_structure = get_course_blocks(self.student, blocks['course'].location, self.transformers)
 
         self.assert_collected_xblock_fields(
             block_structure,
-            blocks[u'problem'].location,
-            weight=problem_metadata[u'weight'],
-            graded=problem_metadata[u'graded'],
+            blocks['problem'].location,
+            weight=problem_metadata['weight'],
+            graded=problem_metadata['graded'],
             has_score=True,
-            due=problem_metadata[u'due'],
+            due=problem_metadata['due'],
             format=None,
         )
 
     def test_max_score_collection(self):
-        problem_data = u'''
+        problem_data = '''
             <problem>
                 <numericalresponse answer="2">
                     <textline label="1+1" trailing_text="%" />
@@ -313,17 +313,17 @@ class GradesTransformerTestCase(CourseStructureTestCase):
         '''
 
         blocks = self.build_course_with_problems(data=problem_data)
-        block_structure = get_course_blocks(self.student, blocks[u'course'].location, self.transformers)
+        block_structure = get_course_blocks(self.student, blocks['course'].location, self.transformers)
 
         self.assert_collected_transformer_block_fields(
             block_structure,
-            blocks[u'problem'].location,
+            blocks['problem'].location,
             self.TRANSFORMER_CLASS_TO_TEST,
             max_score=1,
         )
 
     def test_max_score_for_multiresponse_problem(self):
-        problem_data = u'''
+        problem_data = '''
             <problem>
                 <numericalresponse answer="27">
                     <textline label="3^3" />
@@ -335,37 +335,37 @@ class GradesTransformerTestCase(CourseStructureTestCase):
         '''
 
         blocks = self.build_course_with_problems(problem_data)
-        block_structure = get_course_blocks(self.student, blocks[u'course'].location, self.transformers)
+        block_structure = get_course_blocks(self.student, blocks['course'].location, self.transformers)
 
         self.assert_collected_transformer_block_fields(
             block_structure,
-            blocks[u'problem'].location,
+            blocks['problem'].location,
             self.TRANSFORMER_CLASS_TO_TEST,
             max_score=2,
         )
 
     def test_course_version_not_collected_in_old_mongo(self):
         blocks = self.build_course_with_problems()
-        block_structure = get_course_blocks(self.student, blocks[u'course'].location, self.transformers)
-        self.assertIsNone(block_structure.get_xblock_field(blocks[u'course'].location, u'course_version'))
+        block_structure = get_course_blocks(self.student, blocks['course'].location, self.transformers)
+        self.assertIsNone(block_structure.get_xblock_field(blocks['course'].location, 'course_version'))
 
     def test_course_version_collected_in_split(self):
         with self.store.default_store(ModuleStoreEnum.Type.split):
             blocks = self.build_course_with_problems()
-        block_structure = get_course_blocks(self.student, blocks[u'course'].location, self.transformers)
-        self.assertIsNotNone(block_structure.get_xblock_field(blocks[u'course'].location, u'course_version'))
+        block_structure = get_course_blocks(self.student, blocks['course'].location, self.transformers)
+        self.assertIsNotNone(block_structure.get_xblock_field(blocks['course'].location, 'course_version'))
         self.assertEqual(
-            block_structure.get_xblock_field(blocks[u'problem'].location, u'course_version'),
-            block_structure.get_xblock_field(blocks[u'course'].location, u'course_version')
+            block_structure.get_xblock_field(blocks['problem'].location, 'course_version'),
+            block_structure.get_xblock_field(blocks['course'].location, 'course_version')
         )
 
     def test_grading_policy_collected(self):
         # the calculated hash of the original and updated grading policies of the test course
-        original_grading_policy_hash = u'ChVp0lHGQGCevD0t4njna/C44zQ='
-        updated_grading_policy_hash = u'TsbX04qWOy1WRnC0NHy+94upPd4='
+        original_grading_policy_hash = 'ChVp0lHGQGCevD0t4njna/C44zQ='
+        updated_grading_policy_hash = 'TsbX04qWOy1WRnC0NHy+94upPd4='
 
         blocks = self.build_course_with_problems()
-        course_block = blocks[u'course']
+        course_block = blocks['course']
         self._validate_grading_policy_hash(
             course_block.location,
             original_grading_policy_hash
@@ -402,8 +402,8 @@ class MultiProblemModulestoreAccessTestCase(CourseStructureTestCase, SharedModul
 
     def setUp(self):
         super(MultiProblemModulestoreAccessTestCase, self).setUp()
-        password = u'test'
-        self.student = UserFactory.create(is_staff=False, username=u'test_student', password=password)
+        password = 'test'
+        self.student = UserFactory.create(is_staff=False, username='test_student', password=password)
         self.client.login(username=self.student.username, password=password)
 
     @ddt.data(
@@ -418,26 +418,26 @@ class MultiProblemModulestoreAccessTestCase(CourseStructureTestCase, SharedModul
         """
         course = [
             {
-                u'org': u'GradesTestOrg',
-                u'course': u'GB101',
-                u'run': u'cannonball',
-                u'metadata': {u'format': u'homework'},
-                u'#type': u'course',
-                u'#ref': u'course',
-                u'#children': [],
+                'org': 'GradesTestOrg',
+                'course': 'GB101',
+                'run': 'cannonball',
+                'metadata': {'format': 'homework'},
+                '#type': 'course',
+                '#ref': 'course',
+                '#children': [],
             },
         ]
-        for problem_number in xrange(random.randrange(10, 20)):
-            course[0][u'#children'].append(
+        for problem_number in range(random.randrange(10, 20)):
+            course[0]['#children'].append(
                 {
-                    u'metadata': {
-                        u'graded': True,
-                        u'weight': 1,
-                        u'due': datetime.datetime(2099, 3, 15, 12, 30, 0, tzinfo=pytz.utc),
+                    'metadata': {
+                        'graded': True,
+                        'weight': 1,
+                        'due': datetime.datetime(2099, 3, 15, 12, 30, 0, tzinfo=pytz.utc),
                     },
-                    u'#type': u'problem',
-                    u'#ref': u'problem_{}'.format(problem_number),
-                    u'data': u'''
+                    '#type': 'problem',
+                    '#ref': 'problem_{}'.format(problem_number),
+                    'data': '''
                         <problem>
                             <numericalresponse answer="{number}">
                                 <textline label="1*{number}" />
@@ -447,6 +447,6 @@ class MultiProblemModulestoreAccessTestCase(CourseStructureTestCase, SharedModul
             )
         with self.store.default_store(store_type):
             blocks = self.build_course(course)
-        clear_course_from_cache(blocks[u'course'].id)
+        clear_course_from_cache(blocks['course'].id)
         with check_mongo_calls(expected_mongo_queries):
-            get_course_blocks(self.student, blocks[u'course'].location, self.transformers)
+            get_course_blocks(self.student, blocks['course'].location, self.transformers)

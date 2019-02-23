@@ -37,7 +37,7 @@ def main(log_file, test_suite):
                 test = line.split()[3]
                 if test_suite == "commonlib-unit":
                     if "pavelib" not in test:
-                        test = u"common/lib/{}".format(test)
+                        test = "common/lib/{}".format(test)
                 worker_test_dict[worker_num_string].append(test)
 
     output_folder_name = "worker_list_files"

@@ -36,7 +36,7 @@ class TestTimeZoneUtils(TestCase):
         """
         Asserts that all display_tz_info is equal to the expected inputs
         """
-        self.assertEqual(display_tz_info['str'], u'{name} ({abbr}, UTC{offset})'.format(name=expected_name,
+        self.assertEqual(display_tz_info['str'], '{name} ({abbr}, UTC{offset})'.format(name=expected_name,
                                                                                         abbr=expected_abbr,
                                                                                         offset=expected_offset))
         self.assertEqual(display_tz_info['abbr'], expected_abbr)

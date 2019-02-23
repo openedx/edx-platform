@@ -89,7 +89,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
 
         self.item_descriptor.xmodule_runtime = self.new_module_runtime()
 
-        self.item_url = unicode(self.item_descriptor.location)
+        self.item_url = str(self.item_descriptor.location)
 
     def setup_course(self):
         self.course = CourseFactory.create(data=self.COURSE_DATA)
@@ -135,7 +135,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
         """Return item url with dispatch."""
         return reverse(
             'xblock_handler',
-            args=(unicode(self.course.id), quote_slashes(self.item_url), 'xmodule_handler', dispatch)
+            args=(str(self.course.id), quote_slashes(self.item_url), 'xmodule_handler', dispatch)
         )
 
 
@@ -178,8 +178,8 @@ class LoginEnrollmentTestCase(TestCase):
         response = make_request(url, **kwargs)
         self.assertEqual(
             response.status_code, status_code,
-            u"{method} request to {url} returned status code {actual}, "
-            u"expected status code {expected}".format(
+            "{method} request to {url} returned status code {actual}, "
+            "expected status code {expected}".format(
                 method=method, url=url,
                 actual=response.status_code, expected=status_code
             )
@@ -339,7 +339,7 @@ def masquerade_as_group_member(user, course, partition_id, group_id):
         user,
         data={"role": "student", "user_partition_id": partition_id, "group_id": group_id}
     )
-    response = handle_ajax(request, unicode(course.id))
+    response = handle_ajax(request, str(course.id))
     setup_masquerade(request, course.id, True)
     return response.status_code
 
@@ -367,7 +367,7 @@ def get_expiration_banner_text(user, course, language='en'):
     if upgrade_deadline is None or now() < upgrade_deadline:
         upgrade_deadline = enrollment.course_upgrade_deadline
 
-    date_string = u'<span class="localized-datetime" data-format="shortDate" \
+    date_string = '<span class="localized-datetime" data-format="shortDate" \
         data-datetime="{formatted_date}" data-language="{language}">{formatted_date_localized}</span>'
     formatted_expiration_date = date_string.format(
         language=language,
@@ -381,7 +381,7 @@ def get_expiration_banner_text(user, course, language='en'):
             formatted_date_localized=strftime_localized(upgrade_deadline, EXPIRATION_DATE_FORMAT_STR)
         )
 
-        bannerText = u'<strong>Audit Access Expires {expiration_date}</strong><br>\
+        bannerText = '<strong>Audit Access Expires {expiration_date}</strong><br>\
                      You lose all access to this course, including your progress, on {expiration_date}.\
                      <br>Upgrade by {upgrade_deadline} to get unlimited access to the course as long as it exists\
                      on the site. <a href="{upgrade_link}">Upgrade now<span class="sr-only"> to retain access past\
@@ -391,7 +391,7 @@ def get_expiration_banner_text(user, course, language='en'):
             upgrade_deadline=formatted_upgrade_deadline
         )
     else:
-        bannerText = u'<strong>Audit Access Expires {expiration_date}</strong><br>\
+        bannerText = '<strong>Audit Access Expires {expiration_date}</strong><br>\
                      You lose all access to this course, including your progress, on {expiration_date}.\
                      '.format(
             expiration_date=formatted_expiration_date

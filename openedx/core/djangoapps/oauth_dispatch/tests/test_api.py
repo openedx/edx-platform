@@ -43,9 +43,9 @@ class TestOAuthDispatchAPI(TestCase):
         self.assertTrue(token['refresh_token'])
         self.assertDictContainsSubset(
             {
-                u'token_type': u'Bearer',
-                u'expires_in': EXPECTED_DEFAULT_EXPIRES_IN,
-                u'scope': u'',
+                'token_type': 'Bearer',
+                'expires_in': EXPECTED_DEFAULT_EXPIRES_IN,
+                'scope': '',
             },
             token,
         )
@@ -61,17 +61,17 @@ class TestOAuthDispatchAPI(TestCase):
         token = api.create_dot_access_token(
             HttpRequest(), self.user, self.client, expires_in=expires_in, scopes=['profile'],
         )
-        self.assertDictContainsSubset({u'scope': u'profile'}, token)
-        self.assertDictContainsSubset({u'expires_in': expires_in}, token)
+        self.assertDictContainsSubset({'scope': 'profile'}, token)
+        self.assertDictContainsSubset({'expires_in': expires_in}, token)
 
     def test_refresh_token_success(self):
         old_token = api.create_dot_access_token(HttpRequest(), self.user, self.client)
         new_token = api.refresh_dot_access_token(HttpRequest(), self.client.client_id, old_token['refresh_token'])
         self.assertDictContainsSubset(
             {
-                u'token_type': u'Bearer',
-                u'expires_in': EXPECTED_DEFAULT_EXPIRES_IN,
-                u'scope': u'',
+                'token_type': 'Bearer',
+                'expires_in': EXPECTED_DEFAULT_EXPIRES_IN,
+                'scope': '',
             },
             new_token,
         )

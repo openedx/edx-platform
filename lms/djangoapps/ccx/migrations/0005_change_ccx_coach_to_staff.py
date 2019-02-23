@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+
 import logging
 
 from django.contrib.auth.models import User
@@ -31,18 +31,18 @@ def change_existing_ccx_coaches_to_staff(apps, schema_editor):
         return
     list_ccx = CustomCourseForEdX.objects.using(db_alias).all()
     for ccx in list_ccx:
-        ccx_locator = CCXLocator.from_course_locator(ccx.course_id, unicode(ccx.id))
+        ccx_locator = CCXLocator.from_course_locator(ccx.course_id, str(ccx.id))
         try:
             course = get_course_by_id(ccx_locator)
         except Http404:
-            log.error('Could not migrate access for CCX course: %s', unicode(ccx_locator))
+            log.error('Could not migrate access for CCX course: %s', str(ccx_locator))
         else:
             coach = User.objects.get(id=ccx.coach.id)
             allow_access(course, coach, 'staff', send_email=False)
             revoke_access(course, coach, 'ccx_coach', send_email=False)
             log.info(
                 'The CCX coach of CCX %s has been switched from "CCX Coach" to "Staff".',
-                unicode(ccx_locator)
+                str(ccx_locator)
             )
 
 def revert_ccx_staff_to_coaches(apps, schema_editor):
@@ -61,18 +61,18 @@ def revert_ccx_staff_to_coaches(apps, schema_editor):
         return
     list_ccx = CustomCourseForEdX.objects.using(db_alias).all()
     for ccx in list_ccx:
-        ccx_locator = CCXLocator.from_course_locator(ccx.course_id, unicode(ccx.id))
+        ccx_locator = CCXLocator.from_course_locator(ccx.course_id, str(ccx.id))
         try:
             course = get_course_by_id(ccx_locator)
         except Http404:
-            log.error('Could not migrate access for CCX course: %s', unicode(ccx_locator))
+            log.error('Could not migrate access for CCX course: %s', str(ccx_locator))
         else:
             coach = User.objects.get(id=ccx.coach.id)
             allow_access(course, coach, 'ccx_coach', send_email=False)
             revoke_access(course, coach, 'staff', send_email=False)
             log.info(
                 'The CCX coach of CCX %s has been switched from "Staff" to "CCX Coach".',
-                unicode(ccx_locator)
+                str(ccx_locator)
             )
 
 class Migration(migrations.Migration):

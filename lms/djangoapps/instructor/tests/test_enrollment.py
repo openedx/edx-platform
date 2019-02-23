@@ -2,7 +2,7 @@
 """
 Unit tests for instructor.enrollment methods.
 """
-from __future__ import print_function
+
 
 import json
 from abc import ABCMeta
@@ -65,7 +65,7 @@ class TestSettableEnrollmentState(CacheIsolationTestCase):
         self.assertEqual(mes, ees)
 
 
-class TestEnrollmentChangeBase(CacheIsolationTestCase):
+class TestEnrollmentChangeBase(CacheIsolationTestCase, metaclass=ABCMeta):
     """
     Test instructor enrollment administration against database effects.
 
@@ -73,8 +73,6 @@ class TestEnrollmentChangeBase(CacheIsolationTestCase):
     `action` is a function which is run
     the test will pass if `action` mutates state from `before_ideal` to `after_ideal`
     """
-
-    __metaclass__ = ABCMeta
 
     def setUp(self):
         super(TestEnrollmentChangeBase, self).setUp()
@@ -661,8 +659,8 @@ class TestSendBetaRoleEmail(CacheIsolationTestCase):
 
     def test_bad_action(self):
         bad_action = 'beta_tester'
-        error_msg = u"Unexpected action received '{}' - expected 'add' or 'remove'".format(bad_action)
-        with self.assertRaisesRegexp(ValueError, error_msg):
+        error_msg = "Unexpected action received '{}' - expected 'add' or 'remove'".format(bad_action)
+        with self.assertRaisesRegex(ValueError, error_msg):
             send_beta_role_email(bad_action, self.user, self.email_params)
 
 
@@ -689,12 +687,12 @@ class TestGetEmailParamsCCX(SharedModuleStoreTestCase):
 
         # Explicitly construct what we expect the course URLs to be
         site = settings.SITE_NAME
-        self.course_url = u'https://{}/courses/{}/'.format(
+        self.course_url = 'https://{}/courses/{}/'.format(
             site,
             self.course_key
         )
         self.course_about_url = self.course_url + 'about'
-        self.registration_url = u'https://{}/register'.format(site)
+        self.registration_url = 'https://{}/register'.format(site)
 
     @patch.dict('django.conf.settings.FEATURES', {'CUSTOM_COURSES_EDX': True})
     def test_ccx_enrollment_email_params(self):
@@ -726,12 +724,12 @@ class TestGetEmailParams(SharedModuleStoreTestCase):
 
         # Explicitly construct what we expect the course URLs to be
         site = settings.SITE_NAME
-        cls.course_url = u'https://{}/courses/{}/'.format(
+        cls.course_url = 'https://{}/courses/{}/'.format(
             site,
             text_type(cls.course.id)
         )
         cls.course_about_url = cls.course_url + 'about'
-        cls.registration_url = u'https://{}/register'.format(site)
+        cls.registration_url = 'https://{}/register'.format(site)
 
     def test_normal_params(self):
         # For a normal site, what do we expect to get for the URLs?
@@ -833,7 +831,7 @@ class TestRenderMessageToString(EmailTemplateTagMixin, SharedModuleStoreTestCase
         subject, message = self.get_subject_and_message('eo')
         language_after_rendering = get_language()
 
-        you_have_been_invited_in_esperanto = u"Ýöü hävé ßéén"
+        you_have_been_invited_in_esperanto = "Ýöü hävé ßéén"
         self.assertIn(you_have_been_invited_in_esperanto, subject)
         self.assertIn(you_have_been_invited_in_esperanto, message)
         self.assertEqual(settings.LANGUAGE_CODE, language_after_rendering)
@@ -861,7 +859,7 @@ class TestRenderMessageToString(EmailTemplateTagMixin, SharedModuleStoreTestCase
         self.assertIn(self.ccx.display_name, subject)
         self.assertIn(self.ccx.display_name, message)
         site = settings.SITE_NAME
-        course_url = u'https://{}/courses/{}/'.format(
+        course_url = 'https://{}/courses/{}/'.format(
             site,
             self.course_key
         )
@@ -899,7 +897,7 @@ class TestRenderMessageToString(EmailTemplateTagMixin, SharedModuleStoreTestCase
         self.assertIn(self.ccx.display_name, subject)
         self.assertIn(self.ccx.display_name, message)
         site = settings.SITE_NAME
-        registration_url = u'https://{}/register'.format(site)
+        registration_url = 'https://{}/register'.format(site)
         self.assertIn(registration_url, message)
 
     @patch.dict('django.conf.settings.FEATURES', {'CUSTOM_COURSES_EDX': True})

@@ -2,7 +2,7 @@
 Tests of the LMS XBlock Runtime and associated utilities
 """
 
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 from ddt import data, ddt
 from django.conf import settings

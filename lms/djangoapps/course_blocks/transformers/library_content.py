@@ -51,9 +51,9 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
             """ Basic information about the given block """
             orig_key, orig_version = store.get_block_original_usage(usage_key)
             return {
-                "usage_key": unicode(usage_key),
-                "original_usage_key": unicode(orig_key) if orig_key else None,
-                "original_usage_version": unicode(orig_version) if orig_version else None,
+                "usage_key": str(usage_key),
+                "original_usage_key": str(orig_key) if orig_key else None,
+                "original_usage_version": str(orig_version) if orig_version else None,
             }
 
         # For each block check if block is library_content.
@@ -157,7 +157,7 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
             Helper function to publish an event for analytics purposes
             """
             event_data = {
-                "location": unicode(location),
+                "location": str(location),
                 "previous_count": previous_count,
                 "result": result,
                 "max_count": max_count,

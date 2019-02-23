@@ -28,7 +28,7 @@ def course_updates_url(course):
     return reverse(
         'openedx.course_experience.course_updates',
         kwargs={
-            'course_id': unicode(course.id),
+            'course_id': str(course.id),
         }
     )
 

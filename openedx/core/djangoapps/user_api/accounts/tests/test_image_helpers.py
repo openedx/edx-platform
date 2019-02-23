@@ -56,7 +56,7 @@ class ProfileImageUrlTestCase(TestCase):
         Verify correct url dictionary structure.
         """
         self.assertEqual(set(TEST_SIZES.keys()), set(actual_urls.keys()))
-        for size_display_name, url in actual_urls.items():
+        for size_display_name, url in list(actual_urls.items()):
             if is_default:
                 self.verify_default_url(url, TEST_SIZES[size_display_name])
             else:

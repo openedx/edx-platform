@@ -13,7 +13,7 @@ EXCLUDE_CSRF = lambda elem: elem not in [
     'django.template.context_processors.csrf',
     'django.middleware.csrf.CsrfViewMiddleware'
 ]
-DEFAULT_TEMPLATE_ENGINE['OPTIONS']['context_processors'] = filter(
+DEFAULT_TEMPLATE_ENGINE['OPTIONS']['context_processors'] = list(filter(
     EXCLUDE_CSRF, DEFAULT_TEMPLATE_ENGINE['OPTIONS']['context_processors']
-)
-MIDDLEWARE_CLASSES = filter(EXCLUDE_CSRF, MIDDLEWARE_CLASSES)
+))
+MIDDLEWARE_CLASSES = list(filter(EXCLUDE_CSRF, MIDDLEWARE_CLASSES))

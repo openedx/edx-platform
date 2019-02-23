@@ -54,11 +54,11 @@ def intercept_errors(api_error, ignore_errors=None):
                 for ignored in ignore_errors or []:
                     if isinstance(ex, ignored):
                         msg = (
-                            u"A handled error occurred when calling '{func_name}' "
-                            u"with arguments '{args}' and keyword arguments '{kwargs}': "
-                            u"{exception}"
+                            "A handled error occurred when calling '{func_name}' "
+                            "with arguments '{args}' and keyword arguments '{kwargs}': "
+                            "{exception}"
                         ).format(
-                            func_name=func.func_name,
+                            func_name=func.__name__,
                             args=args,
                             kwargs=kwargs,
                             exception=ex.developer_message if hasattr(ex, 'developer_message') else repr(ex)
@@ -70,11 +70,11 @@ def intercept_errors(api_error, ignore_errors=None):
 
                 # Otherwise, log the error and raise the API-specific error
                 msg = (
-                    u"An unexpected error occurred when calling '{func_name}' "
-                    u"with arguments '{args}' and keyword arguments '{kwargs}' from {caller}: "
-                    u"{exception}"
+                    "An unexpected error occurred when calling '{func_name}' "
+                    "with arguments '{args}' and keyword arguments '{kwargs}' from {caller}: "
+                    "{exception}"
                 ).format(
-                    func_name=func.func_name,
+                    func_name=func.__name__,
                     args=args,
                     kwargs=kwargs,
                     exception=ex.developer_message if hasattr(ex, 'developer_message') else repr(ex),
@@ -104,7 +104,7 @@ def require_post_params(required_params):
             request = args[0]
             missing_params = set(required_params) - set(request.POST.keys())
             if len(missing_params) > 0:
-                msg = u"Missing POST parameters: {missing}".format(
+                msg = "Missing POST parameters: {missing}".format(
                     missing=", ".join(missing_params)
                 )
                 return HttpResponseBadRequest(msg)
@@ -160,10 +160,10 @@ class FormDescription(object):
         self._field_overrides = defaultdict(dict)
 
     def add_field(
-            self, name, label=u"", field_type=u"text", default=u"",
-            placeholder=u"", instructions=u"", required=True, restrictions=None,
+            self, name, label="", field_type="text", default="",
+            placeholder="", instructions="", required=True, restrictions=None,
             options=None, include_default_option=False, error_messages=None,
-            supplementalLink=u"", supplementalText=u""
+            supplementalLink="", supplementalText=""
     ):
         """Add a field to the form description.
 
@@ -215,7 +215,7 @@ class FormDescription(object):
 
         """
         if field_type not in self.ALLOWED_TYPES:
-            msg = u"Field type '{field_type}' is not a valid type.  Allowed types are: {allowed}.".format(
+            msg = "Field type '{field_type}' is not a valid type.  Allowed types are: {allowed}.".format(
                 field_type=field_type,
                 allowed=", ".join(self.ALLOWED_TYPES)
             )
@@ -264,11 +264,11 @@ class FormDescription(object):
 
         if restrictions is not None:
             allowed_restrictions = self.ALLOWED_RESTRICTIONS.get(field_type, [])
-            for key, val in restrictions.iteritems():
+            for key, val in restrictions.items():
                 if key in allowed_restrictions:
                     field_dict["restrictions"][key] = val
                 else:
-                    msg = u"Restriction '{restriction}' is not allowed for field type '{field_type}'".format(
+                    msg = "Restriction '{restriction}' is not allowed for field type '{field_type}'".format(
                         restriction=key,
                         field_type=field_type
                     )
@@ -361,7 +361,7 @@ class FormDescription(object):
 
         self._field_overrides[field_name].update({
             property_name: property_value
-            for property_name, property_value in kwargs.iteritems()
+            for property_name, property_value in kwargs.items()
             if property_name in self.OVERRIDE_FIELD_PROPERTIES
         })
 
@@ -436,7 +436,7 @@ def shim_student_view(view_func, check_logged_in=False):
                     modified_request["course_id"] = analytics.get("enroll_course_id")
             except (ValueError, TypeError):
                 LOGGER.error(
-                    u"Could not parse analytics object sent to user API: {analytics}".format(
+                    "Could not parse analytics object sent to user API: {analytics}".format(
                         analytics=analytics
                     )
                 )
@@ -469,7 +469,7 @@ def shim_student_view(view_func, check_logged_in=False):
         # completion end-point directly.
         try:
             response_dict = json.loads(response.content)
-            msg = response_dict.get("value", u"")
+            msg = response_dict.get("value", "")
             success = response_dict.get("success")
         except (ValueError, TypeError):
             msg = response.content

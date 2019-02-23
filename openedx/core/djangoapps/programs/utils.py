@@ -5,7 +5,7 @@ import logging
 from collections import defaultdict
 from copy import deepcopy
 from itertools import chain
-from urlparse import urljoin, urlparse, urlunparse
+from urllib.parse import urljoin, urlparse, urlunparse
 
 from dateutil.parser import parse
 from django.conf import settings
@@ -95,7 +95,7 @@ class ProgramProgressMeter(object):
         self.course_run_ids = []
         for enrollment in self.enrollments:
             # enrollment.course_id is really a CourseKey (╯ಠ_ಠ）╯︵ ┻━┻
-            enrollment_id = unicode(enrollment.course_id)
+            enrollment_id = str(enrollment.course_id)
             mode = enrollment.mode
             if mode == CourseMode.NO_ID_PROFESSIONAL_MODE:
                 mode = CourseMode.PROFESSIONAL
@@ -140,7 +140,7 @@ class ProgramProgressMeter(object):
                             program_list.append(program)
 
         # Sort programs by title for consistent presentation.
-        for program_list in inverted_programs.itervalues():
+        for program_list in inverted_programs.values():
             program_list.sort(key=lambda p: p['title'])
 
         return inverted_programs
@@ -326,14 +326,14 @@ class ProgramProgressMeter(object):
                 if modes_match and certificate_api.is_passing_status(certificate.status):
                     course_overview = CourseOverview.get_from_id(key)
                     available_date = available_date_for_certificate(course_overview, certificate)
-                    earliest_course_run_date = min(filter(None, [available_date, earliest_course_run_date]))
+                    earliest_course_run_date = min([_f for _f in [available_date, earliest_course_run_date] if _f])
 
             # If we're missing a cert for a course, the program isn't completed and we should just bail now
             if earliest_course_run_date is None:
                 return None
 
             # Keep the catalog course date if it's the latest one
-            program_available_date = max(filter(None, [earliest_course_run_date, program_available_date]))
+            program_available_date = max([_f for _f in [earliest_course_run_date, program_available_date] if _f])
 
         return program_available_date
 
@@ -427,7 +427,7 @@ class ProgramProgressMeter(object):
         completed_runs, failed_runs = [], []
         for certificate in course_run_certificates:
             course_data = {
-                'course_run_id': unicode(certificate['course_key']),
+                'course_run_id': str(certificate['course_key']),
                 'type': self._certificate_mode_translation(certificate['type']),
             }
 
@@ -500,7 +500,7 @@ class ProgramDataExtender(object):
                 try:
                     self.course_overview = CourseOverview.get_from_id(self.course_run_key)
                 except CourseOverview.DoesNotExist:
-                    log.warning(u'Failed to get course overview for course run key: %s',
+                    log.warning('Failed to get course overview for course run key: %s',
                                 self.course_run.get('key'),
                                 exec_info=True)
                 else:
@@ -594,7 +594,7 @@ class ProgramDataExtender(object):
         # Here we check the entitlements' expired_at_datetime property rather than filter by the expired_at attribute
         # to ensure that the expiration status is as up to date as possible
         entitlements = [e for e in entitlements if not e.expired_at_datetime]
-        courses_with_entitlements = set(unicode(entitlement.course_uuid) for entitlement in entitlements)
+        courses_with_entitlements = set(str(entitlement.course_uuid) for entitlement in entitlements)
         return [course for course in courses if course['uuid'] not in courses_with_entitlements]
 
     def _filter_out_courses_with_enrollments(self, courses):
@@ -612,10 +612,10 @@ class ProgramDataExtender(object):
             is_active=True,
             mode__in=self.data['applicable_seat_types']
         )
-        course_runs_with_enrollments = set(unicode(enrollment.course_id) for enrollment in enrollments)
+        course_runs_with_enrollments = set(str(enrollment.course_id) for enrollment in enrollments)
         courses_without_enrollments = []
         for course in courses:
-            if all(unicode(run['key']) not in course_runs_with_enrollments for run in course['course_runs']):
+            if all(str(run['key']) not in course_runs_with_enrollments for run in course['course_runs']):
                 courses_without_enrollments.append(course)
 
         return courses_without_enrollments
@@ -695,7 +695,7 @@ class ProgramDataExtender(object):
                     'variant': bundle_variant
                 })
             except (ConnectionError, SlumberBaseException, Timeout):
-                log.exception(u'Failed to get discount price for following product SKUs: %s ', ', '.join(skus))
+                log.exception('Failed to get discount price for following product SKUs: %s ', ', '.join(skus))
                 self.data.update({
                     'discount_data': {'is_discounted': False}
                 })
@@ -807,7 +807,7 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
             self.data['instructor_ordering'] = []
 
         sorted_instructor_names = [
-            ' '.join(filter(None, (instructor['given_name'], instructor['family_name'])))
+            ' '.join([_f for _f in (instructor['given_name'], instructor['family_name']) if _f])
             for instructor in self.data['instructor_ordering']
         ]
         instructors_to_be_sorted = [

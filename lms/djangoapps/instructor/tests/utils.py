@@ -16,7 +16,7 @@ class FakeInfo(object):
 
     def __init__(self):
         for feature in self.FEATURES:
-            setattr(self, feature, u'expected')
+            setattr(self, feature, 'expected')
 
     def to_dict(self):
         """ Returns a dict representation of the object """
@@ -55,7 +55,7 @@ class FakeEmail(FakeInfo):
 
     def __init__(self, email_id):
         super(FakeEmail, self).__init__()
-        self.id = unicode(email_id)  # pylint: disable=invalid-name
+        self.id = str(email_id)  # pylint: disable=invalid-name
         # Select a random data for create field
         year = random.randint(1950, 2000)
         month = random.randint(1, 12)
@@ -85,17 +85,17 @@ class FakeTargetGroup(object):
 class FakeEmailInfo(FakeInfo):
     """ Fake email information object """
     FEATURES = [
-        u'created',
-        u'sent_to',
-        u'email',
-        u'number_sent',
-        u'requester',
+        'created',
+        'sent_to',
+        'email',
+        'number_sent',
+        'requester',
     ]
 
     EMAIL_FEATURES = [
-        u'subject',
-        u'html_message',
-        u'id'
+        'subject',
+        'html_message',
+        'id'
     ]
 
     def __init__(self, fake_email, num_sent, num_failed):
@@ -109,5 +109,5 @@ class FakeEmailInfo(FakeInfo):
         self.number_sent = number_sent
         fake_email_dict = fake_email.to_dict()
         self.email = {feature: fake_email_dict[feature] for feature in self.EMAIL_FEATURES}
-        self.requester = u'expected'
-        self.sent_to = [u'expected']
+        self.requester = 'expected'
+        self.sent_to = ['expected']

@@ -32,7 +32,7 @@ from .serializers import BookmarkSerializer
 log = logging.getLogger(__name__)
 
 # Default error message for user
-DEFAULT_USER_MESSAGE = ugettext_noop(u'An error has occurred. Please try again.')
+DEFAULT_USER_MESSAGE = ugettext_noop('An error has occurred. Please try again.')
 
 
 class BookmarksPagination(DefaultPagination):
@@ -183,7 +183,7 @@ class BookmarksListView(ListCreateAPIView, BookmarksViewMixin):
             try:
                 course_key = CourseKey.from_string(course_id)
             except InvalidKeyError:
-                log.error(u'Invalid course_id: %s.', course_id)
+                log.error('Invalid course_id: %s.', course_id)
                 return []
         else:
             course_key = None
@@ -225,32 +225,32 @@ class BookmarksListView(ListCreateAPIView, BookmarksViewMixin):
         """
 
         if not request.data:
-            return self.error_response(ugettext_noop(u'No data provided.'), DEFAULT_USER_MESSAGE)
+            return self.error_response(ugettext_noop('No data provided.'), DEFAULT_USER_MESSAGE)
 
         usage_id = request.data.get('usage_id', None)
         if not usage_id:
-            return self.error_response(ugettext_noop(u'Parameter usage_id not provided.'), DEFAULT_USER_MESSAGE)
+            return self.error_response(ugettext_noop('Parameter usage_id not provided.'), DEFAULT_USER_MESSAGE)
 
         try:
             usage_key = UsageKey.from_string(unquote_slashes(usage_id))
         except InvalidKeyError:
-            error_message = ugettext_noop(u'Invalid usage_id: {usage_id}.').format(usage_id=usage_id)
+            error_message = ugettext_noop('Invalid usage_id: {usage_id}.').format(usage_id=usage_id)
             log.error(error_message)
             return self.error_response(error_message, DEFAULT_USER_MESSAGE)
 
         try:
             bookmark = api.create_bookmark(user=self.request.user, usage_key=usage_key)
         except ItemNotFoundError:
-            error_message = ugettext_noop(u'Block with usage_id: {usage_id} not found.').format(usage_id=usage_id)
+            error_message = ugettext_noop('Block with usage_id: {usage_id} not found.').format(usage_id=usage_id)
             log.error(error_message)
             return self.error_response(error_message, DEFAULT_USER_MESSAGE)
         except BookmarksLimitReachedError:
             error_message = ugettext_noop(
-                u'You can create up to {max_num_bookmarks_per_course} bookmarks.'
-                u' You must remove some bookmarks before you can add new ones.'
+                'You can create up to {max_num_bookmarks_per_course} bookmarks.'
+                ' You must remove some bookmarks before you can add new ones.'
             ).format(max_num_bookmarks_per_course=settings.MAX_BOOKMARKS_PER_COURSE)
             log.info(
-                u'Attempted to create more than %s bookmarks',
+                'Attempted to create more than %s bookmarks',
                 settings.MAX_BOOKMARKS_PER_COURSE
             )
             return self.error_response(error_message)
@@ -314,7 +314,7 @@ class BookmarksDetailView(APIView, BookmarksViewMixin):
         try:
             return UsageKey.from_string(usage_id)
         except InvalidKeyError:
-            error_message = ugettext_noop(u'Invalid usage_id: {usage_id}.').format(usage_id=usage_id)
+            error_message = ugettext_noop('Invalid usage_id: {usage_id}.').format(usage_id=usage_id)
             log.error(error_message)
             return self.error_response(error_message, error_status=status.HTTP_404_NOT_FOUND)
 
@@ -335,7 +335,7 @@ class BookmarksDetailView(APIView, BookmarksViewMixin):
             )
         except ObjectDoesNotExist:
             error_message = ugettext_noop(
-                u'Bookmark with usage_id: {usage_id} does not exist.'
+                'Bookmark with usage_id: {usage_id} does not exist.'
             ).format(usage_id=usage_id)
             log.error(error_message)
             return self.error_response(error_message, error_status=status.HTTP_404_NOT_FOUND)
@@ -355,7 +355,7 @@ class BookmarksDetailView(APIView, BookmarksViewMixin):
             api.delete_bookmark(user=request.user, usage_key=usage_key_or_response)
         except ObjectDoesNotExist:
             error_message = ugettext_noop(
-                u'Bookmark with usage_id: {usage_id} does not exist.'
+                'Bookmark with usage_id: {usage_id} does not exist.'
             ).format(usage_id=usage_id)
             log.error(error_message)
             return self.error_response(error_message, error_status=status.HTTP_404_NOT_FOUND)

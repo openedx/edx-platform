@@ -54,7 +54,7 @@ class BlockNavigationTransformerTestCase(TestCase, ChildrenMapTestMixin):
 
         for block_key, expected_nav in enumerate(expected_nav_map):
             self.assertSetEqual(
-                set(unicode(block) for block in expected_nav),
+                set(str(block) for block in expected_nav),
                 set(
                     block_structure.get_transformer_block_field(
                         block_key,
@@ -111,7 +111,7 @@ class BlockNavigationTransformerCourseTestCase(ModuleStoreTestCase):
                 course_key.make_usage_key('vertical', 'vertical_y1a'),
                 course_key.make_usage_key('problem', 'problem_y1a_1'),
         ]:
-            self.assertIn(unicode(block_key), course_descendants)
+            self.assertIn(str(block_key), course_descendants)
 
         # chapter_x and its descendants should not be included
         for block_key in [
@@ -120,4 +120,4 @@ class BlockNavigationTransformerCourseTestCase(ModuleStoreTestCase):
                 course_key.make_usage_key('vertical', 'vertical_x1a'),
                 course_key.make_usage_key('problem', 'problem_x1a_1'),
         ]:
-            self.assertNotIn(unicode(block_key), course_descendants)
+            self.assertNotIn(str(block_key), course_descendants)

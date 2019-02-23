@@ -22,7 +22,7 @@ def course_published_handler(sender, course_key, **kwargs):  # pylint: disable=u
     Consume signals that indicate course published. If course already a CCX, do nothing.
     """
     if not isinstance(course_key, CCXLocator):
-        send_ccx_course_published.delay(unicode(course_key))
+        send_ccx_course_published.delay(str(course_key))
 
 
 @CELERY_APP.task
@@ -33,13 +33,13 @@ def send_ccx_course_published(course_key):
     course_key = CourseLocator.from_string(course_key)
     for ccx in CustomCourseForEdX.objects.filter(course_id=course_key):
         try:
-            ccx_key = CCXLocator.from_course_locator(course_key, unicode(ccx.id))
+            ccx_key = CCXLocator.from_course_locator(course_key, str(ccx.id))
         except InvalidKeyError:
-            log.info(u'Attempt to publish course with deprecated id. Course: %s. CCX: %s', course_key, ccx.id)
+            log.info('Attempt to publish course with deprecated id. Course: %s. CCX: %s', course_key, ccx.id)
             continue
         responses = SignalHandler.course_published.send(
             sender=ccx,
             course_key=ccx_key
         )
         for rec, response in responses:
-            log.info(u'Signal fired when course is published. Receiver: %s. Response: %s', rec, response)
+            log.info('Signal fired when course is published. Receiver: %s. Response: %s', rec, response)

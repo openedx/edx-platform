@@ -62,7 +62,7 @@ def start_stub_servers():
     Start all stub servers
     """
 
-    for stub in SERVICES.keys():
+    for stub in list(SERVICES.keys()):
         start_stub(stub)
 
 
@@ -113,7 +113,7 @@ def is_youtube_available(urls):
     Check if the required youtube urls are available.
     If they are not, then skip the scenario.
     """
-    for name, url in urls.iteritems():
+    for name, url in urls.items():
         try:
             response = requests.get(url, allow_redirects=False)
         except requests.exceptions.ConnectionError:
@@ -138,7 +138,7 @@ def stop_stubs(_scenario):
     """
     # close browser to ensure no open connections to the stub servers
     world.browser.quit()
-    for name in SERVICES.keys():
+    for name in list(SERVICES.keys()):
         stub_server = getattr(world, name, None)
         if stub_server is not None:
             stub_server.shutdown()

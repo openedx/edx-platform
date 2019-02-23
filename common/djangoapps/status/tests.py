@@ -27,9 +27,9 @@ class TestStatus(TestCase):
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     @ddt.data(
         ("Test global message", "Test course message"),
-        (u" Ŧɇsŧ sŧȺŧᵾs", u"Ṫëṡẗ ċöüṛṡë ṡẗäẗüṡ "),
-        (u"", u"Ṫëṡẗ ċöüṛṡë ṡẗäẗüṡ "),
-        (u" Ŧɇsŧ sŧȺŧᵾs", u""),
+        (" Ŧɇsŧ sŧȺŧᵾs", "Ṫëṡẗ ċöüṛṡë ṡẗäẗüṡ "),
+        ("", "Ṫëṡẗ ċöüṛṡë ṡẗäẗüṡ "),
+        (" Ŧɇsŧ sŧȺŧᵾs", ""),
     )
     @ddt.unpack
     def test_get_site_status_msg(self, test_global_message, test_course_message):
@@ -50,7 +50,7 @@ class TestStatus(TestCase):
         course_msg.save()
         self.assertEqual(
             get_site_status_msg(self.course_key),
-            u"{} <br /> {}".format(test_global_message, test_course_message)
+            "{} <br /> {}".format(test_global_message, test_course_message)
         )
 
         msg = GlobalStatusMessage.objects.create(message="", enabled=False)

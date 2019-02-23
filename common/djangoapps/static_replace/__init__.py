@@ -21,7 +21,7 @@ def _url_replace_regex(prefix):
     To anyone contemplating making this more complicated:
     http://xkcd.com/1171/
     """
-    return ur"""
+    return r"""
         (?x)                      # flags=re.VERBOSE
         (?P<quote>\\?['"])        # the opening quotes
         (?P<prefix>{prefix})      # the prefix
@@ -113,7 +113,7 @@ def process_static_urls(text, replacement_function, data_dir=None):
         # works for actual static assets and for magical course asset URLs....
         full_url = prefix + rest
 
-        starts_with_static_url = full_url.startswith(unicode(settings.STATIC_URL))
+        starts_with_static_url = full_url.startswith(str(settings.STATIC_URL))
         starts_with_prefix = full_url.startswith(XBLOCK_STATIC_RESOURCE_PREFIX)
         contains_prefix = XBLOCK_STATIC_RESOURCE_PREFIX in full_url
         if starts_with_prefix or (starts_with_static_url and contains_prefix):
@@ -122,7 +122,7 @@ def process_static_urls(text, replacement_function, data_dir=None):
         return replacement_function(original, prefix, quote, rest)
 
     return re.sub(
-        _url_replace_regex(u'(?:{static_url}|/static/)(?!{data_dir})'.format(
+        _url_replace_regex('(?:{static_url}|/static/)(?!{data_dir})'.format(
             static_url=settings.STATIC_URL,
             data_dir=data_dir
         )),

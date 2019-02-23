@@ -74,7 +74,7 @@ from openedx.core.lib.cache_utils import get_cache as get_request_cache
 log = logging.getLogger(__name__)
 
 
-class WaffleNamespace(object):
+class WaffleNamespace(object, metaclass=ABCMeta):
     """
     A base class for a request cached namespace for waffle flags/switches.
 
@@ -82,7 +82,6 @@ class WaffleNamespace(object):
     (e.g. "course_experience"), and can be used to work with a set of
     flags or switches that will all share this namespace.
     """
-    __metaclass__ = ABCMeta
 
     def __init__(self, name, log_prefix=None):
         """
@@ -109,7 +108,7 @@ class WaffleNamespace(object):
         Arguments:
             setting_name (String): The name of the flag or switch.
         """
-        return u'{}.{}'.format(self.name, setting_name)
+        return '{}.{}'.format(self.name, setting_name)
 
     @staticmethod
     def _get_request_cache():
@@ -160,7 +159,7 @@ class WaffleSwitchNamespace(WaffleNamespace):
         """
         namespaced_switch_name = self._namespaced_name(switch_name)
         self._cached_switches[namespaced_switch_name] = active
-        log.info(u"%sSwitch '%s' set to %s for request.", self.log_prefix, namespaced_switch_name, active)
+        log.info("%sSwitch '%s' set to %s for request.", self.log_prefix, namespaced_switch_name, active)
 
     @contextmanager
     def override_in_model(self, switch_name, active=True):
@@ -173,7 +172,7 @@ class WaffleSwitchNamespace(WaffleNamespace):
         from waffle.testutils import override_switch as waffle_override_switch
         namespaced_switch_name = self._namespaced_name(switch_name)
         with waffle_override_switch(namespaced_switch_name, active):
-            log.info(u"%sSwitch '%s' set to %s in model.", self.log_prefix, namespaced_switch_name, active)
+            log.info("%sSwitch '%s' set to %s in model.", self.log_prefix, namespaced_switch_name, active)
             yield
 
     @property
@@ -216,14 +215,13 @@ class WaffleSwitch(object):
             yield
 
 
-class WaffleFlagNamespace(WaffleNamespace):
+class WaffleFlagNamespace(WaffleNamespace, metaclass=ABCMeta):
     """
     Provides a single namespace for a set of waffle flags.
 
     All namespaced flag values are stored in a single request cache containing
     all flags for all namespaces.
     """
-    __metaclass__ = ABCMeta
 
     @property
     def _cached_flags(self):
@@ -283,7 +281,7 @@ class WaffleFlagNamespace(WaffleNamespace):
                     if request:
                         value = flag_is_active(request, namespaced_flag_name)
                     else:
-                        log.warn(u"%sFlag '%s' accessed without a request", self.log_prefix, namespaced_flag_name)
+                        log.warn("%sFlag '%s' accessed without a request", self.log_prefix, namespaced_flag_name)
                         # Return the default value if not in a request context.
                         # Note: this skips the cache as the value might be different
                         # in a normal request context. This case seems to occur when
@@ -368,7 +366,7 @@ class CourseWaffleFlag(WaffleFlag):
             """
             # Import is placed here to avoid model import at project startup.
             from .models import WaffleFlagCourseOverrideModel
-            cache_key = u'{}.{}'.format(namespaced_flag_name, unicode(course_key))
+            cache_key = '{}.{}'.format(namespaced_flag_name, str(course_key))
             force_override = self.waffle_namespace._cached_flags.get(cache_key)
 
             if force_override is None:
@@ -414,7 +412,7 @@ class CourseWaffleFlag(WaffleFlag):
             checking waffle.
         """
         # validate arguments
-        assert issubclass(type(course_key), CourseKey), u"The course_key '{}' must be a CourseKey.".format(
+        assert issubclass(type(course_key), CourseKey), "The course_key '{}' must be a CourseKey.".format(
             str(course_key)
         )
 

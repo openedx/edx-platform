@@ -2,7 +2,7 @@
 Segregation of pymongo functions from the data modeling mechanisms for split modulestore.
 """
 import datetime
-import cPickle as pickle
+import pickle as pickle
 import math
 import zlib
 import pymongo
@@ -82,7 +82,7 @@ class Tagger(object):
             **kwargs: Each keyword is treated as a tag name, and the
                 value of the argument is the tag value.
         """
-        self.added_tags.extend(kwargs.items())
+        self.added_tags.extend(list(kwargs.items()))
 
     @property
     def tags(self):
@@ -187,14 +187,14 @@ def structure_to_mongo(structure, course_context=None):
 
         check('BlockKey', structure['root'])
         check('dict(BlockKey: BlockData)', structure['blocks'])
-        for block in structure['blocks'].itervalues():
+        for block in structure['blocks'].values():
             if 'children' in block.fields:
                 check('list(BlockKey)', block.fields['children'])
 
         new_structure = dict(structure)
         new_structure['blocks'] = []
 
-        for block_key, block in structure['blocks'].iteritems():
+        for block_key, block in structure['blocks'].items():
             new_block = dict(block.to_storable())
             new_block.setdefault('block_type', block_key.type)
             new_block['block_id'] = block_key.id
@@ -311,7 +311,7 @@ class MongoConnection(object):
                     if doc is None:
                         log.warning(
                             "doc was None when attempting to retrieve structure for item with key %s",
-                            unicode(key)
+                            str(key)
                         )
                         return None
                     tagger_find_one.measure("blocks", len(doc['blocks']))
@@ -420,7 +420,7 @@ class MongoConnection(object):
         with TIMER.timer("get_course_index", key):
             if ignore_case:
                 query = {
-                    key_attr: re.compile(u'^{}$'.format(re.escape(getattr(key, key_attr))), re.IGNORECASE)
+                    key_attr: re.compile('^{}$'.format(re.escape(getattr(key, key_attr))), re.IGNORECASE)
                     for key_attr in ('org', 'course', 'run')
                 }
             else:
@@ -459,7 +459,7 @@ class MongoConnection(object):
                     query['versions.{}'.format(branch)] = {'$exists': True}
 
                 if search_targets:
-                    for key, value in search_targets.iteritems():
+                    for key, value in search_targets.items():
                         query['search_targets.{}'.format(key)] = value
 
                 if org_target:

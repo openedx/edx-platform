@@ -2,7 +2,7 @@
 Tests of edX Studio runtime functionality
 """
 from unittest import TestCase
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 from mock import Mock
 

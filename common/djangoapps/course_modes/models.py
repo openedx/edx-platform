@@ -59,7 +59,7 @@ class CourseMode(models.Model):
 
     @course_id.setter
     def course_id(self, value):
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             self._course_id = CourseKey.from_string(value)
         else:
             self._course_id = value
@@ -87,10 +87,10 @@ class CourseMode(models.Model):
     # Once the date passes, users will no longer be able to enroll as verified.
     _expiration_datetime = models.DateTimeField(
         default=None, null=True, blank=True,
-        verbose_name=_(u"Upgrade Deadline"),
+        verbose_name=_("Upgrade Deadline"),
         help_text=_(
-            u"OPTIONAL: After this date/time, users will no longer be able to enroll in this mode. "
-            u"Leave this blank if users can enroll in this mode until enrollment closes for the course."
+            "OPTIONAL: After this date/time, users will no longer be able to enroll in this mode. "
+            "Leave this blank if users can enroll in this mode until enrollment closes for the course."
         ),
         db_column='expiration_datetime',
     )
@@ -120,8 +120,8 @@ class CourseMode(models.Model):
         blank=True,
         verbose_name="SKU",
         help_text=_(
-            u"OPTIONAL: This is the SKU (stock keeping unit) of this mode in the external ecommerce service.  "
-            u"Leave this blank if the course has not yet been migrated to the ecommerce service."
+            "OPTIONAL: This is the SKU (stock keeping unit) of this mode in the external ecommerce service.  "
+            "Leave this blank if the course has not yet been migrated to the ecommerce service."
         )
     )
 
@@ -133,7 +133,7 @@ class CourseMode(models.Model):
         default=None,  # Need this in order to set DEFAULT NULL on the database column
         verbose_name="Bulk SKU",
         help_text=_(
-            u"This is the bulk SKU (stock keeping unit) of this mode in the external ecommerce service."
+            "This is the bulk SKU (stock keeping unit) of this mode in the external ecommerce service."
         )
     )
 
@@ -184,7 +184,7 @@ class CourseMode(models.Model):
     DEFAULT_SHOPPINGCART_MODE_SLUG = HONOR
     DEFAULT_SHOPPINGCART_MODE = Mode(HONOR, _('Honor'), 0, '', 'usd', None, None, None, None)
 
-    CACHE_NAMESPACE = u"course_modes.CourseMode.cache."
+    CACHE_NAMESPACE = "course_modes.CourseMode.cache."
 
     class Meta(object):
         unique_together = ('course', 'mode_slug', 'currency')
@@ -196,10 +196,10 @@ class CourseMode(models.Model):
         """
         if self.is_professional_slug(self.mode_slug) and self.expiration_datetime is not None:
             raise ValidationError(
-                _(u"Professional education modes are not allowed to have expiration_datetime set.")
+                _("Professional education modes are not allowed to have expiration_datetime set.")
             )
         if self.is_verified_slug(self.mode_slug) and self.min_price <= 0:
-            raise ValidationError(_(u"Verified modes cannot be free."))
+            raise ValidationError(_("Verified modes cannot be free."))
 
     def save(self, force_insert=False, force_update=False, using=None):
         # Ensure currency is always lowercase.
@@ -282,7 +282,7 @@ class CourseMode(models.Model):
                 mode for mode in modes
                 if mode.expiration_datetime is None or mode.expiration_datetime >= now_dt
             ]
-            for course_id, modes in all_modes.iteritems()
+            for course_id, modes in all_modes.items()
         }
 
         return (all_modes, unexpired_modes)
@@ -742,7 +742,7 @@ class CourseMode(models.Model):
         )
 
     def __unicode__(self):
-        return u"{} : {}, min={}".format(
+        return "{} : {}, min={}".format(
             self.course_id, self.mode_slug, self.min_price
         )
 
@@ -870,4 +870,4 @@ class CourseModeExpirationConfig(ConfigurationModel):
 
     def __unicode__(self):
         """ Returns the unicode date of the verification window. """
-        return unicode(self.verification_window)
+        return str(self.verification_window)

@@ -252,7 +252,7 @@ def update_enrollment(user_id, course_id, mode=None, is_active=None, enrollment_
         }
 
     """
-    log.info(u'Starting Update Enrollment process for user {user} in course {course} to mode {mode}'.format(
+    log.info('Starting Update Enrollment process for user {user} in course {course} to mode {mode}'.format(
         user=user_id,
         course=course_id,
         mode=mode,
@@ -261,13 +261,13 @@ def update_enrollment(user_id, course_id, mode=None, is_active=None, enrollment_
         validate_course_mode(course_id, mode, is_active=is_active, include_expired=include_expired)
     enrollment = _data_api().update_course_enrollment(user_id, course_id, mode=mode, is_active=is_active)
     if enrollment is None:
-        msg = u"Course Enrollment not found for user {user} in course {course}".format(user=user_id, course=course_id)
+        msg = "Course Enrollment not found for user {user} in course {course}".format(user=user_id, course=course_id)
         log.warn(msg)
         raise errors.EnrollmentNotFoundError(msg)
     else:
         if enrollment_attributes is not None:
             set_enrollment_attributes(user_id, course_id, enrollment_attributes)
-    log.info(u'Course Enrollment updated for user {user} in course {course} to mode {mode}'.format(
+    log.info('Course Enrollment updated for user {user} in course {course} to mode {mode}'.format(
         user=user_id,
         course=course_id,
         mode=mode
@@ -315,7 +315,7 @@ def get_course_enrollment_details(course_id, include_expired=False):
         }
 
     """
-    cache_key = u'enrollment.course.details.{course_id}.{include_expired}'.format(
+    cache_key = 'enrollment.course.details.{course_id}.{include_expired}'.format(
         course_id=course_id,
         include_expired=include_expired
     )
@@ -324,10 +324,10 @@ def get_course_enrollment_details(course_id, include_expired=False):
         cached_enrollment_data = cache.get(cache_key)
     except Exception:
         # The cache backend could raise an exception (for example, memcache keys that contain spaces)
-        log.exception(u"Error occurred while retrieving course enrollment details from the cache")
+        log.exception("Error occurred while retrieving course enrollment details from the cache")
 
     if cached_enrollment_data:
-        log.info(u"Get enrollment data for course %s (cached)", course_id)
+        log.info("Get enrollment data for course %s (cached)", course_id)
         return cached_enrollment_data
 
     course_enrollment_details = _data_api().get_course_enrollment_info(course_id, include_expired)
@@ -337,10 +337,10 @@ def get_course_enrollment_details(course_id, include_expired=False):
         cache.set(cache_key, course_enrollment_details, cache_time_out)
     except Exception:
         # Catch any unexpected errors during caching.
-        log.exception(u"Error occurred while caching course enrollment details for course %s", course_id)
-        raise errors.CourseEnrollmentError(u"An unexpected error occurred while retrieving course enrollment details.")
+        log.exception("Error occurred while caching course enrollment details for course %s", course_id)
+        raise errors.CourseEnrollmentError("An unexpected error occurred while retrieving course enrollment details.")
 
-    log.info(u"Get enrollment data for course %s", course_id)
+    log.info("Get enrollment data for course %s", course_id)
     return course_enrollment_details
 
 
@@ -446,8 +446,8 @@ def validate_course_mode(course_id, mode, is_active=None, include_expired=False)
     available_modes = [m['slug'] for m in course_modes]
     if mode not in available_modes:
         msg = (
-            u"Specified course mode '{mode}' unavailable for course {course_id}.  "
-            u"Available modes were: {available}"
+            "Specified course mode '{mode}' unavailable for course {course_id}.  "
+            "Available modes were: {available}"
         ).format(
             mode=mode,
             course_id=course_id,
@@ -488,5 +488,5 @@ def _data_api():
     try:
         return importlib.import_module(api_path)
     except (ImportError, ValueError):
-        log.exception(u"Could not load module at '{path}'".format(path=api_path))
+        log.exception("Could not load module at '{path}'".format(path=api_path))
         raise errors.EnrollmentApiLoadError(api_path)

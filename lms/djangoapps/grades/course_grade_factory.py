@@ -102,7 +102,7 @@ class CourseGradeFactory(object):
         course_data = CourseData(
             user=None, course=course, collected_block_structure=collected_block_structure, course_key=course_key,
         )
-        stats_tags = [u'action:{}'.format(course_data.course_key)]
+        stats_tags = ['action:{}'.format(course_data.course_key)]
         for user in users:
             yield self._iter_grade_result(user, course_data, force_update)
 
@@ -124,7 +124,7 @@ class CourseGradeFactory(object):
             # Keep marching on even if this student couldn't be graded for
             # some reason, but log it for future reference.
             log.exception(
-                u'Cannot grade student %s in course %s because of exception: %s',
+                'Cannot grade student %s in course %s because of exception: %s',
                 user.id,
                 course_data.course_key,
                 text_type(exc)
@@ -136,7 +136,7 @@ class CourseGradeFactory(object):
         """
         Returns a ZeroCourseGrade object for the given user and course.
         """
-        log.debug(u'Grades: CreateZero, %s, User: %s', unicode(course_data), user.id)
+        log.debug('Grades: CreateZero, %s, User: %s', str(course_data), user.id)
         return ZeroCourseGrade(user, course_data)
 
     @staticmethod
@@ -149,14 +149,14 @@ class CourseGradeFactory(object):
             raise PersistentCourseGrade.DoesNotExist
 
         persistent_grade = PersistentCourseGrade.read(user.id, course_data.course_key)
-        log.debug(u'Grades: Read, %s, User: %s, %s', unicode(course_data), user.id, persistent_grade)
+        log.debug('Grades: Read, %s, User: %s, %s', str(course_data), user.id, persistent_grade)
 
         return CourseGrade(
             user,
             course_data,
             persistent_grade.percent_grade,
             persistent_grade.letter_grade,
-            persistent_grade.letter_grade is not u''
+            persistent_grade.letter_grade is not ''
         )
 
     @staticmethod
@@ -215,7 +215,7 @@ class CourseGradeFactory(object):
             )
 
         log.info(
-            u'Grades: Update, %s, User: %s, %s, persisted: %s',
+            'Grades: Update, %s, User: %s, %s, persisted: %s',
             course_data.full_string(), user.id, course_grade, should_persist,
         )
 

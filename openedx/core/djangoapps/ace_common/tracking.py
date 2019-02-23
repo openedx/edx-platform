@@ -1,5 +1,5 @@
 # pylint: disable=missing-docstring
-from urlparse import parse_qs
+from urllib.parse import parse_qs
 
 import attr
 from django.utils.http import urlencode
@@ -38,7 +38,7 @@ class CampaignTrackingInfo(object):
         if existing_query_string is not None:
             parameters = parse_qs(existing_query_string)
 
-        for attribute, value in attr.asdict(self).iteritems():
+        for attribute, value in attr.asdict(self).items():
             if value is not None:
                 parameters['utm_' + attribute] = [value]
         return urlencode(parameters, doseq=True)
@@ -104,9 +104,9 @@ class GoogleAnalyticsTrackingPixel(object):
 
         if self.course_id is not None and self.event_label is None:
             param_name = fields.event_label.metadata['param_name']
-            parameters[param_name] = unicode(self.course_id)
+            parameters[param_name] = str(self.course_id)
 
-        return u"https://www.google-analytics.com/collect?{params}".format(params=urlencode(parameters))
+        return "https://www.google-analytics.com/collect?{params}".format(params=urlencode(parameters))
 
     def _get_tracking_id(self):
         tracking_id = get_config_value_from_site_or_settings("GOOGLE_ANALYTICS_ACCOUNT", site=self.site)

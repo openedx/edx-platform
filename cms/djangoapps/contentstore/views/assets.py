@@ -200,9 +200,9 @@ def _get_error_if_invalid_parameters(requested_filter):
     if invalid_filters:
         error_message = {
             'error_code': 'invalid_asset_type_filter',
-            'developer_message': u'The asset_type parameter to the request is invalid. '
-                                 u'The {} filters are not described in the settings.FILES_AND_UPLOAD_TYPE_FILTERS '
-                                 u'dictionary.'.format(invalid_filters)
+            'developer_message': 'The asset_type parameter to the request is invalid. '
+                                 'The {} filters are not described in the settings.FILES_AND_UPLOAD_TYPE_FILTERS '
+                                 'dictionary.'.format(invalid_filters)
         }
         return JsonResponse({'error': error_message}, status=400)
 
@@ -229,7 +229,7 @@ def _get_mongo_expression_for_type_other():
     """
     Construct and return pymongo expression dict for the 'OTHER' content type category.
     """
-    content_types = [ext for extensions in _get_files_and_upload_type_filters().values() for ext in extensions]
+    content_types = [ext for extensions in list(_get_files_and_upload_type_filters().values()) for ext in extensions]
     return {
         'contentType': {
             '$nin': content_types
@@ -424,7 +424,7 @@ def _get_error_if_course_does_not_exist(course_key):
     try:
         modulestore().get_course(course_key)
     except ItemNotFoundError:
-        logging.error(u'Could not find course: %s', course_key)
+        logging.error('Could not find course: %s', course_key)
         return HttpResponseBadRequest()
 
 
@@ -456,8 +456,8 @@ def _check_file_size_is_too_large(file_metadata):
 
 def _get_file_too_large_error_message(filename):
     return _(
-        u'File {filename} exceeds maximum size of '
-        u'{maximum_size_in_megabytes} MB.'
+        'File {filename} exceeds maximum size of '
+        '{maximum_size_in_megabytes} MB.'
     ).format(
         filename=filename,
         maximum_size_in_megabytes=settings.MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB,
@@ -564,7 +564,7 @@ def _delete_thumbnail(thumbnail_location, course_key, asset_key):
             contentstore().delete(thumbnail_content.get_id())
             del_cached_content(thumbnail_location)
         except Exception:  # pylint: disable=broad-except
-            logging.warning(u'Could not delete thumbnail: %s', thumbnail_location)
+            logging.warning('Could not delete thumbnail: %s', thumbnail_location)
 
 
 def _get_asset_json(display_name, content_type, date, location, thumbnail_location, locked):
@@ -583,5 +583,5 @@ def _get_asset_json(display_name, content_type, date, location, thumbnail_locati
         'thumbnail': StaticContent.serialize_asset_key_with_slash(thumbnail_location) if thumbnail_location else None,
         'locked': locked,
         # needed for Backbone delete/update.
-        'id': unicode(location)
+        'id': str(location)
     }

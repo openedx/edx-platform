@@ -216,8 +216,8 @@ class StubXQueueService(StubHttpService):
         Every configuration key is a queue name,
         except for 'default' and 'register_submission_url' which have special meaning
         """
-        return {
+        return list({
             key: value
-            for key, value in self.config.iteritems()
+            for key, value in self.config.items()
             if key not in self.NON_QUEUE_CONFIG_KEYS
-        }.items()
+        }.items())

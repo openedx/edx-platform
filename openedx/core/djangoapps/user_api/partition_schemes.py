@@ -3,7 +3,7 @@ Provides partition support to the user service.
 """
 import logging
 import random
-import course_tag.api as course_tag_api
+from . import course_tag.api as course_tag_api
 
 from eventtracking import tracker
 
@@ -64,7 +64,7 @@ class RandomUserPartitionScheme(object):
             except NoSuchUserPartitionGroupError:
                 # jsa: we can turn off warnings here if this is an expected case.
                 log.warn(
-                    u"group not found in RandomUserPartitionScheme: %r",
+                    "group not found in RandomUserPartitionScheme: %r",
                     {
                         "requested_partition_id": user_partition.id,
                         "requested_group_id": group_id,

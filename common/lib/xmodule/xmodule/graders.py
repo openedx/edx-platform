@@ -2,7 +2,7 @@
 Code used to calculate learner grades.
 """
 
-from __future__ import division
+
 
 import abc
 import inspect
@@ -22,11 +22,10 @@ from xmodule.util.misc import get_short_labeler
 log = logging.getLogger("edx.courseware")
 
 
-class ScoreBase(object):
+class ScoreBase(object, metaclass=abc.ABCMeta):
     """
     Abstract base class for encapsulating fields of values scores.
     """
-    __metaclass__ = abc.ABCMeta
 
     @contract(graded="bool", first_attempted="datetime|None")
     def __init__(self, graded, first_attempted):
@@ -51,7 +50,7 @@ class ScoreBase(object):
         return not self.__eq__(other)
 
     def __repr__(self):
-        return u"{class_name}({fields})".format(class_name=self.__class__.__name__, fields=self.__dict__)
+        return "{class_name}({fields})".format(class_name=self.__class__.__name__, fields=self.__dict__)
 
 
 class ProblemScore(ScoreBase):
@@ -192,12 +191,12 @@ def grader_from_conf(conf):
             msg = ("Unable to parse grader configuration:\n    " +
                    str(subgraderconf) +
                    "\n    Error was:\n    " + str(error))
-            raise ValueError(msg), None, sys.exc_info()[2]
+            raise ValueError(msg).with_traceback(sys.exc_info()[2])
 
     return WeightedSubsectionsGrader(subgraders)
 
 
-class CourseGrader(object):
+class CourseGrader(object, metaclass=abc.ABCMeta):
     """
     A course grader takes the totaled scores for each graded section (that a student has
     started) in the course. From these scores, the grader calculates an overall percentage
@@ -237,8 +236,6 @@ class CourseGrader(object):
 
 
     """
-
-    __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
     def grade(self, grade_sheet, generate_random_scores=False):
@@ -281,7 +278,7 @@ class WeightedSubsectionsGrader(CourseGrader):
             subgrade_result = subgrader.grade(grade_sheet, generate_random_scores)
 
             weighted_percent = subgrade_result['percent'] * weight
-            section_detail = _(u"{assignment_type} = {weighted_percent:.2%} of a possible {weight:.2%}").format(
+            section_detail = _("{assignment_type} = {weighted_percent:.2%} of a possible {weight:.2%}").format(
                 assignment_type=assignment_type,
                 weighted_percent=weighted_percent,
                 weight=weight)
@@ -379,7 +376,7 @@ class AssignmentFormatGrader(CourseGrader):
         return aggregate_score, dropped_indices
 
     def grade(self, grade_sheet, generate_random_scores=False):
-        scores = grade_sheet.get(self.type, {}).values()
+        scores = list(grade_sheet.get(self.type, {}).values())
         breakdown = []
         labeler = get_short_labeler(self.short_label)
         for i in range(max(self.min_count, len(scores))):
@@ -395,7 +392,7 @@ class AssignmentFormatGrader(CourseGrader):
                     section_name = scores[i].display_name
 
                 percentage = scores[i].percent_graded
-                summary_format = u"{section_type} {index} - {name} - {percent:.0%} ({earned:.3n}/{possible:.3n})"
+                summary_format = "{section_type} {index} - {name} - {percent:.0%} ({earned:.3n}/{possible:.3n})"
                 summary = summary_format.format(
                     index=i + self.starting_index,
                     section_type=self.section_type,
@@ -407,7 +404,7 @@ class AssignmentFormatGrader(CourseGrader):
             else:
                 percentage = 0.0
                 # Translators: "Homework 1 - Unreleased - 0% (?/?)" The section has not been released for viewing.
-                summary = _(u"{section_type} {index} Unreleased - 0% (?/?)").format(
+                summary = _("{section_type} {index} Unreleased - 0% (?/?)").format(
                     index=i + self.starting_index,
                     section_type=self.section_type
                 )
@@ -420,7 +417,7 @@ class AssignmentFormatGrader(CourseGrader):
 
         for dropped_index in dropped_indices:
             breakdown[dropped_index]['mark'] = {
-                'detail': _(u"The lowest {drop_count} {section_type} scores are dropped.").format(
+                'detail': _("The lowest {drop_count} {section_type} scores are dropped.").format(
                     drop_count=self.drop_count,
                     section_type=self.section_type
                 )
@@ -429,21 +426,21 @@ class AssignmentFormatGrader(CourseGrader):
         if len(breakdown) == 1:
             # if there is only one entry in a section, suppress the existing individual entry and the average,
             # and just display a single entry for the section.
-            total_detail = u"{section_type} = {percent:.0%}".format(
+            total_detail = "{section_type} = {percent:.0%}".format(
                 percent=total_percent,
                 section_type=self.section_type,
             )
-            total_label = u"{short_label}".format(short_label=self.short_label)
+            total_label = "{short_label}".format(short_label=self.short_label)
             breakdown = [{'percent': total_percent, 'label': total_label,
                           'detail': total_detail, 'category': self.category, 'prominent': True}, ]
         else:
             # Translators: "Homework Average = 0%"
-            total_detail = _(u"{section_type} Average = {percent:.0%}").format(
+            total_detail = _("{section_type} Average = {percent:.0%}").format(
                 percent=total_percent,
                 section_type=self.section_type
             )
             # Translators: Avg is short for Average
-            total_label = _(u"{short_label} Avg").format(short_label=self.short_label)
+            total_label = _("{short_label} Avg").format(short_label=self.short_label)
 
             if self.show_only_average:
                 breakdown = []

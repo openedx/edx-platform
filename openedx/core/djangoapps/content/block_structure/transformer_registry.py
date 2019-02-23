@@ -30,7 +30,7 @@ class TransformerRegistry(PluginManager):
                 registered with the platform's PluginManager.
         """
         if cls.USE_PLUGIN_MANAGER:
-            return set(cls.get_available_plugins().itervalues())
+            return set(cls.get_available_plugins().values())
         else:
             return set()
 

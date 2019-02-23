@@ -68,7 +68,7 @@ class SettingsMilestonesTest(StudioSettingsDetailsTest):
             number=course_number,
             run='test_run'
         )
-        pre_requisite_course_id = unicode(pre_requisite_course_key)
+        pre_requisite_course_id = str(pre_requisite_course_key)
 
         # Refresh the page to load the new course fixture and populate the prrequisite course dropdown
         # Then select the prerequisite course and save the changes

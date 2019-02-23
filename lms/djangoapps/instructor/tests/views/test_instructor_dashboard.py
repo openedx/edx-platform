@@ -87,14 +87,14 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         """
         Returns expected dashboard enrollment message with link to Insights.
         """
-        return u'Enrollment data is now available in <a href="http://example.com/courses/{}" ' \
+        return 'Enrollment data is now available in <a href="http://example.com/courses/{}" ' \
                'target="_blank">Example</a>.'.format(text_type(self.course.id))
 
     def get_dashboard_analytics_message(self):
         """
         Returns expected dashboard demographic message with link to Insights.
         """
-        return u'For analytics about your course, go to <a href="http://example.com/courses/{}" ' \
+        return 'For analytics about your course, go to <a href="http://example.com/courses/{}" ' \
                'target="_blank">Example</a>.'.format(text_type(self.course.id))
 
     def test_instructor_tab(self):
@@ -127,7 +127,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         url = reverse(
             'instructor_dashboard',
             kwargs={
-                'course_id': unicode(self.course_info.id)
+                'course_id': str(self.course_info.id)
             }
         )
 
@@ -171,7 +171,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         url = reverse(
             'instructor_dashboard',
             kwargs={
-                'course_id': unicode(self.course_info.id)
+                'course_id': str(self.course_info.id)
             }
         )
 
@@ -188,7 +188,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         url = reverse(
             'instructor_dashboard',
             kwargs={
-                'course_id': unicode(self.course_info.id)
+                'course_id': str(self.course_info.id)
             }
         )
 
@@ -425,7 +425,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
 
             response = self.client.get(self.url)
 
-            self.assertEquals(
+            self.assertEqual(
                 expected_result,
                 'CCX Coaches are able to create their own Custom Courses based on this course' in response.content
             )
@@ -449,7 +449,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
     @patch('lms.djangoapps.instructor.views.gradebook_api.render_to_response', intercept_renderer)
     @patch('lms.djangoapps.instructor.views.gradebook_api.MAX_STUDENTS_PER_PAGE_GRADE_BOOK', 1)
     def test_spoc_gradebook_pages(self):
-        for i in xrange(2):
+        for i in range(2):
             username = "user_%d" % i
             student = UserFactory.create(username=username)
             CourseEnrollmentFactory.create(user=student, course_id=self.course.id)
@@ -541,7 +541,7 @@ class TestInstructorDashboardPerformance(ModuleStoreTestCase, LoginEnrollmentTes
         )
 
         students = []
-        for i in xrange(20):
+        for i in range(20):
             username = "user_%d" % i
             student = UserFactory.create(username=username)
             CourseEnrollmentFactory.create(user=student, course_id=self.course.id)
@@ -569,11 +569,11 @@ class TestInstructorDashboardPerformance(ModuleStoreTestCase, LoginEnrollmentTes
             publish_item=True,
             start=datetime.datetime(2015, 4, 1, tzinfo=UTC),
         )
-        for i in xrange(10):
+        for i in range(10):
             problem = ItemFactory.create(
                 category="problem",
                 parent=vertical,
-                display_name=u"A Problem Block %d" % i,
+                display_name="A Problem Block %d" % i,
                 weight=1,
                 publish_item=False,
                 metadata={'rerandomize': 'always'},

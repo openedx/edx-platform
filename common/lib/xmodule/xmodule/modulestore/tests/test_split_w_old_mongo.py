@@ -86,7 +86,7 @@ class SplitWMongoCourseBootstrapper(unittest.TestCase):
         )
         if not draft:
             self.draft_mongo.publish(location, self.user_id)
-        if isinstance(data, basestring):
+        if isinstance(data, str):
             fields = {'data': data}
         else:
             fields = data.copy()

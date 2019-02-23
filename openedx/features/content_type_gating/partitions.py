@@ -45,7 +45,7 @@ def create_content_gating_partition(course):
         content_gate_scheme = UserPartition.get_scheme(CONTENT_TYPE_GATING_SCHEME)
     except UserPartitionError:
         LOG.warning(
-            u"No %r scheme registered, ContentTypeGatingPartitionScheme will not be created.",
+            "No %r scheme registered, ContentTypeGatingPartitionScheme will not be created.",
             CONTENT_TYPE_GATING_SCHEME
         )
         return None
@@ -56,19 +56,19 @@ def create_content_gating_partition(course):
         # partition with id 51, it will collide with the Content Gating Partition. We'll catch that here, and
         # then fix the course content as needed (or get the course team to).
         LOG.warning(
-            u"Can't add %r partition, as ID %r is assigned to %r in course %s.",
+            "Can't add %r partition, as ID %r is assigned to %r in course %s.",
             CONTENT_TYPE_GATING_SCHEME,
             CONTENT_GATING_PARTITION_ID,
             _get_partition_from_id(course.user_partitions, CONTENT_GATING_PARTITION_ID).name,
-            unicode(course.id),
+            str(course.id),
         )
         return None
 
     partition = content_gate_scheme.create_user_partition(
         id=CONTENT_GATING_PARTITION_ID,
-        name=_(u"Feature-based Enrollments"),
-        description=_(u"Partition for segmenting users by access to gated content types"),
-        parameters={"course_id": unicode(course.id)}
+        name=_("Feature-based Enrollments"),
+        description=_("Partition for segmenting users by access to gated content types"),
+        parameters={"course_id": str(course.id)}
     )
     return partition
 
@@ -96,7 +96,7 @@ class ContentTypeGatingPartition(UserPartition):
 
     def access_denied_message(self, block, user, user_group, allowed_groups):
         if self._is_audit_enrollment(user, block):
-            return _(u"Graded assessments are available to Verified Track learners. Upgrade to Unlock.")
+            return _("Graded assessments are available to Verified Track learners. Upgrade to Unlock.")
         return None
 
     def _is_audit_enrollment(self, user, block):
@@ -197,8 +197,8 @@ class ContentTypeGatingPartitionScheme(object):
             )
             if course_mode is None:
                 LOG.error(
-                    u"User %s is in an unknown CourseMode '%s'"
-                    u" for course %s. Granting full access to content for this user",
+                    "User %s is in an unknown CourseMode '%s'"
+                    " for course %s. Granting full access to content for this user",
                     user.username,
                     mode_slug,
                     course_key,
@@ -231,8 +231,8 @@ class ContentTypeGatingPartitionScheme(object):
         """
         return ContentTypeGatingPartition(
             id,
-            unicode(name),
-            unicode(description),
+            str(name),
+            str(description),
             [
                 LIMITED_ACCESS,
                 FULL_ACCESS,

@@ -1,5 +1,5 @@
 """ Tests for analytics.distributions """
-from __future__ import print_function
+
 
 import pytest
 from django.test import TestCase
@@ -21,7 +21,7 @@ class TestAnalyticsDistributions(TestCase):
             profile__gender=['m', 'f', 'o'][i % 3],
             profile__level_of_education=['a', 'hs', 'el'][i % 3],
             profile__year_of_birth=i + 1930
-        ) for i in xrange(30)]
+        ) for i in range(30)]
 
         self.ces = [CourseEnrollment.enroll(user, self.course_id)
                     for user in self.users]
@@ -82,12 +82,12 @@ class TestAnalyticsDistributionsNoData(TestCase):
 
         self.users = [UserFactory(
             profile__year_of_birth=i + 1930,
-        ) for i in xrange(5)]
+        ) for i in range(5)]
 
         self.nodata_users = [UserFactory(
             profile__year_of_birth=None,
             profile__gender=[None, ''][i % 2]
-        ) for i in xrange(4)]
+        ) for i in range(4)]
 
         self.users += self.nodata_users
 

@@ -2,7 +2,7 @@
 """
 Test cases to cover account retirement views
 """
-from __future__ import print_function
+
 
 import datetime
 import json

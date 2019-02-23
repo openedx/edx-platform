@@ -88,8 +88,8 @@ class SplitTestModuleTest(XModuleXmlImportTest, PartitionTestCase):
             UserPartition(
                 MINIMUM_STATIC_PARTITION_ID, 'second_partition', 'Second Partition',
                 [
-                    Group(unicode(MINIMUM_STATIC_PARTITION_ID + 1), 'abel'),
-                    Group(unicode(MINIMUM_STATIC_PARTITION_ID + 2), 'baker'), Group("103", 'charlie')
+                    Group(str(MINIMUM_STATIC_PARTITION_ID + 1), 'abel'),
+                    Group(str(MINIMUM_STATIC_PARTITION_ID + 2), 'baker'), Group("103", 'charlie')
                 ],
                 MockUserPartitionScheme()
             )
@@ -138,7 +138,7 @@ class SplitTestModuleLMSTest(SplitTestModuleTest):
     @ddt.unpack
     def test_child(self, user_tag, child_url_name):
         self.user_partition.scheme.current_group = self.user_partition.groups[user_tag]
-        self.assertEquals(self.split_test_module.child_descriptor.url_name, child_url_name)
+        self.assertEqual(self.split_test_module.child_descriptor.url_name, child_url_name)
 
     @ddt.data((0, 'HTML FOR GROUP 0'), (1, 'HTML FOR GROUP 1'))
     @ddt.unpack
@@ -159,7 +159,7 @@ class SplitTestModuleLMSTest(SplitTestModuleTest):
         # If a user_tag has a missing value, a group should be saved/persisted for that user.
         # So, we check that we get the same url_name when we call on the url_name twice.
         # We run the test ten times so that, if our storage is failing, we'll be most likely to notice it.
-        self.assertEquals(
+        self.assertEqual(
             self.split_test_module.child_descriptor.url_name,
             self.split_test_module.child_descriptor.url_name
         )
@@ -178,14 +178,14 @@ class SplitTestModuleLMSTest(SplitTestModuleTest):
         # Write out the xml.
         xml_obj = self.split_test_module.definition_to_xml(MemoryFS())
 
-        self.assertEquals(xml_obj.get('user_partition_id'), '0')
+        self.assertEqual(xml_obj.get('user_partition_id'), '0')
         self.assertIsNotNone(xml_obj.get('group_id_to_child'))
 
         # Read the xml back in.
         fields, children = SplitTestDescriptor.definition_from_xml(xml_obj, self.module_system)
-        self.assertEquals(fields.get('user_partition_id'), '0')
+        self.assertEqual(fields.get('user_partition_id'), '0')
         self.assertIsNotNone(fields.get('group_id_to_child'))
-        self.assertEquals(len(children), 2)
+        self.assertEqual(len(children), 2)
 
 
 class SplitTestModuleStudioTest(SplitTestModuleTest):
@@ -401,10 +401,10 @@ class SplitTestModuleStudioTest(SplitTestModuleTest):
         self.assertEqual(len(validation.messages), 0)
         verify_validation_message(
             validation.summary,
-            u"The experiment is not associated with a group configuration.",
+            "The experiment is not associated with a group configuration.",
             StudioValidationMessage.NOT_CONFIGURED,
             'edit-button',
-            u"Select a Group Configuration",
+            "Select a Group Configuration",
         )
 
         # Verify the messages for a correctly configured split_test
@@ -425,14 +425,14 @@ class SplitTestModuleStudioTest(SplitTestModuleTest):
         self.assertEqual(len(validation.messages), 1)
         verify_validation_message(
             validation.messages[0],
-            u"The experiment does not contain all of the groups in the configuration.",
+            "The experiment does not contain all of the groups in the configuration.",
             StudioValidationMessage.ERROR,
             expected_action_runtime_event='add-missing-groups',
-            expected_action_label=u"Add Missing Groups"
+            expected_action_label="Add Missing Groups"
         )
         verify_summary_message(
             validation.summary,
-            u"This content experiment has issues that affect content visibility.",
+            "This content experiment has issues that affect content visibility.",
             StudioValidationMessage.ERROR
         )
         # Verify the messages for a split test with children that are not associated with any group
@@ -444,12 +444,12 @@ class SplitTestModuleStudioTest(SplitTestModuleTest):
         self.assertEqual(len(validation.messages), 1)
         verify_validation_message(
             validation.messages[0],
-            u"The experiment has an inactive group. Move content into active groups, then delete the inactive group.",
+            "The experiment has an inactive group. Move content into active groups, then delete the inactive group.",
             StudioValidationMessage.WARNING
         )
         verify_summary_message(
             validation.summary,
-            u"This content experiment has issues that affect content visibility.",
+            "This content experiment has issues that affect content visibility.",
             StudioValidationMessage.WARNING
         )
         # Verify the messages for a split test with both missing and inactive children
@@ -461,20 +461,20 @@ class SplitTestModuleStudioTest(SplitTestModuleTest):
         self.assertEqual(len(validation.messages), 2)
         verify_validation_message(
             validation.messages[0],
-            u"The experiment does not contain all of the groups in the configuration.",
+            "The experiment does not contain all of the groups in the configuration.",
             StudioValidationMessage.ERROR,
             expected_action_runtime_event='add-missing-groups',
-            expected_action_label=u"Add Missing Groups"
+            expected_action_label="Add Missing Groups"
         )
         verify_validation_message(
             validation.messages[1],
-            u"The experiment has an inactive group. Move content into active groups, then delete the inactive group.",
+            "The experiment has an inactive group. Move content into active groups, then delete the inactive group.",
             StudioValidationMessage.WARNING
         )
         # With two messages of type error and warning priority given to error.
         verify_summary_message(
             validation.summary,
-            u"This content experiment has issues that affect content visibility.",
+            "This content experiment has issues that affect content visibility.",
             StudioValidationMessage.ERROR
         )
 
@@ -484,13 +484,13 @@ class SplitTestModuleStudioTest(SplitTestModuleTest):
         self.assertEqual(len(validation.messages), 1)
         verify_validation_message(
             validation.messages[0],
-            u"The experiment uses a deleted group configuration. "
-            u"Select a valid group configuration or delete this experiment.",
+            "The experiment uses a deleted group configuration. "
+            "Select a valid group configuration or delete this experiment.",
             StudioValidationMessage.ERROR
         )
         verify_summary_message(
             validation.summary,
-            u"This content experiment has issues that affect content visibility.",
+            "This content experiment has issues that affect content visibility.",
             StudioValidationMessage.ERROR
         )
 
@@ -506,12 +506,12 @@ class SplitTestModuleStudioTest(SplitTestModuleTest):
         self.assertEqual(len(validation.messages), 1)
         verify_validation_message(
             validation.messages[0],
-            u"The experiment uses a group configuration that is not supported for experiments. "
-            u"Select a valid group configuration or delete this experiment.",
+            "The experiment uses a group configuration that is not supported for experiments. "
+            "Select a valid group configuration or delete this experiment.",
             StudioValidationMessage.ERROR
         )
         verify_summary_message(
             validation.summary,
-            u"This content experiment has issues that affect content visibility.",
+            "This content experiment has issues that affect content visibility.",
             StudioValidationMessage.ERROR
         )

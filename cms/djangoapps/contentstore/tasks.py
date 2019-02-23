@@ -1,7 +1,7 @@
 """
 This file contains celery tasks for contentstore views
 """
-from __future__ import absolute_import
+
 
 import base64
 import json
@@ -101,7 +101,7 @@ def enqueue_update_thumbnail_tasks(course_videos, videos_per_task, run):
     start = 0
     end = videos_per_task
     chunks_count = int(ceil(batch_size / float(videos_per_task)))
-    for __ in xrange(0, chunks_count):
+    for __ in range(0, chunks_count):
         course_videos_chunk = course_videos[start:end]
         tasks.append(task_scrape_youtube_thumbnail.s(
             course_videos_chunk, run
@@ -126,8 +126,8 @@ def task_scrape_youtube_thumbnail_callback(self, results, run,  # pylint: disabl
     """
     yt_thumbnails_scraping_tasks_count = len(list(results()))
     LOGGER.info(
-        (u"[video thumbnails] [run=%s] [video-thumbnails-scraping-complete-for-a-batch] [tasks_count=%s] "
-         u"[batch_size=%s] [videos_per_task=%s]"),
+        ("[video thumbnails] [run=%s] [video-thumbnails-scraping-complete-for-a-batch] [tasks_count=%s] "
+         "[batch_size=%s] [videos_per_task=%s]"),
         run, yt_thumbnails_scraping_tasks_count, batch_size, videos_per_task
     )
 
@@ -153,8 +153,8 @@ def task_scrape_youtube_thumbnail(self, course_videos, run):   # pylint: disable
             scrape_youtube_thumbnail(course_id, edx_video_id, youtube_id)
         except Exception:  # pylint: disable=broad-except
             LOGGER.exception(
-                (u"[video thumbnails] [run=%s] [video-thumbnails-scraping-failed-with-unknown-exc] "
-                 u"[edx_video_id=%s] [youtube_id=%s] [course=%s]"),
+                ("[video thumbnails] [run=%s] [video-thumbnails-scraping-failed-with-unknown-exc] "
+                 "[edx_video_id=%s] [youtube_id=%s] [course=%s]"),
                 run,
                 edx_video_id,
                 youtube_id,
@@ -172,8 +172,8 @@ def task_status_callback(self, results, revision,  # pylint: disable=unused-argu
     transcript_tasks_count = len(list(results()))
 
     LOGGER.info(
-        (u"[%s] [run=%s] [video-transcripts-migration-complete-for-a-video] [tasks_count=%s] [course_id=%s] "
-         u"[revision=%s] [video=%s]"),
+        ("[%s] [run=%s] [video-transcripts-migration-complete-for-a-video] [tasks_count=%s] [course_id=%s] "
+         "[revision=%s] [video=%s]"),
         MIGRATION_LOGS_PREFIX, command_run, transcript_tasks_count, course_id, revision, video_location
     )
 
@@ -197,7 +197,7 @@ def enqueue_async_migrate_transcripts_tasks(course_keys,
         'command_run': command_run
     }
     group([
-        async_migrate_transcript.s(unicode(course_key), **kwargs)
+        async_migrate_transcript.s(str(course_key), **kwargs)
         for course_key in course_keys
     ])()
 
@@ -248,11 +248,11 @@ def async_migrate_transcript(self, course_key, **kwargs):   # pylint: disable=un
     course_videos = get_course_videos(CourseKey.from_string(course_key))
 
     LOGGER.info(
-        u"[%s] [run=%s] [video-transcripts-migration-process-started-for-course] [course=%s]",
+        "[%s] [run=%s] [video-transcripts-migration-process-started-for-course] [course=%s]",
         MIGRATION_LOGS_PREFIX, command_run, course_key
     )
 
-    for revision, videos in course_videos.items():
+    for revision, videos in list(course_videos.items()):
         for video in videos:
             # Gather transcripts from a video block.
             all_transcripts = {}
@@ -264,7 +264,7 @@ def async_migrate_transcript(self, course_key, **kwargs):   # pylint: disable=un
                 all_transcripts.update({'en': video.sub})
 
             sub_tasks = []
-            video_location = unicode(video.location)
+            video_location = str(video.location)
             for lang in all_transcripts:
                 sub_tasks.append(async_migrate_transcript_subtask.s(
                     video_location, revision, lang, force_update, **kwargs
@@ -280,13 +280,13 @@ def async_migrate_transcript(self, course_key, **kwargs):   # pylint: disable=un
                 chord(sub_tasks)(callback)
 
                 LOGGER.info(
-                    (u"[%s] [run=%s] [transcripts-migration-tasks-submitted] "
-                     u"[transcripts_count=%s] [course=%s] [revision=%s] [video=%s]"),
+                    ("[%s] [run=%s] [transcripts-migration-tasks-submitted] "
+                     "[transcripts_count=%s] [course=%s] [revision=%s] [video=%s]"),
                     MIGRATION_LOGS_PREFIX, command_run, len(sub_tasks), course_key, revision, video_location
                 )
             else:
                 LOGGER.info(
-                    u"[%s] [run=%s] [no-video-transcripts] [course=%s] [revision=%s] [video=%s]",
+                    "[%s] [run=%s] [no-video-transcripts] [course=%s] [revision=%s] [video=%s]",
                     MIGRATION_LOGS_PREFIX, command_run, course_key, revision, video_location
                 )
 
@@ -321,7 +321,7 @@ def save_transcript_to_storage(command_run, edx_video_id, language_code, transcr
         )
     else:
         LOGGER.info(
-            u"[%s] [run=%s] [do-not-override-existing-transcript] [edx_video_id=%s] [language_code=%s]",
+            "[%s] [run=%s] [do-not-override-existing-transcript] [edx_video_id=%s] [language_code=%s]",
             MIGRATION_LOGS_PREFIX, command_run, edx_video_id, language_code
         )
 
@@ -347,15 +347,15 @@ def async_migrate_transcript_subtask(self, *args, **kwargs):  # pylint: disable=
 
     if not kwargs['commit']:
         LOGGER.info(
-            (u'[%s] [run=%s] [video-transcript-will-be-migrated] '
-             u'[revision=%s] [video=%s] [edx_video_id=%s] [language_code=%s]'),
+            ('[%s] [run=%s] [video-transcript-will-be-migrated] '
+             '[revision=%s] [video=%s] [edx_video_id=%s] [language_code=%s]'),
             MIGRATION_LOGS_PREFIX, command_run, revision, video_location, edx_video_id, language_code
         )
         return success
 
     LOGGER.info(
-        (u'[%s] [run=%s] [transcripts-migration-process-started-for-video-transcript] [revision=%s] '
-         u'[video=%s] [edx_video_id=%s] [language_code=%s]'),
+        ('[%s] [run=%s] [transcripts-migration-process-started-for-video-transcript] [revision=%s] '
+         '[video=%s] [edx_video_id=%s] [language_code=%s]'),
         MIGRATION_LOGS_PREFIX, command_run, revision, video_location, edx_video_id, language_code
     )
 
@@ -383,7 +383,7 @@ def async_migrate_transcript_subtask(self, *args, **kwargs):  # pylint: disable=
                 store.update_item(video, ModuleStoreEnum.UserID.mgmt_command)
 
             LOGGER.info(
-                u'[%s] [run=%s] [generated-edx-video-id] [revision=%s] [video=%s] [edx_video_id=%s] [language_code=%s]',
+                '[%s] [run=%s] [generated-edx-video-id] [revision=%s] [video=%s] [edx_video_id=%s] [language_code=%s]',
                 MIGRATION_LOGS_PREFIX, command_run, revision, video_location, edx_video_id, language_code
             )
 
@@ -397,22 +397,22 @@ def async_migrate_transcript_subtask(self, *args, **kwargs):  # pylint: disable=
         )
     except (NotFoundError, TranscriptsGenerationException, ValCannotCreateError):
         LOGGER.exception(
-            (u'[%s] [run=%s] [video-transcript-migration-failed-with-known-exc] [revision=%s] [video=%s] '
-             u'[edx_video_id=%s] [language_code=%s]'),
+            ('[%s] [run=%s] [video-transcript-migration-failed-with-known-exc] [revision=%s] [video=%s] '
+             '[edx_video_id=%s] [language_code=%s]'),
             MIGRATION_LOGS_PREFIX, command_run, revision, video_location, edx_video_id, language_code
         )
         return failure
     except Exception:
         LOGGER.exception(
-            (u'[%s] [run=%s] [video-transcript-migration-failed-with-unknown-exc] [revision=%s] '
-             u'[video=%s] [edx_video_id=%s] [language_code=%s]'),
+            ('[%s] [run=%s] [video-transcript-migration-failed-with-unknown-exc] [revision=%s] '
+             '[video=%s] [edx_video_id=%s] [language_code=%s]'),
             MIGRATION_LOGS_PREFIX, command_run, revision, video_location, edx_video_id, language_code
         )
         raise
 
     LOGGER.info(
-        (u'[%s] [run=%s] [video-transcript-migration-succeeded-for-a-video] [revision=%s] '
-         u'[video=%s] [edx_video_id=%s] [language_code=%s]'),
+        ('[%s] [run=%s] [video-transcript-migration-succeeded-for-a-video] [revision=%s] '
+         '[video=%s] [edx_video_id=%s] [language_code=%s]'),
         MIGRATION_LOGS_PREFIX, command_run, revision, video_location, edx_video_id, language_code
     )
     return success
@@ -489,14 +489,14 @@ def rerun_course(source_course_key_string, destination_course_key_string, user_i
     except DuplicateCourseError:
         # do NOT delete the original course, only update the status
         CourseRerunState.objects.failed(course_key=destination_course_key)
-        LOGGER.exception(u'Course Rerun Error')
+        LOGGER.exception('Course Rerun Error')
         return "duplicate course"
 
     # catch all exceptions so we can update the state and properly cleanup the course.
     except Exception as exc:  # pylint: disable=broad-except
         # update state: Failed
         CourseRerunState.objects.failed(course_key=destination_course_key)
-        LOGGER.exception(u'Course Rerun Error')
+        LOGGER.exception('Course Rerun Error')
 
         try:
             # cleanup any remnants of the course
@@ -505,7 +505,7 @@ def rerun_course(source_course_key_string, destination_course_key_string, user_i
             # it's possible there was an error even before the course module was created
             pass
 
-        return u"exception: " + text_type(exc)
+        return "exception: " + text_type(exc)
 
 
 def deserialize_fields(json_fields):
@@ -532,9 +532,9 @@ def update_search_index(course_id, triggered_time_isoformat):
         CoursewareSearchIndexer.index(modulestore(), course_key, triggered_at=(_parse_time(triggered_time_isoformat)))
 
     except SearchIndexingError as exc:
-        LOGGER.error(u'Search indexing error for complete course %s - %s', course_id, text_type(exc))
+        LOGGER.error('Search indexing error for complete course %s - %s', course_id, text_type(exc))
     else:
-        LOGGER.debug(u'Search indexing successful for complete course %s', course_id)
+        LOGGER.debug('Search indexing successful for complete course %s', course_id)
 
 
 @task()
@@ -545,9 +545,9 @@ def update_library_index(library_id, triggered_time_isoformat):
         LibrarySearchIndexer.index(modulestore(), library_key, triggered_at=(_parse_time(triggered_time_isoformat)))
 
     except SearchIndexingError as exc:
-        LOGGER.error(u'Search indexing error for library %s - %s', library_id, text_type(exc))
+        LOGGER.error('Search indexing error for library %s - %s', library_id, text_type(exc))
     else:
-        LOGGER.debug(u'Search indexing successful for library %s', library_id)
+        LOGGER.debug('Search indexing successful for library %s', library_id)
 
 
 @task()
@@ -588,8 +588,8 @@ class CourseExportTask(UserTask):  # pylint: disable=abstract-method
         Returns:
             text_type: The generated name
         """
-        key = arguments_dict[u'course_key_string']
-        return u'Export of {}'.format(key)
+        key = arguments_dict['course_key_string']
+        return 'Export of {}'.format(key)
 
 
 @task(base=CourseExportTask, bind=True)
@@ -603,11 +603,11 @@ def export_olx(self, user_id, course_key_string, language):
         user = User.objects.get(pk=user_id)
     except User.DoesNotExist:
         with respect_language(language):
-            self.status.fail(_(u'Unknown User ID: {0}').format(user_id))
+            self.status.fail(_('Unknown User ID: {0}').format(user_id))
         return
     if not has_course_author_access(user, courselike_key):
         with respect_language(language):
-            self.status.fail(_(u'Permission denied'))
+            self.status.fail(_('Permission denied'))
         return
 
     if isinstance(courselike_key, LibraryLocator):
@@ -616,14 +616,14 @@ def export_olx(self, user_id, course_key_string, language):
         courselike_module = modulestore().get_course(courselike_key)
 
     try:
-        self.status.set_state(u'Exporting')
+        self.status.set_state('Exporting')
         tarball = create_export_tarball(courselike_module, courselike_key, {}, self.status)
-        artifact = UserTaskArtifact(status=self.status, name=u'Output')
+        artifact = UserTaskArtifact(status=self.status, name='Output')
         artifact.file.save(name=os.path.basename(tarball.name), content=File(tarball))  # pylint: disable=no-member
         artifact.save()
     # catch all exceptions so we can record useful error messages
     except Exception as exception:  # pylint: disable=broad-except
-        LOGGER.exception(u'Error exporting course %s', courselike_key, exc_info=True)
+        LOGGER.exception('Error exporting course %s', courselike_key, exc_info=True)
         if self.status.state != UserTaskStatus.FAILED:
             self.status.fail({'raw_error_msg': text_type(exception)})
         return
@@ -646,14 +646,14 @@ def create_export_tarball(course_module, course_key, context, status=None):
             export_course_to_xml(modulestore(), contentstore(), course_module.id, root_dir, name)
 
         if status:
-            status.set_state(u'Compressing')
+            status.set_state('Compressing')
             status.increment_completed_steps()
-        LOGGER.debug(u'tar file being generated at %s', export_file.name)
+        LOGGER.debug('tar file being generated at %s', export_file.name)
         with tarfile.open(name=export_file.name, mode='w:gz') as tar_file:
             tar_file.add(root_dir / name, arcname=name)
 
     except SerializationError as exc:
-        LOGGER.exception(u'There was an error exporting %s', course_key, exc_info=True)
+        LOGGER.exception('There was an error exporting %s', course_key, exc_info=True)
         parent = None
         try:
             failed_item = modulestore().get_item(exc.location)
@@ -675,7 +675,7 @@ def create_export_tarball(course_module, course_key, context, status=None):
                                     'edit_unit_url': context['edit_unit_url']}))
         raise
     except Exception as exc:
-        LOGGER.exception(u'There was an error exporting %s', course_key, exc_info=True)
+        LOGGER.exception('There was an error exporting %s', course_key, exc_info=True)
         context.update({
             'in_err': True,
             'edit_unit_url': None,
@@ -719,9 +719,9 @@ class CourseImportTask(UserTask):  # pylint: disable=abstract-method
         Returns:
             text_type: The generated name
         """
-        key = arguments_dict[u'course_key_string']
-        filename = arguments_dict[u'archive_name']
-        return u'Import of {} from {}'.format(key, filename)
+        key = arguments_dict['course_key_string']
+        filename = arguments_dict['archive_name']
+        return 'Import of {} from {}'.format(key, filename)
 
 
 @task(base=CourseImportTask, bind=True)
@@ -734,11 +734,11 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
         user = User.objects.get(pk=user_id)
     except User.DoesNotExist:
         with respect_language(language):
-            self.status.fail(_(u'Unknown User ID: {0}').format(user_id))
+            self.status.fail(_('Unknown User ID: {0}').format(user_id))
         return
     if not has_course_author_access(user, courselike_key):
         with respect_language(language):
-            self.status.fail(_(u'Permission denied'))
+            self.status.fail(_('Permission denied'))
         return
 
     is_library = isinstance(courselike_key, LibraryLocator)
@@ -758,24 +758,24 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
     subdir = base64.urlsafe_b64encode(repr(courselike_key))
     course_dir = data_root / subdir
     try:
-        self.status.set_state(u'Unpacking')
+        self.status.set_state('Unpacking')
 
-        if not archive_name.endswith(u'.tar.gz'):
+        if not archive_name.endswith('.tar.gz'):
             with respect_language(language):
-                self.status.fail(_(u'We only support uploading a .tar.gz file.'))
+                self.status.fail(_('We only support uploading a .tar.gz file.'))
                 return
 
         temp_filepath = course_dir / get_valid_filename(archive_name)
         if not course_dir.isdir():
             os.mkdir(course_dir)
 
-        LOGGER.debug(u'importing course to {0}'.format(temp_filepath))
+        LOGGER.debug('importing course to {0}'.format(temp_filepath))
 
         # Copy the OLX archive from where it was uploaded to (S3, Swift, file system, etc.)
         if not course_import_export_storage.exists(archive_path):
-            LOGGER.info(u'Course import %s: Uploaded file %s not found', courselike_key, archive_path)
+            LOGGER.info('Course import %s: Uploaded file %s not found', courselike_key, archive_path)
             with respect_language(language):
-                self.status.fail(_(u'Tar file not found'))
+                self.status.fail(_('Tar file not found'))
             return
         with course_import_export_storage.open(archive_path, 'rb') as source:
             with open(temp_filepath, 'wb') as destination:
@@ -786,7 +786,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
                     return source.read(FILE_READ_CHUNK)
                 for chunk in iter(read_chunk, b''):
                     destination.write(chunk)
-        LOGGER.info(u'Course import %s: Download from storage complete', courselike_key)
+        LOGGER.info('Course import %s: Download from storage complete', courselike_key)
         # Delete from source location
         course_import_export_storage.delete(archive_path)
 
@@ -794,22 +794,22 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
         # current course state before import.
         if is_course:
             if courselike_module.entrance_exam_enabled:
-                fake_request = RequestFactory().get(u'/')
+                fake_request = RequestFactory().get('/')
                 fake_request.user = user
                 from contentstore.views.entrance_exam import remove_entrance_exam_milestone_reference
                 # TODO: Is this really ok?  Seems dangerous for a live course
                 remove_entrance_exam_milestone_reference(fake_request, courselike_key)
                 LOGGER.info(
-                    u'entrance exam milestone content reference for course %s has been removed',
+                    'entrance exam milestone content reference for course %s has been removed',
                     courselike_module.id
                 )
     # Send errors to client with stage at which error occurred.
     except Exception as exception:  # pylint: disable=broad-except
         if course_dir.isdir():
             shutil.rmtree(course_dir)
-            LOGGER.info(u'Course import %s: Temp data cleared', courselike_key)
+            LOGGER.info('Course import %s: Temp data cleared', courselike_key)
 
-        LOGGER.exception(u'Error importing course %s', courselike_key, exc_info=True)
+        LOGGER.exception('Error importing course %s', courselike_key, exc_info=True)
         self.status.fail(text_type(exception))
         return
 
@@ -817,17 +817,17 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
     try:
         tar_file = tarfile.open(temp_filepath)
         try:
-            safetar_extractall(tar_file, (course_dir + u'/').encode(u'utf-8'))
+            safetar_extractall(tar_file, (course_dir + '/').encode('utf-8'))
         except SuspiciousOperation as exc:
-            LOGGER.info(u'Course import %s: Unsafe tar file - %s', courselike_key, exc.args[0])
+            LOGGER.info('Course import %s: Unsafe tar file - %s', courselike_key, exc.args[0])
             with respect_language(language):
-                self.status.fail(_(u'Unsafe tar file. Aborting import.'))
+                self.status.fail(_('Unsafe tar file. Aborting import.'))
             return
         finally:
             tar_file.close()
 
-        LOGGER.info(u'Course import %s: Uploaded file extracted', courselike_key)
-        self.status.set_state(u'Verifying')
+        LOGGER.info('Course import %s: Uploaded file extracted', courselike_key)
+        self.status.set_state('Verifying')
         self.status.increment_completed_steps()
 
         # find the 'course.xml' file
@@ -854,14 +854,14 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
         dirpath = get_dir_for_filename(course_dir, root_name)
         if not dirpath:
             with respect_language(language):
-                self.status.fail(_(u'Could not find the {0} file in the package.').format(root_name))
+                self.status.fail(_('Could not find the {0} file in the package.').format(root_name))
                 return
 
         dirpath = os.path.relpath(dirpath, data_root)
-        LOGGER.debug(u'found %s at %s', root_name, dirpath)
+        LOGGER.debug('found %s at %s', root_name, dirpath)
 
-        LOGGER.info(u'Course import %s: Extracted file verified', courselike_key)
-        self.status.set_state(u'Updating')
+        LOGGER.info('Course import %s: Extracted file verified', courselike_key)
+        self.status.set_state('Updating')
         self.status.increment_completed_steps()
 
         courselike_items = import_func(
@@ -873,29 +873,29 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
         )
 
         new_location = courselike_items[0].location
-        LOGGER.debug(u'new course at %s', new_location)
+        LOGGER.debug('new course at %s', new_location)
 
-        LOGGER.info(u'Course import %s: Course import successful', courselike_key)
+        LOGGER.info('Course import %s: Course import successful', courselike_key)
     except Exception as exception:   # pylint: disable=broad-except
-        LOGGER.exception(u'error importing course', exc_info=True)
+        LOGGER.exception('error importing course', exc_info=True)
         self.status.fail(text_type(exception))
     finally:
         if course_dir.isdir():
             shutil.rmtree(course_dir)
-            LOGGER.info(u'Course import %s: Temp data cleared', courselike_key)
+            LOGGER.info('Course import %s: Temp data cleared', courselike_key)
 
-        if self.status.state == u'Updating' and is_course:
+        if self.status.state == 'Updating' and is_course:
             # Reload the course so we have the latest state
             course = modulestore().get_course(courselike_key)
             if course.entrance_exam_enabled:
                 entrance_exam_chapter = modulestore().get_items(
                     course.id,
-                    qualifiers={u'category': u'chapter'},
-                    settings={u'is_entrance_exam': True}
+                    qualifiers={'category': 'chapter'},
+                    settings={'is_entrance_exam': True}
                 )[0]
 
-                metadata = {u'entrance_exam_id': text_type(entrance_exam_chapter.location)}
+                metadata = {'entrance_exam_id': text_type(entrance_exam_chapter.location)}
                 CourseMetadata.update_from_dict(metadata, course, user)
                 from contentstore.views.entrance_exam import add_entrance_exam_milestone
                 add_entrance_exam_milestone(course.id, entrance_exam_chapter)
-                LOGGER.info(u'Course %s Entrance exam imported', course.id)
+                LOGGER.info('Course %s Entrance exam imported', course.id)

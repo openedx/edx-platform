@@ -122,7 +122,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
 
     def test_student_view_init(self):
         seq_module = SequenceModule(runtime=Mock(position=2), descriptor=Mock(), scope_ids=Mock())
-        self.assertEquals(seq_module.position, 2)  # matches position set in the runtime
+        self.assertEqual(seq_module.position, 2)  # matches position set in the runtime
 
     @ddt.unpack
     @ddt.data(
@@ -136,7 +136,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
             view=view
         )
         self._assert_view_at_position(html, expected_position=1)
-        self.assertIn(unicode(self.sequence_3_1.location), html)
+        self.assertIn(str(self.sequence_3_1.location), html)
         self.assertIn("'gated': False", html)
         self.assertIn("'next_url': 'NextSequential'", html)
         self.assertIn("'prev_url': 'PrevSequential'", html)
@@ -222,7 +222,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         self.assertIn("'gated': True", html)
         self.assertIn("'prereq_url': 'PrereqUrl'", html)
         self.assertIn("'prereq_section_name': 'PrereqSectionName'", html)
-        self.assertIn("'gated_section_name': u'{}'".format(unicode(sequence.display_name)), html)
+        self.assertIn("'gated_section_name': u'{}'".format(str(sequence.display_name)), html)
         self.assertIn("'next_url': 'NextSequential'", html)
         self.assertIn("'prev_url': 'PrevSequential'", html)
 
@@ -237,7 +237,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
             html
         )
         self.assertIn("'gated': False", html)
-        self.assertIn(unicode(sequence.location), html)
+        self.assertIn(str(sequence.location), html)
         self.assertIn("'prereq_url': None", html)
         self.assertIn("'prereq_section_name': None", html)
         self.assertIn("'next_url': 'NextSequential'", html)
@@ -250,7 +250,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         self.assertIn("seq_module.html", html)
         self.assertIn("'banner_text': None", html)
         self.assertIn("'gated': False", html)
-        self.assertIn(unicode(sequence.location), html)
+        self.assertIn(str(sequence.location), html)
         self.assertIn("'prereq_url': None", html)
         self.assertIn("'prereq_section_name': None", html)
         self.assertIn("'next_url': 'NextSequential'", html)
@@ -312,7 +312,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         targeted vertical through ajax call
         """
         for child in self.sequence_3_1.get_children():
-            usage_key = unicode(child.location)
+            usage_key = str(child.location)
             completion_return = json.loads(self.sequence_3_1.handle_ajax(
                 'get_completion',
                 {'usage_key': usage_key}

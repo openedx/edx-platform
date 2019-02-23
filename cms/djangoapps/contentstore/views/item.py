@@ -1,5 +1,5 @@
 """Views for items (modules)."""
-from __future__ import absolute_import
+
 
 import hashlib
 import logging
@@ -83,7 +83,7 @@ NEVER = lambda x: False
 ALWAYS = lambda x: True
 
 
-highlights_setting = WaffleSwitch(u'dynamic_pacing', u'studio_course_update')
+highlights_setting = WaffleSwitch('dynamic_pacing', 'studio_course_update')
 
 
 def hash_resource(resource):
@@ -102,7 +102,7 @@ def _filter_entrance_exam_grader(graders):
     the grader type for a given section of a course
     """
     if is_entrance_exams_enabled():
-        graders = [grader for grader in graders if grader.get('type') != u'Entrance Exam']
+        graders = [grader for grader in graders if grader.get('type') != 'Entrance Exam']
     return graders
 
 
@@ -224,7 +224,7 @@ def xblock_handler(request, usage_key_string):
                 request.user,
                 request.json.get('display_name'),
             )
-            return JsonResponse({'locator': unicode(dest_usage_key), 'courseKey': unicode(dest_usage_key.course_key)})
+            return JsonResponse({'locator': str(dest_usage_key), 'courseKey': str(dest_usage_key.course_key)})
         else:
             return _create_item(request)
     elif request.method == 'PATCH':
@@ -322,14 +322,14 @@ def xblock_view_handler(request, usage_key_string, view_name):
         xblock.runtime.wrappers.append(partial(
             wrap_xblock,
             'StudioRuntime',
-            usage_id_serializer=unicode,
+            usage_id_serializer=str,
             request_token=request_token(request),
         ))
 
         xblock.runtime.wrappers_asides.append(partial(
             wrap_xblock_aside,
             'StudioRuntime',
-            usage_id_serializer=unicode,
+            usage_id_serializer=str,
             request_token=request_token(request),
             extra_classes=['wrapper-comp-plugins']
         ))
@@ -344,7 +344,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
             # dungeon and surface as uneditable, unsaveable, and undeletable
             # component-goblins.
             except Exception as exc:                          # pylint: disable=broad-except
-                log.debug(u"Unable to render %s for %r", view_name, xblock, exc_info=True)
+                log.debug("Unable to render %s for %r", view_name, xblock, exc_info=True)
                 fragment = Fragment(render_to_string('html_error.html', {'message': str(exc)}))
 
         elif view_name in PREVIEW_VIEWS + container_views:
@@ -368,8 +368,8 @@ def xblock_view_handler(request, usage_key_string, view_name):
                     }
             except ValueError:
                 return HttpResponse(
-                    content=u"Couldn't parse paging parameters: enable_paging: "
-                            u"{0}, page_number: {1}, page_size: {2}".format(
+                    content="Couldn't parse paging parameters: enable_paging: "
+                            "{0}, page_number: {1}, page_size: {2}".format(
                                 request.GET.get('enable_paging', 'false'),
                                 request.GET.get('page_number', 0),
                                 request.GET.get('page_size', 0)
@@ -412,7 +412,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
 
         return JsonResponse({
             'html': fragment.content,
-            'resources': hashed_resources.items()
+            'resources': list(hashed_resources.items())
         })
 
     else:
@@ -507,7 +507,7 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
             store.revert_to_published(xblock.location, user.id)
             # Returning the same sort of result that we do for other save operations. In the future,
             # we may want to return the full XBlockInfo.
-            return JsonResponse({'id': unicode(xblock.location)})
+            return JsonResponse({'id': str(xblock.location)})
 
         old_metadata = own_metadata(xblock)
         old_content = xblock.get_explicitly_set_fields_by_scope(Scope.content)
@@ -576,7 +576,7 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
             # IMPORTANT NOTE: if the client passed 'null' (None) for a piece of metadata that means 'remove it'. If
             # the intent is to make it None, use the nullout field
             if metadata is not None:
-                for metadata_key, value in metadata.items():
+                for metadata_key, value in list(metadata.items()):
                     field = xblock.fields[metadata_key]
 
                     if value is None:
@@ -587,7 +587,7 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
                         except ValueError as verr:
                             reason = _("Invalid data")
                             if text_type(verr):
-                                reason = _(u"Invalid data ({details})").format(details=text_type(verr))
+                                reason = _("Invalid data ({details})").format(details=text_type(verr))
                             return JsonResponse({"error": reason}, 400)
 
                         field.write_to(xblock, value)
@@ -614,7 +614,7 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
                     store.update_item(course, user.id)
 
         result = {
-            'id': unicode(xblock.location),
+            'id': str(xblock.location),
             'data': data,
             'metadata': own_metadata(xblock)
         }
@@ -679,7 +679,7 @@ def _create_item(request):
         # Only these categories are supported at this time.
         if category not in ['html', 'problem', 'video']:
             return HttpResponseBadRequest(
-                u"Category '%s' not supported for Libraries" % category, content_type='text/plain'
+                "Category '%s' not supported for Libraries" % category, content_type='text/plain'
             )
 
     created_block = create_xblock(
@@ -691,7 +691,7 @@ def _create_item(request):
     )
 
     return JsonResponse(
-        {'locator': unicode(created_block.location), 'courseKey': unicode(created_block.location.course_key)}
+        {'locator': str(created_block.location), 'courseKey': str(created_block.location.course_key)}
     )
 
 
@@ -723,7 +723,7 @@ def is_source_item_in_target_parents(source_item, target_parent):
     """
     target_ancestors = _create_xblock_ancestor_info(target_parent, is_concise=True)['ancestors']
     for target_ancestor in target_ancestors:
-        if unicode(source_item.location) == target_ancestor['id']:
+        if str(source_item.location) == target_ancestor['id']:
             return True
     return False
 
@@ -767,7 +767,7 @@ def _move_item(source_usage_key, target_parent_usage_key, user, target_index=Non
 
         if (valid_move_type.get(target_parent_type, '') != source_type and
                 target_parent_type not in parent_component_types):
-            error = _(u'You can not move {source_type} into {target_parent_type}.').format(
+            error = _('You can not move {source_type} into {target_parent_type}.').format(
                 source_type=source_type,
                 target_parent_type=target_parent_type,
             )
@@ -780,20 +780,20 @@ def _move_item(source_usage_key, target_parent_usage_key, user, target_index=Non
         elif target_parent_type == 'split_test':
             error = _('You can not move an item directly into content experiment.')
         elif source_index is None:
-            error = _(u'{source_usage_key} not found in {parent_usage_key}.').format(
-                source_usage_key=unicode(source_usage_key),
-                parent_usage_key=unicode(source_parent.location)
+            error = _('{source_usage_key} not found in {parent_usage_key}.').format(
+                source_usage_key=str(source_usage_key),
+                parent_usage_key=str(source_parent.location)
             )
         else:
             try:
                 target_index = int(target_index) if target_index is not None else None
                 if len(target_parent.children) < target_index:
-                    error = _(u'You can not move {source_usage_key} at an invalid index ({target_index}).').format(
-                        source_usage_key=unicode(source_usage_key),
+                    error = _('You can not move {source_usage_key} at an invalid index ({target_index}).').format(
+                        source_usage_key=str(source_usage_key),
                         target_index=target_index
                     )
             except ValueError:
-                error = _(u'You must provide target_index ({target_index}) as an integer.').format(
+                error = _('You must provide target_index ({target_index}) as an integer.').format(
                     target_index=target_index
                 )
         if error:
@@ -811,16 +811,16 @@ def _move_item(source_usage_key, target_parent_usage_key, user, target_index=Non
         )
 
         log.info(
-            u'MOVE: %s moved from %s to %s at %d index',
-            unicode(source_usage_key),
-            unicode(source_parent.location),
-            unicode(target_parent_usage_key),
+            'MOVE: %s moved from %s to %s at %d index',
+            str(source_usage_key),
+            str(source_parent.location),
+            str(target_parent_usage_key),
             insert_at
         )
 
         context = {
-            'move_source_locator': unicode(source_usage_key),
-            'parent_locator': unicode(target_parent_usage_key),
+            'move_source_locator': str(source_usage_key),
+            'parent_locator': str(target_parent_usage_key),
             'source_index': target_index if target_index is not None else source_index
         }
         return JsonResponse(context)
@@ -841,7 +841,7 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_
         # Can't use own_metadata(), b/c it converts data for JSON serialization -
         # not suitable for setting metadata of the new block
         duplicate_metadata = {}
-        for field in source_item.fields.values():
+        for field in list(source_item.fields.values()):
             if field.scope == Scope.settings and field.is_set_on(source_item):
                 duplicate_metadata[field.name] = field.read_from(source_item)
 
@@ -852,19 +852,19 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_
             duplicate_metadata['display_name'] = display_name
         else:
             if source_item.display_name is None:
-                duplicate_metadata['display_name'] = _(u"Duplicate of {0}").format(source_item.category)
+                duplicate_metadata['display_name'] = _("Duplicate of {0}").format(source_item.category)
             else:
-                duplicate_metadata['display_name'] = _(u"Duplicate of '{0}'").format(source_item.display_name)
+                duplicate_metadata['display_name'] = _("Duplicate of '{0}'").format(source_item.display_name)
 
         asides_to_create = []
         for aside in source_item.runtime.get_asides(source_item):
-            for field in aside.fields.values():
+            for field in list(aside.fields.values()):
                 if field.scope in (Scope.settings, Scope.content,) and field.is_set_on(aside):
                     asides_to_create.append(aside)
                     break
 
         for aside in asides_to_create:
-            for field in aside.fields.values():
+            for field in list(aside.fields.values()):
                 if field.scope not in (Scope.settings, Scope.content,):
                     field.delete_from(aside)
 
@@ -955,7 +955,7 @@ def orphan_handler(request, course_key_string):
     course_usage_key = CourseKey.from_string(course_key_string)
     if request.method == 'GET':
         if has_studio_read_access(request.user, course_usage_key):
-            return JsonResponse([unicode(item) for item in modulestore().get_orphans(course_usage_key)])
+            return JsonResponse([str(item) for item in modulestore().get_orphans(course_usage_key)])
         else:
             raise PermissionDenied()
     if request.method == 'DELETE':
@@ -983,7 +983,7 @@ def _delete_orphans(course_usage_key, user_id, commit=False):
                 if branch == ModuleStoreEnum.BranchName.published:
                     revision = ModuleStoreEnum.RevisionOption.published_only
                 store.delete_item(itemloc, user_id, revision=revision)
-    return [unicode(item) for item in items]
+    return [str(item) for item in items]
 
 
 def _get_xblock(usage_key, user):
@@ -1003,7 +1003,7 @@ def _get_xblock(usage_key, user):
                 raise
         except InvalidLocationError:
             log.error("Can't find item by location.")
-            return JsonResponse({"error": "Can't find item by location: " + unicode(usage_key)}, 404)
+            return JsonResponse({"error": "Can't find item by location: " + str(usage_key)}, 404)
 
 
 def _get_module_info(xblock, rewrite_static_links=True, include_ancestor_info=False, include_publishing_info=False):
@@ -1055,7 +1055,7 @@ def _get_gating_info(course, xblock):
             setattr(course, 'gating_prerequisites', gating_api.get_prerequisites(course.id))
         info["is_prereq"] = gating_api.is_prerequisite(course.id, xblock.location)
         info["prereqs"] = [
-            p for p in course.gating_prerequisites if unicode(xblock.location) not in p['namespace']
+            p for p in course.gating_prerequisites if str(xblock.location) not in p['namespace']
         ]
         prereq, prereq_min_score, prereq_min_completion = gating_api.get_required_content(
             course.id,
@@ -1150,14 +1150,14 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         # Translators: The {pct_sign} here represents the percent sign, i.e., '%'
         # in many languages. This is used to avoid Transifex's misinterpreting of
         # '% o'. The percent sign is also translatable as a standalone string.
-        explanatory_message = _(u'Students must score {score}{pct_sign} or higher to access course materials.').format(
+        explanatory_message = _('Students must score {score}{pct_sign} or higher to access course materials.').format(
             score=int(parent_xblock.entrance_exam_minimum_score_pct * 100),
             # Translators: This is the percent sign. It will be used to represent
             # a percent value out of 100, e.g. "58%" means "58/100".
             pct_sign=_('%'))
 
     xblock_info = {
-        'id': unicode(xblock.location),
+        'id': str(xblock.location),
         'display_name': xblock.display_name_with_default,
         'category': xblock.category,
         'has_children': xblock.has_children
@@ -1490,6 +1490,6 @@ def _xblock_type_and_display_name(xblock):
     """
     Returns a string representation of the xblock's type and display name
     """
-    return _(u'{section_or_subsection} "{display_name}"').format(
+    return _('{section_or_subsection} "{display_name}"').format(
         section_or_subsection=xblock_type_display_name(xblock),
         display_name=xblock.display_name_with_default)

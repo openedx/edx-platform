@@ -102,7 +102,7 @@ def _write_styles(selector, output_root, classes):
         "@import 'bourbon/bourbon';",
         "@import 'lms/theme/variables';",
     ]
-    for class_, fragment_names in css_imports.items():
+    for class_, fragment_names in list(css_imports.items()):
         module_styles_lines.append("""{selector}.xmodule_{class_} {{""".format(
             class_=class_, selector=selector
         ))
@@ -166,15 +166,15 @@ def _write_files(output_root, contents, generated_suffix_map=None):
     to_delete = set(file.basename() for file in output_root.files()) - set(contents.keys())
 
     if generated_suffix_map:
-        for output_file in contents.keys():
-            for suffix, generated_suffix in generated_suffix_map.items():
+        for output_file in list(contents.keys()):
+            for suffix, generated_suffix in list(generated_suffix_map.items()):
                 if output_file.endswith(suffix):
                     to_delete.discard(output_file.replace(suffix, generated_suffix))
 
     for extra_file in to_delete:
         (output_root / extra_file).remove_p()
 
-    for filename, file_content in contents.iteritems():
+    for filename, file_content in contents.items():
         output_file = output_root / filename
 
         not_file = not output_file.isfile()
@@ -200,7 +200,7 @@ def write_webpack(output_file, module_files, descriptor_files):
     config = {
         'entry': {}
     }
-    for (owner, files) in module_files.items() + descriptor_files.items():
+    for (owner, files) in list(module_files.items()) + list(descriptor_files.items()):
         unique_files = sorted(set('./{}'.format(file) for file in files))
         if len(unique_files) == 1:
             unique_files = unique_files[0]
@@ -210,7 +210,7 @@ def write_webpack(output_file, module_files, descriptor_files):
 
     with output_file.open('w') as outfile:
         outfile.write(
-            textwrap.dedent(u"""\
+            textwrap.dedent("""\
                 module.exports = {config_json};
             """).format(config_json=json.dumps(config, indent=4))
         )

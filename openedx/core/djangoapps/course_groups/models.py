@@ -112,7 +112,7 @@ class CohortMembership(models.Model):
                 membership.course_user_group.users.add(user)
                 previous_cohort = None
             elif membership.course_user_group == cohort:
-                raise ValueError(u"User {user_name} already present in cohort {cohort_name}".format(
+                raise ValueError("User {user_name} already present in cohort {cohort_name}".format(
                     user_name=user.username,
                     cohort_name=cohort.name))
             else:
@@ -127,7 +127,7 @@ class CohortMembership(models.Model):
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         self.full_clean(validate_unique=False)
 
-        log.info(u"Saving CohortMembership for user '%s' in '%s'", self.user.id, self.course_id)
+        log.info("Saving CohortMembership for user '%s' in '%s'", self.user.id, self.course_id)
         return super(CohortMembership, self).save(force_insert=force_insert,
                                                   force_update=force_update,
                                                   using=using,

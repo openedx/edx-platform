@@ -5,7 +5,7 @@
 # Python functions which duplicate the standard comparison functions available to LON-CAPA problems.
 # Used in translating LON-CAPA problems to i4x problem specification language.
 
-from __future__ import division
+
 
 import math
 import random

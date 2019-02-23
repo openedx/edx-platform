@@ -54,7 +54,7 @@ class DOTAdapterTestCase(TestCase):
         """
         Make sure unicode representation of RestrictedApplication is correct
         """
-        self.assertEqual(unicode(self.restricted_app), u"<RestrictedApplication '{name}'>".format(
+        self.assertEqual(str(self.restricted_app), "<RestrictedApplication '{name}'>".format(
             name=self.restricted_client.name
         ))
 

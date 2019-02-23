@@ -1,7 +1,7 @@
 """
 Test helpers for Comprehensive Theming.
 """
-from __future__ import print_function
+
 
 from functools import wraps
 import os
@@ -65,17 +65,17 @@ def with_comprehensive_theme_context(theme=None):
 
 def dump_theming_info():
     """Dump a bunch of theming information, for debugging."""
-    for namespace, lookup in edxmako.LOOKUP.items():
-        print(u"--- %s: %s" % (namespace, lookup.template_args['module_directory']))
+    for namespace, lookup in list(edxmako.LOOKUP.items()):
+        print("--- %s: %s" % (namespace, lookup.template_args['module_directory']))
         for directory in lookup.directories:
-            print(u"  %s" % (directory,))
+            print("  %s" % (directory,))
 
     print("=" * 80)
     for dirname, __, filenames in os.walk(settings.MAKO_MODULE_DIR):
-        print(u"%s ----------------" % (dir,))
+        print("%s ----------------" % (dir,))
         for filename in sorted(filenames):
             if filename.endswith(".pyc"):
                 continue
             with open(os.path.join(dirname, filename)) as f:
                 content = len(f.read())
-            print(u"    %s: %d" % (filename, content))
+            print("    %s: %d" % (filename, content))

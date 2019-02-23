@@ -45,9 +45,9 @@ class TestDashboard(SharedModuleStoreTestCase):
                 "max_team_size": 10,
                 "topics": [
                     {
-                        "name": u"Topic {}".format(topic_id),
+                        "name": "Topic {}".format(topic_id),
                         "id": topic_id,
-                        "description": u"Description for topic {}".format(topic_id)
+                        "description": "Description for topic {}".format(topic_id)
                     }
                     for topic_id in range(cls.NUM_TOPICS)
                 ]
@@ -121,7 +121,7 @@ class TestDashboard(SharedModuleStoreTestCase):
         # Create some teams
         for topic_id in range(self.NUM_TOPICS):
             team = CourseTeamFactory.create(
-                name=u"Team for topic {}".format(topic_id),
+                name="Team for topic {}".format(topic_id),
                 course_id=self.course.id,
                 topic_id=topic_id,
             )
@@ -205,8 +205,8 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
                     {
                         'id': 'topic_{}'.format(i),
                         'name': name,
-                        'description': u'Description for topic {}.'.format(i)
-                    } for i, name in enumerate([u'Sólar power', 'Wind Power', 'Nuclear Power', 'Coal Power'])
+                        'description': 'Description for topic {}.'.format(i)
+                    } for i, name in enumerate(['Sólar power', 'Wind Power', 'Nuclear Power', 'Coal Power'])
                 ]
             }
             cls.test_course_1 = CourseFactory.create(
@@ -292,7 +292,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
             dispatch_uid='teams.signals.course_team_post_save_callback'
         ):
             cls.solar_team = CourseTeamFactory.create(
-                name=u'Sólar team',
+                name='Sólar team',
                 course_id=cls.test_course_1.id,
                 topic_id='topic_0'
             )
@@ -313,8 +313,8 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
                 topic_id='topic_7'
             )
             cls.chinese_team = CourseTeamFactory.create(
-                name=u'著文企臺個',
-                description=u'共樣地面較，件展冷不護者這與民教過住意，國制銀產物助音是勢一友',
+                name='著文企臺個',
+                description='共樣地面較，件展冷不護者這與民教過住意，國制銀產物助音是勢一友',
                 country='CN',
                 language='zh_HANS',
                 course_id=cls.test_course_2.id,
@@ -403,7 +403,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
         self.assertEqual(
             expected_status,
             response.status_code,
-            msg=u"Expected status {expected} but got {actual}: {content}".format(
+            msg="Expected status {expected} but got {actual}: {content}".format(
                 expected=expected_status,
                 actual=response.status_code,
                 content=response.content.decode(response.charset),
@@ -576,26 +576,26 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
         self.verify_names(
             {'course_id': self.test_course_2.id},
             200,
-            ['Another Team', 'Public Profile Team', 'Search', u'著文企臺個'],
+            ['Another Team', 'Public Profile Team', 'Search', '著文企臺個'],
             user='staff'
         )
 
     def test_filter_topic_id(self):
-        self.verify_names({'course_id': self.test_course_1.id, 'topic_id': 'topic_0'}, 200, [u'Sólar team'])
+        self.verify_names({'course_id': self.test_course_1.id, 'topic_id': 'topic_0'}, 200, ['Sólar team'])
 
     def test_filter_username(self):
-        self.verify_names({'course_id': self.test_course_1.id, 'username': 'student_enrolled'}, 200, [u'Sólar team'])
+        self.verify_names({'course_id': self.test_course_1.id, 'username': 'student_enrolled'}, 200, ['Sólar team'])
         self.verify_names({'course_id': self.test_course_1.id, 'username': 'staff'}, 200, [])
 
     @ddt.data(
-        (None, 200, ['Nuclear Team', u'Sólar team', 'Wind Team']),
-        ('name', 200, ['Nuclear Team', u'Sólar team', 'Wind Team']),
+        (None, 200, ['Nuclear Team', 'Sólar team', 'Wind Team']),
+        ('name', 200, ['Nuclear Team', 'Sólar team', 'Wind Team']),
         # Note that "Nuclear Team" and "Solar team" have the same open_slots.
         # "Solar team" comes first due to secondary sort by last_activity_at.
-        ('open_slots', 200, ['Wind Team', u'Sólar team', 'Nuclear Team']),
+        ('open_slots', 200, ['Wind Team', 'Sólar team', 'Nuclear Team']),
         # Note that "Wind Team" and "Nuclear Team" have the same last_activity_at.
         # "Wind Team" comes first due to secondary sort by open_slots.
-        ('last_activity_at', 200, [u'Sólar team', 'Wind Team', 'Nuclear Team']),
+        ('last_activity_at', 200, ['Sólar team', 'Wind Team', 'Nuclear Team']),
     )
     @ddt.unpack
     def test_order_by(self, field, status, names):
@@ -608,7 +608,7 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
             sender=CourseTeam,
             dispatch_uid='teams.signals.course_team_post_save_callback'
         ):
-            solar_team = self.test_team_name_id_map[u'Sólar team']
+            solar_team = self.test_team_name_id_map['Sólar team']
             solar_team.last_activity_at = datetime.utcnow().replace(tzinfo=pytz.utc)
             solar_team.save()
 
@@ -627,11 +627,11 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
 
     def test_page_size(self):
         result = self.get_teams_list(200, {'page_size': 2})
-        self.assertEquals(2, result['num_pages'])
+        self.assertEqual(2, result['num_pages'])
 
     def test_page(self):
         result = self.get_teams_list(200, {'page_size': 1, 'page': 3})
-        self.assertEquals(3, result['num_pages'])
+        self.assertEqual(3, result['num_pages'])
         self.assertIsNone(result['next'])
         self.assertIsNotNone(result['previous'])
 
@@ -659,14 +659,14 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
         ('Island', ['Search']),
         ('not-a-query', []),
         ('team', ['Another Team', 'Public Profile Team']),
-        (u'著文企臺個', [u'著文企臺個']),
+        ('著文企臺個', ['著文企臺個']),
     )
     @ddt.unpack
     def test_text_search(self, text_search, expected_team_names):
         def reset_search_index():
             """Clear out the search index and reindex the teams."""
             CourseTeamIndexer.engine().destroy()
-            for team in self.test_team_name_id_map.values():
+            for team in list(self.test_team_name_id_map.values()):
                 CourseTeamIndexer.index(team)
 
         reset_search_index()
@@ -696,7 +696,7 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
 
     def test_delete_removed_from_search(self):
         team = CourseTeamFactory.create(
-            name=u'zoinks',
+            name='zoinks',
             course_id=self.test_course_1.id,
             topic_id='topic_0'
         )
@@ -997,7 +997,7 @@ class TestUpdateTeamAPI(EventTestMixin, TeamAPITestCase):
         prev_name = self.solar_team.name
         team = self.patch_team_detail(self.solar_team.team_id, status, {'name': 'foo'}, user=user)
         if status == 200:
-            self.assertEquals(team['name'], 'foo')
+            self.assertEqual(team['name'], 'foo')
             self.assert_event_emitted(
                 'edx.team.changed',
                 team_id=self.solar_team.team_id,
@@ -1079,11 +1079,11 @@ class TestListTopicsAPI(TeamAPITestCase):
         self.get_topics_list(400)
 
     @ddt.data(
-        (None, 200, ['Coal Power', 'Nuclear Power', u'Sólar power', 'Wind Power'], 'name'),
-        ('name', 200, ['Coal Power', 'Nuclear Power', u'Sólar power', 'Wind Power'], 'name'),
+        (None, 200, ['Coal Power', 'Nuclear Power', 'Sólar power', 'Wind Power'], 'name'),
+        ('name', 200, ['Coal Power', 'Nuclear Power', 'Sólar power', 'Wind Power'], 'name'),
         # Note that "Nuclear Power" and "Solar power" both have 2 teams. "Coal Power" and "Window Power"
         # both have 0 teams. The secondary sort is alphabetical by name.
-        ('team_count', 200, ['Nuclear Power', u'Sólar power', 'Coal Power', 'Wind Power'], 'team_count'),
+        ('team_count', 200, ['Nuclear Power', 'Sólar power', 'Coal Power', 'Wind Power'], 'team_count'),
         ('no_such_field', 400, [], None),
     )
     @ddt.unpack
@@ -1096,10 +1096,10 @@ class TestListTopicsAPI(TeamAPITestCase):
         ):
             # Add 2 teams to "Nuclear Power", which previously had no teams.
             CourseTeamFactory.create(
-                name=u'Nuclear Team 1', course_id=self.test_course_1.id, topic_id='topic_2'
+                name='Nuclear Team 1', course_id=self.test_course_1.id, topic_id='topic_2'
             )
             CourseTeamFactory.create(
-                name=u'Nuclear Team 2', course_id=self.test_course_1.id, topic_id='topic_2'
+                name='Nuclear Team 2', course_id=self.test_course_1.id, topic_id='topic_2'
             )
         data = {'course_id': self.test_course_1.id}
         if field:
@@ -1122,10 +1122,10 @@ class TestListTopicsAPI(TeamAPITestCase):
         ):
             # Add 2 teams to "Wind Power", which previously had no teams.
             CourseTeamFactory.create(
-                name=u'Wind Team 1', course_id=self.test_course_1.id, topic_id='topic_1'
+                name='Wind Team 1', course_id=self.test_course_1.id, topic_id='topic_1'
             )
             CourseTeamFactory.create(
-                name=u'Wind Team 2', course_id=self.test_course_1.id, topic_id='topic_1'
+                name='Wind Team 2', course_id=self.test_course_1.id, topic_id='topic_1'
             )
 
         topics = self.get_topics_list(data={
@@ -1134,7 +1134,7 @@ class TestListTopicsAPI(TeamAPITestCase):
             'page': 1,
             'order_by': 'team_count'
         })
-        self.assertEqual(["Wind Power", u'Sólar power'], [topic['name'] for topic in topics['results']])
+        self.assertEqual(["Wind Power", 'Sólar power'], [topic['name'] for topic in topics['results']])
 
         topics = self.get_topics_list(data={
             'course_id': self.test_course_1.id,
@@ -1165,7 +1165,7 @@ class TestListTopicsAPI(TeamAPITestCase):
         response = self.get_topics_list(data={'course_id': self.test_course_1.id})
         for topic in response['results']:
             self.assertIn('team_count', topic)
-            if topic['id'] == u'topic_0':
+            if topic['id'] == 'topic_0':
                 self.assertEqual(topic['team_count'], 1)
             else:
                 self.assertEqual(topic['team_count'], 0)
@@ -1253,7 +1253,7 @@ class TestListMembershipAPI(TeamAPITestCase):
     @ddt.data(
         ('student_enrolled_both_courses_other_team', 'TestX/TS101/Test_Course', 200, 'Nuclear Team'),
         ('student_enrolled_both_courses_other_team', 'MIT/6.002x/Circuits', 200, 'Another Team'),
-        ('student_enrolled', 'TestX/TS101/Test_Course', 200, u'Sólar team'),
+        ('student_enrolled', 'TestX/TS101/Test_Course', 200, 'Sólar team'),
         ('student_enrolled', 'MIT/6.002x/Circuits', 400, ''),
     )
     @ddt.unpack

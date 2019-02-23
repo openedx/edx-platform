@@ -1,7 +1,7 @@
 """
 Discussion API test utilities
 """
-from __future__ import unicode_literals
+
 
 import hashlib
 import json
@@ -30,7 +30,7 @@ def _get_thread_callback(thread_data):
         additional required fields.
         """
         response_data = make_minimal_cs_thread(thread_data)
-        for key, val_list in request.parsed_body.items():
+        for key, val_list in list(request.parsed_body.items()):
             val = val_list[0]
             if key in ["anonymous", "anonymous_to_peers", "closed", "pinned"]:
                 response_data[key] = val == "True"
@@ -56,7 +56,7 @@ def _get_comment_callback(comment_data, thread_id, parent_id):
         # are returned by the comments service
         response_data["thread_id"] = thread_id
         response_data["parent_id"] = parent_id
-        for key, val_list in request.parsed_body.items():
+        for key, val_list in list(request.parsed_body.items()):
             val = val_list[0]
             if key in ["anonymous", "anonymous_to_peers", "endorsed"]:
                 response_data[key] = val == "True"
@@ -382,7 +382,7 @@ class CommentsServiceMockMixin(object):
             "voted": False,
             "vote_count": 0,
             "editable_fields": ["abuse_flagged", "following", "raw_body", "read", "title", "topic_id", "type", "voted"],
-            "course_id": unicode(self.course.id),
+            "course_id": str(self.course.id),
             "topic_id": "test_topic",
             "group_id": None,
             "group_name": None,
@@ -507,7 +507,7 @@ class ProfileImageTestMixin(object):
 
         If exist is False, make sure none of the images exist.
         """
-        for size, name in get_profile_image_names(user.username).items():
+        for size, name in list(get_profile_image_names(user.username).items()):
             if exist:
                 self.assertTrue(storage.exists(name))
                 with closing(Image.open(storage.path(name))) as img:

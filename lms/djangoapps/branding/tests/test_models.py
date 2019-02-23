@@ -28,7 +28,7 @@ class BrandingInfoConfigTest(TestCase):
         Tests creation of configuration.
         """
         self.config.save()
-        self.assertEquals(self.config.configuration, self.configuration_string)
+        self.assertEqual(self.config.configuration, self.configuration_string)
 
     def test_clean_bad_json(self):
         """
@@ -50,7 +50,7 @@ class BrandingInfoConfigTest(TestCase):
                 "logo_tag": "Video hosted by XuetangX.com"
             }
         }
-        self.assertEquals(self.config.get_config(), expected_config)
+        self.assertEqual(self.config.get_config(), expected_config)
 
     def test_get_not_enabled(self):
         """
@@ -58,4 +58,4 @@ class BrandingInfoConfigTest(TestCase):
         """
         self.config.enabled = False
         self.config.save()
-        self.assertEquals(self.config.get_config(), {})
+        self.assertEqual(self.config.get_config(), {})

@@ -29,4 +29,4 @@ class CCXCon(models.Model):
         return self.title
 
     def __unicode__(self):
-        return unicode(self.__str__())
+        return str(self.__str__())

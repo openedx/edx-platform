@@ -176,7 +176,7 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase):
     def test_password_empty_validation_decision(self):
         # 2 is the default setting for minimum length found in lms/envs/common.py
         # under AUTH_PASSWORD_VALIDATORS.MinimumLengthValidator
-        msg = u'This password is too short. It must contain at least 2 characters.'
+        msg = 'This password is too short. It must contain at least 2 characters.'
         self.assertValidationDecision(
             {'password': ''},
             {"password": msg}
@@ -186,7 +186,7 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase):
         password = 'p'
         # 2 is the default setting for minimum length found in lms/envs/common.py
         # under AUTH_PASSWORD_VALIDATORS.MinimumLengthValidator
-        msg = u'This password is too short. It must contain at least 2 characters.'
+        msg = 'This password is too short. It must contain at least 2 characters.'
         self.assertValidationDecision(
             {'password': password},
             {"password": msg}
@@ -196,7 +196,7 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase):
         password = 'p' * DEFAULT_MAX_PASSWORD_LENGTH
         # 75 is the default setting for maximum length found in lms/envs/common.py
         # under AUTH_PASSWORD_VALIDATORS.MaximumLengthValidator
-        msg = u'This password is too long. It must contain no more than 75 characters.'
+        msg = 'This password is too long. It must contain no more than 75 characters.'
         self.assertValidationDecision(
             {'password': password},
             {"password": msg}
@@ -205,7 +205,7 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase):
     def test_password_equals_username_validation_decision(self):
         self.assertValidationDecision(
             {"username": "somephrase", "password": "somephrase"},
-            {"username": "", "password": u"The password is too similar to the username."}
+            {"username": "", "password": "The password is too similar to the username."}
         )
 
     @override_settings(

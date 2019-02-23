@@ -2,7 +2,7 @@
 Views to support notification preferences.
 """
 
-from __future__ import division
+
 
 import json
 import os

@@ -27,7 +27,7 @@ class BlockOutline(object):
         self.local_cache = {}
         try:
             self.local_cache['course_videos'] = get_video_info_for_course_and_profiles(
-                unicode(course_id), video_profiles
+                str(course_id), video_profiles
             )
         except ValInternalError:  # pragma: nocover
             self.local_cache['course_videos'] = {}
@@ -113,7 +113,7 @@ def path(block, child_to_parent, start_block):
                 # to be consistent with other edx-platform clients, return the defaulted display name
                 'name': block.display_name_with_default_escaped,  # xss-lint: disable=python-deprecated-display-name
                 'category': block.category,
-                'id': unicode(block.location)
+                'id': str(block.location)
             })
     return reversed(block_path)
 
@@ -147,7 +147,7 @@ def find_urls(course_id, block, child_to_parent, request):
                 break
             position += 1
 
-    kwargs = {'course_id': unicode(course_id)}
+    kwargs = {'course_id': str(course_id)}
     if chapter_id is None:
         course_url = reverse("courseware", kwargs=kwargs, request=request)
         return course_url, course_url
@@ -174,7 +174,7 @@ def video_summary(video_profiles, course_id, video_descriptor, request, local_ca
     always_available_data = {
         "name": video_descriptor.display_name,
         "category": video_descriptor.category,
-        "id": unicode(video_descriptor.scope_ids.usage_id),
+        "id": str(video_descriptor.scope_ids.usage_id),
         "only_on_web": video_descriptor.only_on_web,
     }
 
@@ -229,7 +229,7 @@ def video_summary(video_profiles, course_id, video_descriptor, request, local_ca
         lang: reverse(
             'video-transcripts-detail',
             kwargs={
-                'course_id': unicode(course_id),
+                'course_id': str(course_id),
                 'block_id': video_descriptor.scope_ids.usage_id.block_id,
                 'lang': lang,
                 'api_version': api_version

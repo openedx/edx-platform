@@ -21,7 +21,7 @@ class MatlabProblemTest(ProblemsTest):
         """
         Create a matlab problem for the test.
         """
-        problem_data = dedent(u"""
+        problem_data = dedent("""
             <problem markdown="null">
                   <text>
                     <p>
@@ -81,14 +81,14 @@ class MatlabProblemTest(ProblemsTest):
         matlab_problem_page.click_run_code()
 
         self.assertEqual(
-            u'Submitted. As soon as a response is returned, this message will be replaced by that feedback.',
+            'Submitted. As soon as a response is returned, this message will be replaced by that feedback.',
             matlab_problem_page.get_grader_msg(".external-grader-message")[0]
         )
 
         # Wait 5 seconds for xqueue stub server grader response sent back to lms.
         time.sleep(5)
 
-        self.assertEqual(u'', matlab_problem_page.get_grader_msg(".external-grader-message")[0])
+        self.assertEqual('', matlab_problem_page.get_grader_msg(".external-grader-message")[0])
         self.assertEqual(
             self.xqueue_grade_response.get("msg"),
             matlab_problem_page.get_grader_msg(".ungraded-matlab-result")[0]

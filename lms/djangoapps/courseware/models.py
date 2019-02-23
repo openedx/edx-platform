@@ -37,7 +37,7 @@ def chunks(items, chunk_size):
     Yields the values from items in chunks of size chunk_size
     """
     items = list(items)
-    return (items[i:i + chunk_size] for i in xrange(0, len(items), chunk_size))
+    return (items[i:i + chunk_size] for i in range(0, len(items), chunk_size))
 
 
 class ChunkingManager(models.Manager):
@@ -67,7 +67,7 @@ class ChunkingManager(models.Manager):
         """
         chunk_size = kwargs.pop('chunk_size', 500)
         res = itertools.chain.from_iterable(
-            self.filter(**dict([(chunk_field, chunk)] + kwargs.items()))
+            self.filter(**dict([(chunk_field, chunk)] + list(kwargs.items())))
             for chunk in chunks(items, chunk_size)
         )
         return res
@@ -151,7 +151,7 @@ class StudentModule(models.Model):
             },)
 
     def __unicode__(self):
-        return unicode(repr(self))
+        return str(repr(self))
 
     @classmethod
     def get_state_by_params(cls, course_id, module_state_keys, student_id=None):
@@ -245,7 +245,7 @@ class StudentModuleHistory(BaseStudentModuleHistory):
     student_module = models.ForeignKey(StudentModule, db_index=True, on_delete=models.CASCADE)
 
     def __unicode__(self):
-        return unicode(repr(self))
+        return str(repr(self))
 
     def save_history(sender, instance, **kwargs):  # pylint: disable=no-self-argument, unused-argument
         """
@@ -292,7 +292,7 @@ class XBlockFieldBase(models.Model):
 
     def __unicode__(self):
         keys = [field.name for field in self._meta.get_fields() if field.name not in ('created', 'modified')]
-        return HTML(u'{}<{!r}').format(
+        return HTML('{}<{!r}').format(
             HTML(self.__class__.__name__),
             {key: HTML(getattr(self, key)) for key in keys}
         )

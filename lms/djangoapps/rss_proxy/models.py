@@ -19,4 +19,4 @@ class WhitelistedRssUrl(TimeStampedModel):
         app_label = "rss_proxy"
 
     def __unicode__(self):
-        return unicode(self.url)
+        return str(self.url)

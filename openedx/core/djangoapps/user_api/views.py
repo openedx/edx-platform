@@ -15,7 +15,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from six import text_type
 
-import accounts
+from . import accounts
 from django_comment_common.models import Role
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys import InvalidKeyError
@@ -163,7 +163,7 @@ class RegistrationView(APIView):
             # Only return first error for each field
             errors = {
                 field: [{"user_message": error} for error in error_list]
-                for field, error_list in err.message_dict.items()
+                for field, error_list in list(err.message_dict.items())
             }
             return JsonResponse(errors, status=400)
         except PermissionDenied:
@@ -285,7 +285,7 @@ class UpdateEmailOptInPreference(APIView):
         except InvalidKeyError:
             return HttpResponse(
                 status=400,
-                content=u"No course '{course_id}' found".format(course_id=course_id),
+                content="No course '{course_id}' found".format(course_id=course_id),
                 content_type="text/plain"
             )
         # Only check for true. All other values are False.

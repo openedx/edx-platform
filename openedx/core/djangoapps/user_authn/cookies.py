@@ -1,7 +1,7 @@
 """
 Utility functions for setting "logged in" cookies used by subdomains.
 """
-from __future__ import unicode_literals
+
 
 import json
 import logging
@@ -159,7 +159,7 @@ def refresh_jwt_cookies(request, response):
     try:
         refresh_token = request.COOKIES[jwt_cookies.jwt_refresh_cookie_name()]
     except KeyError:
-        raise AuthFailedError(u"JWT Refresh Cookie not found in request.")
+        raise AuthFailedError("JWT Refresh Cookie not found in request.")
 
     # TODO don't extend the cookie expiration - reuse value from existing cookie
     cookie_settings = standard_cookie_settings(request)
@@ -328,5 +328,5 @@ def _get_login_oauth_client():
         return Application.objects.get(client_id=login_client_id)
     except Application.DoesNotExist:
         raise AuthFailedError(
-            u"OAuth Client for the Login service, '{}', is not configured.".format(login_client_id)
+            "OAuth Client for the Login service, '{}', is not configured.".format(login_client_id)
         )

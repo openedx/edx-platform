@@ -226,7 +226,7 @@ class TestSites(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         email, password = self.STUDENT_INFO[0]
         self.login(email, password)
         resp = self.client.get(reverse('root'), HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
-        self.assertEquals(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 200)
 
     def test_no_redirect_on_homepage_when_has_enrollments(self):
         """
@@ -240,7 +240,7 @@ class TestSites(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.enroll(self.course, True)
 
         resp = self.client.get(reverse('root'), HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
-        self.assertEquals(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 200)
 
     def test_site_course_enrollment(self):
         """
@@ -312,8 +312,8 @@ class TestSites(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         url = reverse('about_course', args=[text_type(self.course_with_visibility.id)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
-        self.assertIn(u"Enroll in {}".format(self.course_with_visibility.id.course), resp.content.decode(resp.charset))
-        self.assertNotIn(u"Add {} to Cart ($10)".format(
+        self.assertIn("Enroll in {}".format(self.course_with_visibility.id.course), resp.content.decode(resp.charset))
+        self.assertNotIn("Add {} to Cart ($10)".format(
             self.course_with_visibility.id.course),
             resp.content.decode(resp.charset)
         )
@@ -322,11 +322,11 @@ class TestSites(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         url = reverse('about_course', args=[text_type(self.course_with_visibility.id)])
         resp = self.client.get(url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
         self.assertEqual(resp.status_code, 200)
-        self.assertNotIn(u"Enroll in {}".format(
+        self.assertNotIn("Enroll in {}".format(
             self.course_with_visibility.id.course),
             resp.content.decode(resp.charset)
         )
-        self.assertIn(u"Add {} to Cart <span>($10 USD)</span>".format(
+        self.assertIn("Add {} to Cart <span>($10 USD)</span>".format(
             self.course_with_visibility.id.course
         ), resp.content.decode(resp.charset))
         self.assertIn('$("#add_to_cart_post").click', resp.content)

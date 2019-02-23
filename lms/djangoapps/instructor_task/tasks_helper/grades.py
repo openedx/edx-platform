@@ -5,7 +5,7 @@ import logging
 import re
 from collections import OrderedDict
 from datetime import datetime
-from itertools import chain, izip, izip_longest
+from itertools import chain, zip_longest
 from time import time
 
 from django.contrib.auth import get_user_model
@@ -74,10 +74,10 @@ class _CourseGradeReportContext(object):
     """
     def __init__(self, _xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
         self.task_info_string = (
-            u'Task: {task_id}, '
-            u'InstructorTask ID: {entry_id}, '
-            u'Course: {course_id}, '
-            u'Input: {task_input}'
+            'Task: {task_id}, '
+            'InstructorTask ID: {entry_id}, '
+            'Course: {course_id}, '
+            'Input: {task_input}'
         ).format(
             task_id=_xmodule_instance_args.get('task_id') if _xmodule_instance_args is not None else None,
             entry_id=_entry_id,
@@ -116,24 +116,24 @@ class _CourseGradeReportContext(object):
         """
         grading_cxt = grading_context(self.course, self.course_structure)
         graded_assignments_map = OrderedDict()
-        for assignment_type_name, subsection_infos in grading_cxt['all_graded_subsections_by_type'].iteritems():
+        for assignment_type_name, subsection_infos in grading_cxt['all_graded_subsections_by_type'].items():
             graded_subsections_map = OrderedDict()
             for subsection_index, subsection_info in enumerate(subsection_infos, start=1):
                 subsection = subsection_info['subsection_block']
-                header_name = u"{assignment_type} {subsection_index}: {subsection_name}".format(
+                header_name = "{assignment_type} {subsection_index}: {subsection_name}".format(
                     assignment_type=assignment_type_name,
                     subsection_index=subsection_index,
                     subsection_name=subsection.display_name,
                 )
                 graded_subsections_map[subsection.location] = header_name
 
-            average_header = u"{assignment_type}".format(assignment_type=assignment_type_name)
+            average_header = "{assignment_type}".format(assignment_type=assignment_type_name)
 
             # Use separate subsection and average columns only if
             # there's more than one subsection.
             separate_subsection_avg_headers = len(subsection_infos) > 1
             if separate_subsection_avg_headers:
-                average_header += u" (Avg)"
+                average_header += " (Avg)"
 
             graded_assignments_map[assignment_type_name] = {
                 'subsection_headers': graded_subsections_map,
@@ -148,7 +148,7 @@ class _CourseGradeReportContext(object):
         Updates the status on the celery task to the given message.
         Also logs the update.
         """
-        TASK_LOG.info(u'%s, Task type: %s, %s', self.task_info_string, self.action_name, message)
+        TASK_LOG.info('%s, Task type: %s, %s', self.task_info_string, self.action_name, message)
         return self.task_progress.update_task_state(extra_meta={'step': message})
 
 
@@ -214,18 +214,18 @@ class CourseGradeReport(object):
         """
         Internal method for generating a grade report for the given context.
         """
-        context.update_status(u'Starting grades')
+        context.update_status('Starting grades')
         success_headers = self._success_headers(context)
         error_headers = self._error_headers()
         batched_rows = self._batched_rows(context)
 
-        context.update_status(u'Compiling grades')
+        context.update_status('Compiling grades')
         success_rows, error_rows = self._compile(context, batched_rows)
 
-        context.update_status(u'Uploading grades')
+        context.update_status('Uploading grades')
         self._upload(context, success_headers, success_rows, error_headers, error_rows)
 
-        return context.update_status(u'Completed grades')
+        return context.update_status('Completed grades')
 
     def _success_headers(self, context):
         """
@@ -235,7 +235,7 @@ class CourseGradeReport(object):
             ["Student ID", "Email", "Username"] +
             self._grades_header(context) +
             (['Cohort Name'] if context.cohorts_enabled else []) +
-            [u'Experiment Group ({})'.format(partition.name) for partition in context.course_experiments] +
+            ['Experiment Group ({})'.format(partition.name) for partition in context.course_experiments] +
             (['Team Name'] if context.teams_enabled else []) +
             ['Enrollment Track', 'Verification Status'] +
             ['Certificate Eligible', 'Certificate Delivered', 'Certificate Type'] +
@@ -253,7 +253,7 @@ class CourseGradeReport(object):
         A generator of batches of (success_rows, error_rows) for this report.
         """
         for users in self._batch_users(context):
-            users = filter(lambda u: u is not None, users)
+            users = [u for u in users if u is not None]
             yield self._rows_for_users(context, users)
 
     def _compile(self, context, batched_rows):
@@ -262,7 +262,7 @@ class CourseGradeReport(object):
         the given batched_rows and context.
         """
         # partition and chain successes and errors
-        success_rows, error_rows = izip(*batched_rows)
+        success_rows, error_rows = zip(*batched_rows)
         success_rows = list(chain(*success_rows))
         error_rows = list(chain(*error_rows))
 
@@ -289,9 +289,9 @@ class CourseGradeReport(object):
         """
         graded_assignments = context.graded_assignments
         grades_header = ["Grade"]
-        for assignment_info in graded_assignments.itervalues():
+        for assignment_info in graded_assignments.values():
             if assignment_info['separate_subsection_avg_headers']:
-                grades_header.extend(assignment_info['subsection_headers'].itervalues())
+                grades_header.extend(iter(assignment_info['subsection_headers'].values()))
             grades_header.append(assignment_info['average_header'])
         return grades_header
 
@@ -301,7 +301,7 @@ class CourseGradeReport(object):
         """
         def grouper(iterable, chunk_size=self.USER_BATCH_SIZE, fillvalue=None):
             args = [iter(iterable)] * chunk_size
-            return izip_longest(*args, fillvalue=fillvalue)
+            return zip_longest(*args, fillvalue=fillvalue)
 
         def users_for_course(course_id):
             """
@@ -339,12 +339,12 @@ class CourseGradeReport(object):
                 ).select_related('profile')
                 yield users
 
-        task_log_message = u'{}, Task type: {}'.format(context.task_info_string, context.action_name)
+        task_log_message = '{}, Task type: {}'.format(context.task_info_string, context.action_name)
         if WAFFLE_SWITCHES.is_enabled(OPTIMIZE_GET_LEARNERS_FOR_COURSE):
-            TASK_LOG.info(u'%s, Creating Course Grade with optimization', task_log_message)
+            TASK_LOG.info('%s, Creating Course Grade with optimization', task_log_message)
             return users_for_course_v2(context.course_id)
 
-        TASK_LOG.info(u'%s, Creating Course Grade without optimization', task_log_message)
+        TASK_LOG.info('%s, Creating Course Grade without optimization', task_log_message)
         batch_users = users_for_course(context.course_id)
         return batch_users
 
@@ -354,7 +354,7 @@ class CourseGradeReport(object):
         to the headers for this report.
         """
         grade_results = []
-        for assignment_type, assignment_info in context.graded_assignments.iteritems():
+        for assignment_type, assignment_info in context.graded_assignments.items():
 
             subsection_grades, subsection_grades_results = self._user_subsection_grades(
                 course_grade,
@@ -380,7 +380,7 @@ class CourseGradeReport(object):
             if subsection_grade.attempted_graded:
                 grade_result = subsection_grade.percent_graded
             else:
-                grade_result = u'Not Attempted'
+                grade_result = 'Not Attempted'
             grade_results.append([grade_result])
             subsection_grades.append(subsection_grade)
         return subsection_grades, grade_results
@@ -455,9 +455,9 @@ class CourseGradeReport(object):
             bulk_certs.certificates_by_user.get(user.id),
         )
         TASK_LOG.info(
-            u'Student certificate eligibility: %s '
-            u'(user=%s, course_id=%s, grade_percent=%s letter_grade=%s gradecutoffs=%s, allow_certificate=%s, '
-            u'is_whitelisted=%s)',
+            'Student certificate eligibility: %s '
+            '(user=%s, course_id=%s, grade_percent=%s letter_grade=%s gradecutoffs=%s, allow_certificate=%s, '
+            'is_whitelisted=%s)',
             certificate_info[0],
             user,
             context.course_id,
@@ -522,7 +522,7 @@ class ProblemGradeReport(object):
         graded_scorable_blocks = cls._graded_scorable_blocks_to_header(course)
 
         # Just generate the static fields for now.
-        rows = [list(header_row.values()) + ['Enrollment Status', 'Grade'] + _flatten(graded_scorable_blocks.values())]
+        rows = [list(header_row.values()) + ['Enrollment Status', 'Grade'] + _flatten(list(graded_scorable_blocks.values()))]
         error_rows = [list(header_row.values()) + ['error_msg']]
         current_step = {'step': 'Calculating Grades'}
 
@@ -538,7 +538,7 @@ class ProblemGradeReport(object):
                 err_msg = text_type(error)
                 # There was an error grading this student.
                 if not err_msg:
-                    err_msg = u'Unknown error'
+                    err_msg = 'Unknown error'
                 error_rows.append(student_fields + [err_msg])
                 task_progress.failed += 1
                 continue
@@ -550,12 +550,12 @@ class ProblemGradeReport(object):
                 try:
                     problem_score = course_grade.problem_scores[block_location]
                 except KeyError:
-                    earned_possible_values.append([u'Not Available', u'Not Available'])
+                    earned_possible_values.append(['Not Available', 'Not Available'])
                 else:
                     if problem_score.first_attempted:
                         earned_possible_values.append([problem_score.earned, problem_score.possible])
                     else:
-                        earned_possible_values.append([u'Not Attempted', problem_score.possible])
+                        earned_possible_values.append(['Not Attempted', problem_score.possible])
 
             rows.append(student_fields + [enrollment_status, course_grade.percent] + _flatten(earned_possible_values))
 
@@ -580,12 +580,12 @@ class ProblemGradeReport(object):
         """
         scorable_blocks_map = OrderedDict()
         grading_context = grading_context_for_course(course)
-        for assignment_type_name, subsection_infos in grading_context['all_graded_subsections_by_type'].iteritems():
+        for assignment_type_name, subsection_infos in grading_context['all_graded_subsections_by_type'].items():
             for subsection_index, subsection_info in enumerate(subsection_infos, start=1):
                 for scorable_block in subsection_info['scored_descendants']:
                     header_name = (
-                        u"{assignment_type} {subsection_index}: "
-                        u"{subsection_name} - {scorable_block_name}"
+                        "{assignment_type} {subsection_index}: "
+                        "{subsection_name} - {scorable_block_name}"
                     ).format(
                         scorable_block_name=scorable_block.display_name,
                         assignment_type=assignment_type_name,
@@ -690,7 +690,7 @@ class ProblemResponses(object):
                     response['block_key'] = str(block_key)
                     user_data = generated_report_data.get(response['username'], {})
                     response.update(user_data)
-                    student_data_keys = student_data_keys.union(user_data.keys())
+                    student_data_keys = student_data_keys.union(list(user_data.keys()))
                 if max_count is not None:
                     max_count -= len(responses)
                     if max_count <= 0:

@@ -26,7 +26,7 @@ from capa.tests.response_xml_factory import (
     OptionResponseXMLFactory,
     StringResponseXMLFactory
 )
-from common import section_location
+from .common import section_location
 
 # Factories from capa.tests.response_xml_factory that we will use
 # to generate the problem XML, with the keyword args used to configure

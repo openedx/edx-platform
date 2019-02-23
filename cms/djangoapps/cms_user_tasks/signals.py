@@ -1,7 +1,7 @@
 """
 Receivers of signals sent from django-user-tasks
 """
-from __future__ import absolute_import, print_function, unicode_literals
+
 
 import logging
 

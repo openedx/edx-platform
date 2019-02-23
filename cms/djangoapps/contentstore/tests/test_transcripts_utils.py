@@ -102,7 +102,7 @@ class TestSaveSubsToStore(SharedModuleStoreTestCase):
         """
         A helper to compute a static file location from a subtitle id.
         """
-        return StaticContent.compute_location(cls.course.id, u'subs_{0}.srt.sjson'.format(sub_id))
+        return StaticContent.compute_location(cls.course.id, 'subs_{0}.srt.sjson'.format(sub_id))
 
     @classmethod
     def setUpClass(cls):
@@ -123,8 +123,8 @@ class TestSaveSubsToStore(SharedModuleStoreTestCase):
         }
 
         # Prefix it to ensure that unicode filenames are allowed
-        cls.subs_id = u'uniçøde_{}'.format(uuid4())
-        cls.subs_copied_id = u'cøpy_{}'.format(uuid4())
+        cls.subs_id = 'uniçøde_{}'.format(uuid4())
+        cls.subs_copied_id = 'cøpy_{}'.format(uuid4())
 
         cls.content_location = cls.sub_id_to_location(cls.subs_id)
         cls.content_copied_location = cls.sub_id_to_location(cls.subs_copied_id)
@@ -217,7 +217,7 @@ class TestDownloadYoutubeSubs(TestYoutubeSubsBase):
 
         youtube_subs: dict of '{speed: youtube_id}' format for different speeds.
         """
-        for subs_id in youtube_subs.values():
+        for subs_id in list(youtube_subs.values()):
             self.clear_sub_content(subs_id)
 
     def test_success_downloading_subs(self):
@@ -278,7 +278,7 @@ class TestDownloadYoutubeSubs(TestYoutubeSubsBase):
         transcripts_utils.download_youtube_subs(good_youtube_sub, self.course, settings)
 
         # Check assets status after importing subtitles.
-        for subs_id in good_youtube_subs.values():
+        for subs_id in list(good_youtube_subs.values()):
             filename = 'subs_{0}.srt.sjson'.format(subs_id)
             content_location = StaticContent.compute_location(
                 self.course.id, filename
@@ -378,7 +378,7 @@ class TestGenerateSubsFromSource(TestDownloadYoutubeSubs):
         transcripts_utils.generate_subs_from_source(youtube_subs, 'SRT', srt_filedata, self.course)
 
         # Check assets status after importing subtitles.
-        for subs_id in youtube_subs.values():
+        for subs_id in list(youtube_subs.values()):
             filename = 'subs_{0}.srt.sjson'.format(subs_id)
             content_location = StaticContent.compute_location(
                 self.course.id, filename
@@ -589,7 +589,7 @@ class TestTranscript(unittest.TestCase):
             }
         """)
 
-        self.txt_transcript = u"Elephant's Dream\nAt the left we can see..."
+        self.txt_transcript = "Elephant's Dream\nAt the left we can see..."
 
     def test_convert_srt_to_txt(self):
         """
@@ -657,10 +657,10 @@ class TestSubsFilename(unittest.TestCase):
     """
 
     def test_unicode(self):
-        name = transcripts_utils.subs_filename(u"˙∆©ƒƒƒ")
-        self.assertEqual(name, u'subs_˙∆©ƒƒƒ.srt.sjson')
-        name = transcripts_utils.subs_filename(u"˙∆©ƒƒƒ", 'uk')
-        self.assertEqual(name, u'uk_subs_˙∆©ƒƒƒ.srt.sjson')
+        name = transcripts_utils.subs_filename("˙∆©ƒƒƒ")
+        self.assertEqual(name, 'subs_˙∆©ƒƒƒ.srt.sjson')
+        name = transcripts_utils.subs_filename("˙∆©ƒƒƒ", 'uk')
+        self.assertEqual(name, 'uk_subs_˙∆©ƒƒƒ.srt.sjson')
 
 
 @ddt.ddt
@@ -729,8 +729,8 @@ class TestGetTranscript(SharedModuleStoreTestCase):
         self.subs_srt = transcripts_utils.Transcript.convert(json.dumps(self.subs_sjson), 'sjson', 'srt')
 
         self.subs = {
-            u'en': self.subs_srt,
-            u'ur': transcripts_utils.Transcript.convert(json.dumps(self.subs_sjson), 'sjson', 'srt'),
+            'en': self.subs_srt,
+            'ur': transcripts_utils.Transcript.convert(json.dumps(self.subs_sjson), 'sjson', 'srt'),
         }
 
         self.srt_mime_type = transcripts_utils.Transcript.mime_types[transcripts_utils.Transcript.SRT]
@@ -741,15 +741,15 @@ class TestGetTranscript(SharedModuleStoreTestCase):
         self.video = ItemFactory.create(
             category='video',
             parent_location=self.vertical.location,
-            edx_video_id=u'1234-5678-90'
+            edx_video_id='1234-5678-90'
         )
 
-    def create_transcript(self, subs_id, language=u'en', filename='video.srt', youtube_id_1_0='', html5_sources=None):
+    def create_transcript(self, subs_id, language='en', filename='video.srt', youtube_id_1_0='', html5_sources=None):
         """
         create transcript.
         """
         transcripts = {}
-        if language != u'en':
+        if language != 'en':
             transcripts = {language: filename}
 
         html5_sources = html5_sources or []
@@ -759,7 +759,7 @@ class TestGetTranscript(SharedModuleStoreTestCase):
             sub=subs_id,
             youtube_id_1_0=youtube_id_1_0,
             transcripts=transcripts,
-            edx_video_id=u'1234-5678-90',
+            edx_video_id='1234-5678-90',
             html5_sources=html5_sources
         )
 
@@ -801,9 +801,9 @@ class TestGetTranscript(SharedModuleStoreTestCase):
 
     @ddt.data(
         # en lang does not exist so NotFoundError will be raised
-        (u'en',),
+        ('en',),
         # ur lang does not exist so KeyError and then NotFoundError will be raised
-        (u'ur',),
+        ('ur',),
     )
     @ddt.unpack
     def test_get_transcript_not_found(self, lang):
@@ -819,7 +819,7 @@ class TestGetTranscript(SharedModuleStoreTestCase):
     @ddt.data(
         # video.sub transcript
         {
-            'language': u'en',
+            'language': 'en',
             'subs_id': 'video_101',
             'youtube_id_1_0': '',
             'html5_sources': [],
@@ -827,7 +827,7 @@ class TestGetTranscript(SharedModuleStoreTestCase):
         },
         # if video.sub is present, rest will be skipped.
         {
-            'language': u'en',
+            'language': 'en',
             'subs_id': 'video_101',
             'youtube_id_1_0': 'test_yt_id',
             'html5_sources': ['www.abc.com/foo.mp4'],
@@ -835,7 +835,7 @@ class TestGetTranscript(SharedModuleStoreTestCase):
         },
         # video.youtube_id_1_0 transcript
         {
-            'language': u'en',
+            'language': 'en',
             'subs_id': '',
             'youtube_id_1_0': 'test_yt_id',
             'html5_sources': [],
@@ -843,7 +843,7 @@ class TestGetTranscript(SharedModuleStoreTestCase):
         },
         # video.html5_sources transcript
         {
-            'language': u'en',
+            'language': 'en',
             'subs_id': '',
             'youtube_id_1_0': '',
             'html5_sources': ['www.abc.com/foo.mp4'],
@@ -851,7 +851,7 @@ class TestGetTranscript(SharedModuleStoreTestCase):
         },
         # non-english transcript
         {
-            'language': u'ur',
+            'language': 'ur',
             'subs_id': '',
             'youtube_id_1_0': '',
             'html5_sources': [],
@@ -886,7 +886,7 @@ class TestGetTranscript(SharedModuleStoreTestCase):
         """
         Verify that `get_transcript` function returns correct data for non-english when transcript is in content store.
         """
-        language = u'ur'
+        language = 'ur'
         self.create_transcript(self.subs_id, language)
         content, filename, mimetype = transcripts_utils.get_transcript(
             self.video,

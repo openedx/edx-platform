@@ -67,14 +67,14 @@ class CourseDataTest(ModuleStoreTestCase):
             dict(course_key=self.course.id),
         ]:
             course_data = CourseData(self.user, **kwargs)
-            self.assertEquals(course_data.course_key, self.course.id)
-            self.assertEquals(course_data.location, self.course.location)
-            self.assertEquals(course_data.structure.root_block_usage_key, self.one_true_structure.root_block_usage_key)
-            self.assertEquals(course_data.course.id, self.course.id)
-            self.assertEquals(course_data.version, self.course.course_version)
-            self.assertEquals(course_data.edited_on, expected_edited_on)
-            self.assertIn(u'Course: course_key', unicode(course_data))
-            self.assertIn(u'Course: course_key', course_data.full_string())
+            self.assertEqual(course_data.course_key, self.course.id)
+            self.assertEqual(course_data.location, self.course.location)
+            self.assertEqual(course_data.structure.root_block_usage_key, self.one_true_structure.root_block_usage_key)
+            self.assertEqual(course_data.course.id, self.course.id)
+            self.assertEqual(course_data.version, self.course.course_version)
+            self.assertEqual(course_data.edited_on, expected_edited_on)
+            self.assertIn('Course: course_key', str(course_data))
+            self.assertIn('Course: course_key', course_data.full_string())
 
     def test_no_data(self):
         with self.assertRaises(ValueError):
@@ -89,8 +89,8 @@ class CourseDataTest(ModuleStoreTestCase):
         course_data = CourseData(
             self.user, structure=empty_structure, collected_block_structure=self.collected_structure,
         )
-        self.assertIn(u'Course: course_key: {}, version:'.format(self.course.id), course_data.full_string())
+        self.assertIn('Course: course_key: {}, version:'.format(self.course.id), course_data.full_string())
 
         # full_string returns minimal value when structures aren't readily available.
         course_data = CourseData(self.user, course_key=self.course.id)
-        self.assertIn(u'empty course structure', course_data.full_string())
+        self.assertIn('empty course structure', course_data.full_string())

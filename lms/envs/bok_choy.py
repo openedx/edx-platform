@@ -54,8 +54,8 @@ update_module_store_settings(
 # Capture the console log via template includes, until webdriver supports log capture again
 CAPTURE_CONSOLE_LOG = True
 
-PLATFORM_NAME = ugettext_lazy(u"édX")
-PLATFORM_DESCRIPTION = ugettext_lazy(u"Open édX Platform")
+PLATFORM_NAME = ugettext_lazy("édX")
+PLATFORM_DESCRIPTION = ugettext_lazy("Open édX Platform")
 
 ############################ STATIC FILES #############################
 

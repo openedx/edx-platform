@@ -97,7 +97,7 @@ class TestProgramProgressMeter(TestCase):
 
         self.assertEqual(meter.engaged_programs, [])
         self._assert_progress(meter)
-        self.assertEqual(meter.completed_programs_with_available_dates.keys(), [])
+        self.assertEqual(list(meter.completed_programs_with_available_dates.keys()), [])
 
     def test_enrollments_but_no_programs(self, mock_get_programs):
         """Verify behavior when enrollments exist, but no matching programs do."""
@@ -109,7 +109,7 @@ class TestProgramProgressMeter(TestCase):
 
         self.assertEqual(meter.engaged_programs, [])
         self._assert_progress(meter)
-        self.assertEqual(meter.completed_programs_with_available_dates.keys(), [])
+        self.assertEqual(list(meter.completed_programs_with_available_dates.keys()), [])
 
     def test_entitlements_but_no_programs(self, mock_get_programs):
         """ Verify engaged_programs is empty when entitlements exist, but no matching programs do. """
@@ -148,7 +148,7 @@ class TestProgramProgressMeter(TestCase):
             meter,
             ProgressFactory(uuid=program['uuid'], in_progress=1, grades={course_run_key: 0.0})
         )
-        self.assertEqual(meter.completed_programs_with_available_dates.keys(), [])
+        self.assertEqual(list(meter.completed_programs_with_available_dates.keys()), [])
 
     def test_single_program_entitlement(self, mock_get_programs):
         """
@@ -372,7 +372,7 @@ class TestProgramProgressMeter(TestCase):
             meter,
             *(ProgressFactory(uuid=program['uuid'], in_progress=1, grades=grades) for program in programs)
         )
-        self.assertEqual(meter.completed_programs_with_available_dates.keys(), [])
+        self.assertEqual(list(meter.completed_programs_with_available_dates.keys()), [])
 
     def test_multiple_program_entitlement(self, mock_get_programs):
         """
@@ -445,7 +445,7 @@ class TestProgramProgressMeter(TestCase):
             meter,
             *(ProgressFactory(uuid=program['uuid'], in_progress=1, grades=grades) for program in programs)
         )
-        self.assertEqual(meter.completed_programs_with_available_dates.keys(), [])
+        self.assertEqual(list(meter.completed_programs_with_available_dates.keys()), [])
 
     def test_shared_entitlement_engagement(self, mock_get_programs):
         """
@@ -496,7 +496,7 @@ class TestProgramProgressMeter(TestCase):
         # No enrollments, no programs in progress.
         meter = ProgramProgressMeter(self.site, self.user)
         self._assert_progress(meter)
-        self.assertEqual(meter.completed_programs_with_available_dates.keys(), [])
+        self.assertEqual(list(meter.completed_programs_with_available_dates.keys()), [])
 
         # One enrollment, one program in progress.
         self._create_enrollments(first_course_run_key)
@@ -506,7 +506,7 @@ class TestProgramProgressMeter(TestCase):
             meter,
             ProgressFactory(uuid=program_uuid, in_progress=1, not_started=1, grades={first_course_run_key: 0.0})
         )
-        self.assertEqual(meter.completed_programs_with_available_dates.keys(), [])
+        self.assertEqual(list(meter.completed_programs_with_available_dates.keys()), [])
 
         # Two enrollments, all courses in progress.
         self._create_enrollments(second_course_run_key)
@@ -522,7 +522,7 @@ class TestProgramProgressMeter(TestCase):
                 },
             )
         )
-        self.assertEqual(meter.completed_programs_with_available_dates.keys(), [])
+        self.assertEqual(list(meter.completed_programs_with_available_dates.keys()), [])
 
         # One valid certificate earned, one course complete.
         self._create_certificates(first_course_run_key, mode=MODES.verified)
@@ -539,7 +539,7 @@ class TestProgramProgressMeter(TestCase):
                 }
             )
         )
-        self.assertEqual(meter.completed_programs_with_available_dates.keys(), [])
+        self.assertEqual(list(meter.completed_programs_with_available_dates.keys()), [])
 
         # Invalid certificate earned, still one course to complete. (invalid because mode doesn't match the course)
         second_cert = self._create_certificates(second_course_run_key, mode=MODES.honor)[0]
@@ -557,7 +557,7 @@ class TestProgramProgressMeter(TestCase):
                 }
             )
         )
-        self.assertEqual(meter.completed_programs_with_available_dates.keys(), [])
+        self.assertEqual(list(meter.completed_programs_with_available_dates.keys()), [])
 
         # Second valid certificate obtained, all courses complete.
         second_cert.mode = MODES.verified
@@ -574,7 +574,7 @@ class TestProgramProgressMeter(TestCase):
                 }
             )
         )
-        self.assertEqual(meter.completed_programs_with_available_dates.keys(), [program_uuid])
+        self.assertEqual(list(meter.completed_programs_with_available_dates.keys()), [program_uuid])
 
     def test_nonverified_course_run_completion(self, mock_get_programs):
         """
@@ -604,7 +604,7 @@ class TestProgramProgressMeter(TestCase):
             meter,
             ProgressFactory(uuid=program_uuid, completed=1, grades={course_run_key: 0.0})
         )
-        self.assertEqual(meter.completed_programs_with_available_dates.keys(), [program_uuid])
+        self.assertEqual(list(meter.completed_programs_with_available_dates.keys()), [program_uuid])
 
     @mock.patch(UTILS_MODULE + '.available_date_for_certificate')
     def test_completed_programs_with_available_dates(self, mock_available_date_for_certificate, mock_get_programs):
@@ -691,7 +691,7 @@ class TestProgramProgressMeter(TestCase):
 
         # Verify that the test program is not complete.
         meter = ProgramProgressMeter(self.site, self.user)
-        self.assertEqual(meter.completed_programs_with_available_dates.keys(), [])
+        self.assertEqual(list(meter.completed_programs_with_available_dates.keys()), [])
 
         # Grant a 'no-id-professional' certificate for one of the course runs,
         # thereby completing the program.
@@ -700,7 +700,7 @@ class TestProgramProgressMeter(TestCase):
 
         # Verify that the program is complete.
         meter = ProgramProgressMeter(self.site, self.user)
-        self.assertEqual(meter.completed_programs_with_available_dates.keys(), [program['uuid']])
+        self.assertEqual(list(meter.completed_programs_with_available_dates.keys()), [program['uuid']])
 
     @mock.patch(UTILS_MODULE + '.ProgramProgressMeter.completed_course_runs', new_callable=mock.PropertyMock)
     def test_credit_course_counted_complete_for_verified(self, mock_completed_course_runs, mock_get_programs):
@@ -795,7 +795,7 @@ def _create_course(self, course_price, course_run_count=1, make_entitlement=Fals
         course.instructor_info = self.instructors
         course = self.update_course(course, self.user.id)
 
-        run = CourseRunFactory(key=unicode(course.id), seats=[SeatFactory(price=course_price)])
+        run = CourseRunFactory(key=str(course.id), seats=[SeatFactory(price=course_price)])
         course_runs.append(run)
     entitlements = [EntitlementFactory()] if make_entitlement else []
 
@@ -831,7 +831,7 @@ class TestProgramDataExtender(ModuleStoreTestCase):
         self.course.end = datetime.datetime.now(utc) + datetime.timedelta(days=1)
         self.course = self.update_course(self.course, self.user.id)
 
-        self.course_run = CourseRunFactory(key=unicode(self.course.id))
+        self.course_run = CourseRunFactory(key=str(self.course.id))
         self.catalog_course = CourseFactory(course_runs=[self.course_run])
         self.program = ProgramFactory(courses=[self.catalog_course])
         self.course_price = 100
@@ -1456,7 +1456,7 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
         for __ in range(3):
             course = ModuleStoreCourseFactory()
             course = self.update_course(course, self.user.id)
-            course_runs.append(CourseRunFactory(key=unicode(course.id), seats=[]))
+            course_runs.append(CourseRunFactory(key=str(course.id), seats=[]))
         program = ProgramFactory(courses=[CourseFactory(course_runs=course_runs)])
 
         data = ProgramMarketingDataExtender(program, self.user).extend()
@@ -1527,7 +1527,7 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
             content_type='application/json'
         )
         ProgramMarketingDataExtender(self.program, self.user).extend()
-        self.assertEqual(httpretty.last_request().querystring.get('is_anonymous')[0], u'True')
+        self.assertEqual(httpretty.last_request().querystring.get('is_anonymous')[0], 'True')
 
     @httpretty.activate
     def test_fetching_program_discounted_price_as_anonymous_user(self):

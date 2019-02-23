@@ -383,12 +383,12 @@ class CreditServiceTests(ModuleStoreTestCase):
         # mark the grade as satisfied
         self.service.set_credit_requirement_status(
             self.user.id,
-            unicode(self.course.id),
+            str(self.course.id),
             'grade',
             'grade'
         )
 
-        credit_state = self.service.get_credit_state(self.user.id, unicode(self.course.id))
+        credit_state = self.service.get_credit_state(self.user.id, str(self.course.id))
 
         self.assertIsNotNone(credit_state)
         self.assertEqual(credit_state['enrollment_mode'], 'verified')

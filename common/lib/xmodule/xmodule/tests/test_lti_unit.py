@@ -9,7 +9,7 @@ from lxml import etree
 from webob.request import Request
 from copy import copy
 from six import text_type
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from xmodule.fields import Timedelta
 from xmodule.lti_module import LTIDescriptor
@@ -57,11 +57,11 @@ class LTIModuleTest(LogicTest):
 
         self.user_id = self.xmodule.runtime.anonymous_student_id
         self.lti_id = self.xmodule.lti_id
-        self.unquoted_resource_link_id = u'{}-i4x-2-3-lti-31de800015cf4afb973356dbe81496df'.format(
+        self.unquoted_resource_link_id = '{}-i4x-2-3-lti-31de800015cf4afb973356dbe81496df'.format(
             self.xmodule.runtime.hostname
         )
 
-        sourced_id = u':'.join(urllib.quote(i) for i in (self.lti_id, self.unquoted_resource_link_id, self.user_id))
+        sourced_id = ':'.join(urllib.parse.quote(i) for i in (self.lti_id, self.unquoted_resource_link_id, self.user_id))
 
         self.defaults = {
             'namespace': "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0",
@@ -110,7 +110,7 @@ class LTIModuleTest(LogicTest):
 
     @patch(
         'xmodule.lti_module.LTIModule.get_client_key_secret',
-        return_value=('test_client_key', u'test_client_secret')
+        return_value=('test_client_key', 'test_client_secret')
     )
     def test_authorization_header_not_present(self, _get_key_secret):
         """
@@ -134,7 +134,7 @@ class LTIModuleTest(LogicTest):
 
     @patch(
         'xmodule.lti_module.LTIModule.get_client_key_secret',
-        return_value=('test_client_key', u'test_client_secret')
+        return_value=('test_client_key', 'test_client_secret')
     )
     def test_authorization_header_empty(self, _get_key_secret):
         """
@@ -277,7 +277,7 @@ class LTIModuleTest(LogicTest):
         self.assertEqual(self.xmodule.module_score, float(self.defaults['grade']))
 
     def test_user_id(self):
-        expected_user_id = text_type(urllib.quote(self.xmodule.runtime.anonymous_student_id))
+        expected_user_id = text_type(urllib.parse.quote(self.xmodule.runtime.anonymous_student_id))
         real_user_id = self.xmodule.get_user_id()
         self.assertEqual(real_user_id, expected_user_id)
 
@@ -296,12 +296,12 @@ class LTIModuleTest(LogicTest):
     def test_resource_link_id(self):
         with patch('xmodule.lti_module.LTIModule.location', new_callable=PropertyMock):
             self.xmodule.location.html_id = lambda: 'i4x-2-3-lti-31de800015cf4afb973356dbe81496df'
-            expected_resource_link_id = text_type(urllib.quote(self.unquoted_resource_link_id))
+            expected_resource_link_id = text_type(urllib.parse.quote(self.unquoted_resource_link_id))
             real_resource_link_id = self.xmodule.get_resource_link_id()
             self.assertEqual(real_resource_link_id, expected_resource_link_id)
 
     def test_lis_result_sourcedid(self):
-        expected_sourced_id = u':'.join(urllib.quote(i) for i in (
+        expected_sourced_id = ':'.join(urllib.parse.quote(i) for i in (
             text_type(self.system.course_id),
             self.xmodule.get_resource_link_id(),
             self.user_id
@@ -362,7 +362,7 @@ class LTIModuleTest(LogicTest):
     @patch('xmodule.lti_module.signature.verify_hmac_sha1', Mock(return_value=True))
     @patch(
         'xmodule.lti_module.LTIModule.get_client_key_secret',
-        Mock(return_value=('test_client_key', u'test_client_secret'))
+        Mock(return_value=('test_client_key', 'test_client_secret'))
     )
     def test_successful_verify_oauth_body_sign(self):
         """
@@ -370,9 +370,9 @@ class LTIModuleTest(LogicTest):
         """
         self.xmodule.verify_oauth_body_sign(self.get_signed_grade_mock_request())
 
-    @patch('xmodule.lti_module.LTIModule.get_outcome_service_url', Mock(return_value=u'https://testurl/'))
+    @patch('xmodule.lti_module.LTIModule.get_outcome_service_url', Mock(return_value='https://testurl/'))
     @patch('xmodule.lti_module.LTIModule.get_client_key_secret',
-           Mock(return_value=(u'__consumer_key__', u'__lti_secret__')))
+           Mock(return_value=('__consumer_key__', '__lti_secret__')))
     def test_failed_verify_oauth_body_sign_proxy_mangle_url(self):
         """
         Oauth signing verify fail.
@@ -394,14 +394,14 @@ class LTIModuleTest(LogicTest):
             'X-Requested-With': 'XMLHttpRequest',
             'Content-Type': 'application/x-www-form-urlencoded',
             'Authorization': (
-                u'OAuth realm="https://testurl/", oauth_body_hash="wwzA3s8gScKD1VpJ7jMt9b%2BMj9Q%3D",'
+                'OAuth realm="https://testurl/", oauth_body_hash="wwzA3s8gScKD1VpJ7jMt9b%2BMj9Q%3D",'
                 'oauth_nonce="18821463", oauth_timestamp="1409321145", '
                 'oauth_consumer_key="__consumer_key__", oauth_signature_method="HMAC-SHA1", '
                 'oauth_version="1.0", oauth_signature="fHsE1hhIz76/msUoMR3Lyb7Aou4%3D"'
             )
         }
-        mock_request.url = u'https://testurl'
-        mock_request.http_method = u'POST'
+        mock_request.url = 'https://testurl'
+        mock_request.http_method = 'POST'
         mock_request.method = mock_request.http_method
 
         mock_request.body = (
@@ -443,7 +443,7 @@ class LTIModuleTest(LogicTest):
     @patch('xmodule.lti_module.signature.verify_hmac_sha1', Mock(return_value=False))
     @patch(
         'xmodule.lti_module.LTIModule.get_client_key_secret',
-        Mock(return_value=('test_client_key', u'test_client_secret'))
+        Mock(return_value=('test_client_key', 'test_client_secret'))
     )
     def test_failed_verify_oauth_body_sign(self):
         """
@@ -464,15 +464,15 @@ class LTIModuleTest(LogicTest):
         mock_request.headers = {
             'X-Requested-With': 'XMLHttpRequest',
             'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': u'OAuth oauth_nonce="135685044251684026041377608307", \
+            'Authorization': 'OAuth oauth_nonce="135685044251684026041377608307", \
                 oauth_timestamp="1234567890", oauth_version="1.0", \
                 oauth_signature_method="HMAC-SHA1", \
                 oauth_consumer_key="test_client_key", \
                 oauth_signature="my_signature%3D", \
                 oauth_body_hash="JEpIArlNCeV4ceXxric8gJQCnBw="'
         }
-        mock_request.url = u'http://testurl'
-        mock_request.http_method = u'POST'
+        mock_request.url = 'http://testurl'
+        mock_request.http_method = 'POST'
 
         params = {}
         if not namespace_lti_v1p1:
@@ -492,7 +492,7 @@ class LTIModuleTest(LogicTest):
         self.xmodule.oauth_params = Mock()
         self.xmodule.get_input_fields()
         self.xmodule.oauth_params.assert_called_with(
-            {u'custom_test_custom_params': u'test_custom_param_value'},
+            {'custom_test_custom_params': 'test_custom_param_value'},
             'test_client_key', 'test_client_secret'
         )
 

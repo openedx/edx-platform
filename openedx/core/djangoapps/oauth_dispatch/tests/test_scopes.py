@@ -29,5 +29,5 @@ class ApplicationModelScopesTestCase(TestCase):
         scopes = ApplicationModelScopes()
         self.assertEqual(
             set(scopes.get_available_scopes(application_access.application)),
-            set(settings.OAUTH2_DEFAULT_SCOPES.keys() + expected_additional_scopes),
+            set(list(settings.OAUTH2_DEFAULT_SCOPES.keys()) + expected_additional_scopes),
         )

@@ -4,8 +4,8 @@ Helpers for the student app.
 import json
 import logging
 import mimetypes
-import urllib
-import urlparse
+import urllib.request, urllib.parse, urllib.error
+import urllib.parse
 from datetime import datetime
 
 from django.conf import settings
@@ -285,7 +285,7 @@ def get_next_url_for_login_page(request):
         # Before we redirect to next/dashboard, we need to handle auto-enrollment:
         params = [(param, request.GET[param]) for param in POST_AUTH_PARAMS if param in request.GET]
         params.append(('next', redirect_to))  # After auto-enrollment, user will be sent to payment page or to this URL
-        redirect_to = '{}?{}'.format(reverse('finish_auth'), urllib.urlencode(params))
+        redirect_to = '{}?{}'.format(reverse('finish_auth'), urllib.parse.urlencode(params))
         # Note: if we are resuming a third party auth pipeline, then the next URL will already
         # be saved in the session as part of the pipeline state. That URL will take priority
         # over this one.
@@ -299,12 +299,12 @@ def get_next_url_for_login_page(request):
         # Don't add tpa_hint if we're already in the TPA pipeline (prevent infinite loop),
         # and don't overwrite any existing tpa_hint params (allow tpa_hint override).
         running_pipeline = third_party_auth.pipeline.get(request)
-        (scheme, netloc, path, query, fragment) = list(urlparse.urlsplit(redirect_to))
+        (scheme, netloc, path, query, fragment) = list(urllib.parse.urlsplit(redirect_to))
         if not running_pipeline and 'tpa_hint' not in query:
-            params = urlparse.parse_qs(query)
+            params = urllib.parse.parse_qs(query)
             params['tpa_hint'] = [tpa_hint]
-            query = urllib.urlencode(params, doseq=True)
-            redirect_to = urlparse.urlunsplit((scheme, netloc, path, query, fragment))
+            query = urllib.parse.urlencode(params, doseq=True)
+            redirect_to = urllib.parse.urlunsplit((scheme, netloc, path, query, fragment))
 
     return redirect_to
 
@@ -328,14 +328,14 @@ def _get_redirect_to(request):
         mime_type, _ = mimetypes.guess_type(redirect_to, strict=False)
         if not is_safe_login_or_logout_redirect(request, redirect_to):
             log.warning(
-                u'Unsafe redirect parameter detected after login page: %(redirect_to)r',
+                'Unsafe redirect parameter detected after login page: %(redirect_to)r',
                 {"redirect_to": redirect_to}
             )
             redirect_to = None
         elif 'text/html' not in header_accept:
             log.info(
-                u'Redirect to non html content %(content_type)r detected from %(user_agent)r'
-                u' after login page: %(redirect_to)r',
+                'Redirect to non html content %(content_type)r detected from %(user_agent)r'
+                ' after login page: %(redirect_to)r',
                 {
                     "redirect_to": redirect_to, "content_type": header_accept,
                     "user_agent": request.META.get('HTTP_USER_AGENT', '')
@@ -344,23 +344,23 @@ def _get_redirect_to(request):
             redirect_to = None
         elif mime_type:
             log.warning(
-                u'Redirect to url path with specified filed type %(mime_type)r not allowed: %(redirect_to)r',
+                'Redirect to url path with specified filed type %(mime_type)r not allowed: %(redirect_to)r',
                 {"redirect_to": redirect_to, "mime_type": mime_type}
             )
             redirect_to = None
         elif settings.STATIC_URL in redirect_to:
             log.warning(
-                u'Redirect to static content detected after login page: %(redirect_to)r',
+                'Redirect to static content detected after login page: %(redirect_to)r',
                 {"redirect_to": redirect_to}
             )
             redirect_to = None
         else:
             themes = get_themes()
-            next_path = urlparse.urlparse(redirect_to).path
+            next_path = urllib.parse.urlparse(redirect_to).path
             for theme in themes:
                 if theme.theme_dir_name in next_path:
                     log.warning(
-                        u'Redirect to theme content detected after login page: %(redirect_to)r',
+                        'Redirect to theme content detected after login page: %(redirect_to)r',
                         {"redirect_to": redirect_to}
                     )
                     redirect_to = None
@@ -531,7 +531,7 @@ def _cert_info(user, course_overview, cert_status):
                 status_dict['status'] = 'unavailable'
         elif 'download_url' not in cert_status:
             log.warning(
-                u"User %s has a downloadable cert for %s, but no download url",
+                "User %s has a downloadable cert for %s, but no download url",
                 user.username,
                 course_overview.id
             )

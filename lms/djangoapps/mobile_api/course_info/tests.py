@@ -66,7 +66,7 @@ class TestUpdates(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTest
             # old format stores the updates with the newest first
             for num in range(num_updates, 0, -1):
                 update_data += "<li><h2>Date" + str(num) + "</h2><a href=\"/static/\">Update" + str(num) + "</a></li>"
-            course_updates.data = u"<ol>" + update_data + "</ol>"
+            course_updates.data = "<ol>" + update_data + "</ol>"
         modulestore().update_item(course_updates, self.user.id)
 
         # call API
@@ -83,8 +83,8 @@ class TestUpdates(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTest
         # verify content and sort order of updates (most recent first)
         for num in range(1, num_updates + 1):
             update_data = response.data[num_updates - num]
-            self.assertEquals(num, update_data['id'])
-            self.assertEquals("Date" + str(num), update_data['date'])
+            self.assertEqual(num, update_data['id'])
+            self.assertEqual("Date" + str(num), update_data['date'])
             self.assertIn("Update" + str(num), update_data['content'])
 
 

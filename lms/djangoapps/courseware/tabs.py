@@ -291,7 +291,7 @@ class SingleTextbookTab(CourseTab):
     def __init__(self, name, tab_id, view_name, index):
         def link_func(course, reverse_func, index=index):
             """ Constructs a link for textbooks from a view name, a course, and an index. """
-            return reverse_func(view_name, args=[unicode(course.id), index])
+            return reverse_func(view_name, args=[str(course.id), index])
 
         tab_dict = dict()
         tab_dict['name'] = name

@@ -148,8 +148,8 @@ class CertificateSearchTests(CertificateSupportTestCase):
         ("bar@example.com", False),
         ("", False),
         (CertificateSupportTestCase.STUDENT_USERNAME, False, 'invalid_key'),
-        (CertificateSupportTestCase.STUDENT_USERNAME, False, unicode(CertificateSupportTestCase.COURSE_NOT_EXIST_KEY)),
-        (CertificateSupportTestCase.STUDENT_USERNAME, True, unicode(CertificateSupportTestCase.EXISTED_COURSE_KEY_1)),
+        (CertificateSupportTestCase.STUDENT_USERNAME, False, str(CertificateSupportTestCase.COURSE_NOT_EXIST_KEY)),
+        (CertificateSupportTestCase.STUDENT_USERNAME, True, str(CertificateSupportTestCase.EXISTED_COURSE_KEY_1)),
     )
     @ddt.unpack
     def test_search(self, user_filter, expect_result, course_filter=None):
@@ -185,10 +185,10 @@ class CertificateSearchTests(CertificateSupportTestCase):
         retrieved_cert = results[0]
 
         self.assertEqual(retrieved_cert["username"], self.STUDENT_USERNAME)
-        self.assertEqual(retrieved_cert["course_key"], unicode(self.CERT_COURSE_KEY))
+        self.assertEqual(retrieved_cert["course_key"], str(self.CERT_COURSE_KEY))
         self.assertEqual(retrieved_cert["created"], self.cert.created_date.isoformat())
         self.assertEqual(retrieved_cert["modified"], self.cert.modified_date.isoformat())
-        self.assertEqual(retrieved_cert["grade"], unicode(self.CERT_GRADE))
+        self.assertEqual(retrieved_cert["grade"], str(self.CERT_GRADE))
         self.assertEqual(retrieved_cert["status"], self.CERT_STATUS)
         self.assertEqual(retrieved_cert["type"], self.CERT_MODE)
         self.assertEqual(retrieved_cert["download_url"], self.CERT_DOWNLOAD_URL)
@@ -296,7 +296,7 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
 
     def test_regenerate_no_such_user(self):
         response = self._regenerate(
-            course_key=unicode(self.CERT_COURSE_KEY),
+            course_key=str(self.CERT_COURSE_KEY),
             username="invalid_username",
         )
         self.assertEqual(response.status_code, 400)
@@ -472,7 +472,7 @@ class CertificateGenerateTests(CertificateSupportTestCase):
 
     def test_generate_no_such_user(self):
         response = self._generate(
-            course_key=unicode(self.EXISTED_COURSE_KEY_2),
+            course_key=str(self.EXISTED_COURSE_KEY_2),
             username="invalid_username",
         )
         self.assertEqual(response.status_code, 400)

@@ -111,8 +111,8 @@ class TestPreferenceAPI(CacheIsolationTestCase):
         """
         Verifies the basic behavior of set_user_preference.
         """
-        test_key = u'ⓟⓡⓔⓕⓔⓡⓔⓝⓒⓔ_ⓚⓔⓨ'
-        test_value = u'ǝnןɐʌ_ǝɔuǝɹǝɟǝɹd'
+        test_key = 'ⓟⓡⓔⓕⓔⓡⓔⓝⓒⓔ_ⓚⓔⓨ'
+        test_value = 'ǝnןɐʌ_ǝɔuǝɹǝɟǝɹd'
         set_user_preference(self.user, test_key, test_value)
         self.assertEqual(get_user_preference(self.user, test_key), test_value)
         set_user_preference(self.user, test_key, "new_value", username=self.user.username)
@@ -139,7 +139,7 @@ class TestPreferenceAPI(CacheIsolationTestCase):
         with self.assertRaises(PreferenceValidationError) as context_manager:
             set_user_preference(self.user, too_long_key, "new_value")
         errors = context_manager.exception.preference_errors
-        self.assertEqual(len(errors.keys()), 1)
+        self.assertEqual(len(list(errors.keys())), 1)
         self.assertEqual(
             errors[too_long_key],
             {
@@ -152,7 +152,7 @@ class TestPreferenceAPI(CacheIsolationTestCase):
             with self.assertRaises(PreferenceValidationError) as context_manager:
                 set_user_preference(self.user, self.test_preference_key, empty_value)
             errors = context_manager.exception.preference_errors
-            self.assertEqual(len(errors.keys()), 1)
+            self.assertEqual(len(list(errors.keys())), 1)
             self.assertEqual(
                 errors[self.test_preference_key],
                 {
@@ -163,14 +163,14 @@ class TestPreferenceAPI(CacheIsolationTestCase):
 
         user_preference_save.side_effect = [Exception, None]
         with self.assertRaises(PreferenceUpdateError) as context_manager:
-            set_user_preference(self.user, u"new_key_ȻħȺɍłɇs", u"new_value_ȻħȺɍłɇs")
+            set_user_preference(self.user, "new_key_ȻħȺɍłɇs", "new_value_ȻħȺɍłɇs")
         self.assertEqual(
             context_manager.exception.developer_message,
-            u"Save failed for user preference 'new_key_ȻħȺɍłɇs' with value 'new_value_ȻħȺɍłɇs': "
+            "Save failed for user preference 'new_key_ȻħȺɍłɇs' with value 'new_value_ȻħȺɍłɇs': "
         )
         self.assertEqual(
             context_manager.exception.user_message,
-            u"Save failed for user preference 'new_key_ȻħȺɍłɇs' with value 'new_value_ȻħȺɍłɇs'."
+            "Save failed for user preference 'new_key_ȻħȺɍłɇs' with value 'new_value_ȻħȺɍłɇs'."
         )
 
     def test_update_user_preferences(self):
@@ -241,7 +241,7 @@ class TestPreferenceAPI(CacheIsolationTestCase):
         with self.assertRaises(PreferenceValidationError) as context_manager:
             update_user_preferences(self.user, {too_long_key: "new_value"})
         errors = context_manager.exception.preference_errors
-        self.assertEqual(len(errors.keys()), 1)
+        self.assertEqual(len(list(errors.keys())), 1)
         self.assertEqual(
             errors[too_long_key],
             {
@@ -254,7 +254,7 @@ class TestPreferenceAPI(CacheIsolationTestCase):
             with self.assertRaises(PreferenceValidationError) as context_manager:
                 update_user_preferences(self.user, {self.test_preference_key: empty_value})
             errors = context_manager.exception.preference_errors
-            self.assertEqual(len(errors.keys()), 1)
+            self.assertEqual(len(list(errors.keys())), 1)
             self.assertEqual(
                 errors[self.test_preference_key],
                 {
@@ -268,11 +268,11 @@ class TestPreferenceAPI(CacheIsolationTestCase):
             update_user_preferences(self.user, {self.test_preference_key: "new_value"})
         self.assertEqual(
             context_manager.exception.developer_message,
-            u"Save failed for user preference 'test_key' with value 'new_value': "
+            "Save failed for user preference 'test_key' with value 'new_value': "
         )
         self.assertEqual(
             context_manager.exception.user_message,
-            u"Save failed for user preference 'test_key' with value 'new_value'."
+            "Save failed for user preference 'test_key' with value 'new_value'."
         )
 
         user_preference_delete.side_effect = [Exception, None]
@@ -280,11 +280,11 @@ class TestPreferenceAPI(CacheIsolationTestCase):
             update_user_preferences(self.user, {self.test_preference_key: None})
         self.assertEqual(
             context_manager.exception.developer_message,
-            u"Delete failed for user preference 'test_key': "
+            "Delete failed for user preference 'test_key': "
         )
         self.assertEqual(
             context_manager.exception.user_message,
-            u"Delete failed for user preference 'test_key'."
+            "Delete failed for user preference 'test_key'."
         )
 
     def test_delete_user_preference(self):
@@ -318,11 +318,11 @@ class TestPreferenceAPI(CacheIsolationTestCase):
             delete_user_preference(self.user, self.test_preference_key)
         self.assertEqual(
             context_manager.exception.developer_message,
-            u"Delete failed for user preference 'test_key': "
+            "Delete failed for user preference 'test_key': "
         )
         self.assertEqual(
             context_manager.exception.user_message,
-            u"Delete failed for user preference 'test_key'."
+            "Delete failed for user preference 'test_key'."
         )
 
 
@@ -331,25 +331,25 @@ class UpdateEmailOptInTests(ModuleStoreTestCase):
     """
     Test cases to cover API-driven email list opt-in update workflows
     """
-    USERNAME = u'claire-underwood'
-    PASSWORD = u'ṕáśśẃőŕd'
-    EMAIL = u'claire+underwood@example.com'
+    USERNAME = 'claire-underwood'
+    PASSWORD = 'ṕáśśẃőŕd'
+    EMAIL = 'claire+underwood@example.com'
 
     @ddt.data(
         # Check that a 27 year old can opt-in
-        (27, True, u"True"),
+        (27, True, "True"),
 
         # Check that a 32-year old can opt-out
-        (32, False, u"False"),
+        (32, False, "False"),
 
         # Check that someone 14 years old can opt-in
-        (14, True, u"True"),
+        (14, True, "True"),
 
         # Check that someone 13 years old cannot opt-in (must have turned 13 before this year)
-        (13, True, u"False"),
+        (13, True, "False"),
 
         # Check that someone 12 years old cannot opt-in
-        (12, True, u"False")
+        (12, True, "False")
     )
     @ddt.unpack
     @override_settings(EMAIL_OPTIN_MINIMUM_AGE=13)
@@ -379,7 +379,7 @@ class UpdateEmailOptInTests(ModuleStoreTestCase):
 
         update_email_opt_in(user, course.id.org, True)
         result_obj = UserOrgTag.objects.get(user=user, org=course.id.org, key='email-optin')
-        self.assertEqual(result_obj.value, u"True")
+        self.assertEqual(result_obj.value, "True")
 
     def test_update_email_optin_anonymous_user(self):
         """Verify that the API raises an exception for a user with no profile."""
@@ -390,16 +390,16 @@ class UpdateEmailOptInTests(ModuleStoreTestCase):
 
     @ddt.data(
         # Check that a 27 year old can opt-in, then out.
-        (27, True, False, u"False"),
+        (27, True, False, "False"),
 
         # Check that a 32-year old can opt-out, then in.
-        (32, False, True, u"True"),
+        (32, False, True, "True"),
 
         # Check that someone 13 years old can opt-in, then out.
-        (13, True, False, u"False"),
+        (13, True, False, "False"),
 
         # Check that someone 12 years old cannot opt-in, then explicitly out.
-        (12, True, False, u"False")
+        (12, True, False, "False")
     )
     @ddt.unpack
     @override_settings(EMAIL_OPTIN_MINIMUM_AGE=13)
@@ -466,11 +466,11 @@ def get_expected_validation_developer_message(preference_key, preference_value):
     """
     Returns the expected dict of validation messages for the specified key.
     """
-    return u"Value '{preference_value}' not valid for preference '{preference_key}': {error}".format(
+    return "Value '{preference_value}' not valid for preference '{preference_key}': {error}".format(
         preference_key=preference_key,
         preference_value=preference_value,
         error={
-            "key": [u"Ensure this value has at most 255 characters (it has 256)."]
+            "key": ["Ensure this value has at most 255 characters (it has 256)."]
         }
     )
 
@@ -479,11 +479,11 @@ def get_expected_key_error_user_message(preference_key, preference_value):
     """
     Returns the expected user message for an invalid key.
     """
-    return u"Invalid user preference key '{preference_key}'.".format(preference_key=preference_key)
+    return "Invalid user preference key '{preference_key}'.".format(preference_key=preference_key)
 
 
 def get_empty_preference_message(preference_key):
     """
     Returns the validation message shown for an empty preference.
     """
-    return u"Preference '{preference_key}' cannot be set to an empty value.".format(preference_key=preference_key)
+    return "Preference '{preference_key}' cannot be set to an empty value.".format(preference_key=preference_key)

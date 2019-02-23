@@ -107,7 +107,7 @@ class TaskTestCase(ModuleStoreTestCase):
     def create_thread_and_comments(cls):
         cls.thread = {
             'id': cls.discussion_id,
-            'course_id': unicode(cls.course.id),
+            'course_id': str(cls.course.id),
             'created_at': date.serialize(TWO_HOURS_AGO),
             'title': 'thread-title',
             'user_id': cls.thread_author.id,
@@ -145,7 +145,7 @@ class TaskTestCase(ModuleStoreTestCase):
         cls.comment['child_count'] = 1
         cls.thread2 = {
             'id': cls.discussion_id,
-            'course_id': unicode(cls.course.id),
+            'course_id': str(cls.course.id),
             'created_at': date.serialize(TWO_HOURS_AGO),
             'title': 'thread-title',
             'user_id': cls.thread_author.id,
@@ -315,7 +315,7 @@ class TaskTestCase(ModuleStoreTestCase):
         with mock.patch('edx_ace.ace.send').start() as message:
             # Populate mock message (
             # There are some cruft attrs, but they're harmless.
-            for key, entry in test_props.items():
+            for key, entry in list(test_props.items()):
                 setattr(message, key, entry)
 
             test_props['nonInteraction'] = True

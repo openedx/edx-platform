@@ -27,7 +27,7 @@ def get_bumper_settings(video):
     bumper_settings = copy.deepcopy(getattr(video, 'video_bumper', {}))
 
     # clean up /static/ prefix from bumper transcripts
-    for lang, transcript_url in bumper_settings.get('transcripts', {}).items():
+    for lang, transcript_url in list(bumper_settings.get('transcripts', {}).items()):
         bumper_settings['transcripts'][lang] = transcript_url.replace("/static/", "")
 
     return bumper_settings
@@ -106,7 +106,7 @@ def get_bumper_sources(video):
     try:
         val_profiles = ["desktop_webm", "desktop_mp4"]
         val_video_urls = edxval_api.get_urls_for_profiles(video.bumper['edx_video_id'], val_profiles)
-        bumper_sources = filter(None, [val_video_urls[p] for p in val_profiles])
+        bumper_sources = [_f for _f in [val_video_urls[p] for p in val_profiles] if _f]
     except edxval_api.ValInternalError:
         # if no bumper sources, nothing will be showed
         log.warning(

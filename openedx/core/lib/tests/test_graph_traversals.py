@@ -62,7 +62,7 @@ class TestGraphTraversals(TestCase):
                 will be [].
         """
         result = defaultdict(list)
-        for parent, children in parent_to_children_map.iteritems():
+        for parent, children in parent_to_children_map.items():
             for child in children:
                 result[child].append(parent)
         return result

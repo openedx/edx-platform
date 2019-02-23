@@ -31,12 +31,12 @@ def get_shared_secret_key(provider_id):
     """
     secret = getattr(settings, "CREDIT_PROVIDER_SECRET_KEYS", {}).get(provider_id)
 
-    if isinstance(secret, unicode):
+    if isinstance(secret, str):
         try:
             secret = str(secret)
         except UnicodeEncodeError:
             secret = None
-            log.error(u'Shared secret key for credit provider "%s" contains non-ASCII unicode.', provider_id)
+            log.error('Shared secret key for credit provider "%s" contains non-ASCII unicode.', provider_id)
 
     return secret
 
@@ -53,10 +53,10 @@ def signature(params, shared_secret):
         str: The 32-character signature.
 
     """
-    encoded_params = u"".join([
-        u"{key}:{value}".format(key=key, value=params[key])
+    encoded_params = "".join([
+        "{key}:{value}".format(key=key, value=params[key])
         for key in sorted(params.keys())
-        if key != u"signature"
+        if key != "signature"
     ])
     hasher = hmac.new(shared_secret.encode('utf-8'), encoded_params.encode('utf-8'), hashlib.sha256)
     return hasher.hexdigest()

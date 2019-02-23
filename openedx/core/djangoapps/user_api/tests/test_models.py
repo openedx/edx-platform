@@ -53,20 +53,20 @@ class UserPreferenceModelTest(ModuleStoreTestCase):
         user = UserFactory.create()
         course = CourseFactory.create()
         tag = UserCourseTagFactory.create(user=user, course_id=course.id, key="testkey", value="foobar")
-        self.assertEquals(tag.user, user)
-        self.assertEquals(tag.course_id, course.id)
-        self.assertEquals(tag.key, "testkey")
-        self.assertEquals(tag.value, "foobar")
+        self.assertEqual(tag.user, user)
+        self.assertEqual(tag.course_id, course.id)
+        self.assertEqual(tag.key, "testkey")
+        self.assertEqual(tag.value, "foobar")
 
     def test_create_user_org_tags(self):
         """Create org specific user tags and confirm all properties are set """
         user = UserFactory.create()
         course = CourseFactory.create()
         tag = UserOrgTagFactory.create(user=user, org=course.id.org, key="testkey", value="foobar")
-        self.assertEquals(tag.user, user)
-        self.assertEquals(tag.org, course.id.org)
-        self.assertEquals(tag.key, "testkey")
-        self.assertEquals(tag.value, "foobar")
+        self.assertEqual(tag.user, user)
+        self.assertEqual(tag.org, course.id.org)
+        self.assertEqual(tag.key, "testkey")
+        self.assertEqual(tag.value, "foobar")
         self.assertIsNotNone(tag.created)
         self.assertIsNotNone(tag.modified)
 
@@ -74,7 +74,7 @@ class UserPreferenceModelTest(ModuleStoreTestCase):
         original_modified = tag.modified
         tag.value = "barfoo"
         tag.save()
-        self.assertEquals(tag.value, "barfoo")
+        self.assertEqual(tag.value, "barfoo")
         self.assertNotEqual(original_modified, tag.modified)
 
     def test_retire_user_org_tags_by_user_value(self):

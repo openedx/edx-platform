@@ -138,7 +138,7 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
         vertical2_selected = self.get_block_key_set(self.blocks, 'vertical2').pop() in trans_keys
         vertical3_selected = self.get_block_key_set(self.blocks, 'vertical3').pop() in trans_keys
 
-        self.assertNotEquals(vertical2_selected, vertical3_selected)  # only one of them should be selected
+        self.assertNotEqual(vertical2_selected, vertical3_selected)  # only one of them should be selected
         selected_vertical = 'vertical2' if vertical2_selected else 'vertical3'
         selected_child = 'html1' if vertical2_selected else 'html2'
 
@@ -162,7 +162,7 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
                     selected_vertical,
                     selected_child,
                 ),
-                u"Expected 'selected' equality failed in iteration {}.".format(i)
+                "Expected 'selected' equality failed in iteration {}.".format(i)
             )
 
     def test_staff_access_to_library_content(self):

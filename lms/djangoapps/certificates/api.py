@@ -178,7 +178,7 @@ def generate_user_certificates(student, course_key, course=None, insecure=False,
     if CertificateStatuses.is_passing_status(cert.status):
         emit_certificate_event('created', student, course_key, course, {
             'user_id': student.id,
-            'course_id': unicode(course_key),
+            'course_id': str(course_key),
             'certificate_id': cert.verify_uuid,
             'enrollment_mode': cert.mode,
             'generation_mode': generation_mode
@@ -215,8 +215,8 @@ def regenerate_user_certificates(student, course_key, course=None,
 
     generate_pdf = not has_html_certificates_enabled(course)
     log.info(
-        u"Started regenerating certificates for user %s in course %s with generate_pdf status: %s",
-        student.username, unicode(course_key), generate_pdf
+        "Started regenerating certificates for user %s in course %s with generate_pdf status: %s",
+        student.username, str(course_key), generate_pdf
     )
 
     return xqueue.regen_cert(
@@ -291,12 +291,12 @@ def set_cert_generation_enabled(course_key, is_enabled):
     cert_event_type = 'enabled' if is_enabled else 'disabled'
     event_name = '.'.join(['edx', 'certificate', 'generation', cert_event_type])
     tracker.emit(event_name, {
-        'course_id': unicode(course_key),
+        'course_id': str(course_key),
     })
     if is_enabled:
-        log.info(u"Enabled self-generated certificates for course '%s'.", unicode(course_key))
+        log.info("Enabled self-generated certificates for course '%s'.", str(course_key))
     else:
-        log.info(u"Disabled self-generated certificates for course '%s'.", unicode(course_key))
+        log.info("Disabled self-generated certificates for course '%s'.", str(course_key))
 
 
 def is_certificate_invalid(student, course_key):
@@ -427,7 +427,7 @@ def _certificate_html_url(user_id, course_id, uuid):
     if uuid:
         return reverse('certificates:render_cert_by_uuid', kwargs={'certificate_uuid': uuid})
     elif user_id and course_id:
-        kwargs = {"user_id": str(user_id), "course_id": unicode(course_id)}
+        kwargs = {"user_id": str(user_id), "course_id": str(course_id)}
         return reverse('certificates:html_view', kwargs=kwargs)
     return ''
 
@@ -446,9 +446,9 @@ def _certificate_download_url(user_id, course_id):
         return user_certificate.download_url
     except GeneratedCertificate.DoesNotExist:
         log.critical(
-            u'Unable to lookup certificate\n'
-            u'user id: %d\n'
-            u'course: %s', user_id, unicode(course_id)
+            'Unable to lookup certificate\n'
+            'user id: %d\n'
+            'course: %s', user_id, str(course_id)
         )
     return ''
 
@@ -510,8 +510,8 @@ def get_certificate_template(course_key, mode, language):
         )
         template = get_language_specific_template_or_default(language, org_mode_and_key_templates, course_key)
         if template:
-            log.info(u"Template retrieved for course based on the course_key:{course_key}, mode:{mode} "
-                     u"and org_id:{org_id}".format(course_key=course_key, mode=mode, org_id=org_id))
+            log.info("Template retrieved for course based on the course_key:{course_key}, mode:{mode} "
+                     "and org_id:{org_id}".format(course_key=course_key, mode=mode, org_id=org_id))
 
     # since no template matched that course_key, only consider templates with empty course_key
     empty_course_key_templates = active_templates.filter(course_key=CourseKeyField.Empty)
@@ -522,8 +522,8 @@ def get_certificate_template(course_key, mode, language):
         )
         template = get_language_specific_template_or_default(language, org_and_mode_templates, course_key)
         if template:
-            log.info(u"Template retrieved for course:{course_key} based on the mode:{mode} "
-                     u"and org_id:{org_id}".format(course_key=course_key, mode=mode, org_id=org_id))
+            log.info("Template retrieved for course:{course_key} based on the mode:{mode} "
+                     "and org_id:{org_id}".format(course_key=course_key, mode=mode, org_id=org_id))
     if not template and org_id:  # get template by only org
         org_templates = empty_course_key_templates.filter(
             organization_id=org_id,
@@ -531,7 +531,7 @@ def get_certificate_template(course_key, mode, language):
         )
         template = get_language_specific_template_or_default(language, org_templates, course_key)
         if template:
-            log.info(u"Template retrieved for course:{course_key} and org_id:{org_id}".
+            log.info("Template retrieved for course:{course_key} and org_id:{org_id}".
                      format(course_key=course_key, org_id=org_id))
     if not template and mode:  # get template by only mode
         mode_templates = empty_course_key_templates.filter(
@@ -540,8 +540,8 @@ def get_certificate_template(course_key, mode, language):
         )
         template = get_language_specific_template_or_default(language, mode_templates, course_key)
         if template:
-            log.info(u"Template retrieved for course:{course_key} based on the mode:{mode} "
-                     u"and org_id:{org_id}".format(course_key=course_key, mode=mode, org_id=org_id))
+            log.info("Template retrieved for course:{course_key} based on the mode:{mode} "
+                     "and org_id:{org_id}".format(course_key=course_key, mode=mode, org_id=org_id))
     return template if template else None
 
 
@@ -553,8 +553,8 @@ def get_language_specific_template_or_default(language, templates, course_key):
     """
     two_letter_language = _get_two_letter_language_code(language)
     log.info(
-        u"Retrieved two letter language is {two_letter_language} for the language:{language} and "
-        u"course:{course_key}".format(
+        "Retrieved two letter language is {two_letter_language} for the language:{language} and "
+        "course:{course_key}".format(
             two_letter_language=two_letter_language,
             language=language,
             course_key=course_key
@@ -566,7 +566,7 @@ def get_language_specific_template_or_default(language, templates, course_key):
     language_specific_template = get_language_specific_template(two_letter_language,
                                                                 language_or_default_templates, course_key)
     if language_specific_template:
-        log.info(u"Returning languages: {language} specific template for course:{course_key}".
+        log.info("Returning languages: {language} specific template for course:{course_key}".
                  format(course_key=course_key, language=language))
         return language_specific_template
     else:
@@ -583,11 +583,11 @@ def get_language_specific_template(language, templates, course_key):
     """
     for template in templates:
         if template.language == language:
-            log.info(u"{language} language specific template found for course:{course_key}".
+            log.info("{language} language specific template found for course:{course_key}".
                      format(language=language, course_key=course_key))
             return template
 
-    log.info(u"{language} language specific template not found for course:{course_key}".
+    log.info("{language} language specific template not found for course:{course_key}".
              format(language=language, course_key=course_key))
     return None
 
@@ -626,11 +626,11 @@ def emit_certificate_event(event_name, user, course_id, course=None, event_data=
         course = modulestore().get_course(course_id, depth=0)
     context = {
         'org_id': course.org,
-        'course_id': unicode(course_id)
+        'course_id': str(course_id)
     }
     data = {
         'user_id': user.id,
-        'course_id': unicode(course_id),
+        'course_id': str(course_id),
         'certificate_url': get_certificate_url(user.id, course_id)
     }
     event_data = event_data or {}

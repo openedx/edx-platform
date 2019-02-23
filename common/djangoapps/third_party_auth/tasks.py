@@ -75,11 +75,11 @@ def fetch_saml_metadata():
     num_attempted = len(url_map)
     num_updated = 0
     failure_messages = []  # We return the length of this array for num_failed
-    for url, entity_ids in url_map.items():
+    for url, entity_ids in list(url_map.items()):
         try:
-            log.info(u"Fetching %s", url)
+            log.info("Fetching %s", url)
             if not url.lower().startswith('https'):
-                log.warning(u"This SAML metadata URL is not secure! It should use HTTPS. (%s)", url)
+                log.warning("This SAML metadata URL is not secure! It should use HTTPS. (%s)", url)
             response = requests.get(url, verify=True)  # May raise HTTPError or SSLError or ConnectionError
             response.raise_for_status()  # May raise an HTTPError
 
@@ -91,14 +91,14 @@ def fetch_saml_metadata():
             # TODO: Can use OneLogin_Saml2_Utils to validate signed XML if anyone is using that
 
             for entity_id in entity_ids:
-                log.info(u"Processing IdP with entityID %s", entity_id)
+                log.info("Processing IdP with entityID %s", entity_id)
                 public_key, sso_url, expires_at = _parse_metadata_xml(xml, entity_id)
                 changed = _update_data(entity_id, public_key, sso_url, expires_at)
                 if changed:
-                    log.info(u"→ Created new record for SAMLProviderData")
+                    log.info("→ Created new record for SAMLProviderData")
                     num_updated += 1
                 else:
-                    log.info(u"→ Updated existing SAMLProviderData. Nothing has changed.")
+                    log.info("→ Updated existing SAMLProviderData. Nothing has changed.")
         except (exceptions.SSLError, exceptions.HTTPError, exceptions.RequestException, MetadataParseError) as error:
             # Catch and process exception in case of errors during fetching and processing saml metadata.
             # Here is a description of each exception.
@@ -109,23 +109,23 @@ def fetch_saml_metadata():
 
             log.exception(text_type(error))
             failure_messages.append(
-                u"{error_type}: {error_message}\nMetadata Source: {url}\nEntity IDs: \n{entity_ids}.".format(
+                "{error_type}: {error_message}\nMetadata Source: {url}\nEntity IDs: \n{entity_ids}.".format(
                     error_type=type(error).__name__,
                     error_message=text_type(error),
                     url=url,
                     entity_ids="\n".join(
-                        [u"\t{}: {}".format(count, item) for count, item in enumerate(entity_ids, start=1)],
+                        ["\t{}: {}".format(count, item) for count, item in enumerate(entity_ids, start=1)],
                     )
                 )
             )
         except etree.XMLSyntaxError as error:
             log.exception(text_type(error))
             failure_messages.append(
-                u"XMLSyntaxError: {error_message}\nMetadata Source: {url}\nEntity IDs: \n{entity_ids}.".format(
+                "XMLSyntaxError: {error_message}\nMetadata Source: {url}\nEntity IDs: \n{entity_ids}.".format(
                     error_message=str(error.error_log),
                     url=url,
                     entity_ids="\n".join(
-                        [u"\t{}: {}".format(count, item) for count, item in enumerate(entity_ids, start=1)],
+                        ["\t{}: {}".format(count, item) for count, item in enumerate(entity_ids, start=1)],
                     )
                 )
             )
@@ -145,12 +145,12 @@ def _parse_metadata_xml(xml, entity_id):
         entity_desc = xml
     else:
         if xml.tag != etree.QName(SAML_XML_NS, 'EntitiesDescriptor'):
-            raise MetadataParseError(Text(u"Expected root element to be <EntitiesDescriptor>, not {}").format(xml.tag))
+            raise MetadataParseError(Text("Expected root element to be <EntitiesDescriptor>, not {}").format(xml.tag))
         entity_desc = xml.find(
             ".//{}[@entityID='{}']".format(etree.QName(SAML_XML_NS, 'EntityDescriptor'), entity_id)
         )
         if not entity_desc:
-            raise MetadataParseError(u"Can't find EntityDescriptor for entityID {}".format(entity_id))
+            raise MetadataParseError("Can't find EntityDescriptor for entityID {}".format(entity_id))
 
     expires_at = None
     if "validUntil" in xml.attrib:

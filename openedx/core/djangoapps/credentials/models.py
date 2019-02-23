@@ -2,7 +2,7 @@
 Models for credentials support for the LMS and Studio.
 """
 
-from urlparse import urljoin
+from urllib.parse import urljoin
 
 from config_models.models import ConfigurationModel
 from django.conf import settings
@@ -130,4 +130,4 @@ class NotifyCredentialsConfig(ConfigurationModel):
     )
 
     def __unicode__(self):
-        return unicode(self.arguments)
+        return str(self.arguments)

@@ -2,7 +2,7 @@
 Tests for Discussion API serializers
 """
 import itertools
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 import ddt
 import httpretty
@@ -142,7 +142,7 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTe
         Create a thread with the given overrides, plus some useful test data.
         """
         merged_overrides = {
-            "course_id": unicode(self.course.id),
+            "course_id": str(self.course.id),
             "user_id": str(self.author.id),
             "username": self.author.username,
             "read": True,
@@ -162,7 +162,7 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTe
     def test_basic(self):
         thread = make_minimal_cs_thread({
             "id": "test_thread",
-            "course_id": unicode(self.course.id),
+            "course_id": str(self.course.id),
             "commentable_id": "test_topic",
             "user_id": str(self.author.id),
             "username": self.author.username,
@@ -420,7 +420,7 @@ class ThreadSerializerDeserializationTest(
         self.request = RequestFactory().get("/dummy")
         self.request.user = self.user
         self.minimal_data = {
-            "course_id": unicode(self.course.id),
+            "course_id": str(self.course.id),
             "topic_id": "test_topic",
             "type": "discussion",
             "title": "Test Title",
@@ -428,7 +428,7 @@ class ThreadSerializerDeserializationTest(
         }
         self.existing_thread = Thread(**make_minimal_cs_thread({
             "id": "existing_thread",
-            "course_id": unicode(self.course.id),
+            "course_id": str(self.course.id),
             "commentable_id": "original_topic",
             "thread_type": "discussion",
             "title": "Original Title",
@@ -465,7 +465,7 @@ class ThreadSerializerDeserializationTest(
         self.assertEqual(
             httpretty.last_request().parsed_body,
             {
-                "course_id": [unicode(self.course.id)],
+                "course_id": [str(self.course.id)],
                 "commentable_id": ["test_topic"],
                 "thread_type": ["discussion"],
                 "title": ["Test Title"],
@@ -483,7 +483,7 @@ class ThreadSerializerDeserializationTest(
         self.assertEqual(
             httpretty.last_request().parsed_body,
             {
-                "course_id": [unicode(self.course.id)],
+                "course_id": [str(self.course.id)],
                 "commentable_id": ["test_topic"],
                 "thread_type": ["discussion"],
                 "title": ["Test Title"],
@@ -531,7 +531,7 @@ class ThreadSerializerDeserializationTest(
         self.assertEqual(
             httpretty.last_request().parsed_body,
             {
-                "course_id": [unicode(self.course.id)],
+                "course_id": [str(self.course.id)],
                 "commentable_id": ["original_topic"],
                 "thread_type": ["discussion"],
                 "title": ["Original Title"],
@@ -559,7 +559,7 @@ class ThreadSerializerDeserializationTest(
         self.assertEqual(
             httpretty.last_request().parsed_body,
             {
-                "course_id": [unicode(self.course.id)],
+                "course_id": [str(self.course.id)],
                 "commentable_id": ["edited_topic"],
                 "thread_type": ["question"],
                 "title": ["Edited Title"],
@@ -631,7 +631,7 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMoc
             "body": "Original body",
             "user_id": str(self.user.id),
             "username": self.user.username,
-            "course_id": unicode(self.course.id),
+            "course_id": str(self.course.id),
         }))
 
     def save_and_reserialize(self, data, instance=None):
@@ -642,7 +642,7 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMoc
         context = get_context(
             self.course,
             self.request,
-            make_minimal_cs_thread({"course_id": unicode(self.course.id)})
+            make_minimal_cs_thread({"course_id": str(self.course.id)})
         )
         serializer = CommentSerializer(
             instance,
@@ -674,7 +674,7 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMoc
         self.assertEqual(
             httpretty.last_request().parsed_body,
             {
-                "course_id": [unicode(self.course.id)],
+                "course_id": [str(self.course.id)],
                 "body": ["Test body"],
                 "user_id": [str(self.user.id)],
             }
@@ -696,7 +696,7 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMoc
         self.assertEqual(
             httpretty.last_request().parsed_body,
             {
-                "course_id": [unicode(self.course.id)],
+                "course_id": [str(self.course.id)],
                 "body": ["Test body"],
                 "user_id": [str(self.user.id)],
                 "endorsed": ["True"],
@@ -790,7 +790,7 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMoc
         self.assertEqual(
             httpretty.last_request().parsed_body,
             {
-                "course_id": [unicode(self.course.id)],
+                "course_id": [str(self.course.id)],
                 "body": ["Test body"],
                 "user_id": [str(self.user.id)],
                 "endorsed": ["True"],
@@ -808,7 +808,7 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMoc
             httpretty.last_request().parsed_body,
             {
                 "body": ["Original body"],
-                "course_id": [unicode(self.course.id)],
+                "course_id": [str(self.course.id)],
                 "user_id": [str(self.user.id)],
                 "anonymous": ["False"],
                 "anonymous_to_peers": ["False"],
@@ -829,7 +829,7 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMoc
             httpretty.last_request().parsed_body,
             {
                 "body": ["Edited body"],
-                "course_id": [unicode(self.course.id)],
+                "course_id": [str(self.course.id)],
                 "user_id": [str(self.user.id)],
                 "anonymous": ["False"],
                 "anonymous_to_peers": ["False"],

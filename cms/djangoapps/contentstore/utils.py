@@ -1,7 +1,7 @@
 """
 Common utility functions useful throughout the contentstore
 """
-from __future__ import print_function
+
 
 import logging
 from datetime import datetime
@@ -100,7 +100,7 @@ def _remove_instructors(course_key):
     try:
         remove_all_instructors(course_key)
     except Exception as err:
-        log.error(u"Error in deleting course groups for {0}: {1}".format(course_key, err))
+        log.error("Error in deleting course groups for {0}: {1}".format(course_key, err))
 
 
 def get_lms_link_for_item(location, preview=False):
@@ -132,7 +132,7 @@ def get_lms_link_for_item(location, preview=False):
             settings.FEATURES.get('PREVIEW_LMS_BASE')
         )
 
-    return u"//{lms_base}/courses/{course_key}/jump_to/{location}".format(
+    return "//{lms_base}/courses/{course_key}/jump_to/{location}".format(
         lms_base=lms_base,
         course_key=text_type(location.course_key),
         location=text_type(location),
@@ -151,10 +151,10 @@ def get_lms_link_for_certificate_web_view(user_id, course_key, mode):
     if lms_base is None:
         return None
 
-    return u"//{certificate_web_base}/certificates/user/{user_id}/course/{course_id}?preview={mode}".format(
+    return "//{certificate_web_base}/certificates/user/{user_id}/course/{course_id}?preview={mode}".format(
         certificate_web_base=lms_base,
         user_id=user_id,
-        course_id=unicode(course_key),
+        course_id=str(course_key),
         mode=mode
     )
 
@@ -278,7 +278,7 @@ def reverse_url(handler_name, key_name=None, key_value=None, kwargs=None):
     Creates the URL for the given handler.
     The optional key_name and key_value are passed in as kwargs to the handler.
     """
-    kwargs_for_reverse = {key_name: unicode(key_value)} if key_name else None
+    kwargs_for_reverse = {key_name: str(key_value)} if key_name else None
     if kwargs:
         kwargs_for_reverse.update(kwargs)
     return reverse(handler_name, kwargs=kwargs_for_reverse)
@@ -318,7 +318,7 @@ def get_split_group_display_name(xblock, course):
     """
     for user_partition in get_user_partition_info(xblock, schemes=['random'], course=course):
         for group in user_partition['groups']:
-            if u'Group ID {group_id}'.format(group_id=group['id']) == xblock.display_name_with_default:
+            if 'Group ID {group_id}'.format(group_id=group['id']) == xblock.display_name_with_default:
                 return group['name']
 
 
@@ -386,7 +386,7 @@ def get_user_partition_info(xblock, schemes=None, course=None):
 
     if course is None:
         log.warning(
-            u"Could not find course %s to retrieve user partition information",
+            "Could not find course %s to retrieve user partition information",
             xblock.location.course_key
         )
         return []
@@ -431,7 +431,7 @@ def get_user_partition_info(xblock, schemes=None, course=None):
             # Put together the entire partition dictionary
             partitions.append({
                 "id": p.id,
-                "name": unicode(p.name),  # Convert into a string in case ugettext_lazy was used
+                "name": str(p.name),  # Convert into a string in case ugettext_lazy was used
                 "scheme": p.scheme.name,
                 "groups": groups,
             })
@@ -491,7 +491,7 @@ def get_visibility_partition_info(xblock, course=None):
                 else:
                     # Translators: This is building up a list of groups. It is marked for translation because of the
                     # comma, which is used as a separator between each group.
-                    selected_groups_label = _(u'{previous_groups}, {current_group}').format(
+                    selected_groups_label = _('{previous_groups}, {current_group}').format(
                         previous_groups=selected_groups_label,
                         current_group=group['name']
                     )
@@ -516,7 +516,7 @@ def get_xblock_aside_instance(usage_key):
             if aside.scope_ids.block_type == usage_key.aside_type:
                 return aside
     except ItemNotFoundError:
-        log.warning(u'Unable to load item %s', usage_key.usage_key)
+        log.warning('Unable to load item %s', usage_key.usage_key)
 
 
 def is_self_paced(course):

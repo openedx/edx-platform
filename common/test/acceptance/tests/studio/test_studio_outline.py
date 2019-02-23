@@ -9,7 +9,7 @@ from unittest import skip
 
 from pytz import UTC
 
-from base_studio_test import StudioCourseTest
+from .base_studio_test import StudioCourseTest
 from common.test.acceptance.fixtures.config import ConfigModelFixture
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.lms.course_home import CourseHomePage
@@ -381,11 +381,11 @@ class EditingSectionsTest(CourseOutlineTest):
         self.assertTrue(modal.has_policy())
 
         # Verify initial values
-        self.assertEqual(modal.release_date, u'1/1/1970')
-        self.assertEqual(modal.release_time, u'00:00')
-        self.assertEqual(modal.due_date, u'')
-        self.assertEqual(modal.due_time, u'')
-        self.assertEqual(modal.policy, u'Not Graded')
+        self.assertEqual(modal.release_date, '1/1/1970')
+        self.assertEqual(modal.release_time, '00:00')
+        self.assertEqual(modal.due_date, '')
+        self.assertEqual(modal.due_time, '')
+        self.assertEqual(modal.policy, 'Not Graded')
 
         # Set new values
         modal.release_date = '3/12/1972'
@@ -395,11 +395,11 @@ class EditingSectionsTest(CourseOutlineTest):
         modal.policy = 'Lab'
 
         modal.save()
-        self.assertIn(u'Released: Mar 12, 1972', subsection.release_date)
-        self.assertIn(u'04:01', subsection.release_date)
-        self.assertIn(u'Due: Jul 21, 2014', subsection.due_date)
-        self.assertIn(u'23:39', subsection.due_date)
-        self.assertIn(u'Lab', subsection.policy)
+        self.assertIn('Released: Mar 12, 1972', subsection.release_date)
+        self.assertIn('04:01', subsection.release_date)
+        self.assertIn('Due: Jul 21, 2014', subsection.due_date)
+        self.assertIn('23:39', subsection.due_date)
+        self.assertIn('Lab', subsection.policy)
 
     def test_can_edit_section(self):
         """
@@ -431,13 +431,13 @@ class EditingSectionsTest(CourseOutlineTest):
         self.assertFalse(modal.has_policy())
 
         # Verify initial value
-        self.assertEqual(modal.release_date, u'1/1/1970')
+        self.assertEqual(modal.release_date, '1/1/1970')
 
         # Set new value
         modal.release_date = '5/14/1969'
 
         modal.save()
-        self.assertIn(u'Released: May 14, 1969', section.release_date)
+        self.assertIn('Released: May 14, 1969', section.release_date)
         # Verify that Due date and Policy are not present
         self.assertFalse(section.due_date)
         self.assertFalse(section.policy)
@@ -458,7 +458,7 @@ class EditingSectionsTest(CourseOutlineTest):
         progress_page = ProgressPage(self.browser, self.course_id)
         progress_page.visit()
         progress_page.wait_for_page()
-        self.assertEqual(u'Practice', progress_page.grading_formats[0])
+        self.assertEqual('Practice', progress_page.grading_formats[0])
         self.course_outline_page.visit()
 
         subsection = self.course_outline_page.section(SECTION_NAME).subsection(SUBSECTION_NAME)
@@ -469,7 +469,7 @@ class EditingSectionsTest(CourseOutlineTest):
 
         progress_page.visit()
 
-        self.assertEqual(u'Problem', progress_page.grading_formats[0])
+        self.assertEqual('Problem', progress_page.grading_formats[0])
 
     def test_unchanged_release_date_is_not_saved(self):
         """
@@ -1279,7 +1279,7 @@ class ExpandCollapseMultipleSectionsTest(CourseOutlineTest):
             And all sections are expanded
         """
         self.course_outline_page.visit()
-        self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.COLLAPSE)
+        self.assertEqual(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.COLLAPSE)
         self.verify_all_sections(collapsed=False)
 
     def test_no_expand_link_for_empty_course(self):
@@ -1295,7 +1295,7 @@ class ExpandCollapseMultipleSectionsTest(CourseOutlineTest):
         self.course_outline_page.visit()
         for section in self.course_outline_page.sections():
             section.delete()
-        self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.MISSING)
+        self.assertEqual(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.MISSING)
         self.assertTrue(self.course_outline_page.has_no_content_message)
 
     def test_collapse_all_when_all_expanded(self):
@@ -1310,7 +1310,7 @@ class ExpandCollapseMultipleSectionsTest(CourseOutlineTest):
         self.course_outline_page.visit()
         self.verify_all_sections(collapsed=False)
         self.course_outline_page.toggle_expand_collapse()
-        self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.EXPAND)
+        self.assertEqual(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.EXPAND)
         self.verify_all_sections(collapsed=True)
 
     def test_collapse_all_when_some_expanded(self):
@@ -1327,7 +1327,7 @@ class ExpandCollapseMultipleSectionsTest(CourseOutlineTest):
         self.verify_all_sections(collapsed=False)
         self.course_outline_page.section_at(0).expand_subsection()
         self.course_outline_page.toggle_expand_collapse()
-        self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.EXPAND)
+        self.assertEqual(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.EXPAND)
         self.verify_all_sections(collapsed=True)
 
     def test_expand_all_when_all_collapsed(self):
@@ -1341,9 +1341,9 @@ class ExpandCollapseMultipleSectionsTest(CourseOutlineTest):
         """
         self.course_outline_page.visit()
         self.course_outline_page.toggle_expand_collapse()
-        self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.EXPAND)
+        self.assertEqual(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.EXPAND)
         self.course_outline_page.toggle_expand_collapse()
-        self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.COLLAPSE)
+        self.assertEqual(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.COLLAPSE)
         self.verify_all_sections(collapsed=False)
 
     def test_expand_all_when_some_collapsed(self):
@@ -1361,11 +1361,11 @@ class ExpandCollapseMultipleSectionsTest(CourseOutlineTest):
         # if that helps.
         disable_animations(self.course_outline_page)
         self.course_outline_page.toggle_expand_collapse()
-        self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.EXPAND)
+        self.assertEqual(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.EXPAND)
         self.verify_all_sections(collapsed=True)
         self.course_outline_page.section_at(0).expand_subsection()
         self.course_outline_page.toggle_expand_collapse()
-        self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.COLLAPSE)
+        self.assertEqual(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.COLLAPSE)
         self.verify_all_sections(collapsed=False)
 
 
@@ -1389,7 +1389,7 @@ class ExpandCollapseSingleSectionTest(CourseOutlineTest):
         """
         self.course_outline_page.visit()
         self.course_outline_page.section_at(0).delete()
-        self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.MISSING)
+        self.assertEqual(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.MISSING)
         self.assertTrue(self.course_outline_page.has_no_content_message)
 
     def test_old_subsection_stays_collapsed_after_creation(self):
@@ -1429,7 +1429,7 @@ class ExpandCollapseEmptyTest(CourseOutlineTest):
             Then I do not see the "Collapse All Sections" link
         """
         self.course_outline_page.visit()
-        self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.MISSING)
+        self.assertEqual(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.MISSING)
 
     def test_link_appears_after_section_creation(self):
         """
@@ -1441,9 +1441,9 @@ class ExpandCollapseEmptyTest(CourseOutlineTest):
             And all sections are expanded
         """
         self.course_outline_page.visit()
-        self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.MISSING)
+        self.assertEqual(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.MISSING)
         self.course_outline_page.add_section_from_top_button()
-        self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.COLLAPSE)
+        self.assertEqual(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.COLLAPSE)
         self.assertFalse(self.course_outline_page.section_at(0).is_collapsed)
 
 
@@ -1628,7 +1628,7 @@ class PublishSectionTest(CourseOutlineTest):
         """
         Adds unpublished HTML content to first three units in the course.
         """
-        for index in xrange(3):
+        for index in range(3):
             self.course_fixture.create_xblock(
                 self.course_fixture.get_nested_xblocks(category="vertical")[index].locator,
                 XBlockFixtureDesc('html', 'Unpublished HTML Component ' + str(index)),
@@ -1653,10 +1653,10 @@ class DeprecationWarningMessageTest(CourseOutlineTest):
     HEADING_TEXT = 'This course uses features that are no longer supported.'
     COMPONENT_LIST_HEADING = 'You must delete or replace the following components.'
     ADVANCE_MODULES_REMOVE_TEXT = (
-        u'To avoid errors, édX strongly recommends that you remove unsupported features '
-        u'from the course advanced settings. To do this, go to the Advanced Settings '
-        u'page, locate the "Advanced Module List" setting, and then delete the following '
-        u'modules from the list.'
+        'To avoid errors, édX strongly recommends that you remove unsupported features '
+        'from the course advanced settings. To do this, go to the Advanced Settings '
+        'page, locate the "Advanced Module List" setting, and then delete the following '
+        'modules from the list.'
     )
     DEFAULT_DISPLAYNAME = "Deprecated Component"
 

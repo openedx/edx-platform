@@ -83,7 +83,7 @@ def _delete_asset(course_key, asset_key_string):
                 except InvalidKeyError:
                     # Unable to parse the asset key, log and return
                     LOGGER.info(
-                        u"In course %r, unable to parse asset key %r, not attempting to delete signatory.",
+                        "In course %r, unable to parse asset key %r, not attempting to delete signatory.",
                         course_key,
                         asset_key_string,
                     )
@@ -91,7 +91,7 @@ def _delete_asset(course_key, asset_key_string):
             else:
                 # Unable to parse the asset key, log and return
                 LOGGER.info(
-                    u"In course %r, unable to parse asset key %r, not attempting to delete signatory.",
+                    "In course %r, unable to parse asset key %r, not attempting to delete signatory.",
                     course_key,
                     asset_key_string,
                 )
@@ -149,7 +149,7 @@ class CertificateManager(object):
         # Ensure the schema version meets our expectations
         if certificate_data.get("version") != CERTIFICATE_SCHEMA_VERSION:
             raise TypeError(
-                u"Unsupported certificate schema version: {0}.  Expected version: {1}.".format(
+                "Unsupported certificate schema version: {0}.  Expected version: {1}.".format(
                     certificate_data.get("version"),
                     CERTIFICATE_SCHEMA_VERSION
                 )
@@ -238,7 +238,7 @@ class CertificateManager(object):
         # Ensure the schema fieldset meets our expectations
         for key in ("name", "description", "version"):
             if key not in value:
-                raise CertificateValidationError(_(u"Certificate dict {0} missing value key '{1}'").format(value, key))
+                raise CertificateValidationError(_("Certificate dict {0} missing value key '{1}'").format(value, key))
 
         # Load up the Certificate data
         certificate_data = CertificateManager.parse(value)
@@ -343,7 +343,7 @@ def certificate_activation_handler(request, course_key_string):
     try:
         course = _get_course_and_check_access(course_key, request.user)
     except PermissionDenied:
-        msg = _(u'PermissionDenied: Failed in authenticating {user}').format(user=request.user)
+        msg = _('PermissionDenied: Failed in authenticating {user}').format(user=request.user)
         return JsonResponse({"error": msg}, status=403)
 
     data = json.loads(request.body)
@@ -358,7 +358,7 @@ def certificate_activation_handler(request, course_key_string):
     store.update_item(course, request.user.id)
     cert_event_type = 'activated' if is_active else 'deactivated'
     CertificateManager.track_event(cert_event_type, {
-        'course_id': unicode(course.id),
+        'course_id': str(course.id),
     })
     return HttpResponse(status=200)
 
@@ -381,7 +381,7 @@ def certificates_list_handler(request, course_key_string):
         try:
             course = _get_course_and_check_access(course_key, request.user)
         except PermissionDenied:
-            msg = _(u'PermissionDenied: Failed in authenticating {user}').format(user=request.user)
+            msg = _('PermissionDenied: Failed in authenticating {user}').format(user=request.user)
             return JsonResponse({"error": msg}, status=403)
 
         if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
@@ -446,7 +446,7 @@ def certificates_list_handler(request, course_key_string):
                 )
                 store.update_item(course, request.user.id)
                 CertificateManager.track_event('created', {
-                    'course_id': unicode(course.id),
+                    'course_id': str(course.id),
                     'configuration_id': new_certificate.id
                 })
                 course = _get_course_and_check_access(course_key, request.user)
@@ -503,7 +503,7 @@ def certificates_detail_handler(request, course_key_string, certificate_id):
 
         store.update_item(course, request.user.id)
         CertificateManager.track_event(cert_event_type, {
-            'course_id': unicode(course.id),
+            'course_id': str(course.id),
             'configuration_id': serialized_certificate["id"]
         })
         return JsonResponse(serialized_certificate, status=201)
@@ -525,7 +525,7 @@ def certificates_detail_handler(request, course_key_string, certificate_id):
             certificate_id=certificate_id
         )
         CertificateManager.track_event('deleted', {
-            'course_id': unicode(course.id),
+            'course_id': str(course.id),
             'configuration_id': certificate_id
         })
         return JsonResponse(status=204)

@@ -90,7 +90,7 @@ class ProblemSubmissionTestMixin(TestCase):
         answer_key_prefix = 'input_{}_'.format(problem_location.html_id())
 
         # format the response dictionary to be sent in the post request by adding the above prefix to each key
-        response_dict = {(answer_key_prefix + k): v for k, v in responses.items()}
+        response_dict = {(answer_key_prefix + k): v for k, v in list(responses.items())}
         resp = self.client.post(modx_url, response_dict)
 
         return resp
@@ -175,7 +175,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
             question_text='The correct answer is Correct',
             num_inputs=num_inputs,
             weight=num_inputs,
-            options=['Correct', 'Incorrect', u'ⓤⓝⓘⓒⓞⓓⓔ'],
+            options=['Correct', 'Incorrect', 'ⓤⓝⓘⓒⓞⓓⓔ'],
             correct_option='Correct'
         )
 
@@ -276,14 +276,14 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
         Returns list of scores: [<points on hw_1>, <points on hw_2>, ..., <points on hw_n>]
         """
         return [
-            s.graded_total.earned for s in self.get_course_grade().graded_subsections_by_format['Homework'].itervalues()
+            s.graded_total.earned for s in self.get_course_grade().graded_subsections_by_format['Homework'].values()
         ]
 
     def hw_grade(self, hw_url_name):
         """
         Returns SubsectionGrade for given url.
         """
-        for chapter in self.get_course_grade().chapter_grades.itervalues():
+        for chapter in self.get_course_grade().chapter_grades.values():
             for section in chapter['sections']:
                 if section.url_name == hw_url_name:
                     return section
@@ -296,7 +296,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
         Returns list of scores for the given homework:
             [<points on problem_1>, <points on problem_2>, ..., <points on problem_n>]
         """
-        return [s.earned for s in self.hw_grade(hw_url_name).problem_scores.values()]
+        return [s.earned for s in list(self.hw_grade(hw_url_name).problem_scores.values())]
 
 
 class TestCourseGrades(TestSubmittingProblems):
@@ -320,9 +320,9 @@ class TestCourseGrades(TestSubmittingProblems):
         Verifies the problem score and the homework grade are as expected.
         """
         hw_grade = self.hw_grade('homework')
-        problem_score = hw_grade.problem_scores.values()[0]
-        self.assertEquals((problem_score.earned, problem_score.possible), expected_problem_score)
-        self.assertEquals((hw_grade.graded_total.earned, hw_grade.graded_total.possible), expected_hw_grade)
+        problem_score = list(hw_grade.problem_scores.values())[0]
+        self.assertEqual((problem_score.earned, problem_score.possible), expected_problem_score)
+        self.assertEqual((hw_grade.graded_total.earned, hw_grade.graded_total.possible), expected_hw_grade)
 
     def test_basic(self):
         self._submit_correct_answer()
@@ -406,7 +406,7 @@ class TestCourseGrader(TestSubmittingProblems):
             ]
         }
         self.add_grading_policy(grading_policy)
-        compute_all_grades_for_course.apply_async(kwargs={'course_key': unicode(self.course.id)})
+        compute_all_grades_for_course.apply_async(kwargs={'course_key': str(self.course.id)})
 
     def dropping_setup(self):
         """
@@ -482,7 +482,7 @@ class TestCourseGrader(TestSubmittingProblems):
 
     def test_show_answer_doesnt_write_to_csm(self):
         self.basic_setup()
-        self.submit_question_answer('p1', {'2_1': u'Correct'})
+        self.submit_question_answer('p1', {'2_1': 'Correct'})
 
         # Now fetch the state entry for that problem.
         student_module = StudentModule.objects.filter(
@@ -582,8 +582,8 @@ class TestCourseGrader(TestSubmittingProblems):
 
         student_item = {
             'student_id': anonymous_id_for_user(self.student_user, self.course.id),
-            'course_id': unicode(self.course.id),
-            'item_id': unicode(self.problem_location('p3')),
+            'course_id': str(self.course.id),
+            'item_id': str(self.problem_location('p3')),
             'item_type': 'problem'
         }
         submission = submissions_api.create_submission(student_item, 'any answer')
@@ -800,8 +800,8 @@ class ProblemWithUploadedFilesTest(TestSubmittingProblems):
         self.assertEqual(name, "post")
         self.assertEqual(len(args), 1)
         self.assertTrue(args[0].endswith("/submit/"))
-        self.assertItemsEqual(kwargs.keys(), ["files", "data", "timeout"])
-        self.assertItemsEqual(kwargs['files'].keys(), filenames.split())
+        self.assertItemsEqual(list(kwargs.keys()), ["files", "data", "timeout"])
+        self.assertItemsEqual(list(kwargs['files'].keys()), filenames.split())
 
 
 class TestPythonGradedResponse(TestSubmittingProblems):

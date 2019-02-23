@@ -10,9 +10,9 @@ from mock import patch
 from pytz import UTC
 from splinter.exceptions import ElementDoesNotExist
 
-from common import visit_scenario_item
-from courseware.access import has_access
-from courseware.tests.factories import BetaTesterFactory, InstructorFactory
+from .common import visit_scenario_item
+from .courseware.access import has_access
+from .courseware.tests.factories import BetaTesterFactory, InstructorFactory
 from openedx.core.lib.tests.tools import assert_equal, assert_in, assert_true  # pylint: disable=no-name-in-module
 from student.tests.factories import UserFactory
 
@@ -103,7 +103,7 @@ def add_correct_lti_to_course(_step, fields):
         pass
     elif fields.strip() == 'no_launch_url':
         metadata.update({
-            'launch_url': u''
+            'launch_url': ''
         })
     else:  # incorrect parameter
         assert False
@@ -205,11 +205,11 @@ def check_lti_popup(parent_window):
     # both are there.
     tabs = []
     expected_tabs = [
-        u'LTI | Test Section | {course} Courseware | {platform}'.format(
+        'LTI | Test Section | {course} Courseware | {platform}'.format(
             course=TEST_COURSE_NAME,
             platform=settings.PLATFORM_NAME
         ),
-        u'TEST TITLE'
+        'TEST TITLE'
     ]
 
     for window in windows:
@@ -224,10 +224,10 @@ def check_lti_popup(parent_window):
     url = world.browser.url
     basename = os.path.basename(url)
     pathname = os.path.splitext(basename)[0]
-    assert_equal(pathname, u'correct_lti_endpoint')
+    assert_equal(pathname, 'correct_lti_endpoint')
 
     result = world.css_find('.result').first.text
-    assert_equal(result, u'This is LTI tool. Success.')
+    assert_equal(result, 'This is LTI tool. Success.')
 
     world.browser.driver.close()  # Close the pop-up window
     world.browser.switch_to_window(parent_window)  # Switch to the main window again
@@ -271,14 +271,14 @@ def see_graph(_step, progress):
 def see_value_in_the_gradebook(_step, label, text):
     table_selector = '.grade-table'
     index = 0
-    table_headers = world.css_find(u'{0} thead th'.format(table_selector))
+    table_headers = world.css_find('{0} thead th'.format(table_selector))
 
     for i, element in enumerate(table_headers):
         if element.text.strip() == label:
             index = i
             break
 
-    assert_true(world.css_has_text(u'{0} tbody td'.format(table_selector), text, index=index))
+    assert_true(world.css_has_text('{0} tbody td'.format(table_selector), text, index=index))
 
 
 @step('I submit answer to LTI (.*) question$')

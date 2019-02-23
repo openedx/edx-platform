@@ -127,7 +127,7 @@ class Theme(object):
         return hash((self.theme_dir_name, self.path))
 
     def __unicode__(self):
-        return u"<Theme: {name} at '{path}'>".format(name=self.name, path=self.path)
+        return "<Theme: {name} at '{path}'>".format(name=self.name, path=self.path)
 
     def __repr__(self):
         return self.__unicode__()

@@ -2,7 +2,7 @@
 Utilities related to caching.
 """
 import collections
-import cPickle as pickle
+import pickle as pickle
 import functools
 import itertools
 import zlib
@@ -85,18 +85,18 @@ def _func_call_cache_key(func, arg_map_function, *args, **kwargs):
     """
     arg_map_function = arg_map_function or force_text
 
-    converted_args = map(arg_map_function, args)
-    converted_kwargs = map(arg_map_function, _sorted_kwargs_list(kwargs))
+    converted_args = list(map(arg_map_function, args))
+    converted_kwargs = list(map(arg_map_function, _sorted_kwargs_list(kwargs)))
 
-    cache_keys = [func.__module__, func.func_name] + converted_args + converted_kwargs
-    return u'.'.join(cache_keys)
+    cache_keys = [func.__module__, func.__name__] + converted_args + converted_kwargs
+    return '.'.join(cache_keys)
 
 
 def _sorted_kwargs_list(kwargs):
     """
     Returns a unique and deterministic ordered list from the given kwargs.
     """
-    sorted_kwargs = sorted(kwargs.iteritems())
+    sorted_kwargs = sorted(kwargs.items())
     sorted_kwargs_list = list(itertools.chain(*sorted_kwargs))
     return sorted_kwargs_list
 

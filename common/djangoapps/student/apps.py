@@ -1,7 +1,7 @@
 """
 Configuration for the ``student`` Django application.
 """
-from __future__ import absolute_import
+
 
 from django.apps import AppConfig
 from django.contrib.auth.signals import user_logged_in

@@ -1,7 +1,7 @@
 """
 Tests for paver quality tasks
 """
-from __future__ import print_function
+
 import os
 import shutil
 import tempfile

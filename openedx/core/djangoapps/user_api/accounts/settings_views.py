@@ -67,7 +67,7 @@ def account_settings_context(request):
     """
     user = request.user
 
-    year_of_birth_options = [(unicode(year), unicode(year)) for year in UserProfile.VALID_YEARS]
+    year_of_birth_options = [(str(year), str(year)) for year in UserProfile.VALID_YEARS]
     try:
         user_orders = get_user_orders(user)
     except:  # pylint: disable=bare-except
@@ -210,19 +210,19 @@ def _get_extended_profile_fields():
                               'gender', 'year_of_birth', 'language_proficiencies', 'social_links']
 
     field_labels_map = {
-        "first_name": _(u"First Name"),
-        "last_name": _(u"Last Name"),
-        "city": _(u"City"),
-        "state": _(u"State/Province/Region"),
-        "company": _(u"Company"),
-        "title": _(u"Title"),
-        "job_title": _(u"Job Title"),
-        "mailing_address": _(u"Mailing address"),
-        "goals": _(u"Tell us why you're interested in {platform_name}").format(
+        "first_name": _("First Name"),
+        "last_name": _("Last Name"),
+        "city": _("City"),
+        "state": _("State/Province/Region"),
+        "company": _("Company"),
+        "title": _("Title"),
+        "job_title": _("Job Title"),
+        "mailing_address": _("Mailing address"),
+        "goals": _("Tell us why you're interested in {platform_name}").format(
             platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME)
         ),
-        "profession": _(u"Profession"),
-        "specialty": _(u"Specialty")
+        "profession": _("Profession"),
+        "specialty": _("Specialty")
     }
 
     extended_profile_field_names = configuration_helpers.get_value('extended_profile_fields', [])
@@ -232,7 +232,7 @@ def _get_extended_profile_fields():
 
     extended_profile_field_options = configuration_helpers.get_value('EXTRA_FIELD_OPTIONS', [])
     extended_profile_field_option_tuples = {}
-    for field in extended_profile_field_options.keys():
+    for field in list(extended_profile_field_options.keys()):
         field_options = extended_profile_field_options[field]
         extended_profile_field_option_tuples[field] = [(option.lower(), option) for option in field_options]
 

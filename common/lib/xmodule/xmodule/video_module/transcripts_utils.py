@@ -12,7 +12,7 @@ import logging
 from pysrt import SubRipTime, SubRipItem, SubRipFile
 from pysrt.srtexc import Error
 from lxml import etree
-from HTMLParser import HTMLParser
+from html.parser import HTMLParser
 from six import text_type
 
 from xmodule.exceptions import NotFoundError
@@ -266,7 +266,7 @@ def generate_subs_from_source(speed_subs, subs_type, subs_filedata, item, langua
         'end': sub_ends,
         'text': sub_texts}
 
-    for speed, subs_id in speed_subs.iteritems():
+    for speed, subs_id in speed_subs.items():
         save_subs_to_store(
             generate_subs(speed, 1, subs),
             subs_id,
@@ -300,7 +300,7 @@ def generate_srt_from_sjson(sjson_subs, speed):
             end=SubRipTime(milliseconds=sjson_speed_1['end'][i]),
             text=sjson_speed_1['text'][i]
         )
-        output += (unicode(item))
+        output += (str(item))
         output += '\n'
     return output
 
@@ -338,7 +338,7 @@ def copy_or_rename_transcript(new_name, old_name, item, delete_old=False, user=N
     If `old_name` is not found in storage, raises `NotFoundError`.
     If `delete_old` is True, removes `old_name` files from storage.
     """
-    filename = u'subs_{0}.srt.sjson'.format(old_name)
+    filename = 'subs_{0}.srt.sjson'.format(old_name)
     content_location = StaticContent.compute_location(item.location.course_key, filename)
     transcripts = contentstore().find(content_location).data
     save_subs_to_store(json.loads(transcripts), new_name, item)
@@ -417,7 +417,7 @@ def manage_video_subtitles_save(item, user, old_metadata=None, generate_translat
 
     # 2.
     if generate_translation:
-        for lang, filename in item.transcripts.items():
+        for lang, filename in list(item.transcripts.items()):
             item.transcripts[lang] = os.path.split(filename)[-1]
 
     # 3.
@@ -439,7 +439,7 @@ def manage_video_subtitles_save(item, user, old_metadata=None, generate_translat
                 generate_sjson_for_all_speeds(
                     item,
                     item.transcripts[lang],
-                    {speed: subs_id for subs_id, speed in youtube_speed_dict(item).iteritems()},
+                    {speed: subs_id for subs_id, speed in youtube_speed_dict(item).items()},
                     lang,
                 )
             except TranscriptException as ex:
@@ -464,9 +464,9 @@ def subs_filename(subs_id, lang='en'):
     Generate proper filename for storage.
     """
     if lang == 'en':
-        return u'subs_{0}.srt.sjson'.format(subs_id)
+        return 'subs_{0}.srt.sjson'.format(subs_id)
     else:
-        return u'{0}_subs_{1}.srt.sjson'.format(lang, subs_id)
+        return '{0}_subs_{1}.srt.sjson'.format(lang, subs_id)
 
 
 def generate_sjson_for_all_speeds(item, user_filename, result_subs_dict, lang):
@@ -537,13 +537,13 @@ def get_video_ids_info(edx_video_id, youtube_id_1_0, html5_sources):
     Returns:
         tuple: external or internal, video ids list
     """
-    clean = lambda item: item.strip() if isinstance(item, basestring) else item
+    clean = lambda item: item.strip() if isinstance(item, str) else item
     external = not bool(clean(edx_video_id))
 
     video_ids = [edx_video_id, youtube_id_1_0] + get_html5_ids(html5_sources)
 
     # video_ids cleanup
-    video_ids = filter(lambda item: bool(clean(item)), video_ids)
+    video_ids = [item for item in video_ids if bool(clean(item))]
 
     return external, video_ids
 
@@ -609,7 +609,7 @@ def convert_video_transcript(file_name, content, output_format):
     """
     name_and_extension = os.path.splitext(file_name)
     basename, input_format = name_and_extension[0], name_and_extension[1][1:]
-    filename = u'{base_name}.{ext}'.format(base_name=basename, ext=output_format)
+    filename = '{base_name}.{ext}'.format(base_name=basename, ext=output_format)
     converted_transcript = Transcript.convert(content, input_format=input_format, output_format=output_format)
 
     return dict(filename=filename, content=converted_transcript)
@@ -754,7 +754,7 @@ class VideoTranscriptsMixin(object):
             if sub:
                 all_langs.update({'en': sub})
 
-            for language, filename in all_langs.iteritems():
+            for language, filename in all_langs.items():
                 try:
                     # for bumper videos, transcripts are stored in content store only
                     if is_bumper:
@@ -804,11 +804,11 @@ class VideoTranscriptsMixin(object):
                 raise ValueError
 
             data = Transcript.asset(self.location, transcript_name, lang).data
-            filename = u'{}.{}'.format(transcript_name, transcript_format)
+            filename = '{}.{}'.format(transcript_name, transcript_format)
             content = Transcript.convert(data, 'sjson', transcript_format)
         else:
             data = Transcript.asset(self.location, None, None, other_lang[lang]).data
-            filename = u'{}.{}'.format(os.path.splitext(other_lang[lang])[0], transcript_format)
+            filename = '{}.{}'.format(os.path.splitext(other_lang[lang])[0], transcript_format)
             content = Transcript.convert(data, 'srt', transcript_format)
 
         if not content:
@@ -828,11 +828,11 @@ class VideoTranscriptsMixin(object):
         if self.transcript_language in other_lang:
             transcript_language = self.transcript_language
         elif sub:
-            transcript_language = u'en'
+            transcript_language = 'en'
         elif len(other_lang) > 0:
             transcript_language = sorted(other_lang)[0]
         else:
-            transcript_language = u'en'
+            transcript_language = 'en'
         return transcript_language
 
     def get_transcripts_info(self, is_bumper=False):
@@ -853,7 +853,7 @@ class VideoTranscriptsMixin(object):
         # Only attach transcripts that are not empty.
         transcripts = {
             language_code: transcript_file
-            for language_code, transcript_file in transcripts.items() if transcript_file != ''
+            for language_code, transcript_file in list(transcripts.items()) if transcript_file != ''
         }
 
         # bumper transcripts are stored in content store so we don't need to include val transcripts
@@ -887,7 +887,7 @@ def get_transcript_from_val(edx_video_id, lang=None, output_format=Transcript.SR
     """
     transcript = get_video_transcript_content(edx_video_id, lang)
     if not transcript:
-        raise NotFoundError(u'Transcript not found for {}, lang: {}'.format(edx_video_id, lang))
+        raise NotFoundError('Transcript not found for {}, lang: {}'.format(edx_video_id, lang))
 
     transcript_conversion_props = dict(transcript, output_format=output_format)
     transcript = convert_video_transcript(**transcript_conversion_props)
@@ -955,7 +955,7 @@ def get_transcript_from_contentstore(video, language, output_format, transcripts
     possible_sub_ids = [youtube_id, sub, video.youtube_id_1_0] + get_html5_ids(video.html5_sources)
     for sub_id in possible_sub_ids:
         try:
-            transcripts[u'en'] = sub_id
+            transcripts['en'] = sub_id
             input_format, base_name, transcript_content = get_transcript_for_video(
                 video.location,
                 subs_id=sub_id,
@@ -973,7 +973,7 @@ def get_transcript_from_contentstore(video, language, output_format, transcripts
 
     # add language prefix to transcript file only if language is not None
     language_prefix = '{}_'.format(language) if language else ''
-    transcript_name = u'{}{}.{}'.format(language_prefix, base_name, output_format)
+    transcript_name = '{}{}.{}'.format(language_prefix, base_name, output_format)
     transcript_content = Transcript.convert(transcript_content, input_format=input_format, output_format=output_format)
     if not transcript_content.strip():
         raise NotFoundError('No transcript content')

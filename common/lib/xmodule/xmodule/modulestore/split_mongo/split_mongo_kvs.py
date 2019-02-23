@@ -186,7 +186,7 @@ class SplitMongoKVS(InheritanceKeyValueStore):
                 aside_fields_p = persisted_definition.get('aside_fields')
                 if aside_fields_p:
                     aside_fields = self._definition.field_converter(aside_fields_p)
-                    for aside_type, fields in aside_fields.iteritems():
+                    for aside_type, fields in aside_fields.items():
                         self.aside_fields.setdefault(aside_type, {}).update(fields)
                 # do we want to cache any of the edit_info?
             self._definition = None  # already loaded

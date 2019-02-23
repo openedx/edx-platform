@@ -40,25 +40,25 @@ class TestVideoAPITestCase(MobileAPITestCase):
         self.section = ItemFactory.create(
             parent=self.course,
             category="chapter",
-            display_name=u"test factory section omega \u03a9",
+            display_name="test factory section omega \u03a9",
         )
         self.sub_section = ItemFactory.create(
             parent=self.section,
             category="sequential",
-            display_name=u"test subsection omega \u03a9",
+            display_name="test subsection omega \u03a9",
         )
 
         self.unit = ItemFactory.create(
             parent=self.sub_section,
             category="vertical",
             metadata={'graded': True, 'format': 'Homework'},
-            display_name=u"test unit omega \u03a9",
+            display_name="test unit omega \u03a9",
         )
         self.other_unit = ItemFactory.create(
             parent=self.sub_section,
             category="vertical",
             metadata={'graded': True, 'format': 'Homework'},
-            display_name=u"test unit omega 2 \u03a9",
+            display_name="test unit omega 2 \u03a9",
         )
         self.nameless_unit = ItemFactory.create(
             parent=self.sub_section,
@@ -82,9 +82,9 @@ class TestVideoAPITestCase(MobileAPITestCase):
         api.create_video({
             'edx_video_id': self.edx_video_id,
             'status': 'test',
-            'client_video_id': u"test video omega \u03a9",
+            'client_video_id': "test video omega \u03a9",
             'duration': 12,
-            'courses': [unicode(self.course.id)],
+            'courses': [str(self.course.id)],
             'encoded_videos': [
                 {
                     'profile': 'youtube',
@@ -138,7 +138,7 @@ class TestVideoAPIMixin(object):
             parent=self.unit,
             category="video",
             edx_video_id=self.edx_video_id,
-            display_name=u"test video omega \u03a9",
+            display_name="test video omega \u03a9",
             sub=subid
         )
 
@@ -187,18 +187,18 @@ class TestVideoAPIMixin(object):
         self.split_test = ItemFactory.create(
             parent=self.unit,
             category="split_test",
-            display_name=u"split test unit",
+            display_name="split test unit",
             user_partition_id=0,
         )
         sub_block_a = ItemFactory.create(
             parent=self.split_test,
             category=sub_block_category,
-            display_name=u"split test block a",
+            display_name="split test block a",
         )
         sub_block_b = ItemFactory.create(
             parent=self.split_test,
             category=sub_block_category,
-            display_name=u"split test block b",
+            display_name="split test block b",
         )
         self.split_test.group_id_to_child = {
             str(index): url for index, url in enumerate([sub_block_a.location, sub_block_b.location])
@@ -219,27 +219,27 @@ class TestNonStandardCourseStructure(MobileAPITestCase, TestVideoAPIMixin, Miles
         self.chapter_under_course = ItemFactory.create(
             parent=self.course,
             category="chapter",
-            display_name=u"test factory chapter under course omega \u03a9",
+            display_name="test factory chapter under course omega \u03a9",
         )
         self.section_under_course = ItemFactory.create(
             parent=self.course,
             category="sequential",
-            display_name=u"test factory section under course omega \u03a9",
+            display_name="test factory section under course omega \u03a9",
         )
         self.section_under_chapter = ItemFactory.create(
             parent=self.chapter_under_course,
             category="sequential",
-            display_name=u"test factory section under chapter omega \u03a9",
+            display_name="test factory section under chapter omega \u03a9",
         )
         self.vertical_under_course = ItemFactory.create(
             parent=self.course,
             category="vertical",
-            display_name=u"test factory vertical under course omega \u03a9",
+            display_name="test factory vertical under course omega \u03a9",
         )
         self.vertical_under_section = ItemFactory.create(
             parent=self.section_under_chapter,
             category="vertical",
-            display_name=u"test factory vertical under section omega \u03a9",
+            display_name="test factory vertical under section omega \u03a9",
         )
 
     @ddt.data(API_V05, API_V1)
@@ -251,13 +251,13 @@ class TestNonStandardCourseStructure(MobileAPITestCase, TestVideoAPIMixin, Miles
         ItemFactory.create(
             parent=self.course,
             category="video",
-            display_name=u"test factory video omega \u03a9",
+            display_name="test factory video omega \u03a9",
         )
         course_outline = self.api_response(api_version=api_version).data
         self.assertEqual(len(course_outline), 1)
         section_url = course_outline[0]["section_url"]
         unit_url = course_outline[0]["unit_url"]
-        self.assertRegexpMatches(section_url, r'courseware$')
+        self.assertRegex(section_url, r'courseware$')
         self.assertEqual(section_url, unit_url)
 
         self._verify_paths(course_outline, [])
@@ -271,13 +271,13 @@ class TestNonStandardCourseStructure(MobileAPITestCase, TestVideoAPIMixin, Miles
         ItemFactory.create(
             parent=self.vertical_under_course,
             category="video",
-            display_name=u"test factory video omega \u03a9",
+            display_name="test factory video omega \u03a9",
         )
         course_outline = self.api_response(api_version=api_version).data
         self.assertEqual(len(course_outline), 1)
         section_url = course_outline[0]["section_url"]
         unit_url = course_outline[0]["unit_url"]
-        self.assertRegexpMatches(
+        self.assertRegex(
             section_url,
             r'courseware/test_factory_vertical_under_course_omega_%CE%A9/$'
         )
@@ -286,7 +286,7 @@ class TestNonStandardCourseStructure(MobileAPITestCase, TestVideoAPIMixin, Miles
         self._verify_paths(
             course_outline,
             [
-                u'test factory vertical under course omega \u03a9'
+                'test factory vertical under course omega \u03a9'
             ]
         )
 
@@ -300,13 +300,13 @@ class TestNonStandardCourseStructure(MobileAPITestCase, TestVideoAPIMixin, Miles
         ItemFactory.create(
             parent=self.chapter_under_course,
             category="video",
-            display_name=u"test factory video omega \u03a9",
+            display_name="test factory video omega \u03a9",
         )
         course_outline = self.api_response(api_version=api_version).data
         self.assertEqual(len(course_outline), 1)
         section_url = course_outline[0]["section_url"]
         unit_url = course_outline[0]["unit_url"]
-        self.assertRegexpMatches(
+        self.assertRegex(
             section_url,
             r'courseware/test_factory_chapter_under_course_omega_%CE%A9/$'
         )
@@ -316,7 +316,7 @@ class TestNonStandardCourseStructure(MobileAPITestCase, TestVideoAPIMixin, Miles
         self._verify_paths(
             course_outline,
             [
-                u'test factory chapter under course omega \u03a9',
+                'test factory chapter under course omega \u03a9',
             ]
         )
 
@@ -329,13 +329,13 @@ class TestNonStandardCourseStructure(MobileAPITestCase, TestVideoAPIMixin, Miles
         ItemFactory.create(
             parent=self.section_under_course,
             category="video",
-            display_name=u"test factory video omega \u03a9",
+            display_name="test factory video omega \u03a9",
         )
         course_outline = self.api_response(api_version=api_version).data
         self.assertEqual(len(course_outline), 1)
         section_url = course_outline[0]["section_url"]
         unit_url = course_outline[0]["unit_url"]
-        self.assertRegexpMatches(
+        self.assertRegex(
             section_url,
             r'courseware/test_factory_section_under_course_omega_%CE%A9/$'
         )
@@ -345,7 +345,7 @@ class TestNonStandardCourseStructure(MobileAPITestCase, TestVideoAPIMixin, Miles
         self._verify_paths(
             course_outline,
             [
-                u'test factory section under course omega \u03a9',
+                'test factory section under course omega \u03a9',
             ]
         )
 
@@ -359,13 +359,13 @@ class TestNonStandardCourseStructure(MobileAPITestCase, TestVideoAPIMixin, Miles
         ItemFactory.create(
             parent=self.section_under_chapter,
             category="video",
-            display_name=u"meow factory video omega \u03a9",
+            display_name="meow factory video omega \u03a9",
         )
         course_outline = self.api_response(api_version=api_version).data
         self.assertEqual(len(course_outline), 1)
         section_url = course_outline[0]["section_url"]
         unit_url = course_outline[0]["unit_url"]
-        self.assertRegexpMatches(
+        self.assertRegex(
             section_url,
             (
                 r'courseware/test_factory_chapter_under_course_omega_%CE%A9/' +
@@ -378,8 +378,8 @@ class TestNonStandardCourseStructure(MobileAPITestCase, TestVideoAPIMixin, Miles
         self._verify_paths(
             course_outline,
             [
-                u'test factory chapter under course omega \u03a9',
-                u'test factory section under chapter omega \u03a9',
+                'test factory chapter under course omega \u03a9',
+                'test factory section under chapter omega \u03a9',
             ]
         )
 
@@ -392,20 +392,20 @@ class TestNonStandardCourseStructure(MobileAPITestCase, TestVideoAPIMixin, Miles
         ItemFactory.create(
             parent=self.vertical_under_section,
             category="video",
-            display_name=u"test factory video omega \u03a9",
+            display_name="test factory video omega \u03a9",
         )
         course_outline = self.api_response(api_version=api_version).data
         self.assertEqual(len(course_outline), 1)
         section_url = course_outline[0]["section_url"]
         unit_url = course_outline[0]["unit_url"]
-        self.assertRegexpMatches(
+        self.assertRegex(
             section_url,
             (
                 r'courseware/test_factory_chapter_under_course_omega_%CE%A9/' +
                 'test_factory_section_under_chapter_omega_%CE%A9/$'
             )
         )
-        self.assertRegexpMatches(
+        self.assertRegex(
             unit_url,
             (
                 r'courseware/test_factory_chapter_under_course_omega_%CE%A9/' +
@@ -416,9 +416,9 @@ class TestNonStandardCourseStructure(MobileAPITestCase, TestVideoAPIMixin, Miles
         self._verify_paths(
             course_outline,
             [
-                u'test factory chapter under course omega \u03a9',
-                u'test factory section under chapter omega \u03a9',
-                u'test factory vertical under section omega \u03a9'
+                'test factory chapter under course omega \u03a9',
+                'test factory section under chapter omega \u03a9',
+                'test factory vertical under section omega \u03a9'
             ]
         )
 
@@ -453,7 +453,7 @@ class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileCour
         ItemFactory.create(
             parent=self.unit,
             category="video",
-            display_name=u"test video",
+            display_name="test video",
             only_on_web=True,
             subid=subid
         )
@@ -482,9 +482,9 @@ class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileCour
         api.create_video({
             'edx_video_id': edx_video_id,
             'status': 'test',
-            'client_video_id': u"test video omega \u03a9",
+            'client_video_id': "test video omega \u03a9",
             'duration': 12,
-            'courses': [unicode(self.course.id)],
+            'courses': [str(self.course.id)],
             'encoded_videos': [
                 {
                     'profile': 'youtube',
@@ -503,16 +503,16 @@ class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileCour
         ItemFactory.create(
             parent=self.other_unit,
             category="video",
-            display_name=u"testing mobile high video",
+            display_name="testing mobile high video",
             edx_video_id=edx_video_id,
         )
 
         expected_output = {
             'all_sources': [],
-            'category': u'video',
+            'category': 'video',
             'video_thumbnail_url': None,
-            'language': u'en',
-            'name': u'testing mobile high video',
+            'language': 'en',
+            'name': 'testing mobile high video',
             'video_url': self.video_url_high,
             'duration': 12.0,
             'transcripts': {
@@ -520,11 +520,11 @@ class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileCour
             },
             'only_on_web': False,
             'encoded_videos': {
-                u'mobile_high': {
+                'mobile_high': {
                     'url': self.video_url_high,
                     'file_size': 111
                 },
-                u'youtube': {
+                'youtube': {
                     'url': self.youtube_url,
                     'file_size': 2222
                 }
@@ -580,18 +580,18 @@ class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileCour
         descriptor = ItemFactory.create(
             parent=self.other_unit,
             category="video",
-            display_name=u"testing html5 sources",
+            display_name="testing html5 sources",
             edx_video_id=None,
             source=self.video_url_high,
             html5_sources=[self.video_url_low],
         )
         expected_output = {
             'all_sources': [self.video_url_low, self.video_url_high],
-            'category': u'video',
+            'category': 'video',
             'video_thumbnail_url': None,
-            'language': u'en',
-            'id': unicode(descriptor.scope_ids.usage_id),
-            'name': u'testing html5 sources',
+            'language': 'en',
+            'id': str(descriptor.scope_ids.usage_id),
+            'name': 'testing html5 sources',
             'video_url': self.video_url_low,
             'duration': None,
             'transcripts': {
@@ -613,7 +613,7 @@ class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileCour
             parent=self.other_unit,
             category="video",
             edx_video_id="some_non_existent_id_in_val",
-            display_name=u"some non existent video in val",
+            display_name="some non existent video in val",
             html5_sources=[self.html5_video_url]
         )
 
@@ -631,20 +631,20 @@ class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileCour
         ItemFactory.create(
             parent=self.other_unit,
             category="video",
-            display_name=u"test video omega 2 \u03a9",
+            display_name="test video omega 2 \u03a9",
             html5_sources=[self.html5_video_url]
         )
         ItemFactory.create(
             parent=self.other_unit,
             category="video",
-            display_name=u"test video omega 3 \u03a9",
+            display_name="test video omega 3 \u03a9",
             source=self.html5_video_url
         )
         ItemFactory.create(
             parent=self.unit,
             category="video",
             edx_video_id=self.edx_video_id,
-            display_name=u"test draft video omega \u03a9",
+            display_name="test draft video omega \u03a9",
             visible_to_staff_only=True,
         )
 
@@ -653,7 +653,7 @@ class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileCour
         vid = course_outline[0]
         self.assertIn('test_subsection_omega_%CE%A9', vid['section_url'])
         self.assertIn('test_subsection_omega_%CE%A9/1', vid['unit_url'])
-        self.assertIn(u'test_video_omega_\u03a9', vid['summary']['id'])
+        self.assertIn('test_video_omega_\u03a9', vid['summary']['id'])
         self.assertEqual(vid['summary']['video_url'], self.video_url)
         self.assertEqual(vid['summary']['size'], 12345)
         self.assertIn('en', vid['summary']['transcripts'])
@@ -662,7 +662,7 @@ class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileCour
         self.assertEqual(course_outline[1]['summary']['size'], 0)
         self.assertFalse(course_outline[1]['summary']['only_on_web'])
         self.assertEqual(course_outline[1]['path'][2]['name'], self.other_unit.display_name)
-        self.assertEqual(course_outline[1]['path'][2]['id'], unicode(self.other_unit.location))
+        self.assertEqual(course_outline[1]['path'][2]['id'], str(self.other_unit.location))
         self.assertEqual(course_outline[2]['summary']['video_url'], self.html5_video_url)
         self.assertEqual(course_outline[2]['summary']['size'], 0)
         self.assertFalse(course_outline[2]['summary']['only_on_web'])
@@ -674,7 +674,7 @@ class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileCour
             parent=self.nameless_unit,
             category="video",
             edx_video_id=self.edx_video_id,
-            display_name=u"test draft video omega 2 \u03a9"
+            display_name="test draft video omega 2 \u03a9"
         )
         course_outline = self.api_response(api_version=api_version).data
         self.assertEqual(len(course_outline), 1)
@@ -693,7 +693,7 @@ class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileCour
             parent=self.sub_section,
             category="video",
             edx_video_id=self.edx_video_id,
-            display_name=u"video in the sub section"
+            display_name="video in the sub section"
         )
         course_outline = self.api_response(api_version=api_version).data
         self.assertEqual(len(course_outline), 1)
@@ -701,7 +701,7 @@ class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileCour
         section_url = course_outline[0]["section_url"]
         unit_url = course_outline[0]["unit_url"]
         self.assertIn(
-            u'courseware/test_factory_section_omega_%CE%A9/test_subsection_omega_%CE%A9',
+            'courseware/test_factory_section_omega_%CE%A9/test_subsection_omega_%CE%A9',
             section_url
 
         )
@@ -734,7 +734,7 @@ class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileCour
                 ],
                 block_index
             )
-            self.assertIn(u"split test block", video_outline[block_index]["summary"]["name"])
+            self.assertIn("split test block", video_outline[block_index]["summary"]["name"])
 
     @ddt.data(API_V05, API_V1)
     def test_with_split_vertical(self, api_version):
@@ -745,19 +745,19 @@ class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileCour
         ItemFactory.create(
             parent=split_vertical_a,
             category="video",
-            display_name=u"video in vertical a",
+            display_name="video in vertical a",
         )
         ItemFactory.create(
             parent=split_vertical_b,
             category="video",
-            display_name=u"video in vertical b",
+            display_name="video in vertical b",
         )
 
         video_outline = self.api_response(api_version=api_version).data
 
         # user should see only one of the videos (a or b).
         self.assertEqual(len(video_outline), 1)
-        self.assertIn(u"video in vertical", video_outline[0]["summary"]["name"])
+        self.assertIn("video in vertical", video_outline[0]["summary"]["name"])
         a_or_b = video_outline[0]["summary"]["name"][-1:]
         self._verify_paths(
             video_outline,
@@ -766,7 +766,7 @@ class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileCour
                 self.sub_section.display_name,
                 self.unit.display_name,
                 self.split_test.display_name,
-                u"split test block " + a_or_b
+                "split test block " + a_or_b
             ],
         )
 
@@ -775,7 +775,7 @@ class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileCour
         video_block = ItemFactory.create(
             parent=self.unit,
             category="video",
-            display_name=u"video for group " + unicode(group_id),
+            display_name="video for group " + str(group_id),
         )
         self._setup_group_access(video_block, self.partition_id, [group_id])
 
@@ -784,13 +784,13 @@ class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileCour
         vertical_block = ItemFactory.create(
             parent=self.sub_section,
             category="vertical",
-            display_name=u"vertical for group " + unicode(group_id),
+            display_name="vertical for group " + str(group_id),
         )
         self._setup_group_access(vertical_block, self.partition_id, [group_id])
         ItemFactory.create(
             parent=vertical_block,
             category="video",
-            display_name=u"video for group " + unicode(group_id),
+            display_name="video for group " + str(group_id),
         )
 
     @ddt.data(
@@ -808,7 +808,7 @@ class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileCour
         for group_id in [0, 1]:
             getattr(self, content_creator_method_name)(group_id)
 
-            cohorts.append(CohortFactory(course_id=self.course.id, name=u"Cohort " + unicode(group_id)))
+            cohorts.append(CohortFactory(course_id=self.course.id, name="Cohort " + str(group_id)))
             link = CourseUserGroupPartitionGroup(
                 course_user_group=cohorts[group_id],
                 partition_id=self.partition_id,
@@ -823,8 +823,8 @@ class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileCour
             # should only see video for this cohort
             video_outline = self.api_response(api_version=api_version).data
             self.assertEqual(len(video_outline), 1)
-            self.assertEquals(
-                u"video for group " + unicode(cohort_index),
+            self.assertEqual(
+                "video for group " + str(cohort_index),
                 video_outline[0]["summary"]["name"]
             )
 
@@ -878,7 +878,7 @@ class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileCour
             parent=self.nameless_unit,
             category="video",
             edx_video_id=self.edx_video_id,
-            display_name=u"test draft video omega 2 \u03a9"
+            display_name="test draft video omega 2 \u03a9"
         )
 
         language_case = namedtuple('language_case', ['transcripts', 'expected_language'])
@@ -908,7 +908,7 @@ class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileCour
             parent=self.nameless_unit,
             category="video",
             edx_video_id=self.edx_video_id,
-            display_name=u"test draft video omega 2 \u03a9"
+            display_name="test draft video omega 2 \u03a9"
         )
 
         transcript_case = namedtuple('transcript_case', ['transcripts', 'english_subtitle', 'expected_transcripts'])
@@ -962,7 +962,7 @@ class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileCour
             parent=self.nameless_unit,
             category="video",
             edx_video_id=self.edx_video_id,
-            display_name=u"test draft video omega 2 \u03a9"
+            display_name="test draft video omega 2 \u03a9"
         )
 
         mock_get_transcript_languages.return_value = val_transcripts
@@ -972,7 +972,7 @@ class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileCour
 
         course_outline = self.api_response(api_version=api_version).data
         self.assertEqual(len(course_outline), 1)
-        self.assertItemsEqual(course_outline[0]['summary']['transcripts'].keys(), expected_transcripts)
+        self.assertItemsEqual(list(course_outline[0]['summary']['transcripts'].keys()), expected_transcripts)
 
 
 @ddt.ddt
@@ -1002,7 +1002,7 @@ class TestTranscriptsDetail(TestVideoAPITestCase, MobileAuthTestMixin, MobileCou
 
     @ddt.data(API_V05, API_V1)
     def test_transcript_with_unicode_file_name(self, api_version):
-        self.video = self._create_video_with_subs(custom_subid=u'你好')
+        self.video = self._create_video_with_subs(custom_subid='你好')
         self.login_and_enroll()
         self.api_response(expected_response_code=200, lang='en', api_version=api_version)
 
@@ -1020,7 +1020,7 @@ class TestTranscriptsDetail(TestVideoAPITestCase, MobileAuthTestMixin, MobileCou
             'content': json.dumps({
                 'start': [10],
                 'end': [100],
-                'text': [u'Hi, welcome to Edx.'],
+                'text': ['Hi, welcome to Edx.'],
             }),
             'file_name': 'edx.sjson'
         }
@@ -1030,12 +1030,12 @@ class TestTranscriptsDetail(TestVideoAPITestCase, MobileAuthTestMixin, MobileCou
         response = self.api_response(expected_response_code=200, lang='uk', api_version=api_version)
 
         # Expected headers
-        expected_content = u'0\n00:00:00,010 --> 00:00:00,100\nHi, welcome to Edx.\n\n'
+        expected_content = '0\n00:00:00,010 --> 00:00:00,100\nHi, welcome to Edx.\n\n'
         expected_headers = {
             'Content-Disposition': 'attachment; filename="edx.srt"',
             'Content-Type': 'application/x-subrip; charset=utf-8'
         }
         # Assert the actual response
         self.assertEqual(response.content, expected_content)
-        for attribute, value in expected_headers.iteritems():
+        for attribute, value in expected_headers.items():
             self.assertEqual(response.get(attribute), value)

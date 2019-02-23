@@ -44,7 +44,7 @@ class CreateFakeCertTest(TestCase):
         self.assertEqual(cert.mode, 'honor')
 
     def test_too_few_args(self):
-        with self.assertRaisesRegexp(CommandError, 'Error: too few arguments'):
+        with self.assertRaisesRegex(CommandError, 'Error: too few arguments'):
             self._run_command(self.USERNAME)
 
     def _run_command(self, *args, **kwargs):

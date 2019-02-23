@@ -7,7 +7,7 @@ ImportErrors in production where testing packages aren't installed.
 This script counts on scripts/dependencies/enumerate.sh having already
 been run in order to generate a dependency data file to work from.
 """
-from __future__ import absolute_import, print_function
+
 
 import os
 import re
@@ -65,13 +65,13 @@ with open(data_path, 'r') as f:
             if from_root.endswith('/tests'):
                 continue
             # We usually don't care about dependencies between modules in site-packages
-            if from_root.endswith(u'site-packages') and to_root.endswith(u'site-packages'):
+            if from_root.endswith('site-packages') and to_root.endswith('site-packages'):
                 continue
             # Dependencies on django.test and waffle.testutils are ok
-            if to_name.startswith(u'django/test') or to_name == u'waffle/testutils.py':
+            if to_name.startswith('django/test') or to_name == 'waffle/testutils.py':
                 continue
             # Dependencies within pavelib are ok
-            if from_name.startswith(u'pavelib') and to_name.startswith(u'pavelib'):
+            if from_name.startswith('pavelib') and to_name.startswith('pavelib'):
                 continue
             print(dep)
             exit_status = 1

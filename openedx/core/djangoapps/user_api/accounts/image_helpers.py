@@ -15,7 +15,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 
 PROFILE_IMAGE_FILE_EXTENSION = 'jpg'   # All processed profile images are converted to JPEGs
 
-_PROFILE_IMAGE_SIZES = settings.PROFILE_IMAGE_SIZES_MAP.values()
+_PROFILE_IMAGE_SIZES = list(settings.PROFILE_IMAGE_SIZES_MAP.values())
 
 
 def get_profile_image_storage():
@@ -55,7 +55,7 @@ def _get_profile_image_urls(name, storage, file_extension=PROFILE_IMAGE_FILE_EXT
         )
         return '{}?v={}'.format(url, version) if version is not None else url
 
-    return {size_display_name: _make_url(size) for size_display_name, size in settings.PROFILE_IMAGE_SIZES_MAP.items()}
+    return {size_display_name: _make_url(size) for size_display_name, size in list(settings.PROFILE_IMAGE_SIZES_MAP.items())}
 
 
 def get_profile_image_names(username):
@@ -102,7 +102,7 @@ def get_profile_image_urls_for_user(user, request=None):
         urls = _get_default_profile_image_urls()
 
     if request:
-        for key, value in urls.items():
+        for key, value in list(urls.items()):
             urls[key] = request.build_absolute_uri(value)
 
     return urls

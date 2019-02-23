@@ -666,7 +666,7 @@ class CAPAProblemReportHelpersTest(unittest.TestCase):
             </problem>
             """
         )
-        self.assertEquals(problem.find_answer_text(answer_id, choice_id), answer_text)
+        self.assertEqual(problem.find_answer_text(answer_id, choice_id), answer_text)
 
     @ddt.data(
         # Test for ChoiceResponse
@@ -704,7 +704,7 @@ class CAPAProblemReportHelpersTest(unittest.TestCase):
             </problem>
             """
         )
-        self.assertEquals(problem.find_correct_answer_text(answer_id), answer_text)
+        self.assertEqual(problem.find_correct_answer_text(answer_id), answer_text)
 
     def test_find_answer_text_textinput(self):
         problem = new_loncapa_problem(
@@ -716,4 +716,4 @@ class CAPAProblemReportHelpersTest(unittest.TestCase):
             </problem>
             """
         )
-        self.assertEquals(problem.find_answer_text('1_2_1', 'hide'), 'hide')
+        self.assertEqual(problem.find_answer_text('1_2_1', 'hide'), 'hide')

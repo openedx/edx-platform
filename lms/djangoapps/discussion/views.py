@@ -1,7 +1,7 @@
 """
 Views handling read (GET) requests for the Discussion tab and inline discussions.
 """
-from __future__ import print_function
+
 
 import logging
 from functools import wraps
@@ -75,7 +75,7 @@ def make_course_settings(course, user, include_category_map=True):
         'allow_anonymous': course.allow_anonymous,
         'allow_anonymous_to_peers': course.allow_anonymous_to_peers,
         'groups': [
-            {"id": str(group_id), "name": group_name} for group_id, group_name in group_names_by_id.iteritems()
+            {"id": str(group_id), "name": group_name} for group_id, group_name in group_names_by_id.items()
         ]
     }
     if include_category_map:
@@ -106,7 +106,7 @@ def get_threads(request, course, user_info, discussion_id=None, per_page=THREADS
         'per_page': per_page,
         'sort_key': 'activity',
         'text': '',
-        'course_id': unicode(course.id),
+        'course_id': str(course.id),
         'user_id': request.user.id,
         'context': ThreadContext.COURSE,
         'group_id': get_group_id_for_comments_service(request, course.id, discussion_id),  # may raise ValueError
@@ -277,7 +277,7 @@ def forum_form_discussion(request, course_key):
             'corrected_text': query_params['corrected_text'],
         })
     else:
-        course_id = unicode(course.id)
+        course_id = str(course.id)
         tab_view = CourseTabView()
         return tab_view.get(request, course_id, 'discussion')
 
@@ -324,7 +324,7 @@ def single_thread(request, course_key, discussion_id, thread_id):
             'annotated_content_info': annotated_content_info,
         })
     else:
-        course_id = unicode(course.id)
+        course_id = str(course.id)
         tab_view = CourseTabView()
         return tab_view.get(request, course_id, 'discussion', discussion_id=discussion_id, thread_id=thread_id)
 
@@ -428,7 +428,7 @@ def _create_base_discussion_view_context(request, course_key):
 
 
 def _get_discussion_default_topic_id(course):
-    for topic, entry in course.discussion_topics.items():
+    for topic, entry in list(course.discussion_topics.items()):
         if entry.get('default') is True:
             return entry['id']
 
@@ -457,7 +457,7 @@ def _create_discussion_board_context(request, base_context, thread=None):
             if "pinned" not in thread:
                 thread["pinned"] = False
         thread_pages = 1
-        root_url = reverse('forum_form_discussion', args=[unicode(course.id)])
+        root_url = reverse('forum_form_discussion', args=[str(course.id)])
     else:
         threads, query_params = get_threads(request, course, user_info)   # This might process a search query
         thread_pages = query_params['num_pages']
@@ -589,7 +589,7 @@ def user_profile(request, course_key, user_id):
             # 'user_profile' page
             context['load_mathjax'] = False
 
-            return tab_view.get(request, unicode(course_key), 'discussion', profile_page_context=context)
+            return tab_view.get(request, str(course_key), 'discussion', profile_page_context=context)
     except User.DoesNotExist:
         raise Http404
     except ValueError:
@@ -908,7 +908,7 @@ def course_discussions_settings_handler(request, course_key_string):
             )
 
         if not settings_to_change:
-            return JsonResponse({"error": unicode("Bad Request")}, 400)
+            return JsonResponse({"error": str("Bad Request")}, 400)
 
         try:
             if settings_to_change:
@@ -916,7 +916,7 @@ def course_discussions_settings_handler(request, course_key_string):
 
         except ValueError as err:
             # Note: error message not translated because it is not exposed to the user (UI prevents this state).
-            return JsonResponse({"error": unicode(err)}, 400)
+            return JsonResponse({"error": str(err)}, 400)
 
     divided_course_wide_discussions, divided_inline_discussions = get_divided_discussions(
         course, discussion_settings
@@ -939,7 +939,7 @@ def get_divided_discussions(course, discussion_settings):
     divided_course_wide_discussions = []
     divided_inline_discussions = []
 
-    course_wide_discussions = [topic['id'] for __, topic in course.discussion_topics.items()]
+    course_wide_discussions = [topic['id'] for __, topic in list(course.discussion_topics.items())]
     all_discussions = utils.get_discussion_categories_ids(course, None, include_all=True)
 
     for divided_discussion_id in discussion_settings.divided_discussions:

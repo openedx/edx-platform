@@ -24,7 +24,7 @@ class SerializerTestCase(SharedModuleStoreTestCase):
         self.course = CourseFactory.create(
             teams_configuration={
                 "max_team_size": 10,
-                "topics": [{u'name': u'Tøpic', u'description': u'The bést topic!', u'id': u'0'}]
+                "topics": [{'name': 'Tøpic', 'description': 'The bést topic!', 'id': '0'}]
             }
         )
 
@@ -47,7 +47,7 @@ class MembershipSerializerTestCase(SerializerTestCase):
     def test_membership_serializer_expand_user_and_team(self):
         """Verify that the serializer only expands the user and team one level."""
         data = MembershipSerializer(self.team_membership, context={
-            'expand': [u'team', u'user'],
+            'expand': ['team', 'user'],
             'request': RequestFactory().get('/api/team/v0/team_membership')
         }).data
         username = self.user.username
@@ -81,7 +81,7 @@ class TopicSerializerTestCase(SerializerTestCase):
             serializer = TopicSerializer(self.course.teams_topics[0], context={'course_id': self.course.id})
             self.assertEqual(
                 serializer.data,
-                {u'name': u'Tøpic', u'description': u'The bést topic!', u'id': u'0', u'team_count': 0}
+                {'name': 'Tøpic', 'description': 'The bést topic!', 'id': '0', 'team_count': 0}
             )
 
     def test_topic_with_team_count(self):
@@ -94,7 +94,7 @@ class TopicSerializerTestCase(SerializerTestCase):
             serializer = TopicSerializer(self.course.teams_topics[0], context={'course_id': self.course.id})
             self.assertEqual(
                 serializer.data,
-                {u'name': u'Tøpic', u'description': u'The bést topic!', u'id': u'0', u'team_count': 1}
+                {'name': 'Tøpic', 'description': 'The bést topic!', 'id': '0', 'team_count': 1}
             )
 
     def test_scoped_within_course(self):
@@ -106,13 +106,13 @@ class TopicSerializerTestCase(SerializerTestCase):
                 "topics": [duplicate_topic]
             }
         )
-        CourseTeamFactory.create(course_id=self.course.id, topic_id=duplicate_topic[u'id'])
-        CourseTeamFactory.create(course_id=second_course.id, topic_id=duplicate_topic[u'id'])
+        CourseTeamFactory.create(course_id=self.course.id, topic_id=duplicate_topic['id'])
+        CourseTeamFactory.create(course_id=second_course.id, topic_id=duplicate_topic['id'])
         with self.assertNumQueries(1):
             serializer = TopicSerializer(self.course.teams_topics[0], context={'course_id': self.course.id})
             self.assertEqual(
                 serializer.data,
-                {u'name': u'Tøpic', u'description': u'The bést topic!', u'id': u'0', u'team_count': 1}
+                {'name': 'Tøpic', 'description': 'The bést topic!', 'id': '0', 'team_count': 1}
             )
 
 
@@ -139,13 +139,13 @@ class BaseTopicSerializerTestCase(SerializerTestCase):
         """
         self.course.teams_configuration['topics'] = []
         topics = [
-            {u'name': u'Tøpic {}'.format(i), u'description': u'The bést topic! {}'.format(i), u'id': unicode(i)}
-            for i in xrange(num_topics)
+            {'name': 'Tøpic {}'.format(i), 'description': 'The bést topic! {}'.format(i), 'id': str(i)}
+            for i in range(num_topics)
         ]
-        for i in xrange(num_topics):
-            topic_id = unicode(i)
+        for i in range(num_topics):
+            topic_id = str(i)
             self.course.teams_configuration['topics'].append(topics[i])
-            for _ in xrange(teams_per_topic):
+            for _ in range(teams_per_topic):
                 CourseTeamFactory.create(course_id=self.course.id, topic_id=topic_id)
         return topics
 
@@ -159,7 +159,7 @@ class BaseTopicSerializerTestCase(SerializerTestCase):
             serializer = self.serializer(instance=page, context={'course_id': self.course.id})
             self.assertEqual(
                 serializer.data['results'],
-                [self._merge_dicts(topic, {u'team_count': num_teams_per_topic}) for topic in topics]
+                [self._merge_dicts(topic, {'team_count': num_teams_per_topic}) for topic in topics]
             )
 
     def test_no_topics(self):
@@ -218,7 +218,7 @@ class BulkTeamCountTopicSerializerTestCase(BaseTopicSerializerTestCase):
                 "topics": [duplicate_topic]
             }
         )
-        CourseTeamFactory.create(course_id=second_course.id, topic_id=duplicate_topic[u'id'])
+        CourseTeamFactory.create(course_id=second_course.id, topic_id=duplicate_topic['id'])
         self.assert_serializer_output(first_course_topics, num_teams_per_topic=teams_per_topic, num_queries=1)
 
     def _merge_dicts(self, first, second):
@@ -234,13 +234,13 @@ class BulkTeamCountTopicSerializerTestCase(BaseTopicSerializerTestCase):
         """
         self.course.teams_configuration['topics'] = []
         topics = [
-            {u'name': u'Tøpic {}'.format(i), u'description': u'The bést topic! {}'.format(i), u'id': unicode(i)}
-            for i in xrange(num_topics)
+            {'name': 'Tøpic {}'.format(i), 'description': 'The bést topic! {}'.format(i), 'id': str(i)}
+            for i in range(num_topics)
         ]
-        for i in xrange(num_topics):
-            topic_id = unicode(i)
+        for i in range(num_topics):
+            topic_id = str(i)
             self.course.teams_configuration['topics'].append(topics[i])
-            for _ in xrange(teams_per_topic):
+            for _ in range(teams_per_topic):
                 CourseTeamFactory.create(course_id=self.course.id, topic_id=topic_id)
         return topics
 
@@ -252,7 +252,7 @@ class BulkTeamCountTopicSerializerTestCase(BaseTopicSerializerTestCase):
             serializer = self.serializer(topics, context={'course_id': self.course.id}, many=True)
             self.assertEqual(
                 serializer.data,
-                [self._merge_dicts(topic, {u'team_count': num_teams_per_topic}) for topic in topics]
+                [self._merge_dicts(topic, {'team_count': num_teams_per_topic}) for topic in topics]
             )
 
     def test_no_topics(self):

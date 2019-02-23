@@ -50,7 +50,7 @@ class PersistentGradesEnabledFlag(ConfigurationModel):
 
     def __unicode__(self):
         current_model = PersistentGradesEnabledFlag.current()
-        return u"PersistentGradesEnabledFlag: enabled {}".format(
+        return "PersistentGradesEnabledFlag: enabled {}".format(
             current_model.is_enabled()
         )
 
@@ -75,7 +75,7 @@ class CoursePersistentGradesFlag(ConfigurationModel):
         not_en = "Not "
         if self.enabled:
             not_en = ""
-        return u"Course '{}': Persistent Grades {}Enabled".format(text_type(self.course_id), not_en)
+        return "Course '{}': Persistent Grades {}Enabled".format(text_type(self.course_id), not_en)
 
 
 class ComputeGradesSetting(ConfigurationModel):

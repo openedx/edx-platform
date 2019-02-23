@@ -31,10 +31,10 @@ class Command(BaseCommand):
             assets_deleted = content_store.remove_redundant_content_for_courses()
             success = True
         except Exception as err:
-            log.info("=" * 30 + u"> failed to cleanup")
+            log.info("=" * 30 + "> failed to cleanup")
             log.info("Error:")
             log.info(err)
 
         if success:
             log.info("=" * 80)
-            log.info(u"Total number of assets deleted: {0}".format(assets_deleted))
+            log.info("Total number of assets deleted: {0}".format(assets_deleted))

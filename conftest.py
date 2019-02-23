@@ -1,7 +1,7 @@
 """
 Default unit test configuration and fixtures.
 """
-from __future__ import absolute_import, unicode_literals
+
 import pytest
 
 # Import hooks and fixture overrides from the cms package to

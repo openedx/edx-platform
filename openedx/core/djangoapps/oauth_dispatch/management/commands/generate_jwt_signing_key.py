@@ -2,7 +2,7 @@
 Management command for generating an asymmetric keypair to sign JSON Web Tokens.
 """
 # pylint: disable=missing-docstring
-from __future__ import print_function, unicode_literals
+
 
 import logging
 import json

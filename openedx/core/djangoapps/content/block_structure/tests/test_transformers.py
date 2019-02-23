@@ -50,8 +50,8 @@ class TestBlockStructureTransformers(ChildrenMapTestMixin, TestCase):
         with self.assertRaises(TransformerException):
             self.transformers += [self.UnregisteredTransformer()]
 
-        self.assertEquals(self.transformers._transformers['no_filter'], [])  # pylint: disable=protected-access
-        self.assertEquals(self.transformers._transformers['supports_filter'], [])  # pylint: disable=protected-access
+        self.assertEqual(self.transformers._transformers['no_filter'], [])  # pylint: disable=protected-access
+        self.assertEqual(self.transformers._transformers['supports_filter'], [])  # pylint: disable=protected-access
 
     def test_collect(self):
         with mock_registered_transformers(self.registered_transformers):

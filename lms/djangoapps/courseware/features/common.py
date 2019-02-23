@@ -2,7 +2,7 @@
 # pylint: disable=no-member
 # pylint: disable=redefined-outer-name
 
-from __future__ import absolute_import
+
 
 import time
 from logging import getLogger
@@ -48,17 +48,17 @@ def capture_screenshot_before_after(func):
         prefix = round(time.time() * 1000)
 
         world.capture_screenshot("{}_{}_{}".format(
-            prefix, func.func_name, 'before'
+            prefix, func.__name__, 'before'
         ))
         ret_val = func(*args, **kwargs)
         world.capture_screenshot("{}_{}_{}".format(
-            prefix, func.func_name, 'after'
+            prefix, func.__name__, 'after'
         ))
         return ret_val
     return inner
 
 
-@step(u'The course "([^"]*)" exists$')
+@step('The course "([^"]*)" exists$')
 def create_course(_step, course):
 
     # First clear the modulestore so we don't try to recreate
@@ -91,7 +91,7 @@ def create_course(_step, course):
     )
 
 
-@step(u'I am registered for the course "([^"]*)"$')
+@step('I am registered for the course "([^"]*)"$')
 def i_am_registered_for_the_course(step, course):
     # Create the course
     create_course(step, course)
@@ -107,7 +107,7 @@ def i_am_registered_for_the_course(step, course):
     world.log_in(username='robot', password='test')
 
 
-@step(u'The course "([^"]*)" has extra tab "([^"]*)"$')
+@step('The course "([^"]*)" has extra tab "([^"]*)"$')
 def add_tab_to_course(_step, course, extra_tab_name):
     world.ItemFactory.create(
         parent_location=course_location(course),
@@ -115,7 +115,7 @@ def add_tab_to_course(_step, course, extra_tab_name):
         display_name=str(extra_tab_name))
 
 
-@step(u'I am in a course$')
+@step('I am in a course$')
 def go_into_course(step):
     step.given('I am registered for the course "6.002x"')
     step.given('And I am logged in')
@@ -145,8 +145,8 @@ def visit_scenario_item(item_key):
     url = django_url(reverse(
         'jump_to',
         kwargs={
-            'course_id': unicode(world.scenario_dict['COURSE'].id),
-            'location': unicode(world.scenario_dict[item_key].location),
+            'course_id': str(world.scenario_dict['COURSE'].id),
+            'location': str(world.scenario_dict[item_key].location),
         }
     ))
 

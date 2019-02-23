@@ -305,17 +305,17 @@ class GraderTest(unittest.TestCase):
         (
             # empty
             {},
-            u"Configuration has no appropriate grader class."
+            "Configuration has no appropriate grader class."
         ),
         (
             # no min_count
             {'type': "Homework", 'drop_count': 0},
-            u"Configuration has no appropriate grader class."
+            "Configuration has no appropriate grader class."
         ),
         (
             # no drop_count
             {'type': "Homework", 'min_count': 0},
-            u"__init__() takes at least 4 arguments (3 given)"
+            "__init__() takes at least 4 arguments (3 given)"
         ),
     )
     @ddt.unpack
@@ -403,7 +403,7 @@ class ShowCorrectnessTest(unittest.TestCase):
             due_date = None
         else:
             due_date = getattr(self, due_date_str)
-        self.assertEquals(
+        self.assertEqual(
             ShowCorrectness.correctness_available(ShowCorrectness.PAST_DUE, due_date, has_staff_access),
             expected_result
         )

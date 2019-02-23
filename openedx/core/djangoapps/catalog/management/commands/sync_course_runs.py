@@ -42,8 +42,8 @@ class Command(BaseCommand):
                 num_runs_found_in_course_overview += 1
             except CourseOverview.DoesNotExist:
                 log.info(
-                    u'[sync_course_runs] course overview record not found for course run: %s',
-                    unicode(course_key),
+                    '[sync_course_runs] course overview record not found for course run: %s',
+                    str(course_key),
                 )
                 continue
 
@@ -60,10 +60,10 @@ class Command(BaseCommand):
 
         log.info(
             '[sync_course_runs] '
-            u'course runs found in catalog: %d, '
-            u'course runs found in course overview: %d, '
-            u'course runs not found in course overview: %d, '
-            u'course overviews updated: %d',
+            'course runs found in catalog: %d, '
+            'course runs found in course overview: %d, '
+            'course runs not found in course overview: %d, '
+            'course overviews updated: %d',
             num_runs_found_in_catalog,
             num_runs_found_in_course_overview,
             num_runs_found_in_catalog - num_runs_found_in_course_overview,

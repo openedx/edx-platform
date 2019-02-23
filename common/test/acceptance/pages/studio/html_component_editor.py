@@ -68,7 +68,7 @@ class HtmlXBlockEditorView(XBlockEditorView):
             font = font.replace('font-family: ', '').replace(';', '')
             font_families[index] = font.split(',')
             font_families[index] = [x.lstrip() for x in font_families[index]]
-        font_dict = dict(zip(font_labels, font_families))
+        font_dict = dict(list(zip(font_labels, font_families)))
         return font_dict
 
     def set_content_and_save(self, content, raw=False):
@@ -218,7 +218,7 @@ class HtmlXBlockEditorView(XBlockEditorView):
         """
         If editing, set the value of a field.
         """
-        selector = u'.xblock-studio_view li.field label:contains("{}") + input'.format(field_display_name)
+        selector = '.xblock-studio_view li.field label:contains("{}") + input'.format(field_display_name)
         script = "$(arguments[0]).val(arguments[1]).change();"
         self.browser.execute_script(script, selector, field_value)
 

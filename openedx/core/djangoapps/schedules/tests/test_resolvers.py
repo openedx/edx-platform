@@ -56,8 +56,8 @@ class TestBinnedSchedulesBaseResolver(CacheIsolationTestCase):
     @ddt.unpack
     @ddt.data(
         (None, set([])),
-        ('course1', set([u'course1'])),
-        (['course1', 'course2'], set([u'course1', u'course2']))
+        ('course1', set(['course1'])),
+        (['course1', 'course2'], set(['course1', 'course2']))
     )
     def test_get_course_org_filter_exclude__in(self, course_org_filter, expected_org_list):
         SiteConfigurationFactory.create(

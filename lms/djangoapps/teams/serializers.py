@@ -18,13 +18,13 @@ class CountryField(serializers.Field):
     Field to serialize a country code.
     """
 
-    COUNTRY_CODES = dict(countries).keys()
+    COUNTRY_CODES = list(dict(countries).keys())
 
     def to_representation(self, obj):
         """
         Represent the country as a 2-character unicode identifier.
         """
-        return unicode(obj)
+        return str(obj)
 
     def to_internal_value(self, data):
         """
@@ -36,7 +36,7 @@ class CountryField(serializers.Field):
         """
         if data and data not in self.COUNTRY_CODES:
             raise serializers.ValidationError(
-                u"{code} is not a valid country code".format(code=data)
+                "{code} is not a valid country code".format(code=data)
             )
         return data
 

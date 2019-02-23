@@ -1,7 +1,7 @@
 """
 Tests for the course grading API view
 """
-from __future__ import unicode_literals
+
 
 import json
 from collections import OrderedDict, namedtuple

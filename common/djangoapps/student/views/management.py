@@ -122,7 +122,7 @@ def csrf_token(context):
     token = context.get('csrf_token', '')
     if token == 'NOTPROVIDED':
         return ''
-    return (HTML(u'<div style="display:none"><input type="hidden"'
+    return (HTML('<div style="display:none"><input type="hidden"'
             ' name="csrfmiddlewaretoken" value="{}" /></div>').format(token))
 
 
@@ -227,7 +227,7 @@ def send_reactivation_email_for_user(user):
         context = generate_activation_email_context(user, registration)
     except ObjectDoesNotExist:
         log.error(
-            u'Unable to send reactivation email due to unavailable profile for the user "%s"',
+            'Unable to send reactivation email due to unavailable profile for the user "%s"',
             user.username,
             exc_info=True
         )
@@ -246,7 +246,7 @@ def send_reactivation_email_for_user(user):
         user.email_user(subject, message, from_address)
     except Exception:  # pylint: disable=broad-except
         log.error(
-            u'Unable to send reactivation email from "%s" to "%s"',
+            'Unable to send reactivation email from "%s" to "%s"',
             from_address,
             user.email,
             exc_info=True
@@ -350,7 +350,7 @@ def change_enrollment(request, check_access=True):
         course_id = CourseKey.from_string(request.POST.get("course_id"))
     except InvalidKeyError:
         log.warning(
-            u"User %s tried to %s with invalid course id: %s",
+            "User %s tried to %s with invalid course id: %s",
             user.username,
             action,
             request.POST.get("course_id"),
@@ -366,7 +366,7 @@ def change_enrollment(request, check_access=True):
         # We don't do this check on unenroll, or a bad course id can't be unenrolled from
         if not modulestore().has_course(course_id):
             log.warning(
-                u"User %s tried to enroll in non-existent course %s",
+                "User %s tried to enroll in non-existent course %s",
                 user.username,
                 course_id
             )
@@ -390,7 +390,7 @@ def change_enrollment(request, check_access=True):
             return HttpResponse(redirect_url)
 
         if CourseEntitlement.check_for_existing_entitlement_and_enroll(user=user, course_run_key=course_id):
-            return HttpResponse(reverse('courseware', args=[unicode(course_id)]))
+            return HttpResponse(reverse('courseware', args=[str(course_id)]))
 
         # Check that auto enrollment is allowed for this course
         # (= the course is NOT behind a paywall)
@@ -496,11 +496,11 @@ def disable_account_ajax(request):
         if account_action == 'disable':
             user_account.account_status = UserStanding.ACCOUNT_DISABLED
             context['message'] = _("Successfully disabled {}'s account").format(username)
-            log.info(u"%s disabled %s's account", request.user, username)
+            log.info("%s disabled %s's account", request.user, username)
         elif account_action == 'reenable':
             user_account.account_status = UserStanding.ACCOUNT_ENABLED
             context['message'] = _("Successfully reenabled {}'s account").format(username)
-            log.info(u"%s reenabled %s's account", request.user, username)
+            log.info("%s reenabled %s's account", request.user, username)
         else:
             context['message'] = _("Unexpected account status")
             return JsonResponse(context, status=400)
@@ -539,7 +539,7 @@ def user_signup_handler(sender, **kwargs):  # pylint: disable=unused-argument
         if site:
             user_signup_source = UserSignupSource(user=kwargs['instance'], site=site)
             user_signup_source.save()
-            log.info(u'user {} originated from a white labeled "Microsite"'.format(kwargs['instance'].id))
+            log.info('user {} originated from a white labeled "Microsite"'.format(kwargs['instance'].id))
 
 
 @ensure_csrf_cookie
@@ -548,7 +548,7 @@ def activate_account(request, key):
     When link in activation e-mail is clicked
     """
     # If request is in Studio call the appropriate view
-    if theming_helpers.get_project_root_name().lower() == u'cms':
+    if theming_helpers.get_project_root_name().lower() == 'cms':
         return activate_account_studio(request, key)
 
     try:
@@ -579,7 +579,7 @@ def activate_account(request, key):
         elif waffle().is_enabled(PREVENT_AUTH_USER_WRITES):
             messages.error(
                 request,
-                HTML(u'{html_start}{message}{html_end}').format(
+                HTML('{html_start}{message}{html_end}').format(
                     message=Text(SYSTEM_MAINTENANCE_MSG),
                     html_start=HTML('<p class="message-title">'),
                     html_end=HTML('</p>'),
@@ -904,8 +904,8 @@ def password_reset_confirm_wrapper(request, uidb36=None, token=None):
             form_valid = response.context_data['form'].is_valid() if response.context_data['form'] else False
             if not form_valid:
                 log.warning(
-                    u'Unable to reset password for user [%s] because form is not valid. '
-                    u'A possible cause is that the user had an invalid reset token',
+                    'Unable to reset password for user [%s] because form is not valid. '
+                    'A possible cause is that the user had an invalid reset token',
                     user.username,
                 )
                 response.context_data['err_msg'] = _('Error in resetting your password. Please try again.')
@@ -1058,7 +1058,7 @@ def do_email_change_request(user, new_email, activation_key=None, secondary_emai
         ace.send(msg)
     except Exception:
         from_address = configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
-        log.error(u'Unable to send email activation link to user from "%s"', from_address, exc_info=True)
+        log.error('Unable to send email activation link to user from "%s"', from_address, exc_info=True)
         raise ValueError(_('Unable to send email activation link. Please try again later.'))
 
     if not secondary_email_change_request:
@@ -1187,7 +1187,7 @@ def change_email_settings(request):
         if optout_object:
             optout_object.delete()
         log.info(
-            u"User %s (%s) opted in to receive emails from course %s",
+            "User %s (%s) opted in to receive emails from course %s",
             user.username,
             user.email,
             course_id,
@@ -1201,7 +1201,7 @@ def change_email_settings(request):
     else:
         Optout.objects.get_or_create(user=user, course_id=course_key)
         log.info(
-            u"User %s (%s) opted out of receiving emails from course %s",
+            "User %s (%s) opted out of receiving emails from course %s",
             user.username,
             user.email,
             course_id,

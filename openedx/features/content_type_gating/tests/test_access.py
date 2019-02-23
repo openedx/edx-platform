@@ -76,8 +76,8 @@ def _get_fragment_from_block(block, user_id, course, request_factory, mock_get_c
     vertical_xblock = load_single_xblock(
         request=fake_request,
         user_id=user_id,
-        course_id=unicode(course.id),
-        usage_key_string=unicode(course.scope_ids.usage_id),
+        course_id=str(course.id),
+        usage_key_string=str(course.scope_ids.usage_id),
         course=course
     )
     runtime = vertical_xblock.runtime
@@ -122,7 +122,7 @@ def _assert_block_is_empty(block, user_id, course, request_factory):
         course_id (CourseLocator): id of course
     """
     frag = _get_fragment_from_block(block, user_id, course, request_factory)
-    assert frag.content == u''
+    assert frag.content == ''
 
 
 @ddt.ddt
@@ -463,8 +463,8 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
         url = reverse(
             'xblock_handler',
             kwargs={
-                'course_id': unicode(self.course.id),
-                'usage_id': quote_slashes(unicode(problem_location)),
+                'course_id': str(self.course.id),
+                'usage_id': quote_slashes(str(problem_location)),
                 'handler': 'xmodule_handler',
                 'suffix': 'problem_show',
             }
@@ -580,12 +580,12 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
         self.update_masquerade(**masquerade_config)
 
         block = self.blocks_dict['problem']
-        block_view_url = reverse('render_xblock', kwargs={'usage_key_string': unicode(block.scope_ids.usage_id)})
+        block_view_url = reverse('render_xblock', kwargs={'usage_key_string': str(block.scope_ids.usage_id)})
         response = self.client.get(block_view_url)
         if is_gated:
-            self.assertEquals(response.status_code, 404)
+            self.assertEqual(response.status_code, 404)
         else:
-            self.assertEquals(response.status_code, 200)
+            self.assertEqual(response.status_code, 200)
 
     def update_masquerade(self, role='student', group_id=None, username=None, user_partition_id=None):
         """
@@ -594,7 +594,7 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
         masquerade_url = reverse(
             'masquerade_update',
             kwargs={
-                'course_key_string': unicode(self.course.id),
+                'course_key_string': str(self.course.id),
             }
         )
         response = self.client.post(
@@ -640,9 +640,9 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
         self.update_masquerade(username=user.username)
 
         block = self.blocks_dict['problem']
-        block_view_url = reverse('render_xblock', kwargs={'usage_key_string': unicode(block.scope_ids.usage_id)})
+        block_view_url = reverse('render_xblock', kwargs={'usage_key_string': str(block.scope_ids.usage_id)})
         response = self.client.get(block_view_url)
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
     @ddt.data(
         FORUM_ROLE_COMMUNITY_TA,

@@ -7,7 +7,7 @@ import re
 from copy import deepcopy
 from datetime import datetime
 from math import ceil
-from urllib import urlencode
+from urllib.parse import urlencode
 from uuid import uuid4
 
 from .http import StubHttpRequestHandler, StubHttpService
@@ -390,4 +390,4 @@ class StubEdxNotesService(StubHttpService):
         """
         Search the `query(str)` text in the provided `data(list)`.
         """
-        return [note for note in data if unicode(query).strip() in note.get("text", "").split()]
+        return [note for note in data if str(query).strip() in note.get("text", "").split()]

@@ -2,7 +2,7 @@ from eventtracking import tracker
 from lms.djangoapps.instructor_task.models import ReportStore
 from util.file import course_filename_prefix_generator
 
-REPORT_REQUESTED_EVENT_NAME = u'edx.instructor.report.requested'
+REPORT_REQUESTED_EVENT_NAME = 'edx.instructor.report.requested'
 
 # define value to use when no task_id is provided:
 UNKNOWN_TASK_ID = 'unknown-task_id'
@@ -31,7 +31,7 @@ def upload_csv_to_report_store(rows, csv_name, course_id, timestamp, config_name
         report_name: string - Name of the generated report
     """
     report_store = ReportStore.from_config(config_name)
-    report_name = u"{course_prefix}_{csv_name}_{timestamp_str}.csv".format(
+    report_name = "{course_prefix}_{csv_name}_{timestamp_str}.csv".format(
         course_prefix=course_filename_prefix_generator(course_id),
         csv_name=csv_name,
         timestamp_str=timestamp.strftime("%Y-%m-%d-%H%M")

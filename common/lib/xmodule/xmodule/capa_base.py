@@ -81,7 +81,7 @@ class ComplexEncoder(json.JSONEncoder):
         Print a nicely formatted complex number, or default to the JSON encoder
         """
         if isinstance(obj, complex):
-            return u"{real:.7g}{imag:+.7g}*j".format(real=obj.real, imag=obj.imag)
+            return "{real:.7g}{imag:+.7g}*j".format(real=obj.real, imag=obj.imag)
         return json.JSONEncoder.default(self, obj)
 
 
@@ -267,7 +267,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
                 self.seed = self.lcp.seed
 
         except Exception as err:  # pylint: disable=broad-except
-            msg = u'cannot create LoncapaProblem {loc}: {err}'.format(
+            msg = 'cannot create LoncapaProblem {loc}: {err}'.format(
                 loc=text_type(self.location), err=err)
             # TODO (vshnayder): do modules need error handlers too?
             # We shouldn't be switching on DEBUG.
@@ -276,18 +276,18 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
                 # TODO (vshnayder): This logic should be general, not here--and may
                 # want to preserve the data instead of replacing it.
                 # e.g. in the CMS
-                msg = HTML(u'<p>{msg}</p>').format(msg=msg)
-                msg += HTML(u'<p><pre>{tb}</pre></p>').format(
+                msg = HTML('<p>{msg}</p>').format(msg=msg)
+                msg += HTML('<p><pre>{tb}</pre></p>').format(
                     # just the traceback, no message - it is already present above
-                    tb=u''.join(
+                    tb=''.join(
                         ['Traceback (most recent call last):\n'] +
                         traceback.format_tb(sys.exc_info()[2])
                     )
                 )
                 # create a dummy problem with error message instead of failing
                 problem_text = (
-                    HTML(u'<problem><text><span class="inline-error">'
-                         u'Problem {url} has an error:</span>{msg}</text></problem>').format(
+                    HTML('<problem><text><span class="inline-error">'
+                         'Problem {url} has an error:</span>{msg}</text></problem>').format(
                         url=text_type(self.location),
                         msg=msg,
                     )
@@ -295,7 +295,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
                 self.lcp = self.new_lcp(self.get_state_for_lcp(), text=problem_text)
             else:
                 # add extra info and raise
-                raise Exception(msg), None, sys.exc_info()[2]
+                raise Exception(msg).with_traceback(sys.exc_info()[2])
 
             self.set_state_from_lcp()
 
@@ -312,7 +312,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
             self.seed = 1
         elif self.rerandomize == RANDOMIZATION.PER_STUDENT and hasattr(self.runtime, 'seed'):
             # see comment on randomization_bin
-            self.seed = randomization_bin(self.runtime.seed, unicode(self.location).encode('utf-8'))
+            self.seed = randomization_bin(self.runtime.seed, str(self.location).encode('utf-8'))
         else:
             self.seed = struct.unpack('i', os.urandom(4))[0]
 
@@ -550,13 +550,13 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         # TODO (vshnayder): another switch on DEBUG.
         if self.runtime.DEBUG:
             msg = HTML(
-                u'[courseware.capa.capa_module] <font size="+1" color="red">'
-                u'Failed to generate HTML for problem {url}</font>'
+                '[courseware.capa.capa_module] <font size="+1" color="red">'
+                'Failed to generate HTML for problem {url}</font>'
             ).format(
                 url=text_type(self.location)
             )
-            msg += HTML(u'<p>Error:</p><p><pre>{msg}</pre></p>').format(msg=text_type(err))
-            msg += HTML(u'<p><pre>{tb}</pre></p>').format(tb=traceback.format_exc())
+            msg += HTML('<p>Error:</p><p><pre>{msg}</pre></p>').format(msg=text_type(err))
+            msg += HTML('<p><pre>{tb}</pre></p>').format(tb=traceback.format_exc())
             html = msg
 
         else:
@@ -566,7 +566,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
             # Presumably, student submission has corrupted LoncapaProblem HTML.
             #   First, pull down all student answers
             student_answers = self.lcp.student_answers
-            answer_ids = student_answers.keys()
+            answer_ids = list(student_answers.keys())
 
             # Some inputtypes, such as dynamath, have additional "hidden" state that
             #   is not exposed to the student. Keep those hidden
@@ -590,7 +590,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
             warning_msg = _("The problem's state was corrupted by an invalid submission. The submission consisted of:")
             warning += HTML('{}<ul>').format(warning_msg)
 
-            for student_answer in student_answers.values():
+            for student_answer in list(student_answers.values()):
                 if student_answer != '':
                     warning += HTML('<li>{}</li>').format(student_answer)
 
@@ -721,7 +721,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         save_message = None
         if self.has_saved_answers:
             save_message = _(
-                u"Your answers were previously saved. Click '{button_name}' to grade them."
+                "Your answers were previously saved. Click '{button_name}' to grade them."
             ).format(button_name=self.submit_button_name())
 
         context = {
@@ -747,7 +747,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         html = self.runtime.render_template('problem.html', context)
 
         if encapsulate:
-            html = HTML(u'<div id="problem_{id}" class="problem" data-url="{ajax_url}">{html}</div>').format(
+            html = HTML('<div id="problem_{id}" class="problem" data-url="{ajax_url}">{html}</div>').format(
                 id=self.location.html_id(), ajax_url=self.runtime.ajax_url, html=HTML(html)
             )
 
@@ -774,7 +774,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
 
         if render_notifications:
             progress = self.get_progress()
-            id_list = self.lcp.correct_map.keys()
+            id_list = list(self.lcp.correct_map.keys())
 
             # Show only a generic message if hiding correctness
             if not self.correctness_available():
@@ -1031,7 +1031,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
                     answer_content = self.runtime.replace_jump_to_id_urls(answer_content)
                 new_answer = {answer_id: answer_content}
             except TypeError:
-                log.debug(u'Unable to perform URL substitution on answers[%s]: %s',
+                log.debug('Unable to perform URL substitution on answers[%s]: %s',
                           answer_id, answers[answer_id])
                 new_answer = {answer_id: answers[answer_id]}
             new_answers.update(new_answer)
@@ -1103,7 +1103,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
             # will return (key, '', '')
             # We detect this and raise an error
             if not name:
-                raise ValueError(u"{key} must contain at least one underscore".format(key=key))
+                raise ValueError("{key} must contain at least one underscore".format(key=key))
 
             else:
                 # This allows for answers which require more than one value for
@@ -1124,7 +1124,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
                     # If the submission wasn't deserializable, raise an error.
                     except(KeyError, ValueError):
                         raise ValueError(
-                            u"Invalid submission: {val} for {key}".format(val=data[key], key=key)
+                            "Invalid submission: {val} for {key}".format(val=data[key], key=key)
                         )
                 else:
                     val = data[key]
@@ -1132,7 +1132,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
                 # If the name already exists, then we don't want
                 # to override it.  Raise an error instead
                 if name in answers:
-                    raise ValueError(u"Key {name} already exists in answers dict".format(name=name))
+                    raise ValueError("Key {name} already exists in answers dict".format(name=name))
                 else:
                     answers[name] = val
 
@@ -1174,7 +1174,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         answers_without_files = convert_files_to_filenames(answers)
         event_info['answers'] = answers_without_files
 
-        metric_name = u'capa.check_problem.{}'.format
+        metric_name = 'capa.check_problem.{}'.format
         # Can override current time
         current_time = datetime.datetime.now(utc)
         if override_time is not False:
@@ -1201,7 +1201,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
 
             waittime_between_requests = self.runtime.xqueue['waittime']
             if (current_time - prev_submit_time).total_seconds() < waittime_between_requests:
-                msg = _(u"You must wait at least {wait} seconds between submissions.").format(
+                msg = _("You must wait at least {wait} seconds between submissions.").format(
                     wait=waittime_between_requests)
                 return {'success': msg, 'html': ''}
 
@@ -1210,7 +1210,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
             seconds_since_submission = (current_time - self.last_submission_time).total_seconds()
             if seconds_since_submission < self.submission_wait_seconds:
                 remaining_secs = int(self.submission_wait_seconds - seconds_since_submission)
-                msg = _(u'You must wait at least {wait_secs} between submissions. {remaining_secs} remaining.').format(
+                msg = _('You must wait at least {wait_secs} between submissions. {remaining_secs} remaining.').format(
                     wait_secs=self.pretty_print_seconds(self.submission_wait_seconds),
                     remaining_secs=self.pretty_print_seconds(remaining_secs))
                 return {
@@ -1246,7 +1246,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
             # the full exception, including traceback,
             # in the response
             if self.runtime.user_is_staff:
-                msg = u"Staff debug info: {tb}".format(tb=traceback.format_exc())
+                msg = "Staff debug info: {tb}".format(tb=traceback.format_exc())
 
             # Otherwise, display just an error message,
             # without a stack trace
@@ -1266,8 +1266,8 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
             self.set_score(self.score_from_lcp())
 
             if self.runtime.DEBUG:
-                msg = u"Error checking problem: {}".format(text_type(err))
-                msg += u'\nTraceback:\n{}'.format(traceback.format_exc())
+                msg = "Error checking problem: {}".format(text_type(err))
+                msg += '\nTraceback:\n{}'.format(traceback.format_exc())
                 return {'success': msg}
             raise
         published_grade = self.publish_grade()
@@ -1319,7 +1319,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         """
         # answers is like: {u'i4x-Stanford-CS99-problem-dada976e76f34c24bc8415039dee1300_2_1': u'mask_0'}
         # Each response values has an answer_id which matches the key in answers.
-        for response in self.lcp.responders.values():
+        for response in list(self.lcp.responders.values()):
             # Un-mask choice names in event_info for masked responses.
             if response.has_mask():
                 # We don't assume much about the structure of event_info,
@@ -1419,14 +1419,14 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         strings ''.
         """
         input_metadata = {}
-        for input_id, internal_answer in answers.iteritems():
+        for input_id, internal_answer in answers.items():
             answer_input = self.lcp.inputs.get(input_id)
 
             if answer_input is None:
                 log.warning('Input id %s is not mapped to an input type.', input_id)
 
             answer_response = None
-            for responder in self.lcp.responders.itervalues():
+            for responder in self.lcp.responders.values():
                 if input_id in responder.answer_ids:
                     answer_response = responder
 

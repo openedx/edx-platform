@@ -77,7 +77,7 @@ class TabsEditingDescriptor(EditingFields, MakoModuleDescriptor):
         # load every tab's css
         for tab in cls.tabs:
             tab_styles = tab.get('css', {})
-            for css_type, css_content in tab_styles.items():
+            for css_type, css_content in list(tab_styles.items()):
                 if css_type in cls.css:
                     cls.css[css_type].extend(css_content)
                 else:

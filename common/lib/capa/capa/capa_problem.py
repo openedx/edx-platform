@@ -208,7 +208,7 @@ class LoncapaProblem(object):
 
             # Run response late_transforms last (see MultipleChoiceResponse)
             # Sort the responses to be in *_1 *_2 ... order.
-            responses = self.responders.values()
+            responses = list(self.responders.values())
             responses = sorted(responses, key=lambda resp: int(resp.id[resp.id.rindex('_') + 1:]))
             for response in responses:
                 if hasattr(response, 'late_transforms'):
@@ -274,14 +274,14 @@ class LoncapaProblem(object):
         Set the student's answers to the responders' initial displays, if specified.
         """
         initial_answers = dict()
-        for responder in self.responders.values():
+        for responder in list(self.responders.values()):
             if hasattr(responder, 'get_initial_display'):
                 initial_answers.update(responder.get_initial_display())
 
         self.student_answers = initial_answers
 
     def __unicode__(self):
-        return u"LoncapaProblem ({0})".format(self.problem_id)
+        return "LoncapaProblem ({0})".format(self.problem_id)
 
     def get_state(self):
         """
@@ -302,7 +302,7 @@ class LoncapaProblem(object):
         Return the maximum score for this problem.
         """
         maxscore = 0
-        for responder in self.responders.values():
+        for responder in list(self.responders.values()):
             maxscore += responder.get_max_score()
         return maxscore
 
@@ -335,7 +335,7 @@ class LoncapaProblem(object):
         """
         cmap = CorrectMap()
         cmap.update(self.correct_map)
-        for responder in self.responders.values():
+        for responder in list(self.responders.values()):
             if hasattr(responder, 'update_score'):
                 # Each LoncapaResponse will update its specific entries in cmap
                 #   cmap is passed by reference
@@ -351,7 +351,7 @@ class LoncapaProblem(object):
         Does not return any value
         """
         # check against each inputtype
-        for the_input in self.inputs.values():
+        for the_input in list(self.inputs.values()):
             # if the input type has an ungraded function, pass in the values
             if hasattr(the_input, 'ungraded_response'):
                 the_input.ungraded_response(xqueue_msg, queuekey)
@@ -419,7 +419,7 @@ class LoncapaProblem(object):
         that the responsetypes are synchronous.  This is convenient as it
         permits rescoring to be complete when the rescoring call returns.
         """
-        return all('filesubmission' not in responder.allowed_inputfields for responder in self.responders.values())
+        return all('filesubmission' not in responder.allowed_inputfields for responder in list(self.responders.values()))
 
     def get_grade_from_current_answers(self, student_answers):
         """
@@ -441,7 +441,7 @@ class LoncapaProblem(object):
         # start new with empty CorrectMap
         newcmap = CorrectMap()
         # Call each responsetype instance to do actual grading
-        for responder in self.responders.values():
+        for responder in list(self.responders.values()):
             # File objects are passed only if responsetype explicitly allows
             # for file submissions.  But we have no way of knowing if
             # student_answers contains a proper answer or the filename of
@@ -449,7 +449,7 @@ class LoncapaProblem(object):
             # TODO: figure out where to get file submissions when rescoring.
             if 'filesubmission' in responder.allowed_inputfields and student_answers is None:
                 _ = self.capa_system.i18n.ugettext
-                raise Exception(_(u"Cannot rescore problems with possible file submissions"))
+                raise Exception(_("Cannot rescore problems with possible file submissions"))
 
             # use 'student_answers' only if it is provided, and if it might contain a file
             # submission that would not exist in the persisted "student_answers".
@@ -470,7 +470,7 @@ class LoncapaProblem(object):
         """
         # dict of (id, correct_answer)
         answer_map = dict()
-        for response in self.responders.keys():
+        for response in list(self.responders.keys()):
             results = self.responder_answers[response]
             answer_map.update(results)
 
@@ -490,9 +490,9 @@ class LoncapaProblem(object):
         get_question_answers may only return a subset of these.
         """
         answer_ids = []
-        for response in self.responders.keys():
+        for response in list(self.responders.keys()):
             results = self.responder_answers[response]
-            answer_ids.append(results.keys())
+            answer_ids.append(list(results.keys()))
         return answer_ids
 
     def find_correct_answer_text(self, answer_id):
@@ -612,7 +612,7 @@ class LoncapaProblem(object):
                 self.find_answer_text(answer_id, answer) for answer in current_answer
             )
 
-        elif isinstance(current_answer, basestring) and current_answer.startswith('choice_'):
+        elif isinstance(current_answer, str) and current_answer.startswith('choice_'):
             # Many problem (e.g. checkbox) report "choice_0" "choice_1" etc.
             # Here we transform it
             elems = self.tree.xpath('//*[@id="{answer_id}"]//*[@name="{choice_number}"]'.format(
@@ -625,7 +625,7 @@ class LoncapaProblem(object):
             choices_map = dict(input_cls.extract_choices(choicegroup, self.capa_system.i18n, text_only=True))
             answer_text = choices_map[current_answer]
 
-        elif isinstance(current_answer, basestring):
+        elif isinstance(current_answer, str):
             # Already a string with the answer
             answer_text = current_answer
 
@@ -903,7 +903,7 @@ class LoncapaProblem(object):
 
         Used by get_html.
         """
-        if not isinstance(problemtree.tag, basestring):
+        if not isinstance(problemtree.tag, str):
             # Comment and ProcessingInstruction nodes are not Elements,
             # and we're ok leaving those behind.
             # BTW: etree gives us no good way to distinguish these things
@@ -1001,7 +1001,7 @@ class LoncapaProblem(object):
             tree.tag = html_transforms[problemtree.tag]['tag']
         else:
             # copy attributes over if not innocufying
-            for (key, value) in problemtree.items():
+            for (key, value) in list(problemtree.items()):
                 tree.set(key, value)
 
         tree.text = problemtree.text
@@ -1057,7 +1057,7 @@ class LoncapaProblem(object):
             # get responder answers (do this only once, since there may be a performance cost,
             # eg with externalresponse)
             self.responder_answers = {}
-            for response in self.responders.keys():
+            for response in list(self.responders.keys()):
                 try:
                     self.responder_answers[response] = self.responders[response].get_answers()
                 except:
@@ -1096,7 +1096,7 @@ class LoncapaProblem(object):
             response.set('multiple_inputtypes', 'true')
             group_label_tag = response.find('label')
             group_description_tags = response.findall('description')
-            group_label_tag_id = u'multiinput-group-label-{}'.format(responsetype_id)
+            group_label_tag_id = 'multiinput-group-label-{}'.format(responsetype_id)
             group_label_tag_text = ''
             if group_label_tag is not None:
                 group_label_tag.tag = 'p'
@@ -1107,7 +1107,7 @@ class LoncapaProblem(object):
 
             group_description_ids = []
             for index, group_description_tag in enumerate(group_description_tags):
-                group_description_tag_id = u'multiinput-group-description-{}-{}'.format(responsetype_id, index)
+                group_description_tag_id = 'multiinput-group-description-{}-{}'.format(responsetype_id, index)
                 group_description_tag.tag = 'p'
                 group_description_tag.set('id', group_description_tag_id)
                 group_description_tag.set('class', 'multi-inputs-group-description question-description')

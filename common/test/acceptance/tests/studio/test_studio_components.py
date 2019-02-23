@@ -26,7 +26,7 @@ class AdvancedProblemComponentTest(ContainerBase):
 
     def populate_course_fixture(self, course_fixture):
         course_fixture.add_advanced_settings(
-            {u"advanced_modules": {"value": ["split_test"]}}
+            {"advanced_modules": {"value": ["split_test"]}}
         )
 
         course_fixture.add_children(
@@ -91,7 +91,7 @@ class ComponentTest(ContainerBase):
 
     def populate_course_fixture(self, course_fixture):
         course_fixture.add_advanced_settings(
-            {u"advanced_modules": {"value": ["split_test"]}}
+            {"advanced_modules": {"value": ["split_test"]}}
         )
 
         course_fixture.add_children(

@@ -15,13 +15,13 @@ from terrain.steps import reload_the_page
 from openedx.core.lib.tests.tools import assert_in, assert_regexp_matches  # pylint: disable=no-name-in-module
 
 
-@step(u'I see a table of student profiles')
+@step('I see a table of student profiles')
 def find_student_profile_table(step):  # pylint: disable=unused-argument
     # Find the grading configuration display
     world.wait_for_visible('#data-student-profiles-table')
 
     # Wait for the data table to be populated
-    world.wait_for(lambda _: world.css_text('#data-student-profiles-table') not in [u'', u'Loading'])
+    world.wait_for(lambda _: world.css_text('#data-student-profiles-table') not in ['', 'Loading'])
 
     if world.role == 'instructor':
         expected_data = [
@@ -43,17 +43,17 @@ def find_student_profile_table(step):  # pylint: disable=unused-argument
         assert_in(datum, world.css_text('#data-student-profiles-table'))
 
 
-@step(u"I do not see a button to 'List enrolled students' profile information'")
+@step("I do not see a button to 'List enrolled students' profile information'")
 def no_student_profile_table(step):  # pylint: disable=unused-argument
     world.is_css_not_present('input[name="list-profiles"]')
 
 
-@step(u"I see the grading configuration for the course")
+@step("I see the grading configuration for the course")
 def find_grading_config(step):  # pylint: disable=unused-argument
     # Find the grading configuration display
     world.wait_for_visible('#data-grade-config-text')
     # expected config is the default grading configuration from common/lib/xmodule/xmodule/course_module.py
-    expected_config = u"""-----------------------------------------------------------------------------
+    expected_config = """-----------------------------------------------------------------------------
 Course grader:
 <class 'xmodule.graders.WeightedSubsectionsGrader'>
 
@@ -84,11 +84,11 @@ def verify_report_is_generated(report_name_substring):
     )
 
 
-@step(u"I see a grade report csv file in the reports table")
+@step("I see a grade report csv file in the reports table")
 def find_grade_report_csv_link(step):  # pylint: disable=unused-argument
     verify_report_is_generated('grade_report')
 
 
-@step(u"I see a student profile csv file in the reports table")
+@step("I see a student profile csv file in the reports table")
 def find_student_profile_report_csv_link(step):  # pylint: disable=unused-argument
     verify_report_is_generated('student_profile_info')

@@ -2,7 +2,7 @@
 Utility methods related to course
 """
 import logging
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from django.conf import settings
 
@@ -29,8 +29,8 @@ def get_encoded_course_sharing_utm_params():
     Returns encoded Course Sharing UTM Parameters.
     """
     return {
-        utm_source: urllib.urlencode(utm_params)
-        for utm_source, utm_params in COURSE_SHARING_UTM_PARAMETERS.iteritems()
+        utm_source: urllib.parse.urlencode(utm_params)
+        for utm_source, utm_params in COURSE_SHARING_UTM_PARAMETERS.items()
     }
 
 
@@ -51,9 +51,9 @@ def get_link_for_about_page(course):
     elif settings.FEATURES.get('ENABLE_MKTG_SITE') and getattr(course, 'marketing_url', None):
         course_about_url = course.marketing_url
     else:
-        course_about_url = u'{about_base_url}/courses/{course_key}/about'.format(
+        course_about_url = '{about_base_url}/courses/{course_key}/about'.format(
             about_base_url=configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL),
-            course_key=unicode(course.id),
+            course_key=str(course.id),
         )
 
     return course_about_url

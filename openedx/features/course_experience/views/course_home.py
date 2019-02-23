@@ -44,7 +44,7 @@ from .latest_update import LatestUpdateFragmentView
 from .welcome_message import WelcomeMessageFragmentView
 
 
-EMPTY_HANDOUTS_HTML = u'<ol></ol>'
+EMPTY_HANDOUTS_HTML = '<ol></ol>'
 
 
 class CourseHomeView(CourseTabView):
@@ -68,7 +68,7 @@ class CourseHomeView(CourseTabView):
         return USE_BOOTSTRAP_FLAG.is_enabled(course.id)
 
     def render_to_fragment(self, request, course=None, tab=None, **kwargs):
-        course_id = unicode(course.id)
+        course_id = str(course.id)
         home_fragment_view = CourseHomeFragmentView()
         return home_fragment_view.render_to_fragment(request, course_id=course_id, **kwargs)
 

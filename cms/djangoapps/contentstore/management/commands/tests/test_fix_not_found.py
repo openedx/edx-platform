@@ -16,7 +16,7 @@ class TestFixNotFound(ModuleStoreTestCase):
         """
         Test fix_not_found command with no arguments
         """
-        with self.assertRaisesRegexp(CommandError, "Error: too few arguments"):
+        with self.assertRaisesRegex(CommandError, "Error: too few arguments"):
             call_command('fix_not_found')
 
     def test_fix_not_found_non_split(self):
@@ -24,8 +24,8 @@ class TestFixNotFound(ModuleStoreTestCase):
         The management command doesn't work on non split courses
         """
         course = CourseFactory.create(default_store=ModuleStoreEnum.Type.mongo)
-        with self.assertRaisesRegexp(CommandError, "The owning modulestore does not support this command."):
-            call_command("fix_not_found", unicode(course.id))
+        with self.assertRaisesRegex(CommandError, "The owning modulestore does not support this command."):
+            call_command("fix_not_found", str(course.id))
 
     def test_fix_not_found(self):
         course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
@@ -45,7 +45,7 @@ class TestFixNotFound(ModuleStoreTestCase):
         self.assertEqual(len(course.children), 2)
         self.assertIn(dangling_pointer, course.children)
 
-        call_command("fix_not_found", unicode(course.id))
+        call_command("fix_not_found", str(course.id))
 
         # make sure the dangling pointer was removed from
         # the course block's children

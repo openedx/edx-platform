@@ -12,7 +12,7 @@ from openedx.core.lib.tests.tools import assert_equal, assert_in, assert_true  #
 DISPLAY_NAME = "Display Name"
 
 
-@step(u'I add this type of single step component:$')
+@step('I add this type of single step component:$')
 def add_a_single_step_component(step):
     for step_hash in step.hashes:
         component = step_hash['Component']
@@ -24,17 +24,17 @@ def add_a_single_step_component(step):
         )
 
 
-@step(u'I see this type of single step component:$')
+@step('I see this type of single step component:$')
 def see_a_single_step_component(step):
     for step_hash in step.hashes:
         component = step_hash['Component']
         assert_in(component, ['Discussion', 'Video'])
         component_css = '.xmodule_{}Module'.format(component)
         assert_true(world.is_css_present(component_css),
-                    u"{} couldn't be found".format(component))
+                    "{} couldn't be found".format(component))
 
 
-@step(u'I add this type of( Advanced)? (HTML|Problem) component:$')
+@step('I add this type of( Advanced)? (HTML|Problem) component:$')
 def add_a_multi_step_component(step, is_advanced, category):
     for step_hash in step.hashes:
         world.create_component_instance(
@@ -45,7 +45,7 @@ def add_a_multi_step_component(step, is_advanced, category):
         )
 
 
-@step(u'I see (HTML|Problem) components in this order:')
+@step('I see (HTML|Problem) components in this order:')
 def see_a_multi_step_component(step, category):
 
     # Wait for all components to finish rendering
@@ -71,7 +71,7 @@ def see_a_multi_step_component(step, category):
             assert_in(step_hash['Component'], actual_text)
 
 
-@step(u'I see a "([^"]*)" Problem component$')
+@step('I see a "([^"]*)" Problem component$')
 def see_a_problem_component(step, category):
     component_css = '.xmodule_CapaModule'
     assert_true(world.is_css_present(component_css),
@@ -83,25 +83,25 @@ def see_a_problem_component(step, category):
     assert_true(world.css_contains_text(problem_css, category))
 
 
-@step(u'I add a "([^"]*)" "([^"]*)" component$')
+@step('I add a "([^"]*)" "([^"]*)" component$')
 def add_component_category(step, component, category):
     assert category in ('single step', 'HTML', 'Problem', 'Advanced Problem')
-    given_string = u'I add this type of {} component:'.format(category)
+    given_string = 'I add this type of {} component:'.format(category)
     step.given('{}\n{}\n{}'.format(given_string, '|Component|', '|{}|'.format(component)))
 
 
-@step(u'I delete all components$')
+@step('I delete all components$')
 def delete_all_components(step):
     count = len(world.css_find('.reorderable-container .studio-xblock-wrapper'))
     step.given('I delete "' + str(count) + '" component')
 
 
-@step(u'I delete "([^"]*)" component$')
+@step('I delete "([^"]*)" component$')
 def delete_components(step, number):
     world.wait_for_xmodule()
     delete_btn_css = '.delete-button'
     prompt_css = '#prompt-warning'
-    btn_css = u'{} .action-primary'.format(prompt_css)
+    btn_css = '{} .action-primary'.format(prompt_css)
     saving_mini_css = '#page-notification .wrapper-notification-mini'
     for _ in range(int(number)):
         world.css_click(delete_btn_css)
@@ -121,23 +121,23 @@ def delete_components(step, number):
             world.css_find('{}.is-hiding'.format(saving_mini_css))
 
 
-@step(u'I see no components')
+@step('I see no components')
 def see_no_components(steps):
     assert world.is_css_not_present('li.studio-xblock-wrapper')
 
 
-@step(u'I delete a component')
+@step('I delete a component')
 def delete_one_component(step):
     world.css_click('.delete-button')
 
 
-@step(u'I edit and save a component')
+@step('I edit and save a component')
 def edit_and_save_component(step):
     world.css_click('.edit-button')
     world.css_click('.save-button')
 
 
-@step(u'I duplicate the (first|second|third) component$')
+@step('I duplicate the (first|second|third) component$')
 def duplicated_component(step, ordinal):
     ord_map = {
         "first": 0,
@@ -149,7 +149,7 @@ def duplicated_component(step, ordinal):
     world.css_click(duplicate_btn_css, int(index))
 
 
-@step(u'I see a Problem component with display name "([^"]*)" in position "([^"]*)"$')
+@step('I see a Problem component with display name "([^"]*)" in position "([^"]*)"$')
 def see_component_in_position(step, display_name, index):
     component_css = '.xmodule_CapaModule'
 
@@ -159,14 +159,14 @@ def see_component_in_position(step, display_name, index):
     world.wait_for(find_problem, timeout_msg='Did not find the duplicated problem')
 
 
-@step(u'I see the display name is "([^"]*)"')
+@step('I see the display name is "([^"]*)"')
 def check_component_display_name(step, display_name):
     # The display name for the unit uses the same structure, must differentiate by level-element.
     label = world.css_html(".level-element>header>div>div>span.xblock-display-name")
     assert_equal(display_name, label)
 
 
-@step(u'I change the display name to "([^"]*)"')
+@step('I change the display name to "([^"]*)"')
 def change_display_name(step, display_name):
     world.edit_component_and_select_settings()
     index = world.get_setting_entry_index(DISPLAY_NAME)
@@ -174,7 +174,7 @@ def change_display_name(step, display_name):
     world.save_component()
 
 
-@step(u'I unset the display name')
+@step('I unset the display name')
 def unset_display_name(step):
     world.edit_component_and_select_settings()
     world.revert_setting_entry(DISPLAY_NAME)

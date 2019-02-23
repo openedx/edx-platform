@@ -174,8 +174,8 @@ def update_account_settings(requesting_user, update, username=None):
     if read_only_fields:
         for read_only_field in read_only_fields:
             field_errors[read_only_field] = {
-                "developer_message": u"This field is not editable via this API",
-                "user_message": _(u"The '{field_name}' field cannot be edited.").format(field_name=read_only_field)
+                "developer_message": "This field is not editable via this API",
+                "user_message": _("The '{field_name}' field cannot be edited.").format(field_name=read_only_field)
             }
             del update[read_only_field]
 
@@ -191,7 +191,7 @@ def update_account_settings(requesting_user, update, username=None):
             student_views.validate_new_email(existing_user, new_email)
         except ValueError as err:
             field_errors["email"] = {
-                "developer_message": u"Error thrown from validate_new_email: '{}'".format(text_type(err)),
+                "developer_message": "Error thrown from validate_new_email: '{}'".format(text_type(err)),
                 "user_message": text_type(err)
             }
 
@@ -205,7 +205,7 @@ def update_account_settings(requesting_user, update, username=None):
             student_views.validate_secondary_email(account_recovery, update["secondary_email"])
         except ValueError as err:
             field_errors["secondary_email"] = {
-                "developer_message": u"Error thrown from validate_secondary_email: '{}'".format(text_type(err)),
+                "developer_message": "Error thrown from validate_secondary_email: '{}'".format(text_type(err)),
                 "user_message": text_type(err)
             }
         else:
@@ -217,7 +217,7 @@ def update_account_settings(requesting_user, update, username=None):
             student_forms.validate_name(update['name'])
         except ValidationError as err:
             field_errors["name"] = {
-                "developer_message": u"Error thrown from validate_name: '{}'".format(err.message),
+                "developer_message": "Error thrown from validate_name: '{}'".format(err.message),
                 "user_message": err.message
             }
 
@@ -261,7 +261,7 @@ def update_account_settings(requesting_user, update, username=None):
                 meta['old_names'] = []
             meta['old_names'].append([
                 old_name,
-                u"Name change requested through account API by {0}".format(requesting_user.username),
+                "Name change requested through account API by {0}".format(requesting_user.username),
                 datetime.datetime.now(UTC).isoformat()
             ])
             existing_user_profile.set_meta(meta)
@@ -284,18 +284,18 @@ def update_account_settings(requesting_user, update, username=None):
         raise err
     except Exception as err:
         raise AccountUpdateError(
-            u"Error thrown when saving account updates: '{}'".format(text_type(err))
+            "Error thrown when saving account updates: '{}'".format(text_type(err))
         )
 
     # And try to send the email change request if necessary.
     if changing_email:
         if not settings.FEATURES['ALLOW_EMAIL_ADDRESS_CHANGE']:
-            raise AccountUpdateError(u"Email address changes have been disabled by the site operators.")
+            raise AccountUpdateError("Email address changes have been disabled by the site operators.")
         try:
             student_views.do_email_change_request(existing_user, new_email)
         except ValueError as err:
             raise AccountUpdateError(
-                u"Error thrown from do_email_change_request: '{}'".format(text_type(err)),
+                "Error thrown from do_email_change_request: '{}'".format(text_type(err)),
                 user_message=text_type(err)
             )
     if changing_secondary_email:
@@ -307,7 +307,7 @@ def update_account_settings(requesting_user, update, username=None):
             )
         except ValueError as err:
             raise AccountUpdateError(
-                u"Error thrown from do_email_change_request: '{}'".format(text_type(err)),
+                "Error thrown from do_email_change_request: '{}'".format(text_type(err)),
                 user_message=text_type(err)
             )
 
@@ -653,7 +653,7 @@ def _validate_username(username):
     """
     try:
         _validate_unicode(username)
-        _validate_type(username, basestring, accounts.USERNAME_BAD_TYPE_MSG)
+        _validate_type(username, str, accounts.USERNAME_BAD_TYPE_MSG)
         _validate_length(
             username,
             accounts.USERNAME_MIN_LENGTH,
@@ -685,7 +685,7 @@ def _validate_email(email):
     """
     try:
         _validate_unicode(email)
-        _validate_type(email, basestring, accounts.EMAIL_BAD_TYPE_MSG)
+        _validate_type(email, str, accounts.EMAIL_BAD_TYPE_MSG)
         _validate_length(email, accounts.EMAIL_MIN_LENGTH, accounts.EMAIL_MAX_LENGTH, accounts.EMAIL_BAD_LENGTH_MSG)
         validate_email.message = accounts.EMAIL_INVALID_MSG.format(email=email)
         validate_email(email)
@@ -727,7 +727,7 @@ def _validate_password(password, username=None, email=None):
 
     """
     try:
-        _validate_type(password, basestring, accounts.PASSWORD_BAD_TYPE_MSG)
+        _validate_type(password, str, accounts.PASSWORD_BAD_TYPE_MSG)
         temp_user = User(username=username, email=email) if username else None
         validate_password(password, user=temp_user)
     except errors.AccountDataBadType as invalid_password_err:
@@ -834,7 +834,7 @@ def _validate_length(data, min, max, err):
         raise errors.AccountDataBadLength(err)
 
 
-def _validate_unicode(data, err=u"Input not valid unicode"):
+def _validate_unicode(data, err="Input not valid unicode"):
     """Checks whether the input data is valid unicode or not.
 
     :param data: The data to check for unicode validity.
@@ -844,9 +844,9 @@ def _validate_unicode(data, err=u"Input not valid unicode"):
 
     """
     try:
-        if not isinstance(data, str) and not isinstance(data, unicode):
+        if not isinstance(data, str) and not isinstance(data, str):
             raise UnicodeError(err)
         # In some cases we pass the above, but it's still inappropriate utf-8.
-        unicode(data)
+        str(data)
     except UnicodeError:
         raise UnicodeError(err)

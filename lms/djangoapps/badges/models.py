@@ -26,9 +26,9 @@ def validate_badge_image(image):
     Validates that a particular image is small enough to be a badge and square.
     """
     if image.width != image.height:
-        raise ValidationError(_(u"The badge image must be square."))
+        raise ValidationError(_("The badge image must be square."))
     if not image.size < (250 * 1024):
-        raise ValidationError(_(u"The badge image file size must be less than 250KB."))
+        raise ValidationError(_("The badge image file size must be less than 250KB."))
 
 
 def validate_lowercase(string):
@@ -36,7 +36,7 @@ def validate_lowercase(string):
     Validates that a string is lowercase.
     """
     if not string.islower():
-        raise ValidationError(_(u"This value must be all lowercase."))
+        raise ValidationError(_("This value must be all lowercase."))
 
 
 class CourseBadgesDisabledError(Exception):
@@ -62,7 +62,7 @@ class BadgeClass(models.Model):
     image = models.ImageField(upload_to='badge_classes', validators=[validate_badge_image])
 
     def __unicode__(self):
-        return HTML(u"<Badge '{slug}' for '{issuing_component}'>").format(
+        return HTML("<Badge '{slug}' for '{issuing_component}'>").format(
             slug=HTML(self.slug), issuing_component=HTML(self.issuing_component)
         )
 
@@ -154,7 +154,7 @@ class BadgeAssertion(TimeStampedModel):
     assertion_url = models.URLField()
 
     def __unicode__(self):
-        return HTML(u"<{username} Badge Assertion for {slug} for {issuing_component}").format(
+        return HTML("<{username} Badge Assertion for {slug} for {issuing_component}").format(
             username=HTML(self.user.username),
             slug=HTML(self.badge_class.slug),
             issuing_component=HTML(self.badge_class.issuing_component),
@@ -185,29 +185,29 @@ class CourseCompleteImageConfiguration(models.Model):
     """
     mode = models.CharField(
         max_length=125,
-        help_text=_(u'The course mode for this badge image. For example, "verified" or "honor".'),
+        help_text=_('The course mode for this badge image. For example, "verified" or "honor".'),
         unique=True,
     )
     icon = models.ImageField(
         # Actual max is 256KB, but need overhead for badge baking. This should be more than enough.
         help_text=_(
-            u"Badge images must be square PNG files. The file size should be under 250KB."
+            "Badge images must be square PNG files. The file size should be under 250KB."
         ),
         upload_to='course_complete_badges',
         validators=[validate_badge_image]
     )
     default = models.BooleanField(
         help_text=_(
-            u"Set this value to True if you want this image to be the default image for any course modes "
-            u"that do not have a specified badge image. You can have only one default image."
+            "Set this value to True if you want this image to be the default image for any course modes "
+            "that do not have a specified badge image. You can have only one default image."
         ),
         default=False,
     )
 
     def __unicode__(self):
-        return HTML(u"<CourseCompleteImageConfiguration for '{mode}'{default}>").format(
+        return HTML("<CourseCompleteImageConfiguration for '{mode}'{default}>").format(
             mode=HTML(self.mode),
-            default=HTML(u" (default)") if self.default else HTML(u'')
+            default=HTML(" (default)") if self.default else HTML('')
         )
 
     def clean(self):
@@ -215,7 +215,7 @@ class CourseCompleteImageConfiguration(models.Model):
         Make sure there's not more than one default.
         """
         if self.default and CourseCompleteImageConfiguration.objects.filter(default=True).exclude(id=self.id):
-            raise ValidationError(_(u"There can be only one default image."))
+            raise ValidationError(_("There can be only one default image."))
 
     @classmethod
     def image_for_mode(cls, mode):
@@ -242,32 +242,32 @@ class CourseEventBadgesConfiguration(ConfigurationModel):
     courses_completed = models.TextField(
         blank=True, default='',
         help_text=_(
-            u"On each line, put the number of completed courses to award a badge for, a comma, and the slug of a "
-            u"badge class you have created that has the issuing component 'openedx__course'. "
-            u"For example: 3,enrolled_3_courses"
+            "On each line, put the number of completed courses to award a badge for, a comma, and the slug of a "
+            "badge class you have created that has the issuing component 'openedx__course'. "
+            "For example: 3,enrolled_3_courses"
         )
     )
     courses_enrolled = models.TextField(
         blank=True, default='',
         help_text=_(
-            u"On each line, put the number of enrolled courses to award a badge for, a comma, and the slug of a "
-            u"badge class you have created that has the issuing component 'openedx__course'. "
-            u"For example: 3,enrolled_3_courses"
+            "On each line, put the number of enrolled courses to award a badge for, a comma, and the slug of a "
+            "badge class you have created that has the issuing component 'openedx__course'. "
+            "For example: 3,enrolled_3_courses"
         )
     )
     course_groups = models.TextField(
         blank=True, default='',
         help_text=_(
-            u"Each line is a comma-separated list. The first item in each line is the slug of a badge class you "
-            u"have created that has an issuing component of 'openedx__course'. The remaining items in each line are "
-            u"the course keys the learner needs to complete to be awarded the badge. For example: "
-            u"slug_for_compsci_courses_group_badge,course-v1:CompSci+Course+First,course-v1:CompsSci+Course+Second"
+            "Each line is a comma-separated list. The first item in each line is the slug of a badge class you "
+            "have created that has an issuing component of 'openedx__course'. The remaining items in each line are "
+            "the course keys the learner needs to complete to be awarded the badge. For example: "
+            "slug_for_compsci_courses_group_badge,course-v1:CompSci+Course+First,course-v1:CompsSci+Course+Second"
         )
     )
 
     def __unicode__(self):
-        return HTML(u"<CourseEventBadgesConfiguration ({})>").format(
-            Text(u"Enabled") if self.enabled else Text(u"Disabled")
+        return HTML("<CourseEventBadgesConfiguration ({})>").format(
+            Text("Enabled") if self.enabled else Text("Disabled")
         )
 
     @property
@@ -305,26 +305,26 @@ class CourseEventBadgesConfiguration(ConfigurationModel):
         Verify the settings are parseable.
         """
         errors = {}
-        error_message = _(u"Please check the syntax of your entry.")
+        error_message = _("Please check the syntax of your entry.")
         if 'courses_completed' not in exclude:
             try:
                 self.completed_settings
             except (ValueError, InvalidKeyError):
-                errors['courses_completed'] = [unicode(error_message)]
+                errors['courses_completed'] = [str(error_message)]
         if 'courses_enrolled' not in exclude:
             try:
                 self.enrolled_settings
             except (ValueError, InvalidKeyError):
-                errors['courses_enrolled'] = [unicode(error_message)]
+                errors['courses_enrolled'] = [str(error_message)]
         if 'course_groups' not in exclude:
             store = modulestore()
             try:
-                for key_list in self.course_group_settings.values():
+                for key_list in list(self.course_group_settings.values()):
                     for course_key in key_list:
                         if not store.get_course(course_key):
-                            ValueError(u"The course {course_key} does not exist.".format(course_key=course_key))
+                            ValueError("The course {course_key} does not exist.".format(course_key=course_key))
             except (ValueError, InvalidKeyError):
-                errors['course_groups'] = [unicode(error_message)]
+                errors['course_groups'] = [str(error_message)]
         if errors:
             raise ValidationError(errors)
 

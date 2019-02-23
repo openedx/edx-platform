@@ -142,7 +142,7 @@ class TestTrackViews(EventTrackingTestCase):
                     'course_id': 'foo/bar/baz',
                     'org_id': 'foo',
                     'user_id': user_id,
-                    'path': u'/event'
+                    'path': '/event'
                 },
             }
         finally:
@@ -199,9 +199,9 @@ class TestTrackViews(EventTrackingTestCase):
                 'host': 'testserver',
                 'context': {
                     'user_id': '',
-                    'course_id': u'foo/bar/baz',
+                    'course_id': 'foo/bar/baz',
                     'org_id': 'foo',
-                    'path': u'/courses/foo/bar/baz/xmod/'
+                    'path': '/courses/foo/bar/baz/xmod/'
                 },
             }
         finally:
@@ -233,9 +233,9 @@ class TestTrackViews(EventTrackingTestCase):
                 'host': 'testserver',
                 'context': {
                     'user_id': '',
-                    'course_id': u'foo/bar/baz',
+                    'course_id': 'foo/bar/baz',
                     'org_id': 'foo',
-                    'path': u'/courses/foo/bar/baz/xmod/'
+                    'path': '/courses/foo/bar/baz/xmod/'
                 },
             }
         finally:

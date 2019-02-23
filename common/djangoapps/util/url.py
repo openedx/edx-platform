@@ -7,6 +7,7 @@ from importlib import import_module
 
 from django.conf import settings
 from django.urls import set_urlconf
+import imp
 
 
 def reload_django_url_config():
@@ -17,7 +18,7 @@ def reload_django_url_config():
     """
     urlconf = settings.ROOT_URLCONF
     if urlconf and urlconf in sys.modules:
-        reload(sys.modules[urlconf])
+        imp.reload(sys.modules[urlconf])
     reloaded = import_module(urlconf)
     reloaded_urls = reloaded.urlpatterns
     set_urlconf(tuple(reloaded_urls))

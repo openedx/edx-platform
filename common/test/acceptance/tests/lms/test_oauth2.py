@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for OAuth2 permission delegation."""
 
-from urlparse import parse_qsl, urlparse
+from urllib.parse import parse_qsl, urlparse
 
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.oauth2_confirmation import OAuth2Confirmation

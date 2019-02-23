@@ -51,7 +51,7 @@ def i_visit_the_homepage(step):
     assert world.is_css_present('header.global')
 
 
-@step(u'I (?:visit|access|open) the dashboard$')
+@step('I (?:visit|access|open) the dashboard$')
 def i_visit_the_dashboard(step):
     world.visit('/dashboard')
     assert world.is_css_present('.dashboard')
@@ -63,19 +63,19 @@ def i_should_be_on_the_dashboard(step):
     assert 'Dashboard' in world.browser.title
 
 
-@step(u'I (?:visit|access|open) the courses page$')
+@step('I (?:visit|access|open) the courses page$')
 def i_am_on_the_courses_page(step):
     world.visit('/courses')
     assert world.is_css_present('div.courses')
 
 
-@step(u'I press the "([^"]*)" button$')
+@step('I press the "([^"]*)" button$')
 def and_i_press_the_button(step, value):
     button_css = 'input[value="%s"]' % value
     world.css_click(button_css)
 
 
-@step(u'I click the link with the text "([^"]*)"$')
+@step('I click the link with the text "([^"]*)"$')
 def click_the_link_with_the_text_group1(step, linktext):
     world.click_link(linktext)
 
@@ -89,12 +89,12 @@ def i_should_see_that_the_path_is(step, path):
     )
 
 
-@step(u'the page title should be "([^"]*)"$')
+@step('the page title should be "([^"]*)"$')
 def the_page_title_should_be(step, title):
     assert_equals(world.browser.title, title)
 
 
-@step(u'the page title should contain "([^"]*)"$')
+@step('the page title should contain "([^"]*)"$')
 def the_page_title_should_contain(step, title):
     assert title in world.browser.title
 
@@ -171,29 +171,29 @@ def i_am_logged_in(step):
     assert world.is_css_present(dash_css)
 
 
-@step(u'I am an edX user$')
+@step('I am an edX user$')
 def i_am_an_edx_user(step):
     world.create_user('robot', 'test')
 
 
-@step(u'User "([^"]*)" is an edX user$')
+@step('User "([^"]*)" is an edX user$')
 def registered_edx_user(step, uname):
     world.create_user(uname, 'test')
 
 
-@step(u'All dialogs should be closed$')
+@step('All dialogs should be closed$')
 def dialogs_are_closed(step):
     assert world.dialogs_closed()
 
 
-@step(u'visit the url "([^"]*)"')
+@step('visit the url "([^"]*)"')
 def visit_url(step, url):
     if 'COURSE' in world.scenario_dict:
         url = url.format(world.scenario_dict['COURSE'].id)
     world.browser.visit(lettuce.django.django_url(url))
 
 
-@step(u'wait for AJAX to (?:finish|complete)')
+@step('wait for AJAX to (?:finish|complete)')
 def wait_ajax(_step):
     wait_for_ajax_complete()
 
@@ -236,7 +236,7 @@ def run_ipdb(_step):
     assert True
 
 
-@step(u'(I am viewing|s?he views) the course team settings$')
+@step('(I am viewing|s?he views) the course team settings$')
 def view_course_team_settings(_step, whom):
     """ navigates to course team settings page """
     world.click_course_settings()

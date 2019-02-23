@@ -1,6 +1,6 @@
 """ Tests for Credit API serializers. """
 
-from __future__ import unicode_literals
+
 
 from django.test import TestCase
 
@@ -38,7 +38,7 @@ class CreditEligibilitySerializerTests(TestCase):
         eligibility = CreditEligibilityFactory(username=user.username)
         serializer = serializers.CreditEligibilitySerializer(eligibility)
         expected = {
-            'course_key': unicode(eligibility.course.course_key),
+            'course_key': str(eligibility.course.course_key),
             'deadline': eligibility.deadline.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
             'username': user.username,
         }

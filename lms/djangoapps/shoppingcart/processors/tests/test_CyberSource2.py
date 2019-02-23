@@ -79,7 +79,7 @@ class CyberSource2Test(TestCase):
         # Parameters determined by the order model
         self.assertEqual(params['amount'], '10.00')
         self.assertEqual(params['currency'], 'usd')
-        self.assertEqual(params['orderNumber'], u'OrderId: {order_id}'.format(order_id=self.order.id))
+        self.assertEqual(params['orderNumber'], 'OrderId: {order_id}'.format(order_id=self.order.id))
         self.assertEqual(params['reference_number'], self.order.id)
 
         # Parameters determined by the Django (test) settings
@@ -148,7 +148,7 @@ class CyberSource2Test(TestCase):
         # Expect that we processed the payment successfully
         self.assertTrue(
             result['success'],
-            msg=u"Payment was not successful: {error}".format(error=result.get('error_html'))
+            msg="Payment was not successful: {error}".format(error=result.get('error_html'))
         )
         self.assertEqual(result['error_html'], '')
 
@@ -166,7 +166,7 @@ class CyberSource2Test(TestCase):
 
         # Expect that we get an error message
         self.assertFalse(result['success'])
-        self.assertIn(u"did not accept your payment", result['error_html'])
+        self.assertIn("did not accept your payment", result['error_html'])
         self.assert_dump_recorded(result['order'])
 
     def test_process_payment_invalid_signature(self):
@@ -176,7 +176,7 @@ class CyberSource2Test(TestCase):
 
         # Expect that we get an error message
         self.assertFalse(result['success'])
-        self.assertIn(u"corrupted message regarding your charge", result['error_html'])
+        self.assertIn("corrupted message regarding your charge", result['error_html'])
 
     def test_process_payment_invalid_order(self):
         # Use an invalid order ID
@@ -185,7 +185,7 @@ class CyberSource2Test(TestCase):
 
         # Expect an error
         self.assertFalse(result['success'])
-        self.assertIn(u"inconsistent data", result['error_html'])
+        self.assertIn("inconsistent data", result['error_html'])
 
     def test_process_invalid_payment_amount(self):
         # Change the payment amount (no longer matches the database order record)
@@ -194,7 +194,7 @@ class CyberSource2Test(TestCase):
 
         # Expect an error
         self.assertFalse(result['success'])
-        self.assertIn(u"different amount than the order total", result['error_html'])
+        self.assertIn("different amount than the order total", result['error_html'])
         # refresh data for current order
         order = Order.objects.get(id=self.order.id)
         self.assert_dump_recorded(order)
@@ -206,17 +206,17 @@ class CyberSource2Test(TestCase):
 
         # Expect an error
         self.assertFalse(result['success'])
-        self.assertIn(u"badly-typed value", result['error_html'])
+        self.assertIn("badly-typed value", result['error_html'])
 
     def test_process_user_cancelled(self):
         # Change the payment amount to a non-decimal
         params = self._signed_callback_params(self.order.id, self.COST, "abcd")
-        params['decision'] = u'CANCEL'
+        params['decision'] = 'CANCEL'
         result = process_postpay_callback(params)
 
         # Expect an error
         self.assertFalse(result['success'])
-        self.assertIn(u"you have cancelled this transaction", result['error_html'])
+        self.assertIn("you have cancelled this transaction", result['error_html'])
 
     @patch.object(OrderItem, 'purchased_callback')
     @patch.object(OrderItem, 'pdf_receipt_display_name')
@@ -231,7 +231,7 @@ class CyberSource2Test(TestCase):
         # Expect that we processed the payment successfully
         self.assertTrue(
             result['success'],
-            msg=u"Payment was not successful: {error}".format(error=result.get('error_html'))
+            msg="Payment was not successful: {error}".format(error=result.get('error_html'))
         )
         self.assertEqual(result['error_html'], '')
         self.assert_dump_recorded(result['order'])
@@ -254,14 +254,14 @@ class CyberSource2Test(TestCase):
 
         # Expect an error
         self.assertFalse(result['success'])
-        self.assertIn(u"did not return a required parameter", result['error_html'])
+        self.assertIn("did not return a required parameter", result['error_html'])
 
     @patch.object(OrderItem, 'purchased_callback')
     @patch.object(OrderItem, 'pdf_receipt_display_name')
     def test_sign_then_verify_unicode(self, pdf_receipt_display_name, purchased_callback):  # pylint: disable=unused-argument
         params = self._signed_callback_params(
             self.order.id, self.COST, self.COST,
-            first_name=u'\u2699'
+            first_name='\u2699'
         )
 
         # Verify that this executes without a unicode error
@@ -269,7 +269,7 @@ class CyberSource2Test(TestCase):
         self.assertTrue(result['success'])
         self.assert_dump_recorded(result['order'])
 
-    @ddt.data('string', u'üñîçø∂é')
+    @ddt.data('string', 'üñîçø∂é')
     def test_get_processor_exception_html(self, error_string):
         """
         Tests the processor exception html message
@@ -364,7 +364,7 @@ class CyberSource2Test(TestCase):
             "req_card_number": card_number,
 
             # Stub values
-            "utf8": u"✓",
+            "utf8": "✓",
             "req_bill_to_address_country": "US",
             "auth_avs_code": "X",
             "req_card_expiry_date": "01-2018",
@@ -425,9 +425,9 @@ class CyberSource2Test(TestCase):
         """
         return processor_hash(
             ",".join([
-                u"{0}={1}".format(signed_field, params[signed_field])
+                "{0}={1}".format(signed_field, params[signed_field])
                 for signed_field
-                in params['signed_field_names'].split(u",")
+                in params['signed_field_names'].split(",")
             ])
         )
 
@@ -438,4 +438,4 @@ class CyberSource2Test(TestCase):
 
         # Expect that we get an error message
         self.assertFalse(result['success'])
-        self.assertIn(u"payment was declined", result['error_html'])
+        self.assertIn("payment was declined", result['error_html'])

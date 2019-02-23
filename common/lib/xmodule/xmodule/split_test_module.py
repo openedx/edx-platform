@@ -21,6 +21,7 @@ from six import text_type
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Scope, Integer, String, ReferenceValueDict
+from functools import reduce
 
 log = logging.getLogger('edx.' + __name__)
 
@@ -28,7 +29,7 @@ log = logging.getLogger('edx.' + __name__)
 #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
 
-DEFAULT_GROUP_NAME = _(u'Group ID {group_id}')
+DEFAULT_GROUP_NAME = _('Group ID {group_id}')
 
 
 class SplitTestFields(object):
@@ -179,7 +180,7 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
             child_descriptor = self.get_child_descriptor_by_location(child_location)
         else:
             # Oops.  Config error.
-            log.debug("configuration error in split test module: invalid group_id %r (not one of %r).  Showing error", str_group_id, self.group_id_to_child.keys())
+            log.debug("configuration error in split test module: invalid group_id %r (not one of %r).  Showing error", str_group_id, list(self.group_id_to_child.keys()))
 
         if child_descriptor is None:
             # Peak confusion is great.  Now that we set child_descriptor,
@@ -223,9 +224,9 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
 
             if updated_group_id is None:  # inactive group
                 group_name = child.display_name
-                updated_group_id = [g_id for g_id, loc in self.group_id_to_child.items() if loc == child_location][0]
+                updated_group_id = [g_id for g_id, loc in list(self.group_id_to_child.items()) if loc == child_location][0]
                 inactive_contents.append({
-                    'group_name': _(u'{group_name} (inactive)').format(group_name=group_name),
+                    'group_name': _('{group_name} (inactive)').format(group_name=group_name),
                     'id': text_type(child.location),
                     'content': rendered_child.content,
                     'group_id': updated_group_id,
@@ -312,7 +313,7 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
         """
         if self.child is None:
             # raise error instead?  In fact, could complain on descriptor load...
-            return Fragment(content=u"<div>Nothing here.  Move along.</div>")
+            return Fragment(content="<div>Nothing here.  Move along.</div>")
 
         if self.system.user_is_staff:
             return self._staff_view(context)
@@ -338,7 +339,7 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
         except Exception:
             log.info(
                 "Can't get usage_id of Nonetype object in course {course_key}".format(
-                    course_key=unicode(self.location.course_key)
+                    course_key=str(self.location.course_key)
                 )
             )
             raise
@@ -362,7 +363,7 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
         user_partition = self.descriptor.get_selected_partition()
         if user_partition:
             for group in user_partition.groups:
-                group_id = unicode(group.id)
+                group_id = str(group.id)
                 child_location = self.group_id_to_child.get(group_id, None)
                 if child_location == vertical.location:
                     return (group.name, group.id)
@@ -469,7 +470,7 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
                 # Don't need to call update_item in the modulestore because the caller of this method will do it.
         else:
             # If children referenced in group_id_to_child have been deleted, remove them from the map.
-            for str_group_id, usage_key in self.group_id_to_child.items():
+            for str_group_id, usage_key in list(self.group_id_to_child.items()):
                 if usage_key not in self.children:  # pylint: disable=no-member
                     del self.group_id_to_child[str_group_id]
 
@@ -534,7 +535,7 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
         # Compute the active children in the order specified by the user partition
         active_children = []
         for group in user_partition.groups:
-            group_id = unicode(group.id)
+            group_id = str(group.id)
             child_location = self.group_id_to_child.get(group_id, None)
             child = get_child_descriptor(child_location)
             if child:
@@ -583,9 +584,9 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
             split_validation.add(
                 StudioValidationMessage(
                     StudioValidationMessage.NOT_CONFIGURED,
-                    _(u"The experiment is not associated with a group configuration."),
+                    _("The experiment is not associated with a group configuration."),
                     action_class='edit-button',
-                    action_label=_(u"Select a Group Configuration")
+                    action_label=_("Select a Group Configuration")
                 )
             )
         else:
@@ -594,7 +595,7 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
                 split_validation.add(
                     StudioValidationMessage(
                         StudioValidationMessage.ERROR,
-                        _(u"The experiment uses a deleted group configuration. Select a valid group configuration or delete this experiment.")
+                        _("The experiment uses a deleted group configuration. Select a valid group configuration or delete this experiment.")
                     )
                 )
             else:
@@ -604,8 +605,8 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
                     split_validation.add(
                         StudioValidationMessage(
                             StudioValidationMessage.ERROR,
-                            _(u"The experiment uses a group configuration that is not supported for experiments. "
-                              u"Select a valid group configuration or delete this experiment.")
+                            _("The experiment uses a group configuration that is not supported for experiments. "
+                              "Select a valid group configuration or delete this experiment.")
                         )
                     )
                 else:
@@ -614,17 +615,17 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
                         split_validation.add(
                             StudioValidationMessage(
                                 StudioValidationMessage.ERROR,
-                                _(u"The experiment does not contain all of the groups in the configuration."),
+                                _("The experiment does not contain all of the groups in the configuration."),
                                 action_runtime_event='add-missing-groups',
-                                action_label=_(u"Add Missing Groups")
+                                action_label=_("Add Missing Groups")
                             )
                         )
                     if len(inactive_children) > 0:
                         split_validation.add(
                             StudioValidationMessage(
                                 StudioValidationMessage.WARNING,
-                                _(u"The experiment has an inactive group. "
-                                  u"Move content into active groups, then delete the inactive group.")
+                                _("The experiment has an inactive group. "
+                                  "Move content into active groups, then delete the inactive group.")
                             )
                         )
         return split_validation
@@ -642,7 +643,7 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
             has_error = any(message.type == StudioValidationMessage.ERROR for message in validation.messages)
             return StudioValidationMessage(
                 StudioValidationMessage.ERROR if has_error else StudioValidationMessage.WARNING,
-                _(u"This content experiment has issues that affect content visibility.")
+                _("This content experiment has issues that affect content visibility.")
             )
         return None
 
@@ -657,7 +658,7 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
 
         changed = False
         for group in user_partition.groups:
-            str_group_id = unicode(group.id)
+            str_group_id = str(group.id)
             if str_group_id not in self.group_id_to_child:
                 user_id = self.runtime.service(self, 'user').get_current_user().opt_attrs['edx-platform.user_id']
                 self._create_vertical_for_group(group, user_id)
@@ -679,7 +680,7 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
             user_partition = self.get_selected_partition()
             if user_partition:
                 group_configuration_url = "{url}#{configuration_id}".format(
-                    url='/group_configurations/' + unicode(self.location.course_key),
+                    url='/group_configurations/' + str(self.location.course_key),
                     configuration_id=str(user_partition.id)
                 )
 
@@ -708,6 +709,6 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
             runtime=self.system,
         )
         self.children.append(dest_usage_key)  # pylint: disable=no-member
-        self.group_id_to_child[unicode(group.id)] = dest_usage_key
+        self.group_id_to_child[str(group.id)] = dest_usage_key
 
     tooltip_title = module_attr('tooltip_title')

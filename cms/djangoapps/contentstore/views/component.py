@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+
 
 import logging
 
@@ -130,9 +130,9 @@ def container_handler(request, usage_key_string):
 
             assert unit is not None, "Could not determine unit page"
             subsection = get_parent_xblock(unit)
-            assert subsection is not None, "Could not determine parent subsection from unit " + unicode(unit.location)
+            assert subsection is not None, "Could not determine parent subsection from unit " + str(unit.location)
             section = get_parent_xblock(subsection)
-            assert section is not None, "Could not determine ancestor section from unit " + unicode(unit.location)
+            assert section is not None, "Could not determine ancestor section from unit " + str(unit.location)
 
             # Fetch the XBlock info for use by the container page. Note that it includes information
             # about the block's ancestors and siblings for use by the Unit Outline.
@@ -234,7 +234,7 @@ def get_component_templates(courselike, library=False):
         return {
             "show_legend": XBlockStudioConfigurationFlag.is_enabled(),
             "allow_unsupported_xblocks": allow_unsupported,
-            "documentation_label": _(u"{platform_name} Support Levels:").format(platform_name=settings.PLATFORM_NAME)
+            "documentation_label": _("{platform_name} Support Levels:").format(platform_name=settings.PLATFORM_NAME)
         }
 
     component_display_names = {
@@ -323,7 +323,7 @@ def get_component_templates(courselike, library=False):
                     try:
                         component_display_name = xblock_type_display_name(component)
                     except PluginMissingError:
-                        log.warning(u'Unable to load xblock type %s to read display_name', component, exc_info=True)
+                        log.warning('Unable to load xblock type %s to read display_name', component, exc_info=True)
                     else:
                         templates_for_category.append(
                             create_template_dict(
@@ -362,7 +362,7 @@ def get_component_templates(courselike, library=False):
     # Set component types according to course policy file
     if isinstance(course_advanced_keys, list):
         for category in course_advanced_keys:
-            if category in advanced_component_types.keys() and category not in categories:
+            if category in list(advanced_component_types.keys()) and category not in categories:
                 # boilerplates not supported for advanced components
                 try:
                     component_display_name = xblock_type_display_name(category, default_display_name=category)
@@ -381,12 +381,12 @@ def get_component_templates(courselike, library=False):
                     # prevents any authors from trying to instantiate the
                     # non-existent component type by not showing it in the menu
                     log.warning(
-                        u"Advanced component %s does not exist. It will not be added to the Studio new component menu.",
+                        "Advanced component %s does not exist. It will not be added to the Studio new component menu.",
                         category
                     )
     else:
         log.error(
-            u"Improper format for course advanced keys! %s",
+            "Improper format for course advanced keys! %s",
             course_advanced_keys
         )
     if len(advanced_component_templates['templates']) > 0:
@@ -459,7 +459,7 @@ def component_handler(request, usage_key_string, handler, suffix=''):
         handler_descriptor.xmodule_runtime = StudioEditModuleRuntime(request.user)
         resp = handler_descriptor.handle(handler, req, suffix)
     except NoSuchHandlerError:
-        log.info(u"XBlock %s attempted to access missing handler %r", handler_descriptor, handler, exc_info=True)
+        log.info("XBlock %s attempted to access missing handler %r", handler_descriptor, handler, exc_info=True)
         raise Http404
 
     # unintentional update to handle any side effects of handle call

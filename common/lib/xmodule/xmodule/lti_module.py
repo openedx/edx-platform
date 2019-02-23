@@ -58,7 +58,7 @@ import datetime
 import hashlib
 import logging
 import textwrap
-import urllib
+import urllib.request, urllib.parse, urllib.error
 from xml.sax.saxutils import escape
 
 import bleach
@@ -397,7 +397,7 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
             if param_name not in PARAMETERS:
                 param_name = 'custom_' + param_name
 
-            custom_parameters[unicode(param_name)] = unicode(param_value)
+            custom_parameters[str(param_name)] = str(param_value)
 
         return self.oauth_params(
             custom_parameters,
@@ -460,7 +460,7 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
     def get_user_id(self):
         user_id = self.runtime.anonymous_student_id
         assert user_id is not None
-        return unicode(urllib.quote(user_id))
+        return str(urllib.parse.quote(user_id))
 
     def get_outcome_service_url(self, service_name="grade_handler"):
         """
@@ -506,7 +506,7 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
         i4x-2-3-lti-31de800015cf4afb973356dbe81496df this part of resource_link_id:
         makes resource_link_id to be unique among courses inside same system.
         """
-        return unicode(urllib.quote("{}-{}".format(self.system.hostname, self.location.html_id())))
+        return str(urllib.parse.quote("{}-{}".format(self.system.hostname, self.location.html_id())))
 
     def get_lis_result_sourcedid(self):
         """
@@ -518,7 +518,7 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
         This field is generally optional, but is required for grading.
         """
         return "{context}:{resource_link}:{user_id}".format(
-            context=urllib.quote(self.context_id),
+            context=urllib.parse.quote(self.context_id),
             resource_link=self.get_resource_link_id(),
             user_id=self.get_user_id()
         )
@@ -545,11 +545,11 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
         Get system user role and convert it to LTI role.
         """
         roles = {
-            'student': u'Student',
-            'staff': u'Administrator',
-            'instructor': u'Instructor',
+            'student': 'Student',
+            'staff': 'Administrator',
+            'instructor': 'Instructor',
         }
-        return roles.get(self.system.get_user_role(), u'Student')
+        return roles.get(self.system.get_user_role(), 'Student')
 
     def oauth_params(self, custom_parameters, client_key, client_secret):
         """
@@ -568,23 +568,23 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
 
         # Must have parameters for correct signing from LTI:
         body = {
-            u'user_id': self.get_user_id(),
-            u'oauth_callback': u'about:blank',
-            u'launch_presentation_return_url': '',
-            u'lti_message_type': u'basic-lti-launch-request',
-            u'lti_version': 'LTI-1p0',
-            u'roles': self.role,
+            'user_id': self.get_user_id(),
+            'oauth_callback': 'about:blank',
+            'launch_presentation_return_url': '',
+            'lti_message_type': 'basic-lti-launch-request',
+            'lti_version': 'LTI-1p0',
+            'roles': self.role,
 
             # Parameters required for grading:
-            u'resource_link_id': self.get_resource_link_id(),
-            u'lis_result_sourcedid': self.get_lis_result_sourcedid(),
+            'resource_link_id': self.get_resource_link_id(),
+            'lis_result_sourcedid': self.get_lis_result_sourcedid(),
 
-            u'context_id': self.context_id,
+            'context_id': self.context_id,
         }
 
         if self.has_score:
             body.update({
-                u'lis_outcome_service_url': self.get_outcome_service_url()
+                'lis_outcome_service_url': self.get_outcome_service_url()
             })
 
         self.user_email = ""
@@ -619,21 +619,21 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
 
         try:
             __, headers, __ = client.sign(
-                unicode(self.launch_url.strip()),
-                http_method=u'POST',
+                str(self.launch_url.strip()),
+                http_method='POST',
                 body=body,
                 headers=headers)
         except ValueError:  # Scheme not in url.
             # https://github.com/idan/oauthlib/blob/master/oauthlib/oauth1/rfc5849/signature.py#L136
             # Stubbing headers for now:
             log.info(
-                u"LTI module %s in course %s does not have oauth parameters correctly configured.",
+                "LTI module %s in course %s does not have oauth parameters correctly configured.",
                 self.location,
                 self.location.course_key,
             )
             headers = {
-                u'Content-Type': u'application/x-www-form-urlencoded',
-                u'Authorization': u'OAuth oauth_nonce="80966668944732164491378916897", \
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Authorization': 'OAuth oauth_nonce="80966668944732164491378916897", \
 oauth_timestamp="1378916897", oauth_version="1.0", oauth_signature_method="HMAC-SHA1", \
 oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
 
@@ -641,15 +641,15 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         # Parse headers to pass to template as part of context:
         params = dict([param.strip().replace('"', '').split('=') for param in params.split(',')])
 
-        params[u'oauth_nonce'] = params[u'OAuth oauth_nonce']
-        del params[u'OAuth oauth_nonce']
+        params['oauth_nonce'] = params['OAuth oauth_nonce']
+        del params['OAuth oauth_nonce']
 
         # oauthlib encodes signature with
         # 'Content-Type': 'application/x-www-form-urlencoded'
         # so '='' becomes '%3D'.
         # We send form via browser, so browser will encode it again,
         # So we need to decode signature back:
-        params[u'oauth_signature'] = urllib.unquote(params[u'oauth_signature']).decode('utf8')
+        params['oauth_signature'] = urllib.parse.unquote(params['oauth_signature']).decode('utf8')
 
         # Add LTI parameters to OAuth parameters for sending in form.
         params.update(body)
@@ -753,7 +753,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
             log.debug("[LTI]: " + error_message)
             return Response(response_xml_template.format(**failure_values), content_type="application/xml")
 
-        real_user = self.system.get_real_user(urllib.unquote(sourcedId.split(':')[-1]))
+        real_user = self.system.get_real_user(urllib.parse.unquote(sourcedId.split(':')[-1]))
         if not real_user:  # that means we can't save to database, as we do not have real user id.
             failure_values['imsx_messageIdentifier'] = escape(imsx_messageIdentifier)
             failure_values['imsx_description'] = "User not found."
@@ -822,7 +822,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
 
         client_key, client_secret = self.get_client_key_secret()
         headers = {
-            'Authorization': unicode(request.headers.get('Authorization')),
+            'Authorization': str(request.headers.get('Authorization')),
             'Content-Type': content_type,
         }
 
@@ -833,15 +833,15 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         oauth_headers = dict(oauth_params)
         oauth_signature = oauth_headers.pop('oauth_signature')
         mock_request_lti_1 = mock.Mock(
-            uri=unicode(urllib.unquote(self.get_outcome_service_url())),
-            http_method=unicode(request.method),
-            params=oauth_headers.items(),
+            uri=str(urllib.parse.unquote(self.get_outcome_service_url())),
+            http_method=str(request.method),
+            params=list(oauth_headers.items()),
             signature=oauth_signature
         )
         mock_request_lti_2 = mock.Mock(
-            uri=unicode(urllib.unquote(request.url)),
-            http_method=unicode(request.method),
-            params=oauth_headers.items(),
+            uri=str(urllib.parse.unquote(request.url)),
+            http_method=str(request.method),
+            params=list(oauth_headers.items()),
             signature=oauth_signature
         )
         if oauth_body_hash != oauth_headers.get('oauth_body_hash'):
@@ -862,7 +862,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
                       "headers:{} url:{} method:{}".format(
                           oauth_headers,
                           self.get_outcome_service_url(),
-                          unicode(request.method)
+                          str(request.method)
                       ))
             raise LTIError("OAuth signature verification has failed.")
 

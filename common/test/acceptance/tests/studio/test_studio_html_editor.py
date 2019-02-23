@@ -150,7 +150,7 @@ class HTMLComponentEditorTests(ContainerBase):
                   --></style>
                   ""
         """
-        content = u'<p class="title">pages</p><style><!-- .title { color: red; } --></style>'
+        content = '<p class="title">pages</p><style><!-- .title { color: red; } --></style>'
 
         # Add HTML Text type component
         self._add_component('Text')
@@ -271,24 +271,24 @@ class HTMLComponentEditorTests(ContainerBase):
         self.container_page.edit()
 
         expected_buttons = [
-            u'bold',
-            u'italic',
-            u'underline',
-            u'forecolor',
+            'bold',
+            'italic',
+            'underline',
+            'forecolor',
             # This is our custom "code style" button, which uses an image instead of a class.
-            u'none',
-            u'alignleft',
-            u'aligncenter',
-            u'alignright',
-            u'alignjustify',
-            u'bullist',
-            u'numlist',
-            u'outdent',
-            u'indent',
-            u'blockquote',
-            u'link',
-            u'unlink',
-            u'image'
+            'none',
+            'alignleft',
+            'aligncenter',
+            'alignright',
+            'alignjustify',
+            'bullist',
+            'numlist',
+            'outdent',
+            'indent',
+            'blockquote',
+            'link',
+            'unlink',
+            'image'
         ]
         toolbar_dropdowns = self.html_editor.toolbar_dropdown_titles
         # The toolbar is divided in two sections: drop-downs and all other formatting buttons
@@ -342,25 +342,25 @@ class HTMLComponentEditorTests(ContainerBase):
         self._add_component('Text')
         self.container_page.edit()
         EXPECTED_FONTS = {
-            u"Default": [u'"Open Sans"', u'Verdana', u'Arial', u'Helvetica', u'sans-serif'],
-            u"Andale Mono": [u'andale mono', u'times'],
-            u"Arial": [u'arial', u'helvetica', u'sans-serif'],
-            u"Arial Black": [u'arial black', u'avant garde'],
-            u"Book Antiqua": [u'book antiqua', u'palatino'],
-            u"Comic Sans MS": [u'comic sans ms', u'sans-serif'],
-            u"Courier New": [u'courier new', u'courier'],
-            u"Georgia": [u'georgia', u'palatino'],
-            u"Helvetica": [u'helvetica'],
-            u"Impact": [u'impact', u'chicago'],
-            u"Symbol": [u'symbol'],
-            u"Tahoma": [u'tahoma', u'arial', u'helvetica', u'sans-serif'],
-            u"Terminal": [u'terminal', u'monaco'],
-            u"Times New Roman": [u'times new roman', u'times'],
-            u"Trebuchet MS": [u'trebuchet ms', u'geneva'],
-            u"Verdana": [u'verdana', u'geneva'],
+            "Default": ['"Open Sans"', 'Verdana', 'Arial', 'Helvetica', 'sans-serif'],
+            "Andale Mono": ['andale mono', 'times'],
+            "Arial": ['arial', 'helvetica', 'sans-serif'],
+            "Arial Black": ['arial black', 'avant garde'],
+            "Book Antiqua": ['book antiqua', 'palatino'],
+            "Comic Sans MS": ['comic sans ms', 'sans-serif'],
+            "Courier New": ['courier new', 'courier'],
+            "Georgia": ['georgia', 'palatino'],
+            "Helvetica": ['helvetica'],
+            "Impact": ['impact', 'chicago'],
+            "Symbol": ['symbol'],
+            "Tahoma": ['tahoma', 'arial', 'helvetica', 'sans-serif'],
+            "Terminal": ['terminal', 'monaco'],
+            "Times New Roman": ['times new roman', 'times'],
+            "Trebuchet MS": ['trebuchet ms', 'geneva'],
+            "Verdana": ['verdana', 'geneva'],
             # tinyMCE does not set font-family on dropdown span for these two fonts
-            u"Webdings": [u""],  # webdings
-            u"Wingdings": [u""]  # wingdings
+            "Webdings": [""],  # webdings
+            "Wingdings": [""]  # wingdings
         }
         self.html_editor.open_font_dropdown()
         self.assertDictContainsSubset(EXPECTED_FONTS, self.html_editor.font_dict())

@@ -58,10 +58,10 @@ class InterceptErrorsTest(TestCase):
         self.maxDiff = None
         exception = 'openedx.core.djangoapps.user_api.tests.test_helpers.FakeInputException'
         expected_log_msg = (
-            u"An unexpected error occurred when calling 'intercepted_function' with arguments '()' and "
-            u"keyword arguments '{{'raise_error': <class '{}'>}}' "
-            u"from File \"{}\", line XXX, in test_logs_errors\n"
-            u"    intercepted_function(raise_error=FakeInputException): FakeInputException()"
+            "An unexpected error occurred when calling 'intercepted_function' with arguments '()' and "
+            "keyword arguments '{{'raise_error': <class '{}'>}}' "
+            "from File \"{}\", line XXX, in test_logs_errors\n"
+            "    intercepted_function(raise_error=FakeInputException): FakeInputException()"
         ).format(exception, __file__.rstrip('c'))
 
         # Verify that the raised exception has the error message
@@ -306,8 +306,8 @@ class TestCaseForm(forms.Form):
 
     favorite_movie = forms.CharField(
         label="Fav Flick", min_length=MOVIE_MIN_LEN, max_length=MOVIE_MAX_LEN, error_messages={
-            "required": u"Please tell us your favorite movie.",
-            "invalid": u"We're pretty sure you made that movie up."
+            "required": "Please tell us your favorite movie.",
+            "invalid": "We're pretty sure you made that movie up."
         }
     )
     favorite_editor = forms.ChoiceField(label="Favorite Editor", choices=FAVORITE_EDITOR, required=False, initial='cat')

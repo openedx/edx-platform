@@ -19,14 +19,14 @@ def set_cached_content(content):
     """
     Stores the given piece of content in the cache, using its location as the key.
     """
-    CONTENT_CACHE.set(unicode(content.location).encode("utf-8"), content, version=STATIC_CONTENT_VERSION)
+    CONTENT_CACHE.set(str(content.location).encode("utf-8"), content, version=STATIC_CONTENT_VERSION)
 
 
 def get_cached_content(location):
     """
     Retrieves the given piece of content by its location if cached.
     """
-    return CONTENT_CACHE.get(unicode(location).encode("utf-8"), version=STATIC_CONTENT_VERSION)
+    return CONTENT_CACHE.get(str(location).encode("utf-8"), version=STATIC_CONTENT_VERSION)
 
 
 def del_cached_content(location):
@@ -38,7 +38,7 @@ def del_cached_content(location):
     """
     def location_str(loc):
         """Force the location to a Unicode string."""
-        return unicode(loc).encode("utf-8")
+        return str(loc).encode("utf-8")
 
     locations = [location_str(location)]
     try:

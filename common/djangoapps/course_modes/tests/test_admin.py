@@ -44,7 +44,7 @@ class AdminCourseModePageTest(ModuleStoreTestCase):
         CourseOverview.load_from_module_store(course.id)
 
         data = {
-            'course': unicode(course.id),
+            'course': str(course.id),
             'mode_slug': 'verified',
             'mode_display_name': 'verified',
             'min_price': 10,
@@ -199,7 +199,7 @@ class AdminCourseModeFormTest(ModuleStoreTestCase):
             mode_slug=mode,
         )
         return CourseModeForm({
-            "course": unicode(self.course.id),
+            "course": str(self.course.id),
             "mode_slug": mode,
             "mode_display_name": mode,
             "_expiration_datetime": upgrade_deadline,

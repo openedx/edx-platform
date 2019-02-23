@@ -68,7 +68,7 @@ class CohortTestMixin(object):
         """
         course_fixture._update_xblock(course_fixture._course_location, {
             "metadata": {
-                u"cohort_config": {
+                "cohort_config": {
                     "auto_cohort_groups": auto_cohort_groups or [],
                     "cohorted_discussions": [],
                     "cohorted": True,

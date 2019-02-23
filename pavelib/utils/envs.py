@@ -1,7 +1,7 @@
 """
 Helper functions for loading environment settings.
 """
-from __future__ import print_function
+
 
 import io
 import json
@@ -35,7 +35,7 @@ def repo_root():
             absolute_path = file_path.abspath()
             break
         except OSError:
-            print(u'Attempt {}/180 to get an absolute path failed'.format(attempt))
+            print('Attempt {}/180 to get an absolute path failed'.format(attempt))
             if attempt < 180:
                 attempt += 1
                 sleep(1)
@@ -256,16 +256,16 @@ class Env(object):
                 django_cmd(
                     system,
                     settings,
-                    u"print_setting {django_setting} 2>{log_file}".format(
+                    "print_setting {django_setting} 2>{log_file}".format(
                         django_setting=django_setting,
                         log_file=cls.PRINT_SETTINGS_LOG_FILE
                     )
                 ),
                 capture=True
             )
-            return unicode(value).strip()
+            return str(value).strip()
         except BuildFailure:
-            print(u"Unable to print the value of the {} setting:".format(django_setting))
+            print("Unable to print the value of the {} setting:".format(django_setting))
             with io.open(cls.PRINT_SETTINGS_LOG_FILE, 'r') as f:
                 print(f.read())
             sys.exit(1)
@@ -305,7 +305,7 @@ class Env(object):
             env_path = env_path.parent.parent / env_path.basename()
         if not env_path.isfile():
             print(
-                u"Warning: could not find environment JSON file "
+                "Warning: could not find environment JSON file "
                 "at '{path}'".format(path=env_path),  # pylint: disable=unicode-format-string
                 file=sys.stderr,
             )
@@ -318,7 +318,7 @@ class Env(object):
 
         except ValueError:
             print(
-                u"Error: Could not parse JSON "
+                "Error: Could not parse JSON "
                 "in {path}".format(path=env_path),  # pylint: disable=unicode-format-string
                 file=sys.stderr,
             )

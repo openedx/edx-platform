@@ -11,7 +11,7 @@ class EntitlementsConfig(AppConfig):
     """
     Application Configuration for Entitlements.
     """
-    name = u'entitlements'
+    name = 'entitlements'
 
     def ready(self):
         """

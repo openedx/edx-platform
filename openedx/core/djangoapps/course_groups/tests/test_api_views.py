@@ -40,7 +40,7 @@ class TestCohortOauth(SharedModuleStoreTestCase):
         cls.user = UserFactory(username=USERNAME, email=USER_MAIL, password=cls.password)
         cls.staff_user = UserFactory(is_staff=True, password=cls.password)
         cls.course_key = ToyCourseFactory.create().id
-        cls.course_str = unicode(cls.course_key)
+        cls.course_str = str(cls.course_key)
 
     @ddt.data({'path_name': 'api_cohorts:cohort_settings'},
               {'path_name': 'api_cohorts:cohort_handler'}, )
@@ -126,7 +126,7 @@ class TestCohortApi(SharedModuleStoreTestCase):
         cls.user = UserFactory(username=USERNAME, email=USER_MAIL, password=cls.password)
         cls.staff_user = UserFactory(is_staff=True, password=cls.password)
         cls.course_key = ToyCourseFactory.create().id
-        cls.course_str = unicode(cls.course_key)
+        cls.course_str = str(cls.course_key)
 
     @ddt.data(
         {'is_staff': True, 'status': 200},
@@ -308,7 +308,7 @@ class TestCohortApi(SharedModuleStoreTestCase):
             expected_results = [{
                 'username': user.username,
                 'email': user.email,
-                'name': u'{} {}'.format(user.first_name, user.last_name)
+                'name': '{} {}'.format(user.first_name, user.last_name)
             } for user in users]
             assert results == expected_results
 

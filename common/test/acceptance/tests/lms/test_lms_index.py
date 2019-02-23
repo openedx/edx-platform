@@ -41,7 +41,7 @@ class LmsIndexPageTest(BaseLmsIndexTest):
         Perform a general validation of the index page, renders normally, no exceptions raised, etc.
         """
         self.assertTrue(self.page.banner_element.visible)
-        expected_links = [u'About', u'Blog', u'News', u'Help Center', u'Contact', u'Careers', u'Donate']
+        expected_links = ['About', 'Blog', 'News', 'Help Center', 'Contact', 'Careers', 'Donate']
         self.assertEqual(self.page.footer_links, expected_links)
 
     def test_intro_video_hidden_by_default(self):

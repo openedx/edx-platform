@@ -44,8 +44,8 @@ class BlockRecordListTestCase(TestCase):
         )
 
     def test_empty_block_record_set(self):
-        empty_json = u'{"blocks":[],"course_key":"%s","version":%s}' % (
-            unicode(self.course_key),
+        empty_json = '{"blocks":[],"course_key":"%s","version":%s}' % (
+            str(self.course_key),
             BLOCK_RECORD_LIST_VERSION,
         )
 
@@ -149,15 +149,15 @@ class VisibleBlocksTest(GradesModelTestCase):
         vblocks = self._create_block_record_list([self.record_a])
         list_of_block_dicts = [self.record_a._asdict()]
         for block_dict in list_of_block_dicts:
-            block_dict['locator'] = unicode(block_dict['locator'])  # BlockUsageLocator is not json-serializable
+            block_dict['locator'] = str(block_dict['locator'])  # BlockUsageLocator is not json-serializable
         expected_data = {
             'blocks': [{
-                'locator': unicode(self.record_a.locator),
+                'locator': str(self.record_a.locator),
                 'raw_possible': 10,
                 'weight': 1,
                 'graded': self.record_a.graded,
             }],
-            'course_key': unicode(self.record_a.locator.course_key),
+            'course_key': str(self.record_a.locator.course_key),
             'version': BLOCK_RECORD_LIST_VERSION,
         }
         expected_json = json.dumps(expected_data, separators=(',', ':'), sort_keys=True)
@@ -331,21 +331,21 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
         was called with the expected info based on the passed grade.
         """
         tracker_mock.emit.assert_called_with(
-            u'edx.grades.subsection.grade_calculated',
+            'edx.grades.subsection.grade_calculated',
             {
-                'user_id': unicode(grade.user_id),
-                'course_id': unicode(grade.course_id),
-                'block_id': unicode(grade.usage_key),
-                'course_version': unicode(grade.course_version),
+                'user_id': str(grade.user_id),
+                'course_id': str(grade.course_id),
+                'block_id': str(grade.usage_key),
+                'course_version': str(grade.course_version),
                 'weighted_total_earned': grade.earned_all,
                 'weighted_total_possible': grade.possible_all,
                 'weighted_graded_earned': grade.earned_graded,
                 'weighted_graded_possible': grade.possible_graded,
-                'first_attempted': unicode(grade.first_attempted),
-                'subtree_edited_timestamp': unicode(grade.subtree_edited_timestamp),
-                'event_transaction_id': unicode(get_event_transaction_id()),
-                'event_transaction_type': unicode(get_event_transaction_type()),
-                'visible_blocks_hash': unicode(grade.visible_blocks_id),
+                'first_attempted': str(grade.first_attempted),
+                'subtree_edited_timestamp': str(grade.subtree_edited_timestamp),
+                'event_transaction_id': str(get_event_transaction_id()),
+                'event_transaction_type': str(get_event_transaction_type()),
+                'visible_blocks_hash': str(grade.visible_blocks_id),
             }
         )
 
@@ -389,43 +389,43 @@ class PersistentCourseGradesTest(GradesModelTestCase):
     def test_passed_timestamp(self):
         # When the user has not passed, passed_timestamp is None
         self.params.update({
-            u'percent_grade': 25.0,
-            u'letter_grade': u'',
-            u'passed': False,
+            'percent_grade': 25.0,
+            'letter_grade': '',
+            'passed': False,
         })
         grade = PersistentCourseGrade.update_or_create(**self.params)
         self.assertIsNone(grade.passed_timestamp)
 
         # After the user earns a passing grade, the passed_timestamp is set
         self.params.update({
-            u'percent_grade': 75.0,
-            u'letter_grade': u'C',
-            u'passed': True,
+            'percent_grade': 75.0,
+            'letter_grade': 'C',
+            'passed': True,
         })
         grade = PersistentCourseGrade.update_or_create(**self.params)
         passed_timestamp = grade.passed_timestamp
-        self.assertEqual(grade.letter_grade, u'C')
+        self.assertEqual(grade.letter_grade, 'C')
         self.assertIsInstance(passed_timestamp, datetime)
 
         # After the user improves their score, the new grade is reflected, but
         # the passed_timestamp remains the same.
         self.params.update({
-            u'percent_grade': 95.0,
-            u'letter_grade': u'A',
-            u'passed': True,
+            'percent_grade': 95.0,
+            'letter_grade': 'A',
+            'passed': True,
         })
         grade = PersistentCourseGrade.update_or_create(**self.params)
-        self.assertEqual(grade.letter_grade, u'A')
+        self.assertEqual(grade.letter_grade, 'A')
         self.assertEqual(grade.passed_timestamp, passed_timestamp)
 
         # If the grade later reverts to a failing grade, passed_timestamp remains the same.
         self.params.update({
-            u'percent_grade': 20.0,
-            u'letter_grade': u'',
-            u'passed': False,
+            'percent_grade': 20.0,
+            'letter_grade': '',
+            'passed': False,
         })
         grade = PersistentCourseGrade.update_or_create(**self.params)
-        self.assertEqual(grade.letter_grade, u'')
+        self.assertEqual(grade.letter_grade, '')
         self.assertEqual(grade.passed_timestamp, passed_timestamp)
 
     def test_passed_timestamp_is_now(self):
@@ -437,7 +437,7 @@ class PersistentCourseGradesTest(GradesModelTestCase):
         created_grade = PersistentCourseGrade.update_or_create(**self.params)
         read_grade = PersistentCourseGrade.read(self.params["user_id"], self.params["course_id"])
         for param in self.params:
-            if param == u'passed':
+            if param == 'passed':
                 continue  # passed/passed_timestamp takes special handling, and is tested separately
             self.assertEqual(self.params[param], getattr(created_grade, param))
         self.assertIsInstance(created_grade.passed_timestamp, datetime)
@@ -478,16 +478,16 @@ class PersistentCourseGradesTest(GradesModelTestCase):
         was called with the expected info based on the passed grade.
         """
         tracker_mock.emit.assert_called_with(
-            u'edx.grades.course.grade_calculated',
+            'edx.grades.course.grade_calculated',
             {
-                'user_id': unicode(grade.user_id),
-                'course_id': unicode(grade.course_id),
-                'course_version': unicode(grade.course_version),
+                'user_id': str(grade.user_id),
+                'course_id': str(grade.course_id),
+                'course_version': str(grade.course_version),
                 'percent_grade': grade.percent_grade,
-                'letter_grade': unicode(grade.letter_grade),
-                'course_edited_timestamp': unicode(grade.course_edited_timestamp),
-                'event_transaction_id': unicode(get_event_transaction_id()),
-                'event_transaction_type': unicode(get_event_transaction_type()),
-                'grading_policy_hash': unicode(grade.grading_policy_hash),
+                'letter_grade': str(grade.letter_grade),
+                'course_edited_timestamp': str(grade.course_edited_timestamp),
+                'event_transaction_id': str(get_event_transaction_id()),
+                'event_transaction_type': str(get_event_transaction_type()),
+                'grading_policy_hash': str(grade.grading_policy_hash),
             }
         )

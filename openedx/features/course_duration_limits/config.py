@@ -12,17 +12,17 @@ from student.models import EnrollStatusChange
 from student.signals import ENROLL_STATUS_CHANGE
 
 
-WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name=u'content_type_gating')
+WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='content_type_gating')
 
 CONTENT_TYPE_GATING_FLAG = WaffleFlag(
     waffle_namespace=WAFFLE_FLAG_NAMESPACE,
-    flag_name=u'debug',
+    flag_name='debug',
     flag_undefined_default=False
 )
 
 FEATURE_BASED_ENROLLMENT_GLOBAL_KILL_FLAG = WaffleFlag(
     waffle_namespace=WAFFLE_FLAG_NAMESPACE,
-    flag_name=u'global_kill_switch',
+    flag_name='global_kill_switch',
     flag_undefined_default=False
 )
 

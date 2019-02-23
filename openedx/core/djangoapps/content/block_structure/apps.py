@@ -9,7 +9,7 @@ class BlockStructureConfig(AppConfig):
     """
     block_structure django app.
     """
-    name = u'openedx.core.djangoapps.content.block_structure'
+    name = 'openedx.core.djangoapps.content.block_structure'
 
     def ready(self):
         """

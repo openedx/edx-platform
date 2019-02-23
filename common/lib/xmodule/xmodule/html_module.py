@@ -45,7 +45,7 @@ class HtmlBlock(object):
         # use display_name_with_default for those
         default=_("Text")
     )
-    data = String(help=_("Html contents to display for this module"), default=u"", scope=Scope.content)
+    data = String(help=_("Html contents to display for this module"), default="", scope=Scope.content)
     source_code = String(
         help=_("Source code for LaTeX documents. This feature is not well-supported."),
         scope=Scope.settings
@@ -234,7 +234,7 @@ class HtmlDescriptor(HtmlBlock, XmlDescriptor, EditingDescriptor):  # pylint: di
             )
             base = path(pointer_path).dirname()
             # log.debug("base = {0}, base.dirname={1}, filename={2}".format(base, base.dirname(), filename))
-            filepath = u"{base}/{name}.html".format(base=base, name=filename)
+            filepath = "{base}/{name}.html".format(base=base, name=filename)
             # log.debug("looking for html file for {0} at {1}".format(location, filepath))
 
             # VS[compat]
@@ -272,7 +272,7 @@ class HtmlDescriptor(HtmlBlock, XmlDescriptor, EditingDescriptor):  # pylint: di
                 msg = 'Unable to load file contents at path {0}: {1} '.format(
                     filepath, err)
                 # add more info and re-raise
-                raise Exception(msg), None, sys.exc_info()[2]
+                raise Exception(msg).with_traceback(sys.exc_info()[2])
 
     # TODO (vshnayder): make export put things in the right places.
 
@@ -283,7 +283,7 @@ class HtmlDescriptor(HtmlBlock, XmlDescriptor, EditingDescriptor):  # pylint: di
 
         # Write html to file, return an empty tag
         pathname = name_to_pathname(self.url_name)
-        filepath = u'{category}/{pathname}.html'.format(
+        filepath = '{category}/{pathname}.html'.format(
             category=self.category,
             pathname=pathname
         )
@@ -344,7 +344,7 @@ class AboutFields(object):
     )
     data = String(
         help=_("Html contents to display for this module"),
-        default=u"",
+        default="",
         scope=Scope.content
     )
 
@@ -385,7 +385,7 @@ class StaticTabFields(object):
         scope=Scope.settings
     )
     data = String(
-        default=textwrap.dedent(u"""\
+        default=textwrap.dedent("""\
             <p>Add the content you want students to see on this page.</p>
         """),
         scope=Scope.content,
@@ -422,7 +422,7 @@ class CourseInfoFields(object):
     )
     data = String(
         help=_("Html contents to display for this module"),
-        default=u"<ol></ol>",
+        default="<ol></ol>",
         scope=Scope.content
     )
 

@@ -61,12 +61,12 @@ class TestBlockSerializerBase(SharedModuleStoreTestCase):
         Verifies the given serialized_block when basic fields are requested.
         """
         block_key = deserialize_usage_key(block_key_string, self.course.id)
-        self.assertEquals(
+        self.assertEqual(
             self.block_structure.get_xblock_field(block_key, 'category'),
             serialized_block['type'],
         )
-        self.assertEquals(
-            set(serialized_block.iterkeys()),
+        self.assertEqual(
+            set(serialized_block.keys()),
             {'id', 'block_id', 'type', 'lms_web_url', 'student_view_url'},
         )
 
@@ -100,7 +100,7 @@ class TestBlockSerializerBase(SharedModuleStoreTestCase):
                 'lti_url',
                 'visible_to_staff_only',
             },
-            set(serialized_block.iterkeys()),
+            set(serialized_block.keys()),
         )
 
         # video blocks should have student_view_data
@@ -142,7 +142,7 @@ class TestBlockSerializerBase(SharedModuleStoreTestCase):
         """
         Test fields accessed by a staff user
         """
-        if serialized_block['id'] == unicode(self.html_block.location):
+        if serialized_block['id'] == str(self.html_block.location):
             self.assertTrue(serialized_block['visible_to_staff_only'])
         else:
             self.assertFalse(serialized_block['visible_to_staff_only'])
@@ -167,14 +167,14 @@ class TestBlockSerializer(TestBlockSerializerBase):
         serializer = self.create_serializer()
         for serialized_block in serializer.data:
             self.assert_basic_block(serialized_block['id'], serialized_block)
-        self.assertEquals(len(serializer.data), 28)
+        self.assertEqual(len(serializer.data), 28)
 
     def test_additional_requested_fields(self):
         self.add_additional_requested_fields()
         serializer = self.create_serializer()
         for serialized_block in serializer.data:
             self.assert_extended_block(serialized_block)
-        self.assertEquals(len(serializer.data), 28)
+        self.assertEqual(len(serializer.data), 28)
 
     def test_staff_fields(self):
         """
@@ -186,7 +186,7 @@ class TestBlockSerializer(TestBlockSerializerBase):
         for serialized_block in serializer.data:
             self.assert_extended_block(serialized_block)
             self.assert_staff_fields(serialized_block)
-        self.assertEquals(len(serializer.data), 29)
+        self.assertEqual(len(serializer.data), 29)
 
 
 class TestBlockDictSerializer(TestBlockSerializerBase):
@@ -208,20 +208,20 @@ class TestBlockDictSerializer(TestBlockSerializerBase):
         serializer = self.create_serializer()
 
         # verify root
-        self.assertEquals(serializer.data['root'], unicode(self.block_structure.root_block_usage_key))
+        self.assertEqual(serializer.data['root'], str(self.block_structure.root_block_usage_key))
 
         # verify blocks
-        for block_key_string, serialized_block in serializer.data['blocks'].iteritems():
-            self.assertEquals(serialized_block['id'], block_key_string)
+        for block_key_string, serialized_block in serializer.data['blocks'].items():
+            self.assertEqual(serialized_block['id'], block_key_string)
             self.assert_basic_block(block_key_string, serialized_block)
-        self.assertEquals(len(serializer.data['blocks']), 28)
+        self.assertEqual(len(serializer.data['blocks']), 28)
 
     def test_additional_requested_fields(self):
         self.add_additional_requested_fields()
         serializer = self.create_serializer()
-        for serialized_block in serializer.data['blocks'].itervalues():
+        for serialized_block in serializer.data['blocks'].values():
             self.assert_extended_block(serialized_block)
-        self.assertEquals(len(serializer.data['blocks']), 28)
+        self.assertEqual(len(serializer.data['blocks']), 28)
 
     def test_staff_fields(self):
         """
@@ -230,7 +230,7 @@ class TestBlockDictSerializer(TestBlockSerializerBase):
         context = self.create_staff_context()
         self.add_additional_requested_fields(context)
         serializer = self.create_serializer(context)
-        for serialized_block in serializer.data['blocks'].itervalues():
+        for serialized_block in serializer.data['blocks'].values():
             self.assert_extended_block(serialized_block)
             self.assert_staff_fields(serialized_block)
-        self.assertEquals(len(serializer.data['blocks']), 29)
+        self.assertEqual(len(serializer.data['blocks']), 29)

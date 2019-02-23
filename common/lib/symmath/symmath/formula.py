@@ -28,6 +28,7 @@ from sympy.physics.quantum.qubit import Qubit
 from sympy.physics.quantum.state import Ket
 from sympy.printing.latex import LatexPrinter
 from sympy.printing.str import StrPrinter
+from functools import reduce
 
 log = logging.getLogger(__name__)
 
@@ -206,7 +207,7 @@ class formula(object):
         for k in xml:
             tag = gettag(k)
             if tag == 'mi' or tag == 'ci':
-                usym = unicode(k.text)
+                usym = str(k.text)
                 try:
                     udata = unicodedata.name(usym)
                 except Exception:  # pylint: disable=broad-except
@@ -232,7 +233,7 @@ class formula(object):
         it, if possible...
         """
 
-        if isinstance(xml, (str, unicode)):
+        if isinstance(xml, str):
             xml = etree.fromstring(xml)		# TODO: wrap in try
 
         xml = self.fix_greek_in_mathml(xml)	 # convert greek utf letters to greek spelled out in ascii
@@ -365,7 +366,7 @@ class formula(object):
                 if (
                         tag == 'msup' and
                         len(k) == 2 and gettag(k[1]) == 'mrow' and
-                        gettag(k[1][0]) == 'mo' and k[1][0].text == u'\u200b'  # whew
+                        gettag(k[1][0]) == 'mo' and k[1][0].text == '\u200b'  # whew
                 ):
 
                     # replace the msup with 'X__Y'
@@ -380,7 +381,7 @@ class formula(object):
                 if (
                         tag == 'msubsup' and
                         len(k) == 3 and gettag(k[2]) == 'mrow' and
-                        gettag(k[2][0]) == 'mo' and k[2][0].text == u'\u200b'    # whew
+                        gettag(k[2][0]) == 'mo' and k[2][0].text == '\u200b'    # whew
                 ):
 
                     # replace the msubsup with 'X_Y__Z'
@@ -568,7 +569,7 @@ class formula(object):
                 usym = parse_presentation_symbol(xml[0])
                 sym = sympy.Symbol(str(usym))
             else:
-                usym = unicode(xml.text)
+                usym = str(xml.text)
                 if 'hat' in usym:
                     sym = my_sympify(usym)
                 else:

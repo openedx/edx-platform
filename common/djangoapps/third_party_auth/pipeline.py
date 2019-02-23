@@ -61,7 +61,7 @@ import base64
 import hashlib
 import hmac
 import json
-import urllib
+import urllib.request, urllib.parse, urllib.error
 from collections import OrderedDict
 from logging import getLogger
 from smtplib import SMTPException
@@ -147,7 +147,7 @@ _AUTH_ENTRY_CHOICES = frozenset([
     AUTH_ENTRY_ACCOUNT_SETTINGS,
     AUTH_ENTRY_LOGIN_API,
     AUTH_ENTRY_REGISTER_API,
-] + AUTH_ENTRY_CUSTOM.keys())
+] + list(AUTH_ENTRY_CUSTOM.keys()))
 
 
 logger = getLogger(__name__)
@@ -277,7 +277,7 @@ def _get_enabled_provider(provider_id):
     enabled_provider = provider.Registry.get(provider_id)
 
     if not enabled_provider:
-        raise ValueError(u'Provider %s not enabled' % provider_id)
+        raise ValueError('Provider %s not enabled' % provider_id)
 
     return enabled_provider
 
@@ -299,9 +299,9 @@ def _get_url(view_name, backend_name, auth_entry=None, redirect_url=None,
     if extra_params:
         query_params.update(extra_params)
 
-    return u"{url}?{params}".format(
+    return "{url}?{params}".format(
         url=url,
-        params=urllib.urlencode(query_params)
+        params=urllib.parse.urlencode(query_params)
     )
 
 
@@ -319,7 +319,7 @@ def get_complete_url(backend_name):
         ValueError: if no provider is enabled with the given backend_name.
     """
     if not any(provider.Registry.get_enabled_by_backend_name(backend_name)):
-        raise ValueError(u'Provider with backend %s not enabled' % backend_name)
+        raise ValueError('Provider with backend %s not enabled' % backend_name)
 
     return _get_url('social:complete', backend_name)
 
@@ -492,7 +492,7 @@ def redirect_to_custom_form(request, auth_entry, details, kwargs):
     provider_id = provider.Registry.get_from_pipeline({'backend': backend_name, 'kwargs': kwargs}).provider_id
     form_info = AUTH_ENTRY_CUSTOM[auth_entry]
     secret_key = form_info['secret_key']
-    if isinstance(secret_key, unicode):
+    if isinstance(secret_key, str):
         secret_key = secret_key.encode('utf-8')
     custom_form_url = form_info['url']
     data_str = json.dumps({
@@ -595,7 +595,7 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
             # register anew via SSO. See SOL-1324 in JIRA.
             # However, we will log a warning for this case:
             logger.warning(
-                u'User "%s" is using third_party_auth to login but has not yet activated their account. ',
+                'User "%s" is using third_party_auth to login but has not yet activated their account. ',
                 user.username
             )
 
@@ -712,7 +712,7 @@ def user_details_force_sync(auth_entry, strategy, details, user=None, *args, **k
         changed = {}
 
         # Map each incoming field from the provider to the name on the user model (by default, they always match).
-        field_mapping = {field: (user, field) for field in details.keys() if hasattr(user, field)}
+        field_mapping = {field: (user, field) for field in list(details.keys()) if hasattr(user, field)}
 
         # This is a special case where the field mapping should go to the user profile object and not the user object,
         # in some cases with differing field names (i.e. 'fullname' vs. 'name').
@@ -727,13 +727,13 @@ def user_details_force_sync(auth_entry, strategy, details, user=None, *args, **k
         # Track any fields that would raise an integrity error if there was a conflict.
         integrity_conflict_fields = {'email': user.email, 'username': user.username}
 
-        for provider_field, (model, field) in field_mapping.items():
+        for provider_field, (model, field) in list(field_mapping.items()):
             provider_value = details.get(provider_field)
             current_value = getattr(model, field)
             if provider_value is not None and current_value != provider_value:
                 if field in integrity_conflict_fields and User.objects.filter(**{field: provider_value}).exists():
-                    logger.warning(u'User with ID [%s] tried to synchronize profile data through [%s] '
-                                   u'but there was a conflict with an existing [%s]: [%s].',
+                    logger.warning('User with ID [%s] tried to synchronize profile data through [%s] '
+                                   'but there was a conflict with an existing [%s]: [%s].',
                                    user.id, current_provider.name, field, provider_value)
                     continue
                 changed[provider_field] = current_value
@@ -741,8 +741,8 @@ def user_details_force_sync(auth_entry, strategy, details, user=None, *args, **k
 
         if changed:
             logger.info(
-                u"User [%s] performed SSO through [%s] who synchronizes profile data, and the "
-                u"following fields were changed: %s", user.username, current_provider.name, changed.keys(),
+                "User [%s] performed SSO through [%s] who synchronizes profile data, and the "
+                "following fields were changed: %s", user.username, current_provider.name, list(changed.keys()),
             )
 
             # Save changes to user and user.profile models.
@@ -768,7 +768,7 @@ def user_details_force_sync(auth_entry, strategy, details, user=None, *args, **k
                     email.send()
                 except SMTPException:
                     logger.exception('Error sending IdP learner data sync-initiated email change '
-                                     u'notification email for user [%s].', user.username)
+                                     'notification email for user [%s].', user.username)
 
 
 def set_id_verification_status(auth_entry, strategy, details, user=None, *args, **kwargs):

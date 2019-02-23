@@ -70,7 +70,7 @@ class XQueueInterface(object):
     """
 
     def __init__(self, url, django_auth, requests_auth=None):
-        self.url = unicode(url)
+        self.url = str(url)
         self.auth = django_auth
         self.session = requests.Session()
         self.session.auth = requests_auth
@@ -91,7 +91,7 @@ class XQueueInterface(object):
 
         # log the send to xqueue
         header_info = json.loads(header)
-        queue_name = header_info.get('queue_name', u'')
+        queue_name = header_info.get('queue_name', '')
 
         # Attempt to send to queue
         (error, msg) = self._send_to_queue(header, body, files_to_upload)

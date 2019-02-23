@@ -198,7 +198,7 @@ class CourseExportManager(ExportManager):
         return self.modulestore.get_course(self.courselike_key, depth=None, lazy=False)
 
     def process_root(self, root, export_fs):
-        with export_fs.open(u'course.xml', 'wb') as course_xml:
+        with export_fs.open('course.xml', 'wb') as course_xml:
             lxml.etree.ElementTree(root).write(course_xml, encoding='utf-8')
 
     def process_extra(self, root, courselike, root_courselike_dir, xml_centric_courselike_key, export_fs):
@@ -240,7 +240,7 @@ class CourseExportManager(ExportManager):
                     output_dir = root_courselike_dir + '/static/images/'
                     if not os.path.isdir(output_dir):
                         os.makedirs(output_dir)
-                    with OSFS(output_dir).open(u'course_image.jpg', 'wb') as course_image_file:
+                    with OSFS(output_dir).open('course_image.jpg', 'wb') as course_image_file:
                         course_image_file.write(course_image.data)
 
         # export the static tabs
@@ -271,12 +271,12 @@ class CourseExportManager(ExportManager):
         course_run_policy_dir = policies_dir.makedir(course_policy_dir_name, recreate=True)
 
         # export the grading policy
-        with course_run_policy_dir.open(u'grading_policy.json', 'wb') as grading_policy:
+        with course_run_policy_dir.open('grading_policy.json', 'wb') as grading_policy:
             grading_policy.write(dumps(courselike.grading_policy, cls=EdxJSONEncoder,
                                        sort_keys=True, indent=4).encode('utf-8'))
 
         # export all of the course metadata in policy.json
-        with course_run_policy_dir.open(u'policy.json', 'wb') as course_policy:
+        with course_run_policy_dir.open('policy.json', 'wb') as course_policy:
             policy = {'course/' + courselike.location.run: own_metadata(courselike)}
             course_policy.write(dumps(policy, cls=EdxJSONEncoder, sort_keys=True, indent=4).encode('utf-8'))
 
@@ -355,7 +355,7 @@ def adapt_references(subtree, destination_course_key, export_fs):
     Map every reference in the subtree into destination_course_key and set it back into the xblock fields
     """
     subtree.runtime.export_fs = export_fs  # ensure everything knows where it's going!
-    for field_name, field in subtree.fields.iteritems():
+    for field_name, field in subtree.fields.items():
         if field.is_set_on(subtree):
             if isinstance(field, Reference):
                 value = field.read_from(subtree)
@@ -372,7 +372,7 @@ def adapt_references(subtree, destination_course_key, export_fs):
             elif isinstance(field, ReferenceValueDict):
                 field.write_to(
                     subtree, {
-                        key: ele.map_into_course(destination_course_key) for key, ele in field.read_from(subtree).iteritems()
+                        key: ele.map_into_course(destination_course_key) for key, ele in field.read_from(subtree).items()
                     }
                 )
 
@@ -386,7 +386,7 @@ def _export_field_content(xblock_item, item_dir):
         for field_name in module_data:
             if field_name not in DEFAULT_CONTENT_FIELDS:
                 # filename format: {dirname}.{field_name}.json
-                with item_dir.open(u'{0}.{1}.{2}'.format(xblock_item.location.block_id, field_name, 'json'),
+                with item_dir.open('{0}.{1}.{2}'.format(xblock_item.location.block_id, field_name, 'json'),
                                    'wb') as field_content_file:
                     field_content_file.write(dumps(module_data.get(field_name, {}), cls=EdxJSONEncoder,
                                                    sort_keys=True, indent=4).encode('utf-8'))

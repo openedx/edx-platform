@@ -40,7 +40,7 @@ class CourseUserType(Enum):
 
 class StoreConstructors(object):
     """Enumeration of store constructor types."""
-    draft, split = range(2)
+    draft, split = list(range(2))
 
 
 def mixed_store_config(data_dir, mappings, store_order=None):

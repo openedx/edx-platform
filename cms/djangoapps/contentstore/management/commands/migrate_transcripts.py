@@ -37,14 +37,14 @@ class Command(BaseCommand):
             '--course-id', '--course_id',
             dest='course_ids',
             action='append',
-            help=u'Migrates transcripts for the list of courses.'
+            help='Migrates transcripts for the list of courses.'
         )
         parser.add_argument(
             '--all-courses', '--all', '--all_courses',
             dest='all_courses',
             action='store_true',
             default=DEFAULT_ALL_COURSES,
-            help=u'Migrates transcripts to the configured django storage for all courses.'
+            help='Migrates transcripts to the configured django storage for all courses.'
         )
         parser.add_argument(
             '--from-settings', '--from_settings',
@@ -58,15 +58,15 @@ class Command(BaseCommand):
             dest='force_update',
             action='store_true',
             default=DEFAULT_FORCE_UPDATE,
-            help=u'Force migrate transcripts for the requested courses, overwrite if already present.'
+            help='Force migrate transcripts for the requested courses, overwrite if already present.'
         )
         parser.add_argument(
             '--commit',
             dest='commit',
             action='store_true',
             default=DEFAULT_COMMIT,
-            help=u'Commits the discovered video transcripts to django storage. '
-                 u'Without this flag, the command will return the transcripts discovered for migration.'
+            help='Commits the discovered video transcripts to django storage. '
+                 'Without this flag, the command will return the transcripts discovered for migration.'
         )
 
     def _parse_course_key(self, raw_value):
@@ -74,10 +74,10 @@ class Command(BaseCommand):
         try:
             result = CourseKey.from_string(raw_value)
         except InvalidKeyError:
-            raise CommandError(u"Invalid course_key: '%s'." % raw_value)
+            raise CommandError("Invalid course_key: '%s'." % raw_value)
 
         if not isinstance(result, CourseLocator):
-            raise CommandError(u"Argument {0} is not a course key".format(raw_value))
+            raise CommandError("Argument {0} is not a course key".format(raw_value))
 
         return result
 
@@ -91,7 +91,7 @@ class Command(BaseCommand):
         if courses_mode == 'all_courses':
             course_keys = [course.id for course in modulestore().get_course_summaries()]
         elif courses_mode == 'course_ids':
-            course_keys = map(self._parse_course_key, options['course_ids'])
+            course_keys = list(map(self._parse_course_key, options['course_ids']))
         else:
             migration_settings = self._latest_settings()
             if migration_settings.all_courses:
@@ -110,9 +110,9 @@ class Command(BaseCommand):
                 course_keys = non_migrated_courses[:migration_settings.batch_size]
 
                 log.info(
-                    (u'[Transcript Migration] Courses(total): %s, '
-                     u'Courses(migrated): %s, Courses(non-migrated): %s, '
-                     u'Courses(migration-in-process): %s'),
+                    ('[Transcript Migration] Courses(total): %s, '
+                     'Courses(migrated): %s, Courses(non-migrated): %s, '
+                     'Courses(migration-in-process): %s'),
                     len(all_courses),
                     len(migrated_courses),
                     len(non_migrated_courses),

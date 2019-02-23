@@ -26,7 +26,7 @@ class TestForcePublish(SharedModuleStoreTestCase):
         Test 'force_publish' command with no arguments
         """
         errstring = "Error: too few arguments"
-        with self.assertRaisesRegexp(CommandError, errstring):
+        with self.assertRaisesRegex(CommandError, errstring):
             call_command('force_publish')
 
     def test_invalid_course_key(self):
@@ -34,7 +34,7 @@ class TestForcePublish(SharedModuleStoreTestCase):
         Test 'force_publish' command with invalid course key
         """
         errstring = "Invalid course key."
-        with self.assertRaisesRegexp(CommandError, errstring):
+        with self.assertRaisesRegex(CommandError, errstring):
             call_command('force_publish', 'TestX/TS01')
 
     def test_too_many_arguments(self):
@@ -42,16 +42,16 @@ class TestForcePublish(SharedModuleStoreTestCase):
         Test 'force_publish' command with more than 2 arguments
         """
         errstring = "Error: unrecognized arguments: invalid-arg"
-        with self.assertRaisesRegexp(CommandError, errstring):
-            call_command('force_publish', unicode(self.course.id), '--commit', 'invalid-arg')
+        with self.assertRaisesRegex(CommandError, errstring):
+            call_command('force_publish', str(self.course.id), '--commit', 'invalid-arg')
 
     def test_course_key_not_found(self):
         """
         Test 'force_publish' command with non-existing course key
         """
         errstring = "Course not found."
-        with self.assertRaisesRegexp(CommandError, errstring):
-            call_command('force_publish', unicode('course-v1:org+course+run'))
+        with self.assertRaisesRegex(CommandError, errstring):
+            call_command('force_publish', str('course-v1:org+course+run'))
 
     def test_force_publish_non_split(self):
         """
@@ -59,8 +59,8 @@ class TestForcePublish(SharedModuleStoreTestCase):
         """
         course = CourseFactory.create(default_store=ModuleStoreEnum.Type.mongo)
         errstring = 'The owning modulestore does not support this command.'
-        with self.assertRaisesRegexp(CommandError, errstring):
-            call_command('force_publish', unicode(course.id))
+        with self.assertRaisesRegex(CommandError, errstring):
+            call_command('force_publish', str(course.id))
 
 
 class TestForcePublishModifications(ModuleStoreTestCase):
@@ -92,7 +92,7 @@ class TestForcePublishModifications(ModuleStoreTestCase):
         self.assertTrue(self.store.has_changes(self.store.get_item(self.course.location)))
 
         # get draft and publish branch versions
-        versions = get_course_versions(unicode(self.course.id))
+        versions = get_course_versions(str(self.course.id))
         draft_version = versions['draft-branch']
         published_version = versions['published-branch']
 
@@ -103,13 +103,13 @@ class TestForcePublishModifications(ModuleStoreTestCase):
             patched_yes_no.return_value = True
 
             # force publish course
-            call_command('force_publish', unicode(self.course.id), '--commit')
+            call_command('force_publish', str(self.course.id), '--commit')
 
             # verify that course has no changes
             self.assertFalse(self.store.has_changes(self.store.get_item(self.course.location)))
 
             # get new draft and publish branch versions
-            versions = get_course_versions(unicode(self.course.id))
+            versions = get_course_versions(str(self.course.id))
             new_draft_version = versions['draft-branch']
             new_published_version = versions['published-branch']
 

@@ -526,7 +526,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
             for ref in refele.reference_list:
                 assert isinstance(ref, UsageKey)
             assert len(refele.reference_dict) > 0
-            for ref in refele.reference_dict.itervalues():
+            for ref in refele.reference_dict.values():
                 assert isinstance(ref, UsageKey)
 
         def check_mongo_fields():
@@ -535,17 +535,17 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
 
             def check_children(payload):
                 for child in payload['definition']['children']:
-                    assert isinstance(child, basestring)
+                    assert isinstance(child, str)
 
             refele = get_item(self.refloc)
             check_children(refele)
-            assert isinstance(refele['definition']['data']['reference_link'], basestring)
+            assert isinstance(refele['definition']['data']['reference_link'], str)
             assert len(refele['definition']['data']['reference_list']) > 0
             for ref in refele['definition']['data']['reference_list']:
-                assert isinstance(ref, basestring)
+                assert isinstance(ref, str)
             assert len(refele['metadata']['reference_dict']) > 0
-            for ref in refele['metadata']['reference_dict'].itervalues():
-                assert isinstance(ref, basestring)
+            for ref in refele['metadata']['reference_dict'].values():
+                assert isinstance(ref, str)
 
         setup_test()
         check_xblock_fields()
@@ -566,7 +566,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
 
         root_dir = path(mkdtemp())
         self.addCleanup(shutil.rmtree, root_dir)
-        export_course_to_xml(self.draft_store, self.content_store, course_key, root_dir, u'test_export')
+        export_course_to_xml(self.draft_store, self.content_store, course_key, root_dir, 'test_export')
         self.assertTrue(path(root_dir / 'test_export/static/images/course_image.jpg').isfile())
         self.assertTrue(path(root_dir / 'test_export/static/images_course_image.jpg').isfile())
 
@@ -582,7 +582,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
 
         root_dir = path(mkdtemp())
         self.addCleanup(shutil.rmtree, root_dir)
-        export_course_to_xml(self.draft_store, self.content_store, course.id, root_dir, u'test_export')
+        export_course_to_xml(self.draft_store, self.content_store, course.id, root_dir, 'test_export')
         self.assertTrue(path(root_dir / 'test_export/static/just_a_test.jpg').isfile())
         self.assertFalse(path(root_dir / 'test_export/static/images/course_image.jpg').isfile())
 
@@ -595,7 +595,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         course = self.draft_store.get_course(CourseKey.from_string('edX/simple_with_draft/2012_Fall'))
         root_dir = path(mkdtemp())
         self.addCleanup(shutil.rmtree, root_dir)
-        export_course_to_xml(self.draft_store, self.content_store, course.id, root_dir, u'test_export')
+        export_course_to_xml(self.draft_store, self.content_store, course.id, root_dir, 'test_export')
         self.assertFalse(path(root_dir / 'test_export/static/images/course_image.jpg').isfile())
         self.assertFalse(path(root_dir / 'test_export/static/images_course_image.jpg').isfile())
 
@@ -704,8 +704,8 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
 
         # First child should have been moved to second position, and better child takes the lead
         course = self.draft_store.get_course(course.id)
-        self.assertEqual(unicode(course.children[1]), unicode(first_child.location))
-        self.assertEqual(unicode(course.children[0]), unicode(second_child.location))
+        self.assertEqual(str(course.children[1]), str(first_child.location))
+        self.assertEqual(str(course.children[0]), str(second_child.location))
 
         # Clean up the data so we don't break other tests which apparently expect a particular state
         self.draft_store.delete_course(course.id, self.dummy_user)
@@ -742,7 +742,7 @@ class TestMongoModuleStoreWithNoAssetCollection(TestMongoModuleStore):
         courses = self.draft_store.get_courses()
         course = courses[0]
         # Confirm that no specified asset collection name means empty asset metadata.
-        self.assertEquals(self.draft_store.get_all_asset_metadata(course.id, 'asset'), [])
+        self.assertEqual(self.draft_store.get_all_asset_metadata(course.id, 'asset'), [])
 
     def test_no_asset_invalid_key(self):
         course_key = CourseLocator(org="edx3", course="test_course", run=None, deprecated=True)

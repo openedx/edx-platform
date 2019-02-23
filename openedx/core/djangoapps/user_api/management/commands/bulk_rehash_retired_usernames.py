@@ -11,7 +11,7 @@ original usernames rather than the possibly mixed-case ones.  This management
 command likely cannot be re-used in the future because eventually we will need
 to clean out the UserRetirementStatus table.
 """
-from __future__ import print_function
+
 
 from django.conf import settings
 from django.db import transaction
@@ -55,7 +55,7 @@ class Command(BaseCommand):
             # match:
             if old_retired_username == new_retired_username:
                 print(
-                    u'Skipping UserRetirementStatus ID {} / User ID {} because the hash would not change.'.format(
+                    'Skipping UserRetirementStatus ID {} / User ID {} because the hash would not change.'.format(
                         retirement.id,
                         retirement.user.id,
                     )
@@ -63,8 +63,8 @@ class Command(BaseCommand):
             # Found an username to update
             else:
                 print(
-                    u'Updating UserRetirementStatus ID {} / User ID {} '
-                    u'to rehash their retired username: {} -> {}'.format(
+                    'Updating UserRetirementStatus ID {} / User ID {} '
+                    'to rehash their retired username: {} -> {}'.format(
                         retirement.id,
                         retirement.user.id,
                         old_retired_username,
@@ -86,7 +86,7 @@ class Command(BaseCommand):
                         except comment_client.utils.CommentClientRequestError as e:
                             if e.status_code != 404:
                                 print(
-                                    u'UserRetirementStatus ID {} User ID {} failed to rename in forums: {}'.format(
+                                    'UserRetirementStatus ID {} User ID {} failed to rename in forums: {}'.format(
                                         retirement.id, retirement.user.id, text_type(e)
                                     )
                                 )
@@ -102,7 +102,7 @@ class Command(BaseCommand):
                             retirement.save()
                     except Exception as exc:  # pylint: disable=broad-except
                         print(
-                            u'UserRetirementStatus ID {} User ID {} failed rename'.format(
+                            'UserRetirementStatus ID {} User ID {} failed rename'.format(
                                 retirement.id, retirement.user.id
                             )
                         )
@@ -112,10 +112,10 @@ class Command(BaseCommand):
         if failed_retirements:
             print('------------------------------------------------------------')
             print(
-                u'FAILED! {} retirements failed to rehash. Retirement IDs:\n{}'.format(
+                'FAILED! {} retirements failed to rehash. Retirement IDs:\n{}'.format(
                     len(failed_retirements),
                     '\n'.join([text_type(r.id) for r in failed_retirements])
                 )
             )
         else:
-            print(u'Success! {} retirements examined.'.format(len(retirements)))
+            print('Success! {} retirements examined.'.format(len(retirements)))

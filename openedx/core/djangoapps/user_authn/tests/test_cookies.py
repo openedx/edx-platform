@@ -1,5 +1,5 @@
 # pylint: disable=missing-docstring
-from __future__ import unicode_literals
+
 
 from mock import MagicMock, patch
 import six
@@ -53,7 +53,7 @@ class CookieTests(TestCase):
     def _copy_cookies_to_request(self, response, request):
         request.COOKIES = {
             key: val.value
-            for key, val in response.cookies.iteritems()
+            for key, val in response.cookies.items()
         }
 
     def _set_use_jwt_cookie_header(self, request):

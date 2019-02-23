@@ -31,13 +31,13 @@ def register_access_role(cls):
         role_name = cls.ROLE
         REGISTERED_ACCESS_ROLES[role_name] = cls
     except AttributeError:
-        log.exception(u"Unable to register Access Role with attribute 'ROLE'.")
+        log.exception("Unable to register Access Role with attribute 'ROLE'.")
     return cls
 
 
 class BulkRoleCache(object):
-    CACHE_NAMESPACE = u"student.roles.BulkRoleCache"
-    CACHE_KEY = u'roles_by_user'
+    CACHE_NAMESPACE = "student.roles.BulkRoleCache"
+    CACHE_KEY = 'roles_by_user'
 
     @classmethod
     def prefetch(cls, users):
@@ -47,7 +47,7 @@ class BulkRoleCache(object):
         for role in CourseAccessRole.objects.filter(user__in=users).select_related('user'):
             roles_by_user[role.user.id].add(role)
 
-        users_without_roles = filter(lambda u: u.id not in roles_by_user, users)
+        users_without_roles = [u for u in users if u.id not in roles_by_user]
         for user in users_without_roles:
             roles_by_user[user.id] = set()
 
@@ -80,11 +80,10 @@ class RoleCache(object):
         )
 
 
-class AccessRole(object):
+class AccessRole(object, metaclass=ABCMeta):
     """
     Object representing a role with particular access to a resource
     """
-    __metaclass__ = ABCMeta
 
     @abstractmethod
     def has_user(self, user):

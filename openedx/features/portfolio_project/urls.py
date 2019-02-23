@@ -3,7 +3,7 @@ Url setup for portfolio project.
 """
 from django.conf.urls import url
 
-from views import GenericTabView
+from .views import GenericTabView
 
 
 urlpatterns = [

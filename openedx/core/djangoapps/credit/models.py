@@ -239,12 +239,12 @@ class CreditCourse(models.Model):
         credit_courses = cache.get(cls.CREDIT_COURSES_CACHE_KEY)
         if credit_courses is None:
             credit_courses = set(
-                unicode(course.course_key)
+                str(course.course_key)
                 for course in cls.objects.filter(enabled=True)
             )
             cache.set(cls.CREDIT_COURSES_CACHE_KEY, credit_courses)
 
-        return unicode(course_key) in credit_courses
+        return str(course_key) in credit_courses
 
     @classmethod
     def get_credit_course(cls, course_key):
@@ -264,7 +264,7 @@ class CreditCourse(models.Model):
 
     def __unicode__(self):
         """Unicode representation of the credit course. """
-        return unicode(self.course_key)
+        return str(self.course_key)
 
 
 @receiver(models.signals.post_save, sender=CreditCourse)
@@ -298,7 +298,7 @@ class CreditRequirement(TimeStampedModel):
     criteria = JSONField()
     active = models.BooleanField(default=True)
 
-    CACHE_NAMESPACE = u"credit.CreditRequirement.cache."
+    CACHE_NAMESPACE = "credit.CreditRequirement.cache."
 
     class Meta(object):
         unique_together = ('namespace', 'name', 'course')
@@ -484,7 +484,7 @@ class CreditRequirementStatus(TimeStampedModel):
             # do not update status to `failed` if user has `satisfied` the requirement
             if status == 'failed' and requirement_status.status == 'satisfied':
                 log.info(
-                    u'Can not change status of credit requirement "%s" from satisfied to failed ',
+                    'Can not change status of credit requirement "%s" from satisfied to failed ',
                     requirement_status.requirement_id
                 )
                 return
@@ -508,7 +508,7 @@ class CreditRequirementStatus(TimeStampedModel):
             requirement_status.delete()
         except cls.DoesNotExist:
             log_msg = (
-                u'The requirement status {requirement} does not exist for username {username}.'.format(
+                'The requirement status {requirement} does not exist for username {username}.'.format(
                     requirement=requirement,
                     username=username
                 )
@@ -642,7 +642,7 @@ class CreditEligibility(TimeStampedModel):
 
     def __unicode__(self):
         """Unicode representation of the credit eligibility. """
-        return u"{user}, {course}".format(
+        return "{user}, {course}".format(
             user=self.username,
             course=self.course.course_key,
         )
@@ -767,7 +767,7 @@ class CreditRequest(TimeStampedModel):
 
     def __unicode__(self):
         """Unicode representation of a credit request."""
-        return u"{course}, {provider}, {status}".format(
+        return "{course}, {provider}, {status}".format(
             course=self.course.course_key,
             provider=self.provider.provider_id,
             status=self.status,

@@ -49,7 +49,7 @@ class AjaxEnabledTestClient(Client):
         Convenience method for client post which serializes the data into json and sets the accept type
         to json
         """
-        if not isinstance(data, basestring):
+        if not isinstance(data, str):
             data = json.dumps(data or {})
         kwargs.setdefault("HTTP_X_REQUESTED_WITH", "XMLHttpRequest")
         kwargs.setdefault("HTTP_ACCEPT", "application/json")
@@ -286,7 +286,7 @@ class CourseTestCase(ProceduralCourseTestMixin, ModuleStoreTestCase):
             course1_block_ids = set([item.location.block_id for item in course1_items])
             course2_block_ids = set([item.location.block_id for item in course2_items])
             raise AssertionError(
-                u"Course1 extra blocks: {}; course2 extra blocks: {}".format(
+                "Course1 extra blocks: {}; course2 extra blocks: {}".format(
                     course1_block_ids - course2_block_ids, course2_block_ids - course1_block_ids
                 )
             )
@@ -355,7 +355,7 @@ class CourseTestCase(ProceduralCourseTestMixin, ModuleStoreTestCase):
         course1_asset_attrs = content_store.get_attrs(course1_id.make_asset_key(category, filename))
         course2_asset_attrs = content_store.get_attrs(course2_id.make_asset_key(category, filename))
         self.assertEqual(len(course1_asset_attrs), len(course2_asset_attrs))
-        for key, value in course1_asset_attrs.iteritems():
+        for key, value in course1_asset_attrs.items():
             if key in ['_id', 'filename', 'uploadDate', 'content_son', 'thumbnail_location']:
                 pass
             else:

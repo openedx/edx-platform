@@ -192,21 +192,21 @@ class TestPhotoVerification(TestVerification, MockS3Mixin, ModuleStoreTestCase):
         was when you submitted it.
         """
         user = UserFactory.create()
-        user.profile.name = u"Jack \u01B4"  # gratuious non-ASCII char to test encodings
+        user.profile.name = "Jack \u01B4"  # gratuious non-ASCII char to test encodings
 
         attempt = SoftwareSecurePhotoVerification(user=user)
-        user.profile.name = u"Clyde \u01B4"
+        user.profile.name = "Clyde \u01B4"
         attempt.mark_ready()
 
-        user.profile.name = u"Rusty \u01B4"
+        user.profile.name = "Rusty \u01B4"
 
-        self.assertEqual(u"Clyde \u01B4", attempt.name)
+        self.assertEqual("Clyde \u01B4", attempt.name)
 
     def create_and_submit(self):
         """Helper method to create a generic submission and send it."""
         user = UserFactory.create()
         attempt = SoftwareSecurePhotoVerification(user=user)
-        user.profile.name = u"Rust\u01B4"
+        user.profile.name = "Rust\u01B4"
 
         attempt.upload_face_image("Just pretend this is image data")
         attempt.upload_photo_id_image("Hey, we're a photo ID")
@@ -233,7 +233,7 @@ class TestPhotoVerification(TestVerification, MockS3Mixin, ModuleStoreTestCase):
                 self.assertEqual(attempt.status, "must_retry")
                 logger.check(
                     ('lms.djangoapps.verify_student.models', 'ERROR',
-                     u'Software Secure submission failed for user %s, setting status to must_retry'
+                     'Software Secure submission failed for user %s, setting status to must_retry'
                      % attempt.user.username))
 
     @mock.patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
@@ -259,12 +259,12 @@ class TestPhotoVerification(TestVerification, MockS3Mixin, ModuleStoreTestCase):
         attempt.status = 'denied'
         attempt.error_msg = '[{"userPhotoReasons": ["Face out of view"]}, {"photoIdReasons": ["Photo hidden/No photo", "ID name not provided"]}]'
         parsed_error_msg = attempt.parsed_error_msg()
-        self.assertEquals(parsed_error_msg, ['id_image_missing_name', 'user_image_not_clear', 'id_image_not_clear'])
+        self.assertEqual(parsed_error_msg, ['id_image_missing_name', 'user_image_not_clear', 'id_image_not_clear'])
 
     @ddt.data(
         'Not Provided',
         '{"IdReasons": ["Not provided"]}',
-        u'[{"ïḋṚëäṡöṅṡ": ["Ⓝⓞⓣ ⓟⓡⓞⓥⓘⓓⓔⓓ "]}]',
+        '[{"ïḋṚëäṡöṅṡ": ["Ⓝⓞⓣ ⓟⓡⓞⓥⓘⓓⓔⓓ "]}]',
     )
     def test_parse_error_msg_failure(self, msg):
         user = UserFactory.create()
@@ -328,7 +328,7 @@ class TestPhotoVerification(TestVerification, MockS3Mixin, ModuleStoreTestCase):
         Retire user with record(s) in table
         """
         user = UserFactory.create()
-        user.profile.name = u"Enrique"
+        user.profile.name = "Enrique"
         attempt = SoftwareSecurePhotoVerification(user=user)
 
         # Populate Record
@@ -401,7 +401,7 @@ class VerificationDeadlineTest(CacheIsolationTestCase):
             CourseKey.from_string("edX/DemoX/Fall"): datetime.now(pytz.UTC),
             CourseKey.from_string("edX/DemoX/Spring"): datetime.now(pytz.UTC) + timedelta(days=1)
         }
-        course_keys = deadlines.keys()
+        course_keys = list(deadlines.keys())
 
         # Initially, no deadlines are set
         with self.assertNumQueries(1):
@@ -409,7 +409,7 @@ class VerificationDeadlineTest(CacheIsolationTestCase):
             self.assertEqual(all_deadlines, {})
 
         # Create the deadlines
-        for course_key, deadline in deadlines.iteritems():
+        for course_key, deadline in deadlines.items():
             VerificationDeadline.objects.create(
                 course_key=course_key,
                 deadline=deadline,

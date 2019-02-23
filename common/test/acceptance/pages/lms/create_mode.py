@@ -1,7 +1,7 @@
 """Mode creation page (used to add modes to courses during testing)."""
 
 import re
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from bok_choy.page_object import PageObject
 
@@ -65,7 +65,7 @@ class ModeCreationPage(PageObject):
             course_id=self._course_id
         )
 
-        query_string = urllib.urlencode(self._parameters)
+        query_string = urllib.parse.urlencode(self._parameters)
         if query_string:
             url += '?' + query_string
 

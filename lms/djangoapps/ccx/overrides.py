@@ -38,7 +38,7 @@ class CustomCoursesForEdxOverrideProvider(FieldOverrideProvider):
         elif hasattr(block, 'location'):
             course_key = block.location.course_key
         else:
-            msg = u"Unable to get course id when calculating ccx overide for block type %r"
+            msg = "Unable to get course id when calculating ccx overide for block type %r"
             log.error(msg, type(block))
         if course_key is not None:
             ccx = get_current_ccx(course_key)
@@ -213,7 +213,7 @@ def bulk_delete_ccx_override_fields(ccx, ids):
     """
     Bulk delete for CcxFieldOverride model
     """
-    ids = filter(None, ids)
+    ids = [_f for _f in ids if _f]
     ids = list(set(ids))
     if ids:
         CcxFieldOverride.objects.filter(ccx=ccx, id__in=ids).delete()

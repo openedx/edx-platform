@@ -219,7 +219,7 @@ def traverse_post_order(start_node, get_children, filter_func=None):
 
         # See if there are any additional children for this node.
         try:
-            next_child = current.children.next()
+            next_child = next(current.children)
 
         except StopIteration:
             # Since there are no children left, visit the node and

@@ -86,7 +86,7 @@ def handle_ajax(request, course_key_string):
             return JsonResponse({
                 'success': False,
                 'error': _(
-                    u'There is no user with the username or email address u"{user_identifier}" '
+                    'There is no user with the username or email address u"{user_identifier}" '
                     'enrolled in this course.'
                 ).format(user_identifier=user_name)
             })
@@ -285,5 +285,5 @@ def filter_displayed_blocks(block, unused_view, frag, unused_context):
     if getattr(block, 'show_in_read_only_mode', False):
         return frag
     return Fragment(
-        _(u'This type of component cannot be shown while viewing the course as a specific student.')
+        _('This type of component cannot be shown while viewing the course as a specific student.')
     )

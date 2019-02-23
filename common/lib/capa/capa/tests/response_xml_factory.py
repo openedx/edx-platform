@@ -2,12 +2,10 @@ from lxml import etree
 from abc import ABCMeta, abstractmethod
 
 
-class ResponseXMLFactory(object):
+class ResponseXMLFactory(object, metaclass=ABCMeta):
     """ Abstract base class for capa response XML factories.
     Subclasses override create_response_element and
     create_input_element to produce XML of particular response types"""
-
-    __metaclass__ = ABCMeta
 
     @abstractmethod
     def create_response_element(self, **kwargs):
@@ -238,7 +236,7 @@ class NumericalResponseXMLFactory(ResponseXMLFactory):
             else:
                 response_element.set('answer', str(answer))
 
-        for additional_answer, additional_correcthint in additional_answers.items():
+        for additional_answer, additional_correcthint in list(additional_answers.items()):
             additional_element = etree.SubElement(response_element, 'additional_answer')
             additional_element.set('answer', str(additional_answer))
             if additional_correcthint:
@@ -538,10 +536,10 @@ class FormulaResponseXMLFactory(ResponseXMLFactory):
         # "x,y,z@4,5,3:10,12,8#4" means plug in values for (x,y,z)
         # from within the box defined by points (4,5,3) and (10,12,8)
         # The "#4" means to repeat 4 times.
-        low_range_vals = [str(f[0]) for f in sample_dict.values()]
-        high_range_vals = [str(f[1]) for f in sample_dict.values()]
+        low_range_vals = [str(f[0]) for f in list(sample_dict.values())]
+        high_range_vals = [str(f[1]) for f in list(sample_dict.values())]
         sample_str = (
-            ",".join(sample_dict.keys()) + "@" +
+            ",".join(list(sample_dict.keys())) + "@" +
             ",".join(low_range_vals) + ":" +
             ",".join(high_range_vals) +
             "#" + str(num_samples)
@@ -675,8 +673,8 @@ class OptionResponseXMLFactory(ResponseXMLFactory):
 
         # Set the "options" attribute
         # Format: "('first', 'second', 'third')"
-        options_attr_string = u",".join([u"'{}'".format(o) for o in options_list])
-        options_attr_string = u"({})".format(options_attr_string)
+        options_attr_string = ",".join(["'{}'".format(o) for o in options_list])
+        options_attr_string = "({})".format(options_attr_string)
         optioninput_element.set('options', options_attr_string)
 
         # Set the "correct" attribute
@@ -727,7 +725,7 @@ class StringResponseXMLFactory(ResponseXMLFactory):
         response_element = etree.Element("stringresponse")
 
         # Set the answer attribute
-        response_element.set("answer", unicode(answer))
+        response_element.set("answer", str(answer))
 
         # Set the case sensitivity and regexp:
         type_value = ''

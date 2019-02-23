@@ -16,22 +16,22 @@ class CredentialsConfig(AppConfig):
     plugin_app = {
         PluginSettings.CONFIG: {
             ProjectType.LMS: {
-                SettingsType.AWS: {PluginSettings.RELATIVE_PATH: u'settings.aws'},
-                SettingsType.COMMON: {PluginSettings.RELATIVE_PATH: u'settings.common'},
-                SettingsType.DEVSTACK: {PluginSettings.RELATIVE_PATH: u'settings.devstack'},
-                SettingsType.TEST: {PluginSettings.RELATIVE_PATH: u'settings.test'},
+                SettingsType.AWS: {PluginSettings.RELATIVE_PATH: 'settings.aws'},
+                SettingsType.COMMON: {PluginSettings.RELATIVE_PATH: 'settings.common'},
+                SettingsType.DEVSTACK: {PluginSettings.RELATIVE_PATH: 'settings.devstack'},
+                SettingsType.TEST: {PluginSettings.RELATIVE_PATH: 'settings.test'},
             }
         },
         PluginSignals.CONFIG: {
             ProjectType.LMS: {
                 PluginSignals.RECEIVERS: [
                     {
-                        PluginSignals.RECEIVER_FUNC_NAME: u'handle_grade_change',
-                        PluginSignals.SIGNAL_PATH: u'openedx.core.djangoapps.signals.signals.COURSE_GRADE_CHANGED',
+                        PluginSignals.RECEIVER_FUNC_NAME: 'handle_grade_change',
+                        PluginSignals.SIGNAL_PATH: 'openedx.core.djangoapps.signals.signals.COURSE_GRADE_CHANGED',
                     },
                     {
-                        PluginSignals.RECEIVER_FUNC_NAME: u'handle_cert_change',
-                        PluginSignals.SIGNAL_PATH: u'openedx.core.djangoapps.signals.signals.COURSE_CERT_CHANGED',
+                        PluginSignals.RECEIVER_FUNC_NAME: 'handle_cert_change',
+                        PluginSignals.SIGNAL_PATH: 'openedx.core.djangoapps.signals.signals.COURSE_CERT_CHANGED',
                     },
                 ],
             },

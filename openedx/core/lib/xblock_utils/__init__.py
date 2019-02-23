@@ -141,8 +141,8 @@ def wrap_xblock(
         'content': block.display_name if display_name_only else frag.content,
         'classes': css_classes,
         'display_name': block.display_name_with_default_escaped,  # xss-lint: disable=python-deprecated-display-name
-        'data_attributes': u' '.join(u'data-{}="{}"'.format(markupsafe.escape(key), markupsafe.escape(value))
-                                     for key, value in data.iteritems()),
+        'data_attributes': ' '.join('data-{}="{}"'.format(markupsafe.escape(key), markupsafe.escape(value))
+                                     for key, value in data.items()),
     }
 
     if hasattr(frag, 'json_init_args') and frag.json_init_args is not None:
@@ -214,8 +214,8 @@ def wrap_xblock_aside(
     template_context = {
         'content': frag.content,
         'classes': css_classes,
-        'data_attributes': u' '.join(u'data-{}="{}"'.format(markupsafe.escape(key), markupsafe.escape(value))
-                                     for key, value in data.iteritems()),
+        'data_attributes': ' '.join('data-{}="{}"'.format(markupsafe.escape(key), markupsafe.escape(value))
+                                     for key, value in data.items()),
     }
 
     if hasattr(frag, 'json_init_args') and frag.json_init_args is not None:
@@ -279,7 +279,7 @@ def grade_histogram(module_id):
     from django.db import connection
     cursor = connection.cursor()
 
-    query = u"""\
+    query = """\
         SELECT courseware_studentmodule.grade,
         COUNT(courseware_studentmodule.student_id)
         FROM courseware_studentmodule
@@ -303,7 +303,7 @@ def sanitize_html_id(html_id):
     return sanitized_html_id
 
 
-@contract(user=User, block=XBlock, view=basestring, frag=Fragment, context="dict|None")
+@contract(user=User, block=XBlock, view=str, frag=Fragment, context="dict|None")
 def add_staff_markup(user, disable_staff_debug_info, block, view, frag, context):  # pylint: disable=unused-argument
     """
     Updates the supplied module with a new get_html function that wraps
@@ -377,7 +377,7 @@ def add_staff_markup(user, disable_staff_debug_info, block, view, frag, context)
         is_released = "<font color='red'>Yes!</font>" if (now > mstart) else "<font color='green'>Not yet</font>"
 
     field_contents = []
-    for name, field in block.fields.items():
+    for name, field in list(block.fields.items()):
         try:
             field_contents.append((name, field.read_from(block)))
         except InvalidScopeError:

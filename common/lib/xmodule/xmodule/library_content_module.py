@@ -50,7 +50,7 @@ def _get_capa_types():
 
     return [{'value': ANY_CAPA_TYPE_VALUE, 'display_name': _('Any Type')}] + sorted([
         {'value': capa_type, 'display_name': caption}
-        for capa_type, caption in capa_types.items()
+        for capa_type, caption in list(capa_types.items())
     ], key=lambda item: item.get('display_name'))
 
 
@@ -198,7 +198,7 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
         Helper method to publish an event for analytics purposes
         """
         event_data = {
-            "location": unicode(self.location),
+            "location": str(self.location),
             "result": result,
             "previous_count": getattr(self, "_last_event_result_count", len(self.selected)),
             "max_count": self.max_count,
@@ -439,7 +439,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         """
         Copy any overrides the user has made on blocks in this library.
         """
-        for field in source.fields.itervalues():
+        for field in source.fields.values():
             if field.scope == Scope.settings and field.is_set_on(source):
                 setattr(dest, field.name, field.read_from(source))
         if source.has_children:
@@ -476,16 +476,16 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         """
         latest_version = lib_tools.get_library_version(library_key)
         if latest_version is not None:
-            if version is None or version != unicode(latest_version):
+            if version is None or version != str(latest_version):
                 validation.set_summary(
                     StudioValidationMessage(
                         StudioValidationMessage.WARNING,
-                        _(u'This component is out of date. The library has new content.'),
+                        _('This component is out of date. The library has new content.'),
                         # TODO: change this to action_runtime_event='...' once the unit page supports that feature.
                         # See https://openedx.atlassian.net/browse/TNL-993
                         action_class='library-update-btn',
                         # Translators: {refresh_icon} placeholder is substituted to "↻" (without double quotes)
-                        action_label=_(u"{refresh_icon} Update now.").format(refresh_icon=u"↻")
+                        action_label=_("{refresh_icon} Update now.").format(refresh_icon="↻")
                     )
                 )
                 return False
@@ -493,9 +493,9 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
             validation.set_summary(
                 StudioValidationMessage(
                     StudioValidationMessage.ERROR,
-                    _(u'Library is invalid, corrupt, or has been deleted.'),
+                    _('Library is invalid, corrupt, or has been deleted.'),
                     action_class='edit-button',
-                    action_label=_(u"Edit Library List.")
+                    action_label=_("Edit Library List.")
                 )
             )
             return False
@@ -521,8 +521,8 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
                 StudioValidationMessage(
                     StudioValidationMessage.ERROR,
                     _(
-                        u"This course does not support content libraries. "
-                        u"Contact your system administrator for more information."
+                        "This course does not support content libraries. "
+                        "Contact your system administrator for more information."
                     )
                 )
             )
@@ -531,9 +531,9 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
             validation.set_summary(
                 StudioValidationMessage(
                     StudioValidationMessage.NOT_CONFIGURED,
-                    _(u"A library has not yet been selected."),
+                    _("A library has not yet been selected."),
                     action_class='edit-button',
-                    action_label=_(u"Select a Library.")
+                    action_label=_("Select a Library.")
                 )
             )
             return validation
@@ -548,9 +548,9 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
                 validation,
                 StudioValidationMessage(
                     StudioValidationMessage.WARNING,
-                    _(u'There are no matching problem types in the specified libraries.'),
+                    _('There are no matching problem types in the specified libraries.'),
                     action_class='edit-button',
-                    action_label=_(u"Select another problem type.")
+                    action_label=_("Select another problem type.")
                 )
             )
 
@@ -561,18 +561,18 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
                     StudioValidationMessage.WARNING,
                     (
                         ngettext(
-                            u'The specified library is configured to fetch {count} problem, ',
-                            u'The specified library is configured to fetch {count} problems, ',
+                            'The specified library is configured to fetch {count} problem, ',
+                            'The specified library is configured to fetch {count} problems, ',
                             self.max_count
                         ) +
                         ngettext(
-                            u'but there is only {actual} matching problem.',
-                            u'but there are only {actual} matching problems.',
+                            'but there is only {actual} matching problem.',
+                            'but there are only {actual} matching problems.',
                             matching_children_count
                         )
                     ).format(count=self.max_count, actual=matching_children_count),
                     action_class='edit-button',
-                    action_label=_(u"Edit the library configuration.")
+                    action_label=_("Edit the library configuration.")
                 )
             )
 
@@ -586,13 +586,13 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         user_perms = self.runtime.service(self, 'studio_user_permissions')
         all_libraries = [
             (key, name) for key, name in lib_tools.list_available_libraries()
-            if user_perms.can_read(key) or self.source_library_id == unicode(key)
+            if user_perms.can_read(key) or self.source_library_id == str(key)
         ]
         all_libraries.sort(key=lambda entry: entry[1])  # Sort by name
         if self.source_library_id and self.source_library_key not in [entry[0] for entry in all_libraries]:
-            all_libraries.append((self.source_library_id, _(u"Invalid Library")))
-        all_libraries = [(u"", _("No Library Selected"))] + all_libraries
-        values = [{"display_name": name, "value": unicode(key)} for key, name in all_libraries]
+            all_libraries.append((self.source_library_id, _("Invalid Library")))
+        all_libraries = [("", _("No Library Selected"))] + all_libraries
+        values = [{"display_name": name, "value": str(key)} for key, name in all_libraries]
         return values
 
     def editor_saved(self, user, old_metadata, old_content):
@@ -635,7 +635,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         ]
         definition = {
             attr_name: json.loads(attr_value)
-            for attr_name, attr_value in xml_object.attrib.items()
+            for attr_name, attr_value in list(xml_object.attrib.items())
         }
         return definition, children
 
@@ -645,11 +645,11 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         for child in self.get_children():
             self.runtime.add_block_as_child_node(child, xml_object)
         # Set node attributes based on our fields.
-        for field_name, field in self.fields.iteritems():  # pylint: disable=no-member
+        for field_name, field in self.fields.items():  # pylint: disable=no-member
             if field_name in ('children', 'parent', 'content'):
                 continue
             if field.is_set_on(self):
-                xml_object.set(field_name, unicode(field.read_from(self)))
+                xml_object.set(field_name, str(field.read_from(self)))
         return xml_object
 
 
@@ -667,7 +667,7 @@ class LibrarySummary(object):
 
         display_name (unicode): display name of the library.
         """
-        self.display_name = display_name if display_name else _(u"Empty")
+        self.display_name = display_name if display_name else _("Empty")
 
         self.id = library_locator  # pylint: disable=invalid-name
         self.location = library_locator.make_usage_key('library', 'library')

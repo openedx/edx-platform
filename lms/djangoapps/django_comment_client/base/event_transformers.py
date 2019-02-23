@@ -28,7 +28,7 @@ def _get_string(dictionary, key, del_if_bad=True):
     """
     if key in dictionary:
         value = dictionary[key]
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             return value
         else:
             if del_if_bad:

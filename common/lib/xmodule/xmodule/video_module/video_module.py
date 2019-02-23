@@ -98,8 +98,8 @@ log = logging.getLogger(__name__)
 #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
 
-EXPORT_IMPORT_COURSE_DIR = u'course'
-EXPORT_IMPORT_STATIC_DIR = u'static'
+EXPORT_IMPORT_COURSE_DIR = 'course'
+EXPORT_IMPORT_STATIC_DIR = 'static'
 
 
 @XBlock.wants('settings', 'completion')
@@ -176,7 +176,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             languages['en'] = 'English'
 
         # OrderedDict for easy testing of rendered context in tests
-        sorted_languages = sorted(languages.items(), key=itemgetter(1))
+        sorted_languages = sorted(list(languages.items()), key=itemgetter(1))
 
         sorted_languages = OrderedDict(sorted_languages)
         return track_url, transcript_language, sorted_languages
@@ -219,7 +219,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
 
         track_status = (self.download_track and self.track)
         transcript_download_format = self.transcript_download_format if not track_status else None
-        sources = filter(None, self.html5_sources)
+        sources = [_f for _f in self.html5_sources if _f]
 
         download_video_link = None
         branding_info = None
@@ -499,7 +499,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             validation = StudioValidation.copy(validation)
 
         no_transcript_lang = []
-        for lang_code, transcript in self.transcripts.items():
+        for lang_code, transcript in list(self.transcripts.items()):
             if not transcript:
                 no_transcript_lang.append([label for code, label in settings.ALL_LANGUAGES if code == lang_code][0])
 
@@ -618,7 +618,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                     self.location,
                     subs_id=sub_id,
                     file_name=sub_id,
-                    language=u'en'
+                    language='en'
                 )
                 transcripts_info['transcripts'] = dict(transcripts_info['transcripts'], en=sub_id)
                 break
@@ -684,7 +684,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         # Mild workaround to ensure that tests pass -- if a field
         # is set to its default value, we don't need to write it out.
         if youtube_string and youtube_string != '1.00:3_yD_cEKoCk':
-            xml.set('youtube', unicode(youtube_string))
+            xml.set('youtube', str(youtube_string))
         xml.set('url_name', self.url_name)
         attrs = {
             'display_name': self.display_name,
@@ -695,19 +695,19 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             'download_track': json.dumps(self.download_track),
             'download_video': json.dumps(self.download_video),
         }
-        for key, value in attrs.items():
+        for key, value in list(attrs.items()):
             # Mild workaround to ensure that tests pass -- if a field
             # is set to its default value, we don't write it out.
             if value:
                 if key in self.fields and self.fields[key].is_set_on(self):
                     try:
-                        xml.set(key, unicode(value))
+                        xml.set(key, str(value))
                     except UnicodeDecodeError:
                         exception_message = format_xml_exception_message(self.location, key, value)
                         log.exception(exception_message)
                         # If exception is UnicodeDecodeError set value using unicode 'utf-8' scheme.
                         log.info("Setting xml value using 'utf-8' scheme.")
-                        xml.set(key, unicode(value, 'utf-8'))
+                        xml.set(key, str(value, 'utf-8'))
                     except ValueError:
                         exception_message = format_xml_exception_message(self.location, key, value)
                         log.exception(exception_message)
@@ -749,7 +749,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                     video_id=edx_video_id,
                     resource_fs=resource_fs,
                     static_dir=EXPORT_IMPORT_STATIC_DIR,
-                    course_id=unicode(self.runtime.course_id.for_branch(None))
+                    course_id=str(self.runtime.course_id.for_branch(None))
                 )
                 # Update xml with edxval metadata
                 xml.append(exported_metadata['xml'])
@@ -789,9 +789,9 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             A full youtube url to the video whose ID is passed in
         """
         if youtube_id:
-            return u'https://www.youtube.com/watch?v={0}'.format(youtube_id)
+            return 'https://www.youtube.com/watch?v={0}'.format(youtube_id)
         else:
-            return u''
+            return ''
 
     def get_context(self):
         """
@@ -929,14 +929,14 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         if transcripts:
             field_data['transcripts'] = {tr.get('language'): tr.get('src') for tr in transcripts}
 
-        for attr, value in xml.items():
+        for attr, value in list(xml.items()):
             if attr in compat_keys:
                 attr = compat_keys[attr]
             if attr in cls.metadata_to_strip + ('url_name', 'name'):
                 continue
             if attr == 'youtube':
                 speeds = cls._parse_youtube(value)
-                for speed, youtube_id in speeds.items():
+                for speed, youtube_id in list(speeds.items()):
                     # should have made these youtube_id_1_00 for
                     # cleanliness, but hindsight doesn't need glasses
                     normalized_speed = speed[:-1] if speed.endswith('0') else speed
@@ -954,7 +954,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
 
         course_id = getattr(id_generator, 'target_course_id', None)
         # Update the handout location with current course_id
-        if 'handout' in field_data.keys() and course_id:
+        if 'handout' in list(field_data.keys()) and course_id:
             handout_location = StaticContent.get_location_from_path(field_data['handout'])
             if isinstance(handout_location, AssetLocator):
                 handout_new_location = StaticContent.compute_location(course_id, handout_location.path)
@@ -1006,7 +1006,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             for transcript in [self.sub, self.youtube_id_1_0] if transcript
         ]
 
-        for language_code, transcript in self.transcripts.items():
+        for language_code, transcript in list(self.transcripts.items()):
             external_transcripts[language_code].append(transcript)
 
         if edxval_api:
@@ -1043,7 +1043,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
 
         # Check to see if there are transcripts in other languages besides default transcript
         if self.transcripts:
-            for language in self.transcripts.keys():
+            for language in list(self.transcripts.keys()):
                 _update_transcript_for_index(language)
 
         if "content" in xblock_body:
@@ -1069,7 +1069,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         """
         Returns the VAL data for the requested video profiles for the given course.
         """
-        return edxval_api.get_video_info_for_course_and_profiles(unicode(course_id), video_profile_names)
+        return edxval_api.get_video_info_for_course_and_profiles(str(course_id), video_profile_names)
 
     def student_view_data(self, context=None):
         """

@@ -2,7 +2,7 @@
 Management command for creating a Django OAuth Toolkit Application model.
 """
 
-from __future__ import unicode_literals
+
 
 import logging
 

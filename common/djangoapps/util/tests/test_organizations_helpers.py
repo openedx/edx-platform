@@ -42,7 +42,7 @@ class OrganizationsHelpersTestCase(ModuleStoreTestCase):
         self.assertEqual(len(response), 0)
 
     def test_get_course_organizations_returns_none_when_app_disabled(self):
-        response = organizations_helpers.get_course_organizations(unicode(self.course.id))
+        response = organizations_helpers.get_course_organizations(str(self.course.id))
         self.assertEqual(len(response), 0)
 
     def test_add_organization_returns_none_when_app_disabled(self):

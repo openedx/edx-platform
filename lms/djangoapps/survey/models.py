@@ -55,8 +55,8 @@ class SurveyForm(TimeStampedModel):
         try:
             fields = cls.get_field_names_from_html(html)
         except Exception as ex:
-            log.exception(u"Cannot parse SurveyForm html: {}".format(ex))
-            raise ValidationError(u"Cannot parse SurveyForm as HTML: {}".format(ex))
+            log.exception("Cannot parse SurveyForm html: {}".format(ex))
+            raise ValidationError("Cannot parse SurveyForm as HTML: {}".format(ex))
 
         if not len(fields):
             raise ValidationError("SurveyForms must contain at least one form input field")
@@ -149,7 +149,7 @@ class SurveyForm(TimeStampedModel):
         # make sure the form is wrap in some outer single element
         # otherwise lxml can't parse it
         # NOTE: This wrapping doesn't change the ability to query it
-        tree = etree.fromstring(HTML(u'<div>{}</div>').format(HTML(html)))
+        tree = etree.fromstring(HTML('<div>{}</div>').format(HTML(html)))
 
         input_fields = (
             tree.findall('.//input') + tree.findall('.//select') +
@@ -157,7 +157,7 @@ class SurveyForm(TimeStampedModel):
         )
 
         for input_field in input_fields:
-            if 'name' in input_field.keys() and input_field.attrib['name'] not in names:
+            if 'name' in list(input_field.keys()) and input_field.attrib['name'] not in names:
                 names.append(input_field.attrib['name'])
 
         return names
@@ -245,7 +245,7 @@ class SurveyAnswer(TimeStampedModel):
         IMPORTANT: There is no validaton of form answers at this point. All data
         supplied to this method is presumed to be previously validated
         """
-        for name in answers.keys():
+        for name in list(answers.keys()):
             # See if there is an answer stored for this user, form, field_name pair or not
             # this will allow for update cases. This does include an additional lookup,
             # but write operations will be relatively infrequent

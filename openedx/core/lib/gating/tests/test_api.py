@@ -69,7 +69,7 @@ class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
 
         self.generic_milestone = {
             'name': 'Test generic milestone',
-            'namespace': unicode(self.seq1.location),
+            'namespace': str(self.seq1.location),
         }
 
     @patch('openedx.core.lib.gating.api.log.warning')
@@ -139,7 +139,7 @@ class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
         prereqs = gating_api.get_prerequisites(self.course.id)
         self.assertEqual(len(prereqs), 1)
         self.assertEqual(prereqs[0]['block_display_name'], self.seq1.display_name)
-        self.assertEqual(prereqs[0]['block_usage_key'], unicode(self.seq1.location))
+        self.assertEqual(prereqs[0]['block_usage_key'], str(self.seq1.location))
         self.assertTrue(gating_api.is_prerequisite(self.course.id, self.seq1.location))
 
         gating_api.remove_prerequisite(self.seq1.location)
@@ -156,7 +156,7 @@ class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
         prereq_content_key, min_score, min_completion = gating_api.get_required_content(
             self.course.id, self.seq2.location
         )
-        self.assertEqual(prereq_content_key, unicode(self.seq1.location))
+        self.assertEqual(prereq_content_key, str(self.seq1.location))
         self.assertEqual(min_score, 100)
         self.assertEqual(min_completion, 100)
 
@@ -185,7 +185,7 @@ class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
         milestone = milestones_api.get_course_content_milestones(self.course.id, self.seq2.location, 'requires')[0]
 
         self.assertEqual(gating_api.get_gated_content(self.course, staff), [])
-        self.assertEqual(gating_api.get_gated_content(self.course, student), [unicode(self.seq2.location)])
+        self.assertEqual(gating_api.get_gated_content(self.course, student), [str(self.seq2.location)])
 
         milestones_api.add_user_milestone({'id': student.id}, milestone)
 
@@ -294,7 +294,7 @@ class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
         component = ItemFactory.create(
             parent_location=self.vertical.location,
             category=component_type,
-            display_name=u'{} block'.format(component_type)
+            display_name='{} block'.format(component_type)
         )
 
         with patch.object(BlockCompletion, 'get_course_completions') as course_block_completions_mock:

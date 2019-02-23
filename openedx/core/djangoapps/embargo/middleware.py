@@ -86,8 +86,8 @@ class EmbargoMiddleware(object):
         if ip_filter.enabled and ip_address in ip_filter.blacklist_ips:
             log.info(
                 (
-                    u"User %s was blocked from accessing %s "
-                    u"because IP address %s is blacklisted."
+                    "User %s was blocked from accessing %s "
+                    "because IP address %s is blacklisted."
                 ), request.user.id, request.path, ip_address
             )
 
@@ -105,8 +105,8 @@ class EmbargoMiddleware(object):
         elif ip_filter.enabled and ip_address in ip_filter.whitelist_ips:
             log.info(
                 (
-                    u"User %s was allowed access to %s because "
-                    u"IP address %s is whitelisted."
+                    "User %s was allowed access to %s because "
+                    "IP address %s is whitelisted."
                 ),
                 request.user.id, request.path, ip_address
             )

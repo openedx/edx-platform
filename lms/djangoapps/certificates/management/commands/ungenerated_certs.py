@@ -2,7 +2,7 @@
 Management command to find all students that need certificates for
 courses that have finished, and put their cert requests on the queue.
 """
-from __future__ import print_function
+
 import datetime
 import logging
 
@@ -67,8 +67,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         LOGGER.info(
             (
-                u"Starting to create tasks for ungenerated certificates "
-                u"with arguments %s and options %s"
+                "Starting to create tasks for ungenerated certificates "
+                "with arguments %s and options %s"
             ),
             text_type(args),
             text_type(options)
@@ -111,14 +111,14 @@ class Command(BaseCommand):
                     timeleft = diff * (total - count) / status_interval
                     hours, remainder = divmod(timeleft.seconds, 3600)
                     minutes, _seconds = divmod(remainder, 60)
-                    print(u"{0}/{1} completed ~{2:02}:{3:02}m remaining".format(count, total, hours, minutes))
+                    print("{0}/{1} completed ~{2:02}:{3:02}m remaining".format(count, total, hours, minutes))
                     start = datetime.datetime.now(UTC)
 
                 cert_status = certificate_status_for_student(student, course_key)['status']
                 LOGGER.info(
                     (
-                        u"Student %s has certificate status '%s' "
-                        u"in course '%s'"
+                        "Student %s has certificate status '%s' "
+                        "in course '%s'"
                     ),
                     student.id,
                     cert_status,
@@ -139,9 +139,9 @@ class Command(BaseCommand):
                         if ret == 'generating':
                             LOGGER.info(
                                 (
-                                    u"Added a certificate generation task to the XQueue "
-                                    u"for student %s in course '%s'. "
-                                    u"The new certificate status is '%s'."
+                                    "Added a certificate generation task to the XQueue "
+                                    "for student %s in course '%s'. "
+                                    "The new certificate status is '%s'."
                                 ),
                                 student.id,
                                 text_type(course_key),
@@ -151,9 +151,9 @@ class Command(BaseCommand):
                     else:
                         LOGGER.info(
                             (
-                                u"Skipping certificate generation for "
-                                u"student %s in course '%s' "
-                                u"because the noop flag is set."
+                                "Skipping certificate generation for "
+                                "student %s in course '%s' "
+                                "because the noop flag is set."
                             ),
                             student.id,
                             text_type(course_key)
@@ -162,8 +162,8 @@ class Command(BaseCommand):
                 else:
                     LOGGER.info(
                         (
-                            u"Skipped student %s because "
-                            u"certificate status '%s' is not in %s"
+                            "Skipped student %s because "
+                            "certificate status '%s' is not in %s"
                         ),
                         student.id,
                         cert_status,
@@ -172,8 +172,8 @@ class Command(BaseCommand):
 
             LOGGER.info(
                 (
-                    u"Completed ungenerated certificates command "
-                    u"for course '%s'"
+                    "Completed ungenerated certificates command "
+                    "for course '%s'"
                 ),
                 text_type(course_key)
             )

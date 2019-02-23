@@ -32,8 +32,8 @@ class CourseGradeBase(object):
         self.force_update_subsections = force_update_subsections
 
     def __unicode__(self):
-        return u'Course Grade: percent: {}, letter_grade: {}, passed: {}'.format(
-            unicode(self.percent),
+        return 'Course Grade: percent: {}, letter_grade: {}, passed: {}'.format(
+            str(self.percent),
             self.letter_grade,
             self.passed,
         )
@@ -64,7 +64,7 @@ class CourseGradeBase(object):
         a dict keyed by subsection format types.
         """
         subsections_by_format = defaultdict(OrderedDict)
-        for chapter in self.chapter_grades.itervalues():
+        for chapter in self.chapter_grades.values():
             for subsection_grade in chapter['sections']:
                 if subsection_grade.graded:
                     graded_total = subsection_grade.graded_total
@@ -93,7 +93,7 @@ class CourseGradeBase(object):
         keyed by subsection location.
         """
         subsection_grades = defaultdict(OrderedDict)
-        for chapter in self.chapter_grades.itervalues():
+        for chapter in self.chapter_grades.values():
             for subsection_grade in chapter['sections']:
                 subsection_grades[subsection_grade.location] = subsection_grade
         return subsection_grades
@@ -104,7 +104,7 @@ class CourseGradeBase(object):
         Returns a dict of problem scores keyed by their locations.
         """
         problem_scores = {}
-        for chapter in self.chapter_grades.itervalues():
+        for chapter in self.chapter_grades.values():
             for subsection_grade in chapter['sections']:
                 problem_scores.update(subsection_grade.problem_scores)
         return problem_scores
@@ -271,7 +271,7 @@ class CourseGrade(CourseGradeBase):
         if assume_zero_if_absent(self.course_data.course_key):
             return True
 
-        for chapter in self.chapter_grades.itervalues():
+        for chapter in self.chapter_grades.values():
             for subsection_grade in chapter['sections']:
                 if subsection_grade.all_total.first_attempted:
                     return True
@@ -316,10 +316,10 @@ class CourseGrade(CourseGradeBase):
         Computes and returns whether the given percent value
         is a passing grade according to the given grade cutoffs.
         """
-        nonzero_cutoffs = [cutoff for cutoff in grade_cutoffs.values() if cutoff > 0]
+        nonzero_cutoffs = [cutoff for cutoff in list(grade_cutoffs.values()) if cutoff > 0]
         success_cutoff = min(nonzero_cutoffs) if nonzero_cutoffs else None
         return success_cutoff and percent >= success_cutoff
 
 
 def _uniqueify_and_keep_order(iterable):
-    return OrderedDict([(item, None) for item in iterable]).keys()
+    return list(OrderedDict([(item, None) for item in iterable]).keys())

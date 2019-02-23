@@ -151,7 +151,7 @@ class AssetIndexTestStudioFrontend(StudioCourseTest):
         """
         self.asset_page.visit()
         self.asset_page.delete_all_assets()
-        file_names = [u'file-0.png', u'file-13.pdf', u'file-26.js', u'file-39.txt']
+        file_names = ['file-0.png', 'file-13.pdf', 'file-26.js', 'file-39.txt']
         # Upload the files
         self.asset_page.upload_new_files(file_names)
         # Assert that the files have been uploaded.

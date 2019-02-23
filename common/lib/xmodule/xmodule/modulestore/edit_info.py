@@ -52,11 +52,10 @@ class EditInfoMixin(XBlockMixin):
         return self.runtime.get_published_on(self)
 
 
-class EditInfoRuntimeMixin(object):
+class EditInfoRuntimeMixin(object, metaclass=ABCMeta):
     """
     An abstract mixin class for the functions which the :class: `EditInfoMixin` methods call on the runtime
     """
-    __metaclass__ = ABCMeta
 
     @abstractmethod
     def get_edited_by(self, xblock):

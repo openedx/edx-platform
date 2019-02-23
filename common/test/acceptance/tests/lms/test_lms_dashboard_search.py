@@ -64,7 +64,7 @@ class DashboardSearchTest(AcceptanceTest):
         # generate course fixtures and outline pages
         self.studio_course_outlines = {}
         self.course_fixtures = {}
-        for key, course_info in self.courses.iteritems():
+        for key, course_info in self.courses.items():
             studio_course_outline = StudioCourseOutlinePage(
                 self.browser,
                 course_info['org'],

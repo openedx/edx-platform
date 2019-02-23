@@ -71,8 +71,8 @@ class TestTaskExecution(ModuleStoreTestCase):
         self.add_credit_course(self.course.id)
 
         create_exam(
-            course_id=unicode(self.course.id),
-            content_id=unicode(self.subsection.location),
+            course_id=str(self.course.id),
+            content_id=str(self.subsection.location),
             exam_name='A Proctored Exam',
             time_limit_mins=10,
             is_proctored=True,
@@ -87,7 +87,7 @@ class TestTaskExecution(ModuleStoreTestCase):
         requirements = get_credit_requirements(self.course.id)
         self.assertEqual(len(requirements), 2)
         self.assertEqual(requirements[1]['namespace'], 'proctored_exam')
-        self.assertEqual(requirements[1]['name'], unicode(self.subsection.location))
+        self.assertEqual(requirements[1]['name'], str(self.subsection.location))
         self.assertEqual(requirements[1]['display_name'], 'A Proctored Exam')
         self.assertEqual(requirements[1]['criteria'], {})
 
@@ -99,7 +99,7 @@ class TestTaskExecution(ModuleStoreTestCase):
 
         self.add_credit_course(self.course.id)
         create_exam(
-            course_id=unicode(self.course.id),
+            course_id=str(self.course.id),
             content_id='foo',
             exam_name='A Proctored Exam',
             time_limit_mins=10,
@@ -123,7 +123,7 @@ class TestTaskExecution(ModuleStoreTestCase):
         ])
 
         create_exam(
-            course_id=unicode(self.course.id),
+            course_id=str(self.course.id),
             content_id='foo2',
             exam_name='A Proctored Exam',
             time_limit_mins=10,
@@ -145,7 +145,7 @@ class TestTaskExecution(ModuleStoreTestCase):
 
         # practice proctored exams aren't requirements
         create_exam(
-            course_id=unicode(self.course.id),
+            course_id=str(self.course.id),
             content_id='foo3',
             exam_name='A Proctored Exam',
             time_limit_mins=10,
@@ -195,8 +195,8 @@ class TestTaskExecution(ModuleStoreTestCase):
         self.add_credit_course(self.course.id)
         subsection = ItemFactory.create(parent=self.section, category='sequential', display_name='Dummy Subsection')
         create_exam(
-            course_id=unicode(self.course.id),
-            content_id=unicode(subsection.location),
+            course_id=str(self.course.id),
+            content_id=str(subsection.location),
             exam_name='A Proctored Exam',
             time_limit_mins=10,
             is_proctored=True,
@@ -210,7 +210,7 @@ class TestTaskExecution(ModuleStoreTestCase):
         requirements = get_credit_requirements(self.course.id)
         self.assertEqual(len(requirements), 2)
         self.assertEqual(requirements[1]['namespace'], 'proctored_exam')
-        self.assertEqual(requirements[1]['name'], unicode(subsection.location))
+        self.assertEqual(requirements[1]['name'], str(subsection.location))
         self.assertEqual(requirements[1]['display_name'], 'A Proctored Exam')
         self.assertEqual(requirements[1]['criteria'], {})
 

@@ -22,31 +22,31 @@ class CourseImageTestCase(ModuleStoreTestCase):
         """
         if not expected_url.startswith("/"):
             expected_url = "/" + expected_url
-        self.assertEquals(expected_url, actual_url)
+        self.assertEqual(expected_url, actual_url)
 
     def test_get_image_url(self):
         """Test image URL formatting."""
         course = CourseFactory.create()
         self.verify_url(
-            unicode(course.id.make_asset_key('asset', course.course_image)),
+            str(course.id.make_asset_key('asset', course.course_image)),
             course_image_url(course)
         )
 
     def test_non_ascii_image_name(self):
         """ Verify that non-ascii image names are cleaned """
-        course_image = u'before_\N{SNOWMAN}_after.jpg'
+        course_image = 'before_\N{SNOWMAN}_after.jpg'
         course = CourseFactory.create(course_image=course_image)
         self.verify_url(
-            unicode(course.id.make_asset_key('asset', course_image.replace(u'\N{SNOWMAN}', '_'))),
+            str(course.id.make_asset_key('asset', course_image.replace('\N{SNOWMAN}', '_'))),
             course_image_url(course)
         )
 
     def test_spaces_in_image_name(self):
         """ Verify that image names with spaces in them are cleaned """
-        course_image = u'before after.jpg'
-        course = CourseFactory.create(course_image=u'before after.jpg')
+        course_image = 'before after.jpg'
+        course = CourseFactory.create(course_image='before after.jpg')
         self.verify_url(
-            unicode(course.id.make_asset_key('asset', course_image.replace(" ", "_"))),
+            str(course.id.make_asset_key('asset', course_image.replace(" ", "_"))),
             course_image_url(course)
         )
 
@@ -59,25 +59,25 @@ class CourseImageTestCase(ModuleStoreTestCase):
         `DEFAULT_COURSE_ABOUT_IMAGE_URL` defined in the settings.
         """
         course = CourseFactory.create(course_image='', default_store=default_store)
-        self.assertEquals(
+        self.assertEqual(
             'static/test.png',
             course_image_url(course),
         )
 
     def test_get_banner_image_url(self):
         """Test banner image URL formatting."""
-        banner_image = u'banner_image.jpg'
+        banner_image = 'banner_image.jpg'
         course = CourseFactory.create(banner_image=banner_image)
         self.verify_url(
-            unicode(course.id.make_asset_key('asset', banner_image)),
+            str(course.id.make_asset_key('asset', banner_image)),
             course_image_url(course, 'banner_image')
         )
 
     def test_get_video_thumbnail_image_url(self):
         """Test video thumbnail image URL formatting."""
-        thumbnail_image = u'thumbnail_image.jpg'
+        thumbnail_image = 'thumbnail_image.jpg'
         course = CourseFactory.create(video_thumbnail_image=thumbnail_image)
         self.verify_url(
-            unicode(course.id.make_asset_key('asset', thumbnail_image)),
+            str(course.id.make_asset_key('asset', thumbnail_image)),
             course_image_url(course, 'video_thumbnail_image')
         )

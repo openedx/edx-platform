@@ -13,7 +13,7 @@ class AsideTestType(XBlockAside):
     """
     Test Aside type
     """
-    FRAG_CONTENT = u"<p>Aside rendered</p>"
+    FRAG_CONTENT = "<p>Aside rendered</p>"
 
     content = String(default="default_content", scope=Scope.content)
     data_field = String(default="default_data", scope=Scope.settings)

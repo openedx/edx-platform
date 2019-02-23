@@ -102,10 +102,10 @@ class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
 
         update_url = reverse('admin:{}_{}_add'.format(self.model._meta.app_label, self.model._meta.model_name))
         update_url += '?source={}'.format(instance.pk)
-        return HTML(u'<a href="{}">{}</a>').format(update_url, instance.name)
+        return HTML('<a href="{}">{}</a>').format(update_url, instance.name)
 
     name_with_update_link.allow_tags = True
-    name_with_update_link.short_description = u'Name'
+    name_with_update_link.short_description = 'Name'
 
     def has_data(self, inst):
         """ Do we have cached metadata for this SAML provider? """
@@ -113,7 +113,7 @@ class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
             return None  # N/A
         data = SAMLProviderData.current(inst.entity_id)
         return bool(data and data.is_valid())
-    has_data.short_description = u'Metadata Ready'
+    has_data.short_description = 'Metadata Ready'
     has_data.boolean = True
 
     def mode(self, inst):
@@ -151,10 +151,10 @@ class SAMLConfigurationAdmin(KeyedConfigurationModelAdmin):
         public_key = inst.get_setting('SP_PUBLIC_CERT')
         private_key = inst.get_setting('SP_PRIVATE_KEY')
         if not public_key or not private_key:
-            return HTML(u'<em>Key pair incomplete/missing</em>')
+            return HTML('<em>Key pair incomplete/missing</em>')
         pub1, pub2 = public_key[0:10], public_key[-10:]
         priv1, priv2 = private_key[0:10], private_key[-10:]
-        return HTML(u'Public: {}…{}<br>Private: {}…{}').format(pub1, pub2, priv1, priv2)
+        return HTML('Public: {}…{}<br>Private: {}…{}').format(pub1, pub2, priv1, priv2)
     key_summary.allow_tags = True
 
 admin.site.register(SAMLConfiguration, SAMLConfigurationAdmin)
@@ -210,7 +210,7 @@ class ApiPermissionsAdminForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ApiPermissionsAdminForm, self).__init__(*args, **kwargs)
         self.fields['provider_id'].choices = (
-            (provider.provider_id, u"{} ({})".format(provider.name, provider.provider_id))
+            (provider.provider_id, "{} ({})".format(provider.name, provider.provider_id))
             for provider in Registry.enabled()
         )
 

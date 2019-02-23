@@ -20,7 +20,7 @@ Modulestore virtual   |          XML physical (draft, published)
              (a, a)   |  (a, a) | (x, a) | (x, x) | (x, y) | (a, x)
              (a, b)   |  (a, b) | (x, b) | (x, x) | (x, y) | (a, x)
 """
-from __future__ import print_function
+
 import json
 import logging
 import mimetypes
@@ -95,7 +95,7 @@ class StaticContentImporter:
 
         mimetypes.add_type('application/octet-stream', '.sjson')
         mimetypes.add_type('application/octet-stream', '.srt')
-        self.mimetypes_list = mimetypes.types_map.values()
+        self.mimetypes_list = list(mimetypes.types_map.values())
 
     def import_static_content_directory(self, content_subdir=DEFAULT_STATIC_CONTENT_SUBDIR, verbose=False):
         remap_dict = {}
@@ -170,7 +170,7 @@ class StaticContentImporter:
         try:
             self.static_content_store.save(content)
         except Exception as err:
-            log.exception(u'Error importing {0}, error={1}'.format(
+            log.exception('Error importing {0}, error={1}'.format(
                 file_subpath, err
             ))
 
@@ -374,7 +374,7 @@ class ImportManager(object):
         # first into the store
         course_data_path = path(self.data_dir) / source_courselike.data_dir
 
-        log.debug(u'======> IMPORTING courselike %s', courselike_key)
+        log.debug('======> IMPORTING courselike %s', courselike_key)
 
         if not self.do_import_static:
             # for old-style xblock where this was actually linked to kvs
@@ -490,7 +490,7 @@ class ImportManager(object):
         Iterate over the given directories and yield courses.
         """
         self.preflight()
-        for courselike_key in self.xml_module_store.modules.keys():
+        for courselike_key in list(self.xml_module_store.modules.keys()):
             try:
                 dest_id, runtime = self.get_dest_id(courselike_key)
             except DuplicateCourseError:
@@ -587,13 +587,13 @@ class CourseImportManager(ImportManager):
         # If we are importing into a course with a different course_id and wiki_slug is equal to either of these default
         # values then remap it so that the wiki does not point to the old wiki.
         if courselike_key != course.id:
-            original_unique_wiki_slug = u'{0}.{1}.{2}'.format(
+            original_unique_wiki_slug = '{0}.{1}.{2}'.format(
                 courselike_key.org,
                 courselike_key.course,
                 courselike_key.run
             )
             if course.wiki_slug == original_unique_wiki_slug or course.wiki_slug == courselike_key.course:
-                course.wiki_slug = u'{0}.{1}.{2}'.format(
+                course.wiki_slug = '{0}.{1}.{2}'.format(
                     course.id.org,
                     course.id.course,
                     course.id.run,
@@ -736,7 +736,7 @@ def _update_and_import_module(
     Update all the module reference fields to the destination course id,
     then import the module into the destination course.
     """
-    logging.debug(u'processing import of module %s...', unicode(module.location))
+    logging.debug('processing import of module %s...', str(module.location))
 
     def _update_module_references(module, source_course_id, dest_course_id):
         """
@@ -756,7 +756,7 @@ def _update_and_import_module(
                 return reference
 
         fields = {}
-        for field_name, field in module.fields.iteritems():
+        for field_name, field in module.fields.items():
             if field.scope != Scope.parent and field.is_set_on(module):
                 if isinstance(field, Reference):
                     value = field.read_from(module)
@@ -772,7 +772,7 @@ def _update_and_import_module(
                     fields[field_name] = {
                         key: _convert_ref_fields_to_new_namespace(reference)
                         for key, reference
-                        in reference_dict.iteritems()
+                        in reference_dict.items()
                     }
                 elif field_name == 'xml_attributes':
                     value = field.read_from(module)
@@ -946,7 +946,7 @@ def _import_course_draft(
 
                         index = index_in_children_list(descriptor)
                         parent_url = get_parent_url(descriptor, xml)
-                        draft_url = unicode(descriptor.location)
+                        draft_url = str(descriptor.location)
 
                         draft = draft_node_constructor(
                             module=descriptor, url=draft_url, parent_url=parent_url, index=index
@@ -995,7 +995,7 @@ def check_module_metadata_editability(module):
         print(
             ": found non-editable metadata on {url}. "
             "These metadata keys are not supported = {keys}".format(
-                url=unicode(module.location), keys=illegal_keys
+                url=str(module.location), keys=illegal_keys
             )
         )
 
@@ -1041,7 +1041,7 @@ def create_xml_attributes(module, xml):
     Make up for modules which don't define xml_attributes by creating them here and populating
     """
     xml_attrs = {}
-    for attr, val in xml.attrib.iteritems():
+    for attr, val in xml.attrib.items():
         if attr not in module.fields:
             # translate obsolete attr
             if attr == 'parent_sequential_url':
@@ -1068,7 +1068,7 @@ def validate_category_hierarchy(
 
     parents = []
     # get all modules of parent_category
-    for module in module_store.modules[course_id].itervalues():
+    for module in module_store.modules[course_id].values():
         if module.location.block_type == parent_category:
             parents.append(module)
 
@@ -1124,7 +1124,7 @@ def validate_course_policy(module_store, course_id):
     """
     # is there a reliable way to get the module location just given the course_id?
     warn_cnt = 0
-    for module in module_store.modules[course_id].itervalues():
+    for module in module_store.modules[course_id].values():
         if module.location.block_type == 'course':
             if not module._field_data.has(module, 'rerandomize'):
                 warn_cnt += 1
@@ -1166,7 +1166,7 @@ def perform_xlint(
         warn_cnt += _warn_cnt
 
     # first count all errors and warnings as part of the XMLModuleStore import
-    for err_log in module_store._course_errors.itervalues():  # pylint: disable=protected-access
+    for err_log in module_store._course_errors.values():  # pylint: disable=protected-access
         for err_log_entry in err_log.errors:
             msg = err_log_entry[0]
             if msg.startswith('ERROR:'):
@@ -1175,7 +1175,7 @@ def perform_xlint(
                 warn_cnt += 1
 
     # then count outright all courses that failed to load at all
-    for err_log in module_store.errored_courses.itervalues():
+    for err_log in module_store.errored_courses.values():
         for err_log_entry in err_log.errors:
             msg = err_log_entry[0]
             print(msg)
@@ -1184,7 +1184,7 @@ def perform_xlint(
             else:
                 warn_cnt += 1
 
-    for course_id in module_store.modules.keys():
+    for course_id in list(module_store.modules.keys()):
         # constrain that courses only have 'chapter' children
         err_cnt += validate_category_hierarchy(
             module_store, course_id, "course", "chapter"
@@ -1266,9 +1266,9 @@ def _update_module_location(module, new_location):
         rekey_fields = []
     else:
         rekey_fields = (
-            module.get_explicitly_set_fields_by_scope(Scope.content).keys() +
-            module.get_explicitly_set_fields_by_scope(Scope.settings).keys() +
-            module.get_explicitly_set_fields_by_scope(Scope.children).keys()
+            list(module.get_explicitly_set_fields_by_scope(Scope.content).keys()) +
+            list(module.get_explicitly_set_fields_by_scope(Scope.settings).keys()) +
+            list(module.get_explicitly_set_fields_by_scope(Scope.children).keys())
         )
 
     module.location = new_location

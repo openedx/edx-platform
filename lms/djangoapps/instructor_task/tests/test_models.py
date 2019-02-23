@@ -3,7 +3,7 @@ Tests for instructor_task/models.py.
 """
 import copy
 import time
-from cStringIO import StringIO
+from io import StringIO
 
 import boto
 from django.conf import settings

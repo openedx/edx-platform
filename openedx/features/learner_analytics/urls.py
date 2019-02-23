@@ -3,7 +3,7 @@ Url setup for learner analytics
 """
 from django.conf.urls import url
 
-from views import LearnerAnalyticsView
+from .views import LearnerAnalyticsView
 
 
 urlpatterns = [

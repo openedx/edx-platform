@@ -3,7 +3,7 @@ Minimal Django settings for tests of common/lib.
 Required in Django 1.9+ due to imports of models in stock Django apps.
 """
 
-from __future__ import absolute_import, unicode_literals
+
 
 import sys
 import tempfile

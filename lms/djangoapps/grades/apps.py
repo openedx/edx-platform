@@ -14,21 +14,21 @@ class GradesConfig(AppConfig):
     """
     Application Configuration for Grades.
     """
-    name = u'lms.djangoapps.grades'
+    name = 'lms.djangoapps.grades'
 
     plugin_app = {
         PluginURLs.CONFIG: {
             ProjectType.LMS: {
-                PluginURLs.NAMESPACE: u'grades_api',
-                PluginURLs.REGEX: u'api/grades/',
-                PluginURLs.RELATIVE_PATH: u'api.urls',
+                PluginURLs.NAMESPACE: 'grades_api',
+                PluginURLs.REGEX: 'api/grades/',
+                PluginURLs.RELATIVE_PATH: 'api.urls',
             }
         },
         PluginSettings.CONFIG: {
             ProjectType.LMS: {
-                SettingsType.AWS: {PluginSettings.RELATIVE_PATH: u'settings.aws'},
-                SettingsType.COMMON: {PluginSettings.RELATIVE_PATH: u'settings.common'},
-                SettingsType.TEST: {PluginSettings.RELATIVE_PATH: u'settings.test'},
+                SettingsType.AWS: {PluginSettings.RELATIVE_PATH: 'settings.aws'},
+                SettingsType.COMMON: {PluginSettings.RELATIVE_PATH: 'settings.common'},
+                SettingsType.TEST: {PluginSettings.RELATIVE_PATH: 'settings.test'},
             }
         }
     }

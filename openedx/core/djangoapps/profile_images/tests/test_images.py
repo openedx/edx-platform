@@ -35,7 +35,7 @@ class TestValidateUploadedImage(TestCase):
     Test validate_uploaded_image
     """
     FILE_UPLOAD_BAD_TYPE = (
-        u'The file must be one of the following types: {valid_file_types}.'.format(
+        'The file must be one of the following types: {valid_file_types}.'.format(
             valid_file_types=_get_valid_file_types()
         )
     )
@@ -53,10 +53,10 @@ class TestValidateUploadedImage(TestCase):
             self.assertEqual(uploaded_file.tell(), 0)
 
     @ddt.data(
-        (99, u"The file must be at least 100 bytes in size."),
+        (99, "The file must be at least 100 bytes in size."),
         (100, ),
         (1024, ),
-        (1025, u"The file must be smaller than 1 KB in size."),
+        (1025, "The file must be smaller than 1 KB in size."),
     )
     @ddt.unpack
     @override_settings(PROFILE_IMAGE_MIN_BYTES=100, PROFILE_IMAGE_MAX_BYTES=1024)
@@ -91,8 +91,8 @@ class TestValidateUploadedImage(TestCase):
         file data.
         """
         file_upload_bad_ext = (
-            u'The file name extension for this file does not match '
-            u'the file data. The file may be corrupted.'
+            'The file name extension for this file does not match '
+            'the file data. The file may be corrupted.'
         )
         # make a bmp, try to fool the function into thinking it's a jpeg
         with make_image_file(extension=".bmp") as bmp_file:
@@ -114,8 +114,8 @@ class TestValidateUploadedImage(TestCase):
         extension do not match
         """
         file_upload_bad_mimetype = (
-            u'The Content-Type header for this file does not match '
-            u'the file data. The file may be corrupted.'
+            'The Content-Type header for this file does not match '
+            'the file data. The file may be corrupted.'
         )
         with make_uploaded_file(extension=".jpeg", content_type="image/gif") as uploaded_file:
             with self.assertRaises(ImageValidationError) as ctx:
@@ -243,5 +243,5 @@ class TestRemoveProfileImages(TestCase):
         ):
             remove_profile_images(requested_sizes)
             deleted_names = [v[0][0] for v in mock_storage.delete.call_args_list]
-            self.assertEqual(requested_sizes.values(), deleted_names)
+            self.assertEqual(list(requested_sizes.values()), deleted_names)
             mock_storage.save.reset_mock()

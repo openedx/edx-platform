@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """Tests for LinkedIn Add to Profile configuration. """
-
-from urllib import quote, urlencode
+from urllib.parse import quote, urlencode
 
 import ddt
 from django.conf import settings
@@ -17,24 +16,24 @@ class LinkedInAddToProfileUrlTests(TestCase):
     """Tests for URL generation of LinkedInAddToProfileConfig. """
 
     COURSE_KEY = CourseLocator(org="edx", course="DemoX", run="Demo_Course")
-    COURSE_NAME = u"Test Course ☃"
-    CERT_URL = u"http://s3.edx/cert"
+    COURSE_NAME = "Test Course ☃"
+    CERT_URL = "http://s3.edx/cert"
     SITE_CONFIGURATION = {
         'SOCIAL_SHARING_SETTINGS': {
             'CERTIFICATE_LINKEDIN_MODE_TO_CERT_NAME': {
-                'honor': u'{platform_name} Honor Code Credential for {course_name}',
-                'verified': u'{platform_name} Verified Credential for {course_name}',
-                'professional': u'{platform_name} Professional Credential for {course_name}',
-                'no-id-professional': u'{platform_name} Professional Credential for {course_name}',
+                'honor': '{platform_name} Honor Code Credential for {course_name}',
+                'verified': '{platform_name} Verified Credential for {course_name}',
+                'professional': '{platform_name} Professional Credential for {course_name}',
+                'no-id-professional': '{platform_name} Professional Credential for {course_name}',
             }
         }
     }
 
     @ddt.data(
-        ('honor', u'Honor+Code+Certificate+for+Test+Course+%E2%98%83'),
-        ('verified', u'Verified+Certificate+for+Test+Course+%E2%98%83'),
-        ('professional', u'Professional+Certificate+for+Test+Course+%E2%98%83'),
-        ('default_mode', u'Certificate+for+Test+Course+%E2%98%83')
+        ('honor', 'Honor+Code+Certificate+for+Test+Course+%E2%98%83'),
+        ('verified', 'Verified+Certificate+for+Test+Course+%E2%98%83'),
+        ('professional', 'Professional+Certificate+for+Test+Course+%E2%98%83'),
+        ('default_mode', 'Certificate+for+Test+Course+%E2%98%83')
     )
     @ddt.unpack
     def test_linked_in_url(self, cert_mode, expected_cert_name):
@@ -64,11 +63,11 @@ class LinkedInAddToProfileUrlTests(TestCase):
         self.assertEqual(actual_url, expected_url)
 
     @ddt.data(
-        ('honor', u'Honor+Code+Credential+for+Test+Course+%E2%98%83'),
-        ('verified', u'Verified+Credential+for+Test+Course+%E2%98%83'),
-        ('professional', u'Professional+Credential+for+Test+Course+%E2%98%83'),
-        ('no-id-professional', u'Professional+Credential+for+Test+Course+%E2%98%83'),
-        ('default_mode', u'Certificate+for+Test+Course+%E2%98%83')
+        ('honor', 'Honor+Code+Credential+for+Test+Course+%E2%98%83'),
+        ('verified', 'Verified+Credential+for+Test+Course+%E2%98%83'),
+        ('professional', 'Professional+Credential+for+Test+Course+%E2%98%83'),
+        ('no-id-professional', 'Professional+Credential+for+Test+Course+%E2%98%83'),
+        ('default_mode', 'Certificate+for+Test+Course+%E2%98%83')
     )
     @ddt.unpack
     def test_linked_in_url_with_cert_name_override(self, cert_mode, expected_cert_name):
@@ -106,7 +105,7 @@ class LinkedInAddToProfileUrlTests(TestCase):
         )
 
         expected_param = urlencode({
-            'trk': u'edx-{course_key}_honor-dashboard'.format(
+            'trk': 'edx-{course_key}_honor-dashboard'.format(
                 course_key=self.COURSE_KEY
             )
         })

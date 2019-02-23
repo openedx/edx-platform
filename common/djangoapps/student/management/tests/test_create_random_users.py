@@ -54,7 +54,7 @@ class CreateRandomUserTests(SharedModuleStoreTestCase):
         users_to_create = 3
 
         with pytest.raises(InvalidKeyError):
-            call_command('create_random_users', text_type(users_to_create), u'invalid_course_id')
+            call_command('create_random_users', text_type(users_to_create), 'invalid_course_id')
 
         # Verify correct number of users are now in the database
         self.assertEqual(self.num_users_start, len(self.user_model.objects.all()))

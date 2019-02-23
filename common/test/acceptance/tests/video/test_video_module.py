@@ -128,7 +128,7 @@ class VideoBaseTest(UniqueCourseTest):
         :param vertical_index: index for the vertical display name
         :return: XBlockFixtureDesc
         """
-        xblock_course_vertical = XBlockFixtureDesc('vertical', u'Test Vertical-{0}'.format(vertical_index))
+        xblock_course_vertical = XBlockFixtureDesc('vertical', 'Test Vertical-{0}'.format(vertical_index))
 
         for video in vertical_contents:
             xblock_course_vertical.add_children(
@@ -550,7 +550,7 @@ class YouTubeVideoTest(VideoBaseTest):
     def _verify_caption_text(self, text):
         self.video._wait_for(
             lambda: (text in self.video.captions_text),
-            u'Captions contain "{}" text'.format(text),
+            'Captions contain "{}" text'.format(text),
             timeout=5
         )
 
@@ -560,7 +560,7 @@ class YouTubeVideoTest(VideoBaseTest):
         """
         self.video.wait_for(
             lambda: (text in self.video.closed_captions_text),
-            u'Closed captions contain "{}" text'.format(text),
+            'Closed captions contain "{}" text'.format(text),
             timeout=5
         )
 
@@ -750,7 +750,7 @@ class YouTubeVideoTest(VideoBaseTest):
         self.navigate_to_video()
 
         langs = {'zh_HANS': '在线学习是革', 'zh_HANT': '在線學習是革'}
-        for lang_code, text in langs.items():
+        for lang_code, text in list(langs.items()):
             self.video.scroll_to_button("transcript_button")
             self.assertTrue(self.video.select_language(lang_code))
             unicode_text = text.decode('utf-8')
@@ -1202,8 +1202,8 @@ class HLSVideoTest(VideoBaseTest):
 
         for line_no in range(5):
             self.video.click_transcript_line(line_no=line_no)
-            self.video.wait_for_position(u'0:0{}'.format(line_no))
+            self.video.wait_for_position('0:0{}'.format(line_no))
 
         for line_no in range(5):
-            self.video.seek(u'0:0{}'.format(line_no))
-            self.assertEqual(self.video.active_caption_text, u'Hi, edX welcomes you{}.'.format(line_no))
+            self.video.seek('0:0{}'.format(line_no))
+            self.assertEqual(self.video.active_caption_text, 'Hi, edX welcomes you{}.'.format(line_no))

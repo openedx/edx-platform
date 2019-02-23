@@ -3,7 +3,7 @@ Django module container for classes and operations related to the "Course Module
 """
 import json
 import logging
-from cStringIO import StringIO
+from io import StringIO
 from datetime import datetime, timedelta
 import dateutil.parser
 
@@ -1043,7 +1043,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
             if not getattr(self, "tabs", []):
                 CourseTabList.initialize_default(self)
         except InvalidTabsException as err:
-            raise type(err)('{msg} For course: {course_id}'.format(msg=text_type(err), course_id=unicode(self.id)))
+            raise type(err)('{msg} For course: {course_id}'.format(msg=text_type(err), course_id=str(self.id)))
 
         self.set_default_certificate_available_date()
 
@@ -1109,12 +1109,12 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         policy_dir = None
         url_name = xml_obj.get('url_name', xml_obj.get('slug'))
         if url_name:
-            policy_dir = u'policies/' + url_name
+            policy_dir = 'policies/' + url_name
 
         # Try to load grading policy
-        paths = [u'grading_policy.json']
+        paths = ['grading_policy.json']
         if policy_dir:
-            paths = [policy_dir + u'/grading_policy.json'] + paths
+            paths = [policy_dir + '/grading_policy.json'] + paths
 
         try:
             policy = json.loads(cls.read_grading_policy(paths, system))
@@ -1275,7 +1275,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         Return list of topic ids defined in course policy.
         """
         topics = self.discussion_topics
-        return [d["id"] for d in topics.values()]
+        return [d["id"] for d in list(topics.values())]
 
     @property
     def cohorted_discussions(self):
@@ -1331,7 +1331,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
                 return True
             else:
                 return False
-        elif isinstance(flag, basestring):
+        elif isinstance(flag, str):
             return flag.lower() in ['true', 'yes', 'y']
         else:
             return bool(flag)
@@ -1383,7 +1383,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
             ret = [
                 {"start": date_proxy.from_json(start), "end": date_proxy.from_json(end)}
                 for start, end
-                in filter(None, blackout_dates)
+                in [_f for _f in blackout_dates if _f]
             ]
             for blackout in ret:
                 if not blackout["start"] or not blackout["end"]:
@@ -1527,7 +1527,7 @@ class CourseSummary(object):
     """
     course_info_fields = ['display_name', 'display_coursenumber', 'display_organization', 'end']
 
-    def __init__(self, course_locator, display_name=u"Empty", display_coursenumber=None, display_organization=None,
+    def __init__(self, course_locator, display_name="Empty", display_coursenumber=None, display_organization=None,
                  end=None):
         """
         Initialize and construct course summary
@@ -1587,7 +1587,7 @@ class CourseSummary(object):
         except TypeError as e:
             log.warning(
                 "Course '{course_id}' has an improperly formatted end date '{end_date}'. Error: '{err}'.".format(
-                    course_id=unicode(self.id), end_date=self.end, err=e
+                    course_id=str(self.id), end_date=self.end, err=e
                 )
             )
             modified_end = self.end.replace(tzinfo=utc)

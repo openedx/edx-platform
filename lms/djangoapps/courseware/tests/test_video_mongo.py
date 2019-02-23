@@ -61,7 +61,7 @@ MODULESTORES = {
     ModuleStoreEnum.Type.split: TEST_DATA_SPLIT_MODULESTORE,
 }
 
-TRANSCRIPT_FILE_SRT_DATA = u"""
+TRANSCRIPT_FILE_SRT_DATA = """
 1
 00:00:14,370 --> 00:00:16,530
 I am overwatch.
@@ -80,7 +80,7 @@ class TestVideoYouTube(TestVideo):
     def test_video_constructor(self):
         """Make sure that all parameters extracted correctly from xml"""
         context = self.item_descriptor.render(STUDENT_VIEW).content
-        sources = [u'example.mp4', u'example.webm']
+        sources = ['example.mp4', 'example.webm']
 
         expected_context = {
             'autoadvance_enabled': False,
@@ -89,8 +89,8 @@ class TestVideoYouTube(TestVideo):
             'bumper_metadata': 'null',
             'cdn_eval': False,
             'cdn_exp_group': None,
-            'display_name': u'A Name',
-            'download_video_link': u'example.mp4',
+            'display_name': 'A Name',
+            'download_video_link': 'example.mp4',
             'handout': None,
             'id': self.item_descriptor.location.html_id(),
             'metadata': json.dumps(OrderedDict({
@@ -110,7 +110,7 @@ class TestVideoYouTube(TestVideo):
                 'start': 3603.0,
                 'end': 3610.0,
                 'transcriptLanguage': 'en',
-                'transcriptLanguages': OrderedDict({'en': 'English', 'uk': u'Українська'}),
+                'transcriptLanguages': OrderedDict({'en': 'English', 'uk': 'Українська'}),
                 'ytTestTimeout': 1500,
                 'ytApiUrl': 'https://www.youtube.com/iframe_api',
                 'ytMetadataUrl': 'https://www.googleapis.com/youtube/v3/videos/',
@@ -125,7 +125,7 @@ class TestVideoYouTube(TestVideo):
                 'prioritizeHls': False,
             })),
             'track': None,
-            'transcript_download_format': u'srt',
+            'transcript_download_format': 'srt',
             'transcript_download_formats_list': [
                 {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
@@ -162,7 +162,7 @@ class TestVideoNonYouTube(TestVideo):
             the template generates an empty string for the YouTube streams.
         """
         context = self.item_descriptor.render(STUDENT_VIEW).content
-        sources = [u'example.mp4', u'example.webm']
+        sources = ['example.mp4', 'example.webm']
 
         expected_context = {
             'autoadvance_enabled': False,
@@ -171,8 +171,8 @@ class TestVideoNonYouTube(TestVideo):
             'bumper_metadata': 'null',
             'cdn_eval': False,
             'cdn_exp_group': None,
-            'display_name': u'A Name',
-            'download_video_link': u'example.mp4',
+            'display_name': 'A Name',
+            'download_video_link': 'example.mp4',
             'handout': None,
             'id': self.item_descriptor.location.html_id(),
             'metadata': json.dumps(OrderedDict({
@@ -207,7 +207,7 @@ class TestVideoNonYouTube(TestVideo):
                 'prioritizeHls': False,
             })),
             'track': None,
-            'transcript_download_format': u'srt',
+            'transcript_download_format': 'srt',
             'transcript_download_formats_list': [
                 {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
@@ -291,42 +291,42 @@ class TestGetHtmlMethod(BaseTestXmodule):
 
         cases = [
             {
-                'download_track': u'true',
-                'track': u'<track src="http://www.example.com/track"/>',
-                'sub': u'a_sub_file.srt.sjson',
-                'expected_track_url': u'http://www.example.com/track',
+                'download_track': 'true',
+                'track': '<track src="http://www.example.com/track"/>',
+                'sub': 'a_sub_file.srt.sjson',
+                'expected_track_url': 'http://www.example.com/track',
                 'transcripts': '',
             },
             {
-                'download_track': u'true',
-                'track': u'',
-                'sub': u'a_sub_file.srt.sjson',
-                'expected_track_url': u'a_sub_file.srt.sjson',
+                'download_track': 'true',
+                'track': '',
+                'sub': 'a_sub_file.srt.sjson',
+                'expected_track_url': 'a_sub_file.srt.sjson',
                 'transcripts': '',
             },
             {
-                'download_track': u'true',
-                'track': u'',
-                'sub': u'',
+                'download_track': 'true',
+                'track': '',
+                'sub': '',
                 'expected_track_url': None,
                 'transcripts': '',
             },
             {
-                'download_track': u'false',
-                'track': u'<track src="http://www.example.com/track"/>',
-                'sub': u'a_sub_file.srt.sjson',
+                'download_track': 'false',
+                'track': '<track src="http://www.example.com/track"/>',
+                'sub': 'a_sub_file.srt.sjson',
                 'expected_track_url': None,
                 'transcripts': '',
             },
             {
-                'download_track': u'true',
-                'track': u'',
-                'sub': u'',
-                'expected_track_url': u'a_sub_file.srt.sjson',
+                'download_track': 'true',
+                'track': '',
+                'sub': '',
+                'expected_track_url': 'a_sub_file.srt.sjson',
                 'transcripts': '<transcript language="uk" src="ukrainian.srt" />',
             },
         ]
-        sources = [u'example.mp4', u'example.webm']
+        sources = ['example.mp4', 'example.webm']
 
         expected_context = {
             'autoadvance_enabled': False,
@@ -335,13 +335,13 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'bumper_metadata': 'null',
             'cdn_eval': False,
             'cdn_exp_group': None,
-            'display_name': u'A Name',
-            'download_video_link': u'example.mp4',
+            'display_name': 'A Name',
+            'download_video_link': 'example.mp4',
             'handout': None,
             'id': self.item_descriptor.location.html_id(),
             'metadata': '',
             'track': None,
-            'transcript_download_format': u'srt',
+            'transcript_download_format': 'srt',
             'transcript_download_formats_list': [
                 {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
@@ -365,8 +365,8 @@ class TestGetHtmlMethod(BaseTestXmodule):
 
             context = self.item_descriptor.render(STUDENT_VIEW).content
             metadata.update({
-                'transcriptLanguages': {"en": "English"} if not data['transcripts'] else {"uk": u'Українська'},
-                'transcriptLanguage': u'en' if not data['transcripts'] or data.get('sub') else u'uk',
+                'transcriptLanguages': {"en": "English"} if not data['transcripts'] else {"uk": 'Українська'},
+                'transcriptLanguage': 'en' if not data['transcripts'] or data.get('sub') else 'uk',
                 'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
                 'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
                 'publishCompletionUrl': self.get_handler_url('publish_completion', ''),
@@ -374,10 +374,10 @@ class TestGetHtmlMethod(BaseTestXmodule):
             })
             expected_context.update({
                 'transcript_download_format': (
-                    None if self.item_descriptor.track and self.item_descriptor.download_track else u'srt'
+                    None if self.item_descriptor.track and self.item_descriptor.download_track else 'srt'
                 ),
                 'track': (
-                    track_url if data['expected_track_url'] == u'a_sub_file.srt.sjson' else data['expected_track_url']
+                    track_url if data['expected_track_url'] == 'a_sub_file.srt.sjson' else data['expected_track_url']
                 ),
                 'id': self.item_descriptor.location.html_id(),
                 'metadata': json.dumps(metadata)
@@ -409,8 +409,8 @@ class TestGetHtmlMethod(BaseTestXmodule):
                     <source src="example.webm"/>
                 """,
                 'result': {
-                    'download_video_link': u'example_source.mp4',
-                    'sources': [u'example.mp4', u'example.webm'],
+                    'download_video_link': 'example_source.mp4',
+                    'sources': ['example.mp4', 'example.webm'],
                 },
             },
             {
@@ -421,8 +421,8 @@ class TestGetHtmlMethod(BaseTestXmodule):
                     <source src="example.webm"/>
                 """,
                 'result': {
-                    'download_video_link': u'example.mp4',
-                    'sources': [u'example.mp4', u'example.webm'],
+                    'download_video_link': 'example.mp4',
+                    'sources': ['example.mp4', 'example.webm'],
                 },
             },
             {
@@ -441,7 +441,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
                     <source src="example.webm"/>
                 """,
                 'result': {
-                    'sources': [u'example.mp4', u'example.webm'],
+                    'sources': ['example.mp4', 'example.webm'],
                 },
             },
         ]
@@ -453,13 +453,13 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'bumper_metadata': 'null',
             'cdn_eval': False,
             'cdn_exp_group': None,
-            'display_name': u'A Name',
-            'download_video_link': u'example.mp4',
+            'display_name': 'A Name',
+            'download_video_link': 'example.mp4',
             'handout': None,
             'id': self.item_descriptor.location.html_id(),
             'metadata': self.default_metadata_dict,
             'track': None,
-            'transcript_download_format': u'srt',
+            'transcript_download_format': 'srt',
             'transcript_download_formats_list': [
                 {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
@@ -500,7 +500,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         """
         Tests the VideoModule get_html where a edx_video_id is given but a video is not found
         """
-        SOURCE_XML = u"""
+        SOURCE_XML = """
             <video show_captions="true"
             display_name="A Name"
             sub="a_sub_file.srt.sjson" source="{source}"
@@ -520,8 +520,8 @@ class TestGetHtmlMethod(BaseTestXmodule):
             """,
             'edx_video_id': "meow",
             'result': {
-                'download_video_link': u'example_source.mp4',
-                'sources': [u'example.mp4', u'example.webm'],
+                'download_video_link': 'example_source.mp4',
+                'sources': ['example.mp4', 'example.webm'],
             }
         }
         DATA = SOURCE_XML.format(
@@ -561,7 +561,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'result': {
                 'download_video_link': None,
                 # make sure the desktop_mp4 url is included as part of the alternative sources.
-                'sources': [u'example.mp4', u'example.webm', u'http://www.meowmix.com'],
+                'sources': ['example.mp4', 'example.webm', 'http://www.meowmix.com'],
             }
         }
 
@@ -576,12 +576,12 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'bumper_metadata': 'null',
             'cdn_eval': False,
             'cdn_exp_group': None,
-            'display_name': u'A Name',
-            'download_video_link': u'example.mp4',
+            'display_name': 'A Name',
+            'download_video_link': 'example.mp4',
             'handout': None,
             'id': self.item_descriptor.location.html_id(),
             'track': None,
-            'transcript_download_format': u'srt',
+            'transcript_download_format': 'srt',
             'transcript_download_formats_list': [
                 {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
@@ -601,15 +601,15 @@ class TestGetHtmlMethod(BaseTestXmodule):
         with patch('edxval.api.get_video_info') as mock_get_video_info:
             mock_get_video_info.return_value = {
                 'url': '/edxval/video/example',
-                'edx_video_id': u'example',
+                'edx_video_id': 'example',
                 'duration': 111.0,
-                'client_video_id': u'The example video',
+                'client_video_id': 'The example video',
                 'encoded_videos': [
                     {
-                        'url': u'http://www.meowmix.com',
+                        'url': 'http://www.meowmix.com',
                         'file_size': 25556,
                         'bitrate': 9600,
-                        'profile': u'desktop_mp4'
+                        'profile': 'desktop_mp4'
                     }
                 ]
             }
@@ -651,8 +651,8 @@ class TestGetHtmlMethod(BaseTestXmodule):
             """,
             'edx_video_id': edx_video_id,
             'result': {
-                'download_video_link': u'http://fake-video.edx.org/{}.mp4'.format(edx_video_id),
-                'sources': [u'example.mp4', u'example.webm'] + [video['url'] for video in encoded_videos],
+                'download_video_link': 'http://fake-video.edx.org/{}.mp4'.format(edx_video_id),
+                'sources': ['example.mp4', 'example.webm'] + [video['url'] for video in encoded_videos],
             },
         }
         # context returned by get_html when provided with above data
@@ -682,8 +682,8 @@ class TestGetHtmlMethod(BaseTestXmodule):
             """,
             'edx_video_id': "{}\t".format(edx_video_id),
             'result': {
-                'download_video_link': u'http://fake-video.edx.org/{}.mp4'.format(edx_video_id),
-                'sources': [u'example.mp4', u'example.webm'] + [video['url'] for video in encoded_videos],
+                'download_video_link': 'http://fake-video.edx.org/{}.mp4'.format(edx_video_id),
+                'sources': ['example.mp4', 'example.webm'] + [video['url'] for video in encoded_videos],
             },
         }
         # context returned by get_html when provided with above data
@@ -703,7 +703,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             create_profile(profile)
             encoded_videos.append(
                 dict(
-                    url=u"http://fake-video.edx.org/{}.{}".format(edx_video_id, extension),
+                    url="http://fake-video.edx.org/{}.{}".format(edx_video_id, extension),
                     file_size=9000,
                     bitrate=42,
                     profile=profile,
@@ -726,7 +726,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         Create expected context and get actual context returned by `get_html` method.
         """
         # make sure the urls for the various encodings are included as part of the alternative sources.
-        SOURCE_XML = u"""
+        SOURCE_XML = """
             <video show_captions="true"
             display_name="A Name"
             sub="a_sub_file.srt.sjson" source="{source}"
@@ -748,12 +748,12 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'bumper_metadata': 'null',
             'cdn_eval': False,
             'cdn_exp_group': None,
-            'display_name': u'A Name',
-            'download_video_link': u'example.mp4',
+            'display_name': 'A Name',
+            'download_video_link': 'example.mp4',
             'handout': None,
             'id': self.item_descriptor.location.html_id(),
             'track': None,
-            'transcript_download_format': u'srt',
+            'transcript_download_format': 'srt',
             'transcript_download_formats_list': [
                 {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
@@ -814,7 +814,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
 
         mocked_get_video.side_effect = side_effect
 
-        source_xml = u"""
+        source_xml = """
             <video show_captions="true"
             display_name="A Name"
             sub="a_sub_file.srt.sjson" source="{source}"
@@ -834,10 +834,10 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 <source src="http://example.com/example.webm"/>
             """,
             'result': {
-                'download_video_link': u'example_source.mp4',
+                'download_video_link': 'example_source.mp4',
                 'sources': [
-                    u'http://cdn-example.com/example.mp4',
-                    u'http://cdn-example.com/example.webm'
+                    'http://cdn-example.com/example.mp4',
+                    'http://cdn-example.com/example.webm'
                 ],
             },
         }
@@ -859,13 +859,13 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'bumper_metadata': 'null',
             'cdn_eval': False,
             'cdn_exp_group': None,
-            'display_name': u'A Name',
+            'display_name': 'A Name',
             'download_video_link': None,
             'handout': None,
             'id': None,
             'metadata': self.default_metadata_dict,
             'track': None,
-            'transcript_download_format': u'srt',
+            'transcript_download_format': 'srt',
             'transcript_download_formats_list': [
                 {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
@@ -1067,7 +1067,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         metadata = {
             'html5_sources': ['http://youtu.be/3_yD_cEKoCk.mp4'] + data['hls'],
         }
-        video_xml = u'<video display_name="Video" edx_video_id="12345-67890" youtube_id_1_0="{}">[]</video>'.format(
+        video_xml = '<video display_name="Video" edx_video_id="12345-67890" youtube_id_1_0="{}">[]</video>'.format(
             data['youtube']
         )
         DEPRECATE_YOUTUBE_FLAG = waffle_flags()[DEPRECATE_YOUTUBE]
@@ -1075,7 +1075,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             with override_flag(DEPRECATE_YOUTUBE_FLAG.namespaced_flag_name, active=data['waffle_enabled']):
                 self.initialize_module(data=video_xml, metadata=metadata)
                 context = self.item_descriptor.render(STUDENT_VIEW).content
-                self.assertIn(u'"prioritizeHls": {}'.format(data['result']), context)
+                self.assertIn('"prioritizeHls": {}'.format(data['result']), context)
 
 
 @ddt.ddt
@@ -1120,7 +1120,7 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
 
     def test_download_video_is_explicitly_set(self):
         metadata = {
-            'track': u'http://some_track.srt',
+            'track': 'http://some_track.srt',
             'source': 'http://example.org/video.mp4',
             'html5_sources': ['http://youtu.be/3_yD_cEKoCk.mp4'],
             'download_video': False,
@@ -1306,8 +1306,8 @@ class TestEditorSavedMethod(BaseTestXmodule):
         Verify editor saved when video id contains spaces/tabs.
         """
         self.MODULESTORE = MODULESTORES[default_store]
-        stripped_video_id = unicode(uuid4())
-        unstripped_video_id = u'{video_id}{tabs}'.format(video_id=stripped_video_id, tabs=u'\t\t\t')
+        stripped_video_id = str(uuid4())
+        unstripped_video_id = '{video_id}{tabs}'.format(video_id=stripped_video_id, tabs='\t\t\t')
         self.metadata.update({
             'edx_video_id': unstripped_video_id
         })
@@ -1317,7 +1317,7 @@ class TestEditorSavedMethod(BaseTestXmodule):
 
         # Now, modifying and saving the video module should strip the video id.
         old_metadata = own_metadata(item)
-        item.display_name = u'New display name'
+        item.display_name = 'New display name'
         item.editor_saved(self.user, old_metadata, None)
         self.assertEqual(item.edx_video_id, stripped_video_id)
 
@@ -1335,7 +1335,7 @@ class TestEditorSavedMethod(BaseTestXmodule):
 
         # Now, modify `edx_video_id` and save should override `youtube_id_1_0`.
         old_metadata = own_metadata(item)
-        item.edx_video_id = unicode(uuid4())
+        item.edx_video_id = str(uuid4())
         item.editor_saved(self.user, old_metadata, None)
         self.assertEqual(item.youtube_id_1_0, 'test_yt_id')
 
@@ -1388,7 +1388,7 @@ class TestVideoDescriptorStudentViewJson(CacheIsolationTestCase):
             'duration': self.TEST_DURATION,
             'status': 'dummy',
             'encoded_videos': [self.TEST_ENCODED_VIDEO],
-            'courses': [unicode(self.video.location.course_key)] if associate_course_in_val else [],
+            'courses': [str(self.video.location.course_key)] if associate_course_in_val else [],
         })
         self.val_video = get_video_info(self.TEST_EDX_VIDEO_ID)  # pylint: disable=attribute-defined-outside-init
 
@@ -1532,7 +1532,7 @@ class TestVideoDescriptorStudentViewJson(CacheIsolationTestCase):
         self.video.transcripts = transcripts
         self.video.sub = english_sub
         student_view_response = self.get_result()
-        self.assertItemsEqual(student_view_response['transcripts'].keys(), expected_transcripts)
+        self.assertItemsEqual(list(student_view_response['transcripts'].keys()), expected_transcripts)
 
 
 @ddt.ddt
@@ -1620,7 +1620,7 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
         )
 
         actual = self.descriptor.definition_to_xml(resource_fs=self.file_system)
-        expected_str = u"""
+        expected_str = """
             <video download_video="false" url_name="SampleProblem" transcripts='{transcripts}'>
                 <video_asset client_video_id="test_client_video_id" duration="111.0" image="">
                     <encoded_video profile="mobile" url="http://example.com/video" file_size="222" bitrate="333"/>
@@ -1774,7 +1774,7 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
             EXPORT_IMPORT_STATIC_DIR
         )
 
-        xml_data = u"""
+        xml_data = """
             <video edx_video_id='{edx_video_id}' sub='{sub_id}' transcripts='{transcripts}'>
                 <video_asset client_video_id="test_client_video_id" duration="111.0">
                     <encoded_video profile="mobile" url="http://example.com/video" file_size="222" bitrate="333"/>
@@ -1842,12 +1842,12 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
         id_generator = Mock()
 
         # Verify edx_video_id is empty before.
-        self.assertEqual(self.descriptor.edx_video_id, u'')
+        self.assertEqual(self.descriptor.edx_video_id, '')
 
         video = self.descriptor.from_xml(xml_data, module_system, id_generator)
 
         # Verify edx_video_id is populated after the import.
-        self.assertNotEqual(video.edx_video_id, u'')
+        self.assertNotEqual(video.edx_video_id, '')
 
         video_data = get_video_info(video.edx_video_id)
         self.assertEqual(video_data['client_video_id'], 'External Video')
@@ -1861,7 +1861,7 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
         edx_video_id = 'test_edx_video_id'
         val_transcript_language_code = 'es'
         val_transcript_provider = 'Cielo24'
-        xml_data = u"""
+        xml_data = """
         <video edx_video_id='{edx_video_id}'>
             <video_asset client_video_id="test_client_video_id" duration="111.0">
                 <transcripts>
@@ -1889,12 +1889,12 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
         )
 
         # Verify edx_video_id is empty before.
-        self.assertEqual(self.descriptor.edx_video_id, u'')
+        self.assertEqual(self.descriptor.edx_video_id, '')
 
         video = self.descriptor.from_xml(xml_data, module_system, id_generator)
 
         # Verify edx_video_id is populated after the import.
-        self.assertNotEqual(video.edx_video_id, u'')
+        self.assertNotEqual(video.edx_video_id, '')
 
         video_data = get_video_info(video.edx_video_id)
         self.assertEqual(video_data['status'], 'external')
@@ -1916,8 +1916,8 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
             '<transcripts><transcript file_format="srt" language_code="en" provider="Cielo24"/></transcripts>',
             # VAL transcript takes priority
             {
-                'video_id': u'test_edx_video_id',
-                'language_code': u'en',
+                'video_id': 'test_edx_video_id',
+                'language_code': 'en',
                 'file_format': 'srt',
                 'provider': 'Cielo24'
             }
@@ -1928,8 +1928,8 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
             '<transcripts><transcript file_format="srt" language_code="en" provider="Cielo24"/></transcripts>',
             # VAL transcript takes priority
             {
-                'video_id': u'test_edx_video_id',
-                'language_code': u'en',
+                'video_id': 'test_edx_video_id',
+                'language_code': 'en',
                 'file_format': 'srt',
                 'provider': 'Cielo24'
             }
@@ -1940,8 +1940,8 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
             '<transcripts><transcript file_format="srt" language_code="en" provider="Cielo24"/></transcripts>',
             # VAL transcript takes priority
             {
-                'video_id': u'test_edx_video_id',
-                'language_code': u'en',
+                'video_id': 'test_edx_video_id',
+                'language_code': 'en',
                 'file_format': 'srt',
                 'provider': 'Cielo24'
             }
@@ -1952,8 +1952,8 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
             '',
             # self.sub transcript takes priority
             {
-                'video_id': u'test_edx_video_id',
-                'language_code': u'en',
+                'video_id': 'test_edx_video_id',
+                'language_code': 'en',
                 'file_format': 'sjson',
                 'provider': 'Custom'
             }
@@ -1964,8 +1964,8 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
             '',
             # self.transcripts would be saved.
             {
-                'video_id': u'test_edx_video_id',
-                'language_code': u'en',
+                'video_id': 'test_edx_video_id',
+                'language_code': 'en',
                 'file_format': 'srt',
                 'provider': 'Custom'
             }
@@ -1996,7 +1996,7 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
                 module_system.resources_fs,
                 EXPORT_IMPORT_STATIC_DIR
             )
-            xml_data += u" sub='{sub_id}'".format(
+            xml_data += " sub='{sub_id}'".format(
                 sub_id=sub_id
             )
 
@@ -2008,7 +2008,7 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
                 module_system.resources_fs,
                 EXPORT_IMPORT_STATIC_DIR
             )
-            xml_data += u" transcripts='{transcripts}'".format(
+            xml_data += " transcripts='{transcripts}'".format(
                 transcripts=json.dumps(external_transcripts),
             )
 
@@ -2030,12 +2030,12 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
         xml_data += '</video_asset></video>'
 
         # Verify edx_video_id is empty before import.
-        self.assertEqual(self.descriptor.edx_video_id, u'')
+        self.assertEqual(self.descriptor.edx_video_id, '')
 
         video = self.descriptor.from_xml(xml_data, module_system, id_generator)
 
         # Verify edx_video_id is not empty after import.
-        self.assertNotEqual(video.edx_video_id, u'')
+        self.assertNotEqual(video.edx_video_id, '')
 
         video_data = get_video_info(video.edx_video_id)
         self.assertEqual(video_data['status'], 'external')
@@ -2117,7 +2117,7 @@ class TestVideoWithBumper(TestVideo):
         is_bumper_enabled.return_value = True
 
         content = self.item_descriptor.render(STUDENT_VIEW).content
-        sources = [u'example.mp4', u'example.webm']
+        sources = ['example.mp4', 'example.webm']
         expected_context = {
             'autoadvance_enabled': False,
             'branding_info': None,
@@ -2141,8 +2141,8 @@ class TestVideoWithBumper(TestVideo):
             })),
             'cdn_eval': False,
             'cdn_exp_group': None,
-            'display_name': u'A Name',
-            'download_video_link': u'example.mp4',
+            'display_name': 'A Name',
+            'download_video_link': 'example.mp4',
             'handout': None,
             'id': self.item_descriptor.location.html_id(),
             'metadata': json.dumps(OrderedDict({
@@ -2162,7 +2162,7 @@ class TestVideoWithBumper(TestVideo):
                 'start': 3603.0,
                 'end': 3610.0,
                 'transcriptLanguage': 'en',
-                'transcriptLanguages': OrderedDict({'en': 'English', 'uk': u'Українська'}),
+                'transcriptLanguages': OrderedDict({'en': 'English', 'uk': 'Українська'}),
                 'ytTestTimeout': 1500,
                 'ytApiUrl': 'https://www.youtube.com/iframe_api',
                 'ytMetadataUrl': 'https://www.googleapis.com/youtube/v3/videos/',
@@ -2177,7 +2177,7 @@ class TestVideoWithBumper(TestVideo):
                 'prioritizeHls': False,
             })),
             'track': None,
-            'transcript_download_format': u'srt',
+            'transcript_download_format': 'srt',
             'transcript_download_formats_list': [
                 {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
@@ -2214,8 +2214,8 @@ class TestAutoAdvanceVideo(TestVideo):
             'license': None,
             'cdn_eval': False,
             'cdn_exp_group': None,
-            'display_name': u'A Name',
-            'download_video_link': u'example.mp4',
+            'display_name': 'A Name',
+            'download_video_link': 'example.mp4',
             'handout': None,
             'id': self.item_descriptor.location.html_id(),
             'bumper_metadata': 'null',
@@ -2225,7 +2225,7 @@ class TestAutoAdvanceVideo(TestVideo):
                 'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
                 'autoplay': False,
                 'streams': '0.75:jNCf2gIqpeE,1.00:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg',
-                'sources': [u'example.mp4', u'example.webm'],
+                'sources': ['example.mp4', 'example.webm'],
                 'duration': None,
                 'poster': None,
                 'captionDataDir': None,
@@ -2236,7 +2236,7 @@ class TestAutoAdvanceVideo(TestVideo):
                 'start': 3603.0,
                 'end': 3610.0,
                 'transcriptLanguage': 'en',
-                'transcriptLanguages': OrderedDict({'en': 'English', 'uk': u'Українська'}),
+                'transcriptLanguages': OrderedDict({'en': 'English', 'uk': 'Українська'}),
                 'ytTestTimeout': 1500,
                 'ytApiUrl': 'https://www.youtube.com/iframe_api',
                 'ytMetadataUrl': 'https://www.googleapis.com/youtube/v3/videos/',
@@ -2255,7 +2255,7 @@ class TestAutoAdvanceVideo(TestVideo):
                 'prioritizeHls': False,
             })),
             'track': None,
-            'transcript_download_format': u'srt',
+            'transcript_download_format': 'srt',
             'transcript_download_formats_list': [
                 {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}

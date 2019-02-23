@@ -43,7 +43,7 @@ class CCXCourseSerializer(serializers.ModelSerializer):
         """
         Getter for the CCX Course ID
         """
-        return unicode(CCXLocator.from_course_locator(obj.course.id, obj.id))
+        return str(CCXLocator.from_course_locator(obj.course.id, obj.id))
 
     @staticmethod
     def get_course_modules(obj):

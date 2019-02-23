@@ -41,7 +41,7 @@ class AppVersionConfig(models.Model):
     """
     PLATFORM_CHOICES = tuple([
         (platform, platform)
-        for platform in PLATFORM_CLASSES.keys()
+        for platform in list(PLATFORM_CLASSES.keys())
     ])
     platform = models.CharField(max_length=50, choices=PLATFORM_CHOICES, blank=False)
     version = models.CharField(

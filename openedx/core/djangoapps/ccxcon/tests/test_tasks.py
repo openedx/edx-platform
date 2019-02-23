@@ -23,7 +23,7 @@ class CCXConTaskTestCase(TestCase):
         mock_response = mock.Mock()
         mock_citc.return_value = mock_response
 
-        course_id = u'course-v1:OrgFoo+CN199+CR-FALL01'
+        course_id = 'course-v1:OrgFoo+CN199+CR-FALL01'
         tasks.update_ccxcon.delay(course_id)
 
         mock_citc.assert_called_once_with(CourseKey.from_string(course_id))
@@ -34,7 +34,7 @@ class CCXConTaskTestCase(TestCase):
         Test task with exception that triggers a retry
         """
         mock_citc.side_effect = api.CCXConnServerError()
-        course_id = u'course-v1:OrgFoo+CN199+CR-FALL01'
+        course_id = 'course-v1:OrgFoo+CN199+CR-FALL01'
         tasks.update_ccxcon.delay(course_id)
 
         self.assertEqual(mock_citc.call_count, 6)

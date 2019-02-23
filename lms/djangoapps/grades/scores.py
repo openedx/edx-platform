@@ -160,7 +160,7 @@ def _get_score_from_submissions(submissions_scores, block):
     Returns the score values from the submissions API if found.
     """
     if submissions_scores:
-        submission_value = submissions_scores.get(unicode(block.location))
+        submission_value = submissions_scores.get(str(block.location))
         if submission_value:
             first_attempted = submission_value['created_at']
             weighted_earned = submission_value['points_earned']

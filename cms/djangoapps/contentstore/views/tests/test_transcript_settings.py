@@ -231,31 +231,31 @@ class TranscriptDownloadTest(CourseTestCase):
         )
 
         # Expected response
-        expected_content = u'0\n00:00:00,010 --> 00:00:00,100\nHi, welcome to Edx.\n\n'
+        expected_content = '0\n00:00:00,010 --> 00:00:00,100\nHi, welcome to Edx.\n\n'
         expected_headers = {
             'Content-Disposition': 'attachment; filename="edx.srt"',
-            'Content-Language': u'en',
+            'Content-Language': 'en',
             'Content-Type': 'application/x-subrip; charset=utf-8'
         }
 
         # Assert the actual response
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, expected_content)
-        for attribute, value in expected_headers.iteritems():
+        for attribute, value in expected_headers.items():
             self.assertEqual(response.get(attribute), value)
 
     @ddt.data(
         (
             {},
-            u'The following parameters are required: edx_video_id, language_code.'
+            'The following parameters are required: edx_video_id, language_code.'
         ),
         (
             {'edx_video_id': '123'},
-            u'The following parameters are required: language_code.'
+            'The following parameters are required: language_code.'
         ),
         (
             {'language_code': 'en'},
-            u'The following parameters are required: edx_video_id.'
+            'The following parameters are required: edx_video_id.'
         ),
     )
     @ddt.unpack
@@ -322,7 +322,7 @@ class TranscriptUploadTest(CourseTestCase):
             video_id='123',
             language_code='en',
             metadata={
-                'language_code': u'es',
+                'language_code': 'es',
                 'file_format': 'sjson',
                 'provider': 'Custom'
             },
@@ -336,28 +336,28 @@ class TranscriptUploadTest(CourseTestCase):
                 'language_code': 'en',
                 'new_language_code': 'en',
             },
-            u'A transcript file is required.'
+            'A transcript file is required.'
         ),
         (
             {
-                'language_code': u'en',
-                'file': u'0\n00:00:00,010 --> 00:00:00,100\nHi, welcome to Edx.\n\n'
+                'language_code': 'en',
+                'file': '0\n00:00:00,010 --> 00:00:00,100\nHi, welcome to Edx.\n\n'
             },
-            u'The following parameters are required: edx_video_id, new_language_code.'
+            'The following parameters are required: edx_video_id, new_language_code.'
         ),
         (
             {
-                'language_code': u'en',
-                'new_language_code': u'en',
-                'file': u'0\n00:00:00,010 --> 00:00:00,100\nHi, welcome to Edx.\n\n'
+                'language_code': 'en',
+                'new_language_code': 'en',
+                'file': '0\n00:00:00,010 --> 00:00:00,100\nHi, welcome to Edx.\n\n'
             },
-            u'The following parameters are required: edx_video_id.'
+            'The following parameters are required: edx_video_id.'
         ),
         (
             {
-                'file': u'0\n00:00:00,010 --> 00:00:00,100\nHi, welcome to Edx.\n\n'
+                'file': '0\n00:00:00,010 --> 00:00:00,100\nHi, welcome to Edx.\n\n'
             },
-            u'The following parameters are required: edx_video_id, language_code, new_language_code.'
+            'The following parameters are required: edx_video_id, language_code, new_language_code.'
         )
     )
     @ddt.unpack
@@ -387,7 +387,7 @@ class TranscriptUploadTest(CourseTestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
             json.loads(response.content)['error'],
-            u'A transcript with the "es" language code already exists.'
+            'A transcript with the "es" language code already exists.'
         )
 
     @patch('contentstore.views.transcript_settings.get_available_transcript_languages', Mock(return_value=['en']))
@@ -411,7 +411,7 @@ class TranscriptUploadTest(CourseTestCase):
             self.assertEqual(response.status_code, 400)
             self.assertEqual(
                 json.loads(response.content)['error'],
-                u'There is a problem with this transcript file. Try to upload a different file.'
+                'There is a problem with this transcript file. Try to upload a different file.'
             )
 
     @patch('contentstore.views.transcript_settings.get_available_transcript_languages', Mock(return_value=['en']))
@@ -435,7 +435,7 @@ class TranscriptUploadTest(CourseTestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
             json.loads(response.content)['error'],
-            u'There is a problem with this transcript file. Try to upload a different file.'
+            'There is a problem with this transcript file. Try to upload a different file.'
         )
 
 
@@ -516,7 +516,7 @@ class TranscriptDeleteTest(CourseTestCase):
         self.assertEqual(self.user.is_staff, is_staff)
         self.assertEqual(CourseStaffRole(self.course.id).has_user(self.user), is_course_staff)
 
-        video_id, language_code = u'1234', u'en'
+        video_id, language_code = '1234', 'en'
         # Create a real transcript in VAL.
         api.create_or_update_video_transcript(
             video_id=video_id,

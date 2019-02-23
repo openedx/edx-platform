@@ -2,13 +2,13 @@
 """
 Commandline tool for doing operations on Problems
 """
-from __future__ import unicode_literals
-from __future__ import print_function
+
+
 
 import argparse
 import logging
 import sys
-from cStringIO import StringIO
+from io import StringIO
 
 from mako.lookup import TemplateLookup
 from path import Path as path
@@ -93,11 +93,11 @@ def command_test(problem):
 
 def check_that_blanks_fail(problem):
     """Leaving it blank should never work. Neither should a space."""
-    blank_answers = dict((answer_id, u"")
+    blank_answers = dict((answer_id, "")
                          for answer_id in problem.get_question_answers())
     grading_results = problem.grade_answers(blank_answers)
     try:
-        assert all(result == 'incorrect' for result in grading_results.values())
+        assert all(result == 'incorrect' for result in list(grading_results.values()))
     except AssertionError:
         log.error("Blank accepted as correct answer in {0} for {1}"
                   .format(problem,
@@ -130,11 +130,11 @@ def check_that_suggested_answers_work(problem):
     if real_answers:
         try:
             real_results = dict((answer_id, result) for answer_id, result
-                                in problem.grade_answers(all_answers).items()
+                                in list(problem.grade_answers(all_answers).items())
                                 if answer_id in real_answers)
             log.debug(real_results)
             assert(all(result == 'correct'
-                       for answer_id, result in real_results.items()))
+                       for answer_id, result in list(real_results.items())))
         except UndefinedVariable as uv_exc:
             log.error("The variable \"{0}\" specified in the ".format(uv_exc) +
                       "solution isn't recognized (is it a units measure?).")

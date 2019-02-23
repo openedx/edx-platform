@@ -5,12 +5,11 @@ import abc
 import re
 
 
-class MobilePlatform:
+class MobilePlatform(metaclass=abc.ABCMeta):
     """
     MobilePlatform class creates an instance of platform based on user agent and supports platform
     related operations.
     """
-    __metaclass__ = abc.ABCMeta
     version = None
 
     def __init__(self, version):
@@ -45,7 +44,7 @@ class MobilePlatform:
         Returns:
             instance of one of the supported mobile platforms (i.e. iOS, Android)
         """
-        for subclass in PLATFORM_CLASSES.values():
+        for subclass in list(PLATFORM_CLASSES.values()):
             instance = subclass.get_user_app_platform(user_agent, subclass.USER_AGENT_REGEX)
             if instance:
                 return instance

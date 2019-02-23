@@ -15,4 +15,4 @@ class SystemUser(AnonymousUser):
     """
     # pylint: disable=abstract-method
     def __unicode__(self):
-        return u'SystemUser'
+        return 'SystemUser'

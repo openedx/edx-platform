@@ -36,7 +36,7 @@ class RestrictedApplication(models.Model):
         """
         Return a unicode representation of this object
         """
-        return HTML(u"<RestrictedApplication '{name}'>").format(
+        return HTML("<RestrictedApplication '{name}'>").format(
             name=HTML(self.application.name)
         )
 
@@ -82,7 +82,7 @@ class ApplicationAccess(models.Model):
         """
         Return a unicode representation of this object.
         """
-        return u"{application_name}:{scopes}".format(
+        return "{application_name}:{scopes}".format(
             application_name=self.application.name,
             scopes=self.scopes,
         )
@@ -130,7 +130,7 @@ class ApplicationOrganization(models.Model):
         """
         Return a unicode representation of this object.
         """
-        return u"{application_name}:{organization}:{relation_type}".format(
+        return "{application_name}:{organization}:{relation_type}".format(
             application_name=self.application.name,
             organization=self.organization.short_name,
             relation_type=self.relation_type,
@@ -140,4 +140,4 @@ class ApplicationOrganization(models.Model):
         """
         Serialize for use in JWT filter claim.
         """
-        return unicode(':'.join([self.relation_type, self.organization.short_name]))
+        return str(':'.join([self.relation_type, self.organization.short_name]))

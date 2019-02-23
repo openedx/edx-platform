@@ -236,7 +236,7 @@ class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
                 'organization': 'Signatory_Organization ' + str(i),
                 'signature_image_path': '/static/certificates/images/demo-sig{}.png'.format(i),
                 'id': i,
-            } for i in xrange(signatory_count)
+            } for i in range(signatory_count)
 
         ]
 
@@ -249,7 +249,7 @@ class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
                 'signatories': signatories,
                 'version': 1,
                 'is_active': is_active
-            } for i in xrange(count)
+            } for i in range(count)
         ]
 
         self.course.certificates = {'certificates': certificates}
@@ -292,10 +292,10 @@ class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
         }"""
 
         config = self._certificate_html_view_configuration(configuration_string=test_configuration_string)
-        self.assertEquals(config.configuration, test_configuration_string)
+        self.assertEqual(config.configuration, test_configuration_string)
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id)
+            course_id=str(self.course.id)
         )
         self._add_course_certificates(count=1, signatory_count=2)
         response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
@@ -326,10 +326,10 @@ class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
             }
         }"""
         config = self._certificate_html_view_configuration(configuration_string=test_configuration_string)
-        self.assertEquals(config.configuration, test_configuration_string)
+        self.assertEqual(config.configuration, test_configuration_string)
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id)
+            course_id=str(self.course.id)
         )
         self._add_course_certificates(count=1, signatory_count=2)
         response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)

@@ -293,7 +293,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         # not be called.
         if consent_required:
             self.assertIsInstance(response, HttpResponseRedirect)
-            self.assertEquals(response.url, consent_url)  # pylint: disable=no-member
+            self.assertEqual(response.url, consent_url)  # pylint: disable=no-member
 
         # Otherwise, the view function should have been called with the expected arguments.
         else:

@@ -55,7 +55,7 @@ class ConditionalFields(object):
         scope=Scope.content,
         default='correct',
         values=lambda: [{'display_name': xml_attr, 'value': xml_attr}
-                        for xml_attr in ConditionalModule.conditions_map.keys()]
+                        for xml_attr in list(ConditionalModule.conditions_map.keys())]
     )
 
     conditional_value = String(
@@ -264,7 +264,7 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor, StudioEditabl
         # Convert sources xml_attribute to a ReferenceList field type so Location/Locator
         # substitution can be done.
         if not self.sources_list:
-            if 'sources' in self.xml_attributes and isinstance(self.xml_attributes['sources'], basestring):
+            if 'sources' in self.xml_attributes and isinstance(self.xml_attributes['sources'], str):
                 self.sources_list = [
                     # TODO: it is not clear why we are replacing the run here (which actually is a no-op
                     # for old-style course locators. However, this is the implementation of
@@ -302,7 +302,7 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor, StudioEditabl
         children = []
         show_tag_list = []
         definition = {}
-        for conditional_attr in ConditionalModule.conditions_map.iterkeys():
+        for conditional_attr in ConditionalModule.conditions_map.keys():
             conditional_value = xml_object.get(conditional_attr)
             if conditional_value is not None:
                 definition.update({
@@ -336,13 +336,13 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor, StudioEditabl
                 self.runtime.add_block_as_child_node(child, xml_object)
 
         if self.show_tag_list:
-            show_str = u'<{tag_name} sources="{sources}" />'.format(
+            show_str = '<{tag_name} sources="{sources}" />'.format(
                 tag_name='show', sources=';'.join(text_type(location) for location in self.show_tag_list))
             xml_object.append(etree.fromstring(show_str))
 
         # Overwrite the original sources attribute with the value from sources_list, as
         # Locations may have been changed to Locators.
-        stringified_sources_list = map(lambda loc: text_type(loc), self.sources_list)
+        stringified_sources_list = [text_type(loc) for loc in self.sources_list]
         self.xml_attributes['sources'] = ';'.join(stringified_sources_list)
         self.xml_attributes[self.conditional_attr] = self.conditional_value
         self.xml_attributes['message'] = self.conditional_message
@@ -355,9 +355,9 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor, StudioEditabl
             conditional_validation.add(
                 StudioValidationMessage(
                     StudioValidationMessage.NOT_CONFIGURED,
-                    _(u"This component has no source components configured yet."),
+                    _("This component has no source components configured yet."),
                     action_class='edit-button',
-                    action_label=_(u"Configure list of sources")
+                    action_label=_("Configure list of sources")
                 )
             )
             validation = StudioValidation.copy(validation)

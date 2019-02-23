@@ -30,7 +30,7 @@ class BaseXBlockEditorView(PageObject):
         """
         Return `selector`, but limited to this particular `XBlockEditorView` context
         """
-        return u'{}[data-locator="{}"] {}'.format(
+        return '{}[data-locator="{}"] {}'.format(
             self.BODY_SELECTOR,
             self.locator,
             selector

@@ -13,8 +13,8 @@ from openedx.core.djangoapps.site_configuration.tests.test_util import with_site
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 
 EN = language_api.Language('en', 'English')
-ES_419 = language_api.Language('es-419', u'Español (Latinoamérica)')
-LT_LT = language_api.Language('lt-lt', u'Lietuvių (Lietuva)')
+ES_419 = language_api.Language('es-419', 'Español (Latinoamérica)')
+LT_LT = language_api.Language('lt-lt', 'Lietuvių (Lietuva)')
 
 
 @ddt.ddt
@@ -85,7 +85,7 @@ class LanguageApiTest(CacheIsolationTestCase):
             released_languages = language_api.released_languages()
             self.assertEqual(released_languages, expected_languages)
 
-    @override_settings(ALL_LANGUAGES=[[u"cs", u"Czech"], [u"nl", u"Dutch"]])
+    @override_settings(ALL_LANGUAGES=[["cs", "Czech"], ["nl", "Dutch"]])
     def test_all_languages(self):
         """
         Tests for the list of all languages.
@@ -97,8 +97,8 @@ class LanguageApiTest(CacheIsolationTestCase):
         self.assertLess(all_languages[0][1], all_languages[1][1])
         self.assertEqual("nl", all_languages[0][0])
         self.assertEqual("cs", all_languages[1][0])
-        self.assertEqual(u"Hollandais", all_languages[0][1])
-        self.assertEqual(u"Tchèque", all_languages[1][1])
+        self.assertEqual("Hollandais", all_languages[0][1])
+        self.assertEqual("Tchèque", all_languages[1][1])
 
     def test_beta_languages(self):
         """

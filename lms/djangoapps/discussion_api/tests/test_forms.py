@@ -3,7 +3,7 @@ Tests for Discussion API forms
 """
 import itertools
 from unittest import TestCase
-from urllib import urlencode
+from urllib.parse import urlencode
 
 import ddt
 from django.http import QueryDict

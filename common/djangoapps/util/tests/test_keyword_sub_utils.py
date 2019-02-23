@@ -83,7 +83,7 @@ class KeywordSubTest(ModuleStoreTestCase):
             test_string, self.context,
         )
 
-        self.assertEquals(test_string, result)
+        self.assertEqual(test_string, result)
 
     def test_should_not_sub(self):
         """
@@ -94,7 +94,7 @@ class KeywordSubTest(ModuleStoreTestCase):
             test_string, self.context,
         )
 
-        self.assertEquals(test_string, result)
+        self.assertEqual(test_string, result)
 
     @file_data('fixtures/test_keywordsub_multiple_tags.json')
     def test_sub_multiple_tags(self, test_string, expected):
@@ -114,13 +114,13 @@ class KeywordSubTest(ModuleStoreTestCase):
         test_string = 'This string should not be subbed here %%USER_ID%%'
 
         no_course_context = dict(
-            (key, value) for key, value in self.context.iteritems() if key != 'course_title'
+            (key, value) for key, value in self.context.items() if key != 'course_title'
         )
         result = Ks.substitute_keywords_with_data(test_string, no_course_context)
         self.assertEqual(test_string, result)
 
         no_user_id_context = dict(
-            (key, value) for key, value in self.context.iteritems() if key != 'user_id'
+            (key, value) for key, value in self.context.items() if key != 'user_id'
         )
         result = Ks.substitute_keywords_with_data(test_string, no_user_id_context)
         self.assertEqual(test_string, result)

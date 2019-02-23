@@ -98,7 +98,7 @@ class WordCloudModule(WordCloudFields, XModule):
     def get_state(self):
         """Return success json answer for client."""
         if self.submitted:
-            total_count = sum(self.all_words.itervalues())
+            total_count = sum(self.all_words.values())
             return json.dumps({
                 'status': 'success',
                 'submitted': True,
@@ -144,7 +144,7 @@ class WordCloudModule(WordCloudFields, XModule):
         """
         list_to_return = []
         percents = 0
-        for num, word_tuple in enumerate(top_words.iteritems()):
+        for num, word_tuple in enumerate(top_words.items()):
             if num == len(top_words) - 1:
                 percent = 100 - percents
             else:
@@ -171,7 +171,7 @@ class WordCloudModule(WordCloudFields, XModule):
         """
         return dict(
             sorted(
-                dict_obj.items(),
+                list(dict_obj.items()),
                 key=lambda x: x[1],
                 reverse=True
             )[:amount]
@@ -197,7 +197,7 @@ class WordCloudModule(WordCloudFields, XModule):
             # Student words from client.
             # FIXME: we must use raw JSON, not a post data (multipart/form-data)
             raw_student_words = data.getall('student_words[]')
-            student_words = filter(None, map(self.good_word, raw_student_words))
+            student_words = [_f for _f in map(self.good_word, raw_student_words) if _f]
 
             self.student_words = student_words
 

@@ -103,7 +103,7 @@ class TestSimulatePublish(SharedModuleStoreTestCase):
         """Test sending only to specific courses."""
         self.command.handle(
             **self.options(
-                courses=[unicode(self.course_key_1), unicode(self.course_key_2)]
+                courses=[str(self.course_key_1), str(self.course_key_2)]
             )
         )
         self.assertIn(self.course_key_1, self.received_1)

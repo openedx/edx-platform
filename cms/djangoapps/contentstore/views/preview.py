@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+
 
 import logging
 from functools import partial
@@ -72,7 +72,7 @@ def preview_handler(request, usage_key_string, handler, suffix=''):
         resp = instance.handle(handler, req, suffix)
 
     except NoSuchHandlerError:
-        log.exception(u"XBlock %s attempted to access missing handler %r", instance, handler)
+        log.exception("XBlock %s attempted to access missing handler %r", instance, handler)
         raise Http404
 
     except NotFoundError:
@@ -101,7 +101,7 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
 
     def handler_url(self, block, handler_name, suffix='', query='', thirdparty=False):
         return reverse('preview_handler', kwargs={
-            'usage_key_string': unicode(block.scope_ids.usage_id),
+            'usage_key_string': str(block.scope_ids.usage_id),
             'handler': handler_name,
             'suffix': suffix,
         }) + '?' + query
@@ -137,7 +137,7 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
 
         for aside, aside_fn in aside_frag_fns:
             aside_frag = aside_fn(block, context)
-            if aside_frag.content != u'':
+            if aside_frag.content != '':
                 aside_frag_wrapped = self.wrap_aside(block, aside, view_name, aside_frag, context)
                 aside.save()
                 result.add_fragment_resources(aside_frag_wrapped)
@@ -166,7 +166,7 @@ def _preview_module_system(request, descriptor, field_data):
             wrap_xblock,
             'PreviewRuntime',
             display_name_only=display_name_only,
-            usage_id_serializer=unicode,
+            usage_id_serializer=str,
             request_token=request_token(request)
         ),
 
@@ -180,7 +180,7 @@ def _preview_module_system(request, descriptor, field_data):
         partial(
             wrap_xblock_aside,
             'PreviewRuntime',
-            usage_id_serializer=unicode,
+            usage_id_serializer=str,
             request_token=request_token(request)
         )
     ]
@@ -284,7 +284,7 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
         is_reorderable = _is_xblock_reorderable(xblock, context)
         selected_groups_label = get_visibility_partition_info(xblock)['selected_groups_label']
         if selected_groups_label:
-            selected_groups_label = _(u'Access restricted to: {list_of_groups}').format(list_of_groups=selected_groups_label)
+            selected_groups_label = _('Access restricted to: {list_of_groups}').format(list_of_groups=selected_groups_label)
         course = modulestore().get_course(xblock.location.course_key)
         template_context = {
             'xblock_context': context,
@@ -325,6 +325,6 @@ def get_preview_fragment(request, descriptor, context):
     try:
         fragment = module.render(preview_view, context)
     except Exception as exc:                          # pylint: disable=broad-except
-        log.warning(u"Unable to render %s for %r", preview_view, module, exc_info=True)
+        log.warning("Unable to render %s for %r", preview_view, module, exc_info=True)
         fragment = Fragment(render_to_string('html_error.html', {'message': str(exc)}))
     return fragment

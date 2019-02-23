@@ -98,7 +98,7 @@ def course_filename_prefix_generator(course_id, separator='_'):
         str: A unicode string which can safely be inserted into a
             filename.
     """
-    return get_valid_filename(unicode(separator).join([course_id.org, course_id.course, course_id.run]))
+    return get_valid_filename(str(separator).join([course_id.org, course_id.course, course_id.run]))
 
 
 # pylint: disable=invalid-name
@@ -118,7 +118,7 @@ def course_and_time_based_filename_generator(course_id, base_name):
             and the current time. Note that there will be no extension.
 
     """
-    return u"{course_prefix}_{base_name}_{timestamp_str}".format(
+    return "{course_prefix}_{base_name}_{timestamp_str}".format(
         course_prefix=course_filename_prefix_generator(course_id),
         base_name=get_valid_filename(base_name),
         timestamp_str=datetime.now(UTC).strftime("%Y-%m-%d-%H%M%S")

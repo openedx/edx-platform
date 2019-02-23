@@ -34,10 +34,10 @@ Our next steps would be to:
 * Move more blocks out of the platform, and more tests into the
   blocks themselves.
 """
-from __future__ import print_function
+
 
 import collections
-import HTMLParser
+import html.parser
 import json
 import sys
 import unittest
@@ -273,10 +273,10 @@ class XBlockScenarioTestCaseMixin(object):
                     )
                     cls.xblocks[xblock_config['urlname']] = xblock
 
-                scenario_url = unicode(reverse(
+                scenario_url = str(reverse(
                     'courseware_section',
                     kwargs={
-                        'course_id': unicode(cls.course.id),
+                        'course_id': str(cls.course.id),
                         'chapter': "ch_" + chapter_config['urlname'],
                         'section': "sec_" + chapter_config['urlname']
                     }
@@ -372,8 +372,8 @@ class XBlockTestCase(XBlockStudentTestCaseMixin,
         Get url for the specified xblock handler
         """
         return reverse('xblock_handler', kwargs={
-            'course_id': unicode(self.course.id),
-            'usage_id': unicode(
+            'course_id': str(self.course.id),
+            'usage_id': str(
                 self.course.id.make_usage_key('done', xblock_name)
             ),
             'handler': handler,
@@ -413,9 +413,9 @@ class XBlockTestCase(XBlockStudentTestCaseMixin,
                 if block["urlname"] == xblock_name:
                     xblock_type = block["blocktype"]
 
-        key = unicode(self.course.id.make_usage_key(xblock_type, xblock_name))
+        key = str(self.course.id.make_usage_key(xblock_type, xblock_name))
         return reverse('xblock_handler', kwargs={
-            'course_id': unicode(self.course.id),
+            'course_id': str(self.course.id),
             'usage_id': key,
             'handler': handler,
             'suffix': ''
@@ -449,7 +449,7 @@ class XBlockTestCase(XBlockStudentTestCaseMixin,
         usage_id = self.xblocks[urlname].scope_ids.usage_id
         # First, we get out our <div>
         soup_html = BeautifulSoup(content)
-        xblock_html = unicode(soup_html.find(id="seq_contents_0"))
+        xblock_html = str(soup_html.find(id="seq_contents_0"))
         # Now, we get out the text of the <div>
         try:
             escaped_html = xblock_html.split('<')[1].split('>')[1]
@@ -465,7 +465,7 @@ class XBlockTestCase(XBlockStudentTestCaseMixin,
             print("Dice 2", repr(xblock_html.split('<')[1].split('>')[1]), file=sys.stderr)
             raise
         # Finally, we unescape the contents
-        decoded_html = HTMLParser.HTMLParser().unescape(escaped_html).strip()
+        decoded_html = html.parser.HTMLParser().unescape(escaped_html).strip()
 
         return decoded_html
 

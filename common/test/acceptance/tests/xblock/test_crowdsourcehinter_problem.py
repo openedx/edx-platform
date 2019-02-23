@@ -79,7 +79,7 @@ class CrowdsourcehinterProblemTest(UniqueCourseTest):
 
         csh_problem_page.submit_text_answer("michigann")
         csh_problem_page.wait_for_ajax()
-        self.assertEqual(csh_problem_page.get_hint_text()[0], u"Hint: Sorry, there are no hints for this answer.")
+        self.assertEqual(csh_problem_page.get_hint_text()[0], "Hint: Sorry, there are no hints for this answer.")
 
         self.assertGreater(len(self.browser.find_elements_by_class_name('csh_rate_hint')), 0)
         csh_problem_page.rate_hint()

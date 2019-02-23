@@ -1,7 +1,7 @@
 """
 Acceptance test tasks
 """
-from __future__ import print_function
+
 from optparse import make_option
 
 from paver.easy import cmdopts, needs
@@ -61,5 +61,5 @@ def test_acceptance(options, passthrough_options):
         )
         print(msg)
 
-    suite = AcceptanceTestSuite(u'{} acceptance'.format(opts['system']), **opts)
+    suite = AcceptanceTestSuite('{} acceptance'.format(opts['system']), **opts)
     suite.run()

@@ -5,8 +5,8 @@ Module contains utils specific for video_module but not for transcripts.
 
 from collections import OrderedDict
 import logging
-from urllib import urlencode
-from urlparse import parse_qs, urlsplit, urlunsplit, urlparse
+from urllib.parse import urlencode
+from urllib.parse import parse_qs, urlsplit, urlunsplit, urlparse
 
 from django.conf import settings
 from django.core.validators import URLValidator
@@ -104,7 +104,7 @@ def format_xml_exception_message(location, key, value):
     when setting xml attributes.
     """
     exception_message = "Block-location:{location}, Key:{key}, Value:{value}".format(
-        location=unicode(location),
+        location=str(location),
         key=key,
         value=value
     )

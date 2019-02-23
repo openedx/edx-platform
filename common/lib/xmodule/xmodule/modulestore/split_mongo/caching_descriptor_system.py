@@ -88,7 +88,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
     @contract(returns="dict(BlockKey: BlockKey)")
     def _parent_map(self):
         parent_map = {}
-        for block_key, block in self.course_entry.structure['blocks'].iteritems():
+        for block_key, block in self.course_entry.structure['blocks'].items():
             for child in block.fields.get('children', []):
                 parent_map[child] = block_key
         return parent_map
@@ -382,7 +382,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         new_aside = super(CachingDescriptorSystem, self).get_aside_of_type(block, aside_type)
         new_aside._field_data = block._field_data  # pylint: disable=protected-access
 
-        for key, _ in new_aside.fields.iteritems():
+        for key, _ in new_aside.fields.items():
             if isinstance(key, KeyValueStore.Key) and block._field_data.has(new_aside, key):  # pylint: disable=protected-access
                 try:
                     value = block._field_data.get(new_aside, key)  # pylint: disable=protected-access

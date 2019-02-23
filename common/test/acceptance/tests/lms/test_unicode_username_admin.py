@@ -17,7 +17,7 @@ class UnicodeUsernameAdminTest(AcceptanceTest):
     # The word below reads "Omar II", in Arabic. It also contains a space and
     # an Eastern Arabic Number another option is to use the Esperanto fake
     # language but this was used instead to test non-western letters.
-    FIXTURE_USERNAME = u'عمر ٢'
+    FIXTURE_USERNAME = 'عمر ٢'
 
     # From the db fixture `unicode_user.json`
     FIXTURE_USER_ID = 1000
@@ -42,7 +42,7 @@ class UnicodeUsernameAdminTest(AcceptanceTest):
         As a superuser I should be able to update the first name of a user with unicode username.
         """
         self.assertNotEqual(self.page.first_name, 'John')
-        self.assertEquals(self.page.username, self.FIXTURE_USERNAME)
+        self.assertEqual(self.page.username, self.FIXTURE_USERNAME)
 
         self.page.change_first_name('John')
 
@@ -51,4 +51,4 @@ class UnicodeUsernameAdminTest(AcceptanceTest):
         # Visit the page again to verify changes
         self.page.visit()
 
-        self.assertEquals(self.page.first_name, 'John', 'The first name should be updated')
+        self.assertEqual(self.page.first_name, 'John', 'The first name should be updated')

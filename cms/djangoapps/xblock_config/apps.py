@@ -1,7 +1,7 @@
 """
 xblock_config Application Configuration
 """
-from __future__ import absolute_import
+
 
 from django.apps import AppConfig
 
@@ -13,8 +13,8 @@ class XBlockConfig(AppConfig):
     """
     Default configuration for the "xblock_config" Django application.
     """
-    name = u'xblock_config'
-    verbose_name = u'XBlock Configuration'
+    name = 'xblock_config'
+    verbose_name = 'XBlock Configuration'
 
     def ready(self):
         from openedx.core.lib.xblock_utils import xblock_local_resource_url

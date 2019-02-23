@@ -300,7 +300,7 @@ class AccountCreationForm(forms.Form):
             "city": _("A city is required"),
             "country": _("A country is required")
         }
-        for field_name, field_value in extra_fields.items():
+        for field_name, field_value in list(extra_fields.items()):
             if field_name not in self.fields:
                 if field_name == "honor_code":
                     if field_value == "required":
@@ -381,7 +381,7 @@ class AccountCreationForm(forms.Form):
         """
         return {
             key: value
-            for key, value in self.cleaned_data.items()
+            for key, value in list(self.cleaned_data.items())
             if key in self.extended_profile_fields and value is not None
         }
 

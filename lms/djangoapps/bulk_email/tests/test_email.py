@@ -67,7 +67,7 @@ class EmailSendFromDashboardTestCase(SharedModuleStoreTestCase):
         self.instructor = InstructorFactory(course_key=self.course.id)
 
         self.staff = [
-            StaffFactory(course_key=self.course.id) for __ in xrange(STAFF_COUNT)
+            StaffFactory(course_key=self.course.id) for __ in range(STAFF_COUNT)
         ]
 
     def create_students(self):
@@ -75,7 +75,7 @@ class EmailSendFromDashboardTestCase(SharedModuleStoreTestCase):
         Creates users and enrolls them in self.course. Assigns these users to
         self.students.
         """
-        self.students = [UserFactory() for _ in xrange(STUDENT_COUNT)]
+        self.students = [UserFactory() for _ in range(STUDENT_COUNT)]
         for student in self.students:
             CourseEnrollmentFactory.create(user=student, course_id=self.course.id)
 
@@ -90,7 +90,7 @@ class EmailSendFromDashboardTestCase(SharedModuleStoreTestCase):
         Goes to the instructor dashboard to verify that the email section is
         there.
         """
-        url = reverse('instructor_dashboard', kwargs={'course_id': unicode(self.course.id)})
+        url = reverse('instructor_dashboard', kwargs={'course_id': str(self.course.id)})
         # Response loads the whole instructor dashboard, so no need to explicitly
         # navigate to a particular email section
         response = self.client.get(url)
@@ -101,7 +101,7 @@ class EmailSendFromDashboardTestCase(SharedModuleStoreTestCase):
     @classmethod
     def setUpClass(cls):
         super(EmailSendFromDashboardTestCase, cls).setUpClass()
-        course_title = u"ẗëṡẗ title ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ"
+        course_title = "ẗëṡẗ title ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ"
         cls.course = CourseFactory.create(
             display_name=course_title,
             default_store=ModuleStoreEnum.Type.split
@@ -121,10 +121,10 @@ class EmailSendFromDashboardTestCase(SharedModuleStoreTestCase):
         # Pulling up the instructor dash email view here allows us to test sending emails in tests
         self.goto_instructor_dash_email_view()
         self.send_mail_url = reverse(
-            'send_email', kwargs={'course_id': unicode(self.course.id)}
+            'send_email', kwargs={'course_id': str(self.course.id)}
         )
         self.success_content = {
-            'course_id': unicode(self.course.id),
+            'course_id': str(self.course.id),
             'success': True,
         }
 
@@ -156,7 +156,7 @@ class SendEmailWithMockedUgettextMixin(object):
 
             >>> mock_ugettext('Hello') == '@AR Hello@'
             """
-            return u'@{lang} {text}@'.format(
+            return '@{lang} {text}@'.format(
                 lang=get_language().upper(),
                 text=text,
             )
@@ -180,7 +180,7 @@ class LocalizedFromAddressPlatformLangTestCase(SendEmailWithMockedUgettextMixin,
         """
         self.assertIsNone(self.course.language)  # Sanity check
         message = self.send_email()
-        self.assertRegexpMatches(message.from_email, '.*Course Staff.*')
+        self.assertRegex(message.from_email, '.*Course Staff.*')
 
     @override_settings(LANGUAGE_CODE='eo')
     def test_esperanto_platform(self):
@@ -189,7 +189,7 @@ class LocalizedFromAddressPlatformLangTestCase(SendEmailWithMockedUgettextMixin,
         """
         self.assertIsNone(self.course.language)  # Sanity check
         message = self.send_email()
-        self.assertRegexpMatches(message.from_email, '@EO .* Course Staff@')
+        self.assertRegex(message.from_email, '@EO .* Course Staff@')
 
 
 @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
@@ -208,7 +208,7 @@ class LocalizedFromAddressCourseLangTestCase(SendEmailWithMockedUgettextMixin, E
         Creates a different course.
         """
         super(LocalizedFromAddressCourseLangTestCase, cls).setUpClass()
-        course_title = u"ẗëṡẗ ｲэ"
+        course_title = "ẗëṡẗ ｲэ"
         cls.course = CourseFactory.create(
             display_name=course_title,
             language='ar',
@@ -221,7 +221,7 @@ class LocalizedFromAddressCourseLangTestCase(SendEmailWithMockedUgettextMixin, E
         The course language should override the platform's.
         """
         message = self.send_email()
-        self.assertRegexpMatches(message.from_email, '@AR .* Course Staff@')
+        self.assertRegex(message.from_email, '@AR .* Course Staff@')
 
 
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
@@ -256,16 +256,16 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
             'message': 'test message for myself'
         }
         response = self.client.post(self.send_mail_url, test_email)
-        self.assertEquals(json.loads(response.content), self.success_content)
+        self.assertEqual(json.loads(response.content), self.success_content)
 
         # Check that outbox is as expected
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(len(mail.outbox[0].to), 1)
-        self.assertEquals(mail.outbox[0].to[0], self.instructor.email)
-        self.assertEquals(mail.outbox[0].subject, 'test subject for myself')
-        self.assertEquals(
+        self.assertEqual(mail.outbox[0].to[0], self.instructor.email)
+        self.assertEqual(mail.outbox[0].subject, 'test subject for myself')
+        self.assertEqual(
             mail.outbox[0].from_email,
-            u'"{course_display_name}" Course Staff <{course_name}-no-reply@example.com>'.format(
+            '"{course_display_name}" Course Staff <{course_name}-no-reply@example.com>'.format(
                 course_display_name=self.course.display_name,
                 course_name=self.course.id.course
             )
@@ -282,10 +282,10 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
             'message': 'test message for subject'
         }
         response = self.client.post(self.send_mail_url, test_email)
-        self.assertEquals(json.loads(response.content), self.success_content)
+        self.assertEqual(json.loads(response.content), self.success_content)
 
         # the 1 is for the instructor in this test and others
-        self.assertEquals(len(mail.outbox), 1 + len(self.staff))
+        self.assertEqual(len(mail.outbox), 1 + len(self.staff))
         self.assertItemsEqual(
             [e.to[0] for e in mail.outbox],
             [self.instructor.email] + [s.email for s in self.staff]
@@ -305,7 +305,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
             'message': 'test message for cohort'
         }
         response = self.client.post(self.send_mail_url, test_email)
-        self.assertEquals(json.loads(response.content), self.success_content)
+        self.assertEqual(json.loads(response.content), self.success_content)
 
         self.assertItemsEqual(
             [e.to[0] for e in mail.outbox],
@@ -327,9 +327,9 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
             'message': 'test message for cohort'
         }
         response = self.client.post(self.send_mail_url, test_email)
-        self.assertEquals(json.loads(response.content), self.success_content)
+        self.assertEqual(json.loads(response.content), self.success_content)
 
-        self.assertEquals(len(mail.outbox), len(self.students) - 1)
+        self.assertEqual(len(mail.outbox), len(self.students) - 1)
         self.assertNotIn(self.students[-1].email, [e.to[0] for e in mail.outbox])
 
     def test_send_to_track(self):
@@ -338,7 +338,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         """
         CourseMode.objects.create(mode_slug='test', course_id=self.course.id)
         for student in self.students:
-            update_enrollment(student, unicode(self.course.id), 'test')
+            update_enrollment(student, str(self.course.id), 'test')
         test_email = {
             'action': 'Send email',
             'send_to': '["track:test"]',
@@ -346,7 +346,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
             'message': 'test message for test track',
         }
         response = self.client.post(self.send_mail_url, test_email)
-        self.assertEquals(json.loads(response.content), self.success_content)
+        self.assertEqual(json.loads(response.content), self.success_content)
 
         self.assertItemsEqual(
             [e.to[0] for e in mail.outbox],
@@ -362,7 +362,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         # Create a mode and designate an enrolled user to be placed in that mode
         CourseMode.objects.create(mode_slug='test_mode', course_id=self.course.id)
         test_mode_student = self.students[0]
-        update_enrollment(test_mode_student, unicode(self.course.id), 'test_mode')
+        update_enrollment(test_mode_student, str(self.course.id), 'test_mode')
 
         # Take another user already enrolled in the course, then enroll them in
         # another course but in that same test mode
@@ -373,7 +373,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
             user=test_mode_student_other_course,
             course_id=other_course.id
         )
-        update_enrollment(test_mode_student_other_course, unicode(other_course.id), 'test_mode')
+        update_enrollment(test_mode_student_other_course, str(other_course.id), 'test_mode')
 
         # Send the emails...
         test_email = {
@@ -383,7 +383,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
             'message': 'test message for test_mode track',
         }
         response = self.client.post(self.send_mail_url, test_email)
-        self.assertEquals(json.loads(response.content), self.success_content)
+        self.assertEqual(json.loads(response.content), self.success_content)
 
         # Only the the student in the test mode in the course the email was
         # sent from should receive an email
@@ -402,10 +402,10 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
             'message': 'test message for all'
         }
         response = self.client.post(self.send_mail_url, test_email)
-        self.assertEquals(json.loads(response.content), self.success_content)
+        self.assertEqual(json.loads(response.content), self.success_content)
 
         # the 1 is for the instructor
-        self.assertEquals(len(mail.outbox), 1 + len(self.staff) + len(self.students))
+        self.assertEqual(len(mail.outbox), 1 + len(self.staff) + len(self.students))
         self.assertItemsEqual(
             [e.to[0] for e in mail.outbox],
             [self.instructor.email] + [s.email for s in self.staff] + [s.email for s in self.students]
@@ -452,7 +452,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         Make sure email (with Unicode characters) send to all goes there.
         """
 
-        uni_subject = u'téśt śúbjéćt főŕ áĺĺ'
+        uni_subject = 'téśt śúbjéćt főŕ áĺĺ'
         test_email = {
             'action': 'Send email',
             'send_to': '["myself", "staff", "learners"]',
@@ -460,14 +460,14 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
             'message': 'test message for all'
         }
         response = self.client.post(self.send_mail_url, test_email)
-        self.assertEquals(json.loads(response.content), self.success_content)
+        self.assertEqual(json.loads(response.content), self.success_content)
 
-        self.assertEquals(len(mail.outbox), 1 + len(self.staff) + len(self.students))
+        self.assertEqual(len(mail.outbox), 1 + len(self.staff) + len(self.students))
         self.assertItemsEqual(
             [e.to[0] for e in mail.outbox],
             [self.instructor.email] + [s.email for s in self.staff] + [s.email for s in self.students]
         )
-        self.assertEquals(mail.outbox[0].subject, uni_subject)
+        self.assertEqual(mail.outbox[0].subject, uni_subject)
 
     def test_unicode_students_send_to_all(self):
         """
@@ -475,7 +475,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         """
 
         # Create a student with Unicode in their first & last names
-        unicode_user = UserFactory(first_name=u'Ⓡⓞⓑⓞⓣ', last_name=u'ՇﻉรՇ')
+        unicode_user = UserFactory(first_name='Ⓡⓞⓑⓞⓣ', last_name='ՇﻉรՇ')
         CourseEnrollmentFactory.create(user=unicode_user, course_id=self.course.id)
         self.students.append(unicode_user)
 
@@ -486,9 +486,9 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
             'message': 'test message for all'
         }
         response = self.client.post(self.send_mail_url, test_email)
-        self.assertEquals(json.loads(response.content), self.success_content)
+        self.assertEqual(json.loads(response.content), self.success_content)
 
-        self.assertEquals(len(mail.outbox), 1 + len(self.staff) + len(self.students))
+        self.assertEqual(len(mail.outbox), 1 + len(self.staff) + len(self.students))
 
         self.assertItemsEqual(
             [e.to[0] for e in mail.outbox],
@@ -511,7 +511,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
 
         # make display_name that's longer than 320 characters when encoded
         # to ascii and escaped, but shorter than 320 unicode characters
-        long_name = u"Финансовое программирование и политика, часть 1: макроэкономические счета и анализ"
+        long_name = "Финансовое программирование и политика, часть 1: макроэкономические счета и анализ"
 
         course = CourseFactory.create(
             display_name=long_name,
@@ -537,7 +537,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         self.assertEqual(len(unexpected_from_addr), 137)
 
         self.login_as_user(instructor)
-        send_mail_url = reverse('send_email', kwargs={'course_id': unicode(course.id)})
+        send_mail_url = reverse('send_email', kwargs={'course_id': str(course.id)})
         response = self.client.post(send_mail_url, test_email)
         self.assertTrue(json.loads(response.content)['success'])
 
@@ -545,7 +545,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         from_email = mail.outbox[0].from_email
 
         expected_from_addr = (
-            u'"{course_name}" Course Staff <{course_name}-no-reply@courseupdates.edx.org>'
+            '"{course_name}" Course Staff <{course_name}-no-reply@courseupdates.edx.org>'
         ).format(course_name=course.id.course)
 
         self.assertEqual(
@@ -563,7 +563,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         mock_factory = MockCourseEmailResult()
         email_mock.side_effect = mock_factory.get_mock_update_subtask_status()
         added_users = []
-        for _ in xrange(LARGE_NUM_EMAILS):
+        for _ in range(LARGE_NUM_EMAILS):
             user = UserFactory()
             added_users.append(user)
             CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
@@ -582,9 +582,9 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
             'message': 'test message for all'
         }
         response = self.client.post(self.send_mail_url, test_email)
-        self.assertEquals(json.loads(response.content), self.success_content)
+        self.assertEqual(json.loads(response.content), self.success_content)
 
-        self.assertEquals(mock_factory.emails_sent,
+        self.assertEqual(mock_factory.emails_sent,
                           1 + len(self.staff) + len(self.students) + LARGE_NUM_EMAILS - len(optouts))
         outbox_contents = [e.to[0] for e in mail.outbox]
         should_send_contents = ([self.instructor.email] +
@@ -608,7 +608,7 @@ class TestEmailSendFromDashboard(EmailSendFromDashboardTestCase):
         Make sure email (with Unicode characters) send to all goes there.
         """
 
-        uni_message = u'ẗëṡẗ ṁëṡṡäġë ḟöṛ äḷḷ ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ fоѓ аll'
+        uni_message = 'ẗëṡẗ ṁëṡṡäġë ḟöṛ äḷḷ ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ fоѓ аll'
         test_email = {
             'action': 'Send email',
             'send_to': '["myself", "staff", "learners"]',
@@ -616,9 +616,9 @@ class TestEmailSendFromDashboard(EmailSendFromDashboardTestCase):
             'message': uni_message
         }
         response = self.client.post(self.send_mail_url, test_email)
-        self.assertEquals(json.loads(response.content), self.success_content)
+        self.assertEqual(json.loads(response.content), self.success_content)
 
-        self.assertEquals(len(mail.outbox), 1 + len(self.staff) + len(self.students))
+        self.assertEqual(len(mail.outbox), 1 + len(self.staff) + len(self.students))
         self.assertItemsEqual(
             [e.to[0] for e in mail.outbox],
             [self.instructor.email] + [s.email for s in self.staff] + [s.email for s in self.students]
@@ -639,7 +639,7 @@ class TestCourseEmailContext(SharedModuleStoreTestCase):
         Create a course shared by all tests.
         """
         super(TestCourseEmailContext, cls).setUpClass()
-        cls.course_title = u"Финансовое программирование и политика, часть 1: макроэкономические счета и анализ"
+        cls.course_title = "Финансовое программирование и политика, часть 1: макроэкономические счета и анализ"
         cls.course_org = 'IMF'
         cls.course_number = "FPP.1x"
         cls.course_run = "2016"
@@ -654,19 +654,19 @@ class TestCourseEmailContext(SharedModuleStoreTestCase):
         """
         This test tests that the bulk email context uses http or https urls as appropriate.
         """
-        self.assertEquals(email_context['platform_name'], settings.PLATFORM_NAME)
-        self.assertEquals(email_context['course_title'], self.course_title)
-        self.assertEquals(email_context['course_url'],
+        self.assertEqual(email_context['platform_name'], settings.PLATFORM_NAME)
+        self.assertEqual(email_context['course_title'], self.course_title)
+        self.assertEqual(email_context['course_url'],
                           '{}://edx.org/courses/{}/{}/{}/'.format(scheme,
                                                                   self.course_org,
                                                                   self.course_number,
                                                                   self.course_run))
-        self.assertEquals(email_context['course_image_url'],
+        self.assertEqual(email_context['course_image_url'],
                           '{}://edx.org/c4x/{}/{}/asset/images_course_image.jpg'.format(scheme,
                                                                                         self.course_org,
                                                                                         self.course_number))
-        self.assertEquals(email_context['email_settings_url'], '{}://edx.org/dashboard'.format(scheme))
-        self.assertEquals(email_context['account_settings_url'], '{}://edx.org/account/settings'.format(scheme))
+        self.assertEqual(email_context['email_settings_url'], '{}://edx.org/dashboard'.format(scheme))
+        self.assertEqual(email_context['account_settings_url'], '{}://edx.org/account/settings'.format(scheme))
 
     @override_settings(LMS_ROOT_URL="http://edx.org")
     def test_insecure_email_context(self):

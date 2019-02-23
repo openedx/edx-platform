@@ -157,7 +157,7 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         # Course Mode not exist with mode slug honor
         response = self.client.post(set_course_price_url, data)
         self.assertIn(
-            u"CourseMode with the mode slug({mode_slug}) DoesNotExist".format(mode_slug='honor'),
+            "CourseMode with the mode slug({mode_slug}) DoesNotExist".format(mode_slug='honor'),
             response.content
         )
 
@@ -178,7 +178,7 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         }
         response = self.client.post(add_coupon_url, data)
         self.assertIn(
-            u"coupon with the coupon code ({code}) added successfully".format(code=data['code']),
+            "coupon with the coupon code ({code}) added successfully".format(code=data['code']),
             response.content
         )
 
@@ -197,7 +197,7 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
             'description': 'asdsasda', 'created_by': self.instructor, 'discount': 99
         }
         response = self.client.post(add_coupon_url, data)
-        self.assertIn(u"coupon with the coupon code ({code}) already exist".format(code='A2314'), response.content)
+        self.assertIn("coupon with the coupon code ({code}) already exist".format(code='A2314'), response.content)
 
         response = self.client.post(self.url)
         self.assertIn('<td>ADSADASDSAD</td>', response.content)
@@ -223,7 +223,7 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
 
         data['code'] = 'Vs23Ws4j'
         response = self.client.post(add_coupon_url, data)
-        msg = u"The code ({code}) that you have tried to define is already in use as a registration code"
+        msg = "The code ({code}) that you have tried to define is already in use as a registration code"
         self.assertIn(msg.format(code=data['code']), response.content)
 
     def test_delete_coupon(self):
@@ -244,7 +244,7 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         delete_coupon_url = reverse('remove_coupon', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(delete_coupon_url, {'id': coupon.id})
         self.assertIn(
-            u'coupon with the coupon id ({coupon_id}) updated successfully'.format(coupon_id=coupon.id),
+            'coupon with the coupon id ({coupon_id}) updated successfully'.format(coupon_id=coupon.id),
             response.content
         )
 
@@ -253,13 +253,13 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
 
         response = self.client.post(delete_coupon_url, {'id': coupon.id})
         self.assertIn(
-            u'coupon with the coupon id ({coupon_id}) is already inactive'.format(coupon_id=coupon.id),
+            'coupon with the coupon id ({coupon_id}) is already inactive'.format(coupon_id=coupon.id),
             response.content
         )
 
         response = self.client.post(delete_coupon_url, {'id': 24454})
         self.assertIn(
-            u'coupon with the coupon id ({coupon_id}) DoesNotExist'.format(coupon_id=24454),
+            'coupon with the coupon id ({coupon_id}) DoesNotExist'.format(coupon_id=24454),
             response.content
         )
 
@@ -280,14 +280,14 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         edit_url = reverse('get_coupon_info', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(edit_url, {'id': coupon.id})
         self.assertIn(
-            u'coupon with the coupon id ({coupon_id}) updated successfully'.format(coupon_id=coupon.id),
+            'coupon with the coupon id ({coupon_id}) updated successfully'.format(coupon_id=coupon.id),
             response.content
         )
         self.assertIn(coupon.display_expiry_date, response.content)
 
         response = self.client.post(edit_url, {'id': 444444})
         self.assertIn(
-            u'coupon with the coupon id ({coupon_id}) DoesNotExist'.format(coupon_id=444444),
+            'coupon with the coupon id ({coupon_id}) DoesNotExist'.format(coupon_id=444444),
             response.content
         )
 
@@ -299,7 +299,7 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
 
         response = self.client.post(edit_url, {'id': coupon.id})
         self.assertIn(
-            u"coupon with the coupon id ({coupon_id}) is already inactive".format(coupon_id=coupon.id),
+            "coupon with the coupon id ({coupon_id}) is already inactive".format(coupon_id=coupon.id),
             response.content
         )
 
@@ -322,7 +322,7 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         update_coupon_url = reverse('update_coupon', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(update_coupon_url, data=data)
         self.assertIn(
-            u'coupon with the coupon id ({coupon_id}) updated Successfully'.format(coupon_id=coupon.id),
+            'coupon with the coupon id ({coupon_id}) updated Successfully'.format(coupon_id=coupon.id),
             response.content
         )
 
@@ -331,7 +331,7 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
 
         data['coupon_id'] = 1000  # Coupon Not Exist with this ID
         response = self.client.post(update_coupon_url, data=data)
-        self.assertIn(u'coupon with the coupon id ({coupon_id}) DoesNotExist'.format(coupon_id=1000), response.content)
+        self.assertIn('coupon with the coupon id ({coupon_id}) DoesNotExist'.format(coupon_id=1000), response.content)
 
         data['coupon_id'] = ''  # Coupon id is not provided
         response = self.client.post(update_coupon_url, data=data)
@@ -343,7 +343,7 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         original_mode = CourseMode.objects.get(course_id=self.course.id, mode_slug='honor')
         original_mode.delete()
         new_mode = CourseMode(
-            course_id=unicode(self.course.id), mode_slug='verified',
+            course_id=str(self.course.id), mode_slug='verified',
             mode_display_name='verified', min_price=10, currency='usd'
         )
         new_mode.save()

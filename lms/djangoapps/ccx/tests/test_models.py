@@ -179,4 +179,4 @@ class TestCCX(ModuleStoreTestCase):
         Verify that the locator helper property returns a correct CCXLocator
         """
         locator = self.ccx.locator
-        self.assertEqual(self.ccx.id, long(locator.ccx))
+        self.assertEqual(self.ccx.id, int(locator.ccx))

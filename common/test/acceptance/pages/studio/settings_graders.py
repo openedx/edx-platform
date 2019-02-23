@@ -127,7 +127,7 @@ class GradingPage(SettingsPage):
         """
         weight_id = '#course-grading-assignment-gradeweight'
         f = self.q(css=weight_id).results[-1]
-        for __ in xrange(len(assignment_name)):
+        for __ in range(len(assignment_name)):
             f.send_keys(Keys.END, Keys.BACK_SPACE)
         f.send_keys(weight)
 

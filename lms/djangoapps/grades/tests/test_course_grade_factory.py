@@ -85,7 +85,7 @@ class TestCourseGradeFactory(GradeTestBase):
             _assert_section_order(course_grade)
 
         def _assert_grade_values(course_grade, expected_pass, expected_percent):
-            self.assertEqual(course_grade.letter_grade, u'Pass' if expected_pass else None)
+            self.assertEqual(course_grade.letter_grade, 'Pass' if expected_pass else None)
             self.assertEqual(course_grade.percent, expected_percent)
 
         def _assert_section_order(course_grade):
@@ -144,7 +144,7 @@ class TestCourseGradeFactory(GradeTestBase):
             mocked_course_blocks.return_value = self.course_structure
             with mock_get_score(1, 2):
                 grade_factory.update(self.request.user, self.course, force_update_subsections=True)
-                self.assertEquals(mocked_course_blocks.call_count, 1)
+                self.assertEqual(mocked_course_blocks.call_count, 1)
 
         with patch('lms.djangoapps.grades.course_data.get_course_blocks') as mocked_course_blocks:
             with patch('lms.djangoapps.grades.subsection_grade.get_score') as mocked_get_score:
@@ -212,27 +212,27 @@ class TestCourseGradeFactory(GradeTestBase):
             'section_breakdown': [
                 {
                     'category': 'Homework',
-                    'detail': u'Homework 1 - Test Sequential X - 50% (1/2)',
-                    'label': u'HW 01',
+                    'detail': 'Homework 1 - Test Sequential X - 50% (1/2)',
+                    'label': 'HW 01',
                     'percent': 0.5
                 },
                 {
                     'category': 'Homework',
-                    'detail': u'Homework 2 - Test Sequential A - 0% (0/1)',
-                    'label': u'HW 02',
+                    'detail': 'Homework 2 - Test Sequential A - 0% (0/1)',
+                    'label': 'HW 02',
                     'percent': 0.0
                 },
                 {
                     'category': 'Homework',
-                    'detail': u'Homework Average = 25%',
-                    'label': u'HW Avg',
+                    'detail': 'Homework Average = 25%',
+                    'label': 'HW Avg',
                     'percent': 0.25,
                     'prominent': True
                 },
                 {
                     'category': 'NoCredit',
-                    'detail': u'NoCredit Average = 0%',
-                    'label': u'NC Avg',
+                    'detail': 'NoCredit Average = 0%',
+                    'label': 'NC Avg',
                     'percent': 0,
                     'prominent': True
                 },
@@ -288,10 +288,10 @@ class TestGradeIteration(SharedModuleStoreTestCase):
             wraps=BlockStructureFactory.create_from_store
         ) as mock_create_from_store:
             all_course_grades, all_errors = self._course_grades_and_errors_for(self.course, self.students)
-            self.assertEquals(mock_create_from_store.call_count, 1)
+            self.assertEqual(mock_create_from_store.call_count, 1)
 
         self.assertEqual(len(all_errors), 0)
-        for course_grade in all_course_grades.values():
+        for course_grade in list(all_course_grades.values()):
             self.assertIsNone(course_grade.letter_grade)
             self.assertEqual(course_grade.percent, 0.0)
 
@@ -308,7 +308,7 @@ class TestGradeIteration(SharedModuleStoreTestCase):
 
         student1, student2, student3, student4, student5 = self.students
         mock_course_grade.side_effect = [
-            Exception(u"Error for {}.".format(student.username))
+            Exception("Error for {}.".format(student.username))
             if student.username in ['student3', 'student4']
             else mock_course_grade.return_value
             for student in self.students

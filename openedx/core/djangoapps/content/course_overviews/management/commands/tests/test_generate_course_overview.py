@@ -57,7 +57,7 @@ class TestGenerateCourseOverview(ModuleStoreTestCase):
         Test that a specified course is loaded into course overviews.
         """
         self._assert_courses_not_in_overview(self.course_key_1, self.course_key_2)
-        self.command.handle(unicode(self.course_key_1), all_courses=False)
+        self.command.handle(str(self.course_key_1), all_courses=False)
         self._assert_courses_in_overview(self.course_key_1)
         self._assert_courses_not_in_overview(self.course_key_2)
 
@@ -65,18 +65,18 @@ class TestGenerateCourseOverview(ModuleStoreTestCase):
         self.command.handle(all_courses=True)
 
         # update each course
-        updated_course_name = u'test_generate_course_overview.course_edit'
+        updated_course_name = 'test_generate_course_overview.course_edit'
         for course_key in (self.course_key_1, self.course_key_2):
             course = self.store.get_course(course_key)
             course.display_name = updated_course_name
             self.store.update_item(course, self.user.id)
 
         # force_update course_key_1, but not course_key_2
-        self.command.handle(unicode(self.course_key_1), all_courses=False, force_update=True)
-        self.command.handle(unicode(self.course_key_2), all_courses=False, force_update=False)
+        self.command.handle(str(self.course_key_1), all_courses=False, force_update=True)
+        self.command.handle(str(self.course_key_2), all_courses=False, force_update=False)
 
-        self.assertEquals(CourseOverview.get_from_id(self.course_key_1).display_name, updated_course_name)
-        self.assertNotEquals(CourseOverview.get_from_id(self.course_key_2).display_name, updated_course_name)
+        self.assertEqual(CourseOverview.get_from_id(self.course_key_1).display_name, updated_course_name)
+        self.assertNotEqual(CourseOverview.get_from_id(self.course_key_2).display_name, updated_course_name)
 
     def test_invalid_key(self):
         """
@@ -105,11 +105,11 @@ class TestGenerateCourseOverview(ModuleStoreTestCase):
         self.command.handle(all_courses=True, force_update=True, routing_key='my-routing-key', chunk_size=10000)
 
         called_kwargs = mock_async_task.apply_async.call_args_list[0][1]
-        self.assertEquals(
-            sorted([unicode(self.course_key_1), unicode(self.course_key_2)]),
+        self.assertEqual(
+            sorted([str(self.course_key_1), str(self.course_key_2)]),
             sorted(called_kwargs.pop('args'))
         )
-        self.assertEquals({
+        self.assertEqual({
             'kwargs': {'force_update': True},
             'routing_key': 'my-routing-key'
         }, called_kwargs

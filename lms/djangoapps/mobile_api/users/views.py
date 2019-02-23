@@ -141,7 +141,7 @@ class UserCourseStatus(views.APIView):
         Returns the course status
         """
         path = self._last_visited_module_path(request, course)
-        path_ids = [unicode(module.location) for module in path]
+        path_ids = [str(module.location) for module in path]
         return Response({
             "last_visited_module_id": path_ids[0],
             "last_visited_module_path": path_ids,
@@ -300,7 +300,7 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
                 key="mobile_app_exclusion"
             ).value
             courses_excluded_from_mobile = json.loads(courses_excluded_from_mobile.replace('\r', '').replace('\n', ''))
-            if enrollment.mode == 'audit' and str(course_key) in courses_excluded_from_mobile.keys():
+            if enrollment.mode == 'audit' and str(course_key) in list(courses_excluded_from_mobile.keys()):
                 activationTime = dateparse.parse_datetime(courses_excluded_from_mobile[str(course_key)])
                 if activationTime and enrollment.created and enrollment.created > activationTime:
                     return True

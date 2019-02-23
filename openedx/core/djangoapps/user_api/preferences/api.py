@@ -102,7 +102,7 @@ def update_user_preferences(requesting_user, update, user=None):
         PreferenceUpdateError: the operation failed when performing the update.
         UserAPIInternalError: the operation failed due to an unexpected error.
     """
-    if not user or isinstance(user, basestring):
+    if not user or isinstance(user, str):
         user = _get_authorized_user(requesting_user, user)
     else:
         _check_authorized(requesting_user, user.username)
@@ -110,10 +110,10 @@ def update_user_preferences(requesting_user, update, user=None):
     # First validate each preference setting
     errors = {}
     serializers = {}
-    for preference_key in update.keys():
+    for preference_key in list(update.keys()):
         preference_value = update[preference_key]
         if preference_value is not None:
-            preference_value = unicode(preference_value)
+            preference_value = str(preference_value)
             try:
                 serializer = create_user_preference_serializer(user, preference_key, preference_value)
                 validate_user_preference_serializer(serializer, preference_key, preference_value)
@@ -127,10 +127,10 @@ def update_user_preferences(requesting_user, update, user=None):
     if errors:
         raise PreferenceValidationError(errors)
     # Then perform the patch
-    for preference_key in update.keys():
+    for preference_key in list(update.keys()):
         preference_value = update[preference_key]
         if preference_value is not None:
-            preference_value = unicode(preference_value)
+            preference_value = str(preference_value)
             try:
                 serializer = serializers[preference_key]
 
@@ -169,7 +169,7 @@ def set_user_preference(requesting_user, preference_key, preference_value, usern
     """
     existing_user = _get_authorized_user(requesting_user, username)
     if preference_value is not None:
-        preference_value = unicode(preference_value)
+        preference_value = str(preference_value)
     serializer = create_user_preference_serializer(existing_user, preference_key, preference_value)
     validate_user_preference_serializer(serializer, preference_key, preference_value)
 
@@ -216,10 +216,10 @@ def delete_user_preference(requesting_user, preference_key, username=None):
         user_preference.delete()
     except Exception as error:
         raise PreferenceUpdateError(
-            developer_message=u"Delete failed for user preference '{preference_key}': {error}".format(
+            developer_message="Delete failed for user preference '{preference_key}': {error}".format(
                 preference_key=preference_key, error=error
             ),
-            user_message=_(u"Delete failed for user preference '{preference_key}'.").format(
+            user_message=_("Delete failed for user preference '{preference_key}'.").format(
                 preference_key=preference_key
             ),
         )
@@ -267,7 +267,7 @@ def update_email_opt_in(user, org, opt_in):
         if hasattr(settings, 'LMS_SEGMENT_KEY') and settings.LMS_SEGMENT_KEY:
             _track_update_email_opt_in(user.id, org, opt_in)
     except IntegrityError as err:
-        log.warning(u"Could not update organization wide preference due to IntegrityError: {}".format(text_type(err)))
+        log.warning("Could not update organization wide preference due to IntegrityError: {}".format(text_type(err)))
 
 
 def _track_update_email_opt_in(user_id, organization, opt_in):
@@ -365,8 +365,8 @@ def validate_user_preference_serializer(serializer, preference_key, preference_v
     Raises:
         PreferenceValidationError: the supplied key and/or value for a user preference are invalid.
     """
-    if preference_value is None or unicode(preference_value).strip() == '':
-        format_string = ugettext_noop(u"Preference '{preference_key}' cannot be set to an empty value.")
+    if preference_value is None or str(preference_value).strip() == '':
+        format_string = ugettext_noop("Preference '{preference_key}' cannot be set to an empty value.")
         raise PreferenceValidationError({
             preference_key: {
                 "developer_message": format_string.format(preference_key=preference_key),
@@ -374,15 +374,15 @@ def validate_user_preference_serializer(serializer, preference_key, preference_v
             }
         })
     if not serializer.is_valid():
-        developer_message = u"Value '{preference_value}' not valid for preference '{preference_key}': {error}".format(
+        developer_message = "Value '{preference_value}' not valid for preference '{preference_key}': {error}".format(
             preference_key=preference_key, preference_value=preference_value, error=serializer.errors
         )
         if "key" in serializer.errors:
-            user_message = _(u"Invalid user preference key '{preference_key}'.").format(
+            user_message = _("Invalid user preference key '{preference_key}'.").format(
                 preference_key=preference_key
             )
         else:
-            user_message = _(u"Value '{preference_value}' is not valid for user preference '{preference_key}'.").format(
+            user_message = _("Value '{preference_value}' is not valid for user preference '{preference_key}'.").format(
                 preference_key=preference_key, preference_value=preference_value
             )
         raise PreferenceValidationError({
@@ -392,8 +392,8 @@ def validate_user_preference_serializer(serializer, preference_key, preference_v
             }
         })
     if preference_key == "time_zone" and preference_value not in common_timezones_set:
-        developer_message = ugettext_noop(u"Value '{preference_value}' not valid for preference '{preference_key}': Not in timezone set.")  # pylint: disable=line-too-long
-        user_message = ugettext_noop(u"Value '{preference_value}' is not a valid time zone selection.")
+        developer_message = ugettext_noop("Value '{preference_value}' not valid for preference '{preference_key}': Not in timezone set.")  # pylint: disable=line-too-long
+        user_message = ugettext_noop("Value '{preference_value}' is not a valid time zone selection.")
         raise PreferenceValidationError({
             preference_key: {
                 "developer_message": developer_message.format(
@@ -407,10 +407,10 @@ def validate_user_preference_serializer(serializer, preference_key, preference_v
 def _create_preference_update_error(preference_key, preference_value, error):
     """ Creates a PreferenceUpdateError with developer_message and user_message. """
     return PreferenceUpdateError(
-        developer_message=u"Save failed for user preference '{key}' with value '{value}': {error}".format(
+        developer_message="Save failed for user preference '{key}' with value '{value}': {error}".format(
             key=preference_key, value=preference_value, error=error
         ),
-        user_message=_(u"Save failed for user preference '{key}' with value '{value}'.").format(
+        user_message=_("Save failed for user preference '{key}' with value '{value}'.").format(
             key=preference_key, value=preference_value
         ),
     )

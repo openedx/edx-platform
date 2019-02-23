@@ -17,4 +17,4 @@ class ApplicationOrganizationTestCase(TestCase):
         org_relation = ApplicationOrganizationFactory()
         organization = org_relation.organization
         jwt_filter_claim = org_relation.to_jwt_filter_claim()
-        assert jwt_filter_claim == unicode(':'.join([org_relation.relation_type, organization.short_name]))
+        assert jwt_filter_claim == str(':'.join([org_relation.relation_type, organization.short_name]))

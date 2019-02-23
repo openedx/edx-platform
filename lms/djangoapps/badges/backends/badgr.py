@@ -64,7 +64,7 @@ class BadgrBackend(BadgeBackend):
         if badge_class.issuing_component and badge_class.course_id:
             # Make this unique to the course, and down to 64 characters.
             # We don't do this to badges without issuing_component set for backwards compatibility.
-            slug = hashlib.sha256(slug + unicode(badge_class.course_id)).hexdigest()
+            slug = hashlib.sha256(slug + str(badge_class.course_id)).hexdigest()
         if len(slug) > MAX_SLUG_LENGTH:
             # Will be 64 characters.
             slug = hashlib.sha256(slug).hexdigest()
@@ -78,9 +78,9 @@ class BadgrBackend(BadgeBackend):
             response.raise_for_status()
         except HTTPError:
             LOGGER.error(
-                u"Encountered an error when contacting the Badgr-Server. Request sent to %r with headers %r.\n"
-                u"and data values %r\n"
-                u"Response status was %s.\n%s",
+                "Encountered an error when contacting the Badgr-Server. Request sent to %r with headers %r.\n"
+                "and data values %r\n"
+                "Response status was %s.\n%s",
                 response.request.url, response.request.headers,
                 data,
                 response.status_code, response.content
@@ -97,8 +97,8 @@ class BadgrBackend(BadgeBackend):
         content_type, __ = mimetypes.guess_type(image.name)
         if not content_type:
             raise ValueError(
-                u"Could not determine content-type of image! Make sure it is a properly named .png file. "
-                u"Filename was: {}".format(image.name)
+                "Could not determine content-type of image! Make sure it is a properly named .png file. "
+                "Filename was: {}".format(image.name)
             )
         files = {'image': (image.name, image, content_type)}
         data = {
@@ -123,7 +123,7 @@ class BadgrBackend(BadgeBackend):
                 'badge_slug': assertion.badge_class.slug,
                 'badge_name': assertion.badge_class.display_name,
                 'issuing_component': assertion.badge_class.issuing_component,
-                'course_id': unicode(assertion.badge_class.course_id),
+                'course_id': str(assertion.badge_class.course_id),
                 'enrollment_mode': assertion.badge_class.mode,
                 'assertion_id': assertion.id,
                 'assertion_image_url': assertion.image_url,
@@ -159,7 +159,7 @@ class BadgrBackend(BadgeBackend):
         """
         Headers to send along with the request-- used for authentication.
         """
-        return {'Authorization': u'Token {}'.format(settings.BADGR_API_TOKEN)}
+        return {'Authorization': 'Token {}'.format(settings.BADGR_API_TOKEN)}
 
     def _ensure_badge_created(self, badge_class):
         """

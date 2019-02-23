@@ -4,7 +4,7 @@ Django management command to update the loaded test fixtures as necessary for
 the current test environment.  Currently just sets an appropriate domain for
 each Site fixture.
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 import os
 

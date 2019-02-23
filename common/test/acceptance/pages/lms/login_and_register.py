@@ -1,6 +1,6 @@
 """Login and Registration pages """
 
-from urllib import urlencode
+from urllib.parse import urlencode
 
 from bok_choy.page_object import PageObject, unguarded
 from bok_choy.promise import EmptyPromise, Promise

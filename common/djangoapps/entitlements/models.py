@@ -136,7 +136,7 @@ class CourseEntitlementPolicy(models.Model):
                 and not entitlement.expired_at)
 
     def __unicode__(self):
-        return u'Course Entitlement Policy: expiration_period: {}, refund_period: {}, regain_period: {}, mode: {}'\
+        return 'Course Entitlement Policy: expiration_period: {}, refund_period: {}, regain_period: {}, mode: {}'\
             .format(
                 self.expiration_period,
                 self.refund_period,
@@ -390,7 +390,7 @@ class CourseEntitlement(TimeStampedModel):
                 mode=entitlement.mode
             )
         except CourseEnrollmentException:
-            log.exception(u'Login for Course Entitlement {uuid} failed'.format(uuid=entitlement.uuid))
+            log.exception('Login for Course Entitlement {uuid} failed'.format(uuid=entitlement.uuid))
             return False
 
         entitlement.set_enrollment(enrollment)
@@ -436,7 +436,7 @@ class CourseEntitlement(TimeStampedModel):
         if not refund_successful:
             # This state is achieved in most cases by a failure in the ecommerce service to process the refund.
             log.warn(
-                u'Entitlement Refund failed for Course Entitlement [%s], alert User',
+                'Entitlement Refund failed for Course Entitlement [%s], alert User',
                 self.uuid
             )
             # Force Transaction reset with an Integrity error exception, this will revert all previous transactions
@@ -456,11 +456,11 @@ class CourseEntitlementSupportDetail(TimeStampedModel):
     COURSE_TEAM_REQUEST_NEW = 'COURSE_TEAM_NEW'
     OTHER = 'OTHER'
     ENTITLEMENT_SUPPORT_REASONS = (
-        (LEAVE_SESSION, u'Learner requested leave session for expired entitlement'),
-        (CHANGE_SESSION, u'Learner requested session change for expired entitlement'),
-        (LEARNER_REQUEST_NEW, u'Learner requested new entitlement'),
-        (COURSE_TEAM_REQUEST_NEW, u'Course team requested entitlement for learnerg'),
-        (OTHER, u'Other'),
+        (LEAVE_SESSION, 'Learner requested leave session for expired entitlement'),
+        (CHANGE_SESSION, 'Learner requested session change for expired entitlement'),
+        (LEARNER_REQUEST_NEW, 'Learner requested new entitlement'),
+        (COURSE_TEAM_REQUEST_NEW, 'Course team requested entitlement for learnerg'),
+        (OTHER, 'Other'),
     )
 
     REISSUE = 'REISSUE'
@@ -489,7 +489,7 @@ class CourseEntitlementSupportDetail(TimeStampedModel):
 
     def __unicode__(self):
         """Unicode representation of an Entitlement"""
-        return u'Course Entitlement Support Detail: entitlement: {}, support_user: {}, reason: {}'.format(
+        return 'Course Entitlement Support Detail: entitlement: {}, support_user: {}, reason: {}'.format(
             self.entitlement,
             self.support_user,
             self.reason,

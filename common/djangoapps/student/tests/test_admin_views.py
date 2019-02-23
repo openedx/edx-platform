@@ -31,7 +31,7 @@ class AdminCourseRolesPageTest(SharedModuleStoreTestCase):
     def test_save_valid_data(self):
 
         data = {
-            'course_id': unicode(self.course.id),
+            'course_id': str(self.course.id),
             'role': 'finance_admin',
             'org': 'edx',
             'email': self.user.email
@@ -47,7 +47,7 @@ class AdminCourseRolesPageTest(SharedModuleStoreTestCase):
         self.assertContains(response, 'Select course access role to change')
         self.assertContains(response, 'Add course access role')
         self.assertContains(response, 'finance_admin')
-        self.assertContains(response, unicode(self.course.id))
+        self.assertContains(response, str(self.course.id))
         self.assertContains(response, '1 course access role')
 
         #try adding with same information raise error.
@@ -59,7 +59,7 @@ class AdminCourseRolesPageTest(SharedModuleStoreTestCase):
         data = {
             'role': 'staff',
             'email': self.user.email,
-            'course_id': unicode(self.course.id)
+            'course_id': str(self.course.id)
         }
 
         self.client.login(username=self.user.username, password='test')
@@ -111,7 +111,7 @@ class AdminCourseRolesPageTest(SharedModuleStoreTestCase):
 
     def test_save_with_invalid_course(self):
 
-        course = unicode('no/edx/course')
+        course = str('no/edx/course')
         email = "invalid@email.com"
         data = {
             'course_id': course,
@@ -141,7 +141,7 @@ class AdminCourseRolesPageTest(SharedModuleStoreTestCase):
     def test_save_valid_course_invalid_org(self):
 
         data = {
-            'course_id': unicode(self.course.id),
+            'course_id': str(self.course.id),
             'role': 'finance_admin',
             'org': 'edxxx',
             'email': self.user.email
@@ -265,8 +265,8 @@ class CourseEnrollmentAdminTest(SharedModuleStoreTestCase):
         # is_active will change from True to False
         self.assertTrue(self.course_enrollment.is_active)
         data = {
-            'user': unicode(self.course_enrollment.user.id),
-            'course': unicode(self.course_enrollment.course.id),
+            'user': str(self.course_enrollment.user.id),
+            'course': str(self.course_enrollment.course.id),
             'is_active': 'false',
             'mode': self.course_enrollment.mode,
         }
@@ -286,7 +286,7 @@ class CourseEnrollmentAdminTest(SharedModuleStoreTestCase):
         Send an invalid course ID instead of "org.0/course_0/Run_0" when saving, and verify that it fails.
         """
         data = {
-            'user': unicode(self.course_enrollment.user.id),
+            'user': str(self.course_enrollment.user.id),
             'course': 'invalid-course-id',
             'is_active': 'true',
             'mode': self.course_enrollment.mode,

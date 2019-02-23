@@ -27,8 +27,8 @@ from .images import IMAGE_TYPES, create_profile_images, remove_profile_images, v
 
 log = logging.getLogger(__name__)
 
-LOG_MESSAGE_CREATE = u'Generated and uploaded images %(image_names)s for user %(user_id)s'
-LOG_MESSAGE_DELETE = u'Deleted images %(image_names)s for user %(user_id)s'
+LOG_MESSAGE_CREATE = 'Generated and uploaded images %(image_names)s for user %(user_id)s'
+LOG_MESSAGE_DELETE = 'Deleted images %(image_names)s for user %(user_id)s'
 
 
 def _make_upload_dt():
@@ -113,7 +113,7 @@ class ProfileImageView(DeveloperErrorViewMixin, APIView):
     authentication_classes = (OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser)
     permission_classes = (permissions.IsAuthenticated, IsUserInUrl)
 
-    upload_media_types = set(itertools.chain(*(image_type.mimetypes for image_type in IMAGE_TYPES.values())))
+    upload_media_types = set(itertools.chain(*(image_type.mimetypes for image_type in list(IMAGE_TYPES.values()))))
 
     def post(self, request, username):
         """
@@ -126,8 +126,8 @@ class ProfileImageView(DeveloperErrorViewMixin, APIView):
         if 'file' not in request.FILES:
             return Response(
                 {
-                    "developer_message": u"No file provided for profile image",
-                    "user_message": _(u"No file provided for profile image"),
+                    "developer_message": "No file provided for profile image",
+                    "user_message": _("No file provided for profile image"),
 
                 },
                 status=status.HTTP_400_BAD_REQUEST
@@ -157,7 +157,7 @@ class ProfileImageView(DeveloperErrorViewMixin, APIView):
 
             log.info(
                 LOG_MESSAGE_CREATE,
-                {'image_names': profile_image_names.values(), 'user_id': request.user.id}
+                {'image_names': list(profile_image_names.values()), 'user_id': request.user.id}
             )
 
         # send client response.
@@ -178,7 +178,7 @@ class ProfileImageView(DeveloperErrorViewMixin, APIView):
 
             log.info(
                 LOG_MESSAGE_DELETE,
-                {'image_names': profile_image_names.values(), 'user_id': request.user.id}
+                {'image_names': list(profile_image_names.values()), 'user_id': request.user.id}
             )
         except UserNotFound:
             return Response(status=status.HTTP_404_NOT_FOUND)

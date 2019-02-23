@@ -1,8 +1,8 @@
 """
 Discussion API serializers
 """
-from urllib import urlencode
-from urlparse import urlunparse
+from urllib.parse import urlencode
+from urllib.parse import urlunparse
 
 from django.contrib.auth.models import User as DjangoUser
 from django.core.exceptions import ValidationError
@@ -292,7 +292,7 @@ class ThreadSerializer(_ContentSerializer):
         return thread
 
     def update(self, instance, validated_data):
-        for key, val in validated_data.items():
+        for key, val in list(validated_data.items()):
             instance[key] = val
         instance.save()
         return instance
@@ -409,7 +409,7 @@ class CommentSerializer(_ContentSerializer):
         return comment
 
     def update(self, instance, validated_data):
-        for key, val in validated_data.items():
+        for key, val in list(validated_data.items()):
             instance[key] = val
             # TODO: The comments service doesn't populate the endorsement
             # field on comment creation, so we only provide

@@ -55,7 +55,7 @@ class TestInstructorAPIEnrollmentEmailLocalization(SharedModuleStoreTestCase):
         Check that the email outbox contains exactly one message for which both
         the message subject and body contain a certain Esperanto string.
         """
-        return self.check_outbox(u"Ýöü hävé ßéén")
+        return self.check_outbox("Ýöü hävé ßéén")
 
     def check_outbox(self, expected_message):
         """

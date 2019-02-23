@@ -10,6 +10,6 @@ def _get_key(key_or_id, key_cls):
     """
     return (
         key_cls.from_string(key_or_id)
-        if isinstance(key_or_id, basestring)
+        if isinstance(key_or_id, str)
         else key_or_id
     )

@@ -2,7 +2,7 @@
 This file contains a management command for exporting the modulestore to
 neo4j, a graph database.
 """
-from __future__ import unicode_literals, print_function
+
 
 import logging
 
@@ -12,7 +12,7 @@ from django.utils import six, timezone
 from edx_django_utils.cache import RequestCache
 from opaque_keys.edx.keys import CourseKey
 from py2neo import Graph, Node, Relationship, authenticate, NodeSelector
-from py2neo.compat import integer, string, unicode as neo4j_unicode
+from py2neo.compat import integer, string, str as neo4j_unicode
 
 
 log = logging.getLogger(__name__)
@@ -211,7 +211,7 @@ def serialize_course(course_id):
                     relationships.append(ordering_relationship)
                 previous_child_node = child_node
 
-    nodes = location_to_node.values()
+    nodes = list(location_to_node.values())
     return nodes, relationships
 
 

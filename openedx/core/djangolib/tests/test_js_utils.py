@@ -3,7 +3,7 @@
 """
 Tests for js_utils.py
 """
-import HTMLParser
+import html.parser
 import json
 from unittest import TestCase
 
@@ -43,7 +43,7 @@ class TestJSUtils(TestCase):
         )
 
         escaped_json = dump_js_escaped_json(malicious_dict)
-        self.assertEquals(expected_escaped_json, escaped_json)
+        self.assertEqual(expected_escaped_json, escaped_json)
 
     def test_dump_js_escaped_json_with_custom_encoder_escapes_unsafe_html(self):
         """
@@ -63,7 +63,7 @@ class TestJSUtils(TestCase):
         )
 
         escaped_json = dump_js_escaped_json(malicious_dict, cls=self.SampleJSONEncoder)
-        self.assertEquals(expected_custom_escaped_json, escaped_json)
+        self.assertEqual(expected_custom_escaped_json, escaped_json)
 
     def test_js_escaped_string_escapes_unsafe_html(self):
         """
@@ -71,18 +71,18 @@ class TestJSUtils(TestCase):
         """
         malicious_js_string = "</script><script>alert('hello, ');</script>"
 
-        expected_escaped_string_for_js = unicode(
+        expected_escaped_string_for_js = str(
             r"\u003C/script\u003E\u003Cscript\u003Ealert(\u0027hello, \u0027)\u003B\u003C/script\u003E"
         )
         escaped_string_for_js = js_escaped_string(malicious_js_string)
-        self.assertEquals(expected_escaped_string_for_js, escaped_string_for_js)
+        self.assertEqual(expected_escaped_string_for_js, escaped_string_for_js)
 
     def test_js_escaped_string_with_none(self):
         """
         Test js_escaped_string returns empty string for None
         """
         escaped_string_for_js = js_escaped_string(None)
-        self.assertEquals(u"", escaped_string_for_js)
+        self.assertEqual("", escaped_string_for_js)
 
     def test_mako(self):
         """
@@ -95,7 +95,7 @@ class TestJSUtils(TestCase):
         parsed from json where applicable.
         """
         test_dict = {
-            'test_string': u'test-=&\\;\'"<>☃'.encode(encoding='utf-8'),
+            'test_string': 'test-=&\\;\'"<>☃'.encode(encoding='utf-8'),
             'test_tuple': (1, 2, 3),
             'test_number': 3.5,
             'test_bool': False,
@@ -141,7 +141,7 @@ class TestJSUtils(TestCase):
         expected_attr_json_for_html = "data-test-dict='" + expected_json_for_html + "'"
         self._validate_expectation_of_json_for_html(test_dict, expected_json_for_html)
         self.assertIn(expected_attr_json_for_html, out)
-        self.assertIn(u"data-test-string='test-=&amp;\\;&#39;&#34;&lt;&gt;☃'", out)
+        self.assertIn("data-test-string='test-=&amp;\\;&#39;&#34;&lt;&gt;☃'", out)
         self.assertIn("data-test-tuple='[1, 2, 3]'", out)
         self.assertIn("data-test-number='3.5'", out)
         self.assertIn("data-test-bool='false'", out)
@@ -179,7 +179,7 @@ class TestJSUtils(TestCase):
                 should be parseable into a near equivalent to test_dict.
 
         """
-        html_parser = HTMLParser.HTMLParser()
+        html_parser = html.parser.HTMLParser()
 
         expected_json = html_parser.unescape(expected_json_for_html_string)
         parsed_expected_dict = json.loads(expected_json)

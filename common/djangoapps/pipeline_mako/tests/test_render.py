@@ -36,7 +36,7 @@ class RequireJSPathOverridesTest(TestCase):
     def test_requirejs_path_overrides(self):
         result = render_require_js_path_overrides(self.OVERRIDES)
         # To make the string comparision easy remove the whitespaces
-        self.assertEqual(map(str.strip, result.splitlines()), self.OVERRIDES_JS)
+        self.assertEqual(list(map(str.strip, result.splitlines())), self.OVERRIDES_JS)
 
 
 @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in LMS')
@@ -61,11 +61,11 @@ class PipelineRenderTest(TestCase):
         with self.settings(PIPELINE_ENABLED=pipeline_enabled):
             # Verify the default behavior
             css_include = compressed_css('style-main-v1')
-            self.assertIn(u'lms-main-v1.css', css_include)
+            self.assertIn('lms-main-v1.css', css_include)
 
             # Verify that raw keyword causes raw URLs to be emitted
             css_include = compressed_css('style-main-v1', raw=True)
-            self.assertIn(u'lms-main-v1.css?raw', css_include)
+            self.assertIn('lms-main-v1.css?raw', css_include)
 
     @patch('django.contrib.staticfiles.storage.staticfiles_storage.exists', return_value=True)
     @patch('static_replace.try_staticfiles_lookup', side_effect=mock_staticfiles_lookup)
@@ -77,9 +77,9 @@ class PipelineRenderTest(TestCase):
         # Verify that a single JS file is rendered with the pipeline enabled
         with self.settings(PIPELINE_ENABLED=True):
             js_include = compressed_js('base_application')
-            self.assertIn(u'lms-base-application.js', js_include)
+            self.assertIn('lms-base-application.js', js_include)
 
         # Verify that multiple JS files are rendered with the pipeline disabled
         with self.settings(PIPELINE_ENABLED=False):
             js_include = compressed_js('base_application')
-            self.assertIn(u'/static/js/src/logger.js', js_include)
+            self.assertIn('/static/js/src/logger.js', js_include)

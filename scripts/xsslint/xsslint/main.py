@@ -9,6 +9,7 @@ import sys
 from xsslint.reporting import SummaryResults
 from xsslint.rules import RuleSet
 from xsslint.utils import is_skip_dir
+from functools import reduce
 
 
 def _load_config_module(module_path):

@@ -1,7 +1,7 @@
 """ Utility functions related to HTTP requests """
 import logging
 import re
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 import crum
 from django.conf import settings
@@ -114,9 +114,9 @@ class CookieMetricsMiddleware(MiddlewareMixin):
 
         cookie_names_to_size = {
             name: len(value)
-            for name, value in request.COOKIES.items()
+            for name, value in list(request.COOKIES.items())
         }
-        for name, size in cookie_names_to_size.items():
+        for name, size in list(cookie_names_to_size.items()):
             metric_name = 'cookies.{}.size'.format(name)
             newrelic.agent.add_custom_parameter(metric_name, size)
             log.debug("%s = %d", metric_name, size)

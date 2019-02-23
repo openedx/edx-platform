@@ -82,13 +82,13 @@ class TestGenerateCourseBlocks(ModuleStoreTestCase):
 
     def test_one_course(self):
         self._assert_courses_not_in_block_cache(*self.course_keys)
-        self.command.handle(courses=[unicode(self.course_keys[0])])
+        self.command.handle(courses=[str(self.course_keys[0])])
         self._assert_courses_in_block_cache(self.course_keys[0])
         self._assert_courses_not_in_block_cache(*self.course_keys[1:])
         self._assert_courses_not_in_block_storage(*self.course_keys)
 
     def test_with_storage(self):
-        self.command.handle(with_storage=True, courses=[unicode(self.course_keys[0])])
+        self.command.handle(with_storage=True, courses=[str(self.course_keys[0])])
         self._assert_courses_in_block_cache(self.course_keys[0])
         self._assert_courses_in_block_storage(self.course_keys[0])
         self._assert_courses_not_in_block_storage(*self.course_keys[1:])
@@ -140,7 +140,7 @@ class TestGenerateCourseBlocks(ModuleStoreTestCase):
                         task_action = mock_tasks.get_course_in_cache_v2
                     task_options = task_action.apply_async.call_args[1]
                     if routing_key:
-                        self.assertEquals(task_options['routing_key'], routing_key)
+                        self.assertEqual(task_options['routing_key'], routing_key)
                     else:
                         self.assertNotIn('routing_key', task_options)
 

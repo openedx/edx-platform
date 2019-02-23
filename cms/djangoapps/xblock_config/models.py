@@ -79,7 +79,7 @@ class CourseEditLTIFieldsEnabledFlag(ConfigurationModel):
         if self.enabled:
             en = ""
 
-        return u"Course '{course_id}': Edit LTI access to Learner information {en}Enabled".format(
-            course_id=unicode(self.course_id),
+        return "Course '{course_id}': Edit LTI access to Learner information {en}Enabled".format(
+            course_id=str(self.course_id),
             en=en,
         )

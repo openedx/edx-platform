@@ -61,12 +61,12 @@ class EdxClearExpiredTokensTests(TestCase):
                 (
                     LOGGER_NAME,
                     'INFO',
-                    u'Cleaning {} rows from {} table'.format(0, RefreshToken.__name__)
+                    'Cleaning {} rows from {} table'.format(0, RefreshToken.__name__)
                 ),
                 (
                     LOGGER_NAME,
                     'INFO',
-                    u'Cleaning {} rows from {} table'.format(0, AccessToken.__name__),
+                    'Cleaning {} rows from {} table'.format(0, AccessToken.__name__),
                 ),
                 (
                     LOGGER_NAME,

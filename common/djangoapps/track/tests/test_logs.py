@@ -24,7 +24,7 @@ class TrackingTest(TestCase):
         """
         requests = [
             {"event": "my_event", "event_type": "my_event_type", "page": "my_page"},
-            {"event": "{'json': 'object'}", "event_type": unichr(512), "page": "my_page"}
+            {"event": "{'json': 'object'}", "event_type": chr(512), "page": "my_page"}
         ]
         with mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_SQL_TRACKING_LOGS': True}):
             for request_params in requests:
@@ -44,7 +44,7 @@ class TrackingTest(TestCase):
         """
         requests = [
             {"event": "my_event", "event_type": "my_event_type", "page": "my_page"},
-            {"event": "{'json': 'object'}", "event_type": unichr(512), "page": "my_page"}
+            {"event": "{'json': 'object'}", "event_type": chr(512), "page": "my_page"}
         ]
         with mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_SQL_TRACKING_LOGS': True}):
             for request_params in requests:

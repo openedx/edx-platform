@@ -13,7 +13,7 @@ from util.password_policy_validators import DEFAULT_MAX_PASSWORD_LENGTH
 INVALID_NAMES = [
     None,
     '',
-    u''
+    ''
 ]
 
 INVALID_USERNAMES_ASCII = [
@@ -23,39 +23,39 @@ INVALID_USERNAMES_ASCII = [
 ]
 
 INVALID_USERNAMES_UNICODE = [
-    u'invalid-unicode_fŕáńḱ',
+    'invalid-unicode_fŕáńḱ',
 ]
 
 INVALID_USERNAMES = [
     None,
-    u'',
-    u'a',
-    u'a' * (USERNAME_MAX_LENGTH + 1),
+    '',
+    'a',
+    'a' * (USERNAME_MAX_LENGTH + 1),
 ] + INVALID_USERNAMES_ASCII + INVALID_USERNAMES_UNICODE
 
 INVALID_EMAILS = [
     None,
-    u'',
-    u'a',
+    '',
+    'a',
     'no_domain',
     'no+domain',
     '@',
     '@domain.com',
     'test@no_extension',
-    u'fŕáńḱ@example.com',
+    'fŕáńḱ@example.com',
 
     # Long email -- subtract the length of the @domain
     # except for one character (so we exceed the max length limit)
-    u'{user}@example.com'.format(
-        user=(u'e' * (EMAIL_MAX_LENGTH - 11))
+    '{user}@example.com'.format(
+        user=('e' * (EMAIL_MAX_LENGTH - 11))
     )
 ]
 
 INVALID_PASSWORDS = [
     None,
-    u'',
-    u'a',
-    u'a' * (DEFAULT_MAX_PASSWORD_LENGTH + 1),
+    '',
+    'a',
+    'a' * (DEFAULT_MAX_PASSWORD_LENGTH + 1),
 ]
 
 INVALID_COUNTRIES = [
@@ -66,25 +66,25 @@ INVALID_COUNTRIES = [
 
 VALID_NAMES = [
     'Validation Bot',
-    u'Validation Bot'
+    'Validation Bot'
 ]
 
 VALID_USERNAMES_UNICODE = [
-    u'Enchanté',
-    u'username_with_@',
-    u'username with spaces',
-    u'eastern_arabic_numbers_١٢٣',
+    'Enchanté',
+    'username_with_@',
+    'username with spaces',
+    'eastern_arabic_numbers_١٢٣',
 ]
 
 VALID_USERNAMES = [
-    u'username',
-    u'a' * USERNAME_MIN_LENGTH,
-    u'a' * USERNAME_MAX_LENGTH,
-    u'-' * USERNAME_MIN_LENGTH,
-    u'-' * USERNAME_MAX_LENGTH,
-    u'_username_',
-    u'-username-',
-    u'-_username_-'
+    'username',
+    'a' * USERNAME_MIN_LENGTH,
+    'a' * USERNAME_MAX_LENGTH,
+    '-' * USERNAME_MIN_LENGTH,
+    '-' * USERNAME_MAX_LENGTH,
+    '_username_',
+    '-username-',
+    '-_username_-'
 ]
 
 VALID_EMAILS = [
@@ -92,11 +92,11 @@ VALID_EMAILS = [
 ]
 
 VALID_PASSWORDS = [
-    u'good_password_339',
+    'good_password_339',
 ]
 
 VALID_COUNTRIES = [
-    u'PK',
-    u'Pakistan',
-    u'US'
+    'PK',
+    'Pakistan',
+    'US'
 ]

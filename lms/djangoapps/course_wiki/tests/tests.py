@@ -97,11 +97,11 @@ class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCas
 
         ending_location = resp.redirect_chain[-1][0]
 
-        self.assertEquals(ending_location, course_wiki_page)
-        self.assertEquals(resp.status_code, 200)
+        self.assertEqual(ending_location, course_wiki_page)
+        self.assertEqual(resp.status_code, 200)
 
         self.has_course_navigator(resp)
-        self.assertContains(resp, u'<h3 class="entry-title">{}</h3>'.format(course.display_name_with_default))
+        self.assertContains(resp, '<h3 class="entry-title">{}</h3>'.format(course.display_name_with_default))
 
     def has_course_navigator(self, resp):
         """
@@ -217,7 +217,7 @@ class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCas
 
         # However, for private wikis, enrolled users must pass through the consent gate
         # (Unenrolled users are redirected to course/about)
-        course_id = unicode(course.id)
+        course_id = str(course.id)
         self.login(self.student, self.password)
         self.enroll(course)
 

@@ -80,9 +80,9 @@ class UserAPITestCase(ApiTestCase):
 
     def assertUserIsValid(self, user):
         """Assert that the given user result is valid"""
-        self.assertItemsEqual(user.keys(), ["email", "id", "name", "username", "preferences", "url"])
+        self.assertItemsEqual(list(user.keys()), ["email", "id", "name", "username", "preferences", "url"])
         self.assertItemsEqual(
-            user["preferences"].items(),
+            list(user["preferences"].items()),
             [(pref.key, pref.value) for pref in self.prefs if pref.user.id == user["id"]]
         )
         self.assertSelfReferential(user)
@@ -91,7 +91,7 @@ class UserAPITestCase(ApiTestCase):
         """
         Assert that the given preference is acknowledged by the system
         """
-        self.assertItemsEqual(pref.keys(), ["user", "key", "value", "url"])
+        self.assertItemsEqual(list(pref.keys()), ["user", "key", "value", "url"])
         self.assertSelfReferential(pref)
         self.assertUserIsValid(pref["user"])
 
@@ -111,7 +111,7 @@ class EmptyUserTestCase(UserAPITestCase):
 class EmptyRoleTestCase(UserAPITestCase):
     """Test that the endpoint supports empty result sets"""
     course_id = CourseKey.from_string("org/course/run")
-    LIST_URI = ROLE_LIST_URI + "?course_id=" + unicode(course_id)
+    LIST_URI = ROLE_LIST_URI + "?course_id=" + str(course_id)
 
     def test_get_list_empty(self):
         """Test that the endpoint properly returns empty result sets"""
@@ -131,7 +131,7 @@ class UserApiTestCase(UserAPITestCase):
         self.users = [
             UserFactory.create(
                 email="test{0}@test.org".format(i),
-                profile__name=u"Test {0}".format(i)
+                profile__name="Test {0}".format(i)
             )
             for i in range(5)
         ]
@@ -147,7 +147,7 @@ class RoleTestCase(UserApiTestCase):
     Test cases covering Role-related views and their behaviors
     """
     course_id = CourseKey.from_string("org/course/run")
-    LIST_URI = ROLE_LIST_URI + "?course_id=" + unicode(course_id)
+    LIST_URI = ROLE_LIST_URI + "?course_id=" + str(course_id)
 
     def setUp(self):
         super(RoleTestCase, self).setUp()
@@ -601,7 +601,7 @@ class LoginSessionViewTest(UserAPITestCase):
                 "required": True,
                 "label": "Email",
                 "placeholder": "username@domain.com",
-                "instructions": u"The email address you used to register with {platform_name}".format(
+                "instructions": "The email address you used to register with {platform_name}".format(
                     platform_name=settings.PLATFORM_NAME
                 ),
                 "restrictions": {
@@ -759,7 +759,7 @@ class PasswordResetViewTest(UserAPITestCase):
                 "required": True,
                 "label": "Email",
                 "placeholder": "username@domain.com",
-                "instructions": u"The email address you used to register with {platform_name}".format(
+                "instructions": "The email address you used to register with {platform_name}".format(
                     platform_name=settings.PLATFORM_NAME
                 ),
                 "restrictions": {
@@ -829,7 +829,7 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
             {
                 "email": [{
                     "user_message": (
-                        u"It looks like {} belongs to an existing account. "
+                        "It looks like {} belongs to an existing account. "
                         "Try again with a different email address."
                     ).format(
                         self.EMAIL
@@ -871,7 +871,7 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
             {
                 "email": [{
                     "user_message": (
-                        u"It looks like {} belongs to an existing account. "
+                        "It looks like {} belongs to an existing account. "
                         "Try again with a different email address."
                     ).format(
                         self.EMAIL
@@ -913,7 +913,7 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
             {
                 "username": [{
                     "user_message": (
-                        u"It looks like {} belongs to an existing account. "
+                        "It looks like {} belongs to an existing account. "
                         "Try again with a different username."
                     ).format(
                         self.USERNAME
@@ -950,7 +950,7 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
             {
                 "email": [{
                     "user_message": (
-                        u"It looks like {} belongs to an existing account. "
+                        "It looks like {} belongs to an existing account. "
                         "Try again with a different email address."
                     ).format(
                         self.EMAIL
@@ -985,9 +985,9 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
         self.assertEqual(
             response_json,
             {
-                u"username": [{
-                    u"user_message": (
-                        u"An account with the Public Username '{}' already exists."
+                "username": [{
+                    "user_message": (
+                        "An account with the Public Username '{}' already exists."
                     ).format(
                         self.USERNAME
                     )
@@ -1023,7 +1023,7 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
             {
                 "email": [{
                     "user_message": (
-                        u"It looks like {} belongs to an existing account. "
+                        "It looks like {} belongs to an existing account. "
                         "Try again with a different email address."
                     ).format(
                         self.EMAIL
@@ -1052,31 +1052,31 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
     GOALS = "Learn all the things!"
     PROFESSION_OPTIONS = [
         {
-            "name": u'--',
-            "value": u'',
+            "name": '--',
+            "value": '',
             "default": True
 
         },
         {
-            "value": u'software engineer',
-            "name": u'Software Engineer',
+            "value": 'software engineer',
+            "name": 'Software Engineer',
             "default": False
         },
         {
-            "value": u'teacher',
-            "name": u'Teacher',
+            "value": 'teacher',
+            "name": 'Teacher',
             "default": False
         },
         {
-            "value": u'other',
-            "name": u'Other',
+            "value": 'other',
+            "name": 'Other',
             "default": False
         }
     ]
     SPECIALTY_OPTIONS = [
         {
-            "name": u'--',
-            "value": u'',
+            "name": '--',
+            "value": '',
             "default": True
 
         },
@@ -1086,17 +1086,17 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             "default": False
         },
         {
-            "value": u'early education',
-            "name": u'Early Education',
+            "value": 'early education',
+            "name": 'Early Education',
             "default": False
         },
         {
-            "value": u'n/a',
-            "name": u'N/A',
+            "value": 'n/a',
+            "name": 'N/A',
             "default": False
         }
     ]
-    link_template = u"<a href='/honor' target='_blank'>{link_label}</a>"
+    link_template = "<a href='/honor' target='_blank'>{link_label}</a>"
 
     def setUp(self):
         super(RegistrationViewTest, self).setUp()
@@ -1127,12 +1127,12 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         self._assert_reg_field(
             no_extra_fields_setting,
             {
-                u"name": u"email",
-                u"type": u"email",
-                u"required": True,
-                u"label": u"Email",
-                u"instructions": u"This is what you will use to login.",
-                u"restrictions": {
+                "name": "email",
+                "type": "email",
+                "required": True,
+                "label": "Email",
+                "instructions": "This is what you will use to login.",
+                "restrictions": {
                     "min_length": EMAIL_MIN_LENGTH,
                     "max_length": EMAIL_MAX_LENGTH
                 },
@@ -1142,12 +1142,12 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         self._assert_reg_field(
             no_extra_fields_setting,
             {
-                u"name": u"name",
-                u"type": u"text",
-                u"required": True,
-                u"label": u"Full Name",
-                u"instructions": u"This name will be used on any certificates that you earn.",
-                u"restrictions": {
+                "name": "name",
+                "type": "text",
+                "required": True,
+                "label": "Full Name",
+                "instructions": "This name will be used on any certificates that you earn.",
+                "restrictions": {
                     "max_length": 255
                 },
             }
@@ -1156,13 +1156,13 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         self._assert_reg_field(
             no_extra_fields_setting,
             {
-                u"name": u"username",
-                u"type": u"text",
-                u"required": True,
-                u"label": u"Public Username",
-                u"instructions": u"The name that will identify you in your courses. "
-                                 u"It cannot be changed later.",
-                u"restrictions": {
+                "name": "username",
+                "type": "text",
+                "required": True,
+                "label": "Public Username",
+                "instructions": "The name that will identify you in your courses. "
+                                 "It cannot be changed later.",
+                "restrictions": {
                     "min_length": USERNAME_MIN_LENGTH,
                     "max_length": USERNAME_MAX_LENGTH
                 },
@@ -1172,13 +1172,13 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         self._assert_reg_field(
             no_extra_fields_setting,
             {
-                u"placeholder": "",
-                u"name": u"password",
-                u"type": u"password",
-                u"required": True,
-                u"label": u"Password",
-                u"instructions": password_validators_instruction_texts(),
-                u"restrictions": password_validators_restrictions(),
+                "placeholder": "",
+                "name": "password",
+                "type": "password",
+                "required": True,
+                "label": "Password",
+                "instructions": password_validators_instruction_texts(),
+                "restrictions": password_validators_restrictions(),
             }
         )
 
@@ -1194,22 +1194,22 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         self._assert_reg_field(
             no_extra_fields_setting,
             {
-                u'name': u'password',
-                u'label': u'Password',
-                u"instructions": password_validators_instruction_texts(),
-                u"restrictions": password_validators_restrictions(),
+                'name': 'password',
+                'label': 'Password',
+                "instructions": password_validators_instruction_texts(),
+                "restrictions": password_validators_restrictions(),
             }
         )
 
-        msg = u'Your password must contain at least 2 characters, including '\
-              u'3 uppercase letters & 1 symbol.'
+        msg = 'Your password must contain at least 2 characters, including '\
+              '3 uppercase letters & 1 symbol.'
         self._assert_reg_field(
             no_extra_fields_setting,
             {
-                u'name': u'password',
-                u'label': u'Password',
-                u'instructions': msg,
-                u"restrictions": password_validators_restrictions(),
+                'name': 'password',
+                'label': 'Password',
+                'instructions': msg,
+                "restrictions": password_validators_restrictions(),
             }
         )
 
@@ -1221,12 +1221,12 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         self._assert_reg_field(
             no_extra_fields_setting,
             {
-                u"name": u"email",
-                u"type": u"email",
-                u"required": True,
-                u"label": u"Email",
-                u"instructions": u"This is what you will use to login.",
-                u"restrictions": {
+                "name": "email",
+                "type": "email",
+                "required": True,
+                "label": "Email",
+                "instructions": "This is what you will use to login.",
+                "restrictions": {
                     "min_length": EMAIL_MIN_LENGTH,
                     "max_length": EMAIL_MAX_LENGTH
                 },
@@ -1236,15 +1236,15 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         self._assert_reg_field(
             no_extra_fields_setting,
             {
-                u"name": u"favorite_editor",
-                u"type": u"select",
-                u"required": False,
-                u"label": u"Favorite Editor",
-                u"placeholder": u"cat",
-                u"defaultValue": u"vim",
-                u"errorMessages": {
-                    u'required': u'This field is required.',
-                    u'invalid_choice': u'Select a valid choice. %(value)s is not one of the available choices.',
+                "name": "favorite_editor",
+                "type": "select",
+                "required": False,
+                "label": "Favorite Editor",
+                "placeholder": "cat",
+                "defaultValue": "vim",
+                "errorMessages": {
+                    'required': 'This field is required.',
+                    'invalid_choice': 'Select a valid choice. %(value)s is not one of the available choices.',
                 }
             }
         )
@@ -1252,17 +1252,17 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         self._assert_reg_field(
             no_extra_fields_setting,
             {
-                u"name": u"favorite_movie",
-                u"type": u"text",
-                u"required": True,
-                u"label": u"Fav Flick",
-                u"placeholder": None,
-                u"defaultValue": None,
-                u"errorMessages": {
-                    u'required': u'Please tell us your favorite movie.',
-                    u'invalid': u"We're pretty sure you made that movie up."
+                "name": "favorite_movie",
+                "type": "text",
+                "required": True,
+                "label": "Fav Flick",
+                "placeholder": None,
+                "defaultValue": None,
+                "errorMessages": {
+                    'required': 'Please tell us your favorite movie.',
+                    'invalid': "We're pretty sure you made that movie up."
                 },
-                u"restrictions": {
+                "restrictions": {
                     "min_length": TestCaseForm.MOVIE_MIN_LEN,
                     "max_length": TestCaseForm.MOVIE_MAX_LEN,
                 }
@@ -1294,7 +1294,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             ] + [
                 {
                     "value": country_code,
-                    "name": unicode(country_name),
+                    "name": str(country_name),
                     "default": True if country_code == expected_country_code else False
                 }
                 for country_code, country_name in SORTED_COUNTRIES
@@ -1316,13 +1316,13 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             self._assert_reg_field(
                 no_extra_fields_setting,
                 {
-                    u"name": u"email",
-                    u"defaultValue": u"bob@example.com",
-                    u"type": u"email",
-                    u"required": True,
-                    u"label": u"Email",
-                    u"instructions": u"This is what you will use to login.",
-                    u"restrictions": {
+                    "name": "email",
+                    "defaultValue": "bob@example.com",
+                    "type": "email",
+                    "required": True,
+                    "label": "Email",
+                    "instructions": "This is what you will use to login.",
+                    "restrictions": {
                         "min_length": EMAIL_MIN_LENGTH,
                         "max_length": EMAIL_MAX_LENGTH
                     },
@@ -1333,13 +1333,13 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             self._assert_reg_field(
                 no_extra_fields_setting,
                 {
-                    u"name": u"name",
-                    u"defaultValue": u"Bob",
-                    u"type": u"text",
-                    u"required": True,
-                    u"label": u"Full Name",
-                    u"instructions": u"This name will be used on any certificates that you earn.",
-                    u"restrictions": {
+                    "name": "name",
+                    "defaultValue": "Bob",
+                    "type": "text",
+                    "required": True,
+                    "label": "Full Name",
+                    "instructions": "This name will be used on any certificates that you earn.",
+                    "restrictions": {
                         "max_length": NAME_MAX_LENGTH,
                     }
                 }
@@ -1349,14 +1349,14 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             self._assert_reg_field(
                 no_extra_fields_setting,
                 {
-                    u"name": u"username",
-                    u"defaultValue": expected_username,
-                    u"type": u"text",
-                    u"required": True,
-                    u"label": u"Public Username",
-                    u"instructions": u"The name that will identify you in your courses. "
-                                     u"It cannot be changed later.",
-                    u"restrictions": {
+                    "name": "username",
+                    "defaultValue": expected_username,
+                    "type": "text",
+                    "required": True,
+                    "label": "Public Username",
+                    "instructions": "The name that will identify you in your courses. "
+                                     "It cannot be changed later.",
+                    "restrictions": {
                         "min_length": USERNAME_MIN_LENGTH,
                         "max_length": USERNAME_MAX_LENGTH
                     }
@@ -1365,17 +1365,17 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
 
             # Country should be filled in.
             self._assert_reg_field(
-                {u"country": u"required"},
+                {"country": "required"},
                 {
-                    u"label": u"Country or Region of Residence",
-                    u"name": u"country",
-                    u"defaultValue": expected_country_code,
-                    u"type": u"select",
-                    u"required": True,
-                    u"options": country_options,
-                    u"instructions": u"The country or region where you live.",
-                    u"errorMessages": {
-                        u"required": u"Select your country or region of residence."
+                    "label": "Country or Region of Residence",
+                    "name": "country",
+                    "defaultValue": expected_country_code,
+                    "type": "select",
+                    "required": True,
+                    "options": country_options,
+                    "instructions": "The country or region where you live.",
+                    "errorMessages": {
+                        "required": "Select your country or region of residence."
                     },
                 }
             )
@@ -1483,8 +1483,8 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 }
             ] + [
                 {
-                    "value": unicode(year),
-                    "name": unicode(year),
+                    "value": str(year),
+                    "name": str(year),
                     "default": False
                 }
                 for year in range(this_year, this_year - 120, -1)
@@ -1582,7 +1582,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 "name": "goals",
                 "type": "textarea",
                 "required": False,
-                "label": u"Tell us why you're interested in {platform_name}".format(
+                "label": "Tell us why you're interested in {platform_name}".format(
                     platform_name=settings.PLATFORM_NAME
                 ),
                 "errorMessages": {
@@ -1627,7 +1627,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             ] + [
                 {
                     "value": country_code,
-                    "name": unicode(country_name),
+                    "name": str(country_name),
                     "default": False
                 }
                 for country_code, country_name in SORTED_COUNTRIES
@@ -1668,16 +1668,16 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
     @mock.patch.dict(settings.FEATURES, {"ENABLE_MKTG_SITE": True})
     def test_registration_honor_code_mktg_site_enabled(self):
         link_template = "<a href='https://www.test.com/honor' target='_blank'>{link_label}</a>"
-        link_template2 = u"<a href='#' target='_blank'>{link_label}</a>"
+        link_template2 = "<a href='#' target='_blank'>{link_label}</a>"
         link_label = "Terms of Service and Honor Code"
         link_label2 = "Privacy Policy"
         self._assert_reg_field(
             {"honor_code": "required"},
             {
-                "label": (u"By creating an account with {platform_name}, you agree {spacing}"
-                          u"to abide by our {platform_name} {spacing}"
-                          u"{link_label} {spacing}"
-                          u"and agree to our {link_label2}.").format(
+                "label": ("By creating an account with {platform_name}, you agree {spacing}"
+                          "to abide by our {platform_name} {spacing}"
+                          "{link_label} {spacing}"
+                          "and agree to our {link_label2}.").format(
                     platform_name=settings.PLATFORM_NAME,
                     link_label=link_template.format(link_label=link_label),
                     link_label2=link_template2.format(link_label=link_label2),
@@ -1688,7 +1688,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 "type": "plaintext",
                 "required": True,
                 "errorMessages": {
-                    "required": u"You must agree to the {platform_name} {link_label}".format(
+                    "required": "You must agree to the {platform_name} {link_label}".format(
                         platform_name=settings.PLATFORM_NAME,
                         link_label=link_label
                     )
@@ -1705,10 +1705,10 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         self._assert_reg_field(
             {"honor_code": "required"},
             {
-                "label": (u"By creating an account with {platform_name}, you agree {spacing}"
-                          u"to abide by our {platform_name} {spacing}"
-                          u"{link_label} {spacing}"
-                          u"and agree to our {link_label2}.").format(
+                "label": ("By creating an account with {platform_name}, you agree {spacing}"
+                          "to abide by our {platform_name} {spacing}"
+                          "{link_label} {spacing}"
+                          "and agree to our {link_label2}.").format(
                     platform_name=settings.PLATFORM_NAME,
                     link_label=self.link_template.format(link_label=link_label),
                     link_label2=link_template.format(link_label=link_label2),
@@ -1719,7 +1719,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 "type": "plaintext",
                 "required": True,
                 "errorMessages": {
-                    "required": u"You must agree to the {platform_name} {link_label}".format(
+                    "required": "You must agree to the {platform_name} {link_label}".format(
                         platform_name=settings.PLATFORM_NAME,
                         link_label=link_label
                     )
@@ -1737,11 +1737,11 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         # Honor code field should say ONLY honor code,
         # not "terms of service and honor code"
         link_label = 'Honor Code'
-        link_template = u"<a href='https://www.test.com/honor' target='_blank'>{link_label}</a>"
+        link_template = "<a href='https://www.test.com/honor' target='_blank'>{link_label}</a>"
         self._assert_reg_field(
             {"honor_code": "required", "terms_of_service": "required"},
             {
-                "label": u"I agree to the {platform_name} {link_label}".format(
+                "label": "I agree to the {platform_name} {link_label}".format(
                     platform_name=settings.PLATFORM_NAME,
                     link_label=link_template.format(link_label=link_label)
                 ),
@@ -1750,7 +1750,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 "type": "checkbox",
                 "required": True,
                 "errorMessages": {
-                    "required": u"You must agree to the {platform_name} {link_label}".format(
+                    "required": "You must agree to the {platform_name} {link_label}".format(
                         platform_name=settings.PLATFORM_NAME,
                         link_label=link_label
                     )
@@ -1760,11 +1760,11 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
 
         # Terms of service field should also be present
         link_label = "Terms of Service"
-        link_template = u"<a href='https://www.test.com/tos' target='_blank'>{link_label}</a>"
+        link_template = "<a href='https://www.test.com/tos' target='_blank'>{link_label}</a>"
         self._assert_reg_field(
             {"honor_code": "required", "terms_of_service": "required"},
             {
-                "label": u"I agree to the {platform_name} {link_label}".format(
+                "label": "I agree to the {platform_name} {link_label}".format(
                     platform_name=settings.PLATFORM_NAME,
                     link_label=link_template.format(link_label=link_label)
                 ),
@@ -1773,7 +1773,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 "type": "checkbox",
                 "required": True,
                 "errorMessages": {
-                    "required": u"You must agree to the {platform_name} {link_label}".format(
+                    "required": "You must agree to the {platform_name} {link_label}".format(
                         platform_name=settings.PLATFORM_NAME,
                         link_label=link_label
                     )
@@ -1790,7 +1790,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         self._assert_reg_field(
             {"honor_code": "required", "terms_of_service": "required"},
             {
-                "label": u"I agree to the {platform_name} {link_label}".format(
+                "label": "I agree to the {platform_name} {link_label}".format(
                     platform_name=settings.PLATFORM_NAME,
                     link_label=self.link_template.format(link_label=link_label)
                 ),
@@ -1799,7 +1799,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 "type": "checkbox",
                 "required": True,
                 "errorMessages": {
-                    "required": u"You must agree to the {platform_name} Honor Code".format(
+                    "required": "You must agree to the {platform_name} Honor Code".format(
                         platform_name=settings.PLATFORM_NAME
                     )
                 }
@@ -1808,11 +1808,11 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
 
         link_label = 'Terms of Service'
         # Terms of service field should also be present
-        link_template = u"<a href='/tos' target='_blank'>{link_label}</a>"
+        link_template = "<a href='/tos' target='_blank'>{link_label}</a>"
         self._assert_reg_field(
             {"honor_code": "required", "terms_of_service": "required"},
             {
-                "label": u"I agree to the {platform_name} {link_label}".format(
+                "label": "I agree to the {platform_name} {link_label}".format(
                     platform_name=settings.PLATFORM_NAME,
                     link_label=link_template.format(link_label=link_label)
                 ),
@@ -1821,7 +1821,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 "type": "checkbox",
                 "required": True,
                 "errorMessages": {
-                    "required": u"You must agree to the {platform_name} Terms of Service".format(
+                    "required": "You must agree to the {platform_name} Terms of Service".format(
                         platform_name=settings.PLATFORM_NAME
                     )
                 }
@@ -2110,10 +2110,10 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         self.assertEqual(sent_email.to, [self.EMAIL])
         self.assertEqual(
             sent_email.subject,
-            u"Action Required: Activate your {platform} account".format(platform=settings.PLATFORM_NAME)
+            "Action Required: Activate your {platform} account".format(platform=settings.PLATFORM_NAME)
         )
         self.assertIn(
-            u"high-quality {platform} courses".format(platform=settings.PLATFORM_NAME),
+            "high-quality {platform} courses".format(platform=settings.PLATFORM_NAME),
             sent_email.body
         )
 
@@ -2184,7 +2184,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             {
                 "email": [{
                     "user_message": (
-                        u"It looks like {} belongs to an existing account. "
+                        "It looks like {} belongs to an existing account. "
                         "Try again with a different email address."
                     ).format(
                         self.EMAIL
@@ -2219,7 +2219,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             {
                 "username": [{
                     "user_message": (
-                        u"It looks like {} belongs to an existing account. "
+                        "It looks like {} belongs to an existing account. "
                         "Try again with a different username."
                     ).format(
                         self.USERNAME
@@ -2254,7 +2254,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             {
                 "username": [{
                     "user_message": (
-                        u"It looks like {} belongs to an existing account. "
+                        "It looks like {} belongs to an existing account. "
                         "Try again with a different username."
                     ).format(
                         self.USERNAME
@@ -2262,7 +2262,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 }],
                 "email": [{
                     "user_message": (
-                        u"It looks like {} belongs to an existing account. "
+                        "It looks like {} belongs to an existing account. "
                         "Try again with a different email address."
                     ).format(
                         self.EMAIL
@@ -2295,8 +2295,8 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         self.assertEqual(
             response_json,
             {
-                u"username": [{u"user_message": USERNAME_BAD_LENGTH_MSG}],
-                u"password": [{u"user_message": u"This field is required."}],
+                "username": [{"user_message": USERNAME_BAD_LENGTH_MSG}],
+                "password": [{"user_message": "This field is required."}],
             }
         )
 
@@ -2330,13 +2330,13 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
     def _assert_fields_match(self, actual_field, expected_field):
         self.assertIsNot(
             actual_field, None,
-            msg=u"Could not find field {name}".format(name=expected_field["name"])
+            msg="Could not find field {name}".format(name=expected_field["name"])
         )
 
-        for key, value in expected_field.iteritems():
+        for key, value in expected_field.items():
             self.assertEqual(
                 actual_field[key], expected_field[key],
-                msg=u"Expected {expected} for {key} but got {actual} instead".format(
+                msg="Expected {expected} for {key} but got {actual} instead".format(
                     key=key,
                     actual=actual_field[key],
                     expected=expected_field[key]
@@ -2468,15 +2468,15 @@ class ThirdPartyRegistrationTestMixin(ThirdPartyOAuthTestMixin, CacheIsolationTe
     def _verify_user_existence(self, user_exists, social_link_exists, user_is_active=None, username=None):
         """Verifies whether the user object exists."""
         users = User.objects.filter(username=(username if username else "test_username"))
-        self.assertEquals(users.exists(), user_exists)
+        self.assertEqual(users.exists(), user_exists)
         if user_exists:
-            self.assertEquals(users[0].is_active, user_is_active)
+            self.assertEqual(users[0].is_active, user_is_active)
             self.assertEqual(
                 UserSocialAuth.objects.filter(user=users[0], provider=self.BACKEND).exists(),
                 social_link_exists
             )
         else:
-            self.assertEquals(UserSocialAuth.objects.count(), 0)
+            self.assertEqual(UserSocialAuth.objects.count(), 0)
 
     def test_success(self):
         self._verify_user_existence(user_exists=False, social_link_exists=False)
@@ -2535,7 +2535,7 @@ class ThirdPartyRegistrationTestMixin(ThirdPartyOAuthTestMixin, CacheIsolationTe
         response = self.client.post(self.url, data)
         self._assert_access_token_error(
             response,
-            u"An access_token is required when passing value ({}) for provider.".format(self.BACKEND)
+            "An access_token is required when passing value ({}) for provider.".format(self.BACKEND)
         )
         self._verify_user_existence(user_exists=False, social_link_exists=False)
 
@@ -2559,7 +2559,7 @@ class ThirdPartyRegistrationTestMixin(ThirdPartyOAuthTestMixin, CacheIsolationTe
         response = self.client.post(self.url, data)
         self._assert_third_party_session_expired_error(
             response,
-            u"Registration using {provider} has timed out.".format(provider="Google")
+            "Registration using {provider} has timed out.".format(provider="Google")
         )
         self._verify_user_existence(user_exists=False, social_link_exists=False)
 
@@ -2612,26 +2612,26 @@ class UpdateEmailOptInTestCase(UserAPITestCase, SharedModuleStoreTestCase):
         self.client.login(username=self.USERNAME, password=self.PASSWORD)
 
     @ddt.data(
-        (u"True", u"True"),
-        (u"true", u"True"),
-        (u"TrUe", u"True"),
-        (u"Banana", u"False"),
-        (u"strawberries", u"False"),
-        (u"False", u"False"),
+        ("True", "True"),
+        ("true", "True"),
+        ("TrUe", "True"),
+        ("Banana", "False"),
+        ("strawberries", "False"),
+        ("False", "False"),
     )
     @ddt.unpack
     def test_update_email_opt_in(self, opt, result):
         """Tests the email opt in preference"""
         # Register, which should trigger an activation email
         response = self.client.post(self.url, {
-            "course_id": unicode(self.course.id),
+            "course_id": str(self.course.id),
             "email_opt_in": opt
         })
         self.assertHttpOK(response)
         preference = UserOrgTag.objects.get(
             user=self.user, org=self.course.id.org, key="email-optin"
         )
-        self.assertEquals(preference.value, result)
+        self.assertEqual(preference.value, result)
 
     @ddt.data(
         (True, False),
@@ -2643,9 +2643,9 @@ class UpdateEmailOptInTestCase(UserAPITestCase, SharedModuleStoreTestCase):
         """Tests the email opt in preference"""
         params = {}
         if use_course_id:
-            params["course_id"] = unicode(self.course.id)
+            params["course_id"] = str(self.course.id)
         if use_opt_in:
-            params["email_opt_in"] = u"True"
+            params["email_opt_in"] = "True"
 
         response = self.client.post(self.url, params)
         self.assertHttpBadRequest(response)
@@ -2656,14 +2656,14 @@ class UpdateEmailOptInTestCase(UserAPITestCase, SharedModuleStoreTestCase):
         self.user.save()
         # Register, which should trigger an activation email
         response = self.client.post(self.url, {
-            "course_id": unicode(self.course.id),
-            "email_opt_in": u"True"
+            "course_id": str(self.course.id),
+            "email_opt_in": "True"
         })
         self.assertHttpOK(response)
         preference = UserOrgTag.objects.get(
             user=self.user, org=self.course.id.org, key="email-optin"
         )
-        self.assertEquals(preference.value, u"True")
+        self.assertEqual(preference.value, "True")
 
     def test_update_email_opt_in_anonymous_user(self):
         """
@@ -2672,8 +2672,8 @@ class UpdateEmailOptInTestCase(UserAPITestCase, SharedModuleStoreTestCase):
         """
         self.client.logout()
         response = self.client.post(self.url, {
-            "course_id": unicode(self.course.id),
-            "email_opt_in": u"True"
+            "course_id": str(self.course.id),
+            "email_opt_in": "True"
         })
         self.assertEqual(response.status_code, 403)
 
@@ -2684,7 +2684,7 @@ class UpdateEmailOptInTestCase(UserAPITestCase, SharedModuleStoreTestCase):
         """
         response = self.client.post(self.url, {
             "course_id": 'invalid',
-            "email_opt_in": u"True"
+            "email_opt_in": "True"
         })
         self.assertHttpBadRequest(response)
         with self.assertRaises(UserOrgTag.DoesNotExist):

@@ -28,10 +28,10 @@ from openedx.core.djangolib.testing.utils import skip_unless_lms
 class EmailOptInListTest(ModuleStoreTestCase):
     """Tests for the email opt-in list management command. """
     USER_USERNAME = "test_user"
-    USER_FIRST_NAME = u"Ṫëṡẗ"
-    USER_LAST_NAME = u"Űśéŕ"
+    USER_FIRST_NAME = "Ṫëṡẗ"
+    USER_LAST_NAME = "Űśéŕ"
 
-    TEST_ORG = u"téśt_őŕǵ"
+    TEST_ORG = "téśt_őŕǵ"
 
     OUTPUT_FILE_NAME = "test_org_email_opt_in.csv"
     OUTPUT_FIELD_NAMES = [
@@ -186,7 +186,7 @@ class EmailOptInListTest(ModuleStoreTestCase):
         self._set_opt_in_pref(self.user, self.TEST_ORG, True)
 
         # No course available for this particular org
-        with self.assertRaisesRegexp(CommandError, "^No courses found for orgs:"):
+        with self.assertRaisesRegex(CommandError, "^No courses found for orgs:"):
             self._run_command("other_org")
 
     def test_specify_subset_of_courses(self):
@@ -262,7 +262,7 @@ class EmailOptInListTest(ModuleStoreTestCase):
         expected_msg_regex = (
             "^Error: too few arguments$"
         )
-        with self.assertRaisesRegexp(CommandError, expected_msg_regex):
+        with self.assertRaisesRegex(CommandError, expected_msg_regex):
             call_command('email_opt_in_list', *args)
 
     def test_file_already_exists(self):
@@ -271,7 +271,7 @@ class EmailOptInListTest(ModuleStoreTestCase):
         def _cleanup():
             temp_file.close()
 
-        with self.assertRaisesRegexp(CommandError, "^File already exists"):
+        with self.assertRaisesRegex(CommandError, "^File already exists"):
             call_command('email_opt_in_list', temp_file.name, self.TEST_ORG)
 
     def test_no_user_profile(self):
@@ -395,7 +395,7 @@ class EmailOptInListTest(ModuleStoreTestCase):
                 reader = csv.DictReader(output_file, fieldnames=self.OUTPUT_FIELD_NAMES)
                 rows = [row for row in reader]
         except IOError:
-            self.fail(u"Could not find or open output file at '{path}'".format(path=output_path))
+            self.fail("Could not find or open output file at '{path}'".format(path=output_path))
 
         # Return the output as a list of dictionaries
         return rows

@@ -44,6 +44,6 @@ class CeleryConfigTest(unittest.TestCase):
 
         # We don't know the other dict values exactly,
         # but we can assert that they take the right form
-        self.assertIsInstance(result_dict['task_id'], unicode)
+        self.assertIsInstance(result_dict['task_id'], str)
         self.assertIsInstance(result_dict['time'], float)
         self.assertGreater(result_dict['time'], 0.0)

@@ -17,7 +17,7 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
 
     def setUp(self):
         super(CourseAuthorizationFormTest, self).setUp()
-        course_title = u"ẗëṡẗ title ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ"
+        course_title = "ẗëṡẗ title ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ"
         self.course = CourseFactory.create(display_name=course_title)
         BulkEmailFlag.objects.create(enabled=True, require_course_email_auth=True)
 
@@ -54,11 +54,11 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
         form = CourseAuthorizationAdminForm(data=form_data)
         # Validation should not work because course_id field is unique
         self.assertFalse(form.is_valid())
-        self.assertEquals(
+        self.assertEqual(
             "Course authorization with this Course id already exists.",
             form._errors['course_id'][0]  # pylint: disable=protected-access
         )
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError,
             "The CourseAuthorization could not be created because the data didn't validate."
         ):
@@ -69,18 +69,18 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
 
     def test_form_typo(self):
         # Munge course id
-        bad_id = CourseLocator(u'Broken{}'.format(self.course.id.org), 'hello', self.course.id.run + '_typo')
+        bad_id = CourseLocator('Broken{}'.format(self.course.id.org), 'hello', self.course.id.run + '_typo')
 
         form_data = {'course_id': text_type(bad_id), 'email_enabled': True}
         form = CourseAuthorizationAdminForm(data=form_data)
         # Validation shouldn't work
         self.assertFalse(form.is_valid())
 
-        msg = u'Course not found.'
-        msg += u' Entered course id was: "{0}".'.format(text_type(bad_id))
-        self.assertEquals(msg, form._errors['course_id'][0])  # pylint: disable=protected-access
+        msg = 'Course not found.'
+        msg += ' Entered course id was: "{0}".'.format(text_type(bad_id))
+        self.assertEqual(msg, form._errors['course_id'][0])  # pylint: disable=protected-access
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError,
             "The CourseAuthorization could not be created because the data didn't validate."
         ):
@@ -92,11 +92,11 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
         # Validation shouldn't work
         self.assertFalse(form.is_valid())
 
-        msg = u'Course id invalid.'
-        msg += u' Entered course id was: "asd::**!@#$%^&*())//foobar!!".'
-        self.assertEquals(msg, form._errors['course_id'][0])  # pylint: disable=protected-access
+        msg = 'Course id invalid.'
+        msg += ' Entered course id was: "asd::**!@#$%^&*())//foobar!!".'
+        self.assertEqual(msg, form._errors['course_id'][0])  # pylint: disable=protected-access
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError,
             "The CourseAuthorization could not be created because the data didn't validate."
         ):
@@ -110,9 +110,9 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
         self.assertFalse(form.is_valid())
 
         error_msg = form._errors['course_id'][0]  # pylint: disable=protected-access
-        self.assertIn(u'Entered course id was: "{0}".'.format(self.course.id.run), error_msg)
+        self.assertIn('Entered course id was: "{0}".'.format(self.course.id.run), error_msg)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError,
             "The CourseAuthorization could not be created because the data didn't validate."
         ):

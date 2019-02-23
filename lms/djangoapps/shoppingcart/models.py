@@ -5,7 +5,7 @@ import csv
 import json
 import logging
 import smtplib
-import StringIO
+import io
 from collections import namedtuple
 from datetime import datetime, timedelta
 from decimal import Decimal
@@ -197,7 +197,7 @@ class Order(models.Model):
         Also removes any code redemption associated with the order_item
         """
         if item.order.status == 'cart':
-            log.info(u"order item %s removed for user %s", str(item.id), user)
+            log.info("order item %s removed for user %s", str(item.id), user)
             item.delete()
             # remove any redemption entry associated with the item
             CouponRedemption.remove_code_redemption_from_item(item, user)
@@ -338,7 +338,7 @@ class Order(models.Model):
         this function generates the csv file
         """
         course_names = []
-        csv_file = StringIO.StringIO()
+        csv_file = io.StringIO()
         csv_writer = csv.writer(csv_file)
         csv_writer.writerow(['Course Name', 'Registration Code', 'URL'])
         for item in orderitems:
@@ -349,7 +349,7 @@ class Order(models.Model):
             for registration_code in registration_codes:
                 redemption_url = reverse('register_code_redemption', args=[registration_code.code])
                 url = '{base_url}{redemption_url}'.format(base_url=site_name, redemption_url=redemption_url)
-                csv_writer.writerow([unicode(course.display_name).encode("utf-8"), registration_code.code, url])
+                csv_writer.writerow([str(course.display_name).encode("utf-8"), registration_code.code, url])
 
         return csv_file, course_names
 
@@ -368,7 +368,7 @@ class Order(models.Model):
         if not is_order_type_business:
             subject = _("Order Payment Confirmation")
         else:
-            subject = _(u'Confirmation and Registration Codes for the following courses: {course_name_list}').format(
+            subject = _('Confirmation and Registration Codes for the following courses: {course_name_list}').format(
                 course_name_list=joined_course_names
             )
 
@@ -394,7 +394,7 @@ class Order(models.Model):
                         'course_names': ", ".join(course_names),
                         'dashboard_url': dashboard_url,
                         'currency_symbol': settings.PAID_COURSE_REGISTRATION_CURRENCY[1],
-                        'order_placed_by': u'{username} ({email})'.format(
+                        'order_placed_by': '{username} ({email})'.format(
                             username=self.user.username, email=self.user.email
                         ),
                         'has_billing_info': settings.FEATURES['STORE_BILLING_INFO'],
@@ -417,15 +417,15 @@ class Order(models.Model):
                     email.content_subtype = "html"
 
                 if csv_file:
-                    email.attach(u'RegistrationCodesRedemptionUrls.csv', csv_file.getvalue(), 'text/csv')
+                    email.attach('RegistrationCodesRedemptionUrls.csv', csv_file.getvalue(), 'text/csv')
                 if pdf_file is not None:
-                    email.attach(u'ReceiptOrder{}.pdf'.format(str(self.id)), pdf_file.getvalue(), 'application/pdf')
+                    email.attach('ReceiptOrder{}.pdf'.format(str(self.id)), pdf_file.getvalue(), 'application/pdf')
                 else:
-                    file_buffer = StringIO.StringIO(_('pdf download unavailable right now, please contact support.'))
-                    email.attach(u'pdf_not_available.txt', file_buffer.getvalue(), 'text/plain')
+                    file_buffer = io.StringIO(_('pdf download unavailable right now, please contact support.'))
+                    email.attach('pdf_not_available.txt', file_buffer.getvalue(), 'text/plain')
                 email.send()
         except (smtplib.SMTPException, BotoServerError):  # sadly need to handle diff. mail backends individually
-            log.error(u'Failed sending confirmation e-mail for order %d', self.id)
+            log.error('Failed sending confirmation e-mail for order %d', self.id)
 
     def purchase(self, first='', last='', street1='', street2='', city='', state='', postalcode='',
                  country='', ccnum='', cardtype='', processor_reply_dump=''):
@@ -448,7 +448,7 @@ class Order(models.Model):
         """
         if self.status == 'purchased':
             log.error(
-                u"`purchase` method called on order {}, but order is already purchased.".format(self.id)
+                "`purchase` method called on order {}, but order is already purchased.".format(self.id)
             )
             return
         self.status = 'purchased'
@@ -540,7 +540,7 @@ class Order(models.Model):
             # an operation to fail because of an analytics event, so we will capture these
             # errors in the logs.
             log.exception(
-                u'Unable to emit {event} event for user {user} and order {order}'.format(
+                'Unable to emit {event} event for user {user} and order {order}'.format(
                     event=event_name, user=self.user.id, order=self.id)
             )
 
@@ -596,12 +596,12 @@ class Order(models.Model):
            we throw an UnexpectedOrderItemStatus error)
         """
         # if an order is already retired, no-op:
-        if self.status in ORDER_STATUS_MAP.values():
+        if self.status in list(ORDER_STATUS_MAP.values()):
             return
 
-        if self.status not in ORDER_STATUS_MAP.keys():
+        if self.status not in list(ORDER_STATUS_MAP.keys()):
             raise InvalidStatusToRetire(
-                u"order status {order_status} is not 'paying' or 'cart'".format(
+                "order status {order_status} is not 'paying' or 'cart'".format(
                     order_status=self.status
                 )
             )
@@ -960,18 +960,18 @@ class Invoice(TimeStampedModel):
 
     def __unicode__(self):
         label = (
-            unicode(self.internal_reference)
+            str(self.internal_reference)
             if self.internal_reference
-            else u"No label"
+            else "No label"
         )
 
         created = (
             self.created.strftime("%Y-%m-%d")
             if self.created
-            else u"No date"
+            else "No date"
         )
 
-        return u"{label} ({date_created})".format(
+        return "{label} ({date_created})".format(
             label=label, date_created=created
         )
 
@@ -1079,7 +1079,7 @@ class InvoiceTransaction(TimeStampedModel):
 
         """
         return {
-            'amount': unicode(self.amount),
+            'amount': str(self.amount),
             'currency': self.currency,
             'comments': self.comments,
             'status': self.status,
@@ -1133,7 +1133,7 @@ class InvoiceItem(TimeStampedModel):
         """
         return {
             'qty': self.qty,
-            'unit_price': unicode(self.unit_price),
+            'unit_price': str(self.unit_price),
             'currency': self.currency
         }
 
@@ -1161,7 +1161,7 @@ class CourseRegistrationCodeInvoiceItem(InvoiceItem):
 
         """
         snapshot = super(CourseRegistrationCodeInvoiceItem, self).snapshot()
-        snapshot['course_id'] = unicode(self.course_id)
+        snapshot['course_id'] = str(self.course_id)
         return snapshot
 
 
@@ -1365,7 +1365,7 @@ class Coupon(models.Model):
         """
         return the coupon expiration date in the readable format
         """
-        return (self.expiration_date - timedelta(days=1)).strftime(u"%B %d, %Y") if self.expiration_date else None
+        return (self.expiration_date - timedelta(days=1)).strftime("%B %d, %Y") if self.expiration_date else None
 
 
 class CouponRedemption(models.Model):
@@ -1397,13 +1397,13 @@ class CouponRedemption(models.Model):
             )
             coupon_redemption.delete()
             log.info(
-                u'Coupon "%s" redemption entry removed for user "%s" for order item "%s"',
+                'Coupon "%s" redemption entry removed for user "%s" for order item "%s"',
                 coupon_redemption.coupon.code,
                 user,
                 str(item.id),
             )
         except CouponRedemption.DoesNotExist:
-            log.debug(u'Code redemption does not exist for order item id=%s.', str(item.id))
+            log.debug('Code redemption does not exist for order item id=%s.', str(item.id))
 
     @classmethod
     def remove_coupon_redemption_from_cart(cls, user, cart):
@@ -1413,7 +1413,7 @@ class CouponRedemption(models.Model):
         coupon_redemption = cls.objects.filter(user=user, order=cart)
         if coupon_redemption:
             coupon_redemption.delete()
-            log.info(u'Coupon redemption entry removed for user %s for order %s', user, cart.id)
+            log.info('Coupon redemption entry removed for user %s for order %s', user, cart.id)
 
     @classmethod
     def get_discount_price(cls, percentage_discount, value):
@@ -1433,7 +1433,7 @@ class CouponRedemption(models.Model):
         for coupon_redemption in coupon_redemptions:
             if coupon_redemption.coupon.code != coupon.code or coupon_redemption.coupon.id == coupon.id:
                 log.exception(
-                    u"Coupon redemption already exist for user '%s' against order id '%s'",
+                    "Coupon redemption already exist for user '%s' against order id '%s'",
                     order.user.username,
                     order.id,
                 )
@@ -1449,7 +1449,7 @@ class CouponRedemption(models.Model):
                     item.unit_cost = discount_price
                     item.save()
                     log.info(
-                        u"Discount generated for user %s against order id '%s'",
+                        "Discount generated for user %s against order id '%s'",
                         order.user.username,
                         order.id,
                     )
@@ -1562,13 +1562,13 @@ class PaidCourseRegistration(OrderItem):
         # throw errors if it doesn't.
         course = modulestore().get_course(course_id)
         if not course:
-            log.error(u"User {} tried to add non-existent course {} to cart id {}"
+            log.error("User {} tried to add non-existent course {} to cart id {}"
                       .format(order.user.email, course_id, order.id))
             raise CourseDoesNotExistException
 
         if cls.contained_in_order(order, course_id):
             log.warning(
-                u"User %s tried to add PaidCourseRegistration for course %s, already in cart id %s",
+                "User %s tried to add PaidCourseRegistration for course %s, already in cart id %s",
                 order.user.email,
                 course_id,
                 order.id,
@@ -1576,7 +1576,7 @@ class PaidCourseRegistration(OrderItem):
             raise ItemAlreadyInCartException
 
         if CourseEnrollment.is_enrolled(user=order.user, course_key=course_id):
-            log.warning(u"User {} trying to add course {} to cart id {}, already registered"
+            log.warning("User {} trying to add course {} to cart id {}, already registered"
                         .format(order.user.email, course_id, order.id))
             raise AlreadyEnrolledInCourseException
 
@@ -1599,14 +1599,14 @@ class PaidCourseRegistration(OrderItem):
         item.qty = 1
         item.unit_cost = cost
         item.list_price = cost
-        item.line_desc = _(u'Registration for Course: {course_name}').format(
+        item.line_desc = _('Registration for Course: {course_name}').format(
             course_name=course.display_name_with_default)
         item.currency = currency
         order.currency = currency
         item.report_comments = item.csv_report_comments
         order.save()
         item.save()
-        log.info(u"User {} added course registration {} to cart: order {}"
+        log.info("User {} added course registration {} to cart: order {}"
                  .format(order.user.email, course_id, order.id))
 
         CourseEnrollment.send_signal_full(EnrollStatusChange.paid_start,
@@ -1622,7 +1622,7 @@ class PaidCourseRegistration(OrderItem):
         would in fact be quite silly since there's a clear back door.
         """
         if not modulestore().has_course(self.course_id):
-            msg = u"The customer purchased Course {0}, but that course doesn't exist!".format(self.course_id)
+            msg = "The customer purchased Course {0}, but that course doesn't exist!".format(self.course_id)
             log.error(msg)
             raise PurchasedCallbackException(msg)
 
@@ -1630,7 +1630,7 @@ class PaidCourseRegistration(OrderItem):
         self.course_enrollment = CourseEnrollment.enroll(user=self.user, course_key=self.course_id, mode=self.mode)
         self.save()
 
-        log.info(u"Enrolled {0} in paid course {1}, paid ${2}"
+        log.info("Enrolled {0} in paid course {1}, paid ${2}"
                  .format(self.user.email, self.course_id, self.line_cost))
         self.course_enrollment.send_signal(EnrollStatusChange.paid_complete,
                                            cost=self.line_cost, currency=self.currency)
@@ -1641,11 +1641,11 @@ class PaidCourseRegistration(OrderItem):
         Basically tells the user to visit the dashboard to see their new classes
         """
         notification = Text(_(
-            u"Please visit your {link_start}dashboard{link_end} "
+            "Please visit your {link_start}dashboard{link_end} "
             "to see your new course."
         )).format(
-            link_start=HTML(u'<a href="{url}">').format(url=reverse('dashboard')),
-            link_end=HTML(u'</a>'),
+            link_start=HTML('<a href="{url}">').format(url=reverse('dashboard')),
+            link_end=HTML('</a>'),
         )
 
         return self.pk_with_subclass, set([notification])
@@ -1659,7 +1659,7 @@ class PaidCourseRegistration(OrderItem):
         try:
             return PaidCourseRegistrationAnnotation.objects.get(course_id=self.course_id).annotation
         except PaidCourseRegistrationAnnotation.DoesNotExist:
-            return u""
+            return ""
 
     def analytics_data(self):
         """Simple function used to construct analytics data for the OrderItem.
@@ -1674,10 +1674,10 @@ class PaidCourseRegistration(OrderItem):
         data = super(PaidCourseRegistration, self).analytics_data()
         sku = data['sku']
         if self.course_id != CourseKeyField.Empty:
-            data['name'] = unicode(self.course_id)
-            data['category'] = unicode(self.course_id.org)
+            data['name'] = str(self.course_id)
+            data['category'] = str(self.course_id.org)
         if self.mode:
-            data['sku'] = sku + u'.' + unicode(self.mode)
+            data['sku'] = sku + '.' + str(self.mode)
         return data
 
 
@@ -1751,17 +1751,17 @@ class CourseRegCodeItem(OrderItem):
         # throw errors if it doesn't.
         course = modulestore().get_course(course_id)
         if not course:
-            log.error(u"User {} tried to add non-existent course {} to cart id {}"
+            log.error("User {} tried to add non-existent course {} to cart id {}"
                       .format(order.user.email, course_id, order.id))
             raise CourseDoesNotExistException
 
         if cls.contained_in_order(order, course_id):
-            log.warning(u"User {} tried to add PaidCourseRegistration for course {}, already in cart id {}"
+            log.warning("User {} tried to add PaidCourseRegistration for course {}, already in cart id {}"
                         .format(order.user.email, course_id, order.id))
             raise ItemAlreadyInCartException
 
         if CourseEnrollment.is_enrolled(user=order.user, course_key=course_id):
-            log.warning(u"User {} trying to add course {} to cart id {}, already registered"
+            log.warning("User {} trying to add course {} to cart id {}, already registered"
                         .format(order.user.email, course_id, order.id))
             raise AlreadyEnrolledInCourseException
 
@@ -1784,14 +1784,14 @@ class CourseRegCodeItem(OrderItem):
         item.unit_cost = cost
         item.list_price = cost
         item.qty = qty
-        item.line_desc = _(u'Enrollment codes for Course: {course_name}').format(
+        item.line_desc = _('Enrollment codes for Course: {course_name}').format(
             course_name=course.display_name_with_default)
         item.currency = currency
         order.currency = currency
         item.report_comments = item.csv_report_comments
         order.save()
         item.save()
-        log.info(u"User {} added course registration {} to cart: order {}"
+        log.info("User {} added course registration {} to cart: order {}"
                  .format(order.user.email, course_id, order.id))
         return item
 
@@ -1801,7 +1801,7 @@ class CourseRegCodeItem(OrderItem):
         be redeemed by users
         """
         if not modulestore().has_course(self.course_id):
-            msg = u"The customer purchased Course {0}, but that course doesn't exist!".format(self.course_id)
+            msg = "The customer purchased Course {0}, but that course doesn't exist!".format(self.course_id)
             log.error(msg)
             raise PurchasedCallbackException(msg)
         total_registration_codes = int(self.qty)
@@ -1814,7 +1814,7 @@ class CourseRegCodeItem(OrderItem):
         for i in range(total_registration_codes):  # pylint: disable=unused-variable
             save_registration_code(self.user, self.course_id, self.mode, order=self.order)
 
-        log.info(u"Enrolled {0} in paid course {1}, paid ${2}"
+        log.info("Enrolled {0} in paid course {1}, paid ${2}"
                  .format(self.user.email, self.course_id, self.line_cost))
 
     @property
@@ -1826,7 +1826,7 @@ class CourseRegCodeItem(OrderItem):
         try:
             return CourseRegCodeItemAnnotation.objects.get(course_id=self.course_id).annotation
         except CourseRegCodeItemAnnotation.DoesNotExist:
-            return u""
+            return ""
 
     def analytics_data(self):
         """Simple function used to construct analytics data for the OrderItem.
@@ -1841,10 +1841,10 @@ class CourseRegCodeItem(OrderItem):
         data = super(CourseRegCodeItem, self).analytics_data()
         sku = data['sku']
         if self.course_id != CourseKeyField.Empty:
-            data['name'] = unicode(self.course_id)
-            data['category'] = unicode(self.course_id.org)
+            data['name'] = str(self.course_id)
+            data['category'] = str(self.course_id.org)
         if self.mode:
-            data['sku'] = sku + u'.' + unicode(self.mode)
+            data['sku'] = sku + '.' + str(self.mode)
         return data
 
 
@@ -1864,7 +1864,7 @@ class CourseRegCodeItemAnnotation(models.Model):
     annotation = models.TextField(null=True)
 
     def __unicode__(self):
-        return u"{} : {}".format(text_type(self.course_id), self.annotation)
+        return "{} : {}".format(text_type(self.course_id), self.annotation)
 
 
 class PaidCourseRegistrationAnnotation(models.Model):
@@ -1883,7 +1883,7 @@ class PaidCourseRegistrationAnnotation(models.Model):
     annotation = models.TextField(null=True)
 
     def __unicode__(self):
-        return u"{} : {}".format(text_type(self.course_id), self.annotation)
+        return "{} : {}".format(text_type(self.course_id), self.annotation)
 
 
 class CertificateItem(OrderItem):
@@ -1918,7 +1918,7 @@ class CertificateItem(OrderItem):
             target_cert = target_certs[0]
         except IndexError:
             log.warning(
-                u"Matching CertificateItem not found while trying to refund. User %s, Course %s",
+                "Matching CertificateItem not found while trying to refund. User %s, Course %s",
                 course_enrollment.user,
                 course_enrollment.course_id,
             )
@@ -1932,7 +1932,7 @@ class CertificateItem(OrderItem):
         order_number = target_cert.order_id
         # send billing an email so they can handle refunding
         subject = _("[Refund] User-Requested Refund")
-        message = u"User {user} ({user_email}) has requested a refund on Order #{order_number}.".format(user=course_enrollment.user,
+        message = "User {user} ({user_email}) has requested a refund on Order #{order_number}.".format(user=course_enrollment.user,
                                                                                                         user_email=course_enrollment.user.email,
                                                                                                         order_number=order_number)
         to_email = [settings.PAYMENT_SUPPORT_EMAIL]
@@ -1941,7 +1941,7 @@ class CertificateItem(OrderItem):
             send_mail(subject, message, from_email, to_email, fail_silently=False)
         except Exception as exception:  # pylint: disable=broad-except
             err_str = ('Failed sending email to billing to request a refund for verified certificate'
-                       u' (User {user}, Course {course}, CourseEnrollmentID {ce_id}, Order #{order})\n{exception}')
+                       ' (User {user}, Course {course}, CourseEnrollmentID {ce_id}, Order #{order})\n{exception}')
             log.error(err_str.format(
                 user=course_enrollment.user,
                 course=course_enrollment.course_id,
@@ -1981,10 +1981,10 @@ class CertificateItem(OrderItem):
         if mode in valid_modes:
             mode_info = valid_modes[mode]
         else:
-            msg = u"Mode {mode} does not exist for {course_id}".format(mode=mode, course_id=course_id)
+            msg = "Mode {mode} does not exist for {course_id}".format(mode=mode, course_id=course_id)
             log.error(msg)
             raise InvalidCartItem(
-                _(u"Mode {mode} does not exist for {course_id}").format(mode=mode, course_id=course_id)
+                _("Mode {mode} does not exist for {course_id}").format(mode=mode, course_id=course_id)
             )
 
         item, _created = cls.objects.get_or_create(
@@ -2002,7 +2002,7 @@ class CertificateItem(OrderItem):
         # Translators: In this particular case, mode_name refers to a
         # particular mode (i.e. Honor Code Certificate, Verified Certificate, etc)
         # by which a user could enroll in the given course.
-        item.line_desc = _(u"{mode_name} for course {course}").format(
+        item.line_desc = _("{mode_name} for course {course}").format(
             mode_name=mode_info.name,
             course=course_name
         )
@@ -2033,11 +2033,11 @@ class CertificateItem(OrderItem):
 
         if is_enrollment_mode_verified:
             domain = configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME)
-            path = reverse('verify_student_verify_now', kwargs={'course_id': unicode(self.course_id)})
+            path = reverse('verify_student_verify_now', kwargs={'course_id': str(self.course_id)})
             verification_url = "http://{domain}{path}".format(domain=domain, path=path)
 
             verification_reminder = _(
-                u"If you haven't verified your identity yet, please start the verification process ({verification_url})."
+                "If you haven't verified your identity yet, please start the verification process ({verification_url})."
             ).format(verification_url=verification_url)
 
         if is_professional_mode_verified:
@@ -2045,10 +2045,10 @@ class CertificateItem(OrderItem):
                                     "course start date. ")
 
         refund_reminder = _(
-            u"{refund_reminder_msg}"
-            u"To receive your refund, contact {billing_email}. "
-            u"Please include your order number in your email. "
-            u"Please do NOT include your credit card information."
+            "{refund_reminder_msg}"
+            "To receive your refund, contact {billing_email}. "
+            "Please include your order number in your email. "
+            "Please do NOT include your credit card information."
         ).format(
             refund_reminder_msg=refund_reminder_msg,
             billing_email=settings.PAYMENT_SUPPORT_EMAIL
@@ -2056,7 +2056,7 @@ class CertificateItem(OrderItem):
 
         # Need this to be unicode in case the reminder strings
         # have been translated and contain non-ASCII unicode
-        return u"{verification_reminder} {refund_reminder}".format(
+        return "{verification_reminder} {refund_reminder}".format(
             verification_reminder=verification_reminder,
             refund_reminder=refund_reminder
         )
@@ -2107,10 +2107,10 @@ class CertificateItem(OrderItem):
         data = super(CertificateItem, self).analytics_data()
         sku = data['sku']
         if self.course_id != CourseKeyField.Empty:
-            data['name'] = unicode(self.course_id)
-            data['category'] = unicode(self.course_id.org)
+            data['name'] = str(self.course_id)
+            data['category'] = str(self.course_id.org)
         if self.mode:
-            data['sku'] = sku + u'.' + unicode(self.mode)
+            data['sku'] = sku + '.' + str(self.mode)
         return data
 
 
@@ -2228,9 +2228,9 @@ class Donation(OrderItem):
 
         """
         return _(
-            u"We greatly appreciate this generous contribution and your support of the {platform_name} mission.  "
-            u"This receipt was prepared to support charitable contributions for tax purposes.  "
-            u"We confirm that neither goods nor services were provided in exchange for this gift."
+            "We greatly appreciate this generous contribution and your support of the {platform_name} mission.  "
+            "This receipt was prepared to support charitable contributions for tax purposes.  "
+            "We confirm that neither goods nor services were provided in exchange for this gift."
         ).format(platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME))
 
     @classmethod
@@ -2254,17 +2254,17 @@ class Donation(OrderItem):
         if course_id is not None:
             course = modulestore().get_course(course_id)
             if course is None:
-                msg = u"Could not find a course with the ID '{course_id}'".format(course_id=course_id)
+                msg = "Could not find a course with the ID '{course_id}'".format(course_id=course_id)
                 log.error(msg)
                 raise CourseDoesNotExistException(
-                    _(u"Could not find a course with the ID '{course_id}'").format(course_id=course_id)
+                    _("Could not find a course with the ID '{course_id}'").format(course_id=course_id)
                 )
 
-            return _(u"Donation for {course}").format(course=course.display_name)
+            return _("Donation for {course}").format(course=course.display_name)
 
         # The donation is for the organization as a whole, not a specific course
         else:
-            return _(u"Donation for {platform_name}").format(
+            return _("Donation for {platform_name}").format(
                 platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
             )
 
@@ -2288,8 +2288,8 @@ class Donation(OrderItem):
         """
         data = super(Donation, self).analytics_data()
         if self.course_id != CourseKeyField.Empty:
-            data['name'] = unicode(self.course_id)
-            data['category'] = unicode(self.course_id.org)
+            data['name'] = str(self.course_id)
+            data['category'] = str(self.course_id.org)
         else:
             data['name'] = configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
             data['category'] = configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)

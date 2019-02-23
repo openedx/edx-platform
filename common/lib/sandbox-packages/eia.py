@@ -7,7 +7,7 @@ values in parameterized problems. For details, see:
 
 http://en.wikipedia.org/wiki/Electronic_color_code
 """
-from __future__ import print_function
+
 
 # pylint: disable=invalid-name
 # r is standard name for a resistor. We would like to use it as such.

@@ -224,7 +224,7 @@ def send_beta_role_email(action, user, email_params):
         email_params['email_address'] = user.email
         email_params['full_name'] = user.profile.name
     else:
-        raise ValueError(u"Unexpected action received '{}' - expected 'add' or 'remove'".format(action))
+        raise ValueError("Unexpected action received '{}' - expected 'add' or 'remove'".format(action))
     trying_to_add_inactive_user = not user.is_active and action == 'add'
     if not trying_to_add_inactive_user:
         send_mail_to_student(user.email, email_params, language=get_user_email_language(user))
@@ -268,14 +268,14 @@ def reset_student_attempts(course_id, student, module_state_key, requesting_user
                 with disconnect_submissions_signal_receiver(score_set):
                     clear_student_state(
                         user_id=user_id,
-                        course_id=unicode(course_id),
-                        item_id=unicode(module_state_key),
+                        course_id=str(course_id),
+                        item_id=str(module_state_key),
                         requesting_user_id=requesting_user_id
                     )
                 submission_cleared = True
     except ItemNotFoundError:
         block = None
-        log.warning(u"Could not find %s in modulestore when attempting to reset attempts.", module_state_key)
+        log.warning("Could not find %s in modulestore when attempting to reset attempts.", module_state_key)
 
     # Reset the student's score in the submissions API, if xblock.clear_student_state has not done so already.
     # We need to do this before retrieving the `StudentModule` model, because a score may exist with no student module.
@@ -300,14 +300,14 @@ def reset_student_attempts(course_id, student, module_state_key, requesting_user
         create_new_event_transaction_id()
         set_event_transaction_type(STATE_DELETED_EVENT_TYPE)
         tracker.emit(
-            unicode(STATE_DELETED_EVENT_TYPE),
+            str(STATE_DELETED_EVENT_TYPE),
             {
-                'user_id': unicode(student.id),
-                'course_id': unicode(course_id),
-                'problem_id': unicode(module_state_key),
-                'instructor_id': unicode(requesting_user.id),
-                'event_transaction_id': unicode(get_event_transaction_id()),
-                'event_transaction_type': unicode(STATE_DELETED_EVENT_TYPE),
+                'user_id': str(student.id),
+                'course_id': str(course_id),
+                'problem_id': str(module_state_key),
+                'instructor_id': str(requesting_user.id),
+                'event_transaction_id': str(get_event_transaction_id()),
+                'event_transaction_type': str(STATE_DELETED_EVENT_TYPE),
             }
         )
         if not submission_cleared:
@@ -357,8 +357,8 @@ def _fire_score_changed_for_block(
                 raw_possible=max_score,
                 weight=getattr(block, 'weight', None),
                 user_id=student.id,
-                course_id=unicode(course_id),
-                usage_id=unicode(module_state_key),
+                course_id=str(course_id),
+                usage_id=str(module_state_key),
                 score_deleted=True,
                 only_if_higher=False,
                 modified=datetime.now().replace(tzinfo=pytz.UTC),
@@ -384,12 +384,12 @@ def get_email_params(course, auto_enroll, secure=True, course_key=None, display_
     )
     # TODO: Use request.build_absolute_uri rather than '{proto}://{site}{path}'.format
     # and check with the Services team that this works well with microsites
-    registration_url = u'{proto}://{site}{path}'.format(
+    registration_url = '{proto}://{site}{path}'.format(
         proto=protocol,
         site=stripped_site_name,
         path=reverse('register_user')
     )
-    course_url = u'{proto}://{site}{path}'.format(
+    course_url = '{proto}://{site}{path}'.format(
         proto=protocol,
         site=stripped_site_name,
         path=reverse('course_root', kwargs={'course_id': course_key})
@@ -398,7 +398,7 @@ def get_email_params(course, auto_enroll, secure=True, course_key=None, display_
     # We can't get the url to the course's About page if the marketing site is enabled.
     course_about_url = None
     if not settings.FEATURES.get('ENABLE_MKTG_SITE', False):
-        course_about_url = u'{proto}://{site}{path}'.format(
+        course_about_url = '{proto}://{site}{path}'.format(
             proto=protocol,
             site=stripped_site_name,
             path=reverse('about_course', kwargs={'course_id': course_key})

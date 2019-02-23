@@ -55,24 +55,24 @@ class StudioHelpTest(StudioCourseTest):
         click_studio_help(page)
         links = studio_help_links(page)
         expected_links = [{
-            'href': u'http://docs.edx.org/',
-            'text': u'edX Documentation',
-            'sr_text': u'Access documentation on http://docs.edx.org'
+            'href': 'http://docs.edx.org/',
+            'text': 'edX Documentation',
+            'sr_text': 'Access documentation on http://docs.edx.org'
         }, {
-            'href': u'https://open.edx.org/',
-            'text': u'Open edX Portal',
-            'sr_text': u'Access the Open edX Portal'
+            'href': 'https://open.edx.org/',
+            'text': 'Open edX Portal',
+            'sr_text': 'Access the Open edX Portal'
         }, {
-            'href': u'https://www.edx.org/course/overview-creating-edx-course-edx-edx101#.VO4eaLPF-n1',
-            'text': u'Enroll in edX101',
-            'sr_text': u'Enroll in edX101: Overview of Creating an edX Course'
+            'href': 'https://www.edx.org/course/overview-creating-edx-course-edx-edx101#.VO4eaLPF-n1',
+            'text': 'Enroll in edX101',
+            'sr_text': 'Enroll in edX101: Overview of Creating an edX Course'
         }, {
-            'href': u'https://www.edx.org/course/creating-course-edx-studio-edx-studiox',
-            'text': u'Enroll in StudioX',
-            'sr_text': u'Enroll in StudioX: Creating a Course with edX Studio'
+            'href': 'https://www.edx.org/course/creating-course-edx-studio-edx-studiox',
+            'text': 'Enroll in StudioX',
+            'sr_text': 'Enroll in StudioX: Creating a Course with edX Studio'
         }, {
-            'href': u'mailto:partner-support@example.com',
-            'text': u'Contact Us',
+            'href': 'mailto:partner-support@example.com',
+            'text': 'Contact Us',
             'sr_text': 'Send an email to partner-support@example.com'
         }]
         for expected, actual in zip(expected_links, links):
@@ -128,7 +128,7 @@ class HomeHelpTest(StudioCourseTest):
             test=self,
             page=self.home_page,
             href=expected_url,
-            help_text=u'Getting Started with Your Platform 𝓢𝓽𝓾𝓭𝓲𝓸',
+            help_text='Getting Started with Your Platform 𝓢𝓽𝓾𝓭𝓲𝓸',
             as_list_item=True
         )
 
@@ -181,7 +181,7 @@ class NewCourseHelpTest(AcceptanceTest):
             test=self,
             page=self.dashboard_page,
             href=expected_url,
-            help_text=u'Getting Started with Your Platform 𝓢𝓽𝓾𝓭𝓲𝓸',
+            help_text='Getting Started with Your Platform 𝓢𝓽𝓾𝓭𝓲𝓸',
             as_list_item=True
         )
 
@@ -234,7 +234,7 @@ class NewLibraryHelpTest(AcceptanceTest):
             test=self,
             page=self.dashboard_page,
             href=expected_url,
-            help_text=u'Getting Started with Your Platform 𝓢𝓽𝓾𝓭𝓲𝓸',
+            help_text='Getting Started with Your Platform 𝓢𝓽𝓾𝓭𝓲𝓸',
             as_list_item=True
         )
 
@@ -629,7 +629,7 @@ class StudioUnitHelpTest(ContainerBase):
         Also add a section with a subsection and a unit.
         """
         course_fixture.add_advanced_settings(
-            {u"advanced_modules": {"value": ["split_test"]}}
+            {"advanced_modules": {"value": ["split_test"]}}
         )
 
         course_fixture.add_children(
@@ -942,7 +942,7 @@ class GroupExperimentConfigurationHelpTest(ContainerBase):
         course.
         """
         course_fixture.add_advanced_settings(
-            {u"advanced_modules": {"value": ["split_test"]}}
+            {"advanced_modules": {"value": ["split_test"]}}
         )
 
     def test_course_group_configuration_experiment_side_bar_help(self):

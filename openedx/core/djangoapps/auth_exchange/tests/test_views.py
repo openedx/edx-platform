@@ -46,7 +46,7 @@ class AccessTokenExchangeViewTest(AccessTokenExchangeTestMixin):
         self.assertEqual(response["Content-Type"], "application/json")
         self.assertEqual(
             json.loads(response.content),
-            {u"error": expected_error, u"error_description": expected_error_description}
+            {"error": expected_error, "error_description": expected_error_description}
         )
 
     def _assert_success(self, data, expected_scopes):

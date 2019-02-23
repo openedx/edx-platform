@@ -36,7 +36,7 @@ from common.test.acceptance.tests.helpers import UniqueCourseTest, get_modal_ale
 from openedx.core.lib.tests import attr
 
 
-THREAD_CONTENT_WITH_LATEX = u"""Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
+THREAD_CONTENT_WITH_LATEX = """Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
                                ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
                                ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
                                reprehenderit in voluptate velit sse cillum dolore eu fugiat nulla pariatur.
@@ -123,7 +123,7 @@ class DiscussionResponsePaginationTestMixin(BaseDiscussionMixin):
             (
                 None if response_total == 0 else
                 "Showing all responses" if response_total == displayed_responses else
-                u"Showing first {} responses".format(displayed_responses)
+                "Showing first {} responses".format(displayed_responses)
             )
         )
         self.assertEqual(
@@ -398,7 +398,7 @@ class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePa
         # Update course advance settings with a valid blackout period.
         self.course_fixture.add_advanced_settings(
             {
-                u"discussion_blackouts": {
+                "discussion_blackouts": {
                     "value": [
                         [
                             (now - datetime.timedelta(days=14)).isoformat(),
@@ -648,10 +648,10 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         page.submit_response_edit(response_id, description)
 
         expected_response_html = (
-            u'<p><a href="{}">{}</a></p>'.format(url, description)
+            '<p><a href="{}">{}</a></p>'.format(url, description)
         )
         actual_response_html = page.q(
-            css=u".response_{} .response-body".format(response_id)
+            css=".response_{} .response-body".format(response_id)
         ).html[0]
         self.assertEqual(expected_response_html, actual_response_html)
 
@@ -682,10 +682,10 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         page.submit_response_edit(response_id, '')
 
         expected_response_html = (
-            u'<p><img src="{}" alt="{}" title=""></p>'.format(url, description)
+            '<p><img src="{}" alt="{}" title=""></p>'.format(url, description)
         )
         actual_response_html = page.q(
-            css=u".response_{} .response-body".format(response_id)
+            css=".response_{} .response-body".format(response_id)
         ).html[0]
         self.assertEqual(expected_response_html, actual_response_html)
 
@@ -737,11 +737,11 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         page.submit_response_edit(response_id, "Some content")
 
         expected_response_html = (
-            u'<p>Some content<img src="{}" alt="{}" title=""></p>'.format(
+            '<p>Some content<img src="{}" alt="{}" title=""></p>'.format(
                 url, description)
         )
         actual_response_html = page.q(
-            css=u".response_{} .response-body".format(response_id)
+            css=".response_{} .response-body".format(response_id)
         ).html[0]
         self.assertEqual(expected_response_html, actual_response_html)
 
@@ -1027,9 +1027,9 @@ class DiscussionEditorPreviewTest(UniqueCourseTest):
         appear in the preview box
         """
         self.page.set_new_post_editor_value(
-            ur'\begin{equation}'
-            ur'\tau_g(\omega) = - \frac{d}{d\omega}\phi(\omega) \hspace{2em} (1) '
-            ur'\end{equation}'
+            r'\begin{equation}'
+            r'\tau_g(\omega) = - \frac{d}{d\omega}\phi(\omega) \hspace{2em} (1) '
+            r'\end{equation}'
         )
         self.assertIsNotNone(self.page.get_new_post_preview_text())
         self.page.click_element(".cancel")
@@ -1184,7 +1184,7 @@ class InlineDiscussionTest(UniqueCourseTest):
         now = datetime.datetime.now(UTC)
         self.course_fix.add_advanced_settings(
             {
-                u"discussion_blackouts": {
+                "discussion_blackouts": {
                     "value": [
                         [
                             (now - datetime.timedelta(days=14)).isoformat(),
@@ -1302,7 +1302,7 @@ class DiscussionUserProfileTest(UniqueCourseTest):
             self.PROFILED_USERNAME
         )
         page.visit()
-        self.assertEqual(page.get_user_roles(), u'Student')
+        self.assertEqual(page.get_user_roles(), 'Student')
 
 
 class DiscussionSearchAlertTest(UniqueCourseTest):

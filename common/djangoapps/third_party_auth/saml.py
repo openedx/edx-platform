@@ -155,7 +155,7 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
             for expected in idp.conf['requiredEntitlements']:
                 if expected not in entitlements:
                     log.warning(
-                        u"SAML user from IdP %s rejected due to missing eduPersonEntitlement %s", idp.name, expected)
+                        "SAML user from IdP %s rejected due to missing eduPersonEntitlement %s", idp.name, expected)
                     raise AuthForbidden(self)
 
     def _create_saml_auth(self, idp):
@@ -177,7 +177,7 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
                 def wrapped_method(*args, **kwargs):
                     """ Wrapped login or process_response method """
                     result = method(*args, **kwargs)
-                    log.info(u"SAML login %s for IdP %s. XML is:\n%s", action_description, idp.name, xml_getter())
+                    log.info("SAML login %s for IdP %s. XML is:\n%s", action_description, idp.name, xml_getter())
                     return result
                 setattr(auth_inst, method_name, wrapped_method)
 
@@ -280,13 +280,13 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
         """
         field_mapping = self.field_mappings
         value_defaults = self.conf.get('attr_defaults', {})
-        value_defaults = {key: value_defaults.get(value, '') for key, value in self.defaults_value_mapping.items()}
+        value_defaults = {key: value_defaults.get(value, '') for key, value in list(self.defaults_value_mapping.items())}
         registration_fields = {
             edx_name: response['d'].get(odata_name, value_defaults.get(odata_name, ''))
-            for odata_name, edx_name in field_mapping.items()
+            for odata_name, edx_name in list(field_mapping.items())
         }
         value_mapping = self.value_mappings
-        for field, value in registration_fields.items():
+        for field, value in list(registration_fields.items()):
             if field in value_mapping and value in value_mapping[field]:
                 registration_fields[field] = value_mapping[field][value]
         return registration_fields
@@ -312,7 +312,7 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
         """
         overrides = self.conf.get('sapsf_value_mappings', {})
         base = deepcopy(self.default_value_mapping)
-        for field, override in overrides.items():
+        for field, override in list(overrides.items()):
             if field in base:
                 base[field].update(override)
             else:
@@ -363,8 +363,8 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
         if not all(var in self.conf for var in self.required_variables):
             missing = [var for var in self.required_variables if var not in self.conf]
             log.warning(
-                u"To retrieve rich user data for an SAP SuccessFactors identity provider, the following keys in "
-                u"'other_settings' are required, but were missing: %s",
+                "To retrieve rich user data for an SAP SuccessFactors identity provider, the following keys in "
+                "'other_settings' are required, but were missing: %s",
                 missing
             )
             return missing
@@ -381,14 +381,14 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
         token_data = transaction_data.get('token_data')
         token_data = token_data if token_data else 'Not available'
         log_msg_template = (
-            u'SAPSuccessFactors exception received for {operation_name} request.  ' +
-            u'URL: {url}  ' +
-            u'Company ID: {company_id}.  ' +
-            u'User ID: {user_id}.  ' +
-            u'Error message: {err_msg}.  ' +
-            u'System message: {sys_msg}.  ' +
-            u'Headers: {headers}.  ' +
-            u'Token Data: {token_data}.'
+            'SAPSuccessFactors exception received for {operation_name} request.  ' +
+            'URL: {url}  ' +
+            'Company ID: {company_id}.  ' +
+            'User ID: {user_id}.  ' +
+            'Error message: {err_msg}.  ' +
+            'System message: {sys_msg}.  ' +
+            'Headers: {headers}.  ' +
+            'Token Data: {token_data}.'
         )
         log_msg = log_msg_template.format(
             operation_name=transaction_data['operation_name'],
@@ -469,7 +469,7 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
         if not access_token_data:
             return None
         token_string = access_token_data['access_token']
-        session.headers.update({'Authorization': u'Bearer {}'.format(token_string), 'Accept': 'application/json'})
+        session.headers.update({'Authorization': 'Bearer {}'.format(token_string), 'Accept': 'application/json'})
         session.token_data = access_token_data
         return session
 
@@ -537,7 +537,7 @@ def get_saml_idp_class(idp_identifier_string):
     }
     if idp_identifier_string not in choices:
         log.error(
-            u'%s is not a valid EdXSAMLIdentityProvider subclass; using EdXSAMLIdentityProvider base class.',
+            '%s is not a valid EdXSAMLIdentityProvider subclass; using EdXSAMLIdentityProvider base class.',
             idp_identifier_string
         )
     return choices.get(idp_identifier_string, EdXSAMLIdentityProvider)

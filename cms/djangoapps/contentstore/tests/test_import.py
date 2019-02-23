@@ -3,7 +3,7 @@
 """
 Tests for import_course_from_xml using the mongo modulestore.
 """
-from __future__ import print_function
+
 
 import copy
 from uuid import uuid4
@@ -96,7 +96,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         # Test with the split modulestore because store.has_course fails in old mongo with unicode characters.
         with modulestore().default_store(ModuleStoreEnum.Type.split):
             module_store = modulestore()
-            course_id = module_store.make_course_key(u'Юникода', u'unicode_course', u'échantillon')
+            course_id = module_store.make_course_key('Юникода', 'unicode_course', 'échantillon')
             import_course_from_xml(
                 module_store,
                 self.user.id,
@@ -110,7 +110,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
             self.assertIsNotNone(course)
 
             # test that course 'display_name' same as imported course 'display_name'
-            self.assertEqual(course.display_name, u"Φυσικά το όνομα Unicode")
+            self.assertEqual(course.display_name, "Φυσικά το όνομα Unicode")
 
     def test_static_import(self):
         '''
@@ -134,7 +134,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         self.assertIsNotNone(content)
 
         # make sure course.static_asset_path is correct
-        print(u"static_asset_path = {0}".format(course.static_asset_path))
+        print("static_asset_path = {0}".format(course.static_asset_path))
         self.assertEqual(course.static_asset_path, 'test_import_course')
 
     def test_asset_import_nostatic(self):
@@ -173,7 +173,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
 
     def test_tab_name_imports_correctly(self):
         _module_store, _content_store, course = self.load_test_import_course()
-        print(u"course tabs = {0}".format(course.tabs))
+        print("course tabs = {0}".format(course.tabs))
         self.assertEqual(course.tabs[2]['name'], 'Syllabus')
 
     def test_import_performance_mongo(self):
@@ -268,7 +268,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         self.assertIsNotNone(split_test_module)
 
         remapped_verticals = {
-            key: target_id.make_usage_key('vertical', value) for key, value in groups_to_verticals.iteritems()
+            key: target_id.make_usage_key('vertical', value) for key, value in groups_to_verticals.items()
         }
 
         self.assertEqual(remapped_verticals, split_test_module.group_id_to_child)

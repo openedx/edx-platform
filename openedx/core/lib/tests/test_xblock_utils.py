@@ -1,7 +1,7 @@
 """
 Tests for xblock_utils.py
 """
-from __future__ import absolute_import, unicode_literals
+
 
 import uuid
 
@@ -98,7 +98,7 @@ class TestXblockUtils(SharedModuleStoreTestCase):
         """
         Verify that new content is added and the resources are the same.
         """
-        fragment = self.create_fragment(u"<h1>Test!</h1>")
+        fragment = self.create_fragment("<h1>Test!</h1>")
         course = getattr(self, course_id)
         test_wrap_output = wrap_xblock(
             runtime_class='TestRuntime',
@@ -106,7 +106,7 @@ class TestXblockUtils(SharedModuleStoreTestCase):
             view='baseview',
             frag=fragment,
             context={"wrap_xblock_data": {"custom-attribute": "custom-value"}},
-            usage_id_serializer=lambda usage_id: quote_slashes(unicode(usage_id)),
+            usage_id_serializer=lambda usage_id: quote_slashes(str(usage_id)),
             request_token=uuid.uuid1().get_hex()
         )
         self.assertIsInstance(test_wrap_output, Fragment)
@@ -115,7 +115,7 @@ class TestXblockUtils(SharedModuleStoreTestCase):
         self.assertIn(data_usage_id, test_wrap_output.content)
         self.assertIn('<h1>Test!</h1>', test_wrap_output.content)
         self.assertIn('data-custom-attribute="custom-value"', test_wrap_output.content)
-        self.assertEqual(test_wrap_output.resources[0].data, u'body {background-color:red;}')
+        self.assertEqual(test_wrap_output.resources[0].data, 'body {background-color:red;}')
         self.assertEqual(test_wrap_output.resources[1].data, 'alert("Hi!");')
 
     @ddt.data('course_mongo', 'course_split')

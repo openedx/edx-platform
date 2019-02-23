@@ -207,7 +207,7 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase):
         if settings.ROOT_URLCONF == 'lms.urls':
             url_pattern = '/course/'
         else:
-            url_pattern = '/course/{}'.format(unicode(course_key))
+            url_pattern = '/course/{}'.format(str(course_key))
 
         self.assertTrue(response.url.endswith(url_pattern))
 

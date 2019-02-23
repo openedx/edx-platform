@@ -111,7 +111,7 @@ class MobileAPIMilestonesMixin(object):
             add_entrance_exam_milestone(self.course, self.entrance_exam)
 
             self.course.entrance_exam_minimum_score_pct = 0.50
-            self.course.entrance_exam_id = unicode(self.entrance_exam.location)
+            self.course.entrance_exam_id = str(self.entrance_exam.location)
             self.store.update_item(self.course, self.user.id)
 
     def _add_prerequisite_course(self):

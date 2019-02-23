@@ -210,7 +210,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
 
         self.update_masquerade(**masquerade_config)
 
-        course_home_url = reverse('openedx.course_experience.course_home', args=[unicode(self.course.id)])
+        course_home_url = reverse('openedx.course_experience.course_home', args=[str(self.course.id)])
         response = self.client.get(course_home_url, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertItemsEqual(response.redirect_chain, [])
@@ -227,7 +227,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         masquerade_url = reverse(
             'masquerade_update',
             kwargs={
-                'course_key_string': unicode(self.course.id),
+                'course_key_string': str(self.course.id),
             }
         )
         response = self.client.post(
@@ -275,7 +275,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
 
         self.update_masquerade(username='audit')
 
-        course_home_url = reverse('openedx.course_experience.course_home', args=[unicode(self.course.id)])
+        course_home_url = reverse('openedx.course_experience.course_home', args=[str(self.course.id)])
         response = self.client.get(course_home_url, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertItemsEqual(response.redirect_chain, [])
@@ -311,7 +311,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
 
         self.update_masquerade(username='audit')
 
-        course_home_url = reverse('openedx.course_experience.course_home', args=[unicode(self.course.id)])
+        course_home_url = reverse('openedx.course_experience.course_home', args=[str(self.course.id)])
         response = self.client.get(course_home_url, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertItemsEqual(response.redirect_chain, [])
@@ -362,7 +362,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
 
         self.update_masquerade(username=expired_staff.username)
 
-        course_home_url = reverse('openedx.course_experience.course_home', args=[unicode(self.course.id)])
+        course_home_url = reverse('openedx.course_experience.course_home', args=[str(self.course.id)])
         response = self.client.get(course_home_url, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertItemsEqual(response.redirect_chain, [])
@@ -411,7 +411,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
 
         self.update_masquerade(username=expired_staff.username)
 
-        course_home_url = reverse('openedx.course_experience.course_home', args=[unicode(self.course.id)])
+        course_home_url = reverse('openedx.course_experience.course_home', args=[str(self.course.id)])
         response = self.client.get(course_home_url, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertItemsEqual(response.redirect_chain, [])

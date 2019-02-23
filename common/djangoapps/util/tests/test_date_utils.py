@@ -123,14 +123,14 @@ class StrftimeLocalizedTest(unittest.TestCase):
         ("%Y", "2013"),
         ("%m/%d/%y", "02/14/13"),
         ("hello", "hello"),
-        (u'%Y년 %m월 %d일', u"2013년 02월 14일"),
+        ('%Y년 %m월 %d일', "2013년 02월 14일"),
         ("%a, %b %d, %Y", "Thu, Feb 14, 2013"),
         ("%I:%M:%S %p", "04:41:17 PM"),
         ("%A at %-I%P", "Thursday at 4pm"),
     )
     def test_usual_strftime_behavior(self, fmt_expected):
         (fmt, expected) = fmt_expected
-        dtime = datetime(2013, 02, 14, 16, 41, 17)
+        dtime = datetime(2013, 0o2, 14, 16, 41, 17)
         self.assertEqual(expected, strftime_localized(dtime, fmt))
         # strftime doesn't like Unicode, so do the work in UTF8.
         self.assertEqual(expected, dtime.strftime(fmt.encode('utf8')).decode('utf8'))
@@ -144,7 +144,7 @@ class StrftimeLocalizedTest(unittest.TestCase):
     )
     def test_shortcuts(self, fmt_expected):
         (fmt, expected) = fmt_expected
-        dtime = datetime(2013, 02, 14, 16, 41, 17)
+        dtime = datetime(2013, 0o2, 14, 16, 41, 17)
         self.assertEqual(expected, strftime_localized(dtime, fmt))
 
     @patch('util.date_utils.pgettext', fake_pgettext(translations={
@@ -163,7 +163,7 @@ class StrftimeLocalizedTest(unittest.TestCase):
     )
     def test_translated_words(self, fmt_expected):
         (fmt, expected) = fmt_expected
-        dtime = datetime(2013, 02, 14, 16, 41, 17)
+        dtime = datetime(2013, 0o2, 14, 16, 41, 17)
         self.assertEqual(expected, strftime_localized(dtime, fmt))
 
     @patch('util.date_utils.ugettext', fake_ugettext(translations={
@@ -183,7 +183,7 @@ class StrftimeLocalizedTest(unittest.TestCase):
     )
     def test_translated_formats(self, fmt_expected):
         (fmt, expected) = fmt_expected
-        dtime = datetime(2013, 02, 14, 16, 41, 17)
+        dtime = datetime(2013, 0o2, 14, 16, 41, 17)
         self.assertEqual(expected, strftime_localized(dtime, fmt))
 
     @patch('util.date_utils.ugettext', fake_ugettext(translations={
@@ -196,7 +196,7 @@ class StrftimeLocalizedTest(unittest.TestCase):
     )
     def test_recursion_protection(self, fmt_expected):
         (fmt, expected) = fmt_expected
-        dtime = datetime(2013, 02, 14, 16, 41, 17)
+        dtime = datetime(2013, 0o2, 14, 16, 41, 17)
         self.assertEqual(expected, strftime_localized(dtime, fmt))
 
     @ddt.data(
@@ -205,6 +205,6 @@ class StrftimeLocalizedTest(unittest.TestCase):
         "%Y/%m/%d%",
     )
     def test_invalid_format_strings(self, fmt):
-        dtime = datetime(2013, 02, 14, 16, 41, 17)
+        dtime = datetime(2013, 0o2, 14, 16, 41, 17)
         with self.assertRaises(ValueError):
             strftime_localized(dtime, fmt)

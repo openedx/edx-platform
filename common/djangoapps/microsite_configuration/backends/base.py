@@ -8,7 +8,7 @@ BaseMicrositeBackend is Base Class for microsite configuration backend.
 BaseMicrositeTemplateBackend is Base Class for the microsite template backend.
 """
 
-from __future__ import absolute_import
+
 
 import abc
 import os.path
@@ -20,11 +20,10 @@ from util.url import strip_port_from_host
 
 
 # pylint: disable=unused-argument
-class AbstractBaseMicrositeBackend(object):
+class AbstractBaseMicrositeBackend(object, metaclass=abc.ABCMeta):
     """
     Abstract Base Class for the microsite backends.
     """
-    __metaclass__ = abc.ABCMeta
 
     def __init__(self, **kwargs):
         pass
@@ -151,7 +150,7 @@ class BaseMicrositeBackend(AbstractBaseMicrositeBackend):
         if not self.has_configuration_set() or not domain:
             return
 
-        for key, value in settings.MICROSITE_CONFIGURATION.items():
+        for key, value in list(settings.MICROSITE_CONFIGURATION.items()):
             subdomain = value.get('domain_prefix')
             if subdomain and domain.startswith(subdomain):
                 self._set_microsite_config(key, subdomain, domain)
@@ -207,7 +206,7 @@ class BaseMicrositeBackend(AbstractBaseMicrositeBackend):
         """
         config = {}
 
-        for key, value in settings.MICROSITE_CONFIGURATION.iteritems():
+        for key, value in settings.MICROSITE_CONFIGURATION.items():
             config[key] = value
 
         return config
@@ -222,7 +221,7 @@ class BaseMicrositeBackend(AbstractBaseMicrositeBackend):
             return default
 
         # Filter at the setting file
-        for value in settings.MICROSITE_CONFIGURATION.itervalues():
+        for value in settings.MICROSITE_CONFIGURATION.values():
             org_filter = value.get('course_org_filter', None)
             if org_filter == org:
                 return value.get(val_name, default)
@@ -239,7 +238,7 @@ class BaseMicrositeBackend(AbstractBaseMicrositeBackend):
             return org_filter_set
 
         # Get the orgs in the db
-        for microsite in settings.MICROSITE_CONFIGURATION.itervalues():
+        for microsite in settings.MICROSITE_CONFIGURATION.values():
             org_filter = microsite.get('course_org_filter')
             if org_filter:
                 org_filter_set.add(org_filter)

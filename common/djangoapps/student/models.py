@@ -10,7 +10,7 @@ file and check it in at the same time as your model changes. To do that,
 2. ./manage.py lms schemamigration student --auto description_of_your_change
 3. Add the migration file created in edx-platform/common/djangoapps/student/migrations/
 """
-from __future__ import print_function
+
 import hashlib
 import json
 import logging
@@ -20,7 +20,7 @@ from collections import OrderedDict, defaultdict, namedtuple
 from datetime import datetime, timedelta
 from functools import total_ordering
 from importlib import import_module
-from urllib import urlencode
+from urllib.parse import urlencode
 
 from config_models.models import ConfigurationModel
 from django.apps import apps
@@ -384,8 +384,8 @@ class UserStanding(models.Model):
     ACCOUNT_DISABLED = "disabled"
     ACCOUNT_ENABLED = "enabled"
     USER_STANDING_CHOICES = (
-        (ACCOUNT_DISABLED, u"Account Disabled"),
-        (ACCOUNT_ENABLED, u"Account Enabled"),
+        (ACCOUNT_DISABLED, "Account Disabled"),
+        (ACCOUNT_ENABLED, "Account Enabled"),
     )
 
     user = models.OneToOneField(User, db_index=True, related_name='standing', on_delete=models.CASCADE)
@@ -419,7 +419,7 @@ class UserProfile(models.Model):
     .. pii_retirement: local_api
     """
     # cache key format e.g user.<user_id>.profile.country = 'SG'
-    PROFILE_COUNTRY_CACHE_KEY = u"user.{user_id}.profile.country"
+    PROFILE_COUNTRY_CACHE_KEY = "user.{user_id}.profile.country"
 
     class Meta(object):
         db_table = "auth_userprofile"
@@ -447,7 +447,7 @@ class UserProfile(models.Model):
 
     # Optional demographic data we started capturing from Fall 2012
     this_year = datetime.now(UTC).year
-    VALID_YEARS = range(this_year, this_year - 120, -1)
+    VALID_YEARS = list(range(this_year, this_year - 120, -1))
     year_of_birth = models.IntegerField(blank=True, null=True, db_index=True)
     GENDER_CHOICES = (
         ('m', ugettext_noop('Male')),
@@ -766,7 +766,7 @@ class Registration(models.Model):
         self.user.is_active = True
         self._track_activation()
         self.user.save()
-        log.info(u'User %s (%s) account is successfully activated.', self.user.username, self.user.email)
+        log.info('User %s (%s) account is successfully activated.', self.user.username, self.user.email)
 
     def _track_activation(self):
         """
@@ -1081,7 +1081,7 @@ class CourseEnrollment(models.Model):
 
     @course_id.setter
     def course_id(self, value):
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             self._course_id = CourseKey.from_string(value)
         else:
             self._course_id = value
@@ -1099,9 +1099,9 @@ class CourseEnrollment(models.Model):
     objects = CourseEnrollmentManager()
 
     # cache key format e.g enrollment.<username>.<course_key>.mode = 'honor'
-    COURSE_ENROLLMENT_CACHE_KEY = u"enrollment.{}.{}.mode"  # TODO Can this be removed?  It doesn't seem to be used.
+    COURSE_ENROLLMENT_CACHE_KEY = "enrollment.{}.{}.mode"  # TODO Can this be removed?  It doesn't seem to be used.
 
-    MODE_CACHE_NAMESPACE = u'CourseEnrollment.mode_and_active'
+    MODE_CACHE_NAMESPACE = 'CourseEnrollment.mode_and_active'
 
     class Meta(object):
         unique_together = (('user', 'course'),)
@@ -1314,7 +1314,7 @@ class CourseEnrollment(models.Model):
         except:  # pylint: disable=bare-except
             if event_name and self.course_id:
                 log.exception(
-                    u'Unable to emit event %s for user %s and course %s',
+                    'Unable to emit event %s for user %s and course %s',
                     event_name,
                     self.user.username,
                     self.course_id,
@@ -1364,13 +1364,13 @@ class CourseEnrollment(models.Model):
             # This is here to preserve legacy behavior which allowed enrollment in courses
             # announced before the start of content creation.
             if check_access:
-                log.warning(u"User %s failed to enroll in non-existent course %s", user.username, text_type(course_key))
+                log.warning("User %s failed to enroll in non-existent course %s", user.username, text_type(course_key))
                 raise NonExistentCourseError
 
         if check_access:
             if cls.is_enrollment_closed(user, course):
                 log.warning(
-                    u"User %s failed to enroll in course %s because enrollment is closed",
+                    "User %s failed to enroll in course %s because enrollment is closed",
                     user.username,
                     text_type(course_key)
                 )
@@ -1378,7 +1378,7 @@ class CourseEnrollment(models.Model):
 
             if cls.objects.is_course_full(course):
                 log.warning(
-                    u"Course %s has reached its maximum enrollment of %d learners. User %s failed to enroll.",
+                    "Course %s has reached its maximum enrollment of %d learners. User %s failed to enroll.",
                     text_type(course_key),
                     course.max_student_enrollments_allowed,
                     user.username,
@@ -1386,7 +1386,7 @@ class CourseEnrollment(models.Model):
                 raise CourseFullError
         if cls.is_enrolled(user, course_key):
             log.warning(
-                u"User %s attempted to enroll in %s, but they were already enrolled",
+                "User %s attempted to enroll in %s, but they were already enrolled",
                 user.username,
                 text_type(course_key)
             )
@@ -1433,7 +1433,7 @@ class CourseEnrollment(models.Model):
             user = User.objects.get(email=email)
             return cls.enroll(user, course_id, mode)
         except User.DoesNotExist:
-            err_msg = u"Tried to enroll email {} into course {}, but user not found"
+            err_msg = "Tried to enroll email {} into course {}, but user not found"
             log.error(err_msg.format(email, course_id))
             if ignore_errors:
                 return None
@@ -1459,7 +1459,7 @@ class CourseEnrollment(models.Model):
 
         except cls.DoesNotExist:
             log.error(
-                u"Tried to unenroll student %s from %s but they were not enrolled",
+                "Tried to unenroll student %s from %s but they were not enrolled",
                 user,
                 course_id
             )
@@ -1479,7 +1479,7 @@ class CourseEnrollment(models.Model):
             return cls.unenroll(user, course_id)
         except User.DoesNotExist:
             log.error(
-                u"Tried to unenroll email %s from course %s, but user not found",
+                "Tried to unenroll email %s from course %s, but user not found",
                 email,
                 course_id
             )
@@ -1703,7 +1703,7 @@ class CourseEnrollment(models.Model):
             # If there are multiple attributes then return the last one.
             enrollment_id = self.get_enrollment(self.user, self.course_id).id
             log.warning(
-                u"Multiple CourseEnrollmentAttributes found for user %s with enrollment-ID %s",
+                "Multiple CourseEnrollmentAttributes found for user %s with enrollment-ID %s",
                 self.user.id,
                 enrollment_id
             )
@@ -1715,20 +1715,20 @@ class CourseEnrollment(models.Model):
 
         except HttpClientError:
             log.warning(
-                u"Encountered HttpClientError while getting order details from ecommerce. "
-                u"Order={number} and user {user}".format(number=order_number, user=self.user.id))
+                "Encountered HttpClientError while getting order details from ecommerce. "
+                "Order={number} and user {user}".format(number=order_number, user=self.user.id))
             return None
 
         except HttpServerError:
             log.warning(
-                u"Encountered HttpServerError while getting order details from ecommerce. "
-                u"Order={number} and user {user}".format(number=order_number, user=self.user.id))
+                "Encountered HttpServerError while getting order details from ecommerce. "
+                "Order={number} and user {user}".format(number=order_number, user=self.user.id))
             return None
 
         except SlumberBaseException:
             log.warning(
-                u"Encountered an error while getting order details from ecommerce. "
-                u"Order={number} and user {user}".format(number=order_number, user=self.user.id))
+                "Encountered an error while getting order details from ecommerce. "
+                "Order={number} and user {user}".format(number=order_number, user=self.user.id))
             return None
 
         refund_window_start_date = max(
@@ -2299,9 +2299,9 @@ def create_comments_service_user(user):
 def log_successful_login(sender, request, user, **kwargs):  # pylint: disable=unused-argument
     """Handler to log when logins have occurred successfully."""
     if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
-        AUDIT_LOG.info(u"Login success - user.id: {0}".format(user.id))
+        AUDIT_LOG.info("Login success - user.id: {0}".format(user.id))
     else:
-        AUDIT_LOG.info(u"Login success - {0} ({1})".format(user.username, user.email))
+        AUDIT_LOG.info("Login success - {0} ({1})".format(user.username, user.email))
 
 
 @receiver(user_logged_out)
@@ -2309,9 +2309,9 @@ def log_successful_logout(sender, request, user, **kwargs):  # pylint: disable=u
     """Handler to log when logouts have occurred successfully."""
     if hasattr(request, 'user'):
         if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
-            AUDIT_LOG.info(u"Logout - user.id: {0}".format(request.user.id))  # pylint: disable=logging-format-interpolation
+            AUDIT_LOG.info("Logout - user.id: {0}".format(request.user.id))  # pylint: disable=logging-format-interpolation
         else:
-            AUDIT_LOG.info(u"Logout - {0}".format(request.user))  # pylint: disable=logging-format-interpolation
+            AUDIT_LOG.info("Logout - {0}".format(request.user))  # pylint: disable=logging-format-interpolation
 
 
 @receiver(user_logged_in)
@@ -2369,18 +2369,18 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
     """
 
     MODE_TO_CERT_NAME = {
-        "honor": _(u"{platform_name} Honor Code Certificate for {course_name}"),
-        "verified": _(u"{platform_name} Verified Certificate for {course_name}"),
-        "professional": _(u"{platform_name} Professional Certificate for {course_name}"),
+        "honor": _("{platform_name} Honor Code Certificate for {course_name}"),
+        "verified": _("{platform_name} Verified Certificate for {course_name}"),
+        "professional": _("{platform_name} Professional Certificate for {course_name}"),
         "no-id-professional": _(
-            u"{platform_name} Professional Certificate for {course_name}"
+            "{platform_name} Professional Certificate for {course_name}"
         ),
     }
 
     company_identifier = models.TextField(
         help_text=_(
-            u"The company identifier for the LinkedIn Add-to-Profile button "
-            u"e.g 0_0dPSPyS070e0HsE9HNz_13_d11_"
+            "The company identifier for the LinkedIn Add-to-Profile button "
+            "e.g 0_0dPSPyS070e0HsE9HNz_13_d11_"
         )
     )
 
@@ -2392,9 +2392,9 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
         default="",
         blank=True,
         help_text=_(
-            u"Short identifier for the LinkedIn partner used in the tracking code.  "
-            u"(Example: 'edx')  "
-            u"If no value is provided, tracking codes will not be sent to LinkedIn."
+            "Short identifier for the LinkedIn partner used in the tracking code.  "
+            "(Example: 'edx')  "
+            "If no value is provided, tracking codes will not be sent to LinkedIn."
         )
     )
 
@@ -2424,7 +2424,7 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
         if tracking_code is not None:
             params['trk'] = tracking_code
 
-        return u'http://www.linkedin.com/profile/add?{params}'.format(
+        return 'http://www.linkedin.com/profile/add?{params}'.format(
             params=urlencode(params)
         )
 
@@ -2441,7 +2441,7 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
         """
         default_cert_name = self.MODE_TO_CERT_NAME.get(
             cert_mode,
-            _(u"{platform_name} Certificate for {course_name}")
+            _("{platform_name} Certificate for {course_name}")
         )
         # Look for an override of the certificate name in the SOCIAL_SHARING_SETTINGS setting
         share_settings = configuration_helpers.get_value('SOCIAL_SHARING_SETTINGS', settings.SOCIAL_SHARING_SETTINGS)
@@ -2479,7 +2479,7 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
 
         """
         return (
-            u"{partner}-{course_key}_{cert_mode}-{target}".format(
+            "{partner}-{course_key}_{cert_mode}-{target}".format(
                 partner=self.trk_partner_name,
                 course_key=text_type(course_key),
                 cert_mode=cert_mode,
@@ -2618,7 +2618,7 @@ class CourseEnrollmentAttribute(models.Model):
 
     def __unicode__(self):
         """Unicode representation of the attribute. """
-        return u"{namespace}:{name}, {value}".format(
+        return "{namespace}:{name}, {value}".format(
             namespace=self.namespace,
             name=self.name,
             value=self.value,
@@ -2721,7 +2721,7 @@ class RegistrationCookieConfiguration(ConfigurationModel):
 
     def __unicode__(self):
         """Unicode representation of this config. """
-        return u"UTM: {utm_name}; AFFILIATE: {affiliate_name}".format(
+        return "UTM: {utm_name}; AFFILIATE: {affiliate_name}".format(
             utm_name=self.utm_cookie_name,
             affiliate_name=self.affiliate_cookie_name
         )
@@ -2744,7 +2744,7 @@ class UserAttribute(TimeStampedModel):
 
     def __unicode__(self):
         """Unicode representation of this attribute. """
-        return u"[{username}] {name}: {value}".format(
+        return "[{username}] {name}: {value}".format(
             name=self.name,
             value=self.value,
             username=self.user.username,
@@ -2782,7 +2782,7 @@ class LogoutViewConfiguration(ConfigurationModel):
         """
         Unicode representation of the instance.
         """
-        return u'Logout view configuration: {enabled}'.format(enabled=self.enabled)
+        return 'Logout view configuration: {enabled}'.format(enabled=self.enabled)
 
 
 class AccountRecoveryManager(models.Manager):

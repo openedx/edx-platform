@@ -4,10 +4,10 @@ Created on Jan 18, 2013
 
 @author: brian
 '''
-from __future__ import print_function
+
 import openid
 from openid.fetchers import HTTPFetcher, HTTPResponse
-from urlparse import parse_qs, urlparse
+from urllib.parse import parse_qs, urlparse
 
 from django.conf import settings
 from django.test import TestCase, LiveServerTestCase
@@ -100,7 +100,7 @@ class OpenIdProviderTest(TestCase):
             resp = self.client.post(url)
             code = 200
             self.assertEqual(resp.status_code, code,
-                             u"got code {0} for url '{1}'. Expected code {2}"
+                             "got code {0} for url '{1}'. Expected code {2}"
                              .format(resp.status_code, url, code))
 
     @skipUnless(settings.FEATURES.get('AUTH_USE_OPENID') and
@@ -129,7 +129,7 @@ class OpenIdProviderTest(TestCase):
             resp = self.client.post(url)
             code = 200
             self.assertEqual(resp.status_code, code,
-                             u"got code {0} for url '{1}'. Expected code {2}"
+                             "got code {0} for url '{1}'. Expected code {2}"
                              .format(resp.status_code, url, code))
             for expected_input in (
                     '<input name="openid.ns" type="hidden" value="http://specs.openid.net/auth/2.0" />',
@@ -216,7 +216,7 @@ class OpenIdProviderTest(TestCase):
 
         code = expected_code
         self.assertEqual(resp.status_code, code,
-                         u"got code {0} for url '{1}'. Expected code {2}"
+                         "got code {0} for url '{1}'. Expected code {2}"
                          .format(resp.status_code, url, code))
 
     @skipUnless(settings.FEATURES.get('AUTH_USE_OPENID') and
@@ -270,7 +270,7 @@ class OpenIdProviderTest(TestCase):
     def test_login_openid_handle_redirection(self):
         """ Test to see that we can handle login redirection properly"""
         response = self._send_bad_redirection_login()
-        self.assertEquals(response.status_code, 302)
+        self.assertEqual(response.status_code, 302)
 
     @skipUnless(settings.FEATURES.get('AUTH_USE_OPENID') and
                 settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'),
@@ -278,12 +278,12 @@ class OpenIdProviderTest(TestCase):
     def test_login_openid_handle_redirection_ratelimited(self):
         # try logging in 30 times, the default limit in the number of failed
         # log in attempts before the rate gets limited
-        for _ in xrange(30):
+        for _ in range(30):
             self._send_bad_redirection_login()
 
         response = self._send_bad_redirection_login()
         # verify that we are not returning the default 403
-        self.assertEquals(response.status_code, 302)
+        self.assertEqual(response.status_code, 302)
         # clear the ratelimit cache so that we don't fail other logins
         cache.clear()
 
@@ -314,26 +314,26 @@ class OpenIdProviderTest(TestCase):
     @skipUnless(
         settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'), 'OpenID not enabled')
     def test_provider_login_can_handle_unicode_email(self):
-        user = UserFactory(email=u"user.ąęł@gmail.com")
-        resp = self._attempt_login_and_perform_final_response(user, u"Jan ĄĘŁ")
+        user = UserFactory(email="user.ąęł@gmail.com")
+        resp = self._attempt_login_and_perform_final_response(user, "Jan ĄĘŁ")
         location = resp['Location']
         parsed_url = urlparse(location)
         parsed_qs = parse_qs(parsed_url.query)
-        self.assertEquals(parsed_qs['openid.ax.type.ext1'][0], 'http://axschema.org/contact/email')
-        self.assertEquals(parsed_qs['openid.ax.type.ext0'][0], 'http://axschema.org/namePerson')
-        self.assertEquals(parsed_qs['openid.ax.value.ext0.1'][0],
+        self.assertEqual(parsed_qs['openid.ax.type.ext1'][0], 'http://axschema.org/contact/email')
+        self.assertEqual(parsed_qs['openid.ax.type.ext0'][0], 'http://axschema.org/namePerson')
+        self.assertEqual(parsed_qs['openid.ax.value.ext0.1'][0],
                           user.profile.name.encode('utf-8'))
-        self.assertEquals(parsed_qs['openid.ax.value.ext1.1'][0],
+        self.assertEqual(parsed_qs['openid.ax.value.ext1.1'][0],
                           user.email.encode('utf-8'))  # pylint: disable=no-member
 
     @skipUnless(
         settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'), 'OpenID not enabled')
     def test_provider_login_can_handle_unicode_email_invalid_password(self):
-        user = UserFactory(email=u"user.ąęł@gmail.com")
+        user = UserFactory(email="user.ąęł@gmail.com")
         url = reverse('openid-provider-login')
 
         # login to the client so that we can persist session information
-        user.profile.name = u"Jan ĄĘ"
+        user.profile.name = "Jan ĄĘ"
         user.profile.save()
         # It is asssumed that user's password is test (default for UserFactory)
         self.client.login(username=user.username, password='test')
@@ -352,11 +352,11 @@ class OpenIdProviderTest(TestCase):
     @skipUnless(
         settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'), 'OpenID not enabled')
     def test_provider_login_can_handle_unicode_email_inactive_account(self):
-        user = UserFactory(email=u"user.ąęł@gmail.com", username=u"ąęół")
+        user = UserFactory(email="user.ąęł@gmail.com", username="ąęół")
         url = reverse('openid-provider-login')
 
         # login to the client so that we can persist session information
-        user.profile.name = u'Jan ĄĘ'
+        user.profile.name = 'Jan ĄĘ'
         user.profile.save()  # pylint: disable=no-member
         self.client.login(username=user.username, password='test')
         # login once to get the right session information
@@ -386,10 +386,10 @@ class OpenIdProviderTest(TestCase):
             # parse the url
             parsed_url = urlparse(location)
             parsed_qs = parse_qs(parsed_url.query)
-            self.assertEquals(parsed_qs['openid.ax.type.ext1'][0], 'http://axschema.org/contact/email')
-            self.assertEquals(parsed_qs['openid.ax.type.ext0'][0], 'http://axschema.org/namePerson')
-            self.assertEquals(parsed_qs['openid.ax.value.ext1.1'][0], user.email)
-            self.assertEquals(parsed_qs['openid.ax.value.ext0.1'][0], user.profile.name)
+            self.assertEqual(parsed_qs['openid.ax.type.ext1'][0], 'http://axschema.org/contact/email')
+            self.assertEqual(parsed_qs['openid.ax.type.ext0'][0], 'http://axschema.org/namePerson')
+            self.assertEqual(parsed_qs['openid.ax.value.ext1.1'][0], user.email)
+            self.assertEqual(parsed_qs['openid.ax.value.ext0.1'][0], user.profile.name)
 
     @skipUnless(settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'),
                 'OpenID not enabled')
@@ -411,7 +411,7 @@ class OpenIdProviderTest(TestCase):
 
             # call url again, this time with username and password
             resp = self.client.post(url, post_args)
-            self.assertEquals(resp.status_code, 302)
+            self.assertEqual(resp.status_code, 302)
             redirect_url = resp['Location']
             parsed_url = urlparse(redirect_url)
             query_params = parse_qs(parsed_url[4])
@@ -454,7 +454,7 @@ class OpenIdProviderLiveServerTest(LiveServerTestCase):
             resp = self.client.post(url)
             code = 200
             self.assertEqual(resp.status_code, code,
-                             u"got code {0} for url '{1}'. Expected code {2}"
+                             "got code {0} for url '{1}'. Expected code {2}"
                              .format(resp.status_code, url, code))
 
     @classmethod

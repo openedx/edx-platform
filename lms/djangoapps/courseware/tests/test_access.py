@@ -100,7 +100,7 @@ class CoachAccessTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
         )
         ccx.save()
 
-        ccx_locator = CCXLocator.from_course_locator(self.course.id, unicode(ccx.id))
+        ccx_locator = CCXLocator.from_course_locator(self.course.id, str(ccx.id))
         role = CourseCcxCoachRole(ccx_locator)
         role.add_users(self.coach)
         CourseEnrollment.enroll(self.coach, ccx_locator)
@@ -147,12 +147,12 @@ class CoachAccessTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
         CourseEnrollment.enroll(student, ccx_locator)
 
         # Test for access of a coach
-        resp = self.client.get(reverse('student_progress', args=[unicode(ccx_locator), student.id]))
+        resp = self.client.get(reverse('student_progress', args=[str(ccx_locator), student.id]))
         self.assertEqual(resp.status_code, 200)
 
         # Assert access of a student
         self.client.login(username=student.username, password='test')
-        resp = self.client.get(reverse('student_progress', args=[unicode(ccx_locator), self.coach.id]))
+        resp = self.client.get(reverse('student_progress', args=[str(ccx_locator), self.coach.id]))
         self.assertEqual(resp.status_code, 404)
 
 
@@ -404,7 +404,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
                 (self.course_staff, expected_staff),
                 (self.course_instructor, expected_instructor)
         ):
-            self.assertEquals(
+            self.assertEqual(
                 bool(access._has_access_error_desc(user, action, descriptor, self.course.id)),
                 expected_response
             )
@@ -591,7 +591,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
             org='test_org', number='788', run='test_run'
         )
 
-        pre_requisite_courses = [unicode(pre_requisite_course.id)]
+        pre_requisite_courses = [str(pre_requisite_course.id)]
         course = CourseFactory.create(
             org='test_org', number='786', run='test_run', pre_requisite_courses=pre_requisite_courses
         )
@@ -640,7 +640,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
             run='test_run',
         )
 
-        pre_requisite_courses = [unicode(pre_requisite_course.id)]
+        pre_requisite_courses = [str(pre_requisite_course.id)]
         course = CourseFactory.create(
             org='edX',
             course='1000',
@@ -656,7 +656,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         self.login(user.email, test_password)
         CourseEnrollmentFactory(user=user, course_id=course.id)
 
-        url = reverse('courseware', args=[unicode(course.id)])
+        url = reverse('courseware', args=[str(course.id)])
         response = self.client.get(url)
         self.assertRedirects(
             response,

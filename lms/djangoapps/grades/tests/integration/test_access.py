@@ -73,7 +73,7 @@ class GradesAccessIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreT
         self.student = self.request.user
         self.client.login(username=self.student.username, password="test")
         CourseEnrollment.enroll(self.student, self.course.id)
-        self.instructor = UserFactory.create(is_staff=True, username=u'test_instructor', password=u'test')
+        self.instructor = UserFactory.create(is_staff=True, username='test_instructor', password='test')
         self.refresh_course()
 
     def test_subsection_access_changed(self):

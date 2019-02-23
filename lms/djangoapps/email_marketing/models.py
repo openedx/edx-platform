@@ -165,5 +165,5 @@ class EmailMarketingConfiguration(ConfigurationModel):
     )
 
     def __unicode__(self):
-        return u"Email marketing configuration: New user list %s, Welcome template: %s" % \
+        return "Email marketing configuration: New user list %s, Welcome template: %s" % \
                (self.sailthru_new_user_list, self.sailthru_welcome_template)

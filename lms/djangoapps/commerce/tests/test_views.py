@@ -93,7 +93,7 @@ class ReceiptViewTests(UserMixin, ModuleStoreTestCase):
         else:
             expected_pattern = r"<title>(\s+)Payment Failed"
         response = self.post_to_receipt_page(post_data)
-        self.assertRegexpMatches(response.content, expected_pattern)
+        self.assertRegex(response.content, expected_pattern)
 
     @ddt.data('ACCEPT', 'REJECT', 'ERROR')
     def test_cybersource_decision(self, decision):
@@ -104,7 +104,7 @@ class ReceiptViewTests(UserMixin, ModuleStoreTestCase):
         post_data = {'decision': decision, 'reason_code': '200', 'signed_field_names': 'dummy'}
         expected_pattern = r"<title>(\s+)Receipt" if decision == 'ACCEPT' else r"<title>(\s+)Payment Failed"
         response = self.post_to_receipt_page(post_data)
-        self.assertRegexpMatches(response.content, expected_pattern)
+        self.assertRegex(response.content, expected_pattern)
 
     @ddt.data(True, False)
     @mock.patch('lms.djangoapps.commerce.views.is_user_payment_error')
@@ -121,7 +121,7 @@ class ReceiptViewTests(UserMixin, ModuleStoreTestCase):
 
         user_message = "There was a problem with this transaction"
         system_message = "A system error occurred while processing your payment"
-        self.assertRegexpMatches(response.content, user_message if is_user_message_expected else system_message)
+        self.assertRegex(response.content, user_message if is_user_message_expected else system_message)
         self.assertNotRegexpMatches(response.content, user_message if not is_user_message_expected else system_message)
 
     @with_comprehensive_theme("edx.org")

@@ -3,7 +3,7 @@ The Files and Uploads page for a course in Studio
 """
 
 import os
-import urllib
+import urllib.request, urllib.parse, urllib.error
 from path import Path
 
 from bok_choy.javascript import wait_for_js
@@ -37,7 +37,7 @@ class AssetIndexPageStudioFrontend(CoursePage):
             self.course_info['course_run'],
             deprecated=(default_store == 'draft')
         )
-        url = "/".join([BASE_URL, self.URL_PATH, urllib.quote_plus(unicode(course_key))])
+        url = "/".join([BASE_URL, self.URL_PATH, urllib.parse.quote_plus(str(course_key))])
         return url if url[-1] == '/' else url + '/'
 
     @wait_for_js
@@ -219,9 +219,9 @@ class AssetIndexPageStudioFrontend(CoursePage):
         """Delete the asset with the specified name."""
         names = self.asset_files_names
         if name not in names:
-            raise LookupError(u'Asset with filename {} not found.'.format(name))
+            raise LookupError('Asset with filename {} not found.'.format(name))
         delete_buttons = self.asset_delete_buttons
-        assets = dict(zip(names, delete_buttons))
+        assets = dict(list(zip(names, delete_buttons)))
         # Now click the link in that row
         assets.get(name).click()
         self.confirm_asset_deletion()

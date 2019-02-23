@@ -5,7 +5,7 @@ Unit tests for the API module
 import datetime
 import mock
 import pytz
-import urlparse
+import urllib.parse
 
 from opaque_keys.edx.keys import CourseKey
 from student.tests.factories import AdminFactory
@@ -58,18 +58,18 @@ class APIsTestCase(SharedModuleStoreTestCase):
         )
 
         cls.chapters = [
-            ItemFactory.create(start=start, parent=course) for _ in xrange(2)
+            ItemFactory.create(start=start, parent=course) for _ in range(2)
         ]
         cls.sequentials = flatten([
             [
-                ItemFactory.create(parent=chapter) for _ in xrange(2)
+                ItemFactory.create(parent=chapter) for _ in range(2)
             ] for chapter in cls.chapters
         ])
         cls.verticals = flatten([
             [
                 ItemFactory.create(
-                    start=start, due=due, parent=sequential, graded=True, format='Homework', category=u'vertical'
-                ) for _ in xrange(2)
+                    start=start, due=due, parent=sequential, graded=True, format='Homework', category='vertical'
+                ) for _ in range(2)
             ] for sequential in cls.sequentials
         ])
 
@@ -78,7 +78,7 @@ class APIsTestCase(SharedModuleStoreTestCase):
         with cls.store.bulk_operations(course.id, emit_signals=False):
             blocks = flatten([  # pylint: disable=unused-variable
                 [
-                    ItemFactory.create(parent=vertical) for _ in xrange(2)
+                    ItemFactory.create(parent=vertical) for _ in range(2)
                 ] for vertical in cls.verticals
             ])
 
@@ -167,7 +167,7 @@ class APIsTestCase(SharedModuleStoreTestCase):
         self.assertEqual(k_args, tuple())
         self.assertEqual(
             k_kwargs.get('url'),
-            urlparse.urljoin(self.course.ccx_connector, ccxconapi.CCXCON_COURSEXS_URL)
+            urllib.parse.urljoin(self.course.ccx_connector, ccxconapi.CCXCON_COURSEXS_URL)
         )
 
         # second call with different status code
@@ -182,7 +182,7 @@ class APIsTestCase(SharedModuleStoreTestCase):
         self.assertEqual(k_args, tuple())
         self.assertEqual(
             k_kwargs.get('url'),
-            urlparse.urljoin(self.course.ccx_connector, ccxconapi.CCXCON_COURSEXS_URL)
+            urllib.parse.urljoin(self.course.ccx_connector, ccxconapi.CCXCON_COURSEXS_URL)
         )
 
     @mock.patch('requests_oauthlib.oauth2_session.OAuth2Session.fetch_token', fetch_token_mock)

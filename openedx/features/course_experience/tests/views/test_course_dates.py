@@ -32,7 +32,7 @@ class TestCourseDatesFragmentView(ModuleStoreTestCase):
         self.dates_fragment_url = reverse(
             'openedx.course_experience.mobile_dates_fragment_view',
             kwargs={
-                'course_id': unicode(self.course.id)
+                'course_id': str(self.course.id)
             }
         )
 

@@ -5,4 +5,4 @@ from openedx.core.djangoapps.schedules.tasks import ScheduleCourseUpdate
 class Command(SendEmailBaseCommand):
     async_send_task = ScheduleCourseUpdate
     log_prefix = 'Course Update'
-    offsets = xrange(-7, -77, -7)
+    offsets = range(-7, -77, -7)

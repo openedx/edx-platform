@@ -13,13 +13,13 @@ import base64
 import hashlib
 import os
 import textwrap
-import urllib
+import urllib.request, urllib.parse, urllib.error
 from uuid import uuid4
 import mock
 import oauthlib.oauth1
 import requests
 from openedx.core.djangolib.markup import HTML
-from http import StubHttpRequestHandler, StubHttpService
+from .http import StubHttpRequestHandler, StubHttpService
 from oauthlib.oauth1.rfc5849 import parameters, signature
 
 import logging
@@ -66,7 +66,7 @@ class StubLtiHandler(StubHttpRequestHandler):
             self.send_response(200, content)
         # Respond to request with correct lti endpoint
         elif self._is_correct_lti_request():
-            params = {k: v for k, v in self.post_dict.items() if k != 'oauth_signature'}
+            params = {k: v for k, v in list(self.post_dict.items()) if k != 'oauth_signature'}
             if self._check_oauth_signature(params, self.post_dict.get('oauth_signature', "")):
                 status_message = "This is LTI tool. Success."
                 # Set data for grades what need to be stored as server data
@@ -233,7 +233,7 @@ class StubLtiHandler(StubHttpRequestHandler):
 
         # Currently LTI module doublequotes the lis_result_sourcedid parameter.
         # Unquote response two times.
-        return urllib.unquote(urllib.unquote(response_str))
+        return urllib.parse.unquote(urllib.parse.unquote(response_str))
 
     def _is_correct_lti_request(self):
         """
@@ -242,15 +242,15 @@ class StubLtiHandler(StubHttpRequestHandler):
         lti_endpoint = self.server.config.get('lti_endpoint', self.DEFAULT_LTI_ENDPOINT)
         return lti_endpoint in self.path
 
-    def _oauth_sign(self, url, body, content_type=u'application/x-www-form-urlencoded', method=u'POST'):
+    def _oauth_sign(self, url, body, content_type='application/x-www-form-urlencoded', method='POST'):
         """
         Signs request and returns signed Authorization header.
         """
         client_key = self.server.config.get('client_key', self.DEFAULT_CLIENT_KEY)
         client_secret = self.server.config.get('client_secret', self.DEFAULT_CLIENT_SECRET)
         client = oauthlib.oauth1.Client(
-            client_key=unicode(client_key),
-            client_secret=unicode(client_secret)
+            client_key=str(client_key),
+            client_secret=str(client_secret)
         )
         headers = {
             # This is needed for body encoding:
@@ -260,19 +260,19 @@ class StubLtiHandler(StubHttpRequestHandler):
         # Calculate and encode body hash. See http://oauth.googlecode.com/svn/spec/ext/body_hash/1.0/oauth-bodyhash.html
         sha1 = hashlib.sha1()
         sha1.update(body)
-        oauth_body_hash = unicode(base64.b64encode(sha1.digest()))
+        oauth_body_hash = str(base64.b64encode(sha1.digest()))
         mock_request = mock.Mock(
-            uri=unicode(urllib.unquote(url)),
+            uri=str(urllib.parse.unquote(url)),
             headers=headers,
-            body=u"",
-            decoded_body=u"",
-            http_method=unicode(method),
+            body="",
+            decoded_body="",
+            http_method=str(method),
         )
         params = client.get_oauth_params(mock_request)
         mock_request.oauth_params = params
-        mock_request.oauth_params.append((u'oauth_body_hash', oauth_body_hash))
+        mock_request.oauth_params.append(('oauth_body_hash', oauth_body_hash))
         sig = client.get_oauth_signature(mock_request)
-        mock_request.oauth_params.append((u'oauth_signature', sig))
+        mock_request.oauth_params.append(('oauth_signature', sig))
         new_headers = parameters.prepare_headers(mock_request.oauth_params, headers, realm=None)
         return new_headers['Authorization']
 
@@ -292,17 +292,17 @@ class StubLtiHandler(StubHttpRequestHandler):
         Returns `True` if signatures are correct, otherwise `False`.
 
         """
-        client_secret = unicode(self.server.config.get('client_secret', self.DEFAULT_CLIENT_SECRET))
+        client_secret = str(self.server.config.get('client_secret', self.DEFAULT_CLIENT_SECRET))
         host = os.environ.get('BOK_CHOY_HOSTNAME', '127.0.0.1')
         port = self.server.server_address[1]
         lti_base = self.DEFAULT_LTI_ADDRESS.format(host=host, port=port)
         lti_endpoint = self.server.config.get('lti_endpoint', self.DEFAULT_LTI_ENDPOINT)
         url = lti_base + lti_endpoint
         request = mock.Mock()
-        request.params = [(unicode(k), unicode(v)) for k, v in params.items()]
-        request.uri = unicode(url)
-        request.http_method = u'POST'
-        request.signature = unicode(client_signature)
+        request.params = [(str(k), str(v)) for k, v in list(params.items())]
+        request.uri = str(url)
+        request.http_method = 'POST'
+        request.signature = str(client_signature)
         return signature.verify_hmac_sha1(request, client_secret)
 
 

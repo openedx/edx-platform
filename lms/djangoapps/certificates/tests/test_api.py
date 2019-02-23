@@ -476,7 +476,7 @@ class CertificateGetTests(SharedModuleStoreTestCase):
             'certificates:html_view',
             kwargs={
                 "user_id": str(self.student.id),
-                "course_id": unicode(self.web_cert_course.id),
+                "course_id": str(self.web_cert_course.id),
             }
         )
 
@@ -546,7 +546,7 @@ class GenerateUserCertificatesTest(EventTestMixin, WebCertificateTestMixin, Modu
         self.assert_event_emitted(
             'edx.certificate.created',
             user_id=self.student.id,
-            course_id=unicode(self.course.id),
+            course_id=str(self.course.id),
             certificate_url=certs_api.get_certificate_url(self.student.id, self.course.id),
             certificate_id=cert.verify_uuid,
             enrollment_mode=cert.mode,
@@ -637,7 +637,7 @@ class CertificateGenerationEnabledTest(EventTestMixin, TestCase):
             event_name = '.'.join(['edx', 'certificate', 'generation', cert_event_type])
             self.assert_event_emitted(
                 event_name,
-                course_id=unicode(self.COURSE_KEY),
+                course_id=str(self.COURSE_KEY),
             )
 
         self._assert_enabled_for_course(self.COURSE_KEY, expect_enabled)
@@ -776,7 +776,7 @@ class CertificatesBrandingTest(TestCase):
 
         # Make sure there are not unexpected keys in dict returned by 'get_certificate_header_context'
         self.assertItemsEqual(
-            data.keys(),
+            list(data.keys()),
             ['logo_src', 'logo_url']
         )
         self.assertIn(
@@ -801,7 +801,7 @@ class CertificatesBrandingTest(TestCase):
 
         # Make sure there are not unexpected keys in dict returned by 'get_certificate_footer_context'
         self.assertItemsEqual(
-            data.keys(),
+            list(data.keys()),
             ['company_about_url', 'company_privacy_url', 'company_tos_url']
         )
 

@@ -124,7 +124,7 @@ def award_program_certificates(self, username):
         None
 
     """
-    LOGGER.info(u'Running task award_program_certificates for username %s', username)
+    LOGGER.info('Running task award_program_certificates for username %s', username)
     programs_without_certificates = configuration_helpers.get_value('programs_without_certificates', [])
     if programs_without_certificates:
         if str(programs_without_certificates[0]).lower() == "all":
@@ -147,7 +147,7 @@ def award_program_certificates(self, username):
         try:
             student = User.objects.get(username=username)
         except User.DoesNotExist:
-            LOGGER.exception(u'Task award_program_certificates was called with invalid username %s', username)
+            LOGGER.exception('Task award_program_certificates was called with invalid username %s', username)
             # Don't retry for this case - just conclude the task.
             return
         completed_programs = {}
@@ -156,7 +156,7 @@ def award_program_certificates(self, username):
         if not completed_programs:
             # No reason to continue beyond this point unless/until this
             # task gets updated to support revocation of program certs.
-            LOGGER.info(u'Task award_program_certificates was called for user %s with no completed programs', username)
+            LOGGER.info('Task award_program_certificates was called for user %s with no completed programs', username)
             return
 
         # Determine which program certificates the user has already been awarded, if any.
@@ -167,7 +167,7 @@ def award_program_certificates(self, username):
         awarded_and_skipped_program_uuids = list(set(existing_program_uuids + list(programs_without_certificates)))
 
     except Exception as exc:
-        LOGGER.exception(u'Failed to determine program certificates to be awarded for user %s', username)
+        LOGGER.exception('Failed to determine program certificates to be awarded for user %s', username)
         raise self.retry(exc=exc, countdown=countdown, max_retries=MAX_RETRIES)
 
     # For each completed program for which the student doesn't already have a
@@ -192,10 +192,10 @@ def award_program_certificates(self, username):
             visible_date = completed_programs[program_uuid]
             try:
                 award_program_certificate(credentials_client, username, program_uuid, visible_date)
-                LOGGER.info(u'Awarded certificate for program %s to user %s', program_uuid, username)
+                LOGGER.info('Awarded certificate for program %s to user %s', program_uuid, username)
             except exceptions.HttpNotFoundError:
                 LOGGER.exception(
-                    u"""Certificate for program {uuid} could not be found. Unable to award certificate to user
+                    """Certificate for program {uuid} could not be found. Unable to award certificate to user
                     {username}. The program might not be configured.""".format(uuid=program_uuid, username=username)
                 )
             except exceptions.HttpClientError as exc:
@@ -206,39 +206,39 @@ def award_program_certificates(self, username):
                 if exc.response.status_code == 429:  # pylint: disable=no-member
                     rate_limit_countdown = 60
                     LOGGER.info(
-                        u"""Rate limited. Retrying task to award certificates to user {username} in {countdown}
+                        """Rate limited. Retrying task to award certificates to user {username} in {countdown}
                         seconds""".format(username=username, countdown=rate_limit_countdown)
                     )
                     # Retry after 60 seconds, when we should be in a new throttling window
                     raise self.retry(exc=exc, countdown=rate_limit_countdown, max_retries=MAX_RETRIES)
                 else:
                     LOGGER.exception(
-                        u"""Unable to award certificate to user {username} for program {uuid}. The program might not be
+                        """Unable to award certificate to user {username} for program {uuid}. The program might not be
                         configured.""".format(username=username, uuid=program_uuid)
                     )
             except Exception:  # pylint: disable=broad-except
                 # keep trying to award other certs, but retry the whole task to fix any missing entries
-                LOGGER.warning(u'Failed to award certificate for program {uuid} to user {username}.'.format(
+                LOGGER.warning('Failed to award certificate for program {uuid} to user {username}.'.format(
                     uuid=program_uuid, username=username))
                 failed_program_certificate_award_attempts.append(program_uuid)
 
         if failed_program_certificate_award_attempts:
             # N.B. This logic assumes that this task is idempotent
-            LOGGER.info(u'Retrying task to award failed certificates to user %s', username)
+            LOGGER.info('Retrying task to award failed certificates to user %s', username)
             # The error message may change on each reattempt but will never be raised until
             # the max number of retries have been exceeded. It is unlikely that this list
             # will change by the time it reaches its maximimum number of attempts.
             exception = MaxRetriesExceededError(
-                u"Failed to award certificate for user {} for programs {}".format(
+                "Failed to award certificate for user {} for programs {}".format(
                     username, failed_program_certificate_award_attempts))
             raise self.retry(
                 exc=exception,
                 countdown=countdown,
                 max_retries=MAX_RETRIES)
     else:
-        LOGGER.info(u'User %s is not eligible for any new program certificates', username)
+        LOGGER.info('User %s is not eligible for any new program certificates', username)
 
-    LOGGER.info(u'Successfully completed the task award_program_certificates for username %s', username)
+    LOGGER.info('Successfully completed the task award_program_certificates for username %s', username)
 
 
 def post_course_certificate(client, username, certificate, visible_date):
@@ -268,7 +268,7 @@ def award_course_certificate(self, username, course_run_key):
     This task is designed to be called whenever a student GeneratedCertificate is updated.
     It can be called independently for a username and a course_run, but is invoked on each GeneratedCertificate.save.
     """
-    LOGGER.info(u'Running task award_course_certificate for username %s', username)
+    LOGGER.info('Running task award_course_certificate for username %s', username)
 
     countdown = 2 ** self.request.retries
 
@@ -288,7 +288,7 @@ def award_course_certificate(self, username, course_run_key):
         try:
             user = User.objects.get(username=username)
         except User.DoesNotExist:
-            LOGGER.exception(u'Task award_course_certificate was called with invalid username %s', username)
+            LOGGER.exception('Task award_course_certificate was called with invalid username %s', username)
             # Don't retry for this case - just conclude the task.
             return
         # Get the cert for the course key and username if it's both passing and available in professional/verified
@@ -299,7 +299,7 @@ def award_course_certificate(self, username, course_run_key):
             )
         except GeneratedCertificate.DoesNotExist:
             LOGGER.exception(
-                u'Task award_course_certificate was called without Certificate found for %s to user %s',
+                'Task award_course_certificate was called without Certificate found for %s to user %s',
                 course_key,
                 username
             )
@@ -309,7 +309,7 @@ def award_course_certificate(self, username, course_run_key):
                 course_overview = CourseOverview.get_from_id(course_key)
             except (CourseOverview.DoesNotExist, IOError):
                 LOGGER.exception(
-                    u'Task award_course_certificate was called without course overview data for course %s',
+                    'Task award_course_certificate was called without course overview data for course %s',
                     course_key
                 )
                 return
@@ -323,7 +323,7 @@ def award_course_certificate(self, username, course_run_key):
             visible_date = available_date_for_certificate(course_overview, certificate)
             post_course_certificate(credentials_client, username, certificate, visible_date)
 
-            LOGGER.info(u'Awarded certificate for course %s to user %s', course_key, username)
+            LOGGER.info('Awarded certificate for course %s to user %s', course_key, username)
     except Exception as exc:
-        LOGGER.exception(u'Failed to determine course certificates to be awarded for user %s', username)
+        LOGGER.exception('Failed to determine course certificates to be awarded for user %s', username)
         raise self.retry(exc=exc, countdown=countdown, max_retries=MAX_RETRIES)

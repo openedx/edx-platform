@@ -64,13 +64,13 @@ def i_mouseover_on_html_component(_step, element_class):
     world.trigger_event(action_css, event='mouseover')
 
 
-@step(u'I can see Reply to Annotation link$')
+@step('I can see Reply to Annotation link$')
 def i_see_reply_to_annotation_link(_step):
     css_selector = 'a.annotatable-reply'
     world.wait_for_visible(css_selector)
 
 
-@step(u'I see that page has scrolled "(.*)" when I click on "(.*)" link$')
+@step('I see that page has scrolled "(.*)" when I click on "(.*)" link$')
 def i_see_annotation_problem_page_scrolls(_step, scroll_direction, link_css):
     scroll_js = "$(window).scrollTop();"
     scroll_height_before = world.browser.evaluate_script(scroll_js)
@@ -293,39 +293,39 @@ def high_level_source_in_editor(_step):
     assert_equal('hi', world.css_value('.source-edit-box'))
 
 
-@step(u'I have an empty course')
+@step('I have an empty course')
 def i_have_empty_course(_step):
     open_new_course()
 
 
-@step(u'I import the file "([^"]*)"$')
+@step('I import the file "([^"]*)"$')
 def i_import_the_file(_step, filename):
     import_file(filename)
 
 
-@step(u'I go to the vertical "([^"]*)"$')
+@step('I go to the vertical "([^"]*)"$')
 def i_go_to_vertical(_step, vertical):
     world.css_click("span:contains('{0}')".format(vertical))
 
 
-@step(u'I go to the unit "([^"]*)"$')
+@step('I go to the unit "([^"]*)"$')
 def i_go_to_unit(_step, unit):
     loc = "window.location = $(\"span:contains('{0}')\").closest('a').attr('href')".format(unit)
     world.browser.execute_script(loc)
 
 
-@step(u'I see a message that says "([^"]*)"$')
+@step('I see a message that says "([^"]*)"$')
 def i_can_see_message(_step, msg):
     msg = json.dumps(msg)     # escape quotes
     world.css_has_text("h2.title", msg)
 
 
-@step(u'I can edit the problem$')
+@step('I can edit the problem$')
 def i_can_edit_problem(_step):
     world.edit_component()
 
 
-@step(u'I edit first blank advanced problem for annotation response$')
+@step('I edit first blank advanced problem for annotation response$')
 def i_edit_blank_problem_for_annotation_response(_step):
     world.edit_component(1)
     text = """
@@ -338,7 +338,7 @@ def i_edit_blank_problem_for_annotation_response(_step):
     world.save_component()
 
 
-@step(u'I can see cheatsheet$')
+@step('I can see cheatsheet$')
 def verify_cheat_sheet_displaying(_step):
     world.css_click(".cheatsheet-toggle")
     css_selector = '.simple-editor-cheatsheet'

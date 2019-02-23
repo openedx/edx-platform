@@ -13,7 +13,7 @@ class DOTAdapter(object):
     """
 
     backend = object()
-    FILTER_USER_ME = u'user:me'
+    FILTER_USER_ME = 'user:me'
 
     def create_confidential_client(self,
                                    name,

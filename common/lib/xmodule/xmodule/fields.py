@@ -50,9 +50,9 @@ class Date(JSONField):
             return field
         elif field is "":
             return None
-        elif isinstance(field, basestring):
+        elif isinstance(field, str):
             return self._parse_date_wo_default_month_day(field)
-        elif isinstance(field, (int, long, float)):
+        elif isinstance(field, (int, float)):
             return datetime.datetime.fromtimestamp(field / 1000, UTC)
         elif isinstance(field, time.struct_time):
             return datetime.datetime.fromtimestamp(time.mktime(field), UTC)
@@ -115,7 +115,7 @@ class Timedelta(JSONField):
             return
         parts = parts.groupdict()
         time_params = {}
-        for (name, param) in parts.iteritems():
+        for (name, param) in parts.items():
             if param:
                 time_params[name] = int(param)
         return datetime.timedelta(**time_params)
@@ -201,7 +201,7 @@ class RelativeTime(JSONField):
         if isinstance(value, float):
             return datetime.timedelta(seconds=value)
 
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             return self.isotime_to_timedelta(value)
 
         msg = "RelativeTime Field {0} has bad value '{1!r}'".format(self.name, value)

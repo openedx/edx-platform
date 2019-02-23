@@ -48,7 +48,7 @@ def strip_none(dic):
     """
     Returns a dictionary stripped of any keys having values of None
     """
-    return dict([(k, v) for k, v in dic.iteritems() if v is not None])
+    return dict([(k, v) for k, v in dic.items() if v is not None])
 
 
 def strip_blank(dic):
@@ -60,7 +60,7 @@ def strip_blank(dic):
         Determines if the provided value contains no information
         """
         return isinstance(v, str) and len(v.strip()) == 0
-    return dict([(k, v) for k, v in dic.iteritems() if not _is_blank(v)])
+    return dict([(k, v) for k, v in dic.items() if not _is_blank(v)])
 
 # TODO should we be checking if d1 and d2 have the same keys with different values?
 
@@ -120,7 +120,7 @@ def has_required_keys(xblock):
     for key in ('discussion_id', 'discussion_category', 'discussion_target'):
         if getattr(xblock, key, None) is None:
             log.debug(
-                u"Required key '%s' not in discussion %s, leaving out of category map",
+                "Required key '%s' not in discussion %s, leaving out of category map",
                 key,
                 xblock.location
             )
@@ -233,7 +233,7 @@ def get_discussion_id_map_by_course_id(course_id, user):
     by discussion_id.
     """
     xblocks = get_accessible_discussion_xblocks_by_course_id(course_id, user)
-    return dict(map(get_discussion_id_map_entry, xblocks))
+    return dict(list(map(get_discussion_id_map_entry, xblocks)))
 
 
 @request_cached()
@@ -271,7 +271,7 @@ def _filter_unstarted_categories(category_map, course):
                         if key != "start_date":
                             filtered_map["entries"][child][key] = unfiltered_map["entries"][child][key]
                 else:
-                    log.debug(u"Filtering out:%s with start_date: %s", child, unfiltered_map["entries"][child]["start_date"])
+                    log.debug("Filtering out:%s with start_date: %s", child, unfiltered_map["entries"][child]["start_date"])
             else:
                 if course.self_paced or unfiltered_map["subcategories"][child]["start_date"] < now:
                     filtered_map["children"].append((child, c_type))
@@ -287,11 +287,11 @@ def _sort_map_entries(category_map, sort_alpha):
     Internal helper method to list category entries according to the provided sort order
     """
     things = []
-    for title, entry in category_map["entries"].items():
+    for title, entry in list(category_map["entries"].items()):
         if entry["sort_key"] is None and sort_alpha:
             entry["sort_key"] = title
         things.append((title, entry, TYPE_ENTRY))
-    for title, category in category_map["subcategories"].items():
+    for title, category in list(category_map["subcategories"].items()):
         things.append((title, category, TYPE_SUBCATEGORY))
         _sort_map_entries(category_map["subcategories"][title], sort_alpha)
     category_map["children"] = [(x[0], x[2]) for x in sorted(things, key=lambda x: x[1]["sort_key"])]
@@ -366,7 +366,7 @@ def get_discussion_category_map(course, user, divided_only_if_explicit=False, ex
                                                   "start_date": entry_start_date})
 
     category_map = {"entries": defaultdict(dict), "subcategories": defaultdict(dict)}
-    for category_path, entries in unexpanded_category_map.items():
+    for category_path, entries in list(unexpanded_category_map.items()):
         node = category_map["subcategories"]
         path = [x.strip() for x in category_path.split("/")]
 
@@ -413,7 +413,7 @@ def get_discussion_category_map(course, user, divided_only_if_explicit=False, ex
                 # If we've already seen this title, append an incrementing number to disambiguate
                 # the category from other categores sharing the same title in the course discussion UI.
                 dupe_counters[title] += 1
-                title = u"{title} ({counter})".format(title=title, counter=dupe_counters[title])
+                title = "{title} ({counter})".format(title=title, counter=dupe_counters[title])
             node[level]["entries"][title] = {"id": entry["id"],
                                              "sort_key": entry["sort_key"],
                                              "start_date": entry["start_date"],
@@ -422,7 +422,7 @@ def get_discussion_category_map(course, user, divided_only_if_explicit=False, ex
     # TODO.  BUG! : course location is not unique across multiple course runs!
     # (I think Kevin already noticed this)  Need to send course_id with requests, store it
     # in the backend.
-    for topic, entry in course.discussion_topics.items():
+    for topic, entry in list(course.discussion_topics.items()):
         category_map['entries'][topic] = {
             "id": entry["id"],
             "sort_key": entry.get("sort_key", topic),
@@ -496,7 +496,7 @@ class JsonError(HttpResponse):
         """
         Object constructor, returns an error response containing the provided exception messages
         """
-        if isinstance(error_messages, basestring):
+        if isinstance(error_messages, str):
             error_messages = [error_messages]
         content = json.dumps({'errors': error_messages}, indent=2, ensure_ascii=False)
         super(JsonError, self).__init__(content,
@@ -550,7 +550,7 @@ class QueryCountDebugMiddleware(object):
                     query_time = query.get('duration', 0) / 1000
                 total_time += float(query_time)
 
-            log.info(u'%s queries run, total %s seconds', len(connection.queries), total_time)
+            log.info('%s queries run, total %s seconds', len(connection.queries), total_time)
         return response
 
 
@@ -692,7 +692,7 @@ def extend_content(content):
             roles = dict(('name', role.name.lower()) for role in user.roles.filter(course_id=content['course_id']))
         except User.DoesNotExist:
             log.error(
-                u'User ID %s in comment content %s but not in our DB.',
+                'User ID %s in comment content %s but not in our DB.',
                 content.get('user_id'),
                 content.get('id')
             )
@@ -774,7 +774,7 @@ def prepare_content(content, course_key, is_staff=False, discussion_division_ena
                 endorser = User.objects.get(pk=endorsement["user_id"])
             except User.DoesNotExist:
                 log.error(
-                    u"User ID %s in endorsement for comment %s but not in our DB.",
+                    "User ID %s in endorsement for comment %s but not in our DB.",
                     content.get('user_id'),
                     content.get('id')
                 )
@@ -933,7 +933,7 @@ def is_commentable_divided(course_key, commentable_id, course_discussion_setting
         # inline discussions are divided by default
         ans = True
 
-    log.debug(u"is_commentable_divided(%s, %s) = {%s}", course_key, commentable_id, ans)
+    log.debug("is_commentable_divided(%s, %s) = {%s}", course_key, commentable_id, ans)
     return ans
 
 

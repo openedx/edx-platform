@@ -131,14 +131,14 @@ class CourseInfoTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCase,
         """
         self.setup_user()
         self.enroll(self.course)
-        fake_unicode_start_time = u"üñîçø∂é_ßtå®t_tîµé"
+        fake_unicode_start_time = "üñîçø∂é_ßtå®t_tîµé"
         mock_strftime_localized.return_value = fake_unicode_start_time
 
         url = reverse('info', args=[text_type(self.course.id)])
         response = self.client.get(url)
         expected_params = QueryDict(mutable=True)
         expected_params['notlive'] = fake_unicode_start_time
-        expected_url = u'{url}?{params}'.format(
+        expected_url = '{url}?{params}'.format(
             url=reverse('dashboard'),
             params=expected_params.urlencode()
         )
@@ -171,7 +171,7 @@ class CourseInfoLastAccessedTestCase(LoginEnrollmentTestCase, ModuleStoreTestCas
         is no course content.
         """
         SelfPacedConfiguration(enable_course_home_improvements=True).save()
-        url = reverse('info', args=(unicode(self.course.id),))
+        url = reverse('info', args=(str(self.course.id),))
         response = self.client.get(url)
         content = pq(response.content)
         self.assertEqual(content('.page-header-secondary a').length, 0)
@@ -202,7 +202,7 @@ class CourseInfoLastAccessedTestCase(LoginEnrollmentTestCase, ModuleStoreTestCas
             }
         )
         self.client.get(section_url)
-        info_url = reverse('info', args=(unicode(self.course.id),))
+        info_url = reverse('info', args=(str(self.course.id),))
 
         # Assuring a non-authenticated user cannot see the resume course button.
         resume_course_url = self.get_resume_course_url(info_url)
@@ -288,7 +288,7 @@ class CourseInfoTitleTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         Test the info page on a course with all the multiple display options
         depeding on the current site configuration
         """
-        url = reverse('info', args=(unicode(self.course.id),))
+        url = reverse('info', args=(str(self.course.id),))
         with with_site_configuration_context(configuration=site_config):
             response = self.client.get(url)
 
@@ -339,7 +339,7 @@ class CourseInfoTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         # create ccx
         ccx = CcxFactory(course_id=self.course.id, coach=self.coach)
-        ccx_locator = CCXLocator.from_course_locator(self.course.id, unicode(ccx.id))
+        ccx_locator = CCXLocator.from_course_locator(self.course.id, str(ccx.id))
 
         self.setup_user()
         url = reverse('info', args=[ccx_locator])

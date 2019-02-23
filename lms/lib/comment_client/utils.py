@@ -13,13 +13,13 @@ log = logging.getLogger(__name__)
 
 
 def strip_none(dic):
-    return dict([(k, v) for k, v in dic.iteritems() if v is not None])
+    return dict([(k, v) for k, v in dic.items() if v is not None])
 
 
 def strip_blank(dic):
     def _is_blank(v):
         return isinstance(v, str) and len(v.strip()) == 0
-    return dict([(k, v) for k, v in dic.iteritems() if not _is_blank(v)])
+    return dict([(k, v) for k, v in dic.items() if not _is_blank(v)])
 
 
 def extract(dic, keys):
@@ -41,9 +41,9 @@ def perform_request(method, url, data_or_params=None, raw=False,
     if metric_tags is None:
         metric_tags = []
 
-    metric_tags.append(u'method:{}'.format(method))
+    metric_tags.append('method:{}'.format(method))
     if metric_action:
-        metric_tags.append(u'action:{}'.format(metric_action))
+        metric_tags.append('action:{}'.format(metric_action))
 
     if data_or_params is None:
         data_or_params = {}
@@ -70,11 +70,11 @@ def perform_request(method, url, data_or_params=None, raw=False,
         timeout=config.connection_timeout
     )
 
-    metric_tags.append(u'status_code:{}'.format(response.status_code))
+    metric_tags.append('status_code:{}'.format(response.status_code))
     if response.status_code > 200:
-        metric_tags.append(u'result:failure')
+        metric_tags.append('result:failure')
     else:
-        metric_tags.append(u'result:success')
+        metric_tags.append('result:success')
 
     if 200 < response.status_code < 500:
         raise CommentClientRequestError(response.text, response.status_code)
@@ -91,7 +91,7 @@ def perform_request(method, url, data_or_params=None, raw=False,
                 data = response.json()
             except ValueError:
                 raise CommentClientError(
-                    u"Invalid JSON response for request {request_id}; first 100 characters: '{content}'".format(
+                    "Invalid JSON response for request {request_id}; first 100 characters: '{content}'".format(
                         request_id=request_id,
                         content=response.text[:100]
                     )
@@ -152,4 +152,4 @@ def check_forum_heartbeat():
         else:
             return 'forum', False, res.get('check', 'Forum heartbeat failed')
     except Exception as fail:
-        return 'forum', False, unicode(fail)
+        return 'forum', False, str(fail)

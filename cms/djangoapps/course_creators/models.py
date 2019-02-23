@@ -31,10 +31,10 @@ class CourseCreator(models.Model):
 
     # Second value is the "human-readable" version.
     STATES = (
-        (UNREQUESTED, _(u'unrequested')),
-        (PENDING, _(u'pending')),
-        (GRANTED, _(u'granted')),
-        (DENIED, _(u'denied')),
+        (UNREQUESTED, _('unrequested')),
+        (PENDING, _('pending')),
+        (GRANTED, _('granted')),
+        (DENIED, _('denied')),
     )
 
     user = models.OneToOneField(User, help_text=_("Studio user"), on_delete=models.CASCADE)
@@ -46,7 +46,7 @@ class CourseCreator(models.Model):
                                                                     "why course creation access was denied)"))
 
     def __unicode__(self):
-        return u"{0} | {1} [{2}]".format(self.user, self.state, self.state_changed)
+        return "{0} | {1} [{2}]".format(self.user, self.state, self.state_changed)
 
 
 @receiver(post_init, sender=CourseCreator)

@@ -39,7 +39,7 @@ def show_parameters(request):
     """A page that shows what parameters were on the URL and post."""
     html_list = []
     for name, value in sorted(request.GET.items()):
-        html_list.append(escape(u"GET {}: {!r}".format(name, value)))
+        html_list.append(escape("GET {}: {!r}".format(name, value)))
     for name, value in sorted(request.POST.items()):
-        html_list.append(escape(u"POST {}: {!r}".format(name, value)))
+        html_list.append(escape("POST {}: {!r}".format(name, value)))
     return HttpResponse("\n".join(HTML("<p>{}</p>").format(h) for h in html_list))

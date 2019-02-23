@@ -2,9 +2,9 @@
 Annotations Tool Mixin
 This file contains global variables and functions used in the various Annotation Tools.
 """
-from HTMLParser import HTMLParser
+from html.parser import HTMLParser
 from os.path import basename, splitext
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 from lxml import etree
 

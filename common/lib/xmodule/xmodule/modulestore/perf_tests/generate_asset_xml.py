@@ -4,7 +4,7 @@
 """
 Generates fake XML for asset metadata.
 """
-from __future__ import print_function
+
 
 import random
 from lxml import etree
@@ -21,8 +21,8 @@ except ImportError:
 ASSET_XSD_FILE = 'assets.xsd'
 
 # Characters used in name generation below.
-NAME_CHARS = u'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-'
-NAME_CHARS_W_UNICODE = NAME_CHARS + u'àĚŘǅΦШΩΣӔ'
+NAME_CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-'
+NAME_CHARS_W_UNICODE = NAME_CHARS + 'àĚŘǅΦШΩΣӔ'
 
 
 def coin_flip():
@@ -51,8 +51,8 @@ def filename():
     """
     Fake a filename.
     """
-    fname = u''
-    for __ in xrange(random.randint(10, 30)):
+    fname = ''
+    for __ in range(random.randint(10, 30)):
         fname += random.choice(NAME_CHARS_W_UNICODE)
     fname += random.choice(('.jpg', '.pdf', '.png', '.txt'))
     return fname
@@ -62,9 +62,9 @@ def pathname():
     """
     Fake a pathname.
     """
-    pname = u''
-    for __ in xrange(random.randint(2, 3)):
-        for __ in xrange(random.randint(5, 10)):
+    pname = ''
+    for __ in range(random.randint(2, 3)):
+        for __ in range(random.randint(5, 10)):
             pname += random.choice(NAME_CHARS)
         pname += '/'
     return pname
@@ -149,7 +149,7 @@ def generate_random_asset_md():
     return AssetMetadata(
         asset_key,
         pathname=pathname(),
-        internal_name=str([filename() for __ in xrange(10)]),
+        internal_name=str([filename() for __ in range(10)]),
         locked=locked(),
         contenttype=contenttype(),
         thumbnail=filename(),
@@ -170,7 +170,7 @@ def make_asset_md(amount):
     Make a number of fake AssetMetadata objects.
     """
     all_asset_md = []
-    for __ in xrange(amount):
+    for __ in range(amount):
         all_asset_md.append(generate_random_asset_md())
     return all_asset_md
 

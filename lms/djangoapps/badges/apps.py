@@ -11,7 +11,7 @@ class BadgesConfig(AppConfig):
     """
     Application Configuration for Badges.
     """
-    name = u'badges'
+    name = 'badges'
 
     def ready(self):
         """

@@ -211,14 +211,14 @@ class CreditCourseDashboardTest(ModuleStoreTestCase):
 
     @ddt.data(
         (
-            [u'Arizona State University'],
+            ['Arizona State University'],
             'You are now eligible for credit from Arizona State University'),
         (
-            [u'Arizona State University', u'Hogwarts School of Witchcraft'],
+            ['Arizona State University', 'Hogwarts School of Witchcraft'],
             'You are now eligible for credit from Arizona State University and Hogwarts School of Witchcraft'
         ),
         (
-            [u'Arizona State University', u'Hogwarts School of Witchcraft and Wizardry', u'Charter Oak'],
+            ['Arizona State University', 'Hogwarts School of Witchcraft and Wizardry', 'Charter Oak'],
             'You are now eligible for credit from Arizona State University, Hogwarts School'
             ' of Witchcraft and Wizardry, and Charter Oak'
         ),

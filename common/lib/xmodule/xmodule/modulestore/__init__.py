@@ -37,8 +37,8 @@ new_contract('AssetKey', AssetKey)
 new_contract('AssetMetadata', AssetMetadata)
 new_contract('XBlock', XBlock)
 
-LIBRARY_ROOT = u'library.xml'
-COURSE_ROOT = u'course.xml'
+LIBRARY_ROOT = 'library.xml'
+COURSE_ROOT = 'course.xml'
 
 # List of names of computed fields on xmodules that are of type usage keys.
 # This list can be used to determine which fields need to be stripped of
@@ -207,7 +207,7 @@ class BulkOperationsMixin(object):
 
         # Retrieve the bulk record based on matching org/course/run (possibly ignoring case)
         if ignore_case:
-            for key, record in self._active_bulk_ops.records.iteritems():
+            for key, record in self._active_bulk_ops.records.items():
                 # Shortcut: check basic equivalence for cases where org/course/run might be None.
                 if (key == course_key) or (
                         (key.org and key.org.lower() == course_key.org.lower()) and
@@ -223,7 +223,7 @@ class BulkOperationsMixin(object):
         """
         Yield all active (CourseLocator, BulkOpsRecord) tuples.
         """
-        for course_key, record in self._active_bulk_ops.records.iteritems():
+        for course_key, record in self._active_bulk_ops.records.items():
             if record.active:
                 yield (course_key, record)
 
@@ -634,7 +634,7 @@ class ModuleStoreAssetBase(object):
         if asset_type is None:
             # Add assets of all types to the sorted list.
             all_assets = SortedAssetList(iterable=[], key=key_func)
-            for asset_type, val in course_assets.iteritems():
+            for asset_type, val in course_assets.items():
                 all_assets.update(val)
         else:
             # Add assets of a single type to the sorted list.
@@ -655,7 +655,7 @@ class ModuleStoreAssetBase(object):
             end_idx = (num_assets - 1) - end_idx
 
         ret_assets = []
-        for idx in xrange(start_idx, end_idx, step_incr):
+        for idx in range(start_idx, end_idx, step_incr):
             raw_asset = all_assets[idx]
             asset_key = course_key.make_asset_key(raw_asset['asset_type'], raw_asset['filename'])
             new_asset = AssetMetadata(asset_key)
@@ -776,13 +776,11 @@ class ModuleStoreAssetWriteInterface(ModuleStoreAssetBase):
         pass
 
 
-class ModuleStoreRead(ModuleStoreAssetBase):
+class ModuleStoreRead(ModuleStoreAssetBase, metaclass=ABCMeta):
     """
     An abstract interface for a database backend that stores XModuleDescriptor
     instances and extends read-only functionality
     """
-
-    __metaclass__ = ABCMeta
 
     @abstractmethod
     def has_item(self, usage_key):
@@ -877,7 +875,7 @@ class ModuleStoreRead(ModuleStoreAssetBase):
             else:
                 return True, field
 
-        for key, criteria in qualifiers.iteritems():
+        for key, criteria in qualifiers.items():
             is_set, value = _is_set_on(key)
             if isinstance(criteria, dict) and '$exists' in criteria and criteria['$exists'] == is_set:
                 continue
@@ -1033,13 +1031,11 @@ class ModuleStoreRead(ModuleStoreAssetBase):
         pass
 
 
-class ModuleStoreWrite(ModuleStoreRead, ModuleStoreAssetWriteInterface):
+class ModuleStoreWrite(ModuleStoreRead, ModuleStoreAssetWriteInterface, metaclass=ABCMeta):
     """
     An abstract interface for a database backend that stores XModuleDescriptor
     instances and extends both read and write functionality
     """
-
-    __metaclass__ = ABCMeta
 
     @abstractmethod
     def update_item(self, xblock, user_id, allow_not_found=False, force=False, **kwargs):
@@ -1276,7 +1272,7 @@ class ModuleStoreReadBase(BulkOperationsMixin, ModuleStoreRead):
         A context manager for temporarily changing the default store
         """
         if self.get_modulestore_type(None) != store_type:
-            raise ValueError(u"Cannot set default store to type {}".format(store_type))
+            raise ValueError("Cannot set default store to type {}".format(store_type))
         yield
 
 
@@ -1300,7 +1296,7 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         if fields is None:
             return result
         cls = self.mixologist.mix(XBlock.load_class(category, select=prefer_xmodules))
-        for field_name, value in fields.iteritems():
+        for field_name, value in fields.items():
             field = getattr(cls, field_name)
             result[field.scope][field_name] = value
         return result

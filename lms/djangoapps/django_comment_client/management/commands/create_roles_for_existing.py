@@ -4,7 +4,7 @@ This must be run only after seed_permissions_roles.py!
 Creates default roles for all users currently in the database. Just runs through
 Enrollments.
 """
-from __future__ import print_function
+
 
 from django.core.management.base import BaseCommand
 from django_comment_common.models import assign_default_role_on_enrollment

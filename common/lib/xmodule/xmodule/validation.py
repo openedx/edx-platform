@@ -32,15 +32,15 @@ class StudioValidationMessage(ValidationMessage):
         """
         super(StudioValidationMessage, self).__init__(message_type, message_text)
         if action_label is not None:
-            if not isinstance(action_label, unicode):
+            if not isinstance(action_label, str):
                 raise TypeError("Action label must be unicode.")
             self.action_label = action_label
         if action_class is not None:
-            if not isinstance(action_class, basestring):
+            if not isinstance(action_class, str):
                 raise TypeError("Action class must be a string.")
             self.action_class = action_class
         if action_runtime_event is not None:
-            if not isinstance(action_runtime_event, basestring):
+            if not isinstance(action_runtime_event, str):
                 raise TypeError("Action runtime event must be a string.")
             self.action_runtime_event = action_runtime_event
 

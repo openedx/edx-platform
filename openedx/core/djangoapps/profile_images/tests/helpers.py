@@ -29,7 +29,7 @@ def make_image_file(dimensions=(320, 240), prefix='tmp', extension='.jpeg', forc
     image = Image.new('RGB', dimensions, "green")
     image_file = NamedTemporaryFile(prefix=prefix, suffix=extension)
     try:
-        if orientation and orientation in xrange(1, 9):
+        if orientation and orientation in range(1, 9):
             exif_bytes = piexif.dump({'0th': {piexif.ImageIFD.Orientation: orientation}})
             image.save(image_file, exif=exif_bytes)
         else:
@@ -40,9 +40,9 @@ def make_image_file(dimensions=(320, 240), prefix='tmp', extension='.jpeg', forc
             # write in hunks of 256 bytes
             hunk, byte_ = bytearray([0] * 256), bytearray([0])
             num_hunks, remainder = divmod(bytes_to_pad, 256)
-            for _ in xrange(num_hunks):
+            for _ in range(num_hunks):
                 image_file.write(hunk)
-            for _ in xrange(remainder):
+            for _ in range(remainder):
                 image_file.write(byte_)
             image_file.flush()
         image_file.seek(0)

@@ -11,7 +11,7 @@ This management command will emit the SignalHandler.course_published signal for
 some subset of courses and signal listeners, and then rely on existing listener
 behavior to trigger the necessary data updates.
 """
-from __future__ import print_function
+
 import copy
 import logging
 import os
@@ -68,9 +68,9 @@ class Command(BaseCommand):
             (+ 17 more)
     """
     help = (
-        u"Simulate course publish signals without actually modifying course "
-        u"content. This command is useful for triggering various async tasks "
-        u"that listen for course_published signals."
+        "Simulate course publish signals without actually modifying course "
+        "content. This command is useful for triggering various async tasks "
+        "that listen for course_published signals."
     )
 
     # Having this be a class attribute makes it easier to substitute during
@@ -84,16 +84,16 @@ class Command(BaseCommand):
             '--show-receivers',
             dest='show_receivers',
             action='store_true',
-            help=(u'Display the list of possible receiver functions and exit.')
+            help=('Display the list of possible receiver functions and exit.')
         ),
         parser.add_argument(
             '--dry-run',
             dest='dry_run',
             action='store_true',
             help=(
-                u"Just show a preview of what would happen. This may make an "
-                u"expensive modulestore query to find courses, but it will "
-                u"not emit any signals."
+                "Just show a preview of what would happen. This may make an "
+                "expensive modulestore query to find courses, but it will "
+                "not emit any signals."
             )
         ),
         parser.add_argument(
@@ -102,11 +102,11 @@ class Command(BaseCommand):
             action='store',
             nargs='+',
             help=(
-                u'Send course_published to specific receivers. If this flag is '
-                u'not present, course_published will be sent to all receivers. '
-                u'The CCX receiver is always included unless --skip-ccx is '
-                u'explicitly passed (otherwise CCX courses would never get '
-                u'called for any signal).'
+                'Send course_published to specific receivers. If this flag is '
+                'not present, course_published will be sent to all receivers. '
+                'The CCX receiver is always included unless --skip-ccx is '
+                'explicitly passed (otherwise CCX courses would never get '
+                'called for any signal).'
             )
         )
         parser.add_argument(
@@ -115,8 +115,8 @@ class Command(BaseCommand):
             action='store',
             nargs='+',
             help=(
-                u'Send course_published for specific courses. If this flag is '
-                u'not present, course_published will be sent to all courses.'
+                'Send course_published for specific courses. If this flag is '
+                'not present, course_published will be sent to all courses.'
             )
         )
         parser.add_argument(
@@ -126,8 +126,8 @@ class Command(BaseCommand):
             type=int,
             default=0,
             help=(
-                u"Number of seconds to sleep between emitting course_published "
-                u"signals, so that we don't flood our queues."
+                "Number of seconds to sleep between emitting course_published "
+                "signals, so that we don't flood our queues."
             )
         )
         parser.add_argument(
@@ -135,11 +135,11 @@ class Command(BaseCommand):
             dest='force_lms',
             action='store_true',
             help=(
-                u"This command should be run under cms (Studio), not LMS. "
-                u"Regular publishes happen via Studio, and this script will "
-                u"exit with an error if you attempt to run it in an LMS "
-                u"process. However, if you know what you're doing and need to "
-                u"override that behavior, use this flag."
+                "This command should be run under cms (Studio), not LMS. "
+                "Regular publishes happen via Studio, and this script will "
+                "exit with an error if you attempt to run it in an LMS "
+                "process. However, if you know what you're doing and need to "
+                "override that behavior, use this flag."
             )
         ),
         parser.add_argument(
@@ -147,13 +147,13 @@ class Command(BaseCommand):
             dest='skip_ccx',
             action='store_true',
             help=(
-                u"CCX receivers are special echoing receivers that relay "
-                u"the course_published signal to all CCX courses derived from "
-                u"a modulestore-stored course. That means we almost always "
-                u"want to emit to them (even when using --receivers), or none "
-                u"of our signals will reach any CCX derived courses. However, "
-                u"if you know what you're doing, you can disable this behavior "
-                u"with this flag, so that CCX receivers are omitted."
+                "CCX receivers are special echoing receivers that relay "
+                "the course_published signal to all CCX courses derived from "
+                "a modulestore-stored course. That means we almost always "
+                "want to emit to them (even when using --receivers), or none "
+                "of our signals will reach any CCX derived courses. However, "
+                "if you know what you're doing, you can disable this behavior "
+                "with this flag, so that CCX receivers are omitted."
             )
         ),
 
@@ -162,7 +162,7 @@ class Command(BaseCommand):
             return self.print_show_receivers()
 
         log.info(
-            u"simulate_publish starting, dry-run=%s, delay=%d seconds",
+            "simulate_publish starting, dry-run=%s, delay=%d seconds",
             options['dry_run'],
             options['delay']
         )
@@ -172,8 +172,8 @@ class Command(BaseCommand):
                 log.info("Forcing simulate_publish to run in LMS process.")
             else:
                 log.fatal(
-                    u"simulate_publish should be run as a CMS (Studio) " +
-                    u"command, not %s (override with --force-lms).",  # pylint: disable=unicode-format-string
+                    "simulate_publish should be run as a CMS (Studio) " +
+                    "command, not %s (override with --force-lms).",  # pylint: disable=unicode-format-string
                     os.environ.get('SERVICE_VARIANT')
                 )
                 sys.exit(1)
@@ -193,7 +193,7 @@ class Command(BaseCommand):
         # actual work of emitting signals.
         for i, course_key in enumerate(course_keys, start=1):
             log.info(
-                u"Emitting course_published signal (%d of %d) for course %s",
+                "Emitting course_published signal (%d of %d) for course %s",
                 i, len(course_keys), course_key
             )
             if options['delay']:
@@ -214,19 +214,19 @@ class Command(BaseCommand):
         unknown_receiver_names = set(receiver_names) - all_receiver_names
         if unknown_receiver_names:
             log.fatal(
-                u"The following receivers were specified but not recognized: %s",
-                u", ".join(sorted(unknown_receiver_names))
+                "The following receivers were specified but not recognized: %s",
+                ", ".join(sorted(unknown_receiver_names))
             )
-            log.fatal(u"Known receivers: %s", ", ".join(sorted(all_receiver_names)))
+            log.fatal("Known receivers: %s", ", ".join(sorted(all_receiver_names)))
             sys.exit(1)
-        log.info(u"%d receivers specified: %s", len(receiver_names), ", ".join(receiver_names))
+        log.info("%d receivers specified: %s", len(receiver_names), ", ".join(receiver_names))
         receiver_names_set = set(receiver_names)
         for receiver_fn in get_receiver_fns():
             if receiver_fn == ccx_receiver_fn and not skip_ccx:
                 continue
             fn_name = name_from_fn(receiver_fn)
             if fn_name not in receiver_names_set:
-                log.info(u"Disconnecting %s", fn_name)
+                log.info("Disconnecting %s", fn_name)
                 self.course_published_signal.disconnect(receiver_fn)
 
     def get_course_keys(self, courses):
@@ -242,20 +242,20 @@ class Command(BaseCommand):
         # Use specific courses if specified, but fall back to all courses.
         course_keys = []
         if courses:
-            log.info(u"%d courses specified: %s", len(courses), ", ".join(courses))
+            log.info("%d courses specified: %s", len(courses), ", ".join(courses))
             for course_id in courses:
                 try:
                     course_keys.append(CourseKey.from_string(course_id))
                 except InvalidKeyError:
-                    log.fatal(u"%s is not a parseable CourseKey", course_id)
+                    log.fatal("%s is not a parseable CourseKey", course_id)
                     sys.exit(1)
         else:
             log.info("No courses specified, reading all courses from modulestore...")
             course_keys = sorted(
                 (course.id for course in modulestore().get_course_summaries()),
-                key=unicode  # Different types of CourseKeys can't be compared without this.
+                key=str  # Different types of CourseKeys can't be compared without this.
             )
-            log.info(u"%d courses read from modulestore.", len(course_keys))
+            log.info("%d courses read from modulestore.", len(course_keys))
 
         return course_keys
 
@@ -284,7 +284,7 @@ class Command(BaseCommand):
         for course_key in course_keys[:COURSES_TO_SHOW]:
             print("   ", course_key)
         if len(course_keys) > COURSES_TO_SHOW:
-            print(u"    (+ {} more)".format(len(course_keys) - COURSES_TO_SHOW))
+            print("    (+ {} more)".format(len(course_keys) - COURSES_TO_SHOW))
 
 
 def get_receiver_names():
@@ -305,4 +305,4 @@ def get_receiver_fns():
 
 def name_from_fn(fn):
     """Human readable module.function name."""
-    return u"{}.{}".format(fn.__module__, fn.__name__)
+    return "{}.{}".format(fn.__module__, fn.__name__)

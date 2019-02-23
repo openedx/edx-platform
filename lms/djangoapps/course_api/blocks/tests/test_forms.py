@@ -1,7 +1,7 @@
 """
 Tests for Course Blocks forms
 """
-from urllib import urlencode
+from urllib.parse import urlencode
 
 import ddt
 from django.http import Http404, QueryDict
@@ -46,7 +46,7 @@ class TestBlockListGetForm(FormTestMixin, SharedModuleStoreTestCase):
         self.form_data = QueryDict(
             urlencode({
                 'username': self.student.username,
-                'usage_key': unicode(usage_key),
+                'usage_key': str(usage_key),
             }),
             mutable=True,
         )

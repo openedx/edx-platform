@@ -266,7 +266,7 @@ class EntitlementViewSet(viewsets.ModelViewSet):
             entitlement = CourseEntitlement.objects.get(uuid=entitlement_uuid)
         except CourseEntitlement.DoesNotExist:
             return HttpResponseBadRequest(
-                u'Could not find entitlement {entitlement_uuid} to update'.format(
+                'Could not find entitlement {entitlement_uuid} to update'.format(
                     entitlement_uuid=entitlement_uuid
                 )
             )
@@ -288,7 +288,7 @@ class EntitlementViewSet(viewsets.ModelViewSet):
                     support_detail['unenrolled_run'] = CourseOverview.objects.get(id=unenrolled_run_course_key)
                 except (InvalidKeyError, CourseOverview.DoesNotExist) as error:
                     return HttpResponseBadRequest(
-                        u'Error raised while trying to unenroll user {user} from course run {course_id}: {error}'
+                        'Error raised while trying to unenroll user {user} from course run {course_id}: {error}'
                         .format(user=entitlement.user.username, course_id=unenrolled_run_id, error=error)
                     )
             CourseEntitlementSupportDetail.objects.create(**support_detail)

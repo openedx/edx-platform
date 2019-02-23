@@ -1,5 +1,5 @@
 """ Views related to logout. """
-from urlparse import parse_qs, urlsplit, urlunsplit
+from urllib.parse import parse_qs, urlsplit, urlunsplit
 
 import edx_oauth2_provider
 from django.conf import settings

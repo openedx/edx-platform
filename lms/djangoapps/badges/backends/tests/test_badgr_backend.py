@@ -196,7 +196,7 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
             'name': 'edx.badge.assertion.created',
             'data': {
                 'user_id': self.user.id,
-                'course_id': unicode(self.course.location.course_key),
+                'course_id': str(self.course.location.course_key),
                 'enrollment_mode': 'honor',
                 'assertion_id': assertion.id,
                 'badge_name': 'Test Badge',

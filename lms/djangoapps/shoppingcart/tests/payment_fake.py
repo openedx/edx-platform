@@ -138,7 +138,7 @@ class PaymentFakeView(View):
             "req_card_number": "xxxxxxxxxxxx1111",
             "req_bill_to_address_state": "MA",
             "req_bill_to_address_line1": "123 Fake Street",
-            "utf8": u"✓",
+            "utf8": "✓",
             "reason_code": "100",
             "req_card_expiry_date": "01-2018",
             "req_bill_to_forename": "John",

@@ -62,7 +62,7 @@ class Command(BaseCommand):
                 only_course_keys.append(CourseKey.from_string(course_key_str))
             except InvalidKeyError:
                 raise CommandError(
-                    u'"{course_key_str}" is not a valid course key.'.format(
+                    '"{course_key_str}" is not a valid course key.'.format(
                         course_key_str=course_key_str
                     )
                 )
@@ -70,12 +70,12 @@ class Command(BaseCommand):
         if only_course_keys:
             LOGGER.info(
                 (
-                    u'Starting to re-submit certificates with status "error" '
-                    u'in these courses: %s'
+                    'Starting to re-submit certificates with status "error" '
+                    'in these courses: %s'
                 ), ", ".join([text_type(key) for key in only_course_keys])
             )
         else:
-            LOGGER.info(u'Starting to re-submit certificates with status "error".')
+            LOGGER.info('Starting to re-submit certificates with status "error".')
 
         # Retrieve the IDs of generated certificates with
         # error status in the set of courses we're considering.
@@ -96,19 +96,19 @@ class Command(BaseCommand):
                 resubmit_count += 1
                 LOGGER.info(
                     (
-                        u"Re-submitted certificate for user %s "
-                        u"in course '%s'"
+                        "Re-submitted certificate for user %s "
+                        "in course '%s'"
                     ), user.id, course_key
                 )
             else:
                 LOGGER.error(
                     (
-                        u"Could not find course for course key '%s'.  "
-                        u"Certificate for user %s will not be resubmitted."
+                        "Could not find course for course key '%s'.  "
+                        "Certificate for user %s will not be resubmitted."
                     ), course_key, user.id
                 )
 
-        LOGGER.info(u"Finished resubmitting %s certificate tasks", resubmit_count)
+        LOGGER.info("Finished resubmitting %s certificate tasks", resubmit_count)
 
     def _load_course_with_cache(self, course_key, course_cache):
         """Retrieve the course, then cache it to avoid Mongo queries. """

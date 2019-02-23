@@ -5,7 +5,7 @@ recommender system
 
 import itertools
 import json
-import StringIO
+import io
 import unittest
 from copy import deepcopy
 
@@ -205,7 +205,7 @@ class TestRecommenderCreateFromEmpty(TestRecommender):
         """
         self.enroll_student(self.STUDENTS[0]['email'], self.STUDENTS[0]['password'])
         # Check whether adding new resource is successful
-        for resource_id, resource in self.test_recommendations.iteritems():
+        for resource_id, resource in self.test_recommendations.items():
             for xblock_name in self.XBLOCK_NAMES:
                 result = self.call_event('add_resource', resource, xblock_name)
 
@@ -237,7 +237,7 @@ class TestRecommenderResourceBase(TestRecommender):
         self.logout()
         self.enroll_staff(self.staff_user)
         # Add resources, assume correct here, tested in test_add_resource
-        for resource, xblock_name in itertools.product(self.test_recommendations.values(), self.XBLOCK_NAMES):
+        for resource, xblock_name in itertools.product(list(self.test_recommendations.values()), self.XBLOCK_NAMES):
             self.call_event('add_resource', resource, xblock_name)
 
     def generate_edit_resource(self, resource_id):
@@ -247,7 +247,7 @@ class TestRecommenderResourceBase(TestRecommender):
         """
         resource = {"id": resource_id}
         edited_recommendations = {
-            key: value + "edited" for key, value in self.test_recommendations[self.resource_id].iteritems()
+            key: value + "edited" for key, value in self.test_recommendations[self.resource_id].items()
         }
         resource.update(edited_recommendations)
         return resource
@@ -646,11 +646,11 @@ class TestRecommenderFileUploading(TestRecommender):
         happens or is rejected as expected.
         """
         if 'magic_number' in test_case:
-            f_handler = StringIO.StringIO(test_case['magic_number'].decode('hex'))
+            f_handler = io.StringIO(test_case['magic_number'].decode('hex'))
         elif content is not None:
-            f_handler = StringIO.StringIO(json.dumps(content, sort_keys=True))
+            f_handler = io.StringIO(json.dumps(content, sort_keys=True))
         else:
-            f_handler = StringIO.StringIO('')
+            f_handler = io.StringIO('')
 
         f_handler.content_type = test_case['mimetypes']
         f_handler.name = 'file' + test_case['suffixes']

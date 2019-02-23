@@ -122,7 +122,7 @@ def convert_files_to_filenames(answers):
         convert File objects to their filename (string)
     """
     new_answers = dict()
-    for answer_id in answers.keys():
+    for answer_id in list(answers.keys()):
         answer = answers[answer_id]
         # Files are stored as a list, even if one file
         if is_list_of_files(answer):

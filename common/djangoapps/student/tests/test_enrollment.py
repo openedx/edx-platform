@@ -51,7 +51,7 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
         self.course_limited.max_student_enrollments_allowed = 1
         self.store.update_item(self.course_limited, self.user.id)
         self.urls = [
-            reverse('course_modes_choose', kwargs={'course_id': unicode(self.course.id)})
+            reverse('course_modes_choose', kwargs={'course_id': str(self.course.id)})
         ]
 
     @ddt.data(
@@ -94,7 +94,7 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
         # (otherwise, use an empty string, which the JavaScript client
         # interprets as a redirect to the dashboard)
         full_url = (
-            reverse(next_url, kwargs={'course_id': unicode(self.course.id)})
+            reverse(next_url, kwargs={'course_id': str(self.course.id)})
             if next_url else next_url
         )
 
@@ -272,7 +272,7 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
 
         """
         if course_id is None:
-            course_id = unicode(self.course.id)
+            course_id = str(self.course.id)
 
         params = {
             'enrollment_action': action,

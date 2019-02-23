@@ -249,13 +249,13 @@ class TestCohorts(ModuleStoreTestCase):
         # Make the course cohorted...
         config_course_cohorts(course, is_cohorted=True)
 
-        self.assertEquals(
+        self.assertEqual(
             cohorts.get_cohort(user, course.id).id,
             cohort.id,
             "user should be assigned to the correct cohort"
         )
 
-        self.assertEquals(
+        self.assertEqual(
             cohorts.get_cohort(other_user, course.id).id,
             cohorts.get_cohort_by_name(course.id, cohorts.DEFAULT_COHORT_NAME).id,
             "other_user should be assigned to the default cohort"
@@ -273,14 +273,14 @@ class TestCohorts(ModuleStoreTestCase):
 
         # Add email address to the cohort
         (user, previous_cohort, prereg) = cohorts.add_user_to_cohort(cohort, "email@example.com")
-        self.assertEquals(
+        self.assertEqual(
             (user, previous_cohort, prereg),
             (None, None, True)
         )
 
         # Create user with this email address
         user = UserFactory(username="test", email="email@example.com")
-        self.assertEquals(
+        self.assertEqual(
             cohorts.get_cohort(user, course.id).id,
             cohort.id,
             "User should be assigned to the right cohort"
@@ -299,21 +299,21 @@ class TestCohorts(ModuleStoreTestCase):
 
         # Add email address to the first cohort
         (user, previous_cohort, prereg) = cohorts.add_user_to_cohort(cohort, "email@example.com")
-        self.assertEquals(
+        self.assertEqual(
             (user, previous_cohort, prereg),
             (None, None, True)
         )
 
         # Add email address to the second cohort
         (user, previous_cohort, prereg) = cohorts.add_user_to_cohort(cohort2, "email@example.com")
-        self.assertEquals(
+        self.assertEqual(
             (user, previous_cohort, prereg),
             (None, None, True)
         )
 
         # Create user with this email address
         user = UserFactory(username="test", email="email@example.com")
-        self.assertEquals(
+        self.assertEqual(
             cohorts.get_cohort(user, course.id).id,
             cohort2.id,
             "User should be assigned to the right cohort"
@@ -358,7 +358,7 @@ class TestCohorts(ModuleStoreTestCase):
         self.assertIsNone(cohorts.get_cohort(user, course.id, assign=False))
 
         # get_cohort should return a group for user
-        self.assertEquals(cohorts.get_cohort(user, course.id).name, "AutoGroup")
+        self.assertEqual(cohorts.get_cohort(user, course.id).name, "AutoGroup")
 
     def test_cohorting_with_auto_cohorts(self):
         """
@@ -380,9 +380,9 @@ class TestCohorts(ModuleStoreTestCase):
             auto_cohorts=["AutoGroup"]
         )
 
-        self.assertEquals(cohorts.get_cohort(user1, course.id).id, cohort.id, "user1 should stay put")
+        self.assertEqual(cohorts.get_cohort(user1, course.id).id, cohort.id, "user1 should stay put")
 
-        self.assertEquals(cohorts.get_cohort(user2, course.id).name, "AutoGroup", "user2 should be auto-cohorted")
+        self.assertEqual(cohorts.get_cohort(user2, course.id).name, "AutoGroup", "user2 should be auto-cohorted")
 
     def test_anonymous_user_cohort(self):
         """
@@ -417,7 +417,7 @@ class TestCohorts(ModuleStoreTestCase):
             auto_cohorts=["AutoGroup"]
         )
 
-        self.assertEquals(cohorts.get_cohort(user1, course.id).name, "AutoGroup", "user1 should be auto-cohorted")
+        self.assertEqual(cohorts.get_cohort(user1, course.id).name, "AutoGroup", "user1 should be auto-cohorted")
 
         # Now set the auto_cohort_group to something different
         # This will have no effect on lms side as we are already done with migrations
@@ -427,11 +427,11 @@ class TestCohorts(ModuleStoreTestCase):
             auto_cohort_groups=["OtherGroup"]
         )
 
-        self.assertEquals(
+        self.assertEqual(
             cohorts.get_cohort(user2, course.id).name, "AutoGroup", "user2 should be assigned to AutoGroups"
         )
 
-        self.assertEquals(
+        self.assertEqual(
             cohorts.get_cohort(user1, course.id).name, "AutoGroup", "user1 should still be in originally placed cohort"
         )
 
@@ -455,7 +455,7 @@ class TestCohorts(ModuleStoreTestCase):
             auto_cohorts=[]
         )
 
-        self.assertEquals(
+        self.assertEqual(
             cohorts.get_cohort(user1, course.id).id,
             cohorts.get_cohort_by_name(course.id, cohorts.DEFAULT_COHORT_NAME).id,
             "No groups->default cohort for user1"
@@ -469,13 +469,13 @@ class TestCohorts(ModuleStoreTestCase):
             auto_cohort_groups=["AutoGroup"]
         )
 
-        self.assertEquals(
+        self.assertEqual(
             cohorts.get_cohort(user1, course.id).name,
             cohorts.get_cohort_by_name(course.id, cohorts.DEFAULT_COHORT_NAME).name,
             "user1 should still be in the default cohort"
         )
 
-        self.assertEquals(
+        self.assertEqual(
             cohorts.get_cohort(user2, course.id).id,
             cohorts.get_cohort_by_name(course.id, cohorts.DEFAULT_COHORT_NAME).id,
             "No groups->default cohort for user2"

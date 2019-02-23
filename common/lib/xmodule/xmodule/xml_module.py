@@ -61,7 +61,7 @@ def serialize_field(value):
     If the value is a string, then we simply return what was passed in.
     Otherwise, we return json.dumps on the input value.
     """
-    if isinstance(value, basestring):
+    if isinstance(value, str):
         return value
 
     return json.dumps(value, cls=EdxJSONEncoder)
@@ -177,7 +177,7 @@ class XmlParserMixin(object):
         Remove any attribute named for a field with scope Scope.settings from the supplied
         xml_object
         """
-        for field_name, field in cls.fields.items():
+        for field_name, field in list(cls.fields.items()):
             if (field.scope == Scope.settings
                     and field_name not in excluded_fields
                     and xml_object.get(field_name) is not None):
@@ -208,7 +208,7 @@ class XmlParserMixin(object):
             # Add info about where we are, but keep the traceback
             msg = 'Unable to load file contents at path %s for item %s: %s ' % (
                 filepath, def_id, err)
-            raise Exception, msg, sys.exc_info()[2]
+            raise Exception(msg).with_traceback(sys.exc_info()[2])
 
     @classmethod
     def load_definition(cls, xml_object, system, def_id, id_generator):
@@ -273,7 +273,7 @@ class XmlParserMixin(object):
         Returns a dictionary {key: value}.
         """
         metadata = {'xml_attributes': {}}
-        for attr, val in xml_object.attrib.iteritems():
+        for attr, val in xml_object.attrib.items():
             # VS[compat].  Remove after all key translations done
             attr = cls._translate(attr)
 
@@ -293,7 +293,7 @@ class XmlParserMixin(object):
         Add the keys in policy to metadata, after processing them
         through the attrmap.  Updates the metadata dict in place.
         """
-        for attr, value in policy.iteritems():
+        for attr, value in policy.items():
             attr = cls._translate(attr)
             if attr not in cls.fields:
                 # Store unknown attributes coming from policy.json
@@ -410,7 +410,7 @@ class XmlParserMixin(object):
 
     @classmethod
     def _format_filepath(cls, category, name):
-        return u'{category}/{name}.{ext}'.format(category=category,
+        return '{category}/{name}.{ext}'.format(category=category,
                                                  name=name,
                                                  ext=cls.filename_extension)
 
@@ -459,11 +459,11 @@ class XmlParserMixin(object):
                     xml_object.set(attr, val)
                 except Exception:
                     logging.exception(
-                        u'Failed to serialize metadata attribute %s with value %s in module %s. This could mean data loss!!!',
+                        'Failed to serialize metadata attribute %s with value %s in module %s. This could mean data loss!!!',
                         attr, val, self.url_name
                     )
 
-        for key, value in self.xml_attributes.items():
+        for key, value in list(self.xml_attributes.items()):
             if key not in self.metadata_to_strip:
                 xml_object.set(key, serialize_field(value))
 

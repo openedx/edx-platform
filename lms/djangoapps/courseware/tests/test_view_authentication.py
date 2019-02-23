@@ -84,7 +84,7 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
         urls.extend([
             reverse('book', kwargs={'course_id': text_type(course.id),
                                     'book_index': index})
-            for index in xrange(len(course.textbooks))
+            for index in range(len(course.textbooks))
         ])
         for url in urls:
             self.assert_request_status_code(200, url)

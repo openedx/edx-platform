@@ -179,7 +179,7 @@ class TeamSignalsTest(EventTestMixin, SharedModuleStoreTestCase):
 
     @ddt.data(
         *itertools.product(
-            SIGNALS.keys(),
+            list(SIGNALS.keys()),
             (('user', True), ('moderator', False))
         )
     )
@@ -202,7 +202,7 @@ class TeamSignalsTest(EventTestMixin, SharedModuleStoreTestCase):
             signal = self.SIGNALS[signal_name]
             signal.send(sender=None, user=self.user, post=self.mock_comment(user=self.moderator))
 
-    @ddt.data(*SIGNALS.keys())
+    @ddt.data(*list(SIGNALS.keys()))
     def test_signals_course_context(self, signal_name):
         """Test that `last_activity_at` is not updated when activity takes
         place in discussions outside of a team.

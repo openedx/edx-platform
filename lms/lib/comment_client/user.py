@@ -1,9 +1,9 @@
 """ User model wrapper for comment service"""
 from six import text_type
 
-import settings
-import models
-import utils
+from . import settings
+from . import models
+from . import utils
 
 
 class User(models.Model):

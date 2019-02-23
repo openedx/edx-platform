@@ -97,7 +97,7 @@ class SignatureValidator(RequestValidator):
         :return: True if the signature matches, False if it does not.
         """
 
-        method = unicode(request.method)
+        method = str(request.method)
         url = request.build_absolute_uri()
         body = request.body
 

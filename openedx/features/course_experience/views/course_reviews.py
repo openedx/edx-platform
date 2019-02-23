@@ -38,7 +38,7 @@ class CourseReviewsView(CourseTabView):
         return USE_BOOTSTRAP_FLAG.is_enabled(course.id)
 
     def render_to_fragment(self, request, course=None, tab=None, **kwargs):
-        course_id = unicode(course.id)
+        course_id = str(course.id)
         reviews_fragment_view = CourseReviewsFragmentView()
         return reviews_fragment_view.render_to_fragment(request, course_id=course_id, **kwargs)
 
@@ -55,7 +55,7 @@ class CourseReviewsFragmentView(EdxFragmentView):
         course_key = CourseKey.from_string(course_id)
         course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=False)
         course_url_name = default_course_url_name(course.id)
-        course_url = reverse(course_url_name, kwargs={'course_id': unicode(course.id)})
+        course_url = reverse(course_url_name, kwargs={'course_id': str(course.id)})
 
         is_enrolled = CourseEnrollment.is_enrolled(request.user, course.id)
 

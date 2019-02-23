@@ -30,7 +30,7 @@ class CourseAssetCacheTtlConfig(ConfigurationModel):
         return '<CourseAssetCacheTtlConfig(cache_ttl={})>'.format(self.get_cache_ttl())
 
     def __unicode__(self):
-        return unicode(repr(self))
+        return str(repr(self))
 
 
 class CdnUserAgentsConfig(ConfigurationModel):
@@ -57,4 +57,4 @@ class CdnUserAgentsConfig(ConfigurationModel):
         return '<WhitelistedCdnConfig(cdn_user_agents={})>'.format(self.get_cdn_user_agents())
 
     def __unicode__(self):
-        return unicode(repr(self))
+        return str(repr(self))

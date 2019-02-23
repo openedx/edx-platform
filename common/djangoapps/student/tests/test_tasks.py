@@ -41,7 +41,7 @@ class SendActivationEmailTestCase(TestCase):
                     attempt=attempt,
                     max_attempts=email_max_attempts
                 ))
-        self.assertEquals(mock_log.info.call_count, 6)
+        self.assertEqual(mock_log.info.call_count, 6)
 
         # Asserts that the error was logged on crossing max retry attempts.
         mock_log.error.assert_called_with(
@@ -50,4 +50,4 @@ class SendActivationEmailTestCase(TestCase):
             self.student.email,
             exc_info=True
         )
-        self.assertEquals(mock_log.error.call_count, 1)
+        self.assertEqual(mock_log.error.call_count, 1)

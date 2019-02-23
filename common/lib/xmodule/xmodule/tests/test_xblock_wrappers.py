@@ -65,7 +65,7 @@ CONTAINER_XMODULES = {
     ConditionalDescriptor: [{}],
     CourseDescriptor: [{}],
     RandomizeDescriptor: [{'display_name': 'Test String Display'}],
-    SequenceDescriptor: [{'display_name': u'Test Unicode हिंदी Display'}],
+    SequenceDescriptor: [{'display_name': 'Test Unicode हिंदी Display'}],
     VerticalBlock: [{}],
     WrapperBlock: [{}],
 }
@@ -243,7 +243,7 @@ class ContainerDescriptorFactory(LeafDescriptorFactory):
     Factory to generate XModuleDescriptors that are containers.
     """
     runtime = SubFactory(ContainerDescriptorRuntimeFactory)
-    children = range(3)
+    children = list(range(3))
 
 
 class ContainerModuleFactory(LeafModuleFactory):
@@ -393,7 +393,7 @@ class TestXModuleHandler(TestCase):
         self.assertEqual(response.body, '{}')
 
     @ddt.data(
-        u'{"test_key": "test_value"}',
+        '{"test_key": "test_value"}',
         '{"test_key": "test_value"}',
     )
     def test_xmodule_handler_with_data(self, response_data):
@@ -427,8 +427,8 @@ class TestXmlExport(XBlockWrapperTestMixin, TestCase):
 
         xmodule_node = etree.fromstring(descriptor.export_to_xml(xmodule_api_fs))
 
-        self.assertEquals(list(xmodule_api_fs.walk()), list(xblock_api_fs.walk()))
-        self.assertEquals(etree.tostring(xmodule_node), etree.tostring(xblock_node))
+        self.assertEqual(list(xmodule_api_fs.walk()), list(xblock_api_fs.walk()))
+        self.assertEqual(etree.tostring(xmodule_node), etree.tostring(xblock_node))
 
 
 class TestPublicView(XBlockWrapperTestMixin, TestCase):

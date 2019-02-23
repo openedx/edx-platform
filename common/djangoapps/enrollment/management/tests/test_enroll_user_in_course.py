@@ -29,7 +29,7 @@ class EnrollManagementCommandTest(SharedModuleStoreTestCase):
 
     def setUp(self):
         super(EnrollManagementCommandTest, self).setUp()
-        self.course_id = unicode(self.course.id)
+        self.course_id = str(self.course.id)
         self.username = 'ralph' + uuid4().hex
         self.user_email = self.username + '@example.com'
 

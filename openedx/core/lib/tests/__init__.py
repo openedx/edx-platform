@@ -2,7 +2,7 @@
 Utility functions for the edx-platform test suite.
 """
 
-from __future__ import absolute_import
+
 
 
 def attr(*args, **kwargs):

@@ -160,7 +160,7 @@ class RetirementState(models.Model):
     required = models.BooleanField(default=False)
 
     def __unicode__(self):
-        return u'{} (step {})'.format(self.state_name, self.state_execution_order)
+        return '{} (step {})'.format(self.state_name, self.state_execution_order)
 
     class Meta(object):
         ordering = ('state_execution_order',)
@@ -201,7 +201,7 @@ class UserRetirementPartnerReportingStatus(TimeStampedModel):
         verbose_name_plural = 'User Retirement Reporting Statuses'
 
     def __unicode__(self):
-        return u'UserRetirementPartnerReportingStatus: {} is being processed: {}'.format(
+        return 'UserRetirementPartnerReportingStatus: {} is being processed: {}'.format(
             self.user,
             self.is_being_processed
         )
@@ -227,7 +227,7 @@ class UserRetirementRequest(TimeStampedModel):
         Creates a UserRetirementRequest for the specified user.
         """
         if cls.has_user_requested_retirement(user):
-            raise RetirementStateError(u'User {} already has a retirement request row!'.format(user))
+            raise RetirementStateError('User {} already has a retirement request row!'.format(user))
         return cls.objects.create(user=user)
 
     @classmethod
@@ -238,7 +238,7 @@ class UserRetirementRequest(TimeStampedModel):
         return cls.objects.filter(user=user).exists()
 
     def __unicode__(self):
-        return u'User: {} Requested: {}'.format(self.user.id, self.created)
+        return 'User: {} Requested: {}'.format(self.user.id, self.created)
 
 
 class UserRetirementStatus(TimeStampedModel):
@@ -270,14 +270,14 @@ class UserRetirementStatus(TimeStampedModel):
         dead_end_states = list(RetirementState.get_dead_end_state_names_list())
         states = list(RetirementState.get_state_names_list())
         if self.current_state in dead_end_states:
-            raise RetirementStateError(u'RetirementStatus: Unable to move user from {}'.format(self.current_state))
+            raise RetirementStateError('RetirementStatus: Unable to move user from {}'.format(self.current_state))
 
         try:
             new_state_index = states.index(new_state)
             if new_state_index <= states.index(self.current_state.state_name):
                 raise ValueError()
         except ValueError:
-            err = u'{} does not exist or is an eariler state than current state {}'.format(new_state, self.current_state)
+            err = '{} does not exist or is an eariler state than current state {}'.format(new_state, self.current_state)
             raise RetirementStateError(err)
 
     def _validate_update_data(self, data):
@@ -290,11 +290,11 @@ class UserRetirementStatus(TimeStampedModel):
 
         for required_key in required_keys:
             if required_key not in data:
-                raise RetirementStateError(u'RetirementStatus: Required key {} missing from update'.format(required_key))
+                raise RetirementStateError('RetirementStatus: Required key {} missing from update'.format(required_key))
 
         for key in data:
             if key not in known_keys:
-                raise RetirementStateError(u'RetirementStatus: Unknown key {} in update'.format(key))
+                raise RetirementStateError('RetirementStatus: Unknown key {} in update'.format(key))
 
     @classmethod
     def create_retirement(cls, user):
@@ -308,7 +308,7 @@ class UserRetirementStatus(TimeStampedModel):
             raise RetirementStateError('Default state does not exist! Populate retirement states to retire users.')
 
         if cls.objects.filter(user=user).exists():
-            raise RetirementStateError(u'User {} already has a retirement status row!'.format(user))
+            raise RetirementStateError('User {} already has a retirement status row!'.format(user))
 
         retired_username = get_retired_username_by_username(user.username)
         retired_email = get_retired_email_by_email(user.email)
@@ -324,7 +324,7 @@ class UserRetirementStatus(TimeStampedModel):
             retired_email=retired_email,
             current_state=pending,
             last_state=pending,
-            responses=u'Created in state {} by create_retirement'.format(pending)
+            responses='Created in state {} by create_retirement'.format(pending)
         )
 
     def update_state(self, update):
@@ -341,7 +341,7 @@ class UserRetirementStatus(TimeStampedModel):
         old_state = self.current_state
         self.current_state = RetirementState.objects.get(state_name=update['new_state'])
         self.last_state = old_state
-        self.responses += u"\n Moved from {} to {}:\n{}\n".format(old_state, self.current_state, update['response'])
+        self.responses += "\n Moved from {} to {}:\n{}\n".format(old_state, self.current_state, update['response'])
         self.save()
 
     @classmethod
@@ -369,19 +369,19 @@ class UserRetirementStatus(TimeStampedModel):
                 break
 
         if retirement is None:
-            raise UserRetirementStatus.DoesNotExist(u'{} does not have an exact match in UserRetirementStatus. '
-                                                    u'{} similar rows found.'.format(username, len(retirements)))
+            raise UserRetirementStatus.DoesNotExist('{} does not have an exact match in UserRetirementStatus. '
+                                                    '{} similar rows found.'.format(username, len(retirements)))
 
         state = retirement.current_state
 
         if state.required or state.state_name.endswith('_COMPLETE'):
-            raise RetirementStateError(u'{} is in {}, not a valid state to perform retirement '
-                                       u'actions on.'.format(retirement, state.state_name))
+            raise RetirementStateError('{} is in {}, not a valid state to perform retirement '
+                                       'actions on.'.format(retirement, state.state_name))
 
         return retirement
 
     def __unicode__(self):
-        return u'User: {} State: {} Last Updated: {}'.format(self.user.id, self.current_state, self.modified)
+        return 'User: {} State: {} Last Updated: {}'.format(self.user.id, self.current_state, self.modified)
 
 
 @receiver(models.signals.post_delete, sender=UserRetirementStatus)

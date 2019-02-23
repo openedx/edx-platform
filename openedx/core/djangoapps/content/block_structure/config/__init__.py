@@ -9,19 +9,19 @@ from .models import BlockStructureConfiguration
 
 
 # Namespace
-WAFFLE_NAMESPACE = u'block_structure'
+WAFFLE_NAMESPACE = 'block_structure'
 
 # Switches
-INVALIDATE_CACHE_ON_PUBLISH = u'invalidate_cache_on_publish'
-STORAGE_BACKING_FOR_CACHE = u'storage_backing_for_cache'
-RAISE_ERROR_WHEN_NOT_FOUND = u'raise_error_when_not_found'
+INVALIDATE_CACHE_ON_PUBLISH = 'invalidate_cache_on_publish'
+STORAGE_BACKING_FOR_CACHE = 'storage_backing_for_cache'
+RAISE_ERROR_WHEN_NOT_FOUND = 'raise_error_when_not_found'
 
 
 def waffle():
     """
     Returns the namespaced and cached Waffle class for BlockStructures.
     """
-    return WaffleSwitchNamespace(name=WAFFLE_NAMESPACE, log_prefix=u'BlockStructure: ')
+    return WaffleSwitchNamespace(name=WAFFLE_NAMESPACE, log_prefix='BlockStructure: ')
 
 
 @request_cached()

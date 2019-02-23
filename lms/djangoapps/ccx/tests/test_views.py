@@ -4,7 +4,7 @@ test views
 import datetime
 import json
 import re
-import urlparse
+import urllib.parse
 
 import ddt
 from ccx_keys.locator import CCXLocator
@@ -109,7 +109,7 @@ def setup_students_and_grades(context):
                         module_state_key=problem.location
                     )
 
-        compute_all_grades_for_course.apply_async(kwargs={'course_key': unicode(context.course.id)})
+        compute_all_grades_for_course.apply_async(kwargs={'course_key': str(context.course.id)})
 
 
 def unhide(unit):
@@ -184,19 +184,19 @@ class TestCCXProgressChanges(CcxTestCase, LoginEnrollmentTestCase):
         due = datetime.datetime(2016, 7, 8, 0, 0, tzinfo=UTC)
 
         cls.course = course = CourseFactory.create(enable_ccx=True, start=start)
-        chapter = ItemFactory.create(start=start, parent=course, category=u'chapter')
+        chapter = ItemFactory.create(start=start, parent=course, category='chapter')
         sequential = ItemFactory.create(
             parent=chapter,
             start=start,
             due=due,
-            category=u'sequential',
+            category='sequential',
             metadata={'graded': True, 'format': 'Homework'}
         )
         vertical = ItemFactory.create(
             parent=sequential,
             start=start,
             due=due,
-            category=u'vertical',
+            category='vertical',
             metadata={'graded': True, 'format': 'Homework'}
         )
 
@@ -210,7 +210,7 @@ class TestCCXProgressChanges(CcxTestCase, LoginEnrollmentTestCase):
                 category="problem",
                 data=StringResponseXMLFactory().build_xml(answer='foo'),
                 metadata={'rerandomize': 'always'}
-            )] for _ in xrange(2))
+            )] for _ in range(2))
 
     def assert_progress_summary(self, ccx_course_key, due):
         """
@@ -230,7 +230,7 @@ class TestCCXProgressChanges(CcxTestCase, LoginEnrollmentTestCase):
         grade_summary = progress_page_response.mako_context['courseware_summary']
         chapter = grade_summary[0]
         section = chapter['sections'][0]
-        progress_page_due_date = section.due.strftime(u"%Y-%m-%d %H:%M")
+        progress_page_due_date = section.due.strftime("%Y-%m-%d %H:%M")
         self.assertEqual(progress_page_due_date, due)
 
     @patch('ccx.views.render_to_response', intercept_renderer)
@@ -242,7 +242,7 @@ class TestCCXProgressChanges(CcxTestCase, LoginEnrollmentTestCase):
         """
         self.make_coach()
         ccx = self.make_ccx()
-        ccx_course_key = CCXLocator.from_course_locator(self.course.id, unicode(ccx.id))
+        ccx_course_key = CCXLocator.from_course_locator(self.course.id, str(ccx.id))
         self.client.login(username=self.coach.username, password="test")
 
         url = reverse('ccx_coach_dashboard', kwargs={'course_id': ccx_course_key})
@@ -255,8 +255,8 @@ class TestCCXProgressChanges(CcxTestCase, LoginEnrollmentTestCase):
 
         # edit schedule
         date = datetime.datetime.now() - datetime.timedelta(days=5)
-        start = date.strftime(u"%Y-%m-%d %H:%M")
-        due = (date + datetime.timedelta(days=3)).strftime(u"%Y-%m-%d %H:%M")
+        start = date.strftime("%Y-%m-%d %H:%M")
+        due = (date + datetime.timedelta(days=3)).strftime("%Y-%m-%d %H:%M")
 
         schedule[0]['start'] = start
         schedule[0]['children'][0]['start'] = start
@@ -337,7 +337,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         self.make_coach()
         url = reverse(
             'ccx_coach_dashboard',
-            kwargs={'course_id': unicode(self.course.id)})
+            kwargs={'course_id': str(self.course.id)})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertTrue(re.search(
@@ -353,7 +353,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
 
         url = reverse(
             'create_ccx',
-            kwargs={'course_id': unicode(self.course_with_ccx_connect_set.id)})
+            kwargs={'course_id': str(self.course_with_ccx_connect_set.id)})
 
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -372,7 +372,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         self.make_coach()
         url = reverse(
             'create_ccx',
-            kwargs={'course_id': unicode(self.course.id)})
+            kwargs={'course_id': str(self.course.id)})
 
         response = self.client.post(url, {'name': ccx_name})
         self.assertEqual(response.status_code, 302)
@@ -381,7 +381,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         self.assertEqual(response.status_code, 200)
 
         # Get the ccx_key
-        path = urlparse.urlparse(url).path
+        path = urllib.parse.urlparse(url).path
         resolver = resolve(path)
         ccx_key = resolver.kwargs['course_id']
 
@@ -488,15 +488,15 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         # If a coach does not override dates, then dates will be imported from master course.
         self.assertEqual(
             schedule[0]['start'],
-            self.chapters[0].start.strftime(u'%Y-%m-%d %H:%M')
+            self.chapters[0].start.strftime('%Y-%m-%d %H:%M')
         )
         self.assertEqual(
             schedule[0]['children'][0]['start'],
-            self.sequentials[0].start.strftime(u'%Y-%m-%d %H:%M')
+            self.sequentials[0].start.strftime('%Y-%m-%d %H:%M')
         )
 
         if self.sequentials[0].due:
-            expected_due = self.sequentials[0].due.strftime(u'%Y-%m-%d %H:%M')
+            expected_due = self.sequentials[0].due.strftime('%Y-%m-%d %H:%M')
         else:
             expected_due = None
         self.assertEqual(schedule[0]['children'][0]['due'], expected_due)
@@ -506,10 +506,10 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
             kwargs={'course_id': CCXLocator.from_course_locator(self.course.id, ccx.id)})
 
         unhide(schedule[0])
-        schedule[0]['start'] = u'2014-11-20 00:00'
-        schedule[0]['children'][0]['due'] = u'2014-12-25 00:00'  # what a jerk!
-        schedule[0]['children'][0]['children'][0]['start'] = u'2014-12-20 00:00'
-        schedule[0]['children'][0]['children'][0]['due'] = u'2014-12-25 00:00'
+        schedule[0]['start'] = '2014-11-20 00:00'
+        schedule[0]['children'][0]['due'] = '2014-12-25 00:00'  # what a jerk!
+        schedule[0]['children'][0]['children'][0]['start'] = '2014-12-20 00:00'
+        schedule[0]['children'][0]['children'][0]['due'] = '2014-12-25 00:00'
 
         response = self.client.post(
             url, json.dumps(schedule), content_type='application/json'
@@ -517,23 +517,23 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
 
         schedule = json.loads(response.content)['schedule']
         self.assertEqual(schedule[0]['hidden'], False)
-        self.assertEqual(schedule[0]['start'], u'2014-11-20 00:00')
+        self.assertEqual(schedule[0]['start'], '2014-11-20 00:00')
         self.assertEqual(
-            schedule[0]['children'][0]['due'], u'2014-12-25 00:00'
+            schedule[0]['children'][0]['due'], '2014-12-25 00:00'
         )
 
         self.assertEqual(
-            schedule[0]['children'][0]['children'][0]['due'], u'2014-12-25 00:00'
+            schedule[0]['children'][0]['children'][0]['due'], '2014-12-25 00:00'
         )
         self.assertEqual(
-            schedule[0]['children'][0]['children'][0]['start'], u'2014-12-20 00:00'
+            schedule[0]['children'][0]['children'][0]['start'], '2014-12-20 00:00'
         )
 
         # Make sure start date set on course, follows start date of earliest
         # scheduled chapter
         ccx = CustomCourseForEdX.objects.get()
         course_start = get_override_for_ccx(ccx, self.course, 'start')
-        self.assertEqual(str(course_start)[:-9], self.chapters[0].start.strftime(u'%Y-%m-%d %H:%M'))
+        self.assertEqual(str(course_start)[:-9], self.chapters[0].start.strftime('%Y-%m-%d %H:%M'))
 
         # Make sure grading policy adjusted
         policy = get_override_for_ccx(ccx, self.course, 'grading_policy',
@@ -627,7 +627,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         )
         data = {
             button_tuple[0]: button_tuple[1],
-            student_form_input_name: u','.join([student.email, ]),  # pylint: disable=no-member
+            student_form_input_name: ','.join([student.email, ]),  # pylint: disable=no-member
         }
         if send_email:
             data['email-students'] = 'Notify-students-by-email'
@@ -669,7 +669,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         )
         data = {
             'enrollment-button': 'Enroll',
-            'student-ids': u','.join([student.email for student in students]),
+            'student-ids': ','.join([student.email for student in students]),
         }
         response = self.client.post(url, data=data, follow=True)
         self.assertEqual(response.status_code, 200)
@@ -723,7 +723,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         )
         data = {
             button_tuple[0]: button_tuple[1],
-            student_form_input_name: u','.join([student.email, ]),  # pylint: disable=no-member
+            student_form_input_name: ','.join([student.email, ]),  # pylint: disable=no-member
         }
         if send_email:
             data['email-students'] = 'Notify-students-by-email'
@@ -767,7 +767,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         )
         data = {
             button_tuple[0]: button_tuple[1],
-            student_form_input_name: u','.join([identifier, ]),
+            student_form_input_name: ','.join([identifier, ]),
         }
         if send_email:
             data['email-students'] = 'Notify-students-by-email'
@@ -819,7 +819,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         )
         data = {
             button_tuple[0]: button_tuple[1],
-            student_form_input_name: u','.join([identifier, ]),
+            student_form_input_name: ','.join([identifier, ]),
         }
         if send_email:
             data['email-students'] = 'Notify-students-by-email'
@@ -856,18 +856,18 @@ class TestCoachDashboardSchedule(CcxTestCase, LoginEnrollmentTestCase, ModuleSto
         )
 
         self.chapters = [
-            ItemFactory.create(start=start, parent=course) for _ in xrange(2)
+            ItemFactory.create(start=start, parent=course) for _ in range(2)
         ]
         self.sequentials = flatten([
             [
-                ItemFactory.create(parent=chapter) for _ in xrange(2)
+                ItemFactory.create(parent=chapter) for _ in range(2)
             ] for chapter in self.chapters
         ])
         self.verticals = flatten([
             [
                 ItemFactory.create(
-                    start=start, due=due, parent=sequential, graded=True, format='Homework', category=u'vertical'
-                ) for _ in xrange(2)
+                    start=start, due=due, parent=sequential, graded=True, format='Homework', category='vertical'
+                ) for _ in range(2)
             ] for sequential in self.sequentials
         ])
 
@@ -876,7 +876,7 @@ class TestCoachDashboardSchedule(CcxTestCase, LoginEnrollmentTestCase, ModuleSto
         with self.store.bulk_operations(course.id, emit_signals=False):
             blocks = flatten([  # pylint: disable=unused-variable
                 [
-                    ItemFactory.create(parent=vertical) for _ in xrange(2)
+                    ItemFactory.create(parent=vertical) for _ in range(2)
                 ] for vertical in self.verticals
             ])
 
@@ -950,17 +950,17 @@ class TestCoachDashboardSchedule(CcxTestCase, LoginEnrollmentTestCase, ModuleSto
         vertical = self.verticals[0]
         self.hide_node(vertical)
         locations = self.assert_elements_in_schedule(url, n_verticals=7)
-        self.assertNotIn(unicode(vertical.location), locations)
+        self.assertNotIn(str(vertical.location), locations)
         # hide a sequential
         sequential = self.sequentials[0]
         self.hide_node(sequential)
         locations = self.assert_elements_in_schedule(url, n_sequentials=3, n_verticals=6)
-        self.assertNotIn(unicode(sequential.location), locations)
+        self.assertNotIn(str(sequential.location), locations)
         # hide a chapter
         chapter = self.chapters[0]
         self.hide_node(chapter)
         locations = self.assert_elements_in_schedule(url, n_chapters=1, n_sequentials=2, n_verticals=4)
-        self.assertNotIn(unicode(chapter.location), locations)
+        self.assertNotIn(str(chapter.location), locations)
 
 
 GET_CHILDREN = XModuleMixin.get_children
@@ -1006,7 +1006,7 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
                 parent=chapter,
                 category="sequential",
                 metadata={'graded': True, 'format': 'Homework'})
-            for _ in xrange(4)
+            for _ in range(4)
         ]
         # making problems available at class level for possible future use in tests
         cls.problems = [
@@ -1016,7 +1016,7 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
                     category="problem",
                     data=StringResponseXMLFactory().build_xml(answer='foo'),
                     metadata={'rerandomize': 'always'}
-                ) for _ in xrange(4)
+                ) for _ in range(4)
             ] for section in sections
         ]
 
@@ -1052,7 +1052,7 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
 
         # create a ccx locator and retrieve the course structure using that key
         # which emulates how a student would get access.
-        self.ccx_key = CCXLocator.from_course_locator(self._course.id, unicode(ccx.id))
+        self.ccx_key = CCXLocator.from_course_locator(self._course.id, str(ccx.id))
         self.course = get_course_by_id(self.ccx_key, depth=None)
         CourseOverview.load_from_module_store(self.course.id)
         setup_students_and_grades(self)
@@ -1082,7 +1082,7 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
         self.assertEqual(len(response.mako_context['students']), 1)
         student_info = response.mako_context['students'][0]
         self.assertEqual(student_info['grade_summary']['percent'], 0.5)
-        self.assertEqual(student_info['grade_summary']['grade_breakdown'].values()[0]['percent'], 0.5)
+        self.assertEqual(list(student_info['grade_summary']['grade_breakdown'].values())[0]['percent'], 0.5)
         self.assertEqual(len(student_info['grade_summary']['section_breakdown']), 4)
 
     def test_grades_csv(self):
@@ -1104,7 +1104,7 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
         headers = rows[0]
 
         # picking first student records
-        data = dict(zip(headers.strip().split(','), rows[1].strip().split(',')))
+        data = dict(list(zip(headers.strip().split(','), rows[1].strip().split(','))))
         self.assertNotIn('HW 04', data)
         self.assertEqual(data['HW 01'], '0.75')
         self.assertEqual(data['HW 02'], '0.5')
@@ -1128,7 +1128,7 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
         self.assertEqual(response.status_code, 200)
         grades = response.mako_context['grade_summary']
         self.assertEqual(grades['percent'], 0.5)
-        self.assertEqual(grades['grade_breakdown'].values()[0]['percent'], 0.5)
+        self.assertEqual(list(grades['grade_breakdown'].values())[0]['percent'], 0.5)
         self.assertEqual(len(grades['section_breakdown']), 4)
 
 
@@ -1172,7 +1172,7 @@ class CCXCoachTabTestCase(CcxTestCase):
         """
         with self.settings(FEATURES={'CUSTOM_COURSES_EDX': ccx_feature_flag}):
             course = self.ccx_enabled_course if enable_ccx else self.ccx_disabled_course
-            self.assertEquals(
+            self.assertEqual(
                 expected_result,
                 self.check_ccx_tab(course, self.user)
             )
@@ -1199,7 +1199,7 @@ class CCXCoachTabTestCase(CcxTestCase):
         """
         self.make_coach()
         ccx = self.make_ccx()
-        ccx_key = CCXLocator.from_course_locator(self.course.id, unicode(ccx.id))
+        ccx_key = CCXLocator.from_course_locator(self.course.id, str(ccx.id))
         staff = self.make_staff()
 
         with ccx_course(ccx_key) as course_ccx:
@@ -1228,7 +1228,7 @@ class CCXCoachTabTestCase(CcxTestCase):
         """
         self.make_coach()
         ccx = self.make_ccx()
-        ccx_key = CCXLocator.from_course_locator(self.course.id, unicode(ccx.id))
+        ccx_key = CCXLocator.from_course_locator(self.course.id, str(ccx.id))
         instructor = self.make_instructor()
 
         with ccx_course(ccx_key) as course_ccx:
@@ -1276,5 +1276,5 @@ class TestStudentViewsWithCCX(ModuleStoreTestCase):
 
     def test_load_courseware(self):
         self.client.login(username=self.student.username, password=self.student_password)
-        response = self.client.get(reverse('courseware', kwargs={'course_id': unicode(self.ccx_course_key)}))
+        response = self.client.get(reverse('courseware', kwargs={'course_id': str(self.ccx_course_key)}))
         self.assertEqual(response.status_code, 200)

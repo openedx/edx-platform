@@ -66,7 +66,7 @@ def team_post_save_callback(sender, instance, **kwargs):  # pylint: disable=unus
     if not kwargs['created']:
         for field in changed_fields:
             if field not in instance.FIELD_BLACKLIST:
-                truncated_fields = truncate_fields(unicode(changed_fields[field]), unicode(getattr(instance, field)))
+                truncated_fields = truncate_fields(str(changed_fields[field]), str(getattr(instance, field)))
                 truncated_fields['team_id'] = instance.team_id
                 truncated_fields['field'] = field
 
@@ -372,7 +372,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 result_filter.update({'course_id': course_key})
             except InvalidKeyError:
                 error = build_api_error(
-                    ugettext_noop(u"The supplied course id {course_id} is not valid."),
+                    ugettext_noop("The supplied course id {course_id} is not valid."),
                     course_id=course_id_string,
                 )
                 return Response(error, status=status.HTTP_400_BAD_REQUEST)
@@ -399,7 +399,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
         if topic_id is not None:
             if topic_id not in [topic['id'] for topic in course_module.teams_configuration['topics']]:
                 error = build_api_error(
-                    ugettext_noop(u'The supplied topic id {topic_id} is not valid'),
+                    ugettext_noop('The supplied topic id {topic_id} is not valid'),
                     topic_id=topic_id
                 )
                 return Response(error, status=status.HTTP_400_BAD_REQUEST)
@@ -448,12 +448,12 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 queryset = queryset.order_by('-last_activity_at', 'team_size')
             else:
                 return Response({
-                    'developer_message': u"unsupported order_by value {ordering}".format(ordering=order_by_input),
+                    'developer_message': "unsupported order_by value {ordering}".format(ordering=order_by_input),
                     # Translators: 'ordering' is a string describing a way
                     # of ordering a list. For example, {ordering} may be
                     # 'name', indicating that the user wants to sort the
                     # list by lower case name.
-                    'user_message': _(u"The ordering {ordering} is not supported").format(ordering=order_by_input),
+                    'user_message': _("The ordering {ordering} is not supported").format(ordering=order_by_input),
                 }, status=status.HTTP_400_BAD_REQUEST)
 
             page = self.paginate_queryset(queryset)
@@ -477,7 +477,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 return Response(status=status.HTTP_404_NOT_FOUND)
         except InvalidKeyError:
             field_errors['course_id'] = build_api_error(
-                ugettext_noop(u'The supplied course_id {course_id} is not valid.'),
+                ugettext_noop('The supplied course_id {course_id} is not valid.'),
                 course_id=course_id
             )
             return Response({
@@ -499,7 +499,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
         data = request.data.copy()
-        data['course_id'] = unicode(course_key)
+        data['course_id'] = str(course_key)
 
         serializer = CourseTeamCreationSerializer(data=data)
         add_serializer_errors(serializer, data, field_errors)
@@ -673,7 +673,7 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
 
         # Note: also deletes all team memberships associated with this team
         team.delete()
-        log.info(u'user %d deleted team %s', request.user.id, team_id)
+        log.info('user %d deleted team %s', request.user.id, team_id)
         emit_team_event('edx.team.deleted', team.course_id, {
             'team_id': team_id,
         })
@@ -755,7 +755,7 @@ class TopicListView(GenericAPIView):
             return Response({
                 'field_errors': {
                     'course_id': build_api_error(
-                        ugettext_noop(u"The supplied course id {course_id} is not valid."),
+                        ugettext_noop("The supplied course id {course_id} is not valid."),
                         course_id=course_id_string
                     )
                 }
@@ -777,12 +777,12 @@ class TopicListView(GenericAPIView):
         ordering = request.query_params.get('order_by', 'name')
         if ordering not in ['name', 'team_count']:
             return Response({
-                'developer_message': u"unsupported order_by value {ordering}".format(ordering=ordering),
+                'developer_message': "unsupported order_by value {ordering}".format(ordering=ordering),
                 # Translators: 'ordering' is a string describing a way
                 # of ordering a list. For example, {ordering} may be
                 # 'name', indicating that the user wants to sort the
                 # list by lower case name.
-                'user_message': _(u"The ordering {ordering} is not supported").format(ordering=ordering),
+                'user_message': _("The ordering {ordering} is not supported").format(ordering=ordering),
             }, status=status.HTTP_400_BAD_REQUEST)
 
         # Always sort alphabetically, as it will be used as secondary sort
@@ -1125,7 +1125,7 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
         except AlreadyOnTeamInCourse:
             return Response(
                 build_api_error(
-                    ugettext_noop(u"The user {username} is already a member of a team in this course."),
+                    ugettext_noop("The user {username} is already a member of a team in this course."),
                     username=username
                 ),
                 status=status.HTTP_400_BAD_REQUEST
@@ -1133,7 +1133,7 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
         except NotEnrolledInCourseForTeam:
             return Response(
                 build_api_error(
-                    ugettext_noop(u"The user {username} is not enrolled in the course associated with this team."),
+                    ugettext_noop("The user {username} is not enrolled in the course associated with this team."),
                     username=username
                 ),
                 status=status.HTTP_400_BAD_REQUEST

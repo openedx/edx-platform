@@ -24,11 +24,11 @@ def i_press_the_button_on_the_registration_form(_step):
 
 @step('I should see an email verification prompt')
 def i_should_see_an_email_verification_prompt(_step):
-    world.css_has_text('h1.page-header', u'Studio Home')
-    world.css_has_text('div.msg h3.title', u'We need to verify your email address')
+    world.css_has_text('h1.page-header', 'Studio Home')
+    world.css_has_text('div.msg h3.title', 'We need to verify your email address')
 
 
-@step(u'I fill in and submit the signin form$')
+@step('I fill in and submit the signin form$')
 def i_fill_in_the_signin_form(_step):
     def fill_login_form():
         login_form = world.browser.find_by_css('form#login_form')
@@ -38,7 +38,7 @@ def i_fill_in_the_signin_form(_step):
     world.retry_on_exception(fill_login_form)
 
 
-@step(u'I should( not)? see a login error message$')
+@step('I should( not)? see a login error message$')
 def i_should_see_a_login_error(_step, should_not_see):
     if should_not_see:
         # the login error may be absent or invisible. Check absence first,
@@ -49,7 +49,7 @@ def i_should_see_a_login_error(_step, should_not_see):
         assert world.css_visible('div#login_error')
 
 
-@step(u'I fill in and submit the signin form incorrectly$')
+@step('I fill in and submit the signin form incorrectly$')
 def i_goof_in_the_signin_form(_step):
     def fill_login_form():
         login_form = world.browser.find_by_css('form#login_form')
@@ -59,13 +59,13 @@ def i_goof_in_the_signin_form(_step):
     world.retry_on_exception(fill_login_form)
 
 
-@step(u'I edit the password field$')
+@step('I edit the password field$')
 def i_edit_the_password_field(_step):
     password_css = 'form#login_form input#password'
     world.css_fill(password_css, 'test')
 
 
-@step(u'I submit the signin form$')
+@step('I submit the signin form$')
 def i_submit_the_signin_form(_step):
     submit_css = 'form#login_form button#submit'
     world.css_click(submit_css)

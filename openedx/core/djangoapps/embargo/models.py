@@ -68,7 +68,7 @@ class EmbargoedCourse(models.Model):
         not_em = "Not "
         if self.embargoed:
             not_em = ""
-        return u"Course '{}' is {}Embargoed".format(text_type(self.course_id), not_em)
+        return "Course '{}' is {}Embargoed".format(text_type(self.course_id), not_em)
 
 
 class EmbargoedState(ConfigurationModel):
@@ -122,37 +122,37 @@ class RestrictedCourse(models.Model):
 
     ENROLL_MSG_KEY_CHOICES = tuple([
         (msg_key, msg.description)
-        for msg_key, msg in ENROLL_MESSAGES.iteritems()
+        for msg_key, msg in ENROLL_MESSAGES.items()
     ])
 
     COURSEWARE_MSG_KEY_CHOICES = tuple([
         (msg_key, msg.description)
-        for msg_key, msg in COURSEWARE_MESSAGES.iteritems()
+        for msg_key, msg in COURSEWARE_MESSAGES.items()
     ])
 
     course_key = CourseKeyField(
         max_length=255, db_index=True, unique=True,
-        help_text=ugettext_lazy(u"The course key for the restricted course.")
+        help_text=ugettext_lazy("The course key for the restricted course.")
     )
 
     enroll_msg_key = models.CharField(
         max_length=255,
         choices=ENROLL_MSG_KEY_CHOICES,
         default='default',
-        help_text=ugettext_lazy(u"The message to show when a user is blocked from enrollment.")
+        help_text=ugettext_lazy("The message to show when a user is blocked from enrollment.")
     )
 
     access_msg_key = models.CharField(
         max_length=255,
         choices=COURSEWARE_MSG_KEY_CHOICES,
         default='default',
-        help_text=ugettext_lazy(u"The message to show when a user is blocked from accessing a course.")
+        help_text=ugettext_lazy("The message to show when a user is blocked from accessing a course.")
     )
 
     disable_access_check = models.BooleanField(
         default=False,
         help_text=ugettext_lazy(
-            u"Allow users who enrolled in an allowed country "
+            "Allow users who enrolled in an allowed country "
             "to access restricted courses from excluded countries."
         )
     )
@@ -169,7 +169,7 @@ class RestrictedCourse(models.Model):
             Boolean
             True if course is in restricted course list.
         """
-        return unicode(course_id) in cls._get_restricted_courses_from_cache()
+        return str(course_id) in cls._get_restricted_courses_from_cache()
 
     @classmethod
     def is_disabled_access_check(cls, course_id):
@@ -187,8 +187,8 @@ class RestrictedCourse(models.Model):
         # checking is_restricted_course method also here to make sure course exists in the list otherwise in case of
         # no course found it will throw the key not found error on 'disable_access_check'
         return (
-            cls.is_restricted_course(unicode(course_id))
-            and cls._get_restricted_courses_from_cache().get(unicode(course_id))["disable_access_check"]
+            cls.is_restricted_course(str(course_id))
+            and cls._get_restricted_courses_from_cache().get(str(course_id))["disable_access_check"]
         )
 
     @classmethod
@@ -199,7 +199,7 @@ class RestrictedCourse(models.Model):
         restricted_courses = cache.get(cls.COURSE_LIST_CACHE_KEY)
         if restricted_courses is None:
             restricted_courses = {
-                unicode(course.course_key): {
+                str(course.course_key): {
                     'disable_access_check': course.disable_access_check
                 }
                 for course in RestrictedCourse.objects.all()
@@ -237,7 +237,7 @@ class RestrictedCourse(models.Model):
             'access_msg': self.access_msg_key,
             'country_rules': [
                 {
-                    'country': unicode(rule.country.country),
+                    'country': str(rule.country.country),
                     'rule_type': rule.rule_type
                 }
                 for rule in country_rules_for_course
@@ -265,7 +265,7 @@ class RestrictedCourse(models.Model):
             return self.access_msg_key
 
     def __unicode__(self):
-        return unicode(self.course_key)
+        return str(self.course_key)
 
     @classmethod
     def message_url_path(cls, course_key, access_point):
@@ -380,13 +380,13 @@ class Country(models.Model):
     """
     country = CountryField(
         db_index=True, unique=True,
-        help_text=ugettext_lazy(u"Two character ISO country code.")
+        help_text=ugettext_lazy("Two character ISO country code.")
     )
 
     def __unicode__(self):
-        return u"{name} ({code})".format(
-            name=unicode(self.country.name),
-            code=unicode(self.country)
+        return "{name} ({code})".format(
+            name=str(self.country.name),
+            code=str(self.country)
         )
 
     class Meta(object):
@@ -426,26 +426,26 @@ class CountryAccessRule(models.Model):
         choices=RULE_TYPE_CHOICES,
         default=BLACKLIST_RULE,
         help_text=ugettext_lazy(
-            u"Whether to include or exclude the given course. "
-            u"If whitelist countries are specified, then ONLY users from whitelisted countries "
-            u"will be able to access the course.  If blacklist countries are specified, then "
-            u"users from blacklisted countries will NOT be able to access the course."
+            "Whether to include or exclude the given course. "
+            "If whitelist countries are specified, then ONLY users from whitelisted countries "
+            "will be able to access the course.  If blacklist countries are specified, then "
+            "users from blacklisted countries will NOT be able to access the course."
         )
     )
 
     restricted_course = models.ForeignKey(
         "RestrictedCourse",
-        help_text=ugettext_lazy(u"The course to which this rule applies."),
+        help_text=ugettext_lazy("The course to which this rule applies."),
         on_delete=models.CASCADE,
     )
 
     country = models.ForeignKey(
         "Country",
-        help_text=ugettext_lazy(u"The country to which this rule applies."),
+        help_text=ugettext_lazy("The country to which this rule applies."),
         on_delete=models.CASCADE,
     )
 
-    CACHE_KEY = u"embargo.allowed_countries.{course_key}"
+    CACHE_KEY = "embargo.allowed_countries.{course_key}"
 
     ALL_COUNTRIES = set(code[0] for code in list(countries))
 
@@ -518,14 +518,14 @@ class CountryAccessRule(models.Model):
 
     def __unicode__(self):
         if self.rule_type == self.WHITELIST_RULE:
-            return _(u"Whitelist {country} for {course}").format(
-                course=unicode(self.restricted_course.course_key),
-                country=unicode(self.country),
+            return _("Whitelist {country} for {course}").format(
+                course=str(self.restricted_course.course_key),
+                country=str(self.country),
             )
         elif self.rule_type == self.BLACKLIST_RULE:
-            return _(u"Blacklist {country} for {course}").format(
-                course=unicode(self.restricted_course.course_key),
-                country=unicode(self.country),
+            return _("Blacklist {country} for {course}").format(
+                course=str(self.restricted_course.course_key),
+                country=str(self.country),
             )
 
     @classmethod
@@ -533,7 +533,7 @@ class CountryAccessRule(models.Model):
         """Invalidate the cache. """
         cache_key = cls.CACHE_KEY.format(course_key=course_key)
         cache.delete(cache_key)
-        log.info(u"Invalidated country access list for course %s", course_key)
+        log.info("Invalidated country access list for course %s", course_key)
 
     class Meta(object):
         """a course can be added with either black or white list.  """

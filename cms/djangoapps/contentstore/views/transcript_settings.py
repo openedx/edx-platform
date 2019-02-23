@@ -58,7 +58,7 @@ def validate_transcript_credentials(provider, **credentials):
         only returns the validated ones.
     """
     error_message, validated_credentials = '', {}
-    valid_providers = get_3rd_party_transcription_plans().keys()
+    valid_providers = list(get_3rd_party_transcription_plans().keys())
     if provider in valid_providers:
         must_have_props = []
         if provider == TranscriptProvider.THREE_PLAY_MEDIA:
@@ -66,16 +66,16 @@ def validate_transcript_credentials(provider, **credentials):
         elif provider == TranscriptProvider.CIELO24:
             must_have_props = ['api_key', 'username']
 
-        missing = [must_have_prop for must_have_prop in must_have_props if must_have_prop not in credentials.keys()]
+        missing = [must_have_prop for must_have_prop in must_have_props if must_have_prop not in list(credentials.keys())]
         if missing:
-            error_message = u'{missing} must be specified.'.format(missing=' and '.join(missing))
+            error_message = '{missing} must be specified.'.format(missing=' and '.join(missing))
             return error_message, validated_credentials
 
         validated_credentials.update({
             prop: credentials[prop] for prop in must_have_props
         })
     else:
-        error_message = u'Invalid Provider {provider}.'.format(provider=provider)
+        error_message = 'Invalid Provider {provider}.'.format(provider=provider)
 
     return error_message, validated_credentials
 
@@ -144,7 +144,7 @@ def transcript_download_handler(request):
     missing = [attr for attr in ['edx_video_id', 'language_code'] if attr not in request.GET]
     if missing:
         return JsonResponse(
-            {'error': _(u'The following parameters are required: {missing}.').format(missing=', '.join(missing))},
+            {'error': _('The following parameters are required: {missing}.').format(missing=', '.join(missing))},
             status=400
         )
 
@@ -162,7 +162,7 @@ def transcript_download_handler(request):
         )
         # Construct an HTTP response
         response = HttpResponse(transcript_content, content_type=Transcript.mime_types[Transcript.SRT])
-        response['Content-Disposition'] = u'attachment; filename="{filename}"'.format(filename=transcript_filename)
+        response['Content-Disposition'] = 'attachment; filename="{filename}"'.format(filename=transcript_filename)
     else:
         response = HttpResponseNotFound()
 
@@ -184,16 +184,16 @@ def validate_transcript_upload_data(data, files):
     must_have_attrs = ['edx_video_id', 'language_code', 'new_language_code']
     missing = [attr for attr in must_have_attrs if attr not in data]
     if missing:
-        error = _(u'The following parameters are required: {missing}.').format(missing=', '.join(missing))
+        error = _('The following parameters are required: {missing}.').format(missing=', '.join(missing))
     elif (
         data['language_code'] != data['new_language_code'] and
         data['new_language_code'] in get_available_transcript_languages(video_id=data['edx_video_id'])
     ):
-        error = _(u'A transcript with the "{language_code}" language code already exists.'.format(
+        error = _('A transcript with the "{language_code}" language code already exists.'.format(
             language_code=data['new_language_code']
         ))
     elif 'file' not in files:
-        error = _(u'A transcript file is required.')
+        error = _('A transcript file is required.')
 
     return error
 
@@ -243,7 +243,7 @@ def transcript_upload_handler(request):
             response = JsonResponse(status=201)
         except (TranscriptsGenerationException, UnicodeDecodeError):
             response = JsonResponse(
-                {'error': _(u'There is a problem with this transcript file. Try to upload a different file.')},
+                {'error': _('There is a problem with this transcript file. Try to upload a different file.')},
                 status=400
             )
 

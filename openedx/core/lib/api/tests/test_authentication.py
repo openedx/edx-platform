@@ -3,7 +3,7 @@ Tests for OAuth2.  This module is copied from django-rest-framework-oauth
 (tests/test_authentication.py) and updated to use our subclass of OAuth2Authentication.
 """
 
-from __future__ import unicode_literals
+
 
 import itertools
 import json

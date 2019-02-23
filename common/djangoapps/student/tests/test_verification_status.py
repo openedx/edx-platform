@@ -359,7 +359,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         response = self.client.get(self.dashboard_url)
 
         # Sanity check: verify that the course is on the page
-        self.assertContains(response, unicode(self.course.id))
+        self.assertContains(response, str(self.course.id))
 
         # Verify that the correct banner is rendered on the dashboard
         alt_text = self.BANNER_ALT_MESSAGES.get(status)
@@ -391,7 +391,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         else:
             # Combine all possible messages into a single list
             all_messages = []
-            for msg_group in self.NOTIFICATION_MESSAGES.values():
+            for msg_group in list(self.NOTIFICATION_MESSAGES.values()):
                 all_messages.extend(msg_group)
 
             # Verify that none of the messages are displayed

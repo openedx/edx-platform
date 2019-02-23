@@ -3,7 +3,7 @@
 Tests for the Shopping Cart Models
 """
 import datetime
-import StringIO
+import io
 from textwrap import dedent
 
 import pytz
@@ -49,7 +49,7 @@ class ReportTypeTests(ModuleStoreTestCase):
         # Two are verified, three are audit, one honor
 
         self.cost = 40
-        self.course = CourseFactory.create(org='MITx', number='999', display_name=u'Robot Super Course')
+        self.course = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')
         self.course_key = self.course.id
         settings.COURSE_LISTINGS['default'] = [text_type(self.course_key)]
         course_mode = CourseMode(course_id=self.course_key,
@@ -137,7 +137,7 @@ class ReportTypeTests(ModuleStoreTestCase):
         Tests that a generated purchase report CSV is as we expect
         """
         report = initialize_report("refund_report", self.now - self.FIVE_MINS, self.now + self.FIVE_MINS)
-        csv_file = StringIO.StringIO()
+        csv_file = io.StringIO()
         report.write_csv(csv_file)
         csv = csv_file.getvalue()
         csv_file.close()
@@ -146,14 +146,14 @@ class ReportTypeTests(ModuleStoreTestCase):
 
     def test_basic_cert_status_csv(self):
         report = initialize_report("certificate_status", self.now - self.FIVE_MINS, self.now + self.FIVE_MINS, 'A', 'Z')
-        csv_file = StringIO.StringIO()
+        csv_file = io.StringIO()
         report.write_csv(csv_file)
         csv = csv_file.getvalue()
         self.assertEqual(csv.replace('\r\n', '\n').strip(), self.CORRECT_CERT_STATUS_CSV.strip())
 
     def test_basic_uni_revenue_share_csv(self):
         report = initialize_report("university_revenue_share", self.now - self.FIVE_MINS, self.now + self.FIVE_MINS, 'A', 'Z')
-        csv_file = StringIO.StringIO()
+        csv_file = io.StringIO()
         report.write_csv(csv_file)
         csv = csv_file.getvalue()
         self.assertEqual(csv.replace('\r\n', '\n').strip(), self.CORRECT_UNI_REVENUE_SHARE_CSV.strip())
@@ -164,14 +164,14 @@ class ItemizedPurchaseReportTest(ModuleStoreTestCase):
     Tests for the models used to generate itemized purchase reports
     """
     FIVE_MINS = datetime.timedelta(minutes=5)
-    TEST_ANNOTATION = u'Ba\xfc\u5305'
+    TEST_ANNOTATION = 'Ba\xfc\u5305'
 
     def setUp(self):
         super(ItemizedPurchaseReportTest, self).setUp()
 
         self.user = UserFactory.create()
         self.cost = 40
-        self.course = CourseFactory.create(org='MITx', number='999', display_name=u'Robot Super Course')
+        self.course = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')
         self.course_key = self.course.id
         course_mode = CourseMode(course_id=self.course_key,
                                  mode_slug="honor",
@@ -225,7 +225,7 @@ class ItemizedPurchaseReportTest(ModuleStoreTestCase):
         Tests that a generated purchase report CSV is as we expect
         """
         report = initialize_report("itemized_purchase_report", self.now - self.FIVE_MINS, self.now + self.FIVE_MINS)
-        csv_file = StringIO.StringIO()
+        csv_file = io.StringIO()
         report.write_csv(csv_file)
         csv = csv_file.getvalue()
         csv_file.close()
@@ -245,10 +245,10 @@ class ItemizedPurchaseReportTest(ModuleStoreTestCase):
         """
         Fill in gap in test coverage.  __unicode__ method of PaidCourseRegistrationAnnotation
         """
-        self.assertEqual(text_type(self.annotation), u'{} : {}'.format(text_type(self.course_key), self.TEST_ANNOTATION))
+        self.assertEqual(text_type(self.annotation), '{} : {}'.format(text_type(self.course_key), self.TEST_ANNOTATION))
 
     def test_courseregcodeitemannotationannotation_unicode(self):
         """
         Fill in gap in test coverage.  __unicode__ method of CourseRegCodeItemAnnotation
         """
-        self.assertEqual(text_type(self.course_reg_code_annotation), u'{} : {}'.format(text_type(self.course_key), self.TEST_ANNOTATION))
+        self.assertEqual(text_type(self.course_reg_code_annotation), '{} : {}'.format(text_type(self.course_key), self.TEST_ANNOTATION))

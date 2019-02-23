@@ -1,7 +1,7 @@
 """
 Models for the custom course feature
 """
-from __future__ import unicode_literals
+
 
 import json
 import logging
@@ -102,7 +102,7 @@ class CustomCourseForEdX(models.Model):
         Returns:
             The CCXLocator corresponding to this CCX.
         """
-        return CCXLocator.from_course_locator(self.course_id, unicode(self.id))
+        return CCXLocator.from_course_locator(self.course_id, str(self.id))
 
 
 class CcxFieldOverride(models.Model):

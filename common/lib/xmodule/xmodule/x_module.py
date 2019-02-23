@@ -73,8 +73,8 @@ STUDIO_VIEW = 'studio_view'
 PREVIEW_VIEWS = [STUDENT_VIEW, PUBLIC_VIEW, AUTHOR_VIEW]
 
 DEFAULT_PUBLIC_VIEW_MESSAGE = (
-    u'This content is only accessible to enrolled learners. '
-    u'Sign in or register, and enroll in this course to view it.'
+    'This content is only accessible to enrolled learners. '
+    'Sign in or register, and enroll in this course to view it.'
 )
 
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
@@ -432,7 +432,7 @@ class XModuleMixin(XModuleFields, XBlock):
         any set to None.)
         """
         result = {}
-        for field in self.fields.values():
+        for field in list(self.fields.values()):
             if field.scope == scope and field.is_set_on(self):
                 try:
                     result[field.name] = field.read_json(self)
@@ -517,7 +517,7 @@ class XModuleMixin(XModuleFields, XBlock):
         try:
             child = super(XModuleMixin, self).get_child(usage_id)
         except ItemNotFoundError:
-            log.warning(u'Unable to load item %s, skipping', usage_id)
+            log.warning('Unable to load item %s, skipping', usage_id)
             return None
 
         if child is None:
@@ -644,7 +644,7 @@ class XModuleMixin(XModuleFields, XBlock):
         self.clear_child_cache()
 
         # Clear out any cached field data scoped to the old user.
-        for field in self.fields.values():
+        for field in list(self.fields.values()):
             if field.scope in (Scope.parent, Scope.children):
                 continue
 
@@ -690,7 +690,7 @@ class XModuleMixin(XModuleFields, XBlock):
         # Only use the fields from this class, not mixins
         fields = getattr(self, 'unmixed_class', self.__class__).fields
 
-        for field in fields.values():
+        for field in list(fields.values()):
             if field in self.non_editable_metadata_fields:
                 continue
             if field.scope not in (Scope.settings, Scope.content):
@@ -765,14 +765,14 @@ class XModuleMixin(XModuleFields, XBlock):
         Default message for blocks that don't implement public_view
         """
         alert_html = HTML(
-            u'<div class="page-banner"><div class="alert alert-warning">'
-            u'<span class="icon icon-alert fa fa fa-warning" aria-hidden="true"></span>'
-            u'<div class="message-content">{}</div></div></div>'
+            '<div class="page-banner"><div class="alert alert-warning">'
+            '<span class="icon icon-alert fa fa fa-warning" aria-hidden="true"></span>'
+            '<div class="message-content">{}</div></div></div>'
         )
 
         if self.display_name:
             display_text = _(
-                u'{display_name} is only accessible to enrolled learners. '
+                '{display_name} is only accessible to enrolled learners. '
                 'Sign in or register, and enroll in this course to view it.'
             ).format(
                 display_name=self.display_name
@@ -878,12 +878,12 @@ class XModule(HTMLSnippet, XModuleMixin):
 
     def __unicode__(self):
         # xss-lint: disable=python-wrap-html
-        return u'<x_module(id={0})>'.format(self.id)
+        return '<x_module(id={0})>'.format(self.id)
 
     def handle_ajax(self, _dispatch, _data):
         """ dispatch is last part of the URL.
             data is a dictionary-like object with the content of the request"""
-        return u""
+        return ""
 
     @XBlock.handler
     def xmodule_handler(self, request, suffix=None):
@@ -910,9 +910,9 @@ class XModule(HTMLSnippet, XModuleMixin):
         # WebOb requests have multiple entries for uploaded files.  handle_ajax
         # expects a single entry as a list.
         request_post = MultiDict(request.POST)
-        for key in set(request.POST.iterkeys()):
+        for key in set(request.POST.keys()):
             if hasattr(request.POST[key], "file"):
-                request_post[key] = map(FileObjForWebobFiles, request.POST.getall(key))
+                request_post[key] = list(map(FileObjForWebobFiles, request.POST.getall(key)))
 
         response_data = self.handle_ajax(suffix, request_post)
         return Response(response_data, content_type='application/json', charset='UTF-8')
@@ -970,7 +970,7 @@ def policy_key(location):
     Get the key for a location in a policy file.  (Since the policy file is
     specific to a course, it doesn't need the full location url).
     """
-    return u'{cat}/{name}'.format(cat=location.block_type, name=location.block_id)
+    return '{cat}/{name}'.format(cat=location.block_type, name=location.block_id)
 
 
 Template = namedtuple("Template", "metadata data children")
@@ -1013,7 +1013,7 @@ class ResourceTemplates(object):
         if getattr(cls, 'template_dir_name', None):
             dirname = os.path.join('templates', cls.template_dir_name)
             if not resource_isdir(__name__, dirname):
-                log.warning(u"No resource directory {dir} found when loading {cls_name} templates".format(
+                log.warning("No resource directory {dir} found when loading {cls_name} templates".format(
                     dir=dirname,
                     cls_name=cls.__name__,
                 ))
@@ -1137,7 +1137,7 @@ class XModuleDescriptor(HTMLSnippet, ResourceTemplates, XModuleMixin):
         node.text = exported_node.text
         node.tail = exported_node.tail
 
-        for key, value in exported_node.items():
+        for key, value in list(exported_node.items()):
             if key == 'url_name' and value == 'course' and key in node.attrib:
                 # if url_name is set in ExportManager then do not override it here.
                 continue
@@ -1181,9 +1181,9 @@ class XModuleDescriptor(HTMLSnippet, ResourceTemplates, XModuleMixin):
     def __eq__(self, other):
         return (hasattr(other, 'scope_ids') and
                 self.scope_ids == other.scope_ids and
-                self.fields.keys() == other.fields.keys() and
+                list(self.fields.keys()) == list(other.fields.keys()) and
                 all(getattr(self, field.name) == getattr(other, field.name)
-                    for field in self.fields.values()))
+                    for field in list(self.fields.values())))
 
     def __repr__(self):
         return (
@@ -1343,12 +1343,12 @@ class MetricsMixin(object):
             duration = end_time - start_time
             course_id = getattr(self, 'course_id', '')
             tags = [
-                u'view_name:{}'.format(view_name),
-                u'action:render',
-                u'action_status:{}'.format(status),
-                u'course_id:{}'.format(course_id),
-                u'block_type:{}'.format(block.scope_ids.block_type),
-                u'block_family:{}'.format(block.entry_point),
+                'view_name:{}'.format(view_name),
+                'action:render',
+                'action_status:{}'.format(status),
+                'course_id:{}'.format(course_id),
+                'block_type:{}'.format(block.scope_ids.block_type),
+                'block_family:{}'.format(block.entry_point),
             ]
             log.debug(
                 "%.3fs - render %s.%s (%s)",
@@ -1373,12 +1373,12 @@ class MetricsMixin(object):
             duration = end_time - start_time
             course_id = getattr(self, 'course_id', '')
             tags = [
-                u'handler_name:{}'.format(handler_name),
-                u'action:handle',
-                u'action_status:{}'.format(status),
-                u'course_id:{}'.format(course_id),
-                u'block_type:{}'.format(block.scope_ids.block_type),
-                u'block_family:{}'.format(block.entry_point),
+                'handler_name:{}'.format(handler_name),
+                'action:handle',
+                'action_status:{}'.format(status),
+                'course_id:{}'.format(course_id),
+                'block_type:{}'.format(block.scope_ids.block_type),
+                'block_family:{}'.format(block.entry_point),
             ]
             log.debug(
                 "%.3fs - handle %s.%s (%s)",
@@ -1660,7 +1660,7 @@ class XMLParsingSystem(DescriptorSystem):
         """
         course_key = xblock.scope_ids.usage_id.course_key
 
-        for field in xblock.fields.itervalues():
+        for field in xblock.fields.values():
             if field.is_set_on(xblock):
                 field_value = getattr(xblock, field.name)
                 if field_value is None:
@@ -1670,8 +1670,8 @@ class XMLParsingSystem(DescriptorSystem):
                 elif isinstance(field, ReferenceList):
                     setattr(xblock, field.name, [self._make_usage_key(course_key, ele) for ele in field_value])
                 elif isinstance(field, ReferenceValueDict):
-                    for key, subvalue in field_value.iteritems():
-                        assert isinstance(subvalue, basestring)
+                    for key, subvalue in field_value.items():
+                        assert isinstance(subvalue, str)
                         field_value[key] = self._make_usage_key(course_key, subvalue)
                     setattr(xblock, field.name, field_value)
 

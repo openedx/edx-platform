@@ -18,16 +18,16 @@ from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPa
 _ = lambda text: text
 
 INVALID_USER_PARTITION_VALIDATION_COMPONENT = _(
-    u"This component's access settings refer to deleted or invalid group configurations."
+    "This component's access settings refer to deleted or invalid group configurations."
 )
 INVALID_USER_PARTITION_VALIDATION_UNIT = _(
-    u"This unit's access settings refer to deleted or invalid group configurations."
+    "This unit's access settings refer to deleted or invalid group configurations."
 )
 INVALID_USER_PARTITION_GROUP_VALIDATION_COMPONENT = _(
-    u"This component's access settings refer to deleted or invalid groups."
+    "This component's access settings refer to deleted or invalid groups."
 )
-INVALID_USER_PARTITION_GROUP_VALIDATION_UNIT = _(u"This unit's access settings refer to deleted or invalid groups.")
-NONSENSICAL_ACCESS_RESTRICTION = _(u"This component's access settings contradict its parent's access settings.")
+INVALID_USER_PARTITION_GROUP_VALIDATION_UNIT = _("This unit's access settings refer to deleted or invalid groups.")
+NONSENSICAL_ACCESS_RESTRICTION = _("This component's access settings contradict its parent's access settings.")
 
 
 class GroupAccessDict(Dict):
@@ -40,7 +40,7 @@ class GroupAccessDict(Dict):
 
     def to_json(self, value):
         if value is not None:
-            return {unicode(k): value[k] for k in value}
+            return {str(k): value[k] for k in value}
 
 
 @XBlock.needs('partitions')
@@ -122,7 +122,7 @@ class LmsBlockMixin(XBlockMixin):
 
         merged_access = parent.merged_group_access.copy()
         if self.group_access is not None:
-            for partition_id, group_ids in self.group_access.items():  # pylint: disable=no-member
+            for partition_id, group_ids in list(self.group_access.items()):  # pylint: disable=no-member
                 if group_ids:  # skip if the "local" group_access for this partition is None or empty.
                     if partition_id in merged_access:
                         if merged_access[partition_id] is False:
@@ -155,7 +155,7 @@ class LmsBlockMixin(XBlockMixin):
             if user_partition.id == user_partition_id:
                 return user_partition
 
-        raise NoSuchUserPartitionError(u"could not find a UserPartition with ID [{}]".format(user_partition_id))
+        raise NoSuchUserPartitionError("could not find a UserPartition with ID [{}]".format(user_partition_id))
 
     def _has_nonsensical_access_settings(self):
         """
@@ -182,7 +182,7 @@ class LmsBlockMixin(XBlockMixin):
         parent_group_access = parent.group_access
         component_group_access = self.group_access
 
-        for user_partition_id, parent_group_ids in parent_group_access.iteritems():
+        for user_partition_id, parent_group_ids in parent_group_access.items():
             component_group_ids = component_group_access.get(user_partition_id)  # pylint: disable=no-member
             if component_group_ids:
                 return parent_group_ids and not set(component_group_ids).issubset(set(parent_group_ids))
@@ -200,7 +200,7 @@ class LmsBlockMixin(XBlockMixin):
         has_invalid_groups = False
         block_is_unit = is_unit(self)
 
-        for user_partition_id, group_ids in self.group_access.iteritems():  # pylint: disable=no-member
+        for user_partition_id, group_ids in self.group_access.items():  # pylint: disable=no-member
             try:
                 user_partition = self._get_user_partition(user_partition_id)
             except NoSuchUserPartitionError:
@@ -251,10 +251,10 @@ class LmsBlockMixin(XBlockMixin):
         """
         completion_service = self.runtime.service(self, 'completion')
         if completion_service is None:
-            raise JsonHandlerError(500, u"No completion service found")
+            raise JsonHandlerError(500, "No completion service found")
         elif not completion_service.completion_tracking_enabled():
-            raise JsonHandlerError(404, u"Completion tracking is not enabled and API calls are unexpected")
+            raise JsonHandlerError(404, "Completion tracking is not enabled and API calls are unexpected")
         if not completion_service.can_mark_block_complete_on_view(self):
-            raise JsonHandlerError(400, u"Block not configured for completion on view.")
+            raise JsonHandlerError(400, "Block not configured for completion on view.")
         self.runtime.publish(self, "completion", data)
         return {'result': 'ok'}

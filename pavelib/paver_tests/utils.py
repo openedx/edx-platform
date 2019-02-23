@@ -60,7 +60,7 @@ class MockEnvironment(tasks.Environment):
         else:
             output = message
         if not output.startswith("--->"):
-            self.messages.append(unicode(output))
+            self.messages.append(str(output))
 
 
 def fail_on_eslint(*args, **kwargs):

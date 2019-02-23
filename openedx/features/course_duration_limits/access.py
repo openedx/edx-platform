@@ -24,7 +24,7 @@ from web_fragments.fragment import Fragment
 
 MIN_DURATION = timedelta(weeks=4)
 MAX_DURATION = timedelta(weeks=18)
-EXPIRATION_DATE_FORMAT_STR = u'%b. %-d, %Y'
+EXPIRATION_DATE_FORMAT_STR = '%b. %-d, %Y'
 
 
 class AuditExpiredError(AccessError):
@@ -33,19 +33,19 @@ class AuditExpiredError(AccessError):
     """
     def __init__(self, user, course, expiration_date):
         error_code = "audit_expired"
-        developer_message = u"User {} had access to {} until {}".format(user, course, expiration_date)
+        developer_message = "User {} had access to {} until {}".format(user, course, expiration_date)
         language = get_language()
         expiration_date = strftime_localized(expiration_date, EXPIRATION_DATE_FORMAT_STR)
-        user_message = _(u"Access expired on {expiration_date}").format(expiration_date=expiration_date)
+        user_message = _("Access expired on {expiration_date}").format(expiration_date=expiration_date)
         try:
             course_name = CourseOverview.get_from_id(course.id).display_name_with_default
-            additional_context_user_message = _(u"Access to {course_name} expired on {expiration_date}").format(
+            additional_context_user_message = _("Access to {course_name} expired on {expiration_date}").format(
                 course_name=course_name,
                 expiration_date=expiration_date
             )
         except CourseOverview.DoesNotExist:
-            additional_context_user_message = _(u"Access to the course you were looking"
-                                                u" for expired on {expiration_date}").format(
+            additional_context_user_message = _("Access to the course you were looking"
+                                                " for expired on {expiration_date}").format(
                 expiration_date=expiration_date
             )
         super(AuditExpiredError, self).__init__(error_code, developer_message, user_message,
@@ -113,7 +113,7 @@ def check_course_expired(user, course):
 
 def get_date_string():
     # Creating this method to allow unit testing an issue where this string was missing the unicode prefix
-    return u'<span class="localized-datetime" data-format="shortDate" \
+    return '<span class="localized-datetime" data-format="shortDate" \
         data-datetime="{formatted_date}" data-language="{language}">{formatted_date_localized}</span>'
 
 
@@ -130,7 +130,7 @@ def generate_course_expired_message(user, course):
 
     if is_masquerading_as_specific_student(user, course.id) and timezone.now() > expiration_date:
         upgrade_message = _('This learner does not have access to this course. '
-                            u'Their access expired on {expiration_date}.')
+                            'Their access expired on {expiration_date}.')
         return HTML(upgrade_message).format(
             expiration_date=strftime_localized(expiration_date, EXPIRATION_DATE_FORMAT_STR)
         )
@@ -145,12 +145,12 @@ def generate_course_expired_message(user, course):
         if (not upgrade_deadline) or (upgrade_deadline < now):
             upgrade_deadline = course_upgrade_deadline
 
-        expiration_message = _(u'{strong_open}Audit Access Expires {expiration_date}{strong_close}'
-                               u'{line_break}You lose all access to this course, including your progress, on '
-                               u'{expiration_date}.')
-        upgrade_deadline_message = _(u'{line_break}Upgrade by {upgrade_deadline} to get unlimited access to the course '
-                                     u'as long as it exists on the site. {a_open}Upgrade now{sronly_span_open} to '
-                                     u'retain access past {expiration_date}{span_close}{a_close}')
+        expiration_message = _('{strong_open}Audit Access Expires {expiration_date}{strong_close}'
+                               '{line_break}You lose all access to this course, including your progress, on '
+                               '{expiration_date}.')
+        upgrade_deadline_message = _('{line_break}Upgrade by {upgrade_deadline} to get unlimited access to the course '
+                                     'as long as it exists on the site. {a_open}Upgrade now{sronly_span_open} to '
+                                     'retain access past {expiration_date}{span_close}{a_close}')
         full_message = expiration_message
         if upgrade_deadline and now < upgrade_deadline:
             full_message += upgrade_deadline_message
@@ -173,7 +173,7 @@ def generate_course_expired_message(user, course):
             )
 
             return HTML(full_message).format(
-                a_open=HTML(u'<a href="{upgrade_link}">').format(
+                a_open=HTML('<a href="{upgrade_link}">').format(
                     upgrade_link=verified_upgrade_deadline_link(user=user, course=course)
                 ),
                 sronly_span_open=HTML('<span class="sr-only">'),
@@ -199,7 +199,7 @@ def generate_course_expired_message(user, course):
 def generate_course_expired_fragment(user, course):
     message = generate_course_expired_message(user, course)
     if message:
-        return Fragment(HTML(u"""\
+        return Fragment(HTML("""\
             <div class="course-expiration-message">{}</div>
         """).format(message))
 
@@ -221,7 +221,7 @@ def course_expiration_wrapper(user, block, view, frag, context):  # pylint: disa
     # Course content must be escaped to render correctly due to the way the
     # way the XBlock rendering works. Transforming the safe markup to unicode
     # escapes correctly.
-    course_expiration_fragment.content = unicode(course_expiration_fragment.content)
+    course_expiration_fragment.content = str(course_expiration_fragment.content)
 
     course_expiration_fragment.add_content(frag.content)
     course_expiration_fragment.add_fragment_resources(frag)

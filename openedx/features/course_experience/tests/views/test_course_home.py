@@ -89,7 +89,7 @@ def course_home_url(course):
     Arguments:
         course (CourseDescriptor): The course being tested.
     """
-    return course_home_url_from_string(unicode(course.id))
+    return course_home_url_from_string(str(course.id))
 
 
 def course_home_url_from_string(course_key_string):
@@ -527,10 +527,10 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
 
         response = self.client.get(url)
 
-        expiration_date = strftime_localized(course.start + timedelta(weeks=4), u'%b. %-d, %Y')
+        expiration_date = strftime_localized(course.start + timedelta(weeks=4), '%b. %-d, %Y')
         expected_params = QueryDict(mutable=True)
         course_name = CourseOverview.get_from_id(course.id).display_name_with_default
-        expected_params['access_response_error'] = u'Access to {run} expired on {expiration_date}'.format(
+        expected_params['access_response_error'] = 'Access to {run} expired on {expiration_date}'.format(
             run=course_name,
             expiration_date=expiration_date
         )
@@ -616,14 +616,14 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         future_course = self.create_future_course()
         self.create_user_for_course(future_course, CourseUserType.ENROLLED)
 
-        fake_unicode_start_time = u"üñîçø∂é_ßtå®t_tîµé"
+        fake_unicode_start_time = "üñîçø∂é_ßtå®t_tîµé"
         mock_strftime_localized.return_value = fake_unicode_start_time
 
         url = course_home_url(future_course)
         response = self.client.get(url)
         expected_params = QueryDict(mutable=True)
         expected_params['notlive'] = fake_unicode_start_time
-        expected_url = u'{url}?{params}'.format(
+        expected_url = '{url}?{params}'.format(
             url=reverse('dashboard'),
             params=expected_params.urlencode()
         )
@@ -731,9 +731,9 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         Ensure that switching to other languages that have unicode in their
         date representations will not cause the course home page to 404.
         """
-        fake_unicode_start_time = u"üñîçø∂é_ßtå®t_tîµé"
+        fake_unicode_start_time = "üñîçø∂é_ßtå®t_tîµé"
         mock_strftime_localized.return_value = fake_unicode_start_time
-        date_string = u'<span class="localized-datetime" data-format="shortDate" \
+        date_string = '<span class="localized-datetime" data-format="shortDate" \
         data-datetime="{formatted_date}" data-language="{language}">{formatted_date_localized}</span>'
         mock_get_date_string.return_value = date_string
 
@@ -889,7 +889,7 @@ class CourseHomeFragmentViewTests(ModuleStoreTestCase):
         self.assertIn('<a class="btn-brand btn-upgrade"', response.content)
         self.assertIn(url, response.content)
         self.assertIn(
-            u'Upgrade (${price})'.format(price=self.verified_mode.min_price),
+            'Upgrade (${price})'.format(price=self.verified_mode.min_price),
             response.content.decode(response.charset)
         )
 

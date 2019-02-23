@@ -134,7 +134,7 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
             self.student,
             course_key
         )
-        return CourseKey.from_string(unicode(course_key))
+        return CourseKey.from_string(str(course_key))
 
     def grade_course(self, course_key):
         """
@@ -142,7 +142,7 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
         """
         return progress(
             self.request,
-            course_id=unicode(course_key),
+            course_id=str(course_key),
             student_id=self.student.id
         )
 
@@ -191,7 +191,7 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
                         with self.assertXBlockInstantiations(1):
                             self.grade_course(course_key)
 
-    @ddt.data(*itertools.product(('no_overrides', 'ccx'), range(1, 4), (True, False), (True, False)))
+    @ddt.data(*itertools.product(('no_overrides', 'ccx'), list(range(1, 4)), (True, False), (True, False)))
     @ddt.unpack
     @override_settings(
         XBLOCK_FIELD_DATA_WRAPPERS=[],

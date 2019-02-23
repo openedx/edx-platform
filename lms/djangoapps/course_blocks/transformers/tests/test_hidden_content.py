@@ -68,7 +68,7 @@ class HiddenContentTransformerTestCase(BlockParentsMapTestCase):
             hide_due_values,
             expected_visible_blocks,
     ):
-        for idx, due_date_type in hide_due_values.iteritems():
+        for idx, due_date_type in hide_due_values.items():
             block = self.get_block(idx)
             block.due = self.DueDateType.due(due_date_type)
             block.hide_after_due = True

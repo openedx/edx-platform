@@ -497,7 +497,7 @@ class SplitModuleTest(unittest.TestCase):
         '''
         Sets up the initial data into the db
         '''
-        for _course_id, course_spec in SplitModuleTest.COURSE_CONTENT.iteritems():
+        for _course_id, course_spec in SplitModuleTest.COURSE_CONTENT.items():
             course = split_store.create_course(
                 course_spec['org'],
                 course_spec['course'],
@@ -508,7 +508,7 @@ class SplitModuleTest(unittest.TestCase):
                 root_block_id=course_spec['root_block_id']
             )
             for revision in course_spec.get('revisions', []):
-                for (block_type, block_id), fields in revision.get('update', {}).iteritems():
+                for (block_type, block_id), fields in revision.get('update', {}).items():
                     # cheat since course is most frequent
                     if course.location.block_id == block_id:
                         block = course
@@ -516,7 +516,7 @@ class SplitModuleTest(unittest.TestCase):
                         # not easy to figure out the category but get_item won't care
                         block_usage = BlockUsageLocator.make_relative(course.location, block_type, block_id)
                         block = split_store.get_item(block_usage)
-                    for key, value in fields.iteritems():
+                    for key, value in fields.items():
                         setattr(block, key, value)
                 # create new blocks into dag: parent must already exist; thus, order is important
                 new_ele_dict = {}
@@ -1755,8 +1755,8 @@ class TestItemCrud(SplitModuleTest):
             # First child should have been moved to second position, and better child takes the lead
             refetch_course = store.get_course(versionless_course_locator)
             children = refetch_course.get_children()
-            self.assertEqual(unicode(children[1].location), unicode(first_child.location))
-            self.assertEqual(unicode(children[0].location), unicode(second_child.location))
+            self.assertEqual(str(children[1].location), str(first_child.location))
+            self.assertEqual(str(children[0].location), str(second_child.location))
 
             # Clean up the data so we don't break other tests which apparently expect a particular state
             store.delete_course(refetch_course.id, user)
@@ -1805,7 +1805,7 @@ class TestCourseCreation(SplitModuleTest):
             'best', 'leech', 'leech_run', 'leech_master', BRANCH_NAME_DRAFT,
             versions_dict=original_index['versions'])
         new_draft_locator = new_draft.location
-        self.assertRegexpMatches(new_draft_locator.org, 'best')
+        self.assertRegex(new_draft_locator.org, 'best')
         # the edited_by and other meta fields on the new course will be the original author not this one
         self.assertEqual(new_draft.edited_by, 'test@edx.org')
         self.assertEqual(new_draft_locator.version_guid, original_index['versions'][BRANCH_NAME_DRAFT])
@@ -1855,7 +1855,7 @@ class TestCourseCreation(SplitModuleTest):
             fields=fields
         )
         new_draft_locator = new_draft.location
-        self.assertRegexpMatches(new_draft_locator.org, 'counter')
+        self.assertRegex(new_draft_locator.org, 'counter')
         # the edited_by and other meta fields on the new course will be the original author not this one
         self.assertEqual(new_draft.edited_by, 'leech_master')
         self.assertNotEqual(new_draft_locator.version_guid, original_index['versions'][BRANCH_NAME_DRAFT])
@@ -2157,7 +2157,7 @@ class TestPublish(SplitModuleTest):
             self.assertEqual(source.category, pub_copy.category)
             self.assertEqual(
                 source.update_version, pub_copy.source_version,
-                u"Versions don't match for {}: {} != {}".format(
+                "Versions don't match for {}: {} != {}".format(
                     expected, source.update_version, pub_copy.update_version
                 )
             )
@@ -2165,7 +2165,7 @@ class TestPublish(SplitModuleTest):
                 self.user_id, pub_copy.edited_by,
                 "{} edited_by {} not {}".format(pub_copy.location, pub_copy.edited_by, self.user_id)
             )
-            for field in source.fields.values():
+            for field in list(source.fields.values()):
                 if field.name == 'children':
                     self._compare_children(field.read_from(source), field.read_from(pub_copy), unexpected_blocks)
                 elif isinstance(field, (Reference, ReferenceList, ReferenceValueDict)):

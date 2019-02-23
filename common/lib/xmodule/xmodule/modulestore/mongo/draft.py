@@ -207,7 +207,7 @@ class DraftModuleStore(MongoModuleStore):
                 )
             else:
                 # update fields on existing course
-                for key, value in fields.iteritems():
+                for key, value in fields.items():
                     setattr(new_course, key, value)
                 self.update_item(new_course, user_id)
 
@@ -232,7 +232,7 @@ class DraftModuleStore(MongoModuleStore):
 
             log.info("Cloning module %s to %s....", original_loc, module.location)
 
-            if 'data' in module.fields and module.fields['data'].is_set_on(module) and isinstance(module.data, basestring):
+            if 'data' in module.fields and module.fields['data'].is_set_on(module) and isinstance(module.data, str):
                 module.data = rewrite_nonportable_content_links(
                     original_loc.course_key, dest_course_id, module.data
                 )
@@ -653,7 +653,7 @@ class DraftModuleStore(MongoModuleStore):
 
     @request_cached(
         # use the XBlock's location value in the cache key
-        arg_map_function=lambda arg: unicode(arg.location if isinstance(arg, XBlock) else arg),
+        arg_map_function=lambda arg: str(arg.location if isinstance(arg, XBlock) else arg),
         # use this store's request_cache
         request_cache_getter=lambda args, kwargs: args[1],
     )
@@ -847,7 +847,7 @@ class DraftModuleStore(MongoModuleStore):
             try:
                 source_item = self.get_item(item_location)
             except ItemNotFoundError:
-                log.error('Unable to find the item %s', unicode(item_location))
+                log.error('Unable to find the item %s', str(item_location))
                 return
 
             if source_item.parent and source_item.parent.block_id != original_parent_location.block_id:
@@ -886,7 +886,7 @@ class DraftModuleStore(MongoModuleStore):
                         to_process_dict[draft_as_non_draft_loc] = draft
 
         # convert the dict - which is used for look ups - back into a list
-        queried_children = to_process_dict.values()
+        queried_children = list(to_process_dict.values())
 
         return queried_children
 

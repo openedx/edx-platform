@@ -1,4 +1,4 @@
-from __future__ import print_function
+
 
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
@@ -90,7 +90,7 @@ class Command(BaseCommand):
             v = random.uniform(0, 1)
             group = group_from_value(groups, v)
             group_objects[group].users.add(user)
-            f.write(u"Assigned user {name} ({id}) to {group}\n".format(
+            f.write("Assigned user {name} ({id}) to {group}\n".format(
                 name=user.username,
                 id=user.id,
                 group=group

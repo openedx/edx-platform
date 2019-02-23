@@ -9,8 +9,8 @@ from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.dashboard import DashboardPage
 from common.test.acceptance.tests.helpers import UniqueCourseTest, generate_course_key
 
-DEFAULT_SHORT_DATE_FORMAT = u'{dt:%b} {dt.day}, {dt.year}'
-TEST_DATE_FORMAT = u'{dt:%b} {dt.day}, {dt.year} {dt.hour:02}:{dt.minute:02}'
+DEFAULT_SHORT_DATE_FORMAT = '{dt:%b} {dt.day}, {dt.year}'
+TEST_DATE_FORMAT = '{dt:%b} {dt.day}, {dt.year} {dt.hour:02}:{dt.minute:02}'
 
 
 class BaseLmsDashboardTest(UniqueCourseTest):
@@ -35,7 +35,7 @@ class BaseLmsDashboardTest(UniqueCourseTest):
             self.course_info["display_name"],
         )
         self.course_fixture.add_advanced_settings({
-            u"social_sharing_url": {u"value": "http://custom/course/url"}
+            "social_sharing_url": {"value": "http://custom/course/url"}
         })
         self.course_fixture.install()
 
@@ -102,7 +102,7 @@ class BaseLmsDashboardTestMultiple(UniqueCourseTest):
         self.course_keys = {}
         self.course_fixtures = {}
 
-        for key, value in self.courses.iteritems():
+        for key, value in self.courses.items():
             course_key = generate_course_key(
                 value['org'],
                 value['number'],
@@ -117,8 +117,8 @@ class BaseLmsDashboardTestMultiple(UniqueCourseTest):
             )
 
             course_fixture.add_advanced_settings({
-                u"social_sharing_url": {u"value": "http://custom/course/url"},
-                u"cert_name_long": {u"value": value['cert_name_long']}
+                "social_sharing_url": {"value": "http://custom/course/url"},
+                "cert_name_long": {"value": value['cert_name_long']}
             })
 
             course_fixture.install()
@@ -201,7 +201,7 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         self.course_fixture.configure_course()
 
         end_date = DEFAULT_SHORT_DATE_FORMAT.format(dt=course_end_date)
-        expected_course_date = u"Ended - {end_date}".format(end_date=end_date)
+        expected_course_date = "Ended - {end_date}".format(end_date=end_date)
 
         # reload the page for changes to course date changes to appear in dashboard
         self.dashboard_page.visit()
@@ -234,7 +234,7 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         self.course_fixture.configure_course()
 
         start_date = DEFAULT_SHORT_DATE_FORMAT.format(dt=course_start_date)
-        expected_course_date = u"Started - {start_date}".format(start_date=start_date)
+        expected_course_date = "Started - {start_date}".format(start_date=start_date)
 
         # reload the page for changes to course date changes to appear in dashboard
         self.dashboard_page.visit()
@@ -267,7 +267,7 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         self.course_fixture.configure_course()
 
         start_date = DEFAULT_SHORT_DATE_FORMAT.format(dt=course_start_date)
-        expected_course_date = u"Starts - {start_date}".format(start_date=start_date)
+        expected_course_date = "Starts - {start_date}".format(start_date=start_date)
 
         # reload the page for changes to course date changes to appear in dashboard
         self.dashboard_page.visit()
@@ -301,7 +301,7 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         self.course_fixture.configure_course()
 
         start_date = TEST_DATE_FORMAT.format(dt=course_start_date)
-        expected_course_date = u"Starts - {start_date} UTC".format(start_date=start_date)
+        expected_course_date = "Starts - {start_date} UTC".format(start_date=start_date)
 
         # reload the page for changes to course date changes to appear in dashboard
         self.dashboard_page.visit()
@@ -334,11 +334,11 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         self.course_fixture.configure_course()
 
         self.course_fixture.add_advanced_settings({
-            u"advertised_start": {u"value": course_advertised_start}
+            "advertised_start": {"value": course_advertised_start}
         })
         self.course_fixture._add_advanced_settings()
 
-        expected_course_date = u"Starts - {start_date}".format(start_date=course_advertised_start)
+        expected_course_date = "Starts - {start_date}".format(start_date=course_advertised_start)
 
         self.dashboard_page.visit()
         course_date = self.dashboard_page.get_course_date()
@@ -369,9 +369,9 @@ class LmsDashboardCourseUnEnrollDialogMessageTest(BaseLmsDashboardTestMultiple):
         course_number = self.courses['A']['number']
         course_name = self.courses['A']['display_name']
 
-        expected_track_message = u'Are you sure you want to unenroll from' + \
-                                 u' <span id="unenroll_course_name">' + course_name + u'</span>' + \
-                                 u' (<span id="unenroll_course_number">' + course_number + u'</span>)?'
+        expected_track_message = 'Are you sure you want to unenroll from' + \
+                                 ' <span id="unenroll_course_name">' + course_name + '</span>' + \
+                                 ' (<span id="unenroll_course_number">' + course_number + '</span>)?'
 
         self.assertEqual(dialog_message['track-info'][0], expected_track_message)
 
@@ -387,12 +387,12 @@ class LmsDashboardCourseUnEnrollDialogMessageTest(BaseLmsDashboardTestMultiple):
         course_name = self.courses['B']['display_name']
         cert_long_name = self.courses['B']['cert_name_long']
 
-        expected_track_message = u'Are you sure you want to unenroll from the verified' + \
-                                 u' <span id="unenroll_cert_name">' + cert_long_name + u'</span>' + \
-                                 u' track of <span id="unenroll_course_name">' + course_name + u'</span>' +  \
-                                 u' (<span id="unenroll_course_number">' + course_number + u'</span>)?'
+        expected_track_message = 'Are you sure you want to unenroll from the verified' + \
+                                 ' <span id="unenroll_cert_name">' + cert_long_name + '</span>' + \
+                                 ' track of <span id="unenroll_course_name">' + course_name + '</span>' +  \
+                                 ' (<span id="unenroll_course_number">' + course_number + '</span>)?'
 
-        expected_refund_message = u'The refund deadline for this course has passed,so you will not receive a refund.'
+        expected_refund_message = 'The refund deadline for this course has passed,so you will not receive a refund.'
 
         self.assertEqual(dialog_message['track-info'][0], expected_track_message)
         self.assertEqual(dialog_message['refund-info'][0], expected_refund_message)

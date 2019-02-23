@@ -4,7 +4,7 @@ Module that provides a connection to the ModuleStore specified in the django set
 Passes settings.MODULESTORE as kwargs to MongoModuleStore
 """
 
-from __future__ import absolute_import
+
 
 from importlib import import_module
 import gettext
@@ -125,7 +125,7 @@ class SwitchedSignal(django.dispatch.Signal):
         return []
 
     def __repr__(self):
-        return u"SwitchedSignal('{}')".format(self.name)
+        return "SwitchedSignal('{}')".format(self.name)
 
 
 class SignalHandler(object):
@@ -180,7 +180,7 @@ class SignalHandler(object):
     @classmethod
     def all_signals(cls):
         """Return a list with all our signals in it."""
-        return cls._mapping.values()
+        return list(cls._mapping.values())
 
     @classmethod
     def signal_by_name(cls, signal_name):
@@ -246,7 +246,7 @@ def create_modulestore_instance(
 
     FUNCTION_KEYS = ['render_template']
     for key in FUNCTION_KEYS:
-        if key in _options and isinstance(_options[key], basestring):
+        if key in _options and isinstance(_options[key], str):
             _options[key] = load_function(_options[key])
 
     request_cache = DEFAULT_REQUEST_CACHE
@@ -419,7 +419,7 @@ def _get_modulestore_branch_setting():
 
             # compare hostname against the regex expressions set of mappings which will tell us which branch to use
             if mappings:
-                for key in mappings.iterkeys():
+                for key in mappings.keys():
                     if re.match(key, hostname):
                         return mappings[key]
         if branch is None:

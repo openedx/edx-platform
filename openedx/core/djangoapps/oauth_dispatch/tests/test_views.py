@@ -464,7 +464,7 @@ class TestAuthorizationView(_DispatchingViewTestCase):
         # is the application name specified?
         self.assertContains(
             response,
-            u"Authorize {name}".format(name=self.dot_app.name)
+            "Authorize {name}".format(name=self.dot_app.name)
         )
 
         # are the cancel and allow buttons on the page?
@@ -489,7 +489,7 @@ class TestAuthorizationView(_DispatchingViewTestCase):
         """
         # django-oauth-toolkit tries to redirect to the user's redirect URL
         self.assertEqual(response.status_code, 404)  # We used a non-existent redirect url.
-        expected_redirect_prefix = u'{}?'.format(DUMMY_REDIRECT_URL)
+        expected_redirect_prefix = '{}?'.format(DUMMY_REDIRECT_URL)
         self._assert_startswith(self._redirect_destination(response), expected_redirect_prefix)
 
     def _check_dop_response(self, response):
@@ -497,7 +497,7 @@ class TestAuthorizationView(_DispatchingViewTestCase):
         Check that django-oauth2-provider gives an appropriate authorization response.
         """
         # django-oauth-provider redirects to a confirmation page
-        self.assertRedirects(response, u'http://testserver/oauth2/authorize/confirm', target_status_code=200)
+        self.assertRedirects(response, 'http://testserver/oauth2/authorize/confirm', target_status_code=200)
 
         context = response.context_data
         form = context['form']
@@ -513,7 +513,7 @@ class TestAuthorizationView(_DispatchingViewTestCase):
         """
         Assert that the string starts with the specified prefix.
         """
-        self.assertTrue(string.startswith(prefix), u'{} does not start with {}'.format(string, prefix))
+        self.assertTrue(string.startswith(prefix), '{} does not start with {}'.format(string, prefix))
 
     @staticmethod
     def _redirect_destination(response):
@@ -555,11 +555,11 @@ class TestViewDispatch(TestCase):
         could take any name, this assertion requires the argument to be named
         `request`.  This is good practice.  You should do it anyway.
         """
-        _msg_base = u'{view} is not a view: {reason}'
-        msg_not_callable = _msg_base.format(view=view_candidate, reason=u'it is not callable')
-        msg_no_request = _msg_base.format(view=view_candidate, reason=u'it has no request argument')
+        _msg_base = '{view} is not a view: {reason}'
+        msg_not_callable = _msg_base.format(view=view_candidate, reason='it is not callable')
+        msg_no_request = _msg_base.format(view=view_candidate, reason='it has no request argument')
         self.assertTrue(hasattr(view_candidate, '__call__'), msg_not_callable)
-        args = view_candidate.func_code.co_varnames
+        args = view_candidate.__code__.co_varnames
         self.assertTrue(args, msg_no_request)
         self.assertEqual(args[0], 'request')
 

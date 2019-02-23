@@ -23,7 +23,7 @@ class TestArgParsingCourseExport(unittest.TestCase):
         Test export command with no arguments
         """
         errstring = "Error: too few arguments"
-        with self.assertRaisesRegexp(CommandError, errstring):
+        with self.assertRaisesRegex(CommandError, errstring):
             call_command('export')
 
 
@@ -49,14 +49,14 @@ class TestCourseExport(ModuleStoreTestCase):
         Create a new course try exporting in a path specified
         """
         course = CourseFactory.create(default_store=store)
-        course_id = unicode(course.id)
+        course_id = str(course.id)
         self.assertTrue(
             modulestore().has_course(course.id),
-            u"Could not find course in {}".format(store)
+            "Could not find course in {}".format(store)
         )
         # Test `export` management command with invalid course_id
         errstring = "Invalid course_key: 'InvalidCourseID'."
-        with self.assertRaisesRegexp(CommandError, errstring):
+        with self.assertRaisesRegex(CommandError, errstring):
             call_command('export', "InvalidCourseID", self.temp_dir_1)
 
         # Test `export` management command with correct course_id
@@ -68,5 +68,5 @@ class TestCourseExport(ModuleStoreTestCase):
         Test export command with a valid course key that doesn't exist
         """
         errstring = "Course with x/y/z key not found."
-        with self.assertRaisesRegexp(CommandError, errstring):
+        with self.assertRaisesRegex(CommandError, errstring):
             call_command('export', "x/y/z", self.temp_dir_1)

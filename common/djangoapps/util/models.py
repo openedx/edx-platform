@@ -1,5 +1,5 @@
 """Models for the util app. """
-import cStringIO
+import io
 import gzip
 import logging
 
@@ -35,7 +35,7 @@ def decompress_string(value):
 
     try:
         val = value.encode('utf').decode('base64')
-        zbuf = cStringIO.StringIO(val)
+        zbuf = io.StringIO(val)
         zfile = gzip.GzipFile(fileobj=zbuf)
         ret = zfile.read()
         zfile.close()
@@ -56,7 +56,7 @@ class CompressedTextField(CreatorMixin, models.TextField):
         Compress the text data.
         """
         if value is not None:
-            if isinstance(value, unicode):
+            if isinstance(value, str):
                 value = value.encode('utf8')
             value = compress_string(value)
             value = value.encode('base64').decode('utf8')
@@ -66,7 +66,7 @@ class CompressedTextField(CreatorMixin, models.TextField):
         """
         Decompresses the value from the database.
         """
-        if isinstance(value, unicode):
+        if isinstance(value, str):
             value = decompress_string(value)
 
         return value

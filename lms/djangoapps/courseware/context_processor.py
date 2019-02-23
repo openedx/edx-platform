@@ -39,7 +39,7 @@ def user_timezone_locale_prefs(request):
             else:
                 user_prefs = {
                     key: user_preferences.get(pref_name, None)
-                    for key, pref_name in RETRIEVABLE_PREFERENCES.iteritems()
+                    for key, pref_name in RETRIEVABLE_PREFERENCES.items()
                 }
 
         cached_value.update(user_prefs)

@@ -7,7 +7,7 @@ import json
 import logging
 import re
 import unicodedata
-import urllib
+import urllib.request, urllib.parse, urllib.error
 from textwrap import dedent
 
 import django_openid_auth.views as openid_views
@@ -97,11 +97,11 @@ def openid_login_complete(request,
         oid_backend = openid_auth.OpenIDBackend()
         details = oid_backend._extract_user_details(openid_response)  # pylint: disable=protected-access
 
-        log.debug(u'openid success, details=%s', details)
+        log.debug('openid success, details=%s', details)
 
         url = getattr(settings, 'OPENID_SSO_SERVER_URL', None)
-        external_domain = u"{0}{1}".format(OPENID_DOMAIN_PREFIX, url)
-        fullname = u'%s %s' % (details.get('first_name', ''),
+        external_domain = "{0}{1}".format(OPENID_DOMAIN_PREFIX, url)
+        fullname = '%s %s' % (details.get('first_name', ''),
                                details.get('last_name', ''))
 
         return _external_login_or_signup(
@@ -146,11 +146,11 @@ def _external_login_or_signup(request,
         )
 
     if created:
-        log.debug(u'Created eamap=%s', eamap)
+        log.debug('Created eamap=%s', eamap)
     else:
-        log.debug(u'Found eamap=%s', eamap)
+        log.debug('Found eamap=%s', eamap)
 
-    log.info(u"External_Auth login_or_signup for %s : %s : %s : %s", external_domain, external_id, email, fullname)
+    log.info("External_Auth login_or_signup for %s : %s : %s : %s", external_domain, external_id, email, fullname)
     uses_shibboleth = settings.FEATURES.get('AUTH_USE_SHIB') and external_domain.startswith(SHIBBOLETH_DOMAIN_PREFIX)
     uses_certs = settings.FEATURES.get('AUTH_USE_CERTIFICATES')
     internal_user = eamap.user
@@ -168,24 +168,24 @@ def _external_login_or_signup(request,
                         eamap.user = link_user
                         eamap.save()
                         internal_user = link_user
-                        log.info(u'SHIB: Linking existing account for %s', eamap.external_id)
+                        log.info('SHIB: Linking existing account for %s', eamap.external_id)
                         # now pass through to log in
                     else:
                         # otherwise, there must have been an error, b/c we've already linked a user with these external
                         # creds
                         failure_msg = _(
-                            u"You have already created an account using "
-                            u"an external login like WebAuth or Shibboleth. "
+                            "You have already created an account using "
+                            "an external login like WebAuth or Shibboleth. "
                             "Please contact {tech_support_email} for support."  # pylint: disable=unicode-format-string
                         ).format(
                             tech_support_email=get_value('email_from_address', settings.TECH_SUPPORT_EMAIL),
                         )
                         return default_render_failure(request, failure_msg)
             except User.DoesNotExist:
-                log.info(u'SHIB: No user for %s yet, doing signup', eamap.external_email)
+                log.info('SHIB: No user for %s yet, doing signup', eamap.external_email)
                 return _signup(request, eamap, retfun)
         else:
-            log.info(u'No user for %s yet. doing signup', eamap.external_email)
+            log.info('No user for %s yet. doing signup', eamap.external_email)
             return _signup(request, eamap, retfun)
 
     # We trust shib's authentication, so no need to authenticate using the password again
@@ -200,26 +200,26 @@ def _external_login_or_signup(request,
             auth_backend = 'ratelimitbackend.backends.RateLimitModelBackend'
         user.backend = auth_backend
         if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
-            AUDIT_LOG.info(u'Linked user.id: {0} logged in via Shibboleth'.format(user.id))
+            AUDIT_LOG.info('Linked user.id: {0} logged in via Shibboleth'.format(user.id))
         else:
-            AUDIT_LOG.info(u'Linked user "{0}" logged in via Shibboleth'.format(user.email))
+            AUDIT_LOG.info('Linked user "{0}" logged in via Shibboleth'.format(user.email))
     elif uses_certs:
         # Certificates are trusted, so just link the user and log the action
         user = internal_user
         user.backend = 'ratelimitbackend.backends.RateLimitModelBackend'
         if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
-            AUDIT_LOG.info(u'Linked user_id {0} logged in via SSL certificate'.format(user.id))
+            AUDIT_LOG.info('Linked user_id {0} logged in via SSL certificate'.format(user.id))
         else:
-            AUDIT_LOG.info(u'Linked user "{0}" logged in via SSL certificate'.format(user.email))
+            AUDIT_LOG.info('Linked user "{0}" logged in via SSL certificate'.format(user.email))
     else:
         user = authenticate(username=uname, password=eamap.internal_password, request=request)
 
     if user is None:
         # we want to log the failure, but don't want to log the password attempted:
         if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
-            AUDIT_LOG.warning(u'External Auth Login failed')
+            AUDIT_LOG.warning('External Auth Login failed')
         else:
-            AUDIT_LOG.warning(u'External Auth Login failed for "{0}"'.format(uname))
+            AUDIT_LOG.warning('External Auth Login failed for "{0}"'.format(uname))
         return _signup(request, eamap, retfun)
 
     if not user.is_active:
@@ -229,14 +229,14 @@ def _external_login_or_signup(request,
             user.is_active = True
             user.save()
             if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
-                AUDIT_LOG.info(u'Activating user {0} due to external auth'.format(user.id))
+                AUDIT_LOG.info('Activating user {0} due to external auth'.format(user.id))
             else:
-                AUDIT_LOG.info(u'Activating user "{0}" due to external auth'.format(uname))
+                AUDIT_LOG.info('Activating user "{0}" due to external auth'.format(uname))
         else:
             if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
-                AUDIT_LOG.warning(u'User {0} is not active after external login'.format(user.id))
+                AUDIT_LOG.warning('User {0} is not active after external login'.format(user.id))
             else:
-                AUDIT_LOG.warning(u'User "{0}" is not active after external login'.format(uname))
+                AUDIT_LOG.warning('User "{0}" is not active after external login'.format(uname))
             # TODO: improve error page
             msg = 'Account not yet activated: please look for link in your email'
             return default_render_failure(request, msg)
@@ -245,9 +245,9 @@ def _external_login_or_signup(request,
     request.session.set_expiry(0)
 
     if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
-        AUDIT_LOG.info(u"Login success - user.id: {0}".format(user.id))
+        AUDIT_LOG.info("Login success - user.id: {0}".format(user.id))
     else:
-        AUDIT_LOG.info(u"Login success - {0} ({1})".format(user.username, user.email))
+        AUDIT_LOG.info("Login success - {0} ({1})".format(user.username, user.email))
     if retfun is None:
         return redirect('/')
     return retfun()
@@ -263,7 +263,7 @@ def _flatten_to_ascii(txt):
         txt = txt.decode('utf-8')
         return unicodedata.normalize('NFKD', txt).encode('ASCII', 'ignore')
     else:
-        return unicode(unicodedata.normalize('NFKD', txt).encode('ASCII', 'ignore'))
+        return str(unicodedata.normalize('NFKD', txt).encode('ASCII', 'ignore'))
 
 
 @ensure_csrf_cookie
@@ -291,9 +291,9 @@ def _signup(request, eamap, retfun=None):
         username = eamap.external_email.split('@', 1)[0]
         username = username.replace('.', '_')
         post_vars = dict(username=username,
-                         honor_code=u'true',
-                         terms_of_service=u'true')
-        log.info(u'doing immediate signup for %s, params=%s', username, post_vars)
+                         honor_code='true',
+                         terms_of_service='true')
+        log.info('doing immediate signup for %s, params=%s', username, post_vars)
         create_account(request, post_vars)
         # should check return content for successful completion before
         if retfun is not None:
@@ -333,7 +333,7 @@ def _signup(request, eamap, retfun=None):
     except ValidationError:
         context['ask_for_email'] = True
 
-    log.info(u'EXTAUTH: Doing signup for %s', eamap.external_id)
+    log.info('EXTAUTH: Doing signup for %s', eamap.external_id)
 
     return register_user(request, extra_context=context)
 
@@ -512,10 +512,10 @@ def shib_login(request):
         """))
 
     if not request.META.get('REMOTE_USER'):
-        log.error(u"SHIB: no REMOTE_USER found in request.META")
+        log.error("SHIB: no REMOTE_USER found in request.META")
         return default_render_failure(request, shib_error_msg)
     elif not request.META.get('Shib-Identity-Provider'):
-        log.error(u"SHIB: no Shib-Identity-Provider in request.META")
+        log.error("SHIB: no Shib-Identity-Provider in request.META")
         return default_render_failure(request, shib_error_msg)
     else:
         # If we get here, the user has authenticated properly
@@ -529,9 +529,9 @@ def shib_login(request):
         shib['givenName'] = shib['givenName'].split(";")[0].strip().capitalize()
 
     # TODO: should we be logging creds here, at info level?
-    log.info(u"SHIB creds returned: %r", shib)
+    log.info("SHIB creds returned: %r", shib)
 
-    fullname = shib['displayName'] if shib['displayName'] else u'%s %s' % (shib['givenName'], shib['sn'])
+    fullname = shib['displayName'] if shib['displayName'] else '%s %s' % (shib['givenName'], shib['sn'])
 
     redirect_to = get_next_url_for_login_page(request)
     retfun = functools.partial(_safe_postlogin_redirect, redirect_to, request.get_host())
@@ -680,7 +680,7 @@ def add_openid_attribute_exchange(request, response, data):
 
         # if consumer requested attribute exchange fields, add them
         if ax_request and ax_request.requested_attributes:
-            for type_uri in ax_request.requested_attributes.iterkeys():
+            for type_uri in ax_request.requested_attributes.keys():
                 email_schema = 'http://axschema.org/contact/email'
                 name_schema = 'http://axschema.org/namePerson'
                 if type_uri == email_schema and 'email' in data:
@@ -706,7 +706,7 @@ def provider_respond(server, request, response, data):
     http_response.status_code = webresponse.code
 
     # add OpenID headers to response
-    for key, val in webresponse.headers.iteritems():
+    for key, val in webresponse.headers.items():
         http_response[key] = val
 
     return http_response
@@ -773,9 +773,9 @@ def provider_login(request):
     # If so, the client will have specified an 'openid.mode' as part
     # of the request.
     if request.method == 'GET':
-        querydict = dict(request.GET.items())
+        querydict = dict(list(request.GET.items()))
     else:
-        querydict = dict(request.POST.items())
+        querydict = dict(list(request.POST.items()))
     error = False
     if 'openid.mode' in request.GET or 'openid.mode' in request.POST:
         # decode request
@@ -833,7 +833,7 @@ def provider_login(request):
             param: post_params[param] for param in post_params if param.startswith('openid')
         }
 
-        encoded_params = urllib.urlencode(url_post_params)
+        encoded_params = urllib.parse.urlencode(url_post_params)
 
         if '?' not in openid_request_url:
             openid_request_url = openid_request_url + '?' + encoded_params
@@ -855,9 +855,9 @@ def provider_login(request):
         except User.DoesNotExist:
             request.session['openid_error'] = True
             if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
-                AUDIT_LOG.warning(u"OpenID login failed - Unknown user email")
+                AUDIT_LOG.warning("OpenID login failed - Unknown user email")
             else:
-                msg = u"OpenID login failed - Unknown user email: {0}".format(email)
+                msg = "OpenID login failed - Unknown user email: {0}".format(email)
                 AUDIT_LOG.warning(msg)
             return HttpResponseRedirect(openid_request_url)
 
@@ -868,16 +868,16 @@ def provider_login(request):
         try:
             user = authenticate(username=username, password=password, request=request)
         except RateLimitException:
-            AUDIT_LOG.warning(u'OpenID - Too many failed login attempts.')
+            AUDIT_LOG.warning('OpenID - Too many failed login attempts.')
             return HttpResponseRedirect(openid_request_url)
 
         if user is None:
             request.session['openid_error'] = True
             if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
-                AUDIT_LOG.warning(u"OpenID login failed - invalid password")
+                AUDIT_LOG.warning("OpenID login failed - invalid password")
             else:
                 AUDIT_LOG.warning(
-                    u"OpenID login failed - password for %s is invalid", email)
+                    "OpenID login failed - password for %s is invalid", email)
             return HttpResponseRedirect(openid_request_url)
 
         # authentication succeeded, so fetch user information
@@ -888,10 +888,10 @@ def provider_login(request):
                 del request.session['openid_error']
 
             if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
-                AUDIT_LOG.info(u"OpenID login success - user.id: %s", user.id)
+                AUDIT_LOG.info("OpenID login success - user.id: %s", user.id)
             else:
                 AUDIT_LOG.info(
-                    u"OpenID login success - %s (%s)", user.username, user.email)
+                    "OpenID login success - %s (%s)", user.username, user.email)
             # redirect user to return_to location
             url = endpoint + urlquote(user.username)
             response = openid_request.answer(True, None, url)
@@ -911,10 +911,10 @@ def provider_login(request):
         request.session['openid_error'] = True
         if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
             AUDIT_LOG.warning(
-                u"Login failed - Account not active for user.id %s", user.id)
+                "Login failed - Account not active for user.id %s", user.id)
         else:
             AUDIT_LOG.warning(
-                u"Login failed - Account not active for user %s", username)
+                "Login failed - Account not active for user %s", username)
         return HttpResponseRedirect(openid_request_url)
 
     # determine consumer domain if applicable

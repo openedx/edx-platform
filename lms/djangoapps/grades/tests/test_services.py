@@ -106,8 +106,8 @@ class GradesServiceTests(ModuleStoreTestCase):
         # test with id strings as parameters instead
         self.assertDictEqual(self.subsection_grade_to_dict(self.service.get_subsection_grade(
             user_id=self.user.id,
-            course_key_or_id=unicode(self.course.id),
-            usage_key_or_id=unicode(self.subsection.location)
+            course_key_or_id=str(self.course.id),
+            usage_key_or_id=str(self.subsection.location)
         )), {
             'earned_all': 6.0,
             'earned_graded': 5.0
@@ -135,7 +135,7 @@ class GradesServiceTests(ModuleStoreTestCase):
         # test with course key parameter as string instead
         self.assertDictEqual(self.subsection_grade_override_to_dict(self.service.get_subsection_grade_override(
             user_id=self.user.id,
-            course_key_or_id=unicode(self.course.id),
+            course_key_or_id=str(self.course.id),
             usage_key_or_id=self.subsection.location
         )), {
             'earned_all_override': override.earned_all_override,
@@ -189,8 +189,8 @@ class GradesServiceTests(ModuleStoreTestCase):
             call(
                 sender=None,
                 user_id=self.user.id,
-                course_id=unicode(self.course.id),
-                usage_id=unicode(self.subsection.location),
+                course_id=str(self.course.id),
+                usage_id=str(self.subsection.location),
                 only_if_higher=False,
                 modified=override_obj.modified,
                 score_deleted=False,
@@ -240,8 +240,8 @@ class GradesServiceTests(ModuleStoreTestCase):
             call(
                 sender=None,
                 user_id=self.user.id,
-                course_id=unicode(self.course.id),
-                usage_id=unicode(self.subsection_without_grade.location),
+                course_id=str(self.course.id),
+                usage_id=str(self.subsection_without_grade.location),
                 only_if_higher=False,
                 modified=override_obj.modified,
                 score_deleted=False,
@@ -269,8 +269,8 @@ class GradesServiceTests(ModuleStoreTestCase):
             call(
                 sender=None,
                 user_id=self.user.id,
-                course_id=unicode(self.course.id),
-                usage_id=unicode(self.subsection.location),
+                course_id=str(self.course.id),
+                usage_id=str(self.subsection.location),
                 only_if_higher=False,
                 modified=datetime.now().replace(tzinfo=pytz.UTC),
                 score_deleted=True,

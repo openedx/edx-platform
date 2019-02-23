@@ -1,5 +1,5 @@
 """ Management command to update libraries' search index """
-from __future__ import print_function
+
 from textwrap import dedent
 
 from django.core.management import BaseCommand, CommandError
@@ -22,7 +22,7 @@ class Command(BaseCommand):
         ./manage.py reindex_library --all - reindexes all available libraries
     """
     help = dedent(__doc__)
-    CONFIRMATION_PROMPT = u"Reindexing all libraries might be a time consuming operation. Do you want to continue?"
+    CONFIRMATION_PROMPT = "Reindexing all libraries might be a time consuming operation. Do you want to continue?"
 
     def add_arguments(self, parser):
         parser.add_argument('library_ids', nargs='*')
@@ -38,7 +38,7 @@ class Command(BaseCommand):
         result = CourseKey.from_string(raw_value)
 
         if not isinstance(result, LibraryLocator):
-            raise CommandError(u"Argument {0} is not a library key".format(raw_value))
+            raise CommandError("Argument {0} is not a library key".format(raw_value))
 
         return result
 
@@ -48,7 +48,7 @@ class Command(BaseCommand):
         So, there could be no better docstring than emphasize this once again.
         """
         if (not options['library_ids'] and not options['all']) or (options['library_ids'] and options['all']):
-            raise CommandError(u"reindex_library requires one or more <library_id>s or the --all flag.")
+            raise CommandError("reindex_library requires one or more <library_id>s or the --all flag.")
 
         store = modulestore()
 
@@ -58,8 +58,8 @@ class Command(BaseCommand):
             else:
                 return
         else:
-            library_keys = map(self._parse_library_key, options['library_ids'])
+            library_keys = list(map(self._parse_library_key, options['library_ids']))
 
         for library_key in library_keys:
-            print(u"Indexing library {}".format(library_key))
+            print("Indexing library {}".format(library_key))
             LibrarySearchIndexer.do_library_reindex(store, library_key)

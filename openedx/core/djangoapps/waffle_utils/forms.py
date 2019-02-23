@@ -29,7 +29,7 @@ class WaffleFlagCourseOverrideAdminForm(forms.ModelForm):
         cleaned_flag = self.cleaned_data['waffle_flag']
 
         if not cleaned_flag:
-            msg = u'Waffle flag must be supplied.'
+            msg = 'Waffle flag must be supplied.'
             raise forms.ValidationError(msg)
 
         return cleaned_flag.strip()

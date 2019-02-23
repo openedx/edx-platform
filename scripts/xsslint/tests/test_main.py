@@ -4,7 +4,7 @@ Tests for main.py
 """
 import re
 import textwrap
-from StringIO import StringIO
+from io import StringIO
 from unittest import TestCase
 
 import mock
@@ -87,7 +87,7 @@ class TestXSSLinter(TestCase):
             else:
                 lines_without_rule += 1
         self.assertGreaterEqual(lines_with_rule, 1)
-        self.assertEquals(lines_without_rule, 0)
+        self.assertEqual(lines_without_rule, 0)
         self.assertIsNone(re.search(r'test\.py.*{}'.format(self.ruleset.python_parse_error.rule_id), output))
         self.assertIsNotNone(re.search(r'test\.py.*{}'.format(self.ruleset.python_wrap_html.rule_id), output))
         # Assert no rule totals.

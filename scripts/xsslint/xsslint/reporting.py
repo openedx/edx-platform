@@ -1,7 +1,7 @@
 """
 Utility classes for reporting linter results.
 """
-from __future__ import print_function
+
 
 import os
 import re
@@ -246,7 +246,7 @@ class SummaryResults(object):
         """
         self.total_violations = 0
         self.totals_by_rule = dict.fromkeys(
-            [rule.rule_id for rule in ruleset.rules.values()], 0
+            [rule.rule_id for rule in list(ruleset.rules.values())], 0
         )
 
     def add_violation(self, violation):

@@ -29,7 +29,7 @@ class CrawlersConfigTest(TestCase):
         self.assertFalse(CrawlersConfig.is_crawler(fake_request))
 
     @ddt.data(
-        u"edX-downloader",
+        "edX-downloader",
         "crawler_foo".encode("utf-8")
     )
     def test_req_user_agent_is_crawler(self, req_user_agent):

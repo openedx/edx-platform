@@ -82,7 +82,7 @@ def add_temp_files_from_dict(file_dict, dir):
         with io.open("{}/{}".format(dir, file_name), "w") as opened_file:
             content = file_dict[file_name]
             if content:
-                opened_file.write(unicode(content))
+                opened_file.write(str(content))
 
 
 def remove_temp_files_from_list(file_list, dir):
@@ -100,7 +100,7 @@ class MixedSplitTestCase(TestCase):
     Stripped-down version of ModuleStoreTestCase that can be used without Django
     (i.e. for testing in common/lib/ ). Sets up MixedModuleStore and Split.
     """
-    RENDER_TEMPLATE = lambda t_n, d, ctx=None, nsp='main': u'{}: {}, {}'.format(t_n, repr(d), repr(ctx))
+    RENDER_TEMPLATE = lambda t_n, d, ctx=None, nsp='main': '{}: {}, {}'.format(t_n, repr(d), repr(ctx))
     modulestore_options = {
         'default_class': 'xmodule.raw_module.RawDescriptor',
         'fs_root': DATA_DIR,
@@ -413,12 +413,12 @@ class MixedModulestoreBuilder(StoreBuilderBase):
             contentstore: The contentstore that this modulestore should use to store
                 all of its assets.
         """
-        names, generators = zip(*self.store_builders)
+        names, generators = list(zip(*self.store_builders))
 
         with nested(*(gen.build_with_contentstore(contentstore, **kwargs) for gen in generators)) as modulestores:
             # Make the modulestore creation function just return the already-created modulestores
             store_iterator = iter(modulestores)
-            next_modulestore = lambda *args, **kwargs: store_iterator.next()
+            next_modulestore = lambda *args, **kwargs: next(store_iterator)
 
             # Generate a fake list of stores to give the already generated stores appropriate names
             stores = [{'NAME': name, 'ENGINE': 'This space deliberately left blank'} for name in names]
@@ -491,7 +491,7 @@ DIRECT_MS_SETUPS_SHORT = (
 )
 MODULESTORE_SETUPS = DIRECT_MODULESTORE_SETUPS + MIXED_MODULESTORE_SETUPS
 MODULESTORE_SHORTNAMES = DIRECT_MS_SETUPS_SHORT + MIXED_MS_SETUPS_SHORT
-SHORT_NAME_MAP = dict(zip(MODULESTORE_SETUPS, MODULESTORE_SHORTNAMES))
+SHORT_NAME_MAP = dict(list(zip(MODULESTORE_SETUPS, MODULESTORE_SHORTNAMES)))
 
 CONTENTSTORE_SETUPS = (MongoContentstoreBuilder(),)
 

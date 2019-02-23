@@ -29,8 +29,8 @@ def course_slug(course_key, mode):
     Badgr's max slug length is 255.
     """
     # Seven digits should be enough to realistically avoid collisions. That's what git services use.
-    digest = hashlib.sha256(u"{}{}".format(unicode(course_key), unicode(mode))).hexdigest()[:7]
-    base_slug = slugify(unicode(course_key) + u'_{}_'.format(mode))[:248]
+    digest = hashlib.sha256("{}{}".format(str(course_key), str(mode))).hexdigest()[:7]
+    base_slug = slugify(str(course_key) + '_{}_'.format(mode))[:248]
     return base_slug + digest
 
 
@@ -39,14 +39,14 @@ def badge_description(course, mode):
     Returns a description for the earned badge.
     """
     if course.end:
-        return _(u'Completed the course "{course_name}" ({course_mode}, {start_date} - {end_date})').format(
+        return _('Completed the course "{course_name}" ({course_mode}, {start_date} - {end_date})').format(
             start_date=course.start.date(),
             end_date=course.end.date(),
             course_name=course.display_name,
             course_mode=mode,
         )
     else:
-        return _(u'Completed the course "{course_name}" ({course_mode})').format(
+        return _('Completed the course "{course_name}" ({course_mode})').format(
             course_name=course.display_name,
             course_mode=mode,
         )
@@ -58,15 +58,15 @@ def evidence_url(user_id, course_key):
     event.
     """
     return site_prefix() + reverse(
-        'certificates:html_view', kwargs={'user_id': user_id, 'course_id': unicode(course_key)}) + '?evidence_visit=1'
+        'certificates:html_view', kwargs={'user_id': user_id, 'course_id': str(course_key)}) + '?evidence_visit=1'
 
 
 def criteria(course_key):
     """
     Constructs the 'criteria' URL from the course about page.
     """
-    about_path = reverse('about_course', kwargs={'course_id': unicode(course_key)})
-    return u'{}{}'.format(site_prefix(), about_path)
+    about_path = reverse('about_course', kwargs={'course_id': str(course_key)})
+    return '{}{}'.format(site_prefix(), about_path)
 
 
 def get_completion_badge(course_id, user):

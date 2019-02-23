@@ -1,7 +1,7 @@
 """
 Script for importing a content library from a tar.gz file
 """
-from __future__ import print_function
+
 
 import base64
 import os
@@ -51,7 +51,7 @@ class Command(BaseCommand):
         try:
             safetar_extractall(tar_file, course_dir.encode('utf-8'))
         except SuspiciousOperation as exc:
-            raise CommandError(u'\n=== Course import {0}: Unsafe tar file - {1}\n'.format(archive_path, exc.args[0]))
+            raise CommandError('\n=== Course import {0}: Unsafe tar file - {1}\n'.format(archive_path, exc.args[0]))
         finally:
             tar_file.close()
 
@@ -62,7 +62,7 @@ class Command(BaseCommand):
         # Gather library metadata from XML file
         xml_root = etree.parse(abs_xml_path / 'library.xml').getroot()
         if xml_root.tag != 'library':
-            raise CommandError(u'Failed to import {0}: Not a library archive'.format(archive_path))
+            raise CommandError('Failed to import {0}: Not a library archive'.format(archive_path))
 
         metadata = xml_root.attrib
         org = metadata['org']
@@ -76,10 +76,10 @@ class Command(BaseCommand):
         # Check if data would be overwritten
         ans = ''
         while not created and ans not in ['y', 'yes', 'n', 'no']:
-            inp = raw_input(u'Library "{0}" already exists, overwrite it? [y/n] '.format(courselike_key))
+            inp = input('Library "{0}" already exists, overwrite it? [y/n] '.format(courselike_key))
             ans = inp.lower()
         if ans.startswith('n'):
-            print(u'Aborting import of "{0}"'.format(courselike_key))
+            print('Aborting import of "{0}"'.format(courselike_key))
             return
 
         # At last, import the library
@@ -92,10 +92,10 @@ class Command(BaseCommand):
                 target_id=courselike_key
             )
         except Exception:
-            print(u'\n=== Failed to import library-v1:{0}+{1}'.format(org, library))
+            print('\n=== Failed to import library-v1:{0}+{1}'.format(org, library))
             raise
 
-        print(u'Library "{0}" imported to "{1}"'.format(archive_path, courselike_key))
+        print('Library "{0}" imported to "{1}"'.format(archive_path, courselike_key))
 
 
 def _get_or_create_library(org, number, display_name, user):

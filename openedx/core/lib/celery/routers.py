@@ -11,12 +11,10 @@ from django.conf import settings
 log = logging.getLogger(__name__)
 
 
-class AlternateEnvironmentRouter(object):
+class AlternateEnvironmentRouter(object, metaclass=ABCMeta):
     """
     A custom Router class for use in routing celery tasks to non-default queues.
     """
-    # this is an abstract base class, implementations must provide alternate_env_tasks
-    __metaclass__ = ABCMeta
 
     @abstractproperty
     def alternate_env_tasks(self):

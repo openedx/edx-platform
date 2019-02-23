@@ -3,7 +3,7 @@ Views that dispatch processing of OAuth requests to django-oauth2-provider or
 django-oauth-toolkit as appropriate.
 """
 
-from __future__ import unicode_literals
+
 
 import json
 
@@ -79,7 +79,7 @@ class _DispatchingView(View):
         """
         Return the client_id from the provided request
         """
-        if request.method == u'GET':
+        if request.method == 'GET':
             return request.GET.get('client_id')
         else:
             return request.POST.get('client_id')

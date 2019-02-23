@@ -15,12 +15,12 @@ def convert_tokens(tokens):
 
     if tokens == 'None':
         return None
-    elif isinstance(tokens, basestring) or (not isinstance(tokens, collections.Iterable)):
+    elif isinstance(tokens, str) or (not isinstance(tokens, collections.Iterable)):
         return tokens
     elif isinstance(tokens, dict):
         return {
             convert_tokens(k): convert_tokens(v)
-            for k, v in tokens.items()
+            for k, v in list(tokens.items())
         }
     else:
         return [convert_tokens(v) for v in tokens]

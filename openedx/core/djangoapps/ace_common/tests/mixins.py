@@ -1,5 +1,5 @@
 # pylint: disable=missing-docstring
-from urlparse import parse_qs, urlparse
+from urllib.parse import parse_qs, urlparse
 import uuid
 from django.http import HttpRequest
 from mock import patch
@@ -37,7 +37,7 @@ class QueryStringAssertionMixin(object):
             AssertionError: If any of the expected components do not match.
         """
         parsed_url = urlparse(url)
-        for expected_component, expected_value in kwargs.items():
+        for expected_component, expected_value in list(kwargs.items()):
             if expected_component == 'query':
                 self.assert_query_string_equal(expected_value, parsed_url.query)
             else:
@@ -57,7 +57,7 @@ class QueryStringAssertionMixin(object):
         """
         parsed_url = urlparse(url)
         parsed_qs = parse_qs(parsed_url.query)
-        for expected_key, expected_value in kwargs.items():
+        for expected_key, expected_value in list(kwargs.items()):
             self.assertEqual(parsed_qs[expected_key], [str(expected_value)])
 
 

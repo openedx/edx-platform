@@ -79,5 +79,5 @@ def get_entrance_exam_score_ratio(course_grade, exam_chapter_key):
         entrance_exam_score_ratio = course_grade.chapter_percentage(exam_chapter_key)
     except KeyError:
         entrance_exam_score_ratio = 0.0, 0.0
-        log.warning(u'Gating: Unexpectedly failed to find chapter_grade for %s.', exam_chapter_key)
+        log.warning('Gating: Unexpectedly failed to find chapter_grade for %s.', exam_chapter_key)
     return entrance_exam_score_ratio

@@ -27,7 +27,7 @@ class TestVerifyStudentCommand(TestCase):
         self.user1 = UserFactory.create()
         self.user2 = UserFactory.create()
         self.user3 = UserFactory.create()
-        self.invalid_email = unicode('unknown@unknown.com')
+        self.invalid_email = str('unknown@unknown.com')
 
         self.create_email_ids_file(
             self.tmp_file_path,
@@ -46,11 +46,11 @@ class TestVerifyStudentCommand(TestCase):
         """
         Tests that the manual_verifications management command executes successfully
         """
-        self.assertEquals(ManualVerification.objects.filter(status='approved').count(), 0)
+        self.assertEqual(ManualVerification.objects.filter(status='approved').count(), 0)
 
         call_command('manual_verifications', '--email-ids-file', self.tmp_file_path)
 
-        self.assertEquals(ManualVerification.objects.filter(status='approved').count(), 3)
+        self.assertEqual(ManualVerification.objects.filter(status='approved').count(), 3)
 
     def test_manual_verifications_created_date(self):
         """
@@ -83,15 +83,15 @@ class TestVerifyStudentCommand(TestCase):
         expected_log = (
             (LOGGER_NAME,
              'INFO',
-             u'Creating manual verification for 4 emails.'
+             'Creating manual verification for 4 emails.'
              ),
             (LOGGER_NAME,
              'ERROR',
-             u'Tried to verify email unknown@unknown.com, but user not found'
+             'Tried to verify email unknown@unknown.com, but user not found'
              ),
             (LOGGER_NAME,
              'ERROR',
-             u'Completed manual verification. 1 of 4 failed.'
+             'Completed manual verification. 1 of 4 failed.'
              ),
             (LOGGER_NAME,
              'ERROR',
@@ -110,4 +110,4 @@ class TestVerifyStudentCommand(TestCase):
         Verify command raises the CommandError for invalid file path.
         """
         with self.assertRaises(CommandError):
-            call_command('manual_verifications', '--email-ids-file', u'invalid/email_id/file/path')
+            call_command('manual_verifications', '--email-ids-file', 'invalid/email_id/file/path')

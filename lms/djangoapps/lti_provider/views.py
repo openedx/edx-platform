@@ -76,7 +76,7 @@ def lti_launch(request, course_id, usage_id):
         course_key, usage_key = parse_course_and_usage_keys(course_id, usage_id)
     except InvalidKeyError:
         log.error(
-            u'Invalid course key %s or usage key %s from request %s',
+            'Invalid course key %s or usage key %s from request %s',
             course_id,
             usage_id,
             request
@@ -144,7 +144,7 @@ def render_courseware(request, usage_key):
     """
     # return an HttpResponse object that contains the template and necessary context to render the courseware.
     from courseware.views.views import render_xblock
-    return render_xblock(request, unicode(usage_key), check_if_enrolled=False)
+    return render_xblock(request, str(usage_key), check_if_enrolled=False)
 
 
 def parse_course_and_usage_keys(course_id, usage_id):

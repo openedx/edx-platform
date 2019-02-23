@@ -67,7 +67,7 @@ class UserManagementHelperTest(TestCase):
             for char in range(len(username)):
                 self.assertIn(
                     username[char], string.ascii_letters + string.digits,
-                    u"Username has forbidden character '{}'".format(username[char])
+                    "Username has forbidden character '{}'".format(username[char])
                 )
 
 

@@ -1,6 +1,6 @@
 # pylint: disable=missing-docstring
 
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from django.apps import apps
 from django.contrib.auth import get_user_model
@@ -34,7 +34,7 @@ def log_in(username='robot', password='test', email='robot@edx.org', name="Robot
     """
     url = '/auto_auth'
     params = {'username': username, 'password': password, 'email': email, 'full_name': name}
-    url += "?" + urllib.urlencode(params)
+    url += "?" + urllib.parse.urlencode(params)
     world.visit(url)
 
     # Save the user info in the world scenario_dict for use in the tests

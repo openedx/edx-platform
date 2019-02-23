@@ -145,18 +145,18 @@ class TestVideo(BaseTestXmodule):
             for user in self.users
         }
 
-        status_codes = {response.status_code for response in responses.values()}
+        status_codes = {response.status_code for response in list(responses.values())}
         self.assertEqual(status_codes.pop(), 404)
 
     def test_handle_ajax(self):
 
         data = [
-            {u'speed': 2.0},
-            {u'saved_video_position': "00:00:10"},
-            {u'transcript_language': 'uk'},
-            {u'bumper_do_not_show_again': True},
-            {u'bumper_last_view_date': True},
-            {u'demoo�': 'sample'}
+            {'speed': 2.0},
+            {'saved_video_position': "00:00:10"},
+            {'transcript_language': 'uk'},
+            {'bumper_do_not_show_again': True},
+            {'bumper_last_view_date': True},
+            {'demoo�': 'sample'}
         ]
         for sample in data:
             response = self.clients[self.users[0].username].post(
@@ -187,7 +187,7 @@ class TestVideo(BaseTestXmodule):
             self.item_descriptor.handle_ajax('save_user_state', {'bumper_last_view_date': True})
             self.assertEqual(self.item_descriptor.bumper_last_view_date, now())
 
-        response = self.item_descriptor.handle_ajax('save_user_state', {u'demoo�': "sample"})
+        response = self.item_descriptor.handle_ajax('save_user_state', {'demoo�': "sample"})
         self.assertEqual(json.loads(response)['success'], True)
 
     def get_handler_url(self, handler, suffix):
@@ -211,7 +211,7 @@ class TestTranscriptAvailableTranslationsDispatch(TestVideo):
     Tests for `available_translations` dispatch.
     """
     srt_file = _create_srt_file()
-    DATA = u"""
+    DATA = """
         <video show_captions="true"
         display_name="A Name"
         >
@@ -321,7 +321,7 @@ class TestTranscriptAvailableTranslationsDispatch(TestVideo):
         Tests available translations with video component's and val's transcript languages
         while the feature is enabled.
         """
-        for lang_code, in_content_store in dict(transcripts).iteritems():
+        for lang_code, in_content_store in dict(transcripts).items():
             if in_content_store:
                 file_name, __ = os.path.split(self.srt_file.name)
                 _upload_file(self.srt_file, self.item_descriptor.location, file_name)
@@ -369,7 +369,7 @@ class TestTranscriptAvailableTranslationsBumperDispatch(TestVideo):
     Tests for `available_translations_bumper` dispatch.
     """
     srt_file = _create_srt_file()
-    DATA = u"""
+    DATA = """
         <video show_captions="true"
         display_name="A Name"
         >
@@ -492,7 +492,7 @@ class TestTranscriptDownloadDispatch(TestVideo):
 
     @patch(
         'xmodule.video_module.transcripts_utils.get_transcript_for_video',
-        return_value=(Transcript.SRT, u"塞", 'Subs!')
+        return_value=(Transcript.SRT, "塞", 'Subs!')
     )
     def test_download_non_en_non_ascii_filename(self, __):
         request = Request.blank('/download')
@@ -521,17 +521,17 @@ class TestTranscriptDownloadDispatch(TestVideo):
         response = self.item.transcript(request=request, dispatch='download')
 
         # Expected response
-        expected_content = u'0\n00:00:00,010 --> 00:00:00,100\nHi, welcome to Edx.\n\n'
+        expected_content = '0\n00:00:00,010 --> 00:00:00,100\nHi, welcome to Edx.\n\n'
         expected_headers = {
             'Content-Disposition': 'attachment; filename="edx.srt"',
-            'Content-Language': u'en',
+            'Content-Language': 'en',
             'Content-Type': 'application/x-subrip; charset=utf-8'
         }
 
         # Assert the actual response
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.text, expected_content)
-        for attribute, value in expected_headers.iteritems():
+        for attribute, value in expected_headers.items():
             self.assertEqual(response.headers[attribute], value)
 
 
@@ -544,7 +544,7 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
     """
 
     srt_file = _create_srt_file()
-    DATA = u"""
+    DATA = """
         <video
             show_captions="true"
             display_name="A Name"
@@ -603,10 +603,10 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
 
     def test_translation_non_en_youtube_success(self):
         subs = {
-            u'end': [100],
-            u'start': [12],
-            u'text': [
-                u'\u041f\u0440\u0438\u0432\u0456\u0442, edX \u0432\u0456\u0442\u0430\u0454 \u0432\u0430\u0441.'
+            'end': [100],
+            'start': [12],
+            'text': [
+                '\u041f\u0440\u0438\u0432\u0456\u0442, edX \u0432\u0456\u0442\u0430\u0454 \u0432\u0430\u0441.'
             ]
         }
         self.srt_file.seek(0)
@@ -625,10 +625,10 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
         request = Request.blank('/translation/uk?videoId={}'.format('0_75'))
         response = self.item.transcript(request=request, dispatch='translation/uk')
         calculated_0_75 = {
-            u'end': [75],
-            u'start': [9],
-            u'text': [
-                u'\u041f\u0440\u0438\u0432\u0456\u0442, edX \u0432\u0456\u0442\u0430\u0454 \u0432\u0430\u0441.'
+            'end': [75],
+            'start': [9],
+            'text': [
+                '\u041f\u0440\u0438\u0432\u0456\u0442, edX \u0432\u0456\u0442\u0430\u0454 \u0432\u0430\u0441.'
             ]
         }
 
@@ -639,10 +639,10 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
         request = Request.blank('/translation/uk?videoId={}'.format('1_5'))
         response = self.item.transcript(request=request, dispatch='translation/uk')
         calculated_1_5 = {
-            u'end': [150],
-            u'start': [18],
-            u'text': [
-                u'\u041f\u0440\u0438\u0432\u0456\u0442, edX \u0432\u0456\u0442\u0430\u0454 \u0432\u0430\u0441.'
+            'end': [150],
+            'start': [18],
+            'text': [
+                '\u041f\u0440\u0438\u0432\u0456\u0442, edX \u0432\u0456\u0442\u0430\u0454 \u0432\u0430\u0441.'
             ]
         }
         self.assertDictEqual(json.loads(response.body), calculated_1_5)
@@ -664,10 +664,10 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
 
     def test_translaton_non_en_html5_success(self):
         subs = {
-            u'end': [100],
-            u'start': [12],
-            u'text': [
-                u'\u041f\u0440\u0438\u0432\u0456\u0442, edX \u0432\u0456\u0442\u0430\u0454 \u0432\u0430\u0441.'
+            'end': [100],
+            'start': [12],
+            'text': [
+                '\u041f\u0440\u0438\u0432\u0456\u0442, edX \u0432\u0456\u0442\u0430\u0454 \u0432\u0430\u0441.'
             ]
         }
         self.srt_file.seek(0)
@@ -801,7 +801,7 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
         # Assert the actual response
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.text, transcript['content'])
-        for attribute, value in expected_headers.iteritems():
+        for attribute, value in expected_headers.items():
             self.assertEqual(response.headers[attribute], value)
 
     @patch('xmodule.video_module.VideoModule.translation', Mock(side_effect=NotFoundError))
@@ -823,7 +823,7 @@ class TestStudioTranscriptTranslationGetDispatch(TestVideo):
     Tests for `translation` dispatch GET HTTP method.
     """
     srt_file = _create_srt_file()
-    DATA = u"""
+    DATA = """
         <video show_captions="true"
         display_name="A Name"
         >
@@ -832,7 +832,7 @@ class TestStudioTranscriptTranslationGetDispatch(TestVideo):
             <transcript language="uk" src="{}"/>
             <transcript language="zh" src="{}"/>
         </video>
-    """.format(os.path.split(srt_file.name)[1], u"塞.srt")
+    """.format(os.path.split(srt_file.name)[1], "塞.srt")
 
     MODEL_DATA = {'data': DATA}
 
@@ -851,20 +851,20 @@ class TestStudioTranscriptTranslationGetDispatch(TestVideo):
         # Correct case:
         filename = os.path.split(self.srt_file.name)[1]
         _upload_file(self.srt_file, self.item_descriptor.location, filename)
-        request = Request.blank(u"translation?language_code=uk")
+        request = Request.blank("translation?language_code=uk")
         response = self.item_descriptor.studio_transcript(request=request, dispatch="translation?language_code=uk")
         self.srt_file.seek(0)
         self.assertEqual(response.body, self.srt_file.read())
         self.assertEqual(response.headers["Content-Type"], "application/x-subrip; charset=utf-8")
         self.assertEqual(
             response.headers["Content-Disposition"],
-            u'attachment; filename="uk_{}"'.format(filename)
+            'attachment; filename="uk_{}"'.format(filename)
         )
         self.assertEqual(response.headers["Content-Language"], "uk")
 
         # Non ascii file name download:
         self.srt_file.seek(0)
-        _upload_file(self.srt_file, self.item_descriptor.location, u"塞.srt")
+        _upload_file(self.srt_file, self.item_descriptor.location, "塞.srt")
         request = Request.blank("translation?language_code=zh")
         response = self.item_descriptor.studio_transcript(request=request, dispatch="translation?language_code=zh")
         self.srt_file.seek(0)
@@ -987,7 +987,7 @@ class TestStudioTranscriptTranslationDeleteDispatch(TestVideo):
 
     Tests for `translation` dispatch DELETE HTTP method.
     """
-    EDX_VIDEO_ID, LANGUAGE_CODE_UK, LANGUAGE_CODE_EN = u'an_edx_video_id', u'uk', u'en'
+    EDX_VIDEO_ID, LANGUAGE_CODE_UK, LANGUAGE_CODE_EN = 'an_edx_video_id', 'uk', 'en'
     REQUEST_META = {'wsgi.url_scheme': 'http', 'REQUEST_METHOD': 'DELETE'}
     SRT_FILE = _create_srt_file()
 
@@ -1022,7 +1022,7 @@ class TestStudioTranscriptTranslationDeleteDispatch(TestVideo):
             'client_video_id': 'awesome.mp4',
             'duration': 0,
             'encoded_videos': [],
-            'courses': [unicode(self.course.id)]
+            'courses': [str(self.course.id)]
         })
         api.create_video_transcript(
             video_id=self.EDX_VIDEO_ID,
@@ -1096,7 +1096,7 @@ class TestStudioTranscriptTranslationDeleteDispatch(TestVideo):
         request = Request(self.REQUEST_META, body=request_body)
 
         # sub should not be empy
-        self.assertFalse(self.item_descriptor.sub == u'')
+        self.assertFalse(self.item_descriptor.sub == '')
 
         # upload and verify that srt file exists in assets
         _upload_file(self.SRT_FILE, self.item_descriptor.location, sub_file_name)
@@ -1107,7 +1107,7 @@ class TestStudioTranscriptTranslationDeleteDispatch(TestVideo):
         self.assertEqual(response.status_code, 200)
 
         # verify that sub is empty and transcript is deleted also
-        self.assertTrue(self.item_descriptor.sub == u'')
+        self.assertTrue(self.item_descriptor.sub == '')
         self.assertFalse(_check_asset(self.item_descriptor.location, sub_file_name))
 
 
@@ -1116,7 +1116,7 @@ class TestGetTranscript(TestVideo):
     Make sure that `get_transcript` method works correctly
     """
     srt_file = _create_srt_file()
-    DATA = u"""
+    DATA = """
         <video show_captions="true"
         display_name="A Name"
         >
@@ -1125,7 +1125,7 @@ class TestGetTranscript(TestVideo):
             <transcript language="uk" src="{}"/>
             <transcript language="zh" src="{}"/>
         </video>
-    """.format(os.path.split(srt_file.name)[1], u"塞.srt")
+    """.format(os.path.split(srt_file.name)[1], "塞.srt")
 
     MODEL_DATA = {
         'data': DATA
@@ -1260,7 +1260,7 @@ class TestGetTranscript(TestVideo):
     def test_non_en_with_non_ascii_filename(self):
         self.item.transcript_language = 'zh'
         self.srt_file.seek(0)
-        _upload_file(self.srt_file, self.item_descriptor.location, u"塞.srt")
+        _upload_file(self.srt_file, self.item_descriptor.location, "塞.srt")
 
         transcripts = self.item.get_transcripts_info()
         text, filename, mime_type = self.item.get_transcript(transcripts)
@@ -1270,7 +1270,7 @@ class TestGetTranscript(TestVideo):
         Привіт, edX вітає вас.
         """)
         self.assertEqual(text, expected_text)
-        self.assertEqual(filename, u"塞.srt")
+        self.assertEqual(filename, "塞.srt")
         self.assertEqual(mime_type, 'application/x-subrip; charset=utf-8')
 
     def test_value_error(self):

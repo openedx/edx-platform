@@ -4,7 +4,7 @@ Enrolls the user in the DemoX course.
 Optionally takes in username, email, and course UUID arguments.
 """
 
-from __future__ import unicode_literals
+
 
 from datetime import datetime
 from uuid import uuid4
@@ -77,7 +77,7 @@ class Command(BaseCommand):
             'last_name': "Test",
             'is_active': True
         }
-        for field, value in user_info.items():
+        for field, value in list(user_info.items()):
             setattr(user, field, value)
         user.set_password('gdpr test password')
         user.save()
@@ -99,7 +99,7 @@ class Command(BaseCommand):
             'bio': 'gdpr test bio',
             'profile_image_uploaded_at': profile_image_uploaded_date
         }
-        for field, value in user_profile_info.items():
+        for field, value in list(user_profile_info.items()):
             setattr(user_profile, field, value)
         user_profile.save()
 

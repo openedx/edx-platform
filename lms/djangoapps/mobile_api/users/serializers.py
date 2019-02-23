@@ -18,7 +18,7 @@ class CourseOverviewField(serializers.RelatedField):
     Custom field to wrap a CourseOverview object. Read-only.
     """
     def to_representation(self, course_overview):
-        course_id = unicode(course_overview.id)
+        course_id = str(course_overview.id)
         request = self.context.get('request')
         api_version = self.context.get('api_version')
 

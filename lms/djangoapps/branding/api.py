@@ -13,7 +13,7 @@ the marketing site and blog).
 
 """
 import logging
-import urlparse
+import urllib.parse
 
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -122,9 +122,9 @@ def _footer_copyright():
     return _(
         # Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
         # Please do not translate any of these trademarks and company names.
-        u"\u00A9 {org_name}.  All rights reserved except where noted.  "
-        u"EdX, Open edX and their respective logos are trademarks "
-        u"or registered trademarks of edX Inc."
+        "\u00A9 {org_name}.  All rights reserved except where noted.  "
+        "EdX, Open edX and their respective logos are trademarks "
+        "or registered trademarks of edX Inc."
     ).format(org_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME))
 
 
@@ -161,10 +161,10 @@ def _footer_social_links():
         links.append(
             {
                 "name": social_name,
-                "title": unicode(display.get("title", "")),
+                "title": str(display.get("title", "")),
                 "url": settings.SOCIAL_MEDIA_FOOTER_URLS.get(social_name, "#"),
                 "icon-class": display.get("icon", ""),
-                "action": unicode(display.get("action", "")).format(platform_name=platform_name),
+                "action": str(display.get("action", "")).format(platform_name=platform_name),
             }
         )
     return links
@@ -211,7 +211,7 @@ def _footer_navigation_links(language=settings.LANGUAGE_CODE):
         ("about", (marketing_link("ABOUT"), _("About"))),
         ("enterprise", (
             marketing_link("ENTERPRISE"),
-            _(u"{platform_name} for Business").format(platform_name=platform_name)
+            _("{platform_name} for Business").format(platform_name=platform_name)
         )),
         ("blog", (marketing_link("BLOG"), _("Blog"))),
         ("help-center", (settings.SUPPORT_SITE_LINK, _("Help Center"))),
@@ -276,7 +276,7 @@ def _footer_business_links(language=settings.LANGUAGE_CODE):
         ("about", (marketing_link("ABOUT"), _("About"))),
         ("enterprise", (
             marketing_link("ENTERPRISE"),
-            _(u"{platform_name} for Business").format(platform_name=platform_name)
+            _("{platform_name} for Business").format(platform_name=platform_name)
         )),
     ]
 
@@ -347,7 +347,7 @@ def _footer_mobile_links(is_secure):
             {
                 "name": "apple",
                 "title": _(
-                    u"Download the {platform_name} mobile app from the Apple App Store"
+                    "Download the {platform_name} mobile app from the Apple App Store"
                 ).format(platform_name=platform_name),
                 "url": settings.MOBILE_STORE_URLS.get('apple', '#'),
                 "image": _absolute_url_staticfile(is_secure, 'images/app/app_store_badge_135x40.svg'),
@@ -355,7 +355,7 @@ def _footer_mobile_links(is_secure):
             {
                 "name": "google",
                 "title": _(
-                    u"Download the {platform_name} mobile app from Google Play"
+                    "Download the {platform_name} mobile app from Google Play"
                 ).format(platform_name=platform_name),
                 "url": settings.MOBILE_STORE_URLS.get('google', '#'),
                 "image": _absolute_url_staticfile(is_secure, 'images/app/google_play_badge_45.png'),
@@ -394,7 +394,7 @@ def _footer_logo_img(is_secure):
         # We can log when this happens:
         default_logo = "images/logo.png"
         log.info(
-            u"Failed to find footer logo at '%s', using '%s' instead",
+            "Failed to find footer logo at '%s', using '%s' instead",
             logo_name,
             default_logo,
         )
@@ -417,7 +417,7 @@ def _absolute_url(is_secure, url_path):
     """
     site_name = configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME)
     parts = ("https" if is_secure else "http", site_name, url_path, '', '', '')
-    return urlparse.urlunparse(parts)
+    return urllib.parse.urlunparse(parts)
 
 
 def _absolute_url_staticfile(is_secure, name):
@@ -436,7 +436,7 @@ def _absolute_url_staticfile(is_secure, name):
     # In production, the static files URL will be an absolute
     # URL pointing to a CDN.  If this happens, we can just
     # return the URL.
-    if urlparse.urlparse(url_path).netloc:
+    if urllib.parse.urlparse(url_path).netloc:
         return url_path
 
     # For local development, the returned URL will be relative,

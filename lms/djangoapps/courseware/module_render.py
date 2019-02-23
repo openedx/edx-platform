@@ -191,7 +191,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
             display_id = slugify(chapter.display_name_with_default_escaped)
             local_hide_from_toc = False
             if required_content:
-                if unicode(chapter.location) not in required_content:
+                if str(chapter.location) not in required_content:
                     local_hide_from_toc = True
 
             # Skip the current chapter if a hide flag is tripped
@@ -282,8 +282,8 @@ def _add_timed_exam_info(user, course, section, section_context):
         try:
             timed_exam_attempt_context = get_attempt_status_summary(
                 user.id,
-                unicode(course.id),
-                unicode(section.location)
+                str(course.id),
+                str(section.location)
             )
         except Exception as ex:  # pylint: disable=broad-except
             # safety net in case something blows up in edx_proctoring
@@ -366,21 +366,21 @@ def display_access_messages(user, block, view, frag, context):  # pylint: disabl
     prior_sibling = blocked_prior_sibling.get_cached_response(block.parent)
 
     if prior_sibling.is_found and prior_sibling.value.error_code == load_access.error_code:
-        return Fragment(u"")
+        return Fragment("")
     else:
         blocked_prior_sibling.set(block.parent, load_access)
 
     if load_access.user_fragment:
         msg_fragment = load_access.user_fragment
     elif load_access.user_message:
-        msg_fragment = Fragment(textwrap.dedent(HTML(u"""\
+        msg_fragment = Fragment(textwrap.dedent(HTML("""\
             <div>{}</div>
         """).format(load_access.user_message)))
     else:
-        msg_fragment = Fragment(u"")
+        msg_fragment = Fragment("")
 
     if load_access.developer_message and has_access(user, 'staff', block, block.scope_ids.usage_id.course_key):
-        msg_fragment.content += textwrap.dedent(HTML(u"""\
+        msg_fragment.content += textwrap.dedent(HTML("""\
             <div>{}</div>
         """).format(load_access.developer_message))
 
@@ -610,7 +610,7 @@ def get_module_system_for_user(
         else:
             requested_user_id = event.get('user_id', user.id)
             if requested_user_id != user.id:
-                log.warning(u"{} tried to submit a completion on behalf of {}".format(user, requested_user_id))
+                log.warning("{} tried to submit a completion on behalf of {}".format(user, requested_user_id))
                 return
 
             # If blocks explicitly declare support for the new completion API,
@@ -769,7 +769,7 @@ def get_module_system_for_user(
 
     field_data = LmsFieldData(descriptor._field_data, student_data)  # pylint: disable=protected-access
 
-    user_is_staff = bool(has_access(user, u'staff', descriptor.location, course_id))
+    user_is_staff = bool(has_access(user, 'staff', descriptor.location, course_id))
 
     system = LmsModuleSystem(
         track_function=track_function,
@@ -834,18 +834,18 @@ def get_module_system_for_user(
         try:
             position = int(position)
         except (ValueError, TypeError):
-            log.exception(u'Non-integer %r passed as position.', position)
+            log.exception('Non-integer %r passed as position.', position)
             position = None
 
     system.set('position', position)
 
-    system.set(u'user_is_staff', user_is_staff)
-    system.set(u'user_is_admin', bool(has_access(user, u'staff', 'global')))
-    system.set(u'user_is_beta_tester', CourseBetaTesterRole(course_id).has_user(user))
-    system.set(u'days_early_for_beta', descriptor.days_early_for_beta)
+    system.set('user_is_staff', user_is_staff)
+    system.set('user_is_admin', bool(has_access(user, 'staff', 'global')))
+    system.set('user_is_beta_tester', CourseBetaTesterRole(course_id).has_user(user))
+    system.set('days_early_for_beta', descriptor.days_early_for_beta)
 
     # make an ErrorDescriptor -- assuming that the descriptor's system is ok
-    if has_access(user, u'staff', descriptor.location, course_id):
+    if has_access(user, 'staff', descriptor.location, course_id):
         system.error_descriptor_class = ErrorDescriptor
     else:
         system.error_descriptor_class = NonStaffErrorDescriptor
@@ -935,7 +935,7 @@ def load_single_xblock(request, user_id, course_id, usage_key_string, course=Non
     )
     instance = get_module(user, request, usage_key, field_data_cache, grade_bucket_type='xqueue', course=course)
     if instance is None:
-        msg = u"No module {0} for user {1}--access denied?".format(usage_key_string, user)
+        msg = "No module {0} for user {1}--access denied?".format(usage_key_string, user)
         log.debug(msg)
         raise Http404
     return instance
@@ -1033,7 +1033,7 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
                 user_auth_tuple = authenticator.authenticate(request)
             except APIException:
                 log.exception(
-                    u"XBlock handler %r failed to authenticate with %s", handler, authenticator.__class__.__name__
+                    "XBlock handler %r failed to authenticate with %s", handler, authenticator.__class__.__name__
                 )
             else:
                 if user_auth_tuple is not None:
@@ -1050,13 +1050,13 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
     try:
         course_key = CourseKey.from_string(course_id)
     except InvalidKeyError:
-        raise Http404(u'{} is not a valid course key'.format(course_id))
+        raise Http404('{} is not a valid course key'.format(course_id))
 
     with modulestore().bulk_operations(course_key):
         try:
             course = modulestore().get_course(course_key)
         except ItemNotFoundError:
-            raise Http404(u'{} does not exist in the modulestore'.format(course_id))
+            raise Http404('{} does not exist in the modulestore'.format(course_id))
 
         return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course=course)
 
@@ -1080,7 +1080,7 @@ def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_inf
         descriptor_orig_usage_key, descriptor_orig_version = modulestore().get_block_original_usage(usage_key)
     except ItemNotFoundError:
         log.warn(
-            u"Invalid location for course id %s: %s",
+            "Invalid location for course id %s: %s",
             usage_key.course_key,
             usage_key
         )
@@ -1090,14 +1090,14 @@ def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_inf
         'module': {
             # xss-lint: disable=python-deprecated-display-name
             'display_name': descriptor.display_name_with_default_escaped,
-            'usage_key': unicode(descriptor.location),
+            'usage_key': str(descriptor.location),
         }
     }
 
     # For blocks that are inherited from a content library, we add some additional metadata:
     if descriptor_orig_usage_key is not None:
-        tracking_context['module']['original_usage_key'] = unicode(descriptor_orig_usage_key)
-        tracking_context['module']['original_usage_version'] = unicode(descriptor_orig_version)
+        tracking_context['module']['original_usage_key'] = str(descriptor_orig_usage_key)
+        tracking_context['module']['original_usage_version'] = str(descriptor_orig_version)
 
     unused_masquerade, user = setup_masquerade(request, course_id, has_access(user, 'staff', descriptor, course_id))
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
@@ -1118,7 +1118,7 @@ def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_inf
     if instance is None:
         # Either permissions just changed, or someone is trying to be clever
         # and load something they shouldn't have access to.
-        log.debug(u"No module %s for user %s -- access denied?", usage_key, user)
+        log.debug("No module %s for user %s -- access denied?", usage_key, user)
         raise Http404
 
     return (instance, tracking_context)
@@ -1161,7 +1161,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
         else:
             block_usage_key = usage_key
         instance, tracking_context = get_module_by_usage_id(
-            request, course_id, unicode(block_usage_key), course=course
+            request, course_id, str(block_usage_key), course=course
         )
 
         # Name the transaction so that we can view XBlock handlers separately in
@@ -1191,7 +1191,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
                     resp = append_data_to_webob_response(resp, ee_data)
 
         except NoSuchHandlerError:
-            log.exception(u"XBlock %s attempted to access missing handler %r", instance, handler)
+            log.exception("XBlock %s attempted to access missing handler %r", instance, handler)
             raise Http404
 
         # If we can't find the module, respond with a 404
@@ -1251,7 +1251,7 @@ def xblock_view(request, course_id, usage_id, view_name):
         try:
             fragment = instance.render(view_name, context=request.GET)
         except NoSuchViewError:
-            log.exception(u"Attempt to render missing view on %s: %s", instance, view_name)
+            log.exception("Attempt to render missing view on %s: %s", instance, view_name)
             raise Http404
 
         hashed_resources = OrderedDict()
@@ -1260,8 +1260,8 @@ def xblock_view(request, course_id, usage_id, view_name):
 
         return JsonResponse({
             'html': fragment.content,
-            'resources': hashed_resources.items(),
-            'csrf_token': unicode(csrf(request)['csrf_token']),
+            'resources': list(hashed_resources.items()),
+            'csrf_token': str(csrf(request)['csrf_token']),
         })
 
 
@@ -1273,19 +1273,19 @@ def _check_files_limits(files):
 
     Returns None if files are correct or an error messages otherwise.
     """
-    for fileinput_id in files.keys():
+    for fileinput_id in list(files.keys()):
         inputfiles = files.getlist(fileinput_id)
 
         # Check number of files submitted
         if len(inputfiles) > settings.MAX_FILEUPLOADS_PER_INPUT:
-            msg = u'Submission aborted! Maximum %d files may be submitted at once' % \
+            msg = 'Submission aborted! Maximum %d files may be submitted at once' % \
                   settings.MAX_FILEUPLOADS_PER_INPUT
             return msg
 
         # Check file sizes
         for inputfile in inputfiles:
             if inputfile.size > settings.STUDENT_FILEUPLOAD_MAX_SIZE:  # Bytes
-                msg = u'Submission aborted! Your file "%s" is too large (max size: %d MB)' % \
+                msg = 'Submission aborted! Your file "%s" is too large (max size: %d MB)' % \
                       (inputfile.name, settings.STUDENT_FILEUPLOAD_MAX_SIZE / (1000 ** 2))
                 return msg
 

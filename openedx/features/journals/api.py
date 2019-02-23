@@ -1,7 +1,7 @@
 """
 APIs providing support for Journals functionality.
 """
-from urlparse import urljoin, urlsplit, urlunsplit
+from urllib.parse import urljoin, urlsplit, urlunsplit
 import logging
 import hashlib
 import six
@@ -70,11 +70,11 @@ class DiscoveryApiClient(object):
                 response = self.client.journals.get(orgs=','.join(orgs), status='active')
             else:
                 response = self.client.journals.get(status='active')
-            LOGGER.debug(u'response is type=%s', type(response))
+            LOGGER.debug('response is type=%s', type(response))
             return response.get('results')
         except (HttpClientError, HttpServerError) as err:
             LOGGER.exception(
-                u'Failed to get journals from discovery-service [%s]',
+                'Failed to get journals from discovery-service [%s]',
                 err.content
             )
             return []
@@ -87,7 +87,7 @@ class DiscoveryApiClient(object):
             response = self.client.journal_bundles(uuid).get()
         except (HttpClientError, HttpServerError) as err:
             LOGGER.exception(
-                u'Failed to get journal bundles from discovery-service [%s]',
+                'Failed to get journal bundles from discovery-service [%s]',
                 err.content
             )
             return []
@@ -106,7 +106,7 @@ class JournalsApiClient(object):
         try:
             self.user = self.get_journals_worker()
         except ObjectDoesNotExist:
-            error = u'Unable to retrieve {} service user'.format(JOURNAL_WORKER_USERNAME)
+            error = 'Unable to retrieve {} service user'.format(JOURNAL_WORKER_USERNAME)
             LOGGER.error(error)
             raise ValueError(error)
 

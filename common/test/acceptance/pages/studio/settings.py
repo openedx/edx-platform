@@ -2,7 +2,7 @@
 """
 Course Schedule and Details Settings page.
 """
-from __future__ import unicode_literals
+
 
 import os
 
@@ -77,7 +77,7 @@ class SettingsPage(CoursePage):
         Set the values of the elements to those specified
         in the element_values dict.
         """
-        for css, value in element_values.iteritems():
+        for css, value in element_values.items():
             element = self.get_element(css)
             element.clear()
             element.send_keys(value)

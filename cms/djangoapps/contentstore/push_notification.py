@@ -33,7 +33,7 @@ def enqueue_push_course_update(update, course_key):
         course = modulestore().get_course(course_key)
         if course:
             push_course_update_task.delay(
-                unicode(course_key),
+                str(course_key),
                 course.clean_id(padding_char='_'),
                 course.display_name
             )
@@ -51,7 +51,7 @@ def send_push_course_update(course_key_string, course_subscription_id, course_di
             )
             push_payload = {
                 "action": "course.announcement",
-                "notification-id": unicode(uuid4()),
+                "notification-id": str(uuid4()),
 
                 "course-id": course_key_string,
                 "course-name": course_display_name,

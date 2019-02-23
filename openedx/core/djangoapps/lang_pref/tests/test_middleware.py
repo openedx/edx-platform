@@ -149,7 +149,7 @@ class TestUserPreferenceMiddleware(CacheIsolationTestCase):
         else:
             self.assertEqual(accept_lang_result, accept_lang_out)
 
-        self.assertEquals(self.request.session.get(LANGUAGE_SESSION_KEY), lang_session_out)
+        self.assertEqual(self.request.session.get(LANGUAGE_SESSION_KEY), lang_session_out)
 
     @ddt.data(None, 'es', 'en')
     def test_logout_preserves_cookie(self, lang_cookie):

@@ -1,6 +1,6 @@
 """ Calculation of Miller indices """
 
-from __future__ import absolute_import
+
 import decimal
 import fractions as fr
 import json

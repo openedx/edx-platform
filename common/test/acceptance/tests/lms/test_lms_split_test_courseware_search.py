@@ -70,7 +70,7 @@ class SplitTestCoursewareSearchTest(ContainerBase):
         # pylint: disable=protected-access
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
-                u"user_partitions": [
+                "user_partitions": [
                     create_user_partition_json(
                         0,
                         "Configuration A/B",
@@ -86,7 +86,7 @@ class SplitTestCoursewareSearchTest(ContainerBase):
         Populate the children of the test course fixture.
         """
         course_fixture.add_advanced_settings({
-            u"advanced_modules": {"value": ["split_test"]},
+            "advanced_modules": {"value": ["split_test"]},
         })
 
         course_fixture.add_children(

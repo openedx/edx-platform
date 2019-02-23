@@ -2,7 +2,7 @@
 Command to compute all grades for specified courses.
 """
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 
 import hashlib
 import logging

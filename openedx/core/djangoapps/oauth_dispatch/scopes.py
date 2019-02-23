@@ -19,5 +19,5 @@ class ApplicationModelScopes(SettingsScopes):
             application_scopes = []
 
         default_scopes = self.get_default_scopes()
-        all_scopes = self.get_all_scopes().keys()
+        all_scopes = list(self.get_all_scopes().keys())
         return set(application_scopes + default_scopes).intersection(all_scopes)

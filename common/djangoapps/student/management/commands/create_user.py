@@ -1,4 +1,4 @@
-from __future__ import print_function
+
 
 from django.conf import settings
 from django.contrib.auth.models import User

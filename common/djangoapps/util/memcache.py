@@ -3,7 +3,7 @@ This module provides a KEY_FUNCTION suitable for use with a memcache backend
 so that we can cache any keys, not just ones that memcache would ordinarily accept
 """
 import hashlib
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from django.utils.encoding import smart_str
 
@@ -22,7 +22,7 @@ def cleaned_string(val):
     Converts `val` to unicode and URL-encodes special characters
     (including quotes and spaces)
     """
-    return urllib.quote_plus(smart_str(val))
+    return urllib.parse.quote_plus(smart_str(val))
 
 
 def safe_key(key, key_prefix, version):

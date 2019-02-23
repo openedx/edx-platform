@@ -100,7 +100,7 @@ class SSLClientTest(ModuleStoreTestCase):
         try:
             ExternalAuthMap.objects.get(external_id=self.USER_EMAIL)
         except ExternalAuthMap.DoesNotExist as ex:
-            self.fail(u'User did not get properly added to external auth map, exception was {0}'.format(str(ex)))
+            self.fail('User did not get properly added to external auth map, exception was {0}'.format(str(ex)))
 
         with self.assertRaises(User.DoesNotExist):
             User.objects.get(email=self.USER_EMAIL)
@@ -119,7 +119,7 @@ class SSLClientTest(ModuleStoreTestCase):
         try:
             ExternalAuthMap.objects.get(external_id=self.USER_EMAIL)
         except ExternalAuthMap.DoesNotExist as ex:
-            self.fail(u'User did not get properly added to external auth map, exception was {0}'.format(str(ex)))
+            self.fail('User did not get properly added to external auth map, exception was {0}'.format(str(ex)))
 
         with self.assertRaises(User.DoesNotExist):
             User.objects.get(email=self.USER_EMAIL)
@@ -138,11 +138,11 @@ class SSLClientTest(ModuleStoreTestCase):
         try:
             ExternalAuthMap.objects.get(external_id=self.USER_EMAIL)
         except ExternalAuthMap.DoesNotExist as ex:
-            self.fail(u'User did not get properly added to external auth map, exception was {0}'.format(str(ex)))
+            self.fail('User did not get properly added to external auth map, exception was {0}'.format(str(ex)))
         try:
             User.objects.get(email=self.USER_EMAIL)
         except ExternalAuthMap.DoesNotExist as ex:
-            self.fail(u'User did not get properly added to internal users, exception was {0}'.format(str(ex)))
+            self.fail('User did not get properly added to internal users, exception was {0}'.format(str(ex)))
 
     @skip_unless_cms
     @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH_IMMEDIATE_SIGNUP)
@@ -164,11 +164,11 @@ class SSLClientTest(ModuleStoreTestCase):
         try:
             ExternalAuthMap.objects.get(external_id=self.USER_EMAIL)
         except ExternalAuthMap.DoesNotExist as ex:
-            self.fail(u'User did not get properly added to external auth map, exception was {0}'.format(str(ex)))
+            self.fail('User did not get properly added to external auth map, exception was {0}'.format(str(ex)))
         try:
             User.objects.get(email=self.USER_EMAIL)
         except ExternalAuthMap.DoesNotExist as ex:
-            self.fail(u'User did not get properly added to internal users, exception was {0}'.format(str(ex)))
+            self.fail('User did not get properly added to internal users, exception was {0}'.format(str(ex)))
 
     @skip_unless_lms
     @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH_IMMEDIATE_SIGNUP)
@@ -184,7 +184,7 @@ class SSLClientTest(ModuleStoreTestCase):
         response = self.client.get(
             reverse('dashboard'), follow=True,
             SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL))
-        self.assertEquals(('/dashboard', 302),
+        self.assertEqual(('/dashboard', 302),
                           response.redirect_chain[-1])
         self.assertIn(SESSION_KEY, self.client.session)
 
@@ -198,7 +198,7 @@ class SSLClientTest(ModuleStoreTestCase):
         response = self.client.get(
             reverse('register_user'), follow=True,
             SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL))
-        self.assertEquals(('/dashboard', 302),
+        self.assertEqual(('/dashboard', 302),
                           response.redirect_chain[-1])
         self.assertIn(SESSION_KEY, self.client.session)
 
@@ -238,7 +238,7 @@ class SSLClientTest(ModuleStoreTestCase):
         response = self.client.get(
             reverse('signin_user'), follow=True,
             SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL))
-        self.assertEquals(('/dashboard', 302),
+        self.assertEqual(('/dashboard', 302),
                           response.redirect_chain[-1])
         self.assertIn(SESSION_KEY, self.client.session)
 
@@ -325,11 +325,11 @@ class SSLClientTest(ModuleStoreTestCase):
         try:
             ExternalAuthMap.objects.get(external_id=self.USER_EMAIL)
         except ExternalAuthMap.DoesNotExist as ex:
-            self.fail(u'User did not get properly added to external auth map, exception was {0}'.format(str(ex)))
+            self.fail('User did not get properly added to external auth map, exception was {0}'.format(str(ex)))
         try:
             User.objects.get(email=self.USER_EMAIL)
         except ExternalAuthMap.DoesNotExist as ex:
-            self.fail(u'User did not get properly added to internal users, exception was {0}'.format(str(ex)))
+            self.fail('User did not get properly added to internal users, exception was {0}'.format(str(ex)))
         self.assertEqual(1, len(ExternalAuthMap.objects.all()))
 
         self.assertTrue(self.mock.called)
@@ -413,7 +413,7 @@ class SSLClientTest(ModuleStoreTestCase):
         response = self.client.get(
             reverse('dashboard'), follow=True,
             SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL))
-        self.assertEquals(('/dashboard', 302),
+        self.assertEqual(('/dashboard', 302),
                           response.redirect_chain[-1])
         self.assertIn(SESSION_KEY, self.client.session)
         response = self.client.get(

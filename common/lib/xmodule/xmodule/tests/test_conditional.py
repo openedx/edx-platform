@@ -1,4 +1,4 @@
-from __future__ import print_function
+
 import json
 import unittest
 
@@ -87,7 +87,7 @@ class ConditionalFactory(object):
         # construct other descriptors:
         child_descriptor = Mock(name='child_descriptor')
         child_descriptor.visible_to_staff_only = False
-        child_descriptor._xmodule.student_view.return_value = Fragment(content=u'<p>This is a secret</p>')
+        child_descriptor._xmodule.student_view.return_value = Fragment(content='<p>This is a secret</p>')
         child_descriptor.student_view = child_descriptor._xmodule.student_view
         child_descriptor.displayable_items.return_value = [child_descriptor]
         child_descriptor.runtime = descriptor_system
@@ -168,10 +168,10 @@ class ConditionalModuleBasicTest(unittest.TestCase):
         html = modules['cond_module'].render(STUDENT_VIEW).content
         expected = modules['cond_module'].xmodule_runtime.render_template('conditional_ajax.html', {
             'ajax_url': modules['cond_module'].xmodule_runtime.ajax_url,
-            'element_id': u'i4x-edX-conditional_test-conditional-SampleConditional',
-            'depends': u'i4x-edX-conditional_test-problem-SampleProblem',
+            'element_id': 'i4x-edX-conditional_test-conditional-SampleConditional',
+            'depends': 'i4x-edX-conditional_test-problem-SampleProblem',
         })
-        self.assertEquals(expected, html)
+        self.assertEqual(expected, html)
 
     def test_handle_ajax(self):
         modules = ConditionalFactory.create(self.test_system)
@@ -236,7 +236,7 @@ class ConditionalModuleXmlTest(unittest.TestCase):
         modulestore = XMLModuleStore(DATA_DIR, source_dirs=[name])
         courses = modulestore.get_courses()
         self.modulestore = modulestore
-        self.assertEquals(len(courses), 1)
+        self.assertEqual(len(courses), 1)
         return courses[0]
 
     def test_conditional_module(self):
@@ -280,8 +280,8 @@ class ConditionalModuleXmlTest(unittest.TestCase):
             {
                 # Test ajax url is just usage-id / handler_name
                 'ajax_url': '{}/xmodule_handler'.format(text_type(location)),
-                'element_id': u'i4x-HarvardX-ER22x-conditional-condone',
-                'depends': u'i4x-HarvardX-ER22x-problem-choiceprob'
+                'element_id': 'i4x-HarvardX-ER22x-conditional-condone',
+                'depends': 'i4x-HarvardX-ER22x-problem-choiceprob'
             }
         )
         self.assertEqual(html, html_expect)
@@ -450,8 +450,8 @@ class ConditionalModuleStudioTest(XModuleXmlImportTest):
         validation = self.conditional.validate()
         self.assertEqual(
             validation.summary.text,
-            u"This component has no source components configured yet."
+            "This component has no source components configured yet."
         )
         self.assertEqual(validation.summary.type, StudioValidationMessage.NOT_CONFIGURED)
         self.assertEqual(validation.summary.action_class, 'edit-button')
-        self.assertEqual(validation.summary.action_label, u"Configure list of sources")
+        self.assertEqual(validation.summary.action_label, "Configure list of sources")

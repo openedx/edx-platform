@@ -31,7 +31,7 @@ class GlobalStatusMessage(ConfigurationModel):
 
     def full_message(self, course_key):
         """ Returns the full status message, including any course-specific status messages. """
-        cache_key = "status_message.{course_id}".format(course_id=unicode(course_key))
+        cache_key = "status_message.{course_id}".format(course_id=str(course_key))
         if cache.get(cache_key):
             return cache.get(cache_key)
 
@@ -41,7 +41,7 @@ class GlobalStatusMessage(ConfigurationModel):
                 course_home_message = self.coursemessage_set.get(course_key=course_key)
                 # Don't override the message if course_home_message is blank.
                 if course_home_message:
-                    msg = HTML(u"{} <br /> {}").format(HTML(msg), HTML(course_home_message.message))
+                    msg = HTML("{} <br /> {}").format(HTML(msg), HTML(course_home_message.message))
             except CourseMessage.DoesNotExist:
                 # We don't have a course-specific message, so pass.
                 pass
@@ -66,7 +66,7 @@ class CourseMessage(models.Model):
     message = models.TextField(blank=True, null=True)
 
     def __unicode__(self):
-        return unicode(self.course_key)
+        return str(self.course_key)
 
 
 admin.site.register(GlobalStatusMessage, ConfigurationModelAdmin)

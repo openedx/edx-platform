@@ -127,7 +127,7 @@ class TestViews(TestDiscussionXBlock):
         Mock the methods needed for these tests.
         """
         super(TestViews, self).setUp()
-        self.template_canary = u'canary'
+        self.template_canary = 'canary'
         self.render_template = mock.Mock()
         self.render_template.return_value = self.template_canary
         self.block.runtime.render_template = self.render_template
@@ -190,7 +190,7 @@ class TestViews(TestDiscussionXBlock):
 
         context = self.get_template_context()
 
-        for permission_name, expected_value in expected_permissions.items():
+        for permission_name, expected_value in list(expected_permissions.items()):
             self.assertEqual(expected_value, context[permission_name])
 
     def test_js_init(self):
@@ -353,7 +353,7 @@ class TestXBlockInCourse(SharedModuleStoreTestCase):
         Tests that course block api returns student_view_data for discussion xblock
         """
         self.client.login(username=self.user.username, password='test')
-        url = reverse('blocks_in_block_tree', kwargs={'usage_key_string': unicode(self.course_usage_key)})
+        url = reverse('blocks_in_block_tree', kwargs={'usage_key_string': str(self.course_usage_key)})
         query_params = {
             'depth': 'all',
             'username': self.user.username,
@@ -361,13 +361,13 @@ class TestXBlockInCourse(SharedModuleStoreTestCase):
             'student_view_data': 'discussion'
         }
         response = self.client.get(url, query_params)
-        self.assertEquals(response.status_code, 200)
-        self.assertEquals(response.data['root'], unicode(self.course_usage_key))
-        for block_key_string, block_data in response.data['blocks'].iteritems():
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['root'], str(self.course_usage_key))
+        for block_key_string, block_data in response.data['blocks'].items():
             block_key = deserialize_usage_key(block_key_string, self.course_key)
-            self.assertEquals(block_data['id'], block_key_string)
-            self.assertEquals(block_data['type'], block_key.block_type)
-            self.assertEquals(block_data['display_name'], self.store.get_item(block_key).display_name or '')
+            self.assertEqual(block_data['id'], block_key_string)
+            self.assertEqual(block_data['type'], block_key.block_type)
+            self.assertEqual(block_data['display_name'], self.store.get_item(block_key).display_name or '')
             self.assertEqual(block_data['student_view_data'], {"topic_id": self.discussion_id})
 
 

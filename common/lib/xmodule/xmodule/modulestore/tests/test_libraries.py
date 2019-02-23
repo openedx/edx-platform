@@ -48,15 +48,15 @@ class TestLibraries(MixedSplitTestCase):
 
     @ddt.data(
         "This is a test library!",
-        u"Ωμέγα Βιβλιοθήκη",
+        "Ωμέγα Βιβλιοθήκη",
     )
     def test_str_repr(self, name):
         """
         Test __unicode__() and __str__() methods of libraries
         """
         library = LibraryFactory.create(metadata={"display_name": name}, modulestore=self.store)
-        self.assertIn(name, unicode(library))
-        if not isinstance(name, unicode):
+        self.assertIn(name, str(library))
+        if not isinstance(name, str):
             self.assertIn(name, str(library))
 
     def test_display_with_default_methods(self):

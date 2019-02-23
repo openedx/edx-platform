@@ -270,7 +270,7 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
         return LazySequence(
             (
                 course for course in db_courses
-                if unicode(course.id) in search_courses_ids
+                if str(course.id) in search_courses_ids
             ),
             est_len=len(db_courses)
         )

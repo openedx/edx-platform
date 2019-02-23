@@ -29,7 +29,7 @@ class CourseApiTestMixin(CourseApiFactoryMixin):
         cls.request_factory = APIRequestFactory()
         CourseOverview.get_all_courses()  # seed the CourseOverview table
 
-    def verify_course(self, course, course_id=u'edX/toy/2012_Fall'):
+    def verify_course(self, course, course_id='edX/toy/2012_Fall'):
         """
         Ensure that the returned course is the course we just created
         """
@@ -62,7 +62,7 @@ class TestGetCourseDetail(CourseDetailTestMixin, SharedModuleStoreTestCase):
     def setUpClass(cls):
         super(TestGetCourseDetail, cls).setUpClass()
         cls.course = cls.create_course()
-        cls.hidden_course = cls.create_course(course=u'hidden', visible_to_staff_only=True)
+        cls.hidden_course = cls.create_course(course='hidden', visible_to_staff_only=True)
         cls.honor_user = cls.create_user('honor', is_staff=False)
         cls.staff_user = cls.create_user('staff', is_staff=True)
 
@@ -71,7 +71,7 @@ class TestGetCourseDetail(CourseDetailTestMixin, SharedModuleStoreTestCase):
         self.verify_course(course)
 
     def test_get_nonexistent_course(self):
-        course_key = CourseKey.from_string(u'edX/toy/nope')
+        course_key = CourseKey.from_string('edX/toy/nope')
         with self.assertRaises(Http404):
             self._make_api_call(self.honor_user, self.honor_user, course_key)
 
@@ -81,7 +81,7 @@ class TestGetCourseDetail(CourseDetailTestMixin, SharedModuleStoreTestCase):
 
     def test_hidden_course_for_staff(self):
         course = self._make_api_call(self.staff_user, self.staff_user, self.hidden_course.id)
-        self.verify_course(course, course_id=u'edX/hidden/2012_Fall')
+        self.verify_course(course, course_id='edX/hidden/2012_Fall')
 
     def test_hidden_course_for_staff_as_honor(self):
         with self.assertRaises(Http404):
@@ -203,10 +203,10 @@ class TestGetCourseListMultipleCourses(CourseListTestMixin, ModuleStoreTestCase)
         ]
         for filter_, expected_courses in test_cases:
             filtered_courses = self._make_api_call(self.staff_user, self.staff_user, filter_=filter_)
-            self.assertEquals(
+            self.assertEqual(
                 {course.id for course in filtered_courses},
                 {course.id for course in expected_courses},
-                u"testing course_api.api.list_courses with filter_={}".format(filter_),
+                "testing course_api.api.list_courses with filter_={}".format(filter_),
             )
 
 

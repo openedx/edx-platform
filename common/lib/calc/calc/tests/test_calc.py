@@ -2,7 +2,7 @@
 Unit tests for calc.py
 """
 
-from __future__ import absolute_import
+
 import unittest
 import numpy
 import calc
@@ -521,7 +521,7 @@ class EvaluatorTest(unittest.TestCase):
         Incorrectly capitilized should fail
         Also, it should pick the correct version of a function.
         """
-        with self.assertRaisesRegexp(calc.UndefinedVariable, 'SiN'):
+        with self.assertRaisesRegex(calc.UndefinedVariable, 'SiN'):
             calc.evaluator({}, {}, 'SiN(6)', case_sensitive=True)
 
         # With case sensitive turned on, it should pick the right function
@@ -539,20 +539,20 @@ class EvaluatorTest(unittest.TestCase):
         """
         variables = {'R1': 2.0, 'R3': 4.0}
 
-        with self.assertRaisesRegexp(calc.UndefinedVariable, r'QWSEKO'):
+        with self.assertRaisesRegex(calc.UndefinedVariable, r'QWSEKO'):
             calc.evaluator({}, {}, "5+7*QWSEKO")
-        with self.assertRaisesRegexp(calc.UndefinedVariable, r'r2'):
+        with self.assertRaisesRegex(calc.UndefinedVariable, r'r2'):
             calc.evaluator({'r1': 5}, {}, "r1+r2")
-        with self.assertRaisesRegexp(calc.UndefinedVariable, r'r1, r3'):
+        with self.assertRaisesRegex(calc.UndefinedVariable, r'r1, r3'):
             calc.evaluator(variables, {}, "r1*r3", case_sensitive=True)
-        with self.assertRaisesRegexp(calc.UndefinedVariable, r'did you forget to use \*'):
+        with self.assertRaisesRegex(calc.UndefinedVariable, r'did you forget to use \*'):
             calc.evaluator(variables, {}, "R1(R3 + 1)")
 
     def test_mismatched_parens(self):
         """
         Check to see if the evaluator catches mismatched parens
         """
-        with self.assertRaisesRegexp(calc.UnmatchedParenthesis, 'opened but never closed'):
+        with self.assertRaisesRegex(calc.UnmatchedParenthesis, 'opened but never closed'):
             calc.evaluator({}, {}, "(1+2")
-        with self.assertRaisesRegexp(calc.UnmatchedParenthesis, 'no matching opening parenthesis'):
+        with self.assertRaisesRegex(calc.UnmatchedParenthesis, 'no matching opening parenthesis'):
             calc.evaluator({}, {}, "(1+2))")

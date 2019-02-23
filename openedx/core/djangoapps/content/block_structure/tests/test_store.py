@@ -40,7 +40,7 @@ class TestBlockStructureStore(UsageKeyFactoryMixin, ChildrenMapTestMixin, CacheI
                 self.block_key_factory(0),
                 transformer,
                 key='test',
-                value=u'{} val'.format(transformer.name()),
+                value='{} val'.format(transformer.name()),
             )
 
     @ddt.data(True, False)
@@ -85,6 +85,6 @@ class TestBlockStructureStore(UsageKeyFactoryMixin, ChildrenMapTestMixin, CacheI
         else:
             timeout = BlockStructureConfiguration.DEFAULT_CACHE_TIMEOUT_IN_SECONDS
 
-        self.assertEquals(self.mock_cache.timeout_from_last_call, 0)
+        self.assertEqual(self.mock_cache.timeout_from_last_call, 0)
         self.store.add(self.block_structure)
-        self.assertEquals(self.mock_cache.timeout_from_last_call, timeout)
+        self.assertEqual(self.mock_cache.timeout_from_last_call, timeout)

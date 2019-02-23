@@ -53,7 +53,7 @@ class TestModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
 
     def handler_url(self, block, handler, suffix='', query='', thirdparty=False):
         return '{usage_id}/{handler}{suffix}?{query}'.format(
-            usage_id=unicode(block.scope_ids.usage_id),
+            usage_id=str(block.scope_ids.usage_id),
             handler=handler,
             suffix=suffix,
             query=query,
@@ -61,7 +61,7 @@ class TestModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
 
     def local_resource_url(self, block, uri):
         return 'resource/{usage_id}/{uri}'.format(
-            usage_id=unicode(block.scope_ids.usage_id),
+            usage_id=str(block.scope_ids.usage_id),
             uri=uri,
         )
 
@@ -218,7 +218,7 @@ def map_references(value, field, actual_course_key):
     if isinstance(field, ReferenceList):
         return [sub.map_into_course(actual_course_key) for sub in value]
     if isinstance(field, ReferenceValueDict):
-        return {key: ele.map_into_course(actual_course_key) for key, ele in value.iteritems()}
+        return {key: ele.map_into_course(actual_course_key) for key, ele in value.items()}
     return value
 
 
@@ -388,13 +388,13 @@ class LazyFormat(object):
         return self._message
 
     def __repr__(self):
-        return unicode(self)
+        return str(self)
 
     def __len__(self):
-        return len(unicode(self))
+        return len(str(self))
 
     def __getitem__(self, index):
-        return unicode(self)[index]
+        return str(self)[index]
 
 
 class CourseComparisonTest(BulkAssertionTest):
@@ -446,8 +446,8 @@ class CourseComparisonTest(BulkAssertionTest):
             expected = [extract_key(key) for key in expected]
             actual = [extract_key(key) for key in actual]
         elif isinstance(reference_field, ReferenceValueDict):
-            expected = {key: extract_key(val) for (key, val) in expected.iteritems()}
-            actual = {key: extract_key(val) for (key, val) in actual.iteritems()}
+            expected = {key: extract_key(val) for (key, val) in expected.items()}
+            actual = {key: extract_key(val) for (key, val) in actual.items()}
         self.assertEqual(
             expected,
             actual,
@@ -466,7 +466,7 @@ class CourseComparisonTest(BulkAssertionTest):
         Compare block fields to check for equivalence.
         """
         self.assertEqual(expected_block.fields, actual_block.fields)
-        for field in expected_block.fields.values():
+        for field in list(expected_block.fields.values()):
             self.assertFieldEqual(field, expected_block, actual_block)
 
     def assertFieldEqual(self, field, expected_block, actual_block):
@@ -544,7 +544,7 @@ class CourseComparisonTest(BulkAssertionTest):
             # this comparison
             self.assertItemsEqual(
                 [map_key(item.location) for item in expected_items if item.scope_ids.block_type != 'course'],
-                [key for key in actual_item_map.keys() if key[0] != 'course'],
+                [key for key in list(actual_item_map.keys()) if key[0] != 'course'],
             )
 
             for expected_item in expected_items:
@@ -560,7 +560,7 @@ class CourseComparisonTest(BulkAssertionTest):
                     actual_item = actual_item_map.get(map_key(actual_item_location))
 
                 # Formatting the message slows down tests of large courses significantly, so only do it if it would be used
-                self.assertIn(map_key(actual_item_location), actual_item_map.keys())
+                self.assertIn(map_key(actual_item_location), list(actual_item_map.keys()))
 
                 if actual_item is None:
                     continue
@@ -568,7 +568,7 @@ class CourseComparisonTest(BulkAssertionTest):
                 # compare fields
                 self.assertEqual(expected_item.fields, actual_item.fields)
 
-                for field_name, field in expected_item.fields.iteritems():
+                for field_name, field in expected_item.fields.items():
                     if (expected_item.scope_ids.usage_id, field_name) in self.field_exclusions:
                         continue
 
@@ -658,10 +658,10 @@ class CourseComparisonTest(BulkAssertionTest):
         actual_course_assets = actual_modulestore.get_all_asset_metadata(
             actual_course_key, None, sort=('displayname', ModuleStoreEnum.SortOrder.descending)
         )
-        self.assertEquals(len(expected_course_assets), len(actual_course_assets))
+        self.assertEqual(len(expected_course_assets), len(actual_course_assets))
         for idx, __ in enumerate(expected_course_assets):
             for attr in AssetMetadata.ATTRS_ALLOWED_TO_UPDATE:
                 if attr in ('edited_on',):
                     # edited_on is updated upon import.
                     continue
-                self.assertEquals(getattr(expected_course_assets[idx], attr), getattr(actual_course_assets[idx], attr))
+                self.assertEqual(getattr(expected_course_assets[idx], attr), getattr(actual_course_assets[idx], attr))

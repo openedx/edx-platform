@@ -2,11 +2,11 @@
 """
 Tests for signal handling in commerce djangoapp.
 """
-from __future__ import unicode_literals
+
 
 import base64
 import json
-from urlparse import urljoin
+from urllib.parse import urljoin
 
 import ddt
 import httpretty

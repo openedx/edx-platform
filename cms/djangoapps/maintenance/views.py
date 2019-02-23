@@ -139,8 +139,8 @@ class ForcePublishCourseView(MaintenanceBaseView):
         Returns a dict containing unicoded values of draft and published draft versions.
         """
         return {
-            'draft-branch': unicode(versions['draft-branch']),
-            'published-branch': unicode(versions['published-branch'])
+            'draft-branch': str(versions['draft-branch']),
+            'published-branch': str(versions['published-branch'])
         }
 
     @transaction.atomic
@@ -182,7 +182,7 @@ class ForcePublishCourseView(MaintenanceBaseView):
         if not hasattr(source_store, 'force_publish_course'):
             self.context['msg'] = _('Force publishing course is not supported with old mongo courses.')
             log.warning(
-                u'Force publishing course is not supported with old mongo courses. \
+                'Force publishing course is not supported with old mongo courses. \
                 %s attempted to force publish the course %s.',  # pylint: disable=unicode-format-string
                 request.user,
                 course_id,
@@ -196,7 +196,7 @@ class ForcePublishCourseView(MaintenanceBaseView):
         if current_versions['published-branch'] == current_versions['draft-branch']:
             self.context['msg'] = _('Course is already in published state.')
             log.warning(
-                u'Course is already in published state. %s attempted to force publish the course %s.',
+                'Course is already in published state. %s attempted to force publish the course %s.',
                 request.user,
                 course_id,
                 exc_info=True
@@ -205,7 +205,7 @@ class ForcePublishCourseView(MaintenanceBaseView):
 
         self.context['current_versions'] = current_versions
         log.info(
-            u'%s dry ran force publish the course %s.',
+            '%s dry ran force publish the course %s.',
             request.user,
             course_id,
             exc_info=True

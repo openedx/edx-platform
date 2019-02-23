@@ -179,7 +179,7 @@ def calculate_grades_csv(entry_id, xmodule_instance_args):
     # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
     action_name = ugettext_noop('graded')
     TASK_LOG.info(
-        u"Task: %s, InstructorTask ID: %s, Task type: %s, Preparing for task execution",
+        "Task: %s, InstructorTask ID: %s, Task type: %s, Preparing for task execution",
         xmodule_instance_args.get('task_id'), entry_id, action_name
     )
 
@@ -196,7 +196,7 @@ def calculate_problem_grade_report(entry_id, xmodule_instance_args):
     # Translators: This is a past-tense phrase that is inserted into task progress messages as {action}.
     action_name = ugettext_noop('problem distribution graded')
     TASK_LOG.info(
-        u"Task: %s, InstructorTask ID: %s, Task type: %s, Preparing for task execution",
+        "Task: %s, InstructorTask ID: %s, Task type: %s, Preparing for task execution",
         xmodule_instance_args.get('task_id'), entry_id, action_name
     )
 
@@ -284,7 +284,7 @@ def generate_certificates(entry_id, xmodule_instance_args):
     # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
     action_name = ugettext_noop('certificates generated')
     TASK_LOG.info(
-        u"Task: %s, InstructorTask ID: %s, Task type: %s, Preparing for task execution",
+        "Task: %s, InstructorTask ID: %s, Task type: %s, Preparing for task execution",
         xmodule_instance_args.get('task_id'), entry_id, action_name
     )
 

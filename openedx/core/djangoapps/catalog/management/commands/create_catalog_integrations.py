@@ -65,10 +65,10 @@ class Command(BaseCommand):
                 page_size=page_size
             )
         except Exception as err:
-            raise CommandError(u'Error creating CatalogIntegration: {}'.format(err))
+            raise CommandError('Error creating CatalogIntegration: {}'.format(err))
 
         self.stdout.write(self.style.SUCCESS(
-            u'Successfully created CatalogIntegration enabled={} url={} service_username={}').format(
+            'Successfully created CatalogIntegration enabled={} url={} service_username={}').format(
                 catalog_integration.enabled,
                 catalog_integration.internal_api_url,
                 catalog_integration.service_username

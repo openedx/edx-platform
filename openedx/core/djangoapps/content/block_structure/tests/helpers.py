@@ -303,8 +303,8 @@ class ChildrenMapTestMixin(object):
             self.assertEqual(
                 self.block_key_factory(block_key) in block_structure,
                 block_key not in missing_blocks,
-                u'Expected presence in block_structure for block_key {} to match absence in missing_blocks.'.format(
-                    unicode(block_key)
+                'Expected presence in block_structure for block_key {} to match absence in missing_blocks.'.format(
+                    str(block_key)
                 ),
             )
 
@@ -333,10 +333,10 @@ class UsageKeyFactoryMixin(object):
     """
     def setUp(self):
         super(UsageKeyFactoryMixin, self).setUp()
-        self.course_key = CourseLocator('org', 'course', unicode(uuid4()))
+        self.course_key = CourseLocator('org', 'course', str(uuid4()))
 
     def block_key_factory(self, block_id):
         """
         Returns a block key object for the given block_id.
         """
-        return BlockUsageLocator(course_key=self.course_key, block_type='course', block_id=unicode(block_id))
+        return BlockUsageLocator(course_key=self.course_key, block_type='course', block_id=str(block_id))

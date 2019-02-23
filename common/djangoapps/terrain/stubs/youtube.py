@@ -19,7 +19,7 @@ To start this stub server on its own from Vagrant:
 import json
 import time
 from collections import OrderedDict
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 import requests
 

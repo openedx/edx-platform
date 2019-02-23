@@ -11,11 +11,10 @@ from django.contrib.auth.models import User
 from student.models import UserProfile
 
 
-class AbstractEnrollmentReportProvider(object):
+class AbstractEnrollmentReportProvider(object, metaclass=abc.ABCMeta):
     """
     Abstract interface for Detailed Enrollment Report Provider
     """
-    __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
     def get_enrollment_info(self, user, course_id):

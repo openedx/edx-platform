@@ -35,7 +35,7 @@ class ZeroGradeTest(GradeTestBase):
             chapter_grades = ZeroCourseGrade(self.request.user, course_data).chapter_grades
             for chapter in chapter_grades:
                 for section in chapter_grades[chapter]['sections']:
-                    for score in section.problem_scores.itervalues():
+                    for score in section.problem_scores.values():
                         self.assertEqual(score.earned, 0)
                         self.assertEqual(score.first_attempted, None)
                     self.assertEqual(section.all_total.earned, 0)

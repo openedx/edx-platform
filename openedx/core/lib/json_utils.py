@@ -16,7 +16,7 @@ class EdxJSONEncoder(DjangoJSONEncoder):
     """
     def default(self, o):  # pylint: disable=method-hidden
         if isinstance(o, (CourseKey, UsageKey)):
-            return unicode(o)
+            return str(o)
         elif isinstance(o, datetime.datetime):
             if o.tzinfo is not None:
                 if o.utcoffset() is None:

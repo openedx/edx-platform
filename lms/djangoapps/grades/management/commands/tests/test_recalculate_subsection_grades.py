@@ -16,7 +16,7 @@ from track.event_transaction_utils import get_event_transaction_id
 from util.date_utils import to_timestamp
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
-DATE_FORMAT = u"%Y-%m-%d %H:%M"
+DATE_FORMAT = "%Y-%m-%d %H:%M"
 
 
 @patch.dict(settings.FEATURES, {'PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS': False})
@@ -64,13 +64,13 @@ class TestRecalculateSubsectionGrades(HasCourseWithProblemsMixin, ModuleStoreTes
         self.command.handle(modified_start='2016-08-25 16:42', modified_end='2018-08-25 16:44')
         kwargs = {
             "user_id": "ID",
-            "course_id": u'x/y/z',
-            "usage_id": u'abc',
+            "course_id": 'x/y/z',
+            "usage_id": 'abc',
             "only_if_higher": False,
             "expected_modified_time": to_timestamp(utc.localize(datetime.strptime('2016-08-23 16:43', DATE_FORMAT))),
             "score_deleted": False,
-            "event_transaction_id": unicode(get_event_transaction_id()),
-            "event_transaction_type": u'edx.grades.problem.submitted',
+            "event_transaction_id": str(get_event_transaction_id()),
+            "event_transaction_type": 'edx.grades.problem.submitted',
             "score_db_table": score_db_table,
         }
 

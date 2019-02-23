@@ -23,7 +23,7 @@ class CrawlersConfig(ConfigurationModel):
     )
 
     def __unicode__(self):
-        return u'CrawlersConfig("{}")'.format(self.known_user_agents)
+        return 'CrawlersConfig("{}")'.format(self.known_user_agents)
 
     @classmethod
     def is_crawler(cls, request):

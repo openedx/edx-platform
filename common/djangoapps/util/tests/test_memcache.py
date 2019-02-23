@@ -14,7 +14,7 @@ class MemcacheTest(TestCase):
     """
 
     # Test whitespace, control characters, and some non-ASCII UTF-16
-    UNICODE_CHAR_CODES = (range(30) + [127] +
+    UNICODE_CHAR_CODES = (list(range(30)) + [127] +
                           [129, 500, 2 ** 8 - 1, 2 ** 8 + 1, 2 ** 16 - 1])
 
     def setUp(self):
@@ -70,7 +70,7 @@ class MemcacheTest(TestCase):
         for unicode_char in self.UNICODE_CHAR_CODES:
 
             # Generate a key with that character
-            key = unichr(unicode_char)
+            key = chr(unicode_char)
 
             # Make the key safe
             key = safe_key(key, '', '')
@@ -84,7 +84,7 @@ class MemcacheTest(TestCase):
         for unicode_char in self.UNICODE_CHAR_CODES:
 
             # Generate a prefix with that character
-            prefix = unichr(unicode_char)
+            prefix = chr(unicode_char)
 
             # Make the key safe
             key = safe_key('test', prefix, '')
@@ -98,7 +98,7 @@ class MemcacheTest(TestCase):
         for unicode_char in self.UNICODE_CHAR_CODES:
 
             # Generate a version with that character
-            version = unichr(unicode_char)
+            version = chr(unicode_char)
 
             # Make the key safe
             key = safe_key('test', '', version)

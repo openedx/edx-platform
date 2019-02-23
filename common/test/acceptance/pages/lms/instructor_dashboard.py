@@ -120,7 +120,7 @@ class InstructorDashboardPage(CoursePage):
 
     def is_rescore_unsupported_message_visible(self):
         if (self.q(css='.request-response-error').present):
-            return u'This component cannot be rescored.' in unicode(
+            return 'This component cannot be rescored.' in str(
                 self.q(css='.request-response-error').html
             )
         return False
@@ -162,7 +162,7 @@ class BulkEmailPage(PageObject):
         """
         Return `selector`, but limited to the bulk-email context.
         """
-        return u'.send-email {}'.format(selector)
+        return '.send-email {}'.format(selector)
 
     def _select_recipient(self, recipient):
         """
@@ -196,7 +196,7 @@ class BulkEmailPage(PageObject):
         is covered by the bulk_email unit tests.
         """
         confirmation_selector = self._bounded_selector(".msg-confirm")
-        expected_text = u"Your email message was successfully queued for sending."
+        expected_text = "Your email message was successfully queued for sending."
         EmptyPromise(
             lambda: expected_text in self.q(css=confirmation_selector)[0].text,
             "Message Queued Confirmation"
@@ -293,7 +293,7 @@ class CohortManagementSection(PageObject):
         cohorts_warning_title = '.message-warning .message-title'
 
         if self.q(css=cohorts_warning_title).visible:
-            return self.q(css='.message-title').text[0] == u'You currently have no cohorts configured'
+            return self.q(css='.message-title').text[0] == 'You currently have no cohorts configured'
         # The page may be in either the traditional management state, or an 'add new cohort' state.
         # Confirm the CSS class is visible because the CSS class can exist on the page even in different states.
         return self.q(css='.cohorts-state-section').visible or self.q(css='.new-cohort-form').visible
@@ -302,7 +302,7 @@ class CohortManagementSection(PageObject):
         """
         Return `selector`, but limited to the cohort management context.
         """
-        return u'.cohort-management {}'.format(selector)
+        return '.cohort-management {}'.format(selector)
 
     def _get_cohort_options(self):
         """
@@ -708,13 +708,13 @@ class DiscussionManagementSection(PageObject):
         """
         Return `selector`, but limited to the divided discussion management context.
         """
-        return u'.discussions-management {}'.format(selector)
+        return '.discussions-management {}'.format(selector)
 
     def is_save_button_disabled(self, key):
         """
         Returns the status for form's save button, enabled or disabled.
         """
-        save_button_css = u'%s %s' % (self.discussion_form_selectors[key], '.action-save')
+        save_button_css = '%s %s' % (self.discussion_form_selectors[key], '.action-save')
         disabled = self.q(css=self._bounded_selector(save_button_css)).attrs('disabled')
         return disabled[0] == 'true'
 
@@ -729,7 +729,7 @@ class DiscussionManagementSection(PageObject):
         """
         Returns the text of discussion topic headings if it exists, otherwise return False.
         """
-        form_heading_css = u'%s %s' % (self.discussion_form_selectors[key], '.subsection-title')
+        form_heading_css = '%s %s' % (self.discussion_form_selectors[key], '.subsection-title')
         discussion_heading = self.q(css=self._bounded_selector(form_heading_css))
 
         if len(discussion_heading) == 0:
@@ -753,7 +753,7 @@ class DiscussionManagementSection(PageObject):
         """
         Saves the discussion topics.
         """
-        save_button_css = u'%s %s' % (self.discussion_form_selectors[key], '.action-save')
+        save_button_css = '%s %s' % (self.discussion_form_selectors[key], '.action-save')
         self.q(css=self._bounded_selector(save_button_css)).first.click()
 
     def always_inline_discussion_selected(self):
@@ -791,7 +791,7 @@ class DiscussionManagementSection(PageObject):
         """
         Returns the message related to modifying discussion topics.
         """
-        title_css = u"%s .message-%s .message-title" % (self.discussion_form_selectors[key], msg_type)
+        title_css = "%s .message-%s .message-title" % (self.discussion_form_selectors[key], msg_type)
 
         EmptyPromise(
             lambda: self.q(css=self._bounded_selector(title_css)),
@@ -871,8 +871,8 @@ class MembershipPageAutoEnrollSection(PageObject):
                                        MembershipPageAutoEnrollSection.NOTIFICATION_ERROR
         Returns True if a {section_type} notification is displayed.
         """
-        notification_selector = u'.auto_enroll_csv .results .message-%s' % section_type
-        self.wait_for_element_presence(notification_selector, u"%s Notification" % section_type.title())
+        notification_selector = '.auto_enroll_csv .results .message-%s' % section_type
+        self.wait_for_element_presence(notification_selector, "%s Notification" % section_type.title())
         return self.q(css=notification_selector).is_present()
 
     def first_notification_message(self, section_type):
@@ -881,8 +881,8 @@ class MembershipPageAutoEnrollSection(PageObject):
                                        MembershipPageAutoEnrollSection.NOTIFICATION_ERROR
         Returns the first message from the list of messages in the {section_type} section.
         """
-        error_message_selector = u'.auto_enroll_csv .results .message-%s li.summary-item' % section_type
-        self.wait_for_element_presence(error_message_selector, u"%s message" % section_type.title())
+        error_message_selector = '.auto_enroll_csv .results .message-%s li.summary-item' % section_type
+        self.wait_for_element_presence(error_message_selector, "%s message" % section_type.title())
         return self.q(css=error_message_selector).text[0]
 
     def upload_correct_csv_file(self):
@@ -915,8 +915,8 @@ class MembershipPageAutoEnrollSection(PageObject):
         """
         Fill in the form with the provided email and submit it.
         """
-        email_selector = u"{} textarea".format(self.batch_enrollment_selector)
-        enrollment_button = u"{} .enrollment-button[data-action='enroll']".format(self.batch_enrollment_selector)
+        email_selector = "{} textarea".format(self.batch_enrollment_selector)
+        enrollment_button = "{} .enrollment-button[data-action='enroll']".format(self.batch_enrollment_selector)
 
         # Fill the email addresses after the email selector is visible.
         self.wait_for_element_visibility(email_selector, 'Email field is visible')
@@ -932,9 +932,9 @@ class MembershipPageAutoEnrollSection(PageObject):
         """
         Check notification div is visible and have message.
         """
-        notification_selector = u'{} .request-response'.format(self.batch_enrollment_selector)
+        notification_selector = '{} .request-response'.format(self.batch_enrollment_selector)
         self.wait_for_element_visibility(notification_selector, 'Notification div is visible')
-        return self.q(css=u"{} h3".format(notification_selector)).text
+        return self.q(css="{} h3".format(notification_selector)).text
 
 
 class MembershipPageBetaTesterSection(PageObject):
@@ -953,8 +953,8 @@ class MembershipPageBetaTesterSection(PageObject):
         """
         Fill in the form with the provided username and submit it.
         """
-        username_selector = u"{} textarea".format(self.batch_beta_tester_selector)
-        enrollment_button = u"{} .enrollment-button[data-action='add']".format(self.batch_beta_tester_selector)
+        username_selector = "{} textarea".format(self.batch_beta_tester_selector)
+        enrollment_button = "{} .enrollment-button[data-action='add']".format(self.batch_beta_tester_selector)
 
         # Fill the username  after the username selector is visible.
         self.wait_for_element_visibility(username_selector, 'username field is visible')
@@ -968,10 +968,10 @@ class MembershipPageBetaTesterSection(PageObject):
         """
         Check notification div is visible and have message.
         """
-        notification_selector = u'{} .request-response'.format(self.batch_beta_tester_selector)
+        notification_selector = '{} .request-response'.format(self.batch_beta_tester_selector)
         self.wait_for_element_visibility(notification_selector, 'Notification div is visible')
-        notification_header_text = self.q(css=u"{} h3".format(notification_selector)).text
-        notification_username = self.q(css=u"{} li".format(notification_selector)).text
+        notification_header_text = self.q(css="{} h3".format(notification_selector)).text
+        notification_username = self.q(css="{} li".format(notification_selector)).text
         return notification_header_text, notification_username
 
 
@@ -1198,7 +1198,7 @@ class StudentAdminPage(PageObject):
         Returns the input box with the given name
         for this object's container.
         """
-        return self.q(css=u'{} input[name={}]'.format(self.CONTAINER, input_name))
+        return self.q(css='{} input[name={}]'.format(self.CONTAINER, input_name))
 
     @property
     def problem_location_input(self):
@@ -1212,7 +1212,7 @@ class StudentAdminPage(PageObject):
         Returns input box for problem location
         """
         input_box = self.problem_location_input.first.results[0]
-        input_box.send_keys(unicode(problem_location))
+        input_box.send_keys(str(problem_location))
 
     @property
     def student_email_or_username_input(self):
@@ -1285,7 +1285,7 @@ class StudentAdminPage(PageObject):
             """
             Promise Check Function
             """
-            query = self.q(css=u"{} .{}".format(self.CONTAINER, self.TASK_HISTORY_TABLE_NAME))
+            query = self.q(css="{} .{}".format(self.CONTAINER, self.TASK_HISTORY_TABLE_NAME))
             return query.visible, query
 
         return Promise(check_func, "Waiting for student admin task history table to be visible.").fulfill()
@@ -1384,14 +1384,14 @@ class EntranceExamAdmin(StudentAdminPage):
         """
         Return Let Student Skip Entrance Exam button.
         """
-        return self.q(css=u'{} input[name=skip-entrance-exam]'.format(self.CONTAINER))
+        return self.q(css='{} input[name=skip-entrance-exam]'.format(self.CONTAINER))
 
     @property
     def top_notification(self):
         """
         Returns show background task history for student button.
         """
-        return self.q(css=u'{} .request-response-error'.format(self.CONTAINER)).first
+        return self.q(css='{} .request-response-error'.format(self.CONTAINER)).first
 
     def are_all_buttons_visible(self):
         """

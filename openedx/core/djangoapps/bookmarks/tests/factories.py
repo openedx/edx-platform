@@ -10,8 +10,8 @@ from student.tests.factories import UserFactory
 from opaque_keys.edx.locator import CourseLocator
 from ..models import Bookmark, XBlockCache
 
-COURSE_KEY = CourseLocator(u'edX', u'test_course', u'test')
-LOCATION = partial(COURSE_KEY.make_usage_key, u'problem')
+COURSE_KEY = CourseLocator('edX', 'test_course', 'test')
+LOCATION = partial(COURSE_KEY.make_usage_key, 'problem')
 
 
 class BookmarkFactory(DjangoModelFactory):
@@ -37,6 +37,6 @@ class XBlockCacheFactory(DjangoModelFactory):
         model = XBlockCache
 
     course_key = COURSE_KEY
-    usage_key = factory.Sequence(u'4x://edx/100/block/{0}'.format)
+    usage_key = factory.Sequence('4x://edx/100/block/{0}'.format)
     display_name = ''
     paths = list()

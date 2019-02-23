@@ -28,12 +28,12 @@ def check_and_get_upgrade_link_and_date(user, enrollment=None, course=None):
         if course is None:
             course = enrollment.course
         elif enrollment.course_id != course.id:
-            raise ValueError(u"{} refers to a different course than {} which was supplied".format(
+            raise ValueError("{} refers to a different course than {} which was supplied".format(
                 enrollment, course
             ))
 
         if enrollment.user_id != user.id:
-            raise ValueError(u"{} refers to a different user than {} which was supplied".format(
+            raise ValueError("{} refers to a different user than {} which was supplied".format(
                 enrollment, user
             ))
 
@@ -214,7 +214,7 @@ def get_experiment_user_metadata_context(course, user):
 
     return {
         'upgrade_link': upgrade_link,
-        'upgrade_price': unicode(get_cosmetic_verified_display_price(course)),
+        'upgrade_price': str(get_cosmetic_verified_display_price(course)),
         'enrollment_mode': enrollment_mode,
         'enrollment_time': enrollment_time,
         'pacing_type': 'self_paced' if course.self_paced else 'instructor_paced',

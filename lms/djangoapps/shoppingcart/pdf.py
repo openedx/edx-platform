@@ -64,7 +64,7 @@ class NumberedCanvas(Canvas):
         self.drawRightString(
             200 * mm,
             12 * mm,
-            _(u"Page {page_number} of {page_count}").format(page_number=self._pageNumber, page_count=page_count)
+            _("Page {page_number} of {page_count}").format(page_number=self._pageNumber, page_count=page_count)
         )
 
 
@@ -181,7 +181,7 @@ class PDFInvoice(object):
         try:
             img = Image.open(img_path)
         except IOError as ex:
-            log.exception(u'Pdf unable to open the image file: %s', str(ex))
+            log.exception('Pdf unable to open the image file: %s', str(ex))
             img = None
 
         return img
@@ -245,11 +245,11 @@ class PDFInvoice(object):
         y_pos = y_pos - font_size / 2 - vertical_padding
         # Draw Order/Invoice No.
         self.pdf.drawString(horizontal_padding_from_border, y_pos,
-                            _(u'{id_label} # {item_id}').format(id_label=id_label, item_id=self.item_id))
+                            _('{id_label} # {item_id}').format(id_label=id_label, item_id=self.item_id))
         y_pos = y_pos - font_size / 2 - vertical_padding
         # Draw Date
         self.pdf.drawString(
-            horizontal_padding_from_border, y_pos, _(u'Date: {date}').format(date=self.date)
+            horizontal_padding_from_border, y_pos, _('Date: {date}').format(date=self.date)
         )
 
         return y_pos - self.min_clearance
@@ -381,7 +381,7 @@ class PDFInvoice(object):
         if self.is_invoice:
             # only print TaxID if we are generating an Invoice
             totals_data.append(
-                ['', u'{tax_label}:  {tax_id}'.format(tax_label=self.tax_label, tax_id=self.tax_id)]
+                ['', '{tax_label}:  {tax_id}'.format(tax_label=self.tax_label, tax_id=self.tax_id)]
             )
 
         heights = 8 * mm

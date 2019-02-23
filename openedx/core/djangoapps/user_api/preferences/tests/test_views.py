@@ -17,7 +17,7 @@ from ...accounts.tests.test_views import UserAPITestCase
 from ..api import set_user_preference
 from .test_api import get_expected_validation_developer_message, get_expected_key_error_user_message
 
-TOO_LONG_PREFERENCE_KEY = u"x" * 256
+TOO_LONG_PREFERENCE_KEY = "x" * 256
 
 
 @ddt.ddt
@@ -149,7 +149,7 @@ class TestPreferencesAPI(UserAPITestCase):
             expected_status=204
         )
         response = self.send_get(self.client)
-        self.assertEqual({u"dict_pref": u"{u'int_key': 10}", u"string_pref": u"value"}, response.data)
+        self.assertEqual({"dict_pref": "{u'int_key': 10}", "string_pref": "value"}, response.data)
 
     @ddt.data(
         ("different_client", "different_user"),
@@ -221,14 +221,14 @@ class TestPreferencesAPI(UserAPITestCase):
                 "string_pref": "updated_value",
                 TOO_LONG_PREFERENCE_KEY: "new_value",
                 "new_pref": "new_value",
-                u"empty_pref_ȻħȺɍłɇs": "",
+                "empty_pref_ȻħȺɍłɇs": "",
                 "time_zone": "Asia/Africa",
             },
             expected_status=400
         )
         self.assertTrue(response.data.get("field_errors", None))
         field_errors = response.data["field_errors"]
-        self.assertEquals(
+        self.assertEqual(
             field_errors,
             {
                 TOO_LONG_PREFERENCE_KEY: {
@@ -239,14 +239,14 @@ class TestPreferencesAPI(UserAPITestCase):
                         TOO_LONG_PREFERENCE_KEY, "new_value"
                     ),
                 },
-                u"empty_pref_ȻħȺɍłɇs": {
-                    "developer_message": u"Preference 'empty_pref_ȻħȺɍłɇs' cannot be set to an empty value.",
-                    "user_message": u"Preference 'empty_pref_ȻħȺɍłɇs' cannot be set to an empty value.",
+                "empty_pref_ȻħȺɍłɇs": {
+                    "developer_message": "Preference 'empty_pref_ȻħȺɍłɇs' cannot be set to an empty value.",
+                    "user_message": "Preference 'empty_pref_ȻħȺɍłɇs' cannot be set to an empty value.",
                 },
                 "time_zone": {
-                    "developer_message": u"Value 'Asia/Africa' not valid for preference 'time_zone': Not in "
-                                         u"timezone set.",
-                    "user_message": u"Value 'Asia/Africa' is not a valid time zone selection."
+                    "developer_message": "Value 'Asia/Africa' not valid for preference 'time_zone': Not in "
+                                         "timezone set.",
+                    "user_message": "Value 'Asia/Africa' is not a valid time zone selection."
                 },
             }
         )
@@ -254,10 +254,10 @@ class TestPreferencesAPI(UserAPITestCase):
         # Verify that GET returns the original preferences
         response = self.send_get(self.client)
         expected_preferences = {
-            "dict_pref": u"{'int_key': 10}",
-            "string_pref": u"value",
-            "extra_pref": u"extra_value",
-            "time_zone": u"Pacific/Midway",
+            "dict_pref": "{'int_key': 10}",
+            "string_pref": "value",
+            "extra_pref": "extra_value",
+            "time_zone": "Pacific/Midway",
         }
         self.assertEqual(expected_preferences, response.data)
 
@@ -272,8 +272,8 @@ class TestPreferencesAPI(UserAPITestCase):
         self.assertEqual(
             response.data,
             {
-                "developer_message": u"No data provided for user preference update",
-                "user_message": u"No data provided for user preference update"
+                "developer_message": "No data provided for user preference update",
+                "user_message": "No data provided for user preference update"
             }
         )
 
@@ -282,8 +282,8 @@ class TestPreferencesAPI(UserAPITestCase):
         self.assertEqual(
             response.data,
             {
-                "developer_message": u"No data provided for user preference update",
-                "user_message": u"No data provided for user preference update"
+                "developer_message": "No data provided for user preference update",
+                "user_message": "No data provided for user preference update"
             }
         )
 
@@ -450,7 +450,7 @@ class TestPreferencesDetailAPI(UserAPITestCase):
         set_user_preference(self.user, "dict_pref", {"int_key": 10})
         self._set_url("dict_pref")
         response = self.send_get(client)
-        self.assertEqual(u"{'int_key': 10}", response.data)
+        self.assertEqual("{'int_key': 10}", response.data)
 
     def test_create_preference(self):
         """
@@ -494,8 +494,8 @@ class TestPreferencesDetailAPI(UserAPITestCase):
         self.assertEqual(
             response.data,
             {
-                "developer_message": u"Preference 'new_key' cannot be set to an empty value.",
-                "user_message": u"Preference 'new_key' cannot be set to an empty value."
+                "developer_message": "Preference 'new_key' cannot be set to an empty value.",
+                "user_message": "Preference 'new_key' cannot be set to an empty value."
             }
         )
         self.send_get(self.client, expected_status=404)
@@ -510,7 +510,7 @@ class TestPreferencesDetailAPI(UserAPITestCase):
         new_value = "new value"
         self._set_url(too_long_preference_key)
         response = self.send_put(self.client, new_value, expected_status=400)
-        self.assertEquals(
+        self.assertEqual(
             response.data,
             {
                 "developer_message": get_expected_validation_developer_message(too_long_preference_key, new_value),
@@ -534,9 +534,9 @@ class TestPreferencesDetailAPI(UserAPITestCase):
         self.send_put(client, new_value, expected_status=403)
 
     @ddt.data(
-        (u"new value",),
+        ("new value",),
         (10,),
-        ({u"int_key": 10},)
+        ({"int_key": 10},)
     )
     @ddt.unpack
     def test_update_preference(self, preference_value):
@@ -546,7 +546,7 @@ class TestPreferencesDetailAPI(UserAPITestCase):
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
         self.send_put(self.client, preference_value)
         response = self.send_get(self.client)
-        self.assertEqual(unicode(preference_value), response.data)
+        self.assertEqual(str(preference_value), response.data)
 
     @ddt.data(
         ("different_client", "different_user"),
@@ -576,8 +576,8 @@ class TestPreferencesDetailAPI(UserAPITestCase):
         self.assertEqual(
             response.data,
             {
-                "developer_message": u"Preference 'test_key' cannot be set to an empty value.",
-                "user_message": u"Preference 'test_key' cannot be set to an empty value."
+                "developer_message": "Preference 'test_key' cannot be set to an empty value.",
+                "user_message": "Preference 'test_key' cannot be set to an empty value."
             }
         )
         response = self.send_get(self.client)

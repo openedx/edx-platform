@@ -1,5 +1,5 @@
 """ Tests for API endpoints. """
-from __future__ import unicode_literals
+
 
 import datetime
 import freezegun

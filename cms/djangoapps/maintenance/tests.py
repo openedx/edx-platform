@@ -17,7 +17,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from .views import COURSE_KEY_ERROR_MESSAGES, MAINTENANCE_VIEWS
 
 # This list contains URLs of all maintenance app views.
-MAINTENANCE_URLS = [reverse(view['url']) for view in MAINTENANCE_VIEWS.values()]
+MAINTENANCE_URLS = [reverse(view['url']) for view in list(MAINTENANCE_VIEWS.values())]
 
 
 class TestMaintenanceIndex(ModuleStoreTestCase):
@@ -117,7 +117,7 @@ class MaintenanceViewAccessTests(MaintenanceViewTestCase):
         response = self.client.get(url)
         self.assertContains(
             response,
-            u'Must be {platform_name} staff to perform this action.'.format(platform_name=settings.PLATFORM_NAME),
+            'Must be {platform_name} staff to perform this action.'.format(platform_name=settings.PLATFORM_NAME),
             status_code=403
         )
 
@@ -175,7 +175,7 @@ class TestForcePublish(MaintenanceViewTestCase):
         # validate non split error message
         course = CourseFactory.create(default_store=ModuleStoreEnum.Type.mongo)
         self.verify_error_message(
-            data={'course-id': unicode(course.id)},
+            data={'course-id': str(course.id)},
             error_message='Force publishing course is not supported with old mongo courses.'
         )
 
@@ -187,7 +187,7 @@ class TestForcePublish(MaintenanceViewTestCase):
         # validate non split error message
         course = CourseFactory.create(org='e', number='d', run='X', default_store=ModuleStoreEnum.Type.mongo)
         self.verify_error_message(
-            data={'course-id': unicode(course.id)},
+            data={'course-id': str(course.id)},
             error_message='Force publishing course is not supported with old mongo courses.'
         )
         # Now search for the course key in split version.
@@ -208,7 +208,7 @@ class TestForcePublish(MaintenanceViewTestCase):
 
         # now course is published, we should get `already published course` error.
         self.verify_error_message(
-            data={'course-id': unicode(course.id)},
+            data={'course-id': str(course.id)},
             error_message='Course is already in published state.'
         )
 
@@ -220,7 +220,7 @@ class TestForcePublish(MaintenanceViewTestCase):
             course (object): a course object.
         """
         # get draft and publish branch versions
-        versions = get_course_versions(unicode(course.id))
+        versions = get_course_versions(str(course.id))
 
         # verify that draft and publish point to different versions
         self.assertNotEqual(versions['draft-branch'], versions['published-branch'])
@@ -240,7 +240,7 @@ class TestForcePublish(MaintenanceViewTestCase):
 
         # force publish course view
         data = {
-            'course-id': unicode(course.id)
+            'course-id': str(course.id)
         }
         response = self.client.post(self.view_url, data=data, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         response_data = json.loads(response.content)

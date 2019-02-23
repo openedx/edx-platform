@@ -95,8 +95,8 @@ class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
                 mock_generate_certificate_apply_async.assert_called_with(
                     countdown=CERTIFICATE_DELAY_SECONDS,
                     kwargs={
-                        'student': unicode(self.user.id),
-                        'course_key': unicode(self.course.id),
+                        'student': str(self.user.id),
+                        'course_key': str(self.course.id),
                     }
                 )
 
@@ -123,8 +123,8 @@ class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
                 mock_generate_certificate_apply_async.assert_called_with(
                     countdown=CERTIFICATE_DELAY_SECONDS,
                     kwargs={
-                        'student': unicode(self.user.id),
-                        'course_key': unicode(self.ip_course.id),
+                        'student': str(self.user.id),
+                        'course_key': str(self.ip_course.id),
                     }
                 )
 
@@ -175,8 +175,8 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
                     mock_generate_certificate_apply_async.assert_called_with(
                         countdown=CERTIFICATE_DELAY_SECONDS,
                         kwargs={
-                            'student': unicode(self.user.id),
-                            'course_key': unicode(self.course.id),
+                            'student': str(self.user.id),
+                            'course_key': str(self.course.id),
                         }
                     )
 
@@ -196,8 +196,8 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
                     mock_generate_certificate_apply_async.assert_called_with(
                         countdown=CERTIFICATE_DELAY_SECONDS,
                         kwargs={
-                            'student': unicode(self.user.id),
-                            'course_key': unicode(self.ip_course.id),
+                            'student': str(self.user.id),
+                            'course_key': str(self.ip_course.id),
                         }
                     )
 
@@ -320,8 +320,8 @@ class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
                 mock_generate_certificate_apply_async.assert_called_with(
                     countdown=CERTIFICATE_DELAY_SECONDS,
                     kwargs={
-                        'student': unicode(self.user_one.id),
-                        'course_key': unicode(self.course_one.id),
+                        'student': str(self.user_one.id),
+                        'course_key': str(self.course_one.id),
                         'expected_verification_status': IDVerificationAttempt.STATUS.approved,
                     }
                 )
@@ -341,8 +341,8 @@ class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
                 mock_generate_certificate_apply_async.assert_called_with(
                     countdown=CERTIFICATE_DELAY_SECONDS,
                     kwargs={
-                        'student': unicode(self.user_two.id),
-                        'course_key': unicode(self.course_two.id),
+                        'student': str(self.user_two.id),
+                        'course_key': str(self.course_two.id),
                         'expected_verification_status': IDVerificationAttempt.STATUS.approved,
                     }
                 )

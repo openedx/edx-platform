@@ -67,12 +67,11 @@ class BranchSettingMixin(object):
             return self.default_branch_setting_func()
 
 
-class ModuleStoreDraftAndPublished(BranchSettingMixin, BulkOperationsMixin):
+class ModuleStoreDraftAndPublished(BranchSettingMixin, BulkOperationsMixin, metaclass=ABCMeta):
     """
     A mixin for a read-write database backend that supports two branches, Draft and Published, with
     options to prefer Draft and fallback to Published.
     """
-    __metaclass__ = ABCMeta
 
     @abstractmethod
     def delete_item(self, location, user_id, revision=None, **kwargs):
@@ -167,8 +166,8 @@ class ModuleStoreDraftAndPublished(BranchSettingMixin, BulkOperationsMixin):
             self.update_item(old_parent_item, user_id)  # pylint: disable=no-member
             log.info(
                 '%s removed from %s children',
-                unicode(source_item.location),
-                unicode(old_parent_item.location)
+                str(source_item.location),
+                str(old_parent_item.location)
             )
 
         # Add item to new parent at particular location.
@@ -180,8 +179,8 @@ class ModuleStoreDraftAndPublished(BranchSettingMixin, BulkOperationsMixin):
             self.update_item(new_parent_item, user_id)  # pylint: disable=no-member
             log.info(
                 '%s added to %s children',
-                unicode(source_item.location),
-                unicode(new_parent_item.location)
+                str(source_item.location),
+                str(new_parent_item.location)
             )
 
         # Update parent attribute of the item block
@@ -189,8 +188,8 @@ class ModuleStoreDraftAndPublished(BranchSettingMixin, BulkOperationsMixin):
         self.update_item(source_item, user_id)  # pylint: disable=no-member
         log.info(
             '%s parent updated to %s',
-            unicode(source_item.location),
-            unicode(new_parent_item.location)
+            str(source_item.location),
+            str(new_parent_item.location)
         )
         return source_item.location
 

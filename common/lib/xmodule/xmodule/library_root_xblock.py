@@ -46,10 +46,10 @@ class LibraryRoot(XBlock):
     has_author_view = True
 
     def __unicode__(self):
-        return u"Library: {}".format(self.display_name)
+        return "Library: {}".format(self.display_name)
 
     def __str__(self):
-        return unicode(self).encode('utf-8')
+        return str(self).encode('utf-8')
 
     def author_view(self, context):
         """
@@ -90,7 +90,7 @@ class LibraryRoot(XBlock):
             child = self.runtime.get_block(child_key)
             child_view_name = StudioEditableModule.get_preview_view_name(child)
 
-            if unicode(child.location) == force_render:
+            if str(child.location) == force_render:
                 child_context['show_preview'] = True
 
             if child_context['show_preview']:
@@ -100,7 +100,7 @@ class LibraryRoot(XBlock):
             fragment.add_fragment_resources(rendered_child)
 
             contents.append({
-                'id': unicode(child.location),
+                'id': str(child.location),
                 'content': rendered_child.content,
             })
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+
 
 import logging
 
@@ -44,7 +44,7 @@ def seed_forum_roles_for_existing_ccx(apps, schema_editor):
             )
             continue
 
-        ccx_locator = CCXLocator.from_course_locator(ccx.course_id, unicode(ccx.id))
+        ccx_locator = CCXLocator.from_course_locator(ccx.course_id, str(ccx.id))
 
         # Create forum roles.
         admin_role, _ = Role.objects.get_or_create(name=FORUM_ROLE_ADMINISTRATOR, course_id=ccx_locator)

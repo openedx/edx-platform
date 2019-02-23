@@ -11,6 +11,7 @@ from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCer
 from course_modes.models import CourseMode
 from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.programs.tasks.v1.tasks import award_program_certificates
+from functools import reduce
 
 # TODO: Log to console, even with debug mode disabled?
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
@@ -44,10 +45,10 @@ class Command(BaseCommand):
         self._load_usernames()
 
         if options.get('commit'):
-            logger.info(u'Enqueuing program certification tasks for %d candidates.', len(self.usernames))
+            logger.info('Enqueuing program certification tasks for %d candidates.', len(self.usernames))
         else:
             logger.info(
-                u'Found %d candidates. To enqueue program certification tasks, pass the -c or --commit flags.',
+                'Found %d candidates. To enqueue program certification tasks, pass the -c or --commit flags.',
                 len(self.usernames)
             )
             return
@@ -58,14 +59,14 @@ class Command(BaseCommand):
                 award_program_certificates.delay(username)
             except:  # pylint: disable=bare-except
                 failed += 1
-                logger.exception(u'Failed to enqueue task for user [%s]', username)
+                logger.exception('Failed to enqueue task for user [%s]', username)
             else:
                 succeeded += 1
-                logger.debug(u'Successfully enqueued task for user [%s]', username)
+                logger.debug('Successfully enqueued task for user [%s]', username)
 
         logger.info(
-            u'Done. Successfully enqueued tasks for %d candidates. '
-            u'Failed to enqueue tasks for %d candidates.',
+            'Done. Successfully enqueued tasks for %d candidates. '
+            'Failed to enqueue tasks for %d candidates.',
             succeeded,
             failed
         )
@@ -74,7 +75,7 @@ class Command(BaseCommand):
         """Find all course runs which are part of a program."""
         programs = []
         for site in Site.objects.all():
-            logger.info(u'Loading programs from the catalog for site %s.', site.domain)
+            logger.info('Loading programs from the catalog for site %s.', site.domain)
             programs.extend(get_programs(site))
 
         self.course_runs = self._flatten(programs)

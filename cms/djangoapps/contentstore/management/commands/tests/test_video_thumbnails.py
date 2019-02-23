@@ -32,7 +32,7 @@ class TestArgParsing(TestCase):
     def test_invalid_course(self):
         errstring = "Invalid key specified: <class 'opaque_keys.edx.locator.CourseLocator'>: invalid-course"
         setup_video_thumbnails_config(course_ids='invalid-course')
-        with self.assertRaisesRegexp(CommandError, errstring):
+        with self.assertRaisesRegex(CommandError, errstring):
             call_command('video_thumbnails')
 
 
@@ -70,7 +70,7 @@ class TestVideoThumbnails(ModuleStoreTestCase):
                 ),
                 (
                     LOGGER_NAME, 'INFO',
-                    u'[video thumbnails] selected course videos: {course_videos} '.format(
+                    '[video thumbnails] selected course videos: {course_videos} '.format(
                         course_videos=text_type(course_videos)
                     )
                 )
@@ -122,12 +122,12 @@ class TestVideoThumbnails(ModuleStoreTestCase):
             logger.check(
                 (
                     tasks_logger, 'ERROR',
-                    (u"[video thumbnails] [run=1] [video-thumbnails-scraping-failed-with-unknown-exc] "
-                     u"[edx_video_id=super-soaker] [youtube_id=OscRe3pSP80] [course={}]".format(self.course.id))
+                    ("[video thumbnails] [run=1] [video-thumbnails-scraping-failed-with-unknown-exc] "
+                     "[edx_video_id=super-soaker] [youtube_id=OscRe3pSP80] [course={}]".format(self.course.id))
                 ),
                 (
                     tasks_logger, 'ERROR',
-                    (u"[video thumbnails] [run=1] [video-thumbnails-scraping-failed-with-unknown-exc] "
-                     u"[edx_video_id=medium-soaker] [youtube_id=OscRe3pSP81] [course={}]".format(self.course_2.id))
+                    ("[video thumbnails] [run=1] [video-thumbnails-scraping-failed-with-unknown-exc] "
+                     "[edx_video_id=medium-soaker] [youtube_id=OscRe3pSP81] [course={}]".format(self.course_2.id))
                 )
             )

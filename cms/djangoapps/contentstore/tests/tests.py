@@ -1,7 +1,7 @@
 """
 This test file will test registration, login, activation, and session activity timeouts
 """
-from __future__ import print_function
+
 import datetime
 import time
 
@@ -144,7 +144,7 @@ class AuthTestCase(ContentStoreTestCase):
             reverse('signup'),
         )
         for page in pages:
-            print(u"Checking '{0}'".format(page))
+            print("Checking '{0}'".format(page))
             self.check_page_get(page, 200)
 
     def test_create_account_errors(self):
@@ -183,7 +183,7 @@ class AuthTestCase(ContentStoreTestCase):
     def test_login_ratelimited(self):
         # try logging in 30 times, the default limit in the number of failed
         # login attempts in one 5 minute period before the rate gets limited
-        for i in xrange(30):
+        for i in range(30):
             resp = self._login(self.email, 'wrong_password{0}'.format(i))
             self.assertEqual(resp.status_code, 403)
         resp = self._login(self.email, 'wrong_password')
@@ -200,7 +200,7 @@ class AuthTestCase(ContentStoreTestCase):
             self.create_account(self.username, self.email, self.pw)
             self.activate_user(self.email)
 
-            for i in xrange(3):
+            for i in range(3):
                 resp = self._login(self.email, 'wrong_password{0}'.format(i))
                 self.assertEqual(resp.status_code, 403)
                 self.assertIn(
@@ -268,7 +268,7 @@ class AuthTestCase(ContentStoreTestCase):
         # Not logged in.  Should redirect to login.
         print('Not logged in')
         for page in auth_pages:
-            print(u"Checking '{0}'".format(page))
+            print("Checking '{0}'".format(page))
             self.check_page_get(page, expected=302)
 
         # Logged in should work.
@@ -276,7 +276,7 @@ class AuthTestCase(ContentStoreTestCase):
 
         print('Logged in')
         for page in simple_auth_pages:
-            print(u"Checking '{0}'".format(page))
+            print("Checking '{0}'".format(page))
             self.check_page_get(page, expected=200)
 
     def test_index_auth(self):
@@ -301,7 +301,7 @@ class AuthTestCase(ContentStoreTestCase):
         # make sure we can access courseware immediately
         course_url = '/home/'
         resp = self.client.get_html(course_url)
-        self.assertEquals(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 200)
 
         # then wait a bit and see if we get timed out
         time.sleep(2)

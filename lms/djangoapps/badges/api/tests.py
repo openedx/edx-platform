@@ -44,7 +44,7 @@ class UserAssertionTestCase(UrlResetMixin, ModuleStoreTestCase, ApiTestCase):
         self.assertIn(badge_class.image.url, json_class['image_url'])
         self.assertEqual(badge_class.description, json_class['description'])
         self.assertEqual(badge_class.criteria, json_class['criteria'])
-        self.assertEqual(badge_class.course_id and unicode(badge_class.course_id), json_class['course_id'])
+        self.assertEqual(badge_class.course_id and str(badge_class.course_id), json_class['course_id'])
 
     def check_assertion_structure(self, assertion, json_assertion):
         """
@@ -61,7 +61,7 @@ class UserAssertionTestCase(UrlResetMixin, ModuleStoreTestCase, ApiTestCase):
         if wildcard:
             return '*'
         else:
-            return unicode(badge_class.course_id)
+            return str(badge_class.course_id)
 
     def create_badge_class(self, check_course, **kwargs):
         """

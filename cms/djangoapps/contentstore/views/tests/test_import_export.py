@@ -7,7 +7,7 @@ import logging
 import os
 import re
 import shutil
-import StringIO
+import io
 import tarfile
 import tempfile
 from uuid import uuid4
@@ -88,22 +88,22 @@ class ImportEntranceExamTestCase(CourseTestCase, MilestonesTestCaseMixin):
         """
         course = self.store.get_course(self.course.id)
         self.assertIsNotNone(course)
-        self.assertEquals(course.entrance_exam_enabled, False)
+        self.assertEqual(course.entrance_exam_enabled, False)
 
         with open(self.entrance_exam_tar) as gtar:
             args = {"name": self.entrance_exam_tar, "course-data": [gtar]}
             resp = self.client.post(self.url, args)
-        self.assertEquals(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 200)
         course = self.store.get_course(self.course.id)
         self.assertIsNotNone(course)
-        self.assertEquals(course.entrance_exam_enabled, True)
-        self.assertEquals(course.entrance_exam_minimum_score_pct, 0.7)
+        self.assertEqual(course.entrance_exam_enabled, True)
+        self.assertEqual(course.entrance_exam_minimum_score_pct, 0.7)
 
     def test_import_delete_pre_exiting_entrance_exam(self):
         """
         Check that pre existed entrance exam content should be overwrite with the imported course.
         """
-        exam_url = '/course/{}/entrance_exam/'.format(unicode(self.course.id))
+        exam_url = '/course/{}/entrance_exam/'.format(str(self.course.id))
         resp = self.client.post(exam_url, {'entrance_exam_minimum_score_pct': 0.5}, http_accept='application/json')
         self.assertEqual(resp.status_code, 201)
 
@@ -113,9 +113,9 @@ class ImportEntranceExamTestCase(CourseTestCase, MilestonesTestCaseMixin):
         self.assertTrue(metadata['entrance_exam_enabled'])
         self.assertIsNotNone(metadata['entrance_exam_minimum_score_pct'])
         self.assertEqual(metadata['entrance_exam_minimum_score_pct']['value'], 0.5)
-        self.assertTrue(len(milestones_helpers.get_course_milestones(unicode(self.course.id))))
+        self.assertTrue(len(milestones_helpers.get_course_milestones(str(self.course.id))))
         content_milestones = milestones_helpers.get_course_content_milestones(
-            unicode(self.course.id),
+            str(self.course.id),
             metadata['entrance_exam_id']['value'],
             milestones_helpers.get_milestone_relationship_types()['FULFILLS']
         )
@@ -125,11 +125,11 @@ class ImportEntranceExamTestCase(CourseTestCase, MilestonesTestCaseMixin):
         with open(self.entrance_exam_tar) as gtar:
             args = {"name": self.entrance_exam_tar, "course-data": [gtar]}
             resp = self.client.post(self.url, args)
-        self.assertEquals(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 200)
         course = self.store.get_course(self.course.id)
         self.assertIsNotNone(course)
-        self.assertEquals(course.entrance_exam_enabled, True)
-        self.assertEquals(course.entrance_exam_minimum_score_pct, 0.7)
+        self.assertEqual(course.entrance_exam_enabled, True)
+        self.assertEqual(course.entrance_exam_minimum_score_pct, 0.7)
 
 
 @ddt.ddt
@@ -189,7 +189,7 @@ class ImportTestCase(CourseTestCase):
                     "name": self.bad_tar,
                     "course-data": [btar]
                 })
-        self.assertEquals(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 200)
         # Check that `import_status` returns the appropriate stage (i.e., the
         # stage at which import failed).
         resp_status = self.client.get(
@@ -200,7 +200,7 @@ class ImportTestCase(CourseTestCase):
             )
         )
 
-        self.assertEquals(json.loads(resp_status.content)["ImportStatus"], -2)
+        self.assertEqual(json.loads(resp_status.content)["ImportStatus"], -2)
 
     def test_with_coursexml(self):
         """
@@ -211,7 +211,7 @@ class ImportTestCase(CourseTestCase):
             args = {"name": self.good_tar, "course-data": [gtar]}
             resp = self.client.post(self.url, args)
 
-        self.assertEquals(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 200)
 
     def test_import_in_existing_course(self):
         """
@@ -229,7 +229,7 @@ class ImportTestCase(CourseTestCase):
         with open(self.good_tar) as gtar:
             args = {"name": self.good_tar, "course-data": [gtar]}
             resp = self.client.post(self.url, args)
-        self.assertEquals(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 200)
 
         course = self.store.get_course(self.course.id)
         self.assertIsNotNone(course)
@@ -247,7 +247,7 @@ class ImportTestCase(CourseTestCase):
         with open(self.good_tar) as gtar:
             args = {"name": self.good_tar, "course-data": [gtar]}
             resp = self.client.post(self.url, args)
-        self.assertEquals(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 200)
 
         # Now check that non_staff user has his same role
         self.assertFalse(CourseInstructorRole(self.course.id).has_user(nonstaff_user))
@@ -341,7 +341,7 @@ class ImportTestCase(CourseTestCase):
             with open(tarpath) as tar:
                 args = {"name": tarpath, "course-data": [tar]}
                 resp = self.client.post(self.url, args)
-            self.assertEquals(resp.status_code, 200)
+            self.assertEqual(resp.status_code, 200)
             resp = self.client.get(
                 reverse_course_url(
                     'import_status_handler',
@@ -543,7 +543,7 @@ class ExportTestCase(CourseTestCase):
         Get the HTML for the page.
         """
         resp = self.client.get_html(self.url)
-        self.assertEquals(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 200)
         self.assertContains(resp, "Export My Course Content")
 
     def test_export_json_unsupported(self):
@@ -551,7 +551,7 @@ class ExportTestCase(CourseTestCase):
         JSON is unsupported.
         """
         resp = self.client.get(self.url, HTTP_ACCEPT='application/json')
-        self.assertEquals(resp.status_code, 406)
+        self.assertEqual(resp.status_code, 406)
 
     def test_export_async(self):
         """
@@ -560,22 +560,22 @@ class ExportTestCase(CourseTestCase):
         Return a TarFile of the successful export.
         """
         resp = self.client.post(self.url)
-        self.assertEquals(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 200)
         resp = self.client.get(self.status_url)
         result = json.loads(resp.content)
         status = result['ExportStatus']
-        self.assertEquals(status, 3)
+        self.assertEqual(status, 3)
         self.assertIn('ExportOutput', result)
         output_url = result['ExportOutput']
         resp = self.client.get(output_url)
         self._verify_export_succeeded(resp)
 
-        buff = StringIO.StringIO(b"".join(resp.streaming_content))
+        buff = io.StringIO(b"".join(resp.streaming_content))
         return tarfile.open(fileobj=buff)
 
     def _verify_export_succeeded(self, resp):
         """ Export success helper method. """
-        self.assertEquals(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 200)
         self.assertTrue(resp.get('Content-Disposition').startswith('attachment'))
 
     def test_unknown_xblock_top_level(self):
@@ -666,9 +666,9 @@ class ExportTestCase(CourseTestCase):
     def _verify_export_failure(self, expected_text):
         """ Export failure helper method. """
         resp = self.client.post(self.url)
-        self.assertEquals(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 200)
         resp = self.client.get(self.status_url)
-        self.assertEquals(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 200)
         result = json.loads(resp.content)
         self.assertNotIn('ExportOutput', result)
         self.assertIn('ExportError', result)
@@ -732,7 +732,7 @@ class ExportTestCase(CourseTestCase):
         Export failure if course does not exist
         """
         resp = self.client.get_html(url)
-        self.assertEquals(resp.status_code, 404)
+        self.assertEqual(resp.status_code, 404)
 
     def test_non_course_author(self):
         """
@@ -956,7 +956,7 @@ class TestCourseExportImport(LibraryTestCase):
         source_course_lib_children = self.get_lib_content_block_children(source_course_location)
         dest_course_lib_children = self.get_lib_content_block_children(dest_course_location)
 
-        self.assertEquals(len(source_course_lib_children), len(dest_course_lib_children))
+        self.assertEqual(len(source_course_lib_children), len(dest_course_lib_children))
 
         for source_child_location, dest_child_location in zip(source_course_lib_children, dest_course_lib_children):
             # Assert problem names on draft branch.
@@ -974,7 +974,7 @@ class TestCourseExportImport(LibraryTestCase):
         """
         source_child = self.store.get_item(source_child_location)
         dest_child = self.store.get_item(dest_child_location)
-        self.assertEquals(source_child.display_name, dest_child.display_name)
+        self.assertEqual(source_child.display_name, dest_child.display_name)
 
     @ddt.data(True, False)
     def test_library_content_on_course_export_import(self, publish_item):

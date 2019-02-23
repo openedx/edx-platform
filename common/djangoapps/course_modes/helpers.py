@@ -48,10 +48,10 @@ def enrollment_mode_display(mode, verification_status, course_id):
         enrollment_value = _("Professional Ed")
 
     return {
-        'enrollment_title': unicode(enrollment_title),
-        'enrollment_value': unicode(enrollment_value),
+        'enrollment_title': str(enrollment_title),
+        'enrollment_value': str(enrollment_value),
         'show_image': show_image,
-        'image_alt': unicode(image_alt),
+        'image_alt': str(image_alt),
         'display_mode': _enrollment_mode_display(mode, verification_status, course_id)
     }
 

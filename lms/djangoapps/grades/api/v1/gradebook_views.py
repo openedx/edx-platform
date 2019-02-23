@@ -684,7 +684,7 @@ class GradebookBulkUpdateView(GradeViewMixin, PaginatedAPIView):
                         user_id=requested_user_id,
                         usage_id=requested_usage_id,
                         success=False,
-                        reason=u'usage_key {} does not exist in this course.'.format(usage_key)
+                        reason='usage_key {} does not exist in this course.'.format(usage_key)
                     ))
                     continue
 
@@ -740,8 +740,8 @@ class GradebookBulkUpdateView(GradeViewMixin, PaginatedAPIView):
                 only_if_higher=False,
                 expected_modified_time=to_timestamp(override.modified),
                 score_deleted=False,
-                event_transaction_id=unicode(get_event_transaction_id()),
-                event_transaction_type=unicode(get_event_transaction_type()),
+                event_transaction_id=str(get_event_transaction_id()),
+                event_transaction_type=str(get_event_transaction_type()),
                 score_db_table=ScoreDatabaseTableEnum.overrides,
                 force_update_subsections=True,
             )
@@ -760,7 +760,7 @@ class GradebookBulkUpdateView(GradeViewMixin, PaginatedAPIView):
     ):
 
         log.info(
-            u'Grades: Bulk_Update, UpdatedByUser: %s, User: %s, Usage: %s, Grade: %s, GradeOverride: %s, Success: %s',
+            'Grades: Bulk_Update, UpdatedByUser: %s, User: %s, Usage: %s, Grade: %s, GradeOverride: %s, Success: %s',
             request_user.id,
             user_id,
             usage_id,

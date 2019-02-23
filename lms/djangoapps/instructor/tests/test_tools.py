@@ -33,7 +33,7 @@ class TestDashboardError(unittest.TestCase):
     Test DashboardError exceptions.
     """
     def test_response(self):
-        error = tools.DashboardError(u'Oh noes!')
+        error = tools.DashboardError('Oh noes!')
         response = json.loads(error.response().content)
         self.assertEqual(response, {'error': 'Oh noes!'})
 
@@ -163,7 +163,7 @@ class TestGetUnitsWithDueDate(ModuleStoreTestCase):
             """
             return sorted(text_type(i.location) for i in seq)
 
-        self.assertEquals(
+        self.assertEqual(
             urls(tools.get_units_with_due_date(self.course)),
             urls((self.week1, self.week2)))
 
@@ -174,21 +174,21 @@ class TestTitleOrUrl(unittest.TestCase):
     """
     def test_title(self):
         unit = mock.Mock(display_name='hello')
-        self.assertEquals(tools.title_or_url(unit), 'hello')
+        self.assertEqual(tools.title_or_url(unit), 'hello')
 
     def test_url(self):
         def mock_location_text(self):
             """
             Mock implementation of __unicode__ or __str__ for the unit's location.
             """
-            return u'test:hello'
+            return 'test:hello'
 
         unit = mock.Mock(display_name=None)
         if six.PY2:
             unit.location.__unicode__ = mock_location_text
         else:
             unit.location.__str__ = mock_location_text
-        self.assertEquals(tools.title_or_url(unit), u'test:hello')
+        self.assertEqual(tools.title_or_url(unit), 'test:hello')
 
 
 @override_settings(
@@ -308,7 +308,7 @@ class TestDataDumps(ModuleStoreTestCase):
                                      extended)
         report = tools.dump_module_extensions(self.course, self.week1)
         self.assertEqual(
-            report['title'], u'Users with due date extensions for ' +
+            report['title'], 'Users with due date extensions for ' +
             self.week1.display_name)
         self.assertEqual(
             report['header'], ["Username", "Full Name", "Extended Due Date"])
@@ -328,7 +328,7 @@ class TestDataDumps(ModuleStoreTestCase):
                                      extended)
         report = tools.dump_student_extensions(self.course, self.user1)
         self.assertEqual(
-            report['title'], u'Due date extensions for %s (%s)' %
+            report['title'], 'Due date extensions for %s (%s)' %
             (self.user1.profile.name, self.user1.username))
         self.assertEqual(
             report['header'], ["Unit", "Extended Due Date"])

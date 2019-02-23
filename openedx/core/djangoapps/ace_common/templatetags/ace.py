@@ -1,5 +1,5 @@
 # pylint: disable=missing-docstring
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 from crum import get_current_request
 from django import template
@@ -56,14 +56,14 @@ def _get_variables_from_context(context, tag_name):
 
     if request is None:
         raise template.VariableDoesNotExist(
-            u'The {0} template tag requires a "request" to be present in the template context. Consider using '
-            u'"emulate_http_request" if you are rendering the template in a celery task.'.format(tag_name)
+            'The {0} template tag requires a "request" to be present in the template context. Consider using '
+            '"emulate_http_request" if you are rendering the template in a celery task.'.format(tag_name)
         )
 
     message = context.get('message')
     if message is None:
         raise template.VariableDoesNotExist(
-            u'The {0} template tag requires a "message" to be present in the template context.'.format(tag_name)
+            'The {0} template tag requires a "message" to be present in the template context.'.format(tag_name)
         )
 
     return request.site, request.user, message
@@ -87,7 +87,7 @@ def google_analytics_tracking_pixel(context):
     image_url = _get_google_analytics_tracking_url(context)
     if image_url is not None:
         return mark_safe(
-            HTML(u'<img src="{0}" alt="" role="presentation" aria-hidden="true" />').format(HTML(image_url))
+            HTML('<img src="{0}" alt="" role="presentation" aria-hidden="true" />').format(HTML(image_url))
         )
     else:
         return ''
@@ -150,5 +150,5 @@ def ensure_url_is_absolute(site, relative_path):
     else:
         root = site.domain.rstrip('/')
         relative_path = relative_path.lstrip('/')
-        url = u'https://{root}/{path}'.format(root=root, path=relative_path)
+        url = 'https://{root}/{path}'.format(root=root, path=relative_path)
     return url

@@ -96,8 +96,8 @@ class VideoStudentViewHandlers(object):
 
             return json.dumps({'success': True})
 
-        log.debug(u"GET {0}".format(data))
-        log.debug(u"DISPATCH {0}".format(dispatch))
+        log.debug("GET {0}".format(data))
+        log.debug("DISPATCH {0}".format(dispatch))
 
         raise NotFoundError('Unexpected dispatch type')
 
@@ -153,7 +153,7 @@ class VideoStudentViewHandlers(object):
                 generate_sjson_for_all_speeds(
                     self,
                     other_lang[self.transcript_language],
-                    {speed: youtube_id for youtube_id, speed in youtube_ids.iteritems()},
+                    {speed: youtube_id for youtube_id, speed in youtube_ids.items()},
                     self.transcript_language
                 )
                 sjson_transcript = Transcript.asset(self.location, youtube_id, self.transcript_language).data
@@ -234,14 +234,14 @@ class VideoStudentViewHandlers(object):
         """
         completion_service = self.runtime.service(self, 'completion')
         if completion_service is None:
-            raise JsonHandlerError(500, u"No completion service found")
+            raise JsonHandlerError(500, "No completion service found")
         elif not completion_service.completion_tracking_enabled():
-            raise JsonHandlerError(404, u"Completion tracking is not enabled and API calls are unexpected")
+            raise JsonHandlerError(404, "Completion tracking is not enabled and API calls are unexpected")
         if not isinstance(data['completion'], (int, float)):
-            message = u"Invalid completion value {}. Must be a float in range [0.0, 1.0]"
+            message = "Invalid completion value {}. Must be a float in range [0.0, 1.0]"
             raise JsonHandlerError(400, message.format(data['completion']))
         elif not 0.0 <= data['completion'] <= 1.0:
-            message = u"Invalid completion value {}. Must be in range [0.0, 1.0]"
+            message = "Invalid completion value {}. Must be in range [0.0, 1.0]"
             raise JsonHandlerError(400, message.format(data['completion']))
         self.runtime.publish(self, "completion", data)
         return {"result": "ok"}
@@ -309,7 +309,7 @@ class VideoStudentViewHandlers(object):
                 log.info("Invalid /translation request: no language.")
                 return Response(status=400)
 
-            if language not in ['en'] + transcripts["transcripts"].keys():
+            if language not in ['en'] + list(transcripts["transcripts"].keys()):
                 log.info("Video: transcript facilities are not available for given language.")
                 return Response(status=404)
 
@@ -399,15 +399,15 @@ class VideoStudioViewHandlers(object):
         available_translations = self.available_translations(transcripts, verify_assets=True)
 
         if missing:
-            error = _(u'The following parameters are required: {missing}.').format(missing=', '.join(missing))
+            error = _('The following parameters are required: {missing}.').format(missing=', '.join(missing))
         elif (
             data['language_code'] != data['new_language_code'] and data['new_language_code'] in available_translations
         ):
-            error = _(u'A transcript with the "{language_code}" language code already exists.'.format(
+            error = _('A transcript with the "{language_code}" language code already exists.'.format(
                 language_code=data['new_language_code']
             ))
         elif 'file' not in data:
-            error = _(u'A transcript file is required.')
+            error = _('A transcript file is required.')
 
         return error
 
@@ -456,7 +456,7 @@ class VideoStudioViewHandlers(object):
                     if not edx_video_id:
                         # Back-populate the video ID for an external video.
                         # pylint: disable=attribute-defined-outside-init
-                        self.edx_video_id = edx_video_id = create_external_video(display_name=u'external video')
+                        self.edx_video_id = edx_video_id = create_external_video(display_name='external video')
 
                     try:
                         # Convert SRT transcript into an SJSON format
@@ -484,7 +484,7 @@ class VideoStudioViewHandlers(object):
                         response = Response(
                             json={
                                 'error': _(
-                                    u'There is a problem with this transcript file. Try to upload a different file.'
+                                    'There is a problem with this transcript file. Try to upload a different file.'
                                 )
                             },
                             status=400
@@ -501,7 +501,7 @@ class VideoStudioViewHandlers(object):
                 if edx_video_id:
                     delete_video_transcript(video_id=edx_video_id, language_code=language)
 
-                if language == u'en':
+                if language == 'en':
                     # remove any transcript file from content store for the video ids
                     possible_sub_ids = [
                         self.sub,  # pylint: disable=access-member-before-definition
@@ -523,7 +523,7 @@ class VideoStudioViewHandlers(object):
             elif request.method == 'GET':
                 language = request.GET.get('language_code')
                 if not language:
-                    return Response(json={'error': _(u'Language is required.')}, status=400)
+                    return Response(json={'error': _('Language is required.')}, status=400)
 
                 try:
                     transcript_content, transcript_name, mime_type = get_transcript(

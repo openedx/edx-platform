@@ -2,7 +2,7 @@
 Unit tests for integration of the django-user-tasks app and its REST API.
 """
 
-from __future__ import absolute_import, print_function, unicode_literals
+
 
 import logging
 from uuid import uuid4
@@ -235,4 +235,4 @@ class TestUserTaskStopped(APITestCase):
             mock_delay.side_effect = NoAuthHandlerFound()
             user_task_stopped.send(sender=UserTaskStatus, status=self.status)
             self.assertTrue(mock_delay.called)
-            self.assertEqual(hdlr.messages['error'][0], u'Unable to queue send_task_complete_email')
+            self.assertEqual(hdlr.messages['error'][0], 'Unable to queue send_task_complete_email')

@@ -64,7 +64,7 @@ def get_course(course_id, depth=0):
     """
     course = modulestore().get_course(course_id, depth=depth)
     if course is None:
-        raise ValueError(u"Course not found: {0}".format(course_id))
+        raise ValueError("Course not found: {0}".format(course_id))
     return course
 
 
@@ -81,7 +81,7 @@ def get_course_by_id(course_key, depth=0):
     if course:
         return course
     else:
-        raise Http404(u"Course not found: {}.".format(unicode(course_key)))
+        raise Http404("Course not found: {}.".format(str(course_key)))
 
 
 def get_course_with_access(user, action, course_key, depth=0, check_if_enrolled=False, check_survey_complete=True):
@@ -175,12 +175,12 @@ def check_course_access(course, user, action, check_if_enrolled=False, check_sur
     if check_if_enrolled:
         # If the user is not enrolled, redirect them to the about page
         if not CourseEnrollment.is_enrolled(user, course.id):
-            raise CourseAccessRedirect(reverse('about_course', args=[unicode(course.id)]))
+            raise CourseAccessRedirect(reverse('about_course', args=[str(course.id)]))
 
     # Redirect if the user must answer a survey before entering the course.
     if check_survey_complete and action == 'load':
         if is_survey_required_and_unanswered(user, course):
-            raise CourseAccessRedirect(reverse('course_survey', args=[unicode(course.id)]))
+            raise CourseAccessRedirect(reverse('course_survey', args=[str(course.id)]))
 
 
 def can_self_enroll_in_course(course_key):
@@ -205,7 +205,7 @@ def course_open_for_self_enrollment(course_key):
         return False
 
     # Check the enrollment start and end dates.
-    course_details = get_course_enrollment_details(unicode(course_key))
+    course_details = get_course_enrollment_details(str(course_key))
     now = datetime.now().replace(tzinfo=pytz.UTC)
     start = course_details['enrollment_start']
     end = course_details['enrollment_end']
@@ -234,7 +234,7 @@ def find_file(filesystem, dirs, filename):
         filepath = path(directory) / filename
         if filesystem.exists(filepath):
             return filepath
-    raise ResourceNotFound(u"Could not find {0}".format(filename))
+    raise ResourceNotFound("Could not find {0}".format(filename))
 
 
 def get_course_about_section(request, course, section_key):
@@ -309,14 +309,14 @@ def get_course_about_section(request, course, section_key):
                 except Exception:  # pylint: disable=broad-except
                     html = render_to_string('courseware/error-message.html', None)
                     log.exception(
-                        u"Error rendering course=%s, section_key=%s",
+                        "Error rendering course=%s, section_key=%s",
                         course, section_key
                     )
             return html
 
         except ItemNotFoundError:
             log.warning(
-                u"Missing about section %s in course %s",
+                "Missing about section %s in course %s",
                 section_key, text_type(course.location)
             )
             return None
@@ -378,8 +378,8 @@ def get_course_info_section(request, user, course, section_key):
         except Exception:  # pylint: disable=broad-except
             html = render_to_string('courseware/error-message.html', None)
             log.exception(
-                u"Error rendering course_id=%s, section_key=%s",
-                unicode(course.id), section_key
+                "Error rendering course_id=%s, section_key=%s",
+                str(course.id), section_key
             )
 
     return html
@@ -445,7 +445,7 @@ def get_course_syllabus_section(course, section_key):
                 )
         except ResourceNotFound:
             log.exception(
-                u"Missing syllabus section %s in course %s",
+                "Missing syllabus section %s in course %s",
                 section_key, text_type(course.location)
             )
             return "! Syllabus missing !"
@@ -524,7 +524,7 @@ def get_cms_course_link(course, page='course'):
     """
     # This is fragile, but unfortunately the problem is that within the LMS we
     # can't use the reverse calls from the CMS
-    return u"//{}/{}/{}".format(settings.CMS_BASE, page, unicode(course.id))
+    return "//{}/{}/{}".format(settings.CMS_BASE, page, str(course.id))
 
 
 def get_cms_block_link(block, page):
@@ -534,7 +534,7 @@ def get_cms_block_link(block, page):
     """
     # This is fragile, but unfortunately the problem is that within the LMS we
     # can't use the reverse calls from the CMS
-    return u"//{}/{}/{}".format(settings.CMS_BASE, page, block.location)
+    return "//{}/{}/{}".format(settings.CMS_BASE, page, block.location)
 
 
 def get_studio_url(course, page):
@@ -571,7 +571,7 @@ def get_problems_in_section(section):
         for vertical in subsection.get_children():
             for component in vertical.get_children():
                 if component.location.block_type == 'problem' and getattr(component, 'has_score', False):
-                    problem_descriptors[unicode(component.location)] = component
+                    problem_descriptors[str(component.location)] = component
 
     return problem_descriptors
 
@@ -643,7 +643,7 @@ def get_course_chapter_ids(course_key):
     except Exception:  # pylint: disable=broad-except
         log.exception('Failed to retrieve course from modulestore.')
         return []
-    return [unicode(chapter_key) for chapter_key in chapter_keys if chapter_key.block_type == 'chapter']
+    return [str(chapter_key) for chapter_key in chapter_keys if chapter_key.block_type == 'chapter']
 
 
 def allow_public_access(course, visibilities):

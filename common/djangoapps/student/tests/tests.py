@@ -5,7 +5,7 @@ Miscellaneous tests for the student app.
 import logging
 import unittest
 from datetime import datetime, timedelta
-from urllib import quote
+from urllib.parse import quote
 
 import ddt
 import pytz
@@ -240,7 +240,7 @@ class CourseEndingTest(TestCase):
         )
 
         if cert_grade is not None:
-            cert_status = {'status': 'generating', 'grade': unicode(cert_grade), 'mode': 'honor'}
+            cert_status = {'status': 'generating', 'grade': str(cert_grade), 'mode': 'honor'}
         else:
             cert_status = {'status': 'generating', 'mode': 'honor'}
 
@@ -252,7 +252,7 @@ class CourseEndingTest(TestCase):
                     'status': 'generating',
                     'show_survey_button': True,
                     'survey_url': survey_url,
-                    'grade': unicode(expected_grade),
+                    'grade': str(expected_grade),
                     'mode': 'honor',
                     'linked_in_url': None,
                     'can_unenroll': False,
@@ -382,7 +382,7 @@ class DashboardTest(ModuleStoreTestCase):
         enrollment = CourseEnrollment.enroll(self.user, self.course.id)
         course_mode_info = complete_course_mode_info(self.course.id, enrollment)
         self.assertTrue(course_mode_info['show_upsell'])
-        self.assertEquals(course_mode_info['days_for_upsell'], 1)
+        self.assertEqual(course_mode_info['days_for_upsell'], 1)
 
         verified_mode.expiration_datetime = datetime.now(pytz.UTC) + timedelta(days=-1)
         verified_mode.save()
@@ -427,13 +427,13 @@ class DashboardTest(ModuleStoreTestCase):
 
         redeem_url = reverse('register_code_redemption', args=[course_reg_code.code])
         response = self.client.get(redeem_url)
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         # check button text
         self.assertIn('Activate Course Enrollment', response.content)
 
         #now activate the user by enrolling him/her to the course
         response = self.client.post(redeem_url)
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         response = self.client.get(reverse('dashboard'))
         self.assertIn('You can no longer access this course because payment has not yet been received', response.content)
         optout_object = Optout.objects.filter(user=self.user, course_id=self.course.id)
@@ -442,7 +442,7 @@ class DashboardTest(ModuleStoreTestCase):
         # Direct link to course redirect to user dashboard
         self.client.get(reverse('courseware', kwargs={"course_id": text_type(self.course.id)}))
         log_warning.assert_called_with(
-            u'User %s cannot access the course %s because payment has not yet been received',
+            'User %s cannot access the course %s because payment has not yet been received',
             self.user,
             text_type(self.course.id),
         )
@@ -471,7 +471,7 @@ class DashboardTest(ModuleStoreTestCase):
 
         self.course.start = datetime.now(pytz.UTC) - timedelta(days=2)
         self.course.end = datetime.now(pytz.UTC) - timedelta(days=1)
-        self.course.display_name = u"Omega"
+        self.course.display_name = "Omega"
         self.course = self.update_course(self.course, self.user.id)
 
         download_url = 'www.edx.org'
@@ -485,7 +485,7 @@ class DashboardTest(ModuleStoreTestCase):
         )
         response = self.client.get(reverse('dashboard'))
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertNotIn('Add Certificate to LinkedIn', response.content)
 
         response_url = 'http://www.linkedin.com/profile/add?_ed='
@@ -515,7 +515,7 @@ class DashboardTest(ModuleStoreTestCase):
 
         self.course.start = datetime.now(pytz.UTC) - timedelta(days=2)
         self.course.end = datetime.now(pytz.UTC) - timedelta(days=1)
-        self.course.display_name = u"Omega"
+        self.course.display_name = "Omega"
         self.course = self.update_course(self.course, self.user.id)
 
         download_url = 'www.edx.org'
@@ -529,15 +529,15 @@ class DashboardTest(ModuleStoreTestCase):
         )
         response = self.client.get(reverse('dashboard'))
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertIn('Add Certificate to LinkedIn', response.content)
 
         expected_url = (
-            u'http://www.linkedin.com/profile/add'
-            u'?_ed=0_mC_o2MizqdtZEmkVXjH4eYwMj4DnkCWrZP_D9&'
-            u'pfCertificationName={platform}+Honor+Code+Certificate+for+Omega&'
-            u'pfCertificationUrl=www.edx.org&'
-            u'source=o'
+            'http://www.linkedin.com/profile/add'
+            '?_ed=0_mC_o2MizqdtZEmkVXjH4eYwMj4DnkCWrZP_D9&'
+            'pfCertificationName={platform}+Honor+Code+Certificate+for+Omega&'
+            'pfCertificationUrl=www.edx.org&'
+            'source=o'
         ).format(platform=quote(settings.PLATFORM_NAME.encode('utf-8')))
 
         self.assertContains(response, escape(expected_url))
@@ -575,9 +575,9 @@ class DashboardTest(ModuleStoreTestCase):
         # CourseOverview object that has been created.
         with check_mongo_calls(0):
             response_1 = self.client.get(reverse('dashboard'))
-            self.assertEquals(response_1.status_code, 200)
+            self.assertEqual(response_1.status_code, 200)
             response_2 = self.client.get(reverse('dashboard'))
-            self.assertEquals(response_2.status_code, 200)
+            self.assertEqual(response_2.status_code, 200)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_dashboard_header_nav_has_find_courses(self):
@@ -595,7 +595,7 @@ class DashboardTest(ModuleStoreTestCase):
         """It will be true only if enrollment mode is honor and course has verified mode."""
         course_mode_info = self._enrollment_with_complete_course('honor')
         self.assertTrue(course_mode_info['show_upsell'])
-        self.assertEquals(course_mode_info['days_for_upsell'], 1)
+        self.assertEqual(course_mode_info['days_for_upsell'], 1)
 
     @ddt.data('verified', 'credit')
     def test_course_mode_info_with_different_enrollments(self, enrollment_mode):
@@ -791,11 +791,11 @@ class EnrollInCourseTest(EnrollmentEventTestMixin, CacheIsolationTestCase):
 
         # Make sure mode is updated properly if user unenrolls & re-enrolls
         enrollment = CourseEnrollment.enroll(user, course_id, "verified")
-        self.assertEquals(enrollment.mode, "verified")
+        self.assertEqual(enrollment.mode, "verified")
         CourseEnrollment.unenroll(user, course_id)
         enrollment = CourseEnrollment.enroll(user, course_id, "audit")
         self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
-        self.assertEquals(enrollment.mode, "audit")
+        self.assertEqual(enrollment.mode, "audit")
 
     def test_enrollment_non_existent_user(self):
         # Testing enrollment of newly unsaved user (i.e. no database entry)
@@ -978,7 +978,7 @@ class ChangeEnrollmentViewTest(ModuleStoreTestCase):
         Tests that a student that is a currently enrolled verified student cannot
         accidentally change their enrollment mode
         """
-        CourseEnrollment.enroll(self.user, self.course.id, mode=u'verified')
+        CourseEnrollment.enroll(self.user, self.course.id, mode='verified')
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course.id))
         # now try to enroll the student in the default mode:
         response = self._enroll_through_view(self.course)
@@ -987,14 +987,14 @@ class ChangeEnrollmentViewTest(ModuleStoreTestCase):
             self.user, self.course.id
         )
         self.assertTrue(is_active)
-        self.assertEqual(enrollment_mode, u'verified')
+        self.assertEqual(enrollment_mode, 'verified')
 
     def test_change_to_default_if_verified_not_active(self):
         """
         Tests that one can renroll for a course if one has already unenrolled
         """
         # enroll student
-        CourseEnrollment.enroll(self.user, self.course.id, mode=u'verified')
+        CourseEnrollment.enroll(self.user, self.course.id, mode='verified')
         # now unenroll student:
         CourseEnrollment.unenroll(self.user, self.course.id)
         # check that they are verified but inactive
@@ -1002,7 +1002,7 @@ class ChangeEnrollmentViewTest(ModuleStoreTestCase):
             self.user, self.course.id
         )
         self.assertFalse(is_active)
-        self.assertEqual(enrollment_mode, u'verified')
+        self.assertEqual(enrollment_mode, 'verified')
         # now enroll them through the view:
         response = self._enroll_through_view(self.course)
         self.assertEqual(response.status_code, 200)
@@ -1042,7 +1042,7 @@ class AnonymousLookupTable(ModuleStoreTestCase):
         self.assertEqual(anonymous_id, anonymous_id_for_user(self.user, self.course.id, save=False))
 
     def test_roundtrip_with_unicode_course_id(self):
-        course2 = CourseFactory.create(display_name=u"Omega Course Ω")
+        course2 = CourseFactory.create(display_name="Omega Course Ω")
         CourseEnrollment.enroll(self.user, course2.id)
         anonymous_id = anonymous_id_for_user(self.user, course2.id)
         real_user = user_by_anonymous_id(anonymous_id)
@@ -1086,7 +1086,7 @@ class RelatedProgramsTests(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         self.create_programs_config()
         self.client.login(username=self.user.username, password=self.password)
 
-        course_run = CourseRunFactory(key=unicode(self.course.id))  # pylint: disable=no-member
+        course_run = CourseRunFactory(key=str(self.course.id))  # pylint: disable=no-member
         course = CatalogCourseFactory(course_runs=[course_run])
         self.programs = [ProgramFactory(courses=[course]) for __ in range(2)]
 
@@ -1101,7 +1101,7 @@ class RelatedProgramsTests(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
 
     def expected_link_text(self, program):
         """Construct expected dashboard link text."""
-        return u'{title} {type}'.format(title=program['title'], type=program['type'])
+        return '{title} {type}'.format(title=program['title'], type=program['type'])
 
     def test_related_programs_listed(self, mock_get_programs):
         """Verify that related programs are listed when available."""
@@ -1133,7 +1133,7 @@ class RelatedProgramsTests(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
 
     def test_program_title_unicode(self, mock_get_programs):
         """Verify that the dashboard can deal with programs whose titles contain Unicode."""
-        self.programs[0]['title'] = u'Bases matemáticas para estudiar ingeniería'
+        self.programs[0]['title'] = 'Bases matemáticas para estudiar ingeniería'
         mock_get_programs.return_value = self.programs
 
         response = self.client.get(self.url)
@@ -1160,4 +1160,4 @@ class UserAttributeTests(TestCase):
     def test_unicode(self):
         UserAttribute.set_user_attribute(self.user, self.name, self.value)
         for field in (self.name, self.value, self.user.username):
-            self.assertIn(field, unicode(UserAttribute.objects.get(user=self.user)))
+            self.assertIn(field, str(UserAttribute.objects.get(user=self.user)))

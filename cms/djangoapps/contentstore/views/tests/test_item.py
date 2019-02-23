@@ -63,7 +63,7 @@ class AsideTest(XBlockAside):
     """
     Test xblock aside class
     """
-    FRAG_CONTENT = u"<p>Aside Foo rendered</p>"
+    FRAG_CONTENT = "<p>Aside Foo rendered</p>"
 
     field11 = String(default="aside1_default_value1", scope=Scope.content)
     field12 = String(default="aside1_default_value2", scope=Scope.settings)
@@ -106,7 +106,7 @@ class ItemTest(CourseTestCase):
 
     def create_xblock(self, parent_usage_key=None, display_name=None, category=None, boilerplate=None):
         data = {
-            'parent_locator': unicode(self.usage_key) if parent_usage_key is None else unicode(parent_usage_key),
+            'parent_locator': str(self.usage_key) if parent_usage_key is None else str(parent_usage_key),
             'category': category
         }
         if display_name is not None:
@@ -245,11 +245,11 @@ class GetItemTest(ItemTest):
         # Get the preview HTML and verify the View -> link is present.
         html, __ = self._get_container_preview(root_usage_key)
         self.assertIn('wrapper-xblock', html)
-        self.assertRegexpMatches(
+        self.assertRegex(
             html,
             # The instance of the wrapper class will have an auto-generated ID. Allow any
             # characters after wrapper.
-            ur'"/container/{}" class="action-button">\s*<span class="action-button-text">View</span>'.format(
+            r'"/container/{}" class="action-button">\s*<span class="action-button-text">View</span>'.format(
                 wrapper_usage_key
             )
         )
@@ -293,14 +293,14 @@ class GetItemTest(ItemTest):
 
         # Rename groups in group configuration
         GROUP_CONFIGURATION_JSON = {
-            u'id': 0,
-            u'name': u'first_partition',
-            u'scheme': u'random',
-            u'description': u'First Partition',
-            u'version': UserPartition.VERSION,
-            u'groups': [
-                {u'id': 0, u'name': u'New_NAME_A', u'version': 1},
-                {u'id': 1, u'name': u'New_NAME_B', u'version': 1},
+            'id': 0,
+            'name': 'first_partition',
+            'scheme': 'random',
+            'description': 'First Partition',
+            'version': UserPartition.VERSION,
+            'groups': [
+                {'id': 0, 'name': 'New_NAME_A', 'version': 1},
+                {'id': 1, 'name': 'New_NAME_B', 'version': 1},
             ],
         }
 
@@ -447,7 +447,7 @@ class GetItemTest(ItemTest):
                 xblock (XBlock): An XBlock item.
                 xblock_info (dict): A dict containing xblock information.
             """
-            self.assertEqual(unicode(xblock.location), xblock_info['id'])
+            self.assertEqual(str(xblock.location), xblock_info['id'])
             self.assertEqual(xblock.display_name, xblock_info['display_name'])
             self.assertEqual(xblock.category, xblock_info['category'])
 
@@ -553,7 +553,7 @@ class TestCreateItem(ItemTest):
 
         # Check that its name is not None
         new_tab = self.get_item_from_modulestore(usage_key)
-        self.assertEquals(new_tab.display_name, 'Empty')
+        self.assertEqual(new_tab.display_name, 'Empty')
 
 
 class DuplicateHelper(object):
@@ -591,21 +591,21 @@ class DuplicateHelper(object):
             self.assertEqual(duplicated_asides[0].field13, 'aside1_default_value3')
 
         self.assertNotEqual(
-            unicode(original_item.location),
-            unicode(duplicated_item.location),
+            str(original_item.location),
+            str(duplicated_item.location),
             "Location of duplicate should be different from original"
         )
 
         # Parent will only be equal for root of duplicated structure, in the case
         # where an item is duplicated in-place.
-        if parent_usage_key and unicode(original_item.parent) == unicode(parent_usage_key):
+        if parent_usage_key and str(original_item.parent) == str(parent_usage_key):
             self.assertEqual(
-                unicode(parent_usage_key), unicode(duplicated_item.parent),
+                str(parent_usage_key), str(duplicated_item.parent),
                 "Parent of duplicate should equal parent of source for root xblock when duplicated in-place"
             )
         else:
             self.assertNotEqual(
-                unicode(original_item.parent), unicode(duplicated_item.parent),
+                str(original_item.parent), str(duplicated_item.parent),
                 "Parent duplicate should be different from source"
             )
 
@@ -622,7 +622,7 @@ class DuplicateHelper(object):
                 len(duplicated_item.children),
                 "Duplicated item differs in number of children"
             )
-            for i in xrange(len(original_item.children)):
+            for i in range(len(original_item.children)):
                 if not self._check_equality(original_item.children[i], duplicated_item.children[i], is_child=True):
                     return False
             duplicated_item.children = original_item.children
@@ -637,10 +637,10 @@ class DuplicateHelper(object):
                 return duplicated_item.display_name == original_item.category
             return duplicated_item.display_name == original_item.display_name
         if original_item.display_name is not None:
-            return duplicated_item.display_name == u"Duplicate of '{display_name}'".format(
+            return duplicated_item.display_name == "Duplicate of '{display_name}'".format(
                 display_name=original_item.display_name
             )
-        return duplicated_item.display_name == u"Duplicate of {display_name}".format(
+        return duplicated_item.display_name == "Duplicate of {display_name}".format(
             display_name=original_item.category
         )
 
@@ -650,8 +650,8 @@ class DuplicateHelper(object):
         """
         # pylint: disable=no-member
         data = {
-            'parent_locator': unicode(parent_usage_key),
-            'duplicate_source_locator': unicode(source_usage_key)
+            'parent_locator': str(parent_usage_key),
+            'duplicate_source_locator': str(source_usage_key)
         }
         if display_name is not None:
             data['display_name'] = display_name
@@ -862,8 +862,8 @@ class TestMoveItem(ItemTest):
             resp (JsonResponse): Response after the move operation is complete.
         """
         data = {
-            'move_source_locator': unicode(source_usage_key),
-            'parent_locator': unicode(target_usage_key)
+            'move_source_locator': str(source_usage_key),
+            'parent_locator': str(target_usage_key)
         }
         if target_index is not None:
             data['target_index'] = target_index
@@ -890,8 +890,8 @@ class TestMoveItem(ItemTest):
         response = self._move_component(source_usage_key, target_usage_key, target_index)
         self.assertEqual(response.status_code, 200)
         response = json.loads(response.content)
-        self.assertEqual(response['move_source_locator'], unicode(source_usage_key))
-        self.assertEqual(response['parent_locator'], unicode(target_usage_key))
+        self.assertEqual(response['move_source_locator'], str(source_usage_key))
+        self.assertEqual(response['parent_locator'], str(target_usage_key))
         self.assertEqual(response['source_index'], expected_index)
 
         # Verify parent referance has been changed now.
@@ -953,7 +953,7 @@ class TestMoveItem(ItemTest):
         # Move component and verify that response contains initial index
         response = self._move_component(self.html_usage_key, self.vert2_usage_key)
         response = json.loads(response.content)
-        self.assertEquals(original_index, response['source_index'])
+        self.assertEqual(original_index, response['source_index'])
 
         # Verify that new parent has the moved component at the last index.
         parent = self.get_item_from_modulestore(self.vert2_usage_key)
@@ -961,12 +961,12 @@ class TestMoveItem(ItemTest):
 
         # Verify original and new index is different now.
         source_index = _get_source_index(self.html_usage_key, parent)
-        self.assertNotEquals(original_index, source_index)
+        self.assertNotEqual(original_index, source_index)
 
         # Undo Move to the original index, use the source index fetched from the response.
         response = self._move_component(self.html_usage_key, self.vert_usage_key, response['source_index'])
         response = json.loads(response.content)
-        self.assertEquals(original_index, response['source_index'])
+        self.assertEqual(original_index, response['source_index'])
 
     def test_move_large_target_index(self):
         """
@@ -978,7 +978,7 @@ class TestMoveItem(ItemTest):
         self.assertEqual(response.status_code, 400)
         response = json.loads(response.content)
 
-        expected_error = u'You can not move {usage_key} at an invalid index ({target_index}).'.format(
+        expected_error = 'You can not move {usage_key} at an invalid index ({target_index}).'.format(
             usage_key=self.html_usage_key,
             target_index=parent_children_length + 10
         )
@@ -995,7 +995,7 @@ class TestMoveItem(ItemTest):
         self.assertEqual(response.status_code, 400)
         response = json.loads(response.content)
 
-        expected_error = u'You can not move {source_type} into {target_type}.'.format(
+        expected_error = 'You can not move {source_type} into {target_type}.'.format(
             source_type=self.html_usage_key.block_type,
             target_type=self.seq_usage_key.block_type
         )
@@ -1140,7 +1140,7 @@ class TestMoveItem(ItemTest):
         self.assertEqual(response.status_code, 400)
         response = json.loads(response.content)
 
-        error = u'You must provide target_index ({target_index}) as an integer.'.format(target_index=target_index)
+        error = 'You must provide target_index ({target_index}) as an integer.'.format(target_index=target_index)
         self.assertEqual(response['error'], error)
         new_parent_loc = self.store.get_parent_location(self.html_usage_key)
         self.assertEqual(new_parent_loc, parent_loc)
@@ -1149,7 +1149,7 @@ class TestMoveItem(ItemTest):
         """
         Test move an item without specifying the target location.
         """
-        data = {'move_source_locator': unicode(self.html_usage_key)}
+        data = {'move_source_locator': str(self.html_usage_key)}
         with self.assertRaises(InvalidKeyError):
             self.client.patch(
                 reverse('xblock_handler'),
@@ -1237,10 +1237,10 @@ class TestMoveItem(ItemTest):
         insert_at = 0
         self.assert_move_item(self.html_usage_key, self.vert2_usage_key, insert_at)
         mock_logger.info.assert_called_with(
-            u'MOVE: %s moved from %s to %s at %d index',
-            unicode(self.html_usage_key),
-            unicode(self.vert_usage_key),
-            unicode(self.vert2_usage_key),
+            'MOVE: %s moved from %s to %s at %d index',
+            str(self.html_usage_key),
+            str(self.vert_usage_key),
+            str(self.vert2_usage_key),
             insert_at
         )
 
@@ -1308,8 +1308,8 @@ class TestMoveItem(ItemTest):
         self.setup_course(default_store=store_type)
 
         data = {
-            'move_source_locator': unicode(self.usage_key.course_key.make_usage_key('html', 'html_test')),
-            'parent_locator': unicode(self.vert2_usage_key)
+            'move_source_locator': str(self.usage_key.course_key.make_usage_key('html', 'html_test')),
+            'parent_locator': str(self.vert2_usage_key)
         }
         with self.assertRaises(ItemNotFoundError):
             self.client.patch(
@@ -1492,7 +1492,7 @@ class TestEditItem(TestEditItemSetup):
             user=self.user
         )
         # Both display and actual value should be None
-        self.assertEquals(xblock_info['due_date'], u'')
+        self.assertEqual(xblock_info['due_date'], '')
         self.assertIsNone(xblock_info['due'])
 
     def test_update_generic_fields(self):
@@ -1554,7 +1554,7 @@ class TestEditItem(TestEditItemSetup):
 
         resp = self.client.ajax_post(
             self.seq_update_url,
-            data={'children': [unicode(self.problem_usage_key), unicode(unit2_usage_key), unicode(unit1_usage_key)]}
+            data={'children': [str(self.problem_usage_key), str(unit2_usage_key), str(unit1_usage_key)]}
         )
         self.assertEqual(resp.status_code, 200)
 
@@ -1577,7 +1577,7 @@ class TestEditItem(TestEditItemSetup):
         # move unit 1 from sequential1 to sequential2
         resp = self.client.ajax_post(
             self.seq2_update_url,
-            data={'children': [unicode(unit_1_key), unicode(unit_2_key)]}
+            data={'children': [str(unit_1_key), str(unit_2_key)]}
         )
         self.assertEqual(resp.status_code, 200)
 
@@ -1600,7 +1600,7 @@ class TestEditItem(TestEditItemSetup):
         # adding orphaned unit 1 should return an error
         resp = self.client.ajax_post(
             self.seq2_update_url,
-            data={'children': [unicode(unit_1_key)]}
+            data={'children': [str(unit_1_key)]}
         )
         self.assertEqual(resp.status_code, 400)
         self.assertIn("Invalid data, possibly caused by concurrent authors", resp.content)
@@ -1625,7 +1625,7 @@ class TestEditItem(TestEditItemSetup):
         # remove unit 2 should return an error
         resp = self.client.ajax_post(
             self.seq2_update_url,
-            data={'children': [unicode(unit_1_key)]}
+            data={'children': [str(unit_1_key)]}
         )
         self.assertEqual(resp.status_code, 400)
         self.assertIn("Invalid data, possibly caused by concurrent authors", resp.content)
@@ -1793,7 +1793,7 @@ class TestEditItem(TestEditItemSetup):
         self.client.ajax_post(
             self.problem_update_url,
             data={
-                'id': unicode(self.problem_usage_key),
+                'id': str(self.problem_usage_key),
                 'metadata': {},
                 'data': "<p>Problem content draft.</p>"
             }
@@ -1848,7 +1848,7 @@ class TestEditItem(TestEditItemSetup):
         resp = self.client.ajax_post(
             unit_update_url,
             data={
-                'id': unicode(unit_usage_key),
+                'id': str(unit_usage_key),
                 'metadata': {},
             }
         )
@@ -1868,7 +1868,7 @@ class TestEditItem(TestEditItemSetup):
         response = self.client.ajax_post(
             update_url,
             data={
-                'id': unicode(video_usage_key),
+                'id': str(video_usage_key),
                 'metadata': {
                     'saved_video_position': "Not a valid relative time",
                 },
@@ -1894,7 +1894,7 @@ class TestEditItemSplitMongo(TestEditItemSetup):
         """
         view_url = reverse_usage_url("xblock_view_handler", self.problem_usage_key, {"view_name": STUDIO_VIEW})
 
-        for __ in xrange(3):
+        for __ in range(3):
             resp = self.client.get(view_url, HTTP_ACCEPT='application/json')
             self.assertEqual(resp.status_code, 200)
             content = json.loads(resp.content)
@@ -1910,8 +1910,8 @@ class TestEditSplitModule(ItemTest):
         super(TestEditSplitModule, self).setUp()
         self.user = UserFactory()
 
-        self.first_user_partition_group_1 = Group(unicode(MINIMUM_STATIC_PARTITION_ID + 1), 'alpha')
-        self.first_user_partition_group_2 = Group(unicode(MINIMUM_STATIC_PARTITION_ID + 2), 'beta')
+        self.first_user_partition_group_1 = Group(str(MINIMUM_STATIC_PARTITION_ID + 1), 'alpha')
+        self.first_user_partition_group_2 = Group(str(MINIMUM_STATIC_PARTITION_ID + 2), 'beta')
         self.first_user_partition = UserPartition(
             MINIMUM_STATIC_PARTITION_ID, 'first_partition', 'First Partition',
             [self.first_user_partition_group_1, self.first_user_partition_group_2]
@@ -1919,9 +1919,9 @@ class TestEditSplitModule(ItemTest):
 
         # There is a test point below (test_create_groups) that purposefully wants the group IDs
         # of the 2 partitions to overlap (which is not something that normally happens).
-        self.second_user_partition_group_1 = Group(unicode(MINIMUM_STATIC_PARTITION_ID + 1), 'Group 1')
-        self.second_user_partition_group_2 = Group(unicode(MINIMUM_STATIC_PARTITION_ID + 2), 'Group 2')
-        self.second_user_partition_group_3 = Group(unicode(MINIMUM_STATIC_PARTITION_ID + 3), 'Group 3')
+        self.second_user_partition_group_1 = Group(str(MINIMUM_STATIC_PARTITION_ID + 1), 'Group 1')
+        self.second_user_partition_group_2 = Group(str(MINIMUM_STATIC_PARTITION_ID + 2), 'Group 2')
+        self.second_user_partition_group_3 = Group(str(MINIMUM_STATIC_PARTITION_ID + 3), 'Group 3')
         self.second_user_partition = UserPartition(
             MINIMUM_STATIC_PARTITION_ID + 10, 'second_partition', 'Second Partition',
             [
@@ -1989,8 +1989,8 @@ class TestEditSplitModule(ItemTest):
         vertical_1 = self.get_item_from_modulestore(split_test.children[1], verify_is_draft=True)
         self.assertEqual("vertical", vertical_0.category)
         self.assertEqual("vertical", vertical_1.category)
-        self.assertEqual("Group ID " + unicode(MINIMUM_STATIC_PARTITION_ID + 1), vertical_0.display_name)
-        self.assertEqual("Group ID " + unicode(MINIMUM_STATIC_PARTITION_ID + 2), vertical_1.display_name)
+        self.assertEqual("Group ID " + str(MINIMUM_STATIC_PARTITION_ID + 1), vertical_0.display_name)
+        self.assertEqual("Group ID " + str(MINIMUM_STATIC_PARTITION_ID + 2), vertical_1.display_name)
 
         # Verify that the group_id_to_child mapping is correct.
         self.assertEqual(2, len(split_test.group_id_to_child))
@@ -2163,7 +2163,7 @@ class TestComponentHandler(TestCase):
     def test_request_method(self, method):
 
         def check_handler(handler, request, suffix):
-            self.assertEquals(request.method, method)
+            self.assertEqual(request.method, method)
             return Response()
 
         self.descriptor.handle = check_handler
@@ -2182,7 +2182,7 @@ class TestComponentHandler(TestCase):
 
         self.descriptor.handle = create_response
 
-        self.assertEquals(component_handler(self.request, self.usage_key_string, 'dummy_handler').status_code,
+        self.assertEqual(component_handler(self.request, self.usage_key_string, 'dummy_handler').status_code,
                           status_code)
 
     @ddt.data((True, True), (False, False),)
@@ -2285,9 +2285,9 @@ class TestComponentTemplates(CourseTestCase):
             {
                 'boilerplate_name': None,
                 'category': 'drag-and-drop-v2',
-                'display_name': u'Drag and Drop',
+                'display_name': 'Drag and Drop',
                 'hinted': False,
-                'support_level': u'fs',
+                'support_level': 'fs',
                 'tab': 'advanced'
             }
         ]
@@ -2297,7 +2297,7 @@ class TestComponentTemplates(CourseTestCase):
         self.templates = get_component_templates(self.course)
         self._verify_basic_component("video", "Video", "us")
         problem_templates = self.get_templates_of_type('problem')
-        problem_no_boilerplate = self.get_template(problem_templates, u'Blank Advanced Problem')
+        problem_no_boilerplate = self.get_template(problem_templates, 'Blank Advanced Problem')
         self.assertIsNotNone(problem_no_boilerplate)
         self.assertEqual('us', problem_no_boilerplate['support_level'])
 
@@ -2316,7 +2316,7 @@ class TestComponentTemplates(CourseTestCase):
         self.assertEqual(len(advanced_templates), 1)
         world_cloud_template = advanced_templates[0]
         self.assertEqual(world_cloud_template.get('category'), 'word_cloud')
-        self.assertEqual(world_cloud_template.get('display_name'), u'Word cloud')
+        self.assertEqual(world_cloud_template.get('display_name'), 'Word cloud')
         self.assertIsNone(world_cloud_template.get('boilerplate_name', None))
 
         # Verify that non-advanced components are not added twice
@@ -2339,7 +2339,7 @@ class TestComponentTemplates(CourseTestCase):
         Test the handling of advanced problem templates.
         """
         problem_templates = self.get_templates_of_type('problem')
-        circuit_template = self.get_template(problem_templates, u'Circuit Schematic Builder')
+        circuit_template = self.get_template(problem_templates, 'Circuit Schematic Builder')
         self.assertIsNotNone(circuit_template)
         self.assertEqual(circuit_template.get('category'), 'problem')
         self.assertEqual(circuit_template.get('boilerplate_name'), 'circuitschematic.yaml')
@@ -2664,7 +2664,7 @@ class TestXBlockInfo(ItemTest):
         Validate that the xblock info is correct for the test course.
         """
         self.assertEqual(xblock_info['category'], 'course')
-        self.assertEqual(xblock_info['id'], unicode(self.course.location))
+        self.assertEqual(xblock_info['id'], str(self.course.location))
         self.assertEqual(xblock_info['display_name'], self.course.display_name)
         self.assertTrue(xblock_info['published'])
         self.assertFalse(xblock_info['highlights_enabled_for_messaging'])
@@ -2677,7 +2677,7 @@ class TestXBlockInfo(ItemTest):
         Validate that the xblock info is correct for the test chapter.
         """
         self.assertEqual(xblock_info['category'], 'chapter')
-        self.assertEqual(xblock_info['id'], unicode(self.chapter.location))
+        self.assertEqual(xblock_info['id'], str(self.chapter.location))
         self.assertEqual(xblock_info['display_name'], 'Week 1')
         self.assertTrue(xblock_info['published'])
         self.assertIsNone(xblock_info.get('edited_by', None))
@@ -2697,7 +2697,7 @@ class TestXBlockInfo(ItemTest):
         Validate that the xblock info is correct for the test sequential.
         """
         self.assertEqual(xblock_info['category'], 'sequential')
-        self.assertEqual(xblock_info['id'], unicode(self.sequential.location))
+        self.assertEqual(xblock_info['id'], str(self.sequential.location))
         self.assertEqual(xblock_info['display_name'], 'Lesson 1')
         self.assertTrue(xblock_info['published'])
         self.assertIsNone(xblock_info.get('edited_by', None))
@@ -2710,7 +2710,7 @@ class TestXBlockInfo(ItemTest):
         Validate that the xblock info is correct for the test vertical.
         """
         self.assertEqual(xblock_info['category'], 'vertical')
-        self.assertEqual(xblock_info['id'], unicode(self.vertical.location))
+        self.assertEqual(xblock_info['id'], str(self.vertical.location))
         self.assertEqual(xblock_info['display_name'], 'Unit 1')
         self.assertTrue(xblock_info['published'])
         self.assertEqual(xblock_info['edited_by'], 'testuser')
@@ -2732,7 +2732,7 @@ class TestXBlockInfo(ItemTest):
         Validate that the xblock info is correct for the test component.
         """
         self.assertEqual(xblock_info['category'], 'video')
-        self.assertEqual(xblock_info['id'], unicode(self.video.location))
+        self.assertEqual(xblock_info['id'], str(self.video.location))
         self.assertEqual(xblock_info['display_name'], 'My Video')
         self.assertTrue(xblock_info['published'])
         self.assertIsNone(xblock_info.get('edited_by', None))
@@ -2849,7 +2849,7 @@ class TestLibraryXBlockInfo(ModuleStoreTestCase):
         ancestors = xblock_info['ancestor_info']['ancestors']
         self.assertEqual(len(ancestors), 2)
         self.assertEqual(ancestors[0]['category'], 'vertical')
-        self.assertEqual(ancestors[0]['id'], unicode(self.vertical.location))
+        self.assertEqual(ancestors[0]['id'], str(self.vertical.location))
         self.assertEqual(ancestors[1]['category'], 'library')
 
     def validate_component_xblock_info(self, xblock_info, original_block):
@@ -2857,7 +2857,7 @@ class TestLibraryXBlockInfo(ModuleStoreTestCase):
         Validate that the xblock info is correct for the test component.
         """
         self.assertEqual(xblock_info['category'], original_block.category)
-        self.assertEqual(xblock_info['id'], unicode(original_block.location))
+        self.assertEqual(xblock_info['id'], str(original_block.location))
         self.assertEqual(xblock_info['display_name'], original_block.display_name)
         self.assertIsNone(xblock_info.get('has_changes', None))
         self.assertIsNone(xblock_info.get('published', None))

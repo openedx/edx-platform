@@ -6,7 +6,7 @@ from collections import OrderedDict
 
 from lettuce import step, world
 
-from common import get_codemirror_value, type_in_codemirror
+from .common import get_codemirror_value, type_in_codemirror
 from openedx.core.lib.tests.tools import assert_equal, assert_in  # pylint: disable=no-name-in-module
 
 CODEMIRROR_SELECTOR_PREFIX = "$('iframe').contents().find"
@@ -120,7 +120,7 @@ def image_static_link_is_rewritten(_step, path):
     # Find the TinyMCE iframe within the main window
     with world.browser.get_iframe('mce_0_ifr') as tinymce:
         image = tinymce.find_by_tag('img').first
-        assert_in(unicode(world.scenario_dict['COURSE'].id.make_asset_key('asset', path)), image['src'])
+        assert_in(str(world.scenario_dict['COURSE'].id.make_asset_key('asset', path)), image['src'])
 
 
 @step('the href link is rewritten to the asset link "(.*)"$')
@@ -128,7 +128,7 @@ def link_static_link_is_rewritten(_step, path):
     # Find the TinyMCE iframe within the main window
     with world.browser.get_iframe('mce_0_ifr') as tinymce:
         link = tinymce.find_by_tag('a').first
-        assert_in(unicode(world.scenario_dict['COURSE'].id.make_asset_key('asset', path)), link['href'])
+        assert_in(str(world.scenario_dict['COURSE'].id.make_asset_key('asset', path)), link['href'])
 
 
 @step('the expected toolbar buttons are displayed$')
@@ -231,7 +231,7 @@ def default_options_sets_expected_font_family(step):  # pylint: disable=unused-a
 @step('all standard tinyMCE fonts should be available')
 def check_standard_tinyMCE_fonts(_step):
     fonts = get_available_fonts(get_fonts_list_panel(world))
-    for label, expected_fonts in TINYMCE_FONTS.items():
+    for label, expected_fonts in list(TINYMCE_FONTS.items()):
         for expected_font in expected_fonts:
             assert_in(expected_font, fonts.get(label, None))
 

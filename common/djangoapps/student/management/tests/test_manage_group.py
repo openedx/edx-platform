@@ -36,7 +36,7 @@ class TestManageGroupCommand(TestCase):
         operation has not had any side effects.
         """
         content_type = ContentType.objects.get_for_model(Group)
-        for group_name, permission_codenames in group_permissions.items():
+        for group_name, permission_codenames in list(group_permissions.items()):
             group = Group.objects.create(name=group_name)
             for codename in permission_codenames:
                 group.permissions.add(
@@ -48,8 +48,8 @@ class TestManageGroupCommand(TestCase):
         Checks that the current state of the database matches the specified groups and
         permissions.
         """
-        self.check_groups(group_permissions.keys())
-        for group_name, permission_codenames in group_permissions.items():
+        self.check_groups(list(group_permissions.keys()))
+        for group_name, permission_codenames in list(group_permissions.items()):
             self.check_permissions(group_name, permission_codenames)
 
     def check_groups(self, group_names):

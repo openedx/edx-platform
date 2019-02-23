@@ -152,7 +152,7 @@ class InstructorTaskCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase)
     @staticmethod
     def get_user_email(username):
         """Generate email address based on username"""
-        return u'{0}@test.com'.format(username)
+        return '{0}@test.com'.format(username)
 
     def login_username(self, username):
         """Login the user, given the `username`."""
@@ -219,7 +219,7 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
         Returns the factory args for the option problem type.
         """
         return {
-            'question_text': u'The correct answer is {0}'.format(correct_answer),
+            'question_text': 'The correct answer is {0}'.format(correct_answer),
             'options': [OPTION_1, OPTION_2],
             'correct_option': correct_answer,
             'num_responses': num_responses,
@@ -272,9 +272,9 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
             # URL, modified so that it can be easily stored in html, prepended with "input-" and
             # appended with a sequence identifier for the particular response the input goes to.
             course_key = self.course.id
-            return u'input_i4x-{0}-{1}-problem-{2}_{3}'.format(
-                course_key.org.replace(u'.', u'_'),
-                course_key.course.replace(u'.', u'_'),
+            return 'input_i4x-{0}-{1}-problem-{2}_{3}'.format(
+                course_key.org.replace('.', '_'),
+                course_key.course.replace('.', '_'),
                 problem_url_name,
                 response_id
             )
@@ -294,7 +294,7 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
 
         # assign correct identifier to each response.
         resp = self.client.post(modx_url, {
-            get_input_id(u'{}_1').format(index): response for index, response in enumerate(responses, 2)
+            get_input_id('{}_1').format(index): response for index, response in enumerate(responses, 2)
         })
         return resp
 
@@ -357,7 +357,7 @@ class TestReportMixin(object):
 
             if ignore_other_columns:
                 csv_rows = [
-                    {key: row.get(key) for key in expected_rows[index].keys()} for index, row in enumerate(csv_rows)
+                    {key: row.get(key) for key in list(expected_rows[index].keys())} for index, row in enumerate(csv_rows)
                 ]
 
             if verify_order:
@@ -374,4 +374,4 @@ class TestReportMixin(object):
         report_path = report_store.path_to(self.course.id, report_csv_filename)
         with report_store.storage.open(report_path) as csv_file:
             rows = unicodecsv.reader(csv_file, encoding='utf-8-sig')
-            return rows.next()
+            return next(rows)

@@ -22,7 +22,7 @@ def update_session_language(request):
         data = json.loads(request.body)
         language = data.get(LANGUAGE_KEY, settings.LANGUAGE_CODE)
         if request.session.get(LANGUAGE_SESSION_KEY, None) != language:
-            request.session[LANGUAGE_SESSION_KEY] = unicode(language)
+            request.session[LANGUAGE_SESSION_KEY] = str(language)
         response.set_cookie(
             settings.LANGUAGE_COOKIE,
             language,

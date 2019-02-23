@@ -186,7 +186,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         # Regex of first 3 columns of course information table row for
         # test course loaded from git. Would not have sha1 if
         # git_info_for_course failed.
-        table_re = re.compile(ur"""
+        table_re = re.compile(r"""
             <tr>\s+
             <td>edX\sAuthor\sCourse</td>\s+  # expected test git course name
             <td>course-v1:MITx\+edx4edx\+edx4edx</td>\s+  # expected test git course_id
@@ -201,7 +201,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
 
         # Now add the course and make sure it does match
         response = self._add_edx4edx()
-        self.assertRegexpMatches(response.content, table_re)
+        self.assertRegex(response.content, table_re)
 
     def test_gitlogs(self):
         """
@@ -305,7 +305,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
 
         mongoengine.connect(TEST_MONGODB_LOG['db'])
 
-        for _ in xrange(15):
+        for _ in range(15):
             CourseImportLog(
                 course_id=CourseLocator.from_string("test/test/test"),
                 location="location",
@@ -323,7 +323,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
                 )
             )
             self.assertIn(
-                u'Page {} of 2'.format(expected),
+                'Page {} of 2'.format(expected),
                 response.content.decode(response.charset)
             )
 

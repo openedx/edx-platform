@@ -141,7 +141,7 @@ def _write_chunk(request, courselike_key):
         if not course_dir.isdir():
             os.mkdir(course_dir)
 
-        logging.debug(u'importing course to {0}'.format(temp_filepath))
+        logging.debug('importing course to {0}'.format(temp_filepath))
 
         # Get upload chunks byte ranges
         try:
@@ -163,7 +163,7 @@ def _write_chunk(request, courselike_key):
             if size < int(content_range['start']):
                 _save_request_status(request, courselike_string, -1)
                 log.warning(
-                    u"Reported range %s does not match size downloaded so far %s",
+                    "Reported range %s does not match size downloaded so far %s",
                     content_range['start'],
                     size
                 )
@@ -198,10 +198,10 @@ def _write_chunk(request, courselike_key):
                 }]
             })
 
-        log.info(u"Course import %s: Upload complete", courselike_key)
+        log.info("Course import %s: Upload complete", courselike_key)
         with open(temp_filepath, 'rb') as local_file:
             django_file = File(local_file)
-            storage_path = course_import_export_storage.save(u'olx_import/' + filename, django_file)
+            storage_path = course_import_export_storage.save('olx_import/' + filename, django_file)
         import_olx.delay(
             request.user.id, text_type(courselike_key), storage_path, filename, request.LANGUAGE_CODE)
 
@@ -210,7 +210,7 @@ def _write_chunk(request, courselike_key):
         _save_request_status(request, courselike_string, -1)
         if course_dir.isdir():
             shutil.rmtree(course_dir)
-            log.info(u"Course import %s: Temp data cleared", courselike_key)
+            log.info("Course import %s: Temp data cleared", courselike_key)
 
         log.exception(
             "error importing course"
@@ -248,12 +248,12 @@ def import_status_handler(request, course_key_string, filename=None):
         raise PermissionDenied()
 
     # The task status record is authoritative once it's been created
-    args = {u'course_key_string': course_key_string, u'archive_name': filename}
+    args = {'course_key_string': course_key_string, 'archive_name': filename}
     name = CourseImportTask.generate_name(args)
     task_status = UserTaskStatus.objects.filter(name=name)
     for status_filter in STATUS_FILTERS:
         task_status = status_filter().filter_queryset(request, task_status, import_status_handler)
-    task_status = task_status.order_by(u'-created').first()
+    task_status = task_status.order_by('-created').first()
     if task_status is None:
         # The task hasn't been initialized yet; did we store info in the session already?
         try:
@@ -277,7 +277,7 @@ def send_tarball(tarball, size):
     """
     wrapper = FileWrapper(tarball, settings.COURSE_EXPORT_DOWNLOAD_CHUNK_SIZE)
     response = StreamingHttpResponse(wrapper, content_type='application/x-tgz')
-    response['Content-Disposition'] = u'attachment; filename=%s' % os.path.basename(tarball.name.encode('utf-8'))
+    response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(tarball.name.encode('utf-8'))
     response['Content-Length'] = size
     return response
 
@@ -375,7 +375,7 @@ def export_status_handler(request, course_key_string):
             output_url = reverse_course_url('export_output_handler', course_key)
         elif isinstance(artifact.file.storage, S3BotoStorage):
             filename = os.path.basename(artifact.file.name).encode('utf-8')
-            disposition = u'attachment; filename="{}"'.format(filename)
+            disposition = 'attachment; filename="{}"'.format(filename)
             output_url = artifact.file.storage.url(artifact.file.name, response_headers={
                 'response-content-disposition': disposition,
                 'response-content-encoding': 'application/octet-stream',
@@ -440,9 +440,9 @@ def _latest_task_status(request, course_key_string, view_func=None):
     Get the most recent export status update for the specified course/library
     key.
     """
-    args = {u'course_key_string': course_key_string}
+    args = {'course_key_string': course_key_string}
     name = CourseExportTask.generate_name(args)
     task_status = UserTaskStatus.objects.filter(name=name)
     for status_filter in STATUS_FILTERS:
         task_status = status_filter().filter_queryset(request, task_status, view_func)
-    return task_status.order_by(u'-created').first()
+    return task_status.order_by('-created').first()

@@ -703,7 +703,7 @@ class CapaModuleTest(unittest.TestCase):
 
         # Expect that we get a dict with "input" stripped from key names
         # and that we get the same values back
-        for key in result.keys():
+        for key in list(result.keys()):
             original_key = "input_" + key
             self.assertIn(original_key, valid_get_dict, "Output dict should have key %s" % original_key)
             self.assertEqual(valid_get_dict[original_key], result[key])
@@ -902,8 +902,8 @@ class CapaModuleTest(unittest.TestCase):
 
         self.assertEqual(xqueue_interface._http_post.call_count, 1)
         _, kwargs = xqueue_interface._http_post.call_args  # pylint: disable=unpacking-non-sequence
-        self.assertItemsEqual(fpaths, kwargs['files'].keys())
-        for fpath, fileobj in kwargs['files'].iteritems():
+        self.assertItemsEqual(fpaths, list(kwargs['files'].keys()))
+        for fpath, fileobj in kwargs['files'].items():
             self.assertEqual(fpath, fileobj.name)
 
     def test_submit_problem_with_files_as_xblock(self):
@@ -935,8 +935,8 @@ class CapaModuleTest(unittest.TestCase):
 
         self.assertEqual(xqueue_interface._http_post.call_count, 1)
         _, kwargs = xqueue_interface._http_post.call_args  # pylint: disable=unpacking-non-sequence
-        self.assertItemsEqual(fnames, kwargs['files'].keys())
-        for fpath, fileobj in kwargs['files'].iteritems():
+        self.assertItemsEqual(fnames, list(kwargs['files'].keys()))
+        for fpath, fileobj in kwargs['files'].items():
             self.assertEqual(fpath, fileobj.name)
 
     def test_submit_problem_error(self):
@@ -1025,7 +1025,7 @@ class CapaModuleTest(unittest.TestCase):
 
         # Simulate answering a problem that raises the exception
         with patch('capa.capa_problem.LoncapaProblem.grade_answers') as mock_grade:
-            error_msg = u"Superterrible error happened: ☠"
+            error_msg = "Superterrible error happened: ☠"
             mock_grade.side_effect = Exception(error_msg)
 
             get_request_dict = {CapaFactory.input_key(): '3.14'}
@@ -1064,13 +1064,13 @@ class CapaModuleTest(unittest.TestCase):
 
             # Simulate answering a problem that raises the exception
             with patch('capa.capa_problem.LoncapaProblem.grade_answers') as mock_grade:
-                mock_grade.side_effect = exception_class(u"ȧƈƈḗƞŧḗḓ ŧḗẋŧ ƒǿř ŧḗşŧīƞɠ")
+                mock_grade.side_effect = exception_class("ȧƈƈḗƞŧḗḓ ŧḗẋŧ ƒǿř ŧḗşŧīƞɠ")
 
                 get_request_dict = {CapaFactory.input_key(): '3.14'}
                 result = module.submit_problem(get_request_dict)
 
             # Expect an AJAX alert message in 'success'
-            expected_msg = u'ȧƈƈḗƞŧḗḓ ŧḗẋŧ ƒǿř ŧḗşŧīƞɠ'
+            expected_msg = 'ȧƈƈḗƞŧḗḓ ŧḗẋŧ ƒǿř ŧḗşŧīƞɠ'
 
             self.assertEqual(expected_msg, result['success'])
 
@@ -1300,7 +1300,7 @@ class CapaModuleTest(unittest.TestCase):
 
         # Simulate answering a problem that raises the exception
         with patch('capa.capa_problem.LoncapaProblem.get_grade_from_current_answers') as mock_rescore:
-            mock_rescore.side_effect = exception_class(u'test error \u03a9')
+            mock_rescore.side_effect = exception_class('test error \u03a9')
             with self.assertRaises(exception_class):
                 module.rescore(only_if_higher=False)
 
@@ -1674,7 +1674,7 @@ class CapaModuleTest(unittest.TestCase):
             """
             Mock implementation of __unicode__ or __str__ for the module's location.
             """
-            return u'i4x://edX/capa_test/problem/meh'
+            return 'i4x://edX/capa_test/problem/meh'
 
         module = CapaFactory.create(xml=self.demand_xml)
         # Re-mock the module_id to a fixed string, so we can check the logging
@@ -1689,7 +1689,7 @@ class CapaModuleTest(unittest.TestCase):
             module.get_demand_hint(0)
             mock_track_function.assert_called_with(
                 module, 'edx.problem.hint.demandhint_displayed',
-                {'hint_index': 0, 'module_id': u'i4x://edX/capa_test/problem/meh',
+                {'hint_index': 0, 'module_id': 'i4x://edX/capa_test/problem/meh',
                  'hint_text': 'Demand 1', 'hint_len': 2}
             )
 
@@ -1699,7 +1699,7 @@ class CapaModuleTest(unittest.TestCase):
 
         # check to make sure that the input_state and the keys have the same values
         module1.set_state_from_lcp()
-        self.assertEqual(module1.lcp.inputs.keys(), module1.input_state.keys())
+        self.assertEqual(list(module1.lcp.inputs.keys()), list(module1.input_state.keys()))
 
         module2.set_state_from_lcp()
 
@@ -1748,7 +1748,7 @@ class CapaModuleTest(unittest.TestCase):
 
         # Simulate throwing an exception when the capa problem
         # is asked to render itself as HTML
-        error_msg = u"Superterrible error happened: ☠"
+        error_msg = "Superterrible error happened: ☠"
         module.lcp.get_html = Mock(side_effect=Exception(error_msg))
 
         # Stub out the get_test_system rendering function
@@ -2004,7 +2004,7 @@ class CapaModuleTest(unittest.TestCase):
         Check that get_problem() returns the expected dictionary.
         """
         module = CapaFactory.create()
-        self.assertEquals(module.get_problem("data"), {'html': module.get_problem_html(encapsulate=False)})
+        self.assertEqual(module.get_problem("data"), {'html': module.get_problem_html(encapsulate=False)})
 
     # Standard question with shuffle="true" used by a few tests
     common_shuffle_xml = textwrap.dedent("""
@@ -2033,9 +2033,9 @@ class CapaModuleTest(unittest.TestCase):
             event_info = mock_call[1][2]
             self.assertEqual(event_info['answers'][CapaFactory.answer_key()], 'choice_3')
             # 'permutation' key added to record how problem was shown
-            self.assertEquals(event_info['permutation'][CapaFactory.answer_key()],
+            self.assertEqual(event_info['permutation'][CapaFactory.answer_key()],
                               ('shuffle', ['choice_3', 'choice_1', 'choice_2', 'choice_0']))
-            self.assertEquals(event_info['success'], 'correct')
+            self.assertEqual(event_info['success'], 'correct')
 
     @unittest.skip("masking temporarily disabled")
     def test_save_unmask(self):
@@ -2046,7 +2046,7 @@ class CapaModuleTest(unittest.TestCase):
             module.save_problem(get_request_dict)
             mock_call = mock_track_function.mock_calls[0]
             event_info = mock_call[1][1]
-            self.assertEquals(event_info['answers'][CapaFactory.answer_key()], 'choice_2')
+            self.assertEqual(event_info['answers'][CapaFactory.answer_key()], 'choice_2')
             self.assertIsNotNone(event_info['permutation'][CapaFactory.answer_key()])
 
     @unittest.skip("masking temporarily disabled")
@@ -2060,8 +2060,8 @@ class CapaModuleTest(unittest.TestCase):
             module.reset_problem(None)
             mock_call = mock_track_function.mock_calls[0]
             event_info = mock_call[1][1]
-            self.assertEquals(mock_call[1][0], 'reset_problem')
-            self.assertEquals(event_info['old_state']['student_answers'][CapaFactory.answer_key()], 'choice_2')
+            self.assertEqual(mock_call[1][0], 'reset_problem')
+            self.assertEqual(event_info['old_state']['student_answers'][CapaFactory.answer_key()], 'choice_2')
             self.assertIsNotNone(event_info['permutation'][CapaFactory.answer_key()])
 
     @unittest.skip("masking temporarily disabled")
@@ -2075,8 +2075,8 @@ class CapaModuleTest(unittest.TestCase):
             module.rescore_problem(only_if_higher=False)
             mock_call = mock_track_function.mock_calls[0]
             event_info = mock_call[1][1]
-            self.assertEquals(mock_call[1][0], 'problem_rescore')
-            self.assertEquals(event_info['state']['student_answers'][CapaFactory.answer_key()], 'choice_2')
+            self.assertEqual(mock_call[1][0], 'problem_rescore')
+            self.assertEqual(event_info['state']['student_answers'][CapaFactory.answer_key()], 'choice_2')
             self.assertIsNotNone(event_info['permutation'][CapaFactory.answer_key()])
 
     def test_check_unmask_answerpool(self):
@@ -2101,9 +2101,9 @@ class CapaModuleTest(unittest.TestCase):
             event_info = mock_call[1][2]
             self.assertEqual(event_info['answers'][CapaFactory.answer_key()], 'choice_2')
             # 'permutation' key added to record how problem was shown
-            self.assertEquals(event_info['permutation'][CapaFactory.answer_key()],
+            self.assertEqual(event_info['permutation'][CapaFactory.answer_key()],
                               ('answerpool', ['choice_1', 'choice_3', 'choice_2', 'choice_0']))
-            self.assertEquals(event_info['success'], 'incorrect')
+            self.assertEqual(event_info['success'], 'incorrect')
 
     @ddt.unpack
     @ddt.data(
@@ -2504,8 +2504,8 @@ class CapaDescriptorTest(unittest.TestCase):
         xml = "<problem><{response_tag}></{response_tag}></problem>".format(response_tag=response_tag)
         name = "Some Capa Problem"
         descriptor = self._create_descriptor(xml, name=name)
-        self.assertEquals(descriptor.problem_types, {response_tag})
-        self.assertEquals(descriptor.index_dictionary(), {
+        self.assertEqual(descriptor.problem_types, {response_tag})
+        self.assertEqual(descriptor.index_dictionary(), {
             'content_type': CapaDescriptor.INDEX_CONTENT_TYPE,
             'problem_types': [response_tag],
             'content': {
@@ -2531,8 +2531,8 @@ class CapaDescriptorTest(unittest.TestCase):
         """)
         name = "Test Capa Problem"
         descriptor = self._create_descriptor(xml, name=name)
-        self.assertEquals(descriptor.problem_types, {"multiplechoiceresponse"})
-        self.assertEquals(descriptor.index_dictionary(), {
+        self.assertEqual(descriptor.problem_types, {"multiplechoiceresponse"})
+        self.assertEqual(descriptor.index_dictionary(), {
             'content_type': CapaDescriptor.INDEX_CONTENT_TYPE,
             'problem_types': ["multiplechoiceresponse"],
             'content': {
@@ -2563,8 +2563,8 @@ class CapaDescriptorTest(unittest.TestCase):
         """)
         name = "Other Test Capa Problem"
         descriptor = self._create_descriptor(xml, name=name)
-        self.assertEquals(descriptor.problem_types, {"multiplechoiceresponse", "optionresponse"})
-        self.assertEquals(
+        self.assertEqual(descriptor.problem_types, {"multiplechoiceresponse", "optionresponse"})
+        self.assertEqual(
             descriptor.index_dictionary(), {
                 'content_type': CapaDescriptor.INDEX_CONTENT_TYPE,
                 'problem_types': ["optionresponse", "multiplechoiceresponse"],
@@ -2601,7 +2601,7 @@ class CapaDescriptorTest(unittest.TestCase):
         """)
         name = "Blank Common Capa Problem"
         descriptor = self._create_descriptor(xml, name=name)
-        self.assertEquals(
+        self.assertEqual(
             descriptor.index_dictionary(), {
                 'content_type': CapaDescriptor.INDEX_CONTENT_TYPE,
                 'problem_types': [],
@@ -2615,7 +2615,7 @@ class CapaDescriptorTest(unittest.TestCase):
     def test_indexing_checkboxes(self):
         name = "Checkboxes"
         descriptor = self._create_descriptor(self.sample_checkbox_problem_xml, name=name)
-        capa_content = textwrap.dedent(u"""
+        capa_content = textwrap.dedent("""
             Title
             Description
             Example
@@ -2627,8 +2627,8 @@ class CapaDescriptorTest(unittest.TestCase):
             Hungarian
             Note: Make sure you select all of the correct options—there may be more than one!
         """)
-        self.assertEquals(descriptor.problem_types, {"choiceresponse"})
-        self.assertEquals(
+        self.assertEqual(descriptor.problem_types, {"choiceresponse"})
+        self.assertEqual(
             descriptor.index_dictionary(),
             {
                 'content_type': CapaDescriptor.INDEX_CONTENT_TYPE,
@@ -2649,8 +2649,8 @@ class CapaDescriptorTest(unittest.TestCase):
             You can use the following example problem as a model.
             Which of the following countries celebrates its independence on August 15?
         """)
-        self.assertEquals(descriptor.problem_types, {"optionresponse"})
-        self.assertEquals(
+        self.assertEqual(descriptor.problem_types, {"optionresponse"})
+        self.assertEqual(
             descriptor.index_dictionary(), {
                 'content_type': CapaDescriptor.INDEX_CONTENT_TYPE,
                 'problem_types': ["optionresponse"],
@@ -2674,8 +2674,8 @@ class CapaDescriptorTest(unittest.TestCase):
             Indonesia
             Russia
         """)
-        self.assertEquals(descriptor.problem_types, {"multiplechoiceresponse"})
-        self.assertEquals(
+        self.assertEqual(descriptor.problem_types, {"multiplechoiceresponse"})
+        self.assertEqual(
             descriptor.index_dictionary(), {
                 'content_type': CapaDescriptor.INDEX_CONTENT_TYPE,
                 'problem_types': ["multiplechoiceresponse"],
@@ -2702,8 +2702,8 @@ class CapaDescriptorTest(unittest.TestCase):
             How many miles away from Earth is the sun? Use scientific notation to answer.
             The square of what number is -100?
         """)
-        self.assertEquals(descriptor.problem_types, {"numericalresponse"})
-        self.assertEquals(
+        self.assertEqual(descriptor.problem_types, {"numericalresponse"})
+        self.assertEqual(
             descriptor.index_dictionary(), {
                 'content_type': CapaDescriptor.INDEX_CONTENT_TYPE,
                 'problem_types': ["numericalresponse"],
@@ -2727,8 +2727,8 @@ class CapaDescriptorTest(unittest.TestCase):
             You can use the following example problem as a model.
             What was the first post-secondary school in China to allow both male and female students?
         """)
-        self.assertEquals(descriptor.problem_types, {"stringresponse"})
-        self.assertEquals(
+        self.assertEqual(descriptor.problem_types, {"stringresponse"})
+        self.assertEqual(
             descriptor.index_dictionary(), {
                 'content_type': CapaDescriptor.INDEX_CONTENT_TYPE,
                 'problem_types': ["stringresponse"],
@@ -2751,7 +2751,7 @@ class CapaDescriptorTest(unittest.TestCase):
         capa_content = " FX1_VAL='Καλημέρα' Δοκιμή με μεταβλητές με Ελληνικούς χαρακτήρες μέσα σε python: $FX1_VAL "
 
         descriptor_dict = descriptor.index_dictionary()
-        self.assertEquals(
+        self.assertEqual(
             descriptor_dict['content']['capa_content'], smart_text(capa_content)
         )
 
@@ -2773,8 +2773,8 @@ class CapaDescriptorTest(unittest.TestCase):
             potato
             tomato
         """)
-        self.assertEquals(descriptor.problem_types, {"choiceresponse"})
-        self.assertEquals(
+        self.assertEqual(descriptor.problem_types, {"choiceresponse"})
+        self.assertEqual(
             descriptor.index_dictionary(), {
                 'content_type': CapaDescriptor.INDEX_CONTENT_TYPE,
                 'problem_types': ["choiceresponse"],
@@ -2799,8 +2799,8 @@ class CapaDescriptorTest(unittest.TestCase):
             potato
             tomato
         """)
-        self.assertEquals(descriptor.problem_types, {"optionresponse"})
-        self.assertEquals(
+        self.assertEqual(descriptor.problem_types, {"optionresponse"})
+        self.assertEqual(
             descriptor.index_dictionary(), {
                 'content_type': CapaDescriptor.INDEX_CONTENT_TYPE,
                 'problem_types': ["optionresponse"],
@@ -2825,8 +2825,8 @@ class CapaDescriptorTest(unittest.TestCase):
             potato
             tomato
         """)
-        self.assertEquals(descriptor.problem_types, {"multiplechoiceresponse"})
-        self.assertEquals(
+        self.assertEqual(descriptor.problem_types, {"multiplechoiceresponse"})
+        self.assertEqual(
             descriptor.index_dictionary(), {
                 'content_type': CapaDescriptor.INDEX_CONTENT_TYPE,
                 'problem_types': ["multiplechoiceresponse"],
@@ -2849,8 +2849,8 @@ class CapaDescriptorTest(unittest.TestCase):
             Use the following example problem as a model.
             What is the arithmetic mean for the following set of numbers? (1, 5, 6, 3, 5)
         """)
-        self.assertEquals(descriptor.problem_types, {"numericalresponse"})
-        self.assertEquals(
+        self.assertEqual(descriptor.problem_types, {"numericalresponse"})
+        self.assertEqual(
             descriptor.index_dictionary(), {
                 'content_type': CapaDescriptor.INDEX_CONTENT_TYPE,
                 'problem_types': ["numericalresponse"],
@@ -2873,8 +2873,8 @@ class CapaDescriptorTest(unittest.TestCase):
             Use the following example problem as a model.
             Which U.S. state has the largest land area?
         """)
-        self.assertEquals(descriptor.problem_types, {"stringresponse"})
-        self.assertEquals(
+        self.assertEqual(descriptor.problem_types, {"stringresponse"})
+        self.assertEqual(
             descriptor.index_dictionary(), {
                 'content_type': CapaDescriptor.INDEX_CONTENT_TYPE,
                 'problem_types': ["stringresponse"],
@@ -2906,7 +2906,7 @@ class CapaDescriptorTest(unittest.TestCase):
             This has HTML comment in it.
             HTML end.
         """)
-        self.assertEquals(
+        self.assertEqual(
             descriptor.index_dictionary(), {
                 'content_type': CapaDescriptor.INDEX_CONTENT_TYPE,
                 'problem_types': [],
@@ -2993,7 +2993,7 @@ class TestProblemCheckTracking(unittest.TestCase):
         }
         event = self.get_event_for_answers(module, answer_input_dict)
 
-        self.assertEquals(event['submission'], {
+        self.assertEqual(event['submission'], {
             factory.answer_key(2): {
                 'question': 'What color is the open ocean on a sunny day?',
                 'answer': 'blue',
@@ -3005,7 +3005,7 @@ class TestProblemCheckTracking(unittest.TestCase):
             },
             factory.answer_key(3): {
                 'question': 'Which piece of furniture is built for sitting?',
-                'answer': u'<text>a table</text>',
+                'answer': '<text>a table</text>',
                 'response_type': 'multiplechoiceresponse',
                 'input_type': 'choicegroup',
                 'correct': False,
@@ -3014,7 +3014,7 @@ class TestProblemCheckTracking(unittest.TestCase):
             },
             factory.answer_key(4): {
                 'question': 'Which of the following are musical instruments?',
-                'answer': [u'a piano', u'a tree'],
+                'answer': ['a piano', 'a tree'],
                 'response_type': 'choiceresponse',
                 'input_type': 'checkboxgroup',
                 'correct': False,
@@ -3052,7 +3052,7 @@ class TestProblemCheckTracking(unittest.TestCase):
         }
 
         event = self.get_event_for_answers(module, answer_input_dict)
-        self.assertEquals(event['submission'], {
+        self.assertEqual(event['submission'], {
             factory.answer_key(2): {
                 'question': '',
                 'answer': '3.14',
@@ -3084,7 +3084,7 @@ class TestProblemCheckTracking(unittest.TestCase):
         }
 
         event = self.get_event_for_answers(module, answer_input_dict)
-        self.assertEquals(event['submission'], {
+        self.assertEqual(event['submission'], {
             factory.answer_key(2, 1): {
                 'group_label': group_label,
                 'question': input1_label,
@@ -3154,7 +3154,7 @@ class TestProblemCheckTracking(unittest.TestCase):
         }
 
         event = self.get_event_for_answers(module, answer_input_dict)
-        self.assertEquals(event['submission'], {
+        self.assertEqual(event['submission'], {
             factory.answer_key(2, 1): {
                 'group_label': group_label,
                 'question': input1_label,
@@ -3184,7 +3184,7 @@ class TestProblemCheckTracking(unittest.TestCase):
         }
 
         event = self.get_event_for_answers(module, answer_input_dict)
-        self.assertEquals(event['submission'], {
+        self.assertEqual(event['submission'], {
             factory.answer_key(2): {
                 'question': '',
                 'answer': '3.14',
@@ -3217,7 +3217,7 @@ class TestProblemCheckTracking(unittest.TestCase):
         }
 
         event = self.get_event_for_answers(module, answer_input_dict)
-        self.assertEquals(event['submission'], {
+        self.assertEqual(event['submission'], {
             factory.answer_key(2): {
                 'question': '',
                 'answer': fpaths,
@@ -3320,7 +3320,7 @@ class TestCapaDescriptorReportGeneration(unittest.TestCase):
     def test_generate_report_data_limit_responses(self):
         descriptor = self._get_descriptor()
         report_data = list(descriptor.generate_report_data(self._mock_user_state_generator(), 2))
-        self.assertEquals(2, len(report_data))
+        self.assertEqual(2, len(report_data))
 
     def test_generate_report_data_dont_limit_responses(self):
         descriptor = self._get_descriptor()
@@ -3332,10 +3332,10 @@ class TestCapaDescriptorReportGeneration(unittest.TestCase):
                 response_count=response_count,
             )
         ))
-        self.assertEquals(user_count * response_count, len(report_data))
+        self.assertEqual(user_count * response_count, len(report_data))
 
     def test_generate_report_data_skip_dynamath(self):
         descriptor = self._get_descriptor()
         iterator = iter([self._user_state(suffix='_dynamath')])
         report_data = list(descriptor.generate_report_data(iterator))
-        self.assertEquals(0, len(report_data))
+        self.assertEqual(0, len(report_data))

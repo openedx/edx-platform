@@ -18,7 +18,7 @@ class SystemUserTestCase(unittest.TestCase):
         self.assertIsNone(self.sysuser.id)
 
     def test_system_user_has_custom_unicode_representation(self):
-        self.assertNotEqual(unicode(self.sysuser), unicode(AnonymousUser()))
+        self.assertNotEqual(str(self.sysuser), str(AnonymousUser()))
 
     def test_system_user_is_not_staff(self):
         self.assertFalse(self.sysuser.is_staff)

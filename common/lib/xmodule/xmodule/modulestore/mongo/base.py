@@ -57,7 +57,7 @@ log = logging.getLogger(__name__)
 new_contract('CourseKey', CourseKey)
 new_contract('AssetKey', AssetKey)
 new_contract('AssetMetadata', AssetMetadata)
-new_contract('long', long)
+new_contract('long', int)
 new_contract('BlockUsageLocator', BlockUsageLocator)
 
 # sort order that returns DRAFT items first
@@ -180,10 +180,10 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
     def __repr__(self):
         return "CachingDescriptorSystem{!r}".format((
             self.modulestore,
-            unicode(self.course_id),
-            [unicode(key) for key in self.module_data.keys()],
+            str(self.course_id),
+            [str(key) for key in list(self.module_data.keys())],
             self.default_class,
-            [unicode(key) for key in self.cached_metadata.keys()],
+            [str(key) for key in list(self.cached_metadata.keys())],
         ))
 
     def __init__(self, modulestore, course_key, module_data, default_class, cached_metadata, **kwargs):
@@ -249,7 +249,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
 
                 definition = json_data.get('definition', {})
                 metadata = json_data.get('metadata', {})
-                for old_name, new_name in getattr(class_, 'metadata_translations', {}).items():
+                for old_name, new_name in list(getattr(class_, 'metadata_translations', {}).items()):
                     if old_name in metadata:
                         metadata[new_name] = metadata[old_name]
                         del metadata[old_name]
@@ -262,7 +262,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
                 parent = None
                 if self.cached_metadata is not None:
                     # fish the parent out of here if it's available
-                    parent_url = self.cached_metadata.get(unicode(location), {}).get('parent', {}).get(
+                    parent_url = self.cached_metadata.get(str(location), {}).get('parent', {}).get(
                         ModuleStoreEnum.Branch.published_only if location.branch is None
                         else ModuleStoreEnum.Branch.draft_preferred
                     )
@@ -278,7 +278,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
                     )
 
                 data = definition.get('data', {})
-                if isinstance(data, basestring):
+                if isinstance(data, str):
                     data = {'data': data}
 
                 mixed_class = self.mixologist.mix(class_)
@@ -302,7 +302,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
 
                     # Convert the serialized fields values in self.cached_metadata
                     # to python values
-                    metadata_to_inherit = self.cached_metadata.get(unicode(non_draft_loc), {})
+                    metadata_to_inherit = self.cached_metadata.get(str(non_draft_loc), {})
                     inherit_metadata(module, metadata_to_inherit)
 
                 module._edit_info = json_data.get('edit_info')
@@ -348,7 +348,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         :param jsonfields: a dict of the jsonified version of the fields
         """
         result = {}
-        for field_name, value in jsonfields.iteritems():
+        for field_name, value in jsonfields.items():
             field = class_.fields.get(field_name)
             if field is None:
                 continue
@@ -362,7 +362,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
                 ]
             elif isinstance(field, ReferenceValueDict):
                 result[field_name] = {
-                    key: self._convert_reference_to_key(subvalue) for key, subvalue in value.iteritems()
+                    key: self._convert_reference_to_key(subvalue) for key, subvalue in value.items()
                 }
             else:
                 result[field_name] = value
@@ -438,7 +438,7 @@ def location_to_query(location, wildcard=True, tag='i4x'):
     query = location.to_deprecated_son(prefix='_id.', tag=tag)
 
     if wildcard:
-        for key, value in query.items():
+        for key, value in list(query.items()):
             # don't allow wildcards on revision, since public is set as None, so
             # its ambiguous between None as a real value versus None=wildcard
             if value is None and key != '_id.revision':
@@ -513,17 +513,17 @@ class ParentLocationCache(dict):
     """
     # pylint: disable=missing-docstring
 
-    @contract(key=unicode)
+    @contract(key=str)
     def has(self, key):
         return key in self
 
-    @contract(key=unicode, value="BlockUsageLocator | None")
+    @contract(key=str, value="BlockUsageLocator | None")
     def set(self, key, value):
         self[key] = value
 
     @contract(value="BlockUsageLocator")
     def delete_by_value(self, value):
-        keys_to_delete = [k for k, v in self.iteritems() if v == value]
+        keys_to_delete = [k for k, v in self.items() if v == value]
         for key in keys_to_delete:
             del self[key]
 
@@ -717,7 +717,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             # manually pick it apart b/c the db has tag and we want as_published revision regardless
             location = as_published(BlockUsageLocator._from_deprecated_son(result['_id'], course_id.run))
 
-            location_url = unicode(location)
+            location_url = str(location)
             if location_url in results_by_url:
                 # found either draft or live to complement the other revision
                 # FIXME this is wrong. If the child was moved in draft from one parent to the other, it will
@@ -774,12 +774,12 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         course_id = self.fill_in_run(course_id)
         if not force_refresh:
             # see if we are first in the request cache (if present)
-            if self.request_cache is not None and unicode(course_id) in self.request_cache.data.get('metadata_inheritance', {}):
-                return self.request_cache.data['metadata_inheritance'][unicode(course_id)]
+            if self.request_cache is not None and str(course_id) in self.request_cache.data.get('metadata_inheritance', {}):
+                return self.request_cache.data['metadata_inheritance'][str(course_id)]
 
             # then look in any caching subsystem (e.g. memcached)
             if self.metadata_inheritance_cache_subsystem is not None:
-                tree = self.metadata_inheritance_cache_subsystem.get(unicode(course_id), {})
+                tree = self.metadata_inheritance_cache_subsystem.get(str(course_id), {})
             else:
                 logging.warning(
                     'Running MongoModuleStore without a metadata_inheritance_cache_subsystem. This is \
@@ -792,7 +792,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
 
             # now write out computed tree to caching subsystem (e.g. memcached), if available
             if self.metadata_inheritance_cache_subsystem is not None:
-                self.metadata_inheritance_cache_subsystem.set(unicode(course_id), tree)
+                self.metadata_inheritance_cache_subsystem.set(str(course_id), tree)
 
         # now populate a request_cache, if available. NOTE, we are outside of the
         # scope of the above if: statement so that after a memcache hit, it'll get
@@ -802,7 +802,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             # defined
             if 'metadata_inheritance' not in self.request_cache.data:
                 self.request_cache.data['metadata_inheritance'] = {}
-            self.request_cache.data['metadata_inheritance'][unicode(course_id)] = tree
+            self.request_cache.data['metadata_inheritance'][str(course_id)] = tree
 
         return tree
 
@@ -1019,7 +1019,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             for course_key in course_keys:
                 course_query = {
                     '_id.{}'.format(value_attr): getattr(course_key, key_attr)
-                    for key_attr, value_attr in {'org': 'org', 'course': 'course', 'run': 'name'}.iteritems()
+                    for key_attr, value_attr in {'org': 'org', 'course': 'course', 'run': 'name'}.items()
                 }
                 course_query.update(query)
                 course_queries.append(course_query)
@@ -1145,8 +1145,8 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         location = course_key.make_usage_key('course', course_key.run)
         if ignore_case:
             course_query = location.to_deprecated_son('_id.')
-            for key in course_query.iterkeys():
-                if isinstance(course_query[key], basestring):
+            for key in course_query.keys():
+                if isinstance(course_query[key], str):
                     course_query[key] = re.compile(r"(?i)^{}$".format(course_query[key]))
         else:
             course_query = {'_id': location.to_deprecated_son()}
@@ -1270,9 +1270,9 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                     qualifier_value = {'$in': qualifier_value}
                 query['_id.' + field] = qualifier_value
 
-        for key, value in (settings or {}).iteritems():
+        for key, value in (settings or {}).items():
             query['metadata.' + key] = value
-        for key, value in (content or {}).iteritems():
+        for key, value in (content or {}).items():
             query['definition.data.' + key] = value
         if 'children' in qualifiers:
             query['definition.children'] = qualifiers.pop('children')
@@ -1312,8 +1312,8 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         # Check if a course with this org/course has been defined before (case-insensitive)
         course_search_location = SON([
             ('_id.tag', 'i4x'),
-            ('_id.org', re.compile(u'^{}$'.format(course_id.org), re.IGNORECASE)),
-            ('_id.course', re.compile(u'^{}$'.format(course_id.course), re.IGNORECASE)),
+            ('_id.org', re.compile('^{}$'.format(course_id.org), re.IGNORECASE)),
+            ('_id.course', re.compile('^{}$'.format(course_id.course), re.IGNORECASE)),
             ('_id.category', 'course'),
         ])
         courses = self.collection.find(course_search_location, projection={'_id': True})
@@ -1351,7 +1351,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             if block_type == 'course':
                 block_id = course_key.run
             else:
-                block_id = u'{}_{}'.format(block_type, uuid4().hex[:5])
+                block_id = '{}_{}'.format(block_type, uuid4().hex[:5])
 
         if runtime is None:
             services = {}
@@ -1392,7 +1392,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             for_parent=kwargs.get('for_parent'),
         )
         if fields is not None:
-            for key, value in fields.iteritems():
+            for key, value in fields.items():
                 setattr(xmodule, key, value)
         # decache any pending field settings from init
         xmodule.save()
@@ -1416,7 +1416,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             if block_type == 'course':
                 block_id = course_key.run
             else:
-                block_id = u'{}_{}'.format(block_type, uuid4().hex[:5])
+                block_id = '{}_{}'.format(block_type, uuid4().hex[:5])
 
         runtime = kwargs.pop('runtime', None)
         xblock = self.create_xblock(runtime, course_key, block_type, block_id, **kwargs)
@@ -1548,7 +1548,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                 parent_cache = self._get_parent_cache(self.get_branch_setting())
                 parent_cache.delete_by_value(xblock.location)
                 for child in xblock.children:
-                    parent_cache.set(unicode(child), xblock.location)
+                    parent_cache.set(str(child), xblock.location)
 
             self._update_single_item(xblock.scope_ids.usage_id, payload, allow_not_found=allow_not_found)
 
@@ -1582,19 +1582,19 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         :param jsonfields: a dict of the jsonified version of the fields
         """
         jsonfields = {}
-        for field_name, field in xblock.fields.iteritems():
+        for field_name, field in xblock.fields.items():
             if field.scope == scope and field.is_set_on(xblock):
                 if field.scope == Scope.parent:
                     continue
                 elif isinstance(field, Reference):
-                    jsonfields[field_name] = unicode(field.read_from(xblock))
+                    jsonfields[field_name] = str(field.read_from(xblock))
                 elif isinstance(field, ReferenceList):
                     jsonfields[field_name] = [
-                        unicode(ele) for ele in field.read_from(xblock)
+                        str(ele) for ele in field.read_from(xblock)
                     ]
                 elif isinstance(field, ReferenceValueDict):
                     jsonfields[field_name] = {
-                        key: unicode(subvalue) for key, subvalue in field.read_from(xblock).iteritems()
+                        key: str(subvalue) for key, subvalue in field.read_from(xblock).items()
                     }
                 else:
                     jsonfields[field_name] = field.read_json(xblock)
@@ -1645,19 +1645,19 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             or revision == ModuleStoreEnum.RevisionOption.draft_preferred
 
         parent_cache = self._get_parent_cache(self.get_branch_setting())
-        if parent_cache.has(unicode(location)):
-            return parent_cache.get(unicode(location))
+        if parent_cache.has(str(location)):
+            return parent_cache.get(str(location))
 
         # create a query with tag, org, course, and the children field set to the given location
         query = self._course_key_to_son(location.course_key)
-        query['definition.children'] = unicode(location)
+        query['definition.children'] = str(location)
 
         # if only looking for the PUBLISHED parent, set the revision in the query to None
         if revision == ModuleStoreEnum.RevisionOption.published_only:
             query['_id.revision'] = MongoRevisionKey.published
 
         def cache_and_return(parent_loc):  # pylint:disable=missing-docstring
-            parent_cache.set(unicode(location), parent_loc)
+            parent_cache.set(str(location), parent_loc)
             return parent_loc
 
         # query the collection, sorting by DRAFT first
@@ -1678,7 +1678,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                 if len(non_orphan_parents) > 1:
                     # should never have multiple PUBLISHED parents
                     raise ReferentialIntegrityError(
-                        u"{} parents claim {}".format(len(parents), location)
+                        "{} parents claim {}".format(len(parents), location)
                     )
                 else:
                     return cache_and_return(non_orphan_parents[0].replace(run=location.course_key.run))
@@ -1750,7 +1750,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             if item['_id']['category'] != 'course':
                 # It would be nice to change this method to return UsageKeys instead of the deprecated string.
                 item_locs.add(
-                    unicode(as_published(BlockUsageLocator._from_deprecated_son(item['_id'], course_key.run)))
+                    str(as_published(BlockUsageLocator._from_deprecated_son(item['_id'], course_key.run)))
                 )
             all_reachable = all_reachable.union(item.get('definition', {}).get('children', []))
         item_locs -= all_reachable
@@ -1801,14 +1801,14 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         # A single document exists per course to store the course asset metadata.
         course_key = self.fill_in_run(course_key)
         if course_key.run is None:
-            log.warning(u'No run found for combo org "{}" course "{}" on asset request.'.format(
+            log.warning('No run found for combo org "{}" course "{}" on asset request.'.format(
                 course_key.org, course_key.course
             ))
             course_assets = None
         else:
             # Complete course key, so query for asset metadata.
             course_assets = self.asset_collection.find_one(
-                {'course_id': unicode(course_key)},
+                {'course_id': str(course_key)},
             )
 
         doc_id = None if course_assets is None else course_assets['_id']
@@ -1818,7 +1818,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                 raise ItemNotFoundError(course_key)
             else:
                 # Course exists, so create matching assets document.
-                course_assets = {'course_id': unicode(course_key), 'assets': {}}
+                course_assets = {'course_id': str(course_key), 'assets': {}}
                 doc_id = self.asset_collection.insert(course_assets)
         elif isinstance(course_assets['assets'], list):
             # This record is in the old course assets format.
@@ -1855,7 +1855,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
 
         # Build an update set with potentially multiple embedded fields.
         updates_by_type = {}
-        for asset_type, assets in assets_by_type.iteritems():
+        for asset_type, assets in assets_by_type.items():
             updates_by_type[self._make_mongo_asset_key(asset_type)] = list(assets)
 
         # Update the document.
@@ -1908,8 +1908,8 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             dest_course_key (CourseKey): identifier of course to copy to
         """
         source_assets = self._find_course_assets(source_course_key)
-        dest_assets = {'assets': source_assets.asset_md.copy(), 'course_id': unicode(dest_course_key)}
-        self.asset_collection.remove({'course_id': unicode(dest_course_key)})
+        dest_assets = {'assets': source_assets.asset_md.copy(), 'course_id': str(dest_course_key)}
+        self.asset_collection.remove({'course_id': str(dest_course_key)})
         # Update the document.
         self.asset_collection.insert(dest_assets)
 

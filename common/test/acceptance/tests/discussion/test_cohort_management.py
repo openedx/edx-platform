@@ -72,7 +72,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         Selects the cohort with the given name and verifies the expected description is presented.
         """
         self.cohort_management_page.select_cohort(cohort_name)
-        self.assertEquals(self.cohort_management_page.get_selected_cohort(), cohort_name)
+        self.assertEqual(self.cohort_management_page.get_selected_cohort(), cohort_name)
         self.assertIn(expected_description, self.cohort_management_page.get_cohort_group_setup())
 
     def test_cohort_description(self):
@@ -557,7 +557,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         TODO: refactor events verification to handle this scenario. Events verification assumes movements
         between other cohorts (manual and auto).
         """
-        unicode_hello_in_korean = u'ßßßßßß'
+        unicode_hello_in_korean = 'ßßßßßß'
         self._verify_cohort_settings(cohort_name=unicode_hello_in_korean, assignment_type=None)
         csv_contents = [
             ['username', 'email', 'cohort'],
@@ -578,7 +578,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         start_time = datetime.now(UTC)
         self.cohort_management_page.upload_cohort_file(filename)
         self._verify_cohort_by_csv_notification(
-            u"Your file '{}' has been uploaded. Allow a few minutes for processing.".format(filename)
+            "Your file '{}' has been uploaded. Allow a few minutes for processing.".format(filename)
         )
 
         if not skip_events:
@@ -683,7 +683,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
             lambda: 1 == len(self.cohort_management_page.get_csv_messages()), 'Waiting for notification'
         ).fulfill()
         messages = self.cohort_management_page.get_csv_messages()
-        self.assertEquals(expected_message, messages[0])
+        self.assertEqual(expected_message, messages[0])
 
     @attr('a11y')
     def test_cohorts_management_a11y(self):
@@ -718,7 +718,7 @@ class CohortContentGroupAssociationTest(UniqueCourseTest, CohortTestMixin):
 
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
-                u"user_partitions": [
+                "user_partitions": [
                     create_user_partition_json(
                         0,
                         'Apples, Bananas',
@@ -755,7 +755,7 @@ class CohortContentGroupAssociationTest(UniqueCourseTest, CohortTestMixin):
         self.cohort_management_page.select_cohort(self.cohort_name)
         self.assertIsNone(self.cohort_management_page.get_cohort_associated_content_group())
         self.assertIsNone(self.cohort_management_page.get_cohort_related_content_group_message())
-        self.assertEquals(["Apples", "Bananas"], self.cohort_management_page.get_all_content_groups())
+        self.assertEqual(["Apples", "Bananas"], self.cohort_management_page.get_all_content_groups())
 
     def test_link_to_content_group(self):
         """
@@ -830,7 +830,7 @@ class CohortContentGroupAssociationTest(UniqueCourseTest, CohortTestMixin):
         self._create_new_cohort_linked_to_content_group(new_cohort, "Apples")
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
-                u"user_partitions": [
+                "user_partitions": [
                     create_user_partition_json(
                         0,
                         'Apples, Bananas',
@@ -845,7 +845,7 @@ class CohortContentGroupAssociationTest(UniqueCourseTest, CohortTestMixin):
         self.cohort_management_page.wait_for_page()
         self.cohort_management_page.select_cohort(new_cohort)
         self.assertEqual("Deleted Content Group", self.cohort_management_page.get_cohort_associated_content_group())
-        self.assertEquals(
+        self.assertEqual(
             ["Bananas", "Pears", "Deleted Content Group"],
             self.cohort_management_page.get_all_content_groups()
         )
@@ -857,7 +857,7 @@ class CohortContentGroupAssociationTest(UniqueCourseTest, CohortTestMixin):
         confirmation_messages = self.cohort_management_page.get_cohort_settings_messages()
         self.assertEqual(["Saved cohort"], confirmation_messages)
         self.assertIsNone(self.cohort_management_page.get_cohort_related_content_group_message())
-        self.assertEquals(["Bananas", "Pears"], self.cohort_management_page.get_all_content_groups())
+        self.assertEqual(["Bananas", "Pears"], self.cohort_management_page.get_all_content_groups())
 
     def _create_new_cohort_linked_to_content_group(self, new_cohort, cohort_group):
         """

@@ -8,7 +8,7 @@ aren't installed.
 This script counts on scripts/dependencies/enumerate.sh having already
 been run in order to generate a dependency data file to work from.
 """
-from __future__ import absolute_import, print_function
+
 
 import os
 import re
@@ -37,10 +37,10 @@ with open(data_path, 'r') as f:
             continue
         if dev_pattern.search(to_name) and not dev_pattern.search(from_name):
             # We usually don't care about dependencies between modules in site-packages
-            if from_root.endswith(u'site-packages') and to_root.endswith(u'site-packages'):
+            if from_root.endswith('site-packages') and to_root.endswith('site-packages'):
                 continue
             # The django-debug-toolbar URL imports are safely behind conditions on INSTALLED_APPS
-            if from_name in {u'cms/urls.py', u'lms/urls.py'} and to_name == u'debug_toolbar':
+            if from_name in {'cms/urls.py', 'lms/urls.py'} and to_name == 'debug_toolbar':
                 continue
             print(dep)
             exit_status = 1

@@ -51,7 +51,7 @@ class TestContentHighlights(ModuleStoreTestCase):
     @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, False)
     def test_flag_disabled(self):
         with self.store.bulk_operations(self.course_key):
-            self._create_chapter(highlights=[u'highlights'])
+            self._create_chapter(highlights=['highlights'])
 
         self.assertFalse(course_has_highlights(self.course_key))
         with self.assertRaises(CourseUpdateDoesNotExist):
@@ -59,7 +59,7 @@ class TestContentHighlights(ModuleStoreTestCase):
 
     @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
     def test_flag_enabled(self):
-        highlights = [u'highlights']
+        highlights = ['highlights']
         with self.store.bulk_operations(self.course_key):
             self._create_chapter(highlights=highlights)
         self.assertTrue(course_has_highlights(self.course_key))
@@ -70,7 +70,7 @@ class TestContentHighlights(ModuleStoreTestCase):
 
     @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
     def test_highlights_disabled_for_messaging(self):
-        highlights = [u'A test highlight.']
+        highlights = ['A test highlight.']
         with self.store.bulk_operations(self.course_key):
             self._create_chapter(highlights=highlights)
             self.course.highlights_enabled_for_messaging = False
@@ -88,8 +88,8 @@ class TestContentHighlights(ModuleStoreTestCase):
     @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
     def test_course_with_no_highlights(self):
         with self.store.bulk_operations(self.course_key):
-            self._create_chapter(display_name=u"Week 1")
-            self._create_chapter(display_name=u"Week 2")
+            self._create_chapter(display_name="Week 1")
+            self._create_chapter(display_name="Week 2")
 
         self.course = self.store.get_course(self.course_key)
         self.assertEqual(len(self.course.get_children()), 2)
@@ -101,19 +101,19 @@ class TestContentHighlights(ModuleStoreTestCase):
     @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
     def test_course_with_highlights(self):
         with self.store.bulk_operations(self.course_key):
-            self._create_chapter(highlights=[u'a', u'b', u'á'])
+            self._create_chapter(highlights=['a', 'b', 'á'])
             self._create_chapter(highlights=[])
-            self._create_chapter(highlights=[u'skipped a week'])
+            self._create_chapter(highlights=['skipped a week'])
 
         self.assertTrue(course_has_highlights(self.course_key))
 
         self.assertEqual(
             get_week_highlights(self.user, self.course_key, week_num=1),
-            [u'a', u'b', u'á'],
+            ['a', 'b', 'á'],
         )
         self.assertEqual(
             get_week_highlights(self.user, self.course_key, week_num=2),
-            [u'skipped a week'],
+            ['skipped a week'],
         )
         with self.assertRaises(CourseUpdateDoesNotExist):
             get_week_highlights(self.user, self.course_key, week_num=3)
@@ -122,7 +122,7 @@ class TestContentHighlights(ModuleStoreTestCase):
     def test_staff_only(self):
         with self.store.bulk_operations(self.course_key):
             self._create_chapter(
-                highlights=[u"I'm a secret!"],
+                highlights=["I'm a secret!"],
                 visible_to_staff_only=True,
             )
 

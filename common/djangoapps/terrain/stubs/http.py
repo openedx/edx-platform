@@ -4,12 +4,12 @@ Stub implementation of an HTTP service.
 
 import json
 import threading
-import urllib
-import urlparse
-from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
+import urllib.request, urllib.parse, urllib.error
+import urllib.parse
+from http.server import BaseHTTPRequestHandler, HTTPServer
 from functools import wraps
 from logging import getLogger
-from SocketServer import ThreadingMixIn
+from socketserver import ThreadingMixIn
 
 from lazy import lazy
 
@@ -107,10 +107,10 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler, object):
         # None of our parameters are lists, however, so we map [val] --> val
         # If the list contains multiple entries, we pick the first one
         try:
-            post_dict = urlparse.parse_qs(contents, keep_blank_values=True)
+            post_dict = urllib.parse.parse_qs(contents, keep_blank_values=True)
             return {
                 key: list_val[0]
-                for key, list_val in post_dict.items()
+                for key, list_val in list(post_dict.items())
             }
 
         except:
@@ -121,13 +121,13 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler, object):
         """
         Return the GET parameters (querystring in the URL).
         """
-        query = urlparse.urlparse(self.path).query
+        query = urllib.parse.urlparse(self.path).query
 
         # By default, `parse_qs` returns a list of values for each param
         # For convenience, we replace lists of 1 element with just the element
         return {
             key: value[0] if len(value) == 1 else value
-            for key, value in urlparse.parse_qs(query).items()
+            for key, value in list(urllib.parse.parse_qs(query).items())
         }
 
     @lazy
@@ -136,7 +136,7 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler, object):
         Return the URL path without GET parameters.
         Removes the trailing slash if there is one.
         """
-        path = urlparse.urlparse(self.path).path
+        path = urllib.parse.urlparse(self.path).path
         if path.endswith('/'):
             return path[:-1]
         else:
@@ -153,22 +153,22 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler, object):
         if self.path == "/set_config" or self.path == "/set_config/":
 
             if len(self.post_dict) > 0:
-                for key, value in self.post_dict.iteritems():
+                for key, value in self.post_dict.items():
 
                     # Decode the params as UTF-8
                     try:
-                        key = unicode(key, 'utf-8')
-                        value = unicode(value, 'utf-8')
+                        key = str(key, 'utf-8')
+                        value = str(value, 'utf-8')
                     except UnicodeDecodeError:
                         self.log_message("Could not decode request params as UTF-8")
 
-                    self.log_message(u"Set config '{0}' to '{1}'".format(key, value))
+                    self.log_message("Set config '{0}' to '{1}'".format(key, value))
 
                     try:
                         value = json.loads(value)
 
                     except ValueError:
-                        self.log_message(u"Could not parse JSON: {0}".format(value))
+                        self.log_message("Could not parse JSON: {0}".format(value))
                         self.send_response(400)
 
                     else:
@@ -198,7 +198,7 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler, object):
 
         BaseHTTPRequestHandler.send_response(self, status_code)
 
-        for (key, value) in headers.items():
+        for (key, value) in list(headers.items()):
             self.send_header(key, value)
 
         if len(headers) > 0:
@@ -221,8 +221,8 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler, object):
         `args` is an array of values to fill into the string.
         """
         if not args:
-            format_str = urllib.unquote(format_str)
-        return u"{0} - - [{1}] {2}\n".format(
+            format_str = urllib.parse.unquote(format_str)
+        return "{0} - - [{1}] {2}\n".format(
             self.client_address[0],
             self.log_date_time_string(),
             format_str % args

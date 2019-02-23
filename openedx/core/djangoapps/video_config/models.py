@@ -49,7 +49,7 @@ class HLSPlaybackEnabledFlag(ConfigurationModel):
 
     def __unicode__(self):
         current_model = HLSPlaybackEnabledFlag.current()
-        return u"HLSPlaybackEnabledFlag: enabled {is_enabled}".format(
+        return "HLSPlaybackEnabledFlag: enabled {is_enabled}".format(
             is_enabled=current_model.is_enabled()
         )
 
@@ -70,8 +70,8 @@ class CourseHLSPlaybackEnabledFlag(ConfigurationModel):
         if self.enabled:
             not_en = ""
 
-        return u"Course '{course_key}': HLS Playback {not_enabled}Enabled".format(
-            course_key=unicode(self.course_id),
+        return "Course '{course_key}': HLS Playback {not_enabled}Enabled".format(
+            course_key=str(self.course_id),
             not_enabled=not_en
         )
 
@@ -116,7 +116,7 @@ class VideoTranscriptEnabledFlag(ConfigurationModel):
 
     def __unicode__(self):
         current_model = VideoTranscriptEnabledFlag.current()
-        return u"VideoTranscriptEnabledFlag: enabled {is_enabled}".format(
+        return "VideoTranscriptEnabledFlag: enabled {is_enabled}".format(
             is_enabled=current_model.is_enabled()
         )
 
@@ -139,8 +139,8 @@ class CourseVideoTranscriptEnabledFlag(ConfigurationModel):
         if self.enabled:
             not_en = ""
 
-        return u"Course '{course_key}': Video Transcript {not_enabled}Enabled".format(
-            course_key=unicode(self.course_id),
+        return "Course '{course_key}': Video Transcript {not_enabled}Enabled".format(
+            course_key=str(self.course_id),
             not_enabled=not_en
         )
 
@@ -153,8 +153,8 @@ class TranscriptMigrationSetting(ConfigurationModel):
     """
     def __unicode__(self):
         return (
-            u"[TranscriptMigrationSetting] Courses {courses} with update if already present as {force}"
-            u" and commit as {commit}"
+            "[TranscriptMigrationSetting] Courses {courses} with update if already present as {force}"
+            " and commit as {commit}"
         ).format(
             courses='ALL' if self.all_courses else self.course_ids,
             force=self.force_update,
@@ -198,7 +198,7 @@ class MigrationEnqueuedCourse(TimeStampedModel):
     command_run = PositiveIntegerField(default=0)
 
     def __unicode__(self):
-        return u'MigrationEnqueuedCourse: ID={course_id}, Run={command_run}'.format(
+        return 'MigrationEnqueuedCourse: ID={course_id}, Run={command_run}'.format(
             course_id=self.course_id, command_run=self.command_run
         )
 
@@ -259,6 +259,6 @@ class UpdatedCourseVideos(TimeStampedModel):
         unique_together = ('course_id', 'edx_video_id')
 
     def __unicode__(self):
-        return u'UpdatedCourseVideos: CourseID={course_id}, VideoID={video_id}, Run={command_run}'.format(
+        return 'UpdatedCourseVideos: CourseID={course_id}, VideoID={video_id}, Run={command_run}'.format(
             course_id=self.course_id, video_id=self.edx_video_id, command_run=self.command_run
         )

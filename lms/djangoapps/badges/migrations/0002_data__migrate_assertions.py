@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+
 
 import json
 from datetime import datetime
@@ -44,7 +44,7 @@ def forwards(apps, schema_editor):
             badge_class.image.name = icon.name
             badge_class.save()
             classes[(badge.course_id, badge.mode)] = badge_class
-        if isinstance(badge.data, basestring):
+        if isinstance(badge.data, str):
             data = badge.data
         else:
             data = json.dumps(badge.data)
@@ -82,7 +82,7 @@ def backwards(apps, schema_editor):
         if not badge.badge_class.mode:
             # Can't preserve old badges without modes.
             continue
-        if isinstance(badge.data, basestring):
+        if isinstance(badge.data, str):
             data = badge.data
         else:
             data = json.dumps(badge.data)

@@ -33,16 +33,16 @@ class CourseKeyField(mongoengine.StringField):
         """
         # calling super b/c it decodes utf (and doesn't have circularity of from_python)
         course_key = super(CourseKeyField, self).to_python(course_key)
-        assert isinstance(course_key, (NoneType, basestring, CourseKey))
+        assert isinstance(course_key, (NoneType, str, CourseKey))
         if course_key == '':
             return None
-        if isinstance(course_key, basestring):
+        if isinstance(course_key, str):
             return CourseKey.from_string(course_key)
         else:
             return course_key
 
     def validate(self, value):
-        assert isinstance(value, (NoneType, basestring, CourseKey))
+        assert isinstance(value, (NoneType, str, CourseKey))
         if isinstance(value, CourseKey):
             return super(CourseKeyField, self).validate(text_type(value))
         else:
@@ -69,17 +69,17 @@ class UsageKeyField(mongoengine.StringField):
         """
         Deserialize to a UsageKey instance: for now it's a location missing the run
         """
-        assert isinstance(location, (NoneType, basestring, UsageKey))
+        assert isinstance(location, (NoneType, str, UsageKey))
         if location == '':
             return None
-        if isinstance(location, basestring):
+        if isinstance(location, str):
             location = super(UsageKeyField, self).to_python(location)
             return Location.from_string(location)
         else:
             return location
 
     def validate(self, value):
-        assert isinstance(value, (NoneType, basestring, UsageKey))
+        assert isinstance(value, (NoneType, str, UsageKey))
         if isinstance(value, UsageKey):
             return super(UsageKeyField, self).validate(text_type(value))
         else:

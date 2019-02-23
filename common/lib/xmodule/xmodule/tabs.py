@@ -20,14 +20,13 @@ _ = lambda text: text
 READ_ONLY_COURSE_TAB_ATTRIBUTES = ['type']
 
 
-class CourseTab(object):
+class CourseTab(object, metaclass=ABCMeta):
     """
     The Course Tab class is a data abstraction for all tabs (i.e., course navigation links) within a course.
     It is an abstract class - to be inherited by various tab types.
     Derived classes are expected to override methods as needed.
     When a new tab class is created, it should define the type and add it in this class' factory method.
     """
-    __metaclass__ = ABCMeta
 
     # Class property that specifies the type of the tab.  It is generally a constant value for a
     # subclass, shared by all instances of the subclass.
@@ -291,7 +290,7 @@ class TabFragmentViewMixin(object):
         """
         Renders this tab to a web fragment.
         """
-        return self.fragment_view.render_to_fragment(request, course_id=unicode(course.id), **kwargs)
+        return self.fragment_view.render_to_fragment(request, course_id=str(course.id), **kwargs)
 
 
 class StaticTab(CourseTab):

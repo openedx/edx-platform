@@ -4,7 +4,7 @@ Common test utilities for courseware functionality
 
 from abc import ABCMeta, abstractmethod
 from datetime import datetime, timedelta
-from urllib import urlencode
+from urllib.parse import urlencode
 
 import ddt
 from mock import patch
@@ -19,12 +19,11 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, chec
 
 
 @ddt.ddt
-class RenderXBlockTestMixin(object):
+class RenderXBlockTestMixin(object, metaclass=ABCMeta):
     """
     Mixin for testing the courseware.render_xblock function.
     It can be used for testing any higher-level endpoint that calls this method.
     """
-    __metaclass__ = ABCMeta
 
     # DOM elements that appear in the LMS Courseware,
     # but are excluded from the xBlock-only rendering.

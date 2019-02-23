@@ -10,7 +10,7 @@ class CmsUserTasksConfig(AppConfig):
     """
     Application Configuration for cms_user_tasks.
     """
-    name = u'cms_user_tasks'
+    name = 'cms_user_tasks'
 
     def ready(self):
         """

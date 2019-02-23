@@ -58,8 +58,8 @@ def check_catalog_integration_and_get_user(error_message_field):
             user = catalog_integration.get_service_user()
         except ObjectDoesNotExist:
             logger.error(
-                u'Catalog service user with username [{username}] does not exist. '
-                u'{field} will not be retrieved.'.format(
+                'Catalog service user with username [{username}] does not exist. '
+                '{field} will not be retrieved.'.format(
                     username=catalog_integration.service_username,
                     field=error_message_field,
                 )
@@ -68,7 +68,7 @@ def check_catalog_integration_and_get_user(error_message_field):
         return user, catalog_integration
     else:
         logger.error(
-            u'Unable to retrieve details about {field} because Catalog Integration is not enabled'.format(
+            'Unable to retrieve details about {field} because Catalog Integration is not enabled'.format(
                 field=error_message_field,
             )
         )
@@ -90,7 +90,7 @@ def get_programs(site, uuid=None):
         list of dict, representing programs.
         dict, if a specific program is requested.
     """
-    missing_details_msg_tpl = u'Failed to get details for program {uuid} from the cache.'
+    missing_details_msg_tpl = 'Failed to get details for program {uuid} from the cache.'
 
     if uuid:
         program = cache.get(PROGRAM_CACHE_KEY_TPL.format(uuid=uuid))
@@ -100,7 +100,7 @@ def get_programs(site, uuid=None):
         return program
     uuids = cache.get(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=site.domain), [])
     if not uuids:
-        logger.warning(u'Failed to get program UUIDs from the cache for site {}.'.format(site.domain))
+        logger.warning('Failed to get program UUIDs from the cache for site {}.'.format(site.domain))
 
     programs = cache.get_many([PROGRAM_CACHE_KEY_TPL.format(uuid=uuid) for uuid in uuids])
     programs = list(programs.values())
@@ -116,7 +116,7 @@ def get_programs(site, uuid=None):
     missing_uuids = set(uuids) - set(program['uuid'] for program in programs)
     if missing_uuids:
         logger.info(
-            u'Failed to get details for {count} programs. Retrying.'.format(count=len(missing_uuids))
+            'Failed to get details for {count} programs. Retrying.'.format(count=len(missing_uuids))
         )
 
         retried_programs = cache.get_many([PROGRAM_CACHE_KEY_TPL.format(uuid=uuid) for uuid in missing_uuids])
@@ -171,7 +171,7 @@ def get_pathways(site, pathway_id=None):
         list of dict, representing pathways.
         dict, if a specific pathway is requested.
     """
-    missing_details_msg_tpl = u'Failed to get details for credit pathway {id} from the cache.'
+    missing_details_msg_tpl = 'Failed to get details for credit pathway {id} from the cache.'
 
     if pathway_id:
         pathway = cache.get(PATHWAY_CACHE_KEY_TPL.format(id=pathway_id))
@@ -184,7 +184,7 @@ def get_pathways(site, pathway_id=None):
         logger.warning('Failed to get credit pathway ids from the cache.')
 
     pathways = cache.get_many([PATHWAY_CACHE_KEY_TPL.format(id=pathway_id) for pathway_id in pathway_ids])
-    pathways = pathways.values()
+    pathways = list(pathways.values())
 
     # The get_many above sometimes fails to bring back details cached on one or
     # more Memcached nodes. It doesn't look like these keys are being evicted.
@@ -197,13 +197,13 @@ def get_pathways(site, pathway_id=None):
     missing_ids = set(pathway_ids) - set(pathway['id'] for pathway in pathways)
     if missing_ids:
         logger.info(
-            u'Failed to get details for {count} pathways. Retrying.'.format(count=len(missing_ids))
+            'Failed to get details for {count} pathways. Retrying.'.format(count=len(missing_ids))
         )
 
         retried_pathways = cache.get_many(
             [PATHWAY_CACHE_KEY_TPL.format(id=pathway_id) for pathway_id in missing_ids]
         )
-        pathways += retried_pathways.values()
+        pathways += list(retried_pathways.values())
 
         still_missing_ids = set(pathway_ids) - set(pathway['id'] for pathway in pathways)
         for missing_id in still_missing_ids:
@@ -240,8 +240,8 @@ def format_price(price, symbol='$', code='USD'):
     :return: A formatted price string, i.e. '$10 USD', '$10.52 USD'.
     """
     if int(price) == price:
-        return u'{}{} {}'.format(symbol, int(price), code)
-    return u'{}{:0.2f} {}'.format(symbol, price, code)
+        return '{}{} {}'.format(symbol, int(price), code)
+    return '{}{:0.2f} {}'.format(symbol, price, code)
 
 
 def get_localized_price_text(price, request):
@@ -399,7 +399,7 @@ def get_course_uuid_for_course(course_run_key):
         course_run_data = get_edx_api_data(
             catalog_integration,
             'course_runs',
-            resource_id=unicode(course_run_key),
+            resource_id=str(course_run_key),
             api=api,
             cache_key=run_cache_key if catalog_integration.is_cache_enabled else None,
             long_term_cache=True,
@@ -506,7 +506,7 @@ def get_course_run_details(course_run_key, fields):
     """
     course_run_details = dict()
     user, catalog_integration = check_catalog_integration_and_get_user(
-        error_message_field=u'Data for course_run {}'.format(course_run_key)
+        error_message_field='Data for course_run {}'.format(course_run_key)
     )
     if user:
         api = create_catalog_api_client(user)

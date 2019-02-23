@@ -7,7 +7,7 @@ from datetime import datetime
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import ToyCourseFactory
 
-TEST_PASSWORD = u'edx'
+TEST_PASSWORD = 'edx'
 
 
 class CourseApiFactoryMixin(object):
@@ -36,7 +36,7 @@ class CourseApiFactoryMixin(object):
         """
         return UserFactory(
             username=username,
-            email=u'{}@example.com'.format(username),
+            email='{}@example.com'.format(username),
             password=TEST_PASSWORD,
             is_staff=is_staff
         )

@@ -59,7 +59,7 @@ def get_old_style_versioned_asset_url(asset_path):
     try:
         locator = StaticContent.get_location_from_path(asset_path)
         content = AssetManager.find(locator, as_stream=True)
-        return u'{}/{}{}'.format(VERSIONED_ASSETS_PREFIX, content.content_digest, asset_path)
+        return '{}/{}{}'.format(VERSIONED_ASSETS_PREFIX, content.content_digest, asset_path)
     except (InvalidKeyError, ItemNotFoundError):
         pass
 
@@ -89,14 +89,14 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
 
         # A locked asset
         cls.locked_asset = cls.course_key.make_asset_key('asset', 'sample_static.html')
-        cls.url_locked = unicode(cls.locked_asset)
+        cls.url_locked = str(cls.locked_asset)
         cls.url_locked_versioned = get_versioned_asset_url(cls.url_locked)
         cls.url_locked_versioned_old_style = get_old_style_versioned_asset_url(cls.url_locked)
         cls.contentstore.set_attr(cls.locked_asset, 'locked', True)
 
         # An unlocked asset
         cls.unlocked_asset = cls.course_key.make_asset_key('asset', 'another_static.txt')
-        cls.url_unlocked = unicode(cls.unlocked_asset)
+        cls.url_unlocked = str(cls.unlocked_asset)
         cls.url_unlocked_versioned = get_versioned_asset_url(cls.url_unlocked)
         cls.url_unlocked_versioned_old_style = get_old_style_versioned_asset_url(cls.url_unlocked)
         cls.length_unlocked = cls.contentstore.get_attr(cls.unlocked_asset, 'length')
@@ -292,7 +292,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         """
         resp = self.client.get(self.url_unlocked)
         self.assertEqual(resp.status_code, 200)
-        self.assertEquals('Origin', resp['Vary'])
+        self.assertEqual('Origin', resp['Vary'])
 
     @patch('openedx.core.djangoapps.contentserver.models.CourseAssetCacheTtlConfig.get_cache_ttl')
     def test_cache_headers_with_ttl_unlocked(self, mock_get_cache_ttl):
@@ -305,7 +305,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         resp = self.client.get(self.url_unlocked)
         self.assertEqual(resp.status_code, 200)
         self.assertIn('Expires', resp)
-        self.assertEquals('public, max-age=10, s-maxage=10', resp['Cache-Control'])
+        self.assertEqual('public, max-age=10, s-maxage=10', resp['Cache-Control'])
 
     @patch('openedx.core.djangoapps.contentserver.models.CourseAssetCacheTtlConfig.get_cache_ttl')
     def test_cache_headers_with_ttl_locked(self, mock_get_cache_ttl):
@@ -322,7 +322,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         resp = self.client.get(self.url_locked)
         self.assertEqual(resp.status_code, 200)
         self.assertNotIn('Expires', resp)
-        self.assertEquals('private, no-cache, no-store', resp['Cache-Control'])
+        self.assertEqual('private, no-cache, no-store', resp['Cache-Control'])
 
     @patch('openedx.core.djangoapps.contentserver.models.CourseAssetCacheTtlConfig.get_cache_ttl')
     def test_cache_headers_without_ttl_unlocked(self, mock_get_cache_ttl):
@@ -352,7 +352,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         resp = self.client.get(self.url_locked)
         self.assertEqual(resp.status_code, 200)
         self.assertNotIn('Expires', resp)
-        self.assertEquals('private, no-cache, no-store', resp['Cache-Control'])
+        self.assertEqual('private, no-cache, no-store', resp['Cache-Control'])
 
     def test_get_expiration_value(self):
         start_dt = datetime.datetime.strptime("Thu, 01 Dec 1983 20:00:00 GMT", HTTP_DATE_FORMAT)
@@ -444,6 +444,6 @@ class ParseRangeHeaderTestCase(unittest.TestCase):
     )
     @ddt.unpack
     def test_invalid_syntax(self, header_value, exception_class, exception_message_regex):
-        self.assertRaisesRegexp(
+        self.assertRaisesRegex(
             exception_class, exception_message_regex, parse_range_header, header_value, self.content_length
         )

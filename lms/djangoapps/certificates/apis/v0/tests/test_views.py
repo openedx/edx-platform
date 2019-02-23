@@ -76,7 +76,7 @@ class CertificatesRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestCase,
                 'grade': '0.88',
                 'download_url': 'www.google.com',
                 'certificate_type': CourseMode.VERIFIED,
-                'course_id': unicode(self.course.id),
+                'course_id': str(self.course.id),
                 'created_date': self.now,
             }
         )

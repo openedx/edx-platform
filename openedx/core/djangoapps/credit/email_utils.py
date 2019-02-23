@@ -2,10 +2,10 @@
 This file contains utility functions which will responsible for sending emails.
 """
 
-import HTMLParser
+import html.parser
 import logging
 import os
-import urlparse
+import urllib.parse
 import uuid
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
@@ -37,7 +37,7 @@ def send_credit_notifications(username, course_key):
     try:
         user = User.objects.get(username=username)
     except User.DoesNotExist:
-        log.error(u'No user with %s exist', username)
+        log.error('No user with %s exist', username)
         return
 
     course = modulestore().get_course(course_key, depth=0)
@@ -86,10 +86,10 @@ def send_credit_notifications(username, course_key):
     msg_alternative = MIMEMultipart('alternative')
     notification_msg.attach(msg_alternative)
     # render the credit notification templates
-    subject = _(u'Course Credit Eligibility')
+    subject = _('Course Credit Eligibility')
 
     if providers_string:
-        subject = _(u'You are eligible for credit from {providers_string}').format(
+        subject = _('You are eligible for credit from {providers_string}').format(
             providers_string=providers_string
         )
 
@@ -106,7 +106,7 @@ def send_credit_notifications(username, course_key):
                 cur_text = cur_file.read()
                 # use html parser to unescape html characters which are changed
                 # by the 'pynliner' while adding inline css to html content
-                html_parser = HTMLParser.HTMLParser()
+                html_parser = html.parser.HTMLParser()
                 email_body_content = html_parser.unescape(with_inline_css(cur_text))
                 # cache the email body content before rendering it since the
                 # email context will change for each user e.g., 'full_name'
@@ -193,7 +193,7 @@ def _email_url_parser(url_name, extra_param=None):
     site_name = configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME)
     dashboard_url_path = reverse(url_name) + extra_param if extra_param else reverse(url_name)
     dashboard_link_parts = ("https", site_name, dashboard_url_path, '', '', '')
-    return urlparse.urlunparse(dashboard_link_parts)
+    return urllib.parse.urlunparse(dashboard_link_parts)
 
 
 def get_credit_provider_display_names(course_key):
@@ -205,7 +205,7 @@ def get_credit_provider_display_names(course_key):
     Returns:
         List of credit provider display names.
     """
-    course_id = unicode(course_key)
+    course_id = str(course_key)
     credit_config = CreditConfig.current()
 
     cache_key = None
@@ -224,11 +224,11 @@ def get_credit_provider_display_names(course_key):
         user = User.objects.get(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME)
         response = ecommerce_api_client(user).courses(course_id).get(include_products=1)
     except Exception:  # pylint: disable=broad-except
-        log.exception(u"Failed to receive data from the ecommerce course API for Course ID '%s'.", course_id)
+        log.exception("Failed to receive data from the ecommerce course API for Course ID '%s'.", course_id)
         return provider_names
 
     if not response:
-        log.info(u"No Course information found from ecommerce API for Course ID '%s'.", course_id)
+        log.info("No Course information found from ecommerce API for Course ID '%s'.", course_id)
         return provider_names
 
     provider_ids = []
@@ -266,15 +266,15 @@ def make_providers_strings(providers):
 
     elif len(providers) == 2:
         # Translators: The join of two university names (e.g., Harvard and MIT).
-        providers_string = _(u"{first_provider} and {second_provider}").format(
+        providers_string = _("{first_provider} and {second_provider}").format(
             first_provider=providers[0],
             second_provider=providers[1]
         )
     else:
         # Translators: The join of three or more university names. The first of these formatting strings
         # represents a comma-separated list of names (e.g., MIT, Harvard, Dartmouth).
-        providers_string = _(u"{first_providers}, and {last_provider}").format(
-            first_providers=u", ".join(providers[:-1]),
+        providers_string = _("{first_providers}, and {last_provider}").format(
+            first_providers=", ".join(providers[:-1]),
             last_provider=providers[-1]
         )
 

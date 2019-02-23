@@ -52,7 +52,7 @@ import pyparsing
 from lxml import etree
 from six import text_type
 
-import xqueue_interface
+from . import xqueue_interface
 from calc.preview import latex_preview
 from capa.xqueue_interface import XQUEUE_TIMEOUT
 from chem import chemcalc
@@ -82,7 +82,7 @@ class Status(object):
     }
     __slots__ = ('classname', '_status', 'display_name', 'display_tooltip')
 
-    def __init__(self, status, gettext_func=unicode):
+    def __init__(self, status, gettext_func=str):
         self.classname = self.css_classes.get(status, status)
         _ = gettext_func
         names = {
@@ -107,8 +107,8 @@ class Status(object):
                 ['incomplete', 'unanswered', 'unsubmitted'], _('Not yet answered.')
             )
         )
-        self.display_name = names.get(status, unicode(status))
-        self.display_tooltip = tooltips.get(status, u'')
+        self.display_name = names.get(status, str(status))
+        self.display_tooltip = tooltips.get(status, '')
         self._status = status or ''
 
     def __str__(self):
@@ -251,9 +251,9 @@ class InputTypeBase(object):
             self.setup()
         except Exception as err:
             # Something went wrong: add xml to message, but keep the traceback
-            msg = u"Error in xml '{x}': {err} ".format(
+            msg = "Error in xml '{x}': {err} ".format(
                 x=etree.tostring(xml), err=text_type(err))
-            raise Exception, msg, sys.exc_info()[2]
+            raise Exception(msg).with_traceback(sys.exc_info()[2])
 
     @classmethod
     def get_attributes(cls):
@@ -341,14 +341,14 @@ class InputTypeBase(object):
         # Every list should contain the status id
         status_id = 'status_' + self.input_id
         descriptions.append(status_id)
-        descriptions.extend(self.response_data.get('descriptions', {}).keys())
+        descriptions.extend(list(self.response_data.get('descriptions', {}).keys()))
         description_ids = ' '.join(descriptions)
         context.update(
             {'describedby_html': HTML('aria-describedby="{}"').format(description_ids)}
         )
 
         context.update(
-            (a, v) for (a, v) in self.loaded_attributes.iteritems() if a in self.to_render
+            (a, v) for (a, v) in self.loaded_attributes.items() if a in self.to_render
         )
         context.update(self._extra_context())
         if self.answervariable:
@@ -554,7 +554,7 @@ class ChoiceGroup(InputTypeBase):
         return choices
 
     def get_user_visible_answer(self, internal_answer):
-        if isinstance(internal_answer, basestring):
+        if isinstance(internal_answer, str):
             return self._choices_map[internal_answer]
 
         return [self._choices_map[i] for i in internal_answer]
@@ -689,7 +689,7 @@ class TextLine(InputTypeBase):
                 'class_name': self.loaded_attributes['preprocessorClassName'],
                 'script_src': self.loaded_attributes['preprocessorSrc'],
             }
-            if None in self.preprocessor.values():
+            if None in list(self.preprocessor.values()):
                 self.preprocessor = None
 
     def _extra_context(self):
@@ -929,7 +929,7 @@ class MatlabInput(CodeInput):
         queue_msg = self.queue_msg
         if len(self.queue_msg) > 0:  # An empty string cannot be parsed as XML but is okay to include in the template.
             try:
-                etree.XML(HTML(u'<div>{0}</div>').format(HTML(self.queue_msg)))
+                etree.XML(HTML('<div>{0}</div>').format(HTML(self.queue_msg)))
             except etree.XMLSyntaxError:
                 try:
                     html5lib.parseFragment(self.queue_msg, treebuilder='lxml', namespaceHTMLElements=False)[0]
@@ -1367,7 +1367,7 @@ class DragAndDropInput(InputTypeBase):
 
             dic = dict()
 
-            for attr_name in tag_attrs[tag_type].keys():
+            for attr_name in list(tag_attrs[tag_type].keys()):
                 dic[attr_name] = Attribute(attr_name,
                                            default=tag_attrs[tag_type][attr_name]).parse_from_xml(tag)
 
@@ -1594,7 +1594,7 @@ class AnnotationInput(InputTypeBase):
             d = {}
 
         comment_value = d.get('comment', '')
-        if not isinstance(comment_value, basestring):
+        if not isinstance(comment_value, str):
             comment_value = ''
 
         options_value = d.get('options', [])

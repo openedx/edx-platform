@@ -114,7 +114,7 @@ def sale_order_record_features(course_id, features):
             coupon_codes = [redemption.coupon.code for redemption in coupon_redemption]
             order_item_dict.update({'coupon_code': ", ".join(coupon_codes)})
 
-        sale_order_dict.update(dict(order_item_dict.items()))
+        sale_order_dict.update(dict(list(order_item_dict.items())))
 
         return sale_order_dict
 
@@ -172,7 +172,7 @@ def sale_record_features(course_id, features):
 
         course_reg_dict['course_id'] = text_type(course_id)
         course_reg_dict.update({'codes': ", ".join(codes)})
-        sale_dict.update(dict(course_reg_dict.items()))
+        sale_dict.update(dict(list(course_reg_dict.items())))
 
         return sale_dict
 
@@ -191,7 +191,7 @@ def issued_certificates(course_key, features):
     ]
     """
 
-    report_run_date = datetime.date.today().strftime(u"%B %d, %Y")
+    report_run_date = datetime.date.today().strftime("%B %d, %Y")
     certificate_features = [x for x in CERTIFICATE_FEATURES if x in features]
     generated_certificates = list(GeneratedCertificate.eligible_certificates.filter(
         course_id=course_key,
@@ -240,7 +240,7 @@ def enrolled_students_features(course_key, features):
             DjangoJSONEncoder().default(attr)
             return attr
         except TypeError:
-            return unicode(attr)
+            return str(attr)
 
     def extract_student(student, features):
         """ convert student to dictionary """
@@ -340,12 +340,12 @@ def get_proctored_exam_results(course_key, features):
 
         for status in comment_statuses:
             comment_list = exam_attempt.get(
-                u'{status} Comments'.format(status=status),
+                '{status} Comments'.format(status=status),
                 []
             )
             proctored_exam.update({
-                u'{status} Count'.format(status=status): len(comment_list),
-                u'{status} Comments'.format(status=status): '; '.join(comment_list),
+                '{status} Count'.format(status=status): len(comment_list),
+                '{status} Comments'.format(status=status): '; '.join(comment_list),
             })
 
         return proctored_exam
@@ -518,26 +518,26 @@ def dump_grading_context(course):
         msg += '\n'
         msg += "Graded sections:\n"
         for subgrader, category, weight in course.grader.subgraders:
-            msg += u"  subgrader=%s, type=%s, category=%s, weight=%s\n"\
+            msg += "  subgrader=%s, type=%s, category=%s, weight=%s\n"\
                 % (subgrader.__class__, subgrader.type, category, weight)
             subgrader.index = 1
             graders[subgrader.type] = subgrader
     msg += hbar
-    msg += u"Listing grading context for course %s\n" % text_type(course.id)
+    msg += "Listing grading context for course %s\n" % text_type(course.id)
 
     gcontext = grading_context_for_course(course)
     msg += "graded sections:\n"
 
-    msg += '%s\n' % gcontext['all_graded_subsections_by_type'].keys()
-    for (gsomething, gsvals) in gcontext['all_graded_subsections_by_type'].items():
-        msg += u"--> Section %s:\n" % (gsomething)
+    msg += '%s\n' % list(gcontext['all_graded_subsections_by_type'].keys())
+    for (gsomething, gsvals) in list(gcontext['all_graded_subsections_by_type'].items()):
+        msg += "--> Section %s:\n" % (gsomething)
         for sec in gsvals:
             sdesc = sec['subsection_block']
             frmat = getattr(sdesc, 'format', None)
             aname = ''
             if frmat in graders:
                 gform = graders[frmat]
-                aname = u'%s %02d' % (gform.short_label, gform.index)
+                aname = '%s %02d' % (gform.short_label, gform.index)
                 gform.index += 1
             elif sdesc.display_name in graders:
                 gform = graders[sdesc.display_name]
@@ -545,7 +545,7 @@ def dump_grading_context(course):
             notes = ''
             if getattr(sdesc, 'score_by_attempt', False):
                 notes = ', score by attempt!'
-            msg += u"      %s (format=%s, Assignment=%s%s)\n"\
+            msg += "      %s (format=%s, Assignment=%s%s)\n"\
                 % (sdesc.display_name, frmat, aname, notes)
     msg += "all graded blocks:\n"
     msg += "length=%d\n" % gcontext['count_all_graded_blocks']

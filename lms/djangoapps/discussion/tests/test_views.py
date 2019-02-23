@@ -21,7 +21,7 @@ from django_comment_client.tests.group_id import (
     GroupIdAssertionMixin,
     NonCohortedTopicGroupIdTestMixin
 )
-from django_comment_client.tests.unicode import UnicodeTestMixin
+from django_comment_client.tests.str import UnicodeTestMixin
 from django_comment_client.tests.utils import (
     CohortedTestCase,
     ForumsEnableMixin,
@@ -292,7 +292,7 @@ class PartialDictMatcher(object):
     def __eq__(self, other):
         return all([
             key in other and other[key] == value
-            for key, value in self.expected_values.iteritems()
+            for key, value in self.expected_values.items()
         ])
 
 
@@ -325,11 +325,11 @@ class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase):
             "test_thread_id"
         )
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         response_data = json.loads(response.content)
         # strip_none is being used to perform the same transform that the
         # django view performs prior to writing thread data to the response
-        self.assertEquals(
+        self.assertEqual(
             response_data["content"],
             strip_none(make_mock_thread_data(course=self.course, text=text, thread_id=thread_id, num_children=1))
         )
@@ -361,11 +361,11 @@ class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase):
             "dummy_discussion_id",
             "test_thread_id"
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         response_data = json.loads(response.content)
         # strip_none is being used to perform the same transform that the
         # django view performs prior to writing thread data to the response
-        self.assertEquals(
+        self.assertEqual(
             response_data["content"],
             strip_none(make_mock_thread_data(course=self.course, text=text, thread_id=thread_id, num_children=1))
         )
@@ -392,7 +392,7 @@ class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase):
             "dummy_discussion_id",
             "dummy_thread_id"
         )
-        self.assertEquals(response.status_code, 405)
+        self.assertEqual(response.status_code, 405)
 
     def test_not_found(self, mock_request):
         request = RequestFactory().get("dummy_url")
@@ -481,8 +481,8 @@ class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
                     "dummy_discussion_id",
                     test_thread_id
                 )
-            self.assertEquals(response.status_code, 200)
-            self.assertEquals(len(json.loads(response.content)["content"]["children"]), num_thread_responses)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(json.loads(response.content)["content"]["children"]), num_thread_responses)
 
         # Test uncached first, then cached now that the cache is warm.
         cached_calls = [
@@ -523,9 +523,9 @@ class SingleCohortedThreadTestCase(CohortedTestCase):
             self.mock_thread_id
         )
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         response_data = json.loads(response.content)
-        self.assertEquals(
+        self.assertEqual(
             response_data["content"],
             make_mock_thread_data(
                 course=self.course,
@@ -545,18 +545,18 @@ class SingleCohortedThreadTestCase(CohortedTestCase):
         self.client.login(username=self.student.username, password='test')
         response = self.client.get(
             reverse('single_thread', kwargs={
-                'course_id': unicode(self.course.id),
+                'course_id': str(self.course.id),
                 'discussion_id': "cohorted_topic",
                 'thread_id': self.mock_thread_id,
             })
         )
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
         html = response.content
 
         # Verify that the group name is correctly included in the HTML
-        self.assertRegexpMatches(html, r'"group_name": "student_cohort"')
+        self.assertRegex(html, r'"group_name": "student_cohort"')
 
 
 @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
@@ -666,7 +666,7 @@ class SingleThreadGroupIdTestCase(CohortedTestCase, GroupIdAssertionMixin):
         self.client.login(username=user.username, password='test')
 
         return self.client.get(
-            reverse('single_thread', args=[unicode(self.course.id), commentable_id, "dummy_thread_id"]),
+            reverse('single_thread', args=[str(self.course.id), commentable_id, "dummy_thread_id"]),
             data=request_data,
             **headers
         )
@@ -729,7 +729,7 @@ class ForumFormDiscussionContentGroupTestCase(ForumsEnableMixin, ContentGroupTes
         )
         self.client.login(username=user.username, password='test')
         return self.client.get(
-            reverse("forum_form_discussion", args=[unicode(self.course.id)]),
+            reverse("forum_form_discussion", args=[str(self.course.id)]),
             HTTP_X_REQUESTED_WITH="XMLHttpRequest"
         )
 
@@ -794,7 +794,7 @@ class SingleThreadContentGroupTestCase(ForumsEnableMixin, UrlResetMixin, Content
         def call_single_thread():
             self.client.login(username=user.username, password='test')
             return self.client.get(
-                reverse('single_thread', args=[unicode(self.course.id), discussion_id, thread_id])
+                reverse('single_thread', args=[str(self.course.id), discussion_id, thread_id])
             )
 
         if should_have_access:
@@ -917,7 +917,7 @@ class InlineDiscussionContextTestCase(ForumsEnableMixin, ModuleStoreTestCase):
 
         response = views.inline_discussion(
             request,
-            unicode(self.course.id),
+            str(self.course.id),
             self.discussion_topic_id,
         )
 
@@ -995,7 +995,7 @@ class ForumFormDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdT
 
         self.client.login(username=user.username, password='test')
         return self.client.get(
-            reverse("forum_form_discussion", args=[unicode(self.course.id)]),
+            reverse("forum_form_discussion", args=[str(self.course.id)]),
             data=request_data,
             **headers
         )
@@ -1047,7 +1047,7 @@ class UserProfileDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupI
 
         self.client.login(username=requesting_user.username, password='test')
         return self.client.get(
-            reverse('user_profile', args=[unicode(self.course.id), profiled_user.id]),
+            reverse('user_profile', args=[str(self.course.id), profiled_user.id]),
             data=request_data,
             **headers
         )
@@ -1290,7 +1290,7 @@ class UserProfileTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
 
         response = self.client.get(
             reverse('user_profile', kwargs={
-                'course_id': unicode(self.course.id),
+                'course_id': str(self.course.id),
                 'user_id': self.profiled_user.id,
             }),
             data=params,
@@ -1315,14 +1315,14 @@ class UserProfileTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
         html = response.content
-        self.assertRegexpMatches(html, r'data-page="1"')
-        self.assertRegexpMatches(html, r'data-num-pages="1"')
-        self.assertRegexpMatches(html, r'<span class="discussion-count">1</span> discussion started')
-        self.assertRegexpMatches(html, r'<span class="discussion-count">2</span> comments')
-        self.assertRegexpMatches(html, ur'&#39;id&#39;: &#39;{}&#39;'.format(self.TEST_THREAD_ID))
-        self.assertRegexpMatches(html, ur'&#39;title&#39;: &#39;{}&#39;'.format(self.TEST_THREAD_TEXT))
-        self.assertRegexpMatches(html, ur'&#39;body&#39;: &#39;{}&#39;'.format(self.TEST_THREAD_TEXT))
-        self.assertRegexpMatches(html, ur'&#39;username&#39;: u&#39;{}&#39;'.format(self.student.username))
+        self.assertRegex(html, r'data-page="1"')
+        self.assertRegex(html, r'data-num-pages="1"')
+        self.assertRegex(html, r'<span class="discussion-count">1</span> discussion started')
+        self.assertRegex(html, r'<span class="discussion-count">2</span> comments')
+        self.assertRegex(html, r'&#39;id&#39;: &#39;{}&#39;'.format(self.TEST_THREAD_ID))
+        self.assertRegex(html, r'&#39;title&#39;: &#39;{}&#39;'.format(self.TEST_THREAD_TEXT))
+        self.assertRegex(html, r'&#39;body&#39;: &#39;{}&#39;'.format(self.TEST_THREAD_TEXT))
+        self.assertRegex(html, r'&#39;username&#39;: u&#39;{}&#39;'.format(self.student.username))
 
     def check_ajax(self, mock_request, **params):
         response = self.get_response(mock_request, params, HTTP_X_REQUESTED_WITH="XMLHttpRequest")
@@ -1552,7 +1552,7 @@ class ForumDiscussionXSSTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTe
         mock_user.return_value.to_dict.return_value = {}
         reverse_url = "%s%s" % (reverse(
             "forum_form_discussion",
-            kwargs={"course_id": unicode(self.course.id)}), '/forum_form_discussion')
+            kwargs={"course_id": str(self.course.id)}), '/forum_form_discussion')
         # Test that malicious code does not appear in html
         url = "%s?%s=%s" % (reverse_url, 'sort_key', malicious_code)
         resp = self.client.get(url)
@@ -1575,7 +1575,7 @@ class ForumDiscussionXSSTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTe
         mock_request.side_effect = make_mock_request_impl(course=self.course, text='dummy')
 
         url = reverse('user_profile',
-                      kwargs={'course_id': unicode(self.course.id), 'user_id': str(self.student.id)})
+                      kwargs={'course_id': str(self.course.id), 'user_id': str(self.student.id)})
         # Test that malicious code does not appear in html
         url_string = "%s?%s=%s" % (url, 'page', malicious_code)
         resp = self.client.get(url_string)
@@ -1772,7 +1772,7 @@ class EnterpriseConsentTestCase(EnterpriseTestConsentRequired, ForumsEnableMixin
         mock_enterprise_customer_for_request.return_value = None
 
         thread_id = 'dummy'
-        course_id = unicode(self.course.id)
+        course_id = str(self.course.id)
         mock_request.side_effect = make_mock_request_impl(course=self.course, text='dummy', thread_id=thread_id)
 
         for url in (
@@ -1830,7 +1830,7 @@ class CourseDiscussionTopicsTestCase(DividedDiscussionsTestCase):
         """
         Verify that we cannot access divide_discussion_topics if we're a non-staff user.
         """
-        self._verify_non_staff_cannot_access(views.discussion_topics, "GET", [unicode(self.course.id)])
+        self._verify_non_staff_cannot_access(views.discussion_topics, "GET", [str(self.course.id)])
 
     def test_get_discussion_topics(self):
         """
@@ -1886,12 +1886,12 @@ class CourseDiscussionsHandlerTestCase(DividedDiscussionsTestCase):
         Returns the static response dict.
         """
         return {
-            u'always_divide_inline_discussions': False,
-            u'divided_inline_discussions': [],
-            u'divided_course_wide_discussions': [],
-            u'id': 1,
-            u'division_scheme': u'cohort',
-            u'available_division_schemes': [u'cohort']
+            'always_divide_inline_discussions': False,
+            'divided_inline_discussions': [],
+            'divided_course_wide_discussions': [],
+            'id': 1,
+            'division_scheme': 'cohort',
+            'available_division_schemes': ['cohort']
         }
 
     def test_non_staff(self):
@@ -1899,10 +1899,10 @@ class CourseDiscussionsHandlerTestCase(DividedDiscussionsTestCase):
         Verify that we cannot access course_discussions_settings_handler if we're a non-staff user.
         """
         self._verify_non_staff_cannot_access(
-            course_discussions_settings_handler, "GET", [unicode(self.course.id)]
+            course_discussions_settings_handler, "GET", [str(self.course.id)]
         )
         self._verify_non_staff_cannot_access(
-            course_discussions_settings_handler, "PATCH", [unicode(self.course.id)]
+            course_discussions_settings_handler, "PATCH", [str(self.course.id)]
         )
 
     def test_update_always_divide_inline_discussion_settings(self):
@@ -2007,7 +2007,7 @@ class CourseDiscussionsHandlerTestCase(DividedDiscussionsTestCase):
             handler=views.course_discussions_settings_handler
         )
         self.assertEqual(
-            u"Incorrect field type for `{}`. Type must be `{}`".format('always_divide_inline_discussions', bool.__name__),
+            "Incorrect field type for `{}`. Type must be `{}`".format('always_divide_inline_discussions', bool.__name__),
             response.get("error")
         )
 
@@ -2120,7 +2120,7 @@ class ThreadViewedEventTestCase(EventTestMixin, ForumsEnableMixin, UrlResetMixin
             commentable_id=self.category.discussion_id,
         )
         url = '/courses/{0}/discussion/forum/{1}/threads/{2}'.format(
-            unicode(self.course.id),
+            str(self.course.id),
             self.category.discussion_id,
             self.DUMMY_THREAD_ID
         )
@@ -2138,9 +2138,9 @@ class ThreadViewedEventTestCase(EventTestMixin, ForumsEnableMixin, UrlResetMixin
             'team_id': self.team.id,
             'url': self.DUMMY_URL,
         }
-        expected_event_items = expected_event.items()
+        expected_event_items = list(expected_event.items())
 
         self.assert_event_emission_count('edx.forum.thread.viewed', 1)
         _, event = self.get_latest_call_args()
-        event_items = event.items()
+        event_items = list(event.items())
         self.assertTrue(kv_pair in event_items for kv_pair in expected_event_items)

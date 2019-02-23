@@ -1,7 +1,7 @@
 import json
 import unittest
 
-import draganddrop
+from . import draganddrop
 
 from .draganddrop import PositionsCompare
 

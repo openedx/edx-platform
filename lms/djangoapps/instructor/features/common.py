@@ -6,7 +6,7 @@ Define common steps for instructor dashboard acceptance tests.
 # pylint: disable=no-member
 # pylint: disable=redefined-outer-name
 
-from __future__ import absolute_import
+
 
 from lettuce import step, world
 from mock import patch
@@ -15,7 +15,7 @@ from courseware.tests.factories import InstructorFactory, StaffFactory
 from openedx.core.lib.tests.tools import assert_in  # pylint: disable=no-name-in-module
 
 
-@step(u'Given I am "([^"]*)" for a very large course')
+@step('Given I am "([^"]*)" for a very large course')
 def make_staff_or_instructor_for_large_course(step, role):
     make_large_course(step, role)
 
@@ -25,7 +25,7 @@ def make_large_course(step, role):
     i_am_staff_or_instructor(step, role)
 
 
-@step(u'Given I am "([^"]*)" for a course')
+@step('Given I am "([^"]*)" for a course')
 def i_am_staff_or_instructor(step, role):  # pylint: disable=unused-argument
     ## In summary: makes a test course, makes a new Staff or Instructor user
     ## (depending on `role`), and logs that user in to the course
@@ -75,12 +75,12 @@ def i_am_staff_or_instructor(step, role):  # pylint: disable=unused-argument
 def go_to_section(section_name):
     # section name should be one of
     # course_info, membership, student_admin, data_download, analytics, send_email
-    world.visit(u'/courses/{}'.format(world.course_key))
-    world.css_click(u'a[href="/courses/{}/instructor"]'.format(world.course_key))
+    world.visit('/courses/{}'.format(world.course_key))
+    world.css_click('a[href="/courses/{}/instructor"]'.format(world.course_key))
     world.css_click('[data-section="{0}"]'.format(section_name))
 
 
-@step(u'I click "([^"]*)"')
+@step('I click "([^"]*)"')
 def click_a_button(step, button):  # pylint: disable=unused-argument
 
     if button == "Generate Grade Report":
@@ -122,7 +122,7 @@ def click_a_button(step, button):  # pylint: disable=unused-argument
         raise ValueError("Unrecognized button option " + button)
 
 
-@step(u'I visit the "([^"]*)" tab')
+@step('I visit the "([^"]*)" tab')
 def click_a_tab(step, tab_name):  # pylint: disable=unused-argument
     # course_info, membership, student_admin, data_download, analytics, send_email
     tab_name_dict = {

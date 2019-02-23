@@ -111,7 +111,7 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
 
     def _get_template_overrides(self):
         templates_override = deepcopy(settings.TEMPLATES)
-        templates_override[0]['OPTIONS']['string_if_invalid'] = u"TEMPLATE WARNING - MISSING VARIABLE [%s]"
+        templates_override[0]['OPTIONS']['string_if_invalid'] = "TEMPLATE WARNING - MISSING VARIABLE [%s]"
         return templates_override
 
     def _schedule_factory(self, offset=None, **factory_kwargs):
@@ -187,7 +187,7 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
             target_day_str = serialize(target_day)
 
             for b in range(self.task.num_bins):
-                LOG.debug(u'Checking bin %d', b)
+                LOG.debug('Checking bin %d', b)
                 expected_queries = NUM_QUERIES_SITE_SCHEDULES
                 if b in bins_in_use:
                     if is_first_match:

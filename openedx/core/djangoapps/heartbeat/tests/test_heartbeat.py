@@ -1,7 +1,7 @@
 """
 Test the heartbeat
 """
-from __future__ import print_function
+
 import json
 
 from django.urls import reverse

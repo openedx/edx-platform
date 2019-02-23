@@ -48,7 +48,7 @@ class XmlImportData(object):
         return etree.tostring(self._xml_node)
 
     def __repr__(self):
-        return u"XmlImportData{!r}".format((
+        return "XmlImportData{!r}".format((
             self._xml_node, self._xml_string, self.course_id,
             self.default_class, self.policy,
             self.filesystem, self.parent, self.xblock_mixins,
@@ -108,7 +108,7 @@ class XmlImportFactory(Factory):
         if inline_xml:
             kwargs['xml_node'].set('not_a_pointer', 'true')
 
-        for key in kwargs.keys():
+        for key in list(kwargs.keys()):
             if key not in XML_IMPORT_ARGS:
                 kwargs['xml_node'].set(key, kwargs.pop(key))
 

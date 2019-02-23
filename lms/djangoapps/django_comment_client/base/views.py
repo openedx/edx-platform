@@ -1,13 +1,13 @@
 """Views for discussion forums."""
 
-from __future__ import print_function
+
 
 import functools
 import json
 import logging
 import random
 import time
-import urlparse
+import urllib.parse
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -237,7 +237,7 @@ def create_thread(request, course_id, commentable_id):
     Given a course and commentable ID, create the thread
     """
 
-    log.debug(u"Creating new thread in %r, id %r", course_id, commentable_id)
+    log.debug("Creating new thread in %r, id %r", course_id, commentable_id)
     course_key = CourseKey.from_string(course_id)
     course = get_course_with_access(request.user, 'load', course_key)
     post = request.POST
@@ -771,18 +771,18 @@ def upload(request, course_id):  # ajax upload file to a question or answer
         )
 
     except exceptions.PermissionDenied as err:
-        error = unicode(err)
+        error = str(err)
     except Exception as err:      # pylint: disable=broad-except
         print(err)
-        logging.critical(unicode(err))
+        logging.critical(str(err))
         error = _('Error uploading file. Please contact the site administrator. Thank you.')
 
     if error == '':
         result = _('Good')
         file_url = file_storage.url(new_file_name)
-        parsed_url = urlparse.urlparse(file_url)
-        file_url = urlparse.urlunparse(
-            urlparse.ParseResult(
+        parsed_url = urllib.parse.urlparse(file_url)
+        file_url = urllib.parse.urlunparse(
+            urllib.parse.ParseResult(
                 parsed_url.scheme,
                 parsed_url.netloc,
                 parsed_url.path,

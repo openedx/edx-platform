@@ -460,7 +460,7 @@ def _accessible_courses_list_from_groups(request):
 
     instructor_courses = UserBasedRole(request.user, CourseInstructorRole.ROLE).courses_with_role()
     staff_courses = UserBasedRole(request.user, CourseStaffRole.ROLE).courses_with_role()
-    all_courses = filter(filter_ccx, instructor_courses | staff_courses)
+    all_courses = list(filter(filter_ccx, instructor_courses | staff_courses))
     courses_list = []
     course_keys = {}
 
@@ -469,7 +469,7 @@ def _accessible_courses_list_from_groups(request):
             raise AccessListFallback
         course_keys[course_access.course_id] = course_access.course_id
 
-    course_keys = course_keys.values()
+    course_keys = list(course_keys.values())
 
     if course_keys:
         courses_list = modulestore().get_course_summaries(course_keys=course_keys)
@@ -501,7 +501,7 @@ def course_listing(request):
     """
 
     optimization_enabled = GlobalStaff().has_user(request.user) and \
-        WaffleSwitchNamespace(name=WAFFLE_NAMESPACE).is_enabled(u'enable_global_staff_optimization')
+        WaffleSwitchNamespace(name=WAFFLE_NAMESPACE).is_enabled('enable_global_staff_optimization')
 
     org = request.GET.get('org', '') if optimization_enabled else None
     courses_iter, in_process_course_actions = get_courses_accessible_to_user(request, org)
@@ -513,20 +513,20 @@ def course_listing(request):
         Return a dict of the data which the view requires for each unsucceeded course
         """
         return {
-            u'display_name': uca.display_name,
-            u'course_key': unicode(uca.course_key),
-            u'org': uca.course_key.org,
-            u'number': uca.course_key.course,
-            u'run': uca.course_key.run,
-            u'is_failed': True if uca.state == CourseRerunUIStateManager.State.FAILED else False,
-            u'is_in_progress': True if uca.state == CourseRerunUIStateManager.State.IN_PROGRESS else False,
-            u'dismiss_link': reverse_course_url(
-                u'course_notifications_handler',
+            'display_name': uca.display_name,
+            'course_key': str(uca.course_key),
+            'org': uca.course_key.org,
+            'number': uca.course_key.course,
+            'run': uca.course_key.run,
+            'is_failed': True if uca.state == CourseRerunUIStateManager.State.FAILED else False,
+            'is_in_progress': True if uca.state == CourseRerunUIStateManager.State.IN_PROGRESS else False,
+            'dismiss_link': reverse_course_url(
+                'course_notifications_handler',
                 uca.course_key,
                 kwargs={
-                    u'action_state_id': uca.id,
+                    'action_state_id': uca.id,
                 },
-            ) if uca.state == CourseRerunUIStateManager.State.FAILED else u''
+            ) if uca.state == CourseRerunUIStateManager.State.FAILED else ''
         }
 
     def format_library_for_view(library):
@@ -535,32 +535,32 @@ def course_listing(request):
         """
 
         return {
-            u'display_name': library.display_name,
-            u'library_key': unicode(library.location.library_key),
-            u'url': reverse_library_url(u'library_handler', unicode(library.location.library_key)),
-            u'org': library.display_org_with_default,
-            u'number': library.display_number_with_default,
-            u'can_edit': has_studio_write_access(request.user, library.location.library_key),
+            'display_name': library.display_name,
+            'library_key': str(library.location.library_key),
+            'url': reverse_library_url('library_handler', str(library.location.library_key)),
+            'org': library.display_org_with_default,
+            'number': library.display_number_with_default,
+            'can_edit': has_studio_write_access(request.user, library.location.library_key),
         }
 
-    split_archived = settings.FEATURES.get(u'ENABLE_SEPARATE_ARCHIVED_COURSES', False)
+    split_archived = settings.FEATURES.get('ENABLE_SEPARATE_ARCHIVED_COURSES', False)
     active_courses, archived_courses = _process_courses_list(courses_iter, in_process_course_actions, split_archived)
     in_process_course_actions = [format_in_process_course_view(uca) for uca in in_process_course_actions]
 
-    return render_to_response(u'index.html', {
-        u'courses': active_courses,
-        u'archived_courses': archived_courses,
-        u'in_process_course_actions': in_process_course_actions,
-        u'libraries_enabled': LIBRARIES_ENABLED,
-        u'libraries': [format_library_for_view(lib) for lib in libraries],
-        u'show_new_library_button': get_library_creator_status(user),
-        u'user': user,
-        u'request_course_creator_url': reverse('request_course_creator'),
-        u'course_creator_status': _get_course_creator_status(user),
-        u'rerun_creator_status': GlobalStaff().has_user(user),
-        u'allow_unicode_course_id': settings.FEATURES.get(u'ALLOW_UNICODE_COURSE_ID', False),
-        u'allow_course_reruns': settings.FEATURES.get(u'ALLOW_COURSE_RERUNS', True),
-        u'optimization_enabled': optimization_enabled
+    return render_to_response('index.html', {
+        'courses': active_courses,
+        'archived_courses': archived_courses,
+        'in_process_course_actions': in_process_course_actions,
+        'libraries_enabled': LIBRARIES_ENABLED,
+        'libraries': [format_library_for_view(lib) for lib in libraries],
+        'show_new_library_button': get_library_creator_status(user),
+        'user': user,
+        'request_course_creator_url': reverse('request_course_creator'),
+        'course_creator_status': _get_course_creator_status(user),
+        'rerun_creator_status': GlobalStaff().has_user(user),
+        'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False),
+        'allow_course_reruns': settings.FEATURES.get('ALLOW_COURSE_RERUNS', True),
+        'optimization_enabled': optimization_enabled
     })
 
 
@@ -624,7 +624,7 @@ def course_index(request, course_key):
         lms_link = get_lms_link_for_item(course_module.location)
         reindex_link = None
         if settings.FEATURES.get('ENABLE_COURSEWARE_INDEX', False):
-            reindex_link = "/course/{course_id}/search_reindex".format(course_id=unicode(course_key))
+            reindex_link = "/course/{course_id}/search_reindex".format(course_id=str(course_key))
         sections = course_module.get_children()
         course_structure = _course_outline_json(request, course_module)
         locator_to_show = request.GET.get('show', None)
@@ -708,7 +708,7 @@ def _process_courses_list(courses_iter, in_process_course_actions, split_archive
         """
         return {
             'display_name': course.display_name,
-            'course_key': unicode(course.location.course_key),
+            'course_key': str(course.location.course_key),
             'url': reverse_course_url('course_handler', course.id),
             'lms_link': get_lms_link_for_item(course.location),
             'rerun_link': _get_rerun_link_for_item(course.id),
@@ -809,7 +809,7 @@ def _create_or_rerun_course(request):
         # existing xml courses this cannot be changed in CourseDescriptor.
         # # TODO get rid of defining wiki slug in this org/course/run specific way and reconcile
         # w/ xmodule.course_module.CourseDescriptor.__init__
-        wiki_slug = u"{0}.{1}.{2}".format(org, course, run)
+        wiki_slug = "{0}.{1}.{2}".format(org, course, run)
         definition_data = {'wiki_slug': wiki_slug}
         fields.update(definition_data)
 
@@ -819,14 +819,14 @@ def _create_or_rerun_course(request):
             destination_course_key = rerun_course(request.user, source_course_key, org, course, run, fields)
             return JsonResponse({
                 'url': reverse_url('course_handler'),
-                'destination_course_key': unicode(destination_course_key)
+                'destination_course_key': str(destination_course_key)
             })
         else:
             try:
                 new_course = create_new_course(request.user, org, course, run, fields)
                 return JsonResponse({
                     'url': reverse_course_url('course_handler', new_course.id),
-                    'course_key': unicode(new_course.id),
+                    'course_key': str(new_course.id),
                 })
             except ValidationError as ex:
                 return JsonResponse({'error': text_type(ex)}, status=400)
@@ -846,7 +846,7 @@ def _create_or_rerun_course(request):
         })
     except InvalidKeyError as error:
         return JsonResponse({
-            "ErrMsg": _(u"Unable to create course '{name}'.\n\n{err}").format(name=display_name, err=text_type(error))}
+            "ErrMsg": _("Unable to create course '{name}'.\n\n{err}").format(name=display_name, err=text_type(error))}
         )
 
 
@@ -928,7 +928,7 @@ def rerun_course(user, source_course_key, org, number, run, fields, background=T
     fields['video_upload_pipeline'] = {}
 
     json_fields = json.dumps(fields, cls=EdxJSONEncoder)
-    args = [unicode(source_course_key), unicode(destination_course_key), user.id, json_fields]
+    args = [str(source_course_key), str(destination_course_key), user.id, json_fields]
 
     if background:
         rerun_course_task.delay(*args)
@@ -1221,7 +1221,7 @@ def grading_handler(request, course_key_string, grader_index=None):
                 # update credit course requirements if 'minimum_grade_credit'
                 # field value is changed
                 if 'minimum_grade_credit' in request.json:
-                    update_credit_course_requirements.delay(unicode(course_key))
+                    update_credit_course_requirements.delay(str(course_key))
 
                 # None implies update the whole model (cutoffs, graceperiod, and graders) not a specific grader
                 if grader_index is None:
@@ -1369,7 +1369,7 @@ def validate_textbook_json(textbook):
     """
     Validate the given text as representing a list of PDF textbooks
     """
-    if isinstance(textbook, basestring):
+    if isinstance(textbook, str):
         try:
             textbook = json.loads(textbook)
         except ValueError:
@@ -1378,7 +1378,7 @@ def validate_textbook_json(textbook):
         raise TextbookValidationError("must be JSON object")
     if not textbook.get("tab_title"):
         raise TextbookValidationError("must have tab_title")
-    tid = unicode(textbook.get("id", ""))
+    tid = str(textbook.get("id", ""))
     if tid and not tid[0].isdigit():
         raise TextbookValidationError("textbook ID must start with a digit")
     return textbook
@@ -1495,7 +1495,7 @@ def textbooks_detail_handler(request, course_key_string, textbook_id):
     with store.bulk_operations(course_key):
         course_module = get_course_and_check_access(course_key, request.user)
         matching_id = [tb for tb in course_module.pdf_textbooks
-                       if unicode(tb.get("id")) == unicode(textbook_id)]
+                       if str(tb.get("id")) == str(textbook_id)]
         if matching_id:
             textbook = matching_id[0]
         else:
@@ -1683,7 +1683,7 @@ def group_configurations_detail_handler(request, course_key_string, group_config
     with store.bulk_operations(course_key):
         course = get_course_and_check_access(course_key, request.user)
         matching_id = [p for p in course.user_partitions
-                       if unicode(p.id) == unicode(group_configuration_id)]
+                       if str(p.id) == str(group_configuration_id)]
         if matching_id:
             configuration = matching_id[0]
         else:

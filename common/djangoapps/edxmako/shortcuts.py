@@ -13,7 +13,7 @@
 #   limitations under the License.
 
 import logging
-from urlparse import urljoin
+from urllib.parse import urljoin
 
 from django.conf import settings
 from django.urls import reverse
@@ -113,8 +113,8 @@ def marketing_link_context_processor(request):
         [
             ("MKTG_URL_" + k, marketing_link(k))
             for k in (
-                settings.MKTG_URL_LINK_MAP.viewkeys() |
-                marketing_urls.viewkeys()
+                settings.MKTG_URL_LINK_MAP.keys() |
+                marketing_urls.keys()
             )
         ]
     )

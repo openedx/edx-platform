@@ -48,7 +48,7 @@ class FakeDjangoSettings(object):
 
     def __init__(self, mappings):
         """Initializes the fake from mappings dict."""
-        for key, value in mappings.iteritems():
+        for key, value in mappings.items():
             setattr(self, key, value)
 
 
@@ -220,7 +220,7 @@ class SAMLTestCase(TestCase):
         error_mock = log_mock.error
         idp_class = get_saml_idp_class('fake_idp_class_option')
         error_mock.assert_called_once_with(
-            u'%s is not a valid EdXSAMLIdentityProvider subclass; using EdXSAMLIdentityProvider base class.',
+            '%s is not a valid EdXSAMLIdentityProvider subclass; using EdXSAMLIdentityProvider base class.',
             'fake_idp_class_option'
         )
         self.assertIs(idp_class, EdXSAMLIdentityProvider)

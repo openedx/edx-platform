@@ -163,7 +163,7 @@ class TestMigration(SplitWMongoCourseBootstrapper):
         if split_dag_root.category != 'course':
             self.assertEqual(presplit_dag_root.location.block_id, split_dag_root.location.block_id)
         # compare all fields but references
-        for name, field in presplit_dag_root.fields.iteritems():
+        for name, field in presplit_dag_root.fields.items():
             # fields generated from UNIQUE_IDs are unique to an XBlock's scope,
             # so if such a field is unset on an XBlock, we don't expect it
             # to persist across courses
@@ -175,7 +175,7 @@ class TestMigration(SplitWMongoCourseBootstrapper):
                 self.assertEqual(
                     getattr(presplit_dag_root, name),
                     getattr(split_dag_root, name),
-                    u"{}/{}: {} != {}".format(
+                    "{}/{}: {} != {}".format(
                         split_dag_root.location, name, getattr(presplit_dag_root, name), getattr(split_dag_root, name)
                     )
                 )
@@ -185,7 +185,7 @@ class TestMigration(SplitWMongoCourseBootstrapper):
             self.assertEqual(
                 # need get_children to filter out drafts
                 len(presplit_dag_root.get_children()), len(split_dag_root.children),
-                u"{0.category} '{0.display_name}': children  {1} != {2}".format(
+                "{0.category} '{0.display_name}': children  {1} != {2}".format(
                     presplit_dag_root, presplit_dag_root.children, split_dag_root.children
                 )
             )
