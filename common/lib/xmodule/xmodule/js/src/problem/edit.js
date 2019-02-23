@@ -573,6 +573,18 @@
                             );
                         },
 
+                        checkIsNumeric = function(stringValue) {
+                            // remove OLX feedback
+                            if ((stringValue.indexOf('{{') !== -1) && (stringValue.indexOf('}}') !== -1)) {
+                                // Remove comments made in answers bracked
+                                stringValue = stringValue.replace(/{{[\s\S]*?}}/g, '').trim();
+                            }
+                            if (stringValue.match(/[a-z]/i)) {
+                                return false;
+                            }
+                            return !isNaN(parseFloat(stringValue));
+                        },
+
                         getAnswerData = function(answerValue) {
                             var answerData = {},
                                 answerParams = /(.*?)\+\-\s*(.*?$)/.exec(answerValue);
@@ -593,7 +605,7 @@
                             firstAnswer = answerValues[0].replace(/^\=\s*/, '');
 
                             // If answer is not numerical
-                            if (isNaN(parseFloat(firstAnswer)) && !isRangeToleranceCase(firstAnswer)) {
+                            if (!checkIsNumeric(firstAnswer) && !isRangeToleranceCase(firstAnswer)) {
                                 return false;
                             }
 
