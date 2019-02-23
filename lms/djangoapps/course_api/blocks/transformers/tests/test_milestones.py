@@ -22,7 +22,6 @@ class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseM
     Test behavior of ProctoredExamTransformer
     """
     TRANSFORMER_CLASS_TO_TEST = MilestonesAndSpecialExamsTransformer
-    shard = 3
 
     def setUp(self):
         """

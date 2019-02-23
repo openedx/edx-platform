@@ -18,7 +18,6 @@ CROSS_DOMAIN_REFERER = 'https://ecommerce.edx.org'
 
 
 class ExperimentDataViewSetTests(APITestCase):
-    shard = 4
 
     def assert_data_created_for_user(self, user, method='post', status=201):
         url = reverse('api_experiments:v0:data-list')
@@ -314,7 +313,6 @@ class ExperimentCrossDomainTests(APITestCase):
 
 
 class ExperimentKeyValueViewSetTests(APITestCase):
-    shard = 4
 
     def test_permissions(self):
         """ Staff access is required for write operations. """

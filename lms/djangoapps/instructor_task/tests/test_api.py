@@ -91,7 +91,6 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
 @ddt.ddt
 class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
     """Tests API methods that involve the submission of module-based background tasks."""
-    shard = 3
 
     def setUp(self):
         super(InstructorTaskModuleSubmitTest, self).setUp()
@@ -213,7 +212,6 @@ class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCase):
     """Tests API methods that involve the submission of course-based background tasks."""
-    shard = 3
 
     def setUp(self):
         super(InstructorTaskCourseSubmitTest, self).setUp()

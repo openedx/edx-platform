@@ -73,7 +73,6 @@ class UserPartitionTransformerTestCase(UserPartitionTestMixin, CourseStructureTe
     """
     UserPartitionTransformer Test
     """
-    shard = 3
 
     def setup_partitions_and_course(self, active=True):
         """
@@ -247,7 +246,6 @@ class MergedGroupAccessTestData(UserPartitionTestMixin, CourseStructureTestCase)
     """
     _MergedGroupAccess Test
     """
-    shard = 3
 
     def setUp(self):
         """

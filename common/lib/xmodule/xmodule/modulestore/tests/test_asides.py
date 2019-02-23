@@ -28,7 +28,6 @@ class TestAsidesXmlStore(TestCase):
     """
     Test Asides sourced from xml store
     """
-    shard = 1
 
     @patch('xmodule.modulestore.xml.ImportSystem.applicable_aside_types', lambda self, block: ['test_aside'])
     @XBlockAside.register_temp_plugin(AsideTestType, 'test_aside')

@@ -1,3 +1,4 @@
+# pylint: disable=unicode-format-string
 # -*- coding: utf-8 -*-
 """
 Tests for js_utils.py
@@ -15,7 +16,6 @@ class TestJSUtils(TestCase):
     """
     Test JS utils
     """
-    shard = 2
 
     class NoDefaultEncoding(object):
         """

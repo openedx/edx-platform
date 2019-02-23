@@ -93,7 +93,7 @@ def get_login_session_form(request):
 
     # Translators: These instructions appear on the login form, immediately
     # below a field meant to hold the user's email address.
-    email_instructions = _("The email address you used to register with {platform_name}").format(
+    email_instructions = _(u"The email address you used to register with {platform_name}").format(
         platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
     )
 
@@ -267,7 +267,7 @@ class RegistrationFormFactory(object):
                 field_type = field_options.get('field_type', FormDescription.FIELD_TYPE_MAP.get(field.__class__))
                 if not field_type:
                     raise ImproperlyConfigured(
-                        "Field type '{}' not recognized for registration extension field '{}'.".format(
+                        u"Field type '{}' not recognized for registration extension field '{}'.".format(
                             field_type,
                             field_name
                         )
@@ -515,14 +515,14 @@ class RegistrationFormFactory(object):
             include_default_option = False
             options = None
             error_msg = ''
-            exec("error_msg = accounts.REQUIRED_FIELD_%s_TEXT_MSG" % (field_name.upper()))
+            error_msg = getattr(accounts, u'REQUIRED_FIELD_{}_TEXT_MSG'.format(field_name.upper()))
         else:
             field_type = "select"
             include_default_option = True
             field_options = extra_field_options.get(field_name)
             options = [(unicode(option.lower()), option) for option in field_options]
             error_msg = ''
-            exec("error_msg = accounts.REQUIRED_FIELD_%s_SELECT_MSG" % (field_name.upper()))
+            error_msg = getattr(accounts, u'REQUIRED_FIELD_{}_SELECT_MSG'.format(field_name.upper()))
 
         form_desc.add_field(
             field_name,
@@ -806,7 +806,7 @@ class RegistrationFormFactory(object):
         )).format(
             platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
             terms_of_service=terms_label,
-            terms_of_service_link_start=HTML("<a href='{terms_link}' target='_blank'>").format(terms_link=terms_link),
+            terms_of_service_link_start=HTML(u"<a href='{terms_link}' target='_blank'>").format(terms_link=terms_link),
             terms_of_service_link_end=HTML("</a>"),
         )
 
@@ -832,9 +832,9 @@ class RegistrationFormFactory(object):
             )).format(
                 platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
                 terms_of_service=terms_label,
-                terms_of_service_link_start=HTML("<a href='{terms_url}' target='_blank'>").format(terms_url=terms_link),
+                terms_of_service_link_start=HTML(u"<a href='{terms_url}' target='_blank'>").format(terms_url=terms_link),
                 terms_of_service_link_end=HTML("</a>"),
-                privacy_policy_link_start=HTML("<a href='{pp_url}' target='_blank'>").format(pp_url=pp_link),
+                privacy_policy_link_start=HTML(u"<a href='{pp_url}' target='_blank'>").format(pp_url=pp_link),
                 privacy_policy_link_end=HTML("</a>"),
             )
 
@@ -866,7 +866,7 @@ class RegistrationFormFactory(object):
         label = Text(_(u"I agree to the {platform_name} {tos_link_start}{terms_of_service}{tos_link_end}")).format(
             platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
             terms_of_service=terms_label,
-            tos_link_start=HTML("<a href='{terms_link}' target='_blank'>").format(terms_link=terms_link),
+            tos_link_start=HTML(u"<a href='{terms_link}' target='_blank'>").format(terms_link=terms_link),
             tos_link_end=HTML("</a>"),
         )
 

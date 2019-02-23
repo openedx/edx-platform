@@ -10,7 +10,6 @@ from openedx.core.djangoapps.site_configuration.tests.test_util import with_site
 
 class MarketingSiteViewTests(TestCase):
     """ Tests for the marketing site views """
-    shard = 4
 
     def _test_view(self, view_name, mimetype):
         """
@@ -119,7 +118,7 @@ class MarketingSiteViewTests(TestCase):
         resp = self.client.get(url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
         self.assertContains(
             resp,
-            'There has been a 500 error on the <em>{platform_name}</em> servers'.format(
+            u'There has been a 500 error on the <em>{platform_name}</em> servers'.format(
                 platform_name=settings.MICROSITE_CONFIGURATION['test_site']['platform_name']
             ),
             status_code=500

@@ -155,7 +155,7 @@ class LmsBlockMixin(XBlockMixin):
             if user_partition.id == user_partition_id:
                 return user_partition
 
-        raise NoSuchUserPartitionError("could not find a UserPartition with ID [{}]".format(user_partition_id))
+        raise NoSuchUserPartitionError(u"could not find a UserPartition with ID [{}]".format(user_partition_id))
 
     def _has_nonsensical_access_settings(self):
         """

@@ -49,7 +49,6 @@ class TestUtils(unittest.TestCase):
                 /        \
             child_3    child_4
     """
-    shard = 2
 
     ONLY_ROOTS = [
         ('url1', 'vertical'),

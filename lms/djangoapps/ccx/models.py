@@ -23,6 +23,8 @@ log = logging.getLogger("edx.ccx")
 class CustomCourseForEdX(models.Model):
     """
     A Custom Course.
+
+    .. no_pii:
     """
     course_id = CourseKeyField(max_length=255, db_index=True)
     display_name = models.CharField(max_length=255)
@@ -106,6 +108,8 @@ class CustomCourseForEdX(models.Model):
 class CcxFieldOverride(models.Model):
     """
     Field overrides for custom courses.
+
+    .. no_pii:
     """
     ccx = models.ForeignKey(CustomCourseForEdX, db_index=True, on_delete=models.CASCADE)
     location = UsageKeyField(max_length=255, db_index=True)

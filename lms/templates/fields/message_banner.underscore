@@ -1,8 +1,9 @@
-<div class="wrapper-msg urgency-<%= urgency %> <%= type %>">
+<div id="banner-msg" class="wrapper-msg urgency-<%- urgency %> <%- type %> <% if (isRecoveryEmailMsg == true) { %> recovery-email-alert <% } %>" role="alert">
+  <i <% if (hideCloseBtn == true) { %> hidden <% } %> id="close" class="fa fa-close close-icon"></i>
     <div class="msg">
         <div class="msg-content">
             <div class="copy">
-                <p><%-message%></p>
+                <p><%= HtmlUtils.HTML(message) %></p>
             </div>
         </div>
     </div>

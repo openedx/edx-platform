@@ -117,7 +117,7 @@ class BaseUserView(APIView):
         if identifier.kind not in self.identifier_kinds:
             # This is already checked before we get here, so raise a 500 error
             # if the check fails.
-            raise ValueError("Identifier kind {} not in {}".format(identifier.kind, self.identifier_kinds))
+            raise ValueError(u"Identifier kind {} not in {}".format(identifier.kind, self.identifier_kinds))
 
         self_request = False
         if identifier == self.identifier('username', request.user.username):

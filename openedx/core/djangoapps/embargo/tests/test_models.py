@@ -74,8 +74,8 @@ class EmbargoModelsTest(CacheIsolationTestCase):
             self.assertIn(state, currently_blocked)
 
     def test_ip_blocking(self):
-        whitelist = '127.0.0.1'
-        blacklist = '18.244.51.3'
+        whitelist = u'127.0.0.1'
+        blacklist = u'18.244.51.3'
 
         cwhitelist = IPFilter.current().whitelist_ips
         self.assertNotIn(whitelist, cwhitelist)
@@ -90,20 +90,20 @@ class EmbargoModelsTest(CacheIsolationTestCase):
         self.assertIn(blacklist, cblacklist)
 
     def test_ip_network_blocking(self):
-        whitelist = '1.0.0.0/24'
-        blacklist = '1.1.0.0/16'
+        whitelist = u'1.0.0.0/24'
+        blacklist = u'1.1.0.0/16'
 
         IPFilter(whitelist=whitelist, blacklist=blacklist).save()
 
         cwhitelist = IPFilter.current().whitelist_ips
-        self.assertIn('1.0.0.100', cwhitelist)
-        self.assertIn('1.0.0.10', cwhitelist)
-        self.assertNotIn('1.0.1.0', cwhitelist)
+        self.assertIn(u'1.0.0.100', cwhitelist)
+        self.assertIn(u'1.0.0.10', cwhitelist)
+        self.assertNotIn(u'1.0.1.0', cwhitelist)
         cblacklist = IPFilter.current().blacklist_ips
-        self.assertIn('1.1.0.0', cblacklist)
-        self.assertIn('1.1.0.1', cblacklist)
-        self.assertIn('1.1.1.0', cblacklist)
-        self.assertNotIn('1.2.0.0', cblacklist)
+        self.assertIn(u'1.1.0.0', cblacklist)
+        self.assertIn(u'1.1.0.1', cblacklist)
+        self.assertIn(u'1.1.1.0', cblacklist)
+        self.assertNotIn(u'1.2.0.0', cblacklist)
 
 
 class RestrictedCourseTest(CacheIsolationTestCase):

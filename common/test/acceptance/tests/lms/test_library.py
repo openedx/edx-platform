@@ -52,7 +52,7 @@ class LibraryContentTestBase(UniqueCourseTest):
             self.course_info['run']
         )
 
-        self.library_fixture = LibraryFixture('test_org', self.unique_id, 'Test Library {}'.format(self.unique_id))
+        self.library_fixture = LibraryFixture('test_org', self.unique_id, u'Test Library {}'.format(self.unique_id))
         self.populate_library_fixture(self.library_fixture)
 
         self.library_fixture.install()
@@ -99,8 +99,7 @@ class LibraryContentTestBase(UniqueCourseTest):
         editor.save()
         self._go_to_unit_page(change_login=False)
         unit_page.wait_for_page()
-        unit_page.publish_action.click()
-        unit_page.wait_for_ajax()
+        unit_page.publish()
         self.assertIn("Published and Live", unit_page.publish_title)
 
     @property
@@ -218,11 +217,11 @@ class StudioLibraryContainerCapaFilterTest(LibraryContentTestBase, TestWithSearc
     def _get_problem_choice_group_text(self, name, items):
         """ Generates Choice Group CAPA problem XML """
         items_text = "\n".join([
-            "<choice correct='{correct}'>{item}</choice>".format(correct=correct, item=item)
+            u"<choice correct='{correct}'>{item}</choice>".format(correct=correct, item=item)
             for item, correct in items
         ])
 
-        return textwrap.dedent("""
+        return textwrap.dedent(u"""
         <problem>
             <p>{name}</p>
             <multiplechoiceresponse>
@@ -234,7 +233,7 @@ class StudioLibraryContainerCapaFilterTest(LibraryContentTestBase, TestWithSearc
         """ Generates Select Option CAPA problem XML """
         items_text = ",".join(["'{0}'".format(item) for item in items])
 
-        return textwrap.dedent("""
+        return textwrap.dedent(u"""
         <problem>
             <p>{name}</p>
             <optionresponse>

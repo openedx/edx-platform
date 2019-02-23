@@ -2,7 +2,6 @@
 Tests use cases related to LMS Entrance Exam behavior, such as gated content access (TOC)
 """
 from django.urls import reverse
-from django.test.client import RequestFactory
 from mock import Mock, patch
 from crum import set_current_request
 
@@ -15,7 +14,7 @@ from courseware.entrance_exams import (
 )
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module, handle_xblock_callback, toc_for_course
-from courseware.tests.factories import InstructorFactory, StaffFactory, UserFactory
+from courseware.tests.factories import InstructorFactory, StaffFactory, UserFactory, RequestFactoryNoCsrf
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from milestones.tests.utils import MilestonesTestCaseMixin
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
@@ -44,7 +43,6 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
     Creates a test course from scratch. The tests below are designed to execute
     workflows regardless of the feature flag settings.
     """
-    shard = 2
 
     @patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': True})
     def setUp(self):
@@ -329,10 +327,10 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn(
-            'To access course materials, you must score {}% or higher'.format(minimum_score_pct),
-            resp.content
+            u'To access course materials, you must score {}% or higher'.format(minimum_score_pct),
+            resp.content.decode(resp.charset)
         )
-        self.assertIn('Your current score is 20%.', resp.content)
+        self.assertIn(u'Your current score is 20%.', resp.content.decode(resp.charset))
 
     def test_entrance_exam_requirement_message_hidden(self):
         """
@@ -378,7 +376,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
 
         resp = self.client.get(url)
         self.assertNotIn('To access course materials, you must score', resp.content)
-        self.assertIn('Your score is 100%. You have passed the entrance exam.', resp.content)
+        self.assertIn(u'Your score is 100%. You have passed the entrance exam.', resp.content.decode(resp.charset))
         self.assertIn('Lesson 1', resp.content)
 
     def test_entrance_exam_gating(self):
@@ -536,7 +534,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         """
         Tests entrance exam xblock has `entrance_exam_passed` key in json response.
         """
-        request_factory = RequestFactory()
+        request_factory = RequestFactoryNoCsrf()
         data = {'input_{}_2_1'.format(unicode(self.problem_1.location.html_id())): 'choice_2'}
         request = request_factory.post(
             'problem_check',

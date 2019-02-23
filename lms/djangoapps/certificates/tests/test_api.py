@@ -14,6 +14,7 @@ from django.test.utils import override_settings
 from django.utils import timezone
 from freezegun import freeze_time
 from mock import patch
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 import pytz
 
@@ -32,7 +33,6 @@ from course_modes.tests.factories import CourseModeFactory
 from courseware.tests.factories import GlobalStaffFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from microsite_configuration import microsite
-from openedx.core.lib.tests import attr
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from util.testing import EventTestMixin
@@ -82,7 +82,6 @@ class WebCertificateTestMixin(object):
         self.store.update_item(self.course, self.user.id)
 
 
-@attr(shard=1)
 @ddt.ddt
 class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTestCase):
     """Tests for the `certificate_downloadable_status` helper function. """
@@ -233,7 +232,6 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
         )
 
 
-@attr(shard=1)
 @ddt.ddt
 class CertificateisInvalid(WebCertificateTestMixin, ModuleStoreTestCase):
     """Tests for the `is_certificate_invalid` helper function. """
@@ -345,7 +343,6 @@ class CertificateisInvalid(WebCertificateTestMixin, ModuleStoreTestCase):
         )
 
 
-@attr(shard=1)
 class CertificateGetTests(SharedModuleStoreTestCase):
     """Tests for the `test_get_certificate_for_user` helper function. """
     now = timezone.now()
@@ -359,6 +356,7 @@ class CertificateGetTests(SharedModuleStoreTestCase):
         cls.student = UserFactory()
         cls.student_no_cert = UserFactory()
         cls.uuid = uuid.uuid4().hex
+        cls.nonexistent_course_id = CourseKey.from_string('course-v1:some+fake+course')
         cls.web_cert_course = CourseFactory.create(
             org='edx',
             number='verified_1',
@@ -390,6 +388,12 @@ class CertificateGetTests(SharedModuleStoreTestCase):
             download_url='www.gmail.com',
             grade="0.99",
             verify_uuid=cls.uuid,
+        )
+        # certificate for a course that will be deleted
+        GeneratedCertificateFactory.create(
+            user=cls.student,
+            course_id=cls.nonexistent_course_id,
+            status=CertificateStatuses.downloadable
         )
 
     @classmethod
@@ -494,8 +498,18 @@ class CertificateGetTests(SharedModuleStoreTestCase):
         )
         self.assertEqual('www.gmail.com', cert_url)
 
+    def test_get_certificate_with_deleted_course(self):
+        """
+        Test the case when there is a certificate but the course was deleted.
+        """
+        self.assertIsNone(
+            certs_api.get_certificate_for_user(
+                self.student.username,
+                self.nonexistent_course_id
+            )
+        )
 
-@attr(shard=1)
+
 @override_settings(CERT_QUEUE='certificates')
 class GenerateUserCertificatesTest(EventTestMixin, WebCertificateTestMixin, ModuleStoreTestCase):
     """Tests for generating certificates for students. """
@@ -591,7 +605,6 @@ class GenerateUserCertificatesTest(EventTestMixin, WebCertificateTestMixin, Modu
         self.assertEqual(url, "")
 
 
-@attr(shard=1)
 @ddt.ddt
 class CertificateGenerationEnabledTest(EventTestMixin, TestCase):
     """Test enabling/disabling self-generated certificates for a course. """
@@ -659,7 +672,6 @@ class CertificateGenerationEnabledTest(EventTestMixin, TestCase):
         self.assertEqual(expect_enabled, actual_enabled)
 
 
-@attr(shard=1)
 class GenerateExampleCertificatesTest(TestCase):
     """Test generation of example certificates. """
 
@@ -747,7 +759,6 @@ def set_microsite(domain):
 
 
 @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-@attr(shard=1)
 class CertificatesBrandingTest(TestCase):
     """Test certificates branding. """
 

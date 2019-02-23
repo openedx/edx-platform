@@ -15,7 +15,6 @@ class SurveyRetireSignalTests(ModuleStoreTestCase):
     """
     Test the _listen_for_lms_retire signal
     """
-    shard = 4
 
     def test_success_answers_exist(self):
         """

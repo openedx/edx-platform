@@ -8,7 +8,6 @@ class TestDraftModuleStore(TestCase):
     """
     Test the draft modulestore
     """
-    shard = 1
 
     def test_get_items_with_course_items(self):
         store = modulestore()

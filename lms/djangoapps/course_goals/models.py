@@ -25,6 +25,8 @@ GOAL_KEY_CHOICES = Choices(
 class CourseGoal(models.Model):
     """
     Represents a course goal set by a user on the course home page.
+
+    .. no_pii:
     """
     user = models.ForeignKey(User, blank=False, on_delete=models.CASCADE)
     course_key = CourseKeyField(max_length=255, db_index=True)
@@ -33,8 +35,8 @@ class CourseGoal(models.Model):
     def __unicode__(self):
         return 'CourseGoal: {user} set goal to {goal} for course {course}'.format(
             user=self.user.username,
+            goal=self.goal_key,
             course=self.course_key,
-            goal_key=self.goal_key,
         )
 
     class Meta:

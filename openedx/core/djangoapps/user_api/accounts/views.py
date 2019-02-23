@@ -10,6 +10,7 @@ from functools import wraps
 
 import pytz
 from consent.models import DataSharingConsent
+from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model, logout
 from django.contrib.sites.models import Site
 from django.core.cache import cache
@@ -39,15 +40,16 @@ from openedx.core.djangoapps.ace_common.template_context import get_base_templat
 from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
 from openedx.core.djangoapps.credit.models import CreditRequirementStatus, CreditRequest
 from openedx.core.djangoapps.course_groups.models import UnregisteredLearnerCohortAssignments
+from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.profile_images.images import remove_profile_images
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_names, set_has_profile_image
 from openedx.core.djangolib.oauth2_retirement_utils import retire_dot_oauth2_models, retire_dop_oauth2_models
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.api.parsers import MergePatchParser
 from student.models import (
+    AccountRecovery,
     CourseEnrollment,
     ManualEnrollmentAudit,
-    PasswordHistory,
     PendingNameChange,
     CourseEnrollmentAllowed,
     LoginFailures,
@@ -125,6 +127,14 @@ class AccountViewSet(ViewSet):
 
             PATCH /api/user/v1/accounts/{username}/{"key":"value"} "application/merge-patch+json"
 
+        **Notes for PATCH requests to /accounts endpoints**
+            * Requested updates to social_links are automatically merged with
+              previously set links. That is, any newly introduced platforms are
+              add to the previous list. Updated links to pre-existing platforms
+              replace their values in the previous list. Pre-existing platforms
+              can be removed by setting the value of the social_link to an
+              empty string ("").
+
         **Response Values for GET requests to the /me endpoint**
             If the user is not logged in, an HTTP 401 "Not Authorized" response
             is returned.
@@ -195,16 +205,20 @@ class AccountViewSet(ViewSet):
 
             * requires_parental_consent: True if the user is a minor
               requiring parental consent.
-            * social_links: Array of social links. Each
-              preference is a JSON object with the following keys:
+            * social_links: Array of social links, sorted alphabetically by
+              "platform". Each preference is a JSON object with the following keys:
 
                 * "platform": A particular social platform, ex: 'facebook'
                 * "social_link": The link to the user's profile on the particular platform
 
             * username: The username associated with the account.
             * year_of_birth: The year the user was born, as an integer, or null.
+
             * account_privacy: The user's setting for sharing her personal
-              profile. Possible values are "all_users" or "private".
+              profile. Possible values are "all_users", "private", or "custom".
+              If "custom", the user has selectively chosen a subset of shareable
+              fields to make visible to others via the User Preferences API.
+
             * accomplishments_shared: Signals whether badges are enabled on the
               platform and should be fetched.
 
@@ -214,7 +228,7 @@ class AccountViewSet(ViewSet):
 
             If a user who does not have "is_staff" access requests account
             information for a different user, only a subset of these fields is
-            returned. The returns fields depend on the
+            returned. The returned fields depend on the
             ACCOUNT_VISIBILITY_CONFIGURATION configuration setting and the
             visibility preference of the user for whom data is requested.
 
@@ -248,7 +262,7 @@ class AccountViewSet(ViewSet):
             If the update is successful, updated user account data is returned.
     """
     authentication_classes = (
-        OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser, JwtAuthentication
+        JwtAuthentication, OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser
     )
     permission_classes = (permissions.IsAuthenticated,)
     parser_classes = (MergePatchParser,)
@@ -384,6 +398,7 @@ class DeactivateLogoutView(APIView):
             if verify_user_password_response.status_code != status.HTTP_204_NO_CONTENT:
                 return verify_user_password_response
             with transaction.atomic():
+                # Add user to retirement queue.
                 UserRetirementStatus.create_retirement(request.user)
                 # Unlink LMS social auth accounts
                 UserSocialAuth.objects.filter(user_id=request.user.id).delete()
@@ -392,22 +407,29 @@ class DeactivateLogoutView(APIView):
                 request.user.email = get_retired_email_by_email(request.user.email)
                 request.user.save()
                 _set_unusable_password(request.user)
+
                 # TODO: Unlink social accounts & change password on each IDA.
                 # Remove the activation keys sent by email to the user for account activation.
                 Registration.objects.filter(user=request.user).delete()
-                # Add user to retirement queue.
+
                 # Delete OAuth tokens associated with the user.
                 retire_dop_oauth2_models(request.user)
                 retire_dot_oauth2_models(request.user)
+                AccountRecovery.retire_recovery_email(request.user.id)
 
                 try:
                     # Send notification email to user
                     site = Site.objects.get_current()
                     notification_context = get_base_template_context(site)
                     notification_context.update({'full_name': request.user.profile.name})
+                    language_code = request.user.preferences.model.get_value(
+                        request.user,
+                        LANGUAGE_KEY,
+                        default=settings.LANGUAGE_CODE
+                    )
                     notification = DeletionNotificationMessage().personalize(
                         recipient=Recipient(username='', email_address=user_email),
-                        language=request.user.profile.language,
+                        language=language_code,
                         user_context=notification_context,
                     )
                     ace.send(notification)
@@ -591,9 +613,9 @@ class AccountRetirementPartnerReportView(ViewSet):
         # to disambiguate them in Python, which will respect case in the comparison.
         if len(usernames) != len(retirement_statuses_clean):
             return Response(
-                '{} original_usernames given, {} found!\n'
-                'Given usernames:\n{}\n'
-                'Found UserRetirementReportingStatuses:\n{}'.format(
+                u'{} original_usernames given, {} found!\n'
+                u'Given usernames:\n{}\n'
+                u'Found UserRetirementReportingStatuses:\n{}'.format(
                     len(usernames),
                     len(retirement_statuses_clean),
                     usernames,
@@ -636,7 +658,7 @@ class AccountRetirementStatusView(ViewSet):
             state_objs = RetirementState.objects.filter(state_name__in=states)
             if state_objs.count() != len(states):
                 found = [s.state_name for s in state_objs]
-                raise RetirementStateError('Unknown state. Requested: {} Found: {}'.format(states, found))
+                raise RetirementStateError(u'Unknown state. Requested: {} Found: {}'.format(states, found))
 
             earliest_datetime = datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=cool_off_days)
 
@@ -653,7 +675,7 @@ class AccountRetirementStatusView(ViewSet):
         except ValueError:
             return Response('Invalid cool_off_days, should be integer.', status=status.HTTP_400_BAD_REQUEST)
         except KeyError as exc:
-            return Response('Missing required parameter: {}'.format(text_type(exc)), status=status.HTTP_400_BAD_REQUEST)
+            return Response(u'Missing required parameter: {}'.format(text_type(exc)), status=status.HTTP_400_BAD_REQUEST)
         except RetirementStateError as exc:
             return Response(text_type(exc), status=status.HTTP_400_BAD_REQUEST)
 
@@ -692,9 +714,9 @@ class AccountRetirementStatusView(ViewSet):
             return Response(serializer.data)
         # This should only occur on the datetime conversion of the start / end dates.
         except ValueError as exc:
-            return Response('Invalid start or end date: {}'.format(text_type(exc)), status=status.HTTP_400_BAD_REQUEST)
+            return Response(u'Invalid start or end date: {}'.format(text_type(exc)), status=status.HTTP_400_BAD_REQUEST)
         except KeyError as exc:
-            return Response('Missing required parameter: {}'.format(text_type(exc)), status=status.HTTP_400_BAD_REQUEST)
+            return Response(u'Missing required parameter: {}'.format(text_type(exc)), status=status.HTTP_400_BAD_REQUEST)
         except RetirementState.DoesNotExist:
             return Response('Unknown retirement state.', status=status.HTTP_400_BAD_REQUEST)
         except RetirementStateError as exc:
@@ -825,7 +847,6 @@ class LMSAccountRetirementView(ViewSet):
             RevisionPluginRevision.retire_user(retirement.user)
             ArticleRevision.retire_user(retirement.user)
             PendingNameChange.delete_by_user_value(retirement.user, field='user')
-            PasswordHistory.retire_user(retirement.user.id)
             ManualEnrollmentAudit.retire_manual_enrollments(retirement.user, retirement.retired_email)
 
             CreditRequest.retire_user(retirement)

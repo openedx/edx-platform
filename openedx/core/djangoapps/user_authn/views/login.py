@@ -26,10 +26,7 @@ from openedx.core.djangoapps.password_policy import compliance as password_polic
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangolib.markup import HTML, Text
-from student.models import (
-    LoginFailures,
-    PasswordHistory,
-)
+from student.models import LoginFailures
 from student.views import send_reactivation_email_for_user
 from student.forms import send_password_reset_email_for_user
 from track import segment
@@ -58,28 +55,28 @@ def _do_third_party_auth(request):
     except User.DoesNotExist:
         AUDIT_LOG.info(
             u"Login failed - user with username {username} has no social auth "
-            "with backend_name {backend_name}".format(
+            u"with backend_name {backend_name}".format(
                 username=username, backend_name=backend_name)
         )
         message = _(
-            "You've successfully logged into your {provider_name} account, "
-            "but this account isn't linked with an {platform_name} account yet."
+            u"You've successfully logged into your {provider_name} account, "
+            u"but this account isn't linked with an {platform_name} account yet."
         ).format(
             platform_name=platform_name,
             provider_name=requested_provider.name,
         )
         message += "<br/><br/>"
         message += _(
-            "Use your {platform_name} username and password to log into {platform_name} below, "
-            "and then link your {platform_name} account with {provider_name} from your dashboard."
+            u"Use your {platform_name} username and password to log into {platform_name} below, "
+            u"and then link your {platform_name} account with {provider_name} from your dashboard."
         ).format(
             platform_name=platform_name,
             provider_name=requested_provider.name,
         )
         message += "<br/><br/>"
         message += Text(_(
-            "If you don't have an {platform_name} account yet, "
-            "click {register_label_strong} at the top of the page."
+            u"If you don't have an {platform_name} account yet, "
+            u"click {register_label_strong} at the top of the page."
         )).format(
             platform_name=platform_name,
             register_label_strong=HTML('<strong>{register_text}</strong>').format(
@@ -134,16 +131,6 @@ def _check_excessive_login_attempts(user):
                                     'to excessive login failures. Try again later.'))
 
 
-def _check_forced_password_reset(user):
-    """
-    See if the user must reset his/her password due to any policy settings
-    """
-    if user and PasswordHistory.should_user_reset_password_now(user):
-        raise AuthFailedError(_('Your password has expired due to password policy on this account. You must '
-                                'reset your password before you can log in again. Please click the '
-                                '"Forgot Password" link on this page to reset your password before logging in again.'))
-
-
 def _enforce_password_policy_compliance(request, user):
     try:
         password_policy_compliance.enforce_compliance_on_login(user, request.POST.get('password'))
@@ -172,10 +159,10 @@ def _generate_not_activated_message(user):
         settings.PLATFORM_NAME
     )
 
-    not_activated_msg_template = _('In order to sign in, you need to activate your account.<br /><br />'
-                                   'We just sent an activation link to <strong>{email}</strong>.  If '
-                                   'you do not receive an email, check your spam folders or '
-                                   '<a href="{support_url}">contact {platform} Support</a>.')
+    not_activated_msg_template = _(u'In order to sign in, you need to activate your account.<br /><br />'
+                                   u'We just sent an activation link to <strong>{email}</strong>.  If '
+                                   u'you do not receive an email, check your spam folders or '
+                                   u'<a href="{support_url}">contact {platform} Support</a>.')
 
     not_activated_message = not_activated_msg_template.format(
         email=user.email,
@@ -273,6 +260,9 @@ def _track_user_login(user, request):
     """
     Sends a tracking event for a successful login.
     """
+    # .. pii: Username and email are sent to Segment here. Retired directly through Segment API call in Tubular.
+    # .. pii_types: email_address, username
+    # .. pii_retirement: third_party
     segment.identify(
         user.id,
         {
@@ -359,7 +349,6 @@ def login_user(request):
 
         _check_shib_redirect(email_user)
         _check_excessive_login_attempts(email_user)
-        _check_forced_password_reset(email_user)
 
         possibly_authenticated_user = email_user
 

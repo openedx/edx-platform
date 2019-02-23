@@ -57,18 +57,20 @@ class Command(BaseCommand):
 
         # Make sure we're changing to a code that actually exists. Presumably it's safe to move away from a code that
         # doesn't.
+        dark_lang_config = DarkLangConfig.current()
         langs = [lang_code[0] for lang_code in settings.LANGUAGES]
-        langs += DarkLangConfig.current().released_languages_list
+        langs += dark_lang_config.released_languages_list
+        langs += dark_lang_config.beta_languages_list if dark_lang_config.enable_beta_languages else []
 
         if new_lang_code not in langs:
-            raise CommandError('{} is not a configured language code in settings.LANGUAGES '
+            raise CommandError(u'{} is not a configured language code in settings.LANGUAGES '
                                'or the current DarkLangConfig.'.format(new_lang_code))
 
         max_id = UserPreference.objects.all().aggregate(Max('id'))['id__max']
 
-        print('Updating user language preferences from {} to {}. '
-              'Start id is {}, current max id is {}. '
-              'Chunk size is of {}'.format(old_lang_code, new_lang_code, start, max_id, chunk_size))
+        print(u'Updating user language preferences from {} to {}. '
+              u'Start id is {}, current max id is {}. '
+              u'Chunk size is of {}'.format(old_lang_code, new_lang_code, start, max_id, chunk_size))
 
         updated_count = 0
 
@@ -88,7 +90,7 @@ class Command(BaseCommand):
 
             updated_count += curr
 
-            print('Updated rows {} to {}, {} rows affected'.format(start, end - 1, curr))
+            print(u'Updated rows {} to {}, {} rows affected'.format(start, end - 1, curr))
 
             if end >= max_id:
                 break
@@ -97,4 +99,8 @@ class Command(BaseCommand):
             end += chunk_size
             sleep(sleep_time_secs)
 
-        print('Finished! Updated {} total preferences from {} to {}'.format(updated_count, old_lang_code, new_lang_code))
+        print(u'Finished! Updated {} total preferences from {} to {}'.format(
+            updated_count,
+            old_lang_code,
+            new_lang_code
+        ))

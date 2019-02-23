@@ -44,7 +44,7 @@ def handle_course_cert_awarded(sender, user, course_key, mode, status, **kwargs)
 
     # schedule background task to process
     LOGGER.debug(
-        'handling COURSE_CERT_AWARDED: username=%s, course_key=%s, mode=%s, status=%s',
+        u'handling COURSE_CERT_AWARDED: username=%s, course_key=%s, mode=%s, status=%s',
         user,
         course_key,
         mode,
@@ -83,13 +83,13 @@ def handle_course_cert_changed(sender, user, course_key, mode, status, **kwargs)
 
     verbose = kwargs.get('verbose', False)
     if verbose:
-        msg = "Starting handle_course_cert_changed with params: "\
-            "sender [{sender}], "\
-            "user [{username}], "\
-            "course_key [{course_key}], "\
-            "mode [{mode}], "\
-            "status [{status}], "\
-            "kwargs [{kw}]"\
+        msg = u"Starting handle_course_cert_changed with params: "\
+            u"sender [{sender}], "\
+            u"user [{username}], "\
+            u"course_key [{course_key}], "\
+            u"mode [{mode}], "\
+            u"status [{status}], "\
+            u"kwargs [{kw}]"\
             .format(
                 sender=sender,
                 username=getattr(user, 'username', None),
@@ -112,7 +112,7 @@ def handle_course_cert_changed(sender, user, course_key, mode, status, **kwargs)
     if not helpers.get_value_for_org(course_key.org, 'ENABLE_LEARNER_RECORDS', True):
         if verbose:
             LOGGER.info(
-                "Skipping send cert: ENABLE_LEARNER_RECORDS False for org [{org}]".format(
+                u"Skipping send cert: ENABLE_LEARNER_RECORDS False for org [{org}]".format(
                     org=course_key.org
                 )
             )
@@ -120,7 +120,7 @@ def handle_course_cert_changed(sender, user, course_key, mode, status, **kwargs)
 
     # schedule background task to process
     LOGGER.debug(
-        'handling COURSE_CERT_CHANGED: username=%s, course_key=%s, mode=%s, status=%s',
+        u'handling COURSE_CERT_CHANGED: username=%s, course_key=%s, mode=%s, status=%s',
         user,
         course_key,
         mode,

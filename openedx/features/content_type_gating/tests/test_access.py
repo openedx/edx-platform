@@ -1,17 +1,28 @@
 """
 Test audit user's access to various content based on content-gating features.
 """
-
-from datetime import date
+import json
+from datetime import datetime, timedelta
 import ddt
 from django.conf import settings
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
+from django.utils import timezone
 from mock import patch
 
+from django_comment_common.models import (
+    FORUM_ROLE_ADMINISTRATOR,
+    FORUM_ROLE_MODERATOR,
+    FORUM_ROLE_GROUP_MODERATOR,
+    FORUM_ROLE_COMMUNITY_TA,
+    Role
+)
+from django_comment_client.tests.factories import RoleFactory
 from course_modes.tests.factories import CourseModeFactory
 from experiments.models import ExperimentKeyValue
+from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
+
 from lms.djangoapps.courseware.module_render import load_single_xblock
 from lms.djangoapps.courseware.tests.factories import (
     InstructorFactory,
@@ -23,35 +34,40 @@ from lms.djangoapps.courseware.tests.factories import (
 )
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 from openedx.core.djangoapps.util.testing import TestConditionalContent
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.lib.url_utils import quote_slashes
-from openedx.features.content_type_gating.partitions import CONTENT_GATING_PARTITION_ID
+from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID, CONTENT_TYPE_GATE_GROUP_IDS
+from openedx.features.content_type_gating.partitions import ContentTypeGatingPartition
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.config import (
-    EXPERIMENT_DATA_HOLDBACK_KEY,
     EXPERIMENT_ID,
 )
 from student.models import CourseEnrollment
-from student.roles import CourseBetaTesterRole, CourseInstructorRole, CourseStaffRole
+from student.roles import CourseInstructorRole
 from student.tests.factories import (
     CourseEnrollmentFactory,
     UserFactory,
     TEST_PASSWORD
 )
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from lms.djangoapps.courseware.tests.factories import (
+    InstructorFactory,
+    StaffFactory,
+    BetaTesterFactory,
+    OrgStaffFactory,
+    OrgInstructorFactory,
+    GlobalStaffFactory,
+)
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 @patch("crum.get_current_request")
-def _assert_block_is_gated(mock_get_current_request, block, is_gated, user_id, course, request_factory):
+def _get_fragment_from_block(block, user_id, course, request_factory, mock_get_current_request):
     """
-    Asserts that a block in a specific course is gated for a specific user
+    Returns the rendered fragment of a block
     Arguments:
         block: some sort of xblock descriptor, must implement .scope_ids.usage_id
-        is_gated (bool): if True, this user is expected to be gated from this block
         user_id (int): id of user
         course_id (CourseLocator): id of course
-        view_name (str): type of view for the block, if not set will default to 'student_view'
     """
     fake_request = request_factory.get('')
     mock_get_current_request.return_value = fake_request
@@ -71,10 +87,42 @@ def _assert_block_is_gated(mock_get_current_request, block, is_gated, user_id, c
 
     # Attempt to render the block, this should return different fragments if the content is gated or not.
     frag = runtime.render(problem_block, 'student_view')
+    return frag
+
+
+def _assert_block_is_gated(block, is_gated, user_id, course, request_factory, has_upgrade_link=True):
+    """
+    Asserts that a block in a specific course is gated for a specific user
+    Arguments:
+        block: some sort of xblock descriptor, must implement .scope_ids.usage_id
+        is_gated (bool): if True, this user is expected to be gated from this block
+        user_id (int): id of user
+        course_id (CourseLocator): id of course
+    """
+    checkout_link = '#' if has_upgrade_link else None
+    with patch.object(ContentTypeGatingPartition, '_get_checkout_link', return_value=checkout_link):
+        frag = _get_fragment_from_block(block, user_id, course, request_factory)
     if is_gated:
         assert 'content-paywall' in frag.content
+        if has_upgrade_link:
+            assert 'certA_1' in frag.content
+        else:
+            assert 'certA_1' not in frag.content
     else:
         assert 'content-paywall' not in frag.content
+
+
+def _assert_block_is_empty(block, user_id, course, request_factory):
+    """
+    Asserts that a block in a specific course is empty for a specific user
+    Arguments:
+        block: some sort of xblock descriptor, must implement .scope_ids.usage_id
+        is_gated (bool): if True, this user is expected to be gated from this block
+        user_id (int): id of user
+        course_id (CourseLocator): id of course
+    """
+    frag = _get_fragment_from_block(block, user_id, course, request_factory)
+    assert frag.content == u''
 
 
 @ddt.ddt
@@ -173,8 +221,8 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
             graded=True,
             group_access={
                 CONTENT_GATING_PARTITION_ID: [
-                    settings.CONTENT_TYPE_GATE_GROUP_IDS['limited_access'],
-                    settings.CONTENT_TYPE_GATE_GROUP_IDS['full_access']
+                    CONTENT_TYPE_GATE_GROUP_IDS['limited_access'],
+                    CONTENT_TYPE_GATE_GROUP_IDS['full_access']
                 ]
             },
         )
@@ -195,13 +243,25 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
             component_types=['problem', 'html']
         )
 
+        cls.courses['expired_upgrade_deadline'] = cls._create_course(
+            run='expired_upgrade_deadline_run_1',
+            display_name='Expired Upgrade Deadline Course Title',
+            modes=['audit'],
+            component_types=['problem', 'html']
+        )
+        CourseModeFactory.create(
+            course_id=cls.courses['expired_upgrade_deadline']['course'].scope_ids.usage_id.course_key,
+            mode_slug='verified',
+            expiration_datetime=datetime(2018, 1, 1)
+        )
+
     def setUp(self):
         super(TestProblemTypeAccess, self).setUp()
 
         # enroll all users into the all track types course
         self.users = {}
         for mode_type in self.MODE_TYPES:
-            self.users[mode_type] = UserFactory.create()
+            self.users[mode_type] = UserFactory.create(username=mode_type)
             CourseEnrollmentFactory.create(
                 user=self.users[mode_type],
                 course_id=self.courses['all_track_types']['course'].id,
@@ -225,7 +285,13 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
             course_id=self.courses['audit_only']['course'].id,
             mode='audit'
         )
-        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=date(2018, 1, 1))
+        # enroll audit user into the upgrade expired course
+        CourseEnrollmentFactory.create(
+            user=self.audit_user,
+            course_id=self.courses['expired_upgrade_deadline']['course'].id,
+            mode='audit'
+        )
+        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
 
     @classmethod
     def _create_course(cls, run, display_name, modes, component_types):
@@ -245,7 +311,8 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
                     ....
              }
         """
-        course = CourseFactory.create(run=run, display_name=display_name)
+        start_date = timezone.now() - timedelta(weeks=1)
+        course = CourseFactory.create(run=run, display_name=display_name, start=start_date)
 
         for mode in modes:
             CourseModeFactory.create(course_id=course.id, mode_slug=mode)
@@ -364,6 +431,20 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
             request_factory=self.factory,
         )
 
+    def test_access_expired_upgrade_deadline(self):
+        """
+        If a user is enrolled as an audit user and the upgrade deadline has passed
+        the user will continue to see gated content, but the upgrade messaging will be removed.
+        """
+        _assert_block_is_gated(
+            block=self.courses['default']['blocks']['problem'],
+            user_id=self.users['audit'].id,
+            course=self.courses['default']['course'],
+            is_gated=True,
+            request_factory=self.factory,
+            has_upgrade_link=False
+        )
+
     @ddt.data(
         ('problem', 'graded_problem', 'audit', 404),
         ('problem', 'graded_problem', 'verified', 200),
@@ -398,6 +479,7 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
         BetaTesterFactory,
         OrgStaffFactory,
         OrgInstructorFactory,
+        GlobalStaffFactory,
     )
     def test_access_course_team_users(self, role_factory):
         """
@@ -406,7 +488,10 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
         # There are two types of course team members: instructor and staff
         # they have different privileges, but for the purpose of this test the important thing is that they should both
         # have access to all graded content
-        user = role_factory.create(course_key=self.course.id)
+        if role_factory == GlobalStaffFactory:
+            user = role_factory.create()
+        else:
+            user = role_factory.create(course_key=self.course.id)
         # assert that course team members have access to graded content
         _assert_block_is_gated(
             block=self.blocks_dict['problem'],
@@ -417,17 +502,19 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
         )
 
     @ddt.data(
-        GlobalStaffFactory,
+        FORUM_ROLE_COMMUNITY_TA,
+        FORUM_ROLE_ADMINISTRATOR,
+        FORUM_ROLE_MODERATOR,
+        FORUM_ROLE_GROUP_MODERATOR
     )
-    def test_access_global_users(self, role_factory):
+    def test_access_user_with_forum_role(self, role_name):
         """
-        Test that members of the course team do not lose access to graded content
+        Test that users with a given forum role do not lose access to graded content
         """
-        # There are two types of course team members: instructor and staff
-        # they have different privileges, but for the purpose of this test the important thing is that they should both
-        # have access to all graded content
-        user = role_factory.create()
-        # assert that course team members have access to graded content
+        user = UserFactory.create()
+        role = RoleFactory(name=role_name, course_id=self.course.id)
+        role.users.add(user)
+
         _assert_block_is_gated(
             block=self.blocks_dict['problem'],
             user_id=user.id,
@@ -465,6 +552,129 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
             request_factory=self.factory,
         )
 
+    @ddt.data(
+        ({'user_partition_id': CONTENT_GATING_PARTITION_ID,
+          'group_id': CONTENT_TYPE_GATE_GROUP_IDS['limited_access']}, True),
+        ({'user_partition_id': CONTENT_GATING_PARTITION_ID,
+          'group_id': CONTENT_TYPE_GATE_GROUP_IDS['full_access']}, False),
+        ({'user_partition_id': ENROLLMENT_TRACK_PARTITION_ID,
+          'group_id': settings.COURSE_ENROLLMENT_MODES['audit']['id']}, True),
+        ({'user_partition_id': ENROLLMENT_TRACK_PARTITION_ID,
+          'group_id': settings.COURSE_ENROLLMENT_MODES['verified']['id']}, False),
+        ({'role': 'staff'}, False),
+        ({'role': 'student'}, True),
+        ({'username': 'audit'}, True),
+        ({'username': 'verified'}, False),
+    )
+    @ddt.unpack
+    def test_masquerade(self, masquerade_config, is_gated):
+        instructor = UserFactory.create()
+        CourseEnrollmentFactory.create(
+            user=instructor,
+            course_id=self.course.id,
+            mode='audit'
+        )
+        CourseInstructorRole(self.course.id).add_users(instructor)
+        self.client.login(username=instructor.username, password=TEST_PASSWORD)
+
+        self.update_masquerade(**masquerade_config)
+
+        block = self.blocks_dict['problem']
+        block_view_url = reverse('render_xblock', kwargs={'usage_key_string': unicode(block.scope_ids.usage_id)})
+        response = self.client.get(block_view_url)
+        if is_gated:
+            self.assertEquals(response.status_code, 404)
+        else:
+            self.assertEquals(response.status_code, 200)
+
+    def update_masquerade(self, role='student', group_id=None, username=None, user_partition_id=None):
+        """
+        Toggle masquerade state.
+        """
+        masquerade_url = reverse(
+            'masquerade_update',
+            kwargs={
+                'course_key_string': unicode(self.course.id),
+            }
+        )
+        response = self.client.post(
+            masquerade_url,
+            json.dumps({
+                'role': role,
+                'group_id': group_id,
+                'user_name': username,
+                'user_partition_id': user_partition_id,
+            }),
+            'application/json'
+        )
+        self.assertEqual(response.status_code, 200)
+        return response
+
+    @ddt.data(
+        InstructorFactory,
+        StaffFactory,
+        BetaTesterFactory,
+        OrgStaffFactory,
+        OrgInstructorFactory,
+        GlobalStaffFactory,
+    )
+    def test_access_masquerade_as_course_team_users(self, role_factory):
+        """
+        Test that when masquerading as members of the course team you do not lose access to graded content
+        """
+        # There are two types of course team members: instructor and staff
+        # they have different privileges, but for the purpose of this test the important thing is that they should both
+        # have access to all graded content
+        staff_user = StaffFactory.create(password=TEST_PASSWORD, course_key=self.course.id)
+        CourseEnrollmentFactory.create(
+            user=staff_user,
+            course_id=self.course.id,
+            mode='audit'
+        )
+        self.client.login(username=staff_user.username, password=TEST_PASSWORD)
+
+        if role_factory == GlobalStaffFactory:
+            user = role_factory.create()
+        else:
+            user = role_factory.create(course_key=self.course.id)
+        self.update_masquerade(username=user.username)
+
+        block = self.blocks_dict['problem']
+        block_view_url = reverse('render_xblock', kwargs={'usage_key_string': unicode(block.scope_ids.usage_id)})
+        response = self.client.get(block_view_url)
+        self.assertEquals(response.status_code, 200)
+
+    @ddt.data(
+        FORUM_ROLE_COMMUNITY_TA,
+        FORUM_ROLE_ADMINISTRATOR,
+        FORUM_ROLE_MODERATOR,
+        FORUM_ROLE_GROUP_MODERATOR
+    )
+    def test_access_masquerade_as_user_with_forum_role(self, role_name):
+        """
+        Test that when masquerading as a user with a given forum role you do not lose access to graded content
+        """
+        staff_user = StaffFactory.create(password=TEST_PASSWORD, course_key=self.course.id)
+        CourseEnrollmentFactory.create(
+            user=staff_user,
+            course_id=self.course.id,
+            mode='audit'
+        )
+        self.client.login(username=staff_user.username, password=TEST_PASSWORD)
+
+        user = UserFactory.create()
+        role = RoleFactory(name=role_name, course_id=self.course.id)
+        role.users.add(user)
+        self.update_masquerade(username=user.username)
+
+        _assert_block_is_gated(
+            block=self.blocks_dict['problem'],
+            user_id=user.id,
+            course=self.course,
+            is_gated=False,
+            request_factory=self.factory,
+        )
+
 
 @override_settings(FIELD_OVERRIDE_PROVIDERS=(
     'openedx.features.content_type_gating.field_override.ContentTypeGatingFieldOverride',
@@ -478,7 +688,7 @@ class TestConditionalContentAccess(TestConditionalContent):
     def setUpClass(cls):
         super(TestConditionalContentAccess, cls).setUpClass()
         cls.factory = RequestFactory()
-        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=date(2018, 1, 1))
+        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
 
     def setUp(self):
         super(TestConditionalContentAccess, self).setUp()
@@ -558,4 +768,220 @@ class TestConditionalContentAccess(TestConditionalContent):
             course=self.course,
             is_gated=False,
             request_factory=self.factory,
+        )
+
+
+@override_settings(FIELD_OVERRIDE_PROVIDERS=(
+    'openedx.features.content_type_gating.field_override.ContentTypeGatingFieldOverride',
+))
+class TestMessageDeduplication(ModuleStoreTestCase):
+    """
+    Tests to verify that access denied messages isn't shown if multiple items in a row are denied.
+    Expected results:
+        - 0 items denied => No access denied messages
+        - 1+ items in a row denied => 1 access denied message
+        - If page has accessible content between access denied blocks, show both blocks.
+
+    NOTE: This uses `_assert_block_is_gated` to verify that the message is being shown (as that's
+    how it's currently tested). If that method changes to use something other than the template
+    message, this method's checks will need to be updated.
+    """
+
+    def setUp(self):
+        super(TestMessageDeduplication, self).setUp()
+
+        self.user = UserFactory.create()
+        self.request_factory = RequestFactory()
+        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
+
+    def _create_course(self):
+        course = CourseFactory.create(run='test', display_name='test')
+        CourseModeFactory.create(course_id=course.id, mode_slug='audit')
+        CourseModeFactory.create(course_id=course.id, mode_slug='verified')
+        blocks_dict = {}
+        with self.store.bulk_operations(course.id):
+            blocks_dict['chapter'] = ItemFactory.create(
+                parent=course,
+                category='chapter',
+                display_name='Week 1'
+            )
+            blocks_dict['sequential'] = ItemFactory.create(
+                parent=blocks_dict['chapter'],
+                category='sequential',
+                display_name='Lesson 1'
+            )
+            blocks_dict['vertical'] = ItemFactory.create(
+                parent=blocks_dict['sequential'],
+                category='vertical',
+                display_name='Lesson 1 Vertical - Unit 1'
+            )
+        return {
+            'course': course,
+            'blocks': blocks_dict,
+        }
+
+    def test_single_denied(self):
+        ''' Single graded problem should show error '''
+        course = self._create_course()
+        blocks_dict = course['blocks']
+        CourseEnrollmentFactory.create(
+            user=self.user,
+            course_id=course['course'].id,
+            mode='audit'
+        )
+        blocks_dict['graded_1'] = ItemFactory.create(
+            parent=blocks_dict['vertical'],
+            category='problem',
+            display_name='graded_problem',
+            graded=True,
+        )
+        _assert_block_is_gated(
+            block=blocks_dict['graded_1'],
+            user_id=self.user.id,
+            course=course['course'],
+            is_gated=True,
+            request_factory=self.request_factory,
+        )
+
+    def test_double_denied(self):
+        ''' First graded problem should show message, second shouldn't '''
+        course = self._create_course()
+        blocks_dict = course['blocks']
+        blocks_dict['graded_1'] = ItemFactory.create(
+            parent=blocks_dict['vertical'],
+            category='problem',
+            display_name='graded_problem',
+            graded=True,
+        )
+        blocks_dict['graded_2'] = ItemFactory.create(
+            parent=blocks_dict['vertical'],
+            category='problem',
+            display_name='graded_problem',
+            graded=True,
+        )
+        CourseEnrollmentFactory.create(
+            user=self.user,
+            course_id=course['course'].id,
+            mode='audit'
+        )
+        _assert_block_is_gated(
+            block=blocks_dict['graded_1'],
+            user_id=self.user.id,
+            course=course['course'],
+            is_gated=True,
+            request_factory=self.request_factory,
+        )
+        _assert_block_is_empty(
+            block=blocks_dict['graded_2'],
+            user_id=self.user.id,
+            course=course['course'],
+            request_factory=self.request_factory,
+        )
+
+    def test_many_denied(self):
+        ''' First graded problem should show message, all that follow shouldn't '''
+        course = self._create_course()
+        blocks_dict = course['blocks']
+        blocks_dict['graded_1'] = ItemFactory.create(
+            parent=blocks_dict['vertical'],
+            category='problem',
+            display_name='graded_problem',
+            graded=True,
+        )
+        blocks_dict['graded_2'] = ItemFactory.create(
+            parent=blocks_dict['vertical'],
+            category='problem',
+            display_name='graded_problem',
+            graded=True,
+        )
+        blocks_dict['graded_3'] = ItemFactory.create(
+            parent=blocks_dict['vertical'],
+            category='problem',
+            display_name='graded_problem',
+            graded=True,
+        )
+        blocks_dict['graded_4'] = ItemFactory.create(
+            parent=blocks_dict['vertical'],
+            category='problem',
+            display_name='graded_problem',
+            graded=True,
+        )
+        CourseEnrollmentFactory.create(
+            user=self.user,
+            course_id=course['course'].id,
+            mode='audit'
+        )
+        _assert_block_is_gated(
+            block=blocks_dict['graded_1'],
+            user_id=self.user.id,
+            course=course['course'],
+            is_gated=True,
+            request_factory=self.request_factory,
+        )
+        _assert_block_is_empty(
+            block=blocks_dict['graded_2'],
+            user_id=self.user.id,
+            course=course['course'],
+            request_factory=self.request_factory,
+        )
+        _assert_block_is_empty(
+            block=blocks_dict['graded_3'],
+            user_id=self.user.id,
+            course=course['course'],
+            request_factory=self.request_factory,
+        )
+        _assert_block_is_empty(
+            block=blocks_dict['graded_4'],
+            user_id=self.user.id,
+            course=course['course'],
+            request_factory=self.request_factory,
+        )
+
+    def test_alternate_denied(self):
+        ''' Multiple graded content with ungraded between it should show message on either end '''
+        course = self._create_course()
+        blocks_dict = course['blocks']
+        blocks_dict['graded_1'] = ItemFactory.create(
+            parent=blocks_dict['vertical'],
+            category='problem',
+            display_name='graded_problem',
+            graded=True,
+        )
+        blocks_dict['ungraded_2'] = ItemFactory.create(
+            parent=blocks_dict['vertical'],
+            category='problem',
+            display_name='ungraded_problem',
+            graded=False,
+        )
+        blocks_dict['graded_3'] = ItemFactory.create(
+            parent=blocks_dict['vertical'],
+            category='problem',
+            display_name='graded_problem',
+            graded=True,
+        )
+        CourseEnrollmentFactory.create(
+            user=self.user,
+            course_id=course['course'].id,
+            mode='audit'
+        )
+        _assert_block_is_gated(
+            block=blocks_dict['graded_1'],
+            user_id=self.user.id,
+            course=course['course'],
+            is_gated=True,
+            request_factory=self.request_factory,
+        )
+        _assert_block_is_gated(
+            block=blocks_dict['ungraded_2'],
+            user_id=self.user.id,
+            course=course['course'],
+            is_gated=False,
+            request_factory=self.request_factory,
+        )
+        _assert_block_is_gated(
+            block=blocks_dict['graded_3'],
+            user_id=self.user.id,
+            course=course['course'],
+            is_gated=True,
+            request_factory=self.request_factory,
         )

@@ -21,7 +21,6 @@ class TestStudentModuleHistoryBackends(TestCase):
     """ Tests of data in CSMH and CSMHE """
     # Tell Django to clean out all databases, not just default
     multi_db = True
-    shard = 1
 
     def setUp(self):
         super(TestStudentModuleHistoryBackends, self).setUp()

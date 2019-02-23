@@ -24,15 +24,21 @@ from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import get_current_site
 from openedx.core.djangoapps.user_api import accounts as accounts_settings
+from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
-from student.message_types import PasswordReset
-from student.models import CourseEnrollmentAllowed, email_exists_or_retired
+from student.message_types import AccountRecovery as AccountRecoveryMessage, PasswordReset
+from student.models import AccountRecovery, CourseEnrollmentAllowed, email_exists_or_retired
 from util.password_policy_validators import validate_password
 
 
-def send_password_reset_email_for_user(user, request):
+def send_password_reset_email_for_user(user, request, preferred_email=None):
     """
     Send out a password reset email for the given user.
+
+    Arguments:
+        user (User): Django User object
+        request (HttpRequest): Django request object
+        preferred_email (str): Send email to this address if present, otherwise fallback to user's email address.
     """
     site = get_current_site()
     message_context = get_base_template_context(site)
@@ -51,7 +57,40 @@ def send_password_reset_email_for_user(user, request):
     })
 
     msg = PasswordReset().personalize(
-        recipient=Recipient(user.username, user.email),
+        recipient=Recipient(user.username, preferred_email or user.email),
+        language=get_user_preference(user, LANGUAGE_KEY),
+        user_context=message_context,
+    )
+    ace.send(msg)
+
+
+def send_account_recovery_email_for_user(user, request, email=None):
+    """
+    Send out a account recovery email for the given user.
+
+    Arguments:
+        user (User): Django User object
+        request (HttpRequest): Django request object
+        email (str): Send email to this address.
+    """
+    site = get_current_site()
+    message_context = get_base_template_context(site)
+    message_context.update({
+        'request': request,  # Used by google_analytics_tracking_pixel
+        'email': email,
+        'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
+        'reset_link': '{protocol}://{site}{link}?is_account_recovery=true'.format(
+            protocol='https' if request.is_secure() else 'http',
+            site=configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME),
+            link=reverse('password_reset_confirm', kwargs={
+                'uidb36': int_to_base36(user.id),
+                'token': default_token_generator.make_token(user),
+            }),
+        )
+    })
+
+    msg = AccountRecoveryMessage().personalize(
+        recipient=Recipient(user.username, email),
         language=get_user_preference(user, LANGUAGE_KEY),
         user_context=message_context,
     )
@@ -66,6 +105,8 @@ class PasswordResetFormNoActive(PasswordResetForm):
                       "address cannot reset the password."),
     }
 
+    is_account_recovery = True
+
     def clean_email(self):
         """
         This is a literal copy from Django 1.4.5's django.contrib.auth.forms.PasswordResetForm
@@ -75,6 +116,14 @@ class PasswordResetFormNoActive(PasswordResetForm):
         email = self.cleaned_data["email"]
         #The line below contains the only change, removing is_active=True
         self.users_cache = User.objects.filter(email__iexact=email)
+
+        if len(self.users_cache) == 0 and is_secondary_email_feature_enabled():
+            # Check if user has entered the secondary email.
+            self.users_cache = User.objects.filter(
+                id__in=AccountRecovery.objects.filter(secondary_email__iexact=email, is_active=True).values_list('user')
+            )
+            self.is_account_recovery = not bool(self.users_cache)
+
         if not len(self.users_cache):
             raise forms.ValidationError(self.error_messages['unknown'])
         if any((user.password.startswith(UNUSABLE_PASSWORD_PREFIX))
@@ -92,7 +141,10 @@ class PasswordResetFormNoActive(PasswordResetForm):
         user.
         """
         for user in self.users_cache:
-            send_password_reset_email_for_user(user, request)
+            if self.is_account_recovery:
+                send_password_reset_email_for_user(user, request)
+            else:
+                send_account_recovery_email_for_user(user, request, user.account_recovery.secondary_email)
 
 
 class TrueCheckbox(widgets.CheckboxInput):

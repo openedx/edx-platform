@@ -1,10 +1,19 @@
+"""
+Tests for the SubsectionGradeFactory class.
+"""
 import ddt
-from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
-from django.conf import settings
-from lms.djangoapps.grades.config.tests.utils import persistent_grades_feature_flags
 from mock import patch
+from django.conf import settings
 
-from ..models import PersistentSubsectionGrade
+from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
+from lms.djangoapps.grades.config.tests.utils import persistent_grades_feature_flags
+from student.tests.factories import UserFactory
+
+from ..models import (
+    PersistentSubsectionGrade,
+    PersistentSubsectionGradeOverride,
+    PersistentSubsectionGradeOverrideHistory,
+)
 from ..subsection_grade_factory import ZeroSubsectionGrade
 from .base import GradeTestBase
 from .utils import mock_get_score
@@ -19,7 +28,6 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
     persistent grades are functioning as expected, and that the flag to
     enable saving subsection grades blocks/enables that feature as expected.
     """
-    shard = 4
 
     def assert_grade(self, grade, expected_earned, expected_possible):
         """
@@ -27,6 +35,10 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
         """
         self.assertEqual(
             (grade.all_total.earned, grade.all_total.possible),
+            (expected_earned, expected_possible),
+        )
+        self.assertEqual(
+            (grade.graded_total.earned, grade.graded_total.possible),
             (expected_earned, expected_possible),
         )
 
@@ -100,3 +112,48 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
             ):
                 self.subsection_grade_factory.create(self.sequence)
         self.assertEqual(mock_read_saved_grade.called, feature_flag and course_setting)
+
+    @ddt.data(
+        (0, None),
+        (None, 3),
+        (None, None),
+        (0, 3),
+    )
+    @ddt.unpack
+    def test_update_with_override(self, earned_graded_override, possible_graded_override):
+        """
+        Tests that when a PersistentSubsectionGradeOverride exists, the update()
+        method returns a CreateSubsectionGrade with scores that account
+        for the override.
+        """
+        # first, do an update to create a persistent grade
+        with mock_get_score(2, 3):
+            grade = self.subsection_grade_factory.update(self.sequence)
+            self.assert_grade(grade, 2, 3)
+
+        # there should only be one persistent grade
+        persistent_grade = PersistentSubsectionGrade.objects.first()
+        self.assertEqual(2, persistent_grade.earned_graded)
+        self.assertEqual(3, persistent_grade.possible_graded)
+
+        # Now create the override
+        PersistentSubsectionGradeOverride.update_or_create_override(
+            UserFactory(),
+            persistent_grade,
+            earned_graded_override=earned_graded_override,
+            earned_all_override=earned_graded_override,
+            possible_graded_override=possible_graded_override,
+            feature=PersistentSubsectionGradeOverrideHistory.GRADEBOOK,
+        )
+
+        # Now, even if the problem scores interface gives us a 2/3,
+        # the subsection grade returned should be 0/3 due to the override.
+        with mock_get_score(2, 3):
+            grade = self.subsection_grade_factory.update(self.sequence)
+            expected_earned = earned_graded_override
+            if earned_graded_override is None:
+                expected_earned = persistent_grade.earned_graded
+            expected_possible = possible_graded_override
+            if possible_graded_override is None:
+                expected_possible = persistent_grade.possible_graded
+            self.assert_grade(grade, expected_earned, expected_possible)

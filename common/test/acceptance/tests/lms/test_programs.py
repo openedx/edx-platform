@@ -1,6 +1,4 @@
 """Acceptance tests for LMS-hosted Programs pages"""
-import pytest
-
 from common.test.acceptance.fixtures.catalog import CatalogFixture, CatalogIntegrationMixin
 from common.test.acceptance.fixtures.course import CourseFixture
 from common.test.acceptance.fixtures.programs import ProgramsConfigMixin
@@ -109,9 +107,10 @@ class ProgramListingPageTest(ProgramPageBase):
         self.assertFalse(self.listing_page.are_cards_present)
 
 
-@pytest.mark.a11y
 class ProgramListingPageA11yTest(ProgramPageBase):
     """Test program listing page accessibility."""
+    a11y = True
+
     def setUp(self):
         super(ProgramListingPageA11yTest, self).setUp()
 
@@ -121,6 +120,11 @@ class ProgramListingPageA11yTest(ProgramPageBase):
 
     def test_empty_a11y(self):
         """Test a11y of the page's empty state."""
+        self.listing_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+            ]
+        })
         self.auth(enroll=False)
         self.stub_catalog_api(programs=[self.program], pathways=[])
         self.cache_programs()
@@ -133,6 +137,11 @@ class ProgramListingPageA11yTest(ProgramPageBase):
 
     def test_cards_a11y(self):
         """Test a11y when program cards are present."""
+        self.listing_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+            ]
+        })
         self.auth()
         self.stub_catalog_api(programs=[self.program], pathways=[])
         self.cache_programs()
@@ -144,9 +153,10 @@ class ProgramListingPageA11yTest(ProgramPageBase):
         self.listing_page.a11y_audit.check_for_accessibility_errors()
 
 
-@pytest.mark.a11y
 class ProgramDetailsPageA11yTest(ProgramPageBase):
     """Test program details page accessibility."""
+    a11y = True
+
     def setUp(self):
         super(ProgramDetailsPageA11yTest, self).setUp()
 
@@ -157,6 +167,11 @@ class ProgramDetailsPageA11yTest(ProgramPageBase):
 
     def test_a11y(self):
         """Test the page's a11y compliance."""
+        self.details_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+            ]
+        })
         self.auth()
         self.stub_catalog_api(programs=[self.program], pathways=[])
         self.cache_programs()

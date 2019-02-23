@@ -10,7 +10,7 @@ def wait_for_xblock_initialization(page, xblock_css):
     """
     def _is_finished_loading():
         # Wait for the xblock javascript to finish initializing
-        is_done = page.browser.execute_script("return $({!r}).data('initialized')".format(xblock_css))
+        is_done = page.browser.execute_script(u"return $({!r}).data('initialized')".format(xblock_css))
         return (is_done, is_done)
 
     return Promise(_is_finished_loading, 'Finished initializing the xblock.').fulfill()

@@ -41,6 +41,8 @@ def parse_path_data(path_data):
 class Bookmark(TimeStampedModel):
     """
     Bookmarks model.
+
+    .. no_pii:
     """
     user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
     course_key = CourseKeyField(max_length=255, db_index=True)
@@ -189,6 +191,8 @@ class Bookmark(TimeStampedModel):
 class XBlockCache(TimeStampedModel):
     """
     XBlockCache model to store info about xblocks.
+
+    .. no_pii:
     """
 
     course_key = CourseKeyField(max_length=255, db_index=True)

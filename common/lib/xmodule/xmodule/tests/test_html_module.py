@@ -11,6 +11,7 @@ from xblock.fields import ScopeIds
 from xmodule.html_module import CourseInfoModule, HtmlDescriptor, HtmlModule
 
 from . import get_test_descriptor_system, get_test_system
+from ..x_module import PUBLIC_VIEW, STUDENT_VIEW
 
 
 def instantiate_descriptor(**field_data):
@@ -32,7 +33,6 @@ class HtmlModuleCourseApiTestCase(unittest.TestCase):
     """
     Test the HTML XModule's student_view_data method.
     """
-    shard = 1
 
     @ddt.data(
         dict(),
@@ -81,10 +81,25 @@ class HtmlModuleCourseApiTestCase(unittest.TestCase):
         module = HtmlModule(descriptor, module_system, field_data, Mock())
         self.assertEqual(module.student_view_data(), dict(enabled=True, html=html))
 
+    @ddt.data(
+        STUDENT_VIEW,
+        PUBLIC_VIEW,
+    )
+    def test_student_preview_view(self, view):
+        """
+        Ensure that student_view and public_view renders correctly.
+        """
+        html = '<p>This is a test</p>'
+        descriptor = Mock()
+        field_data = DictFieldData({'data': html})
+        module_system = get_test_system()
+        module = HtmlModule(descriptor, module_system, field_data, Mock())
+        rendered = module_system.render(module, view, {}).content
+        self.assertIn(html, rendered)
+
 
 class HtmlModuleSubstitutionTestCase(unittest.TestCase):
     descriptor = Mock()
-    shard = 1
 
     def test_substitution_works(self):
         sample_xml = '''%%USER_ID%%'''
@@ -117,7 +132,6 @@ class HtmlDescriptorIndexingTestCase(unittest.TestCase):
     """
     Make sure that HtmlDescriptor can format data for indexing as expected.
     """
-    shard = 1
 
     def test_index_dictionary_simple_html_module(self):
         sample_xml = '''
@@ -210,7 +224,6 @@ class CourseInfoModuleTestCase(unittest.TestCase):
     """
     Make sure that CourseInfoModule renders updates properly.
     """
-    shard = 1
 
     def test_updates_render(self):
         """

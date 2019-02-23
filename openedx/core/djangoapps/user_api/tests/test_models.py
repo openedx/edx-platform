@@ -33,7 +33,7 @@ class UserPreferenceModelTest(ModuleStoreTestCase):
         user = UserFactory.create()
         self._create_and_assert(user=user, key="testkey0", value="")
         self._create_and_assert(user=user, key="testkey1", value="This is some English text!")
-        self._create_and_assert(user=user, key="testkey2", value="{'some': 'json'}")
+        self._create_and_assert(user=user, key="testkey2", value='{"some": "json"}')
         self._create_and_assert(
             user=user,
             key="testkey3",

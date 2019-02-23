@@ -13,7 +13,7 @@ from student.tests.factories import UserFactory
 from ..image_helpers import get_profile_image_urls_for_user
 
 TEST_SIZES = {'full': 50, 'small': 10}
-TEST_PROFILE_IMAGE_UPLOAD_DT = datetime.datetime(2002, 1, 9, 15, 43, 01, tzinfo=UTC)
+TEST_PROFILE_IMAGE_UPLOAD_DT = datetime.datetime(2002, 1, 9, 15, 43, 1, tzinfo=UTC)
 
 
 @patch.dict('django.conf.settings.PROFILE_IMAGE_SIZES_MAP', TEST_SIZES, clear=True)
@@ -22,7 +22,6 @@ class ProfileImageUrlTestCase(TestCase):
     """
     Tests for profile image URL generation helpers.
     """
-    shard = 2
 
     def setUp(self):
         super(ProfileImageUrlTestCase, self).setUp()

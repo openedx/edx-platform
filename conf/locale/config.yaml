@@ -128,7 +128,7 @@ ignore_dirs:
     - src/done-xblock
     - src/edx-jsme
     - src/parse-rest
-    - src/pygeoip
+    - src/geoip2
     - src/pystache-custom
     - src/rate-xblock
     - src/xblock-google-drive
@@ -139,6 +139,7 @@ ignore_dirs:
 # .tx/config file so that it will be pushed to and pulled from transifex.
 third_party:
     - wiki
+    - edx_proctoring_proctortrack
 
 
 # How should .po files be segmented?  See i18n/segment.py for details. Strings
@@ -171,6 +172,7 @@ generate_merge:
         - mako.po
         - mako-studio.po
         - wiki.po
+        - edx_proctoring_proctortrack.po
     djangojs.po:
         - djangojs-partial.po
         - djangojs-studio.po

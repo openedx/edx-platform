@@ -27,7 +27,6 @@ from mobile_api.testutils import (
 )
 from mobile_api.utils import API_V05, API_V1
 from openedx.core.lib.courses import course_image_url
-from openedx.core.lib.tests import attr
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
@@ -42,7 +41,6 @@ from .. import errors
 from .serializers import CourseEnrollmentSerializer, CourseEnrollmentSerializerv05
 
 
-@attr(shard=9)
 @ddt.ddt
 class TestUserDetailApi(MobileAPITestCase, MobileAuthUserTestMixin):
     """
@@ -59,7 +57,6 @@ class TestUserDetailApi(MobileAPITestCase, MobileAuthUserTestMixin):
         self.assertEqual(response.data['email'], self.user.email)
 
 
-@attr(shard=9)
 @ddt.ddt
 class TestUserInfoApi(MobileAPITestCase, MobileAuthTestMixin):
     """
@@ -76,7 +73,6 @@ class TestUserInfoApi(MobileAPITestCase, MobileAuthTestMixin):
         self.assertIn(self.username, response['location'])
 
 
-@attr(shard=9)
 @ddt.ddt
 @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
 class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTestMixin,
@@ -277,7 +273,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         self.create_enrollment(expired)
         return self.api_response(api_version=api_version).data
 
-    def _assert_enrollment_results(self, api_version, courses, num_courses_returned):
+    def _assert_enrollment_results(self, api_version, courses, num_courses_returned, gating_enabled=True):
         self.assertEqual(len(courses), num_courses_returned)
 
         if api_version == API_V05:
@@ -285,7 +281,8 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
                 self.assertNotIn('audit_access_expires', courses[0])
         else:
             self.assertIn('audit_access_expires', courses[0])
-            self.assertIsNotNone(courses[0].get('audit_access_expires'))
+            if gating_enabled:
+                self.assertIsNotNone(courses[0].get('audit_access_expires'))
 
     @ddt.data(
         (API_V05, True, 0),
@@ -299,9 +296,9 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         Test that expired courses are only returned in v1 of API
         when waffle flag enabled, and un-expired courses always returned
         '''
-        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime.date(2018, 1, 1))
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime.datetime(2018, 1, 1))
         courses = self._get_enrollment_data(api_version, expired)
-        self._assert_enrollment_results(api_version, courses, num_courses_returned)
+        self._assert_enrollment_results(api_version, courses, num_courses_returned, True)
 
     @ddt.data(
         (API_V05, True, 1),
@@ -317,10 +314,9 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         '''
         CourseDurationLimitConfig.objects.create(enabled=False)
         courses = self._get_enrollment_data(api_version, expired)
-        self._assert_enrollment_results(api_version, courses, num_courses_returned)
+        self._assert_enrollment_results(api_version, courses, num_courses_returned, False)
 
 
-@attr(shard=9)
 @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
 class TestUserEnrollmentCertificates(UrlResetMixin, MobileAPITestCase, MilestonesTestCaseMixin):
     """
@@ -396,7 +392,6 @@ class TestUserEnrollmentCertificates(UrlResetMixin, MobileAPITestCase, Milestone
         )
 
 
-@attr(shard=9)
 class CourseStatusAPITestCase(MobileAPITestCase):
     """
     Base test class for /api/mobile/{api_version}/users/<user_name>/course_status_info/{course_id}
@@ -431,7 +426,6 @@ class CourseStatusAPITestCase(MobileAPITestCase):
         )
 
 
-@attr(shard=9)
 class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin,
                           MobileCourseAccessTestMixin, MilestonesTestCaseMixin):
     """
@@ -451,7 +445,6 @@ class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin,
         )
 
 
-@attr(shard=9)
 class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin,
                             MobileCourseAccessTestMixin, MilestonesTestCaseMixin):
     """
@@ -555,7 +548,6 @@ class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin,
         )
 
 
-@attr(shard=9)
 @ddt.ddt
 @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
 @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})

@@ -90,6 +90,7 @@
 # Najwan Al Rousan <najwanrousan@gmail.com>, 2013
 # Sahbi BG <sahbi.g@gmail.com>, 2017
 # Sahbi BG <sahbi.g@gmail.com>, 2017
+# Shadi Naif <shadinaif@gmail.com>, 2018
 # shefaa abu jabel <shefaa.aj@gmail.com>, 2017
 # Soha Assali <soha+transifex@qordoba.com>, 2015-2016
 # soliman osman <solimanosman@windowslive.com>, 2015
@@ -198,7 +199,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-11-18 20:42+0000\n"
+"POT-Creation-Date: 2018-12-30 20:42+0000\n"
 "PO-Revision-Date: 2018-07-23 07:15+0000\n"
 "Last-Translator: Muhammad Ayub khan <ayubkhan@edx.org>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
@@ -239,7 +240,6 @@ msgstr "امتحان الدخول"
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 #: cms/templates/course_outline.html lms/templates/seq_module.html
 #: lms/templates/ccx/schedule.html
-#: lms/templates/courseware/writable_gradebook.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Section"
 msgstr "قسم"
@@ -543,6 +543,10 @@ msgstr "الطالب"
 #: common/djangoapps/student/admin.py
 msgid "User profile"
 msgstr "الملف التعريفي للمستخدم"
+
+#: common/djangoapps/student/admin.py
+msgid "Account recovery"
+msgstr ""
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This label appears above a field on the login form
@@ -901,6 +905,14 @@ msgstr "اسم سمة هذا المستخدم."
 msgid "Value of this user attribute."
 msgstr "قيمة سمة هذا المستخدم."
 
+#: common/djangoapps/student/models.py
+msgid "Secondary email address"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Secondary email address to recover linked account."
+msgstr ""
+
 #: common/djangoapps/student/views/dashboard.py
 msgid " and "
 msgstr ""
@@ -943,6 +955,13 @@ msgid ""
 "Check your {email_start}{email}{email_end} inbox for an account activation "
 "link from {platform_name}. If you need help, contact "
 "{link_start}{platform_name} Support{link_end}."
+msgstr ""
+
+#: common/djangoapps/student/views/dashboard.py
+#, python-brace-format
+msgid ""
+"Add a recovery email to retain access when single-sign on is not available. "
+"Go to {link_start}your Account Settings{link_end}."
 msgstr ""
 
 #: common/djangoapps/student/views/dashboard.py
@@ -1068,6 +1087,10 @@ msgstr "يجب إدخال عنوان بريد إلكتروني صحيح."
 #: common/djangoapps/student/views/management.py
 msgid "Old email is the same as the new email."
 msgstr "البريد الإلكتروني القديم مطابق للبريد الإلكتروني الجديد."
+
+#: common/djangoapps/student/views/management.py
+msgid "Cannot be same as your sign in email address."
+msgstr ""
 
 #: common/djangoapps/student/views/management.py
 msgid "Unable to send email activation link. Please try again later."
@@ -3765,6 +3788,30 @@ msgid "Specify what student can learn from the course."
 msgstr "حدد ما يمكن أن يتعلمه الطلاب في هذه الدورة التدريبية."
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "Course Visibility For Unenrolled Learners"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Defines the access permissions for unenrolled learners. This can be set to "
+"one of three values: 'private' (default visibility, only allowed for "
+"enrolled students), 'public_outline' (allow access to course outline) and "
+"'public' (allow access to both outline and course content)."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "private"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "public_outline"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "public"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Instructor"
 msgstr "مدرّس الدورة التدريبية"
 
@@ -4583,6 +4630,12 @@ msgstr ""
 "الامتحانات التحضيرية غير موثَّقة."
 
 #: common/lib/xmodule/xmodule/seq_module.py
+msgid ""
+"This subsection is unlocked for learners when they meet the prerequisite "
+"requirements."
+msgstr "هذا القسم الفرعي متاح للمتعلمين عند استيفائهم للشروط المطلوبة مسبقًا."
+
+#: common/lib/xmodule/xmodule/seq_module.py
 msgid "This exam is hidden from the learner."
 msgstr "هذا الامتحان لا يظهر للمتعلم"
 
@@ -4595,12 +4648,6 @@ msgstr ""
 msgid ""
 "Because the due date has passed, this assignment is hidden from the learner."
 msgstr ""
-
-#: common/lib/xmodule/xmodule/seq_module.py
-msgid ""
-"This subsection is unlocked for learners when they meet the prerequisite "
-"requirements."
-msgstr "هذا القسم الفرعي متاح للمتعلمين عند استيفائهم للشروط المطلوبة مسبقًا."
 
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid ""
@@ -5901,7 +5948,6 @@ msgid "Grade"
 msgstr "الدرجة"
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/templates/courseware/writable_gradebook.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Percent"
 msgstr "النسبة المئوية"
@@ -6708,6 +6754,7 @@ msgstr "جرت إضافة مساق "
 
 #: lms/djangoapps/dashboard/sysadmin.py cms/templates/course-create-rerun.html
 #: cms/templates/index.html lms/templates/shoppingcart/receipt.html
+#: lms/templates/support/feature_based_enrollments.html
 msgid "Course Name"
 msgstr "اسم المساق"
 
@@ -9125,6 +9172,15 @@ msgstr ""
 msgid "View, create, and reissue learner entitlements"
 msgstr ""
 
+#: lms/djangoapps/support/views/index.py
+#: lms/templates/support/feature_based_enrollments.html
+msgid "Feature Based Enrollments"
+msgstr ""
+
+#: lms/djangoapps/support/views/index.py
+msgid "View feature based enrollment settings"
+msgstr ""
+
 #: lms/djangoapps/support/views/manage_user.py
 msgid "user_support_url"
 msgstr ""
@@ -9160,6 +9216,7 @@ msgstr "عنوان البريد الإلكتروني"
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+#: lms/templates/support/feature_based_enrollments.html
 msgid "Course ID"
 msgstr "الرقم التعريفي للمساق"
 
@@ -11309,6 +11366,19 @@ msgstr "username@domain.com"
 msgid "The email address you used to register with {platform_name}"
 msgstr "عنوان البريد الإلكتروني الذي استخدمته للتسجيل في {platform_name}"
 
+#. Translators: This label appears above a field on the password reset
+#. form meant to hold the user's email address.
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Secondary email"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/api.py
+#, python-brace-format
+msgid ""
+"Secondary email address you registered with {platform_name} using account "
+"settings page"
+msgstr ""
+
 #: openedx/core/djangoapps/user_api/api.py lms/templates/login.html
 msgid "Remember me"
 msgstr "تذكُّر بياناتي"
@@ -11557,17 +11627,6 @@ msgstr ""
 "بريدنا الإلكتروني."
 
 #: openedx/core/djangoapps/user_authn/views/login.py
-msgid ""
-"Your password has expired due to password policy on this account. You must "
-"reset your password before you can log in again. Please click the \"Forgot "
-"Password\" link on this page to reset your password before logging in again."
-msgstr ""
-"انتهت صلاحية كلمة المرور الخاصة بك حسب سياسة كلمة المرور المعتمدة لهذا "
-"الحساب. لذا يُرجى منك إعادة ضبط كلمة المرور لتتمكّن من تسجيل دخولك مرّة "
-"أخرى. يُرجى الضغط على رابط \"نسيت كلمة المرور\" الموجود على هذه الصفحة لتعيد"
-" ضبط كلمة المرور قبل إعادة محاولة تسجيل الدخول."
-
-#: openedx/core/djangoapps/user_authn/views/login.py
 #, python-brace-format
 msgid ""
 "In order to sign in, you need to activate your account.<br /><br />We just "
@@ -11705,12 +11764,71 @@ msgid ""
 "{register_link}, and enroll in this course."
 msgstr ""
 
+#: openedx/features/content_type_gating/admin.py
+#: openedx/features/course_duration_limits/admin.py
+msgid ""
+"These define the context to enable course duration limits on. If no values "
+"are set, then the configuration applies globally. If a single value is set, "
+"then the configuration applies to all courses within that context. At most "
+"one value can be set at a time.<br>If multiple contexts apply to a course "
+"(for example, if configuration is specified for the course specifically, and"
+" for the org that the course is in, then the more specific context overrides"
+" the more general context."
+msgstr ""
+
+#: openedx/features/content_type_gating/admin.py
+#: openedx/features/course_duration_limits/admin.py
+msgid ""
+"If any of these values is left empty or \"Unknown\", then their value at "
+"runtime will be retrieved from the next most specific context that applies. "
+"For example, if \"Enabled\" is left as \"Unknown\" in the course context, "
+"then that course will be Enabled only if the org that it is in is Enabled."
+msgstr ""
+
+#: openedx/features/content_type_gating/models.py
+#: openedx/features/course_duration_limits/models.py
+#: lms/templates/support/feature_based_enrollments.html
+msgid "Enabled As Of"
+msgstr ""
+
+#: openedx/features/content_type_gating/models.py
+#: openedx/features/course_duration_limits/models.py
+msgid ""
+"If the configuration is Enabled, then all enrollments created after this "
+"date and time (UTC) will be affected."
+msgstr ""
+
+#: openedx/features/content_type_gating/models.py
+msgid "Studio Override Enabled"
+msgstr ""
+
+#: openedx/features/content_type_gating/models.py
+msgid ""
+"Allow Feature Based Enrollment visibility to be overriden on a per-component"
+" basis in Studio."
+msgstr ""
+
+#: openedx/features/content_type_gating/models.py
+#: openedx/features/course_duration_limits/models.py
+msgid "enabled_as_of must be set when enabled is True"
+msgstr ""
+
 #: openedx/features/content_type_gating/partitions.py
 msgid "Feature-based Enrollments"
 msgstr ""
 
 #: openedx/features/content_type_gating/partitions.py
 msgid "Partition for segmenting users by access to gated content types"
+msgstr ""
+
+#: openedx/features/content_type_gating/partitions.py
+msgid ""
+"Graded assessments are available to Verified Track learners. Upgrade to "
+"Unlock."
+msgstr ""
+
+#: openedx/features/content_type_gating/templates/content_type_gating/access_denied_message.html
+msgid "Content available only to verified track learners"
 msgstr ""
 
 #: openedx/features/content_type_gating/templates/content_type_gating/access_denied_message.html
@@ -11737,15 +11855,31 @@ msgstr ""
 
 #: openedx/features/course_duration_limits/access.py
 #, python-brace-format
-msgid "Access to the course you were lookingfor expired on {expiration_date}"
+msgid "Access to the course you were looking for expired on {expiration_date}"
 msgstr ""
 
 #: openedx/features/course_duration_limits/access.py
 #, python-brace-format
 msgid ""
-"Your access to this course expires on {expiration_date}."
-"                     <a href=\"{upgrade_link}\">Upgrade now</a> for "
-"unlimited access."
+"This learner does not have access to this course. Their access expired on "
+"{expiration_date}."
+msgstr ""
+
+#: openedx/features/course_duration_limits/access.py
+#, python-brace-format
+msgid ""
+"{strong_open}Audit Access Expires "
+"{expiration_date}{strong_close}{line_break}You lose all access to this "
+"course, including your progress, on {expiration_date}."
+msgstr ""
+
+#: openedx/features/course_duration_limits/access.py
+#, python-brace-format
+msgid ""
+"{line_break}Upgrade by {upgrade_deadline} to get unlimited access to the "
+"course as long as it exists on the site. {a_open}Upgrade "
+"now{sronly_span_open} to retain access past "
+"{expiration_date}{span_close}{a_close}"
 msgstr ""
 
 #: openedx/features/course_experience/plugins.py
@@ -11884,6 +12018,10 @@ msgstr "يجب أن يكون لديك اسم الإعدادات"
 #: cms/djangoapps/contentstore/course_group_config.py
 msgid "must have at least one group"
 msgstr "يجب أن تتوفّر مجموعة واحدة على الأقل."
+
+#: cms/djangoapps/contentstore/course_group_config.py
+msgid "unable to load this type of group configuration"
+msgstr ""
 
 #: cms/djangoapps/contentstore/course_info_model.py
 msgid "Invalid course update id."
@@ -15262,7 +15400,6 @@ msgstr "إنشاء مقرّر مخصّص جديد لمنصّة edX"
 
 #: lms/templates/ccx/coach_dashboard.html
 #: lms/templates/ccx/grading_policy.html
-#: lms/templates/courseware/writable_gradebook.html
 msgid "Grading Policy"
 msgstr "سياسة التقييم"
 
@@ -16000,7 +16137,6 @@ msgid "Your score is {current_score}%. You have passed the entrance exam."
 msgstr "علامتك هي {current_score}%. لقد نجحت في اختبار الدخول."
 
 #: lms/templates/courseware/gradebook.html
-#: lms/templates/courseware/writable_gradebook.html
 msgid "Gradebook"
 msgstr "دفتر الدرجات"
 
@@ -16324,30 +16460,6 @@ msgid ""
 msgstr ""
 "لقد زرتَ مؤخّرًا القسم {section_link}. فإذا انتهيت من العمل فيه، يُرجى "
 "اختيار قسم آخر على الجهة اليمنى. "
-
-#: lms/templates/courseware/writable_gradebook.html
-msgid "Score View:"
-msgstr ""
-
-#: lms/templates/courseware/writable_gradebook.html
-msgid "Absolute"
-msgstr ""
-
-#: lms/templates/courseware/writable_gradebook.html
-msgid "Download Grade Report"
-msgstr ""
-
-#: lms/templates/courseware/writable_gradebook.html
-msgid "Fetching gradebook data"
-msgstr ""
-
-#: lms/templates/courseware/writable_gradebook.html
-msgid "No matching records found"
-msgstr ""
-
-#: lms/templates/courseware/writable_gradebook.html
-msgid "There are no students enrolled in this course."
-msgstr ""
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 #: lms/templates/emails/business_order_confirmation_email.txt
@@ -18939,6 +19051,7 @@ msgid "Therefore, please give enough detail to account for this action."
 msgstr "لذا يرجى توفير تفاصيل كافية لتبرير هذه الخطوة."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
+#: lms/templates/support/feature_based_enrollments.html
 msgid "Reason"
 msgstr "السبب"
 
@@ -20415,6 +20528,18 @@ msgstr ""
 #: lms/templates/support/enrollment.html
 msgid "Student Support: Enrollment"
 msgstr "دعم الطلاب: التسجيل"
+
+#: lms/templates/support/feature_based_enrollments.html
+msgid "Student Support: Feature Based Enrollments"
+msgstr ""
+
+#: lms/templates/support/feature_based_enrollments.html
+msgid "Is Enabled"
+msgstr ""
+
+#: lms/templates/support/feature_based_enrollments.html
+msgid "No results found"
+msgstr ""
 
 #: lms/templates/support/manage_user.html
 msgid "Student Support: Manage User"

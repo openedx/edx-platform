@@ -21,7 +21,6 @@ class StartDateTransformerTestCase(BlockParentsMapTestCase):
     STUDENT = 1
     BETA_USER = 2
     TRANSFORMER_CLASS_TO_TEST = StartDateTransformer
-    shard = 3
 
     class StartDateType(object):
         """

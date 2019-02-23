@@ -26,7 +26,7 @@ def lc_choose(index, *args):
     '''
     try:
         return args[int(index) - 1]
-    except Exception, err:
+    except Exception as err:
         pass
     if len(args):
         return args[0]

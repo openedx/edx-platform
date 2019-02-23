@@ -1,9 +1,9 @@
 """
 Unit tests for the gating feature in Studio
 """
-import ddt
 import json
 
+import ddt
 from mock import patch
 
 from contentstore.tests.utils import CourseTestCase

@@ -1,5 +1,4 @@
 """Implements basics of Capa, including class CapaModule."""
-import cgi
 import copy
 import datetime
 import hashlib
@@ -12,11 +11,6 @@ import sys
 import traceback
 
 from django.conf import settings
-# We don't want to force a dependency on datadog, so make the import conditional
-try:
-    import dogstats_wrapper as dog_stats_api
-except ImportError:
-    dog_stats_api = None
 from pytz import utc
 from django.utils.encoding import smart_text
 from six import text_type
@@ -145,7 +139,16 @@ class CapaFields(object):
             {"display_name": _("Finished"), "value": SHOWANSWER.FINISHED},
             {"display_name": _("Correct or Past Due"), "value": SHOWANSWER.CORRECT_OR_PAST_DUE},
             {"display_name": _("Past Due"), "value": SHOWANSWER.PAST_DUE},
-            {"display_name": _("Never"), "value": SHOWANSWER.NEVER}]
+            {"display_name": _("Never"), "value": SHOWANSWER.NEVER},
+            {"display_name": _("After Some Number of Attempts"), "value": SHOWANSWER.AFTER_SOME_NUMBER_OF_ATTEMPTS},
+        ]
+    )
+    attempts_before_showanswer_button = Integer(
+        display_name=_("Show Answer: Number of Attempts"),
+        help=_("Number of times the student must attempt to answer the question before the Show Answer button appears."),
+        values={"min": 0},
+        default=0,
+        scope=Scope.settings,
     )
     force_save_button = Boolean(
         help=_("Whether to force the save button to appear on the page"),
@@ -273,20 +276,18 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
                 # TODO (vshnayder): This logic should be general, not here--and may
                 # want to preserve the data instead of replacing it.
                 # e.g. in the CMS
-                msg = u'<p>{msg}</p>'.format(msg=cgi.escape(msg))
-                msg += u'<p><pre>{tb}</pre></p>'.format(
+                msg = HTML(u'<p>{msg}</p>').format(msg=msg)
+                msg += HTML(u'<p><pre>{tb}</pre></p>').format(
                     # just the traceback, no message - it is already present above
-                    tb=cgi.escape(
-                        u''.join(
-                            ['Traceback (most recent call last):\n'] +
-                            traceback.format_tb(sys.exc_info()[2])
-                        )
+                    tb=u''.join(
+                        ['Traceback (most recent call last):\n'] +
+                        traceback.format_tb(sys.exc_info()[2])
                     )
                 )
                 # create a dummy problem with error message instead of failing
                 problem_text = (
-                    u'<problem><text><span class="inline-error">'
-                    u'Problem {url} has an error:</span>{msg}</text></problem>'.format(
+                    HTML(u'<problem><text><span class="inline-error">'
+                         u'Problem {url} has an error:</span>{msg}</text></problem>').format(
                         url=text_type(self.location),
                         msg=msg,
                     )
@@ -548,13 +549,14 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
 
         # TODO (vshnayder): another switch on DEBUG.
         if self.runtime.DEBUG:
-            msg = (
+            msg = HTML(
                 u'[courseware.capa.capa_module] <font size="+1" color="red">'
-                u'Failed to generate HTML for problem {url}</font>'.format(
-                    url=cgi.escape(text_type(self.location)))
+                u'Failed to generate HTML for problem {url}</font>'
+            ).format(
+                url=text_type(self.location)
             )
-            msg += u'<p>Error:</p><p><pre>{msg}</pre></p>'.format(msg=cgi.escape(text_type(err)))
-            msg += u'<p><pre>{tb}</pre></p>'.format(tb=traceback.format_exc())
+            msg += HTML(u'<p>Error:</p><p><pre>{msg}</pre></p>').format(msg=text_type(err))
+            msg += HTML(u'<p><pre>{tb}</pre></p>').format(tb=traceback.format_exc())
             html = msg
 
         else:
@@ -581,19 +583,19 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
             self.set_score(self.score_from_lcp())
             # Prepend a scary warning to the student
             _ = self.runtime.service(self, "i18n").ugettext
-            warning_msg = _("Warning: The problem has been reset to its initial state!")
-            warning = '<div class="capa_reset"> <h2> ' + warning_msg + '</h2>'
+            warning_msg = Text(_("Warning: The problem has been reset to its initial state!"))
+            warning = HTML('<div class="capa_reset"> <h2>{}</h2>').format(warning_msg)
 
             # Translators: Following this message, there will be a bulleted list of items.
             warning_msg = _("The problem's state was corrupted by an invalid submission. The submission consisted of:")
-            warning += warning_msg + '<ul>'
+            warning += HTML('{}<ul>').format(warning_msg)
 
             for student_answer in student_answers.values():
                 if student_answer != '':
-                    warning += '<li>' + cgi.escape(student_answer) + '</li>'
+                    warning += HTML('<li>{}</li>').format(student_answer)
 
             warning_msg = _('If this error persists, please contact the course staff.')
-            warning += '</ul>' + warning_msg + '</div>'
+            warning += HTML('</ul>{}</div>').format(warning_msg)
 
             html = warning
             try:
@@ -745,9 +747,9 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         html = self.runtime.render_template('problem.html', context)
 
         if encapsulate:
-            html = u'<div id="problem_{id}" class="problem" data-url="{ajax_url}">'.format(
-                id=self.location.html_id(), ajax_url=self.runtime.ajax_url
-            ) + html + "</div>"
+            html = HTML(u'<div id="problem_{id}" class="problem" data-url="{ajax_url}">{html}</div>').format(
+                id=self.location.html_id(), ajax_url=self.runtime.ajax_url, html=HTML(html)
+            )
 
         # Now do all the substitutions which the LMS module_render normally does, but
         # we need to do here explicitly since we can get called for our HTML via AJAX
@@ -834,7 +836,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
                 'correcthint', 'regexphint', 'additional_answer', 'stringequalhint', 'compoundhint',
                 'stringequalhint']
         for tag in tags:
-            html = re.sub(r'<%s.*?>.*?</%s>' % (tag, tag), '', html, flags=re.DOTALL)
+            html = re.sub(r'<%s.*?>.*?</%s>' % (tag, tag), '', html, flags=re.DOTALL)  # xss-lint: disable=python-interpolate-html
             # Some of these tags span multiple lines
         # Note: could probably speed this up by calling sub() once with a big regex
         # vs. simply calling sub() many times as we have here.
@@ -920,6 +922,11 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
             return self.is_correct() or self.is_past_due()
         elif self.showanswer == SHOWANSWER.PAST_DUE:
             return self.is_past_due()
+        elif self.showanswer == SHOWANSWER.AFTER_SOME_NUMBER_OF_ATTEMPTS:
+            required_attempts = self.attempts_before_showanswer_button
+            if self.max_attempts and required_attempts >= self.max_attempts:
+                required_attempts = self.max_attempts
+            return self.attempts >= required_attempts
         elif self.showanswer == SHOWANSWER.ALWAYS:
             return True
 
@@ -1179,16 +1186,12 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         if self.closed():
             event_info['failure'] = 'closed'
             self.track_function_unmask('problem_check_fail', event_info)
-            if dog_stats_api:
-                dog_stats_api.increment(metric_name('checks'), tags=[u'result:failed', u'failure:closed'])
             raise NotFoundError(_("Problem is closed."))
 
         # Problem submitted. Student should reset before checking again
         if self.done and self.rerandomize == RANDOMIZATION.ALWAYS:
             event_info['failure'] = 'unreset'
             self.track_function_unmask('problem_check_fail', event_info)
-            if dog_stats_api:
-                dog_stats_api.increment(metric_name('checks'), tags=[u'result:failed', u'failure:unreset'])
             raise NotFoundError(_("Problem must be reset before it can be submitted again."))
 
         # Problem queued. Students must wait a specified waittime before they are allowed to submit
@@ -1284,18 +1287,6 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         event_info['attempts'] = self.attempts
         event_info['submission'] = self.get_submission_metadata_safe(answers_without_files, correct_map)
         self.track_function_unmask('problem_check', event_info)
-
-        if dog_stats_api:
-            dog_stats_api.increment(metric_name('checks'), tags=[u'result:success'])
-            if published_grade['max_grade'] != 0:
-                dog_stats_api.histogram(
-                    metric_name('correct_pct'),
-                    float(published_grade['grade']) / published_grade['max_grade'],
-                )
-            dog_stats_api.histogram(
-                metric_name('attempts'),
-                self.attempts,
-            )
 
         # render problem into HTML
         html = self.get_problem_html(encapsulate=False, submit_notification=True)

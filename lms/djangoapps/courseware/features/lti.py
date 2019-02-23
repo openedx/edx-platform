@@ -271,14 +271,14 @@ def see_graph(_step, progress):
 def see_value_in_the_gradebook(_step, label, text):
     table_selector = '.grade-table'
     index = 0
-    table_headers = world.css_find('{0} thead th'.format(table_selector))
+    table_headers = world.css_find(u'{0} thead th'.format(table_selector))
 
     for i, element in enumerate(table_headers):
         if element.text.strip() == label:
             index = i
             break
 
-    assert_true(world.css_has_text('{0} tbody td'.format(table_selector), text, index=index))
+    assert_true(world.css_has_text(u'{0} tbody td'.format(table_selector), text, index=index))
 
 
 @step('I submit answer to LTI (.*) question$')

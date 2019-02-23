@@ -1,3 +1,7 @@
+"""Views for discussion forums."""
+
+from __future__ import print_function
+
 import functools
 import json
 import logging
@@ -233,7 +237,7 @@ def create_thread(request, course_id, commentable_id):
     Given a course and commentable ID, create the thread
     """
 
-    log.debug("Creating new thread in %r, id %r", course_id, commentable_id)
+    log.debug(u"Creating new thread in %r, id %r", course_id, commentable_id)
     course_key = CourseKey.from_string(course_id)
     course = get_course_with_access(request.user, 'load', course_key)
     post = request.POST
@@ -766,10 +770,10 @@ def upload(request, course_id):  # ajax upload file to a question or answer
             max_file_size=cc_settings.MAX_UPLOAD_FILE_SIZE
         )
 
-    except exceptions.PermissionDenied, err:
+    except exceptions.PermissionDenied as err:
         error = unicode(err)
-    except Exception, err:
-        print err
+    except Exception as err:      # pylint: disable=broad-except
+        print(err)
         logging.critical(unicode(err))
         error = _('Error uploading file. Please contact the site administrator. Thank you.')
 

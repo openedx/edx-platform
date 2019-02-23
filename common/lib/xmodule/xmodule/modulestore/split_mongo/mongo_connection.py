@@ -20,7 +20,6 @@ try:
 except ImportError:
     DJANGO_AVAILABLE = False
 
-import dogstats_wrapper as dog_stats_api
 import logging
 
 from contracts import check, new_contract
@@ -137,27 +136,6 @@ class QueryTimer(object):
             end = time()
             tags = tagger.tags
             tags.append('course:{}'.format(course_context))
-            for name, size in tagger.measures:
-                dog_stats_api.histogram(
-                    '{}.{}'.format(metric_name, name),
-                    size,
-                    timestamp=end,
-                    tags=[tag for tag in tags if not tag.startswith('{}:'.format(metric_name))],
-                    sample_rate=tagger.sample_rate,
-                )
-            dog_stats_api.histogram(
-                '{}.duration'.format(metric_name),
-                end - start,
-                timestamp=end,
-                tags=tags,
-                sample_rate=tagger.sample_rate,
-            )
-            dog_stats_api.increment(
-                metric_name,
-                timestamp=end,
-                tags=tags,
-                sample_rate=tagger.sample_rate,
-            )
 
 
 TIMER = QueryTimer(__name__, 0.01)

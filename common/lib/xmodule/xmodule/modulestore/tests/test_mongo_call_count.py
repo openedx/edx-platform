@@ -28,7 +28,6 @@ class CountMongoCallsXMLRoundtrip(TestCase):
     """
     This class exists to test XML import and export to/from Split.
     """
-    shard = 2
 
     def setUp(self):
         super(CountMongoCallsXMLRoundtrip, self).setUp()
@@ -89,7 +88,6 @@ class CountMongoCallsCourseTraversal(TestCase):
     Tests the number of Mongo calls made when traversing a course tree from the top course root
     to the leaf nodes.
     """
-    shard = 2
 
     def _traverse_blocks_in_course(self, course, access_all_block_fields):
         """

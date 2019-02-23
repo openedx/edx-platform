@@ -1,33 +1,33 @@
 # #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2018 EdX
+# Copyright (C) 2019 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 #
 # #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2018 EdX
+# Copyright (C) 2019 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 #
 # #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2018 edX
+# Copyright (C) 2019 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 #
 # #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2018 edX
+# Copyright (C) 2019 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-11-25 20:36+0000\n"
-"PO-Revision-Date: 2018-11-25 20:37:03.145083\n"
+"POT-Creation-Date: 2019-02-22 07:51+0000\n"
+"PO-Revision-Date: 2019-02-22 07:52:03.138106\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -5327,7 +5327,7 @@ msgstr "Çhéçk Ýöür Émäïl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α�
 msgid ""
 "{paragraphStart}You entered {boldStart}{email}{boldEnd}. If this email "
 "address is associated with your {platform_name} account, we will send a "
-"message with password reset instructions to this email "
+"message with password recovery instructions to this email "
 "address.{paragraphEnd}{paragraphStart}If you do not receive a password reset"
 " message, verify that you entered the correct email address, or check your "
 "spam folder.{paragraphEnd}{paragraphStart}If you need further assistance, "
@@ -5335,12 +5335,11 @@ msgid ""
 msgstr ""
 "{paragraphStart}Ýöü éntéréd {boldStart}{email}{boldEnd}. Ìf thïs émäïl "
 "äddréss ïs ässöçïätéd wïth ýöür {platform_name} äççöünt, wé wïll sénd ä "
-"méssägé wïth pässwörd rését ïnstrüçtïöns tö thïs émäïl "
+"méssägé wïth pässwörd réçövérý ïnstrüçtïöns tö thïs émäïl "
 "äddréss.{paragraphEnd}{paragraphStart}Ìf ýöü dö nöt réçéïvé ä pässwörd rését"
 " méssägé, vérïfý thät ýöü éntéréd thé çörréçt émäïl äddréss, ör çhéçk ýöür "
 "späm földér.{paragraphEnd}{paragraphStart}Ìf ýöü nééd fürthér ässïstänçé, "
-"{anchorStart}çöntäçt téçhnïçäl süppört{anchorEnd}.{paragraphEnd} Ⱡ'σяєм "
-"ιρѕυ#"
+"{anchorStart}çöntäçt téçhnïçäl süppört{anchorEnd}.{paragraphEnd} Ⱡ'σ#"
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
@@ -5413,6 +5412,18 @@ msgid ""
 msgstr ""
 "Ýöü réçéïvé méssägés fröm {platform_name} änd çöürsé téäms ät thïs äddréss. "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Recovery Email Address"
+msgstr "Réçövérý Émäïl Àddréss Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid ""
+"You may access your account with this address if single-sign on or access to"
+" your primary email is not available."
+msgstr ""
+"Ýöü mäý äççéss ýöür äççöünt wïth thïs äddréss ïf sïnglé-sïgn ön ör äççéss tö"
+" ýöür prïmärý émäïl ïs nöt äväïläßlé. Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
@@ -5532,6 +5543,15 @@ msgstr "Ýéär öf Bïrth Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Preferred Language"
 msgstr "Préférréd Längüägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid ""
+"We've sent a confirmation message to {new_secondary_email_address}. Click "
+"the link in the message to update your secondary email address."
+msgstr ""
+"Wé'vé sént ä çönfïrmätïön méssägé tö {new_secondary_email_address}. Çlïçk "
+"thé lïnk ïn thé méssägé tö üpdäté ýöür séçöndärý émäïl äddréss. Ⱡ'σяєм ιρѕυм"
+" ∂σłσя #"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Social Media Links"
@@ -5677,6 +5697,26 @@ msgstr "Àççöünt Ìnförmätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт
 #: lms/static/js/student_account/views/account_settings_view.js
 msgid "Order History"
 msgstr "Ördér Hïstörý Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: lms/static/js/student_account/views/account_settings_view.js
+msgid ""
+"You have set your language to {beta_language}, which is currently not fully "
+"translated. You can help us translate this language fully by joining the "
+"Transifex community and adding translations from English for learners that "
+"speak {beta_language}."
+msgstr ""
+"Ýöü hävé sét ýöür längüägé tö {beta_language}, whïçh ïs çürréntlý nöt füllý "
+"tränslätéd. Ýöü çän hélp üs tränsläté thïs längüägé füllý ßý jöïnïng thé "
+"Tränsïféx çömmünïtý änd äddïng tränslätïöns fröm Énglïsh för léärnérs thät "
+"spéäk {beta_language}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg "
+"єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт "
+"єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт "
+"αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη "
+"νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυł#"
+
+#: lms/static/js/student_account/views/account_settings_view.js
+msgid "Help Translate into {beta_language}"
+msgstr "Hélp Tränsläté ïntö {beta_language} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: lms/static/js/verify_student/views/image_input_view.js
 msgid "Image Upload Error"
@@ -5968,6 +6008,16 @@ msgstr ""
 "Théré wäs än érrör üpdätïng ýöür göäl. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
 
+#: openedx/features/course_experience/static/course_experience/js/CourseOutline.js
+#: lms/templates/ccx/schedule.underscore
+msgid "Expand All"
+msgstr "Éxpänd Àll Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: openedx/features/course_experience/static/course_experience/js/CourseOutline.js
+#: lms/templates/ccx/schedule.underscore
+msgid "Collapse All"
+msgstr "Çölläpsé Àll Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result"
 msgid_plural "{total_results} results"
@@ -6105,12 +6155,6 @@ msgstr ""
 msgid "This link will open in a modal window"
 msgstr ""
 "Thïs lïnk wïll öpén ïn ä mödäl wïndöw Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυ#"
-
-#: cms/static/js/certificates/collections/certificates.js
-msgid "Could not parse certificate JSON. %(message)s"
-msgstr ""
-"Çöüld nöt pärsé çértïfïçäté JSÖN. %(message)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυ#"
 
 #: cms/static/js/certificates/models/certificate.js
@@ -7060,8 +7104,12 @@ msgid "Visibility"
 msgstr "Vïsïßïlïtý Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: cms/static/js/views/modals/edit_xblock.js
-msgid "Editing: %(title)s"
-msgstr "Édïtïng: %(title)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+msgid "Editing: {title}"
+msgstr "Édïtïng: {title} Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: cms/static/js/views/modals/edit_xblock.js
+msgid "Plugins"
+msgstr "Plügïns Ⱡ'σяєм ιρѕυм #"
 
 #: cms/static/js/views/modals/edit_xblock.js
 #: lms/templates/ccx/schedule.underscore
@@ -8468,14 +8516,6 @@ msgid "This catalog's courses:"
 msgstr "Thïs çätälög's çöürsés: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: lms/templates/ccx/schedule.underscore
-msgid "Expand All"
-msgstr "Éxpänd Àll Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: lms/templates/ccx/schedule.underscore
-msgid "Collapse All"
-msgstr "Çölläpsé Àll Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: lms/templates/ccx/schedule.underscore
 msgid "Start Date"
 msgstr "Stärt Däté Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
@@ -8639,8 +8679,14 @@ msgid "Mark Exam As Completed"
 msgstr "Märk Éxäm Às Çömplétéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
-msgid "timed"
-msgstr "tïméd Ⱡ'σяєм ιρѕ#"
+msgid "a timed exam"
+msgstr "ä tïméd éxäm Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "The timer on the right shows the time remaining in the exam."
+msgstr ""
+"Thé tïmér ön thé rïght shöws thé tïmé rémäïnïng ïn thé éxäm. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid ""
@@ -8649,6 +8695,18 @@ msgid ""
 msgstr ""
 "Tö réçéïvé çrédït för prößléms, ýöü müst séléçt \"Süßmït\" för éäçh prößlém "
 "ßéföré ýöü séléçt \"Énd Mý Éxäm\". Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show More"
+msgstr "Shöw Möré Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show Less"
+msgstr "Shöw Léss Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Exam timer and end exam button"
+msgstr "Éxäm tïmér änd énd éxäm ßüttön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "End My Exam"
@@ -9435,6 +9493,10 @@ msgid "Reset Password"
 msgstr "Rését Pässwörd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: lms/templates/student_account/account_settings.underscore
+msgid "Switch Language Back"
+msgstr "Swïtçh Längüägé Bäçk Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
 msgstr "Àççöünt Séttïngs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
@@ -9445,8 +9507,8 @@ msgstr ""
 "¢σηѕє¢тєтυя #"
 
 #: lms/templates/student_account/form_field.underscore
-msgid "Forgot password?"
-msgstr "Förgöt pässwörd? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+msgid "Need help logging in?"
+msgstr "Nééd hélp löggïng ïn? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/student_account/hinted_login.underscore
 #, python-format
@@ -9586,15 +9648,15 @@ msgstr "Pässwörd ässïstänçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α
 
 #: lms/templates/student_account/password_reset.underscore
 msgid ""
-"Please enter your email address below and we will send you instructions for "
-"setting a new password."
+"Please enter your log-in or recovery email address below and we will send "
+"you an email with instructions."
 msgstr ""
-"Pléäsé éntér ýöür émäïl äddréss ßélöw änd wé wïll sénd ýöü ïnstrüçtïöns för "
-"séttïng ä néw pässwörd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+"Pléäsé éntér ýöür lög-ïn ör réçövérý émäïl äddréss ßélöw änd wé wïll sénd "
+"ýöü än émäïl wïth ïnstrüçtïöns. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
 
 #: lms/templates/student_account/password_reset.underscore
-msgid "Reset my password"
-msgstr "Rését mý pässwörd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+msgid "Recover my password"
+msgstr "Réçövér mý pässwörd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: lms/templates/student_account/register.underscore
 msgid "Already have an {platformName} account?"
@@ -10935,6 +10997,10 @@ msgid "Ungraded"
 msgstr "Ûngrädéd Ⱡ'σяєм ιρѕυм ∂#"
 
 #: cms/templates/js/course-outline.underscore
+msgid "Onboarding Exam"
+msgstr "Önßöärdïng Éxäm Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: cms/templates/js/course-outline.underscore
 msgid "Practice proctored Exam"
 msgstr "Präçtïçé pröçtöréd Éxäm Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
@@ -10956,6 +11022,10 @@ msgstr ""
 #: cms/templates/js/course-outline.underscore
 msgid "Display Name"
 msgstr "Dïspläý Nämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: cms/templates/js/course-outline.underscore
+msgid "Proctoring Settings"
+msgstr "Pröçtörïng Séttïngs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Configure"
@@ -11756,6 +11826,10 @@ msgstr ""
 " whén théý süßmït änswérs tö ässéssménts. Ⱡ'σяєм ιρѕυм ∂#"
 
 #: cms/templates/js/show-textbook.underscore
+msgid "PDF Chapters"
+msgstr "PDF Çhäptérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: cms/templates/js/show-textbook.underscore
 msgid "View Live"
 msgstr "Vïéw Lïvé Ⱡ'σяєм ιρѕυм ∂σł#"
 
@@ -11947,6 +12021,26 @@ msgstr ""
 "αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη "
 "νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт "
 "σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂є#"
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "Onboarding"
+msgstr "Önßöärdïng Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"Use Onboarding to introduce learners to proctoring, verify their identity, "
+"and create an onboarding profile. Learners must complete the onboarding "
+"profile step prior to taking a proctored exam. Profile reviews take 2+ "
+"business days."
+msgstr ""
+"Ûsé Önßöärdïng tö ïntrödüçé léärnérs tö pröçtörïng, vérïfý théïr ïdéntïtý, "
+"änd çréäté än önßöärdïng pröfïlé. Léärnérs müst çömplété thé önßöärdïng "
+"pröfïlé stép prïör tö täkïng ä pröçtöréd éxäm. Pröfïlé révïéws täké 2+ "
+"ßüsïnéss däýs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, "
+"ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм "
+"α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ "
+"єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє"
+" νєłιт єѕѕє ¢ιłłυм ∂σł#"
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Practice Proctored"

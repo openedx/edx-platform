@@ -23,5 +23,7 @@ def is_safe_login_or_logout_redirect(request, redirect_to):
         if redirect_to in application.redirect_uris:
             login_redirect_whitelist.add(urlparse(redirect_to).netloc)
 
-    is_safe_url = http.is_safe_url(redirect_to, allowed_hosts=login_redirect_whitelist, require_https=True)
+    is_safe_url = http.is_safe_url(
+        redirect_to, allowed_hosts=login_redirect_whitelist, require_https=request.is_secure(),
+    )
     return is_safe_url

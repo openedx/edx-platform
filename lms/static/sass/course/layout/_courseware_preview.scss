@@ -1,3 +1,4 @@
+$proctoring-banner-text-size: 14px;
 .wrapper-preview-menu {
   @include clearfix();
 
@@ -67,8 +68,7 @@
   }
 
   .exam-timer {
-    @include font-size(14);
-
+    font-size: $proctoring-banner-text-size;
     background-color: rgb(229, 234, 236);
     padding: $baseline ($baseline*2);
     border-left: 4px solid theme-color("primary");
@@ -128,7 +128,8 @@
           background-color: transparent;
           border: 1px solid $white;
 
-          #toggle_timer, b {
+          #toggle_timer,
+          b {
             color: $white;
           }
 
@@ -189,6 +190,10 @@
         border-bottom-left-radius: 0;
         border-top-left-radius: 0;
         margin-right: 0;
+      }
+      h3 {
+        display: inline;
+        font-size: $proctoring-banner-text-size;
       }
 
       b {

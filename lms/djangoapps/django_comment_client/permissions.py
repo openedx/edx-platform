@@ -147,7 +147,7 @@ def _check_conditions_permissions(user, permissions, course_id, content, user_gr
                         or user_group_id is None
                         or content_user_group is None
                         or user_group_id != content_user_group):
-                        return False
+                    return False
             return has_permission(user, per, course_id=course_id)
         elif isinstance(per, list) and operator in ["and", "or"]:
             results = [test(user, x, operator="and") for x in per]
@@ -200,5 +200,5 @@ def check_permissions_by_view(user, course_id, content, name, group_id=None, con
     try:
         p = VIEW_PERMISSIONS[name]
     except KeyError:
-        logging.warning("Permission for view named %s does not exist in permissions.py", name)
+        logging.warning(u"Permission for view named %s does not exist in permissions.py", name)
     return _check_conditions_permissions(user, p, course_id, content, group_id, content_user_group)

@@ -118,7 +118,7 @@ class CompletionBatchTestCase(CompletionWaffleTestMixin, ModuleStoreTestCase):
             },
             400,
             {
-                "detail": "Block with key: 'i4x://some/other_course/problem/Test_Problem' is not in course {}".format(
+                "detail": u"Block with key: 'i4x://some/other_course/problem/Test_Problem' is not in course {}".format(
                     COURSE_KEY,
                 )
             }

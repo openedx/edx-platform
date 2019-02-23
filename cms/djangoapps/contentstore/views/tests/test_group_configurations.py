@@ -4,14 +4,16 @@
 Group Configuration Tests.
 """
 import json
-import ddt
-from mock import patch
 from operator import itemgetter
 
+import ddt
+from mock import patch
+
 from contentstore.utils import reverse_course_url, reverse_usage_url
-from contentstore.course_group_config import GroupConfiguration, CONTENT_GROUP_CONFIGURATION_NAME
+from contentstore.course_group_config import GroupConfiguration, CONTENT_GROUP_CONFIGURATION_NAME, ENROLLMENT_SCHEME
 from contentstore.tests.utils import CourseTestCase
-from openedx.features.content_type_gating.partitions import CONTENT_GATING_PARTITION_ID
+from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID
+from openedx.features.content_type_gating.partitions import CONTENT_TYPE_GATING_SCHEME
 from xmodule.partitions.partitions import Group, UserPartition, ENROLLMENT_TRACK_PARTITION_ID
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.validation import StudioValidation, StudioValidationMessage
@@ -51,12 +53,12 @@ class HelperMethods(object):
         sequential = ItemFactory.create(
             category='sequential',
             parent_location=self.course.location,
-            display_name='Test Subsection {}'.format(name_suffix)
+            display_name=u'Test Subsection {}'.format(name_suffix)
         )
         vertical = ItemFactory.create(
             category='vertical',
             parent_location=sequential.location,
-            display_name='Test Unit {}'.format(name_suffix)
+            display_name=u'Test Unit {}'.format(name_suffix)
         )
         c0_url = self.course.id.make_usage_key("vertical", "split_test_cond0")
         c1_url = self.course.id.make_usage_key("vertical", "split_test_cond1")
@@ -120,14 +122,14 @@ class HelperMethods(object):
             subsection = ItemFactory.create(
                 category='sequential',
                 parent_location=self.course.location,
-                display_name="Test Subsection {}".format(name_suffix)
+                display_name=u"Test Subsection {}".format(name_suffix)
             )
             vertical_parent_location = subsection.location
 
         vertical = ItemFactory.create(
             category='vertical',
             parent_location=vertical_parent_location,
-            display_name="Test Unit {}".format(name_suffix)
+            display_name=u"Test Unit {}".format(name_suffix)
         )
 
         problem = ItemFactory.create(
@@ -169,7 +171,6 @@ class GroupConfigurationsBaseTestCase(object):
     """
     Mixin with base test cases for the group configurations.
     """
-    shard = 1
 
     def _remove_ids(self, content):
         """
@@ -224,7 +225,7 @@ class GroupConfigurationsBaseTestCase(object):
         Test invalid json handling.
         """
         # No property name.
-        invalid_json = "{u'name': 'Test Name', []}"
+        invalid_json = u"{u'name': 'Test Name', []}"
 
         response = self.client.post(
             self._url(),
@@ -244,7 +245,6 @@ class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurations
     """
     Test cases for group_configurations_list_handler.
     """
-    shard = 1
 
     def _url(self):
         """
@@ -351,8 +351,6 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
     """
     Test cases for group_configurations_detail_handler.
     """
-
-    shard = 1
     ID = 0
 
     def _url(self, cid=-1):
@@ -650,7 +648,7 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
         self.assertEqual(len(user_partititons), 2)
         self.assertEqual(user_partititons[0].name, 'Name 0')
 
-    @ddt.data('content_type_gate', 'enrollment_track')
+    @ddt.data(CONTENT_TYPE_GATING_SCHEME, ENROLLMENT_SCHEME)
     def test_cannot_create_restricted_group_configuration(self, scheme_id):
         """
         Test that you cannot create a restricted group configuration.
@@ -665,8 +663,8 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
         self.assertEqual(response.status_code, 400)
 
     @ddt.data(
-        ('content_type_gate', CONTENT_GATING_PARTITION_ID),
-        ('enrollment_track', ENROLLMENT_TRACK_PARTITION_ID),
+        (CONTENT_TYPE_GATING_SCHEME, CONTENT_GATING_PARTITION_ID),
+        (ENROLLMENT_SCHEME, ENROLLMENT_TRACK_PARTITION_ID),
     )
     @ddt.unpack
     def test_cannot_edit_restricted_group_configuration(self, scheme_id, partition_id):
@@ -691,7 +689,6 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
     """
     Tests for usage information of configurations and content groups.
     """
-    shard = 1
 
     def _get_user_partition(self, scheme):
         """
@@ -1120,12 +1117,53 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
         actual = GroupConfiguration.get_content_groups_items_usage_info(self.store, self.course)
         self.assertEqual(actual.keys(), [0])
 
+    def test_can_handle_duplicate_group_ids(self):
+        # Create the user partitions
+        self.course.user_partitions = [
+            UserPartition(
+                id=0,
+                name='Cohort user partition 1',
+                scheme=UserPartition.get_scheme('cohort'),
+                description='Cohorted user partition',
+                groups=[
+                    Group(id=2, name="Group 1A"),
+                    Group(id=3, name="Group 1B"),
+                ],
+            ),
+            UserPartition(
+                id=1,
+                name='Cohort user partition 2',
+                scheme=UserPartition.get_scheme('cohort'),
+                description='Random user partition',
+                groups=[
+                    Group(id=2, name="Group 2A"),
+                    Group(id=3, name="Group 2B"),
+                ],
+            ),
+        ]
+        self.store.update_item(self.course, ModuleStoreEnum.UserID.test)
+
+        # Assign group access rules for multiple partitions, one of which is a cohorted partition
+        self._create_problem_with_content_group(0, 2, name_suffix='0')
+        self._create_problem_with_content_group(1, 3, name_suffix='1')
+
+        # This used to cause an exception since the code assumed that
+        # only one partition would be available.
+        actual = GroupConfiguration.get_partitions_usage_info(self.store, self.course)
+        self.assertEqual(actual.keys(), [0, 1])
+        self.assertEqual(actual[0].keys(), [2])
+        self.assertEqual(actual[1].keys(), [3])
+
+        actual = GroupConfiguration.get_content_groups_items_usage_info(self.store, self.course)
+        self.assertEqual(actual.keys(), [0, 1])
+        self.assertEqual(actual[0].keys(), [2])
+        self.assertEqual(actual[1].keys(), [3])
+
 
 class GroupConfigurationsValidationTestCase(CourseTestCase, HelperMethods):
     """
     Tests for validation in Group Configurations.
     """
-    shard = 1
 
     @patch('xmodule.split_test_module.SplitTestDescriptor.validate_split_test')
     def verify_validation_add_usage_info(self, expected_result, mocked_message, mocked_validation_messages):

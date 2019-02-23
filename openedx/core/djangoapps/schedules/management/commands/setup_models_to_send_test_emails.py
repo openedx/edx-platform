@@ -66,7 +66,7 @@ class Command(BaseCommand):
             start=datetime.datetime.today() - datetime.timedelta(days=30),
             end=datetime.datetime.today() + datetime.timedelta(days=30),
             number=factory.Sequence('schedules_test_course_{}'.format),
-            display_name=factory.Sequence('Schedules Test Course {}'.format),
+            display_name=factory.Sequence(u'Schedules Test Course {}'.format),
         )
         XMODULE_FACTORY_LOCK.disable()
         course_overview = CourseOverview.load_from_module_store(course.id)

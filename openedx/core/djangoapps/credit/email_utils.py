@@ -24,6 +24,7 @@ from eventtracking import tracker
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.credit.models import CreditConfig, CreditProvider
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangolib.markup import HTML
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
@@ -36,7 +37,7 @@ def send_credit_notifications(username, course_key):
     try:
         user = User.objects.get(username=username)
     except User.DoesNotExist:
-        log.error('No user with %s exist', username)
+        log.error(u'No user with %s exist', username)
         return
 
     course = modulestore().get_course(course_key, depth=0)
@@ -150,7 +151,7 @@ def with_inline_css(html_without_css):
         import pynliner
 
         # insert style tag in the html and run pyliner.
-        html_with_inline_css = pynliner.fromString('<style>' + css_content + '</style>' + html_without_css)
+        html_with_inline_css = pynliner.fromString(HTML('<style>{}</style>{}').format(css_content, html_without_css))
         return html_with_inline_css
 
     return html_without_css
@@ -167,7 +168,7 @@ def attach_image(img_dict, filename):
     if img_path:
         with open(img_path, 'rb') as img:
             msg_image = MIMEImage(img.read(), name=os.path.basename(img_path))
-            msg_image.add_header('Content-ID', '<{}>'.format(img_dict['cid']))
+            msg_image.add_header('Content-ID', b'<{}>'.format(img_dict['cid']))  # xss-lint: disable=python-wrap-html
             msg_image.add_header("Content-Disposition", "inline", filename=filename)
         return msg_image
 
@@ -223,11 +224,11 @@ def get_credit_provider_display_names(course_key):
         user = User.objects.get(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME)
         response = ecommerce_api_client(user).courses(course_id).get(include_products=1)
     except Exception:  # pylint: disable=broad-except
-        log.exception("Failed to receive data from the ecommerce course API for Course ID '%s'.", course_id)
+        log.exception(u"Failed to receive data from the ecommerce course API for Course ID '%s'.", course_id)
         return provider_names
 
     if not response:
-        log.info("No Course information found from ecommerce API for Course ID '%s'.", course_id)
+        log.info(u"No Course information found from ecommerce API for Course ID '%s'.", course_id)
         return provider_names
 
     provider_ids = []
@@ -265,14 +266,14 @@ def make_providers_strings(providers):
 
     elif len(providers) == 2:
         # Translators: The join of two university names (e.g., Harvard and MIT).
-        providers_string = _("{first_provider} and {second_provider}").format(
+        providers_string = _(u"{first_provider} and {second_provider}").format(
             first_provider=providers[0],
             second_provider=providers[1]
         )
     else:
         # Translators: The join of three or more university names. The first of these formatting strings
         # represents a comma-separated list of names (e.g., MIT, Harvard, Dartmouth).
-        providers_string = _("{first_providers}, and {last_provider}").format(
+        providers_string = _(u"{first_providers}, and {last_provider}").format(
             first_providers=u", ".join(providers[:-1]),
             last_provider=providers[-1]
         )

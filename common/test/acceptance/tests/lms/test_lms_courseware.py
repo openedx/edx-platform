@@ -113,9 +113,9 @@ class CoursewareTest(UniqueCourseTest):
         """
         xblocks = self.course_fix.get_nested_xblocks(category="problem")
         for index in range(1, len(xblocks) + 1):
-            test_section_title = 'Test Section {}'.format(index)
-            test_subsection_title = 'Test Subsection {}'.format(index)
-            test_unit_title = 'Test Problem {}'.format(index)
+            test_section_title = u'Test Section {}'.format(index)
+            test_subsection_title = u'Test Subsection {}'.format(index)
+            test_unit_title = u'Test Problem {}'.format(index)
             self.course_home_page.visit()
             self.course_home_page.outline.go_to_section(test_section_title, test_subsection_title)
             course_nav = self.courseware_page.nav
@@ -853,3 +853,76 @@ class CompletionTestCase(UniqueCourseTest, EventsTestMixin):
         # Auto-auth register for the course.
         AutoAuthPage(self.browser, username=self.USERNAME, email=self.EMAIL,
                      course_id=self.course_id, staff=False).visit()
+
+
+@attr(shard=9)
+class WordCloudTests(UniqueCourseTest):
+    """
+    Tests the Word Cloud.
+    """
+    USERNAME = "STUDENT_TESTER"
+    EMAIL = "student101@example.com"
+
+    def setUp(self):
+        super(WordCloudTests, self).setUp()
+
+        self.courseware_page = CoursewarePage(self.browser, self.course_id)
+
+        self.studio_course_outline = StudioCourseOutlinePage(
+            self.browser,
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        )
+
+        # Install a course
+        course_fix = CourseFixture(
+            self.course_info['org'], self.course_info['number'],
+            self.course_info['run'], self.course_info['display_name']
+        )
+        # Set word cloud value against advanced modules in advanced settings
+        course_fix.add_advanced_settings({
+            "advanced_modules": {"value": ["word_cloud"]},
+        })
+
+        course_fix.add_children(
+            XBlockFixtureDesc('chapter', 'Test Section 1').add_children(
+                XBlockFixtureDesc('sequential', 'Test Subsection 1').add_children(
+                    XBlockFixtureDesc('vertical', 'Test Unit').add_children(
+                        XBlockFixtureDesc(
+                            'word_cloud', 'advanced WORDCLOUD'
+                        )
+                    )
+                )
+            )
+        ).install()
+
+        auto_auth(self.browser, self.USERNAME, self.EMAIL, False, self.course_id)
+        self.courseware_page.visit()
+
+    def test_word_cloud_is_rendered_with_empty_result(self):
+        """
+        Scenario: Word Cloud component in LMS is rendered with empty result
+        Given the course has a Word Cloud component
+            Then I view the word cloud and it has rendered
+        When I press the Save button
+            Then I see the empty result
+        """
+        self.assertTrue(self.courseware_page.is_word_cloud_rendered)
+        self.courseware_page.save_word_cloud()
+        self.assertEqual(self.courseware_page.word_cloud_answer_list, '')
+
+    def test_word_cloud_is_rendered_with_result(self):
+        """
+        Scenario: Word Cloud component in LMS is rendered with result
+        Given the course has a Word Cloud component
+            Then I view the word cloud and it has rendered
+        When I fill inputs
+        And I press the Save button
+            Then I see the result with words count
+        """
+        expected_data = ['test_wordcloud1', 'test_wordcloud2', 'test_wordcloud3', 'test_wordcloud4', 'test_wordcloud5']
+        self.assertTrue(self.courseware_page.is_word_cloud_rendered)
+        self.courseware_page.input_word_cloud('test_wordcloud')
+        self.courseware_page.save_word_cloud()
+        self.assertItemsEqual(expected_data, self.courseware_page.word_cloud_answer_list)

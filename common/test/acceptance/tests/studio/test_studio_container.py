@@ -48,7 +48,7 @@ class NestedVerticalTest(ContainerBase):
         self.group_a_item_1_action_index = 0
         self.group_a_item_2_action_index = 1
 
-        self.duplicate_label = "Duplicate of '{0}'"
+        self.duplicate_label = u"Duplicate of '{0}'"
         self.discussion_label = "Discussion"
 
         course_fixture.add_children(
@@ -80,7 +80,7 @@ class AddComponentTest(NestedVerticalTest):
 
     def add_and_verify(self, menu_index, expected_ordering):
         self.do_action_and_verify(
-            lambda (container): add_discussion(container, menu_index),
+            lambda container: add_discussion(container, menu_index),
             expected_ordering
         )
 
@@ -120,7 +120,7 @@ class DuplicateComponentTest(NestedVerticalTest):
 
     def duplicate_and_verify(self, source_index, expected_ordering):
         self.do_action_and_verify(
-            lambda (container): container.duplicate(source_index),
+            lambda container: container.duplicate(source_index),
             expected_ordering
         )
 
@@ -166,7 +166,7 @@ class DeleteComponentTest(NestedVerticalTest):
 
     def delete_and_verify(self, source_index, expected_ordering):
         self.do_action_and_verify(
-            lambda (container): container.delete(source_index),
+            lambda container: container.delete(source_index),
             expected_ordering
         )
 
@@ -286,7 +286,7 @@ class BaseGroupConfigurationsTest(ContainerBase):
             self.assertEqual("Access is not restricted", visibility_editor.current_groups_message)
         else:
             self.assertEqual(
-                "Access is restricted to: {groups}".format(groups=expected_current_groups),
+                u"Access is restricted to: {groups}".format(groups=expected_current_groups),
                 visibility_editor.current_groups_message
             )
 
@@ -788,8 +788,7 @@ class UnitPublishingTest(ContainerBase):
         add_discussion(unit)
         unit.verify_publish_title(self.DRAFT_STATUS)
         self._verify_last_published_and_saved(unit, self.LAST_PUBLISHED, self.LAST_SAVED)
-        unit.publish_action.click()
-        unit.wait_for_ajax()
+        unit.publish()
         unit.verify_publish_title(self.PUBLISHED_LIVE_STATUS)
         self._verify_last_published_and_saved(unit, self.LAST_PUBLISHED, self.LAST_PUBLISHED)
 
@@ -852,7 +851,7 @@ class UnitPublishingTest(ContainerBase):
         """
         unit = self.go_to_unit_page()
         add_discussion(unit)
-        unit.publish_action.click()
+        unit.publish()
         self._view_published_version(unit)
         self._verify_components_visible(['html', 'discussion'])
 
@@ -1021,8 +1020,7 @@ class UnitPublishingTest(ContainerBase):
         unit = self.go_to_unit_page()
         unit.delete(0)
         unit.verify_publish_title(self.DRAFT_STATUS)
-        unit.publish_action.click()
-        unit.wait_for_ajax()
+        unit.publish()
         unit.verify_publish_title(self.PUBLISHED_LIVE_STATUS)
         self._view_published_version(unit)
         self.assertEqual(0, self.courseware.num_xblock_components)
@@ -1042,8 +1040,7 @@ class UnitPublishingTest(ContainerBase):
         unit.verify_publish_title(self.PUBLISHED_STATUS)
         add_discussion(unit)
         unit.verify_publish_title(self.DRAFT_STATUS)
-        unit.publish_action.click()
-        unit.wait_for_ajax()
+        unit.publish()
         unit.verify_publish_title(self.PUBLISHED_STATUS)
 
     def _view_published_version(self, unit):
@@ -1066,8 +1063,9 @@ class UnitPublishingTest(ContainerBase):
         """
         Verifies no component is visible when viewing as a student.
         """
-        self._verify_and_return_staff_page().set_staff_view_mode('Learner')
-        self.assertEqual(0, self.courseware.num_xblock_components)
+        page = self._verify_and_return_staff_page()
+        page.set_staff_view_mode('Learner')
+        page.wait_for(lambda: self.courseware.num_xblock_components == 0, 'No XBlocks visible')
 
     def _verify_student_view_visible(self, expected_components):
         """
@@ -1235,8 +1233,8 @@ class MoveComponentTest(ContainerBase):
         }
         self.source_component_display_name = 'HTML 11'
         self.source_xblock_category = 'component'
-        self.message_move = 'Success! "{display_name}" has been moved.'
-        self.message_undo = 'Move cancelled. "{display_name}" has been moved back to its original location.'
+        self.message_move = u'Success! "{display_name}" has been moved.'
+        self.message_undo = u'Move cancelled. "{display_name}" has been moved back to its original location.'
 
     def populate_course_fixture(self, course_fixture):
         """
@@ -1318,7 +1316,7 @@ class MoveComponentTest(ContainerBase):
 
         # Now click publish/discard button
         if operation == 'publish':
-            unit_page.publish_action.click()
+            unit_page.publish()
         else:
             unit_page.discard_changes()
 

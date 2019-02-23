@@ -62,8 +62,8 @@ def score_changed_handler(sender, **kwargs):  # pylint: disable=unused-argument
                 )
     else:
         log.error(
-            "Outcome Service: Required signal parameter is None. "
-            "points_possible: %s, points_earned: %s, user_id: %s, "
-            "course_id: %s, usage_id: %s",
+            u"Outcome Service: Required signal parameter is None. "
+            u"points_possible: %s, points_earned: %s, user_id: %s, "
+            u"course_id: %s, usage_id: %s",
             points_possible, points_earned, user_id, course_id, usage_id
         )

@@ -19,7 +19,6 @@ class UserManagementHelperTest(TestCase):
     """
     Tests for the helper functions in users.py
     """
-    shard = 4
 
     def setUp(self):
         super(UserManagementHelperTest, self).setUp()
@@ -68,7 +67,7 @@ class UserManagementHelperTest(TestCase):
             for char in range(len(username)):
                 self.assertIn(
                     username[char], string.ascii_letters + string.digits,
-                    "Username has forbidden character '{}'".format(username[char])
+                    u"Username has forbidden character '{}'".format(username[char])
                 )
 
 
@@ -78,7 +77,6 @@ class AuthenticateLtiUserTest(TestCase):
     """
     Tests for the authenticate_lti_user function in users.py
     """
-    shard = 4
 
     def setUp(self):
         super(AuthenticateLtiUserTest, self).setUp()
@@ -146,7 +144,6 @@ class CreateLtiUserTest(TestCase):
     """
     Tests for the create_lti_user function in users.py
     """
-    shard = 4
 
     def setUp(self):
         super(CreateLtiUserTest, self).setUp()
@@ -184,7 +181,6 @@ class LtiBackendTest(TestCase):
     """
     Tests for the authentication backend that authenticates LTI users.
     """
-    shard = 4
 
     def setUp(self):
         super(LtiBackendTest, self).setUp()

@@ -22,7 +22,7 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
     blocks within a library_content module to which a user should not
     have access.
 
-    Staff users are *not* exempted from library content pathways.
+    Staff users are to exempted from library content pathways.
     """
     WRITE_VERSION = 1
     READ_VERSION = 1
@@ -98,7 +98,7 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
                 # Save back any changes
                 if any(block_keys[changed] for changed in ('invalid', 'overlimit', 'added')):
                     state_dict['selected'] = list(selected)
-                    StudentModule.objects.update_or_create(
+                    StudentModule.save_state(  # pylint: disable=no-value-for-parameter
                         student=usage_info.user,
                         course_id=usage_info.course_key,
                         module_state_key=block_key,
@@ -123,8 +123,10 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
             Return True if selected block should be removed.
 
             Block is removed if it is part of library_content, but has
-            not been selected for current user.
+            not been selected for current user, with staff as an exemption.
             """
+            if usage_info.has_staff_access:
+                return False
             if block_key not in all_library_children:
                 return False
             if block_key in all_selected_children:

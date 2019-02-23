@@ -1,18 +1,18 @@
 """Tests for items views."""
 
 import copy
-from codecs import BOM_UTF8
-import ddt
 import json
-from mock import patch, Mock
 import tempfile
 import textwrap
+from codecs import BOM_UTF8
 from uuid import uuid4
 
+import ddt
 from django.conf import settings
-from django.urls import reverse
 from django.test.utils import override_settings
+from django.urls import reverse
 from edxval.api import create_video
+from mock import Mock, patch
 from opaque_keys.edx.keys import UsageKey
 
 from contentstore.tests.utils import CourseTestCase, mock_requests_get
@@ -23,9 +23,9 @@ from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
 from xmodule.video_module.transcripts_utils import (
     GetTranscriptsFromYouTubeException,
+    Transcript,
     get_video_transcript_content,
     remove_subs_from_store,
-    Transcript,
 )
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
@@ -836,7 +836,7 @@ class TestCheckTranscripts(BaseTranscripts):
     """
     def test_success_download_nonyoutube(self):
         subs_id = str(uuid4())
-        self.item.data = textwrap.dedent("""
+        self.item.data = textwrap.dedent(u"""
             <video youtube="" sub="{}">
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.mp4"/>
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.webm"/>
@@ -1030,7 +1030,7 @@ class TestCheckTranscripts(BaseTranscripts):
         usage_key = self._get_usage_key(resp)
         subs_id = str(uuid4())
         item = modulestore().get_item(usage_key)
-        item.data = textwrap.dedent("""
+        item.data = textwrap.dedent(u"""
             <not_video youtube="" sub="{}">
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.mp4"/>
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.webm"/>

@@ -14,7 +14,6 @@ class BookmarksServiceTests(BookmarksTestsBase):
     """
     Tests the Bookmarks service.
     """
-    shard = 9
 
     def setUp(self):
         super(BookmarksServiceTests, self).setUp()

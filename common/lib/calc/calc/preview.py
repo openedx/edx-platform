@@ -8,7 +8,9 @@ Because intermediate values of the render contain more data than simply the
 string of latex, store it in a custom class `LatexRendered`.
 """
 
-from calc import DEFAULT_FUNCTIONS, DEFAULT_VARIABLES, SUFFIXES, ParseAugmenter
+from __future__ import absolute_import
+from .calc import DEFAULT_FUNCTIONS, DEFAULT_VARIABLES, SUFFIXES, ParseAugmenter
+from functools import reduce
 
 
 class LatexRendered(object):

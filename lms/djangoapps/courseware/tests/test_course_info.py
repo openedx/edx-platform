@@ -2,7 +2,7 @@
 """
 Test the course_info xblock
 """
-from datetime import date
+from datetime import datetime
 import ddt
 import mock
 from django.conf import settings
@@ -15,7 +15,6 @@ from lms.djangoapps.ccx.tests.factories import CcxFactory
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
-from openedx.core.lib.tests import attr
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
@@ -39,7 +38,6 @@ from .helpers import LoginEnrollmentTestCase
 QUERY_COUNT_TABLE_BLACKLIST = WAFFLE_TABLES
 
 
-@attr(shard=1)
 @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
 class CourseInfoTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCase, SharedModuleStoreTestCase):
     """
@@ -153,7 +151,6 @@ class CourseInfoTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCase,
         self.assertEqual(response.status_code, 404)
 
 
-@attr(shard=1)
 @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
 class CourseInfoLastAccessedTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
@@ -222,7 +219,6 @@ class CourseInfoLastAccessedTestCase(LoginEnrollmentTestCase, ModuleStoreTestCas
         self.assertEqual(resume_course_url, section_url)
 
 
-@attr(shard=1)
 @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
 @ddt.ddt
 class CourseInfoTitleTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
@@ -352,7 +348,6 @@ class CourseInfoTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertRedirects(response, expected, status_code=302, target_status_code=200)
 
 
-@attr(shard=1)
 @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
 class CourseInfoTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
@@ -401,7 +396,6 @@ class CourseInfoTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.assertNotIn(self.xml_data, resp.content)
 
 
-@attr(shard=1)
 @override_settings(FEATURES=dict(settings.FEATURES, EMBARGO=False))
 @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
 class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
@@ -418,7 +412,7 @@ class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
 
     def setUp(self):
         super(SelfPacedCourseInfoTestCase, self).setUp()
-        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=date(2018, 1, 1))
+        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
 
         self.setup_user()
 
@@ -435,7 +429,9 @@ class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
         self.assertEqual(resp.status_code, 200)
 
     def test_num_queries_instructor_paced(self):
-        self.fetch_course_info_with_queries(self.instructor_paced_course, 38, 3)
+        # TODO: decrease query count as part of REVO-28
+        self.fetch_course_info_with_queries(self.instructor_paced_course, 44, 3)
 
     def test_num_queries_self_paced(self):
-        self.fetch_course_info_with_queries(self.self_paced_course, 38, 3)
+        # TODO: decrease query count as part of REVO-28
+        self.fetch_course_info_with_queries(self.self_paced_course, 44, 3)

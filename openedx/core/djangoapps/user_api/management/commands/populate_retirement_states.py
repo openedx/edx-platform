@@ -51,17 +51,17 @@ class Command(BaseCommand):
             raise CommandError('settings.RETIREMENT_STATES does not exist or is empty.')
 
         if not set(REQUIRED_STATES).issubset(set(new_states)):
-            raise CommandError('settings.RETIREMENT_STATES ({}) does not contain all required states '
-                               '({})'.format(new_states, REQ_STR))
+            raise CommandError(u'settings.RETIREMENT_STATES ({}) does not contain all required states '
+                               u'({})'.format(new_states, REQ_STR))
 
         # Confirm that the start and end states are in the right places
         if new_states.index(START_STATE) != 0:
-            raise CommandError('{} must be the first state'.format(START_STATE))
+            raise CommandError(u'{} must be the first state'.format(START_STATE))
 
         num_end_states = len(END_STATES)
 
         if new_states[-num_end_states:] != END_STATES:
-            raise CommandError('The last {} states must be these (in this order): '
+            raise CommandError(u'The last {} states must be these (in this order): '
                                '{}'.format(num_end_states, END_STATES))
 
     def _check_current_users(self):
@@ -76,8 +76,8 @@ class Command(BaseCommand):
 
     def _check_users_in_states_to_delete(self, states_to_delete):
         if UserRetirementStatus.objects.filter(current_state__state_name__in=states_to_delete).exists():
-            raise CommandError('Users exist in a state that is marked for deletion! States to delete'
-                               'are: {}'.format(states_to_delete))
+            raise CommandError(u'Users exist in a state that is marked for deletion! States to delete'
+                               u'are: {}'.format(states_to_delete))
 
     def _delete_old_states_and_create_new(self, new_states, dry_run=False):
         """
@@ -152,9 +152,9 @@ class Command(BaseCommand):
 
         # Report
         print("States have been synchronized. Differences:")
-        print("   Added: {}".format(created))
-        print("   Removed: {}".format(deleted))
-        print("   Remaining: {}".format(existed))
+        print(u"   Added: {}".format(created))
+        print(u"   Removed: {}".format(deleted))
+        print(u"   Remaining: {}".format(existed))
         print("States updated successfully. Current states:")
 
         for state in RetirementState.objects.all():

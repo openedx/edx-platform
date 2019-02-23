@@ -6,6 +6,7 @@ Runs tasks on answers to course problems to validate that code
 paths actually work.
 
 """
+from __future__ import print_function
 import json
 from itertools import chain, cycle, repeat
 from smtplib import SMTPAuthenticationError, SMTPConnectError, SMTPDataError, SMTPServerDisconnected
@@ -75,7 +76,6 @@ def my_update_subtask_status(entry_id, current_task_id, new_subtask_status):
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
     """Tests instructor task that send bulk email."""
-    shard = 5
 
     def setUp(self):
         super(TestBulkEmailInstructorTask, self).setUp()
@@ -152,7 +152,7 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         self.assertEquals(len(task_id_list), 1)
         task_id = task_id_list[0]
         subtask_status = subtask_status_info.get(task_id)
-        print "Testing subtask status: {}".format(subtask_status)
+        print(u"Testing subtask status: {}".format(subtask_status))
         self.assertEquals(subtask_status.get('task_id'), task_id)
         self.assertEquals(subtask_status.get('attempted'), succeeded + failed)
         self.assertEquals(subtask_status.get('succeeded'), succeeded)

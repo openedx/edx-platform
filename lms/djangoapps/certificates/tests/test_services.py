@@ -13,7 +13,6 @@ class CertificateServiceTests(ModuleStoreTestCase):
     """
     Tests for the Certificate service
     """
-    shard = 4
 
     def setUp(self):
         super(CertificateServiceTests, self).setUp()

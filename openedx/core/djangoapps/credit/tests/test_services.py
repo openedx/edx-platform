@@ -20,7 +20,6 @@ class CreditServiceTests(ModuleStoreTestCase):
     """
     Tests for the Credit xBlock service
     """
-    shard = 2
 
     def setUp(self):
         super(CreditServiceTests, self).setUp()

@@ -61,7 +61,7 @@ def get_ccx_from_ccx_locator(course_id):
         ccx = CustomCourseForEdX.objects.filter(id=ccx_id)
     if not ccx:
         log.warning(
-            "CCX does not exist for course with id %s",
+            u"CCX does not exist for course with id %s",
             course_id
         )
         return None
@@ -86,10 +86,10 @@ def get_date(ccx, node, date_type=None, parent_node=None):
 
     if date is not None:
         # Setting override date [start or due]
-        date = date.strftime('%Y-%m-%d %H:%M')
+        date = date.strftime(u'%Y-%m-%d %H:%M')
     elif not parent_node and master_date is not None:
         # Setting date from master course
-        date = master_date.strftime('%Y-%m-%d %H:%M')
+        date = master_date.strftime(u'%Y-%m-%d %H:%M')
     elif parent_node is not None:
         # Set parent date (vertical has same dates as subsections)
         date = get_date(ccx, node=parent_node, date_type=date_type)
@@ -224,7 +224,7 @@ def get_valid_student_with_email(identifier):
     try:
         validate_email(email)
     except ValidationError:
-        raise CCXUserValidationException('Could not find a user with name or email "{0}" '.format(identifier))
+        raise CCXUserValidationException(u'Could not find a user with name or email "{0}" '.format(identifier))
     return email, user
 
 
@@ -263,7 +263,7 @@ def ccx_students_enrolling_center(action, identifiers, email_students, course_ke
                 continue
 
             if CourseEnrollment.objects.is_course_full(ccx_course_overview) and not must_enroll:
-                error = _('The course is full: the limit is {max_student_enrollments_allowed}').format(
+                error = _(u'The course is full: the limit is {max_student_enrollments_allowed}').format(
                     max_student_enrollments_allowed=ccx_course_overview.max_student_enrollments_allowed)
                 log.info("%s", error)
                 errors.append(error)
@@ -355,7 +355,7 @@ def add_master_course_staff_to_ccx(master_course, ccx_key, display_name, send_em
                     allow_access(course_ccx, staff, 'staff')
                 except CourseEnrollmentException:
                     log.warning(
-                        "Unable to enroll staff %s to course with id %s",
+                        u"Unable to enroll staff %s to course with id %s",
                         staff.email,
                         ccx_key
                     )
@@ -380,7 +380,7 @@ def add_master_course_staff_to_ccx(master_course, ccx_key, display_name, send_em
                     allow_access(course_ccx, instructor, 'instructor')
                 except CourseEnrollmentException:
                     log.warning(
-                        "Unable to enroll instructor %s to course with id %s",
+                        u"Unable to enroll instructor %s to course with id %s",
                         instructor.email,
                         ccx_key
                     )

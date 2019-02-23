@@ -10,6 +10,8 @@ class ProgramsApiConfig(ConfigurationModel):
     This model no longer fronts an API, but now sets a few config-related values for the idea of programs in general.
 
     A rename to ProgramsConfig would be more accurate, but costly in terms of developer time.
+
+    .. no_pii:
     """
     class Meta(object):
         app_label = "programs"

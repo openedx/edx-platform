@@ -37,7 +37,8 @@ from xmodule.util.xmodule_django import add_webpack_to_fragment
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.asides import AsideUsageKeyV2, AsideDefinitionKeyV2
 from xmodule.exceptions import UndefinedContext
-import dogstats_wrapper as dog_stats_api
+
+from openedx.core.djangolib.markup import HTML
 
 log = logging.getLogger(__name__)
 
@@ -55,6 +56,10 @@ DEPRECATION_VSCOMPAT_EVENT = 'deprecation.vscompat'
 # the XBlock also implements author_view.
 STUDENT_VIEW = 'student_view'
 
+# This is the view that will be rendered to display the XBlock in the LMS for unenrolled learners.
+# Implementations of this view should assume that a user and user data are not available.
+PUBLIC_VIEW = 'public_view'
+
 # An optional view of the XBlock similar to student_view, but with possible inline
 # editing capabilities. This view differs from studio_view in that it should be as similar to student_view
 # as possible. When previewing XBlocks within Studio, Studio will prefer author_view to student_view.
@@ -65,8 +70,12 @@ AUTHOR_VIEW = 'author_view'
 STUDIO_VIEW = 'studio_view'
 
 # Views that present a "preview" view of an xblock (as opposed to an editing view).
-PREVIEW_VIEWS = [STUDENT_VIEW, AUTHOR_VIEW]
+PREVIEW_VIEWS = [STUDENT_VIEW, PUBLIC_VIEW, AUTHOR_VIEW]
 
+DEFAULT_PUBLIC_VIEW_MESSAGE = (
+    u'This content is only accessible to enrolled learners. '
+    u'Sign in or register, and enroll in this course to view it.'
+)
 
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
 #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
@@ -509,14 +518,6 @@ class XModuleMixin(XModuleFields, XBlock):
             child = super(XModuleMixin, self).get_child(usage_id)
         except ItemNotFoundError:
             log.warning(u'Unable to load item %s, skipping', usage_id)
-            dog_stats_api.increment(
-                "xmodule.item_not_found_error",
-                tags=[
-                    u"course_id:{}".format(usage_id.course_key),
-                    u"block_type:{}".format(usage_id.block_type),
-                    u"parent_block_type:{}".format(self.location.block_type),
-                ]
-            )
             return None
 
         if child is None:
@@ -758,6 +759,28 @@ class XModuleMixin(XModuleFields, XBlock):
         metadata_field_editor_info['options'] = [] if values is None else values
 
         return metadata_field_editor_info
+
+    def public_view(self, _context):
+        """
+        Default message for blocks that don't implement public_view
+        """
+        alert_html = HTML(
+            u'<div class="page-banner"><div class="alert alert-warning">'
+            u'<span class="icon icon-alert fa fa fa-warning" aria-hidden="true"></span>'
+            u'<div class="message-content">{}</div></div></div>'
+        )
+
+        if self.display_name:
+            display_text = _(
+                u'{display_name} is only accessible to enrolled learners. '
+                'Sign in or register, and enroll in this course to view it.'
+            ).format(
+                display_name=self.display_name
+            )
+        else:
+            display_text = _(DEFAULT_PUBLIC_VIEW_MESSAGE)
+
+        return Fragment(alert_html.format(display_text))
 
 
 class ProxyAttribute(object):
@@ -1072,12 +1095,6 @@ class XModuleDescriptor(HTMLSnippet, ResourceTemplates, XModuleMixin):
 
     @classmethod
     def _translate(cls, key):
-        'VS[compat]'
-        if key in cls.metadata_translations:
-            dog_stats_api.increment(
-                DEPRECATION_VSCOMPAT_EVENT,
-                tags=["location:xmodule_descriptor_translate"]
-            )
         return cls.metadata_translations.get(key, key)
 
     # ================================= XML PARSING ============================
@@ -1223,6 +1240,7 @@ class XModuleDescriptor(HTMLSnippet, ResourceTemplates, XModuleMixin):
     get_score = module_attr('get_score')
     handle_ajax = module_attr('handle_ajax')
     student_view = module_attr(STUDENT_VIEW)
+    public_view = module_attr(PUBLIC_VIEW)
     get_child_descriptors = module_attr('get_child_descriptors')
     xmodule_handler = module_attr('xmodule_handler')
 
@@ -1332,13 +1350,6 @@ class MetricsMixin(object):
                 u'block_type:{}'.format(block.scope_ids.block_type),
                 u'block_family:{}'.format(block.entry_point),
             ]
-            dog_stats_api.increment(XMODULE_METRIC_NAME, tags=tags, sample_rate=XMODULE_METRIC_SAMPLE_RATE)
-            dog_stats_api.histogram(
-                XMODULE_DURATION_METRIC_NAME,
-                duration,
-                tags=tags,
-                sample_rate=XMODULE_METRIC_SAMPLE_RATE,
-            )
             log.debug(
                 "%.3fs - render %s.%s (%s)",
                 duration,
@@ -1369,13 +1380,6 @@ class MetricsMixin(object):
                 u'block_type:{}'.format(block.scope_ids.block_type),
                 u'block_family:{}'.format(block.entry_point),
             ]
-            dog_stats_api.increment(XMODULE_METRIC_NAME, tags=tags, sample_rate=XMODULE_METRIC_SAMPLE_RATE)
-            dog_stats_api.histogram(
-                XMODULE_DURATION_METRIC_NAME,
-                duration,
-                tags=tags,
-                sample_rate=XMODULE_METRIC_SAMPLE_RATE
-            )
             log.debug(
                 "%.3fs - handle %s.%s (%s)",
                 duration,

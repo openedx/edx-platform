@@ -127,7 +127,7 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
                 for sequential in chapter.children:
                     self.assertIn(sequential.display_name, response_content)
                     if sequential.graded:
-                        self.assertIn(sequential.due.strftime('%Y-%m-%d %H:%M:%S'), response_content)
+                        self.assertIn(sequential.due.strftime(u'%Y-%m-%d %H:%M:%S'), response_content)
                         self.assertIn(sequential.format, response_content)
                     self.assertTrue(sequential.children)
                     for vertical in sequential.children:
@@ -641,8 +641,8 @@ class TestCourseOutlinePreview(SharedModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Future Chapter')
 
-        # Verify that staff masquerading as a learner does not see the future chapter.
+        # Verify that staff masquerading as a learner see the future chapter.
         self.update_masquerade(course, role='student')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertNotContains(response, 'Future Chapter')
+        self.assertContains(response, 'Future Chapter')

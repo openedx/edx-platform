@@ -2,12 +2,17 @@
 Tests of CourseDurationLimitConfig.
 """
 
-from datetime import timedelta, date
+from datetime import timedelta, datetime
 import itertools
 
 import ddt
+from django.utils import timezone
 from mock import Mock
+import pytz
 
+from edx_django_utils.cache import RequestCache
+from opaque_keys.edx.locator import CourseLocator
+from openedx.core.djangoapps.config_model_utils.models import Provenance
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
@@ -46,12 +51,12 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
         enrolled_before_enabled,
     ):
 
-        # Tweak the day to enable the config so that it is either before
-        # or after today (which is when the enrollment will be created)
+        # Tweak the datetime to enable the config so that it is either before
+        # or after now (which is when the enrollment will be created)
         if enrolled_before_enabled:
-            enabled_as_of = date.today() + timedelta(days=1)
+            enabled_as_of = timezone.now() + timedelta(days=1)
         else:
-            enabled_as_of = date.today() - timedelta(days=1)
+            enabled_as_of = timezone.now() - timedelta(days=1)
 
         CourseDurationLimitConfig.objects.create(
             enabled=True,
@@ -76,9 +81,9 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
             user = self.user
             course_key = self.course_overview.id
 
-        query_count = 5
-        if not pass_enrollment and already_enrolled:
-            query_count = 6
+        query_count = 9
+        if pass_enrollment and already_enrolled:
+            query_count = 8
 
         with self.assertNumQueries(query_count):
             enabled = CourseDurationLimitConfig.enabled_for_enrollment(
@@ -130,15 +135,15 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
         config = CourseDurationLimitConfig.objects.create(
             enabled=True,
             course=self.course_overview,
-            enabled_as_of=date.today(),
+            enabled_as_of=timezone.now(),
         )
 
-        # Tweak the day to check for course enablement so it is either
+        # Tweak the datetime to check for course enablement so it is either
         # before or after when the configuration was enabled
         if before_enabled:
-            target_date = config.enabled_as_of - timedelta(days=1)
+            target_datetime = config.enabled_as_of - timedelta(days=1)
         else:
-            target_date = config.enabled_as_of + timedelta(days=1)
+            target_datetime = config.enabled_as_of + timedelta(days=1)
 
         course_key = self.course_overview.id
 
@@ -146,7 +151,7 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
             not before_enabled,
             CourseDurationLimitConfig.enabled_for_course(
                 course_key=course_key,
-                target_date=target_date,
+                target_datetime=target_datetime,
             )
         )
 
@@ -199,13 +204,76 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
         self.assertEqual(expected_org_setting, CourseDurationLimitConfig.current(org=test_course.org).enabled)
         self.assertEqual(expected_course_setting, CourseDurationLimitConfig.current(course_key=test_course.id).enabled)
 
+    def test_all_current_course_configs(self):
+        # Set up test objects
+        for global_setting in (True, False, None):
+            CourseDurationLimitConfig.objects.create(enabled=global_setting, enabled_as_of=datetime(2018, 1, 1))
+            for site_setting in (True, False, None):
+                test_site_cfg = SiteConfigurationFactory.create(values={'course_org_filter': []})
+                CourseDurationLimitConfig.objects.create(
+                    site=test_site_cfg.site, enabled=site_setting, enabled_as_of=datetime(2018, 1, 1)
+                )
+
+                for org_setting in (True, False, None):
+                    test_org = "{}-{}".format(test_site_cfg.id, org_setting)
+                    test_site_cfg.values['course_org_filter'].append(test_org)
+                    test_site_cfg.save()
+
+                    CourseDurationLimitConfig.objects.create(
+                        org=test_org, enabled=org_setting, enabled_as_of=datetime(2018, 1, 1)
+                    )
+
+                    for course_setting in (True, False, None):
+                        test_course = CourseOverviewFactory.create(
+                            org=test_org,
+                            id=CourseLocator(test_org, 'test_course', 'run-{}'.format(course_setting))
+                        )
+                        CourseDurationLimitConfig.objects.create(
+                            course=test_course, enabled=course_setting, enabled_as_of=datetime(2018, 1, 1)
+                        )
+
+            with self.assertNumQueries(4):
+                all_configs = CourseDurationLimitConfig.all_current_course_configs()
+
+        # Deliberatly using the last all_configs that was checked after the 3rd pass through the global_settings loop
+        # We should be creating 3^4 courses (3 global values * 3 site values * 3 org values * 3 course values)
+        # Plus 1 for the edX/toy/2012_Fall course
+        self.assertEqual(len(all_configs), 3**4 + 1)
+
+        # Point-test some of the final configurations
+        self.assertEqual(
+            all_configs[CourseLocator('7-True', 'test_course', 'run-None')],
+            {
+                'enabled': (True, Provenance.org),
+                'enabled_as_of': (datetime(2018, 1, 1, 5, tzinfo=pytz.UTC), Provenance.course),
+            }
+        )
+        self.assertEqual(
+            all_configs[CourseLocator('7-True', 'test_course', 'run-False')],
+            {
+                'enabled': (False, Provenance.course),
+                'enabled_as_of': (datetime(2018, 1, 1, 5, tzinfo=pytz.UTC), Provenance.course),
+            }
+        )
+        self.assertEqual(
+            all_configs[CourseLocator('7-None', 'test_course', 'run-None')],
+            {
+                'enabled': (True, Provenance.site),
+                'enabled_as_of': (datetime(2018, 1, 1, 5, tzinfo=pytz.UTC), Provenance.course),
+            }
+        )
+
     def test_caching_global(self):
-        global_config = CourseDurationLimitConfig(enabled=True, enabled_as_of=date(2018, 1, 1))
+        global_config = CourseDurationLimitConfig(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         global_config.save()
+
+        RequestCache.clear_all_namespaces()
 
         # Check that the global value is not retrieved from cache after save
         with self.assertNumQueries(1):
             self.assertTrue(CourseDurationLimitConfig.current().enabled)
+
+        RequestCache.clear_all_namespaces()
 
         # Check that the global value can be retrieved from cache after read
         with self.assertNumQueries(0):
@@ -214,18 +282,24 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
         global_config.enabled = False
         global_config.save()
 
+        RequestCache.clear_all_namespaces()
+
         # Check that the global value in cache was deleted on save
         with self.assertNumQueries(1):
             self.assertFalse(CourseDurationLimitConfig.current().enabled)
 
     def test_caching_site(self):
         site_cfg = SiteConfigurationFactory()
-        site_config = CourseDurationLimitConfig(site=site_cfg.site, enabled=True, enabled_as_of=date(2018, 1, 1))
+        site_config = CourseDurationLimitConfig(site=site_cfg.site, enabled=True, enabled_as_of=datetime(2018, 1, 1))
         site_config.save()
+
+        RequestCache.clear_all_namespaces()
 
         # Check that the site value is not retrieved from cache after save
         with self.assertNumQueries(1):
             self.assertTrue(CourseDurationLimitConfig.current(site=site_cfg.site).enabled)
+
+        RequestCache.clear_all_namespaces()
 
         # Check that the site value can be retrieved from cache after read
         with self.assertNumQueries(0):
@@ -234,12 +308,16 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
         site_config.enabled = False
         site_config.save()
 
+        RequestCache.clear_all_namespaces()
+
         # Check that the site value in cache was deleted on save
         with self.assertNumQueries(1):
             self.assertFalse(CourseDurationLimitConfig.current(site=site_cfg.site).enabled)
 
-        global_config = CourseDurationLimitConfig(enabled=True, enabled_as_of=date(2018, 1, 1))
+        global_config = CourseDurationLimitConfig(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         global_config.save()
+
+        RequestCache.clear_all_namespaces()
 
         # Check that the site value is not updated in cache by changing the global value
         with self.assertNumQueries(0):
@@ -248,12 +326,16 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
     def test_caching_org(self):
         course = CourseOverviewFactory.create(org='test-org')
         site_cfg = SiteConfigurationFactory.create(values={'course_org_filter': course.org})
-        org_config = CourseDurationLimitConfig(org=course.org, enabled=True, enabled_as_of=date(2018, 1, 1))
+        org_config = CourseDurationLimitConfig(org=course.org, enabled=True, enabled_as_of=datetime(2018, 1, 1))
         org_config.save()
+
+        RequestCache.clear_all_namespaces()
 
         # Check that the org value is not retrieved from cache after save
         with self.assertNumQueries(2):
             self.assertTrue(CourseDurationLimitConfig.current(org=course.org).enabled)
+
+        RequestCache.clear_all_namespaces()
 
         # Check that the org value can be retrieved from cache after read
         with self.assertNumQueries(0):
@@ -262,19 +344,25 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
         org_config.enabled = False
         org_config.save()
 
+        RequestCache.clear_all_namespaces()
+
         # Check that the org value in cache was deleted on save
         with self.assertNumQueries(2):
             self.assertFalse(CourseDurationLimitConfig.current(org=course.org).enabled)
 
-        global_config = CourseDurationLimitConfig(enabled=True, enabled_as_of=date(2018, 1, 1))
+        global_config = CourseDurationLimitConfig(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         global_config.save()
+
+        RequestCache.clear_all_namespaces()
 
         # Check that the org value is not updated in cache by changing the global value
         with self.assertNumQueries(0):
             self.assertFalse(CourseDurationLimitConfig.current(org=course.org).enabled)
 
-        site_config = CourseDurationLimitConfig(site=site_cfg.site, enabled=True, enabled_as_of=date(2018, 1, 1))
+        site_config = CourseDurationLimitConfig(site=site_cfg.site, enabled=True, enabled_as_of=datetime(2018, 1, 1))
         site_config.save()
+
+        RequestCache.clear_all_namespaces()
 
         # Check that the org value is not updated in cache by changing the site value
         with self.assertNumQueries(0):
@@ -283,12 +371,16 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
     def test_caching_course(self):
         course = CourseOverviewFactory.create(org='test-org')
         site_cfg = SiteConfigurationFactory.create(values={'course_org_filter': course.org})
-        course_config = CourseDurationLimitConfig(course=course, enabled=True, enabled_as_of=date(2018, 1, 1))
+        course_config = CourseDurationLimitConfig(course=course, enabled=True, enabled_as_of=datetime(2018, 1, 1))
         course_config.save()
+
+        RequestCache.clear_all_namespaces()
 
         # Check that the org value is not retrieved from cache after save
         with self.assertNumQueries(2):
             self.assertTrue(CourseDurationLimitConfig.current(course_key=course.id).enabled)
+
+        RequestCache.clear_all_namespaces()
 
         # Check that the org value can be retrieved from cache after read
         with self.assertNumQueries(0):
@@ -297,26 +389,34 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
         course_config.enabled = False
         course_config.save()
 
+        RequestCache.clear_all_namespaces()
+
         # Check that the org value in cache was deleted on save
         with self.assertNumQueries(2):
             self.assertFalse(CourseDurationLimitConfig.current(course_key=course.id).enabled)
 
-        global_config = CourseDurationLimitConfig(enabled=True, enabled_as_of=date(2018, 1, 1))
+        global_config = CourseDurationLimitConfig(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         global_config.save()
+
+        RequestCache.clear_all_namespaces()
 
         # Check that the org value is not updated in cache by changing the global value
         with self.assertNumQueries(0):
             self.assertFalse(CourseDurationLimitConfig.current(course_key=course.id).enabled)
 
-        site_config = CourseDurationLimitConfig(site=site_cfg.site, enabled=True, enabled_as_of=date(2018, 1, 1))
+        site_config = CourseDurationLimitConfig(site=site_cfg.site, enabled=True, enabled_as_of=datetime(2018, 1, 1))
         site_config.save()
+
+        RequestCache.clear_all_namespaces()
 
         # Check that the org value is not updated in cache by changing the site value
         with self.assertNumQueries(0):
             self.assertFalse(CourseDurationLimitConfig.current(course_key=course.id).enabled)
 
-        org_config = CourseDurationLimitConfig(org=course.org, enabled=True, enabled_as_of=date(2018, 1, 1))
+        org_config = CourseDurationLimitConfig(org=course.org, enabled=True, enabled_as_of=datetime(2018, 1, 1))
         org_config.save()
+
+        RequestCache.clear_all_namespaces()
 
         # Check that the org value is not updated in cache by changing the site value
         with self.assertNumQueries(0):

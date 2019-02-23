@@ -42,7 +42,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         course_id = options['course']
-        log.info('Fetching ungraded students for %s.', course_id)
+        log.info(u'Fetching ungraded students for %s.', course_id)
         ungraded = GeneratedCertificate.objects.filter(  # pylint: disable=no-member
             course_id__exact=course_id
         ).filter(grade__exact='')
@@ -50,7 +50,7 @@ class Command(BaseCommand):
         for cert in ungraded:
             # grade the student
             grade = CourseGradeFactory().read(cert.user, course)
-            log.info('grading %s - %s', cert.user, grade.percent)
+            log.info(u'grading %s - %s', cert.user, grade.percent)
             cert.grade = grade.percent
             if not options['noop']:
                 cert.save()

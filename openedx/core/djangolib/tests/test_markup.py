@@ -16,7 +16,6 @@ from openedx.core.djangolib.markup import HTML, Text, strip_all_tags_but_br
 @ddt.ddt
 class FormatHtmlTest(unittest.TestCase):
     """Test that we can format plain strings and HTML into them properly."""
-    shard = 2
 
     @ddt.data(
         (u"hello", u"hello"),
@@ -26,7 +25,8 @@ class FormatHtmlTest(unittest.TestCase):
         (u"Stop & Shop", u"Stop &amp; Shop"),
         (u"<a>нтмℓ-єѕ¢αρє∂</a>", u"&lt;a&gt;нтмℓ-єѕ¢αρє∂&lt;/a&gt;"),
     )
-    def test_simple(self, (before, after)):
+    def test_simple(self, before_after):
+        (before, after) = before_after
         self.assertEqual(unicode(Text(_(before))), after)
         self.assertEqual(unicode(Text(before)), after)
 
@@ -45,7 +45,7 @@ class FormatHtmlTest(unittest.TestCase):
         # Sometimes, you have plain text, with html inserted, and the html has
         # plain text inserted.  It gets twisty...
         out = Text(_(u"Send {start}email{end}")).format(
-            start=HTML("<a href='mailto:{email}'>").format(email="A&B"),
+            start=HTML(u"<a href='mailto:{email}'>").format(email="A&B"),
             end=HTML("</a>"),
         )
         self.assertEqual(
@@ -56,7 +56,7 @@ class FormatHtmlTest(unittest.TestCase):
     def test_mako(self):
         # The default_filters used here have to match the ones in edxmako.
         template = Template(
-            """
+            u"""
                 <%!
                 from django.utils.translation import ugettext as _
 
@@ -71,13 +71,13 @@ class FormatHtmlTest(unittest.TestCase):
 
     def test_ungettext(self):
         for i in [1, 2]:
-            out = Text(ungettext("1 & {}", "2 & {}", i)).format(HTML("<>"))
-            self.assertEqual(out, "{} &amp; <>".format(i))
+            out = Text(ungettext(u"1 & {}", u"2 & {}", i)).format(HTML(u"<>"))
+            self.assertEqual(out, u"{} &amp; <>".format(i))
 
     def test_strip_all_tags_but_br_filter(self):
         """ Verify filter removes every tags except br """
         template = Template(
-            """
+            u"""
                 <%page expression_filter="h"/>
                 <%!
                 from openedx.core.djangolib.markup import strip_all_tags_but_br

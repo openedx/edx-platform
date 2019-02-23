@@ -27,7 +27,6 @@ from openedx.core.djangolib.testing.utils import skip_unless_lms
 @skip_unless_lms
 class EmailOptInListTest(ModuleStoreTestCase):
     """Tests for the email opt-in list management command. """
-    shard = 2
     USER_USERNAME = "test_user"
     USER_FIRST_NAME = u"Ṫëṡẗ"
     USER_LAST_NAME = u"Űśéŕ"
@@ -396,7 +395,7 @@ class EmailOptInListTest(ModuleStoreTestCase):
                 reader = csv.DictReader(output_file, fieldnames=self.OUTPUT_FIELD_NAMES)
                 rows = [row for row in reader]
         except IOError:
-            self.fail("Could not find or open output file at '{path}'".format(path=output_path))
+            self.fail(u"Could not find or open output file at '{path}'".format(path=output_path))
 
         # Return the output as a list of dictionaries
         return rows

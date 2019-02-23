@@ -212,7 +212,7 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
         )
 
         # Fire off the disconnect pipeline to unlink.
-        self.assert_redirect_to_dashboard_looks_correct(
+        self.assert_redirect_after_pipeline_completes(
             actions.do_disconnect(
                 request.backend,
                 user,
@@ -290,13 +290,13 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
             self.assertEqual(mock_log.call_count, 4)
 
             (msg, action_type, idp_name, xml), _kwargs = mock_log.call_args_list[0]
-            self.assertTrue(msg.startswith("SAML login %s"))
+            self.assertTrue(msg.startswith(u"SAML login %s"))
             self.assertEqual(action_type, "request")
             self.assertEqual(idp_name, self.PROVIDER_IDP_SLUG)
             self.assertIn('<samlp:AuthnRequest', xml)
 
             (msg, action_type, idp_name, xml), _kwargs = mock_log.call_args_list[1]
-            self.assertTrue(msg.startswith("SAML login %s"))
+            self.assertTrue(msg.startswith(u"SAML login %s"))
             self.assertEqual(action_type, "response")
             self.assertEqual(idp_name, self.PROVIDER_IDP_SLUG)
             self.assertIn('<saml2p:Response', xml)

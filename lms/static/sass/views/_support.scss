@@ -185,6 +185,34 @@
   text-align: center;
 }
 
+.fb-enrollments-results {
+  .fb-enrollments-table {
+    display: inline-block;
+  }
+
+  th {
+    @extend %t-title7;
+
+    text-align: center;
+  }
+
+  td{
+    padding: 0 23px;
+  }
+}
+
+.fb-enrollments-content{
+  text-align: center;
+}
+
+.fb-enrollments-search{
+  margin: 40px 0;
+
+  input[name="course_key"] {
+    width: 350px;
+  }
+}
+
 .contact-us-wrapper {
   min-width: auto;
 

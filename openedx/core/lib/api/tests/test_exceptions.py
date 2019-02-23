@@ -11,7 +11,6 @@ class TestDictExceptionsAllowDictDetails(TestCase):
     """
     Test that standard DRF exceptions can return dictionaries in error details.
     """
-    shard = 2
 
     def test_drf_errors_are_not_coerced_to_strings(self):
         # Demonstrate that dictionaries in exceptions are not coerced to strings.

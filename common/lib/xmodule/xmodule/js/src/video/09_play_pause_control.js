@@ -25,7 +25,7 @@
 
         PlayPauseControl.prototype = {
             template: [
-                '<button class="control video_control play" aria-disabled="false" title="',
+                '<button class="control video_control play" aria-disabled="false" aria-label="',
                 gettext('Play'),
                 '">',
                 '<span class="icon fa fa-play" aria-hidden="true"></span>',

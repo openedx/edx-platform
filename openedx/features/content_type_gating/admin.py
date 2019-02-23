@@ -36,5 +36,6 @@ class ContentTypeGatingConfigAdmin(StackedConfigModelAdmin):
             ),
         })
     )
+    raw_id_fields = ('course',)
 
 admin.site.register(ContentTypeGatingConfig, ContentTypeGatingConfigAdmin)

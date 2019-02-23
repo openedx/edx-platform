@@ -10,7 +10,6 @@ from django.contrib.auth.models import AnonymousUser
 from django.core.cache import cache
 from django.db.models import signals
 from django.db.models.functions import Lower
-from django.test import TestCase
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
@@ -26,11 +25,13 @@ from student.models import (
     PendingEmailChange,
     ManualEnrollmentAudit,
     ALLOWEDTOENROLL_TO_ENROLLED,
-    PendingNameChange
+    PendingNameChange,
+    AccountRecovery
 )
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory, AccountRecoveryFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+from django.test import TestCase
 
 
 @ddt.ddt
@@ -383,3 +384,24 @@ class TestManualEnrollmentAudit(SharedModuleStoreTestCase):
         self.assertFalse(ManualEnrollmentAudit.objects.filter(enrollment=enrollment).exclude(
             reason=""
         ))
+
+
+class TestAccountRecovery(TestCase):
+    """
+    Tests for the AccountRecovery Model
+    """
+
+    def test_retire_recovery_email(self):
+        """
+        Assert that Account Record for a given user is deleted when `retire_recovery_email` is called
+        """
+        # Create user and associated recovery email record
+        user = UserFactory()
+        AccountRecoveryFactory(user=user)
+        assert len(AccountRecovery.objects.filter(user_id=user.id)) == 1
+
+        # Retire recovery email
+        AccountRecovery.retire_recovery_email(user_id=user.id)
+
+        # Assert that there is no longer an AccountRecovery record for this user
+        assert len(AccountRecovery.objects.filter(user_id=user.id)) == 0

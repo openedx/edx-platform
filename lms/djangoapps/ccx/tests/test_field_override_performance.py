@@ -3,7 +3,7 @@
 Performance tests for field overrides.
 """
 import itertools
-from datetime import datetime, date
+from datetime import datetime
 
 import ddt
 import mock
@@ -53,7 +53,6 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
     __test__ = False
     # Tell Django to clean out all databases, not just default
     multi_db = True
-    shard = 7
 
     # TEST_DATA must be overridden by subclasses
     TEST_DATA = None
@@ -204,7 +203,7 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
         """
         ContentTypeGatingConfig.objects.create(
             enabled=True,
-            enabled_as_of=date(2018, 1, 1),
+            enabled_as_of=datetime(2018, 1, 1),
         )
 
         providers = {
@@ -239,23 +238,25 @@ class TestFieldOverrideMongoPerformance(FieldOverridePerformanceTestCase):
     MODULESTORE = TEST_DATA_MONGO_MODULESTORE
     __test__ = True
 
+    # TODO: decrease query count as part of REVO-28
+    QUERY_COUNT = 36
     TEST_DATA = {
         # (providers, course_width, enable_ccx, view_as_ccx): (
         #     # of sql queries to default,
         #     # of mongo queries,
         # )
-        ('no_overrides', 1, True, False): (31, 1),
-        ('no_overrides', 2, True, False): (31, 1),
-        ('no_overrides', 3, True, False): (31, 1),
-        ('ccx', 1, True, False): (31, 1),
-        ('ccx', 2, True, False): (31, 1),
-        ('ccx', 3, True, False): (31, 1),
-        ('no_overrides', 1, False, False): (31, 1),
-        ('no_overrides', 2, False, False): (31, 1),
-        ('no_overrides', 3, False, False): (31, 1),
-        ('ccx', 1, False, False): (31, 1),
-        ('ccx', 2, False, False): (31, 1),
-        ('ccx', 3, False, False): (31, 1),
+        ('no_overrides', 1, True, False): (QUERY_COUNT, 1),
+        ('no_overrides', 2, True, False): (QUERY_COUNT, 1),
+        ('no_overrides', 3, True, False): (QUERY_COUNT, 1),
+        ('ccx', 1, True, False): (QUERY_COUNT, 1),
+        ('ccx', 2, True, False): (QUERY_COUNT, 1),
+        ('ccx', 3, True, False): (QUERY_COUNT, 1),
+        ('no_overrides', 1, False, False): (QUERY_COUNT, 1),
+        ('no_overrides', 2, False, False): (QUERY_COUNT, 1),
+        ('no_overrides', 3, False, False): (QUERY_COUNT, 1),
+        ('ccx', 1, False, False): (QUERY_COUNT, 1),
+        ('ccx', 2, False, False): (QUERY_COUNT, 1),
+        ('ccx', 3, False, False): (QUERY_COUNT, 1),
     }
 
 
@@ -266,20 +267,22 @@ class TestFieldOverrideSplitPerformance(FieldOverridePerformanceTestCase):
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
     __test__ = True
 
+    # TODO: decrease query count as part of REVO-28
+    QUERY_COUNT = 36
     TEST_DATA = {
-        ('no_overrides', 1, True, False): (31, 3),
-        ('no_overrides', 2, True, False): (31, 3),
-        ('no_overrides', 3, True, False): (31, 3),
-        ('ccx', 1, True, False): (31, 3),
-        ('ccx', 2, True, False): (31, 3),
-        ('ccx', 3, True, False): (31, 3),
-        ('ccx', 1, True, True): (32, 3),
-        ('ccx', 2, True, True): (32, 3),
-        ('ccx', 3, True, True): (32, 3),
-        ('no_overrides', 1, False, False): (31, 3),
-        ('no_overrides', 2, False, False): (31, 3),
-        ('no_overrides', 3, False, False): (31, 3),
-        ('ccx', 1, False, False): (31, 3),
-        ('ccx', 2, False, False): (31, 3),
-        ('ccx', 3, False, False): (31, 3),
+        ('no_overrides', 1, True, False): (QUERY_COUNT, 3),
+        ('no_overrides', 2, True, False): (QUERY_COUNT, 3),
+        ('no_overrides', 3, True, False): (QUERY_COUNT, 3),
+        ('ccx', 1, True, False): (QUERY_COUNT, 3),
+        ('ccx', 2, True, False): (QUERY_COUNT, 3),
+        ('ccx', 3, True, False): (QUERY_COUNT, 3),
+        ('ccx', 1, True, True): (QUERY_COUNT + 1, 3),
+        ('ccx', 2, True, True): (QUERY_COUNT + 1, 3),
+        ('ccx', 3, True, True): (QUERY_COUNT + 1, 3),
+        ('no_overrides', 1, False, False): (QUERY_COUNT, 3),
+        ('no_overrides', 2, False, False): (QUERY_COUNT, 3),
+        ('no_overrides', 3, False, False): (QUERY_COUNT, 3),
+        ('ccx', 1, False, False): (QUERY_COUNT, 3),
+        ('ccx', 2, False, False): (QUERY_COUNT, 3),
+        ('ccx', 3, False, False): (QUERY_COUNT, 3),
     }

@@ -81,6 +81,9 @@ from openedx.features.portfolio_project import INCLUDE_PORTFOLIO_UPSELL_MODAL
     </header>
     <div class="page-content">
         <div class="page-content-main">
+            % if course_expiration_fragment:
+                ${HTML(course_expiration_fragment.content)}
+            % endif
             % if course_home_message_fragment:
                 ${HTML(course_home_message_fragment.body_html())}
             % endif

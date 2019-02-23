@@ -45,7 +45,7 @@ class CertificateConfigFixture(StudioApiFixture):
 
         if not response.ok:
             raise CertificateConfigFixtureError(
-                "Could not create certificate {0}.  Status was {1}".format(
+                u"Could not create certificate {0}.  Status was {1}".format(
                     json.dumps(self.certificates), response.status_code
                 )
             )
@@ -64,7 +64,7 @@ class CertificateConfigFixture(StudioApiFixture):
 
         if not response.ok:
             raise CertificateConfigUpdateFixtureError(
-                "Could not update certificate {0}.  Status was {1}".format(
+                u"Could not update certificate {0}.  Status was {1}".format(
                     json.dumps(self.certificates), response.status_code
                 )
             )

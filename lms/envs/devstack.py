@@ -21,9 +21,13 @@ SITE_NAME = 'localhost:8000'
 CELERY_ALWAYS_EAGER = True
 HTTPS = 'off'
 
-LMS_ROOT_URL = 'http://localhost:8000'
+LMS_ROOT_URL = "http://localhost:8000"
 LMS_INTERNAL_ROOT_URL = LMS_ROOT_URL
 ENTERPRISE_API_URL = LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/'
+IDA_LOGOUT_URI_LIST = [
+    'http://localhost:18130/logout/',  # ecommerce
+    'http://localhost:18150/logout/',  # credentials
+]
 
 ################################ LOGGERS ######################################
 
@@ -32,7 +36,6 @@ import logging
 LOG_OVERRIDES = [
     ('track.contexts', logging.CRITICAL),
     ('track.middleware', logging.CRITICAL),
-    ('dd.dogapi', logging.CRITICAL),
     ('django_comment_client.utils', logging.CRITICAL),
 ]
 for log_name, log_level in LOG_OVERRIDES:
@@ -142,7 +145,6 @@ FEATURES['ENABLE_VIDEO_ABSTRACTION_LAYER_API'] = True
 FEATURES['ENABLE_MAX_FAILED_LOGIN_ATTEMPTS'] = False
 FEATURES['SQUELCH_PII_IN_LOGS'] = False
 FEATURES['PREVENT_CONCURRENT_LOGINS'] = False
-FEATURES['ADVANCED_SECURITY'] = False
 
 ########################### Milestones #################################
 FEATURES['MILESTONES_APP'] = True
@@ -229,9 +231,10 @@ CORS_ALLOW_HEADERS = corsheaders_default_headers + (
     'use-jwt-cookie',
 )
 
-LOGIN_REDIRECT_WHITELIST = []
+LOGIN_REDIRECT_WHITELIST = [CMS_BASE]
 
 ###################### JWTs ######################
+# pylint: disable=unicode-format-string
 JWT_AUTH.update({
     'JWT_ISSUER': OAUTH_OIDC_ISSUER,
     'JWT_AUDIENCE': 'lms-key',
@@ -257,7 +260,7 @@ JWT_AUTH.update({
         'y5ZLcTUomo4rZLjghVpq6KZxfS6I1Vz79ZsMVUWEdXOYePCKKsrQG20ogQEkmTf9FT_SouC6jPcHLXw"}]}'
     ),
 })
-
+# pylint: enable=unicode-format-string
 #####################################################################
 from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants
 plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS, plugin_constants.SettingsType.DEVSTACK)

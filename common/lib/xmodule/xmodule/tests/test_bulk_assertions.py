@@ -52,7 +52,6 @@ CONTEXT_FAILING_ASSERTIONS = (
 
 @ddt.ddt
 class TestBulkAssertionTestCase(BulkAssertionTest):
-    shard = 1
 
     # We have to use assertion methods from the base UnitTest class,
     # so we make a number of super calls that skip BulkAssertionTest.

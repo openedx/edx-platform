@@ -55,12 +55,17 @@ def get_edx_api_data(api_config, resource, api, resource_id=None, querystring=No
 
         cached = cache.get(cache_key)
         if cached:
+            log.info("Cached course run was returned for the course: {resource_id} and response is {cached} ".
+                     format(resource_id=resource_id, cached=zunpickle(cached)))
             return zunpickle(cached)
 
     try:
         endpoint = getattr(api, resource)
         querystring = querystring if querystring else {}
+        log.info("Hitting discovery for course run:{resource_id}".format(resource_id=resource_id))
         response = endpoint(resource_id).get(**querystring)
+        log.info("Response for the course: {resource_id} from discovery: {response} ".
+                 format(resource_id=resource_id, response=response))
 
         if resource_id is not None:
             if fields:

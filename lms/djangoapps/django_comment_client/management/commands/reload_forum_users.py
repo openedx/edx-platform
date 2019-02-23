@@ -23,7 +23,7 @@ class Command(BaseCommand):
             cc_user = cc.User.from_django_user(user)
             cc_user.save()
         except Exception as err:
-            print('update user info to discussion failed for user with id: {}, error={}'.format(user, str(err)))
+            print(u'update user info to discussion failed for user with id: {}, error={}'.format(user, str(err)))
 
     def handle(self, *args, **options):
         if len(options['usernames']) >= 1:

@@ -111,7 +111,7 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
 
     def _get_template_overrides(self):
         templates_override = deepcopy(settings.TEMPLATES)
-        templates_override[0]['OPTIONS']['string_if_invalid'] = "TEMPLATE WARNING - MISSING VARIABLE [%s]"
+        templates_override[0]['OPTIONS']['string_if_invalid'] = u"TEMPLATE WARNING - MISSING VARIABLE [%s]"
         return templates_override
 
     def _schedule_factory(self, offset=None, **factory_kwargs):
@@ -187,7 +187,7 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
             target_day_str = serialize(target_day)
 
             for b in range(self.task.num_bins):
-                LOG.debug('Checking bin %d', b)
+                LOG.debug(u'Checking bin %d', b)
                 expected_queries = NUM_QUERIES_SITE_SCHEDULES
                 if b in bins_in_use:
                     if is_first_match:
@@ -415,10 +415,10 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
             self.assertEqual(len(sent_messages), num_expected_messages)
 
             with self.assertNumQueries(NUM_QUERIES_PER_MESSAGE_DELIVERY):
-                with patch('analytics.track') as mock_analytics_track:
+                with patch('openedx.core.djangoapps.schedules.tasks.segment.track') as mock_segment_track:
                     with patch('edx_ace.channel.channels', return_value=channel_map):
                         self.deliver_task(*sent_messages[0])
-                        self.assertEqual(mock_analytics_track.call_count, 1)
+                        self.assertEqual(mock_segment_track.call_count, 1)
 
             self.assertEqual(mock_channel.deliver.call_count, 1)
             for (_name, (_msg, email), _kwargs) in mock_channel.deliver.mock_calls:

@@ -12,6 +12,7 @@ class OAuth2PermissionDelegationTests(AcceptanceTest):
     """
     Tests for acceptance/denial of permission delegation requests.
     """
+    shard = 16
 
     def setUp(self):
         super(OAuth2PermissionDelegationTests, self).setUp()

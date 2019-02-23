@@ -5,7 +5,6 @@ End-to-end tests for the courseware unit bookmarks.
 import json
 from unittest import skip
 
-import pytest
 import requests
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
@@ -239,7 +238,7 @@ class BookmarksTest(BookmarksTestMixin):
         container_page.wait_for_page()
 
         self.assertEqual(container_page.name, modified_name)
-        container_page.publish_action.click()
+        container_page.publish()
 
     def test_bookmark_button(self):
         """
@@ -586,15 +585,21 @@ class BookmarksTest(BookmarksTestMixin):
         )
 
 
-@pytest.mark.a11y
 class BookmarksA11yTests(BookmarksTestMixin):
     """
     Tests for checking the a11y of the bookmarks page.
     """
+    a11y = True
+
     def test_view_a11y(self):
         """
         Verify the basic accessibility of the bookmarks page while paginated.
         """
+        self.bookmarks_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+            ]
+        })
         self.setup_test(num_chapters=11)
         self.bookmark_units(num_units=11)
         self.bookmarks_page.visit()

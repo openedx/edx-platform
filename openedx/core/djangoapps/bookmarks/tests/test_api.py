@@ -41,7 +41,6 @@ class BookmarksAPITests(BookmarkApiEventTestMixin, BookmarksTestsBase):
     """
     These tests cover the parts of the API methods.
     """
-    shard = 9
 
     def test_get_bookmark(self):
         """

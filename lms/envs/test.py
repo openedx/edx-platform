@@ -228,7 +228,6 @@ FEATURES['ENFORCE_PASSWORD_POLICY'] = False
 FEATURES['ENABLE_MAX_FAILED_LOGIN_ATTEMPTS'] = False
 FEATURES['SQUELCH_PII_IN_LOGS'] = False
 FEATURES['PREVENT_CONCURRENT_LOGINS'] = False
-FEATURES['ADVANCED_SECURITY'] = False
 
 ######### Third-party auth ##########
 FEATURES['ENABLE_THIRD_PARTY_AUTH'] = True
@@ -585,7 +584,7 @@ VIDEO_TRANSCRIPTS_SETTINGS = dict(
 )
 
 ####################### Authentication Settings ##########################
-
+# pylint: disable=unicode-format-string
 JWT_AUTH.update({
     'JWT_PUBLIC_SIGNING_JWK_SET': (
         '{"keys": [{"kid": "BTZ9HA6K", "e": "AQAB", "kty": "RSA", "n": "o5cn3ljSRi6FaDEKTn0PS-oL9EFyv1pI7dRgffQLD1qf5D6'
@@ -607,7 +606,7 @@ JWT_AUTH.update({
         ': "RSA"}'
     ),
 })
-
+# pylint: enable=unicode-format-string
 ####################### Plugin Settings ##########################
 
 from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants

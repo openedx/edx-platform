@@ -43,7 +43,6 @@ class TestEmailErrors(ModuleStoreTestCase):
     """
     Test that errors from sending email are handled properly.
     """
-    shard = 1
 
     ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
 
@@ -224,7 +223,7 @@ class TestEmailErrors(ModuleStoreTestCase):
             email = CourseEmail.create(  # pylint: disable=unused-variable
                 self.course.id,
                 self.instructor,
-                ["{}:IDONTEXIST".format(target_type)],
+                [u"{}:IDONTEXIST".format(target_type)],
                 "re: subject",
                 "dummy body goes here"
             )

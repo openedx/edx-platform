@@ -44,7 +44,7 @@ class Command(BaseCommand):
         try:
             result = CourseKey.from_string(raw_value)
         except InvalidKeyError:
-            raise CommandError("Invalid course_key: '%s'." % raw_value)
+            raise CommandError(u"Invalid course_key: '%s'." % raw_value)
 
         if not isinstance(result, CourseLocator):
             raise CommandError(u"Argument {0} is not a course key".format(raw_value))
@@ -75,7 +75,7 @@ class Command(BaseCommand):
                     # try getting the ElasticSearch engine
                     searcher = SearchEngine.get_search_engine(index_name)
                 except exceptions.ElasticsearchException as exc:
-                    logging.exception('Search Engine error - %s', exc)
+                    logging.exception(u'Search Engine error - %s', exc)
                     return
 
                 index_exists = searcher._es.indices.exists(index=index_name)  # pylint: disable=protected-access

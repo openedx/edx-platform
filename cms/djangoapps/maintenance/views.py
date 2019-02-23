@@ -182,8 +182,8 @@ class ForcePublishCourseView(MaintenanceBaseView):
         if not hasattr(source_store, 'force_publish_course'):
             self.context['msg'] = _('Force publishing course is not supported with old mongo courses.')
             log.warning(
-                'Force publishing course is not supported with old mongo courses. \
-                %s attempted to force publish the course %s.',
+                u'Force publishing course is not supported with old mongo courses. \
+                %s attempted to force publish the course %s.',  # pylint: disable=unicode-format-string
                 request.user,
                 course_id,
                 exc_info=True
@@ -196,7 +196,7 @@ class ForcePublishCourseView(MaintenanceBaseView):
         if current_versions['published-branch'] == current_versions['draft-branch']:
             self.context['msg'] = _('Course is already in published state.')
             log.warning(
-                'Course is already in published state. %s attempted to force publish the course %s.',
+                u'Course is already in published state. %s attempted to force publish the course %s.',
                 request.user,
                 course_id,
                 exc_info=True
@@ -205,7 +205,7 @@ class ForcePublishCourseView(MaintenanceBaseView):
 
         self.context['current_versions'] = current_versions
         log.info(
-            '%s dry ran force publish the course %s.',
+            u'%s dry ran force publish the course %s.',
             request.user,
             course_id,
             exc_info=True

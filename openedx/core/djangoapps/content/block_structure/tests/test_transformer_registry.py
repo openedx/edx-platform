@@ -35,7 +35,6 @@ class TransformerRegistryTestCase(TestCase):
     """
     Test cases for TransformerRegistry.
     """
-    shard = 2
 
     def tearDown(self):
         super(TransformerRegistryTestCase, self).tearDown()

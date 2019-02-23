@@ -19,7 +19,6 @@ class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTe
     """
     All tests for the views.py file
     """
-    shard = 1
     STUDENT_INFO = [('view@test.com', 'foo')]
 
     @classmethod
@@ -153,7 +152,7 @@ class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTe
         )
 
         self.assertEqual(resp.status_code, 200)
-        expected = '<input type="hidden" name="course_id" value="{course_id}" />'.format(
+        expected = u'<input type="hidden" name="course_id" value="{course_id}" />'.format(
             course_id=unicode(self.course.id)
         )
 

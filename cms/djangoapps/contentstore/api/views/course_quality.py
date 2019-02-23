@@ -8,9 +8,6 @@ from rest_framework.response import Response
 
 from contentstore.views.item import highlights_setting
 from edxval.api import get_videos_for_course
-from openedx.core.djangoapps.waffle_utils import (
-    CourseWaffleFlag, WaffleFlagNamespace
-)
 from openedx.core.lib.cache_utils import request_cached
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from openedx.core.lib.graph_traversals import traverse_pre_order
@@ -19,13 +16,6 @@ from xmodule.modulestore.django import modulestore
 from .utils import get_bool_param, course_author_access_required
 
 log = logging.getLogger(__name__)
-
-WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name=u'checklist')
-DISABLE_COURSE_CHECKLIST_QUALITY = CourseWaffleFlag(
-    waffle_namespace=WAFFLE_FLAG_NAMESPACE,
-    flag_name=u'course_checklist',
-    flag_undefined_default=False
-)
 
 
 @view_auth_classes()
@@ -100,7 +90,7 @@ class CourseQualityView(DeveloperErrorViewMixin, GenericAPIView):
             if log_time:
                 start_time = time.time()
                 output = func(*args)
-                log.info('[%s] completed in [%f]', func.__name__, (time.time() - start_time))
+                log.info(u'[%s] completed in [%f]', func.__name__, (time.time() - start_time))
             else:
                 output = func(*args)
             return output
@@ -116,25 +106,24 @@ class CourseQualityView(DeveloperErrorViewMixin, GenericAPIView):
             response = dict(
                 is_self_paced=course.self_paced,
             )
-            if not DISABLE_COURSE_CHECKLIST_QUALITY.is_enabled(course_key):
-                if get_bool_param(request, 'sections', all_requested):
-                    response.update(
-                        sections=_execute_method_and_log_time(course_key_harvard, self._sections_quality, course)
+            if get_bool_param(request, 'sections', all_requested):
+                response.update(
+                    sections=_execute_method_and_log_time(course_key_harvard, self._sections_quality, course)
+                )
+            if get_bool_param(request, 'subsections', all_requested):
+                response.update(
+                    subsections=_execute_method_and_log_time(
+                        course_key_harvard, self._subsections_quality, course, request
                     )
-                if get_bool_param(request, 'subsections', all_requested):
-                    response.update(
-                        subsections=_execute_method_and_log_time(
-                            course_key_harvard, self._subsections_quality, course, request
-                        )
-                    )
-                if get_bool_param(request, 'units', all_requested):
-                    response.update(
-                        units=_execute_method_and_log_time(course_key_harvard, self._units_quality, course, request)
-                    )
-                if get_bool_param(request, 'videos', all_requested):
-                    response.update(
-                        videos=_execute_method_and_log_time(course_key_harvard, self._videos_quality, course)
-                    )
+                )
+            if get_bool_param(request, 'units', all_requested):
+                response.update(
+                    units=_execute_method_and_log_time(course_key_harvard, self._units_quality, course, request)
+                )
+            if get_bool_param(request, 'videos', all_requested):
+                response.update(
+                    videos=_execute_method_and_log_time(course_key_harvard, self._videos_quality, course)
+                )
 
         return Response(response)
 
@@ -191,7 +180,8 @@ class CourseQualityView(DeveloperErrorViewMixin, GenericAPIView):
 
     def _videos_quality(self, course):
         video_blocks_in_course = modulestore().get_items(course.id, qualifiers={'category': 'video'})
-        videos_in_val = list(get_videos_for_course(course.id))
+        videos, __ = get_videos_for_course(course.id)
+        videos_in_val = list(videos)
         video_durations = [video['duration'] for video in videos_in_val]
 
         return dict(

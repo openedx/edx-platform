@@ -5,7 +5,6 @@ End-to-end tests for the Account Settings page.
 from datetime import datetime
 from unittest import skip
 
-import pytest
 from bok_choy.page_object import XSS_INJECTION
 from pytz import timezone, utc
 
@@ -23,6 +22,8 @@ class AccountSettingsTestMixin(EventsTestMixin, AcceptanceTest):
     CHANGE_INITIATED_EVENT_NAME = u"edx.user.settings.change_initiated"
     USER_SETTINGS_CHANGED_EVENT_NAME = 'edx.user.settings.changed'
     ACCOUNT_SETTINGS_REFERER = u"/account/settings"
+
+    shard = 23
 
     def visit_account_settings_page(self, gdpr=False):
         """
@@ -553,11 +554,11 @@ class AccountSettingsDeleteAccountTest(AccountSettingsTestMixin, AcceptanceTest)
         )
 
 
-@pytest.mark.a11y
 class AccountSettingsA11yTest(AccountSettingsTestMixin, AcceptanceTest):
     """
     Class to test account settings accessibility.
     """
+    a11y = True
 
     def test_account_settings_a11y(self):
         """
@@ -565,4 +566,9 @@ class AccountSettingsA11yTest(AccountSettingsTestMixin, AcceptanceTest):
         """
         self.log_in_as_unique_user()
         self.visit_account_settings_page()
+        self.account_settings_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+            ]
+        })
         self.account_settings_page.a11y_audit.check_for_accessibility_errors()

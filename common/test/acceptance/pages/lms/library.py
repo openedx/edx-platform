@@ -25,7 +25,7 @@ class LibraryContentXBlockWrapper(PageObject):
         """
         Return `selector`, but limited to this particular block's context
         """
-        return '{}[data-id="{}"] {}'.format(
+        return u'{}[data-id="{}"] {}'.format(
             self.BODY_SELECTOR,
             self.locator,
             selector

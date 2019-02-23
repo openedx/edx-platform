@@ -43,14 +43,14 @@ def validate_course_id(course_id):
         course_key = CourseKey.from_string(unicode(course_id))
     except InvalidKeyError:
         raise serializers.ValidationError(
-            _("{course_id} is not a valid course key.").format(
+            _(u"{course_id} is not a valid course key.").format(
                 course_id=course_id
             )
         )
 
     if not modulestore().has_course(course_key):
         raise serializers.ValidationError(
-            _('Course {course_id} does not exist.').format(
+            _(u'Course {course_id} does not exist.').format(
                 course_id=course_id
             )
         )

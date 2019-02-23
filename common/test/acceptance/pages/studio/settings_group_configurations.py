@@ -110,7 +110,7 @@ class GroupConfiguration(object):
 
     def __init__(self, page, prefix, index):
         self.page = page
-        self.SELECTOR = prefix + ' .wrapper-collection-{}'.format(index)
+        self.SELECTOR = prefix + u' .wrapper-collection-{}'.format(index)
         self.index = index
 
     def get_selector(self, css=''):

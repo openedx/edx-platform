@@ -1,4 +1,5 @@
 """ Tests for DiscussionXBLock"""
+from __future__ import print_function
 from collections import namedtuple
 import ddt
 import itertools
@@ -20,7 +21,7 @@ def attribute_pair_repr(self):
     Custom string representation for the AttributePair namedtuple which is
     consistent between test runs.
     """
-    return '<AttributePair name={}>'.format(self.name)
+    return u'<AttributePair name={}>'.format(self.name)
 
 
 AttributePair = namedtuple("AttributePair", ["name", "value"])
@@ -58,7 +59,6 @@ class DiscussionXBlockImportExportTests(TestCase):
     Import and export tests
     """
     DISCUSSION_XBLOCK_LOCATION = "openedx.core.lib.xblock_builtin.xblock_discussion.xblock_discussion.DiscussionXBlock"
-    shard = 2
 
     def setUp(self):
         """
@@ -86,7 +86,7 @@ class DiscussionXBlockImportExportTests(TestCase):
         """
         Test that xblock export XML format can be parsed preserving field values
         """
-        xblock_xml = """
+        xblock_xml = u"""
         <discussion
             url_name="82bb87a2d22240b1adac2dfcc1e7e5e4" xblock-family="xblock.v1"
             {id_attr}="{id_value}"
@@ -108,7 +108,7 @@ class DiscussionXBlockImportExportTests(TestCase):
             self.assertEqual(block.discussion_category, category_pair.value)
             self.assertEqual(block.discussion_target, target_pair.value)
         except AssertionError:
-            print xblock_xml
+            print(xblock_xml)
             raise
 
     @mock.patch(DISCUSSION_XBLOCK_LOCATION + ".load_definition_xml")
@@ -119,7 +119,7 @@ class DiscussionXBlockImportExportTests(TestCase):
         Test that legacy export XML format can be parsed preserving field values
         """
         xblock_xml = """<discussion url_name="82bb87a2d22240b1adac2dfcc1e7e5e4"/>"""
-        xblock_definition_xml = """
+        xblock_definition_xml = u"""
         <discussion
             {id_attr}="{id_value}"
             {category_attr}="{category_value}"
@@ -140,7 +140,7 @@ class DiscussionXBlockImportExportTests(TestCase):
             self.assertEqual(block.discussion_category, category_pair.value)
             self.assertEqual(block.discussion_target, target_pair.value)
         except AssertionError:
-            print xblock_xml, xblock_definition_xml
+            print(xblock_xml, xblock_definition_xml)
             raise
 
     def test_export_default_discussion_id(self):

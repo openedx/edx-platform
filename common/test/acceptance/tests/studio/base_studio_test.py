@@ -144,7 +144,7 @@ class StudioLibraryTest(AcceptanceTest):
         fixture = LibraryFixture(
             'test_org',
             self.unique_id,
-            'Test Library {}'.format(self.unique_id),
+            u'Test Library {}'.format(self.unique_id),
         )
         self.populate_library_fixture(fixture)
         fixture.install()

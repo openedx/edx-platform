@@ -9,15 +9,17 @@
         'js/student_account/models/LoginModel',
         'js/student_account/models/PasswordResetModel',
         'js/student_account/models/RegisterModel',
+        'js/student_account/models/AccountRecoveryModel',
         'js/student_account/views/LoginView',
         'js/student_account/views/PasswordResetView',
         'js/student_account/views/RegisterView',
         'js/student_account/views/InstitutionLoginView',
         'js/student_account/views/HintedLoginView',
+        'edx-ui-toolkit/js/utils/html-utils',
         'js/vendor/history'
     ],
-        function($, utility, _, _s, Backbone, LoginModel, PasswordResetModel, RegisterModel, LoginView,
-                 PasswordResetView, RegisterView, InstitutionLoginView, HintedLoginView) {
+        function($, utility, _, _s, Backbone, LoginModel, PasswordResetModel, RegisterModel, AccountRecoveryModel,
+                 LoginView, PasswordResetView, RegisterView, InstitutionLoginView, HintedLoginView, HtmlUtils) {
             return Backbone.View.extend({
                 tpl: '#access-tpl',
                 events: {
@@ -27,6 +29,7 @@
                     login: {},
                     register: {},
                     passwordHelp: {},
+                    accountRecoveryHelp: {},
                     institutionLogin: {},
                     hintedLogin: {}
                 },
@@ -54,6 +57,7 @@
 
                     // Account activation messages
                     this.accountActivationMessages = options.account_activation_messages || [];
+                    this.accountRecoveryMessages = options.account_recovery_messages || [];
 
                     if (options.login_redirect_url) {
                         this.nextUrl = options.login_redirect_url;
@@ -74,9 +78,15 @@
                     this.hideAuthWarnings = options.hide_auth_warnings || false;
                     this.pipelineUserDetails = options.third_party_auth.pipeline_user_details;
                     this.enterpriseName = options.enterprise_name || '';
+                    this.isAccountRecoveryFeatureEnabled = options.is_account_recovery_feature_enabled || false;
 
                 // The login view listens for 'sync' events from the reset model
                     this.resetModel = new PasswordResetModel({}, {
+                        method: 'GET',
+                        url: '#'
+                    });
+
+                    this.accountRecoveryModel = new AccountRecoveryModel({}, {
                         method: 'GET',
                         url: '#'
                     });
@@ -87,16 +97,21 @@
                 // there is no need to show it again, if the user changes mode:
                     this.thirdPartyAuth.errorMessage = null;
 
-                    // Once the account activation messages have been shown once,
+                    // Once the account activation/account recovery messages have been shown once,
                     // there is no need to show it again, if the user changes mode:
                     this.accountActivationMessages = [];
+                    this.accountRecoveryMessages = [];
                 },
 
                 render: function() {
-                    $(this.el).html(_.template(this.tpl)({
-                        mode: this.activeForm
-                    }));
-
+                    HtmlUtils.setHtml(
+                        $(this.el),
+                        HtmlUtils.HTML(
+                            _.template(this.tpl)({
+                                mode: this.activeForm
+                            })
+                        )
+                    )
                     this.postRender();
 
                     return this;
@@ -126,8 +141,10 @@
                             fields: data.fields,
                             model: model,
                             resetModel: this.resetModel,
+                            accountRecoveryModel: this.accountRecoveryModel,
                             thirdPartyAuth: this.thirdPartyAuth,
                             accountActivationMessages: this.accountActivationMessages,
+                            accountRecoveryMessages: this.accountRecoveryMessages,
                             platformName: this.platformName,
                             supportURL: this.supportURL,
                             passwordResetSupportUrl: this.passwordResetSupportUrl,

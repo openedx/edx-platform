@@ -34,7 +34,6 @@ from courseware.module_render import get_module_for_descriptor
 from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.courses import course_image_url
-from openedx.core.lib.tests import attr
 from student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import _get_modulestore_branch_setting, modulestore
@@ -48,7 +47,6 @@ CMS_BASE_TEST = 'testcms'
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
 
-@attr(shard=1)
 @ddt.ddt
 class CoursesTest(ModuleStoreTestCase):
     """Test methods related to fetching courses."""
@@ -141,7 +139,7 @@ class CoursesTest(ModuleStoreTestCase):
 
             # Request filtering for an org distinct from the designated org.
             no_courses = get_courses(user, org=primary)
-            self.assertEqual(no_courses, [])
+            self.assertEqual(list(no_courses), [])
 
             # Request filtering for an org matching the designated org.
             site_courses = get_courses(user, org=alternate)
@@ -171,7 +169,7 @@ class CoursesTest(ModuleStoreTestCase):
                     get_courses(user, filter_=filter_)
                 },
                 expected_courses,
-                "testing get_courses with filter_={}".format(filter_),
+                u"testing get_courses with filter_={}".format(filter_),
             )
 
     def test_get_current_child(self):
@@ -192,7 +190,6 @@ class CoursesTest(ModuleStoreTestCase):
         self.assertIsNone(get_current_child(mock_xmodule))
 
 
-@attr(shard=1)
 class ModuleStoreBranchSettingTest(ModuleStoreTestCase):
     """Test methods related to the modulestore branch setting."""
     @mock.patch(
@@ -218,7 +215,6 @@ class ModuleStoreBranchSettingTest(ModuleStoreTestCase):
         self.assertEqual(_get_modulestore_branch_setting(), 'fake_default_branch')
 
 
-@attr(shard=1)
 @override_settings(CMS_BASE=CMS_BASE_TEST)
 class MongoCourseImageTestCase(ModuleStoreTestCase):
     """Tests for course image URLs when using a mongo modulestore."""
@@ -274,7 +270,6 @@ class MongoCourseImageTestCase(ModuleStoreTestCase):
         )
 
 
-@attr(shard=1)
 class XmlCourseImageTestCase(XModuleXmlImportTest):
     """Tests for course image URLs when using an xml modulestore."""
 
@@ -292,7 +287,6 @@ class XmlCourseImageTestCase(XModuleXmlImportTest):
         self.assertEquals(course_image_url(course), u'/static/xml_test_course/before after.jpg')
 
 
-@attr(shard=1)
 class CoursesRenderTest(ModuleStoreTestCase):
     """Test methods related to rendering courses content."""
 
@@ -385,7 +379,6 @@ class CourseEnrollmentOpenTests(ModuleStoreTestCase):
         self.assertFalse(course_open_for_self_enrollment(course.id))
 
 
-@attr(shard=1)
 @ddt.ddt
 class CourseInstantiationTests(ModuleStoreTestCase):
     """
@@ -430,7 +423,6 @@ class CourseInstantiationTests(ModuleStoreTestCase):
                         self.assertTrue(item.graded)
 
 
-@attr(shard=1)
 class TestGetCourseChapters(ModuleStoreTestCase):
     """
     Tests for the `get_course_chapter_ids` function.

@@ -22,7 +22,7 @@ HTTPS = 'off'
 import logging
 
 # Disable noisy loggers
-for pkg_name in ['track.contexts', 'track.middleware', 'dd.dogapi']:
+for pkg_name in ['track.contexts', 'track.middleware']:
     logging.getLogger(pkg_name).setLevel(logging.CRITICAL)
 
 
@@ -139,6 +139,8 @@ REQUIRE_DEBUG = DEBUG
 ########################### OAUTH2 #################################
 OAUTH_OIDC_ISSUER = 'http://127.0.0.1:8000/oauth2'
 
+# pylint: disable=unicode-format-string
+
 JWT_AUTH.update({
     'JWT_SECRET_KEY': 'lms-secret',
     'JWT_ISSUER': 'http://127.0.0.1:8000/oauth2',
@@ -165,6 +167,13 @@ JWT_AUTH.update({
         'kty": "RSA"}'
     ),
 })
+
+# pylint: enable=unicode-format-string
+
+IDA_LOGOUT_URI_LIST = [
+    'http://localhost:18130/logout/',  # ecommerce
+    'http://localhost:18150/logout/',  # credentials
+]
 
 #####################################################################
 from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants

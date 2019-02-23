@@ -139,7 +139,6 @@ class TestHinterFunctions(TestCrowdsourceHinter):
     Tests cover the basic process of receiving a hint, adding a new hint,
     and rating/reporting hints.
     """
-    shard = 6
 
     def test_get_hint_with_no_hints(self):
         """

@@ -21,7 +21,7 @@ def create_csv_response(filename, header, datarows):
 
     """
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename={0}'.format(filename)
+    response['Content-Disposition'] = u'attachment; filename={0}'.format(filename)
     csvwriter = csv.writer(
         response,
         dialect='excel',
@@ -74,7 +74,7 @@ def format_dictlist(dictlist, features):
     def dict_to_entry(dct):
         """ Convert dictionary to a list for a csv row """
         relevant_items = [(k, v) for (k, v) in dct.items() if k in features]
-        ordered = sorted(relevant_items, key=lambda (k, v): header.index(k))
+        ordered = sorted(relevant_items, key=lambda k_v: header.index(k_v[0]))
         vals = [v for (_, v) in ordered]
         return vals
 

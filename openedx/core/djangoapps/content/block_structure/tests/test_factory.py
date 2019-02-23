@@ -16,7 +16,6 @@ class TestBlockStructureFactory(TestCase, ChildrenMapTestMixin):
     """
     Tests for BlockStructureFactory
     """
-    shard = 2
 
     def setUp(self):
         super(TestBlockStructureFactory, self).setUp()

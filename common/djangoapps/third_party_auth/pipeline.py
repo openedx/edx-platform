@@ -78,6 +78,8 @@ from social_core.pipeline import partial
 from social_core.pipeline.social_auth import associate_by_email
 
 from edxmako.shortcuts import render_to_string
+
+from util.json_request import JsonResponse
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_authn import cookies as user_authn_cookies
 from lms.djangoapps.verify_student.models import SSOVerification
@@ -275,7 +277,7 @@ def _get_enabled_provider(provider_id):
     enabled_provider = provider.Registry.get(provider_id)
 
     if not enabled_provider:
-        raise ValueError('Provider %s not enabled' % provider_id)
+        raise ValueError(u'Provider %s not enabled' % provider_id)
 
     return enabled_provider
 
@@ -317,7 +319,7 @@ def get_complete_url(backend_name):
         ValueError: if no provider is enabled with the given backend_name.
     """
     if not any(provider.Registry.get_enabled_by_backend_name(backend_name)):
-        raise ValueError('Provider with backend %s not enabled' % backend_name)
+        raise ValueError(u'Provider with backend %s not enabled' % backend_name)
 
     return _get_url('social:complete', backend_name)
 
@@ -593,7 +595,7 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
             # register anew via SSO. See SOL-1324 in JIRA.
             # However, we will log a warning for this case:
             logger.warning(
-                'User "%s" is using third_party_auth to login but has not yet activated their account. ',
+                u'User "%s" is using third_party_auth to login but has not yet activated their account. ',
                 user.username
             )
 
@@ -626,13 +628,16 @@ def set_logged_in_cookies(backend=None, user=None, strategy=None, auth_entry=Non
 
     """
     if not is_api(auth_entry) and user is not None and user.is_authenticated:
+        if not user.has_usable_password():
+            msg = "Your account is disabled"
+            return JsonResponse(msg, status=403)
         request = strategy.request if strategy else None
         # n.b. for new users, user.is_active may be False at this point; set the cookie anyways.
         if request is not None:
             # Check that the cookie isn't already set.
             # This ensures that we allow the user to continue to the next
             # pipeline step once he/she has the cookie set by this step.
-            has_cookie = user_authn_cookies.is_logged_in_cookie_set(request)
+            has_cookie = user_authn_cookies.are_logged_in_cookies_set(request)
             if not has_cookie:
                 try:
                     redirect_url = get_complete_url(current_partial.backend)
@@ -727,8 +732,8 @@ def user_details_force_sync(auth_entry, strategy, details, user=None, *args, **k
             current_value = getattr(model, field)
             if provider_value is not None and current_value != provider_value:
                 if field in integrity_conflict_fields and User.objects.filter(**{field: provider_value}).exists():
-                    logger.warning('User with ID [%s] tried to synchronize profile data through [%s] '
-                                   'but there was a conflict with an existing [%s]: [%s].',
+                    logger.warning(u'User with ID [%s] tried to synchronize profile data through [%s] '
+                                   u'but there was a conflict with an existing [%s]: [%s].',
                                    user.id, current_provider.name, field, provider_value)
                     continue
                 changed[provider_field] = current_value
@@ -736,8 +741,8 @@ def user_details_force_sync(auth_entry, strategy, details, user=None, *args, **k
 
         if changed:
             logger.info(
-                "User [%s] performed SSO through [%s] who synchronizes profile data, and the "
-                "following fields were changed: %s", user.username, current_provider.name, changed.keys(),
+                u"User [%s] performed SSO through [%s] who synchronizes profile data, and the "
+                u"following fields were changed: %s", user.username, current_provider.name, changed.keys(),
             )
 
             # Save changes to user and user.profile models.
@@ -763,7 +768,7 @@ def user_details_force_sync(auth_entry, strategy, details, user=None, *args, **k
                     email.send()
                 except SMTPException:
                     logger.exception('Error sending IdP learner data sync-initiated email change '
-                                     'notification email for user [%s].', user.username)
+                                     u'notification email for user [%s].', user.username)
 
 
 def set_id_verification_status(auth_entry, strategy, details, user=None, *args, **kwargs):

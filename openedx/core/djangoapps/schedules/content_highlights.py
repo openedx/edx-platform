@@ -66,14 +66,14 @@ def _get_course_with_highlights(course_key):
     # pylint: disable=missing-docstring
     if not COURSE_UPDATE_WAFFLE_FLAG.is_enabled(course_key):
         raise CourseUpdateDoesNotExist(
-            "%s Course Update Messages waffle flag is disabled.",
+            u"%s Course Update Messages waffle flag is disabled.",
             course_key,
         )
 
     course_descriptor = _get_course_descriptor(course_key)
     if not course_descriptor.highlights_enabled_for_messaging:
         raise CourseUpdateDoesNotExist(
-            "%s Course Update Messages are disabled.",
+            u"%s Course Update Messages are disabled.",
             course_key,
         )
 
@@ -84,7 +84,7 @@ def _get_course_descriptor(course_key):
     course_descriptor = modulestore().get_course(course_key, depth=1)
     if course_descriptor is None:
         raise CourseUpdateDoesNotExist(
-            "Course {} not found.".format(course_key)
+            u"Course {} not found.".format(course_key)
         )
     return course_descriptor
 
@@ -116,7 +116,7 @@ def _get_highlights_for_week(sections, week_num, course_key):
     num_sections = len(sections)
     if not (1 <= week_num <= num_sections):
         raise CourseUpdateDoesNotExist(
-            "Requested week {} but {} has only {} sections.".format(
+            u"Requested week {} but {} has only {} sections.".format(
                 week_num, course_key, num_sections
             )
         )

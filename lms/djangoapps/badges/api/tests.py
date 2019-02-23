@@ -151,7 +151,6 @@ class TestUserBadgeAssertionsByClass(UserAssertionTestCase):
     """
     Test the Badge Assertions view with the badge class filter.
     """
-    shard = 3
 
     @unpack
     @data((False, False), (True, False), (True, True))

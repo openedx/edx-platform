@@ -39,7 +39,6 @@ class TestValidateUploadedImage(TestCase):
             valid_file_types=_get_valid_file_types()
         )
     )
-    shard = 2
 
     def check_validation_result(self, uploaded_file, expected_failure_message):
         """
@@ -130,7 +129,6 @@ class TestGenerateProfileImages(TestCase):
     """
     Test create_profile_images
     """
-    shard = 2
 
     def check_exif_orientation(self, image, expected_orientation):
         """
@@ -227,7 +225,6 @@ class TestRemoveProfileImages(TestCase):
     """
     Test remove_profile_images
     """
-    shard = 2
 
     def test_remove(self):
         """

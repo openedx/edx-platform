@@ -47,6 +47,7 @@ class XBlockAcidNoChildTest(XBlockAcidBase):
     """
     Tests of an AcidBlock with no children
     """
+    shard = 20
     __test__ = True
 
     def setup_fixtures(self):
@@ -80,6 +81,7 @@ class XBlockAcidChildTest(XBlockAcidBase):
     """
     Tests of an AcidBlock with children
     """
+    shard = 20
     __test__ = True
 
     def setup_fixtures(self):
@@ -125,6 +127,7 @@ class XBlockAcidAsideTest(XBlockAcidBase):
     """
     Tests of an AcidBlock with children
     """
+    shard = 20
     __test__ = True
 
     def setup_fixtures(self):

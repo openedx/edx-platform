@@ -36,5 +36,6 @@ class CourseDurationLimitConfigAdmin(StackedConfigModelAdmin):
             ),
         })
     )
+    raw_id_fields = ('course',)
 
 admin.site.register(CourseDurationLimitConfig, CourseDurationLimitConfigAdmin)

@@ -34,7 +34,6 @@ COURSE_KEY2 = CourseKey.from_string('edx/history/2')
 @ddt.ddt
 class TeamMembershipTest(SharedModuleStoreTestCase):
     """Tests for the TeamMembership model."""
-    shard = 4
 
     def setUp(self):
         """
@@ -117,7 +116,6 @@ class TeamMembershipTest(SharedModuleStoreTestCase):
 @ddt.ddt
 class TeamSignalsTest(EventTestMixin, SharedModuleStoreTestCase):
     """Tests for handling of team-related signals."""
-    shard = 4
 
     SIGNALS = {
         'thread_created': thread_created,
@@ -186,10 +184,11 @@ class TeamSignalsTest(EventTestMixin, SharedModuleStoreTestCase):
         )
     )
     @ddt.unpack
-    def test_signals(self, signal_name, (user, should_update)):
+    def test_signals(self, signal_name, user_should_update):
         """Test that `last_activity_at` is correctly updated when team-related
         signals are sent.
         """
+        (user, should_update) = user_should_update
         with self.assert_last_activity_updated(should_update):
             user = getattr(self, user)
             signal = self.SIGNALS[signal_name]

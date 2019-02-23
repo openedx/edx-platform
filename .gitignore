@@ -140,3 +140,6 @@ dist
 
 # Visual Studio Code
 .vscode
+
+# Locally generated PII reports
+pii_report

@@ -2,7 +2,7 @@
 from django.conf import settings
 from django.conf.urls import url
 
-from cms.djangoapps.contentstore.api.views import course_grading, course_import, course_quality, course_validation
+from cms.djangoapps.contentstore.api.views import course_import, course_quality, course_validation
 
 
 app_name = 'contentstore'
@@ -14,6 +14,4 @@ urlpatterns = [
         course_validation.CourseValidationView.as_view(), name='course_validation'),
     url(r'^v1/quality/{course_id}/$'.format(course_id=settings.COURSE_ID_PATTERN,),
         course_quality.CourseQualityView.as_view(), name='course_quality'),
-    url(r'^v1/grading/{course_id}/$'.format(course_id=settings.COURSE_ID_PATTERN,),
-        course_grading.CourseGradingView.as_view(), name='course_grading'),
 ]

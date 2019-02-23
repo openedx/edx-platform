@@ -1,6 +1,7 @@
 """
 Install Python and Node prerequisites.
 """
+from __future__ import print_function
 
 import hashlib
 import os
@@ -120,7 +121,7 @@ def prereq_cache(cache_name, paths, install_func):
             post_install_hash = compute_fingerprint(paths)
             cache_file.write(post_install_hash)
     else:
-        print '{cache} unchanged, skipping...'.format(cache=cache_name)
+        print(u'{cache} unchanged, skipping...'.format(cache=cache_name))
 
 
 def node_prereqs_installation():
@@ -149,16 +150,16 @@ def node_prereqs_installation():
         # the forked process has returned
         proc = subprocess.Popen(npm_command, stderr=npm_log_file)
         proc.wait()
-    except BuildFailure, error_text:
+    except BuildFailure as error_text:
         if cb_error_text in error_text:
-            print "npm install error detected. Retrying..."
+            print("npm install error detected. Retrying...")
             proc = subprocess.Popen(npm_command, stderr=npm_log_file)
             proc.wait()
         else:
             raise BuildFailure(error_text)
-    print "Successfully installed NPM packages. Log found at {}".format(
+    print(u"Successfully installed NPM packages. Log found at {}".format(
         npm_log_file_path
-    )
+    ))
 
 
 def python_prereqs_installation():
@@ -172,7 +173,7 @@ def python_prereqs_installation():
 def pip_install_req_file(req_file):
     """Pip install the requirements file."""
     pip_cmd = 'pip install -q --disable-pip-version-check --exists-action w'
-    sh("{pip_cmd} -r {req_file}".format(pip_cmd=pip_cmd, req_file=req_file))
+    sh(u"{pip_cmd} -r {req_file}".format(pip_cmd=pip_cmd, req_file=req_file))
 
 
 @task
@@ -182,7 +183,7 @@ def install_node_prereqs():
     Installs Node prerequisites
     """
     if no_prereq_install():
-        print NO_PREREQ_MESSAGE
+        print(NO_PREREQ_MESSAGE)
         return
 
     prereq_cache("Node prereqs", ["package.json"], node_prereqs_installation)
@@ -197,6 +198,7 @@ PACKAGES_TO_UNINSTALL = [
     "django-oauth2-provider",       # Because now it's called edx-django-oauth2-provider.
     "edx-oauth2-provider",          # Because it moved from github to pypi
     "i18n-tools",                   # Because now it's called edx-i18n-tools
+    "python-saml",                  # Because python3-saml shares the same directory name
 ]
 
 
@@ -213,7 +215,7 @@ def uninstall_python_packages():
     """
 
     if no_python_uninstall():
-        print NO_PYTHON_UNINSTALL_MESSAGE
+        print(NO_PYTHON_UNINSTALL_MESSAGE)
         return
 
     # So that we don't constantly uninstall things, use a hash of the packages
@@ -228,7 +230,7 @@ def uninstall_python_packages():
         with io.open(state_file_path) as state_file:
             version = state_file.read()
         if version == expected_version:
-            print 'Python uninstalls unchanged, skipping...'
+            print('Python uninstalls unchanged, skipping...')
             return
 
     # Run pip to find the packages we need to get rid of.  Believe it or not,
@@ -241,13 +243,13 @@ def uninstall_python_packages():
         for package_name in PACKAGES_TO_UNINSTALL:
             if package_in_frozen(package_name, frozen):
                 # Uninstall the pacakge
-                sh("pip uninstall --disable-pip-version-check -y {}".format(package_name))
+                sh(u"pip uninstall --disable-pip-version-check -y {}".format(package_name))
                 uninstalled = True
         if not uninstalled:
             break
     else:
         # We tried three times and didn't manage to get rid of the pests.
-        print "Couldn't uninstall unwanted Python packages!"
+        print("Couldn't uninstall unwanted Python packages!")
         return
 
     # Write our version.
@@ -277,7 +279,7 @@ def package_in_frozen(package_name, frozen_output):
 def install_coverage_prereqs():
     """ Install python prereqs for measuring coverage. """
     if no_prereq_install():
-        print NO_PREREQ_MESSAGE
+        print(NO_PREREQ_MESSAGE)
         return
     pip_install_req_file(COVERAGE_REQ_FILE)
 
@@ -289,7 +291,7 @@ def install_python_prereqs():
     Installs Python prerequisites.
     """
     if no_prereq_install():
-        print NO_PREREQ_MESSAGE
+        print(NO_PREREQ_MESSAGE)
         return
 
     uninstall_python_packages()
@@ -323,7 +325,7 @@ def install_prereqs():
     Installs Node and Python prerequisites
     """
     if no_prereq_install():
-        print NO_PREREQ_MESSAGE
+        print(NO_PREREQ_MESSAGE)
         return
 
     if not str2bool(os.environ.get('SKIP_NPM_INSTALL', 'False')):
@@ -335,15 +337,15 @@ def install_prereqs():
 
 def log_installed_python_prereqs():
     """  Logs output of pip freeze for debugging. """
-    sh("pip freeze > {}".format(Env.GEN_LOG_DIR + "/pip_freeze.log"))
+    sh(u"pip freeze > {}".format(Env.GEN_LOG_DIR + "/pip_freeze.log"))
     return
 
 
 def print_devstack_warning():
     if Env.USING_DOCKER:  # pragma: no cover
-        print "********************************************************************************"
-        print "* WARNING: Mac users should run this from both the lms and studio shells"
-        print "* in docker devstack to avoid startup errors that kill your CPU."
-        print "* For more details, see:"
-        print "* https://github.com/edx/devstack#docker-is-using-lots-of-cpu-time-when-it-should-be-idle"
-        print "********************************************************************************"
+        print("********************************************************************************")
+        print("* WARNING: Mac users should run this from both the lms and studio shells")
+        print("* in docker devstack to avoid startup errors that kill your CPU.")
+        print("* For more details, see:")
+        print("* https://github.com/edx/devstack#docker-is-using-lots-of-cpu-time-when-it-should-be-idle")
+        print("********************************************************************************")

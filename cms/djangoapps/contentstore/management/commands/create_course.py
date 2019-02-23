@@ -22,12 +22,12 @@ class Command(BaseCommand):
     """
 
     # can this query modulestore for the list of write accessible stores or does that violate command pattern?
-    help = "Create a course in one of {}".format([ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split])
+    help = u"Create a course in one of {}".format([ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split])
 
     def add_arguments(self, parser):
         parser.add_argument('modulestore',
                             choices=MODULESTORE_CHOICES,
-                            help="Modulestore must be one of {}".format(MODULESTORE_CHOICES))
+                            help=u"Modulestore must be one of {}".format(MODULESTORE_CHOICES))
         parser.add_argument('user',
                             help="The instructor's email address or integer ID.")
         parser.add_argument('org',
@@ -52,7 +52,7 @@ class Command(BaseCommand):
         try:
             user_object = user_from_str(user)
         except User.DoesNotExist:
-            raise CommandError("No user {user} found.".format(user=user))
+            raise CommandError(u"No user {user} found.".format(user=user))
         return user_object
 
     def handle(self, *args, **options):

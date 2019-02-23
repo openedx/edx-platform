@@ -10,7 +10,6 @@ from openedx.core.lib.course_tabs import CourseTabPluginManager
 
 class CourseTabPluginManagerTestCase(TestCase):
     """Test cases for CourseTabPluginManager class"""
-    shard = 2
 
     @patch('openedx.core.lib.course_tabs.CourseTabPluginManager.get_available_plugins')
     def test_get_tab_types(self, get_available_plugins):
@@ -40,7 +39,6 @@ class CourseTabPluginManagerTestCase(TestCase):
 
 class KeyCheckerTestCase(TestCase):
     """Test cases for KeyChecker class"""
-    shard = 2
 
     def setUp(self):
         super(KeyCheckerTestCase, self).setUp()
@@ -59,7 +57,6 @@ class KeyCheckerTestCase(TestCase):
 
 class NeedNameTestCase(TestCase):
     """Test cases for NeedName validator"""
-    shard = 2
 
     def setUp(self):
         super(NeedNameTestCase, self).setUp()

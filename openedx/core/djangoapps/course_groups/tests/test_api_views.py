@@ -308,7 +308,7 @@ class TestCohortApi(SharedModuleStoreTestCase):
             expected_results = [{
                 'username': user.username,
                 'email': user.email,
-                'name': '{} {}'.format(user.first_name, user.last_name)
+                'name': u'{} {}'.format(user.first_name, user.last_name)
             } for user in users]
             assert results == expected_results
 

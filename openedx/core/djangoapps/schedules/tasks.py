@@ -1,7 +1,6 @@
 import datetime
 import logging
 
-import analytics
 from celery import task
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -16,12 +15,15 @@ from edx_ace import ace
 from edx_ace.message import Message
 from edx_ace.utils.date import deserialize, serialize
 from edx_django_utils.monitoring import set_custom_metric
+from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.schedules import message_types
 from openedx.core.djangoapps.schedules.models import Schedule, ScheduleConfig
 from openedx.core.djangoapps.schedules import resolvers
 from openedx.core.lib.celery.task_utils import emulate_http_request
+from track import segment
+
 
 LOG = logging.getLogger(__name__)
 
@@ -38,7 +40,7 @@ UPGRADE_REMINDER_LOG_PREFIX = 'Upgrade Reminder'
 COURSE_UPDATE_LOG_PREFIX = 'Course Update'
 
 
-@task(base=LoggedPersistOnFailureTask, bind=True, default_retry_delay=30, routing_key=ROUTING_KEY)
+@task(base=LoggedPersistOnFailureTask, bind=True, default_retry_delay=30)
 def update_course_schedules(self, **kwargs):
     course_key = CourseKey.from_string(kwargs['course_id'])
     new_start_date = deserialize(kwargs['new_start_date_str'])
@@ -51,7 +53,7 @@ def update_course_schedules(self, **kwargs):
         )
     except Exception as exc:
         if not isinstance(exc, KNOWN_RETRY_ERRORS):
-            LOG.exception("Unexpected failure: task id: %s, kwargs=%s".format(self.request.id, kwargs))
+            LOG.exception(u"Unexpected failure: task id: {}, kwargs={}".format(self.request.id, kwargs))
         raise self.retry(kwargs=kwargs, exc=exc)
 
 
@@ -87,11 +89,11 @@ class ScheduleMessageBaseTask(LoggedTask):
         current_date = resolvers._get_datetime_beginning_of_day(current_date)
 
         if not cls.is_enqueue_enabled(site):
-            cls.log_info('Message queuing disabled for site %s', site.domain)
+            cls.log_info(u'Message queuing disabled for site %s', site.domain)
             return
 
         target_date = current_date + datetime.timedelta(days=day_offset)
-        cls.log_info('Target date = %s', target_date.isoformat())
+        cls.log_info(u'Target date = %s', target_date.isoformat())
         for bin in range(cls.num_bins):
             task_args = (
                 site.id,
@@ -100,7 +102,7 @@ class ScheduleMessageBaseTask(LoggedTask):
                 bin,
                 override_recipient_email,
             )
-            cls.log_info('Launching task with args = %r', task_args)
+            cls.log_info(u'Launching task with args = %r', task_args)
             cls().apply_async(
                 task_args,
                 retry=False,
@@ -203,7 +205,7 @@ def _schedule_send(msg_str, site_id, delivery_config_var, log_prefix):
         user = User.objects.get(username=msg.recipient.username)
         with emulate_http_request(site=site, user=user):
             _annonate_send_task_for_monitoring(msg)
-            LOG.debug('%s: Sending message = %s', log_prefix, msg_str)
+            LOG.debug(u'%s: Sending message = %s', log_prefix, msg_str)
             ace.send(msg)
             _track_message_sent(site, user, msg)
 
@@ -224,18 +226,31 @@ def _track_message_sent(site, user, msg):
         properties['course_ids'] = course_ids[:10]
         properties['primary_course_id'] = course_ids[0]
 
-    analytics.track(
-        user_id=user.id,
-        event='edx.bi.email.sent',
-        properties=properties
-    )
+    tracking_context = {
+        'host': site.domain,
+        'path': '/',  # make up a value, in order to allow the host to be passed along.
+    }
+    # I wonder if the user of this event should be the recipient, as they are not the ones
+    # who took an action.  Rather, the system is acting, and they are the object.
+    # Admittedly that may be what 'nonInteraction' is meant to address.  But sessionization may
+    # get confused by these events if they're attributed in this way, because there's no way for
+    # this event to get context that would match with what the user might be doing at the moment.
+    # But the events do show up in GA being joined up with existing sessions (i.e. within a half
+    # hour in the past), so they don't always break sessions.  Not sure what happens after these.
+    # We can put the recipient_user_id into the properties, and then export as a custom dimension.
+    with tracker.get_tracker().context(msg.app_label, tracking_context):
+        segment.track(
+            user_id=user.id,
+            event_name='edx.bi.email.sent',
+            properties=properties,
+        )
 
 
 def _is_delivery_enabled(site, delivery_config_var, log_prefix):
     if getattr(ScheduleConfig.current(site), delivery_config_var, False):
         return True
     else:
-        LOG.info('%s: Message delivery disabled for site %s', log_prefix, site.domain)
+        LOG.info(u'%s: Message delivery disabled for site %s', log_prefix, site.domain)
 
 
 def _annotate_for_monitoring(message_type, site, bin_num, target_day_str, day_offset):

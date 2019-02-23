@@ -55,7 +55,9 @@
             // the option as displayed in the context menu to false.
             // When upgrading to 2.6, check if this variable name changed.
             window.MathJax = {
-                menuSettings: {CHTMLpreview: false}
+                menuSettings: {
+                    CHTMLpreview: false
+                }
             };
         };
 
@@ -131,7 +133,7 @@
             'lang_edx': 'js/src/lang_edx',
 
             // externally hosted files
-            mathjax: '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured',  // eslint-disable-line max-len
+            mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured',  // eslint-disable-line max-len
             'youtube': [
                 // youtube URL does not end in '.js'. We add '?noext' to the path so
                 // that require.js adds the '.js' to the query component of the URL,

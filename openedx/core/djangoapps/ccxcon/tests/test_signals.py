@@ -15,7 +15,6 @@ class CCXConSignalTestCase(TestCase):
     the call for the ccxcon update are performed correctly by the
     course_published signal handler
     """
-    shard = 2
 
     @mock.patch('openedx.core.djangoapps.ccxcon.tasks.update_ccxcon.delay')
     def test_course_published_ccxcon_call(self, mock_upc):

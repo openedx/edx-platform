@@ -55,6 +55,7 @@ setup(
             "start_date = lms.djangoapps.course_blocks.transformers.start_date:StartDateTransformer",
             "user_partitions = lms.djangoapps.course_blocks.transformers.user_partitions:UserPartitionTransformer",
             "visibility = lms.djangoapps.course_blocks.transformers.visibility:VisibilityTransformer",
+            "hide_empty = lms.djangoapps.course_blocks.transformers.hide_empty:HideEmptyTransformer",
             "hidden_content = lms.djangoapps.course_blocks.transformers.hidden_content:HiddenContentTransformer",
             "course_blocks_api = lms.djangoapps.course_api.blocks.transformers.blocks_api:BlocksAPITransformer",
             "milestones = lms.djangoapps.course_api.blocks.transformers.milestones:MilestonesAndSpecialExamsTransformer",

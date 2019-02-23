@@ -55,7 +55,7 @@
 [MASTER]
 ignore = ,.git,.tox,migrations,node_modules,.pycharm_helpers
 persistent = yes
-load-plugins = edx_lint.pylint,pylint_django,pylint_celery
+load-plugins = edx_lint.pylint,pylint_django,pylint_celery,caniusepython3.pylint_checker
 init-hook = "import sys; sys.path.extend(['lms/djangoapps', 'cms/djangoapps', 'common/djangoapps'])"
 
 [MESSAGES CONTROL]
@@ -346,6 +346,7 @@ disable =
 	using-cmp-argument,
 	xrange-builtin,
 	zip-builtin-not-iterating,
+	native-string,
 
 [REPORTS]
 output-format = text
@@ -372,7 +373,7 @@ docstring-min-length = 5
 
 [FORMAT]
 max-line-length = 120
-ignore-long-lines = ^\s*(# )?<?https?://\S+>?$
+ignore-long-lines = ^\s*(# )?((<?https?://\S+>?)|(\.\. pii: .*))$
 single-line-if-stmt = no
 no-space-check = trailing-comma,dict-separator
 max-module-lines = 1000
@@ -445,4 +446,4 @@ int-import-graph =
 [EXCEPTIONS]
 overgeneral-exceptions = Exception
 
-# cb770bb6272f6fe1edfd74aa1fb912be5541481c
+# bb786547d45a1ec1adda9b687d900083dd57603b

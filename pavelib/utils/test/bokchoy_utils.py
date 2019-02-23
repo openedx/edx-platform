@@ -1,6 +1,7 @@
 """
 Helper functions for bok_choy test tasks
 """
+from __future__ import print_function
 import httplib
 import os
 import subprocess
@@ -36,19 +37,19 @@ def start_servers(options):
         """
         Starts a single server.
         """
-        print cmd, logfile
+        print(cmd, logfile)
         run_background_process(cmd, out_log=logfile, err_log=logfile, cwd=cwd)
 
     for service, info in Env.BOK_CHOY_SERVERS.iteritems():
         address = "0.0.0.0:{}".format(info['port'])
-        cmd = ("DEFAULT_STORE={default_store} ").format(default_store=options.default_store)
+        cmd = (u"DEFAULT_STORE={default_store} ").format(default_store=options.default_store)
         if coveragerc:
-            cmd += ("coverage run --rcfile={coveragerc} -m ").format(coveragerc=coveragerc)
+            cmd += (u"coverage run --rcfile={coveragerc} -m ").format(coveragerc=coveragerc)
         else:
             cmd += "python -m "
         cmd += (
-            "manage {service} --settings {settings} runserver "
-            "{address} --traceback --noreload".format(
+            u"manage {service} --settings {settings} runserver "
+            u"{address} --traceback --noreload".format(
                 service=service,
                 settings=Env.SETTINGS,
                 address=address,
@@ -58,7 +59,7 @@ def start_servers(options):
 
     for service, info in Env.BOK_CHOY_STUBS.iteritems():
         cmd = (
-            "python -m stubs.start {service} {port} "
+            u"python -m stubs.start {service} {port} "
             "{config}".format(
                 service=service,
                 port=info['port'],
@@ -73,7 +74,7 @@ def wait_for_server(server, port):
     Wait for a server to respond with status 200
     """
     print(
-        "Checking server {server} on port {port}".format(
+        u"Checking server {server} on port {port}".format(
             server=server,
             port=port,
         )
@@ -113,9 +114,9 @@ def wait_for_test_servers():
         if not ready:
             msg = colorize(
                 "red",
-                "Could not contact {} test server".format(service)
+                u"Could not contact {} test server".format(service)
             )
-            print msg
+            print(msg)
             sys.exit(1)
 
 
@@ -125,7 +126,7 @@ def is_mongo_running():
     """
     # The mongo command will connect to the service,
     # failing with a non-zero exit code if it cannot connect.
-    output = os.popen('mongo --host {} --eval "print(\'running\')"'.format(Env.MONGO_HOST)).read()
+    output = os.popen(u'mongo --host {} --eval "print(\'running\')"'.format(Env.MONGO_HOST)).read()
     return output and "running" in output
 
 
@@ -157,7 +158,7 @@ def clear_mongo():
     Clears mongo database.
     """
     sh(
-        "mongo --host {} {} --eval 'db.dropDatabase()' > /dev/null".format(
+        u"mongo --host {} {} --eval 'db.dropDatabase()' > /dev/null".format(
             Env.MONGO_HOST,
             Env.BOK_CHOY_MONGO_DATABASE,
         )
@@ -172,7 +173,7 @@ def check_mongo():
     """
     if not is_mongo_running():
         msg = colorize('red', "Mongo is not running locally.")
-        print msg
+        print(msg)
         sys.exit(1)
 
 
@@ -184,7 +185,7 @@ def check_memcache():
     """
     if not is_memcache_running():
         msg = colorize('red', "Memcache is not running locally.")
-        print msg
+        print(msg)
         sys.exit(1)
 
 
@@ -199,7 +200,7 @@ def check_mysql():
         return
     if not is_mysql_running():
         msg = colorize('red', "MySQL is not running locally.")
-        print msg
+        print(msg)
         sys.exit(1)
 
 

@@ -97,7 +97,7 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
         self.user.profile.save()
         self.client.login(username=self.user.username, password='foo')
         self.request = RequestFactory().request()
-        self.linkedin_url = 'http://www.linkedin.com/profile/add?{params}'
+        self.linkedin_url = u'http://www.linkedin.com/profile/add?{params}'
 
         self.cert = GeneratedCertificateFactory.create(
             user=self.user,
@@ -129,7 +129,7 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
                 'name': 'Signatory_Name ' + str(i),
                 'title': 'Signatory_Title ' + str(i),
                 'organization': 'Signatory_Organization ' + str(i),
-                'signature_image_path': '/static/certificates/images/demo-sig{}.png'.format(i),
+                'signature_image_path': u'/static/certificates/images/demo-sig{}.png'.format(i),
                 'id': i
             } for i in xrange(signatory_count)
 
@@ -141,7 +141,7 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
                 'name': 'Name ' + str(i),
                 'description': 'Description ' + str(i),
                 'course_title': 'course_title_' + str(i),
-                'org_logo_path': '/t4x/orgX/testX/asset/org-logo-{}.png'.format(i),
+                'org_logo_path': u'/t4x/orgX/testX/asset/org-logo-{}.png'.format(i),
                 'signatories': signatories,
                 'version': 1,
                 'is_active': is_active
@@ -157,7 +157,7 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
         """
         Creates a custom certificate template entry in DB.
         """
-        template_html = """
+        template_html = u"""
             <%namespace name='static' file='static_content.html'/>
             <html>
             <body>
@@ -185,12 +185,12 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
         """
         Creates a custom certificate template entry in DB.
         """
-        template_html = """
+        template_html = u"""
             <%namespace name='static' file='static_content.html'/>
             <html>
             <body>
                 lang: ${LANGUAGE_CODE}
-                course name: """ + template_name + """
+                course name: """ + template_name + u"""
                 mode: ${course_mode}
                 ${accomplishment_copy_course_description}
                 ${twitter_url}
@@ -213,7 +213,7 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
         """
         Creates a custom certificate template entry in DB that includes hours of effort.
         """
-        template_html = """
+        template_html = u"""
             <%namespace name='static' file='static_content.html'/>
             <html>
             <body>
@@ -246,7 +246,6 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
     """
     Tests for the certificates web/html views
     """
-    shard = 1
 
     def setUp(self):
         super(CertificatesViewsTests, self).setUp()
@@ -267,10 +266,10 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         self.assertEqual(response.status_code, 200)
         params = OrderedDict([
             ('_ed', '0_0dPSPyS070e0HsE9HNz_13_d11_',),
-            ('pfCertificationName', '{platform_name} Honor Code Certificate for {course_name}'.format(
-                platform_name=settings.PLATFORM_NAME.encode('utf-8'),
+            ('pfCertificationName', u'{platform_name} Honor Code Certificate for {course_name}'.format(
+                platform_name=settings.PLATFORM_NAME,
                 course_name=self.course.display_name,
-            ),),
+            ).encode('utf-8'),),
             ('pfCertificationUrl', self.request.build_absolute_uri(test_url),),
         ])
         self.assertIn(
@@ -290,10 +289,10 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         # the linkedIn share URL with appropriate parameters should be present
         params = OrderedDict([
             ('_ed', settings.MICROSITE_CONFIGURATION['test_site']['LINKEDIN_COMPANY_ID'],),
-            ('pfCertificationName', '{platform_name} Honor Code Certificate for {course_name}'.format(
+            ('pfCertificationName', u'{platform_name} Honor Code Certificate for {course_name}'.format(
                 platform_name=settings.MICROSITE_CONFIGURATION['test_site']['platform_name'],
                 course_name=self.course.display_name,
-            ),),
+            ).encode('utf-8'),),
             ('pfCertificationUrl', 'http://' + settings.MICROSITE_TEST_HOSTNAME + test_url,),
         ])
         self.assertIn(
@@ -409,19 +408,20 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             course_id=unicode(self.course.id)
         )
         response = self.client.get(test_url)
+        content = response.content.decode(response.charset)
         self.assertIn(
             'a course of study offered by test_organization, an online learning initiative of test organization',
-            response.content
+            content
         )
         self.assertNotIn(
             'a course of study offered by testorg',
-            response.content
+            content
         )
         self.assertIn(
-            '<title>test_organization {} Certificate |'.format(self.course.number, ),
-            response.content
+            u'<title>test_organization {} Certificate |'.format(self.course.number, ),
+            content
         )
-        self.assertIn('logo_test1.png', response.content)
+        self.assertIn('logo_test1.png', content)
 
     @ddt.data(True, False)
     @patch('lms.djangoapps.certificates.views.webview.get_completion_badge')
@@ -518,7 +518,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         )
         # Test an item from user info
         self.assertIn(
-            "{fullname}, you earned a certificate!".format(fullname=self.user.profile.name),
+            u"{fullname}, you earned a certificate!".format(fullname=self.user.profile.name),
             response.content
         )
         # Test an item from social info
@@ -532,7 +532,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         )
         # Test an item from certificate/org info
         self.assertIn(
-            "a course of study offered by {partner_short_name}, "
+            u"a course of study offered by {partner_short_name}, "
             "an online learning initiative of "
             "{partner_long_name}.".format(
                 partner_short_name=short_org_name,
@@ -668,6 +668,27 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         )
 
         self.cert.invalidate()
+
+        user_language = 'fr'
+        self.client.cookies[settings.LANGUAGE_COOKIE] = user_language
+        response = self.client.get(test_url)
+        self.assertIn('<html class="no-js" lang="fr">', response.content)
+
+        user_language = 'ar'
+        self.client.cookies[settings.LANGUAGE_COOKIE] = user_language
+        response = self.client.get(test_url)
+        self.assertIn('<html class="no-js" lang="ar">', response.content)
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    def test_html_lang_attribute_is_dynamic_for_certificate_html_view(self):
+        """
+        Tests that Certificate HTML Web View's lang attribute is based on user language.
+        """
+        self._add_course_certificates(count=1, signatory_count=2)
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=unicode(self.course.id)
+        )
 
         user_language = 'fr'
         self.client.cookies[settings.LANGUAGE_COOKIE] = user_language
@@ -975,12 +996,12 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             expected_date = self.course.certificate_available_date
         with waffle.waffle().override(waffle.AUTO_CERTIFICATE_GENERATION, active=True):
             response = self.client.get(test_url)
-        date = '{month} {day}, {year}'.format(
+        date = u'{month} {day}, {year}'.format(
             month=strftime_localized(expected_date, "%B"),
             day=expected_date.day,
             year=expected_date.year
         )
-        self.assertIn(date, response.content)
+        self.assertIn(date, response.content.decode(response.charset))
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_render_html_view_invalid_certificate_configuration(self):
@@ -1149,7 +1170,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             mock_get_org_id.return_value = None
             response = self.client.get(test_url)
             self.assertEqual(response.status_code, 200)
-            self.assertContains(response, 'mode: {}'.format(mode))
+            self.assertContains(response, u'mode: {}'.format(mode))
             self.assertContains(response, 'course name: test_template_1_course')
 
     ## Templates With Language tests
@@ -1532,7 +1553,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
                         response = self.client.get(test_url)
                         self.assertEqual(response.status_code, 200)
                         if custom_certs_enabled:
-                            self.assertContains(response, 'mode: {}'.format(mode))
+                            self.assertContains(response, u'mode: {}'.format(mode))
                         else:
                             self.assertContains(response, "Tweet this Accomplishment")
                         self.assertContains(response, 'https://twitter.com/intent/tweet')
@@ -1569,7 +1590,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             mock_get_org_id.return_value = None
             response = self.client.get(test_url)
             self.assertContains(
-                response, '<img class="custom-logo" src="{}certificate_template_assets/32/test_logo.png" />'.format(
+                response, u'<img class="custom-logo" src="{}certificate_template_assets/32/test_logo.png" />'.format(
                     settings.MEDIA_URL
                 )
             )
@@ -1714,7 +1735,6 @@ class CertificateEventTests(CommonCertificatesTestCase, EventTrackingTestCase):
     """
     Test events emitted by certificate handling.
     """
-    shard = 1
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_certificate_evidence_event_emitted(self):

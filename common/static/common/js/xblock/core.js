@@ -11,6 +11,9 @@
         } else {
             selector = '.' + blockClass;
         }
+        // After an element is initialized, a class is added to it. To avoid repeat initialization, no
+        // elements with that class should be selected.
+        selector += ':not(.xblock-initialized)';
         return $(element).immediateDescendents(selector).map(function(idx, elem) {
             return initializer(elem, requestToken);
         }).toArray();
@@ -112,6 +115,7 @@
         initializeAside: function(element) {
             var blockUsageId = $(element).data('block-id');
             var blockElement = $(element).siblings('[data-usage-id="' + blockUsageId + '"]')[0];
+
             return constructBlock(element, [blockElement, initArgs(element)]);
         },
 

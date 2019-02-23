@@ -5,11 +5,9 @@ Django Celery tasks for service status app
 import time
 
 from djcelery import celery
-from dogapi import dog_stats_api
 
 
 @celery.task
-@dog_stats_api.timed('status.service.celery.pong')
 def delayed_ping(value, delay):
     """A simple tasks that replies to a message after a especified amount
     of seconds.
@@ -17,7 +15,7 @@ def delayed_ping(value, delay):
     if value == 'ping':
         result = 'pong'
     else:
-        result = 'got: {0}'.format(value)
+        result = u'got: {0}'.format(value)
 
     time.sleep(delay)
 

@@ -29,7 +29,6 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
 
     ACCOUNT_INFO = [('view@test.com', 'foo'), ('view2@test.com', 'foo')]
     ENABLED_SIGNALS = ['course_published']
-    shard = 1
 
     @staticmethod
     def _reverse_urls(names, course):
@@ -413,7 +412,6 @@ class TestBetatesterAccess(ModuleStoreTestCase, CourseAccessTestMixin):
     """
     Tests for the beta tester feature
     """
-    shard = 1
 
     def setUp(self):
         super(TestBetatesterAccess, self).setUp()

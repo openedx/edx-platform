@@ -7,7 +7,6 @@ import logging
 
 import requests
 
-import dogstats_wrapper as dog_stats_api
 
 log = logging.getLogger(__name__)
 dateformat = '%Y%m%d%H%M%S'
@@ -55,7 +54,7 @@ def parse_xreply(xreply):
     """
     try:
         xreply = json.loads(xreply)
-    except ValueError, err:
+    except ValueError as err:
         log.error(err)
         return (1, 'unexpected reply from server')
 
@@ -93,10 +92,6 @@ class XQueueInterface(object):
         # log the send to xqueue
         header_info = json.loads(header)
         queue_name = header_info.get('queue_name', u'')
-        dog_stats_api.increment(XQUEUE_METRIC_NAME, tags=[
-            u'action:send_to_queue',
-            u'queue:{}'.format(queue_name)
-        ])
 
         # Attempt to send to queue
         (error, msg) = self._send_to_queue(header, body, files_to_upload)
@@ -140,11 +135,11 @@ class XQueueInterface(object):
             response = self.session.post(
                 url, data=data, files=files, timeout=(CONNECT_TIMEOUT, READ_TIMEOUT)
             )
-        except requests.exceptions.ConnectionError, err:
+        except requests.exceptions.ConnectionError as err:
             log.error(err)
             return (1, 'cannot connect to server')
 
-        except requests.exceptions.ReadTimeout, err:
+        except requests.exceptions.ReadTimeout as err:
             log.error(err)
             return (1, 'failed to read from the server')
 

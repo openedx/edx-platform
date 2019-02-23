@@ -10,6 +10,7 @@ file and check it in at the same time as your model changes. To do that,
 2. ./manage.py lms schemamigration student --auto description_of_your_change
 3. Add the migration file created in edx-platform/common/djangoapps/student/migrations/
 """
+from __future__ import print_function
 import hashlib
 import json
 import logging
@@ -125,6 +126,8 @@ class AnonymousUserId(models.Model):
 
     We generate anonymous_user_id using md5 algorithm,
     and use result in hex form, so its length is equal to 32 bytes.
+
+    .. no_pii: We store anonymous_user_ids here, but do not consider them PII under OEP-30.
     """
 
     objects = NoneToEmptyManager()
@@ -291,7 +294,7 @@ def get_retired_email_by_email(email):
     return user_util.get_retired_email(email, settings.RETIRED_USER_SALTS, settings.RETIRED_EMAIL_FMT)
 
 
-def get_all_retired_usernames_by_username(username):
+def _get_all_retired_usernames_by_username(username):
     """
     Returns a generator of "retired usernames", one hashed with each
     configured salt. Used for finding out if the given username has
@@ -300,7 +303,7 @@ def get_all_retired_usernames_by_username(username):
     return user_util.get_all_retired_usernames(username, settings.RETIRED_USER_SALTS, settings.RETIRED_USERNAME_FMT)
 
 
-def get_all_retired_emails_by_email(email):
+def _get_all_retired_emails_by_email(email):
     """
     Returns a generator of "retired emails", one hashed with each
     configured salt. Used for finding out if the given email has
@@ -315,7 +318,7 @@ def get_potentially_retired_user_by_username(username):
     does not exist, then any hashed username salted with the historical
     salts.
     """
-    locally_hashed_usernames = list(get_all_retired_usernames_by_username(username))
+    locally_hashed_usernames = list(_get_all_retired_usernames_by_username(username))
     locally_hashed_usernames.append(username)
     potential_users = User.objects.filter(username__in=locally_hashed_usernames)
 
@@ -329,11 +332,22 @@ def get_potentially_retired_user_by_username(username):
     if not potential_users:
         raise User.DoesNotExist()
 
-    # If there are 2, one of two things should be true:
-    # - The user we want is un-retired and has the same case-match username
-    # - Or retired one was the case-match
+    # For a brief period, users were able to retire accounts and make another account with
+    # the same differently-cased username, like "testuser" and "TestUser".
+    # If there are two users found, return the one that's the *actual* case-matching username,
+    # whether retired or not.
     if len(potential_users) == 2:
-        return potential_users[0] if potential_users[0].username == username else potential_users[1]
+        # Figure out which user has been retired.
+        if potential_users[0].username.startswith(settings.RETIRED_USERNAME_PREFIX):
+            retired = potential_users[0]
+            active = potential_users[1]
+        else:
+            retired = potential_users[1]
+            active = potential_users[0]
+
+        # If the active (non-retired) user's username doesn't *exactly* match (including case),
+        # then the retired account must be the one that exactly matches.
+        return active if active.username == username else retired
 
     # We should have, at most, a retired username and an active one with a username
     # differing only by case. If there are more we need to disambiguate them by hand.
@@ -349,7 +363,7 @@ def get_potentially_retired_user_by_username_and_hash(username, hashed_username)
       does not exist, the any hashed username salted with the historical
       salts.
     """
-    locally_hashed_usernames = list(get_all_retired_usernames_by_username(username))
+    locally_hashed_usernames = list(_get_all_retired_usernames_by_username(username))
 
     if hashed_username not in locally_hashed_usernames:
         raise Exception('Mismatched hashed_username, bad salt?')
@@ -364,6 +378,8 @@ class UserStanding(models.Model):
     Currently, we're only disabling accounts; in the future we can imagine
     taking away more specific privileges, like forums access, or adding
     more specific karma levels or probationary stages.
+
+    .. no_pii:
     """
     ACCOUNT_DISABLED = "disabled"
     ACCOUNT_ENABLED = "enabled"
@@ -397,6 +413,10 @@ class UserProfile(models.Model):
 
     Some of the fields are legacy ones that were captured during the initial
     MITx fall prototype.
+
+    .. pii: Contains many PII fields. Retired in AccountRetirementView.
+    .. pii_types: name, location, birth_date, gender, biography
+    .. pii_retirement: local_api
     """
     # cache key format e.g user.<user_id>.profile.country = 'SG'
     PROFILE_COUNTRY_CACHE_KEY = u"user.{user_id}.profile.country"
@@ -414,9 +434,15 @@ class UserProfile(models.Model):
     meta = models.TextField(blank=True)  # JSON dictionary for future expansion
     courseware = models.CharField(blank=True, max_length=255, default='course.xml')
 
+    # Language is deprecated and no longer used. Old rows exist that have
+    # user-entered free form text values (ex. "English"), some of which have
+    # non-ASCII values. You probably want UserPreference version of this, which
+    # stores the user's preferred language code. See openedx/core/djangoapps/lang_pref
+    # for more information.
+    language = models.CharField(blank=True, max_length=255, db_index=True)
+
     # Location is no longer used, but is held here for backwards compatibility
     # for users imported from our first class.
-    language = models.CharField(blank=True, max_length=255, db_index=True)
     location = models.CharField(blank=True, max_length=255, db_index=True)
 
     # Optional demographic data we started capturing from Fall 2012
@@ -683,6 +709,8 @@ class UserSignupSource(models.Model):
     """
     This table contains information about users registering
     via Micro-Sites
+
+    .. no_pii:
     """
     user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
     site = models.CharField(max_length=255, db_index=True)
@@ -704,16 +732,23 @@ def unique_id_for_user(user, save=True):
 # TODO: Should be renamed to generic UserGroup, and possibly
 # Given an optional field for type of group
 class UserTestGroup(models.Model):
+    """
+    .. no_pii:
+    """
     users = models.ManyToManyField(User, db_index=True)
     name = models.CharField(blank=False, max_length=32, db_index=True)
     description = models.TextField(blank=True)
 
 
 class Registration(models.Model):
-    ''' Allows us to wait for e-mail before user is registered. A
-        registration profile is created when the user creates an
-        account, but that account is inactive. Once the user clicks
-        on the activation key, it becomes active. '''
+    """
+    Allows us to wait for e-mail before user is registered. A
+    registration profile is created when the user creates an
+    account, but that account is inactive. Once the user clicks
+    on the activation key, it becomes active.
+
+    .. no_pii:
+    """
 
     class Meta(object):
         db_table = "auth_registration"
@@ -734,10 +769,15 @@ class Registration(models.Model):
         log.info(u'User %s (%s) account is successfully activated.', self.user.username, self.user.email)
 
     def _track_activation(self):
-        """ Update the isActive flag in mailchimp for activated users."""
+        """
+        Update the isActive flag in mailchimp for activated users.
+        """
         has_segment_key = getattr(settings, 'LMS_SEGMENT_KEY', None)
         has_mailchimp_id = hasattr(settings, 'MAILCHIMP_NEW_USER_LIST_ID')
         if has_segment_key and has_mailchimp_id:
+            # .. pii: Username and email are sent to Segment here. Retired directly through Segment API call in Tubular.
+            # .. pii_types: email_address, username
+            # .. pii_retirement: third_party
             segment.identify(
                 self.user.id,  # pylint: disable=no-member
                 {
@@ -754,6 +794,13 @@ class Registration(models.Model):
 
 
 class PendingNameChange(DeletableByUserValue, models.Model):
+    """
+    This model keeps track of pending requested changes to a user's email address.
+
+    .. pii: Contains new_name, retired in LMSAccountRetirementView
+    .. pii_types: name
+    .. pii_retirement: local_api
+    """
     user = models.OneToOneField(User, unique=True, db_index=True, on_delete=models.CASCADE)
     new_name = models.CharField(blank=True, max_length=255)
     rationale = models.CharField(blank=True, max_length=1024)
@@ -762,6 +809,10 @@ class PendingNameChange(DeletableByUserValue, models.Model):
 class PendingEmailChange(DeletableByUserValue, models.Model):
     """
     This model keeps track of pending requested changes to a user's email address.
+
+    .. pii: Contains new_email, retired in AccountRetirementView
+    .. pii_types: email_address
+    .. pii_retirement: local_api
     """
     user = models.OneToOneField(User, unique=True, db_index=True, on_delete=models.CASCADE)
     new_email = models.CharField(blank=True, max_length=255, db_index=True)
@@ -785,215 +836,29 @@ class PendingEmailChange(DeletableByUserValue, models.Model):
         return self.activation_key
 
 
+class PendingSecondaryEmailChange(DeletableByUserValue, models.Model):
+    """
+    This model keeps track of pending requested changes to a user's secondary email address.
+
+    .. pii: Contains new_secondary_email, not currently retired
+    .. pii_types: email_address
+    .. pii_retirement: retained
+    """
+    user = models.OneToOneField(User, unique=True, db_index=True, on_delete=models.CASCADE)
+    new_secondary_email = models.CharField(blank=True, max_length=255, db_index=True)
+    activation_key = models.CharField(('activation key'), max_length=32, unique=True, db_index=True)
+
+
 EVENT_NAME_ENROLLMENT_ACTIVATED = 'edx.course.enrollment.activated'
 EVENT_NAME_ENROLLMENT_DEACTIVATED = 'edx.course.enrollment.deactivated'
 EVENT_NAME_ENROLLMENT_MODE_CHANGED = 'edx.course.enrollment.mode_changed'
 
 
-class PasswordHistory(models.Model):
-    """
-    This model will keep track of past passwords that a user has used
-    as well as providing contraints (e.g. can't reuse passwords)
-    """
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    password = models.CharField(max_length=128)
-    time_set = models.DateTimeField(default=timezone.now)
-
-    def create(self, user):
-        """
-        This will copy over the current password, if any of the configuration has been turned on
-        """
-
-        if not (PasswordHistory.is_student_password_reuse_restricted() or
-                PasswordHistory.is_staff_password_reuse_restricted() or
-                PasswordHistory.is_password_reset_frequency_restricted() or
-                PasswordHistory.is_staff_forced_password_reset_enabled() or
-                PasswordHistory.is_student_forced_password_reset_enabled()):
-
-            return
-
-        self.user = user
-        self.password = user.password
-        self.save()
-
-    @classmethod
-    def is_student_password_reuse_restricted(cls):
-        """
-        Returns whether the configuration which limits password reuse has been turned on
-        """
-        if not settings.FEATURES['ADVANCED_SECURITY']:
-            return False
-        min_diff_pw = settings.ADVANCED_SECURITY_CONFIG.get(
-            'MIN_DIFFERENT_STUDENT_PASSWORDS_BEFORE_REUSE', 0
-        )
-        return min_diff_pw > 0
-
-    @classmethod
-    def is_staff_password_reuse_restricted(cls):
-        """
-        Returns whether the configuration which limits password reuse has been turned on
-        """
-        if not settings.FEATURES['ADVANCED_SECURITY']:
-            return False
-        min_diff_pw = settings.ADVANCED_SECURITY_CONFIG.get(
-            'MIN_DIFFERENT_STAFF_PASSWORDS_BEFORE_REUSE', 0
-        )
-        return min_diff_pw > 0
-
-    @classmethod
-    def is_password_reset_frequency_restricted(cls):
-        """
-        Returns whether the configuration which limits the password reset frequency has been turned on
-        """
-        if not settings.FEATURES['ADVANCED_SECURITY']:
-            return False
-        min_days_between_reset = settings.ADVANCED_SECURITY_CONFIG.get(
-            'MIN_TIME_IN_DAYS_BETWEEN_ALLOWED_RESETS'
-        )
-        return min_days_between_reset
-
-    @classmethod
-    def is_staff_forced_password_reset_enabled(cls):
-        """
-        Returns whether the configuration which forces password resets to occur has been turned on
-        """
-        if not settings.FEATURES['ADVANCED_SECURITY']:
-            return False
-        min_days_between_reset = settings.ADVANCED_SECURITY_CONFIG.get(
-            'MIN_DAYS_FOR_STAFF_ACCOUNTS_PASSWORD_RESETS'
-        )
-        return min_days_between_reset
-
-    @classmethod
-    def is_student_forced_password_reset_enabled(cls):
-        """
-        Returns whether the configuration which forces password resets to occur has been turned on
-        """
-        if not settings.FEATURES['ADVANCED_SECURITY']:
-            return False
-        min_days_pw_reset = settings.ADVANCED_SECURITY_CONFIG.get(
-            'MIN_DAYS_FOR_STUDENT_ACCOUNTS_PASSWORD_RESETS'
-        )
-        return min_days_pw_reset
-
-    @classmethod
-    def should_user_reset_password_now(cls, user):
-        """
-        Returns whether a password has 'expired' and should be reset. Note there are two different
-        expiry policies for staff and students
-        """
-        assert user
-
-        if not settings.FEATURES['ADVANCED_SECURITY']:
-            return False
-
-        days_before_password_reset = None
-        if user.is_staff:
-            if cls.is_staff_forced_password_reset_enabled():
-                days_before_password_reset = \
-                    settings.ADVANCED_SECURITY_CONFIG['MIN_DAYS_FOR_STAFF_ACCOUNTS_PASSWORD_RESETS']
-        elif cls.is_student_forced_password_reset_enabled():
-            days_before_password_reset = \
-                settings.ADVANCED_SECURITY_CONFIG['MIN_DAYS_FOR_STUDENT_ACCOUNTS_PASSWORD_RESETS']
-
-        if days_before_password_reset:
-            history = PasswordHistory.objects.filter(user=user).order_by('-time_set')
-            time_last_reset = None
-
-            if history:
-                # first element should be the last time we reset password
-                time_last_reset = history[0].time_set
-            else:
-                # no history, then let's take the date the user joined
-                time_last_reset = user.date_joined
-
-            now = timezone.now()
-
-            delta = now - time_last_reset
-
-            return delta.days >= days_before_password_reset
-
-        return False
-
-    @classmethod
-    def is_password_reset_too_soon(cls, user):
-        """
-        Verifies that the password is not getting reset too frequently
-        """
-        if not cls.is_password_reset_frequency_restricted():
-            return False
-
-        history = PasswordHistory.objects.filter(user=user).order_by('-time_set')
-
-        if not history:
-            return False
-
-        now = timezone.now()
-
-        delta = now - history[0].time_set
-
-        return delta.days < settings.ADVANCED_SECURITY_CONFIG['MIN_TIME_IN_DAYS_BETWEEN_ALLOWED_RESETS']
-
-    @classmethod
-    def is_allowable_password_reuse(cls, user, new_password):
-        """
-        Verifies that the password adheres to the reuse policies
-        """
-        assert user
-
-        if not settings.FEATURES['ADVANCED_SECURITY']:
-            return True
-
-        if user.is_staff and cls.is_staff_password_reuse_restricted():
-            min_diff_passwords_required = \
-                settings.ADVANCED_SECURITY_CONFIG['MIN_DIFFERENT_STAFF_PASSWORDS_BEFORE_REUSE']
-        elif cls.is_student_password_reuse_restricted():
-            min_diff_passwords_required = \
-                settings.ADVANCED_SECURITY_CONFIG['MIN_DIFFERENT_STUDENT_PASSWORDS_BEFORE_REUSE']
-        else:
-            min_diff_passwords_required = 0
-
-        # just limit the result set to the number of different
-        # password we need
-        history = PasswordHistory.objects.filter(user=user).order_by('-time_set')[:min_diff_passwords_required]
-
-        for entry in history:
-
-            # be sure to re-use the same salt
-            # NOTE, how the salt is serialized in the password field is dependent on the algorithm
-            # in pbkdf2_sha256 [LMS] it's the 3rd element, in sha1 [unit tests] it's the 2nd element
-            hash_elements = entry.password.split('$')
-            algorithm = hash_elements[0]
-            if algorithm == 'pbkdf2_sha256':
-                hashed_password = make_password(new_password, hash_elements[2])
-            elif algorithm == 'sha1':
-                hashed_password = make_password(new_password, hash_elements[1])
-            else:
-                # This means we got something unexpected. We don't want to throw an exception, but
-                # log as an error and basically allow any password reuse
-                AUDIT_LOG.error('''
-                                Unknown password hashing algorithm "{0}" found in existing password
-                                hash, password reuse policy will not be enforced!!!
-                                '''.format(algorithm))
-                return True
-
-            if entry.password == hashed_password:
-                return False
-
-        return True
-
-    @classmethod
-    def retire_user(cls, user_id):
-        """
-        Updates the password in all rows corresponding to a user
-        to an empty string as part of removing PII for user retirement.
-        """
-        return cls.objects.filter(user_id=user_id).update(password="")
-
-
 class LoginFailures(models.Model):
     """
-    This model will keep track of failed login attempts
+    This model will keep track of failed login attempts.
+
+    .. no_pii:
     """
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     failure_count = models.IntegerField(default=0)
@@ -1197,6 +1062,8 @@ class CourseEnrollment(models.Model):
     more should be brought in (such as checking against CourseEnrollmentAllowed,
     checking course dates, user permissions, etc.) This logic is currently
     scattered across our views.
+
+    .. no_pii:
     """
     MODEL_TAGS = ['course', 'is_active', 'mode']
 
@@ -1438,6 +1305,8 @@ class CourseEnrollment(models.Model):
                 'run': self.course_id.run,
                 'mode': self.mode,
             }
+            if event_name == EVENT_NAME_ENROLLMENT_ACTIVATED:
+                segment_properties['email'] = self.user.email
             with tracker.get_tracker().context(event_name, context):
                 tracker.emit(event_name, data)
                 segment.track(self.user_id, event_name, segment_properties)
@@ -1920,7 +1789,7 @@ class CourseEnrollment(models.Model):
         if self.dynamic_upgrade_deadline is not None:
             # When course modes expire they aren't found any more and None would be returned.
             # Replicate that behavior here by returning None if the personalized deadline is in the past.
-            if datetime.now(UTC) >= self.dynamic_upgrade_deadline:
+            if self.dynamic_upgrade_deadline <= datetime.now(UTC):
                 log.debug('Schedules: Returning None since dynamic upgrade deadline has already passed.')
                 return None
 
@@ -1967,14 +1836,12 @@ class CourseEnrollment(models.Model):
                 'Schedules: Pulling upgrade deadline for CourseEnrollment %d from Schedule %d.',
                 self.id, self.schedule.id
             )
-            upgrade_deadline = self.schedule.upgrade_deadline
+            return self.schedule.upgrade_deadline
         except ObjectDoesNotExist:
             # NOTE: Schedule has a one-to-one mapping with CourseEnrollment. If no schedule is associated
             # with this enrollment, Django will raise an exception rather than return None.
             log.debug('Schedules: No schedule exists for CourseEnrollment %d.', self.id)
             return None
-
-        return upgrade_deadline
 
     @cached_property
     def course_upgrade_deadline(self):
@@ -2112,7 +1979,9 @@ class CourseEnrollment(models.Model):
 @receiver(models.signals.post_save, sender=CourseEnrollment)
 @receiver(models.signals.post_delete, sender=CourseEnrollment)
 def invalidate_enrollment_mode_cache(sender, instance, **kwargs):  # pylint: disable=unused-argument, invalid-name
-    """Invalidate the cache of CourseEnrollment model. """
+    """
+    Invalidate the cache of CourseEnrollment model.
+    """
 
     cache_key = CourseEnrollment.cache_key_name(
         instance.user.id,
@@ -2124,6 +1993,10 @@ def invalidate_enrollment_mode_cache(sender, instance, **kwargs):  # pylint: dis
 class ManualEnrollmentAudit(models.Model):
     """
     Table for tracking which enrollments were performed through manual enrollment.
+
+    .. pii: Contains enrolled_email, retired in LMSAccountRetirementView
+    .. pii_types: email_address
+    .. pii_retirement: local_api
     """
     enrollment = models.ForeignKey(CourseEnrollment, null=True, on_delete=models.CASCADE)
     enrolled_by = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
@@ -2190,6 +2063,8 @@ class CourseEnrollmentAllowed(DeletableByUserValue, models.Model):
     even if the enrollment time window is past.  Once an enrollment from this list effectively happens,
     the object is marked with the student who enrolled, to prevent students from changing e-mails and
     enrolling many accounts through the same e-mail.
+
+    .. no_pii:
     """
     email = models.CharField(max_length=255, db_index=True)
     course_id = CourseKeyField(max_length=255, db_index=True)
@@ -2246,6 +2121,8 @@ class CourseAccessRole(models.Model):
     Maps users to org, courses, and roles. Used by student.roles.CourseRole and OrgRole.
     To establish a user as having a specific role over all courses in the org, create an entry
     without a course_id.
+
+    .. no_pii:
     """
 
     objects = NoneToEmptyManager()
@@ -2329,12 +2206,12 @@ def get_user(email):
 
 def user_info(email):
     user, u_prof = get_user(email)
-    print "User id", user.id
-    print "Username", user.username
-    print "E-mail", user.email
-    print "Name", u_prof.name
-    print "Location", u_prof.location
-    print "Language", u_prof.language
+    print("User id", user.id)
+    print("Username", user.username)
+    print("E-mail", user.email)
+    print("Name", u_prof.name)
+    print("Location", u_prof.location)
+    print("Language", u_prof.language)
     return user, u_prof
 
 
@@ -2351,8 +2228,8 @@ def change_name(email, new_name):
 
 
 def user_count():
-    print "All users", User.objects.all().count()
-    print "Active users", User.objects.filter(is_active=True).count()
+    print("All users", User.objects.all().count())
+    print("Active users", User.objects.filter(is_active=True).count())
     return User.objects.all().count()
 
 
@@ -2459,10 +2336,12 @@ def enforce_single_login(sender, request, user, signal, **kwargs):    # pylint: 
 
 
 class DashboardConfiguration(ConfigurationModel):
-    """Dashboard Configuration settings.
+    """
+    Dashboard Configuration settings.
 
     Includes configuration options for the dashboard, which impact behavior and rendering for the application.
 
+    .. no_pii:
     """
     recent_enrollment_time_delta = models.PositiveIntegerField(
         default=0,
@@ -2485,6 +2364,8 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
     users are sent to the LinkedIn site with a pre-filled
     form allowing them to add the certificate to their
     LinkedIn profile.
+
+    .. no_pii:
     """
 
     MODE_TO_CERT_NAME = {
@@ -2611,6 +2492,8 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
 class EntranceExamConfiguration(models.Model):
     """
     Represents a Student's entrance exam specific data for a single Course
+
+    .. no_pii:
     """
 
     user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
@@ -2678,6 +2561,8 @@ class LanguageProficiency(models.Model):
     to go through the accounts API (AccountsView) defined in
     /edx-platform/openedx/core/djangoapps/user_api/accounts/views.py or its associated api method
     (update_account_settings) so that the events are emitted.
+
+    .. no_pii: Language is not PII value according to OEP-30.
     """
     class Meta(object):
         unique_together = (('code', 'user_profile'),)
@@ -2701,6 +2586,10 @@ class SocialLink(models.Model):  # pylint: disable=model-missing-unicode
     component of the stored URL and an example of a valid URL.
 
     The stored social_link value must adhere to the form 'https://www.[url_stub][username]'.
+
+    .. pii: Stores linkage from User to a learner's social media profiles. Retired in AccountRetirementView.
+    .. pii_types: external_service
+    .. pii_retirement: local_api
     """
     user_profile = models.ForeignKey(UserProfile, db_index=True, related_name='social_links', on_delete=models.CASCADE)
     platform = models.CharField(max_length=30)
@@ -2710,6 +2599,8 @@ class SocialLink(models.Model):  # pylint: disable=model-missing-unicode
 class CourseEnrollmentAttribute(models.Model):
     """
     Provide additional information about the user's enrollment.
+
+    .. no_pii: This stores key/value pairs, of which there is no full list, but the ones currently in use are not PII
     """
     enrollment = models.ForeignKey(CourseEnrollment, related_name="attributes", on_delete=models.CASCADE)
     namespace = models.CharField(
@@ -2735,12 +2626,13 @@ class CourseEnrollmentAttribute(models.Model):
 
     @classmethod
     def add_enrollment_attr(cls, enrollment, data_list):
-        """Delete all the enrollment attributes for the given enrollment and
+        """
+        Delete all the enrollment attributes for the given enrollment and
         add new attributes.
 
         Args:
-            enrollment(CourseEnrollment): 'CourseEnrollment' for which attribute is to be added
-            data(list): list of dictionaries containing data to save
+            enrollment (CourseEnrollment): 'CourseEnrollment' for which attribute is to be added
+            data_list: list of dictionaries containing data to save
         """
         cls.objects.filter(enrollment=enrollment).delete()
         attributes = [
@@ -2781,6 +2673,8 @@ class CourseEnrollmentAttribute(models.Model):
 class EnrollmentRefundConfiguration(ConfigurationModel):
     """
     Configuration for course enrollment refunds.
+
+    .. no_pii:
     """
 
     # TODO: Django 1.8 introduces a DurationField
@@ -2812,6 +2706,8 @@ class EnrollmentRefundConfiguration(ConfigurationModel):
 class RegistrationCookieConfiguration(ConfigurationModel):
     """
     Configuration for registration cookies.
+
+    .. no_pii:
     """
     utm_cookie_name = models.CharField(
         max_length=255,
@@ -2834,6 +2730,8 @@ class RegistrationCookieConfiguration(ConfigurationModel):
 class UserAttribute(TimeStampedModel):
     """
     Record additional metadata about a user, stored as key/value pairs of text.
+
+    .. no_pii:
     """
 
     class Meta(object):
@@ -2874,8 +2772,93 @@ class UserAttribute(TimeStampedModel):
 
 
 class LogoutViewConfiguration(ConfigurationModel):
-    """ DEPRECATED: Configuration for the logout view. """
+    """
+    DEPRECATED: Configuration for the logout view.
+
+    .. no_pii:
+    """
 
     def __unicode__(self):
-        """Unicode representation of the instance. """
+        """
+        Unicode representation of the instance.
+        """
         return u'Logout view configuration: {enabled}'.format(enabled=self.enabled)
+
+
+class AccountRecoveryManager(models.Manager):
+    """
+    Custom Manager for AccountRecovery model
+    """
+
+    def get_active(self, **filters):
+        """
+        Return only active AccountRecovery record after applying the given filters.
+
+        Arguments:
+            filters (**kwargs): Filter parameters for AccountRecovery records.
+
+        Returns:
+            AccountRecovery: AccountRecovery object with is_active=true
+        """
+        filters['is_active'] = True
+        return super(AccountRecoveryManager, self).get_queryset().get(**filters)
+
+    def activate(self):
+        """
+        Set is_active flag to True.
+        """
+        super(AccountRecoveryManager, self).get_queryset().update(is_active=True)
+
+
+class AccountRecovery(models.Model):
+    """
+    Model for storing information for user's account recovery in case of access loss.
+
+    .. pii: the field named secondary_email contains pii, retired in the `DeactivateLogoutView`
+    .. pii_types: email_address
+    .. pii_retirement: local_api
+    """
+    user = models.OneToOneField(User, related_name='account_recovery', on_delete=models.CASCADE)
+    secondary_email = models.EmailField(
+        verbose_name=_('Secondary email address'),
+        help_text=_('Secondary email address to recover linked account.'),
+        unique=True,
+        null=False,
+        blank=False,
+    )
+    is_active = models.BooleanField(default=False)
+
+    class Meta(object):
+        db_table = "auth_accountrecovery"
+
+    objects = AccountRecoveryManager()
+
+    def update_recovery_email(self, email):
+        """
+        Update the secondary email address on the instance to the email in the argument.
+
+        Arguments:
+            email (str): New email address to be set as the secondary email address.
+        """
+        self.secondary_email = email
+        self.is_active = False
+        self.save()
+
+    @classmethod
+    def retire_recovery_email(cls, user_id):
+        """
+        Retire user's recovery/secondary email as part of GDPR Phase I.
+        Returns 'True'
+
+        If an AccountRecovery record is found for this user it will be deleted,
+        if it is not found it is assumed this table has no PII for the given user.
+
+        :param user_id: int
+        :return: bool
+        """
+        try:
+            cls.objects.get(user_id=user_id).delete()
+        except cls.DoesNotExist:
+            pass
+
+        return True

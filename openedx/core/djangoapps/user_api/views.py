@@ -285,7 +285,7 @@ class UpdateEmailOptInPreference(APIView):
         except InvalidKeyError:
             return HttpResponse(
                 status=400,
-                content="No course '{course_id}' found".format(course_id=course_id),
+                content=u"No course '{course_id}' found".format(course_id=course_id),
                 content_type="text/plain"
             )
         # Only check for true. All other values are False.

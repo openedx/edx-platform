@@ -21,15 +21,16 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework import status, permissions
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
+from rest_framework.serializers import Serializer
 from six import text_type
 
-from courseware.courses import get_course_with_access
+from courseware.courses import get_course, get_course_with_access
 from edxmako.shortcuts import render_to_response
 from util.json_request import JsonResponse, expect_json
-
 from openedx.core.djangoapps.course_groups.models import CohortMembership
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
+from student.auth import has_course_author_access
 from . import api, cohorts
 from .models import CourseUserGroup, CourseUserGroupPartitionGroup
 from .serializers import CohortUsersAPISerializer
@@ -165,7 +166,11 @@ def cohort_handler(request, course_key_string, cohort_id=None):
         cohort.
     """
     course_key = CourseKey.from_string(course_key_string)
-    course = get_course_with_access(request.user, 'staff', course_key)
+    if not has_course_author_access(request.user, course_key):
+        raise Http404('The requesting user does not have course author permissions.')
+
+    course = get_course(course_key)
+
     if request.method == 'GET':
         if not cohort_id:
             all_cohorts = [
@@ -265,7 +270,7 @@ def users_in_cohort(request, course_key_string, cohort_id):
 
     user_info = [{'username': u.username,
                   'email': u.email,
-                  'name': '{0} {1}'.format(u.first_name, u.last_name)}
+                  'name': u'{0} {1}'.format(u.first_name, u.last_name)}
                  for u in users]
 
     return json_http_response({'success': True,
@@ -302,7 +307,7 @@ def add_users_to_cohort(request, course_key_string, cohort_id):
     try:
         cohort = cohorts.get_cohort_by_id(course_key, cohort_id)
     except CourseUserGroup.DoesNotExist:
-        raise Http404("Cohort (ID {cohort_id}) not found for {course_key_string}".format(
+        raise Http404(u"Cohort (ID {cohort_id}) not found for {course_key_string}".format(
             cohort_id=cohort_id,
             course_key_string=course_key_string
         ))
@@ -373,7 +378,7 @@ def remove_user_from_cohort(request, course_key_string, cohort_id):
         api.remove_user_from_cohort(course_key, username)
     except User.DoesNotExist:
         log.debug('no user')
-        return json_http_response({'success': False, 'msg': "No user '{0}'".format(username)})
+        return json_http_response({'success': False, 'msg': u"No user '{0}'".format(username)})
 
     return json_http_response({'success': True})
 
@@ -426,6 +431,7 @@ class APIPermissions(GenericAPIView):
         SessionAuthenticationAllowInactiveUser,
     )
     permission_classes = (permissions.IsAuthenticated, permissions.IsAdminUser)
+    serializer_class = Serializer
 
 
 class CohortSettings(DeveloperErrorViewMixin, APIPermissions):
@@ -494,7 +500,6 @@ class CohortHandler(DeveloperErrorViewMixin, APIPermissions):
             * user_partition_id: The integer identified of the UserPartition.
             * group_id: The integer identified of the specific group in the partition.
     """
-
     def get(self, request, course_key_string, cohort_id=None):
         """
         Endpoint to get either one or all cohorts.
@@ -662,7 +667,7 @@ class CohortUsers(DeveloperErrorViewMixin, APIPermissions):
         try:
             cohort = cohorts.get_cohort_by_id(course_key, cohort_id)
         except CourseUserGroup.DoesNotExist:
-            msg = 'Cohort (ID {cohort_id}) not found for {course_key_string}'.format(
+            msg = u'Cohort (ID {cohort_id}) not found for {course_key_string}'.format(
                 cohort_id=cohort_id,
                 course_key_string=course_key_string
             )

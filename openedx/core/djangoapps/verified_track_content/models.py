@@ -39,7 +39,7 @@ def move_to_verified_cohort(sender, instance, **kwargs):  # pylint: disable=unus
 
     if verified_cohort_enabled and (instance.mode != instance._old_mode):  # pylint: disable=protected-access
         if not is_course_cohorted(course_key):
-            log.error("Automatic verified cohorting enabled for course '%s', but course is not cohorted.", course_key)
+            log.error(u"Automatic verified cohorting enabled for course '%s', but course is not cohorted.", course_key)
         else:
             course = get_course_by_id(course_key)
             existing_manual_cohorts = get_course_cohorts(course, CourseCohort.MANUAL)
@@ -55,8 +55,8 @@ def move_to_verified_cohort(sender, instance, **kwargs):  # pylint: disable=unus
                     'default_cohort_name': random_cohort.name
                 }
                 log.info(
-                    "Queuing automatic cohorting for user '%s' in course '%s' "
-                    "due to change in enrollment mode from '%s' to '%s'.",
+                    u"Queuing automatic cohorting for user '%s' in course '%s' "
+                    u"due to change in enrollment mode from '%s' to '%s'.",
                     instance.user.id, course_key, instance._old_mode, instance.mode  # pylint: disable=protected-access
                 )
 
@@ -70,8 +70,8 @@ def move_to_verified_cohort(sender, instance, **kwargs):  # pylint: disable=unus
                 sync_cohort_with_mode.apply_async(kwargs=args, countdown=300)
             else:
                 log.error(
-                    "Automatic verified cohorting enabled for course '%s', "
-                    "but verified cohort named '%s' does not exist.",
+                    u"Automatic verified cohorting enabled for course '%s', "
+                    u"but verified cohort named '%s' does not exist.",
                     course_key,
                     verified_cohort_name,
                 )
@@ -92,6 +92,8 @@ def pre_save_callback(sender, instance, **kwargs):  # pylint: disable=unused-arg
 class VerifiedTrackCohortedCourse(models.Model):
     """
     Tracks which courses have verified track auto-cohorting enabled.
+
+    .. no_pii:
     """
     course_key = CourseKeyField(
         max_length=255, db_index=True, unique=True,
@@ -154,6 +156,8 @@ def invalidate_verified_track_cache(sender, **kwargs):   # pylint: disable=unuse
 class MigrateVerifiedTrackCohortsSetting(ConfigurationModel):
     """
     Configuration for the swap_from_auto_track_cohorts management command.
+
+    .. no_pii:
     """
     class Meta(object):
         app_label = "verified_track_content"

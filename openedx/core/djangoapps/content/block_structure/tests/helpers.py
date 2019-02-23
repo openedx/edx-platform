@@ -303,7 +303,7 @@ class ChildrenMapTestMixin(object):
             self.assertEqual(
                 self.block_key_factory(block_key) in block_structure,
                 block_key not in missing_blocks,
-                'Expected presence in block_structure for block_key {} to match absence in missing_blocks.'.format(
+                u'Expected presence in block_structure for block_key {} to match absence in missing_blocks.'.format(
                     unicode(block_key)
                 ),
             )

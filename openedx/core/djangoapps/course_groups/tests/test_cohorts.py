@@ -6,7 +6,7 @@ import ddt
 from mock import call, patch
 
 import before_after
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AnonymousUser
 from django.db import IntegrityError
 from django.http import Http404
 from django.test import TestCase
@@ -33,7 +33,6 @@ class TestCohortSignals(TestCase):
     """
     Test cases to validate event emissions for various cohort-related workflows
     """
-    shard = 2
 
     def setUp(self):
         super(TestCohortSignals, self).setUp()
@@ -140,7 +139,6 @@ class TestCohorts(ModuleStoreTestCase):
     Test the cohorts feature
     """
     MODULESTORE = TEST_DATA_MIXED_MODULESTORE
-    shard = 2
 
     def setUp(self):
         """
@@ -385,6 +383,22 @@ class TestCohorts(ModuleStoreTestCase):
         self.assertEquals(cohorts.get_cohort(user1, course.id).id, cohort.id, "user1 should stay put")
 
         self.assertEquals(cohorts.get_cohort(user2, course.id).name, "AutoGroup", "user2 should be auto-cohorted")
+
+    def test_anonymous_user_cohort(self):
+        """
+        Anonymous user is not assigned to any cohort group.
+        """
+        course = modulestore().get_course(self.toy_course_key)
+
+        # verify cohorts is None when course is not cohorted
+        self.assertIsNone(cohorts.get_cohort(AnonymousUser(), course.id))
+
+        config_course_cohorts(
+            course,
+            is_cohorted=True,
+            auto_cohorts=["AutoGroup"]
+        )
+        self.assertIsNone(cohorts.get_cohort(AnonymousUser(), course.id))
 
     def test_cohorting_with_migrations_done(self):
         """
@@ -734,7 +748,6 @@ class TestCohortsAndPartitionGroups(ModuleStoreTestCase):
     Test Cohorts and Partitions Groups.
     """
     MODULESTORE = TEST_DATA_MIXED_MODULESTORE
-    shard = 2
 
     def setUp(self):
         """

@@ -48,7 +48,7 @@ def handle_dashboard_error(view):
         """
         try:
             return view(request, course_id=course_id)
-        except DashboardError, error:
+        except DashboardError as error:
             return error.response()
 
     return wrapper
@@ -83,7 +83,7 @@ def require_student_from_identifier(unique_student_identifier):
         return get_student_from_identifier(unique_student_identifier)
     except User.DoesNotExist:
         raise DashboardError(
-            _("Could not find student matching identifier: {student_identifier}").format(
+            _(u"Could not find student matching identifier: {student_identifier}").format(
                 student_identifier=unique_student_identifier
             )
         )
@@ -120,7 +120,7 @@ def find_unit(course, url):
 
     unit = find(course, url)
     if unit is None:
-        raise DashboardError(_("Couldn't find module for url: {0}").format(url))
+        raise DashboardError(_(u"Couldn't find module for url: {0}").format(url))
     return unit
 
 
@@ -169,7 +169,7 @@ def set_due_date_extension(course, unit, student, due_date):
             original_due_date = getattr(unit, 'due', None)
 
         if not original_due_date:
-            raise DashboardError(_("Unit {0} has no due date to extend.").format(unit.location))
+            raise DashboardError(_(u"Unit {0} has no due date to extend.").format(unit.location))
         if due_date < original_due_date:
             raise DashboardError(_("An extended due date must be later than the original due date."))
 
@@ -196,7 +196,7 @@ def dump_module_extensions(course, unit):
         field='due')
     for override in query:
         due = DATE_FIELD.from_json(json.loads(override.value))
-        due = due.strftime("%Y-%m-%d %H:%M")
+        due = due.strftime(u"%Y-%m-%d %H:%M")
         fullname = override.student.profile.name
         data.append(dict(zip(
             header,
@@ -204,7 +204,7 @@ def dump_module_extensions(course, unit):
     data.sort(key=lambda x: x[header[0]])
     return {
         "header": header,
-        "title": _("Users with due date extensions for {0}").format(
+        "title": _(u"Users with due date extensions for {0}").format(
             title_or_url(unit)),
         "data": data
     }
@@ -228,12 +228,12 @@ def dump_student_extensions(course, student):
         if location not in units:
             continue
         due = DATE_FIELD.from_json(json.loads(override.value))
-        due = due.strftime("%Y-%m-%d %H:%M")
+        due = due.strftime(u"%Y-%m-%d %H:%M")
         title = title_or_url(units[location])
         data.append(dict(zip(header, (title, due))))
     return {
         "header": header,
-        "title": _("Due date extensions for {0} {1} ({2})").format(
+        "title": _(u"Due date extensions for {0} {1} ({2})").format(
             student.first_name, student.last_name, student.username),
         "data": data}
 

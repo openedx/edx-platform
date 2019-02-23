@@ -69,6 +69,7 @@ class GoogleAnalyticsTrackingPixel(object):
     event_label = attr.ib(default=None, metadata={'param_name': 'el'})
 
     document_path = attr.ib(default=None, metadata={'param_name': 'dp'})
+    document_host = attr.ib(default=None, metadata={'param_name': 'dh'})
 
     user_id = attr.ib(default=None, metadata={'param_name': 'uid'})
     client_id = attr.ib(default=ANONYMOUS_USER_CLIENT_ID, metadata={'param_name': 'cid'})

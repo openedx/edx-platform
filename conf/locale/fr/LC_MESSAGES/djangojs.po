@@ -1,6 +1,6 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from French (http://www.transifex.com/open-edx/edx-platform/language/fr/).
-# Copyright (C) 2018 EdX
+# Copyright (C) 2019 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -70,7 +70,7 @@
 # d6910e756eb8532754192e6021dc9f83, 2014-2015
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from French (http://www.transifex.com/open-edx/edx-platform/language/fr/).
-# Copyright (C) 2018 EdX
+# Copyright (C) 2019 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -118,7 +118,7 @@
 # d6910e756eb8532754192e6021dc9f83, 2015
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from French (http://www.transifex.com/open-edx/edx-platform/language/fr/)
-# Copyright (C) 2018 edX
+# Copyright (C) 2019 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -150,7 +150,7 @@
 # Steven BERNARD <steven.bernard@u-paris2.fr>, 2014
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from French (http://www.transifex.com/open-edx/edx-platform/language/fr/)
-# Copyright (C) 2018 edX
+# Copyright (C) 2019 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -172,15 +172,16 @@
 # romain couturat <romain.couturat@fun-mooc.fr>, 2016
 # Steven BERNARD <steven.bernard@u-paris2.fr>, 2014
 # Tala Aoun <talaaoun@gmail.com>, 2016
+# willyedoo <willyedoo@gmail.com>, 2019
 # d6910e756eb8532754192e6021dc9f83, 2015
 # d6910e756eb8532754192e6021dc9f83, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-11-18 20:42+0000\n"
-"PO-Revision-Date: 2018-08-20 13:55+0000\n"
-"Last-Translator: John Burke <johnb@matinee.co.uk>\n"
+"POT-Creation-Date: 2019-02-17 20:42+0000\n"
+"PO-Revision-Date: 2019-02-10 20:45+0000\n"
+"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: French (http://www.transifex.com/open-edx/edx-platform/language/fr/)\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -240,7 +241,7 @@ msgstr "Supprimer"
 #: cms/static/js/views/validation.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/static/common/js/components/utils/view_utils.js
-#: lms/static/js/Markdown.Editor.js lms/static/js/writable_gradebook.js
+#: lms/static/js/Markdown.Editor.js
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 #: cms/templates/js/add-xblock-component-menu.underscore
 #: cms/templates/js/certificate-editor.underscore
@@ -367,7 +368,6 @@ msgstr "Charger un fichier"
 #: cms/static/js/views/modals/base_modal.js
 #: cms/static/js/views/modals/course_outline_modals.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: lms/static/js/writable_gradebook.js
 #: cms/templates/js/certificate-editor.underscore
 #: cms/templates/js/content-group-editor.underscore
 #: cms/templates/js/course_info_handouts.underscore
@@ -3966,7 +3966,6 @@ msgstr "Marquer le code d'inscription comme non utilisé"
 
 #: lms/static/js/instructor_dashboard/membership.js
 #: lms/static/js/student_account/views/account_settings_factory.js
-#: lms/static/js/writable_gradebook.js
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 #: cms/templates/js/transcript-organization-credentials.underscore
 #: lms/djangoapps/support/static/support/templates/manage_user.underscore
@@ -4876,20 +4875,12 @@ msgstr "Vérifiez votre email"
 msgid ""
 "{paragraphStart}You entered {boldStart}{email}{boldEnd}. If this email "
 "address is associated with your {platform_name} account, we will send a "
-"message with password reset instructions to this email "
+"message with password recovery instructions to this email "
 "address.{paragraphEnd}{paragraphStart}If you do not receive a password reset"
 " message, verify that you entered the correct email address, or check your "
 "spam folder.{paragraphEnd}{paragraphStart}If you need further assistance, "
 "{anchorStart}contact technical support{anchorEnd}.{paragraphEnd}"
 msgstr ""
-"{paragraphStart}Vous avez indiqué {boldStart}{email}{boldEnd}. Si cet email "
-"est à associé à votre compte sur {platform_name}, nous vous enverrons un "
-"email avec les instructions de réinitialisation de votre mot de passe à cet "
-"adresse email.{paragraphEnd}{paragraphStart}Si vous n'avez pas reçu d'email "
-"de réinitialisation de mot de passe, vérifiez que vous avez entré la bonne "
-"adresse email, ou vérifiez votre dossier "
-"spam.{paragraphEnd}{paragraphStart}Si vous avez besoin d'aide, "
-"{anchorStart}contactez le support technique{anchorEnd}.{paragraphEnd}"
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
@@ -4948,6 +4939,16 @@ msgstr ""
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
 "You receive messages from {platform_name} and course teams at this address."
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Recovery Email Address"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid ""
+"You may access your account with this address if single-sign on or access to"
+" your primary email is not available."
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -5044,6 +5045,12 @@ msgstr "Année de naissance"
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Preferred Language"
 msgstr "Langue préférée"
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid ""
+"We've sent a confirmation message to {new_secondary_email_address}. Click "
+"the link in the message to update your secondary email address."
+msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Social Media Links"
@@ -5180,6 +5187,18 @@ msgstr "Information du compte"
 #: lms/static/js/student_account/views/account_settings_view.js
 msgid "Order History"
 msgstr "Historique des commandes"
+
+#: lms/static/js/student_account/views/account_settings_view.js
+msgid ""
+"You have set your language to {beta_language}, which is currently not fully "
+"translated. You can help us translate this language fully by joining the "
+"Transifex community and adding translations from English for learners that "
+"speak {beta_language}."
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_view.js
+msgid "Help Translate into {beta_language}"
+msgstr ""
 
 #: lms/static/js/verify_student/views/image_input_view.js
 msgid "Image Upload Error"
@@ -5378,32 +5397,6 @@ msgstr "KB"
 msgid "MB"
 msgstr "MB"
 
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Total"
-msgstr "Total"
-
-#: lms/static/js/writable_gradebook.js
-msgid "The Assignment name is:"
-msgstr ""
-
-#: lms/static/js/writable_gradebook.js
-msgid "Publish grades"
-msgstr ""
-
-#: lms/static/js/writable_gradebook.js
-msgid "No matching records found"
-msgstr ""
-
-#: lms/static/js/writable_gradebook.js
-msgid "Student Name"
-msgstr ""
-
-#: lms/static/js/writable_gradebook.js
-msgid "Update in progress, please wait..."
-msgstr ""
-
 #: lms/static/lms/js/preview/preview_factory.js
 msgid "Course is not yet visible to students."
 msgstr "Ce cours n'est pas encore visible pour les étudiants."
@@ -5457,6 +5450,14 @@ msgstr ""
 #: openedx/features/course_experience/static/course_experience/js/CourseHome.js
 msgid "There was an error updating your goal."
 msgstr ""
+
+#: lms/templates/ccx/schedule.underscore
+msgid "Expand All"
+msgstr "Tout déplier"
+
+#: lms/templates/ccx/schedule.underscore
+msgid "Collapse All"
+msgstr "Tout replier"
 
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result"
@@ -5576,10 +5577,6 @@ msgstr ""
 #: cms/static/js/base.js
 msgid "This link will open in a modal window"
 msgstr ""
-
-#: cms/static/js/certificates/collections/certificates.js
-msgid "Could not parse certificate JSON. %(message)s"
-msgstr "Le certificat JSON n'a pas pu être analysé. %(message)s"
 
 #: cms/static/js/certificates/models/certificate.js
 msgid "Certificate name is required."
@@ -6383,7 +6380,11 @@ msgid "Visibility"
 msgstr "Visibilité"
 
 #: cms/static/js/views/modals/edit_xblock.js
-msgid "Editing: %(title)s"
+msgid "Editing: {title}"
+msgstr ""
+
+#: cms/static/js/views/modals/edit_xblock.js
+msgid "Plugins"
 msgstr ""
 
 #: lms/templates/ccx/schedule.underscore
@@ -7666,14 +7667,6 @@ msgid "This catalog's courses:"
 msgstr "Les cours de ce catalogue : "
 
 #: lms/templates/ccx/schedule.underscore
-msgid "Expand All"
-msgstr "Tout déplier"
-
-#: lms/templates/ccx/schedule.underscore
-msgid "Collapse All"
-msgstr "Tout replier"
-
-#: lms/templates/ccx/schedule.underscore
 msgid "Start Date"
 msgstr "Date de début"
 
@@ -7771,6 +7764,12 @@ msgid "Amount"
 msgstr "Montant"
 
 #: lms/templates/commerce/receipt.underscore
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Total"
+msgstr "Total"
+
+#: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Please Note"
 msgstr "Veuillez noter"
@@ -7816,13 +7815,29 @@ msgid "Mark Exam As Completed"
 msgstr "Marquer l'examen comme complété"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
-msgid "timed"
-msgstr "temps limité"
+msgid "a timed exam"
+msgstr ""
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "The timer on the right shows the time remaining in the exam."
+msgstr ""
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid ""
 "To receive credit for problems, you must select \"Submit\" for each problem "
 "before you select \"End My Exam\"."
+msgstr ""
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show More"
+msgstr ""
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show Less"
+msgstr ""
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Exam timer and end exam button"
 msgstr ""
 
 #: lms/templates/courseware/proctored-exam-status.underscore
@@ -8536,6 +8551,10 @@ msgid "Reset Password"
 msgstr "Réinitialiser le mot de passe"
 
 #: lms/templates/student_account/account_settings.underscore
+msgid "Switch Language Back"
+msgstr ""
+
+#: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
 msgstr "Paramètres du compte"
 
@@ -8544,8 +8563,8 @@ msgid "An error occurred. Please reload the page."
 msgstr "Une erreur est survenue. Merci de rafraîchir la page."
 
 #: lms/templates/student_account/form_field.underscore
-msgid "Forgot password?"
-msgstr "Mot de passe oublié?"
+msgid "Need help logging in?"
+msgstr ""
 
 #: lms/templates/student_account/hinted_login.underscore
 #, python-format
@@ -8661,15 +8680,13 @@ msgstr "Aide mot de passe"
 
 #: lms/templates/student_account/password_reset.underscore
 msgid ""
-"Please enter your email address below and we will send you instructions for "
-"setting a new password."
+"Please enter your log-in or recovery email address below and we will send "
+"you an email with instructions."
 msgstr ""
-"Merci d'entrer votre adresse email ci dessous afin de recevoir les "
-"instructions pour créer un nouveau mot de passe."
 
 #: lms/templates/student_account/password_reset.underscore
-msgid "Reset my password"
-msgstr "Réinitialiser mon mot de passe"
+msgid "Recover my password"
+msgstr ""
 
 #: lms/templates/student_account/register.underscore
 msgid "Already have an {platformName} account?"
@@ -9842,6 +9859,10 @@ msgid "Ungraded"
 msgstr "Non noté"
 
 #: cms/templates/js/course-outline.underscore
+msgid "Onboarding Exam"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
 msgid "Practice proctored Exam"
 msgstr "Pratiquer l'examen surveillé"
 
@@ -9862,6 +9883,10 @@ msgstr "Déplier/Replier ce %(xblock_type)s"
 #: cms/templates/js/course-outline.underscore
 msgid "Display Name"
 msgstr "Nom d'affichage"
+
+#: cms/templates/js/course-outline.underscore
+msgid "Proctoring Settings"
+msgstr ""
 
 #: cms/templates/js/course-outline.underscore
 msgid "Configure"
@@ -10569,6 +10594,10 @@ msgid ""
 msgstr ""
 
 #: cms/templates/js/show-textbook.underscore
+msgid "PDF Chapters"
+msgstr ""
+
+#: cms/templates/js/show-textbook.underscore
 msgid "View Live"
 msgstr "Aperçu réel"
 
@@ -10740,6 +10769,18 @@ msgstr ""
 "Les examens vérifiés sont minutés et un enregistrement vidéo est fait que "
 "chaque étudiant. Les vidéo sont ensuite vérifiées pour s'assurer que les "
 "conditions de l'examen étaient correctes;"
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "Onboarding"
+msgstr ""
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"Use Onboarding to introduce learners to proctoring, verify their identity, "
+"and create an onboarding profile. Learners must complete the onboarding "
+"profile step prior to taking a proctored exam. Profile reviews take 2+ "
+"business days."
+msgstr ""
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Practice Proctored"

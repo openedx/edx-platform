@@ -31,7 +31,6 @@ from lms.djangoapps.instructor_task.tasks import (
 from lms.djangoapps.instructor_task.tasks_helper.misc import upload_ora2_data
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
 from lms.djangoapps.instructor_task.tests.test_base import InstructorTaskModuleTestCase
-from openedx.core.lib.tests import attr
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 PROBLEM_URL_NAME = "test_urlname"
@@ -374,7 +373,6 @@ class TestOverrideScoreInstructorTask(TestInstructorTasks):
         )
 
 
-@attr(shard=3)
 @ddt.ddt
 class TestRescoreInstructorTask(TestInstructorTasks):
     """Tests problem-rescoring instructor task."""
@@ -433,7 +431,7 @@ class TestRescoreInstructorTask(TestInstructorTasks):
         entry = InstructorTask.objects.get(id=task_entry.id)
         output = json.loads(entry.task_output)
         self.assertEquals(output['exception'], "UpdateProblemModuleStateError")
-        self.assertEquals(output['message'], "Specified module {0} of type {1} does not support rescoring.".format(
+        self.assertEquals(output['message'], u"Specified module {0} of type {1} does not support rescoring.".format(
             self.location,
             mock_instance.__class__,
         ))
@@ -490,7 +488,6 @@ class TestRescoreInstructorTask(TestInstructorTasks):
         )
 
 
-@attr(shard=3)
 class TestResetAttemptsInstructorTask(TestInstructorTasks):
     """Tests instructor task that resets problem attempts."""
 
@@ -589,7 +586,6 @@ class TestResetAttemptsInstructorTask(TestInstructorTasks):
         self._test_reset_with_student(True)
 
 
-@attr(shard=3)
 class TestDeleteStateInstructorTask(TestInstructorTasks):
     """Tests instructor task that deletes problem state."""
 

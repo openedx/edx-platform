@@ -451,7 +451,7 @@ class formula(object):
                 try:
                     cmml = self.cmathml
                     xml = etree.fromstring(str(cmml))
-                except Exception, err:
+                except Exception as err:
                     if 'conversion from Presentation MathML to Content MathML was not successful' in cmml:
                         msg = "Illegal math expression"
                     else:
@@ -538,7 +538,7 @@ class formula(object):
                 args = [self.make_sympy(expr) for expr in xml[1:]]
                 try:
                     res = op(*args)
-                except Exception, err:
+                except Exception as err:
                     self.args = args  # pylint: disable=attribute-defined-outside-init
                     self.op = op      # pylint: disable=attribute-defined-outside-init, invalid-name
                     raise Exception('[formula] error=%s failed to apply %s to args=%s' % (err, opstr, args))

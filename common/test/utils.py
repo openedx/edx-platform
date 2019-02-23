@@ -133,7 +133,7 @@ class reprwrapper(object):
     """
     def __init__(self, func):
         self._func = func
-        self.repr = 'Func: {}'.format(func.__name__)
+        self.repr = u'Func: {}'.format(func.__name__)
         functools.update_wrapper(self, func)
 
     def __call__(self, *args, **kw):

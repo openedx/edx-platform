@@ -43,7 +43,6 @@ from lms.djangoapps.verify_student.views import (
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
-from openedx.core.lib.tests import attr
 from shoppingcart.models import CertificateItem, Order
 from student.models import CourseEnrollment
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
@@ -62,7 +61,6 @@ render_mock = Mock(side_effect=mock_render_to_response)
 PAYMENT_DATA_KEYS = {'payment_processor_name', 'payment_page_url', 'payment_form_data'}
 
 
-@attr(shard=2)
 class StartView(TestCase):
     """
     This view is for the first time student is
@@ -83,7 +81,6 @@ class StartView(TestCase):
         self.assertHttpForbidden(self.client.get(self.start_url()))
 
 
-@attr(shard=2)
 @ddt.ddt
 class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
     """
@@ -983,9 +980,9 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         response_dict = self._get_page_data(response)
         for req, displayed in response_dict['requirements'].iteritems():
             if req in requirements:
-                self.assertTrue(displayed, msg="Expected '{req}' requirement to be displayed".format(req=req))
+                self.assertTrue(displayed, msg=u"Expected '{req}' requirement to be displayed".format(req=req))
             else:
-                self.assertFalse(displayed, msg="Expected '{req}' requirement to be hidden".format(req=req))
+                self.assertFalse(displayed, msg=u"Expected '{req}' requirement to be hidden".format(req=req))
 
     def _assert_course_details(self, response, course_key, display_name, url):
         """Check the course information on the page. """
@@ -1105,7 +1102,6 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         self.assertNotEqual(httpretty.last_request().headers, {})
 
 
-@attr(shard=2)
 class CheckoutTestMixin(object):
     """
     Mixin implementing test methods that should behave identically regardless
@@ -1231,7 +1227,6 @@ class CheckoutTestMixin(object):
         self.assertEqual(data, {'foo': 'bar'})
 
 
-@attr(shard=2)
 @patch('lms.djangoapps.verify_student.views.checkout_with_shoppingcart', return_value=TEST_PAYMENT_DATA, autospec=True)
 class TestCreateOrderShoppingCart(CheckoutTestMixin, ModuleStoreTestCase):
     """ Test view behavior when the shoppingcart is used. """
@@ -1245,7 +1240,6 @@ class TestCreateOrderShoppingCart(CheckoutTestMixin, ModuleStoreTestCase):
         return dict(zip(('request', 'user', 'course_key', 'course_mode', 'amount'), patched_create_order.call_args[0]))
 
 
-@attr(shard=2)
 @override_settings(ECOMMERCE_API_URL=TEST_API_URL)
 @patch(
     'lms.djangoapps.verify_student.views.checkout_with_ecommerce_service',
@@ -1264,7 +1258,6 @@ class TestCreateOrderEcommerceService(CheckoutTestMixin, ModuleStoreTestCase):
         return dict(zip(('user', 'course_key', 'course_mode', 'processor'), patched_create_order.call_args[0]))
 
 
-@attr(shard=2)
 class TestCheckoutWithEcommerceService(ModuleStoreTestCase):
     """
     Ensures correct behavior in the function `checkout_with_ecommerce_service`.
@@ -1310,7 +1303,6 @@ class TestCheckoutWithEcommerceService(ModuleStoreTestCase):
         self.assertEqual(actual_payment_data, expected_payment_data)
 
 
-@attr(shard=2)
 class TestCreateOrderView(ModuleStoreTestCase):
     """
     Tests for the create_order view of verified course enrollment process.
@@ -1414,7 +1406,6 @@ class TestCreateOrderView(ModuleStoreTestCase):
         return response
 
 
-@attr(shard=2)
 @ddt.ddt
 @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
 class TestSubmitPhotosForVerification(TestCase):
@@ -1629,7 +1620,7 @@ class TestSubmitPhotosForVerification(TestCase):
         """
         if expect_email:
             # Verify that photo submission confirmation email was sent
-            subject = _("{platform_name} ID Verification Photos Received").format(
+            subject = _(u"{platform_name} ID Verification Photos Received").format(
                 platform_name=settings.PLATFORM_NAME
             )
             self.assertEqual(len(mail.outbox), 1)
@@ -1659,7 +1650,6 @@ class TestSubmitPhotosForVerification(TestCase):
         return json.loads(last_request.body)
 
 
-@attr(shard=2)
 class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
     """
     Tests for the results_callback view.
@@ -1774,6 +1764,17 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         """
         Test for verification passed.
         """
+        expiry_date = datetime.now(pytz.UTC) + timedelta(
+            days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
+        )
+        verification = SoftwareSecurePhotoVerification.objects.create(user=self.user)
+        verification.mark_ready()
+        verification.submit()
+        verification.approve()
+        verification.expiry_date = datetime.now(pytz.UTC)
+        verification.expiry_email_date = datetime.now(pytz.UTC)
+        verification.save()
+
         data = {
             "EdX-ID": self.receipt_id,
             "Result": "PASS",
@@ -1788,7 +1789,11 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
             HTTP_DATE='testdate'
         )
         attempt = SoftwareSecurePhotoVerification.objects.get(receipt_id=self.receipt_id)
+        old_verification = SoftwareSecurePhotoVerification.objects.get(pk=verification.pk)
         self.assertEqual(attempt.status, u'approved')
+        self.assertEqual(attempt.expiry_date.date(), expiry_date.date())
+        self.assertIsNone(old_verification.expiry_date)
+        self.assertIsNone(old_verification.expiry_email_date)
         self.assertEquals(response.content, 'OK!')
         self.assertEqual(len(mail.outbox), 1)
 
@@ -1874,7 +1879,6 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.assertIn('Result Unknown not understood', response.content)
 
 
-@attr(shard=2)
 class TestReverifyView(TestCase):
     """
     Tests for the reverification view.

@@ -28,6 +28,7 @@ from oauth2_provider.models import RefreshToken as dot_refresh_token
 from provider.oauth2.models import AccessToken as dop_access_token
 from provider.oauth2.models import RefreshToken as dop_refresh_token
 from testfixtures import LogCapture
+from waffle.models import Switch
 
 from course_modes.models import CourseMode
 from openedx.core.djangoapps.user_authn.views.login_form import login_and_registration_form
@@ -36,9 +37,11 @@ from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme_context
 from openedx.core.djangoapps.user_api.accounts.api import activate_account, create_account
 from openedx.core.djangoapps.user_api.errors import UserAPIInternalError
+from openedx.core.djangoapps.user_api.accounts.utils import ENABLE_SECONDARY_EMAIL_FEATURE_SWITCH
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
+from student.tests.factories import AccountRecoveryFactory
 from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin, simulate_running_pipeline
 from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -75,6 +78,12 @@ class UserAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
         # Create/activate a new account
         activation_key = create_account(self.USERNAME, self.OLD_PASSWORD, self.OLD_EMAIL)
         activate_account(activation_key)
+
+        self.account_recovery = AccountRecoveryFactory.create(user=User.objects.get(email=self.OLD_EMAIL))
+        self.enable_account_recovery_switch = Switch.objects.create(
+            name=ENABLE_SECONDARY_EMAIL_FEATURE_SWITCH,
+            active=True
+        )
 
         # Login
         result = self.client.login(username=self.USERNAME, password=self.OLD_PASSWORD)
@@ -158,7 +167,7 @@ class UserAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
         html_body = sent_message.alternatives[0][0]
 
         for email_body in [text_body, html_body]:
-            msg = 'However, there is currently no user account associated with your email address: {email}'.format(
+            msg = u'However, there is currently no user account associated with your email address: {email}'.format(
                 email=bad_email
             )
 
@@ -289,7 +298,6 @@ class UserAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
 @ddt.ddt
 class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleStoreTestCase):
     """ Tests for the student account views that update the user's account information. """
-    shard = 7
     USERNAME = "bob"
     EMAIL = "bob@example.com"
     PASSWORD = u"password"
@@ -322,14 +330,24 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
     @ddt.unpack
     def test_login_and_registration_form(self, url_name, initial_mode):
         response = self.client.get(reverse(url_name))
-        expected_data = '"initial_mode": "{mode}"'.format(mode=initial_mode)
+        expected_data = u'"initial_mode": "{mode}"'.format(mode=initial_mode)
         self.assertContains(response, expected_data)
 
     @ddt.data("signin_user", "register_user")
     def test_login_and_registration_form_already_authenticated(self, url_name):
-        # Create/activate a new account and log in
-        activation_key = create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
-        activate_account(activation_key)
+        # call the account registration api that sets the login cookies
+        url = reverse('user_api_registration')
+        request_data = {
+            'username': self.USERNAME,
+            'password': self.PASSWORD,
+            'email': self.EMAIL,
+            'name': self.USERNAME,
+            'terms_of_service': 'true',
+            'honor_code': 'true',
+        }
+        result = self.client.post(url, data=request_data)
+        self.assertEqual(result.status_code, 200)
+
         result = self.client.login(username=self.USERNAME, password=self.PASSWORD)
         self.assertTrue(result)
 
@@ -575,7 +593,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         tpa_hint = self.hidden_enabled_provider.provider_id
         params = [("next", "/courses/something/?tpa_hint={0}".format(tpa_hint))]
         response = self.client.get(reverse('signin_user'), params, HTTP_ACCEPT="text/html")
-        self.assertContains(response, '"third_party_auth_hint": "{0}"'.format(tpa_hint))
+        self.assertContains(response, u'"third_party_auth_hint": "{0}"'.format(tpa_hint))
 
         tpa_hint = self.hidden_disabled_provider.provider_id
         params = [("next", "/courses/something/?tpa_hint={0}".format(tpa_hint))]
@@ -618,7 +636,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         tpa_hint = self.hidden_enabled_provider.provider_id
         params = [("next", "/courses/something/?tpa_hint={0}".format(tpa_hint))]
         response = self.client.get(reverse(url_name), params, HTTP_ACCEPT="text/html")
-        self.assertContains(response, '"third_party_auth_hint": "{0}"'.format(tpa_hint))
+        self.assertContains(response, u'"third_party_auth_hint": "{0}"'.format(tpa_hint))
 
         # Even disabled providers in the query string will override THIRD_PARTY_AUTH_HINT
         tpa_hint = self.hidden_disabled_provider.provider_id
@@ -684,7 +702,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
                 line_break=HTML('<br/>'),
                 enterprise_name=ec_name,
                 platform_name=settings.PLATFORM_NAME,
-                privacy_policy_link_start=HTML("<a href='{pp_url}' target='_blank'>").format(
+                privacy_policy_link_start=HTML(u"<a href='{pp_url}' target='_blank'>").format(
                     pp_url=settings.MKTG_URLS.get('PRIVACY', 'https://www.edx.org/edx-privacy-policy')
                 ),
                 privacy_policy_link_end=HTML("</a>"),
@@ -750,7 +768,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
             auth_info['providers'] = []
         auth_info = dump_js_escaped_json(auth_info)
 
-        expected_data = '"third_party_auth": {auth_info}'.format(
+        expected_data = u'"third_party_auth": {auth_info}'.format(
             auth_info=auth_info
         )
         self.assertContains(response, expected_data)
@@ -777,7 +795,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         }
         auth_info = dump_js_escaped_json(auth_info)
 
-        expected_data = '"third_party_auth": {auth_info}'.format(
+        expected_data = u'"third_party_auth": {auth_info}'.format(
             auth_info=auth_info
         )
         self.assertContains(response, expected_data)
@@ -846,5 +864,5 @@ class AccountCreationTestCaseWithSiteOverrides(SiteMixin, TestCase):
         ALLOW_PUBLIC_ACCOUNT_CREATION flag is turned off
         """
         response = self.client.get(reverse('signin_user'))
-        self.assertNotIn('<a class="btn-neutral" href="/register?next=%2Fdashboard">Register</a>',
-                         response.content)
+        self.assertNotIn(u'<a class="btn-neutral" href="/register?next=%2Fdashboard">Register</a>',
+                         response.content.decode(response.charset))

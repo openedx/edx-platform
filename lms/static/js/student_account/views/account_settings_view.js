@@ -42,7 +42,8 @@
             ],
             events: {
                 'click .account-nav-link': 'switchTab',
-                'keydown .account-nav-link': 'keydownHandler'
+                'keydown .account-nav-link': 'keydownHandler',
+                'click .btn-alert-primary': 'revertValue'
             },
 
             initialize: function(options) {
@@ -51,10 +52,37 @@
             },
 
             render: function() {
-                var tabName,
+                var tabName, betaLangMessage, helpTranslateText, helpTranslateLink, betaLangCode, oldLangCode,
                     view = this;
+                if (!_.isEmpty(view.options.betaLanguage) && $.cookie('old-pref-lang')) {
+                    betaLangMessage = HtmlUtils.interpolateHtml(
+                        gettext('You have set your language to {beta_language}, which is currently not fully translated. You can help us translate this language fully by joining the Transifex community and adding translations from English for learners that speak {beta_language}.'),  // eslint-disable-line max-len
+                        {
+                            beta_language: view.options.betaLanguage.name
+                        }
+                    );
+                    helpTranslateText = HtmlUtils.interpolateHtml(
+                        gettext('Help Translate into {beta_language}'),
+                        {
+                            beta_language: view.options.betaLanguage.name
+                        }
+                    );
+                    betaLangCode = this.options.betaLanguage.code.split('-');
+                    betaLangCode = betaLangCode[0] + '_' + betaLangCode[1].toUpperCase();
+                    helpTranslateLink = 'https://www.transifex.com/open-edx/edx-platform/translate/#' + betaLangCode;
+                    oldLangCode = $.cookie('old-pref-lang');
+                    // Deleting the cookie
+                    document.cookie = 'old-pref-lang=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/account;';
+
+                    $.cookie('focus_id', '#beta-language-message');
+                }
                 HtmlUtils.setHtml(this.$el, HtmlUtils.template(accountSettingsTemplate)({
-                    accountSettingsTabs: this.accountSettingsTabs
+                    accountSettingsTabs: this.accountSettingsTabs,
+                    HtmlUtils: HtmlUtils,
+                    message: betaLangMessage,
+                    helpTranslateText: helpTranslateText,
+                    helpTranslateLink: helpTranslateLink,
+                    oldLangCode: oldLangCode
                 }));
                 _.each(view.accountSettingsTabs, function(tab) {
                     tabName = tab.name;
@@ -108,6 +136,10 @@
 
             showLoadingError: function() {
                 this.$('.ui-loading-error').removeClass('is-hidden');
+            },
+
+            revertValue: function(event) {
+                this.options.userPreferencesModel.trigger('revertValue', event);
             }
         });
 

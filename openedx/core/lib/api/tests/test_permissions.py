@@ -32,7 +32,6 @@ class TestCcxObject(TestObject):
 
 class IsCourseStaffInstructorTests(TestCase):
     """ Test for IsCourseStaffInstructor permission class. """
-    shard = 2
 
     def setUp(self):
         super(IsCourseStaffInstructorTests, self).setUp()
@@ -66,7 +65,6 @@ class IsCourseStaffInstructorTests(TestCase):
 
 class IsMasterCourseStaffInstructorTests(TestCase):
     """ Test for IsMasterCourseStaffInstructorTests permission class. """
-    shard = 2
 
     def setUp(self):
         super(IsMasterCourseStaffInstructorTests, self).setUp()
@@ -112,7 +110,6 @@ class IsMasterCourseStaffInstructorTests(TestCase):
 @ddt.ddt
 class IsStaffOrOwnerTests(TestCase):
     """ Tests for IsStaffOrOwner permission class. """
-    shard = 2
 
     def setUp(self):
         super(IsStaffOrOwnerTests, self).setUp()

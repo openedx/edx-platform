@@ -33,13 +33,11 @@ from courseware.tests.factories import GlobalStaffFactory, InstructorFactory, Us
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from lms.djangoapps.verify_student.services import IDVerificationService
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
-from openedx.core.lib.tests import attr
 from student.models import CourseEnrollment
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=1)
 @ddt.ddt
 class CertificatesInstructorDashTest(SharedModuleStoreTestCase):
     """Tests for the certificate panel of the instructor dash. """
@@ -186,7 +184,7 @@ class CertificatesInstructorDashTest(SharedModuleStoreTestCase):
         response = self.client.get(self.url)
 
         if expected_status == 'started':
-            expected = 'Generating example {name} certificate'.format(name=cert_name)
+            expected = u'Generating example {name} certificate'.format(name=cert_name)
             self.assertContains(response, expected)
         elif expected_status == 'error':
             expected = self.ERROR_REASON
@@ -195,7 +193,7 @@ class CertificatesInstructorDashTest(SharedModuleStoreTestCase):
             expected = self.DOWNLOAD_URL
             self.assertContains(response, expected)
         else:
-            self.fail("Invalid certificate status: {status}".format(status=expected_status))
+            self.fail(u"Invalid certificate status: {status}".format(status=expected_status))
 
     def _assert_enable_certs_button_is_disabled(self):
         """Check that the "enable student-generated certificates" button is disabled. """
@@ -213,7 +211,6 @@ class CertificatesInstructorDashTest(SharedModuleStoreTestCase):
         self.assertContains(response, expected_html)
 
 
-@attr(shard=1)
 @override_settings(CERT_QUEUE='certificates')
 @ddt.ddt
 class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
@@ -481,7 +478,6 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         self.assertEqual(res_json['message'], u'Please select certificate statuses from the list only.')
 
 
-@attr(shard=1)
 @override_settings(CERT_QUEUE='certificates')
 @ddt.ddt
 class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
@@ -685,7 +681,7 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
         # Assert Error Message
         self.assertEqual(
             res_json['message'],
-            "{user} is not enrolled in this course. Please check your spelling and retry.".format(
+            u"{user} is not enrolled in this course. Please check your spelling and retry.".format(
                 user=self.certificate_exception['user_name']
             )
         )
@@ -768,7 +764,6 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
         )
 
 
-@attr(shard=1)
 @override_settings(CERT_QUEUE='certificates')
 @ddt.ddt
 class GenerateCertificatesInstructorApiTest(SharedModuleStoreTestCase):
@@ -886,7 +881,6 @@ class GenerateCertificatesInstructorApiTest(SharedModuleStoreTestCase):
         )
 
 
-@attr(shard=1)
 @ddt.ddt
 class TestCertificatesInstructorApiBulkWhiteListExceptions(SharedModuleStoreTestCase):
     """
@@ -1044,7 +1038,6 @@ class TestCertificatesInstructorApiBulkWhiteListExceptions(SharedModuleStoreTest
         return data
 
 
-@attr(shard=1)
 @ddt.ddt
 class CertificateInvalidationViewTests(SharedModuleStoreTestCase):
     """

@@ -6,12 +6,9 @@ from contextlib import contextmanager
 from datetime import datetime
 from unittest import skip
 
-import pytest
-
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.common.logout import LogoutPage
 from common.test.acceptance.pages.lms.account_settings import AccountSettingsPage
-from common.test.acceptance.pages.lms.dashboard import DashboardPage
 from common.test.acceptance.pages.lms.learner_profile import LearnerProfilePage
 from common.test.acceptance.tests.helpers import AcceptanceTest, EventsTestMixin
 
@@ -269,25 +266,6 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, AcceptanceTest):
         self.browser.refresh()
         profile_page.wait_for_page()
         self.verify_profile_page_is_private(profile_page)
-
-    def test_dashboard_learner_profile_link(self):
-        """
-        Scenario: Verify that my profile link is present on dashboard page and we can navigate to correct page.
-
-        Given that I am a registered user.
-        When I go to Dashboard page.
-        And I click on username dropdown.
-        Then I see Profile link in the dropdown menu.
-        When I click on Profile link.
-        Then I will be navigated to Profile page.
-        """
-        username, __ = self.log_in_as_unique_user()
-        dashboard_page = DashboardPage(self.browser)
-        dashboard_page.visit()
-        self.assertIn('Profile', dashboard_page.tabs_link_text)
-        dashboard_page.click_my_profile_link()
-        my_profile_page = LearnerProfilePage(self.browser, username)
-        my_profile_page.wait_for_page()
 
     def test_fields_on_my_private_profile(self):
         """
@@ -679,11 +657,11 @@ class DifferentUserLearnerProfilePageTest(LearnerProfileTestMixin, AcceptanceTes
         badge.close_modal()
 
 
-@pytest.mark.a11y
 class LearnerProfileA11yTest(LearnerProfileTestMixin, AcceptanceTest):
     """
     Class to test learner profile accessibility.
     """
+    a11y = True
 
     def test_editable_learner_profile_a11y(self):
         """
@@ -691,7 +669,13 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, AcceptanceTest):
         (user viewing her own public profile).
         """
         username, _ = self.log_in_as_unique_user()
+
         profile_page = self.visit_profile_page(username)
+        profile_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+            ]
+        })
         profile_page.a11y_audit.check_for_accessibility_errors()
 
         profile_page.make_field_editable('language_proficiencies')
@@ -711,7 +695,13 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, AcceptanceTest):
         # only looking at a read-only profile page with a username.
         different_username, _ = self.initialize_different_user(privacy=self.PRIVACY_PUBLIC)
         self.log_in_as_unique_user()
+
         profile_page = self.visit_profile_page(different_username)
+        profile_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+            ]
+        })
         profile_page.a11y_audit.check_for_accessibility_errors()
 
     def test_badges_accessibility(self):
@@ -719,8 +709,14 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, AcceptanceTest):
         Test the accessibility of the badge listings and sharing modal.
         """
         username = 'testcert'
+
         AutoAuthPage(self.browser, username=username).visit()
         profile_page = self.visit_profile_page(username)
+        profile_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+            ]
+        })
         profile_page.display_accomplishments()
         profile_page.a11y_audit.check_for_accessibility_errors()
         profile_page.badges[0].display_modal()

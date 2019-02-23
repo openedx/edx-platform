@@ -16,7 +16,6 @@ def _add_p_tags(raw_body):
 @ddt.ddt
 class RenderBodyTest(TestCase):
     """Tests for render_body"""
-    shard = 8
 
     def test_empty(self):
         self.assertEqual(render_body(""), "")
@@ -29,8 +28,8 @@ class RenderBodyTest(TestCase):
     @ddt.unpack
     def test_markdown_inline(self, delimiter, tag):
         self.assertEqual(
-            render_body("{delimiter}some text{delimiter}".format(delimiter=delimiter)),
-            "<p><{tag}>some text</{tag}></p>".format(tag=tag)
+            render_body(u"{delimiter}some text{delimiter}".format(delimiter=delimiter)),
+            u"<p><{tag}>some text</{tag}></p>".format(tag=tag)
         )
 
     @ddt.data(

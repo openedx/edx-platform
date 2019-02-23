@@ -41,7 +41,6 @@ class VideoModuleLogicTest(LogicTest):
     raw_field_data = {
         'data': '<video />'
     }
-    shard = 1
 
     def test_parse_youtube(self):
         """Test parsing old-style Youtube ID strings into a dict."""

@@ -9,6 +9,7 @@ from django.utils.translation import ugettext as _
 
 import third_party_auth
 from third_party_auth import pipeline
+from enterprise.models import EnterpriseCustomerUser
 
 from openedx.core.djangoapps.user_authn.cookies import standard_cookie_settings
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -257,3 +258,16 @@ def get_enterprise_learner_generic_name(request):
         if enterprise_customer and enterprise_customer['replace_sensitive_sso_username']
         else ''
     )
+
+
+def is_enterprise_learner(user):
+    """
+    Check if the given user belongs to an enterprise.
+
+    Arguments:
+        user (User): Django User object.
+
+    Returns:
+        (bool): True if given user is an enterprise learner.
+    """
+    return EnterpriseCustomerUser.objects.filter(user_id=user.id).exists()

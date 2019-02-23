@@ -22,7 +22,6 @@ from lms.djangoapps.certificates.models import (
 )
 from lms.djangoapps.certificates.tests.factories import CertificateInvalidationFactory, GeneratedCertificateFactory
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
-from openedx.core.lib.tests import attr
 from student.tests.factories import AdminFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -37,7 +36,6 @@ PLATFORM_ROOT = TEST_DIR.parent.parent.parent.parent
 TEST_DATA_ROOT = PLATFORM_ROOT / TEST_DATA_DIR
 
 
-@attr(shard=1)
 class ExampleCertificateTest(TestCase):
     """Tests for the ExampleCertificate model. """
 
@@ -103,7 +101,6 @@ class ExampleCertificateTest(TestCase):
         self.assertIs(result, None)
 
 
-@attr(shard=1)
 class CertificateHtmlViewConfigurationTest(TestCase):
     """
     Test the CertificateHtmlViewConfiguration model.
@@ -170,7 +167,6 @@ class CertificateHtmlViewConfigurationTest(TestCase):
         self.assertEquals(self.config.get_config(), {})
 
 
-@attr(shard=1)
 class CertificateTemplateAssetTest(TestCase):
     """
     Test Assets are uploading/saving successfully for CertificateTemplateAsset.
@@ -198,7 +194,6 @@ class CertificateTemplateAssetTest(TestCase):
         self.assertEqual(certificate_template_asset.asset, 'certificate_template_assets/1/picture2.jpg')
 
 
-@attr(shard=1)
 class EligibleCertificateManagerTest(SharedModuleStoreTestCase):
     """
     Test the GeneratedCertificate model's object manager for filtering
@@ -237,7 +232,6 @@ class EligibleCertificateManagerTest(SharedModuleStoreTestCase):
         )
 
 
-@attr(shard=1)
 @ddt.ddt
 class TestCertificateGenerationHistory(TestCase):
     """
@@ -303,7 +297,6 @@ class TestCertificateGenerationHistory(TestCase):
         )
 
 
-@attr(shard=1)
 class CertificateInvalidationTest(SharedModuleStoreTestCase):
     """
     Test for the Certificate Invalidation model.

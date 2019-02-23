@@ -7,6 +7,7 @@ values in parameterized problems. For details, see:
 
 http://en.wikipedia.org/wiki/Electronic_color_code
 """
+from __future__ import print_function
 
 # pylint: disable=invalid-name
 # r is standard name for a resistor. We would like to use it as such.
@@ -91,21 +92,21 @@ def iseia(r, valid_types=(E6, E12, E24)):
 
 if __name__ == '__main__':
     # Test cases. All of these should return True
-    print iseia(100)        # 100 ohm resistor is EIA
-    print not iseia(101)    # 101 is not
-    print not iseia(100.3)  # Floating point close to EIA is not EIA
-    print iseia(100.001)    # But within floating point error is
-    print iseia(1e5)        # We handle big numbers well
-    print iseia(2200)       # We handle middle-of-the-list well
+    print(iseia(100))        # 100 ohm resistor is EIA
+    print(not iseia(101))    # 101 is not
+    print(not iseia(100.3))  # Floating point close to EIA is not EIA
+    print(iseia(100.001))    # But within floating point error is
+    print(iseia(1e5))        # We handle big numbers well
+    print(iseia(2200))       # We handle middle-of-the-list well
     # We can handle 1% components correctly; 2.2k is EIA24, but not EIA48.
-    print not iseia(2200, (E48, E96, E192))
-    print iseia(5490e2, (E48, E96, E192))
-    print iseia(2200)
-    print not iseia(5490e2)
-    print iseia(1e-5)      # We handle little numbers well
-    print not iseia("Hello")  # Junk handled okay
-    print not iseia(float('NaN'))
-    print not iseia(-1)
-    print not iseia(iseia)
-    print not iseia(float('Inf'))
-    print iseia(0)  # Corner case. 0 is a standard resistor value.
+    print(not iseia(2200, (E48, E96, E192)))
+    print(iseia(5490e2, (E48, E96, E192)))
+    print(iseia(2200))
+    print(not iseia(5490e2))
+    print(iseia(1e-5))      # We handle little numbers well
+    print(not iseia("Hello"))  # Junk handled okay
+    print(not iseia(float('NaN')))
+    print(not iseia(-1))
+    print(not iseia(iseia))
+    print(not iseia(float('Inf')))
+    print(iseia(0))  # Corner case. 0 is a standard resistor value.

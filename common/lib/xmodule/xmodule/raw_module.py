@@ -24,6 +24,25 @@ class RawDescriptor(XmlDescriptor, XMLEditingDescriptor):
         return {'data': etree.tostring(xml_object, pretty_print=True, encoding='unicode')}, []
 
     def definition_to_xml(self, resource_fs):
+        """
+        Return an Element if we've kept the import OLX, or None otherwise.
+        """
+        # If there's no self.data, it means that an XBlock/XModule originally
+        # existed for this data at the time of import/editing, but was later
+        # uninstalled. RawDescriptor therefore never got to preserve the
+        # original OLX that came in, and we have no idea how it should be
+        # serialized for export. It's possible that we could do some smarter
+        # fallback here and attempt to extract the data, but it's reasonable
+        # and simpler to just skip this node altogether.
+        if not self.data:
+            log.warning(
+                "Could not serialize %s: No XBlock installed for '%s' tag.",
+                self.location,
+                self.location.block_type,
+            )
+            return None
+
+        # Normal case: Just echo back the original OLX we saved.
         try:
             return etree.fromstring(self.data)
         except etree.XMLSyntaxError as err:

@@ -28,6 +28,8 @@ class Microsite(models.Model):
         - The site field is django site.
         - The values field must be validated on save to prevent the platform from crashing
         badly in the case the string is not able to be loaded as json.
+
+    .. no_pii:
     """
     site = models.OneToOneField(Site, related_name='microsite', on_delete=models.CASCADE)
     key = models.CharField(max_length=63, db_index=True, unique=True)
@@ -60,6 +62,8 @@ class MicrositeHistory(TimeStampedModel):
     """
     This is an archive table for Microsites model, so that we can maintain a history of changes. Note that the
     key field is no longer unique
+
+    .. no_pii:
     """
     site = models.ForeignKey(Site, related_name='microsite_history', on_delete=models.CASCADE)
     key = models.CharField(max_length=63, db_index=True)
@@ -109,6 +113,8 @@ def on_microsite_updated(sender, instance, **kwargs):  # pylint: disable=unused-
 class MicrositeOrganizationMapping(models.Model):
     """
     Mapping of Organization to which Microsite it belongs
+
+    .. no_pii:
     """
 
     organization = models.CharField(max_length=63, db_index=True, unique=True)
@@ -145,6 +151,8 @@ class MicrositeOrganizationMapping(models.Model):
 class MicrositeTemplate(models.Model):
     """
     A HTML template that a microsite can use
+
+    .. no_pii:
     """
 
     microsite = models.ForeignKey(Microsite, db_index=True, on_delete=models.CASCADE)

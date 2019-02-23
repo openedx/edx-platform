@@ -100,7 +100,6 @@ class MockImage(Mock):
 
 @ddt.ddt
 class ContentTest(unittest.TestCase):
-    shard = 1
 
     def test_thumbnail_none(self):
         # We had a bug where a thumbnail location of None was getting transformed into a Location tuple, with

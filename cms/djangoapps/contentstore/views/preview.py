@@ -72,7 +72,7 @@ def preview_handler(request, usage_key_string, handler, suffix=''):
         resp = instance.handle(handler, req, suffix)
 
     except NoSuchHandlerError:
-        log.exception("XBlock %s attempted to access missing handler %r", instance, handler)
+        log.exception(u"XBlock %s attempted to access missing handler %r", instance, handler)
         raise Http404
 
     except NotFoundError:
@@ -284,7 +284,7 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
         is_reorderable = _is_xblock_reorderable(xblock, context)
         selected_groups_label = get_visibility_partition_info(xblock)['selected_groups_label']
         if selected_groups_label:
-            selected_groups_label = _('Access restricted to: {list_of_groups}').format(list_of_groups=selected_groups_label)
+            selected_groups_label = _(u'Access restricted to: {list_of_groups}').format(list_of_groups=selected_groups_label)
         course = modulestore().get_course(xblock.location.course_key)
         template_context = {
             'xblock_context': context,
@@ -325,6 +325,6 @@ def get_preview_fragment(request, descriptor, context):
     try:
         fragment = module.render(preview_view, context)
     except Exception as exc:                          # pylint: disable=broad-except
-        log.warning("Unable to render %s for %r", preview_view, module, exc_info=True)
+        log.warning(u"Unable to render %s for %r", preview_view, module, exc_info=True)
         fragment = Fragment(render_to_string('html_error.html', {'message': str(exc)}))
     return fragment

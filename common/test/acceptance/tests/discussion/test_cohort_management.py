@@ -578,7 +578,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         start_time = datetime.now(UTC)
         self.cohort_management_page.upload_cohort_file(filename)
         self._verify_cohort_by_csv_notification(
-            "Your file '{}' has been uploaded. Allow a few minutes for processing.".format(filename)
+            u"Your file '{}' has been uploaded. Allow a few minutes for processing.".format(filename)
         )
 
         if not skip_events:
@@ -690,6 +690,11 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         """
         Run accessibility audit for cohort management.
         """
+        self.cohort_management_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+            ]
+        })
         self.cohort_management_page.a11y_audit.check_for_accessibility_errors()
 
 

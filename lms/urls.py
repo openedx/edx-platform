@@ -1012,11 +1012,6 @@ if 'debug_toolbar' in settings.INSTALLED_APPS:
         url(r'^__debug__/', include(debug_toolbar.urls)),
     ]
 
-# include into our URL patterns the HTTP REST API that comes with edx-proctoring.
-urlpatterns += [
-    url(r'^api/', include('edx_proctoring.urls')),
-]
-
 if settings.FEATURES.get('ENABLE_FINANCIAL_ASSISTANCE_FORM'):
     urlpatterns += [
         url(

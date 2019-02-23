@@ -2856,14 +2856,11 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             course_assets = new_structure.setdefault('assets', {})
 
             asset_type = asset_key.asset_type
-            all_assets = SortedAssetList(iterable=[])
-            # Assets should be pre-sorted, so add them efficiently without sorting.
-            # extend() will raise a ValueError if the passed-in list is not sorted.
-            all_assets.extend(course_assets.setdefault(asset_type, []))
+            all_assets = SortedAssetList(iterable=course_assets.setdefault(asset_type, []))
             asset_idx = all_assets.find(asset_key)
 
             all_assets_updated = update_function(all_assets, asset_idx)
-            new_structure['assets'][asset_type] = all_assets_updated.as_list()
+            new_structure['assets'][asset_type] = list(all_assets_updated)
 
             # update index if appropriate and structures
             self.update_structure(asset_key.course_key, new_structure)
@@ -2894,7 +2891,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             )
 
             for asset_type, assets in assets_by_type.iteritems():
-                new_structure['assets'][asset_type] = assets.as_list()
+                new_structure['assets'][asset_type] = list(assets)
 
             # update index if appropriate and structures
             self.update_structure(course_key, new_structure)
@@ -2935,7 +2932,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             mdata.update(attr_dict)
 
             # Generate a Mongo doc from the metadata and update the course asset info.
-            all_assets[asset_idx] = mdata.to_storable()
+            all_assets.insert_or_update(mdata)
             return all_assets
 
         self._update_course_assets(user_id, asset_key, _internal_method)

@@ -42,13 +42,13 @@ EXPECTED_INDEX_COURSE_COMMAND = (
     u"python manage.py {system} --settings={settings} reindex_course --setup"
 )
 EXPECTED_PRINT_SETTINGS_COMMAND = [
-    u"python manage.py lms --settings={settings} print_setting STATIC_ROOT 2>/dev/null",
-    u"python manage.py cms --settings={settings} print_setting STATIC_ROOT 2>/dev/null",
-    u"python manage.py lms --settings={settings} print_setting WEBPACK_CONFIG_PATH 2>/dev/null"
+    u"python manage.py lms --settings={settings} print_setting STATIC_ROOT 2>{log_file}",
+    u"python manage.py cms --settings={settings} print_setting STATIC_ROOT 2>{log_file}",
+    u"python manage.py lms --settings={settings} print_setting WEBPACK_CONFIG_PATH 2>{log_file}"
 ]
 EXPECTED_WEBPACK_COMMAND = (
     u"NODE_ENV={node_env} STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms} "
-    "$(npm bin)/webpack --config={webpack_config_path}"
+    u"$(npm bin)/webpack --config={webpack_config_path}"
 )
 
 
@@ -167,7 +167,7 @@ class TestPaverServerTasks(PaverTestCase):
         settings = options.get("settings", Env.DEVSTACK_SETTINGS)
         call_task("pavelib.servers.update_db", options=options)
         # pylint: disable=line-too-long
-        db_command = "NO_EDXAPP_SUDO=1 EDX_PLATFORM_SETTINGS_OVERRIDE={settings} /edx/bin/edxapp-migrate-{server} --traceback --pythonpath=. "
+        db_command = u"NO_EDXAPP_SUDO=1 EDX_PLATFORM_SETTINGS_OVERRIDE={settings} /edx/bin/edxapp-migrate-{server} --traceback --pythonpath=. "
         self.assertEquals(
             self.task_messages,
             [
@@ -192,8 +192,8 @@ class TestPaverServerTasks(PaverTestCase):
         self.assertEquals(
             self.task_messages,
             [
-                "echo 'import {system}.envs.{settings}' "
-                "| python manage.py {system} --settings={settings} shell --plain --pythonpath=.".format(
+                u"echo 'import {system}.envs.{settings}' "
+                u"| python manage.py {system} --settings={settings} shell --plain --pythonpath=.".format(
                     system=system, settings=settings
                 ),
             ]
@@ -243,7 +243,8 @@ class TestPaverServerTasks(PaverTestCase):
             expected_messages.append(u"xmodule_assets common/static/xmodule")
             expected_messages.append(u"install npm_assets")
             expected_messages.extend(
-                [c.format(settings=expected_asset_settings) for c in EXPECTED_PRINT_SETTINGS_COMMAND]
+                [c.format(settings=expected_asset_settings,
+                          log_file=Env.PRINT_SETTINGS_LOG_FILE) for c in EXPECTED_PRINT_SETTINGS_COMMAND]
             )
             expected_messages.append(EXPECTED_WEBPACK_COMMAND.format(
                 node_env="production",
@@ -288,7 +289,8 @@ class TestPaverServerTasks(PaverTestCase):
             expected_messages.append(u"xmodule_assets common/static/xmodule")
             expected_messages.append(u"install npm_assets")
             expected_messages.extend(
-                [c.format(settings=expected_asset_settings) for c in EXPECTED_PRINT_SETTINGS_COMMAND]
+                [c.format(settings=expected_asset_settings,
+                          log_file=Env.PRINT_SETTINGS_LOG_FILE) for c in EXPECTED_PRINT_SETTINGS_COMMAND]
             )
             expected_messages.append(EXPECTED_WEBPACK_COMMAND.format(
                 node_env="production",

@@ -14,6 +14,7 @@ from six import text_type
 from lms.djangoapps.badges.utils import badges_enabled
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import errors
+from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled_for_user
 from openedx.core.djangoapps.user_api.models import (
     RetirementState,
     UserPreference,
@@ -23,8 +24,8 @@ from openedx.core.djangoapps.user_api.serializers import ReadOnlyFieldsSerialize
 from student.models import UserProfile, LanguageProficiency, SocialLink
 
 from . import (
-    NAME_MIN_LENGTH, ACCOUNT_VISIBILITY_PREF_KEY, PRIVATE_VISIBILITY,
-    ALL_USERS_VISIBILITY,
+    NAME_MIN_LENGTH, ACCOUNT_VISIBILITY_PREF_KEY, PRIVATE_VISIBILITY, CUSTOM_VISIBILITY,
+    ALL_USERS_VISIBILITY, VISIBILITY_PREFIX
 )
 from .image_helpers import get_profile_image_urls_for_user
 from .utils import validate_social_link, format_social_link
@@ -81,7 +82,7 @@ class UserReadOnlySerializer(serializers.Serializer):
 
     def to_representation(self, user):
         """
-        Overwrite to_native to handle custom logic since we are serializing two models as one here
+        Overwrite to_native to handle custom logic since we are serializing three models as one here
         :param user: User object
         :return: Dict serialized account
         """
@@ -89,7 +90,12 @@ class UserReadOnlySerializer(serializers.Serializer):
             user_profile = user.profile
         except ObjectDoesNotExist:
             user_profile = None
-            LOGGER.warning("user profile for the user [%s] does not exist", user.username)
+            LOGGER.warning(u"user profile for the user [%s] does not exist", user.username)
+
+        try:
+            account_recovery = user.account_recovery
+        except ObjectDoesNotExist:
+            account_recovery = None
 
         accomplishments_shared = badges_enabled()
 
@@ -131,7 +137,7 @@ class UserReadOnlySerializer(serializers.Serializer):
                         user_profile, user, self.context.get('request')
                     ),
                     "language_proficiencies": LanguageProficiencySerializer(
-                        user_profile.language_proficiencies.all(), many=True
+                        user_profile.language_proficiencies.all().order_by('code'), many=True
                     ).data,
                     "name": user_profile.name,
                     "gender": AccountLegacyProfileSerializer.convert_empty_to_None(user_profile.gender),
@@ -144,11 +150,19 @@ class UserReadOnlySerializer(serializers.Serializer):
                     "requires_parental_consent": user_profile.requires_parental_consent(),
                     "account_privacy": get_profile_visibility(user_profile, user, self.configuration),
                     "social_links": SocialLinkSerializer(
-                        user_profile.social_links.all(), many=True
+                        user_profile.social_links.all().order_by('platform'), many=True
                     ).data,
                     "extended_profile": get_extended_profile(user_profile),
                 }
             )
+
+        if account_recovery:
+            if is_secondary_email_feature_enabled_for_user(user):
+                data.update(
+                    {
+                        "secondary_email": account_recovery.secondary_email,
+                    }
+                )
 
         if self.custom_fields:
             fields = self.custom_fields
@@ -208,7 +222,7 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
         """ Enforce minimum length for name. """
         if len(new_name) < NAME_MIN_LENGTH:
             raise serializers.ValidationError(
-                "The name field must be at least {} characters long.".format(NAME_MIN_LENGTH)
+                u"The name field must be at least {} characters long.".format(NAME_MIN_LENGTH)
             )
         return new_name
 
@@ -292,6 +306,49 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
         """
         return AccountLegacyProfileSerializer.get_profile_image(user_profile, user_profile.user)
 
+    def _update_social_links(self, instance, requested_social_links):
+        """
+        Update the given profile instance's social links as requested.
+        """
+        try:
+            new_social_links = []
+            deleted_social_platforms = []
+            for requested_link_data in requested_social_links:
+                requested_platform = requested_link_data['platform']
+                requested_link_url = requested_link_data['social_link']
+                validate_social_link(requested_platform, requested_link_url)
+                formatted_link = format_social_link(requested_platform, requested_link_url)
+                if not formatted_link:
+                    deleted_social_platforms.append(requested_platform)
+                else:
+                    new_social_links.append(
+                        SocialLink(user_profile=instance, platform=requested_platform, social_link=formatted_link)
+                    )
+
+            platforms_of_new_social_links = [s.platform for s in new_social_links]
+            current_social_links = list(instance.social_links.all())
+            unreplaced_social_links = [
+                social_link for social_link in current_social_links
+                if social_link.platform not in platforms_of_new_social_links
+            ]
+            pruned_unreplaced_social_links = [
+                social_link for social_link in unreplaced_social_links
+                if social_link.platform not in deleted_social_platforms
+            ]
+            merged_social_links = new_social_links + pruned_unreplaced_social_links
+
+            instance.social_links.all().delete()
+            instance.social_links.bulk_create(merged_social_links)
+
+        except ValueError as err:
+            # If we have encountered any validation errors, return them to the user.
+            raise errors.AccountValidationError({
+                'social_links': {
+                    "developer_message": u"Error when adding new social link: '{}'".format(text_type(err)),
+                    "user_message": text_type(err)
+                }
+            })
+
     def update(self, instance, validated_data):
         """
         Update the profile, including nested fields.
@@ -319,38 +376,11 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
             ])
 
         # Update the user's social links
-        social_link_data = self._kwargs['data']['social_links'] if 'social_links' in self._kwargs['data'] else None
-        if social_link_data and len(social_link_data) > 0:
-            new_social_link = social_link_data[0]
-            current_social_links = list(instance.social_links.all())
-            instance.social_links.all().delete()
-
-            try:
-                # Add the new social link with correct formatting
-                validate_social_link(new_social_link['platform'], new_social_link['social_link'])
-                formatted_link = format_social_link(new_social_link['platform'], new_social_link['social_link'])
-                instance.social_links.bulk_create([
-                    SocialLink(user_profile=instance, platform=new_social_link['platform'], social_link=formatted_link)
-                ])
-            except ValueError as err:
-                # If we have encountered any validation errors, return them to the user.
-                raise errors.AccountValidationError({
-                    'social_links': {
-                        "developer_message": u"Error thrown from adding new social link: '{}'".format(text_type(err)),
-                        "user_message": text_type(err)
-                    }
-                })
-
-            # Add back old links unless overridden by new link
-            for current_social_link in current_social_links:
-                if current_social_link.platform != new_social_link['platform']:
-                    instance.social_links.bulk_create([
-                        SocialLink(user_profile=instance, platform=current_social_link.platform,
-                                   social_link=current_social_link.social_link)
-                    ])
+        requested_social_links = self._kwargs['data'].get('social_links')
+        if requested_social_links:
+            self._update_social_links(instance, requested_social_links)
 
         instance.save()
-
         return instance
 
 
@@ -437,37 +467,53 @@ def get_extended_profile(user_profile):
     return extended_profile
 
 
-def get_profile_visibility(user_profile, user, configuration=None):
+def get_profile_visibility(user_profile, user, configuration):
     """
     Returns the visibility level for the specified user profile.
     """
     if user_profile.requires_parental_consent():
         return PRIVATE_VISIBILITY
 
-    if not configuration:
-        configuration = settings.ACCOUNT_VISIBILITY_CONFIGURATION
-
     # Calling UserPreference directly because the requesting user may be different from existing_user
     # (and does not have to be is_staff).
     profile_privacy = UserPreference.get_value(user, ACCOUNT_VISIBILITY_PREF_KEY)
-    return profile_privacy if profile_privacy else configuration.get('default_visibility')
+    if profile_privacy:
+        return profile_privacy
+    else:
+        return configuration.get('default_visibility')
 
 
 def _visible_fields(user_profile, user, configuration=None):
     """
-    Return what fields should be visible based on user settings
+    Return what fields should be visible based on user's preferences
 
     :param user_profile: User profile object
     :param user: User object
     :param configuration: A visibility configuration dictionary.
     :return: whitelist List of fields to be shown
     """
-
     if not configuration:
         configuration = settings.ACCOUNT_VISIBILITY_CONFIGURATION
 
     profile_visibility = get_profile_visibility(user_profile, user, configuration)
     if profile_visibility == ALL_USERS_VISIBILITY:
         return configuration.get('shareable_fields')
+
+    elif profile_visibility == CUSTOM_VISIBILITY:
+        return _visible_fields_from_custom_preferences(user, configuration)
+
     else:
         return configuration.get('public_fields')
+
+
+def _visible_fields_from_custom_preferences(user, configuration):
+    """
+    Returns all fields that are marked to be shared with other users in the
+    given user's preferences. Includes fields that are always public.
+    """
+    preferences = UserPreference.get_all_preferences(user)
+    fields_shared_with_all_users = [
+        field_name for field_name in configuration.get('shareable_fields')
+        if preferences.get('{}{}'.format(VISIBILITY_PREFIX, field_name)) == 'all_users'
+    ]
+    return set(fields_shared_with_all_users + configuration.get('public_fields'))

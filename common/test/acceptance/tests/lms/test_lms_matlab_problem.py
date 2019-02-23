@@ -15,11 +15,13 @@ class MatlabProblemTest(ProblemsTest):
     """
     Tests that verify matlab problem "Run Code".
     """
+    shard = 11
+
     def get_problem(self):
         """
         Create a matlab problem for the test.
         """
-        problem_data = dedent("""
+        problem_data = dedent(u"""
             <problem markdown="null">
                   <text>
                     <p>

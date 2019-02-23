@@ -179,6 +179,7 @@ class AssetIndexTestStudioFrontend(StudioCourseTest):
 
 class AssetIndexTestStudioFrontendPagination(StudioCourseTest):
     """Pagination tests for the Asset index page."""
+    shard = 23
 
     def setUp(self, is_staff=False):  # pylint: disable=arguments-differ
         super(AssetIndexTestStudioFrontendPagination, self).setUp()

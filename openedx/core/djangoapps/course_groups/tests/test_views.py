@@ -11,8 +11,8 @@ from django.http import Http404
 from django.test.client import RequestFactory
 from django_comment_common.models import CourseDiscussionSettings
 from django_comment_common.utils import get_course_discussion_settings
+from lms.djangoapps.courseware.tests.factories import StaffFactory, InstructorFactory
 from opaque_keys.edx.locator import CourseLocator
-from openedx.core.lib.tests import attr
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -31,7 +31,6 @@ from ..views import (
 from .helpers import CohortFactory, CourseCohortFactory, config_course_cohorts, config_course_cohorts_legacy
 
 
-@attr(shard=2)
 class CohortViewsTestCase(ModuleStoreTestCase):
     """
     Base class which sets up a course and staff/non-staff users.
@@ -93,13 +92,15 @@ class CohortViewsTestCase(ModuleStoreTestCase):
         view_args.insert(0, request)
         self.assertRaises(Http404, view, *view_args)
 
-    def get_handler(self, course, cohort=None, expected_response_code=200, handler=cohort_handler):
+    def get_handler(self, course, cohort=None, expected_response_code=200, handler=cohort_handler, user=None):
         """
         Call a GET on `handler` for a given `course` and return its response as a dict.
         Raise an exception if response status code is not as expected.
         """
         request = RequestFactory().get("dummy_url")
-        request.user = self.staff_user
+        if not user:
+            user = self.staff_user
+        request.user = user
         if cohort:
             response = handler(request, unicode(course.id), cohort.id)
         else:
@@ -141,7 +142,6 @@ class CohortViewsTestCase(ModuleStoreTestCase):
         return json.loads(response.content)
 
 
-@attr(shard=2)
 class CourseCohortSettingsHandlerTestCase(CohortViewsTestCase):
     """
     Tests the `course_cohort_settings_handler` view.
@@ -231,18 +231,28 @@ class CourseCohortSettingsHandlerTestCase(CohortViewsTestCase):
         )
 
 
-@attr(shard=2)
 class CohortHandlerTestCase(CohortViewsTestCase):
     """
     Tests the `cohort_handler` view.
     """
-    def verify_lists_expected_cohorts(self, expected_cohorts, response_dict=None):
+    def setUp(self):
+        super(CohortHandlerTestCase, self).setUp()
+        self.course_staff_user = StaffFactory(
+            username="coursestaff",
+            course_key=self.course.id
+        )
+        self.course_instructor_user = InstructorFactory(
+            username='courseinstructor',
+            course_key=self.course.id
+        )
+
+    def verify_lists_expected_cohorts(self, expected_cohorts, response_dict=None, user=None):
         """
         Verify that the server response contains the expected_cohorts.
         If response_dict is None, the list of cohorts is requested from the server.
         """
         if response_dict is None:
-            response_dict = self.get_handler(self.course)
+            response_dict = self.get_handler(self.course, user=user)
 
         self.assertEqual(
             response_dict.get("cohorts"),
@@ -274,9 +284,15 @@ class CohortHandlerTestCase(CohortViewsTestCase):
         """
         Verify that we cannot access cohort_handler if we're a non-staff user.
         """
-        self._verify_non_staff_cannot_access(cohort_handler, "GET", [unicode(self.course.id)])
         self._verify_non_staff_cannot_access(cohort_handler, "POST", [unicode(self.course.id)])
         self._verify_non_staff_cannot_access(cohort_handler, "PUT", [unicode(self.course.id)])
+
+    def test_course_writers(self):
+        """
+        Verify course staff and course instructors can access cohort_handler view
+        """
+        self.verify_lists_expected_cohorts([], user=self.course_staff_user)
+        self.verify_lists_expected_cohorts([], user=self.course_instructor_user)
 
     def test_no_cohorts(self):
         """
@@ -584,7 +600,6 @@ class CohortHandlerTestCase(CohortViewsTestCase):
         )
 
 
-@attr(shard=2)
 class UsersInCohortTestCase(CohortViewsTestCase):
     """
     Tests the `users_in_cohort` view.
@@ -717,7 +732,6 @@ class UsersInCohortTestCase(CohortViewsTestCase):
         self.request_users_in_cohort(cohort, self.course, -1, should_return_bad_request=True)
 
 
-@attr(shard=2)
 class AddUsersToCohortTestCase(CohortViewsTestCase):
     """
     Tests the `add_users_to_cohort` view.
@@ -1043,7 +1057,7 @@ class AddUsersToCohortTestCase(CohortViewsTestCase):
         """
         unknown = "unknown_user"
         response_dict = self.request_add_users_to_cohort(
-            " {} {}\t{}, \r\n{}".format(
+            u" {} {}\t{}, \r\n{}".format(
                 unknown,
                 self.cohort1_users[0].username,
                 self.cohort2_users[0].username,
@@ -1110,7 +1124,6 @@ class AddUsersToCohortTestCase(CohortViewsTestCase):
         )
 
 
-@attr(shard=2)
 class RemoveUserFromCohortTestCase(CohortViewsTestCase):
     """
     Tests the `remove_user_from_cohort` view.
@@ -1181,7 +1194,7 @@ class RemoveUserFromCohortTestCase(CohortViewsTestCase):
             username,
             response_dict,
             cohort,
-            expected_error_msg='No user \'{0}\''.format(username)
+            expected_error_msg=u'No user \'{0}\''.format(username)
         )
 
     def test_can_remove_user_not_in_cohort(self):

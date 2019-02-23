@@ -17,7 +17,6 @@ class UserCartContextProcessorUnitTest(ModuleStoreTestCase):
     """
     Unit test for shoppingcart context_processor
     """
-    shard = 4
 
     def setUp(self):
         super(UserCartContextProcessorUnitTest, self).setUp()

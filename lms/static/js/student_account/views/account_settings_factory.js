@@ -27,14 +27,18 @@
             enterpriseReadonlyAccountFields,
             edxSupportUrl,
             extendedProfileFields,
-            displayAccountDeletion
+            displayAccountDeletion,
+            isSecondaryEmailFeatureEnabled,
+            betaLanguage
         ) {
             var $accountSettingsElement, userAccountModel, userPreferencesModel, aboutSectionsData,
                 accountsSectionData, ordersSectionData, accountSettingsView, showAccountSettingsPage,
                 showLoadingError, orderNumber, getUserField, userFields, timeZoneDropdownField, countryDropdownField,
-                emailFieldView, socialFields, accountDeletionFields, platformData,
+                emailFieldView, secondaryEmailFieldView, socialFields, accountDeletionFields, platformData,
                 aboutSectionMessageType, aboutSectionMessage, fullnameFieldView, countryFieldView,
-                fullNameFieldData, emailFieldData, countryFieldData, additionalFields, fieldItem;
+                fullNameFieldData, emailFieldData, secondaryEmailFieldData, countryFieldData, additionalFields,
+                fieldItem, emailFieldViewIndex, focusId,
+                tabIndex = 0;
 
             $accountSettingsElement = $('.wrapper-account-settings');
 
@@ -81,6 +85,14 @@
                     view: new AccountSettingsFieldViews.EmailFieldView(emailFieldData)
                 };
             }
+
+            secondaryEmailFieldData = {
+                model: userAccountModel,
+                title: gettext('Recovery Email Address'),
+                valueAttribute: 'secondary_email',
+                helpMessage: gettext('You may access your account with this address if single-sign on or access to your primary email is not available.'),  // eslint-disable-line max-len
+                persistChanges: true
+            };
 
             fullNameFieldData = {
                 model: userAccountModel,
@@ -169,7 +181,7 @@
                                 ),
                                 options: fieldsData.language.options,
                                 persistChanges: true,
-                                focusNextID: '#u-field-select-country',
+                                focusNextID: '#u-field-select-country'
                             })
                         },
                         countryFieldView,
@@ -232,6 +244,29 @@
                     ]
                 }
             ];
+
+			// Secondary email address
+            if (isSecondaryEmailFeatureEnabled) {
+                secondaryEmailFieldView = {
+                    view: new AccountSettingsFieldViews.EmailFieldView(secondaryEmailFieldData),
+                    successMessage: function() {
+                    return HtmlUtils.joinHtml(
+                        this.indicators.success,
+                        StringUtils.interpolate(
+                            gettext('We\'ve sent a confirmation message to {new_secondary_email_address}. Click the link in the message to update your secondary email address.'),  // eslint-disable-line max-len
+                            {
+                                new_secondary_email_address: this.fieldValue()
+                            }
+                        )
+                    );}
+                };
+                emailFieldViewIndex = aboutSectionsData[0].fields.indexOf(emailFieldView);
+
+                // Insert secondary email address after email address field.
+                aboutSectionsData[0].fields.splice(
+                emailFieldViewIndex + 1, 0, secondaryEmailFieldView
+                )
+            }
 
             // Add the extended profile fields
             additionalFields = aboutSectionsData[1];
@@ -385,15 +420,24 @@
                     accountsTabSections: accountsSectionData,
                     ordersTabSections: ordersSectionData
                 },
-                userPreferencesModel: userPreferencesModel
+                userPreferencesModel: userPreferencesModel,
+                betaLanguage: betaLanguage
             });
 
             accountSettingsView.render();
-            if( $.cookie('focus_id')) {
-                $($.cookie('focus_id')).attr({"tabindex": 0});
-                $($.cookie('focus_id')).focus();
+            focusId = $.cookie('focus_id');
+            if (focusId) {
+                if (~focusId.indexOf('beta-language')) {
+                    tabIndex = -1;
+
+                    // Scroll to top of selected element
+                    $('html, body').animate({
+                        scrollTop: $(focusId).offset().top
+                    }, 'slow');
+                }
+                $(focusId).attr({tabindex: tabIndex}).focus();
                 // Deleting the cookie
-                document.cookie = "focus_id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/account;";
+                document.cookie = 'focus_id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/account;';
             }
             showAccountSettingsPage = function() {
                 // Record that the account settings page was viewed.

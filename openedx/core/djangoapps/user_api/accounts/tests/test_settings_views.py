@@ -7,13 +7,17 @@ from django.contrib.messages.middleware import MessageMiddleware
 from django.urls import reverse
 from django.http import HttpRequest
 from django.test import TestCase
+from django.test.utils import override_settings
 from edx_rest_api_client import exceptions
 
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.tests import factories
 from lms.djangoapps.commerce.tests.mocks import mock_get_orders
+from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
+from openedx.core.djangoapps.lang_pref.tests.test_api import EN, LT_LT
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
+from openedx.core.djangoapps.user_api.tests.factories import UserPreferenceFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.core.djangoapps.user_api.accounts.settings_views import account_settings_context, get_user_orders
 from student.tests.factories import UserFactory
@@ -60,35 +64,47 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase, ProgramsApiConf
     @mock.patch('openedx.features.enterprise_support.api.get_enterprise_customer_for_learner')
     def test_context(self, mock_get_enterprise_customer_for_learner):
         self.request.site = SiteFactory.create()
+        UserPreferenceFactory(user=self.user, key='pref-lang', value='lt-lt')
+        DarkLangConfig(
+            released_languages='en',
+            changed_by=self.user,
+            enabled=True,
+            beta_languages='lt-lt',
+            enable_beta_languages=True
+        ).save()
         mock_get_enterprise_customer_for_learner.return_value = {}
-        context = account_settings_context(self.request)
 
-        user_accounts_api_url = reverse("accounts_api", kwargs={'username': self.user.username})
-        self.assertEqual(context['user_accounts_api_url'], user_accounts_api_url)
+        with override_settings(LANGUAGES=[EN, LT_LT], LANGUAGE_CODE='en'):
+            context = account_settings_context(self.request)
 
-        user_preferences_api_url = reverse('preferences_api', kwargs={'username': self.user.username})
-        self.assertEqual(context['user_preferences_api_url'], user_preferences_api_url)
+            user_accounts_api_url = reverse("accounts_api", kwargs={'username': self.user.username})
+            self.assertEqual(context['user_accounts_api_url'], user_accounts_api_url)
 
-        for attribute in self.FIELDS:
-            self.assertIn(attribute, context['fields'])
+            user_preferences_api_url = reverse('preferences_api', kwargs={'username': self.user.username})
+            self.assertEqual(context['user_preferences_api_url'], user_preferences_api_url)
 
-        self.assertEqual(
-            context['user_accounts_api_url'], reverse("accounts_api", kwargs={'username': self.user.username})
-        )
-        self.assertEqual(
-            context['user_preferences_api_url'], reverse('preferences_api', kwargs={'username': self.user.username})
-        )
+            for attribute in self.FIELDS:
+                self.assertIn(attribute, context['fields'])
 
-        self.assertEqual(context['duplicate_provider'], 'facebook')
-        self.assertEqual(context['auth']['providers'][0]['name'], 'Facebook')
-        self.assertEqual(context['auth']['providers'][1]['name'], 'Google')
+            self.assertEqual(
+                context['user_accounts_api_url'], reverse("accounts_api", kwargs={'username': self.user.username})
+            )
+            self.assertEqual(
+                context['user_preferences_api_url'], reverse('preferences_api', kwargs={'username': self.user.username})
+            )
 
-        self.assertEqual(context['sync_learner_profile_data'], False)
-        self.assertEqual(context['edx_support_url'], settings.SUPPORT_SITE_LINK)
-        self.assertEqual(context['enterprise_name'], None)
-        self.assertEqual(
-            context['enterprise_readonly_account_fields'], {'fields': settings.ENTERPRISE_READONLY_ACCOUNT_FIELDS}
-        )
+            self.assertEqual(context['duplicate_provider'], 'facebook')
+            self.assertEqual(context['auth']['providers'][0]['name'], 'Facebook')
+            self.assertEqual(context['auth']['providers'][1]['name'], 'Google')
+
+            self.assertEqual(context['sync_learner_profile_data'], False)
+            self.assertEqual(context['edx_support_url'], settings.SUPPORT_SITE_LINK)
+            self.assertEqual(context['enterprise_name'], None)
+            self.assertEqual(
+                context['enterprise_readonly_account_fields'], {'fields': settings.ENTERPRISE_READONLY_ACCOUNT_FIELDS}
+            )
+            expected_beta_language = {'code': 'lt-lt', 'name': settings.LANGUAGE_DICT.get('lt-lt')}
+            self.assertEqual(context['beta_language'], expected_beta_language)
 
     @mock.patch('openedx.core.djangoapps.user_api.accounts.settings_views.get_enterprise_customer_for_learner')
     @mock.patch('openedx.features.enterprise_support.utils.third_party_auth.provider.Registry.get')

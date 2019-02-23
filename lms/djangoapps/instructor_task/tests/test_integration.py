@@ -72,7 +72,6 @@ class TestRescoringTask(TestIntegrationTask):
 
     Exercises real problems with a minimum of patching.
     """
-    shard = 3
 
     def setUp(self):
         super(TestRescoringTask, self).setUp()
@@ -354,7 +353,7 @@ class TestRescoringTask(TestIntegrationTask):
         to not-equals).
         """
         factory = CustomResponseXMLFactory()
-        script = textwrap.dedent("""
+        script = textwrap.dedent(u"""
                 def check_func(expect, answer_given):
                     expected = str(random.randint(0, 100))
                     return {'ok': answer_given %s expected, 'msg': expected}
@@ -400,7 +399,7 @@ class TestRescoringTask(TestIntegrationTask):
             module = self.get_student_module(user.username, descriptor)
             state = json.loads(module.state)
             correct_map = state['correct_map']
-            log.info("Correct Map: %s", correct_map)
+            log.info(u"Correct Map: %s", correct_map)
             # only one response, so pull it out:
             answer = correct_map.values()[0]['msg']
             self.submit_student_answer(user.username, problem_url_name, [answer, answer])
@@ -596,7 +595,7 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
 
         def user_partition_group(user):
             """Return a dict having single key with value equals to students group in partition"""
-            group_config_hdr_tpl = 'Experiment Group ({})'
+            group_config_hdr_tpl = u'Experiment Group ({})'
             return {
                 group_config_hdr_tpl.format(self.partition.name): self.partition.scheme.get_group_for_user(
                     self.course.id, user, self.partition

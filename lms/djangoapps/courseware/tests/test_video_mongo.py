@@ -34,7 +34,6 @@ from mock import MagicMock, Mock, patch
 from path import Path as path
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from openedx.core.lib.tests import attr
 from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
 from openedx.core.djangoapps.video_pipeline.config.waffle import waffle_flags, DEPRECATE_YOUTUBE
 from waffle.testutils import override_flag
@@ -51,7 +50,7 @@ from xmodule.video_module.video_module import (
     EXPORT_IMPORT_COURSE_DIR,
     EXPORT_IMPORT_STATIC_DIR,
 )
-from xmodule.x_module import STUDENT_VIEW
+from xmodule.x_module import STUDENT_VIEW, PUBLIC_VIEW
 
 from .helpers import BaseTestXmodule
 from .test_video_handlers import TestVideo
@@ -75,7 +74,6 @@ I am overwatch.
 TRANSCRIPT_FILE_SJSON_DATA = """{\n   "start": [10],\n   "end": [100],\n   "text": ["Hi, welcome to edxval."]\n}"""
 
 
-@attr(shard=7)
 class TestVideoYouTube(TestVideo):
     METADATA = {}
 
@@ -97,6 +95,7 @@ class TestVideoYouTube(TestVideo):
             'id': self.item_descriptor.location.html_id(),
             'metadata': json.dumps(OrderedDict({
                 'autoAdvance': False,
+                'saveStateEnabled': True,
                 'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
                 'autoplay': False,
                 'streams': '0.75:jNCf2gIqpeE,1.00:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg',
@@ -140,7 +139,6 @@ class TestVideoYouTube(TestVideo):
         )
 
 
-@attr(shard=7)
 class TestVideoNonYouTube(TestVideo):
     """Integration tests: web client + mongo."""
     DATA = """
@@ -179,6 +177,7 @@ class TestVideoNonYouTube(TestVideo):
             'id': self.item_descriptor.location.html_id(),
             'metadata': json.dumps(OrderedDict({
                 'autoAdvance': False,
+                'saveStateEnabled': True,
                 'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
                 'autoplay': False,
                 'streams': '1.00:3_yD_cEKoCk',
@@ -222,7 +221,6 @@ class TestVideoNonYouTube(TestVideo):
         )
 
 
-@attr(shard=7)
 @ddt.ddt
 class TestGetHtmlMethod(BaseTestXmodule):
     '''
@@ -238,6 +236,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         self.setup_course()
         self.default_metadata_dict = OrderedDict({
             'autoAdvance': False,
+            'saveStateEnabled': True,
             'saveStateUrl': '',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
             'streams': '1.00:3_yD_cEKoCk',
@@ -501,7 +500,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         """
         Tests the VideoModule get_html where a edx_video_id is given but a video is not found
         """
-        SOURCE_XML = """
+        SOURCE_XML = u"""
             <video show_captions="true"
             display_name="A Name"
             sub="a_sub_file.srt.sjson" source="{source}"
@@ -727,7 +726,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         Create expected context and get actual context returned by `get_html` method.
         """
         # make sure the urls for the various encodings are included as part of the alternative sources.
-        SOURCE_XML = """
+        SOURCE_XML = u"""
             <video show_captions="true"
             display_name="A Name"
             sub="a_sub_file.srt.sjson" source="{source}"
@@ -815,7 +814,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
 
         mocked_get_video.side_effect = side_effect
 
-        SOURCE_XML = """
+        source_xml = u"""
             <video show_captions="true"
             display_name="A Name"
             sub="a_sub_file.srt.sjson" source="{source}"
@@ -876,7 +875,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         initial_context['metadata']['duration'] = None
 
         for data in cases:
-            DATA = SOURCE_XML.format(
+            DATA = source_xml.format(
                 download_video=data['download_video'],
                 source=data['source'],
                 sources=data['sources'],
@@ -971,6 +970,22 @@ class TestGetHtmlMethod(BaseTestXmodule):
         context = self.item_descriptor.render(STUDENT_VIEW).content
         self.assertIn("'download_video_link': None", context)
 
+    def test_html_student_public_view(self):
+        """
+        Test the student and public views
+        """
+        video_xml = """
+        <video display_name="Video" download_video="true" source="https://hls.com/hls.m3u8">
+        ["https://hls.com/hls2.m3u8", "https://hls.com/hls3.m3u8"]
+        </video>
+        """
+
+        self.initialize_module(data=video_xml)
+        context = self.item_descriptor.render(STUDENT_VIEW).content
+        self.assertIn('"saveStateEnabled": true', context)
+        context = self.item_descriptor.render(PUBLIC_VIEW).content
+        self.assertIn('"saveStateEnabled": false', context)
+
     @patch('xmodule.video_module.video_module.edxval_api.get_course_video_image_url')
     def test_poster_image(self, get_course_video_image_url):
         """
@@ -1052,7 +1067,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         metadata = {
             'html5_sources': ['http://youtu.be/3_yD_cEKoCk.mp4'] + data['hls'],
         }
-        video_xml = '<video display_name="Video" edx_video_id="12345-67890" youtube_id_1_0="{}">[]</video>'.format(
+        video_xml = u'<video display_name="Video" edx_video_id="12345-67890" youtube_id_1_0="{}">[]</video>'.format(
             data['youtube']
         )
         DEPRECATE_YOUTUBE_FLAG = waffle_flags()[DEPRECATE_YOUTUBE]
@@ -1060,10 +1075,9 @@ class TestGetHtmlMethod(BaseTestXmodule):
             with override_flag(DEPRECATE_YOUTUBE_FLAG.namespaced_flag_name, active=data['waffle_enabled']):
                 self.initialize_module(data=video_xml, metadata=metadata)
                 context = self.item_descriptor.render(STUDENT_VIEW).content
-                self.assertIn('"prioritizeHls": {}'.format(data['result']), context)
+                self.assertIn(u'"prioritizeHls": {}'.format(data['result']), context)
 
 
-@attr(shard=7)
 @ddt.ddt
 class TestVideoDescriptorInitialization(BaseTestXmodule):
     """
@@ -1222,7 +1236,6 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
         self.assertEqual(context['transcripts_basic_tab_metadata']['video_url']['value'], video_url)
 
 
-@attr(shard=7)
 @ddt.ddt
 class TestEditorSavedMethod(BaseTestXmodule):
     """
@@ -1522,7 +1535,6 @@ class TestVideoDescriptorStudentViewJson(CacheIsolationTestCase):
         self.assertItemsEqual(student_view_response['transcripts'].keys(), expected_transcripts)
 
 
-@attr(shard=7)
 @ddt.ddt
 class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
     """
@@ -1608,7 +1620,7 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
         )
 
         actual = self.descriptor.definition_to_xml(resource_fs=self.file_system)
-        expected_str = """
+        expected_str = u"""
             <video download_video="false" url_name="SampleProblem" transcripts='{transcripts}'>
                 <video_asset client_video_id="test_client_video_id" duration="111.0" image="">
                     <encoded_video profile="mobile" url="http://example.com/video" file_size="222" bitrate="333"/>
@@ -1762,7 +1774,7 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
             EXPORT_IMPORT_STATIC_DIR
         )
 
-        xml_data = """
+        xml_data = u"""
             <video edx_video_id='{edx_video_id}' sub='{sub_id}' transcripts='{transcripts}'>
                 <video_asset client_video_id="test_client_video_id" duration="111.0">
                     <encoded_video profile="mobile" url="http://example.com/video" file_size="222" bitrate="333"/>
@@ -1849,7 +1861,7 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
         edx_video_id = 'test_edx_video_id'
         val_transcript_language_code = 'es'
         val_transcript_provider = 'Cielo24'
-        xml_data = """
+        xml_data = u"""
         <video edx_video_id='{edx_video_id}'>
             <video_asset client_video_id="test_client_video_id" duration="111.0">
                 <transcripts>
@@ -1984,7 +1996,7 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
                 module_system.resources_fs,
                 EXPORT_IMPORT_STATIC_DIR
             )
-            xml_data += " sub='{sub_id}'".format(
+            xml_data += u" sub='{sub_id}'".format(
                 sub_id=sub_id
             )
 
@@ -1996,7 +2008,7 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
                 module_system.resources_fs,
                 EXPORT_IMPORT_STATIC_DIR
             )
-            xml_data += " transcripts='{transcripts}'".format(
+            xml_data += u" transcripts='{transcripts}'".format(
                 transcripts=json.dumps(external_transcripts),
             )
 
@@ -2135,6 +2147,7 @@ class TestVideoWithBumper(TestVideo):
             'id': self.item_descriptor.location.html_id(),
             'metadata': json.dumps(OrderedDict({
                 'autoAdvance': False,
+                'saveStateEnabled': True,
                 'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
                 'autoplay': False,
                 'streams': '0.75:jNCf2gIqpeE,1.00:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg',
@@ -2208,6 +2221,7 @@ class TestAutoAdvanceVideo(TestVideo):
             'bumper_metadata': 'null',
             'metadata': json.dumps(OrderedDict({
                 'autoAdvance': autoadvance_flag,
+                'saveStateEnabled': True,
                 'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
                 'autoplay': False,
                 'streams': '0.75:jNCf2gIqpeE,1.00:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg',

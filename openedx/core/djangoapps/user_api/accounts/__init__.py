@@ -26,6 +26,12 @@ ALL_USERS_VISIBILITY = 'all_users'
 # Indicates the user's preference that all their account information be private.
 PRIVATE_VISIBILITY = 'private'
 
+# Indicates that the user has custom preferences for the visibility of their account information.
+CUSTOM_VISIBILITY = 'custom'
+
+# Prefix prepended to user preferences related to custom account visibility preferences.
+VISIBILITY_PREFIX = 'visibility.'
+
 # Translators: This message is shown when the Unicode usernames are NOT allowed.
 # It is shown to users who attempt to create a new account using invalid characters
 # in the username.

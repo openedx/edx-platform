@@ -66,6 +66,10 @@ LMS_ENROLLMENT_API_PATH = "/api/enrollment/v1/"
 # This setting is used when a site does not define its own choices via site configuration
 MANUAL_ENROLLMENT_ROLE_CHOICES = ['Learner', 'Support', 'Partner']
 
+# List of logout URIs for each IDA that the learner should be logged out of when they logout of the LMS. Only applies to
+# IDA for which the social auth flow uses DOT (Django OAuth Toolkit).
+IDA_LOGOUT_URI_LIST = []
+
 # Features
 FEATURES = {
     'DISPLAY_DEBUG_INFO_TO_STAFF': True,
@@ -237,9 +241,6 @@ FEATURES = {
 
     # Prevent concurrent logins per user
     'PREVENT_CONCURRENT_LOGINS': True,
-
-    # Turn on Advanced Security by default
-    'ADVANCED_SECURITY': True,
 
     # When a logged in user goes to the homepage ('/') should the user be
     # redirected to the dashboard - this is default Open edX behavior. Set to
@@ -449,9 +450,7 @@ node_paths = [
 NODE_PATH = ':'.join(node_paths)
 
 # For geolocation ip database
-GEOIP_PATH = REPO_ROOT / "common/static/data/geoip/GeoIP.dat"
-GEOIPV6_PATH = REPO_ROOT / "common/static/data/geoip/GeoIPv6.dat"
-
+GEOIP_PATH = REPO_ROOT / "common/static/data/geoip/GeoLite2-Country.mmdb"
 # Where to look for a status message
 STATUS_MESSAGE_PATH = ENV_ROOT / "status_message.json"
 
@@ -654,8 +653,10 @@ derived_collection_entry('DEFAULT_TEMPLATE_ENGINE', 'DIRS')
 ###############################################################################################
 
 AUTHENTICATION_BACKENDS = [
+    'rules.permissions.ObjectPermissionBackend',
     'openedx.core.djangoapps.oauth_dispatch.dot_overrides.backends.EdxRateLimitedAllowAllUsersModelBackend'
 ]
+
 STUDENT_FILEUPLOAD_MAX_SIZE = 4 * 1000 * 1000  # 4 MB
 MAX_FILEUPLOADS_PER_INPUT = 20
 
@@ -965,6 +966,7 @@ MEDIA_ROOT = '/edx/var/edxapp/media/'
 MEDIA_URL = '/media/'
 
 # Locale/Internationalization
+CELERY_TIMEZONE = 'UTC'
 TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
 # these languages display right to left
@@ -1218,6 +1220,9 @@ MIDDLEWARE_CLASSES = [
     'edx_django_utils.cache.middleware.RequestCacheMiddleware',
     'edx_django_utils.monitoring.middleware.MonitoringCustomMetricsMiddleware',
 
+    # Cookie monitoring
+    'openedx.core.lib.request_utils.CookieMetricsMiddleware',
+
     'mobile_api.middleware.AppVersionUpgrade',
     'openedx.core.djangoapps.header_control.middleware.HeaderControlMiddleware',
     'microsite_configuration.middleware.MicrositeMiddleware',
@@ -1348,28 +1353,6 @@ courseware_js = [
     'js/modules/tab.js',
 ]
 
-proctoring_js = (
-    [
-        'proctoring/js/models/proctored_exam_allowance_model.js',
-        'proctoring/js/models/proctored_exam_attempt_model.js',
-        'proctoring/js/models/proctored_exam_model.js'
-    ] +
-    [
-        'proctoring/js/collections/proctored_exam_allowance_collection.js',
-        'proctoring/js/collections/proctored_exam_attempt_collection.js',
-        'proctoring/js/collections/proctored_exam_collection.js'
-    ] +
-    [
-        'proctoring/js/views/Backbone.ModalDialog.js',
-        'proctoring/js/views/proctored_exam_add_allowance_view.js',
-        'proctoring/js/views/proctored_exam_allowance_view.js',
-        'proctoring/js/views/proctored_exam_attempt_view.js',
-        'proctoring/js/views/proctored_exam_view.js'
-    ] +
-    [
-        'proctoring/js/proctored_app.js'
-    ]
-)
 
 # Before a student accesses courseware, we do not
 # need many of the JS dependencies.  This includes
@@ -1696,10 +1679,6 @@ PIPELINE_JS = {
         ),
         'output_filename': 'js/lms-application.js',
     },
-    'proctoring': {
-        'source_filenames': proctoring_js,
-        'output_filename': 'js/lms-proctoring.js',
-    },
     'courseware': {
         'source_filenames': courseware_js,
         'output_filename': 'js/lms-courseware.js',
@@ -1844,6 +1823,10 @@ WEBPACK_LOADER = {
     'DEFAULT': {
         'BUNDLE_DIR_NAME': 'bundles/',
         'STATS_FILE': os.path.join(STATIC_ROOT, 'webpack-stats.json')
+    },
+    'WORKERS': {
+        'BUNDLE_DIR_NAME': 'bundles/',
+        'STATS_FILE': os.path.join(STATIC_ROOT, 'webpack-worker-stats.json')
     }
 }
 WEBPACK_CONFIG_PATH = 'webpack.prod.config.js'
@@ -2139,9 +2122,6 @@ INSTALLED_APPS = [
     # Splash screen
     'splash',
 
-    # Monitoring
-    'openedx.core.djangoapps.datadog.apps.DatadogConfig',
-
     # User API
     'rest_framework',
     'openedx.core.djangoapps.user_api',
@@ -2265,6 +2245,9 @@ INSTALLED_APPS = [
 
     # additional release utilities to ease automation
     'release_util',
+
+    # rule-based authorization
+    'rules.apps.AutodiscoverRulesConfig',
 
     # Customized celery tasks, including persisting failed tasks so they can
     # be retried
@@ -2403,28 +2386,28 @@ SOCIAL_MEDIA_FOOTER_DISPLAY = {
         # translate this the way that Facebook advertises in your language.
         "title": _("Facebook"),
         "icon": "fa-facebook-square",
-        "action": _("Like {platform_name} on Facebook")
+        "action": _(u"Like {platform_name} on Facebook")
     },
     "twitter": {
         # Translators: This is the website name of www.twitter.com.  Please
         # translate this the way that Twitter advertises in your language.
         "title": _("Twitter"),
         "icon": "fa-twitter-square",
-        "action": _("Follow {platform_name} on Twitter")
+        "action": _(u"Follow {platform_name} on Twitter")
     },
     "linkedin": {
         # Translators: This is the website name of www.linkedin.com.  Please
         # translate this the way that LinkedIn advertises in your language.
         "title": _("LinkedIn"),
         "icon": "fa-linkedin-square",
-        "action": _("Follow {platform_name} on LinkedIn")
+        "action": _(u"Follow {platform_name} on LinkedIn")
     },
     "google_plus": {
         # Translators: This is the website name of plus.google.com.  Please
         # translate this the way that Google+ advertises in your language.
         "title": _("Google+"),
         "icon": "fa-google-plus-square",
-        "action": _("Follow {platform_name} on Google+")
+        "action": _(u"Follow {platform_name} on Google+")
     },
     "tumblr": {
         # Translators: This is the website name of www.tumblr.com.  Please
@@ -2443,7 +2426,7 @@ SOCIAL_MEDIA_FOOTER_DISPLAY = {
         # translate this the way that Reddit advertises in your language.
         "title": _("Reddit"),
         "icon": "fa-reddit-square",
-        "action": _("Subscribe to the {platform_name} subreddit"),
+        "action": _(u"Subscribe to the {platform_name} subreddit"),
     },
     "vk": {
         # Translators: This is the website name of https://vk.com.  Please
@@ -2462,7 +2445,7 @@ SOCIAL_MEDIA_FOOTER_DISPLAY = {
         # translate this the way that YouTube advertises in your language.
         "title": _("Youtube"),
         "icon": "fa-youtube-square",
-        "action": _("Subscribe to the {platform_name} YouTube channel")
+        "action": _(u"Subscribe to the {platform_name} YouTube channel")
     }
 }
 
@@ -2519,7 +2502,7 @@ if FEATURES.get('ENABLE_CORS_HEADERS'):
 # to simulate cross-domain requests.
 XDOMAIN_PROXY_CACHE_TIMEOUT = 60 * 15
 
-LOGIN_REDIRECT_WHITELIST = []
+LOGIN_REDIRECT_WHITELIST = [CMS_BASE]
 
 ###################### Registration ##################################
 
@@ -2884,9 +2867,6 @@ OPTIONAL_APPS = [
     # edxval
     ('edxval', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
 
-    # edX Proctoring
-    ('edx_proctoring', None),
-
     # Organizations App (http://github.com/edx/edx-organizations)
     ('organizations', None),
 
@@ -2918,10 +2898,6 @@ for app_name, insert_before in OPTIONAL_APPS:
         INSTALLED_APPS.insert(INSTALLED_APPS.index(insert_before), app_name)
     except (IndexError, ValueError):
         INSTALLED_APPS.append(app_name)
-
-### ADVANCED_SECURITY_CONFIG
-# Empty by default
-ADVANCED_SECURITY_CONFIG = {}
 
 ### External auth usage -- prefixes for ENROLLMENT_DOMAIN
 SHIBBOLETH_DOMAIN_PREFIX = 'shib:'
@@ -2991,51 +2967,45 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
     # The value is one of: 'all_users', 'private'
     "default_visibility": "all_users",
 
-    # The list of all fields that can be shared with other users
-    "shareable_fields": [
-        'username',
-        'profile_image',
-        'country',
-        'time_zone',
-        'date_joined',
-        'language_proficiencies',
-        'bio',
-        'social_links',
-        'account_privacy',
-        # Not an actual field, but used to signal whether badges should be public.
-        'accomplishments_shared',
-    ],
-
     # The list of account fields that are always public
     "public_fields": [
-        'username',
-        'profile_image',
         'account_privacy',
+        'profile_image',
+        'username',
     ],
+}
 
-    # The list of account fields that are visible only to staff and users viewing their own profiles
-    "admin_fields": [
-        "username",
+# The list of all fields that can be shared with other users
+ACCOUNT_VISIBILITY_CONFIGURATION["shareable_fields"] = (
+    ACCOUNT_VISIBILITY_CONFIGURATION["public_fields"] + [
+        'bio',
+        'country',
+        'date_joined',
+        'language_proficiencies',
+        "level_of_education",
+        'social_links',
+        'time_zone',
+
+        # Not an actual field, but used to signal whether badges should be public.
+        'accomplishments_shared',
+    ]
+)
+
+# The list of account fields that are visible only to staff and users viewing their own profiles
+ACCOUNT_VISIBILITY_CONFIGURATION["admin_fields"] = (
+    ACCOUNT_VISIBILITY_CONFIGURATION["shareable_fields"] + [
         "email",
-        "is_active",
-        "bio",
-        "country",
-        "date_joined",
-        "profile_image",
-        "language_proficiencies",
-        "social_links",
-        "name",
+        "extended_profile",
         "gender",
         "goals",
-        "year_of_birth",
-        "level_of_education",
+        "is_active",
         "mailing_address",
+        "name",
         "requires_parental_consent",
-        "account_privacy",
-        "accomplishments_shared",
-        "extended_profile",
+        "secondary_email",
+        "year_of_birth",
     ]
-}
+)
 
 # The current list of social platforms to be shown to the user.
 #
@@ -3221,14 +3191,6 @@ MICROSITE_DATABASE_TEMPLATE_CACHE_TTL = 5 * 60
 
 RSS_PROXY_CACHE_TIMEOUT = 3600  # The length of time we cache RSS retrieved from remote URLs in seconds
 
-#### PROCTORING CONFIGURATION DEFAULTS
-
-PROCTORING_BACKEND_PROVIDER = {
-    'class': 'edx_proctoring.backends.null.NullBackendProvider',
-    'options': {},
-}
-PROCTORING_SETTINGS = {}
-
 #### Custom Courses for EDX (CCX) configuration
 
 # This is an arbitrary hard limit.
@@ -3277,6 +3239,9 @@ AUDIT_CERT_CUTOFF_DATE = None
 
 CREDENTIALS_SERVICE_USERNAME = 'credentials_service_user'
 CREDENTIALS_GENERATION_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
+
+# Queue to use for award program certificates
+PROGRAM_CERTIFICATES_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
 
 # Settings for Comprehensive Theming app
 
@@ -3357,11 +3322,11 @@ ENTERPRISE_CUSTOMER_LOGO_IMAGE_SIZE = 512   # Enterprise logo image size limit i
 
 ENTERPRISE_PLATFORM_WELCOME_TEMPLATE = _(u'Welcome to {platform_name}.')
 ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE = _(
-    'You have left the {start_bold}{enterprise_name}{end_bold} website and are now on the {platform_name} site. '
-    '{enterprise_name} has partnered with {platform_name} to offer you high-quality, always available learning '
-    'programs to help you advance your knowledge and career. '
-    '{line_break}Please note that {platform_name} has a different {privacy_policy_link_start}Privacy Policy'
-    '{privacy_policy_link_end} from {enterprise_name}.'
+    u'You have left the {start_bold}{enterprise_name}{end_bold} website and are now on the {platform_name} site. '
+    u'{enterprise_name} has partnered with {platform_name} to offer you high-quality, always available learning '
+    u'programs to help you advance your knowledge and career. '
+    u'{line_break}Please note that {platform_name} has a different {privacy_policy_link_start}Privacy Policy'
+    u'{privacy_policy_link_end} from {enterprise_name}.'
 )
 ENTERPRISE_TAGLINE = ''
 ENTERPRISE_EXCLUDED_REGISTRATION_FIELDS = {
@@ -3488,10 +3453,16 @@ RETIREMENT_STATES = [
     'COMPLETE',
 ]
 
-############## Settings for Writable Gradebook  #########################
+############## Settings for Microfrontends  #########################
 # If running a Gradebook container locally,
 # modify lms/envs/private.py to give it a non-null value
 WRITABLE_GRADEBOOK_URL = None
+
+# TODO (DEPR-17)
+# This URL value is needed to redirect the old profile page to a new
+# micro-frontend based implementation. Once the old implementation is
+# completely removed and this redirect is no longer needed, we can remove this.
+PROFILE_MICROFRONTEND_URL = "http://some.profile.spa/u/"
 
 ############### Settings for django-fernet-fields ##################
 FERNET_KEYS = [

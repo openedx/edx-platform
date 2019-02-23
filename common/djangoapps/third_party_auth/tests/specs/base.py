@@ -63,7 +63,10 @@ class HelperMixin(object):
         """
         self.assertEqual(200, response.status_code)
         # Check that the correct provider was selected.
-        self.assertIn('successfully signed in with <strong>%s</strong>' % self.provider.name, response.content)
+        self.assertIn(
+            u'successfully signed in with <strong>%s</strong>' % self.provider.name,
+            response.content.decode(response.charset)
+        )
         # Expect that each truthy value we've prepopulated the register form
         # with is actually present.
         form_field_data = self.provider.get_register_form_data(pipeline_kwargs)
@@ -120,8 +123,8 @@ class HelperMixin(object):
         """Asserts failure on /login for missing social auth looks right."""
         self.assertEqual(403, response.status_code)
         self.assertIn(
-            "successfully logged into your %s account, but this account isn&#39;t linked" % self.provider.name,
-            response.content
+            u"successfully logged into your %s account, but this account isn&#39;t linked" % self.provider.name,
+            response.content.decode(response.charset)
         )
 
     def assert_json_failure_response_is_username_collision(self, response):
@@ -161,12 +164,14 @@ class HelperMixin(object):
         """Makes sure the given request is running an auth pipeline."""
         self.assertTrue(pipeline.running(request))
 
-    def assert_redirect_to_dashboard_looks_correct(self, response):
-        """Asserts a response would redirect to /dashboard."""
+    def assert_redirect_after_pipeline_completes(self, response, expected_redirect_url=None):
+        """Asserts a response would redirect to the expected_redirect_url or SOCIAL_AUTH_LOGIN_REDIRECT_URL."""
         self.assertEqual(302, response.status_code)
         # NOTE: Ideally we should use assertRedirects(), however it errors out due to the hostname, testserver,
         # not being properly set. This may be an issue with the call made by PSA, but we are not certain.
-        self.assertTrue(response.get('Location').endswith(django_settings.SOCIAL_AUTH_LOGIN_REDIRECT_URL))
+        self.assertTrue(response.get('Location').endswith(
+            expected_redirect_url or django_settings.SOCIAL_AUTH_LOGIN_REDIRECT_URL,
+        ))
 
     def assert_redirect_to_login_looks_correct(self, response):
         """Asserts a response would redirect to /login."""
@@ -560,7 +565,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
         self.set_logged_in_cookies(request)
 
         # Fire off the auth pipeline to link.
-        self.assert_redirect_to_dashboard_looks_correct(
+        self.assert_redirect_after_pipeline_completes(
             actions.do_complete(
                 request.backend,
                 social_views._do_login,  # pylint: disable=protected-access
@@ -606,7 +611,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
         self.assert_social_auth_exists_for_user(request.user, strategy)
 
         # Fire off the disconnect pipeline to unlink.
-        self.assert_redirect_to_dashboard_looks_correct(
+        self.assert_redirect_after_pipeline_completes(
             actions.do_disconnect(
                 request.backend,
                 request.user,
@@ -725,7 +730,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
         # Set the cookie and try again
         self.set_logged_in_cookies(request)
 
-        self.assert_redirect_to_dashboard_looks_correct(
+        self.assert_redirect_after_pipeline_completes(
             actions.do_complete(request.backend, social_views._do_login, user=user, request=request))
         self.assert_account_settings_context_looks_correct(account_settings_context(request))
 
@@ -764,6 +769,20 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
     def test_first_party_auth_trumps_third_party_auth_and_succeeds_when_credentials_good(self):
         self.assert_first_party_auth_trumps_third_party_auth(
             email='user@example.com', password=u'password', success=True)
+
+    def test_pipeline_redirects_to_requested_url(self):
+        requested_redirect_url = 'foo'  # something different from '/dashboard'
+        request, strategy = self.get_request_and_strategy(redirect_uri='social:complete')
+        strategy.request.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
+        request.session[pipeline.AUTH_REDIRECT_KEY] = requested_redirect_url
+
+        user = self.create_user_models_for_existing_account(strategy, 'user@foo.com', 'password', self.get_username())
+        self.set_logged_in_cookies(request)
+
+        self.assert_redirect_after_pipeline_completes(
+            actions.do_complete(request.backend, social_views._do_login, user=user, request=request),  # pylint: disable=protected-access
+            requested_redirect_url,
+        )
 
     def test_full_pipeline_succeeds_registering_new_account(self):
         # First, create, the request and strategy that store pipeline state.
@@ -831,7 +850,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
 
         # Set the cookie and try again
         self.set_logged_in_cookies(request)
-        self.assert_redirect_to_dashboard_looks_correct(
+        self.assert_redirect_after_pipeline_completes(
             actions.do_complete(strategy.request.backend, social_views._do_login, user=created_user, request=request))
         # Now the user has been redirected to the dashboard. Their third party account should now be linked.
         self.assert_social_auth_exists_for_user(created_user, strategy)

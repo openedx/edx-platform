@@ -322,7 +322,7 @@ def get_course_topics(request, course_key, topic_ids=None):
         not_found_topic_ids = topic_ids - (existing_courseware_topic_ids | existing_non_courseware_topic_ids)
         if not_found_topic_ids:
             raise DiscussionNotFoundError(
-                "Discussion not found for '{}'.".format(", ".join(str(id) for id in not_found_topic_ids))
+                u"Discussion not found for '{}'.".format(", ".join(str(id) for id in not_found_topic_ids))
             )
 
     return {
@@ -528,11 +528,11 @@ def get_thread_list(
     if order_by not in cc_map:
         raise ValidationError({
             "order_by":
-                ["Invalid value. '{}' must be 'last_activity_at', 'comment_count', or 'vote_count'".format(order_by)]
+                [u"Invalid value. '{}' must be 'last_activity_at', 'comment_count', or 'vote_count'".format(order_by)]
         })
     if order_direction != "desc":
         raise ValidationError({
-            "order_direction": ["Invalid value. '{}' must be 'desc'".format(order_direction)]
+            "order_direction": [u"Invalid value. '{}' must be 'desc'".format(order_direction)]
         })
 
     course = _get_course(course_key, request.user)
@@ -555,7 +555,7 @@ def get_thread_list(
             query_params[view] = "true"
         else:
             ValidationError({
-                "view": ["Invalid value. '{}' must be 'unread' or 'unanswered'".format(view)]
+                "view": [u"Invalid value. '{}' must be 'unread' or 'unanswered'".format(view)]
             })
 
     if following:

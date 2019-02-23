@@ -83,6 +83,7 @@ urlpatterns = [
     url(r'^howitworks$', contentstore.views.howitworks, name='howitworks'),
     url(r'^signup$', contentstore.views.signup, name='signup'),
     url(r'^signin$', contentstore.views.login_page, name='login'),
+    url(r'^signin_redirect_to_lms$', contentstore.views.login_redirect_to_lms, name='login_redirect_to_lms'),
     url(r'^request_course_creator$', contentstore.views.request_course_creator, name='request_course_creator'),
     url(r'^course_team/{}(?:/(?P<email>.+))?$'.format(COURSELIKE_KEY_PATTERN),
         contentstore.views.course_team_handler, name='course_team_handler'),

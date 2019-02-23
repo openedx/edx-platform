@@ -128,7 +128,7 @@ class VideoBaseTest(UniqueCourseTest):
         :param vertical_index: index for the vertical display name
         :return: XBlockFixtureDesc
         """
-        xblock_course_vertical = XBlockFixtureDesc('vertical', 'Test Vertical-{0}'.format(vertical_index))
+        xblock_course_vertical = XBlockFixtureDesc('vertical', u'Test Vertical-{0}'.format(vertical_index))
 
         for video in vertical_contents:
             xblock_course_vertical.add_children(
@@ -1158,22 +1158,6 @@ class HLSVideoTest(VideoBaseTest):
         # Verify that the video download url is not shown
         self.assertEqual(self.video.video_download_url, None)
 
-    def test_hls_video_with_youtube_blocked(self):
-        """
-        Scenario: HLS video is rendered when the YouTube API is blocked
-        Given the YouTube API is blocked
-        And the course has a Video component with Youtube, HTML5 and HLS sources available
-        Then the HLS video is rendered
-        """
-        # configure youtube server
-        self.youtube_configuration.update({
-            'youtube_api_blocked': True,
-        })
-
-        self.metadata = self.metadata_for_mode('html5_and_hls', additional_data={'youtube_id_1_0': 'b7xgknqkQk8'})
-        self.navigate_to_video()
-        self.assertTrue(self.video.is_video_rendered('hls'))
-
     def test_hls_video_with_youtube_delayed_response_time(self):
         """
         Scenario: HLS video is rendered when the YouTube API response time is slow
@@ -1218,8 +1202,8 @@ class HLSVideoTest(VideoBaseTest):
 
         for line_no in range(5):
             self.video.click_transcript_line(line_no=line_no)
-            self.video.wait_for_position('0:0{}'.format(line_no))
+            self.video.wait_for_position(u'0:0{}'.format(line_no))
 
         for line_no in range(5):
-            self.video.seek('0:0{}'.format(line_no))
-            self.assertEqual(self.video.active_caption_text, 'Hi, edX welcomes you{}.'.format(line_no))
+            self.video.seek(u'0:0{}'.format(line_no))
+            self.assertEqual(self.video.active_caption_text, u'Hi, edX welcomes you{}.'.format(line_no))

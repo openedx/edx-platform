@@ -14,6 +14,13 @@ class ProblemPage(PageObject):
 
     url = None
     CSS_PROBLEM_HEADER = '.problem-header'
+    status_indicators = {
+        'correct': ['span.correct'],
+        'incorrect': ['span.incorrect'],
+        'unanswered': ['span.unanswered'],
+        'submitted': ['span.submitted'],
+        'unsubmitted': ['.unsubmitted']
+    }
 
     def is_browser_on_page(self):
         return self.q(css='.xblock-student_view').present
@@ -90,6 +97,21 @@ class ProblemPage(PageObject):
             description="MathJax rendered in problem body"
         )
 
+    def verify_mathjax_rendered_in_preview(self):
+        """
+        Check that MathJax has been rendered in formula problem preview
+        """
+
+        def mathjax_present():
+            """ Returns True if MathJax css is present inside the preview """
+            mathjax_container = self.q(css="div.problem div .MathJax_SVG")
+            return mathjax_container.visible and mathjax_container.present
+
+        self.wait_for(
+            mathjax_present,
+            description="MathJax rendered in problem preview"
+        )
+
     def verify_mathjax_rendered_in_hint(self):
         """
         Check that MathJax have been rendered in problem hint
@@ -127,6 +149,13 @@ class ProblemPage(PageObject):
         self.wait_for_element_invisibility('.loading', 'wait for loading icon to disappear')
         self.wait_for_ajax()
 
+    @property
+    def get_numerical_input_value(self):
+        """
+        Get the numerical problem input contents
+        """
+        return self.q(css='div.problem div.inputtype input').text[0]
+
     def click_submit(self):
         """
         Click the Submit button.
@@ -144,6 +173,7 @@ class ProblemPage(PageObject):
         Click the Reset button.
         """
         click_css(self, '.problem .reset', require_notification=False)
+        self.wait_for_ajax()
 
     def click_show(self):
         """
@@ -282,7 +312,7 @@ class ProblemPage(PageObject):
             status_selector(str): status selector string.
             message(str): description of promise, to be logged.
         """
-        msg = "Wait for status to be {}".format(message)
+        msg = u"Wait for status to be {}".format(message)
         self.wait_for_element_visibility(status_selector, msg)
 
     def is_expected_status_visible(self, status_selector):
@@ -346,7 +376,7 @@ class ProblemPage(PageObject):
         Arguments:
             hint_index (int): Index of a displayed hint
         """
-        css = '.notification-hint .notification-message > ol > li.hint-index-{hint_index}'.format(
+        css = u'.notification-hint .notification-message > ol > li.hint-index-{hint_index}'.format(
             hint_index=hint_index
         )
         self.wait_for(
@@ -358,7 +388,7 @@ class ProblemPage(PageObject):
         """
         Click on the "Review" button within the visible notification.
         """
-        css_string = '.notification.notification-{notification_type} .review-btn'.format(
+        css_string = u'.notification.notification-{notification_type} .review-btn'.format(
             notification_type=notification_type
         )
 
@@ -416,13 +446,30 @@ class ProblemPage(PageObject):
         """
         return self.q(css="div.problem div.inputtype div.incorrect span.status").is_present()
 
+    def get_simpleprob_correctness(self):
+        """
+        Returns the correctness status for a simple problem.
+
+        Given a simple problem, the method returns the correctness status.
+        If there is no visible status, None is returned
+        """
+
+        if self.simpleprob_is_correct():
+            return 'correct'
+        elif self.simpleprob_is_incorrect():
+            return 'incorrect'
+        elif self.simpleprob_is_partially_correct():
+            return 'partial'
+        else:
+            return None
+
     def click_clarification(self, index=0):
         """
         Click on an inline icon that can be included in problem text using an HTML <clarification> element:
 
         Problem <clarification>clarification text hidden by an icon in rendering</clarification> Text
         """
-        self.q(css='div.problem .clarification:nth-child({index}) span[data-tooltip]'.format(index=index + 1)).click()
+        self.q(css=u'div.problem .clarification:nth-child({index}) span[data-tooltip]'.format(index=index + 1)).click()
 
     @property
     def visible_tooltip_text(self):
@@ -443,10 +490,10 @@ class ProblemPage(PageObject):
         """
         Check if the given answer/choice is highlighted for choice group.
         """
-        choice_status_xpath = ('//fieldset/div[contains(@class, "field")][{{0}}]'
-                               '/label[contains(@class, "choicegroup_{choice}")]'
-                               '/span[contains(@class, "status {choice}")]'.format(choice=choice))
-        any_status_xpath = '//fieldset/div[contains(@class, "field")][{0}]/label/span'
+        choice_status_xpath = (u'//fieldset/div[contains(@class, "field")][{{0}}]'
+                               u'/label[contains(@class, "choicegroup_{choice}")]'
+                               u'/span[contains(@class, "status {choice}")]'.format(choice=choice))
+        any_status_xpath = u'//fieldset/div[contains(@class, "field")][{0}]/label/span'
         for choice in choices_list:
             if not self.q(xpath=choice_status_xpath.format(choice)).is_present():
                 return False
@@ -498,3 +545,31 @@ class ProblemPage(PageObject):
         Returns the text in the special "sr" region used for display status.
         """
         return self.q(css='#reader-feedback').text[0]
+
+    @property
+    def submission_feedback(self):
+        """
+        Returns the submission feedback of the problem
+        """
+        return self.q(css='div[class="submission-feedback"]').text[0].split('\n')[0]
+
+    @property
+    def answer(self):
+        """
+        Returns the answer of the problem
+        """
+        return self.q(css='p[class="answer"]').text[0]
+
+    @property
+    def score_notification(self):
+        """
+        Returns the score after the submission of answer
+        """
+        self.wait_for_element_visibility('.notification-submit .notification-message', 'Problem score is visible')
+        return self.q(css='.notification-submit .notification-message').text[0]
+
+    def is_present(self, selector):
+        """
+        Checks for the presence of the locator
+        """
+        return self.q(css=selector).present
