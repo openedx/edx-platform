@@ -15,6 +15,12 @@ urlpatterns = [
         ])),
         url(r'^block/(?P<usage_key_str>gblock-v1:[^/]+)/', include([
             url(r'^$', views.bundle_block),
+            url(r'^handler_url/(?P<handler_name>[\w\-]+)/$', views.bundle_xblock_handler_url),
+            url(
+                r'^handler/(?P<user_id>\d+)-(?P<secure_token>\w+)/(?P<handler_name>[\w\-]+)/(?P<suffix>.+)?$',
+                    views.bundle_xblock_handler,
+                    name='bundle_xblock_handler',
+                ),
         ])),
     ])),
 ]

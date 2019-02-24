@@ -3,6 +3,7 @@ Key-value store that holds XBlock field data read out of Blockstore
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 from contextlib import contextmanager
+import logging
 
 from xblock.fields import Scope
 from xblock.runtime import KeyValueStore
@@ -32,6 +33,8 @@ from xblock.runtime import KeyValueStore
 # The collect_changes() context should be used when running any
 # XBlock view or handler, and it signifies that writes are deliberate
 # changes.
+
+log = logging.getLogger(__name__)
 
 _cached_keys = {}  # Values that we read out of XML during a transaction, and/or committed writes
 _transaction_depth = 0  # This is > 0 inside a blockstore_transaction() context
@@ -79,9 +82,11 @@ def collect_parsed_fields():
 def collect_changes():
     """
     Use this context manager while running an XBlock view or handler that
-    may be saving new field values. Changes will be collected and then
-    when this context manager exists, the changes will be persisted to
+    may be saving new field values to Blockstore. Changes will be collected and
+    then when this context manager exists, the changes will be persisted to
     blockstore in an atomic transaction.
+
+    This is not needed when only user state fields are changing.
     """
     if _transaction_depth < 1:
         raise RuntimeError("You need to be in a blockstore_transaction() context.")
@@ -90,6 +95,11 @@ def collect_changes():
     try:
         yield
         # TODO: Now persist all changes to Blockstore
+        for key, value in new_keys.iteritems():
+            log.warning(
+                "Block field '%s' has changed to '%s' but persisting changes is not yet implemented.",
+                key, value,
+            )
         # Now save all new_keys into _cached_keys:
         for key, value in new_keys.iteritems():
             _cached_keys[key] = value

@@ -2,8 +2,10 @@
 Common base classes for all new XBlock runtimes.
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
+import logging
 
 from django.utils.lru_cache import lru_cache
+from six import text_type
 from xblock.exceptions import NoSuchServiceError
 from xblock.field_data import SplitFieldData
 from xblock.fields import Scope
@@ -13,6 +15,9 @@ from openedx.core.lib.xblock_utils import xblock_local_resource_url
 from xmodule.errortracker import make_error_tracker
 from .id_managers import OpaqueKeyReader
 from .shims import RuntimeShim, XBlockShim
+
+
+log = logging.getLogger(__name__)
 
 
 class XBlockRuntime(RuntimeShim, Runtime):
@@ -44,7 +49,16 @@ class XBlockRuntime(RuntimeShim, Runtime):
         self.user_id = user_id
 
     def handler_url(self, block, handler_name, suffix='', query='', thirdparty=False):
-        return self.system.handler_url(block, handler_name, suffix, query, thirdparty)
+        url = self.system.handler_url(
+            usage_id_str=text_type(block.scope_ids.usage_id),
+            handler_name=handler_name,
+            suffix=suffix,
+            user_id=XBlockRuntimeSystem.ANONYMOUS_USER if thirdparty else self.user_id,
+        )
+        if query:
+            url += '&' if '?' in url else '?'
+            url += query
+        return url
 
     def resource_url(self, resource):
         raise NotImplementedError("resource_url is not supported by Open edX.")
@@ -56,6 +70,7 @@ class XBlockRuntime(RuntimeShim, Runtime):
         if block.scope_ids.user_id != self.user_id:
             raise ValueError("XBlocks are not allowed to publish events for other users.")  # Is that true?
         # TODO: publish events properly
+        log.info("XBlock %s has published a '%s' event: %s", block.scope_ids.usage_id, event_type, event_data)
 
     def applicable_aside_types(self, block):
         """ Disable XBlock asides in this runtime """
@@ -97,17 +112,25 @@ class XBlockRuntimeSystem(object):
     class can be used with many different XBlocks, whereas each XBlock gets its
     own instance of XBlockRuntime.
     """
+    ANONYMOUS_USER = 'anon'  # Special value passed to handler_url() methods
+
     def __init__(
         self,
-        handler_url,  # type: (Callable[[XBlock, string, string, string, bool], string]
+        handler_url,  # type: (Callable[[int, XBlock, string, string, string, bool], string]
         authored_data_kvs,  # type: KeyValueStore
         student_data_kvs,  # type: KeyValueStore
         runtime_class,  # type: XBlockRuntime
     ):
         """
         args:
-            handler_url: A method that implements the XBlock runtime
-                handler_url interface.
+            handler_url: A method to get URLs to call XBlock handlers. It must
+                implement this signature:
+                handler_url(
+                    usage_id_str: str, handler_name: str, suffix: str,
+                    user_id: Union[int, ANONYMOUS_USER]
+                )
+                If user_id is ANONYMOUS_USER, the handler should execute without
+                any user-scoped fields.
             authored_data_kvs: An KeyValueStore used to retrieve
                 any fields with UserScope.NONE
             student_data_kvs: An KeyValueStore used to retrieve
