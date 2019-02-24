@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-02-22 07:52+0000\n"
-"PO-Revision-Date: 2019-02-22 07:52:03.110366\n"
+"POT-Creation-Date: 2019-02-24 20:37+0000\n"
+"PO-Revision-Date: 2019-02-24 20:37:32.857113\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -16513,8 +16513,8 @@ msgid "Enrollment is Closed"
 msgstr "ثرقخمموثرف هس ذمخسثي"
 
 #: lms/templates/courseware/course_about.html
-msgid "Add {course_name} to Cart <span>({price} USD)</span>"
-msgstr "شيي {course_name} فخ ذشقف <span>({price} عسي)</span>"
+msgid "Add {course_name} to Cart {start_span}({price} USD){end_span}"
+msgstr "شيي {course_name} فخ ذشقف {start_span}({price} عسي){end_span}"
 
 #: lms/templates/courseware/course_about.html
 msgid "Enroll in {course_name}"
