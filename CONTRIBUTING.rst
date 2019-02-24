@@ -185,7 +185,7 @@ Step 6: Merge!
 
 Once the core committers are satisfied that your pull request is ready to go,
 one of them will merge it for you. Your code will end up on the edX production
-servers in the next release, which usually which happens every week. Congrats!
+servers in the next release, which usually happens every week. Congrats!
 
 
 ############################
