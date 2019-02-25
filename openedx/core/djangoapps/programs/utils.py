@@ -109,7 +109,7 @@ class ProgramProgressMeter(object):
         self.course_grade_factory = CourseGradeFactory()
 
         if uuid:
-            self.programs = [get_programs(self.site, uuid=uuid)]
+            self.programs = [get_programs(uuid=uuid)]
         else:
             self.programs = attach_program_detail_url(get_programs(self.site), self.mobile_only)
 

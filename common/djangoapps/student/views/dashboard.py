@@ -695,7 +695,7 @@ def student_dashboard(request):
             for program in inverted_programs.values():
                 try:
                     program_uuid = program[0]['uuid']
-                    program_data = get_programs(request.site, uuid=program_uuid)
+                    program_data = get_programs(uuid=program_uuid)
                     program_data = ProgramDataExtender(program_data, request.user).extend()
                     skus = program_data.get('skus')
                     checkout_page_url = ecommerce_service.get_checkout_page_url(*skus)
