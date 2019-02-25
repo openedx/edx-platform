@@ -323,7 +323,7 @@ SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 ######### custom courses #########
 if 'openedx.core.djangoapps.ccxcon.apps.CCXConnectorConfig' not in INSTALLED_APPS:
     INSTALLED_APPS.append('openedx.core.djangoapps.ccxcon.apps.CCXConnectorConfig')
-    
+
 FEATURES['CUSTOM_COURSES_EDX'] = True
 
 ########################## VIDEO IMAGE STORAGE ############################

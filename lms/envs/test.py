@@ -354,7 +354,7 @@ for static_dir in STATICFILES_DIRS:
 
     if data_dir.startswith(REPO_ROOT) and static_dir not in _NEW_STATICFILES_DIRS:
         _NEW_STATICFILES_DIRS.append(static_dir)
-        
+
 STATICFILES_DIRS = _NEW_STATICFILES_DIRS
 
 FILE_UPLOAD_TEMP_DIR = TEST_ROOT / "uploads"

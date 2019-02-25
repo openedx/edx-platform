@@ -29,8 +29,8 @@ from path import Path as path
 from xmodule.modulestore.modulestore_settings import convert_module_store_setting_if_needed
 
 from .common import *
-from openedx.core.lib.derived import derive_settings  # pylint: disable=wrong-import-order
-from openedx.core.lib.logsettings import get_logger_config  # pylint: disable=wrong-import-order
+from openedx.core.lib.derived import derive_settings # pylint: disable=wrong-import-order
+from openedx.core.lib.logsettings import get_logger_config # pylint: disable=wrong-import-order
 from django.core.exceptions import ImproperlyConfigured # pylint: disable=wrong-import-order
 
 def get_env_setting(setting):
@@ -840,33 +840,32 @@ ECOMMERCE_SERVICE_WORKER_USERNAME = __config__.get(
 ##### Custom Courses for EdX #####
 if FEATURES.get('CUSTOM_COURSES_EDX'):
 
-    
     # We have to check if this has been added yet until aws.py is removed because otherwise falling back to aws.py may
     # add a duplicate to this list
     if ('lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider',) not in MODULESTORE_FIELD_OVERRIDE_PROVIDERS:
         MODULESTORE_FIELD_OVERRIDE_PROVIDERS += ('lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider',)
-    
+
 CCX_MAX_STUDENTS_ALLOWED = __config__.get('CCX_MAX_STUDENTS_ALLOWED', CCX_MAX_STUDENTS_ALLOWED)
 
 ##### Individual Due Date Extensions #####
 if FEATURES.get('INDIVIDUAL_DUE_DATES'):
-    
+
     # We have to check if this has been added yet until aws.py is removed because otherwise falling back to aws.py may
     # add a duplicate to this list
     if ('courseware.student_field_overrides.IndividualStudentOverrideProvider',) not in FIELD_OVERRIDE_PROVIDERS:
         FIELD_OVERRIDE_PROVIDERS += ('courseware.student_field_overrides.IndividualStudentOverrideProvider',)
-    
+
 
 ##### Self-Paced Course Due Dates #####
 if ('lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap',) not in XBLOCK_FIELD_DATA_WRAPPERS:
-    
+
     # We have to check if this has been added yet until aws.py is removed because otherwise falling back to aws.py may
     # add a duplicate to this list
     XBLOCK_FIELD_DATA_WRAPPERS += ('lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap',)
 
 
 if ('courseware.self_paced_overrides.SelfPacedDateOverrideProvider',) not in MODULESTORE_FIELD_OVERRIDE_PROVIDERS:
-    
+
     # We have to check if this has been added yet until aws.py is removed because otherwise falling back to aws.py may
     # add a duplicate to this list
     MODULESTORE_FIELD_OVERRIDE_PROVIDERS += ('courseware.self_paced_overrides.SelfPacedDateOverrideProvider',)

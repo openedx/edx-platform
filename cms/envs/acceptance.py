@@ -115,7 +115,7 @@ USE_I18N = True
 # django.contrib.staticfiles is not added to lms as there is a ^/static$ route built in to the app
 if 'lettuce.django' not in INSTALLED_APPS:
     INSTALLED_APPS.append('lettuce.django')
-    
+
 LETTUCE_APPS = ('contentstore',)
 LETTUCE_BROWSER = os.environ.get('LETTUCE_BROWSER', 'chrome')
 

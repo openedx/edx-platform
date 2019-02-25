@@ -289,7 +289,7 @@ if FEATURES.get('AUTH_USE_CAS'):
 
     if 'django_cas.middleware.CASMiddleware' not in MIDDLEWARE_CLASSES:
         MIDDLEWARE_CLASSES.append('django_cas.middleware.CASMiddleware')
-        
+
     CAS_ATTRIBUTE_CALLBACK = ENV_TOKENS.get('CAS_ATTRIBUTE_CALLBACK', None)
     if CAS_ATTRIBUTE_CALLBACK:
         import importlib

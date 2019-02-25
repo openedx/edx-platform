@@ -15,9 +15,10 @@ from xmodule.modulestore.modulestore_settings import convert_module_store_settin
 
 from .common import *
 
-from openedx.core.lib.derived import derive_settings  # pylint: disable=wrong-import-order
-from openedx.core.lib.logsettings import get_logger_config  # pylint: disable=wrong-import-order
+from openedx.core.lib.derived import derive_settings # pylint: disable=wrong-import-order
+from openedx.core.lib.logsettings import get_logger_config # pylint: disable=wrong-import-order
 from django.core.exceptions import ImproperlyConfigured # pylint: disable=wrong-import-order
+
 
 def get_env_setting(setting):
     """ Get the environment setting or return exception """
@@ -155,8 +156,6 @@ LMS_INTERNAL_ROOT_URL = __config__.get('LMS_INTERNAL_ROOT_URL', LMS_ROOT_URL)
 ENTERPRISE_API_URL = __config__.get('ENTERPRISE_API_URL', LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/')
 ENTERPRISE_CONSENT_API_URL = __config__.get('ENTERPRISE_CONSENT_API_URL', LMS_INTERNAL_ROOT_URL + '/consent/api/v1/')
 # Note that FEATURES['PREVIEW_LMS_BASE'] gets read in from the environment file.
-
-
 
 # List of logout URIs for each IDA that the learner should be logged out of when they logout of
 # Studio. Only applies to IDA for which the social auth flow uses DOT (Django OAuth Toolkit).
@@ -306,7 +305,7 @@ if FEATURES.get('AUTH_USE_CAS'):
 
     if 'django_cas.middleware.CASMiddleware' not in MIDDLEWARE_CLASSES:
         MIDDLEWARE_CLASSES.append('django_cas.middleware.CASMiddleware')
-    
+
     CAS_ATTRIBUTE_CALLBACK = __config__.get('CAS_ATTRIBUTE_CALLBACK', None)
     if CAS_ATTRIBUTE_CALLBACK:
         import importlib

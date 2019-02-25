@@ -841,7 +841,7 @@ if FEATURES.get('CUSTOM_COURSES_EDX'):
 
     if 'lms.djangoapps.ccx' not in INSTALLED_APPS:
         INSTALLED_APPS.append('lms.djangoapps.ccx')
-    
+
     MODULESTORE_FIELD_OVERRIDE_PROVIDERS += ('lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider',)
 
 CCX_MAX_STUDENTS_ALLOWED = ENV_TOKENS.get('CCX_MAX_STUDENTS_ALLOWED', CCX_MAX_STUDENTS_ALLOWED)

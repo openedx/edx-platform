@@ -1,5 +1,5 @@
 """
-This config file extends the test environment configuration
+This congfig file extends the test environment configuration
 so that we can run the lettuce acceptance tests.
 """
 
@@ -148,7 +148,7 @@ FEATURES['ENABLE_FEEDBACK_SUBMISSION'] = False
 # Include the lettuce app for acceptance testing, including the 'harvest' django-admin command
 if 'lettuce.django' not in INSTALLED_APPS:
     INSTALLED_APPS.append('lettuce.django')
-    
+
 LETTUCE_APPS = ('courseware', 'instructor')
 
 # Lettuce appears to have a bug that causes it to search

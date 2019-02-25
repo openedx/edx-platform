@@ -31,7 +31,7 @@ if 'BOK_CHOY_HOSTNAME' in os.environ:
     os.environ['SERVICE_VARIANT'] = 'bok_choy_docker'
 else:
     os.environ['SERVICE_VARIANT'] = 'bok_choy'
-    
+
 os.environ['CONFIG_ROOT'] = path(__file__).abspath().dirname()
 os.environ['LMS_CFG'] = str.format("{}/{}.yml", path(__file__).abspath().dirname(), os.environ['SERVICE_VARIANT'])
 
