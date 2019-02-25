@@ -402,11 +402,11 @@ def create_multiple_choice_problem(problem_name):
     )
 
 
-def auto_auth(browser, username, email, staff, course_id):
+def auto_auth(browser, username, email, staff, course_id, **kwargs):
     """
     Logout and login with given credentials.
     """
-    AutoAuthPage(browser, username=username, email=email, course_id=course_id, staff=staff).visit()
+    AutoAuthPage(browser, username=username, email=email, course_id=course_id, staff=staff, **kwargs).visit()
 
 
 def assert_link(test, expected_link, actual_link):
