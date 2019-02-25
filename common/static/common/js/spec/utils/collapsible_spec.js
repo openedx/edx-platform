@@ -1,5 +1,5 @@
 /* globals Collapsible */
-(function(this) {
+(function() {
     'use strict';
 
     describe('Collapsible', function() {
@@ -119,4 +119,4 @@
             });
         });
     });
-}).call(this);
+})()

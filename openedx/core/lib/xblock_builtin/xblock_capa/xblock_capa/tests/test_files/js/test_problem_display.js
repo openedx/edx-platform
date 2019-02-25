@@ -1,4 +1,3 @@
-/* eslint-disable no-class */
 /*
  * decaffeinate suggestions:
  * DS001: Remove Babel/TypeScript constructor workaround

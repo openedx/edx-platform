@@ -46,16 +46,12 @@ cms/static/js/spec/views/course_info_spec.js
 cms/static/js/spec/views/metadata_edit_spec.js
 cms/static/js/spec/views/textbook_spec.js
 cms/static/js/spec/views/upload_spec.js
-common/lib/capa/capa/tests/test_files/js/test_problem_display.js
-common/lib/capa/capa/tests/test_files/js/test_problem_generator.js
-common/lib/capa/capa/tests/test_files/js/test_problem_grader.js
-common/lib/capa/capa/tests/test_files/js/xproblem.js
 common/lib/xmodule/xmodule/js/spec/annotatable/display_spec.js
-common/lib/xmodule/xmodule/js/spec/capa/display_spec.js
 common/lib/xmodule/xmodule/js/spec/html/edit_spec.js
-common/lib/xmodule/xmodule/js/spec/problem/edit_spec_hint.js
-common/lib/xmodule/xmodule/js/spec/problem/edit_spec.js
 common/lib/xmodule/xmodule/js/spec/tabs/edit.js
+common/static/common/js/spec/capa/display_spec.js
+common/static/common/js/spec/capa/edit_spec_hint.js
+common/static/common/js/spec/capa/edit_spec.js
 lms/static/js/spec/calculator_spec.js
 lms/static/js/spec/courseware_spec.js
 lms/static/js/spec/feedback_form_spec.js
@@ -63,6 +59,10 @@ lms/static/js/spec/helper.js
 lms/static/js/spec/histogram_spec.js
 lms/static/js/spec/modules/tab_spec.js
 lms/static/js/spec/requirejs_spec.js
+openedx/core/xblock_builtin/xblock_capa/xblock_capa/tests/test_files/js/test_problem_display.js
+openedx/core/xblock_builtin/xblock_capa/xblock_capa/tests/test_files/js/test_problem_generator.js
+openedx/core/xblock_builtin/xblock_capa/xblock_capa/tests/test_files/js/test_problem_grader.js
+openedx/core/xblock_builtin/xblock_capa/xblock_capa/tests/test_files/js/xproblem.js
 
 
 !**/.eslintrc.js

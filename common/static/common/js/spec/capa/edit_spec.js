@@ -1,4 +1,3 @@
-/* eslint-disable no-const */
 describe('CapaMarkdownEditor', function() {
   describe('save stores the correct data', function() {
     it('saves markdown from markdown editor', function() {

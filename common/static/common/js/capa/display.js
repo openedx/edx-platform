@@ -18,7 +18,7 @@
             return -1;
         };
 
-    var Problem = (function() {
+    this.Problem = (function() {  // eslint-disable-line wrap-iife
         function Problem(element, runtime) {
             var that = this;
             this.hint_button = function() {
@@ -1326,8 +1326,6 @@
 
         return Problem;
     })();
-
-    this.Problem = Problem;
 }).call(this);
 
 function CapaXBlock(runtime, element) {

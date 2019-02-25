@@ -25,9 +25,9 @@
         el.find('.longform').hide();
         edx.HtmlUtils.append(el.find('.shortform'), edx.StringUtils.interpolate(
                 '{linkTop}{linkBottom}', {
-                linkTop: linkTop,
-                linkBottom: linkBottom
-            })
+                    linkTop: linkTop,
+                    linkBottom: linkBottom
+                })
         );
 
         // Custom longform + shortform text pattern.
@@ -41,8 +41,8 @@
             closeText = $(elt).data('close-text');
             edx.HtmlUtils.append($(elt), edx.StringUtils.interpolate(
                     "<a href='#' class='full-custom'>{text}</a>", {
-                    text: openText
-                })
+                        text: openText
+                    })
             );
 
             $(elt).find('.full-custom').click(function(event) {
@@ -116,8 +116,6 @@
     Collapsible.setCollapsibles = setCollapsibles;
     Collapsible.toggleFull = toggleFull;
     Collapsible.toggleHint = toggleHint;
-
     this.Collapsible = Collapsible;
     return;
-
 }).call(this);

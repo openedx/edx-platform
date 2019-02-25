@@ -3,8 +3,8 @@ Test capa problem.
 """
 import textwrap
 
-import six
 import unittest
+import six
 import ddt
 
 from lxml import etree
