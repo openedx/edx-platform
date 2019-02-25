@@ -162,7 +162,7 @@ ENTERPRISE_CONSENT_API_URL = __config__.get('ENTERPRISE_CONSENT_API_URL', LMS_IN
 # Studio. Only applies to IDA for which the social auth flow uses DOT (Django OAuth Toolkit).
 IDA_LOGOUT_URI_LIST = __config__.get('IDA_LOGOUT_URI_LIST', [])
 
-SITE_NAME = __config__.get['SITE_NAME']
+SITE_NAME = __config__.get('SITE_NAME')
 
 ALLOWED_HOSTS = [
     # TODO: bbeggs remove this before prod, temp fix to get load testing running
