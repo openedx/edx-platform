@@ -69,9 +69,15 @@ CELERY_ALWAYS_EAGER = True
 
 ################################ DEBUG TOOLBAR ################################
 
-INSTALLED_APPS += ['debug_toolbar', 'debug_toolbar_mongo']
+if 'debug_toolbar' not in INSTALLED_APPS:
+    INSTALLED_APPS.append('debug_toolbar')
 
-MIDDLEWARE_CLASSES.append('debug_toolbar.middleware.DebugToolbarMiddleware')
+if 'debug_toolbar_mongo' not in INSTALLED_APPS:
+    INSTALLED_APPS.append('debug_toolbar_mongo')
+
+if 'debug_toolbar.middleware.DebugToolbarMiddleware' not in MIDDLEWARE_CLASSES:
+    MIDDLEWARE_CLASSES.append('debug_toolbar.middleware.DebugToolbarMiddleware')
+
 INTERNAL_IPS = ('127.0.0.1',)
 
 DEBUG_TOOLBAR_PANELS = (

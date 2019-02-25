@@ -146,7 +146,9 @@ USE_I18N = True
 FEATURES['ENABLE_FEEDBACK_SUBMISSION'] = False
 
 # Include the lettuce app for acceptance testing, including the 'harvest' django-admin command
-INSTALLED_APPS.append('lettuce.django')
+if 'lettuce.django' not in INSTALLED_APPS:
+    INSTALLED_APPS.append('lettuce.django')
+    
 LETTUCE_APPS = ('courseware', 'instructor')
 
 # Lettuce appears to have a bug that causes it to search

@@ -206,8 +206,11 @@ FEATURES['ENABLE_DISCUSSION_HOME_PANEL'] = True
 FEATURES['ENABLE_OPENBADGES'] = True
 
 FEATURES['ENABLE_LTI_PROVIDER'] = True
-INSTALLED_APPS.append('lti_provider.apps.LtiProviderConfig')
-AUTHENTICATION_BACKENDS.append('lti_provider.users.LtiBackend')
+if 'lti_provider.apps.LtiProviderConfig' not in INSTALLED_APPS:
+    INSTALLED_APPS.append('lti_provider.apps.LtiProviderConfig')
+
+if 'lti_provider.users.LtiBackend' not in AUTHENTICATION_BACKENDS:
+    AUTHENTICATION_BACKENDS.append('lti_provider.users.LtiBackend')
 
 FEATURES['ENABLE_THIRD_PARTY_AUTH'] = True
 THIRD_PARTY_AUTH = {
@@ -248,7 +251,9 @@ PROFILE_IMAGE_BACKEND = {
 
 # Make sure we test with the extended history table
 FEATURES['ENABLE_CSMH_EXTENDED'] = True
-INSTALLED_APPS.append('coursewarehistoryextended')
+
+if 'coursewarehistoryextended' not in INSTALLED_APPS:
+    INSTALLED_APPS.append('coursewarehistoryextended')
 
 BADGING_BACKEND = 'lms.djangoapps.badges.backends.tests.dummy_backend.DummyBackend'
 

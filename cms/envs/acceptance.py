@@ -113,7 +113,9 @@ USE_I18N = True
 # Include the lettuce app for acceptance testing, including the 'harvest' django-admin command
 # django.contrib.staticfiles used to be loaded by lettuce, now we must add it ourselves
 # django.contrib.staticfiles is not added to lms as there is a ^/static$ route built in to the app
-INSTALLED_APPS.append('lettuce.django')
+if 'lettuce.django' not in INSTALLED_APPS:
+    INSTALLED_APPS.append('lettuce.django')
+    
 LETTUCE_APPS = ('contentstore',)
 LETTUCE_BROWSER = os.environ.get('LETTUCE_BROWSER', 'chrome')
 

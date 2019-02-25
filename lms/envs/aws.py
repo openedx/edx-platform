@@ -322,7 +322,8 @@ USE_I18N = ENV_TOKENS.get('USE_I18N', USE_I18N)
 
 # Additional installed apps
 for app in ENV_TOKENS.get('ADDL_INSTALLED_APPS', []):
-    INSTALLED_APPS.append(app)
+    if app not in INSTALLED_APPS:
+        INSTALLED_APPS.append(app)
 
 WIKI_ENABLED = ENV_TOKENS.get('WIKI_ENABLED', WIKI_ENABLED)
 
@@ -390,10 +391,11 @@ if FEATURES.get('AUTH_USE_CAS'):
         'django.contrib.auth.backends.ModelBackend',
         'django_cas.backends.CASBackend',
     ]
+    if 'django_cas' not in INSTALLED_APPS:
+        INSTALLED_APPS.append('django_cas')
 
-    INSTALLED_APPS.append('django_cas')
-
-    MIDDLEWARE_CLASSES.append('django_cas.middleware.CASMiddleware')
+    if 'django_cas.middleware.CASMiddleware' not in MIDDLEWARE_CLASSES:
+        MIDDLEWARE_CLASSES.append('django_cas.middleware.CASMiddleware')
     CAS_ATTRIBUTE_CALLBACK = ENV_TOKENS.get('CAS_ATTRIBUTE_CALLBACK', None)
     if CAS_ATTRIBUTE_CALLBACK:
         import importlib
@@ -840,25 +842,17 @@ if FEATURES.get('CUSTOM_COURSES_EDX'):
     if 'lms.djangoapps.ccx' not in INSTALLED_APPS:
         INSTALLED_APPS.append('lms.djangoapps.ccx')
     
-    MODULESTORE_FIELD_OVERRIDE_PROVIDERS += (
-        'lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider',
-    )
+    MODULESTORE_FIELD_OVERRIDE_PROVIDERS += ('lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider',)
+
 CCX_MAX_STUDENTS_ALLOWED = ENV_TOKENS.get('CCX_MAX_STUDENTS_ALLOWED', CCX_MAX_STUDENTS_ALLOWED)
 
 ##### Individual Due Date Extensions #####
 if FEATURES.get('INDIVIDUAL_DUE_DATES'):
-    FIELD_OVERRIDE_PROVIDERS += (
-        'lms.djangoapps.courseware.student_field_overrides.IndividualStudentOverrideProvider',
-    )
+    FIELD_OVERRIDE_PROVIDERS += ('lms.djangoapps.courseware.student_field_overrides.IndividualStudentOverrideProvider',)
 
 ##### Self-Paced Course Due Dates #####
-XBLOCK_FIELD_DATA_WRAPPERS += (
-    'lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap',
-)
-
-MODULESTORE_FIELD_OVERRIDE_PROVIDERS += (
-    'courseware.self_paced_overrides.SelfPacedDateOverrideProvider',
-)
+XBLOCK_FIELD_DATA_WRAPPERS += ('lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap',)
+MODULESTORE_FIELD_OVERRIDE_PROVIDERS += ('courseware.self_paced_overrides.SelfPacedDateOverrideProvider',)
 
 # PROFILE IMAGE CONFIG
 PROFILE_IMAGE_BACKEND = ENV_TOKENS.get('PROFILE_IMAGE_BACKEND', PROFILE_IMAGE_BACKEND)
@@ -885,8 +879,10 @@ CREDIT_PROVIDER_SECRET_KEYS = AUTH_TOKENS.get("CREDIT_PROVIDER_SECRET_KEYS", {})
 
 ##################### LTI Provider #####################
 if FEATURES.get('ENABLE_LTI_PROVIDER'):
-    INSTALLED_APPS.append('lti_provider.apps.LtiProviderConfig')
-    AUTHENTICATION_BACKENDS.append('lti_provider.users.LtiBackend')
+    if 'lti_provider.apps.LtiProviderConfig' not in INSTALLED_APPS:
+        INSTALLED_APPS.append('lti_provider.apps.LtiProviderConfig')
+    if 'lti_provider.users.LtiBackend' not in AUTHENTICATION_BACKENDS:
+        AUTHENTICATION_BACKENDS.append('lti_provider.users.LtiBackend')
 
 LTI_USER_EMAIL_DOMAIN = ENV_TOKENS.get('LTI_USER_EMAIL_DOMAIN', 'lti.example.com')
 
@@ -931,7 +927,7 @@ CREDENTIALS_GENERATION_ROUTING_KEY = ENV_TOKENS.get('CREDENTIALS_GENERATION_ROUT
 PROGRAM_CERTIFICATES_ROUTING_KEY = ENV_TOKENS.get('PROGRAM_CERTIFICATES_ROUTING_KEY', DEFAULT_PRIORITY_QUEUE)
 
 # The extended StudentModule history table
-if FEATURES.get('ENABLE_CSMH_EXTENDED'):
+if FEATURES.get('ENABLE_CSMH_EXTENDED') and 'coursewarehistoryextended' not in INSTALLED_APPS:
     INSTALLED_APPS.append('coursewarehistoryextended')
 
 API_ACCESS_MANAGER_EMAIL = ENV_TOKENS.get('API_ACCESS_MANAGER_EMAIL')

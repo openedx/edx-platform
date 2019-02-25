@@ -58,11 +58,17 @@ DJFS = {
 
 ################################ DEBUG TOOLBAR ################################
 
-INSTALLED_APPS += ['debug_toolbar', 'debug_toolbar_mongo']
-MIDDLEWARE_CLASSES += [
-    'django_comment_client.utils.QueryCountDebugMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
-]
+if 'debug_toolbar' not in INSTALLED_APPS:
+    INSTALLED_APPS.append('debug_toolbar')
+
+if 'debug_toolbar_mongo' not in INSTALLED_APPS:
+    INSTALLED_APPS.append('debug_toolbar_mongo')
+
+if 'django_comment_client.utils.QueryCountDebugMiddleware' not in MIDDLEWARE_CLASSES:
+    MIDDLEWARE_CLASSES.append('django_comment_client.utils.QueryCountDebugMiddleware')
+
+if 'debug_toolbar.middleware.DebugToolbarMiddleware' not in MIDDLEWARE_CLASSES:
+    MIDDLEWARE_CLASSES.append('debug_toolbar.middleware.DebugToolbarMiddleware')
 
 INTERNAL_IPS = ('127.0.0.1',)
 

@@ -264,7 +264,8 @@ for feature, value in ENV_FEATURES.items():
 
 # Additional installed apps
 for app in __config__.get('ADDL_INSTALLED_APPS', []):
-    INSTALLED_APPS.append(app)
+    if app not in INSTALLED_APPS:
+        INSTALLED_APPS.append(app)
 
 WIKI_ENABLED = __config__.get('WIKI_ENABLED', WIKI_ENABLED)
 
@@ -300,9 +301,12 @@ if FEATURES.get('AUTH_USE_CAS'):
         'django_cas.backends.CASBackend',
     ]
 
-    INSTALLED_APPS.append('django_cas')
+    if 'django_cas' not in INSTALLED_APPS:
+        INSTALLED_APPS.append('django_cas')
 
-    MIDDLEWARE_CLASSES.append('django_cas.middleware.CASMiddleware')
+    if 'django_cas.middleware.CASMiddleware' not in MIDDLEWARE_CLASSES:
+        MIDDLEWARE_CLASSES.append('django_cas.middleware.CASMiddleware')
+    
     CAS_ATTRIBUTE_CALLBACK = __config__.get('CAS_ATTRIBUTE_CALLBACK', None)
     if CAS_ATTRIBUTE_CALLBACK:
         import importlib

@@ -337,7 +337,8 @@ USE_I18N = __config__.get('USE_I18N', USE_I18N)
 
 # Additional installed apps
 for app in __config__.get('ADDL_INSTALLED_APPS', []):
-    INSTALLED_APPS.append(app)
+    if app not in INSTALLED_APPS:
+        INSTALLED_APPS.append(app)
 
 WIKI_ENABLED = __config__.get('WIKI_ENABLED', WIKI_ENABLED)
 
@@ -406,9 +407,12 @@ if FEATURES.get('AUTH_USE_CAS'):
         'django_cas.backends.CASBackend',
     ]
 
-    INSTALLED_APPS.append('django_cas')
+    if 'django_cas' not in INSTALLED_APPS:
+        INSTALLED_APPS.append('django_cas')
 
-    MIDDLEWARE_CLASSES.append('django_cas.middleware.CASMiddleware')
+    if 'django_cas.middleware.CASMiddleware' not in MIDDLEWARE_CLASSES:
+        MIDDLEWARE_CLASSES.append('django_cas.middleware.CASMiddleware')
+
     CAS_ATTRIBUTE_CALLBACK = __config__.get('CAS_ATTRIBUTE_CALLBACK', None)
     if CAS_ATTRIBUTE_CALLBACK:
         import importlib
@@ -839,7 +843,7 @@ if FEATURES.get('CUSTOM_COURSES_EDX'):
     
     # We have to check if this has been added yet until aws.py is removed because otherwise falling back to aws.py may
     # add a duplicate to this list
-    if 'lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider' not in MODULESTORE_FIELD_OVERRIDE_PROVIDERS:
+    if ('lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider',) not in MODULESTORE_FIELD_OVERRIDE_PROVIDERS:
         MODULESTORE_FIELD_OVERRIDE_PROVIDERS += ('lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider',)
     
 CCX_MAX_STUDENTS_ALLOWED = __config__.get('CCX_MAX_STUDENTS_ALLOWED', CCX_MAX_STUDENTS_ALLOWED)
@@ -849,19 +853,19 @@ if FEATURES.get('INDIVIDUAL_DUE_DATES'):
     
     # We have to check if this has been added yet until aws.py is removed because otherwise falling back to aws.py may
     # add a duplicate to this list
-    if 'courseware.student_field_overrides.IndividualStudentOverrideProvider' not in FIELD_OVERRIDE_PROVIDERS:
+    if ('courseware.student_field_overrides.IndividualStudentOverrideProvider',) not in FIELD_OVERRIDE_PROVIDERS:
         FIELD_OVERRIDE_PROVIDERS += ('courseware.student_field_overrides.IndividualStudentOverrideProvider',)
     
 
 ##### Self-Paced Course Due Dates #####
-if 'lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap' not in XBLOCK_FIELD_DATA_WRAPPERS:
+if ('lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap',) not in XBLOCK_FIELD_DATA_WRAPPERS:
     
     # We have to check if this has been added yet until aws.py is removed because otherwise falling back to aws.py may
     # add a duplicate to this list
     XBLOCK_FIELD_DATA_WRAPPERS += ('lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap',)
 
 
-if 'courseware.self_paced_overrides.SelfPacedDateOverrideProvider' not in MODULESTORE_FIELD_OVERRIDE_PROVIDERS:
+if ('courseware.self_paced_overrides.SelfPacedDateOverrideProvider',) not in MODULESTORE_FIELD_OVERRIDE_PROVIDERS:
     
     # We have to check if this has been added yet until aws.py is removed because otherwise falling back to aws.py may
     # add a duplicate to this list
@@ -893,8 +897,10 @@ CREDIT_PROVIDER_SECRET_KEYS = __config__.get("CREDIT_PROVIDER_SECRET_KEYS", {})
 
 ##################### LTI Provider #####################
 if FEATURES.get('ENABLE_LTI_PROVIDER'):
-    INSTALLED_APPS.append('lti_provider.apps.LtiProviderConfig')
-    AUTHENTICATION_BACKENDS.append('lti_provider.users.LtiBackend')
+    if 'lti_provider.apps.LtiProviderConfig' not in INSTALLED_APPS:
+        INSTALLED_APPS.append('lti_provider.apps.LtiProviderConfig')
+    if 'lti_provider.users.LtiBackend' not in AUTHENTICATION_BACKENDS:
+        AUTHENTICATION_BACKENDS.append('lti_provider.users.LtiBackend')
 
 LTI_USER_EMAIL_DOMAIN = __config__.get('LTI_USER_EMAIL_DOMAIN', 'lti.example.com')
 
@@ -940,7 +946,8 @@ PROGRAM_CERTIFICATES_ROUTING_KEY = ENV_TOKENS.get('PROGRAM_CERTIFICATES_ROUTING_
 
 # The extended StudentModule history table
 if FEATURES.get('ENABLE_CSMH_EXTENDED'):
-    INSTALLED_APPS.append('coursewarehistoryextended')
+    if 'coursewarehistoryextended' not in INSTALLED_APPS:
+        INSTALLED_APPS.append('coursewarehistoryextended')
 
 API_ACCESS_MANAGER_EMAIL = __config__.get('API_ACCESS_MANAGER_EMAIL')
 API_ACCESS_FROM_EMAIL = __config__.get('API_ACCESS_FROM_EMAIL')

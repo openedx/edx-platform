@@ -98,7 +98,8 @@ if STATIC_URL_BASE:
     STATIC_URL = STATIC_URL_BASE.encode('ascii')
     if not STATIC_URL.endswith("/"):
         STATIC_URL += "/"
-    STATIC_URL += 'studio/'
+    if not STATIC_URL.endswith("studio/"):
+        STATIC_URL += "studio/"
 
 # DEFAULT_COURSE_ABOUT_IMAGE_URL specifies the default image to show for courses that don't provide one
 DEFAULT_COURSE_ABOUT_IMAGE_URL = ENV_TOKENS.get('DEFAULT_COURSE_ABOUT_IMAGE_URL', DEFAULT_COURSE_ABOUT_IMAGE_URL)
@@ -250,7 +251,8 @@ for feature, value in ENV_FEATURES.items():
 
 # Additional installed apps
 for app in ENV_TOKENS.get('ADDL_INSTALLED_APPS', []):
-    INSTALLED_APPS.append(app)
+    if app not in INSTALLED_APPS:
+        INSTALLED_APPS.append(app)
 
 WIKI_ENABLED = ENV_TOKENS.get('WIKI_ENABLED', WIKI_ENABLED)
 
@@ -282,9 +284,12 @@ if FEATURES.get('AUTH_USE_CAS'):
         'django_cas.backends.CASBackend',
     ]
 
-    INSTALLED_APPS.append('django_cas')
+    if 'django_cas' not in INSTALLED_APPS:
+        INSTALLED_APPS.append('django_cas')
 
-    MIDDLEWARE_CLASSES.append('django_cas.middleware.CASMiddleware')
+    if 'django_cas.middleware.CASMiddleware' not in MIDDLEWARE_CLASSES:
+        MIDDLEWARE_CLASSES.append('django_cas.middleware.CASMiddleware')
+        
     CAS_ATTRIBUTE_CALLBACK = ENV_TOKENS.get('CAS_ATTRIBUTE_CALLBACK', None)
     if CAS_ATTRIBUTE_CALLBACK:
         import importlib

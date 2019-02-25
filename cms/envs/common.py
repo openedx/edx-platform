@@ -1316,7 +1316,8 @@ for app_name, insert_before in OPTIONAL_APPS:
     try:
         INSTALLED_APPS.insert(INSTALLED_APPS.index(insert_before), app_name)
     except (IndexError, ValueError):
-        INSTALLED_APPS.append(app_name)
+        if app_name not in INSTALLED_APPS:
+            INSTALLED_APPS.append(app_name)
 
 
 ### External auth usage -- prefixes for ENROLLMENT_DOMAIN

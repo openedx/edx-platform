@@ -643,7 +643,8 @@ def _add_microsite_dirs_to_default_template_engine(settings):
     Derives the final DEFAULT_TEMPLATE_ENGINE['DIRS'] setting from other settings.
     """
     if settings.FEATURES.get('USE_MICROSITES', False) and getattr(settings, "MICROSITE_CONFIGURATION", False):
-        DEFAULT_TEMPLATE_ENGINE_DIRS.append(settings.MICROSITE_ROOT_DIR)
+        if settings.MICROSITE_ROOT_DIR not in DEFAULT_TEMPLATE_ENGINE_DIRS:
+            DEFAULT_TEMPLATE_ENGINE_DIRS.append(settings.MICROSITE_ROOT_DIR)
     return DEFAULT_TEMPLATE_ENGINE_DIRS
 
 
@@ -1077,7 +1078,8 @@ def _make_locale_paths(settings):
     if settings.ENABLE_COMPREHENSIVE_THEMING:
         # Add locale paths to settings for comprehensive theming.
         for locale_path in settings.COMPREHENSIVE_THEME_LOCALE_PATHS:
-            locale_paths += (path(locale_path), )
+            if (path(locale_path), ) not in locale_paths:
+                locale_paths += (path(locale_path), )
     return locale_paths
 LOCALE_PATHS = _make_locale_paths
 derived('LOCALE_PATHS')
@@ -2465,7 +2467,8 @@ DISABLE_ACCOUNT_ACTIVATION_REQUIREMENT_SWITCH = "verify_student_disable_account_
 ### This enables the Metrics tab for the Instructor dashboard ###########
 FEATURES['CLASS_DASHBOARD'] = False
 if FEATURES.get('CLASS_DASHBOARD'):
-    INSTALLED_APPS.append('class_dashboard')
+    if 'class_dashboard' not in INSTALLED_APPS:
+        INSTALLED_APPS.append('class_dashboard')
 
 ################ Enable credit eligibility feature ####################
 ENABLE_CREDIT_ELIGIBILITY = True
@@ -2480,9 +2483,11 @@ if FEATURES.get('AUTH_USE_CAS'):
         'django_cas.backends.CASBackend',
     ]
 
-    INSTALLED_APPS.append('django_cas')
+    if 'django_cas' not in INSTALLED_APPS:
+        INSTALLED_APPS.append('django_cas')
 
-    MIDDLEWARE_CLASSES.append('django_cas.middleware.CASMiddleware')
+    if 'django_cas.middleware.CASMiddleware' not in MIDDLEWARE_CLASSES:
+        MIDDLEWARE_CLASSES.append('django_cas.middleware.CASMiddleware')
 
 ############# Cross-domain requests #################
 
@@ -2894,7 +2899,8 @@ for app_name, insert_before in OPTIONAL_APPS:
     try:
         INSTALLED_APPS.insert(INSTALLED_APPS.index(insert_before), app_name)
     except (IndexError, ValueError):
-        INSTALLED_APPS.append(app_name)
+        if app_name not in INSTALLED_APPS:
+            INSTALLED_APPS.append(app_name)
 
 ### External auth usage -- prefixes for ENROLLMENT_DOMAIN
 SHIBBOLETH_DOMAIN_PREFIX = 'shib:'

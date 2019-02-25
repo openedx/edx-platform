@@ -132,11 +132,10 @@ STATICFILES_DIRS = [
     COMMON_ROOT / "static",
     PROJECT_ROOT / "static",
 ]
-STATICFILES_DIRS += [
-    (course_dir, COMMON_TEST_DATA_ROOT / course_dir)
-    for course_dir in os.listdir(COMMON_TEST_DATA_ROOT)
-    if os.path.isdir(COMMON_TEST_DATA_ROOT / course_dir)
-]
+
+for course_dir in os.listdir(COMMON_TEST_DATA_ROOT):
+    if os.path.isdir(COMMON_TEST_DATA_ROOT / course_dir) and (course_dir, COMMON_TEST_DATA_ROOT / course_dir) not in STATICFILES_DIRS:
+        STATICFILES_DIRS.append((course_dir, COMMON_TEST_DATA_ROOT / course_dir))
 
 # Avoid having to run collectstatic before the unit test suite
 # If we don't add these settings, then Django templates that can't
@@ -189,7 +188,8 @@ if os.environ.get('DISABLE_MIGRATIONS'):
 
 # Make sure we test with the extended history table
 FEATURES['ENABLE_CSMH_EXTENDED'] = True
-INSTALLED_APPS.append('coursewarehistoryextended')
+if 'coursewarehistoryextended' not in INSTALLED_APPS:
+    INSTALLED_APPS.append('coursewarehistoryextended')
 
 CACHES = {
     # This is the cache used for most things.
@@ -338,7 +338,9 @@ ACTIVATION_EMAIL_SUPPORT_LINK = 'https://support.example.com/activation-email-he
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 MEDIA_ROOT = TEST_ROOT / "uploads"
 MEDIA_URL = "/static/uploads/"
-STATICFILES_DIRS.append(("uploads", MEDIA_ROOT))
+
+if ("uploads", MEDIA_ROOT) not in STATICFILES_DIRS:
+    STATICFILES_DIRS.append(("uploads", MEDIA_ROOT))
 
 _NEW_STATICFILES_DIRS = []
 # Strip out any static files that aren't in the repository root
@@ -350,8 +352,9 @@ for static_dir in STATICFILES_DIRS:
     except ValueError:
         data_dir = static_dir
 
-    if data_dir.startswith(REPO_ROOT):
+    if data_dir.startswith(REPO_ROOT) and static_dir not in _NEW_STATICFILES_DIRS:
         _NEW_STATICFILES_DIRS.append(static_dir)
+        
 STATICFILES_DIRS = _NEW_STATICFILES_DIRS
 
 FILE_UPLOAD_TEMP_DIR = TEST_ROOT / "uploads"
@@ -530,7 +533,7 @@ if 'openedx.core.djangoapps.ccxcon.apps.CCXConnectorConfig' not in INSTALLED_APP
 
 if 'lms.djangoapps.ccx' not in INSTALLED_APPS:
     INSTALLED_APPS.append('lms.djangoapps.ccx')
-    
+
 FEATURES['CUSTOM_COURSES_EDX'] = True
 
 # Set dummy values for profile image settings.
@@ -549,8 +552,11 @@ PROFILE_IMAGE_MIN_BYTES = 100
 
 # Enable the LTI provider feature for testing
 FEATURES['ENABLE_LTI_PROVIDER'] = True
-INSTALLED_APPS.append('lti_provider.apps.LtiProviderConfig')
-AUTHENTICATION_BACKENDS.append('lti_provider.users.LtiBackend')
+if 'lti_provider.apps.LtiProviderConfig' not in INSTALLED_APPS:
+    INSTALLED_APPS.append('lti_provider.apps.LtiProviderConfig')
+
+if 'lti_provider.users.LtiBackend' not in AUTHENTICATION_BACKENDS:
+    AUTHENTICATION_BACKENDS.append('lti_provider.users.LtiBackend')
 
 # ORGANIZATIONS
 FEATURES['ORGANIZATIONS_APP'] = True
