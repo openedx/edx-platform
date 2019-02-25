@@ -840,7 +840,7 @@ if FEATURES.get('CUSTOM_COURSES_EDX'):
     # We have to check if this has been added yet until aws.py is removed because otherwise falling back to aws.py may
     # add a duplicate to this list
     if 'lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider' not in MODULESTORE_FIELD_OVERRIDE_PROVIDERS:
-        MODULESTORE_FIELD_OVERRIDE_PROVIDERS += ('lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider')
+        MODULESTORE_FIELD_OVERRIDE_PROVIDERS += ('lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider',)
     
 CCX_MAX_STUDENTS_ALLOWED = __config__.get('CCX_MAX_STUDENTS_ALLOWED', CCX_MAX_STUDENTS_ALLOWED)
 
@@ -850,7 +850,7 @@ if FEATURES.get('INDIVIDUAL_DUE_DATES'):
     # We have to check if this has been added yet until aws.py is removed because otherwise falling back to aws.py may
     # add a duplicate to this list
     if 'courseware.student_field_overrides.IndividualStudentOverrideProvider' not in FIELD_OVERRIDE_PROVIDERS:
-        FIELD_OVERRIDE_PROVIDERS += ('courseware.student_field_overrides.IndividualStudentOverrideProvider')
+        FIELD_OVERRIDE_PROVIDERS += ('courseware.student_field_overrides.IndividualStudentOverrideProvider',)
     
 
 ##### Self-Paced Course Due Dates #####
@@ -858,14 +858,14 @@ if 'lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap'
     
     # We have to check if this has been added yet until aws.py is removed because otherwise falling back to aws.py may
     # add a duplicate to this list
-    XBLOCK_FIELD_DATA_WRAPPERS += ('lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap')
+    XBLOCK_FIELD_DATA_WRAPPERS += ('lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap',)
 
 
 if 'courseware.self_paced_overrides.SelfPacedDateOverrideProvider' not in MODULESTORE_FIELD_OVERRIDE_PROVIDERS:
     
     # We have to check if this has been added yet until aws.py is removed because otherwise falling back to aws.py may
     # add a duplicate to this list
-    MODULESTORE_FIELD_OVERRIDE_PROVIDERS += ('courseware.self_paced_overrides.SelfPacedDateOverrideProvider')
+    MODULESTORE_FIELD_OVERRIDE_PROVIDERS += ('courseware.self_paced_overrides.SelfPacedDateOverrideProvider',)
 
 
 # PROFILE IMAGE CONFIG
