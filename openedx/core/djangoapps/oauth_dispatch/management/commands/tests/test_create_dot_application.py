@@ -31,13 +31,13 @@ class TestCreateDotApplication(TestCase):
         Application.objects.filter(user=self.user).delete()
 
     @ddt.data(
-        (None, None, None, None),
-        (None, None, 'client-abc', None),
-        (None, None, None, 'great-big-secret'),
-        ('password', True, 'client-dce', 'has-a-great-big-secret'),
+        (None, None, None, None, False),
+        (None, None, 'client-abc', None, False),
+        (None, None, None, 'great-big-secret', False),
+        ('password', True, 'client-dce', 'has-a-great-big-secret', True),
     )
     @ddt.unpack
-    def test_create_dot_application(self, grant_type, public, client_id, client_secret):
+    def test_create_dot_application(self, grant_type, public, client_id, client_secret, skip_auth):
         # Add optional arguments if provided
         call_args = ['testing_application', self.user.username]
         if grant_type:
@@ -58,6 +58,8 @@ class TestCreateDotApplication(TestCase):
         if client_secret:
             call_args.append('--client-secret')
             call_args.append(client_secret)
+        if skip_auth:
+            call_args.append('--skip-authorization')
 
         call_command(Command(), *call_args)
 
@@ -69,6 +71,7 @@ class TestCreateDotApplication(TestCase):
         self.assertEqual(grant_type, application.authorization_grant_type)
         self.assertEqual(client_type, application.client_type)
         self.assertEqual('', application.redirect_uris)
+        self.assertEqual(skip_auth, application.skip_authorization)
 
         if client_id:
             self.assertEqual(client_id, application.client_id)
