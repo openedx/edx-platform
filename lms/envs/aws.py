@@ -833,7 +833,13 @@ ECOMMERCE_SERVICE_WORKER_USERNAME = ENV_TOKENS.get(
 
 ##### Custom Courses for EdX #####
 if FEATURES.get('CUSTOM_COURSES_EDX'):
-    INSTALLED_APPS += ['lms.djangoapps.ccx', 'openedx.core.djangoapps.ccxcon.apps.CCXConnectorConfig']
+
+    if 'openedx.core.djangoapps.ccxcon.apps.CCXConnectorConfig' not in INSTALLED_APPS:
+        INSTALLED_APPS.append('openedx.core.djangoapps.ccxcon.apps.CCXConnectorConfig')
+
+    if 'lms.djangoapps.ccx' not in INSTALLED_APPS:
+        INSTALLED_APPS.append('lms.djangoapps.ccx')
+    
     MODULESTORE_FIELD_OVERRIDE_PROVIDERS += (
         'lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider',
     )

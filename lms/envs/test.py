@@ -525,7 +525,12 @@ FACEBOOK_APP_ID = "Test"
 FACEBOOK_API_VERSION = "v2.8"
 
 ######### custom courses #########
-INSTALLED_APPS += ['lms.djangoapps.ccx', 'openedx.core.djangoapps.ccxcon.apps.CCXConnectorConfig']
+if 'openedx.core.djangoapps.ccxcon.apps.CCXConnectorConfig' not in INSTALLED_APPS:
+    INSTALLED_APPS.append('openedx.core.djangoapps.ccxcon.apps.CCXConnectorConfig')
+
+if 'lms.djangoapps.ccx' not in INSTALLED_APPS:
+    INSTALLED_APPS.append('lms.djangoapps.ccx')
+    
 FEATURES['CUSTOM_COURSES_EDX'] = True
 
 # Set dummy values for profile image settings.

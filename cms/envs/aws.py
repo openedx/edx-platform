@@ -518,7 +518,8 @@ JWT_AUTH.update(AUTH_TOKENS.get('JWT_AUTH', {}))
 
 ######################## CUSTOM COURSES for EDX CONNECTOR ######################
 if FEATURES.get('CUSTOM_COURSES_EDX'):
-    INSTALLED_APPS.append('openedx.core.djangoapps.ccxcon.apps.CCXConnectorConfig')
+    if 'openedx.core.djangoapps.ccxcon.apps.CCXConnectorConfig' not in INSTALLED_APPS:
+        INSTALLED_APPS.append('openedx.core.djangoapps.ccxcon.apps.CCXConnectorConfig')
 
 # Partner support link for CMS footer
 PARTNER_SUPPORT_EMAIL = ENV_TOKENS.get('PARTNER_SUPPORT_EMAIL', PARTNER_SUPPORT_EMAIL)
