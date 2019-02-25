@@ -40,7 +40,6 @@ class Command(BaseCommand):
             WHERE
                 s.start < c.start
                 AND s.start > %s
-                AND c.start < CURRENT_DATE()
                 AND c.id = %s;
             """
         )
