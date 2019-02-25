@@ -130,8 +130,8 @@ def _register_course_home_messages(request, course, user_access, course_start_da
             Text(_(
                 '{open_enroll_link}Enroll now{close_enroll_link} to access the full course.'
             )).format(
-                open_enroll_link='',
-                close_enroll_link=''
+                open_enroll_link=HTML('<button class="enroll-btn btn-link">'),
+                close_enroll_link=HTML('</button>')
             ),
             title=Text(_('Welcome to {course_display_name}')).format(
                 course_display_name=course.display_name

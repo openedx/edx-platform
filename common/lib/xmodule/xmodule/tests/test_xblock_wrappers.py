@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Tests for the wrapping layer that provides the XBlock API using XModule/Descriptor
 functionality
@@ -27,7 +28,7 @@ from xblock.core import XBlock
 
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
-from xmodule.x_module import ModuleSystem, XModule, XModuleDescriptor, DescriptorSystem, STUDENT_VIEW, STUDIO_VIEW
+from xmodule.x_module import ModuleSystem, XModule, XModuleDescriptor, DescriptorSystem, STUDENT_VIEW, STUDIO_VIEW, PUBLIC_VIEW
 from xmodule.annotatable_module import AnnotatableDescriptor
 from xmodule.capa_module import CapaDescriptor
 from xmodule.course_module import CourseDescriptor
@@ -63,8 +64,8 @@ LEAF_XMODULES = {
 CONTAINER_XMODULES = {
     ConditionalDescriptor: [{}],
     CourseDescriptor: [{}],
-    RandomizeDescriptor: [{}],
-    SequenceDescriptor: [{}],
+    RandomizeDescriptor: [{'display_name': 'Test String Display'}],
+    SequenceDescriptor: [{'display_name': u'Test Unicode हिंदी Display'}],
     VerticalBlock: [{}],
     WrapperBlock: [{}],
 }
@@ -433,3 +434,34 @@ class TestXmlExport(XBlockWrapperTestMixin, TestCase):
 
         self.assertEquals(list(xmodule_api_fs.walk()), list(xblock_api_fs.walk()))
         self.assertEquals(etree.tostring(xmodule_node), etree.tostring(xblock_node))
+
+
+class TestPublicView(XBlockWrapperTestMixin, TestCase):
+    """
+    This tests that default public_view shows the correct message.
+    """
+    shard = 1
+
+    def skip_if_invalid(self, descriptor_cls):
+        pure_xblock_class = issubclass(descriptor_cls, XBlock) and not issubclass(descriptor_cls, XModuleDescriptor)
+        if pure_xblock_class:
+            public_view = descriptor_cls.public_view
+        else:
+            public_view = descriptor_cls.module_class.public_view
+        if public_view != XModule.public_view:
+            raise SkipTest(descriptor_cls.__name__ + " implements public_view")
+
+    def check_property(self, descriptor):
+        """
+        Assert that public_view contains correct message.
+        """
+        if descriptor.display_name:
+            self.assertIn(
+                descriptor.display_name,
+                descriptor.render(PUBLIC_VIEW).content
+            )
+        else:
+            self.assertIn(
+                "This content is only accessible",
+                descriptor.render(PUBLIC_VIEW).content
+            )
