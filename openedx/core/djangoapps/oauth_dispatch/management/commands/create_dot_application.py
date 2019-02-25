@@ -45,6 +45,10 @@ class Command(BaseCommand):
                             dest='public',
                             default=False,
                             help='Make the application public?  Confidential by default.')
+        parser.add_argument('--skip-authorization',
+                            action='store_true',
+                            dest='skip_authorization',
+                            help='Skip the in-browser user authorization?  False by default.')
         parser.add_argument('--client-id',
                             action='store',
                             dest='client_id',
@@ -61,6 +65,7 @@ class Command(BaseCommand):
         username = options['username']
         grant_type = options['grant_type']
         redirect_uris = options['redirect_uris']
+        skip_authorization = options['skip_authorization']
         client_type = Application.CLIENT_PUBLIC if options['public'] else Application.CLIENT_CONFIDENTIAL
         client_id = options['client_id']
         client_secret = options['client_secret']
@@ -79,7 +84,8 @@ class Command(BaseCommand):
             user=user,
             redirect_uris=redirect_uris,
             client_type=client_type,
-            authorization_grant_type=grant_type
+            authorization_grant_type=grant_type,
+            skip_authorization=skip_authorization
         )
         if client_id:
             create_kwargs['client_id'] = client_id
