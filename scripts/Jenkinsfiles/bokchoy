@@ -26,7 +26,7 @@ def bokchoyTestCleanup() {
 }
 
 pipeline {
-    agent { label "jenkins-worker" }
+    agent { label "ironwood-jenkins-worker" }
     options {
         timestamps()
         timeout(60)
@@ -62,7 +62,7 @@ pipeline {
                     for (int i = 1; i <= 22; i++) {
                         int index = i
                         parallel_stages["${index}"] = {
-                            node('jenkins-worker') {
+                            node('ironwood-jenkins-worker') {
                                 withEnv(["SHARD=${index}","TEST_SUITE=bok-choy"]) {
                                     try {
                                         stage("Bokchoy shard: ${index}") {

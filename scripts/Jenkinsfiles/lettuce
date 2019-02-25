@@ -25,7 +25,7 @@ def lettuceTestCleanup() {
 }
 
 pipeline {
-    agent { label "jenkins-worker" }
+    agent { label "ironwood-jenkins-worker" }
     options {
         timestamps()
         timeout(60)
@@ -57,7 +57,7 @@ pipeline {
         stage('Run Tests') {
             parallel {
                 stage("lms-acceptance") {
-                    agent { label "jenkins-worker" }
+                    agent { label "ironwood-jenkins-worker" }
                     environment {
                         TEST_SUITE = "lms-acceptance"
                     }
@@ -75,7 +75,7 @@ pipeline {
                     }
                 }
                 stage("cms-acceptance") {
-                    agent { label "jenkins-worker" }
+                    agent { label "ironwood-jenkins-worker" }
                     environment {
                         TEST_SUITE = "cms-acceptance"
                     }
