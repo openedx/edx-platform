@@ -356,7 +356,7 @@ CREATE TABLE `auth_permission` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `auth_permission_content_type_id_codename_01ab375a_uniq` (`content_type_id`,`codename`),
   CONSTRAINT `auth_permission_content_type_id_2f476e4b_fk_django_co` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1095 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1146 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `auth_registration`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2156,7 +2156,7 @@ CREATE TABLE `django_content_type` (
   `model` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `django_content_type_app_label_model_76bd3d3b_uniq` (`app_label`,`model`)
-) ENGINE=InnoDB AUTO_INCREMENT=364 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=381 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_migrations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2167,7 +2167,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=512 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=515 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2730,7 +2730,7 @@ CREATE TABLE `enterprise_enterprisecustomerreportingconfiguration` (
   `enterprise_customer_id` char(32) NOT NULL,
   `sftp_file_path` varchar(256) DEFAULT NULL,
   `sftp_hostname` varchar(256) DEFAULT NULL,
-  `sftp_port` int(10) unsigned,
+  `sftp_port` int(10) unsigned DEFAULT NULL,
   `sftp_username` varchar(256) DEFAULT NULL,
   `decrypted_password` longblob,
   `decrypted_sftp_password` longblob,
@@ -2851,7 +2851,7 @@ CREATE TABLE `enterprise_historicalenterprisecustomer` (
   `slug` varchar(30) NOT NULL,
   `country` varchar(2) DEFAULT NULL,
   `enable_autocohorting` tinyint(1) NOT NULL,
-  `customer_type_id` int(11),
+  `customer_type_id` int(11) DEFAULT NULL,
   `enable_portal_code_management_screen` tinyint(1) NOT NULL,
   PRIMARY KEY (`history_id`),
   KEY `enterprise_historica_history_user_id_bbd9b0d6_fk_auth_user` (`history_user_id`),
@@ -3287,6 +3287,71 @@ CREATE TABLE `lms_xblock_xblockasidesconfig` (
   CONSTRAINT `lms_xblock_xblockasi_changed_by_id_71928be3_fk_auth_user` FOREIGN KEY (`changed_by_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `lti_provider_gradedassignment`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `lti_provider_gradedassignment` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `course_key` varchar(255) NOT NULL,
+  `usage_key` varchar(255) NOT NULL,
+  `lis_result_sourcedid` varchar(255) NOT NULL,
+  `version_number` int(11) NOT NULL,
+  `outcome_service_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `lti_provider_gradedassig_outcome_service_id_lis_r_12a00643_uniq` (`outcome_service_id`,`lis_result_sourcedid`),
+  KEY `lti_provider_gradedassignment_course_key_1b6d1469` (`course_key`),
+  KEY `lti_provider_gradedassignment_usage_key_161dd3bb` (`usage_key`),
+  KEY `lti_provider_gradedassignment_lis_result_sourcedid_30c964e4` (`lis_result_sourcedid`),
+  KEY `lti_provider_gradedassignment_user_id_c45f47d4_fk_auth_user_id` (`user_id`),
+  CONSTRAINT `lti_provider_gradeda_outcome_service_id_6f93cb3a_fk_lti_provi` FOREIGN KEY (`outcome_service_id`) REFERENCES `lti_provider_outcomeservice` (`id`),
+  CONSTRAINT `lti_provider_gradedassignment_user_id_c45f47d4_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `lti_provider_lticonsumer`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `lti_provider_lticonsumer` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `consumer_name` varchar(255) NOT NULL,
+  `consumer_key` varchar(32) NOT NULL,
+  `consumer_secret` varchar(32) NOT NULL,
+  `instance_guid` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `consumer_name` (`consumer_name`),
+  UNIQUE KEY `consumer_key` (`consumer_key`),
+  UNIQUE KEY `consumer_secret` (`consumer_secret`),
+  UNIQUE KEY `instance_guid` (`instance_guid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `lti_provider_ltiuser`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `lti_provider_ltiuser` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `lti_user_id` varchar(255) NOT NULL,
+  `edx_user_id` int(11) NOT NULL,
+  `lti_consumer_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `edx_user_id` (`edx_user_id`),
+  UNIQUE KEY `lti_provider_ltiuser_lti_consumer_id_lti_user_id_d684c543_uniq` (`lti_consumer_id`,`lti_user_id`),
+  CONSTRAINT `lti_provider_ltiuser_edx_user_id_e06b2db5_fk_auth_user_id` FOREIGN KEY (`edx_user_id`) REFERENCES `auth_user` (`id`),
+  CONSTRAINT `lti_provider_ltiuser_lti_consumer_id_c1b42ee3_fk_lti_provi` FOREIGN KEY (`lti_consumer_id`) REFERENCES `lti_provider_lticonsumer` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `lti_provider_outcomeservice`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `lti_provider_outcomeservice` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `lis_outcome_service_url` varchar(255) NOT NULL,
+  `lti_consumer_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `lis_outcome_service_url` (`lis_outcome_service_url`),
+  KEY `lti_provider_outcome_lti_consumer_id_eb82db58_fk_lti_provi` (`lti_consumer_id`),
+  CONSTRAINT `lti_provider_outcome_lti_consumer_id_eb82db58_fk_lti_provi` FOREIGN KEY (`lti_consumer_id`) REFERENCES `lti_provider_lticonsumer` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `microsite_configuration_microsite`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -3667,7 +3732,7 @@ CREATE TABLE `oauth2_provider_application` (
   KEY `oauth2_provider_application_client_secret_53133678` (`client_secret`),
   KEY `oauth2_provider_application_user_id_79829054_fk_auth_user_id` (`user_id`),
   CONSTRAINT `oauth2_provider_application_user_id_79829054_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `oauth2_provider_grant`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
