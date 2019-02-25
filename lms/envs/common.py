@@ -3384,6 +3384,12 @@ COURSE_ENROLLMENT_MODES = {
         "display_name": _("Honor"),
         "min_price": 0
     },
+    "masters": {
+        "id": 7,
+        "slug": "masters",
+        "display_name": _("Master's"),
+        "min_price": 0
+    },
 }
 
 CONTENT_TYPE_GATE_GROUP_IDS = {
