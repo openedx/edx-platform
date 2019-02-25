@@ -116,7 +116,7 @@ class LibraryToolsService(object):
             return False
 
         descriptor = self.store.get_item(usage_key, depth=0)
-        assert isinstance(descriptor, CapaXBlock)
+        assert hasattr(descriptor, 'problem_types')
         return capa_type in descriptor.problem_types
 
     def can_use_library_content(self, block):
