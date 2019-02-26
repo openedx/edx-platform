@@ -617,7 +617,7 @@ COURSE_ENROLLMENT_MODES = ENV_TOKENS.get('COURSE_ENROLLMENT_MODES', COURSE_ENROL
 from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants  # pylint: disable=wrong-import-order, wrong-import-position, ungrouped-imports
 
 plugin_settings.add_plugins("cms.envs.aws", plugin_constants.ProjectType.CMS,
-                                            plugin_constants.SettingsType.DEPRECATED_AWS)
+                            plugin_constants.SettingsType.DEPRECATED_AWS)
 
 # We continue to load production.py over aws.py
 plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.CMS, plugin_constants.SettingsType.PRODUCTION)

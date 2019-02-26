@@ -842,9 +842,9 @@ if FEATURES.get('CUSTOM_COURSES_EDX'):
 
     # We have to check if this has been added yet until aws.py is removed because otherwise falling back to aws.py may
     # add a duplicate to this list
-    if (('lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider',)
-        not in MODULESTORE_FIELD_OVERRIDE_PROVIDERS):
-        MODULESTORE_FIELD_OVERRIDE_PROVIDERS += ('lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider',)
+    __custom_courses_override_provider__ = ('lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider',)
+    if (__custom_courses_override_provider__ not in MODULESTORE_FIELD_OVERRIDE_PROVIDERS):
+        MODULESTORE_FIELD_OVERRIDE_PROVIDERS += __custom_courses_override_provider__
 
 CCX_MAX_STUDENTS_ALLOWED = ENV_TOKENS.get('CCX_MAX_STUDENTS_ALLOWED', CCX_MAX_STUDENTS_ALLOWED)
 
@@ -1140,7 +1140,7 @@ PROFILE_MICROFRONTEND_URL = ENV_TOKENS.get('PROFILE_MICROFRONTEND_URL', PROFILE_
 
 from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants  # pylint: disable=wrong-import-order, wrong-import-position, ungrouped-imports
 plugin_settings.add_plugins("lms.envs.aws", plugin_constants.ProjectType.LMS,
-    plugin_constants.SettingsType.DEPRECATED_AWS)
+                            plugin_constants.SettingsType.DEPRECATED_AWS)
 
 # Load production.py in plugins
 plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS, plugin_constants.SettingsType.PRODUCTION)
