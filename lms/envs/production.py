@@ -843,7 +843,7 @@ if FEATURES.get('CUSTOM_COURSES_EDX'):
     # We have to check if this has been added yet until aws.py is removed because otherwise falling back to aws.py may
     # add a duplicate to this list
     __custom_courses_override_provider__ = ('lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider',)
-    if (__custom_courses_override_provider__ not in MODULESTORE_FIELD_OVERRIDE_PROVIDERS):
+    if __custom_courses_override_provider__ not in MODULESTORE_FIELD_OVERRIDE_PROVIDERS:
         MODULESTORE_FIELD_OVERRIDE_PROVIDERS += __custom_courses_override_provider__
 
 CCX_MAX_STUDENTS_ALLOWED = ENV_TOKENS.get('CCX_MAX_STUDENTS_ALLOWED', CCX_MAX_STUDENTS_ALLOWED)
