@@ -1,0 +1,82 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_static admin_modify %}
+{% block content %}
+    <div id="content-main">
+        <form action="" method="POST">
+            {% csrf_token %}
+            {% if form.non_field_errors|length > 0 %}
+                <p class="errornote">
+                    Please correct the errors below.
+                </p>
+                {{ form.non_field_errors }}
+            {% endif %}
+            <fieldset class="module aligned">
+                <div class="form-row">
+                    <label><storng>Warning:</storng></label>
+                    <p>
+                        Please make sure you'r assigning the right user to the right organization!
+                        Otherwise customer data would be exposed.
+                    </p>
+                </div>
+
+                <div class="form-row">
+                    <label for="amc_username">Username</label>
+                    <input id="amc_username" readonly value="{{ amc_user.username }}" />
+                    <p class="help">Readonly</p>
+                </div>
+
+                <div class="form-row">
+                    <label for="amc_email">Email</label>
+                    <input id="amc_email" readonly value="{{ amc_user.email }}" />
+                    <p class="help">Readonly</p>
+                </div>
+
+                {% for field in form %}
+                    <div class="form-row">
+                        {{ field.errors }}
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {% if field.field.help_text %}
+                            <p class="help">
+                                {{ field.field.help_text|safe }}
+                            </p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+
+                <div class="form-row">
+                    <label for="amc_access_token">Access Token</label>
+                    <input id="amc_access_token" readonly value="{{ tokens.access_token }}" />
+                    <p class="help">Copy to AMC</p>
+                </div>
+
+                <div class="form-row">
+                    <label for="amc_refresh_token">Refresh Token</label>
+                    <input id="amc_refresh_token" readonly value="{{ tokens.refresh_token }}" />
+                    <p class="help">Copy to AMC</p>
+                </div>
+
+                <div class="form-row">
+                    <label for="amc_access_expiration_date">Access Token Expiration Date</label>
+                    <input id="amc_access_expiration_date" readonly value="{{ tokens.access_expires | date:"Y-m-d" }}" />
+                    <p class="help">Copy to AMC</p>
+                </div>
+                <div class="form-row">
+                    <label for="amc_access_expiration_time">Access Token Expiration Time</label>
+                    <input id="amc_access_expiration_time" readonly value="{{ tokens.access_expires | date:"H:i:s" }}" />
+                    <p class="help">Copy to AMC</p>
+                </div>
+
+                <div class="form-row">
+                    <label>Locate user in AMC Admin</label>
+                    <a target="_blank" class="button" href="{{ amc_app_url }}{% url 'admin:auth_user_changelist' %}?q={{ user.email | urlencode }}">
+                        Locate user in AMC Admin (new window)
+                    </a>
+                </div>
+            </fieldset>
+            <div class="submit-row">
+                <input type="submit" class="default" value="Reset Tokens, Make AMC Admin">
+            </div>
+        </form>
+    </div>
+{% endblock %}
