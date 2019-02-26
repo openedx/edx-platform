@@ -2285,6 +2285,8 @@ INSTALLED_APPS = [
 
     # edx-drf-extensions
     'csrf.apps.CsrfAppConfig',  # Enables frontend apps to retrieve CSRF tokens.
+
+    'openedx.core.djangoapps.user_roles',
 ]
 
 ######################### CSRF #########################################
