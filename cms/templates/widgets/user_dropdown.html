@@ -39,15 +39,6 @@
     </span>
     <span class="icon fa fa-caret-down ui-toggle-dd" aria-hidden="true"></span>
   </h3>
-  <%
-        if settings.FEATURES.get('DISABLE_STUDIO_SSO_OVER_LMS', False):
-          logout_url = reverse('logout')
-        else:
-          logout_url = '{lms_root_url}/logout?next={next_url}'.format(
-            lms_root_url=settings.LMS_ROOT_URL,
-            next_url=current_site_url,
-          )
-  %>
   <div class="wrapper wrapper-nav-sub">
     <div class="nav-sub">
       <ul>
@@ -60,7 +51,7 @@
         </li>
         % endif
         <li class="nav-item nav-account-signout">
-          <a class="action action-signout" href="${logout_url}">${_("Sign Out")}</a>
+          <a class="action action-signout" href="${settings.FRONTEND_LOGOUT_URL}">${_("Sign Out")}</a>
         </li>
       </ul>
     </div>

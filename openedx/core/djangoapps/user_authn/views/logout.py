@@ -57,7 +57,11 @@ class LogoutView(TemplateView):
 
         logout(request)
 
-        response = super(LogoutView, self).dispatch(request, *args, **kwargs)
+        # If we don't need to deal with OIDC logouts, just redirect the user.
+        if self.oauth_client_ids:
+            response = super(LogoutView, self).dispatch(request, *args, **kwargs)
+        else:
+            response = redirect(self.target)
 
         # Clear the cookie used by the edx.org marketing site
         delete_logged_in_cookies(response)
