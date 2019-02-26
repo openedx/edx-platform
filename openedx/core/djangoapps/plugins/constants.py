@@ -29,7 +29,7 @@ class SettingsType(object):
     See https://github.com/edx/edx-platform/master/lms/envs/docs/README.rst for
     further information on each Settings Type.
     """
-    DEPRECATED_AWS = u'aws' # aws.py has been deprecated. See https://openedx.atlassian.net/browse/DEPR-14
+    DEPRECATED_AWS = u'aws'  # aws.py has been deprecated. See https://openedx.atlassian.net/browse/DEPR-14
     PRODUCTION = u'production'
     COMMON = u'common'
     DEVSTACK = u'devstack'
