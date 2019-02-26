@@ -36,7 +36,7 @@ def xdist_git_branch() {
 }
 
 pipeline {
-    agent { label "jenkins-worker" }
+    agent { label "ironwood-jenkins-worker" }
     options {
         timestamps()
         timeout(60)
@@ -44,7 +44,7 @@ pipeline {
     environment {
         XDIST_CONTAINER_SUBNET = credentials('XDIST_CONTAINER_SUBNET')
         XDIST_CONTAINER_SECURITY_GROUP = credentials('XDIST_CONTAINER_SECURITY_GROUP')
-        XDIST_CONTAINER_TASK_NAME = "jenkins-worker-task"
+        XDIST_CONTAINER_TASK_NAME = "ironwood-jenkins-worker-task"
         XDIST_GIT_BRANCH = xdist_git_branch()
     }
     stages {
@@ -74,7 +74,7 @@ pipeline {
         stage('Run Tests') {
             parallel {
                 stage("lms-unit") {
-                    agent { label "jenkins-worker" }
+                    agent { label "ironwood-jenkins-worker" }
                     environment {
                         TEST_SUITE = "lms-unit"
                         XDIST_NUM_TASKS = 10
@@ -94,7 +94,7 @@ pipeline {
                     }
                 }
                 stage("cms-unit") {
-                    agent { label "jenkins-worker" }
+                    agent { label "ironwood-jenkins-worker" }
                     environment {
                         TEST_SUITE = "cms-unit"
                         XDIST_NUM_TASKS = 3
@@ -114,7 +114,7 @@ pipeline {
                     }
                 }
                 stage("commonlib-unit") {
-                    agent { label "jenkins-worker" }
+                    agent { label "ironwood-jenkins-worker" }
                     environment {
                         TEST_SUITE = "commonlib-unit"
                         XDIST_NUM_TASKS = 3
