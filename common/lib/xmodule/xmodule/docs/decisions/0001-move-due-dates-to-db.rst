@@ -23,10 +23,11 @@ Decisions
 This approach anticipates other date-related functions in the future, such as APIs for returning a calendar view of upcoming dates.
 
 - The app will contain at least these models:
-    + ``ContentDate``: mapping content ids to dates
-    + ``UserContentDate``: mapping user ids to ``ContentDates``. It will also record an audit trail for the override.
-- The app will contain a custom XBlock field that will be a drop-in replacement for the existing Date XBlock field.
-    + If the date exists in the relational database (whether in UserContentDate or ContentDate), it'll use that date; otherwise, it'll use the one stored in the XBlock.
+    + ``DatePolicy``: contains course_key, absolute date and a time delta
+    + ``ContentDate``: contains DatePolicy id and content id + field
+    + ``UserDate``: contains user id, DatePolicy id, and absolute date + relative date. It will also record an audit trail for the override.
+- The app will hook in to the ``LmsModuleSystem`` with a custom ``FieldDate`` implementation.
+    + If the date exists in the relational database (whether in UserDate or ContentDate), it'll use that date; otherwise, it'll use the one stored in the XBlock.
 - The app will expose a REST API for retrieving and updating dates in the database.
 
 2. Create an instructor interface for setting student due dates
@@ -39,14 +40,21 @@ The existing IDDE instructor interface may be used, or a modern micro-frontend c
 
 It's important that the underlying implementation can efficiently retrieve all due dates for the course, otherwise it's not an improvement over IDDE.
 
-4. All new courses will automatically start storing due dates in the database.
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+For instance, to retrieve all dates for a given user and course
 
-Since the new XBlock field will transparently convert dates between the content store and relational database, importing and exporting courses should automatically work. If not, an explicit import/export step may be needed. 
+::
 
-5. There may be a migration process for copying due date data from old courses into the new table.
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    select cd.location, datep.date, datep.delta, ud.date, ud.delta
+    from content_date cd
+    left join date_policy datep on datep.id = cd.policy_id
+    left join user_date ud on ud.policy_id = datep.id
+    order by cd.location, ud.date, ud.delta
+    where datep.course_key = "course_key"
+    and ud.user_id = 1234
 
-If the due date extension feature is desired for older courses, the due dates will need to be migrated by iterating the course blocks and copying dates into the database.
 
+4. Dates will be copied to the relational database when the course is published.
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The app will listen for the ``SignalHandler.course_published`` signal in Studio and will create/modify ``DatePolicies`` and ``ContentDates`` as required.
 
