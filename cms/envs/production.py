@@ -6,7 +6,6 @@ This is the default template for our main set of AWS servers.
 # want to import all variables from base settings files
 # pylint: disable=wildcard-import, unused-wildcard-import
 import codecs
-import json
 import os
 import yaml
 
@@ -25,14 +24,14 @@ def get_env_setting(setting):
     try:
         return os.environ[setting]
     except KeyError:
-        error_msg = "Set the %s env variable" % setting
+        error_msg = u"Set the %s env variable" % setting
         raise ImproperlyConfigured(error_msg)
 
 # A file path to a YAML file from which to load all the configuration for the edx platform
 CONFIG_FILE = get_env_setting('STUDIO_CFG')
 
 with codecs.open(CONFIG_FILE, encoding='utf-8') as f:
-    __config__ = yaml.load(f)
+    __config__ = yaml.safe_load(f)
 
     # ENV_TOKENS and AUTH_TOKENS are included for reverse compatability.
     # These two lines can be removed once aws.py is removed.
@@ -100,10 +99,10 @@ CELERY_QUEUES = {
 CELERY_ROUTES = "{}celery.Router".format(QUEUE_VARIANT)
 
 # Do NOT calculate this dynamically at startup with git because it's *slow*.
-EDX_PLATFORM_REVISION = __config__.get('EDX_PLATFORM_REVISION', EDX_PLATFORM_REVISION)
+EDX_PLATFORM_REVISION = ENV_TOKENS.get('EDX_PLATFORM_REVISION', EDX_PLATFORM_REVISION)
 
 # STATIC_URL_BASE specifies the base url to use for static files
-STATIC_URL_BASE = __config__.get('STATIC_URL_BASE', None)
+STATIC_URL_BASE = ENV_TOKENS.get('STATIC_URL_BASE', None)
 if STATIC_URL_BASE:
     # collectstatic will fail if STATIC_URL is a unicode string
     STATIC_URL = STATIC_URL_BASE.encode('ascii')
@@ -113,66 +112,66 @@ if STATIC_URL_BASE:
         STATIC_URL += "studio/"
 
 # DEFAULT_COURSE_ABOUT_IMAGE_URL specifies the default image to show for courses that don't provide one
-DEFAULT_COURSE_ABOUT_IMAGE_URL = __config__.get('DEFAULT_COURSE_ABOUT_IMAGE_URL', DEFAULT_COURSE_ABOUT_IMAGE_URL)
+DEFAULT_COURSE_ABOUT_IMAGE_URL = ENV_TOKENS.get('DEFAULT_COURSE_ABOUT_IMAGE_URL', DEFAULT_COURSE_ABOUT_IMAGE_URL)
 
-DEFAULT_COURSE_VISIBILITY_IN_CATALOG = __config__.get(
+DEFAULT_COURSE_VISIBILITY_IN_CATALOG = ENV_TOKENS.get(
     'DEFAULT_COURSE_VISIBILITY_IN_CATALOG',
     DEFAULT_COURSE_VISIBILITY_IN_CATALOG
 )
 
 # DEFAULT_MOBILE_AVAILABLE specifies if the course is available for mobile by default
-DEFAULT_MOBILE_AVAILABLE = __config__.get(
+DEFAULT_MOBILE_AVAILABLE = ENV_TOKENS.get(
     'DEFAULT_MOBILE_AVAILABLE',
     DEFAULT_MOBILE_AVAILABLE
 )
 
 # MEDIA_ROOT specifies the directory where user-uploaded files are stored.
-MEDIA_ROOT = __config__.get('MEDIA_ROOT', MEDIA_ROOT)
-MEDIA_URL = __config__.get('MEDIA_URL', MEDIA_URL)
+MEDIA_ROOT = ENV_TOKENS.get('MEDIA_ROOT', MEDIA_ROOT)
+MEDIA_URL = ENV_TOKENS.get('MEDIA_URL', MEDIA_URL)
 
 # GITHUB_REPO_ROOT is the base directory
 # for course data
-GITHUB_REPO_ROOT = __config__.get('GITHUB_REPO_ROOT', GITHUB_REPO_ROOT)
+GITHUB_REPO_ROOT = ENV_TOKENS.get('GITHUB_REPO_ROOT', GITHUB_REPO_ROOT)
 
 # STATIC_ROOT specifies the directory where static files are
 # collected
 
-STATIC_ROOT_BASE = __config__.get('STATIC_ROOT_BASE', None)
+STATIC_ROOT_BASE = ENV_TOKENS.get('STATIC_ROOT_BASE', None)
 if STATIC_ROOT_BASE:
     STATIC_ROOT = path(STATIC_ROOT_BASE) / 'studio'
     WEBPACK_LOADER['DEFAULT']['STATS_FILE'] = STATIC_ROOT / "webpack-stats.json"
     WEBPACK_LOADER['WORKERS']['STATS_FILE'] = STATIC_ROOT / "webpack-worker-stats.json"
 
-EMAIL_BACKEND = __config__.get('EMAIL_BACKEND', EMAIL_BACKEND)
-EMAIL_FILE_PATH = __config__.get('EMAIL_FILE_PATH', None)
+EMAIL_BACKEND = ENV_TOKENS.get('EMAIL_BACKEND', EMAIL_BACKEND)
+EMAIL_FILE_PATH = ENV_TOKENS.get('EMAIL_FILE_PATH', None)
 
-EMAIL_HOST = __config__.get('EMAIL_HOST', EMAIL_HOST)
-EMAIL_PORT = __config__.get('EMAIL_PORT', EMAIL_PORT)
-EMAIL_USE_TLS = __config__.get('EMAIL_USE_TLS', EMAIL_USE_TLS)
+EMAIL_HOST = ENV_TOKENS.get('EMAIL_HOST', EMAIL_HOST)
+EMAIL_PORT = ENV_TOKENS.get('EMAIL_PORT', EMAIL_PORT)
+EMAIL_USE_TLS = ENV_TOKENS.get('EMAIL_USE_TLS', EMAIL_USE_TLS)
 
-LMS_BASE = __config__.get('LMS_BASE')
-LMS_ROOT_URL = __config__.get('LMS_ROOT_URL')
-LMS_INTERNAL_ROOT_URL = __config__.get('LMS_INTERNAL_ROOT_URL', LMS_ROOT_URL)
-ENTERPRISE_API_URL = __config__.get('ENTERPRISE_API_URL', LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/')
-ENTERPRISE_CONSENT_API_URL = __config__.get('ENTERPRISE_CONSENT_API_URL', LMS_INTERNAL_ROOT_URL + '/consent/api/v1/')
+LMS_BASE = ENV_TOKENS.get('LMS_BASE')
+LMS_ROOT_URL = ENV_TOKENS.get('LMS_ROOT_URL')
+LMS_INTERNAL_ROOT_URL = ENV_TOKENS.get('LMS_INTERNAL_ROOT_URL', LMS_ROOT_URL)
+ENTERPRISE_API_URL = ENV_TOKENS.get('ENTERPRISE_API_URL', LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/')
+ENTERPRISE_CONSENT_API_URL = ENV_TOKENS.get('ENTERPRISE_CONSENT_API_URL', LMS_INTERNAL_ROOT_URL + '/consent/api/v1/')
 # Note that FEATURES['PREVIEW_LMS_BASE'] gets read in from the environment file.
 
 # List of logout URIs for each IDA that the learner should be logged out of when they logout of
 # Studio. Only applies to IDA for which the social auth flow uses DOT (Django OAuth Toolkit).
-IDA_LOGOUT_URI_LIST = __config__.get('IDA_LOGOUT_URI_LIST', [])
+IDA_LOGOUT_URI_LIST = ENV_TOKENS.get('IDA_LOGOUT_URI_LIST', [])
 
-SITE_NAME = __config__.get('SITE_NAME')
+SITE_NAME = ENV_TOKENS.get('SITE_NAME')
 
 ALLOWED_HOSTS = [
     # TODO: bbeggs remove this before prod, temp fix to get load testing running
     "*",
-    __config__.get('CMS_BASE')
+    ENV_TOKENS.get('CMS_BASE')
 ]
 
-LOG_DIR = __config__['LOG_DIR']
-DATA_DIR = path(__config__.get('DATA_DIR', DATA_DIR))
+LOG_DIR = ENV_TOKENS['LOG_DIR']
+DATA_DIR = path(ENV_TOKENS.get('DATA_DIR', DATA_DIR))
 
-CACHES = __config__['CACHES']
+CACHES = ENV_TOKENS['CACHES']
 # Cache used for location mapping -- called many times with the same key/value
 # in a given request.
 if 'loc_cache' not in CACHES:
@@ -181,46 +180,46 @@ if 'loc_cache' not in CACHES:
         'LOCATION': 'edx_location_mem_cache',
     }
 
-SESSION_COOKIE_DOMAIN = __config__.get('SESSION_COOKIE_DOMAIN')
-SESSION_COOKIE_HTTPONLY = __config__.get('SESSION_COOKIE_HTTPONLY', True)
-SESSION_ENGINE = __config__.get('SESSION_ENGINE', SESSION_ENGINE)
-SESSION_COOKIE_SECURE = __config__.get('SESSION_COOKIE_SECURE', SESSION_COOKIE_SECURE)
-SESSION_SAVE_EVERY_REQUEST = __config__.get('SESSION_SAVE_EVERY_REQUEST', SESSION_SAVE_EVERY_REQUEST)
+SESSION_COOKIE_DOMAIN = ENV_TOKENS.get('SESSION_COOKIE_DOMAIN')
+SESSION_COOKIE_HTTPONLY = ENV_TOKENS.get('SESSION_COOKIE_HTTPONLY', True)
+SESSION_ENGINE = ENV_TOKENS.get('SESSION_ENGINE', SESSION_ENGINE)
+SESSION_COOKIE_SECURE = ENV_TOKENS.get('SESSION_COOKIE_SECURE', SESSION_COOKIE_SECURE)
+SESSION_SAVE_EVERY_REQUEST = ENV_TOKENS.get('SESSION_SAVE_EVERY_REQUEST', SESSION_SAVE_EVERY_REQUEST)
 
 # social sharing settings
-SOCIAL_SHARING_SETTINGS = __config__.get('SOCIAL_SHARING_SETTINGS', SOCIAL_SHARING_SETTINGS)
+SOCIAL_SHARING_SETTINGS = ENV_TOKENS.get('SOCIAL_SHARING_SETTINGS', SOCIAL_SHARING_SETTINGS)
 
-REGISTRATION_EMAIL_PATTERNS_ALLOWED = __config__.get('REGISTRATION_EMAIL_PATTERNS_ALLOWED')
+REGISTRATION_EMAIL_PATTERNS_ALLOWED = ENV_TOKENS.get('REGISTRATION_EMAIL_PATTERNS_ALLOWED')
 
 # allow for environments to specify what cookie name our login subsystem should use
 # this is to fix a bug regarding simultaneous logins between edx.org and edge.edx.org which can
 # happen with some browsers (e.g. Firefox)
-if __config__.get('SESSION_COOKIE_NAME', None):
+if ENV_TOKENS.get('SESSION_COOKIE_NAME', None):
     # NOTE, there's a bug in Django (http://bugs.python.org/issue18012) which necessitates this being a str()
-    SESSION_COOKIE_NAME = str(__config__.get('SESSION_COOKIE_NAME'))
+    SESSION_COOKIE_NAME = str(ENV_TOKENS.get('SESSION_COOKIE_NAME'))
 
 # Set the names of cookies shared with the marketing site
 # These have the same cookie domain as the session, which in production
 # usually includes subdomains.
-EDXMKTG_LOGGED_IN_COOKIE_NAME = __config__.get('EDXMKTG_LOGGED_IN_COOKIE_NAME', EDXMKTG_LOGGED_IN_COOKIE_NAME)
-EDXMKTG_USER_INFO_COOKIE_NAME = __config__.get('EDXMKTG_USER_INFO_COOKIE_NAME', EDXMKTG_USER_INFO_COOKIE_NAME)
+EDXMKTG_LOGGED_IN_COOKIE_NAME = ENV_TOKENS.get('EDXMKTG_LOGGED_IN_COOKIE_NAME', EDXMKTG_LOGGED_IN_COOKIE_NAME)
+EDXMKTG_USER_INFO_COOKIE_NAME = ENV_TOKENS.get('EDXMKTG_USER_INFO_COOKIE_NAME', EDXMKTG_USER_INFO_COOKIE_NAME)
 
 # Determines whether the CSRF token can be transported on
 # unencrypted channels. It is set to False here for backward compatibility,
 # but it is highly recommended that this is True for environments accessed
 # by end users.
-CSRF_COOKIE_SECURE = __config__.get('CSRF_COOKIE_SECURE', False)
+CSRF_COOKIE_SECURE = ENV_TOKENS.get('CSRF_COOKIE_SECURE', False)
 
 #Email overrides
-DEFAULT_FROM_EMAIL = __config__.get('DEFAULT_FROM_EMAIL', DEFAULT_FROM_EMAIL)
-DEFAULT_FEEDBACK_EMAIL = __config__.get('DEFAULT_FEEDBACK_EMAIL', DEFAULT_FEEDBACK_EMAIL)
-ADMINS = __config__.get('ADMINS', ADMINS)
-SERVER_EMAIL = __config__.get('SERVER_EMAIL', SERVER_EMAIL)
-MKTG_URLS = __config__.get('MKTG_URLS', MKTG_URLS)
-MKTG_URL_LINK_MAP.update(__config__.get('MKTG_URL_LINK_MAP', {}))
-TECH_SUPPORT_EMAIL = __config__.get('TECH_SUPPORT_EMAIL', TECH_SUPPORT_EMAIL)
+DEFAULT_FROM_EMAIL = ENV_TOKENS.get('DEFAULT_FROM_EMAIL', DEFAULT_FROM_EMAIL)
+DEFAULT_FEEDBACK_EMAIL = ENV_TOKENS.get('DEFAULT_FEEDBACK_EMAIL', DEFAULT_FEEDBACK_EMAIL)
+ADMINS = ENV_TOKENS.get('ADMINS', ADMINS)
+SERVER_EMAIL = ENV_TOKENS.get('SERVER_EMAIL', SERVER_EMAIL)
+MKTG_URLS = ENV_TOKENS.get('MKTG_URLS', MKTG_URLS)
+MKTG_URL_LINK_MAP.update(ENV_TOKENS.get('MKTG_URL_LINK_MAP', {}))
+TECH_SUPPORT_EMAIL = ENV_TOKENS.get('TECH_SUPPORT_EMAIL', TECH_SUPPORT_EMAIL)
 
-for name, value in __config__.get("CODE_JAIL", {}).items():
+for name, value in ENV_TOKENS.get("CODE_JAIL", {}).items():
     oldvalue = CODE_JAIL.get(name)
     if isinstance(oldvalue, dict):
         for subname, subvalue in value.items():
@@ -228,48 +227,48 @@ for name, value in __config__.get("CODE_JAIL", {}).items():
     else:
         CODE_JAIL[name] = value
 
-COURSES_WITH_UNSAFE_CODE = __config__.get("COURSES_WITH_UNSAFE_CODE", [])
+COURSES_WITH_UNSAFE_CODE = ENV_TOKENS.get("COURSES_WITH_UNSAFE_CODE", [])
 
-ASSET_IGNORE_REGEX = __config__.get('ASSET_IGNORE_REGEX', ASSET_IGNORE_REGEX)
+ASSET_IGNORE_REGEX = ENV_TOKENS.get('ASSET_IGNORE_REGEX', ASSET_IGNORE_REGEX)
 
-COMPREHENSIVE_THEME_DIRS = __config__.get('COMPREHENSIVE_THEME_DIRS', COMPREHENSIVE_THEME_DIRS) or []
+COMPREHENSIVE_THEME_DIRS = ENV_TOKENS.get('COMPREHENSIVE_THEME_DIRS', COMPREHENSIVE_THEME_DIRS) or []
 
 # COMPREHENSIVE_THEME_LOCALE_PATHS contain the paths to themes locale directories e.g.
 # "COMPREHENSIVE_THEME_LOCALE_PATHS" : [
 #        "/edx/src/edx-themes/conf/locale"
 #    ],
-COMPREHENSIVE_THEME_LOCALE_PATHS = __config__.get('COMPREHENSIVE_THEME_LOCALE_PATHS', [])
+COMPREHENSIVE_THEME_LOCALE_PATHS = ENV_TOKENS.get('COMPREHENSIVE_THEME_LOCALE_PATHS', [])
 
-DEFAULT_SITE_THEME = __config__.get('DEFAULT_SITE_THEME', DEFAULT_SITE_THEME)
-ENABLE_COMPREHENSIVE_THEMING = __config__.get('ENABLE_COMPREHENSIVE_THEMING', ENABLE_COMPREHENSIVE_THEMING)
+DEFAULT_SITE_THEME = ENV_TOKENS.get('DEFAULT_SITE_THEME', DEFAULT_SITE_THEME)
+ENABLE_COMPREHENSIVE_THEMING = ENV_TOKENS.get('ENABLE_COMPREHENSIVE_THEMING', ENABLE_COMPREHENSIVE_THEMING)
 
 #Timezone overrides
-TIME_ZONE = __config__.get('CELERY_TIMEZONE', CELERY_TIMEZONE)
+TIME_ZONE = ENV_TOKENS.get('CELERY_TIMEZONE', CELERY_TIMEZONE)
 
 # Push to LMS overrides
-GIT_REPO_EXPORT_DIR = __config__.get('GIT_REPO_EXPORT_DIR', '/edx/var/edxapp/export_course_repos')
+GIT_REPO_EXPORT_DIR = ENV_TOKENS.get('GIT_REPO_EXPORT_DIR', '/edx/var/edxapp/export_course_repos')
 
 # Translation overrides
-LANGUAGES = __config__.get('LANGUAGES', LANGUAGES)
-LANGUAGE_CODE = __config__.get('LANGUAGE_CODE', LANGUAGE_CODE)
-LANGUAGE_COOKIE = __config__.get('LANGUAGE_COOKIE', LANGUAGE_COOKIE)
+LANGUAGES = ENV_TOKENS.get('LANGUAGES', LANGUAGES)
+LANGUAGE_CODE = ENV_TOKENS.get('LANGUAGE_CODE', LANGUAGE_CODE)
+LANGUAGE_COOKIE = ENV_TOKENS.get('LANGUAGE_COOKIE', LANGUAGE_COOKIE)
 
-USE_I18N = __config__.get('USE_I18N', USE_I18N)
-ALL_LANGUAGES = __config__.get('ALL_LANGUAGES', ALL_LANGUAGES)
+USE_I18N = ENV_TOKENS.get('USE_I18N', USE_I18N)
+ALL_LANGUAGES = ENV_TOKENS.get('ALL_LANGUAGES', ALL_LANGUAGES)
 
-ENV_FEATURES = __config__.get('FEATURES', {})
+ENV_FEATURES = ENV_TOKENS.get('FEATURES', {})
 for feature, value in ENV_FEATURES.items():
     FEATURES[feature] = value
 
 # Additional installed apps
-for app in __config__.get('ADDL_INSTALLED_APPS', []):
+for app in ENV_TOKENS.get('ADDL_INSTALLED_APPS', []):
     if app not in INSTALLED_APPS:
         INSTALLED_APPS.append(app)
 
-WIKI_ENABLED = __config__.get('WIKI_ENABLED', WIKI_ENABLED)
+WIKI_ENABLED = ENV_TOKENS.get('WIKI_ENABLED', WIKI_ENABLED)
 
 LOGGING = get_logger_config(LOG_DIR,
-                            logging_env=__config__['LOGGING_ENV'],
+                            logging_env=ENV_TOKENS['LOGGING_ENV'],
                             service_variant=SERVICE_VARIANT)
 
 #theming start:
@@ -277,24 +276,24 @@ LOGGING = get_logger_config(LOG_DIR,
 # The following variables use (or) instead of the default value inside (get). This is to enforce using the Lazy Text
 # values when the varibale is an empty string. Therefore, setting these variable as empty text in related
 # json files will make the system reads thier values from django translation files
-PLATFORM_NAME = __config__.get('PLATFORM_NAME') or PLATFORM_NAME
-PLATFORM_DESCRIPTION = __config__.get('PLATFORM_DESCRIPTION') or PLATFORM_DESCRIPTION
-STUDIO_NAME = __config__.get('STUDIO_NAME') or STUDIO_NAME
-STUDIO_SHORT_NAME = __config__.get('STUDIO_SHORT_NAME') or STUDIO_SHORT_NAME
+PLATFORM_NAME = ENV_TOKENS.get('PLATFORM_NAME') or PLATFORM_NAME
+PLATFORM_DESCRIPTION = ENV_TOKENS.get('PLATFORM_DESCRIPTION') or PLATFORM_DESCRIPTION
+STUDIO_NAME = ENV_TOKENS.get('STUDIO_NAME') or STUDIO_NAME
+STUDIO_SHORT_NAME = ENV_TOKENS.get('STUDIO_SHORT_NAME') or STUDIO_SHORT_NAME
 
 # Event Tracking
-if "TRACKING_IGNORE_URL_PATTERNS" in __config__:
-    TRACKING_IGNORE_URL_PATTERNS = __config__.get("TRACKING_IGNORE_URL_PATTERNS")
+if "TRACKING_IGNORE_URL_PATTERNS" in ENV_TOKENS:
+    TRACKING_IGNORE_URL_PATTERNS = ENV_TOKENS.get("TRACKING_IGNORE_URL_PATTERNS")
 
 # Heartbeat
-HEARTBEAT_CHECKS = __config__.get('HEARTBEAT_CHECKS', HEARTBEAT_CHECKS)
-HEARTBEAT_EXTENDED_CHECKS = __config__.get('HEARTBEAT_EXTENDED_CHECKS', HEARTBEAT_EXTENDED_CHECKS)
-HEARTBEAT_CELERY_TIMEOUT = __config__.get('HEARTBEAT_CELERY_TIMEOUT', HEARTBEAT_CELERY_TIMEOUT)
+HEARTBEAT_CHECKS = ENV_TOKENS.get('HEARTBEAT_CHECKS', HEARTBEAT_CHECKS)
+HEARTBEAT_EXTENDED_CHECKS = ENV_TOKENS.get('HEARTBEAT_EXTENDED_CHECKS', HEARTBEAT_EXTENDED_CHECKS)
+HEARTBEAT_CELERY_TIMEOUT = ENV_TOKENS.get('HEARTBEAT_CELERY_TIMEOUT', HEARTBEAT_CELERY_TIMEOUT)
 
 # Django CAS external authentication settings
-CAS_EXTRA_LOGIN_PARAMS = __config__.get("CAS_EXTRA_LOGIN_PARAMS", None)
+CAS_EXTRA_LOGIN_PARAMS = ENV_TOKENS.get("CAS_EXTRA_LOGIN_PARAMS", None)
 if FEATURES.get('AUTH_USE_CAS'):
-    CAS_SERVER_URL = __config__.get("CAS_SERVER_URL", None)
+    CAS_SERVER_URL = ENV_TOKENS.get("CAS_SERVER_URL", None)
     AUTHENTICATION_BACKENDS = [
         'django.contrib.auth.backends.ModelBackend',
         'django_cas.backends.CASBackend',
@@ -306,7 +305,7 @@ if FEATURES.get('AUTH_USE_CAS'):
     if 'django_cas.middleware.CASMiddleware' not in MIDDLEWARE_CLASSES:
         MIDDLEWARE_CLASSES.append('django_cas.middleware.CASMiddleware')
 
-    CAS_ATTRIBUTE_CALLBACK = __config__.get('CAS_ATTRIBUTE_CALLBACK', None)
+    CAS_ATTRIBUTE_CALLBACK = ENV_TOKENS.get('CAS_ATTRIBUTE_CALLBACK', None)
     if CAS_ATTRIBUTE_CALLBACK:
         import importlib
         CAS_USER_DETAILS_RESOLVER = getattr(
@@ -315,58 +314,58 @@ if FEATURES.get('AUTH_USE_CAS'):
         )
 
 # Specific setting for the File Upload Service to store media in a bucket.
-FILE_UPLOAD_STORAGE_BUCKET_NAME = __config__.get('FILE_UPLOAD_STORAGE_BUCKET_NAME', FILE_UPLOAD_STORAGE_BUCKET_NAME)
-FILE_UPLOAD_STORAGE_PREFIX = __config__.get('FILE_UPLOAD_STORAGE_PREFIX', FILE_UPLOAD_STORAGE_PREFIX)
+FILE_UPLOAD_STORAGE_BUCKET_NAME = ENV_TOKENS.get('FILE_UPLOAD_STORAGE_BUCKET_NAME', FILE_UPLOAD_STORAGE_BUCKET_NAME)
+FILE_UPLOAD_STORAGE_PREFIX = ENV_TOKENS.get('FILE_UPLOAD_STORAGE_PREFIX', FILE_UPLOAD_STORAGE_PREFIX)
 
 # Zendesk
-ZENDESK_URL = __config__.get('ZENDESK_URL', ZENDESK_URL)
-ZENDESK_CUSTOM_FIELDS = __config__.get('ZENDESK_CUSTOM_FIELDS', ZENDESK_CUSTOM_FIELDS)
+ZENDESK_URL = ENV_TOKENS.get('ZENDESK_URL', ZENDESK_URL)
+ZENDESK_CUSTOM_FIELDS = ENV_TOKENS.get('ZENDESK_CUSTOM_FIELDS', ZENDESK_CUSTOM_FIELDS)
 
 
 ############### XBlock filesystem field config ##########
-if 'DJFS' in __config__ and __config__['DJFS'] is not None:
-    DJFS = __config__['DJFS']
+if 'DJFS' in ENV_TOKENS and ENV_TOKENS['DJFS'] is not None:
+    DJFS = ENV_TOKENS['DJFS']
     if 'url_root' in DJFS:
         DJFS['url_root'] = DJFS['url_root'].format(platform_revision=EDX_PLATFORM_REVISION)
 
-EMAIL_HOST_USER = __config__.get('EMAIL_HOST_USER', EMAIL_HOST_USER)
-EMAIL_HOST_PASSWORD = __config__.get('EMAIL_HOST_PASSWORD', EMAIL_HOST_PASSWORD)
+EMAIL_HOST_USER = AUTH_TOKENS.get('EMAIL_HOST_USER', EMAIL_HOST_USER)
+EMAIL_HOST_PASSWORD = AUTH_TOKENS.get('EMAIL_HOST_PASSWORD', EMAIL_HOST_PASSWORD)
 
-AWS_SES_REGION_NAME = __config__.get('AWS_SES_REGION_NAME', 'us-east-1')
-AWS_SES_REGION_ENDPOINT = __config__.get('AWS_SES_REGION_ENDPOINT', 'email.us-east-1.amazonaws.com')
+AWS_SES_REGION_NAME = ENV_TOKENS.get('AWS_SES_REGION_NAME', 'us-east-1')
+AWS_SES_REGION_ENDPOINT = ENV_TOKENS.get('AWS_SES_REGION_ENDPOINT', 'email.us-east-1.amazonaws.com')
 
 # Note that this is the Studio key for Segment. There is a separate key for the LMS.
-CMS_SEGMENT_KEY = __config__.get('SEGMENT_KEY')
+CMS_SEGMENT_KEY = AUTH_TOKENS.get('SEGMENT_KEY')
 
-SECRET_KEY = __config__['SECRET_KEY']
+SECRET_KEY = AUTH_TOKENS['SECRET_KEY']
 
-AWS_ACCESS_KEY_ID = __config__["AWS_ACCESS_KEY_ID"]
+AWS_ACCESS_KEY_ID = AUTH_TOKENS["AWS_ACCESS_KEY_ID"]
 if AWS_ACCESS_KEY_ID == "":
     AWS_ACCESS_KEY_ID = None
 
-AWS_SECRET_ACCESS_KEY = __config__["AWS_SECRET_ACCESS_KEY"]
+AWS_SECRET_ACCESS_KEY = AUTH_TOKENS["AWS_SECRET_ACCESS_KEY"]
 if AWS_SECRET_ACCESS_KEY == "":
     AWS_SECRET_ACCESS_KEY = None
 
-AWS_STORAGE_BUCKET_NAME = __config__.get('AWS_STORAGE_BUCKET_NAME', 'edxuploads')
+AWS_STORAGE_BUCKET_NAME = AUTH_TOKENS.get('AWS_STORAGE_BUCKET_NAME', 'edxuploads')
 
 # Disabling querystring auth instructs Boto to exclude the querystring parameters (e.g. signature, access key) it
 # normally appends to every returned URL.
-AWS_QUERYSTRING_AUTH = __config__.get('AWS_QUERYSTRING_AUTH', True)
+AWS_QUERYSTRING_AUTH = AUTH_TOKENS.get('AWS_QUERYSTRING_AUTH', True)
 
 AWS_DEFAULT_ACL = 'private'
 AWS_BUCKET_ACL = AWS_DEFAULT_ACL
 AWS_QUERYSTRING_EXPIRE = 7 * 24 * 60 * 60  # 7 days
-AWS_S3_CUSTOM_DOMAIN = __config__.get('AWS_S3_CUSTOM_DOMAIN', 'edxuploads.s3.amazonaws.com')
+AWS_S3_CUSTOM_DOMAIN = AUTH_TOKENS.get('AWS_S3_CUSTOM_DOMAIN', 'edxuploads.s3.amazonaws.com')
 
-if __config__.get('DEFAULT_FILE_STORAGE'):
-    DEFAULT_FILE_STORAGE = __config__.get('DEFAULT_FILE_STORAGE')
+if AUTH_TOKENS.get('DEFAULT_FILE_STORAGE'):
+    DEFAULT_FILE_STORAGE = AUTH_TOKENS.get('DEFAULT_FILE_STORAGE')
 elif AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 else:
     DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
-COURSE_IMPORT_EXPORT_BUCKET = __config__.get('COURSE_IMPORT_EXPORT_BUCKET', '')
+COURSE_IMPORT_EXPORT_BUCKET = ENV_TOKENS.get('COURSE_IMPORT_EXPORT_BUCKET', '')
 
 if COURSE_IMPORT_EXPORT_BUCKET:
     COURSE_IMPORT_EXPORT_STORAGE = 'contentstore.storage.ImportExportS3Storage'
@@ -375,7 +374,7 @@ else:
 
 USER_TASKS_ARTIFACT_STORAGE = COURSE_IMPORT_EXPORT_STORAGE
 
-DATABASES = __config__['DATABASES']
+DATABASES = AUTH_TOKENS['DATABASES']
 
 # The normal database user does not have enough permissions to run migrations.
 # Migrations are run with separate credentials, given as DB_MIGRATION_*
@@ -391,53 +390,53 @@ for name, database in DATABASES.items():
             'PORT': os.environ.get('DB_MIGRATION_PORT', database['PORT']),
         })
 
-MODULESTORE = convert_module_store_setting_if_needed(__config__.get('MODULESTORE', MODULESTORE))
+MODULESTORE = convert_module_store_setting_if_needed(AUTH_TOKENS.get('MODULESTORE', MODULESTORE))
 
-MODULESTORE_FIELD_OVERRIDE_PROVIDERS = __config__.get(
+MODULESTORE_FIELD_OVERRIDE_PROVIDERS = ENV_TOKENS.get(
     'MODULESTORE_FIELD_OVERRIDE_PROVIDERS',
     MODULESTORE_FIELD_OVERRIDE_PROVIDERS
 )
 
-XBLOCK_FIELD_DATA_WRAPPERS = __config__.get(
+XBLOCK_FIELD_DATA_WRAPPERS = ENV_TOKENS.get(
     'XBLOCK_FIELD_DATA_WRAPPERS',
     XBLOCK_FIELD_DATA_WRAPPERS
 )
 
-CONTENTSTORE = __config__['CONTENTSTORE']
-DOC_STORE_CONFIG = __config__['DOC_STORE_CONFIG']
+CONTENTSTORE = AUTH_TOKENS['CONTENTSTORE']
+DOC_STORE_CONFIG = AUTH_TOKENS['DOC_STORE_CONFIG']
 # Datadog for events!
-DATADOG = __config__.get("DATADOG", {})
-DATADOG.update(__config__.get("DATADOG", {}))
+DATADOG = AUTH_TOKENS.get("DATADOG", {})
+DATADOG.update(ENV_TOKENS.get("DATADOG", {}))
 
 # TODO: deprecated (compatibility with previous settings)
-if 'DATADOG_API' in __config__:
-    DATADOG['api_key'] = __config__['DATADOG_API']
+if 'DATADOG_API' in AUTH_TOKENS:
+    DATADOG['api_key'] = AUTH_TOKENS['DATADOG_API']
 
 # Celery Broker
-CELERY_ALWAYS_EAGER = __config__.get("CELERY_ALWAYS_EAGER", False)
-CELERY_BROKER_TRANSPORT = __config__.get("CELERY_BROKER_TRANSPORT", "")
-CELERY_BROKER_HOSTNAME = __config__.get("CELERY_BROKER_HOSTNAME", "")
-CELERY_BROKER_VHOST = __config__.get("CELERY_BROKER_VHOST", "")
-CELERY_BROKER_USER = __config__.get("CELERY_BROKER_USER", "")
-CELERY_BROKER_PASSWORD = __config__.get("CELERY_BROKER_PASSWORD", "")
+CELERY_ALWAYS_EAGER = ENV_TOKENS.get("CELERY_ALWAYS_EAGER", False)
+CELERY_BROKER_TRANSPORT = ENV_TOKENS.get("CELERY_BROKER_TRANSPORT", "")
+CELERY_BROKER_HOSTNAME = ENV_TOKENS.get("CELERY_BROKER_HOSTNAME", "")
+CELERY_BROKER_VHOST = ENV_TOKENS.get("CELERY_BROKER_VHOST", "")
+CELERY_BROKER_USER = AUTH_TOKENS.get("CELERY_BROKER_USER", "")
+CELERY_BROKER_PASSWORD = AUTH_TOKENS.get("CELERY_BROKER_PASSWORD", "")
 
 BROKER_URL = "{0}://{1}:{2}@{3}/{4}".format(CELERY_BROKER_TRANSPORT,
                                             CELERY_BROKER_USER,
                                             CELERY_BROKER_PASSWORD,
                                             CELERY_BROKER_HOSTNAME,
                                             CELERY_BROKER_VHOST)
-BROKER_USE_SSL = __config__.get('CELERY_BROKER_USE_SSL', False)
+BROKER_USE_SSL = ENV_TOKENS.get('CELERY_BROKER_USE_SSL', False)
 
 # Message expiry time in seconds
-CELERY_EVENT_QUEUE_TTL = __config__.get('CELERY_EVENT_QUEUE_TTL', None)
+CELERY_EVENT_QUEUE_TTL = ENV_TOKENS.get('CELERY_EVENT_QUEUE_TTL', None)
 
 # Allow CELERY_QUEUES to be overwritten by config,
-ENV_CELERY_QUEUES = __config__.get('CELERY_QUEUES', None)
+ENV_CELERY_QUEUES = ENV_TOKENS.get('CELERY_QUEUES', None)
 if ENV_CELERY_QUEUES:
     CELERY_QUEUES = {queue: {} for queue in ENV_CELERY_QUEUES}
 
 # Then add alternate environment queues
-ALTERNATE_QUEUE_ENVS = __config__.get('ALTERNATE_WORKER_QUEUES', '').split()
+ALTERNATE_QUEUE_ENVS = ENV_TOKENS.get('ALTERNATE_WORKER_QUEUES', '').split()
 ALTERNATE_QUEUES = [
     DEFAULT_PRIORITY_QUEUE.replace(QUEUE_VARIANT, alternate + '.')
     for alternate in ALTERNATE_QUEUE_ENVS
@@ -452,86 +451,86 @@ CELERY_QUEUES.update(
 )
 
 # Queue to use for updating grades due to grading policy change
-POLICY_CHANGE_GRADES_ROUTING_KEY = __config__.get('POLICY_CHANGE_GRADES_ROUTING_KEY', DEFAULT_PRIORITY_QUEUE)
+POLICY_CHANGE_GRADES_ROUTING_KEY = ENV_TOKENS.get('POLICY_CHANGE_GRADES_ROUTING_KEY', DEFAULT_PRIORITY_QUEUE)
 
 # Rate limit for regrading tasks that a grading policy change can kick off
-POLICY_CHANGE_TASK_RATE_LIMIT = __config__.get('POLICY_CHANGE_TASK_RATE_LIMIT', POLICY_CHANGE_TASK_RATE_LIMIT)
+POLICY_CHANGE_TASK_RATE_LIMIT = ENV_TOKENS.get('POLICY_CHANGE_TASK_RATE_LIMIT', POLICY_CHANGE_TASK_RATE_LIMIT)
 
 # Event tracking
-TRACKING_BACKENDS.update(__config__.get("TRACKING_BACKENDS", {}))
-EVENT_TRACKING_BACKENDS['tracking_logs']['OPTIONS']['backends'].update(__config__.get("EVENT_TRACKING_BACKENDS", {}))
+TRACKING_BACKENDS.update(AUTH_TOKENS.get("TRACKING_BACKENDS", {}))
+EVENT_TRACKING_BACKENDS['tracking_logs']['OPTIONS']['backends'].update(AUTH_TOKENS.get("EVENT_TRACKING_BACKENDS", {}))
 EVENT_TRACKING_BACKENDS['segmentio']['OPTIONS']['processors'][0]['OPTIONS']['whitelist'].extend(
-    __config__.get("EVENT_TRACKING_SEGMENTIO_EMIT_WHITELIST", []))
+    AUTH_TOKENS.get("EVENT_TRACKING_SEGMENTIO_EMIT_WHITELIST", []))
 
 ##### ACCOUNT LOCKOUT DEFAULT PARAMETERS #####
-MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED = __config__.get("MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED", 5)
-MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS = __config__.get("MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS", 15 * 60)
+MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED = ENV_TOKENS.get("MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED", 5)
+MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS = ENV_TOKENS.get("MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS", 15 * 60)
 
 #### PASSWORD POLICY SETTINGS #####
-AUTH_PASSWORD_VALIDATORS = __config__.get("AUTH_PASSWORD_VALIDATORS", AUTH_PASSWORD_VALIDATORS)
+AUTH_PASSWORD_VALIDATORS = ENV_TOKENS.get("AUTH_PASSWORD_VALIDATORS", AUTH_PASSWORD_VALIDATORS)
 
 ### INACTIVITY SETTINGS ####
-SESSION_INACTIVITY_TIMEOUT_IN_SECONDS = __config__.get("SESSION_INACTIVITY_TIMEOUT_IN_SECONDS")
+SESSION_INACTIVITY_TIMEOUT_IN_SECONDS = AUTH_TOKENS.get("SESSION_INACTIVITY_TIMEOUT_IN_SECONDS")
 
 ##### X-Frame-Options response header settings #####
-X_FRAME_OPTIONS = __config__.get('X_FRAME_OPTIONS', X_FRAME_OPTIONS)
+X_FRAME_OPTIONS = ENV_TOKENS.get('X_FRAME_OPTIONS', X_FRAME_OPTIONS)
 
 ################ ADVANCED COMPONENT/PROBLEM TYPES ###############
 
-ADVANCED_PROBLEM_TYPES = __config__.get('ADVANCED_PROBLEM_TYPES', ADVANCED_PROBLEM_TYPES)
+ADVANCED_PROBLEM_TYPES = ENV_TOKENS.get('ADVANCED_PROBLEM_TYPES', ADVANCED_PROBLEM_TYPES)
 
 ################ VIDEO UPLOAD PIPELINE ###############
 
-VIDEO_UPLOAD_PIPELINE = __config__.get('VIDEO_UPLOAD_PIPELINE', VIDEO_UPLOAD_PIPELINE)
+VIDEO_UPLOAD_PIPELINE = ENV_TOKENS.get('VIDEO_UPLOAD_PIPELINE', VIDEO_UPLOAD_PIPELINE)
 
 ################ VIDEO IMAGE STORAGE ###############
 
-VIDEO_IMAGE_SETTINGS = __config__.get('VIDEO_IMAGE_SETTINGS', VIDEO_IMAGE_SETTINGS)
+VIDEO_IMAGE_SETTINGS = ENV_TOKENS.get('VIDEO_IMAGE_SETTINGS', VIDEO_IMAGE_SETTINGS)
 
 ################ VIDEO TRANSCRIPTS STORAGE ###############
 
-VIDEO_TRANSCRIPTS_SETTINGS = __config__.get('VIDEO_TRANSCRIPTS_SETTINGS', VIDEO_TRANSCRIPTS_SETTINGS)
+VIDEO_TRANSCRIPTS_SETTINGS = ENV_TOKENS.get('VIDEO_TRANSCRIPTS_SETTINGS', VIDEO_TRANSCRIPTS_SETTINGS)
 
 ################ PUSH NOTIFICATIONS ###############
 
-PARSE_KEYS = __config__.get("PARSE_KEYS", {})
+PARSE_KEYS = AUTH_TOKENS.get("PARSE_KEYS", {})
 
 
 # Video Caching. Pairing country codes with CDN URLs.
 # Example: {'CN': 'http://api.xuetangx.com/edx/video?s3_url='}
-VIDEO_CDN_URL = __config__.get('VIDEO_CDN_URL', {})
+VIDEO_CDN_URL = ENV_TOKENS.get('VIDEO_CDN_URL', {})
 
 if FEATURES['ENABLE_COURSEWARE_INDEX'] or FEATURES['ENABLE_LIBRARY_INDEX']:
     # Use ElasticSearch for the search engine
     SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"
 
-ELASTIC_SEARCH_CONFIG = __config__.get('ELASTIC_SEARCH_CONFIG', [{}])
+ELASTIC_SEARCH_CONFIG = ENV_TOKENS.get('ELASTIC_SEARCH_CONFIG', [{}])
 
-XBLOCK_SETTINGS = __config__.get('XBLOCK_SETTINGS', {})
+XBLOCK_SETTINGS = ENV_TOKENS.get('XBLOCK_SETTINGS', {})
 XBLOCK_SETTINGS.setdefault("VideoDescriptor", {})["licensing_enabled"] = FEATURES.get("LICENSING", False)
-XBLOCK_SETTINGS.setdefault("VideoModule", {})['YOUTUBE_API_KEY'] = __config__.get('YOUTUBE_API_KEY', YOUTUBE_API_KEY)
+XBLOCK_SETTINGS.setdefault("VideoModule", {})['YOUTUBE_API_KEY'] = ENV_TOKENS.get('YOUTUBE_API_KEY', YOUTUBE_API_KEY)
 
 ################# MICROSITE ####################
 # microsite specific configurations.
-MICROSITE_CONFIGURATION = __config__.get('MICROSITE_CONFIGURATION', {})
-MICROSITE_ROOT_DIR = path(__config__.get('MICROSITE_ROOT_DIR', ''))
+MICROSITE_CONFIGURATION = ENV_TOKENS.get('MICROSITE_CONFIGURATION', {})
+MICROSITE_ROOT_DIR = path(ENV_TOKENS.get('MICROSITE_ROOT_DIR', ''))
 # this setting specify which backend to be used when pulling microsite specific configuration
-MICROSITE_BACKEND = __config__.get("MICROSITE_BACKEND", MICROSITE_BACKEND)
+MICROSITE_BACKEND = ENV_TOKENS.get("MICROSITE_BACKEND", MICROSITE_BACKEND)
 # this setting specify which backend to be used when loading microsite specific templates
-MICROSITE_TEMPLATE_BACKEND = __config__.get("MICROSITE_TEMPLATE_BACKEND", MICROSITE_TEMPLATE_BACKEND)
+MICROSITE_TEMPLATE_BACKEND = ENV_TOKENS.get("MICROSITE_TEMPLATE_BACKEND", MICROSITE_TEMPLATE_BACKEND)
 # TTL for microsite database template cache
-MICROSITE_DATABASE_TEMPLATE_CACHE_TTL = __config__.get(
+MICROSITE_DATABASE_TEMPLATE_CACHE_TTL = ENV_TOKENS.get(
     "MICROSITE_DATABASE_TEMPLATE_CACHE_TTL", MICROSITE_DATABASE_TEMPLATE_CACHE_TTL
 )
 
 ############################ OAUTH2 Provider ###################################
 
 # OpenID Connect issuer ID. Normally the URL of the authentication endpoint.
-OAUTH_OIDC_ISSUER = __config__['OAUTH_OIDC_ISSUER']
+OAUTH_OIDC_ISSUER = ENV_TOKENS['OAUTH_OIDC_ISSUER']
 
 #### JWT configuration ####
-JWT_AUTH.update(__config__.get('JWT_AUTH', {}))
-JWT_AUTH.update(__config__.get('JWT_AUTH', {}))
+JWT_AUTH.update(ENV_TOKENS.get('JWT_AUTH', {}))
+JWT_AUTH.update(AUTH_TOKENS.get('JWT_AUTH', {}))
 
 ######################## CUSTOM COURSES for EDX CONNECTOR ######################
 if FEATURES.get('CUSTOM_COURSES_EDX'):
@@ -539,29 +538,29 @@ if FEATURES.get('CUSTOM_COURSES_EDX'):
         INSTALLED_APPS.append('openedx.core.djangoapps.ccxcon.apps.CCXConnectorConfig')
 
 # Partner support link for CMS footer
-PARTNER_SUPPORT_EMAIL = __config__.get('PARTNER_SUPPORT_EMAIL', PARTNER_SUPPORT_EMAIL)
+PARTNER_SUPPORT_EMAIL = ENV_TOKENS.get('PARTNER_SUPPORT_EMAIL', PARTNER_SUPPORT_EMAIL)
 
 # Affiliate cookie tracking
-AFFILIATE_COOKIE_NAME = __config__.get('AFFILIATE_COOKIE_NAME', AFFILIATE_COOKIE_NAME)
+AFFILIATE_COOKIE_NAME = ENV_TOKENS.get('AFFILIATE_COOKIE_NAME', AFFILIATE_COOKIE_NAME)
 
 ############## Settings for Studio Context Sensitive Help ##############
 
-HELP_TOKENS_BOOKS = __config__.get('HELP_TOKENS_BOOKS', HELP_TOKENS_BOOKS)
+HELP_TOKENS_BOOKS = ENV_TOKENS.get('HELP_TOKENS_BOOKS', HELP_TOKENS_BOOKS)
 
 ############## Settings for CourseGraph ############################
-COURSEGRAPH_JOB_QUEUE = __config__.get('COURSEGRAPH_JOB_QUEUE', DEFAULT_PRIORITY_QUEUE)
+COURSEGRAPH_JOB_QUEUE = ENV_TOKENS.get('COURSEGRAPH_JOB_QUEUE', DEFAULT_PRIORITY_QUEUE)
 
 ########## Settings for video transcript migration tasks ############
-VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE = __config__.get('VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE', DEFAULT_PRIORITY_QUEUE)
+VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE = ENV_TOKENS.get('VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE', DEFAULT_PRIORITY_QUEUE)
 
 ########## Settings youtube thumbnails scraper tasks ############
-SCRAPE_YOUTUBE_THUMBNAILS_JOB_QUEUE = __config__.get('SCRAPE_YOUTUBE_THUMBNAILS_JOB_QUEUE', DEFAULT_PRIORITY_QUEUE)
+SCRAPE_YOUTUBE_THUMBNAILS_JOB_QUEUE = ENV_TOKENS.get('SCRAPE_YOUTUBE_THUMBNAILS_JOB_QUEUE', DEFAULT_PRIORITY_QUEUE)
 
 ########################## Parental controls config  #######################
 
 # The age at which a learner no longer requires parental consent, or None
 # if parental consent is never required.
-PARENTAL_CONSENT_AGE_LIMIT = __config__.get(
+PARENTAL_CONSENT_AGE_LIMIT = ENV_TOKENS.get(
     'PARENTAL_CONSENT_AGE_LIMIT',
     PARENTAL_CONSENT_AGE_LIMIT
 )
@@ -569,13 +568,13 @@ PARENTAL_CONSENT_AGE_LIMIT = __config__.get(
 ########################## Extra middleware classes  #######################
 
 # Allow extra middleware classes to be added to the app through configuration.
-MIDDLEWARE_CLASSES.extend(__config__.get('EXTRA_MIDDLEWARE_CLASSES', []))
+MIDDLEWARE_CLASSES.extend(ENV_TOKENS.get('EXTRA_MIDDLEWARE_CLASSES', []))
 
 ########################## Settings for Completion API #####################
 
 # Once a user has watched this percentage of a video, mark it as complete:
 # (0.0 = 0%, 1.0 = 100%)
-COMPLETION_VIDEO_COMPLETE_PERCENTAGE = __config__.get(
+COMPLETION_VIDEO_COMPLETE_PERCENTAGE = ENV_TOKENS.get(
     'COMPLETION_VIDEO_COMPLETE_PERCENTAGE',
     COMPLETION_VIDEO_COMPLETE_PERCENTAGE,
 )
@@ -583,30 +582,30 @@ COMPLETION_VIDEO_COMPLETE_PERCENTAGE = __config__.get(
 ####################### Enterprise Settings ######################
 # A shared secret to be used for encrypting passwords passed from the enterprise api
 # to the enteprise reporting script.
-ENTERPRISE_REPORTING_SECRET = __config__.get(
+ENTERPRISE_REPORTING_SECRET = AUTH_TOKENS.get(
     'ENTERPRISE_REPORTING_SECRET',
     ENTERPRISE_REPORTING_SECRET
 )
 
 # A default dictionary to be used for filtering out enterprise customer catalog.
-ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER = __config__.get(
+ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER = ENV_TOKENS.get(
     'ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER',
     ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER
 )
 
 ############### Settings for Retirement #####################
-RETIRED_USERNAME_PREFIX = __config__.get('RETIRED_USERNAME_PREFIX', RETIRED_USERNAME_PREFIX)
-RETIRED_EMAIL_PREFIX = __config__.get('RETIRED_EMAIL_PREFIX', RETIRED_EMAIL_PREFIX)
-RETIRED_EMAIL_DOMAIN = __config__.get('RETIRED_EMAIL_DOMAIN', RETIRED_EMAIL_DOMAIN)
-RETIRED_USER_SALTS = __config__.get('RETIRED_USER_SALTS', RETIRED_USER_SALTS)
-RETIREMENT_SERVICE_WORKER_USERNAME = __config__.get(
+RETIRED_USERNAME_PREFIX = ENV_TOKENS.get('RETIRED_USERNAME_PREFIX', RETIRED_USERNAME_PREFIX)
+RETIRED_EMAIL_PREFIX = ENV_TOKENS.get('RETIRED_EMAIL_PREFIX', RETIRED_EMAIL_PREFIX)
+RETIRED_EMAIL_DOMAIN = ENV_TOKENS.get('RETIRED_EMAIL_DOMAIN', RETIRED_EMAIL_DOMAIN)
+RETIRED_USER_SALTS = ENV_TOKENS.get('RETIRED_USER_SALTS', RETIRED_USER_SALTS)
+RETIREMENT_SERVICE_WORKER_USERNAME = ENV_TOKENS.get(
     'RETIREMENT_SERVICE_WORKER_USERNAME',
     RETIREMENT_SERVICE_WORKER_USERNAME
 )
-RETIREMENT_STATES = __config__.get('RETIREMENT_STATES', RETIREMENT_STATES)
+RETIREMENT_STATES = ENV_TOKENS.get('RETIREMENT_STATES', RETIREMENT_STATES)
 
 ############## Settings for Course Enrollment Modes ######################
-COURSE_ENROLLMENT_MODES = __config__.get('COURSE_ENROLLMENT_MODES', COURSE_ENROLLMENT_MODES)
+COURSE_ENROLLMENT_MODES = ENV_TOKENS.get('COURSE_ENROLLMENT_MODES', COURSE_ENROLLMENT_MODES)
 
 ####################### Plugin Settings ##########################
 
@@ -615,11 +614,12 @@ COURSE_ENROLLMENT_MODES = __config__.get('COURSE_ENROLLMENT_MODES', COURSE_ENROL
 # We continue to load aws.py until we remove aws.py from all plugins for reverse compatibility
 # after aws.py is removed, we should remove these lines.
 
-from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants  # pylint: disable=wrong-import-order, wrong-import-position
-plugin_settings.add_plugins("cms.envs.aws", plugin_constants.ProjectType.CMS, plugin_constants.SettingsType.DEPRECATED_AWS)
+from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants  # pylint: disable=wrong-import-order, wrong-import-position, ungrouped-imports
+
+plugin_settings.add_plugins("cms.envs.aws", plugin_constants.ProjectType.CMS,
+                                            plugin_constants.SettingsType.DEPRECATED_AWS)
 
 # We continue to load production.py over aws.py
-from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants  # pylint: disable=wrong-import-order, wrong-import-position
 plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.CMS, plugin_constants.SettingsType.PRODUCTION)
 
 ########################## Derive Any Derived Settings  #######################

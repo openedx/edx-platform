@@ -30,7 +30,7 @@ else:
     os.environ['SERVICE_VARIANT'] = 'bok_choy'
 
 os.environ['CONFIG_ROOT'] = path(__file__).abspath().dirname()
-os.environ['STUDIO_CFG'] = str.format("{}/{}.yml", path(__file__).abspath().dirname(), os.environ['SERVICE_VARIANT'])
+os.environ['STUDIO_CFG'] = str.format("{0}/{1}.yml", os.environ['CONFIG_ROOT'], os.environ['SERVICE_VARIANT'])
 
 from .production import *  # pylint: disable=wildcard-import, unused-wildcard-import, wrong-import-position
 

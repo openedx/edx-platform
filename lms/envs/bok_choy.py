@@ -27,13 +27,9 @@ TEST_ROOT = CONFIG_ROOT.dirname().dirname() / "test_root"
 # Unlike in prod, we use the JSON files stored in this repo.
 # This is a convenience for ensuring (a) that we can consistently find the files
 # and (b) that the files are the same in Jenkins as in local dev.
-if 'BOK_CHOY_HOSTNAME' in os.environ:
-    os.environ['SERVICE_VARIANT'] = 'bok_choy_docker'
-else:
-    os.environ['SERVICE_VARIANT'] = 'bok_choy'
-
-os.environ['CONFIG_ROOT'] = path(__file__).abspath().dirname()
-os.environ['LMS_CFG'] = str.format("{}/{}.yml", path(__file__).abspath().dirname(), os.environ['SERVICE_VARIANT'])
+os.environ['SERVICE_VARIANT'] = 'bok_choy_docker' if 'BOK_CHOY_HOSTNAME' in os.environ else 'bok_choy'
+os.environ['CONFIG_ROOT'] = CONFIG_ROOT
+os.environ['LMS_CFG'] = str.format("{}/{}.yml", os.environ['CONFIG_ROOT'], os.environ['SERVICE_VARIANT'])
 
 from .production import *  # pylint: disable=wildcard-import, unused-wildcard-import, wrong-import-position
 
