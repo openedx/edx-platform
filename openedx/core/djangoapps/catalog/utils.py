@@ -107,7 +107,9 @@ def get_programs(site=None, uuid=None, course=None):  # pylint: disable=redefine
     elif course:
         uuids = cache.get(COURSE_PROGRAMS_CACHE_KEY_TPL.format(course_run_id=course))
         if not uuids:
-            logger.warning(missing_details_msg_tpl.format(course=course))
+            # Currently, the cache does not differentiate between a cache miss and a course
+            # without programs. After this is changed, log any cache misses here.
+            return []
     else:
         uuids = cache.get(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=site.domain), [])
         if not uuids:

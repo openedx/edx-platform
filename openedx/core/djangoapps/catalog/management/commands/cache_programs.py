@@ -1,3 +1,5 @@
+""""Management command to add program information to the cache."""
+from collections import defaultdict
 import logging
 import sys
 
@@ -211,15 +213,12 @@ class Command(BaseCommand):
         in the cache not just the course runs in a program. Therefore, a cache miss would be different from a
         course not in a program.
         """
-        course_runs = {}
+        course_runs = defaultdict(list)
         failure = False
 
-        for program_uuid, program in programs.items():
+        for program in programs.values():
             for course in program['courses']:
                 for course_run in course['course_runs']:
-                    course_run_key = course_run['key']
-                    if course_run_key in course_runs:
-                        course_runs[course_run_key] += program_uuid
-                    else:
-                        course_runs[course_run_key] = [program_uuid]
+                    course_run_cache_key = COURSE_PROGRAMS_CACHE_KEY_TPL.format(course_run_id=course_run['key'])
+                    course_runs[course_run_cache_key].append(program['uuid'])
         return course_runs, failure
