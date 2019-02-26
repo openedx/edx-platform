@@ -1,6 +1,7 @@
 """
 Tests for the lms_filter_generator
 """
+from django.test.utils import override_settings
 from mock import Mock, patch
 
 from lms.lib.courseware_search.lms_filter_generator import LmsSearchFilterGenerator
@@ -10,8 +11,9 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
+@override_settings(SEARCH_FILTER_GENERATOR="lms.lib.courseware_search.lms_filter_generator.LmsSearchFilterGenerator")
 class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):
-    """ Tests for search result processor """
+    """ Tests for search filter generator """
 
     def build_courses(self):
         """
@@ -80,12 +82,12 @@ class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):
 
     def test_user_not_provided(self):
         """
-        Tests that we get empty list of courses in case the user is not provided
+        Tests that we get empty dict in case the user is not provided
         """
         field_dictionary, filter_dictionary, _ = LmsSearchFilterGenerator.generate_field_filters()
 
         self.assertIn('start_date', filter_dictionary)
-        self.assertEqual(0, len(field_dictionary['course']))
+        self.assertEqual({}, field_dictionary)
 
     def test_excludes_site_org(self):
         """

@@ -28,11 +28,10 @@ class LmsSearchFilterGenerator(SearchFilterGenerator):
     def field_dictionary(self, **kwargs):
         """ add course if provided otherwise add courses in which the user is enrolled in """
         field_dictionary = super(LmsSearchFilterGenerator, self).field_dictionary(**kwargs)
-        if not kwargs.get('user'):
-            field_dictionary['course'] = []
-        elif not kwargs.get('course_id'):
-            user_enrollments = self._enrollments_for_user(kwargs['user'])
-            field_dictionary['course'] = [unicode(enrollment.course_id) for enrollment in user_enrollments]
+        if kwargs.get('user'):
+            if not kwargs.get('course_id'):
+                user_enrollments = self._enrollments_for_user(kwargs['user'])
+                field_dictionary['course'] = [unicode(enrollment.course_id) for enrollment in user_enrollments]
 
         # if we have an org filter, only include results for this org filter
         course_org_filter = configuration_helpers.get_current_site_orgs()
