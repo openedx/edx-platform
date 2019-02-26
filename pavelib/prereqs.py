@@ -192,6 +192,7 @@ def install_node_prereqs():
 # To add a package to the uninstall list, just add it to this list! No need
 # to touch any other part of this file.
 PACKAGES_TO_UNINSTALL = [
+    "MySQL-python",                 # Because mysqlclient shares the same directory name
     "South",                        # Because it interferes with Django 1.8 migrations.
     "edxval",                       # Because it was bork-installed somehow.
     "django-storages",
