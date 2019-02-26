@@ -1,13 +1,15 @@
 import json
 from itertools import izip
+from urlparse import urlparse
 
 import cssutils
 import os
 import sass
+from django.core.files.storage import get_storage_class
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
-from django.contrib.staticfiles.templatetags.staticfiles import static
+from django.utils.text import slugify
 from organizations.api import add_organization
 from organizations.models import UserOrganizationMapping, Organization
 
@@ -26,6 +28,31 @@ def get_lms_link_from_course_key(base_lms_url, course_key):
         site_domain = "{}.{}".format(course_key.org, base_lms_url)
 
     return site_domain
+
+
+def to_safe_file_name(url):
+    path = urlparse(url).path.lower()
+    safe_extensions = {'.png', '.jpeg', '.jpg'}
+    sluggified = slugify(path)
+
+    for ext in safe_extensions:
+        if path.endswith(ext):
+            return sluggified + ext
+
+    return sluggified
+
+
+def get_customer_files_storage():
+    kwargs = {}
+    # Passing these settings to the FileSystemStorage causes an exception
+    # TODO: Use settings instead of hardcoded in Python
+    if not settings.DEBUG:
+        kwargs = {
+            'location': 'customer_files',
+            'file_overwrite': False
+        }
+
+    return get_storage_class()(**kwargs)
 
 
 def get_initial_sass_variables():
