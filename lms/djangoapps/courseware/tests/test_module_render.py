@@ -321,7 +321,7 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         """Test that anonymous GET is allowed."""
         dispatch_url = self._get_dispatch_url()
         response = self.client.get(dispatch_url)
-        self.assertEquals(200, response.status_code)
+        self.assertEquals(403, response.status_code)
 
     def test_anonymous_post_xblock_callback(self):
         """Test that anonymous POST is not allowed."""

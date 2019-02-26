@@ -1040,6 +1040,9 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
                     request.user, _ = user_auth_tuple
                     break
 
+    if not request.user.is_authenticated:
+        return HttpResponse('Unauthenticated', status=403)
+
     # NOTE (CCB): Allow anonymous GET calls (e.g. for transcripts). Modifying this view is simpler than updating
     # the XBlocks to use `handle_xblock_callback_noauth`, which is practically identical to this view.
     if request.method != 'GET' and not (request.user and request.user.is_authenticated):
