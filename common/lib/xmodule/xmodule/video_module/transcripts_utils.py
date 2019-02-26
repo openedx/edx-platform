@@ -890,6 +890,9 @@ def get_transcript_from_val(edx_video_id, lang=None, output_format=Transcript.SR
         raise NotFoundError(u'Transcript not found for {}, lang: {}'.format(edx_video_id, lang))
 
     transcript_conversion_props = dict(transcript, output_format=output_format)
+    # Log for EDUCATOR-3928
+    if edx_video_id == 'MIT6002XT214-V002700':
+        log.info("Transcript content: %s", transcript_conversion_props.get('content', ''))
     transcript = convert_video_transcript(**transcript_conversion_props)
     filename = transcript['filename']
     content = transcript['content']
