@@ -85,7 +85,7 @@
                     });
 
                     it('set current video speed via cookie', function() {
-                        expect(state.speed).toEqual('1.50');
+                        expect(state.speed).toEqual(1.5);
                     });
                 });
 
