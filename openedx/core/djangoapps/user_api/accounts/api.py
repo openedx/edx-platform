@@ -572,6 +572,8 @@ def delete_users(users):
     for user in users:
         retire_user_comments(user)
 
-    delete_profile_images.delay(users)
+    # Delete user profile images in background task
+    usernames = list(users.values_list('username', flat=True))
+    delete_profile_images.delay(usernames)
 
     users.delete()

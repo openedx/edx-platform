@@ -507,7 +507,8 @@ class UserDeletionTest(TestCase):
         user1 = UserFactory.create(password='secret')
         user2 = UserFactory.create(password='secret')
 
-        users_qs = User.objects.filter(username__in=[user1.username, user2.username])
+        usernames = [user1.username, user2.username]
+        users_qs = User.objects.filter(username__in=usernames)
 
         # Delete the users
         delete_users(users_qs)
@@ -521,7 +522,7 @@ class UserDeletionTest(TestCase):
         ])
 
         # Verify that the delete_profile_images task is called
-        mock_delete_profile_images.delay.assert_called_with(users_qs)
+        mock_delete_profile_images.delay.assert_called_with(usernames)
 
         # Verify that the user objects have been deleted
         self.assertEqual(User.objects.filter(username__in=[user1.username, user2.username]).count(), 0)

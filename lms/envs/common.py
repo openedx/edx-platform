@@ -2273,6 +2273,9 @@ INSTALLED_APPS = (
 
     # User Manager API
     'user_manager',
+
+    # Profile image
+    'openedx.core.djangoapps.profile_images',
 )
 
 ######################### CSRF #########################################

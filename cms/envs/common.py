@@ -1056,6 +1056,9 @@ INSTALLED_APPS = (
     # Completion
     'completion',
     'completion_aggregator',
+
+    # Profile image
+    'openedx.core.djangoapps.profile_images',
 )
 
 
