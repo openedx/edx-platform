@@ -16,6 +16,7 @@ from course_modes.tests.factories import CourseModeFactory
 from entitlements.tests.factories import CourseEntitlementFactory
 from openedx.core.constants import COURSE_UNPUBLISHED
 from openedx.core.djangoapps.catalog.cache import (
+    COURSE_PROGRAMS_CACHE_KEY_TPL,
     PATHWAY_CACHE_KEY_TPL,
     PROGRAM_CACHE_KEY_TPL,
     SITE_PATHWAY_IDS_CACHE_KEY_TPL,
@@ -181,6 +182,27 @@ class TestGetPrograms(CacheIsolationTestCase):
 
         actual_program = get_programs(uuid=expected_uuid)
         self.assertEqual(actual_program, expected_program)
+        self.assertFalse(mock_warning.called)
+
+    def test_get_from_course(self, mock_warning, _mock_info):
+        expected_program = ProgramFactory()
+        expected_course = expected_program['courses'][0]['course_runs'][0]['key']
+
+        self.assertEqual(get_programs(course=expected_course), [])
+
+        cache.set(
+            COURSE_PROGRAMS_CACHE_KEY_TPL.format(course_run_id=expected_course),
+            [expected_program['uuid']],
+            None
+        )
+        cache.set(
+            PROGRAM_CACHE_KEY_TPL.format(uuid=expected_program['uuid']),
+            expected_program,
+            None
+        )
+
+        actual_program = get_programs(course=expected_course)
+        self.assertEqual(actual_program, [expected_program])
         self.assertFalse(mock_warning.called)
 
 
