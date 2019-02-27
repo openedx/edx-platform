@@ -1764,6 +1764,17 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         """
         Test for verification passed.
         """
+        expiry_date = datetime.now(pytz.UTC) + timedelta(
+            days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
+        )
+        verification = SoftwareSecurePhotoVerification.objects.create(user=self.user)
+        verification.mark_ready()
+        verification.submit()
+        verification.approve()
+        verification.expiry_date = datetime.now(pytz.UTC)
+        verification.expiry_email_date = datetime.now(pytz.UTC)
+        verification.save()
+
         data = {
             "EdX-ID": self.receipt_id,
             "Result": "PASS",
@@ -1778,7 +1789,45 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
             HTTP_DATE='testdate'
         )
         attempt = SoftwareSecurePhotoVerification.objects.get(receipt_id=self.receipt_id)
+        old_verification = SoftwareSecurePhotoVerification.objects.get(pk=verification.pk)
         self.assertEqual(attempt.status, u'approved')
+        self.assertEqual(attempt.expiry_date.date(), expiry_date.date())
+        self.assertIsNone(old_verification.expiry_date)
+        self.assertIsNone(old_verification.expiry_email_date)
+        self.assertEquals(response.content, 'OK!')
+        self.assertEqual(len(mail.outbox), 1)
+
+    @patch(
+        'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
+        mock.Mock(side_effect=mocked_has_valid_signature)
+    )
+    @patch('lms.djangoapps.verify_student.views.log.error')
+    @patch('lms.djangoapps.verify_student.utils.SailthruClient.send')
+    def test_first_time_verification(self, mock_sailthru_send, mock_log_error):  # pylint: disable=unused-argument
+        """
+        Test for verification passed if the learner does not have any previous verification
+        """
+        expiry_date = datetime.now(pytz.UTC) + timedelta(
+            days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
+        )
+
+        data = {
+            "EdX-ID": self.receipt_id,
+            "Result": "PASS",
+            "Reason": "",
+            "MessageType": "You have been verified."
+        }
+        json_data = json.dumps(data)
+        response = self.client.post(
+            reverse('verify_student_results_callback'), data=json_data,
+            content_type='application/json',
+            HTTP_AUTHORIZATION='test BBBBBBBBBBBBBBBBBBBB:testing',
+            HTTP_DATE='testdate'
+        )
+
+        attempt = SoftwareSecurePhotoVerification.objects.get(receipt_id=self.receipt_id)
+        self.assertEqual(attempt.status, u'approved')
+        self.assertEqual(attempt.expiry_date.date(), expiry_date.date())
         self.assertEquals(response.content, 'OK!')
         self.assertEqual(len(mail.outbox), 1)
 

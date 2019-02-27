@@ -1158,7 +1158,17 @@ def results_callback(request):
         'platform_name': settings.PLATFORM_NAME,
     }
     if result == "PASS":
-        log.debug(u"Approving verification for %s", receipt_id)
+        # If this verification is not an outdated version then make expiry date of previous approved verification NULL
+        # Setting expiry date to NULL is important so that it does not get filtered in the management command
+        # that sends email when verification expires : verify_student/send_verification_expiry_email
+        if attempt.status != 'approved':
+            verification = SoftwareSecurePhotoVerification.objects.filter(status='approved', user_id=attempt.user_id)
+            if verification:
+                log.info(u'Making expiry date of previous approved verification NULL for {}'.format(attempt.user_id))
+                previous_verification = verification.latest('updated_at')
+                SoftwareSecurePhotoVerification.objects.filter(pk=previous_verification.pk
+                                                               ).update(expiry_date=None, expiry_email_date=None)
+        log.debug(u'Approving verification for {}'.format(receipt_id))
         attempt.approve()
         status = u"approved"
         expiry_date = datetime.date.today() + datetime.timedelta(
