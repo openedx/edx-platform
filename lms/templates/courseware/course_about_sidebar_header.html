@@ -54,10 +54,10 @@ from six import text_type
             )
         ).replace(u" ", u"%20")
       %>
-      <a href="${tweet_action}" class="share">
+      <a href="${tweet_action}" class="share" target="_blank">
         <span class="icon fa fa-twitter" aria-hidden="true"></span><span class="sr">${_("Tweet that you've enrolled in this course")}</span>
       </a>
-      <a href="${facebook_link}" class="share">
+      <a href="${facebook_link}" class="share" target="_blank">
         <span class="icon fa fa-thumbs-up" aria-hidden="true"></span><span class="sr">${_("Post a Facebook message to say you've enrolled in this course")}</span>
       </a>
       <a href="${email_subject}" class="share">
