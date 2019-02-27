@@ -2,6 +2,8 @@
 Utilities to facilitate experimentation
 """
 
+import hashlib
+import re
 from student.models import CourseEnrollment
 from django_comment_common.models import Role
 from course_modes.models import get_cosmetic_verified_display_price
@@ -202,3 +204,23 @@ def get_experiment_dashboard_metadata_context(enrollments):
     """
     return {str(enrollment.course): enrollment.course_price for enrollment in enrollments}
 #TODO END: Clean up REVEM-205
+
+
+def stable_bucketing_hash_group(group_name, group_count, username):
+    """
+    Return the bucket that a user should be in for a given stable bucketing assignment.
+
+    This function has been verified to return the same values as the stable bucketing
+    functions in javascript and the master experiments table.
+
+    Arguments:
+        group_name: The name of the grouping/experiment.
+        group_count: How many groups to bucket users into.
+        username: The username of the user being bucketed.
+    """
+    hasher = hashlib.md5()
+    hasher.update(group_name.encode('utf-8'))
+    hasher.update(username.encode('utf-8'))
+    hash_str = hasher.hexdigest()
+
+    return int(re.sub('[8-9a-f]', '1', re.sub('[0-7]', '0', hash_str)), 2) % group_count
