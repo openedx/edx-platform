@@ -631,12 +631,18 @@ def _get_catalog_data_for_course(course_key):
 
     catalog_data = {}
     course_run_fields = []
+    log.info(u"language specific template is:{lang} and include hours of effort is:{hof} for the course:{course_key}"
+             .format(lang=course_certificate_settings.language_specific_templates_enabled,
+                     hof=course_certificate_settings.include_hours_of_effort,
+                     course_key=course_key))
     if course_certificate_settings.language_specific_templates_enabled:
         course_run_fields.append('content_language')
     if course_certificate_settings.include_hours_of_effort:
         course_run_fields.extend(['weeks_to_complete', 'max_effort'])
 
     if course_run_fields:
+        log.info(u'requesting following fields:{course_run_fields} for the course:{course_key}'.
+                 format(course_run_fields=course_run_fields, course_key=course_key))
         course_run_data = get_course_run_details(course_key, course_run_fields)
         if course_run_data.get('weeks_to_complete') and course_run_data.get('max_effort'):
             try:

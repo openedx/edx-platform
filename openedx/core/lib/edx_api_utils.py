@@ -55,8 +55,9 @@ def get_edx_api_data(api_config, resource, api, resource_id=None, querystring=No
 
         cached = cache.get(cache_key)
         if cached:
-            log.info("Cached course run was returned for the course: {resource_id} and response is {cached} ".
-                     format(resource_id=resource_id, cached=zunpickle(cached)))
+            log.info("Cached course run was returned for the course: {resource_id} using the key:{cache_key}"
+                     "  and response is {cached} ".format(resource_id=resource_id, cache_key=cache_key,
+                                                          cached=zunpickle(cached)))
             return zunpickle(cached)
 
     try:
@@ -69,6 +70,8 @@ def get_edx_api_data(api_config, resource, api, resource_id=None, querystring=No
 
         if resource_id is not None:
             if fields:
+                log.info("Getting following fields:{fields} for the course:{resource_id}".format(
+                    fields=fields, resource_id=resource_id))
                 results = get_fields(fields, response)
             else:
                 results = response
@@ -85,6 +88,8 @@ def get_edx_api_data(api_config, resource, api, resource_id=None, querystring=No
         cache_ttl = api_config.cache_ttl
         if long_term_cache:
             cache_ttl = api_config.long_term_cache_ttl
+        log.info('setting cache for the course:{resource_id} with key:{cache_key} and results:{results}'.format(
+            resource_id=resource_id, cache_key=cache_key, results=results))
         cache.set(cache_key, zdata, cache_ttl)
 
     return results
