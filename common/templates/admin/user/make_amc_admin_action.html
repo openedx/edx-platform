@@ -69,7 +69,7 @@
 
                 <div class="form-row">
                     <label>Locate user in AMC Admin</label>
-                    <a target="_blank" class="button" href="{{ amc_app_url }}{% url 'admin:auth_user_changelist' %}?q={{ user.email | urlencode }}">
+                    <a target="_blank" class="button" href="{{ amc_app_url }}{% url 'admin:auth_user_changelist' %}?q={{ amc_user.email | urlencode }}">
                         Locate user in AMC Admin (new window)
                     </a>
                 </div>
