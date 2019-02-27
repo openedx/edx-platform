@@ -26,7 +26,7 @@ This approach anticipates other date-related functions in the future, such as AP
     + ``DatePolicy``: contains course_key, absolute date and a time delta
     + ``ContentDate``: contains DatePolicy id and content id + field
     + ``UserDate``: contains user id, DatePolicy id, and absolute date + relative date. It will also record an audit trail for the override.
-- The app will hook in to the ``LmsModuleSystem`` with a custom ``FieldDate`` implementation.
+- The app will hook in to the ``LmsModuleSystem`` with a custom ``FieldData`` implementation.
     + If the date exists in the relational database (whether in UserDate or ContentDate), it'll use that date; otherwise, it'll use the one stored in the XBlock.
 - The app will expose a REST API for retrieving and updating dates in the database.
 
