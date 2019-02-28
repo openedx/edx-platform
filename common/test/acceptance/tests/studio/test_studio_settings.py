@@ -426,18 +426,6 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
             'Settings must be saved successfully in order to have confirmation message'
         )
 
-    def test_deprecated_settings_invisible_by_default(self):
-        """
-        Scenario: Test that advanced settings does not have deprecated settings by default
-            Given a staff logs in to studio
-            When this user goes to advanced settings page
-                Then the user does not see the deprecated settings
-                And sees 'Show Deprecated Settings' button
-        """
-        button_text = self.advanced_settings.deprecated_settings_button_text
-        self.assertEqual(button_text, 'Show Deprecated Settings')
-        self.assertFalse(self.advanced_settings.is_deprecated_setting_visible())
-
     def test_deprecated_settings_can_be_toggled(self):
         """
         Scenario: Test that advanced settings can toggle deprecated settings
