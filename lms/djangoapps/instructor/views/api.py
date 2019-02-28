@@ -41,7 +41,6 @@ from edx_rest_framework_extensions.auth.session.authentication import SessionAut
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from rest_framework import permissions, status
-from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from six import text_type
@@ -82,7 +81,6 @@ from lms.djangoapps.instructor.enrollment import (
     send_mail_to_student,
     unenroll_email
 )
-from lms.djangoapps.instructor.permissions import IsCourseStaff
 from lms.djangoapps.instructor.views import INVOICE_KEY
 from lms.djangoapps.instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
 from lms.djangoapps.instructor_task.api import submit_override_score
@@ -996,67 +994,45 @@ def list_course_role_members(request, course_id):
     return JsonResponse(response_payload)
 
 
-class ProblemResponseReport(DeveloperErrorViewMixin, APIView):
+@transaction.non_atomic_requests
+@require_POST
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+@common_exceptions_400
+def get_problem_responses(request, course_id):
     """
-    **Use Cases**
+    Initiate generation of a CSV file containing all student answers
+    to a given problem.
 
-        Initiate generation of a CSV file containing all student answers
-        to a given problem.
+    Responds with JSON
+        {"status": "... status message ...", "task_id": created_task_UUID}
 
-    **Example Requests**:
+    if initiation is successful (or generation task is already running).
 
-        POST /api/instructor/v1/course/{}/reports
-
-    **Response Values**
-        {
-            "task_id": "task_id"
-            "status": "... status message ..."
-        }
-        Responds with BadRequest if problem location is faulty.
+    Responds with BadRequest if problem location is faulty.
     """
-    authentication_classes = (JwtAuthentication, OAuth2AuthenticationAllowInactiveUser, SessionAuthentication,)
-    permission_classes = (permissions.IsAuthenticated, IsCourseStaff)
+    course_key = CourseKey.from_string(course_id)
+    problem_location = request.POST.get('problem_location', '')
+    report_type = _('problem responses')
 
-    # The non-atomic decorator is required because this view calls a celery
-    # task which uses the 'outer_atomic' context manager.
-    @method_decorator(transaction.non_atomic_requests)
-    def dispatch(self, *args, **kwargs):  # pylint: disable=W0221
-        return super(ProblemResponseReport, self).dispatch(*args, **kwargs)
+    try:
+        problem_key = UsageKey.from_string(problem_location)
+        # Are we dealing with an "old-style" problem location?
+        run = problem_key.run
+        if not run:
+            problem_key = UsageKey.from_string(problem_location).map_into_course(course_key)
+        if problem_key.course_key != course_key:
+            raise InvalidKeyError(type(problem_key), problem_key)
+    except InvalidKeyError:
+        return JsonResponseBadRequest(_("Could not find problem with this location."))
 
-    @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-    def post(self, request, course_id):
-        """
-        Initiate generation of a CSV file containing all student answers
-        to a given problem.
-        """
-        course_key = CourseKey.from_string(course_id)
-        problem_location = request.POST.get('problem_location', '')
-        report_type = _('problem responses')
+    task = lms.djangoapps.instructor_task.api.submit_calculate_problem_responses_csv(
+        request, course_key, problem_location
+    )
+    success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
 
-        try:
-            problem_key = UsageKey.from_string(problem_location)
-            # Are we dealing with an "old-style" problem location?
-            run = problem_key.run
-            if not run:
-                problem_key = problem_key.map_into_course(course_key)
-            if problem_key.course_key != course_key:
-                raise InvalidKeyError(type(problem_key), problem_key)
-        except InvalidKeyError:
-            return JsonResponseBadRequest(_("Could not find problem with this location."))
-
-        try:
-            task = lms.djangoapps.instructor_task.api.submit_calculate_problem_responses_csv(
-                request, course_key, problem_location
-            )
-            success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
-
-            return JsonResponse({
-                "status": success_status,
-                "task_id": task.task_id
-            })
-        except AlreadyRunningError as err:
-            error_message = unicode(err)
-            return JsonResponseBadRequest(error_message)
+    return JsonResponse({"status": success_status, "task_id": task.task_id})
 
 
 @require_POST
@@ -2425,84 +2401,50 @@ def list_email_content(request, course_id):  # pylint: disable=unused-argument
     return JsonResponse(response_payload)
 
 
-class InstructorTasks(DeveloperErrorViewMixin, APIView):
+@require_POST
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+def list_instructor_tasks(request, course_id):
     """
-    **Use Cases**
+    List instructor tasks.
 
-        Lists currently running instructor tasks
-
-    **Parameters**
+    Takes optional query paremeters.
         - With no arguments, lists running tasks.
         - `problem_location_str` lists task history for problem
         - `problem_location_str` and `unique_student_identifier` lists task
             history for problem AND student (intersection)
-
-    **Example Requests**:
-
-        POST /api/instructor/v1/course/{}/tasks
-
-    **Response Values**
-        {
-          "tasks": [
-            {
-              "status": "Incomplete",
-              "task_type": "grade_problems",
-              "task_id": "2519ff31-22d9-4a62-91e2-55495895b355",
-              "created": "2019-01-15T18:00:15.902470+00:00",
-              "task_input": "{}",
-              "duration_sec": "unknown",
-              "task_message": "No status information available",
-              "requester": "staff",
-              "task_state": "PROGRESS"
-            }
-          ]
-        }
     """
-    authentication_classes = (JwtAuthentication, OAuth2AuthenticationAllowInactiveUser, SessionAuthentication,)
-    permission_classes = (permissions.IsAuthenticated, IsCourseStaff)
+    course_id = CourseKey.from_string(course_id)
+    problem_location_str = strip_if_string(request.POST.get('problem_location_str', False))
+    student = request.POST.get('unique_student_identifier', None)
+    if student is not None:
+        student = get_student_from_identifier(student)
 
-    @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-    def post(self, request, course_id):
-        """
-        List instructor tasks.
-        """
-        course_id = CourseKey.from_string(course_id)
-        problem_location_str = strip_if_string(request.POST.get('problem_location_str', False))
-        student = request.POST.get('unique_student_identifier', None)
-        if student is not None:
-            student = get_student_from_identifier(student)
+    if student and not problem_location_str:
+        return HttpResponseBadRequest(
+            "unique_student_identifier must accompany problem_location_str"
+        )
 
-        if student and not problem_location_str:
-            return HttpResponseBadRequest(
-                "unique_student_identifier must accompany problem_location_str"
-            )
-
-        if problem_location_str:
-            try:
-                module_state_key = course_id.make_usage_key_from_deprecated_string(problem_location_str)
-            except InvalidKeyError:
-                return HttpResponseBadRequest()
-            if student:
-                # Specifying for a single student's history on this problem
-                tasks = lms.djangoapps.instructor_task.api.get_instructor_task_history(
-                    course_id,
-                    module_state_key,
-                    student
-                )
-            else:
-                # Specifying for single problem's history
-                tasks = lms.djangoapps.instructor_task.api.get_instructor_task_history(
-                    course_id,
-                    module_state_key
-                )
+    if problem_location_str:
+        try:
+            module_state_key = UsageKey.from_string(problem_location_str).map_into_course(course_id)
+        except InvalidKeyError:
+            return HttpResponseBadRequest()
+        if student:
+            # Specifying for a single student's history on this problem
+            tasks = lms.djangoapps.instructor_task.api.get_instructor_task_history(course_id, module_state_key, student)
         else:
-            # If no problem or student, just get currently running tasks
-            tasks = lms.djangoapps.instructor_task.api.get_running_instructor_tasks(course_id)
+            # Specifying for single problem's history
+            tasks = lms.djangoapps.instructor_task.api.get_instructor_task_history(course_id, module_state_key)
+    else:
+        # If no problem or student, just get currently running tasks
+        tasks = lms.djangoapps.instructor_task.api.get_running_instructor_tasks(course_id)
 
-        response_payload = {
-            'tasks': map(extract_task_features, tasks),
-        }
-        return JsonResponse(response_payload)
+    response_payload = {
+        'tasks': map(extract_task_features, tasks),
+    }
+    return JsonResponse(response_payload)
 
 
 @require_POST
@@ -2547,49 +2489,28 @@ def list_entrance_exam_instructor_tasks(request, course_id):
     return JsonResponse(response_payload)
 
 
-class ReportDownloadsList(DeveloperErrorViewMixin, APIView):
+@require_POST
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+def list_report_downloads(request, course_id):
     """
-    **Use Cases**
+    List grade CSV files that are available for download for this course.
 
-        Lists reports available for download
-
-    **Example Requests**:
-
-        POST /api/instructor/v1/course/{}/tasks
-
-    **Response Values**
-        {
-            "downloads": [
-                {
-                    "url": "https://1.mock.url",
-                    "link": "<a href=\"https://1.mock.url\">mock_file_name_1</a>",
-                    "name": "mock_file_name_1"
-                }
-            ]
-        }
+    Takes the following query parameters:
+    - (optional) report_name - name of the report
     """
-    authentication_classes = (JwtAuthentication, OAuth2AuthenticationAllowInactiveUser, SessionAuthentication,)
-    permission_classes = (permissions.IsAuthenticated, IsCourseStaff)
+    course_id = CourseKey.from_string(course_id)
+    report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
+    report_name = request.POST.get("report_name", None)
 
-    @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-    def post(self, request, course_id):
-        """
-        List grade CSV files that are available for download for this course.
-
-        Takes the following query parameters:
-        - (optional) report_name - name of the report
-        """
-        course_id = CourseKey.from_string(course_id)
-        report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
-        report_name = request.POST.get("report_name", None)
-
-        response_payload = {
-            'downloads': [
-                dict(name=name, url=url, link=HTML(u'<a href="{}">{}</a>').format(HTML(url), Text(name)))
-                for name, url in report_store.links_for(course_id) if report_name is None or name == report_name
-            ]
-        }
-        return JsonResponse(response_payload)
+    response_payload = {
+        'downloads': [
+            dict(name=name, url=url, link=HTML(u'<a href="{}">{}</a>').format(HTML(url), Text(name)))
+            for name, url in report_store.links_for(course_id) if report_name is None or name == report_name
+        ]
+    }
+    return JsonResponse(response_payload)
 
 
 @require_POST

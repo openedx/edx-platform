@@ -505,9 +505,6 @@ urlpatterns += [
         include(COURSE_URLS)
     ),
 
-    # Instructor API (accessible via OAuth)
-    url(r'^api/instructor/', include('lms.djangoapps.instructor.urls', namespace='api_instructor')),
-
     # Discussions Management
     url(
         r'^courses/{}/discussions/settings$'.format(
