@@ -170,11 +170,57 @@ def _footer_social_links():
     return links
 
 
+def _build_support_form_url(full_path=False):
+    """
+    Return the support form path
+
+    Returns url of support form, which can have 3 possible values:
+    - '' if the contact form is disabled (by setting SiteConfiguration
+      `CONTACT_US_ENABLE = False`)
+
+    - The normal edx support form path using reverse("support:contact_us") if
+      `CONTACT_US_ENABLE = True` and a custom link isn't set on
+      CONTACT_US_CUSTOM_LINK. There's the optional parameter `full_path`, that
+      if set to True will append the LMS base url to the relative path before
+      returning.
+
+    - CONTACT_US_CUSTOM_LINK if the the user has set a custom URL redirect
+      for support forms (by setting `CONTACT_US_ENABLE = True` and
+      `CONTACT_US_CUSTOM_LINK = http://some.url/for/contact`).
+      If this is set, the returned link is the content of
+      CONTACT_US_CUSTOM_LINK and the `full_path` variable is ignored since this
+      is a path outside the LMS
+
+    Parameters:
+        - full_path: bool. Appends base_url to returned value if
+                     `CONTACT_US_ENABLE = True`and no link is set on
+                     `CONTACT_US_CUSTOM_LINK`
+
+    Returns: string
+
+    """
+    contact_us_page = ''
+
+    if configuration_helpers.get_value('CONTACT_US_ENABLE', True):
+        # Gets custom url ad check if it's enabled
+        contact_us_page = configuration_helpers.get_value('CONTACT_US_CUSTOM_LINK', '')
+
+        # If no custom link is set, get default support form using reverse
+        if not contact_us_page:
+            contact_us_page = reverse("support:contact_us")
+
+            # Prepend with lms base_url if specified by `full_path`
+            if full_path:
+                contact_us_page = '{}{}'.format(settings.LMS_ROOT_URL, contact_us_page)
+
+    return contact_us_page
+
+
 def _footer_connect_links(language=settings.LANGUAGE_CODE):
     """Return the connect links to display in the footer. """
     links = [
         ("blog", (marketing_link("BLOG"), _("Blog"))),
-        ("contact", (_build_support_form_url(), _("Contact Us"))),
+        ("contact", (_build_support_form_url(full_path=True), _("Contact Us"))),
         ("help-center", (settings.SUPPORT_SITE_LINK, _("Help Center"))),
     ]
 
@@ -191,10 +237,6 @@ def _footer_connect_links(language=settings.LANGUAGE_CODE):
         for link_name, (link_url, link_title) in links
         if link_url and link_url != "#"
     ]
-
-
-def _build_support_form_url():
-    return '{base_url}/support/contact_us'.format(base_url=settings.LMS_ROOT_URL)
 
 
 def _find_position_of_link(links, key):
@@ -215,7 +257,7 @@ def _footer_navigation_links(language=settings.LANGUAGE_CODE):
         )),
         ("blog", (marketing_link("BLOG"), _("Blog"))),
         ("help-center", (settings.SUPPORT_SITE_LINK, _("Help Center"))),
-        ("contact", (reverse("support:contact_us"), _("Contact"))),
+        ("contact", (_build_support_form_url(), _("Contact"))),
         ("careers", (marketing_link("CAREERS"), _("Careers"))),
         ("donate", (marketing_link("DONATE"), _("Donate"))),
     ]

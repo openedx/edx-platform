@@ -11,6 +11,19 @@ from django.test.utils import override_settings
 from branding.api import get_footer, get_home_url, get_logo_url
 from edxmako.shortcuts import marketing_link
 
+from openedx.core.djangoapps.site_configuration.tests.test_util import (
+    with_site_configuration,
+)
+
+test_config_disabled_contact_us = {   # pylint: disable=invalid-name
+    "CONTACT_US_ENABLE": False,
+}
+
+test_config_custom_url_contact_us = {   # pylint: disable=invalid-name
+    "CONTACT_US_ENABLE": True,
+    "CONTACT_US_CUSTOM_LINK": "https://open.edx.org/",
+}
+
 
 class TestHeader(TestCase):
     """Test API end-point for retrieving the header. """
@@ -149,3 +162,30 @@ class TestFooter(TestCase):
             },
         }
         self.assertEqual(actual_footer, expected_footer)
+
+    @with_site_configuration(configuration=test_config_disabled_contact_us)
+    def test_get_footer_disabled_contact_form(self):
+        """
+        Test retrieving the footer with disabled contact form.
+        """
+        actual_footer = get_footer(is_secure=True)
+        self.assertEqual(any(l['name'] == 'contact' for l in actual_footer['connect_links']), False)
+        self.assertEqual(any(l['name'] == 'contact' for l in actual_footer['navigation_links']), False)
+
+    @with_site_configuration(configuration=test_config_custom_url_contact_us)
+    def test_get_footer_custom_contact_url(self):
+        """
+        Test retrieving the footer with custom contact form url.
+        """
+        actual_footer = get_footer(is_secure=True)
+        contact_us_link = [l for l in actual_footer['connect_links'] if l['name'] == 'contact'][0]
+        self.assertEqual(
+            contact_us_link['url'],
+            test_config_custom_url_contact_us['CONTACT_US_CUSTOM_LINK']
+        )
+
+        navigation_link_contact_us = [l for l in actual_footer['navigation_links'] if l['name'] == 'contact'][0]
+        self.assertEqual(
+            navigation_link_contact_us['url'],
+            test_config_custom_url_contact_us['CONTACT_US_CUSTOM_LINK']
+        )
