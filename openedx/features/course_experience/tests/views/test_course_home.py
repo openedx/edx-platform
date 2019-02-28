@@ -125,6 +125,14 @@ class CourseHomePageTestCase(SharedModuleStoreTestCase):
                     number='test',
                     display_name='Test Course',
                     start=now() - timedelta(days=30),
+                    metadata={"invitation_only": False}
+                )
+                cls.private_course = CourseFactory.create(
+                    org='edX',
+                    number='test',
+                    display_name='Test Private Course',
+                    start=now() - timedelta(days=30),
+                    metadata={"invitation_only": True}
                 )
                 with cls.store.bulk_operations(cls.course.id):
                     chapter = ItemFactory.create(
@@ -292,6 +300,9 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
                 url = course_home_url(self.course)
                 response = self.client.get(url)
 
+                private_url = course_home_url(self.private_course)
+                private_response = self.client.get(private_url)
+
         # Verify that the course tools and dates are always shown
         self.assertContains(response, TEST_COURSE_TOOLS)
         self.assertContains(response, TEST_COURSE_TODAY)
@@ -312,7 +323,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         # Verify the outline is shown to enrolled users, unenrolled_staff and anonymous users if allowed
         self.assertContains(response, TEST_CHAPTER_NAME, count=(1 if expected_course_outline else 0))
 
-        # Verify that the expected message is shown to the user
+        # Verify the message shown to the user
         if not enable_unenrolled_access or course_visibility != COURSE_VISIBILITY_PUBLIC:
             self.assertContains(
                 response, 'To see course content', count=(1 if is_anonymous else 0)
@@ -320,6 +331,12 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
             self.assertContains(response, '<div class="user-messages"', count=(1 if expected_enroll_message else 0))
             if expected_enroll_message:
                 self.assertContains(response, 'You must be enrolled in the course to see course content.')
+
+        if enable_unenrolled_access and course_visibility == COURSE_VISIBILITY_PUBLIC:
+            if user_type == CourseUserType.UNENROLLED and self.private_course.invitation_only:
+                if expected_enroll_message:
+                    self.assertContains(private_response,
+                                        'You should be enrolled in the course to fully access the contents.')
 
     @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
     @override_waffle_flag(SHOW_REVIEWS_TOOL_FLAG, active=True)

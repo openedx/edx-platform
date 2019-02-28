@@ -5,16 +5,12 @@ View logic for handling course messages.
 from datetime import datetime
 
 from babel.dates import format_date, format_timedelta
+from courseware.courses import get_course_date_blocks, get_course_with_access
 from django.contrib import auth
 from django.template.loader import render_to_string
 from django.utils.http import urlquote_plus
-from django.utils.translation import ugettext as _
 from django.utils.translation import get_language, to_locale
-from opaque_keys.edx.keys import CourseKey
-from pytz import UTC
-from web_fragments.fragment import Fragment
-
-from courseware.courses import get_course_date_blocks, get_course_with_access
+from django.utils.translation import ugettext as _
 from lms.djangoapps.course_goals.api import (
     get_course_goal,
     get_course_goal_options,
@@ -23,10 +19,15 @@ from lms.djangoapps.course_goals.api import (
     valid_course_goals_ordered
 )
 from lms.djangoapps.course_goals.models import GOAL_KEY_CHOICES
+from lms.djangoapps.courseware.courses import allow_public_access
+from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_experience import CourseHomeMessages
+from pytz import UTC
 from student.models import CourseEnrollment
+from web_fragments.fragment import Fragment
+from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
 
 
 class CourseHomeMessageFragmentView(EdxFragmentView):
@@ -107,7 +108,9 @@ def _register_course_home_messages(request, course, user_access, course_start_da
     """
     Register messages to be shown in the course home content page.
     """
-    if user_access['is_anonymous']:
+    allow_anonymous = allow_public_access(course, [COURSE_VISIBILITY_PUBLIC])
+
+    if user_access['is_anonymous'] and not allow_anonymous:
         CourseHomeMessages.register_info_message(
             request,
             Text(_(
@@ -124,19 +127,26 @@ def _register_course_home_messages(request, course, user_access, course_start_da
             ),
             title=Text(_('You must be enrolled in the course to see course content.'))
         )
-    if not user_access['is_anonymous'] and not user_access['is_staff'] and not user_access['is_enrolled']:
-        CourseHomeMessages.register_info_message(
-            request,
-            Text(_(
-                u'{open_enroll_link}Enroll now{close_enroll_link} to access the full course.'
-            )).format(
-                open_enroll_link=HTML('<button class="enroll-btn btn-link">'),
-                close_enroll_link=HTML('</button>')
-            ),
-            title=Text(_(u'Welcome to {course_display_name}')).format(
-                course_display_name=course.display_name
+    if not user_access['is_anonymous'] and not user_access['is_staff'] and \
+            not user_access['is_enrolled']:
+        if not course.invitation_only:
+            CourseHomeMessages.register_info_message(
+                request,
+                Text(_(
+                    u'{open_enroll_link}Enroll now{close_enroll_link} to access the full course.'
+                )).format(
+                    open_enroll_link=HTML('<button class="enroll-btn btn-link">'),
+                    close_enroll_link=HTML('</button>')
+                ),
+                title=Text(_(u'Welcome to {course_display_name}')).format(
+                    course_display_name=course.display_name
+                )
             )
-        )
+        else:
+            CourseHomeMessages.register_info_message(
+                request,
+                Text(_(u'You should be enrolled in the course to fully access the contents.')),
+            )
 
 
 def _register_course_goal_message(request, course):
