@@ -2,7 +2,6 @@
 <%!
 from django.utils.translation import ugettext as _
 from openedx.core.djangolib.markup import Text
-from django.template.defaultfilters import escapejs
 from openedx.core.djangolib.js_utils import js_escaped_string
 
 from six import text_type
@@ -145,14 +144,14 @@ ${block_content}
 <script type="text/javascript">
 // assumes courseware.html's loaded this method.
 $(function () {
-    setup_debug('${element_id}',
+    setup_debug('${element_id | n, js_escaped_string}',
         %if edit_link:
         '${edit_link | n, js_escaped_string}',
         %else:
         null,
         %endif
         {
-            'location': '${location | escapejs}',
+            'location': '${location | n, js_escaped_string}',
             'xqa_key': '${xqa_key | n, js_escaped_string}',
             'category': '${category | n, js_escaped_string}',
             'user': '${user | n, js_escaped_string}'

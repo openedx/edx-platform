@@ -99,17 +99,26 @@ from third_party_auth import provider, pipeline
       var $submitButton = $('form .form-actions #submit');
 
       if(enable) {
+        var platform = "${_('Log into My {platform_name} Account').format(platform_name=platform_name) | n, js_escaped_string}";
+        var msg = "${_('Access My Courses') | n, js_escaped_string}";
+
+        content  = edx.HtmlUtils.interpolateHtml(
+           edx.HtmlUtils.HTML("'{platform}'<span class='orn-plus'>+</span>'{msg}'"),
+           {
+               platform:platform,
+               msg:msg
+           });
         $submitButton.
           removeClass('is-disabled').
           attr('aria-disabled', false).
           prop('disabled', false).
-          html("${Text(_('Log into My {platform_name} Account')).format(platform_name=platform_name)} <span class='orn-plus'>+</span> ${Text(_('Access My Courses'))}");
+          text(content);
       }
       else {
         $submitButton.
           addClass('is-disabled').
           prop('disabled', true).
-          text("${Text(_(u'Processing your account information'))}");
+          text("${Text(_(u'Processing your account information')) | n, js_escaped_string}");
       }
     }
 
@@ -127,7 +136,7 @@ from third_party_auth import provider, pipeline
        if (pipeline_running) {
          $('#login-form').submit();
        }
-    })(${pipeline_running})
+    })("${pipeline_running | n, js_escaped_string}")
   </script>
 </%block>
 
