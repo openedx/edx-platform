@@ -184,6 +184,8 @@ class CreditProvider(TimeStampedModel):
             ]
 
             cache.set(cls.CREDIT_PROVIDERS_CACHE_KEY, credit_providers)
+        else:
+            log.info(u"Found %d credit providers from cache.", len(credit_providers))
 
         if providers_list:
             credit_providers = [provider for provider in credit_providers if provider['id'] in providers_list]
