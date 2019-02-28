@@ -327,6 +327,9 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         """Test that anonymous POST is not allowed."""
         dispatch_url = self._get_dispatch_url()
         response = self.client.post(dispatch_url, {'position': 2})
+
+        # https://openedx.atlassian.net/browse/LEARNER-7131
+        self.assertEquals('Unauthenticated', response.content)
         self.assertEquals(403, response.status_code)
 
     def test_session_authentication(self):
