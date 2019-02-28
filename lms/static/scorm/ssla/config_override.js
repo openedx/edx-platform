@@ -13,8 +13,10 @@ var sslaConfig = {
     studentName: studentName,
 	
     // McKA specific configurations
-    closePopupSingleScoBehavior: "",
-    closePopupMultiScoBehavior: "",
+    closePopupSingleScoBehavior: "custom",
+    closePopupMultiScoBehavior: "custom",
+    closePopupSingleScoCustomFunction: closePopupSingleSco,
+    closePopupMultiScoCustomFunction: closePopupMultiSco,
     singleScoView: "HIDE_ALL",
     popupMainContentMessageAfterOpen: function() {
         return '';
@@ -142,4 +144,18 @@ function studentName() {
   catch (e){
     return "";
   }
+}
+
+function closePopupSingleSco(){
+    console.log('Closing single sco popup');
+    handlePopupClosed();
+}
+
+function closePopupMultiSco() {
+    console.log('Closing multi sco popup');
+    handlePopupClosed();
+}
+
+function handlePopupClosed() {
+    parent.document.handleScormPopupClosed()
 }
