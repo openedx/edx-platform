@@ -137,23 +137,23 @@ class EntitlementUnenrollmentView extends Backbone.View {
   }
 
   switchToSlideTwo() {
-    let price = this.$(".reasons_survey input[name='priceEntitlementUnenrollment']:checked").val(),
-        dissastisfied = this.$(".reasons_survey input[name='dissastisfiedEntitlementUnenrollment']:checked").val(),
-        difficult = this.$(".reasons_survey input[name='difficultEntitlementUnenrollment']:checked").val(),
-        time = this.$(".reasons_survey input[name='timeEntitlementUnenrollment']:checked").val(),
-        unavailable = this.$(".reasons_survey input[name='unavailableEntitlementUnenrollment']:checked").val(),
-        email = this.$(".reasons_survey input[name='emailEntitlementUnenrollment']:checked").val();
+    const price = this.$(".reasons_survey input[name='priceEntitlementUnenrollment']:checked").val(),
+          dissastisfied = this.$(".reasons_survey input[name='dissastisfiedEntitlementUnenrollment']:checked").val(),
+          difficult = this.$(".reasons_survey input[name='difficultEntitlementUnenrollment']:checked").val(),
+          time = this.$(".reasons_survey input[name='timeEntitlementUnenrollment']:checked").val(),
+          unavailable = this.$(".reasons_survey input[name='unavailableEntitlementUnenrollment']:checked").val(),
+          email = this.$(".reasons_survey input[name='emailEntitlementUnenrollment']:checked").val();
 
     if (price || dissastisfied || difficult || time || unavailable || email) {
-      let results = {
-        price: price, 
-        dissastisfied: dissastisfied, 
-        difficult: difficult, 
+      const results = {
+        price: price,
+        dissastisfied: dissastisfied,
+        difficult: difficult,
         time: time,
         unavailable: unavailable,
-        email: email
+        email: email,
       };
-
+      
       window.analytics.track('entitlement_unenrollment_reason.selected', {
         category: 'user-engagement',
         label: results,
