@@ -19,7 +19,10 @@ def get_secure_token_for_xblock_handler(user_id, block_key_str, time_idx = 0):
     bearer token) and the CSRF token for such requests.
 
     The token is specific to one user and one XBlock usage ID, though may
-    be used for any handler. It expires and is only valid for 2-4 days.
+    be used for any handler. It expires and is only valid for 2-4 days (our
+    current best guess at a reasonable trade off between "what if the user left
+    their browser open overnight and tried to continue the next day" which
+    should work vs. "for security, tokens should last too long")
 
     We use this token because XBlocks may sometimes be sandboxed (run in a
     client-side JavaScript environment with no access to cookies) and
@@ -28,15 +31,19 @@ def get_secure_token_for_xblock_handler(user_id, block_key_str, time_idx = 0):
     cookies are present or including this sort of secure token in the
     handler URL.
 
-    to ensure that only authorized XBlock code in an IFrame we created is
-    calling the secure_xblock_handler endpoint.
-
     For security, we need these tokens to have an expiration date. So: the
     hash incorporates the current time, rounded to the lowest TOKEN_PERIOD
     value. When checking this, you should check both time_idx=0 and
     time_idx=-1 in case we just recently moved from one time period to
     another (i.e. at the stroke of midnight UTC or similar). The effect of
     this is that each token is valid for 2-4 days.
+
+    (Alternatively, we could make each token expire after exactly X days, but
+    that requires storing the expiration date of each token on the server side,
+    making the implementation needlessly complex. The "time window" approach we
+    are using here also has the advantage that throughout a typical day, the
+    token each user gets for a given XBlock doesn't change, which makes
+    debugging and reasoning about the system simpler.)
     """
     TOKEN_PERIOD = 24 * 60 * 60 * 2  # These URLs are valid for 2-4 days
     time_token = math.floor(time.time() / TOKEN_PERIOD)
