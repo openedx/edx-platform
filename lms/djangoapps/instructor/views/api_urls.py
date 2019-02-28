@@ -12,6 +12,7 @@ urlpatterns = [
     url(r'^list_course_role_members$', api.list_course_role_members, name='list_course_role_members'),
     url(r'^modify_access$', api.modify_access, name='modify_access'),
     url(r'^bulk_beta_modify_access$', api.bulk_beta_modify_access, name='bulk_beta_modify_access'),
+    url(r'^get_problem_responses$', api.get_problem_responses, name='get_problem_responses'),
     url(r'^get_grading_config$', api.get_grading_config, name='get_grading_config'),
     url(r'^get_students_features(?P<csv>/csv)?$', api.get_students_features, name='get_students_features'),
     url(r'^get_issued_certificates/$', api.get_issued_certificates, name='get_issued_certificates'),
@@ -33,6 +34,7 @@ urlpatterns = [
         name='list_entrance_exam_instructor_tasks'),
     url(r'^mark_student_can_skip_entrance_exam', api.mark_student_can_skip_entrance_exam,
         name='mark_student_can_skip_entrance_exam'),
+    url(r'^list_instructor_tasks$', api.list_instructor_tasks, name='list_instructor_tasks'),
     url(r'^list_background_email_tasks$', api.list_background_email_tasks, name='list_background_email_tasks'),
     url(r'^list_email_content$', api.list_email_content, name='list_email_content'),
     url(r'^list_forum_members$', api.list_forum_members, name='list_forum_members'),
@@ -47,6 +49,7 @@ urlpatterns = [
     url(r'^get_proctored_exam_results$', api.get_proctored_exam_results, name='get_proctored_exam_results'),
 
     # Grade downloads...
+    url(r'^list_report_downloads$', api.list_report_downloads, name='list_report_downloads'),
     url(r'calculate_grades_csv$', api.calculate_grades_csv, name='calculate_grades_csv'),
     url(r'problem_grade_report$', api.problem_grade_report, name='problem_grade_report'),
 
@@ -88,21 +91,4 @@ urlpatterns = [
     url(r'^generate_bulk_certificate_exceptions', api.generate_bulk_certificate_exceptions,
         name='generate_bulk_certificate_exceptions'),
     url(r'^certificate_invalidation_view/$', api.certificate_invalidation_view, name='certificate_invalidation_view'),
-
-    # Instructor endpoints moved to the new API, kept here for backwards compatibility
-    url(
-        r'^list_instructor_tasks$',
-        api.InstructorTasks.as_view(),
-        name='list_instructor_tasks_old',
-    ),
-    url(
-        r'^get_problem_responses$',
-        api.ProblemResponseReport.as_view(),
-        name='get_problem_responses_old',
-    ),
-    url(
-        r'^list_report_downloads$',
-        api.ReportDownloadsList.as_view(),
-        name='list_report_downloads_old',
-    ),
 ]
