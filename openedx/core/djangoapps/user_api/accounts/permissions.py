@@ -6,8 +6,6 @@ from __future__ import unicode_literals
 from django.conf import settings
 from rest_framework import permissions
 
-USERNAME_REPLACEMENT_GROUP = "username_replacement_admin"
-
 class CanDeactivateUser(permissions.BasePermission):
     """
     Grants access to AccountDeactivationView if the requesting user is a superuser

@@ -1,6 +1,7 @@
 """
 Discussion API views
 """
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
@@ -49,7 +50,7 @@ from discussion_api.serializers import (
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.api.parsers import MergePatchParser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
-from openedx.core.djangoapps.user_api.accounts.permissions import CanRetireUser
+from openedx.core.djangoapps.user_api.accounts.permissions import CanReplaceUsername, CanRetireUser
 from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 from util.json_request import JsonResponse
 from xmodule.modulestore.django import modulestore
@@ -586,6 +587,57 @@ class RetireUserView(APIView):
             return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class ReplaceUsernameView(APIView):
+    """
+    A request from the settings.USERNAME_REPLACEMENT_WORKER user can replace
+    the username for a user. This will change their username and update all of
+    their comments to have the new username
+
+    POST /api/discussion/v1/accounts/replace_username/
+    {
+        "current_username": "users_current_username",
+        "new_username": "name_to_change_it_to"
+    }
+
+    Returns empty response if successful
+    """
+
+    authentication_classes = (JwtAuthentication,)
+    permission_classes = (permissions.IsAuthenticated, CanReplaceUsername)
+
+    def post(self, request):
+        """
+        Implements the username replacement endpoint
+        """
+        current_username = request.data.get("current_username")
+        new_username = request.data.get("new_username")
+
+        if not (current_username and new_username):
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            current_user = User.objects.get(username=current_username)
+            cc_user = comment_client.User.from_django_user(current_user)
+            cc_user.replace_username(new_username)
+        except User.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        except comment_client.CommentClientRequestError as exc:
+            if exc.status_code == 404:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+            raise
+        except Exception as exc:
+            return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
+
+
+
+
+
+
 
 
 class CourseDiscussionSettingsAPIView(DeveloperErrorViewMixin, APIView):

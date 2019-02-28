@@ -1014,6 +1014,9 @@ class UsernameReplacementView(APIView):
 
     API will recieve a list of current usernames and their requested new
     username. If their new username is taken, it will randomly assign a new username.
+
+    This API will be called first, before calling the APIs in other services as this
+    one handles the checks on the usernames provided.
     """
     authentication_classes = (JwtAuthentication, )
     permission_classes = (permissions.IsAuthenticated, CanReplaceUsername)

@@ -3450,6 +3450,8 @@ RETIREMENT_STATES = [
     'COMPLETE',
 ]
 
+USERNAME_REPLACEMENT_WORKER = "REPLACE WITH VALID USERNAME"
+
 ############## Settings for Microfrontends  #########################
 # If running a Gradebook container locally,
 # modify lms/envs/private.py to give it a non-null value
