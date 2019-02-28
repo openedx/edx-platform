@@ -43,7 +43,7 @@ pipeline {
                             string(name: 'GITHUB_REPO', value: "${REPO_NAME}"),
                             string(name: 'TARGET_URL', value: "${BUILD_URL}"),
                             string(name: 'DESCRIPTION', value: 'Pending'),
-                            string(name: 'CONTEXT', value: 'jenkins/lettuce'),
+                            string(name: 'CONTEXT', value: "${GITHUB_CONTEXT}"),
                             string(name: 'CREATE_DEPLOYMENT', value: 'false'),
                             string(name: 'BUILD_STATUS', value: 'pending')
                         ],
@@ -119,7 +119,7 @@ pipeline {
                             string(name: 'GITHUB_REPO', value: "${REPO_NAME}"),
                             string(name: 'TARGET_URL', value: "${BUILD_URL}"),
                             string(name: 'DESCRIPTION', value: build_description),
-                            string(name: 'CONTEXT', value: 'jenkins/lettuce'),
+                            string(name: 'CONTEXT', value: "${GITHUB_CONTEXT}"),
                             string(name: 'CREATE_DEPLOYMENT', value: create_deployment),
                             string(name: 'BUILD_STATUS', value: build_status)
                         ],
