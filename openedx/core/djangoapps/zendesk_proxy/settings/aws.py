@@ -1,4 +1,4 @@
-""" Production settings for zendesk proxy."""
+""" AWS settings for zendesk proxy."""
 
 
 def plugin_settings(settings):
