@@ -35,3 +35,9 @@ urllib3<1.24
 # See https://github.com/oauthlib/oauthlib/issues/264 for more context
 requests-oauthlib==1.1.0
 oauthlib==2.1.0
+
+# pytest-randomly dropped support for Python 2 with 2.0.0, and only supports Python 3.4+
+pytest-randomly<2.0.0
+
+# Tornado dropped support for Python 2.7 and 3.4 with version 6.0. Only Python 3.5.2+ is now supported
+tornado<6.0
