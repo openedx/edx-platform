@@ -1,0 +1,14 @@
+<%page expression_filter="h" args="section_data"/>
+<%namespace name='static' file='../../static_content.html'/>
+
+<div class="communicator">
+    ${static.renderReact(
+      component="Communicator",
+      id="communicator-container",
+      props={
+        "courseId": section_data['course_id'],
+        "anonUserId": section_data['anon_user_id'],
+        "backendUrl": section_data['backend_url'],
+      }
+    )}
+</div>

@@ -8,8 +8,6 @@ from courseware.date_summary import (
     verified_upgrade_deadline_link, verified_upgrade_link_is_valid
 )
 from xmodule.partitions.partitions_service import get_user_partition_groups, get_all_partitions_for_course
-from crum import get_current_request
-from openedx.core.djangoapps.programs.utils import ProgramDataExtender, ProgramProgressMeter
 
 
 def check_and_get_upgrade_link_and_date(user, enrollment=None, course=None):
@@ -59,9 +57,6 @@ def get_experiment_user_metadata_context(course, user):
     # TODO: clean up as part of REVO-28 (START)
     has_non_audit_enrollments = None
     # TODO: clean up as part of REVO-28 (END)
-    # TODO: clean up as part of REVEM-106 (START)
-    program_key = None
-    # TODO: clean up as part of REVEM-106 (END)
     try:
         # TODO: clean up as part of REVO-28 (START)
         user_enrollments = CourseEnrollment.objects.select_related('course').filter(user_id=user.id)
@@ -74,50 +69,6 @@ def get_experiment_user_metadata_context(course, user):
         if enrollment.is_active:
             enrollment_mode = enrollment.mode
             enrollment_time = enrollment.created
-
-            # TODO: clean up as part of REVEM-106 (START)
-            # get program data for this course
-            request = get_current_request()
-            if request:
-                enrollment_list = [enrollment]
-                meter = ProgramProgressMeter(request.site, user, enrollments=enrollment_list)
-                if meter.engaged_programs and meter.engaged_programs[0]:
-                    org_name = None
-                    courses_not_started = 0
-                    courses_in_progress = 0
-                    courses_completed = 0
-                    is_discounted = None
-                    full_price = 0
-                    discounted_price = 0
-                    program_data = meter.engaged_programs[0]
-                    program_data = ProgramDataExtender(program_data, user, mobile_only=False).extend()
-                    program_orgs = program_data.get('credit_backing_organizations')
-                    if program_orgs and program_orgs[0]:
-                        org = program_orgs[0]
-                        org_name = org.get('name')
-                    if meter.progress() and meter.progress()[0]:
-                        progress = meter.progress()[0]
-                        courses_not_started = progress.get('not_started')
-                        courses_in_progress = progress.get('in_progress')
-                        courses_completed = progress.get('completed')
-                    if program_data.get('discount_data'):
-                        discount_data = program_data.get('discount_data')
-                        is_discounted = discount_data.get('is_discounted')
-                        full_price = discount_data.get('total_incl_tax_excl_discounts')
-                        discounted_price = discount_data.get('total_incl_tax')
-                    program_key = {
-                        'uuid': program_data.get('uuid'),
-                        'title': program_data.get('title'),
-                        'marketing_url': program_data.get('marketing_url'),
-                        'org_name': org_name,
-                        'courses_not_started': courses_not_started,
-                        'courses_in_progress': courses_in_progress,
-                        'courses_completed': courses_completed,
-                        'is_discounted': is_discounted,
-                        'full_price': full_price,
-                        'discounted_price': discounted_price,
-                    }
-            # TODO: clean up as part of REVEM-106 (END)
     except CourseEnrollment.DoesNotExist:
         pass  # Not enrolled, used the default None values
 
@@ -151,7 +102,4 @@ def get_experiment_user_metadata_context(course, user):
         # TODO: clean up as part of REVO-28 (START)
         'has_non_audit_enrollments': has_non_audit_enrollments,
         # TODO: clean up as part of REVO-28 (END)
-        # TODO: clean up as part of REVEM-106 (START)
-        'program_key_fields': program_key,
-        # TODO: clean up as part of REVEM-106 (END)
     }

@@ -1,0 +1,187 @@
+@import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz:400,700);
+
+#analyticsRadio, #allRadio {
+  width: 30px;
+  height:20px;
+  margin-left:20px
+}
+
+#myDropdown {
+  float:left;
+}
+
+#analytics {
+  display:block;
+}
+
+#student-list { 
+display:none;
+}
+
+#recipients {
+  font-family:Open-Sans;
+  font-size:16px;
+  font-weight:100;
+}
+
+#all-recipients {
+  font-family:Open-Sans;
+  font-size:16px;
+  font-weight:100;
+  display:none;
+}
+
+#from-name, #reply-to {
+  width:250px;
+}
+
+#email-subject {
+  width:250px;
+  margin-top:10px;
+}
+
+#email-body{
+  width:500px;
+  height: 100px;
+  margin-top:10px;
+}
+
+#automated {
+  margin-right: 10px;
+  margin-left: 50px;
+  display:inline;
+  width:16px;
+  height:16px;
+}
+
+#tip {
+  color:#B72667;
+  width:500px;
+  display:none;
+}
+
+#saveChanges {
+  display:none; 
+  background:#00A0E3; 
+  float:right; 
+  color: white; 
+  margin:50px; 
+  width:200px; 
+  height:50px; 
+  text-shadow: 0 1px 0 #d2c9c9;
+}
+
+#body > p {
+  line-height: 1.5em;
+  width: 640px;
+  text-rendering: optimizeLegibility;
+}
+
+#charts {
+  padding: 10px 0;
+}
+
+.chart {
+  display: inline-block;
+  height: 151px;
+  margin-bottom: 20px;
+}
+
+.reset {
+  padding-left: 1em;
+  font-size: smaller;
+  color: #ccc;
+}
+
+.background.bar {
+  fill: #ccc;
+}
+
+.foreground.bar {
+  fill: steelblue;
+}
+
+.axis path, .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.axis text {
+  font: 10px sans-serif;
+}
+
+.brush rect.extent {
+  fill: steelblue;
+  fill-opacity: .125;
+}
+
+.brush .resize path {
+  fill: #eee;
+  stroke: #666;
+}
+
+#completion-chart {
+  width: 920px;
+}
+
+#attrition-chart {
+  width: 920px;
+}
+
+#certification-chart {
+  width: 920px;
+}
+
+#date-chart {
+  width: 920px;
+}
+
+#student-list .all-students {
+  height: 200px;
+  overflow-y:scroll;
+}
+
+#student-list .all-students,
+#student-list .day {
+  margin-bottom: .4em;
+}
+
+#student-list .student {
+  line-height: 1.5em;
+  background: #eee;
+  width: 650px;
+  margin-bottom: 1px;
+}
+
+#student-list .student div {
+  display: inline-block;
+  width: 100px;
+  /*text-align: center;*/
+  padding-left: 50px;
+}
+
+#student-list div.anon-student {
+  color: #999;
+  width: 150px;
+}
+
+#student-list .early {
+  color: green;
+}
+
+aside {
+  font-size: smaller;
+  float:right;
+}
+
+.radios {
+  padding-bottom: 20px;
+}
+
+/* The container <div> - needed to position the dropdown content */
+.dropdown {
+    position: relative;
+    display: inline-block;
+    float:right;
+}

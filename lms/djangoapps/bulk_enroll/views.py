@@ -11,7 +11,7 @@ from rest_framework.views import APIView
 
 from bulk_enroll.serializers import BulkEnrollmentSerializer
 from enrollment.views import EnrollmentUserThrottle
-from instructor.views.api import students_update_enrollment
+from lms.djangoapps.instructor.views.api import students_update_enrollment
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.course_groups.cohorts import (

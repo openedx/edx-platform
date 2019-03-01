@@ -21,6 +21,7 @@
     "bootstrap": "4.0.0-beta.2",
     "camelize": "1.0.0",
     "classnames": "2.2.5",
+    "crossfilter2": "^1.4.6",
     "css-loader": "0.28.8",
     "datatables": "1.10.18",
     "datatables.net-fixedcolumns": "3.2.6",

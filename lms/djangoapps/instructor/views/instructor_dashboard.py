@@ -51,7 +51,7 @@ from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.url_utils import quote_slashes
 from openedx.core.lib.xblock_utils import wrap_xblock
 from shoppingcart.models import Coupon, CourseRegCodeItem, PaidCourseRegistration
-from student.models import CourseEnrollment
+from student.models import CourseEnrollment, anonymous_id_for_user
 from student.roles import CourseFinanceAdminRole, CourseSalesAdminRole, CourseStaffRole, CourseInstructorRole
 from util.json_request import JsonResponse
 from xmodule.html_module import HtmlDescriptor
@@ -59,6 +59,10 @@ from xmodule.modulestore.django import modulestore
 from xmodule.tabs import CourseTab
 
 from .tools import get_units_with_due_date, title_or_url
+from lms.djangoapps.instructor.config.waffle import ENABLE_COMMUNICATOR_WAFFLE_FLAG, COMMUNICATOR_BACKEND_URL
+from lms.djangoapps.instructor.admin import CommunicatorConfig
+
+from openedx.core.djangoapps.theming.helpers import get_current_site
 
 log = logging.getLogger(__name__)
 
@@ -200,6 +204,14 @@ def instructor_dashboard_2(request, course_id):
     openassessment_blocks = modulestore().get_items(
         course_key, qualifiers={'category': 'openassessment'}
     )
+
+    # Communicator panel
+    # This is used to target specific segments of a course's learners
+    # Gate access to only admins and instructors
+    if (access['admin'] or access['instructor']) and ENABLE_COMMUNICATOR_WAFFLE_FLAG.is_enabled(course_key):
+        sections.append(_section_communicator(course, access, request.user))
+
+
     # filter out orphaned openassessment blocks
     openassessment_blocks = [
         block for block in openassessment_blocks if block.parent is not None
@@ -783,6 +795,42 @@ def _section_open_response_assessment(request, course, openassessment_blocks, ac
         'section_display_name': _('Open Responses'),
         'access': access,
         'course_id': unicode(course_key),
+    }
+    return section_data
+
+def _section_communicator(course, access, user):
+    """
+    Provides data for the corresponding dashboard section. User is required
+    to fetch anonymized id for authentication with the prediction backend.
+    """
+    course_key = course.id
+
+    # fetch the backend URL for this course
+    current_site = get_current_site()
+    if current_site is None:
+        log.debug('Communicator: No current site')
+        return
+
+    try:
+        communicator_config = CommunicatorConfig.current(current_site, course_key)
+    except e:
+        log.debug(e)
+        log.debug("CommunicatorConfig fetch failed. Perhaps you havent' set the CommunicatorConfig flag?")
+    if communicator_config is None:
+        log.debug('Communicator: No current config')
+        return
+    backend_url = communicator_config.backend_url
+
+    # fetch site-wide anonymized user id
+    anon_user_id = anonymous_id_for_user(user, None)
+
+    section_data = {
+        'section_key': 'communicator',
+        'section_display_name': _('Communicator'),
+        'access': access,
+        'course_id': unicode(course_key),
+        'backend_url': unicode(backend_url),
+        'anon_user_id': unicode(anon_user_id),
     }
     return section_data
 

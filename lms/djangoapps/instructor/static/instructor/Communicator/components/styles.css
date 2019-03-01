@@ -1,0 +1,343 @@
+@import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz:400,700);
+
+#analyticsRadio, #allRadio {
+  width: 30px;
+  height:20px;
+  margin-left:20px
+}
+
+#myDropdown {
+  float:left;
+}
+
+#analytics {
+  display:block;
+}
+
+#student-list {
+display:none;
+}
+
+#recipients {
+  font-family:Open-Sans;
+  font-size:16px;
+  font-weight:100;
+}
+
+#all-recipients {
+  font-family:Open-Sans;
+  font-size:16px;
+  font-weight:100;
+  display:none;
+}
+
+#from-name, #reply-to {
+  width:250px;
+}
+
+#email-subject {
+  width:250px;
+  margin-top:10px;
+}
+
+#email-body{
+  width:500px;
+  height: 100px;
+  margin-top:10px;
+}
+
+#automated {
+  margin-right: 10px;
+  margin-left: 50px;
+  display:inline;
+  width:16px;
+  height:16px;
+}
+
+#tip {
+  color:#B72667;
+  width:500px;
+  display:none;
+}
+
+#saveChanges {
+  display:none; 
+  background:#00A0E3; 
+  float:right; 
+  color: white; 
+  margin:50px; 
+  width:200px; 
+  height:50px; 
+  text-shadow: 0 1px 0 #d2c9c9;
+}
+
+
+
+body {
+  font-family: "Helvetica Neue";
+  margin: 40px auto;
+  width: 100%;
+}
+
+#body {
+  position: relative;
+}
+
+button {
+  background-color: lightBlue;
+  cursor: pointer;
+}
+
+button:disabled {
+  background-color: white;
+  cursor: auto;
+}
+
+footer {
+  padding: 2em 0 1em 0;
+  font-size: 12px;
+}
+
+h1 {
+  font-size: 96px;
+  margin-top: .3em;
+  margin-bottom: 0;
+}
+
+h1 + h2 {
+  margin-top: 0;
+}
+
+h2 {
+  font-weight: 400;
+  font-size: 28px;
+}
+
+h1, h2 {
+  font-family: "Yanone Kaffeesatz";
+  text-rendering: optimizeLegibility;
+}
+
+#body > p {
+  line-height: 1.5em;
+  width: 640px;
+  text-rendering: optimizeLegibility;
+}
+
+#charts {
+  padding: 10px 0;
+}
+
+.chart {
+  display: inline-block;
+  height: 151px;
+  margin-bottom: 20px;
+}
+
+.reset {
+  padding-left: 1em;
+  font-size: smaller;
+  color: #ccc;
+}
+
+.background.bar {
+  fill: #ccc;
+}
+
+.foreground.bar {
+  fill: steelblue;
+}
+
+.axis path, .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.axis text {
+  font: 10px sans-serif;
+}
+
+.brush rect.extent {
+  fill: steelblue;
+  fill-opacity: .125;
+}
+
+.brush .resize path {
+  fill: #eee;
+  stroke: #666;
+}
+
+#completion-chart {
+  width: 920px;
+}
+
+#attrition-chart {
+  width: 920px;
+}
+
+#certification-chart {
+  width: 920px;
+}
+
+#date-chart {
+  width: 920px;
+}
+
+#student-list .all-students {
+  height: 200px;
+  overflow-y:scroll;
+}
+
+#student-list .all-students,
+#student-list .day {
+  margin-bottom: .4em;
+}
+
+#student-list .student {
+  line-height: 1.5em;
+  background: #eee;
+  width: 650px;
+  margin-bottom: 1px;
+}
+
+#student-list .student div {
+  display: inline-block;
+  width: 100px;
+  /*text-align: center;*/
+  padding-left: 50px;
+}
+
+#student-list div.anon-student {
+  color: #999;
+  width: 150px;
+}
+
+#student-list .early {
+  color: green;
+}
+
+aside {
+  font-size: smaller;
+  float:right;
+}
+
+.radios {
+  padding-bottom: 20px;
+}
+
+/* Dropdown Button */
+.dropbtn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 16px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+}
+
+/* Dropdown button on hover & focus */
+.dropbtn:hover, .dropbtn:focus {
+    background-color: #3e8e41;
+}
+
+/* The container <div> - needed to position the dropdown content */
+.dropdown {
+    position: relative;
+    display: inline-block;
+    float:right;
+}
+
+/* Dropdown Content (Hidden by Default) */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+/* Links inside the dropdown */
+.dropdown-content p {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content p:hover {background-color: #f1f1f1}
+
+/* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
+.show {display:block;}
+
+#email-button-error {
+  color: red
+}
+
+/* The Modal (background) */
+/*.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+}*/
+
+/* Modal Content/Box */
+/*.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 30%;
+}*/
+
+/* The Close Button */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+
+/* Tooltip container */
+.tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 6px;
+
+    /* Position the tooltip text - see examples below! */
+    position: absolute;
+    z-index: 1;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+}

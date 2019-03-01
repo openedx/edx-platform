@@ -130,8 +130,7 @@ class TestCourseUpdatesPage(SharedModuleStoreTestCase):
 
         # Fetch the view and verify that the query counts haven't changed
         # TODO: decrease query count as part of REVO-28
-        # TODO: decrease query count as part of REVEM-106
-        with self.assertNumQueries(54, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
+        with self.assertNumQueries(53, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
             with check_mongo_calls(4):
                 url = course_updates_url(self.course)
                 self.client.get(url)
