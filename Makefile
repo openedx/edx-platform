@@ -1,5 +1,5 @@
 # Do things in edx-platform
-.PHONY: clean extract_translations help pull pull_translations push_translations requirements shell upgrade
+.PHONY: clean docs extract_translations help pull pull_translations push_translations requirements shell upgrade
 
 # Careful with mktemp syntax: it has to work on Mac and Ubuntu, which have differences.
 PRIVATE_FILES := $(shell mktemp -u /tmp/private_files.XXXXXX)
@@ -17,6 +17,10 @@ clean: ## archive and delete most git-ignored files
 	-git clean -fdX
 	tar xf $(PRIVATE_FILES)
 	rm $(PRIVATE_FILES)
+
+docs: ## build the developer documentation for this repository
+	rm -rf docs/_build docs/cms docs/common docs/lms docs/openedx
+	cd docs; make html
 
 extract_translations: ## extract localizable strings from sources
 	i18n_tool extract -v
