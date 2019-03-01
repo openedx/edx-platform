@@ -144,7 +144,7 @@ class::
                 ProjectType.LMS: {
 
                     # Configure each Settings Type, as needed.
-                    SettingsType.AWS: {
+                    SettingsType.PRODUCTION: {
 
                         # The python path (relative to this app) to the settings module for the relevant Project Type and Settings Type.
                         # Optional; Defaults to u'settings'.
