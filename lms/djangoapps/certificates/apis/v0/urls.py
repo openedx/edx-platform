@@ -14,6 +14,12 @@ CERTIFICATES_URLS = ([
         ),
         views.CertificatesDetailView.as_view(), name='detail'
     ),
+    url(
+        r'^{username}/$'.format(
+            username=settings.USERNAME_PATTERN
+        ),
+        views.CertificatesListView.as_view(), name='list'
+    ),
 ], 'certificates')
 
 app_name = 'v0'

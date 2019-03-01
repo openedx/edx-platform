@@ -63,13 +63,9 @@ def format_certificate_for_user(username, cert):
             "created": cert.created_date,
             "modified": cert.modified_date,
             "is_passing": is_passing_status(cert.status),
-
-            # NOTE: the download URL is not currently being set for webview certificates.
-            # In the future, we can update this to construct a URL to the webview certificate
-            # for courses that have this feature enabled.
             "is_pdf_certificate": bool(cert.download_url),
             "download_url": (
-                cert.download_url or get_certificate_url(cert.user.id, cert.course_id)
+                get_certificate_url(cert.user.id, cert.course_id, user_certificate=cert)
                 if cert.status == CertificateStatuses.downloadable
                 else None
             ),
@@ -432,24 +428,28 @@ def _certificate_html_url(user_id, course_id, uuid):
     return ''
 
 
-def _certificate_download_url(user_id, course_id):
+def _certificate_download_url(user_id, course_id, user_certificate=None):
     """
     :param user_id:
     :param course_id:
     :return:
     """
-    try:
-        user_certificate = GeneratedCertificate.eligible_certificates.get(
-            user=user_id,
-            course_id=_safe_course_key(course_id)
-        )
+    if not user_certificate:
+        try:
+            user_certificate = GeneratedCertificate.eligible_certificates.get(
+                user=user_id,
+                course_id=_safe_course_key(course_id)
+            )
+        except GeneratedCertificate.DoesNotExist:
+            log.critical(
+                u'Unable to lookup certificate\n'
+                u'user id: %d\n'
+                u'course: %s', user_id, unicode(course_id)
+            )
+
+    if user_certificate:
         return user_certificate.download_url
-    except GeneratedCertificate.DoesNotExist:
-        log.critical(
-            u'Unable to lookup certificate\n'
-            u'user id: %d\n'
-            u'course: %s', user_id, unicode(course_id)
-        )
+
     return ''
 
 
@@ -459,7 +459,7 @@ def has_html_certificates_enabled(course):
     return course.cert_html_view_enabled
 
 
-def get_certificate_url(user_id=None, course_id=None, uuid=None):
+def get_certificate_url(user_id=None, course_id=None, uuid=None, user_certificate=None):
     """
     :param user_id:
     :param course_id:
@@ -475,7 +475,7 @@ def get_certificate_url(user_id=None, course_id=None, uuid=None):
     if has_html_certificates_enabled(course):
         url = _certificate_html_url(user_id, course_id, uuid)
     else:
-        url = _certificate_download_url(user_id, course_id)
+        url = _certificate_download_url(user_id, course_id, user_certificate=user_certificate)
     return url
 
 
