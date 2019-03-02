@@ -1051,11 +1051,14 @@ def _certificate_message(student, course, enrollment_mode):
     if cert_downloadable_status['is_generating']:
         return GENERATING_CERT_DATA
 
-    if cert_downloadable_status['is_unverified'] or _missing_required_verification(student, enrollment_mode):
+    if cert_downloadable_status['is_unverified']:
         return UNVERIFIED_CERT_DATA
 
     if cert_downloadable_status['is_downloadable']:
         return _downloadable_certificate_message(course, cert_downloadable_status)
+
+    if _missing_required_verification(student, enrollment_mode):
+        return UNVERIFIED_CERT_DATA
 
     return REQUESTING_CERT_DATA
 

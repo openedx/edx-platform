@@ -54,6 +54,7 @@ from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.grades.config.waffle import waffle as grades_waffle
 from lms.djangoapps.grades.config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT
+from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
 from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory, ProgramFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -1328,6 +1329,38 @@ class ProgressPageTests(ProgressPageBaseTests):
 
         resp = self._get_progress_page()
         self.assertNotContains(resp, 'Request Certificate')
+
+    @patch('lms.djangoapps.certificates.api.get_active_web_certificate', PropertyMock(return_value=True))
+    @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
+    def test_view_certificate_for_unverified_student(self):
+        """
+        If user has already generated a certificate, it should be visible in case of user being
+        unverified too.
+        """
+        GeneratedCertificateFactory.create(
+            user=self.user,
+            course_id=self.course.id,
+            status=CertificateStatuses.downloadable,
+            mode='verified'
+        )
+
+        # Enable the feature, but do not enable it for this course
+        CertificateGenerationConfiguration(enabled=True).save()
+
+        # Enable certificate generation for this course
+        certs_api.set_cert_generation_enabled(self.course.id, True)
+        CourseEnrollment.enroll(self.user, self.course.id, mode="verified")
+
+        # Check that the user is unverified
+        self.assertFalse(IDVerificationService.user_is_verified(self.user))
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_create:
+            course_grade = mock_create.return_value
+            course_grade.passed = True
+            course_grade.summary = {'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [],
+                                    'grade_breakdown': {}}
+            resp = self._get_progress_page()
+            self.assertNotContains(resp, u"Certificate unavailable")
+            self.assertContains(resp, u"Your certificate is available")
 
     @patch('lms.djangoapps.certificates.api.get_active_web_certificate', PropertyMock(return_value=True))
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
