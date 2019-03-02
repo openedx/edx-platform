@@ -17,7 +17,6 @@ class TestFooter(TestCase):
     """
     Tests for edx and OpenEdX footer
     """
-    shard = 1
 
     SOCIAL_MEDIA_NAMES = [
         "facebook",

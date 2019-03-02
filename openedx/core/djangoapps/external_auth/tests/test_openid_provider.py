@@ -4,6 +4,7 @@ Created on Jan 18, 2013
 
 @author: brian
 '''
+from __future__ import print_function
 import openid
 from openid.fetchers import HTTPFetcher, HTTPResponse
 from urlparse import parse_qs, urlparse
@@ -99,7 +100,7 @@ class OpenIdProviderTest(TestCase):
             resp = self.client.post(url)
             code = 200
             self.assertEqual(resp.status_code, code,
-                             "got code {0} for url '{1}'. Expected code {2}"
+                             u"got code {0} for url '{1}'. Expected code {2}"
                              .format(resp.status_code, url, code))
 
     @skipUnless(settings.FEATURES.get('AUTH_USE_OPENID') and
@@ -128,7 +129,7 @@ class OpenIdProviderTest(TestCase):
             resp = self.client.post(url)
             code = 200
             self.assertEqual(resp.status_code, code,
-                             "got code {0} for url '{1}'. Expected code {2}"
+                             u"got code {0} for url '{1}'. Expected code {2}"
                              .format(resp.status_code, url, code))
             for expected_input in (
                     '<input name="openid.ns" type="hidden" value="http://specs.openid.net/auth/2.0" />',
@@ -215,7 +216,7 @@ class OpenIdProviderTest(TestCase):
 
         code = expected_code
         self.assertEqual(resp.status_code, code,
-                         "got code {0} for url '{1}'. Expected code {2}"
+                         u"got code {0} for url '{1}'. Expected code {2}"
                          .format(resp.status_code, url, code))
 
     @skipUnless(settings.FEATURES.get('AUTH_USE_OPENID') and
@@ -453,7 +454,7 @@ class OpenIdProviderLiveServerTest(LiveServerTestCase):
             resp = self.client.post(url)
             code = 200
             self.assertEqual(resp.status_code, code,
-                             "got code {0} for url '{1}'. Expected code {2}"
+                             u"got code {0} for url '{1}'. Expected code {2}"
                              .format(resp.status_code, url, code))
 
     @classmethod
@@ -470,4 +471,4 @@ class OpenIdProviderLiveServerTest(LiveServerTestCase):
         try:
             super(OpenIdProviderLiveServerTest, cls).tearDownClass()
         except RuntimeError:
-            print "Warning: Could not shut down test server."
+            print("Warning: Could not shut down test server.")

@@ -482,7 +482,6 @@
                 this.postMathJaxProcessor(this.markdownWithHighlight(element.text()))
             );
 
-            this.typesetMathJax(element);
         };
 
         DiscussionUtil.typesetMathJax = function(element) {

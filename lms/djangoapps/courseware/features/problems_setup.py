@@ -269,8 +269,7 @@ def answer_problem(course, problem_type, correctness):
             image_selector = "#imageinput_{}_2_1".format(problem_html_loc)
             input_selector = "#input_{}_2_1".format(problem_html_loc)
 
-            world.browser.execute_script('$("body").on("click", function(event) {console.log(event);})')
-
+            world.browser.execute_script('$("body").on("click", function(event) {console.log(event);})')  # pylint: disable=unicode-format-string
             initial_input = world.css_value(input_selector)
             world.wait_for_visible(image_selector)
             image = world.css_find(image_selector).first

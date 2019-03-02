@@ -16,7 +16,6 @@ class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCas
     """
     Tests for wiki course redirection.
     """
-    shard = 1
 
     def setUp(self):
         super(WikiRedirectTestCase, self).setUp()
@@ -102,7 +101,7 @@ class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCas
         self.assertEquals(resp.status_code, 200)
 
         self.has_course_navigator(resp)
-        self.assertContains(resp, '<h3 class="entry-title">{}</h3>'.format(course.display_name_with_default))
+        self.assertContains(resp, u'<h3 class="entry-title">{}</h3>'.format(course.display_name_with_default))
 
     def has_course_navigator(self, resp):
         """

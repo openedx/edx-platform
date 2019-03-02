@@ -23,7 +23,6 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Check that navigation state is saved properly.
     """
-    shard = 1
     STUDENT_INFO = [('view@test.com', 'foo'), ('view2@test.com', 'foo')]
 
     @classmethod
@@ -87,7 +86,7 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         for line in response.content.split('\n'):
             if tabname in line and 'active' in line:
                 return
-        raise AssertionError("assertTabActive failed: {} not active".format(tabname))
+        raise AssertionError(u"assertTabActive failed: {} not active".format(tabname))
 
     def assertTabInactive(self, tabname, response):
         ''' Check if the progress tab is active in the tab set '''

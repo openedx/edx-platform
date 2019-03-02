@@ -53,8 +53,8 @@ class SAMLMetadataTest(SAMLTestCase):
         self.enable_saml(
             other_config_str=(
                 '{'
-                '"TECHNICAL_CONTACT": {"givenName": "Jane Tech", "emailAddress": "jane@example.com"},'
-                '"SUPPORT_CONTACT": {"givenName": "Joe Support", "emailAddress": "joe@example.com"}'
+                '"TECHNICAL_CONTACT": {"givenName": "Jane Tech", "emailAddress": "jane@example.com"},'  # pylint: disable=unicode-format-string,line-too-long
+                '"SUPPORT_CONTACT": {"givenName": "Joe Support", "emailAddress": "joe@example.com"}'  # pylint: disable=unicode-format-string,line-too-long
                 '}'
             )
         )

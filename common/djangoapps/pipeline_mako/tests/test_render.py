@@ -12,7 +12,6 @@ from pipeline_mako import compressed_css, compressed_js, render_require_js_path_
 
 class RequireJSPathOverridesTest(TestCase):
     """Test RequireJS path overrides. """
-    shard = 7
 
     OVERRIDES = {
         'jquery': 'common/js/vendor/jquery.js',
@@ -44,7 +43,6 @@ class RequireJSPathOverridesTest(TestCase):
 @ddt.ddt
 class PipelineRenderTest(TestCase):
     """Test individual pipeline rendering functions. """
-    shard = 7
 
     @staticmethod
     def mock_staticfiles_lookup(path):

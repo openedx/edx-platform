@@ -33,7 +33,6 @@ class SegmentIOTrackingTestCase(SegmentIOTrackingTestCaseBase):
     """
     Test processing of Segment events.
     """
-    shard = 3
 
     def setUp(self):
         super(SegmentIOTrackingTestCase, self).setUp()

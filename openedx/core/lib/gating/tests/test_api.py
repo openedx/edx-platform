@@ -22,7 +22,6 @@ class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
     """
     Tests for the gating API
     """
-    shard = 2
 
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
@@ -295,7 +294,7 @@ class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
         component = ItemFactory.create(
             parent_location=self.vertical.location,
             category=component_type,
-            display_name='{} block'.format(component_type)
+            display_name=u'{} block'.format(component_type)
         )
 
         with patch.object(BlockCompletion, 'get_course_completions') as course_block_completions_mock:

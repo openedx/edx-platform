@@ -90,6 +90,8 @@ class BulkEmailTest(BaseInstructorDashboardTest):
     """
     End-to-end tests for bulk emailing from instructor dash.
     """
+    shard = 23
+
     def setUp(self):
         super(BulkEmailTest, self).setUp()
         self.course_fixture = CourseFixture(**self.course_info).install()
@@ -239,6 +241,7 @@ class BatchBetaTestersTest(BaseInstructorDashboardTest):
     """
     End-to-end tests for Batch beta testers functionality.
     """
+    shard = 23
 
     def setUp(self):
         super(BatchBetaTestersTest, self).setUp()
@@ -697,6 +700,8 @@ class DataDownloadsWithMultipleRoleTests(BaseInstructorDashboardTest):
     """
     Bok Choy tests for the "Data Downloads" tab with multiple user roles.
     """
+    shard = 23
+
     def setUp(self):
         super(DataDownloadsWithMultipleRoleTests, self).setUp()
         self.course_fixture = CourseFixture(**self.course_info).install()
@@ -721,6 +726,7 @@ class DataDownloadsWithMultipleRoleTests(BaseInstructorDashboardTest):
         data_download_section = instructor_dashboard_page.select_data_download()
 
         data_download_section.enrolled_student_profile_button.click()
+        instructor_dashboard_page.wait_for_ajax()
         student_profile_info = data_download_section.student_profile_information
 
         self.assertNotIn(student_profile_info, [u'', u'Loading'])
@@ -994,7 +1000,7 @@ class CertificatesTest(BaseInstructorDashboardTest):
         self.certificates_section.add_certificate_exception(self.user_name, '')
 
         self.assertIn(
-            '{user} already in exception list.'.format(user=self.user_name),
+            u'{user} already in exception list.'.format(user=self.user_name),
             self.certificates_section.message.text
         )
 
@@ -1041,7 +1047,7 @@ class CertificatesTest(BaseInstructorDashboardTest):
         self.certificates_section.wait_for_ajax()
 
         self.assertIn(
-            "{user} does not exist in the LMS. Please check your spelling and retry.".format(user=invalid_user),
+            u"{user} does not exist in the LMS. Please check your spelling and retry.".format(user=invalid_user),
             self.certificates_section.message.text
         )
 
@@ -1074,7 +1080,7 @@ class CertificatesTest(BaseInstructorDashboardTest):
         self.certificates_section.wait_for_ajax()
 
         self.assertIn(
-            "{user} is not enrolled in this course. Please check your spelling and retry.".format(user=new_user),
+            u"{user} is not enrolled in this course. Please check your spelling and retry.".format(user=new_user),
             self.certificates_section.message.text
         )
 
@@ -1212,7 +1218,7 @@ class CertificateInvalidationTest(BaseInstructorDashboardTest):
 
         # Validate success message
         self.assertIn(
-            "Certificate has been successfully invalidated for {user}.".format(user=self.student_name),
+            u"Certificate has been successfully invalidated for {user}.".format(user=self.student_name),
             self.certificates_section.certificate_invalidation_message.text
         )
 
@@ -1449,6 +1455,8 @@ class StudentAdminTest(BaseInstructorDashboardTest):
     SUBSECTION_NAME = 'Test Subsection 1'
     UNIT_NAME = 'Test Unit 1'
     PROBLEM_NAME = 'Test Problem 1'
+
+    shard = 23
 
     def setUp(self):
         super(StudentAdminTest, self).setUp()

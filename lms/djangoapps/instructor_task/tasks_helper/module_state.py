@@ -101,7 +101,7 @@ def perform_module_state_update(update_fcn, filter_fcn, _entry_id, course_id, ta
         elif update_status == UPDATE_STATUS_SKIPPED:
             task_progress.skipped += 1
         else:
-            raise UpdateProblemModuleStateError("Unexpected update_status returned: {}".format(update_status))
+            raise UpdateProblemModuleStateError(u"Unexpected update_status returned: {}".format(update_status))
 
     return task_progress.update_task_state()
 
@@ -141,7 +141,7 @@ def rescore_problem_module_state(xmodule_instance_args, module_descriptor, stude
         if instance is None:
             # Either permissions just changed, or someone is trying to be clever
             # and load something they shouldn't have access to.
-            msg = "No module {location} for student {student}--access denied?".format(
+            msg = u"No module {location} for student {student}--access denied?".format(
                 location=usage_key,
                 student=student
             )
@@ -151,7 +151,7 @@ def rescore_problem_module_state(xmodule_instance_args, module_descriptor, stude
         if not hasattr(instance, 'rescore'):
             # This should not happen, since it should be already checked in the
             # caller, but check here to be sure.
-            msg = "Specified module {0} of type {1} does not support rescoring.".format(usage_key, instance.__class__)
+            msg = u"Specified module {0} of type {1} does not support rescoring.".format(usage_key, instance.__class__)
             raise UpdateProblemModuleStateError(msg)
 
         # We check here to see if the problem has any submissions. If it does not, we don't want to rescore it
@@ -226,7 +226,7 @@ def override_score_module_state(xmodule_instance_args, module_descriptor, studen
         if instance is None:
             # Either permissions just changed, or someone is trying to be clever
             # and load something they shouldn't have access to.
-            msg = "No module {location} for student {student}--access denied?".format(
+            msg = u"No module {location} for student {student}--access denied?".format(
                 location=usage_key,
                 student=student
             )

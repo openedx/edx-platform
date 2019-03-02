@@ -8,7 +8,6 @@ from instructor_analytics.csvs import create_csv_response, format_dictlist, form
 
 class TestAnalyticsCSVS(TestCase):
     """ Test analytics rendering of csv files."""
-    shard = 4
 
     def test_create_csv_response_nodata(self):
         header = ['Name', 'Email']
@@ -16,7 +15,7 @@ class TestAnalyticsCSVS(TestCase):
 
         res = create_csv_response('robot.csv', header, datarows)
         self.assertEqual(res['Content-Type'], 'text/csv')
-        self.assertEqual(res['Content-Disposition'], 'attachment; filename={0}'.format('robot.csv'))
+        self.assertEqual(res['Content-Disposition'], u'attachment; filename={0}'.format('robot.csv'))
         self.assertEqual(res.content.strip(), '"Name","Email"')
 
     def test_create_csv_response(self):
@@ -25,7 +24,7 @@ class TestAnalyticsCSVS(TestCase):
 
         res = create_csv_response('robot.csv', header, datarows)
         self.assertEqual(res['Content-Type'], 'text/csv')
-        self.assertEqual(res['Content-Disposition'], 'attachment; filename={0}'.format('robot.csv'))
+        self.assertEqual(res['Content-Disposition'], u'attachment; filename={0}'.format('robot.csv'))
         self.assertEqual(res.content.strip(), '"Name","Email"\r\n"Jim","jim@edy.org"\r\n"Jake","jake@edy.org"\r\n"Jeeves","jeeves@edy.org"')
 
     def test_create_csv_response_empty(self):
@@ -34,13 +33,12 @@ class TestAnalyticsCSVS(TestCase):
 
         res = create_csv_response('robot.csv', header, datarows)
         self.assertEqual(res['Content-Type'], 'text/csv')
-        self.assertEqual(res['Content-Disposition'], 'attachment; filename={0}'.format('robot.csv'))
+        self.assertEqual(res['Content-Disposition'], u'attachment; filename={0}'.format('robot.csv'))
         self.assertEqual(res.content.strip(), '')
 
 
 class TestAnalyticsFormatDictlist(TestCase):
     """ Test format_dictlist method """
-    shard = 4
 
     def test_format_dictlist(self):
         dictlist = [
@@ -79,13 +77,12 @@ class TestAnalyticsFormatDictlist(TestCase):
 
         res = create_csv_response('robot.csv', header, datarows)
         self.assertEqual(res['Content-Type'], 'text/csv')
-        self.assertEqual(res['Content-Disposition'], 'attachment; filename={0}'.format('robot.csv'))
+        self.assertEqual(res['Content-Disposition'], u'attachment; filename={0}'.format('robot.csv'))
         self.assertEqual(res.content.strip(), '"Name","Email"\r\n"Jim","jim@edy.org"\r\n"Jake","jake@edy.org"\r\n"Jeeves","jeeves@edy.org"')
 
 
 class TestAnalyticsFormatInstances(TestCase):
     """ test format_instances method """
-    shard = 4
 
     class TestDataClass(object):
         """ Test class to generate objects for format_instances """

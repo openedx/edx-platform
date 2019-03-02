@@ -112,7 +112,7 @@ class CourseOutlineDragAndDropTest(CourseOutlineTest):
     def drag_and_verify(self, source, target, expected_ordering, outline_page=None):
         self.do_action_and_verify(
             outline_page,
-            lambda (outline): drag(outline, source, target),
+            lambda outline: drag(outline, source, target),
             expected_ordering
         )
 
@@ -1870,6 +1870,7 @@ class SelfPacedOutlineTest(CourseOutlineTest):
 
 class CourseStatusOutlineTest(CourseOutlineTest):
     """Test the course outline status section."""
+    shard = 6
 
     def setUp(self):
         super(CourseStatusOutlineTest, self).setUp()

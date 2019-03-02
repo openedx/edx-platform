@@ -1,6 +1,7 @@
 """
 Internationalization tasks
 """
+from __future__ import print_function
 
 import re
 import subprocess
@@ -130,9 +131,9 @@ def i18n_validate_transifex_config():
     if not config.isfile or config.getsize == 0:
         msg = colorize(
             'red',
-            "Cannot connect to Transifex, config file is missing"
-            " or empty: {config} \nSee "
-            "http://help.transifex.com/features/client/#transifexrc \n".format(
+            u"Cannot connect to Transifex, config file is missing"
+            u" or empty: {config} \nSee "
+            u"http://help.transifex.com/features/client/#transifexrc \n".format(
                 config=config,
             )
         )
@@ -169,11 +170,11 @@ def i18n_rtl():
     """
     sh("i18n_tool transifex rtl")
 
-    print "Now generating langugage files..."
+    print("Now generating langugage files...")
 
     sh("i18n_tool generate --rtl")
 
-    print "Committing translations..."
+    print("Committing translations...")
     sh('git clean -fdX conf/locale')
     sh('git add conf/locale')
     sh('git commit --amend')
@@ -187,11 +188,11 @@ def i18n_ltr():
     """
     sh("i18n_tool transifex ltr")
 
-    print "Now generating langugage files..."
+    print("Now generating langugage files...")
 
     sh("i18n_tool generate --ltr")
 
-    print "Committing translations..."
+    print("Committing translations...")
     sh('git clean -fdX conf/locale')
     sh('git add conf/locale')
     sh('git commit --amend')
@@ -216,7 +217,7 @@ def i18n_robot_pull():
     # TODO: Validate the recently pulled translations, and give a bail option
     sh('git clean -fdX conf/locale/rtl')
     sh('git clean -fdX conf/locale/eo')
-    print "\n\nValidating translations with `i18n_tool validate`..."
+    print("\n\nValidating translations with `i18n_tool validate`...")
     sh("i18n_tool validate")
 
     con = raw_input("Continue with committing these translations (y/n)? ")

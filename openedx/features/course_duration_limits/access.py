@@ -18,12 +18,13 @@ from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_lin
 from lms.djangoapps.courseware.masquerade import get_course_masquerade, is_masquerading_as_specific_student
 from openedx.core.djangoapps.catalog.utils import get_course_run_details
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangolib.markup import HTML, Text
+from openedx.core.djangolib.markup import HTML
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from web_fragments.fragment import Fragment
 
 MIN_DURATION = timedelta(weeks=4)
 MAX_DURATION = timedelta(weeks=18)
+EXPIRATION_DATE_FORMAT_STR = u'%b. %-d, %Y'
 
 
 class AuditExpiredError(AccessError):
@@ -32,22 +33,19 @@ class AuditExpiredError(AccessError):
     """
     def __init__(self, user, course, expiration_date):
         error_code = "audit_expired"
-        developer_message = "User {} had access to {} until {}".format(user, course, expiration_date)
+        developer_message = u"User {} had access to {} until {}".format(user, course, expiration_date)
         language = get_language()
-        if language and language.split('-')[0].lower() == 'es':
-            expiration_date = strftime_localized(expiration_date, '%-d de %b. de %Y').lower()
-        else:
-            expiration_date = strftime_localized(expiration_date, '%b. %-d, %Y')
-        user_message = _("Access expired on {expiration_date}").format(expiration_date=expiration_date)
+        expiration_date = strftime_localized(expiration_date, EXPIRATION_DATE_FORMAT_STR)
+        user_message = _(u"Access expired on {expiration_date}").format(expiration_date=expiration_date)
         try:
             course_name = CourseOverview.get_from_id(course.id).display_name_with_default
-            additional_context_user_message = _("Access to {course_name} expired on {expiration_date}").format(
+            additional_context_user_message = _(u"Access to {course_name} expired on {expiration_date}").format(
                 course_name=course_name,
                 expiration_date=expiration_date
             )
         except CourseOverview.DoesNotExist:
-            additional_context_user_message = _("Access to the course you were looking"
-                                                " for expired on {expiration_date}").format(
+            additional_context_user_message = _(u"Access to the course you were looking"
+                                                u" for expired on {expiration_date}").format(
                 expiration_date=expiration_date
             )
         super(AuditExpiredError, self).__init__(error_code, developer_message, user_message,
@@ -63,10 +61,11 @@ def get_user_course_expiration_date(user, course):
       - Course access duration is bounded by the min and max duration.
       - If course fields are missing, default course access duration to MIN_DURATION.
     """
-
     access_duration = MIN_DURATION
 
-    if not CourseMode.verified_mode_for_course(course.id, include_expired=True):
+    verified_mode = CourseMode.verified_mode_for_course(course=course, include_expired=True)
+
+    if not verified_mode:
         return None
 
     enrollment = CourseEnrollment.get_enrollment(user, course.id)
@@ -112,6 +111,12 @@ def check_course_expired(user, course):
     return ACCESS_GRANTED
 
 
+def get_date_string():
+    # Creating this method to allow unit testing an issue where this string was missing the unicode prefix
+    return u'<span class="localized-datetime" data-format="shortDate" \
+        data-datetime="{formatted_date}" data-language="{language}">{formatted_date_localized}</span>'
+
+
 def generate_course_expired_message(user, course):
     """
     Generate the message for the user course expiration date if it exists.
@@ -125,9 +130,9 @@ def generate_course_expired_message(user, course):
 
     if is_masquerading_as_specific_student(user, course.id) and timezone.now() > expiration_date:
         upgrade_message = _('This learner does not have access to this course. '
-                            'Their access expired on {expiration_date}.')
+                            u'Their access expired on {expiration_date}.')
         return HTML(upgrade_message).format(
-            expiration_date=strftime_localized(expiration_date, '%b. %-d, %Y')
+            expiration_date=strftime_localized(expiration_date, EXPIRATION_DATE_FORMAT_STR)
         )
     else:
         enrollment = CourseEnrollment.get_enrollment(user, course.id)
@@ -140,12 +145,12 @@ def generate_course_expired_message(user, course):
         if (not upgrade_deadline) or (upgrade_deadline < now):
             upgrade_deadline = course_upgrade_deadline
 
-        expiration_message = _('{strong_open}Audit Access Expires {expiration_date}{strong_close}'
-                               '{line_break}You lose all access to this course, including your progress, on '
-                               '{expiration_date}.')
-        upgrade_deadline_message = _('{line_break}Upgrade by {upgrade_deadline} to get unlimited access to the course '
-                                     'as long as it exists on the site. {a_open}Upgrade now{sronly_span_open} to '
-                                     'retain access past {expiration_date}{span_close}{a_close}')
+        expiration_message = _(u'{strong_open}Audit Access Expires {expiration_date}{strong_close}'
+                               u'{line_break}You lose all access to this course, including your progress, on '
+                               u'{expiration_date}.')
+        upgrade_deadline_message = _(u'{line_break}Upgrade by {upgrade_deadline} to get unlimited access to the course '
+                                     u'as long as it exists on the site. {a_open}Upgrade now{sronly_span_open} to '
+                                     u'retain access past {expiration_date}{span_close}{a_close}')
         full_message = expiration_message
         if upgrade_deadline and now < upgrade_deadline:
             full_message += upgrade_deadline_message
@@ -154,36 +159,37 @@ def generate_course_expired_message(user, course):
             using_upgrade_messaging = False
 
         language = get_language()
-        language_is_es = language and language.split('-')[0].lower() == 'es'
-        if language_is_es:
-            formatted_expiration_date = strftime_localized(expiration_date, '%-d de %b. de %Y').lower()
-        else:
-            formatted_expiration_date = strftime_localized(expiration_date, '%b. %-d, %Y')
-
+        date_string = get_date_string()
+        formatted_expiration_date = date_string.format(
+            language=language,
+            formatted_date=expiration_date.strftime(EXPIRATION_DATE_FORMAT_STR),
+            formatted_date_localized=strftime_localized(expiration_date, EXPIRATION_DATE_FORMAT_STR)
+        )
         if using_upgrade_messaging:
-            if language_is_es:
-                formatted_upgrade_deadline = strftime_localized(upgrade_deadline, '%-d de %b. de %Y').lower()
-            else:
-                formatted_upgrade_deadline = strftime_localized(upgrade_deadline, '%b. %-d, %Y')
+            formatted_upgrade_deadline = date_string.format(
+                language=language,
+                formatted_date=upgrade_deadline.strftime(EXPIRATION_DATE_FORMAT_STR),
+                formatted_date_localized=strftime_localized(upgrade_deadline, EXPIRATION_DATE_FORMAT_STR)
+            )
 
             return HTML(full_message).format(
-                a_open=HTML('<a href="{upgrade_link}">').format(
+                a_open=HTML(u'<a href="{upgrade_link}">').format(
                     upgrade_link=verified_upgrade_deadline_link(user=user, course=course)
                 ),
                 sronly_span_open=HTML('<span class="sr-only">'),
                 span_close=HTML('</span>'),
                 a_close=HTML('</a>'),
-                expiration_date=formatted_expiration_date,
+                expiration_date=HTML(formatted_expiration_date),
                 strong_open=HTML('<strong>'),
                 strong_close=HTML('</strong>'),
                 line_break=HTML('<br>'),
-                upgrade_deadline=formatted_upgrade_deadline
+                upgrade_deadline=HTML(formatted_upgrade_deadline)
             )
 
         else:
             return HTML(full_message).format(
                 span_close=HTML('</span>'),
-                expiration_date=formatted_expiration_date,
+                expiration_date=HTML(formatted_expiration_date),
                 strong_open=HTML('<strong>'),
                 strong_close=HTML('</strong>'),
                 line_break=HTML('<br>'),

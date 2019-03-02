@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 """ Tests for transcripts_utils. """
 import copy
-import tempfile
-import ddt
 import json
+import tempfile
 import textwrap
 import unittest
 from uuid import uuid4
 
+import ddt
 import pytest
 from django.conf import settings
 from django.test.utils import override_settings
@@ -16,12 +16,12 @@ from mock import Mock, patch
 from six import text_type
 
 from contentstore.tests.utils import mock_requests_get
+from student.tests.factories import UserFactory
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from student.tests.factories import UserFactory
 from xmodule.video_module import transcripts_utils
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)

@@ -26,7 +26,6 @@ class RefundTests(ModuleStoreTestCase):
     """
     Tests for the manual refund page
     """
-    shard = 4
 
     def setUp(self):
         super(RefundTests, self).setUp()
@@ -107,7 +106,7 @@ class RefundTests(ModuleStoreTestCase):
     def test_no_order(self):
         self._enroll(purchase=False)
         response = self.client.post('/support/refund/', self.form_pars)
-        self.assertContains(response, 'No order found for %s' % self.student.username)
+        self.assertContains(response, u'No order found for %s' % self.student.username)
 
     def test_valid_order(self):
         self._enroll()
@@ -124,7 +123,7 @@ class RefundTests(ModuleStoreTestCase):
         self.assertTrue(response.status_code, 302)
         response = self.client.get(response.get('location'))
 
-        self.assertContains(response, "Unenrolled %s from" % self.student)
+        self.assertContains(response, u"Unenrolled %s from" % self.student)
         self.assertContains(response, "Refunded 1.00 for order id")
 
         self.assertFalse(CourseEnrollment.is_enrolled(self.student, self.course_id))

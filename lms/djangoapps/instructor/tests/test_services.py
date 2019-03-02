@@ -20,7 +20,6 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
     """
     Tests for the InstructorService
     """
-    shard = 1
 
     @classmethod
     def setUpClass(cls):
@@ -149,9 +148,9 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
         email = "edx-proctoring@edx.org"
         subject = u"Proctored Exam Review: {review_status}".format(review_status="Suspicious")
 
-        body = "A proctored exam attempt for {exam_name} in {course_name} by username: {student_username} was " \
-               "reviewed as {review_status} by the proctored exam review provider.\n" \
-               "Review link: {url}"
+        body = u"A proctored exam attempt for {exam_name} in {course_name} by username: {student_username} was " \
+               u"reviewed as {review_status} by the proctored exam review provider.\n" \
+               u"Review link: {url}"
         args = {
             'exam_name': 'test_exam',
             'student_username': 'test_student',

@@ -1007,7 +1007,6 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
     """
     Test the problem report on a course that has split tests.
     """
-    shard = 3
     OPTION_1 = 'Option 1'
     OPTION_2 = 'Option 2'
 
@@ -1079,10 +1078,10 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
         self.course = CourseFactory.create(
             grading_policy={
                 "GRADER": [{
-                    "type": "Homework %d" % i,
+                    "type": u"Homework %d" % i,
                     "min_count": 1,
                     "drop_count": 0,
-                    "short_label": "HW %d" % i,
+                    "short_label": u"HW %d" % i,
                     "weight": 1.0
                 } for i in xrange(1, grader_num)]
             }
@@ -1097,10 +1096,10 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
         problem_vertical_list = []
 
         for i in xrange(1, grader_num):
-            chapter_name = 'Chapter %d' % i
-            problem_section_name = 'Problem section %d' % i
-            problem_section_format = 'Homework %d' % i
-            problem_vertical_name = 'Problem Unit %d' % i
+            chapter_name = u'Chapter %d' % i
+            problem_section_name = u'Problem section %d' % i
+            problem_section_format = u'Homework %d' % i
+            problem_vertical_name = u'Problem Unit %d' % i
 
             chapter = ItemFactory.create(parent_location=self.course.location,
                                          display_name=chapter_name)
@@ -1124,7 +1123,7 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
         for i in xrange(1, grader_num):
             problem_url = 'test_problem_%d' % i
             self.define_option_problem(problem_url, parent=problem_vertical_list[i - 1])
-            title = 'Homework %d 1: Problem section %d - %s' % (i, i, problem_url)
+            title = u'Homework %d 1: Problem section %d - %s' % (i, i, problem_url)
             problem_names.append(title)
 
         header_row = [u'Student ID', u'Email', u'Username', u'Enrollment Status', u'Grade']
@@ -2131,7 +2130,6 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
     """
     Test certificate generation task works.
     """
-    shard = 3
 
     ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
 

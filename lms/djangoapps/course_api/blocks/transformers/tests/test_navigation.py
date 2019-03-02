@@ -21,7 +21,6 @@ class BlockNavigationTransformerTestCase(TestCase, ChildrenMapTestMixin):
     """
     Course-agnostic test class for testing the Navigation transformer.
     """
-    shard = 4
 
     @ddt.data(
         (0, 0, [], []),
@@ -72,7 +71,6 @@ class BlockNavigationTransformerCourseTestCase(ModuleStoreTestCase):
     Uses SampleCourseFactory and Modulestore to test the Navigation transformer,
     specifically to test enforcement of the hide_from_toc field
     """
-    shard = 4
 
     def test_hide_from_toc(self):
         course_key = SampleCourseFactory.create().id

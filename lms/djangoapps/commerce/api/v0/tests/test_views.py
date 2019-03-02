@@ -39,7 +39,6 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
     """
     Tests for the commerce Baskets view.
     """
-    shard = 1
 
     def _post_to_view(self, course_id=None, marketing_email_opt_in=False, include_utm_cookie=False):
         """
@@ -284,7 +283,6 @@ class BasketOrderViewTests(UserMixin, TestCase):
     view_name = 'commerce_api:v0:baskets:retrieve_order'
     MOCK_ORDER = {'number': 1}
     path = reverse_lazy(view_name, kwargs={'basket_id': 1})
-    shard = 1
 
     def setUp(self):
         super(BasketOrderViewTests, self).setUp()

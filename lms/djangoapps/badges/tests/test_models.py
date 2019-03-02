@@ -36,7 +36,6 @@ class BadgeImageConfigurationTest(TestCase):
     """
     Test the validation features of BadgeImageConfiguration.
     """
-    shard = 1
 
     def tearDown(self):
         tmp_path = Path(TEST_DATA_ROOT / 'course_complete_badges')

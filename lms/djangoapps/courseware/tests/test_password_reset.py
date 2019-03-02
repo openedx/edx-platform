@@ -18,7 +18,6 @@ class TestPasswordReset(LoginEnrollmentTestCase):
     """
     Go through some of the password reset use cases
     """
-    shard = 1
 
     def _setup_user(self, is_staff=False, password=None):
         """

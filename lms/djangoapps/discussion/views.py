@@ -1,6 +1,7 @@
 """
 Views handling read (GET) requests for the Discussion tab and inline discussions.
 """
+from __future__ import print_function
 
 import logging
 from functools import wraps
@@ -633,8 +634,8 @@ def followed_threads(request, course_key, user_id):
             query_params['group_id'] = group_id
 
         paginated_results = profiled_user.subscribed_threads(query_params)
-        print "\n \n \n paginated results \n \n \n "
-        print paginated_results
+        print("\n \n \n paginated results \n \n \n ")
+        print(paginated_results)
         query_params['page'] = paginated_results.page
         query_params['num_pages'] = paginated_results.num_pages
         user_info = cc.User.from_django_user(request.user).to_dict()
@@ -738,11 +739,13 @@ class DiscussionBoardFragmentView(EdxFragmentView):
             return fragment
         except cc.utils.CommentClientMaintenanceError:
             log.warning('Forum is in maintenance mode')
-            html = render_to_response('discussion/maintenance_fragment.html', {
+            html = render_to_string('discussion/maintenance_fragment.html', {
                 'disable_courseware_js': True,
                 'uses_pattern_library': True,
             })
-            return Fragment(html)
+            fragment = Fragment(html)
+            self.add_fragment_resource_urls(fragment)
+            return fragment
 
     def vendor_js_dependencies(self):
         """

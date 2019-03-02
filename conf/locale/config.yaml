@@ -128,7 +128,7 @@ ignore_dirs:
     - src/done-xblock
     - src/edx-jsme
     - src/parse-rest
-    - src/pygeoip
+    - src/geoip2
     - src/pystache-custom
     - src/rate-xblock
     - src/xblock-google-drive
@@ -157,6 +157,10 @@ segment:
     djangojs-partial.po:
         djangojs-studio.po:
             - cms/*
+        djangojs-account-settings-view.po:
+            - lms/static/js/student_account/views/account_settings_view.js
+        # Segregating student account settings view strings, so that beta language message
+        # can be translated for wide set of partially supported languages.
     mako.po:
         mako-studio.po:
             - cms/*
@@ -172,8 +176,10 @@ generate_merge:
         - mako.po
         - mako-studio.po
         - wiki.po
+        - edx_proctoring_proctortrack.po
     djangojs.po:
         - djangojs-partial.po
         - djangojs-studio.po
+        - djangojs-account-settings-view.po
         - underscore.po
         - underscore-studio.po

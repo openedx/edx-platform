@@ -22,6 +22,7 @@ import crum
 from config_models.models import ConfigurationModel, cache
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.lib.cache_utils import request_cached
 
 
 class Provenance(Enum):
@@ -252,7 +253,9 @@ class StackedConfigurationModel(ConfigurationModel):
         return course_key.org
 
     @classmethod
+    @request_cached()
     def _site_from_org(cls, org):
+
         configuration = SiteConfiguration.get_configuration_for_org(org, select_related=['site'])
         if configuration is None:
             try:

@@ -15,9 +15,11 @@ from edxmako.shortcuts import render_to_response
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
+from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.lang_pref.api import all_languages, released_languages
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from openedx.core.lib.time_zone_utils import TIME_ZONE_CHOICES
 from openedx.features.enterprise_support.api import get_enterprise_customer_for_learner
@@ -74,6 +76,15 @@ def account_settings_context(request):
         # it will be broken if exception raised
         user_orders = []
 
+    beta_language = {}
+    dark_lang_config = DarkLangConfig.current()
+    if dark_lang_config.enable_beta_languages:
+        user_preferences = get_user_preferences(user)
+        pref_language = user_preferences.get('pref-lang')
+        if pref_language in dark_lang_config.beta_languages_list:
+            beta_language['code'] = pref_language
+            beta_language['name'] = settings.LANGUAGE_DICT.get(pref_language)
+
     context = {
         'auth': {},
         'duplicate_provider': None,
@@ -111,6 +122,7 @@ def account_settings_context(request):
             'ENABLE_ACCOUNT_DELETION', settings.FEATURES.get('ENABLE_ACCOUNT_DELETION', False)
         ),
         'extended_profile_fields': _get_extended_profile_fields(),
+        'beta_language': beta_language
     }
 
     enterprise_customer = get_enterprise_customer_for_learner(site=request.site, user=request.user)

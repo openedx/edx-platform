@@ -264,8 +264,8 @@ def create_credit_request(course_key, provider_id, username):
             final_grade = unicode(final_grade)
 
     except (CreditRequirementStatus.DoesNotExist, TypeError, KeyError):
-        msg = 'Could not retrieve final grade from the credit eligibility table for ' \
-              'user [{user_id}] in course [{course_key}].'.format(user_id=user.id, course_key=course_key)
+        msg = u'Could not retrieve final grade from the credit eligibility table for ' \
+              u'user [{user_id}] in course [{course_key}].'.format(user_id=user.id, course_key=course_key)
         log.exception(msg)
         raise UserIsNotEligible(msg)
 

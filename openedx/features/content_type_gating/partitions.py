@@ -9,13 +9,19 @@ import logging
 
 import crum
 from django.apps import apps
+from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 from web_fragments.fragment import Fragment
 
 from course_modes.models import CourseMode
+from courseware.masquerade import (
+    is_masquerading_as_specific_student,
+    is_masquerading_as_student,
+    get_course_masquerade,
+)
 from lms.djangoapps.commerce.utils import EcommerceService
-from xmodule.partitions.partitions import UserPartition, UserPartitionError
+from xmodule.partitions.partitions import UserPartition, UserPartitionError, ENROLLMENT_TRACK_PARTITION_ID
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID, FULL_ACCESS, LIMITED_ACCESS
@@ -39,7 +45,7 @@ def create_content_gating_partition(course):
         content_gate_scheme = UserPartition.get_scheme(CONTENT_TYPE_GATING_SCHEME)
     except UserPartitionError:
         LOG.warning(
-            "No %r scheme registered, ContentTypeGatingPartitionScheme will not be created.",
+            u"No %r scheme registered, ContentTypeGatingPartitionScheme will not be created.",
             CONTENT_TYPE_GATING_SCHEME
         )
         return None
@@ -50,7 +56,7 @@ def create_content_gating_partition(course):
         # partition with id 51, it will collide with the Content Gating Partition. We'll catch that here, and
         # then fix the course content as needed (or get the course team to).
         LOG.warning(
-            "Can't add %r partition, as ID %r is assigned to %r in course %s.",
+            u"Can't add %r partition, as ID %r is assigned to %r in course %s.",
             CONTENT_TYPE_GATING_SCHEME,
             CONTENT_GATING_PARTITION_ID,
             _get_partition_from_id(course.user_partitions, CONTENT_GATING_PARTITION_ID).name,
@@ -73,7 +79,8 @@ class ContentTypeGatingPartition(UserPartition):
     to gated content.
     """
     def access_denied_fragment(self, block, user, user_group, allowed_groups):
-        modes = CourseMode.modes_for_course_dict(block.scope_ids.usage_id.course_key)
+        course_key = self._get_course_key_from_course_block(block)
+        modes = CourseMode.modes_for_course_dict(course_key)
         verified_mode = modes.get(CourseMode.VERIFIED)
         if verified_mode is None or not self._is_audit_enrollment(user, block):
             return None
@@ -81,7 +88,7 @@ class ContentTypeGatingPartition(UserPartition):
 
         request = crum.get_current_request()
         frag = Fragment(render_to_string('content_type_gating/access_denied_message.html', {
-            'mobile_app': is_request_from_mobile_app(request),
+            'mobile_app': request and is_request_from_mobile_app(request),
             'ecommerce_checkout_link': ecommerce_checkout_link,
             'min_price': str(verified_mode.min_price)
         }))
@@ -93,8 +100,41 @@ class ContentTypeGatingPartition(UserPartition):
         return None
 
     def _is_audit_enrollment(self, user, block):
+        """
+        Checks if user is enrolled in `Audit` track of course or any staff member is
+        viewing course as in `Audit` enrollment.
+        """
+        course_key = self._get_course_key_from_course_block(block)
+
+        if self._is_masquerading_as_generic_student(user, course_key):
+            return self._is_masquerading_audit_enrollment(user, course_key)
+        return self._has_active_enrollment_in_audit_mode(user, course_key)
+
+    def _is_masquerading_as_generic_student(self, user, course_key):
+        """
+        Checks if user is masquerading as a generic student.
+        """
+        return (
+            is_masquerading_as_student(user, course_key) and
+            not is_masquerading_as_specific_student(user, course_key)
+        )
+
+    def _is_masquerading_audit_enrollment(self, user, course_key):
+        """
+        Checks if user is masquerading as learners in `Audit` enrollment track.
+        """
+        course_masquerade = get_course_masquerade(user, course_key)
+        if course_masquerade.user_partition_id == ENROLLMENT_TRACK_PARTITION_ID:
+            audit_mode_id = settings.COURSE_ENROLLMENT_MODES.get(CourseMode.AUDIT, {}).get('id')
+            return course_masquerade.group_id == audit_mode_id
+        return False
+
+    def _has_active_enrollment_in_audit_mode(self, user, course_key):
+        """
+        Checks if user has an audit and active enrollment in the given course.
+        """
         course_enrollment = apps.get_model('student.CourseEnrollment')
-        mode_slug, is_active = course_enrollment.enrollment_mode_for_user(user, block.scope_ids.usage_id.course_key)
+        mode_slug, is_active = course_enrollment.enrollment_mode_for_user(user, course_key)
         return mode_slug == CourseMode.AUDIT and is_active
 
     def _get_checkout_link(self, user, sku):
@@ -102,6 +142,12 @@ class ContentTypeGatingPartition(UserPartition):
         ecommerce_checkout = ecomm_service.is_enabled(user)
         if ecommerce_checkout and sku:
             return ecomm_service.get_checkout_page_url(sku) or ''
+
+    def _get_course_key_from_course_block(self, block):
+        """
+        Extracts and returns `course_key` from `block`
+        """
+        return block.scope_ids.usage_id.course_key
 
 
 class ContentTypeGatingPartitionScheme(object):
@@ -151,8 +197,8 @@ class ContentTypeGatingPartitionScheme(object):
             )
             if course_mode is None:
                 LOG.error(
-                    "User %s is in an unknown CourseMode '%s'"
-                    " for course %s. Granting full access to content for this user",
+                    u"User %s is in an unknown CourseMode '%s'"
+                    u" for course %s. Granting full access to content for this user",
                     user.username,
                     mode_slug,
                     course_key,

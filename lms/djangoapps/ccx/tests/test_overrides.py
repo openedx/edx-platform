@@ -31,7 +31,6 @@ class TestFieldOverrides(FieldOverrideTestMixin, SharedModuleStoreTestCase):
     Make sure field overrides behave in the expected manner.
     """
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
-    shard = 7
 
     @classmethod
     def setUpClass(cls):

@@ -1,11 +1,17 @@
 """
 Discussion API forms
 """
+import urllib
+
 from django.core.exceptions import ValidationError
 from django.forms import BooleanField, CharField, ChoiceField, Form, IntegerField
 from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
+from six import text_type
 
+from courseware.courses import get_course_with_access
+from django_comment_common.models import Role, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_GROUP_MODERATOR
 from openedx.core.djangoapps.util.forms import ExtendedNullBooleanField, MultiValueField
 
 
@@ -61,7 +67,7 @@ class ThreadListGetForm(_PaginationForm):
         try:
             return CourseLocator.from_string(value)
         except InvalidKeyError:
-            raise ValidationError("'{}' is not a valid course id".format(value))
+            raise ValidationError(u"'{}' is not a valid course id".format(value))
 
     def clean_following(self):
         """Validate following"""
@@ -78,7 +84,7 @@ class ThreadListGetForm(_PaginationForm):
         )
         if exclusive_params_count > 1:
             raise ValidationError(
-                "The following query parameters are mutually exclusive: {}".format(
+                u"The following query parameters are mutually exclusive: {}".format(
                     ", ".join(self.EXCLUSIVE_PARAMS)
                 )
             )
@@ -119,3 +125,53 @@ class CommentGetForm(_PaginationForm):
     A form to validate query parameters in the comment retrieval endpoint
     """
     requested_fields = MultiValueField(required=False)
+
+
+class CourseDiscussionSettingsForm(Form):
+    """
+    A form to validate the fields in the course discussion settings requests.
+    """
+    course_id = CharField()
+
+    def __init__(self, *args, **kwargs):
+        self.request_user = kwargs.pop('request_user')
+        super(CourseDiscussionSettingsForm, self).__init__(*args, **kwargs)
+
+    def clean_course_id(self):
+        """Validate the 'course_id' value"""
+        course_id = self.cleaned_data['course_id']
+        try:
+            course_key = CourseKey.from_string(course_id)
+            self.cleaned_data['course'] = get_course_with_access(self.request_user, 'staff', course_key)
+            self.cleaned_data['course_key'] = course_key
+            return course_id
+        except InvalidKeyError:
+            raise ValidationError("'{}' is not a valid course key".format(text_type(course_id)))
+
+
+class CourseDiscussionRolesForm(CourseDiscussionSettingsForm):
+    """
+    A form to validate the fields in the course discussion roles requests.
+    """
+    ROLE_CHOICES = (
+        (FORUM_ROLE_MODERATOR, FORUM_ROLE_MODERATOR),
+        (FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_MODERATOR),
+        (FORUM_ROLE_GROUP_MODERATOR, FORUM_ROLE_GROUP_MODERATOR),
+    )
+    rolename = ChoiceField(
+        ROLE_CHOICES,
+        error_messages={"invalid_choice": "Role '%(value)s' does not exist"}
+    )
+
+    def clean_rolename(self):
+        """Validate the 'rolename' value."""
+        rolename = urllib.unquote(self.cleaned_data.get('rolename'))
+        course_id = self.cleaned_data.get('course_key')
+        if course_id and rolename:
+            try:
+                role = Role.objects.get(name=rolename, course_id=course_id)
+            except Role.DoesNotExist:
+                raise ValidationError("Role '{}' does not exist".format(rolename))
+
+            self.cleaned_data['role'] = role
+            return rolename

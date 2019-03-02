@@ -47,7 +47,6 @@ class TestPreferenceAPI(CacheIsolationTestCase):
     are not specified.
     """
     password = "test"
-    shard = 2
 
     def setUp(self):
         super(TestPreferenceAPI, self).setUp()
@@ -335,7 +334,6 @@ class UpdateEmailOptInTests(ModuleStoreTestCase):
     USERNAME = u'claire-underwood'
     PASSWORD = u'ṕáśśẃőŕd'
     EMAIL = u'claire+underwood@example.com'
-    shard = 2
 
     @ddt.data(
         # Check that a 27 year old can opt-in
@@ -488,4 +486,4 @@ def get_empty_preference_message(preference_key):
     """
     Returns the validation message shown for an empty preference.
     """
-    return "Preference '{preference_key}' cannot be set to an empty value.".format(preference_key=preference_key)
+    return u"Preference '{preference_key}' cannot be set to an empty value.".format(preference_key=preference_key)

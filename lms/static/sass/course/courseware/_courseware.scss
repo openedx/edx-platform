@@ -152,6 +152,12 @@ html.video-fullscreen {
     }
 
     div.timed-exam {
+      color: #555353;
+
+      strong {
+        font-weight: 600;
+      }
+
       h3 {
         margin-bottom: 12px;
         font-size: 22px;
@@ -178,14 +184,6 @@ html.video-fullscreen {
 
         b.failure {
           color: #cb4765;
-        }
-      }
-
-      p {
-        color: #797676;
-
-        strong {
-          font-weight: 600;
         }
       }
 

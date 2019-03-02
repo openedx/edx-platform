@@ -65,6 +65,11 @@ def assign_role(course_id, user, rolename):
 
 
 class Role(models.Model):
+    """
+    Maps users to django_comment_client roles for a given course
+
+    .. no_pii:
+    """
 
     objects = NoneToEmptyManager()
 
@@ -100,7 +105,9 @@ class Role(models.Model):
         self.permissions.add(Permission.objects.get_or_create(name=permission)[0])
 
     def has_permission(self, permission):
-        """Returns True if this role has the given permission, False otherwise."""
+        """
+        Returns True if this role has the given permission, False otherwise.
+        """
         course = modulestore().get_course(self.course_id)
         if course is None:
             raise ItemNotFoundError(self.course_id)
@@ -118,6 +125,11 @@ class Role(models.Model):
 
 
 class Permission(models.Model):
+    """
+    Permissions for django_comment_client
+
+    .. no_pii:
+    """
     name = models.CharField(max_length=30, null=False, blank=False, primary_key=True)
     roles = models.ManyToManyField(Role, related_name="permissions")
 
@@ -130,7 +142,8 @@ class Permission(models.Model):
 
 
 def permission_blacked_out(course, role_names, permission_name):
-    """Returns true if a user in course with the given roles would have permission_name blacked out.
+    """
+    Returns true if a user in course with the given roles would have permission_name blacked out.
 
     This will return true if it is a permission that the user might have normally had for the course, but does not have
     right this moment because we are in a discussion blackout period (as defined by the settings on the course module).
@@ -145,7 +158,9 @@ def permission_blacked_out(course, role_names, permission_name):
 
 
 def all_permissions_for_user_in_course(user, course_id):  # pylint: disable=invalid-name
-    """Returns all the permissions the user has in the given course."""
+    """
+    Returns all the permissions the user has in the given course.
+    """
     if not user.is_authenticated:
         return {}
 
@@ -176,7 +191,11 @@ def all_permissions_for_user_in_course(user, course_id):  # pylint: disable=inva
 
 
 class ForumsConfig(ConfigurationModel):
-    """Config for the connection to the cs_comments_service forums backend."""
+    """
+    Config for the connection to the cs_comments_service forums backend.
+
+    .. no_pii:
+    """
 
     connection_timeout = models.FloatField(
         default=5.0,
@@ -189,11 +208,18 @@ class ForumsConfig(ConfigurationModel):
         return getattr(settings, "COMMENTS_SERVICE_KEY", None)
 
     def __unicode__(self):
-        """Simple representation so the admin screen looks less ugly."""
+        """
+        Simple representation so the admin screen looks less ugly.
+        """
         return u"ForumsConfig: timeout={}".format(self.connection_timeout)
 
 
 class CourseDiscussionSettings(models.Model):
+    """
+    Settings for course discussions
+
+    .. no_pii:
+    """
     course_id = CourseKeyField(
         unique=True,
         max_length=255,
@@ -216,17 +242,25 @@ class CourseDiscussionSettings(models.Model):
 
     @property
     def divided_discussions(self):
-        """Jsonify the divided_discussions"""
+        """
+        Jsonify the divided_discussions
+        """
         return json.loads(self._divided_discussions)
 
     @divided_discussions.setter
     def divided_discussions(self, value):
-        """Un-Jsonify the divided_discussions"""
+        """
+        Un-Jsonify the divided_discussions
+        """
         self._divided_discussions = json.dumps(value)
 
 
 class DiscussionsIdMapping(models.Model):
-    """This model is a performance optimization, updated on course publish."""
+    """
+    This model is a performance optimization, updated on course publish.
+
+    .. no_pii:
+    """
     course_id = CourseKeyField(db_index=True, primary_key=True, max_length=255)
     mapping = JSONField(
         help_text="Key/value store mapping discussion IDs to discussion XBlock usage keys.",

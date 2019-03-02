@@ -27,8 +27,8 @@ from .images import IMAGE_TYPES, create_profile_images, remove_profile_images, v
 
 log = logging.getLogger(__name__)
 
-LOG_MESSAGE_CREATE = 'Generated and uploaded images %(image_names)s for user %(user_id)s'
-LOG_MESSAGE_DELETE = 'Deleted images %(image_names)s for user %(user_id)s'
+LOG_MESSAGE_CREATE = u'Generated and uploaded images %(image_names)s for user %(user_id)s'
+LOG_MESSAGE_DELETE = u'Deleted images %(image_names)s for user %(user_id)s'
 
 
 def _make_upload_dt():

@@ -42,7 +42,6 @@ BRANCH_NAME_DRAFT = ModuleStoreEnum.BranchName.draft
 BRANCH_NAME_PUBLISHED = ModuleStoreEnum.BranchName.published
 
 
-@attr(shard=2)
 @attr('mongo')
 class SplitModuleTest(unittest.TestCase):
     '''
@@ -569,7 +568,6 @@ class SplitModuleTest(unittest.TestCase):
                 return element
 
 
-@attr(shard=2)
 class TestHasChildrenAtDepth(SplitModuleTest):
     """Test the has_children_at_depth method of XModuleMixin. """
 
@@ -607,7 +605,6 @@ class TestHasChildrenAtDepth(SplitModuleTest):
         self.assertFalse(ch3.has_children_at_depth(1))
 
 
-@attr(shard=2)
 @ddt.ddt
 class SplitModuleCourseTests(SplitModuleTest):
     '''
@@ -938,7 +935,6 @@ class SplitModuleCourseTests(SplitModuleTest):
         self.assertEqual(root_block_key.block_id, "course")
 
 
-@attr(shard=2)
 class TestCourseStructureCache(SplitModuleTest):
     """Tests for the CourseStructureCache"""
 
@@ -1012,7 +1008,6 @@ class TestCourseStructureCache(SplitModuleTest):
         )
 
 
-@attr(shard=2)
 class SplitModuleItemTests(SplitModuleTest):
     '''
     Item read tests including inheritance
@@ -1275,7 +1270,6 @@ def version_agnostic(children):
     return [child.version_agnostic() for child in children]
 
 
-@attr(shard=2)
 class TestItemCrud(SplitModuleTest):
     """
     Test create update and delete of items
@@ -1768,7 +1762,6 @@ class TestItemCrud(SplitModuleTest):
             store.delete_course(refetch_course.id, user)
 
 
-@attr(shard=2)
 class TestCourseCreation(SplitModuleTest):
     """
     Test create_course
@@ -1967,7 +1960,6 @@ class TestCourseCreation(SplitModuleTest):
                     self.assertEqual(fetched_modified.advertised_start, modified_course.advertised_start)
 
 
-@attr(shard=2)
 class TestInheritance(SplitModuleTest):
     """
     Test the metadata inheritance mechanism.
@@ -2043,7 +2035,6 @@ class TestInheritance(SplitModuleTest):
 #         self.assertTrue(parented_problem.visible_to_staff_only)
 
 
-@attr(shard=2)
 class TestPublish(SplitModuleTest):
     """
     Test the publishing api
@@ -2219,7 +2210,6 @@ class TestPublish(SplitModuleTest):
         self.assertEqual(source_block_keys, dest_block_keys)
 
 
-@attr(shard=2)
 class TestSchema(SplitModuleTest):
     """
     Test the db schema (and possibly eventually migrations?)

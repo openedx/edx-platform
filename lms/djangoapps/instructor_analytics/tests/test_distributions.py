@@ -1,4 +1,5 @@
 """ Tests for analytics.distributions """
+from __future__ import print_function
 
 import pytest
 from django.test import TestCase
@@ -11,7 +12,6 @@ from student.tests.factories import UserFactory
 
 class TestAnalyticsDistributions(TestCase):
     '''Test analytics distribution gathering.'''
-    shard = 4
 
     def setUp(self):
         super(TestAnalyticsDistributions, self).setUp()
@@ -45,7 +45,7 @@ class TestAnalyticsDistributions(TestCase):
         feature = 'year_of_birth'
         self.assertIn(feature, AVAILABLE_PROFILE_FEATURES)
         distribution = profile_distribution(self.course_id, feature)
-        print distribution
+        print(distribution)
         self.assertEqual(distribution.type, 'OPEN_CHOICE')
         self.assertTrue(hasattr(distribution, 'choices_display_names'))
         self.assertEqual(distribution.choices_display_names, None)
@@ -75,7 +75,6 @@ class TestAnalyticsDistributions(TestCase):
 
 class TestAnalyticsDistributionsNoData(TestCase):
     '''Test analytics distribution gathering.'''
-    shard = 4
 
     def setUp(self):
         super(TestAnalyticsDistributionsNoData, self).setUp()
@@ -99,7 +98,7 @@ class TestAnalyticsDistributionsNoData(TestCase):
         feature = 'gender'
         self.assertIn(feature, AVAILABLE_PROFILE_FEATURES)
         distribution = profile_distribution(self.course_id, feature)
-        print distribution
+        print(distribution)
         self.assertEqual(distribution.type, 'EASY_CHOICE')
         self.assertTrue(hasattr(distribution, 'choices_display_names'))
         self.assertNotEqual(distribution.choices_display_names, None)
@@ -110,7 +109,7 @@ class TestAnalyticsDistributionsNoData(TestCase):
         feature = 'year_of_birth'
         self.assertIn(feature, AVAILABLE_PROFILE_FEATURES)
         distribution = profile_distribution(self.course_id, feature)
-        print distribution
+        print(distribution)
         self.assertEqual(distribution.type, 'OPEN_CHOICE')
         self.assertTrue(hasattr(distribution, 'choices_display_names'))
         self.assertEqual(distribution.choices_display_names, None)

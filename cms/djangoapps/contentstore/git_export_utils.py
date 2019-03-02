@@ -34,7 +34,7 @@ class GitExportError(Exception):
         # Force the lazy i18n values to turn into actual unicode objects
         super(GitExportError, self).__init__(unicode(message))
 
-    NO_EXPORT_DIR = _("GIT_REPO_EXPORT_DIR not set or path {0} doesn't exist, "
+    NO_EXPORT_DIR = _(u"GIT_REPO_EXPORT_DIR not set or path {0} doesn't exist, "
                       "please create it, or configure a different path with "
                       "GIT_REPO_EXPORT_DIR").format(GIT_REPO_EXPORT_DIR)
     URL_BAD = _('Non writable git url provided. Expecting something like:'
@@ -61,9 +61,9 @@ def cmd_log(cmd, cwd):
     command doesn't return 0, and returns the command's output.
     """
     output = subprocess.check_output(cmd, cwd=cwd, stderr=subprocess.STDOUT)
-    log.debug('Command was: {0!r}. '
-              'Working directory was: {1!r}'.format(' '.join(cmd), cwd))
-    log.debug('Command output was: {0!r}'.format(output))
+    log.debug(u'Command was: {0!r}. '
+              u'Working directory was: {1!r}'.format(' '.join(cmd), cwd))
+    log.debug(u'Command output was: {0!r}'.format(output))
     return output
 
 
@@ -92,7 +92,7 @@ def export_to_git(course_id, repo, user='', rdir=None):
     else:
         rdir = repo.rsplit('/', 1)[-1].rsplit('.git', 1)[0]
 
-    log.debug("rdir = %s", rdir)
+    log.debug(u"rdir = %s", rdir)
 
     # Pull or clone repo before exporting to xml
     # and update url in case origin changed.
@@ -107,7 +107,7 @@ def export_to_git(course_id, repo, user='', rdir=None):
         try:
             branch = cmd_log(cmd, cwd).strip('\n')
         except subprocess.CalledProcessError as ex:
-            log.exception('Failed to get branch: %r', ex.output)
+            log.exception(u'Failed to get branch: %r', ex.output)
             raise GitExportError(GitExportError.DETACHED_HEAD)
 
         cmds = [
@@ -126,7 +126,7 @@ def export_to_git(course_id, repo, user='', rdir=None):
         try:
             cmd_log(cmd, cwd)
         except subprocess.CalledProcessError as ex:
-            log.exception('Failed to pull git repository: %r', ex.output)
+            log.exception(u'Failed to pull git repository: %r', ex.output)
             raise GitExportError(GitExportError.CANNOT_PULL)
 
     # export course as xml before commiting and pushing
@@ -145,7 +145,7 @@ def export_to_git(course_id, repo, user='', rdir=None):
         try:
             branch = cmd_log(cmd, os.path.abspath(rdirp)).strip('\n')
         except subprocess.CalledProcessError as ex:
-            log.exception('Failed to get branch from freshly cloned repo: %r',
+            log.exception(u'Failed to get branch from freshly cloned repo: %r',
                           ex.output)
             raise GitExportError(GitExportError.MISSING_BRANCH)
 
@@ -161,23 +161,23 @@ def export_to_git(course_id, repo, user='', rdir=None):
         ident = GIT_EXPORT_DEFAULT_IDENT
     time_stamp = timezone.now()
     cwd = os.path.abspath(rdirp)
-    commit_msg = "Export from Studio at {time_stamp}".format(
+    commit_msg = u"Export from Studio at {time_stamp}".format(
         time_stamp=time_stamp,
     )
     try:
         cmd_log(['git', 'config', 'user.email', ident['email']], cwd)
         cmd_log(['git', 'config', 'user.name', ident['name']], cwd)
     except subprocess.CalledProcessError as ex:
-        log.exception('Error running git configure commands: %r', ex.output)
+        log.exception(u'Error running git configure commands: %r', ex.output)
         raise GitExportError(GitExportError.CONFIG_ERROR)
     try:
         cmd_log(['git', 'add', '.'], cwd)
         cmd_log(['git', 'commit', '-a', '-m', commit_msg], cwd)
     except subprocess.CalledProcessError as ex:
-        log.exception('Unable to commit changes: %r', ex.output)
+        log.exception(u'Unable to commit changes: %r', ex.output)
         raise GitExportError(GitExportError.CANNOT_COMMIT)
     try:
         cmd_log(['git', 'push', '-q', 'origin', branch], cwd)
     except subprocess.CalledProcessError as ex:
-        log.exception('Error running git push command: %r', ex.output)
+        log.exception(u'Error running git push command: %r', ex.output)
         raise GitExportError(GitExportError.CANNOT_PUSH)

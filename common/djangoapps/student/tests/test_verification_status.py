@@ -31,7 +31,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
     """Tests for per-course verification status on the dashboard. """
 
-    shard = 3
     PAST = 'past'
     FUTURE = 'future'
     DATES = {

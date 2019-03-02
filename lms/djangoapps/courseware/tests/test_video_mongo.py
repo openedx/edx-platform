@@ -34,7 +34,6 @@ from mock import MagicMock, Mock, patch
 from path import Path as path
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from openedx.core.lib.tests import attr
 from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
 from openedx.core.djangoapps.video_pipeline.config.waffle import waffle_flags, DEPRECATE_YOUTUBE
 from waffle.testutils import override_flag
@@ -75,7 +74,6 @@ I am overwatch.
 TRANSCRIPT_FILE_SJSON_DATA = """{\n   "start": [10],\n   "end": [100],\n   "text": ["Hi, welcome to edxval."]\n}"""
 
 
-@attr(shard=7)
 class TestVideoYouTube(TestVideo):
     METADATA = {}
 
@@ -141,7 +139,6 @@ class TestVideoYouTube(TestVideo):
         )
 
 
-@attr(shard=7)
 class TestVideoNonYouTube(TestVideo):
     """Integration tests: web client + mongo."""
     DATA = """
@@ -224,7 +221,6 @@ class TestVideoNonYouTube(TestVideo):
         )
 
 
-@attr(shard=7)
 @ddt.ddt
 class TestGetHtmlMethod(BaseTestXmodule):
     '''
@@ -504,7 +500,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         """
         Tests the VideoModule get_html where a edx_video_id is given but a video is not found
         """
-        SOURCE_XML = """
+        SOURCE_XML = u"""
             <video show_captions="true"
             display_name="A Name"
             sub="a_sub_file.srt.sjson" source="{source}"
@@ -730,7 +726,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         Create expected context and get actual context returned by `get_html` method.
         """
         # make sure the urls for the various encodings are included as part of the alternative sources.
-        SOURCE_XML = """
+        SOURCE_XML = u"""
             <video show_captions="true"
             display_name="A Name"
             sub="a_sub_file.srt.sjson" source="{source}"
@@ -818,7 +814,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
 
         mocked_get_video.side_effect = side_effect
 
-        SOURCE_XML = """
+        source_xml = u"""
             <video show_captions="true"
             display_name="A Name"
             sub="a_sub_file.srt.sjson" source="{source}"
@@ -879,7 +875,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         initial_context['metadata']['duration'] = None
 
         for data in cases:
-            DATA = SOURCE_XML.format(
+            DATA = source_xml.format(
                 download_video=data['download_video'],
                 source=data['source'],
                 sources=data['sources'],
@@ -1071,7 +1067,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         metadata = {
             'html5_sources': ['http://youtu.be/3_yD_cEKoCk.mp4'] + data['hls'],
         }
-        video_xml = '<video display_name="Video" edx_video_id="12345-67890" youtube_id_1_0="{}">[]</video>'.format(
+        video_xml = u'<video display_name="Video" edx_video_id="12345-67890" youtube_id_1_0="{}">[]</video>'.format(
             data['youtube']
         )
         DEPRECATE_YOUTUBE_FLAG = waffle_flags()[DEPRECATE_YOUTUBE]
@@ -1079,10 +1075,9 @@ class TestGetHtmlMethod(BaseTestXmodule):
             with override_flag(DEPRECATE_YOUTUBE_FLAG.namespaced_flag_name, active=data['waffle_enabled']):
                 self.initialize_module(data=video_xml, metadata=metadata)
                 context = self.item_descriptor.render(STUDENT_VIEW).content
-                self.assertIn('"prioritizeHls": {}'.format(data['result']), context)
+                self.assertIn(u'"prioritizeHls": {}'.format(data['result']), context)
 
 
-@attr(shard=7)
 @ddt.ddt
 class TestVideoDescriptorInitialization(BaseTestXmodule):
     """
@@ -1241,7 +1236,6 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
         self.assertEqual(context['transcripts_basic_tab_metadata']['video_url']['value'], video_url)
 
 
-@attr(shard=7)
 @ddt.ddt
 class TestEditorSavedMethod(BaseTestXmodule):
     """
@@ -1541,7 +1535,6 @@ class TestVideoDescriptorStudentViewJson(CacheIsolationTestCase):
         self.assertItemsEqual(student_view_response['transcripts'].keys(), expected_transcripts)
 
 
-@attr(shard=7)
 @ddt.ddt
 class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
     """
@@ -1627,7 +1620,7 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
         )
 
         actual = self.descriptor.definition_to_xml(resource_fs=self.file_system)
-        expected_str = """
+        expected_str = u"""
             <video download_video="false" url_name="SampleProblem" transcripts='{transcripts}'>
                 <video_asset client_video_id="test_client_video_id" duration="111.0" image="">
                     <encoded_video profile="mobile" url="http://example.com/video" file_size="222" bitrate="333"/>
@@ -1781,7 +1774,7 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
             EXPORT_IMPORT_STATIC_DIR
         )
 
-        xml_data = """
+        xml_data = u"""
             <video edx_video_id='{edx_video_id}' sub='{sub_id}' transcripts='{transcripts}'>
                 <video_asset client_video_id="test_client_video_id" duration="111.0">
                     <encoded_video profile="mobile" url="http://example.com/video" file_size="222" bitrate="333"/>
@@ -1868,7 +1861,7 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
         edx_video_id = 'test_edx_video_id'
         val_transcript_language_code = 'es'
         val_transcript_provider = 'Cielo24'
-        xml_data = """
+        xml_data = u"""
         <video edx_video_id='{edx_video_id}'>
             <video_asset client_video_id="test_client_video_id" duration="111.0">
                 <transcripts>
@@ -2003,7 +1996,7 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
                 module_system.resources_fs,
                 EXPORT_IMPORT_STATIC_DIR
             )
-            xml_data += " sub='{sub_id}'".format(
+            xml_data += u" sub='{sub_id}'".format(
                 sub_id=sub_id
             )
 
@@ -2015,7 +2008,7 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
                 module_system.resources_fs,
                 EXPORT_IMPORT_STATIC_DIR
             )
-            xml_data += " transcripts='{transcripts}'".format(
+            xml_data += u" transcripts='{transcripts}'".format(
                 transcripts=json.dumps(external_transcripts),
             )
 

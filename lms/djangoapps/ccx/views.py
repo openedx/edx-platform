@@ -239,7 +239,7 @@ def create_ccx(request, course, ccx=None):
         course_key=CCXLocator.from_course_locator(course.id, unicode(ccx.id))
     )
     for rec, response in responses:
-        log.info('Signal fired when course is published. Receiver: %s. Response: %s', rec, response)
+        log.info(u'Signal fired when course is published. Receiver: %s. Response: %s', rec, response)
 
     return redirect(url)
 
@@ -338,7 +338,7 @@ def save_ccx(request, course, ccx=None):
         course_key=CCXLocator.from_course_locator(course.id, unicode(ccx.id))
     )
     for rec, response in responses:
-        log.info('Signal fired when course is published. Receiver: %s. Response: %s', rec, response)
+        log.info(u'Signal fired when course is published. Receiver: %s. Response: %s', rec, response)
 
     return HttpResponse(
         json.dumps({
@@ -367,7 +367,7 @@ def set_grading_policy(request, course, ccx=None):
         course_key=CCXLocator.from_course_locator(course.id, unicode(ccx.id))
     )
     for rec, response in responses:
-        log.info('Signal fired when course is published. Receiver: %s. Response: %s', rec, response)
+        log.info(u'Signal fired when course is published. Receiver: %s. Response: %s', rec, response)
 
     url = reverse(
         'ccx_coach_dashboard',

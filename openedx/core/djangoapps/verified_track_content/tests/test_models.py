@@ -52,7 +52,7 @@ class TestVerifiedTrackCohortedCourse(TestCase):
         # Enable for a course
         config = VerifiedTrackCohortedCourse.objects.create(course_key=course_key, enabled=True)
         config.save()
-        self.assertEqual(unicode(config), "Course: {}, enabled: True".format(self.SAMPLE_COURSE))
+        self.assertEqual(unicode(config), u"Course: {}, enabled: True".format(self.SAMPLE_COURSE))
 
     def test_verified_cohort_name(self):
         cohort_name = 'verified cohort'
@@ -179,7 +179,7 @@ class TestMoveToVerified(SharedModuleStoreTestCase):
         self.assertTrue(VerifiedTrackCohortedCourse.is_verified_track_cohort_enabled(self.course.id))
         self._verify_no_automatic_cohorting()
         self.assertTrue(error_logger.called)
-        error_message = "cohort named '%s' does not exist"
+        error_message = u"cohort named '%s' does not exist"
         self.assertIn(error_message, error_logger.call_args[0][0])
 
     @ddt.data(CourseMode.VERIFIED, CourseMode.CREDIT_MODE)

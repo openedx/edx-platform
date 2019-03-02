@@ -27,7 +27,6 @@ class TestLTI(BaseTestXmodule):
     of `oauthlib` library.
     """
     CATEGORY = "lti"
-    shard = 1
 
     def setUp(self):
         """
@@ -131,7 +130,6 @@ class TestLTIModuleListing(SharedModuleStoreTestCase):
     # arbitrary constant
     COURSE_SLUG = "100"
     COURSE_NAME = "test_course"
-    shard = 1
 
     @classmethod
     def setUpClass(cls):

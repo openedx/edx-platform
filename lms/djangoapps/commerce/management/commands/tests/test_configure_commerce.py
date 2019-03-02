@@ -11,7 +11,6 @@ class TestCommerceConfigurationCommand(TestCase):
     """
     Test django management command for enabling commerce configuration.
     """
-    shard = 4
 
     def test_commerce_configuration(self):
         """

@@ -15,9 +15,8 @@ from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from edx_oauth2_provider.tests.factories import ClientFactory
 from mock import MagicMock, patch
-from provider.oauth2.models import Client
+from oauth2_provider.models import Application
 
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
@@ -28,8 +27,8 @@ from edxnotes.decorators import edxnotes
 from edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
 from edxnotes.plugins import EdxNotesTab
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
+from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory
 from openedx.core.djangoapps.user_api.models import RetirementState, UserRetirementStatus
-from openedx.core.lib.tests import attr
 from student.tests.factories import CourseEnrollmentFactory, SuperuserFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -90,7 +89,6 @@ class TestProblem(object):
         return "original_get_html"
 
 
-@attr(shard=3)
 @skipUnless(settings.FEATURES["ENABLE_EDXNOTES"], "EdxNotes feature needs to be enabled.")
 class EdxNotesDecoratorTest(ModuleStoreTestCase):
     """
@@ -100,7 +98,7 @@ class EdxNotesDecoratorTest(ModuleStoreTestCase):
     def setUp(self):
         super(EdxNotesDecoratorTest, self).setUp()
 
-        ClientFactory(name="edx-notes")
+        ApplicationFactory(name="edx-notes")
         # Using old mongo because of locator comparison issues (see longer
         # note below in EdxNotesHelpersTest setUp.
         self.course = CourseFactory(edxnotes=True, default_store=ModuleStoreEnum.Type.mongo)
@@ -186,7 +184,6 @@ class EdxNotesDecoratorTest(ModuleStoreTestCase):
         assert problem.get_html() == "original_get_html"
 
 
-@attr(shard=3)
 @skipUnless(settings.FEATURES["ENABLE_EDXNOTES"], "EdxNotes feature needs to be enabled.")
 @ddt.ddt
 class EdxNotesHelpersTest(ModuleStoreTestCase):
@@ -204,7 +201,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         # comparison values do not. This needs further investigation in order to enable these tests
         # with the split modulestore.
         with self.store.default_store(ModuleStoreEnum.Type.mongo):
-            ClientFactory(name="edx-notes")
+            ApplicationFactory(name="edx-notes")
             self.course = CourseFactory.create()
             self.chapter = ItemFactory.create(category="chapter", parent_location=self.course.location)
             self.chapter_2 = ItemFactory.create(category="chapter", parent_location=self.course.location)
@@ -347,13 +344,13 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                         u"quote": u"quote text",
                         u"text": u"text",
                         u"chapter": {
-                            u"display_name": self.chapter.display_name_with_default_escaped,
+                            u"display_name": self.chapter.display_name_with_default,
                             u"index": 0,
                             u"location": unicode(self.chapter.location),
                             u"children": [unicode(self.sequential.location)]
                         },
                         u"section": {
-                            u"display_name": self.sequential.display_name_with_default_escaped,
+                            u"display_name": self.sequential.display_name_with_default,
                             u"location": unicode(self.sequential.location),
                             u"children": [
                                 unicode(self.vertical.location), unicode(self.vertical_with_container.location)
@@ -361,7 +358,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                         },
                         u"unit": {
                             u"url": self._get_unit_url(self.course, self.chapter, self.sequential),
-                            u"display_name": self.vertical.display_name_with_default_escaped,
+                            u"display_name": self.vertical.display_name_with_default,
                             u"location": unicode(self.vertical.location),
                         },
                         u"usage_id": unicode(self.html_module_2.location),
@@ -371,13 +368,13 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                         u"quote": u"quote text",
                         u"text": u"text",
                         u"chapter": {
-                            u"display_name": self.chapter.display_name_with_default_escaped,
+                            u"display_name": self.chapter.display_name_with_default,
                             u"index": 0,
                             u"location": unicode(self.chapter.location),
                             u"children": [unicode(self.sequential.location)]
                         },
                         u"section": {
-                            u"display_name": self.sequential.display_name_with_default_escaped,
+                            u"display_name": self.sequential.display_name_with_default,
                             u"location": unicode(self.sequential.location),
                             u"children": [
                                 unicode(self.vertical.location),
@@ -385,7 +382,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                         },
                         u"unit": {
                             u"url": self._get_unit_url(self.course, self.chapter, self.sequential),
-                            u"display_name": self.vertical.display_name_with_default_escaped,
+                            u"display_name": self.vertical.display_name_with_default,
                             u"location": unicode(self.vertical.location),
                         },
                         u"usage_id": unicode(self.html_module_1.location),
@@ -453,13 +450,13 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                         u"quote": u"quote text",
                         u"text": u"text",
                         u"chapter": {
-                            u"display_name": self.chapter.display_name_with_default_escaped,
+                            u"display_name": self.chapter.display_name_with_default,
                             u"index": 0,
                             u"location": unicode(self.chapter.location),
                             u"children": [unicode(self.sequential.location)]
                         },
                         u"section": {
-                            u"display_name": self.sequential.display_name_with_default_escaped,
+                            u"display_name": self.sequential.display_name_with_default,
                             u"location": unicode(self.sequential.location),
                             u"children": [
                                 unicode(self.vertical.location),
@@ -467,7 +464,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                         },
                         u"unit": {
                             u"url": self._get_unit_url(self.course, self.chapter, self.sequential),
-                            u"display_name": self.vertical.display_name_with_default_escaped,
+                            u"display_name": self.vertical.display_name_with_default,
                             u"location": unicode(self.vertical.location),
                         },
                         u"usage_id": unicode(self.html_module_2.location),
@@ -477,13 +474,13 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                         u"quote": u"quote text",
                         u"text": u"text",
                         u"chapter": {
-                            u"display_name": self.chapter.display_name_with_default_escaped,
+                            u"display_name": self.chapter.display_name_with_default,
                             u"index": 0,
                             u"location": unicode(self.chapter.location),
                             u"children": [unicode(self.sequential.location)]
                         },
                         u"section": {
-                            u"display_name": self.sequential.display_name_with_default_escaped,
+                            u"display_name": self.sequential.display_name_with_default,
                             u"location": unicode(self.sequential.location),
                             u"children": [
                                 unicode(self.vertical.location),
@@ -491,7 +488,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                         },
                         u"unit": {
                             u"url": self._get_unit_url(self.course, self.chapter, self.sequential),
-                            u"display_name": self.vertical.display_name_with_default_escaped,
+                            u"display_name": self.vertical.display_name_with_default,
                             u"location": unicode(self.vertical.location),
                         },
                         u"usage_id": unicode(self.html_module_1.location),
@@ -576,19 +573,19 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                 u"quote": u"quote text",
                 u"text": u"text",
                 u"chapter": {
-                    u"display_name": self.chapter.display_name_with_default_escaped,
+                    u"display_name": self.chapter.display_name_with_default,
                     u"index": 0,
                     u"location": unicode(self.chapter.location),
                     u"children": [unicode(self.sequential.location)]
                 },
                 u"section": {
-                    u"display_name": self.sequential.display_name_with_default_escaped,
+                    u"display_name": self.sequential.display_name_with_default,
                     u"location": unicode(self.sequential.location),
                     u"children": [unicode(self.vertical.location), unicode(self.vertical_with_container.location)]
                 },
                 u"unit": {
                     u"url": self._get_unit_url(self.course, self.chapter, self.sequential),
-                    u"display_name": self.vertical.display_name_with_default_escaped,
+                    u"display_name": self.vertical.display_name_with_default,
                     u"location": unicode(self.vertical.location),
                 },
                 u"usage_id": unicode(self.html_module_1.location),
@@ -622,19 +619,19 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                 u"quote": u"quote text",
                 u"text": u"text",
                 u"chapter": {
-                    u"display_name": self.chapter.display_name_with_default_escaped,
+                    u"display_name": self.chapter.display_name_with_default,
                     u"index": 0,
                     u"location": unicode(self.chapter.location),
                     u"children": [unicode(self.sequential.location)]
                 },
                 u"section": {
-                    u"display_name": self.sequential.display_name_with_default_escaped,
+                    u"display_name": self.sequential.display_name_with_default,
                     u"location": unicode(self.sequential.location),
                     u"children": [unicode(self.vertical.location), unicode(self.vertical_with_container.location)]
                 },
                 u"unit": {
                     u"url": self._get_unit_url(self.course, self.chapter, self.sequential),
-                    u"display_name": self.vertical.display_name_with_default_escaped,
+                    u"display_name": self.vertical.display_name_with_default,
                     u"location": unicode(self.vertical.location),
                 },
                 u"usage_id": unicode(self.html_module_1.location),
@@ -674,13 +671,13 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                 u"quote": u"quote text1",
                 u"text": u"text1",
                 u"usage_id": unicode(self.html_module_1.location),
-                u"updated": datetime(2016, 01, 26, 8, 5, 16, 00000).isoformat(),
+                u"updated": datetime(2016, 1, 26, 8, 5, 16, 00000).isoformat(),
             },
             {
                 u"quote": u"quote text2",
                 u"text": u"text2",
                 u"usage_id": unicode(self.html_module_2.location),
-                u"updated": datetime(2016, 01, 26, 9, 6, 17, 00000).isoformat(),
+                u"updated": datetime(2016, 1, 26, 9, 6, 17, 00000).isoformat(),
             },
         ]
 
@@ -692,26 +689,26 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                     'chapter': {},
                     "unit": {
                         u"url": self._get_unit_url(self.course, self.chapter, self.sequential),
-                        u"display_name": self.vertical.display_name_with_default_escaped,
+                        u"display_name": self.vertical.display_name_with_default,
                         u"location": unicode(self.vertical.location),
                     },
                     u'text': u'text1',
                     u'quote': u'quote text1',
                     u'usage_id': unicode(self.html_module_1.location),
-                    u'updated': datetime(2016, 01, 26, 8, 5, 16)
+                    u'updated': datetime(2016, 1, 26, 8, 5, 16)
                 },
                 {
                     'section': {},
                     'chapter': {},
                     "unit": {
                         u"url": self._get_unit_url(self.course, self.chapter, self.sequential),
-                        u"display_name": self.vertical.display_name_with_default_escaped,
+                        u"display_name": self.vertical.display_name_with_default,
                         u"location": unicode(self.vertical.location),
                     },
                     u'text': u'text2',
                     u'quote': u'quote text2',
                     u'usage_id': unicode(self.html_module_2.location),
-                    u'updated': datetime(2016, 01, 26, 9, 6, 17)
+                    u'updated': datetime(2016, 1, 26, 9, 6, 17)
                 }
             ],
             helpers.preprocess_collection(self.user, self.course, initial_collection)
@@ -723,7 +720,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         """
         self.assertDictEqual(
             {
-                u"display_name": self.sequential.display_name_with_default_escaped,
+                u"display_name": self.sequential.display_name_with_default,
                 u"location": unicode(self.sequential.location),
                 u"children": [unicode(self.vertical.location), unicode(self.vertical_with_container.location)],
             },
@@ -736,7 +733,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         """
         self.assertDictEqual(
             {
-                u"display_name": self.html_module_1.display_name_with_default_escaped,
+                u"display_name": self.html_module_1.display_name_with_default,
                 u"location": unicode(self.html_module_1.location),
             },
             helpers.get_module_context(self.course, self.html_module_1)
@@ -748,7 +745,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         """
         self.assertDictEqual(
             {
-                u"display_name": self.chapter.display_name_with_default_escaped,
+                u"display_name": self.chapter.display_name_with_default,
                 u"index": 0,
                 u"location": unicode(self.chapter.location),
                 u"children": [unicode(self.sequential.location)],
@@ -757,7 +754,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         )
         self.assertDictEqual(
             {
-                u"display_name": self.chapter_2.display_name_with_default_escaped,
+                u"display_name": self.chapter_2.display_name_with_default,
                 u"index": 1,
                 u"location": unicode(self.chapter_2.location),
                 u"children": [],
@@ -846,7 +843,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
 
         mock_chapter = MagicMock()
         mock_chapter.url_name = 'chapter_url_name'
-        mock_chapter.display_name_with_default_escaped = 'Test Chapter Display Name'
+        mock_chapter.display_name_with_default = 'Test Chapter Display Name'
 
         mock_course_module.get_display_items.return_value = [mock_chapter]
 
@@ -876,7 +873,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
 
         mock_section = MagicMock()
         mock_section.url_name = 'section_url_name'
-        mock_section.display_name_with_default_escaped = 'Test Section Display Name'
+        mock_section.display_name_with_default = 'Test Section Display Name'
 
         mock_chapter.get_display_items.return_value = [mock_section]
         mock_section.get_display_items.return_value = [MagicMock()]
@@ -954,7 +951,6 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         verify_url(previous_url, previous_api_url)
 
 
-@attr(shard=3)
 @skipUnless(settings.FEATURES["ENABLE_EDXNOTES"], "EdxNotes feature needs to be enabled.")
 @ddt.ddt
 class EdxNotesViewsTest(ModuleStoreTestCase):
@@ -962,7 +958,7 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
     Tests for EdxNotes views.
     """
     def setUp(self):
-        ClientFactory(name="edx-notes")
+        ApplicationFactory(name="edx-notes")
         super(EdxNotesViewsTest, self).setUp()
         self.course = CourseFactory(edxnotes=True)
         self.user = UserFactory()
@@ -1089,7 +1085,7 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
         """
         response = self.client.get(self.get_token_url)
         self.assertEqual(response.status_code, 200)
-        client = Client.objects.get(name='edx-notes')
+        client = Application.objects.get(name='edx-notes')
         jwt.decode(response.content, client.client_secret, audience=client.client_id)
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": True})
@@ -1150,13 +1146,12 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 400)
 
 
-@attr(shard=3)
 class EdxNotesRetireAPITest(ModuleStoreTestCase):
     """
     Tests for EdxNotes retirement API.
     """
     def setUp(self):
-        ClientFactory(name="edx-notes")
+        ApplicationFactory(name="edx-notes")
         super(EdxNotesRetireAPITest, self).setUp()
 
         # setup relevant states
@@ -1264,7 +1259,6 @@ class EdxNotesRetireAPITest(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 500)
 
 
-@attr(shard=3)
 @skipUnless(settings.FEATURES["ENABLE_EDXNOTES"], "EdxNotes feature needs to be enabled.")
 @ddt.ddt
 class EdxNotesPluginTest(ModuleStoreTestCase):

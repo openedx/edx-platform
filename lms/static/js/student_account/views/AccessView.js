@@ -15,13 +15,11 @@
         'js/student_account/views/RegisterView',
         'js/student_account/views/InstitutionLoginView',
         'js/student_account/views/HintedLoginView',
-        'js/student_account/views/AccountRecoveryView',
         'edx-ui-toolkit/js/utils/html-utils',
         'js/vendor/history'
     ],
         function($, utility, _, _s, Backbone, LoginModel, PasswordResetModel, RegisterModel, AccountRecoveryModel,
-                 LoginView, PasswordResetView, RegisterView, InstitutionLoginView, HintedLoginView, AccountRecoveryView,
-                 HtmlUtils) {
+                 LoginView, PasswordResetView, RegisterView, InstitutionLoginView, HintedLoginView, HtmlUtils) {
             return Backbone.View.extend({
                 tpl: '#access-tpl',
                 events: {
@@ -69,7 +67,6 @@
                         login: options.login_form_desc,
                         register: options.registration_form_desc,
                         reset: options.password_reset_form_desc,
-                        account_recovery: options.account_recovery_form_desc,
                         institution_login: null,
                         hinted_login: null
                     };
@@ -125,9 +122,6 @@
                     if (Backbone.history.getHash() === 'forgot-password-modal') {
                         this.resetPassword();
                     }
-                    else if (Backbone.history.getHash() === 'account-recovery-modal') {
-                        this.accountRecovery();
-                    }
                     this.loadForm(this.activeForm);
                 },
 
@@ -163,9 +157,6 @@
                     // Listen for 'password-help' event to toggle sub-views
                         this.listenTo(this.subview.login, 'password-help', this.resetPassword);
 
-                    // Listen for 'account-recovery-help' event to toggle sub-views
-                        this.listenTo(this.subview.login, 'account-recovery-help', this.accountRecovery);
-
                     // Listen for 'auth-complete' event so we can enroll/redirect the user appropriately.
                         this.listenTo(this.subview.login, 'auth-complete', this.authComplete);
                     },
@@ -181,24 +172,6 @@
 
                     // Listen for 'password-email-sent' event to toggle sub-views
                         this.listenTo(this.subview.passwordHelp, 'password-email-sent', this.passwordEmailSent);
-
-                    // Focus on the form
-                        $('.password-reset-form').focus();
-                    },
-
-                    account_recovery: function(data) {
-                        this.accountRecoveryModel.ajaxType = data.method;
-                        this.accountRecoveryModel.urlRoot = data.submit_url;
-
-                        this.subview.accountRecoveryHelp = new AccountRecoveryView({
-                            fields: data.fields,
-                            model: this.accountRecoveryModel
-                        });
-
-                    // Listen for 'account-recovery-email-sent' event to toggle sub-views
-                        this.listenTo(
-                            this.subview.accountRecoveryHelp, 'account-recovery-email-sent', this.passwordEmailSent
-                        );
 
                     // Focus on the form
                         $('.password-reset-form').focus();
@@ -258,19 +231,6 @@
                     this.element.hide($(this.el).find('#login-anchor'));
                     this.loadForm('reset');
                     this.element.scrollTop($('#password-reset-anchor'));
-                },
-
-                accountRecovery: function() {
-                    if (this.isAccountRecoveryFeatureEnabled) {
-                        window.analytics.track('edx.bi.account_recovery.viewed', {
-                            category: 'user-engagement'
-                        });
-
-                        this.element.hide($(this.el).find('#login-anchor'));
-                        this.loadForm('account_recovery');
-                        this.element.scrollTop($('#password-reset-anchor'));
-                    }
-
                 },
 
                 toggleForm: function(e) {

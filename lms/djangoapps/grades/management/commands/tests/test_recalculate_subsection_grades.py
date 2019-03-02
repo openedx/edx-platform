@@ -16,7 +16,7 @@ from track.event_transaction_utils import get_event_transaction_id
 from util.date_utils import to_timestamp
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
-DATE_FORMAT = "%Y-%m-%d %H:%M"
+DATE_FORMAT = u"%Y-%m-%d %H:%M"
 
 
 @patch.dict(settings.FEATURES, {'PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS': False})
@@ -25,7 +25,6 @@ class TestRecalculateSubsectionGrades(HasCourseWithProblemsMixin, ModuleStoreTes
     """
     Tests recalculate subsection grades management command.
     """
-    shard = 4
 
     def setUp(self):
         super(TestRecalculateSubsectionGrades, self).setUp()

@@ -1,6 +1,7 @@
 """
 Factories for use in tests of XBlocks.
 """
+from __future__ import print_function
 
 import datetime
 import functools
@@ -195,7 +196,7 @@ class ToyCourseFactory(SampleCourseFactory):
             'graded': True,
             'discussion_topics': {"General": {"id": "i4x-edX-toy-course-2012_Fall"}},
             'graceperiod': datetime.timedelta(days=2, seconds=21599),
-            'start': datetime.datetime(2015, 07, 17, 12, tzinfo=pytz.utc),
+            'start': datetime.datetime(2015, 7, 17, 12, tzinfo=pytz.utc),
             'xml_attributes': {"filename": ["course/2012_Fall.xml", "course/2012_Fall.xml"]},
             'pdf_textbooks': [
                 {
@@ -584,7 +585,7 @@ def check_sum_of_calls(object_, methods, maximum_calls, minimum_calls=1, include
                         messages.append("      args: {}\n".format(args))
                         messages.append("      kwargs: {}\n\n".format(dict(kwargs)))
 
-        print "".join(messages)
+        print("".join(messages))
 
     # verify the counter actually worked by ensuring we have counted greater than (or equal to) the minimum calls
     assert call_count >= minimum_calls

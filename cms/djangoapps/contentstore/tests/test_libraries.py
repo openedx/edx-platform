@@ -35,7 +35,6 @@ class LibraryTestCase(ModuleStoreTestCase):
     """
     Common functionality for content libraries tests
     """
-    shard = 1
 
     def setUp(self):
         super(LibraryTestCase, self).setUp()
@@ -149,7 +148,6 @@ class TestLibraries(LibraryTestCase):
     """
     High-level tests for libraries
     """
-    shard = 1
 
     @ddt.data(
         (2, 1, 1),
@@ -187,7 +185,7 @@ class TestLibraries(LibraryTestCase):
         # Create many blocks in the library and add them to a course:
         for num in range(8):
             ItemFactory.create(
-                data="This is #{}".format(num + 1),
+                data=u"This is #{}".format(num + 1),
                 category="html", parent_location=self.library.location, user_id=self.user.id, publish_item=False
             )
 
@@ -483,7 +481,6 @@ class TestLibraryAccess(LibraryTestCase):
     """
     Test Roles and Permissions related to Content Libraries
     """
-    shard = 1
 
     def setUp(self):
         """ Create a library, staff user, and non-staff user """
@@ -818,7 +815,6 @@ class TestOverrides(LibraryTestCase):
     """
     Test that overriding block Scope.settings fields from a library in a specific course works
     """
-    shard = 1
 
     def setUp(self):
         super(TestOverrides, self).setUp()
@@ -1004,7 +1000,6 @@ class TestIncompatibleModuleStore(LibraryTestCase):
     """
     Tests for proper validation errors with an incompatible course modulestore.
     """
-    shard = 1
 
     def setUp(self):
         super(TestIncompatibleModuleStore, self).setUp()

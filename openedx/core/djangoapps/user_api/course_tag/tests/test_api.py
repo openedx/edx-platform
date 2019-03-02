@@ -12,7 +12,6 @@ class TestCourseTagAPI(TestCase):
     """
     Test the user service
     """
-    shard = 2
 
     def setUp(self):
         super(TestCourseTagAPI, self).setUp()

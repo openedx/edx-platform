@@ -24,7 +24,6 @@ class ZeroGradeTest(GradeTestBase):
     Tests ZeroCourseGrade (and, implicitly, ZeroSubsectionGrade)
     functionality.
     """
-    shard = 4
 
     @ddt.data(True, False)
     def test_zero(self, assume_zero_enabled):
@@ -71,7 +70,6 @@ class TestScoreForModule(SharedModuleStoreTestCase):
                    (2/5) (3/5) (0/1)   -   (1/3)   -   (3/10)
 
     """
-    shard = 4
 
     @classmethod
     def setUpClass(cls):

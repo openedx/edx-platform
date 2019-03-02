@@ -12,7 +12,6 @@ class TestGraphTraversals(TestCase):
     """
     Test Class for graph traversal generator functions.
     """
-    shard = 2
 
     def setUp(self):
         # Creates a test graph with the following disconnected

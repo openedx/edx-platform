@@ -6,7 +6,9 @@ from logging import getLogger
 
 from six import text_type
 
-from openedx.core.djangoapps.signals.signals import COURSE_GRADE_CHANGED, COURSE_GRADE_NOW_PASSED
+from openedx.core.djangoapps.signals.signals import (COURSE_GRADE_CHANGED,
+                                                     COURSE_GRADE_NOW_PASSED,
+                                                     COURSE_GRADE_NOW_FAILED)
 
 from .config import assume_zero_if_absent, should_persist_grades
 from .course_data import CourseData
@@ -122,7 +124,7 @@ class CourseGradeFactory(object):
             # Keep marching on even if this student couldn't be graded for
             # some reason, but log it for future reference.
             log.exception(
-                'Cannot grade student %s in course %s because of exception: %s',
+                u'Cannot grade student %s in course %s because of exception: %s',
                 user.id,
                 course_data.course_key,
                 text_type(exc)
@@ -162,11 +164,11 @@ class CourseGradeFactory(object):
         """
         Computes, saves, and returns a CourseGrade object for the
         given user and course.
-        Sends a COURSE_GRADE_CHANGED signal to listeners and a
-        COURSE_GRADE_NOW_PASSED if learner has passed course.
+        Sends a COURSE_GRADE_CHANGED signal to listeners and
+        COURSE_GRADE_NOW_PASSED if learner has passed course or
+        COURSE_GRADE_NOW_FAILED if learner is now failing course
         """
         should_persist = should_persist_grades(course_data.course_key)
-
         if should_persist and force_update_subsections:
             prefetch(user, course_data.course_key)
 
@@ -203,6 +205,13 @@ class CourseGradeFactory(object):
                 sender=CourseGradeFactory,
                 user=user,
                 course_id=course_data.course_key,
+            )
+        else:
+            COURSE_GRADE_NOW_FAILED.send(
+                sender=CourseGradeFactory,
+                user=user,
+                course_id=course_data.course_key,
+                grade=course_grade,
             )
 
         log.info(

@@ -109,7 +109,6 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
         NOW: datetime.now(),
         None: None,
     }
-    shard = 3
 
     def setUp(self):
         super(CourseRetrieveUpdateViewTests, self).setUp()
@@ -398,7 +397,6 @@ class OrderViewTests(UserMixin, TestCase):
     ORDER_NUMBER = 'EDX-100001'
     MOCK_ORDER = {'number': ORDER_NUMBER}
     path = reverse_lazy(view_name, kwargs={'number': ORDER_NUMBER})
-    shard = 1
 
     def setUp(self):
         super(OrderViewTests, self).setUp()

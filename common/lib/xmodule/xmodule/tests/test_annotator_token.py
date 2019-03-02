@@ -10,7 +10,6 @@ class TokenRetriever(unittest.TestCase):
     """
     Tests to make sure that when passed in a username and secret token, that it will be encoded correctly
     """
-    shard = 1
 
     def test_token(self):
         """

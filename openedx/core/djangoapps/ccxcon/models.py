@@ -7,9 +7,10 @@ from django.db import models
 
 class CCXCon(models.Model):
     """
-    The definition of the CCXCon model.
-    This will store the url and the oauth key to access the REST APIs
-    on the CCX Connector.
+    Definition of the CCXCon model.
+    Stores the url and the oauth key to access the REST APIs on the CCX Connector.
+
+    .. no_pii:
     """
     url = models.URLField(unique=True, db_index=True)
     oauth_client_id = models.CharField(max_length=255)

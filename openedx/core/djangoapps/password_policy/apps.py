@@ -56,5 +56,5 @@ class PasswordPolicyConfig(AppConfig):
             if isinstance(deadline, six.string_types):
                 config[setting] = parse_date(deadline)
         except (ValueError, OverflowError):
-            log.exception("Could not parse %s password policy rollout value of '%s'.", setting, deadline)
+            log.exception(u"Could not parse %s password policy rollout value of '%s'.", setting, deadline)
             config[setting] = None

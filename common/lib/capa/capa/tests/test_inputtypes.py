@@ -861,7 +861,6 @@ class MatlabTest(unittest.TestCase):
             'response_data': {},
             'describedby_html': 'aria-describedby="status_{id}"'.format(id=prob_id)
         }
-
         self.assertEqual(context, expected)
         self.the_input.capa_system.render_template = DemoSystem().render_template
         self.the_input.get_html()  # Should not raise an exception

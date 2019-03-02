@@ -66,6 +66,9 @@ class AccessTokenMixin(object):
             'email_verified': user.is_active,
         }
 
+        if 'user_id' in scopes:
+            expected['user_id'] = user.id
+
         if 'email' in scopes:
             expected['email'] = user.email
 

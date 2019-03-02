@@ -212,7 +212,7 @@ def edxnotes_visibility(request, course_id):
         return JsonResponse(status=200)
     except (ValueError, KeyError):
         log.warning(
-            "Could not decode request body as JSON and find a boolean visibility field: '%s'", request.body
+            u"Could not decode request body as JSON and find a boolean visibility field: '%s'", request.body
         )
         return JsonResponseBadRequest()
 

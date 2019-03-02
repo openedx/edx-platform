@@ -10,11 +10,12 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from six import text_type
 from util.date_utils import to_timestamp
 
 from courseware.courses import get_course_by_id
-from lms.djangoapps.grades.api.serializers import StudentGradebookEntrySerializer
+from lms.djangoapps.grades.api.serializers import StudentGradebookEntrySerializer, SubsectionGradeResponseSerializer
 from lms.djangoapps.grades.api.v1.utils import (
     USER_MODEL,
     CourseEnrollmentPagination,
@@ -347,7 +348,6 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
         * passed: Boolean representing whether the course has been
                   passed according to the course's grading policy.
         * percent: A float representing the overall grade for the course
-        * letter_grade: A letter grade as defined in grading policy (e.g. 'A' 'B' 'C' for 6.002x) or None
         * progress_page_url: A link to the user's progress page.
         * section_breakdown: A list of subsection grade details, as specified below.
 
@@ -364,15 +364,9 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
         enabled for this course.
     **Example GET Response**
         {
-            "course_id": "course-v1:edX+DemoX+Demo_Course",
-            "email": "staff@example.com",
             "user_id": 9,
             "username": "staff",
-            "full_name": "",
-            "passed": false,
             "percent": 0.36,
-            "letter_grade": null,
-            "progress_page_url": "/courses/course-v1:edX+DemoX+Demo_Course/progress/9/",
             "section_breakdown": [
                 {
                     "are_grades_published": true,
@@ -382,13 +376,11 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
                     "comment": "",
                     "detail": "",
                     "displayed_value": "0.00",
-                    "is_graded": false,
                     "grade_description": "(0.00/0.00)",
                     "is_ag": false,
                     "is_average": false,
                     "is_manually_graded": false,
                     "label": null,
-                    "letter_grade": null,
                     "module_id": "block-v1:edX+DemoX+Demo_Course+type@sequential+block@edx_introduction",
                     "percent": 0.0,
                     "score_earned": 0.0,
@@ -453,9 +445,7 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
             breakdown.append({
                 'attempted': attempted,
                 'category': subsection_grade.format,
-                'is_graded': subsection_grade.graded,
                 'label': short_label,
-                'letter_grade': course_grade.letter_grade,
                 'module_id': text_type(subsection_grade.location),
                 'percent': subsection_grade.percent_graded,
                 'score_earned': score_earned,
@@ -694,7 +684,7 @@ class GradebookBulkUpdateView(GradeViewMixin, PaginatedAPIView):
                         user_id=requested_user_id,
                         usage_id=requested_usage_id,
                         success=False,
-                        reason='usage_key {} does not exist in this course.'.format(usage_key)
+                        reason=u'usage_key {} does not exist in this course.'.format(usage_key)
                     ))
                     continue
 
@@ -770,7 +760,7 @@ class GradebookBulkUpdateView(GradeViewMixin, PaginatedAPIView):
     ):
 
         log.info(
-            'Grades: Bulk_Update, UpdatedByUser: %s, User: %s, Usage: %s, Grade: %s, GradeOverride: %s, Success: %s',
+            u'Grades: Bulk_Update, UpdatedByUser: %s, User: %s, Usage: %s, Grade: %s, GradeOverride: %s, Success: %s',
             request_user.id,
             user_id,
             usage_id,
@@ -778,3 +768,160 @@ class GradebookBulkUpdateView(GradeViewMixin, PaginatedAPIView):
             subsection_grade_override,
             success
         )
+
+
+@view_auth_classes()
+class SubsectionGradeView(GradeViewMixin, APIView):
+    """
+    **Use Case**
+        * This api is to get information about a users original grade for a subsection.
+        It also exposes any overrides that now replace the original grade and a history of user changes
+        with time stamps of all changes.
+    **Example Request**
+        GET /api/grades/v1/subsection/{subsection_id}/?user_id={user_id}
+    **GET Parameters**
+        A GET request may include the following query parameters.
+        * user_id: (required) An integer represenation of a user
+    **GET Response Values**
+        If the request for subsection grade data is successful,
+        an HTTP 200 "OK" response is returned.
+        The HTTP 200 response has the following values:
+        * subsection_id: A string representation of the usage_key for a course subsection
+        * user_id: The user's integer id
+        * course_id: A string representation of a Course ID.
+        * original_grade: An object representation of a users original grade containing:
+            * earned_all: The float score a user earned for all graded and not graded problems
+            * possible_all: The float highest score a user can earn for all graded and not graded problems
+            * earned_graded: The float score a user earned for only graded probles
+            * possible_graded: The float highest score a user can earn for only graded problems
+        * override: An object representation of an over ride for a user's subsection grade containing:
+            * earned_all_override: The float overriden score a user earned for all graded and not graded problems
+            * possible_all_override: The float overriden highest score a user can earn for all graded
+              and not graded problems
+            * earned_graded_override: The float overriden grade a user earned for only graded problems
+            * possible_graded_override: The float overriden highest possible grade a user can earn
+              for only graded problems
+        * history: A list of history objects that contain
+            * user: The string representation of the user who was responsible for overriding the grade
+            * comments: A string comment about why that person changed the grade
+            * created: The date timestamp the grade was changed
+            * feature: The string representation of the feature through which the grade was overrriden
+            * action: The string representation of the CRUD action the override did
+
+        An HTTP 404 may be returned for the following reasons:
+            * The requested subsection_id is invalid.
+            * The requested user_id is invalid.
+            * NOTE: if you pass in a valid subsection_id and a valid user_id with no data representation in the DB
+              then you will still recieve a 200 with a response with 'original_grade', 'override' and 'course_id'
+              set to None and the 'history' list will be empty.
+
+    **Example GET Response**
+        {
+            "subsection_id": "block-v1:edX+DemoX+Demo_Course+type@sequential+block@basic_questions",
+            "user_id": 2,
+            "course_id": "course-v1:edX+DemoX+Demo_Course",
+            "original_grade": {
+                "earned_all": 0,
+                "possible_all": 11,
+                "earned_graded": 8,
+                "possible_graded": 11
+            },
+            "override": {
+                "earned_all_override": null,
+                "possible_all_override": null,
+                "earned_graded_override": 8,
+                "possible_graded_override": null
+            },
+            "history": [
+                {
+                    "user": "edx",
+                    "comments": null,
+                    "created": "2018-12-03T18:52:36.087134Z",
+                    "feature": "GRADEBOOK",
+                    "action": "CREATEORUPDATE"
+                },
+                {
+                    "user": "edx",
+                    "comments": null,
+                    "created": "2018-12-03T20:41:02.507685Z",
+                    "feature": "GRADEBOOK",
+                    "action": "CREATEORUPDATE"
+                },
+                {
+                    "user": "edx",
+                    "comments": null,
+                    "created": "2018-12-03T20:46:08.933387Z",
+                    "feature": "GRADEBOOK",
+                    "action": "CREATEORUPDATE"
+                }
+            ]
+        }
+    """
+
+    def get(self, request, subsection_id):
+        """
+        Returns subection grade data, override grade data and a history of changes made to
+        a specific users specific subsection grade.
+
+        Args:
+            subsection_id: String representation of a usage_key, which is an opaque key of
+            a persistant subection grade.
+            user_id: An integer represenation of a user
+
+        """
+        try:
+            usage_key = UsageKey.from_string(subsection_id)
+        except InvalidKeyError:
+            raise self.api_error(
+                status_code=status.HTTP_404_NOT_FOUND,
+                developer_message='Invalid UsageKey',
+                error_code='invalid_usage_key'
+            )
+
+        if not has_course_author_access(request.user, usage_key.course_key):
+            raise DeveloperErrorViewMixin.api_error(
+                status_code=status.HTTP_403_FORBIDDEN,
+                developer_message='The requesting user does not have course author permissions.',
+                error_code='user_permissions',
+            )
+
+        try:
+            user_id = int(request.GET.get('user_id'))
+        except ValueError:
+            raise self.api_error(
+                status_code=status.HTTP_404_NOT_FOUND,
+                developer_message='Invalid UserID',
+                error_code='invalid_user_id'
+            )
+
+        try:
+            original_grade = PersistentSubsectionGrade.read_grade(user_id, usage_key)
+        except PersistentSubsectionGrade.DoesNotExist:
+            results = SubsectionGradeResponseSerializer({
+                'original_grade': None,
+                'override': None,
+                'history': [],
+                'subsection_id': usage_key,
+                'user_id': user_id,
+                'course_id': None,
+            })
+
+            return Response(results.data)
+
+        try:
+            override = original_grade.override
+            history = PersistentSubsectionGradeOverrideHistory.objects.filter(override_id=override.id)
+        except PersistentSubsectionGradeOverride.DoesNotExist:
+            override = None
+            history = []
+
+        results = SubsectionGradeResponseSerializer({
+            'original_grade': original_grade,
+            'override': override,
+            'history': history,
+            'subsection_id': original_grade.usage_key,
+            'user_id': original_grade.user_id,
+            'course_id': original_grade.course_id,
+        })
+
+        return Response(results.data)

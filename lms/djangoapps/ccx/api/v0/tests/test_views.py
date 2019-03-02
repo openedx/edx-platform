@@ -91,7 +91,7 @@ class CcxRestApiTest(CcxTestCase, APITestCase):
         token_resp = self.client.post(reverse('oauth2:access_token'), data=token_data, format='multipart')
         self.assertEqual(token_resp.status_code, status.HTTP_200_OK)
         token_resp_json = json.loads(token_resp.content)
-        return '{token_type} {token}'.format(
+        return u'{token_type} {token}'.format(
             token_type=token_resp_json['token_type'],
             token=token_resp_json['access_token']
         )
@@ -132,7 +132,7 @@ class CcxRestApiTest(CcxTestCase, APITestCase):
             token='16MGyP3OaQYHmpT1lK7Q6MMNAZsjwF'
         )
 
-        auth_header_oauth2_provider = "Bearer {0}".format(auth_oauth2_provider)
+        auth_header_oauth2_provider = u"Bearer {0}".format(auth_oauth2_provider)
         auth = self.get_auth_token(app_grant, app_client)
 
         return auth, auth_header_oauth2_provider
@@ -166,7 +166,6 @@ class CcxListTest(CcxRestApiTest):
     Test for the CCX REST APIs
     """
     ENABLED_SIGNALS = ['course_published']
-    shard = 9
 
     @classmethod
     def setUpClass(cls):
@@ -340,7 +339,7 @@ class CcxListTest(CcxRestApiTest):
         all_ccx = CustomCourseForEdX.objects.all()
         all_ccx = all_ccx.order_by('id')
         self.assertEqual(len(all_ccx), num_ccx)
-        title_str = 'Title CCX {0}'
+        title_str = u'Title CCX {0}'
         for num, ccx in enumerate(all_ccx):
             ccx.display_name = title_str.format(string.ascii_lowercase[-(num + 1)])
             ccx.save()
@@ -877,7 +876,6 @@ class CcxDetailTest(CcxRestApiTest):
     Test for the CCX REST APIs
     """
     ENABLED_SIGNALS = ['course_published']
-    shard = 9
 
     def setUp(self):
         """

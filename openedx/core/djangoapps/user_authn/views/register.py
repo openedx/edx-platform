@@ -190,7 +190,7 @@ def create_account_with_params(request, params):
         try:
             enable_notifications(user)
         except Exception:  # pylint: disable=broad-except
-            log.exception("Enable discussion notifications failed for user {id}.".format(id=user.id))
+            log.exception(u"Enable discussion notifications failed for user {id}.".format(id=user.id))
 
     _track_user_registration(user, profile, params, third_party_provider)
 
@@ -282,7 +282,7 @@ def _link_user_to_third_party_provider(
         if not social_access_token:
             raise ValidationError({
                 'access_token': [
-                    _("An access_token is required when passing value ({}) for provider.").format(
+                    _(u"An access_token is required when passing value ({}) for provider.").format(
                         params['provider']
                     )
                 ]
@@ -335,12 +335,17 @@ def _track_user_registration(user, profile, params, third_party_provider):
                 }
             })
 
+        # .. pii: Many pieces of PII are sent to Segment here. Retired directly through Segment API call in Tubular.
+        # .. pii_types: email_address, username, name, birth_date, location, gender
+        # .. pii_retirement: third_party
         segment.identify(*identity_args)
         segment.track(
             user.id,
             "edx.bi.user.account.registered",
             {
                 'category': 'conversion',
+                # ..pii: Learner email is sent to Segment in following line and will be associated with analytics data.
+                'email': user.email,
                 'label': params.get('course_id'),
                 'provider': third_party_provider.name if third_party_provider else None
             },
@@ -390,7 +395,7 @@ def _skip_activation_email(user, do_external_auth, running_pipeline, third_party
     # log the cases where skip activation email flag is set, but email validity check fails
     if third_party_provider and third_party_provider.skip_email_verification and not valid_email:
         log.info(
-            '[skip_email_verification=True][user=%s][pipeline-email=%s][identity_provider=%s][provider_type=%s] '
+            u'[skip_email_verification=True][user=%s][pipeline-email=%s][identity_provider=%s][provider_type=%s] '
             'Account activation email sent as user\'s system email differs from SSO email.',
             user.email,
             sso_pipeline_email,

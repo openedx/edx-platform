@@ -110,6 +110,10 @@ class Order(models.Model):
     This is the model for an order.  Before purchase, an Order and its related OrderItems are used
     as the shopping cart.
     FOR ANY USER, THERE SHOULD ONLY EVER BE ZERO OR ONE ORDER WITH STATUS='cart'.
+
+    .. pii: Contains many PII fields in an app edx.org does not currently use. "other" data is payment information.
+    .. pii_types: name, location, email_address, other
+    .. pii_retirement: retained
     """
     class Meta(object):
         app_label = "shoppingcart"
@@ -193,7 +197,7 @@ class Order(models.Model):
         Also removes any code redemption associated with the order_item
         """
         if item.order.status == 'cart':
-            log.info("order item %s removed for user %s", str(item.id), user)
+            log.info(u"order item %s removed for user %s", str(item.id), user)
             item.delete()
             # remove any redemption entry associated with the item
             CouponRedemption.remove_code_redemption_from_item(item, user)
@@ -364,7 +368,7 @@ class Order(models.Model):
         if not is_order_type_business:
             subject = _("Order Payment Confirmation")
         else:
-            subject = _('Confirmation and Registration Codes for the following courses: {course_name_list}').format(
+            subject = _(u'Confirmation and Registration Codes for the following courses: {course_name_list}').format(
                 course_name_list=joined_course_names
             )
 
@@ -390,7 +394,7 @@ class Order(models.Model):
                         'course_names': ", ".join(course_names),
                         'dashboard_url': dashboard_url,
                         'currency_symbol': settings.PAID_COURSE_REGISTRATION_CURRENCY[1],
-                        'order_placed_by': '{username} ({email})'.format(
+                        'order_placed_by': u'{username} ({email})'.format(
                             username=self.user.username, email=self.user.email
                         ),
                         'has_billing_info': settings.FEATURES['STORE_BILLING_INFO'],
@@ -421,7 +425,7 @@ class Order(models.Model):
                     email.attach(u'pdf_not_available.txt', file_buffer.getvalue(), 'text/plain')
                 email.send()
         except (smtplib.SMTPException, BotoServerError):  # sadly need to handle diff. mail backends individually
-            log.error('Failed sending confirmation e-mail for order %d', self.id)
+            log.error(u'Failed sending confirmation e-mail for order %d', self.id)
 
     def purchase(self, first='', last='', street1='', street2='', city='', state='', postalcode='',
                  country='', ccnum='', cardtype='', processor_reply_dump=''):
@@ -597,7 +601,7 @@ class Order(models.Model):
 
         if self.status not in ORDER_STATUS_MAP.keys():
             raise InvalidStatusToRetire(
-                "order status {order_status} is not 'paying' or 'cart'".format(
+                u"order status {order_status} is not 'paying' or 'cart'".format(
                     order_status=self.status
                 )
             )
@@ -639,6 +643,8 @@ class OrderItem(TimeStampedModel):
 
     Each implementation of OrderItem should provide its own purchased_callback as
     a method.
+
+    .. no_pii:
     """
     class Meta(object):
         app_label = "shoppingcart"
@@ -824,6 +830,10 @@ class Invoice(TimeStampedModel):
     This table capture all the information needed to support "invoicing"
     which is when a user wants to purchase Registration Codes,
     but will not do so via a Credit Card transaction.
+
+    .. pii: Contains many PII fields in an app edx.org does not currently use
+    .. pii_types: name, location, email_address
+    .. pii_retirement: retained
     """
     class Meta(object):
         app_label = "shoppingcart"
@@ -996,6 +1006,7 @@ class InvoiceTransaction(TimeStampedModel):
        create a transaction with a negative amount to represent
        the refund.
 
+    .. no_pii:
     """
     class Meta(object):
         app_label = "shoppingcart"
@@ -1086,6 +1097,8 @@ class InvoiceItem(TimeStampedModel):
     there might be an invoice item representing 10 registration
     codes for the DemoX course.
 
+
+    .. no_pii:
     """
     class Meta(object):
         app_label = "shoppingcart"
@@ -1130,6 +1143,7 @@ class CourseRegistrationCodeInvoiceItem(InvoiceItem):
     This is an invoice item that represents a payment for
     a course registration.
 
+    .. no_pii:
     """
     class Meta(object):
         app_label = "shoppingcart"
@@ -1166,6 +1180,7 @@ class InvoiceHistory(models.Model):
     transaction, so the history record is created only
     if the invoice change is successfully persisted.
 
+    .. no_pii:
     """
     timestamp = models.DateTimeField(auto_now_add=True, db_index=True)
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)
@@ -1225,6 +1240,8 @@ class CourseRegistrationCode(models.Model):
     """
     This table contains registration codes
     With registration code, a user can register for a course for free
+
+    .. no_pii:
     """
     class Meta(object):
         app_label = "shoppingcart"
@@ -1263,6 +1280,8 @@ class CourseRegistrationCode(models.Model):
 class RegistrationCodeRedemption(models.Model):
     """
     This model contains the registration-code redemption info
+
+    .. no_pii:
     """
     class Meta(object):
         app_label = "shoppingcart"
@@ -1323,6 +1342,8 @@ class Coupon(models.Model):
     """
     This table contains coupon codes
     A user can get a discount offer on course if provide coupon code
+
+    .. no_pii:
     """
     class Meta(object):
         app_label = "shoppingcart"
@@ -1344,12 +1365,14 @@ class Coupon(models.Model):
         """
         return the coupon expiration date in the readable format
         """
-        return (self.expiration_date - timedelta(days=1)).strftime("%B %d, %Y") if self.expiration_date else None
+        return (self.expiration_date - timedelta(days=1)).strftime(u"%B %d, %Y") if self.expiration_date else None
 
 
 class CouponRedemption(models.Model):
     """
     This table contain coupon redemption info
+
+    .. no_pii:
     """
     class Meta(object):
         app_label = "shoppingcart"
@@ -1466,6 +1489,8 @@ class CouponRedemption(models.Model):
 class PaidCourseRegistration(OrderItem):
     """
     This is an inventory item for paying for a course registration
+
+    .. no_pii:
     """
     class Meta(object):
         app_label = "shoppingcart"
@@ -1537,7 +1562,7 @@ class PaidCourseRegistration(OrderItem):
         # throw errors if it doesn't.
         course = modulestore().get_course(course_id)
         if not course:
-            log.error("User {} tried to add non-existent course {} to cart id {}"
+            log.error(u"User {} tried to add non-existent course {} to cart id {}"
                       .format(order.user.email, course_id, order.id))
             raise CourseDoesNotExistException
 
@@ -1551,7 +1576,7 @@ class PaidCourseRegistration(OrderItem):
             raise ItemAlreadyInCartException
 
         if CourseEnrollment.is_enrolled(user=order.user, course_key=course_id):
-            log.warning("User {} trying to add course {} to cart id {}, already registered"
+            log.warning(u"User {} trying to add course {} to cart id {}, already registered"
                         .format(order.user.email, course_id, order.id))
             raise AlreadyEnrolledInCourseException
 
@@ -1581,7 +1606,7 @@ class PaidCourseRegistration(OrderItem):
         item.report_comments = item.csv_report_comments
         order.save()
         item.save()
-        log.info("User {} added course registration {} to cart: order {}"
+        log.info(u"User {} added course registration {} to cart: order {}"
                  .format(order.user.email, course_id, order.id))
 
         CourseEnrollment.send_signal_full(EnrollStatusChange.paid_start,
@@ -1605,7 +1630,7 @@ class PaidCourseRegistration(OrderItem):
         self.course_enrollment = CourseEnrollment.enroll(user=self.user, course_key=self.course_id, mode=self.mode)
         self.save()
 
-        log.info("Enrolled {0} in paid course {1}, paid ${2}"
+        log.info(u"Enrolled {0} in paid course {1}, paid ${2}"
                  .format(self.user.email, self.course_id, self.line_cost))
         self.course_enrollment.send_signal(EnrollStatusChange.paid_complete,
                                            cost=self.line_cost, currency=self.currency)
@@ -1617,7 +1642,7 @@ class PaidCourseRegistration(OrderItem):
         """
         notification = Text(_(
             u"Please visit your {link_start}dashboard{link_end} "
-            u"to see your new course."
+            "to see your new course."
         )).format(
             link_start=HTML(u'<a href="{url}">').format(url=reverse('dashboard')),
             link_end=HTML(u'</a>'),
@@ -1660,6 +1685,8 @@ class CourseRegCodeItem(OrderItem):
     """
     This is an inventory item for paying for
     generating course registration codes
+
+    .. no_pii:
     """
     class Meta(object):
         app_label = "shoppingcart"
@@ -1724,17 +1751,17 @@ class CourseRegCodeItem(OrderItem):
         # throw errors if it doesn't.
         course = modulestore().get_course(course_id)
         if not course:
-            log.error("User {} tried to add non-existent course {} to cart id {}"
+            log.error(u"User {} tried to add non-existent course {} to cart id {}"
                       .format(order.user.email, course_id, order.id))
             raise CourseDoesNotExistException
 
         if cls.contained_in_order(order, course_id):
-            log.warning("User {} tried to add PaidCourseRegistration for course {}, already in cart id {}"
+            log.warning(u"User {} tried to add PaidCourseRegistration for course {}, already in cart id {}"
                         .format(order.user.email, course_id, order.id))
             raise ItemAlreadyInCartException
 
         if CourseEnrollment.is_enrolled(user=order.user, course_key=course_id):
-            log.warning("User {} trying to add course {} to cart id {}, already registered"
+            log.warning(u"User {} trying to add course {} to cart id {}, already registered"
                         .format(order.user.email, course_id, order.id))
             raise AlreadyEnrolledInCourseException
 
@@ -1764,7 +1791,7 @@ class CourseRegCodeItem(OrderItem):
         item.report_comments = item.csv_report_comments
         order.save()
         item.save()
-        log.info("User {} added course registration {} to cart: order {}"
+        log.info(u"User {} added course registration {} to cart: order {}"
                  .format(order.user.email, course_id, order.id))
         return item
 
@@ -1787,7 +1814,7 @@ class CourseRegCodeItem(OrderItem):
         for i in range(total_registration_codes):  # pylint: disable=unused-variable
             save_registration_code(self.user, self.course_id, self.mode, order=self.order)
 
-        log.info("Enrolled {0} in paid course {1}, paid ${2}"
+        log.info(u"Enrolled {0} in paid course {1}, paid ${2}"
                  .format(self.user.email, self.course_id, self.line_cost))
 
     @property
@@ -1827,6 +1854,8 @@ class CourseRegCodeItemAnnotation(models.Model):
     generates report for the paid courses, each report item must contain the payment account associated with a course.
     And unfortunately we didn't have the concept of a "SKU" or stock item where we could keep this association,
     so this is to retrofit it.
+
+    .. no_pii:
     """
     class Meta(object):
         app_label = "shoppingcart"
@@ -1844,6 +1873,8 @@ class PaidCourseRegistrationAnnotation(models.Model):
     generates report for the paid courses, each report item must contain the payment account associated with a course.
     And unfortunately we didn't have the concept of a "SKU" or stock item where we could keep this association,
     so this is to retrofit it.
+
+    .. no_pii:
     """
     class Meta(object):
         app_label = "shoppingcart"
@@ -1858,6 +1889,8 @@ class PaidCourseRegistrationAnnotation(models.Model):
 class CertificateItem(OrderItem):
     """
     This is an inventory item for purchasing certificates
+
+    .. no_pii:
     """
     class Meta(object):
         app_label = "shoppingcart"
@@ -1899,16 +1932,16 @@ class CertificateItem(OrderItem):
         order_number = target_cert.order_id
         # send billing an email so they can handle refunding
         subject = _("[Refund] User-Requested Refund")
-        message = "User {user} ({user_email}) has requested a refund on Order #{order_number}.".format(user=course_enrollment.user,
-                                                                                                       user_email=course_enrollment.user.email,
-                                                                                                       order_number=order_number)
+        message = u"User {user} ({user_email}) has requested a refund on Order #{order_number}.".format(user=course_enrollment.user,
+                                                                                                        user_email=course_enrollment.user.email,
+                                                                                                        order_number=order_number)
         to_email = [settings.PAYMENT_SUPPORT_EMAIL]
         from_email = configuration_helpers.get_value('payment_support_email', settings.PAYMENT_SUPPORT_EMAIL)
         try:
             send_mail(subject, message, from_email, to_email, fail_silently=False)
         except Exception as exception:  # pylint: disable=broad-except
             err_str = ('Failed sending email to billing to request a refund for verified certificate'
-                       ' (User {user}, Course {course}, CourseEnrollmentID {ce_id}, Order #{order})\n{exception}')
+                       u' (User {user}, Course {course}, CourseEnrollmentID {ce_id}, Order #{order})\n{exception}')
             log.error(err_str.format(
                 user=course_enrollment.user,
                 course=course_enrollment.course_id,
@@ -1969,7 +2002,7 @@ class CertificateItem(OrderItem):
         # Translators: In this particular case, mode_name refers to a
         # particular mode (i.e. Honor Code Certificate, Verified Certificate, etc)
         # by which a user could enroll in the given course.
-        item.line_desc = _("{mode_name} for course {course}").format(
+        item.line_desc = _(u"{mode_name} for course {course}").format(
             mode_name=mode_info.name,
             course=course_name
         )
@@ -2004,7 +2037,7 @@ class CertificateItem(OrderItem):
             verification_url = "http://{domain}{path}".format(domain=domain, path=path)
 
             verification_reminder = _(
-                "If you haven't verified your identity yet, please start the verification process ({verification_url})."
+                u"If you haven't verified your identity yet, please start the verification process ({verification_url})."
             ).format(verification_url=verification_url)
 
         if is_professional_mode_verified:
@@ -2012,10 +2045,10 @@ class CertificateItem(OrderItem):
                                     "course start date. ")
 
         refund_reminder = _(
-            "{refund_reminder_msg}"
-            "To receive your refund, contact {billing_email}. "
-            "Please include your order number in your email. "
-            "Please do NOT include your credit card information."
+            u"{refund_reminder_msg}"
+            u"To receive your refund, contact {billing_email}. "
+            u"Please include your order number in your email. "
+            u"Please do NOT include your credit card information."
         ).format(
             refund_reminder_msg=refund_reminder_msg,
             billing_email=settings.PAYMENT_SUPPORT_EMAIL
@@ -2082,16 +2115,23 @@ class CertificateItem(OrderItem):
 
 
 class DonationConfiguration(ConfigurationModel):
-    """Configure whether donations are enabled on the site."""
+    """
+    Configure whether donations are enabled on the site.
+
+    .. no_pii:
+    """
     class Meta(ConfigurationModel.Meta):
         app_label = "shoppingcart"
 
 
 class Donation(OrderItem):
-    """A donation made by a user.
+    """
+    A donation made by a user.
 
     Donations can be made for a specific course or to the organization as a whole.
     Users can choose the donation amount.
+
+    .. no_pii:
     """
 
     class Meta(object):

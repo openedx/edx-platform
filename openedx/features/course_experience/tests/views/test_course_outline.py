@@ -127,7 +127,7 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
                 for sequential in chapter.children:
                     self.assertIn(sequential.display_name, response_content)
                     if sequential.graded:
-                        self.assertIn(sequential.due.strftime('%Y-%m-%d %H:%M:%S'), response_content)
+                        self.assertIn(sequential.due.strftime(u'%Y-%m-%d %H:%M:%S'), response_content)
                         self.assertIn(sequential.format, response_content)
                     self.assertTrue(sequential.children)
                     for vertical in sequential.children:

@@ -135,13 +135,13 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
         if "read_replica" in settings.DATABASES:
             schedules = schedules.using("read_replica")
 
-        LOG.info('Query = %r', schedules.query.sql_with_params())
+        LOG.info(u'Query = %r', schedules.query.sql_with_params())
 
         with function_trace('schedule_query_set_evaluation'):
             # This will run the query and cache all of the results in memory.
             num_schedules = len(schedules)
 
-        LOG.info('Number of schedules = %d', num_schedules)
+        LOG.info(u'Number of schedules = %d', num_schedules)
 
         # This should give us a sense of the volume of data being processed by each task.
         set_custom_metric('num_schedules', num_schedules)
@@ -352,7 +352,7 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
                 week_highlights = get_week_highlights(user, enrollment.course_id, week_num)
             except CourseUpdateDoesNotExist:
                 LOG.warning(
-                    'Weekly highlights for user {} in week {} of course {} does not exist or is disabled'.format(
+                    u'Weekly highlights for user {} in week {} of course {} does not exist or is disabled'.format(
                         user, week_num, enrollment.course_id
                     )
                 )

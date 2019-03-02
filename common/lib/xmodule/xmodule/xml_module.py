@@ -429,6 +429,12 @@ class XmlParserMixin(object):
         """
         # Get the definition
         xml_object = self.definition_to_xml(self.runtime.export_fs)
+
+        # If xml_object is None, we don't know how to serialize this node, but
+        # we shouldn't crash out the whole export for it.
+        if xml_object is None:
+            return
+
         for aside in self.runtime.get_asides(self):
             if aside.needs_serialization():
                 aside_node = etree.Element("unknown_root", nsmap=XML_NAMESPACES)

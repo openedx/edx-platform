@@ -4,6 +4,7 @@ Parser and evaluator for FormulaResponse and NumericalResponse
 Uses pyparsing to parse. Main function as of now is evaluator().
 """
 
+from __future__ import absolute_import
 import math
 import numbers
 import operator
@@ -27,7 +28,9 @@ from pyparsing import (
     stringEnd
 )
 
-import functions
+from . import functions
+import six
+from functools import reduce
 
 # Functions available by default
 # We use scimath variants which give complex results when needed. For example:
@@ -103,7 +106,7 @@ def lower_dict(input_dict):
     variables that have the same lowercase representation. It would be hard to
     tell which is used in the final dict and which isn't.
     """
-    return {k.lower(): v for k, v in input_dict.iteritems()}
+    return {k.lower(): v for k, v in six.iteritems(input_dict)}
 
 
 # The following few functions define evaluation actions, which are run on lists

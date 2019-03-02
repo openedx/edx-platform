@@ -94,14 +94,14 @@ class TextbookUploadPage(CoursePage):
         Adds chapter name by taking the ordinal of the chapter.
         """
         index = ["first", "second", "third"].index(ordinal)
-        self.set_input_field_value('.textbook .chapter{i} input.chapter-name'.format(i=index + 1), chapter_name)
+        self.set_input_field_value(u'.textbook .chapter{i} input.chapter-name'.format(i=index + 1), chapter_name)
 
     def fill_chapter_asset(self, ordinal, chapter_asset):
         """
         Adds chapter asset by taking the ordinal of the chapter.
         """
         index = ["first", "second", "third"].index(ordinal)
-        self.set_input_field_value('.textbook .chapter{i} input.chapter-asset-path'.format(i=index + 1), chapter_asset)
+        self.set_input_field_value(u'.textbook .chapter{i} input.chapter-asset-path'.format(i=index + 1), chapter_asset)
 
     def submit_chapter(self):
         """

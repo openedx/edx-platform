@@ -123,7 +123,7 @@ def _footer_css_urls(request, package_name):
     ]
 
 
-def _render_footer_html(request, show_openedx_logo, include_dependencies, include_language_selector):
+def _render_footer_html(request, show_openedx_logo, include_dependencies, include_language_selector, language):
     """Render the footer as HTML.
 
     Arguments:
@@ -143,7 +143,8 @@ def _render_footer_html(request, show_openedx_logo, include_dependencies, includ
         'footer_css_urls': _footer_css_urls(request, css_name),
         'bidi': bidi,
         'include_dependencies': include_dependencies,
-        'include_language_selector': include_language_selector
+        'include_language_selector': include_language_selector,
+        'language': language
     }
 
     return render_to_response("footer.html", context)
@@ -288,7 +289,7 @@ def footer(request):
         if content is None:
             with translation.override(language):
                 content = _render_footer_html(
-                    request, show_openedx_logo, include_dependencies, include_language_selector
+                    request, show_openedx_logo, include_dependencies, include_language_selector, language
                 )
                 cache.set(cache_key, content, settings.FOOTER_CACHE_TIMEOUT)
         return HttpResponse(content, status=200, content_type="text/html; charset=utf-8")

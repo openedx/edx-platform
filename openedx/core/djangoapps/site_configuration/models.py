@@ -22,6 +22,8 @@ class SiteConfiguration(models.Model):
     Fields:
         site (OneToOneField): one to one field relating each configuration to a single site
         values (JSONField):  json field to store configurations for a site
+
+    .. no_pii:
     """
     site = models.OneToOneField(Site, related_name='configuration', on_delete=models.CASCADE)
     enabled = models.BooleanField(default=False, verbose_name="Enabled")
@@ -54,9 +56,9 @@ class SiteConfiguration(models.Model):
             try:
                 return self.values.get(name, default)
             except AttributeError as error:
-                logger.exception('Invalid JSON data. \n [%s]', error)
+                logger.exception(u'Invalid JSON data. \n [%s]', error)
         else:
-            logger.info("Site Configuration is not enabled for site (%s).", self.site)
+            logger.info(u"Site Configuration is not enabled for site (%s).", self.site)
 
         return default
 
@@ -140,6 +142,8 @@ class SiteConfigurationHistory(TimeStampedModel):
     Fields:
         site (ForeignKey): foreign-key to django Site
         values (JSONField): json field to store configurations for a site
+
+    .. no_pii:
     """
     site = models.ForeignKey(Site, related_name='configuration_histories', on_delete=models.CASCADE)
     enabled = models.BooleanField(default=False, verbose_name="Enabled")

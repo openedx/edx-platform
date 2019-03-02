@@ -37,7 +37,6 @@ class CommandsTestBase(SharedModuleStoreTestCase):
     __test__ = False
     url_name = '2012_Fall'
     ENABLED_SIGNALS = ['course_published']
-    shard = 1
 
     @classmethod
     def setUpClass(cls):
@@ -98,7 +97,7 @@ class CommandsTestBase(SharedModuleStoreTestCase):
 
         try:
             output = self.call_command('dump_course_structure', *args, **kwargs)
-        except TypeError, exception:
+        except TypeError as exception:
             self.fail(exception)
 
         dump = json.loads(output)

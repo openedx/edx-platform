@@ -21,7 +21,6 @@ class GradingPolicyTestMixin(object):
     """
     Mixin class for Grading Policy tests
     """
-    shard = 4
     view_name = None
 
     def setUp(self):
@@ -158,7 +157,6 @@ class CourseGradingPolicyTests(GradingPolicyTestMixin, SharedModuleStoreTestCase
     """
     Tests for CourseGradingPolicy view.
     """
-    shard = 4
     view_name = 'grades_api:v1:course_grading_policy'
 
     raw_grader = [
@@ -210,7 +208,6 @@ class CourseGradingPolicyMissingFieldsTests(GradingPolicyTestMixin, SharedModule
     """
     Tests for CourseGradingPolicy view when fields are missing.
     """
-    shard = 4
     view_name = 'grades_api:v1:course_grading_policy'
 
     # Raw grader with missing keys

@@ -56,7 +56,7 @@ class BasketsView(APIView):
         try:
             course_key = CourseKey.from_string(course_id)
             courses.get_course(course_key)
-        except (InvalidKeyError, ValueError)as ex:
+        except (InvalidKeyError, ValueError) as ex:
             log.exception(u'Unable to locate course matching %s.', course_id)
             return False, None, text_type(ex)
 
@@ -79,7 +79,7 @@ class BasketsView(APIView):
             except Exception:  # pylint: disable=broad-except
                 # log the error, return silently
                 log.exception(
-                    'Failed to handle marketing opt-in flag: user="%s", course="%s"', user.username, course_key
+                    u'Failed to handle marketing opt-in flag: user="%s", course="%s"', user.username, course_key
                 )
 
     def post(self, request, *args, **kwargs):

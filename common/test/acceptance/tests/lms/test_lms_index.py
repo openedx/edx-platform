@@ -28,6 +28,7 @@ class BaseLmsIndexTest(AcceptanceTest):
 
 class LmsIndexPageTest(BaseLmsIndexTest):
     """ Test suite for the LMS Index (Home) page """
+    shard = 2
 
     def setUp(self):
         super(LmsIndexPageTest, self).setUp()

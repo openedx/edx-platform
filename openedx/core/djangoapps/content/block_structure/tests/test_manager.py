@@ -93,7 +93,6 @@ class TestBlockStructureManager(UsageKeyFactoryMixin, ChildrenMapTestMixin, Test
     """
     Test class for BlockStructureManager.
     """
-    shard = 2
 
     def setUp(self):
         super(TestBlockStructureManager, self).setUp()

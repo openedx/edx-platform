@@ -3,6 +3,7 @@ Tests for discussion pages
 """
 
 import datetime
+import time
 from unittest import skip
 from uuid import uuid4
 
@@ -35,7 +36,7 @@ from common.test.acceptance.tests.helpers import UniqueCourseTest, get_modal_ale
 from openedx.core.lib.tests import attr
 
 
-THREAD_CONTENT_WITH_LATEX = """Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
+THREAD_CONTENT_WITH_LATEX = u"""Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
                                ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
                                ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
                                reprehenderit in voluptate velit sse cillum dolore eu fugiat nulla pariatur.
@@ -122,7 +123,7 @@ class DiscussionResponsePaginationTestMixin(BaseDiscussionMixin):
             (
                 None if response_total == 0 else
                 "Showing all responses" if response_total == displayed_responses else
-                "Showing first {} responses".format(displayed_responses)
+                u"Showing first {} responses".format(displayed_responses)
             )
         )
         self.assertEqual(
@@ -647,10 +648,10 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         page.submit_response_edit(response_id, description)
 
         expected_response_html = (
-            '<p><a href="{}">{}</a></p>'.format(url, description)
+            u'<p><a href="{}">{}</a></p>'.format(url, description)
         )
         actual_response_html = page.q(
-            css=".response_{} .response-body".format(response_id)
+            css=u".response_{} .response-body".format(response_id)
         ).html[0]
         self.assertEqual(expected_response_html, actual_response_html)
 
@@ -681,10 +682,10 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         page.submit_response_edit(response_id, '')
 
         expected_response_html = (
-            '<p><img src="{}" alt="{}" title=""></p>'.format(url, description)
+            u'<p><img src="{}" alt="{}" title=""></p>'.format(url, description)
         )
         actual_response_html = page.q(
-            css=".response_{} .response-body".format(response_id)
+            css=u".response_{} .response-body".format(response_id)
         ).html[0]
         self.assertEqual(expected_response_html, actual_response_html)
 
@@ -736,11 +737,11 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         page.submit_response_edit(response_id, "Some content")
 
         expected_response_html = (
-            '<p>Some content<img src="{}" alt="{}" title=""></p>'.format(
+            u'<p>Some content<img src="{}" alt="{}" title=""></p>'.format(
                 url, description)
         )
         actual_response_html = page.q(
-            css=".response_{} .response-body".format(response_id)
+            css=u".response_{} .response-body".format(response_id)
         ).html[0]
         self.assertEqual(expected_response_html, actual_response_html)
 
@@ -961,6 +962,9 @@ class DiscussionEditorPreviewTest(UniqueCourseTest):
         self.page.visit()
         self.page.click_new_post_button()
 
+        # sleep/wait added to allow Major MathJax a11y files to load
+        time.sleep(5)
+
     def test_text_rendering(self):
         """When I type plain text into the editor, it should be rendered as plain text in the preview box"""
         self.page.set_new_post_editor_value("Some plain text")
@@ -999,6 +1003,21 @@ class DiscussionEditorPreviewTest(UniqueCourseTest):
         )
         self.assertEqual(self.page.get_new_post_preview_text(), 'Text line 1\nText line 2')
 
+    def test_inline_mathjax_rendering_in_order(self):
+        """
+        Tests the order of Post body content when inline Mathjax is used.
+
+        With inline mathjax expressions, the text content doesn't break into new lines at the places of
+        mathjax expressions.
+        """
+        self.page.set_new_post_editor_value(
+            'Text line 1 \n'
+            '$e[n]=d_1$ \n'
+            'Text line 2 \n'
+            '$e[n]=d_2$'
+        )
+        self.assertEqual(self.page.get_new_post_preview_text('.wmd-preview > p'), 'Text line 1 Text line 2')
+
     def test_mathjax_not_rendered_after_post_cancel(self):
         """
         Tests that mathjax is not rendered when we cancel the post
@@ -1008,9 +1027,9 @@ class DiscussionEditorPreviewTest(UniqueCourseTest):
         appear in the preview box
         """
         self.page.set_new_post_editor_value(
-            r'\begin{equation}'
-            r'\tau_g(\omega) = - \frac{d}{d\omega}\phi(\omega) \hspace{2em} (1) '
-            r'\end{equation}'
+            ur'\begin{equation}'
+            ur'\tau_g(\omega) = - \frac{d}{d\omega}\phi(\omega) \hspace{2em} (1) '
+            ur'\end{equation}'
         )
         self.assertIsNotNone(self.page.get_new_post_preview_text())
         self.page.click_element(".cancel")

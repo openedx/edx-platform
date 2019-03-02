@@ -55,7 +55,7 @@ class TestCreateCourse(ModuleStoreTestCase):
         new_key = modulestore().make_course_key("org", "course", "run")
         self.assertTrue(
             modulestore().has_course(new_key),
-            "Could not find course in {}".format(store)
+            u"Could not find course in {}".format(store)
         )
         # pylint: disable=protected-access
         self.assertEqual(store, modulestore()._get_modulestore_for_courselike(new_key).get_modulestore_type())

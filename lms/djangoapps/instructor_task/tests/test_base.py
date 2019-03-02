@@ -219,7 +219,7 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
         Returns the factory args for the option problem type.
         """
         return {
-            'question_text': 'The correct answer is {0}'.format(correct_answer),
+            'question_text': u'The correct answer is {0}'.format(correct_answer),
             'options': [OPTION_1, OPTION_2],
             'correct_option': correct_answer,
             'num_responses': num_responses,
@@ -303,7 +303,6 @@ class TestReportMixin(object):
     """
     Cleans up after tests that place files in the reports directory.
     """
-    shard = 4
 
     def setUp(self):
 

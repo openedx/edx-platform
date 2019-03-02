@@ -23,7 +23,6 @@ TEST_API_URL = 'http://www-internal.example.com/api'
 class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, CacheIsolationTestCase):
     """Tests for edX API data retrieval utility."""
     ENABLED_CACHES = ['default']
-    shard = 2
 
     def setUp(self):
         super(TestGetEdxApiData, self).setUp()

@@ -1,16 +1,17 @@
 """
 Tests for exporting courseware to the desired path
 """
-import unittest
 import shutil
-import ddt
-from django.core.management import CommandError, call_command
+import unittest
 from tempfile import mkdtemp
 
-from xmodule.modulestore.tests.factories import CourseFactory
+import ddt
+from django.core.management import CommandError, call_command
+
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class TestArgParsingCourseExport(unittest.TestCase):
@@ -51,7 +52,7 @@ class TestCourseExport(ModuleStoreTestCase):
         course_id = unicode(course.id)
         self.assertTrue(
             modulestore().has_course(course.id),
-            "Could not find course in {}".format(store)
+            u"Could not find course in {}".format(store)
         )
         # Test `export` management command with invalid course_id
         errstring = "Invalid course_key: 'InvalidCourseID'."

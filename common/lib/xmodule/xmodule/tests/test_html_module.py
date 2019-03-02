@@ -33,7 +33,6 @@ class HtmlModuleCourseApiTestCase(unittest.TestCase):
     """
     Test the HTML XModule's student_view_data method.
     """
-    shard = 1
 
     @ddt.data(
         dict(),
@@ -101,7 +100,6 @@ class HtmlModuleCourseApiTestCase(unittest.TestCase):
 
 class HtmlModuleSubstitutionTestCase(unittest.TestCase):
     descriptor = Mock()
-    shard = 1
 
     def test_substitution_works(self):
         sample_xml = '''%%USER_ID%%'''
@@ -134,7 +132,6 @@ class HtmlDescriptorIndexingTestCase(unittest.TestCase):
     """
     Make sure that HtmlDescriptor can format data for indexing as expected.
     """
-    shard = 1
 
     def test_index_dictionary_simple_html_module(self):
         sample_xml = '''
@@ -227,7 +224,6 @@ class CourseInfoModuleTestCase(unittest.TestCase):
     """
     Make sure that CourseInfoModule renders updates properly.
     """
-    shard = 1
 
     def test_updates_render(self):
         """

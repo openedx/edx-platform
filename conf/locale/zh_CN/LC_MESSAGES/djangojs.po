@@ -1,10 +1,10 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/).
-# Copyright (C) 2018 EdX
+# Copyright (C) 2019 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
-# abby li <yc.li@eliteu.cn>, 2018
+# abby li <yc.li@eliteu.cn>, 2018-2019
 # alisan617, 2017
 # shuchuanchen <am15501@163.com>, 2014
 # BertZou <turingcat@gmail.com>, 2015
@@ -30,6 +30,7 @@
 # hohomi <hohomi@gmail.com>, 2014,2016
 # hohomi <hohomi@gmail.com>, 2014,2016
 # bnw, 2014
+# HYY <wingyin.wong@outlook.com>, 2019
 # ifLab <webmaster@iflab.org>, 2018
 # Jerome Huang <canni3269@gmail.com>, 2014
 # jg Ma <jg20040308@126.com>, 2016
@@ -80,11 +81,12 @@
 # 顾翔 <c0710204@gmail.com>, 2014
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/).
-# Copyright (C) 2018 EdX
+# Copyright (C) 2019 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
 # vingte <411029240@qq.com>, 2014
+# abby li <yc.li@eliteu.cn>, 2019
 # Anna Hu <dejilibaobao@163.com>, 2014
 # BertZou <turingcat@gmail.com>, 2015
 # bnw, 2014
@@ -141,10 +143,11 @@
 # 肖寒 <bookman@vip.163.com>, 2013
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)
-# Copyright (C) 2018 edX
+# Copyright (C) 2019 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
+# abby li <yc.li@eliteu.cn>, 2019
 # alisan617, 2017
 # alisan617, 2017
 # Bill <power_free@126.com>, 2015
@@ -173,10 +176,11 @@
 # 胡超威 <chadennishu@gmail.com>, 2014
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)
-# Copyright (C) 2018 edX
+# Copyright (C) 2019 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
+# abby li <yc.li@eliteu.cn>, 2019
 # alisan617, 2017
 # BertZou <turingcat@gmail.com>, 2015
 # Changyue Wang <peterwang.dut@gmail.com>, 2015
@@ -206,9 +210,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-12-30 20:42+0000\n"
-"PO-Revision-Date: 2018-12-12 14:22+0000\n"
-"Last-Translator: 微 李 <w.li@eliteu.com.cn>\n"
+"POT-Creation-Date: 2019-02-17 20:42+0000\n"
+"PO-Revision-Date: 2019-02-10 20:45+0000\n"
+"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
@@ -499,12 +503,12 @@ msgstr "回复批注"
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "%(num_points)s point possible (graded, results hidden)"
 msgid_plural "%(num_points)s points possible (graded, results hidden)"
-msgstr[0] "%(num_points)s 满分 (计入成绩, 隐藏答案)"
+msgstr[0] "%(num_points)s 满分 (计入成绩，隐藏答案)"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "%(num_points)s point possible (ungraded, results hidden)"
 msgid_plural "%(num_points)s points possible (ungraded, results hidden)"
-msgstr[0] " %(num_points)s满分 (不计入成绩, 隐藏答案)"
+msgstr[0] " %(num_points)s满分 (不计入成绩，隐藏答案)"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "%(num_points)s point possible (graded)"
@@ -547,7 +551,7 @@ msgstr "您提交了 {filename}；仅支持提交 {allowedFiles} 格式的文件
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Your file {filename} is too large (max size: {maxSize}MB)."
-msgstr "你的文件 {filename} 过大 ( 最大: {maxSize} MB)。"
+msgstr "您的文件 {filename} 过大 ( 最大: {maxSize} MB)。"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "You did not submit the required files: {requiredFiles}."
@@ -1843,7 +1847,7 @@ msgstr "要显示的文字"
 msgid ""
 "The URL you entered seems to be an email address. Do you want to add the "
 "required mailto: prefix?"
-msgstr "输入的URL似乎是一个电子邮件地址，您想加上必要的“mailto:”前缀吗？"
+msgstr "输入的 URL 似乎是一个邮箱地址，您想加上必要的 mailto: 前缀吗？"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1997,7 +2001,7 @@ msgid ""
 "\n"
 "Click Cancel to return to this page without sending your information."
 msgstr ""
-"点击确定，将您的用户名和电子邮件地址发送给第三方应用程序。\n"
+"点击确定，将您的用户名和邮箱发送给第三方应用程序。\n"
 "\n"
 "点击取消，取消发送信息并返回当前页。"
 
@@ -2017,7 +2021,7 @@ msgid ""
 "\n"
 "Click Cancel to return to this page without sending your information."
 msgstr ""
-"点击确定，将你的电子邮件地址发送给第三方应用程序。\n"
+"点击确定，将您的邮箱发送给第三方应用程序。\n"
 "\n"
 "点击取消，取消发送信息并返回当前页。"
 
@@ -2043,7 +2047,7 @@ msgid ""
 "\n"
 "Proceed to the Advanced Editor and convert this problem to XML?"
 msgstr ""
-"如果你使用高级编辑器，该题目将转换为XML格式，并且无法再回到简易编辑器界面。\n"
+"如果您使用高级编辑器，该题目将转换为XML格式，并且无法再回到简易编辑器界面。\n"
 "\n"
 "要继续使用高级编辑器并将该题目转换为XML格式吗？"
 
@@ -2185,7 +2189,7 @@ msgstr[0] "%(value)s秒"
 msgid ""
 "Click on this button to mute or unmute this video or press UP or DOWN "
 "buttons to increase or decrease volume level."
-msgstr "请点击此按钮以对该视频静音／取消静音, 或者使用键盘的上下方向键增大或减小音量。"
+msgstr "请点击此按钮以对该视频静音／取消静音，或者使用键盘的上下方向键增大或减小音量。"
 
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid "Adjust video volume"
@@ -2515,7 +2519,7 @@ msgstr "您确定要删除这个回复吗"
 
 #: common/static/common/js/utils/edx.utils.validate.js
 msgid "The email address you've provided isn't formatted correctly."
-msgstr "您所提供的电子邮件地址的格式不正确。"
+msgstr "您所提供的邮箱格式不正确。"
 
 #: common/static/common/js/utils/edx.utils.validate.js
 msgid "%(field)s must have at least %(count)d characters."
@@ -2527,7 +2531,7 @@ msgstr "%(field)s 最多只能有 %(count)d 个字符。"
 
 #: common/static/common/js/utils/edx.utils.validate.js
 msgid "Please enter your %(field)s."
-msgstr "请输入您的 %(field)s."
+msgstr "请输入您的 %(field)s。"
 
 #: common/static/js/capa/drag_and_drop/base_image.js
 msgid "Drop target image"
@@ -2871,7 +2875,7 @@ msgstr "团队 \"{team}\" 已成功删除。"
 
 #: lms/djangoapps/teams/static/teams/js/views/my_teams.js
 msgid "You are not currently a member of any team."
-msgstr "你目前不是任何团队中的一员。"
+msgstr "您目前不是任何团队中的一员。"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
 msgid "and others"
@@ -2898,7 +2902,7 @@ msgstr "离开这个团队？"
 msgid ""
 "If you leave, you can no longer post in this team's discussions. Your place "
 "will be available to another learner."
-msgstr "如果你离开了，你不能在本团队的讨论区上发言。您的位置将提供给其它的学习者。"
+msgstr "如果您离开了，您将不能在本团队的讨论区上发言。您的位置将提供给其它的学习者。"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 #: lms/static/js/verify_student/views/reverify_view.js
@@ -2908,7 +2912,7 @@ msgstr "确认"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
 msgid "You already belong to another team."
-msgstr "你已经属于另一个团队。"
+msgstr "您已经属于另一个团队。"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
 msgid "This team is full."
@@ -2935,7 +2939,7 @@ msgstr "主题"
 msgid ""
 "See all teams in your course, organized by topic. Join a team to collaborate"
 " with other learners who are interested in the same topic as you are."
-msgstr "在你的课程中查看以主题组织的所有团队。加入一个团队，与其他志同道合的学习者合作。"
+msgstr "在您的课程中查看以主题组织的所有团队。加入一个团队，与其他志同道合的学习者合作。"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "My Team"
@@ -2973,7 +2977,7 @@ msgstr "创建新的团队"
 msgid ""
 "Create a new team if you can't find an existing team to join, or if you "
 "would like to learn with friends you know."
-msgstr "建立一个新的团队-- 如果你找不到现有的团队加入，或者你想和你认识的朋友组队。"
+msgstr "建立一个新的团队-- 如果您找不到现有的团队加入，或者您想和认识的朋友组队。"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 #: lms/djangoapps/teams/static/teams/templates/team-profile-header-actions.underscore
@@ -2984,7 +2988,7 @@ msgstr "编辑团队"
 msgid ""
 "If you make significant changes, make sure you notify members of the team "
 "before making these changes."
-msgstr "如果你做较大更改，请确保您在进行这些更改之前通知团队成员。"
+msgstr "如果您做较大更改，请确保您在进行这些更改之前通知团队成员。"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Membership"
@@ -3038,7 +3042,7 @@ msgid ""
 "topic{span_end}."
 msgstr ""
 "{browse_span_start} 用其他标题浏览团队 {span_end} 或 {search_span_start} "
-"搜索团队{span_end} 於此标题。 如果你仍然无法找到团队来加入， {create_span_start} "
+"搜索团队{span_end} 於此标题。 如果您仍然无法找到团队来加入， {create_span_start} "
 "在此标题新创一个团队{span_end}。"
 
 #: lms/djangoapps/teams/static/teams/js/views/topics.js
@@ -3390,11 +3394,11 @@ msgstr "您的捐款无法提交。"
 
 #: lms/static/js/dashboard/legacy.js
 msgid "You will be refunded the amount you paid."
-msgstr "你将会收到全额退款。"
+msgstr "您将会收到全额退款。"
 
 #: lms/static/js/dashboard/legacy.js
 msgid "You will not be refunded the amount you paid."
-msgstr "你将无法获得全额退款。"
+msgstr "您将无法获得全额退款。"
 
 #: lms/static/js/dashboard/legacy.js
 msgid ""
@@ -3595,7 +3599,7 @@ msgstr "添加学员时发生错误。"
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "Enter a username or email."
-msgstr "输入用户名或电子邮件地址。"
+msgstr "输入用户名或邮箱。"
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "{numUsersAdded} learner has been added to this cohort. "
@@ -3631,7 +3635,7 @@ msgstr "未知用户名: {user}"
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "Invalid email address: {email}"
-msgstr "无效的邮箱地址: {email}"
+msgstr "无效的邮箱: {email}"
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "There was an error when trying to add learners:"
@@ -3696,7 +3700,7 @@ msgstr "上传文件并为学生分组"
 #: lms/static/js/groups/views/cohorts.js
 msgid ""
 "Your file '{file}' has been uploaded. Allow a few minutes for processing."
-msgstr "你的文件'{file}'已经上传。需要几分钟时间进行处理。"
+msgstr "您的文件'{file}'已经上传。需要几分钟时间进行处理。"
 
 #: lms/static/js/groups/views/course_cohort_settings_notification.js
 msgid "Cohorts Enabled"
@@ -3772,7 +3776,7 @@ msgstr "产生调查结果时发生错误。 请再试一次。"
 
 #: lms/static/js/instructor_dashboard/data_download.js
 msgid "Error generating student profile information. Please try again."
-msgstr "生成学生档案信息时发生错误，请重试。"
+msgstr "生成学生资料信息时发生错误，请重试。"
 
 #: lms/static/js/instructor_dashboard/data_download.js
 #: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmarks_list.js
@@ -3839,7 +3843,7 @@ msgstr "用户名"
 #: lms/static/js/instructor_dashboard/membership.js
 #: lms/djangoapps/support/static/support/templates/manage_user.underscore
 msgid "Email"
-msgstr "电子邮件"
+msgstr "邮箱"
 
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "Revoke access"
@@ -3851,7 +3855,7 @@ msgstr "小组"
 
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "Enter username or email"
-msgstr "输入用户名或者电子邮件地址"
+msgstr "输入用户名或者邮箱"
 
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "Please enter a username or email."
@@ -3868,7 +3872,7 @@ msgstr "更改用户权限出错。"
 #: lms/static/js/instructor_dashboard/membership.js
 msgid ""
 "Could not find a user with username or email address '<%- identifier %>'."
-msgstr "未找到用户名或邮箱地址为<%- identifier %>的用户。"
+msgstr "未找到用户名或邮箱为<%- identifier %>的用户。"
 
 #: lms/static/js/instructor_dashboard/membership.js
 msgid ""
@@ -3903,7 +3907,7 @@ msgstr "成功"
 
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "All accounts were created successfully."
-msgstr "所有账户创建成功。"
+msgstr "所有账号创建成功。"
 
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "Error adding/removing users as beta testers."
@@ -3935,7 +3939,7 @@ msgstr "这些用户未从beta测试者中删除："
 msgid ""
 "Users must create and activate their account before they can be promoted to "
 "beta tester."
-msgstr "成为beta测试者之前，需要创建并激活账户。"
+msgstr "成为beta测试者之前，需要创建并激活账号。"
 
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "Could not find users associated with the following identifiers:"
@@ -3955,7 +3959,7 @@ msgstr "用户选课／放弃选课时出错。"
 
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "The following email addresses and/or usernames are invalid:"
-msgstr "以下电子邮件地址／用户名无效："
+msgstr "以下邮箱/用户名无效："
 
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "Successfully enrolled and sent email to the following users:"
@@ -4077,7 +4081,7 @@ msgstr "发至："
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Please enter a student email address or username."
-msgstr "请输入学生的邮件地址或用户名。"
+msgstr "请输入学生的邮箱或用户名。"
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -4151,7 +4155,7 @@ msgstr "重置学生'{student_id}'的入学考试尝试次数时出错了，请�
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Enter a student's username or email address."
-msgstr "输入学生的用户名或电子邮件地址。"
+msgstr "输入学生的用户名或邮箱。"
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -4163,7 +4167,7 @@ msgstr "您是否允许该学生('{student_id}')跳过入学考试？"
 msgid ""
 "An error occurred. Make sure that the student's username or email address is"
 " correct and try again."
-msgstr "发生了一个错误，请确认学生用户名或电子邮件地址正确并再次尝试。"
+msgstr "发生了一个错误，请确认学生用户名或邮箱正确并重试。"
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Entrance exam state is being deleted for student '{student_id}'."
@@ -4556,7 +4560,7 @@ msgstr "继续操作前，请先{htmlStart}激活您的账号{htmlEnd}。"
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
 "{htmlStart}Want to change your email, name, or password instead?{htmlEnd}"
-msgstr "{htmlStart}是否想要更改您的电子邮件，名字，或者密码？{htmlEnd}"
+msgstr "{htmlStart}是否想要更改您的邮箱，名字，或者密码？{htmlEnd}"
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
@@ -4565,7 +4569,7 @@ msgid ""
 "{strongStart}you will no longer be able to use the same email on "
 "edX.{strongEnd}"
 msgstr ""
-"{strongStart}警告：账号将被永久删除。{strongEnd}在继续之前，请仔细阅读以上内容。这是一个不可撤销的操作，并且{strongStart}您将不能够在edX上使用相同的电子邮件地址。.{strongEnd}"
+"{strongStart}警告：账号将被永久删除。{strongEnd}在继续之前，请仔细阅读以上内容。这是一个不可撤销的操作，并且{strongStart}您将不能够在edX上使用相同的邮箱。{strongEnd}"
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid "We’re sorry to see you go!"
@@ -4631,8 +4635,7 @@ msgid ""
 "Account deletion, including removal from email lists, may take a few weeks "
 "to fully process through our system. If you want to opt-out of emails before"
 " then, please unsubscribe from the footer of any email."
-msgstr ""
-"删除账号包括从邮箱列表中移除您的邮箱地址，我们的系统可能需要耗时数周才能完成处理。如果在此期间您不希望收到邮件，请从任意邮件的页脚取消订阅。"
+msgstr "删除账号包括从邮箱列表中移除您的邮箱，我们的系统可能需要耗时数周才能完成处理。如果在此期间您不希望收到邮件，请从任意邮件的页脚取消订阅。"
 
 #: lms/static/js/student_account/tos_modal.js
 msgid "Terms of Service and Honor Code"
@@ -4685,13 +4688,12 @@ msgstr "请检查您的电子邮件"
 msgid ""
 "{paragraphStart}You entered {boldStart}{email}{boldEnd}. If this email "
 "address is associated with your {platform_name} account, we will send a "
-"message with password reset instructions to this email "
+"message with password recovery instructions to this email "
 "address.{paragraphEnd}{paragraphStart}If you do not receive a password reset"
 " message, verify that you entered the correct email address, or check your "
 "spam folder.{paragraphEnd}{paragraphStart}If you need further assistance, "
 "{anchorStart}contact technical support{anchorEnd}.{paragraphEnd}"
 msgstr ""
-"{paragraphStart}您已输入{boldStart}{email}{boldEnd}。如果此邮箱地址与您的{platform_name}账号相关联，我们会发送一封重置密码指引邮件到此邮箱。{paragraphEnd}{paragraphStart}如果您没收到该邮件，请检查所输入的邮箱地址是否正确，或者查看邮箱中的垃圾邮件。{paragraphEnd}{paragraphStart}如需进一步协助，{anchorStart}请联系技术支持{anchorEnd}。{paragraphEnd}"
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
@@ -4705,8 +4707,7 @@ msgid ""
 "%(currentProvider)s account does not have a linked %(platformName)s account."
 " To link your accounts, sign in now using your %(platformName)s password."
 msgstr ""
-"您已成功登录 %(currentProvider)s，但是您的 %(currentProvider)s 帐户尚无关联的 %(platformName)s"
-" 账号。要关联您的账号，请使用您的 %(platformName)s 密码登录。"
+"您已成功登录%(currentProvider)s，但此%(currentProvider)s账号尚未关联到%(platformName)s账号。要关联账号，请使用您的%(platformName)s密码登录。"
 
 #: lms/static/js/student_account/views/RegisterView.js
 msgid "We couldn't create your account."
@@ -4739,20 +4740,22 @@ msgstr "您的账号设置由{enterprise_name}管理，如需帮助请联系您�
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Email Address (Sign In)"
-msgstr "电子邮件地址（登录）"
+msgstr "邮箱（登录）"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
 "You receive messages from {platform_name} and course teams at this address."
-msgstr "此邮箱地址用于接收来自{platform_name}和课程团队的信息。"
+msgstr "此邮箱用于接收来自{platform_name}和课程团队的信息。"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Secondary Email Address"
-msgstr "备选邮箱地址"
+msgid "Recovery Email Address"
+msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid "You may access your account when single-sign on is not available."
-msgstr "如果单点登录不可用，您可以访问自己的帐户。"
+msgid ""
+"You may access your account with this address if single-sign on or access to"
+" your primary email is not available."
+msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
@@ -4775,7 +4778,7 @@ msgstr "您所居住的国家或地区。"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Basic Account Information"
-msgstr "基本账户信息"
+msgstr "基本账号信息"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "These settings include basic information about your account."
@@ -4848,6 +4851,12 @@ msgid "Preferred Language"
 msgstr "首选语言"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+msgid ""
+"We've sent a confirmation message to {new_secondary_email_address}. Click "
+"the link in the message to update your secondary email address."
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Social Media Links"
 msgstr "社交媒体链接"
 
@@ -4868,7 +4877,7 @@ msgstr "请输入您的"
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/static/js/student_account/views/account_settings_view.js
 msgid "Linked Accounts"
-msgstr "关联的帐户"
+msgstr "关联的账号"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
@@ -4906,7 +4915,7 @@ msgstr "此页面包含您在{platform_name}所下的订单信息。"
 msgid ""
 "We've sent a confirmation message to {new_email_address}. Click the link in "
 "the message to update your email address."
-msgstr "我们已会发送一个验证讯息至 {new_email_address}。点击讯息中的链接以更新您的电子邮件信箱。"
+msgstr "我们已会发送一个验证消息至 {new_email_address}。点击消息中的链接以更新您的邮箱。"
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid ""
@@ -4923,11 +4932,11 @@ msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Link your {accountName} account"
-msgstr "关联您的{accountName}帐户"
+msgstr "关联您的{accountName}账号"
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Unlink This Account"
-msgstr "解绑此账户"
+msgstr "解绑此账号"
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid ""
@@ -4937,11 +4946,11 @@ msgstr "您可以使用您的{accountName}账号来登录您的{platformName}账
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Unlink your {accountName} account"
-msgstr "解绑您的{accountName}帐户"
+msgstr "解绑您的{accountName}账号"
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Link Your Account"
-msgstr "关联您的账户"
+msgstr "关联您的账号"
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid ""
@@ -4964,11 +4973,23 @@ msgstr "解绑成功。"
 
 #: lms/static/js/student_account/views/account_settings_view.js
 msgid "Account Information"
-msgstr "帐户信息"
+msgstr "账号信息"
 
 #: lms/static/js/student_account/views/account_settings_view.js
 msgid "Order History"
 msgstr "订单记录"
+
+#: lms/static/js/student_account/views/account_settings_view.js
+msgid ""
+"You have set your language to {beta_language}, which is currently not fully "
+"translated. You can help us translate this language fully by joining the "
+"Transifex community and adding translations from English for learners that "
+"speak {beta_language}."
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_view.js
+msgid "Help Translate into {beta_language}"
+msgstr ""
 
 #: lms/static/js/verify_student/views/image_input_view.js
 msgid "Image Upload Error"
@@ -5208,6 +5229,14 @@ msgstr "您已成功更新目标。"
 msgid "There was an error updating your goal."
 msgstr "更新目标时出错。"
 
+#: lms/templates/ccx/schedule.underscore
+msgid "Expand All"
+msgstr "展开全部"
+
+#: lms/templates/ccx/schedule.underscore
+msgid "Collapse All"
+msgstr "折叠全部"
+
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result"
 msgid_plural "{total_results} results"
@@ -5253,7 +5282,7 @@ msgstr "个人资料"
 msgid ""
 "Tell other learners a little about yourself: where you live, what your "
 "interests are, why you're taking courses, or what you hope to learn."
-msgstr "向其他用户简单介绍下你自己：如居住地、兴趣爱好、为什么选择这些课程，及你希望学习哪方面的知识。"
+msgstr "向其他用户简单介绍下您自己：如居住地、兴趣爱好、为什么选择这些课程，及您希望学习哪方面的知识。"
 
 #: openedx/features/learner_profile/static/learner_profile/js/views/badge_list_container.js
 msgid "Accomplishments Pagination"
@@ -6006,15 +6035,15 @@ msgstr "删除用户过程中出现错误"
 
 #: cms/static/js/views/manage_users_and_roles.js
 msgid "A valid email address is required"
-msgstr "需要一个有效的电子邮件地址"
+msgstr "需要一个有效的邮箱"
 
 #: cms/static/js/views/manage_users_and_roles.js
 msgid "You must enter a valid email address in order to add a new team member"
-msgstr "您必须输入一个有效的电子邮件地址以便添加一个新的团队成员"
+msgstr "您必须输入一个有效的邮箱以便添加一个新的团队成员"
 
 #: cms/static/js/views/manage_users_and_roles.js
 msgid "Return and add email address"
-msgstr "返回并添加电子邮件地址"
+msgstr "返回并添加邮箱"
 
 #: cms/static/js/views/manage_users_and_roles.js
 msgid "Already a member"
@@ -6024,7 +6053,7 @@ msgstr "已经是成员了"
 msgid ""
 "{email} is already on the {container} team. Recheck the email address if you"
 " want to add a new member."
-msgstr "{email}已在{container}团队中。如果您想添加新成员，请再次检查电子邮件地址。"
+msgstr "{email}已在{container}团队中。如果您想添加新成员，请再次检查邮箱是否正确。"
 
 #: cms/static/js/views/manage_users_and_roles.js
 msgid "Return to team listing"
@@ -7094,7 +7123,7 @@ msgstr "所有讨论帖"
 
 #: lms/djangoapps/support/static/support/templates/certificates.underscore
 msgid "username or email"
-msgstr "用户名称/电子邮件"
+msgstr "用户名/邮箱"
 
 #: lms/djangoapps/support/static/support/templates/certificates.underscore
 msgid "course id"
@@ -7177,7 +7206,7 @@ msgstr "提交选课变更"
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 msgid "Username or email address"
-msgstr "用户名或电子邮箱地址"
+msgstr "用户名或邮箱"
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 msgid "Course ID"
@@ -7242,7 +7271,7 @@ msgstr "密码状态"
 
 #: lms/djangoapps/support/static/support/templates/manage_user.underscore
 msgid "Toggle Account Password (Usable/Unusable)"
-msgstr "切换账户密码 （可用/不可用）"
+msgstr "切换账号密码 （可用/不可用）"
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
 msgid "Your team could not be created."
@@ -7339,14 +7368,6 @@ msgstr "在获取这个目录的预览结果时发生错误。请检查您的指
 #: lms/templates/api_admin/catalog-results.underscore
 msgid "This catalog's courses:"
 msgstr "此目录下的课程："
-
-#: lms/templates/ccx/schedule.underscore
-msgid "Expand All"
-msgstr "展开全部"
-
-#: lms/templates/ccx/schedule.underscore
-msgid "Collapse All"
-msgstr "折叠全部"
 
 #: lms/templates/ccx/schedule.underscore
 msgid "Start Date"
@@ -7490,14 +7511,30 @@ msgid "Mark Exam As Completed"
 msgstr "标记考试完成"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
-msgid "timed"
-msgstr "定时"
+msgid "a timed exam"
+msgstr ""
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "The timer on the right shows the time remaining in the exam."
+msgstr ""
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid ""
 "To receive credit for problems, you must select \"Submit\" for each problem "
 "before you select \"End My Exam\"."
 msgstr "在点击 “结束我的考试” 之前，您必须点击 \"提交\" 按钮以获得学分。"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show More"
+msgstr ""
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show Less"
+msgstr ""
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Exam timer and end exam button"
+msgstr ""
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "End My Exam"
@@ -7606,7 +7643,7 @@ msgstr "以下信息已经是您的 {platform} 简述的一部分。我们已将
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Email address"
-msgstr "电子邮件"
+msgstr "邮箱"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Legal name"
@@ -7643,7 +7680,7 @@ msgid ""
 "second comma separated field."
 msgstr ""
 "上传一个用逗号隔开的值 (.csv) "
-"文件，文件要包含获得特例的学员的用户名或电子邮箱地址。将用户名或电子邮箱地址列入第一个逗号隔开的字段中。您可以在第二个用逗号隔开的字段中输入特殊处理的原因描述。"
+"文件，文件要包含获得特例的学员的用户名或邮箱。将用户名或邮箱列入第一个逗号隔开的字段中。您可以在第二个用逗号隔开的字段中输入特殊处理的原因描述。"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Upload a CSV file"
@@ -7658,7 +7695,7 @@ msgstr "添加到特殊处理列表"
 msgid ""
 "To invalidate a certificate for a particular learner, add the username or "
 "email address below."
-msgstr "要设定某个特定学员的证书无效，请在下面添加相应的用户名或电子邮箱地址。"
+msgstr "要设定某个特定学员的证书无效，请在下面添加相应的用户名或邮箱。"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 msgid "Add notes about this learner"
@@ -7697,7 +7734,7 @@ msgstr "个别特殊处理"
 msgid ""
 "Enter the username or email address of each learner that you want to add as "
 "an exception."
-msgstr "输入您要添加为特殊处理的每一位学员的用户名或电子邮件。"
+msgstr "输入您要添加为特殊处理的每一位学员的用户名或邮箱。"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
 msgid "Student email or username"
@@ -7721,7 +7758,7 @@ msgstr "特殊处理列表中的所有用户"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "User Email"
-msgstr "用户电子邮件"
+msgstr "用户邮箱"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Exception Granted"
@@ -7757,7 +7794,7 @@ msgstr "注意：学员只可在一个群组中，添加学员至此分组将覆
 msgid ""
 "Enter email addresses and/or usernames, separated by new lines or commas, "
 "for the learners you want to add. *"
-msgstr "输入邮箱地址和/或用户名以添加学员，换行或用逗号区分用户。"
+msgstr "输入邮箱和/或用户名以添加学员，换行或用逗号区分用户。"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
@@ -7860,7 +7897,7 @@ msgstr[0] "（包括 %(student_count)s 个学生）"
 msgid ""
 "Learners are added to this cohort only when you provide their email "
 "addresses or usernames on this page."
-msgstr "仅当你在此页面中提供学员的电子邮件或用户名时，方可将学员添加至这个组。"
+msgstr "仅当您在此页面中提供学员的邮箱或用户名时，方可将学员添加至这个组。"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-group-header.underscore
 msgid "What does this mean?"
@@ -8175,37 +8212,27 @@ msgstr "新地址"
 
 #: lms/templates/student_account/account.underscore
 msgid "Change My Email Address"
-msgstr "更改我的电子邮件"
+msgstr "更改我的邮箱地址"
 
 #: lms/templates/student_account/account.underscore
 msgid "Reset Password"
 msgstr "重设密码"
 
-#: lms/templates/student_account/account_recovery.underscore
-msgid "Account Recovery"
-msgstr ""
-
-#: lms/templates/student_account/account_recovery.underscore
-msgid ""
-"Please enter your secondary email address below and we will send you "
-"instructions for recovering your account and setting a new password."
-msgstr ""
-
-#: lms/templates/student_account/account_recovery.underscore
-msgid "Recover my account"
+#: lms/templates/student_account/account_settings.underscore
+msgid "Switch Language Back"
 msgstr ""
 
 #: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
-msgstr "账户设置"
+msgstr "账号设置"
 
 #: lms/templates/student_account/account_settings_section.underscore
 msgid "An error occurred. Please reload the page."
 msgstr "发生了一个错误，请重新加载页面。"
 
 #: lms/templates/student_account/form_field.underscore
-msgid "Forgot password?"
-msgstr "忘记密码？"
+msgid "Need help logging in?"
+msgstr ""
 
 #: lms/templates/student_account/hinted_login.underscore
 #, python-format
@@ -8223,12 +8250,12 @@ msgstr "为我显示其他登录或注册方式"
 
 #: lms/templates/student_account/institution_login.underscore
 msgid "Sign in with Institution/Campus Credentials"
-msgstr "使用机构/校园帐号登录"
+msgstr "使用机构/校园账号登录"
 
 #: lms/templates/student_account/institution_login.underscore
 #: lms/templates/student_account/institution_register.underscore
 msgid "Choose your institution from the list below:"
-msgstr "从以下列表中选择你的机构："
+msgstr "从以下列表中选择您的机构："
 
 #: lms/templates/student_account/institution_login.underscore
 msgid "Back to sign in"
@@ -8236,7 +8263,7 @@ msgstr "返回登录"
 
 #: lms/templates/student_account/institution_register.underscore
 msgid "Register with Institution/Campus Credentials"
-msgstr "使用机构/校园帐号注册"
+msgstr "使用机构/校园账号注册"
 
 #: lms/templates/student_account/institution_register.underscore
 msgid "Register through edX"
@@ -8261,7 +8288,7 @@ msgstr "登录以继续学习"
 #: lms/templates/student_account/login.underscore
 msgid ""
 "You already have an edX account with your {enterprise_name} email address."
-msgstr "您已使用{enterprise_name}邮箱地址注册edX账号。"
+msgstr "您已使用邮箱{enterprise_name}注册edX账号。"
 
 #: lms/templates/student_account/login.underscore
 msgid ""
@@ -8291,11 +8318,11 @@ msgstr "使用您的电子邮件和密码或使用以下列出的一个方式在
 
 #: lms/templates/student_account/login.underscore
 msgid "Sign in here using your email address and password."
-msgstr "在这里使用你的电子邮件和密码登录。"
+msgstr "在这里使用您的电子邮件和密码登录。"
 
 #: lms/templates/student_account/login.underscore
 msgid "If you do not yet have an account, use the button below to register."
-msgstr "如果您尚无帐户，请使用以下按钮进行注册。"
+msgstr "如果您尚无账号，请使用以下按钮进行注册。"
 
 #: lms/templates/student_account/login.underscore
 msgid "or sign in with"
@@ -8309,7 +8336,7 @@ msgstr "使用 %(providerName)s 登录"
 #: lms/templates/student_account/login.underscore
 #: lms/templates/student_account/register.underscore
 msgid "Use my institution/campus credentials"
-msgstr "使用我的机构/校园帐号"
+msgstr "使用我的机构/校园账号"
 
 #: lms/templates/student_account/password_reset.underscore
 msgid "Password assistance"
@@ -8317,13 +8344,13 @@ msgstr "密码帮助"
 
 #: lms/templates/student_account/password_reset.underscore
 msgid ""
-"Please enter your email address below and we will send you instructions for "
-"setting a new password."
-msgstr "请在下面输入您的电子邮件以便我们给您发送如何设置新密码的说明。"
+"Please enter your log-in or recovery email address below and we will send "
+"you an email with instructions."
+msgstr ""
 
 #: lms/templates/student_account/password_reset.underscore
-msgid "Reset my password"
-msgstr "重设我的密码"
+msgid "Recover my password"
+msgstr ""
 
 #: lms/templates/student_account/register.underscore
 msgid "Already have an {platformName} account?"
@@ -8335,16 +8362,16 @@ msgstr "登录"
 
 #: lms/templates/student_account/register.underscore
 msgid "Create an account using"
-msgstr "使用以下方式创建账户"
+msgstr "使用以下方式创建账号"
 
 #: lms/templates/student_account/register.underscore
 #, python-format
 msgid "Create account using %(providerName)s."
-msgstr "使用 %(providerName)s 创建帐户。"
+msgstr "使用 %(providerName)s 创建账号。"
 
 #: lms/templates/student_account/register.underscore
 msgid "or create a new one here"
-msgstr "或在此创建一个新账户"
+msgstr "或在此创建一个新账号"
 
 #: lms/templates/student_account/register.underscore
 msgid "Create an Account"
@@ -8357,7 +8384,7 @@ msgstr "请提供您的其他信息，以支持我们的教育研究调查"
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 #, python-format
 msgid "Congratulations! You are now verified on %(platformName)s!"
-msgstr "恭喜！您在%(platformName)s上认证成功！"
+msgstr "恭喜！您在%(platformName)s上已认证成功！"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "You are now enrolled as a verified student for:"
@@ -8365,15 +8392,15 @@ msgstr "您已经已认证学生的身份选择了课程："
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "A list of courses you have just enrolled in as a verified student"
-msgstr "你以认证学生的身份选修的课程列表"
+msgstr "您以认证学生的身份选修的课程列表"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Explore your course!"
-msgstr "探索你的课程！"
+msgstr "探索您的课程！"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Go to your Dashboard"
-msgstr "前往你的控制面板"
+msgstr "前往您的控制面板"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Verified Status"
@@ -8387,7 +8414,7 @@ msgid ""
 "certificates. Verification is good for one year. After one year, you must "
 "submit photos for verification again."
 msgstr ""
-"感谢提交您的照片，我们将于稍后进行审核。您现在就可以注册%(platformName)s上任一提供认证证书的课程。认证有效期为一年。一年后，您必须要提交照片重新认证。"
+"感谢提交您的照片，我们稍后将进行审核。您现在就可以去加入%(platformName)s上任何提供认证证书的课程。认证有效期为一年。一年后，您需要重新提交照片进行认证。"
 
 #: lms/templates/verify_student/error.underscore
 msgid "Error:"
@@ -8430,7 +8457,7 @@ msgstr "给自己拍照"
 msgid ""
 "When your face is in position, use the camera button {icon} below to take "
 "your photo."
-msgstr "当你摆好脸部位置后，使用以下的摄像头按钮 {icon} 进行拍照。"
+msgstr "当您摆好脸部位置后，使用以下的摄像头按钮 {icon} 进行拍照。"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid "To take a successful photo, make sure that:"
@@ -8494,7 +8521,7 @@ msgid ""
 "are not saved or visible anywhere on %(platformName)s after the verification"
 " process is complete."
 msgstr ""
-"我们会采用最高级别的安全技术来加密你的照片并发送到我们的授权服务用于审核目的；一旦完成了认证过程，%(platformName)s不会继续保存这些照片和信息。"
+"我们会采用最高级别的安全技术来加密您的照片并发送到我们的授权服务用于审核目的；一旦完成了认证过程，%(platformName)s不会继续保存这些照片和信息。"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -8512,7 +8539,7 @@ msgstr "拍摄您的身份证件"
 msgid ""
 "Use your webcam to take a photo of your ID. We will match this photo with "
 "the photo of your face and the name on your account."
-msgstr "请用摄像头拍摄一张您身份证件的照片，我们将查看该照片是否与您的面部照片及您在账户中填写的姓名匹配。"
+msgstr "请用摄像头拍摄一张您身份证件的照片，我们将查看该照片是否与您的面部照片及您在账号中填写的姓名匹配。"
 
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid ""
@@ -8531,7 +8558,7 @@ msgstr "请确保您的照片和名字清晰可见"
 
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid "Make sure your ID is well-lit"
-msgstr "请确保你的身份证件光线充足"
+msgstr "请确保您的身份证件光线充足"
 
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid "Once in position, use the camera button {icon} to capture your ID"
@@ -8574,19 +8601,19 @@ msgstr "我们能否将您拍的照片与您身份证件上的照片进行比对
 
 #: lms/templates/verify_student/intro_step.underscore
 msgid "Thanks for returning to verify your ID in: {courseName}"
-msgstr "感谢你返回认证您在 {courseName} 中的 ID"
+msgstr "感谢您返回认证您在 {courseName} 中的 ID"
 
 #: lms/templates/verify_student/intro_step.underscore
 msgid ""
 "You need to activate your account before you can enroll in courses. Check "
 "your inbox for an activation email. After you complete activation you can "
 "return and refresh this page."
-msgstr "在选课之前你需要先激活你的账户，请检查收件箱中的激活邮件。当你完成激活后，你可以返回并刷新本页面。"
+msgstr "在选课之前您需要先激活您的账号，请检查收件箱中的激活邮件。当您完成激活后，您可以返回并刷新本页面。"
 
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Activate Your Account"
-msgstr "激活你的账户"
+msgstr "激活您的账号"
 
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
@@ -8612,20 +8639,20 @@ msgstr "您正在升级您的 {courseName} 选课状态"
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid ""
 "You can now enter your payment information and complete your enrollment."
-msgstr "你可以现在就输入支付信息并完成选课。"
+msgstr "您可以现在就输入支付信息并完成选课。"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid ""
 "You can pay now even if you don't have the following items available, but "
 "you will need to have these by {date} to qualify to earn a Verified "
 "Certificate."
-msgstr "即使您没有满足下面这些要求，您也可以现在付款；但是你只有在 {date} 之前满足这些要求才有资格获得认证证书。"
+msgstr "即使您没有满足下面这些要求，您也可以现在付款；但是您只有在 {date} 之前满足这些要求才有资格获得认证证书。"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid ""
 "An email has been sent to {userEmail} with a link for you to activate your "
 "account."
-msgstr "一封带有激活帐号链接的邮件已发送至{userEmail}。"
+msgstr "一封带有激活账号链接的邮件已发送至{userEmail}。"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid "Why activate?"
@@ -8635,13 +8662,13 @@ msgstr "为什么要激活？"
 msgid ""
 "We ask you to activate your account to ensure it is really you creating the "
 "account and to prevent fraud."
-msgstr "我们要求您激活您的帐号是为了确认真的是您创建了帐户，防止欺诈。"
+msgstr "我们要求您激活您的账号是为了确认真的是您创建了账号，防止欺诈。"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid ""
 "You can pay now even if you don't have the following items available, but "
 "you will need to have these to qualify to earn a Verified Certificate."
-msgstr "即使你没有满足下面这些要求，你也可以现在就付款；但是你只有满足了这些要求才有资格获得认证证书。"
+msgstr "即使您没有满足下面这些要求，您也可以现在就付款；但是您只有满足了这些要求才有资格获得认证证书。"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid "Government-Issued Photo ID"
@@ -8664,7 +8691,7 @@ msgstr "您已经成功验证了您的身份证件！"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid "Your verification status is good until {verificationGoodUntil}."
-msgstr "在 {verificationGoodUntil} 之前，你的认证状态良好。"
+msgstr "在 {verificationGoodUntil} 之前，您的认证状态良好。"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid "price"
@@ -8672,7 +8699,7 @@ msgstr "价格"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "Account Not Activated"
-msgstr "账户未激活"
+msgstr "账号未激活"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "Upgrade to a Verified Certificate for {courseName}"
@@ -8681,11 +8708,11 @@ msgstr "升级到 {courseName} 的验证证书"
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid ""
 "Before you upgrade to a certificate track, you must activate your account."
-msgstr "在你升级至证书路径之前，你必须激活你的帐户。"
+msgstr "在您升级至证书路径之前，您必须激活您的账号。"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "Check your email for an activation message."
-msgstr "检查你的电子邮箱是否收到激活消息。"
+msgstr "检查您的电子邮箱是否收到激活消息。"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "Professional Certificate for {courseName}"
@@ -8698,51 +8725,51 @@ msgstr "{courseName} 的验证证书"
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid ""
 "To receive a certificate, you must also verify your identity before {date}."
-msgstr "要获得证书，你必须在 {date} 之前验证您的身份。"
+msgstr "要获得证书，您必须在 {date} 之前验证您的身份。"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "To receive a certificate, you must also verify your identity."
-msgstr "要获得证书，你必须验证你的身份。"
+msgstr "要获得证书，您必须验证您的身份。"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid ""
 "To verify your identity, you need a webcam and a government-issued photo ID."
-msgstr "要验证你的身份，你需要一个网络摄像头和一张政府签发的有照片的身份证件。"
+msgstr "要验证您的身份，您需要一个网络摄像头和一张政府签发的有照片的身份证件。"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid ""
 "Your ID must be a government-issued photo ID that clearly shows your face."
-msgstr "你的身份证件必须是政府签发的有照片的身份证件，并可以清晰显示你的脸部。"
+msgstr "您的身份证件必须是政府签发的有照片的身份证件，并可以清晰显示您的脸部。"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid ""
 "You will use your webcam to take a picture of your face and of your "
 "government-issued photo ID."
-msgstr "你将使用你的网络摄像头拍摄一张同时显示你的脸部和政府签发的有照片的身份证件的照片。"
+msgstr "您将使用您的网络摄像头拍摄一张同时显示您的脸部和政府签发的有照片的身份证件的照片。"
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Thank you! We have received your payment for {courseName}."
-msgstr "谢谢！我们已经收到你的 {courseName} 付款。"
+msgstr "谢谢！我们已经收到您的 {courseName} 付款。"
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Next Step: Confirm your identity"
-msgstr "下一步：确认你的身份"
+msgstr "下一步：确认您的身份"
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Check your email"
-msgstr "查收你的邮件"
+msgstr "查收您的邮件"
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid ""
 "You need to activate your account before you can enroll in courses. Check "
 "your inbox for an activation email."
-msgstr "在选课之前你需要先激活你的账户，请检查收件箱中的激活邮件。"
+msgstr "在选课之前您需要先激活您的账号，请检查收件箱中的激活邮件。"
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid ""
 "A driver's license, passport, or government-issued ID with your name and "
 "photo."
-msgstr "驾照、护照或者由政府签发的带有你姓名和照片的身份证件。"
+msgstr "驾照、护照或者由政府签发的带有您姓名和照片的身份证件。"
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 #, python-format
@@ -8750,7 +8777,7 @@ msgid ""
 "If you don't verify your identity now, you can still explore your course "
 "from your dashboard. You will receive periodic reminders from "
 "%(platformName)s to verify your identity."
-msgstr "如果你现在不验证你的身份，你仍可以通过控制面板浏览课程。但你会定期从%(platformName)s收到身份验证提醒。"
+msgstr "如果您现在不验证您的身份，您仍可以通过控制面板浏览课程。但您会定期从%(platformName)s收到身份验证提醒。"
 
 #: lms/templates/verify_student/reverify_success_step.underscore
 msgid "Identity Verification In Progress"
@@ -8763,22 +8790,22 @@ msgid ""
 "(usually within 1-2 days). In the meantime, you can still access all "
 "available course content."
 msgstr ""
-"我们已经收到你的信息并正在验证你的身份。验证流程结束后(一般在 1-2 "
-"天内)，你将在你的控制面板上收到一条消息。与此同时，你仍然可以访问所有的课程内容。"
+"我们已经收到您的信息并正在验证您的身份。验证流程结束后(一般在 1-2 "
+"天内)，您将在您的控制面板上收到一条消息。与此同时，您仍然可以访问所有的课程内容。"
 
 #: lms/templates/verify_student/reverify_success_step.underscore
 msgid "Return to Your Dashboard"
-msgstr "返回你的控制面板"
+msgstr "返回您的控制面板"
 
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Review Your Photos"
-msgstr "检查你的照片"
+msgstr "检查您的照片"
 
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid ""
 "Make sure we can verify your identity with the photos and information you "
 "have provided."
-msgstr "请确保我们可以通过你提供的照片及信息来验证你的身份。"
+msgstr "请确保我们可以通过您提供的照片及信息来验证您的身份。"
 
 #: lms/templates/verify_student/review_photos_step.underscore
 #, python-format
@@ -8796,29 +8823,29 @@ msgstr "照片要求："
 
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Does the photo of you show your whole face?"
-msgstr "这张照片中有你的整张脸吗？"
+msgstr "这张照片中有您的整张脸吗？"
 
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Does the photo of you match your ID photo?"
-msgstr "这张照片和你身份证件上的照片相匹配吗？"
+msgstr "这张照片和您身份证件上的照片相匹配吗？"
 
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Is your name on your ID readable?"
-msgstr "你身份证件上的名字是否清晰可见？"
+msgstr "您身份证件上的名字是否清晰可见？"
 
 #: lms/templates/verify_student/review_photos_step.underscore
 #, python-format
 msgid "Does the name on your ID match your account name: %(fullName)s?"
-msgstr "你身份证件上的姓名和你在账户中填写的姓名“%(fullName)s”相符吗？"
+msgstr "您身份证件上的姓名和您在账号中填写的姓名“%(fullName)s”相符吗？"
 
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Edit Your Name"
-msgstr "编辑你的名字"
+msgstr "编辑您的名字"
 
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid ""
 "Make sure that the full name on your account matches the name on your ID."
-msgstr "请确保你在账户中填写的全名和你身份证件中的名字相一致。"
+msgstr "请确保您在账号中填写的全名和您身份证件中的名字相一致。"
 
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Photos don't meet the requirements?"
@@ -8826,17 +8853,17 @@ msgstr "照片不符合要求？"
 
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Retake Your Photos"
-msgstr "重拍你的照片"
+msgstr "重拍您的照片"
 
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Before proceeding, please confirm that your details match"
-msgstr "在进行下一步之前，请确认你提供的信息之间相符"
+msgstr "在进行下一步之前，请确认您提供的信息之间相符"
 
 #: lms/templates/verify_student/webcam_photo.underscore
 msgid ""
 "Don't see your picture? Make sure to allow your browser to use your camera "
 "when it asks for permission."
-msgstr "没有看到你自己？请确认当浏览器请求使用摄像头权限的时候你选择了允许。"
+msgstr "没有看到您自己？请确认当浏览器请求使用摄像头权限的时候您选择了允许。"
 
 #: lms/templates/verify_student/webcam_photo.underscore
 msgid "Live view of webcam"
@@ -8919,14 +8946,14 @@ msgid ""
 "Backpack account. Complete the following steps to add your certificate to "
 "Backpack."
 msgstr ""
-"要在 Mozilla Backpack 上分享您的证书，您必须首先拥有一个 Backpack 帐户。通过完成以下步骤将您的证书添加至 Backpack。"
+"要在 Mozilla Backpack 上分享您的证书，您必须首先拥有一个Backpack账号。通过完成以下步骤将您的证书添加至 Backpack。"
 
 #: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
 #, python-format
 msgid ""
 "Create a %(link_start)sMozilla Backpack%(link_end)s account, or log in to "
 "your existing account"
-msgstr "创建一个 %(link_start)sMozilla Backpack%(link_end)s 帐户，或登录您已有的帐户"
+msgstr "创建一个%(link_start)sMozilla Backpack%(link_end)s 账号，或登录您已有的账号"
 
 #: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
 #, python-format
@@ -8935,7 +8962,7 @@ msgid ""
 "save as)%(link_end)s and then %(upload_link_start)supload%(link_end)s it to "
 "your backpack.</li>"
 msgstr ""
-"%(download_link_start)s下载此图像（右击或单击选项，另存为）%(link_end)s，随后%(upload_link_start)s上传%(link_end)s至你的"
+"%(download_link_start)s下载此图像（右击或单击选项，另存为）%(link_end)s，随后%(upload_link_start)s上传%(link_end)s至您的"
 " backpack 中。</li>"
 
 #: cms/templates/js/access-editor.underscore
@@ -9055,7 +9082,7 @@ msgstr "其他"
 
 #: cms/templates/js/asset-library.underscore
 msgid "You haven't added any assets to this course yet."
-msgstr "你尚未向该课程添加任何资源。"
+msgstr "您尚未向该课程添加任何资源。"
 
 #: cms/templates/js/asset-library.underscore
 msgid "Upload your first asset"
@@ -9387,6 +9414,10 @@ msgid "Ungraded"
 msgstr "未分级"
 
 #: cms/templates/js/course-outline.underscore
+msgid "Onboarding Exam"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
 msgid "Practice proctored Exam"
 msgstr "模拟监考"
 
@@ -9407,6 +9438,10 @@ msgstr "折叠／扩展该%(xblock_type)s"
 #: cms/templates/js/course-outline.underscore
 msgid "Display Name"
 msgstr "显示名称"
+
+#: cms/templates/js/course-outline.underscore
+msgid "Proctoring Settings"
+msgstr ""
 
 #: cms/templates/js/course-outline.underscore
 msgid "Configure"
@@ -10245,6 +10280,18 @@ msgid ""
 msgstr "监考下的考试是计时的，并且每个学生的考试过程将被录像。录像将被审核以确保学生遵守了考试纪律。"
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
+msgid "Onboarding"
+msgstr ""
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"Use Onboarding to introduce learners to proctoring, verify their identity, "
+"and create an onboarding profile. Learners must complete the onboarding "
+"profile step prior to taking a proctored exam. Profile reviews take 2+ "
+"business days."
+msgstr ""
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Practice Proctored"
 msgstr "监考模式模拟考"
 
@@ -10293,7 +10340,7 @@ msgstr "设置规则或期望条例，方便监考审查团队在审查视频时
 
 #: cms/templates/js/transcript-organization-credentials.underscore
 msgid "Account"
-msgstr "账户"
+msgstr "账号"
 
 #: cms/templates/js/transcript-organization-credentials.underscore
 msgid ""

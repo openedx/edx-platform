@@ -5,7 +5,6 @@ from six import text_type
 from django_comment_common.models import Role
 from models import CourseDiscussionSettings
 from openedx.core.djangoapps.course_groups.cohorts import CourseCohortsSettings
-from openedx.core.lib.tests import attr
 from student.models import CourseEnrollment, User
 from utils import get_course_discussion_settings, set_course_discussion_settings
 from xmodule.modulestore import ModuleStoreEnum
@@ -14,7 +13,6 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=1)
 class RoleAssignmentTest(TestCase):
     """
     Basic checks to make sure our Roles get assigned and unassigned as students
@@ -67,7 +65,6 @@ class RoleAssignmentTest(TestCase):
     #     self.assertIn(student_role, another_student.roles.all())
 
 
-@attr(shard=1)
 class CourseDiscussionSettingsTest(ModuleStoreTestCase):
 
     def setUp(self):

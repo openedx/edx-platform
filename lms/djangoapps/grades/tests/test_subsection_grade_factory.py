@@ -28,7 +28,6 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
     persistent grades are functioning as expected, and that the flag to
     enable saving subsection grades blocks/enables that feature as expected.
     """
-    shard = 4
 
     def assert_grade(self, grade, expected_earned, expected_possible):
         """
@@ -114,7 +113,14 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
                 self.subsection_grade_factory.create(self.sequence)
         self.assertEqual(mock_read_saved_grade.called, feature_flag and course_setting)
 
-    def test_update_with_override(self):
+    @ddt.data(
+        (0, None),
+        (None, 3),
+        (None, None),
+        (0, 3),
+    )
+    @ddt.unpack
+    def test_update_with_override(self, earned_graded_override, possible_graded_override):
         """
         Tests that when a PersistentSubsectionGradeOverride exists, the update()
         method returns a CreateSubsectionGrade with scores that account
@@ -134,8 +140,9 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
         PersistentSubsectionGradeOverride.update_or_create_override(
             UserFactory(),
             persistent_grade,
-            earned_graded_override=0,
-            earned_all_override=0,
+            earned_graded_override=earned_graded_override,
+            earned_all_override=earned_graded_override,
+            possible_graded_override=possible_graded_override,
             feature=PersistentSubsectionGradeOverrideHistory.GRADEBOOK,
         )
 
@@ -143,4 +150,10 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
         # the subsection grade returned should be 0/3 due to the override.
         with mock_get_score(2, 3):
             grade = self.subsection_grade_factory.update(self.sequence)
-            self.assert_grade(grade, 0, 3)
+            expected_earned = earned_graded_override
+            if earned_graded_override is None:
+                expected_earned = persistent_grade.earned_graded
+            expected_possible = possible_graded_override
+            if possible_graded_override is None:
+                expected_possible = persistent_grade.possible_graded
+            self.assert_grade(grade, expected_earned, expected_possible)

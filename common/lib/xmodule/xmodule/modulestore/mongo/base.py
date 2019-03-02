@@ -1025,7 +1025,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                 course_queries.append(course_query)
             query = {'$or': course_queries}
         elif course_org_filter:
-                query['_id.org'] = course_org_filter
+            query['_id.org'] = course_org_filter
 
         course_records = self.collection.find(query, {'metadata': True})
 
@@ -1856,7 +1856,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         # Build an update set with potentially multiple embedded fields.
         updates_by_type = {}
         for asset_type, assets in assets_by_type.iteritems():
-            updates_by_type[self._make_mongo_asset_key(asset_type)] = assets.as_list()
+            updates_by_type[self._make_mongo_asset_key(asset_type)] = list(assets)
 
         # Update the document.
         self.asset_collection.update(

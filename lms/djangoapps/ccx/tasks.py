@@ -35,11 +35,11 @@ def send_ccx_course_published(course_key):
         try:
             ccx_key = CCXLocator.from_course_locator(course_key, unicode(ccx.id))
         except InvalidKeyError:
-            log.info('Attempt to publish course with deprecated id. Course: %s. CCX: %s', course_key, ccx.id)
+            log.info(u'Attempt to publish course with deprecated id. Course: %s. CCX: %s', course_key, ccx.id)
             continue
         responses = SignalHandler.course_published.send(
             sender=ccx,
             course_key=ccx_key
         )
         for rec, response in responses:
-            log.info('Signal fired when course is published. Receiver: %s. Response: %s', rec, response)
+            log.info(u'Signal fired when course is published. Receiver: %s. Response: %s', rec, response)

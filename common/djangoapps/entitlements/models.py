@@ -26,6 +26,8 @@ log = logging.getLogger("common.entitlements.models")
 class CourseEntitlementPolicy(models.Model):
     """
     Represents the Entitlement's policy for expiration, refunds, and regaining a used certificate
+
+    .. no_pii:
     """
 
     DEFAULT_EXPIRATION_PERIOD_DAYS = 730
@@ -146,6 +148,8 @@ class CourseEntitlementPolicy(models.Model):
 class CourseEntitlement(TimeStampedModel):
     """
     Represents a Student's Entitlement to a Course Run for a given Course.
+
+    .. no_pii:
     """
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     uuid = models.UUIDField(default=uuid_tools.uuid4, editable=False, unique=True)
@@ -386,7 +390,7 @@ class CourseEntitlement(TimeStampedModel):
                 mode=entitlement.mode
             )
         except CourseEnrollmentException:
-            log.exception('Login for Course Entitlement {uuid} failed'.format(uuid=entitlement.uuid))
+            log.exception(u'Login for Course Entitlement {uuid} failed'.format(uuid=entitlement.uuid))
             return False
 
         entitlement.set_enrollment(enrollment)
@@ -432,7 +436,7 @@ class CourseEntitlement(TimeStampedModel):
         if not refund_successful:
             # This state is achieved in most cases by a failure in the ecommerce service to process the refund.
             log.warn(
-                'Entitlement Refund failed for Course Entitlement [%s], alert User',
+                u'Entitlement Refund failed for Course Entitlement [%s], alert User',
                 self.uuid
             )
             # Force Transaction reset with an Integrity error exception, this will revert all previous transactions
@@ -442,6 +446,8 @@ class CourseEntitlement(TimeStampedModel):
 class CourseEntitlementSupportDetail(TimeStampedModel):
     """
     Table recording support interactions with an entitlement
+
+    .. no_pii:
     """
     # Reasons deprecated
     LEAVE_SESSION = 'LEAVE'

@@ -1,6 +1,8 @@
+# pylint: disable=unicode-format-string
 """
 A class used for defining and running test suites
 """
+from __future__ import print_function
 import sys
 import subprocess
 
@@ -38,7 +40,7 @@ class TestSuite(object):
 
         i.e. Checking for and defining required directories.
         """
-        print "\nSetting up for {suite_name}".format(suite_name=self.root)
+        print(u"\nSetting up for {suite_name}".format(suite_name=self.root))
         self.failed_suites = []
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -51,7 +53,7 @@ class TestSuite(object):
 
         i.e. Cleaning mongo after the lms tests run.
         """
-        print "\nCleaning up after {suite_name}".format(suite_name=self.root)
+        print(u"\nCleaning up after {suite_name}".format(suite_name=self.root))
 
     @property
     def cmd(self):
@@ -122,12 +124,12 @@ class TestSuite(object):
         Writes a list of failed_suites to sys.stderr
         """
         if self.failed_suites:
-            msg = colorize('red', "\n\n{bar}\nTests failed in the following suites:\n* ".format(bar="=" * 48))
+            msg = colorize('red', u"\n\n{bar}\nTests failed in the following suites:\n* ".format(bar="=" * 48))
             msg += colorize('red', '\n* '.join([s.root for s in self.failed_suites]) + '\n\n')
         else:
-            msg = colorize('green', "\n\n{bar}\nNo test failures ".format(bar="=" * 48))
+            msg = colorize('green', u"\n\n{bar}\nNo test failures ".format(bar="=" * 48))
 
-        print msg
+        print(msg)
 
     def run(self):
         """

@@ -2,6 +2,7 @@
 Signle support contact view
 """
 from django.conf import settings
+from django.http import Http404
 from django.views.generic import View
 from edxmako.shortcuts import render_to_response
 from student.models import CourseEnrollment
@@ -16,6 +17,9 @@ class ContactUsView(View):
     """
 
     def get(self, request):
+        if not configuration_helpers.get_value('CONTACT_US_PAGE', True):
+            raise Http404
+
         context = {
             'platform_name': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME),
             'support_email': configuration_helpers.get_value('CONTACT_EMAIL', settings.CONTACT_EMAIL),

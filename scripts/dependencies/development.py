@@ -20,7 +20,6 @@ pattern_fragments = [
     r'^xmodule/modulestore/perf_tests'        # modulestore performance tests
 
     # Development-only package dependencies
-    r'^code_block_timer',                     # code_block_timer
     r'^debug_toolbar',                        # django-debug-toolbar
 ]
 

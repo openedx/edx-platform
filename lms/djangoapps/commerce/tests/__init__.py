@@ -63,7 +63,7 @@ class EdxRestApiClientTest(TestCase):
                 }
             }
             expected_jwt = create_jwt_for_user(self.user, additional_claims=claims)
-            expected_header = 'JWT {}'.format(expected_jwt)
+            expected_header = u'JWT {}'.format(expected_jwt)
             self.assertEqual(actual_header, expected_header)
 
     @httpretty.activate

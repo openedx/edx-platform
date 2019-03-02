@@ -50,7 +50,7 @@ class CohortedDiscussionTestMixin(BaseDiscussionMixin, CohortTestMixin):
         self.refresh_thread_page(self.thread_id)
         self.assertEquals(
             self.thread_page.get_group_visibility_label(),
-            "This post is visible only to {}.".format(self.cohort_1_name)
+            u"This post is visible only to {}.".format(self.cohort_1_name)
         )
 
         # Disable cohorts and verify that the post now shows as visible to everyone.

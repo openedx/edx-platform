@@ -22,7 +22,6 @@ SAMPLE_GUIDS_LIST = ['SAMPLE_VERSION_GUID', 'SAMPLE_UNICODE_VERSION_GUID', 'BSON
 
 
 class TestBulkWriteMixin(unittest.TestCase):
-    shard = 2
 
     def setUp(self):
         super(TestBulkWriteMixin, self).setUp()
@@ -64,7 +63,6 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
     """
     Tests of the bulk write mixin when bulk operations aren't active.
     """
-    shard = 2
 
     @ddt.data(*SAMPLE_GUIDS_LIST)
     def test_no_bulk_read_structure(self, version_guid_name):
@@ -310,7 +308,6 @@ class TestBulkWriteMixinFindMethods(TestBulkWriteMixin):
     """
     Tests of BulkWriteMixin methods for finding many structures or indexes
     """
-    shard = 2
 
     def test_no_bulk_find_matching_course_indexes(self):
         branch = Mock(name='branch')
@@ -588,7 +585,6 @@ class TestBulkWriteMixinOpen(TestBulkWriteMixin):
     """
     Tests of the bulk write mixin when bulk write operations are open
     """
-    shard = 2
 
     def setUp(self):
         super(TestBulkWriteMixinOpen, self).setUp()

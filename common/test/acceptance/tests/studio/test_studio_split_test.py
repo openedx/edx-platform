@@ -322,7 +322,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
 
         # I publish and view in LMS and it is rendered correctly
         if publish:
-            unit.publish_action.click()
+            unit.publish()
         unit.view_published_version()
         self.assertEqual(len(self.browser.window_handles), 2)
         courseware_page.wait_for_page()

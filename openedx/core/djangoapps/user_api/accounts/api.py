@@ -209,8 +209,7 @@ def update_account_settings(requesting_user, update, username=None):
                 "user_message": text_type(err)
             }
         else:
-            account_recovery.secondary_email = update["secondary_email"]
-            account_recovery.save()
+            account_recovery.update_recovery_email(update["secondary_email"])
 
     # If the user asked to change full name, validate it
     if changing_full_name:
@@ -471,36 +470,6 @@ def request_password_change(email, is_secure):
     # Binding data to a form requires that the data be passed as a dictionary
     # to the Form class constructor.
     form = forms.PasswordResetFormNoActive({'email': email})
-
-    # Validate that a user exists with the given email address.
-    if form.is_valid():
-        # Generate a single-use link for performing a password reset
-        # and email it to the user.
-        form.save(
-            from_email=configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL),
-            use_https=is_secure,
-            request=get_current_request(),
-        )
-    else:
-        # No user with the provided email address exists.
-        raise errors.UserNotFound
-
-
-@helpers.intercept_errors(errors.UserAPIInternalError, ignore_errors=[errors.UserAPIRequestError])
-def request_account_recovery(email, is_secure):
-    """
-    Email a single-use link for performing a password reset so users can login with new email and password.
-
-    Arguments:
-        email (str): An email address
-        is_secure (bool): Whether the request was made with HTTPS
-
-    Raises:
-        errors.UserNotFound: Raised if secondary email address does not exist.
-    """
-    # Binding data to a form requires that the data be passed as a dictionary
-    # to the Form class constructor.
-    form = student_forms.AccountRecoveryForm({'email': email})
 
     # Validate that a user exists with the given email address.
     if form.is_valid():

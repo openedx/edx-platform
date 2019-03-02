@@ -84,7 +84,7 @@ class TestThemingViews(TestCase):
         self.assertEquals(response.status_code, 200)
         self.assertContains(
             response,
-            '<option value="{theme_name}" selected=selected>'.format(theme_name=TEST_THEME_NAME)
+            u'<option value="{theme_name}" selected=selected>'.format(theme_name=TEST_THEME_NAME)
         )
 
         # Request to reset the theme
@@ -101,5 +101,5 @@ class TestThemingViews(TestCase):
         self.assertEquals(response.status_code, 200)
         self.assertContains(
             response,
-            '<option value="{theme_name}">'.format(theme_name=TEST_THEME_NAME)
+            u'<option value="{theme_name}">'.format(theme_name=TEST_THEME_NAME)
         )

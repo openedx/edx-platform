@@ -51,7 +51,6 @@ class TestGitAddCourse(SharedModuleStoreTestCase):
     """
     Tests the git_add_course management command for proper functions.
     """
-    shard = 3
     TEST_REPO = 'https://github.com/mitocw/edx4edx_lite.git'
     TEST_COURSE = 'MITx/edx4edx/edx4edx'
     TEST_BRANCH = 'testing_do_not_delete'
@@ -82,7 +81,7 @@ class TestGitAddCourse(SharedModuleStoreTestCase):
             'blah', 'blah', 'blah', 'blah')
         # Not a valid path.
         self.assertCommandFailureRegexp(
-            'Path {0} doesn\'t exist, please create it,'.format(self.git_repo_dir),
+            u'Path {0} doesn\'t exist, please create it,'.format(self.git_repo_dir),
             'blah')
         # Test successful import from command
         if not os.path.isdir(self.git_repo_dir):

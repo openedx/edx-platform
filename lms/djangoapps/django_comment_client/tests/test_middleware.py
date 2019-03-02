@@ -9,7 +9,6 @@ import lms.lib.comment_client
 
 
 class AjaxExceptionTestCase(TestCase):
-    shard = 1
 
     def setUp(self):
         super(AjaxExceptionTestCase, self).setUp()

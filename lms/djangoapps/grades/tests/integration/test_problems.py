@@ -26,7 +26,6 @@ class TestMultipleProblemTypesSubsectionScores(SharedModuleStoreTestCase):
     """
     Test grading of different problem types.
     """
-    shard = 4
 
     SCORED_BLOCK_COUNT = 7
     ACTUAL_TOTAL_POSSIBLE = 17.0
@@ -101,7 +100,6 @@ class TestVariedMetadata(ProblemSubmissionTestMixin, ModuleStoreTestCase):
     Test that changing the metadata on a block has the desired effect on the
     persisted score.
     """
-    shard = 4
     default_problem_metadata = {
         u'graded': True,
         u'weight': 2.5,
@@ -210,7 +208,6 @@ class TestWeightedProblems(SharedModuleStoreTestCase):
     """
     Test scores and grades with various problem weight values.
     """
-    shard = 4
 
     @classmethod
     def setUpClass(cls):

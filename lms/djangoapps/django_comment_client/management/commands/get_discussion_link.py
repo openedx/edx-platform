@@ -17,7 +17,7 @@ class Command(BaseCommand):
 
         course = get_course(course_key)
         if not course:
-            raise CommandError('Invalid course id: {}'.format(course_id))
+            raise CommandError(u'Invalid course id: {}'.format(course_id))
 
         if course.discussion_link:
             self.stdout.write(course.discussion_link)

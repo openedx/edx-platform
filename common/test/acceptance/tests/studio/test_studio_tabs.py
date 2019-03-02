@@ -9,6 +9,7 @@ class PagesTest(StudioCourseTest):
     """
     Test that Pages functionality is working properly on studio side
     """
+    shard = 23
 
     def setUp(self, is_staff=True):  # pylint: disable=arguments-differ
         """
@@ -99,11 +100,86 @@ class PagesTest(StudioCourseTest):
         self.pages_page.set_field_val("Display Name", "First")
         self.pages_page.save()
         self.pages_page.add_static_page()
-        self.pages_page.drag_and_drop_first_static_page_to_last()
+        self.pages_page.drag_and_drop()
         self.pages_page.refresh_and_wait_for_load()
         static_tab_titles = self.pages_page.static_tab_titles
         self.assertEqual(
             static_tab_titles,
             ['Empty', 'First'],
-            'Order should be:["Empty", "First] but getting {} from the page'.format(static_tab_titles)
+            u'Order should be:["Empty", "First] but getting {} from the page'.format(static_tab_titles)
         )
+
+    def test_user_can_reorder_builtin_tabs(self):
+        """
+        Scenario: Users can reorder built-in pages
+            Given I have opened the pages page in a new course
+                Then the built-in pages are in the default order
+            When I drag the first page to the last
+                Then the built-in pages are switched
+            And I reload the page
+                Then the built-in pages are switched
+        """
+        default_order = ['Home', 'Course', 'Discussion', 'Wiki', 'Progress']
+        new_order = ['Home', 'Course', 'Wiki', 'Progress', 'Discussion']
+        self.assertEqual(
+            self.pages_page.built_in_page_titles,
+            default_order,
+            'Tabs are not in the default order'
+        )
+        self.pages_page.drag_and_drop(default_tab=True)
+        built_in_page_titles = self.pages_page.built_in_page_titles
+        self.assertEqual(
+            built_in_page_titles,
+            new_order,
+            'Tabs are not in the new order'
+        )
+        self.pages_page.refresh_and_wait_for_load()
+        self.assertEqual(
+            built_in_page_titles,
+            new_order,
+            'Tabs are not in the new order'
+        )
+
+    def test_users_can_toggle_visibility(self):
+        """
+        Scenario: Users can toggle visibility on hideable pages
+        Given I have opened the pages page in a new course
+            Then I should see the "wiki" page as "visible"
+        When I toggle the visibility of the "wiki" page
+            Then I should see the "wiki" page as "hidden"
+        And I reload the page
+            Then I should see the "wiki" page as "hidden"
+        When I toggle the visibility of the "wiki" page
+            Then I should see the "wiki" page as "visible"
+        And I reload the page
+            Then I should see the "wiki" page as "visible"
+        """
+        tab = 'wiki'
+        self.assertTrue(self.pages_page.is_tab_visible(tab))
+        self.pages_page.toggle_tab(tab)
+        self.assertFalse(self.pages_page.is_tab_visible(tab))
+        self.pages_page.refresh_and_wait_for_load()
+        self.assertFalse(self.pages_page.is_tab_visible(tab))
+        self.pages_page.toggle_tab(tab)
+        self.assertTrue(self.pages_page.is_tab_visible(tab))
+        self.pages_page.refresh_and_wait_for_load()
+        self.assertTrue(self.pages_page.is_tab_visible(tab))
+
+    def test_default_order_with_static_pages(self):
+        """
+        Scenario: Users can reorder built-in pages amongst static pages
+        Given I have created two different static pages
+            Then the pages are in the default order
+        """
+        expected_order = ['Home', 'Course', 'Discussion', 'Wiki', 'Progress', 'First', 'Empty']
+        self.assertFalse(
+            self.pages_page.is_static_page_present(),
+            'Static tab should not be present on the page for a newly created course'
+        )
+        self.pages_page.add_static_page()
+        self.pages_page.click_edit_static_page()
+        self.pages_page.set_field_val("Display Name", "First")
+        self.pages_page.save()
+        self.pages_page.add_static_page()
+        tab_names = self.pages_page.built_in_page_titles + self.pages_page.static_tab_titles
+        self.assertEqual(tab_names, expected_order)

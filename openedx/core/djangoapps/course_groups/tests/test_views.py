@@ -13,7 +13,6 @@ from django_comment_common.models import CourseDiscussionSettings
 from django_comment_common.utils import get_course_discussion_settings
 from lms.djangoapps.courseware.tests.factories import StaffFactory, InstructorFactory
 from opaque_keys.edx.locator import CourseLocator
-from openedx.core.lib.tests import attr
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -32,7 +31,6 @@ from ..views import (
 from .helpers import CohortFactory, CourseCohortFactory, config_course_cohorts, config_course_cohorts_legacy
 
 
-@attr(shard=2)
 class CohortViewsTestCase(ModuleStoreTestCase):
     """
     Base class which sets up a course and staff/non-staff users.
@@ -144,7 +142,6 @@ class CohortViewsTestCase(ModuleStoreTestCase):
         return json.loads(response.content)
 
 
-@attr(shard=2)
 class CourseCohortSettingsHandlerTestCase(CohortViewsTestCase):
     """
     Tests the `course_cohort_settings_handler` view.
@@ -234,7 +231,6 @@ class CourseCohortSettingsHandlerTestCase(CohortViewsTestCase):
         )
 
 
-@attr(shard=2)
 class CohortHandlerTestCase(CohortViewsTestCase):
     """
     Tests the `cohort_handler` view.
@@ -604,7 +600,6 @@ class CohortHandlerTestCase(CohortViewsTestCase):
         )
 
 
-@attr(shard=2)
 class UsersInCohortTestCase(CohortViewsTestCase):
     """
     Tests the `users_in_cohort` view.
@@ -737,7 +732,6 @@ class UsersInCohortTestCase(CohortViewsTestCase):
         self.request_users_in_cohort(cohort, self.course, -1, should_return_bad_request=True)
 
 
-@attr(shard=2)
 class AddUsersToCohortTestCase(CohortViewsTestCase):
     """
     Tests the `add_users_to_cohort` view.
@@ -1063,7 +1057,7 @@ class AddUsersToCohortTestCase(CohortViewsTestCase):
         """
         unknown = "unknown_user"
         response_dict = self.request_add_users_to_cohort(
-            " {} {}\t{}, \r\n{}".format(
+            u" {} {}\t{}, \r\n{}".format(
                 unknown,
                 self.cohort1_users[0].username,
                 self.cohort2_users[0].username,
@@ -1130,7 +1124,6 @@ class AddUsersToCohortTestCase(CohortViewsTestCase):
         )
 
 
-@attr(shard=2)
 class RemoveUserFromCohortTestCase(CohortViewsTestCase):
     """
     Tests the `remove_user_from_cohort` view.
@@ -1201,7 +1194,7 @@ class RemoveUserFromCohortTestCase(CohortViewsTestCase):
             username,
             response_dict,
             cohort,
-            expected_error_msg='No user \'{0}\''.format(username)
+            expected_error_msg=u'No user \'{0}\''.format(username)
         )
 
     def test_can_remove_user_not_in_cohort(self):

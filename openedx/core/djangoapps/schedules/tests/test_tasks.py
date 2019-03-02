@@ -38,7 +38,7 @@ class TestScheduleMessageBaseTask(CacheIsolationTestCase):
                 day_offset=2
             )
             patches['log_info'].assert_called_once_with(
-                'Message queuing disabled for site %s', self.site.domain)
+                u'Message queuing disabled for site %s', self.site.domain)
             send.apply_async.assert_not_called()
 
     @ddt.data(0, 2, -3)
@@ -59,7 +59,7 @@ class TestScheduleMessageBaseTask(CacheIsolationTestCase):
             target_date = current_date.replace(hour=0, minute=0, second=0, microsecond=0) + \
                 datetime.timedelta(day_offset)
             patches['log_info'].assert_any_call(
-                'Target date = %s', target_date.isoformat())
+                u'Target date = %s', target_date.isoformat())
             assert send.call_count == DEFAULT_NUM_BINS
 
     @ddt.data(True, False)

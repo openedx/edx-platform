@@ -12,6 +12,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.certificates.models import CertificateInvalidation, CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import CertificateInvalidationFactory
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from student.models import CourseEnrollment
 from student.roles import GlobalStaff, SupportStaffRole
 from student.tests.factories import UserFactory
@@ -26,7 +27,6 @@ class CertificateSupportTestCase(ModuleStoreTestCase):
     """
     Base class for tests of the certificate support views.
     """
-    shard = 4
 
     SUPPORT_USERNAME = "support"
     SUPPORT_EMAIL = "support@example.com"
@@ -92,14 +92,17 @@ class CertificateSearchTests(CertificateSupportTestCase):
     """
     Tests for the certificate search end-point used by the support team.
     """
-    shard = 4
 
     def setUp(self):
         """
         Create a course
         """
         super(CertificateSearchTests, self).setUp()
-        self.course = CourseFactory()
+        self.course = CourseFactory(
+            org=self.CERT_COURSE_KEY.org,
+            course=self.CERT_COURSE_KEY.course,
+            run=self.CERT_COURSE_KEY.run,
+        )
         self.course.cert_html_view_enabled = True
 
         #course certificate configurations
@@ -118,6 +121,10 @@ class CertificateSearchTests(CertificateSupportTestCase):
         self.course.certificates = {'certificates': certificates}
         self.course.save()
         self.store.update_item(self.course, self.user.id)
+        self.course_overview = CourseOverviewFactory(
+            id=self.course.id,
+            cert_html_view_enabled=True,
+        )
 
     @ddt.data(
         (GlobalStaff, True),
@@ -194,6 +201,7 @@ class CertificateSearchTests(CertificateSupportTestCase):
         self.assertEqual(retrieved_cert["status"], self.CERT_STATUS)
         self.assertEqual(retrieved_cert["type"], self.CERT_MODE)
         self.assertEqual(retrieved_cert["download_url"], self.CERT_DOWNLOAD_URL)
+        self.assertFalse(retrieved_cert["regenerate"])
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_download_link(self):
@@ -215,6 +223,7 @@ class CertificateSearchTests(CertificateSupportTestCase):
                 kwargs={"user_id": self.student.id, "course_id": self.course.id}
             )
         )
+        self.assertTrue(retrieved_cert["regenerate"])
 
     def _search(self, user_filter, course_filter=None):
         """Execute a search and return the response. """
@@ -229,7 +238,6 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
     """
     Tests for the certificate regeneration end-point used by the support team.
     """
-    shard = 4
 
     def setUp(self):
         """
@@ -270,6 +278,10 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
             self.assertEqual(response.status_code, 403)
 
     def test_regenerate_certificate(self):
+        """Test web certificate regenration."""
+        self.cert.download_url = ''
+        self.cert.save()
+
         response = self._regenerate(
             course_key=self.course.id,
             username=self.STUDENT_USERNAME,
@@ -412,7 +424,6 @@ class CertificateGenerateTests(CertificateSupportTestCase):
     """
     Tests for the certificate generation end-point used by the support team.
     """
-    shard = 4
 
     def setUp(self):
         """

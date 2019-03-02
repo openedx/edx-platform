@@ -16,6 +16,7 @@ class CourseDiscoveryTest(AcceptanceTest):
     """
     Test searching for courses.
     """
+    shard = 20
 
     STAFF_USERNAME = "STAFF_TESTER"
     STAFF_EMAIL = "staff101@example.com"

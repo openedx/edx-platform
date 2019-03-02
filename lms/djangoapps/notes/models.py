@@ -10,6 +10,14 @@ from six import text_type
 
 
 class Note(models.Model):
+    """
+    Stores user Notes for the LMS local Notes service.
+
+    .. pii: Legacy model for an app that edx.org hasn't used since 2013
+    .. pii_types: other
+    .. pii_retirement: retained
+    """
+
     user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
     course_id = CourseKeyField(max_length=255, db_index=True)
     uri = models.CharField(max_length=255, db_index=True)

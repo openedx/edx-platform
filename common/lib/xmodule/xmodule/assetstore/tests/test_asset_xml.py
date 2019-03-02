@@ -16,7 +16,6 @@ class TestAssetXml(unittest.TestCase):
     """
     Tests for storing/querying course asset metadata.
     """
-    shard = 1
 
     def setUp(self):
         super(TestAssetXml, self).setUp()

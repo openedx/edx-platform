@@ -10,6 +10,7 @@ file and check it in at the same time as your model changes. To do that,
 2. ./manage.py lms schemamigration student --auto description_of_your_change
 3. Add the migration file created in edx-platform/common/djangoapps/student/migrations/
 """
+from __future__ import print_function
 import hashlib
 import json
 import logging
@@ -125,6 +126,8 @@ class AnonymousUserId(models.Model):
 
     We generate anonymous_user_id using md5 algorithm,
     and use result in hex form, so its length is equal to 32 bytes.
+
+    .. no_pii: We store anonymous_user_ids here, but do not consider them PII under OEP-30.
     """
 
     objects = NoneToEmptyManager()
@@ -375,6 +378,8 @@ class UserStanding(models.Model):
     Currently, we're only disabling accounts; in the future we can imagine
     taking away more specific privileges, like forums access, or adding
     more specific karma levels or probationary stages.
+
+    .. no_pii:
     """
     ACCOUNT_DISABLED = "disabled"
     ACCOUNT_ENABLED = "enabled"
@@ -408,6 +413,10 @@ class UserProfile(models.Model):
 
     Some of the fields are legacy ones that were captured during the initial
     MITx fall prototype.
+
+    .. pii: Contains many PII fields. Retired in AccountRetirementView.
+    .. pii_types: name, location, birth_date, gender, biography
+    .. pii_retirement: local_api
     """
     # cache key format e.g user.<user_id>.profile.country = 'SG'
     PROFILE_COUNTRY_CACHE_KEY = u"user.{user_id}.profile.country"
@@ -425,9 +434,15 @@ class UserProfile(models.Model):
     meta = models.TextField(blank=True)  # JSON dictionary for future expansion
     courseware = models.CharField(blank=True, max_length=255, default='course.xml')
 
+    # Language is deprecated and no longer used. Old rows exist that have
+    # user-entered free form text values (ex. "English"), some of which have
+    # non-ASCII values. You probably want UserPreference version of this, which
+    # stores the user's preferred language code. See openedx/core/djangoapps/lang_pref
+    # for more information.
+    language = models.CharField(blank=True, max_length=255, db_index=True)
+
     # Location is no longer used, but is held here for backwards compatibility
     # for users imported from our first class.
-    language = models.CharField(blank=True, max_length=255, db_index=True)
     location = models.CharField(blank=True, max_length=255, db_index=True)
 
     # Optional demographic data we started capturing from Fall 2012
@@ -694,6 +709,8 @@ class UserSignupSource(models.Model):
     """
     This table contains information about users registering
     via Micro-Sites
+
+    .. no_pii:
     """
     user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
     site = models.CharField(max_length=255, db_index=True)
@@ -715,16 +732,23 @@ def unique_id_for_user(user, save=True):
 # TODO: Should be renamed to generic UserGroup, and possibly
 # Given an optional field for type of group
 class UserTestGroup(models.Model):
+    """
+    .. no_pii:
+    """
     users = models.ManyToManyField(User, db_index=True)
     name = models.CharField(blank=False, max_length=32, db_index=True)
     description = models.TextField(blank=True)
 
 
 class Registration(models.Model):
-    ''' Allows us to wait for e-mail before user is registered. A
-        registration profile is created when the user creates an
-        account, but that account is inactive. Once the user clicks
-        on the activation key, it becomes active. '''
+    """
+    Allows us to wait for e-mail before user is registered. A
+    registration profile is created when the user creates an
+    account, but that account is inactive. Once the user clicks
+    on the activation key, it becomes active.
+
+    .. no_pii:
+    """
 
     class Meta(object):
         db_table = "auth_registration"
@@ -745,10 +769,15 @@ class Registration(models.Model):
         log.info(u'User %s (%s) account is successfully activated.', self.user.username, self.user.email)
 
     def _track_activation(self):
-        """ Update the isActive flag in mailchimp for activated users."""
+        """
+        Update the isActive flag in mailchimp for activated users.
+        """
         has_segment_key = getattr(settings, 'LMS_SEGMENT_KEY', None)
         has_mailchimp_id = hasattr(settings, 'MAILCHIMP_NEW_USER_LIST_ID')
         if has_segment_key and has_mailchimp_id:
+            # .. pii: Username and email are sent to Segment here. Retired directly through Segment API call in Tubular.
+            # .. pii_types: email_address, username
+            # .. pii_retirement: third_party
             segment.identify(
                 self.user.id,  # pylint: disable=no-member
                 {
@@ -765,6 +794,13 @@ class Registration(models.Model):
 
 
 class PendingNameChange(DeletableByUserValue, models.Model):
+    """
+    This model keeps track of pending requested changes to a user's email address.
+
+    .. pii: Contains new_name, retired in LMSAccountRetirementView
+    .. pii_types: name
+    .. pii_retirement: local_api
+    """
     user = models.OneToOneField(User, unique=True, db_index=True, on_delete=models.CASCADE)
     new_name = models.CharField(blank=True, max_length=255)
     rationale = models.CharField(blank=True, max_length=1024)
@@ -773,6 +809,10 @@ class PendingNameChange(DeletableByUserValue, models.Model):
 class PendingEmailChange(DeletableByUserValue, models.Model):
     """
     This model keeps track of pending requested changes to a user's email address.
+
+    .. pii: Contains new_email, retired in AccountRetirementView
+    .. pii_types: email_address
+    .. pii_retirement: local_api
     """
     user = models.OneToOneField(User, unique=True, db_index=True, on_delete=models.CASCADE)
     new_email = models.CharField(blank=True, max_length=255, db_index=True)
@@ -799,6 +839,10 @@ class PendingEmailChange(DeletableByUserValue, models.Model):
 class PendingSecondaryEmailChange(DeletableByUserValue, models.Model):
     """
     This model keeps track of pending requested changes to a user's secondary email address.
+
+    .. pii: Contains new_secondary_email, not currently retired
+    .. pii_types: email_address
+    .. pii_retirement: retained
     """
     user = models.OneToOneField(User, unique=True, db_index=True, on_delete=models.CASCADE)
     new_secondary_email = models.CharField(blank=True, max_length=255, db_index=True)
@@ -812,7 +856,9 @@ EVENT_NAME_ENROLLMENT_MODE_CHANGED = 'edx.course.enrollment.mode_changed'
 
 class LoginFailures(models.Model):
     """
-    This model will keep track of failed login attempts
+    This model will keep track of failed login attempts.
+
+    .. no_pii:
     """
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     failure_count = models.IntegerField(default=0)
@@ -1016,6 +1062,8 @@ class CourseEnrollment(models.Model):
     more should be brought in (such as checking against CourseEnrollmentAllowed,
     checking course dates, user permissions, etc.) This logic is currently
     scattered across our views.
+
+    .. no_pii:
     """
     MODEL_TAGS = ['course', 'is_active', 'mode']
 
@@ -1931,7 +1979,9 @@ class CourseEnrollment(models.Model):
 @receiver(models.signals.post_save, sender=CourseEnrollment)
 @receiver(models.signals.post_delete, sender=CourseEnrollment)
 def invalidate_enrollment_mode_cache(sender, instance, **kwargs):  # pylint: disable=unused-argument, invalid-name
-    """Invalidate the cache of CourseEnrollment model. """
+    """
+    Invalidate the cache of CourseEnrollment model.
+    """
 
     cache_key = CourseEnrollment.cache_key_name(
         instance.user.id,
@@ -1943,6 +1993,10 @@ def invalidate_enrollment_mode_cache(sender, instance, **kwargs):  # pylint: dis
 class ManualEnrollmentAudit(models.Model):
     """
     Table for tracking which enrollments were performed through manual enrollment.
+
+    .. pii: Contains enrolled_email, retired in LMSAccountRetirementView
+    .. pii_types: email_address
+    .. pii_retirement: local_api
     """
     enrollment = models.ForeignKey(CourseEnrollment, null=True, on_delete=models.CASCADE)
     enrolled_by = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
@@ -2009,6 +2063,8 @@ class CourseEnrollmentAllowed(DeletableByUserValue, models.Model):
     even if the enrollment time window is past.  Once an enrollment from this list effectively happens,
     the object is marked with the student who enrolled, to prevent students from changing e-mails and
     enrolling many accounts through the same e-mail.
+
+    .. no_pii:
     """
     email = models.CharField(max_length=255, db_index=True)
     course_id = CourseKeyField(max_length=255, db_index=True)
@@ -2065,6 +2121,8 @@ class CourseAccessRole(models.Model):
     Maps users to org, courses, and roles. Used by student.roles.CourseRole and OrgRole.
     To establish a user as having a specific role over all courses in the org, create an entry
     without a course_id.
+
+    .. no_pii:
     """
 
     objects = NoneToEmptyManager()
@@ -2148,12 +2206,12 @@ def get_user(email):
 
 def user_info(email):
     user, u_prof = get_user(email)
-    print "User id", user.id
-    print "Username", user.username
-    print "E-mail", user.email
-    print "Name", u_prof.name
-    print "Location", u_prof.location
-    print "Language", u_prof.language
+    print("User id", user.id)
+    print("Username", user.username)
+    print("E-mail", user.email)
+    print("Name", u_prof.name)
+    print("Location", u_prof.location)
+    print("Language", u_prof.language)
     return user, u_prof
 
 
@@ -2170,8 +2228,8 @@ def change_name(email, new_name):
 
 
 def user_count():
-    print "All users", User.objects.all().count()
-    print "Active users", User.objects.filter(is_active=True).count()
+    print("All users", User.objects.all().count())
+    print("Active users", User.objects.filter(is_active=True).count())
     return User.objects.all().count()
 
 
@@ -2278,10 +2336,12 @@ def enforce_single_login(sender, request, user, signal, **kwargs):    # pylint: 
 
 
 class DashboardConfiguration(ConfigurationModel):
-    """Dashboard Configuration settings.
+    """
+    Dashboard Configuration settings.
 
     Includes configuration options for the dashboard, which impact behavior and rendering for the application.
 
+    .. no_pii:
     """
     recent_enrollment_time_delta = models.PositiveIntegerField(
         default=0,
@@ -2304,6 +2364,8 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
     users are sent to the LinkedIn site with a pre-filled
     form allowing them to add the certificate to their
     LinkedIn profile.
+
+    .. no_pii:
     """
 
     MODE_TO_CERT_NAME = {
@@ -2430,6 +2492,8 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
 class EntranceExamConfiguration(models.Model):
     """
     Represents a Student's entrance exam specific data for a single Course
+
+    .. no_pii:
     """
 
     user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
@@ -2497,6 +2561,8 @@ class LanguageProficiency(models.Model):
     to go through the accounts API (AccountsView) defined in
     /edx-platform/openedx/core/djangoapps/user_api/accounts/views.py or its associated api method
     (update_account_settings) so that the events are emitted.
+
+    .. no_pii: Language is not PII value according to OEP-30.
     """
     class Meta(object):
         unique_together = (('code', 'user_profile'),)
@@ -2520,6 +2586,10 @@ class SocialLink(models.Model):  # pylint: disable=model-missing-unicode
     component of the stored URL and an example of a valid URL.
 
     The stored social_link value must adhere to the form 'https://www.[url_stub][username]'.
+
+    .. pii: Stores linkage from User to a learner's social media profiles. Retired in AccountRetirementView.
+    .. pii_types: external_service
+    .. pii_retirement: local_api
     """
     user_profile = models.ForeignKey(UserProfile, db_index=True, related_name='social_links', on_delete=models.CASCADE)
     platform = models.CharField(max_length=30)
@@ -2529,6 +2599,8 @@ class SocialLink(models.Model):  # pylint: disable=model-missing-unicode
 class CourseEnrollmentAttribute(models.Model):
     """
     Provide additional information about the user's enrollment.
+
+    .. no_pii: This stores key/value pairs, of which there is no full list, but the ones currently in use are not PII
     """
     enrollment = models.ForeignKey(CourseEnrollment, related_name="attributes", on_delete=models.CASCADE)
     namespace = models.CharField(
@@ -2554,12 +2626,13 @@ class CourseEnrollmentAttribute(models.Model):
 
     @classmethod
     def add_enrollment_attr(cls, enrollment, data_list):
-        """Delete all the enrollment attributes for the given enrollment and
+        """
+        Delete all the enrollment attributes for the given enrollment and
         add new attributes.
 
         Args:
-            enrollment(CourseEnrollment): 'CourseEnrollment' for which attribute is to be added
-            data(list): list of dictionaries containing data to save
+            enrollment (CourseEnrollment): 'CourseEnrollment' for which attribute is to be added
+            data_list: list of dictionaries containing data to save
         """
         cls.objects.filter(enrollment=enrollment).delete()
         attributes = [
@@ -2600,6 +2673,8 @@ class CourseEnrollmentAttribute(models.Model):
 class EnrollmentRefundConfiguration(ConfigurationModel):
     """
     Configuration for course enrollment refunds.
+
+    .. no_pii:
     """
 
     # TODO: Django 1.8 introduces a DurationField
@@ -2631,6 +2706,8 @@ class EnrollmentRefundConfiguration(ConfigurationModel):
 class RegistrationCookieConfiguration(ConfigurationModel):
     """
     Configuration for registration cookies.
+
+    .. no_pii:
     """
     utm_cookie_name = models.CharField(
         max_length=255,
@@ -2653,6 +2730,8 @@ class RegistrationCookieConfiguration(ConfigurationModel):
 class UserAttribute(TimeStampedModel):
     """
     Record additional metadata about a user, stored as key/value pairs of text.
+
+    .. no_pii:
     """
 
     class Meta(object):
@@ -2693,10 +2772,16 @@ class UserAttribute(TimeStampedModel):
 
 
 class LogoutViewConfiguration(ConfigurationModel):
-    """ DEPRECATED: Configuration for the logout view. """
+    """
+    DEPRECATED: Configuration for the logout view.
+
+    .. no_pii:
+    """
 
     def __unicode__(self):
-        """Unicode representation of the instance. """
+        """
+        Unicode representation of the instance.
+        """
         return u'Logout view configuration: {enabled}'.format(enabled=self.enabled)
 
 
@@ -2728,6 +2813,10 @@ class AccountRecoveryManager(models.Manager):
 class AccountRecovery(models.Model):
     """
     Model for storing information for user's account recovery in case of access loss.
+
+    .. pii: the field named secondary_email contains pii, retired in the `DeactivateLogoutView`
+    .. pii_types: email_address
+    .. pii_retirement: local_api
     """
     user = models.OneToOneField(User, related_name='account_recovery', on_delete=models.CASCADE)
     secondary_email = models.EmailField(
@@ -2743,3 +2832,33 @@ class AccountRecovery(models.Model):
         db_table = "auth_accountrecovery"
 
     objects = AccountRecoveryManager()
+
+    def update_recovery_email(self, email):
+        """
+        Update the secondary email address on the instance to the email in the argument.
+
+        Arguments:
+            email (str): New email address to be set as the secondary email address.
+        """
+        self.secondary_email = email
+        self.is_active = False
+        self.save()
+
+    @classmethod
+    def retire_recovery_email(cls, user_id):
+        """
+        Retire user's recovery/secondary email as part of GDPR Phase I.
+        Returns 'True'
+
+        If an AccountRecovery record is found for this user it will be deleted,
+        if it is not found it is assumed this table has no PII for the given user.
+
+        :param user_id: int
+        :return: bool
+        """
+        try:
+            cls.objects.get(user_id=user_id).delete()
+        except cls.DoesNotExist:
+            pass
+
+        return True

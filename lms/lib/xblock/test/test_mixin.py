@@ -10,7 +10,6 @@ from lms_xblock.mixin import (
     INVALID_USER_PARTITION_VALIDATION_UNIT,
     NONSENSICAL_ACCESS_RESTRICTION
 )
-from openedx.core.lib.tests import attr
 from xblock.validation import ValidationMessage
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import CourseFactory, ToyCourseFactory, ItemFactory
@@ -64,7 +63,6 @@ class LmsXBlockMixinTestCase(ModuleStoreTestCase):
         self.store.update_item(block, 1)
 
 
-@attr(shard=5)
 class XBlockValidationTest(LmsXBlockMixinTestCase):
     """
     Unit tests for XBlock validation
@@ -274,7 +272,6 @@ class XBlockValidationTest(LmsXBlockMixinTestCase):
         )
 
 
-@attr(shard=5)
 class OpenAssessmentBlockMixinTestCase(ModuleStoreTestCase):
     """
     Tests for OpenAssessmentBlock mixin.
@@ -297,7 +294,6 @@ class OpenAssessmentBlockMixinTestCase(ModuleStoreTestCase):
         self.assertTrue(self.open_assessment.has_score)
 
 
-@attr(shard=5)
 @ddt.ddt
 class XBlockGetParentTest(LmsXBlockMixinTestCase):
     """
@@ -390,7 +386,6 @@ def ddt_named(parent, child):
     return args
 
 
-@attr(shard=5)
 @ddt.ddt
 class XBlockMergedGroupAccessTest(LmsXBlockMixinTestCase):
     """

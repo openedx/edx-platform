@@ -163,7 +163,7 @@ class Command(BaseCommand):
             options = self.get_args_from_database()
 
         log.info(
-            "notify_credentials starting, dry-run=%s, site=%s, delay=%d seconds",
+            u"notify_credentials starting, dry-run=%s, site=%s, delay=%d seconds",
             options['dry_run'],
             options['site'],
             options['delay']
@@ -175,8 +175,7 @@ class Command(BaseCommand):
         try:
             site_config = SiteConfiguration.objects.get(site__domain=options['site']) if options['site'] else None
         except SiteConfiguration.DoesNotExist:
-            log.error('No site configuration found for site %s', options['site'])
-
+            log.error(u'No site configuration found for site %s', options['site'])
         if options['courses']:
             course_keys = self.get_course_keys(options['courses'])
             cert_filter_args['course_id__in'] = course_keys
@@ -214,11 +213,11 @@ class Command(BaseCommand):
         # First, do certs
         for i, cert in paged_query(certs, delay, page_size):
             if site_config and not site_config.has_org(cert.course_id.org):
-                log.info("Skipping credential changes %d for certificate %s", i, certstr(cert))
+                log.info(u"Skipping credential changes %d for certificate %s", i, certstr(cert))
                 continue
 
             log.info(
-                "Handling credential changes %d for certificate %s",
+                u"Handling credential changes %d for certificate %s",
                 i, certstr(cert),
             )
 
@@ -236,11 +235,11 @@ class Command(BaseCommand):
         # Then do grades
         for i, grade in paged_query(grades, delay, page_size):
             if site_config and not site_config.has_org(grade.course_id.org):
-                log.info("Skipping grade changes %d for grade %s", i, gradestr(grade))
+                log.info(u"Skipping grade changes %d for grade %s", i, gradestr(grade))
                 continue
 
             log.info(
-                "Handling grade changes %d for grade %s",
+                u"Handling grade changes %d for grade %s",
                 i, gradestr(grade),
             )
 
@@ -267,12 +266,12 @@ class Command(BaseCommand):
         """
         # Use specific courses if specified, but fall back to all courses.
         course_keys = []
-        log.info("%d courses specified: %s", len(courses), ", ".join(courses))
+        log.info(u"%d courses specified: %s", len(courses), ", ".join(courses))
         for course_id in courses:
             try:
                 course_keys.append(CourseKey.from_string(course_id))
             except InvalidKeyError:
-                log.fatal("%s is not a parseable CourseKey", course_id)
+                log.fatal(u"%s is not a parseable CourseKey", course_id)
                 sys.exit(1)
 
         return course_keys
@@ -286,10 +285,10 @@ class Command(BaseCommand):
         for cert in certs[:ITEMS_TO_SHOW]:
             print("   ", certstr(cert))
         if certs.count() > ITEMS_TO_SHOW:
-            print("    (+ {} more)".format(certs.count() - ITEMS_TO_SHOW))
+            print(u"    (+ {} more)".format(certs.count() - ITEMS_TO_SHOW))
 
         print(grades.count(), "Grades:")
         for grade in grades[:ITEMS_TO_SHOW]:
             print("   ", gradestr(grade))
         if grades.count() > ITEMS_TO_SHOW:
-            print("    (+ {} more)".format(grades.count() - ITEMS_TO_SHOW))
+            print(u"    (+ {} more)".format(grades.count() - ITEMS_TO_SHOW))

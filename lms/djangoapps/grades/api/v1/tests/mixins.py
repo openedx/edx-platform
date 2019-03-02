@@ -103,19 +103,19 @@ class GradeViewTestMixin(SharedModuleStoreTestCase):
                     category='sequential',
                     parent_location=chapter.location,
                     due=datetime(2017, 12, 18, 11, 30, 00),
-                    display_name='Sequential {} {}'.format(grading_type, num),
+                    display_name=u'Sequential {} {}'.format(grading_type, num),
                     format=grading_type,
                     graded=True,
                 )
                 vertical = ItemFactory.create(
                     category='vertical',
                     parent_location=section.location,
-                    display_name='Vertical {} {}'.format(grading_type, num),
+                    display_name=u'Vertical {} {}'.format(grading_type, num),
                 )
                 ItemFactory.create(
                     category='problem',
                     parent_location=vertical.location,
-                    display_name='Problem {} {}'.format(grading_type, num),
+                    display_name=u'Problem {} {}'.format(grading_type, num),
                 )
 
         return course

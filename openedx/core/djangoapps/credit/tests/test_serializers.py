@@ -11,7 +11,6 @@ from student.tests.factories import UserFactory
 
 class CreditProviderSerializerTests(TestCase):
     """ CreditProviderSerializer tests. """
-    shard = 2
 
     def test_data(self):
         """ Verify the correct fields are serialized. """
@@ -32,7 +31,6 @@ class CreditProviderSerializerTests(TestCase):
 
 class CreditEligibilitySerializerTests(TestCase):
     """ CreditEligibilitySerializer tests. """
-    shard = 2
 
     def test_data(self):
         """ Verify the correct fields are serialized. """

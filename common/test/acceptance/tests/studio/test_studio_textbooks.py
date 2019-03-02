@@ -12,6 +12,8 @@ class TextbooksTest(StudioCourseTest):
     """
     Test that textbook functionality is working properly on studio side
     """
+    shard = 8
+
     def setUp(self, is_staff=True):  # pylint: disable=arguments-differ
         """
         Install a course with no content using a fixture.

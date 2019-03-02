@@ -191,13 +191,22 @@ class NonZeroSubsectionGrade(SubsectionGradeBase):
         used instead.
         """
         score_type = 'graded' if is_graded else 'all'
-        grade_object = grade_model
+        earned_value = getattr(grade_model, 'earned_{}'.format(score_type))
+        possible_value = getattr(grade_model, 'possible_{}'.format(score_type))
         if hasattr(grade_model, 'override'):
             score_type = 'graded_override' if is_graded else 'all_override'
-            grade_object = grade_model.override
+
+            earned_override = getattr(grade_model.override, 'earned_{}'.format(score_type))
+            if earned_override is not None:
+                earned_value = earned_override
+
+            possible_override = getattr(grade_model.override, 'possible_{}'.format(score_type))
+            if possible_override is not None:
+                possible_value = possible_override
+
         return AggregatedScore(
-            tw_earned=getattr(grade_object, 'earned_{}'.format(score_type)),
-            tw_possible=getattr(grade_object, 'possible_{}'.format(score_type)),
+            tw_earned=earned_value,
+            tw_possible=possible_value,
             graded=is_graded,
             first_attempted=grade_model.first_attempted,
         )

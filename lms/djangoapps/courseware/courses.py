@@ -8,6 +8,7 @@ from datetime import datetime
 
 import branding
 import pytz
+from crum import get_current_request
 from openedx.features.course_duration_limits.access import AuditExpiredError
 from courseware.access import has_access
 from courseware.access_response import StartDateError, MilestoneAccessError
@@ -19,9 +20,12 @@ from courseware.date_summary import (
     VerifiedUpgradeDeadlineDate,
     CertificateAvailableDate
 )
+from courseware.masquerade import check_content_start_date_for_masquerade_user
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module
+from course_modes.models import CourseMode
 from django.conf import settings
+from django.db.models import Prefetch
 from django.urls import reverse
 from django.http import Http404, QueryDict
 from enrollment.api import get_course_enrollment_details
@@ -33,6 +37,8 @@ from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from opaque_keys.edx.keys import UsageKey
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.lib.api.view_utils import LazySequence
+from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from path import Path as path
 from six import text_type
 from static_replace import replace_static_urls
@@ -75,7 +81,7 @@ def get_course_by_id(course_key, depth=0):
     if course:
         return course
     else:
-        raise Http404("Course not found: {}.".format(unicode(course_key)))
+        raise Http404(u"Course not found: {}.".format(unicode(course_key)))
 
 
 def get_course_with_access(user, action, course_key, depth=0, check_if_enrolled=False, check_survey_complete=True):
@@ -131,6 +137,9 @@ def check_course_access(course, user, action, check_if_enrolled=False, check_sur
     # Allow staff full access to the course even if not enrolled
     if has_access(user, 'staff', course.id):
         return
+
+    request = get_current_request()
+    check_content_start_date_for_masquerade_user(course.id, user, request, course.start)
 
     access_response = has_access(user, action, course, course.id)
     if not access_response:
@@ -446,19 +455,30 @@ def get_course_syllabus_section(course, section_key):
 
 def get_courses(user, org=None, filter_=None):
     """
-    Returns a list of courses available, sorted by course.number and optionally
-    filtered by org code (case-insensitive).
+    Return a LazySequence of courses available, optionally filtered by org code (case-insensitive).
     """
-    courses = branding.get_visible_courses(org=org, filter_=filter_)
+    courses = branding.get_visible_courses(
+        org=org,
+        filter_=filter_,
+    ).prefetch_related(
+        Prefetch(
+            'modes',
+            queryset=CourseMode.objects.exclude(mode_slug__in=CourseMode.CREDIT_MODES),
+            to_attr='selectable_modes',
+        ),
+    ).select_related(
+        'image_set'
+    )
 
     permission_name = configuration_helpers.get_value(
         'COURSE_CATALOG_VISIBILITY_PERMISSION',
         settings.COURSE_CATALOG_VISIBILITY_PERMISSION
     )
 
-    courses = [c for c in courses if has_access(user, permission_name, c)]
-
-    return courses
+    return LazySequence(
+        (c for c in courses if has_access(user, permission_name, c)),
+        est_len=courses.count()
+    )
 
 
 def get_permission_for_course_about():
@@ -624,3 +644,13 @@ def get_course_chapter_ids(course_key):
         log.exception('Failed to retrieve course from modulestore.')
         return []
     return [unicode(chapter_key) for chapter_key in chapter_keys if chapter_key.block_type == 'chapter']
+
+
+def allow_public_access(course, visibilities):
+    """
+    This checks if the unenrolled access waffle flag for the course is set
+    and the course visibility matches any of the input visibilities.
+    """
+    unenrolled_access_flag = COURSE_ENABLE_UNENROLLED_ACCESS_FLAG.is_enabled(course.id)
+    allow_access = unenrolled_access_flag and course.course_visibility in visibilities
+    return allow_access

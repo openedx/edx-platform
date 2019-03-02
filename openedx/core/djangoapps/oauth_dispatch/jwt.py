@@ -156,13 +156,19 @@ def _update_from_additional_handlers(payload, user, scopes):
     requested by the given scopes.
     """
     _claim_handlers = {
+        'user_id': _attach_user_id_claim,
         'email': _attach_email_claim,
-        'profile': _attach_profile_claim
+        'profile': _attach_profile_claim,
     }
     for scope in scopes:
         handler = _claim_handlers.get(scope)
         if handler:
             handler(payload, user)
+
+
+def _attach_user_id_claim(payload, user):
+    """Add the user_id claim details to the JWT payload."""
+    payload['user_id'] = user.id
 
 
 def _attach_email_claim(payload, user):

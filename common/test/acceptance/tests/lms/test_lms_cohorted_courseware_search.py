@@ -181,7 +181,7 @@ class CoursewareSearchCohortTest(ContainerBase, CohortTestMixin):
         set_visibility(2, [self.content_group_b])
         set_visibility(3, [self.content_group_a, self.content_group_b])
 
-        container_page.publish_action.click()
+        container_page.publish()
 
     def create_cohorts_and_assign_students(self):
         """

@@ -54,7 +54,7 @@ class Command(BaseCommand):
         course_id = options['course_id']
         num_segments = options['num_segments']
 
-        log.info('Syncronizing email list for %s', course_id)
+        log.info(u'Syncronizing email list for %s', course_id)
 
         mailchimp = connect_mailchimp(key)
 
@@ -106,7 +106,7 @@ def verify_list(mailchimp, list_id, course_id):
 
     list_name = lists[0]['name']
 
-    log.debug('list name: %s', list_name)
+    log.debug(u'list name: %s', list_name)
 
     # check that we are connecting to the correct list
     parts = course_id.replace('_', ' ').replace('/', ' ').split()
@@ -294,7 +294,7 @@ def subscribe_with_data(mailchimp, list_id, user_data):
                                               update_existing=True)
 
         log.debug(
-            "Added: %s Error on: %s", result['add_count'], result['error_count']
+            u"Added: %s Error on: %s", result['add_count'], result['error_count']
         )
 
 

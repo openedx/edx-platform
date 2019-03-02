@@ -38,7 +38,6 @@ from lms.lib.comment_client import Thread
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
-from openedx.core.lib.tests import attr
 from student.roles import CourseStaffRole, UserBasedRole
 from student.tests.factories import CourseAccessRoleFactory, CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
@@ -73,7 +72,6 @@ class MockRequestSetupMixin(object):
         mock_request.return_value = self._create_response_mock(data)
 
 
-@attr(shard=2)
 @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
 class CreateThreadGroupIdTestCase(
         MockRequestSetupMixin,
@@ -109,7 +107,6 @@ class CreateThreadGroupIdTestCase(
         self._assert_json_response_contains_group_info(response)
 
 
-@attr(shard=2)
 @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
 @disable_signal(views, 'thread_edited')
 @disable_signal(views, 'thread_voted')
@@ -225,8 +222,8 @@ class ViewsTestCaseMixin(object):
                 parent_location=self.course.location,
                 category='discussion',
                 discussion_id='id_module_{}'.format(i),
-                discussion_category='Category {}'.format(i),
-                discussion_target='Discussion {}'.format(i)
+                discussion_category=u'Category {}'.format(i),
+                discussion_target=u'Discussion {}'.format(i)
             )
 
         # seed the forums permissions and roles
@@ -367,7 +364,6 @@ class ViewsTestCaseMixin(object):
         self.assertEqual(data['commentable_id'], 'some_topic')
 
 
-@attr(shard=2)
 @ddt.ddt
 @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
 @disable_signal(views, 'thread_created')
@@ -421,7 +417,6 @@ class ViewsQueryCountTestCase(
         self.update_thread_helper(mock_request)
 
 
-@attr(shard=2)
 @ddt.ddt
 @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
 class ViewsTestCase(
@@ -1067,7 +1062,6 @@ class ViewsTestCase(
         self.assertEqual(response.status_code, 200)
 
 
-@attr(shard=2)
 @patch("lms.lib.comment_client.utils.requests.request", autospec=True)
 @disable_signal(views, 'comment_endorsed')
 class ViewPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase, MockRequestSetupMixin):
@@ -1177,7 +1171,6 @@ class ViewPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleStor
         self.assertEqual(response.status_code, 200)
 
 
-@attr(shard=2)
 class CreateThreadUnicodeTestCase(
         ForumsEnableMixin,
         SharedModuleStoreTestCase,
@@ -1218,7 +1211,6 @@ class CreateThreadUnicodeTestCase(
         self.assertEqual(mock_request.call_args[1]["data"]["title"], text)
 
 
-@attr(shard=2)
 @disable_signal(views, 'thread_edited')
 class UpdateThreadUnicodeTestCase(
         ForumsEnableMixin,
@@ -1261,7 +1253,6 @@ class UpdateThreadUnicodeTestCase(
         self.assertEqual(mock_request.call_args[1]["data"]["commentable_id"], "test_commentable")
 
 
-@attr(shard=2)
 @disable_signal(views, 'comment_created')
 class CreateCommentUnicodeTestCase(
         ForumsEnableMixin,
@@ -1309,7 +1300,6 @@ class CreateCommentUnicodeTestCase(
             del Thread.commentable_id
 
 
-@attr(shard=2)
 @disable_signal(views, 'comment_edited')
 class UpdateCommentUnicodeTestCase(
         ForumsEnableMixin,
@@ -1348,7 +1338,6 @@ class UpdateCommentUnicodeTestCase(
         self.assertEqual(mock_request.call_args[1]["data"]["body"], text)
 
 
-@attr(shard=2)
 @disable_signal(views, 'comment_created')
 class CreateSubCommentUnicodeTestCase(
         ForumsEnableMixin,
@@ -1400,7 +1389,6 @@ class CreateSubCommentUnicodeTestCase(
             del Thread.commentable_id
 
 
-@attr(shard=2)
 @ddt.ddt
 @patch("lms.lib.comment_client.utils.requests.request", autospec=True)
 @disable_signal(views, 'thread_voted')
@@ -1745,7 +1733,6 @@ class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleSto
 TEAM_COMMENTABLE_ID = 'test-team-discussion'
 
 
-@attr(shard=2)
 @disable_signal(views, 'comment_created')
 @ddt.ddt
 class ForumEventTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockRequestSetupMixin):
@@ -1931,7 +1918,6 @@ class ForumEventTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockReque
         self.assertEqual(event['vote_value'], 'up')
 
 
-@attr(shard=2)
 class UsersEndpointTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockRequestSetupMixin):
 
     @classmethod
@@ -2297,7 +2283,7 @@ class ForumThreadViewedEventTransformerTestCase(ForumsEnableMixin, UrlResetMixin
             topic_id=self.category.discussion_id,
         )
         self.assertEqual(event_trans_2['event'].get('category_id'), self.category.discussion_id)
-        full_category_name = '{0} / {1}'.format(self.category.discussion_category, self.category.discussion_target)
+        full_category_name = u'{0} / {1}'.format(self.category.discussion_category, self.category.discussion_target)
         self.assertEqual(event_trans_2['event'].get('category_name'), full_category_name)
 
     def test_roles(self):

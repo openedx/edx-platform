@@ -131,7 +131,7 @@ You can run all of the unit-level tests using this command::
 
     paver test
 
-This includes python, javascript, and documentation tests. It does not,
+This includes python, JavaScript, and documentation tests. It does not,
 however, run any acceptance tests.
 
 Note -

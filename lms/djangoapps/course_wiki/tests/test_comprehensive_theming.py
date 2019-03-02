@@ -15,7 +15,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 class TestComprehensiveTheming(ModuleStoreTestCase):
     """Tests for comprehensive theming of wiki pages."""
-    shard = 1
 
     def setUp(self):
         """Test setup."""

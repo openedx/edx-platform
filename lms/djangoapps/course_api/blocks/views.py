@@ -216,7 +216,7 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
                 )
             )
         except ItemNotFoundError as exception:
-            raise Http404("Block not found: {}".format(text_type(exception)))
+            raise Http404(u"Block not found: {}".format(text_type(exception)))
 
 
 @view_auth_classes()
@@ -279,5 +279,5 @@ class BlocksInCourseView(BlocksView):
             course_key = CourseKey.from_string(course_key_string)
             course_usage_key = modulestore().make_course_usage_key(course_key)
         except InvalidKeyError:
-            raise ValidationError("'{}' is not a valid course key.".format(unicode(course_key_string)))
+            raise ValidationError(u"'{}' is not a valid course key.".format(unicode(course_key_string)))
         return super(BlocksInCourseView, self).list(request, course_usage_key)

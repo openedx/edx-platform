@@ -61,9 +61,42 @@ class TestProctoredExams(ModuleStoreTestCase):
         self.assertEqual(exam['exam_name'], sequence.display_name)
         self.assertEqual(exam['time_limit_mins'], sequence.default_time_limit_minutes)
         self.assertEqual(exam['is_proctored'], sequence.is_proctored_exam)
-        self.assertEqual(exam['is_practice_exam'], sequence.is_practice_exam)
+        self.assertEqual(exam['is_practice_exam'], sequence.is_practice_exam or sequence.is_onboarding_exam)
         self.assertEqual(exam['is_active'], expected_active)
         self.assertEqual(exam['backend'], self.course.proctoring_provider)
+
+    @ddt.data(
+        (False, True),
+        (True, False),
+    )
+    @ddt.unpack
+    def test_onboarding_exam_is_practice_exam(self, is_practice_exam, is_onboarding_exam):
+        """
+        Check that an onboarding exam is treated as a practice exam when
+        communicating with the edx-proctoring subsystem.
+        """
+        default_time_limit_minutes = 10
+        is_proctored_exam = True
+
+        chapter = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
+        sequence = ItemFactory.create(
+            parent=chapter,
+            category='sequential',
+            display_name='Test Proctored Exam',
+            graded=True,
+            is_time_limited=True,
+            default_time_limit_minutes=default_time_limit_minutes,
+            is_proctored_exam=is_proctored_exam,
+            is_practice_exam=is_practice_exam,
+            due=datetime.now(UTC) + timedelta(minutes=default_time_limit_minutes + 1),
+            exam_review_rules="allow_use_of_paper",
+            hide_after_due=True,
+            is_onboarding_exam=is_onboarding_exam,
+        )
+
+        listen_for_course_publish(self, self.course.id)
+
+        self._verify_exam_data(sequence, True)
 
     @ddt.data(
         (True, False, True, False, False),
@@ -93,6 +126,7 @@ class TestProctoredExams(ModuleStoreTestCase):
             due=datetime.now(UTC) + timedelta(minutes=default_time_limit_minutes + 1),
             exam_review_rules="allow_use_of_paper",
             hide_after_due=hide_after_due,
+            is_onboarding_exam=False,
         )
 
         listen_for_course_publish(self, self.course.id)
@@ -125,6 +159,7 @@ class TestProctoredExams(ModuleStoreTestCase):
             default_time_limit_minutes=10,
             is_proctored_exam=True,
             hide_after_due=False,
+            is_onboarding_exam=False,
         )
 
         listen_for_course_publish(self, self.course.id)

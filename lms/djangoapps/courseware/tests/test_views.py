@@ -19,7 +19,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.urls import reverse, reverse_lazy
 from django.http import Http404, HttpResponseBadRequest
 from django.test import TestCase
-from django.test.client import Client, RequestFactory
+from django.test.client import Client
 from django.test.utils import override_settings
 from freezegun import freeze_time
 from milestones.tests.utils import MilestonesTestCaseMixin
@@ -40,7 +40,7 @@ from course_modes.tests.factories import CourseModeFactory
 from courseware.access_utils import check_course_open_for_learner
 from courseware.model_data import FieldDataCache, set_score
 from courseware.module_render import get_module, handle_xblock_callback
-from courseware.tests.factories import GlobalStaffFactory, StudentModuleFactory
+from courseware.tests.factories import GlobalStaffFactory, StudentModuleFactory, RequestFactoryNoCsrf
 from courseware.tests.helpers import get_expiration_banner_text
 from courseware.testutils import RenderXBlockTestMixin
 from courseware.url_helpers import get_redirect_url
@@ -54,6 +54,7 @@ from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.grades.config.waffle import waffle as grades_waffle
 from lms.djangoapps.grades.config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT
+from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
 from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory, ProgramFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -63,7 +64,6 @@ from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.gating import api as gating_api
-from openedx.core.lib.tests import attr
 from openedx.core.lib.url_utils import quote_slashes
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
@@ -94,7 +94,6 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, chec
 QUERY_COUNT_TABLE_BLACKLIST = WAFFLE_TABLES
 
 
-@attr(shard=5)
 class TestJumpTo(ModuleStoreTestCase):
     """
     Check the jumpto link for a course.
@@ -205,7 +204,6 @@ class TestJumpTo(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 404)
 
 
-@attr(shard=5)
 @ddt.ddt
 class IndexQueryTestCase(ModuleStoreTestCase):
     """
@@ -249,7 +247,6 @@ class IndexQueryTestCase(ModuleStoreTestCase):
                 self.assertEqual(response.status_code, 200)
 
 
-@attr(shard=5)
 @ddt.ddt
 class ViewsTestCase(ModuleStoreTestCase):
     """
@@ -494,7 +491,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         # Construct the link according the following scenarios and verify its presence in the response:
         #      (1) shopping cart is enabled and the user is not logged in
         #      (2) shopping cart is enabled and the user is logged in
-        href = '<a href="{uri_stem}?sku={sku}" class="add-to-cart">'.format(
+        href = u'<a href="{uri_stem}?sku={sku}" class="add-to-cart">'.format(
             uri_stem=configuration.basket_checkout_page,
             sku=sku,
         )
@@ -502,7 +499,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         # Generate the course about page content
         response = self.client.get(reverse('about_course', args=[unicode(course.id)]))
         self.assertEqual(response.status_code, 200)
-        self.assertIn(href, response.content)
+        self.assertIn(href, response.content.decode(response.charset))
 
     @ddt.data(True, False)
     def test_ecommerce_checkout(self, is_anonymous):
@@ -964,7 +961,6 @@ class ViewsTestCase(ModuleStoreTestCase):
             self.assertContains(response, test)
 
 
-@attr(shard=5)
 # Patching 'lms.djangoapps.courseware.views.views.get_programs' would be ideal,
 # but for some unknown reason that patch doesn't seem to be applied.
 @patch('openedx.core.djangoapps.catalog.utils.cache')
@@ -1006,7 +1002,6 @@ class TestProgramMarketingView(SharedModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
 
 
-@attr(shard=5)
 # setting TIME_ZONE_DISPLAYED_FOR_DEADLINES explicitly
 @override_settings(TIME_ZONE_DISPLAYED_FOR_DEADLINES="UTC")
 class BaseDueDateTests(ModuleStoreTestCase):
@@ -1099,7 +1094,6 @@ class TestProgressDueDate(BaseDueDateTests):
 
 
 # TODO: LEARNER-71: Delete entire TestAccordionDueDate class
-@attr(shard=5)
 class TestAccordionDueDate(BaseDueDateTests):
     """
     Test that the accordion page displays due dates correctly
@@ -1139,7 +1133,6 @@ class TestAccordionDueDate(BaseDueDateTests):
         super(TestAccordionDueDate, self).test_format_none()
 
 
-@attr(shard=5)
 class StartDateTests(ModuleStoreTestCase):
     """
     Test that start dates are properly localized and displayed on the student
@@ -1180,7 +1173,6 @@ class StartDateTests(ModuleStoreTestCase):
         self.assertContains(response, "2013-09-16T07:17:28+0000")
 
 
-@attr(shard=5)
 class ProgressPageBaseTests(ModuleStoreTestCase):
     """
     Base class for progress page tests.
@@ -1238,7 +1230,6 @@ class ProgressPageBaseTests(ModuleStoreTestCase):
 
 
 # pylint: disable=protected-access
-@attr(shard=5)
 @ddt.ddt
 class ProgressPageTests(ProgressPageBaseTests):
     """
@@ -1338,6 +1329,38 @@ class ProgressPageTests(ProgressPageBaseTests):
 
         resp = self._get_progress_page()
         self.assertNotContains(resp, 'Request Certificate')
+
+    @patch('lms.djangoapps.certificates.api.get_active_web_certificate', PropertyMock(return_value=True))
+    @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
+    def test_view_certificate_for_unverified_student(self):
+        """
+        If user has already generated a certificate, it should be visible in case of user being
+        unverified too.
+        """
+        GeneratedCertificateFactory.create(
+            user=self.user,
+            course_id=self.course.id,
+            status=CertificateStatuses.downloadable,
+            mode='verified'
+        )
+
+        # Enable the feature, but do not enable it for this course
+        CertificateGenerationConfiguration(enabled=True).save()
+
+        # Enable certificate generation for this course
+        certs_api.set_cert_generation_enabled(self.course.id, True)
+        CourseEnrollment.enroll(self.user, self.course.id, mode="verified")
+
+        # Check that the user is unverified
+        self.assertFalse(IDVerificationService.user_is_verified(self.user))
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_create:
+            course_grade = mock_create.return_value
+            course_grade.passed = True
+            course_grade.summary = {'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [],
+                                    'grade_breakdown': {}}
+            resp = self._get_progress_page()
+            self.assertNotContains(resp, u"Certificate unavailable")
+            self.assertContains(resp, u"Your certificate is available")
 
     @patch('lms.djangoapps.certificates.api.get_active_web_certificate', PropertyMock(return_value=True))
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
@@ -1456,7 +1479,7 @@ class ProgressPageTests(ProgressPageBaseTests):
 
     @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
     @ddt.data(
-        (False, 63, 43),
+        (False, 64, 44),
         (True, 55, 39)
     )
     @ddt.unpack
@@ -1867,7 +1890,6 @@ class ProgressPageTests(ProgressPageBaseTests):
         }
 
 
-@attr(shard=5)
 @ddt.ddt
 class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
     """
@@ -2147,7 +2169,6 @@ class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
         self.assert_progress_page_show_grades(resp, show_correctness, due_date, graded, show_grades, 1, 1, .5)
 
 
-@attr(shard=5)
 class VerifyCourseKeyDecoratorTests(TestCase):
     """
     Tests for the ensure_valid_course_key decorator.
@@ -2156,7 +2177,7 @@ class VerifyCourseKeyDecoratorTests(TestCase):
     def setUp(self):
         super(VerifyCourseKeyDecoratorTests, self).setUp()
 
-        self.request = RequestFactory().get("foo")
+        self.request = RequestFactoryNoCsrf().get("foo")
         self.valid_course_id = "edX/test/1"
         self.invalid_course_id = "edX/"
 
@@ -2173,7 +2194,6 @@ class VerifyCourseKeyDecoratorTests(TestCase):
         self.assertFalse(mocked_view.called)
 
 
-@attr(shard=5)
 class GenerateUserCertTests(ModuleStoreTestCase):
     """
     Tests for the view function Generated User Certs
@@ -2320,7 +2340,7 @@ class ViewCheckerBlock(XBlock):
         A student_view that asserts that the ``state`` field for this block
         matches the block's usage_id.
         """
-        msg = "{} != {}".format(self.state, self.scope_ids.usage_id)
+        msg = u"{} != {}".format(self.state, self.scope_ids.usage_id)
         assert self.state == unicode(self.scope_ids.usage_id), msg
         fragments = self.runtime.render_children(self)
         result = Fragment(
@@ -2332,7 +2352,6 @@ class ViewCheckerBlock(XBlock):
         return result
 
 
-@attr(shard=5)
 @ddt.ddt
 class TestIndexView(ModuleStoreTestCase):
     """
@@ -2472,6 +2491,10 @@ class TestIndexView(ModuleStoreTestCase):
                     self.assertIn('xblock-public_view-vertical', response.content)
                     self.assertIn('xblock-public_view-html', response.content)
                     self.assertIn('xblock-public_view-video', response.content)
+                    if user_type == CourseUserType.ANONYMOUS and course_visibility == COURSE_VISIBILITY_PRIVATE:
+                        self.assertIn('To see course content', response.content)
+                    if user_type == CourseUserType.UNENROLLED and course_visibility == COURSE_VISIBILITY_PRIVATE:
+                        self.assertIn('You must be enrolled', response.content)
                 else:
                     self.assertIn('data-save-position="true"', response.content)
                     self.assertIn('data-show-completion="true"', response.content)
@@ -2481,7 +2504,6 @@ class TestIndexView(ModuleStoreTestCase):
                     self.assertIn('xblock-student_view-video', response.content)
 
 
-@attr(shard=5)
 @ddt.ddt
 class TestIndexViewCompleteOnView(ModuleStoreTestCase, CompletionWaffleTestMixin):
     """
@@ -2494,7 +2516,7 @@ class TestIndexViewCompleteOnView(ModuleStoreTestCase, CompletionWaffleTestMixin
         """
         # pylint:disable=attribute-defined-outside-init
 
-        self.request_factory = RequestFactory()
+        self.request_factory = RequestFactoryNoCsrf()
         self.user = UserFactory()
 
         with modulestore().default_store(default_store):
@@ -2618,7 +2640,6 @@ class TestIndexViewCompleteOnView(ModuleStoreTestCase, CompletionWaffleTestMixin
         self.assertNotIn('data-mark-completed-on-view-after-delay', response.content)
 
 
-@attr(shard=5)
 @ddt.ddt
 class TestIndexViewWithVerticalPositions(ModuleStoreTestCase):
     """
@@ -2685,7 +2706,6 @@ class TestIndexViewWithVerticalPositions(ModuleStoreTestCase):
         self._assert_correct_position(resp, expected_position)
 
 
-@attr(shard=5)
 class TestIndexViewWithGating(ModuleStoreTestCase, MilestonesTestCaseMixin):
     """
     Test the index view for a course with gated content
@@ -2737,7 +2757,6 @@ class TestIndexViewWithGating(ModuleStoreTestCase, MilestonesTestCaseMixin):
         self.assertIn("Content Locked", response.content)
 
 
-@attr(shard=5)
 class TestIndexViewWithCourseDurationLimits(ModuleStoreTestCase):
     """
     Test the index view for a course with course duration limits enabled.
@@ -2806,7 +2825,6 @@ class TestIndexViewWithCourseDurationLimits(ModuleStoreTestCase):
         self.assertNotContains(response, bannerText, html=True)
 
 
-@attr(shard=5)
 class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaffleTestMixin):
     """
     Tests for the courseware.render_xblock endpoint.
@@ -2860,7 +2878,7 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaf
         self.assertIn('data-enable-completion-on-view-service="true"', response.content)
         self.assertIn('data-mark-completed-on-view-after-delay', response.content)
 
-        request = RequestFactory().post(
+        request = RequestFactoryNoCsrf().post(
             '/',
             data=json.dumps({"completion": 1}),
             content_type='application/json',
@@ -2900,7 +2918,6 @@ class TestRenderXBlockSelfPaced(TestRenderXBlock):
         return options
 
 
-@attr(shard=5)
 class TestIndexViewCrawlerStudentStateWrites(SharedModuleStoreTestCase):
     """
     Ensure that courseware index requests do not trigger student state writes.
@@ -2980,7 +2997,6 @@ class TestIndexViewCrawlerStudentStateWrites(SharedModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
 
 
-@attr(shard=5)
 class EnterpriseConsentTestCase(EnterpriseTestConsentRequired, ModuleStoreTestCase):
     """
     Ensure that the Enterprise Data Consent redirects are in place only when consent is required.
@@ -3010,7 +3026,6 @@ class EnterpriseConsentTestCase(EnterpriseTestConsentRequired, ModuleStoreTestCa
             self.verify_consent_required(self.client, url)
 
 
-@attr(shard=5)
 @ddt.ddt
 class AccessUtilsTestCase(ModuleStoreTestCase):
     """

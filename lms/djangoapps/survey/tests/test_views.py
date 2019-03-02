@@ -18,7 +18,6 @@ class SurveyViewsTests(ModuleStoreTestCase):
     """
     All tests for the views.py file
     """
-    shard = 4
 
     def setUp(self):
         """

@@ -1066,7 +1066,6 @@ class AnonymousLookupTable(ModuleStoreTestCase):
 @patch('openedx.core.djangoapps.programs.utils.get_programs')
 class RelatedProgramsTests(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
     """Tests verifying that related programs appear on the course dashboard."""
-    shard = 3
     maxDiff = None
     password = 'test'
     related_programs_preface = 'Related Programs'

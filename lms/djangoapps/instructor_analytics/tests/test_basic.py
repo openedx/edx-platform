@@ -51,7 +51,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 class TestAnalyticsBasic(ModuleStoreTestCase):
     """ Test basic analytics functions. """
-    shard = 3
 
     def setUp(self):
         super(TestAnalyticsBasic, self).setUp()
@@ -62,8 +61,8 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         self.instructor = InstructorFactory(course_key=self.course_key)
         for user in self.users:
             user.profile.meta = json.dumps({
-                "position": "edX expert {}".format(user.id),
-                "company": "Open edX Inc {}".format(user.id),
+                "position": u"edX expert {}".format(user.id),
+                "company": u"Open edX Inc {}".format(user.id),
             })
             user.profile.save()
         self.students_who_may_enroll = list(self.users) + [UserFactory() for _ in range(5)]
@@ -125,8 +124,8 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
     def test_enrolled_students_features_keys(self):
         query_features = ('username', 'name', 'email', 'city', 'country',)
         for user in self.users:
-            user.profile.city = "Mos Eisley {}".format(user.id)
-            user.profile.country = "Tatooine {}".format(user.id)
+            user.profile.city = u"Mos Eisley {}".format(user.id)
+            user.profile.country = u"Tatooine {}".format(user.id)
             user.profile.save()
         for feature in query_features:
             self.assertIn(feature, AVAILABLE_FEATURES)
@@ -163,8 +162,8 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         self.assertEqual(len(userreports), len(self.users))
         for userreport in userreports:
             self.assertEqual(set(userreport.keys()), set(query_features))
-            self.assertIn(userreport['meta.position'], ["edX expert {}".format(user.id) for user in self.users])
-            self.assertIn(userreport['meta.company'], ["Open edX Inc {}".format(user.id) for user in self.users])
+            self.assertIn(userreport['meta.position'], [u"edX expert {}".format(user.id) for user in self.users])
+            self.assertIn(userreport['meta.company'], [u"Open edX Inc {}".format(user.id) for user in self.users])
 
     def test_enrolled_students_enrollment_verification(self):
         """

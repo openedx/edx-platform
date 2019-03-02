@@ -69,7 +69,7 @@ def run_multi_processes(cmd_list, out_log=None, err_log=None):
 
     # pylint: disable=broad-except
     except Exception as err:
-        print("Error running process {}".format(err), file=sys.stderr)
+        print(u"Error running process {}".format(err), file=sys.stderr)
 
     finally:
         for pid in pids:

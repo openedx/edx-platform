@@ -152,7 +152,7 @@ def update_xblocks_cache(course_id):
     # Ideally we'd like to accept a CourseLocator; however, CourseLocator is not JSON-serializable (by default) so
     # Celery's delayed tasks fail to start. For this reason, callers should pass the course key as a Unicode string.
     if not isinstance(course_id, basestring):
-        raise ValueError('course_id must be a string. {} is not acceptable.'.format(type(course_id)))
+        raise ValueError(u'course_id must be a string. {} is not acceptable.'.format(type(course_id)))
 
     course_key = CourseKey.from_string(course_id)
     log.info(u'Starting XBlockCaches update for course_key: %s', course_id)

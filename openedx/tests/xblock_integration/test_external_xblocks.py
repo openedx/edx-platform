@@ -7,6 +7,7 @@ run v1 tests only.
 
 That be the dragon here.
 """
+from __future__ import print_function
 import pkg_resources
 
 
@@ -49,5 +50,5 @@ for entrypoint in pkg_resources.iter_entry_points(group="xblock.test.v0"):
     if not classname.replace("_", "").isalnum():
         raise InvalidTestName("Python variables should be letters, numbers, and underscores: " + classname)
     globals()[classname] = plugin
-    print "Loading XBlock test: " + classname
+    print("Loading XBlock test: " + classname)
     xblock_loaded = True

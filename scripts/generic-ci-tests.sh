@@ -137,6 +137,8 @@ case "$TEST_SUITE" in
                 run_paver_quality run_xsslint -t $XSSLINT_THRESHOLDS || { EXIT=1; }
                 echo "Running safe commit linter report."
                 run_paver_quality run_xsscommitlint || { EXIT=1; }
+                echo "Running PII checker on all Django models..."
+                run_paver_quality run_pii_check || { EXIT=1; }
                 ;;
 
         esac
@@ -193,12 +195,12 @@ case "$TEST_SUITE" in
                 $TOX paver test_bokchoy $PAVER_ARGS
                 ;;
 
-            [1-9]|1[0-9]|2[0-1])
+            [1-9]|1[0-9]|2[0-4])
                 $TOX paver test_bokchoy --eval-attr="shard==$SHARD and not a11y" $PAVER_ARGS
                 ;;
 
-            22|"noshard")
-                $TOX paver test_bokchoy --eval-attr='not shard and not a11y' $PAVER_ARGS
+            25|"noshard")
+                $TOX paver test_bokchoy --eval-attr="(shard>=$SHARD or not shard) and not a11y" $PAVER_ARGS
                 ;;
 
             # Default case because if we later define another bok-choy shard on Jenkins
