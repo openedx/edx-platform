@@ -10,6 +10,12 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2019.
 #
+# #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
+# edX translation file.
+# Copyright (C) 2019 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2019.
+#
 # #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2019 edX
@@ -26,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-02-24 20:37+0000\n"
-"PO-Revision-Date: 2019-02-24 20:37:32.896234\n"
+"POT-Creation-Date: 2019-03-03 20:37+0000\n"
+"PO-Revision-Date: 2019-03-03 20:37:47.064649\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -5085,30 +5091,6 @@ msgstr "مهرنهرل"
 msgid "Successfully unlinked."
 msgstr "سعذذثسسبعممغ عرمهرنثي."
 
-#: lms/static/js/student_account/views/account_settings_view.js
-msgid "Account Information"
-msgstr "شذذخعرف هربخقوشفهخر"
-
-#: lms/static/js/student_account/views/account_settings_view.js
-msgid "Order History"
-msgstr "خقيثق اهسفخقغ"
-
-#: lms/static/js/student_account/views/account_settings_view.js
-msgid ""
-"You have set your language to {beta_language}, which is currently not fully "
-"translated. You can help us translate this language fully by joining the "
-"Transifex community and adding translations from English for learners that "
-"speak {beta_language}."
-msgstr ""
-"غخع اشدث سثف غخعق مشرلعشلث فخ {beta_language}, صاهذا هس ذعققثرفمغ رخف بعممغ "
-"فقشرسمشفثي. غخع ذشر اثمح عس فقشرسمشفث فاهس مشرلعشلث بعممغ زغ تخهرهرل فاث "
-"فقشرسهبثط ذخووعرهفغ شري شييهرل فقشرسمشفهخرس بقخو ثرلمهسا بخق مثشقرثقس فاشف "
-"سحثشن {beta_language}."
-
-#: lms/static/js/student_account/views/account_settings_view.js
-msgid "Help Translate into {beta_language}"
-msgstr "اثمح فقشرسمشفث هرفخ {beta_language}"
-
 #: lms/static/js/verify_student/views/image_input_view.js
 msgid "Image Upload Error"
 msgstr "هوشلث عحمخشي ثققخق"
@@ -6913,6 +6895,30 @@ msgstr "صشقرهرل"
 #: cms/static/js/xblock_asides/structured_tags.js
 msgid "Updating Tags"
 msgstr "عحيشفهرل فشلس"
+
+#: lms/static/js/student_account/views/account_settings_view.js
+msgid "Account Information"
+msgstr "شذذخعرف هربخقوشفهخر"
+
+#: lms/static/js/student_account/views/account_settings_view.js
+msgid "Order History"
+msgstr "خقيثق اهسفخقغ"
+
+#: lms/static/js/student_account/views/account_settings_view.js
+msgid ""
+"You have set your language to {beta_language}, which is currently not fully "
+"translated. You can help us translate this language fully by joining the "
+"Transifex community and adding translations from English for learners that "
+"speak {beta_language}."
+msgstr ""
+"غخع اشدث سثف غخعق مشرلعشلث فخ {beta_language}, صاهذا هس ذعققثرفمغ رخف بعممغ "
+"فقشرسمشفثي. غخع ذشر اثمح عس فقشرسمشفث فاهس مشرلعشلث بعممغ زغ تخهرهرل فاث "
+"فقشرسهبثط ذخووعرهفغ شري شييهرل فقشرسمشفهخرس بقخو ثرلمهسا بخق مثشقرثقس فاشف "
+"سحثشن {beta_language}."
+
+#: lms/static/js/student_account/views/account_settings_view.js
+msgid "Help Translate into {beta_language}"
+msgstr "اثمح فقشرسمشفث هرفخ {beta_language}"
 
 #: cms/templates/js/asset-library.underscore
 #: cms/templates/js/basic-modal.underscore

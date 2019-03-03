@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-02-24 20:37+0000\n"
-"PO-Revision-Date: 2019-02-24 20:37:32.857113\n"
+"POT-Creation-Date: 2019-03-03 20:37+0000\n"
+"PO-Revision-Date: 2019-03-03 20:37:47.049579\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -493,6 +493,7 @@ msgid "Unauthorized email address."
 msgstr "عرشعفاخقهظثي ثوشهم شييقثسس."
 
 #: common/djangoapps/student/forms.py
+#: common/djangoapps/student/views/management.py
 #, python-brace-format
 msgid ""
 "It looks like {email} belongs to an existing account. Try again with a "
@@ -5117,6 +5118,36 @@ msgstr ""
 #, python-format
 msgid "Request to change %(platform_name)s account e-mail"
 msgstr "قثضعثسف فخ ذاشرلث %(platform_name)s شذذخعرف ث-وشهم"
+
+#: common/templates/student/edx_ace/emailchangeconfirmation/email/body.html
+#: common/templates/student/edx_ace/emailchangeconfirmation/email/subject.txt
+#, python-format
+msgid "Email Change Confirmation for %(platform_name)s"
+msgstr "ثوشهم ذاشرلث ذخربهقوشفهخر بخق %(platform_name)s"
+
+#: common/templates/student/edx_ace/emailchangeconfirmation/email/body.html
+#: common/templates/student/edx_ace/emailchangeconfirmation/email/body.txt
+#, python-format
+msgid ""
+"This is to confirm that you changed the e-mail associated with "
+"%(platform_name)s from %(old_email)s to %(new_email)s. If you did not make "
+"this request, please contact us immediately. Contact information is listed "
+"at:"
+msgstr ""
+"فاهس هس فخ ذخربهقو فاشف غخع ذاشرلثي فاث ث-وشهم شسسخذهشفثي صهفا "
+"%(platform_name)s بقخو %(old_email)s فخ %(new_email)s. هب غخع يهي رخف وشنث "
+"فاهس قثضعثسف, حمثشسث ذخرفشذف عس هووثيهشفثمغ. ذخرفشذف هربخقوشفهخر هس مهسفثي "
+"شف:"
+
+#: common/templates/student/edx_ace/emailchangeconfirmation/email/body.html
+#: common/templates/student/edx_ace/emailchangeconfirmation/email/body.txt
+#: themes/stanford-style/lms/templates/emails/confirm_email_change.txt
+msgid ""
+"We keep a log of old e-mails, so if this request was unintentional, we can "
+"investigate."
+msgstr ""
+"صث نثثح ش مخل خب خمي ث-وشهمس, سخ هب فاهس قثضعثسف صشس عرهرفثرفهخرشم, صث ذشر "
+"هردثسفهلشفث."
 
 #: common/templates/student/edx_ace/passwordreset/email/body.html
 #: lms/templates/forgot_password_modal.html
@@ -17583,61 +17614,38 @@ msgstr ""
 "{platform_name} شذذخعرف."
 
 #: lms/templates/dashboard/_entitlement_reason_survey.html
-#: lms/templates/dashboard/_reason_survey.html
 msgid ""
-"We're sorry to see you go! Please share your main reason for unenrolling."
+"We're sorry to see you go! Read the following statements and rate your level"
+" of agreement."
 msgstr ""
-"صث'قث سخققغ فخ سثث غخع لخ! حمثشسث ساشقث غخعق وشهر قثشسخر بخق عرثرقخممهرل."
+"صث'قث سخققغ فخ سثث غخع لخ! قثشي فاث بخممخصهرل سفشفثوثرفس شري قشفث غخعق مثدثم"
+" خب شلقثثوثرف."
 
 #: lms/templates/dashboard/_entitlement_reason_survey.html
-#: lms/templates/dashboard/_reason_survey.html
-msgid "I just wanted to browse the material"
-msgstr "ه تعسف صشرفثي فخ زقخصسث فاث وشفثقهشم"
+msgid "Price is too high for me"
+msgstr "حقهذث هس فخخ اهلا بخق وث"
 
 #: lms/templates/dashboard/_entitlement_reason_survey.html
-#: lms/templates/dashboard/_reason_survey.html
-msgid "This won't help me reach my goals"
-msgstr "فاهس صخر'ف اثمح وث قثشذا وغ لخشمس"
+msgid "I was not satisfied with my experience taking the courses"
+msgstr "ه صشس رخف سشفهسبهثي صهفا وغ ثطحثقهثرذث فشنهرل فاث ذخعقسثس"
 
 #: lms/templates/dashboard/_entitlement_reason_survey.html
-#: lms/templates/dashboard/_reason_survey.html
-msgid "I don't have the time"
-msgstr "ه يخر'ف اشدث فاث فهوث"
+msgid "Content of the courses was too difficult"
+msgstr "ذخرفثرف خب فاث ذخعقسثس صشس فخخ يهببهذعمف"
 
 #: lms/templates/dashboard/_entitlement_reason_survey.html
-#: lms/templates/dashboard/_reason_survey.html
-msgid "I don't have the academic or language prerequisites"
-msgstr "ه يخر'ف اشدث فاث شذشيثوهذ خق مشرلعشلث حقثقثضعهسهفثس"
+msgid "I did not have enough time to complete the courses"
+msgstr "ه يهي رخف اشدث ثرخعلا فهوث فخ ذخوحمثفث فاث ذخعقسثس"
 
 #: lms/templates/dashboard/_entitlement_reason_survey.html
-#: lms/templates/dashboard/_reason_survey.html
-msgid "I don't have enough support"
-msgstr "ه يخر'ف اشدث ثرخعلا سعححخقف"
+msgid "The content was not available when I wanted to start"
+msgstr "فاث ذخرفثرف صشس رخف شدشهمشزمث صاثر ه صشرفثي فخ سفشقف"
 
 #: lms/templates/dashboard/_entitlement_reason_survey.html
-#: lms/templates/dashboard/_reason_survey.html
-msgid "I am not happy with the quality of the content"
-msgstr "ه شو رخف اشححغ صهفا فاث ضعشمهفغ خب فاث ذخرفثرف"
-
-#: lms/templates/dashboard/_entitlement_reason_survey.html
-#: lms/templates/dashboard/_reason_survey.html
-msgid "The course material was too hard"
-msgstr "فاث ذخعقسث وشفثقهشم صشس فخخ اشقي"
-
-#: lms/templates/dashboard/_entitlement_reason_survey.html
-#: lms/templates/dashboard/_reason_survey.html
-msgid "The course material was too easy"
-msgstr "فاث ذخعقسث وشفثقهشم صشس فخخ ثشسغ"
-
-#: lms/templates/dashboard/_entitlement_reason_survey.html
-#: lms/templates/dashboard/_reason_survey.html
-msgid "Something was broken"
-msgstr "سخوثفاهرل صشس زقخنثر"
-
-#: lms/templates/dashboard/_entitlement_reason_survey.html
-#: lms/templates/dashboard/_reason_survey.html
-msgid "Other"
-msgstr "خفاثق"
+msgid ""
+"Can we contact you for follow up? If so, enter your email address below:"
+msgstr ""
+"ذشر صث ذخرفشذف غخع بخق بخممخص عح? هب سخ, ثرفثق غخعق ثوشهم شييقثسس زثمخص:"
 
 #: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
@@ -17658,6 +17666,52 @@ msgstr "قثفعقر فخ يشسازخشقي"
 #: lms/templates/dashboard/_reason_survey.html
 msgid "Browse Courses"
 msgstr "زقخصسث ذخعقسثس"
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid ""
+"We're sorry to see you go! Please share your main reason for unenrolling."
+msgstr ""
+"صث'قث سخققغ فخ سثث غخع لخ! حمثشسث ساشقث غخعق وشهر قثشسخر بخق عرثرقخممهرل."
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "I just wanted to browse the material"
+msgstr "ه تعسف صشرفثي فخ زقخصسث فاث وشفثقهشم"
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "This won't help me reach my goals"
+msgstr "فاهس صخر'ف اثمح وث قثشذا وغ لخشمس"
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "I don't have the time"
+msgstr "ه يخر'ف اشدث فاث فهوث"
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "I don't have the academic or language prerequisites"
+msgstr "ه يخر'ف اشدث فاث شذشيثوهذ خق مشرلعشلث حقثقثضعهسهفثس"
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "I don't have enough support"
+msgstr "ه يخر'ف اشدث ثرخعلا سعححخقف"
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "I am not happy with the quality of the content"
+msgstr "ه شو رخف اشححغ صهفا فاث ضعشمهفغ خب فاث ذخرفثرف"
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "The course material was too hard"
+msgstr "فاث ذخعقسث وشفثقهشم صشس فخخ اشقي"
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "The course material was too easy"
+msgstr "فاث ذخعقسث وشفثقهشم صشس فخخ ثشسغ"
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "Something was broken"
+msgstr "سخوثفاهرل صشس زقخنثر"
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "Other"
+msgstr "خفاثق"
 
 #: lms/templates/debug/run_python_form.html
 msgid "Results:"
@@ -18019,29 +18073,6 @@ msgstr ""
 #: lms/templates/emails/business_order_confirmation_email.txt
 msgid "<p>Sincerely,</p><p>[[Your Signature]]</p>"
 msgstr "<p>سهرذثقثمغ,</p><p>[[غخعق سهلرشفعقث]]</p>"
-
-#: lms/templates/emails/confirm_email_change.txt
-msgid ""
-"This is to confirm that you changed the e-mail associated with "
-"{platform_name} from {old_email} to {new_email}. If you did not make this "
-"request, please contact us immediately. Contact information is listed at:"
-msgstr ""
-"فاهس هس فخ ذخربهقو فاشف غخع ذاشرلثي فاث ث-وشهم شسسخذهشفثي صهفا "
-"{platform_name} بقخو {old_email} فخ {new_email}. هب غخع يهي رخف وشنث فاهس "
-"قثضعثسف, حمثشسث ذخرفشذف عس هووثيهشفثمغ. ذخرفشذف هربخقوشفهخر هس مهسفثي شف:"
-
-#: lms/templates/emails/confirm_email_change.txt
-#: themes/stanford-style/lms/templates/emails/confirm_email_change.txt
-msgid ""
-"We keep a log of old e-mails, so if this request was unintentional, we can "
-"investigate."
-msgstr ""
-"صث نثثح ش مخل خب خمي ث-وشهمس, سخ هب فاهس قثضعثسف صشس عرهرفثرفهخرشم, صث ذشر "
-"هردثسفهلشفث."
-
-#: lms/templates/emails/email_change_subject.txt
-msgid "Request to change {platform_name} account e-mail"
-msgstr "قثضعثسف فخ ذاشرلث {platform_name} شذذخعرف ث-وشهم"
 
 #: lms/templates/emails/failed_verification_email.txt
 msgid ""

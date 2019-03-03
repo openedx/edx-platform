@@ -5,9 +5,10 @@
 #
 # Translators:
 # Adolfo Michel <Michel.14.993@gmail.com>, 2017
-# Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2018
+# Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2018-2019
 # arrow1234 <aleoncavallo@gmail.com>, 2014
 # Anatoli F. Peña Castillo <djanatoli@gmail.com>, 2016
+# AngelesAlvarez, 2019
 # Anthony Mangano <amangano@edx.org>, 2017
 # Antonio Pardo <apardo@alabs.org>, 2013
 # Antonio Pardo <apardo@alabs.org>, 2013
@@ -71,7 +72,7 @@
 #
 # Translators:
 # Addi Hazel Mendoza Sánchez <addictivoh@gmail.com>, 2015
-# Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2018
+# Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2018-2019
 # Andres Garcia <afgarcia0479@misena.edu.co>, 2019
 # Antonio Pardo <apardo@alabs.org>, 2013
 # Antonio Pardo <apardo@alabs.org>, 2013
@@ -108,10 +109,11 @@
 # Translators:
 # Addi Hazel Mendoza Sánchez <addictivoh@gmail.com>, 2014
 # Adolfo Michel <Michel.14.993@gmail.com>, 2017
-# Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2018
+# Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2018-2019
 # Anatoli F. Peña Castillo <djanatoli@gmail.com>, 2016
 # andreslucena <inactive+andreslucena@transifex.com>, 2013
 # andreslucena <inactive+andreslucena@transifex.com>, 2013
+# AngelesAlvarez, 2019
 # Angel Kurten <angelkurten@hotmail.com>, 2016
 # Anthony Mangano <amangano@edx.org>, 2017
 # Antonio Pardo <apardo@alabs.org>, 2013
@@ -238,14 +240,15 @@
 #
 # Translators:
 # Miguel Bonilla <mbonilla@edx.org>, 2019
+# Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2019
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-02-17 20:42+0000\n"
+"POT-Creation-Date: 2019-02-26 13:11+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
-"Last-Translator: Miguel Bonilla <mbonilla@edx.org>, 2019\n"
+"Last-Translator: Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2019\n"
 "Language-Team: Spanish (Latin America) (https://www.transifex.com/open-edx/teams/6205/es_419/)\n"
 "Language: es_419\n"
 "MIME-Version: 1.0\n"
@@ -364,15 +367,15 @@ msgstr "Pendiente"
 
 #: cms/templates/admin/base_site.html lms/templates/admin/base_site.html
 msgid "Django site admin"
-msgstr ""
+msgstr "Administrador del sitio Django"
 
 #: cms/templates/admin/base_site.html lms/templates/admin/base_site.html
 msgid "Django administration"
-msgstr ""
+msgstr "Administración de Django"
 
 #: cms/templates/admin/base_site.html lms/templates/admin/base_site.html
 msgid "View site"
-msgstr ""
+msgstr "Ver sitio"
 
 #: cms/templates/admin/base_site.html lms/templates/admin/base_site.html
 msgid "Documentation"
@@ -596,7 +599,7 @@ msgstr "Perfil de usuario"
 
 #: common/djangoapps/student/admin.py
 msgid "Account recovery"
-msgstr ""
+msgstr "Recuperación de cuenta"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This label appears above a field on the login form
@@ -618,6 +621,8 @@ msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password."
 msgstr ""
+"Las contraseñas sin procesar no son almacenadas, así que no hay manera de "
+"ver la contraseña de este usuario."
 
 #: common/djangoapps/student/forms.py
 msgid ""
@@ -962,11 +967,13 @@ msgstr "Valor de este atributo de usuario."
 
 #: common/djangoapps/student/models.py
 msgid "Secondary email address"
-msgstr ""
+msgstr "Dirección de correo electrónico secundaria"
 
 #: common/djangoapps/student/models.py
 msgid "Secondary email address to recover linked account."
 msgstr ""
+"Dirección de correo electrónico secundaria para recuperar una cuenta "
+"asociada"
 
 #: common/djangoapps/student/views/dashboard.py
 msgid " and "
@@ -1021,12 +1028,17 @@ msgid ""
 "Add a recovery email to retain access when single-sign on is not available. "
 "Go to {link_start}your Account Settings{link_end}."
 msgstr ""
+"Añadir un correo electrónico de recuperación para mantener el acceso cuando "
+"no está disponible el inicio de sesión único. Ir a {link_start} "
+"configuración de la cuenta{link_end}."
 
 #: common/djangoapps/student/views/dashboard.py
 msgid ""
 "Recovery email is not activated yet. Kindly visit your email and follow the "
 "instructions to activate it."
 msgstr ""
+"El correo de recuperación aún no ha sido activado. Revise su coreo "
+"electrónico y siga las instrucciones para activarlo."
 
 #: common/djangoapps/student/views/dashboard.py
 #, python-brace-format
@@ -1160,6 +1172,9 @@ msgid ""
 "{html_start}Password Creation Complete{html_end}Your password has been "
 "created. {bold_start}{email}{bold_end} is now your primary login email."
 msgstr ""
+"{html_start} Creación de contraseña completa {html_end} Su contrseña ha sido"
+" creada. {bold_start}{email}{bold_end} es ahora su correo de acceso "
+"principal."
 
 #: common/djangoapps/student/views/management.py
 msgid "Valid e-mail address required."
@@ -1171,7 +1186,7 @@ msgstr "El correo electrónico nuevo es igual al anterior."
 
 #: common/djangoapps/student/views/management.py
 msgid "Cannot be same as your sign in email address."
-msgstr ""
+msgstr "No puede ser el mismo que su correo electrónico para iniciar sesión."
 
 #: common/djangoapps/student/views/management.py
 msgid "Unable to send email activation link. Please try again later."
@@ -2509,17 +2524,19 @@ msgstr "Correcto o fecha vencida"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "After Some Number of Attempts"
-msgstr ""
+msgstr "Después de un cierto número de intentos"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Show Answer: Number of Attempts"
-msgstr ""
+msgstr "Mostrar respuesta: Número de intentos"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid ""
 "Number of times the student must attempt to answer the question before the "
 "Show Answer button appears."
 msgstr ""
+"Número de veces que el estudiante debe intentar responder la pregunta antes "
+"de que el botón Mostrar Respuesta aparezca."
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Whether to force the save button to appear on the page"
@@ -2952,6 +2969,9 @@ msgid ""
 "The selected proctoring provider, {proctoring_provider}, is not a valid "
 "provider. Please select from one of {available_providers}."
 msgstr ""
+"El proveedor de supervisión seleccionado, {proctoring_provider}, no es un "
+"proveedor válido. Por favor selecione uno de los siguientes "
+"{available_providers}."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "LTI Passports"
@@ -3785,7 +3805,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Proctoring Provider"
-msgstr ""
+msgstr "Proveedor de Supervisión"
 
 #: common/lib/xmodule/xmodule/course_module.py
 #, python-brace-format
@@ -3793,6 +3813,8 @@ msgid ""
 "Enter the proctoring provider you want to use for this course run. Choose "
 "from the following options: {available_providers}."
 msgstr ""
+"Indique el proveedor de supervisión que quiere usar para el tiempo durante el cual se realizará el curso. Eliga entre las siguientes opciones:\n"
+"{available_providers}"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Allow Opting Out of Proctored Exams"
@@ -3904,7 +3926,7 @@ msgstr "Especifique lo que un estudiante puede aprender en el curso."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Visibility For Unenrolled Learners"
-msgstr ""
+msgstr "Visibilidad del curso para estudiantes no inscritos"
 
 #. Translators: the quoted words 'private', 'public_outline', and 'public'
 #. must be left untranslated.  Leave them as English words.
@@ -3915,6 +3937,11 @@ msgid ""
 "enrolled students), 'public_outline' (allow access to course outline) and "
 "'public' (allow access to both outline and course content)."
 msgstr ""
+"Define los permisos de acceso para estudiantes no inscritos. Puede ser "
+"establecido en uno de tres valores: 'private' (visibilidad por defecto, "
+"permitido solo para esudiantes inscritos), 'public_outline' (permite acceso "
+"a la estructura del curso) y 'public' (permite acceso a la estructura del "
+"curso y al contenido del curso)."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Instructor"
@@ -4763,11 +4790,11 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid "Is Onboarding Exam"
-msgstr ""
+msgstr "Es examen de Integración"
 
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid "This setting indicates whether this exam is an onboarding exam."
-msgstr ""
+msgstr "Esta configuración indica si este examen es un examen de Integración."
 
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid ""
@@ -5345,10 +5372,12 @@ msgid ""
 "{display_name} is only accessible to enrolled learners. Sign in or register,"
 " and enroll in this course to view it."
 msgstr ""
+"{display_name} sólo es accesible para los estudiantes inscritos. Inicie "
+"sesión o regístrese, e inscríbase en el curso para verlo."
 
 #: common/templates/student/edx_ace/accountrecovery/email/body.html
 msgid "Create Password"
-msgstr ""
+msgstr "Crear contraseña"
 
 #: common/templates/student/edx_ace/accountrecovery/email/body.html
 #: common/templates/student/edx_ace/accountrecovery/email/body.txt
@@ -5357,6 +5386,8 @@ msgid ""
 "You're receiving this e-mail because you requested to create a password for "
 "your user account at %(platform_name)s."
 msgstr ""
+"Ha recibido este correo electrónico porque solicitó crear una constraseña "
+"para su cuenta de usuario en %(platform_name)s"
 
 #: common/templates/student/edx_ace/accountrecovery/email/body.html
 #: common/templates/student/edx_ace/accountrecovery/email/body.txt
@@ -5365,6 +5396,9 @@ msgid ""
 "We've restored access to your %(platform_name)s account using the recovery "
 "email you provided at registration."
 msgstr ""
+"Hemos restablecido el acceso a su cuenta en  %(platform_name)s usando la "
+"dirección de correo electrónico de recuperación que usted proporcionó al "
+"momento de registrarse."
 
 #: common/templates/student/edx_ace/accountrecovery/email/body.html
 #: common/templates/student/edx_ace/accountrecovery/email/body.txt
@@ -5373,6 +5407,9 @@ msgid ""
 "Once you've created a password [below], you will be able to log in to "
 "%(platform_name)s with this email (%(email)s) and your new password."
 msgstr ""
+"Una vez ha creado una contraseña [debajo], podrá iniciar sesión en "
+"%(platform_name)s con este correo electrónico (%(email)s) y su nueva "
+"contraseña."
 
 #: common/templates/student/edx_ace/accountrecovery/email/body.html
 #: common/templates/student/edx_ace/accountrecovery/email/body.txt
@@ -5399,7 +5436,7 @@ msgstr "El equpo de %(platform_name)s"
 #: common/templates/student/edx_ace/accountrecovery/email/subject.txt
 #, python-format
 msgid "Password creation on %(platform_name)s"
-msgstr ""
+msgstr "Creación de contraseña en %(platform_name)s"
 
 #: common/templates/student/edx_ace/emailchange/email/body.html
 msgid "Email Change"
@@ -5487,13 +5524,15 @@ msgstr "Reestablicimiento de contraseña en %(platform_name)s"
 
 #: common/templates/student/edx_ace/recoveryemailcreate/email/body.html
 msgid "Create Recovery Email"
-msgstr ""
+msgstr "Crear correo de recuperación"
 
 #: common/templates/student/edx_ace/recoveryemailcreate/email/body.html
 #: common/templates/student/edx_ace/recoveryemailcreate/email/body.txt
 #, python-format
 msgid "You've registered this recovery email address for %(platform_name)s."
 msgstr ""
+"Ha registrado esta dirección de correo electrónico de recuperación para el "
+"sitio %(platform_name)s."
 
 #: common/templates/student/edx_ace/recoveryemailcreate/email/body.html
 #: common/templates/student/edx_ace/recoveryemailcreate/email/body.txt
@@ -5501,6 +5540,9 @@ msgid ""
 "If you set this email address, click \"confirm email.\"  If you didn't "
 "request this change, you can disregard this email."
 msgstr ""
+"Si establece está dirección de correo electrónico, seleccione \"confirmar "
+"correo\". Si no solicitó este cambio, puede ignorar este correo electrónico."
+" "
 
 #. Translators: This label appears above a field on the registration form
 #. meant to confirm the user's email address.
@@ -5512,7 +5554,7 @@ msgstr "Confirmar Correo Electrónico"
 #: common/templates/student/edx_ace/recoveryemailcreate/email/subject.txt
 #, python-format
 msgid "Confirm your recovery email for %(platform_name)s"
-msgstr ""
+msgstr "Confirme su correo de recuperación para %(platform_name)s"
 
 #: lms/djangoapps/badges/events/course_complete.py
 #, python-brace-format
@@ -6634,12 +6676,16 @@ msgid ""
 "There is no user with the username or email address u\"{user_identifier}\" "
 "enrolled in this course."
 msgstr ""
+"No hay un usuario con nombre de usuario o dirección de correo "
+"electrónico\"{user_identifier}\" inscrito en este curso."
 
 #: lms/djangoapps/courseware/masquerade.py
 msgid ""
 "This user does not have access to this content because"
 "                         the content start date is in the future"
 msgstr ""
+"Este usuario no tiene acceso a este contenido porque la fecha de inicio del "
+"contenido está en el futuro."
 
 #: lms/djangoapps/courseware/masquerade.py
 msgid ""
@@ -7362,6 +7408,8 @@ msgid ""
 "A proctored exam attempt for {exam_name} in {course_name} by username: {student_username} was reviewed as {review_status} by the proctored exam review provider.\n"
 "Review link: {review_url}"
 msgstr ""
+"Un intento en el examen supervisado para {exam_name} en el curso {course_name} por el usuario: {student_username} fue revisado como {review_status} por el proveedor de revisiones del examen supervisado.\n"
+"Enlace de revisión: {review_url}"
 
 #: lms/djangoapps/instructor/settings/common.py
 msgid "Your Platform Insights"
@@ -9577,13 +9625,14 @@ msgstr "Derechos"
 msgid "View, create, and reissue learner entitlements"
 msgstr "Ver, crear y reexpedir derechos de los estudiantes."
 
+#: lms/djangoapps/support/views/index.py
 #: lms/templates/support/feature_based_enrollments.html
 msgid "Feature Based Enrollments"
-msgstr "Inscripciones basadas en características"
+msgstr "Inscripciones Basadas en Características"
 
 #: lms/djangoapps/support/views/index.py
 msgid "View feature based enrollment settings"
-msgstr ""
+msgstr "Ver configuración de Inscripción basada en características"
 
 #: lms/djangoapps/support/views/manage_user.py
 msgid "user_support_url"
@@ -9859,7 +9908,7 @@ msgstr "Para empezar, por favor visita https://%(site_name)s."
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
 msgid "The login information for your account follows:"
-msgstr ""
+msgstr "La información de inicio de sesión para su cuenta:"
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
@@ -9882,7 +9931,7 @@ msgstr "Se recomienda que cambies tu contraseña."
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
 #, python-format
 msgid "Sincerely yours, The %(course_name)s Team"
-msgstr ""
+msgstr "Atentamente, el equipo de %(course_name)s"
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
 #, python-format
@@ -10061,7 +10110,7 @@ msgstr "Apreciado estudiante,"
 #: lms/templates/instructor/edx_ace/allowedenroll/email/body.txt
 #, python-format
 msgid "To access this course visit %(course_url)s and login."
-msgstr ""
+msgstr "Para acceder a este curso visita %(course_url)s e inicia sesión."
 
 #: lms/templates/instructor/edx_ace/allowedenroll/email/body.txt
 #, python-format
@@ -10069,6 +10118,8 @@ msgid ""
 "To access this course visit %(course_about_url)s and register for this "
 "course."
 msgstr ""
+"Para acceder al curso visite %(course_about_url)s e inscríbase en este "
+"curso."
 
 #: lms/templates/instructor/edx_ace/allowedenroll/email/body.txt
 #, python-format
@@ -10188,6 +10239,8 @@ msgstr "Accede al material del curso ahora"
 msgid ""
 "You have been removed as a beta tester for %(course_name)s at %(site_name)s"
 msgstr ""
+"Ha sido removido como usuario de prueba para el curso %(course_name)s en "
+"%(site_name)s"
 
 #: lms/templates/instructor/edx_ace/removebetatester/email/body.html
 #, python-format
@@ -10195,6 +10248,8 @@ msgid ""
 "You have been removed as a beta tester for %(course_name)s at %(site_name)s "
 "by a member of the course staff."
 msgstr ""
+"Ha sido removido como usuario de prueba para el curso %(course_name)s en  "
+"%(site_name)s por un miembro del equipo del curso."
 
 #: lms/templates/instructor/edx_ace/removebetatester/email/body.html
 msgid ""
@@ -10211,11 +10266,16 @@ msgid ""
 "by a member of the course staff. This course will remain on your dashboard, "
 "but you will no longer be part of the beta testing group."
 msgstr ""
+"Ha sido removido como usuario de prueba para el curso %(course_name)s en  "
+"%(site_name)s por un miembro del equipo del curso. Este curso continuará en "
+"su panel de control, pero usted no será parte del grupo de usuarios de "
+"prueba."
 
 #: lms/templates/instructor/edx_ace/removebetatester/email/subject.txt
 #, python-format
 msgid "You have been removed from a beta test for %(course_name)s"
 msgstr ""
+"Usted ha sido eliminado de la prueba beta para el curso %(course_name)s"
 
 #: lms/templates/logout.html
 msgid "Signed Out"
@@ -10269,6 +10329,9 @@ msgstr ""
 
 #: lms/templates/oauth2_provider/authorize.html
 #: openedx/core/djangoapps/user_api/admin.py
+#: cms/templates/course-create-rerun.html cms/templates/index.html
+#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
+#: cms/templates/videos_index_pagination.html
 msgid "Cancel"
 msgstr "Cancelar"
 
@@ -10449,7 +10512,8 @@ msgstr "Previsualizar esta revisión"
 msgid "Auto log:"
 msgstr "Auto log:"
 
-#: lms/templates/wiki/history.html wiki/templates/wiki/history.html
+#: lms/templates/wiki/history.html cms/templates/videos_index_pagination.html
+#: wiki/templates/wiki/history.html
 msgid "Change"
 msgstr "Cambiar"
 
@@ -11044,7 +11108,7 @@ msgstr "Habilitado"
 
 #: openedx/core/djangoapps/config_model_utils/models.py
 msgid "Configuration may not be specified at more than one level at once."
-msgstr ""
+msgstr "La configuración no se puede especificar en más de un nivel a la vez."
 
 #: openedx/core/djangoapps/cors_csrf/models.py
 msgid ""
@@ -11374,6 +11438,11 @@ msgid ""
 "to the email address associated with this account. Thank you for helping us "
 "keep your data safe."
 msgstr ""
+"{strong_tag_open} Recientemente cambiamos los requisitos para las "
+"contraseñas. {strong_tag_close}{break_line_tag}Su contraseña actual no "
+"cumple con los nuevos requisitos de seguridad. Acabamos de enviar un mensaje"
+" para restablecer la contraseña al correo electrónico asociado con esta "
+"cuenta. Gracias por ayudarnos a mantener su información segura. "
 
 #: openedx/core/djangoapps/password_policy/compliance.py
 #, python-brace-format
@@ -11384,6 +11453,12 @@ msgid ""
 "does not meet these requirements. To reset your password, go to to "
 "{anchor_tag_open}Account Settings{anchor_tag_close}."
 msgstr ""
+"{strong_tag_open} Acción requerida: Por favor actualice su "
+"contraseña{strong_tag_close}{break_line_tag} a partir de {deadline}, "
+"{platform_name} requerirá que todos los estudiantes tengan contraseñas "
+"complejas. Su contraseña actual no cumple con estos requerimientos. Para "
+"restablecer su contraseña vaya a {anchor_tag_open} Configuración de la "
+"cuenta {anchor_tag_close}."
 
 #: openedx/core/djangoapps/profile_images/images.py
 #, python-brace-format
@@ -12413,6 +12488,14 @@ msgid ""
 " for the org that the course is in, then the more specific context overrides"
 " the more general context."
 msgstr ""
+"Estos definen el contexto para habilitar los límites de duración del curso. "
+"Si no se establecen valores, entonces la configuración es aplicada "
+"globalmente. Si se establece un solo valor, entonces la configuración aplica"
+" para todos los cursos dentro de ese contexto.  Como máximo se pude "
+"establecer un valor a la vez. <br>Si multiples contextos aplican a un curso "
+"(por ejemplo, si la configuración es específicada solamente para el curso, y"
+" para la organización del curso, entonces, el contexto más específico "
+"reemplaza al contexto más general."
 
 #: openedx/features/content_type_gating/admin.py
 #: openedx/features/course_duration_limits/admin.py
@@ -12422,7 +12505,14 @@ msgid ""
 "For example, if \"Enabled\" is left as \"Unknown\" in the course context, "
 "then that course will be Enabled only if the org that it is in is Enabled."
 msgstr ""
+"Si alguno de estos valores es dejado vacío o \"Desconocido\", su valor en "
+"tiempo de ejecución se recuperará del siguiente contexto más específico que "
+"corresponda. Por ejemplo, si \"Habilitado\" es dejado como \"Desconocido\" "
+"en el contexto del curso, entonces ese curso estará Habilitado solo si la "
+"organización del curso está Habilitada."
 
+#: openedx/features/content_type_gating/models.py
+#: openedx/features/course_duration_limits/models.py
 #: lms/templates/support/feature_based_enrollments.html
 msgid "Enabled As Of"
 msgstr "Habilitado a partir de"
@@ -12433,29 +12523,36 @@ msgid ""
 "If the configuration is Enabled, then all enrollments created after this "
 "date and time (UTC) will be affected."
 msgstr ""
+"Si se habilita la configuración, todas las inscripciones creadas depues de "
+"esta fecha y hora (UTC) serán afectadas."
 
 #: openedx/features/content_type_gating/models.py
 msgid "Studio Override Enabled"
-msgstr ""
+msgstr "Sobre-escribir en Studio habilitada"
 
 #: openedx/features/content_type_gating/models.py
 msgid ""
 "Allow Feature Based Enrollment visibility to be overriden on a per-component"
 " basis in Studio."
 msgstr ""
+"Permitir que la visibilidad de inscripciones basadas en características sea "
+"sobreescrita en en función de cada componente en Studio."
 
 #: openedx/features/content_type_gating/models.py
 #: openedx/features/course_duration_limits/models.py
 msgid "enabled_as_of must be set when enabled is True"
 msgstr ""
+"Habilitado_apartir_de debe ser establecido cuando habilitado está en True"
 
 #: openedx/features/content_type_gating/partitions.py
 msgid "Feature-based Enrollments"
-msgstr ""
+msgstr "Inscripciones basadas en características"
 
 #: openedx/features/content_type_gating/partitions.py
 msgid "Partition for segmenting users by access to gated content types"
 msgstr ""
+"Partición para segmentar usuarios por acceso a tipos de contenido "
+"restringido"
 
 #: openedx/features/content_type_gating/partitions.py
 msgid ""
@@ -12495,7 +12592,7 @@ msgstr "El acceso a {course_name} expiró el {expiration_date}"
 #: openedx/features/course_duration_limits/access.py
 #, python-brace-format
 msgid "Access to the course you were looking for expired on {expiration_date}"
-msgstr ""
+msgstr "El acceso al curso que estaba buscando expiró el {expiration_date}"
 
 #: openedx/features/course_duration_limits/access.py
 #, python-brace-format
@@ -13329,7 +13426,7 @@ msgstr "{course}_video_urls"
 
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "A non zero positive integer is expected"
-msgstr ""
+msgstr "Se espera un número entero positivo diferente a cero"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "unrequested"
@@ -14828,21 +14925,23 @@ msgstr ""
 
 #: lms/templates/secondary_email_change_failed.html
 msgid "Secondary e-mail change failed"
-msgstr ""
+msgstr "El cambio en el correo electrónico secundario falló"
 
 #: lms/templates/secondary_email_change_failed.html
 msgid "We were unable to activate your secondary email {secondary_email}"
-msgstr ""
+msgstr "No pudimos activar su correo electrónico secundario {secondary_email}"
 
 #: lms/templates/secondary_email_change_successful.html
 msgid "Secondary e-mail change successful!"
-msgstr ""
+msgstr "¡El cambio de correo electrónico secundario fue exitoso!"
 
 #: lms/templates/secondary_email_change_successful.html
 msgid ""
 "Your secondary email has been activated. Please visit "
 "{link_start}dashboard{link_end} for courses."
 msgstr ""
+"Su correo electrónico secundario ha sido activdado. Por favor visite "
+"{link_start}Panel de Control{link_end} para ver los cursos."
 
 #: lms/templates/seq_module.html
 msgid "Important!"
@@ -15080,7 +15179,7 @@ msgstr ""
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Manage course staff and instructors"
-msgstr "Administrar el personal del curso y los instructores"
+msgstr "Administrar el equipo del curso y los instructores"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Download staff and instructor list (csv file)"
@@ -16941,6 +17040,9 @@ msgid ""
 "discussions forums. {b_start}This track does not include graded "
 "assignments.{b_end}"
 msgstr ""
+"Tome este curso de manera gratuita y obtenga acceso a materiales del curso y"
+" foros de discusión. {b_start}Este tipo de inscripción no incluye "
+"actividades calificables.{b_end}"
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
@@ -16949,6 +17051,9 @@ msgid ""
 "discussions forums. {b_start}This track does not include unlimited course "
 "access.{b_end}"
 msgstr ""
+"Tome este curso de manera gratuita y obtenga acceso a materiales del curso y"
+" foros de discusión. {b_start} Este tipo de inscripción no incluye acceso "
+"ilimitado al curso.{b_end}"
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
@@ -17030,8 +17135,8 @@ msgid "Enrollment is Closed"
 msgstr "Inscripción cerrada"
 
 #: lms/templates/courseware/course_about.html
-msgid "Add {course_name} to Cart <span>({price} USD)</span>"
-msgstr "Añadir {course_name} al carrito <span>({price} USD)</span>"
+msgid "Add {course_name} to Cart {start_span}({price} USD){end_span}"
+msgstr "Añadir {course_name} al carrito {start_span}({price} USD){end_span}"
 
 #: lms/templates/courseware/course_about.html
 msgid "Enroll in {course_name}"
@@ -19307,6 +19412,10 @@ msgid "Professional"
 msgstr "Profesional"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Master's"
+msgstr "Maestría"
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Basic Course Information"
 msgstr "Información básica del curso"
 
@@ -20707,7 +20816,7 @@ msgstr "Registro de intentos de los estudiantes en los exámenes especiales."
 
 #: lms/templates/instructor/instructor_dashboard_2/special_exams.html
 msgid "Review Dashboard"
-msgstr ""
+msgstr "Revisar panel de control"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View gradebook for enrolled learners"
@@ -25957,11 +26066,11 @@ msgstr "Ajustes de vídeo del curso"
 
 #: cms/templates/videos_index_pagination.html
 msgid "Changing.."
-msgstr ""
+msgstr "Cambiando..."
 
 #: cms/templates/videos_index_pagination.html
 msgid "Videos per page:"
-msgstr ""
+msgstr "Vídeos por página:"
 
 #: cms/templates/visibility_editor.html
 msgid "Access is not restricted"
@@ -27527,13 +27636,17 @@ msgid ""
 "Once you have verified your identity and reviewed the exam guidelines in "
 "Proctortrack, you will be redirected back to this page."
 msgstr ""
+"Una vez que haya verificado su identidad y revisado las pautas del examen en"
+" Proctortrack, regresará a esta página."
 
 #: edx_proctoring_proctortrack/backends/proctortrack_rest.py
 msgid ""
 "To confirm that proctoring has started, make sure your webcam feed and the "
 "blue Proctortrack box are both visible on your screen."
 msgstr ""
+"Para confirmar que la supervisión ha empezado, asegúrese que las imágenes de"
+" su camara web y la caja azul de Proctortrack sean visibles en su pantalla."
 
 #: edx_proctoring_proctortrack/backends/proctortrack_rest.py
 msgid "Click on the \"Start Proctored Exam\" button below to continue."
-msgstr ""
+msgstr "Seleccione la opción \"Empezar examen supervisado\" abajo para continuar."

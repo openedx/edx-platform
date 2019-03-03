@@ -5,7 +5,7 @@
 #
 # Translators:
 # Addi Hazel Mendoza Sánchez <addictivoh@gmail.com>, 2015
-# Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2018
+# Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2018-2019
 # Andres Garcia <afgarcia0479@misena.edu.co>, 2019
 # Antonio Pardo <apardo@alabs.org>, 2013
 # Antonio Pardo <apardo@alabs.org>, 2013
@@ -54,7 +54,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
-# Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2018
+# Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2018-2019
 # Anatoli F. Peña Castillo <djanatoli@gmail.com>, 2016
 # Andres Garcia <afgarcia0479@misena.edu.co>, 2019
 # Antonio Pardo <apardo@alabs.org>, 2013
@@ -83,13 +83,24 @@
 # palichis <palichis@solid-ec.org>, 2015
 # Pedro Guimarães Martins <pedrogmartins7@gmail.com>, 2014
 # Yovany Alexander Álvarez Correa <yalvarez@innovapues.com>, 2018
+# #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
+# edX community translations have been downloaded from Spanish (Latin America) (https://www.transifex.com/open-edx/teams/6205/es_419/).
+# Copyright (C) 2019 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2019.
+#
+# Translators:
+# morsoinferno <cristobal.acosta@usach.cl>, 2019
+# Laura Silva <lingison@edx.org>, 2019
+# Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2019
+#
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)
 # Copyright (C) 2019 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
-# Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2018
+# Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2018-2019
 # Lohenrex <lohenrex.ragnarok@gmail.com>, 2018
 # Alex Dzul <alexexc2@gmail.com>, 2016
 # Anatoli F. Peña Castillo <djanatoli@gmail.com>, 2016
@@ -125,7 +136,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
-# Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2018
+# Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2018-2019
 # Anatoli F. Peña Castillo <djanatoli@gmail.com>, 2016
 # Andres Garcia <afgarcia0479@misena.edu.co>, 2019
 # Morphyne <cirrosis60@gmail.com>, 2014
@@ -150,9 +161,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-02-17 20:42+0000\n"
-"PO-Revision-Date: 2019-02-10 20:45+0000\n"
-"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
+"POT-Creation-Date: 2019-02-26 13:11+0000\n"
+"PO-Revision-Date: 2019-02-27 22:36+0000\n"
+"Last-Translator: Albeiro Gonzalez <albeiro.gonzalez@edunext.co>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
 "Language: es_419\n"
 "MIME-Version: 1.0\n"
@@ -5001,6 +5012,14 @@ msgid ""
 "spam folder.{paragraphEnd}{paragraphStart}If you need further assistance, "
 "{anchorStart}contact technical support{anchorEnd}.{paragraphEnd}"
 msgstr ""
+"{paragraphStart} Ingresó {boldStart}{email}{boldEnd}. Si esta dirección de "
+"correo electrónico está asociada con su cuenta {platform_name} , le "
+"enviaremos un mensaje con instrucciones para recuperar la contraseña a esta "
+"dirección de correo electrónico. {paragraphEnd}{paragraphStart}Si no recibe "
+"un mensaje de restablecimiento de contraseña, compruebe que ha ingresado la "
+"dirección de correo electrónico correcta o compruebe su carpeta de correo no"
+" deseado.{paragraphEnd}{paragraphStart}Si necesita más ayuda, "
+"{anchorStart}contacte soporte técnico{anchorEnd}.{paragraphEnd}"
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
@@ -5066,13 +5085,15 @@ msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Recovery Email Address"
-msgstr ""
+msgstr "Dirección de correo electrónico de recuperación"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
 "You may access your account with this address if single-sign on or access to"
 " your primary email is not available."
 msgstr ""
+"Puede acceder a su cuenta con esta dirección si no están disponibles el "
+"inicio de sesión único -SSO- o el acceso a su correo electrónico principal."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
@@ -5184,6 +5205,8 @@ msgid ""
 "We've sent a confirmation message to {new_secondary_email_address}. Click "
 "the link in the message to update your secondary email address."
 msgstr ""
+"Hemos enviado un mensaje de confirmación a {new_secondary_email_address}. "
+"Hacer clic en el enlace del mensaje para actualizar tu correo electrónico."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Social Media Links"
@@ -5314,26 +5337,6 @@ msgstr "Vinculando"
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Successfully unlinked."
 msgstr "Se desvinculó con éxito."
-
-#: lms/static/js/student_account/views/account_settings_view.js
-msgid "Account Information"
-msgstr "Información de la cuenta"
-
-#: lms/static/js/student_account/views/account_settings_view.js
-msgid "Order History"
-msgstr "Historial de órdenes"
-
-#: lms/static/js/student_account/views/account_settings_view.js
-msgid ""
-"You have set your language to {beta_language}, which is currently not fully "
-"translated. You can help us translate this language fully by joining the "
-"Transifex community and adding translations from English for learners that "
-"speak {beta_language}."
-msgstr ""
-
-#: lms/static/js/student_account/views/account_settings_view.js
-msgid "Help Translate into {beta_language}"
-msgstr ""
 
 #: lms/static/js/verify_student/views/image_input_view.js
 msgid "Image Upload Error"
@@ -5587,10 +5590,12 @@ msgstr "Ha actualizado exitosamente su objetivo."
 msgid "There was an error updating your goal."
 msgstr "Hubo un error actualizando su objetivo."
 
+#: openedx/features/course_experience/static/course_experience/js/CourseOutline.js
 #: lms/templates/ccx/schedule.underscore
 msgid "Expand All"
 msgstr "Expandir todo"
 
+#: openedx/features/course_experience/static/course_experience/js/CourseOutline.js
 #: lms/templates/ccx/schedule.underscore
 msgid "Collapse All"
 msgstr "Colapsar todo"
@@ -5708,7 +5713,7 @@ msgstr "Studio tiene problemas para guardar tu trabajo"
 
 #: cms/static/cms/js/xblock/cms.runtime.v1.js
 msgid "OpenAssessment Save Error"
-msgstr ""
+msgstr "Error en el servidor al guardar el componente calificación abierta"
 
 #: cms/static/js/base.js
 msgid "This link will open in a new browser window/tab"
@@ -6426,7 +6431,7 @@ msgstr ""
 
 #: cms/static/js/views/license.js
 msgid "Share Alike"
-msgstr ""
+msgstr "Compartir por igual"
 
 #: cms/static/js/views/license.js
 msgid ""
@@ -6541,11 +6546,11 @@ msgstr "Visibilidad"
 
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Editing: {title}"
-msgstr ""
+msgstr "Edición: {title}"
 
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Plugins"
-msgstr ""
+msgstr "Plug-ins"
 
 #: cms/static/js/views/modals/edit_xblock.js
 #: lms/templates/ccx/schedule.underscore
@@ -6562,7 +6567,7 @@ msgstr "Mover"
 
 #: cms/static/js/views/modals/move_xblock_modal.js
 msgid "Choose a location to move your component to"
-msgstr ""
+msgstr "Escoja una ubicación a la cual mover su componente"
 
 #: cms/static/js/views/modals/move_xblock_modal.js
 msgid "Move: {displayName}"
@@ -6652,7 +6657,7 @@ msgstr "Ocultar solo a los estudiantes"
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Inheriting Student Visibility"
-msgstr ""
+msgstr "Heredando la Visibilidad a estudiantes."
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Make Visible to Students"
@@ -6867,57 +6872,63 @@ msgid ""
 "Move cancelled. \"{sourceDisplayName}\" has been moved back to its original "
 "location."
 msgstr ""
+"Movimiento cancelado. \"{sourceDisplayName}\" ha sido movido a su ubicación "
+"original."
 
 #: cms/static/js/views/utils/move_xblock_utils.js
 msgid "Undo move"
-msgstr ""
+msgstr "Deshacer movimiento"
 
 #: cms/static/js/views/utils/move_xblock_utils.js
 msgid "Take me to the new location"
-msgstr ""
+msgstr "Léveme a una nueva ubicación"
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Duplicating"
-msgstr ""
+msgstr "Duplicando"
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Undo moving"
-msgstr ""
+msgstr "Deshacer movimiento"
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Moving"
-msgstr ""
+msgstr "Moviendo"
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Deleting this {xblock_type} is permanent and cannot be undone."
 msgstr ""
+"Eliminar este {xblock_type} es una acción permanente y no se puede revertir."
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid ""
 "Any content that has listed this content as a prerequisite will also have "
 "access limitations removed."
 msgstr ""
+"Se eliminarán las restricciones de acceso a cualquier contenido que inscriba"
+" este contenido como prerrequisito."
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Delete this {xblock_type} (and prerequisite)?"
-msgstr ""
+msgstr "¿Eliminar este {xblock_type} (y prerrequisitos)?"
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Yes, delete this {xblock_type}"
-msgstr ""
+msgstr "Si, eliminar este {xblock_type}"
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Delete this {xblock_type}?"
-msgstr ""
+msgstr "¿Eliminar este {xblock_type}?"
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "section"
-msgstr ""
+msgstr "sección"
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "subsection"
-msgstr ""
+msgstr "subsección"
 
+#: cms/static/js/views/utils/xblock_utils.js
 #: cms/templates/js/container-access.underscore
 msgid "unit"
 msgstr "unidad"
@@ -6946,64 +6957,68 @@ msgstr "Guardar cambios"
 
 #: cms/static/js/views/video/transcripts/file_uploader.js
 msgid "Please select a file in .srt format."
-msgstr ""
+msgstr "Por favor seleccione un archivo en formato .srt"
 
 #: cms/static/js/views/video/transcripts/file_uploader.js
 msgid "Error: Uploading failed."
-msgstr ""
+msgstr "Error: Falló la carga del archivo."
 
 #: cms/static/js/views/video/transcripts/message_manager.js
 msgid "Error: Import failed."
-msgstr ""
+msgstr "Error: Falló la importación."
 
 #: cms/static/js/views/video/transcripts/message_manager.js
 msgid "Error: Replacing failed."
-msgstr ""
+msgstr "Error: Falló reemplazo."
 
 #: cms/static/js/views/video/transcripts/message_manager.js
 msgid "Error: Choosing failed."
-msgstr ""
+msgstr "Error: Falló la selección."
 
 #: cms/static/js/views/video/transcripts/metadata_videolist.js
 msgid "Error: Connection with server failed."
-msgstr ""
+msgstr "Error: Falló la conexión con el servidor."
 
 #: cms/static/js/views/video/transcripts/metadata_videolist.js
 msgid "Link types should be unique."
-msgstr ""
+msgstr "Los tipos de vínculos deben ser únicos."
 
 #: cms/static/js/views/video/transcripts/metadata_videolist.js
 msgid "Links should be unique."
-msgstr ""
+msgstr "Los enlaces deben ser únicos."
 
 #: cms/static/js/views/video/transcripts/metadata_videolist.js
 msgid "Incorrect url format."
-msgstr ""
+msgstr "Formato incorrecto de URL."
 
 #: cms/static/js/views/video/translations_editor.js
 msgid ""
 "Sorry, there was an error parsing the subtitles that you uploaded. Please "
 "check the format and try again."
 msgstr ""
+"Lo sentimos. Ocurrió un error en la interpretación de los subtítulos "
+"enviados. Por favor revise el formato e intente nuevamente."
 
 #: cms/static/js/views/video/translations_editor.js
 #: cms/static/js/views/video_transcripts.js
 msgid "Are you sure you want to remove this transcript?"
-msgstr ""
+msgstr "¿Esta seguro de que quiere eliminar esta transcripción?"
 
 #: cms/static/js/views/video/translations_editor.js
 msgid ""
 "If you remove this transcript, the transcript will not be available for this"
 " component."
 msgstr ""
+"Si elimina esta transcripción, la transcripción no estará disponible para "
+"este componente."
 
 #: cms/static/js/views/video/translations_editor.js
 msgid "Remove Transcript"
-msgstr ""
+msgstr "Eliminar Transcripción."
 
 #: cms/static/js/views/video/translations_editor.js
 msgid "Upload translation"
-msgstr ""
+msgstr "Subir traducción"
 
 #: cms/static/js/views/video_thumbnail.js
 msgid "Add Thumbnail"
@@ -7144,23 +7159,48 @@ msgstr ""
 
 #: cms/static/js/views/xblock_editor.js
 msgid "Editor"
-msgstr ""
+msgstr "Editor"
 
+#: cms/static/js/views/xblock_editor.js
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid "Settings"
 msgstr "Configuración"
 
 #: cms/static/js/views/xblock_outline.js
 msgid "New {component_type}"
-msgstr ""
+msgstr "Nuevo {component_type}"
 
 #: cms/static/js/views/xblock_validation.js
 msgid "Warning"
-msgstr ""
+msgstr "Advertencia"
 
 #: cms/static/js/xblock_asides/structured_tags.js
 msgid "Updating Tags"
 msgstr "Actualizando Etiquetas"
+
+#: lms/static/js/student_account/views/account_settings_view.js
+msgid "Account Information"
+msgstr "Información de la cuenta"
+
+#: lms/static/js/student_account/views/account_settings_view.js
+msgid "Order History"
+msgstr "Historial de órdenes"
+
+#: lms/static/js/student_account/views/account_settings_view.js
+msgid ""
+"You have set your language to {beta_language}, which is currently not fully "
+"translated. You can help us translate this language fully by joining the "
+"Transifex community and adding translations from English for learners that "
+"speak {beta_language}."
+msgstr ""
+"Ha establecido su idioma en {beta_language}, el cual no está traducido "
+"completamente. Puede ayudarnos a traducir este idioma totalmente uniéndose "
+"la comunidad Transifex y adicionando traducciones desde el Inglés para los "
+"estudiantes que hablan {beta_language}."
+
+#: lms/static/js/student_account/views/account_settings_view.js
+msgid "Help Translate into {beta_language}"
+msgstr "Ayude a traducir a {beta_language}"
 
 #: cms/templates/js/asset-library.underscore
 #: cms/templates/js/basic-modal.underscore
@@ -7749,7 +7789,7 @@ msgstr "Estado de la Contraseña"
 
 #: lms/djangoapps/support/static/support/templates/manage_user.underscore
 msgid "Toggle Account Password (Usable/Unusable)"
-msgstr ""
+msgstr "Cambiar Contraseña de Cuenta (Usable/No-usable)"
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
 msgid "Your team could not be created."
@@ -8008,11 +8048,13 @@ msgstr "Marcar el examen como completado"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "a timed exam"
-msgstr ""
+msgstr "Un examen cronometrado"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "The timer on the right shows the time remaining in the exam."
 msgstr ""
+"El cronometro a la derecha muestra el tiempo restante para finalizar el "
+"examen."
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid ""
@@ -8024,19 +8066,19 @@ msgstr ""
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "Show More"
-msgstr ""
+msgstr "Mostrar más"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "Show Less"
-msgstr ""
+msgstr "Mostrar menos"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "Exam timer and end exam button"
-msgstr ""
+msgstr "Cronometro del examen y botón de finalizar examen"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "End My Exam"
-msgstr "Terminar mi examen"
+msgstr "Finalizar mi examen"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "Hide Timer"
@@ -8685,15 +8727,15 @@ msgstr "Ver registros del programa"
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid "Additional Credit Opportunities"
-msgstr ""
+msgstr "Oportunidades Adicionales de Crédito"
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid "Learn More"
-msgstr ""
+msgstr "Aprender más"
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid "Additional Professional Opportunities"
-msgstr ""
+msgstr "Oportunidades Profesionales Adicionales"
 
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Congratulations!"
@@ -8772,7 +8814,7 @@ msgstr "Restablecer Contraseña"
 
 #: lms/templates/student_account/account_settings.underscore
 msgid "Switch Language Back"
-msgstr ""
+msgstr "Cambiar idioma de nuevo."
 
 #: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
@@ -8784,7 +8826,7 @@ msgstr "Ocurrió un error. Por favor recargue la página."
 
 #: lms/templates/student_account/form_field.underscore
 msgid "Need help logging in?"
-msgstr ""
+msgstr "¿Necesita ayuda para iniciar sesión?"
 
 #: lms/templates/student_account/hinted_login.underscore
 #, python-format
@@ -8911,10 +8953,13 @@ msgid ""
 "Please enter your log-in or recovery email address below and we will send "
 "you an email with instructions."
 msgstr ""
+"Por favor ingrese su dirección de correo electrónico de inicio de sesión o "
+"de recuperación a continuación , y le enviaremos un correo electrónico con "
+"instrucciones."
 
 #: lms/templates/student_account/password_reset.underscore
 msgid "Recover my password"
-msgstr ""
+msgstr "Recuperar mi contraseña"
 
 #: lms/templates/student_account/register.underscore
 msgid "Already have an {platformName} account?"
@@ -10097,7 +10142,7 @@ msgstr "No calificado"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Onboarding Exam"
-msgstr ""
+msgstr "Examen de Integración"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Practice proctored Exam"
@@ -10123,7 +10168,7 @@ msgstr "Nombre para mostrar:"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Proctoring Settings"
-msgstr ""
+msgstr "Configuración de supervisión"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Configure"
@@ -10864,7 +10909,7 @@ msgstr ""
 
 #: cms/templates/js/show-textbook.underscore
 msgid "PDF Chapters"
-msgstr ""
+msgstr "Capítulos de PDF"
 
 #: cms/templates/js/show-textbook.underscore
 msgid "View Live"
@@ -11040,7 +11085,7 @@ msgstr ""
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Onboarding"
-msgstr ""
+msgstr "Integración"
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid ""
@@ -11049,6 +11094,10 @@ msgid ""
 "profile step prior to taking a proctored exam. Profile reviews take 2+ "
 "business days."
 msgstr ""
+"Utilice Integración para presentar la supervisión a los estudiantes, "
+"verificar su identidad y crear un perfil de integración. Los alumnos deben "
+"completar el paso del perfil de integración antes de tomar un examen "
+"supervisado. Las evaluaciones del perfil requieren 2 o más días hábiles."
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Practice Proctored"
