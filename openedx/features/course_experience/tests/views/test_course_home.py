@@ -25,7 +25,7 @@ from django_comment_client.tests.factories import RoleFactory
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.tests.helpers import get_expiration_banner_text
-from experiments.models import ExperimentKeyValue
+from experiments.models import ExperimentData
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.course_goals.api import add_course_goal, remove_course_goal
@@ -41,7 +41,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
-from openedx.features.course_duration_limits.config import EXPERIMENT_ID
+from openedx.features.course_duration_limits.config import EXPERIMENT_DATA_HOLDBACK_KEY, EXPERIMENT_ID
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience import (
     SHOW_REVIEWS_TOOL_FLAG,
@@ -589,18 +589,18 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         for mode in [CourseMode.AUDIT, CourseMode.VERIFIED]:
             CourseModeFactory.create(course_id=course.id, mode_slug=mode)
 
-        ExperimentKeyValue.objects.create(
-            experiment_id=EXPERIMENT_ID,
-            key="content_type_gating_holdback_percentage",
-            value="100"
-        )
-
         # assert that an if an expired audit user in the holdback tries to access the course
         # they are not redirected to the dashboard
         audit_user = UserFactory(password=self.TEST_PASSWORD)
         self.client.login(username=audit_user.username, password=self.TEST_PASSWORD)
         audit_enrollment = CourseEnrollment.enroll(audit_user, course.id, mode=CourseMode.AUDIT)
         ScheduleFactory(start=THREE_YEARS_AGO, enrollment=audit_enrollment)
+        ExperimentData.objects.create(
+            user=audit_user,
+            experiment_id=EXPERIMENT_ID,
+            key=EXPERIMENT_DATA_HOLDBACK_KEY,
+            value='True'
+        )
 
         response = self.client.get(url)
 
