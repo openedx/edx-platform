@@ -182,8 +182,6 @@ FEATURES = {
     # Doing so will cause all courses to be released on production
     'DISABLE_START_DATES': False,  # When True, all courses will be active, regardless of start date
 
-    'AUTH_USE_CERTIFICATES': False,
-
     # email address for studio staff (eg to request course creation)
     'STUDIO_REQUEST_EMAIL': '',
 
@@ -1026,7 +1024,6 @@ INSTALLED_APPS = [
 
     'openedx.core.djangoapps.contentserver',
     'course_creators',
-    'openedx.core.djangoapps.external_auth',
     'student.apps.StudentConfig',  # misleading name due to sharing with lms
     'openedx.core.djangoapps.course_groups',  # not used in cms (yet), but tests run
     'xblock_config.apps.XBlockConfig',

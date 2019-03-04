@@ -9,7 +9,6 @@ import contentstore.views
 from cms.djangoapps.contentstore.views.organization import OrganizationListView
 import openedx.core.djangoapps.common_views.xblock
 import openedx.core.djangoapps.debug.views
-import openedx.core.djangoapps.external_auth.views
 import openedx.core.djangoapps.lang_pref.views
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
 from openedx.core.djangoapps.password_policy.forms import PasswordPolicyAwareAdminAuthForm
@@ -199,13 +198,6 @@ if settings.FEATURES.get('ENABLE_EXPORT_GIT'):
 if settings.FEATURES.get('ENABLE_SERVICE_STATUS'):
     urlpatterns.append(url(r'^status/', include('openedx.core.djangoapps.service_status.urls')))
 
-if settings.FEATURES.get('AUTH_USE_CAS'):
-    import django_cas.views
-
-    urlpatterns += [
-        url(r'^cas-auth/login/$', openedx.core.djangoapps.external_auth.views.cas_login, name="cas-login"),
-        url(r'^cas-auth/logout/$', django_cas.views.logout, {'next_page': '/'}, name="cas-logout"),
-    ]
 # The password pages in the admin tool are disabled so that all password
 # changes go through our user portal and follow complexity requirements.
 urlpatterns.append(url(r'^admin/password_change/$', handler404))
