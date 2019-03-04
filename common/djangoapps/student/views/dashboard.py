@@ -510,6 +510,14 @@ def _credit_statuses(user, course_enrollments):
                 status["provider_status_url"] = provider_info.get("status_url")
                 status["provider_id"] = provider_id
 
+                if not status["provider_name"] and not status["provider_status_url"]:
+                    status["error"] = True
+                    log.error(
+                        u"Could not find credit provider info for [%s] in [%s]. The user will not "
+                        u"be able to see his or her credit request status on the student dashboard.",
+                        provider_id, provider_info_by_id
+                    )
+
         statuses[course_key] = status
 
     return statuses
