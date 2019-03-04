@@ -975,26 +975,6 @@ class FormulaProblemTest(ProblemsTest):
                 """)
         return XBlockFixtureDesc('problem', 'TEST PROBLEM', data=xml, metadata={'show_reset_button': True})
 
-    def test_reset_problem_after_incorrect_submission(self):
-        """
-        Scenario: Verify that formula problem can be resetted after an incorrect submission.
-
-        Given I am attempting a formula response problem type
-        When I input an incorrect answer
-        Then the answer preview is generated using MathJax
-        When I submit the problem
-        Then I can see incorrect status and a reset button
-        When I click reset, the input pane contents get clear
-        """
-        problem_page = ProblemPage(self.browser)
-        problem_page.fill_answer_numerical('R_1*R_2')
-        problem_page.verify_mathjax_rendered_in_preview()
-        problem_page.click_submit()
-        self.assertFalse(problem_page.simpleprob_is_correct())
-        self.assertTrue(problem_page.is_reset_button_present())
-        problem_page.click_reset()
-        self.assertEqual(problem_page.get_numerical_input_value, '')
-
     def test_reset_button_not_rendered_after_correct_submission(self):
         """
         Scenario: Verify that formula problem can not be resetted after an incorrect submission.
