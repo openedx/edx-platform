@@ -1,6 +1,7 @@
 """ API v0 views. """
 import logging
 
+from django.contrib.auth import get_user_model
 from rest_condition import C
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
@@ -14,10 +15,12 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.user_api.accounts.api import visible_fields
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 
 
 log = logging.getLogger(__name__)
+User = get_user_model()
 
 
 class CertificatesDetailView(GenericAPIView):
@@ -215,7 +218,7 @@ class CertificatesListView(GenericAPIView):
             A JSON serialized representation of the list of certificates.
         """
         user_certs = []
-        if request.user.username == username or request.user.is_staff:
+        if self._viewable_by_requestor(request, username):
             for user_cert in self._get_certificates_for_user(username):
                 user_certs.append({
                     'username': user_cert.get('username'),
@@ -231,6 +234,21 @@ class CertificatesListView(GenericAPIView):
                 })
 
         return Response(user_certs)
+
+    def _viewable_by_requestor(self, request, username):
+        """
+        Returns whether or not the requesting user is allowed to view the given user's certificates.
+        """
+        try:
+            user = User.objects.select_related('profile').get(username=username)
+        except User.DoesNotExist:
+            return False
+
+        is_owner = request.user.username == username
+        is_staff = request.user.is_staff
+        certificates_viewable = 'course_certificates' in visible_fields(user.profile, user)
+
+        return is_owner or is_staff or certificates_viewable
 
     def _get_certificates_for_user(self, username):
         """
