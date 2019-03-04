@@ -8,6 +8,7 @@ from contextlib import closing
 
 from pytz import UTC
 from django.utils.translation import ugettext as _
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from rest_framework import permissions, status
 from rest_framework.parsers import FormParser, MultiPartParser
@@ -110,7 +111,11 @@ class ProfileImageView(DeveloperErrorViewMixin, APIView):
     """
 
     parser_classes = (MultiPartParser, FormParser, TypedFileUploadParser)
-    authentication_classes = (OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser)
+    authentication_classes = (
+        JwtAuthentication,
+        OAuth2AuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
     permission_classes = (permissions.IsAuthenticated, IsUserInUrl)
 
     upload_media_types = set(itertools.chain(*(image_type.mimetypes for image_type in IMAGE_TYPES.values())))
