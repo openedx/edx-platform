@@ -37,6 +37,7 @@ from contentstore.views.item import (
     add_container_page_publishing_info,
     create_xblock_info,
     highlights_setting,
+    _delete_item,
 )
 from lms_xblock.mixin import NONSENSICAL_ACCESS_RESTRICTION
 from student.tests.factories import UserFactory
@@ -57,6 +58,8 @@ from xmodule.partitions.partitions import (
 )
 from xmodule.partitions.tests.test_partitions import MockPartitionService
 from xmodule.x_module import STUDENT_VIEW, STUDIO_VIEW
+from openedx.core.djangoapps.bookmarks.models import Bookmark, XBlockCache
+from openedx.core.djangoapps.bookmarks.tests.factories import BookmarkFactory
 
 
 class AsideTest(XBlockAside):
@@ -482,6 +485,52 @@ class DeleteItem(ItemTest):
         # Now delete it. There was a bug that the delete was failing (static tabs do not exist in draft modulestore).
         resp = self.client.delete(reverse_usage_url('xblock_handler', usage_key))
         self.assertEqual(resp.status_code, 204)
+
+    @patch('openedx.core.djangoapps.bookmarks.api.delete_bookmarks')
+    def test_delete_item(self, mock_delete_bookmarks):
+        # create a vertical
+        vert = self.create_xblock(display_name='vertical1', category='vertical')
+        vert_usage_key = self.response_usage_key(vert)
+
+        # retrieve a vertical
+        resp = self.client.get(reverse_usage_url('xblock_handler', vert_usage_key))
+        self.assertEqual(resp.status_code, 200)
+
+        # delete a vertical
+        _delete_item(usage_key=vert_usage_key, user=self.user)
+
+        # check that bookmark api method has been invoked
+        mock_delete_bookmarks.assert_called_once_with(usage_key=vert_usage_key)
+
+        # check that vertical is deleted
+        with self.assertRaises(ItemNotFoundError):
+            self.client.get(reverse_usage_url('xblock_handler', vert_usage_key))
+
+    def test_delete_bookmarked_item(self):
+        display_name = 'vertical'
+        vert = self.create_xblock(display_name=display_name, category='vertical')
+        vert_usage_key = self.response_usage_key(vert)
+
+        # create a bookmark
+        BookmarkFactory.create(
+            user=self.user,
+            usage_key=vert_usage_key,
+            xblock_cache=XBlockCache.create({
+                'display_name': display_name,
+                'usage_key': vert_usage_key,
+            }),
+        )
+        self.assertNotEqual(Bookmark.objects.filter(usage_key=vert_usage_key).count(), 0)
+
+        # retrieve a vertical
+        resp = self.client.get(reverse_usage_url('xblock_handler', vert_usage_key))
+        self.assertEqual(resp.status_code, 200)
+
+        # delete a vertical
+        _delete_item(usage_key=vert_usage_key, user=self.user)
+
+        # check that a bookmark is deleted
+        self.assertEqual(Bookmark.objects.filter(usage_key=vert_usage_key).count(), 0)
 
 
 class TestCreateItem(ItemTest):

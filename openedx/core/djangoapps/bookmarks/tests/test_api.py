@@ -234,3 +234,47 @@ class BookmarksAPITests(BookmarkApiEventTestMixin, BookmarksTestsBase):
                 api.delete_bookmark(user=self.other_user, usage_key=self.vertical_1.location)
 
         self.assert_no_events_were_emitted(mock_tracker)
+
+    def test_delete_bookmarks_unit(self):
+        """
+        Verifies that delete_bookmarks removes given bookmark for all users
+        (usage_key is a key for a unit).
+        """
+        # create 2 bookmarks for the unit
+        api.create_bookmark(user=self.user, usage_key=self.vertical_1.location)
+        api.create_bookmark(user=self.other_user, usage_key=self.vertical_1.location)
+        self.assertEqual(Bookmark.objects.filter(usage_key=self.vertical_1.location).count(), 2)
+
+        # delete bookmarks for this unit
+        api.delete_bookmarks(usage_key=self.vertical_1.location)
+        self.assertEqual(Bookmark.objects.filter(usage_key=self.vertical_1.location).count(), 0)
+
+    def test_delete_bookmarks_subsection(self):
+        """
+        Verifies that delete_bookmarks removes given bookmark for all users
+        (usage_key is a key for a subsection).
+        """
+        # create 2 bookmarks for the unit
+        api.create_bookmark(user=self.user, usage_key=self.vertical_1.location)
+        api.create_bookmark(user=self.other_user, usage_key=self.vertical_1.location)
+        self.assertEqual(Bookmark.objects.filter(usage_key=self.vertical_1.location).count(), 2)
+
+        # delete bookmarks for the parent of the unit (subsection)
+        # this is triggered when the subsection is being deleted
+        api.delete_bookmarks(usage_key=self.sequential_1.location)
+        self.assertEqual(Bookmark.objects.filter(usage_key=self.vertical_1.location).count(), 0)
+
+    def test_delete_bookmarks_section(self):
+        """
+        Verifies that delete_bookmarks removes given bookmark for all users
+        (usage_key is a key for a section).
+        """
+        # create 2 bookmarks for the unit
+        api.create_bookmark(user=self.user, usage_key=self.vertical_1.location)
+        api.create_bookmark(user=self.other_user, usage_key=self.vertical_1.location)
+        self.assertEqual(Bookmark.objects.filter(usage_key=self.vertical_1.location).count(), 2)
+
+        # delete bookmarks for the section that contains the given unit
+        # this is triggered when the section is being deleted
+        api.delete_bookmarks(usage_key=self.chapter_1.location)
+        self.assertEqual(Bookmark.objects.filter(usage_key=self.vertical_1.location).count(), 0)
