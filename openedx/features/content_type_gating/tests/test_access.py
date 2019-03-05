@@ -20,7 +20,7 @@ from django_comment_common.models import (
 )
 from django_comment_client.tests.factories import RoleFactory
 from course_modes.tests.factories import CourseModeFactory
-from experiments.models import ExperimentKeyValue
+from experiments.models import ExperimentData, ExperimentKeyValue
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
 
 from lms.djangoapps.courseware.module_render import load_single_xblock
@@ -39,6 +39,7 @@ from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITIO
 from openedx.features.content_type_gating.partitions import ContentTypeGatingPartition
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.config import (
+    EXPERIMENT_DATA_HOLDBACK_KEY,
     EXPERIMENT_ID,
 )
 from student.models import CourseEnrollment
@@ -532,14 +533,15 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
         """
         Test that putting a user in the content gating holdback disables content gating.
         """
-        if put_user_in_holdback:
-            ExperimentKeyValue.objects.create(
-                experiment_id=EXPERIMENT_ID,
-                key="content_type_gating_holdback_percentage",
-                value="100"
-            ).value
-
         user = UserFactory.create()
+        if put_user_in_holdback:
+            ExperimentData.objects.create(
+                user=user,
+                experiment_id=EXPERIMENT_ID,
+                key=EXPERIMENT_DATA_HOLDBACK_KEY,
+                value='True'
+            )
+
         CourseEnrollment.enroll(user, self.course.id)
 
         graded, has_score, weight = True, True, 1
