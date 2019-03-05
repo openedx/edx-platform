@@ -1,3 +1,4 @@
+## xss-lint: disable=mako-missing-default
 <%namespace name='static' file='../static_content.html'/>
 <%!
 from django.utils.translation import ugettext as _
@@ -11,16 +12,16 @@ from django.urls import reverse
       <span class="icon fa fa-remove" aria-hidden="true"></span>
       <span class="sr">
         ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
-        ${_('Close')}
+        ${_('Close') | h}
       </span>
     </button>
 
     <header>
       <h2>
-        <span id="change_language_title">${_("Change Preferred Language")}</span>
+        <span id="change_language_title">${_("Change Preferred Language") | h}</span>
         <span class="sr">,
           ## Translators: this text gives status on if the modal interface (a menu or piece of UI that takes the full focus of the screen) is open or not
-          ${_("window open")}
+          ${_("window open") | h}
         </span>
       </h2>
       <hr/>
@@ -30,7 +31,7 @@ from django.urls import reverse
       <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}">
         <ol class="list-input">
           <li class="field text settings-language-select" id="settings-language-select">
-            <label class="label sr" for="settings-language-value">${_("Please choose your preferred language")}</label>
+            <label class="label sr" for="settings-language-value">${_("Please choose your preferred language") | h}</label>
             <select class="input select" id="settings-language-value" name="language">
             % for abbrv in language_options:
               % for language in settings.LANGUAGES:

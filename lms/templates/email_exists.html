@@ -1,4 +1,4 @@
-
+## xss-lint: disable=mako-missing-default
 <%! from django.utils.translation import ugettext as _
 from openedx.core.djangolib.markup import HTML, Text
 %>
@@ -8,10 +8,10 @@ from openedx.core.djangolib.markup import HTML, Text
 <section class="container activation">
 
   <section class="message">
-    <h1 class="invalid">${Text(_("E-mail change failed"))}</h1>
+    <h1 class="invalid">${_("E-mail change failed") | h}</h1>
     <hr class="horizontal-divider">
 
-    <p>${Text(_("An account with the new e-mail address already exists."))}</p>
+    <p>${_("An account with the new e-mail address already exists.") | h}</p>
 
     <p>${Text(_("Go back to the {link_start}home page{link_end}.")).format(
         link_start=HTML('<a href="/">'),

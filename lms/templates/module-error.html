@@ -1,3 +1,4 @@
+## xss-lint: disable=mako-missing-default
 <%!
 from django.utils.translation import ugettext as _
 from openedx.core.djangolib.markup import HTML, Text
@@ -19,15 +20,15 @@ from openedx.core.djangolib.markup import HTML, Text
   </p>
 
 % if staff_access:
-<h1>${_("Details")}</h1>
+<h1>${_("Details") | h}</h1>
 
-<p>${_("Error:")}
+<p>${_("Error:") | h}
 <pre>
 ${error | h}
 </pre>
 </p>
 
-<p>${_("Raw data:")}
+<p>${_("Raw data:") | h}
 
 <pre>${data | h}</pre>
 </p>

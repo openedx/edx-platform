@@ -1,3 +1,4 @@
+## xss-lint: disable=mako-missing-default
 <%inherit file="main.html" />
 <%namespace name='static' file='static_content.html'/>
 
@@ -10,7 +11,7 @@ import third_party_auth
 from third_party_auth import provider, pipeline
 %>
 
-<%block name="pagetitle">${Text(_("Log into your {platform_name} Account")).format(platform_name=platform_name)}</%block>
+<%block name="pagetitle">${_("Log into your {platform_name} Account").format(platform_name=platform_name) | h}</%block>
 
 <%block name="bodyclass">view-login</%block>
 
@@ -118,7 +119,7 @@ from third_party_auth import provider, pipeline
         $submitButton.
           addClass('is-disabled').
           prop('disabled', true).
-          text("${Text(_(u'Processing your account information')) | n, js_escaped_string}");
+          text("${_(u'Processing your account information') | n, js_escaped_string}");
       }
     }
 
@@ -145,8 +146,8 @@ from third_party_auth import provider, pipeline
 <section class="introduction">
   <header>
     <h1 class="title">
-      <span class="title-super">${Text(_("Please log in"))}</span>
-      <span class="title-sub">${Text(_("to access your account and courses"))}</span>
+      <span class="title-super">${_("Please log in") | h}</span>
+      <span class="title-sub">${_("to access your account and courses") | h}</span>
     </h1>
   </header>
 </section>
@@ -157,13 +158,13 @@ from third_party_auth import provider, pipeline
 
       <!-- status messages -->
       <div role="alert" class="status message">
-        <h3 class="message-title">${Text(_("We're Sorry, {platform_name} accounts are unavailable currently")).format(platform_name=platform_name)}</h3>
+        <h3 class="message-title">${_("We're Sorry, {platform_name} accounts are unavailable currently").format(platform_name=platform_name) | h}</h3>
       </div>
 
       <div role="alert" class="status message submission-error" tabindex="-1">
-        <h3 class="message-title">${Text(_("We couldn't log you in."))} </h3>
+        <h3 class="message-title">${_("We couldn't log you in.") | h} </h3>
         <ul class="message-copy">
-          <li>${Text(_("Your email or password is incorrect"))}</li>
+          <li>${_("Your email or password is incorrect") | h}</li>
         </ul>
       </div>
 
@@ -173,7 +174,7 @@ from third_party_auth import provider, pipeline
 
       % if third_party_auth_error:
         <div role="alert" class="status message third-party-auth-error is-shown" tabindex="-1">
-          <h3 class="message-title">${Text(_("An error occurred when signing you in to {platform_name}.")).format(platform_name=platform_name)} </h3>
+          <h3 class="message-title">${_("An error occurred when signing you in to {platform_name}.").format(platform_name=platform_name) | h} </h3>
           <ul class="message-copy">
             <li>${third_party_auth_error}</li>
           </ul>
@@ -188,31 +189,31 @@ from third_party_auth import provider, pipeline
       </p>
 
       <div class="group group-form group-form-requiredinformation">
-        <h2 class="sr">${Text(_('Required Information'))}</h2>
+        <h2 class="sr">${_('Required Information') | h}</h2>
 
         <ol class="list-input">
           <li class="field required text" id="field-email">
-            <label for="email">${Text(_('E-mail'))}</label>
+            <label for="email">${_('E-mail') | h}</label>
             <input class="" id="email" type="email" name="email" value="" placeholder="${_('example: username@domain.com')}" required aria-required="true" aria-describedby="email-tip" />
-            <span class="tip tip-input" id="email-tip">${Text(_("This is the e-mail address you used to register with {platform}")).format(platform=platform_name)}</span>
+            <span class="tip tip-input" id="email-tip">${_("This is the e-mail address you used to register with {platform}").format(platform=platform_name) | h}</span>
           </li>
           <li class="field required password" id="field-password">
-            <label for="password">${Text(_('Password'))}</label>
+            <label for="password">${_('Password') | h}</label>
             <input id="password" type="password" name="password" value="" required aria-required="true" />
             <span class="tip tip-input">
-              <a href="#forgot-password-modal" rel="leanModal" class="pwd-reset action action-forgotpw" id="forgot-password-link" role="button" aria-haspopup="true">${Text(_('Forgot password?'))}</a>
+              <a href="#forgot-password-modal" rel="leanModal" class="pwd-reset action action-forgotpw" id="forgot-password-link" role="button" aria-haspopup="true">${_('Forgot password?') | h}</a>
             </span>
           </li>
         </ol>
       </div>
 
       <div class="group group-form group-form-secondary group-form-accountpreferences">
-        <h2 class="sr">${Text(_('Account Preferences'))}</h2>
+        <h2 class="sr">${_('Account Preferences') | h}</h2>
 
         <ol class="list-input">
           <li class="field required checkbox" id="field-remember">
             <input id="remember-yes" type="checkbox" name="remember" value="true" />
-            <label for="remember-yes">${Text(_('Remember me'))}</label>
+            <label for="remember-yes">${_('Remember me') | h}</label>
           </li>
         </ol>
       </div>
@@ -227,7 +228,7 @@ from third_party_auth import provider, pipeline
       <span class="deco-divider">
         ## Developers: this is a sentence fragment, which is usually frowned upon.  The design of the pags uses this fragment to provide an "else" clause underneath a number of choices.  It's OK to leave it.
         ## Translators: this is the last choice of a number of choices of how to log in to the site.
-        <span class="copy">${Text(_('or'))}</span>
+        <span class="copy">${_('or') | h}</span>
       </span>
 
     <div class="form-actions form-third-party-auth">
@@ -240,7 +241,7 @@ from third_party_auth import provider, pipeline
         % else:
         <span class="icon" aria-hidden="true"><img class="icon-image" src="${enabled.icon_image.url}" alt="${enabled.name} icon" /></span>
         % endif
-        ${Text(_('Sign in with {provider_name}')).format(provider_name=enabled.name)}
+        ${_('Sign in with {provider_name}').format(provider_name=enabled.name) | h}
       </button>
     % endfor
 

@@ -1,3 +1,4 @@
+## xss-lint: disable=mako-missing-default
 <%!
 from django.utils.translation import ugettext as _
 from openedx.core.djangolib.markup import HTML, Text
@@ -9,14 +10,14 @@ from openedx.features.course_experience import course_home_url_name
 
 <%inherit file="../main.html" />
 <%namespace name='static' file='/static_content.html'/>
-<%block name="pagetitle">${_("Confirm Enrollment")}</%block>
+<%block name="pagetitle">${_("Confirm Enrollment") | h}</%block>
 
 <%block name="content">
 <div class="container">
   <section class="wrapper confirm-enrollment">
     <header class="page-header">
       <h1 class="title">
-        ${_("{site_name} -  Confirm Enrollment").format(site_name=site_name)}
+        ${_("{site_name} -  Confirm Enrollment").format(site_name=site_name) | h}
       </h1>
     </header>
     <section>
@@ -25,7 +26,7 @@ from openedx.features.course_experience import course_home_url_name
             alt="${_("{course_number} {course_title} Cover Image").format(
               course_number=course.display_number_with_default,
               course_title=course.display_name_with_default,
-            )}"/>
+            ) | h}"/>
       </div>adsfafd
       <div class="enrollment-details">
         <div class="sub-title">
@@ -62,11 +63,11 @@ from openedx.features.course_experience import course_home_url_name
                 link_end=HTML('</a>')
               )}
             % elif course_full:
-              ${_("The course you are enrolling for is full.")}
+              ${_("The course you are enrolling for is full.") | h}
             % elif enrollment_closed:
-              ${_("The course you are enrolling for is closed.")}
+              ${_("The course you are enrolling for is closed.") | h}
             % elif redeem_code_error:
-              ${_("There was an error processing your redeem code.")}
+              ${_("There was an error processing your redeem code.") | h}
             % else:
               ${_("You're about to activate an enrollment code for {course_name} by {site_name}. "
               "This code can only be used one time, so you should only activate this code if you're its intended"
@@ -78,12 +79,12 @@ from openedx.features.course_experience import course_home_url_name
       % if not reg_code_already_redeemed:
         %if redemption_success:
           <% course_url = reverse(course_home_url_name(course.id), args=[text_type(course.id)]) %>
-          <a href="${course_url}" class="link-button course-link-bg-color">${_("View Course")} <span class="icon fa fa-caret-right" aria-hidden="true"></span></a>
+          <a href="${course_url}" class="link-button course-link-bg-color">${_("View Course") | h} <span class="icon fa fa-caret-right" aria-hidden="true"></span></a>
         %elif not registered_for_course:
           <form method="post">
             <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
             <button type="submit" id="id_active_course_enrollment"
-               name="active_course_enrollment">${_("Activate Course Enrollment")} <span class="icon fa fa-caret-right" aria-hidden="true"></span></button>
+               name="active_course_enrollment">${_("Activate Course Enrollment") | h} <span class="icon fa fa-caret-right" aria-hidden="true"></span></button>
           </form>
         %endif
       %endif

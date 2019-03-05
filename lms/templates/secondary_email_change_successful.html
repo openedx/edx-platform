@@ -9,7 +9,7 @@ from openedx.core.djangolib.markup import HTML, Text
 
 <section class="container activation">
   <section class="message">
-    <h1 class="valid">${_("Secondary e-mail change successful!")}</h1>
+    <h1 class="valid">${_("Secondary e-mail change successful!") | h}</h1>
     <hr class="horizontal-divider">
 
     <p>${Text(_('Your secondary email has been activated. Please visit {link_start}dashboard{link_end} for courses.')).format(
