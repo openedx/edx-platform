@@ -320,6 +320,21 @@ html.video-fullscreen {
         }
       }
 
+      &.instructions {
+        p {
+          margin: 0;
+        }
+        h4 {
+          margin-top: ($baseline * 3/2);
+        }
+        ul {
+          margin: 0;
+        }
+        .exam-action-button {
+          margin-top: $baseline / 2;
+        }
+      }
+
       hr {
         border-bottom: 1px solid $uxpl-gray-background;
       }
