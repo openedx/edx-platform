@@ -149,7 +149,7 @@ class EntitlementUnenrollmentView extends Backbone.View {
 
       window.analytics.track('entitlement_unenrollment_reason.selected', {
         category: 'user-engagement',
-        label: results,
+        label: JSON.stringify(results),
         displayName: 'v1',
       });
     }
