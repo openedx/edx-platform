@@ -16,9 +16,6 @@ binding = remind_users_to_bind_phones(request)
 
 <div class="my-footer">
   <div class="footer-content clearfix">
-    % if context.get('include_language_selector', footer_language_selector_is_enabled()):
-      <%include file="${static.get_template_path('widgets/footer-language-selector.html')}"/>
-    % endif
     <div class="footer-app">
       <img class="logo" src="${static.url('images/logo.png')}" />
       <p class="slogan">${_(u"Learn to Change·Change to Progress")}</p>
