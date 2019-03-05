@@ -129,17 +129,23 @@ class CourseDurationLimitConfig(StackedConfigurationModel):
             elif has_staff_roles(user, course_key):
                 return False
 
-        no_masquerade = get_course_masquerade(user, course_key) is None
+        is_masquerading = get_course_masquerade(user, course_key)
+        no_masquerade = is_masquerading is None
         student_masquerade = is_masquerading_as_specific_student(user, course_key)
 
         # check if user is in holdback
         if (no_masquerade or student_masquerade) and is_in_holdback(user):
             return False
 
+        not_student_masquerade = is_masquerading and not student_masquerade
+
         # enrollment might be None if the user isn't enrolled. In that case,
         # return enablement as if the user enrolled today
-        # Also, ignore enrollment creation date if the user is masquerading.
-        if enrollment is None or not no_masquerade:
+        # When masquerading as a user group rather than a specific learner,
+        # course duration limits will be on if they are on for the course.
+        # When masquerading as a specific learner, course duration limits
+        # will be on if they are currently on for the learner.
+        if enrollment is None or not_student_masquerade:
             return cls.enabled_for_course(course_key=course_key, target_datetime=timezone.now())
         else:
             current_config = cls.current(course_key=enrollment.course_id)
