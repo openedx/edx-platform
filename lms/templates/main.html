@@ -1,3 +1,4 @@
+<%page expression_filter="h"/>
 ## coding=utf-8
 
 ## This is the main Mako template that all page templates should include.
@@ -135,7 +136,7 @@ from pipeline_mako import render_require_js_path_overrides
   <%include file="widgets/segment-io.html" />
 
   <meta name="path_prefix" content="${EDX_ROOT_URL}">
-  
+
   <% google_site_verification_id = configuration_helpers.get_value('GOOGLE_SITE_VERIFICATION_ID', settings.GOOGLE_SITE_VERIFICATION_ID) %>
   % if google_site_verification_id:
     <meta name="google-site-verification" content="${google_site_verification_id}" />
