@@ -126,34 +126,33 @@ def get_experiment_user_metadata_context(course, user):
         audit_enrollments = user_enrollments.filter(mode='audit')
         has_non_audit_enrollments = (len(audit_enrollments) != len(user_enrollments))
         # TODO: clean up as part of REVO-28 (END)
+        # TODO: clean up as part of REVEM-199 (START)
+        if PROGRAM_INFO_FLAG.is_enabled():
+            programs = get_programs(course=course.id)
+            if programs:
+                # A course can be in multiple programs, but we're just grabbing the first one
+                program = programs[0]
+                complete_enrollment = False
+                total_courses = None
+                courses = program.get('courses')
+                if courses is not None:
+                    total_courses = len(courses)
+                    complete_enrollment = is_enrolled_in_all_courses_in_program(courses, user_enrollments)
+
+                program_key = {
+                    'uuid': program.get('uuid'),
+                    'title': program.get('title'),
+                    'marketing_url': program.get('marketing_url'),
+                    'total_courses': total_courses,
+                    'complete_enrollment': complete_enrollment,
+                }
+        # TODO: clean up as part of REVEM-199 (END)
         enrollment = CourseEnrollment.objects.select_related(
             'course'
         ).get(user_id=user.id, course_id=course.id)
         if enrollment.is_active:
             enrollment_mode = enrollment.mode
             enrollment_time = enrollment.created
-
-            # TODO: clean up as part of REVEM-199 (START)
-            if PROGRAM_INFO_FLAG.is_enabled():
-                programs = get_programs(course=course.id)
-                if programs:
-                    # A course can be in multiple programs, but we're just grabbing the first one
-                    program = programs[0]
-                    complete_enrollment = False
-                    total_courses = None
-                    courses = program.get('courses')
-                    if courses is not None:
-                        total_courses = len(courses)
-                        complete_enrollment = is_enrolled_in_all_courses_in_program(courses, user_enrollments)
-
-                    program_key = {
-                        'uuid': program.get('uuid'),
-                        'title': program.get('title'),
-                        'marketing_url': program.get('marketing_url'),
-                        'total_courses': total_courses,
-                        'complete_enrollment': complete_enrollment,
-                    }
-            # TODO: clean up as part of REVEM-199 (END)
     except CourseEnrollment.DoesNotExist:
         pass  # Not enrolled, used the default None values
 
