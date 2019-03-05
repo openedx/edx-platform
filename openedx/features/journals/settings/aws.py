@@ -3,7 +3,7 @@
 
 def plugin_settings(settings):
     """
-    Settings for AWS/Production
+    Settings for AWS
     """
     settings.JOURNALS_URL_ROOT = settings.ENV_TOKENS.get('JOURNALS_URL_ROOT', settings.JOURNALS_URL_ROOT)
     settings.JOURNALS_FRONTEND_URL = settings.ENV_TOKENS.get('JOURNALS_FRONTEND_URL', settings.JOURNALS_FRONTEND_URL)
