@@ -53,6 +53,7 @@ import uuid
 from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.db.models import Count
@@ -208,6 +209,28 @@ class EligibleCertificateManager(models.Manager):
         return super(EligibleCertificateManager, self).get_queryset().exclude(
             status__in=(CertificateStatuses.audit_passing, CertificateStatuses.audit_notpassing)
         )
+
+
+class CertificatePdfConfig(TimeStampedModel):
+    """
+    This model stores the certificate pdf template configurations.
+    For every microsites, there should be only one config instance
+    exists.
+    """
+    site = models.ForeignKey(Site, related_name='cert_pdf_configs')
+    sentences = models.TextField()
+    canvas = models.TextField()
+    positions = models.TextField()
+    font_name = models.CharField(max_length=255)
+    font_info = models.TextField()
+
+    class Meta(object):
+        app_label = "certificates"
+
+    @staticmethod
+    def get_config(site):
+        config = site.cert_pdf_configs.first()
+        return config
 
 
 class GeneratedCertificate(models.Model):
