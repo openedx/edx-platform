@@ -69,7 +69,6 @@ from openedx.core.lib.xblock_utils import (
     replace_static_urls,
     wrap_xblock
 )
-from progress.models import CourseModuleCompletion
 from student.models import anonymous_id_for_user, user_by_anonymous_id
 from student.roles import CourseBetaTesterRole
 from track import contexts
@@ -491,10 +490,13 @@ def get_module_system_for_user(
         Returns None if no special processing is required.
         """
         handlers = {
-            'completion': handle_completion_event,
             'grade': handle_grade_event,
-            'progress': handle_deprecated_progress_event,
         }
+        if completion_waffle.waffle().is_enabled(completion_waffle.ENABLE_COMPLETION_TRACKING):
+            handlers.update({
+                'completion': handle_completion_event,
+                'progress': handle_deprecated_progress_event,
+            })
         return handlers.get(event_type)
 
     def publish(block, event_type, event):
@@ -517,6 +519,26 @@ def get_module_system_for_user(
             with tracker.get_tracker().context(event_type, context):
                 track_function(event_type, event)
 
+    def handle_completion_event(block, event):
+        """
+        Submit a completion object for the block.
+        """
+        if not completion_waffle.waffle().is_enabled(completion_waffle.ENABLE_COMPLETION_TRACKING):
+            raise Http404
+        elif not settings.FEATURES.get("ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE", True):
+            # if a course has ended, don't register progress events
+            course = modulestore().get_course(course_id, depth=0)
+            now = datetime.now(UTC())
+            if course.end is not None and now > course.end:
+                return
+
+        BlockCompletion.objects.submit_completion(
+            user=user,
+            course_key=course_id,
+            block_key=block.scope_ids.usage_id,
+            completion=event['completion'],
+        )
+
     def handle_grade_event(block, event):  # pylint: disable=unused-argument
         """
         Manages the workflow for recording and updating of student module grade state
@@ -538,36 +560,6 @@ def get_module_system_for_user(
             only_if_higher=event.get('only_if_higher'),
         )
 
-        # we can treat a grading event as a indication that a user
-        # "completed" an xBlock
-        if settings.FEATURES.get('MARK_PROGRESS_ON_GRADING_EVENT', False):
-            handle_deprecated_progress_event(block, event)
-
-    def handle_completion_event(block, event):
-        """
-        Submit a completion object for the block.
-        """
-        if not completion_waffle.waffle().is_enabled(completion_waffle.ENABLE_COMPLETION_TRACKING):
-            raise NoSuchHandlerError
-        elif not settings.FEATURES.get("ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE", True):
-            # if a course has ended, don't register progress events
-            course = modulestore().get_course(course_id, depth=0)
-            now = datetime.now(UTC())
-            if course.end is not None and now > course.end:
-                return
-
-        BlockCompletion.objects.submit_completion(
-            user=user,
-            course_key=course_id,
-            block_key=block.scope_ids.usage_id,
-            completion=event['completion'],
-        )
-        CourseModuleCompletion.objects.get_or_create(
-            user_id=user.id,
-            course_id=course_id,
-            content_id=unicode(block.scope_ids.usage_id),
-        )
-
     def handle_deprecated_progress_event(block, event):
         """
         DEPRECATED: Submit a completion for the block represented by the
@@ -584,25 +576,28 @@ def get_module_system_for_user(
             if course.end is not None and now > course.end:
                 return
 
-        user_id = event.get('user_id', user.id)
-        if not user_id:
-            return
-
-        CourseModuleCompletion.objects.get_or_create(
-            user_id=user_id,
-            course_id=course_id,
-            content_id=unicode(descriptor.location)
-        )
-        if completion_waffle.waffle().is_enabled(completion_waffle.ENABLE_COMPLETION_TRACKING):
-            if user_id != user.id:
-                log.warning("{} tried to submit a completion on behalf of {}".format(user, user_id))
+        if not completion_waffle.waffle().is_enabled(completion_waffle.ENABLE_COMPLETION_TRACKING):
+            raise Http404
+        else:
+            requested_user_id = event.get('user_id', user.id)
+            if requested_user_id != user.id:
+                log.warning(u"{} tried to submit a completion on behalf of {}".format(user, requested_user_id))
                 return
-            BlockCompletion.objects.submit_completion(
-                user=user,
-                course_key=course_id,
-                block_key=block.scope_ids.usage_id,
-                completion=1.0,
-            )
+
+            if not requested_user_id:
+                return
+
+            # If blocks explicitly declare support for the new completion API,
+            # we expect them to emit 'completion' events,
+            # and we ignore the deprecated 'progress' events
+            # in order to avoid duplicate work and possibly conflicting semantics.
+            if not getattr(block, 'has_custom_completion', False):
+                BlockCompletion.objects.submit_completion(
+                    user=user,
+                    course_key=course_id,
+                    block_key=block.scope_ids.usage_id,
+                    completion=1.0,
+                )
 
     def rebind_noauth_module_to_user(module, real_user):
         """

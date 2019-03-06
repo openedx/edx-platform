@@ -88,7 +88,6 @@ else
             paver test_system -s lms -t edx_solutions_organizations --with-xunitmp --disable-migrations
             paver test_system -s lms -t edx_solutions_projects --with-xunitmp --disable-migrations
             paver test_system -s lms -t gradebook --with-xunitmp --disable-migrations
-            paver test_system -s lms -t progress --with-xunitmp --disable-migrations
             paver test_system -s lms -t social_engagement --with-xunitmp --disable-migrations
             paver test_system -s lms -t course_metadata --with-xunitmp --disable-migrations
             paver test_system -s lms -t mobileapps --with-xunitmp --disable-migrations

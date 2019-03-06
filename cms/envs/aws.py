@@ -251,28 +251,6 @@ PLATFORM_NAME = ENV_TOKENS.get('PLATFORM_NAME', 'edX')
 STUDIO_NAME = ENV_TOKENS.get('STUDIO_NAME', 'edX Studio')
 STUDIO_SHORT_NAME = ENV_TOKENS.get('STUDIO_SHORT_NAME', 'Studio')
 
-# Modules having these categories would be excluded from progress calculations
-PROGRESS_DETACHED_APPS = ['group_project_v2']
-for app in PROGRESS_DETACHED_APPS:
-    try:
-        app_config = importlib.import_module('.app_config', app)
-    except ImportError:
-        continue
-
-    detached_module_categories = getattr(app_config, 'PROGRESS_DETACHED_CATEGORIES', [])
-    PROGRESS_DETACHED_CATEGORIES.extend(detached_module_categories)
-
-# Modules having these categories would be excluded from progress calculations
-PROGRESS_DETACHED_APPS = ['group_project_v2']
-for app in PROGRESS_DETACHED_APPS:
-    try:
-        app_config = importlib.import_module('.app_config', app)
-    except ImportError:
-        continue
-
-    detached_module_categories = getattr(app_config, 'PROGRESS_DETACHED_CATEGORIES', [])
-    PROGRESS_DETACHED_CATEGORIES.extend(detached_module_categories)
-
 # Event Tracking
 if "TRACKING_IGNORE_URL_PATTERNS" in ENV_TOKENS:
     TRACKING_IGNORE_URL_PATTERNS = ENV_TOKENS.get("TRACKING_IGNORE_URL_PATTERNS")
@@ -526,7 +504,6 @@ if FEATURES.get('EDX_SOLUTIONS_API'):
         'edx_solutions_api_integration',
         'social_engagement',
         'gradebook',
-        'progress',
         'edx_solutions_projects',
         'edx_solutions_organizations',
         'mobileapps',

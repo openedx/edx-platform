@@ -91,6 +91,8 @@ def run():
             settings.FEATURES.get('DISABLE_SOLUTIONS_APPS_SIGNALS', False):
         disable_solutions_apps_signals()
 
+    connect_completion_signal()
+
     # In order to allow modules to use a handler url, we need to
     # monkey-patch the x_module library.
     # TODO: Remove this code when Runtimes are no longer created by modulestores
@@ -104,6 +106,16 @@ def run():
 
     # validate configurations on startup
     validate_lms_config(settings)
+
+
+def connect_completion_signal():
+    """
+    Temporary mechanism to connect the completion signal from edx/completion.
+    Should happen automatically in Hawthorn via pluggable apps.
+    """
+    from completion.handlers import scorable_block_completion
+    from lms.djangoapps.grades.signals.signals import PROBLEM_WEIGHTED_SCORE_CHANGED
+    PROBLEM_WEIGHTED_SCORE_CHANGED.connect(scorable_block_completion)
 
 
 def add_mimetypes():
