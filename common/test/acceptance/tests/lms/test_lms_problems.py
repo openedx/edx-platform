@@ -1059,8 +1059,7 @@ class FormulaProblemRandomizeTest(ProblemsTest):
 
     @ddt.data(
         ('R_1*R_2', 'incorrect'),
-        ('R_1/R_3', 'incorrect'),
-        ('R_1*R_2/R_3', 'correct')
+        ('R_1/R_3', 'incorrect')
     )
     @ddt.unpack
     def test_reset_problem_after_submission(self, input_value, correctness):
