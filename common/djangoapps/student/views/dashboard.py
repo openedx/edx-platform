@@ -22,7 +22,7 @@ from six import text_type, iteritems
 
 import track.views
 from bulk_email.models import BulkEmailFlag, Optout  # pylint: disable=import-error
-from course_modes.models import CourseMode
+from course_modes.models import CourseMode, get_cosmetic_display_price
 from courseware.access import has_access
 from edxmako.shortcuts import render_to_response, render_to_string
 from entitlements.models import CourseEntitlement
@@ -42,7 +42,7 @@ from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled_for_user
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.enterprise_support.api import get_dashboard_consent_notification
-from openedx.features.enterprise_support.utils import is_enterprise_learner
+from lms.djangoapps.experiments.utils import get_experiment_dashboard_metadata_context
 from openedx.features.journals.api import journals_enabled
 from shoppingcart.api import order_history
 from shoppingcart.models import CourseRegistrationCode, DonationConfiguration
@@ -59,6 +59,13 @@ from util.milestones_helpers import get_pre_requisite_courses_not_completed
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger("edx.student")
+
+experiments_namespace = WaffleFlagNamespace(name=u'student.experiments')
+#TODO START: Delete waffle flag as part of REVEM-204.
+dashboard_metadata_flag = WaffleFlag(experiments_namespace,
+                                     u'dashboard_metadata',
+                                     flag_undefined_default=False)
+#TODO END: REVEM-204
 
 
 def get_org_black_and_whitelist_for_site():
@@ -695,7 +702,7 @@ def student_dashboard(request):
     inverted_programs = meter.invert_programs()
 
     urls, programs_data = {}, {}
-    bundles_on_dashboard_flag = WaffleFlag(WaffleFlagNamespace(name=u'student.experiments'), u'bundles_on_dashboard')
+    bundles_on_dashboard_flag = WaffleFlag(experiments_namespace, u'bundles_on_dashboard')
 
     # TODO: Delete this code and the relevant HTML code after testing LEARNER-3072 is complete
     if bundles_on_dashboard_flag.is_enabled() and inverted_programs and inverted_programs.items():
@@ -869,6 +876,10 @@ def student_dashboard(request):
         'empty_dashboard_message': empty_dashboard_message,
         'recovery_email_message': recovery_email_message,
         'recovery_email_activation_message': recovery_email_activation_message,
+        # TODO START: Clean up REVEM-205 & REVEM-204.
+        # The below context is for experiments in dashboard_metadata
+        'course_prices': get_experiment_dashboard_metadata_context(course_enrollments) if dashboard_metadata_flag.is_enabled() else None,
+        # TODO END: Clean up REVEM-205 & REVEM-204.
     }
 
     if ecommerce_service.is_enabled(request.user):

@@ -475,7 +475,7 @@ class CourseMode(models.Model):
     @classmethod
     def min_course_price_for_verified_for_currency(cls, course_id, currency):  # pylint: disable=invalid-name
         """
-        Returns the minimum price of the course int he appropriate currency over all the
+        Returns the minimum price of the course in the appropriate currency over all the
         course's *verified*, non-expired modes.
 
         Assuming all verified courses have a minimum price of >0, this value should always
