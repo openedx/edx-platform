@@ -474,6 +474,7 @@ class CourseModeModelTest(TestCase):
         (CourseMode.CREDIT_MODE, False),
         (CourseMode.PROFESSIONAL, True),
         (CourseMode.NO_ID_PROFESSIONAL_MODE, False),
+        (CourseMode.MASTERS, False),
     )
     @ddt.unpack
     def test_verified_min_price(self, mode_slug, is_error_expected):
