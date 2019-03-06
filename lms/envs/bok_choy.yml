@@ -143,7 +143,7 @@ STATIC_URL_BASE: /static/
 SUPPORT_SITE_LINK: https://support.example.com
 SYSLOG_SERVER: ''
 TECH_SUPPORT_EMAIL: technical@example.com
-THIRD_PARTY_AUTH_BACKENDS: [social_core.backends.google.GoogleOAuth2, social_core.backends.linkedin.LinkedinOAuth2,
+THIRD_PARTY_AUTH_BACKENDS: [third_party_auth.custom_backends.CustomGoogleOAuth, social_core.backends.linkedin.LinkedinOAuth2,
   social_core.backends.facebook.FacebookOAuth2, third_party_auth.dummy.DummyBackend,
   third_party_auth.saml.SAMLAuthBackend]
 TIME_ZONE: America/New_York

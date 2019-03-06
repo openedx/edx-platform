@@ -233,7 +233,7 @@ FEATURES['PREVENT_CONCURRENT_LOGINS'] = False
 FEATURES['ENABLE_THIRD_PARTY_AUTH'] = True
 
 AUTHENTICATION_BACKENDS = [
-    'social_core.backends.google.GoogleOAuth2',
+    'third_party_auth.custom_backends.CustomGoogleOAuth',
     'social_core.backends.linkedin.LinkedinOAuth2',
     'social_core.backends.facebook.FacebookOAuth2',
     'social_core.backends.azuread.AzureADOAuth2',
