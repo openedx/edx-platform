@@ -46,6 +46,9 @@ class CourseCreator(models.Model):
     def __unicode__(self):
         return u"{0} | {1} [{2}]".format(self.user, self.state, self.state_changed)
 
+    class Meta(object):
+        app_label = "course_creators"
+
 
 @receiver(post_init, sender=CourseCreator)
 def post_init_callback(sender, **kwargs):
