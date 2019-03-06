@@ -47,7 +47,7 @@ class CourseDurationLimitConfig(StackedConfigurationModel):
         blank=True,
         help_text=_(
             'If the configuration is Enabled, then all enrollments '
-            'created after this date and time (UTC) will be affected.'
+            'created after this date and time (user local time) will be affected.'
         )
     )
 
