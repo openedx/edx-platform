@@ -312,34 +312,6 @@ class SubsectionGradingPolicyBase(ProgressPageBaseTest):
         self.assertEqual([label, 'true' if label_hidden else None], self.progress_page.x_tick_label(index))
 
 
-class SubsectionGradingPolicyTest(SubsectionGradingPolicyBase):
-    """
-    Tests changing a subsection's 'graded' field
-    and the effect it has on the progress page.
-    """
-    shard = 22
-
-    def test_subsection_grading_policy_on_progress_page(self):
-        with self._logged_in_session():
-            self._check_scores_and_page_text([(0, 1), (0, 1)], (0, 2), u"Homework 1 - Test Subsection 1 - 0% (0/2)")
-            self.courseware_page.visit()
-            self._answer_problem_correctly()
-            self._check_scores_and_page_text([(1, 1), (0, 1)], (1, 2), u"Homework 1 - Test Subsection 1 - 50% (1/2)")
-
-        self._set_policy_for_subsection("Not Graded")
-
-        with self._logged_in_session():
-            self.progress_page.visit()
-            self.assertEqual(self._get_problem_scores(), [(1, 1), (0, 1)])
-            self.assertEqual(self._get_section_score(), (1, 2))
-            self.assertFalse(self.progress_page.text_on_page("Homework 1 - Test Subsection 1"))
-
-        self._set_policy_for_subsection("Homework")
-
-        with self._logged_in_session():
-            self._check_scores_and_page_text([(1, 1), (0, 1)], (1, 2), u"Homework 1 - Test Subsection 1 - 50% (1/2)")
-
-
 class SubsectionGradingPolicyA11yTest(SubsectionGradingPolicyBase):
     """
     Class to test the accessibility of subsection grading
