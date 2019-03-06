@@ -27,7 +27,7 @@ def get_initial_sass_variables():
     # TODO: Fix Site Configuration and Organizations hacks. https://github.com/appsembler/edx-platform/issues/329
     """
     from openedx.core.djangoapps.appsembler.sites import utils
-    return utils.get_initial_sass_variables
+    return utils.get_initial_sass_variables()
 
 
 def get_initial_page_elements():
@@ -37,7 +37,7 @@ def get_initial_page_elements():
     # TODO: Fix Site Configuration and Organizations hacks. https://github.com/appsembler/edx-platform/issues/329
     """
     from openedx.core.djangoapps.appsembler.sites import utils
-    return utils.get_initial_page_elements
+    return utils.get_initial_page_elements()
 
 
 class SiteConfiguration(models.Model):
