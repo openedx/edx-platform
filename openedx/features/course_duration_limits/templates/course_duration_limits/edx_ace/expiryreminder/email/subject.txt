@@ -1,0 +1,5 @@
+{% autoescape off %}
+{% load i18n %}
+
+{% blocktrans trimmed %}Upgrade to keep your access to {{first_course_name}}{% endblocktrans %}
+{% endautoescape %}
