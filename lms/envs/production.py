@@ -23,11 +23,12 @@ import json
 import os
 import dateutil
 
-from corsheaders.defaults import default_headers as corsheaders_default_headers
 from path import Path as path
 from xmodule.modulestore.modulestore_settings import convert_module_store_setting_if_needed
+from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants
 
 from .common import *
+
 from openedx.core.lib.derived import derive_settings  # pylint: disable=wrong-import-order
 from openedx.core.lib.logsettings import get_logger_config  # pylint: disable=wrong-import-order
 
@@ -1101,8 +1102,14 @@ WRITABLE_GRADEBOOK_URL = ENV_TOKENS.get('WRITABLE_GRADEBOOK_URL', WRITABLE_GRADE
 ############################### Plugin Settings ###############################
 
 # This is at the bottom because it is going to load more settings after base settings are loaded
-from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants  # pylint: disable=wrong-import-order, wrong-import-position
-plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS, plugin_constants.SettingsType.AWS)
+
+# Load aws.py in plugins for reverse compatibility.  This can be removed after aws.py
+# is officially removed.
+plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS,
+                            plugin_constants.SettingsType.AWS)
+
+# Load production.py in plugins
+plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS, plugin_constants.SettingsType.PRODUCTION)
 
 ########################## Derive Any Derived Settings  #######################
 
