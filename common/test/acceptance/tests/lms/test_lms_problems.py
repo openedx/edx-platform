@@ -1058,7 +1058,6 @@ class FormulaProblemRandomizeTest(ProblemsTest):
         )
 
     @ddt.data(
-        ('R_1*R_2', 'incorrect'),
         ('R_1/R_3', 'incorrect')
     )
     @ddt.unpack

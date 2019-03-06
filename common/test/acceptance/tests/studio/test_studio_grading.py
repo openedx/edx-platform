@@ -262,23 +262,3 @@ class GradingPageTest(StudioCourseTest):
         self.ensure_input_fields_are_loaded()
         grace_time = self.grading_page.grace_period_value
         self.assertEqual(grace_time, '02:39')
-
-    def test_setting_grace_period_greater_than_one_day(self):
-        """
-        Scenario: User can set a grace period greater than one day
-            Given I have populated a new course in Studio
-            And I am viewing the grading settings
-            When I change the grace period to "48:00"
-            And I press the "Save" notification button
-            And I reload the page
-            Then I see the grace period is "48:00"
-        """
-        self.ensure_input_fields_are_loaded()
-        self.grading_page.check_field_value('00:00')
-        self.grading_page.set_grace_period('48:00')
-        self.grading_page.check_field_value('48:00')
-        self.grading_page.click_button("save")
-        self.grading_page.refresh_and_wait_for_load()
-        self.ensure_input_fields_are_loaded()
-        grace_time = self.grading_page.grace_period_value
-        self.assertEqual(grace_time, '48:00')
