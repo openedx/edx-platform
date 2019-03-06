@@ -84,10 +84,11 @@ def _listen_for_failing_grade(sender, user, course_id, grade, **kwargs):  # pyli
     cert = GeneratedCertificate.certificate_for_student(user, course_id)
     if cert is not None:
         if CertificateStatuses.is_passing_status(cert.status):
-            cert.mark_notpassing(grade)
-            log.info(u'Certificate marked not passing for {user} : {course} via failing grade'.format(
+            cert.mark_notpassing(grade.percent)
+            log.info(u'Certificate marked not passing for {user} : {course} via failing grade: {grade}'.format(
                 user=user.id,
-                course=course_id
+                course=course_id,
+                grade=grade
             ))
 
 
