@@ -913,6 +913,7 @@ class TestRenderMessageToString(EmailTemplateTagMixin, SharedModuleStoreTestCase
         body_template = 'instructor/edx_ace/allowedunenroll/email/{body_file_name}'.format(
             body_file_name=body_file_name,
         )
+
         subject, message = self.get_subject_and_message_ccx(subject_template, body_template)
         self.assertIn(self.ccx.display_name, subject)
         self.assertIn(self.ccx.display_name, message)

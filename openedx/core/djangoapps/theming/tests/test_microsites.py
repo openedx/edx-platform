@@ -30,7 +30,7 @@ class TestComprehensiveThemeLMS(TestCase):
         """
         Test that theme footer is used instead of microsite footer.
         """
-        # Add SiteTheme with the same domain name as micrositelms
+        # Add SiteTheme with the same domain name as microsite
         self.__add_site_theme__(domain=settings.MICROSITE_TEST_HOSTNAME, theme="test-theme")
 
         # Test that requesting on a host, where both theme and microsite is applied

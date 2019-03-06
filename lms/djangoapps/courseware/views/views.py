@@ -1504,6 +1504,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
                 student_view_context['wrap_xblock_data'] = {
                     'mark-completed-on-view-after-delay': completion_service.get_complete_on_view_delay_ms()
                 }
+
         context = {
             'fragment': block.render('student_view', context=student_view_context),
             'course': course,
