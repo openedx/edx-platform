@@ -212,6 +212,25 @@ class EligibleCertificateManager(models.Manager):
         )
 
 
+class EligibleAvailableCertificateManager(EligibleCertificateManager):
+    """
+    A manager for `GeneratedCertificate` models that automatically
+    filters out ineligible certs and any linked to nonexistent courses.
+
+    Adds to the super class filtering ot also exclude certificates for
+    courses that do not have a corresponding CourseOverview.
+    """
+
+    def get_queryset(self):
+        """
+        Return a queryset for `GeneratedCertificate` models, filtering out
+        ineligible certificates and any linked to nonexistent courses.
+        """
+        return super(EligibleAvailableCertificateManager, self).get_queryset().filter(
+            course_id__in=list(CourseOverview.objects.values_list('id', flat=True))
+        )
+
+
 class GeneratedCertificate(models.Model):
     """
     Base model for generated certificates
@@ -227,6 +246,10 @@ class GeneratedCertificate(models.Model):
     # Only returns eligible certificates. This should be used in
     # preference to the default `objects` manager in most cases.
     eligible_certificates = EligibleCertificateManager()
+
+    # Only returns eligible certificates for courses that have an
+    # associated CourseOverview
+    eligible_available_certificates = EligibleAvailableCertificateManager()
 
     # Normal object manager, which should only be used when ineligible
     # certificates (i.e. new audit certs) should be included in the

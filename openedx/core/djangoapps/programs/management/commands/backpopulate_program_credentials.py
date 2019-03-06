@@ -111,5 +111,7 @@ class Command(BaseCommand):
 
         query = status_query & course_run_query
 
-        username_dicts = GeneratedCertificate.eligible_certificates.filter(query).values('user__username').distinct()
+        username_dicts = GeneratedCertificate.eligible_available_certificates.filter(
+            query
+        ).values('user__username').distinct()
         self.usernames = [d['user__username'] for d in username_dicts]
