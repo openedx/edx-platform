@@ -19,7 +19,6 @@
 
 beautifulsoup4            # Library for extracting data from HTML and XML files
 before_after              # Syntactic sugar for mock, only used in one test case, not Python 3 compatible
-bok-choy                  # Framework for browser automation tests, based on selenium
 caniusepython3            # Library for checking the ability to upgrade to python3
 code-annotations          # Perform code annotation checking, such as for PII annotations
 cssselect                 # Used to extract HTML fragments via CSS selectors in 2 test cases and pyquery
@@ -51,5 +50,6 @@ tox                       # virtualenv management for tests
 tox-battery               # Makes tox aware of requirements file changes
 transifex-client          # Command-line interface for the Transifex localization service
 
+-e git+https://github.com/edx/bok-choy.git@54217ed7b54a3d48873b9f90901bfd1ea991eedc#egg=bok-choy==0.9.3
 # Deprecated acceptance testing framework
 -e git+https://github.com/edx/lettuce.git@7a04591c78ac56dac3eb3e91ca94b15cce844133#egg=lettuce==0.2.23+edx.1

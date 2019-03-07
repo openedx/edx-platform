@@ -333,6 +333,7 @@ class SubsectionGradingPolicyA11yTest(SubsectionGradingPolicyBase):
             self.progress_page.a11y_audit.config.set_rules({
                 "ignore": [
                     'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                    'region',
                 ]
             })
             self.progress_page.visit()
@@ -420,6 +421,7 @@ class ProgressPageA11yTest(ProgressPageBaseTest):
         self.progress_page.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',
             ]
         })
         self.progress_page.visit()

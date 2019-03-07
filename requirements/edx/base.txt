@@ -205,7 +205,7 @@ python-swiftclient==3.7.0
 python3-saml==1.5.0
 pytz==2018.9
 pyuca==1.1
-pyyaml==3.13
+pyyaml==5.1
 redis==2.10.6
 reportlab==3.5.13
 requests-oauthlib==1.1.0

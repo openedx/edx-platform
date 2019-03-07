@@ -80,6 +80,7 @@ class LMSInstructorDashboardA11yTest(BaseInstructorDashboardTest):
         self.instructor_dashboard_page.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',
             ]
         })
         self.instructor_dashboard_page.a11y_audit.check_for_accessibility_errors()
@@ -115,6 +116,9 @@ class BulkEmailTest(BaseInstructorDashboardTest):
         self.send_email_page.a11y_audit.config.set_rules({
             "ignore": [
                 'button-name',  # TODO: TNL-5830
+                'aria-allowed-role',
+                'color-contrast',
+                'listitem'
             ]
         })
         self.send_email_page.a11y_audit.check_for_accessibility_errors()
@@ -232,7 +236,7 @@ class AutoEnrollmentWithCSVTest(BaseInstructorDashboardTest):
         Auto-enrollment with CSV accessibility tests
         """
         self.auto_enroll_section.a11y_audit.config.set_scope([
-            '#member-list-widget-template'
+            '#membership-list-widget-tpl'
         ])
         self.auto_enroll_section.a11y_audit.check_for_accessibility_errors()
 
@@ -1113,6 +1117,11 @@ class CertificatesTest(BaseInstructorDashboardTest):
         """
         Certificates page accessibility tests
         """
+        self.certificates_section.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-hidden-focus'
+            ]
+        })
         self.certificates_section.a11y_audit.config.set_scope([
             '.certificates-wrapper'
         ])
@@ -1322,6 +1331,11 @@ class CertificateInvalidationTest(BaseInstructorDashboardTest):
         """
         Certificate invalidation accessibility tests
         """
+        self.certificates_section.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-hidden-focus'
+            ]
+        })
         self.certificates_section.a11y_audit.config.set_scope([
             '.certificates-wrapper'
         ])

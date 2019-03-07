@@ -598,6 +598,10 @@ class BookmarksA11yTests(BookmarksTestMixin):
         self.bookmarks_page.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'heading-order',
+                'landmark-no-duplicate-banner',
+                'landmark-one-main',
+                'region'
             ]
         })
         self.setup_test(num_chapters=11)

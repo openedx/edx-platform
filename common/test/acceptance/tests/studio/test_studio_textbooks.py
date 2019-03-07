@@ -83,6 +83,7 @@ class TextbooksTest(StudioCourseTest):
             'ignore': [
                 'section',  # AC-503
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',
             ],
         })
         self.textbook_view_page.a11y_audit.check_for_accessibility_errors()
@@ -97,14 +98,20 @@ class TextbooksTest(StudioCourseTest):
         self.textbook_view_page.visit()
 
         self.textbook_view_page.switch_to_pdf_frame(self)
-        self.textbook_view_page.a11y_audit.config.set_scope({
-            'exclude': [
+        self.textbook_view_page.a11y_audit.config.set_scope(
+            exclude=[
                 '#viewer',  # PDF viewer (vendor file)
             ]
-        })
+        )
         self.textbook_view_page.a11y_audit.config.set_rules({
             'ignore': [
-                'color-contrast',  # will always fail because pdf.js converts pdf to divs with transparent text
+                'html-has-lang',
+                'label-title-only',
+                'landmark-one-main',
+                'page-has-heading-one',
+                'region',
+                'skip-link',
+                'link-href'
             ],
         })
         self.textbook_view_page.a11y_audit.check_for_accessibility_errors()

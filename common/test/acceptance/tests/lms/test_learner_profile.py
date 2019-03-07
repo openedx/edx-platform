@@ -674,6 +674,7 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, AcceptanceTest):
         profile_page.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',
             ]
         })
         profile_page.a11y_audit.check_for_accessibility_errors()
@@ -700,6 +701,7 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, AcceptanceTest):
         profile_page.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',
             ]
         })
         profile_page.a11y_audit.check_for_accessibility_errors()
@@ -715,6 +717,8 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, AcceptanceTest):
         profile_page.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',
+                'color-contrast'
             ]
         })
         profile_page.display_accomplishments()

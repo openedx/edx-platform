@@ -550,6 +550,7 @@ class AccountSettingsA11yTest(AccountSettingsTestMixin, AcceptanceTest):
         self.account_settings_page.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',
             ]
         })
         self.account_settings_page.a11y_audit.check_for_accessibility_errors()

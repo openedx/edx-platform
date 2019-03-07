@@ -654,6 +654,10 @@ class StudioLibraryA11yTest(StudioLibraryTest):
         lib_page.a11y_audit.config.set_rules({
             "ignore": [
                 'link-href',  # TODO: AC-590
+                'duplicate-id-aria',
+                'heading-order',
+                'landmark-complementary-is-top-level',
+                'region'
             ],
         })
 

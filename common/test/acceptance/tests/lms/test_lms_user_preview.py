@@ -426,6 +426,7 @@ class CourseWithContentGroupsTest(StaffViewTest):
                 'color-contrast',  # TODO: AC-559
                 'link-href',  # TODO: AC-559
                 'section',  # TODO: AC-559
+                'region',
             ]
         })
         course_page.a11y_audit.check_for_accessibility_errors()
