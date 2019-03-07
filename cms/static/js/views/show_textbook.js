@@ -5,6 +5,7 @@ define(['js/views/baseview', 'underscore', 'gettext', 'common/js/components/view
                 initialize: function() {
                     this.template = _.template($('#show-textbook-tpl').text());
                     this.listenTo(this.model, 'change', this.render);
+                    this.listenTo(this.model, 'destroy', this.remove);
                 },
                 tagName: 'section',
                 className: 'textbook',
@@ -18,7 +19,7 @@ define(['js/views/baseview', 'underscore', 'gettext', 'common/js/components/view
                     var attrs = $.extend({}, this.model.attributes);
                     attrs.bookindex = this.model.collection.indexOf(this.model);
                     attrs.course = window.course.attributes;
-                    this.$el.html(this.template(attrs));
+                    this.$el.html(this.template(attrs)); // xss-lint: disable=javascript-jquery-html
                     return this;
                 },
                 editTextbook: function(e) {
@@ -29,7 +30,7 @@ define(['js/views/baseview', 'underscore', 'gettext', 'common/js/components/view
                     if (e && e.preventDefault) { e.preventDefault(); }
                     var textbook = this.model;
                     new PromptView.Warning({
-                        title: _.template(gettext('Delete “<%= name %>”?'))(
+                        title: _.template(gettext('Delete “<%- name %>”?'))(
                     {name: textbook.get('name')}
                 ),
                         message: gettext("Deleting a textbook cannot be undone and once deleted any reference to it in your courseware's navigation will also be removed."),
