@@ -4,6 +4,7 @@ Utilities to facilitate experimentation
 
 import hashlib
 import re
+import logging
 from student.models import CourseEnrollment
 from django_comment_common.models import Role
 from course_modes.models import get_cosmetic_verified_display_price
@@ -11,8 +12,12 @@ from courseware.access import has_staff_access_to_preview_mode
 from courseware.date_summary import verified_upgrade_deadline_link, verified_upgrade_link_is_valid
 from xmodule.partitions.partitions_service import get_user_partition_groups, get_all_partitions_for_course
 from opaque_keys.edx.keys import CourseKey
+from opaque_keys import InvalidKeyError
 from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
+
+
+logger = logging.getLogger(__name__)
 
 
 # TODO: clean up as part of REVEM-199 (START)
@@ -104,8 +109,16 @@ def is_enrolled_in_course_run(course_run, enrollment_course_ids):
     """
     Determine if the user is enrolled in this course run
     """
-    course_run_key = CourseKey.from_string(course_run.get('key'))
-    return course_run_key in enrollment_course_ids
+    key = None
+    try:
+        key = course_run.get('key')
+        course_run_key = CourseKey.from_string(key)
+        return course_run_key in enrollment_course_ids
+    except InvalidKeyError:
+        logger.warn(
+            u'Unable to determine if user was enrolled since the course key {} is invalid'.format(key)
+        )
+        return False  # Invalid course run key. Assume user is not enrolled.
 # TODO: clean up as part of REVEM-199 (END)
 
 
