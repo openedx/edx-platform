@@ -12,6 +12,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from pytz import UTC
 from six import text_type
 
+from course_modes.models import CourseMode
 from django_comment_common.models import assign_default_role
 from django_comment_common.utils import seed_permissions_roles
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
@@ -24,6 +25,24 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.partitions.partitions_service import get_all_partitions_for_course
 
 log = logging.getLogger(__name__)
+
+
+def add_course_honor_mode(course_key):
+    """
+    add course_mode = 'Honor' to a course
+    """
+    CourseMode(course_id=course_key,
+               mode_slug=CourseMode.HONOR,
+               mode_display_name=CourseMode.HONOR).save()
+
+
+def delete_course_mode(course_key):
+    """
+    when we delete a course from modulestore, we delete the course_mode as well.
+    since we add default course_mode to a course when we create it,
+    we need to delete course_mode if we recreate a course after deletion.
+    """
+    CourseMode.objects.filter(course_id=course_key).delete()
 
 
 def add_instructor(course_key, requesting_user, new_instructor):
@@ -67,7 +86,7 @@ def delete_course(course_key, user_id, keep_instructors=False):
     groups permissions from course.
     """
     _delete_course_from_modulestore(course_key, user_id)
-
+    delete_course_mode(course_key)
     if not keep_instructors:
         _remove_instructors(course_key)
 

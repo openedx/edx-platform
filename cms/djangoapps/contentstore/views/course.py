@@ -41,6 +41,7 @@ from contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexin
 from contentstore.push_notification import push_notification_enabled
 from contentstore.tasks import rerun_course as rerun_course_task
 from contentstore.utils import (
+    add_course_honor_mode,
     add_instructor,
     get_lms_link_for_item,
     initialize_permissions,
@@ -882,6 +883,9 @@ def create_new_course_in_store(store, user, org, number, run, fields):
 
     # Make sure user has instructor and staff access to the new course
     add_instructor(new_course.id, user, user)
+
+    # Make sure the course has a default course_mode = 'Honor'
+    add_course_honor_mode(new_course.id)
 
     # Initialize permissions for user in the new course
     initialize_permissions(new_course.id, user)

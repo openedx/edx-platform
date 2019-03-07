@@ -697,6 +697,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         self.course.certificates = {'certificates': test_certificates}
         self.course.cert_html_view_enabled = True
         self.course.certificate_available_date = datetime.datetime.today() + datetime.timedelta(days=1)
+        self.course.certificates_display_behavior = 'end'
         self.course.save()
         self.store.update_item(self.course, self.user.id)
 

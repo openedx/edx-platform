@@ -220,6 +220,7 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
         cert_avail_date = datetime.now(pytz.UTC) + cert_avail_delta
         self.course.self_paced = self_paced
         self.course.certificate_available_date = cert_avail_date
+        self.course.certificates_display_behavior = 'end'
         self.course.save()
 
         CourseEnrollment.enroll(self.student, self.course.id, mode='honor')

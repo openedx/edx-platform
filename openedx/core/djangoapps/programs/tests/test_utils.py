@@ -1038,6 +1038,7 @@ class TestProgramDataExtender(ModuleStoreTestCase):
         """
         Verify that the `may_certify` is included during data extension.
         """
+        self.course.certificates_display_behavior = 'end'
         self.course.certificates_show_before_end = may_certify
         self.course = self.update_course(self.course, self.user.id)
 

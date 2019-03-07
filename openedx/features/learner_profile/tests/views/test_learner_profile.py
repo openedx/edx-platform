@@ -216,12 +216,12 @@ class LearnerProfileViewTest(UrlResetMixin, ModuleStoreTestCase):
         """
         # add new course with certificate_available_date is future date.
         course = CourseFactory.create(
-            certificate_available_date=datetime.datetime.now() + datetime.timedelta(days=5)
+            certificate_available_date=datetime.datetime.now() + datetime.timedelta(days=5),
+            certificates_display_behavior='end'
         )
 
         cert = self._create_certificate(course_key=course.id)
         cert.save()
 
         response = self.client.get('/u/{username}'.format(username=self.user.username))
-
         self.assertNotContains(response, 'card certificate-card mode-{cert_mode}'.format(cert_mode=cert.mode))
