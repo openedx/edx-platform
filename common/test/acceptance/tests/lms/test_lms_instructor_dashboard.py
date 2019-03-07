@@ -707,34 +707,6 @@ class DataDownloadsWithMultipleRoleTests(BaseInstructorDashboardTest):
         self.course_fixture = CourseFixture(**self.course_info).install()
 
     @ddt.data(['staff'], ['instructor'])
-    def test_list_student_profile_information(self, role):
-        """
-        Scenario: List enrolled students' profile information
-        Given I am "<Role>" for a course
-        When I click "List enrolled students' profile information"
-            Then I see a table of student profiles
-            Examples:
-            | Role          |
-            | instructor    |
-            | staff         |
-        """
-        username, user_id, email, __ = self.log_in_as_instructor(
-            global_staff=False,
-            course_access_roles=role
-        )
-        instructor_dashboard_page = self.visit_instructor_dashboard()
-        data_download_section = instructor_dashboard_page.select_data_download()
-
-        data_download_section.enrolled_student_profile_button.click()
-        instructor_dashboard_page.wait_for_ajax()
-        student_profile_info = data_download_section.student_profile_information
-
-        self.assertNotIn(student_profile_info, [u'', u'Loading'])
-        expected_data = [user_id, username, email]
-        for datum in expected_data:
-            self.assertIn(str(datum), student_profile_info[0].split('\n'))
-
-    @ddt.data(['staff'], ['instructor'])
     def test_list_student_profile_information_for_large_course(self, role):
         """
         Scenario: List enrolled students' profile information for a large course
