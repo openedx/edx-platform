@@ -56,7 +56,7 @@ beautifulsoup4==4.7.1
 before-after==1.0.1
 billiard==3.3.0.23
 bleach==2.1.4
-bok-choy==0.9.3
+bok-choy==1.0.0
 boto3==1.4.8
 boto==2.39.0
 botocore==1.8.17
@@ -130,7 +130,7 @@ edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
 edx-django-utils==1.0.3
 edx-drf-extensions==2.2.0
-edx-enterprise==1.4.5
+edx-enterprise==1.4.6
 edx-i18n-tools==0.4.8
 edx-lint==1.1.2
 edx-milestones==0.1.13
@@ -212,7 +212,7 @@ mpmath==1.1.0
 mysqlclient==1.4.2.post1
 networkx==1.7
 newrelic==4.16.1.117
-nltk==3.4
+nltk==3.4.1
 nodeenv==1.1.1
 numpy==1.16.2
 oauth2==1.9.0.post1
@@ -318,7 +318,7 @@ text-unidecode==1.2       # via faker
 tincan==0.0.5
 toml==0.10.0              # via tox
 tox-battery==0.5.1
-tox==3.8.6
+tox==3.9.0
 traceback2==1.4.0         # via testtools, unittest2
 transifex-client==0.13.6
 twisted==19.2.0           # via scrapy

@@ -70,7 +70,7 @@
     "@edx/mockprock": "^1.0.1",
     "@edx/stylelint-config-edx": "1.1.0",
     "babel-jest": "23.0.1",
-    "edx-custom-a11y-rules": "1.0.5",
+    "edx-custom-a11y-rules": "1.0.6",
     "enzyme": "3.3.0",
     "enzyme-adapter-react-16": "1.1.1",
     "eslint-config-edx": "3.0.1",
