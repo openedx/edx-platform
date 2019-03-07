@@ -39,9 +39,23 @@ class SiteConfigurationListSerializer(SiteConfigurationSerializer):
 
 
 class AlternativeDomainSerializer(serializers.ModelSerializer):
+    site = serializers.PrimaryKeyRelatedField(queryset=Site.objects.all())
+
     class Meta:
         model = AlternativeDomain
-        fields = ('id', 'domain', 'site')
+        fields = ('id', 'site', 'domain')
+
+    def create(self, validated_data):
+        """
+        Allow only one alternative domain per Site model.
+        """
+        domain, created = AlternativeDomain.objects.get_or_create(
+            site=validated_data.get('site', None),
+            defaults={'domain': validated_data.get('domain', None)})
+        if not created:
+            domain.domain = validated_data.get('domain', None)
+            domain.save()
+        return domain
 
 
 class SiteSerializer(serializers.ModelSerializer):
@@ -135,23 +149,3 @@ class RegistrationSerializer(serializers.Serializer):
             'password': 'hashed',
             'initial_values': initial_values,
         }
-
-
-class AlternativeDomainSerializer(serializers.ModelSerializer):
-    site = serializers.PrimaryKeyRelatedField(queryset=Site.objects.all())
-
-    class Meta:
-        model = AlternativeDomain
-        fields = ('id', 'site', 'domain')
-
-    def create(self, validated_data):
-        """
-        Allow only one alternative domain per Site model.
-        """
-        domain, created = AlternativeDomain.objects.get_or_create(
-            site=validated_data.get('site', None),
-            defaults={'domain': validated_data.get('domain', None)})
-        if not created:
-            domain.domain = validated_data.get('domain', None)
-            domain.save()
-        return domain

@@ -754,12 +754,6 @@ def create_account_with_params(request, params):
     # Perform operations that are non-critical parts of account creation
     create_or_set_user_attribute_created_on_site(user, request.site)
 
-    organization = Organization.objects.filter(name=request.GET.get('organization_name'))[0]
-    UserOrganizationMapping.objects.create(
-        user=user,
-        organization=organization,
-    )
-
     preferences_api.set_user_preference(user, LANGUAGE_KEY, get_language())
 
     if settings.FEATURES.get('ENABLE_DISCUSSION_EMAIL_DIGEST'):
