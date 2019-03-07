@@ -1,3 +1,12 @@
+"""
+Currently edx is using 1.7.0 version of social-auth-core
+which uses google-plus-api to sign in with google.
+As google plus is being shutting down on 7th of March,
+so this version of social-auth-core will cause problems.
+Luckily social-auth-core version 3.0.0 Link has handled
+this issue already so this module is to incorporate that fix
+into the edx code by adding custom google oauth2 backend for google+.
+"""
 from social_core.backends.google import GoogleOAuth2
 
 
