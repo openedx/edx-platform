@@ -236,6 +236,7 @@ class RetireViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         """
         pass
 
+
 @httpretty.activate
 @mock.patch('django.conf.settings.USERNAME_REPLACEMENT_WORKER', 'test_replace_username_service_worker')
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -311,6 +312,7 @@ class ReplaceUsernameViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         Override the parent implementation of this, we JWT auth for this API
         """
         pass
+
 
 @ddt.ddt
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})

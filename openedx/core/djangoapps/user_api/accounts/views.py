@@ -1006,6 +1006,7 @@ class AccountRetirementView(ViewSet):
         for entitlement in CourseEntitlement.objects.filter(user_id=user.id):
             entitlement.courseentitlementsupportdetail_set.all().update(comments='')
 
+
 class UsernameReplacementView(APIView):
     """
     WARNING: This API is only meant to be used as part of a larger job that
@@ -1163,4 +1164,3 @@ class UsernameReplacementView(APIView):
             new=new_username,
         ))
         return True
-

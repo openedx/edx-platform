@@ -225,6 +225,7 @@ def _url_for_retire(user_id):
     """
     return "{prefix}/users/{user_id}/retire".format(prefix=settings.PREFIX, user_id=user_id)
 
+
 def _url_for_username_replacement(user_id):
     """
     Returns cs_comments_servuce url endpoint to replace the username of a user

@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 from django.conf import settings
 from rest_framework import permissions
 
+
 class CanDeactivateUser(permissions.BasePermission):
     """
     Grants access to AccountDeactivationView if the requesting user is a superuser
@@ -23,6 +24,7 @@ class CanRetireUser(permissions.BasePermission):
     """
     def has_permission(self, request, view):
         return request.user.has_perm('accounts.can_retire_user')
+
 
 class CanReplaceUsername(permissions.BasePermission):
     """

@@ -588,6 +588,7 @@ class RetireUserView(APIView):
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
 class ReplaceUsernameView(APIView):
     """
     A request from the settings.USERNAME_REPLACEMENT_WORKER user can replace
@@ -629,15 +630,6 @@ class ReplaceUsernameView(APIView):
         except Exception as exc:
             return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-
-
-
-
-
-
-
 
 
 class CourseDiscussionSettingsAPIView(DeveloperErrorViewMixin, APIView):
