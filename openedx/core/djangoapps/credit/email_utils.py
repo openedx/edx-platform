@@ -66,7 +66,7 @@ def send_credit_notifications(username, course_key):
         # strip enclosing angle brackets from 'logo_image' cache 'Content-ID'
         logo_image_id = logo_image.get('Content-ID', '')[1:-1]
 
-    providers_names = get_credit_provider_display_names(course_key)
+    providers_names = get_credit_provider_attribute_values(course_key, 'display_name')
     providers_string = make_providers_strings(providers_names)
     context = {
         'full_name': user.get_full_name(),
@@ -196,40 +196,43 @@ def _email_url_parser(url_name, extra_param=None):
     return urlparse.urlunparse(dashboard_link_parts)
 
 
-def get_credit_provider_display_names(course_key):
+def get_credit_provider_attribute_values(course_key, attribute_name):
     """Get the course information from ecommerce and parse the data to get providers.
 
     Arguments:
         course_key (CourseKey): The identifier for the course.
+        attribute_name (String): Name of the attribute of credit provider.
 
     Returns:
-        List of credit provider display names.
+        List of provided credit provider attribute values.
     """
     course_id = unicode(course_key)
     credit_config = CreditConfig.current()
 
     cache_key = None
-    provider_names = None
+    attribute_values = None
 
     if credit_config.is_cache_enabled:
-        cache_key = '{key_prefix}.{course_key}'.format(
-            key_prefix=credit_config.CACHE_KEY, course_key=course_id
+        cache_key = '{key_prefix}.{course_key}.{attribute_name}'.format(
+            key_prefix=credit_config.CACHE_KEY,
+            course_key=course_id,
+            attribute_name=attribute_name
         )
-        provider_names = cache.get(cache_key)
+        attribute_values = cache.get(cache_key)
 
-    if provider_names is not None:
-        return provider_names
+    if attribute_values is not None:
+        return attribute_values
 
     try:
         user = User.objects.get(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME)
         response = ecommerce_api_client(user).courses(course_id).get(include_products=1)
     except Exception:  # pylint: disable=broad-except
         log.exception(u"Failed to receive data from the ecommerce course API for Course ID '%s'.", course_id)
-        return provider_names
+        return attribute_values
 
     if not response:
         log.info(u"No Course information found from ecommerce API for Course ID '%s'.", course_id)
-        return provider_names
+        return attribute_values
 
     provider_ids = []
     for product in response.get('products'):
@@ -237,16 +240,16 @@ def get_credit_provider_display_names(course_key):
             attr.get('value') for attr in product.get('attribute_values') if attr.get('name') == 'credit_provider'
         ]
 
-    provider_names = []
+    attribute_values = []
     credit_providers = CreditProvider.get_credit_providers()
     for provider in credit_providers:
         if provider['id'] in provider_ids:
-            provider_names.append(provider['display_name'])
+            attribute_values.append(provider[attribute_name])
 
     if credit_config.is_cache_enabled:
-        cache.set(cache_key, provider_names, credit_config.cache_ttl)
+        cache.set(cache_key, attribute_values, credit_config.cache_ttl)
 
-    return provider_names
+    return attribute_values
 
 
 def make_providers_strings(providers):
