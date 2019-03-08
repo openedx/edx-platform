@@ -402,25 +402,6 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
             actual_events
         )
 
-    def test_year_of_birth_field(self):
-        """
-        Test behaviour of "Year of Birth" field.
-        """
-        # Note that when we clear the year_of_birth here we're firing an event.
-        self.assertEqual(self.account_settings_page.value_for_dropdown_field('year_of_birth', '', focus_out=True), '')
-
-        expected_events = [
-            self.expected_settings_changed_event('year_of_birth', None, 1980),
-            self.expected_settings_changed_event('year_of_birth', 1980, None),
-        ]
-        with self.assert_events_match_during(self.settings_changed_event_filter, expected_events):
-            self._test_dropdown_field(
-                u'year_of_birth',
-                u'Year of Birth',
-                u'',
-                [u'1980', u''],
-            )
-
     def test_country_field(self):
         """
         Test behaviour of "Country or Region" field.
