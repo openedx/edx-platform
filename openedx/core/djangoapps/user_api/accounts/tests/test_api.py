@@ -424,6 +424,7 @@ class AccountSettingsOnCreationTest(TestCase):
             'extended_profile': [],
             'secondary_email': None,
             'time_zone': None,
+            'course_certificates': None,
         })
 
     def test_normalize_password(self):

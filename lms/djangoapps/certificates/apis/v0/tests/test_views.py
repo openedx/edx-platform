@@ -16,6 +16,7 @@ from lms.djangoapps.certificates.apis.v0.views import CertificatesDetailView, Ce
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from openedx.core.djangoapps.oauth_dispatch.toggles import ENFORCE_JWT_SCOPES
+from openedx.core.djangoapps.user_api.tests.factories import UserPreferenceFactory
 from openedx.core.djangoapps.user_authn.tests.utils import AuthType, AuthAndScopesTestMixin, JWT_AUTH_TYPES
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -175,6 +176,53 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
             self.assertEqual(resp.status_code, status.HTTP_200_OK)
             self.assertEqual(len(resp.data), 0)
 
+    @ddt.data(*product(list(AuthType), (True, False)))
+    @ddt.unpack
+    def test_another_user_with_certs_shared_public(self, auth_type, scopes_enforced):
+        """
+        Returns 200 with cert list for OAuth, Session, and JWT auth.
+        Returns 200 for jwt_restricted and user:me filter unset.
+        """
+        self.student.profile.year_of_birth = 1977
+        self.student.profile.save()
+        UserPreferenceFactory.build(
+            user=self.student,
+            key='account_privacy',
+            value='all_users',
+        ).save()
+
+        with ENFORCE_JWT_SCOPES.override(active=scopes_enforced):
+            resp = self.get_response(auth_type, requesting_user=self.other_student)
+
+            self.assertEqual(resp.status_code, status.HTTP_200_OK)
+            self.assertEqual(len(resp.data), 1)
+
+    @ddt.data(*product(list(AuthType), (True, False)))
+    @ddt.unpack
+    def test_another_user_with_certs_shared_custom(self, auth_type, scopes_enforced):
+        """
+        Returns 200 with cert list for OAuth, Session, and JWT auth.
+        Returns 200 for jwt_restricted and user:me filter unset.
+        """
+        self.student.profile.year_of_birth = 1977
+        self.student.profile.save()
+        UserPreferenceFactory.build(
+            user=self.student,
+            key='account_privacy',
+            value='custom',
+        ).save()
+        UserPreferenceFactory.build(
+            user=self.student,
+            key='visibility.course_certificates',
+            value='all_users',
+        ).save()
+
+        with ENFORCE_JWT_SCOPES.override(active=scopes_enforced):
+            resp = self.get_response(auth_type, requesting_user=self.other_student)
+
+            self.assertEqual(resp.status_code, status.HTTP_200_OK)
+            self.assertEqual(len(resp.data), 1)
+
     @patch('edx_rest_framework_extensions.permissions.log')
     @ddt.data(*product(JWT_AUTH_TYPES, (True, False)))
     @ddt.unpack
@@ -210,7 +258,7 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
     def test_query_counts(self):
         # Test student with no certificates
         student_no_cert = UserFactory.create(password=self.user_password)
-        with self.assertNumQueries(21):
+        with self.assertNumQueries(22):
             resp = self.get_response(
                 AuthType.jwt,
                 requesting_user=student_no_cert,
@@ -220,7 +268,7 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
             self.assertEqual(len(resp.data), 0)
 
         # Test student with 1 certificate
-        with self.assertNumQueries(29):
+        with self.assertNumQueries(30):
             resp = self.get_response(
                 AuthType.jwt,
                 requesting_user=self.student,
@@ -253,7 +301,7 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
             download_url='www.google.com',
             grade="0.88",
         )
-        with self.assertNumQueries(29):
+        with self.assertNumQueries(30):
             resp = self.get_response(
                 AuthType.jwt,
                 requesting_user=student_2_certs,
