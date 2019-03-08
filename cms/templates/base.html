@@ -87,17 +87,17 @@ from openedx.core.release import RELEASE_LINE
     <%block name="header_extras"></%block>
 
     <% ga_acct = getattr(settings, 'GOOGLE_ANALYTICS_ACCOUNT', None) %>
-    % if ga_acct:
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=${ga_acct}"></script>
+    <!-- Google Analytics -->
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
-      gtag('config', '${ga_acct}');
+    ga('create', '${ga_acct}', 'auto');
+    ga('send', 'pageview');
     </script>
-    % endif
+    <!-- End Google Analytics --> 
   </head>
 
   <body class="${static.dir_rtl()} <%block name='bodyclass'></%block> lang_${LANGUAGE_CODE}">
