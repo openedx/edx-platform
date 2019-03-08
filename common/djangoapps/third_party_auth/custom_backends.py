@@ -11,9 +11,14 @@ from social_core.backends.google import GoogleOAuth2
 
 
 class CustomGoogleOAuth(GoogleOAuth2):
+    """
+    Google OAuth2 custom authentication backend
+    """
 
     def get_user_id(self, details, response):
-        """Use google email as unique id"""
+        """
+        Use google email as unique id
+        """
         if self.setting('USE_UNIQUE_USER_ID', False):
             if 'sub' in response:
                 return response['sub']
@@ -23,7 +28,9 @@ class CustomGoogleOAuth(GoogleOAuth2):
             return details['email']
 
     def get_user_details(self, response):
-        """Return user details from Google API account"""
+        """
+        Return user details from Google API account
+        """
         if 'email' in response:
             email = response['email']
         else:
@@ -45,7 +52,9 @@ class CustomGoogleOAuth(GoogleOAuth2):
                 'last_name': last_name}
 
     def user_data(self, access_token, *args, **kwargs):
-        """Return user data from Google API"""
+        """
+        Return user data from Google API
+        """
         return self.get_json(
             'https://www.googleapis.com/oauth2/v3/userinfo',
             params={
@@ -53,3 +62,9 @@ class CustomGoogleOAuth(GoogleOAuth2):
                 'alt': 'json'
             }
         )
+
+    def auth_html(self):
+        """
+        Abstract Method Inclusion
+        """
+        pass
