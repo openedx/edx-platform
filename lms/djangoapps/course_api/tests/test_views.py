@@ -277,6 +277,7 @@ class CourseDetailViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase
 })
 @override_settings(SEARCH_ENGINE="search.tests.mock_search_engine.MockSearchEngine")
 @override_settings(COURSEWARE_INDEX_NAME=TEST_INDEX_NAME)
+@ddt.ddt
 class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, SearcherMixin):
     """
     Tests the search functionality of the courses API.
@@ -355,7 +356,8 @@ class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, Sear
         self.assertEqual(res.data['pagination']['count'], 3)
         self.assertEqual(len(res.data['results']), 1)  # Should return a single course
 
-    def test_too_many_courses(self):
+    @ddt.data(True, False)
+    def test_too_many_courses(self, with_username):
         """
         Test that search results are limited to 100 courses, and that they don't
         blow up the database.
@@ -394,8 +396,14 @@ class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, Sear
 
         for page in range(1, 12):
             RequestCache.clear_all_namespaces()
-            with self.assertNumQueries(query_counts[page - 1]):
-                response = self.verify_response(params={'page': page, 'page_size': 30})
+            expected_query_count = query_counts[page - 1]
+            if with_username:
+                expected_query_count += 4
+            with self.assertNumQueries(expected_query_count):
+                params = {'page': page, 'page_size': 30}
+                if with_username:
+                    params['username'] = self.audit_user.username
+                response = self.verify_response(params=params)
 
                 self.assertIn('results', response.data)
                 self.assertEqual(response.data['pagination']['count'], 303)

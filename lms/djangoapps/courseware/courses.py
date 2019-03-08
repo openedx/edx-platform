@@ -25,7 +25,7 @@ from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module
 from course_modes.models import CourseMode
 from django.conf import settings
-from django.db.models import Prefetch
+from django.db.models import Prefetch, prefetch_related_objects
 from django.urls import reverse
 from django.http import Http404, QueryDict
 from enrollment.api import get_course_enrollment_details
@@ -474,7 +474,8 @@ def get_courses(user, org=None, filter_=None):
         'COURSE_CATALOG_VISIBILITY_PERMISSION',
         settings.COURSE_CATALOG_VISIBILITY_PERMISSION
     )
-
+    if user.is_authenticated:
+        prefetch_related_objects([user], 'roles', 'courseenrollment_set', 'experimentdata_set')
     return LazySequence(
         (c for c in courses if has_access(user, permission_name, c)),
         est_len=courses.count()
