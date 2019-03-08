@@ -442,10 +442,14 @@ class CountryTimeZoneTest(CacheIsolationTestCase):
     """
 
     @ddt.data(('ES', ['Africa/Ceuta', 'Atlantic/Canary', 'Europe/Madrid']),
-              (None, common_timezones[:10]))
+              (None, common_timezones[:10]),
+              ('AA', common_timezones[:10]))
     @ddt.unpack
     def test_get_country_time_zones(self, country_code, expected_time_zones):
-        """Verify that list of common country time zones dictionaries is returned"""
+        """
+        Verify that list of common country time zones dictionaries is returned
+        An unrecognized country code (e.g. AA) will return the list of common timezones
+        """
         expected_dict = [
             {
                 'time_zone': time_zone,
@@ -455,11 +459,6 @@ class CountryTimeZoneTest(CacheIsolationTestCase):
         ]
         country_time_zones_dicts = get_country_time_zones(country_code)[:10]
         self.assertEqual(country_time_zones_dicts, expected_dict)
-
-    def test_country_code_errors(self):
-        """Verify that country code error is raised for invalid country code"""
-        with self.assertRaises(CountryCodeError):
-            get_country_time_zones('AA')
 
 
 def get_expected_validation_developer_message(preference_key, preference_value):
