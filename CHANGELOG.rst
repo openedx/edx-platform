@@ -1,3 +1,4 @@
+
 We don't maintain a detailed changelog.  For details of changes, please see
 either the `edX Release Notes`_ or the `GitHub commit history`_.
 
