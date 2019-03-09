@@ -491,14 +491,14 @@ class TestCourseGrader(TestSubmittingProblems):
         )
         # count how many state history entries there are
         baseline = BaseStudentModuleHistory.get_history(student_module)
-        self.assertEqual(len(baseline), 3)
+        self.assertEqual(len(baseline), 2)
 
         # now click "show answer"
         self.show_question_answer('p1')
 
         # check that we don't have more state history entries
         csmh = BaseStudentModuleHistory.get_history(student_module)
-        self.assertEqual(len(csmh), 3)
+        self.assertEqual(len(csmh), 2)
 
     def test_grade_with_collected_max_score(self):
         """

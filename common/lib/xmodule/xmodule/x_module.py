@@ -207,7 +207,12 @@ class HTMLSnippet(object):
     js = {}
     js_module_name = None
 
+    preview_view_js = {}
+    studio_view_js = {}
+
     css = {}
+    preview_view_css = {}
+    studio_view_css = {}
 
     @classmethod
     def get_javascript(cls):
@@ -234,6 +239,30 @@ class HTMLSnippet(object):
         return cls.js
 
     @classmethod
+    def get_preview_view_js(cls):
+        if issubclass(cls, XModule):
+            return cls.get_javascript()
+        return cls.preview_view_js
+
+    @classmethod
+    def get_preview_view_js_bundle_name(cls):
+        if issubclass(cls, XModule):
+            return cls.__name__
+        return cls.__name__ + 'Preview'
+
+    @classmethod
+    def get_studio_view_js(cls):
+        if issubclass(cls, XModuleDescriptor):
+            return cls.get_javascript()
+        return cls.studio_view_js
+
+    @classmethod
+    def get_studio_view_js_bundle_name(cls):
+        if issubclass(cls, XModuleDescriptor):
+            return cls.__name__
+        return cls.__name__ + 'Studio'
+
+    @classmethod
     def get_css(cls):
         """
         Return a dictionary containing some of the following keys:
@@ -249,6 +278,18 @@ class HTMLSnippet(object):
         """
         return cls.css
 
+    @classmethod
+    def get_preview_view_css(cls):
+        if issubclass(cls, XModule):
+            return cls.get_css()
+        return cls.preview_view_css
+
+    @classmethod
+    def get_studio_view_css(cls):
+        if issubclass(cls, XModuleDescriptor):
+            return cls.get_css()
+        return cls.studio_view_css
+
     def get_html(self):
         """
         Return the html used to display this snippet
@@ -258,7 +299,7 @@ class HTMLSnippet(object):
             .format(self.__class__))
 
 
-def shim_xmodule_js(block, fragment):
+def shim_xmodule_js(fragment, js_module_name):
     """
     Set up the XBlock -> XModule shim on the supplied :class:`web_fragments.fragment.Fragment`
     """
@@ -268,7 +309,7 @@ def shim_xmodule_js(block, fragment):
 
     if not fragment.js_init_fn:
         fragment.initialize_js('XBlockToXModuleShim')
-        fragment.json_init_args = {'xmodule-type': block.js_module_name}
+        fragment.json_init_args = {'xmodule-type': js_module_name}
 
         add_webpack_to_fragment(fragment, 'XModuleShim')
 
@@ -831,8 +872,52 @@ descriptor_attr = partial(ProxyAttribute, 'descriptor')  # pylint: disable=inval
 module_runtime_attr = partial(ProxyAttribute, 'xmodule_runtime')  # pylint: disable=invalid-name
 
 
+class XModuleToXBlockMixin(object):
+    """
+    Common code needed by XModule and XBlocks converted from XModules.
+    """
+    @property
+    def ajax_url(self):
+        """
+        Returns the URL for the ajax handler.
+        """
+        return self.runtime.handler_url(self, 'xmodule_handler', '', '').rstrip('/?')
+
+    @XBlock.handler
+    def xmodule_handler(self, request, suffix=None):
+        """
+        XBlock handler that wraps `handle_ajax`
+        """
+        class FileObjForWebobFiles(object):
+            """
+            Turn Webob cgi.FieldStorage uploaded files into pure file objects.
+
+            Webob represents uploaded files as cgi.FieldStorage objects, which
+            have a .file attribute.  We wrap the FieldStorage object, delegating
+            attribute access to the .file attribute.  But the files have no
+            name, so we carry the FieldStorage .filename attribute as the .name.
+
+            """
+            def __init__(self, webob_file):
+                self.file = webob_file.file
+                self.name = webob_file.filename
+
+            def __getattr__(self, name):
+                return getattr(self.file, name)
+
+        # WebOb requests have multiple entries for uploaded files.  handle_ajax
+        # expects a single entry as a list.
+        request_post = MultiDict(request.POST)
+        for key in set(request.POST.iterkeys()):
+            if hasattr(request.POST[key], "file"):
+                request_post[key] = map(FileObjForWebobFiles, request.POST.getall(key))
+
+        response_data = self.handle_ajax(suffix, request_post)
+        return Response(response_data, content_type='application/json', charset='UTF-8')
+
+
 @XBlock.needs("i18n")
-class XModule(HTMLSnippet, XModuleMixin):
+class XModule(XModuleToXBlockMixin, HTMLSnippet, XModuleMixin):
     """ Implements a generic learning module.
 
         Subclasses must at a minimum provide a definition for get_html in order
@@ -884,38 +969,6 @@ class XModule(HTMLSnippet, XModuleMixin):
         """ dispatch is last part of the URL.
             data is a dictionary-like object with the content of the request"""
         return u""
-
-    @XBlock.handler
-    def xmodule_handler(self, request, suffix=None):
-        """
-        XBlock handler that wraps `handle_ajax`
-        """
-        class FileObjForWebobFiles(object):
-            """
-            Turn Webob cgi.FieldStorage uploaded files into pure file objects.
-
-            Webob represents uploaded files as cgi.FieldStorage objects, which
-            have a .file attribute.  We wrap the FieldStorage object, delegating
-            attribute access to the .file attribute.  But the files have no
-            name, so we carry the FieldStorage .filename attribute as the .name.
-
-            """
-            def __init__(self, webob_file):
-                self.file = webob_file.file
-                self.name = webob_file.filename
-
-            def __getattr__(self, name):
-                return getattr(self.file, name)
-
-        # WebOb requests have multiple entries for uploaded files.  handle_ajax
-        # expects a single entry as a list.
-        request_post = MultiDict(request.POST)
-        for key in set(request.POST.iterkeys()):
-            if hasattr(request.POST[key], "file"):
-                request_post[key] = map(FileObjForWebobFiles, request.POST.getall(key))
-
-        response_data = self.handle_ajax(suffix, request_post)
-        return Response(response_data, content_type='application/json', charset='UTF-8')
 
     def get_child(self, usage_id):
         if usage_id in self._child_cache:
@@ -1041,23 +1094,10 @@ class ResourceTemplates(object):
                     return template
 
 
-@XBlock.needs("i18n")
-class XModuleDescriptor(HTMLSnippet, ResourceTemplates, XModuleMixin):
+class XModuleDescriptorToXBlockMixin(object):
     """
-    An XModuleDescriptor is a specification for an element of a course. This
-    could be a problem, an organizational element (a group of content), or a
-    segment of video, for example.
-
-    XModuleDescriptors are independent and agnostic to the current student state
-    on a problem. They handle the editing interface used by instructors to
-    create a problem, and can generate XModules (which do know about student
-    state).
+    Common code needed by XModuleDescriptor and XBlocks converted from XModules.
     """
-
-    entry_point = "xmodule.v1"
-
-    module_class = XModule
-
     # VS[compat].  Backwards compatibility code that can go away after
     # importing 2012 courses.
     # A set of metadata key conversions that we want to make
@@ -1065,33 +1105,6 @@ class XModuleDescriptor(HTMLSnippet, ResourceTemplates, XModuleMixin):
         'slug': 'url_name',
         'name': 'display_name',
     }
-
-    # ============================= STRUCTURAL MANIPULATION ===================
-    def __init__(self, *args, **kwargs):
-        """
-        Construct a new XModuleDescriptor. The only required arguments are the
-        system, used for interaction with external resources, and the
-        definition, which specifies all the data needed to edit and display the
-        problem (but none of the associated metadata that handles recordkeeping
-        around the problem).
-
-        This allows for maximal flexibility to add to the interface while
-        preserving backwards compatibility.
-
-        runtime: A DescriptorSystem for interacting with external resources
-
-        field_data: A dictionary-like object that maps field names to values
-            for those fields.
-
-        XModuleDescriptor.__init__ takes the same arguments as xblock.core:XBlock.__init__
-        """
-        super(XModuleDescriptor, self).__init__(*args, **kwargs)
-        # update_version is the version which last updated this xblock v prev being the penultimate updater
-        # leaving off original_version since it complicates creation w/o any obv value yet and is computable
-        # by following previous until None
-        # definition_locator is only used by mongostores which separate definitions from blocks
-        self.previous_version = self.update_version = self.definition_locator = None
-        self.xmodule_runtime = None
 
     @classmethod
     def _translate(cls, key):
@@ -1159,6 +1172,51 @@ class XModuleDescriptor(HTMLSnippet, ResourceTemplates, XModuleMixin):
         and course
         """
         raise NotImplementedError('Modules must implement export_to_xml to enable xml export')
+
+
+@XBlock.needs("i18n")
+class XModuleDescriptor(XModuleDescriptorToXBlockMixin, HTMLSnippet, ResourceTemplates, XModuleMixin):
+    """
+    An XModuleDescriptor is a specification for an element of a course. This
+    could be a problem, an organizational element (a group of content), or a
+    segment of video, for example.
+
+    XModuleDescriptors are independent and agnostic to the current student state
+    on a problem. They handle the editing interface used by instructors to
+    create a problem, and can generate XModules (which do know about student
+    state).
+    """
+
+    entry_point = "xmodule.v1"
+
+    module_class = XModule
+
+    # ============================= STRUCTURAL MANIPULATION ===================
+    def __init__(self, *args, **kwargs):
+        """
+        Construct a new XModuleDescriptor. The only required arguments are the
+        system, used for interaction with external resources, and the
+        definition, which specifies all the data needed to edit and display the
+        problem (but none of the associated metadata that handles recordkeeping
+        around the problem).
+
+        This allows for maximal flexibility to add to the interface while
+        preserving backwards compatibility.
+
+        runtime: A DescriptorSystem for interacting with external resources
+
+        field_data: A dictionary-like object that maps field names to values
+            for those fields.
+
+        XModuleDescriptor.__init__ takes the same arguments as xblock.core:XBlock.__init__
+        """
+        super(XModuleDescriptor, self).__init__(*args, **kwargs)
+        # update_version is the version which last updated this xblock v prev being the penultimate updater
+        # leaving off original_version since it complicates creation w/o any obv value yet and is computable
+        # by following previous until None
+        # definition_locator is only used by mongostores which separate definitions from blocks
+        self.previous_version = self.update_version = self.definition_locator = None
+        self.xmodule_runtime = None
 
     def editor_saved(self, user, old_metadata, old_content):
         """

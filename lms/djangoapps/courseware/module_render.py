@@ -752,7 +752,7 @@ def get_module_system_for_user(
     is_pure_xblock = isinstance(descriptor, XBlock) and not isinstance(descriptor, XModuleDescriptor)
     module_class = getattr(descriptor, 'module_class', None)
     is_lti_module = not is_pure_xblock and issubclass(module_class, LTIModule)
-    if is_pure_xblock or is_lti_module:
+    if (is_pure_xblock and not getattr(descriptor, 'requires_per_student_anonymous_id', False)) or is_lti_module:
         anonymous_student_id = anonymous_id_for_user(user, course_id)
     else:
         anonymous_student_id = anonymous_id_for_user(user, None)

@@ -65,6 +65,7 @@ from openedx.core.lib.url_utils import quote_slashes
 from student.models import anonymous_id_for_user, CourseEnrollment
 from verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from xblock_django.models import XBlockConfiguration
+from xmodule.capa_module import ProblemBlock
 from xmodule.lti_module import LTIDescriptor
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -1932,12 +1933,15 @@ class TestStaffDebugInfo(SharedModuleStoreTestCase):
 
 
 PER_COURSE_ANONYMIZED_DESCRIPTORS = (LTIDescriptor, )
+PER_STUDENT_ANONYMIZED_XBLOCKS = [
+    ProblemBlock,
+]
 
 # The "set" here is to work around the bug that load_classes returns duplicates for multiply-declared classes.
-PER_STUDENT_ANONYMIZED_DESCRIPTORS = sorted(set(
+PER_STUDENT_ANONYMIZED_DESCRIPTORS = sorted(set([
     class_ for (name, class_) in XModuleDescriptor.load_classes()
     if not issubclass(class_, PER_COURSE_ANONYMIZED_DESCRIPTORS)
-), key=str)
+] + PER_STUDENT_ANONYMIZED_XBLOCKS), key=str)
 
 
 @ddt.ddt
@@ -2164,7 +2168,7 @@ class TestXmoduleRuntimeEvent(TestSubmittingProblems):
             mock_request,
             self.problem.location,
             field_data_cache,
-        )._xmodule
+        )
 
     def set_module_grade_using_publish(self, grade_dict):
         """Publish the user's grade, takes grade_dict as input"""
@@ -2237,7 +2241,7 @@ class TestRebindModule(TestSubmittingProblems):
             mock_request,
             item.location,
             field_data_cache,
-        )._xmodule
+        )
 
     def test_rebind_module_to_new_users(self):
         module = self.get_module_for_user(self.user, self.problem)
@@ -2245,7 +2249,7 @@ class TestRebindModule(TestSubmittingProblems):
         # Bind the module to another student, which will remove "correct_map"
         # from the module's _field_data_cache and _dirty_fields.
         user2 = UserFactory.create()
-        module.descriptor.bind_for_student(module.system, user2.id)
+        module.bind_for_student(module.system, user2.id)
 
         # XBlock's save method assumes that if a field is in _dirty_fields,
         # then it's also in _field_data_cache. If this assumption
@@ -2254,7 +2258,7 @@ class TestRebindModule(TestSubmittingProblems):
         # _field_data cache, but not _dirty_fields, when we bound
         # this module to the second student. (TNL-2640)
         user3 = UserFactory.create()
-        module.descriptor.bind_for_student(module.system, user3.id)
+        module.bind_for_student(module.system, user3.id)
 
     def test_rebind_noauth_module_to_user_not_anonymous(self):
         """
@@ -2278,11 +2282,11 @@ class TestRebindModule(TestSubmittingProblems):
         module = self.get_module_for_user(self.anon_user)
         user2 = UserFactory()
         user2.id = 2
-        module.system.rebind_noauth_module_to_user(module, user2)
+        module.system.rebind_noauth_module_to_user(module._xmodule, user2)  # pylint: disable=protected-access
         self.assertTrue(module)
         self.assertEqual(module.system.anonymous_student_id, anonymous_id_for_user(user2, self.course.id))
         self.assertEqual(module.scope_ids.user_id, user2.id)
-        self.assertEqual(module.descriptor.scope_ids.user_id, user2.id)
+        self.assertEqual(module._xmodule.scope_ids.user_id, user2.id)  # pylint: disable=protected-access
 
 
 @ddt.ddt
@@ -2587,11 +2591,11 @@ class TestDisabledXBlockTypes(ModuleStoreTestCase):
         """Tests that the list of disabled xblocks can dynamically update."""
         with self.store.default_store(default_ms):
             course = CourseFactory()
-            item_usage_id = self._verify_descriptor('problem', course, 'CapaDescriptorWithMixins')
+            item_usage_id = self._verify_descriptor('problem', course, 'ProblemBlockWithMixins')
             XBlockConfiguration(name='problem', enabled=False).save()
 
             # First verify that the cached value is used until there is a new request cache.
-            self._verify_descriptor('problem', course, 'CapaDescriptorWithMixins', item_usage_id)
+            self._verify_descriptor('problem', course, 'ProblemBlockWithMixins', item_usage_id)
 
             # Now simulate a new request cache.
             self.store.request_cache.data.clear()
