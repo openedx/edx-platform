@@ -37,7 +37,7 @@ from xblock.scorable import Score
 from . import get_test_system
 from pytz import UTC
 from capa.correctmap import CorrectMap
-from ..capa_base_constants import RANDOMIZATION, SHOWANSWER
+from ..capa_base import RANDOMIZATION, SHOWANSWER
 
 
 class CapaFactory(object):

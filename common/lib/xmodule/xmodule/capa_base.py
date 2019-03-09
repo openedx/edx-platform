@@ -21,7 +21,6 @@ from capa.responsetypes import StudentInputError, ResponseError, LoncapaProblemE
 from capa.util import convert_files_to_filenames, get_inner_html_from_xpath
 from xblock.fields import Boolean, Dict, Float, Integer, Scope, String, XMLString
 from xblock.scorable import ScorableXBlockMixin, Score
-from xmodule.capa_base_constants import RANDOMIZATION, SHOWANSWER
 from xmodule.exceptions import NotFoundError
 from xmodule.graders import ShowCorrectness
 from .fields import Date, Timedelta, ScoreField
@@ -41,6 +40,31 @@ NUM_RANDOMIZATION_BINS = 20
 MAX_RANDOMIZATION_BINS = 1000
 
 FEATURES = getattr(settings, 'FEATURES', {})
+
+
+class SHOWANSWER(object):
+    """
+    Constants for when to show answer
+    """
+    ALWAYS = "always"
+    ANSWERED = "answered"
+    ATTEMPTED = "attempted"
+    CLOSED = "closed"
+    FINISHED = "finished"
+    CORRECT_OR_PAST_DUE = "correct_or_past_due"
+    PAST_DUE = "past_due"
+    NEVER = "never"
+    AFTER_SOME_NUMBER_OF_ATTEMPTS = "after_attempts"
+
+
+class RANDOMIZATION(object):
+    """
+    Constants for problem randomization
+    """
+    ALWAYS = "always"
+    ONRESET = "onreset"
+    NEVER = "never"
+    PER_STUDENT = "per_student"
 
 
 def randomization_bin(seed, problem_id):
