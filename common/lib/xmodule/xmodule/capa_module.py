@@ -7,6 +7,7 @@ import sys
 from django.conf import settings
 from lxml import etree
 from pkg_resources import resource_string
+from xblock.core import XBlock
 from xblock.fields import Boolean, Dict, Float, Integer, Scope, String, XMLString
 
 from capa import responsetypes
@@ -16,7 +17,8 @@ from xmodule.raw_module import RawDescriptor
 from xmodule.contentstore.django import contentstore
 from xmodule.util.misc import escape_html_characters
 from xmodule.util.sandboxing import get_python_lib_zip
-from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT, XModule, module_attr
+from xmodule.x_module import HTMLSnippet, ResourceTemplates, XModuleMixin, XModuleToXBlockMixin
+from xmodule.xml_module import XmlParserMixin
 
 from .capa_base import _, CapaMixin, ComplexEncoder, FEATURES, RANDOMIZATION, Randomization, SHOWANSWER
 from .fields import Date, Timedelta, ScoreField
@@ -24,7 +26,9 @@ from .fields import Date, Timedelta, ScoreField
 log = logging.getLogger("edx.courseware")
 
 
-class CapaFields(object):
+@XBlock.wants('user')  # pylint: disable=abstract-method
+@XBlock.needs('i18n')
+class ProblemBlock(CapaMixin, HTMLSnippet, ResourceTemplates, XmlParserMixin, XModuleMixin, XModuleToXBlockMixin):
     """
     Define the possible fields for a Capa problem
     """
@@ -171,7 +175,6 @@ class CapaFields(object):
     )
 
 
-class CapaModule(CapaFields, CapaMixin, XModule):
     """
     An XModule implementing LonCapa format problems, implemented by way of
     capa.capa_problem.LoncapaProblem
@@ -198,6 +201,13 @@ class CapaModule(CapaFields, CapaMixin, XModule):
         Renders the Studio preview view.
         """
         return self.student_view(context)
+
+    @property
+    def ajax_url(self):
+        """
+        Returns the URL for the ajax handler.
+        """
+        return self.runtime.handler_url(self, 'xmodule_handler', '', '').rstrip('/?')
 
     def handle_ajax(self, dispatch, data):
         """
@@ -290,15 +300,12 @@ class CapaModule(CapaFields, CapaMixin, XModule):
 
         return self.display_name
 
-
-class CapaDescriptor(CapaFields, RawDescriptor):
     """
     Module implementing problems in the LON-CAPA format,
     as implemented by capa.capa_problem
     """
     INDEX_CONTENT_TYPE = 'CAPA'
 
-    module_class = CapaModule
     resources_dir = None
 
     has_score = True
@@ -351,14 +358,14 @@ class CapaDescriptor(CapaFields, RawDescriptor):
 
     @property
     def non_editable_metadata_fields(self):
-        non_editable_fields = super(CapaDescriptor, self).non_editable_metadata_fields
+        non_editable_fields = super(ProblemBlock, self).non_editable_metadata_fields
         non_editable_fields.extend([
-            CapaDescriptor.due,
-            CapaDescriptor.graceperiod,
-            CapaDescriptor.force_save_button,
-            CapaDescriptor.markdown,
-            CapaDescriptor.use_latex_compiler,
-            CapaDescriptor.show_correctness,
+            ProblemBlock.due,
+            ProblemBlock.graceperiod,
+            ProblemBlock.force_save_button,
+            ProblemBlock.markdown,
+            ProblemBlock.use_latex_compiler,
+            ProblemBlock.show_correctness,
         ])
         return non_editable_fields
 
@@ -377,7 +384,7 @@ class CapaDescriptor(CapaFields, RawDescriptor):
         """
         Return dictionary prepared with module content and type for indexing.
         """
-        xblock_body = super(CapaDescriptor, self).index_dictionary()
+        xblock_body = super(ProblemBlock, self).index_dictionary()
         # Removing solutions and hints, as well as script and style
         capa_content = re.sub(
             re.compile(
@@ -551,37 +558,3 @@ class CapaDescriptor(CapaFields, RawDescriptor):
                 if correct_answer_text is not None:
                     report[_("Correct Answer")] = correct_answer_text
                 yield (user_state.username, report)
-
-    # Proxy to CapaModule for access to any of its attributes
-    answer_available = module_attr('answer_available')
-    submit_button_name = module_attr('submit_button_name')
-    submit_button_submitting_name = module_attr('submit_button_submitting_name')
-    submit_problem = module_attr('submit_problem')
-    choose_new_seed = module_attr('choose_new_seed')
-    closed = module_attr('closed')
-    get_answer = module_attr('get_answer')
-    get_problem = module_attr('get_problem')
-    get_problem_html = module_attr('get_problem_html')
-    get_state_for_lcp = module_attr('get_state_for_lcp')
-    handle_input_ajax = module_attr('handle_input_ajax')
-    hint_button = module_attr('hint_button')
-    handle_problem_html_error = module_attr('handle_problem_html_error')
-    handle_ungraded_response = module_attr('handle_ungraded_response')
-    has_submitted_answer = module_attr('has_submitted_answer')
-    is_attempted = module_attr('is_attempted')
-    is_correct = module_attr('is_correct')
-    is_past_due = module_attr('is_past_due')
-    is_submitted = module_attr('is_submitted')
-    lcp = module_attr('lcp')
-    make_dict_of_responses = module_attr('make_dict_of_responses')
-    new_lcp = module_attr('new_lcp')
-    publish_grade = module_attr('publish_grade')
-    rescore = module_attr('rescore')
-    reset_problem = module_attr('reset_problem')
-    save_problem = module_attr('save_problem')
-    set_score = module_attr('set_score')
-    set_state_from_lcp = module_attr('set_state_from_lcp')
-    should_show_submit_button = module_attr('should_show_submit_button')
-    should_show_reset_button = module_attr('should_show_reset_button')
-    should_show_save_button = module_attr('should_show_save_button')
-    update_score = module_attr('update_score')

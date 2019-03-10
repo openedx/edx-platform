@@ -2587,11 +2587,11 @@ class TestDisabledXBlockTypes(ModuleStoreTestCase):
         """Tests that the list of disabled xblocks can dynamically update."""
         with self.store.default_store(default_ms):
             course = CourseFactory()
-            item_usage_id = self._verify_descriptor('problem', course, 'CapaDescriptorWithMixins')
+            item_usage_id = self._verify_descriptor('problem', course, 'ProblemBlockWithMixins')
             XBlockConfiguration(name='problem', enabled=False).save()
 
             # First verify that the cached value is used until there is a new request cache.
-            self._verify_descriptor('problem', course, 'CapaDescriptorWithMixins', item_usage_id)
+            self._verify_descriptor('problem', course, 'ProblemBlockWithMixins', item_usage_id)
 
             # Now simulate a new request cache.
             self.store.request_cache.data.clear()

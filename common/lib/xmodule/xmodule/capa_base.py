@@ -205,7 +205,7 @@ class CapaMixin(ScorableXBlockMixin):
             text = self.data
 
         capa_system = LoncapaSystem(
-            ajax_url=self.runtime.ajax_url,
+            ajax_url=self.ajax_url,
             anonymous_student_id=self.runtime.anonymous_student_id,
             cache=self.runtime.cache,
             can_execute_unsafe_code=self.runtime.can_execute_unsafe_code,
@@ -309,7 +309,7 @@ class CapaMixin(ScorableXBlockMixin):
         return self.runtime.render_template('problem_ajax.html', {
             'element_id': self.location.html_id(),
             'id': text_type(self.location),
-            'ajax_url': self.runtime.ajax_url,
+            'ajax_url': self.ajax_url,
             'current_score': curr_score,
             'total_possible': total_possible,
             'attempts_used': self.attempts,
@@ -625,7 +625,7 @@ class CapaMixin(ScorableXBlockMixin):
 
         if encapsulate:
             html = HTML(u'<div id="problem_{id}" class="problem" data-url="{ajax_url}">{html}</div>').format(
-                id=self.location.html_id(), ajax_url=self.runtime.ajax_url, html=HTML(html)
+                id=self.location.html_id(), ajax_url=self.ajax_url, html=HTML(html)
             )
 
         # Now do all the substitutions which the LMS module_render normally does, but

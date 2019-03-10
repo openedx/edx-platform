@@ -26,7 +26,7 @@ def create_component_instance(step, category, component_type=None, is_advanced=F
 
     component_button_css = 'span.large-{}-icon'.format(category.lower())
     if category == 'problem':
-        module_css = 'div.xmodule_CapaModule'
+        module_css = 'div.xblock-author_view-{}'.format(category.lower())
     elif category == 'advanced':
         module_css = 'div.xmodule_{}Module'.format(advanced_component.title())
     elif category == 'discussion':

@@ -42,7 +42,7 @@ from lms_xblock.mixin import NONSENSICAL_ACCESS_RESTRICTION
 from student.tests.factories import UserFactory
 from xblock_django.models import XBlockConfiguration, XBlockStudioConfiguration, XBlockStudioConfigurationFlag
 from xblock_django.user_service import DjangoXBlockUserService
-from xmodule.capa_module import CapaDescriptor
+from xmodule.capa_module import ProblemBlock
 from xmodule.course_module import DEFAULT_START_DATE
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -523,7 +523,7 @@ class TestCreateItem(ItemTest):
         prob_usage_key = self.response_usage_key(resp)
         problem = self.get_item_from_modulestore(prob_usage_key, verify_is_draft=True)
         # check against the template
-        template = CapaDescriptor.get_template(template_id)
+        template = ProblemBlock.get_template(template_id)
         self.assertEqual(problem.data, template['data'])
         self.assertEqual(problem.display_name, template['metadata']['display_name'])
         self.assertEqual(problem.markdown, template['metadata']['markdown'])

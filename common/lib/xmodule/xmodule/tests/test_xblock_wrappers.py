@@ -30,7 +30,7 @@ from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
 from xmodule.x_module import ModuleSystem, XModule, XModuleDescriptor, DescriptorSystem, STUDENT_VIEW, STUDIO_VIEW, PUBLIC_VIEW
 from xmodule.annotatable_module import AnnotatableDescriptor
-from xmodule.capa_module import CapaDescriptor
+# from xmodule.capa_module import CapaDescriptor
 from xmodule.course_module import CourseDescriptor
 from xmodule.html_module import HtmlDescriptor
 from xmodule.poll_module import PollDescriptor
@@ -49,7 +49,8 @@ from xmodule.tests import get_test_descriptor_system, get_test_system
 # TODO: Add more types of sample data
 LEAF_XMODULES = {
     AnnotatableDescriptor: [{}],
-    CapaDescriptor: [{}],
+    # TODO: How many of these checks are still needed?
+    # CapaDescriptor: [{}],
     HtmlDescriptor: [{}],
     PollDescriptor: [{'display_name': 'Poll Display Name'}],
     WordCloudDescriptor: [{}],

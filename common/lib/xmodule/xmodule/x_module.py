@@ -831,8 +831,45 @@ descriptor_attr = partial(ProxyAttribute, 'descriptor')  # pylint: disable=inval
 module_runtime_attr = partial(ProxyAttribute, 'xmodule_runtime')  # pylint: disable=invalid-name
 
 
+class XModuleToXBlockMixin(object):
+    """
+    Common code needed by XModules and XBlocks converted from XModules.
+    """
+    @XBlock.handler
+    def xmodule_handler(self, request, suffix=None):
+        """
+        XBlock handler that wraps `handle_ajax`
+        """
+        class FileObjForWebobFiles(object):
+            """
+            Turn Webob cgi.FieldStorage uploaded files into pure file objects.
+
+            Webob represents uploaded files as cgi.FieldStorage objects, which
+            have a .file attribute.  We wrap the FieldStorage object, delegating
+            attribute access to the .file attribute.  But the files have no
+            name, so we carry the FieldStorage .filename attribute as the .name.
+
+            """
+            def __init__(self, webob_file):
+                self.file = webob_file.file
+                self.name = webob_file.filename
+
+            def __getattr__(self, name):
+                return getattr(self.file, name)
+
+        # WebOb requests have multiple entries for uploaded files.  handle_ajax
+        # expects a single entry as a list.
+        request_post = MultiDict(request.POST)
+        for key in set(request.POST.iterkeys()):
+            if hasattr(request.POST[key], "file"):
+                request_post[key] = map(FileObjForWebobFiles, request.POST.getall(key))
+
+        response_data = self.handle_ajax(suffix, request_post)
+        return Response(response_data, content_type='application/json', charset='UTF-8')
+
+
 @XBlock.needs("i18n")
-class XModule(HTMLSnippet, XModuleMixin):
+class XModule(HTMLSnippet, XModuleToXBlockMixin, XModuleMixin):
     """ Implements a generic learning module.
 
         Subclasses must at a minimum provide a definition for get_html in order
@@ -884,38 +921,6 @@ class XModule(HTMLSnippet, XModuleMixin):
         """ dispatch is last part of the URL.
             data is a dictionary-like object with the content of the request"""
         return u""
-
-    @XBlock.handler
-    def xmodule_handler(self, request, suffix=None):
-        """
-        XBlock handler that wraps `handle_ajax`
-        """
-        class FileObjForWebobFiles(object):
-            """
-            Turn Webob cgi.FieldStorage uploaded files into pure file objects.
-
-            Webob represents uploaded files as cgi.FieldStorage objects, which
-            have a .file attribute.  We wrap the FieldStorage object, delegating
-            attribute access to the .file attribute.  But the files have no
-            name, so we carry the FieldStorage .filename attribute as the .name.
-
-            """
-            def __init__(self, webob_file):
-                self.file = webob_file.file
-                self.name = webob_file.filename
-
-            def __getattr__(self, name):
-                return getattr(self.file, name)
-
-        # WebOb requests have multiple entries for uploaded files.  handle_ajax
-        # expects a single entry as a list.
-        request_post = MultiDict(request.POST)
-        for key in set(request.POST.iterkeys()):
-            if hasattr(request.POST[key], "file"):
-                request_post[key] = map(FileObjForWebobFiles, request.POST.getall(key))
-
-        response_data = self.handle_ajax(suffix, request_post)
-        return Response(response_data, content_type='application/json', charset='UTF-8')
 
     def get_child(self, usage_id):
         if usage_id in self._child_cache:

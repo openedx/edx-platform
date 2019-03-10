@@ -73,7 +73,7 @@ def see_a_multi_step_component(step, category):
 
 @step(u'I see a "([^"]*)" Problem component$')
 def see_a_problem_component(step, category):
-    component_css = '.xmodule_CapaModule'
+    component_css = 'div.xblock-author_view-problem'
     assert_true(world.is_css_present(component_css),
                 'No problem was added to the unit.')
 
@@ -151,7 +151,7 @@ def duplicated_component(step, ordinal):
 
 @step(u'I see a Problem component with display name "([^"]*)" in position "([^"]*)"$')
 def see_component_in_position(step, display_name, index):
-    component_css = '.xmodule_CapaModule'
+    component_css = 'div.xblock-author_view-problem'
 
     def find_problem(_driver):
         return world.css_text(component_css, int(index)).startswith(display_name)
