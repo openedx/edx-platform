@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-03-03 20:37+0000\n"
-"PO-Revision-Date: 2019-03-03 20:37:47.049579\n"
+"POT-Creation-Date: 2019-03-10 20:37+0000\n"
+"PO-Revision-Date: 2019-03-10 20:37:56.058832\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -295,7 +295,10 @@ msgid ""
 msgstr ""
 
 #: common/djangoapps/course_modes/models.py
-msgid "Verified modes cannot be free."
+#, python-brace-format
+msgid ""
+"The {course_mode} course mode has a minimum price of {min_price}. You must "
+"set a price greater than or equal to {min_price}."
 msgstr ""
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
@@ -5954,37 +5957,6 @@ msgid ""
 " and optionally specified directory."
 msgstr ""
 
-#. Translators: This message means that the user could not be authenticated
-#. (that is, we could
-#. not log them in for some reason - maybe they don't have permission, or
-#. their password was wrong)
-#: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
-msgid "Failed in authenticating {username}, error {error}\n"
-msgstr ""
-
-#. Translators: This message means that the user could not be authenticated
-#. (that is, we could
-#. not log them in for some reason - maybe they don't have permission, or
-#. their password was wrong)
-#: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
-msgid "Failed in authenticating {username}\n"
-msgstr ""
-
-#. Translators: this means that the password has been corrected (sometimes the
-#. database needs to be resynchronized)
-#. Translate this as meaning "the password was fixed" or "the password was
-#. corrected".
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "fixed password"
-msgstr ""
-
-#. Translators: this means everything happened successfully, yay!
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "All ok!"
-msgstr ""
-
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Must provide username"
 msgstr ""
@@ -5993,19 +5965,8 @@ msgstr ""
 msgid "Must provide full name"
 msgstr ""
 
-#. Translators: Domain is an email domain, such as "@gmail.com"
 #: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
-msgid "Email address must end in {domain}"
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
-msgid "Failed - email {email_addr} already exists as {external_id}"
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Password must be supplied if not using certificates"
+msgid "Password must be supplied"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
@@ -6064,10 +6025,6 @@ msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "email"
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Repair Results"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
@@ -8939,6 +8896,84 @@ msgstr ""
 msgid "Error"
 msgstr ""
 
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
+msgid "Expired ID Verification"
+msgstr ""
+
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
+#, python-format
+msgid ""
+"\n"
+"                    Hello %(full_name)s,\n"
+"                    Your %(platform_name)s ID verification has expired.\n"
+"                "
+msgstr ""
+
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
+msgid ""
+"You must have a valid ID verification to take proctored exams and qualify "
+"for certificates."
+msgstr ""
+
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
+msgid ""
+"Follow the link below to submit your photos and renew your ID verification."
+msgstr ""
+
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
+msgid "You can also do this from your dashboard."
+msgstr ""
+
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
+#, python-format
+msgid ""
+"\n"
+"                    Resubmit Verification : %(lms_verification_link)s\n"
+"                    ID verification FAQ : %(help_center_link)s\n"
+"                "
+msgstr ""
+
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
+#, python-format
+msgid ""
+"\n"
+"                Thank you,\n"
+"                The %(platform_name)s Team\n"
+"                "
+msgstr ""
+
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
+#, python-format
+msgid ""
+"\n"
+"Hello %(full_name)s,\n"
+"Your %(platform_name)s ID verification has expired.\n"
+msgstr ""
+
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
+#, python-format
+msgid ""
+"\n"
+"Resubmit Verification : %(lms_verification_link)s\n"
+"ID verification FAQ : %(help_center_link)s\n"
+msgstr ""
+
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
+#, python-format
+msgid ""
+"\n"
+"Thank you,\n"
+"The %(platform_name)s Team\n"
+msgstr ""
+
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/subject.txt
+#, python-format
+msgid "Your %(platform_name)s Verification has Expired"
+msgstr ""
+
 #: lms/templates/wiki/article.html
 msgid "Last modified:"
 msgstr ""
@@ -9484,6 +9519,8 @@ msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.html
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.txt
+#: openedx/features/course_duration_limits/templates/course_duration_limits/edx_ace/expiryreminder/email/body.html
+#: openedx/features/course_duration_limits/templates/course_duration_limits/edx_ace/expiryreminder/email/body.txt
 msgid "Upgrade Now"
 msgstr ""
 
@@ -9898,21 +9935,6 @@ msgstr ""
 #: openedx/core/djangoapps/embargo/models.py
 #, python-brace-format
 msgid "Blacklist {country} for {course}"
-msgstr ""
-
-#: openedx/core/djangoapps/external_auth/views.py
-#, python-brace-format
-msgid ""
-"You have already created an account using an external login like WebAuth or "
-"Shibboleth. Please contact {tech_support_email} for support."
-msgstr ""
-
-#: openedx/core/djangoapps/external_auth/views.py
-msgid ""
-"\n"
-"        Your university identity server did not return your ID information to us.\n"
-"        Please try logging in again.  (You may need to restart your browser.)\n"
-"        "
 msgstr ""
 
 #: openedx/core/djangoapps/oauth_dispatch/models.py
@@ -10864,7 +10886,7 @@ msgstr ""
 #: openedx/features/course_duration_limits/models.py
 msgid ""
 "If the configuration is Enabled, then all enrollments created after this "
-"date and time (UTC) will be affected."
+"date and time (user local time) will be affected."
 msgstr ""
 
 #: openedx/features/content_type_gating/models.py
@@ -10949,6 +10971,45 @@ msgid ""
 "course as long as it exists on the site. {a_open}Upgrade "
 "now{sronly_span_open} to retain access past "
 "{expiration_date}{span_close}{a_close}"
+msgstr ""
+
+#: openedx/features/course_duration_limits/resolvers.py
+msgid "%b. %d, %Y"
+msgstr ""
+
+#: openedx/features/course_duration_limits/templates/course_duration_limits/edx_ace/expiryreminder/email/body.html
+#, python-format
+msgid ""
+"We hope you have enjoyed %(first_course_name)s! You lose all access to this "
+"course in %(time_until_expiration)s."
+msgstr ""
+
+#: openedx/features/course_duration_limits/templates/course_duration_limits/edx_ace/expiryreminder/email/body.html
+#, python-format
+msgid ""
+"We hope you have enjoyed %(first_course_name)s! You lose all access to this "
+"course, including your progress, on %(first_course_expiration_date)s "
+"(%(time_until_expiration)s)."
+msgstr ""
+
+#: openedx/features/course_duration_limits/templates/course_duration_limits/edx_ace/expiryreminder/email/body.html
+msgid ""
+"Upgrade now to get unlimited access and for the chance to earn a verified "
+"certificate."
+msgstr ""
+
+#: openedx/features/course_duration_limits/templates/course_duration_limits/edx_ace/expiryreminder/email/body.txt
+#, python-format
+msgid ""
+"We hope you have enjoyed %(first_course_name)s! You lose all access to this "
+"course, including your progress, on %(first_course_expiration_date)s "
+"(%(time_until_expiration)s). Upgrade now to get unlimited access and for the"
+" chance to earn a verified certificate."
+msgstr ""
+
+#: openedx/features/course_duration_limits/templates/course_duration_limits/edx_ace/expiryreminder/email/subject.txt
+#, python-format
+msgid "Upgrade to keep your access to %(first_course_name)s"
 msgstr ""
 
 #: openedx/features/course_experience/plugins.py
@@ -12540,16 +12601,6 @@ msgstr[1] ""
 
 #: lms/templates/login-sidebar.html
 msgid "Helpful Information"
-msgstr ""
-
-#: lms/templates/login-sidebar.html
-msgid "Login via OpenID"
-msgstr ""
-
-#: lms/templates/login-sidebar.html
-msgid ""
-"You can now start learning with {platform_name} by logging in with your <a "
-"rel=\"external\" href=\"http://openid.net/\">OpenID account</a>."
 msgstr ""
 
 #: lms/templates/login-sidebar.html
@@ -14808,14 +14859,6 @@ msgid "An error occurred. Please try again later."
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
-msgid ""
-"The currently logged-in user account does not have permission to enroll in "
-"this course. You may need to {start_logout_tag}log out{end_tag} then try the"
-" enroll button again. Please visit the {start_help_tag}help page{end_tag} "
-"for a possible solution."
-msgstr ""
-
-#: lms/templates/courseware/course_about.html
 msgid "You are enrolled in this course"
 msgstr ""
 
@@ -14827,7 +14870,7 @@ msgid "View Course"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
-msgid "This course is in your <a href=\"{cart_link}\">cart</a>."
+msgid "This course is in your {start_cart_link}cart{end_cart_link}."
 msgstr ""
 
 #: lms/templates/courseware/course_about.html

@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-03-03 20:37+0000\n"
-"PO-Revision-Date: 2019-03-03 20:37:47.049579\n"
+"POT-Creation-Date: 2019-03-10 20:37+0000\n"
+"PO-Revision-Date: 2019-03-10 20:37:56.058832\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -335,8 +335,14 @@ msgstr ""
 "sét. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: common/djangoapps/course_modes/models.py
-msgid "Verified modes cannot be free."
-msgstr "Vérïfïéd mödés çännöt ßé fréé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+#, python-brace-format
+msgid ""
+"The {course_mode} course mode has a minimum price of {min_price}. You must "
+"set a price greater than or equal to {min_price}."
+msgstr ""
+"Thé {course_mode} çöürsé mödé häs ä mïnïmüm prïçé öf {min_price}. Ýöü müst "
+"sét ä prïçé gréätér thän ör éqüäl tö {min_price}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт,#"
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This will look like '$50', where {currency_symbol} is a symbol
@@ -7710,41 +7716,6 @@ msgstr ""
 "Ìmpört thé spéçïfïéd gït répösïtörý änd öptïönäl ßränçh ïntö thé mödüléstöré"
 " änd öptïönällý spéçïfïéd dïréçtörý. Ⱡ'σяєм ιρѕυм ∂σłσя#"
 
-#. Translators: This message means that the user could not be authenticated
-#. (that is, we could
-#. not log them in for some reason - maybe they don't have permission, or
-#. their password was wrong)
-#: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
-msgid "Failed in authenticating {username}, error {error}\n"
-msgstr ""
-"Fäïléd ïn äüthéntïçätïng {username}, érrör {error}\n"
-" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#\n"
-
-#. Translators: This message means that the user could not be authenticated
-#. (that is, we could
-#. not log them in for some reason - maybe they don't have permission, or
-#. their password was wrong)
-#: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
-msgid "Failed in authenticating {username}\n"
-msgstr ""
-"Fäïléd ïn äüthéntïçätïng {username}\n"
-" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#\n"
-
-#. Translators: this means that the password has been corrected (sometimes the
-#. database needs to be resynchronized)
-#. Translate this as meaning "the password was fixed" or "the password was
-#. corrected".
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "fixed password"
-msgstr "fïxéd pässwörd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
-
-#. Translators: this means everything happened successfully, yay!
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "All ok!"
-msgstr "Àll ök! Ⱡ'σяєм ιρѕυм #"
-
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Must provide username"
 msgstr "Müst prövïdé üsérnämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
@@ -7753,25 +7724,9 @@ msgstr "Müst prövïdé üsérnämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт
 msgid "Must provide full name"
 msgstr "Müst prövïdé füll nämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
-#. Translators: Domain is an email domain, such as "@gmail.com"
 #: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
-msgid "Email address must end in {domain}"
-msgstr ""
-"Émäïl äddréss müst énd ïn {domain} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
-msgid "Failed - email {email_addr} already exists as {external_id}"
-msgstr ""
-"Fäïléd - émäïl {email_addr} älréädý éxïsts äs {external_id} Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Password must be supplied if not using certificates"
-msgstr ""
-"Pässwörd müst ßé süpplïéd ïf nöt üsïng çértïfïçätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
+msgid "Password must be supplied"
+msgstr "Pässwörd müst ßé süpplïéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "email address required (not username)"
@@ -7840,10 +7795,6 @@ msgstr "üsérnämé Ⱡ'σяєм ιρѕυм ∂#"
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "email"
 msgstr "émäïl Ⱡ'σяєм ιρѕ#"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Repair Results"
-msgstr "Répäïr Résülts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Create User Results"
@@ -11454,6 +11405,116 @@ msgstr "Àllöw Ⱡ'σяєм ιρѕ#"
 msgid "Error"
 msgstr "Érrör Ⱡ'σяєм ιρѕ#"
 
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
+msgid "Expired ID Verification"
+msgstr "Éxpïréd ÌD Vérïfïçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
+#, python-format
+msgid ""
+"\n"
+"                    Hello %(full_name)s,\n"
+"                    Your %(platform_name)s ID verification has expired.\n"
+"                "
+msgstr ""
+"\n"
+"                    Héllö %(full_name)s,\n"
+"                    Ýöür %(platform_name)s ÌD vérïfïçätïön häs éxpïréd.\n"
+"                 Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
+
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
+msgid ""
+"You must have a valid ID verification to take proctored exams and qualify "
+"for certificates."
+msgstr ""
+"Ýöü müst hävé ä välïd ÌD vérïfïçätïön tö täké pröçtöréd éxäms änd qüälïfý "
+"för çértïfïçätés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
+msgid ""
+"Follow the link below to submit your photos and renew your ID verification."
+msgstr ""
+"Föllöw thé lïnk ßélöw tö süßmït ýöür phötös änd rénéw ýöür ÌD vérïfïçätïön. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
+
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
+msgid "You can also do this from your dashboard."
+msgstr ""
+"Ýöü çän älsö dö thïs fröm ýöür däshßöärd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
+#, python-format
+msgid ""
+"\n"
+"                    Resubmit Verification : %(lms_verification_link)s\n"
+"                    ID verification FAQ : %(help_center_link)s\n"
+"                "
+msgstr ""
+"\n"
+"                    Résüßmït Vérïfïçätïön : %(lms_verification_link)s\n"
+"                    ÌD vérïfïçätïön FÀQ : %(help_center_link)s\n"
+"                 Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
+#, python-format
+msgid ""
+"\n"
+"                Thank you,\n"
+"                The %(platform_name)s Team\n"
+"                "
+msgstr ""
+"\n"
+"                Thänk ýöü,\n"
+"                Thé %(platform_name)s Téäm\n"
+"                 Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
+
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
+#, python-format
+msgid ""
+"\n"
+"Hello %(full_name)s,\n"
+"Your %(platform_name)s ID verification has expired.\n"
+msgstr ""
+"\n"
+"Héllö %(full_name)s,\n"
+"Ýöür %(platform_name)s ÌD vérïfïçätïön häs éxpïréd.\n"
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#\n"
+
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
+#, python-format
+msgid ""
+"\n"
+"Resubmit Verification : %(lms_verification_link)s\n"
+"ID verification FAQ : %(help_center_link)s\n"
+msgstr ""
+"\n"
+"Résüßmït Vérïfïçätïön : %(lms_verification_link)s\n"
+"ÌD vérïfïçätïön FÀQ : %(help_center_link)s\n"
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#\n"
+
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
+#, python-format
+msgid ""
+"\n"
+"Thank you,\n"
+"The %(platform_name)s Team\n"
+msgstr ""
+"\n"
+"Thänk ýöü,\n"
+"Thé %(platform_name)s Téäm\n"
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#\n"
+
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/subject.txt
+#, python-format
+msgid "Your %(platform_name)s Verification has Expired"
+msgstr ""
+"Ýöür %(platform_name)s Vérïfïçätïön häs Éxpïréd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
+" ¢σηѕє¢тє#"
+
 #: lms/templates/wiki/article.html
 msgid "Last modified:"
 msgstr "Läst mödïfïéd: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
@@ -12065,6 +12126,8 @@ msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.html
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.txt
+#: openedx/features/course_duration_limits/templates/course_duration_limits/edx_ace/expiryreminder/email/body.html
+#: openedx/features/course_duration_limits/templates/course_duration_limits/edx_ace/expiryreminder/email/body.txt
 msgid "Upgrade Now"
 msgstr "Ûpgrädé Nöw Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
@@ -12634,27 +12697,6 @@ msgstr "Whïtélïst {country} för {course} Ⱡ'σяєм ιρѕυм ∂σłσя
 #, python-brace-format
 msgid "Blacklist {country} for {course}"
 msgstr "Bläçklïst {country} för {course} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: openedx/core/djangoapps/external_auth/views.py
-#, python-brace-format
-msgid ""
-"You have already created an account using an external login like WebAuth or "
-"Shibboleth. Please contact {tech_support_email} for support."
-msgstr ""
-"Ýöü hävé älréädý çréätéd än äççöünt üsïng än éxtérnäl lögïn lïké WéßÀüth ör "
-"Shïßßöléth. Pléäsé çöntäçt {tech_support_email} för süppört. Ⱡ'σяєм ιρѕυм#"
-
-#: openedx/core/djangoapps/external_auth/views.py
-msgid ""
-"\n"
-"        Your university identity server did not return your ID information to us.\n"
-"        Please try logging in again.  (You may need to restart your browser.)\n"
-"        "
-msgstr ""
-"\n"
-"        Ýöür ünïvérsïtý ïdéntïtý sérvér dïd nöt rétürn ýöür ÌD ïnförmätïön tö üs.\n"
-"        Pléäsé trý löggïng ïn ägäïn.  (Ýöü mäý nééd tö réstärt ýöür ßröwsér.)\n"
-"         Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒ#"
 
 #: openedx/core/djangoapps/oauth_dispatch/models.py
 msgid ""
@@ -13900,10 +13942,10 @@ msgstr "Énäßléd Às Öf Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 #: openedx/features/course_duration_limits/models.py
 msgid ""
 "If the configuration is Enabled, then all enrollments created after this "
-"date and time (UTC) will be affected."
+"date and time (user local time) will be affected."
 msgstr ""
 "Ìf thé çönfïgürätïön ïs Énäßléd, thén äll énröllménts çréätéd äftér thïs "
-"däté änd tïmé (ÛTÇ) wïll ßé äfféçtéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+"däté änd tïmé (üsér löçäl tïmé) wïll ßé äfféçtéd. Ⱡ'σяєм ιρѕ#"
 
 #: openedx/features/content_type_gating/models.py
 msgid "Studio Override Enabled"
@@ -14020,6 +14062,64 @@ msgstr ""
 "∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα"
 " ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι"
 " σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт łα#"
+
+#: openedx/features/course_duration_limits/resolvers.py
+msgid "%b. %d, %Y"
+msgstr "%ß. %d, %Ý Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: openedx/features/course_duration_limits/templates/course_duration_limits/edx_ace/expiryreminder/email/body.html
+#, python-format
+msgid ""
+"We hope you have enjoyed %(first_course_name)s! You lose all access to this "
+"course in %(time_until_expiration)s."
+msgstr ""
+"Wé höpé ýöü hävé énjöýéd %(first_course_name)s! Ýöü lösé äll äççéss tö thïs "
+"çöürsé ïn %(time_until_expiration)s. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
+#: openedx/features/course_duration_limits/templates/course_duration_limits/edx_ace/expiryreminder/email/body.html
+#, python-format
+msgid ""
+"We hope you have enjoyed %(first_course_name)s! You lose all access to this "
+"course, including your progress, on %(first_course_expiration_date)s "
+"(%(time_until_expiration)s)."
+msgstr ""
+"Wé höpé ýöü hävé énjöýéd %(first_course_name)s! Ýöü lösé äll äççéss tö thïs "
+"çöürsé, ïnçlüdïng ýöür prögréss, ön %(first_course_expiration_date)s "
+"(%(time_until_expiration)s). Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: openedx/features/course_duration_limits/templates/course_duration_limits/edx_ace/expiryreminder/email/body.html
+msgid ""
+"Upgrade now to get unlimited access and for the chance to earn a verified "
+"certificate."
+msgstr ""
+"Ûpgrädé nöw tö gét ünlïmïtéd äççéss änd för thé çhänçé tö éärn ä vérïfïéd "
+"çértïfïçäté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: openedx/features/course_duration_limits/templates/course_duration_limits/edx_ace/expiryreminder/email/body.txt
+#, python-format
+msgid ""
+"We hope you have enjoyed %(first_course_name)s! You lose all access to this "
+"course, including your progress, on %(first_course_expiration_date)s "
+"(%(time_until_expiration)s). Upgrade now to get unlimited access and for the"
+" chance to earn a verified certificate."
+msgstr ""
+"Wé höpé ýöü hävé énjöýéd %(first_course_name)s! Ýöü lösé äll äççéss tö thïs "
+"çöürsé, ïnçlüdïng ýöür prögréss, ön %(first_course_expiration_date)s "
+"(%(time_until_expiration)s). Ûpgrädé nöw tö gét ünlïmïtéd äççéss änd för thé"
+" çhänçé tö éärn ä vérïfïéd çértïfïçäté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт "
+"∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση "
+"υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє "
+"∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα"
+" ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση#"
+
+#: openedx/features/course_duration_limits/templates/course_duration_limits/edx_ace/expiryreminder/email/subject.txt
+#, python-format
+msgid "Upgrade to keep your access to %(first_course_name)s"
+msgstr ""
+"Ûpgrädé tö kéép ýöür äççéss tö %(first_course_name)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєт#"
 
 #: openedx/features/course_experience/plugins.py
 #: cms/templates/widgets/header.html
@@ -15943,19 +16043,6 @@ msgstr[1] ""
 #: lms/templates/login-sidebar.html
 msgid "Helpful Information"
 msgstr "Hélpfül Ìnförmätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#: lms/templates/login-sidebar.html
-msgid "Login via OpenID"
-msgstr "Lögïn vïä ÖpénÌD Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#: lms/templates/login-sidebar.html
-msgid ""
-"You can now start learning with {platform_name} by logging in with your <a "
-"rel=\"external\" href=\"http://openid.net/\">OpenID account</a>."
-msgstr ""
-"Ýöü çän nöw stärt léärnïng wïth {platform_name} ßý löggïng ïn wïth ýöür <a "
-"rel=\"external\" href=\"http://openid.net/\">ÖpénÌD äççöünt</a>. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: lms/templates/login-sidebar.html
 msgid "Not Enrolled?"
@@ -18915,23 +19002,6 @@ msgstr ""
 "¢σηѕє¢тєтυя #"
 
 #: lms/templates/courseware/course_about.html
-msgid ""
-"The currently logged-in user account does not have permission to enroll in "
-"this course. You may need to {start_logout_tag}log out{end_tag} then try the"
-" enroll button again. Please visit the {start_help_tag}help page{end_tag} "
-"for a possible solution."
-msgstr ""
-"Thé çürréntlý löggéd-ïn üsér äççöünt döés nöt hävé pérmïssïön tö énröll ïn "
-"thïs çöürsé. Ýöü mäý nééd tö {start_logout_tag}lög öüt{end_tag} thén trý thé"
-" énröll ßüttön ägäïn. Pléäsé vïsït thé {start_help_tag}hélp pägé{end_tag} "
-"för ä pössïßlé sölütïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
-"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
-" αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
-"ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
-"яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα "
-"ραяιαтυя. єχ¢єρтєυя#"
-
-#: lms/templates/courseware/course_about.html
 msgid "You are enrolled in this course"
 msgstr "Ýöü äré énrölléd ïn thïs çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
@@ -18943,10 +19013,10 @@ msgid "View Course"
 msgstr "Vïéw Çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/templates/courseware/course_about.html
-msgid "This course is in your <a href=\"{cart_link}\">cart</a>."
+msgid "This course is in your {start_cart_link}cart{end_cart_link}."
 msgstr ""
-"Thïs çöürsé ïs ïn ýöür <a href=\"{cart_link}\">çärt</a>. Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєт#"
+"Thïs çöürsé ïs ïn ýöür {start_cart_link}çärt{end_cart_link}. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: lms/templates/courseware/course_about.html
 msgid "Course is full"

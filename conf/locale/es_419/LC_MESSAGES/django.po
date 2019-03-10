@@ -246,7 +246,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-02-26 13:11+0000\n"
+"POT-Creation-Date: 2019-03-03 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2019\n"
 "Language-Team: Spanish (Latin America) (https://www.transifex.com/open-edx/teams/6205/es_419/)\n"
@@ -702,6 +702,7 @@ msgid "Unauthorized email address."
 msgstr "Dirección de correo electrónico no autorizada"
 
 #: common/djangoapps/student/forms.py
+#: common/djangoapps/student/views/management.py
 #, python-brace-format
 msgid ""
 "It looks like {email} belongs to an existing account. Try again with a "
@@ -5477,6 +5478,30 @@ msgid "Request to change %(platform_name)s account e-mail"
 msgstr ""
 "Petición para cambiar el correo electrónico de le cuenta de "
 "%(platform_name)s "
+
+#: common/templates/student/edx_ace/emailchangeconfirmation/email/body.html
+#: common/templates/student/edx_ace/emailchangeconfirmation/email/subject.txt
+#, python-format
+msgid "Email Change Confirmation for %(platform_name)s"
+msgstr ""
+
+#: common/templates/student/edx_ace/emailchangeconfirmation/email/body.html
+#: common/templates/student/edx_ace/emailchangeconfirmation/email/body.txt
+#, python-format
+msgid ""
+"This is to confirm that you changed the e-mail associated with "
+"%(platform_name)s from %(old_email)s to %(new_email)s. If you did not make "
+"this request, please contact us immediately. Contact information is listed "
+"at:"
+msgstr ""
+
+#: themes/stanford-style/lms/templates/emails/confirm_email_change.txt
+msgid ""
+"We keep a log of old e-mails, so if this request was unintentional, we can "
+"investigate."
+msgstr ""
+"Mantenemos un registro de correos electrónicos antiguos, así que si esta "
+"solicitud no fue intencional, es posible hacer una inspección."
 
 #: common/templates/student/edx_ace/passwordreset/email/body.html
 #: lms/templates/forgot_password_modal.html
@@ -18224,62 +18249,35 @@ msgstr ""
 "de {platform_name}. "
 
 #: lms/templates/dashboard/_entitlement_reason_survey.html
-#: lms/templates/dashboard/_reason_survey.html
 msgid ""
-"We're sorry to see you go! Please share your main reason for unenrolling."
+"We're sorry to see you go! Read the following statements and rate your level"
+" of agreement."
 msgstr ""
-"¡Lamentamos que te vayas! Por favor comparte la principal razón por la que "
-"cancelas la inscripción."
 
 #: lms/templates/dashboard/_entitlement_reason_survey.html
-#: lms/templates/dashboard/_reason_survey.html
-msgid "I just wanted to browse the material"
-msgstr "Solo quería explorar el material."
+msgid "Price is too high for me"
+msgstr ""
 
 #: lms/templates/dashboard/_entitlement_reason_survey.html
-#: lms/templates/dashboard/_reason_survey.html
-msgid "This won't help me reach my goals"
-msgstr "Esto no ayudara a alcanzar mis metas"
+msgid "I was not satisfied with my experience taking the courses"
+msgstr ""
 
 #: lms/templates/dashboard/_entitlement_reason_survey.html
-#: lms/templates/dashboard/_reason_survey.html
-msgid "I don't have the time"
-msgstr "No tengo el tiempo"
+msgid "Content of the courses was too difficult"
+msgstr ""
 
 #: lms/templates/dashboard/_entitlement_reason_survey.html
-#: lms/templates/dashboard/_reason_survey.html
-msgid "I don't have the academic or language prerequisites"
-msgstr "No cumplo con los requisitos académicos o de lenguaje"
+msgid "I did not have enough time to complete the courses"
+msgstr ""
 
 #: lms/templates/dashboard/_entitlement_reason_survey.html
-#: lms/templates/dashboard/_reason_survey.html
-msgid "I don't have enough support"
-msgstr "No tengo suficiente soporte"
+msgid "The content was not available when I wanted to start"
+msgstr ""
 
 #: lms/templates/dashboard/_entitlement_reason_survey.html
-#: lms/templates/dashboard/_reason_survey.html
-msgid "I am not happy with the quality of the content"
-msgstr "No estoy conforme con la calidad del contenido"
-
-#: lms/templates/dashboard/_entitlement_reason_survey.html
-#: lms/templates/dashboard/_reason_survey.html
-msgid "The course material was too hard"
-msgstr "El material del curso fue muy difícil"
-
-#: lms/templates/dashboard/_entitlement_reason_survey.html
-#: lms/templates/dashboard/_reason_survey.html
-msgid "The course material was too easy"
-msgstr "El material del curso fue muy fácil"
-
-#: lms/templates/dashboard/_entitlement_reason_survey.html
-#: lms/templates/dashboard/_reason_survey.html
-msgid "Something was broken"
-msgstr "Algo estaba roto"
-
-#: lms/templates/dashboard/_entitlement_reason_survey.html
-#: lms/templates/dashboard/_reason_survey.html
-msgid "Other"
-msgstr "Otro"
+msgid ""
+"Can we contact you for follow up? If so, enter your email address below:"
+msgstr ""
 
 #: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
@@ -18300,6 +18298,53 @@ msgstr "Volver al panel principal"
 #: lms/templates/dashboard/_reason_survey.html
 msgid "Browse Courses"
 msgstr "Explora los cursos"
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid ""
+"We're sorry to see you go! Please share your main reason for unenrolling."
+msgstr ""
+"¡Lamentamos que te vayas! Por favor comparte la principal razón por la que "
+"cancelas la inscripción."
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "I just wanted to browse the material"
+msgstr "Solo quería explorar el material."
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "This won't help me reach my goals"
+msgstr "Esto no ayudara a alcanzar mis metas"
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "I don't have the time"
+msgstr "No tengo el tiempo"
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "I don't have the academic or language prerequisites"
+msgstr "No cumplo con los requisitos académicos o de lenguaje"
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "I don't have enough support"
+msgstr "No tengo suficiente soporte"
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "I am not happy with the quality of the content"
+msgstr "No estoy conforme con la calidad del contenido"
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "The course material was too hard"
+msgstr "El material del curso fue muy difícil"
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "The course material was too easy"
+msgstr "El material del curso fue muy fácil"
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "Something was broken"
+msgstr "Algo estaba roto"
+
+#: lms/templates/dashboard/_reason_survey.html
+msgid "Other"
+msgstr "Otro"
 
 #: lms/templates/debug/run_python_form.html
 msgid "Results:"
@@ -18671,31 +18716,6 @@ msgstr ""
 #: lms/templates/emails/business_order_confirmation_email.txt
 msgid "<p>Sincerely,</p><p>[[Your Signature]]</p>"
 msgstr "<p>Atentamente,</p><p>[[Your Signature]]</p>"
-
-#: lms/templates/emails/confirm_email_change.txt
-msgid ""
-"This is to confirm that you changed the e-mail associated with "
-"{platform_name} from {old_email} to {new_email}. If you did not make this "
-"request, please contact us immediately. Contact information is listed at:"
-msgstr ""
-"Este correo es para confirmar que tú has cambiado la dirección de correo "
-"asociada con {platform_name} de {old_email} a {new_email}. Si tú no "
-"realizaste esta solicitud, por favor contáctenos inmediatamente. La "
-"información de contacto se encuentra en: "
-
-#: lms/templates/emails/confirm_email_change.txt
-#: themes/stanford-style/lms/templates/emails/confirm_email_change.txt
-msgid ""
-"We keep a log of old e-mails, so if this request was unintentional, we can "
-"investigate."
-msgstr ""
-"Mantenemos un registro de correos electrónicos antiguos, así que si esta "
-"solicitud no fue intencional, es posible hacer una inspección."
-
-#: lms/templates/emails/email_change_subject.txt
-msgid "Request to change {platform_name} account e-mail"
-msgstr ""
-"Solicitud de cambio de correo electrónico en una cuenta de {platform_name}"
 
 #: lms/templates/emails/failed_verification_email.txt
 msgid ""
