@@ -112,7 +112,7 @@ pipeline {
                     . /tmp/.venv/bin/activate
                     ansible-playbook --ssh-common-args='-o "StrictHostKeyChecking no"' \
                     -u ubuntu -i ${selectedIpAddress}, --key-file="/tmp/STAGING_SG.pem" \
-                    -e "${vars}" -e "@/tmp/themes.yml" -e "@/tmp/${machine}_password.yml" -e "@/tmp/${machine}_host.yml" \
+                    -e "${vars}" -e "@/tmp/${machine}_password.yml" -e "@/tmp/${machine}_host.yml" -e "@/tmp/themes.yml" \
                     -t ${tags} lt_edxapp_with_worker.yml
                     """
                 }
