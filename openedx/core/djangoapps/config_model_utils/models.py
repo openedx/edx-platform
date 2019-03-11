@@ -43,6 +43,11 @@ class StackedConfigurationModel(ConfigurationModel):
     """
     class Meta(object):
         abstract = True
+        indexes = [
+            # This index optimizes the .object.current_set() query
+            # by preventing a filesort
+            models.Index(fields=['site', 'org', 'course'])
+        ]
 
     KEY_FIELDS = ('site', 'org', 'course')
     STACKABLE_FIELDS = ('enabled',)
@@ -134,23 +139,18 @@ class StackedConfigurationModel(ConfigurationModel):
             site_override_q |
             org_override_q |
             course_override_q
-        ).order_by(
-            # Sort nulls first, and in reverse specificity order
-            # so that the overrides are in the order of general to specific.
-            #
-            # Site | Org  | Course
-            # --------------------
-            # Null | Null | Null
-            # site | Null | Null
-            # Null | org  | Null
-            # Null | Null | Course
-            F('course').desc(nulls_first=True),
-            F('org').desc(nulls_first=True),
-            F('site').desc(nulls_first=True),
         )
 
         provenances = defaultdict(lambda: Provenance.default)
-        for override in overrides:
+        # We are sorting in python to avoid doing a filesort in the database for
+        # what will only be 4 rows at maximum
+        for override in sorted(
+            overrides,
+            # This particular sort order sorts None before not-None (because False < True)
+            # It sorts global first (because all entries are None), then site entries
+            # (because course_id and org are None), then org and course (by the same logic)
+            key=lambda o: (o.course_id is not None, o.org is not None, o.site_id is not None)
+        ):
             for field in stackable_fields:
                 value = field.value_from_object(override)
                 if value != field_defaults[field.name]:

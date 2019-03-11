@@ -138,10 +138,10 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
 
     @ddt.data(
         # Generate all combinations of setting each configuration level to True/False/None
-        *itertools.product(*[(True, False, None)] * 4)
+        *itertools.product(*([(True, False, None)] * 4 + [(True, False)]))
     )
     @ddt.unpack
-    def test_config_overrides(self, global_setting, site_setting, org_setting, course_setting):
+    def test_config_overrides(self, global_setting, site_setting, org_setting, course_setting, reverse_order):
         """
         Test that the stacked configuration overrides happen in the correct order and priority.
 
@@ -170,10 +170,16 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
         test_course = CourseOverviewFactory.create(org='test-org')
         test_site_cfg = SiteConfigurationFactory.create(values={'course_org_filter': test_course.org})
 
-        CourseDurationLimitConfig.objects.create(enabled=global_setting)
-        CourseDurationLimitConfig.objects.create(course=test_course, enabled=course_setting)
-        CourseDurationLimitConfig.objects.create(org=test_course.org, enabled=org_setting)
-        CourseDurationLimitConfig.objects.create(site=test_site_cfg.site, enabled=site_setting)
+        if reverse_order:
+            CourseDurationLimitConfig.objects.create(site=test_site_cfg.site, enabled=site_setting)
+            CourseDurationLimitConfig.objects.create(org=test_course.org, enabled=org_setting)
+            CourseDurationLimitConfig.objects.create(course=test_course, enabled=course_setting)
+            CourseDurationLimitConfig.objects.create(enabled=global_setting)
+        else:
+            CourseDurationLimitConfig.objects.create(enabled=global_setting)
+            CourseDurationLimitConfig.objects.create(course=test_course, enabled=course_setting)
+            CourseDurationLimitConfig.objects.create(org=test_course.org, enabled=org_setting)
+            CourseDurationLimitConfig.objects.create(site=test_site_cfg.site, enabled=site_setting)
 
         expected_global_setting = self._resolve_settings([global_setting])
         expected_site_setting = self._resolve_settings([global_setting, site_setting])
