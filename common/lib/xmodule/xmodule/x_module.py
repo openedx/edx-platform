@@ -324,6 +324,17 @@ class XModuleMixin(XModuleFields, XBlock):
         self._asides = []
 
         super(XModuleMixin, self).__init__(*args, **kwargs)
+        self.init_only_for_xmodules_converted_to_xblocks()
+
+    def init_only_for_xmodules_converted_to_xblocks(self):
+        """
+        In an XModule init, the ModuleSystem is available. But an XBlock is init-ed in modulestore earlier.
+        So any steps which depend on the ModuleSystem can be added here.
+        """
+        if hasattr(self, '_init_only_for_xmodules_converted_to_xblocks'):
+            if hasattr(self.runtime, 'DEBUG') and not getattr(self, 'xmodule_init_complete', False):
+                self.xmodule_init_complete = True
+                self._init_only_for_xmodules_converted_to_xblocks()
 
     @property
     def runtime(self):
@@ -667,6 +678,8 @@ class XModuleMixin(XModuleFields, XBlock):
             wrapped_field_data = wrapper(wrapped_field_data)
 
         self._field_data = wrapped_field_data
+
+        self.init_only_for_xmodules_converted_to_xblocks()
 
     @property
     def non_editable_metadata_fields(self):

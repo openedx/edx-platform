@@ -111,8 +111,7 @@ class CapaMixin(ScorableXBlockMixin):
     """
         Core logic for Capa Problem, which can be used by XModules or XBlocks.
     """
-    def __init__(self, *args, **kwargs):
-        super(CapaMixin, self).__init__(*args, **kwargs)
+    def _init_only_for_xmodules_converted_to_xblocks(self):
 
         due_date = self.due
 
@@ -141,7 +140,35 @@ class CapaMixin(ScorableXBlockMixin):
         except Exception as err:  # pylint: disable=broad-except
             msg = u'cannot create LoncapaProblem {loc}: {err}'.format(
                 loc=text_type(self.location), err=err)
-            raise Exception(msg), None, sys.exc_info()[2]
+            # TODO (vshnayder): do modules need error handlers too?
+            # We shouldn't be switching on DEBUG.
+            if self.runtime.DEBUG:
+                log.warning(msg)
+                # TODO (vshnayder): This logic should be general, not here--and may
+                # want to preserve the data instead of replacing it.
+                # e.g. in the CMS
+                msg = HTML(u'<p>{msg}</p>').format(msg=msg)
+                msg += HTML(u'<p><pre>{tb}</pre></p>').format(
+                    # just the traceback, no message - it is already present above
+                    tb=u''.join(
+                        ['Traceback (most recent call last):\n'] +
+                        traceback.format_tb(sys.exc_info()[2])
+                    )
+                )
+                # create a dummy problem with error message instead of failing
+                problem_text = (
+                    HTML(u'<problem><text><span class="inline-error">'
+                         u'Problem {url} has an error:</span>{msg}</text></problem>').format(
+                        url=text_type(self.location),
+                        msg=msg,
+                    )
+                )
+                self._lcp = self.new_lcp(self.get_state_for_lcp(), text=problem_text)
+            else:
+                # add extra info and raise
+                raise Exception(msg), None, sys.exc_info()[2]
+
+            self.set_state_from_lcp()
 
         if self.score is None:
             self.set_score(self.score_from_lcp())

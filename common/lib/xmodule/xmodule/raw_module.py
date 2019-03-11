@@ -59,12 +59,13 @@ class RawDescriptorMixin(object):
             raise SerializationError(self.location, msg)
 
 
-class RawDescriptor(XmlDescriptor, XMLEditingDescriptor, RawDescriptorMixin):
+class RawDescriptor(RawDescriptorMixin, XmlDescriptor, XMLEditingDescriptor):
     """
     Module that provides a raw editing view of its data and children.  It
     requires that the definition xml is valid.
     """
     pass
+
 
 class EmptyDataRawDescriptor(XmlDescriptor, XMLEditingDescriptor):
     """
