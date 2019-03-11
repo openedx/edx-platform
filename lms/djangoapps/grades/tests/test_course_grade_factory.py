@@ -313,7 +313,7 @@ class TestGradeIteration(SharedModuleStoreTestCase):
             else mock_course_grade.return_value
             for student in self.students
         ]
-        with self.assertNumQueries(9):
+        with self.assertNumQueries(7):
             all_course_grades, all_errors = self._course_grades_and_errors_for(self.course, self.students)
         self.assertEqual(
             {student: text_type(all_errors[student]) for student in all_errors},

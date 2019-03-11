@@ -21,10 +21,6 @@ from lms.djangoapps.courseware.masquerade import (
 from openedx.core.djangoapps.config_model_utils.models import StackedConfigurationModel
 from openedx.core.djangoapps.config_model_utils.utils import is_in_holdback
 from openedx.features.content_type_gating.helpers import FULL_ACCESS, LIMITED_ACCESS
-from openedx.features.course_duration_limits.config import (
-    CONTENT_TYPE_GATING_FLAG,
-    FEATURE_BASED_ENROLLMENT_GLOBAL_KILL_FLAG,
-)
 from student.models import CourseEnrollment
 from student.role_helpers import has_staff_roles
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
@@ -106,12 +102,6 @@ class ContentTypeGatingConfig(StackedConfigurationModel):
             user: The user being queried.
             course_key: The CourseKey of the course being queried.
         """
-        if FEATURE_BASED_ENROLLMENT_GLOBAL_KILL_FLAG.is_enabled():
-            return False
-
-        if CONTENT_TYPE_GATING_FLAG.is_enabled():
-            return True
-
         if enrollment is not None and (user is not None or course_key is not None):
             raise ValueError('Specify enrollment or user/course_key, but not both')
 
@@ -172,12 +162,6 @@ class ContentTypeGatingConfig(StackedConfigurationModel):
             target_datetime: The datetime to checked enablement as of. Defaults to the current date and time.
         """
 
-        if FEATURE_BASED_ENROLLMENT_GLOBAL_KILL_FLAG.is_enabled():
-            return False
-
-        if CONTENT_TYPE_GATING_FLAG.is_enabled():
-            return True
-
         if target_datetime is None:
             target_datetime = timezone.now()
 
@@ -195,12 +179,6 @@ class ContentTypeGatingConfig(StackedConfigurationModel):
         Arguments:
             target_datetime (:class:`datetime.datetime`): The datetime that ``enabled_as_of`` must be equal to or before
         """
-
-        if FEATURE_BASED_ENROLLMENT_GLOBAL_KILL_FLAG.is_enabled():
-            return False
-
-        if CONTENT_TYPE_GATING_FLAG.is_enabled():
-            return True
 
         # Explicitly cast this to bool, so that when self.enabled is None the method doesn't return None
         return bool(self.enabled and self.enabled_as_of <= target_datetime)

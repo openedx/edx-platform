@@ -18,7 +18,6 @@ from openedx.core.djangoapps.content.course_overviews.tests.factories import Cou
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
-from openedx.features.course_duration_limits.config import CONTENT_TYPE_GATING_FLAG
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 
@@ -81,9 +80,9 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
             user = self.user
             course_key = self.course_overview.id
 
-        query_count = 9
+        query_count = 7
         if pass_enrollment and already_enrolled:
-            query_count = 8
+            query_count = 6
 
         with self.assertNumQueries(query_count):
             enabled = CourseDurationLimitConfig.enabled_for_enrollment(
@@ -108,24 +107,6 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
                 None,
                 Mock(name='course_key')
             )
-
-    @override_waffle_flag(CONTENT_TYPE_GATING_FLAG, True)
-    def test_enabled_for_enrollment_flag_override(self):
-        self.assertTrue(CourseDurationLimitConfig.enabled_for_enrollment(
-            None,
-            None,
-            None
-        ))
-        self.assertTrue(CourseDurationLimitConfig.enabled_for_enrollment(
-            Mock(name='enrollment'),
-            Mock(name='user'),
-            None
-        ))
-        self.assertTrue(CourseDurationLimitConfig.enabled_for_enrollment(
-            Mock(name='enrollment'),
-            None,
-            Mock(name='course_key')
-        ))
 
     @ddt.data(True, False)
     def test_enabled_for_course(
