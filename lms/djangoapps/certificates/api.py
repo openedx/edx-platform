@@ -65,7 +65,7 @@ def format_certificate_for_user(username, cert):
             "is_passing": is_passing_status(cert.status),
             "is_pdf_certificate": bool(cert.download_url),
             "download_url": (
-                get_certificate_url(cert.user.id, cert.course_id, user_certificate=cert)
+                cert.download_url or get_certificate_url(cert.user.id, cert.course_id, user_certificate=cert)
                 if cert.status == CertificateStatuses.downloadable
                 else None
             ),

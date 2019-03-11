@@ -15,6 +15,7 @@ from course_modes.models import CourseMode
 from lms.djangoapps.certificates.apis.v0.views import CertificatesDetailView, CertificatesListView
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.oauth_dispatch.toggles import ENFORCE_JWT_SCOPES
 from openedx.core.djangoapps.user_api.tests.factories import UserPreferenceFactory
 from openedx.core.djangoapps.user_authn.tests.utils import AuthType, AuthAndScopesTestMixin, JWT_AUTH_TYPES
@@ -114,6 +115,13 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
             org='edx',
             number='verified',
             display_name='Verified Course',
+            self_paced=True,
+        )
+        cls.course_overview = CourseOverviewFactory.create(
+            id=cls.course.id,
+            display_org_with_default='edx',
+            display_name='Verified Course',
+            cert_html_view_enabled=True,
             self_paced=True,
         )
 
@@ -268,7 +276,7 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
             self.assertEqual(len(resp.data), 0)
 
         # Test student with 1 certificate
-        with self.assertNumQueries(30):
+        with self.assertNumQueries(17):
             resp = self.get_response(
                 AuthType.jwt,
                 requesting_user=self.student,
@@ -283,6 +291,13 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
             org='edx',
             number='test',
             display_name='Test Course',
+            self_paced=True,
+        )
+        CourseOverviewFactory.create(
+            id=course.id,
+            display_org_with_default='edx',
+            display_name='Test Course',
+            cert_html_view_enabled=True,
             self_paced=True,
         )
         GeneratedCertificateFactory.create(
@@ -301,7 +316,7 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
             download_url='www.google.com',
             grade="0.88",
         )
-        with self.assertNumQueries(30):
+        with self.assertNumQueries(17):
             resp = self.get_response(
                 AuthType.jwt,
                 requesting_user=student_2_certs,
