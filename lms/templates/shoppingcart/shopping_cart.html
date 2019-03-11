@@ -32,9 +32,9 @@ from openedx.core.lib.courses import course_image_url
     % if shoppingcart_items:
       <%block name="billing_details_highlight">
         % if order.order_type == 'business':
-          <li class="billing">${_('Billing Details')}</li>
+          <li class="billing">${_('Billing Details') | h}</li>
         % else:
-          <li class="billing hidden">${_('Billing Details')}</li>
+          <li class="billing hidden">${_('Billing Details') | h}</li>
         % endif
       </%block>
 
@@ -46,7 +46,7 @@ from openedx.core.lib.courses import course_image_url
       order_type = 'personal'
    %>
 
-    <article class="wrapper confirm-enrollment shopping-cart cart-view" aria-label="${_('Shopping Cart')}">
+    <article class="wrapper confirm-enrollment shopping-cart cart-view" aria-label="${_('Shopping Cart') | h}">
       % for item, course in shoppingcart_items:
         <%
           ## Translators: currency_symbol is a symbol indicating type of currency, ex "$".
@@ -69,12 +69,12 @@ from openedx.core.lib.courses import course_image_url
         <div class="clearfix">
         <div class="image">
           <img class="item-image" src="${course_image_url(course)}"
-              alt="${course.display_number_with_default | h} ${course.display_name_with_default} ${_('Cover Image')}" />
+              alt="${course.display_number_with_default | h} ${course.display_name_with_default} ${_('Cover Image') | h}" />
         </div>
         <div class="data-input">
           ## Translators: "Registration for:" is followed by a course name
           <h3 class="course-title-info" id="course-title">
-            <span class="course-registration-title">${_('Registration for:')}</span>
+            <span class="course-registration-title">${_('Registration for:') | h}</span>
             <span class="course-display-name">${ course.display_name }</span>
           </h3>
           <hr>
@@ -82,7 +82,7 @@ from openedx.core.lib.courses import course_image_url
               <div class="col-1">
                   % if item.is_discounted:
                     <% discount_applied = True %>
-                    <div class="price">${_('Price per student:')}
+                    <div class="price">${_('Price per student:') | h}
                       <span class="line-through">
                         ## Translators: currency_symbol is a symbol indicating type of currency, ex "$".
                         ## This string would look like this when all variables are in:
@@ -90,11 +90,11 @@ from openedx.core.lib.courses import course_image_url
                         ${_("{currency_symbol}{price}").format(currency_symbol=currency_symbol, price="{0:0.2f}".format(item.list_price))}
                       </span>
                     </div>
-                    <div class="price green">${_('Discount Applied:')}
+                    <div class="price green">${_('Discount Applied:') | h}
                       <span>${unit_cost}</span>
                     </div>
                   % else:
-                    <div class="price">${_('Price per student:')}
+                    <div class="price">${_('Price per student:') | h}
                       <span>${unit_cost}</span>
                     </div>
                   % endif
@@ -102,17 +102,17 @@ from openedx.core.lib.courses import course_image_url
               <div class="col-2">
                 % if enable_bulk_purchase:
                 <div class="numbers-row" aria-live="polite">
-                  <label for="field_${item.id}">${_('Students:')}</label>
+                  <label for="field_${item.id}">${_('Students:') | h}</label>
                   <div class="counter">
-                      <input maxlength="3" class="spin-counter" title="${_('Input quantity and press enter.')}" max="999" type="text" name="students" value="${item.qty}" id="field_${item.id}" data-unit-cost="${item.unit_cost}" data-qty="${item.qty}" data-item-id="${item.id}" aria-describedby="students-${item.id}">
+                      <input maxlength="3" class="spin-counter" title="${_('Input quantity and press enter.') | h}" max="999" type="text" name="students" value="${item.qty}" id="field_${item.id}" data-unit-cost="${item.unit_cost}" data-qty="${item.qty}" data-item-id="${item.id}" aria-describedby="students-${item.id}">
                   </div>
                   <button class="inc button" data-operation="inc">
                     <span class="icon fa fa-caret-up" aria-hidden="true"><span>+</span></span>
-                    <span class="sr">${_('Increase')}</span>
+                    <span class="sr">${_('Increase') | h}</span>
                   </button>
                   <button class="dec button" data-operation="dec">
                     <span class="icon fa fa-caret-down" aria-hidden="true"></span>
-                    <span class="sr">${_('Decrease')}</span>
+                    <span class="sr">${_('Decrease') | h}</span>
                   </button>
                       <!--<a name="updateBtn" class="updateBtn hidden" id="updateBtn-${item.id}" href="#">update</a>-->
                   <span class="error-text hidden" id="students-${item.id}"></span>
@@ -123,7 +123,7 @@ from openedx.core.lib.courses import course_image_url
               <div class="col-3">
                  <button href="#" class="btn-remove" data-item-id="${item.id}">
                   <span class="icon fa fa-times-circle" aria-hidden="true"></span>
-                  <span class="sr">${_('Remove')}</span>
+                  <span class="sr">${_('Remove') | h}</span>
                 </button>
               </div>
           </div>
@@ -137,18 +137,18 @@ from openedx.core.lib.courses import course_image_url
             <div class="code-text">
             % if not discount_applied:
               <div class="code-input" aria-live="polite">
-                <label for="input_code" class="sr">${_('Discount or activation code')}</label>
+                <label for="input_code" class="sr">${_('Discount or activation code') | h}</label>
                 <input type="text" placeholder="${_('discount or activation code')}" id="input_code">
-                <button type="submit" class="blue" id="submit-code">${_('Apply')}</button>
+                <button type="submit" class="blue" id="submit-code">${_('Apply') | h}</button>
                 <span class="error-text hidden" id="code"></span>
               </div>
             % else:
               <div class="code-applied">
-                <span class="green"><span class="icon fa fa-check-square-o" aria-hidden="true"></span>${_('code has been applied')}</span>
-                <button type="submit" class="blue-border" id="submit-reset-redemption">${_('Reset')}</button>
+                <span class="green"><span class="icon fa fa-check-square-o" aria-hidden="true"></span>${_('code has been applied') | h}</span>
+                <button type="submit" class="blue-border" id="submit-reset-redemption">${_('Reset') | h}</button>
               </div>
             % endif
-                <span class="pull-right">${_('TOTAL:')}
+                <span class="pull-right">${_('TOTAL:') | h}
                   <b id="total-amount" data-amount="${'{price:0.2f}'.format(price=amount)}">
                     ## Translators: currency_symbol is a symbol indicating type of currency, ex "$". currency_abbr is
                     ## an abbreviation for the currency, ex "USD". This string would look like this when all variables are in:
@@ -163,11 +163,11 @@ from openedx.core.lib.courses import course_image_url
                % if order_type == 'business':
                   <div name="billing">
                       <button type="submit" name="billing-details" aria-describedby="billing_business_helper_text">
-                        ${_('Billing Details')}
+                        ${_('Billing Details') | h}
                         <span class="icon fa fa-caret-right" aria-hidden="true"></span>
                       </button>
                       <p id="billing_business_helper_text">
-                          ${_('After this purchase is complete, a receipt is generated with relative billing details and registration codes for students.')}
+                          ${_('After this purchase is complete, a receipt is generated with relative billing details and registration codes for students.') | h}
                       </p>
                   </div>
                    <div name="payment" class="hidden">
@@ -193,7 +193,7 @@ from openedx.core.lib.courses import course_image_url
                         <span class="icon fa fa-caret-right" aria-hidden="true"></span>
                       </button>
                       <p id="billing_helper_text">
-                          ${_('After this purchase is complete, a receipt is generated with relative billing details and registration codes for students.')}
+                          ${_('After this purchase is complete, a receipt is generated with relative billing details and registration codes for students.') | h}
                       </p>
                   </div>
                %endif
@@ -203,11 +203,11 @@ from openedx.core.lib.courses import course_image_url
       % else:
         <article aria-label="${_('Empty Cart')}">
           <div class="empty-cart" >
-            <h2>${_('Your Shopping cart is currently empty.')}</h2>
+            <h2>${_('Your Shopping cart is currently empty.') | h}</h2>
             % if is_course_enrollment_closed:
               <p>${expiry_message}</p>
             % endif
-            <a href="${marketing_link('COURSES')}" class="blue">${_('View Courses')}</a>
+            <a href="${marketing_link('COURSES')}" class="blue">${_('View Courses') | h}</a>
           </div>
         </article>
       % endif
