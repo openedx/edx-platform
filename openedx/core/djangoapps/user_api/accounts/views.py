@@ -1144,7 +1144,7 @@ class UsernameReplacementView(APIView):
                     ).update(
                         **{column: new_username}
                     )
-        except Exception as exc:  #pylint: disable-broad-except
+        except Exception as exc:  # pylint: disable-broad-except
             log.exception("Unable to change username from {current} to {new}. Reason: {error}".format(
                 current=current_username,
                 new=new_username,
