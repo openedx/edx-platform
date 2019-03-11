@@ -208,6 +208,9 @@ To run a single django test class use this command::
 
     paver test_system -t lms/djangoapps/courseware/tests/tests.py::ActivateLoginTest
 
+Running a Single Test
+---------------------
+
 When developing tests, it is often helpful to be able to really just run
 one single test without the overhead of PIP installs, UX builds, etc. In
 this case, it is helpful to look at the output of paver, and run just
@@ -291,14 +294,39 @@ This is an example of how to run a single test and get stdout shown immediately,
 
     pytest cms/djangoapps/contentstore/tests/test_import.py -s
 
+How to output coverage locally
+------------------------------
+
 These are examples of how to run a single test and get coverage::
 
-    pytest cms/djangoapps/contentstore/tests/test_import.py --cov # cms example
-    pytest lms/djangoapps/courseware/tests/test_module_render.py --cov # lms example
+    pytest cms/djangoapps/contentstore/tests/test_import.py --cov --cov-conifg=.coveragerc-local # cms example
+    pytest lms/djangoapps/courseware/tests/test_module_render.py --cov --cov-conifg=.coveragerc-local # lms example
 
-Use this command to generate a coverage report::
+That ``--cov-conifg=.coveragerc-local`` option is important - without it, the coverage
+tool will look for paths that exist on our jenkins test servers, but not on your local devstack.
+
+How to spit out coverage for a single file with a list of each line that is missing coverage::
+
+   pytest lms/djangoapps/grades/tests/test_subsection_grade.py \
+       --cov=lms.djangoapps.grades.subsection_grade \
+       --cov-config=.coveragerc-local \
+       --cov-report=term-missing
+   ---------- coverage: platform linux2, python 2.7.12-final-0 ----------
+
+   Name                                        Stmts   Miss  Cover   Missing
+   -------------------------------------------------------------------------
+   lms/djangoapps/grades/subsection_grade.py     125     38    70%   47-51, 57, 80-81, 85, 89, 99, 109, 113, [...]
+
+Use this command to generate a coverage report (after previously running ``pytest``)::
 
     coverage report
+
+The above command looks for a test coverage data file in ``reports/.coverage`` - this file will
+contain coverage data from your last run of ``pytest``.  Coverage data is recorded for whichever
+paths you specified in your ``--cov`` option, e.g.::
+
+    --cov=.  # will track coverage for the entire project
+    --cov=path.to.your.module  # will track coverage only for "module"
 
 Use this command to generate an HTML report::
 
