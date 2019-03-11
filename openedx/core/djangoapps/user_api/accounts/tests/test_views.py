@@ -282,6 +282,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         self.assertIsNotNone(data["social_links"])
         self.assertEqual(UserPreference.get_value(self.user, 'time_zone'), data["time_zone"])
         self.assertIsNotNone(data["accomplishments_shared"])
+        self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
 
         # additional admin fields (10)
         self.assertEqual(self.user.email, data["email"])
@@ -290,7 +291,6 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         self.assertEqual("world peace", data["goals"])
         self.assertTrue(data["is_active"])
         self.assertEqual("Park Ave", data['mailing_address'])
-        self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
         self.assertEquals(requires_parental_consent, data["requires_parental_consent"])
         self.assertIsNone(data["secondary_email"])
         self.assertEqual(year_of_birth, data["year_of_birth"])
@@ -403,7 +403,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         self.create_mock_profile(self.user)
         # set user's custom visibility preferences
         set_user_preference(self.user, ACCOUNT_VISIBILITY_PREF_KEY, CUSTOM_VISIBILITY)
-        shared_fields = ("bio", "language_proficiencies")
+        shared_fields = ("bio", "language_proficiencies", "name")
         for field_name in shared_fields:
             set_user_preference(self.user, "visibility.{}".format(field_name), ALL_USERS_VISIBILITY)
 
@@ -414,7 +414,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         # verify response
         if requesting_username == "different_user":
             data = response.data
-            self.assertEqual(5, len(data))
+            self.assertEqual(6, len(data))
 
             # public fields
             self.assertEqual(self.user.username, data["username"])
@@ -424,6 +424,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
             # custom shared fields
             self.assertEqual(TEST_BIO_VALUE, data["bio"])
             self.assertEqual([{"code": TEST_LANGUAGE_PROFICIENCY_CODE}], data["language_proficiencies"])
+            self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
         else:
             self._verify_full_account_response(response)
 

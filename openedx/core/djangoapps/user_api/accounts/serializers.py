@@ -497,7 +497,7 @@ def _visible_fields(user_profile, user, configuration=None):
 
     profile_visibility = get_profile_visibility(user_profile, user, configuration)
     if profile_visibility == ALL_USERS_VISIBILITY:
-        return configuration.get('shareable_fields')
+        return configuration.get('bulk_shareable_fields')
 
     elif profile_visibility == CUSTOM_VISIBILITY:
         return _visible_fields_from_custom_preferences(user, configuration)
@@ -513,7 +513,7 @@ def _visible_fields_from_custom_preferences(user, configuration):
     """
     preferences = UserPreference.get_all_preferences(user)
     fields_shared_with_all_users = [
-        field_name for field_name in configuration.get('shareable_fields')
+        field_name for field_name in configuration.get('custom_shareable_fields')
         if preferences.get('{}{}'.format(VISIBILITY_PREFIX, field_name)) == 'all_users'
     ]
     return set(fields_shared_with_all_users + configuration.get('public_fields'))
