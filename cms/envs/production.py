@@ -13,8 +13,8 @@ import yaml
 from path import Path as path
 from xmodule.modulestore.modulestore_settings import convert_module_store_setting_if_needed
 from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants
-from django.core.urlresolvers import reverse_lazy
 from django.core.exceptions import ImproperlyConfigured
+from django.core.urlresolvers import reverse_lazy
 
 from .common import *
 
