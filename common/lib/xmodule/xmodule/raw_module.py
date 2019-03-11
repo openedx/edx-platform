@@ -10,20 +10,19 @@ from xmodule.xml_module import XmlDescriptor
 log = logging.getLogger(__name__)
 
 
-class RawDescriptor(XmlDescriptor, XMLEditingDescriptor):
+class RawDescriptorMixin(object):
     """
-    Module that provides a raw editing view of its data and children.  It
-    requires that the definition xml is valid.
+    Common code between RawDescriptor and XBlocks converted from XModules.
     """
     resources_dir = None
 
     data = String(help="XML data for the module", default="", scope=Scope.content)
 
     @classmethod
-    def definition_from_xml(cls, xml_object, system):
+    def definition_from_xml(cls, xml_object, _system):
         return {'data': etree.tostring(xml_object, pretty_print=True, encoding='unicode')}, []
 
-    def definition_to_xml(self, resource_fs):
+    def definition_to_xml(self, _resource_fs):
         """
         Return an Element if we've kept the import OLX, or None otherwise.
         """
@@ -59,6 +58,13 @@ class RawDescriptor(XmlDescriptor, XMLEditingDescriptor):
             )
             raise SerializationError(self.location, msg)
 
+
+class RawDescriptor(XmlDescriptor, XMLEditingDescriptor, RawDescriptorMixin):
+    """
+    Module that provides a raw editing view of its data and children.  It
+    requires that the definition xml is valid.
+    """
+    pass
 
 class EmptyDataRawDescriptor(XmlDescriptor, XMLEditingDescriptor):
     """

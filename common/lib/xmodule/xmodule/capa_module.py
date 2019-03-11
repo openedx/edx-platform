@@ -7,10 +7,12 @@ import sys
 from django.conf import settings
 from lxml import etree
 from pkg_resources import resource_string
+from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Boolean, Dict, Float, Integer, Scope, String, XMLString
 
 from capa import responsetypes
+from xmodule.raw_module import RawDescriptorMixin
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.graders import ShowCorrectness
 from xmodule.raw_module import RawDescriptor
@@ -28,7 +30,10 @@ log = logging.getLogger("edx.courseware")
 
 @XBlock.wants('user')  # pylint: disable=abstract-method
 @XBlock.needs('i18n')
-class ProblemBlock(CapaMixin, HTMLSnippet, ResourceTemplates, XmlParserMixin, XModuleMixin, XModuleToXBlockMixin):
+class ProblemBlock(
+        CapaMixin, HTMLSnippet, ResourceTemplates,
+        RawDescriptorMixin, XmlParserMixin, XModuleMixin, XModuleToXBlockMixin
+    ):
     """
     Define the possible fields for a Capa problem
     """
@@ -174,13 +179,6 @@ class ProblemBlock(CapaMixin, HTMLSnippet, ResourceTemplates, XmlParserMixin, XM
         scope=Scope.settings
     )
 
-
-    """
-    An XModule implementing LonCapa format problems, implemented by way of
-    capa.capa_problem.LoncapaProblem
-
-    CapaModule.__init__ takes the same arguments as xmodule.x_module:XModule.__init__
-    """
     icon_class = 'problem'
 
     js = {
@@ -196,11 +194,23 @@ class ProblemBlock(CapaMixin, HTMLSnippet, ResourceTemplates, XmlParserMixin, XM
     js_module_name = "Problem"
     css = {'scss': [resource_string(__name__, 'css/capa/display.scss')]}
 
+    def student_view(self, _context):
+        """
+        Return the student view.
+        """
+        return Fragment(self.get_html())
+
     def author_view(self, context):
         """
         Renders the Studio preview view.
         """
         return self.student_view(context)
+
+    def studio_view(self, _context):
+        """
+        Return the studio view.
+        """
+        return Fragment(self.get_html())
 
     @property
     def ajax_url(self):
@@ -300,10 +310,6 @@ class ProblemBlock(CapaMixin, HTMLSnippet, ResourceTemplates, XmlParserMixin, XM
 
         return self.display_name
 
-    """
-    Module implementing problems in the LON-CAPA format,
-    as implemented by capa.capa_problem
-    """
     INDEX_CONTENT_TYPE = 'CAPA'
 
     resources_dir = None
