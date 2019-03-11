@@ -1182,6 +1182,7 @@ CREATE TABLE `content_type_gating_contenttypegatingconfig` (
   KEY `content_type_gating__course_id_f19cc50d_fk_course_ov` (`course_id`),
   KEY `content_type_gating__site_id_c9f3bc6a_fk_django_si` (`site_id`),
   KEY `content_type_gating_contenttypegatingconfig_org_043e72a9` (`org`),
+  KEY `content_typ_site_id_e91576_idx` (`site_id`,`org`,`course_id`),
   CONSTRAINT `content_type_gating__changed_by_id_e1754c4b_fk_auth_user` FOREIGN KEY (`changed_by_id`) REFERENCES `auth_user` (`id`),
   CONSTRAINT `content_type_gating__course_id_f19cc50d_fk_course_ov` FOREIGN KEY (`course_id`) REFERENCES `course_overviews_courseoverview` (`id`),
   CONSTRAINT `content_type_gating__site_id_c9f3bc6a_fk_django_si` FOREIGN KEY (`site_id`) REFERENCES `django_site` (`id`)
@@ -1314,6 +1315,7 @@ CREATE TABLE `course_duration_limits_coursedurationlimitconfig` (
   KEY `course_duration_limi_course_id_97b7a8e9_fk_course_ov` (`course_id`),
   KEY `course_duration_limi_site_id_cb492296_fk_django_si` (`site_id`),
   KEY `course_duration_limits_coursedurationlimitconfig_org_c2cc0091` (`org`),
+  KEY `course_dura_site_id_424016_idx` (`site_id`,`org`,`course_id`),
   CONSTRAINT `course_duration_limi_changed_by_id_f320fd76_fk_auth_user` FOREIGN KEY (`changed_by_id`) REFERENCES `auth_user` (`id`),
   CONSTRAINT `course_duration_limi_course_id_97b7a8e9_fk_course_ov` FOREIGN KEY (`course_id`) REFERENCES `course_overviews_courseoverview` (`id`),
   CONSTRAINT `course_duration_limi_site_id_cb492296_fk_django_si` FOREIGN KEY (`site_id`) REFERENCES `django_site` (`id`)
@@ -2167,7 +2169,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=519 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=521 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
