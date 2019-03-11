@@ -613,7 +613,7 @@ def answer_entrance_exam_problem(course, request, problem, user=None, value=1, m
         request,
         problem.scope_ids.usage_id,
         field_data_cache,
-    )._xmodule
+    )
     module.system.publish(problem, 'grade', grade_dict)
 
 

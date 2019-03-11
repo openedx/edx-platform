@@ -32,8 +32,7 @@ log = logging.getLogger("edx.courseware")
 @XBlock.needs('i18n')
 class ProblemBlock(
         CapaMixin, HTMLSnippet, ResourceTemplates,
-        RawDescriptorMixin, XmlParserMixin, XModuleMixin, XModuleToXBlockMixin
-    ):
+        RawDescriptorMixin, XmlParserMixin, XModuleMixin, XModuleToXBlockMixin):
     """
     Define the possible fields for a Capa problem
     """

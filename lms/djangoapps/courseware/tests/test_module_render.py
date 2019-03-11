@@ -2164,7 +2164,7 @@ class TestXmoduleRuntimeEvent(TestSubmittingProblems):
             mock_request,
             self.problem.location,
             field_data_cache,
-        )._xmodule
+        )
 
     def set_module_grade_using_publish(self, grade_dict):
         """Publish the user's grade, takes grade_dict as input"""
@@ -2237,7 +2237,7 @@ class TestRebindModule(TestSubmittingProblems):
             mock_request,
             item.location,
             field_data_cache,
-        )._xmodule
+        )
 
     def test_rebind_module_to_new_users(self):
         module = self.get_module_for_user(self.user, self.problem)
