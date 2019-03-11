@@ -2942,8 +2942,8 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
     ],
 }
 
-# The list of all fields that can be shared with other users
-ACCOUNT_VISIBILITY_CONFIGURATION["shareable_fields"] = (
+# The list of all fields that are shared with other users using the bulk 'all_users' privacy setting
+ACCOUNT_VISIBILITY_CONFIGURATION["bulk_shareable_fields"] = (
     ACCOUNT_VISIBILITY_CONFIGURATION["public_fields"] + [
         'bio',
         'course_certificates',
@@ -2959,16 +2959,22 @@ ACCOUNT_VISIBILITY_CONFIGURATION["shareable_fields"] = (
     ]
 )
 
+# The list of all fields that can be shared selectively with other users using the 'custom' privacy setting
+ACCOUNT_VISIBILITY_CONFIGURATION["custom_shareable_fields"] = (
+    ACCOUNT_VISIBILITY_CONFIGURATION["bulk_shareable_fields"] + [
+        "name",
+    ]
+)
+
 # The list of account fields that are visible only to staff and users viewing their own profiles
 ACCOUNT_VISIBILITY_CONFIGURATION["admin_fields"] = (
-    ACCOUNT_VISIBILITY_CONFIGURATION["shareable_fields"] + [
+    ACCOUNT_VISIBILITY_CONFIGURATION["custom_shareable_fields"] + [
         "email",
         "extended_profile",
         "gender",
         "goals",
         "is_active",
         "mailing_address",
-        "name",
         "requires_parental_consent",
         "secondary_email",
         "year_of_birth",

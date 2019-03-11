@@ -47,7 +47,7 @@ class UserMembershipSerializer(serializers.ModelSerializer):
     Used for listing team members.
     """
     profile_configuration = deepcopy(settings.ACCOUNT_VISIBILITY_CONFIGURATION)
-    profile_configuration['shareable_fields'].append('url')
+    profile_configuration['bulk_shareable_fields'].append('url')
     profile_configuration['public_fields'].append('url')
 
     user = ExpandableField(
@@ -134,7 +134,7 @@ class CourseTeamSerializerWithoutMembership(CourseTeamSerializer):
 class MembershipSerializer(serializers.ModelSerializer):
     """Serializes CourseTeamMemberships with information about both teams and users."""
     profile_configuration = deepcopy(settings.ACCOUNT_VISIBILITY_CONFIGURATION)
-    profile_configuration['shareable_fields'].append('url')
+    profile_configuration['bulk_shareable_fields'].append('url')
     profile_configuration['public_fields'].append('url')
 
     user = ExpandableField(

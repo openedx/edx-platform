@@ -103,13 +103,8 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, Retireme
         """Test the difference in behavior when a configuration is supplied to get_account_settings."""
         config = {
             "default_visibility": "private",
-
-            "shareable_fields": [
-                'name',
-            ],
-
             "public_fields": [
-                'email',
+                'email', 'name',
             ],
         }
 
