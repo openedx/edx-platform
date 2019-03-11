@@ -1145,21 +1145,25 @@ class UsernameReplacementView(APIView):
                         **{column: new_username}
                     )
         except Exception as exc:  # pylint: disable-broad-except
-            log.exception("Unable to change username from {current} to {new}. Reason: {error}".format(
-                current=current_username,
-                new=new_username,
-                error=exc
-            ))
+            log.exception(
+                "Unable to change username from %s to %s. Reason: %s",
+                current_username,
+                new_username,
+                exc
+            )
             return False
         if num_rows_changed == 0:
-            log.warning("Unable to change username from {current} to {new} because {current} doesn't exist.".format(
-                current=current_username,
-                new=new_username,
-            ))
+            log.warning(
+                "Unable to change username from %s to %s because %s doesn't exist.",
+                current_username,
+                new_username,
+                current_username,
+            )
             return False
 
-        log.info("Successfully changed username from {current} to {new}.".format(
-            current=current_username,
-            new=new_username,
-        ))
+        log.info(
+            "Successfully changed username from %s to %s.",
+            current_username,
+            new_username,
+        )
         return True
