@@ -32,4 +32,4 @@ class CanReplaceUsername(permissions.BasePermission):
     including the service user.
     """
     def has_permission(self, request, view):
-        return request.user.username == getattr(settings, "USERNAME_REPLACEMENT_WORKER")
+        return request.user.username == getattr(settings, "USERNAME_REPLACEMENT_WORKER", False)
