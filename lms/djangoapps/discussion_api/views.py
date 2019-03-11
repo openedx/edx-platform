@@ -627,7 +627,7 @@ class ReplaceUsernameView(APIView):
             if exc.status_code == 404:
                 return Response(status=status.HTTP_404_NOT_FOUND)
             raise
-        except Exception as exc:
+        except Exception as exc:  #pylint disable-broad-except
             return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return Response(status=status.HTTP_204_NO_CONTENT)
 

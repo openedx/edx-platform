@@ -1118,7 +1118,6 @@ class UsernameReplacementView(APIView):
 
     def _generate_unique_username(self, desired_username, suffix_length=4):
         """ Accepts a username and returns a unique username if the requested is taken """
-        User = apps.get_model('auth.user')
         new_username = desired_username
         # Keep checking usernames in case desired_username + random suffix is already taken
         while True:
@@ -1145,7 +1144,7 @@ class UsernameReplacementView(APIView):
                     ).update(
                         **{column: new_username}
                     )
-        except Exception as exc:
+        except Exception as exc:  #pylint: disable-broad-except
             log.exception("Unable to change username from {current} to {new}. Reason: {error}".format(
                 current=current_username,
                 new=new_username,

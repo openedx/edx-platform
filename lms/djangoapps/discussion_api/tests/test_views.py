@@ -10,7 +10,6 @@ from urlparse import urlparse
 import ddt
 import httpretty
 import mock
-from django.conf import settings
 from django.urls import reverse
 from edx_oauth2_provider.tests.factories import ClientFactory, AccessTokenFactory
 from opaque_keys.edx.keys import CourseKey
