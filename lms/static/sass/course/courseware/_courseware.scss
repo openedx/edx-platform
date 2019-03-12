@@ -205,8 +205,8 @@ html.video-fullscreen {
         }
       }
 
-      span.proctored-exam-code {
-        margin-top: 5px;
+      .proctored-exam-code {
+        margin: 5px 0px;
         font-size: 1.3em;
       }
 
@@ -228,8 +228,12 @@ html.video-fullscreen {
         }
       }
 
-      .proctored-exam-select-code {
-        @include margin-left(30px);
+      .copy-exam-code-button {
+        margin: 5px 0px;
+        padding: 7.5px 20px;
+        margin-left: -5px;
+        border-top-left-radius: 0px;
+        border-bottom-left-radius: 0px;
       }
 
       .exam-action-button {
