@@ -523,11 +523,11 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         audit_user = UserFactory(password=self.TEST_PASSWORD)
         self.client.login(username=audit_user.username, password=self.TEST_PASSWORD)
         audit_enrollment = CourseEnrollment.enroll(audit_user, course.id, mode=CourseMode.AUDIT)
-        ScheduleFactory(start=THREE_YEARS_AGO, enrollment=audit_enrollment)
+        ScheduleFactory(start=THREE_YEARS_AGO + timedelta(days=1), enrollment=audit_enrollment)
 
         response = self.client.get(url)
 
-        expiration_date = strftime_localized(course.start + timedelta(weeks=4), u'%b. %-d, %Y')
+        expiration_date = strftime_localized(course.start + timedelta(weeks=4) + timedelta(days=1), u'%b. %-d, %Y')
         expected_params = QueryDict(mutable=True)
         course_name = CourseOverview.get_from_id(course.id).display_name_with_default
         expected_params['access_response_error'] = u'Access to {run} expired on {expiration_date}'.format(
