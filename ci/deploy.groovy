@@ -50,8 +50,9 @@ pipeline {
                                          string(defaultValue: '1', description: "", name: 'step', trim: true),
                                          string(defaultValue: '10', description: "", name: 'failPercentage', trim: true)]
 
-                        def contents = input message: 'Content you want to deploy, all/theme. Optionally theme name, split by `,`,(stage only allow one theme) empty for all themes',
-                            parameters: [choice(choices: ["full", "themes"], description: "", name: 'repo'),
+
+                        def contents = input message: 'Content you want to deploy, all/platform/themes. Optionally theme name, split by `,`,(stage only allow one theme) empty for all themes',
+                            parameters: [choice(choices: ["full", "platform", "themes"], description: "", name: 'repo'),
                                          string(defaultValue: '', description: "", name: 'themes', trim: true)]
 
                         themes = contents['themes'].tokenize(',')
@@ -68,6 +69,8 @@ pipeline {
 
                         // post process parameters
                         if(repo == 'full'){
+                            tags = "deploy,assets"
+                        } else if (repo == 'platform') {
                             tags = "deploy"
                         } else {
                             tags = "assets"
