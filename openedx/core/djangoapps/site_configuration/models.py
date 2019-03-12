@@ -161,7 +161,7 @@ class SiteConfiguration(models.Model):
         super(SiteConfiguration, self).delete(using=using)
 
     def compile_microsite_sass(self):
-        # Proxy to `utils.get_initial_page_elements` to avoid test-time Django errors.
+        # Importing `compile_sass` to avoid test-time Django errors.
         # TODO: Fix Site Configuration and Organizations hacks. https://github.com/appsembler/edx-platform/issues/329
         from openedx.core.djangoapps.appsembler.sites.utils import compile_sass
         css_output = compile_sass('main.scss', custom_branding=self._sass_var_override)
