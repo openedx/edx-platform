@@ -1,12 +1,14 @@
 """
 This test tests that i18n extraction (`paver i18n_extract -v`) works properly.
 """
+
 import os
 import random
 import re
 import string
 import subprocess
 import sys
+import unittest
 from datetime import datetime, timedelta
 from unittest import TestCase
 
@@ -15,6 +17,7 @@ from polib import pofile
 from pytz import UTC
 
 
+@unittest.skip
 class TestGenerate(TestCase):
     """
     Tests functionality of i18n/generate.py

@@ -12,6 +12,7 @@ def tags = null
 def themes = null
 def vars = "LT_KEY_FILE=/root/.ssh/id_rsa "
 def machine = null
+def proceed = true
 
 pipeline {
     agent any
@@ -23,6 +24,7 @@ pipeline {
         stage("Get parameters") {
             steps {
                 script {
+                    try {
                     timeout(time: 2) {
                         // get parameters
                         if(env.GIT_BRANCH =~ "(master|hotfix).*"){
@@ -90,10 +92,16 @@ pipeline {
                         }
                         vars += "edx_platform_version=${commitId}"
                     }
+                    } catch (err) {
+                        proceed = false
+                    }
                 }
             }
         }
         stage("Get Deployment repo") {
+            when {
+                expression { return proceed == true }
+            }
             steps {
                 dir("configuration") {
                     git credentialsId: 'github', url: 'https://github.com/Learningtribes/configuration.git'
@@ -109,6 +117,9 @@ pipeline {
 
         }
         stage("Deploy") {
+            when {
+                expression { return proceed == true }
+            }
             steps {
                 dir("configuration/playbooks") {
                     sh """
@@ -119,12 +130,17 @@ pipeline {
                     -t ${tags} lt_edxapp_with_worker.yml
                     """
                 }
+
             }
         }
     }
     post {
         always {
             sh "rm -rf configuration"
+            script {
+                currentBuild.result = "SUCCESS"
+                echo "RESULT: ${currentBuild.result}"
+            }
         }
     }
 
