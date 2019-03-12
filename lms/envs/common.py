@@ -547,17 +547,6 @@ def _make_mako_template_dirs(settings):
         for theme in get_themes_unchecked(themes_dirs, settings.PROJECT_ROOT):
             if theme.themes_base_dir not in settings.MAKO_TEMPLATE_DIRS_BASE:
                 settings.MAKO_TEMPLATE_DIRS_BASE.insert(0, theme.themes_base_dir)
-
-                customer_themes_dir = os.path.join(theme.themes_base_dir, 'customer_themes')
-                if os.path.isdir(customer_themes_dir):
-                    settings.STATICFILES_DIRS.insert(0, ('customer_themes', customer_themes_dir))
-
-                theme_static = theme.path / 'static'
-                if os.path.isdir(theme_static):
-                    settings.STATICFILES_DIRS.append(
-                        (u'', theme_static)
-                    )
-
     if settings.FEATURES.get('USE_MICROSITES', False) and getattr(settings, "MICROSITE_CONFIGURATION", False):
         settings.MAKO_TEMPLATE_DIRS_BASE.insert(0, settings.MICROSITE_ROOT_DIR)
     return settings.MAKO_TEMPLATE_DIRS_BASE
