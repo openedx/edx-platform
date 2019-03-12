@@ -17,7 +17,7 @@ from opaque_keys.edx.keys import CourseKey
 from course_modes.models import CourseMode
 from lms.djangoapps.commerce.tests import TEST_API_URL
 from openedx.core.djangoapps.credit import api
-from openedx.core.djangoapps.credit.email_utils import get_credit_provider_display_names, make_providers_strings
+from openedx.core.djangoapps.credit.email_utils import get_credit_provider_attribute_values, make_providers_strings
 from openedx.core.djangoapps.credit.exceptions import (
     CreditRequestNotFound,
     InvalidCreditCourse,
@@ -845,7 +845,9 @@ class CreditRequirementApiTests(CreditApiTestBase):
             requirements[0]["name"]
         )
         # Satisfy the other requirement. And mocked the api to return different kind of data.
-        with mock.patch('openedx.core.djangoapps.credit.email_utils.get_credit_provider_display_names') as mock_method:
+        with mock.patch(
+            'openedx.core.djangoapps.credit.email_utils.get_credit_provider_attribute_values'
+        ) as mock_method:
             mock_method.return_value = providers_list
             api.set_credit_requirement_status(
                 user,
@@ -1231,7 +1233,7 @@ class CourseApiTests(CreditApiTestBase):
     def test_get_credit_provider_display_names_method(self):
         """Verify that parsed providers list is returns after getting course production information."""
         self._mock_ecommerce_courses_api(self.course_key, self.COURSE_API_RESPONSE)
-        response_providers = get_credit_provider_display_names(self.course_key)
+        response_providers = get_credit_provider_attribute_values(self.course_key, 'display_name')
         self.assertListEqual(self.PROVIDERS_LIST, response_providers)
 
     @httpretty.activate
@@ -1239,7 +1241,7 @@ class CourseApiTests(CreditApiTestBase):
     def test_get_credit_provider_display_names_method_with_exception(self, mock_init):
         """Verify that in case of any exception it logs the error and return."""
         mock_init.side_effect = Exception
-        response = get_credit_provider_display_names(self.course_key)
+        response = get_credit_provider_attribute_values(self.course_key, 'display_name')
         self.assertTrue(mock_init.called)
         self.assertEqual(response, None)
 
@@ -1250,11 +1252,11 @@ class CourseApiTests(CreditApiTestBase):
         self._mock_ecommerce_courses_api(self.course_key, self.COURSE_API_RESPONSE)
 
         # Warm up the cache.
-        response_providers = get_credit_provider_display_names(self.course_key)
+        response_providers = get_credit_provider_attribute_values(self.course_key, 'display_name')
         self.assertListEqual(self.PROVIDERS_LIST, response_providers)
 
         # Hit the cache.
-        response_providers = get_credit_provider_display_names(self.course_key)
+        response_providers = get_credit_provider_attribute_values(self.course_key, 'display_name')
         self.assertListEqual(self.PROVIDERS_LIST, response_providers)
 
         # Verify only one request was made.
@@ -1269,10 +1271,10 @@ class CourseApiTests(CreditApiTestBase):
 
         self._mock_ecommerce_courses_api(self.course_key, self.COURSE_API_RESPONSE)
 
-        response_providers = get_credit_provider_display_names(self.course_key)
+        response_providers = get_credit_provider_attribute_values(self.course_key, 'display_name')
         self.assertListEqual(self.PROVIDERS_LIST, response_providers)
 
-        response_providers = get_credit_provider_display_names(self.course_key)
+        response_providers = get_credit_provider_attribute_values(self.course_key, 'display_name')
         self.assertListEqual(self.PROVIDERS_LIST, response_providers)
 
         self.assertEqual(len(httpretty.httpretty.latest_requests), 2)
@@ -1309,7 +1311,7 @@ class CourseApiTests(CreditApiTestBase):
     @ddt.unpack
     def test_get_provider_api_with_multiple_data(self, data, expected_data):
         self._mock_ecommerce_courses_api(self.course_key, data)
-        response_providers = get_credit_provider_display_names(self.course_key)
+        response_providers = get_credit_provider_attribute_values(self.course_key, 'display_name')
         self.assertEqual(expected_data, response_providers)
 
     @httpretty.activate
@@ -1317,7 +1319,7 @@ class CourseApiTests(CreditApiTestBase):
         """Verify that if all providers are in-active than method return empty list."""
         self._mock_ecommerce_courses_api(self.course_key, self.COURSE_API_RESPONSE)
         CreditProvider.objects.all().update(active=False)
-        self.assertEqual(get_credit_provider_display_names(self.course_key), [])
+        self.assertEqual(get_credit_provider_attribute_values(self.course_key, 'display_name'), [])
 
     @ddt.data(None, ['asu'], ['asu', 'co'], ['asu', 'co', 'mit'])
     def test_make_providers_strings(self, providers):
