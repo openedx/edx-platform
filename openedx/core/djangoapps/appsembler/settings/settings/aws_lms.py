@@ -1,8 +1,38 @@
 """
 Settings for Appsembler on LMS in Production (aka AWS).
 """
+from os import path
 
 from openedx.core.djangoapps.appsembler.settings.settings import aws_common
+
+
+def _add_theme_static_dirs(settings):
+    """
+    Appsembler Themes static files customizations.
+    """
+    from openedx.core.djangoapps.theming.helpers_dirs import (
+        get_themes_unchecked,
+        get_theme_base_dirs_from_settings
+    )
+
+    if settings.ENABLE_COMPREHENSIVE_THEMING:
+        themes_dirs = get_theme_base_dirs_from_settings(settings.COMPREHENSIVE_THEME_DIRS)
+        themes = get_themes_unchecked(themes_dirs, settings.PROJECT_ROOT)
+
+        assert len(themes), 'Customer themes enabled, but it seems that there is no Tahoe theme.'
+        assert len(themes) == 1, (
+            'Customer themes enabled, but it looks like there is more than one theme, '
+            'however Tahoe does only supports having a single instance of `edx-theme-codebase`'
+            'and no other theme should be installed.'
+        )
+
+        theme = themes[0]
+
+        # Allow the theme to override the platform files transparently
+        # without having to change the Open edX code.
+        theme_static = theme.path / 'static'
+        if path.isdir(theme_static):
+            settings.STATICFILES_DIRS.append(theme_static)
 
 
 def plugin_settings(settings):
@@ -69,3 +99,5 @@ def plugin_settings(settings):
     settings.MAIN_SITE_REDIRECT_WHITELIST = ['api', 'admin', 'oauth', 'status']
 
     settings.USE_S3_FOR_CUSTOMER_THEMES = True
+
+    _add_theme_static_dirs(settings)
