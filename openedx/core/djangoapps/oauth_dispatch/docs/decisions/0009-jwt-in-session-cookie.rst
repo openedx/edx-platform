@@ -113,12 +113,6 @@ JWT Cookie Lifetime
    endpoint, or preemptively recognize an imminent expiration. To automatically refresh the JWT cookie, the
    microfrontend will call a new endpoint ("refresh") that returns a new JWT Cookie to keep the user's session alive.
 
-   * To support this, the login endpoint will include 3 related cookies in its response:
-
-     * **Two JWT Cookies** (as described above), with a *domain* setting so that it is forwarded to any microservice
-       in the system.
-     * **JWT Refresh Cookie**, with a *domain* setting so that it is sent to the login service only.
-
 #. **Remove JWT Cookie on Logout.** When the user logs out, we will remove all JWT-related cookies in the response,
    which will remove them from the user's browser cookie jar. Thus, the user will be logged out of all the
    microfrontends.

@@ -293,7 +293,7 @@ class LoginTest(CacheIsolationTestCase):
     def test_login_refresh(self):
         def _assert_jwt_cookie_present(response):
             self.assertEqual(response.status_code, 200)
-            self.assertIn(jwt_cookies.jwt_refresh_cookie_name(), self.client.cookies)
+            self.assertIn(jwt_cookies.jwt_cookie_header_payload_name(), self.client.cookies)
 
         setup_login_oauth_client()
         response, _ = self._login_response('test@edx.org', 'test_password')
