@@ -37,6 +37,14 @@ class Provenance(Enum):
     default = 'Default'
 
 
+def validate_course_in_org(value):
+    if value.count('+') != 1:
+        raise ValidationError(
+            _('%(value)s should have the form ORG+COURSE'),
+            params={'value': value},
+        )
+
+
 class StackedConfigurationModel(ConfigurationModel):
     """
     A ConfigurationModel that stacks Global, Site, Org, Course, and Course Run level
@@ -82,8 +90,9 @@ class StackedConfigurationModel(ConfigurationModel):
         verbose_name=_("Course in Org"),
         help_text=_(
             "Configure values for all course runs associated with this course. "
-            "This is should be formatted as 'org/course' (i.e. MITx/6.002x, HarvardX/CS50)."
+            "This is should be formatted as 'org+course' (i.e. MITx+6.002x, HarvardX+CS50)."
         ),
+        validators=[validate_course_in_org],
     )
     course = models.ForeignKey(
         CourseOverview,
