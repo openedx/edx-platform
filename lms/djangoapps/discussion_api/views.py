@@ -628,39 +628,46 @@ class ReplaceUsernamesView(APIView):
         for username_pair in username_mappings:
             current_username = list(username_pair.keys())[0]
             new_username = list(username_pair.values())[0]
-            try:
-                # This API will be called after the regular LMS API, so the username in
-                # the DB will have already been updated to new_username
-                current_user = User.objects.get(username=new_username)
-                cc_user = comment_client.User.from_django_user(current_user)
-                cc_user.replace_username(new_username)
-            except User.DoesNotExist:
-                log.warning(
-                    u"Unable to change username from %s to %s in forums because %s doesn't exist in LMS DB.",
-                    current_username,
-                    new_username,
-                    new_username,
-                )
+            successfully_replaced = self._replace_username(current_username, new_username)
+            if successfully_replaced:
+                successful_replacements += {current_username: new_username}
+            else:
                 failed_replacements += {current_username: new_username}
-            except comment_client.CommentClientRequestError as exc:
-                log.exception(
-                    u"Unable to change username from %s to %s in forums because forums API call failed with: %s.",
-                    current_username,
-                    new_username,
-                    exc,
-                )
-                failed_replacements += {current_username: new_username}
-            log.info(
-                u"Successfully changed username from %s to %s in forums.",
-                current_username,
-                new_username,
-            )
-            successful_replacements += {current_username: new_username}
-
         return JsonResponse({
             "successful_replacements": successful_replacements,
             "failed_replacements": failed_replacements,
         })
+
+    def _replace_username(self, current_username, new_username):
+        try:
+            # This API will be called after the regular LMS API, so the username in
+            # the DB will have already been updated to new_username
+            current_user = User.objects.get(username=new_username)
+            cc_user = comment_client.User.from_django_user(current_user)
+            cc_user.replace_username(new_username)
+        except User.DoesNotExist:
+            log.warning(
+                u"Unable to change username from %s to %s in forums because %s doesn't exist in LMS DB.",
+                current_username,
+                new_username,
+                new_username,
+            )
+            return False
+        except comment_client.CommentClientRequestError as exc:
+            log.exception(
+                u"Unable to change username from %s to %s in forums because forums API call failed with: %s.",
+                current_username,
+                new_username,
+                exc,
+            )
+            return False
+
+        log.info(
+            u"Successfully changed username from %s to %s in forums.",
+            current_username,
+            new_username,
+        )
+        return True
 
     def _has_valid_schema(self, post_data):
         """ Verifies the data is a list of objects with a single key:value pair """
