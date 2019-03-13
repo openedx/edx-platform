@@ -63,6 +63,7 @@ setup(
             "completion = lms.djangoapps.course_api.blocks.transformers.block_completion:BlockCompletionTransformer",
             "load_override_data = lms.djangoapps.course_blocks.transformers.load_override_data:OverrideDataTransformer",
             "content_type_gate = openedx.features.content_type_gating.block_transformers:ContentTypeGateTransformer",
+            "access_denied_message_filter = lms.djangoapps.course_blocks.transformers.access_denied_filter:AccessDeniedMessageFilterTransformer",
         ],
         "openedx.ace.policy": [
             "bulk_email_optout = lms.djangoapps.bulk_email.policies:CourseEmailOptout"

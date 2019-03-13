@@ -35,6 +35,20 @@ class BlockSerializer(serializers.Serializer):  # pylint: disable=abstract-metho
         Return a serializable representation of the requested block
         """
         # create response data dict for basic fields
+
+        block_structure = self.context['block_structure']
+        authorization_denial_reason = block_structure.get_xblock_field(block_key, 'authorization_denial_reason')
+        authorization_denial_message = block_structure.get_xblock_field(block_key, 'authorization_denial_message')
+
+        if authorization_denial_reason and authorization_denial_message:
+            data = {
+                'id': unicode(block_key),
+                'block_id': unicode(block_key.block_id),
+                'authorization_denial_reason': authorization_denial_reason,
+                'authorization_denial_message': authorization_denial_message
+            }
+            return data
+
         data = {
             'id': unicode(block_key),
             'block_id': unicode(block_key.block_id),
@@ -71,7 +85,7 @@ class BlockSerializer(serializers.Serializer):  # pylint: disable=abstract-metho
                     data[supported_field.serializer_field_name] = field_value
 
         if 'children' in self.context['requested_fields']:
-            children = self.context['block_structure'].get_children(block_key)
+            children = block_structure.get_children(block_key)
             if children:
                 data['children'] = [unicode(child) for child in children]
 
