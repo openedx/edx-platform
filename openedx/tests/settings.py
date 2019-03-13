@@ -23,6 +23,8 @@ BLOCK_STRUCTURES_SETTINGS = dict(
     TASK_MAX_RETRIES=5,
 )
 
+COURSE_ADVANCED_MODULES = []
+
 COURSE_KEY_PATTERN = r'(?P<course_key_string>[^/+]+(/|\+)[^/+]+(/|\+)[^/?]+)'
 COURSE_ID_PATTERN = COURSE_KEY_PATTERN.replace('course_key_string', 'course_id')
 
