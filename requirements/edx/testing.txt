@@ -63,7 +63,7 @@ boto==2.39.0
 botocore==1.8.17
 caniusepython3==7.0.0
 celery==3.1.25
-certifi==2018.11.29
+certifi==2019.3.9
 cffi==1.12.2
 chardet==3.0.4
 click-log==0.1.8          # via edx-lint
@@ -131,14 +131,14 @@ edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
 edx-django-utils==1.0.3
 edx-drf-extensions==2.0.1
-edx-enterprise==1.3.0
+edx-enterprise==1.3.1
 edx-i18n-tools==0.4.8
 edx-lint==1.1.1
 edx-milestones==0.1.13
 edx-oauth2-provider==1.2.2
 edx-opaque-keys[django]==0.4.4
 edx-organizations==1.0.1
-edx-proctoring-proctortrack==1.0.2
+edx-proctoring-proctortrack==1.0.4
 edx-proctoring==1.5.20
 edx-rbac==0.1.3
 edx-rest-api-client==1.9.2
@@ -153,7 +153,7 @@ event-tracking==0.2.8
 execnet==1.5.0            # via pytest-xdist
 extras==1.0.0             # via python-subunit, testtools
 factory_boy==2.8.1
-faker==1.0.2              # via factory-boy
+faker==1.0.4              # via factory-boy
 feedparser==5.1.3
 filelock==3.0.10          # via tox
 firebase-token-generator==1.3.2
@@ -183,7 +183,7 @@ incremental==17.5.0       # via twisted
 inflect==2.1.0
 ipaddress==1.0.22
 isodate==0.6.0
-isort==4.3.13
+isort==4.3.15
 itsdangerous==1.1.0       # via flask
 itypes==1.1.0
 jinja2-pluralize==0.3.0
@@ -268,7 +268,7 @@ pytest-django==3.4.8
 pytest-forked==1.0.2      # via pytest-xdist
 pytest-randomly==1.2.3
 pytest-xdist==1.26.1
-pytest==4.3.0
+pytest==4.3.1
 python-dateutil==2.4.0
 python-levenshtein==0.12.0
 python-memcached==1.48
@@ -292,7 +292,7 @@ rfc6266-parser==0.0.5.post2
 rules==2.0.1
 s3transfer==0.1.13
 sailthru-client==2.2.3
-scandir==1.9.0            # via pathlib2
+scandir==1.10.0           # via pathlib2
 scipy==0.14.0
 scrapy==1.6.0             # via pa11ycrawler
 selenium==3.141.0
@@ -310,11 +310,11 @@ sorl-thumbnail==12.3
 sortedcontainers==2.1.0
 soupsieve==1.8
 splinter==0.9.0
-sqlparse==0.2.4
+sqlparse==0.3.0
 stevedore==1.30.1
 sure==1.4.11
 sympy==0.7.1
-testfixtures==6.6.0
+testfixtures==6.6.1
 testtools==2.3.0          # via fixtures, python-subunit
 text-unidecode==1.2       # via faker
 tincan==0.0.5
