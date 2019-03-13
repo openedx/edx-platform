@@ -47,7 +47,8 @@ def learner_profile(request, username):
     Example usage:
         GET /account/profile
     """
-    if REDIRECT_TO_PROFILE_MICROFRONTEND.is_enabled():
+    is_profile_mfe_enabled_for_site = configuration_helpers.get_value('ENABLE_PROFILE_MICROFRONTEND')
+    if is_profile_mfe_enabled_for_site and REDIRECT_TO_PROFILE_MICROFRONTEND.is_enabled():
         profile_microfrontend_url = "{}{}".format(settings.PROFILE_MICROFRONTEND_URL, username)
         return redirect(profile_microfrontend_url)
 
