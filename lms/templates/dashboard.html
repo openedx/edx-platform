@@ -72,6 +72,13 @@ from student.models import CourseEnrollment
       });
     });
   </%static:webpack>
+  <%static:webpack entry="SwiperInitializer">
+    $(document).ready(function() {
+      SwiperInitializer();
+    });
+  </%static:webpack>
+
+
   % if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
     <%static:require_module module_name="course_search/js/dashboard_search_factory" class_name="DashboardSearchFactory">
         DashboardSearchFactory();
@@ -122,14 +129,39 @@ from student.models import CourseEnrollment
 
 <main id="main" aria-label="Content" tabindex="-1">
     <div class="dashboard" id="dashboard-main">
+      <section class="banner">
+        <section class="welcome-wrapper">
+          <h2>Hello My Boss,</h2>
+          <p>Welcome to your dashboard</p>
+        </section>
+        <nav class="whiteboard">
+          <div>
+            <i class="icon far fa-file-alt" ></i>
+            <h3>12</h3>
+            <p>completed courses</p>
+          </div>
+          <div>
+            <i class="icon far fa-trophy"></i>
+            <h3>18</h3>
+            <p>badges obtained</p>
+          </div>
+          <div>
+            <i class="icon far fa-comment-alt-lines" ></i>
+            <h3>46</h3>
+            <p>posts</p>
+          </div>
+          <a href="#" class="flat-button">view my learning transcript</a>
+        </nav>
+      </section>
+
       <div class="main-container">
-        <div class="my-courses" id="my-courses">
+        <div class="swiper-container my-courses" id="my-courses">
           % if display_dashboard_courses:
           <%include file="learner_dashboard/_dashboard_navigation_courses.html"/>
           % endif
 
           % if len(course_entitlements + course_enrollments) > 0:
-            <ul class="listing-courses">
+            <ul class="swiper-wrapper listing-courses">
             <%
                 share_settings = configuration_helpers.get_value(
                     'SOCIAL_SHARING_SETTINGS',
@@ -191,6 +223,8 @@ from student.models import CourseEnrollment
                 resume_button_url = resume_button_urls[dashboard_index]
               %>
               <%include file='dashboard/_dashboard_course_listing.html' args='course_overview=course_overview, course_card_index=dashboard_index, enrollment=enrollment, is_unfulfilled_entitlement=is_unfulfilled_entitlement, is_fulfilled_entitlement=is_fulfilled_entitlement, entitlement=entitlement, entitlement_session=entitlement_session, entitlement_available_sessions=entitlement_available_sessions, entitlement_expiration_date=entitlement_expiration_date, entitlement_expired_at=entitlement_expired_at, show_courseware_link=show_courseware_link, cert_status=cert_status, can_refund_entitlement=can_refund_entitlement, can_unenroll=can_unenroll, credit_status=credit_status, show_email_settings=show_email_settings, course_mode_info=course_mode_info, is_paid_course=is_paid_course, is_course_blocked=is_course_blocked, verification_status=course_verification_status, course_requirements=course_requirements, dashboard_index=dashboard_index, share_settings=share_settings, user=user, related_programs=related_programs, display_course_modes_on_dashboard=display_course_modes_on_dashboard, show_consent_link=show_consent_link, enterprise_customer_name=enterprise_customer_name, resume_button_url=resume_button_url' />
+              <%include file='dashboard/_dashboard_course_listing.html' args='course_overview=course_overview, course_card_index=dashboard_index, enrollment=enrollment, is_unfulfilled_entitlement=is_unfulfilled_entitlement, is_fulfilled_entitlement=is_fulfilled_entitlement, entitlement=entitlement, entitlement_session=entitlement_session, entitlement_available_sessions=entitlement_available_sessions, entitlement_expiration_date=entitlement_expiration_date, entitlement_expired_at=entitlement_expired_at, show_courseware_link=show_courseware_link, cert_status=cert_status, can_refund_entitlement=can_refund_entitlement, can_unenroll=can_unenroll, credit_status=credit_status, show_email_settings=show_email_settings, course_mode_info=course_mode_info, is_paid_course=is_paid_course, is_course_blocked=is_course_blocked, verification_status=course_verification_status, course_requirements=course_requirements, dashboard_index=dashboard_index, share_settings=share_settings, user=user, related_programs=related_programs, display_course_modes_on_dashboard=display_course_modes_on_dashboard, show_consent_link=show_consent_link, enterprise_customer_name=enterprise_customer_name, resume_button_url=resume_button_url' />
+              <%include file='dashboard/_dashboard_course_listing.html' args='course_overview=course_overview, course_card_index=dashboard_index, enrollment=enrollment, is_unfulfilled_entitlement=is_unfulfilled_entitlement, is_fulfilled_entitlement=is_fulfilled_entitlement, entitlement=entitlement, entitlement_session=entitlement_session, entitlement_available_sessions=entitlement_available_sessions, entitlement_expiration_date=entitlement_expiration_date, entitlement_expired_at=entitlement_expired_at, show_courseware_link=show_courseware_link, cert_status=cert_status, can_refund_entitlement=can_refund_entitlement, can_unenroll=can_unenroll, credit_status=credit_status, show_email_settings=show_email_settings, course_mode_info=course_mode_info, is_paid_course=is_paid_course, is_course_blocked=is_course_blocked, verification_status=course_verification_status, course_requirements=course_requirements, dashboard_index=dashboard_index, share_settings=share_settings, user=user, related_programs=related_programs, display_course_modes_on_dashboard=display_course_modes_on_dashboard, show_consent_link=show_consent_link, enterprise_customer_name=enterprise_customer_name, resume_button_url=resume_button_url' />
             % endfor
 
             </ul>
@@ -229,7 +263,19 @@ from student.models import CourseEnrollment
             % endfor
             </div>
           % endif
+          <!-- Add Arrows -->
+          <div class="swiper-button-next far fa-angle-right"></div>
+          <div class="swiper-button-prev far fa-angle-left"></div>
         </div>
+        <!-- Add Pagination -->
+        <div class="swiper-pagination"></div>
+
+        <section class="ilt-calendar">
+          <header class="wrapper-header">
+            <h2 class="header">My upcoming ILT sessions</h2>
+          </header>
+        </section>
+
       </div>
       <div class="side-container">
         %if display_sidebar_account_activation_message:

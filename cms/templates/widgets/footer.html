@@ -1,3 +1,4 @@
+<%namespace name='static' file='/static_content.html'/>
 <%!
 from django.utils.translation import ugettext as _
 from django.urls import reverse
@@ -7,13 +8,19 @@ import pytz
 from cms.djangoapps.contentstore.config.waffle import waffle, ENABLE_ACCESSIBILITY_POLICY_PAGE
 %>
 
+<div class="wrapper-footer-nav wrapper">
+  <footer>
+    <img src="${static.url(u'images/studio-logo.png')}" class="logo-triboo"/>
+  </footer>
+</div>
+
 <div class="wrapper-footer wrapper">
   <footer class="primary" role="contentinfo">
 
     <div class="footer-content-primary">
-      <div class="colophon">
-        <p>&copy; ${datetime.now(pytz.timezone(settings.TIME_ZONE)).year} <a data-rel="edx.org" href="${marketing_link('ROOT')}" rel="external">${settings.PLATFORM_NAME}</a>.</p>
-      </div>
+      ## <div class="colophon">
+      ##   <p>&copy; ${settings.COPYRIGHT_YEAR} <a data-rel="edx.org" href="${marketing_link('ROOT')}" rel="external">${settings.PLATFORM_NAME}</a>.</p>
+      ## </div>
 
         <nav class="nav-peripheral" aria-label="${_("Policies")}">
           <ol>
@@ -27,14 +34,6 @@ from cms.djangoapps.contentstore.config.waffle import waffle, ENABLE_ACCESSIBILI
                 <a data-rel="edx.org" href="${marketing_link('PRIVACY')}">${_("Privacy Policy")}</a>
               </li>
             % endif
-            % if waffle().is_enabled(ENABLE_ACCESSIBILITY_POLICY_PAGE):
-              <li class="nav-item nav-peripheral-aar">
-                <a data-rel="edx.org" href="${reverse('accessibility')}">${_("Accessibility Accommodation Request")}</a>
-              </li>
-            %endif
-            <li class="nav-item">
-              <a data-rel="edx.org" id="lms-link" href="${settings.LMS_ROOT_URL}">${_("LMS")}</a>
-            </li>
           </ol>
         </nav>
     </div>
@@ -44,17 +43,19 @@ from cms.djangoapps.contentstore.config.waffle import waffle, ENABLE_ACCESSIBILI
         ## Site operators: Please do not remove this paragraph! This attributes back to edX and makes your acknowledgement of edX's trademarks clear.
         <p>
           ## Translators: 'EdX', 'edX', 'Studio', and 'Open edX' are trademarks of 'edX Inc.'. Please do not translate any of these trademarks and company names.
-          ${_("EdX, Open edX, Studio, and the edX and Open edX logos are registered trademarks or trademarks of {link_start}edX Inc.{link_end}").format(
-            link_start=u"<a data-rel='edx.org' href='https://www.edx.org/'>",
-            link_end=u"</a>"
-          )}
+          ## ${_("EdX, Open edX, Studio, and the edX and Open edX logos are registered trademarks or trademarks of {link_start}edX Inc.{link_end}").format(
+          ##   link_start=u"<a data-rel='edx.org' href='https://www.edx.org/'>",
+          ##   link_end=u"</a>"
+          ## )}
+          Copyright &copy; ${datetime.now(pytz.timezone(settings.TIME_ZONE)).year} <a href="${marketing_link('ABOUT')}">Learning Tribes</a>. ${_("All rights reserved.")}
         </p>
       </div>
 
       <div class="footer-about-openedx">
-        <a href="http://open.edx.org" title="${_("Powered by Open edX")}">
-          <img alt="${_("Powered by Open edX")}" src="https://files.edx.org/openedx-logos/edx-openedx-logo-tag.png">
-        </a>
+        ## <a href="http://open.edx.org" title="${_("Powered by Open edX")}">
+        ##   <img alt="${_("Powered by Open edX")}" src="https://files.edx.org/openedx-logos/edx-openedx-logo-tag.png">
+        ## </a>
+        ## <img src="${static.url(u'images/logo-triboo-white-S.png')}" class="logo-triboo"/>
       </div>
     </div>
   </footer>

@@ -17,12 +17,14 @@
 %>
 <%namespace name='static' file='../static_content.html'/>
 
-<div class="footer-language-selector">
-    <label for="footer-language-select">
-        <span class="icon fa fa-globe" aria-hidden="true"></span>
-        <span class="sr">${_("Choose Language")}</span>
-    </label>
+<div class="select-component footer-language-selector">
+
+    ##<label for="footer-language-select">
+    ##    <span class="icon fa fa-globe" aria-hidden="true"></span>
+    ##    <span class="sr">${_("Choose Language")}</span>
+    ##</label>
     <select id="footer-language-select" name="language" onchange="footerLanguageSelector.handleSelection(this)">
+        ##<option value=""></option>
         % for language in sorted(released_languages(), key=lambda x: x.code):
             <% language_name = Locale.parse(language.code.replace('_', '-'), sep='-').language_name %>
             % if language.code == LANGUAGE_CODE:
@@ -31,10 +33,130 @@
                 <option value="${language.code}">${language_name}</option>
             % endif
         % endfor
+        <option selected="selected" value="100" imageSrc="${static.url('images/country-icons/british.png')}">English</option>
+        <option value="101" imageSrc="${static.url('images/country-icons/french.png')}">French</option>
+        <option value="102" imageSrc="${static.url('images/country-icons/chinese.png')}">Chinese</option>
+        <option value="102" imageSrc="${static.url('images/country-icons/brazilian.png')}">Brazil</option>
+        <option value="102" imageSrc="${static.url('images/country-icons/american.png')}">United States</option>
     </select>
 </div>
 
 <script type="text/javascript">
+
+    class selectComponent {
+
+        constructor (){
+
+            let wrapper;
+            /* Look for any elements with the class "footer-language-selector": */
+            wrapper = document.querySelector(".footer-language-selector");
+
+            let selElmnt = this.selectEl = wrapper.querySelector('select');
+            /* For each element, create a new DIV that will act as the selected item: */
+            let dropdown = this.dropdown = document.createElement("div");
+            dropdown.setAttribute("class", "select-selected");
+            let icon = document.createElement("img");
+            let span = document.createElement("span");
+            dropdown.appendChild(icon);
+            dropdown.appendChild(span);
+            let selectedItem = selElmnt.children[selElmnt.selectedIndex];
+            span.innerText = selectedItem.innerText;
+            icon.src = selectedItem.getAttribute('imageSrc');
+            wrapper.appendChild(dropdown);
+
+            /* For each element, create a new DIV that will contain the option list: */
+            let panel = this.panel = document.createElement("ul");
+            panel.setAttribute("class", "select-items select-hide");
+            let selectedIndex = this.selectEl.selectedIndex;
+
+            for (let j = 0; j < selElmnt.length; j++) {
+                /* For each option in the original select element,
+                create a new DIV that will act as an option item: */
+                let item = document.createElement("li");
+                let img = document.createElement("img");
+                let span = document.createElement("span");
+                item.appendChild(img);
+                item.appendChild(span);
+                const option = selElmnt.options[j];
+                span.innerText = option.innerHTML;
+                img.src = option.getAttribute('imageSrc');
+
+                if (j == selectedIndex){
+                    item.classList.add('same-as-selected');
+                }
+
+                item.addEventListener("click", this.selectItem.bind(this));
+                panel.appendChild(item);
+            }
+            wrapper.appendChild(panel);
+
+            dropdown.addEventListener("click", this.togglePanel.bind(this));
+            document.querySelector('body:not(.select-component)').addEventListener("click", this.closePanel.bind(this))
+        }
+
+        togglePanel(e){
+            /* When the select box is clicked, close any other select boxes,
+            and open/close the current select box: */
+            e && e.stopPropagation();
+            this.closeAllSelect(this.dropdown);
+            this.dropdown.nextSibling.classList.toggle("select-hide");
+            this.dropdown.classList.toggle("select-arrow-active");
+        }
+
+        closePanel(){
+            this.closeAllSelect(this.dropdown);
+            this.dropdown.nextSibling.classList.add("select-hide");
+            this.dropdown.classList.remove("select-arrow-active");
+        }
+
+        selectItem (e) {
+            /* When an item is clicked, update the original select box,
+            and the selected item: */
+            let span = this.dropdown.querySelector('span');
+            let icon = this.dropdown.querySelector('img');
+
+            let li = e.currentTarget;
+            let liSpan = li.querySelector('span');
+            let liIcon = li.querySelector('img');
+
+            span.innerText = liSpan.innerText;
+            icon.setAttribute('src', liIcon.getAttribute('src'));
+
+            //this.panel.querySelector('li').classList.remove('same-as-selected');
+            this.panel.querySelectorAll('li').forEach(li=> li.classList.remove('same-as-selected'))
+            li.classList.add('same-as-selected');
+            this.togglePanel();
+            this.selectEl.selectedIndex = this.getIndex(li);
+        }
+
+        closeAllSelect(elmnt) {
+            /* A function that will close all select boxes in the document,
+            except the current select box: */
+            let panel, dropdown, arrNo = [];
+            panel = document.getElementsByClassName("select-items");
+            dropdown = document.getElementsByClassName("select-selected");
+            for (let i = 0; i < dropdown.length; i++) {
+                if (elmnt == dropdown[i]) {
+                    arrNo.push(i)
+                } else {
+                    dropdown[i].classList.remove("select-arrow-active");
+                }
+            }
+            for (let i = 0; i < panel.length; i++) {
+                if (arrNo.indexOf(i)) {
+                    x[i].classList.add("select-hide");
+                }
+            }
+        }
+
+        getIndex(liRef){
+            let nodes = Array.prototype.slice.call( this.panel.children );
+            return nodes.indexOf( liRef );
+        }
+    }
+
+    window.onload = new selectComponent();
+
     window.footerLanguageSelector = {
         ##
         ## Set the language cookie using the same settings as

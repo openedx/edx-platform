@@ -61,6 +61,7 @@ from openedx.core.release import RELEASE_LINE
     <script type="text/javascript" src="${static.url(jsi18n_path)}"></script>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="path_prefix" content="${EDX_ROOT_URL}">
+    <link rel="icon" type="image/x-icon" href="${static.url("images/favicon.ico")}" />
 
     <%static:css group='style-vendor'/>
     <%static:css group='style-vendor-tinymce-content'/>
@@ -98,7 +99,10 @@ from openedx.core.release import RELEASE_LINE
     <!-- view -->
     <div class="wrapper wrapper-view" dir="${static.dir_rtl()}">
       <% online_help_token = self.online_help_token() if hasattr(self, 'online_help_token') else None %>
+
+      <%block name="header">
       <%include file="widgets/header.html" args="online_help_token=online_help_token" />
+      </%block>
 
       <%
       banner_messages = list(PageLevelMessages.user_messages(request))
@@ -127,10 +131,13 @@ from openedx.core.release import RELEASE_LINE
         </div>
       </main>
 
-      % if user.is_authenticated:
-        <%include file="widgets/sock.html" args="online_help_token=online_help_token" />
-      % endif
+      ##% if user.is_authenticated:
+      ##  <%include file="widgets/sock.html" args="online_help_token=online_help_token" />
+      ##% endif
+
+      <%block name="footer">
       <%include file="widgets/footer.html" />
+      </%block>
 
       <div id="page-notification"></div>
     </div>

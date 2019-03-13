@@ -52,6 +52,7 @@ module.exports = Merge.smart({
         PasswordResetConfirmation: './lms/static/js/student_account/components/PasswordResetConfirmation.jsx',
         StudentAccountDeletion: './lms/static/js/student_account/components/StudentAccountDeletion.jsx',
         StudentAccountDeletionInitializer: './lms/static/js/student_account/StudentAccountDeletionInitializer.js',
+        SwiperInitializer: './lms/static/js/dashboard-extend/SwiperInitializer.js',
 
         // Learner Dashboard
         EntitlementFactory: './lms/static/js/learner_dashboard/course_entitlement_factory.js',

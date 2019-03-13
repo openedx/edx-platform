@@ -27,11 +27,38 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 %>
 
 <div class="nav-links">
+  ## Dashboard, Catalogue, My courses, Analytics, Studio
   <div class="main">
     % if show_dashboard_tabs:
       <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
         <a class="${'active ' if reverse('dashboard') == request.path else ''}tab-nav-link" href="${reverse('dashboard')}">
-          ${_("Courses")}
+          <span class="label"><span class="icon far fa-home-alt" aria-hidden="true"></span></span>
+          ${_("Dashboard")}
+        </a>
+      </div>
+      <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
+        <a class="tab-nav-link" href="${reverse('dashboard')}">
+          <!--alternatives for icon; fa-building grip-horizontal th -->
+          <span class="label"><span class="icon far fa-grip-vertical" aria-hidden="true"></span></span>
+          ${_("Catalog")}
+        </a>
+      </div>
+      <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
+        <a class="tab-nav-link" href="${reverse('dashboard')}">
+          <span class="label"><span class="icon far fa-file-alt" aria-hidden="true"></span></span>
+          ${_("My Courses")}
+        </a>
+      </div>
+      <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
+        <a class="tab-nav-link" href="${reverse('dashboard')}">
+          <span class="label"><span class="icon far fa-analytics" aria-hidden="true"></span></span>
+          ${_("Analytics")}
+        </a>
+      </div>
+      <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
+        <a class="tab-nav-link" href="${reverse('dashboard')}">
+          <span class="label"><span class="icon far fa-edit" aria-hidden="true"></span></span>
+          ${_("Studio")}
         </a>
       </div>
       % if show_program_listing:
@@ -67,9 +94,9 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
         </a>
       </div>
     % endif
-    <div class="mobile-nav-item hidden-mobile nav-item">
-      <a class="help-link" href="${help_link}" target="_blank">${_("Help")}</a>
-    </div>
+    ##<div class="mobile-nav-item hidden-mobile nav-item">
+    ##  <a class="help-link" href="${help_link}" target="_blank">${_("Help")}</a>
+    ##</div>
     <%include file="user_dropdown.html"/>
   </div>
 </div>

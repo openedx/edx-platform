@@ -5,6 +5,9 @@
   from django.utils.translation import ugettext as _
   from branding.api import get_footer
   from openedx.core.djangoapps.lang_pref.api import footer_language_selector_is_enabled
+  from django.conf import settings
+  from datetime import datetime
+  import pytz
 %>
 <% footer = get_footer(is_secure=is_secure) %>
 <%namespace name='static' file='static_content.html'/>
@@ -69,23 +72,14 @@
       % endif
     >
       <div class="colophon">
-        <nav class="nav-colophon" aria-label="${_('About')}">
-          <ol>
-              % for item_num, link in enumerate(footer['navigation_links'], start=1):
-              <li class="nav-colophon-0${item_num}">
-                <a id="${link['name']}" href="${link['url']}">${link['title']}</a>
-              </li>
-              % endfor
-          </ol>
-        </nav>
 
-        % if context.get('include_language_selector', footer_language_selector_is_enabled()):
-            <%include file="${static.get_template_path('widgets/footer-language-selector.html')}"/>
-        % endif
+
+        ##% if context.get('include_language_selector', footer_language_selector_is_enabled()):
+        ##    <%include file="${static.get_template_path('widgets/footer-language-selector.html')}"/>
+        ##% endif
 
         <div class="wrapper-logo">
-          <p>
-            <a href="/">
+            ##<a href="/">
               ## The default logo is a placeholder.
               ## You can either replace this link entirely or update
               ## the FOOTER_ORGANIZATION_IMAGE in Django settings.
@@ -93,39 +87,79 @@
               ## can be included in the footer on other sites
               ## (e.g. a blog or marketing front-end) to provide a consistent
               ## user experience.  See the branding app for details.
-              <img alt="organization logo" src="${footer['logo_image']}">
-            </a>
-          </p>
+              ##<img alt="organization logo" src="${footer['logo_image']}">
+              <figure>
+                <img src="${static.url(u'images/studio-logo.png')}" class="logo-triboo"/>
+                <figcaption>Lorem ipsum dolor sit amet consectetur adipiscing elit aliquam eget nullam pellentesque aliquam curabitur cociis.</figcaption>
+              </figure>
+            ##</a>
         </div>
 
-        ## Site operators: Please do not remove this paragraph! This attributes back to edX and makes your acknowledgement of edX's trademarks clear.
-        <p class="copyright">${footer['copyright']} ${u" | {icp}".format(icp=getattr(settings,'ICP_LICENSE')) if getattr(settings,'ICP_LICENSE',False) else ""}</p>
-
-        <nav class="nav-legal" aria-label="${_('Legal')}">
-          <ul>
-            % for item_num, link in enumerate(footer['legal_links'], start=1):
-              <li class="nav-legal-0${item_num}">
-                <a href="${link['url']}">${link['title']}</a>
+        <nav class="nav-colophon" aria-label="${_('About')}">
+          <h6>navigation</h6>
+          <ol>
+              <%
+                links = [
+                  {'title':'Dashboard', 'url':'#', 'name':'dashboard'},
+                  {'title':'Explore', 'url':'#', 'name':'explore'},
+                  {'title':'My Courses', 'url':'#', 'name':'my-courses'},
+                  {'title':'My Account', 'url':'#', 'name':'my-account'},
+                ]
+              %>
+              % for item_num, link in enumerate(links, start=1):
+              <li class="nav-colophon-0${item_num}">
+                <a id="${link['name']}" href="${link['url']}">${link['title']}</a>
               </li>
-            % endfor
-            <li><a href="${footer['edx_org_link']['url']}">${footer['edx_org_link']['text']}</a></li>
-          </ul>
+              % endfor
+
+          </ol>
         </nav>
+
+        <nav class="nav-other-systems">
+          <h6>admin space</h6>
+          <ol>
+            <li><a href="#">Studio</a></li>
+            <li><a href="#">Analytics</a></li>
+            <li><a href="#">User Management System</a></li>
+          </ol>
+        </nav>
+
+        <%include file="${static.get_template_path('widgets/footer-language-selector.html')}"/>
+
+        ## Site operators: Please do not remove this paragraph! This attributes back to edX and makes your acknowledgement of edX's trademarks clear.
+        ##<p class="copyright">${footer['copyright']} ${u" | {icp}".format(icp=getattr(settings,'ICP_LICENSE')) if getattr(settings,'ICP_LICENSE',False) else ""}</p>
+
+        ##<nav class="nav-legal" aria-label="${_('Legal')}">
+        ##  <ul>
+        ##    % for item_num, link in enumerate(footer['legal_links'], start=1):
+        ##      <li class="nav-legal-0${item_num}">
+        ##        <a href="${link['url']}">${link['title']}</a>
+        ##      </li>
+        ##    % endfor
+        ##    <li><a href="${footer['edx_org_link']['url']}">${footer['edx_org_link']['text']}</a></li>
+        ##  </ul>
+        ##</nav>
       </div>
+
+
+
 
       ## Please leave this link and use one of the logos provided
       ## The OpenEdX link may be hidden when this view is served
       ## through an API to partner sites (such as marketing sites or blogs),
       ## which are not technically powered by OpenEdX.
-      % if not hide_openedx_link:
-      <div class="footer-about-openedx">
-        <p>
-          <a href="${footer['openedx_link']['url']}">
-            <img src="${footer['openedx_link']['image']}" alt="${footer['openedx_link']['title']}" width="140" />
-          </a>
-        </p>
-      </div>
-      % endif
+      ##% if not hide_openedx_link:
+      ##<div class="footer-about-openedx">
+      ##  <p>
+      ##    <a href="${footer['openedx_link']['url']}">
+      ##      <img src="${footer['openedx_link']['image']}" alt="${footer['openedx_link']['title']}" width="140" />
+      ##    </a>
+      ##  </p>
+      ##</div>
+      ##% endif
+    </footer>
+    <footer class="copyright-wrapper">
+      <p class="copyright">Copyright &copy; ${datetime.now(pytz.timezone(settings.TIME_ZONE)).year} <a href="${marketing_link('ABOUT')}">Learning Tribes</a>. ${_("All rights reserved.")}</p>
     </footer>
   </div>
 % endif

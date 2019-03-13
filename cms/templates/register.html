@@ -1,3 +1,4 @@
+<%namespace name='static' file='/static_content.html'/>
 <%inherit file="base.html" />
 <%def name="online_help_token()"><% return "register" %></%def>
 <%!
@@ -8,22 +9,34 @@ from django.urls import reverse
 <%block name="title">${_("Sign Up")}</%block>
 <%block name="bodyclass">not-signedin view-signup</%block>
 
+<%block name="header" />
 <%block name="content">
 
 <div class="wrapper-content wrapper">
   <section class="content">
-    <header>
-      <h1 class="title title-1">${_("Sign Up for {studio_name}").format(studio_name=settings.STUDIO_NAME)}</h1>
-      <a href="${reverse('login')}" class="action action-signin">${_("Already have a {studio_name} Account? Sign in").format(studio_name=settings.STUDIO_SHORT_NAME)}</a>
-    </header>
+    ##<header>
+    ##  <h1 class="title title-1">${_("Sign Up for {studio_name}").format(studio_name=settings.STUDIO_NAME)}</h1>
+    ##  <a href="${reverse('login')}" class="action action-signin">${_("Already have a {studio_name} Account? Sign in").format(studio_name=settings.STUDIO_SHORT_NAME)}</a>
+    ##</header>
 
-    <p class="introduction">${_("Ready to start creating online courses? Sign up below and start creating your first {platform_name} course today.").format(platform_name=settings.PLATFORM_NAME)}</p>
+    ##<p class="introduction">${_("Ready to start creating online courses? Sign up below and start creating your first {platform_name} course today.").format(platform_name=settings.PLATFORM_NAME)}</p>
+
+    <aside>
+      <figure>
+        <img src='${static.url("/images/login-illustration.jpg")}' />
+        <figcaption><a href="${reverse('login')}" class="action action-signin">${_("Already have a {studio_name} Account? Sign in").format(studio_name=settings.STUDIO_SHORT_NAME)}</a></figcaption>
+      </figure>
+    </aside>
 
     <article class="content-primary" role="main">
       <form id="register_form" method="post">
         <div id="register_error" name="register_error" class="message message-status message-status error">
         </div>
 
+        <figure>
+          <a class="brand-link" href="/"><img src="${static.url('/images/studio-logo.png')}"></a>
+          <figcaption><p class="introduction">${_("Ready to start creating online courses? Sign up below and start creating your first {platform_name} course today.").format(platform_name=settings.PLATFORM_NAME)}</p></figcaption>
+        </figure>
         <fieldset>
           <legend class="sr">${_("Required Information to Sign Up for {studio_name}").format(studio_name=settings.STUDIO_NAME)}</legend>
 
@@ -83,7 +96,7 @@ from django.urls import reverse
       </form>
     </article>
 
-    <aside class="content-supplementary" role="complementary">
+    <!--<aside class="content-supplementary" role="complementary">
       <h2 class="sr">${_("Common {studio_name} Questions").format(studio_name=settings.STUDIO_SHORT_NAME)}</h2>
 
       <div class="bit">
@@ -104,10 +117,11 @@ from django.urls import reverse
         <h3 class="title-3">${_("I've never authored a course online before. Is there help?")}</h3>
         <p>${_("Absolutely. We have created an online course, edX101, that describes some best practices: from filming video, creating exercises, to the basics of running an online course. Additionally, we're always here to help, just drop us a note.")}</p>
       </div>
-    </aside>
+    </aside>-->
   </section>
 </div>
 </%block>
+<%block name="footer" />
 
 <%block name="requirejs">
     require(["js/factories/register"], function (RegisterFactory) {

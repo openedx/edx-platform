@@ -8,7 +8,7 @@
             return function(options) {
                 var $logistrationElement = $('#login-and-registration-container');
 
-                new AccessView(_.extend(options, {el: $logistrationElement}));
+                return new AccessView(_.extend(options, {el: $logistrationElement}));
             };
         }
     );
