@@ -266,6 +266,12 @@ class ReplaceUsernamesViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         headers = {'HTTP_AUTHORIZATION': 'JWT ' + token}
         return headers
 
+    def call_api(self, user, data):
+        """ Helper function to call API with data """
+        data = json.dumps(data)
+        headers = self.build_jwt_headers(user)
+        return self.client.post(self.url, data, content_type='application/json', **headers)
+
     @ddt.data(
         [{}, {}],
         {},
@@ -273,11 +279,10 @@ class ReplaceUsernamesViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     )
     def test_bad_schema(self, mapping_data):
         """ Verify the endpoint rejects bad data schema """
-        headers = self.build_jwt_headers(self.client_user)
         data = {
             "username_mappings": mapping_data
         }
-        response = self.client.post(self.url, data, **headers)
+        response = self.call_api(self.url, self.client_user, data)
         self.assertEqual(response.status_code, 400)
 
     def test_auth(self):
@@ -295,13 +300,11 @@ class ReplaceUsernamesViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 
         # Test non-service worker
         random_user = UserFactory()
-        headers = self.build_jwt_headers(random_user)
-        response = self.client.post(self.url, data, **headers)
+        response = self.call_api(self.url, random_user, data)
         self.assertEqual(response.status_code, 403)
 
         # Test service worker
-        headers = self.build_jwt_headers(self.service_user)
-        response = self.client.post(self.url, data, **headers)
+        response = self.call_api(self.url, self.client_user, data)
         self.assertEqual(response.status_code, 200)
 
     def test_basic(self):
@@ -316,8 +319,7 @@ class ReplaceUsernamesViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             'successful_replacements': data["username_mappings"]
         }
         self.register_get_username_replacement_response(self.user)
-        headers = self.build_jwt_headers(self.client_user)
-        response = self.client.post(self.url, data, **headers)
+        response = self.call_api(self.url, self.client_user, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, expected_response)
 
