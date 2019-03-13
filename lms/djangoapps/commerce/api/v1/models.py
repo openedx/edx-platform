@@ -12,6 +12,8 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 
 log = logging.getLogger(__name__)
 
+UNDEFINED = object()
+
 
 class Course(object):
     """ Pseudo-course model used to group CourseMode objects. """
@@ -19,10 +21,12 @@ class Course(object):
     modes = None
     _deleted_modes = None
 
-    def __init__(self, id, modes, verification_deadline=None):  # pylint: disable=redefined-builtin
+    def __init__(self, id, modes, **kwargs):  # pylint: disable=redefined-builtin
         self.id = CourseKey.from_string(unicode(id))  # pylint: disable=invalid-name
         self.modes = list(modes)
-        self.verification_deadline = verification_deadline
+        self.verification_deadline = UNDEFINED
+        if 'verification_deadline' in kwargs:
+            self.verification_deadline = kwargs['verification_deadline']
         self._deleted_modes = []
 
     @property
@@ -59,8 +63,10 @@ class Course(object):
     def save(self, *args, **kwargs):  # pylint: disable=unused-argument
         """ Save the CourseMode objects to the database. """
 
-        # Override the verification deadline for the course (not the individual modes)
-        VerificationDeadline.set_deadline(self.id, self.verification_deadline, is_explicit=True)
+        if self.verification_deadline is not UNDEFINED:
+            # Override the verification deadline for the course (not the individual modes)
+            # This will delete verification deadlines for the course if self.verification_deadline is null
+            VerificationDeadline.set_deadline(self.id, self.verification_deadline, is_explicit=True)
 
         for mode in self.modes:
             mode.course_id = self.id
@@ -73,7 +79,10 @@ class Course(object):
 
     def update(self, attrs):
         """ Update the model with external data (usually passed via API call). """
-        self.verification_deadline = attrs.get('verification_deadline')
+        # There are possible downstream effects of settings self.verification_deadline to null,
+        # so don't assign it a value here unless it is specifically included in attrs.
+        if 'verification_deadline' in attrs:
+            self.verification_deadline = attrs.get('verification_deadline')
 
         existing_modes = {mode.mode_slug: mode for mode in self.modes}
         merged_modes = set()

@@ -128,8 +128,9 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
 
     @ddt.data('post', 'put')
     def test_authorization_required(self, method):
-        self.user.user_permissions.clear()
         """ Verify create/edit operations require appropriate permissions. """
+        self.user.user_permissions.clear()
+
         response = getattr(self.client, method)(self.path, content_type=JSON_CONTENT_TYPE)
         self.assertEqual(response.status_code, 403)
 
@@ -235,6 +236,32 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
 
         self.assertEqual(response.status_code, 200)
         self.assertIsNone(VerificationDeadline.deadline_for_course(self.course.id))
+
+    def test_update_verification_deadline_left_alone(self):
+        """
+        When the course's verification deadline is set and an update request doesn't
+        include it, we should take no action on it.
+        """
+        verification_deadline = datetime(year=1915, month=5, day=7, tzinfo=pytz.utc)
+        response, __ = self._get_update_response_and_expected_data(None, verification_deadline)
+        self.assertEqual(VerificationDeadline.deadline_for_course(self.course.id), verification_deadline)
+
+        verified_mode = CourseMode(
+            mode_slug=u'verified',
+            min_price=200,
+            currency=u'USD',
+            sku=u'ABC123',
+            bulk_sku=u'BULK-ABC123',
+            expiration_datetime=None
+        )
+        updated_data = self._serialize_course(self.course, [verified_mode], None)
+        # don't include the verification_deadline key in the PUT request
+        updated_data.pop('verification_deadline', None)
+
+        response = self.client.put(self.path, json.dumps(updated_data), content_type=JSON_CONTENT_TYPE)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(VerificationDeadline.deadline_for_course(self.course.id), verification_deadline)
 
     def test_remove_upgrade_deadline(self):
         """

@@ -10,7 +10,7 @@ from rest_framework import serializers
 from course_modes.models import CourseMode
 from xmodule.modulestore.django import modulestore
 
-from .models import Course
+from .models import Course, UNDEFINED
 
 
 class CourseModeSerializer(serializers.ModelSerializer):
@@ -56,11 +56,22 @@ def validate_course_id(course_id):
         )
 
 
+class PossiblyUndefinedDateTimeField(serializers.DateTimeField):
+    """
+    We need a DateTime serializer that can deal with the non-JSON-serializable
+    UNDEFINED object.
+    """
+    def to_representation(self, value):
+        if value is UNDEFINED:
+            return None
+        return super(PossiblyUndefinedDateTimeField, self).to_representation(value)
+
+
 class CourseSerializer(serializers.Serializer):
     """ Course serializer. """
     id = serializers.CharField(validators=[validate_course_id])  # pylint: disable=invalid-name
     name = serializers.CharField(read_only=True)
-    verification_deadline = serializers.DateTimeField(format=None, allow_null=True, required=False)
+    verification_deadline = PossiblyUndefinedDateTimeField(format=None, allow_null=True, required=False)
     modes = CourseModeSerializer(many=True)
 
     def validate(self, attrs):
@@ -87,11 +98,23 @@ class CourseSerializer(serializers.Serializer):
         return attrs
 
     def create(self, validated_data):
-        """Create course modes for a course. """
+        """
+        Create course modes for a course.
+
+        arguments:
+            validated_data: The result of self.validate() - a dictionary containing 'id', 'modes', and optionally
+            a 'verification_deadline` key.
+        returns:
+            A ``commerce.api.v1.models.Course`` object.
+        """
+        kwargs = {}
+        if 'verification_deadline' in validated_data:
+            kwargs['verification_deadline'] = validated_data['verification_deadline']
+
         course = Course(
             validated_data["id"],
             self._new_course_mode_models(validated_data["modes"]),
-            verification_deadline=validated_data["verification_deadline"]
+            **kwargs
         )
         course.save()
         return course
