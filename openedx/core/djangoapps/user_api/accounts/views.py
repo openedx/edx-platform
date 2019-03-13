@@ -1153,17 +1153,16 @@ class UsernameReplacementView(APIView):
             )
             return False
         if num_rows_changed == 0:
-            log.warning(
+            log.info(
                 u"Unable to change username from %s to %s because %s doesn't exist.",
                 current_username,
                 new_username,
                 current_username,
             )
-            return False
-
-        log.info(
-            u"Successfully changed username from %s to %s.",
-            current_username,
-            new_username,
-        )
+        else:
+            log.info(
+                u"Successfully changed username from %s to %s.",
+                current_username,
+                new_username,
+            )
         return True
