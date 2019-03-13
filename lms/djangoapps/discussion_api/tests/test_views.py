@@ -236,13 +236,14 @@ class RetireViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         pass
 
 
+@ddt.ddt
 @httpretty.activate
 @mock.patch('django.conf.settings.USERNAME_REPLACEMENT_WORKER', 'test_replace_username_service_worker')
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
-class ReplaceUsernameViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
-    """Tests for ReplaceUsernameView"""
+class ReplaceUsernamesViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
+    """Tests for ReplaceUsernamesView"""
     def setUp(self):
-        super(ReplaceUsernameViewTest, self).setUp()
+        super(ReplaceUsernamesViewTest, self).setUp()
         self.client_user = UserFactory()
         self.client_user.username = "test_replace_username_service_worker"
         self.new_username = "test_username_replacement"
@@ -265,46 +266,60 @@ class ReplaceUsernameViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         headers = {'HTTP_AUTHORIZATION': 'JWT ' + token}
         return headers
 
-    def test_missing_params(self):
+    @ddt.data(
+        [{}, {}],
+        {},
+        [{"test_key": "test_value", "test_key_2": "test_value_2"}]
+    )
+    def test_bad_schema(self, mapping_data):
+        """ Verify the endpoint rejects bad data schema """
         headers = self.build_jwt_headers(self.client_user)
-        # Using this instead of ddt so we can access self.user
-        bad_post_contents = (
-            {},
-            {"current_username": self.user.username},
-            {"new_username": "test_username_replacement"},
-        )
-        for data in bad_post_contents:
-            response = self.client.post(self.url, data, **headers)
-            self.assert_response_correct(response, 400, "")
+        data = {
+            "username_mappings": mapping_data
+        }
+        response = self.client.post(self.url, data, **headers)
+        self.assertEqual(response.status_code, 400)
+
+    def test_auth(self):
+        """ Verify the endpoint only works with the service worker """
+        data = {
+            "username_mappings": [
+                {"test_username_1": "test_new_username_1"},
+                {"test_username_2": "test_new_username_2"}
+            ]
+        }
+
+        # Test unauthenticated
+        response = self.client.post(self.url, data)
+        self.assertEqual(response.status_code, 401)
+
+        # Test non-service worker
+        random_user = UserFactory()
+        headers = self.build_jwt_headers(random_user)
+        response = self.client.post(self.url, data, **headers)
+        self.assertEqual(response.status_code, 403)
+
+        # Test service worker
+        headers = self.build_jwt_headers(self.service_user)
+        response = self.client.post(self.url, data, **headers)
+        self.assertEqual(response.status_code, 200)
 
     def test_basic(self):
         """ Check successful replacement """
+        data = {
+            "username_mappings": [
+                {self.user.username: self.new_username},
+            ]
+        }
+        expected_response = {
+            'failed_replacements': [],
+            'successful_replacements': data["username_mappings"]
+        }
         self.register_get_username_replacement_response(self.user)
         headers = self.build_jwt_headers(self.client_user)
-        data = {"current_username": self.user.username, "new_username": self.new_username}
         response = self.client.post(self.url, data, **headers)
-        self.assert_response_correct(response, 204, "")
-
-    def test_nonexistant_user(self):
-        self.register_get_username_replacement_response(self.user)
-        headers = self.build_jwt_headers(self.client_user)
-        data = {"current_username": "non-existant-user", "new_username": self.new_username}
-        response = self.client.post(self.url, data, **headers)
-        self.assert_response_correct(response, 404, "")
-
-    def test_client_404(self):
-        self.register_get_username_replacement_response(self.user, status=404)
-        headers = self.build_jwt_headers(self.client_user)
-        data = {"current_username": self.user.username, "new_username": self.new_username}
-        response = self.client.post(self.url, data, **headers)
-        self.assert_response_correct(response, 404, "")
-
-    def test_client_500(self):
-        self.register_get_username_replacement_response(self.user, status=500)
-        headers = self.build_jwt_headers(self.client_user)
-        data = {"current_username": self.user.username, "new_username": self.new_username}
-        response = self.client.post(self.url, data, **headers)
-        self.assert_response_correct(response, 500, "")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, expected_response)
 
     def test_not_authenticated(self):
         """
