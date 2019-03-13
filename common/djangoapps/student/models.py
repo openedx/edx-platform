@@ -54,7 +54,7 @@ from edx_django_utils.cache import RequestCache
 import lms.lib.comment_client as cc
 from student.signals import UNENROLL_DONE, ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED
 from lms.djangoapps.certificates.models import GeneratedCertificate
-from course_modes.models import CourseMode, get_cosmetic_display_price
+from course_modes.models import CourseMode, get_cosmetic_verified_display_price
 from courseware.models import (
     CourseDynamicUpgradeDeadlineConfiguration,
     DynamicUpgradeDeadlineConfiguration,
@@ -1077,7 +1077,7 @@ class CourseEnrollment(models.Model):
 
     @property
     def course_price(self):
-        return get_cosmetic_display_price(self.course)
+        return get_cosmetic_verified_display_price(self.course)
 
     @property
     def course_id(self):
