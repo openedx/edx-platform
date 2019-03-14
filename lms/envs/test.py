@@ -551,6 +551,10 @@ COMPREHENSIVE_THEME_LOCALE_PATHS = [REPO_ROOT / "themes/conf/locale", ]
 
 LMS_ROOT_URL = "http://localhost:8000"
 
+# TODO (felipemontoya): This key is only needed during lettuce tests.
+# To be removed during https://openedx.atlassian.net/browse/DEPR-19
+FRONTEND_LOGOUT_URL = LMS_ROOT_URL + '/logout'
+
 ECOMMERCE_API_URL = 'https://ecommerce.example.com/api/v2/'
 ENTERPRISE_API_URL = 'http://enterprise.example.com/enterprise/api/v1/'
 ENTERPRISE_CONSENT_API_URL = 'http://enterprise.example.com/consent/api/v1/'
