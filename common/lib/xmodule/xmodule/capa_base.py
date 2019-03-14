@@ -10,7 +10,6 @@ import struct
 import sys
 import traceback
 
-from django.conf import settings
 from pytz import utc
 from django.utils.encoding import smart_text
 from six import text_type
@@ -36,8 +35,6 @@ _ = lambda text: text
 NUM_RANDOMIZATION_BINS = 20
 # Never produce more than this many different seeds, no matter what.
 MAX_RANDOMIZATION_BINS = 1000
-
-FEATURES = getattr(settings, 'FEATURES', {})
 
 
 class SHOWANSWER(object):
@@ -123,6 +120,11 @@ class CapaMixin(ScorableXBlockMixin):
         if self.seed is None:
             self.choose_new_seed()
 
+            # Need the problem location in openendedresponse to send out.  Adding
+            # it to the system here seems like the least clunky way to get it
+            # there.
+            self.runtime.set('location', text_type(self.location))
+
         try:
             # TODO (vshnayder): move as much as possible of this work and error
             # checking to descriptor load time
@@ -163,7 +165,7 @@ class CapaMixin(ScorableXBlockMixin):
                         msg=msg,
                     )
                 )
-                self._lcp = self.new_lcp(self.get_state_for_lcp(), text=problem_text)
+                self.lcp = self.new_lcp(self.get_state_for_lcp(), text=problem_text)
             else:
                 # add extra info and raise
                 raise Exception(msg), None, sys.exc_info()[2]

@@ -5,6 +5,7 @@ import re
 import sys
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from lxml import etree
 from pkg_resources import resource_string
 from web_fragments.fragment import Fragment
@@ -19,20 +20,27 @@ from xmodule.raw_module import RawDescriptor
 from xmodule.contentstore.django import contentstore
 from xmodule.util.misc import escape_html_characters
 from xmodule.util.sandboxing import get_python_lib_zip
-from xmodule.x_module import HTMLSnippet, ResourceTemplates, XModuleMixin, XModuleToXBlockMixin
+from xmodule.util.xmodule_django import add_webpack_to_fragment
+from xmodule.x_module import HTMLSnippet, ResourceTemplates, shim_xmodule_js, XModuleMixin, XModuleToXBlockMixin
 from xmodule.xml_module import XmlParserMixin
 
-from .capa_base import _, CapaMixin, ComplexEncoder, FEATURES, RANDOMIZATION, Randomization, SHOWANSWER
+from .capa_base import _, CapaMixin, ComplexEncoder, RANDOMIZATION, Randomization, SHOWANSWER
 from .fields import Date, Timedelta, ScoreField
 
 log = logging.getLogger("edx.courseware")
 
 
+try:
+    FEATURES = getattr(settings, 'FEATURES', {})
+except ImproperlyConfigured:
+    FEATURES = {}
+
+
 @XBlock.wants('user')  # pylint: disable=abstract-method
 @XBlock.needs('i18n')
 class ProblemBlock(
-        CapaMixin, HTMLSnippet, ResourceTemplates,
-        RawDescriptorMixin, XmlParserMixin, XModuleMixin, XModuleToXBlockMixin):
+        CapaMixin, ResourceTemplates,
+        RawDescriptorMixin, XmlParserMixin, XModuleToXBlockMixin, XModuleMixin):
     """
     Define the possible fields for a Capa problem
     """
@@ -180,24 +188,44 @@ class ProblemBlock(
 
     icon_class = 'problem'
 
-    js = {
-        'js': [
-            resource_string(__name__, 'js/src/javascript_loader.js'),
-            resource_string(__name__, 'js/src/capa/display.js'),
-            resource_string(__name__, 'js/src/collapsible.js'),
-            resource_string(__name__, 'js/src/capa/imageinput.js'),
-            resource_string(__name__, 'js/src/capa/schematic.js'),
-        ]
-    }
+    class CapaModule(HTMLSnippet):
 
-    js_module_name = "Problem"
-    css = {'scss': [resource_string(__name__, 'css/capa/display.scss')]}
+        js = {
+            'js': [
+                resource_string(__name__, 'js/src/javascript_loader.js'),
+                resource_string(__name__, 'js/src/capa/display.js'),
+                resource_string(__name__, 'js/src/collapsible.js'),
+                resource_string(__name__, 'js/src/capa/imageinput.js'),
+                resource_string(__name__, 'js/src/capa/schematic.js'),
+            ]
+        }
+
+        js_module_name = "Problem"
+        css = {'scss': [resource_string(__name__, 'css/capa/display.scss')]}
+
+    class CapaDescriptor(HTMLSnippet):
+
+        js = {'js': [resource_string(__name__, 'js/src/problem/edit.js')]}
+        js_module_name = "MarkdownEditingDescriptor"
+
+        css = {
+            'scss': [
+                resource_string(__name__, 'css/editor/edit.scss'),
+                resource_string(__name__, 'css/problem/edit.scss')
+            ]
+        }
+
+    descriptor_class = CapaDescriptor
+    module_class = CapaModule
 
     def student_view(self, _context):
         """
         Return the student view.
         """
-        return Fragment(self.get_html())
+        fragment = Fragment(self.get_html())
+        add_webpack_to_fragment(fragment, self.module_class.__name__)
+        shim_xmodule_js(self.module_class, fragment)
+        return fragment
 
     def author_view(self, context):
         """
@@ -317,15 +345,7 @@ class ProblemBlock(
     show_in_read_only_mode = True
     template_dir_name = 'problem'
     mako_template = "widgets/problem-edit.html"
-    js = {'js': [resource_string(__name__, 'js/src/problem/edit.js')]}
-    js_module_name = "MarkdownEditingDescriptor"
     has_author_view = True
-    css = {
-        'scss': [
-            resource_string(__name__, 'css/editor/edit.scss'),
-            resource_string(__name__, 'css/problem/edit.scss')
-        ]
-    }
 
     # The capa format specifies that what we call max_attempts in the code
     # is the attribute `attempts`. This will do that conversion

@@ -18,8 +18,17 @@ from docopt import docopt
 from path import Path as path
 
 from xmodule.x_module import XModuleDescriptor
+from capa_module import ProblemBlock
+
 
 LOG = logging.getLogger(__name__)
+
+
+# List of XBlocks which use this static content setup.
+# Should only be used for XModules being converted to XBlocks.
+XBLOCK_CLASSES = [
+    ProblemBlock,
+]
 
 
 def write_module_styles(output_root):
@@ -48,15 +57,19 @@ def _list_descriptors():
         desc for desc in [
             desc for (_, desc) in XModuleDescriptor.load_classes()
         ]
+    ] + [
+        xblock_class.descriptor_class for xblock_class in XBLOCK_CLASSES
     ]
 
 
 def _list_modules():
     """Return a list of all registered XModule classes."""
     return [
-        desc.module_class
-        for desc
-        in _list_descriptors()
+        desc.module_class for desc in [
+            desc for (_, desc) in XModuleDescriptor.load_classes()
+        ]
+    ] + [
+        xblock_class.module_class for xblock_class in XBLOCK_CLASSES
     ]
 
 
