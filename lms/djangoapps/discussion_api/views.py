@@ -682,6 +682,7 @@ class ReplaceUsernamesView(APIView):
                 return False
         return True
 
+
 class CourseDiscussionSettingsAPIView(DeveloperErrorViewMixin, APIView):
     """
     **Use Cases**
