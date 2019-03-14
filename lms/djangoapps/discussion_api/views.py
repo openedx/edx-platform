@@ -658,12 +658,20 @@ class ReplaceUsernamesView(APIView):
             )
             return True
         except comment_client.CommentClientRequestError as exc:
-            log.exception(
-                u"Unable to change username from %s to %s in forums because forums API call failed with: %s.",
-                current_username,
-                new_username,
-                exc,
-            )
+            if exc.status_code == 404:
+                log.info(
+                    u"Unable to change username from %s to %s in forums because user doesn't exist in forums",
+                    current_username,
+                    new_username,
+                )
+                return True
+            else:
+                log.exception(
+                    u"Unable to change username from %s to %s in forums because forums API call failed with: %s.",
+                    current_username,
+                    new_username,
+                    exc,
+                )
             return False
 
         log.info(
