@@ -631,18 +631,12 @@ def _get_catalog_data_for_course(course_key):
 
     catalog_data = {}
     course_run_fields = []
-    log.info(u"language specific template is:{lang} and include hours of effort is:{hof} for the course:{course_key}"
-             .format(lang=course_certificate_settings.language_specific_templates_enabled,
-                     hof=course_certificate_settings.include_hours_of_effort,
-                     course_key=course_key))
     if course_certificate_settings.language_specific_templates_enabled:
         course_run_fields.append('content_language')
     if course_certificate_settings.include_hours_of_effort:
         course_run_fields.extend(['weeks_to_complete', 'max_effort'])
 
     if course_run_fields:
-        log.info(u'requesting following fields:{course_run_fields} for the course:{course_key}'.
-                 format(course_run_fields=course_run_fields, course_key=course_key))
         course_run_data = get_course_run_details(course_key, course_run_fields)
         if course_run_data.get('weeks_to_complete') and course_run_data.get('max_effort'):
             try:
@@ -675,16 +669,11 @@ def _get_custom_template_and_language(course_id, course_mode, course_language):
     template = get_certificate_template(course_id, course_mode, closest_released_language)
 
     if template and template.language:
-        log.info("Returning template for course: {course_id} and template language is {language}".format(
-            course_id=course_id, language=template.language))
         return (template, closest_released_language)
     elif template:
         user_language = translation.get_language()
-        log.info("Returning template for course: {course_id} and template language is returned from settings"
-                 " {language}".format(course_id=course_id, language=user_language))
         return (template, user_language)
     else:
-        log.info("No template found for course: {course_id}" .format(course_id=course_id))
         return (None, None)
 
 
