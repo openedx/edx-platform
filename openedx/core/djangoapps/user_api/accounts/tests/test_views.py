@@ -951,7 +951,7 @@ class UsernameReplacementViewTests(APITestCase):
         Helper function for creating headers for the JWT authentication.
         """
         token = create_jwt_for_user(user)
-        headers = {'HTTP_AUTHORIZATION': token}
+        headers = {'HTTP_AUTHORIZATION': 'JWT {}'.format(token)}
         return headers
 
     def call_api(self, user, data):

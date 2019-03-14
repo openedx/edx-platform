@@ -1361,6 +1361,7 @@ ADVANCED_PROBLEM_TYPES = [
     }
 ]
 
+USERNAME_REPLACEMENT_WORKER = "REPLACE WITH VALID USERNAME"
 
 # Files and Uploads type filter values
 

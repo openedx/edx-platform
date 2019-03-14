@@ -10,7 +10,7 @@ from edx_rest_framework_extensions.auth.session.authentication import SessionAut
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import permissions
 from rest_framework import status
-from rest_framework.exceptions import UnsupportedMediaType
+from rest_framework.exceptions import ParseError, UnsupportedMediaType
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -621,7 +621,7 @@ class ReplaceUsernamesView(APIView):
         username_mappings = request.data.get("username_mappings")
 
         if not self._has_valid_schema(username_mappings):
-            raise ValidationError("Request data does not match schema")
+            raise ParseError("Request data does not match schema")
 
         successful_replacements, failed_replacements = [], []
 
@@ -630,13 +630,17 @@ class ReplaceUsernamesView(APIView):
             new_username = list(username_pair.values())[0]
             successfully_replaced = self._replace_username(current_username, new_username)
             if successfully_replaced:
-                successful_replacements += {current_username: new_username}
+                successful_replacements.append({current_username: new_username})
             else:
-                failed_replacements += {current_username: new_username}
-        return JsonResponse({
-            "successful_replacements": successful_replacements,
-            "failed_replacements": failed_replacements,
-        })
+                failed_replacements.append({current_username: new_username})
+
+        return Response(
+            status=status.HTTP_200_OK,
+            data={
+                "successful_replacements": successful_replacements,
+                "failed_replacements": failed_replacements
+            }
+        )
 
     def _replace_username(self, current_username, new_username):
         try:
@@ -652,7 +656,7 @@ class ReplaceUsernamesView(APIView):
                 new_username,
                 new_username,
             )
-            return False
+            return True
         except comment_client.CommentClientRequestError as exc:
             log.exception(
                 u"Unable to change username from %s to %s in forums because forums API call failed with: %s.",
