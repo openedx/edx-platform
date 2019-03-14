@@ -29,7 +29,6 @@ from xmodule.modulestore.modulestore_settings import convert_module_store_settin
 from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants
 
 from .common import *
-
 from openedx.core.lib.derived import derive_settings  # pylint: disable=wrong-import-order
 from openedx.core.lib.logsettings import get_logger_config  # pylint: disable=wrong-import-order
 
