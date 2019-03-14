@@ -4,7 +4,7 @@ Tests of experiment functionality
 from decimal import Decimal
 from unittest import TestCase
 from lms.djangoapps.experiments.utils import get_course_entitlement_price_and_sku, get_program_price_and_skus, \
-    get_program_purchase_url, get_unenrolled_courses, is_enrolled_in_course_run
+    get_unenrolled_courses, is_enrolled_in_course_run
 from opaque_keys.edx.keys import CourseKey
 
 
@@ -41,40 +41,6 @@ class ExperimentUtilsTests(TestCase):
         }
         enrollment_ids = {CourseKey.from_string('course-v1:DelftX+NGIx+RA0')}
         self.assertFalse(is_enrolled_in_course_run(course_run, enrollment_ids))
-
-    def test_program_url_with_no_skus(self):
-        url = get_program_purchase_url(None)
-        self.assertEqual(None, url)
-
-    def test_program_url_with_no_skus_and_no_bundle(self):
-        url = get_program_purchase_url(None, None)
-        self.assertEqual(None, url)
-
-    def test_program_url_with_single_sku(self):
-        skus = ['9FE0DE2']
-        expected_url = 'https://ecommerce.edx.org/basket/add/?sku=9FE0DE2'
-        url = get_program_purchase_url(skus)
-        self.assertEqual(expected_url, url)
-
-    def test_program_url_with_single_sku_and_bundle(self):
-        skus = ['9FE0DE2']
-        program_id = 'bef7201a-6f97-40ad-ad17-d5ea8be1eec8'
-        expected_url = 'https://ecommerce.edx.org/basket/add/?sku=9FE0DE2&bundle=' + program_id
-        url = get_program_purchase_url(skus, program_id)
-        self.assertEqual(expected_url, url)
-
-    def test_program_url_with_multiple_skus(self):
-        skus = ['9FE0DE2', 'B37EBA0', 'FDCED11']
-        expected_url = 'https://ecommerce.edx.org/basket/add/?sku=9FE0DE2&sku=B37EBA0&sku=FDCED11'
-        url = get_program_purchase_url(skus)
-        self.assertEqual(expected_url, url)
-
-    def test_program_url_with_multiple_skus_and_bundle(self):
-        skus = ['9FE0DE2', 'B37EBA0', 'FDCED11']
-        program_id = 'bef7201a-6f97-40ad-ad17-d5ea8be1eec8'
-        expected_url = 'https://ecommerce.edx.org/basket/add/?sku=9FE0DE2&sku=B37EBA0&sku=FDCED11&bundle=' + program_id
-        url = get_program_purchase_url(skus, program_id)
-        self.assertEqual(expected_url, url)
 
     def test_program_price_and_skus_for_empty_courses(self):
         price, skus = get_program_price_and_skus([])
