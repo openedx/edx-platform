@@ -209,6 +209,11 @@
   .forum-nav-refine-bar{
     border-bottom: none;
     background: none;
+    padding:  5px 0;
+  }
+  .forum-nav-filter-main-control,
+  .forum-nav-sort-control{
+    padding: 0 20px;
   }
   .forum-nav-thread-list{
     border: none;
@@ -289,4 +294,17 @@
 .discussion-response .response-header-content .username{
   max-width: 180px;
   display: inline-block;
+}
+
+// edit a disussion
+.edit-post-form {
+  .post-field .field-label{
+    width: 100%;
+    input[type="text"].field-input{
+      width: 100%;
+    }
+  }
+  .edit-post-body{
+    width: 100%;
+  }
 }

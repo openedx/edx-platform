@@ -25,6 +25,15 @@
   p+p{
     margin: 0 0 15px 0;
   }
+  p+ul{
+    margin: 0;
+  }
+  ul{
+    margin: 0;
+    padding-left: 30px;
+    list-style: initial;
+    line-height: 1.8;
+  }
 }
 
 @media screen and (max-width:576px){
