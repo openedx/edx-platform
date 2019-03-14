@@ -55,9 +55,6 @@ def get_edx_api_data(api_config, resource, api, resource_id=None, querystring=No
 
         cached = cache.get(cache_key)
         if cached:
-            log.info("Cached course run was returned for the course: {resource_id} using the key:{cache_key}"
-                     "  and response is {cached} ".format(resource_id=resource_id, cache_key=cache_key,
-                                                          cached=zunpickle(cached)))
             cached_response = zunpickle(cached)
             if fields:
                 cached_response = get_fields(fields, cached_response)
@@ -67,10 +64,7 @@ def get_edx_api_data(api_config, resource, api, resource_id=None, querystring=No
     try:
         endpoint = getattr(api, resource)
         querystring = querystring if querystring else {}
-        log.info("Hitting discovery for course run:{resource_id}".format(resource_id=resource_id))
         response = endpoint(resource_id).get(**querystring)
-        log.info("Response for the course: {resource_id} from discovery: {response} ".
-                 format(resource_id=resource_id, response=response))
 
         if resource_id is None and traverse_pagination:
             results = _traverse_pagination(response, endpoint, querystring, no_data)
@@ -86,8 +80,6 @@ def get_edx_api_data(api_config, resource, api, resource_id=None, querystring=No
         cache_ttl = api_config.cache_ttl
         if long_term_cache:
             cache_ttl = api_config.long_term_cache_ttl
-        log.info('setting cache for the course:{resource_id} with key:{cache_key} and results:{results}'.format(
-            resource_id=resource_id, cache_key=cache_key, results=results))
         cache.set(cache_key, zdata, cache_ttl)
 
     if fields:

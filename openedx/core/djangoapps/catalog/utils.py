@@ -526,7 +526,6 @@ def get_course_run_details(course_run_key, fields):
 
         cache_key = '{base}.course_runs'.format(base=catalog_integration.CACHE_KEY)
 
-        logger.info("getting course run detail for the course: {course_key}".format(course_key=course_run_key))
         course_run_details = get_edx_api_data(catalog_integration, 'course_runs', api, resource_id=course_run_key,
                                               cache_key=cache_key, many=False, traverse_pagination=False, fields=fields)
     return course_run_details
