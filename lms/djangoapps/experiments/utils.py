@@ -9,6 +9,7 @@ from decimal import Decimal
 from student.models import CourseEnrollment
 from django_comment_common.models import Role
 from django.utils.timezone import now
+from lms.djangoapps.commerce.utils import EcommerceService
 from course_modes.models import get_cosmetic_verified_display_price, format_course_price
 from courseware.access import has_staff_access_to_preview_mode
 from courseware.date_summary import verified_upgrade_deadline_link, verified_upgrade_link_is_valid
@@ -98,25 +99,6 @@ def check_and_get_upgrade_link_and_date(user, enrollment=None, course=None):
 
 
 # TODO: clean up as part of REVEM-199 (START)
-def get_program_purchase_url(skus, bundle_id=None):
-    """
-    Return a url that will allow the purchase of the courses with these skus
-    """
-    if not skus:
-        return None
-
-    url = 'https://ecommerce.edx.org/basket/add/?'
-    for sku in skus:
-        url += 'sku=' + sku + '&'
-
-    if bundle_id:
-        url += 'bundle=' + bundle_id
-    else:
-        # Remove trailing & from the skus
-        url = url[:-1]
-    return url
-
-
 def get_program_price_and_skus(courses):
     """
     Get the total program price and purchase skus from these courses in the program
@@ -272,8 +254,8 @@ def get_experiment_user_metadata_context(course, user):
                             has_courses_left_to_purchase = True
                         courses_left_to_purchase_price, courses_left_to_purchase_skus = get_program_price_and_skus(
                             courses_left_to_purchase)
-                        courses_left_to_purchase_url = get_program_purchase_url(courses_left_to_purchase_skus,
-                                                                                program_uuid)
+                        courses_left_to_purchase_url = EcommerceService().get_checkout_page_url(
+                            *courses_left_to_purchase_skus, program_uuid=program_uuid)
 
                 program_key = {
                     'uuid': program_uuid,
