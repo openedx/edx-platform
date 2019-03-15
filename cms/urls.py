@@ -73,7 +73,8 @@ urlpatterns = [
     url(r'^api/', include('cms.djangoapps.api.urls', namespace='api')),
 
     # restful api
-    url(r'^$', contentstore.views.howitworks, name='homepage'),
+    # url(r'^$', contentstore.views.howitworks, name='homepage'),
+    url(r'^$', contentstore.views.course_listing, name='homepage'),
     url(r'^howitworks$', contentstore.views.howitworks, name='howitworks'),
     url(r'^signup$', contentstore.views.signup, name='signup'),
     url(r'^signin$', contentstore.views.login_page, name='login'),
