@@ -520,49 +520,53 @@ from six import string_types
     script.src = '//res2.wx.qq.com/open/js/jweixin-1.4.0.js ';
     head.appendChild(script);
     var url = location.href.split('#')[0];
-    // 获取签名信息
-    $.ajax({
+
+    script.onload = function(){
+      // 获取签名信息
+      $.ajax({
         url: '/api/courses/v1/getweixinsign',
         type: 'POST',
         data: { 'url': url },
         success: function (response) {
-            // 配置wx-sdk config
-            wx.config({
-              appId: response.appId,
-              timestamp: response.timestamp,
-              nonceStr: response.nonceStr,
-              signature: response.signature,
-              jsApiList: [
-                'updateAppMessageShareData', 
-                'updateTimelineShareData', 
-                'onMenuShareWeibo',
-                'onMenuShareTimeline',
-                'onMenuShareAppMessage',
-                'onMenuShareQQ',
-                'onMenuShareQZone'
-              ]
-            });
+          // 配置wx-sdk config
+          wx.config({
+            appId: response.appId,
+            timestamp: response.timestamp,
+            nonceStr: response.nonceStr,
+            signature: response.signature,
+            jsApiList: [
+              'updateAppMessageShareData', 
+              'updateTimelineShareData', 
+              'onMenuShareWeibo',
+              'onMenuShareTimeline',
+              'onMenuShareAppMessage',
+              'onMenuShareQQ',
+              'onMenuShareQZone'
+            ]
+          });
+          
+          // 配置个性化设置
+          wx.ready(function(){
+            var wxShareImg = 'https://oss.elitemba.cn/web_static/imgs/mba_logo.png';
+            var obj = {
+                title: document.title,
+                link: url,
+                imgUrl: wxShareImg,
+                desc: ''
+            };
             
-            // 配置个性化设置
-            wx.ready(function(){
-                var wxShareImg = 'https://oss.elitemba.cn/web_static/imgs/mba_logo.png';
-                var obj = {
-                    title: document.title,
-                    link: url,
-                    imgUrl: wxShareImg,
-                    desc: ''
-                };
-                
-                wx.updateAppMessageShareData(obj)
-                wx.updateTimelineShareData(obj)
-                wx.onMenuShareWeibo(obj)
-                wx.onMenuShareTimeline(obj);
-                wx.onMenuShareAppMessage(obj);
-                wx.onMenuShareQQ(obj);
-                wx.onMenuShareQZone(obj);
-            })
+            wx.updateAppMessageShareData(obj)
+            wx.updateTimelineShareData(obj)
+            wx.onMenuShareWeibo(obj)
+            wx.onMenuShareTimeline(obj);
+            wx.onMenuShareAppMessage(obj);
+            wx.onMenuShareQQ(obj);
+            wx.onMenuShareQZone(obj);
+          })
         }
-    })
+      })   
+    }
+
  
 }
 </script>

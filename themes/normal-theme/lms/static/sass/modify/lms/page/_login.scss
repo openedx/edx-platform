@@ -64,6 +64,7 @@
       outline: none;
       box-shadow: none;
       border-radius: 2px;
+      -webkit-appearance: none;
       &:focus{
         border: 1px solid $primary;
         box-shadow: 0px 1px 2px 0px $border;
