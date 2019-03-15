@@ -145,10 +145,17 @@ binding = remind_users_to_bind_phones(request)
 </script>
 <script>
     var _hmt = _hmt || [];
-    (function() {
-      var hm = document.createElement("script");
+    var getQueryString = function(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i"); 
+        var r = window.location.search.substr(1).match(reg); 
+        if (r != null) return unescape(r[2]); return null; 
+    }
+    var device = getQueryString('device');
+    if(device == undefined){
+    $(document).ready(function(){
+        var hm = document.createElement("script");
       hm.src = "${settings.BAIDU_BRIDGE_URL}";
       var s = document.getElementsByTagName("script")[0]; 
       s.parentNode.insertBefore(hm, s);
-    })();
+    });}
 </script>
