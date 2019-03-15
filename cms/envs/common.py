@@ -439,6 +439,9 @@ LMS_INTERNAL_ROOT_URL = LMS_ROOT_URL
 LMS_ENROLLMENT_API_PATH = "/api/enrollment/v1/"
 ENTERPRISE_API_URL = LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/'
 ENTERPRISE_CONSENT_API_URL = LMS_INTERNAL_ROOT_URL + '/consent/api/v1/'
+FRONTEND_LOGIN_URL = LOGIN_URL
+FRONTEND_LOGOUT_URL = lambda settings: settings.LMS_ROOT_URL + '/logout'
+derived('FRONTEND_LOGOUT_URL')
 
 # List of logout URIs for each IDA that the learner should be logged out of when they logout of
 # Studio. Only applies to IDA for which the social auth flow uses DOT (Django OAuth Toolkit).

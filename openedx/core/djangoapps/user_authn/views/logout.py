@@ -57,7 +57,11 @@ class LogoutView(TemplateView):
 
         logout(request)
 
-        response = super(LogoutView, self).dispatch(request, *args, **kwargs)
+        # If we are using studio logout directly and there is not OIDC logouts we can just redirect the user
+        if settings.FEATURES.get('DISABLE_STUDIO_SSO_OVER_LMS', False) and not self.oauth_client_ids:
+            response = redirect(self.target)
+        else:
+            response = super(LogoutView, self).dispatch(request, *args, **kwargs)
 
         # Clear the cookie used by the edx.org marketing site
         delete_logged_in_cookies(response)

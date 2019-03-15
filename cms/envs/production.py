@@ -14,6 +14,7 @@ from path import Path as path
 from xmodule.modulestore.modulestore_settings import convert_module_store_setting_if_needed
 from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants
 from django.core.exceptions import ImproperlyConfigured
+from django.core.urlresolvers import reverse_lazy
 
 from .common import *
 
@@ -297,6 +298,15 @@ if "TRACKING_IGNORE_URL_PATTERNS" in ENV_TOKENS:
 HEARTBEAT_CHECKS = ENV_TOKENS.get('HEARTBEAT_CHECKS', HEARTBEAT_CHECKS)
 HEARTBEAT_EXTENDED_CHECKS = ENV_TOKENS.get('HEARTBEAT_EXTENDED_CHECKS', HEARTBEAT_EXTENDED_CHECKS)
 HEARTBEAT_CELERY_TIMEOUT = ENV_TOKENS.get('HEARTBEAT_CELERY_TIMEOUT', HEARTBEAT_CELERY_TIMEOUT)
+
+# Login using the LMS as the identity provider.
+# Turning the flag to True means that the LMS will NOT be used as the Identity Provider (idp)
+if FEATURES.get('DISABLE_STUDIO_SSO_OVER_LMS', False):
+    LOGIN_URL = reverse_lazy('login')
+    FRONTEND_LOGIN_URL = LOGIN_URL
+    FRONTEND_LOGOUT_URL = reverse_lazy('logout')
+
+LOGIN_REDIRECT_WHITELIST = [reverse_lazy('home')]
 
 # Specific setting for the File Upload Service to store media in a bucket.
 FILE_UPLOAD_STORAGE_BUCKET_NAME = ENV_TOKENS.get('FILE_UPLOAD_STORAGE_BUCKET_NAME', FILE_UPLOAD_STORAGE_BUCKET_NAME)
