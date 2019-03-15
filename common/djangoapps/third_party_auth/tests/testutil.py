@@ -26,6 +26,8 @@ from third_party_auth.models import (
     SAMLProviderConfig
 )
 from third_party_auth.saml import EdXSAMLIdentityProvider, get_saml_idp_class
+from third_party_auth.tests.data.saml_identity_provider_mock_data import mock_conf, mock_attributes,\
+    expected_user_details
 
 AUTH_FEATURES_KEY = 'ENABLE_THIRD_PARTY_AUTH'
 AUTH_FEATURE_ENABLED = AUTH_FEATURES_KEY in settings.FEATURES
@@ -224,6 +226,11 @@ class SAMLTestCase(TestCase):
             'fake_idp_class_option'
         )
         self.assertIs(idp_class, EdXSAMLIdentityProvider)
+
+    def test_get_user_details(self):
+        """ test get_attr and get_user_details of EdXSAMLIdentityProvider"""
+        edx_smal_identity_provider = EdXSAMLIdentityProvider('demo', **mock_conf)
+        self.assertEqual(edx_smal_identity_provider.get_user_details(mock_attributes), expected_user_details)
 
 
 @contextmanager

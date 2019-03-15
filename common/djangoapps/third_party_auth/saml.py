@@ -219,8 +219,12 @@ class EdXSAMLIdentityProvider(SAMLIdentityProvider):
         another attribute to use.
         """
         key = self.conf.get(conf_key, default_attribute)
-        default = self.conf['attr_defaults'].get(conf_key) or None
-        return attributes[key][0] if key in attributes else default
+        if key in attributes:
+            try:
+                return attributes[key][0]
+            except IndexError:
+                log.warning(u'SAML attribute "%s" value not found.', key)
+        return self.conf['attr_defaults'].get(conf_key) or None
 
     @property
     def saml_sp_configuration(self):
