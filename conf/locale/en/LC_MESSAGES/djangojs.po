@@ -2290,6 +2290,13 @@ msgid_plural "%d years"
 msgstr[0] ""
 msgstr[1] ""
 
+#: lms/djangoapps/discussion/static/discussion/js/views/discussion_board_view.js
+#: lms/static/js/edxnotes/views/tabs/search_results.js
+#: openedx/features/course_search/static/course_search/templates/course_search_results.underscore
+#: openedx/features/course_search/static/course_search/templates/dashboard_search_results.underscore
+msgid "Search Results"
+msgstr ""
+
 #: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/Main/Main.jsx
 msgid "Select a section or problem"
 msgstr ""
@@ -3273,12 +3280,6 @@ msgstr ""
 
 #: lms/static/js/edxnotes/views/tabs/search_results.js
 msgid "No results found for \"%(query_string)s\". Please try searching again."
-msgstr ""
-
-#: lms/static/js/edxnotes/views/tabs/search_results.js
-#: openedx/features/course_search/static/course_search/templates/course_search_results.underscore
-#: openedx/features/course_search/static/course_search/templates/dashboard_search_results.underscore
-msgid "Search Results"
 msgstr ""
 
 #. Translators: this is a title shown before all Notes that have no associated

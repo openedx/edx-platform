@@ -5131,8 +5131,8 @@ msgstr "关于{platform_name}的成就"
 #. Translators:  This line appears on the page just before the generation date
 #. for the certificate
 #: lms/djangoapps/certificates/views/webview.py
-msgid "Issued On:"
-msgstr "签发日期："
+msgid "Issued On"
+msgstr "签发日期"
 
 #. Translators:  The Certificate ID Number is an alphanumeric value unique to
 #. each individual certificate
@@ -5251,7 +5251,7 @@ msgstr "{fullname}，您已经取得证书！"
 msgid ""
 "Congratulations! This page summarizes what you accomplished. Show it off to "
 "family, friends, and colleagues in your social and professional networks."
-msgstr "恭喜!本页总结您所完成之项目。在您的社交和专业网络展示给家人，朋友和同事。"
+msgstr "恭喜！本页总结您所完成之项目。"
 
 #. Translators: This line leads the reader to understand more about the
 #. certificate that a student has been awarded
@@ -16248,7 +16248,7 @@ msgid ""
 "Your verification submission was not accepted. To receive a verified "
 "certificate, you must submit a new photo of yourself and your government-"
 "issued photo ID before the verification deadline for your course."
-msgstr "您的认证提交未被接受。您必须在您课程认证个截止日期前提交一张新照片和政府签发的身份证件，才可以收到认证证书。"
+msgstr "您的认证提交未被接受。您必须在您课程认证的截止日期前提交一张新照片和政府签发的身份证件，才可以收到认证证书。"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Your verification was denied for the following reasons:"
@@ -19062,7 +19062,7 @@ msgstr "密码重置已完成"
 #: lms/templates/registration/password_reset_complete.html
 msgid ""
 "Your password has been reset. {start_link}Sign-in to your account.{end_link}"
-msgstr "您的密码已重置。{start_link}登录您的账号。{end_link}"
+msgstr "您的密码已重置。{start_link}登录您的账号{end_link}。"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Reset Your {platform_name} Password"
@@ -20334,6 +20334,10 @@ msgid "bind your account to your cellphone number"
 msgstr "绑定手机号"
 
 #: themes/normal-theme/lms/templates/footer.html
+msgid "Please enter the phone number"
+msgstr "请输入手机号码"
+
+#: themes/normal-theme/lms/templates/footer.html
 msgid "get verification code"
 msgstr "获取验证码"
 
@@ -20367,6 +20371,10 @@ msgstr "月均99.84元，畅学高价值MBA课程！"
 #: themes/normal-theme/lms/templates/certificates/_accomplishment-banner.html
 msgid "Download Certificate"
 msgstr "下载证书"
+
+#: themes/normal-theme/lms/templates/certificates/_accomplishment-rendering.html
+msgid ":"
+msgstr "："
 
 #: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid "Add {course_name} to Cart <span>({price} USD)</span>"

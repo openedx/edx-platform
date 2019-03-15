@@ -2303,6 +2303,13 @@ msgid "%d year"
 msgid_plural "%d years"
 msgstr[0] "%d年"
 
+#: lms/djangoapps/discussion/static/discussion/js/views/discussion_board_view.js
+#: lms/static/js/edxnotes/views/tabs/search_results.js
+#: openedx/features/course_search/static/course_search/templates/course_search_results.underscore
+#: openedx/features/course_search/static/course_search/templates/dashboard_search_results.underscore
+msgid "Search Results"
+msgstr "搜索结果"
+
 #: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/Main/Main.jsx
 msgid "Select a section or problem"
 msgstr "选择一个章节或一个问题"
@@ -3287,12 +3294,6 @@ msgstr "近期活动"
 #: lms/static/js/edxnotes/views/tabs/search_results.js
 msgid "No results found for \"%(query_string)s\". Please try searching again."
 msgstr "未找到有关\"%(query_string)s\"的任何结果。请重新搜索。"
-
-#: lms/static/js/edxnotes/views/tabs/search_results.js
-#: openedx/features/course_search/static/course_search/templates/course_search_results.underscore
-#: openedx/features/course_search/static/course_search/templates/dashboard_search_results.underscore
-msgid "Search Results"
-msgstr "搜索结果"
 
 #. Translators: this is a title shown before all Notes that have no associated
 #. tags. It is put within

@@ -5039,7 +5039,7 @@ msgstr ""
 #. Translators:  This line appears on the page just before the generation date
 #. for the certificate
 #: lms/djangoapps/certificates/views/webview.py
-msgid "Issued On:"
+msgid "Issued On"
 msgstr ""
 
 #. Translators:  The Certificate ID Number is an alphanumeric value unique to
@@ -19958,6 +19958,10 @@ msgid "bind your account to your cellphone number"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/footer.html
+msgid "Please enter the phone number"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
 msgid "get verification code"
 msgstr ""
 
@@ -19990,6 +19994,10 @@ msgstr ""
 
 #: themes/normal-theme/lms/templates/certificates/_accomplishment-banner.html
 msgid "Download Certificate"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/certificates/_accomplishment-rendering.html
+msgid ":"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/courseware/course_about.html

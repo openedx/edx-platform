@@ -187,7 +187,7 @@ def _update_context_with_basic_info(context, course_id, platform_name, configura
     )
 
     # Translators:  This line appears on the page just before the generation date for the certificate
-    context['certificate_date_issued_title'] = _("Issued On:")
+    context['certificate_date_issued_title'] = _("Issued On")
 
     # Translators:  The Certificate ID Number is an alphanumeric value unique to each individual certificate
     context['certificate_id_number_title'] = _('Certificate ID Number')
