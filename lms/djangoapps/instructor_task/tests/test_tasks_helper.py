@@ -558,24 +558,35 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         """
         self.define_option_problem(u'Problem1')
         self.submit_student_answer(self.student.username, u'Problem1', ['Option 1'])
-        state = {'some': 'state', 'more': 'state!'}
+        state1 = {'some': 'state1', 'more': 'state1!'}
+        state2 = {'some': 'state2', 'more': 'state2!'}
         mock_generate_report_data.return_value = iter([
-            ('student', state),
+            ('student', state1),
+            ('student', state2),
         ])
         student_data, _ = ProblemResponses._build_student_data(
             user_id=self.instructor.id,
             course_key=self.course.id,
             usage_key_str=str(self.course.location),
         )
-        self.assertEquals(len(student_data), 1)
+        self.assertEquals(len(student_data), 2)
         self.assertDictContainsSubset({
             'username': 'student',
             'location': 'test_course > Section > Subsection > Problem1',
             'block_key': 'i4x://edx/1.23x/problem/Problem1',
             'title': 'Problem1',
-            'some': 'state',
-            'more': 'state!',
+            'some': 'state1',
+            'more': 'state1!',
         }, student_data[0])
+        self.assertDictContainsSubset({
+            'username': 'student',
+            'location': 'test_course > Section > Subsection > Problem1',
+            'block_key': 'i4x://edx/1.23x/problem/Problem1',
+            'title': 'Problem1',
+            'some': 'state2',
+            'more': 'state2!',
+        }, student_data[1])
+        self.assertEquals(student_data[0]['state'], student_data[1]['state'])
 
     def test_build_student_data_for_block_with_real_generate_report_data(self):
         """
