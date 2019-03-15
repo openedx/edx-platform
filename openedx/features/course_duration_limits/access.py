@@ -38,7 +38,7 @@ class AuditExpiredError(AccessError):
         expiration_date = strftime_localized(expiration_date, EXPIRATION_DATE_FORMAT_STR)
         user_message = _(u"Access expired on {expiration_date}").format(expiration_date=expiration_date)
         try:
-            course_name = CourseOverview.get_from_id(course.id).display_name_with_default
+            course_name = course.display_name_with_default
             additional_context_user_message = _(u"Access to {course_name} expired on {expiration_date}").format(
                 course_name=course_name,
                 expiration_date=expiration_date
