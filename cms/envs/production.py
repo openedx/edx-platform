@@ -12,6 +12,7 @@ import os
 from path import Path as path
 from xmodule.modulestore.modulestore_settings import convert_module_store_setting_if_needed
 from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants
+from django.core.urlresolvers import reverse_lazy
 
 from .common import *
 
@@ -144,6 +145,10 @@ LMS_INTERNAL_ROOT_URL = ENV_TOKENS.get('LMS_INTERNAL_ROOT_URL', LMS_ROOT_URL)
 ENTERPRISE_API_URL = ENV_TOKENS.get('ENTERPRISE_API_URL', LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/')
 ENTERPRISE_CONSENT_API_URL = ENV_TOKENS.get('ENTERPRISE_CONSENT_API_URL', LMS_INTERNAL_ROOT_URL + '/consent/api/v1/')
 # Note that FEATURES['PREVIEW_LMS_BASE'] gets read in from the environment file.
+
+# List of logout URIs for each IDA that the learner should be logged out of when they logout of
+# Studio. Only applies to IDA for which the social auth flow uses DOT (Django OAuth Toolkit).
+IDA_LOGOUT_URI_LIST = ENV_TOKENS.get('IDA_LOGOUT_URI_LIST', [])
 
 SITE_NAME = ENV_TOKENS['SITE_NAME']
 
@@ -293,6 +298,15 @@ if FEATURES.get('AUTH_USE_CAS'):
             importlib.import_module(CAS_ATTRIBUTE_CALLBACK['module']),
             CAS_ATTRIBUTE_CALLBACK['function']
         )
+
+# Login using the LMS as the identity provider.
+# Turning the flag to True means that the LMS will NOT be used as the Identity Provider (idp)
+if FEATURES.get('DISABLE_STUDIO_SSO_OVER_LMS', False):
+    LOGIN_URL = reverse_lazy('login')
+    FRONTEND_LOGIN_URL = LOGIN_URL
+    FRONTEND_LOGOUT_URL = reverse_lazy('logout')
+
+LOGIN_REDIRECT_WHITELIST = [reverse_lazy('home')]
 
 # Specific setting for the File Upload Service to store media in a bucket.
 FILE_UPLOAD_STORAGE_BUCKET_NAME = ENV_TOKENS.get('FILE_UPLOAD_STORAGE_BUCKET_NAME', FILE_UPLOAD_STORAGE_BUCKET_NAME)

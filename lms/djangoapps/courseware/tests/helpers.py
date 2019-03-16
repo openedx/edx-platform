@@ -208,8 +208,7 @@ class LoginEnrollmentTestCase(TestCase):
         Logout; check that the HTTP response code indicates redirection
         as expected.
         """
-        # should redirect
-        self.assert_request_status_code(302, reverse('logout'))
+        self.assert_request_status_code(200, reverse('logout'))
 
     def create_account(self, username, email, password):
         """

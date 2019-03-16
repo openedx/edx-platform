@@ -166,6 +166,11 @@ JWT_AUTH.update({
     ),
 })
 
+IDA_LOGOUT_URI_LIST = [
+    'http://localhost:18130/logout/',  # ecommerce
+    'http://localhost:18150/logout/',  # credentials
+]
+
 #####################################################################
 from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants
 plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.CMS, plugin_constants.SettingsType.DEVSTACK)
