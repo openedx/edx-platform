@@ -512,7 +512,7 @@ class XmlParserMixin(object):
         return non_editable_fields
 
 
-class XmlDescriptor(XmlParserMixin, XModuleDescriptor):  # pylint: disable=abstract-method
+class XmlMixin(XmlParserMixin):
     """
     Mixin class for standardized parsing of XModule xml.
     """
@@ -538,7 +538,7 @@ class XmlDescriptor(XmlParserMixin, XModuleDescriptor):  # pylint: disable=abstr
         # This only exists to satisfy subclasses that both:
         #    a) define from_xml themselves
         #    b) call super(..).from_xml(..)
-        return super(XmlDescriptor, cls).parse_xml(
+        return super(XmlMixin, cls).parse_xml(
             etree.fromstring(xml_data),
             system,
             None,  # This is ignored by XmlParserMixin
@@ -550,12 +550,12 @@ class XmlDescriptor(XmlParserMixin, XModuleDescriptor):  # pylint: disable=abstr
         """
         Interpret the parsed XML in `node`, creating an XModuleDescriptor.
         """
-        if cls.from_xml != XmlDescriptor.from_xml:
+        if cls.from_xml != XmlMixin.from_xml:
             # Skip the parse_xml from XmlParserMixin to get the shim parse_xml
             # from XModuleDescriptor, which actually calls `from_xml`.
             return super(XmlParserMixin, cls).parse_xml(node, runtime, keys, id_generator)  # pylint: disable=bad-super-call
         else:
-            return super(XmlDescriptor, cls).parse_xml(node, runtime, keys, id_generator)
+            return super(XmlMixin, cls).parse_xml(node, runtime, keys, id_generator)
 
     def export_to_xml(self, resource_fs):
         """
@@ -575,7 +575,7 @@ class XmlDescriptor(XmlParserMixin, XModuleDescriptor):  # pylint: disable=abstr
         #    a) define export_to_xml themselves
         #    b) call super(..).export_to_xml(..)
         node = Element(self.category)
-        super(XmlDescriptor, self).add_xml_to_node(node)
+        super(XmlMixin, self).add_xml_to_node(node)
         return etree.tostring(node)
 
     def add_xml_to_node(self, node):
@@ -583,9 +583,13 @@ class XmlDescriptor(XmlParserMixin, XModuleDescriptor):  # pylint: disable=abstr
         Export this :class:`XModuleDescriptor` as XML, by setting attributes on the provided
         `node`.
         """
-        if self.export_to_xml != XmlDescriptor.export_to_xml:
+        if self.export_to_xml != XmlMixin.export_to_xml:
             # Skip the add_xml_to_node from XmlParserMixin to get the shim add_xml_to_node
             # from XModuleDescriptor, which actually calls `export_to_xml`.
             super(XmlParserMixin, self).add_xml_to_node(node)  # pylint: disable=bad-super-call
         else:
-            super(XmlDescriptor, self).add_xml_to_node(node)
+            super(XmlMixin, self).add_xml_to_node(node)
+
+
+class XmlDescriptor(XmlMixin, XModuleDescriptor):
+    pass

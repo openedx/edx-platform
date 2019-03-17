@@ -10,7 +10,7 @@ from xmodule.xml_module import XmlDescriptor
 log = logging.getLogger(__name__)
 
 
-class RawDescriptorMixin(object):
+class RawMixin(object):
     """
     Common code between RawDescriptor and XBlocks converted from XModules.
     """
@@ -59,7 +59,7 @@ class RawDescriptorMixin(object):
             raise SerializationError(self.location, msg)
 
 
-class RawDescriptor(RawDescriptorMixin, XmlDescriptor, XMLEditingDescriptor):
+class RawDescriptor(RawMixin, XmlDescriptor, XMLEditingDescriptor):
     """
     Module that provides a raw editing view of its data and children.  It
     requires that the definition xml is valid.

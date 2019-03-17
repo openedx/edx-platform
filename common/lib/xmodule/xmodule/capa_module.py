@@ -13,15 +13,18 @@ from xblock.core import XBlock
 from xblock.fields import Boolean, Dict, Float, Integer, Scope, String, XMLString
 
 from capa import responsetypes
-from xmodule.raw_module import RawDescriptorMixin
+from xmodule.editing_module import EditingMixin
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.graders import ShowCorrectness
-from xmodule.raw_module import RawDescriptor
+from xmodule.raw_module import RawMixin
 from xmodule.contentstore.django import contentstore
 from xmodule.util.misc import escape_html_characters
 from xmodule.util.sandboxing import get_python_lib_zip
 from xmodule.util.xmodule_django import add_webpack_to_fragment
-from xmodule.x_module import HTMLSnippet, ResourceTemplates, shim_xmodule_js, XModuleMixin, XModuleToXBlockMixin
+from xmodule.x_module import (
+    HTMLSnippet, ResourceTemplates, shim_xmodule_js,
+    XModuleMixin, XModuleToXBlockMixin, XModuleDescriptorToXBlockMixin,
+)
 from xmodule.xml_module import XmlParserMixin
 
 from .capa_base import _, CapaMixin, ComplexEncoder, RANDOMIZATION, Randomization, SHOWANSWER
@@ -39,8 +42,8 @@ except ImproperlyConfigured:
 @XBlock.wants('user')  # pylint: disable=abstract-method
 @XBlock.needs('i18n')
 class ProblemBlock(
-        CapaMixin, ResourceTemplates,
-        RawDescriptorMixin, XmlParserMixin, XModuleToXBlockMixin, XModuleMixin):
+        CapaMixin, RawMixin, XmlParserMixin, EditingMixin,
+        XModuleDescriptorToXBlockMixin, XModuleToXBlockMixin, ResourceTemplates, XModuleMixin):
     """
     Define the possible fields for a Capa problem
     """
@@ -237,14 +240,12 @@ class ProblemBlock(
         """
         Return the studio view.
         """
-        return Fragment(self.get_html())
-
-    @property
-    def ajax_url(self):
-        """
-        Returns the URL for the ajax handler.
-        """
-        return self.runtime.handler_url(self, 'xmodule_handler', '', '').rstrip('/?')
+        fragment = Fragment(
+            self.system.render_template(self.mako_template, self.get_context())
+        )
+        add_webpack_to_fragment(fragment, self.descriptor_class.__name__)
+        shim_xmodule_js(self.descriptor_class, fragment)
+        return fragment
 
     def handle_ajax(self, dispatch, data):
         """
@@ -349,7 +350,7 @@ class ProblemBlock(
 
     # The capa format specifies that what we call max_attempts in the code
     # is the attribute `attempts`. This will do that conversion
-    metadata_translations = dict(RawDescriptor.metadata_translations)
+    metadata_translations = dict(XmlParserMixin.metadata_translations)
     metadata_translations['attempts'] = 'max_attempts'
 
     @classmethod
@@ -363,7 +364,7 @@ class ProblemBlock(
         return 'latex' not in template['template_id'] or course.use_latex_compiler
 
     def get_context(self):
-        _context = RawDescriptor.get_context(self)
+        _context = EditingMixin.get_context(self)
         _context.update({
             'markdown': self.markdown,
             'enable_markdown': self.markdown is not None,
