@@ -11,7 +11,9 @@ from django.core.validators import validate_email, ValidationError
 from django.http import HttpResponseForbidden
 from openedx.core.djangoapps.profile_images.tasks import delete_profile_images
 from openedx.core.djangoapps.user_api.preferences.api import update_user_preferences
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.errors import PreferenceValidationError
+from openedx.core.lib.api.view_utils import add_serializer_errors
 
 from student.models import User, UserProfile, Registration
 from student import forms as student_forms
@@ -19,8 +21,7 @@ from student import views as student_views
 from util.model_utils import emit_setting_changed_event
 from lms.lib.comment_client.user import User as CCUser
 from lms.lib.comment_client.utils import CommentClientRequestError
-
-from openedx.core.lib.api.view_utils import add_serializer_errors
+from edx_notifications.lib.admin import purge_user_data as purge_notifications
 
 from ..errors import (
     AccountUpdateError, AccountValidationError, AccountUsernameInvalid, AccountPasswordInvalid,
@@ -38,7 +39,6 @@ from .serializers import (
     AccountLegacyProfileSerializer, AccountUserSerializer,
     UserReadOnlySerializer, _visible_fields  # pylint: disable=invalid-name
 )
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
 # Public access point for this function.
@@ -559,21 +559,37 @@ def delete_users(users):
     1. models with a ForeignKey relationship to User (with on_delete=CASCADE).
     2. models with indirect relationship to User (i.e. through another model, or with on_delete other than CASCADE)
     3. files belonging to the user.
+    4. user notifications in edx-notification models
 
     Arguments:
         users: An iterable of 'User' objects.
 
     Returns:
-        None
+        results array of dictionaries with user email and error message or None in case of success
 
     Raises:
         UserAPIInternalError
     """
+    failed = {}
     for user in users:
-        retire_user_comments(user)
+        try:
+            retire_user_comments(user)
+        except Exception as e:
+            failed[user.email] = str(e)
 
     # Delete user profile images in background task
     usernames = list(users.values_list('username', flat=True))
     delete_profile_images.delay(usernames)
 
-    users.delete()
+    # Delete notifications
+    user_ids = users.values_list('id', flat=True)
+    purge_notifications(user_ids)
+
+    # Finally delete user and related models
+    for user in users.exclude(email__in=failed):
+        try:
+            user.delete()
+        except Exception as e:
+            failed[user.email] = str(e)
+
+    return failed
