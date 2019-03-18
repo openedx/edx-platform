@@ -36,26 +36,52 @@ from cms.djangoapps.contentstore.config.waffle import waffle, ENABLE_ACCESSIBILI
             % endif
           </ol>
         </nav>
+
+        <% languages = released_languages() %>
+        % if len(languages) > 1:
+          <nav class="user-language-selector" aria-label="${_('Language preference')}">
+            <form action="/i18n/setlang/" method="post" class="settings-language-form" id="language-settings-form">
+                <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
+                % if user.is_authenticated:
+                <input title="preference api" type="hidden" id="preference-api-url" class="url-endpoint" value="${reverse('preferences_api', kwargs={'username': user.username})}" data-user-is-authenticated="true">
+                % else:
+                <input title="session update url" type="hidden" id="update-session-url" class="url-endpoint" value="${reverse('session_language')}" data-user-is-authenticated="false">
+                % endif
+                <label><span class="sr">${_("Choose Language")}</span>
+                <select class="input select language-selector" id="settings-language-value" name="language">
+                % for language in languages:
+                  % if language[0] == LANGUAGE_CODE:
+                   <option value="${language[0]}" selected="selected">${language[1]}</option>
+                  % else:
+                   <option value="${language[0]}" >${language[1]}</option>
+                  % endif
+                % endfor
+                </select>
+                </label>
+            </form>
+          </nav>
+        % endif
     </div>
 
     <div class="footer-content-secondary" aria-label="${_("Legal")}">
       <div class="footer-about-copyright">
-        ## Site operators: Please do not remove this paragraph! This attributes back to edX and makes your acknowledgement of edX's trademarks clear.
         <p>
-          ## Translators: 'EdX', 'edX', 'Studio', and 'Open edX' are trademarks of 'edX Inc.'. Please do not translate any of these trademarks and company names.
-          ## ${_("EdX, Open edX, Studio, and the edX and Open edX logos are registered trademarks or trademarks of {link_start}edX Inc.{link_end}").format(
-          ##   link_start=u"<a data-rel='edx.org' href='https://www.edx.org/'>",
-          ##   link_end=u"</a>"
-          ## )}
-          Copyright &copy; ${datetime.now(pytz.timezone(settings.TIME_ZONE)).year} <a href="${marketing_link('ABOUT')}">Learning Tribes</a>. ${_("All rights reserved.")}
+          Copyright &copy; ${datetime.now(pytz.timezone(settings.TIME_ZONE)).year} Learning Tribes. ${_("All rights reserved.")}
         </p>
       </div>
-
+      <div class="footer-about-openedx-copyright">
+        <p>
+          ## Translators: 'EdX', 'edX', 'Studio', and 'Open edX' are trademarks of 'edX Inc.'. Please do not translate any of these trademarks and company names.
+          ${_("EdX, Open edX, Studio, and the edX and Open edX logos are registered trademarks or trademarks of {link_start}edX Inc.{link_end}").format(
+            link_start=u"<a data-rel='edx.org' href='https://www.edx.org/'>",
+            link_end=u"</a>"
+          )}
+        </p>
+      </div>
       <div class="footer-about-openedx">
-        ## <a href="http://open.edx.org" title="${_("Powered by Open edX")}">
-        ##   <img alt="${_("Powered by Open edX")}" src="https://files.edx.org/openedx-logos/edx-openedx-logo-tag.png">
-        ## </a>
-        ## <img src="${static.url(u'images/logo-triboo-white-S.png')}" class="logo-triboo"/>
+        <a href="http://open.edx.org" title="${_("Powered by Open edX")}">
+          <img alt="${_("Powered by Open edX")}" src="https://files.edx.org/openedx-logos/edx-openedx-logo-tag.png">
+        </a>
       </div>
     </div>
   </footer>

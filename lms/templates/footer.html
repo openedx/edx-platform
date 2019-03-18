@@ -1,13 +1,14 @@
 ## mako
 <%page expression_filter="h"/>
 <%!
-  from django.urls import reverse
-  from django.utils.translation import ugettext as _
-  from branding.api import get_footer
-  from openedx.core.djangoapps.lang_pref.api import footer_language_selector_is_enabled
-  from django.conf import settings
   from datetime import datetime
   import pytz
+  from django.conf import settings
+  from django.urls import reverse
+  from django.utils.translation import ugettext as _
+  from openedx.core.djangoapps.lang_pref.api import footer_language_selector_is_enabled
+  from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+  from branding.api import get_footer
 %>
 <% footer = get_footer(is_secure=is_secure) %>
 <%namespace name='static' file='static_content.html'/>
@@ -26,7 +27,7 @@
               % endfor
             </ul>
           </nav>
-
+        % if not hide_openedx_link and hide_openedx_link != Undefined:
           ## Site operators: Please do not remove this paragraph! This attributes back to edX and makes your acknowledgement of edX's trademarks clear.
           <p class="copyright">${footer['copyright']} ${u" | {icp}".format(icp=getattr(settings,'ICP_LICENSE')) if getattr(settings,'ICP_LICENSE',False) else ""}</p>
 
@@ -42,13 +43,15 @@
               </li>
             </ul>
           </nav>
+        % endif
         </div>
+
         <div class="col-md-3">
+          % if not hide_openedx_link and hide_openedx_link != Undefined:
           ## Please leave this link and use one of the logos provided
           ## The OpenEdX link may be hidden when this view is served
           ## through an API to partner sites (such as marketing sites or blogs),
           ## which are not technically powered by Open edX.
-          % if not hide_openedx_link:
             <div class="footer-about-openedx">
               <p>
                 <a href="${footer['openedx_link']['url']}">
@@ -73,90 +76,83 @@
     >
       <div class="colophon">
 
-
-        ##% if context.get('include_language_selector', footer_language_selector_is_enabled()):
-        ##    <%include file="${static.get_template_path('widgets/footer-language-selector.html')}"/>
-        ##% endif
-
         <div class="wrapper-logo">
-            ##<a href="/">
-              ## The default logo is a placeholder.
-              ## You can either replace this link entirely or update
-              ## the FOOTER_ORGANIZATION_IMAGE in Django settings.
-              ## If you customize FOOTER_ORGANIZATION_IMAGE, then the image
-              ## can be included in the footer on other sites
-              ## (e.g. a blog or marketing front-end) to provide a consistent
-              ## user experience.  See the branding app for details.
-              ##<img alt="organization logo" src="${footer['logo_image']}">
-              <figure>
-                <img src="${static.url(u'images/studio-logo.png')}" class="logo-triboo"/>
-                <figcaption>Lorem ipsum dolor sit amet consectetur adipiscing elit aliquam eget nullam pellentesque aliquam curabitur cociis.</figcaption>
-              </figure>
-            ##</a>
+          <figure>
+            <img src="${static.url(u'images/studio-logo.png')}" class="logo-triboo"/>
+            <figcaption>${_('Triboo is the Learning Experience Platform powered by Learning Tribes, international training organization.')}</figcaption>
+          </figure>
         </div>
 
         <nav class="nav-colophon" aria-label="${_('About')}">
           <h6>navigation</h6>
           <ol>
-              <%
-                links = [
-                  {'title':'Dashboard', 'url':'#', 'name':'dashboard'},
-                  {'title':'Explore', 'url':'#', 'name':'explore'},
-                  {'title':'My Courses', 'url':'#', 'name':'my-courses'},
-                  {'title':'My Account', 'url':'#', 'name':'my-account'},
-                ]
-              %>
-              % for item_num, link in enumerate(links, start=1):
-              <li class="nav-colophon-0${item_num}">
-                <a id="${link['name']}" href="${link['url']}">${link['title']}</a>
-              </li>
-              % endfor
+            <li><a href="${reverse('dashboard')}">${_('Dashboard')}</a></li>
 
+          % if (configuration_helpers.get_value('COURSES_ARE_BROWSABLE', settings.FEATURES.get('COURSES_ARE_BROWSABLE', False)) \
+            and CATALOG_DENIED_GROUP not in [group.name for group in user.groups.all()]):
+            <li><a href="${marketing_link('COURSES')}">${_("Explore")}</a></li>
+          % endif
+
+          % if (configuration_helpers.get_value('ENABLE_MYMOOC_CATALOG', settings.FEATURES.get('ENABLE_MYMOOC_CATALOG', False)) \
+              and configuration_helpers.get_value('MYMOOC_URL', None) \
+              and MYMOOC_DENIED_GROUP not in [group.name for group in user.groups.all()]):
+
+            <li><a href="">${_("My Mooc")}</a></li>
+          % endif
+
+            <li><a href="${reverse('dashboard')}">${_('My Courses')}</a></li>
+            <li><a href="${reverse('account_settings')}">${_('My Account')}</a></li>
           </ol>
         </nav>
 
         <nav class="nav-other-systems">
           <h6>admin space</h6>
           <ol>
-            <li><a href="#">Studio</a></li>
-            <li><a href="#">Analytics</a></li>
-            <li><a href="#">User Management System</a></li>
-          </ol>
+            <li><a href="#">${_('Studio')}</a></li>
+
+          % if (configuration_helpers.get_value('ENABLE_ANALYTICS', settings.FEATURES.get('ENABLE_ANALYTICS', False)) \
+              and (ANALYTICS_ACCESS_GROUP in [group.name for group in user.groups.all()] \
+                or ANALYTICS_LIMITED_ACCESS_GROUP in [group.name for group in user.groups.all()])):
+            <li><a href="${reverse('analytics_microsite')}">${_("Analytics")}</a></li>
+          % endif
+
+            </ol>
         </nav>
 
-        <%include file="${static.get_template_path('widgets/footer-language-selector.html')}"/>
+        % if context.get('include_language_selector', footer_language_selector_is_enabled()):
+           <%include file="${static.get_template_path('widgets/footer-language-selector.html')}"/>
+        % endif
 
-        ## Site operators: Please do not remove this paragraph! This attributes back to edX and makes your acknowledgement of edX's trademarks clear.
-        ##<p class="copyright">${footer['copyright']} ${u" | {icp}".format(icp=getattr(settings,'ICP_LICENSE')) if getattr(settings,'ICP_LICENSE',False) else ""}</p>
+        % if not hide_openedx_link and hide_openedx_link != Undefined:
+          ## Site operators: Please do not remove this paragraph! This attributes back to edX and makes your acknowledgement of edX's trademarks clear.
+          <p class="copyright">${footer['copyright']} ${u" | {icp}".format(icp=getattr(settings,'ICP_LICENSE')) if getattr(settings,'ICP_LICENSE',False) else ""}</p>
 
-        ##<nav class="nav-legal" aria-label="${_('Legal')}">
-        ##  <ul>
-        ##    % for item_num, link in enumerate(footer['legal_links'], start=1):
-        ##      <li class="nav-legal-0${item_num}">
-        ##        <a href="${link['url']}">${link['title']}</a>
-        ##      </li>
-        ##    % endfor
-        ##    <li><a href="${footer['edx_org_link']['url']}">${footer['edx_org_link']['text']}</a></li>
-        ##  </ul>
-        ##</nav>
+          <nav class="nav-legal" aria-label="${_('Legal')}">
+           <ul>
+             % for item_num, link in enumerate(footer['legal_links'], start=1):
+               <li class="nav-legal-0${item_num}">
+                 <a href="${link['url']}">${link['title']}</a>
+               </li>
+             % endfor
+             <li><a href="${footer['edx_org_link']['url']}">${footer['edx_org_link']['text']}</a></li>
+           </ul>
+          </nav>
+        % endif
       </div>
-
-
-
 
       ## Please leave this link and use one of the logos provided
       ## The OpenEdX link may be hidden when this view is served
       ## through an API to partner sites (such as marketing sites or blogs),
       ## which are not technically powered by OpenEdX.
-      ##% if not hide_openedx_link:
-      ##<div class="footer-about-openedx">
-      ##  <p>
-      ##    <a href="${footer['openedx_link']['url']}">
-      ##      <img src="${footer['openedx_link']['image']}" alt="${footer['openedx_link']['title']}" width="140" />
-      ##    </a>
-      ##  </p>
-      ##</div>
-      ##% endif
+      % if not hide_openedx_link and hide_openedx_link != Undefined:
+        <div class="footer-about-openedx">
+         <p>
+           <a href="${footer['openedx_link']['url']}">
+             <img src="${footer['openedx_link']['image']}" alt="${footer['openedx_link']['title']}" width="140" />
+           </a>
+         </p>
+        </div>
+      % endif
     </footer>
     <footer class="copyright-wrapper">
       <p class="copyright">Copyright &copy; ${datetime.now(pytz.timezone(settings.TIME_ZONE)).year} <a href="${marketing_link('ABOUT')}">Learning Tribes</a>. ${_("All rights reserved.")}</p>

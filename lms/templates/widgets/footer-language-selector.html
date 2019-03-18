@@ -24,20 +24,14 @@
     ##    <span class="sr">${_("Choose Language")}</span>
     ##</label>
     <select id="footer-language-select" name="language" onchange="footerLanguageSelector.handleSelection(this)">
-        ##<option value=""></option>
         % for language in sorted(released_languages(), key=lambda x: x.code):
             <% language_name = Locale.parse(language.code.replace('_', '-'), sep='-').language_name %>
             % if language.code == LANGUAGE_CODE:
-                <option value="${language.code}" selected="selected">${language_name}</option>
+                <option value="${language.code}" imagesrc="${static.url('images/country-icons/{}.png'.format(language.code))}" selected="selected">${language_name}</option>
             % else:
                 <option value="${language.code}">${language_name}</option>
             % endif
         % endfor
-        <option selected="selected" value="100" imageSrc="${static.url('images/country-icons/british.png')}">English</option>
-        <option value="101" imageSrc="${static.url('images/country-icons/french.png')}">French</option>
-        <option value="102" imageSrc="${static.url('images/country-icons/chinese.png')}">Chinese</option>
-        <option value="102" imageSrc="${static.url('images/country-icons/brazilian.png')}">Brazil</option>
-        <option value="102" imageSrc="${static.url('images/country-icons/american.png')}">United States</option>
     </select>
 </div>
 
