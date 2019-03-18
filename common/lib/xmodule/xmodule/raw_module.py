@@ -19,10 +19,10 @@ class RawMixin(object):
     data = String(help="XML data for the module", default="", scope=Scope.content)
 
     @classmethod
-    def definition_from_xml(cls, xml_object, _system):
+    def definition_from_xml(cls, xml_object, system):
         return {'data': etree.tostring(xml_object, pretty_print=True, encoding='unicode')}, []
 
-    def definition_to_xml(self, _resource_fs):
+    def definition_to_xml(self, resource_fs):
         """
         Return an Element if we've kept the import OLX, or None otherwise.
         """

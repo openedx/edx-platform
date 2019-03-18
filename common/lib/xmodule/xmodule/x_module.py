@@ -331,10 +331,8 @@ class XModuleMixin(XModuleFields, XBlock):
         In an XModule init, the ModuleSystem is available. But an XBlock is init-ed in modulestore earlier.
         So any steps which depend on the ModuleSystem can be added here.
         """
-        if hasattr(self, '_init_only_for_xmodules_converted_to_xblocks'):
-            if hasattr(self.runtime, 'DEBUG') and not getattr(self, 'xmodule_init_complete', False):
-                self.xmodule_init_complete = True
-                self._init_only_for_xmodules_converted_to_xblocks()
+        if hasattr(self, '_init_only_for_xmodules_converted_to_xblocks') and hasattr(self.runtime, 'DEBUG'):
+            self._init_only_for_xmodules_converted_to_xblocks()
 
     @property
     def runtime(self):
