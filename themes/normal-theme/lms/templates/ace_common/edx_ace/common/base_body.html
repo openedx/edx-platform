@@ -27,7 +27,7 @@
     <img src="{image_src}" alt="" role="presentation" aria-hidden="true" />
 {% endfor %}
 
-{% google_analytics_tracking_pixel %}
+
 
 <div bgcolor="#f5f5f5" lang="{{ LANGUAGE_CODE|default:"en" }}" dir="{{ LANGUAGE_BIDI|yesno:"rtl,ltr" }}" style="
     margin: 0;
@@ -200,3 +200,5 @@
 {# Debug info that is not user-visible #}
 <span id="ace-message-id" style="display:none;">{{ message.log_id }}</span>
 <span id="template-revision" style="display:none;">{{ template_revision }}</span>
+
+{% google_analytics_tracking_pixel %}
