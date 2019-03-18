@@ -97,6 +97,12 @@ FEATURES['ENABLE_API_DOCS'] = True
 PIPELINE_ENABLED = False
 STATICFILES_STORAGE = 'openedx.core.storage.DevelopmentStorage'
 
+# STATICFILES_DIRS = [
+#     '/edx/src/edx_xblock_scorm/lms/static/',
+#     '/edx/src/edx_xblock_scorm/cms/static/',
+# ]
+
+
 # Revert to the default set of finders as we don't want the production pipeline
 STATICFILES_FINDERS = [
     'openedx.core.djangoapps.theming.finders.ThemeFilesFinder',

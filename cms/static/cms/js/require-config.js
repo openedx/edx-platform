@@ -61,6 +61,8 @@
 
         defineDependency('jQuery', 'jquery');
         defineDependency('jQuery', 'jquery-migrate');
+        defineDependency('Vue', 'vue');
+        defineDependency('Vue.http', 'vue-resource');
         defineDependency('_', 'underscore');
         defineDependency('s', 'underscore.string');
         defineDependency('gettext', 'gettext');
@@ -105,6 +107,9 @@
             'jquery.iframe-transport': 'js/vendor/jQuery-File-Upload/js/jquery.iframe-transport',
             'jquery.inputnumber': 'js/vendor/html5-input-polyfills/number-polyfill',
             'jquery.immediateDescendents': 'js/src/jquery.immediateDescendents',
+            'vue': 'common/js/vendor/vue',
+            'vue-resource': 'common/js/vendor/vue-resource',
+
             'datepair': 'js/vendor/timepicker/datepair',
             'date': 'js/vendor/date',
             moment: 'common/js/vendor/moment-with-locales',
@@ -228,6 +233,13 @@
             'jquery.tinymce': {
                 deps: ['jquery', 'tinymce'],
                 exports: 'jQuery.fn.tinymce'
+            },
+            'vue': {
+                exports: 'Vue'
+            },
+            'vue-resource': {
+                deps: ['vue'],
+                exports: 'Vue.http'
             },
             'datepair': {
                 deps: ['jquery.ui', 'jquery.timepicker']

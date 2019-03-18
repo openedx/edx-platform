@@ -25,6 +25,9 @@ from util.json_request import JsonResponse
 
 log = logging.getLogger(__name__)
 
+CATALOG_DENIED_GROUP = "Catalog Denied Users"
+MYMOOC_DENIED_GROUP = "MyMooc Denied Users"
+
 
 @ensure_csrf_cookie
 @transaction.non_atomic_requests
@@ -310,3 +313,27 @@ def footer(request):
 
     else:
         return HttpResponse(status=406)
+
+
+@ensure_csrf_cookie
+@cache_if_anonymous()
+def mymooc_catalog(request):
+    """
+    If the "ENABLE_MYMOOC_CATALOG" feature is true
+       and the Mymooc url link is provided in django admin
+       and the user is not part of the MYMOOC_DENIED_GROUP
+    then render the page containing an iframe loading the url.
+    Otherwise return 404
+    """
+    enable_mymooc = configuration_helpers.get_value('ENABLE_MYMOOC_CATALOG',
+                                                    settings.FEATURES.get('ENABLE_MYMOOC_CATALOG', False))
+    mymooc_url = configuration_helpers.get_value('MYMOOC_URL', None)
+    if (enable_mymooc and mymooc_url
+            and MYMOOC_DENIED_GROUP not in [group.name for group in request.user.groups.all()]):
+        context = {'mymooc_url': mymooc_url}
+        redirect_mymooc = configuration_helpers.get_value('ENABLE_MYMOOC_REDIRECTION', False)
+        if redirect_mymooc:
+            return redirect(mymooc_url)
+        return render_to_response('courseware/mymooc_catalog.html', context)
+    else:
+        raise Http404
