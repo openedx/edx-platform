@@ -71,20 +71,23 @@ def check_and_get_upgrade_link_and_date(user, enrollment=None, course=None):
     otherwise, returns None for both the link and date.
     """
     if enrollment is None and course is None:
-        raise ValueError("Must specify either an enrollment or a course")
+        logger.warn(u'Must specify either an enrollment or a course')
+        return (None, None)
 
     if enrollment:
         if course is None:
             course = enrollment.course
         elif enrollment.course_id != course.id:
-            raise ValueError(u"{} refers to a different course than {} which was supplied".format(
+            logger.warn(u'{} refers to a different course than {} which was supplied'.format(
                 enrollment, course
             ))
+            return (None, None)
 
         if enrollment.user_id != user.id:
-            raise ValueError(u"{} refers to a different user than {} which was supplied".format(
+            logger.warn(u'{} refers to a different user than {} which was supplied'.format(
                 enrollment, user
             ))
+            return (None, None)
 
     if enrollment is None:
         enrollment = CourseEnrollment.get_enrollment(user, course.id)
@@ -247,7 +250,7 @@ def get_experiment_user_metadata_context(course, user):
                         # program has 3 courses (A, B and C), and the user previously purchased a certificate for A.
                         # The user is enrolled in audit mode for B. The "left to purchase price" should be the price of
                         # B+C.
-                        non_audit_enrollments = [enrollment for enrollment in user_enrollments if enrollment not in
+                        non_audit_enrollments = [en for en in user_enrollments if en not in
                                                  audit_enrollments]
                         courses_left_to_purchase = get_unenrolled_courses(courses, non_audit_enrollments)
                         if courses_left_to_purchase:
