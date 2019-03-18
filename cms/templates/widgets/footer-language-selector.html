@@ -36,10 +36,10 @@
 </div>
 
 <script type="text/javascript">
+
     class selectComponent {
 
         constructor () {
-
             let wrapper;
             /* Look for any elements with the class "footer-language-selector": */
             wrapper = document.querySelector(".footer-language-selector");
@@ -72,7 +72,7 @@
                 item.appendChild(span);
                 const option = selElmnt.options[j];
                 span.innerText = option.innerHTML;
-                img.src = option.getAttribute('imageSrc');
+                img.src = option.getAttribute('imagesrc');
 
                 if (j == selectedIndex){
                     item.classList.add('same-as-selected');

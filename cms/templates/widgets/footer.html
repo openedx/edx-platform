@@ -1,66 +1,24 @@
 <%namespace name='static' file='/static_content.html'/>
 <%!
+from datetime import datetime
+import pytz
+from django.conf import settings
+from openedx.core.djangoapps.lang_pref.api import header_language_selector_is_enabled, released_languages
 from django.utils.translation import ugettext as _
 from django.urls import reverse
-from datetime import datetime
-from django.conf import settings
-import pytz
 from cms.djangoapps.contentstore.config.waffle import waffle, ENABLE_ACCESSIBILITY_POLICY_PAGE
 %>
 
-<div class="wrapper-footer-nav wrapper">
-  <footer>
-    <img src="${static.url(u'images/studio-logo.png')}" class="logo-triboo"/>
-  </footer>
-</div>
 
 <div class="wrapper-footer wrapper">
   <footer class="primary" role="contentinfo">
 
     <div class="footer-content-primary">
-      ## <div class="colophon">
-      ##   <p>&copy; ${settings.COPYRIGHT_YEAR} <a data-rel="edx.org" href="${marketing_link('ROOT')}" rel="external">${settings.PLATFORM_NAME}</a>.</p>
-      ## </div>
+        <div class="wrapper-logo">
+          <img src="${static.url(u'images/studio-logo.png')}" class="logo-triboo"/>
+        </div>
 
-        <nav class="nav-peripheral" aria-label="${_("Policies")}">
-          <ol>
-            % if is_marketing_link_set('TOS'):
-              <li class="nav-item nav-peripheral-tos">
-                <a data-rel="edx.org" href="${marketing_link('TOS')}">${_("Terms of Service")}</a>
-              </li>
-            % endif
-            % if is_marketing_link_set('PRIVACY'):
-              <li class="nav-item nav-peripheral-pp">
-                <a data-rel="edx.org" href="${marketing_link('PRIVACY')}">${_("Privacy Policy")}</a>
-              </li>
-            % endif
-          </ol>
-        </nav>
-
-        <% languages = released_languages() %>
-        % if len(languages) > 1:
-          <nav class="user-language-selector" aria-label="${_('Language preference')}">
-            <form action="/i18n/setlang/" method="post" class="settings-language-form" id="language-settings-form">
-                <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
-                % if user.is_authenticated:
-                <input title="preference api" type="hidden" id="preference-api-url" class="url-endpoint" value="${reverse('preferences_api', kwargs={'username': user.username})}" data-user-is-authenticated="true">
-                % else:
-                <input title="session update url" type="hidden" id="update-session-url" class="url-endpoint" value="${reverse('session_language')}" data-user-is-authenticated="false">
-                % endif
-                <label><span class="sr">${_("Choose Language")}</span>
-                <select class="input select language-selector" id="settings-language-value" name="language">
-                % for language in languages:
-                  % if language[0] == LANGUAGE_CODE:
-                   <option value="${language[0]}" selected="selected">${language[1]}</option>
-                  % else:
-                   <option value="${language[0]}" >${language[1]}</option>
-                  % endif
-                % endfor
-                </select>
-                </label>
-            </form>
-          </nav>
-        % endif
+        <%include file="${static.get_template_path('footer-language-selector.html')}"/>
     </div>
 
     <div class="footer-content-secondary" aria-label="${_("Legal")}">

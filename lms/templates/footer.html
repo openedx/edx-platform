@@ -97,7 +97,7 @@
               and configuration_helpers.get_value('MYMOOC_URL', None) \
               and MYMOOC_DENIED_GROUP not in [group.name for group in user.groups.all()]):
 
-            <li><a href="">${_("My Mooc")}</a></li>
+            <li><a href="${reverse('mymooc_catalog')}">${_("My Mooc")}</a></li>
           % endif
 
             <li><a href="${reverse('dashboard')}">${_('My Courses')}</a></li>
@@ -108,7 +108,7 @@
         <nav class="nav-other-systems">
           <h6>admin space</h6>
           <ol>
-            <li><a href="#">${_('Studio')}</a></li>
+            <li><a href="${getattr(settings, 'CMS_BASE')}">${_('Studio')}</a></li>
 
           % if (configuration_helpers.get_value('ENABLE_ANALYTICS', settings.FEATURES.get('ENABLE_ANALYTICS', False)) \
               and (ANALYTICS_ACCESS_GROUP in [group.name for group in user.groups.all()] \
