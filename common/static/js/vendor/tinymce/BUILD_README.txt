@@ -4,7 +4,7 @@ Instructions for creating js/tinymce.full.min.js
    install them per the directions on https://github.com/tinymce/tinymce/tree/4.0.20.
 2. Unzip edx-platform/vendor_extra/tinymce/JakePackage.zip into this directory (so that Jakefile.js resides in this directory).
 3. Run the following command in the tinymce directory:
-   jake minify bundle[themes:modern,plugins:image,link,codemirror,paste,table,textcolor,media]
+   jake minify bundle[themes:modern,plugins:advlist,anchor,autolink,charmap,code,codemirror,contextmenu,image,insertdatetime,link,lists,media,paste,print,save,searchreplace,table,textcolor,visualblocks]
 4. Cleanup by deleting the Unversioned files that were created from unzipping jake_package.zip.
 
 Instructions for updating tinymce to a newer version:
