@@ -301,6 +301,9 @@ urlpatterns += [
 
     url(r'^courses/?$', branding_views.courses, name='courses'),
 
+    # view of mymooc catalog
+    url(r'^courses/mymooc_catalog$', branding_views.mymooc_catalog, name='mymooc_catalog'),
+
     #About the course
     url(
         r'^courses/{}/about$'.format(

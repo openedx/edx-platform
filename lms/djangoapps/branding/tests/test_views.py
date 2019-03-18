@@ -15,6 +15,7 @@ from branding.models import BrandingApiConfig
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.lang_pref.api import released_languages
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme_context
 from student.tests.factories import UserFactory
 
@@ -320,3 +321,32 @@ class TestIndex(SiteMixin, TestCase):
         self.client.login(username=self.user.username, password="password")
         response = self.client.get(reverse("dashboard"))
         self.assertIn(self.site_configuration_other.values["MKTG_URLS"]["ROOT"], response.content)
+
+
+class TestMyMoocCatalog(TestCase):
+    """ Test the mymooc_catalog view """
+
+    def setUp(self):
+        super(TestMyMoocCatalog, self).setUp()
+        self.disable_mymooc_config_1 = {"ENABLE_MYMOOC_CATALOG": False}
+        self.disable_mymooc_config_2 = {"ENABLE_MYMOOC_CATALOG": True, "MYMOOC_URL": ""}
+        self.enable_redirection_config = {"ENABLE_MYMOOC_CATALOG": True, "MYMOOC_URL": "http://test.com",
+                                          "ENABLE_MYMOOC_REDIRECTION": True}
+
+    def test_with_mymooc_catalog_disabled(self):
+        """ Test mymooc_catalog view returns 404 if ENABLE_MYMOOC_CATALOG=False """
+        with with_site_configuration_context(configuration=self.disable_mymooc_config_1):
+            response = self.client.get(reverse("mymooc_catalog"))
+            self.assertEqual(response.status_code, 404)
+
+    def test_with_empty_mymooc_url(self):
+        """ Test mymooc_catalog view returns 404 if MYMOOC_URL is not provided """
+        with with_site_configuration_context(configuration=self.disable_mymooc_config_2):
+            response = self.client.get(reverse("mymooc_catalog"))
+            self.assertEqual(response.status_code, 404)
+
+    def test_with_mymooc_redirection_enabled(self):
+        """ Test mymooc_catalog view will redirect if ENABLE_MYMOOC_REDIRECTION=True """
+        with with_site_configuration_context(configuration=self.enable_redirection_config):
+            response = self.client.get(reverse("mymooc_catalog"))
+            self.assertEqual(response.status_code, 302)
