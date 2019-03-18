@@ -389,7 +389,8 @@ class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, Sear
         self.setup_user(self.audit_user)
 
         # These query counts were found empirically
-        query_counts = [63, 50, 50, 50, 50, 50, 50, 50, 50, 50, 20]
+        query_counts = [64, 51, 51, 51, 51, 51, 51, 51, 51, 51, 21]
+        with_username_adjust = [4, 4, 4, 7, 7, 7, 10, 10, 10, 13, 13]
         ordered_course_ids = sorted([str(cid) for cid in (course_ids + [c.id for c in self.courses])])
 
         self.clear_caches()
@@ -398,7 +399,7 @@ class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, Sear
             RequestCache.clear_all_namespaces()
             expected_query_count = query_counts[page - 1]
             if with_username:
-                expected_query_count += 4
+                expected_query_count += with_username_adjust[page - 1]
             with self.assertNumQueries(expected_query_count):
                 params = {'page': page, 'page_size': 30}
                 if with_username:
