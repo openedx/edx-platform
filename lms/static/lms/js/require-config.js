@@ -49,6 +49,8 @@
         };
 
         defineDependency('jQuery', 'jquery');
+        defineDependency('Vue', 'vue');
+        defineDependency('Vue.http', 'vue-resource');
         defineDependency('jQuery', 'jquery-migrate');
         defineDependency('_', 'underscore');
         defineDependency('s', 'underscore.string');
@@ -96,6 +98,8 @@
             'jquery.ui': 'js/vendor/jquery-ui.min',
             'jquery.iframe-transport': 'js/vendor/jQuery-File-Upload/js/jquery.iframe-transport',
             'jquery.fileupload': 'js/vendor/jQuery-File-Upload/js/jquery.fileupload',
+            'vue': 'common/js/vendor/vue',
+            'vue-resource': 'common/js/vendor/vue-resource',
             'URI': 'js/vendor/URI.min',
             'string_utils': 'js/src/string_utils',
             'utility': 'js/src/utility',
@@ -158,6 +162,13 @@
             'jquery.tinymce': {
                 deps: ['jquery', 'tinymce'],
                 exports: 'jQuery.fn.tinymce'
+            },
+            'vue': {
+                exports: 'Vue'
+            },
+            'vue-resource': {
+                deps: ['vue'],
+                exports: 'Vue.http'
             },
             'backbone.paginator': {
                 deps: ['backbone'],
