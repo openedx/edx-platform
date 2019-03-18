@@ -43,7 +43,7 @@ except ImproperlyConfigured:
 @XBlock.needs('i18n')
 class ProblemBlock(
         CapaMixin, RawMixin, XmlParserMixin, EditingMixin,
-        XModuleDescriptorToXBlockMixin, XModuleToXBlockMixin, ResourceTemplates, XModuleMixin):
+        XModuleDescriptorToXBlockMixin, XModuleToXBlockMixin, HTMLSnippet, ResourceTemplates, XModuleMixin):
     """
     Define the possible fields for a Capa problem
     """
@@ -189,45 +189,63 @@ class ProblemBlock(
         scope=Scope.settings
     )
 
+    INDEX_CONTENT_TYPE = 'CAPA'
+
+    resources_dir = None
+
+    has_score = True
+    show_in_read_only_mode = True
+    template_dir_name = 'problem'
+    mako_template = "widgets/problem-edit.html"
+    has_author_view = True
+
+    # The capa format specifies that what we call max_attempts in the code
+    # is the attribute `attempts`. This will do that conversion
+    metadata_translations = dict(XmlParserMixin.metadata_translations)
+    metadata_translations['attempts'] = 'max_attempts'
+
     icon_class = 'problem'
 
-    class CapaModule(HTMLSnippet):
+    uses_xmodule_styles_setup = True
 
-        js = {
-            'js': [
-                resource_string(__name__, 'js/src/javascript_loader.js'),
-                resource_string(__name__, 'js/src/capa/display.js'),
-                resource_string(__name__, 'js/src/collapsible.js'),
-                resource_string(__name__, 'js/src/capa/imageinput.js'),
-                resource_string(__name__, 'js/src/capa/schematic.js'),
-            ]
-        }
+    preview_view_js = {
+        'js': [
+            resource_string(__name__, 'js/src/javascript_loader.js'),
+            resource_string(__name__, 'js/src/capa/display.js'),
+            resource_string(__name__, 'js/src/collapsible.js'),
+            resource_string(__name__, 'js/src/capa/imageinput.js'),
+            resource_string(__name__, 'js/src/capa/schematic.js'),
+        ],
+        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js')
+    }
 
-        js_module_name = "Problem"
-        css = {'scss': [resource_string(__name__, 'css/capa/display.scss')]}
+    preview_view_css = {
+        'scss': [
+            resource_string(__name__, 'css/capa/display.scss'),
+        ],
+    }
 
-    class CapaDescriptor(HTMLSnippet):
+    studio_view_js = {
+        'js': [
+            resource_string(__name__, 'js/src/problem/edit.js'),
+        ],
+        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
+    }
 
-        js = {'js': [resource_string(__name__, 'js/src/problem/edit.js')]}
-        js_module_name = "MarkdownEditingDescriptor"
-
-        css = {
-            'scss': [
-                resource_string(__name__, 'css/editor/edit.scss'),
-                resource_string(__name__, 'css/problem/edit.scss')
-            ]
-        }
-
-    descriptor_class = CapaDescriptor
-    module_class = CapaModule
+    studio_view_css = {
+        'scss': [
+            resource_string(__name__, 'css/editor/edit.scss'),
+            resource_string(__name__, 'css/problem/edit.scss'),
+        ]
+    }
 
     def student_view(self, _context):
         """
         Return the student view.
         """
         fragment = Fragment(self.get_html())
-        add_webpack_to_fragment(fragment, self.module_class.__name__)
-        shim_xmodule_js(self.module_class, fragment)
+        add_webpack_to_fragment(fragment, 'ProblemBlockPreview')
+        shim_xmodule_js(fragment, 'Problem')
         return fragment
 
     def author_view(self, context):
@@ -243,8 +261,8 @@ class ProblemBlock(
         fragment = Fragment(
             self.system.render_template(self.mako_template, self.get_context())
         )
-        add_webpack_to_fragment(fragment, self.descriptor_class.__name__)
-        shim_xmodule_js(self.descriptor_class, fragment)
+        add_webpack_to_fragment(fragment, 'ProblemBlockStudio')
+        shim_xmodule_js(fragment, 'MarkdownEditingDescriptor')
         return fragment
 
     def handle_ajax(self, dispatch, data):
@@ -337,21 +355,6 @@ class ProblemBlock(
             return self.location.block_type
 
         return self.display_name
-
-    INDEX_CONTENT_TYPE = 'CAPA'
-
-    resources_dir = None
-
-    has_score = True
-    show_in_read_only_mode = True
-    template_dir_name = 'problem'
-    mako_template = "widgets/problem-edit.html"
-    has_author_view = True
-
-    # The capa format specifies that what we call max_attempts in the code
-    # is the attribute `attempts`. This will do that conversion
-    metadata_translations = dict(XmlParserMixin.metadata_translations)
-    metadata_translations['attempts'] = 'max_attempts'
 
     @classmethod
     def filter_templates(cls, template, course):

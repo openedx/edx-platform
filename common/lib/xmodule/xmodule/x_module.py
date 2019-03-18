@@ -207,7 +207,12 @@ class HTMLSnippet(object):
     js = {}
     js_module_name = None
 
+    preview_view_js = {}
+    studio_view_js = {}
+
     css = {}
+    preview_view_css = {}
+    studio_view_css = {}
 
     @classmethod
     def get_javascript(cls):
@@ -234,6 +239,30 @@ class HTMLSnippet(object):
         return cls.js
 
     @classmethod
+    def get_preview_view_js(cls):
+        if issubclass(cls, XModule):
+            return cls.get_javascript()
+        return cls.preview_view_js
+
+    @classmethod
+    def get_preview_view_js_bundle_name(cls):
+        if issubclass(cls, XModule):
+            return cls.__name__
+        return cls.__name__ + 'Preview'
+
+    @classmethod
+    def get_studio_view_js(cls):
+        if issubclass(cls, XModuleDescriptor):
+            return cls.get_javascript()
+        return cls.studio_view_js
+
+    @classmethod
+    def get_studio_view_js_bundle_name(cls):
+        if issubclass(cls, XModuleDescriptor):
+            return cls.__name__
+        return cls.__name__ + 'Studio'
+
+    @classmethod
     def get_css(cls):
         """
         Return a dictionary containing some of the following keys:
@@ -249,6 +278,18 @@ class HTMLSnippet(object):
         """
         return cls.css
 
+    @classmethod
+    def get_preview_view_css(cls):
+        if issubclass(cls, XModule):
+            return cls.get_css()
+        return cls.preview_view_css
+
+    @classmethod
+    def get_studio_view_css(cls):
+        if issubclass(cls, XModuleDescriptor):
+            return cls.get_css()
+        return cls.studio_view_css
+
     def get_html(self):
         """
         Return the html used to display this snippet
@@ -258,7 +299,7 @@ class HTMLSnippet(object):
             .format(self.__class__))
 
 
-def shim_xmodule_js(block, fragment):
+def shim_xmodule_js(fragment, js_module_name):
     """
     Set up the XBlock -> XModule shim on the supplied :class:`web_fragments.fragment.Fragment`
     """
@@ -268,7 +309,7 @@ def shim_xmodule_js(block, fragment):
 
     if not fragment.js_init_fn:
         fragment.initialize_js('XBlockToXModuleShim')
-        fragment.json_init_args = {'xmodule-type': block.js_module_name}
+        fragment.json_init_args = {'xmodule-type': js_module_name}
 
         add_webpack_to_fragment(fragment, 'XModuleShim')
 
