@@ -63,7 +63,7 @@ coreschema==0.0.4         # via coreapi
 cryptography==2.6.1
 cssutils==1.0.2           # via pynliner
 ddt==1.2.1
-decorator==4.3.2          # via pycontracts
+decorator==4.4.0          # via pycontracts
 defusedxml==0.5.0
 django-appconf==1.0.3     # via django-statici18n
 django-babel-underscore==0.5.2
@@ -205,7 +205,7 @@ python-swiftclient==3.7.0
 python3-saml==1.5.0
 pytz==2018.9
 pyuca==1.1
-pyyaml==3.13
+pyyaml==5.1
 redis==2.10.6
 reportlab==3.5.13
 requests-oauthlib==1.1.0
