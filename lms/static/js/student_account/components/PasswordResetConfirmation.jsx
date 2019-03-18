@@ -99,6 +99,7 @@ class PasswordResetConfirmation extends React.Component {
               label={gettext('New Password')}
               onBlur={this.onBlurPassword1}
               isValid={this.state.isValid}
+              autoComplete="new-password"
               validationMessage={this.state.validationMessage}
             />
 
@@ -108,6 +109,7 @@ class PasswordResetConfirmation extends React.Component {
               label={gettext('Confirm Password')}
               onBlur={this.onBlurPassword2}
               isValid={!this.state.showMatchError}
+              autoComplete="new-password"
               validationMessage={gettext('Passwords do not match.')}
             />
 
