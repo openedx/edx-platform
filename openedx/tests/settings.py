@@ -88,6 +88,7 @@ INSTALLED_APPS = (
     'milestones',
     'celery_utils',
     'waffle',
+    'edx_when',
 
     # Django 1.11 demands to have imported models supported by installed apps.
     'completion',
