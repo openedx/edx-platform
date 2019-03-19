@@ -20,7 +20,7 @@ def unquote_slashes(text):
     """
     Unquote slashes quoted by `quote_slashes`
     """
-    return re.sub(u'(;;|;_)', _unquote_slashes, text)
+    return re.sub(r'(;;|;_)', _unquote_slashes, text)
 
 
 def _quote_slashes(match):
