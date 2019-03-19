@@ -68,7 +68,7 @@ class CourseDurationLimitMessageBaseTask(LoggedTask):
 
             if not enqueue_enabled:
                 cls.log_info(u'Message queuing disabled for course_key %s', course_key)
-                return
+                continue
 
             target_date = current_date + datetime.timedelta(days=day_offset)
             for bin_num in range(cls.num_bins):
