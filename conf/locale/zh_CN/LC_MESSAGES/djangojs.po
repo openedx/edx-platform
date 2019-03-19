@@ -387,7 +387,7 @@ msgstr[0] "%(earned)s/%(possible)s得分 (计入成绩)"
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "%(earned)s/%(possible)s point (ungraded)"
 msgid_plural "%(earned)s/%(possible)s points (ungraded)"
-msgstr[0] "%(earned)s/%(possible)s/得分 (不计入成绩)"
+msgstr[0] "%(earned)s/%(possible)s 得分 (不计入成绩)"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "The grading process is still running. Refresh the page to see updates."

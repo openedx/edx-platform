@@ -5174,7 +5174,7 @@ msgstr "为自己验证此证书"
 #: lms/djangoapps/certificates/views/webview.py
 #, python-brace-format
 msgid "{platform_name} offers interactive online classes and MOOCs."
-msgstr "{platform_name} 提供线上互动课程和MOOCs课程。"
+msgstr "{platform_name}提供线上互动课程和MOOCs课程。"
 
 #: lms/djangoapps/certificates/views/webview.py
 #, python-brace-format
@@ -26448,7 +26448,7 @@ msgstr "萧柏春 博士"
 msgid ""
 "Lifetime Professor and Dean of Management Major in School of Business, Long "
 "Island University - C. W. Post, USA"
-msgstr "美国长岛大学商学院管理系主任、终身教授"
+msgstr "美国长岛大学商学院管理系终身教授、系主任"
 
 #: membership/templates/membership/index.html
 msgid "Dr. Lloyd E. Shefsky"
@@ -26458,7 +26458,7 @@ msgstr "谢洛德 博士"
 msgid ""
 "Clinical Professor, Founder and Co-director of the Center for Family "
 "Enterprises in Kellogg School of Management at Northwestern University, USA"
-msgstr "原美国西北大学凯洛格商学院家族企业中心创始人、创业专业教授"
+msgstr "原美国西北大学凯洛格商学院创业专业教授"
 
 #: membership/templates/membership/index.html
 msgid "Prof. Tim Smithe"
@@ -26498,7 +26498,7 @@ msgstr "汪嘉旻 博士"
 msgid ""
 "Lifetime Professor of Information Management & Technology, Long Island "
 "University - C. W. Post, USA"
-msgstr "美国长岛大学商学院管理信息系统专业终身教授"
+msgstr "美国长岛大学商学院管理系终身教授"
 
 #: membership/templates/membership/index.html
 msgid "Dr. Tianning Li"
