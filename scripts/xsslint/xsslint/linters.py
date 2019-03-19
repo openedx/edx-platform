@@ -1062,11 +1062,11 @@ class MakoTemplateLinter(BaseLinter):
         contexts = self._get_contexts(mako_template)
         self._check_javascript_contexts(mako_template, contexts, results)
         for expression in expressions:
-            if expression.end_index is None:
-                results.violations.append(ExpressionRuleViolation(
-                    self.ruleset.mako_unparseable_expression, expression
-                ))
-                continue
+            # if expression.end_index is None:
+            #     results.violations.append(ExpressionRuleViolation(
+            #         self.ruleset.mako_unparseable_expression, expression
+            #     ))
+            #     continue
 
             context = self._get_context(contexts, expression.start_index)
             self._check_expression_and_filters(mako_template, expression, context, has_page_default, results)
@@ -1226,6 +1226,9 @@ class MakoTemplateLinter(BaseLinter):
             results: A list of results into which violations will be added.
 
         """
+        from pdb import set_trace
+        set_trace()
+
         if context == 'unknown':
             results.violations.append(ExpressionRuleViolation(
                 self.ruleset.mako_unknown_context, expression
