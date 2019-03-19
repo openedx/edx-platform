@@ -99,7 +99,7 @@ def _get_course_module(course_descriptor, user):
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
         course_descriptor.id, user, course_descriptor, depth=1, read_only=True,
     )
-    module =  get_module_for_descriptor(
+    module = get_module_for_descriptor(
         user, request, course_descriptor, field_data_cache, course_descriptor.id, course=course_descriptor,
     )
     if module is None:
