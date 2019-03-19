@@ -13,18 +13,29 @@
 <script src="/static/normal-theme/js/certificates/qrcode.js"></script>
 <script type="text/javascript">
     if (document.getElementById("action-print-view") != null){
-        document.getElementById("action-print-view").addEventListener("click", printView);
-        function printView(event) {
-           event.preventDefault();
-           window.print();
-        }
-        document.getElementById("action-download-view").addEventListener("click", function(){
-            var aLink = document.createElement('a')
-            aLink.download = 'certificates.png'
-            var url = document.querySelector('#container img').src;
-            aLink.href = url 
-            aLink.dispatchEvent(new MouseEvent('click', {}))
-        });
+        $('#action-print-view').click(function(){
+            window.print();
+         });
+
+        $('#action-download-view').click(function(){
+            var imgUrl = document.querySelector('#container img').src;
+            // 如果浏览器支持msSaveOrOpenBlob方法（也就是使用IE浏览器的时候），那么调用该方法去下载图片
+            if (window.navigator.msSaveOrOpenBlob) {
+                var bstr = atob(imgUrl.split(',')[1])
+                var n = bstr.length
+                var u8arr = new Uint8Array(n)
+                while (n--) {
+                u8arr[n] = bstr.charCodeAt(n)
+            }
+            var blob = new Blob([u8arr])
+            window.navigator.msSaveOrOpenBlob(blob, 'certificates' + '.' + 'png')
+            } else {
+                const a = document.createElement('a')
+                a.href = imgUrl
+                a.setAttribute('download', 'certificates.png')
+                a.click()
+            }
+        })
     }
 </script>
 
