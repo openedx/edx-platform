@@ -30,70 +30,86 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
   ## Dashboard, Catalogue, My courses, Analytics, Studio
   <div class="main">
     % if show_dashboard_tabs:
-      <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
-        <a class="${'active ' if reverse('dashboard') == request.path else ''}tab-nav-link" href="${reverse('dashboard')}">
-          <span class="label"><span class="icon far fa-home-alt" aria-hidden="true"></span></span>
-          ${_("Dashboard")}
-        </a>
-      </div>
-      <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
-        <a class="tab-nav-link" href="${reverse('dashboard')}">
-          <!--alternatives for icon; fa-building grip-horizontal th -->
-          <span class="label"><span class="icon far fa-grip-vertical" aria-hidden="true"></span></span>
-          ${_("Catalog")}
-        </a>
-      </div>
-      <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
-        <a class="tab-nav-link" href="${reverse('dashboard')}">
-          <span class="label"><span class="icon far fa-file-alt" aria-hidden="true"></span></span>
-          ${_("My Courses")}
-        </a>
-      </div>
-      <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
-        <a class="tab-nav-link" href="${reverse('dashboard')}">
-          <span class="label"><span class="icon far fa-analytics" aria-hidden="true"></span></span>
-          ${_("Analytics")}
-        </a>
-      </div>
-      <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
-        <a class="tab-nav-link" href="${reverse('dashboard')}">
-          <span class="label"><span class="icon far fa-edit" aria-hidden="true"></span></span>
-          ${_("Studio")}
-        </a>
-      </div>
-      % if show_program_listing:
         <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
-          <a class="${'active ' if reverse('program_listing_view') in request.path else ''}tab-nav-link" href="${reverse('program_listing_view')}">
-            ${_("Programs")}
+          <a class="${'active ' if reverse('dashboard') == request.path else ''}tab-nav-link" href="${reverse('dashboard')}">
+            <span class="label"><span class="icon far fa-home-alt" aria-hidden="true"></span></span>
+            ${_("Dashboard")}
+          </a>
+        </div>
+
+      % if (configuration_helpers.get_value('COURSES_ARE_BROWSABLE', settings.FEATURES.get('COURSES_ARE_BROWSABLE', False)) \
+        and CATALOG_DENIED_GROUP not in [group.name for group in user.groups.all()]):
+        <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
+          <a class="tab-nav-link" href="${marketing_link('COURSES')}">
+            <span class="label"><span class="icon far fa-book-open" aria-hidden="true"></span></span>
+            ${_("Explore")}
           </a>
         </div>
       % endif
-      <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
-        <a class="${'active ' if '/u/' in request.path  else ''}tab-nav-link" href="${reverse('learner_profile', args=[self.real_user.username])}">
-          ${_("Profile")}
-        </a>
-      </div>
+
+  ##  % if show_explore_courses:
+      % if (configuration_helpers.get_value('ENABLE_MYMOOC_CATALOG', settings.FEATURES.get('ENABLE_MYMOOC_CATALOG', False)) \
+        and configuration_helpers.get_value('MYMOOC_URL', None) \
+        and MYMOOC_DENIED_GROUP not in [group.name for group in user.groups.all()]):
+        <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
+          <a class="tab-nav-link" href="${reverse('mymooc_catalog')}">
+            <span class="label"><span class="icon far fa-book-open" aria-hidden="true"></span></span>
+            ${_("My Mooc")}
+          </a>
+        </div>
+      % endif
+
+
+        <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
+          <a class="tab-nav-link" href="${reverse('dashboard')}">
+            <span class="label"><span class="icon far fa-file-alt" aria-hidden="true"></span></span>
+            ${_("My Courses")}
+          </a>
+        </div>
+
+      % if (configuration_helpers.get_value('ENABLE_ANALYTICS', settings.FEATURES.get('ENABLE_ANALYTICS', False)) \
+        and (ANALYTICS_ACCESS_GROUP in [group.name for group in user.groups.all()] \
+        or ANALYTICS_LIMITED_ACCESS_GROUP in [group.name for group in user.groups.all()])):
+        <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
+          <a class="tab-nav-link" href="${reverse('analytics_microsite')}">
+            <span class="label"><span class="icon far fa-analytics" aria-hidden="true"></span></span>
+            ${_("Analytics")}
+          </a>
+        </div>
+      % endif
+
+        <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
+          <a class="tab-nav-link" href="${getattr(settings, 'CMS_BASE')}">
+            <span class="label"><span class="icon far fa-edit" aria-hidden="true"></span></span>
+            ${_("Studio")}
+          </a>
+        </div>
+
+  ##      % if show_program_listing:
+  ##        <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
+  ##          <a class="${'active ' if reverse('program_listing_view') in request.path else ''}tab-nav-link" href="${reverse('program_listing_view')}">
+  ##            ${_("Programs")}
+  ##          </a>
+  ##        </div>
+  ##      % endif
     % endif
-    % if show_explore_courses:
-      <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
-        <a class="tab-nav-link" href="${marketing_link('COURSES')}">${_('Discover New')}</a>
-      </div>
-    % endif
-    % if show_sysadmin_dashboard:
-      <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
-        ## Translators: This is short for "System administration".
-        <a class="tab-nav-link" href="${reverse('sysadmin')}">${_("Sysadmin")}</a>
-      </div>
-    % endif
+
+  ## % if show_sysadmin_dashboard:
+  ##   <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
+  ##     ## Translators: This is short for "System administration".
+  ##     <a class="tab-nav-link" href="${reverse('sysadmin')}">${_("Sysadmin")}</a>
+  ##   </div>
+  ## % endif
   </div>
+
   <div class="secondary">
-    % if should_display_shopping_cart_func() and not (course and static.is_request_in_themed_site()): # see shoppingcart.context_processor.user_has_cart_context_processor
-      <div class="mobile-nav-item hidden-mobile nav-item">
-        <a class="shopping-cart" href="${reverse('shoppingcart.views.show_cart')}">
-          <span class="icon fa fa-shopping-cart" aria-hidden="true"></span> ${_("Shopping Cart")}
-        </a>
-      </div>
-    % endif
+    ## % if should_display_shopping_cart_func() and not (course and static.is_request_in_themed_site()): # see shoppingcart.context_processor.user_has_cart_context_processor
+    ##   <div class="mobile-nav-item hidden-mobile nav-item">
+    ##     <a class="shopping-cart" href="${reverse('shoppingcart.views.show_cart')}">
+    ##       <span class="icon fa fa-shopping-cart" aria-hidden="true"></span> ${_("Shopping Cart")}
+    ##     </a>
+    ##   </div>
+    ## % endif
     ##<div class="mobile-nav-item hidden-mobile nav-item">
     ##  <a class="help-link" href="${help_link}" target="_blank">${_("Help")}</a>
     ##</div>

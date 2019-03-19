@@ -31,7 +31,7 @@ $bookmarked-icon: "\f02e"; // .fa-bookmark
 
     &::before {
       content: $bookmarked-icon;
-      font-family: FontAwesome;
+      font-family: 'Font Awesome 5 Pro';
     }
   }
 }
@@ -57,7 +57,7 @@ $bookmarked-icon: "\f02e"; // .fa-bookmark
       @include padding-right($baseline / 4);
 
       content: $bookmark-icon;
-      font-family: FontAwesome;
+      font-family: 'Font Awesome 5 Pro';
     }
 
     &.bookmarked {

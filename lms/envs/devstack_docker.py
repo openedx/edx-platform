@@ -9,9 +9,9 @@ LOGGING['handlers']['local'] = LOGGING['handlers']['tracking'] = {
 
 LOGGING['loggers']['tracking']['handlers'] = ['console']
 
-LMS_BASE = 'edx.devstack.lms:18000'
-CMS_BASE = 'edx.devstack.studio:18010'
-SITE_NAME = LMS_BASE
+LMS_BASE = '0.0.0.0:18000'
+CMS_BASE = '0.0.0.0:18010'
+SITE_NAME = "Triboo"
 LMS_ROOT_URL = 'http://{}'.format(LMS_BASE)
 LMS_INTERNAL_ROOT_URL = LMS_ROOT_URL
 

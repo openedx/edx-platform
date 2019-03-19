@@ -15,6 +15,14 @@
 // Bootstrap components
 @import 'bootstrap/scss/popover';
 
+// Fontawesome
+@import 'fontawesome/fontawesome';
+@import 'fontawesome/light';
+@import 'fontawesome/regular';
+@import 'fontawesome/solid';
+@import 'fontawesome/v4-shims';
+
+
 // LMS-specific variables
 @import '../variables';
 

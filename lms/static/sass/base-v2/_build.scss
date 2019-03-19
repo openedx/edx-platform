@@ -10,6 +10,14 @@
 @import 'bootstrap/scss/mixins/breakpoints';
 @import 'bootstrap/scss/mixins/grid';
 
+// Fontawesome
+@import 'fontawesome/fontawesome';
+@import 'fontawesome/light';
+@import 'fontawesome/regular';
+@import 'fontawesome/solid';
+@import 'fontawesome/v4-shims';
+
+
 // Pattern Library extensions
 @import 'base';
 @import 'extends';

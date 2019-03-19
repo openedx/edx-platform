@@ -94,9 +94,8 @@
           % endif
 
           % if (configuration_helpers.get_value('ENABLE_MYMOOC_CATALOG', settings.FEATURES.get('ENABLE_MYMOOC_CATALOG', False)) \
-              and configuration_helpers.get_value('MYMOOC_URL', None) \
-              and MYMOOC_DENIED_GROUP not in [group.name for group in user.groups.all()]):
-
+            and configuration_helpers.get_value('MYMOOC_URL', None) \
+            and MYMOOC_DENIED_GROUP not in [group.name for group in user.groups.all()]):
             <li><a href="${reverse('mymooc_catalog')}">${_("My Mooc")}</a></li>
           % endif
 
