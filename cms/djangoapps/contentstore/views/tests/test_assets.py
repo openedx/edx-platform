@@ -294,7 +294,7 @@ class PaginationTestCase(AssetsTestCase):
         assets_response = json_response['assets']
         self.assertEquals(filter_value_split, json_response['assetTypes'])
 
-        if filter_value is not '':
+        if filter_value != '':
             content_types = [asset['content_type'].lower()
                              for asset in assets_response]
             if 'OTHER' in filter_value_split:

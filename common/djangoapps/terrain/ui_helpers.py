@@ -634,12 +634,12 @@ def click_tools():
 
 @world.absorb
 def is_mac():
-    return platform.mac_ver()[0] is not ''
+    return platform.mac_ver()[0] != ''
 
 
 @world.absorb
 def is_firefox():
-    return world.browser.driver_name is 'Firefox'
+    return world.browser.driver_name == 'Firefox'
 
 
 @world.absorb
