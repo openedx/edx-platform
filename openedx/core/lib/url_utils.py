@@ -13,7 +13,7 @@ def quote_slashes(text):
     ';;'. By making the escape sequence fixed length, and escaping
     identifier character ';', we are able to reverse the escaping.
     """
-    return re.sub(ur'[;/]', _quote_slashes, text)
+    return re.sub(r'[;/]', _quote_slashes, text)
 
 
 def unquote_slashes(text):
