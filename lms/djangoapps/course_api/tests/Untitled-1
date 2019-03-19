@@ -1,0 +1,38 @@
+ SELECT   `course_duration_limits_coursedurationlimitconfig`.`id`,
+         `course_duration_limits_coursedurationlimitconfig`.`change_date`,
+         `course_duration_limits_coursedurationlimitconfig`.`changed_by_id`,
+         `course_duration_limits_coursedurationlimitconfig`.`enabled`,
+         `course_duration_limits_coursedurationlimitconfig`.`site_id`,
+         `course_duration_limits_coursedurationlimitconfig`.`org`,
+         `course_duration_limits_coursedurationlimitconfig`.`course_id`,
+         `course_duration_limits_coursedurationlimitconfig`.`enabled_as_of`,
+         1 AS `is_active`
+FROM     `course_duration_limits_coursedurationlimitconfig`
+WHERE    (
+                  `course_duration_limits_coursedurationlimitconfig`.`id` IN
+                  (
+                           SELECT   max(u0.`id`) AS `max`
+                           FROM     `course_duration_limits_coursedurationlimitconfig` u0
+                           GROUP BY u0.`site_id`,
+                                    u0.`org`,
+                                    u0.`course_id`
+                           ORDER BY NULL)
+         AND      ((
+                                    `course_duration_limits_coursedurationlimitconfig`.`course_id` IS NULL
+                           AND      `course_duration_limits_coursedurationlimitconfig`.`org` IS NULL
+                           AND      `course_duration_limits_coursedurationlimitconfig`.`site_id` IS NULL)
+                  OR       (
+                                    `course_duration_limits_coursedurationlimitconfig`.`course_id` IS NULL
+                           AND      `course_duration_limits_coursedurationlimitconfig`.`org` IS NULL
+                           AND      `course_duration_limits_coursedurationlimitconfig`.`site_id` = 1)
+                  OR       (
+                                    `course_duration_limits_coursedurationlimitconfig`.`course_id` IS NULL
+                           AND      `course_duration_limits_coursedurationlimitconfig`.`org` = 'edX'
+                           AND      `course_duration_limits_coursedurationlimitconfig`.`site_id` IS NULL)
+                  OR       (
+                                    `course_duration_limits_coursedurationlimitconfig`.`course_id` = 'course-v1:UCSanDiegoX+ALGS201x+2T2017'
+                           AND      `course_duration_limits_coursedurationlimitconfig`.`org` IS NULL
+                           AND      `course_duration_limits_coursedurationlimitconfig`.`site_id` IS NULL)))
+ORDER BY IF(Isnull(`course_duration_limits_coursedurationlimitconfig`.`course_id`),0,1), `course_duration_limits_coursedurationlimitconfig`.`course_id` DESC,
+IF(isnull(`course_duration_limits_coursedurationlimitconfig`.`org`),0,1), `course_duration_limits_coursedurationlimitconfig`.`org` DESC,
+IF(isnull(`course_duration_limits_coursedurationlimitconfig`.`site_id`),0,1), `course_duration_limits_coursedurationlimitconfig`.`site_id` DESC

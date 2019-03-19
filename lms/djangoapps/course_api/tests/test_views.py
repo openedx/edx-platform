@@ -277,6 +277,7 @@ class CourseDetailViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase
 })
 @override_settings(SEARCH_ENGINE="search.tests.mock_search_engine.MockSearchEngine")
 @override_settings(COURSEWARE_INDEX_NAME=TEST_INDEX_NAME)
+@ddt.ddt
 class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, SearcherMixin):
     """
     Tests the search functionality of the courses API.
@@ -355,7 +356,8 @@ class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, Sear
         self.assertEqual(res.data['pagination']['count'], 3)
         self.assertEqual(len(res.data['results']), 1)  # Should return a single course
 
-    def test_too_many_courses(self):
+    @ddt.data(True, False)
+    def test_too_many_courses(self, with_username):
         """
         Test that search results are limited to 100 courses, and that they don't
         blow up the database.
@@ -387,15 +389,22 @@ class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, Sear
         self.setup_user(self.audit_user)
 
         # These query counts were found empirically
-        query_counts = [63, 50, 50, 50, 50, 50, 50, 50, 50, 50, 20]
+        query_counts = [64, 51, 51, 51, 51, 51, 51, 51, 51, 51, 21]
+        with_username_adjust = [4, 4, 4, 7, 7, 7, 10, 10, 10, 13, 13]
         ordered_course_ids = sorted([str(cid) for cid in (course_ids + [c.id for c in self.courses])])
 
         self.clear_caches()
 
         for page in range(1, 12):
             RequestCache.clear_all_namespaces()
-            with self.assertNumQueries(query_counts[page - 1]):
-                response = self.verify_response(params={'page': page, 'page_size': 30})
+            expected_query_count = query_counts[page - 1]
+            if with_username:
+                expected_query_count += with_username_adjust[page - 1]
+            with self.assertNumQueries(expected_query_count):
+                params = {'page': page, 'page_size': 30}
+                if with_username:
+                    params['username'] = self.audit_user.username
+                response = self.verify_response(params=params)
 
                 self.assertIn('results', response.data)
                 self.assertEqual(response.data['pagination']['count'], 303)

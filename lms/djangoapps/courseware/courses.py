@@ -25,9 +25,10 @@ from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module
 from course_modes.models import CourseMode
 from django.conf import settings
-from django.db.models import Prefetch
+from django.db.models import Prefetch, prefetch_related_objects
 from django.urls import reverse
 from django.http import Http404, QueryDict
+from django_chunked_iterator import batch_iterator, iterator
 from enrollment.api import get_course_enrollment_details
 from edxmako.shortcuts import render_to_string
 from fs.errors import ResourceNotFound
@@ -453,31 +454,52 @@ def get_course_syllabus_section(course, section_key):
     raise KeyError("Invalid about key " + str(section_key))
 
 
-def get_courses(user, org=None, filter_=None):
+def get_courses(user, org=None, filter_=None, batch_size=100):
     """
     Return a LazySequence of courses available, optionally filtered by org code (case-insensitive).
     """
-    courses = branding.get_visible_courses(
+    courses_qset = branding.get_visible_courses(
         org=org,
         filter_=filter_,
+    ).select_related(
+        'image_set'
     ).prefetch_related(
         Prefetch(
             'modes',
             queryset=CourseMode.objects.exclude(mode_slug__in=CourseMode.CREDIT_MODES),
             to_attr='selectable_modes',
         ),
-    ).select_related(
-        'image_set'
     )
 
     permission_name = configuration_helpers.get_value(
         'COURSE_CATALOG_VISIBILITY_PERMISSION',
         settings.COURSE_CATALOG_VISIBILITY_PERMISSION
     )
+    if user.is_authenticated:
+        prefetch_related_objects([user], 'roles', 'experimentdata_set')
 
+        def with_prefetched_users():
+            for courses in batch_iterator(courses_qset, batch_size=batch_size):
+                prefetch_related_objects(
+                    [user],
+                    Prefetch(
+                        'courseenrollment_set',
+                        queryset=CourseEnrollment.objects.filter(
+                            user=user,
+                            course__in=courses
+                        ).select_related('schedule')
+                    )
+                )
+                for course in courses:
+                    if has_access(user, permission_name, course):
+                        yield course
+
+        course_iterator = with_prefetched_users()
+    else:
+        course_iterator = (c for c in iterator(courses_qset) if has_access(user, permission_name, c))
     return LazySequence(
-        (c for c in courses if has_access(user, permission_name, c)),
-        est_len=courses.count()
+        course_iterator,
+        est_len=courses_qset.count()
     )
 
 

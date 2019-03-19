@@ -79,7 +79,7 @@ cryptography==2.6.1
 cssselect==1.0.3
 cssutils==1.0.2
 ddt==1.2.1
-decorator==4.3.2
+decorator==4.4.0
 defusedxml==0.5.0
 dicttoxml==1.7.4          # via moto
 diff-cover==0.9.8
@@ -87,6 +87,7 @@ distlib==0.2.8            # via caniusepython3
 django-appconf==1.0.3
 django-babel-underscore==0.5.2
 django-babel==0.6.2
+django-chunked-iterator==0.6.1
 django-classy-tags==0.8.0
 django-config-models==0.2.2
 django-cors-headers==2.1.0
