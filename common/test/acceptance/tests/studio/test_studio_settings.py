@@ -823,11 +823,11 @@ class StudioSubsectionSettingsA11yTest(StudioCourseTest):
         self.course_outline.open_subsection_settings_dialog()
         self.course_outline.select_advanced_tab()
 
-        self.course_outline.a11y_audit.config.set_rules({
-            "ignore": [
-                'section',
-            ],
-        })
+        # self.course_outline.a11y_audit.config.set_rules({
+        #     "ignore": [
+        #         'section',
+        #     ],
+        # })
         # limit the scope of the audit to the special exams tab on the modal dialog
         self.course_outline.a11y_audit.config.set_scope(
             include=['section.edit-settings-timed-examination']

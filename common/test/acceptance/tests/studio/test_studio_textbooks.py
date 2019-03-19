@@ -110,8 +110,8 @@ class TextbooksTest(StudioCourseTest):
                 'landmark-one-main',
                 'page-has-heading-one',
                 'region',
-                'skip-link',
-                'link-href'
+                # 'skip-link',
+                # 'link-href'
             ],
         })
         self.textbook_view_page.a11y_audit.check_for_accessibility_errors()
