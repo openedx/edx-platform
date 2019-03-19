@@ -100,10 +100,10 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
 
     def test_login_required(self):
         """
-        The view should return HTTP 403 status if the user is not logged in.
+        The view should return HTTP 401 status if the user is not logged in.
         """
         self.client.logout()
-        self.assertEqual(403, self._post_to_view().status_code)
+        self.assertEqual(401, self._post_to_view().status_code)
 
     @ddt.data('delete', 'get', 'put')
     def test_post_required(self, method):
