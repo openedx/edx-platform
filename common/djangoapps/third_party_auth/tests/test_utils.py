@@ -32,3 +32,6 @@ class TestUtils(TestCase):
         self.assertFalse(
             user_exists({'username': 'invalid_user'}),
         )
+        self.assertTrue(
+            user_exists({'username': 'TesT_User'})
+        )

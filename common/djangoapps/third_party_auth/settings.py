@@ -49,7 +49,7 @@ def apply_settings(django_settings):
         'social_core.pipeline.social_auth.auth_allowed',
         'social_core.pipeline.social_auth.social_user',
         'third_party_auth.pipeline.associate_by_email_if_login_api',
-        'social_core.pipeline.user.get_username',
+        'third_party_auth.pipeline.get_username',
         'third_party_auth.pipeline.set_pipeline_timeout',
         'third_party_auth.pipeline.ensure_user_information',
         'social_core.pipeline.user.create_user',
