@@ -75,6 +75,9 @@
     display: inline;
     float: left;
     color:$title;
+    span{
+      color: $font;
+    }
   }
   .validate-dec li span:nth-of-type(2){ 
      float: right;
