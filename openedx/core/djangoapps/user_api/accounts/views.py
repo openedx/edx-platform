@@ -1052,8 +1052,6 @@ class UsernameReplacementView(APIView):
                 {"old_username_2": "new_username_2"}
             ]
         }
-
-        TODO: Determine if we need an audit trail outside of logging and API response.
         """
 
         # (model_name, column_name)
@@ -1117,7 +1115,11 @@ class UsernameReplacementView(APIView):
         return True
 
     def _generate_unique_username(self, desired_username, suffix_length=4):
-        """ Accepts a username and returns a unique username if the requested is taken """
+        """
+        Generates a unique username.
+        If the desired username is available, that will be returned.
+        Otherwise it will generate unique suffixs to the desired username until it is an available username.
+        """
         new_username = desired_username
         # Keep checking usernames in case desired_username + random suffix is already taken
         while True:
