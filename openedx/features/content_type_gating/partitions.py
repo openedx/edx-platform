@@ -82,7 +82,8 @@ class ContentTypeGatingPartition(UserPartition):
         course_key = self._get_course_key_from_course_block(block)
         modes = CourseMode.modes_for_course_dict(course_key)
         verified_mode = modes.get(CourseMode.VERIFIED)
-        if verified_mode is None or not self._is_audit_enrollment(user, block):
+        if (verified_mode is None or not self._is_audit_enrollment(user, course_key) or
+                user_group == FULL_ACCESS):
             return None
         ecommerce_checkout_link = self._get_checkout_link(user, verified_mode.sku)
 
@@ -95,17 +96,19 @@ class ContentTypeGatingPartition(UserPartition):
         return frag
 
     def access_denied_message(self, block, user, user_group, allowed_groups):
-        if self._is_audit_enrollment(user, block):
-            return _(u"Graded assessments are available to Verified Track learners. Upgrade to Unlock.")
-        return None
+        course_key = self._get_course_key_from_course_block(block)
+        modes = CourseMode.modes_for_course_dict(course_key)
+        verified_mode = modes.get(CourseMode.VERIFIED)
+        if (verified_mode is None or not self._is_audit_enrollment(user, course_key) or
+                user_group == FULL_ACCESS):
+            return None
+        return _(u"Graded assessments are available to Verified Track learners. Upgrade to Unlock.")
 
-    def _is_audit_enrollment(self, user, block):
+    def _is_audit_enrollment(self, user, course_key):
         """
         Checks if user is enrolled in `Audit` track of course or any staff member is
         viewing course as in `Audit` enrollment.
         """
-        course_key = self._get_course_key_from_course_block(block)
-
         if self._is_masquerading_as_generic_student(user, course_key):
             return self._is_masquerading_audit_enrollment(user, course_key)
         return self._has_active_enrollment_in_audit_mode(user, course_key)

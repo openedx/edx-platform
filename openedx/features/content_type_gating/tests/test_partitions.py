@@ -8,12 +8,13 @@ from course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID
+from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID, FULL_ACCESS
 from openedx.features.content_type_gating.partitions import (
     create_content_gating_partition,
     ContentTypeGatingPartition
 )
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
+from student.tests.factories import GroupFactory
 from xmodule.partitions.partitions import UserPartitionError, ENROLLMENT_TRACK_PARTITION_ID
 
 
@@ -93,9 +94,33 @@ class TestContentTypeGatingPartition(CacheIsolationTestCase):
             'crum.get_current_request',
             return_value=mock_request
         ):
-            fragment = partition.access_denied_fragment(mock_block, global_staff, 'test_group', 'test_allowed_group')
+            fragment = partition.access_denied_fragment(mock_block, global_staff, GroupFactory(), 'test_allowed_group')
 
         self.assertIsNotNone(fragment)
+
+    def test_access_denied_fragment_for_full_access_users(self):
+        """
+        Test that Full Access users do not see the access_denied_fragment or access_denied_message
+        """
+        mock_request = RequestFactory().get('/')
+        mock_course = Mock(id=self.course_key, user_partitions={})
+        mock_block = Mock(scope_ids=Mock(usage_id=Mock(course_key=mock_course.id)))
+
+        CourseModeFactory.create(course_id=mock_course.id, mode_slug='verified')
+
+        global_staff = GlobalStaffFactory.create()
+        ContentTypeGatingConfig.objects.create(enabled=False, studio_override_enabled=True)
+
+        partition = create_content_gating_partition(mock_course)
+
+        with patch(
+            'crum.get_current_request',
+            return_value=mock_request
+        ):
+            fragment = partition.access_denied_fragment(mock_block, global_staff, FULL_ACCESS, 'test_allowed_group')
+            self.assertIsNone(fragment)
+            message = partition.access_denied_message(mock_block, global_staff, FULL_ACCESS, 'test_allowed_group')
+            self.assertIsNone(message)
 
     def test_acess_denied_fragment_for_null_request(self):
         """
@@ -120,6 +145,6 @@ class TestContentTypeGatingPartition(CacheIsolationTestCase):
             'openedx.features.content_type_gating.partitions.ContentTypeGatingPartition._is_audit_enrollment',
             return_value=True
         ):
-            fragment = partition.access_denied_fragment(mock_block, global_staff, 'test_group', 'test_allowed_group')
+            fragment = partition.access_denied_fragment(mock_block, global_staff, GroupFactory(), 'test_allowed_group')
 
         self.assertIsNotNone(fragment)
