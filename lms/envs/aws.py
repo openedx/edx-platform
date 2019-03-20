@@ -625,17 +625,6 @@ BLOCK_STRUCTURES_SETTINGS = ENV_TOKENS.get('BLOCK_STRUCTURES_SETTINGS', BLOCK_ST
 # upload limits
 STUDENT_FILEUPLOAD_MAX_SIZE = ENV_TOKENS.get("STUDENT_FILEUPLOAD_MAX_SIZE", STUDENT_FILEUPLOAD_MAX_SIZE)
 
-# Modules having these categories would be excluded from progress calculations
-PROGRESS_DETACHED_APPS = ['group_project_v2']
-for app in PROGRESS_DETACHED_APPS:
-    try:
-        app_config = importlib.import_module('.app_config', app)
-    except ImportError:
-        continue
-
-    detached_module_categories = getattr(app_config, 'PROGRESS_DETACHED_CATEGORIES', [])
-    PROGRESS_DETACHED_CATEGORIES.extend(detached_module_categories)
-
 # Event tracking
 TRACKING_BACKENDS.update(AUTH_TOKENS.get("TRACKING_BACKENDS", {}))
 EVENT_TRACKING_BACKENDS['tracking_logs']['OPTIONS']['backends'].update(AUTH_TOKENS.get("EVENT_TRACKING_BACKENDS", {}))
@@ -881,7 +870,6 @@ if FEATURES.get('EDX_SOLUTIONS_API'):
         'edx_solutions_api_integration',
         'social_engagement',
         'gradebook',
-        'progress',
         'edx_solutions_projects',
         'edx_solutions_organizations',
         'mobileapps',

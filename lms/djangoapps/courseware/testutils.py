@@ -148,9 +148,9 @@ class RenderXBlockTestMixin(object):
         return response
 
     @ddt.data(
-        ('vertical_block', ModuleStoreEnum.Type.mongo, 14),
+        ('vertical_block', ModuleStoreEnum.Type.mongo, 10),
         ('vertical_block', ModuleStoreEnum.Type.split, 6),
-        ('html_block', ModuleStoreEnum.Type.mongo, 15),
+        ('html_block', ModuleStoreEnum.Type.mongo, 11),
         ('html_block', ModuleStoreEnum.Type.split, 6),
     )
     @ddt.unpack
@@ -210,7 +210,7 @@ class RenderXBlockTestMixin(object):
         Helper method used by test_success_enrolled_staff because one test
         class using this mixin has an increased number of mongo (only) queries.
         """
-        return 9
+        return 5
 
     def test_success_unenrolled_staff(self):
         self.setup_course()

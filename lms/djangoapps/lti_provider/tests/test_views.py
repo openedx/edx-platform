@@ -169,7 +169,7 @@ class LtiLaunchTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCa
     This class overrides the get_response method, which is used by
     the tests defined in RenderXBlockTestMixin.
     """
-    SUCCESS_ENROLLED_STAFF_MONGO_COUNT = 12
+    SUCCESS_ENROLLED_STAFF_MONGO_COUNT = 9
 
     def get_response(self, usage_key, url_encoded_params=None):
         """
@@ -224,4 +224,4 @@ class LtiLaunchTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCa
         #   (5)-(8) calls related to the inherited user_partitions field.
         #   (9) edx_notes descriptor call to get_course
         """
-        return 12
+        return 9
