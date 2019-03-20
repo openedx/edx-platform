@@ -90,7 +90,7 @@
                 }
 
                 function quote(string) {
-                    return '"' + string + '"';
+                    return string;
                 }
             };
         });
