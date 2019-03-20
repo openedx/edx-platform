@@ -33,6 +33,7 @@
                 const a = document.createElement('a')
                 a.href = imgUrl
                 a.setAttribute('download', 'certificates.png')
+                document.body.appendChild(a);
                 a.click()
             }
         })
