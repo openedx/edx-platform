@@ -9,6 +9,8 @@ from django.utils.translation import ugettext as _
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
 from openedx.core.djangoapps.user_api.accounts.utils import retrieve_last_sitewide_block_completed
 from openedx.features.enterprise_support.utils import get_enterprise_learner_generic_name
+
+from student.models import UserProfile
 %>
 
 <%
@@ -16,8 +18,12 @@ from openedx.features.enterprise_support.utils import get_enterprise_learner_gen
 self.real_user = getattr(user, 'real_user', user)
 username = self.real_user.username
 display_name = username
-if user.profile.name not in [None, ""]:
-  display_name = user.profile.name
+try:
+    if user.profile.name not in [None, ""]:
+        display_name = user.profile.name
+except UserProfile.DoesNotExist:
+    pass
+
 profile_image_url = get_profile_image_urls_for_user(self.real_user)['medium']
 # resume_block = retrieve_last_sitewide_block_completed(username)
 %>

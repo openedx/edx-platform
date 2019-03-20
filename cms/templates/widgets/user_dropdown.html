@@ -4,6 +4,7 @@
   from django.conf import settings
   from django.urls import reverse
   from django.utils.translation import ugettext as _
+  from student.models import UserProfile
   from student.roles import GlobalStaff
   from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
 %>
@@ -11,8 +12,11 @@
 <%
   username = user.username
   display_name = username
-  if user.profile.name not in [None, ""]:
-      display_name = user.profile.name
+  try:
+    if user.profile.name not in [None, ""]:
+        display_name = user.profile.name
+  except UserProfile.DoesNotExist:
+    pass
   profile_image_url = get_profile_image_urls_for_user(user)['medium']
 %>
 
