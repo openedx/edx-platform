@@ -166,7 +166,7 @@ markupsafe==1.1.1
 maxminddb==1.4.1          # via geoip2
 mock==1.0.1
 mongoengine==0.10.0
-mysql-python==1.2.5
+mysqlclient==1.4.2.post1
 networkx==1.7
 newrelic==4.14.0.115
 nltk==3.4

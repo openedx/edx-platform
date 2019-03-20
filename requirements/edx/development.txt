@@ -219,7 +219,7 @@ modernize==0.7
 mongoengine==0.10.0
 more-itertools==5.0.0
 moto==0.3.1
-mysql-python==1.2.5
+mysqlclient==1.4.2.post1
 networkx==1.7
 newrelic==4.14.0.115
 nltk==3.4
