@@ -60,8 +60,11 @@ class CourseDurationLimitMessageBaseTask(LoggedTask):
     def enqueue(cls, site, current_date, day_offset, override_recipient_email=None):
         current_date = _get_datetime_beginning_of_day(current_date)
 
-        # for course_key, config in CourseDurationLimitConfig.all_current_course_configs().items():
-        for course_key, _ in CourseDurationLimitConfig.all_current_course_configs().items():
+        for course_key, config in CourseDurationLimitConfig.all_current_course_configs().items():
+            if not config['enabled'][0]:
+                cls.log_info(u'Course duration limits disabled for course_key %s, skipping', course_key)
+                continue
+
             # enqueue_enabled, _ = config[cls.enqueue_config_var]
             # TODO: Switch over to a model where enqueing is based in CourseDurationLimitConfig
             enqueue_enabled = waffle.switch_is_active('course_duration_limits.enqueue_enabled')
