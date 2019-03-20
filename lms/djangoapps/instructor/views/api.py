@@ -1254,13 +1254,11 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
     available_features = instructor_analytics.basic.AVAILABLE_FEATURES
 
     if not csv:
-        student_data = instructor_analytics.basic.enrolled_students_features(course_key, query_features)
+        student_data = instructor_analytics.basic.enrolled_students_features(course_key)
         response_payload = {
             'course_id': unicode(course_key),
             'students': student_data,
             'students_count': len(student_data),
-            'queried_features': query_features,
-            'feature_names': query_features_names,
             'available_features': available_features,
         }
         return JsonResponse(response_payload)
@@ -1268,8 +1266,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
     else:
         lms.djangoapps.instructor_task.api.submit_calculate_students_features_csv(
             request,
-            course_key,
-            query_features
+            course_key
         )
         success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
 

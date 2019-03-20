@@ -206,7 +206,7 @@ def issued_certificates(course_key, features):
     return generated_certificates
 
 
-def enrolled_students_features(course_key, features):
+def enrolled_students_features(course_key):
     """
     Return list of student features as dictionaries.
 
