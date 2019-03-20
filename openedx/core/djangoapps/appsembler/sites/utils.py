@@ -1,14 +1,17 @@
 import json
 from itertools import izip
+from urlparse import urlparse
 
 import cssutils
 import os
 import sass
+from django.core.files.storage import get_storage_class
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.db.models.query import Q
 from provider.oauth2.models import AccessToken, RefreshToken, Client
+from django.utils.text import slugify
 
 from organizations.api import add_organization
 from organizations.models import UserOrganizationMapping, Organization, UserSiteMapping
@@ -142,6 +145,31 @@ def make_amc_admin(user, org_name):
         'organization_name': org.name,
         'tokens': reset_amc_tokens(user),
     }
+
+
+def to_safe_file_name(url):
+    path = urlparse(url).path.lower()
+    safe_extensions = {'.png', '.jpeg', '.jpg'}
+    sluggified = slugify(path)
+
+    for ext in safe_extensions:
+        if path.endswith(ext):
+            return sluggified + ext
+
+    return sluggified
+
+
+def get_customer_files_storage():
+    kwargs = {}
+    # Passing these settings to the FileSystemStorage causes an exception
+    # TODO: Use settings instead of hardcoded in Python
+    if not settings.DEBUG:
+        kwargs = {
+            'location': 'customer_files',
+            'file_overwrite': False
+        }
+
+    return get_storage_class()(**kwargs)
 
 
 def get_initial_sass_variables():

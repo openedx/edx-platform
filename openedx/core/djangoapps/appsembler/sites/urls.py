@@ -1,8 +1,17 @@
 from django.conf import settings
 from django.conf.urls import url, include
 from rest_framework.routers import DefaultRouter
-from .api import SiteConfigurationViewSet, SiteViewSet, FileUploadView, SiteCreateView,\
-    UsernameAvailabilityView, DomainAvailabilityView, CustomDomainView, DomainSwitchView
+from openedx.core.djangoapps.appsembler.sites.api import (
+    CustomDomainView,
+    DomainAvailabilityView,
+    DomainSwitchView,
+    HostFilesView,
+    FileUploadView,
+    SiteConfigurationViewSet,
+    SiteCreateView,
+    SiteViewSet,
+    UsernameAvailabilityView,
+)
 
 # Create a router and register our viewsets with it.
 router = DefaultRouter()
@@ -20,3 +29,9 @@ urlpatterns = [
     url(r'^register/', SiteCreateView.as_view()),
     url(r'^', include(router.urls)),
 ]
+
+if settings.APPSEMBLER_FEATURES.get('ENABLE_FILE_HOST_API', True):
+    urlpatterns += [
+        url(r'^host_files', HostFilesView.as_view()),
+    ]
+
