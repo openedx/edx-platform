@@ -1485,3 +1485,124 @@ class MakoTemplateLinter(BaseLinter):
                 start_index = expression.end_index
             expressions.append(expression)
         return expressions
+
+
+class DjangoTemplateLinter(BaseLinter):
+    """
+    The linter for Django template files
+    """
+    LINE_COMMENT_DELIM = "#"
+
+    ruleset = RuleSet(
+        django_trans_missing_escape='django-trans-missing-escape',
+        django_blocktrans_missing_escape='django-block-trans-missing-escape',
+    )
+
+    def __init__(self, skip_dirs=None):
+        """
+        Init method.
+        """
+        super(DjangoTemplateLinter, self).__init__()
+        self._skip_django_dirs = skip_dirs or ()
+
+    def process_file(self, directory, file_name):
+        """
+        Process file to determine if it is a Django template file and
+        if it is safe.
+
+        Arguments:
+            directory (string): The directory of the file to be checked
+            file_name (string): A filename for a potential Django file
+
+        Returns:
+            The file results containing any violations.
+
+        """
+        django_file_full_path = os.path.normpath(directory + '/' + file_name)
+        results = FileResults(django_file_full_path)
+
+        if not results.is_file:
+            return results
+
+        if not self._is_valid_directory(directory):
+            return results
+
+        if not (file_name.lower().endswith('.html')):
+            return results
+
+        return self._load_and_check_file_is_safe(django_file_full_path, self._check_django_file_is_safe, results)
+
+    def _is_valid_directory(self, directory):
+        """
+        Determines if the provided directory is a directory that could contain
+        Django template files that need to be linted.
+
+        Arguments:
+            directory: The directory to be linted.
+
+        Returns:
+            True if this directory should be linted for Django template violations
+            and False otherwise.
+        """
+        if is_skip_dir(self._skip_django_dirs, directory):
+            return False
+
+        if ('/templates/' in directory) or directory.endswith('/templates'):
+            return True
+
+        return False
+
+    def _is_django_template(self, mako_template):
+        """
+            Determines if the template is actually a Django template.
+
+        Arguments:
+            mako_template: The template code.
+
+        Returns:
+            True if this is really a Django template, and False otherwise.
+
+        """
+        if re.search('({%.*%})|({{.*}})|({#.*#})', mako_template) is not None:
+            return True
+        return False
+
+    def _check_django_file_is_safe(self, django_template, results):
+        if not self._is_django_template(django_template):
+            return
+
+        self._check_django_expression(django_template, results)
+        results.prepare_results(django_template, line_comment_delim=self.LINE_COMMENT_DELIM)
+
+    def _check_django_expression(self, django_template, results):
+        """
+        Searches for django trans and blocktrans expression and then checks
+        if they contain violations
+
+        Arguments:
+            django_template: The contents of the Django template.
+            results: A list of results into which violations will be added.
+
+        """
+        expressions = self._find_django_expressions(django_template)
+        for expression in expressions:
+            if expression.end_index is None:
+                results.violations.append(ExpressionRuleViolation(
+                    self.ruleset.mako_unparseable_expression, expression
+                ))
+                continue
+            self._check_expression_and_filters(django_template, expression, results)
+
+    def _find_django_expresions(self, django_template):
+        """
+        Finds all the Django trans/blocktrans expressions in a Django template
+        and creates a list of dicts for each expression.
+
+        Arguments:
+            django_template: The content of the Django template.
+
+        Returns:
+            A list of Expressions.
+        """
+
+        pass
