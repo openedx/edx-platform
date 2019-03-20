@@ -217,6 +217,53 @@ def enrolled_students_features(course_key, features):
         {'username': 'username3', 'first_name': 'firstname3'}
     ]
     """
+    default_query_features = [
+        'id', 'username', 'name', 'email', 'language', 'location',
+        'year_of_birth', 'gender', 'level_of_education', 'mailing_address',
+        'goals', 'enrollment_mode', 'verification_status',
+    ]
+    default_query_features_names = {
+        'id': _('User ID'),
+        'username': _('Username'),
+        'name': _('Name'),
+        'email': _('Email'),
+        'language': _('Language'),
+        'location': _('Location'),
+        'year_of_birth': _('Birth Year'),
+        'gender': _('Gender'),
+        'level_of_education': _('Level of Education'),
+        'mailing_address': _('Mailing Address'),
+        'goals': _('Goals'),
+        'enrollment_mode': _('Enrollment Mode'),
+        'verification_status': _('Verification Status'),
+    }
+    query_features = list(
+        configuration_helpers.get_value(
+            'student_profile_download_fields',
+            getattr(settings, 'STUDENT_PROFILE_DOWNLOAD_FIELDS', default_query_features)
+        )
+    )
+    query_features_names = list(
+        configuration_helpers.get_value(
+            'student_profile_download_field_names',
+            getattr(settings, 'STUDENT_PROFILE_DOWNLOAD_FIELD_NAMES', default_query_features_names)
+        )
+    )
+
+    if is_course_cohorted(course.id):
+        # Translators: 'Cohort' refers to a group of students within a course.
+        query_features.append('cohort')
+        query_features_names['cohort'] = _('Cohort')
+
+    if course.teams_enabled:
+        query_features.append('team')
+        query_features_names['team'] = _('Team')
+
+    # For compatibility reasons, city and country should always appear last.
+    query_features.append('city')
+    query_features_names['city'] = _('City')
+    query_features.append('country')
+    query_features_names['country'] = _('Country')
     include_cohort_column = 'cohort' in features
     include_team_column = 'team' in features
     include_enrollment_mode = 'enrollment_mode' in features
