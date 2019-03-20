@@ -643,6 +643,9 @@ class ReplaceUsernamesView(APIView):
         )
 
     def _replace_username(self, current_username, new_username):
+        """
+        Replaces the current username with the new username in the forums service
+        """
         try:
             # This API will be called after the regular LMS API, so the username in
             # the DB will have already been updated to new_username
