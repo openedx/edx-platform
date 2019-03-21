@@ -48,7 +48,7 @@ class Date(JSONField):
         """
         if field is None:
             return field
-        elif field is "":
+        elif field == "":
             return None
         elif isinstance(field, basestring):
             return self._parse_date_wo_default_month_day(field)
