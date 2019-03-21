@@ -121,14 +121,7 @@ class Role(models.Model):
         """
         Returns True if the user has one of the given roles for the given course
         """
-        if 'roles' in getattr(user, '_prefetched_objects_cache', {}):
-            # Don't blow up the prefetch cache
-            return any(
-                role.course_id == course_id and role.name in role_names
-                for role in user.roles.all()
-            )
-        else:
-            return user.roles.filter(course_id=course_id, name__in=role_names).exists()
+        return Role.objects.filter(course_id=course_id, name__in=role_names, users=user).exists()
 
 
 class Permission(models.Model):
