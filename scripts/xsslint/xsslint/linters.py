@@ -1613,3 +1613,14 @@ class DjangoTemplateLinter(BaseLinter):
                                          template=django_template)
             if trans_expr:
                 expressions.append(trans_expr)
+
+        block_trans_iterator = re.finditer(r'{% blocktrans .*?%}', django_template, re.I)
+        for trans in block_trans_iterator:
+            trans_expr = BlockTransExpression(self.ruleset,
+                                         trans.start(),
+                                         trans.end(),
+                                         start_delim='{%',
+                                         end_delim='%}',
+                                         template=django_template)
+            if trans_expr:
+                expressions.append(trans_expr)
