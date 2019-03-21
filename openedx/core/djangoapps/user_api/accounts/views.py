@@ -1148,9 +1148,10 @@ class UsernameReplacementView(APIView):
                     )
         except Exception as exc:  # pylint: disable=broad-except
             log.exception(
-                u"Unable to change username from %s to %s. Reason: %s",
+                u"Unable to change username from %s to %s. Failed on table %s because %s",
                 current_username,
                 new_username,
+                model.__class__.__name__,  # Retrieves the model name that it failed on
                 exc
             )
             return False

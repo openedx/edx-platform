@@ -28,8 +28,7 @@ class CanRetireUser(permissions.BasePermission):
 
 class CanReplaceUsername(permissions.BasePermission):
     """
-    Grants access to the Username Replacement API for anyone in the group,
-    including the service user.
+    Grants access to the Username Replacement API for the service user.
     """
     def has_permission(self, request, view):
         return request.user.username == getattr(settings, "USERNAME_REPLACEMENT_WORKER", False)
