@@ -37,7 +37,6 @@ celery==3.1.25                      # Asynchronous task execution library
 defusedxml
 Django==1.11.20                     # Web application framework
 django-babel-underscore             # underscore template extractor for django-babel (internationalization utilities)
-django-chunked-iterator             # Allow more control over how large queries are executed
 django-config-models>=0.2.2         # Configuration models for Django allowing config management with auditing
 django-cors-headers==2.1.0          # Used to allow to configure CORS headers for cross-domain requests
 django-countries==4.6.1             # Country data for Django forms and model fields

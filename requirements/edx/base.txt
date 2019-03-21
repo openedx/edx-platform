@@ -68,7 +68,6 @@ defusedxml==0.5.0
 django-appconf==1.0.3     # via django-statici18n
 django-babel-underscore==0.5.2
 django-babel==0.6.2       # via django-babel-underscore
-django-chunked-iterator==0.6.1
 django-classy-tags==0.8.0  # via django-sekizai
 django-config-models==0.2.2
 django-cors-headers==2.1.0
