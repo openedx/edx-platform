@@ -65,6 +65,7 @@ import urllib
 from collections import OrderedDict
 from logging import getLogger
 from smtplib import SMTPException
+from uuid import uuid4
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -76,6 +77,7 @@ import social_django
 from social_core.exceptions import AuthException
 from social_core.pipeline import partial
 from social_core.pipeline.social_auth import associate_by_email
+from social_core.utils import slugify, module_member
 
 from edxmako.shortcuts import render_to_string
 
@@ -148,6 +150,8 @@ _AUTH_ENTRY_CHOICES = frozenset([
     AUTH_ENTRY_LOGIN_API,
     AUTH_ENTRY_REGISTER_API,
 ] + AUTH_ENTRY_CUSTOM.keys())
+
+USER_FIELDS = ['username', 'email']
 
 
 logger = getLogger(__name__)
@@ -795,3 +799,64 @@ def set_id_verification_status(auth_entry, strategy, details, user=None, *args, 
                 identity_provider_type=current_provider.full_class_name,
                 identity_provider_slug=current_provider.slug,
             )
+
+
+def get_username(strategy, details, backend, user=None, *args, **kwargs):
+    """
+    Copy of social_core.pipeline.user.get_username with additional logging and case insensitive username checks.
+    """
+    if 'username' not in backend.setting('USER_FIELDS', USER_FIELDS):
+        return
+    storage = strategy.storage
+
+    if not user:
+        email_as_username = strategy.setting('USERNAME_IS_FULL_EMAIL', False)
+        uuid_length = strategy.setting('UUID_LENGTH', 16)
+        max_length = storage.user.username_max_length()
+        do_slugify = strategy.setting('SLUGIFY_USERNAMES', False)
+        do_clean = strategy.setting('CLEAN_USERNAMES', True)
+
+        if do_clean:
+            override_clean = strategy.setting('CLEAN_USERNAME_FUNCTION')
+            if override_clean:
+                clean_func = module_member(override_clean)
+            else:
+                clean_func = storage.user.clean_username
+        else:
+            clean_func = lambda val: val
+
+        if do_slugify:
+            override_slug = strategy.setting('SLUGIFY_FUNCTION')
+            if override_slug:
+                slug_func = module_member(override_slug)
+            else:
+                slug_func = slugify
+        else:
+            slug_func = lambda val: val
+
+        if email_as_username and details.get('email'):
+            username = details['email']
+        elif details.get('username'):
+            username = details['username']
+        else:
+            username = uuid4().hex
+
+        short_username = (username[:max_length - uuid_length]
+                          if max_length is not None
+                          else username)
+        final_username = slug_func(clean_func(username[:max_length]))
+
+        # Generate a unique username for current user using username
+        # as base but adding a unique hash at the end. Original
+        # username is cut to avoid any field max_length.
+        # The final_username may be empty and will skip the loop.
+        # We are using our own version of user_exists to avoid possible case sensitivity issues.
+        while not final_username or user_exists({'username': final_username}):
+            # These log statements are here for debugging purposes and should be removed when ENT-1500 is resolved.
+            logger.info(u'Username %s is either empty or already in use, generating a new username!', final_username)
+            username = short_username + uuid4().hex[:uuid_length]
+            final_username = slug_func(clean_func(username[:max_length]))
+            logger.info(u'Generated username %s.', final_username)
+    else:
+        final_username = storage.user.get_username(user)
+    return {'username': final_username}

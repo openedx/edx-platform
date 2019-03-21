@@ -516,7 +516,14 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
             }
             self.log_bizx_api_exception(transaction_data, err)
             return basic_details
-        return self.get_registration_fields(response)
+        registration_fields = self.get_registration_fields(response)
+        # This statement is here for debugging purposes and should be removed when ENT-1500 is resolved.
+        if user_id != registration_fields.get('username'):
+            log.info(u'loggedinuser_id %s is different from BizX username %s',
+                     user_id,
+                     registration_fields.get('username'))
+
+        return registration_fields
 
 
 def get_saml_idp_choices():
