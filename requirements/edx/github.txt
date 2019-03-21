@@ -90,6 +90,3 @@ git+https://github.com/edx/edx-proctoring.git@0.18.1#egg=edx-proctoring==0.18.1
 
 # Third Party XBlocks
 git+https://github.com/edx-solutions/xblock-drag-and-drop-v2.git@4cc813c02b1fe259d3da7192f706a6fce5548d3a#egg=xblock-drag-and-drop-v2==2.1.7
-
-# Forked completion for mobile app
-git+https://github.com/open-craft/completion.git@5256e9de45fcce3c45c1c7b2c629bd881867b038#egg=edx-completion==0.1.10.1
