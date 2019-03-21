@@ -9,7 +9,8 @@ import textwrap
 from xsslint import visitors
 from xsslint.reporting import ExpressionRuleViolation, FileResults, RuleViolation
 from xsslint.rules import RuleSet
-from xsslint.utils import Expression, ParseString, StringLines, is_skip_dir, DjangoExpression, TransExpression, BlockTransExpression
+from xsslint.utils import Expression, ParseString, StringLines, is_skip_dir
+from xsslint.django_linter import TransExpression, BlockTransExpression
 
 
 class BaseLinter(object):
@@ -1493,7 +1494,11 @@ class DjangoTemplateLinter(BaseLinter):
 
     ruleset = RuleSet(
         django_trans_missing_escape='django-trans-missing-escape',
-        django_blocktrans_missing_escape='django-block-trans-missing-escape',
+        django_trans_invalid_escape_filter='django-trans-invalid-escape-filter',
+        django_escape_variable_mismatch='django-escape-variable-mismatch',
+        django_blocktrans_missing_escape_filter='django-blocktrans-missing-escape-filter',
+        django_bloctrans_invalid_escape_filter='django-blocktrans-invalid-escape-filter',
+        django_blocktrans_escape_filter_parse_error='django-blocktrans-escape-filter-parse-error'
     )
 
     def __init__(self, skip_dirs=None):
@@ -1568,7 +1573,6 @@ class DjangoTemplateLinter(BaseLinter):
     def _check_django_file_is_safe(self, django_template, results):
         if not self._is_django_template(django_template):
             return
-
         self._check_django_expression(django_template, results)
         results.prepare_results(django_template, line_comment_delim=self.LINE_COMMENT_DELIM)
 
@@ -1583,11 +1587,11 @@ class DjangoTemplateLinter(BaseLinter):
 
         """
         expressions = []
-        expressions = self._find_django_expressions(django_template, expressions)
+        self._find_django_expressions(django_template, expressions)
         for expr in expressions:
             expr.validate_expression(django_template, results)
 
-    def _find_django_expresions(self, django_template, expressions):
+    def _find_django_expressions(self, django_template, expressions):
         """
         Finds all the Django trans/blocktrans expressions in a Django template
         and creates a list of dicts for each expression.
@@ -1601,34 +1605,11 @@ class DjangoTemplateLinter(BaseLinter):
 
         trans_iterator = re.finditer(r'{% trans .*%}', django_template, re.I)
         for trans in trans_iterator:
-            expr = trans.string[trans.start():trans.end()]
-
-            start = trans.start()
-            lineno = django_template.count('\n', 0, start) + 1
-            offset = start - django_template.rfind('\n', 0, start)
-
-            trans_expr = TransExpression(expr,
+            trans_expr = TransExpression(self.ruleset,
                                          trans.start(),
                                          trans.end(),
-                                         lineno,
-                                         offset)
+                                         start_delim='{%',
+                                         end_delim='%}',
+                                         template=django_template)
             if trans_expr:
                 expressions.append(trans_expr)
-
-        block_trans_iterator = re.finditer(r'{% blocktrans .*?%}', django_template, re.I)
-        for trans in block_trans_iterator:
-            expr = trans.string[trans.start():trans.end()]
-            start = trans.start()
-
-            lineno = django_template.count('\n', 0, start) + 1
-            offset = start - django_template.rfind('\n', 0, start)
-
-            blocktrans_expr = BlockTransExpression(expr,
-                                                   trans.start(),
-                                                   trans.end(),
-                                                   lineno,
-                                                   offset)
-
-            if blocktrans_expr:
-                expressions.append(blocktrans_expr)
-
