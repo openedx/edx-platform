@@ -130,6 +130,9 @@ class ContentTypeGatingPartition(UserPartition):
         if course_masquerade.user_partition_id == ENROLLMENT_TRACK_PARTITION_ID:
             audit_mode_id = settings.COURSE_ENROLLMENT_MODES.get(CourseMode.AUDIT, {}).get('id')
             return course_masquerade.group_id == audit_mode_id
+        if course_masquerade.user_partition_id == CONTENT_GATING_PARTITION_ID:
+            limited_access_group_id = LIMITED_ACCESS.id
+            return course_masquerade.group_id == limited_access_group_id
         return False
 
     def _has_active_enrollment_in_audit_mode(self, user, course_key):
