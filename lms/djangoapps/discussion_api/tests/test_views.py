@@ -237,6 +237,100 @@ class RetireViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
 
 
 @ddt.ddt
+@httpretty.activate
+@mock.patch('django.conf.settings.USERNAME_REPLACEMENT_WORKER', 'test_replace_username_service_worker')
+@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+class ReplaceUsernamesViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
+    """Tests for ReplaceUsernamesView"""
+    def setUp(self):
+        super(ReplaceUsernamesViewTest, self).setUp()
+        self.client_user = UserFactory()
+        self.client_user.username = "test_replace_username_service_worker"
+        self.new_username = "test_username_replacement"
+        self.url = reverse("replace_discussion_username")
+
+    def assert_response_correct(self, response, expected_status, expected_content):
+        """
+        Assert that the response has the given status code and content
+        """
+        self.assertEqual(response.status_code, expected_status)
+
+        if expected_content:
+            self.assertEqual(text_type(response.content), expected_content)
+
+    def build_jwt_headers(self, user):
+        """
+        Helper function for creating headers for the JWT authentication.
+        """
+        token = create_jwt_for_user(user)
+        headers = {'HTTP_AUTHORIZATION': 'JWT ' + token}
+        return headers
+
+    def call_api(self, user, data):
+        """ Helper function to call API with data """
+        data = json.dumps(data)
+        headers = self.build_jwt_headers(user)
+        return self.client.post(self.url, data, content_type='application/json', **headers)
+
+    @ddt.data(
+        [{}, {}],
+        {},
+        [{"test_key": "test_value", "test_key_2": "test_value_2"}]
+    )
+    def test_bad_schema(self, mapping_data):
+        """ Verify the endpoint rejects bad data schema """
+        data = {
+            "username_mappings": mapping_data
+        }
+        response = self.call_api(self.client_user, data)
+        self.assertEqual(response.status_code, 400)
+
+    def test_auth(self):
+        """ Verify the endpoint only works with the service worker """
+        data = {
+            "username_mappings": [
+                {"test_username_1": "test_new_username_1"},
+                {"test_username_2": "test_new_username_2"}
+            ]
+        }
+
+        # Test unauthenticated
+        response = self.client.post(self.url, data)
+        self.assertEqual(response.status_code, 401)
+
+        # Test non-service worker
+        random_user = UserFactory()
+        response = self.call_api(random_user, data)
+        self.assertEqual(response.status_code, 403)
+
+        # Test service worker
+        response = self.call_api(self.client_user, data)
+        self.assertEqual(response.status_code, 200)
+
+    def test_basic(self):
+        """ Check successful replacement """
+        data = {
+            "username_mappings": [
+                {self.user.username: self.new_username},
+            ]
+        }
+        expected_response = {
+            'failed_replacements': [],
+            'successful_replacements': data["username_mappings"]
+        }
+        self.register_get_username_replacement_response(self.user)
+        response = self.call_api(self.client_user, data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, expected_response)
+
+    def test_not_authenticated(self):
+        """
+        Override the parent implementation of this, we JWT auth for this API
+        """
+        pass
+
+
+@ddt.ddt
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """

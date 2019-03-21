@@ -180,6 +180,17 @@ class User(models.Model):
             metric_tags=self._metric_tags
         )
 
+    def replace_username(self, new_username):
+        url = _url_for_username_replacement(self.id)
+        params = {"new_username": new_username}
+
+        utils.perform_request(
+            'post',
+            url,
+            params,
+            raw=True,
+        )
+
 
 def _url_for_vote_comment(comment_id):
     return "{prefix}/comments/{comment_id}/votes".format(prefix=settings.PREFIX, comment_id=comment_id)
@@ -213,3 +224,10 @@ def _url_for_retire(user_id):
     Returns cs_comments_service url endpoint to retire a user (remove all post content, etc.)
     """
     return "{prefix}/users/{user_id}/retire".format(prefix=settings.PREFIX, user_id=user_id)
+
+
+def _url_for_username_replacement(user_id):
+    """
+    Returns cs_comments_servuce url endpoint to replace the username of a user
+    """
+    return "{prefix}/users/{user_id}/replace_username".format(prefix=settings.PREFIX, user_id=user_id)

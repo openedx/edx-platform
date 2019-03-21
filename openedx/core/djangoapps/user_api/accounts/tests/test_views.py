@@ -17,6 +17,7 @@ import mock
 import pytz
 from rest_framework.test import APIClient, APITestCase
 
+from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.user_api.accounts import ACCOUNT_VISIBILITY_PREF_KEY
 from openedx.core.djangoapps.user_api.models import UserPreference
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
@@ -933,3 +934,81 @@ class TestAccountAPITransactions(TransactionTestCase):
         data = response.data
         self.assertEqual(old_email, data["email"])
         self.assertEqual(u"m", data["gender"])
+
+
+@ddt.ddt
+@mock.patch('django.conf.settings.USERNAME_REPLACEMENT_WORKER', 'test_replace_username_service_worker')
+class UsernameReplacementViewTests(APITestCase):
+    """ Tests UsernameReplacementView """
+    SERVICE_USERNAME = 'test_replace_username_service_worker'
+
+    def setUp(self):
+        super(UsernameReplacementViewTests, self).setUp()
+        self.service_user = UserFactory(username=self.SERVICE_USERNAME)
+        self.url = reverse("username_replacement")
+
+    def build_jwt_headers(self, user):
+        """
+        Helper function for creating headers for the JWT authentication.
+        """
+        token = create_jwt_for_user(user)
+        headers = {'HTTP_AUTHORIZATION': u'JWT {}'.format(token)}
+        return headers
+
+    def call_api(self, user, data):
+        """ Helper function to call API with data """
+        data = json.dumps(data)
+        headers = self.build_jwt_headers(user)
+        return self.client.post(self.url, data, content_type='application/json', **headers)
+
+    def test_auth(self):
+        """ Verify the endpoint only works with the service worker """
+        data = {
+            "username_mappings": [
+                {"test_username_1": "test_new_username_1"},
+                {"test_username_2": "test_new_username_2"}
+            ]
+        }
+
+        # Test unauthenticated
+        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, 401)
+
+        # Test non-service worker
+        random_user = UserFactory()
+        response = self.call_api(random_user, data)
+        self.assertEqual(response.status_code, 403)
+
+        # Test service worker
+        response = self.call_api(self.service_user, data)
+        self.assertEqual(response.status_code, 200)
+
+    @ddt.data(
+        [{}, {}],
+        {},
+        [{"test_key": "test_value", "test_key_2": "test_value_2"}]
+    )
+    def test_bad_schema(self, mapping_data):
+        """ Verify the endpoint rejects bad data schema """
+        data = {
+            "username_mappings": mapping_data
+        }
+        response = self.call_api(self.service_user, data)
+        self.assertEqual(response.status_code, 400)
+
+    def test_existing_and_non_existing_users(self):
+        """ Tests a mix of existing and non existing users """
+        random_users = [UserFactory() for _ in range(5)]
+        fake_usernames = ["myname_" + str(x) for x in range(5)]
+        existing_users = [{user.username: user.username + '_new'} for user in random_users]
+        non_existing_users = [{username: username + '_new'} for username in fake_usernames]
+        data = {
+            "username_mappings": existing_users + non_existing_users
+        }
+        expected_response = {
+            'failed_replacements': [],
+            'successful_replacements': existing_users + non_existing_users
+        }
+        response = self.call_api(self.service_user, data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, expected_response)
