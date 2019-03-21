@@ -9,7 +9,7 @@ import textwrap
 from xsslint import visitors
 from xsslint.reporting import ExpressionRuleViolation, FileResults, RuleViolation
 from xsslint.rules import RuleSet
-from xsslint.utils import Expression, ParseString, StringLines, is_skip_dir
+from xsslint.utils import Expression, ParseString, StringLines, is_skip_dir, DjangoExpression, TransExpression, BlockTransExpression
 
 
 class BaseLinter(object):
@@ -1062,11 +1062,11 @@ class MakoTemplateLinter(BaseLinter):
         contexts = self._get_contexts(mako_template)
         self._check_javascript_contexts(mako_template, contexts, results)
         for expression in expressions:
-            # if expression.end_index is None:
-            #     results.violations.append(ExpressionRuleViolation(
-            #         self.ruleset.mako_unparseable_expression, expression
-            #     ))
-            #     continue
+            if expression.end_index is None:
+                results.violations.append(ExpressionRuleViolation(
+                    self.ruleset.mako_unparseable_expression, expression
+                ))
+                continue
 
             context = self._get_context(contexts, expression.start_index)
             self._check_expression_and_filters(mako_template, expression, context, has_page_default, results)
@@ -1226,8 +1226,6 @@ class MakoTemplateLinter(BaseLinter):
             results: A list of results into which violations will be added.
 
         """
-        from pdb import set_trace
-        set_trace()
 
         if context == 'unknown':
             results.violations.append(ExpressionRuleViolation(
@@ -1584,16 +1582,12 @@ class DjangoTemplateLinter(BaseLinter):
             results: A list of results into which violations will be added.
 
         """
-        expressions = self._find_django_expressions(django_template)
-        for expression in expressions:
-            if expression.end_index is None:
-                results.violations.append(ExpressionRuleViolation(
-                    self.ruleset.mako_unparseable_expression, expression
-                ))
-                continue
-            self._check_expression_and_filters(django_template, expression, results)
+        expressions = []
+        expressions = self._find_django_expressions(django_template, expressions)
+        for expr in expressions:
+            expr.validate_expression(django_template, results)
 
-    def _find_django_expresions(self, django_template):
+    def _find_django_expresions(self, django_template, expressions):
         """
         Finds all the Django trans/blocktrans expressions in a Django template
         and creates a list of dicts for each expression.
@@ -1605,4 +1599,36 @@ class DjangoTemplateLinter(BaseLinter):
             A list of Expressions.
         """
 
-        pass
+        trans_iterator = re.finditer(r'{% trans .*%}', django_template, re.I)
+        for trans in trans_iterator:
+            expr = trans.string[trans.start():trans.end()]
+
+            start = trans.start()
+            lineno = django_template.count('\n', 0, start) + 1
+            offset = start - django_template.rfind('\n', 0, start)
+
+            trans_expr = TransExpression(expr,
+                                         trans.start(),
+                                         trans.end(),
+                                         lineno,
+                                         offset)
+            if trans_expr:
+                expressions.append(trans_expr)
+
+        block_trans_iterator = re.finditer(r'{% blocktrans .*?%}', django_template, re.I)
+        for trans in block_trans_iterator:
+            expr = trans.string[trans.start():trans.end()]
+            start = trans.start()
+
+            lineno = django_template.count('\n', 0, start) + 1
+            offset = start - django_template.rfind('\n', 0, start)
+
+            blocktrans_expr = BlockTransExpression(expr,
+                                                   trans.start(),
+                                                   trans.end(),
+                                                   lineno,
+                                                   offset)
+
+            if blocktrans_expr:
+                expressions.append(blocktrans_expr)
+

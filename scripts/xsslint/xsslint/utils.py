@@ -350,3 +350,102 @@ class Expression(object):
         else:
             self.expression = None
             self.expression_inner = None
+
+
+class DjangoExpression(object):
+
+    def __init__(self, full_expression, start, end, lineno, offset):
+        self.full_expression = full_expression
+        self.start = start
+        self.end = end
+        self.lineno = lineno
+        self.offset = offset
+        self.inner_expression = full_expression[2:-2]
+
+
+class TransExpression(DjangoExpression):
+    def __init__(self, *args, **kwargs):
+        super(TransExpression, self).__init__(*args, **kwargs)
+
+    def validate_expression(self, template_file, results):
+        return
+        # from pdb import set_trace
+        # set_trace()
+        print str(self.start) + ':' + self.inner_expression
+        trans_expr = self.inner_expression
+        if 'as' not in trans_expr:
+            results.append({'violation': 'django-trans-missing-escape', 'expression': self})
+            return
+        pos = trans_expr.find('as')
+        if pos == -1:
+            results.append({'violation': 'django-trans-missing-escape', 'expression': self})
+            return
+        trans_var_name_used = trans_expr[pos + len('as'):].strip()
+        print trans_var_name_used
+
+        escape_expr_start_pos = template_file.find('{{', self.end)
+        if escape_expr_start_pos == -1:
+            results.append({'violation': 'django-trans-missing-escape', 'expression': self})
+            return
+        escape_expr_end_pos = template_file.find('}}', escape_expr_start_pos)
+
+        # couldn't find matching }}
+        if escape_expr_end_pos == -1:
+            results.append({'violation': 'django-trans-missing-escape', 'expression': self})
+        escape_expr = template_file[escape_expr_start_pos + len('{{'):escape_expr_end_pos]
+
+        # check escape expression has the right variable and its escaped properly
+        # with force_escape filter
+        if '|' not in escape_expr \
+            or len(escape_expr.split('|')) != 2:
+            results.append({'violation': 'django-trans-invalid-escape-filter', 'expression': self})
+            return
+        escape_expr_var_used, escape_filter = escape_expr.split('|')[0], escape_expr.split('|')[1]
+        if trans_var_name_used != escape_expr_var_used:
+            results.append({'violation': 'django-escape-variable-mismatch', 'expression': self})
+            return
+        if escape_filter != 'force_escape':
+            results.append({'violation': 'django-escape-invalid-filter', 'expression': self})
+            return
+
+
+class BlockTransExpression(DjangoExpression):
+    def __init__(self, *args, **kwargs):
+        super(BlockTransExpression, self).__init__(*args, **kwargs)
+
+    def validate_expression(self, template_file, results):
+        # pass
+        # from pdb import set_trace
+        # set_trace()
+        print str(self.start) + ':' + self.inner_expression
+        if self.offset == 0 and self.lineno == 0:
+            results.append({'violation': 'django-blocktrans-missing-escape-filter', 'expression': self})
+            return
+        if self.lineno >= 0:
+            # prev_offset = self.start - self.offset
+            filter_start_pos = template_file.rfind('{%', 0, self.start)
+            if filter_start_pos == -1:
+                results.append({'violation': 'django-blocktrans-missing-escape-filter', 'expression': self})
+                return
+
+            filter_end_pos = template_file.find('%}', filter_start_pos)
+            if filter_end_pos > self.start:
+                results.append({'violation': 'django-blocktrans-missing-escape-filter', 'expression': self})
+                return
+
+            escape_filter = template_file[filter_start_pos:filter_end_pos + 2]
+
+            if len(escape_filter) < len('{%filter force_escape%}'):
+                results.append({'violation': 'django-blocktrans-missing-escape-filter', 'expression': self})
+                return
+
+            escape_filter = escape_filter[2:-2].strip()
+            escape_filter = escape_filter.split(' ')
+
+            if len(escape_filter) < 2:
+                results.append({'violation': 'django-blocktrans-missing-escape-filter', 'expression': self})
+                return
+
+            if escape_filter[0] != 'filter' or escape_filter[1] != 'force_escape':
+                results.append({'violation': 'django-blocktrans-missing-escape-filter', 'expression': self})
+                return
