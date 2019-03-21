@@ -2965,7 +2965,7 @@ CREATE TABLE `enterprise_systemwideenterpriserole` (
   `created` datetime(6) NOT NULL,
   `modified` datetime(6) NOT NULL,
   `name` varchar(255) NOT NULL,
-  `description` longtext NULL
+  `description` longtext NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
