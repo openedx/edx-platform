@@ -338,7 +338,8 @@ class OAuth2ProviderConfig(ProviderConfig):
         help_text=(
             "Which python-social-auth OAuth2 provider backend to use. "
             "The list of backend choices is determined by the THIRD_PARTY_AUTH_BACKENDS setting."
-            # To be precise, it's set by AUTHENTICATION_BACKENDS - which aws.py sets from THIRD_PARTY_AUTH_BACKENDS
+            # To be precise, it's set by AUTHENTICATION_BACKENDS
+            # which production.py sets from THIRD_PARTY_AUTH_BACKENDS
         )
     )
     key = models.TextField(blank=True, verbose_name="Client ID")

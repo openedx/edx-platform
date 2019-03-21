@@ -604,12 +604,6 @@ COURSE_ENROLLMENT_MODES = ENV_TOKENS.get('COURSE_ENROLLMENT_MODES', COURSE_ENROL
 
 # This is at the bottom because it is going to load more settings after base settings are loaded
 
-# Load aws.py in plugins for reverse compatibility.  This can be removed after aws.py
-# is officially removed.
-plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.CMS,
-                            plugin_constants.SettingsType.AWS)
-
-# We continue to load production.py over aws.py
 plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.CMS, plugin_constants.SettingsType.PRODUCTION)
 
 ########################## Derive Any Derived Settings  #######################

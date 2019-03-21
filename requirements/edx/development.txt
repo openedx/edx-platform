@@ -72,7 +72,7 @@ click-log==0.1.8
 click==7.0
 code-annotations==0.3.1
 colorama==0.4.1
-configparser==3.7.3
+configparser==3.7.4
 constantly==15.1.0
 coreapi==2.3.3
 coreschema==0.0.4
@@ -143,7 +143,7 @@ edx-oauth2-provider==1.2.2
 edx-opaque-keys[django]==0.4.4
 edx-organizations==1.0.1
 edx-proctoring-proctortrack==1.0.4
-edx-proctoring==1.5.21
+edx-proctoring==1.6.0
 edx-rbac==0.1.5
 edx-rest-api-client==1.9.2
 edx-search==1.2.2
@@ -189,7 +189,7 @@ incremental==17.5.0
 inflect==2.1.0
 ipaddress==1.0.22
 isodate==0.6.0
-isort==4.3.15
+isort==4.3.16
 itsdangerous==1.1.0
 itypes==1.1.0
 jinja2-pluralize==0.3.0
@@ -221,7 +221,7 @@ moto==0.3.1
 mpmath==1.1.0
 mysqlclient==1.4.2.post1
 networkx==1.7
-newrelic==4.14.0.115
+newrelic==4.16.0.116
 nltk==3.4
 nodeenv==1.1.1
 numpy==1.16.2
@@ -294,7 +294,7 @@ pyyaml==5.1
 queuelib==1.5.0
 radon==3.0.1
 redis==2.10.6
-reportlab==3.5.13
+reportlab==3.5.16
 requests-oauthlib==1.1.0
 requests==2.21.0
 rest-condition==1.0.3
@@ -320,7 +320,7 @@ social-auth-app-django==2.1.0
 social-auth-core==1.7.0
 sorl-thumbnail==12.3
 sortedcontainers==2.1.0
-soupsieve==1.8
+soupsieve==1.9
 sphinx==1.8.5
 sphinxcontrib-websupport==1.1.0  # via sphinx
 splinter==0.9.0
@@ -334,7 +334,7 @@ text-unidecode==1.2
 tincan==0.0.5
 toml==0.10.0
 tox-battery==0.5.1
-tox==3.7.0
+tox==3.8.0
 traceback2==1.4.0
 transifex-client==0.13.6
 twisted==18.9.0

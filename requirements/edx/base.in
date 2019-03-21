@@ -79,7 +79,7 @@ edx-enterprise
 edx-milestones
 edx-oauth2-provider
 edx-organizations
-edx-proctoring>=1.5.3
+edx-proctoring>=1.6.0
 edx-proctoring-proctortrack
 edx-rest-api-client
 edx-search

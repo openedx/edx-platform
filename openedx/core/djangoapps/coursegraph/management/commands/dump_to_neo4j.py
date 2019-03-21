@@ -33,7 +33,7 @@ class Command(BaseCommand):
 
     Example usage:
       python manage.py lms dump_to_neo4j --host localhost --https_port 7473 \
-        --secure --user user --password password --settings=aws
+        --secure --user user --password password --settings=production
     """
     def add_arguments(self, parser):
         parser.add_argument('--host', type=six.text_type)
