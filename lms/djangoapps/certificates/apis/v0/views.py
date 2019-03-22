@@ -227,6 +227,7 @@ class CertificatesListView(GenericAPIView):
                     'course_organization': user_cert.get('course_organization'),
                     'certificate_type': user_cert.get('type'),
                     'created_date': user_cert.get('created'),
+                    'modified_date': user_cert.get('modified'),
                     'status': user_cert.get('status'),
                     'is_passing': user_cert.get('is_passing'),
                     'download_url': user_cert.get('download_url'),

@@ -163,6 +163,7 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
                 'course_organization': self.course.org,
                 'certificate_type': CourseMode.VERIFIED,
                 'created_date': self.now,
+                'modified_date': self.now,
                 'status': CertificateStatuses.downloadable,
                 'is_passing': True,
                 'download_url': 'www.google.com',
