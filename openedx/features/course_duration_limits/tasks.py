@@ -15,6 +15,7 @@ from edx_ace import ace
 from edx_ace.message import Message
 from edx_ace.utils.date import deserialize, serialize
 from edx_django_utils.monitoring import set_custom_metric
+from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.schedules.tasks import (
     _annonate_send_task_for_monitoring,
     _track_message_sent
@@ -77,7 +78,7 @@ class CourseDurationLimitMessageBaseTask(LoggedTask):
             for bin_num in range(cls.num_bins):
                 task_args = (
                     site.id,
-                    course_key,
+                    unicode(course_key),
                     serialize(target_date),
                     day_offset,
                     bin_num,
@@ -89,17 +90,17 @@ class CourseDurationLimitMessageBaseTask(LoggedTask):
                 )
 
     def run(  # pylint: disable=arguments-differ
-        self, site_id, course_key, target_day_str, day_offset, bin_num, override_recipient_email=None,
+        self, site_id, course_key_str, target_day_str, day_offset, bin_num, override_recipient_email=None,
     ):
         try:
             site = Site.objects.select_related('configuration').get(id=site_id)
             with emulate_http_request(site=site):
                 msg_type = self.make_message_type(day_offset)
-                _annotate_for_monitoring(msg_type, course_key, bin_num, target_day_str, day_offset)
+                _annotate_for_monitoring(msg_type, course_key_str, bin_num, target_day_str, day_offset)
                 return self.resolver(  # pylint: disable=not-callable
                     self.async_send_task,
                     site,
-                    course_key,
+                    CourseKey.from_string(course_key_str),
                     deserialize(target_day_str),
                     day_offset,
                     bin_num,
