@@ -42,7 +42,7 @@ def expire_old_entitlements(self, start, end, logid='...'):
 
     # This query could be optimized to return a more narrow set, but at a
     # complexity cost. See bug LEARNER-3451 about improving it.
-    entitlements = CourseEntitlement.objects.filter(expired_at__isnull=True, id__gte=start, id__lt=end)
+    entitlements = CourseEntitlement.objects.filter(expired_at__isnull=True, id__gte=start, id__lte=end)
 
     countdown = 2 ** self.request.retries
 
