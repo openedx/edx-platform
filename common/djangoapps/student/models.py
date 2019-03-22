@@ -1195,19 +1195,13 @@ class CourseEnrollment(models.Model):
         if user.is_anonymous:
             return None
         try:
-            if 'courseenrollment' in getattr(user, '_prefetched_objects_cache', {}):
-                for enrollment in user.courseenrollment_set.all():
-                    if enrollment.course_id == course_key:
-                        return enrollment
-                return None
-            else:
-                query = cls.objects
-                if select_related is not None:
-                    query = query.select_related(*select_related)
-                return query.get(
-                    user=user,
-                    course_id=course_key
-                )
+            query = cls.objects
+            if select_related is not None:
+                query = query.select_related(*select_related)
+            return query.get(
+                user=user,
+                course_id=course_key
+            )
         except cls.DoesNotExist:
             return None
 
