@@ -298,6 +298,39 @@ def _retryable_sailthru_error(error):
 
 
 @task(bind=True, routing_key=ACE_ROUTING_KEY)
+def update_sailthru_vars(self, email, attribute):
+    """
+    Update Custom vars of a user profile on sailthru of a provided email
+    """
+    config = EmailMarketingConfiguration.current()
+
+    try:
+        sailthru_client = SailthruClient(config.sailthru_key, config.sailthru_secret)
+    except:
+        log.error(u"Error attempting to create Sailthru Client for : %s", email)
+        return
+    sailthru_response = sailthru_client.api_get("user", {"id": email})
+
+    if not sailthru_response.is_ok():
+        schedule_retry(self, config)
+
+    vars = sailthru_response.json.get("vars", {})
+    attr_list = attribute.split(',')
+    post_flag = False
+
+    for attr in attr_list:
+        if attr in vars:
+            vars[attr] = ""
+            post_flag = True
+
+    if post_flag:
+        sailthru_response = sailthru_client.api_post("user", {"id": email, "vars": vars})
+
+        if not sailthru_response.is_ok():
+            schedule_retry(self, config)
+
+
+@task(bind=True, routing_key=ACE_ROUTING_KEY)
 def update_course_enrollment(self, email, course_key, mode, site=None):
     """Adds/updates Sailthru when a user adds to cart/purchases/upgrades a course
          Args:
