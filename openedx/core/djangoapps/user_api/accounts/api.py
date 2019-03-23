@@ -4,6 +4,7 @@ Programmatic integration point for User API Accounts sub-application
 from django.utils.translation import override as override_language, ugettext as _
 from django.db import transaction, IntegrityError
 import datetime
+
 from pytz import UTC
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
@@ -21,7 +22,7 @@ from student import views as student_views
 from util.model_utils import emit_setting_changed_event
 from lms.lib.comment_client.user import User as CCUser
 from lms.lib.comment_client.utils import CommentClientRequestError
-from edx_notifications.lib.admin import purge_user_data as purge_notifications
+from edx_notifications.lib import admin as notification_admin
 
 from ..errors import (
     AccountUpdateError, AccountValidationError, AccountUsernameInvalid, AccountPasswordInvalid,
@@ -583,7 +584,12 @@ def delete_users(users):
 
     # Delete notifications
     user_ids = users.values_list('id', flat=True)
-    purge_notifications(user_ids)
+    notification_admin.purge_user_data(user_ids)
+
+    # Delete notifications that mention the users, e.g. group work
+    for username in usernames:
+        payload = '"action_username": "{}"'.format(username)
+        notification_admin.purge_notifications_with_payload(payload)
 
     # Finally delete user and related models
     for user in users.exclude(email__in=failed):
