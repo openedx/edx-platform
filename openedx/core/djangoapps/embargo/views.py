@@ -1,11 +1,58 @@
 """Views served by the embargo app. """
 
+from django.contrib.auth.models import User
 from django.http import Http404
 from django.views.generic.base import View
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+from rest_framework import permissions
+from rest_framework.exceptions import ValidationError
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from edxmako.shortcuts import render_to_response
 
 from . import messages
+from .api import check_course_access
+
+
+class CheckCourseAccessView(APIView):
+    permission_classes = (permissions.IsAuthenticated, permissions.IsAdminUser)
+
+    def get(self, request):
+        """
+        GET /api/embargo/v1/course_access/
+
+        Arguments:
+            request (HttpRequest)
+
+        Return:
+            Response: True or False depending on the check.
+
+        """
+        course_ids = request.GET.getlist('course_ids', [])
+        username = request.GET.get('user')
+        user_ip_address = request.GET.get('ip_address')
+
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            user = None
+
+        response = {'access': True}
+
+        if course_ids and user and user_ip_address:
+            for course_id in course_ids:
+                try:
+                    if not check_course_access(CourseKey.from_string(course_id), user, user_ip_address):
+                        response['access'] = False
+                        break
+                except InvalidKeyError:
+                    raise ValidationError('Invalid course_ids')
+        else:
+            raise ValidationError('Missing parameters')
+
+        return Response(response)
 
 
 class CourseAccessMessageView(View):

@@ -3,12 +3,13 @@ CourseBlocks API views
 """
 from django.core.exceptions import ValidationError
 from django.http import Http404
-from rest_framework.generics import ListAPIView
-from rest_framework.response import Response
-
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from openedx.core.lib.api.view_utils import view_auth_classes, DeveloperErrorViewMixin
+from rest_framework.generics import ListAPIView
+from rest_framework.response import Response
+from six import text_type
+
+from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
@@ -128,6 +129,11 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
             the child blocks.  Returned only if "children" is included in the
             "requested_fields" parameter.
 
+          * completion: (float or None) The level of completion of the block.
+            Its value can vary between 0.0 and 1.0 or be equal to None
+            if block is not completable. Returned only if "completion"
+            is included in the "requested_fields" parameter.
+
           * block_counts: (dict) For each block type specified in the
             block_counts parameter to the endpoint, the aggregate number of
             blocks of that type for this block and all of its descendants.
@@ -172,6 +178,9 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
 
           * due: The due date of the block. Returned only if "due" is included
             in the "requested_fields" parameter.
+
+          * show_correctness: Whether to show scores/correctness to learners for the current sequence or problem.
+            Returned only if "show_correctness" is included in the "requested_fields" parameter.
     """
 
     def list(self, request, usage_key_string):  # pylint: disable=arguments-differ
@@ -207,7 +216,7 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
                 )
             )
         except ItemNotFoundError as exception:
-            raise Http404("Block not found: {}".format(exception.message))
+            raise Http404("Block not found: {}".format(text_type(exception)))
 
 
 @view_auth_classes()

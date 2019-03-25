@@ -3,6 +3,7 @@ This file contains all the classes used by has_access for error handling
 """
 
 from django.utils.translation import ugettext as _
+
 from xmodule.course_metadata_utils import DEFAULT_START_DATE
 
 
@@ -104,7 +105,7 @@ class StartDateError(AccessError):
         super(StartDateError, self).__init__(error_code, developer_message, user_message)
 
 
-class MilestoneError(AccessError):
+class MilestoneAccessError(AccessError):
     """
     Access denied because the user has unfulfilled milestones
     """
@@ -112,7 +113,7 @@ class MilestoneError(AccessError):
         error_code = "unfulfilled_milestones"
         developer_message = "User has unfulfilled milestones"
         user_message = _("You have unfulfilled milestones")
-        super(MilestoneError, self).__init__(error_code, developer_message, user_message)
+        super(MilestoneAccessError, self).__init__(error_code, developer_message, user_message)
 
 
 class VisibilityError(AccessError):

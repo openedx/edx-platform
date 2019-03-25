@@ -28,6 +28,6 @@ define(['codemirror', 'js/utils/handle_iframe_binding', 'utility'],
             return content;
         };
 
-        return {'editWithCodeMirror': editWithCodeMirror, 'changeContentToPreview': changeContentToPreview};
+        return {editWithCodeMirror: editWithCodeMirror, changeContentToPreview: changeContentToPreview};
     }
 );

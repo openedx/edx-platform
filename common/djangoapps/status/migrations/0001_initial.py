@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import migrations, models
 import django.db.models.deletion
 from django.conf import settings
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
+from django.db import migrations, models
+
+from opaque_keys.edx.django.models import CourseKeyField
 
 
 class Migration(migrations.Migration):
@@ -39,6 +40,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='coursemessage',
             name='global_message',
-            field=models.ForeignKey(to='status.GlobalStatusMessage'),
+            field=models.ForeignKey(to='status.GlobalStatusMessage', on_delete=models.CASCADE),
         ),
     ]

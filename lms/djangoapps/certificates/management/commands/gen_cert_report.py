@@ -2,14 +2,13 @@
 Generate a report of certificate statuses
 """
 
-from django.core.management.base import BaseCommand, CommandError
-from certificates.models import GeneratedCertificate
 from django.contrib.auth.models import User
-from optparse import make_option
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from django.core.management.base import BaseCommand, CommandError
 from django.db.models import Count
+from opaque_keys.edx.keys import CourseKey
+from six import text_type
+
+from lms.djangoapps.certificates.models import GeneratedCertificate
 
 
 class Command(BaseCommand):
@@ -36,25 +35,20 @@ class Command(BaseCommand):
 
     """
 
-    option_list = BaseCommand.option_list + (
-        make_option('-c', '--course',
-                    metavar='COURSE_ID',
-                    dest='course',
-                    default=None,
-                    help='Only generate for COURSE_ID'),
-    )
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '-c', '--course',
+            metavar='COURSE_ID',
+            dest='course',
+            default=None,
+            help='Only generate for COURSE_ID'
+        )
 
     def handle(self, *args, **options):
-
         # Find all courses that have ended
 
         if options['course']:
-            try:
-                course_id = CourseKey.from_string(options['course'])
-            except InvalidKeyError:
-                print ("Course id {} could not be parsed as a CourseKey; "
-                       "falling back to SSCK.from_dep_str").format(options['course'])
-                course_id = SlashSeparatedCourseKey.from_deprecated_string(options['course'])
+            course_id = CourseKey.from_string(options['course'])
         else:
             raise CommandError("You must specify a course")
 
@@ -123,7 +117,7 @@ class Command(BaseCommand):
         print ' '.join(["{:>16}".format(heading) for heading in status_headings])
 
         # print the report
-        print "{0:>26}".format(course_id.to_deprecated_string()),
+        print "{0:>26}".format(text_type(course_id)),
         for heading in status_headings:
             if heading in cert_data[course_id]:
                 print "{:>16}".format(cert_data[course_id][heading]),

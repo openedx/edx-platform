@@ -1,0 +1,214 @@
+"""
+A few places in the LMS want to notify the Credentials service when certain events
+happen (like certificates being awarded or grades changing). To do this, they
+listen for a signal. Sometimes we want to rebuild the data on these apps
+regardless of an actual change in the database, either to recover from a bug or
+to bootstrap a new feature we're rolling out for the first time.
+
+This management command will manually trigger the receivers we care about.
+(We don't want to trigger all receivers for these signals, since these are busy
+signals.)
+"""
+from __future__ import print_function
+import logging
+import time
+import sys
+
+import dateutil.parser
+from django.contrib.auth.models import User
+from django.core.management.base import BaseCommand, CommandError
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+from pytz import UTC
+
+from lms.djangoapps.certificates.models import GeneratedCertificate
+from lms.djangoapps.grades.models import PersistentCourseGrade
+from openedx.core.djangoapps.credentials.signals import handle_cert_change, send_grade_if_interesting
+from openedx.core.djangoapps.programs.signals import handle_course_cert_awarded, handle_course_cert_changed
+
+
+log = logging.getLogger(__name__)
+
+
+def certstr(cert):
+    return '{} for user {}'.format(cert.course_id, cert.user.username)
+
+
+def gradestr(grade):
+    return '{} for user {}'.format(grade.course_id, grade.user_id)
+
+
+def parsetime(timestr):
+    dt = dateutil.parser.parse(timestr)
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=UTC)
+    return dt
+
+
+class Command(BaseCommand):
+    """
+    Example usage:
+
+    # Process all certs/grades changes for a given course:
+    $ ./manage.py lms --settings=devstack_docker notify_credentials \
+    --courses course-v1:edX+DemoX+Demo_Course
+
+    # Process all certs/grades changes in a given time range:
+    $ ./manage.py lms --settings=devstack_docker notify_credentials \
+    --start-date 2018-06-01 --end-date 2018-07-31
+
+    A Dry Run will produce output that looks like:
+
+        DRY-RUN: This command would have handled changes for...
+        3 Certificates:
+            course-v1:edX+RecordsSelfPaced+1 for user records_one_cert
+            course-v1:edX+RecordsSelfPaced+1 for user records
+            course-v1:edX+RecordsSelfPaced+1 for user records_unverified
+        3 Grades:
+            course-v1:edX+RecordsSelfPaced+1 for user 14
+            course-v1:edX+RecordsSelfPaced+1 for user 17
+            course-v1:edX+RecordsSelfPaced+1 for user 18
+    """
+    help = (
+        u"Simulate certificate/grade changes without actually modifying database "
+        u"content. Specifically, trigger the handlers that send data to Credentials."
+    )
+
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--dry-run',
+            action='store_true',
+            help='Just show a preview of what would happen.',
+        )
+        parser.add_argument(
+            '--courses',
+            nargs='+',
+            help='Send information only for specific courses.',
+        )
+        parser.add_argument(
+            '--start-date',
+            type=parsetime,
+            help='Send information only for certificates or grades that have changed since this date.',
+        )
+        parser.add_argument(
+            '--end-date',
+            type=parsetime,
+            help='Send information only for certificates or grades that have changed before this date.',
+        )
+        parser.add_argument(
+            '--delay',
+            type=float,
+            default=0,
+            help="Number of seconds to sleep between processing certificates, so that we don't flood our queues.",
+        )
+
+    def handle(self, *args, **options):
+        log.info(
+            "notify_credentials starting, dry-run=%s, delay=%d seconds",
+            options['dry_run'],
+            options['delay']
+        )
+
+        cert_filter_args = {}
+        grade_filter_args = {}
+
+        if options['courses']:
+            course_keys = self.get_course_keys(options['courses'])
+            cert_filter_args['course_id__in'] = course_keys
+            grade_filter_args['course_id__in'] = course_keys
+
+        if options['start_date']:
+            cert_filter_args['modified_date__gte'] = options['start_date']
+            grade_filter_args['modified__gte'] = options['start_date']
+
+        if options['end_date']:
+            cert_filter_args['modified_date__lte'] = options['end_date']
+            grade_filter_args['modified__lte'] = options['end_date']
+
+        if not cert_filter_args:
+            raise CommandError('You must specify a filter (e.g. --courses= or --start-date)')
+
+        # pylint: disable=no-member
+        certs = GeneratedCertificate.objects.filter(**cert_filter_args).order_by('modified_date')
+        grades = PersistentCourseGrade.objects.filter(**grade_filter_args).order_by('modified')
+
+        if options['dry_run']:
+            self.print_dry_run(list(certs), list(grades))
+        else:
+            self.send_notifications(certs, grades, delay=options['delay'])
+
+        log.info('notify_credentials finished')
+
+    def send_notifications(self, certs, grades, delay=0):
+        """ Run actual handler commands for the provided certs and grades. """
+
+        # First, do certs
+        for i, cert in enumerate(certs, start=1):
+            log.info(
+                "Handling credential changes (%d of %d) for certificate %s",
+                i, len(certs), certstr(cert),
+            )
+            if delay:
+                time.sleep(delay)
+
+            signal_args = {
+                'sender': None,
+                'user': cert.user,
+                'course_key': cert.course_id,
+                'mode': cert.mode,
+                'status': cert.status,
+            }
+            handle_course_cert_awarded(**signal_args)
+            handle_course_cert_changed(**signal_args)
+            handle_cert_change(**signal_args)
+
+        # Then do grades
+        for i, grade in enumerate(grades, start=1):
+            log.info(
+                "Handling grade changes (%d of %d) for grade %s",
+                i, len(grades), gradestr(grade),
+            )
+            if delay:
+                time.sleep(delay)
+
+            user = User.objects.get(id=grade.user_id)
+            send_grade_if_interesting(user, grade.course_id, None, None, grade.letter_grade, grade.percent_grade)
+
+    def get_course_keys(self, courses):
+        """
+        Return a list of CourseKeys that we will emit signals to.
+
+        `courses` is an optional list of strings that can be parsed into
+        CourseKeys. If `courses` is empty or None, we will default to returning
+        all courses in the modulestore (which can be very expensive). If one of
+        the strings passed in the list for `courses` does not parse correctly,
+        it is a fatal error and will cause us to exit the entire process.
+        """
+        # Use specific courses if specified, but fall back to all courses.
+        course_keys = []
+        log.info("%d courses specified: %s", len(courses), ", ".join(courses))
+        for course_id in courses:
+            try:
+                course_keys.append(CourseKey.from_string(course_id))
+            except InvalidKeyError:
+                log.fatal("%s is not a parseable CourseKey", course_id)
+                sys.exit(1)
+
+        return course_keys
+
+    def print_dry_run(self, certs, grades):
+        """Give a preview of what certs/grades we will handle."""
+        print("DRY-RUN: This command would have handled changes for...")
+        ITEMS_TO_SHOW = 10
+
+        print(len(certs), "Certificates:")
+        for cert in certs[:ITEMS_TO_SHOW]:
+            print("   ", certstr(cert))
+        if len(certs) > ITEMS_TO_SHOW:
+            print("    (+ {} more)".format(len(certs) - ITEMS_TO_SHOW))
+
+        print(len(grades), "Grades:")
+        for grade in grades[:ITEMS_TO_SHOW]:
+            print("   ", gradestr(grade))
+        if len(grades) > ITEMS_TO_SHOW:
+            print("    (+ {} more)".format(len(grades) - ITEMS_TO_SHOW))

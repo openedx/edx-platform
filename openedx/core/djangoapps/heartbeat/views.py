@@ -1,12 +1,10 @@
 """
 Views for verifying the health (heartbeat) of the app.
 """
-from xmodule.modulestore.django import modulestore
 from dogapi import dog_stats_api
 from util.json_request import JsonResponse
-from django.db import connection
-from django.db.utils import DatabaseError
-from xmodule.exceptions import HeartbeatFailure
+
+from .runchecks import runchecks
 
 
 @dog_stats_api.timed('edxapp.heartbeat')
@@ -16,21 +14,16 @@ def heartbeat(request):  # pylint: disable=unused-argument
     of service id: status or message. If the status for any service is anything other than True,
     it returns HTTP code 503 (Service Unavailable); otherwise, it returns 200.
     """
-    # This refactoring merely delegates to the default modulestore (which if it's mixed modulestore will
-    # delegate to all configured modulestores) and a quick test of sql. A later refactoring may allow
-    # any service to register itself as participating in the heartbeat. It's important that all implementation
-    # do as little as possible but give a sound determination that they are ready.
+    check_results = {}
     try:
-        output = modulestore().heartbeat()
-    except HeartbeatFailure as fail:
-        return JsonResponse({fail.service: unicode(fail)}, status=503)
+        check_results = runchecks('extended' in request.GET)
 
-    cursor = connection.cursor()
-    try:
-        cursor.execute("SELECT CURRENT_DATE")
-        cursor.fetchone()
-        output['SQL'] = True
-    except DatabaseError as fail:
-        return JsonResponse({'SQL': unicode(fail)}, status=503)
+        status_code = 200  # Default to OK
+        for check in check_results:
+            if not check_results[check]['status']:
+                status_code = 503  # 503 on any failure
+    except Exception as e:
+        status_code = 503
+        check_results = {'error': unicode(e)}
 
-    return JsonResponse(output)
+    return JsonResponse(check_results, status=status_code)

@@ -1,23 +1,18 @@
 """
 This test tests that i18n extraction (`paver i18n_extract -v`) works properly.
 """
-from datetime import datetime, timedelta
 import os
 import random
 import re
-import sys
 import string
 import subprocess
+import sys
+from datetime import datetime, timedelta
 from unittest import TestCase
 
-from mock import patch
+from i18n import config, dummy, extract, generate
 from polib import pofile
 from pytz import UTC
-
-from i18n import config
-from i18n import dummy
-from i18n import extract
-from i18n import generate
 
 
 class TestGenerate(TestCase):

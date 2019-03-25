@@ -3,16 +3,14 @@
 
 // About: Sass compile for the LMS Courseware Elements that are shared between LTR and RTL UI. Configuration and vendor specific imports happen before this shared set of imports are compiled in the lms-course-*.scss files.
 
+// Base build
+@import 'base/build';
 @import 'base/base';
 @import 'base/headings';
 @import 'base/extends';
 @import 'base/animations';
 @import 'shared/alerts_pattern_library_shim';
 @import 'shared/tooltips';
-
-// Pattern Library shims
-@import 'edx-pattern-library-shims/base/variables';
-@import 'edx-pattern-library-shims/buttons';
 
 // base - elements
 @import 'elements/typography';
@@ -68,3 +66,7 @@
 
 // responsive
 @import 'base/layouts'; // temporary spot for responsive course
+@import 'header';
+
+// features
+@import 'features/course-sock';

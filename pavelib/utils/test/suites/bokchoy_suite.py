@@ -1,14 +1,14 @@
 """
 Class used for defining and running Bok Choy acceptance test suite
 """
+import os
 from time import sleep
-from urllib import urlencode
 from textwrap import dedent
 
 from common.test.acceptance.fixtures.course import CourseFixture, FixtureError
 
 from path import Path as path
-from paver.easy import sh, BuildFailure, cmdopts, task, needs, might_call, call_task, dry
+from paver.easy import sh, cmdopts, task, needs, might_call, call_task, dry
 from pavelib.utils.test.suites.suite import TestSuite
 from pavelib.utils.envs import Env
 from pavelib.utils.test.bokchoy_utils import (
@@ -22,8 +22,7 @@ from pavelib.utils.test.bokchoy_options import (
 )
 from pavelib.utils.test import utils as test_utils
 from pavelib.utils.timer import timed
-
-import os
+from pavelib.database import update_local_bokchoy_db_from_s3
 
 try:
     from pygments.console import colorize
@@ -49,9 +48,10 @@ def load_bok_choy_data(options):
     print 'Loading data from json fixtures in db_fixtures directory'
     sh(
         "DEFAULT_STORE={default_store}"
-        " ./manage.py lms --settings bok_choy loaddata --traceback"
+        " ./manage.py lms --settings {settings} loaddata --traceback"
         " common/test/db_fixtures/*.json".format(
             default_store=options.default_store,
+            settings=Env.SETTINGS
         )
     )
 
@@ -77,9 +77,10 @@ def load_courses(options):
 
         sh(
             "DEFAULT_STORE={default_store}"
-            " ./manage.py cms --settings=bok_choy import {import_dir}".format(
+            " ./manage.py cms --settings={settings} import {import_dir}".format(
                 default_store=options.default_store,
-                import_dir=options.imports_dir
+                import_dir=options.imports_dir,
+                settings=Env.SETTINGS
             )
         )
     else:
@@ -134,8 +135,10 @@ def get_test_course(options):
 def reset_test_database():
     """
     Reset the database used by the bokchoy tests.
+
+    Use the database cache automation defined in pavelib/database.py
     """
-    sh("{}/scripts/reset-test-db.sh".format(Env.REPO_ROOT))
+    update_local_bokchoy_db_from_s3()  # pylint: disable=no-value-for-parameter
 
 
 @task
@@ -178,10 +181,11 @@ class BokChoyTestSuite(TestSuite):
       testsonly - assume servers are running (as per above) and run tests with no setup or cleaning of environment
       test_spec - when set, specifies test files, classes, cases, etc. See platform doc.
       default_store - modulestore to use when running tests (split or draft)
+      eval_attr - only run tests matching given attribute expression
       num_processes - number of processes or threads to use in tests. Recommendation is that this
       is less than or equal to the number of available processors.
       verify_xss - when set, check for XSS vulnerabilities in the page HTML.
-      See nosetest documentation: http://nose.readthedocs.org/en/latest/usage.html
+      See pytest documentation: https://docs.pytest.org/en/latest/
     """
     def __init__(self, *args, **kwargs):
         super(BokChoyTestSuite, self).__init__(*args, **kwargs)
@@ -195,6 +199,7 @@ class BokChoyTestSuite(TestSuite):
         self.testsonly = kwargs.get('testsonly', False)
         self.test_spec = kwargs.get('test_spec', None)
         self.default_store = kwargs.get('default_store', None)
+        self.eval_attr = kwargs.get('eval_attr', None)
         self.verbosity = kwargs.get('verbosity', DEFAULT_VERBOSITY)
         self.num_processes = kwargs.get('num_processes', DEFAULT_NUM_PROCESSES)
         self.verify_xss = kwargs.get('verify_xss', os.environ.get('VERIFY_XSS', True))
@@ -214,6 +219,11 @@ class BokChoyTestSuite(TestSuite):
         self.report_dir.makedirs_p()
         test_utils.clean_reports_dir()  # pylint: disable=no-value-for-parameter
 
+        # Set the environment so that webpack understands where to compile its resources.
+        # This setting is expected in other environments, so we are setting it for the
+        # bok-choy test run.
+        os.environ['EDX_PLATFORM_SETTINGS'] = 'test_static_optimized'
+
         if not (self.fasttest or self.skip_clean or self.testsonly):
             test_utils.clean_test_files()
 
@@ -222,7 +232,7 @@ class BokChoyTestSuite(TestSuite):
         check_services()
 
         if not self.testsonly:
-            call_task('prepare_bokchoy_run', options={'log_dir': self.log_dir})  # pylint: disable=no-value-for-parameter
+            call_task('prepare_bokchoy_run', options={'log_dir': self.log_dir})
         else:
             # load data in db_fixtures
             load_bok_choy_data()  # pylint: disable=no-value-for-parameter
@@ -257,35 +267,28 @@ class BokChoyTestSuite(TestSuite):
             # Clean up data we created in the databases
             msg = colorize('green', "Cleaning up databases...")
             print msg
-            sh("./manage.py lms --settings bok_choy flush --traceback --noinput")
+            sh("./manage.py lms --settings {settings} flush --traceback --noinput".format(settings=Env.SETTINGS))
             clear_mongo()
 
     @property
     def verbosity_processes_command(self):
         """
-        Multiprocessing, xunit, color, and verbosity do not work well together. We need to construct
-        the proper combination for use with nosetests.
+        Construct the proper combination of multiprocessing, XUnit XML file, color, and verbosity for use with pytest.
         """
-        command = []
-
-        if self.verbosity != DEFAULT_VERBOSITY and self.num_processes != DEFAULT_NUM_PROCESSES:
-            msg = 'Cannot pass in both num_processors and verbosity. Quitting'
-            raise BuildFailure(msg)
+        command = ["--junitxml={}".format(self.xunit_report)]
 
         if self.num_processes != 1:
-            # Construct "multiprocess" nosetest command
-            command = [
-                "--xunitmp-file={}".format(self.xunit_report),
-                "--processes={}".format(self.num_processes),
-                "--no-color",
-                "--process-timeout=1200",
+            # Construct "multiprocess" pytest command
+            command += [
+                "-n {}".format(self.num_processes),
+                "--color=no",
             ]
-
-        else:
-            command = [
-                "--xunit-file={}".format(self.xunit_report),
-                "--verbosity={}".format(self.verbosity),
-            ]
+        if self.verbosity < 1:
+            command.append("--quiet")
+        elif self.verbosity > 1:
+            command.append("--verbose")
+        if self.eval_attr:
+            command.append("-a '{}'".format(self.eval_attr))
 
         return command
 
@@ -294,7 +297,7 @@ class BokChoyTestSuite(TestSuite):
         Infinite loop. Servers will continue to run in the current session unless interrupted.
         """
         print 'Bok-choy servers running. Press Ctrl-C to exit...\n'
-        print 'Note: pressing Ctrl-C multiple times can corrupt noseid files and system state. Just press it once.\n'
+        print 'Note: pressing Ctrl-C multiple times can corrupt system state. Just press it once.\n'
 
         while True:
             try:
@@ -306,7 +309,7 @@ class BokChoyTestSuite(TestSuite):
     @property
     def cmd(self):
         """
-        This method composes the nosetests command to send to the terminal. If nosetests aren't being run,
+        This method composes the pytest command to send to the terminal. If pytest isn't being run,
          the command returns None.
         """
         # Default to running all tests if no specific test is specified
@@ -315,12 +318,12 @@ class BokChoyTestSuite(TestSuite):
         else:
             test_spec = self.test_dir / self.test_spec
 
-        # Skip any additional commands (such as nosetests) if running in
+        # Skip any additional commands (such as pytest) if running in
         # servers only mode
         if self.serversonly:
             return None
 
-        # Construct the nosetests command, specifying where to save
+        # Construct the pytest command, specifying where to save
         # screenshots and XUnit XML reports
         cmd = [
             "DEFAULT_STORE={}".format(self.default_store),
@@ -329,11 +332,25 @@ class BokChoyTestSuite(TestSuite):
             "BOKCHOY_A11Y_CUSTOM_RULES_FILE='{}'".format(self.a11y_file),
             "SELENIUM_DRIVER_LOG_DIR='{}'".format(self.log_dir),
             "VERIFY_XSS='{}'".format(self.verify_xss),
-            "nosetests",
+        ]
+        if self.save_screenshots:
+            cmd.append("NEEDLE_SAVE_BASELINE=True")
+        if self.coveragerc:
+            cmd += [
+                "coverage",
+                "run",
+            ]
+            cmd.append("--rcfile={}".format(self.coveragerc))
+        else:
+            cmd += [
+                "python",
+                "-Wd",
+            ]
+        cmd += [
+            "-m",
+            "pytest",
             test_spec,
         ] + self.verbosity_processes_command
-        if self.save_screenshots:
-            cmd.append("--with-save-baseline")
         if self.extra_args:
             cmd.append(self.extra_args)
         cmd.extend(self.passthrough_options)
@@ -350,6 +367,7 @@ class Pa11yCrawler(BokChoyTestSuite):
     def __init__(self, *args, **kwargs):
         super(Pa11yCrawler, self).__init__(*args, **kwargs)
         self.course_key = kwargs.get('course_key')
+        self.single_url = kwargs.get('single_url', False)
         self.ensure_scrapy_cfg()
 
     def ensure_scrapy_cfg(self):
@@ -395,8 +413,9 @@ class Pa11yCrawler(BokChoyTestSuite):
         Runs pa11ycrawler as staff user against the test course.
         """
         data_dir = os.path.join(self.report_dir, 'data')
-        url = "https://raw.githubusercontent.com/singingwolfboy/pa11ycrawler-ignore/master/ignore.yaml"
-        return [
+        url = "https://raw.githubusercontent.com/edx/pa11ycrawler-ignore/master/ignore.yaml"
+
+        command = [
             "scrapy",
             "crawl",
             "edx",
@@ -407,5 +426,13 @@ class Pa11yCrawler(BokChoyTestSuite):
             "-a",
             "pa11y_ignore_rules_url={url}".format(url=url),
             "-a",
-            "data_dir={dir}".format(dir=data_dir)
+            "data_dir={dir}".format(dir=data_dir),
         ]
+
+        if self.single_url:
+            command = command + [
+                "-a",
+                "single_url={url}".format(url=self.single_url),
+            ]
+
+        return command

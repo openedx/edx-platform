@@ -2,7 +2,7 @@
  Code for editing users and assigning roles within a course or library team context.
  */
 define(['jquery', 'underscore', 'gettext', 'js/views/baseview',
-        'common/js/components/views/feedback_prompt', 'common/js/components/utils/view_utils'],
+    'common/js/components/views/feedback_prompt', 'common/js/components/utils/view_utils'],
     function($, _, gettext, BaseView, PromptView, ViewUtils) {
         'use strict';
         var default_messages = {
@@ -95,7 +95,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview',
                     'click .create-user-button': 'addUserHandler',
                     'submit #create-user-form': 'createUserFormSubmit',
                     'click .action-cancel': 'cancelEditHandler',
-                    'keyup': 'keyUpHandler',
+                    keyup: 'keyUpHandler',
                     'click .remove-user': 'removeUserHandler'
                 };
                 var roleEvents = {};
@@ -106,7 +106,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview',
 
                     (function(role) {
                         roleEvents[role_selector] = function(event) { self.handleRoleButtonClick(event.target, role); };
-                    })(role_name);
+                    }(role_name));
                 }
                 return _.extend(baseEvents, roleEvents);
             },
@@ -171,8 +171,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview',
                     role_names = _.map(this.roles, function(role) { return role.key; });
                 if (role === this.admin_role.key && adminRoleCount === 1) {
                     result.push({notoggle: true});
-                }
-                else {
+                } else {
                     var currentRoleIdx = _.indexOf(role_names, role);
                     // in reverse order to show "Add" buttons to the left, "Remove" to the right
                     for (var i = this.roles.length - 1; i >= 0; i--) {

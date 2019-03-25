@@ -1,4 +1,4 @@
-require([
+define([
     'domReady',
     'jquery',
     'underscore',
@@ -25,9 +25,35 @@ require([
         ModuleUtils,
         IframeUtils,
         DropdownMenuView
-    )
-{
+    ) {
+        'use strict';
         var $body;
+
+        function smoothScrollLink(e) {
+            (e).preventDefault();
+
+            $.smoothScroll({
+                offset: -200,
+                easing: 'swing',
+                speed: 1000,
+                scrollElement: null,
+                scrollTarget: $(this).attr('href')
+            });
+        }
+
+        function hideNotification(e) {
+            (e).preventDefault();
+            $(this)
+                .closest('.wrapper-notification')
+                .removeClass('is-shown')
+                .addClass('is-hiding')
+                .attr('aria-hidden', 'true');
+        }
+
+        function hideAlert(e) {
+            (e).preventDefault();
+            $(this).closest('.wrapper-alert').removeClass('is-shown');
+        }
 
         domReady(function() {
             var dropdownMenuView;
@@ -45,14 +71,14 @@ require([
             $('.action-notification-close').bind('click', hideNotification);
 
             // nav - dropdown related
-            $body.click(function(e) {
+            $body.click(function() {
                 $('.nav-dd .nav-item .wrapper-nav-sub').removeClass('is-shown');
                 $('.nav-dd .nav-item .title').removeClass('is-selected');
             });
 
             $('.nav-dd .nav-item, .filterable-column .nav-item').click(function(e) {
-                $subnav = $(this).find('.wrapper-nav-sub');
-                $title = $(this).find('.title');
+                var $subnav = $(this).find('.wrapper-nav-sub'),
+                    $title = $(this).find('.title');
 
                 if ($subnav.hasClass('is-shown')) {
                     $subnav.removeClass('is-shown');
@@ -69,7 +95,8 @@ require([
             });
 
             // general link management - new window/tab
-            $('a[rel="external"]:not([title])').attr('title', gettext('This link will open in a new browser window/tab'));
+            $('a[rel="external"]:not([title])')
+                .attr('title', gettext('This link will open in a new browser window/tab'));
             $('a[rel="external"]').attr('target', '_blank');
 
             // general link management - lean modal window
@@ -98,39 +125,7 @@ require([
                 });
                 dropdownMenuView.postRender();
             }
+
+            window.studioNavMenuActive = true;
         });
-
-        function smoothScrollLink(e) {
-            (e).preventDefault();
-
-            $.smoothScroll({
-                offset: -200,
-                easing: 'swing',
-                speed: 1000,
-                scrollElement: null,
-                scrollTarget: $(this).attr('href')
-            });
-        }
-
-        function smoothScrollTop(e) {
-            (e).preventDefault();
-
-            $.smoothScroll({
-                offset: -200,
-                easing: 'swing',
-                speed: 1000,
-                scrollElement: null,
-                scrollTarget: $('#view-top')
-            });
-        }
-
-        function hideNotification(e) {
-            (e).preventDefault();
-            $(this).closest('.wrapper-notification').removeClass('is-shown').addClass('is-hiding').attr('aria-hidden', 'true');
-        }
-
-        function hideAlert(e) {
-            (e).preventDefault();
-            $(this).closest('.wrapper-alert').removeClass('is-shown');
-        }
     }); // end require()

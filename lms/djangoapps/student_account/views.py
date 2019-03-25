@@ -1,53 +1,63 @@
 """ Views for a student's account information. """
 
-import logging
 import json
-import urlparse
+import logging
 from datetime import datetime
 
+import urlparse
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
-from django.core.urlresolvers import reverse, resolve
-from django.http import (
-    HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpRequest
-)
+from django.contrib.auth.decorators import login_required
+from django.urls import reverse
+from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 from django_countries import countries
-from edxmako.shortcuts import render_to_response
-import pytz
+import third_party_auth
 
-from commerce.models import CommerceConfiguration
+from edx_ace import ace
+from edx_ace.recipient import Recipient
+from edxmako.shortcuts import render_to_response
+from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService
-from openedx.core.djangoapps.external_auth.login_and_register import (
-    login as external_auth_login,
-    register as external_auth_register
-)
+from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
-from openedx.core.djangoapps.lang_pref.api import released_languages, all_languages
+from openedx.core.djangoapps.external_auth.login_and_register import login as external_auth_login
+from openedx.core.djangoapps.external_auth.login_and_register import register as external_auth_register
+from openedx.core.djangoapps.lang_pref.api import all_languages, released_languages
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
+from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site, get_current_site
 from openedx.core.djangoapps.user_api.accounts.api import request_password_change
-from openedx.core.djangoapps.user_api.errors import UserNotFound
-from openedx.core.lib.time_zone_utils import TIME_ZONE_CHOICES
-from openedx.core.lib.edx_api_utils import get_edx_api_data
-from student.models import UserProfile
-from student.views import (
-    signin_user as old_login_view,
-    register_user as old_register_view
+from openedx.core.djangoapps.user_api.api import (
+    RegistrationFormFactory,
+    get_login_session_form,
+    get_password_reset_form
 )
-from student.helpers import get_next_url_for_login_page, destroy_oauth_tokens
-import third_party_auth
+from openedx.core.djangoapps.user_api.errors import (
+    UserNotFound,
+    UserAPIInternalError
+)
+from openedx.core.lib.edx_api_utils import get_edx_api_data
+from openedx.core.lib.time_zone_utils import TIME_ZONE_CHOICES
+from openedx.features.enterprise_support.api import enterprise_customer_for_request, get_enterprise_customer_for_learner
+from openedx.features.enterprise_support.utils import (
+    handle_enterprise_cookies_for_logistration,
+    update_logistration_context_for_enterprise,
+    update_account_settings_context_for_enterprise,
+)
+from student.helpers import destroy_oauth_tokens, get_next_url_for_login_page
+from student.message_types import PasswordReset
+from student.models import UserProfile
+from student.views import register_user as old_register_view, signin_user as old_login_view
 from third_party_auth import pipeline
 from third_party_auth.decorators import xframe_allow_whitelisted
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 from util.date_utils import strftime_localized
-from util.enterprise_helpers import set_enterprise_branding_filter_param
+
 
 AUDIT_LOG = logging.getLogger("audit")
 log = logging.getLogger(__name__)
@@ -70,7 +80,7 @@ def login_and_registration_form(request, initial_mode="login"):
     # Determine the URL to redirect to following login/registration/third_party_auth
     redirect_to = get_next_url_for_login_page(request)
     # If we're already logged in, redirect to the dashboard
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         return redirect(redirect_to)
 
     # Retrieve the form descriptions from the user API
@@ -83,13 +93,22 @@ def login_and_registration_form(request, initial_mode="login"):
         try:
             next_args = urlparse.parse_qs(urlparse.urlparse(redirect_to).query)
             provider_id = next_args['tpa_hint'][0]
-            if third_party_auth.provider.Registry.get(provider_id=provider_id):
+            tpa_hint_provider = third_party_auth.provider.Registry.get(provider_id=provider_id)
+            if tpa_hint_provider:
+                if tpa_hint_provider.skip_hinted_login_dialog:
+                    # Forward the user directly to the provider's login URL when the provider is configured
+                    # to skip the dialog.
+                    if initial_mode == "register":
+                        auth_entry = pipeline.AUTH_ENTRY_REGISTER
+                    else:
+                        auth_entry = pipeline.AUTH_ENTRY_LOGIN
+                    return redirect(
+                        pipeline.get_login_url(provider_id, auth_entry, redirect_url=redirect_to)
+                    )
                 third_party_auth_hint = provider_id
                 initial_mode = "hinted_login"
-        except (KeyError, ValueError, IndexError):
-            pass
-
-    set_enterprise_branding_filter_param(request=request, provider_id=third_party_auth_hint)
+        except (KeyError, ValueError, IndexError) as ex:
+            log.error("Unknown tpa_hint provider: %s", ex)
 
     # If this is a themed site, revert to the old login/registration pages.
     # We need to do this for now to support existing themes.
@@ -107,15 +126,26 @@ def login_and_registration_form(request, initial_mode="login"):
     if ext_auth_response is not None:
         return ext_auth_response
 
+    # Account activation message
+    account_activation_messages = [
+        {
+            'message': message.message, 'tags': message.tags
+        } for message in messages.get_messages(request) if 'account-activation' in message.tags
+    ]
+
     # Otherwise, render the combined login/registration page
     context = {
         'data': {
             'login_redirect_url': redirect_to,
             'initial_mode': initial_mode,
-            'third_party_auth': _third_party_auth_context(request, redirect_to),
+            'third_party_auth': _third_party_auth_context(request, redirect_to, third_party_auth_hint),
             'third_party_auth_hint': third_party_auth_hint or '',
             'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
             'support_link': configuration_helpers.get_value('SUPPORT_SITE_LINK', settings.SUPPORT_SITE_LINK),
+            'password_reset_support_link': configuration_helpers.get_value(
+                'PASSWORD_RESET_SUPPORT_LINK', settings.PASSWORD_RESET_SUPPORT_LINK
+            ) or settings.SUPPORT_SITE_LINK,
+            'account_activation_messages': account_activation_messages,
 
             # Include form descriptions retrieved from the user API.
             # We could have the JS client make these requests directly,
@@ -124,18 +154,27 @@ def login_and_registration_form(request, initial_mode="login"):
             'login_form_desc': json.loads(form_descriptions['login']),
             'registration_form_desc': json.loads(form_descriptions['registration']),
             'password_reset_form_desc': json.loads(form_descriptions['password_reset']),
+            'account_creation_allowed': configuration_helpers.get_value(
+                'ALLOW_PUBLIC_ACCOUNT_CREATION', settings.FEATURES.get('ALLOW_PUBLIC_ACCOUNT_CREATION', True))
         },
         'login_redirect_url': redirect_to,  # This gets added to the query string of the "Sign In" button in header
         'responsive': True,
         'allow_iframing': True,
         'disable_courseware_js': True,
+        'combined_login_and_register': True,
         'disable_footer': not configuration_helpers.get_value(
             'ENABLE_COMBINED_LOGIN_REGISTRATION_FOOTER',
             settings.FEATURES['ENABLE_COMBINED_LOGIN_REGISTRATION_FOOTER']
         ),
     }
 
-    return render_to_response('student_account/login_and_register.html', context)
+    enterprise_customer = enterprise_customer_for_request(request)
+    update_logistration_context_for_enterprise(request, context, enterprise_customer)
+
+    response = render_to_response('student_account/login_and_register.html', context)
+    handle_enterprise_cookies_for_logistration(request, response, context)
+
+    return response
 
 
 @require_http_methods(['POST'])
@@ -171,24 +210,50 @@ def password_change_request_handler(request):
 
     user = request.user
     # Prefer logged-in user's email
-    email = user.email if user.is_authenticated() else request.POST.get('email')
+    email = user.email if user.is_authenticated else request.POST.get('email')
 
     if email:
         try:
-            request_password_change(email, request.get_host(), request.is_secure())
-            user = user if user.is_authenticated() else User.objects.get(email=email)
+            request_password_change(email, request.is_secure())
+            user = user if user.is_authenticated else User.objects.get(email=email)
             destroy_oauth_tokens(user)
         except UserNotFound:
             AUDIT_LOG.info("Invalid password reset attempt")
             # Increment the rate limit counter
             limiter.tick_bad_request_counter(request)
 
+            # If enabled, send an email saying that a password reset was attempted, but that there is
+            # no user associated with the email
+            if configuration_helpers.get_value('ENABLE_PASSWORD_RESET_FAILURE_EMAIL',
+                                               settings.FEATURES['ENABLE_PASSWORD_RESET_FAILURE_EMAIL']):
+
+                site = get_current_site()
+                message_context = get_base_template_context(site)
+
+                message_context.update({
+                    'failed': True,
+                    'request': request,  # Used by google_analytics_tracking_pixel
+                    'email_address': email,
+                })
+
+                msg = PasswordReset().personalize(
+                    recipient=Recipient(username='', email_address=email),
+                    language=settings.LANGUAGE_CODE,
+                    user_context=message_context,
+                )
+
+                ace.send(msg)
+        except UserAPIInternalError as err:
+            log.exception('Error occured during password change for user {email}: {error}'
+                          .format(email=email, error=err))
+            return HttpResponse(_("Some error occured during password change. Please try again"), status=500)
+
         return HttpResponse(status=200)
     else:
         return HttpResponseBadRequest(_("No email address provided."))
 
 
-def _third_party_auth_context(request, redirect_to):
+def _third_party_auth_context(request, redirect_to, tpa_hint=None):
     """Context for third party auth providers and the currently running pipeline.
 
     Arguments:
@@ -196,6 +261,8 @@ def _third_party_auth_context(request, redirect_to):
             is currently running.
         redirect_to: The URL to send the user to following successful
             authentication.
+        tpa_hint (string): An override flag that will return a matching provider
+            as long as its configuration has been enabled
 
     Returns:
         dict
@@ -207,10 +274,13 @@ def _third_party_auth_context(request, redirect_to):
         "secondaryProviders": [],
         "finishAuthUrl": None,
         "errorMessage": None,
+        "registerFormSubmitButtonText": _("Create Account"),
+        "syncLearnerProfileData": False,
+        "pipeline_user_details": {}
     }
 
     if third_party_auth.is_enabled():
-        for enabled in third_party_auth.provider.Registry.displayed_for_login():
+        for enabled in third_party_auth.provider.Registry.displayed_for_login(tpa_hint=tpa_hint):
             info = {
                 "id": enabled.provider_id,
                 "name": enabled.name,
@@ -232,10 +302,14 @@ def _third_party_auth_context(request, redirect_to):
         running_pipeline = pipeline.get(request)
         if running_pipeline is not None:
             current_provider = third_party_auth.provider.Registry.get_from_pipeline(running_pipeline)
+            user_details = running_pipeline['kwargs']['details']
+            if user_details:
+                context['pipeline_user_details'] = user_details
 
             if current_provider is not None:
                 context["currentProvider"] = current_provider.name
                 context["finishAuthUrl"] = pipeline.get_complete_url(current_provider.backend_name)
+                context["syncLearnerProfileData"] = current_provider.sync_learner_profile_data
 
                 if current_provider.skip_registration_form:
                     # As a reliable way of "skipping" the registration form, we just submit it automatically
@@ -262,41 +336,72 @@ def _get_form_descriptions(request):
             values are the JSON-serialized form descriptions.
 
     """
+
     return {
-        'login': _local_server_get('/user_api/v1/account/login_session/', request.session),
-        'registration': _local_server_get('/user_api/v1/account/registration/', request.session),
-        'password_reset': _local_server_get('/user_api/v1/account/password_reset/', request.session)
+        'password_reset': get_password_reset_form().to_json(),
+        'login': get_login_session_form(request).to_json(),
+        'registration': RegistrationFormFactory().get_registration_form(request).to_json()
     }
 
 
-def _local_server_get(url, session):
-    """Simulate a server-server GET request for an in-process API.
-
-    Arguments:
-        url (str): The URL of the request (excluding the protocol and domain)
-        session (SessionStore): The session of the original request,
-            used to get past the CSRF checks.
+def _get_extended_profile_fields():
+    """Retrieve the extended profile fields from site configuration to be shown on the
+       Account Settings page
 
     Returns:
-        str: The content of the response
-
+        A list of dicts. Each dict corresponds to a single field. The keys per field are:
+            "field_name"  : name of the field stored in user_profile.meta
+            "field_label" : The label of the field.
+            "field_type"  : TextField or ListField
+            "field_options": a list of tuples for options in the dropdown in case of ListField
     """
-    # Since the user API is currently run in-process,
-    # we simulate the server-server API call by constructing
-    # our own request object.  We don't need to include much
-    # information in the request except for the session
-    # (to get past through CSRF validation)
-    request = HttpRequest()
-    request.method = "GET"
-    request.session = session
 
-    # Call the Django view function, simulating
-    # the server-server API call
-    view, args, kwargs = resolve(url)
-    response = view(request, *args, **kwargs)
+    extended_profile_fields = []
+    fields_already_showing = ['username', 'name', 'email', 'pref-lang', 'country', 'time_zone', 'level_of_education',
+                              'gender', 'year_of_birth', 'language_proficiencies', 'social_links']
 
-    # Return the content of the response
-    return response.content
+    field_labels_map = {
+        "first_name": _(u"First Name"),
+        "last_name": _(u"Last Name"),
+        "city": _(u"City"),
+        "state": _(u"State/Province/Region"),
+        "company": _(u"Company"),
+        "title": _(u"Title"),
+        "job_title": _(u"Job Title"),
+        "mailing_address": _(u"Mailing address"),
+        "goals": _(u"Tell us why you're interested in {platform_name}").format(
+            platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME)
+        ),
+        "profession": _(u"Profession"),
+        "specialty": _(u"Specialty")
+    }
+
+    extended_profile_field_names = configuration_helpers.get_value('extended_profile_fields', [])
+    for field_to_exclude in fields_already_showing:
+        if field_to_exclude in extended_profile_field_names:
+            extended_profile_field_names.remove(field_to_exclude)  # pylint: disable=no-member
+
+    extended_profile_field_options = configuration_helpers.get_value('EXTRA_FIELD_OPTIONS', [])
+    extended_profile_field_option_tuples = {}
+    for field in extended_profile_field_options.keys():
+        field_options = extended_profile_field_options[field]
+        extended_profile_field_option_tuples[field] = [(option.lower(), option) for option in field_options]
+
+    for field in extended_profile_field_names:
+        field_dict = {
+            "field_name": field,
+            "field_label": field_labels_map.get(field, field),
+        }
+
+        field_options = extended_profile_field_option_tuples.get(field)
+        if field_options:
+            field_dict["field_type"] = "ListField"
+            field_dict["field_options"] = field_options
+        else:
+            field_dict["field_type"] = "TextField"
+        extended_profile_fields.append(field_dict)
+
+    return extended_profile_fields
 
 
 def _external_auth_intercept(request, mode):
@@ -327,7 +432,6 @@ def get_user_orders(user):
     """
     no_data = []
     user_orders = []
-    allowed_course_modes = ['professional', 'verified', 'credit']
     commerce_configuration = CommerceConfiguration.current()
     user_query = {'username': user.username}
 
@@ -335,31 +439,20 @@ def get_user_orders(user):
     cache_key = commerce_configuration.CACHE_KEY + '.' + str(user.id) if use_cache else None
     api = ecommerce_api_client(user)
     commerce_user_orders = get_edx_api_data(
-        commerce_configuration, user, 'orders', api=api, querystring=user_query, cache_key=cache_key
+        commerce_configuration, 'orders', api=api, querystring=user_query, cache_key=cache_key
     )
 
     for order in commerce_user_orders:
         if order['status'].lower() == 'complete':
-            for line in order['lines']:
-                product = line.get('product')
-                if product:
-                    for attribute in product['attribute_values']:
-                        if attribute['name'] == 'certificate_type' and attribute['value'] in allowed_course_modes:
-                            try:
-                                date_placed = datetime.strptime(order['date_placed'], "%Y-%m-%dT%H:%M:%SZ")
-                                order_data = {
-                                    'number': order['number'],
-                                    'price': order['total_excl_tax'],
-                                    'title': order['lines'][0]['title'],
-                                    'order_date': strftime_localized(
-                                        date_placed.replace(tzinfo=pytz.UTC), 'SHORT_DATE'
-                                    ),
-                                    'receipt_url': EcommerceService().get_receipt_page_url(order['number'])
-                                }
-                                user_orders.append(order_data)
-                            except KeyError:
-                                log.exception('Invalid order structure: %r', order)
-                                return no_data
+            date_placed = datetime.strptime(order['date_placed'], "%Y-%m-%dT%H:%M:%SZ")
+            order_data = {
+                'number': order['number'],
+                'price': order['total_excl_tax'],
+                'order_date': strftime_localized(date_placed, 'SHORT_DATE'),
+                'receipt_url': EcommerceService().get_receipt_page_url(order['number']),
+                'lines': order['lines'],
+            }
+            user_orders.append(order_data)
 
     return user_orders
 
@@ -382,7 +475,8 @@ def account_settings(request):
         GET /account/settings
 
     """
-    return render_to_response('student_account/account_settings.html', account_settings_context(request))
+    context = account_settings_context(request)
+    return render_to_response('student_account/account_settings.html', context)
 
 
 @login_required
@@ -464,12 +558,23 @@ def account_settings_context(request):
             }
         },
         'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
+        'password_reset_support_link': configuration_helpers.get_value(
+            'PASSWORD_RESET_SUPPORT_LINK', settings.PASSWORD_RESET_SUPPORT_LINK
+        ) or settings.SUPPORT_SITE_LINK,
         'user_accounts_api_url': reverse("accounts_api", kwargs={'username': user.username}),
         'user_preferences_api_url': reverse('preferences_api', kwargs={'username': user.username}),
         'disable_courseware_js': True,
-        'show_program_listing': ProgramsApiConfig.current().show_program_listing,
-        'order_history': user_orders
+        'show_program_listing': ProgramsApiConfig.is_enabled(),
+        'show_dashboard_tabs': True,
+        'order_history': user_orders,
+        'enable_account_deletion': configuration_helpers.get_value(
+            'ENABLE_ACCOUNT_DELETION', settings.FEATURES.get('ENABLE_ACCOUNT_DELETION', False)
+        ),
+        'extended_profile_fields': _get_extended_profile_fields(),
     }
+
+    enterprise_customer = get_enterprise_customer_for_learner(site=request.site, user=request.user)
+    update_account_settings_context_for_enterprise(context, enterprise_customer)
 
     if third_party_auth.is_enabled():
         # If the account on the third party provider is already connected with another edX account,

@@ -5,15 +5,25 @@
 // =====
 
 // page-level
-.view-register, .view-login, .view-passwordreset {
+.view-register,
+.view-login,
+.view-passwordreset {
   background: $container-bg;
 
 
 
   // edx.org - marketing typography
-  %heading-1, %heading-2, %heading-3, %heading-4, %heading-5, %body-text-emphasized, %body-text, %button-primary, %button-secondary {
+  %heading-1,
+  %heading-2,
+  %heading-3,
+  %heading-4,
+  %heading-5,
+  %body-text-emphasized,
+  %body-text,
+  %button-primary,
+  %button-secondary {
     display: block;
-    font-family: $sans-serif;
+    font-family: $font-family-sans-serif;
     line-height: lh(1);
   }
 
@@ -21,26 +31,21 @@
     font-size: 25px;
     margin: 0 0 $baseline 0;
     font-weight: 300;
-    text-transform: uppercase;
-    color: $link-color-d1;
+    color: $link-color;
   }
 
   %heading-3 {
     font-size: 21px;
     margin: 0 0 $baseline 0;
     font-weight: 300;
-    color: $base-font-color;
+    color: $body-color;
   }
 
   %heading-4 {
     font-size: 14px;
     font-weight: 600;
-    text-transform: uppercase;
     letter-spacing: 0 !important;
     color: $m-gray-d2;
-  }
-
-  %heading-5 {
   }
 
   // specific examples - body
@@ -48,7 +53,7 @@
     font-size: 18px;
     margin: 0 0 $baseline 0;
     font-weight: 300;
-    color: $base-font-color;
+    color: $body-color;
     font-family: 'Open Sans', sans-serif;
     line-height: lh(1.1);
   }
@@ -56,14 +61,16 @@
   %body-text {
     font-size: 15px;
     margin: 0 0 $baseline 0;
-    color: $base-font-color;
+    color: $body-color;
     line-height: lh(1);
   }
 
   // specific examples - buttons
   %button-primary {
     border-radius: 0;
-    @include linear-gradient(saturate($link-color-d1,15%) 5%, shade($link-color-d1,15%) 95%);
+
+    @include linear-gradient(saturate($link-color,15%) 5%, shade($link-color,15%) 95%);
+
     display: inline-block;
     padding: $baseline/2 $baseline*2.5;
     text-transform: lowercase;
@@ -74,18 +81,17 @@
     text-align: center;
     border: none !important;
     text-shadow: none;
-    letter-spacing: 0;
-    font-size: 16px;
+    font-size: $font-size-base;
     box-shadow: none !important;
   }
 
   %button-secondary {
     @include linear-gradient($outer-border-color 5%, $lighter-base-font-color 95%);
+
     display: inline-block;
     padding: $baseline/2 $baseline*2.5;
     text-transform: lowercase;
     color: $very-light-text;
-    letter-spacing: 0.1rem;
     font-weight: 600;
     cursor: pointer;
     text-align: center;
@@ -101,9 +107,11 @@
     padding-bottom: 0;
   }
 
-  .container, .introduction {
+  .container,
+  .introduction {
     @include box-sizing(border-box);
     @include clearfix();
+
     margin: 0 auto;
     width: 960px;
     background: $container-bg;
@@ -122,7 +130,9 @@
       // CASE: normal typographical headings
       h1 {
         @extend %heading-2;
+
         @include text-align(left);
+
         margin-bottom: $baseline;
         padding-bottom: $baseline;
       }
@@ -131,10 +141,13 @@
       .title {
         position: absolute;
         top: ($baseline*2.5);
+
         @include left($baseline*1.5);
 
-        .title-super, .title-sub {
+        .title-super,
+        .title-sub {
           @extend %t-weight1;
+
           display: block;
           letter-spacing: 0;
         }
@@ -142,13 +155,14 @@
         .title-super {
           @include font-size(26);
           @include line-height(18);
-          text-transform: uppercase;
+
           color: $header-graphic-super-color;
         }
 
         .title-sub {
           @include font-size(20);
           @include margin-left($baseline*2);
+
           text-transform: lowercase;
           color: $header-graphic-sub-color;
         }
@@ -158,30 +172,55 @@
 }
 
 // shared
-.login, .register, .passwordreset, #forgot-password-modal #password-reset {
+.login,
+.register,
+.passwordreset,
+#forgot-password-modal #password-reset {
 
   // reset - horrible, but necessary
-  p, ol, ul, h1, h2, h3, h4, h5, h6, label, input, textarea {
+  p,
+  ol,
+  ul,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  label,
+  input,
+  textarea {
     @extend %body-text;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     letter-spacing: 0;
   }
 
   a {
     @include transition(color 0.15s ease-in-out 0s, border 0.15s ease-in-out 0s);
 
-    &:link, &:visited, &:hover, &:active, &:focus {
-      color: $link-color-d1;
+    &:link,
+    &:visited,
+    &:hover,
+    &:active,
+    &:focus {
+      color: $link-color;
       font-weight: 400;
       text-decoration: none !important; // needed but nasty
-      font-family: $sans-serif;
+      font-family: $font-family-sans-serif;
     }
 
-    &:hover, &:active, &:focus {
+    &:hover,
+    &:active,
+    &:focus {
       text-decoration: none !important; // needed but nasty
-      border-bottom: 1px dotted $link-color-d1;
+      border-bottom: 1px dotted $link-color;
     }
   }
 
@@ -190,33 +229,34 @@
   }
 
   // basic layout
-  .content, aside {
+  .content,
+  aside {
     @include box-sizing(border-box);
+
     margin: $baseline 0 0 0;
   }
 
   .content {
     @include float(left);
     @include margin-right($baseline*2);
+
     width: 600px;
   }
 
   aside {
     @include float(left);
+
     width: 280px;
 
-    p, ol, ul {
-      font-size: 14px !important;
+    p,
+    ol,
+    ul {
+      font-size: $font-size-sm !important;
     }
-  }
-
-  // content
-  .content {
   }
 
   // aside
   aside {
-
     .btn {
       margin: 0 0 ($baseline*2) 0;
 
@@ -226,12 +266,12 @@
 
       h3 {
         @extend %heading-4;
+
         margin: 0 0 ($baseline/4) 0;
       }
     }
 
     .btn-login {
-
       h3.title,
       .instructions {
         display: inline-block;
@@ -240,7 +280,9 @@
 
       .btn-login-action {
         @extend %btn-secondary-grey-outline;
+
         padding: ($baseline/10) ($baseline*0.75);
+
         @include margin-left($baseline/4);
       }
     }
@@ -248,9 +290,9 @@
 
   // forms
   form {
-
     .instructions {
       @extend %body-text-emphasized;
+
       margin-bottom: $baseline;
     }
 
@@ -269,16 +311,19 @@
     // field groups
     .field-group {
       @include clearfix();
+
       margin: 0 0 $baseline 0;
 
       .field {
         @include float(left);
         @include margin(0, ($baseline*1.5), 0, 0);
+
         display: block;
         border-bottom: none;
         padding-bottom: 0;
 
-        input, textarea {
+        input,
+        textarea {
           width: 100%;
           font-weight: 600;
         }
@@ -290,7 +335,6 @@
     }
 
     .group-form-personalinformation {
-
       .field-education-level,
       .field-gender,
       .field-yob {
@@ -305,24 +349,28 @@
       margin: 0 0 $baseline 0;
 
       // elements
-      label, input, textarea {
+      label,
+      input,
+      textarea {
         border-radius: 0;
         display: block;
         height: auto;
-        font-family: $sans-serif;
+        font-family: $font-family-sans-serif;
         font-style: normal;
         font-weight: 500;
-        color: $base-font-color;
+        color: $body-color;
       }
 
       label {
         @include transition(color 0.15s ease-in-out 0s);
+
         margin: 0 0 ($baseline/4) 0;
         color: tint($black, 20%);
       }
 
       .tip {
         @include transition(color 0.15s ease-in-out 0s);
+
         display: block;
         margin-top: ($baseline/4);
         color: $lighter-base-font-color;
@@ -335,11 +383,13 @@
         .tip {
           position: absolute;
           top: 0;
+
           @include right(0);
         }
       }
 
-      input, textarea {
+      input,
+      textarea {
         width: 100%;
         margin: 0;
         padding: ($baseline/2) ($baseline*0.75);
@@ -365,7 +415,6 @@
 
       // types - select
       &.select {
-
         select {
           width: 100%;
         }
@@ -373,10 +422,10 @@
 
       // types - checkboxes/radio buttons
       &.checkbox {
-
         input[type="checkbox"] {
           display: inline-block;
           width: auto;
+
           @include margin-right($baseline/4);
         }
 
@@ -386,56 +435,56 @@
       }
 
       // states - all
-      &.disabled, &.submitted {
-        color: rgba(0,0,0,.25);
+      &.disabled,
+      &.submitted {
+        color: rgba(0, 0, 0, 0.25);
 
         label {
           cursor: text;
 
-          &:after {
+          &::after {
             @include margin-left($baseline/4);
           }
         }
 
-        textarea, input {
+        textarea,
+        input {
           background: $container-bg;
-          color: rgba(0,0,0,.25);
+          color: rgba(0, 0, 0, 0.25);
         }
       }
 
       // states - focused
       &.is-focused {
-
         label {
-          color: saturate($link-color-d1,15%);
+          color: saturate($link-color, 15%);
         }
 
         .tip {
-          color: saturate($link-color-d1,15%);
+          color: saturate($link-color, 15%);
         }
       }
 
       // states - disabled
       &.disabled {
-        label:after {
-          color: rgba(0,0,0,.35);
+        label::after {
+          color: rgba(0, 0, 0, 0.35);
           content: "(Disabled Currently)";
         }
       }
 
       &.error {
-
         label {
           color: $red;
         }
 
-        input, textarea {
-          border-color: tint($red,50%);
+        input,
+        textarea {
+          border-color: tint($red, 50%);
         }
       }
 
       &.required {
-
         label {
           font-weight: 600;
 
@@ -444,8 +493,9 @@
           }
         }
 
-        label:after {
+        label::after {
           @include margin-left($baseline/4);
+
           content: "*";
         }
       }
@@ -460,27 +510,27 @@
       @extend %m-btn-primary;
       @extend %t-action2;
 
-      &:disabled, &.is-disabled {
+      &:disabled,
+      &.is-disabled {
         opacity: 0.3;
         cursor: default !important;
       }
     }
 
     .action-primary {
-      width: flex-grid(8,8);
+      width: flex-grid(8, 8);
     }
 
     .action-secondary {
       display: block;
+
       @include float(right);
-      width: flex-grid(3,8);
+
+      width: flex-grid(3, 8);
       margin: $baseline $baseline 0 0;
       font-size: em(14);
+
       @include text-align(right);
-    }
-
-    &.error {
-
     }
   }
 
@@ -496,9 +546,12 @@
     .copy {
       @extend %t-copy-lead1;
       @extend %t-weight4;
+
       position: absolute;
       top: -($baseline);
+
       @include left(43%);
+
       padding: ($baseline/4) ($baseline*1.5);
       background: white;
       text-align: center;
@@ -509,23 +562,28 @@
   // downplay required note
   .instructions .note {
     @extend %t-copy-sub2;
+
     display: block;
     font-weight: normal;
     color: $gray;
   }
 
   .form-actions.form-third-party-auth {
-    width: flex-grid(8,8);
+    width: flex-grid(8, 8);
     margin-bottom: $baseline;
 
     button[type="submit"] {
       @extend %btn-secondary-blue-outline;
-      width: flex-grid(4,8);
+
+      width: flex-grid(4, 8);
+
       @include margin-right($baseline/2);
 
       .icon {
         @extend %sso-icon;
+
         @include margin-right($baseline/2);
+
         color: inherit;
       }
 
@@ -533,46 +591,50 @@
         margin-right: 0;
       }
 
-      &.button-oa2-google-oauth2:hover, &.button-oa2-google-oauth2:focus {
-        background-color: #dd4b39;
-        border: 1px solid #A5382B;
+      &.button-oa2-google-oauth2:hover,
+      &.button-oa2-google-oauth2:focus {
+        background-color: $google-red;
+        border: 1px solid #a5382b;
       }
 
       &.button-oa2-google-oauth2:hover {
-        box-shadow: 0 2px 1px 0 #8D3024;
+        box-shadow: 0 2px 1px 0 #8d3024;
       }
 
-      &.button-oa2-facebook:hover, &.button-oa2-facebook:focus {
-        background-color: #3b5998;
-        border: 1px solid #263A62;
+      &.button-oa2-facebook:hover,
+      &.button-oa2-facebook:focus {
+        background-color: $facebook-blue;
+        border: 1px solid #263a62;
       }
 
       &.button-oa2-facebook:hover {
-        box-shadow: 0 2px 1px 0 #30487C;
+        box-shadow: 0 2px 1px 0 #30487c;
       }
 
-      &.button-oa2-linkedin-oauth2:hover , &.button-oa2-linkedin-oauth2:focus {
-        background-color: #0077b5;
-        border: 1px solid #06527D;
+      &.button-oa2-linkedin-oauth2:hover,
+      &.button-oa2-linkedin-oauth2:focus {
+        background-color: $linkedin-blue;
+        border: 1px solid #06527d;
       }
 
       &.button-oa2-linkedin-oauth2:hover {
-        box-shadow: 0 2px 1px 0 #005D8E;
+        box-shadow: 0 2px 1px 0 #005d8e;
       }
-
     }
   }
 
   // forms - messages/status
   .status {
     @include box-sizing(border-box);
+
     margin: 0 0 $baseline 0;
     border-bottom: 3px solid shade($yellow, 10%);
     padding: $baseline $baseline;
-    background: tint($yellow,20%);
+    background: tint($yellow, 20%);
 
     .message-title {
       @extend %heading-4;
+
       margin: 0 0 ($baseline/4) 0;
       font-size: em(14);
       font-weight: 600;
@@ -580,23 +642,25 @@
 
     .message-copy {
       @extend %body-text;
+
       margin: 0 !important;
       padding: 0;
       list-style: none;
 
       li {
-        margin: 0; /*0 0 ($baseline/4) 0;*/
+        margin: 0; /* 0 0 ($baseline/4) 0; */
       }
     }
   }
 
-  .submission-error, .system-error {
+  .submission-error,
+  .system-error {
     box-shadow: inset 0 -1px 2px 0 tint($red, 85%);
     border-bottom: 3px solid shade($red, 10%);
-    background: tint($red,95%);
+    background: tint($danger, 95%);
 
     .message-title {
-      color: shade($red, 10%) !important;
+      color: shade($danger, 10%) !important;
     }
   }
 
@@ -606,8 +670,9 @@
     padding: 0 $baseline/4;
   }
 
-  #register-form, #login-form, #passwordreset-form {
-
+  #register-form,
+  #login-form,
+  #passwordreset-form {
     .status.message {
       display: none;
 
@@ -630,8 +695,7 @@
 
 // login
 .view-login {
-
-  .header-global  .nav-courseware .btn-login {
+  .header-global .nav-courseware .btn-login {
     display: none;
   }
 
@@ -645,7 +709,6 @@
 
 // register
 .view-register {
-
   .introduction {
     header {
       height: 120px;
@@ -656,7 +719,6 @@
 
 // password reset
 .view-passwordreset {
-
   .header-global .nav-courseware .btn-login {
     display: none;
   }
@@ -692,12 +754,13 @@
       margin: 0;
       padding: 0;
 
-      &:before {
+      &::before {
         background-image: none;
       }
 
       h2 {
         @extend %heading-2;
+
         @include text-align(left);
       }
     }
@@ -723,9 +786,9 @@
       padding: 0;
 
       .field {
-
-        &.text, &.email, &.textarea {
-
+        &.text,
+        &.email,
+        &.textarea {
           input {
             background: #fafafa;
             margin-bottom: 0;
@@ -747,12 +810,15 @@
 
   .modal-form-error {
     @extend %body-text;
+
     box-shadow: inset 0 -1px 2px 0 tint($red, 85%);
+
     @include box-sizing(border-box);
+
     margin: $baseline 0 ($baseline/2) 0 !important;
     padding: $baseline;
     border: none;
     border-bottom: 3px solid shade($red, 10%);
-    background: tint($red,95%);
+    background: tint($red, 95%);
   }
 }

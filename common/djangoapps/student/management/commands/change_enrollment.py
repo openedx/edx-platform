@@ -6,8 +6,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from optparse import make_option
+from six import text_type
 
 from student.models import CourseEnrollment, User
 
@@ -35,66 +34,59 @@ class Command(BaseCommand):
 
         Or
 
-          $ ... change_enrollment -e "joe@example.com,frank@example.com,bill@example.com" -c some/course/id --from audit --to honor
+          $ ... change_enrollment -e "joe@example.com,frank@example.com,..." -c some/course/id --from audit --to honor
 
         See what would have been changed from audit to honor without making that change
 
           $ ... change_enrollment -u joe,frank,bill -c some/course/id --from audit --to honor -n
-
     """
 
-    option_list = BaseCommand.option_list + (
-        make_option('-f', '--from',
-                    metavar='FROM_MODE',
-                    dest='from_mode',
-                    default=False,
-                    help='move from this enrollment mode'),
-        make_option('-t', '--to',
-                    metavar='TO_MODE',
-                    dest='to_mode',
-                    default=False,
-                    help='move to this enrollment mode'),
-        make_option('-u', '--usernames',
-                    metavar='USERNAME',
-                    dest='username',
-                    default=False,
-                    help="Comma-separated list of usernames to move in the course"),
-        make_option('-e', '--emails',
-                    metavar='EMAIL',
-                    dest='email',
-                    default=False,
-                    help="Comma-separated list of email addresses to move in the course"),
-        make_option('-c', '--course',
-                    metavar='COURSE_ID',
-                    dest='course_id',
-                    default=False,
-                    help="course id to use for transfer"),
-        make_option('-n', '--noop',
-                    action='store_true',
-                    dest='noop',
-                    default=False,
-                    help="display what will be done but don't actually do anything")
+    enrollment_modes = ('audit', 'verified', 'honor', 'credit')
 
-    )
+    def add_arguments(self, parser):
+        parser.add_argument('-f', '--from',
+                            metavar='FROM_MODE',
+                            dest='from_mode',
+                            required=True,
+                            choices=self.enrollment_modes,
+                            help='Move from this enrollment mode')
+        parser.add_argument('-t', '--to',
+                            metavar='TO_MODE',
+                            dest='to_mode',
+                            required=True,
+                            choices=self.enrollment_modes,
+                            help='Move to this enrollment mode')
+        parser.add_argument('-u', '--username',
+                            metavar='USERNAME',
+                            help='Comma-separated list of usernames to move in the course')
+        parser.add_argument('-e', '--email',
+                            metavar='EMAIL',
+                            help='Comma-separated list of email addresses to move in the course')
+        parser.add_argument('-c', '--course',
+                            metavar='COURSE_ID',
+                            dest='course_id',
+                            required=True,
+                            help='Course id to use for transfer')
+        parser.add_argument('-n', '--noop',
+                            action='store_true',
+                            help='Display what will be done but do not actually do anything')
 
     def handle(self, *args, **options):
-        error_users = []
-        success_users = []
-
-        if not options['course_id']:
-            raise CommandError('You must specify a course id for this command')
-        if not options['from_mode'] or not options['to_mode']:
-            raise CommandError('You must specify a "to" and "from" mode as parameters')
-
         try:
             course_key = CourseKey.from_string(options['course_id'])
         except InvalidKeyError:
-            course_key = SlashSeparatedCourseKey.from_deprecated_string(options['course_id'])
+            raise CommandError('Invalid or non-existant course id {}'.format(options['course_id']))
+
+        if not options['username'] and not options['email']:
+            raise CommandError('You must include usernames (-u) or emails (-e) to select users to update')
 
         enrollment_args = dict(
             course_id=course_key,
             mode=options['from_mode']
         )
+
+        error_users = []
+        success_users = []
 
         if options['username']:
             self.update_enrollments('username', enrollment_args, options, error_users, success_users)
@@ -107,8 +99,10 @@ class Command(BaseCommand):
     def update_enrollments(self, identifier, enrollment_args, options, error_users, success_users):
         """ Update enrollments for a specific user identifier (email or username). """
         users = options[identifier].split(",")
+
         for identified_user in users:
             logger.info(identified_user)
+
             try:
                 user_args = {
                     identifier: identified_user
@@ -142,4 +136,4 @@ class Command(BaseCommand):
         if len(error_users) > 0:
             logger.info('The following %i user(s) not saved:', len(error_users))
             for user, error in error_users:
-                logger.info('user: [%s] reason: [%s] %s', user, type(error).__name__, error.message)
+                logger.info('user: [%s] reason: [%s] %s', user, type(error).__name__, text_type(error))

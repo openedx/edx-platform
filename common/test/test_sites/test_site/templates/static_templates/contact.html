@@ -1,8 +1,9 @@
+<%page expression_filter="h"/>
 <%inherit file="../main.html" />
 <%namespace name='static' file='../static_content.html'/>
 <%!
 from django.utils.translation import ugettext as _
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 %>
 
 <%block name="title"><title>${_("Contact {platform_name}").format(platform_name=settings.PLATFORM_NAME)}</title></%block>
@@ -21,7 +22,7 @@ from django.core.urlresolvers import reverse
     </div>
     <div class="contacts">
       <h2>${_("Class Feedback")}</h2>
-      <p>${_("We are always seeking feedback to improve our courses. If you are an enrolled student and have any questions, feedback, suggestions, or any other issues specific to a particular class, please post on the discussion forums of that&nbsp;class.")}</p>
+      <p>${_("We are always seeking feedback to improve our courses. If you are an enrolled student and have any questions, feedback, suggestions, or any other issues specific to a particular class, please post on the discussion forums of that class.")}</p>
 
       <h2>${_("General Inquiries and Feedback")}</h2>
       <p>${_('If you have a general question about {platform_name} please email {email}. To see if your question has already been answered, visit our {faq_link_start}FAQ page{faq_link_end}. You can also join the discussion on our {fb_link_start}facebook page{fb_link_end}. Though we may not have a chance to respond to every email, we take all feedback into consideration.').format(

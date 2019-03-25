@@ -4,22 +4,20 @@ Tests for tasks.
 import ddt
 from nose.plugins.attrib import attr
 
-from django.conf import settings
-
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import check_mongo_calls, ItemFactory
-
 from ..models import XBlockCache
 from ..tasks import _calculate_course_xblocks_data, _update_xblocks_cache
 from .test_models import BookmarksTestsBase
 
 
-@attr(shard=2)
+@attr(shard=9)
 @ddt.ddt
 class XBlockCacheTaskTests(BookmarksTestsBase):
     """
     Test the XBlockCache model.
     """
+
     def setUp(self):
         super(XBlockCacheTaskTests, self).setUp()
 
@@ -156,12 +154,6 @@ class XBlockCacheTaskTests(BookmarksTestsBase):
         Test that the xblocks data is persisted correctly.
         """
         course = getattr(self, course_attr)
-
-        if settings.ROOT_URLCONF == 'lms.urls':
-            # When the tests run under LMS, there is a certificates course_published
-            # signal handler that runs and causes the number of queries to be one more
-            # (due to the check for disabled_xblocks in django.py).
-            expected_sql_queries += 1
 
         with self.assertNumQueries(expected_sql_queries):
             _update_xblocks_cache(course.id)

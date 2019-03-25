@@ -129,6 +129,7 @@ u'<p><object data="http://www.gametrailers.com/remote_wrap.php?mid=58079" height
 """
 
 import markdown
+
 try:
     # Markdown 2.1.0 changed from 2.0.3. We try importing the new version first,
     # but import the 2.0.3 version if it fails
@@ -141,7 +142,7 @@ version = "0.1.6"
 
 
 class VideoExtension(markdown.Extension):
-    def __init__(self, configs):
+    def __init__(self, **kwargs):
         self.config = {
             'bliptv_width': ['480', 'Width for Blip.tv videos'],
             'bliptv_height': ['300', 'Height for Blip.tv videos'],
@@ -162,8 +163,7 @@ class VideoExtension(markdown.Extension):
         }
 
         # Override defaults with user settings
-        for key, value in configs:
-            self.setConfig(key, value)
+        super(VideoExtension, self).__init__(**kwargs)
 
     def add_inline(self, md, name, klass, re):  # pylint: disable=invalid-name
         """Adds the inline link"""
@@ -284,15 +284,12 @@ def flash_object(url, width, height):
     param.set('name', 'allowFullScreen')
     param.set('value', 'true')
     obj.append(param)
-    #param = etree.Element('param')
-    #param.set('name', 'allowScriptAccess')
-    #param.set('value', 'sameDomain')
-    #obj.append(param)
     return obj
 
 
-def makeExtension(configs=None):
-    return VideoExtension(configs=configs)
+def makeExtension(**kwargs):
+    return VideoExtension(**kwargs)
+
 
 if __name__ == "__main__":
     import doctest

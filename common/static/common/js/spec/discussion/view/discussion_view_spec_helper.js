@@ -132,7 +132,7 @@
         DiscussionViewSpecHelper.setNextResponseContent = function(content) {
             return $.ajax.and.callFake(function(params) {
                 params.success({
-                    'content': content
+                    content: content
                 });
                 return {
                     always: function() {
@@ -142,5 +142,5 @@
         };
 
         return DiscussionViewSpecHelper;
-    })();
+    }());
 }).call(this);

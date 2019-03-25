@@ -1,9 +1,10 @@
 """Test for async task service status"""
 
-from django.utils import unittest
-from django.test.client import Client
-from django.core.urlresolvers import reverse
 import json
+
+from django.urls import reverse
+from django.test.client import Client
+import unittest
 
 
 class CeleryConfigTest(unittest.TestCase):

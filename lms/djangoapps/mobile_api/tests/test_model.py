@@ -2,9 +2,11 @@
 Tests for Mobile API Configuration Models
 """
 from datetime import datetime
+
 import ddt
 from django.test import TestCase
 from pytz import UTC
+
 from mobile_api.models import AppVersionConfig, MobileApiConfig
 
 
@@ -13,8 +15,7 @@ class TestAppVersionConfigModel(TestCase):
     """
     Tests for app version configuration model
     """
-    def setUp(self):
-        super(TestAppVersionConfigModel, self).setUp()
+    shard = 4
 
     def set_app_version_config(self):
         """ Creates configuration data for platform versions """
@@ -89,6 +90,7 @@ class TestMobileApiConfig(TestCase):
     """
     Tests MobileAPIConfig
     """
+    shard = 4
 
     def test_video_profile_list(self):
         """Check that video_profiles config is returned in order as a list"""

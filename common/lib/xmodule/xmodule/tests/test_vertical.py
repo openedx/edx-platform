@@ -1,14 +1,72 @@
 """
 Tests for vertical module.
 """
+
+# pylint: disable=protected-access
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+from collections import namedtuple
+import json
+
 import ddt
-from mock import Mock
 from fs.memoryfs import MemoryFS
-from xmodule.tests import get_test_system
-from xmodule.tests.helpers import StubUserService
-from xmodule.tests.xml import XModuleXmlImportTest
-from xmodule.tests.xml import factories as xml
-from xmodule.x_module import STUDENT_VIEW, AUTHOR_VIEW
+from mock import Mock, patch
+import six
+
+from . import get_test_system
+from .helpers import StubUserService
+from .xml import XModuleXmlImportTest
+from .xml import factories as xml
+from ..x_module import STUDENT_VIEW, AUTHOR_VIEW
+
+
+COMPLETION_DELAY = 9876
+
+JsonRequest = namedtuple('JsonRequest', ['method', 'body'])
+
+
+def get_json_request(data):
+    """
+    Given a data dictionary, return an appropriate JSON request.
+    """
+    return JsonRequest(
+        method='POST',
+        body=json.dumps(data),
+    )
+
+
+class StubCompletionService(object):
+    """
+    A stub implementation of the CompletionService for testing without access to django
+    """
+
+    def __init__(self, enabled, completion_value):
+        self._enabled = enabled
+        self._completion_value = completion_value
+        self.delay = COMPLETION_DELAY
+
+    def completion_tracking_enabled(self):
+        """
+        Turn on or off completion tracking for clients of the
+        StubCompletionService.
+        """
+        return self._enabled
+
+    def get_completions(self, candidates):
+        """
+        Return the (dummy) completion values for each specified candidate
+        block.
+        """
+        return {candidate: self._completion_value for candidate in candidates}
+
+    def get_complete_on_view_delay_ms(self):
+        """
+        Return the completion-by-viewing delay in milliseconds.
+        """
+        return self.delay
+
+    def blocks_to_mark_complete_on_view(self, blocks):
+        return {} if self._completion_value == 1.0 else blocks
 
 
 class BaseVerticalBlockTest(XModuleXmlImportTest):
@@ -33,11 +91,14 @@ class BaseVerticalBlockTest(XModuleXmlImportTest):
         course_seq = self.course.get_children()[0]
         self.module_system = get_test_system()
 
-        self.module_system.descriptor_runtime = self.course._runtime  # pylint: disable=protected-access
+        self.module_system.descriptor_runtime = self.course._runtime
         self.course.runtime.export_fs = MemoryFS()
 
         self.vertical = course_seq.get_children()[0]
         self.vertical.xmodule_runtime = self.module_system
+
+        self.html1block = self.vertical.get_children()[0]
+        self.html2block = self.vertical.get_children()[1]
 
         self.username = "bilbo"
         self.default_context = {"bookmarked": False, "username": self.username}
@@ -48,6 +109,8 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
     """
     Tests for the VerticalBlock.
     """
+    shard = 1
+
     def assert_bookmark_info_in(self, content):
         """
         Assert content has all the bookmark info.
@@ -66,8 +129,9 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
         """
         Test the rendering of the student view.
         """
-        self.module_system._services['bookmarks'] = Mock()  # pylint: disable=protected-access
-        self.module_system._services['user'] = StubUserService()  # pylint: disable=protected-access
+        self.module_system._services['bookmarks'] = Mock()
+        self.module_system._services['user'] = StubUserService()
+        self.module_system._services['completion'] = StubCompletionService(enabled=True, completion_value=0.0)
 
         html = self.module_system.render(
             self.vertical, STUDENT_VIEW, self.default_context if context is None else context
@@ -75,6 +139,31 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
         self.assertIn(self.test_html_1, html)
         self.assertIn(self.test_html_2, html)
         self.assert_bookmark_info_in(html)
+
+    @ddt.unpack
+    @ddt.data(
+        (True, 0.9, True),
+        (False, 0.9, False),
+        (True, 1.0, False),
+    )
+    def test_mark_completed_on_view_after_delay_in_context(
+            self, completion_enabled, completion_value, mark_completed_enabled
+    ):
+        """
+        Test that mark-completed-on-view-after-delay is only set for relevant child Xblocks.
+        """
+        with patch.object(self.html1block, 'render') as mock_student_view:
+            self.module_system._services['completion'] = StubCompletionService(
+                enabled=completion_enabled,
+                completion_value=completion_value,
+            )
+            self.module_system.render(self.vertical, STUDENT_VIEW, self.default_context)
+            if (mark_completed_enabled):
+                self.assertEqual(
+                    mock_student_view.call_args[0][1]['wrap_xblock_data']['mark-completed-on-view-after-delay'], 9876
+                )
+            else:
+                self.assertNotIn('wrap_xblock_data', mock_student_view.call_args[0][1])
 
     def test_render_studio_view(self):
         """

@@ -1,15 +1,17 @@
 """
 Unit test tasks
 """
-import re
 import os
+import re
 import sys
-from paver.easy import sh, task, cmdopts, needs
-from pavelib.utils.test import suites
-from pavelib.utils.envs import Env
-from pavelib.utils.timer import timed
-from pavelib.utils.passthrough_opts import PassthroughTask
 from optparse import make_option
+
+from paver.easy import cmdopts, needs, sh, task
+
+from pavelib.utils.envs import Env
+from pavelib.utils.passthrough_opts import PassthroughTask
+from pavelib.utils.test import suites
+from pavelib.utils.timer import timed
 
 try:
     from pygments.console import colorize
@@ -29,16 +31,32 @@ __test__ = False  # do not collect
     ("fail-fast", "x", "Fail suite on first failed test"),
     ("fasttest", "a", "Run without collectstatic"),
     make_option(
+        "--django_version", dest="django_version",
+        help="Run against which Django version (1.8, 1.9, 1.10, -or- 1.11)."
+    ),
+    make_option(
+        "--eval-attr", dest="eval_attr",
+        help="Only run tests matching given attribute expression."
+    ),
+    make_option(
         '-c', '--cov-args', default='',
         help='adds as args to coverage for the test run'
     ),
     ('skip-clean', 'C', 'skip cleaning repository before running tests'),
-    ('processes=', 'p', 'number of processes to use running tests'),
+    make_option('-p', '--processes', dest='processes', default=0, help='number of processes to use running tests'),
     make_option('-r', '--randomize', action='store_true', help='run the tests in a random order'),
     make_option('--no-randomize', action='store_false', dest='randomize', help="don't run the tests in a random order"),
     make_option("--verbose", action="store_const", const=2, dest="verbosity"),
     make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
     make_option("-v", "--verbosity", action="count", dest="verbosity", default=1),
+    make_option(
+        "--disable_capture", action="store_true", dest="disable_capture",
+        help="Disable capturing of stdout/stderr"
+    ),
+    make_option(
+        "--disable-coverage", action="store_false", dest="with_coverage",
+        help="Run the unit tests directly through pytest, NOT coverage"
+    ),
     make_option(
         '--disable-migrations',
         action='store_true',
@@ -51,14 +69,6 @@ __test__ = False  # do not collect
         dest='disable_migrations',
         help="Create tables by applying migrations."
     ),
-    ("fail_fast", None, "deprecated in favor of fail-fast"),
-    ("test_id=", None, "deprecated in favor of test-id"),
-    ('cov_args=', None, 'deprecated in favor of cov-args'),
-    make_option(
-        "-e", "--extra_args", default="",
-        help="deprecated, pass extra options directly in the paver commandline"
-    ),
-    ('skip_clean', None, 'deprecated in favor of skip-clean'),
 ], share_with=['pavelib.utils.test.utils.clean_reports_dir'])
 @PassthroughTask
 @timed
@@ -68,23 +78,32 @@ def test_system(options, passthrough_options):
     """
     system = getattr(options, 'system', None)
     test_id = getattr(options, 'test_id', None)
+    django_version = getattr(options, 'django_version', None)
+
+    assert system in (None, 'lms', 'cms')
+    assert django_version in (None, '1.8', '1.9', '1.10', '1.11')
 
     if test_id:
+        # Testing a single test ID.
+        # Ensure the proper system for the test id.
         if not system:
             system = test_id.split('/')[0]
         if system in ['common', 'openedx']:
             system = 'lms'
-        options.test_system['test_id'] = test_id
-
-    if test_id or system:
         system_tests = [suites.SystemTestSuite(
             system,
             passthrough_options=passthrough_options,
             **options.test_system
         )]
     else:
+        # Testing a single system -or- both systems.
+        if system:
+            systems = [system]
+        else:
+            # No specified system or test_id, so run all tests of both systems.
+            systems = ['cms', 'lms']
         system_tests = []
-        for syst in ('cms', 'lms'):
+        for syst in systems:
             system_tests.append(suites.SystemTestSuite(
                 syst,
                 passthrough_options=passthrough_options,
@@ -110,6 +129,14 @@ def test_system(options, passthrough_options):
     ("failed", "f", "Run only failed tests"),
     ("fail-fast", "x", "Run only failed tests"),
     make_option(
+        "--django_version", dest="django_version",
+        help="Run against which Django version (1.8, 1.9, 1.10, -or- 1.11)."
+    ),
+    make_option(
+        "--eval-attr", dest="eval_attr",
+        help="Only run tests matching given attribute expression."
+    ),
+    make_option(
         '-c', '--cov-args', default='',
         help='adds as args to coverage for the test run'
     ),
@@ -117,14 +144,14 @@ def test_system(options, passthrough_options):
     make_option("--verbose", action="store_const", const=2, dest="verbosity"),
     make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
     make_option("-v", "--verbosity", action="count", dest="verbosity", default=1),
-    ('cov_args=', None, 'deprecated in favor of cov-args'),
     make_option(
-        '-e', '--extra_args', default='',
-        help='deprecated, pass extra options directly in the paver commandline'
+        "--disable_capture", action="store_true", dest="disable_capture",
+        help="Disable capturing of stdout/stderr"
     ),
-    ("fail_fast", None, "deprecated in favor of fail-fast"),
-    ('skip_clean', None, 'deprecated in favor of skip-clean'),
-    ("test_id=", None, "deprecated in favor of test-id"),
+    make_option(
+        "--disable-coverage", action="store_false", dest="with_coverage",
+        help="Run the unit tests directly through pytest, NOT coverage"
+    ),
 ], share_with=['pavelib.utils.test.utils.clean_reports_dir'])
 @PassthroughTask
 @timed
@@ -134,8 +161,12 @@ def test_lib(options, passthrough_options):
     """
     lib = getattr(options, 'lib', None)
     test_id = getattr(options, 'test_id', lib)
+    django_version = getattr(options, 'django_version', None)
+
+    assert django_version in (None, '1.8', '1.9', '1.10', '1.11')
 
     if test_id:
+        # Testing a single test id.
         if '/' in test_id:
             lib = '/'.join(test_id.split('/')[0:3])
         else:
@@ -147,12 +178,14 @@ def test_lib(options, passthrough_options):
             **options.test_lib
         )]
     else:
+        # Testing all common/lib test dirs - plus pavelib.
         lib_tests = [
             suites.LibTestSuite(
                 d,
                 passthrough_options=passthrough_options,
+                append_coverage=(i != 0),
                 **options.test_lib
-            ) for d in Env.LIB_TEST_DIRS
+            ) for i, d in enumerate(Env.LIB_TEST_DIRS)
         ]
 
     test_suite = suites.PythonTestSuite(
@@ -184,12 +217,6 @@ def test_lib(options, passthrough_options):
         dest='disable_migrations',
         help="Create tables directly from apps' models. Can also be used by exporting DISABLE_MIGRATIONS=1."
     ),
-    ('cov_args=', None, 'deprecated in favor of cov-args'),
-    make_option(
-        '-e', '--extra_args', default='',
-        help='deprecated, pass extra options directly in the paver commandline'
-    ),
-    ("fail_fast", None, "deprecated in favor of fail-fast"),
 ])
 @PassthroughTask
 @timed
@@ -218,11 +245,6 @@ def test_python(options, passthrough_options):
     make_option("--verbose", action="store_const", const=2, dest="verbosity"),
     make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
     make_option("-v", "--verbosity", action="count", dest="verbosity", default=1),
-    ('cov_args=', None, 'deprecated in favor of cov-args'),
-    make_option(
-        '-e', '--extra_args', default='',
-        help='deprecated, pass extra options directly in the paver commandline'
-    ),
 ])
 @PassthroughTask
 @timed
@@ -247,7 +269,6 @@ def test(options, passthrough_options):
 @needs('pavelib.prereqs.install_coverage_prereqs')
 @cmdopts([
     ("compare-branch=", "b", "Branch to compare against, defaults to origin/master"),
-    ("compare_branch=", None, "deprecated in favor of compare-branch"),
 ])
 @timed
 def coverage():
@@ -285,7 +306,6 @@ def coverage():
 @needs('pavelib.prereqs.install_coverage_prereqs')
 @cmdopts([
     ("compare-branch=", "b", "Branch to compare against, defaults to origin/master"),
-    ("compare_branch=", None, "deprecated in favor of compare-branch"),
 ], share_with=['coverage'])
 @timed
 def diff_coverage(options):

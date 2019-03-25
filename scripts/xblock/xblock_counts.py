@@ -1,11 +1,12 @@
 import argparse
 import csv
 import json
+import os
 import sys
 from datetime import datetime
 
-import os
 import requests
+from six import text_type
 
 # Keys for the CSV and JSON interpretation
 PAGINATION_KEY = 'pagination'
@@ -164,10 +165,10 @@ def _get_block_types_from_json_file(xblock_json_file):
         type_set = set()
         try:
             json_data = json.loads(json_file.read())
-        except ValueError, e:
+        except ValueError as e:
             print 'xBlock configuration file does not match the expected layout and is ' \
                   'missing "data" list: %s' % xblock_json_file
-            sys.exit(e.message)
+            sys.exit(text_type(e))
         if 'data' in json_data:
             xblock_type_list = json_data['data']
             for xblock in xblock_type_list:

@@ -17,11 +17,12 @@
         function($, Backbone, Content, Discussion, DiscussionUtil, DiscussionCourseSettings, DiscussionUser,
                  NewPostView, DiscussionRouter, DiscussionBoardView) {
             return function(options) {
-                var userInfo = options.user_info,
-                    sortPreference = options.sort_preference,
+                var userInfo = options.userInfo,
+                    sortPreference = options.sortPreference,
                     threads = options.threads,
-                    threadPages = options.thread_pages,
-                    contentInfo = options.content_info,
+                    threadPages = options.threadPages,
+                    isCommentableDivided = options.isCommentableDivided,
+                    contentInfo = options.contentInfo,
                     user = new DiscussionUser(userInfo),
                     discussion,
                     courseSettings,
@@ -33,14 +34,15 @@
                 // TODO: eliminate usage of global variables when possible
                 DiscussionUtil.loadRoles(options.roles);
                 window.$$course_id = options.courseId;
-                window.courseName = options.course_name;
+                window.courseName = options.courseName;
                 DiscussionUtil.setUser(user);
                 window.user = user;
                 Content.loadContentInfos(contentInfo);
 
                 // Create a discussion model
-                discussion = new Discussion(threads, {pages: threadPages, sort: sortPreference});
-                courseSettings = new DiscussionCourseSettings(options.course_settings);
+                discussion = new Discussion(threads, {pages: threadPages, sort: sortPreference,
+                    is_commentable_divided: isCommentableDivided});
+                courseSettings = new DiscussionCourseSettings(options.courseSettings);
 
                 // Create the discussion board view
                 discussionBoardView = new DiscussionBoardView({
@@ -55,13 +57,16 @@
                     el: $('.new-post-article'),
                     collection: discussion,
                     course_settings: courseSettings,
-                    mode: 'tab'
+                    discussionBoardView: discussionBoardView,
+                    mode: 'tab',
+                    startHeader: 2,
+                    topicId: options.defaultTopicId
                 });
                 newPostView.render();
 
                 // Set up a router to manage the page's history
                 router = new DiscussionRouter({
-                    courseId: options.courseId,
+                    rootUrl: options.rootUrl,
                     discussion: discussion,
                     courseSettings: courseSettings,
                     discussionBoardView: discussionBoardView,

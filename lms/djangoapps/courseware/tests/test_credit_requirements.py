@@ -3,18 +3,16 @@ Tests for credit requirement display on the progress page.
 """
 
 import ddt
-from mock import patch
-
 from django.conf import settings
-from django.core.urlresolvers import reverse
-
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from django.urls import reverse
+from mock import patch
 
 from course_modes.models import CourseMode
 from openedx.core.djangoapps.credit import api as credit_api
 from openedx.core.djangoapps.credit.models import CreditCourse
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @patch.dict(settings.FEATURES, {"ENABLE_CREDIT_ELIGIBILITY": True})
@@ -23,6 +21,7 @@ class ProgressPageCreditRequirementsTest(SharedModuleStoreTestCase):
     """
     Tests for credit requirement display on the progress page.
     """
+    shard = 4
 
     USERNAME = "bob"
     PASSWORD = "test"

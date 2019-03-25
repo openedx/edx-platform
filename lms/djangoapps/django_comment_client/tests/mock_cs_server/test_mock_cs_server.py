@@ -1,9 +1,11 @@
-import unittest
-import threading
 import json
+import threading
+import unittest
 import urllib2
-from django_comment_client.tests.mock_cs_server.mock_cs_server import MockCommentServiceServer
+
 from nose.plugins.skip import SkipTest
+
+from django_comment_client.tests.mock_cs_server.mock_cs_server import MockCommentServiceServer
 
 
 class MockCommentServiceServerTest(unittest.TestCase):
@@ -11,6 +13,7 @@ class MockCommentServiceServerTest(unittest.TestCase):
     A mock version of the Comment Service server that listens on a local
     port and responds with pre-defined grade messages.
     '''
+    shard = 4
 
     def setUp(self):
         super(MockCommentServiceServerTest, self).setUp()

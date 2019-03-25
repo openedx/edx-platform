@@ -1,14 +1,13 @@
 """
 Tests the course meta badging events
 """
-from ddt import ddt, unpack, data
+from ddt import data, ddt, unpack
+from django.conf import settings
 from django.test.utils import override_settings
 from mock import patch
 
-from django.conf import settings
-
-from badges.tests.factories import RandomBadgeClassFactory, CourseEventBadgesConfigurationFactory
-from certificates.models import GeneratedCertificate, CertificateStatuses
+from badges.tests.factories import CourseEventBadgesConfigurationFactory, RandomBadgeClassFactory
+from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -22,6 +21,8 @@ class CourseEnrollmentBadgeTest(ModuleStoreTestCase):
     """
     Tests the event which awards badges based on number of courses a user is enrolled in.
     """
+    shard = 4
+
     def setUp(self):
         super(CourseEnrollmentBadgeTest, self).setUp()
         self.badge_classes = [
@@ -73,6 +74,8 @@ class CourseCompletionBadgeTest(ModuleStoreTestCase):
     """
     Tests the event which awards badges based on the number of courses completed.
     """
+    shard = 4
+
     def setUp(self, **kwargs):
         super(CourseCompletionBadgeTest, self).setUp()
         self.badge_classes = [
@@ -131,6 +134,8 @@ class CourseGroupBadgeTest(ModuleStoreTestCase):
     """
     Tests the event which awards badges when a user completes a set of courses.
     """
+    shard = 4
+
     def setUp(self):
         super(CourseGroupBadgeTest, self).setUp()
         self.badge_classes = [

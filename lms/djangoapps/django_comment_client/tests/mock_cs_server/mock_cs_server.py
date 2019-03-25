@@ -1,6 +1,7 @@
-from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 import json
+from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from logging import getLogger
+
 logger = getLogger(__name__)
 
 

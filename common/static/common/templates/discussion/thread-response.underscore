@@ -15,7 +15,7 @@
                 <div class="comment-body" id="add-new-comment-<%- wmdId %>" data-id="<%- wmdId %>"
                 data-placeholder="<%- gettext('Add a comment') %>"></div>
                 <div class="comment-post-control">
-                    <button class="btn-brand discussion-submit-comment control-button"><%- gettext("Submit") %></button>
+                    <button class="btn btn-primary discussion-submit-comment control-button"><%- gettext("Submit") %></button>
                 </div>
             </form>
         <% } %>

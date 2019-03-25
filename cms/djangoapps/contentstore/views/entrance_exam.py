@@ -2,25 +2,25 @@
 Entrance Exams view module -- handles all requests related to entrance exam management via Studio
 Intended to be utilized as an AJAX callback handler, versus a proper view/screen
 """
-from functools import wraps
 import logging
+from functools import wraps
 
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.csrf import ensure_csrf_cookie
 from django.http import HttpResponse, HttpResponseBadRequest
+from django.utils.translation import ugettext as _
+from django.views.decorators.csrf import ensure_csrf_cookie
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey, UsageKey
 
-from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from contentstore.views.helpers import create_xblock, remove_entrance_exam_graders
 from contentstore.views.item import delete_item
 from models.settings.course_metadata import CourseMetadata
-from opaque_keys.edx.keys import CourseKey, UsageKey
-from opaque_keys import InvalidKeyError
+from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from student.auth import has_course_author_access
 from util import milestones_helpers
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from django.conf import settings
-from django.utils.translation import ugettext as _
 
 __all__ = ['entrance_exam', ]
 
@@ -145,7 +145,7 @@ def _create_entrance_exam(request, course_key, entrance_exam_minimum_score_pct=N
     course = modulestore().get_course(course_key)
     metadata = {
         'entrance_exam_enabled': True,
-        'entrance_exam_minimum_score_pct': unicode(entrance_exam_minimum_score_pct),
+        'entrance_exam_minimum_score_pct': entrance_exam_minimum_score_pct,
         'entrance_exam_id': unicode(created_block.location),
     }
     CourseMetadata.update_from_dict(metadata, course, request.user)

@@ -88,6 +88,16 @@ def get_course_organizations(course_id):
     return organizations_api.get_course_organizations(course_id)
 
 
+def get_course_organization_id(course_id):
+    """
+    Returns organization id for course or None if the course is not linked to an org
+    """
+    course_organization = get_course_organizations(course_id)
+    if course_organization:
+        return course_organization[0]['id']
+    return None
+
+
 def organizations_enabled():
     """
     Returns boolean indication if organizations app is enabled on not.

@@ -18,22 +18,25 @@ To enable this implementation, add the following to Django settings:
     }
 
 """
-import time
-import hmac
 import binascii
-import re
+import hmac
 import json
+import re
+import time
 from collections import OrderedDict, defaultdict
 from decimal import Decimal, InvalidOperation
 from hashlib import sha1
 from textwrap import dedent
+
 from django.conf import settings
 from django.utils.translation import ugettext as _
+from six import text_type
+
 from edxmako.shortcuts import render_to_string
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from shoppingcart.models import Order
 from shoppingcart.processors.exceptions import *
 from shoppingcart.processors.helpers import get_processor_config
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
 def process_postpay_callback(params, **kwargs):
@@ -281,7 +284,7 @@ def get_processor_exception_html(exception):
         )
         formatted = msg.format(
             error_message='<span class="exception_msg">{msg}</span>'.format(
-                msg=exception.message,
+                msg=text_type(exception),
             ),
             email=payment_support_email,
         )
@@ -296,7 +299,7 @@ def get_processor_exception_html(exception):
         )
         formatted = msg.format(
             error_message='<span class="exception_msg">{msg}</span>'.format(
-                msg=exception.message,
+                msg=text_type(exception),
             ),
             email=payment_support_email,
         )
@@ -314,7 +317,7 @@ def get_processor_exception_html(exception):
         )
         formatted = msg.format(
             error_message='<span class="exception_msg">{msg}</span>'.format(
-                msg=exception.message,
+                msg=text_type(exception),
             ),
             email=payment_support_email,
         )

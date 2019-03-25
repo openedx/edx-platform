@@ -1,10 +1,10 @@
 """
 Urls for verifying health (heartbeat) of the app.
 """
-from django.conf.urls import url, patterns
+from django.conf.urls import url
 
-urlpatterns = patterns(
-    '',
+from openedx.core.djangoapps.heartbeat.views import heartbeat
 
-    url(r'^$', 'openedx.core.djangoapps.heartbeat.views.heartbeat', name='heartbeat'),
-)
+urlpatterns = [
+    url(r'^$', heartbeat, name='heartbeat'),
+]

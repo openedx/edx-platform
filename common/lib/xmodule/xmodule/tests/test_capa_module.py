@@ -8,13 +8,17 @@ Tests of the Capa XModule
 import datetime
 import json
 import random
+import requests
 import os
 import textwrap
 import unittest
 
 import ddt
+from django.utils.encoding import smart_text
+from edx_user_state_client.interface import XBlockUserState
 from lxml import etree
 from mock import Mock, patch, DEFAULT
+import six
 import webob
 from webob.multidict import MultiDict
 
@@ -25,14 +29,15 @@ from capa.responsetypes import (StudentInputError, LoncapaProblemError,
                                 ResponseError)
 from capa.xqueue_interface import XQueueInterface
 from xmodule.capa_module import CapaModule, CapaDescriptor, ComplexEncoder
-from opaque_keys.edx.locations import Location
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
+from xblock.scorable import Score
 
 from . import get_test_system
 from pytz import UTC
 from capa.correctmap import CorrectMap
-from ..capa_base_constants import RANDOMIZATION
+from ..capa_base_constants import RANDOMIZATION, SHOWANSWER
 
 
 class CapaFactory(object):
@@ -97,13 +102,11 @@ class CapaFactory(object):
 
             attempts: also added to instance state.  Will be converted to an int.
         """
-        location = Location(
-            "edX",
-            "capa_test",
-            "2012_Fall",
+        location = BlockUsageLocator(
+            CourseLocator("edX", "capa_test", "2012_Fall", deprecated=True),
             "problem",
             "SampleProblem{0}".format(cls.next_num()),
-            None
+            deprecated=True,
         )
         if xml is None:
             xml = cls.sample_problem_xml
@@ -129,9 +132,9 @@ class CapaFactory(object):
         if override_get_score:
             if correct:
                 # TODO: probably better to actually set the internal state properly, but...
-                module.get_score = lambda: {'score': 1, 'total': 1}
+                module.score = Score(raw_earned=1, raw_possible=1)
             else:
-                module.get_score = lambda: {'score': 0, 'total': 1}
+                module.score = Score(raw_earned=0, raw_possible=1)
 
         module.graded = 'False'
         return module
@@ -180,6 +183,7 @@ if submission[0] == '':
 
 @ddt.ddt
 class CapaModuleTest(unittest.TestCase):
+    shard = 1
 
     def setUp(self):
         super(CapaModuleTest, self).setUp()
@@ -195,10 +199,10 @@ class CapaModuleTest(unittest.TestCase):
 
     def test_import(self):
         module = CapaFactory.create()
-        self.assertEqual(module.get_score()['score'], 0)
+        self.assertEqual(module.get_score().raw_earned, 0)
 
         other_module = CapaFactory.create()
-        self.assertEqual(module.get_score()['score'], 0)
+        self.assertEqual(module.get_score().raw_earned, 0)
         self.assertNotEqual(module.url_name, other_module.url_name,
                             "Factory should be creating unique names for each problem")
 
@@ -207,31 +211,33 @@ class CapaModuleTest(unittest.TestCase):
         Check that the factory creates correct and incorrect problems properly.
         """
         module = CapaFactory.create()
-        self.assertEqual(module.get_score()['score'], 0)
+        self.assertEqual(module.get_score().raw_earned, 0)
 
         other_module = CapaFactory.create(correct=True)
-        self.assertEqual(other_module.get_score()['score'], 1)
+        self.assertEqual(other_module.get_score().raw_earned, 1)
 
     def test_get_score(self):
         """
-        Do 1 test where the internals of get_score are properly set
-
-        @jbau Note: this obviously depends on a particular implementation of get_score, but I think this is actually
-        useful as unit-code coverage for this current implementation.  I don't see a layer where LoncapaProblem
-        is tested directly
+        Tests the internals of get_score. In keeping with the ScorableXBlock spec,
+        Capa modules store their score independently of the LCP internals, so it must
+        be explicitly updated.
         """
         student_answers = {'1_2_1': 'abcd'}
         correct_map = CorrectMap(answer_id='1_2_1', correctness="correct", npoints=0.9)
         module = CapaFactory.create(correct=True, override_get_score=False)
         module.lcp.correct_map = correct_map
         module.lcp.student_answers = student_answers
-        self.assertEqual(module.get_score()['score'], 0.9)
+        self.assertEqual(module.get_score().raw_earned, 0.0)
+        module.set_score(module.score_from_lcp())
+        self.assertEqual(module.get_score().raw_earned, 0.9)
 
         other_correct_map = CorrectMap(answer_id='1_2_1', correctness="incorrect", npoints=0.1)
         other_module = CapaFactory.create(correct=False, override_get_score=False)
         other_module.lcp.correct_map = other_correct_map
         other_module.lcp.student_answers = student_answers
-        self.assertEqual(other_module.get_score()['score'], 0.1)
+        self.assertEqual(other_module.get_score().raw_earned, 0.0)
+        other_module.set_score(other_module.score_from_lcp())
+        self.assertEqual(other_module.get_score().raw_earned, 0.1)
 
     def test_showanswer_default(self):
         """
@@ -242,11 +248,67 @@ class CapaModuleTest(unittest.TestCase):
         problem = CapaFactory.create()
         self.assertFalse(problem.answer_available())
 
+    @ddt.data(
+        (requests.exceptions.ReadTimeout, (1, 'failed to read from the server')),
+        (requests.exceptions.ConnectionError, (1, 'cannot connect to server')),
+    )
+    @ddt.unpack
+    def test_xqueue_request_exception(self, exception, result):
+        """
+        Makes sure that platform will raise appropriate exception in case of
+        connect/read timeout(s) to request to xqueue
+        """
+        xqueue_interface = XQueueInterface("http://example.com/xqueue", Mock())
+        with patch.object(xqueue_interface.session, 'post', side_effect=exception):
+            # pylint: disable = protected-access
+            response = xqueue_interface._http_post('http://some/fake/url', {})
+            self.assertEqual(response, result)
+
     def test_showanswer_attempted(self):
         problem = CapaFactory.create(showanswer='attempted')
         self.assertFalse(problem.answer_available())
         problem.attempts = 1
         self.assertTrue(problem.answer_available())
+
+    @ddt.data(
+        # If show_correctness=always, Answer is visible after attempted
+        ({
+            'showanswer': 'attempted',
+            'max_attempts': '1',
+            'show_correctness': 'always',
+        }, False, True),
+        # If show_correctness=never, Answer is never visible
+        ({
+            'showanswer': 'attempted',
+            'max_attempts': '1',
+            'show_correctness': 'never',
+        }, False, False),
+        # If show_correctness=past_due, answer is not visible before due date
+        ({
+            'showanswer': 'attempted',
+            'show_correctness': 'past_due',
+            'max_attempts': '1',
+            'due': 'tomorrow_str',
+        }, False, False),
+        # If show_correctness=past_due, answer is visible after due date
+        ({
+            'showanswer': 'attempted',
+            'show_correctness': 'past_due',
+            'max_attempts': '1',
+            'due': 'yesterday_str',
+        }, True, True),
+    )
+    @ddt.unpack
+    def test_showanswer_hide_correctness(self, problem_data, answer_available_no_attempt, answer_available_after_attempt):
+        """
+        Ensure that the answer will not be shown when correctness is being hidden.
+        """
+        if 'due' in problem_data:
+            problem_data['due'] = getattr(self, problem_data['due'])
+        problem = CapaFactory.create(**problem_data)
+        self.assertEqual(problem.answer_available(), answer_available_no_attempt)
+        problem.attempts = 1
+        self.assertEqual(problem.answer_available(), answer_available_after_attempt)
 
     def test_showanswer_closed(self):
 
@@ -396,6 +458,98 @@ class CapaModuleTest(unittest.TestCase):
                                             due=self.yesterday_str,
                                             graceperiod=self.two_day_delta_str)
         self.assertTrue(still_in_grace.answer_available())
+
+    def test_showanswer_answered(self):
+        """
+        Tests that with showanswer="answered" should show answer after the problem is correctly answered.
+        It should *NOT* show answer if the answer is incorrect.
+        """
+        # Can not see "Show Answer" when student answer is wrong
+        answer_wrong = CapaFactory.create(
+            showanswer=SHOWANSWER.ANSWERED,
+            max_attempts="1",
+            attempts="0",
+            due=self.tomorrow_str,
+            correct=False
+        )
+        self.assertFalse(answer_wrong.answer_available())
+
+        # Expect to see "Show Answer" when answer is correct
+        answer_correct = CapaFactory.create(
+            showanswer=SHOWANSWER.ANSWERED,
+            max_attempts="1",
+            attempts="0",
+            due=self.tomorrow_str,
+            correct=True
+        )
+        self.assertTrue(answer_correct.answer_available())
+
+    @ddt.data('', 'other-value')
+    def test_show_correctness_other(self, show_correctness):
+        """
+        Test that correctness is visible if show_correctness is not set to one of the values
+        from SHOW_CORRECTNESS constant.
+        """
+        problem = CapaFactory.create(show_correctness=show_correctness)
+        self.assertTrue(problem.correctness_available())
+
+    def test_show_correctness_default(self):
+        """
+        Test that correctness is visible by default.
+        """
+        problem = CapaFactory.create()
+        self.assertTrue(problem.correctness_available())
+
+    def test_show_correctness_never(self):
+        """
+        Test that correctness is hidden when show_correctness turned off.
+        """
+        problem = CapaFactory.create(show_correctness='never')
+        self.assertFalse(problem.correctness_available())
+
+    @ddt.data(
+        # Correctness not visible if due date in the future, even after using up all attempts
+        ({
+            'show_correctness': 'past_due',
+            'max_attempts': '1',
+            'attempts': '1',
+            'due': 'tomorrow_str',
+        }, False),
+        # Correctness visible if due date in the past
+        ({
+            'show_correctness': 'past_due',
+            'max_attempts': '1',
+            'attempts': '0',
+            'due': 'yesterday_str',
+        }, True),
+        # Correctness not visible if due date in the future
+        ({
+            'show_correctness': 'past_due',
+            'max_attempts': '1',
+            'attempts': '0',
+            'due': 'tomorrow_str',
+        }, False),
+        # Correctness not visible because grace period hasn't expired,
+        # even after using up all attempts
+        ({
+            'show_correctness': 'past_due',
+            'max_attempts': '1',
+            'attempts': '1',
+            'due': 'yesterday_str',
+            'graceperiod': 'two_day_delta_str',
+        }, False),
+    )
+    @ddt.unpack
+    def test_show_correctness_past_due(self, problem_data, expected_result):
+        """
+        Test that with show_correctness="past_due", correctness will only be visible
+        after the problem is closed for everyone--e.g. after due date + grace period.
+        """
+        problem_data['due'] = getattr(self, problem_data['due'])
+        if 'graceperiod' in problem_data:
+            problem_data['graceperiod'] = getattr(self, problem_data['graceperiod'])
+        problem = CapaFactory.create(**problem_data)
+        self.assertEqual(problem.correctness_available(), expected_result)
 
     def test_closed(self):
 
@@ -694,7 +848,44 @@ class CapaModuleTest(unittest.TestCase):
                 result = module.submit_problem(get_request_dict)
 
             # Expect an AJAX alert message in 'success'
-            expected_msg = 'Error: test error'
+            expected_msg = 'test error'
+
+            self.assertEqual(expected_msg, result['success'])
+
+            # Expect that the number of attempts is NOT incremented
+            self.assertEqual(module.attempts, 1)
+
+    def test_submit_problem_error_with_codejail_exception(self):
+
+        # Try each exception that capa_module should handle
+        exception_classes = [StudentInputError,
+                             LoncapaProblemError,
+                             ResponseError]
+        for exception_class in exception_classes:
+
+            # Create the module
+            module = CapaFactory.create(attempts=1)
+
+            # Ensure that the user is NOT staff
+            module.system.user_is_staff = False
+
+            # Simulate a codejail exception "Exception: Couldn't execute jailed code"
+            with patch('capa.capa_problem.LoncapaProblem.grade_answers') as mock_grade:
+                try:
+                    raise ResponseError(
+                        'Couldn\'t execute jailed code: stdout: \'\', '
+                        'stderr: \'Traceback (most recent call last):\\n'
+                        '  File "jailed_code", line 15, in <module>\\n'
+                        '    exec code in g_dict\\n  File "<string>", line 67, in <module>\\n'
+                        '  File "<string>", line 65, in check_func\\n'
+                        'Exception: Couldn\'t execute jailed code\\n\' with status code: 1',)
+                except ResponseError as err:
+                    mock_grade.side_effect = exception_class(six.text_type(err))
+                get_request_dict = {CapaFactory.input_key(): '3.14'}
+                result = module.submit_problem(get_request_dict)
+
+            # Expect an AJAX alert message in 'success' without the text of the stack trace
+            expected_msg = 'Couldn\'t execute jailed code'
             self.assertEqual(expected_msg, result['success'])
 
             # Expect that the number of attempts is NOT incremented
@@ -762,7 +953,8 @@ class CapaModuleTest(unittest.TestCase):
                 result = module.submit_problem(get_request_dict)
 
             # Expect an AJAX alert message in 'success'
-            expected_msg = u'Error: ȧƈƈḗƞŧḗḓ ŧḗẋŧ ƒǿř ŧḗşŧīƞɠ'
+            expected_msg = u'ȧƈƈḗƞŧḗḓ ŧḗẋŧ ƒǿř ŧḗşŧīƞɠ'
+
             self.assertEqual(expected_msg, result['success'])
 
             # Expect that the number of attempts is NOT incremented
@@ -796,6 +988,36 @@ class CapaModuleTest(unittest.TestCase):
 
             # Expect that the number of attempts is NOT incremented
             self.assertEqual(module.attempts, 1)
+
+    @ddt.data(
+        ("never", True, None, 'submitted'),
+        ("never", False, None, 'submitted'),
+        ("past_due", True, None, 'submitted'),
+        ("past_due", False, None, 'submitted'),
+        ("always", True, 1, 'correct'),
+        ("always", False, 0, 'incorrect'),
+    )
+    @ddt.unpack
+    def test_handle_ajax_show_correctness(self, show_correctness, is_correct, expected_score, expected_success):
+        module = CapaFactory.create(show_correctness=show_correctness,
+                                    due=self.tomorrow_str,
+                                    correct=is_correct)
+
+        # Simulate marking the input correct/incorrect
+        with patch('capa.correctmap.CorrectMap.is_correct') as mock_is_correct:
+            mock_is_correct.return_value = is_correct
+
+            # Check the problem
+            get_request_dict = {CapaFactory.input_key(): '0'}
+            json_result = module.handle_ajax('problem_check', get_request_dict)
+            result = json.loads(json_result)
+
+        # Expect that the AJAX result withholds correctness and score
+        self.assertEqual(result['current_score'], expected_score)
+        self.assertEqual(result['success'], expected_success)
+
+        # Expect that the number of attempts is incremented by 1
+        self.assertEqual(module.attempts, 1)
 
     def test_reset_problem(self):
         module = CapaFactory.create(done=True)
@@ -848,20 +1070,62 @@ class CapaModuleTest(unittest.TestCase):
 
     def test_rescore_problem_correct(self):
 
-        module = CapaFactory.create(attempts=1, done=True)
+        module = CapaFactory.create(attempts=0, done=True)
 
         # Simulate that all answers are marked correct, no matter
         # what the input is, by patching LoncapaResponse.evaluate_answers()
         with patch('capa.responsetypes.LoncapaResponse.evaluate_answers') as mock_evaluate_answers:
-            mock_evaluate_answers.return_value = CorrectMap(CapaFactory.answer_key(), 'correct')
-            result = module.rescore_problem(only_if_higher=False)
+            mock_evaluate_answers.return_value = CorrectMap(
+                answer_id=CapaFactory.answer_key(),
+                correctness='correct',
+                npoints=1,
+            )
+            with patch('capa.correctmap.CorrectMap.is_correct') as mock_is_correct:
+                mock_is_correct.return_value = True
+
+                # Check the problem
+                get_request_dict = {CapaFactory.input_key(): '1'}
+                module.submit_problem(get_request_dict)
+            module.rescore(only_if_higher=False)
 
         # Expect that the problem is marked correct
-        self.assertEqual(result['success'], 'correct')
+        self.assertEqual(module.is_correct(), True)
 
-        # Expect that we get no HTML
-        self.assertNotIn('contents', result)
+        # Expect that the number of attempts is not incremented
+        self.assertEqual(module.attempts, 1)
 
+    def test_rescore_problem_additional_correct(self):
+        # make sure it also works when new correct answer has been added
+        module = CapaFactory.create(attempts=0)
+        answer_id = CapaFactory.answer_key()
+
+        # Check the problem
+        get_request_dict = {CapaFactory.input_key(): '1'}
+        result = module.submit_problem(get_request_dict)
+
+        # Expect that the problem is marked incorrect and user didn't earn score
+        self.assertEqual(result['success'], 'incorrect')
+        self.assertEqual(module.get_score(), (0, 1))
+        self.assertEqual(module.correct_map[answer_id]['correctness'], 'incorrect')
+        # Expect that the number of attempts is incremented
+        self.assertEqual(module.attempts, 1)
+
+        # Simulate that after making an incorrect answer to the correct answer
+        # the new calculated score is (1,1)
+        # by patching CorrectMap.is_correct() and NumericalResponse.get_staff_ans()
+        # In case of rescore with only_if_higher=True it should update score of module
+        # if previous score was lower
+
+        with patch('capa.correctmap.CorrectMap.is_correct') as mock_is_correct:
+            mock_is_correct.return_value = True
+            module.set_score(module.score_from_lcp())
+            with patch('capa.responsetypes.NumericalResponse.get_staff_ans') as get_staff_ans:
+                get_staff_ans.return_value = 1 + 0j
+                module.rescore(only_if_higher=True)
+
+        # Expect that the problem is marked correct and user earned the score
+        self.assertEqual(module.get_score(), (1, 1))
+        self.assertEqual(module.correct_map[answer_id]['correctness'], 'correct')
         # Expect that the number of attempts is not incremented
         self.assertEqual(module.attempts, 1)
 
@@ -874,10 +1138,10 @@ class CapaModuleTest(unittest.TestCase):
         # what the input is, by patching LoncapaResponse.evaluate_answers()
         with patch('capa.responsetypes.LoncapaResponse.evaluate_answers') as mock_evaluate_answers:
             mock_evaluate_answers.return_value = CorrectMap(CapaFactory.answer_key(), 'incorrect')
-            result = module.rescore_problem(only_if_higher=False)
+            module.rescore(only_if_higher=False)
 
         # Expect that the problem is marked incorrect
-        self.assertEqual(result['success'], 'incorrect')
+        self.assertEqual(module.is_correct(), False)
 
         # Expect that the number of attempts is not incremented
         self.assertEqual(module.attempts, 0)
@@ -888,7 +1152,7 @@ class CapaModuleTest(unittest.TestCase):
 
         # Try to rescore the problem, and get exception
         with self.assertRaises(xmodule.exceptions.NotFoundError):
-            module.rescore_problem(only_if_higher=False)
+            module.rescore(only_if_higher=False)
 
     def test_rescore_problem_not_supported(self):
         module = CapaFactory.create(done=True)
@@ -897,7 +1161,7 @@ class CapaModuleTest(unittest.TestCase):
         with patch('capa.capa_problem.LoncapaProblem.supports_rescoring') as mock_supports_rescoring:
             mock_supports_rescoring.return_value = False
             with self.assertRaises(NotImplementedError):
-                module.rescore_problem(only_if_higher=False)
+                module.rescore(only_if_higher=False)
 
     def _rescore_problem_error_helper(self, exception_class):
         """Helper to allow testing all errors that rescoring might return."""
@@ -905,13 +1169,10 @@ class CapaModuleTest(unittest.TestCase):
         module = CapaFactory.create(attempts=1, done=True)
 
         # Simulate answering a problem that raises the exception
-        with patch('capa.capa_problem.LoncapaProblem.rescore_existing_answers') as mock_rescore:
+        with patch('capa.capa_problem.LoncapaProblem.get_grade_from_current_answers') as mock_rescore:
             mock_rescore.side_effect = exception_class(u'test error \u03a9')
-            result = module.rescore_problem(only_if_higher=False)
-
-        # Expect an AJAX alert message in 'success'
-        expected_msg = u'Error: test error \u03a9'
-        self.assertEqual(result['success'], expected_msg)
+            with self.assertRaises(exception_class):
+                module.rescore(only_if_higher=False)
 
         # Expect that the number of attempts is NOT incremented
         self.assertEqual(module.attempts, 1)
@@ -1277,10 +1538,19 @@ class CapaModuleTest(unittest.TestCase):
         self.assertFalse(result['should_enable_next_hint'])
 
     def test_demand_hint_logging(self):
+        def mock_location_text(self):
+            """
+            Mock implementation of __unicode__ or __str__ for the module's location.
+            """
+            return u'i4x://edX/capa_test/problem/meh'
+
         module = CapaFactory.create(xml=self.demand_xml)
         # Re-mock the module_id to a fixed string, so we can check the logging
         module.location = Mock(module.location)
-        module.location.to_deprecated_string.return_value = 'i4x://edX/capa_test/problem/meh'
+        if six.PY2:
+            module.location.__unicode__ = mock_location_text
+        else:
+            module.location.__str__ = mock_location_text
 
         with patch.object(module.runtime, 'publish') as mock_track_function:
             module.get_problem_html()
@@ -1567,6 +1837,27 @@ class CapaModuleTest(unittest.TestCase):
         other_module.get_progress()
         mock_progress.assert_called_with(1, 1)
 
+    @ddt.data(
+        ("never", True, None),
+        ("never", False, None),
+        ("past_due", True, None),
+        ("past_due", False, None),
+        ("always", True, 1),
+        ("always", False, 0),
+    )
+    @ddt.unpack
+    def test_get_display_progress_show_correctness(self, show_correctness, is_correct, expected_score):
+        """
+        Check that score and total are calculated correctly for the progress fraction.
+        """
+        module = CapaFactory.create(correct=is_correct,
+                                    show_correctness=show_correctness,
+                                    due=self.tomorrow_str)
+        module.weight = 1
+        score, total = module.get_display_progress()
+        self.assertEqual(score, expected_score)
+        self.assertEqual(total, 1)
+
     def test_get_html(self):
         """
         Check that get_html() calls get_progress() with no arguments.
@@ -1713,6 +2004,7 @@ class CapaModuleTest(unittest.TestCase):
 
 @ddt.ddt
 class CapaDescriptorTest(unittest.TestCase):
+    shard = 1
 
     sample_checkbox_problem_xml = textwrap.dedent("""
         <problem>
@@ -2192,7 +2484,7 @@ class CapaDescriptorTest(unittest.TestCase):
     def test_indexing_checkboxes(self):
         name = "Checkboxes"
         descriptor = self._create_descriptor(self.sample_checkbox_problem_xml, name=name)
-        capa_content = textwrap.dedent("""
+        capa_content = textwrap.dedent(u"""
             Title
             Description
             Example
@@ -2206,7 +2498,8 @@ class CapaDescriptorTest(unittest.TestCase):
         """)
         self.assertEquals(descriptor.problem_types, {"choiceresponse"})
         self.assertEquals(
-            descriptor.index_dictionary(), {
+            descriptor.index_dictionary(),
+            {
                 'content_type': CapaDescriptor.INDEX_CONTENT_TYPE,
                 'problem_types': ["choiceresponse"],
                 'content': {
@@ -2313,6 +2606,22 @@ class CapaDescriptorTest(unittest.TestCase):
                     'capa_content': capa_content.replace("\n", " ")
                 }
             }
+        )
+
+    def test_indexing_non_latin_problem(self):
+        sample_text_input_problem_xml = textwrap.dedent("""
+            <problem>
+                <script type="text/python">FX1_VAL='Καλημέρα'</script>
+                <p>Δοκιμή με μεταβλητές με Ελληνικούς χαρακτήρες μέσα σε python: $FX1_VAL</p>
+            </problem>
+        """)
+        name = "Non latin Input"
+        descriptor = self._create_descriptor(sample_text_input_problem_xml, name=name)
+        capa_content = " FX1_VAL='Καλημέρα' Δοκιμή με μεταβλητές με Ελληνικούς χαρακτήρες μέσα σε python: $FX1_VAL "
+
+        descriptor_dict = descriptor.index_dictionary()
+        self.assertEquals(
+            descriptor_dict['content']['capa_content'], smart_text(capa_content)
         )
 
     def test_indexing_checkboxes_with_hints_and_feedback(self):
@@ -2491,6 +2800,8 @@ class CapaDescriptorTest(unittest.TestCase):
 
 
 class ComplexEncoderTest(unittest.TestCase):
+    shard = 1
+
     def test_default(self):
         """
         Check that complex numbers can be encoded into JSON.
@@ -2505,6 +2816,7 @@ class TestProblemCheckTracking(unittest.TestCase):
     """
     Ensure correct tracking information is included in events emitted during problem checks.
     """
+    shard = 1
 
     def setUp(self):
         super(TestProblemCheckTracking, self).setUp()
@@ -2822,3 +3134,79 @@ class TestProblemCheckTracking(unittest.TestCase):
         problem.runtime.replace_jump_to_id_urls = Mock()
         problem.get_answer(data)
         self.assertTrue(problem.runtime.replace_jump_to_id_urls.called)
+
+
+class TestCapaDescriptorReportGeneration(unittest.TestCase):
+    """
+    Ensure that Capa report generation works correctly
+    """
+
+    def setUp(self):
+        self.find_question_label_patcher = patch(
+            'capa.capa_problem.LoncapaProblem.find_question_label',
+            lambda self, answer_id: answer_id
+        )
+        self.find_answer_text_patcher = patch(
+            'capa.capa_problem.LoncapaProblem.find_answer_text',
+            lambda self, answer_id, current_answer: current_answer
+        )
+        self.find_question_label_patcher.start()
+        self.find_answer_text_patcher.start()
+        self.addCleanup(self.find_question_label_patcher.stop)
+        self.addCleanup(self.find_answer_text_patcher.stop)
+
+    def _mock_user_state_generator(self, user_count=1, response_count=10):
+        for uid in range(user_count):
+            yield self._user_state(username='user{}'.format(uid), response_count=response_count)
+
+    def _user_state(self, username='testuser', response_count=10, suffix=''):
+        return XBlockUserState(
+            username=username,
+            state={
+                'student_answers': {
+                    '{}_answerid_{}{}'.format(username, aid, suffix): '{}_answer_{}'.format(username, aid)
+                    for aid in range(response_count)
+                },
+                'seed': 1,
+                'correct_map': {},
+            },
+            block_key=None,
+            updated=None,
+            scope=None,
+        )
+
+    def _get_descriptor(self):
+        scope_ids = Mock(block_type='problem')
+        descriptor = CapaDescriptor(get_test_system(), scope_ids=scope_ids)
+        descriptor.runtime = Mock()
+        descriptor.data = '<problem/>'
+        return descriptor
+
+    def test_generate_report_data_not_implemented(self):
+        scope_ids = Mock(block_type='noproblem')
+        descriptor = CapaDescriptor(get_test_system(), scope_ids=scope_ids)
+        with self.assertRaises(NotImplementedError):
+            next(descriptor.generate_report_data(iter([])))
+
+    def test_generate_report_data_limit_responses(self):
+        descriptor = self._get_descriptor()
+        report_data = list(descriptor.generate_report_data(self._mock_user_state_generator(), 2))
+        self.assertEquals(2, len(report_data))
+
+    def test_generate_report_data_dont_limit_responses(self):
+        descriptor = self._get_descriptor()
+        user_count = 5
+        response_count = 10
+        report_data = list(descriptor.generate_report_data(
+            self._mock_user_state_generator(
+                user_count=user_count,
+                response_count=response_count,
+            )
+        ))
+        self.assertEquals(user_count * response_count, len(report_data))
+
+    def test_generate_report_data_skip_dynamath(self):
+        descriptor = self._get_descriptor()
+        iterator = iter([self._user_state(suffix='_dynamath')])
+        report_data = list(descriptor.generate_report_data(iterator))
+        self.assertEquals(0, len(report_data))

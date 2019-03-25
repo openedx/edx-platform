@@ -1,34 +1,35 @@
 # -*- coding: utf-8 -*-
-from datetime import timedelta, datetime
 import json
+from datetime import datetime, timedelta
 
 import boto
 import ddt
-from django.conf import settings
-from django.db import IntegrityError
-from freezegun import freeze_time
 import mock
-from mock import patch
-from nose.tools import assert_is_none, assert_equals, assert_raises, assert_true, assert_false  # pylint: disable=no-name-in-module
 import pytz
 import requests.exceptions
+from django.conf import settings
+from django.test import TestCase
+from freezegun import freeze_time
+from mock import patch
+from nose.tools import (  # pylint: disable=no-name-in-module
+    assert_equals,
+    assert_raises,
+    assert_true
+)
+from opaque_keys.edx.keys import CourseKey
 from testfixtures import LogCapture
 
 from common.test.utils import MockS3Mixin
-from student.tests.factories import UserFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
-
-from opaque_keys.edx.keys import CourseKey
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-
 from lms.djangoapps.verify_student.models import (
     SoftwareSecurePhotoVerification,
-    VerificationException, VerificationCheckpoint,
-    VerificationStatus, SkippedReverification,
-    VerificationDeadline
+    SSOVerification,
+    ManualVerification,
+    VerificationDeadline,
+    VerificationException
 )
-
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
+from student.tests.factories import UserFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 FAKE_SETTINGS = {
     "SOFTWARE_SECURE": {
@@ -97,11 +98,39 @@ def mock_software_secure_post_unavailable(url, headers=None, data=None, **kwargs
     raise requests.exceptions.ConnectionError
 
 
+class TestVerification(TestCase):
+    """
+    Common tests across all types of Verications (e.g., SoftwareSecurePhotoVerication, SSOVerification)
+    """
+    def verification_active_at_datetime(self, attempt):
+        """
+        Tests to ensure the Verification is active or inactive at the appropriate datetimes.
+        """
+        # Not active before the created date
+        before = attempt.created_at - timedelta(seconds=1)
+        self.assertFalse(attempt.active_at_datetime(before))
+
+        # Active immediately after created date
+        after_created = attempt.created_at + timedelta(seconds=1)
+        self.assertTrue(attempt.active_at_datetime(after_created))
+
+        # Active immediately before expiration date
+        expiration = attempt.created_at + timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
+        before_expiration = expiration - timedelta(seconds=1)
+        self.assertTrue(attempt.active_at_datetime(before_expiration))
+
+        # Not active after the expiration date
+        attempt.created_at = attempt.created_at - timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
+        attempt.save()
+        self.assertFalse(attempt.active_at_datetime(datetime.now(pytz.UTC) + timedelta(days=1)))
+
+
 # Lots of patching to stub in our own settings, and HTTP posting
 @patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
 @patch('lms.djangoapps.verify_student.models.requests.post', new=mock_software_secure_post)
 @ddt.ddt
-class TestPhotoVerification(MockS3Mixin, ModuleStoreTestCase):
+class TestPhotoVerification(TestVerification, MockS3Mixin, ModuleStoreTestCase):
+    shard = 4
 
     def setUp(self):
         super(TestPhotoVerification, self).setUp()
@@ -232,247 +261,29 @@ class TestPhotoVerification(MockS3Mixin, ModuleStoreTestCase):
 
         self.assertEqual(attempt.photo_id_key, "fake-photo-id-key")
 
-    def test_active_for_user(self):
-        """
-        Make sure we can retrive a user's active (in progress) verification
-        attempt.
-        """
-        user = UserFactory.create()
-
-        # This user has no active at the moment...
-        assert_is_none(SoftwareSecurePhotoVerification.active_for_user(user))
-
-        # Create an attempt and mark it ready...
-        attempt = SoftwareSecurePhotoVerification(user=user)
-        attempt.mark_ready()
-        assert_equals(attempt, SoftwareSecurePhotoVerification.active_for_user(user))
-
-        # A new user won't see this...
-        user2 = UserFactory.create()
-        user2.save()
-        assert_is_none(SoftwareSecurePhotoVerification.active_for_user(user2))
-
-        # If it's got a different status, it doesn't count
-        for status in ["submitted", "must_retry", "approved", "denied"]:
-            attempt.status = status
-            attempt.save()
-            assert_is_none(SoftwareSecurePhotoVerification.active_for_user(user))
-
-        # But if we create yet another one and mark it ready, it passes again.
-        attempt_2 = SoftwareSecurePhotoVerification(user=user)
-        attempt_2.mark_ready()
-        assert_equals(attempt_2, SoftwareSecurePhotoVerification.active_for_user(user))
-
-        # And if we add yet another one with a later created time, we get that
-        # one instead. We always want the most recent attempt marked ready()
-        attempt_3 = SoftwareSecurePhotoVerification(
-            user=user,
-            created_at=attempt_2.created_at + timedelta(days=1)
-        )
-        attempt_3.save()
-
-        # We haven't marked attempt_3 ready yet, so attempt_2 still wins
-        assert_equals(attempt_2, SoftwareSecurePhotoVerification.active_for_user(user))
-
-        # Now we mark attempt_3 ready and expect it to come back
-        attempt_3.mark_ready()
-        assert_equals(attempt_3, SoftwareSecurePhotoVerification.active_for_user(user))
-
-    def test_user_is_verified(self):
-        """
-        Test to make sure we correctly answer whether a user has been verified.
-        """
-        user = UserFactory.create()
-        attempt = SoftwareSecurePhotoVerification(user=user)
-        attempt.save()
-
-        # If it's any of these, they're not verified...
-        for status in ["created", "ready", "denied", "submitted", "must_retry"]:
-            attempt.status = status
-            attempt.save()
-            assert_false(SoftwareSecurePhotoVerification.user_is_verified(user), status)
-
-        attempt.status = "approved"
-        attempt.save()
-        assert_true(SoftwareSecurePhotoVerification.user_is_verified(user), attempt.status)
-
-    def test_user_has_valid_or_pending(self):
-        """
-        Determine whether we have to prompt this user to verify, or if they've
-        already at least initiated a verification submission.
-        """
-        user = UserFactory.create()
-        attempt = SoftwareSecurePhotoVerification(user=user)
-
-        # If it's any of these statuses, they don't have anything outstanding
-        for status in ["created", "ready", "denied"]:
-            attempt.status = status
-            attempt.save()
-            assert_false(SoftwareSecurePhotoVerification.user_has_valid_or_pending(user), status)
-
-        # Any of these, and we are. Note the benefit of the doubt we're giving
-        # -- must_retry, and submitted both count until we hear otherwise
-        for status in ["submitted", "must_retry", "approved"]:
-            attempt.status = status
-            attempt.save()
-            assert_true(SoftwareSecurePhotoVerification.user_has_valid_or_pending(user), status)
-
-    def test_user_status(self):
-        # test for correct status when no error returned
-        user = UserFactory.create()
-        status = SoftwareSecurePhotoVerification.user_status(user)
-        self.assertEquals(status, ('none', ''))
-
-        # test for when one has been created
-        attempt = SoftwareSecurePhotoVerification(user=user)
-        attempt.status = 'approved'
-        attempt.save()
-
-        status = SoftwareSecurePhotoVerification.user_status(user)
-        self.assertEquals(status, ('approved', ''))
-
-        # create another one for the same user, make sure the right one is
-        # returned
-        attempt2 = SoftwareSecurePhotoVerification(user=user)
-        attempt2.status = 'denied'
-        attempt2.error_msg = '[{"photoIdReasons": ["Not provided"]}]'
-        attempt2.save()
-
-        status = SoftwareSecurePhotoVerification.user_status(user)
-        self.assertEquals(status, ('approved', ''))
-
-        # now delete the first one and verify that the denial is being handled
-        # properly
-        attempt.delete()
-        status = SoftwareSecurePhotoVerification.user_status(user)
-        self.assertEquals(status, ('must_reverify', "No photo ID was provided."))
-
+    # pylint: disable=line-too-long
     def test_parse_error_msg_success(self):
         user = UserFactory.create()
         attempt = SoftwareSecurePhotoVerification(user=user)
         attempt.status = 'denied'
-        attempt.error_msg = '[{"photoIdReasons": ["Not provided"]}]'
+        attempt.error_msg = '[{"userPhotoReasons": ["Face out of view"]}, {"photoIdReasons": ["Photo hidden/No photo", "ID name not provided"]}]'
         parsed_error_msg = attempt.parsed_error_msg()
-        self.assertEquals("No photo ID was provided.", parsed_error_msg)
+        self.assertEquals(parsed_error_msg, ['id_image_missing_name', 'user_image_not_clear', 'id_image_not_clear'])
 
-    def test_parse_error_msg_failure(self):
+    @ddt.data(
+        'Not Provided',
+        '{"IdReasons": ["Not provided"]}',
+        u'[{"ïḋṚëäṡöṅṡ": ["Ⓝⓞⓣ ⓟⓡⓞⓥⓘⓓⓔⓓ "]}]',
+    )
+    def test_parse_error_msg_failure(self, msg):
         user = UserFactory.create()
-        attempt = SoftwareSecurePhotoVerification(user=user)
-        attempt.status = 'denied'
-        # when we can't parse into json
-        bad_messages = {
-            'Not Provided',
-            '[{"IdReasons": ["Not provided"]}]',
-            '{"IdReasons": ["Not provided"]}',
-            u'[{"ïḋṚëäṡöṅṡ": ["Ⓝⓞⓣ ⓟⓡⓞⓥⓘⓓⓔⓓ "]}]',
-        }
-        for msg in bad_messages:
-            attempt.error_msg = msg
-            parsed_error_msg = attempt.parsed_error_msg()
-            self.assertEquals(parsed_error_msg, "There was an error verifying your ID photos.")
+        attempt = SoftwareSecurePhotoVerification.objects.create(user=user, status='denied', error_msg=msg)
+        self.assertEqual(attempt.parsed_error_msg(), [])
 
     def test_active_at_datetime(self):
         user = UserFactory.create()
         attempt = SoftwareSecurePhotoVerification.objects.create(user=user)
-
-        # Not active before the created date
-        before = attempt.created_at - timedelta(seconds=1)
-        self.assertFalse(attempt.active_at_datetime(before))
-
-        # Active immediately after created date
-        after_created = attempt.created_at + timedelta(seconds=1)
-        self.assertTrue(attempt.active_at_datetime(after_created))
-
-        # Active immediately before expiration date
-        expiration = attempt.created_at + timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
-        before_expiration = expiration - timedelta(seconds=1)
-        self.assertTrue(attempt.active_at_datetime(before_expiration))
-
-        # Not active after the expiration date
-        attempt.created_at = attempt.created_at - timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
-        attempt.save()
-        self.assertFalse(attempt.active_at_datetime(datetime.now(pytz.UTC) + timedelta(days=1)))
-
-    def test_verification_for_datetime(self):
-        user = UserFactory.create()
-        now = datetime.now(pytz.UTC)
-
-        # No attempts in the query set, so should return None
-        query = SoftwareSecurePhotoVerification.objects.filter(user=user)
-        result = SoftwareSecurePhotoVerification.verification_for_datetime(now, query)
-        self.assertIs(result, None)
-
-        # Should also return None if no deadline specified
-        query = SoftwareSecurePhotoVerification.objects.filter(user=user)
-        result = SoftwareSecurePhotoVerification.verification_for_datetime(None, query)
-        self.assertIs(result, None)
-
-        # Make an attempt
-        attempt = SoftwareSecurePhotoVerification.objects.create(user=user)
-
-        # Before the created date, should get no results
-        before = attempt.created_at - timedelta(seconds=1)
-        query = SoftwareSecurePhotoVerification.objects.filter(user=user)
-        result = SoftwareSecurePhotoVerification.verification_for_datetime(before, query)
-        self.assertIs(result, None)
-
-        # Immediately after the created date, should get the attempt
-        after_created = attempt.created_at + timedelta(seconds=1)
-        query = SoftwareSecurePhotoVerification.objects.filter(user=user)
-        result = SoftwareSecurePhotoVerification.verification_for_datetime(after_created, query)
-        self.assertEqual(result, attempt)
-
-        # If no deadline specified, should return first available
-        query = SoftwareSecurePhotoVerification.objects.filter(user=user)
-        result = SoftwareSecurePhotoVerification.verification_for_datetime(None, query)
-        self.assertEqual(result, attempt)
-
-        # Immediately before the expiration date, should get the attempt
-        expiration = attempt.created_at + timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
-        before_expiration = expiration - timedelta(seconds=1)
-        query = SoftwareSecurePhotoVerification.objects.filter(user=user)
-        result = SoftwareSecurePhotoVerification.verification_for_datetime(before_expiration, query)
-        self.assertEqual(result, attempt)
-
-        # Immediately after the expiration date, should not get the attempt
-        attempt.created_at = attempt.created_at - timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
-        attempt.save()
-        after = datetime.now(pytz.UTC) + timedelta(days=1)
-        query = SoftwareSecurePhotoVerification.objects.filter(user=user)
-        result = SoftwareSecurePhotoVerification.verification_for_datetime(after, query)
-        self.assertIs(result, None)
-
-        # Create a second attempt in the same window
-        second_attempt = SoftwareSecurePhotoVerification.objects.create(user=user)
-
-        # Now we should get the newer attempt
-        deadline = second_attempt.created_at + timedelta(days=1)
-        query = SoftwareSecurePhotoVerification.objects.filter(user=user)
-        result = SoftwareSecurePhotoVerification.verification_for_datetime(deadline, query)
-        self.assertEqual(result, second_attempt)
-
-    @ddt.unpack
-    @ddt.data(
-        {'enrollment_mode': 'honor', 'status': None, 'output': 'N/A'},
-        {'enrollment_mode': 'audit', 'status': None, 'output': 'N/A'},
-        {'enrollment_mode': 'verified', 'status': False, 'output': 'Not ID Verified'},
-        {'enrollment_mode': 'verified', 'status': True, 'output': 'ID Verified'},
-    )
-    def test_verification_status_for_user(self, enrollment_mode, status, output):
-        """
-        Verify verification_status_for_user returns correct status.
-        """
-        user = UserFactory.create()
-        course = CourseFactory.create()
-
-        with patch(
-            'lms.djangoapps.verify_student.models.SoftwareSecurePhotoVerification.user_is_verified'
-        ) as mock_verification:
-
-            mock_verification.return_value = status
-
-            status = SoftwareSecurePhotoVerification.verification_status_for_user(user, course.id, enrollment_mode)
-            self.assertEqual(status, output)
+        self.verification_active_at_datetime(attempt)
 
     def test_initial_verification_for_user(self):
         """Test that method 'get_initial_verification' of model
@@ -521,313 +332,77 @@ class TestPhotoVerification(MockS3Mixin, ModuleStoreTestCase):
             self.assertIsNotNone(fourth_result)
             self.assertEqual(fourth_result, first_result)
 
-
-@ddt.ddt
-class VerificationCheckpointTest(ModuleStoreTestCase):
-    """Tests for the VerificationCheckpoint model. """
-
-    def setUp(self):
-        super(VerificationCheckpointTest, self).setUp()
-        self.user = UserFactory.create()
-        self.course = CourseFactory.create()
-        self.checkpoint_midterm = u'i4x://{org}/{course}/edx-reverification-block/midterm_uuid'.format(
-            org=self.course.id.org, course=self.course.id.course
-        )
-        self.checkpoint_final = u'i4x://{org}/{course}/edx-reverification-block/final_uuid'.format(
-            org=self.course.id.org, course=self.course.id.course
-        )
-
-    @ddt.data('midterm', 'final')
-    def test_get_or_create_verification_checkpoint(self, checkpoint):
+    def test_retire_user(self):
         """
-        Test that a reverification checkpoint is created properly.
+        Retire user with record(s) in table
         """
-        checkpoint_location = u'i4x://{org}/{course}/edx-reverification-block/{checkpoint}'.format(
-            org=self.course.id.org, course=self.course.id.course, checkpoint=checkpoint
-        )
-        # create the 'VerificationCheckpoint' checkpoint
-        verification_checkpoint = VerificationCheckpoint.objects.create(
-            course_id=self.course.id,
-            checkpoint_location=checkpoint_location
-        )
-        self.assertEqual(
-            VerificationCheckpoint.get_or_create_verification_checkpoint(self.course.id, checkpoint_location),
-            verification_checkpoint
-        )
+        user = UserFactory.create()
+        user.profile.name = u"Enrique"
+        attempt = SoftwareSecurePhotoVerification(user=user)
 
-    def test_get_or_create_verification_checkpoint_for_not_existing_values(self):
-        # Retrieving a checkpoint that doesn't yet exist will create it
-        location = u'i4x://edX/DemoX/edx-reverification-block/invalid_location'
-        checkpoint = VerificationCheckpoint.get_or_create_verification_checkpoint(self.course.id, location)
+        # Populate Record
+        attempt.mark_ready()
+        attempt.status = "submitted"
+        attempt.photo_id_image_url = "https://example.com/test/image/img.jpg"
+        attempt.face_image_url = "https://example.com/test/face/img.jpg"
+        attempt.photo_id_key = 'there_was_an_attempt'
+        attempt.approve()
 
-        self.assertIsNot(checkpoint, None)
-        self.assertEqual(checkpoint.course_id, self.course.id)
-        self.assertEqual(checkpoint.checkpoint_location, location)
+        # Validate data before retirement
+        assert_equals(attempt.name, user.profile.name)
+        assert_equals(attempt.photo_id_image_url, 'https://example.com/test/image/img.jpg')
+        assert_equals(attempt.face_image_url, 'https://example.com/test/face/img.jpg')
+        assert_equals(attempt.photo_id_key, 'there_was_an_attempt')
 
-    def test_get_or_create_integrity_error(self):
-        # Create the checkpoint
-        VerificationCheckpoint.objects.create(
-            course_id=self.course.id,
-            checkpoint_location=self.checkpoint_midterm,
-        )
+        # Retire User
+        attempt_again = SoftwareSecurePhotoVerification(user=user)
+        self.assertTrue(attempt_again.retire_user(user_id=user.id))
 
-        # Simulate that the get-or-create operation raises an IntegrityError.
-        # This can happen when two processes both try to get-or-create at the same time
-        # when the database is set to REPEATABLE READ.
-        # To avoid IntegrityError situations when calling this method, set the view to
-        # use a READ COMMITTED transaction instead.
-        with patch.object(VerificationCheckpoint.objects, "get_or_create") as mock_get_or_create:
-            mock_get_or_create.side_effect = IntegrityError
-            with self.assertRaises(IntegrityError):
-                _ = VerificationCheckpoint.get_or_create_verification_checkpoint(
-                    self.course.id,
-                    self.checkpoint_midterm
-                )
+        # Validate data after retirement
+        self.assertEqual(attempt_again.name, '')
+        self.assertEqual(attempt_again.face_image_url, '')
+        self.assertEqual(attempt_again.photo_id_image_url, '')
+        self.assertEqual(attempt_again.photo_id_key, '')
 
-    def test_unique_together_constraint(self):
+    def test_retire_nonuser(self):
         """
-        Test the unique together constraint.
+        Attempt to Retire User with no records in table
         """
-        # create the VerificationCheckpoint checkpoint
-        VerificationCheckpoint.objects.create(course_id=self.course.id, checkpoint_location=self.checkpoint_midterm)
+        user = UserFactory.create()
+        attempt = SoftwareSecurePhotoVerification(user=user)
 
-        # test creating the VerificationCheckpoint checkpoint with same course
-        # id and checkpoint name
-        with self.assertRaises(IntegrityError):
-            VerificationCheckpoint.objects.create(course_id=self.course.id, checkpoint_location=self.checkpoint_midterm)
+        # User with no records in table
+        self.assertFalse(attempt.retire_user(user_id=user.id))
 
-    def test_add_verification_attempt_software_secure(self):
-        """
-        Test adding Software Secure photo verification attempts for the
-        reverification checkpoints.
-        """
-        # adding two check points.
-        first_checkpoint = VerificationCheckpoint.objects.create(
-            course_id=self.course.id, checkpoint_location=self.checkpoint_midterm
-        )
-        second_checkpoint = VerificationCheckpoint.objects.create(
-            course_id=self.course.id, checkpoint_location=self.checkpoint_final
-        )
-
-        # make an attempt for the 'first_checkpoint'
-        first_checkpoint.add_verification_attempt(SoftwareSecurePhotoVerification.objects.create(user=self.user))
-        self.assertEqual(first_checkpoint.photo_verification.count(), 1)
-
-        # make another attempt for the 'first_checkpoint'
-        first_checkpoint.add_verification_attempt(SoftwareSecurePhotoVerification.objects.create(user=self.user))
-        self.assertEqual(first_checkpoint.photo_verification.count(), 2)
-
-        # make new attempt for the 'second_checkpoint'
-        attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
-        second_checkpoint.add_verification_attempt(attempt)
-        self.assertEqual(second_checkpoint.photo_verification.count(), 1)
-
-        # remove the attempt from 'second_checkpoint'
-        second_checkpoint.photo_verification.remove(attempt)
-        self.assertEqual(second_checkpoint.photo_verification.count(), 0)
+        # No user
+        self.assertFalse(attempt.retire_user(user_id=47))
 
 
-@ddt.ddt
-class VerificationStatusTest(ModuleStoreTestCase):
-    """ Tests for the VerificationStatus model. """
-
-    def setUp(self):
-        super(VerificationStatusTest, self).setUp()
-        self.user = UserFactory.create()
-        self.course = CourseFactory.create()
-
-        self.first_checkpoint_location = u'i4x://{org}/{course}/edx-reverification-block/first_checkpoint_uuid'.format(
-            org=self.course.id.org, course=self.course.id.course
-        )
-        self.first_checkpoint = VerificationCheckpoint.objects.create(
-            course_id=self.course.id,
-            checkpoint_location=self.first_checkpoint_location
-        )
-
-        self.second_checkpoint_location = u'i4x://{org}/{course}/edx-reverification-block/second_checkpoint_uuid'.\
-            format(org=self.course.id.org, course=self.course.id.course)
-        self.second_checkpoint = VerificationCheckpoint.objects.create(
-            course_id=self.course.id,
-            checkpoint_location=self.second_checkpoint_location
-        )
-
-    @ddt.data('submitted', "approved", "denied", "error")
-    def test_add_verification_status(self, status):
-        """ Adding verification status using the class method. """
-
-        # adding verification status
-        VerificationStatus.add_verification_status(
-            checkpoint=self.first_checkpoint,
-            user=self.user,
-            status=status
-        )
-
-        # test the status from database
-        result = VerificationStatus.objects.filter(checkpoint=self.first_checkpoint)[0]
-        self.assertEqual(result.status, status)
-        self.assertEqual(result.user, self.user)
-
-    @ddt.data("approved", "denied", "error")
-    def test_add_status_from_checkpoints(self, status):
-        """Test verification status for reverification checkpoints after
-        submitting software secure photo verification.
-        """
-
-        # add initial verification status for checkpoints
-        initial_status = "submitted"
-        VerificationStatus.add_verification_status(
-            checkpoint=self.first_checkpoint,
-            user=self.user,
-            status=initial_status
-        )
-        VerificationStatus.add_verification_status(
-            checkpoint=self.second_checkpoint,
-            user=self.user,
-            status=initial_status
-        )
-
-        # now add verification status for multiple checkpoint points
-        VerificationStatus.add_status_from_checkpoints(
-            checkpoints=[self.first_checkpoint, self.second_checkpoint], user=self.user, status=status
-        )
-
-        # test that verification status entries with new status have been added
-        # for both checkpoints
-        result = VerificationStatus.objects.filter(user=self.user, checkpoint=self.first_checkpoint)
-        self.assertEqual(len(result), len(self.first_checkpoint.checkpoint_status.all()))
-        self.assertEqual(
-            list(result.values_list('checkpoint__checkpoint_location', flat=True)),
-            list(self.first_checkpoint.checkpoint_status.values_list('checkpoint__checkpoint_location', flat=True))
-        )
-
-        result = VerificationStatus.objects.filter(user=self.user, checkpoint=self.second_checkpoint)
-        self.assertEqual(len(result), len(self.second_checkpoint.checkpoint_status.all()))
-        self.assertEqual(
-            list(result.values_list('checkpoint__checkpoint_location', flat=True)),
-            list(self.second_checkpoint.checkpoint_status.values_list('checkpoint__checkpoint_location', flat=True))
-        )
-
-    def test_get_location_id(self):
-        """
-        Getting location id for a specific checkpoint.
-        """
-
-        # creating software secure attempt against checkpoint
-        self.first_checkpoint.add_verification_attempt(SoftwareSecurePhotoVerification.objects.create(user=self.user))
-
-        # add initial verification status for checkpoint
-        VerificationStatus.add_verification_status(
-            checkpoint=self.first_checkpoint,
-            user=self.user,
-            status='submitted',
-        )
-        attempt = SoftwareSecurePhotoVerification.objects.filter(user=self.user)
-
-        self.assertIsNotNone(VerificationStatus.get_location_id(attempt))
-        self.assertEqual(VerificationStatus.get_location_id(None), '')
-
-    def test_get_user_attempts(self):
-        """
-        Test adding verification status.
-        """
-        VerificationStatus.add_verification_status(
-            checkpoint=self.first_checkpoint,
-            user=self.user,
-            status='submitted'
-        )
-
-        actual_attempts = VerificationStatus.get_user_attempts(
-            self.user.id,
-            self.course.id,
-            self.first_checkpoint_location
-        )
-        self.assertEqual(actual_attempts, 1)
-
-
-class SkippedReverificationTest(ModuleStoreTestCase):
+class SSOVerificationTest(TestVerification):
     """
-    Tests for the SkippedReverification model.
+    Tests for the SSOVerification model
     """
+    def test_active_at_datetime(self):
+        user = UserFactory.create()
+        attempt = SSOVerification.objects.create(user=user)
+        self.verification_active_at_datetime(attempt)
 
-    def setUp(self):
-        super(SkippedReverificationTest, self).setUp()
-        self.user = UserFactory.create()
-        self.course = CourseFactory.create()
-        dummy_checkpoint_location = u'i4x://edX/DemoX/edx-reverification-block/midterm_uuid'
-        self.checkpoint = VerificationCheckpoint.objects.create(
-            course_id=self.course.id,
-            checkpoint_location=dummy_checkpoint_location
-        )
 
-    def test_add_skipped_attempts(self):
-        """
-        Test 'add_skipped_reverification_attempt' method.
-        """
-
-        # add verification status
-        SkippedReverification.add_skipped_reverification_attempt(
-            checkpoint=self.checkpoint, user_id=self.user.id, course_id=unicode(self.course.id)
-        )
-
-        # test the status of skipped reverification from database
-        result = SkippedReverification.objects.filter(course_id=self.course.id)[0]
-        self.assertEqual(result.checkpoint, self.checkpoint)
-        self.assertEqual(result.user, self.user)
-        self.assertEqual(result.course_id, self.course.id)
-
-    def test_unique_constraint(self):
-        """Test that adding skipped re-verification with same user and course
-        id will raise 'IntegrityError' exception.
-        """
-        # add verification object
-        SkippedReverification.add_skipped_reverification_attempt(
-            checkpoint=self.checkpoint, user_id=self.user.id, course_id=unicode(self.course.id)
-        )
-        with self.assertRaises(IntegrityError):
-            SkippedReverification.add_skipped_reverification_attempt(
-                checkpoint=self.checkpoint, user_id=self.user.id, course_id=unicode(self.course.id)
-            )
-
-        # create skipped attempt for different user
-        user2 = UserFactory.create()
-        SkippedReverification.add_skipped_reverification_attempt(
-            checkpoint=self.checkpoint, user_id=user2.id, course_id=unicode(self.course.id)
-        )
-
-        # test the status of skipped reverification from database
-        result = SkippedReverification.objects.filter(user=user2)[0]
-        self.assertEqual(result.checkpoint, self.checkpoint)
-        self.assertEqual(result.user, user2)
-        self.assertEqual(result.course_id, self.course.id)
-
-    def test_check_user_skipped_reverification_exists(self):
-        """
-        Test the 'check_user_skipped_reverification_exists' method's response.
-        """
-        # add verification status
-        SkippedReverification.add_skipped_reverification_attempt(
-            checkpoint=self.checkpoint, user_id=self.user.id, course_id=unicode(self.course.id)
-        )
-        self.assertTrue(
-            SkippedReverification.check_user_skipped_reverification_exists(
-                user_id=self.user.id,
-                course_id=self.course.id
-            )
-        )
-
-        user2 = UserFactory.create()
-        self.assertFalse(
-            SkippedReverification.check_user_skipped_reverification_exists(
-                user_id=user2.id,
-                course_id=self.course.id
-            )
-        )
+class ManualVerificationTest(TestVerification):
+    """
+    Tests for the ManualVerification model
+    """
+    def test_active_at_datetime(self):
+        user = UserFactory.create()
+        verification = ManualVerification.objects.create(user=user)
+        self.verification_active_at_datetime(verification)
 
 
 class VerificationDeadlineTest(CacheIsolationTestCase):
     """
     Tests for the VerificationDeadline model.
     """
+    shard = 4
 
     ENABLED_CACHES = ['default']
 

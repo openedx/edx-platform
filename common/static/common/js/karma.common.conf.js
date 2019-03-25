@@ -34,12 +34,27 @@
 //
 
 /* eslint-env node */
+/* globals process */
 
 'use strict';
 
 var path = require('path');
 var _ = require('underscore');
 var appRoot = path.join(__dirname, '../../../../');
+var webdriver = require('selenium-webdriver');
+var firefox = require('selenium-webdriver/firefox');
+var webpackConfig = require(path.join(appRoot, 'webpack.dev.config.js'));
+
+// The following crazy bit is to work around the webpack.optimize.CommonsChunkPlugin
+// plugin. The problem is that it it factors out the code that defines webpackJsonp
+// and puts in in the commons JS, which Karma doesn't know to load first. This is a
+// workaround recommended in the karma-webpack bug report that basically just removes
+// the plugin for the purposes of Karma testing (the plugin is meant to be an
+// optimization only).
+//     https://github.com/webpack-contrib/karma-webpack/issues/24#issuecomment-257613167
+//
+// This should be fixed in v3 of karma-webpack
+var commonsChunkPluginIndex = webpackConfig.plugins.findIndex(function(plugin) { return plugin.chunkNames; });
 
 // Files which are needed by all lms/cms suites.
 var commonFiles = {
@@ -47,7 +62,6 @@ var commonFiles = {
         {pattern: 'common/js/vendor/**/*.js'},
         {pattern: 'edx-pattern-library/js/**/*.js'},
         {pattern: 'edx-ui-toolkit/js/**/*.js'},
-        {pattern: 'xmodule_js/common_static/coffee/src/**/!(*spec).js'},
         {pattern: 'xmodule_js/common_static/common/js/**/!(*spec).js'},
         {pattern: 'xmodule_js/common_static/js/**/!(*spec).js'},
         {pattern: 'xmodule_js/src/**/*.js'}
@@ -65,6 +79,10 @@ var commonFiles = {
         {pattern: 'common/templates/**/*.underscore'}
     ]
 };
+
+webpackConfig.plugins.splice(commonsChunkPluginIndex, 1);
+
+delete webpackConfig.entry;
 
 /**
  * Customize the name attribute in xml testcase element
@@ -107,6 +125,8 @@ function reporters(config) {
  * @return {Object}
  */
 function getBasepathAndFilename(filepath) {
+    var file, dir;
+
     if (!filepath) {
         // these will configure the reporters to create report files relative to this karma config file
         return {
@@ -114,9 +134,8 @@ function getBasepathAndFilename(filepath) {
             file: undefined
         };
     }
-
-    var file = filepath.replace(/^.*[\\\/]/, ''),
-        dir = filepath.replace(file, '');
+    file = filepath.replace(/^.*[\\/]/, '');
+    dir = filepath.replace(file, '');
 
     return {
         dir: dir,
@@ -131,13 +150,13 @@ function getBasepathAndFilename(filepath) {
  * @return {Object}
  */
 function coverageSettings(config) {
-    var path = getBasepathAndFilename(config.coveragereportpath);
+    var pth = getBasepathAndFilename(config.coveragereportpath);
     return {
-        dir: path.dir,
+        dir: pth.dir,
         subdir: '.',
         includeAllSources: true,
         reporters: [
-            {type: 'cobertura', file: path.file},
+            {type: 'cobertura', file: pth.file},
             {type: 'text-summary'}
         ]
     };
@@ -150,10 +169,10 @@ function coverageSettings(config) {
  * @return {Object}
  */
 function junitSettings(config) {
-    var path = getBasepathAndFilename(config.junitreportpath);
+    var pth = getBasepathAndFilename(config.junitreportpath);
     return {
-        outputDir: path.dir,
-        outputFile: path.file,
+        outputDir: pth.dir,
+        outputFile: pth.file,
         suite: 'javascript',
         useBrowserName: false,
         nameFormatter: junitNameFormatter,
@@ -167,68 +186,68 @@ function junitSettings(config) {
  * @param {String} pattern
  * @return {String}
  */
-var defaultNormalizeFunc = function(appRoot, pattern) {
-    if (pattern.match(/^common\/js/)) {
-        pattern = path.join(appRoot, '/common/static/' + pattern);
-    } else if (pattern.match(/^xmodule_js\/common_static/)) {
-        pattern = path.join(appRoot, '/common/static/' +
-            pattern.replace(/^xmodule_js\/common_static\//, ''));
+// I'd like to fix the no-shadow violation on the next line, but it would break this shared conf's API.
+function defaultNormalizeFunc(appRoot, pattern) { // eslint-disable-line no-shadow
+    var pat = pattern;
+    if (pat.match(/^common\/js/)) {
+        pat = path.join(appRoot, '/common/static/' + pat);
+    } else if (pat.match(/^xmodule_js\/common_static/)) {
+        pat = path.join(appRoot, '/common/static/' +
+            pat.replace(/^xmodule_js\/common_static\//, ''));
     }
-    return pattern;
-};
+    return pat;
+}
 
-var normalizePathsForCoverage = function(files, normalizeFunc) {
+function normalizePathsForCoverage(files, normalizeFunc, preprocessors) {
     var normalizeFn = normalizeFunc || defaultNormalizeFunc,
+        normalizedFile,
         filesForCoverage = {};
 
     files.forEach(function(file) {
         if (!file.ignoreCoverage) {
-            filesForCoverage[normalizeFn(appRoot, file.pattern)] = ['coverage'];
+            normalizedFile = normalizeFn(appRoot, file.pattern);
+            if (preprocessors && preprocessors.hasOwnProperty(normalizedFile)) {
+                filesForCoverage[normalizedFile] = ['coverage'].concat(preprocessors[normalizedFile]);
+            } else {
+                filesForCoverage[normalizedFile] = ['coverage'];
+            }
         }
     });
 
     return filesForCoverage;
-};
-
-/**
- * Sets nocache on each file in the list.
- * @param {Object} files
- * @param {Bool} enable
- * @return {Object}
- */
-var setNocache = function(files, enable) {
-    files.forEach(function(f) {
-        if (_.isObject(f)) {
-            f.nocache = enable;
-        }
-    });
-    return files;
-};
+}
 
 /**
  * Sets defaults for each file pattern.
+ * RequireJS files are excluded by default.
+ * Webpack files are included by default.
  * @param {Object} files
  * @return {Object}
  */
-var setDefaults = function(files) {
+function setDefaults(files) {
     return files.map(function(f) {
         var file = _.isObject(f) ? f : {pattern: f};
-        if (!file.included) {
-            f.included = false;
+        if (!file.included && !file.webpack) {
+            file.included = false;
         }
         return file;
     });
-};
+}
 
-var getBaseConfig = function(config, useRequireJs) {
+function getBaseConfig(config, useRequireJs) {
     var getFrameworkFiles = function() {
         var files = [
-            'node_modules/jquery/dist/jquery.js',
+            'common/static/common/js/vendor/jquery.js',
             'node_modules/jasmine-core/lib/jasmine-core/jasmine.js',
             'common/static/common/js/jasmine_stack_trace.js',
             'node_modules/karma-jasmine/lib/boot.js',
             'node_modules/karma-jasmine/lib/adapter.js',
-            'node_modules/jasmine-jquery/lib/jasmine-jquery.js'
+            'node_modules/jasmine-jquery/lib/jasmine-jquery.js',
+            'node_modules/popper.js/dist/umd/popper.js',
+            'node_modules/bootstrap/dist/js/bootstrap.js',
+            'node_modules/underscore/underscore.js',
+            'node_modules/backbone/backbone.js',
+            'common/static/js/test/i18n.js'
         ];
 
         if (useRequireJs) {
@@ -258,11 +277,22 @@ var getBaseConfig = function(config, useRequireJs) {
         });
     };
 
-    initFrameworks.$inject = ['config.files'];
-
+    var hostname = 'localhost';
+    var port = 9876;
     var customPlugin = {
         'framework:custom': ['factory', initFrameworks]
     };
+
+    if (process.env.hasOwnProperty('BOK_CHOY_HOSTNAME')) {
+        hostname = process.env.BOK_CHOY_HOSTNAME;
+        if (hostname === 'edx.devstack.lms') {
+            port = 19876;
+        } else {
+            port = 19877;
+        }
+    }
+
+    initFrameworks.$inject = ['config.files'];
 
     return {
         // base path that will be used to resolve all patterns (eg. files, exclude)
@@ -281,6 +311,9 @@ var getBaseConfig = function(config, useRequireJs) {
             'karma-chrome-launcher',
             'karma-firefox-launcher',
             'karma-spec-reporter',
+            'karma-selenium-webdriver-launcher',
+            'karma-webpack',
+            'karma-sourcemap-loader',
             customPlugin
         ],
 
@@ -304,8 +337,9 @@ var getBaseConfig = function(config, useRequireJs) {
         junitReporter: junitSettings(config),
 
 
-        // web server port
-        port: 9876,
+        // web server hostname and port
+        hostname: hostname,
+        port: port,
 
 
         // enable / disable colors in the output (reporters and logs)
@@ -334,6 +368,31 @@ var getBaseConfig = function(config, useRequireJs) {
                     'app.update.auto': false,
                     'app.update.enabled': false
                 }
+            },
+            ChromeDocker: {
+                base: 'SeleniumWebdriver',
+                browserName: 'chrome',
+                getDriver: function() {
+                    return new webdriver.Builder()
+                        .forBrowser('chrome')
+                        .usingServer('http://edx.devstack.chrome:4444/wd/hub')
+                        .build();
+                }
+            },
+            FirefoxDocker: {
+                base: 'SeleniumWebdriver',
+                browserName: 'firefox',
+                getDriver: function() {
+                    var options = new firefox.Options(),
+                        profile = new firefox.Profile();
+                    profile.setPreference('focusmanager.testmode', true);
+                    options.setProfile(profile);
+                    return new webdriver.Builder()
+                        .forBrowser('firefox')
+                        .usingServer('http://edx.devstack.firefox:4444/wd/hub')
+                        .setFirefoxOptions(options)
+                        .build();
+                }
             }
         },
 
@@ -349,13 +408,22 @@ var getBaseConfig = function(config, useRequireJs) {
 
         client: {
             captureConsole: false
+        },
+
+        webpack: webpackConfig,
+
+        webpackMiddleware: {
+            watchOptions: {
+                poll: true
+            }
         }
     };
-};
+}
 
-var configure = function(config, options) {
-    var useRequireJs = options.useRequireJs === undefined ? true : useRequireJs,
-        baseConfig = getBaseConfig(config, useRequireJs);
+function configure(config, options) {
+    var useRequireJs = options.useRequireJs === undefined ? true : options.useRequireJs,
+        baseConfig = getBaseConfig(config, useRequireJs),
+        files, filesForCoverage, preprocessors;
 
     if (options.includeCommonFiles) {
         _.forEach(['libraryFiles', 'sourceFiles', 'specFiles', 'fixtureFiles'], function(collectionName) {
@@ -363,7 +431,7 @@ var configure = function(config, options) {
         });
     }
 
-    var files = _.flatten(
+    files = _.flatten(
         _.map(
             ['libraryFilesToInclude', 'libraryFiles', 'sourceFiles', 'specFiles', 'fixtureFiles', 'runFiles'],
             function(collectionName) { return options[collectionName] || []; }
@@ -382,12 +450,7 @@ var configure = function(config, options) {
     // We set it to false by default because RequireJS should be used instead.
     files = setDefaults(files);
 
-    // With nocache=true, Karma always serves the latest files from disk.
-    // However, that prevents coverage tracking from working.
-    // So we only set it if coverage tracking is off.
-    setNocache(files, !config.coverage);
-
-    var filesForCoverage = _.flatten(
+    filesForCoverage = _.flatten(
         _.map(
             ['sourceFiles', 'specFiles'],
             function(collectionName) { return options[collectionName]; }
@@ -396,17 +459,17 @@ var configure = function(config, options) {
 
     // If we give symlink paths to Istanbul, coverage for each path gets tracked
     // separately. So we pass absolute paths to the karma-coverage preprocessor.
-    var preprocessors = _.extend(
+    preprocessors = _.extend(
         {},
         options.preprocessors,
-        normalizePathsForCoverage(filesForCoverage, options.normalizePathsForCoverageFunc)
+        normalizePathsForCoverage(filesForCoverage, options.normalizePathsForCoverageFunc, options.preprocessors)
     );
 
     config.set(_.extend(baseConfig, {
         files: files,
         preprocessors: preprocessors
     }));
-};
+}
 
 module.exports = {
     configure: configure,

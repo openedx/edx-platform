@@ -9,22 +9,24 @@ The following are currently implemented:
 
 # pylint: disable=abstract-method
 
+import django.contrib.auth as auth
+import social_django.utils as social_utils
 from django.conf import settings
 from django.contrib.auth import login
-import django.contrib.auth as auth
 from django.http import HttpResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from edx_oauth2_provider.constants import SCOPE_VALUE_DICT
+from oauth2_provider import models as dot_models
 from oauth2_provider.settings import oauth2_settings
 from oauth2_provider.views.base import TokenView as DOTAccessTokenView
 from oauthlib.oauth2.rfc6749.tokens import BearerToken
 from provider import constants
 from provider.oauth2.views import AccessTokenView as DOPAccessTokenView
 from rest_framework import permissions
+from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.response import Response
 from rest_framework.views import APIView
-import social.apps.django_app.utils as social_utils
 
 from openedx.core.djangoapps.auth_exchange.forms import AccessTokenExchangeForm
 from openedx.core.djangoapps.oauth_dispatch import adapters
@@ -37,7 +39,7 @@ class AccessTokenExchangeBase(APIView):
     OAuth access token.
     """
     @method_decorator(csrf_exempt)
-    @method_decorator(social_utils.strategy("social:complete"))
+    @method_decorator(social_utils.psa("social:complete"))
     def dispatch(self, *args, **kwargs):
         return super(AccessTokenExchangeBase, self).dispatch(*args, **kwargs)
 
@@ -137,11 +139,11 @@ class DOTAccessTokenExchangeView(AccessTokenExchangeBase, DOTAccessTokenView):
         request.extra_credentials = None
         request.grant_type = client.authorization_grant_type
 
-    def error_response(self, form_errors):
+    def error_response(self, form_errors, **kwargs):
         """
         Return an error response consisting of the errors in the form
         """
-        return Response(status=400, data=form_errors)
+        return Response(status=400, data=form_errors, **kwargs)
 
 
 class LoginWithAccessTokenView(APIView):
@@ -161,6 +163,18 @@ class LoginWithAccessTokenView(APIView):
             if backend.get_user(user.id):
                 return backend_path
 
+    @staticmethod
+    def _is_grant_password(access_token):
+        """
+        Check if the access token provided is DOT based and has password type grant.
+        """
+        token_query = dot_models.AccessToken.objects.select_related('user')
+        dot_token = token_query.filter(token=access_token).first()
+        if dot_token and dot_token.application.authorization_grant_type == dot_models.Application.GRANT_PASSWORD:
+            return True
+
+        return False
+
     @method_decorator(csrf_exempt)
     def post(self, request):
         """
@@ -171,7 +185,15 @@ class LoginWithAccessTokenView(APIView):
         # The login method assumes the backend path had been previously stored in request.user.backend
         # in the 'authenticate' call.  However, not all authentication providers do so.
         # So we explicitly populate the request.user.backend field here.
+
         if not hasattr(request.user, 'backend'):
             request.user.backend = self._get_path_of_arbitrary_backend_for_user(request.user)
+
+        if not self._is_grant_password(request.auth):
+            raise AuthenticationFailed({
+                u'error_code': u'non_supported_token',
+                u'developer_message': u'Only support DOT type access token with grant type password. '
+            })
+
         login(request, request.user)  # login generates and stores the user's cookies in the session
         return HttpResponse(status=204)  # cookies stored in the session are returned with the response

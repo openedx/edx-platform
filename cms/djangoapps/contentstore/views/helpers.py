@@ -4,24 +4,23 @@ Helper methods for Studio views.
 
 from __future__ import absolute_import
 
-from uuid import uuid4
 import urllib
+from uuid import uuid4
 
 from django.conf import settings
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
-
-from edxmako.shortcuts import render_to_string
 from opaque_keys.edx.keys import UsageKey
 from xblock.core import XBlock
-import dogstats_wrapper as dog_stats_api
-from xmodule.modulestore.django import modulestore
-from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT
-from xmodule.tabs import StaticTab
 
+import dogstats_wrapper as dog_stats_api
 from contentstore.utils import reverse_course_url, reverse_library_url, reverse_usage_url
+from edxmako.shortcuts import render_to_string
 from models.settings.course_grading import CourseGradingModel
 from util.milestones_helpers import is_entrance_exams_enabled
+from xmodule.modulestore.django import modulestore
+from xmodule.tabs import StaticTab
+from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT
 
 __all__ = ['event']
 
@@ -45,11 +44,11 @@ def event(request):
     return HttpResponse(status=204)
 
 
-def render_from_lms(template_name, dictionary, context=None, namespace='main'):
+def render_from_lms(template_name, dictionary, namespace='main'):
     """
-    Render a template using the LMS MAKO_TEMPLATES
+    Render a template using the LMS Mako templates
     """
-    return render_to_string(template_name, dictionary, context, namespace="lms." + namespace)
+    return render_to_string(template_name, dictionary, namespace="lms." + namespace)
 
 
 def get_parent_xblock(xblock):
@@ -283,7 +282,7 @@ def create_xblock(parent_locator, user, category, display_name, boilerplate=None
             course.tabs.append(
                 StaticTab(
                     name=display_name,
-                    url_slug=dest_usage_key.name,
+                    url_slug=dest_usage_key.block_id,
                 )
             )
             store.update_item(course, user.id)
@@ -299,7 +298,7 @@ def is_item_in_course_tree(item):
     if its parent has been deleted and is now an orphan.
     """
     ancestor = item.get_parent()
-    while ancestor is not None and ancestor.location.category != "course":
+    while ancestor is not None and ancestor.location.block_type != "course":
         ancestor = ancestor.get_parent()
 
     return ancestor is not None

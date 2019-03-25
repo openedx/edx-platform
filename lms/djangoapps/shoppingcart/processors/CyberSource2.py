@@ -20,24 +20,28 @@ To enable this implementation, add the following Django settings:
 
 """
 
-import hmac
 import binascii
-import re
+import hmac
 import json
-import uuid
 import logging
-from textwrap import dedent
-from datetime import datetime
+import re
+import uuid
 from collections import OrderedDict, defaultdict
+from datetime import datetime
 from decimal import Decimal, InvalidOperation
 from hashlib import sha256
+from textwrap import dedent
+
 from django.conf import settings
-from django.utils.translation import ugettext as _, ugettext_noop
+from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_noop
+from six import text_type
+
 from edxmako.shortcuts import render_to_string
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from shoppingcart.models import Order
 from shoppingcart.processors.exceptions import *
 from shoppingcart.processors.helpers import get_processor_config
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 log = logging.getLogger(__name__)
 
@@ -500,7 +504,7 @@ def _get_processor_exception_html(exception):
                 u"The specific error message is: {msg} "
                 u"Your credit card may possibly have been charged.  Contact us with payment-specific questions at {email}."
             ).format(
-                msg=u'<span class="exception_msg">{msg}</span>'.format(msg=exception.message),
+                msg=u'<span class="exception_msg">{msg}</span>'.format(msg=text_type(exception)),
                 email=payment_support_email
             )
         )
@@ -511,7 +515,7 @@ def _get_processor_exception_html(exception):
                 u"The specific error message is: {msg}. "
                 u"Your credit card has probably been charged. Contact us with payment-specific questions at {email}."
             ).format(
-                msg=u'<span class="exception_msg">{msg}</span>'.format(msg=exception.message),
+                msg=u'<span class="exception_msg">{msg}</span>'.format(msg=text_type(exception)),
                 email=payment_support_email
             )
         )
@@ -524,7 +528,7 @@ def _get_processor_exception_html(exception):
                 u"We apologize that we cannot verify whether the charge went through and take further action on your order. "
                 u"Your credit card may possibly have been charged. Contact us with payment-specific questions at {email}."
             ).format(
-                msg=u'<span class="exception_msg">{msg}</span>'.format(msg=exception.message),
+                msg=u'<span class="exception_msg">{msg}</span>'.format(msg=text_type(exception)),
                 email=payment_support_email
             )
         )

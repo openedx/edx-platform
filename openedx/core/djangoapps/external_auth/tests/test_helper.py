@@ -19,11 +19,10 @@ class ExternalAuthHelperFnTest(TestCase):
         ONSITE3 = 'http://{}/my/custom/url'.format(HOST)  # pylint: disable=invalid-name
         OFFSITE1 = 'http://www.attacker.com'              # pylint: disable=invalid-name
 
-        for redirect_to in [ONSITE1, ONSITE2, ONSITE3]:
+        for redirect_to in [ONSITE1, ONSITE2, ONSITE3, OFFSITE1]:
             redir = _safe_postlogin_redirect(redirect_to, HOST)
             self.assertEqual(redir.status_code, 302)
-            self.assertEqual(redir['location'], redirect_to)
-
-        redir2 = _safe_postlogin_redirect(OFFSITE1, HOST)
-        self.assertEqual(redir2.status_code, 302)
-        self.assertEqual("/", redir2['location'])
+            if redirect_to in [ONSITE3, OFFSITE1]:
+                self.assertEqual(redir['location'], "/")
+            else:
+                self.assertEqual(redir['location'], redirect_to)

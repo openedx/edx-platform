@@ -1,0 +1,573 @@
+// ------------------------------
+// Styling for files located in the openedx/features repository.
+
+// Course sidebar sections
+.course-sidebar {
+  .section {
+    h3 {
+      font-size: $font-size-base;
+      font-weight: $font-weight-bold;
+    }
+
+    .icon {
+      width: 20px;
+      text-align: center;
+    }
+
+    &:not(:first-child) {
+      margin-top: $baseline;
+    }
+  }
+}
+
+// Course call to action message
+.course-message {
+  display: flex;
+
+  .message-author {
+    display: inline-block;
+    width: 70px;
+    height: 70px;
+    border-radius: $baseline*7/4;
+    border: 1px solid $border-color;
+
+    @media (max-width: $grid-breakpoints-md) {
+      display: none;
+    }
+  }
+
+  .message-content {
+    @include margin(0, 0, $baseline, $baseline);
+
+    flex-grow: 1;
+    position: relative;
+    border: 1px solid $border-color;
+    padding: $baseline;
+    border-radius: $baseline/4;
+
+    @media (max-width: $grid-breakpoints-md) {
+      width: 100%;
+      margin: $baseline 0;
+    }
+
+    &::after,
+    &::before {
+      @include left(0);
+
+      top: 25px;
+      border: solid transparent;
+      height: 0;
+      width: 0;
+      content: " ";
+      position: absolute;
+
+      @media (max-width: $grid-breakpoints-md) {
+        display: none;
+      }
+    }
+
+    &::after {
+      @include border-right-color($white);
+      @include margin-left($baseline*-1+1);
+
+      border-width: $baseline/2;
+    }
+
+    &::before {
+      @include margin-left($baseline*-1);
+      @include border-right-color($border-color);
+
+      border-width: $baseline/2;
+    }
+
+    .message-header {
+      @include margin-right($baseline*4);
+
+      font-weight: $font-semibold;
+      margin-bottom: $baseline/2;
+    }
+
+    a:not(.btn) {
+      font-weight: $font-semibold;
+      text-decoration: underline;
+    }
+
+    .dismiss {
+      @include right($baseline/4);
+
+      top: $baseline/4;
+      position: absolute;
+      cursor: pointer;
+      color: $black-t3;
+
+      &:hover {
+        color: $black-t2;
+      }
+    }
+    // Course Goal Message Styling
+    .success-message {
+      font-size: font-size(small);
+    }
+
+    .goal-options-container {
+      margin-top: $baseline;
+      text-align: center;
+      display: flex;
+      flex-direction: row;
+
+      .goal-option {
+        text-decoration: none;
+        font-size: $font-size-base;
+        padding: $baseline/2;
+        margin: $baseline/4 $baseline/4 0;
+        flex-grow: 1;
+
+        &:not(.dismissible):first-of-type {
+          color: theme-color("purchase");
+          border-color: theme-color("purchase");
+
+          &:hover {
+            color: theme-color("inverse");
+            background-color: theme-color("purchase");
+          }
+        }
+
+        &.dismissible {
+          @include right($baseline/4);
+
+          position: absolute;
+          top: $baseline/2;
+          margin: 0;
+          width: auto;
+          flex-grow: 1;
+          font-size: font-size(small);
+          color: theme-color("primary");
+          cursor: pointer;
+
+          &:hover {
+            color: $black-t2;
+          }
+        }
+      }
+
+      @media (max-width: $grid-breakpoints-md) {
+        flex-direction: column;
+
+        .goal-option {
+          margin-top: $baseline/4;
+          width: 100%;
+        }
+      }
+    }
+  }
+
+  .message-actions {
+    display: flex;
+    margin-top: $baseline/2;
+    justify-content: flex-end;
+  }
+}
+
+// Welcome message / Latest Update message
+.welcome-message,
+.update-message {
+  border: solid 1px $border-color;
+
+  @include border-left(solid 4px $black);
+
+  margin-bottom: $baseline;
+  padding: $baseline;
+  overflow: hidden;
+
+  h1,
+  h2,
+  h3 {
+    font-size: font-size(large);
+    font-weight: $font-bold;
+    color: $black;
+  }
+
+  img {
+    @include float(left);
+
+    margin: $baseline/2;
+    max-width: 100%;
+  }
+
+  .dismiss-message {
+    @include float(right);
+
+    .btn-link {
+      color: palette(grayscale, base);
+      border-color: transparent;
+    }
+  }
+}
+
+// Course sidebar
+.course-sidebar {
+  @include margin-left(0);
+  @include padding-left($baseline);
+
+  // Course Goal Updates
+  .section-goals {
+    @include float(left);
+
+    border: 1px solid $border-color;
+    padding: $baseline*0.75 $baseline*0.75 $baseline*0.5;
+    border-radius: 5px;
+    position: relative;
+    width: 100%;
+    cursor: pointer;
+    margin-bottom: $baseline;
+
+    &.hidden {
+      display: none;
+    }
+
+    .edit-goal-select {
+      display: none;
+      background-color: transparent;
+    }
+
+    .edit-icon {
+      @include right($baseline/4);
+
+      position: absolute;
+      top: $baseline*0.6;
+      cursor: pointer;
+      border: transparent;
+      background-color: transparent;
+
+      &:hover {
+        color: $border-color;
+      }
+    }
+
+    .current-goal-container {
+      .title {
+        @include margin($baseline/5, $baseline*0.4, 0, 0);
+        @include float(left);
+      }
+
+      .title-label {
+        display: none;
+      }
+
+      .goal {
+        @include float(left);
+        @include padding-left($baseline*0.4);
+      }
+
+      .response-icon {
+        @include margin-left($baseline/4);
+        @include right(-1*$baseline);
+
+        top: $baseline*0.75;
+        position: absolute;
+
+        &.fa-check {
+          color: theme-color("success");
+        }
+
+        &.fa-close {
+          color: theme-color("error");
+        }
+      }
+    }
+
+    .section-tools .course-tool {
+      .course-tool-link:visited {
+        color: theme-color("primary");
+      }
+
+      &:not(:first-child) {
+        margin-top: ($baseline / 5);
+      }
+    }
+
+    @media print {
+      .section-tools {
+        display: none !important;
+      }
+    }
+  }
+
+  @include media-breakpoint-down(sm) {
+    @include padding-left(0);
+
+    border-top: 1px solid theme-color("light");
+    padding-top: $baseline;
+  }
+}
+
+// Course outline for visual progress waffle switch
+.course-outline {
+  .block-tree {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+
+    .section {
+      @include media-breakpoint-up(md) {
+        margin: 0;
+      }
+
+      margin: 0 (-1 * $baseline) 0 ($baseline);
+      width: calc(100% + (2));
+      padding: 0;
+
+      border-bottom: 1px solid $border-color;
+
+      .section-name {
+        padding: ($baseline / 2) 0 ($baseline / 2) 2px;
+
+        .section-title {
+          font-weight: $font-regular;
+          font-size: 1.1rem;
+          margin: 0;
+          display: inline;
+          padding-left: $baseline - 2;
+        }
+      }
+
+      .outline-item {
+        @include padding-left(0);
+      }
+
+      ol.outline-item {
+        margin: 0;
+
+        .subsection {
+          list-style-type: none;
+          border-top: 1px solid $border-color;
+          margin: 0 0 0 35px;
+
+          .subsection-title {
+            display: inline-block;
+            margin: 0;
+            font-weight: $font-regular;
+            margin-left: $baseline - 2;
+          }
+
+          .subsection-text {
+            .details {
+              font-size: $body-font-size;
+              color: theme-color("secondary");
+              margin-left: 34px;
+            }
+            .prerequisite {
+              color: theme-color("secondary");
+              font-weight: $font-bold;
+            }
+          }
+
+          .vertical {
+            @include margin-left(16px);
+
+            list-style-type: none;
+
+            a.outline-item {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              padding: ($baseline / 2) 0 ($baseline / 2) 0;
+              margin: 0 0 0 ($baseline);
+              border-top: 1px solid $border-color;
+            }
+
+            a.outline-item:hover {
+              text-decoration: none;
+
+              .vertical-details {
+                text-decoration: underline;
+              }
+
+              .complete-checkmark {
+                text-decoration: none;
+              }
+            }
+
+            .vertical-details {
+              float:left;
+            }
+
+            &:hover,
+            &:focus {
+              background-color: palette(primary, x-back);
+              border-radius: $btn-border-radius;
+              text-decoration: none;
+            }
+
+            .vertical-actions {
+              .resume-right {
+                position: relative;
+                top: calc(50% - (#{$baseline} / 2));
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Course outline accordion
+button.accordion-trigger, button.prerequisite-button {
+  padding: 10px 0 10px 2px;
+  border: none;
+  width: 100%;
+  text-align: left;
+  margin: 0px;
+  background: none;
+  cursor: pointer;
+
+  .fa {
+    color: $blue;
+  }
+}
+
+#expand-collapse-outline-all-button {
+  float: right;
+  background-color: $white;
+  color: $black;
+  cursor: pointer;
+}
+
+// extra padding for expand/collapse text change
+.expand-collapse-outline-all-extra-padding {
+  padding: 0 4px 0 4px;
+}
+
+.accordion-panel.is-hidden {
+  display: none;
+}
+
+.fa-check.fa.complete-checkmark {
+  border: 1px solid $green;
+  margin-right: $baseline / 2;
+  border-radius: 100px;
+  color: white;
+  background-color: $green;
+  float: right;
+}
+
+// date summary
+.date-summary-container {
+  .date-summary {
+    @include clearfix;
+    @include border-left(3px solid $gray-300);
+
+    padding: $baseline/2;
+
+    .heading {
+      font-size: 0.9rem;
+      line-height: 1;
+      font-weight: $font-bold;
+      color: theme-color("dark");
+    }
+
+    .description {
+      margin-top: $baseline/2;
+      margin-bottom: $baseline/2;
+      display: inline-block;
+    }
+
+    .date-summary-link {
+      font-weight: $font-semibold;
+
+      a {
+        color: $link-color;
+        font-weight: $font-regular;
+      }
+    }
+
+    .date {
+      color: theme-color("dark");
+    }
+
+    &-todays-date {
+      @include border-left(3px solid $blue);
+    }
+
+    &-verified-upgrade-deadline {
+      @include border-left(3px solid $green);
+    }
+
+    &-verification-deadline-passed {
+      @include border-left(3px solid $red);
+    }
+
+    &-verification-deadline-retry {
+      @include border-left(3px solid $red);
+    }
+
+    &-verification-deadline-upcoming {
+      @include border-left(3px solid $orange);
+    }
+  }
+}
+
+// Course Updates Page
+.course-updates {
+  .all-updates {
+    flex-grow: 1;
+
+    .updates-article {
+      margin: ($baseline*6/5) 0;
+      padding-bottom: ($baseline*6/5);
+      border-bottom: 1px solid $border-color;
+
+      .date {
+        font-size: font-size(small);
+        font-weight: $font-light;
+        float: none;
+        padding-bottom: ($baseline/4);
+      }
+
+      &:last-child {
+        border-bottom: 0;
+      }
+
+      img {
+        margin: $baseline/2;
+        max-width: 100%;
+      }
+    }
+  }
+}
+
+// Course Reviews Page
+.course-reviews {
+  .page-header.has-secondary > .page-header-main {
+    display: block;
+    position: relative;
+
+    .toggle-read-write-reviews {
+      position: absolute;
+      top: $baseline * (-1/2);
+      right: $baseline / 2;
+      cursor: pointer;
+      background-color: theme-color("primary");
+    }
+  }
+
+  .course-reviews-tool {
+    margin: ($baseline * 2) ($baseline * 3);
+    position: relative;
+    text-align: center;
+    min-height: 300px;
+
+    .fa.fa-spinner {
+      @include left(50%);
+
+      font-size: 2rem;
+      margin-top: $baseline*3;
+      position: absolute;
+    }
+
+    iframe {
+      display: block !important;
+    }
+  }
+}

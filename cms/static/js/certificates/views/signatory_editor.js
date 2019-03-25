@@ -144,8 +144,7 @@ function($, _, Backbone, gettext,
                             if (model.isNew()) {
                                 model.collection.remove(model);
                                 self.eventAgg.trigger('onSignatoryRemoved', model);
-                            }
-                            else {
+                            } else {
                                 deleting.show();
                                 model.destroy({
                                     wait: true,
@@ -200,8 +199,7 @@ function($, _, Backbone, gettext,
                     $(selector).addClass('error');
                     $(selector).append("<span class='message-error'>" + errorMessage + '</span>');
                 }
-            }
-            else {
+            } else {
                 // Remove the error message.
                 $(selector).removeClass('error');
                 $(selector + '>span.message-error').remove();

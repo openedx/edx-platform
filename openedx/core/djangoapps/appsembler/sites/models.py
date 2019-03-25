@@ -6,10 +6,9 @@ from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.http.request import split_domain_port
 from django.contrib.sites.models import Site, SiteManager, SITE_CACHE
-from django.core.exceptions import ImproperlyConfigured
 import django
 
-cache = caches['general']
+cache = caches['default']
 
 
 def _cache_key_for_site_id(site_id):
@@ -79,7 +78,7 @@ def patched_clear_site_cache(sender, **kwargs):
 class AlternativeDomain(models.Model):
     site = models.OneToOneField(Site, related_name='alternative_domain')
     domain = models.CharField(max_length=500)
-
+    
     def __unicode__(self):
         return self.domain
 

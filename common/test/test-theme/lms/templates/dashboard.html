@@ -1,0 +1,9 @@
+<%page expression_filter="h"/>
+<%!
+    from openedx.core.djangolib.markup import HTML
+%>
+
+<%inherit file="dashboard.html" />
+<%block name="pagetitle">Overridden Title!</%block>
+${HTML(parent.body())}
+<%block name="bodyextra">Overriden Body Extra!</%block>

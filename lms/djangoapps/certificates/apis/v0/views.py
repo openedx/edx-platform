@@ -1,16 +1,17 @@
 """ API v0 views. """
 import logging
 
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
 from rest_framework.generics import GenericAPIView
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from edx_rest_framework_extensions import permissions
+from edx_rest_framework_extensions.authentication import JwtAuthentication
 from lms.djangoapps.certificates.api import get_certificate_for_user
-from openedx.core.lib.api import (
-    authentication,
-    permissions,
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+from openedx.core.lib.api.authentication import (
+    OAuth2AuthenticationAllowInactiveUser,
+    SessionAuthenticationAllowInactiveUser
 )
 
 
@@ -48,7 +49,11 @@ class CertificatesDetailView(GenericAPIView):
             * certificate_type: A string representation of the certificate type.
                 Can be honor|verified|professional
 
+            * created_date: Date/time the certificate was created, in ISO-8661 format.
+
             * status: A string representation of the certificate status.
+
+            * is_passing: True if the certificate has a passing status, False if not.
 
             * download_url: A string representation of the certificate url.
 
@@ -60,20 +65,23 @@ class CertificatesDetailView(GenericAPIView):
                 "username": "bob",
                 "course_id": "edX/DemoX/Demo_Course",
                 "certificate_type": "verified",
+                "created_date": "2015-12-03T13:14:28+0000",
                 "status": "downloadable",
+                "is_passing": true,
                 "download_url": "http://www.example.com/cert.pdf",
                 "grade": "0.98"
             }
     """
 
     authentication_classes = (
-        authentication.OAuth2AuthenticationAllowInactiveUser,
-        authentication.SessionAuthenticationAllowInactiveUser,
+        JwtAuthentication,
+        OAuth2AuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
     )
-    permission_classes = (
-        IsAuthenticated,
-        permissions.IsUserInUrlOrStaff
-    )
+
+    permission_classes = (permissions.JWT_RESTRICTED_APPLICATION_OR_USER_ACCESS,)
+
+    required_scopes = ['certificates:read']
 
     def get(self, request, username, course_id):
         """
@@ -107,7 +115,9 @@ class CertificatesDetailView(GenericAPIView):
                 "username": user_cert.get('username'),
                 "course_id": unicode(user_cert.get('course_key')),
                 "certificate_type": user_cert.get('type'),
+                "created_date": user_cert.get('created'),
                 "status": user_cert.get('status'),
+                "is_passing": user_cert.get('is_passing'),
                 "download_url": user_cert.get('download_url'),
                 "grade": user_cert.get('grade')
             }

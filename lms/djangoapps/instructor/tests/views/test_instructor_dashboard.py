@@ -1,32 +1,35 @@
 """
 Unit tests for instructor_dashboard.py.
 """
-import ddt
 import datetime
+
+import ddt
+from django.conf import settings
+from django.contrib.sites.models import Site
+from django.urls import reverse
+from django.test.client import RequestFactory
+from django.test.utils import override_settings
 from mock import patch
 from nose.plugins.attrib import attr
 from pytz import UTC
-
-from django.conf import settings
-from django.core.urlresolvers import reverse
-from django.test.client import RequestFactory
-from django.test.utils import override_settings
-from edxmako.shortcuts import render_to_response
-
-from courseware.tabs import get_course_tab_list
-from courseware.tests.factories import UserFactory, StudentModuleFactory, StaffFactory
-from courseware.tests.helpers import LoginEnrollmentTestCase
-from lms.djangoapps.instructor.views.gradebook_api import calculate_page_info
+from six import text_type
 
 from common.test.utils import XssTestMixin
+from course_modes.models import CourseMode
+from courseware.tabs import get_course_tab_list
+from courseware.tests.factories import StaffFactory, StudentModuleFactory, UserFactory
+from courseware.tests.helpers import LoginEnrollmentTestCase
+from edxmako.shortcuts import render_to_response
+from lms.djangoapps.instructor.views.gradebook_api import calculate_page_info
+from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
+from pyquery import PyQuery as pq
+from shoppingcart.models import CourseRegCodeItem, Order, PaidCourseRegistration
+from student.models import CourseEnrollment
+from student.roles import CourseFinanceAdminRole
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
-from shoppingcart.models import PaidCourseRegistration, Order, CourseRegCodeItem
-from course_modes.models import CourseMode
-from student.roles import CourseFinanceAdminRole
-from student.models import CourseEnrollment
 
 
 def intercept_renderer(path, context):
@@ -66,27 +69,33 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
             mode_display_name=CourseMode.DEFAULT_MODE.name,
             min_price=40
         )
+        self.course_info = CourseFactory.create(
+            org="ACME",
+            number="001",
+            run="2017",
+            name="How to defeat the Road Runner"
+        )
         self.course_mode.save()
         # Create instructor account
         self.instructor = AdminFactory.create()
         self.client.login(username=self.instructor.username, password="test")
 
         # URL for instructor dash
-        self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        self.url = reverse('instructor_dashboard', kwargs={'course_id': text_type(self.course.id)})
 
     def get_dashboard_enrollment_message(self):
         """
         Returns expected dashboard enrollment message with link to Insights.
         """
         return 'Enrollment data is now available in <a href="http://example.com/courses/{}" ' \
-               'target="_blank">Example</a>.'.format(unicode(self.course.id))
+               'target="_blank">Example</a>.'.format(text_type(self.course.id))
 
     def get_dashboard_analytics_message(self):
         """
         Returns expected dashboard demographic message with link to Insights.
         """
         return 'For analytics about your course, go to <a href="http://example.com/courses/{}" ' \
-               'target="_blank">Example</a>.'.format(unicode(self.course.id))
+               'target="_blank">Example</a>.'.format(text_type(self.course.id))
 
     def test_instructor_tab(self):
         """
@@ -106,6 +115,87 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
 
         student = UserFactory.create()
         self.assertFalse(has_instructor_tab(student, self.course))
+
+    @ddt.data(
+        ("How to defeat the Road Runner", "2017", "001", "ACME"),
+    )
+    @ddt.unpack
+    def test_instructor_course_info(self, display_name, run, number, org):
+        """
+        Verify that it shows the correct course information
+        """
+        url = reverse(
+            'instructor_dashboard',
+            kwargs={
+                'course_id': unicode(self.course_info.id)
+            }
+        )
+
+        response = self.client.get(url)
+        content = pq(response.content)
+
+        self.assertEqual(
+            display_name,
+            content('#field-course-display-name b').contents()[0].strip()
+        )
+
+        self.assertEqual(
+            run,
+            content('#field-course-name b').contents()[0].strip()
+        )
+
+        self.assertEqual(
+            number,
+            content('#field-course-number b').contents()[0].strip()
+        )
+
+        self.assertEqual(
+            org,
+            content('#field-course-organization b').contents()[0].strip()
+        )
+
+    def test_membership_site_configuration_role(self):
+        """
+        Verify that the role choices set via site configuration are loaded in the membership tab
+        of the instructor dashboard
+        """
+
+        configuration_values = {
+            "MANUAL_ENROLLMENT_ROLE_CHOICES": [
+                "role1",
+                "role2",
+            ]
+        }
+        site = Site.objects.first()
+        SiteConfiguration.objects.create(site=site, values=configuration_values, enabled=True)
+        url = reverse(
+            'instructor_dashboard',
+            kwargs={
+                'course_id': unicode(self.course_info.id)
+            }
+        )
+
+        response = self.client.get(url)
+        self.assertIn('<option value="role1">role1</option>', response.content)
+        self.assertIn('<option value="role2">role2</option>', response.content)
+
+    def test_membership_default_role(self):
+        """
+        Verify that in the absence of site configuration role choices, default values of role choices are loaded
+        in the membership tab of the instructor dashboard
+        """
+
+        url = reverse(
+            'instructor_dashboard',
+            kwargs={
+                'course_id': unicode(self.course_info.id)
+            }
+        )
+
+        response = self.client.get(url)
+        self.assertIn('<option value="Learner">Learner</option>', response.content)
+        self.assertIn('<option value="Support">Support</option>', response.content)
+        self.assertIn('<option value="Partner">Partner</option>', response.content)
 
     def test_student_admin_staff_instructor(self):
         """
@@ -169,7 +259,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         response = self.client.get(self.url)
 
         # enrollment information visible
-        self.assertIn('<h3 class="hd hd-3">Enrollment Information</h3>', response.content)
+        self.assertIn('<h4 class="hd hd-4">Enrollment Information</h4>', response.content)
         self.assertIn('<th scope="row">Verified</th>', response.content)
         self.assertIn('<th scope="row">Audit</th>', response.content)
         self.assertIn('<th scope="row">Honor</th>', response.content)
@@ -228,7 +318,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         Test analytics dashboard message is shown
         """
         response = self.client.get(self.url)
-        analytics_section = '<li class="nav-item"><button type="button" class="btn-link" data-section="instructor_analytics">Analytics</button></li>'  # pylint: disable=line-too-long
+        analytics_section = '<li class="nav-item"><button type="button" class="btn-link instructor_analytics" data-section="instructor_analytics">Analytics</button></li>'  # pylint: disable=line-too-long
         self.assertIn(analytics_section, response.content)
 
         # link to dashboard shown
@@ -266,10 +356,8 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
     @ddt.data(
         (True, True, True),
         (True, False, False),
-        (True, None, False),
         (False, True, False),
         (False, False, False),
-        (False, None, False),
     )
     @ddt.unpack
     def test_ccx_coaches_option_on_admin_list_management_instructor(
@@ -320,6 +408,43 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         self.assertEqual(response.status_code, 200)
         # Max number of student per page is one.  Patched setting MAX_STUDENTS_PER_PAGE_GRADE_BOOK = 1
         self.assertEqual(len(response.mako_context['students']), 1)  # pylint: disable=no-member
+
+    def test_open_response_assessment_page(self):
+        """
+        Test that Open Responses is available only if course contains at least one ORA block
+        """
+        ora_section = (
+            '<li class="nav-item">'
+            '<button type="button" class="btn-link open_response_assessment" data-section="open_response_assessment">'
+            'Open Responses'
+            '</button>'
+            '</li>'
+        )
+
+        response = self.client.get(self.url)
+        self.assertNotIn(ora_section, response.content)
+
+        ItemFactory.create(parent_location=self.course.location, category="openassessment")
+        response = self.client.get(self.url)
+        self.assertIn(ora_section, response.content)
+
+    def test_open_response_assessment_page_orphan(self):
+        """
+        Tests that the open responses tab loads if the course contains an
+        orphaned openassessment block
+        """
+        # create non-orphaned openassessment block
+        ItemFactory.create(
+            parent_location=self.course.location,
+            category="openassessment",
+        )
+        # create orphan
+        self.store.create_item(
+            self.user.id, self.course.id, 'openassessment', "orphan"
+        )
+        response = self.client.get(self.url)
+        # assert we don't get a 500 error
+        self.assertEqual(200, response.status_code)
 
 
 @ddt.ddt
@@ -412,6 +537,6 @@ class TestInstructorDashboardPerformance(ModuleStoreTestCase, LoginEnrollmentTes
 
         # check MongoDB calls count
         url = reverse('spoc_gradebook', kwargs={'course_id': self.course.id})
-        with check_mongo_calls(7):
+        with check_mongo_calls(9):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 200)

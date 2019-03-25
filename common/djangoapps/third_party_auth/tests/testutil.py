@@ -4,27 +4,28 @@ Utilities for writing third_party_auth tests.
 Used by Django and non-Django tests; must not have Django deps.
 """
 
+import os.path
 from contextlib import contextmanager
+
+import django.test
+import mock
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
-from provider.oauth2.models import Client as OAuth2Client
-from provider import constants
-import django.test
 from mako.template import Template
-import mock
-import os.path
+from provider import constants
+from provider.oauth2.models import Client as OAuth2Client
 from storages.backends.overwrite import OverwriteStorage
 
+from third_party_auth.models import cache as config_cache
 from third_party_auth.models import (
-    OAuth2ProviderConfig,
-    SAMLProviderConfig,
-    SAMLConfiguration,
     LTIProviderConfig,
-    cache as config_cache,
+    OAuth2ProviderConfig,
     ProviderApiPermissions,
+    SAMLConfiguration,
+    SAMLProviderConfig
 )
-
+from third_party_auth.saml import EdXSAMLIdentityProvider, get_saml_idp_class
 
 AUTH_FEATURES_KEY = 'ENABLE_THIRD_PARTY_AUTH'
 AUTH_FEATURE_ENABLED = AUTH_FEATURES_KEY in settings.FEATURES
@@ -77,7 +78,7 @@ class ThirdPartyAuthTestMixin(object):
     @staticmethod
     def configure_oauth_provider(**kwargs):
         """ Update the settings for an OAuth2-based third party auth provider """
-        kwargs.setdefault('provider_slug', kwargs['backend_name'])
+        kwargs.setdefault('slug', kwargs['backend_name'])
         obj = OAuth2ProviderConfig(**kwargs)
         obj.save()
         return obj
@@ -85,7 +86,7 @@ class ThirdPartyAuthTestMixin(object):
     def configure_saml_provider(self, **kwargs):
         """ Update the settings for a SAML-based third party auth provider """
         self.assertTrue(
-            SAMLConfiguration.is_enabled(Site.objects.get_current()),
+            SAMLConfiguration.is_enabled(Site.objects.get_current(), 'default'),
             "SAML Provider Configuration only works if SAML is enabled."
         )
         obj = SAMLProviderConfig(**kwargs)
@@ -186,8 +187,9 @@ class TestCase(ThirdPartyAuthTestMixin, django.test.TestCase):
         super(TestCase, self).setUp()
         # Explicitly set a server name that is compatible with all our providers:
         # (The SAML lib we use doesn't like the default 'testserver' as a domain)
-        self.client.defaults['SERVER_NAME'] = 'example.none'
-        self.url_prefix = 'http://example.none'
+        self.hostname = 'example.none'
+        self.client.defaults['SERVER_NAME'] = self.hostname
+        self.url_prefix = 'http://{}'.format(self.hostname)
 
 
 class SAMLTestCase(TestCase):
@@ -213,9 +215,19 @@ class SAMLTestCase(TestCase):
         kwargs.setdefault('entity_id', "https://saml.example.none")
         super(SAMLTestCase, self).enable_saml(**kwargs)
 
+    @mock.patch('third_party_auth.saml.log')
+    def test_get_saml_idp_class_with_fake_identifier(self, log_mock):
+        error_mock = log_mock.error
+        idp_class = get_saml_idp_class('fake_idp_class_option')
+        error_mock.assert_called_once_with(
+            '%s is not a valid EdXSAMLIdentityProvider subclass; using EdXSAMLIdentityProvider base class.',
+            'fake_idp_class_option'
+        )
+        self.assertIs(idp_class, EdXSAMLIdentityProvider)
+
 
 @contextmanager
-def simulate_running_pipeline(pipeline_target, backend, email=None, fullname=None, username=None):
+def simulate_running_pipeline(pipeline_target, backend, email=None, fullname=None, username=None, **kwargs):
     """Simulate that a pipeline is currently running.
 
     You can use this context manager to test packages that rely on third party auth.
@@ -258,6 +270,9 @@ def simulate_running_pipeline(pipeline_target, backend, email=None, fullname=Non
             app generates itself and should be available by the time the user
             is authenticating with a third-party provider.
 
+        kwargs (dict): If provided, simulate that the current provider has
+            included additional user details (useful for filling in the registration form).
+
     Returns:
         None
 
@@ -265,9 +280,11 @@ def simulate_running_pipeline(pipeline_target, backend, email=None, fullname=Non
     pipeline_data = {
         "backend": backend,
         "kwargs": {
-            "details": {}
+            "details": kwargs,
+            "response": kwargs.get("response", {})
         }
     }
+
     if email is not None:
         pipeline_data["kwargs"]["details"]["email"] = email
     if fullname is not None:

@@ -1,8 +1,8 @@
 # pylint: disable=missing-docstring
 # pylint: disable=redefined-outer-name
 
-from lettuce import world, step
-from nose.tools import assert_true, assert_false
+from lettuce import step, world
+from nose.tools import assert_false, assert_true
 
 
 @step('I fill in the registration form$')

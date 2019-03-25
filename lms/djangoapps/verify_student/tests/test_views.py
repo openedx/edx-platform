@@ -5,60 +5,54 @@ Tests of verify_student views.
 
 import json
 import urllib
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
 from uuid import uuid4
 
+import boto
 import ddt
 import httpretty
 import mock
-from nose.plugins.attrib import attr
-import boto
 import moto
 import pytz
-from bs4 import BeautifulSoup
-from mock import patch, Mock, ANY
 import requests
-
+from bs4 import BeautifulSoup
 from django.conf import settings
-from django.core.urlresolvers import reverse
 from django.core import mail
+from django.urls import reverse
 from django.test import TestCase
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
-from django.utils import timezone
-
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from django.utils.translation import ugettext as _
+from mock import Mock, patch
+from nose.plugins.attrib import attr
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
-from opaque_keys.edx.keys import UsageKey
+from waffle.testutils import override_switch
 
+from common.test.utils import XssTestMixin
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from courseware.url_helpers import get_redirect_url
-from common.test.utils import XssTestMixin
-from commerce.models import CommerceConfiguration
-from commerce.tests import TEST_PAYMENT_DATA, TEST_API_URL, TEST_API_SIGNING_KEY, TEST_PUBLIC_URL_ROOT
-from openedx.core.djangoapps.embargo.test_utils import restrict_course
-from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
-from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
-from shoppingcart.models import Order, CertificateItem
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
-from student.models import CourseEnrollment
-from util.date_utils import get_default_time_display
-from util.testing import UrlResetMixin
+from lms.djangoapps.commerce.models import CommerceConfiguration
+from lms.djangoapps.commerce.tests import TEST_API_URL, TEST_PAYMENT_DATA, TEST_PUBLIC_URL_ROOT
+from lms.djangoapps.commerce.utils import EcommerceService
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
 from lms.djangoapps.verify_student.views import (
-    checkout_with_ecommerce_service, render_to_response, PayAndVerifyView,
-    _compose_message_reverification_email
+    PayAndVerifyView,
+    checkout_with_ecommerce_service,
+    render_to_response,
+    EmailMarketingConfiguration
 )
-from lms.djangoapps.verify_student.models import (
-    VerificationDeadline, SoftwareSecurePhotoVerification,
-    VerificationCheckpoint, VerificationStatus,
-    IcrvStatusEmailsConfiguration,
-)
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.django import modulestore
+from openedx.core.djangoapps.embargo.test_utils import restrict_course
+from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
+from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
+from shoppingcart.models import CertificateItem, Order
+from student.models import CourseEnrollment
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from util.testing import UrlResetMixin
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.factories import check_mongo_calls
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 def mock_render_to_response(*args, **kwargs):
@@ -101,8 +95,15 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
     PASSWORD = "test_password"
 
     NOW = datetime.now(pytz.UTC)
-    YESTERDAY = NOW - timedelta(days=1)
-    TOMORROW = NOW + timedelta(days=1)
+    YESTERDAY = 'yesterday'
+    TOMORROW = 'tomorrow'
+    NEXT_YEAR = 'next_year'
+    DATES = {
+        YESTERDAY: NOW - timedelta(days=1),
+        TOMORROW: NOW + timedelta(days=1),
+        NEXT_YEAR: NOW + timedelta(days=360),
+        None: None,
+    }
 
     URLCONF_MODULES = ['openedx.core.djangoapps.embargo']
 
@@ -140,12 +141,10 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
     @httpretty.activate
     @override_settings(
         ECOMMERCE_API_URL=TEST_API_URL,
-        ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY,
         ECOMMERCE_PUBLIC_URL_ROOT=TEST_PUBLIC_URL_ROOT
     )
     def test_start_flow_with_ecommerce(self):
         """Verify user gets redirected to ecommerce checkout when ecommerce checkout is enabled."""
-        checkout_page = '/test_basket/'
         sku = 'TESTSKU'
         # When passing a SKU ecommerce api gets called.
         httpretty.register_uri(
@@ -154,15 +153,19 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
             body=json.dumps(['foo', 'bar']),
             content_type="application/json",
         )
+        configuration = CommerceConfiguration.objects.create(checkout_on_ecommerce_service=True)
+        checkout_page = configuration.basket_checkout_page
+        checkout_page += "?utm_source=test"
         httpretty.register_uri(httpretty.GET, "{}{}".format(TEST_PUBLIC_URL_ROOT, checkout_page))
-        CommerceConfiguration.objects.create(
-            checkout_on_ecommerce_service=True,
-            single_course_checkout_page=checkout_page
-        )
+
         course = self._create_course('verified', sku=sku)
         self._enroll(course.id)
-        response = self._get_page('verify_student_start_flow', course.id, expected_status_code=302)
-        expected_page = '{}{}?sku={}'.format(TEST_PUBLIC_URL_ROOT, checkout_page, sku)
+
+        # Verify that utm params are included in the url used for redirect
+        url_with_utm = 'http://www.example.com/basket/add/?utm_source=test&sku=TESTSKU'
+        with mock.patch.object(EcommerceService, 'get_checkout_page_url', return_value=url_with_utm):
+            response = self._get_page('verify_student_start_flow', course.id, expected_status_code=302)
+        expected_page = '{}{}&sku={}'.format(TEST_PUBLIC_URL_ROOT, checkout_page, sku)
         self.assertRedirects(response, expected_page, fetch_redirect_response=False)
 
     @ddt.data(
@@ -502,7 +505,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
     )
     @ddt.unpack
     def test_payment_confirmation_course_details(self, course_start, show_courseware_url):
-        course = self._create_course("verified", course_start=course_start)
+        course = self._create_course("verified", course_start=self.DATES[course_start])
         self._enroll(course.id, "verified")
         response = self._get_page('verify_student_payment_confirmation', course.id)
 
@@ -681,6 +684,25 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
             PayAndVerifyView.WEBCAM_REQ,
         ])
 
+    @override_switch(settings.DISABLE_ACCOUNT_ACTIVATION_REQUIREMENT_SWITCH, active=True)
+    @ddt.data("verify_student_start_flow", "verify_student_begin_flow")
+    def test_disable_account_activation_requirement_flag_active(self, payment_flow):
+        """
+        Here we are validating that the activation requirement step is not
+        being returned in the requirements response when the waffle flag is active
+        """
+        self.user.is_active = False
+        self.user.save()
+        course = self._create_course("verified")
+        response = self._get_page(payment_flow, course.id)
+
+        # Confirm that ID and webcam requirements are displayed,
+        # and that activation requirement is hidden.
+        self._assert_requirements_displayed(response, [
+            PayAndVerifyView.PHOTO_ID_REQ,
+            PayAndVerifyView.WEBCAM_REQ,
+        ])
+
     @ddt.data("verify_student_start_flow", "verify_student_begin_flow")
     def test_no_contribution(self, payment_flow):
         # Do NOT specify a contribution for the course in a session var.
@@ -744,9 +766,10 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         self.assertContains(response, "verification deadline")
         self.assertContains(response, deadline)
 
-    @ddt.data(datetime.now(tz=pytz.UTC) + timedelta(days=360), None)
+    @ddt.data(NEXT_YEAR, None)
     def test_course_mode_expired_verification_deadline_in_future(self, verification_deadline):
         """Verify that student can not upgrade in expired course mode."""
+        verification_deadline = self.DATES[verification_deadline]
         course_modes = ("verified", "credit")
         course = self._create_course(*course_modes)
 
@@ -822,7 +845,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         self.assertContains(response, "verification deadline")
         self.assertContains(response, verification_deadline_in_past)
 
-    @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
+    @patch.dict(settings.FEATURES, {'EMBARGO': True})
     @ddt.data("verify_student_start_flow", "verify_student_begin_flow")
     def test_embargo_restrict(self, payment_flow):
         course = self._create_course("verified")
@@ -832,7 +855,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
             response = self._get_page(payment_flow, course.id, expected_status_code=302)
             self.assertRedirects(response, redirect_url)
 
-    @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
+    @patch.dict(settings.FEATURES, {'EMBARGO': True})
     @ddt.data("verify_student_start_flow", "verify_student_begin_flow")
     def test_embargo_allow(self, payment_flow):
         course = self._create_course("verified")
@@ -1053,7 +1076,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         self.assertEqual(response_dict['course_name'], mode_display_name)
 
     @httpretty.activate
-    @override_settings(ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY)
+    @override_settings(ECOMMERCE_API_URL=TEST_API_URL)
     @ddt.data("verify_student_start_flow", "verify_student_begin_flow")
     def test_processors_api(self, payment_flow):
         """
@@ -1083,6 +1106,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         self.assertNotEqual(httpretty.last_request().headers, {})
 
 
+@attr(shard=2)
 class CheckoutTestMixin(object):
     """
     Mixin implementing test methods that should behave identically regardless
@@ -1223,7 +1247,7 @@ class TestCreateOrderShoppingCart(CheckoutTestMixin, ModuleStoreTestCase):
 
 
 @attr(shard=2)
-@override_settings(ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY)
+@override_settings(ECOMMERCE_API_URL=TEST_API_URL)
 @patch(
     'lms.djangoapps.verify_student.views.checkout_with_ecommerce_service',
     return_value=TEST_PAYMENT_DATA,
@@ -1248,7 +1272,7 @@ class TestCheckoutWithEcommerceService(ModuleStoreTestCase):
     """
 
     @httpretty.activate
-    @override_settings(ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY)
+    @override_settings(ECOMMERCE_API_URL=TEST_API_URL)
     def test_create_basket(self):
         """
         Check that when working with a product being processed by the
@@ -1301,7 +1325,7 @@ class TestCreateOrderView(ModuleStoreTestCase):
         self.course_id = 'Robot/999/Test_Course'
         self.course = CourseFactory.create(org='Robot', number='999', display_name='Test Course')
         verified_mode = CourseMode(
-            course_id=SlashSeparatedCourseKey("Robot", "999", 'Test_Course'),
+            course_id=CourseKey.from_string("Robot/999/Test_Course"),
             mode_slug="verified",
             mode_display_name="Verified Certificate",
             min_price=50
@@ -1606,8 +1630,11 @@ class TestSubmitPhotosForVerification(TestCase):
         """
         if expect_email:
             # Verify that photo submission confirmation email was sent
+            subject = _("{platform_name} ID Verification Photos Received").format(
+                platform_name=settings.PLATFORM_NAME
+            )
             self.assertEqual(len(mail.outbox), 1)
-            self.assertEqual("Verification photos received", mail.outbox[0].subject)
+            self.assertEqual(subject, mail.outbox[0].subject)
         else:
             # Verify that photo submission confirmation email was not sent
             self.assertEqual(len(mail.outbox), 0)
@@ -1688,7 +1715,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.assertIn('JSON should be dict', response.content)
         self.assertEqual(response.status_code, 400)
 
-    @mock.patch(
+    @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
         mock.Mock(side_effect=mocked_has_valid_signature)
     )
@@ -1713,7 +1740,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.assertIn('Access key invalid', response.content)
         self.assertEqual(response.status_code, 400)
 
-    @mock.patch(
+    @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
         mock.Mock(side_effect=mocked_has_valid_signature)
     )
@@ -1738,14 +1765,17 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.assertIn('edX ID Invalid-Id not found', response.content)
         self.assertEqual(response.status_code, 400)
 
-    @mock.patch(
+    @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
         mock.Mock(side_effect=mocked_has_valid_signature)
     )
-    def test_pass_result(self):
+    @patch('lms.djangoapps.verify_student.views.log.error')
+    @patch('lms.djangoapps.verify_student.utils.SailthruClient.send')
+    def test_passed_status_template(self, mock_sailthru_send, mock_log_error):
         """
         Test for verification passed.
         """
+        EmailMarketingConfiguration.objects.create(sailthru_verification_passed_template='test_template')
         data = {
             "EdX-ID": self.receipt_id,
             "Result": "PASS",
@@ -1762,15 +1792,20 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         attempt = SoftwareSecurePhotoVerification.objects.get(receipt_id=self.receipt_id)
         self.assertEqual(attempt.status, u'approved')
         self.assertEquals(response.content, 'OK!')
+        self.assertFalse(mock_log_error.called)
+        self.assertTrue(mock_sailthru_send.call_args[1], 'test_template')
 
-    @mock.patch(
+    @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
         mock.Mock(side_effect=mocked_has_valid_signature)
     )
-    def test_fail_result(self):
+    @patch('lms.djangoapps.verify_student.views.log.error')
+    @patch('sailthru.sailthru_client.SailthruClient.send')
+    def test_failed_status_template(self, mock_sailthru_send, mock_log_error):
         """
         Test for failed verification.
         """
+        EmailMarketingConfiguration.objects.create(sailthru_verification_failed_template='test_template')
         data = {
             "EdX-ID": self.receipt_id,
             "Result": 'FAIL',
@@ -1790,8 +1825,10 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.assertEqual(attempt.error_code, u'Your photo doesn\'t meet standards.')
         self.assertEqual(attempt.error_msg, u'"Invalid photo"')
         self.assertEquals(response.content, 'OK!')
+        self.assertFalse(mock_log_error.called)
+        self.assertTrue(mock_sailthru_send.call_args[1], 'test_template')
 
-    @mock.patch(
+    @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
         mock.Mock(side_effect=mocked_has_valid_signature)
     )
@@ -1817,7 +1854,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.assertEqual(attempt.error_msg, u'"Memory overflow"')
         self.assertEquals(response.content, 'OK!')
 
-    @mock.patch(
+    @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
         mock.Mock(side_effect=mocked_has_valid_signature)
     )
@@ -1840,159 +1877,6 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
             HTTP_DATE='testdate'
         )
         self.assertIn('Result Unknown not understood', response.content)
-
-    @mock.patch(
-        'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
-        mock.Mock(side_effect=mocked_has_valid_signature)
-    )
-    def test_in_course_reverify_disabled(self):
-        """
-        Test for verification passed.
-        """
-        data = {
-            "EdX-ID": self.receipt_id,
-            "Result": "PASS",
-            "Reason": "",
-            "MessageType": "You have been verified."
-        }
-        json_data = json.dumps(data)
-        response = self.client.post(
-            reverse('verify_student_results_callback'), data=json_data,
-            content_type='application/json',
-            HTTP_AUTHORIZATION='test BBBBBBBBBBBBBBBBBBBB:testing',
-            HTTP_DATE='testdate'
-        )
-        attempt = SoftwareSecurePhotoVerification.objects.get(receipt_id=self.receipt_id)
-        self.assertEqual(attempt.status, u'approved')
-        self.assertEquals(response.content, 'OK!')
-        # Verify that photo submission confirmation email was sent
-        self.assertEqual(len(mail.outbox), 0)
-        user_status = VerificationStatus.objects.filter(user=self.user).count()
-        self.assertEqual(user_status, 0)
-
-    @mock.patch(
-        'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
-        mock.Mock(side_effect=mocked_has_valid_signature)
-    )
-    def test_pass_in_course_reverify_result(self):
-        """
-        Test for verification passed.
-        """
-        # Verify that ICRV status email was sent when config is enabled
-        IcrvStatusEmailsConfiguration.objects.create(enabled=True)
-        self.create_reverification_xblock()
-
-        data = {
-            "EdX-ID": self.receipt_id,
-            "Result": "PASS",
-            "Reason": "",
-            "MessageType": "You have been verified."
-        }
-
-        json_data = json.dumps(data)
-
-        response = self.client.post(
-            reverse('verify_student_results_callback'), data=json_data,
-            content_type='application/json',
-            HTTP_AUTHORIZATION='test BBBBBBBBBBBBBBBBBBBB:testing',
-            HTTP_DATE='testdate'
-        )
-        attempt = SoftwareSecurePhotoVerification.objects.get(receipt_id=self.receipt_id)
-
-        self.assertEqual(attempt.status, u'approved')
-        self.assertEquals(response.content, 'OK!')
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual("Re-verification Status", mail.outbox[0].subject)
-
-    @mock.patch('verify_student.ssencrypt.has_valid_signature', mock.Mock(side_effect=mocked_has_valid_signature))
-    def test_icrv_status_email_with_disable_config(self):
-        """
-        Verify that photo re-verification status email was not sent when config is disable
-        """
-        IcrvStatusEmailsConfiguration.objects.create(enabled=False)
-
-        self.create_reverification_xblock()
-
-        data = {
-            "EdX-ID": self.receipt_id,
-            "Result": "PASS",
-            "Reason": "",
-            "MessageType": "You have been verified."
-        }
-
-        json_data = json.dumps(data)
-
-        response = self.client.post(
-            reverse('verify_student_results_callback'), data=json_data,
-            content_type='application/json',
-            HTTP_AUTHORIZATION='test BBBBBBBBBBBBBBBBBBBB:testing',
-            HTTP_DATE='testdate'
-        )
-        attempt = SoftwareSecurePhotoVerification.objects.get(receipt_id=self.receipt_id)
-
-        self.assertEqual(attempt.status, u'approved')
-        self.assertEquals(response.content, 'OK!')
-        self.assertEqual(len(mail.outbox), 0)
-
-    @mock.patch('lms.djangoapps.verify_student.views._send_email')
-    @mock.patch(
-        'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
-        mock.Mock(side_effect=mocked_has_valid_signature)
-    )
-    def test_reverification_on_callback(self, mock_send_email):
-        """
-        Test software secure callback flow for re-verification.
-        """
-        IcrvStatusEmailsConfiguration.objects.create(enabled=True)
-
-        # Create the 'edx-reverification-block' in course tree
-        self.create_reverification_xblock()
-
-        # create dummy data for software secure photo verification result callback
-        data = {
-            "EdX-ID": self.receipt_id,
-            "Result": "PASS",
-            "Reason": "",
-            "MessageType": "You have been verified."
-        }
-        json_data = json.dumps(data)
-        response = self.client.post(
-            reverse('verify_student_results_callback'),
-            data=json_data,
-            content_type='application/json',
-            HTTP_AUTHORIZATION='test BBBBBBBBBBBBBBBBBBBB:testing',
-            HTTP_DATE='testdate'
-        )
-        self.assertEqual(response.content, 'OK!')
-
-        # now check that '_send_email' method is called on result callback
-        # with required parameters
-        subject = "Re-verification Status"
-        mock_send_email.assert_called_once_with(self.user.id, subject, ANY)
-
-    def create_reverification_xblock(self):
-        """
-        Create the reverification XBlock.
-        """
-        # Create the 'edx-reverification-block' in course tree
-        section = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
-        subsection = ItemFactory.create(parent=section, category='sequential', display_name='Test Subsection')
-        vertical = ItemFactory.create(parent=subsection, category='vertical', display_name='Test Unit')
-        reverification = ItemFactory.create(
-            parent=vertical,
-            category='edx-reverification-block',
-            display_name='Test Verification Block'
-        )
-
-        # Create checkpoint
-        checkpoint = VerificationCheckpoint(course_id=self.course_id, checkpoint_location=reverification.location)
-        checkpoint.save()
-
-        # Add a re-verification attempt
-        checkpoint.add_verification_attempt(self.attempt)
-
-        # Add a re-verification attempt status for the user
-        VerificationStatus.add_verification_status(checkpoint, self.user, "submitted")
 
 
 @attr(shard=2)
@@ -2105,495 +1989,3 @@ class TestReverifyView(TestCase):
         """
         response = self._get_reverify_page()
         self.assertContains(response, "reverify-blocked")
-
-
-@attr(shard=2)
-class TestInCourseReverifyView(ModuleStoreTestCase):
-    """
-    Tests for the incourse reverification views.
-    """
-    IMAGE_DATA = "abcd,1234"
-
-    def build_course(self):
-        """
-        Build up a course tree with a Reverificaiton xBlock.
-        """
-        self.course_key = SlashSeparatedCourseKey("Robot", "999", "Test_Course")
-        self.course = CourseFactory.create(org='Robot', number='999', display_name='Test Course')
-
-        # Create the course modes
-        for mode in ('audit', 'honor', 'verified'):
-            min_price = 0 if mode in ["honor", "audit"] else 1
-            CourseModeFactory.create(mode_slug=mode, course_id=self.course_key, min_price=min_price)
-
-        # Create the 'edx-reverification-block' in course tree
-        section = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
-        subsection = ItemFactory.create(parent=section, category='sequential', display_name='Test Subsection')
-        vertical = ItemFactory.create(parent=subsection, category='vertical', display_name='Test Unit')
-        self.reverification = ItemFactory.create(
-            parent=vertical,
-            category='edx-reverification-block',
-            display_name='Test Verification Block'
-        )
-        self.section_location = section.location
-        self.subsection_location = subsection.location
-        self.vertical_location = vertical.location
-        self.reverification_location = unicode(self.reverification.location)
-        self.reverification_assessment = self.reverification.related_assessment
-
-    def setUp(self):
-        super(TestInCourseReverifyView, self).setUp()
-
-        self.build_course()
-
-        self.user = UserFactory.create(username="rusty", password="test")
-        self.client.login(username="rusty", password="test")
-
-        # Enroll the user in the default mode (honor) to emulate
-        CourseEnrollment.enroll(self.user, self.course_key, mode="verified")
-
-        # mocking and patching for bi events
-        analytics_patcher = patch('lms.djangoapps.verify_student.views.analytics')
-        self.mock_tracker = analytics_patcher.start()
-        self.addCleanup(analytics_patcher.stop)
-
-    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
-    def test_incourse_reverify_invalid_checkpoint_get(self):
-        # Retrieve a checkpoint that doesn't yet exist
-        response = self.client.get(self._get_url(self.course_key, "invalid_checkpoint"))
-        self.assertEqual(response.status_code, 404)
-
-    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
-    def test_incourse_reverify_initial_redirect_get(self):
-        self._create_checkpoint()
-        response = self.client.get(self._get_url(self.course_key, self.reverification_location))
-
-        url = reverse('verify_student_verify_now', kwargs={"course_id": unicode(self.course_key)})
-        url += u"?{params}".format(params=urllib.urlencode({"checkpoint": self.reverification_location}))
-        self.assertRedirects(response, url)
-
-    @override_settings(LMS_SEGMENT_KEY="foobar")
-    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
-    def test_incourse_reverify_get(self):
-        """
-        Test incourse reverification.
-        """
-        self._create_checkpoint()
-        self._create_initial_verification()
-
-        response = self.client.get(self._get_url(self.course_key, self.reverification_location))
-        self.assertEquals(response.status_code, 200)
-
-        # verify that Google Analytics event fires after successfully
-        # submitting the photo verification
-        self.mock_tracker.track.assert_called_once_with(  # pylint: disable=no-member
-            self.user.id,
-            'edx.bi.reverify.started',
-            {
-                'category': "verification",
-                'label': unicode(self.course_key),
-                'checkpoint': self.reverification_assessment
-            },
-
-            context={
-                'ip': '127.0.0.1',
-                'Google Analytics':
-                {'clientId': None}
-            }
-        )
-        self.mock_tracker.reset_mock()
-
-    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
-    def test_checkpoint_post(self):
-        """Verify that POST requests including an invalid checkpoint location
-        results in a 400 response.
-        """
-        response = self._submit_photos(self.course_key, self.reverification_location, self.IMAGE_DATA)
-        self.assertEquals(response.status_code, 400)
-
-    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
-    def test_incourse_reverify_id_required_if_no_initial_verification(self):
-        self._create_checkpoint()
-
-        # Since the user has no initial verification and we're not sending the ID photo,
-        # we should expect a 400 bad request
-        response = self._submit_photos(self.course_key, self.reverification_location, self.IMAGE_DATA)
-        self.assertEqual(response.status_code, 400)
-
-    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
-    def test_incourse_reverify_index_error_post(self):
-        self._create_checkpoint()
-        self._create_initial_verification()
-
-        response = self._submit_photos(self.course_key, self.reverification_location, "")
-        self.assertEqual(response.status_code, 400)
-
-    @override_settings(LMS_SEGMENT_KEY="foobar")
-    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
-    def test_incourse_reverify_post(self):
-        self._create_checkpoint()
-        self._create_initial_verification()
-
-        response = self._submit_photos(self.course_key, self.reverification_location, self.IMAGE_DATA)
-        self.assertEqual(response.status_code, 200)
-
-        # Check that the checkpoint status has been updated
-        status = VerificationStatus.get_user_status_at_checkpoint(
-            self.user, self.course_key, self.reverification_location
-        )
-        self.assertEqual(status, "submitted")
-
-        # Test that Google Analytics event fires after successfully submitting
-        # photo verification
-        self.mock_tracker.track.assert_called_once_with(  # pylint: disable=no-member
-            self.user.id,
-            'edx.bi.reverify.submitted',
-            {
-                'category': "verification",
-                'label': unicode(self.course_key),
-                'checkpoint': self.reverification_assessment
-            },
-            context={
-                'ip': '127.0.0.1',
-                'Google Analytics':
-                {'clientId': None}
-            }
-        )
-        self.mock_tracker.reset_mock()
-
-    def _create_checkpoint(self):
-        """
-        Helper method for creating a reverification checkpoint.
-        """
-        checkpoint = VerificationCheckpoint(course_id=self.course_key, checkpoint_location=self.reverification_location)
-        checkpoint.save()
-
-    def _create_initial_verification(self):
-        """
-        Helper method for initial verification.
-        """
-        attempt = SoftwareSecurePhotoVerification(user=self.user, photo_id_key="dummy_photo_id_key")
-        attempt.mark_ready()
-        attempt.save()
-        attempt.submit()
-
-    def _get_url(self, course_key, checkpoint_location):
-        """
-        Construct the reverification url.
-
-        Arguments:
-            course_key (unicode): The ID of the course
-            checkpoint_location (str): Location of verification checkpoint
-
-        Returns:
-            url
-        """
-        return reverse(
-            'verify_student_incourse_reverify',
-            kwargs={
-                "course_id": unicode(course_key),
-                "usage_id": checkpoint_location
-            }
-        )
-
-    def _submit_photos(self, course_key, checkpoint_location, face_image_data):
-        """ Submit photos for verification. """
-        url = reverse("verify_student_submit_photos")
-        data = {
-            "course_key": unicode(course_key),
-            "checkpoint": checkpoint_location,
-            "face_image": face_image_data,
-        }
-        return self.client.post(url, data)
-
-
-@attr(shard=2)
-class TestEmailMessageWithCustomICRVBlock(ModuleStoreTestCase):
-    """
-    Test email sending on re-verification
-    """
-
-    def build_course(self):
-        """
-        Build up a course tree with a Reverificaiton xBlock.
-        """
-        self.course_key = SlashSeparatedCourseKey("Robot", "999", "Test_Course")
-        self.course = CourseFactory.create(org='Robot', number='999', display_name='Test Course')
-        self.due_date = datetime.now(pytz.UTC) + timedelta(days=20)
-        self.allowed_attempts = 1
-
-        # Create the course modes
-        for mode in ('audit', 'honor', 'verified'):
-            min_price = 0 if mode in ["honor", "audit"] else 1
-            CourseModeFactory.create(mode_slug=mode, course_id=self.course_key, min_price=min_price)
-
-        # Create the 'edx-reverification-block' in course tree
-        section = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
-        subsection = ItemFactory.create(parent=section, category='sequential', display_name='Test Subsection')
-        vertical = ItemFactory.create(parent=subsection, category='vertical', display_name='Test Unit')
-
-        self.reverification = ItemFactory.create(
-            parent=vertical,
-            category='edx-reverification-block',
-            display_name='Test Verification Block',
-            metadata={'attempts': self.allowed_attempts, 'due': self.due_date}
-        )
-
-        self.section_location = section.location
-        self.subsection_location = subsection.location
-        self.vertical_location = vertical.location
-        self.reverification_location = unicode(self.reverification.location)
-        self.assessment = self.reverification.related_assessment
-
-        self.re_verification_link = reverse(
-            'verify_student_incourse_reverify',
-            args=(
-                unicode(self.course_key),
-                self.reverification_location
-            )
-        )
-
-    def setUp(self):
-        """
-        Setup method for testing photo verification email messages.
-        """
-        super(TestEmailMessageWithCustomICRVBlock, self).setUp()
-        self.build_course()
-        self.check_point = VerificationCheckpoint.objects.create(
-            course_id=self.course.id, checkpoint_location=self.reverification_location
-        )
-        self.check_point.add_verification_attempt(SoftwareSecurePhotoVerification.objects.create(user=self.user))
-
-        VerificationStatus.add_verification_status(
-            checkpoint=self.check_point,
-            user=self.user,
-            status='submitted'
-        )
-        self.attempt = SoftwareSecurePhotoVerification.objects.filter(user=self.user)
-        location_id = VerificationStatus.get_location_id(self.attempt)
-        usage_key = UsageKey.from_string(location_id)
-        redirect_url = get_redirect_url(self.course_key, usage_key.replace(course_key=self.course_key))
-        self.request = RequestFactory().get('/url')
-        self.course_link = self.request.build_absolute_uri(redirect_url)
-
-    def test_approved_email_message(self):
-
-        subject, body = _compose_message_reverification_email(
-            self.course.id, self.user.id, self.reverification_location, "approved", self.request
-        )
-
-        self.assertIn(
-            "We have successfully verified your identity for the {assessment} "
-            "assessment in the {course_name} course.".format(
-                assessment=self.assessment,
-                course_name=self.course.display_name_with_default_escaped
-            ),
-            body
-        )
-
-        self.check_courseware_link_exists(body)
-        self.assertIn("Re-verification Status", subject)
-
-    def test_denied_email_message_with_valid_due_date_and_attempts_allowed(self):
-
-        subject, body = _compose_message_reverification_email(
-            self.course.id, self.user.id, self.reverification_location, "denied", self.request
-        )
-
-        self.assertIn(
-            "We could not verify your identity for the {assessment} assessment "
-            "in the {course_name} course. You have used "
-            "{used_attempts} out of {allowed_attempts} attempts to "
-            "verify your identity".format(
-                course_name=self.course.display_name_with_default_escaped,
-                assessment=self.assessment,
-                used_attempts=1,
-                allowed_attempts=self.allowed_attempts + 1
-            ),
-            body
-        )
-
-        self.assertIn(
-            "You must verify your identity before the assessment "
-            "closes on {due_date}".format(
-                due_date=get_default_time_display(self.due_date)
-            ),
-            body
-        )
-        reverify_link = self.request.build_absolute_uri(self.re_verification_link)
-        self.assertIn(
-            "To try to verify your identity again, select the following link:",
-            body
-        )
-
-        self.assertIn(reverify_link, body)
-        self.assertIn("Re-verification Status", subject)
-
-    def test_denied_email_message_with_due_date_and_no_attempts(self):
-        """ Denied email message if due date is still open but user has no
-            attempts available.
-        """
-
-        VerificationStatus.add_verification_status(
-            checkpoint=self.check_point,
-            user=self.user,
-            status='submitted'
-        )
-
-        __, body = _compose_message_reverification_email(
-            self.course.id, self.user.id, self.reverification_location, "denied", self.request
-        )
-
-        self.assertIn(
-            "We could not verify your identity for the {assessment} assessment "
-            "in the {course_name} course. You have used "
-            "{used_attempts} out of {allowed_attempts} attempts to "
-            "verify your identity, and verification is no longer "
-            "possible".format(
-                course_name=self.course.display_name_with_default_escaped,
-                assessment=self.assessment,
-                used_attempts=2,
-                allowed_attempts=self.allowed_attempts + 1
-            ),
-            body
-        )
-
-        self.check_courseware_link_exists(body)
-
-    def test_denied_email_message_with_close_verification_dates(self):
-        # Due date given and expired
-        return_value = datetime.now(tz=pytz.UTC) + timedelta(days=22)
-        with patch.object(timezone, 'now', return_value=return_value):
-            __, body = _compose_message_reverification_email(
-                self.course.id, self.user.id, self.reverification_location, "denied", self.request
-            )
-
-            self.assertIn(
-                "We could not verify your identity for the {assessment} assessment "
-                "in the {course_name} course. You have used "
-                "{used_attempts} out of {allowed_attempts} attempts to "
-                "verify your identity, and verification is no longer "
-                "possible".format(
-                    course_name=self.course.display_name_with_default_escaped,
-                    assessment=self.assessment,
-                    used_attempts=1,
-                    allowed_attempts=self.allowed_attempts + 1
-                ),
-                body
-            )
-
-    def test_check_num_queries(self):
-        # Get the re-verification block to check the call made
-        with check_mongo_calls(1):
-            ver_block = modulestore().get_item(self.reverification.location)
-
-        # Expect that the verification block is fetched
-        self.assertIsNotNone(ver_block)
-
-    def check_courseware_link_exists(self, body):
-        """Checking courseware url and signature information of EDX"""
-        self.assertIn(
-            "To go to the courseware, select the following link:",
-            body
-        )
-        self.assertIn(
-            "{course_link}".format(
-                course_link=self.course_link
-            ),
-            body
-        )
-
-        self.assertIn("Thanks,", body)
-        self.assertIn(
-            u"The {platform_name} team".format(
-                platform_name=settings.PLATFORM_NAME
-            ),
-            body
-        )
-
-
-@attr(shard=2)
-class TestEmailMessageWithDefaultICRVBlock(ModuleStoreTestCase):
-    """
-    Test for In-course Re-verification
-    """
-
-    def build_course(self):
-        """
-        Build up a course tree with a Reverificaiton xBlock.
-        """
-        self.course_key = SlashSeparatedCourseKey("Robot", "999", "Test_Course")
-        self.course = CourseFactory.create(org='Robot', number='999', display_name='Test Course')
-
-        # Create the course modes
-        for mode in ('audit', 'honor', 'verified'):
-            min_price = 0 if mode in ["honor", "audit"] else 1
-            CourseModeFactory.create(mode_slug=mode, course_id=self.course_key, min_price=min_price)
-
-        # Create the 'edx-reverification-block' in course tree
-        section = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
-        subsection = ItemFactory.create(parent=section, category='sequential', display_name='Test Subsection')
-        vertical = ItemFactory.create(parent=subsection, category='vertical', display_name='Test Unit')
-
-        self.reverification = ItemFactory.create(
-            parent=vertical,
-            category='edx-reverification-block',
-            display_name='Test Verification Block'
-        )
-
-        self.section_location = section.location
-        self.subsection_location = subsection.location
-        self.vertical_location = vertical.location
-        self.reverification_location = unicode(self.reverification.location)
-        self.assessment = self.reverification.related_assessment
-
-        self.re_verification_link = reverse(
-            'verify_student_incourse_reverify',
-            args=(
-                unicode(self.course_key),
-                self.reverification_location
-            )
-        )
-
-    def setUp(self):
-        super(TestEmailMessageWithDefaultICRVBlock, self).setUp()
-
-        self.build_course()
-        self.check_point = VerificationCheckpoint.objects.create(
-            course_id=self.course.id, checkpoint_location=self.reverification_location
-        )
-        self.check_point.add_verification_attempt(SoftwareSecurePhotoVerification.objects.create(user=self.user))
-        self.attempt = SoftwareSecurePhotoVerification.objects.filter(user=self.user)
-        self.request = RequestFactory().get('/url')
-
-    def test_denied_email_message_with_no_attempt_allowed(self):
-
-        VerificationStatus.add_verification_status(
-            checkpoint=self.check_point,
-            user=self.user,
-            status='submitted'
-        )
-
-        __, body = _compose_message_reverification_email(
-            self.course.id, self.user.id, self.reverification_location, "denied", self.request
-        )
-
-        self.assertIn(
-            "We could not verify your identity for the {assessment} assessment "
-            "in the {course_name} course. You have used "
-            "{used_attempts} out of {allowed_attempts} attempts to "
-            "verify your identity, and verification is no longer "
-            "possible".format(
-                course_name=self.course.display_name_with_default_escaped,
-                assessment=self.assessment,
-                used_attempts=1,
-                allowed_attempts=1
-            ),
-            body
-        )
-
-    def test_error_on_compose_email(self):
-        resp = _compose_message_reverification_email(
-            self.course.id, self.user.id, self.reverification_location, "denied", True
-        )
-        self.assertIsNone(resp)

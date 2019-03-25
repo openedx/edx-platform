@@ -19,7 +19,7 @@ function(_, gettext, ManageUsersAndRoles) {
         var roles = [
             {key: 'library_user', name: gettext('Library User')},
             {key: 'staff', name: gettext('Staff')},
-            {key: 'instructor', 'name': gettext('Admin')}
+            {key: 'instructor', name: gettext('Admin')}
         ];
 
         var options = {

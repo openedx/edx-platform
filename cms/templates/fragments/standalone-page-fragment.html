@@ -1,0 +1,15 @@
+<%! from openedx.core.djangolib.markup import HTML %>
+
+<%block name="head_extra">
+    ${HTML(fragment.head_html())}
+</%block>
+
+<%block name="footer_extra">
+    ${HTML(fragment.foot_html())}
+</%block>
+
+<div class="wrapper-content wrapper">
+    <section class="content">
+        ${HTML(fragment.body_html())}
+    </section>
+</div>

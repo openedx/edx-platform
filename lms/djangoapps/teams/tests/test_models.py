@@ -1,33 +1,32 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=no-member
 """Tests for the teams API at the HTTP request level."""
+import itertools
 from contextlib import contextmanager
 from datetime import datetime
+
 import ddt
-import itertools
-from mock import Mock
 import pytz
+from mock import Mock
+from opaque_keys.edx.keys import CourseKey
 
 from django_comment_common.signals import (
-    thread_created,
-    thread_edited,
-    thread_deleted,
-    thread_voted,
     comment_created,
-    comment_edited,
     comment_deleted,
+    comment_edited,
+    comment_endorsed,
     comment_voted,
-    comment_endorsed
+    thread_created,
+    thread_deleted,
+    thread_edited,
+    thread_voted
 )
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from opaque_keys.edx.keys import CourseKey
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
-
-from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
-from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from lms.djangoapps.teams import TEAM_DISCUSSION_CONTEXT
+from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
+from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import EventTestMixin
-
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 COURSE_KEY1 = CourseKey.from_string('edx/history/1')
 COURSE_KEY2 = CourseKey.from_string('edx/history/2')
@@ -36,6 +35,7 @@ COURSE_KEY2 = CourseKey.from_string('edx/history/2')
 @ddt.ddt
 class TeamMembershipTest(SharedModuleStoreTestCase):
     """Tests for the TeamMembership model."""
+    shard = 4
 
     def setUp(self):
         """
@@ -118,18 +118,19 @@ class TeamMembershipTest(SharedModuleStoreTestCase):
 @ddt.ddt
 class TeamSignalsTest(EventTestMixin, SharedModuleStoreTestCase):
     """Tests for handling of team-related signals."""
+    shard = 4
 
-    SIGNALS_LIST = (
-        thread_created,
-        thread_edited,
-        thread_deleted,
-        thread_voted,
-        comment_created,
-        comment_edited,
-        comment_deleted,
-        comment_voted,
-        comment_endorsed
-    )
+    SIGNALS = {
+        'thread_created': thread_created,
+        'thread_edited': thread_edited,
+        'thread_deleted': thread_deleted,
+        'thread_voted': thread_voted,
+        'comment_created': comment_created,
+        'comment_edited': comment_edited,
+        'comment_deleted': comment_deleted,
+        'comment_voted': comment_voted,
+        'comment_endorsed': comment_endorsed,
+    }
 
     DISCUSSION_TOPIC_ID = 'test_topic'
 
@@ -181,30 +182,33 @@ class TeamSignalsTest(EventTestMixin, SharedModuleStoreTestCase):
 
     @ddt.data(
         *itertools.product(
-            SIGNALS_LIST,
+            SIGNALS.keys(),
             (('user', True), ('moderator', False))
         )
     )
     @ddt.unpack
-    def test_signals(self, signal, (user, should_update)):
+    def test_signals(self, signal_name, (user, should_update)):
         """Test that `last_activity_at` is correctly updated when team-related
         signals are sent.
         """
         with self.assert_last_activity_updated(should_update):
             user = getattr(self, user)
+            signal = self.SIGNALS[signal_name]
             signal.send(sender=None, user=user, post=self.mock_comment())
 
-    @ddt.data(thread_voted, comment_voted)
-    def test_vote_others_post(self, signal):
+    @ddt.data('thread_voted', 'comment_voted')
+    def test_vote_others_post(self, signal_name):
         """Test that voting on another user's post correctly fires a
         signal."""
         with self.assert_last_activity_updated(True):
+            signal = self.SIGNALS[signal_name]
             signal.send(sender=None, user=self.user, post=self.mock_comment(user=self.moderator))
 
-    @ddt.data(*SIGNALS_LIST)
-    def test_signals_course_context(self, signal):
+    @ddt.data(*SIGNALS.keys())
+    def test_signals_course_context(self, signal_name):
         """Test that `last_activity_at` is not updated when activity takes
         place in discussions outside of a team.
         """
         with self.assert_last_activity_updated(False):
+            signal = self.SIGNALS[signal_name]
             signal.send(sender=None, user=self.user, post=self.mock_comment(context='course'))

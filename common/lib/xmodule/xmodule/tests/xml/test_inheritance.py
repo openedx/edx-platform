@@ -12,6 +12,8 @@ class TestInheritedFieldParsing(XModuleXmlImportTest):
     Test that inherited fields work correctly when parsing XML
 
     """
+    shard = 2
+
     def test_null_string(self):
         # Test that the string inherited fields are passed through 'deserialize_field',
         # which converts the string "null" to the python value None

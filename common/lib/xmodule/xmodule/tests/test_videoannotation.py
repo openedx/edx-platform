@@ -20,6 +20,7 @@ class VideoAnnotationModuleTestCase(unittest.TestCase):
             <instructions><p>Video Test Instructions.</p></instructions>
         </annotatable>
     '''
+    shard = 1
     sample_sourceurl = "http://video-js.zencoder.com/oceans-clip.mp4"
     sample_youtubeurl = "http://www.youtube.com/watch?v=yxLIu-scR9Y"
 

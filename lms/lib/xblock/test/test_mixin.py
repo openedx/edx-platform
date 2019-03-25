@@ -4,6 +4,13 @@ Tests of the LMS XBlock Mixin
 import ddt
 from nose.plugins.attrib import attr
 
+from lms_xblock.mixin import (
+    INVALID_USER_PARTITION_GROUP_VALIDATION_COMPONENT,
+    INVALID_USER_PARTITION_GROUP_VALIDATION_UNIT,
+    INVALID_USER_PARTITION_VALIDATION_COMPONENT,
+    INVALID_USER_PARTITION_VALIDATION_UNIT,
+    NONSENSICAL_ACCESS_RESTRICTION
+)
 from xblock.validation import ValidationMessage
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import CourseFactory, ToyCourseFactory, ItemFactory
@@ -37,10 +44,16 @@ class LmsXBlockMixinTestCase(ModuleStoreTestCase):
         subsection = ItemFactory.create(parent=section, category='sequential', display_name='Test Subsection')
         vertical = ItemFactory.create(parent=subsection, category='vertical', display_name='Test Unit')
         video = ItemFactory.create(parent=vertical, category='video', display_name='Test Video 1')
+        split_test = ItemFactory.create(parent=vertical, category='split_test', display_name='Test Content Experiment')
+        child_vertical = ItemFactory.create(parent=split_test, category='vertical')
+        child_html_module = ItemFactory.create(parent=child_vertical, category='html')
         self.section_location = section.location
         self.subsection_location = subsection.location
         self.vertical_location = vertical.location
         self.video_location = video.location
+        self.split_test_location = split_test.location
+        self.child_vertical_location = child_vertical.location
+        self.child_html_module_location = child_html_module.location
 
     def set_group_access(self, block_location, access_dict):
         """
@@ -51,6 +64,7 @@ class LmsXBlockMixinTestCase(ModuleStoreTestCase):
         self.store.update_item(block, 1)
 
 
+@attr(shard=5)
 class XBlockValidationTest(LmsXBlockMixinTestCase):
     """
     Unit tests for XBlock validation
@@ -83,14 +97,14 @@ class XBlockValidationTest(LmsXBlockMixinTestCase):
 
     def test_validate_invalid_user_partitions(self):
         """
-        Test the validation messages produced for an xblock referring to non-existent user partitions.
+        Test the validation messages produced for a component referring to non-existent user partitions.
         """
         self.set_group_access(self.video_location, {999: [self.group1.id]})
         validation = self.store.get_item(self.video_location).validate()
         self.assertEqual(len(validation.messages), 1)
         self.verify_validation_message(
             validation.messages[0],
-            u"This component refers to deleted or invalid content group configurations.",
+            INVALID_USER_PARTITION_VALIDATION_COMPONENT,
             ValidationMessage.ERROR,
         )
 
@@ -102,7 +116,32 @@ class XBlockValidationTest(LmsXBlockMixinTestCase):
         self.assertEqual(len(validation.messages), 1)
         self.verify_validation_message(
             validation.messages[0],
-            u"This component refers to deleted or invalid content group configurations.",
+            INVALID_USER_PARTITION_VALIDATION_COMPONENT,
+            ValidationMessage.ERROR,
+        )
+
+    def test_validate_invalid_user_partitions_unit(self):
+        """
+        Test the validation messages produced for a unit referring to non-existent user partitions.
+        """
+        self.set_group_access(self.vertical_location, {999: [self.group1.id]})
+        validation = self.store.get_item(self.vertical_location).validate()
+        self.assertEqual(len(validation.messages), 1)
+        self.verify_validation_message(
+            validation.messages[0],
+            INVALID_USER_PARTITION_VALIDATION_UNIT,
+            ValidationMessage.ERROR,
+        )
+
+        # Now add a second invalid user partition and validate again.
+        # Note that even though there are two invalid configurations,
+        # only a single error message will be returned.
+        self.set_group_access(self.vertical_location, {998: [self.group2.id]})
+        validation = self.store.get_item(self.vertical_location).validate()
+        self.assertEqual(len(validation.messages), 1)
+        self.verify_validation_message(
+            validation.messages[0],
+            INVALID_USER_PARTITION_VALIDATION_UNIT,
             ValidationMessage.ERROR,
         )
 
@@ -115,7 +154,7 @@ class XBlockValidationTest(LmsXBlockMixinTestCase):
         self.assertEqual(len(validation.messages), 1)
         self.verify_validation_message(
             validation.messages[0],
-            u"This component refers to deleted or invalid content groups.",
+            INVALID_USER_PARTITION_GROUP_VALIDATION_COMPONENT,
             ValidationMessage.ERROR,
         )
 
@@ -125,11 +164,117 @@ class XBlockValidationTest(LmsXBlockMixinTestCase):
         self.assertEqual(len(validation.messages), 1)
         self.verify_validation_message(
             validation.messages[0],
-            u"This component refers to deleted or invalid content groups.",
+            INVALID_USER_PARTITION_GROUP_VALIDATION_COMPONENT,
+            ValidationMessage.ERROR,
+        )
+
+    def test_validate_nonsensical_access_for_split_test_children(self):
+        """
+        Test the validation messages produced for components within
+        a content group experiment (also known as a split_test).
+        Ensures that children of split_test xblocks only validate
+        their access settings off the parent, rather than any
+        grandparent.
+        """
+        # Test that no validation message is displayed on split_test child when child agrees with parent
+        self.set_group_access(self.vertical_location, {self.user_partition.id: [self.group1.id]})
+        self.set_group_access(self.split_test_location, {self.user_partition.id: [self.group2.id]})
+        self.set_group_access(self.child_vertical_location, {self.user_partition.id: [self.group2.id]})
+        self.set_group_access(self.child_html_module_location, {self.user_partition.id: [self.group2.id]})
+        validation = self.store.get_item(self.child_html_module_location).validate()
+        self.assertEqual(len(validation.messages), 0)
+
+        # Test that a validation message is displayed on split_test child when the child contradicts the parent,
+        # even though the child agrees with the grandparent unit.
+        self.set_group_access(self.child_html_module_location, {self.user_partition.id: [self.group1.id]})
+        validation = self.store.get_item(self.child_html_module_location).validate()
+        self.assertEqual(len(validation.messages), 1)
+        self.verify_validation_message(
+            validation.messages[0],
+            NONSENSICAL_ACCESS_RESTRICTION,
+            ValidationMessage.ERROR,
+        )
+
+    def test_validate_invalid_groups_for_unit(self):
+        """
+        Test the validation messages produced for a unit-level xblock referring to non-existent groups.
+        """
+        self.set_group_access(self.vertical_location, {self.user_partition.id: [self.group1.id, 999]})
+        validation = self.store.get_item(self.vertical_location).validate()
+        self.assertEqual(len(validation.messages), 1)
+        self.verify_validation_message(
+            validation.messages[0],
+            INVALID_USER_PARTITION_GROUP_VALIDATION_UNIT,
+            ValidationMessage.ERROR,
+        )
+
+    def test_validate_nonsensical_access_restriction(self):
+        """
+        Test the validation messages produced for a component whose
+        access settings contradict the unit level access.
+        """
+        # Test that there is no validation message for non-contradicting access restrictions
+        self.set_group_access(self.vertical_location, {self.user_partition.id: [self.group1.id]})
+        self.set_group_access(self.video_location, {self.user_partition.id: [self.group1.id]})
+        validation = self.store.get_item(self.video_location).validate()
+        self.assertEqual(len(validation.messages), 0)
+
+        # Now try again with opposing access restrictions
+        self.set_group_access(self.vertical_location, {self.user_partition.id: [self.group1.id]})
+        self.set_group_access(self.video_location, {self.user_partition.id: [self.group2.id]})
+        validation = self.store.get_item(self.video_location).validate()
+        self.assertEqual(len(validation.messages), 1)
+        self.verify_validation_message(
+            validation.messages[0],
+            NONSENSICAL_ACCESS_RESTRICTION,
+            ValidationMessage.ERROR,
+        )
+
+        # Now try again when the component restricts access to additional groups that the unit does not
+        self.set_group_access(self.vertical_location, {self.user_partition.id: [self.group1.id]})
+        self.set_group_access(self.video_location, {self.user_partition.id: [self.group1.id, self.group2.id]})
+        validation = self.store.get_item(self.video_location).validate()
+        self.assertEqual(len(validation.messages), 1)
+        self.verify_validation_message(
+            validation.messages[0],
+            NONSENSICAL_ACCESS_RESTRICTION,
+            ValidationMessage.ERROR,
+        )
+
+        # Now try again when the component tries to allow access to all learners and staff
+        self.set_group_access(self.vertical_location, {self.user_partition.id: [self.group1.id]})
+        self.set_group_access(self.video_location, {})
+        validation = self.store.get_item(self.video_location).validate()
+        self.assertEqual(len(validation.messages), 1)
+        self.verify_validation_message(
+            validation.messages[0],
+            NONSENSICAL_ACCESS_RESTRICTION,
+            ValidationMessage.ERROR,
+        )
+
+    def test_nonsensical_access_restriction_does_not_override(self):
+        """
+        Test that the validation message produced for a component
+        whose access settings contradict the unit level access don't
+        override other messages but add on to them.
+        """
+        self.set_group_access(self.vertical_location, {self.user_partition.id: [self.group1.id]})
+        self.set_group_access(self.video_location, {self.user_partition.id: [self.group2.id, 999]})
+        validation = self.store.get_item(self.video_location).validate()
+        self.assertEqual(len(validation.messages), 2)
+        self.verify_validation_message(
+            validation.messages[0],
+            INVALID_USER_PARTITION_GROUP_VALIDATION_COMPONENT,
+            ValidationMessage.ERROR,
+        )
+        self.verify_validation_message(
+            validation.messages[1],
+            NONSENSICAL_ACCESS_RESTRICTION,
             ValidationMessage.ERROR,
         )
 
 
+@attr(shard=5)
 class OpenAssessmentBlockMixinTestCase(ModuleStoreTestCase):
     """
     Tests for OpenAssessmentBlock mixin.
@@ -152,7 +297,7 @@ class OpenAssessmentBlockMixinTestCase(ModuleStoreTestCase):
         self.assertTrue(self.open_assessment.has_score)
 
 
-@attr(shard=3)
+@attr(shard=5)
 @ddt.ddt
 class XBlockGetParentTest(LmsXBlockMixinTestCase):
     """
@@ -245,7 +390,7 @@ def ddt_named(parent, child):
     return args
 
 
-@attr(shard=3)
+@attr(shard=5)
 @ddt.ddt
 class XBlockMergedGroupAccessTest(LmsXBlockMixinTestCase):
     """

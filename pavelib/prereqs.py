@@ -2,34 +2,29 @@
 Install Python and Node prerequisites.
 """
 
-from distutils import sysconfig
 import hashlib
 import os
 import re
 import sys
+from distutils import sysconfig
 
-from paver.easy import sh, task, BuildFailure
+from paver.easy import BuildFailure, sh, task
 
 from .utils.envs import Env
 from .utils.timer import timed
 
-
 PREREQS_STATE_DIR = os.getenv('PREREQ_CACHE_DIR', Env.REPO_ROOT / '.prereqs_cache')
-NPM_REGISTRY = "https://registry.npmjs.org/"
 NO_PREREQ_MESSAGE = "NO_PREREQ_INSTALL is set, not installing prereqs"
+NO_PYTHON_UNINSTALL_MESSAGE = 'NO_PYTHON_UNINSTALL is set. No attempts will be made to uninstall old Python libs.'
 COVERAGE_REQ_FILE = 'requirements/edx/coverage.txt'
 
 # If you make any changes to this list you also need to make
 # a corresponding change to circle.yml, which is how the python
 # prerequisites are installed for builds on circleci.com
-PYTHON_REQ_FILES = [
-    'requirements/edx/pre.txt',
-    'requirements/edx/github.txt',
-    'requirements/edx/local.txt',
-    'requirements/edx/base.txt',
-    'requirements/edx/paver.txt',
-    'requirements/edx/post.txt',
-]
+if 'TOXENV' in os.environ:
+    PYTHON_REQ_FILES = ['requirements/edx/testing.txt']
+else:
+    PYTHON_REQ_FILES = ['requirements/edx/development.txt']
 
 # Developers can have private requirements, for local copies of github repos,
 # or favorite debugging tools, etc.
@@ -38,23 +33,21 @@ if os.path.exists(PRIVATE_REQS):
     PYTHON_REQ_FILES.append(PRIVATE_REQS)
 
 
+def str2bool(s):
+    s = str(s)
+    return s.lower() in ('yes', 'true', 't', '1')
+
+
 def no_prereq_install():
     """
     Determine if NO_PREREQ_INSTALL should be truthy or falsy.
     """
-    vals = {
-        '0': False,
-        '1': True,
-        'true': True,
-        'false': False,
-    }
+    return str2bool(os.environ.get('NO_PREREQ_INSTALL', 'False'))
 
-    val = os.environ.get("NO_PREREQ_INSTALL", 'False').lower()
 
-    try:
-        return vals[val]
-    except KeyError:
-        return False
+def no_python_uninstall():
+    """ Determine if we should run the uninstall_python_packages task. """
+    return str2bool(os.environ.get('NO_PYTHON_UNINSTALL', 'False'))
 
 
 def create_prereqs_cache_dir():
@@ -133,9 +126,6 @@ def node_prereqs_installation():
     Configures npm and installs Node prerequisites
     """
     cb_error_text = "Subprocess return code: 1"
-    sh("test `npm config get registry` = \"{reg}\" || "
-       "(echo setting registry; npm config set registry"
-       " {reg})".format(reg=NPM_REGISTRY))
 
     # Error handling around a race condition that produces "cb() never called" error. This
     # evinces itself as `cb_error_text` and it ought to disappear when we upgrade
@@ -160,7 +150,7 @@ def python_prereqs_installation():
 
 def pip_install_req_file(req_file):
     """Pip install the requirements file."""
-    pip_cmd = 'pip install -q --disable-pip-version-check --exists-action w'
+    pip_cmd = 'pip install --disable-pip-version-check --exists-action w'
     sh("{pip_cmd} -r {req_file}".format(pip_cmd=pip_cmd, req_file=req_file))
 
 
@@ -199,8 +189,12 @@ def uninstall_python_packages():
     uninstalled, notably, South.  Some other packages were once installed in
     ways that were resistant to being upgraded, like edxval.  Also uninstall
     them.
-
     """
+
+    if no_python_uninstall():
+        print(NO_PYTHON_UNINSTALL_MESSAGE)
+        return
+
     # So that we don't constantly uninstall things, use a hash of the packages
     # to be uninstalled.  Check it, and skip this if we're up to date.
     hasher = hashlib.sha1()
@@ -311,7 +305,8 @@ def install_prereqs():
         print NO_PREREQ_MESSAGE
         return
 
-    install_node_prereqs()
+    if not str2bool(os.environ.get('SKIP_NPM_INSTALL', 'False')):
+        install_node_prereqs()
     install_python_prereqs()
     log_installed_python_prereqs()
 

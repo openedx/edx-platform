@@ -1,6 +1,6 @@
 define(['common/js/spec_helpers/template_helpers',
-        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
-        'js/dashboard/donation'],
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+    'js/dashboard/donation'],
     function(TemplateHelpers, AjaxHelpers) {
         'use strict';
 

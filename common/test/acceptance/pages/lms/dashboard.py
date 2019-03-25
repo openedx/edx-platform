@@ -3,6 +3,7 @@
 Student dashboard page.
 """
 from bok_choy.page_object import PageObject
+
 from common.test.acceptance.pages.lms import BASE_URL
 
 
@@ -11,14 +12,6 @@ class DashboardPage(PageObject):
     Student dashboard, where the student can view
     courses she/he has registered for.
     """
-    def __init__(self, browser):
-        """Initialize the page.
-
-        Arguments:
-            browser (Browser): The browser instance.
-        """
-        super(DashboardPage, self).__init__(browser)
-
     url = "{base}/dashboard".format(base=BASE_URL)
 
     def is_browser_on_page(self):
@@ -142,11 +135,50 @@ class DashboardPage(PageObject):
         else:
             return None
 
+    def view_course_unenroll_dialog_message(self, course_id):
+        """
+        Go to the course unenroll dialog message for `course_id` (e.g. edx/Open_DemoX/edx_demo_course)
+        """
+        div_index = self.get_course_actions_link_css(course_id)
+        button_link_css = "#actions-dropdown-link-{}".format(div_index)
+        unenroll_css = "#unenroll-{}".format(div_index)
+
+        if button_link_css is not None:
+            self.q(css=button_link_css).first.click()
+            self.wait_for_element_visibility(unenroll_css, 'Unenroll message dialog is visible.')
+            self.q(css=unenroll_css).first.click()
+            self.wait_for_ajax()
+
+            return {
+                'track-info': self.q(css='#track-info').html,
+                'refund-info': self.q(css='#refund-info').html
+            }
+
+        else:
+            msg = "No links found for course {0}".format(course_id)
+            self.warning(msg)
+
+    def get_course_actions_link_css(self, course_id):
+        """
+            Return a index for unenroll button with `course_id`.
+        """
+        # Get the link hrefs for all courses
+        all_divs = self.q(css='div.wrapper-action-more').map(lambda el: el.get_attribute('data-course-key')).results
+
+        # Search for the first link that matches the course id
+        div_index = None
+        for index in range(len(all_divs)):
+            if course_id in all_divs[index]:
+                div_index = index
+                break
+
+        return div_index
+
     def pre_requisite_message_displayed(self):
         """
         Verify if pre-requisite course messages are being displayed.
         """
-        return self.q(css='li.prerequisites > .tip').visible
+        return self.q(css='div.prerequisites > .tip').visible
 
     def get_course_listings(self):
         """Retrieve the list of course DOM elements"""
@@ -176,26 +208,33 @@ class DashboardPage(PageObject):
         """
         Click username dropdown.
         """
-        self.q(css='.dropdown').first.click()
+        self.q(css='.toggle-user-dropdown').first.click()
 
     @property
     def username_dropdown_link_text(self):
         """
         Return list username dropdown links.
         """
-        return self.q(css='.dropdown-menu li a').text
+        return self.q(css='.dropdown-user-menu a').text
+
+    @property
+    def tabs_link_text(self):
+        """
+        Return the text of all the tabs on the dashboard.
+        """
+        return self.q(css='.nav-tab a').text
 
     def click_my_profile_link(self):
         """
         Click on `Profile` link.
         """
-        self.q(css='.dropdown-menu li a').nth(1).click()
+        self.q(css='.nav-tab a').nth(1).click()
 
     def click_account_settings_link(self):
         """
         Click on `Account` link.
         """
-        self.q(css='.dropdown-menu li a').nth(2).click()
+        self.q(css='.dropdown-user-menu a').nth(1).click()
 
     @property
     def language_selector(self):

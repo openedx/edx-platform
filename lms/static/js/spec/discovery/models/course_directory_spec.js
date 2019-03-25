@@ -5,67 +5,67 @@ define([
 
 
     var JSON_RESPONSE = {
-        'total': 365,
-        'results': [
+        total: 365,
+        results: [
             {
-                'data': {
-                    'modes': [
+                data: {
+                    modes: [
                         'honor'
                     ],
-                    'course': 'edX/DemoX/Demo_Course',
-                    'enrollment_start': '2015-04-21T00:00:00+00:00',
-                    'number': 'DemoX',
-                    'content': {
-                        'overview': ' About This Course Include your long course description here.',
-                        'display_name': 'edX Demonstration Course',
-                        'number': 'DemoX'
+                    course: 'edX/DemoX/Demo_Course',
+                    enrollment_start: '2015-04-21T00:00:00+00:00',
+                    number: 'DemoX',
+                    content: {
+                        overview: ' About This Course Include your long course description here.',
+                        display_name: 'edX Demonstration Course',
+                        number: 'DemoX'
                     },
-                    'start': '1970-01-01T05:00:00+00:00',
-                    'image_url': '/c4x/edX/DemoX/asset/images_course_image.jpg',
-                    'org': 'edX',
-                    'id': 'edX/DemoX/Demo_Course'
+                    start: '1970-01-01T05:00:00+00:00',
+                    image_url: '/c4x/edX/DemoX/asset/images_course_image.jpg',
+                    org: 'edX',
+                    id: 'edX/DemoX/Demo_Course'
                 }
             }
         ],
-        'facets': {
-            'org': {
-                'total': 26,
-                'terms': {
-                    'edX1': 1,
-                    'edX2': 1,
-                    'edX3': 1,
-                    'edX4': 1,
-                    'edX5': 1,
-                    'edX6': 1,
-                    'edX7': 1,
-                    'edX8': 1,
-                    'edX9': 1,
-                    'edX10': 1,
-                    'edX11': 1,
-                    'edX12': 1,
-                    'edX13': 1,
-                    'edX14': 1,
-                    'edX15': 1,
-                    'edX16': 1,
-                    'edX17': 1,
-                    'edX18': 1,
-                    'edX19': 1,
-                    'edX20': 1,
-                    'edX21': 1,
-                    'edX22': 1,
-                    'edX23': 1,
-                    'edX24': 1,
-                    'edX25': 1,
-                    'edX26': 1
+        facets: {
+            org: {
+                total: 26,
+                terms: {
+                    edX1: 1,
+                    edX2: 1,
+                    edX3: 1,
+                    edX4: 1,
+                    edX5: 1,
+                    edX6: 1,
+                    edX7: 1,
+                    edX8: 1,
+                    edX9: 1,
+                    edX10: 1,
+                    edX11: 1,
+                    edX12: 1,
+                    edX13: 1,
+                    edX14: 1,
+                    edX15: 1,
+                    edX16: 1,
+                    edX17: 1,
+                    edX18: 1,
+                    edX19: 1,
+                    edX20: 1,
+                    edX21: 1,
+                    edX22: 1,
+                    edX23: 1,
+                    edX24: 1,
+                    edX25: 1,
+                    edX26: 1
                 },
-                'other': 0
+                other: 0
             },
-            'modes': {
-                'total': 1,
-                'terms': {
-                    'honor': 1
+            modes: {
+                total: 1,
+                terms: {
+                    honor: 1
                 },
-                'other': 0
+                other: 0
             }
         }
     };

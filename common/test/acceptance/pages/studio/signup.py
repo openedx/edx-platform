@@ -3,9 +3,9 @@ Signup page for studio
 """
 from bok_choy.page_object import PageObject
 
-from common.test.acceptance.pages.studio import BASE_URL
-from common.test.acceptance.pages.studio.utils import set_input_value, HelpMixin
 from common.test.acceptance.pages.common.utils import click_css
+from common.test.acceptance.pages.studio import BASE_URL
+from common.test.acceptance.pages.studio.utils import HelpMixin, set_input_value
 
 
 class SignupPage(PageObject, HelpMixin):
@@ -17,6 +17,10 @@ class SignupPage(PageObject, HelpMixin):
 
     def is_browser_on_page(self):
         return self.q(css='body.view-signup').visible
+
+    def input_password(self, password):
+        """Inputs a password and then returns the password input"""
+        return set_input_value(self, '#password', password)
 
     def sign_up_user(self, registration_dictionary):
         """

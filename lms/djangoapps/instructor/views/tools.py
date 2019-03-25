@@ -1,23 +1,21 @@
 """
 Tools for the instructor dashboard
 """
-import dateutil
 import json
 
+import dateutil
 from django.contrib.auth.models import User
 from django.http import HttpResponseBadRequest
-from django.utils.timezone import utc
+from pytz import UTC
 from django.utils.translation import ugettext as _
-
-from courseware.models import StudentFieldOverride
-from courseware.field_overrides import disable_overrides
-from courseware.student_field_overrides import (
-    clear_override_for_user,
-    get_override_for_user,
-    override_field_for_user,
-)
-from xmodule.fields import Date
 from opaque_keys.edx.keys import UsageKey
+from six import text_type, string_types
+
+from student.models import get_user_by_username_or_email
+from courseware.field_overrides import disable_overrides
+from courseware.models import StudentFieldOverride
+from courseware.student_field_overrides import clear_override_for_user, get_override_for_user, override_field_for_user
+from xmodule.fields import Date
 
 DATE_FIELD = Date()
 
@@ -53,7 +51,7 @@ def handle_dashboard_error(view):
 
 
 def strip_if_string(value):
-    if isinstance(value, basestring):
+    if isinstance(value, string_types):
         return value.strip()
     return value
 
@@ -64,14 +62,12 @@ def get_student_from_identifier(unique_student_identifier):
 
     Returns the student object associated with `unique_student_identifier`
 
-    Raises User.DoesNotExist if no user object can be found.
+    Raises User.DoesNotExist if no user object can be found, the user was
+    retired, or the user is in the process of being retired.
+
+    DEPRECATED: use student.models.get_user_by_username_or_email instead.
     """
-    unique_student_identifier = strip_if_string(unique_student_identifier)
-    if "@" in unique_student_identifier:
-        student = User.objects.get(email=unique_student_identifier)
-    else:
-        student = User.objects.get(username=unique_student_identifier)
-    return student
+    return get_user_by_username_or_email(unique_student_identifier)
 
 
 def require_student_from_identifier(unique_student_identifier):
@@ -95,7 +91,7 @@ def parse_datetime(datestr):
     UTC.
     """
     try:
-        return dateutil.parser.parse(datestr).replace(tzinfo=utc)
+        return dateutil.parser.parse(datestr).replace(tzinfo=UTC)
     except ValueError:
         raise DashboardError(_("Unable to parse date: ") + datestr)
 
@@ -110,7 +106,7 @@ def find_unit(course, url):
         """
         Find node in course tree for url.
         """
-        if node.location.to_deprecated_string() == url:
+        if text_type(node.location) == url:
             return node
         for child in node.get_children():
             found = find(child, url)
@@ -154,7 +150,7 @@ def title_or_url(node):
     """
     title = getattr(node, 'display_name', None)
     if not title:
-        title = node.location.to_deprecated_string()
+        title = text_type(node.location)
     return title
 
 

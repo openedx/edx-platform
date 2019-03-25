@@ -5,18 +5,18 @@ This includes initialization and teardown for stub and video HTTP services
 and checking for external URLs that need to be accessible and responding.
 
 """
-from lettuce import before, after, world
+import re
+from logging import getLogger
+
+import requests
 from django.conf import settings
-from terrain.stubs.youtube import StubYouTubeService
-from terrain.stubs.xqueue import StubXQueueService
-from terrain.stubs.lti import StubLtiService
-from terrain.stubs.video_source import VideoSourceHttpService
+from lettuce import after, before, world
 from selenium.common.exceptions import NoAlertPresentException
 
-import re
-import requests
-
-from logging import getLogger
+from terrain.stubs.lti import StubLtiService
+from terrain.stubs.video_source import VideoSourceHttpService
+from terrain.stubs.xqueue import StubXQueueService
+from terrain.stubs.youtube import StubYouTubeService
 
 LOGGER = getLogger(__name__)
 

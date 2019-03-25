@@ -4,6 +4,8 @@ Adapter to isolate django-oauth-toolkit dependencies
 
 from oauth2_provider import models
 
+from openedx.core.djangoapps.oauth_dispatch.models import RestrictedApplication
+
 
 class DOTAdapter(object):
     """
@@ -11,6 +13,7 @@ class DOTAdapter(object):
     """
 
     backend = object()
+    FILTER_USER_ME = u'user:me'
 
     def create_confidential_client(self,
                                    name,
@@ -30,7 +33,8 @@ class DOTAdapter(object):
             redirect_uris=redirect_uri,
         )
 
-    def create_public_client(self, name, user, redirect_uri, client_id=None):
+    def create_public_client(self, name, user, redirect_uri, client_id=None,
+                             grant_type=models.Application.GRANT_PASSWORD):
         """
         Create an oauth client application that is public.
         """
@@ -39,7 +43,7 @@ class DOTAdapter(object):
             user=user,
             client_id=client_id,
             client_type=models.Application.CLIENT_PUBLIC,
-            authorization_grant_type=models.Application.GRANT_PASSWORD,
+            authorization_grant_type=grant_type,
             redirect_uris=redirect_uri,
         )
 
@@ -76,3 +80,26 @@ class DOTAdapter(object):
         Given an access token object, return its scopes.
         """
         return list(token.scopes)
+
+    def is_client_restricted(self, client_id):
+        """
+        Returns true if the client is set up as a RestrictedApplication.
+        """
+        application = self.get_client(client_id=client_id)
+        return RestrictedApplication.objects.filter(application=application).exists()
+
+    def get_authorization_filters(self, client_id):
+        """
+        Get the authorization filters for the given client application.
+        """
+        application = self.get_client(client_id=client_id)
+        filters = [org_relation.to_jwt_filter_claim() for org_relation in application.organizations.all()]
+
+        # Allow applications configured with the client credentials grant type to access
+        # data for all users. This will enable these applications to fetch data in bulk.
+        # Applications configured with all other grant types should only have access
+        # to data for the request user.
+        if application.authorization_grant_type != application.GRANT_CLIENT_CREDENTIALS:
+            filters.append(self.FILTER_USER_ME)
+
+        return filters

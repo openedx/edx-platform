@@ -3,22 +3,23 @@ Acceptance tests for Studio related to the container page.
 The container page is used both for displaying units, and
 for displaying containers within units.
 """
-from nose.plugins.attrib import attr
-from unittest import skip
-
-from common.test.acceptance.fixtures.course import XBlockFixtureDesc
-from common.test.acceptance.pages.studio.component_editor import ComponentEditorView, ComponentVisibilityEditorView
-from common.test.acceptance.pages.studio.container import ContainerPage
-from common.test.acceptance.pages.studio.html_component_editor import HtmlComponentEditorView
-from common.test.acceptance.pages.studio.utils import add_discussion, drag
-from common.test.acceptance.pages.lms.courseware import CoursewarePage
-from common.test.acceptance.pages.lms.staff_view import StaffPage
-from common.test.acceptance.tests.helpers import create_user_partition_json
-
 import datetime
-from bok_choy.promise import Promise, EmptyPromise
+
+import ddt
+from nose.plugins.attrib import attr
+
 from base_studio_test import ContainerBase
-from xmodule.partitions.partitions import Group
+from common.test.acceptance.fixtures.course import XBlockFixtureDesc
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.pages.lms.create_mode import ModeCreationPage
+from common.test.acceptance.pages.lms.staff_view import StaffCoursewarePage
+from common.test.acceptance.pages.studio.xblock_editor import XBlockEditorView, XBlockVisibilityEditorView
+from common.test.acceptance.pages.studio.container import ContainerPage
+from common.test.acceptance.pages.studio.html_component_editor import HtmlXBlockEditorView
+from common.test.acceptance.pages.studio.move_xblock import MoveModalView
+from common.test.acceptance.pages.studio.utils import add_discussion
+from common.test.acceptance.tests.helpers import create_user_partition_json
+from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID, MINIMUM_STATIC_PARTITION_ID, Group
 
 
 class NestedVerticalTest(ContainerBase):
@@ -69,87 +70,6 @@ class NestedVerticalTest(ContainerBase):
                 )
             )
         )
-
-
-@skip("Flaky: 01/16/2015")
-@attr(shard=1)
-class DragAndDropTest(NestedVerticalTest):
-    """
-    Tests of reordering within the container page.
-    """
-
-    def drag_and_verify(self, source, target, expected_ordering):
-        self.do_action_and_verify(
-            lambda (container): drag(container, source, target, 40),
-            expected_ordering
-        )
-
-    def test_reorder_in_group(self):
-        """
-        Drag Group A Item 2 before Group A Item 1.
-        """
-        expected_ordering = [{self.container_title: [self.group_a, self.group_empty, self.group_b]},
-                             {self.group_a: [self.group_a_item_2, self.group_a_item_1]},
-                             {self.group_b: [self.group_b_item_1, self.group_b_item_2]},
-                             {self.group_empty: []}]
-        self.drag_and_verify(self.group_a_item_2_handle, self.group_a_item_1_handle, expected_ordering)
-
-    def test_drag_to_top(self):
-        """
-        Drag Group A Item 1 to top level (outside of Group A).
-        """
-        expected_ordering = [{self.container_title: [self.group_a_item_1, self.group_a, self.group_empty, self.group_b]},
-                             {self.group_a: [self.group_a_item_2]},
-                             {self.group_b: [self.group_b_item_1, self.group_b_item_2]},
-                             {self.group_empty: []}]
-        self.drag_and_verify(self.group_a_item_1_handle, self.group_a_handle, expected_ordering)
-
-    def test_drag_into_different_group(self):
-        """
-        Drag Group B Item 1 into Group A (first element).
-        """
-        expected_ordering = [{self.container_title: [self.group_a, self.group_empty, self.group_b]},
-                             {self.group_a: [self.group_b_item_1, self.group_a_item_1, self.group_a_item_2]},
-                             {self.group_b: [self.group_b_item_2]},
-                             {self.group_empty: []}]
-        self.drag_and_verify(self.group_b_item_1_handle, self.group_a_item_1_handle, expected_ordering)
-
-    def test_drag_group_into_group(self):
-        """
-        Drag Group B into Group A (first element).
-        """
-        expected_ordering = [{self.container_title: [self.group_a, self.group_empty]},
-                             {self.group_a: [self.group_b, self.group_a_item_1, self.group_a_item_2]},
-                             {self.group_b: [self.group_b_item_1, self.group_b_item_2]},
-                             {self.group_empty: []}]
-        self.drag_and_verify(self.group_b_handle, self.group_a_item_1_handle, expected_ordering)
-
-    def test_drag_after_addition(self):
-        """
-        Add some components and then verify that drag and drop still works.
-        """
-        group_a_menu = 0
-
-        def add_new_components_and_rearrange(container):
-            # Add a video component to Group 1
-            add_discussion(container, group_a_menu)
-            # Duplicate the first item in Group A
-            container.duplicate(self.group_a_item_1_action_index)
-
-            first_handle = self.group_a_item_1_handle
-            # Drag newly added video component to top.
-            drag(container, first_handle + 3, first_handle, 40)
-            # Drag duplicated component to top.
-            drag(container, first_handle + 2, first_handle, 40)
-
-        duplicate_label = self.duplicate_label.format(self.group_a_item_1)
-
-        expected_ordering = [{self.container_title: [self.group_a, self.group_empty, self.group_b]},
-                             {self.group_a: [duplicate_label, self.discussion_label, self.group_a_item_1, self.group_a_item_2]},
-                             {self.group_b: [self.group_b_item_1, self.group_b_item_2]},
-                             {self.group_empty: []}]
-
-        self.do_action_and_verify(add_new_components_and_rearrange, expected_ordering)
 
 
 @attr(shard=1)
@@ -261,7 +181,7 @@ class DeleteComponentTest(NestedVerticalTest):
         self.delete_and_verify(group_a_item_1_delete_index, expected_ordering)
 
 
-@attr(shard=1)
+@attr(shard=16)
 class EditContainerTest(NestedVerticalTest):
     """
     Tests of editing a container.
@@ -274,7 +194,7 @@ class EditContainerTest(NestedVerticalTest):
         modified_name = 'modified'
         self.assertNotEqual(component.name, modified_name)
         component.edit()
-        component_editor = ComponentEditorView(self.browser, component.locator)
+        component_editor = XBlockEditorView(self.browser, component.locator)
         component_editor.set_field_value_and_save('Display Name', modified_name)
         self.assertEqual(component.name, modified_name)
 
@@ -305,38 +225,40 @@ class EditContainerTest(NestedVerticalTest):
         component = container.xblocks[1].children[0]
         component.edit()
 
-        html_editor = HtmlComponentEditorView(self.browser, component.locator)
+        html_editor = HtmlXBlockEditorView(self.browser, component.locator)
         html_editor.set_content_and_save(modified_content, raw=True)
 
         #note we're expecting the <p> tags to have been removed
         self.assertEqual(component.student_content, "modified content")
 
 
-@attr(shard=3)
-class EditVisibilityModalTest(ContainerBase):
-    """
-    Tests of the visibility settings modal for components on the unit
-    page.
-    """
-    VISIBILITY_LABEL_ALL = 'All Students and Staff'
-    VISIBILITY_LABEL_SPECIFIC = 'Specific Content Groups'
-    MISSING_GROUP_LABEL = 'Deleted Content Group\nContent group no longer exists. Please choose another or allow access to All Students and staff'
+class BaseGroupConfigurationsTest(ContainerBase):
+    ALL_LEARNERS_AND_STAFF = XBlockVisibilityEditorView.ALL_LEARNERS_AND_STAFF
+    CHOOSE_ONE = "Select a group type"
+    CONTENT_GROUP_PARTITION = XBlockVisibilityEditorView.CONTENT_GROUP_PARTITION
+    ENROLLMENT_TRACK_PARTITION = XBlockVisibilityEditorView.ENROLLMENT_TRACK_PARTITION
+    MISSING_GROUP_LABEL = 'Deleted Group\nThis group no longer exists. Choose another group or remove the access restriction.'
     VALIDATION_ERROR_LABEL = 'This component has validation issues.'
-    VALIDATION_ERROR_MESSAGE = 'Error:\nThis component refers to deleted or invalid content groups.'
-    GROUP_VISIBILITY_MESSAGE = 'Some content in this unit is visible only to particular content groups'
+    VALIDATION_ERROR_MESSAGE = "Error:\nThis component's access settings refer to deleted or invalid groups."
+    GROUP_VISIBILITY_MESSAGE = 'Access to some content in this unit is restricted to specific groups of learners.'
+    MODAL_NOT_RESTRICTED_MESSAGE = "Access is not restricted"
 
     def setUp(self):
-        super(EditVisibilityModalTest, self).setUp()
+        super(BaseGroupConfigurationsTest, self).setUp()
 
         # Set up a cohort-schemed user partition
+        self.id_base = MINIMUM_STATIC_PARTITION_ID
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
                 u"user_partitions": [
                     create_user_partition_json(
-                        0,
-                        'Configuration Dogs, Cats',
+                        self.id_base,
+                        self.CONTENT_GROUP_PARTITION,
                         'Content Group Partition',
-                        [Group("0", 'Dogs'), Group("1", 'Cats')],
+                        [
+                            Group(self.id_base + 1, 'Dogs'),
+                            Group(self.id_base + 2, 'Cats')
+                        ],
                         scheme="cohort"
                     )
                 ],
@@ -362,43 +284,77 @@ class EditVisibilityModalTest(ContainerBase):
 
     def edit_component_visibility(self, component):
         """
-        Edit the visibility of an xblock on the container page.
+        Edit the visibility of an xblock on the container page and returns an XBlockVisibilityEditorView.
         """
         component.edit_visibility()
-        return ComponentVisibilityEditorView(self.browser, component.locator)
+        return XBlockVisibilityEditorView(self.browser, component.locator)
 
-    def verify_selected_labels(self, visibility_editor, expected_labels):
+    def edit_unit_visibility(self, unit):
         """
-        Verify that a visibility editor's selected labels match the
-        expected ones.
+        Edit the visibility of a unit on the container page and returns an XBlockVisibilityEditorView.
         """
-        # If anything other than 'All Students and Staff', is selected,
-        # 'Specific Content Groups' should be selected as well.
-        if expected_labels != [self.VISIBILITY_LABEL_ALL]:
-            expected_labels.append(self.VISIBILITY_LABEL_SPECIFIC)
-        self.assertItemsEqual(expected_labels, [option.text for option in visibility_editor.selected_options])
+        unit.edit_visibility()
+        return XBlockVisibilityEditorView(self.browser, unit.locator)
 
-    def select_and_verify_saved(self, component, labels, expected_labels=None):
+    def verify_current_groups_message(self, visibility_editor, expected_current_groups):
+        """
+        Check that the current visibility is displayed at the top of the dialog.
+        """
+        if expected_current_groups == self.ALL_LEARNERS_AND_STAFF:
+            self.assertEqual("Access is not restricted", visibility_editor.current_groups_message)
+        else:
+            self.assertEqual(
+                "Access is restricted to: {groups}".format(groups=expected_current_groups),
+                visibility_editor.current_groups_message
+            )
+
+    def verify_selected_partition_scheme(self, visibility_editor, expected_scheme):
+        """
+        Check that the expected partition scheme is selected.
+        """
+        self.assertItemsEqual(expected_scheme, visibility_editor.selected_partition_scheme)
+
+    def verify_selected_groups(self, visibility_editor, expected_groups):
+        """
+        Check the expected partition groups.
+        """
+        self.assertItemsEqual(expected_groups, [group.text for group in visibility_editor.selected_groups])
+
+    def select_and_verify_saved(self, component, partition_label, groups=[]):
         """
         Edit the visibility of an xblock on the container page and
-        verify that the edit persists.  If provided, verify that
-        `expected_labels` are selected after save, otherwise expect
-        that `labels` are selected after save.  Note that `labels`
+        verify that the edit persists. Note that `groups`
         are labels which should be clicked, but not necessarily checked.
         """
-        if expected_labels is None:
-            expected_labels = labels
-
         # Make initial edit(s) and save
         visibility_editor = self.edit_component_visibility(component)
-        for label in labels:
-            visibility_editor.select_option(label, save=False)
+
+        visibility_editor.select_groups_in_partition_scheme(partition_label, groups)
+
+        # Re-open the modal and inspect its selected inputs. If no groups were selected,
+        # "All Learners" should be selected partitions scheme, and we show "Select a group type" in the select.
+        if not groups:
+            partition_label = self.CHOOSE_ONE
+        visibility_editor = self.edit_component_visibility(component)
+        self.verify_selected_partition_scheme(visibility_editor, partition_label)
+        self.verify_selected_groups(visibility_editor, groups)
         visibility_editor.save()
 
-        # Re-open the modal and inspect its selected inputs
-        visibility_editor = self.edit_component_visibility(component)
-        self.verify_selected_labels(visibility_editor, expected_labels)
-        visibility_editor.save()
+    def select_and_verify_unit_group_access(self, unit, partition_label, groups=[]):
+        """
+        Edit the visibility of an xblock on the unit page and
+        verify that the edit persists. Note that `groups`
+        are labels which should be clicked, but are not necessarily checked.
+        """
+        unit_access_editor = self.edit_unit_visibility(unit)
+        unit_access_editor.select_groups_in_partition_scheme(partition_label, groups)
+
+        if not groups:
+            partition_label = self.CHOOSE_ONE
+        unit_access_editor = self.edit_unit_visibility(unit)
+        self.verify_selected_partition_scheme(unit_access_editor, partition_label)
+        self.verify_selected_groups(unit_access_editor, groups)
+        unit_access_editor.save()
 
     def verify_component_validation_error(self, component):
         """
@@ -421,6 +377,19 @@ class EditVisibilityModalTest(ContainerBase):
             self.assertNotIn(self.GROUP_VISIBILITY_MESSAGE, self.container_page.sidebar_visibility_message)
             self.assertFalse(component.has_group_visibility_set)
 
+    def verify_unit_visibility_set(self, unit, set_groups=[]):
+        """
+        Verify that the container visibility modal shows that unit visibility
+        settings have been edited if there are `set_groups`. Otherwise verify
+        that the modal shows no such information.
+        """
+        unit_access_editor = self.edit_unit_visibility(unit)
+        if set_groups:
+            self.assertIn(", ".join(set_groups), unit_access_editor.current_groups_message)
+        else:
+            self.assertEqual(self.MODAL_NOT_RESTRICTED_MESSAGE, unit_access_editor.current_groups_message)
+        unit_access_editor.cancel()
+
     def update_component(self, component, metadata):
         """
         Update a component's metadata and refresh the page.
@@ -435,15 +404,79 @@ class EditVisibilityModalTest(ContainerBase):
         verify that there are no missing group messages in the modal
         and that there is no validation error on the component.
         """
-        for option in visibility_editor.selected_options:
+        for option in visibility_editor.all_group_options:
             if option.text == self.MISSING_GROUP_LABEL:
                 option.click()
         visibility_editor.save()
         visibility_editor = self.edit_component_visibility(component)
-        self.assertNotIn(self.MISSING_GROUP_LABEL, [item.text for item in visibility_editor.all_options])
+        self.assertNotIn(self.MISSING_GROUP_LABEL, [item.text for item in visibility_editor.all_group_options])
         visibility_editor.cancel()
         self.assertFalse(component.has_validation_error)
 
+
+@attr(shard=21)
+class UnitAccessContainerTest(BaseGroupConfigurationsTest):
+    """
+    Tests unit level access
+    """
+    GROUP_RESTRICTED_MESSAGE = 'Access to this unit is restricted to: Dogs'
+
+    def _toggle_container_unit_access(self, group_ids, unit):
+        """
+        Toggle the unit level access on the course outline page
+        """
+        unit.toggle_unit_access('Content Groups', group_ids)
+
+    def _verify_container_unit_access_message(self, group_ids, expected_message):
+        """
+        Check that the container page displays the correct unit
+        access message.
+        """
+        self.outline.visit()
+        self.outline.expand_all_subsections()
+        unit = self.outline.section_at(0).subsection_at(0).unit_at(0)
+        self._toggle_container_unit_access(group_ids, unit)
+
+        container_page = self.go_to_unit_page()
+        self.assertEqual(str(container_page.get_xblock_access_message()), expected_message)
+
+    def test_default_selection(self):
+        """
+        Tests that no message is displayed when there are no
+        restrictions on the unit or components.
+        """
+        self._verify_container_unit_access_message([], '')
+
+    def test_restricted_components_message(self):
+        """
+        Test that the proper message is displayed when access to
+        some components is restricted.
+        """
+        container_page = self.go_to_unit_page()
+        html_component = container_page.xblocks[1]
+
+        # Initially set visibility to Dog group.
+        self.update_component(
+            html_component,
+            {'group_access': {self.id_base: [self.id_base + 1]}}
+        )
+
+        self._verify_container_unit_access_message([], self.GROUP_VISIBILITY_MESSAGE)
+
+    def test_restricted_access_message(self):
+        """
+        Test that the proper message is displayed when access to the
+        unit is restricted to a particular group.
+        """
+        self._verify_container_unit_access_message([self.id_base + 1], self.GROUP_RESTRICTED_MESSAGE)
+
+
+@attr(shard=9)
+class ContentGroupVisibilityModalTest(BaseGroupConfigurationsTest):
+    """
+    Tests of the visibility settings modal for components on the unit
+    page (content groups).
+    """
     def test_default_selection(self):
         """
         Scenario: The component visibility modal selects visible to all by default.
@@ -453,7 +486,10 @@ class EditVisibilityModalTest(ContainerBase):
             Then the default visibility selection should be 'All Students and Staff'
             And the container page should not display the content visibility warning
         """
-        self.verify_selected_labels(self.edit_component_visibility(self.html_component), [self.VISIBILITY_LABEL_ALL])
+        visibility_dialog = self.edit_component_visibility(self.html_component)
+        self.verify_current_groups_message(visibility_dialog, self.ALL_LEARNERS_AND_STAFF)
+        self.verify_selected_partition_scheme(visibility_dialog, self.CHOOSE_ONE)
+        visibility_dialog.cancel()
         self.verify_visibility_set(self.html_component, False)
 
     def test_reset_to_all_students_and_staff(self):
@@ -461,20 +497,35 @@ class EditVisibilityModalTest(ContainerBase):
         Scenario: The component visibility modal can be set to be visible to all students and staff.
             Given I have a unit with one component
             When I go to the container page for that unit
-            And I open the visibility editor modal for that unit's component
-            And I select 'Dogs'
-            And I save the modal
-            Then the container page should display the content visibility warning
-            And I re-open the visibility editor modal for that unit's component
+            Then the container page should not display the content visibility warning by default.
+            If I then restrict access and save, and then I open the visibility editor modal for that unit's component
             And I select 'All Students and Staff'
             And I save the modal
             Then the visibility selection should be 'All Students and Staff'
-            And the container page should not display the content visibility warning
+            And the container page should still not display the content visibility warning
         """
-        self.select_and_verify_saved(self.html_component, ['Dogs'])
-        self.verify_visibility_set(self.html_component, True)
-        self.select_and_verify_saved(self.html_component, [self.VISIBILITY_LABEL_ALL])
+        self.select_and_verify_saved(self.html_component, self.CONTENT_GROUP_PARTITION, ['Dogs'])
+        self.select_and_verify_saved(self.html_component, self.ALL_LEARNERS_AND_STAFF)
         self.verify_visibility_set(self.html_component, False)
+
+    def test_reset_unit_access_to_all_students_and_staff(self):
+        """
+        Scenario: The unit visibility modal can be set to be visible to all students and staff.
+            Given I have a unit
+            When I go to the container page for that unit
+            And I open the visibility editor modal for that unit
+            And I select 'Dogs'
+            And I save the modal
+            Then I re-open the modal, the unit access modal should display the content visibility settings
+            Then after re-opening the modal again
+            And I select 'All Learners and Staff'
+            And I save the modal
+            And I re-open the modal, the unit access modal should display that no content is restricted
+        """
+        self.select_and_verify_unit_group_access(self.container_page, self.CONTENT_GROUP_PARTITION, ['Dogs'])
+        self.verify_unit_visibility_set(self.container_page, set_groups=["Dogs"])
+        self.select_and_verify_unit_group_access(self.container_page, self.ALL_LEARNERS_AND_STAFF)
+        self.verify_unit_visibility_set(self.container_page)
 
     def test_select_single_content_group(self):
         """
@@ -485,10 +536,8 @@ class EditVisibilityModalTest(ContainerBase):
             And I select 'Dogs'
             And I save the modal
             Then the visibility selection should be 'Dogs' and 'Specific Content Groups'
-            And the container page should display the content visibility warning
         """
-        self.select_and_verify_saved(self.html_component, ['Dogs'])
-        self.verify_visibility_set(self.html_component, True)
+        self.select_and_verify_saved(self.html_component, self.CONTENT_GROUP_PARTITION, ['Dogs'])
 
     def test_select_multiple_content_groups(self):
         """
@@ -499,10 +548,8 @@ class EditVisibilityModalTest(ContainerBase):
             And I select 'Dogs' and 'Cats'
             And I save the modal
             Then the visibility selection should be 'Dogs', 'Cats', and 'Specific Content Groups'
-            And the container page should display the content visibility warning
         """
-        self.select_and_verify_saved(self.html_component, ['Dogs', 'Cats'])
-        self.verify_visibility_set(self.html_component, True)
+        self.select_and_verify_saved(self.html_component, self.CONTENT_GROUP_PARTITION, ['Dogs', 'Cats'])
 
     def test_select_zero_content_groups(self):
         """
@@ -517,7 +564,7 @@ class EditVisibilityModalTest(ContainerBase):
             And the container page should not display the content visibility warning
         """
         self.select_and_verify_saved(
-            self.html_component, [self.VISIBILITY_LABEL_SPECIFIC], expected_labels=[self.VISIBILITY_LABEL_ALL]
+            self.html_component, self.CONTENT_GROUP_PARTITION
         )
         self.verify_visibility_set(self.html_component, False)
 
@@ -538,11 +585,14 @@ class EditVisibilityModalTest(ContainerBase):
             And I should not see any validation errors on the component
             And the container page should not display the content visibility warning
         """
-        self.update_component(self.html_component, {'group_access': {0: [2, 3]}})
-        self.verify_component_validation_error(self.html_component)
-        visibility_editor = self.edit_component_visibility(self.html_component)
-        self.verify_selected_labels(visibility_editor, [self.MISSING_GROUP_LABEL] * 2)
-        self.remove_missing_groups(visibility_editor, self.html_component)
+        self.update_component(
+            self.html_component,
+            {'group_access': {self.id_base: [self.id_base + 3, self.id_base + 4]}}
+        )
+        self._verify_and_remove_missing_content_groups(
+            "Deleted Group, Deleted Group",
+            [self.MISSING_GROUP_LABEL] * 2
+        )
         self.verify_visibility_set(self.html_component, False)
 
     def test_found_and_missing_groups(self):
@@ -555,24 +605,104 @@ class EditVisibilityModalTest(ContainerBase):
             Then I should see a validation error message on that unit's component
             And I open the visibility editor modal for that unit's component
             Then I should see that I have selected multiple deleted groups
-            And the container page should display the content visibility warning
-            And I de-select the missing groups
+            And then if I de-select the missing groups
             And I save the modal
             Then the visibility selection should be the names of the valid groups.
             And I should not see any validation errors on the component
-            And the container page should display the content visibility warning
         """
-        self.update_component(self.html_component, {'group_access': {0: [0, 1, 2, 3]}})
+        self.update_component(
+            self.html_component,
+            {'group_access': {self.id_base: [self.id_base + 1, self.id_base + 2, self.id_base + 3, self.id_base + 4]}}
+        )
+
+        self._verify_and_remove_missing_content_groups(
+            'Dogs, Cats, Deleted Group, Deleted Group',
+            ['Dogs', 'Cats'] + [self.MISSING_GROUP_LABEL] * 2
+        )
+
+        visibility_editor = self.edit_component_visibility(self.html_component)
+        self.verify_selected_partition_scheme(visibility_editor, self.CONTENT_GROUP_PARTITION)
+        expected_groups = ['Dogs', 'Cats']
+        self.verify_current_groups_message(visibility_editor, ", ".join(expected_groups))
+        self.verify_selected_groups(visibility_editor, expected_groups)
+
+    def _verify_and_remove_missing_content_groups(self, current_groups_message, all_group_labels):
         self.verify_component_validation_error(self.html_component)
         visibility_editor = self.edit_component_visibility(self.html_component)
-        self.verify_selected_labels(visibility_editor, ['Dogs', 'Cats'] + [self.MISSING_GROUP_LABEL] * 2)
+        self.verify_selected_partition_scheme(visibility_editor, self.CONTENT_GROUP_PARTITION)
+        self.verify_current_groups_message(visibility_editor, current_groups_message)
+        self.verify_selected_groups(visibility_editor, all_group_labels)
         self.remove_missing_groups(visibility_editor, self.html_component)
+
+
+@attr(shard=3)
+class EnrollmentTrackVisibilityModalTest(BaseGroupConfigurationsTest):
+    """
+    Tests of the visibility settings modal for components on the unit
+    page (enrollment tracks).
+    """
+    AUDIT_TRACK = "Audit Track"
+    VERIFIED_TRACK = "Verified Track"
+
+    def setUp(self):
+        super(EnrollmentTrackVisibilityModalTest, self).setUp()
+
+        # Add an audit mode to the course
+        ModeCreationPage(self.browser, self.course_id, mode_slug=u'audit', mode_display_name=self.AUDIT_TRACK).visit()
+
+        # Add a verified mode to the course
+        ModeCreationPage(
+            self.browser, self.course_id, mode_slug=u'verified',
+            mode_display_name=self.VERIFIED_TRACK, min_price=10
+        ).visit()
+
+        self.container_page = self.go_to_unit_page()
+        self.html_component = self.container_page.xblocks[1]
+
+        # Initially set visibility to Verified track.
+        self.update_component(
+            self.html_component,
+            {'group_access': {ENROLLMENT_TRACK_PARTITION_ID: [2]}}  # "2" is Verified
+        )
+
+    def verify_component_group_visibility_messsage(self, component, expected_groups):
+        """
+        Verifies that the group visibility message below the component display name is correct.
+        """
+        if not expected_groups:
+            self.assertIsNone(component.get_partition_group_message)
+        else:
+            self.assertEqual("Access restricted to: " + expected_groups, component.get_partition_group_message)
+
+    def test_setting_enrollment_tracks(self):
+        """
+        Test that enrollment track groups can be selected.
+        """
+        # Verify that the "Verified" Group is shown on the unit page (under the unit display name).
+        self.verify_component_group_visibility_messsage(self.html_component, "Verified Track")
+
+        # Open dialog with "Verified" already selected.
         visibility_editor = self.edit_component_visibility(self.html_component)
-        self.verify_selected_labels(visibility_editor, ['Dogs', 'Cats'])
-        self.verify_visibility_set(self.html_component, True)
+        self.verify_current_groups_message(visibility_editor, self.VERIFIED_TRACK)
+        self.verify_selected_partition_scheme(
+            visibility_editor,
+            self.ENROLLMENT_TRACK_PARTITION
+        )
+        self.verify_selected_groups(visibility_editor, [self.VERIFIED_TRACK])
+        visibility_editor.cancel()
+
+        # Select "All Learners and Staff". The helper method saves the change,
+        # then reopens the dialog to verify that it was persisted.
+        self.select_and_verify_saved(self.html_component, self.ALL_LEARNERS_AND_STAFF)
+        self.verify_component_group_visibility_messsage(self.html_component, None)
+
+        # Select "Audit" enrollment track. The helper method saves the change,
+        # then reopens the dialog to verify that it was persisted.
+        self.select_and_verify_saved(self.html_component, self.ENROLLMENT_TRACK_PARTITION, [self.AUDIT_TRACK])
+        self.verify_component_group_visibility_messsage(self.html_component, "Audit Track")
 
 
-@attr(shard=1)
+@attr(shard=16)
 class UnitPublishingTest(ContainerBase):
     """
     Tests of the publishing control and related widgets on the Unit page.
@@ -663,7 +793,7 @@ class UnitPublishingTest(ContainerBase):
             And the last saved text contains "Last published"
         """
         unit = self.go_to_unit_page()
-        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
+        unit.verify_publish_title(self.PUBLISHED_LIVE_STATUS)
         # Start date set in course fixture to 1970.
         self._verify_release_date_info(
             unit, self.RELEASE_TITLE_RELEASED, 'Jan 01, 1970 at 00:00 UTC\nwith Section "Test Section"'
@@ -674,11 +804,11 @@ class UnitPublishingTest(ContainerBase):
 
         # Add a component to the page so it will have unpublished changes.
         add_discussion(unit)
-        self._verify_publish_title(unit, self.DRAFT_STATUS)
+        unit.verify_publish_title(self.DRAFT_STATUS)
         self._verify_last_published_and_saved(unit, self.LAST_PUBLISHED, self.LAST_SAVED)
         unit.publish_action.click()
         unit.wait_for_ajax()
-        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
+        unit.verify_publish_title(self.PUBLISHED_LIVE_STATUS)
         self._verify_last_published_and_saved(unit, self.LAST_PUBLISHED, self.LAST_PUBLISHED)
 
     def test_discard_changes(self):
@@ -695,9 +825,9 @@ class UnitPublishingTest(ContainerBase):
         """
         unit = self.go_to_unit_page()
         add_discussion(unit)
-        self._verify_publish_title(unit, self.DRAFT_STATUS)
+        unit.verify_publish_title(self.DRAFT_STATUS)
         unit.discard_changes()
-        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
+        unit.verify_publish_title(self.PUBLISHED_LIVE_STATUS)
 
     def test_view_live_no_changes(self):
         """
@@ -756,7 +886,7 @@ class UnitPublishingTest(ContainerBase):
             Then I see the content in the unit
         """
         unit = self.go_to_unit_page("Unlocked Section", "Unlocked Subsection", "Unlocked Unit")
-        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
+        unit.verify_publish_title(self.PUBLISHED_LIVE_STATUS)
         self.assertTrue(unit.currently_visible_to_students)
         self._verify_release_date_info(
             unit, self.RELEASE_TITLE_RELEASED, self.past_start_date_text + '\n' + 'with Section "Unlocked Section"'
@@ -782,7 +912,7 @@ class UnitPublishingTest(ContainerBase):
         self.assertTrue(checked)
         self.assertFalse(unit.currently_visible_to_students)
         self.assertFalse(unit.shows_inherited_staff_lock())
-        self._verify_publish_title(unit, self.LOCKED_STATUS)
+        unit.verify_publish_title(self.LOCKED_STATUS)
         self._view_published_version(unit)
         # Will initially be in staff view, locked component should be visible.
         self._verify_components_visible(['problem'])
@@ -801,7 +931,7 @@ class UnitPublishingTest(ContainerBase):
             Then I do not see any content in the unit
         """
         unit = self.go_to_unit_page("Section With Locked Unit", "Subsection With Locked Unit", "Locked Unit")
-        self._verify_publish_title(unit, self.LOCKED_STATUS)
+        unit.verify_publish_title(self.LOCKED_STATUS)
         self.assertFalse(unit.currently_visible_to_students)
         self._verify_release_date_info(
             unit, self.RELEASE_TITLE_RELEASE,
@@ -825,7 +955,7 @@ class UnitPublishingTest(ContainerBase):
         unit = self.go_to_unit_page("Section With Locked Unit", "Subsection With Locked Unit", "Locked Unit")
         checked = unit.toggle_staff_lock()
         self.assertFalse(checked)
-        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
+        unit.verify_publish_title(self.PUBLISHED_LIVE_STATUS)
         self.assertTrue(unit.currently_visible_to_students)
         self._view_published_version(unit)
         # Will initially be in staff view, components always visible.
@@ -873,33 +1003,6 @@ class UnitPublishingTest(ContainerBase):
         unit_page = unit.go_to()
         self._verify_explicit_lock_overrides_implicit_lock_information(unit_page)
 
-    def test_published_unit_with_draft_child(self):
-        """
-        Scenario: A published unit with a draft child can be published
-            Given I have a published unit with no unpublished changes
-            When I go to the unit page in Studio
-            And edit the content of the only component
-            Then the content changes
-            And the title in the Publish information box is "Draft (Unpublished changes)"
-            And when I click the Publish button
-            Then the title in the Publish information box is "Published and Live"
-            And when I click the View Live button
-            Then I see the changed content in LMS
-        """
-        modified_content = 'modified content'
-
-        unit = self.go_to_unit_page()
-        component = unit.xblocks[1]
-        component.edit()
-        HtmlComponentEditorView(self.browser, component.locator).set_content_and_save(modified_content)
-        self.assertEqual(component.student_content, modified_content)
-        self._verify_publish_title(unit, self.DRAFT_STATUS)
-        unit.publish_action.click()
-        unit.wait_for_ajax()
-        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
-        self._view_published_version(unit)
-        self.assertIn(modified_content, self.courseware.xblock_component_html_content(0))
-
     def test_cancel_does_not_create_draft(self):
         """
         Scenario: Editing a component and then canceling does not create a draft version (TNL-399)
@@ -914,12 +1017,12 @@ class UnitPublishingTest(ContainerBase):
         unit = self.go_to_unit_page()
         component = unit.xblocks[1]
         component.edit()
-        HtmlComponentEditorView(self.browser, component.locator).set_content_and_cancel("modified content")
+        HtmlXBlockEditorView(self.browser, component.locator).set_content_and_cancel("modified content")
         self.assertEqual(component.student_content, "Body of HTML Unit.")
-        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
+        unit.verify_publish_title(self.PUBLISHED_LIVE_STATUS)
         self.browser.refresh()
         unit.wait_for_page()
-        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
+        unit.verify_publish_title(self.PUBLISHED_LIVE_STATUS)
 
     def test_delete_child_in_published_unit(self):
         """
@@ -935,10 +1038,10 @@ class UnitPublishingTest(ContainerBase):
         """
         unit = self.go_to_unit_page()
         unit.delete(0)
-        self._verify_publish_title(unit, self.DRAFT_STATUS)
+        unit.verify_publish_title(self.DRAFT_STATUS)
         unit.publish_action.click()
         unit.wait_for_ajax()
-        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
+        unit.verify_publish_title(self.PUBLISHED_LIVE_STATUS)
         self._view_published_version(unit)
         self.assertEqual(0, self.courseware.num_xblock_components)
 
@@ -954,12 +1057,12 @@ class UnitPublishingTest(ContainerBase):
             Then the title in the Publish information box is "Published (not yet released)"
         """
         unit = self.go_to_unit_page('Unreleased Section', 'Unreleased Subsection', 'Unreleased Unit')
-        self._verify_publish_title(unit, self.PUBLISHED_STATUS)
+        unit.verify_publish_title(self.PUBLISHED_STATUS)
         add_discussion(unit)
-        self._verify_publish_title(unit, self.DRAFT_STATUS)
+        unit.verify_publish_title(self.DRAFT_STATUS)
         unit.publish_action.click()
         unit.wait_for_ajax()
-        self._verify_publish_title(unit, self.PUBLISHED_STATUS)
+        unit.verify_publish_title(self.PUBLISHED_STATUS)
 
     def _view_published_version(self, unit):
         """
@@ -971,9 +1074,9 @@ class UnitPublishingTest(ContainerBase):
 
     def _verify_and_return_staff_page(self):
         """
-        Verifies that the browser is on the staff page and returns a StaffPage.
+        Verifies that the browser is on the staff page and returns a StaffCoursewarePage.
         """
-        page = StaffPage(self.browser, self.course_id)
+        page = StaffCoursewarePage(self.browser, self.course_id)
         page.wait_for_page()
         return page
 
@@ -981,14 +1084,14 @@ class UnitPublishingTest(ContainerBase):
         """
         Verifies no component is visible when viewing as a student.
         """
-        self._verify_and_return_staff_page().set_staff_view_mode('Student')
+        self._verify_and_return_staff_page().set_staff_view_mode('Learner')
         self.assertEqual(0, self.courseware.num_xblock_components)
 
     def _verify_student_view_visible(self, expected_components):
         """
         Verifies expected components are visible when viewing as a student.
         """
-        self._verify_and_return_staff_page().set_staff_view_mode('Student')
+        self._verify_and_return_staff_page().set_staff_view_mode('Learner')
         self._verify_components_visible(expected_components)
 
     def _verify_components_visible(self, expected_components):
@@ -1005,15 +1108,6 @@ class UnitPublishingTest(ContainerBase):
         """
         self.assertEqual(expected_title, unit.release_title)
         self.assertEqual(expected_date, unit.release_date)
-
-    def _verify_publish_title(self, unit, expected_title):
-        """
-        Waits for the publish title to change to the expected value.
-        """
-        def wait_for_title_change():
-            return (unit.publish_title == expected_title, unit.publish_title)
-
-        Promise(wait_for_title_change, "Publish title incorrect. Found '" + unit.publish_title + "'").fulfill()
 
     def _verify_last_published_and_saved(self, unit, expected_published_prefix, expected_saved_prefix):
         """
@@ -1136,3 +1230,308 @@ class ProblemCategoryTabsTest(ContainerBase):
             "Text Input with Hints and Feedback",
         ]
         self.assertEqual(page.get_category_tab_components('problem', 1), expected_components)
+
+
+@attr(shard=16)
+@ddt.ddt
+class MoveComponentTest(ContainerBase):
+    """
+    Tests of moving an XBlock to another XBlock.
+    """
+    PUBLISHED_LIVE_STATUS = "Publishing Status\nPublished and Live"
+    DRAFT_STATUS = "Publishing Status\nDraft (Unpublished changes)"
+
+    def setUp(self, is_staff=True):
+        super(MoveComponentTest, self).setUp(is_staff=is_staff)
+        self.container = ContainerPage(self.browser, None)
+        self.move_modal_view = MoveModalView(self.browser)
+
+        self.navigation_options = {
+            'section': 0,
+            'subsection': 0,
+            'unit': 1,
+        }
+        self.source_component_display_name = 'HTML 11'
+        self.source_xblock_category = 'component'
+        self.message_move = 'Success! "{display_name}" has been moved.'
+        self.message_undo = 'Move cancelled. "{display_name}" has been moved back to its original location.'
+
+    def populate_course_fixture(self, course_fixture):
+        """
+        Sets up a course structure.
+        """
+        # pylint: disable=attribute-defined-outside-init
+        self.unit_page1 = XBlockFixtureDesc('vertical', 'Test Unit 1').add_children(
+            XBlockFixtureDesc('html', 'HTML 11'),
+            XBlockFixtureDesc('html', 'HTML 12')
+        )
+        self.unit_page2 = XBlockFixtureDesc('vertical', 'Test Unit 2').add_children(
+            XBlockFixtureDesc('html', 'HTML 21'),
+            XBlockFixtureDesc('html', 'HTML 22')
+        )
+        course_fixture.add_children(
+            XBlockFixtureDesc('chapter', 'Test Section').add_children(
+                XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
+                    self.unit_page1,
+                    self.unit_page2
+                )
+            )
+        )
+
+    def verify_move_opertions(self, unit_page, source_component, operation, component_display_names_after_operation,
+                              should_verify_publish_title=True):
+        """
+        Verify move operations.
+
+        Arguments:
+            unit_page (Object)                                Unit container page.
+            source_component (Object)                         Source XBlock object to be moved.
+            operation (str),                                  `move` or `undo move` operation.
+            component_display_names_after_operation (dict)    Display names of components after operation in source/dest
+            should_verify_publish_title (Boolean)             Should verify publish title ot not. Default is True.
+        """
+        source_component.open_move_modal()
+        self.move_modal_view.navigate_to_category(self.source_xblock_category, self.navigation_options)
+        self.assertEqual(self.move_modal_view.is_move_button_enabled, True)
+
+        # Verify unit is in published state before move operation
+        if should_verify_publish_title:
+            self.container.verify_publish_title(self.PUBLISHED_LIVE_STATUS)
+
+        self.move_modal_view.click_move_button()
+        self.container.verify_confirmation_message(
+            self.message_move.format(display_name=self.source_component_display_name)
+        )
+        self.assertEqual(len(unit_page.displayed_children), 1)
+
+        # Verify unit in draft state now
+        if should_verify_publish_title:
+            self.container.verify_publish_title(self.DRAFT_STATUS)
+
+        if operation == 'move':
+            self.container.click_take_me_there_link()
+        elif operation == 'undo_move':
+            self.container.click_undo_move_link()
+            self.container.verify_confirmation_message(
+                self.message_undo.format(display_name=self.source_component_display_name)
+            )
+
+        unit_page = ContainerPage(self.browser, None)
+        components = unit_page.displayed_children
+        self.assertEqual(
+            [component.name for component in components],
+            component_display_names_after_operation
+        )
+
+    def verify_state_change(self, unit_page, operation):
+        """
+        Verify that after state change, confirmation message is hidden.
+
+        Arguments:
+            unit_page (Object)  Unit container page.
+            operation (String)  Publish or discard changes operation.
+        """
+        # Verify unit in draft state now
+        self.container.verify_publish_title(self.DRAFT_STATUS)
+
+        # Now click publish/discard button
+        if operation == 'publish':
+            unit_page.publish_action.click()
+        else:
+            unit_page.discard_changes()
+
+        # Now verify success message is hidden
+        self.container.verify_publish_title(self.PUBLISHED_LIVE_STATUS)
+        self.container.verify_confirmation_message(
+            message=self.message_move.format(display_name=self.source_component_display_name),
+            verify_hidden=True
+        )
+
+    def test_move_component_successfully(self):
+        """
+        Test if we can move a component successfully.
+
+        Given I am a staff user
+        And I go to unit page in first section
+        And I open the move modal
+        And I navigate to unit in second section
+        And I see move button is enabled
+        When I click on the move button
+        Then I see move operation success message
+        And When I click on take me there link
+        Then I see moved component there.
+        """
+        unit_page = self.go_to_unit_page(unit_name='Test Unit 1')
+        components = unit_page.displayed_children
+        self.assertEqual(len(components), 2)
+
+        self.verify_move_opertions(
+            unit_page=unit_page,
+            source_component=components[0],
+            operation='move',
+            component_display_names_after_operation=['HTML 21', 'HTML 22', 'HTML 11']
+        )
+
+    def test_undo_move_component_successfully(self):
+        """
+        Test if we can undo move a component successfully.
+
+        Given I am a staff user
+        And I go to unit page in first section
+        And I open the move modal
+        When I click on the move button
+        Then I see move operation successful message
+        And When I clicked on undo move link
+        Then I see that undo move operation is successful
+        """
+        unit_page = self.go_to_unit_page(unit_name='Test Unit 1')
+        components = unit_page.displayed_children
+        self.assertEqual(len(components), 2)
+
+        self.verify_move_opertions(
+            unit_page=unit_page,
+            source_component=components[0],
+            operation='undo_move',
+            component_display_names_after_operation=['HTML 11', 'HTML 12']
+        )
+
+    @ddt.data('publish', 'discard')
+    def test_publish_discard_changes_afer_move(self, operation):
+        """
+        Test if success banner is hidden when we  discard changes or publish the unit after a move operation.
+
+        Given I am a staff user
+        And I go to unit page in first section
+        And I open the move modal
+        And I navigate to unit in second section
+        And I see move button is enabled
+        When I click on the move button
+        Then I see move operation success message
+        And When I click on publish or discard changes button
+        Then I see move operation success message is hidden.
+        """
+        unit_page = self.go_to_unit_page(unit_name='Test Unit 1')
+        components = unit_page.displayed_children
+        self.assertEqual(len(components), 2)
+
+        components[0].open_move_modal()
+        self.move_modal_view.navigate_to_category(self.source_xblock_category, self.navigation_options)
+        self.assertEqual(self.move_modal_view.is_move_button_enabled, True)
+
+        # Verify unit is in published state before move operation
+        self.container.verify_publish_title(self.PUBLISHED_LIVE_STATUS)
+
+        self.move_modal_view.click_move_button()
+        self.container.verify_confirmation_message(
+            self.message_move.format(display_name=self.source_component_display_name)
+        )
+        self.assertEqual(len(unit_page.displayed_children), 1)
+
+        self.verify_state_change(unit_page, operation)
+
+    def test_content_experiment(self):
+        """
+        Test if we can move a component of content experiment successfully.
+
+        Given that I am a staff user
+        And I go to content experiment page
+        And I open the move dialogue modal
+        When I navigate to the unit in second section
+        Then I see move button is enabled
+        And when I click on the move button
+        Then I see move operation success message
+        And when I click on take me there link
+        Then I see moved component there
+        And when I undo move a component
+        Then I see that undo move operation success message
+        """
+        # Add content experiment support to course.
+        self.course_fixture.add_advanced_settings({
+            u'advanced_modules': {'value': ['split_test']},
+        })
+
+        # Create group configurations
+        # pylint: disable=protected-access
+        self.course_fixture._update_xblock(self.course_fixture._course_location, {
+            'metadata': {
+                u'user_partitions': [
+                    create_user_partition_json(
+                        0,
+                        'Test Group Configuration',
+                        'Description of the group configuration.',
+                        [Group('0', 'Group A'), Group('1', 'Group B')]
+                    ),
+                ],
+            },
+        })
+
+        # Add split test to unit_page1 and assign newly created group configuration to it
+        split_test = XBlockFixtureDesc('split_test', 'Test Content Experiment', metadata={'user_partition_id': 0})
+        self.course_fixture.create_xblock(self.unit_page1.locator, split_test)
+
+        # Visit content experiment container page.
+        unit_page = ContainerPage(self.browser, split_test.locator)
+        unit_page.visit()
+
+        group_a_locator = unit_page.displayed_children[0].locator
+
+        # Add some components to Group A.
+        self.course_fixture.create_xblock(
+            group_a_locator, XBlockFixtureDesc('html', 'HTML 311')
+        )
+        self.course_fixture.create_xblock(
+            group_a_locator, XBlockFixtureDesc('html', 'HTML 312')
+        )
+
+        # Go to group page to move it's component.
+        group_container_page = ContainerPage(self.browser, group_a_locator)
+        group_container_page.visit()
+
+        # Verify content experiment block has correct groups and components.
+        components = group_container_page.displayed_children
+        self.assertEqual(len(components), 2)
+
+        self.source_component_display_name = 'HTML 311'
+
+        # Verify undo move operation for content experiment.
+        self.verify_move_opertions(
+            unit_page=group_container_page,
+            source_component=components[0],
+            operation='undo_move',
+            component_display_names_after_operation=['HTML 311', 'HTML 312'],
+            should_verify_publish_title=False
+        )
+
+        # Verify move operation for content experiment.
+        self.verify_move_opertions(
+            unit_page=group_container_page,
+            source_component=components[0],
+            operation='move',
+            component_display_names_after_operation=['HTML 21', 'HTML 22', 'HTML 311'],
+            should_verify_publish_title=False
+        )
+
+    # Ideally this test should be decorated with @attr('a11y') so that it should run in a11y jenkins job
+    # But for some reason it always fails in a11y jenkins job and passes always locally on devstack as well
+    # as in bokchoy jenkins job. Due to this reason, test is marked to run under bokchoy jenkins job.
+    def test_a11y(self):
+        """
+        Verify move modal a11y.
+        """
+        unit_page = self.go_to_unit_page(unit_name='Test Unit 1')
+
+        unit_page.a11y_audit.config.set_scope(
+            include=[".modal-window.move-modal"]
+        )
+        unit_page.a11y_audit.config.set_rules({
+            'ignore': [
+                'color-contrast',  # TODO: AC-716
+                'link-href',  # TODO: AC-716
+            ]
+        })
+
+        unit_page.displayed_children[0].open_move_modal()
+
+        for category in ['section', 'subsection', 'component']:
+            self.move_modal_view.navigate_to_category(category, self.navigation_options)
+            unit_page.a11y_audit.check_for_accessibility_errors()

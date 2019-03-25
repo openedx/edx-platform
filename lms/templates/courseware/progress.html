@@ -4,13 +4,21 @@
 <%def name="online_help_token()"><% return "progress" %></%def>
 <%!
 from course_modes.models import CourseMode
-from certificates.models import CertificateStatuses
+from lms.djangoapps.certificates.models import CertificateStatuses
 from django.utils.translation import ugettext as _
 from openedx.core.djangolib.markup import HTML, Text
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.conf import settings
 from django.utils.http import urlquote_plus
+from six import text_type
+
+from openedx.features.enterprise_support.utils import get_enterprise_learner_generic_name
 %>
+
+<%
+username = get_enterprise_learner_generic_name(request) or student.username
+%>
+
 <%block name="bodyclass">view-in-course view-progress</%block>
 
 <%block name="headextra">
@@ -32,7 +40,7 @@ from django.utils.http import urlquote_plus
 <script>
     ## This JavaScript is being HTML-escaped because it historically has, and it is not clear what
     ## the correct syntax is. For safety, maintain the previous behavior.
-    ## safe-lint: disable=mako-invalid-js-filter
+    ## xss-lint: disable=mako-invalid-js-filter
     ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph", not course.no_grade, not course.no_grade)}
 </script>
 </%block>
@@ -42,20 +50,23 @@ from django.utils.http import urlquote_plus
 <main id="main" aria-label="Content" tabindex="-1">
     <div class="container">
         <div class="profile-wrapper">
-            <section class="course-info" id="course-info-progress">
+            <section class="course-info" id="course-info-progress"
+              % if getattr(course, 'language'):
+                lang="${course.language}"
+              % endif
+              >
                 % if staff_access and studio_url is not None:
                 <div class="wrap-instructor-info">
                     <a class="instructor-info-action studio-view" href="${studio_url}">${_("View Grading in studio")}</a>
                 </div>
                 % endif
-                <h3 class="hd hd-3 progress-certificates-title">
-                    ${_("Course Progress for Student '{username}' ({email})").format(username=student.username, email=student.email)}
-                </h3>
+                <h2 class="hd hd-2 progress-certificates-title">
+                    ${_("Course Progress for Student '{username}' ({email})").format(username=username, email=student.email)}
+                </h2>
 
-                %if certificate_data:
                 <div class="wrapper-msg wrapper-auto-cert">
                     <div id="errors-info" class="errors-info"></div>
-                    %if passed:
+                    %if certificate_data:
                     <div class="auto-cert-message" id="course-success">
                         <div class="has-actions">
                             <% post_url = reverse('generate_user_cert', args=[unicode(course.id)]) %>
@@ -76,7 +87,6 @@ from django.utils.http import urlquote_plus
                     </div>
                     %endif
                 </div>
-                %endif
 
                 %if not course.disable_progress_graph:
                 <div class="grade-detail-graph" id="grade-detail-graph"></div>
@@ -145,21 +155,22 @@ from django.utils.http import urlquote_plus
 
                 %if courseware_summary:
                 <section class="chapters">
-                    <h3 class="hd hd-4 sr">${_('Details for each chapter')}</h3>
+                    <h2 class="sr">${_('Details for each chapter')}</h2>
                     %for chapter in courseware_summary:
                         %if not chapter['display_name'] == "hidden":
                         <section aria-labelledby="chapter_${loop.index}">
-                            <h4 class="hd hd-4" id="chapter_${loop.index}">${ chapter['display_name']}</h4>
+                            <h3 class="hd hd-3" id="chapter_${loop.index}">${ chapter['display_name']}</h3>
                             <div class="sections">
                                 %for section in chapter['sections']:
                                     <div>
                                         <%
                                         earned = section.all_total.earned
                                         total = section.all_total.possible
-                                        percentageString = "{0:.0%}".format( float(earned)/total) if earned > 0 and total > 0 else ""
+
+                                        percentageString = "{0:.0%}".format(section.percent_graded) if earned > 0 and total > 0 else ""
                                         %>
-                                        <h5 class="hd hd-5">
-                                            <a href="${reverse('courseware_section', kwargs=dict(course_id=course.id.to_deprecated_string(), chapter=chapter['url_name'], section=section.url_name))}">
+                                        <h4 class="hd hd-4">
+                                            <a href="${reverse('courseware_section', kwargs=dict(course_id=text_type(course.id), chapter=chapter['url_name'], section=section.url_name))}">
                                                 ${ section.display_name}
                                                 %if total > 0 or earned > 0:
                                                 <span class="sr">
@@ -170,7 +181,7 @@ from django.utils.http import urlquote_plus
                                             %if total > 0 or earned > 0:
                                             <span> ${"({0:.3n}/{1:.3n}) {2}".format( float(earned), float(total), percentageString )}</span>
                                             %endif
-                                        </h5>
+                                        </h4>
                                         <p>
                                             %if section.format is not None:
                                                 ${section.format}
@@ -179,13 +190,40 @@ from django.utils.http import urlquote_plus
                                                 <em class="localized-datetime" data-datetime="${section.due}" data-string="${_('due {date}')}" data-timezone="${user_timezone}" data-language="${user_language}"></em>
                                             %endif
                                         </p>
-                                        %if len(section.scores) > 0:
-                                        <dl class="scores">
-                                            <dt class="hd hd-6">${ _("Problem Scores: ") if section.graded else _("Practice Scores: ")}</dt>
-                                            %for score in section.scores:
-                                            <dd>${"{0:.3n}/{1:.3n}".format(float(score.earned),float(score.possible))}</dd>
-                                            %endfor
-                                        </dl>
+                                        <p class="override-notice">
+                                            %if section.override is not None:
+                                                %if section.format is not None and section.format == "Exam":
+                                                    ${_("Suspicious activity detected during proctored exam review. Exam score 0.")}
+                                                %else:
+                                                    ${_("Section grade has been overridden.")}
+                                                %endif
+                                            %endif
+                                        </p>
+                                        %if len(section.problem_scores.values()) > 0:
+                                          %if section.show_grades(staff_access):
+                                          <dl class="scores">
+                                              <dt class="hd hd-6">${ _("Problem Scores: ") if section.graded else _("Practice Scores: ")}</dt>
+                                              %for score in section.problem_scores.values():
+                                              <dd>${"{0:.3n}/{1:.3n}".format(float(score.earned),float(score.possible))}</dd>
+                                              %endfor
+                                          </dl>
+                                          %else:
+                                            <p class="hide-scores">
+                                            %if section.show_correctness == 'past_due':
+                                                %if section.graded:
+                                                  ${_("Problem scores are hidden until the due date.")}
+                                                %else:
+                                                  ${_("Practice scores are hidden until the due date.")}
+                                                %endif
+                                            %else:
+                                                %if section.graded:
+                                                  ${_("Problem scores are hidden.")}
+                                                %else:
+                                                  ${_("Practice scores are hidden.")}
+                                                %endif
+                                            %endif
+                                            </p>
+                                          %endif
                                         %else:
                                         <p class="no-scores">${_("No problem scores in this section")}</p>
                                         %endif

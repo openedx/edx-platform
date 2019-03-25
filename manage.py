@@ -10,15 +10,21 @@ by passing the --settings flag, you can specify what environment specific settin
 
 Any arguments not understood by this manage.py will be passed to django-admin.py
 """
+# pylint: disable=wrong-import-order, wrong-import-position
+from __future__ import absolute_import, print_function
+
+from openedx.core.lib.logsettings import log_python_warnings
+log_python_warnings()
 
 # Patch the xml libs before anything else.
 from safe_lxml import defuse_xml_libs
 defuse_xml_libs()
 
+import importlib
 import os
 import sys
-import importlib
 from argparse import ArgumentParser
+
 import contracts
 
 
@@ -37,7 +43,7 @@ def parse_args():
     lms.add_argument(
         '--settings',
         help="Which django settings module to use under lms.envs. If not provided, the DJANGO_SETTINGS_MODULE "
-             "environment variable will be used if it is set, otherwise it will default to lms.envs.dev")
+             "environment variable will be used if it is set, otherwise it will default to lms.envs.devstack_docker")
     lms.add_argument(
         '--service-variant',
         choices=['lms', 'lms-xml', 'lms-preview'],
@@ -51,7 +57,7 @@ def parse_args():
     lms.set_defaults(
         help_string=lms.format_help(),
         settings_base='lms/envs',
-        default_settings='lms.envs.dev',
+        default_settings='lms.envs.devstack_docker',
         startup='lms.startup',
     )
 
@@ -64,7 +70,7 @@ def parse_args():
     cms.add_argument(
         '--settings',
         help="Which django settings module to use under cms.envs. If not provided, the DJANGO_SETTINGS_MODULE "
-             "environment variable will be used if it is set, otherwise it will default to cms.envs.dev")
+             "environment variable will be used if it is set, otherwise it will default to cms.envs.devstack_docker")
     cms.add_argument('-h', '--help', action='store_true', help='show this help message and exit')
     cms.add_argument(
         '--contracts',
@@ -74,7 +80,7 @@ def parse_args():
     cms.set_defaults(
         help_string=cms.format_help(),
         settings_base='cms/envs',
-        default_settings='cms.envs.dev',
+        default_settings='cms.envs.devstack_docker',
         service_variant='cms',
         startup='cms.startup',
     )
@@ -82,8 +88,8 @@ def parse_args():
     edx_args, django_args = parser.parse_known_args()
 
     if edx_args.help:
-        print "edX:"
-        print edx_args.help_string
+        print("edX:")
+        print(edx_args.help_string)
 
     return edx_args, django_args
 
@@ -104,7 +110,7 @@ if __name__ == "__main__":
         contracts.disable_all()
 
     if edx_args.help:
-        print "Django:"
+        print("Django:")
         # This will trigger django-admin.py to print out its help
         django_args.append('--help')
 
@@ -112,5 +118,4 @@ if __name__ == "__main__":
     startup.run()
 
     from django.core.management import execute_from_command_line
-
     execute_from_command_line([sys.argv[0]] + django_args)

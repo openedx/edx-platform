@@ -3,13 +3,11 @@ URL routes for the bookmarks app.
 """
 
 from django.conf import settings
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
-from .views import BookmarksListView, BookmarksDetailView
+from .views import BookmarksDetailView, BookmarksListView
 
-
-urlpatterns = patterns(
-    'bookmarks',
+urlpatterns = [
     url(
         r'^v1/bookmarks/$',
         BookmarksListView.as_view(),
@@ -23,4 +21,4 @@ urlpatterns = patterns(
         BookmarksDetailView.as_view(),
         name='bookmarks_detail'
     ),
-)
+]

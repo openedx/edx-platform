@@ -43,10 +43,6 @@ Feature: CMS.Pages
     Scenario: Users can reorder built-in pages amongst static pages
         Given I have created two different static pages
         Then the pages are in the default order
-        When I drag the first page to the last
-        Then the pages are switched
-        And I reload the page
-        Then the pages are switched
 
     Scenario: Users can toggle visibility on hideable pages
         Given I have opened the pages page in a new course

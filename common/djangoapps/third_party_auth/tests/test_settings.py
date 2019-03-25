@@ -1,15 +1,15 @@
 """Unit tests for settings.py."""
 
-from third_party_auth import provider, settings
-from third_party_auth.tests import testutil
-from util.enterprise_helpers import enterprise_enabled
 import unittest
 
+from third_party_auth import provider, settings
+from third_party_auth.tests import testutil
 
-_ORIGINAL_AUTHENTICATION_BACKENDS = ('first_authentication_backend',)
-_ORIGINAL_INSTALLED_APPS = ('first_installed_app',)
-_ORIGINAL_MIDDLEWARE_CLASSES = ('first_middleware_class',)
-_ORIGINAL_TEMPLATE_CONTEXT_PROCESSORS = ('first_template_context_preprocessor',)
+
+_ORIGINAL_AUTHENTICATION_BACKENDS = ['first_authentication_backend']
+_ORIGINAL_INSTALLED_APPS = ['first_installed_app']
+_ORIGINAL_MIDDLEWARE_CLASSES = ['first_middleware_class']
+_ORIGINAL_TEMPLATE_CONTEXT_PROCESSORS = ['first_template_context_preprocessor']
 _SETTINGS_MAP = {
     'AUTHENTICATION_BACKENDS': _ORIGINAL_AUTHENTICATION_BACKENDS,
     'INSTALLED_APPS': _ORIGINAL_INSTALLED_APPS,
@@ -45,7 +45,7 @@ class SettingsUnitTest(testutil.TestCase):
         settings.apply_settings(self.settings)
         self.assertEqual(settings._FIELDS_STORED_IN_SESSION, self.settings.FIELDS_STORED_IN_SESSION)
 
-    @unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, 'third_party_auth not enabled')
+    @unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
     def test_apply_settings_enables_no_providers_by_default(self):
         # Providers are only enabled via ConfigurationModels in the database
         settings.apply_settings(self.settings)
@@ -56,9 +56,3 @@ class SettingsUnitTest(testutil.TestCase):
         # bad in prod.
         settings.apply_settings(self.settings)
         self.assertFalse(self.settings.SOCIAL_AUTH_RAISE_EXCEPTIONS)
-
-    @unittest.skipUnless(enterprise_enabled(), 'enterprise not enabled')
-    def test_enterprise_elements_inserted(self):
-        settings.apply_settings(self.settings)
-        self.assertIn('enterprise.tpa_pipeline.set_data_sharing_consent_record', self.settings.SOCIAL_AUTH_PIPELINE)
-        self.assertIn('enterprise.tpa_pipeline.verify_data_sharing_consent', self.settings.SOCIAL_AUTH_PIPELINE)

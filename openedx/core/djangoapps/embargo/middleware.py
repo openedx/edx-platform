@@ -28,16 +28,16 @@ Usage:
 import logging
 import re
 
-from django.core.exceptions import MiddlewareNotUsed
-from django.core.urlresolvers import reverse
 from django.conf import settings
+from django.core.exceptions import MiddlewareNotUsed
+from django.urls import reverse
 from django.shortcuts import redirect
 from ipware.ip import get_ip
+
 from util.request import course_id_from_url
 
-from .models import IPFilter
 from . import api as embargo_api
-
+from .models import IPFilter
 
 log = logging.getLogger(__name__)
 
@@ -54,10 +54,6 @@ class EmbargoMiddleware(object):
         # accidentally lock ourselves out of Django admin
         # during testing.
         re.compile(r'^/admin/'),
-
-        # Do not block access to course metadata. This information is needed for
-        # sever-to-server calls.
-        re.compile(r'^/api/course_structure/v[\d+]/courses/{}/$'.format(settings.COURSE_ID_PATTERN)),
     ]
 
     def __init__(self):
@@ -98,7 +94,7 @@ class EmbargoMiddleware(object):
             # If the IP is blacklisted, reject.
             # This applies to any request, not just courseware URLs.
             ip_blacklist_url = reverse(
-                'embargo_blocked_message',
+                'embargo:blocked_message',
                 kwargs={
                     'access_point': 'courseware',
                     'message_key': 'embargo'

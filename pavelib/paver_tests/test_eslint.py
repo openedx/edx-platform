@@ -1,11 +1,12 @@
 """
-Tests for paver quality tasks
+Tests for Paver's Stylelint tasks.
 """
 import unittest
+
 from mock import patch
+from paver.easy import BuildFailure, call_task
 
 import pavelib.quality
-from paver.easy import BuildFailure
 
 
 class TestPaverESLint(unittest.TestCase):
@@ -37,7 +38,7 @@ class TestPaverESLint(unittest.TestCase):
         """
         mock_count.return_value = None
         with self.assertRaises(BuildFailure):
-            pavelib.quality.run_eslint("")
+            call_task('pavelib.quality.run_eslint', args=[''])
 
     @patch.object(pavelib.quality, '_write_metric')
     @patch.object(pavelib.quality, '_prepare_report_dir')

@@ -2,21 +2,20 @@
 from smtplib import SMTPException
 
 import ddt
-from django.conf import settings
 from django.db import IntegrityError
 from django.test import TestCase
 import mock
-import unittest
 
 from microsite_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.api_admin.models import ApiAccessRequest, ApiAccessConfig
 from openedx.core.djangoapps.api_admin.models import log as model_log
 from openedx.core.djangoapps.api_admin.tests.factories import ApiAccessRequestFactory
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory
 
 
 @ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class ApiAccessRequestTests(TestCase):
 
     def setUp(self):
@@ -65,6 +64,19 @@ class ApiAccessRequestTests(TestCase):
         self.assertIn(self.request.website, request_unicode)  # pylint: disable=no-member
         self.assertIn(self.request.status, request_unicode)
 
+    def test_retire_user_success(self):
+        retire_result = self.request.retire_user(self.user)
+        self.assertTrue(retire_result)
+        self.assertEqual(self.request.company_address, '')
+        self.assertEqual(self.request.company_name, '')
+        self.assertEqual(self.request.website, '')
+        self.assertEqual(self.request.reason, '')
+
+    def test_retire_user_do_not_exist(self):
+        user2 = UserFactory()
+        retire_result = self.request.retire_user(user2)
+        self.assertFalse(retire_result)
+
 
 class ApiAccessConfigTests(TestCase):
 
@@ -79,7 +91,7 @@ class ApiAccessConfigTests(TestCase):
         )
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class ApiAccessRequestSignalTests(TestCase):
     def setUp(self):
         super(ApiAccessRequestSignalTests, self).setUp()

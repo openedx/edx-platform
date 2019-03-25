@@ -1,13 +1,13 @@
 """
 Django module for Course Metadata class -- manages advanced settings and related parameters
 """
+from django.conf import settings
+from django.utils.translation import ugettext as _
+from six import text_type
 from xblock.fields import Scope
+
 from xblock_django.models import XBlockStudioConfigurationFlag
 from xmodule.modulestore.django import modulestore
-
-from django.utils.translation import ugettext as _
-from django.conf import settings
-from openedx.core.djangoapps.site_configuration.helpers import get_value_for_org
 
 
 class CourseMetadata(object):
@@ -27,6 +27,7 @@ class CourseMetadata(object):
         'end',
         'enrollment_start',
         'enrollment_end',
+        'certificate_available_date',
         'tabs',
         'graceperiod',
         'show_timezone',
@@ -55,8 +56,10 @@ class CourseMetadata(object):
         'exam_review_rules',
         'hide_after_due',
         'self_paced',
+        'show_correctness',
         'chrome',
         'default_tab',
+        'highlights_enabled_for_messaging',
     ]
 
     @classmethod
@@ -79,6 +82,10 @@ class CourseMetadata(object):
         if not settings.FEATURES.get('ENABLE_VIDEO_UPLOAD_PIPELINE'):
             filtered_list.append('video_upload_pipeline')
 
+        # Do not show video auto advance if the feature is disabled
+        if not settings.FEATURES.get('ENABLE_AUTOADVANCE_VIDEOS'):
+            filtered_list.append('video_auto_advance')
+
         # Do not show social sharing url field if the feature is disabled.
         if (not hasattr(settings, 'SOCIAL_SHARING_SETTINGS') or
                 not getattr(settings, 'SOCIAL_SHARING_SETTINGS', {}).get("CUSTOM_COURSE_URLS")):
@@ -96,12 +103,17 @@ class CourseMetadata(object):
             filtered_list.append('enable_ccx')
             filtered_list.append('ccx_connector')
 
+        # Do not show "Issue Open Badges" in Studio Advanced Settings
+        # if the feature is disabled.
+        if not settings.FEATURES.get('ENABLE_OPENBADGES'):
+            filtered_list.append('issue_badges')
+
         # If the XBlockStudioConfiguration table is not being used, there is no need to
         # display the "Allow Unsupported XBlocks" setting.
         if not XBlockStudioConfigurationFlag.is_enabled():
             filtered_list.append('allow_unsupported_xblocks')
 
-        # Appsembler specfic, we don't display the field if the site doesn't
+        # Appsembler specific, we don't display the field if the site doesn't
         # belong to a MSFT LP
         # if org and not get_value_for_org(
         #     org,
@@ -137,10 +149,16 @@ class CourseMetadata(object):
         for field in descriptor.fields.values():
             if field.scope != Scope.settings:
                 continue
+
+            field_help = _(field.help)                  # pylint: disable=translation-of-non-string
+            help_args = field.runtime_options.get('help_format_args')
+            if help_args is not None:
+                field_help = field_help.format(**help_args)
+
             result[field.name] = {
                 'value': field.read_json(descriptor),
                 'display_name': _(field.display_name),    # pylint: disable=translation-of-non-string
-                'help': _(field.help),                    # pylint: disable=translation-of-non-string
+                'help': field_help,
                 'deprecated': field.runtime_options.get('deprecated', False)
             }
         return result
@@ -170,7 +188,7 @@ class CourseMetadata(object):
                     key_values[key] = descriptor.fields[key].from_json(val)
             except (TypeError, ValueError) as err:
                 raise ValueError(_("Incorrect format for field '{name}'. {detailed_message}").format(
-                    name=model['display_name'], detailed_message=err.message))
+                    name=model['display_name'], detailed_message=text_type(err)))
 
         return cls.update_from_dict(key_values, descriptor, user)
 
@@ -205,7 +223,7 @@ class CourseMetadata(object):
                     key_values[key] = descriptor.fields[key].from_json(val)
             except (TypeError, ValueError) as err:
                 did_validate = False
-                errors.append({'message': err.message, 'model': model})
+                errors.append({'message': text_type(err), 'model': model})
 
         # If did validate, go ahead and update the metadata
         if did_validate:

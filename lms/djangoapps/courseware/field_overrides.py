@@ -14,16 +14,15 @@ package and is used to wrap the `authored_data` when constructing an
 `LmsFieldData`.  This means overrides will be in effect for all scopes covered
 by `authored_data`, e.g. course content and settings stored in Mongo.
 """
+import threading
 from abc import ABCMeta, abstractmethod
 from contextlib import contextmanager
-import threading
 
 from django.conf import settings
 from xblock.field_data import FieldData
 
-from request_cache.middleware import RequestCache
+from openedx.core.djangoapps.request_cache.middleware import RequestCache
 from xmodule.modulestore.inheritance import InheritanceMixin
-
 
 NOTSET = object()
 ENABLED_OVERRIDE_PROVIDERS_KEY = u'courseware.field_overrides.enabled_providers.{course_id}'
@@ -258,6 +257,7 @@ class OverrideFieldData(FieldData):
 
 class OverrideModulestoreFieldData(OverrideFieldData):
     """Apply field data overrides at the modulestore level. No student context required."""
+    provider_classes = None
 
     @classmethod
     def wrap(cls, block, field_data):  # pylint: disable=arguments-differ

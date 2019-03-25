@@ -2,13 +2,14 @@
 Tests for the models that control the
 persistent grading feature.
 """
+import itertools
+
 import ddt
 from django.conf import settings
-import itertools
-from mock import patch
-
 from django.test import TestCase
+from mock import patch
 from opaque_keys.edx.locator import CourseLocator
+
 from lms.djangoapps.grades.config.models import PersistentGradesEnabledFlag
 from lms.djangoapps.grades.config.tests.utils import persistent_grades_feature_flags
 
@@ -20,6 +21,8 @@ class PersistentGradesFeatureFlagTests(TestCase):
     Tests the behavior of the feature flags for persistent grading.
     These are set via Django admin settings.
     """
+    shard = 4
+
     def setUp(self):
         super(PersistentGradesFeatureFlagTests, self).setUp()
         self.course_id_1 = CourseLocator(org="edx", course="course", run="run")

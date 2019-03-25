@@ -1,29 +1,29 @@
 import json
 import logging
-from smtplib import SMTPException
 import sys
 from functools import wraps
+from smtplib import SMTPException
+import crum
 
+import zendesk
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.cache import caches
 from django.core.mail import send_mail
 from django.core.validators import ValidationError, validate_email
+from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseNotAllowed, HttpResponseServerError
 from django.views.decorators.csrf import requires_csrf_token
 from django.views.defaults import server_error
-from django.http import (Http404, HttpResponse, HttpResponseNotAllowed,
-                         HttpResponseServerError, HttpResponseForbidden)
-import dogstats_wrapper as dog_stats_api
-import zendesk
-import calc
-
 from opaque_keys import InvalidKeyError
-
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
+import calc
+import dogstats_wrapper as dog_stats_api
+import track.views
 from edxmako.shortcuts import render_to_response, render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-import track.views
+from openedx.features.enterprise_support import api as enterprise_api
+from student.models import CourseEnrollment
 from student.roles import GlobalStaff
 
 log = logging.getLogger(__name__)
@@ -86,6 +86,21 @@ def require_global_staff(func):
                 )
             )
     return login_required(wrapped)
+
+
+def fix_crum_request(func):
+    """
+    A decorator that ensures that the 'crum' package (a middleware that stores and fetches the current request in
+    thread-local storage) can correctly fetch the current request. Under certain conditions, the current request cannot
+    be fetched by crum (e.g.: when HTTP errors are raised in our views via 'raise Http404', et. al.). This decorator
+    manually sets the current request for crum if it cannot be fetched.
+    """
+    @wraps(func)
+    def wrapper(request, *args, **kwargs):
+        if not crum.get_current_request():
+            crum.set_current_request(request=request)
+        return func(request, *args, **kwargs)
+    return wrapper
 
 
 @requires_csrf_token
@@ -222,6 +237,45 @@ class _ZendeskApi(object):
         return None
 
 
+def _get_zendesk_custom_field_context(request, **kwargs):
+    """
+    Construct a dictionary of data that can be stored in Zendesk custom fields.
+    """
+    context = {}
+
+    course_id = request.POST.get("course_id")
+    if not course_id:
+        return context
+
+    context["course_id"] = course_id
+    if not request.user.is_authenticated:
+        return context
+
+    enrollment = CourseEnrollment.get_enrollment(request.user, CourseKey.from_string(course_id))
+    if enrollment and enrollment.is_active:
+        context["enrollment_mode"] = enrollment.mode
+
+    enterprise_learner_data = kwargs.get('learner_data', None)
+    if enterprise_learner_data:
+        enterprise_customer_name = enterprise_learner_data[0]['enterprise_customer']['name']
+        context["enterprise_customer_name"] = enterprise_customer_name
+
+    return context
+
+
+def _format_zendesk_custom_fields(context):
+    """
+    Format the data in `context` for compatibility with the Zendesk API.
+    Ignore any keys that have not been configured in `ZENDESK_CUSTOM_FIELDS`.
+    """
+    custom_fields = []
+    for key, val, in settings.ZENDESK_CUSTOM_FIELDS.items():
+        if key in context:
+            custom_fields.append({"id": val, "value": context[key]})
+
+    return custom_fields
+
+
 def _record_feedback_in_zendesk(
         realname,
         email,
@@ -231,7 +285,8 @@ def _record_feedback_in_zendesk(
         additional_info,
         group_name=None,
         require_update=False,
-        support_email=None
+        support_email=None,
+        custom_fields=None
 ):
     """
     Create a new user-requested Zendesk ticket.
@@ -246,6 +301,8 @@ def _record_feedback_in_zendesk(
     If `require_update` is provided, returns False when the update does not
     succeed. This allows using the private comment to add necessary information
     which the user will not see in followup emails from support.
+
+    If `custom_fields` is provided, submits data to those fields in Zendesk.
     """
     zendesk_api = _ZendeskApi()
 
@@ -257,11 +314,11 @@ def _record_feedback_in_zendesk(
     # Tag all issues with LMS to distinguish channel in Zendesk; requested by student support team
     zendesk_tags = list(tags.values()) + ["LMS"]
 
-    # Per edX support, we would like to be able to route white label feedback items
-    # via tagging
-    white_label_org = configuration_helpers.get_value('course_org_filter')
-    if white_label_org:
-        zendesk_tags = zendesk_tags + ["whitelabel_{org}".format(org=white_label_org)]
+    # Per edX support, we would like to be able to route feedback items by site via tagging
+    current_site_name = configuration_helpers.get_value("SITE_NAME")
+    if current_site_name:
+        current_site_name = current_site_name.replace(".", "_")
+        zendesk_tags.append("site_name_{site}".format(site=current_site_name))
 
     new_ticket = {
         "ticket": {
@@ -271,6 +328,10 @@ def _record_feedback_in_zendesk(
             "tags": zendesk_tags
         }
     }
+
+    if custom_fields:
+        new_ticket["ticket"]["custom_fields"] = custom_fields
+
     group = None
     if group_name is not None:
         group = zendesk_api.get_group(group_name)
@@ -322,12 +383,12 @@ def get_feedback_form_context(request):
     context["subject"] = request.POST["subject"]
     context["details"] = request.POST["details"]
     context["tags"] = dict(
-        [(tag, request.POST[tag]) for tag in ["issue_type", "course_id"] if tag in request.POST]
+        [(tag, request.POST[tag]) for tag in ["issue_type", "course_id"] if request.POST.get(tag)]
     )
 
     context["additional_info"] = {}
 
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         context["realname"] = request.user.profile.name
         context["email"] = request.user.email
         context["additional_info"]["username"] = request.user.username
@@ -371,7 +432,7 @@ def submit_feedback(request):
 
     required_fields = ["subject", "details"]
 
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         required_fields += ["name", "email"]
 
     required_field_errs = {
@@ -384,7 +445,7 @@ def submit_feedback(request):
         if field not in request.POST or not request.POST[field]:
             return build_error_response(400, field, required_field_errs[field])
 
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         try:
             validate_email(request.POST["email"])
         except ValidationError:
@@ -392,6 +453,12 @@ def submit_feedback(request):
 
     success = False
     context = get_feedback_form_context(request)
+
+    # Update the tag info with 'enterprise_learner' if the user belongs to an enterprise customer.
+    enterprise_learner_data = enterprise_api.get_enterprise_learner_data(user=request.user)
+    if enterprise_learner_data:
+        context["tags"]["learner_type"] = "enterprise_learner"
+
     support_backend = configuration_helpers.get_value('CONTACT_FORM_SUBMISSION_BACKEND', SUPPORT_BACKEND_ZENDESK)
 
     if support_backend == SUPPORT_BACKEND_EMAIL:
@@ -412,6 +479,11 @@ def submit_feedback(request):
         if not settings.ZENDESK_URL or not settings.ZENDESK_USER or not settings.ZENDESK_API_KEY:
             raise Exception("Zendesk enabled but not configured")
 
+        custom_fields = None
+        if settings.ZENDESK_CUSTOM_FIELDS:
+            custom_field_context = _get_zendesk_custom_field_context(request, learner_data=enterprise_learner_data)
+            custom_fields = _format_zendesk_custom_fields(custom_field_context)
+
         success = _record_feedback_in_zendesk(
             context["realname"],
             context["email"],
@@ -419,7 +491,8 @@ def submit_feedback(request):
             context["details"],
             context["tags"],
             context["additional_info"],
-            support_email=context["support_email"]
+            support_email=context["support_email"],
+            custom_fields=custom_fields
         )
 
     _record_feedback_in_datadog(context["tags"])

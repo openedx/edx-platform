@@ -8,14 +8,14 @@ If student have answered - words he entered and cloud.
 
 import json
 import logging
+
 from pkg_resources import resource_string
+from web_fragments.fragment import Fragment
+from xblock.fields import Boolean, Dict, Integer, List, Scope, String
 
-from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
+from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.x_module import XModule
-
-from xblock.fields import Scope, Dict, Boolean, List, Integer, String
-from xblock.fragment import Fragment
 
 log = logging.getLogger(__name__)
 
@@ -38,7 +38,7 @@ class WordCloudFields(object):
     """XFields for word cloud."""
     display_name = String(
         display_name=_("Display Name"),
-        help=_("The label for this word cloud on the course page."),
+        help=_("The display name for this component."),
         scope=Scope.settings,
         default="Word cloud"
     )
@@ -91,11 +91,7 @@ class WordCloudFields(object):
 
 class WordCloudModule(WordCloudFields, XModule):
     """WordCloud Xmodule"""
-    js = {
-        'js': [
-            resource_string(__name__, 'js/src/javascript_loader.js'),
-        ],
-    }
+    js = {'js': [resource_string(__name__, 'assets/word_cloud/src/js/word_cloud.js')]}
     css = {'scss': [resource_string(__name__, 'css/word_cloud/display.scss')]}
     js_module_name = "WordCloud"
 
@@ -244,16 +240,11 @@ class WordCloudModule(WordCloudFields, XModule):
             'ajax_url': self.system.ajax_url,
             'display_name': self.display_name,
             'instructions': self.instructions,
-            'element_class': self.location.category,
+            'element_class': self.location.block_type,
             'element_id': self.location.html_id(),
             'num_inputs': self.num_inputs,
             'submitted': self.submitted,
         }))
-
-        fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/d3.min.js'))
-        fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/d3.layout.cloud.js'))
-        fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/word_cloud.js'))
-        fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/word_cloud_main.js'))
 
         return fragment
 

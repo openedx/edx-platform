@@ -1,31 +1,31 @@
 """
 This module implements the upload and remove endpoints of the profile image api.
 """
-from contextlib import closing
 import datetime
 import itertools
 import logging
+from contextlib import closing
 
+from pytz import UTC
 from django.utils.translation import ugettext as _
-from django.utils.timezone import utc
 from rest_framework import permissions, status
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from six import text_type
 
+from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_names, set_has_profile_image
 from openedx.core.djangoapps.user_api.errors import UserNotFound
 from openedx.core.lib.api.authentication import (
     OAuth2AuthenticationAllowInactiveUser,
-    SessionAuthenticationAllowInactiveUser,
+    SessionAuthenticationAllowInactiveUser
 )
 from openedx.core.lib.api.parsers import TypedFileUploadParser
 from openedx.core.lib.api.permissions import IsUserInUrl
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
-from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_names, set_has_profile_image
+
 from .exceptions import ImageValidationError
-from .images import (
-    IMAGE_TYPES, validate_uploaded_image, create_profile_images, remove_profile_images
-)
+from .images import IMAGE_TYPES, create_profile_images, remove_profile_images, validate_uploaded_image
 
 log = logging.getLogger(__name__)
 
@@ -38,7 +38,7 @@ def _make_upload_dt():
     Generate a server-side timestamp for the upload. This is in a separate
     function so its behavior can be overridden in tests.
     """
-    return datetime.datetime.utcnow().replace(tzinfo=utc)
+    return datetime.datetime.utcnow().replace(tzinfo=UTC)
 
 
 class ProfileImageView(DeveloperErrorViewMixin, APIView):
@@ -146,7 +146,7 @@ class ProfileImageView(DeveloperErrorViewMixin, APIView):
                 validate_uploaded_image(uploaded_file)
             except ImageValidationError as error:
                 return Response(
-                    {"developer_message": error.message, "user_message": error.user_message},
+                    {"developer_message": text_type(error), "user_message": error.user_message},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 

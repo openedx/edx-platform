@@ -3,36 +3,36 @@
     define(['backbone', 'js/edxnotes/utils/utils', 'underscore.string'], function(Backbone, Utils, str) {
         var NoteModel = Backbone.Model.extend({
             defaults: {
-                'id': null,
-                'created': '',
-                'updated': '',
-                'user': '',
-                'usage_id': '',
-                'course_id': '',
-                'text': '',
-                'quote': '',
-                'ranges': [],
-                'tags': [],
-                'unit': {
-                    'display_name': '',
-                    'url': '',
-                    'location': ''
+                id: null,
+                created: '',
+                updated: '',
+                user: '',
+                usage_id: '',
+                course_id: '',
+                text: '',
+                quote: '',
+                ranges: [],
+                tags: [],
+                unit: {
+                    display_name: '',
+                    url: '',
+                    location: ''
                 },
-                'section': {
-                    'display_name': '',
-                    'location': '',
-                    'children': []
+                section: {
+                    display_name: '',
+                    location: '',
+                    children: []
                 },
-                'chapter': {
-                    'display_name': '',
-                    'location': '',
-                    'index': 0,
-                    'children': []
+                chapter: {
+                    display_name: '',
+                    location: '',
+                    index: 0,
+                    children: []
                 },
             // Flag indicating current state of the note: expanded or collapsed.
-                'is_expanded': false,
+                is_expanded: false,
             // Flag indicating whether `More` link should be shown.
-                'show_link': false
+                show_link: false
             },
 
             textSize: 300,

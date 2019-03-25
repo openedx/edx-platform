@@ -12,8 +12,8 @@
             DiscussionSpecHelper.setUnderscoreFixtures();
             spyOn(DiscussionUtil, 'makeWmdEditor');
             this.threadData = DiscussionViewSpecHelper.makeThreadWithProps({
-                'commentable_id': 'test_topic',
-                'title': 'test thread title'
+                commentable_id: 'test_topic',
+                title: 'test thread title'
             });
             this.thread = new Thread(this.threadData);
             this.course_settings = DiscussionSpecHelper.createTestCourseSettings();
@@ -74,7 +74,7 @@
         });
 
         it('can save new data correctly in inline mode', function() {
-            this.createEditView({'mode': 'inline'});
+            this.createEditView({mode: 'inline'});
             testUpdate(this.view, this.thread, 'other_topic', 'Other Topic', 'inline');
         });
 
@@ -89,36 +89,36 @@
         });
 
         it('can close the view in inline mode', function() {
-            this.createEditView({'mode': 'inline'});
+            this.createEditView({mode: 'inline'});
             testCancel(this.view);
         });
 
         describe('renderComments', function() {
             beforeEach(function() {
                 this.course_settings = new DiscussionCourseSettings({
-                    'category_map': {
-                        'children': [ // eslint-disable-line quote-props
+                    category_map: {
+                        children: [
                             ['Topic', 'entry'],
                             ['General', 'entry'],
                             ['Basic Question', 'entry']
                         ],
-                        'entries': {
-                            'Topic': {
-                                'is_cohorted': true,
-                                'id': 'topic'
+                        entries: {
+                            Topic: {
+                                is_divided: true,
+                                id: 'topic'
                             },
-                            'General': {
-                                'sort_key': 'General',
-                                'is_cohorted': false,
-                                'id': '6.00.1x_General'
+                            General: {
+                                sort_key: 'General',
+                                is_divided: false,
+                                id: '6.00.1x_General'
                             },
                             'Basic Question': {
-                                'is_cohorted': false,
-                                'id': "6>00'1x\"Basic_Question"
+                                is_divided: false,
+                                id: "6>00'1x\"Basic_Question"
                             }
                         }
                     },
-                    'is_cohorted': true
+                    is_cohorted: true
                 });
             });
 

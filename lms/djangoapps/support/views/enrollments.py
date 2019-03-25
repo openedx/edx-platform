@@ -2,15 +2,16 @@
 Support tool for changing course enrollments.
 """
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponseBadRequest
 from django.utils.decorators import method_decorator
 from django.views.generic import View
-from rest_framework.generics import GenericAPIView
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from rest_framework.generics import GenericAPIView
+from six import text_type
 
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response
@@ -20,7 +21,7 @@ from enrollment.serializers import ModeSerializer
 from lms.djangoapps.support.decorators import require_support_permission
 from lms.djangoapps.support.serializers import ManualEnrollmentSerializer
 from lms.djangoapps.verify_student.models import VerificationDeadline
-from student.models import CourseEnrollment, ManualEnrollmentAudit, ENROLLED_TO_ENROLLED
+from student.models import ENROLLED_TO_ENROLLED, CourseEnrollment, ManualEnrollmentAudit
 from util.json_request import JsonResponse
 
 
@@ -45,6 +46,10 @@ class EnrollmentSupportListView(GenericAPIView):
     Allows viewing and changing learner enrollments by support
     staff.
     """
+    # TODO: ARCH-91
+    # This view is excluded from Swagger doc generation because it
+    # does not specify a serializer class.
+    exclude_from_schema = True
 
     @method_decorator(require_support_permission)
     def get(self, request, username_or_email):
@@ -89,7 +94,7 @@ class EnrollmentSupportListView(GenericAPIView):
             if new_mode == CourseMode.CREDIT_MODE:
                 return HttpResponseBadRequest(u'Enrollment cannot be changed to credit mode.')
         except KeyError as err:
-            return HttpResponseBadRequest(u'The field {} is required.'.format(err.message))
+            return HttpResponseBadRequest(u'The field {} is required.'.format(text_type(err)))
         except InvalidKeyError:
             return HttpResponseBadRequest(u'Could not parse course key.')
         except (CourseEnrollment.DoesNotExist, User.DoesNotExist):
@@ -113,7 +118,7 @@ class EnrollmentSupportListView(GenericAPIView):
                 )
                 return JsonResponse(ManualEnrollmentSerializer(instance=manual_enrollment).data)
         except CourseModeNotFoundError as err:
-            return HttpResponseBadRequest(err.message)
+            return HttpResponseBadRequest(text_type(err))
 
     @staticmethod
     def include_verified_mode_info(enrollment_data, course_key):

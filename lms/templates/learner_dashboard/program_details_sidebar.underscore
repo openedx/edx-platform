@@ -1,0 +1,17 @@
+<aside class="aside js-program-progress program-progress">
+    <% if (programCertificate) { %>
+        <h2 class="progress-heading certificate-heading"><%- StringUtils.interpolate(gettext('Your {program} Certificate'), {program: type}, true) %></h2>
+
+        <a href="<%- programCertificate.url %>" class="program-cert-link">
+            <img src="<%- programCertificate.img %>" class="program-cert" alt="<%- interpolate(gettext('Open the certificate you earned for the %(title)s program.'), {title: programCertificate.title}, true) %>" />
+        </a>
+    <% } %>
+</aside>
+<% if (programRecordUrl) { %>
+    <aside class="aside js-program-record program-record">
+        <a href="<%- programRecordUrl %>" class="program-record-link">
+            <button class="btn program-record-button"><%- gettext('View Program Record') %></button>
+        </a>
+    </aside>
+<% } %>
+<aside class="aside js-course-certificates"></aside>

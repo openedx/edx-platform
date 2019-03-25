@@ -1,50 +1,59 @@
 """
 Tests for the Shopping Cart Models
 """
-from decimal import Decimal
-import datetime
-import sys
-import json
 import copy
-
+import datetime
+import json
 import smtplib
-from boto.exception import BotoServerError  # this is a super-class of SESError and catches connection errors
+import sys
+from decimal import Decimal
 
-from mock import patch, MagicMock
-from nose.plugins.attrib import attr
-import pytz
 import ddt
+import pytz
+from boto.exception import BotoServerError  # this is a super-class of SESError and catches connection errors
+from django.conf import settings
+from django.contrib.auth.models import AnonymousUser
 from django.core import mail
 from django.core.mail.message import EmailMessage
-from django.conf import settings
+from django.urls import reverse
 from django.db import DatabaseError
 from django.test import TestCase
 from django.test.utils import override_settings
-from django.core.urlresolvers import reverse
-from django.contrib.auth.models import AnonymousUser
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from mock import Mock, MagicMock, patch
+from nose.plugins.attrib import attr
+from opaque_keys.edx.locator import CourseLocator
 
-from shoppingcart.models import (
-    Order, OrderItem, CertificateItem,
-    InvalidCartItem, CourseRegistrationCode, PaidCourseRegistration, CourseRegCodeItem,
-    Donation, OrderItemSubclassPK,
-    Invoice, CourseRegistrationCodeInvoiceItem, InvoiceTransaction, InvoiceHistory,
-    RegistrationCodeRedemption,
-    Coupon, CouponRedemption)
-from student.tests.factories import UserFactory
-from student.models import CourseEnrollment
 from course_modes.models import CourseMode
 from shoppingcart.exceptions import (
-    PurchasedCallbackException,
-    CourseDoesNotExistException,
-    ItemAlreadyInCartException,
     AlreadyEnrolledInCourseException,
+    CourseDoesNotExistException,
     InvalidStatusToRetire,
-    UnexpectedOrderItemStatus,
+    ItemAlreadyInCartException,
+    PurchasedCallbackException,
+    UnexpectedOrderItemStatus
 )
-
-from opaque_keys.edx.locator import CourseLocator
+from shoppingcart.models import (
+    CertificateItem,
+    Coupon,
+    CouponRedemption,
+    CourseRegCodeItem,
+    CourseRegistrationCode,
+    CourseRegistrationCodeInvoiceItem,
+    Donation,
+    InvalidCartItem,
+    Invoice,
+    InvoiceHistory,
+    InvoiceTransaction,
+    Order,
+    OrderItem,
+    OrderItemSubclassPK,
+    PaidCourseRegistration,
+    RegistrationCodeRedemption
+)
+from student.models import CourseEnrollment
+from student.tests.factories import UserFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @attr(shard=3)
@@ -238,12 +247,8 @@ class OrderTest(ModuleStoreTestCase):
         self.assertEqual(cart.status, status)
         self.assertEqual(item.status, status)
 
-    @override_settings(
-        LMS_SEGMENT_KEY="foobar",
-        FEATURES={
-            'STORE_BILLING_INFO': True,
-        }
-    )
+    @override_settings(LMS_SEGMENT_KEY="foobar")
+    @patch.dict(settings.FEATURES, {'STORE_BILLING_INFO': True})
     def test_purchase(self):
         # This test is for testing the subclassing functionality of OrderItem, but in
         # order to do this, we end up testing the specific functionality of
@@ -905,15 +910,13 @@ class CertificateItemTest(ModuleStoreTestCase):
         cert_item = CertificateItem.add_to_order(cart, self.course_key, self.cost, 'honor')
         self.assertEquals(cert_item.single_item_receipt_template, 'shoppingcart/receipt.html')
 
-    @override_settings(
-        LMS_SEGMENT_KEY="foobar",
-        FEATURES={
-            'STORE_BILLING_INFO': True,
-        }
-    )
-    def test_refund_cert_callback_no_expiration(self):
+    @override_settings(LMS_SEGMENT_KEY="foobar")
+    @patch.dict(settings.FEATURES, {'STORE_BILLING_INFO': True})
+    @patch('lms.djangoapps.course_goals.views.update_google_analytics', Mock(return_value=True))
+    @patch('student.models.CourseEnrollment.refund_cutoff_date')
+    def test_refund_cert_callback_no_expiration(self, cutoff_date):
         # When there is no expiration date on a verified mode, the user can always get a refund
-
+        cutoff_date.return_value = datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=1)
         # need to prevent analytics errors from appearing in stderr
         with patch('sys.stderr', sys.stdout.write):
             CourseEnrollment.enroll(self.user, self.course_key, 'verified')
@@ -946,13 +949,11 @@ class CertificateItemTest(ModuleStoreTestCase):
         self.assertFalse(target_certs[0].refund_requested_time)
         self.assertEquals(target_certs[0].order.status, 'purchased')
 
-    @override_settings(
-        LMS_SEGMENT_KEY="foobar",
-        FEATURES={
-            'STORE_BILLING_INFO': True,
-        }
-    )
-    def test_refund_cert_callback_before_expiration(self):
+    @override_settings(LMS_SEGMENT_KEY="foobar")
+    @patch.dict(settings.FEATURES, {'STORE_BILLING_INFO': True})
+    @patch('lms.djangoapps.course_goals.views.update_google_analytics', Mock(return_value=True))
+    @patch('student.models.CourseEnrollment.refund_cutoff_date')
+    def test_refund_cert_callback_before_expiration(self, cutoff_date):
         # If the expiration date has not yet passed on a verified mode, the user can be refunded
         many_days = datetime.timedelta(days=60)
 
@@ -965,6 +966,7 @@ class CertificateItemTest(ModuleStoreTestCase):
                                  expiration_datetime=(datetime.datetime.now(pytz.utc) + many_days))
         course_mode.save()
 
+        cutoff_date.return_value = datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=1)
         # need to prevent analytics errors from appearing in stderr
         with patch('sys.stderr', sys.stdout.write):
             CourseEnrollment.enroll(self.user, self.course_key, 'verified')
@@ -979,7 +981,8 @@ class CertificateItemTest(ModuleStoreTestCase):
         self.assertEquals(target_certs[0].order.status, 'refunded')
         self._assert_refund_tracked()
 
-    def test_refund_cert_callback_before_expiration_email(self):
+    @patch('student.models.CourseEnrollment.refund_cutoff_date')
+    def test_refund_cert_callback_before_expiration_email(self, cutoff_date):
         """ Test that refund emails are being sent correctly. """
         course = CourseFactory.create()
         course_key = course.id
@@ -998,6 +1001,7 @@ class CertificateItemTest(ModuleStoreTestCase):
         cart.purchase()
 
         mail.outbox = []
+        cutoff_date.return_value = datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=1)
         with patch('shoppingcart.models.log.error') as mock_error_logger:
             CourseEnrollment.unenroll(self.user, course_key)
             self.assertFalse(mock_error_logger.called)
@@ -1006,8 +1010,9 @@ class CertificateItemTest(ModuleStoreTestCase):
             self.assertEquals(settings.PAYMENT_SUPPORT_EMAIL, mail.outbox[0].from_email)
             self.assertIn('has requested a refund on Order', mail.outbox[0].body)
 
+    @patch('student.models.CourseEnrollment.refund_cutoff_date')
     @patch('shoppingcart.models.log.error')
-    def test_refund_cert_callback_before_expiration_email_error(self, error_logger):
+    def test_refund_cert_callback_before_expiration_email_error(self, error_logger, cutoff_date):
         # If there's an error sending an email to billing, we need to log this error
         many_days = datetime.timedelta(days=60)
 
@@ -1026,6 +1031,7 @@ class CertificateItemTest(ModuleStoreTestCase):
         CertificateItem.add_to_order(cart, course_key, self.cost, 'verified')
         cart.purchase()
 
+        cutoff_date.return_value = datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=1)
         with patch('shoppingcart.models.send_mail', side_effect=smtplib.SMTPException):
             CourseEnrollment.unenroll(self.user, course_key)
             self.assertTrue(error_logger.call_args[0][0].startswith('Failed sending email'))

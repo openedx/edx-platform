@@ -30,6 +30,7 @@ class TestContentstore(unittest.TestCase):
     """
     Test the methods in contentstore.mongo using deprecated and non-deprecated keys
     """
+    shard = 2
 
     # don't use these 2 class vars as they restore behavior once the tests are done
     asset_deprecated = None
@@ -155,7 +156,7 @@ class TestContentstore(unittest.TestCase):
         self.assertEqual(count, len(self.course1_files), course1_assets)
         for asset in course1_assets:
             parsed = AssetKey.from_string(asset['filename'])
-            self.assertIn(parsed.name, self.course1_files)
+            self.assertIn(parsed.block_id, self.course1_files)
 
         course1_assets, __ = self.contentstore.get_all_content_for_course(self.course1_key, 1, 1)
         self.assertEqual(len(course1_assets), 1, course1_assets)

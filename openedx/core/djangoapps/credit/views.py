@@ -13,23 +13,32 @@ from django.views.decorators.csrf import csrf_exempt
 from edx_rest_framework_extensions.authentication import JwtAuthentication
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from rest_framework import viewsets, mixins, permissions, views, generics
+from rest_framework import generics, mixins, permissions, views, viewsets
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework_oauth.authentication import OAuth2Authentication
+from six import text_type
 
 from openedx.core.djangoapps.credit.api import create_credit_request
 from openedx.core.djangoapps.credit.exceptions import (
-    UserNotEligibleException, InvalidCourseKey, CreditApiBadRequest, InvalidCreditRequest,
+    CreditApiBadRequest,
+    InvalidCourseKey,
+    InvalidCreditRequest,
+    UserNotEligibleException
 )
 from openedx.core.djangoapps.credit.models import (
-    CreditCourse, CreditProvider, CREDIT_PROVIDER_ID_REGEX,
-    CreditEligibility, CreditRequest,
+    CREDIT_PROVIDER_ID_REGEX,
+    CreditCourse,
+    CreditEligibility,
+    CreditProvider,
+    CreditRequest
 )
 from openedx.core.djangoapps.credit.serializers import (
-    CreditCourseSerializer, CreditProviderSerializer,
-    CreditEligibilitySerializer, CreditProviderCallbackSerializer,
+    CreditCourseSerializer,
+    CreditEligibilitySerializer,
+    CreditProviderCallbackSerializer,
+    CreditProviderSerializer
 )
 from openedx.core.lib.api.mixins import PutAsCreateMixin
 from openedx.core.lib.api.permissions import IsStaffOrOwner
@@ -93,7 +102,7 @@ class CreditProviderRequestCreateView(views.APIView):
             credit_request = create_credit_request(course_key, provider.provider_id, username)
             return Response(credit_request)
         except CreditApiBadRequest as ex:
-            raise InvalidCreditRequest(ex.message)
+            raise InvalidCreditRequest(text_type(ex))
 
 
 class CreditProviderCallbackView(views.APIView):

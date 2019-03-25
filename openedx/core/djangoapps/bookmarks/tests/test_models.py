@@ -1,25 +1,23 @@
 """
 Tests for Bookmarks models.
 """
-from contextlib import contextmanager
 import datetime
+from contextlib import contextmanager
+
 import ddt
-from freezegun import freeze_time
 import mock
-from nose.plugins.attrib import attr
 import pytz
-from unittest import skipUnless
-
-from django.conf import settings
-
+from freezegun import freeze_time
+from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import UsageKey
-from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
+
+from openedx.core.djangolib.testing.utils import skip_unless_lms
+from student.tests.factories import AdminFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.factories import check_mongo_calls, CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-
-from student.tests.factories import AdminFactory, UserFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
 from .. import DEFAULT_FIELDS, OPTIONAL_FIELDS, PathItem
 from ..models import Bookmark, XBlockCache, parse_path_data
@@ -226,9 +224,9 @@ class BookmarksTestsBase(ModuleStoreTestCase):
             self.assertEqual(bookmark_data['path'], bookmark.path)
 
 
-@attr(shard=2)
+@attr(shard=9)
 @ddt.ddt
-@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Tests only valid in LMS')
+@skip_unless_lms
 class BookmarkModelTests(BookmarksTestsBase):
     """
     Test the Bookmark model.
@@ -255,10 +253,10 @@ class BookmarkModelTests(BookmarksTestsBase):
 
     @ddt.data(
         (ModuleStoreEnum.Type.mongo, 'course', [], 3),
-        (ModuleStoreEnum.Type.mongo, 'chapter_1', [], 4),
-        (ModuleStoreEnum.Type.mongo, 'sequential_1', ['chapter_1'], 6),
-        (ModuleStoreEnum.Type.mongo, 'vertical_1', ['chapter_1', 'sequential_1'], 8),
-        (ModuleStoreEnum.Type.mongo, 'html_1', ['chapter_1', 'sequential_2', 'vertical_2'], 10),
+        (ModuleStoreEnum.Type.mongo, 'chapter_1', [], 3),
+        (ModuleStoreEnum.Type.mongo, 'sequential_1', ['chapter_1'], 4),
+        (ModuleStoreEnum.Type.mongo, 'vertical_1', ['chapter_1', 'sequential_1'], 6),
+        (ModuleStoreEnum.Type.mongo, 'html_1', ['chapter_1', 'sequential_2', 'vertical_2'], 7),
         (ModuleStoreEnum.Type.split, 'course', [], 3),
         (ModuleStoreEnum.Type.split, 'chapter_1', [], 2),
         (ModuleStoreEnum.Type.split, 'sequential_1', ['chapter_1'], 2),
@@ -412,7 +410,7 @@ class BookmarkModelTests(BookmarksTestsBase):
             self.assertEqual(bookmark.path, [])
 
 
-@attr(shard=2)
+@attr(shard=9)
 @ddt.ddt
 class XBlockCacheModelTest(ModuleStoreTestCase):
     """
@@ -432,9 +430,6 @@ class XBlockCacheModelTest(ModuleStoreTestCase):
         [unicode(CHAPTER1_USAGE_KEY), 'Chapter 1'],
         [unicode(SECTION2_USAGE_KEY), 'Section 2'],
     ]
-
-    def setUp(self):
-        super(XBlockCacheModelTest, self).setUp()
 
     def assert_xblock_cache_data(self, xblock_cache, data):
         """

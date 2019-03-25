@@ -1,26 +1,23 @@
 """
 Test view handler for rerun (and eventually create)
 """
-import ddt
-from mock import patch
+import datetime
 
+import ddt
+from django.urls import reverse
 from django.test.client import RequestFactory
-from django.core.urlresolvers import reverse
+from mock import patch
 from opaque_keys.edx.keys import CourseKey
 
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
+from contentstore.tests.utils import AjaxEnabledTestClient, parse_json
 from student.roles import CourseInstructorRole, CourseStaffRole
 from student.tests.factories import UserFactory
-from contentstore.tests.utils import AjaxEnabledTestClient, parse_json
-from datetime import datetime
+from util.organizations_helpers import add_organization, get_course_organizations
 from xmodule.course_module import CourseFields
-from util.organizations_helpers import (
-    add_organization,
-    get_course_organizations,
-)
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @ddt.ddt
@@ -40,12 +37,19 @@ class TestCourseListing(ModuleStoreTestCase):
         self.client = AjaxEnabledTestClient()
         self.client.login(username=self.user.username, password='test')
         self.course_create_rerun_url = reverse('course_handler')
+        self.course_start = datetime.datetime.utcnow()
+        self.course_end = self.course_start + datetime.timedelta(days=30)
+        self.enrollment_start = self.course_start - datetime.timedelta(days=7)
+        self.enrollment_end = self.course_end - datetime.timedelta(days=14)
         source_course = CourseFactory.create(
             org='origin',
             number='the_beginning',
             run='first',
             display_name='the one and only',
-            start=datetime.utcnow()
+            start=self.course_start,
+            end=self.course_end,
+            enrollment_start=self.enrollment_start,
+            enrollment_end=self.enrollment_end
         )
         self.source_course_key = source_course.id
 
@@ -73,8 +77,12 @@ class TestCourseListing(ModuleStoreTestCase):
         dest_course_key = CourseKey.from_string(data['destination_course_key'])
 
         self.assertEqual(dest_course_key.run, 'copy')
+        source_course = self.store.get_course(self.source_course_key)
         dest_course = self.store.get_course(dest_course_key)
         self.assertEqual(dest_course.start, CourseFields.start.default)
+        self.assertEqual(dest_course.end, source_course.end)
+        self.assertEqual(dest_course.enrollment_start, None)
+        self.assertEqual(dest_course.enrollment_end, None)
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_newly_created_course_has_web_certs_enabled(self, store):

@@ -14,15 +14,16 @@ from django.utils.translation import ugettext_noop
 
 from openedx.core.lib.time_zone_utils import get_display_time_zone
 from pytz import common_timezones, common_timezones_set, country_timezones
+from six import text_type
+
 from student.models import User, UserProfile
-from request_cache import get_request_or_stub
 from ..errors import (
     UserAPIInternalError, UserAPIRequestError, UserNotFound, UserNotAuthorized,
     PreferenceValidationError, PreferenceUpdateError, CountryCodeError
 )
-from ..helpers import intercept_errors
+from ..helpers import intercept_errors, serializer_is_dirty
 from ..models import UserOrgTag, UserPreference
-from ..serializers import UserSerializer, RawUserPreferenceSerializer
+from ..serializers import RawUserPreferenceSerializer
 
 log = logging.getLogger(__name__)
 
@@ -72,18 +73,7 @@ def get_user_preferences(requesting_user, username=None):
          UserAPIInternalError: the operation failed due to an unexpected error.
     """
     existing_user = _get_authorized_user(requesting_user, username, allow_staff=True)
-
-    # Django Rest Framework V3 uses the current request to version
-    # hyperlinked URLS, so we need to retrieve the request and pass
-    # it in the serializer's context (otherwise we get an AssertionError).
-    # We're retrieving the request from the cache rather than passing it in
-    # as an argument because this is an implementation detail of how we're
-    # serializing data, which we want to encapsulate in the API call.
-    context = {
-        "request": get_request_or_stub()
-    }
-    user_serializer = UserSerializer(existing_user, context=context)
-    return user_serializer.data["preferences"]
+    return UserPreference.get_all_preferences(existing_user)
 
 
 @intercept_errors(UserAPIInternalError, ignore_errors=[UserAPIRequestError])
@@ -124,6 +114,7 @@ def update_user_preferences(requesting_user, update, user=None):
     for preference_key in update.keys():
         preference_value = update[preference_key]
         if preference_value is not None:
+            preference_value = unicode(preference_value)
             try:
                 serializer = create_user_preference_serializer(user, preference_key, preference_value)
                 validate_user_preference_serializer(serializer, preference_key, preference_value)
@@ -140,9 +131,12 @@ def update_user_preferences(requesting_user, update, user=None):
     for preference_key in update.keys():
         preference_value = update[preference_key]
         if preference_value is not None:
+            preference_value = unicode(preference_value)
             try:
                 serializer = serializers[preference_key]
-                serializer.save()
+
+                if serializer_is_dirty(serializer):
+                    serializer.save()
             except Exception as error:
                 raise _create_preference_update_error(preference_key, preference_value, error)
         else:
@@ -161,7 +155,7 @@ def set_user_preference(requesting_user, preference_key, preference_value, usern
         requesting_user (User): The user requesting to modify account information. Only the user with username
             'username' has permissions to modify account information.
         preference_key (str): The key for the user preference.
-        preference_value (str): The value to be stored. Non-string values will be converted to strings.
+        preference_value (str): The value to be stored. Non-string values are converted to strings.
         username (str): Optional username specifying which account should be updated. If not specified,
             `requesting_user.username` is assumed.
 
@@ -175,12 +169,16 @@ def set_user_preference(requesting_user, preference_key, preference_value, usern
         UserAPIInternalError: the operation failed due to an unexpected error.
     """
     existing_user = _get_authorized_user(requesting_user, username)
+    if preference_value is not None:
+        preference_value = unicode(preference_value)
     serializer = create_user_preference_serializer(existing_user, preference_key, preference_value)
     validate_user_preference_serializer(serializer, preference_key, preference_value)
-    try:
-        serializer.save()
-    except Exception as error:
-        raise _create_preference_update_error(preference_key, preference_value, error)
+
+    if serializer_is_dirty(serializer):
+        try:
+            serializer.save()
+        except Exception as error:
+            raise _create_preference_update_error(preference_key, preference_value, error)
 
 
 @intercept_errors(UserAPIInternalError, ignore_errors=[UserAPIRequestError])
@@ -270,7 +268,7 @@ def update_email_opt_in(user, org, opt_in):
         if hasattr(settings, 'LMS_SEGMENT_KEY') and settings.LMS_SEGMENT_KEY:
             _track_update_email_opt_in(user.id, org, opt_in)
     except IntegrityError as err:
-        log.warn(u"Could not update organization wide preference due to IntegrityError: {}".format(err.message))
+        log.warning(u"Could not update organization wide preference due to IntegrityError: {}".format(text_type(err)))
 
 
 def _track_update_email_opt_in(user_id, organization, opt_in):
@@ -310,13 +308,20 @@ def _get_authorized_user(requesting_user, username=None, allow_staff=False):
     If username is not provided, requesting_user.username is assumed.
     """
     if username is None:
-        username = requesting_user.username
+        # If the user is one that has already been stored to the database, use that
+        if requesting_user.pk:
+            return requesting_user
+        else:
+            # Otherwise, treat this as a request against a separate user
+            username = requesting_user.username
+
+    _check_authorized(requesting_user, username, allow_staff)
+
     try:
         existing_user = User.objects.get(username=username)
     except ObjectDoesNotExist:
         raise UserNotFound()
 
-    _check_authorized(requesting_user, username, allow_staff)
     return existing_user
 
 
@@ -347,13 +352,13 @@ def create_user_preference_serializer(user, preference_key, preference_value):
     except ObjectDoesNotExist:
         existing_user_preference = None
     new_data = {
-        "user": user.id,
         "key": preference_key,
         "value": preference_value,
     }
     if existing_user_preference:
-        serializer = RawUserPreferenceSerializer(existing_user_preference, data=new_data)
+        serializer = RawUserPreferenceSerializer(existing_user_preference, data=new_data, partial=True)
     else:
+        new_data['user'] = user.id
         serializer = RawUserPreferenceSerializer(data=new_data)
     return serializer
 

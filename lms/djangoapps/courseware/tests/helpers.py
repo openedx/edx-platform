@@ -1,17 +1,147 @@
 """
 Helpers for courseware tests.
 """
-import crum
 import json
 
+from django.contrib import messages
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase
-from django.test.client import RequestFactory
+from django.test.client import Client, RequestFactory
+from six import text_type
 
 from courseware.access import has_access
+from courseware.masquerade import handle_ajax, setup_masquerade
+from edxmako.shortcuts import render_to_string
+from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.lib.url_utils import quote_slashes
 from student.models import Registration
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from xblock.field_data import DictFieldData
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.tests import get_test_descriptor_system, get_test_system
+
+
+class BaseTestXmodule(ModuleStoreTestCase):
+    """Base class for testing Xmodules with mongo store.
+
+    This class prepares course and users for tests:
+        1. create test course;
+        2. create, enroll and login users for this course;
+
+    Any xmodule should overwrite only next parameters for test:
+        1. CATEGORY
+        2. DATA or METADATA
+        3. MODEL_DATA
+        4. COURSE_DATA and USER_COUNT if needed
+
+    This class should not contain any tests, because CATEGORY
+    should be defined in child class.
+    """
+    MODULESTORE = TEST_DATA_MONGO_MODULESTORE
+
+    USER_COUNT = 2
+    COURSE_DATA = {}
+
+    # Data from YAML common/lib/xmodule/xmodule/templates/NAME/default.yaml
+    CATEGORY = "vertical"
+    DATA = ''
+    # METADATA must be overwritten for every instance that uses it. Otherwise,
+    # if we'll change it in the tests, it will be changed for all other instances
+    # of parent class.
+    METADATA = {}
+    MODEL_DATA = {'data': '<some_module></some_module>'}
+
+    def new_module_runtime(self):
+        """
+        Generate a new ModuleSystem that is minimally set up for testing
+        """
+        return get_test_system(course_id=self.course.id)
+
+    def new_descriptor_runtime(self):
+        runtime = get_test_descriptor_system()
+        runtime.get_block = modulestore().get_item
+        return runtime
+
+    def initialize_module(self, **kwargs):
+        kwargs.update({
+            'parent_location': self.section.location,
+            'category': self.CATEGORY
+        })
+
+        self.item_descriptor = ItemFactory.create(**kwargs)
+
+        self.runtime = self.new_descriptor_runtime()
+
+        field_data = {}
+        field_data.update(self.MODEL_DATA)
+        student_data = DictFieldData(field_data)
+        self.item_descriptor._field_data = LmsFieldData(self.item_descriptor._field_data, student_data)
+
+        self.item_descriptor.xmodule_runtime = self.new_module_runtime()
+
+        self.item_url = unicode(self.item_descriptor.location)
+
+    def setup_course(self):
+        self.course = CourseFactory.create(data=self.COURSE_DATA)
+
+        # Turn off cache.
+        modulestore().request_cache = None
+        modulestore().metadata_inheritance_cache_subsystem = None
+
+        chapter = ItemFactory.create(
+            parent_location=self.course.location,
+            category="sequential",
+        )
+        self.section = ItemFactory.create(
+            parent_location=chapter.location,
+            category="sequential"
+        )
+
+        # username = robot{0}, password = 'test'
+        self.users = [
+            UserFactory.create()
+            for dummy0 in range(self.USER_COUNT)
+        ]
+
+        for user in self.users:
+            CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
+
+        # login all users for acces to Xmodule
+        self.clients = {user.username: Client() for user in self.users}
+        self.login_statuses = [
+            self.clients[user.username].login(
+                username=user.username, password='test')
+            for user in self.users
+        ]
+
+        self.assertTrue(all(self.login_statuses))
+
+    def setUp(self):
+        super(BaseTestXmodule, self).setUp()
+        self.setup_course()
+        self.initialize_module(metadata=self.METADATA, data=self.DATA)
+
+    def get_url(self, dispatch):
+        """Return item url with dispatch."""
+        return reverse(
+            'xblock_handler',
+            args=(unicode(self.course.id), quote_slashes(self.item_url), 'xmodule_handler', dispatch)
+        )
+
+
+class XModuleRenderingTestBase(BaseTestXmodule):
+
+    def new_module_runtime(self):
+        """
+        Create a runtime that actually does html rendering
+        """
+        runtime = super(XModuleRenderingTestBase, self).new_module_runtime()
+        runtime.render_template = render_to_string
+        return runtime
 
 
 class LoginEnrollmentTestCase(TestCase):
@@ -49,6 +179,14 @@ class LoginEnrollmentTestCase(TestCase):
             )
         )
         return response
+
+    def assert_account_activated(self, url, method="GET", **kwargs):
+        make_request = getattr(self.client, method.lower())
+        response = make_request(url, **kwargs)
+        message_list = list(messages.get_messages(response.wsgi_request))
+        self.assertEqual(len(message_list), 1)
+        self.assertIn("success", message_list[0].tags)
+        self.assertTrue("You have activated your account." in message_list[0].message)
 
     # ============ User creation and login ==============
 
@@ -99,7 +237,7 @@ class LoginEnrollmentTestCase(TestCase):
         activation_key = Registration.objects.get(user__email=email).activation_key
         # and now we try to activate
         url = reverse('activate', kwargs={'key': activation_key})
-        self.assert_request_status_code(200, url)
+        self.assert_account_activated(url)
         # Now make sure that the user is now actually activated
         user = User.objects.get(email=email)
         self.assertTrue(user.is_active)
@@ -116,7 +254,7 @@ class LoginEnrollmentTestCase(TestCase):
         """
         resp = self.client.post(reverse('change_enrollment'), {
             'enrollment_action': 'enroll',
-            'course_id': course.id.to_deprecated_string(),
+            'course_id': text_type(course.id),
             'check_access': True,
         })
         result = resp.status_code == 200
@@ -132,7 +270,7 @@ class LoginEnrollmentTestCase(TestCase):
         url = reverse('change_enrollment')
         request_data = {
             'enrollment_action': 'unenroll',
-            'course_id': course.id.to_deprecated_string(),
+            'course_id': text_type(course.id),
         }
         self.assert_request_status_code(200, url, method="POST", data=request_data)
 
@@ -178,3 +316,39 @@ class CourseAccessTestMixin(TestCase):
         """
         self.assertFalse(has_access(user, action, course))
         self.assertFalse(has_access(user, action, CourseOverview.get_from_id(course.id)))
+
+
+def masquerade_as_group_member(user, course, partition_id, group_id):
+    """
+    Installs a masquerade for the specified user and course, to enable
+    the user to masquerade as belonging to the specific partition/group
+    combination.
+
+    Arguments:
+        user (User): a user.
+        course (CourseDescriptor): a course.
+        partition_id (int): the integer partition id, referring to partitions already
+           configured in the course.
+        group_id (int); the integer group id, within the specified partition.
+
+    Returns: the status code for the AJAX response to update the user's masquerade for
+        the specified course.
+    """
+    request = _create_mock_json_request(
+        user,
+        data={"role": "student", "user_partition_id": partition_id, "group_id": group_id}
+    )
+    response = handle_ajax(request, unicode(course.id))
+    setup_masquerade(request, course.id, True)
+    return response.status_code
+
+
+def _create_mock_json_request(user, data, method='POST'):
+    """
+    Returns a mock JSON request for the specified user.
+    """
+    factory = RequestFactory()
+    request = factory.generic(method, '/', content_type='application/json', data=json.dumps(data))
+    request.user = user
+    request.session = {}
+    return request

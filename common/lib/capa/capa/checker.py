@@ -7,13 +7,13 @@ from __future__ import unicode_literals
 import argparse
 import logging
 import sys
-from path import Path as path
-
 from cStringIO import StringIO
+
+from mako.lookup import TemplateLookup
+from path import Path as path
 
 from calc import UndefinedVariable
 from capa.capa_problem import LoncapaProblem
-from mako.lookup import TemplateLookup
 
 logging.basicConfig(format="%(levelname)s %(message)s")
 log = logging.getLogger('capa.checker')
@@ -24,14 +24,11 @@ class DemoSystem(object):
         self.lookup = TemplateLookup(directories=[path(__file__).dirname() / 'templates'])
         self.DEBUG = True
 
-    def render_template(self, template_filename, dictionary, context=None):
-        if context is None:
-            context = {}
-
-        context_dict = {}
-        context_dict.update(dictionary)
-        context_dict.update(context)
-        return self.lookup.get_template(template_filename).render(**context_dict)
+    def render_template(self, template_filename, dictionary):
+        """
+        Render the specified template with the given dictionary of context data.
+        """
+        return self.lookup.get_template(template_filename).render(**dictionary)
 
 
 def main():

@@ -9,8 +9,9 @@ except for making it optional.
 # possible, we should disable pylint so it doesn't complain about the violations
 # that are already in that file
 # pylint: skip-file
+from django.template import Library, TemplateDoesNotExist
 from django.template.base import (
-    TemplateSyntaxError, Library, token_kwargs, TemplateDoesNotExist
+    TemplateSyntaxError, token_kwargs
 )
 from django.template.loader_tags import IncludeNode
 

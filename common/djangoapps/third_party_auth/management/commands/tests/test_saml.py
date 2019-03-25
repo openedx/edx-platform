@@ -62,15 +62,25 @@ class TestSAMLCommand(TestCase):
         # We are creating SAMLConfiguration instance here so that there is always at-least one
         # disabled saml configuration instance, this is done to verify that disabled configurations are
         # not processed.
-        SAMLConfigurationFactory.create(enabled=False)
-        SAMLProviderConfigFactory.create()
+        SAMLConfigurationFactory.create(enabled=False, site__domain='testserver.fake', site__name='testserver.fake')
+        SAMLProviderConfigFactory.create(site__domain='testserver.fake', site__name='testserver.fake')
 
     def __create_saml_configurations__(self, saml_config=None, saml_provider_config=None):
         """
         Helper method to create SAMLConfiguration and AMLProviderConfig.
         """
-        SAMLConfigurationFactory.create(enabled=True, **(saml_config or {}))
-        SAMLProviderConfigFactory.create(enabled=True, **(saml_provider_config or {}))
+        SAMLConfigurationFactory.create(enabled=True, **(
+            saml_config or {
+                'site__domain': 'testserver.fake',
+                'site__name': 'testserver.fake'
+            }
+        ))
+        SAMLProviderConfigFactory.create(enabled=True, **(
+            saml_provider_config or {
+                'site__domain': 'testserver.fake',
+                'site__name': 'testserver.fake'
+            }
+        ))
 
     def test_raises_command_error_for_invalid_arguments(self):
         """
@@ -92,10 +102,9 @@ class TestSAMLCommand(TestCase):
         Test that management command completes without errors and logs correct information when no
         saml configurations are enabled/present.
         """
-        # Capture command output log for testing.
+        expected = "\nDone.\n1 provider(s) found in database.\n1 skipped and 0 attempted.\n0 updated and 0 failed.\n"
         call_command("saml", pull=True, stdout=self.stdout)
-
-        self.assertIn('Done. Fetched 0 total. 0 were updated and 0 failed.', self.stdout.getvalue())
+        self.assertIn(expected, self.stdout.getvalue())
 
     @mock.patch("requests.get", mock_get())
     def test_fetch_saml_metadata(self):
@@ -106,10 +115,9 @@ class TestSAMLCommand(TestCase):
         # Create enabled configurations
         self.__create_saml_configurations__()
 
-        # Capture command output log for testing.
+        expected = "\nDone.\n1 provider(s) found in database.\n0 skipped and 1 attempted.\n1 updated and 0 failed.\n"
         call_command("saml", pull=True, stdout=self.stdout)
-
-        self.assertIn('Done. Fetched 1 total. 1 were updated and 0 failed.', self.stdout.getvalue())
+        self.assertIn(expected, self.stdout.getvalue())
 
     @mock.patch("requests.get", mock_get(status_code=404))
     def test_fetch_saml_metadata_failure(self):
@@ -120,11 +128,11 @@ class TestSAMLCommand(TestCase):
         # Create enabled configurations
         self.__create_saml_configurations__()
 
-        with self.assertRaisesRegexp(CommandError, r"HTTPError: 404 Client Error"):
-            # Capture command output log for testing.
-            call_command("saml", pull=True, stdout=self.stdout)
+        expected = "\nDone.\n1 provider(s) found in database.\n0 skipped and 1 attempted.\n0 updated and 1 failed.\n"
 
-            self.assertIn('Done. Fetched 1 total. 0 were updated and 1 failed.', self.stdout.getvalue())
+        with self.assertRaisesRegexp(CommandError, r"HTTPError: 404 Client Error"):
+            call_command("saml", pull=True, stdout=self.stdout)
+        self.assertIn(expected, self.stdout.getvalue())
 
     @mock.patch("requests.get", mock_get(status_code=200))
     def test_fetch_multiple_providers_data(self):
@@ -139,10 +147,12 @@ class TestSAMLCommand(TestCase):
         self.__create_saml_configurations__(
             saml_config={
                 "site__domain": "second.testserver.fake",
+                "site__name": "testserver.fake",
             },
             saml_provider_config={
                 "site__domain": "second.testserver.fake",
-                "idp_slug": "second-test-shib",
+                "site__name": "testserver.fake",
+                "slug": "second-test-shib",
                 "entity_id": "https://idp.testshib.org/idp/another-shibboleth",
                 "metadata_source": "https://www.testshib.org/metadata/another-testshib-providers.xml",
             }
@@ -152,21 +162,45 @@ class TestSAMLCommand(TestCase):
         self.__create_saml_configurations__(
             saml_config={
                 "site__domain": "third.testserver.fake",
+                "site__name": "testserver.fake",
             },
             saml_provider_config={
                 "site__domain": "third.testserver.fake",
-                "idp_slug": "third-test-shib",
+                "site__name": "testserver.fake",
+                "slug": "third-test-shib",
                 # Note: This entity id will not be present in returned response and will cause failed update.
                 "entity_id": "https://idp.testshib.org/idp/non-existent-shibboleth",
                 "metadata_source": "https://www.testshib.org/metadata/third/testshib-providers.xml",
             }
         )
 
+        expected = '\n3 provider(s) found in database.\n0 skipped and 3 attempted.\n2 updated and 1 failed.\n'
         with self.assertRaisesRegexp(CommandError, r"MetadataParseError: Can't find EntityDescriptor for entityID"):
-            # Capture command output log for testing.
             call_command("saml", pull=True, stdout=self.stdout)
+        self.assertIn(expected, self.stdout.getvalue())
 
-            self.assertIn('Done. Fetched 3 total. 2 were updated and 1 failed.', self.stdout.getvalue())
+        # Now add a fourth configuration, and indicate that it should not be included in the update
+        self.__create_saml_configurations__(
+            saml_config={
+                "site__domain": "fourth.testserver.fake",
+                "site__name": "testserver.fake",
+            },
+            saml_provider_config={
+                "site__domain": "fourth.testserver.fake",
+                "site__name": "testserver.fake",
+                "slug": "fourth-test-shib",
+                "automatic_refresh_enabled": False,
+                # Note: This invalid entity id will not be present in the refresh set
+                "entity_id": "https://idp.testshib.org/idp/fourth-shibboleth",
+                "metadata_source": "https://www.testshib.org/metadata/fourth/testshib-providers.xml",
+            }
+        )
+
+        # Four configurations -- one will be skipped and three attempted, with similar results.
+        expected = '\nDone.\n4 provider(s) found in database.\n1 skipped and 3 attempted.\n0 updated and 1 failed.\n'
+        with self.assertRaisesRegexp(CommandError, r"MetadataParseError: Can't find EntityDescriptor for entityID"):
+            call_command("saml", pull=True, stdout=self.stdout)
+        self.assertIn(expected, self.stdout.getvalue())
 
     @mock.patch("requests.get")
     def test_saml_request_exceptions(self, mocked_get):
@@ -178,27 +212,23 @@ class TestSAMLCommand(TestCase):
 
         mocked_get.side_effect = exceptions.SSLError
 
-        with self.assertRaisesRegexp(CommandError, "SSLError:"):
-            # Capture command output log for testing.
-            call_command("saml", pull=True, stdout=self.stdout)
+        expected = "\nDone.\n1 provider(s) found in database.\n0 skipped and 1 attempted.\n0 updated and 1 failed.\n"
 
-            self.assertIn('Done. Fetched 1 total. 0 were updated and 1 failed.', self.stdout.getvalue())
+        with self.assertRaisesRegexp(CommandError, "SSLError:"):
+            call_command("saml", pull=True, stdout=self.stdout)
+        self.assertIn(expected, self.stdout.getvalue())
 
         mocked_get.side_effect = exceptions.ConnectionError
 
         with self.assertRaisesRegexp(CommandError, "ConnectionError:"):
-            # Capture command output log for testing.
             call_command("saml", pull=True, stdout=self.stdout)
-
-            self.assertIn('Done. Fetched 1 total. 0 were updated and 1 failed.', self.stdout.getvalue())
+        self.assertIn(expected, self.stdout.getvalue())
 
         mocked_get.side_effect = exceptions.HTTPError
 
         with self.assertRaisesRegexp(CommandError, "HTTPError:"):
-            # Capture command output log for testing.
             call_command("saml", pull=True, stdout=self.stdout)
-
-            self.assertIn('Done. Fetched 1 total. 0 were updated and 1 failed.', self.stdout.getvalue())
+        self.assertIn(expected, self.stdout.getvalue())
 
     @mock.patch("requests.get", mock_get(status_code=200))
     def test_saml_parse_exceptions(self):
@@ -212,18 +242,18 @@ class TestSAMLCommand(TestCase):
             },
             saml_provider_config={
                 "site__domain": "third.testserver.fake",
-                "idp_slug": "third-test-shib",
+                "slug": "third-test-shib",
                 # Note: This entity id will not be present in returned response and will cause failed update.
                 "entity_id": "https://idp.testshib.org/idp/non-existent-shibboleth",
                 "metadata_source": "https://www.testshib.org/metadata/third/testshib-providers.xml",
             }
         )
 
-        with self.assertRaisesRegexp(CommandError, "MetadataParseError: Can't find EntityDescriptor for entityID"):
-            # Capture command output log for testing.
-            call_command("saml", pull=True, stdout=self.stdout)
+        expected = "\nDone.\n2 provider(s) found in database.\n1 skipped and 1 attempted.\n0 updated and 1 failed.\n"
 
-            self.assertIn('Done. Fetched 1 total. 0 were updated and 1 failed.', self.stdout.getvalue())
+        with self.assertRaisesRegexp(CommandError, "MetadataParseError: Can't find EntityDescriptor for entityID"):
+            call_command("saml", pull=True, stdout=self.stdout)
+        self.assertIn(expected, self.stdout.getvalue())
 
     @mock.patch("requests.get")
     def test_xml_parse_exceptions(self, mocked_get):
@@ -239,8 +269,8 @@ class TestSAMLCommand(TestCase):
         # create enabled configuration
         self.__create_saml_configurations__()
 
-        with self.assertRaisesRegexp(CommandError, "XMLSyntaxError:"):
-            # Capture command output log for testing.
-            call_command("saml", pull=True, stdout=self.stdout)
+        expected = "\nDone.\n1 provider(s) found in database.\n0 skipped and 1 attempted.\n0 updated and 1 failed.\n"
 
-            self.assertIn('Done. Fetched 1 total. 0 were updated and 1 failed.', self.stdout.getvalue())
+        with self.assertRaisesRegexp(CommandError, "XMLSyntaxError:"):
+            call_command("saml", pull=True, stdout=self.stdout)
+        self.assertIn(expected, self.stdout.getvalue())

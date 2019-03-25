@@ -1,24 +1,58 @@
 """
 Tests for grades.scores module.
 """
+import itertools
 # pylint: disable=protected-access
 from collections import namedtuple
+
 import ddt
 from django.test import TestCase
-import itertools
-
-from lms.djangoapps.grades.models import BlockRecord
-import lms.djangoapps.grades.scores as scores
-from lms.djangoapps.grades.transformer import GradesTransformer
+from django.utils.timezone import now
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
-from openedx.core.lib.block_structure.block_structure import BlockData
+
+import lms.djangoapps.grades.scores as scores
+from lms.djangoapps.grades.models import BlockRecord
+from lms.djangoapps.grades.transformer import GradesTransformer
+from openedx.core.djangoapps.content.block_structure.block_structure import BlockData
 from xmodule.graders import ProblemScore
+
+NOW = now()
+
+
+def submission_value_repr(self):
+    """
+    String representation for the SubmissionValue namedtuple which excludes
+    the "created_at" attribute that changes with each execution.  Needed for
+    consistency of ddt-generated test methods across pytest-xdist workers.
+    """
+    return '<SubmissionValue exists={}>'.format(self.exists)
+
+
+def csm_value_repr(self):
+    """
+    String representation for the CSMValue namedtuple which excludes
+    the "created" attribute that changes with each execution.  Needed for
+    consistency of ddt-generated test methods across pytest-xdist workers.
+    """
+    return '<CSMValue exists={} raw_earned={}>'.format(self.exists, self.raw_earned)
+
+
+def expected_result_repr(self):
+    """
+    String representation for the ExpectedResult namedtuple which excludes
+    the "first_attempted" attribute that changes with each execution.  Needed
+    for consistency of ddt-generated test methods across pytest-xdist workers.
+    """
+    included = ('raw_earned', 'raw_possible', 'weighted_earned', 'weighted_possible', 'weight', 'graded')
+    attributes = ['{}={}'.format(name, getattr(self, name)) for name in included]
+    return '<ExpectedResult {}>'.format(' '.join(attributes))
 
 
 class TestScoredBlockTypes(TestCase):
     """
     Tests for the possibly_scored function.
     """
+    shard = 4
     possibly_scored_block_types = {
         'course', 'chapter', 'sequential', 'vertical',
         'library_content', 'split_test', 'conditional', 'library', 'randomize',
@@ -27,10 +61,7 @@ class TestScoredBlockTypes(TestCase):
     }
 
     def test_block_types_possibly_scored(self):
-        self.assertSetEqual(
-            self.possibly_scored_block_types,
-            scores._block_types_possibly_scored()
-        )
+        self.assertTrue(self.possibly_scored_block_types.issubset(scores._block_types_possibly_scored()))
 
     def test_possibly_scored(self):
         course_key = CourseLocator(u'org', u'course', u'run')
@@ -44,23 +75,28 @@ class TestGetScore(TestCase):
     """
     Tests for get_score
     """
+    shard = 4
     display_name = 'test_name'
     location = 'test_location'
 
-    SubmissionValue = namedtuple('SubmissionValue', 'exists, weighted_earned, weighted_possible')
-    CSMValue = namedtuple('CSMValue', 'exists, raw_earned, raw_possible')
+    SubmissionValue = namedtuple('SubmissionValue', 'exists, points_earned, points_possible, created_at')
+    SubmissionValue.__repr__ = submission_value_repr
+    CSMValue = namedtuple('CSMValue', 'exists, raw_earned, raw_possible, created')
+    CSMValue.__repr__ = csm_value_repr
     PersistedBlockValue = namedtuple('PersistedBlockValue', 'exists, raw_possible, weight, graded')
     ContentBlockValue = namedtuple('ContentBlockValue', 'raw_possible, weight, explicit_graded')
     ExpectedResult = namedtuple(
-        'ExpectedResult', 'raw_earned, raw_possible, weighted_earned, weighted_possible, weight, graded, attempted'
+        'ExpectedResult',
+        'raw_earned, raw_possible, weighted_earned, weighted_possible, weight, graded, first_attempted'
     )
+    ExpectedResult.__repr__ = expected_result_repr
 
     def _create_submissions_scores(self, submission_value):
         """
         Creates a stub result from the submissions API for the given values.
         """
         if submission_value.exists:
-            return {self.location: (submission_value.weighted_earned, submission_value.weighted_possible)}
+            return {self.location: submission_value._asdict()}
         else:
             return {}
 
@@ -69,8 +105,14 @@ class TestGetScore(TestCase):
         Creates a stub result from courseware student module for the given values.
         """
         if csm_value.exists:
-            stub_csm_record = namedtuple('stub_csm_record', 'correct, total')
-            return {self.location: stub_csm_record(correct=csm_value.raw_earned, total=csm_value.raw_possible)}
+            stub_csm_record = namedtuple('stub_csm_record', 'correct, total, created')
+            return {
+                self.location: stub_csm_record(
+                    correct=csm_value.raw_earned,
+                    total=csm_value.raw_possible,
+                    created=csm_value.created
+                )
+            }
         else:
             return {}
 
@@ -106,64 +148,66 @@ class TestGetScore(TestCase):
         return block
 
     @ddt.data(
-        # submissions _trumps_ other values; weighted and graded from persisted-block _trumps_ latest content values
+        # The value from Submissions trumps other values; The persisted value
+        # from persisted-block trumps latest content values
         (
-            SubmissionValue(exists=True, weighted_earned=50, weighted_possible=100),
-            CSMValue(exists=True, raw_earned=10, raw_possible=40),
+            SubmissionValue(exists=True, points_earned=50, points_possible=100, created_at=NOW),
+            CSMValue(exists=True, raw_earned=10, raw_possible=40, created=NOW),
             PersistedBlockValue(exists=True, raw_possible=5, weight=40, graded=True),
             ContentBlockValue(raw_possible=1, weight=20, explicit_graded=False),
             ExpectedResult(
                 raw_earned=None, raw_possible=None,
                 weighted_earned=50, weighted_possible=100,
-                weight=40, graded=True, attempted=True,
+                weight=40, graded=True, first_attempted=NOW
             ),
         ),
-        # same as above, except submissions doesn't exist; CSM values used
+        # same as above, except Submissions doesn't exist; CSM values used
         (
-            SubmissionValue(exists=False, weighted_earned=50, weighted_possible=100),
-            CSMValue(exists=True, raw_earned=10, raw_possible=40),
+            SubmissionValue(exists=False, points_earned=50, points_possible=100, created_at=NOW),
+            CSMValue(exists=True, raw_earned=10, raw_possible=40, created=NOW),
             PersistedBlockValue(exists=True, raw_possible=5, weight=40, graded=True),
             ContentBlockValue(raw_possible=1, weight=20, explicit_graded=False),
             ExpectedResult(
                 raw_earned=10, raw_possible=40,
                 weighted_earned=10, weighted_possible=40,
-                weight=40, graded=True, attempted=True,
+                weight=40, graded=True, first_attempted=NOW,
             ),
         ),
         # CSM values exist, but with NULL earned score treated as not-attempted
         (
-            SubmissionValue(exists=False, weighted_earned=50, weighted_possible=100),
-            CSMValue(exists=True, raw_earned=None, raw_possible=40),
+            SubmissionValue(exists=False, points_earned=50, points_possible=100, created_at=NOW),
+            CSMValue(exists=True, raw_earned=None, raw_possible=40, created=NOW),
             PersistedBlockValue(exists=True, raw_possible=5, weight=40, graded=True),
             ContentBlockValue(raw_possible=1, weight=20, explicit_graded=False),
             ExpectedResult(
                 raw_earned=0, raw_possible=40,
                 weighted_earned=0, weighted_possible=40,
-                weight=40, graded=True, attempted=False,
+                weight=40, graded=True, first_attempted=None
             ),
         ),
         # neither submissions nor CSM exist; Persisted values used
         (
-            SubmissionValue(exists=False, weighted_earned=50, weighted_possible=100),
-            CSMValue(exists=False, raw_earned=10, raw_possible=40),
+            SubmissionValue(exists=False, points_earned=50, points_possible=100, created_at=NOW),
+            CSMValue(exists=False, raw_earned=10, raw_possible=40, created=NOW),
             PersistedBlockValue(exists=True, raw_possible=5, weight=40, graded=True),
             ContentBlockValue(raw_possible=1, weight=20, explicit_graded=False),
             ExpectedResult(
                 raw_earned=0, raw_possible=5,
                 weighted_earned=0, weighted_possible=40,
-                weight=40, graded=True, attempted=False,
+                weight=40, graded=True, first_attempted=None
             ),
         ),
         # none of submissions, CSM, or persisted exist; Latest content values used
         (
-            SubmissionValue(exists=False, weighted_earned=50, weighted_possible=100),
-            CSMValue(exists=False, raw_earned=10, raw_possible=40),
+            SubmissionValue(exists=False, points_earned=50, points_possible=100, created_at=NOW),
+            CSMValue(exists=False, raw_earned=10, raw_possible=40, created=NOW),
             PersistedBlockValue(exists=False, raw_possible=5, weight=40, graded=True),
             ContentBlockValue(raw_possible=1, weight=20, explicit_graded=False),
             ExpectedResult(
                 raw_earned=0, raw_possible=1,
                 weighted_earned=0, weighted_possible=20,
-                weight=20, graded=False, attempted=False,
+                weight=20, graded=False,
+                first_attempted=None
             ),
         ),
     )
@@ -184,6 +228,8 @@ class TestWeightedScore(TestCase):
     """
     Tests the helper method: weighted_score
     """
+    shard = 4
+
     @ddt.data(
         (0, 0, 1),
         (5, 0, 0),
@@ -224,6 +270,8 @@ class TestInternalGetGraded(TestCase):
     """
     Tests the internal helper method: _get_explicit_graded
     """
+    shard = 4
+
     def _create_block(self, explicit_graded_value):
         """
         Creates and returns a minimal BlockData object with the give value
@@ -263,6 +311,8 @@ class TestInternalGetScoreFromBlock(TestCase):
     """
     Tests the internal helper method: _get_score_from_persisted_or_latest_block
     """
+    shard = 4
+
     def _create_block(self, raw_possible):
         """
         Creates and returns a minimal BlockData object with the give value
@@ -278,7 +328,7 @@ class TestInternalGetScoreFromBlock(TestCase):
         """
         # pylint: disable=unbalanced-tuple-unpacking
         (
-            raw_earned, raw_possible, weighted_earned, weighted_possible, attempted
+            raw_earned, raw_possible, weighted_earned, weighted_possible, first_attempted
         ) = scores._get_score_from_persisted_or_latest_block(persisted_block, block, weight)
 
         self.assertEquals(raw_earned, 0.0)
@@ -288,7 +338,7 @@ class TestInternalGetScoreFromBlock(TestCase):
             self.assertEquals(weighted_possible, expected_r_possible)
         else:
             self.assertEquals(weighted_possible, weight)
-        self.assertFalse(attempted)
+        self.assertIsNone(first_attempted)
 
     @ddt.data(
         *itertools.product((0, 1, 5), (None, 0, 1, 5))

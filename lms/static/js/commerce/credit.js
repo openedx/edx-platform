@@ -19,15 +19,15 @@ var edx = edx || {};
             dataType: 'json',
             contentType: 'application/json',
             data: JSON.stringify({
-                'course_key': courseKey,
-                'username': username
+                course_key: courseKey,
+                username: username
             }),
             context: this,
             success: function(requestData) {
                 var $form = $('<form>', {
-                    'class': 'hidden',
-                    'action': requestData.url,
-                    'method': 'POST',
+                    class: 'hidden',
+                    action: requestData.url,
+                    method: 'POST',
                     'accept-method': 'UTF-8'
                 });
 
@@ -42,4 +42,4 @@ var edx = edx || {};
             }
         });
     };
-})(jQuery, _);
+}(jQuery, _));

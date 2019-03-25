@@ -6,7 +6,8 @@ from __future__ import absolute_import
 from django.conf import settings
 
 from xmodule.partitions.partitions import UserPartition
-from xblock.fields import Scope, Boolean, String, Float, XBlockMixin, Dict, Integer, List
+from xblock.core import XBlockMixin
+from xblock.fields import Scope, Boolean, String, Float, Dict, Integer, List
 from xblock.runtime import KeyValueStore, KvsFieldData
 from xmodule.fields import Date, Timedelta
 from ..course_metadata_utils import DEFAULT_START_DATE
@@ -100,6 +101,19 @@ class InheritanceMixin(XBlockMixin):
         scope=Scope.settings,
         default="finished",
     )
+
+    show_correctness = String(
+        display_name=_("Show Results"),
+        help=_(
+            # Translators: DO NOT translate the words in quotes here, they are
+            # specific words for the acceptable values.
+            'Specify when to show answer correctness and score to learners. '
+            'Valid values are "always", "never", and "past_due".'
+        ),
+        scope=Scope.settings,
+        default="always",
+    )
+
     rerandomize = String(
         display_name=_("Randomization"),
         help=_(
@@ -159,13 +173,22 @@ class InheritanceMixin(XBlockMixin):
         default=True,
         scope=Scope.settings
     )
+    video_auto_advance = Boolean(
+        display_name=_("Enable video auto-advance"),
+        help=_(
+            "Specify whether to show an auto-advance button in videos. If the student clicks it, when the last video in a unit finishes it will automatically move to the next unit and autoplay the first video."
+        ),
+        scope=Scope.settings,
+        default=False
+    )
     video_bumper = Dict(
         display_name=_("Video Pre-Roll"),
         help=_(
             "Identify a video, 5-10 seconds in length, to play before course videos. Enter the video ID from "
             "the Video Uploads page and one or more transcript files in the following format: {format}. "
             "For example, an entry for a video with two transcripts looks like this: {example}"
-        ).format(
+        ),
+        help_format_args=dict(
             format='{"video_id": "ID", "transcripts": {"language": "/static/filename.srt"}}',
             example=(
                 '{'
@@ -304,7 +327,7 @@ class InheritingFieldData(KvsFieldData):
             # from parent as '_copy_from_templates' puts fields into
             # defaults.
             if ancestor and \
-               ancestor.location.category == 'library_content' and \
+               ancestor.location.block_type == 'library_content' and \
                self.has_default_value(name):
                 return super(InheritingFieldData, self).default(block, name)
 

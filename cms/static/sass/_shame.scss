@@ -8,7 +8,6 @@
 
   // elements - authorship controls
   .wrapper-authorshiprights {
-
     .ui-toggle-control {
       // needed to override general a element transition properties - need to fix.
       transition-duration: $tmg-f2;
@@ -26,7 +25,8 @@
 // ====================
 
 // overriding outline styling for general drag and drop cases
-.outline-section, .outline-subsection {
+.outline-section,
+.outline-subsection {
 
   // STATE: is dragging
   &.is-dragging {
@@ -51,8 +51,7 @@ body b {
 
 // needed display property reinforcement since manual CSS abstraction happened
 #page-prompt {
-
-  .wrapper-prompt:before {
+  .wrapper-prompt::before {
     display: inline-block;
   }
 }
@@ -94,8 +93,8 @@ body b {
 }
 
 //  hides latex compiler button if settings mode is-active
-div.wrapper-comp-editor.is-inactive ~ div.launch-latex-compiler{
- display: none;
+div.wrapper-comp-editor.is-inactive ~ div.launch-latex-compiler {
+  display: none;
 }
 
 // ====================
@@ -109,7 +108,6 @@ div.wrapper-comp-editor.is-inactive ~ div.launch-latex-compiler{
 
 // JQuery UI tabs font-weight override
 .ui-tabs-nav {
-
   .ui-state-default {
     font-weight: normal;
   }

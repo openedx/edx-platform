@@ -3,15 +3,19 @@
 Code to manage fetching and storing the metadata of IdPs.
 """
 
-from celery.task import task
 import datetime
+import logging
+
 import dateutil.parser
 import pytz
-import logging
-from lxml import etree
 import requests
-from requests import exceptions
+from celery.task import task
+from django.utils.timezone import now
+from lxml import etree
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
+from requests import exceptions
+from six import text_type
+
 from third_party_auth.models import SAMLConfiguration, SAMLProviderConfig, SAMLProviderData
 
 log = logging.getLogger(__name__)
@@ -33,27 +37,43 @@ def fetch_saml_metadata():
     It's OK to run this whether or not SAML is enabled.
 
     Return value:
-        tuple(num_changed, num_failed, num_total, failure_messages)
-        num_changed: Number of providers that are either new or whose metadata has changed
+        tuple(num_skipped, num_attempted, num_updated, num_failed, failure_messages)
+        num_total: Total number of providers found in the database
+        num_skipped: Number of providers skipped for various reasons (see L52)
+        num_attempted: Number of providers whose metadata was fetched
+        num_updated: Number of providers that are either new or whose metadata has changed
         num_failed: Number of providers that could not be updated
-        num_total: Total number of providers whose metadata was fetched
         failure_messages: List of error messages for the providers that could not be updated
     """
-    num_changed = 0
-    failure_messages = []
 
     # First make a list of all the metadata XML URLs:
+    saml_providers = SAMLProviderConfig.key_values('slug', flat=True)
+    num_total = len(saml_providers)
+    num_skipped = 0
     url_map = {}
-    for idp_slug in SAMLProviderConfig.key_values('idp_slug', flat=True):
+    for idp_slug in saml_providers:
         config = SAMLProviderConfig.current(idp_slug)
-        if not config.enabled or not SAMLConfiguration.is_enabled(config.site):
+        saml_config_slug = config.saml_configuration.slug if config.saml_configuration else 'default'
+
+        # Skip SAML provider configurations which do not qualify for fetching
+        if any([
+            not config.enabled,
+            not config.automatic_refresh_enabled,
+            not SAMLConfiguration.is_enabled(config.site, saml_config_slug)
+        ]):
+            num_skipped += 1
             continue
+
         url = config.metadata_source
         if url not in url_map:
             url_map[url] = []
         if config.entity_id not in url_map[url]:
             url_map[url].append(config.entity_id)
-    # Now fetch the metadata:
+
+    # Now attempt to fetch the metadata for the remaining SAML providers:
+    num_attempted = len(url_map)
+    num_updated = 0
+    failure_messages = []  # We return the length of this array for num_failed
     for url, entity_ids in url_map.items():
         try:
             log.info("Fetching %s", url)
@@ -75,7 +95,7 @@ def fetch_saml_metadata():
                 changed = _update_data(entity_id, public_key, sso_url, expires_at)
                 if changed:
                     log.info(u"→ Created new record for SAMLProviderData")
-                    num_changed += 1
+                    num_updated += 1
                 else:
                     log.info(u"→ Updated existing SAMLProviderData. Nothing has changed.")
         except (exceptions.SSLError, exceptions.HTTPError, exceptions.RequestException, MetadataParseError) as error:
@@ -86,11 +106,11 @@ def fetch_saml_metadata():
             # RequestException is the base exception for any request related error that "requests" lib raises.
             # MetadataParseError is raised if there is error in the fetched meta data (e.g. missing @entityID etc.)
 
-            log.exception(error.message)
+            log.exception(text_type(error))
             failure_messages.append(
                 "{error_type}: {error_message}\nMetadata Source: {url}\nEntity IDs: \n{entity_ids}.".format(
                     error_type=type(error).__name__,
-                    error_message=error.message,
+                    error_message=text_type(error),
                     url=url,
                     entity_ids="\n".join(
                         ["\t{}: {}".format(count, item) for count, item in enumerate(entity_ids, start=1)],
@@ -98,7 +118,7 @@ def fetch_saml_metadata():
                 )
             )
         except etree.XMLSyntaxError as error:
-            log.exception(error.message)
+            log.exception(text_type(error))
             failure_messages.append(
                 "XMLSyntaxError: {error_message}\nMetadata Source: {url}\nEntity IDs: \n{entity_ids}.".format(
                     error_message=str(error.error_log),
@@ -109,7 +129,8 @@ def fetch_saml_metadata():
                 )
             )
 
-    return num_changed, len(failure_messages), len(url_map), failure_messages
+    # Return counts for total, skipped, attempted, updated, and failed, along with any failure messages
+    return num_total, num_skipped, num_attempted, num_updated, len(failure_messages), failure_messages
 
 
 def _parse_metadata_xml(xml, entity_id):
@@ -170,7 +191,7 @@ def _update_data(entity_id, public_key, sso_url, expires_at):
         True if a new record was created. (Either this is a new provider or something changed.)
     """
     data_obj = SAMLProviderData.current(entity_id)
-    fetched_at = datetime.datetime.now()
+    fetched_at = now()
     if data_obj and (data_obj.public_key == public_key and data_obj.sso_url == sso_url):
         data_obj.expires_at = expires_at
         data_obj.fetched_at = fetched_at

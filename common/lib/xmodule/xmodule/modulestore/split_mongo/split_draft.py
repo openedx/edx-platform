@@ -39,7 +39,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
             )
             if master_branch == ModuleStoreEnum.BranchName.draft and not skip_auto_publish:
                 # any other value is hopefully only cloning or doing something which doesn't want this value add
-                self._auto_publish_no_children(item.location, item.location.category, user_id, **kwargs)
+                self._auto_publish_no_children(item.location, item.location.block_type, user_id, **kwargs)
 
                 # create any other necessary things as a side effect: ensure they populate the draft branch
                 # and rely on auto publish to populate the published branch: split's create course doesn't
@@ -130,7 +130,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
                 keys_to_check = list(new_keys)
                 while keys_to_check:
                     usage_key = keys_to_check.pop()
-                    if usage_key.category in DIRECT_ONLY_CATEGORIES:
+                    if usage_key.block_type in DIRECT_ONLY_CATEGORIES:
                         self.publish(usage_key.version_agnostic(), user_id, blacklist=EXCLUDE_ALL, **kwargs)
                         children = getattr(self.get_item(usage_key, **kwargs), "children", [])
                         # e.g. if usage_key is a chapter, it may have an auto-publish sequential child
@@ -152,7 +152,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
                 asides=asides,
                 **kwargs
             )
-            self._auto_publish_no_children(item.location, item.location.category, user_id, **kwargs)
+            self._auto_publish_no_children(item.location, item.location.block_type, user_id, **kwargs)
             descriptor.location = old_descriptor_locn
             return item
 
@@ -171,7 +171,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
                 force=force, **kwargs
             )
             if not skip_auto_publish:
-                self._auto_publish_no_children(item.location, item.location.category, user_id, **kwargs)
+                self._auto_publish_no_children(item.location, item.location.block_type, user_id, **kwargs)
             return item
 
     def create_child(
@@ -185,8 +185,8 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
                 fields=fields, asides=asides, **kwargs
             )
             # Publish both the child and the parent, if the child is a direct-only category
-            self._auto_publish_no_children(item.location, item.location.category, user_id, **kwargs)
-            self._auto_publish_no_children(parent_usage_key, item.location.category, user_id, **kwargs)
+            self._auto_publish_no_children(item.location, item.location.block_type, user_id, **kwargs)
+            self._auto_publish_no_children(parent_usage_key, item.location.block_type, user_id, **kwargs)
             return item
 
     def delete_item(self, location, user_id, revision=None, skip_auto_publish=False, **kwargs):
@@ -215,7 +215,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
         with self.bulk_operations(location.course_key):
             if isinstance(location, LibraryUsageLocator):
                 branches_to_delete = [ModuleStoreEnum.BranchName.library]  # Libraries don't yet have draft/publish support
-            elif location.category in DIRECT_ONLY_CATEGORIES:
+            elif location.block_type in DIRECT_ONLY_CATEGORIES:
                 branches_to_delete = [ModuleStoreEnum.BranchName.published, ModuleStoreEnum.BranchName.draft]
             elif revision == ModuleStoreEnum.RevisionOption.all:
                 branches_to_delete = [ModuleStoreEnum.BranchName.published, ModuleStoreEnum.BranchName.draft]
@@ -408,7 +408,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
 
         :raises InvalidVersionError: if no published version exists for the location specified
         """
-        if location.category in DIRECT_ONLY_CATEGORIES:
+        if location.block_type in DIRECT_ONLY_CATEGORIES:
             return
 
         draft_course_key = location.course_key.for_branch(ModuleStoreEnum.BranchName.draft)
@@ -443,7 +443,10 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
                     self._get_block_from_structure(published_course_structure, root_block_id)
                 )
                 block = self._get_block_from_structure(new_structure, root_block_id)
+                original_parent_location = location.course_key.make_usage_key(root_block_id.type, root_block_id.id)
                 for child_block_id in block.fields.get('children', []):
+                    item_location = location.course_key.make_usage_key(child_block_id.type, child_block_id.id)
+                    self.update_parent_if_moved(item_location, original_parent_location, new_structure, user_id)
                     copy_from_published(child_block_id)
 
             copy_from_published(BlockKey.from_usage_key(location))
@@ -453,6 +456,23 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
             index_entry = self._get_index_if_valid(draft_course_key)
             if index_entry is not None:
                 self._update_head(draft_course_key, index_entry, ModuleStoreEnum.BranchName.draft, new_structure['_id'])
+
+    def update_parent_if_moved(self, item_location, original_parent_location, course_structure, user_id):
+        """
+        Update parent of an item if it has moved.
+
+        Arguments:
+            item_location (BlockUsageLocator)    : Locator of item.
+            original_parent_location (BlockUsageLocator)  : Original parent block locator.
+            course_structure (dict)  : course structure of the course.
+            user_id (int)   : User id
+        """
+        parent_block_keys = self._get_parents_from_structure(BlockKey.from_usage_key(item_location), course_structure)
+        for block_key in parent_block_keys:
+            # Item's parent is different than its new parent - so it has moved.
+            if block_key.id != original_parent_location.block_id:
+                old_parent_location = original_parent_location.course_key.make_usage_key(block_key.type, block_key.id)
+                self.update_item_parent(item_location, original_parent_location, old_parent_location, user_id)
 
     def force_publish_course(self, course_locator, user_id, commit=False):
         """

@@ -1,22 +1,19 @@
-import json
 import copy
+import json
 import logging
 import os
 import sys
-from lxml import etree
 
+from lxml import etree
+from lxml.etree import Element, ElementTree, XMLParser
 from xblock.core import XML_NAMESPACES
 from xblock.fields import Dict, Scope, ScopeIds
 from xblock.runtime import KvsFieldData
-from xmodule.x_module import XModuleDescriptor, DEPRECATION_VSCOMPAT_EVENT
-from xmodule.modulestore.inheritance import own_metadata, InheritanceKeyValueStore
-from xmodule.modulestore import EdxJSONEncoder
 
 import dogstats_wrapper as dog_stats_api
-
-from lxml.etree import (
-    Element, ElementTree, XMLParser,
-)
+from xmodule.modulestore import EdxJSONEncoder
+from xmodule.modulestore.inheritance import InheritanceKeyValueStore, own_metadata
+from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT, XModuleDescriptor
 
 log = logging.getLogger(__name__)
 
@@ -142,6 +139,14 @@ class XmlParserMixin(object):
                          # Used for storing xml attributes between import and export, for roundtrips
                          'xml_attributes')
 
+    # This is a categories to fields map that contains the block category specific fields which should not be
+    # cleaned and/or override while adding xml to node.
+    metadata_to_not_to_clean = {
+        # A category `video` having `sub` and `transcripts` fields
+        # which should not be cleaned/override in an xml object.
+        'video': ('sub', 'transcripts')
+    }
+
     metadata_to_export_to_policy = ('discussion_topics',)
 
     @staticmethod
@@ -168,13 +173,15 @@ class XmlParserMixin(object):
         raise NotImplementedError("%s does not implement definition_from_xml" % cls.__name__)
 
     @classmethod
-    def clean_metadata_from_xml(cls, xml_object):
+    def clean_metadata_from_xml(cls, xml_object, excluded_fields=()):
         """
         Remove any attribute named for a field with scope Scope.settings from the supplied
         xml_object
         """
         for field_name, field in cls.fields.items():
-            if field.scope == Scope.settings and xml_object.get(field_name) is not None:
+            if (field.scope == Scope.settings
+                    and field_name not in excluded_fields
+                    and xml_object.get(field_name) is not None):
                 del xml_object.attrib[field_name]
 
     @classmethod
@@ -451,7 +458,8 @@ class XmlParserMixin(object):
                 aside.add_xml_to_node(aside_node)
                 xml_object.append(aside_node)
 
-        self.clean_metadata_from_xml(xml_object)
+        not_to_clean_fields = self.metadata_to_not_to_clean.get(self.category, ())
+        self.clean_metadata_from_xml(xml_object, excluded_fields=not_to_clean_fields)
 
         # Set the tag on both nodes so we get the file path right.
         xml_object.tag = self.category
@@ -460,7 +468,9 @@ class XmlParserMixin(object):
         # Add the non-inherited metadata
         for attr in sorted(own_metadata(self)):
             # don't want e.g. data_dir
-            if attr not in self.metadata_to_strip and attr not in self.metadata_to_export_to_policy:
+            if (attr not in self.metadata_to_strip
+                    and attr not in self.metadata_to_export_to_policy
+                    and attr not in not_to_clean_fields):
                 val = serialize_field(self._field_data.get(self, attr))
                 try:
                     xml_object.set(attr, val)
@@ -478,8 +488,8 @@ class XmlParserMixin(object):
             # Write the definition to a file
             url_path = name_to_pathname(self.url_name)
             filepath = self._format_filepath(self.category, url_path)
-            self.runtime.export_fs.makedir(os.path.dirname(filepath), recursive=True, allow_recreate=True)
-            with self.runtime.export_fs.open(filepath, 'w') as fileobj:
+            self.runtime.export_fs.makedirs(os.path.dirname(filepath), recreate=True)
+            with self.runtime.export_fs.open(filepath, 'wb') as fileobj:
                 ElementTree(xml_object).write(fileobj, pretty_print=True, encoding='utf-8')
         else:
             # Write all attributes from xml_object onto node

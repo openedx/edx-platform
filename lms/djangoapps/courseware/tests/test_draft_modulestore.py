@@ -1,8 +1,8 @@
 from django.test import TestCase
 from nose.plugins.attrib import attr
+from opaque_keys.edx.keys import CourseKey
 
 from xmodule.modulestore.django import modulestore
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 @attr(shard=1)
@@ -14,7 +14,7 @@ class TestDraftModuleStore(TestCase):
         store = modulestore()
 
         # fix was to allow get_items() to take the course_id parameter
-        store.get_items(SlashSeparatedCourseKey('a', 'b', 'c'), qualifiers={'category': 'vertical'})
+        store.get_items(CourseKey.from_string('a/b/c'), qualifiers={'category': 'vertical'})
 
         # test success is just getting through the above statement.
         # The bug was that 'course_id' argument was

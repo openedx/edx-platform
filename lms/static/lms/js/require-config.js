@@ -1,10 +1,10 @@
 /* globals _, requirejs */
-/* eslint-disable quote-props */
+/* eslint-disable quote-props, no-console, no-plusplus */
 
 (function(require, define) {
     'use strict';
 
-    var defineDependency;
+    var defineDependency, librarySetup;
 
     // We do not wish to bundle common libraries (that may also be used by non-RequireJS code on the page
     // into the optimized files. Therefore load these libraries through script tags and explicitly define them.
@@ -31,15 +31,27 @@
                 console.error('Expected library to be included on page, but not found on window object: ' + name);
             }
         };
+
+        librarySetup = function() {
+            // This is the function to setup all the vendor libraries
+
+            // Underscore.string no longer installs itself directly on '_'. For compatibility with existing
+            // code, add it to '_' with its previous name.
+            if (window._ && window.s) {
+                window._.str = window.s;
+            }
+
+            window.$.ajaxSetup({
+                contents: {
+                    script: false
+                }
+            });
+        };
+
         defineDependency('jQuery', 'jquery');
         defineDependency('jQuery', 'jquery-migrate');
         defineDependency('_', 'underscore');
         defineDependency('s', 'underscore.string');
-        // Underscore.string no longer installs itself directly on '_'. For compatibility with existing
-        // code, add it to '_' with its previous name.
-        if (window._ && window.s) {
-            window._.str = window.s;
-        }
         defineDependency('gettext', 'gettext');
         defineDependency('Logger', 'logger');
         defineDependency('URI', 'URI');
@@ -52,6 +64,8 @@
 
         // utility.js adds two functions to the window object, but does not return anything
         defineDependency('isExternal', 'utility', true);
+
+        librarySetup();
     }
 
     require.config({
@@ -86,6 +100,7 @@
             'string_utils': 'js/src/string_utils',
             'utility': 'js/src/utility',
             'draggabilly': 'js/vendor/draggabilly',
+            'bootstrap': 'common/js/vendor/bootstrap.bundle',
 
             // Files needed by OVA
             'annotator': 'js/vendor/ova/annotator-full',
@@ -108,7 +123,8 @@
             'handlebars': 'js/vendor/ova/catch/js/handlebars-1.1.2',
             'tinymce': 'js/vendor/tinymce/js/tinymce/tinymce.full.min',
             'jquery.tinymce': 'js/vendor/tinymce/js/tinymce/jquery.tinymce.min',
-            'picturefill': 'common/js/vendor/picturefill'
+            'picturefill': 'common/js/vendor/picturefill',
+            'hls': 'common/js/vendor/hls'
             // end of files needed by OVA
         },
         shim: {
@@ -149,6 +165,9 @@
             },
             'backbone-super': {
                 deps: ['backbone']
+            },
+            'bootstrap': {
+                deps: ['jquery']
             },
             'string_utils': {
                 deps: ['underscore'],
@@ -224,6 +243,9 @@
             // global namespace instead of being registered in require.
             'draggabilly': {
                 exports: 'Draggabilly'
+            },
+            'hls': {
+                exports: 'Hls'
             }
         }
     });

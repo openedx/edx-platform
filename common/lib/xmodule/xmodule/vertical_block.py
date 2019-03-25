@@ -1,17 +1,25 @@
 """
 VerticalBlock - an XBlock which renders its children in a column.
 """
-import logging
+
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from copy import copy
+import logging
+
 from lxml import etree
+import six
+from web_fragments.fragment import Fragment
 from xblock.core import XBlock
-from xblock.fragment import Fragment
+
 from xmodule.mako_module import MakoTemplateBlockBase
 from xmodule.progress import Progress
 from xmodule.seq_module import SequenceFields
 from xmodule.studio_editable import StudioEditableBlock
 from xmodule.x_module import STUDENT_VIEW, XModuleFields
 from xmodule.xml_module import XmlParserMixin
+
+import webpack_loader.utils
 
 log = logging.getLogger(__name__)
 
@@ -21,6 +29,7 @@ CLASS_PRIORITY = ['video', 'problem']
 
 
 @XBlock.needs('user', 'bookmarks')
+@XBlock.wants('completion')
 class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParserMixin, MakoTemplateBlockBase, XBlock):
     """
     Layout XBlock for rendering subblocks vertically.
@@ -54,17 +63,29 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
             user_service = self.runtime.service(self, 'user')
             child_context['username'] = user_service.get_current_user().opt_attrs['edx-platform.username']
 
-        child_context['child_of_vertical'] = True
+        child_blocks = self.get_display_items()
 
+        child_blocks_to_complete_on_view = set()
+        completion_service = self.runtime.service(self, 'completion')
+        if completion_service and completion_service.completion_tracking_enabled():
+            child_blocks_to_complete_on_view = completion_service.blocks_to_mark_complete_on_view(child_blocks)
+            complete_on_view_delay = completion_service.get_complete_on_view_delay_ms()
+
+        child_context['child_of_vertical'] = True
         is_child_of_vertical = context.get('child_of_vertical', False)
 
         # pylint: disable=no-member
-        for child in self.get_display_items():
-            rendered_child = child.render(STUDENT_VIEW, child_context)
-            fragment.add_frag_resources(rendered_child)
+        for child in child_blocks:
+            child_block_context = copy(child_context)
+            if child in child_blocks_to_complete_on_view:
+                child_block_context['wrap_xblock_data'] = {
+                    'mark-completed-on-view-after-delay': complete_on_view_delay
+                }
+            rendered_child = child.render(STUDENT_VIEW, child_block_context)
+            fragment.add_fragment_resources(rendered_child)
 
             contents.append({
-                'id': child.location.to_deprecated_string(),
+                'id': six.text_type(child.location),
                 'content': rendered_child.content
             })
 
@@ -74,10 +95,11 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
             'unit_title': self.display_name_with_default if not is_child_of_vertical else None,
             'show_bookmark_button': child_context.get('show_bookmark_button', not is_child_of_vertical),
             'bookmarked': child_context['bookmarked'],
-            'bookmark_id': u"{},{}".format(child_context['username'], unicode(self.location))
+            'bookmark_id': u"{},{}".format(child_context['username'], unicode(self.location)),  # pylint: disable=no-member
         }))
 
-        fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/vertical_student_view.js'))
+        for tag in webpack_loader.utils.get_as_tags('VerticalStudentView'):
+            fragment.add_resource(tag, mimetype='text/html', placement='head')
         fragment.initialize_js('VerticalStudentView')
 
         return fragment

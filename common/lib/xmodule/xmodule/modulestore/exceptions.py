@@ -18,6 +18,13 @@ class MultipleCourseBlocksFound(Exception):
     pass
 
 
+class MultipleLibraryBlocksFound(Exception):
+    """
+    Raise this exception when Iterating over the library blocks return multiple library blocks.
+    """
+    pass
+
+
 class InsufficientSpecificationError(Exception):
     pass
 

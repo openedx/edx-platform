@@ -5,20 +5,28 @@ source to be used throughout the API.
 import logging
 
 from django.contrib.auth.models import User
+from django.db import transaction
 from opaque_keys.edx.keys import CourseKey
+from six import text_type
 
 from enrollment.errors import (
-    CourseEnrollmentClosedError, CourseEnrollmentFullError,
-    CourseEnrollmentExistsError, UserNotFoundError, InvalidEnrollmentAttribute
+    CourseEnrollmentClosedError,
+    CourseEnrollmentExistsError,
+    CourseEnrollmentFullError,
+    InvalidEnrollmentAttribute,
+    UserNotFoundError
 )
 from enrollment.serializers import CourseEnrollmentSerializer, CourseSerializer
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.exceptions import CourseNotFoundError
 from student.models import (
-    CourseEnrollment, NonExistentCourseError, EnrollmentClosedError,
-    CourseFullError, AlreadyEnrolledError, CourseEnrollmentAttribute
+    AlreadyEnrolledError,
+    CourseEnrollment,
+    CourseEnrollmentAttribute,
+    CourseFullError,
+    EnrollmentClosedError,
+    NonExistentCourseError
 )
-
 
 log = logging.getLogger(__name__)
 
@@ -85,6 +93,22 @@ def get_course_enrollment(username, course_id):
         return None
 
 
+def get_user_enrollments(course_key):
+    """Based on the course id, return all user enrollments in the course
+    Args:
+        course_key (CourseKey): Identifier of the course
+        from which to retrieve enrollments.
+    Returns:
+        A course's user enrollments as a queryset
+    Raises:
+        CourseEnrollment.DoesNotExist
+    """
+    return CourseEnrollment.objects.filter(
+        course_id=course_key,
+        is_active=True
+    ).order_by('created')
+
+
 def create_course_enrollment(username, course_id, mode, is_active):
     """Create a new course enrollment for the given user.
 
@@ -119,14 +143,14 @@ def create_course_enrollment(username, course_id, mode, is_active):
         enrollment = CourseEnrollment.enroll(user, course_key, check_access=True)
         return _update_enrollment(enrollment, is_active=is_active, mode=mode)
     except NonExistentCourseError as err:
-        raise CourseNotFoundError(err.message)
+        raise CourseNotFoundError(text_type(err))
     except EnrollmentClosedError as err:
-        raise CourseEnrollmentClosedError(err.message)
+        raise CourseEnrollmentClosedError(text_type(err))
     except CourseFullError as err:
-        raise CourseEnrollmentFullError(err.message)
+        raise CourseEnrollmentFullError(text_type(err))
     except AlreadyEnrolledError as err:
         enrollment = get_course_enrollment(username, course_id)
-        raise CourseEnrollmentExistsError(err.message, enrollment)
+        raise CourseEnrollmentExistsError(text_type(err), enrollment)
 
 
 def update_course_enrollment(username, course_id, mode=None, is_active=None):
@@ -212,6 +236,21 @@ def get_enrollment_attributes(user_id, course_id):
     user = _get_user(user_id)
     enrollment = CourseEnrollment.get_enrollment(user, course_key)
     return CourseEnrollmentAttribute.get_enrollment_attributes(enrollment)
+
+
+def unenroll_user_from_all_courses(user_id):
+    """
+    Set all of a user's enrollments to inactive.
+    :param user_id: The user being unenrolled.
+    :return: A list of all courses from which the user was unenrolled.
+    """
+    user = _get_user(user_id)
+    enrollments = CourseEnrollment.objects.filter(user=user)
+    with transaction.atomic():
+        for enrollment in enrollments:
+            _update_enrollment(enrollment, is_active=False)
+
+    return set([str(enrollment.course_id.org) for enrollment in enrollments])
 
 
 def _get_user(user_id):

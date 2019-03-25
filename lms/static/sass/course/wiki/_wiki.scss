@@ -1,6 +1,4 @@
-section.wiki {
-  padding-top: 25px;
-
+.wiki-wrapper section.wiki {
   .pull-left {
     float: left;
   }
@@ -9,18 +7,20 @@ section.wiki {
     float: right;
   }
 
-  .wiki-wrapper {
-    @include clearfix();
-
-    > header {
-      height: 33px;
-      padding: 24px 0 26px;
-      border-bottom: 1px solid $gray-l3;
-      border-radius: 3px 3px 0 0;
-      background-color: $sidebar-color;
-    }
+  .form-search .input-prepend>label {
+    display: inline-block;
+    vertical-align: bottom;
   }
 
+  @include clearfix();
+
+  .breadcrumbs-header {
+    height: 33px;
+    padding: 24px 0 26px;
+    border-bottom: 1px solid $gray-l3;
+    border-radius: 3px 3px 0 0;
+    background-color: $sidebar-color;
+  }
 
 
   /*-----------------
@@ -52,11 +52,11 @@ section.wiki {
         color: $link-color;
       }
 
-      &:after {
+      &::after {
         content: '›';
         display: inline;
         margin-left: ($baseline/2);
-        color: $base-font-color;
+        color: $body-color;
         height: 30px;
         line-height: 31px;
       }
@@ -83,6 +83,7 @@ section.wiki {
 
   .add-article-btn {
     @include button(simple, #eee);
+
     margin-left: 25px;
     padding: 7px 15px !important;
     font-size: 0.72em;
@@ -104,8 +105,9 @@ section.wiki {
       border: 1px solid #c8c8c8;
       border-radius: 14px;
       box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12) inset;
-      font-family: $sans-serif;
+      font-family: $font-family-sans-serif;
       font-size: 12px;
+
       @include transition(border-color .1s linear 0s);
 
       &:-webkit-input-placholder {
@@ -126,12 +128,20 @@ section.wiki {
 
   -----------------*/
 
-  .article-wrapper {
-
-  }
-
   h1 {
     font-weight: bold;
+    letter-spacing: 0;
+  }
+
+  .entry-title {
+    padding-bottom: 8px;
+    margin-bottom: 22px;
+    margin-top: 0;
+    border-bottom: 1px solid $light-gray;
+    font-size: 1.6em;
+    font-weight: bold;
+    color: $body-color;
+    text-transform: none;
     letter-spacing: 0;
   }
 
@@ -139,7 +149,8 @@ section.wiki {
     float: left;
     width: flex-grid(9);
     padding: 40px 0 40px 40px;
-    color: $base-font-color;
+    color: $body-color;
+
     @include box-sizing(border-box);
   }
 
@@ -150,7 +161,7 @@ section.wiki {
       border-bottom: 1px solid $light-gray;
       font-size: 1.6em;
       font-weight: bold;
-      color: $base-font-color;
+      color: $body-color;
       text-transform: none;
       letter-spacing: 0;
     }
@@ -171,17 +182,15 @@ section.wiki {
 
     h5 {
       margin: 20px 0 10px;
-      font-size: .8em;
+      font-size: 0.8em;
       font-weight: bold;
-      text-transform: uppercase;
     }
 
     h6 {
       margin: 20px 0 10px;
-      font-size: .8em;
+      font-size: 0.8em;
       font-weight: bold;
       color: #999;
-      text-transform: uppercase;
     }
 
     ul {
@@ -229,17 +238,17 @@ section.wiki {
     float: left;
     width: flex-grid(3);
     padding: 40px 40px;
+
     @include box-sizing(border-box);
 
-    .timestamp{
+    .timestamp {
       margin-top: ($baseline*0.75);
       padding: 15px 0 0 10px;
       border-top: 1px solid $light-gray;
 
       .label {
         font-size: 0.7em;
-        color: #aaa;
-        text-transform: uppercase;
+        color: $uxpl-gray-base;
       }
 
       .date {
@@ -261,8 +270,8 @@ section.wiki {
         line-height: 25px;
 
         &:hover, &:focus {
-          background-color: $gray-l6;
-          text-decoration: none;
+          color: $uxpl-blue-hover-active;
+          font-weight: bold;
         }
       }
     }
@@ -276,9 +285,11 @@ section.wiki {
     li {
       &.active {
         a {
-          color: $link-color;
+          color: $uxpl-blue-hover-active;
           font-weight: bold;
-          background-color: $gray-l4;
+          background-color: $light-gray1;
+          border-color: $uxpl-blue-hover-active;
+          border-left: 4px solid
         }
       }
     }
@@ -301,8 +312,8 @@ section.wiki {
       }
 
       &:hover, &:focus {
-        background-color: $gray-l6;
-        text-decoration: none;
+        color: $uxpl-blue-hover-active;
+        font-weight: bold;
       }
     }
   }
@@ -317,16 +328,15 @@ section.wiki {
   -----------------*/
 
   label {
-    font-family: $sans-serif;
+    font-family: $font-family-sans-serif;
     font-size: 0.9em;
     font-weight: bold;
     font-style: normal;
-    text-transform: uppercase;
-    color: #aaa;
+    color: $uxpl-gray-base;
   }
 
   input {
-    font-family: $sans-serif;
+    font-family: $font-family-sans-serif;
     font-style: normal;
     font-weight: normal;
   }
@@ -372,15 +382,16 @@ section.wiki {
       box-shadow: 0 0 1px 1px $shadow-l1, 0 1px 6px $shadow;
     }
 
-    &:before {
+    &::before {
       @extend %ui-depth4;
+
       content: 'click to edit schematic';
       position: absolute;
       top: 10px;
       left: 7px;
-      font-family: $sans-serif;
+      font-family: $font-family-sans-serif;
       font-size: 0.75em;
-      color: #aaa;
+      color: $uxpl-gray-base;
       pointer-events: none;
     }
   }
@@ -405,11 +416,12 @@ section.wiki {
   }
 
   button {
-    font-family: $sans-serif;
+    font-family: $font-family-sans-serif;
   }
 
   .btn {
     @include button(simple, #eee);
+
     font-size: 0.8em;
     margin-right: ($baseline/4);
     line-height: 1.2em;
@@ -417,22 +429,25 @@ section.wiki {
     letter-spacing: 0 !important;
 
     &:hover, &:focus {
-      color: $base-font-color;
+      color: $body-color;
       text-decoration: none;
     }
 
     &.btn-primary {
-      @include button;
+      @include button(simple, $btn-default-color);
+
       font-size: 0.8em;
     }
 
     &.btn-danger {
       @include button(simple, $pink);
+
       font-size: 0.8em;
     }
 
     &.btn-info {
       @include button(simple, $gray-l3);
+
       font-size: 0.8em;
     }
   }
@@ -443,6 +458,7 @@ section.wiki {
 
   .modal {
     @extend %ui-depth4;
+
     width: 960px;
     min-height: 500px;
     margin-left: -480px;
@@ -492,7 +508,7 @@ section.wiki {
       margin-bottom: ($baseline/2);
 
       h1, p {
-        color: $base-font-color;
+        color: $body-color;
       }
 
       h1 {
@@ -559,6 +575,7 @@ section.wiki {
     text-align: left;
     padding: 20px;
     font-size: 14px;
+
     @include clearfix();
 
     h3 {
@@ -576,7 +593,7 @@ section.wiki {
     margin-top: ($baseline*2);
   }
 
-  #cheatsheet-body pre{
+  #cheatsheet-body pre {
     color: $black;
     text-align: left;
     background: #eee;
@@ -606,7 +623,7 @@ section.wiki {
 
   .accordion small {
     font-size: 0.8em;
-    color: #aaa;
+    color: $uxpl-gray-base;
   }
 
   .accordion-toggle div {
@@ -629,7 +646,7 @@ section.wiki {
     }
 
     th {
-      font-family: $sans-serif;
+      font-family: $font-family-sans-serif;
       font-size: 0.7em;
     }
 
@@ -655,6 +672,7 @@ section.wiki {
   #settings_form {
     .well {
       margin-bottom: ($baseline*0.75);
+
       @include clearfix();
     }
 
@@ -747,22 +765,14 @@ section.wiki {
 
     + p {
       font-size: 0.9em;
-      color: #aaa;
+      color: $uxpl-gray-base;
     }
   }
 
   .filter-clear {
-    margin-right: ($baseline/2);
+    margin-left: ($baseline/2);
     margin-top: ($baseline/2);
     font-size: .9em;
-
-    a {
-      color: #aaa;
-
-      &:hover, &:focus {
-        color: #777;
-      }
-    }
   }
 
   .table.table-striped {
@@ -777,6 +787,12 @@ section.wiki {
 
     a.list-children {
       margin-left: 3px;
+    }
+
+    a {
+      &:hover, &:focus {
+        font-weight: bold;
+      }
     }
 
     tr:nth-child(even) {
@@ -806,8 +822,8 @@ section.wiki {
 
     li {
       margin-bottom: ($baseline*0.75);
-      border: 1px solid #DDD;
-      background: #F9F9F9;
+      border: 1px solid #ddd;
+      background: #f9f9f9;
       border-radius: 5px;
     }
 
@@ -831,7 +847,7 @@ section.wiki {
         float: right;
         font-size: 0.6em;
         line-height: 20px;
-        color: #aaa;
+        color: $uxpl-gray-base;
       }
     }
 
@@ -897,9 +913,9 @@ section.wiki {
   .alert {
     position: relative;
     width: auto;
-    margin: 24px 0px;
+    margin: 24px 0;
     padding: 8px 12px;
-    border: 1px solid #EBE8BF;
+    border: 1px solid #ebe8bf;
     border-radius: 3px;
     background: $yellow;
     color: $black;
@@ -942,7 +958,9 @@ section.wiki {
         color: $white;
         font-weight: bold;
         font-size: em(18);
+
         @include transition(none);
+
         text-align: center;
         -webkit-font-smoothing: antialiased;
 
@@ -956,6 +974,7 @@ section.wiki {
 
 .modal-backdrop {
   @extend %ui-depth3;
+
   position: fixed;
   top: 0;
   left: 0;

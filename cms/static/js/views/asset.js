@@ -1,5 +1,5 @@
 define(['js/views/baseview', 'underscore', 'gettext', 'common/js/components/views/feedback_prompt',
-      'common/js/components/views/feedback_notification'],
+    'common/js/components/views/feedback_notification'],
     function(BaseView, _, gettext, PromptView, NotificationView) {
         var AssetView = BaseView.extend({
             initialize: function() {
@@ -36,8 +36,7 @@ define(['js/views/baseview', 'underscore', 'gettext', 'common/js/components/view
                 if (this.model.get('locked')) {
                     this.$el.addClass(locked_class);
                     this.$el.find('.lock-checkbox').attr('checked', 'checked');
-                }
-                else {
+                } else {
                     this.$el.removeClass(locked_class);
                     this.$el.find('.lock-checkbox').removeAttr('checked');
                 }
@@ -45,7 +44,8 @@ define(['js/views/baseview', 'underscore', 'gettext', 'common/js/components/view
 
             confirmDelete: function(e) {
                 if (e && e.preventDefault) { e.preventDefault(); }
-                var asset = this.model, collection = this.model.collection;
+                var asset = this.model,
+                    collection = this.model.collection;
                 new PromptView.Warning({
                     title: gettext('Delete File Confirmation'),
                     message: gettext('Are you sure you wish to delete this item. It cannot be reversed!\n\nAlso any content that links/refers to this item will no longer work (e.g. broken images and/or links)'),
@@ -81,7 +81,7 @@ define(['js/views/baseview', 'underscore', 'gettext', 'common/js/components/view
                 var saving = new NotificationView.Mini({
                     title: gettext('Saving')
                 }).show();
-                asset.save({'locked': !asset.get('locked')}, {
+                asset.save({locked: !asset.get('locked')}, {
                     wait: true, // This means we won't re-render until we get back the success state.
                     success: function() {
                         saving.hide();

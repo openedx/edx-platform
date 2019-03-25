@@ -7,15 +7,13 @@ that would have been used in the settings.
 """
 import collections
 
-from django.db import models
-from django.dispatch import receiver
-from django.db.models.signals import pre_save, pre_delete
-from django.db.models.base import ObjectDoesNotExist
 from django.contrib.sites.models import Site
-
+from django.db import models
+from django.db.models.base import ObjectDoesNotExist
+from django.db.models.signals import pre_delete, pre_save
+from django.dispatch import receiver
 from jsonfield.fields import JSONField
 from model_utils.models import TimeStampedModel
-from simple_history.models import HistoricalRecords
 
 
 class Microsite(models.Model):
@@ -31,7 +29,7 @@ class Microsite(models.Model):
         - The values field must be validated on save to prevent the platform from crashing
         badly in the case the string is not able to be loaded as json.
     """
-    site = models.OneToOneField(Site, related_name='microsite')
+    site = models.OneToOneField(Site, related_name='microsite', on_delete=models.CASCADE)
     key = models.CharField(max_length=63, db_index=True, unique=True)
     values = JSONField(null=False, blank=True, load_kwargs={'object_pairs_hook': collections.OrderedDict})
 
@@ -63,7 +61,7 @@ class MicrositeHistory(TimeStampedModel):
     This is an archive table for Microsites model, so that we can maintain a history of changes. Note that the
     key field is no longer unique
     """
-    site = models.ForeignKey(Site, related_name='microsite_history')
+    site = models.ForeignKey(Site, related_name='microsite_history', on_delete=models.CASCADE)
     key = models.CharField(max_length=63, db_index=True)
     values = JSONField(null=False, blank=True, load_kwargs={'object_pairs_hook': collections.OrderedDict})
 
@@ -114,10 +112,7 @@ class MicrositeOrganizationMapping(models.Model):
     """
 
     organization = models.CharField(max_length=63, db_index=True, unique=True)
-    microsite = models.ForeignKey(Microsite, db_index=True)
-
-    # for archiving
-    history = HistoricalRecords()
+    microsite = models.ForeignKey(Microsite, db_index=True, on_delete=models.CASCADE)
 
     def __unicode__(self):
         """String conversion"""
@@ -152,12 +147,9 @@ class MicrositeTemplate(models.Model):
     A HTML template that a microsite can use
     """
 
-    microsite = models.ForeignKey(Microsite, db_index=True)
+    microsite = models.ForeignKey(Microsite, db_index=True, on_delete=models.CASCADE)
     template_uri = models.CharField(max_length=255, db_index=True)
     template = models.TextField()
-
-    # for archiving
-    history = HistoricalRecords()
 
     def __unicode__(self):
         """String conversion"""

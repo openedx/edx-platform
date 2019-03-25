@@ -33,8 +33,7 @@
                     form.showLoadingIndicator();
                     if (filters.get(type)) {
                         removeFilter(type);
-                    }
-                    else {
+                    } else {
                         filters.add({type: type, query: query, name: name});
                         search.refineSearch(filters.getTerms());
                     }
@@ -63,8 +62,7 @@
                                 {merge: true}
                             );
                         }
-                    }
-                    else {
+                    } else {
                         form.showNotFoundMessage(query);
                         filters.reset();
                     }
@@ -74,7 +72,7 @@
                 });
 
                 dispatcher.listenTo(search, 'error', function() {
-                    form.showErrorMessage();
+                    form.showErrorMessage(search.errorMessage);
                     form.hideLoadingIndicator();
                 });
 
@@ -86,8 +84,7 @@
                     filters.remove(type);
                     if (type === 'search_query') {
                         form.doSearch('');
-                    }
-                    else {
+                    } else {
                         search.refineSearch(filters.getTerms());
                     }
                 }
@@ -97,4 +94,4 @@
                 }
             };
         });
-})(define || RequireJS.define);
+}(define || RequireJS.define));

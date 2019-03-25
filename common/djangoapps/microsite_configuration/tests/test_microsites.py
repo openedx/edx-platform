@@ -4,14 +4,14 @@ Tests configuration templatetags and helper functions.
 """
 import logging
 
-from mock import patch
-from django.test import TestCase
 from django.conf import settings
+from django.test import TestCase
+
 from microsite_configuration import microsite
 from microsite_configuration.backends.base import BaseMicrositeBackend
 from microsite_configuration.backends.database import DatabaseMicrositeBackend
-from openedx.core.djangoapps.site_configuration.templatetags import configuration as configuration_tags
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.site_configuration.templatetags import configuration as configuration_tags
 
 log = logging.getLogger(__name__)
 
@@ -80,20 +80,3 @@ class MicrositeTests(TestCase):
             ),
             DatabaseMicrositeBackend
         )
-
-    def test_enable_microsites_pre_startup(self):
-        """
-        Tests microsite.test_enable_microsites_pre_startup is not used if the feature is turned off.
-        """
-        # remove microsite root directory paths first
-        settings.DEFAULT_TEMPLATE_ENGINE['DIRS'] = [
-            path for path in settings.DEFAULT_TEMPLATE_ENGINE['DIRS']
-            if path != settings.MICROSITE_ROOT_DIR
-        ]
-
-        with patch.dict('django.conf.settings.FEATURES', {'USE_MICROSITES': False}):
-            microsite.enable_microsites_pre_startup(log)
-            self.assertNotIn(settings.MICROSITE_ROOT_DIR, settings.DEFAULT_TEMPLATE_ENGINE['DIRS'])
-        with patch.dict('django.conf.settings.FEATURES', {'USE_MICROSITES': True}):
-            microsite.enable_microsites_pre_startup(log)
-            self.assertIn(settings.MICROSITE_ROOT_DIR, settings.DEFAULT_TEMPLATE_ENGINE['DIRS'])

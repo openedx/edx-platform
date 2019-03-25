@@ -3,7 +3,7 @@ define(['js/models/custom_sync_xblock_info'],
         var XBlockOutlineInfo = CustomSyncXBlockInfo.extend({
 
             urlRoots: {
-                'read': '/xblock/outline'
+                read: '/xblock/outline'
             },
 
             createChild: function(response) {

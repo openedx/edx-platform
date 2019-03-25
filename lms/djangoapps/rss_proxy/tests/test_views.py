@@ -1,14 +1,16 @@
 """
 Tests for the rss_proxy views
 """
+from django.urls import reverse
 from django.test import TestCase
-from django.core.urlresolvers import reverse
-from mock import patch, Mock
+from mock import Mock, patch
+
 from rss_proxy.models import WhitelistedRssUrl
 
 
 class RssProxyViewTests(TestCase):
     """ Tests for the rss_proxy views """
+    shard = 4
 
     def setUp(self):
         super(RssProxyViewTests, self).setUp()

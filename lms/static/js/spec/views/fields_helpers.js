@@ -1,11 +1,11 @@
 define(['backbone',
-        'jquery',
-        'underscore',
-        'edx-ui-toolkit/js/utils/html-utils',
-        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
-        'common/js/spec_helpers/template_helpers',
-        'js/views/fields',
-        'string_utils'],
+    'jquery',
+    'underscore',
+    'edx-ui-toolkit/js/utils/html-utils',
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+    'common/js/spec_helpers/template_helpers',
+    'js/views/fields',
+    'string_utils'],
     function(Backbone, $, _, HtmlUtils, AjaxHelpers, TemplateHelpers, FieldViews) {
         'use strict';
 
@@ -38,14 +38,14 @@ define(['backbone',
 
             switch (fieldType) {
             case FieldViews.DropdownFieldView:
-                data['required'] = fieldData.required || false;
-                data['options'] = fieldData.options || SELECT_OPTIONS;
+                data.required = fieldData.required || false;
+                data.options = fieldData.options || SELECT_OPTIONS;
                 break;
             case FieldViews.LinkFieldView:
             case FieldViews.PasswordFieldView:
-                data['linkTitle'] = fieldData.linkTitle || 'Link Title';
-                data['linkHref'] = fieldData.linkHref || '/path/to/resource';
-                data['emailAttribute'] = 'email';
+                data.linkTitle = fieldData.linkTitle || 'Link Title';
+                data.linkHref = fieldData.linkHref || '/path/to/resource';
+                data.emailAttribute = 'email';
                 break;
             }
 
@@ -57,10 +57,10 @@ define(['backbone',
         var createErrorMessage = function(attribute, user_message) {
             var field_errors = {};
             field_errors[attribute] = {
-                'user_message': user_message
+                user_message: user_message
             };
             return {
-                'field_errors': field_errors
+                field_errors: field_errors
             };
         };
 
@@ -184,6 +184,7 @@ define(['backbone',
             }
 
             view.$(data.valueInputSelector).val(data.validValue).change();
+            view.$(data.valueInputSelector).focusout();
             // When the value in the field is changed
             expect(view.fieldValue()).toBe(data.validValue);
             expectMessageContains(view, view.indicators.inProgress);
@@ -203,6 +204,7 @@ define(['backbone',
             }
 
             view.$(data.valueInputSelector).val(data.invalidValue1).change();
+            view.$(data.valueInputSelector).focusout();
             request_data[data.valueAttribute] = data.invalidValue1;
             AjaxHelpers.expectJsonRequest(
                 requests, 'PATCH', url, request_data
@@ -214,6 +216,7 @@ define(['backbone',
             expect(view.el).toHaveClass('mode-edit');
 
             view.$(data.valueInputSelector).val(data.invalidValue2).change();
+            view.$(data.valueInputSelector).focusout();
             request_data[data.valueAttribute] = data.invalidValue2;
             AjaxHelpers.expectJsonRequest(
                 requests, 'PATCH', url, request_data
@@ -225,6 +228,7 @@ define(['backbone',
             expect(view.el).toHaveClass('mode-edit');
 
             view.$(data.valueInputSelector).val('').change();
+            view.$(data.valueInputSelector).focusout();
             // When the value in the field is changed
             expect(view.fieldValue()).toBe(data.defaultValue);
             request_data[data.valueAttribute] = data.defaultValue;
@@ -240,6 +244,28 @@ define(['backbone',
             }
         };
 
+        var verifyReadonlyField = function(view, data) {
+            if (data.editable === 'toggle') {
+                expect(view.el).toHaveClass('mode-placeholder');
+                expectTitleToContain(view, data.title);
+                expectMessageContains(view, view.indicators.canEdit);
+                view.$el.click();
+            } else {
+                expectTitleAndMessageToContain(view, data.title, data.helpMessage);
+            }
+            expect(view.el).toHaveClass('u-field-readonly');
+
+            if (view.fieldValue() !== null) {
+                expect(view.fieldValue()).not.toContain(data.validValue);
+            }
+        };
+
+        var verifyUneditableDropdownField = function(view, data) {
+            expectTitleAndMessageToContain(view, data.title, data.helpMessage);
+            expect(view.el).toHaveClass('u-field-dropdown');
+            expect(view.el).toHaveClass('editable-never');
+        };
+
         var verifyTextField = function(view, data, requests) {
             verifyEditableField(view, _.extend({
                 valueSelector: '.u-field-value',
@@ -248,12 +274,24 @@ define(['backbone',
                 requests);
         };
 
+        var verifyReadonlyTextField = function(view, data) {
+            verifyReadonlyField(view, _.extend({
+                valueSelector: '.u-field-value'
+            }, data));
+        };
+
         var verifyDropDownField = function(view, data, requests) {
             verifyEditableField(view, _.extend({
                 valueSelector: '.u-field-value',
                 valueInputSelector: '.u-field-value > select'
             }, data
             ), requests);
+        };
+
+        var verifyReadonlyDropDownField = function(view, data) {
+            verifyUneditableDropdownField(view, _.extend({
+                valueSelector: '.editable-never'
+            }, data));
         };
 
         return {
@@ -270,7 +308,9 @@ define(['backbone',
             verifySuccessMessageReset: verifySuccessMessageReset,
             verifyEditableField: verifyEditableField,
             verifyTextField: verifyTextField,
+            verifyReadonlyTextField: verifyReadonlyTextField,
             verifyDropDownField: verifyDropDownField,
+            verifyReadonlyDropDownField: verifyReadonlyDropDownField,
             verifyPersistence: verifyPersistence
         };
     });

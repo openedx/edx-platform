@@ -26,6 +26,6 @@
             }
 
             return DiscussionCourseSettings;
-        })(Backbone.Model);
+        }(Backbone.Model));
     }
 }).call(this);

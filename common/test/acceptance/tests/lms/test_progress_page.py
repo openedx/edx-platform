@@ -3,24 +3,27 @@
 End-to-end tests for the LMS that utilize the
 progress page.
 """
-import ddt
-
 from contextlib import contextmanager
-from nose.plugins.attrib import attr
-from flaky import flaky
 
-from ..helpers import (
-    UniqueCourseTest, auto_auth, create_multiple_choice_problem, create_multiple_choice_xml, get_modal_alert
-)
+import ddt
+from nose.plugins.attrib import attr
+
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from ...pages.common.logout import LogoutPage
 from ...pages.lms.courseware import CoursewarePage
 from ...pages.lms.instructor_dashboard import InstructorDashboardPage, StudentSpecificAdmin
 from ...pages.lms.problem import ProblemPage
 from ...pages.lms.progress import ProgressPage
-from ...pages.studio.component_editor import ComponentEditorView
+from ...pages.studio.xblock_editor import XBlockEditorView
+from ...pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
 from ...pages.studio.utils import type_in_codemirror
-from ...pages.studio.overview import CourseOutlinePage
+from ..helpers import (
+    UniqueCourseTest,
+    auto_auth,
+    create_multiple_choice_problem,
+    create_multiple_choice_xml,
+    get_modal_alert
+)
 
 
 class ProgressPageBaseTest(UniqueCourseTest):
@@ -43,7 +46,7 @@ class ProgressPageBaseTest(UniqueCourseTest):
         self.progress_page = ProgressPage(self.browser, self.course_id)
         self.logout_page = LogoutPage(self.browser)
 
-        self.course_outline = CourseOutlinePage(
+        self.studio_course_outline = StudioCourseOutlinePage(
             self.browser,
             self.course_info['org'],
             self.course_info['number'],
@@ -124,7 +127,7 @@ class ProgressPageBaseTest(UniqueCourseTest):
             self.logout_page.visit()
 
 
-@attr(shard=9)
+@attr(shard=22)
 @ddt.ddt
 class PersistentGradesTest(ProgressPageBaseTest):
     """
@@ -140,10 +143,11 @@ class PersistentGradesTest(ProgressPageBaseTest):
         Adds a unit to the subsection, which
         should not affect a persisted subsection grade.
         """
-        self.course_outline.visit()
-        subsection = self.course_outline.section(self.SECTION_NAME).subsection(self.SUBSECTION_NAME)
+        self.studio_course_outline.visit()
+        subsection = self.studio_course_outline.section(self.SECTION_NAME).subsection(self.SUBSECTION_NAME)
         subsection.expand_subsection()
         subsection.add_unit()
+        self.studio_course_outline.wait_for_ajax()
         subsection.publish()
 
     def _set_staff_lock_on_subsection(self, locked):
@@ -151,8 +155,8 @@ class PersistentGradesTest(ProgressPageBaseTest):
         Sets staff lock for a subsection, which should hide the
         subsection score from students on the progress page.
         """
-        self.course_outline.visit()
-        subsection = self.course_outline.section_at(0).subsection_at(0)
+        self.studio_course_outline.visit()
+        subsection = self.studio_course_outline.section_at(0).subsection_at(0)
         subsection.set_staff_lock(locked)
         self.assertEqual(subsection.has_staff_lock_warning, locked)
 
@@ -162,9 +166,9 @@ class PersistentGradesTest(ProgressPageBaseTest):
         along with its container unit, so any changes can
         be published.
         """
-        self.course_outline.visit()
-        self.course_outline.section_at(0).subsection_at(0).expand_subsection()
-        unit = self.course_outline.section_at(0).subsection_at(0).unit(self.UNIT_NAME).go_to()
+        self.studio_course_outline.visit()
+        self.studio_course_outline.section_at(0).subsection_at(0).expand_subsection()
+        unit = self.studio_course_outline.section_at(0).subsection_at(0).unit(self.UNIT_NAME).go_to()
         component = unit.xblocks[1]
         return unit, component
 
@@ -175,7 +179,7 @@ class PersistentGradesTest(ProgressPageBaseTest):
         """
         unit, component = self._get_problem_in_studio()
         component.edit()
-        component_editor = ComponentEditorView(self.browser, component.locator)
+        component_editor = XBlockEditorView(self.browser, component.locator)
         component_editor.set_field_value_and_save('Problem Weight', 5)
         unit.publish()
 
@@ -227,7 +231,6 @@ class PersistentGradesTest(ProgressPageBaseTest):
         _change_subsection_structure,
         _change_weight_for_problem
     )
-    @flaky  # TODO: fix this, see TNL-6040
     def test_content_changes_do_not_change_score(self, edit):
         with self._logged_in_session():
             self.courseware_page.visit()
@@ -272,7 +275,7 @@ class PersistentGradesTest(ProgressPageBaseTest):
             self.assertEqual(self._get_section_score(), (0, 2))
 
 
-@attr(shard=9)
+@attr(shard=22)
 class SubsectionGradingPolicyTest(ProgressPageBaseTest):
     """
     Tests changing a subsection's 'graded' field
@@ -289,8 +292,8 @@ class SubsectionGradingPolicyTest(ProgressPageBaseTest):
         If a section index is not provided, 0 is assumed.
         """
         with self._logged_in_session(staff=True):
-            self.course_outline.visit()
-            modal = self.course_outline.section_at(section).subsection_at(0).edit()
+            self.studio_course_outline.visit()
+            modal = self.studio_course_outline.section_at(section).subsection_at(0).edit()
             modal.policy = policy
             modal.save()
 
@@ -322,6 +325,9 @@ class SubsectionGradingPolicyTest(ProgressPageBaseTest):
             # Answer the first Lab problem (unit only contains a single problem)
             self._answer_problem_correctly()
             self.progress_page.visit()
+
+            # Verify the basic a11y of the progress page
+            self.progress_page.a11y_audit.check_for_accessibility_errors()
 
             # Verify that y-Axis labels are aria-hidden
             self.assertEqual(['100%', 'true'], self.progress_page.y_tick_label(0))

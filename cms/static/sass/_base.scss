@@ -27,24 +27,28 @@ html {
 
 body {
   @extend %t-copy-base;
+
   min-width: $fg-min-width;
   background: $uxpl-grayscale-x-back;
   color: $gray-d3;
 }
 
-body, input, button {
+body,
+input,
+button {
   font-family: 'Open Sans', sans-serif;
 }
 
 // removing the outline on any element that we make programmatically focusable
 [tabindex="-1"] {
-    outline: none;
+  outline: none;
 }
 
 a {
   @include transition(color $tmg-f2 ease-in-out 0s);
+
   text-decoration: none;
-  color: $uxpl-blue-base;
+  color: theme-color("primary");
 
   &:hover {
     color: $uxpl-blue-hover-active;
@@ -67,6 +71,7 @@ h1 {
 .wrapper {
   @include clearfix();
   @include box-sizing(border-box);
+
   width: 100%;
 }
 
@@ -75,12 +80,15 @@ h1 {
 .page-header {
   @extend %t-title3;
   @extend %t-strong;
+
   display: block;
   color: $gray-d3;
 
-  .navigation, .subtitle {
+  .navigation,
+  .subtitle {
     @extend %t-title7;
     @extend %t-regular;
+
     position: relative;
     top: ($baseline/4);
     display: block;
@@ -118,7 +126,6 @@ h1 {
 // +Typography - Primary Content
 // ====================
 .content-primary {
-
   .section-header {
     color: $gray-d3;
 
@@ -155,7 +162,6 @@ h1 {
 // +Typography - Secondary Content
 // ====================
 .content-secondary {
-
   .section-header {
     color: $gray-d3;
 
@@ -183,34 +189,44 @@ h1 {
 
 // +Typography - Loose Headings  (BT: needs to be removed once html is clean)
 // ====================
-.title-1, .title-2, .title-3, .title-4, .title-5, .title-6 {
+.title-1,
+.title-2,
+.title-3,
+.title-4,
+.title-5,
+.title-6 {
   @extend %t-strong;
 }
 
 .title-1 {
   @extend %t-title3;
+
   margin-bottom: ($baseline*1.5);
 }
 
 .title-2 {
   @extend %t-title4;
+
   margin-bottom: $baseline;
 }
 
 .title-3 {
   @extend %t-title5;
+
   margin-bottom: ($baseline/2);
 }
 
 .title-4 {
   @extend %t-title7;
   @extend %t-regular;
+
   margin-bottom: $baseline;
 }
 
 .title-5 {
   @extend %t-title7;
   @extend %t-regular;
+
   color: $gray-l1;
   margin-bottom: $baseline;
 }
@@ -218,22 +234,20 @@ h1 {
 .title-6 {
   @extend %t-title7;
   @extend %t-regular;
+
   color: $gray-l2;
   margin-bottom: $baseline;
 }
 
-p, ul, ol, dl {
+p,
+ul,
+ol,
+dl {
   margin-bottom: ($baseline/2);
 
   &:last-child {
     margin-bottom: 0;
   }
-}
-
-// +Layout - Basic
-// ====================
-.wrapper-view {
-
 }
 
 // +Layout - Basic Page Header
@@ -245,6 +259,7 @@ p, ul, ol, dl {
 
   .mast, .metadata {
     @include clearfix();
+
     position: relative;
     max-width: $fg-max-width;
     min-width: $fg-min-width;
@@ -269,19 +284,22 @@ p, ul, ol, dl {
       .page-header {
         @include float(left);
         @include margin-right(flex-gutter());
-        width: flex-grid(6,12);
+
+        width: flex-grid(6, 12);
       }
 
       .nav-actions {
         @include float(left);
         @include text-align(right);
+
         position: relative;
         bottom: -($baseline*0.75);
-        width: flex-grid(6,12);
+        width: flex-grid(6, 12);
 
         .nav-item {
           display: inline-block;
           vertical-align: top;
+
           @include margin-right($baseline/2);
 
           &:last-child {
@@ -298,7 +316,6 @@ p, ul, ol, dl {
 
     // layout with actions
     &.has-subtitle {
-
       .nav-actions {
         bottom: -($baseline*1.5);
       }
@@ -306,29 +323,30 @@ p, ul, ol, dl {
 
     // layout with navigation
     &.has-navigation {
-
       .nav-actions {
         bottom: -($baseline*1.5);
       }
 
       .navigation-link {
         @extend %cont-truncated;
+
         display: inline-block;
         vertical-align: bottom; // correct for extra padding in FF
         max-width: 250px;
 
         &.navigation-current {
           @extend %ui-disabled;
+
           color: $gray;
           max-width: 250px;
 
-          &:before {
+          &::before {
             color: $gray;
           }
         }
       }
 
-      .navigation-link:before {
+      .navigation-link::before {
         content: " / ";
         margin: ($baseline/4);
         color: $gray;
@@ -338,7 +356,7 @@ p, ul, ol, dl {
         }
       }
 
-      .navigation .navigation-link:first-child:before {
+      .navigation .navigation-link:first-child::before {
         content: "";
         margin: 0;
       }
@@ -347,17 +365,18 @@ p, ul, ol, dl {
 
   // CASE: wizard-based mast
   .mast-wizard {
-
     .page-header-sub {
       @extend %t-title4;
+
       color: $gray;
       font-weight: 300;
     }
 
     .page-header-super {
       @extend %t-title4;
+
       float: left;
-      width: flex-grid(12,12);
+      width: flex-grid(12, 12);
       margin-top: ($baseline/2);
       border-top: 1px solid $gray-l4;
       padding-top: ($baseline/2);
@@ -381,7 +400,9 @@ p, ul, ol, dl {
 
 .content {
   @include clearfix();
+
   @extend %t-copy-base;
+
   max-width: $fg-max-width;
   min-width: $fg-min-width;
   width: flex-grid(12);
@@ -396,6 +417,7 @@ p, ul, ol, dl {
 
     .title-sub {
       @extend %t-copy-sub1;
+
       display: block;
       margin: 0;
       color: $gray-l2;
@@ -403,6 +425,7 @@ p, ul, ol, dl {
 
     .title-1 {
       @extend %t-title3;
+
       margin: 0;
       padding: 0;
       font-weight: 600;
@@ -418,18 +441,19 @@ p, ul, ol, dl {
 // +Layout - Primary Content
 // ====================
 .content-primary {
-
   .title-1 {
     @extend %t-title3;
   }
 
   .title-2 {
     @extend %t-title4;
+
     margin: 0 0 ($baseline/2) 0;
   }
 
   .title-3 {
     @extend %t-title6;
+
     margin: 0 0 ($baseline/2) 0;
   }
 
@@ -444,8 +468,10 @@ p, ul, ol, dl {
 
     .tip {
       @extend %t-copy-sub2;
+
       @include text-align(right);
       @include float(right);
+
       width: flex-grid(7, 12);
       margin-top: ($baseline/2);
       color: $gray-d1;
@@ -456,7 +482,6 @@ p, ul, ol, dl {
 // +Layout - Supplemental Content
 // ====================
 .content-supplementary {
-
   > section {
     margin: 0 0 $baseline 0;
   }
@@ -471,6 +496,7 @@ p, ul, ol, dl {
 
 .inner-wrapper {
   @include clearfix();
+
   position: relative;
   max-width: 1280px;
   margin: auto;
@@ -482,12 +508,15 @@ p, ul, ol, dl {
 
 .main-column {
   clear: both;
+
   @include float(left);
+
   width: 70%;
 }
 
 .sidebar {
   @include float(right);
+
   width: 28%;
 }
 
@@ -505,7 +534,9 @@ p, ul, ol, dl {
 .new-subsection-item,
 .new-policy-item {
   @include grey-button();
+
   @extend %t-action5;
+
   margin: ($baseline/2);
   padding: 3px ($baseline/2) 4px ($baseline/2);
 
@@ -520,6 +551,7 @@ p, ul, ol, dl {
 .item-actions {
   position: absolute;
   top: 5px;
+
   @include right(5px);
 
   .edit-button,
@@ -538,25 +570,27 @@ hr.divide {
 }
 
 .item-details {
-    float: left;
-    padding: ($baseline/2) 0;
+  float: left;
+  padding: ($baseline/2) 0;
 }
 
 .details {
-    @extend %t-copy-sub1;
-    display: none;
-    margin-bottom: ($baseline*1.5);
+  @extend %t-copy-sub1;
+
+  display: none;
+  margin-bottom: ($baseline*1.5);
 }
 
 .window {
-
   .window-contents {
     padding: 20px;
   }
 
   .header {
-    @include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
+    @include linear-gradient(top, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0));
+
     @extend %t-title7;
+
     padding: 6px 14px;
     border-bottom: 1px solid $mediumGrey;
     border-radius: 2px 2px 0 0;
@@ -568,6 +602,7 @@ hr.divide {
   label {
     display: block;
     margin-bottom: 6px;
+
     @extend %t-strong;
 
     &.inline-label {
@@ -577,6 +612,7 @@ hr.divide {
     .description {
       @extend %t-copy-sub2;
       @extend %t-regular;
+
       display: block;
       font-style: italic;
       color: #999;
@@ -617,9 +653,10 @@ hr.divider {
 .nav-skip,
 .transcript-skip {
   @extend %t-action3;
+
   display: inline-block;
   position: absolute;
-  left: 0px;
+  left: 0;
   top: -($baseline*30);
   overflow: hidden;
   background: $white;
@@ -640,6 +677,7 @@ hr.divider {
 .content-modal {
   @include border-bottom-radius(2px);
   @include box-sizing(border-box);
+
   position: relative;
   display: none;
   width: 700px;
@@ -652,6 +690,7 @@ hr.divider {
   .action-modal-close {
     @include transition(top $tmg-f3 ease-in-out 0s);
     @include border-bottom-radius(3px);
+
     position: absolute;
     top: -3px;
     right: $baseline;
@@ -665,18 +704,20 @@ hr.divider {
 
     .icon {
       @extend %t-action1;
+
       color: $white;
     }
 
     &:hover,
     &:active {
       top: 0;
-      background: $uxpl-blue-base;
+      background: theme-color("primary");
     }
   }
 
   img {
     @include box-sizing(border-box);
+
     width: 100%;
     overflow-y: scroll;
     padding: ($baseline/10);
@@ -686,12 +727,14 @@ hr.divider {
   .title {
     @extend %t-title5;
     @extend %t-strong;
+
     margin: 0 0 ($baseline/2) 0;
     color: $gray-d3;
   }
 
   .description {
     @extend %t-copy-sub2;
+
     margin-top: ($baseline/2);
     color: $gray-l1;
   }

@@ -15,9 +15,10 @@ from mock import Mock
 
 import xmodule
 from xmodule.capa_module import CapaModule
-from opaque_keys.edx.locations import Location
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
+from xblock.scorable import Score
 
 from . import get_test_system
 from pytz import UTC
@@ -84,7 +85,8 @@ class CapaFactoryWithDelay(object):
         """
         Optional parameters here are cut down to what we actually use vs. the regular CapaFactory.
         """
-        location = Location("edX", "capa_test", "run", "problem", "SampleProblem{0}".format(cls.next_num()))
+        location = BlockUsageLocator(CourseLocator('edX', 'capa_test', 'run', deprecated=True),
+                                     'problem', 'SampleProblem{0}'.format(cls.next_num()), deprecated=True)
         field_data = {'data': cls.sample_problem_xml}
 
         if max_attempts is not None:
@@ -111,9 +113,9 @@ class CapaFactoryWithDelay(object):
 
         if correct:
             # Could set the internal state formally, but here we just jam in the score.
-            module.get_score = lambda: {'score': 1, 'total': 1}
+            module.score = Score(raw_earned=1, raw_possible=1)
         else:
-            module.get_score = lambda: {'score': 0, 'total': 1}
+            module.score = Score(raw_earned=0, raw_possible=1)
 
         return module
 
@@ -122,6 +124,7 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
     """
     Class to test delay between quiz attempts.
     """
+    shard = 1
 
     def create_and_check(self,
                          num_attempts=None,

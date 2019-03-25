@@ -1,0 +1,18 @@
+<form action="" method="post" id="cohort-course-wide-discussions-form" class="cohort-course-wide-discussions-form">
+    <div class="wrapper discussions-management-supplemental">
+        <div class="form-fields">
+            <div class="form-field">
+                <div class="course-wide-discussion-topics">
+                    <h4 class="hd hd-4 subsection-title"><%- gettext('Course-Wide Discussion Topics') %></h4>
+                    <p><%- gettext('Select the course-wide discussion topics that you want to divide.') %></p>
+                    <div class="field">
+                        <ul class="discussions-wrapper"><%= HtmlUtils.ensureHtml(courseWideTopicsHtml) %></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-actions">
+            <button class="form-submit button action-primary action-save"><%- gettext('Save') %></button>
+        </div>
+    </div>
+</form>

@@ -3,26 +3,28 @@
 Acceptance tests for Studio's Setting pages
 """
 from __future__ import unicode_literals
-import os
 
+import os
+from textwrap import dedent
+
+from bok_choy.promise import EmptyPromise
 from mock import patch
 from nose.plugins.attrib import attr
 
 from base_studio_test import StudioCourseTest
-from bok_choy.promise import EmptyPromise
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
-from common.test.acceptance.tests.helpers import create_user_partition_json, element_has_text
+from common.test.acceptance.pages.common.utils import add_enrollment_course_modes
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.studio.overview import CourseOutlinePage
 from common.test.acceptance.pages.studio.settings import SettingsPage
 from common.test.acceptance.pages.studio.settings_advanced import AdvancedSettingsPage
 from common.test.acceptance.pages.studio.settings_group_configurations import GroupConfigurationsPage
-from common.test.acceptance.pages.lms.courseware import CoursewarePage
-from common.test.acceptance.pages.studio.utils import get_input_value
-from textwrap import dedent
+from common.test.acceptance.pages.studio.utils import get_input_value, type_in_codemirror
+from common.test.acceptance.tests.helpers import create_user_partition_json, element_has_text
 from xmodule.partitions.partitions import Group
 
 
-@attr(shard=8)
+@attr(shard=19)
 class ContentGroupConfigurationTest(StudioCourseTest):
     """
     Tests for content groups in the Group Configurations Page.
@@ -231,11 +233,67 @@ class ContentGroupConfigurationTest(StudioCourseTest):
         self.outline_page.wait_for_page()
 
 
-@attr(shard=8)
+@attr(shard=17)
+class EnrollmentTrackModeTest(StudioCourseTest):
+    """
+    Tests for the enrollment tracks section
+    """
+
+    def setUp(self, is_staff=True, test_xss=True):
+        super(EnrollmentTrackModeTest, self).setUp(is_staff=is_staff)
+
+        self.audit_track = "Audit"
+        self.verified_track = "Verified"
+        self.staff_user = self.user
+
+    def test_all_course_modes_present(self):
+        """
+        This test is meant to ensure that all the course modes show up as groups
+        on the Group configuration page within the Enrollment Tracks section.
+        It also checks to make sure that the edit buttons are not available.
+        """
+        add_enrollment_course_modes(self.browser, self.course_id, ['audit', 'verified'])
+        group_configurations_page = GroupConfigurationsPage(
+            self.browser,
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        )
+        group_configurations_page.visit()
+        self.assertTrue(group_configurations_page.enrollment_track_section_present)
+
+        # Make sure the edit buttons are not available.
+        self.assertFalse(group_configurations_page.enrollment_track_edit_present)
+        groups = group_configurations_page.get_enrollment_groups()
+        for g in [self.audit_track, self.verified_track]:
+            self.assertTrue(g in groups)
+
+    def test_one_course_mode(self):
+        """
+        The purpose of this test is to ensure that when there is 1 or fewer course modes
+        the enrollment track section is not shown.
+        """
+        add_enrollment_course_modes(self.browser, self.course_id, ['audit'])
+        group_configurations_page = GroupConfigurationsPage(
+            self.browser,
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        )
+        group_configurations_page.visit()
+        self.assertFalse(group_configurations_page.enrollment_track_section_present)
+        groups = group_configurations_page.get_enrollment_groups()
+        self.assertEqual(len(groups), 0)
+
+
+@attr(shard=19)
 class AdvancedSettingsValidationTest(StudioCourseTest):
     """
     Tests for validation feature in Studio's advanced settings tab
     """
+    course_name_key = 'Course Display Name'
+    course_name_value = 'Test Name'
+
     def setUp(self):
         super(AdvancedSettingsValidationTest, self).setUp()
         self.advanced_settings = AdvancedSettingsPage(
@@ -250,6 +308,81 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
 
         # Before every test, make sure to visit the page first
         self.advanced_settings.visit()
+
+    def test_course_author_sees_default_advanced_settings(self):
+        """
+        Scenario: Test that advanced settings have the default settings
+            Given a staff logs in to studio
+            When this user goes to advanced settings page
+                Then this user sees 'Allow Anonymous Discussion Posts' as true
+                And 'Enable Timed Exams' as false
+                And 'Maximum Attempts' as null
+        """
+        anonymous_discussion_setting = self.advanced_settings.get('Allow Anonymous Discussion Posts')
+        timed_exam_settings = self.advanced_settings.get('Enable Timed Exams')
+        max_attempts = self.advanced_settings.get('Maximum Attempts')
+        page_default_settings = [
+            anonymous_discussion_setting,
+            timed_exam_settings,
+            max_attempts
+        ]
+        default_anonymous_discussion_setting = 'true'
+        default_timed_exam_settings = 'false'
+        default_max_attempts = 'null'
+        expected_default_settings = [
+            default_anonymous_discussion_setting,
+            default_timed_exam_settings,
+            default_max_attempts
+        ]
+        self.assertEqual(
+            page_default_settings,
+            expected_default_settings
+        )
+
+    def test_keys_appear_alphabetically(self):
+        """
+        Scenario: Test that advanced settings have all the keys in alphabetic order
+            Given a staff logs in to studio
+            When this user goes to advanced settings page
+                Then he sees all the advanced setting keys in alphabetic order
+        """
+
+        key_names = self.advanced_settings.key_names
+        self.assertEqual(key_names, sorted(key_names))
+
+    def test_cancel_editing_key_value(self):
+        """
+        Scenario: Test that advanced settings does not save the key value, if cancel
+        is clicked from notification bar
+            Given a staff logs in to studio
+            When this user goes to advanced settings page and enters and new course name
+                Then he clicks 'cancel' buttin when asked to save changes
+            When this user reloads the page
+                And then he does not see any change in the original course name
+        """
+
+        original_course_display_name = self.advanced_settings.get(self.course_name_key)
+        new_course_name = 'New Course Name'
+        type_in_codemirror(self.advanced_settings, 16, new_course_name)
+        self.advanced_settings.cancel()
+        self.advanced_settings.refresh_and_wait_for_load()
+        self.assertNotEqual(
+            original_course_display_name,
+            new_course_name,
+            ('original course name:{} can not not be equal to unsaved course name {}'.format(
+                original_course_display_name,
+                new_course_name
+            )
+            )
+        )
+        self.assertEqual(
+            self.advanced_settings.get(self.course_name_key),
+            original_course_display_name,
+            ('course name from the page should be same as original_course_display_name:{}'.format(
+                original_course_display_name
+            )
+            )
+        )
 
     def test_modal_shows_one_validation_error(self):
         """
@@ -403,7 +536,7 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
         self.assertEquals(set(displayed_fields), set(expected_fields))
 
 
-@attr(shard=1)
+@attr(shard=16)
 class ContentLicenseTest(StudioCourseTest):
     """
     Tests for course-level licensing (that is, setting the license,
@@ -565,7 +698,7 @@ class StudioSubsectionSettingsA11yTest(StudioCourseTest):
         self.course_outline.a11y_audit.check_for_accessibility_errors()
 
 
-@attr(shard=1)
+@attr(shard=16)
 class StudioSettingsImageUploadTest(StudioCourseTest):
     """
     Class to test course settings image uploads.
@@ -603,7 +736,7 @@ class StudioSettingsImageUploadTest(StudioCourseTest):
         self.assertIn(file_to_upload, self.settings_page.get_uploaded_image_path('#video-thumbnail-image'))
 
 
-@attr(shard=1)
+@attr(shard=16)
 class CourseSettingsTest(StudioCourseTest):
     """
     Class to test course settings.

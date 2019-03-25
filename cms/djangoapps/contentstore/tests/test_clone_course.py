@@ -2,20 +2,20 @@
 Unit tests for cloning a course between the same and different module stores.
 """
 import json
-from django.conf import settings
 
+from django.conf import settings
+from mock import Mock, patch
 from opaque_keys.edx.locator import CourseLocator
-from xmodule.modulestore import ModuleStoreEnum, EdxJSONEncoder
-from contentstore.tests.utils import CourseTestCase
+
 from contentstore.tasks import rerun_course
-from student.auth import has_course_author_access
-from course_action_state.models import CourseRerunState
+from contentstore.tests.utils import CourseTestCase
 from course_action_state.managers import CourseRerunUIStateManager
-from mock import patch, Mock
+from course_action_state.models import CourseRerunState
+from student.auth import has_course_author_access
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
+from xmodule.modulestore import EdxJSONEncoder, ModuleStoreEnum
 from xmodule.modulestore.tests.factories import CourseFactory
-
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
@@ -28,15 +28,6 @@ class CloneCourseTest(CourseTestCase):
         """Tests cloning of a course as follows: XML -> Mongo (+ data) -> Mongo -> Split -> Split"""
         # 1. import and populate test toy course
         mongo_course1_id = self.import_and_populate_course()
-
-        # 2. clone course (mongo -> mongo)
-        # TODO - This is currently failing since clone_course doesn't handle Private content - fails on Publish
-        # mongo_course2_id = SlashSeparatedCourseKey('edX2', 'toy2', '2013_Fall')
-        # self.store.clone_course(mongo_course1_id, mongo_course2_id, self.user.id)
-        # self.assertCoursesEqual(mongo_course1_id, mongo_course2_id)
-        # self.check_populated_course(mongo_course2_id)
-
-        # NOTE: When the code above is uncommented this can be removed.
         mongo_course2_id = mongo_course1_id
 
         # 3. clone course (mongo -> split)

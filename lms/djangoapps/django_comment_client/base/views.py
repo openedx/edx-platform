@@ -1,6 +1,6 @@
 import functools
-import logging
 import json
+import logging
 import random
 import time
 import urlparse
@@ -8,47 +8,53 @@ import urlparse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core import exceptions
-from django.http import Http404, HttpResponseBadRequest, HttpResponse
+from django.http import Http404, HttpResponse, HttpResponseServerError
 from django.utils.translation import ugettext as _
 from django.views.decorators import csrf
 from django.views.decorators.http import require_GET, require_POST
 from opaque_keys.edx.keys import CourseKey
+from six import text_type
 
-from courseware.access import has_access
-from util.file import store_uploaded_file
-from courseware.courses import get_course_with_access, get_course_overview_with_access, get_course_by_id
 import django_comment_client.settings as cc_settings
-from django_comment_common.signals import (
-    thread_created,
-    thread_edited,
-    thread_voted,
-    thread_deleted,
-    comment_created,
-    comment_edited,
-    comment_voted,
-    comment_deleted,
-    comment_endorsed,
-)
-from django_comment_common.utils import ThreadContext
+import lms.lib.comment_client as cc
+from courseware.access import has_access
+from courseware.courses import get_course_by_id, get_course_overview_with_access, get_course_with_access
+from django_comment_client.permissions import check_permissions_by_view, get_team, has_permission
 from django_comment_client.utils import (
-    add_courseware_context,
-    get_annotated_content_info,
-    get_ability,
-    is_comment_too_deep,
     JsonError,
     JsonResponse,
-    prepare_content,
-    get_group_id_for_comments_service,
+    add_courseware_context,
     discussion_category_id_access,
+    get_ability,
+    get_annotated_content_info,
     get_cached_discussion_id_map,
+    get_group_id_for_comments_service,
+    get_user_group_ids,
+    is_comment_too_deep,
+    prepare_content
 )
-from django_comment_client.permissions import check_permissions_by_view, has_permission, get_team
-from eventtracking import tracker
-import lms.lib.comment_client as cc
+from django_comment_common.signals import (
+    comment_created,
+    comment_deleted,
+    comment_edited,
+    comment_endorsed,
+    comment_voted,
+    thread_created,
+    thread_deleted,
+    thread_edited,
+    thread_voted,
+    thread_followed,
+    thread_unfollowed,
+)
+from django_comment_common.utils import ThreadContext
+import eventtracking
+from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
+from util.file import store_uploaded_file
 
 log = logging.getLogger(__name__)
 
 TRACKING_MAX_FORUM_BODY = 2000
+TRACKING_MAX_FORUM_TITLE = 1000
 _EVENT_NAME_TEMPLATE = 'edx.forum.{obj_type}.{action_name}'
 
 
@@ -78,7 +84,7 @@ def track_forum_event(request, event_name, course, obj, data, id_map=None):
         role.role for role in user.courseaccessrole_set.filter(course_id=course.id)
     ]
 
-    tracker.emit(event_name, data)
+    eventtracking.tracker.emit(event_name, data)
 
 
 def track_created_event(request, event_name, course, obj, data):
@@ -93,6 +99,11 @@ def track_created_event(request, event_name, course, obj, data):
     track_forum_event(request, event_name, course, obj, data)
 
 
+def add_truncated_title_to_event_data(event_data, full_title):  # pylint: disable=invalid-name
+    event_data['title_truncated'] = (len(full_title) > TRACKING_MAX_FORUM_TITLE)
+    event_data['title'] = full_title[:TRACKING_MAX_FORUM_TITLE]
+
+
 def track_thread_created_event(request, course, thread, followed):
     """
     Send analytics event for a newly created thread.
@@ -102,7 +113,6 @@ def track_thread_created_event(request, course, thread, followed):
         'commentable_id': thread.commentable_id,
         'group_id': thread.get("group_id"),
         'thread_type': thread.thread_type,
-        'title': thread.title,
         'anonymous': thread.anonymous,
         'anonymous_to_peers': thread.anonymous_to_peers,
         'options': {'followed': followed},
@@ -111,6 +121,7 @@ def track_thread_created_event(request, course, thread, followed):
         # However, the view does not contain that data, and including it will
         # likely require changes elsewhere.
     }
+    add_truncated_title_to_event_data(event_data, thread.title)
     track_created_event(request, event_name, course, thread, event_data)
 
 
@@ -149,6 +160,19 @@ def track_voted_event(request, course, obj, vote_value, undo_vote=False):
     track_forum_event(request, event_name, course, obj, event_data)
 
 
+def track_thread_viewed_event(request, course, thread):
+    """
+    Send analytics event for a viewed thread.
+    """
+    event_name = _EVENT_NAME_TEMPLATE.format(obj_type='thread', action_name='viewed')
+    event_data = {}
+    event_data['commentable_id'] = thread.commentable_id
+    if hasattr(thread, 'username'):
+        event_data['target_username'] = thread.username
+    add_truncated_title_to_event_data(event_data, thread.title)
+    track_forum_event(request, event_name, course, thread, event_data)
+
+
 def permitted(func):
     """
     View decorator to verify the user is authorized to access this endpoint.
@@ -162,6 +186,8 @@ def permitted(func):
             """
             Extract the forum object from the keyword arguments to the view.
             """
+            user_group_id = None
+            content_user_group_id = None
             if "thread_id" in kwargs:
                 content = cc.Thread.find(kwargs["thread_id"]).to_dict()
             elif "comment_id" in kwargs:
@@ -170,9 +196,16 @@ def permitted(func):
                 content = cc.Commentable.find(kwargs["commentable_id"]).to_dict()
             else:
                 content = None
-            return content
+
+            if 'username' in content:
+                (user_group_id, content_user_group_id) = get_user_group_ids(course_key, content, request.user)
+            return content, user_group_id, content_user_group_id
+
         course_key = CourseKey.from_string(kwargs['course_id'])
-        if check_permissions_by_view(request.user, course_key, fetch_content(), request.view_name):
+        content, user_group_id, content_user_group_id = fetch_content()
+
+        if check_permissions_by_view(request.user, course_key, content,
+                                     request.view_name, user_group_id, content_user_group_id):
             return func(request, *args, **kwargs)
         else:
             return JsonError("unauthorized", status=401)
@@ -196,7 +229,7 @@ def ajax_content_response(request, course_key, content):
 @permitted
 def create_thread(request, course_id, commentable_id):
     """
-    Given a course and commentble ID, create the thread
+    Given a course and commentable ID, create the thread
     """
 
     log.debug("Creating new thread in %r, id %r", course_id, commentable_id)
@@ -224,7 +257,7 @@ def create_thread(request, course_id, commentable_id):
         'anonymous': anonymous,
         'anonymous_to_peers': anonymous_to_peers,
         'commentable_id': commentable_id,
-        'course_id': course_key.to_deprecated_string(),
+        'course_id': text_type(course_key),
         'user_id': user.id,
         'thread_type': post["thread_type"],
         'body': post["body"],
@@ -239,11 +272,11 @@ def create_thread(request, course_id, commentable_id):
 
     thread = cc.Thread(**params)
 
-    # Cohort the thread if required
+    # Divide the thread if required
     try:
         group_id = get_group_id_for_comments_service(request, course_key, commentable_id)
     except ValueError:
-        return HttpResponseBadRequest("Invalid cohort id")
+        return HttpResponseServerError("Invalid group id for commentable")
     if group_id is not None:
         thread.group_id = group_id
 
@@ -260,6 +293,7 @@ def create_thread(request, course_id, commentable_id):
     if follow:
         cc_user = cc.User.from_django_user(user)
         cc_user.follow(thread)
+        thread_followed.send(sender=None, user=user, post=thread)
 
     data = thread.to_dict()
 
@@ -341,7 +375,7 @@ def _create_comment(request, course_key, thread_id=None, parent_id=None):
         anonymous=anonymous,
         anonymous_to_peers=anonymous_to_peers,
         user_id=user.id,
-        course_id=course_key.to_deprecated_string(),
+        course_id=text_type(course_key),
         thread_id=thread_id,
         parent_id=parent_id,
         body=post["body"]
@@ -494,6 +528,7 @@ def _vote_or_unvote(request, course_id, obj, value='up', undo_vote=False):
         # (People could theoretically downvote by handcrafting AJAX requests.)
     else:
         user.vote(obj, value)
+    thread_voted.send(sender=None, user=request.user, post=obj)
     track_voted_event(request, course, obj, value, undo_vote)
     return JsonResponse(prepare_content(obj.to_dict(), course_key))
 
@@ -532,7 +567,6 @@ def vote_for_thread(request, course_id, thread_id, value):
     """
     thread = cc.Thread.find(thread_id)
     result = _vote_or_unvote(request, course_id, thread, value)
-    thread_voted.send(sender=None, user=request.user, post=thread)
     return result
 
 
@@ -658,6 +692,7 @@ def follow_thread(request, course_id, thread_id):
     user = cc.User.from_django_user(request.user)
     thread = cc.Thread.find(thread_id)
     user.follow(thread)
+    thread_followed.send(sender=None, user=request.user, post=thread)
     return JsonResponse({})
 
 
@@ -686,6 +721,7 @@ def unfollow_thread(request, course_id, thread_id):
     user = cc.User.from_django_user(request.user)
     thread = cc.Thread.find(thread_id)
     user.unfollow(thread)
+    thread_unfollowed.send(sender=None, user=request.user, post=thread)
     return JsonResponse({})
 
 
@@ -716,7 +752,7 @@ def upload(request, course_id):  # ajax upload file to a question or answer
     try:
         # TODO authorization
         #may raise exceptions.PermissionDenied
-        #if request.user.is_anonymous():
+        #if request.user.is_anonymous:
         #    msg = _('Sorry, anonymous users cannot upload files')
         #    raise exceptions.PermissionDenied(msg)
 
@@ -777,6 +813,9 @@ def users(request, course_id):
         get_course_overview_with_access(request.user, 'load', course_key, check_if_enrolled=True)
     except Http404:
         # course didn't exist, or requesting user does not have access to it.
+        return JsonError(status=404)
+    except CourseAccessRedirect:
+        # user does not have access to the course.
         return JsonError(status=404)
 
     try:

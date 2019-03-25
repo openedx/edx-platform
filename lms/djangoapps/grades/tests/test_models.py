@@ -1,36 +1,39 @@
 """
 Unit tests for grades models.
 """
+import json
 from base64 import b64encode
 from collections import OrderedDict
 from datetime import datetime
-import ddt
 from hashlib import sha1
-import json
-from mock import patch
 
-from django.core.exceptions import ValidationError
+import ddt
+import pytz
 from django.db.utils import IntegrityError
 from django.test import TestCase
 from django.utils.timezone import now
 from freezegun import freeze_time
-from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
-from track.event_transaction_utils import get_event_transaction_id, get_event_transaction_type
+from mock import patch
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
 from lms.djangoapps.grades.models import (
+    BLOCK_RECORD_LIST_VERSION,
     BlockRecord,
     BlockRecordList,
-    BLOCK_RECORD_LIST_VERSION,
     PersistentCourseGrade,
     PersistentSubsectionGrade,
+    PersistentSubsectionGradeOverride,
     VisibleBlocks
 )
+from track.event_transaction_utils import get_event_transaction_id, get_event_transaction_type
 
 
 class BlockRecordListTestCase(TestCase):
     """
     Verify the behavior of BlockRecordList, particularly around edge cases
     """
+    shard = 4
+
     def setUp(self):
         super(BlockRecordListTestCase, self).setUp()
         self.course_key = CourseLocator(
@@ -87,8 +90,7 @@ class BlockRecordTest(GradesModelTestCase):
     """
     Test the BlockRecord model.
     """
-    def setUp(self):
-        super(BlockRecordTest, self).setUp()
+    shard = 4
 
     def test_creation(self):
         """
@@ -128,11 +130,18 @@ class VisibleBlocksTest(GradesModelTestCase):
     """
     Test the VisibleBlocks model.
     """
-    def _create_block_record_list(self, blocks):
+    shard = 4
+
+    def setUp(self):
+        super(VisibleBlocksTest, self).setUp()
+        self.user_id = 12345
+
+    def _create_block_record_list(self, blocks, user_id=None):
         """
         Creates and returns a BlockRecordList for the given blocks.
         """
-        return VisibleBlocks.objects.create_from_blockrecords(BlockRecordList.from_list(blocks, self.course_key))
+        block_record_list = BlockRecordList.from_list(blocks, self.course_key)
+        return VisibleBlocks.cached_get_or_create(user_id or self.user_id, block_record_list)
 
     def test_creation(self):
         """
@@ -195,6 +204,8 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
     """
     Test the PersistentSubsectionGrade model.
     """
+    shard = 4
+
     def setUp(self):
         super(PersistentSubsectionGradeTest, self).setUp()
         self.usage_key = BlockUsageLocator(
@@ -207,54 +218,39 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
             "user_id": 12345,
             "usage_key": self.usage_key,
             "course_version": "deadbeef",
-            "subtree_edited_timestamp": "2016-08-01 18:53:24.354741",
+            "subtree_edited_timestamp": "2016-08-01 18:53:24.354741Z",
             "earned_all": 6.0,
             "possible_all": 12.0,
             "earned_graded": 6.0,
             "possible_graded": 8.0,
             "visible_blocks": self.block_records,
-            "attempted": True,
+            "first_attempted": datetime(2000, 1, 1, 12, 30, 45, tzinfo=pytz.UTC),
         }
 
-    def test_create(self):
-        """
-        Tests model creation, and confirms error when trying to recreate model.
-        """
-        created_grade = PersistentSubsectionGrade.create_grade(**self.params)
-        with self.assertNumQueries(1):
-            read_grade = PersistentSubsectionGrade.read_grade(
-                user_id=self.params["user_id"],
-                usage_key=self.params["usage_key"],
-            )
-            self.assertEqual(created_grade, read_grade)
-            self.assertEqual(read_grade.visible_blocks.blocks, self.block_records)
-        with self.assertRaises(ValidationError):
-            PersistentSubsectionGrade.create_grade(**self.params)
-
-    def test_optional_fields(self):
-        del self.params["course_version"]
-        PersistentSubsectionGrade.create_grade(**self.params)
+    @ddt.data('course_version', 'subtree_edited_timestamp')
+    def test_optional_fields(self, field):
+        del self.params[field]
+        PersistentSubsectionGrade.update_or_create_grade(**self.params)
 
     @ddt.data(
-        ("user_id", ValidationError),
+        ("user_id", KeyError),
         ("usage_key", KeyError),
-        ("subtree_edited_timestamp", ValidationError),
-        ("earned_all", ValidationError),
-        ("possible_all", ValidationError),
-        ("earned_graded", ValidationError),
-        ("possible_graded", ValidationError),
+        ("earned_all", IntegrityError),
+        ("possible_all", IntegrityError),
+        ("earned_graded", IntegrityError),
+        ("possible_graded", IntegrityError),
         ("visible_blocks", KeyError),
-        ("attempted", KeyError),
+        ("first_attempted", KeyError),
     )
     @ddt.unpack
     def test_non_optional_fields(self, field, error):
         del self.params[field]
         with self.assertRaises(error):
-            PersistentSubsectionGrade.create_grade(**self.params)
+            PersistentSubsectionGrade.update_or_create_grade(**self.params)
 
     @ddt.data(True, False)
     def test_update_or_create_grade(self, already_created):
-        created_grade = PersistentSubsectionGrade.create_grade(**self.params) if already_created else None
+        created_grade = PersistentSubsectionGrade.update_or_create_grade(**self.params) if already_created else None
 
         self.params["earned_all"] = 7
         updated_grade = PersistentSubsectionGrade.update_or_create_grade(**self.params)
@@ -263,53 +259,53 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
             self.assertEqual(created_grade.id, updated_grade.id)
             self.assertEqual(created_grade.earned_all, 6)
 
-    def test_update_or_create_attempted(self):
-        grade = PersistentSubsectionGrade.update_or_create_grade(**self.params)
-        self.assertIsInstance(grade.first_attempted, datetime)
+        with self.assertNumQueries(1):
+            read_grade = PersistentSubsectionGrade.read_grade(
+                user_id=self.params["user_id"],
+                usage_key=self.params["usage_key"],
+            )
+            self.assertEqual(updated_grade, read_grade)
+            self.assertEqual(read_grade.visible_blocks.blocks, self.block_records)
 
     def test_unattempted(self):
-        self.params['attempted'] = False
+        self.params['first_attempted'] = None
         self.params['earned_all'] = 0.0
         self.params['earned_graded'] = 0.0
-        grade = PersistentSubsectionGrade.create_grade(**self.params)
+        grade = PersistentSubsectionGrade.update_or_create_grade(**self.params)
         self.assertIsNone(grade.first_attempted)
         self.assertEqual(grade.earned_all, 0.0)
         self.assertEqual(grade.earned_graded, 0.0)
 
-    def test_create_inconsistent_unattempted(self):
-        self.params['attempted'] = False
-        with self.assertRaises(ValidationError):
-            PersistentSubsectionGrade.create_grade(**self.params)
-
-    def test_update_or_create_inconsistent_unattempted(self):
-        self.params['attempted'] = False
-        self.params['earned_all'] = 1.0
-        self.params['earned_graded'] = 1.0
-        with self.assertRaises(ValidationError):
-            PersistentSubsectionGrade.update_or_create_grade(**self.params)
-
     def test_first_attempted_not_changed_on_update(self):
-        PersistentSubsectionGrade.create_grade(**self.params)
+        PersistentSubsectionGrade.update_or_create_grade(**self.params)
         moment = now()
         grade = PersistentSubsectionGrade.update_or_create_grade(**self.params)
         self.assertLess(grade.first_attempted, moment)
 
     def test_unattempted_save_does_not_remove_attempt(self):
-        PersistentSubsectionGrade.create_grade(**self.params)
-        self.params['attempted'] = False
+        PersistentSubsectionGrade.update_or_create_grade(**self.params)
+        self.params['first_attempted'] = None
         grade = PersistentSubsectionGrade.update_or_create_grade(**self.params)
         self.assertIsInstance(grade.first_attempted, datetime)
         self.assertEqual(grade.earned_all, 6.0)
 
     def test_update_or_create_event(self):
-        with patch('lms.djangoapps.grades.models.tracker') as tracker_mock:
+        with patch('lms.djangoapps.grades.events.tracker') as tracker_mock:
             grade = PersistentSubsectionGrade.update_or_create_grade(**self.params)
         self._assert_tracker_emitted_event(tracker_mock, grade)
 
     def test_create_event(self):
-        with patch('lms.djangoapps.grades.models.tracker') as tracker_mock:
-            grade = PersistentSubsectionGrade.create_grade(**self.params)
+        with patch('lms.djangoapps.grades.events.tracker') as tracker_mock:
+            grade = PersistentSubsectionGrade.update_or_create_grade(**self.params)
         self._assert_tracker_emitted_event(tracker_mock, grade)
+
+    def test_grade_override(self):
+        grade = PersistentSubsectionGrade.update_or_create_grade(**self.params)
+        override = PersistentSubsectionGradeOverride(grade=grade, earned_all_override=0.0, earned_graded_override=0.0)
+        override.save()
+        grade = PersistentSubsectionGrade.update_or_create_grade(**self.params)
+        self.assertEqual(grade.earned_all, 0.0)
+        self.assertEqual(grade.earned_graded, 0.0)
 
     def _assert_tracker_emitted_event(self, tracker_mock, grade):
         """
@@ -341,6 +337,8 @@ class PersistentCourseGradesTest(GradesModelTestCase):
     """
     Tests the PersistentCourseGrade model.
     """
+    shard = 4
+
     def setUp(self):
         super(PersistentCourseGradesTest, self).setUp()
         self.params = {
@@ -355,6 +353,7 @@ class PersistentCourseGradesTest(GradesModelTestCase):
                 minute=53,
                 second=24,
                 microsecond=354741,
+                tzinfo=pytz.UTC,
             ),
             "percent_grade": 77.7,
             "letter_grade": "Great job",
@@ -362,10 +361,10 @@ class PersistentCourseGradesTest(GradesModelTestCase):
         }
 
     def test_update(self):
-        created_grade = PersistentCourseGrade.update_or_create_course_grade(**self.params)
+        created_grade = PersistentCourseGrade.update_or_create(**self.params)
         self.params["percent_grade"] = 88.8
         self.params["letter_grade"] = "Better job"
-        updated_grade = PersistentCourseGrade.update_or_create_course_grade(**self.params)
+        updated_grade = PersistentCourseGrade.update_or_create(**self.params)
         self.assertEqual(updated_grade.percent_grade, 88.8)
         self.assertEqual(updated_grade.letter_grade, "Better job")
         self.assertEqual(created_grade.id, updated_grade.id)
@@ -377,7 +376,7 @@ class PersistentCourseGradesTest(GradesModelTestCase):
             u'letter_grade': u'',
             u'passed': False,
         })
-        grade = PersistentCourseGrade.update_or_create_course_grade(**self.params)
+        grade = PersistentCourseGrade.update_or_create(**self.params)
         self.assertIsNone(grade.passed_timestamp)
 
         # After the user earns a passing grade, the passed_timestamp is set
@@ -386,7 +385,7 @@ class PersistentCourseGradesTest(GradesModelTestCase):
             u'letter_grade': u'C',
             u'passed': True,
         })
-        grade = PersistentCourseGrade.update_or_create_course_grade(**self.params)
+        grade = PersistentCourseGrade.update_or_create(**self.params)
         passed_timestamp = grade.passed_timestamp
         self.assertEqual(grade.letter_grade, u'C')
         self.assertIsInstance(passed_timestamp, datetime)
@@ -398,28 +397,28 @@ class PersistentCourseGradesTest(GradesModelTestCase):
             u'letter_grade': u'A',
             u'passed': True,
         })
-        grade = PersistentCourseGrade.update_or_create_course_grade(**self.params)
+        grade = PersistentCourseGrade.update_or_create(**self.params)
         self.assertEqual(grade.letter_grade, u'A')
         self.assertEqual(grade.passed_timestamp, passed_timestamp)
 
-        # If the grade later reverts to a failing grade, they keep their passed_timestamp
+        # If the grade later reverts to a failing grade, passed_timestamp remains the same.
         self.params.update({
             u'percent_grade': 20.0,
             u'letter_grade': u'',
             u'passed': False,
         })
-        grade = PersistentCourseGrade.update_or_create_course_grade(**self.params)
+        grade = PersistentCourseGrade.update_or_create(**self.params)
         self.assertEqual(grade.letter_grade, u'')
         self.assertEqual(grade.passed_timestamp, passed_timestamp)
 
-    @freeze_time(now())
     def test_passed_timestamp_is_now(self):
-        grade = PersistentCourseGrade.update_or_create_course_grade(**self.params)
-        self.assertEqual(now(), grade.passed_timestamp)
+        with freeze_time(now()):
+            grade = PersistentCourseGrade.update_or_create(**self.params)
+            self.assertEqual(now(), grade.passed_timestamp)
 
     def test_create_and_read_grade(self):
-        created_grade = PersistentCourseGrade.update_or_create_course_grade(**self.params)
-        read_grade = PersistentCourseGrade.read_course_grade(self.params["user_id"], self.params["course_id"])
+        created_grade = PersistentCourseGrade.update_or_create(**self.params)
+        read_grade = PersistentCourseGrade.read(self.params["user_id"], self.params["course_id"])
         for param in self.params:
             if param == u'passed':
                 continue  # passed/passed_timestamp takes special handling, and is tested separately
@@ -427,10 +426,11 @@ class PersistentCourseGradesTest(GradesModelTestCase):
         self.assertIsInstance(created_grade.passed_timestamp, datetime)
         self.assertEqual(created_grade, read_grade)
 
-    def test_course_version_optional(self):
-        del self.params["course_version"]
-        grade = PersistentCourseGrade.update_or_create_course_grade(**self.params)
-        self.assertEqual("", grade.course_version)
+    @ddt.data('course_version', 'course_edited_timestamp')
+    def test_optional_fields(self, field):
+        del self.params[field]
+        grade = PersistentCourseGrade.update_or_create(**self.params)
+        self.assertFalse(getattr(grade, field))
 
     @ddt.data(
         ("percent_grade", "Not a float at all", ValueError),
@@ -444,15 +444,15 @@ class PersistentCourseGradesTest(GradesModelTestCase):
     def test_update_or_create_with_bad_params(self, param, val, error):
         self.params[param] = val
         with self.assertRaises(error):
-            PersistentCourseGrade.update_or_create_course_grade(**self.params)
+            PersistentCourseGrade.update_or_create(**self.params)
 
     def test_grade_does_not_exist(self):
         with self.assertRaises(PersistentCourseGrade.DoesNotExist):
-            PersistentCourseGrade.read_course_grade(self.params["user_id"], self.params["course_id"])
+            PersistentCourseGrade.read(self.params["user_id"], self.params["course_id"])
 
     def test_update_or_create_event(self):
-        with patch('lms.djangoapps.grades.models.tracker') as tracker_mock:
-            grade = PersistentCourseGrade.update_or_create_course_grade(**self.params)
+        with patch('lms.djangoapps.grades.events.tracker') as tracker_mock:
+            grade = PersistentCourseGrade.update_or_create(**self.params)
         self._assert_tracker_emitted_event(tracker_mock, grade)
 
     def _assert_tracker_emitted_event(self, tracker_mock, grade):

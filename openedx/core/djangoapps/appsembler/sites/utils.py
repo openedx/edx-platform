@@ -14,6 +14,8 @@ from provider.oauth2.models import AccessToken, RefreshToken, Client
 from django.utils.text import slugify
 
 from organizations.api import add_organization
+from organizations import api as org_api
+from organizations import models as org_models
 from organizations.models import UserOrganizationMapping, Organization, UserSiteMapping
 
 from openedx.core.djangoapps.theming.models import SiteTheme
@@ -184,11 +186,16 @@ def get_initial_sass_variables():
 
 def get_branding_values_from_file():
     from openedx.core.djangoapps.theming.helpers import get_theme_base_dir, Theme
+
+    if not settings.ENABLE_COMPREHENSIVE_THEMING:
+        return {}
+
     site_theme = SiteTheme(site=Site.objects.get(id=settings.SITE_ID), theme_dir_name=settings.DEFAULT_SITE_THEME)
     theme = Theme(
         name=site_theme.theme_dir_name,
         theme_dir_name=site_theme.theme_dir_name,
-        themes_base_dir=get_theme_base_dir(site_theme.theme_dir_name)
+        themes_base_dir=get_theme_base_dir(site_theme.theme_dir_name),
+        project_root=settings.PROJECT_ROOT,
     )
     if theme:
         sass_var_file = os.path.join(theme.customer_specific_path, 'static',
@@ -202,6 +209,10 @@ def get_branding_values_from_file():
 
 
 def get_branding_labels_from_file(custom_branding=None):
+
+    if not settings.ENABLE_COMPREHENSIVE_THEMING:
+        return []
+
     css_output = compile_sass('_brand.scss', custom_branding)
     css_rules = cssutils.parseString(css_output, validate=False).cssRules
     labels = []
@@ -221,7 +232,8 @@ def compile_sass(sass_file, custom_branding=None):
     theme = Theme(
         name=site_theme.theme_dir_name,
         theme_dir_name=site_theme.theme_dir_name,
-        themes_base_dir=get_theme_base_dir(site_theme.theme_dir_name)
+        themes_base_dir=get_theme_base_dir(site_theme.theme_dir_name),
+        project_root=settings.PROJECT_ROOT,
     )
     sass_var_file = os.path.join(theme.path, 'static', 'sass', sass_file)
     customer_specific_includes = os.path.join(theme.customer_specific_path, 'static', 'sass')
@@ -271,12 +283,12 @@ def bootstrap_site(site, org_data=None, user_email=None):
     site.configuration_id = site_config.id
     # temp workarounds while old staging is still up and running
     if organization_slug:
-        organization_data = add_organization({
+        organization_data = org_api.add_organization({
             'name': organization_slug,
             'short_name': organization_slug,
             'edx_uuid': org_data.get('edx_uuid')
         })
-        organization = Organization.objects.get(id=organization_data.get('id'))
+        organization = org_models.Organization.objects.get(id=organization_data.get('id'))
         organization.sites.add(site)
         site_config.values['course_org_filter'] = organization_slug
         site_config.save()
@@ -284,7 +296,7 @@ def bootstrap_site(site, org_data=None, user_email=None):
         organization = {}
     if user_email:
         user = User.objects.get(email=user_email)
-        UserOrganizationMapping.objects.create(user=user, organization=organization, is_amc_admin=True)
+        org_models.UserOrganizationMapping.objects.create(user=user, organization=organization, is_amc_admin=True)
     else:
         user = {}
     return organization, site, user

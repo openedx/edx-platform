@@ -2,16 +2,19 @@ import sys
 
 from django.contrib.sites.models import Site
 from django.conf import settings
-from django.core.management.base import NoArgsCommand
+try:
+    from django.core.management.base import NoArgsCommand as BaseCommand
+except ImportError:
+    from django.core.management.base import BaseCommand
 
 
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 
 
-class Command(NoArgsCommand):
+class Command(BaseCommand):
     help = 'Create default SiteConfiguration for the default SITE_ID.'
 
-    def handle_noargs(self, **options):
+    def handle(self, *args, **options):
         s = Site.objects.get(id=settings.SITE_ID)
 
         try:

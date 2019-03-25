@@ -1,12 +1,13 @@
 # pylint: disable=missing-docstring
 # pylint: disable=redefined-outer-name
 
-from lettuce import world, step
-from common import *
-from terrain.steps import reload_the_page
+from lettuce import step, world
+from nose.tools import assert_equal, assert_in, assert_not_equal
 from selenium.common.exceptions import InvalidElementStateException
+
+from common import *
 from contentstore.utils import reverse_course_url
-from nose.tools import assert_in, assert_equal, assert_not_equal
+from terrain.steps import reload_the_page
 
 
 @step(u'I am viewing the grading settings')

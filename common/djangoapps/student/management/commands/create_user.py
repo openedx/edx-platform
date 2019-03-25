@@ -1,16 +1,16 @@
-from optparse import make_option
+from __future__ import print_function
 
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.management.base import BaseCommand
 from django.utils import translation
 
-from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from six import text_type
+
 from student.forms import AccountCreationForm
+from student.helpers import do_create_account
 from student.models import CourseEnrollment, create_comments_service_user
-from student.views import _do_create_account, AccountValidationError
+from student.views import AccountValidationError
 from track.management.tracked_command import TrackedCommand
 
 
@@ -25,61 +25,39 @@ class Command(TrackedCommand):
         manage.py ... create_user -e test@example.com -p insecure -c edX/Open_DemoX/edx_demo_course -m verified
     """
 
-    option_list = BaseCommand.option_list + (
-        make_option('-m', '--mode',
-                    metavar='ENROLLMENT_MODE',
-                    dest='mode',
-                    default='honor',
-                    choices=('audit', 'verified', 'honor'),
-                    help='Enrollment type for user for a specific course'),
-        make_option('-u', '--username',
-                    metavar='USERNAME',
-                    dest='username',
-                    default=None,
-                    help='Username, defaults to "user" in the email'),
-        make_option('-n', '--name',
-                    metavar='NAME',
-                    dest='name',
-                    default=None,
-                    help='Name, defaults to "user" in the email'),
-        make_option('-p', '--password',
-                    metavar='PASSWORD',
-                    dest='password',
-                    default=None,
-                    help='Password for user'),
-        make_option('-e', '--email',
-                    metavar='EMAIL',
-                    dest='email',
-                    default=None,
-                    help='Email for user'),
-        make_option('-c', '--course',
-                    metavar='COURSE_ID',
-                    dest='course',
-                    default=None,
-                    help='course to enroll the user in (optional)'),
-        make_option('-s', '--staff',
-                    dest='staff',
-                    default=False,
-                    action='store_true',
-                    help='give user the staff bit'),
-    )
+    def add_arguments(self, parser):
+        parser.add_argument('-m', '--mode',
+                            metavar='ENROLLMENT_MODE',
+                            default='honor',
+                            choices=('audit', 'verified', 'honor'),
+                            help='Enrollment type for user for a specific course, defaults to "honor"')
+        parser.add_argument('-u', '--username',
+                            metavar='USERNAME',
+                            help='Username, defaults to "user" in the email')
+        parser.add_argument('-n', '--proper_name',
+                            metavar='NAME',
+                            help='Name, defaults to "user" in the email')
+        parser.add_argument('-p', '--password',
+                            metavar='PASSWORD',
+                            help='Password for user',
+                            required=True)
+        parser.add_argument('-e', '--email',
+                            metavar='EMAIL',
+                            help='Email for user',
+                            required=True)
+        parser.add_argument('-c', '--course',
+                            metavar='COURSE_ID',
+                            help='Course to enroll the user in (optional)')
+        parser.add_argument('-s', '--staff',
+                            action='store_true',
+                            help='Give user the staff bit, defaults to off')
 
     def handle(self, *args, **options):
-        username = options['username']
-        name = options['name']
-        if not username:
-            username = options['email'].split('@')[0]
-        if not name:
-            name = options['email'].split('@')[0]
+        username = options['username'] if options['username'] else options['email'].split('@')[0]
+        name = options['proper_name'] if options['proper_name'] else options['email'].split('@')[0]
 
         # parse out the course into a coursekey
-        if options['course']:
-            try:
-                course = CourseKey.from_string(options['course'])
-            # if it's not a new-style course key, parse it from an old-style
-            # course key
-            except InvalidKeyError:
-                course = SlashSeparatedCourseKey.from_deprecated_string(options['course'])
+        course = CourseKey.from_string(options['course']) if options['course'] else None
 
         form = AccountCreationForm(
             data={
@@ -90,13 +68,15 @@ class Command(TrackedCommand):
             },
             tos_required=False
         )
+
         # django.utils.translation.get_language() will be used to set the new
         # user's preferred language.  This line ensures that the result will
         # match this installation's default locale.  Otherwise, inside a
         # management command, it will always return "en-us".
         translation.activate(settings.LANGUAGE_CODE)
+
         try:
-            user, _, reg = _do_create_account(form)
+            user, _, reg = do_create_account(form)
             if options['staff']:
                 user.is_staff = True
                 user.save()
@@ -104,8 +84,10 @@ class Command(TrackedCommand):
             reg.save()
             create_comments_service_user(user)
         except AccountValidationError as e:
-            print e.message
+            print(text_type(e))
             user = User.objects.get(email=options['email'])
-        if options['course']:
+
+        if course:
             CourseEnrollment.enroll(user, course, mode=options['mode'])
+
         translation.deactivate()

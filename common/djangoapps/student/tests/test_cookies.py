@@ -3,14 +3,15 @@ from __future__ import unicode_literals
 
 import six
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import RequestFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
+from openedx.core.djangoapps.user_api.accounts.utils import retrieve_last_sitewide_block_completed
 from student.cookies import get_user_info_cookie_data
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class CookieTests(SharedModuleStoreTestCase):
@@ -26,6 +27,7 @@ class CookieTests(SharedModuleStoreTestCase):
     def _get_expected_header_urls(self, request):
         expected_header_urls = {
             'logout': reverse('logout'),
+            'resume_block': retrieve_last_sitewide_block_completed(self.user.username)
         }
 
         # Studio (CMS) does not have the URLs below

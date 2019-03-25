@@ -11,7 +11,6 @@ from openedx.core.djangoapps.site_configuration import helpers
 
 from .transformers import EventTransformerRegistry
 
-
 CONTEXT_FIELDS_TO_INCLUDE = [
     'username',
     'session',

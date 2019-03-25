@@ -2,26 +2,27 @@
 """
 Acceptance tests for studio related to the outline page.
 """
+import itertools
 import json
 from datetime import datetime, timedelta
-import itertools
-from pytz import UTC
-from bok_choy.promise import EmptyPromise
-from nose.plugins.attrib import attr
+from unittest import skip
 
-from common.test.acceptance.pages.studio.settings_advanced import AdvancedSettingsPage
-from common.test.acceptance.pages.studio.overview import CourseOutlinePage, ContainerPage, ExpandCollapseLinkState
-from common.test.acceptance.pages.studio.utils import add_discussion, drag, verify_ordering
-from common.test.acceptance.pages.lms.courseware import CoursewarePage
-from common.test.acceptance.pages.lms.course_nav import CourseNavPage
-from common.test.acceptance.pages.lms.staff_view import StaffPage
-from common.test.acceptance.fixtures.config import ConfigModelFixture
-from common.test.acceptance.fixtures.course import XBlockFixtureDesc
+from nose.plugins.attrib import attr
+from pytz import UTC
 
 from base_studio_test import StudioCourseTest
-from common.test.acceptance.tests.helpers import load_data_str, disable_animations
+from common.test.acceptance.fixtures.config import ConfigModelFixture
+from common.test.acceptance.fixtures.course import XBlockFixtureDesc
+from common.test.acceptance.pages.common.utils import add_enrollment_course_modes
+from common.test.acceptance.pages.lms.course_home import CourseHomePage
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.progress import ProgressPage
-
+from common.test.acceptance.pages.lms.staff_view import StaffCoursewarePage
+from common.test.acceptance.pages.studio.overview import ContainerPage, CourseOutlinePage, ExpandCollapseLinkState
+from common.test.acceptance.pages.studio.settings_advanced import AdvancedSettingsPage
+from common.test.acceptance.pages.studio.settings_group_configurations import GroupConfigurationsPage
+from common.test.acceptance.pages.studio.utils import add_discussion, drag, verify_ordering
+from common.test.acceptance.tests.helpers import disable_animations, load_data_str
 
 SECTION_NAME = 'Test Section'
 SUBSECTION_NAME = 'Test Subsection'
@@ -115,6 +116,7 @@ class CourseOutlineDragAndDropTest(CourseOutlineTest):
             expected_ordering
         )
 
+    @skip("Fails in Firefox 45 but passes in Chrome")
     def test_drop_unit_in_collapsed_subsection(self):
         """
         Drag vertical "1.1.2" from subsection "1.1" into collapsed subsection "1.2" which already
@@ -495,6 +497,85 @@ class EditingSectionsTest(CourseOutlineTest):
 
 
 @attr(shard=3)
+class UnitAccessTest(CourseOutlineTest):
+    """
+    Feature: Units can be restricted and unrestricted to certain groups from the course outline.
+    """
+
+    __test__ = True
+
+    def setUp(self):
+        super(UnitAccessTest, self).setUp()
+        self.group_configurations_page = GroupConfigurationsPage(
+            self.browser,
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        )
+        self.content_group_a = "Test Group A"
+        self.content_group_b = "Test Group B"
+
+        self.group_configurations_page.visit()
+        self.group_configurations_page.create_first_content_group()
+        config_a = self.group_configurations_page.content_groups[0]
+        config_a.name = self.content_group_a
+        config_a.save()
+        self.content_group_a_id = config_a.id
+
+        self.group_configurations_page.add_content_group()
+        config_b = self.group_configurations_page.content_groups[1]
+        config_b.name = self.content_group_b
+        config_b.save()
+        self.content_group_b_id = config_b.id
+
+    def populate_course_fixture(self, course_fixture):
+        """
+        Create a course with one section, one subsection, and two units
+        """
+        # with collapsed outline
+        self.chap_1_handle = 0
+        self.chap_1_seq_1_handle = 1
+
+        # with first sequential expanded
+        self.seq_1_vert_1_handle = 2
+        self.seq_1_vert_2_handle = 3
+        self.chap_1_seq_2_handle = 4
+
+        course_fixture.add_children(
+            XBlockFixtureDesc('chapter', "1").add_children(
+                XBlockFixtureDesc('sequential', '1.1').add_children(
+                    XBlockFixtureDesc('vertical', '1.1.1'),
+                    XBlockFixtureDesc('vertical', '1.1.2')
+                )
+            )
+        )
+
+    def _set_restriction_on_unrestricted_unit(self, unit):
+        """
+        Restrict unit access to a certain group and confirm that a
+        warning is displayed.  Then, remove the access restriction
+        and verify that the warning no longer appears.
+        """
+        self.assertFalse(unit.has_restricted_warning)
+        unit.toggle_unit_access('Content Groups', [self.content_group_a_id])
+        self.assertTrue(unit.has_restricted_warning)
+        unit.toggle_unit_access('Content Groups', [self.content_group_a_id])
+        self.assertFalse(unit.has_restricted_warning)
+
+    def test_units_can_be_restricted(self):
+        """
+        Visit the course outline page, restrict access to a unit.
+        Verify that there is a restricted group warning.
+        Remove the group access restriction and verify that there
+        is no longer a warning.
+        """
+        self.course_outline_page.visit()
+        self.course_outline_page.expand_all_subsections()
+        unit = self.course_outline_page.section_at(0).subsection_at(0).unit_at(0)
+        self._set_restriction_on_unrestricted_unit(unit)
+
+
+@attr(shard=14)
 class StaffLockTest(CourseOutlineTest):
     """
     Feature: Sections, subsections, and units can be locked and unlocked from the course outline.
@@ -730,38 +811,22 @@ class StaffLockTest(CourseOutlineTest):
             Given I have a course with two sections
             When I enable explicit staff lock on one section
             And I click the View Live button to switch to staff view
-            Then I see two sections in the sidebar
+            And I visit the course home with the outline
+            Then I see two sections in the outline
             And when I switch the view mode to student view
-            Then I see one section in the sidebar
+            Then I see one section in the outline
         """
         self.course_outline_page.visit()
         self.course_outline_page.add_section_from_top_button()
         self.course_outline_page.section_at(1).set_staff_lock(True)
         self.course_outline_page.view_live()
-        courseware = CoursewarePage(self.browser, self.course_id)
-        courseware.wait_for_page()
-        self.assertEqual(courseware.num_sections, 2)
-        StaffPage(self.browser, self.course_id).set_staff_view_mode('Student')
-        self.assertEqual(courseware.num_sections, 1)
 
-    def test_locked_subsections_do_not_appear_in_lms(self):
-        """
-        Scenario: A locked subsection is not visible to students in the LMS
-            Given I have a course with two subsections
-            When I enable explicit staff lock on one subsection
-            And I click the View Live button to switch to staff view
-            Then I see two subsections in the sidebar
-            And when I switch the view mode to student view
-            Then I see one section in the sidebar
-        """
-        self.course_outline_page.visit()
-        self.course_outline_page.section_at(0).subsection_at(1).set_staff_lock(True)
-        self.course_outline_page.view_live()
-        courseware = CoursewarePage(self.browser, self.course_id)
-        courseware.wait_for_page()
-        self.assertEqual(courseware.num_subsections, 2)
-        StaffPage(self.browser, self.course_id).set_staff_view_mode('Student')
-        self.assertEqual(courseware.num_subsections, 1)
+        course_home_page = CourseHomePage(self.browser, self.course_id)
+        course_home_page.visit()
+        course_home_page.wait_for_page()
+        self.assertEqual(course_home_page.outline.num_sections, 2)
+        course_home_page.preview.set_staff_view_mode('Learner')
+        self.assertEqual(course_home_page.outline.num_sections, 1)
 
     def test_toggling_staff_lock_on_section_does_not_publish_draft_units(self):
         """
@@ -876,7 +941,7 @@ class StaffLockTest(CourseOutlineTest):
         self._remove_staff_lock_and_verify_warning(subsection, False)
 
 
-@attr(shard=3)
+@attr(shard=14)
 class EditNamesTest(CourseOutlineTest):
     """
     Feature: Click-to-edit section/subsection names
@@ -992,7 +1057,7 @@ class EditNamesTest(CourseOutlineTest):
         self.assertTrue(self.course_outline_page.section_at(0).is_collapsed)
 
 
-@attr(shard=3)
+@attr(shard=14)
 class CreateSectionsTest(CourseOutlineTest):
     """
     Feature: Create new sections/subsections/units
@@ -1079,7 +1144,7 @@ class CreateSectionsTest(CourseOutlineTest):
         self.assertTrue(unit_page.is_inline_editing_display_name())
 
 
-@attr(shard=3)
+@attr(shard=14)
 class DeleteContentTest(CourseOutlineTest):
     """
     Feature: Deleting sections/subsections/units
@@ -1191,7 +1256,7 @@ class DeleteContentTest(CourseOutlineTest):
         self.assertTrue(self.course_outline_page.has_no_content_message)
 
 
-@attr(shard=3)
+@attr(shard=14)
 class ExpandCollapseMultipleSectionsTest(CourseOutlineTest):
     """
     Feature: Courses with multiple sections can expand and collapse all sections.
@@ -1327,7 +1392,7 @@ class ExpandCollapseMultipleSectionsTest(CourseOutlineTest):
         self.verify_all_sections(collapsed=False)
 
 
-@attr(shard=3)
+@attr(shard=14)
 class ExpandCollapseSingleSectionTest(CourseOutlineTest):
     """
     Feature: Courses with a single section can expand and collapse all sections.
@@ -1367,7 +1432,7 @@ class ExpandCollapseSingleSectionTest(CourseOutlineTest):
         self.assertFalse(self.course_outline_page.section_at(0).subsection_at(1).is_collapsed)
 
 
-@attr(shard=3)
+@attr(shard=14)
 class ExpandCollapseEmptyTest(CourseOutlineTest):
     """
     Feature: Courses with no sections initially can expand and collapse all sections after addition.
@@ -1405,7 +1470,7 @@ class ExpandCollapseEmptyTest(CourseOutlineTest):
         self.assertFalse(self.course_outline_page.section_at(0).is_collapsed)
 
 
-@attr(shard=3)
+@attr(shard=14)
 class DefaultStatesEmptyTest(CourseOutlineTest):
     """
     Feature: Misc course outline default states/actions when starting with an empty course
@@ -1430,7 +1495,7 @@ class DefaultStatesEmptyTest(CourseOutlineTest):
         self.assertTrue(self.course_outline_page.bottom_add_section_button.is_present())
 
 
-@attr(shard=3)
+@attr(shard=14)
 class DefaultStatesContentTest(CourseOutlineTest):
     """
     Feature: Misc course outline default states/actions when starting with a course with content
@@ -1455,7 +1520,7 @@ class DefaultStatesContentTest(CourseOutlineTest):
         self.assertEqual(courseware.xblock_component_type(2), 'discussion')
 
 
-@attr(shard=3)
+@attr(shard=7)
 class UnitNavigationTest(CourseOutlineTest):
     """
     Feature: Navigate to units
@@ -1476,7 +1541,7 @@ class UnitNavigationTest(CourseOutlineTest):
         unit.wait_for_page()
 
 
-@attr(shard=3)
+@attr(shard=7)
 class PublishSectionTest(CourseOutlineTest):
     """
     Feature: Publish sections.
@@ -1490,7 +1555,7 @@ class PublishSectionTest(CourseOutlineTest):
         The first subsection has 2 units, and the second subsection has one unit.
         """
         self.courseware = CoursewarePage(self.browser, self.course_id)
-        self.course_nav = CourseNavPage(self.browser)
+        self.course_home_page = CourseHomePage(self.browser, self.course_id)
         course_fixture.add_children(
             XBlockFixtureDesc('chapter', SECTION_NAME).add_children(
                 XBlockFixtureDesc('sequential', SUBSECTION_NAME).add_children(
@@ -1578,7 +1643,8 @@ class PublishSectionTest(CourseOutlineTest):
         self.assertEqual(1, self.courseware.num_xblock_components)
         self.courseware.go_to_sequential_position(2)
         self.assertEqual(1, self.courseware.num_xblock_components)
-        self.course_nav.go_to_section(SECTION_NAME, 'Test Subsection 2')
+        self.course_home_page.visit()
+        self.course_home_page.outline.go_to_section(SECTION_NAME, 'Test Subsection 2')
         self.assertEqual(1, self.courseware.num_xblock_components)
 
     def _add_unpublished_content(self):
@@ -1602,7 +1668,7 @@ class PublishSectionTest(CourseOutlineTest):
         return (section, subsection, unit)
 
 
-@attr(shard=3)
+@attr(shard=7)
 class DeprecationWarningMessageTest(CourseOutlineTest):
     """
     Feature: Verify deprecation warning message.

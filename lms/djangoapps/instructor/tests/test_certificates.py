@@ -1,35 +1,42 @@
 """Tests for the certificates panel of the instructor dash. """
 import contextlib
-import ddt
-import mock
+import io
 import json
-import pytz
-
 from datetime import datetime, timedelta
 
-from nose.plugins.attrib import attr
-from django.core.urlresolvers import reverse
-from django.core.exceptions import ObjectDoesNotExist
-from django.test.utils import override_settings
+import ddt
+import mock
+import pytz
+from config_models.models import cache
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.urls import reverse
+from django.test.utils import override_settings
+from nose.plugins.attrib import attr
 
-from course_modes.models import CourseMode
 from capa.xqueue_interface import XQueueInterface
+from lms.djangoapps.certificates import api as certs_api
+from lms.djangoapps.certificates.models import (
+    CertificateGenerationConfiguration,
+    CertificateInvalidation,
+    CertificateStatuses,
+    CertificateWhitelist,
+    GeneratedCertificate
+)
+from lms.djangoapps.certificates.tests.factories import (
+    CertificateInvalidationFactory,
+    CertificateWhitelistFactory,
+    GeneratedCertificateFactory
+)
+from course_modes.models import CourseMode
+from courseware.tests.factories import StaffFactory, GlobalStaffFactory, InstructorFactory, UserFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
+from lms.djangoapps.verify_student.services import IDVerificationService
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
+from student.models import CourseEnrollment
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from config_models.models import cache
-from courseware.tests.factories import StaffFactory, GlobalStaffFactory, InstructorFactory, UserFactory
-from certificates.tests.factories import GeneratedCertificateFactory, CertificateWhitelistFactory, \
-    CertificateInvalidationFactory
-from certificates.models import CertificateGenerationConfiguration, CertificateStatuses, CertificateWhitelist, \
-    GeneratedCertificate, CertificateInvalidation
-from certificates import api as certs_api
-from student.models import CourseEnrollment
-from django.core.files.uploadedfile import SimpleUploadedFile
-import io
 
 
 @attr(shard=1)
@@ -401,10 +408,9 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
 
             # Create and assert user's ID verification record.
             SoftwareSecurePhotoVerificationFactory.create(user=self.user, status=id_verification_status)
-            actual_verification_status = SoftwareSecurePhotoVerification.verification_status_for_user(
+            actual_verification_status = IDVerificationService.verification_status_for_user(
                 self.user,
-                self.course.id,
-                enrollment.mode,
+                enrollment.mode
             )
             self.assertEquals(actual_verification_status, verification_output)
 

@@ -1,10 +1,9 @@
 import json
 from unittest import TestCase
+
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import reverse_course_url
-
-from contentstore.views.course import (
-    validate_textbooks_json, validate_textbook_json, TextbookValidationError)
+from contentstore.views.course import TextbookValidationError, validate_textbook_json, validate_textbooks_json
 
 
 class TextbookIndexTestCase(CourseTestCase):
@@ -20,7 +19,7 @@ class TextbookIndexTestCase(CourseTestCase):
         self.assertEqual(resp.status_code, 200)
         # we don't have resp.context right now,
         # due to bugs in our testing harness :(
-        if resp.context:
+        if resp.context and resp.context.get('course'):
             self.assertEqual(resp.context['course'], self.course)
 
     def test_view_index_xhr(self):

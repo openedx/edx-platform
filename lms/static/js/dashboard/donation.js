@@ -129,8 +129,7 @@ var edx = edx || {};
                     addDonationToCart(amount, this.course)
                         .done(this.startPayment)
                         .fail(this.displayServerError);
-                }
-                else {
+                } else {
                     // If an error occurred, allow the user to resubmit
                     this.$submit.removeClass('disabled');
                 }
@@ -167,9 +166,7 @@ var edx = edx || {};
                 if (isValid) {
                     this.$amount.removeClass('validation-error');
                     this.$errorMsg.text('');
-                }
-
-                else {
+                } else {
                     this.$amount.addClass('validation-error');
                     this.$errorMsg.text(
                         gettext('Please enter a valid donation amount.')
@@ -232,12 +229,12 @@ var edx = edx || {};
         // that form, and parameterize it based on the
         // "data-course" attribute (the course ID).
         $('.donate-container').each(function() {
-            var container = $(this);
-            var course = container.data('course');
+            var $container = $(this);
+            var course = $container.data('course');
             var view = new edx.dashboard.donation.DonationView({
-                el: container,
+                el: $container,
                 course: course
             }).render();
         });
     });
-})(jQuery);
+}(jQuery));

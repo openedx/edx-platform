@@ -1,6 +1,7 @@
 """Tests for the CORS CSRF version of Django Rest Framework's SessionAuthentication."""
 from mock import patch
 
+from django.middleware.csrf import get_token
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.test.client import RequestFactory
@@ -11,16 +12,21 @@ from rest_framework.exceptions import PermissionDenied
 from ..authentication import SessionAuthenticationCrossDomainCsrf
 
 
+# A class to pass into django.middleware.csrf.get_token() so we can easily get a valid CSRF token to use.
+class FakeRequest(object):
+    META = {}
+
+
 class CrossDomainAuthTest(TestCase):
     """Tests for the CORS CSRF version of Django Rest Framework's SessionAuthentication. """
 
     URL = "/dummy_url"
     REFERER = "https://www.edx.org"
-    CSRF_TOKEN = 'abcd1234'
 
     def setUp(self):
         super(CrossDomainAuthTest, self).setUp()
         self.auth = SessionAuthenticationCrossDomainCsrf()
+        self.csrf_token = get_token(FakeRequest())
 
     def test_perform_csrf_referer_check(self):
         request = self._fake_request()
@@ -45,12 +51,14 @@ class CrossDomainAuthTest(TestCase):
     def _fake_request(self):
         """Construct a fake request with a referer and CSRF token over a secure connection. """
         factory = RequestFactory()
-        factory.cookies[settings.CSRF_COOKIE_NAME] = self.CSRF_TOKEN
-
+        factory.cookies[settings.CSRF_COOKIE_NAME] = self.csrf_token
         request = factory.post(
             self.URL,
             HTTP_REFERER=self.REFERER,
-            HTTP_X_CSRFTOKEN=self.CSRF_TOKEN
+            HTTP_X_CSRFTOKEN=self.csrf_token
         )
         request.is_secure = lambda: True
+
+        # The way we're testing this skips django.middleware.csrf's process_request, which copies this from the cookie
+        request.META['CSRF_COOKIE'] = self.csrf_token
         return request

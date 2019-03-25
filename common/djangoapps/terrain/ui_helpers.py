@@ -1,27 +1,27 @@
 # pylint: disable=missing-docstring
 
-from lettuce import world
-
-import time
 import json
-import re
 import platform
+import re
+import time
+from textwrap import dedent
+from urllib import quote_plus
 
 # django_url is assigned late in the process of loading lettuce,
 # so we import this as a module, and then read django_url from
 # it to get the correct value
 import lettuce.django
-
-
-from textwrap import dedent
-from urllib import quote_plus
-from selenium.common.exceptions import (
-    WebDriverException, TimeoutException,
-    StaleElementReferenceException, InvalidElementStateException)
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
+from lettuce import world
 from nose.tools import assert_true
+from selenium.common.exceptions import (
+    InvalidElementStateException,
+    StaleElementReferenceException,
+    TimeoutException,
+    WebDriverException
+)
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
 GLOBAL_WAIT_FOR_TIMEOUT = 60
 
@@ -36,11 +36,6 @@ REQUIREJS_WAIT = {
         "jquery", "js/base", "js/models/course", "js/models/settings/advanced",
         "js/views/settings/advanced", "codemirror"],
 
-    # Unit page
-    re.compile(r'^Unit \|'): [
-        "jquery", "js/base", "js/models/xblock_info", "js/views/pages/container",
-        "js/collections/component_template", "xmodule", "cms/js/main", "xblock/cms.runtime.v1"],
-
     # Content - Outline
     # Note that calling your org, course number, or display name, 'course' will mess this up
     re.compile(r'^Course Outline \|'): [
@@ -48,20 +43,25 @@ REQUIREJS_WAIT = {
 
     # Dashboard
     re.compile(r'^Studio Home \|'): [
-        "js/sock", "gettext", "js/base",
+        "gettext", "js/base",
         "jquery.ui", "cms/js/main", "underscore"],
-
-    # Upload
-    re.compile(r'^\s*Files & Uploads'): [
-        'js/base', 'jquery.ui', 'cms/js/main', 'underscore',
-        'js/views/assets', 'js/views/asset'
-    ],
 
     # Pages
     re.compile(r'^Pages \|'): [
-        'js/models/explicit_url', 'js/views/tabs',
-        'xmodule', 'cms/js/main', 'xblock/cms.runtime.v1'
+        'js/models/explicit_url', 'js/views/tabs', 'cms/js/main', 'xblock/cms.runtime.v1'
     ],
+}
+
+TRUTHY_WAIT = {
+    # Pages
+    re.compile(r'^Pages \|'): [
+        'XBlock'
+    ],
+    # Unit page
+    re.compile(r'Unit \|'): [
+        "jQuery", "XBlock", "ContainerFactory"
+    ],
+
 }
 
 
@@ -72,12 +72,15 @@ def wait(seconds):
 
 @world.absorb
 def wait_for_js_to_load():
-    requirements = None
     for test, req in REQUIREJS_WAIT.items():
         if test.search(world.browser.title):
-            requirements = req
+            world.wait_for_requirejs(req)
             break
-    world.wait_for_requirejs(requirements)
+
+    for test, req in TRUTHY_WAIT.items():
+        if test.search(world.browser.title):
+            for var in req:
+                world.wait_for_js_variable_truthy(var)
 
 
 # Selenium's `execute_async_script` function pauses Selenium's execution
@@ -139,7 +142,7 @@ def wait_for_xmodule():
 @world.absorb
 def wait_for_mathjax():
     "Wait until MathJax is loaded and set up on the page."
-    world.wait_for_js_variable_truthy("MathJax.isReady")
+    world.wait_for_js_variable_truthy("MathJax")
 
 
 class RequireJSError(Exception):

@@ -4,14 +4,15 @@ Run just this test with: paver test_lib -t pavelib/paver_tests/test_paver_bok_ch
 """
 import os
 import unittest
+from test.test_support import EnvironmentVarGuard
 from textwrap import dedent
 
 import ddt
-from mock import patch, call, Mock
-from test.test_support import EnvironmentVarGuard
-from paver.easy import BuildFailure, call_task, environment
+from mock import Mock, call, patch
+from paver.easy import call_task, environment
+
 from pavelib.utils.test.suites import BokChoyTestSuite, Pa11yCrawler
-from pavelib.utils.test.suites.bokchoy_suite import DEMO_COURSE_TAR_GZ, DEMO_COURSE_IMPORT_DIR
+from pavelib.utils.test.suites.bokchoy_suite import DEMO_COURSE_IMPORT_DIR, DEMO_COURSE_TAR_GZ
 
 REPO_DIR = os.getcwd()
 
@@ -39,10 +40,13 @@ class TestPaverBokChoyCmd(unittest.TestCase):
             ),
             "SELENIUM_DRIVER_LOG_DIR='{}/test_root/log{}'".format(REPO_DIR, shard_str),
             "VERIFY_XSS='{}'".format(verify_xss),
-            "nosetests",
+            "python",
+            "-Wd",
+            "-m",
+            "pytest",
             "{}/common/test/acceptance/{}".format(REPO_DIR, name),
-            "--xunit-file={}/reports/bok_choy{}/xunit.xml".format(REPO_DIR, shard_str),
-            "--verbosity=2",
+            "--junitxml={}/reports/bok_choy{}/xunit.xml".format(REPO_DIR, shard_str),
+            "--verbose",
         ]
         return expected_statement
 
@@ -121,11 +125,11 @@ class TestPaverBokChoyCmd(unittest.TestCase):
         Using 1 process means paver should ask for the traditional xunit plugin for plugin results
         """
         expected_verbosity_command = [
-            "--xunit-file={repo_dir}/reports/bok_choy{shard_str}/xunit.xml".format(
+            "--junitxml={repo_dir}/reports/bok_choy{shard_str}/xunit.xml".format(
                 repo_dir=REPO_DIR,
                 shard_str='/shard_' + self.shard if self.shard else ''
             ),
-            "--verbosity=2",
+            "--verbose",
         ]
         suite = BokChoyTestSuite('', num_processes=1)
         self.assertEqual(suite.verbosity_processes_command, expected_verbosity_command)
@@ -137,13 +141,13 @@ class TestPaverBokChoyCmd(unittest.TestCase):
         """
         process_count = 2
         expected_verbosity_command = [
-            "--xunitmp-file={repo_dir}/reports/bok_choy{shard_str}/xunit.xml".format(
+            "--junitxml={repo_dir}/reports/bok_choy{shard_str}/xunit.xml".format(
                 repo_dir=REPO_DIR,
                 shard_str='/shard_' + self.shard if self.shard else '',
             ),
-            "--processes={}".format(process_count),
-            "--no-color",
-            "--process-timeout=1200",
+            "-n {}".format(process_count),
+            "--color=no",
+            "--verbose",
         ]
         suite = BokChoyTestSuite('', num_processes=process_count)
         self.assertEqual(suite.verbosity_processes_command, expected_verbosity_command)
@@ -154,26 +158,16 @@ class TestPaverBokChoyCmd(unittest.TestCase):
         """
         process_count = 3
         expected_verbosity_command = [
-            "--xunitmp-file={repo_dir}/reports/bok_choy{shard_str}/xunit.xml".format(
+            "--junitxml={repo_dir}/reports/bok_choy{shard_str}/xunit.xml".format(
                 repo_dir=REPO_DIR,
                 shard_str='/shard_' + self.shard if self.shard else '',
             ),
-            "--processes={}".format(process_count),
-            "--no-color",
-            "--process-timeout=1200",
+            "-n {}".format(process_count),
+            "--color=no",
+            "--verbose",
         ]
         suite = BokChoyTestSuite('', num_processes=process_count)
         self.assertEqual(suite.verbosity_processes_command, expected_verbosity_command)
-
-    def test_invalid_verbosity_and_processes(self):
-        """
-        If an invalid combination of verbosity and number of processors is passed in, a
-        BuildFailure should be raised
-        """
-        suite = BokChoyTestSuite('', num_processes=2, verbosity=3)
-        with self.assertRaises(BuildFailure):
-            # pylint: disable=pointless-statement
-            suite.verbosity_processes_command
 
 
 @ddt.ddt
@@ -203,7 +197,7 @@ class TestPaverPa11yCrawlerCmd(unittest.TestCase):
         )
         ignore = (
             "pa11y_ignore_rules_url="
-            "https://raw.githubusercontent.com/singingwolfboy/"
+            "https://raw.githubusercontent.com/edx/"
             "pa11ycrawler-ignore/master/ignore.yaml"
         )
         expected_cmd = [

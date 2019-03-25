@@ -1,17 +1,19 @@
+import json
+
+import ddt
+from django.conf import settings
+from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test.client import Client
-from django.contrib.auth.models import User
-from django.conf import settings
-from django_comment_common.models import (
-    Role, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_STUDENT)
-from django_comment_common.utils import seed_permissions_roles
-from student.models import anonymous_id_for_user, CourseEnrollment, UserProfile
-from util.testing import UrlResetMixin
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from mock import patch, Mock
 from opaque_keys.edx.locator import CourseLocator
-from mock import patch
-import ddt
-import json
+
+from django_comment_common.models import (
+    Role, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_STUDENT
+)
+from django_comment_common.utils import seed_permissions_roles
+from student.models import anonymous_id_for_user, CourseAccessRole, CourseEnrollment, UserProfile
+from util.testing import UrlResetMixin
 
 
 class AutoAuthTestCase(UrlResetMixin, TestCase):
@@ -29,8 +31,6 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase):
     COURSE_ID_MONGO = 'edX/Test101/2014_Spring'
     COURSE_ID_SPLIT = 'course-v1:edX+Test101+2014_Spring'
     COURSE_IDS_DDT = (
-        (COURSE_ID_MONGO, SlashSeparatedCourseKey.from_deprecated_string(COURSE_ID_MONGO)),
-        (COURSE_ID_SPLIT, SlashSeparatedCourseKey.from_deprecated_string(COURSE_ID_SPLIT)),
         (COURSE_ID_MONGO, CourseLocator.from_string(COURSE_ID_MONGO)),
         (COURSE_ID_SPLIT, CourseLocator.from_string(COURSE_ID_SPLIT)),
     )
@@ -55,6 +55,7 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase):
         self.assertTrue(user.is_active)
         self.assertFalse(user.profile.requires_parental_consent())
 
+    @patch.dict("django.conf.settings.FEATURES", {'RESTRICT_AUTOMATIC_AUTH': False})
     def test_create_same_user(self):
         self._auto_auth({'username': 'test'})
         self._auto_auth({'username': 'test'})
@@ -92,6 +93,7 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase):
         # By default, the user should not be global staff
         self.assertFalse(user.is_staff)
 
+    @patch.dict("django.conf.settings.FEATURES", {'RESTRICT_AUTOMATIC_AUTH': False})
     def test_create_staff_user(self):
 
         # Create a staff user
@@ -118,6 +120,7 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase):
 
     @ddt.data(*COURSE_IDS_DDT)
     @ddt.unpack
+    @patch.dict("django.conf.settings.FEATURES", {'RESTRICT_AUTOMATIC_AUTH': False})
     def test_double_enrollment(self, course_id, course_key):
 
         # Create a user and enroll in a course
@@ -136,7 +139,7 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase):
     def test_set_roles(self, course_id, course_key):
         seed_permissions_roles(course_key)
         course_roles = dict((r.name, r) for r in Role.objects.filter(course_id=course_key))
-        self.assertEqual(len(course_roles), 4)  # sanity check
+        self.assertEqual(len(course_roles), 5)  # sanity check
 
         # Student role is assigned by default on course enrollment.
         self._auto_auth({'username': 'a_student', 'course_id': course_id})
@@ -168,18 +171,16 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase):
                 course_roles[FORUM_ROLE_MODERATOR],
                 course_roles[FORUM_ROLE_ADMINISTRATOR]]))
 
-    @ddt.data(*COURSE_IDS_DDT)
-    @ddt.unpack
-    def test_json_response(self, course_id, course_key):  # pylint: disable=unused-argument
-        """Verify that we can get JSON back from the auto_auth page."""
-        response = self._auto_auth(HTTP_ACCEPT='application/json')
+    def test_json_response(self):
+        """ The view should return JSON. """
+        response = self._auto_auth()
         response_data = json.loads(response.content)
         for key in ['created_status', 'username', 'email', 'password', 'user_id', 'anonymous_id']:
             self.assertIn(key, response_data)
         user = User.objects.get(username=response_data['username'])
         self.assertDictContainsSubset(
             {
-                'created_status': "Logged in",
+                'created_status': 'Logged in',
                 'anonymous_id': anonymous_id_for_user(user, None),
             },
             response_data
@@ -203,7 +204,7 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase):
 
         # Check that the redirect was to the course info/outline page
         if settings.ROOT_URLCONF == 'lms.urls':
-            url_pattern = '/info'
+            url_pattern = '/course/'
         else:
             url_pattern = '/course/{}'.format(unicode(course_key))
 
@@ -236,23 +237,23 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase):
 
         self.assertTrue(response.url.endswith(url_pattern))  # pylint: disable=no-member
 
-    def _auto_auth(self, params=None, status_code=None, **kwargs):
+    def _auto_auth(self, params=None, status_code=200, **kwargs):
         """
         Make a request to the auto-auth end-point and check
         that the response is successful.
 
         Arguments:
             params (dict): Dict of params to pass to the auto_auth view
+            status_code (int): Expected response status code
             kwargs: Passed directly to the test client's get method.
 
-        Returns
-            response: The response object for the auto_auth page.
+        Returns:
+            Response: The response object for the auto_auth page.
         """
         params = params or {}
         response = self.client.get(self.url, params, **kwargs)
 
-        expected_status_code = status_code if status_code else 200
-        self.assertEqual(response.status_code, expected_status_code)
+        self.assertEqual(response.status_code, status_code)
 
         # Check that session and CSRF are set in the response
         for cookie in ['csrftoken', 'sessionid']:
@@ -260,6 +261,34 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase):
             self.assertTrue(response.cookies[cookie].value)  # pylint: disable=maybe-no-member
 
         return response
+
+    @patch("openedx.core.djangoapps.site_configuration.helpers.get_value", Mock(return_value=False))
+    def test_create_account_not_allowed(self):
+        """
+        Test case to check user creation is forbidden when ALLOW_PUBLIC_ACCOUNT_CREATION feature flag is turned off
+        """
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_course_access_roles(self):
+        """ Passing role names via the course_access_roles query string parameter should create CourseAccessRole
+        objects associated with the user.
+        """
+        expected_roles = ['finance_admin', 'sales_admin']
+        course_key = CourseLocator.from_string(self.COURSE_ID_SPLIT)
+        params = {
+            'course_id': str(course_key),
+            'course_access_roles': ','.join(expected_roles)
+        }
+        response = self._auto_auth(params)
+        user_info = json.loads(response.content)
+
+        for role in expected_roles:
+            self.assertTrue(
+                CourseAccessRole.objects.filter(
+                    user__id=user_info['user_id'], course_id=course_key, org=course_key.org, role=role
+                ).exists()
+            )
 
 
 class AutoAuthDisabledTestCase(AutoAuthTestCase):
@@ -283,3 +312,38 @@ class AutoAuthDisabledTestCase(AutoAuthTestCase):
         """
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 404)
+
+
+class AutoAuthRestrictedTestCase(AutoAuthTestCase):
+    """
+    Test that the default security restrictions on automatic authentication
+    work as intended.  These restrictions are in place for load tests.
+    """
+
+    @patch.dict('django.conf.settings.FEATURES', {'AUTOMATIC_AUTH_FOR_TESTING': True})
+    def setUp(self):
+        # Patching the settings.FEATURES['AUTOMATIC_AUTH_FOR_TESTING']
+        # value affects the contents of urls.py,
+        # so we need to call super.setUp() which reloads urls.py (because
+        # of the UrlResetMixin)
+        super(AutoAuthRestrictedTestCase, self).setUp()
+        self.url = '/auto_auth'
+        self.client = Client()
+
+    @patch.dict("django.conf.settings.FEATURES", {'RESTRICT_AUTOMATIC_AUTH': True})
+    def test_superuser(self):
+        """
+        Make sure that superusers cannot be created.
+        """
+        response = self.client.get(self.url, {'username': 'test', 'superuser': 'true'})
+        assert response.status_code == 403
+
+    @patch.dict("django.conf.settings.FEATURES", {'RESTRICT_AUTOMATIC_AUTH': True})
+    def test_modify_user(self):
+        """
+        Make sure that existing users cannot be modified.
+        """
+        response = self.client.get(self.url, {'username': 'test'})
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(self.url, {'username': 'test'})
+        self.assertEqual(response.status_code, 403)

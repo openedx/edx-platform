@@ -3,14 +3,11 @@
 import logging
 
 import django.utils.timezone
-from rest_framework.authentication import SessionAuthentication
-from rest_framework import exceptions as drf_exceptions
-from rest_framework_oauth.authentication import OAuth2Authentication
-
-from provider.oauth2 import models as dop_models
 from oauth2_provider import models as dot_models
-
-from openedx.core.lib.api.exceptions import AuthenticationFailed
+from provider.oauth2 import models as dop_models
+from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.authentication import SessionAuthentication
+from rest_framework_oauth.authentication import OAuth2Authentication
 
 
 OAUTH2_TOKEN_ERROR = u'token_error'
@@ -61,7 +58,7 @@ class SessionAuthenticationAllowInactiveUser(SessionAuthentication):
         # This is where regular `SessionAuthentication` checks that the user is active.
         # We have removed that check in this implementation.
         # But we added a check to prevent anonymous users since we require a logged-in account.
-        if not user or user.is_anonymous():
+        if not user or user.is_anonymous:
             return None
 
         self.enforce_csrf(request)
@@ -91,27 +88,25 @@ class OAuth2AuthenticationAllowInactiveUser(OAuth2Authentication):
         succeeds, raises an AuthenticationFailed (HTTP 401) if authentication
         fails or None if the user did not try to authenticate using an access
         token.
-
-        Overrides base class implementation to return edX-style error
-        responses.
         """
 
         try:
             return super(OAuth2AuthenticationAllowInactiveUser, self).authenticate(*args, **kwargs)
-        except AuthenticationFailed:
-            # AuthenticationFailed is a subclass of drf_exceptions.AuthenticationFailed,
-            # but we don't want to post-process the exception detail for our own class.
-            raise
-        except drf_exceptions.AuthenticationFailed as exc:
-            if 'No credentials provided' in exc.detail:
-                error_code = OAUTH2_TOKEN_ERROR_NOT_PROVIDED
-            elif 'Token string should not contain spaces' in exc.detail:
-                error_code = OAUTH2_TOKEN_ERROR_MALFORMED
+        except AuthenticationFailed as exc:
+            if isinstance(exc.detail, dict):
+                developer_message = exc.detail['developer_message']
+                error_code = exc.detail['error_code']
             else:
-                error_code = OAUTH2_TOKEN_ERROR
+                developer_message = exc.detail
+                if 'No credentials provided' in developer_message:
+                    error_code = OAUTH2_TOKEN_ERROR_NOT_PROVIDED
+                elif 'Token string should not contain spaces' in developer_message:
+                    error_code = OAUTH2_TOKEN_ERROR_MALFORMED
+                else:
+                    error_code = OAUTH2_TOKEN_ERROR
             raise AuthenticationFailed({
                 u'error_code': error_code,
-                u'developer_message': exc.detail
+                u'developer_message': developer_message
             })
 
     def authenticate_credentials(self, request, access_token):

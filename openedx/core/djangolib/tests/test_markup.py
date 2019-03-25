@@ -3,14 +3,15 @@
 Tests for openedx.core.djangolib.markup
 """
 
-from nose.plugins.attrib import attr
 import unittest
 
 import ddt
-from django.utils.translation import ugettext as _, ungettext
+from django.utils.translation import ugettext as _
+from django.utils.translation import ungettext
 from mako.template import Template
+from nose.plugins.attrib import attr
 
-from openedx.core.djangolib.markup import HTML, Text
+from openedx.core.djangolib.markup import HTML, Text, strip_all_tags_but_br
 
 
 @attr(shard=2)
@@ -73,3 +74,28 @@ class FormatHtmlTest(unittest.TestCase):
         for i in [1, 2]:
             out = Text(ungettext("1 & {}", "2 & {}", i)).format(HTML("<>"))
             self.assertEqual(out, "{} &amp; <>".format(i))
+
+    def test_strip_all_tags_but_br_filter(self):
+        """ Verify filter removes every tags except br """
+        template = Template(
+            """
+                <%page expression_filter="h"/>
+                <%!
+                from openedx.core.djangolib.markup import strip_all_tags_but_br
+                %>
+                ${" course <br> title <script>" | n, strip_all_tags_but_br}
+            """
+        )
+        rendered_template = template.render()
+
+        self.assertIn('<br>', rendered_template)
+        self.assertNotIn('<script>', rendered_template)
+
+    def test_strip_all_tags_but_br_returns_html(self):
+        """
+        Verify filter returns HTML Markup safe string object
+        """
+
+        html = strip_all_tags_but_br('{name}<br><script>')
+        html = html.format(name='Rock & Roll')
+        self.assertEqual(html.decode(), u'Rock &amp; Roll<br>')

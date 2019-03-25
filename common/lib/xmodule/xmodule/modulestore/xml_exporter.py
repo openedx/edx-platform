@@ -4,6 +4,7 @@ Methods for exporting course data to XML
 
 import logging
 from abc import abstractmethod
+from six import text_type
 import lxml.etree
 from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
 from xmodule.contentstore.content import StaticContent
@@ -42,7 +43,7 @@ def _export_drafts(modulestore, course_key, export_fs, xml_centric_course_key):
         # Only modules with changes will be exported into the /drafts directory.
         draft_modules = [module for module in draft_modules if modulestore.has_changes(module)]
         if draft_modules:
-            draft_course_dir = export_fs.makeopendir(DRAFT_DIR)
+            draft_course_dir = export_fs.makedir(DRAFT_DIR, recreate=True)
 
             # accumulate tuples of draft_modules and their parents in
             # this list:
@@ -57,12 +58,12 @@ def _export_drafts(modulestore, course_key, export_fs, xml_centric_course_key):
                 # if module has no parent, set its parent_url to `None`
                 parent_url = None
                 if parent_loc is not None:
-                    parent_url = parent_loc.to_deprecated_string()
+                    parent_url = text_type(parent_loc)
 
                 draft_node = draft_node_constructor(
                     draft_module,
                     location=draft_module.location,
-                    url=draft_module.location.to_deprecated_string(),
+                    url=text_type(draft_module.location),
                     parent_location=parent_loc,
                     parent_url=parent_url,
                 )
@@ -118,7 +119,7 @@ class ExportManager(object):
         self.contentstore = contentstore
         self.courselike_key = courselike_key
         self.root_dir = root_dir
-        self.target_dir = target_dir
+        self.target_dir = text_type(target_dir)
 
     @abstractmethod
     def get_key(self):
@@ -160,7 +161,7 @@ class ExportManager(object):
             # export only the published content
             with self.modulestore.branch_setting(ModuleStoreEnum.Branch.published_only, self.courselike_key):
                 courselike = self.get_courselike()
-                export_fs = courselike.runtime.export_fs = fsm.makeopendir(self.target_dir)
+                export_fs = courselike.runtime.export_fs = fsm.makedir(self.target_dir, recreate=True)
 
                 # change all of the references inside the course to use the xml expected key type w/o version & branch
                 xml_centric_courselike_key = self.get_key()
@@ -196,8 +197,8 @@ class CourseExportManager(ExportManager):
         return self.modulestore.get_course(self.courselike_key, depth=None, lazy=False)
 
     def process_root(self, root, export_fs):
-        with export_fs.open('course.xml', 'w') as course_xml:
-            lxml.etree.ElementTree(root).write(course_xml)
+        with export_fs.open(u'course.xml', 'wb') as course_xml:
+            lxml.etree.ElementTree(root).write(course_xml, encoding='utf-8')
 
     def process_extra(self, root, courselike, root_courselike_dir, xml_centric_courselike_key, export_fs):
         # Export the modulestore's asset metadata.
@@ -210,11 +211,11 @@ class CourseExportManager(ExportManager):
             # All asset types are exported using the "asset" tag - but their asset type is specified in each asset key.
             asset = lxml.etree.SubElement(asset_root, AssetMetadata.ASSET_XML_TAG)
             asset_md.to_xml(asset)
-        with OSFS(asset_dir).open(AssetMetadata.EXPORTED_ASSET_FILENAME, 'w') as asset_xml_file:
-            lxml.etree.ElementTree(asset_root).write(asset_xml_file)
+        with OSFS(asset_dir).open(AssetMetadata.EXPORTED_ASSET_FILENAME, 'wb') as asset_xml_file:
+            lxml.etree.ElementTree(asset_root).write(asset_xml_file, encoding='utf-8')
 
         # export the static assets
-        policies_dir = export_fs.makeopendir('policies')
+        policies_dir = export_fs.makedir('policies', recreate=True)
         if self.contentstore:
             self.contentstore.export_all_for_course(
                 self.courselike_key,
@@ -238,7 +239,7 @@ class CourseExportManager(ExportManager):
                     output_dir = root_courselike_dir + '/static/images/'
                     if not os.path.isdir(output_dir):
                         os.makedirs(output_dir)
-                    with OSFS(output_dir).open('course_image.jpg', 'wb') as course_image_file:
+                    with OSFS(output_dir).open(u'course_image.jpg', 'wb') as course_image_file:
                         course_image_file.write(course_image.data)
 
         # export the static tabs
@@ -270,16 +271,17 @@ class CourseExportManager(ExportManager):
             # Use url_name for split mongo because course_run is not used when loading policies.
             course_policy_dir_name = courselike.url_name
 
-        course_run_policy_dir = policies_dir.makeopendir(course_policy_dir_name)
+        course_run_policy_dir = policies_dir.makedir(course_policy_dir_name, recreate=True)
 
         # export the grading policy
-        with course_run_policy_dir.open('grading_policy.json', 'w') as grading_policy:
-            grading_policy.write(dumps(courselike.grading_policy, cls=EdxJSONEncoder, sort_keys=True, indent=4))
+        with course_run_policy_dir.open(u'grading_policy.json', 'wb') as grading_policy:
+            grading_policy.write(dumps(courselike.grading_policy, cls=EdxJSONEncoder,
+                                       sort_keys=True, indent=4).encode('utf-8'))
 
         # export all of the course metadata in policy.json
-        with course_run_policy_dir.open('policy.json', 'w') as course_policy:
-            policy = {'course/' + courselike.location.name: own_metadata(courselike)}
-            course_policy.write(dumps(policy, cls=EdxJSONEncoder, sort_keys=True, indent=4))
+        with course_run_policy_dir.open(u'policy.json', 'wb') as course_policy:
+            policy = {'course/' + courselike.location.block_id: own_metadata(courselike)}
+            course_policy.write(dumps(policy, cls=EdxJSONEncoder, sort_keys=True, indent=4).encode('utf-8'))
 
         _export_drafts(self.modulestore, self.courselike_key, export_fs, xml_centric_courselike_key)
 
@@ -315,7 +317,7 @@ class LibraryExportManager(ExportManager):
         to ease in duck typing during import. This may be expanded as a useful feature eventually.
         """
         # export the static assets
-        export_fs.makeopendir('policies')
+        export_fs.makedir('policies', recreate=True)
 
         if self.contentstore:
             self.contentstore.export_all_for_course(
@@ -332,7 +334,7 @@ class LibraryExportManager(ExportManager):
         called library.xml.
         """
         # Create the Library.xml file, which acts as the index of all library contents.
-        xml_file = export_fs.open(LIBRARY_ROOT, 'w')
+        xml_file = export_fs.open(LIBRARY_ROOT, 'wb')
         xml_file.write(lxml.etree.tostring(root, pretty_print=True, encoding='utf-8'))
         xml_file.close()
 
@@ -387,19 +389,20 @@ def _export_field_content(xblock_item, item_dir):
         for field_name in module_data:
             if field_name not in DEFAULT_CONTENT_FIELDS:
                 # filename format: {dirname}.{field_name}.json
-                with item_dir.open('{0}.{1}.{2}'.format(xblock_item.location.name, field_name, 'json'),
-                                   'w') as field_content_file:
-                    field_content_file.write(dumps(module_data.get(field_name, {}), cls=EdxJSONEncoder, sort_keys=True, indent=4))
+                with item_dir.open(u'{0}.{1}.{2}'.format(xblock_item.location.block_id, field_name, 'json'),
+                                   'wb') as field_content_file:
+                    field_content_file.write(dumps(module_data.get(field_name, {}), cls=EdxJSONEncoder,
+                                                   sort_keys=True, indent=4).encode('utf-8'))
 
 
 def export_extra_content(export_fs, modulestore, source_course_key, dest_course_key, category_type, dirname, file_suffix=''):
     items = modulestore.get_items(source_course_key, qualifiers={'category': category_type})
 
     if len(items) > 0:
-        item_dir = export_fs.makeopendir(dirname)
+        item_dir = export_fs.makedir(dirname, recreate=True)
         for item in items:
             adapt_references(item, dest_course_key, export_fs)
-            with item_dir.open(item.location.name + file_suffix, 'w') as item_file:
+            with item_dir.open(item.location.block_id + file_suffix, 'wb') as item_file:
                 item_file.write(item.data.encode('utf8'))
 
                 # export content fields other then metadata and data in json format in current directory

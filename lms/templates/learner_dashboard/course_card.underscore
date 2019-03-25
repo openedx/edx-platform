@@ -1,41 +1,48 @@
-<div class="section">
-    <div class="course-meta-container col-12 md-col-8 sm-col-12">
-        <div class="course-image-container">
-            <% if ( marketing_url || course_url ) { %>
-                <a href="<%- marketing_url || course_url %>" class="course-image-link">
-                    <img
-                        class="header-img"
-                        src="<%- course_image_url %>"
-                        <% // safe-lint: disable=underscore-not-escaped %>
-                        alt="<%= interpolate(gettext('%(courseName)s Home Page.'), {courseName: display_name}, true) %>"/>
-                </a>
-            <% } else { %>
-                <img class="header-img" src="<%- course_image_url %>" alt=""/>
-            <% } %>
-
+<div class="section" id="course-<%-uuid%>">
+    <div class="course-meta-container">
+        <div class="course-content">
+            <div class="course-details">
+                <h5 class="course-title">
+                    <% if (course_title_link) { %>
+                        <a href="<%- course_title_link %>" class="course-title-link">
+                            <%- title %>
+                        </a>
+                    <% } else { %>
+                        <%- title %>
+                    <% } %>
+                </h5>
+                <div class="course-text">
+                    <% if (enrolled && !user_entitlement) { %>
+                        <span class="enrolled"><%- enrolled %>: </span>
+                    <% } %>
+                    <% if (dateString && !is_unfulfilled_entitlement) { %>
+                        <span class="run-period"><%- dateString %></span>
+                        <% if (user_entitlement && !user_entitlement.expired_at && !is_unfulfilled_entitlement) { %>
+                            <button class="change-session btn-link"> <%- gettext('Change or Leave Session')%></button>
+                        <% } %>
+                    <% } %>
+                </div>
+                <% if (user_entitlement && user_entitlement.expiration_date) { %>
+                    <div class="info-expires-at">
+                        <% if (is_unfulfilled_entitlement) { %>
+                            <% if (!user_entitlement.expired_at) { %>
+                                <%- StringUtils.interpolate(gettext('You must select a session by {expiration_date} to access the course.'), {expiration_date: user_entitlement.expiration_date}) %>
+                            <% } %>
+                        <% } else { %>
+                            <% if (user_entitlement.expired_at) { %>
+                                <%- gettext('You can no longer change sessions.')%>
+                            <% } else { %>
+                                <%- StringUtils.interpolate(gettext('You can change sessions until {expiration_date}.'), {expiration_date: user_entitlement.expiration_date}) %>
+                            <% } %>
+                        <% } %>
+                    </div>
+                 <% } %>
+            <div class="course-actions"></div>
         </div>
-        <div class="course-details">
-            <h3 class="course-title">
-                <% if ( marketing_url || course_url ) { %>
-                    <a href="<%- marketing_url || course_url %>" class="course-title-link">
-                        <%- display_name %>
-                    </a>
-                <% } else { %>
-                    <%- display_name %>
-                <% } %>
-            </h3>
-            <div class="course-text">
-                <% if (start_date && end_date) { %>
-                    <span class="run-period"><%- start_date %> - <%- end_date %></span>
-                    -
-                <% } %>
-                <span class="course-key"><%- key %></span>
-            </div>
-        </div>
+        <div class="course-certificate certificate-status"></div>
     </div>
-    <div class="course-actions col-12 md-col-4 sm-col-12">        
-    </div>
+    <div class="course-entitlement-selection-container<% if (!is_unfulfilled_entitlement && user_entitlement) { %> hidden <% } %>"></div>
 </div>
 <div class="section action-msg-view"></div>
 <div class="section upgrade-message"></div>
-<div class="section certificate-status"></div>
+<div class="section expired-notification"></div>

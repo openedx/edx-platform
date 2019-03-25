@@ -1,25 +1,17 @@
 """
 Microsite backend that reads the configuration from the database
 """
-from mako.template import Template
-from util.cache import cache
-
 from django.conf import settings
-from django.dispatch import receiver
 from django.db.models.signals import post_save
+from django.dispatch import receiver
+from mako.template import Template
 
+from microsite_configuration.backends.base import BaseMicrositeBackend, BaseMicrositeTemplateBackend
+from microsite_configuration.microsite import get_value as microsite_get_value
+from microsite_configuration.models import Microsite, MicrositeOrganizationMapping, MicrositeTemplate
+from util.cache import cache
 from util.memcache import fasthash
 from util.url import strip_port_from_host
-from microsite_configuration.backends.base import (
-    BaseMicrositeBackend,
-    BaseMicrositeTemplateBackend,
-)
-from microsite_configuration.models import (
-    Microsite,
-    MicrositeOrganizationMapping,
-    MicrositeTemplate
-)
-from microsite_configuration.microsite import get_value as microsite_get_value
 
 
 class DatabaseMicrositeBackend(BaseMicrositeBackend):

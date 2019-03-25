@@ -3,7 +3,8 @@
     define([
         'jquery', 'underscore', 'js/edxnotes/views/notes_factory'
     ], function($, _, NotesFactory) {
-        var parameters = {}, visibility = null,
+        var parameters = {},
+            visibility = null,
             getIds, createNote, cleanup, factory;
 
         getIds = function() {

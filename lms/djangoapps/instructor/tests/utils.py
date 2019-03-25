@@ -4,7 +4,9 @@ Utilities for instructor unit tests
 import datetime
 import json
 import random
-from django.utils.timezone import utc
+
+from pytz import UTC
+
 from util.date_utils import get_default_time_display
 
 
@@ -60,7 +62,7 @@ class FakeEmail(FakeInfo):
         day = random.randint(1, 28)
         hour = random.randint(0, 23)
         minute = random.randint(0, 59)
-        self.created = datetime.datetime(year, month, day, hour, minute, tzinfo=utc)
+        self.created = datetime.datetime(year, month, day, hour, minute, tzinfo=UTC)
         self.targets = FakeTargetGroup()
 
 

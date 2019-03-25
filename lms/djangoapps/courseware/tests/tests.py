@@ -4,18 +4,17 @@ Test for LMS courseware app.
 from textwrap import dedent
 from unittest import TestCase
 
-from django.core.urlresolvers import reverse
 import mock
+from django.urls import reverse
 from nose.plugins.attrib import attr
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
+from six import text_type
 
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import (
-    ModuleStoreTestCase, TEST_DATA_MIXED_MODULESTORE
-)
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ToyCourseFactory
 
 
@@ -77,22 +76,22 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
 
             if descriptor.location.category == 'about':
                 self._assert_loads('about_course',
-                                   {'course_id': course_key.to_deprecated_string()},
+                                   {'course_id': text_type(course_key)},
                                    descriptor)
 
             elif descriptor.location.category == 'static_tab':
-                kwargs = {'course_id': course_key.to_deprecated_string(),
+                kwargs = {'course_id': text_type(course_key),
                           'tab_slug': descriptor.location.name}
                 self._assert_loads('static_tab', kwargs, descriptor)
 
             elif descriptor.location.category == 'course_info':
-                self._assert_loads('info', {'course_id': course_key.to_deprecated_string()},
+                self._assert_loads('info', {'course_id': text_type(course_key)},
                                    descriptor)
 
             else:
 
-                kwargs = {'course_id': course_key.to_deprecated_string(),
-                          'location': descriptor.location.to_deprecated_string()}
+                kwargs = {'course_id': text_type(course_key),
+                          'location': text_type(descriptor.location)}
 
                 self._assert_loads('jump_to', kwargs, descriptor,
                                    expect_redirect=True,
@@ -153,7 +152,7 @@ class TestDraftModuleStore(ModuleStoreTestCase):
         store = modulestore()
 
         # fix was to allow get_items() to take the course_id parameter
-        store.get_items(SlashSeparatedCourseKey('abc', 'def', 'ghi'), qualifiers={'category': 'vertical'})
+        store.get_items(CourseKey.from_string('abc/def/ghi'), qualifiers={'category': 'vertical'})
 
         # test success is just getting through the above statement.
         # The bug was that 'course_id' argument was

@@ -33,7 +33,7 @@
 var _split; // instead of split for a less common name; avoid conflict
 
 // Avoid running twice; that would break the `nativeSplit` reference
-_split = _split || function(undef) {
+_split = _split || (function(undef) {
     var nativeSplit = String.prototype.split,
         compliantExecNpcg = /()??/.exec('')[1] === undef, // NPCG: nonparticipating capturing group
         self;
@@ -112,5 +112,5 @@ _split = _split || function(undef) {
     };
 
     return self;
-}();
+}());
 

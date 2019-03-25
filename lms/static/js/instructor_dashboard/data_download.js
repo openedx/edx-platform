@@ -122,16 +122,18 @@
             });
             this.$proctored_exam_csv_btn.click(function() {
                 var url = dataDownloadObj.$proctored_exam_csv_btn.data('endpoint');
+                var errorMessage = gettext('Error generating proctored exam results. Please try again.');
                 return $.ajax({
                     type: 'POST',
                     dataType: 'json',
                     url: url,
-                    error: function() {
+                    error: function(error) {
+                        if (error.responseText) {
+                            errorMessage = JSON.parse(error.responseText);
+                        }
                         dataDownloadObj.clear_display();
-                        dataDownloadObj.$reports_request_response_error.text(
-                            gettext('Error generating proctored exam results. Please try again.')
-                        );
-                        return $('.msg-error').css({
+                        dataDownloadObj.$reports_request_response_error.text(errorMessage);
+                        return dataDownloadObj.$reports_request_response_error.css({
                             display: 'block'
                         });
                     },
@@ -146,16 +148,18 @@
             });
             this.$survey_results_csv_btn.click(function() {
                 var url = dataDownloadObj.$survey_results_csv_btn.data('endpoint');
+                var errorMessage = gettext('Error generating survey results. Please try again.');
                 return $.ajax({
                     type: 'POST',
                     dataType: 'json',
                     url: url,
-                    error: function() {
+                    error: function(error) {
+                        if (error.responseText) {
+                            errorMessage = JSON.parse(error.responseText);
+                        }
                         dataDownloadObj.clear_display();
-                        dataDownloadObj.$reports_request_response_error.text(
-                            gettext('Error generating survey results. Please try again.')
-                        );
-                        return $('.msg-error').css({
+                        dataDownloadObj.$reports_request_response_error.text(errorMessage);
+                        return dataDownloadObj.$reports_request_response_error.css({
                             display: 'block'
                         });
                     },
@@ -170,16 +174,18 @@
             });
             this.$list_studs_csv_btn.click(function() {
                 var url = dataDownloadObj.$list_studs_csv_btn.data('endpoint') + '/csv';
+                var errorMessage = gettext('Error generating student profile information. Please try again.');
                 dataDownloadObj.clear_display();
                 return $.ajax({
                     type: 'POST',
                     dataType: 'json',
                     url: url,
-                    error: function() {
-                        dataDownloadObj.$reports_request_response_error.text(
-                            gettext('Error generating student profile information. Please try again.')
-                        );
-                        return $('.msg-error').css({
+                    error: function(error) {
+                        if (error.responseText) {
+                            errorMessage = JSON.parse(error.responseText);
+                        }
+                        dataDownloadObj.$reports_request_response_error.text(errorMessage);
+                        return dataDownloadObj.$reports_request_response_error.css({
                             display: 'block'
                         });
                     },
@@ -201,9 +207,12 @@
                     url: url,
                     error: function() {
                         dataDownloadObj.clear_display();
-                        return dataDownloadObj.$download_request_response_error.text(
+                        dataDownloadObj.$download_request_response_error.text(
                             gettext('Error getting student list.')
                         );
+                        return dataDownloadObj.$download_request_response_error.css({
+                            display: 'block'
+                        });
                     },
                     success: function(data) {
                         var $tablePlaceholder, columns, feature, gridData, options;
@@ -251,7 +260,7 @@
                         dataDownloadObj.$reports_request_response_error.text(
                             JSON.parse(error.responseText)
                         );
-                        return $('.msg-error').css({
+                        return dataDownloadObj.$reports_request_response_error.css({
                             display: 'block'
                         });
                     },
@@ -265,16 +274,18 @@
             });
             this.$list_may_enroll_csv_btn.click(function() {
                 var url = dataDownloadObj.$list_may_enroll_csv_btn.data('endpoint');
+                var errorMessage = gettext('Error generating list of students who may enroll. Please try again.');
                 dataDownloadObj.clear_display();
                 return $.ajax({
                     type: 'POST',
                     dataType: 'json',
                     url: url,
-                    error: function() {
-                        dataDownloadObj.$reports_request_response_error.text(
-                            gettext('Error generating list of students who may enroll. Please try again.')
-                        );
-                        return $('.msg-error').css({
+                    error: function(error) {
+                        if (error.responseText) {
+                            errorMessage = JSON.parse(error.responseText);
+                        }
+                        dataDownloadObj.$reports_request_response_error.text(errorMessage);
+                        return dataDownloadObj.$reports_request_response_error.css({
                             display: 'block'
                         });
                     },
@@ -294,9 +305,12 @@
                     url: url,
                     error: function() {
                         dataDownloadObj.clear_display();
-                        return dataDownloadObj.$download_request_response_error.text(
+                        dataDownloadObj.$download_request_response_error.text(
                             gettext('Error retrieving grading configuration.')
                         );
+                        return dataDownloadObj.$download_request_response_error.css({
+                            display: 'block'
+                        });
                     },
                     success: function(data) {
                         dataDownloadObj.clear_display();
@@ -307,29 +321,27 @@
             });
             this.$async_report_btn.click(function(e) {
                 var url = $(e.target).data('endpoint');
+                var errorMessage = '';
                 dataDownloadObj.clear_display();
                 return $.ajax({
                     type: 'POST',
                     dataType: 'json',
                     url: url,
-                    error: statusAjaxError(function() {
-                        if (e.target.name === 'calculate-grades-csv') {
-                            dataDownloadObj.$grades_request_response_error.text(
-                                gettext('Error generating grades. Please try again.')
-                            );
+                    error: function(error) {
+                        if (error.responseText) {
+                            errorMessage = JSON.parse(error.responseText);
+                        } else if (e.target.name === 'calculate-grades-csv') {
+                            errorMessage = gettext('Error generating grades. Please try again.');
                         } else if (e.target.name === 'problem-grade-report') {
-                            dataDownloadObj.$grades_request_response_error.text(
-                                gettext('Error generating problem grade report. Please try again.')
-                            );
+                            errorMessage = gettext('Error generating problem grade report. Please try again.');
                         } else if (e.target.name === 'export-ora2-data') {
-                            dataDownloadObj.$grades_request_response_error.text(
-                                gettext('Error generating ORA data report. Please try again.')
-                            );
+                            errorMessage = gettext('Error generating ORA data report. Please try again.');
                         }
-                        return $('.msg-error').css({
+                        dataDownloadObj.$reports_request_response_error.text(errorMessage);
+                        return dataDownloadObj.$reports_request_response_error.css({
                             display: 'block'
                         });
-                    }),
+                    },
                     success: function(data) {
                         dataDownloadObj.$reports_request_response.text(data.status);
                         return $('.msg-confirm').css({

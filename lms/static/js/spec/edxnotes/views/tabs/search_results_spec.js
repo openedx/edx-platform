@@ -29,13 +29,13 @@ define([
             }
             ],
             responseJson = {
-                'count': 3,
-                'current_page': 1,
-                'num_pages': 1,
-                'start': 0,
-                'next': null,
-                'previous': null,
-                'results': notes
+                count: 3,
+                current_page: 1,
+                num_pages: 1,
+                start: 0,
+                next: null,
+                previous: null,
+                results: notes
             },
             getView, submitForm, tabInfo, searchResultsTabId;
 
@@ -195,13 +195,13 @@ define([
 
             submitForm(view.searchBox, 'new_test_query');
             Helpers.respondToRequest(requests, {
-                'count': 1,
-                'current_page': 1,
-                'num_pages': 1,
-                'start': 0,
-                'next': null,
-                'previous': null,
-                'results': newNotes
+                count: 1,
+                current_page: 1,
+                num_pages: 1,
+                start: 0,
+                next: null,
+                previous: null,
+                results: newNotes
             }, true);
 
             expect(view.$('.note').length).toHaveLength(1);
@@ -214,13 +214,13 @@ define([
             var view = getView(this.tabsCollection),
                 requests = AjaxHelpers.requests(this),
                 notes = {
-                    'count': 0,
-                    'current_page': 1,
-                    'num_pages': 1,
-                    'start': 0,
-                    'next': null,
-                    'previous': null,
-                    'results': []
+                    count: 0,
+                    current_page: 1,
+                    num_pages: 1,
+                    start: 0,
+                    next: null,
+                    previous: null,
+                    results: []
                 };
             submitForm(view.searchBox, 'awesome');
             Helpers.respondToRequest(requests, notes, true);

@@ -2,9 +2,11 @@
 Javascript test tasks
 """
 import sys
-from paver.easy import task, cmdopts, needs
-from pavelib.utils.test.suites import JsTestSuite
+
+from paver.easy import cmdopts, needs, task
+
 from pavelib.utils.envs import Env
+from pavelib.utils.test.suites import JsTestSuite
 from pavelib.utils.timer import timed
 
 __test__ = False  # do not collect
@@ -14,6 +16,7 @@ __test__ = False  # do not collect
 @needs(
     'pavelib.prereqs.install_node_prereqs',
     'pavelib.utils.test.utils.clean_reports_dir',
+    'pavelib.assets.process_xmodule_assets',
 )
 @cmdopts([
     ("suite=", "s", "Test suite to run"),

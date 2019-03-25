@@ -19,6 +19,9 @@ class Command(BaseCommand):
 
     help = 'Compile and collect themed assets...'
 
+    # NOTE (CCB): This allows us to compile static assets in Docker containers without database access.
+    requires_system_checks = False
+
     def add_arguments(self, parser):
         """
             Add arguments for compile_sass command.
@@ -89,7 +92,7 @@ class Command(BaseCommand):
         if theme_dirs:
             available_themes = {}
             for theme_dir in theme_dirs:
-                available_themes.update({t.theme_dir_name: t for t in get_themes(theme_dir)})
+                available_themes.update({t.theme_dir_name: t for t in get_themes([theme_dir])})
         else:
             theme_dirs = get_theme_base_dirs()
             available_themes = {t.theme_dir_name: t for t in get_themes()}

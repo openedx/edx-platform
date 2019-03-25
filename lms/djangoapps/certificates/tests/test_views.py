@@ -4,22 +4,23 @@ import json
 from uuid import uuid4
 
 import ddt
+import datetime
 from django.conf import settings
 from django.core.cache import cache
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test.client import Client
 from django.test.utils import override_settings
 from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import CourseLocator
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 
-from certificates.api import get_certificate_url
-from certificates.models import (
-    ExampleCertificateSet,
-    ExampleCertificate,
-    GeneratedCertificate,
+from lms.djangoapps.certificates.api import get_certificate_url
+from lms.djangoapps.certificates.models import (
     CertificateHtmlViewConfiguration,
+    ExampleCertificate,
+    ExampleCertificateSet,
+    GeneratedCertificate
 )
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -58,7 +59,7 @@ class UpdateExampleCertificateViewTest(CacheIsolationTestCase):
             description=self.DESCRIPTION,
             template=self.TEMPLATE,
         )
-        self.url = reverse('certificates.views.update_example_certificate')
+        self.url = reverse('update_example_certificate')
 
         # Since rate limit counts are cached, we need to clear
         # this before each test.
@@ -189,7 +190,10 @@ class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
         super(MicrositeCertificatesViewsTests, self).setUp()
         self.client = Client()
         self.course = CourseFactory.create(
-            org='testorg', number='run1', display_name='refundable course'
+            org='testorg',
+            number='run1',
+            display_name='refundable course',
+            certificate_available_date=datetime.datetime.today() - datetime.timedelta(days=1)
         )
         self.course.cert_html_view_enabled = True
         self.course.save()
@@ -291,11 +295,11 @@ class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
 
         config = self._certificate_html_view_configuration(configuration_string=test_configuration_string)
         self.assertEquals(config.configuration, test_configuration_string)
+        self._add_course_certificates(count=1, signatory_count=2)
         test_url = get_certificate_url(
             user_id=self.user.id,
             course_id=unicode(self.course.id)
         )
-        self._add_course_certificates(count=1, signatory_count=2)
         response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
         self.assertIn('platform_microsite', response.content)
 
@@ -325,11 +329,11 @@ class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
         }"""
         config = self._certificate_html_view_configuration(configuration_string=test_configuration_string)
         self.assertEquals(config.configuration, test_configuration_string)
+        self._add_course_certificates(count=1, signatory_count=2)
         test_url = get_certificate_url(
             user_id=self.user.id,
             course_id=unicode(self.course.id)
         )
-        self._add_course_certificates(count=1, signatory_count=2)
         response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
         self.assertIn('edX', response.content)
         self.assertNotIn('platform_microsite', response.content)

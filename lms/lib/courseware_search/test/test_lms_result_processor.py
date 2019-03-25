@@ -1,16 +1,15 @@
 """
 Tests for the lms_result_processor
 """
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-
 from courseware.tests.factories import UserFactory
-
 from lms.lib.courseware_search.lms_result_processor import LmsSearchResultProcessor
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 class LmsSearchResultProcessorTestCase(ModuleStoreTestCase):
     """ Test case class to test search result processor """
+    shard = 5
 
     def build_course(self):
         """

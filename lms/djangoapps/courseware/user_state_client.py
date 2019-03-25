@@ -4,22 +4,27 @@ data in a Django ORM model.
 """
 
 import itertools
+import logging
 from operator import attrgetter
 from time import time
-import logging
+
+from django.conf import settings
+from django.core.paginator import Paginator
+from django.contrib.auth.models import User
+from django.db import transaction
+from django.db.utils import IntegrityError
+from edx_user_state_client.interface import XBlockUserState, XBlockUserStateClient
+from xblock.fields import Scope
+
+import dogstats_wrapper as dog_stats_api
+from courseware.models import BaseStudentModuleHistory, StudentModule
+from openedx.core.djangoapps import monitoring_utils
+
 try:
     import simplejson as json
 except ImportError:
     import json
 
-import newrelic_custom_metrics
-import dogstats_wrapper as dog_stats_api
-from django.contrib.auth.models import User
-from django.db import transaction
-from django.db.utils import IntegrityError
-from xblock.fields import Scope
-from courseware.models import StudentModule, BaseStudentModuleHistory
-from edx_user_state_client.interface import XBlockUserStateClient, XBlockUserState
 
 log = logging.getLogger(__name__)
 
@@ -136,7 +141,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         """
         Accumulate arbitrary NR stats (not specific to block types).
         """
-        newrelic_custom_metrics.accumulate(
+        monitoring_utils.accumulate(
             self._nr_metric_name(function_name, stat_name),
             value
         )
@@ -151,11 +156,11 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         """
         Accumulate NR stats related to block types.
         """
-        newrelic_custom_metrics.accumulate(
+        monitoring_utils.accumulate(
             self._nr_metric_name(function_name, stat_name),
             value,
         )
-        newrelic_custom_metrics.accumulate(
+        monitoring_utils.accumulate(
             self._nr_metric_name(function_name, stat_name, block_type=block_type),
             value,
         )
@@ -260,7 +265,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         else:
             user = User.objects.get(username=username)
 
-        if user.is_anonymous():
+        if user.is_anonymous:
             # Anonymous users cannot be persisted to the database, so let's just use
             # what we have.
             return
@@ -268,15 +273,25 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         evt_time = time()
 
         for usage_key, state in block_keys_to_state.items():
-            student_module, created = StudentModule.objects.get_or_create(
-                student=user,
-                course_id=usage_key.course_key,
-                module_state_key=usage_key,
-                defaults={
-                    'state': json.dumps(state),
-                    'module_type': usage_key.block_type,
-                },
-            )
+            try:
+                student_module, created = StudentModule.objects.get_or_create(
+                    student=user,
+                    course_id=usage_key.course_key,
+                    module_state_key=usage_key,
+                    defaults={
+                        'state': json.dumps(state),
+                        'module_type': usage_key.block_type,
+                    },
+                )
+            except IntegrityError:
+                # PLAT-1109 - Until we switch to read committed, we cannot rely
+                # on get_or_create to be able to see rows created in another
+                # process. This seems to happen frequently, and ignoring it is the
+                # best course of action for now
+                log.warning("set_many: IntegrityError for student {} - course_id {} - usage key {}".format(
+                    user, repr(unicode(usage_key.course_key)), usage_key
+                ))
+                return
 
             num_fields_before = num_fields_after = num_new_fields_set = len(state)
             num_fields_updated = 0
@@ -426,22 +441,69 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
 
             yield XBlockUserState(username, block_key, state, history_entry.created, scope)
 
-    def iter_all_for_block(self, block_key, scope=Scope.user_state, batch_size=None):
+    def iter_all_for_block(self, block_key, scope=Scope.user_state):
         """
-        You get no ordering guarantees. Fetching will happen in batch_size
-        increments. If you're using this method, you should be running in an
-        async task.
-        """
-        if scope != Scope.user_state:
-            raise ValueError("Only Scope.user_state is supported")
-        raise NotImplementedError()
+        Return an iterator over the data stored in the block (e.g. a problem block).
 
-    def iter_all_for_course(self, course_key, block_type=None, scope=Scope.user_state, batch_size=None):
-        """
-        You get no ordering guarantees. Fetching will happen in batch_size
-        increments. If you're using this method, you should be running in an
+        You get no ordering guarantees.If you're using this method, you should be running in an
         async task.
+
+        Arguments:
+            block_key: an XBlock's locator (e.g. :class:`~BlockUsageLocator`)
+            scope (Scope): must be `Scope.user_state`
+
+        Returns:
+            an iterator over all data. Each invocation returns the next :class:`~XBlockUserState`
+                object, which includes the block's contents.
         """
         if scope != Scope.user_state:
             raise ValueError("Only Scope.user_state is supported")
-        raise NotImplementedError()
+
+        results = StudentModule.objects.order_by('id').filter(module_state_key=block_key)
+        p = Paginator(results, settings.USER_STATE_BATCH_SIZE)
+
+        for page_number in p.page_range:
+            page = p.page(page_number)
+
+            for sm in page.object_list:
+                state = json.loads(sm.state)
+
+                if state == {}:
+                    continue
+
+                yield XBlockUserState(sm.student.username, sm.module_state_key, state, sm.modified, scope)
+
+    def iter_all_for_course(self, course_key, block_type=None, scope=Scope.user_state):
+        """
+        Return an iterator over all data stored in a course's blocks.
+
+        You get no ordering guarantees. If you're using this method, you should be running in an
+        async task.
+
+        Arguments:
+            course_key: a course locator
+            scope (Scope): must be `Scope.user_state`
+
+        Returns:
+            an iterator over all data. Each invocation returns the next :class:`~XBlockUserState`
+                object, which includes the block's contents.
+        """
+        if scope != Scope.user_state:
+            raise ValueError("Only Scope.user_state is supported")
+
+        results = StudentModule.objects.order_by('id').filter(course_id=course_key)
+        if block_type:
+            results = results.filter(module_type=block_type)
+
+        p = Paginator(results, settings.USER_STATE_BATCH_SIZE)
+
+        for page_number in p.page_range:
+            page = p.page(page_number)
+
+            for sm in page.object_list:
+                state = json.loads(sm.state)
+
+                if state == {}:
+                    continue
+
+                yield XBlockUserState(sm.student.username, sm.module_state_key, state, sm.modified, scope)

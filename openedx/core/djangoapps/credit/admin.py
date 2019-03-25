@@ -1,10 +1,15 @@
 """
 Django admin page for credit eligibility
 """
-from ratelimitbackend import admin
+from django.contrib import admin
 
 from openedx.core.djangoapps.credit.models import (
-    CreditConfig, CreditCourse, CreditProvider, CreditEligibility, CreditRequest, CreditRequirement,
+    CreditConfig,
+    CreditCourse,
+    CreditEligibility,
+    CreditProvider,
+    CreditRequest,
+    CreditRequirement,
     CreditRequirementStatus
 )
 

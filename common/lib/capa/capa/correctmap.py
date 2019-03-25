@@ -91,8 +91,11 @@ class CorrectMap(object):
         # empty current dict
         self.__init__()
 
+        if not correct_map:
+            return
+
         # create new dict entries
-        if correct_map and not isinstance(correct_map.values()[0], dict):
+        if not isinstance(correct_map.values()[0], dict):
             # special migration
             for k in correct_map:
                 self.set(k, correctness=correct_map[k])

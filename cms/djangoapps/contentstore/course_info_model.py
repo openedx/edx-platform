@@ -12,18 +12,17 @@ Current db representation:
 }
 """
 
-import re
 import logging
+import re
 
 from django.http import HttpResponseBadRequest
 from django.utils.translation import ugettext as _
 
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore.django import modulestore
-from xmodule.html_module import CourseInfoModule
-
-from openedx.core.lib.xblock_utils import get_course_update_items
 from cms.djangoapps.contentstore.push_notification import enqueue_push_course_update
+from openedx.core.lib.xblock_utils import get_course_update_items
+from xmodule.html_module import CourseInfoModule
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 # # This should be in a class which inherits from XmlDescriptor
 log = logging.getLogger(__name__)

@@ -16,15 +16,14 @@ var options = {
 
     // Avoid adding files to this list. Use RequireJS.
     libraryFilesToInclude: [
-        {pattern: 'coffee/src/ajax_prefix.js', included: true},
+        {pattern: 'js/src/ajax_prefix.js', included: true},
         {pattern: 'js/vendor/draggabilly.js', included: true},
         {pattern: 'common/js/vendor/jquery.js', included: true},
         {pattern: 'common/js/vendor/jquery-migrate.js', included: true},
-        {pattern: 'coffee/src/jquery.immediateDescendents.js', included: true},
+        {pattern: 'js/src/jquery.immediateDescendents.js', included: true},
         {pattern: 'js/vendor/jquery.leanModal.js', included: true},
         {pattern: 'js/vendor/jquery.timeago.js', included: true},
         {pattern: 'js/vendor/jquery.truncate.js', included: true},
-        {pattern: 'js/vendor/mustache.js', included: true},
         {pattern: 'js/vendor/URI.min.js', included: true},
         {pattern: 'js/test/add_ajax_prefix.js', included: true},
         {pattern: 'js/test/i18n.js', included: true},
@@ -50,7 +49,6 @@ var options = {
     // Make sure the patterns in sourceFiles and specFiles do not match the same file.
     // Otherwise Istanbul which is used for coverage tracking will cause tests to not run.
     sourceFiles: [
-        {pattern: 'coffee/src/**/*.js', included: true},
         {pattern: 'common/js/xblock/core.js', included: true},
         {pattern: 'common/js/xblock/runtime.v1.js', included: true},
         {pattern: 'common/js/discussion/**/*.js', included: true},
@@ -59,7 +57,6 @@ var options = {
     ],
 
     specFiles: [
-        {pattern: 'coffee/spec/**/*.js', included: true},
         {pattern: 'common/js/spec/xblock/*.js', included: true},
         {pattern: 'common/js/spec/discussion/**/*spec.js', included: true},
         {pattern: 'js/**/*spec.js', included: true}

@@ -1,144 +1,368 @@
-def dockerImage = 'gcr.io/appsembler-testing/jenkins-worker:v0.2.0'
-def k8sCloud = 'jnlp'
+def runPythonTests() {
+    ansiColor('gnome-terminal') {
+        sshagent(credentials: ['jenkins-worker'], ignoreMissing: true) {
+            checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '${sha1}']],
+                doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [],
+                userRemoteConfigs: [[credentialsId: 'jenkins-worker',
+                refspec: '+refs/heads/*:refs/remotes/origin/* +refs/pull/*:refs/remotes/origin/pr/*',
+                url: 'git@github.com:edx/edx-platform.git']]]
+            console_output = sh(returnStdout: true, script: 'bash scripts/all-tests.sh').trim()
+            dir('stdout') {
+                writeFile file: "${TEST_SUITE}-${SHARD}-stdout.log", text: console_output
+            }
+            stash includes: 'reports/**/*coverage*', name: "${TEST_SUITE}-${SHARD}-reports"
+        }
+    }
+}
 
-def makeNode(suite, shard) {
-  return {
-    echo "I am ${suite}:${shard}, and the worker is yet to be started!"
-        node('edxapp') {
-            container('edxapp') {
-                checkout scm
-                
-                timeout(time: 55, unit: 'MINUTES') {
-                    echo "Hi, it is me ${suite}:${shard} again, the worker just started!"
-                    stage('install') {
-                        sh """
-npm install
-source /tmp/ve/bin/activate
-# temporary fix for openssl/cryptography==1.5.3 incompatibility on debian stretch
-sed -i 's/cryptography==1.5.3/cryptography==1.9/' requirements/edx/base.txt
-pip install --exists-action w -r requirements/edx/paver.txt
-pip install --exists-action w -r requirements/edx/pre.txt
-pip install --exists-action w -r requirements/edx/github.txt
-pip install --exists-action w -r requirements/edx/local.txt
-pip install --exists-action w pbr==0.9.0
-pip install --exists-action w -r requirements/edx/base.txt
-pip install --exists-action w -r requirements/edx/post.txt
-"""
+def savePythonTestArtifacts() {
+    archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/**/*,test_root/log/**/*.log,**/nosetests.xml,stdout/*.log,*.log'
+    junit '**/nosetests.xml'
+}
+
+pipeline {
+
+    agent { label "coverage-worker" }
+
+    options {
+        timestamps()
+        timeout(75)
+    }
+
+    stages {
+        stage('Run Tests') {
+            parallel {
+                stage('lms-unit-1') {
+                    agent { label "jenkins-worker" }
+                    environment {
+                        SHARD = 1
+                        TEST_SUITE = 'lms-unit'
                     }
-                    try {
-                        if (suite == 'quality') {
-                            stage('quality') {
-                                sh """
-export PYLINT_THRESHOLD=3600
-export ESLINT_THRESHOLD=9850
-export NO_PREREQ_INSTALL=true
-
-source /tmp/ve/bin/activate
-EXIT=0
-
-mkdir reports
-
-echo "Finding fixme's and storing report..."
-paver find_fixme > reports/fixme.log || { cat reports/fixme.log; EXIT=1; }
-
-echo "Finding pep8 violations and storing report..."
-paver run_pep8 > reports/pep8.log || { cat reports/pep8.log; EXIT=1; }
-
-echo "Finding pylint violations and storing in report..."
-# paver run_pylint -l \${PYLINT_THRESHOLD} | tee pylint.log || EXIT=1
-
-mkdir -p reports
-PATH=\${PATH}:node_modules/.bin
-
-echo "Finding ESLint violations and storing report..."
-paver run_eslint -l \${ESLINT_THRESHOLD} > reports/eslint.log || { cat reports/eslint.log; EXIT=1; }
-
-# Run quality task. Pass in the 'fail-under' percentage to diff-quality
-# paver run_quality -p 100 || EXIT=1
-
-echo "Running code complexity report (python)."
-paver run_complexity > reports/code_complexity.log || echo "Unable to calculate code complexity. Ignoring error."
-
-cat > reports/quality.xml <<END
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="quality" tests="1" errors="0" failures="0" skip="0">
-<testcase classname="quality" name="quality" time="0.604"></testcase>
-</testsuite>
-END
-
-exit \$EXIT
-"""
-                            }
-                        } else {
-                            stage('test') {
-                                try {
-                                    sh """
-# prepare environment for tests
-source /tmp/ve/bin/activate
-mkdir /tmp/mongodata
-mongod --fork --logpath=/tmp/mongod.log --nojournal --dbpath /tmp/mongodata
-export NO_PREREQ_INSTALL=true
-
-# run tests
-paver test_lib --with-flaky --cov-args="-p" --with-xunit
-
-# clean up
-killall mongod
-
-# coverage reporting
-curl -s https://codecov.io/bash > /tmp/codecov
-/bin/bash /tmp/codecov -t ${CODECOV_TOKEN}
-"""
-                                } finally {
-                                    archiveArtifacts 'reports/**, test_root/log/**'
-                                    junit 'reports/**/*.xml'
-                                }
+                    steps {
+                        script {
+                            runPythonTests()
+                        }
+                    }
+                    post {
+                        always {
+                            script {
+                                savePythonTestArtifacts()
                             }
                         }
-                    } finally {
-                        deleteDir()
+                    }
+                }
+                stage('lms-unit-2') {
+                    agent { label "jenkins-worker" }
+                    environment {
+                        SHARD = 2
+                        TEST_SUITE = 'lms-unit'
+                    }
+                    steps{
+                        script {
+                            runPythonTests()
+                        }
+                    }
+                    post {
+                        always {
+                            script {
+                                savePythonTestArtifacts()
+                            }
+                        }
+                    }
+                }
+                stage('lms-unit-3') {
+                    agent { label "jenkins-worker" }
+                    environment {
+                        SHARD = 3
+                        TEST_SUITE = 'lms-unit'
+                    }
+                    steps {
+                        script {
+                            runPythonTests()
+                        }
+                    }
+                    post {
+                        always {
+                            script {
+                                savePythonTestArtifacts()
+                            }
+                        }
+                    }
+                }
+                stage('lms-unit-4') {
+                    agent { label "jenkins-worker" }
+                    environment {
+                        SHARD = 4
+                        TEST_SUITE = 'lms-unit'
+                    }
+                    steps {
+                        script {
+                            runPythonTests()
+                        }
+                    }
+                    post {
+                        always {
+                            script {
+                                savePythonTestArtifacts()
+                            }
+                        }
+                    }
+                }
+                stage('lms-unit-5') {
+                    agent { label "jenkins-worker" }
+                    environment {
+                        SHARD = 5
+                        TEST_SUITE = 'lms-unit'
+                    }
+                    steps {
+                        script {
+                            runPythonTests()
+                        }
+                    }
+                    post {
+                        always {
+                            script {
+                                savePythonTestArtifacts()
+                            }
+                        }
+                    }
+                }
+                stage('lms-unit-6') {
+                    agent { label "jenkins-worker" }
+                    environment {
+                        SHARD = 6
+                        TEST_SUITE = 'lms-unit'
+                    }
+                    steps {
+                        script {
+                            runPythonTests()
+                        }
+                    }
+                    post {
+                        always {
+                            script {
+                                savePythonTestArtifacts()
+                            }
+                        }
+                    }
+                }
+                stage('lms-unit-7') {
+                    agent { label "jenkins-worker" }
+                    environment {
+                        SHARD = 7
+                        TEST_SUITE = 'lms-unit'
+                    }
+                    steps {
+                        script {
+                            runPythonTests()
+                        }
+                    }
+                    post {
+                        always {
+                            script {
+                                savePythonTestArtifacts()
+                            }
+                        }
+                    }
+                }
+                stage('lms-unit-8') {
+                    agent { label "jenkins-worker" }
+                    environment {
+                        SHARD = 8
+                        TEST_SUITE = 'lms-unit'
+                    }
+                    steps {
+                        script {
+                            runPythonTests()
+                        }
+                    }
+                    post {
+                        always {
+                            script {
+                                savePythonTestArtifacts()
+                            }
+                        }
+                    }
+                }
+                stage('lms-unit-9') {
+                    agent { label "jenkins-worker" }
+                    environment {
+                        SHARD = 9
+                        TEST_SUITE = 'lms-unit'
+                    }
+                    steps {
+                        script {
+                            runPythonTests()
+                        }
+                    }
+                    post {
+                        always {
+                            script {
+                                savePythonTestArtifacts()
+                            }
+                        }
+                    }
+                }
+                stage('lms-unit-10') {
+                    agent { label "jenkins-worker" }
+                    environment {
+                        SHARD = 10
+                        TEST_SUITE = 'lms-unit'
+                    }
+                    steps {
+                        script {
+                            runPythonTests()
+                        }
+                    }
+                    post {
+                        always {
+                            script {
+                                savePythonTestArtifacts()
+                            }
+                        }
+                    }
+                }
+                stage('cms-unit-1') {
+                    agent { label "jenkins-worker" }
+                    environment {
+                        SHARD = 1
+                        TEST_SUITE = 'cms-unit'
+                    }
+                    steps {
+                        script {
+                            runPythonTests()
+                        }
+                    }
+                    post {
+                        always {
+                            script {
+                                savePythonTestArtifacts()
+                            }
+                        }
+                    }
+                }
+                stage('cms-unit-2') {
+                    agent { label "jenkins-worker" }
+                    environment {
+                        SHARD = 2
+                        TEST_SUITE = 'cms-unit'
+                    }
+                    steps {
+                        script {
+                            runPythonTests()
+                        }
+                    }
+                    post {
+                        always {
+                            script {
+                                savePythonTestArtifacts()
+                            }
+                        }
+                    }
+                }
+                stage('commonlib-unit-1') {
+                    agent { label "jenkins-worker" }
+                    environment {
+                        SHARD = 1
+                        TEST_SUITE = 'commonlib-unit'
+                    }
+                    steps {
+                        script {
+                            runPythonTests()
+                        }
+                    }
+                    post {
+                        always {
+                            script {
+                                savePythonTestArtifacts()
+                            }
+                        }
+                    }
+                }
+                stage('commonlib-unit-2') {
+                    agent { label "jenkins-worker" }
+                    environment {
+                        SHARD = 2
+                        TEST_SUITE = 'commonlib-unit'
+                    }
+                    steps {
+                        script {
+                            runPythonTests()
+                        }
+                    }
+                    post {
+                        always {
+                            script {
+                                savePythonTestArtifacts()
+                            }
+                        }
+                    }
+                }
+                stage('commonlib-unit-3') {
+                    agent { label "jenkins-worker" }
+                    environment {
+                        SHARD = 3
+                        TEST_SUITE = 'commonlib-unit'
+                    }
+                    steps {
+                        script {
+                            runPythonTests()
+                        }
+                    }
+                    post {
+                        always {
+                            script {
+                                savePythonTestArtifacts()
+                            }
+                        }
                     }
                 }
             }
         }
-    }
-}
-
-def getSuites() {
-    return [
-        [name: 'quality', 'shards': ['all']],
-        [name: 'test_lib', 'shards': ['all']]
-    ]
-}
-
-def buildParallelSteps() {
-    def parallelSteps = [:]
-
-    for (def suite in getSuites()) {
-        def name = suite['name']
-
-        for (def shard in suite['shards']) {
-            parallelSteps["${name}_${shard}"] = makeNode(name, shard)
+        stage('Run coverage') {
+            environment {
+                CODE_COV_TOKEN = credentials('CODE_COV_TOKEN')
+                TARGET_BRANCH = "origin/master"
+                CI_BRANCH = "${ghprbSourceBranch}"
+                SUBSET_JOB = "null" // Keep this variable until we can remove the $SUBSET_JOB path from .coveragerc
+            }
+            steps {
+                ansiColor('gnome-terminal') {
+                    sshagent(credentials: ['jenkins-worker'], ignoreMissing: true) {
+                        checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '${sha1}']],
+                            doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [],
+                            userRemoteConfigs: [[credentialsId: 'jenkins-worker',
+                            refspec: '+refs/heads/*:refs/remotes/origin/* +refs/pull/*:refs/remotes/origin/pr/*',
+                            url: 'git@github.com:edx/edx-platform.git']]]
+                        unstash 'lms-unit-1-reports'
+                        unstash 'lms-unit-2-reports'
+                        unstash 'lms-unit-3-reports'
+                        unstash 'lms-unit-4-reports'
+                        unstash 'lms-unit-5-reports'
+                        unstash 'lms-unit-6-reports'
+                        unstash 'lms-unit-7-reports'
+                        unstash 'lms-unit-8-reports'
+                        unstash 'lms-unit-9-reports'
+                        unstash 'lms-unit-10-reports'
+                        unstash 'cms-unit-1-reports'
+                        unstash 'cms-unit-2-reports'
+                        unstash 'commonlib-unit-1-reports'
+                        unstash 'commonlib-unit-2-reports'
+                        unstash 'commonlib-unit-3-reports'
+                        sh "./scripts/jenkins-report.sh"
+                    }
+                }
+            }
+            post {
+                always {
+                    publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: true,
+                        reportDir: 'reports', reportFiles: 'diff_coverage_combined.html',
+                        reportName: 'Diff Coverage Report', reportTitles: ''])
+                    publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: true,
+                        reportDir: 'reports/cover', reportFiles: 'index.html',
+                        reportName: 'Coverage.py Report', reportTitles: ''])
+                }
+            }
         }
-    }
-
-    return parallelSteps
-}
-
-podTemplate(cloud: k8sCloud, label: 'edxapp', containers: [
-        containerTemplate(name: 'edxapp',
-            image: dockerImage,
-            ttyEnabled: true, 
-            command: 'cat')
-    ]) {
-    stage('Prepare') {
-        echo 'Starting the build...'
-        echo 'It it always nice to have a green checkmark :D'
-    }
-    stage('Test') {
-        parallel buildParallelSteps()
-    }
-    stage('Done') {
-        echo 'I am done, hurray!'
     }
 }

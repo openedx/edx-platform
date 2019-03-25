@@ -11,25 +11,26 @@ file and check it in at the same time as your model changes. To do that,
 3. Add the migration file created in edx-platform/openedx/core/djangoapps/embargo/migrations/
 """
 
-import ipaddr
 import json
 import logging
 
-from django.db import models
-from django.utils.translation import ugettext as _, ugettext_lazy
-from django.core.cache import cache
-from django.core.urlresolvers import reverse
-from django.db.models.signals import post_save, post_delete
-
-from django_countries.fields import CountryField
-from django_countries import countries
-
+import ipaddr
 from config_models.models import ConfigurationModel
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, NoneToEmptyManager
+from django.core.cache import cache
+from django.urls import reverse
+from django.db import models
+from django.db.models.signals import post_delete, post_save
+from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy
+from django_countries import countries
+from django_countries.fields import CountryField
+from opaque_keys.edx.django.models import CourseKeyField
+from six import text_type
+
+from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 
 from .exceptions import InvalidAccessPoint
-from .messages import ENROLL_MESSAGES, COURSEWARE_MESSAGES
-
+from .messages import COURSEWARE_MESSAGES, ENROLL_MESSAGES
 
 log = logging.getLogger(__name__)
 
@@ -66,7 +67,7 @@ class EmbargoedCourse(models.Model):
         if self.embargoed:
             not_em = ""
         # pylint: disable=no-member
-        return u"Course '{}' is {}Embargoed".format(self.course_id.to_deprecated_string(), not_em)
+        return u"Course '{}' is {}Embargoed".format(text_type(self.course_id), not_em)
 
 
 class EmbargoedState(ConfigurationModel):
@@ -318,7 +319,7 @@ class RestrictedCourse(models.Model):
         # We use generic messaging unless we find something more specific,
         # but *always* return a valid URL path.
         default_path = reverse(
-            'embargo_blocked_message',
+            'embargo:blocked_message',
             kwargs={
                 'access_point': 'courseware',
                 'message_key': 'default'
@@ -337,7 +338,7 @@ class RestrictedCourse(models.Model):
             course = cls.objects.get(course_key=course_key)
             msg_key = course.message_key_for_access_point(access_point)
             return reverse(
-                'embargo_blocked_message',
+                'embargo:blocked_message',
                 kwargs={
                     'access_point': access_point,
                     'message_key': msg_key
@@ -427,12 +428,14 @@ class CountryAccessRule(models.Model):
 
     restricted_course = models.ForeignKey(
         "RestrictedCourse",
-        help_text=ugettext_lazy(u"The course to which this rule applies.")
+        help_text=ugettext_lazy(u"The course to which this rule applies."),
+        on_delete=models.CASCADE,
     )
 
     country = models.ForeignKey(
         "Country",
-        help_text=ugettext_lazy(u"The country to which this rule applies.")
+        help_text=ugettext_lazy(u"The country to which this rule applies."),
+        on_delete=models.CASCADE,
     )
 
     CACHE_KEY = u"embargo.allowed_countries.{course_key}"

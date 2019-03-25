@@ -4,31 +4,27 @@ HTTP end-points for the Bookmarks API.
 For more information, see:
 https://openedx.atlassian.net/wiki/display/TNL/Bookmarks+API
 """
-import eventtracking
 import logging
 
+from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from django.utils.translation import ugettext as _, ugettext_noop
-
-from rest_framework import status
-from rest_framework import permissions
+from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_noop
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey, UsageKey
+from rest_framework import permissions, status
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.generics import ListCreateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_oauth.authentication import OAuth2Authentication
 
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey, UsageKey
-from django.conf import settings
+import eventtracking
 from openedx.core.djangoapps.bookmarks.api import BookmarksLimitReachedError
-
+from edx_rest_framework_extensions.paginators import DefaultPagination
 from openedx.core.lib.api.permissions import IsUserInUrl
-
-from xmodule.modulestore.exceptions import ItemNotFoundError
-
-from openedx.core.lib.api.paginators import DefaultPagination
 from openedx.core.lib.url_utils import unquote_slashes
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from . import DEFAULT_FIELDS, OPTIONAL_FIELDS, api
 from .serializers import BookmarkSerializer

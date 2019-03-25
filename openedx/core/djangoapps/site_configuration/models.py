@@ -2,27 +2,42 @@
 Django models for site configurations.
 """
 import collections
-
+from logging import getLogger
 import os
+
 from django.conf import settings
-from django.contrib.staticfiles.storage import staticfiles_storage
-from django.contrib.staticfiles.templatetags.staticfiles import static
-from django.core.files.storage import FileSystemStorage, get_storage_class
-from django.db import models
 from django.contrib.sites.models import Site
+from django.contrib.staticfiles.templatetags.staticfiles import static
+from django.core.files.storage import get_storage_class
+from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
-from django_extensions.db.models import TimeStampedModel
 from jsonfield.fields import JSONField
+from model_utils.models import TimeStampedModel
 
 from storages.backends.s3boto import S3BotoStorage
 
-from openedx.core.djangoapps.appsembler.sites.utils import get_initial_sass_variables, get_initial_page_elements, \
-    compile_sass
-
-from logging import getLogger
 logger = getLogger(__name__)  # pylint: disable=invalid-name
+
+
+def get_initial_sass_variables():
+    """
+    Proxy to `utils.get_initial_sass_variables` to avoid test-time Django errors.
+
+    # TODO: Fix Site Configuration and Organizations hacks. https://github.com/appsembler/edx-platform/issues/329
+    """
+    from openedx.core.djangoapps.appsembler.sites import utils
+    return utils.get_initial_sass_variables()
+
+
+def get_initial_page_elements():
+    """
+    Proxy to `utils.get_initial_page_elements` to avoid test-time Django errors.
+
+    # TODO: Fix Site Configuration and Organizations hacks. https://github.com/appsembler/edx-platform/issues/329
+    """
+    from openedx.core.djangoapps.appsembler.sites import utils
+    return utils.get_initial_page_elements()
 
 
 class SiteConfiguration(models.Model):
@@ -34,7 +49,7 @@ class SiteConfiguration(models.Model):
         site (OneToOneField): one to one field relating each configuration to a single site
         values (JSONField):  json field to store configurations for a site
     """
-    site = models.OneToOneField(Site, related_name='configuration')
+    site = models.OneToOneField(Site, related_name='configuration', on_delete=models.CASCADE)
     enabled = models.BooleanField(default=False, verbose_name="Enabled")
     values = JSONField(
         null=False,
@@ -108,8 +123,12 @@ class SiteConfiguration(models.Model):
             Configuration value for the given key.
         """
         for configuration in cls.objects.filter(values__contains=org, enabled=True).defer('page_elements', 'sass_variables').all():
-            org_filter = configuration.get_value('course_org_filter', None)
-            if org_filter == org:
+            course_org_filter = configuration.get_value('course_org_filter', [])
+            # The value of 'course_org_filter' can be configured as a string representing
+            # a single organization or a list of strings representing multiple organizations.
+            if not isinstance(course_org_filter, list):
+                course_org_filter = [course_org_filter]
+            if org in course_org_filter:
                 return configuration.get_value(name, default)
         return default
 
@@ -125,9 +144,10 @@ class SiteConfiguration(models.Model):
         org_filter_set = set()
 
         for configuration in cls.objects.filter(values__contains='course_org_filter', enabled=True).defer('page_elements', 'sass_variables').all():
-            org_filter = configuration.get_value('course_org_filter', None)
-            if org_filter:
-                org_filter_set.add(org_filter)
+            course_org_filter = configuration.get_value('course_org_filter', [])
+            if not isinstance(course_org_filter, list):
+                course_org_filter = [course_org_filter]
+            org_filter_set.update(course_org_filter)
         return org_filter_set
 
     @classmethod
@@ -145,6 +165,9 @@ class SiteConfiguration(models.Model):
         super(SiteConfiguration, self).delete(using=using)
 
     def compile_microsite_sass(self):
+        # Importing `compile_sass` to avoid test-time Django errors.
+        # TODO: Fix Site Configuration and Organizations hacks. https://github.com/appsembler/edx-platform/issues/329
+        from openedx.core.djangoapps.appsembler.sites.utils import compile_sass
         css_output = compile_sass('main.scss', custom_branding=self._sass_var_override)
         file_name = self.get_value('css_overrides_file')
         if settings.USE_S3_FOR_CUSTOMER_THEMES:
@@ -222,13 +245,17 @@ class SiteConfigurationHistory(TimeStampedModel):
         site (ForeignKey): foreign-key to django Site
         values (JSONField): json field to store configurations for a site
     """
-    site = models.ForeignKey(Site, related_name='configuration_histories')
+    site = models.ForeignKey(Site, related_name='configuration_histories', on_delete=models.CASCADE)
     enabled = models.BooleanField(default=False, verbose_name="Enabled")
     values = JSONField(
         null=False,
         blank=True,
         load_kwargs={'object_pairs_hook': collections.OrderedDict}
     )
+
+    class Meta:
+        get_latest_by = 'modified'
+        ordering = ('-modified', '-created',)
 
     def __unicode__(self):
         return u"<SiteConfigurationHistory: {site}, Last Modified: {modified} >".format(

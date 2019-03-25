@@ -49,6 +49,7 @@ class TestUtils(unittest.TestCase):
                 /        \
             child_3    child_4
     """
+    shard = 2
 
     ONLY_ROOTS = [
         draft_node_constructor(Mock(), 'url1', 'vertical'),

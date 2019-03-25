@@ -4,7 +4,7 @@ Acceptance Tests for Course Information
 from common.test.acceptance.pages.studio.course_info import CourseUpdatesPage
 from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest
 
-from ...pages.studio.auto_auth import AutoAuthPage
+from ...pages.common.auto_auth import AutoAuthPage
 from ...pages.studio.index import DashboardPage
 
 
@@ -12,6 +12,7 @@ class UsersCanAddUpdatesTest(StudioCourseTest):
     """
     Series of Bok Choy Tests to test the Course Updates page
     """
+    shard = 21
 
     def _create_and_verify_update(self, message):
         """

@@ -10,14 +10,14 @@ If true, it:
     b) calls apply_settings(), passing in the Django settings
 """
 
-from util.enterprise_helpers import insert_enterprise_pipeline_elements
+from openedx.features.enterprise_support.api import insert_enterprise_pipeline_elements
 
 _FIELDS_STORED_IN_SESSION = ['auth_entry', 'next']
-_MIDDLEWARE_CLASSES = (
-    'third_party_auth.middleware.ExceptionMiddleware',
-    'third_party_auth.middleware.PipelineQuarantineMiddleware',
-)
+_MIDDLEWARE_CLASSES = ['third_party_auth.middleware.ExceptionMiddleware']
 _SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/dashboard'
+_SOCIAL_AUTH_AZUREAD_OAUTH2_AUTH_EXTRA_ARGUMENTS = {
+    'msafed': 0
+}
 
 
 def apply_settings(django_settings):
@@ -28,7 +28,7 @@ def apply_settings(django_settings):
     django_settings.FIELDS_STORED_IN_SESSION = _FIELDS_STORED_IN_SESSION
 
     # Inject exception middleware to make redirects fire.
-    django_settings.MIDDLEWARE_CLASSES += _MIDDLEWARE_CLASSES
+    django_settings.MIDDLEWARE_CLASSES.extend(_MIDDLEWARE_CLASSES)
 
     # Where to send the user if there's an error during social authentication
     # and we cannot send them to a more specific URL
@@ -38,22 +38,27 @@ def apply_settings(django_settings):
     # Where to send the user once social authentication is successful.
     django_settings.SOCIAL_AUTH_LOGIN_REDIRECT_URL = _SOCIAL_AUTH_LOGIN_REDIRECT_URL
 
+    # Adding extra key value pair in the url query string for microsoft as per request
+    django_settings.SOCIAL_AUTH_AZUREAD_OAUTH2_AUTH_EXTRA_ARGUMENTS = _SOCIAL_AUTH_AZUREAD_OAUTH2_AUTH_EXTRA_ARGUMENTS
+
     # Inject our customized auth pipeline. All auth backends must work with
     # this pipeline.
     django_settings.SOCIAL_AUTH_PIPELINE = [
         'third_party_auth.pipeline.parse_query_params',
-        'social.pipeline.social_auth.social_details',
-        'social.pipeline.social_auth.social_uid',
-        'social.pipeline.social_auth.auth_allowed',
-        'social.pipeline.social_auth.social_user',
+        'social_core.pipeline.social_auth.social_details',
+        'social_core.pipeline.social_auth.social_uid',
+        'social_core.pipeline.social_auth.auth_allowed',
+        'social_core.pipeline.social_auth.social_user',
         'third_party_auth.pipeline.associate_by_email_if_login_api',
-        'social.pipeline.user.get_username',
+        'social_core.pipeline.user.get_username',
         'third_party_auth.pipeline.set_pipeline_timeout',
         'third_party_auth.pipeline.ensure_user_information',
-        'social.pipeline.user.create_user',
-        'social.pipeline.social_auth.associate_user',
-        'social.pipeline.social_auth.load_extra_data',
-        'social.pipeline.user.user_details',
+        'social_core.pipeline.user.create_user',
+        'social_core.pipeline.social_auth.associate_user',
+        'social_core.pipeline.social_auth.load_extra_data',
+        'social_core.pipeline.user.user_details',
+        'third_party_auth.pipeline.user_details_force_sync',
+        'third_party_auth.pipeline.set_id_verification_status',
         'third_party_auth.pipeline.set_logged_in_cookies',
         'third_party_auth.pipeline.login_analytics',
     ]
@@ -87,6 +92,6 @@ def apply_settings(django_settings):
     # Context processors required under Django.
     django_settings.SOCIAL_AUTH_UUID_LENGTH = 4
     django_settings.DEFAULT_TEMPLATE_ENGINE['OPTIONS']['context_processors'] += (
-        'social.apps.django_app.context_processors.backends',
-        'social.apps.django_app.context_processors.login_redirect',
+        'social_django.context_processors.backends',
+        'social_django.context_processors.login_redirect',
     )

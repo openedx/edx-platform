@@ -1,10 +1,10 @@
 """
 Acceptance tests for Studio related to the acid xblock.
 """
-from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
+from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.studio.overview import CourseOutlinePage
 from common.test.acceptance.pages.xblock.acid import AcidView
-from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.tests.helpers import AcceptanceTest
 
 
@@ -12,6 +12,7 @@ class XBlockAcidBase(AcceptanceTest):
     """
     Base class for tests that verify that XBlock integration is working correctly
     """
+    shard = 21
     __test__ = False
 
     def setUp(self):

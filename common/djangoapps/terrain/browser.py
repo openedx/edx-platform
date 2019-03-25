@@ -5,18 +5,18 @@ Browser set up for acceptance tests.
 # pylint: disable=no-member
 # pylint: disable=unused-argument
 
-from lettuce import before, after, world
-from splinter.browser import Browser
-from logging import getLogger
-from django.core.management import call_command
-from django.conf import settings
-from selenium.common.exceptions import WebDriverException
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-import requests
 from base64 import encodestring
 from json import dumps
+from logging import getLogger
 
-import xmodule.modulestore.django
+import requests
+from django.conf import settings
+from django.core.management import call_command
+from lettuce import after, before, world
+from selenium.common.exceptions import WebDriverException
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from splinter.browser import Browser
+
 from xmodule.contentstore.django import _CONTENTSTORE
 
 LOGGER = getLogger(__name__)
@@ -177,11 +177,12 @@ def clear_data(scenario):
 
 @after.each_scenario
 def reset_databases(scenario):
-    '''
+    """
     After each scenario, all databases are cleared/dropped.  Contentstore data are stored in unique databases
     whereas modulestore data is in unique collection names.  This data is created implicitly during the scenarios.
     If no data is created during the test, these lines equivilently do nothing.
-    '''
+    """
+    import xmodule.modulestore.django
     xmodule.modulestore.django.modulestore()._drop_database()  # pylint: disable=protected-access
     xmodule.modulestore.django.clear_existing_modulestores()
     _CONTENTSTORE.clear()

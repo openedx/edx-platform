@@ -5,7 +5,7 @@ import logging
 
 from mock import Mock
 from pkg_resources import resource_string
-from opaque_keys.edx.locations import Location
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xmodule.editing_module import TabsEditingDescriptor
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
@@ -17,6 +17,7 @@ log = logging.getLogger(__name__)
 
 class TabsEditingDescriptorTestCase(unittest.TestCase):
     """ Testing TabsEditingDescriptor"""
+    shard = 1
 
     def setUp(self):
         super(TabsEditingDescriptorTestCase, self).setUp()
@@ -55,7 +56,9 @@ class TabsEditingDescriptorTestCase(unittest.TestCase):
         TabsEditingDescriptor.tabs = self.tabs
         self.descriptor = system.construct_xblock_from_class(
             TabsEditingDescriptor,
-            scope_ids=ScopeIds(None, None, None, Location('org', 'course', 'run', 'category', 'name', 'revision')),
+            scope_ids=ScopeIds(None, None, None,
+                               BlockUsageLocator(CourseLocator('org', 'course', 'run', branch='revision'),
+                                                 'category', 'name')),
             field_data=DictFieldData({}),
         )
 

@@ -2,14 +2,14 @@
     'use strict';
 
     define(['backbone',
-            'jquery',
-            'underscore',
-            'gettext',
-            'teams/js/models/team',
-            'teams/js/views/team_utils',
-            'common/js/components/utils/view_utils',
-            'text!teams/templates/edit-team-member.underscore',
-            'text!teams/templates/date.underscore'
+        'jquery',
+        'underscore',
+        'gettext',
+        'teams/js/models/team',
+        'teams/js/views/team_utils',
+        'common/js/components/utils/view_utils',
+        'text!teams/templates/edit-team-member.underscore',
+        'text!teams/templates/date.underscore'
     ],
         function(Backbone, $, _, gettext, TeamModel, TeamUtils, ViewUtils, editTeamMemberTemplate, dateTemplate) {
             return Backbone.View.extend({
@@ -36,8 +36,7 @@
                 render: function() {
                     if (this.model.get('membership').length === 0) {
                         this.$el.html('<p>' + gettext('This team does not have any members.') + '</p>');
-                    }
-                    else {
+                    } else {
                         this.$el.html('<ul class="edit-members"></ul>');
                         this.renderTeamMembers();
                     }
@@ -45,7 +44,8 @@
                 },
 
                 renderTeamMembers: function() {
-                    var self = this, dateJoined, lastActivity;
+                    var self = this,
+                        dateJoined, lastActivity;
 
                     _.each(this.model.get('membership'), function(membership) {
                         dateJoined = interpolate(
@@ -75,7 +75,8 @@
                 },
 
                 removeMember: function(event) {
-                    var self = this, username = $(event.currentTarget).data('username');
+                    var self = this,
+                        username = $(event.currentTarget).data('username');
                     event.preventDefault();
 
                     ViewUtils.confirmThenRunOperation(

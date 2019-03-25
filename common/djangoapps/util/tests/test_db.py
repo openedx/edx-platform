@@ -1,20 +1,20 @@
 """Tests for util.db module."""
 
-import ddt
 import threading
 import time
 import unittest
 
+import ddt
+import pytest
 from django.contrib.auth.models import User
 from django.core.management import call_command
-from django.db import connection, IntegrityError
-from django.db.transaction import atomic, TransactionManagementError
+from django.db import IntegrityError, connection
+from django.db.transaction import TransactionManagementError, atomic
 from django.test import TestCase, TransactionTestCase
 from django.test.utils import override_settings
+from django.utils.six import StringIO
 
-from util.db import (
-    commit_on_success, enable_named_outer_atomic, outer_atomic, generate_int_id, NoOpMigrationModules
-)
+from util.db import commit_on_success, enable_named_outer_atomic, generate_int_id, outer_atomic
 
 
 def do_nothing():
@@ -31,20 +31,26 @@ class TransactionManagersTestCase(TransactionTestCase):
 
     To test do: "./manage.py lms --settings=test_with_mysql test util.tests.test_db"
     """
+    DECORATORS = {
+        'outer_atomic': outer_atomic(),
+        'outer_atomic_read_committed': outer_atomic(read_committed=True),
+        'commit_on_success': commit_on_success(),
+        'commit_on_success_read_committed': commit_on_success(read_committed=True),
+    }
 
     @ddt.data(
-        (outer_atomic(), IntegrityError, None, True),
-        (outer_atomic(read_committed=True), type(None), False, True),
-        (commit_on_success(), IntegrityError, None, True),
-        (commit_on_success(read_committed=True), type(None), False, True),
+        ('outer_atomic', IntegrityError, None, True),
+        ('outer_atomic_read_committed', type(None), False, True),
+        ('commit_on_success', IntegrityError, None, True),
+        ('commit_on_success_read_committed', type(None), False, True),
     )
     @ddt.unpack
-    def test_concurrent_requests(self, transaction_decorator, exception_class, created_in_1, created_in_2):
+    def test_concurrent_requests(self, transaction_decorator_name, exception_class, created_in_1, created_in_2):
         """
         Test that when isolation level is set to READ COMMITTED get_or_create()
         for the same row in concurrent requests does not raise an IntegrityError.
         """
-
+        transaction_decorator = self.DECORATORS[transaction_decorator_name]
         if connection.vendor != 'mysql':
             raise unittest.SkipTest('Only works on MySQL.')
 
@@ -222,6 +228,12 @@ class MigrationTests(TestCase):
 
         The test is set up to override MIGRATION_MODULES to ensure migrations are
         enabled for purposes of this test regardless of the overall test settings.
+
+        TODO: Find a general way of handling the case where if we're trying to
+        make a migrationless release that'll require a separate migration
+        release afterwards, this test doesn't fail.
         """
-        with self.assertRaises(SystemExit):
-            call_command('makemigrations', '-e')
+        out = StringIO()
+        call_command('makemigrations', dry_run=True, verbosity=3, stdout=out)
+        output = out.getvalue()
+        self.assertIn('No changes detected', output)

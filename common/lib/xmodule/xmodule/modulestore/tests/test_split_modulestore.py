@@ -42,6 +42,7 @@ BRANCH_NAME_DRAFT = ModuleStoreEnum.BranchName.draft
 BRANCH_NAME_PUBLISHED = ModuleStoreEnum.BranchName.published
 
 
+@attr(shard=2)
 @attr('mongo')
 class SplitModuleTest(unittest.TestCase):
     '''
@@ -264,6 +265,15 @@ class SplitModuleTest(unittest.TestCase):
                             "category": "chapter",
                             "fields": {
                                 "display_name": "Hercules"
+                            },
+                        },
+                        {
+                            "id": "chap",
+                            "parent": "head12345",
+                            "parent_type": "course",
+                            "category": "chapter",
+                            "fields": {
+                                "display_name": "Buffalo buffalo Buffalo buffalo buffalo buffalo Buffalo buffalo"
                             },
                         },
                         {
@@ -559,6 +569,7 @@ class SplitModuleTest(unittest.TestCase):
                 return element
 
 
+@attr(shard=2)
 class TestHasChildrenAtDepth(SplitModuleTest):
     """Test the has_children_at_depth method of XModuleMixin. """
 
@@ -596,6 +607,7 @@ class TestHasChildrenAtDepth(SplitModuleTest):
         self.assertFalse(ch3.has_children_at_depth(1))
 
 
+@attr(shard=2)
 @ddt.ddt
 class SplitModuleCourseTests(SplitModuleTest):
     '''
@@ -620,7 +632,7 @@ class SplitModuleCourseTests(SplitModuleTest):
             course.advertised_start, "Fall 2013",
             "advertised_start"
         )
-        self.assertEqual(len(course.children), 3, "children")
+        self.assertEqual(len(course.children), 4, "children")
         # check dates and graders--forces loading of descriptor
         self.assertEqual(course.edited_by, "testassist@edx.org")
         self.assertDictEqual(course.grade_cutoffs, {"Pass": 0.45})
@@ -726,7 +738,7 @@ class SplitModuleCourseTests(SplitModuleTest):
         self.assertEqual(len(course.tabs), 6)
         self.assertEqual(course.display_name, "The Ancient Greek Hero")
         self.assertEqual(course.advertised_start, "Fall 2013")
-        self.assertEqual(len(course.children), 3)
+        self.assertEqual(len(course.children), 4)
         # check dates and graders--forces loading of descriptor
         self.assertEqual(course.edited_by, "testassist@edx.org")
         self.assertDictEqual(course.grade_cutoffs, {"Pass": 0.45})
@@ -923,9 +935,10 @@ class SplitModuleCourseTests(SplitModuleTest):
         root_block_key = modulestore().make_course_usage_key(course_key)
         self.assertIsInstance(root_block_key, root_block_cls)
         self.assertEqual(root_block_key.block_type, "course")
-        self.assertEqual(root_block_key.name, "course")
+        self.assertEqual(root_block_key.block_id, "course")
 
 
+@attr(shard=2)
 class TestCourseStructureCache(SplitModuleTest):
     """Tests for the CourseStructureCache"""
 
@@ -999,6 +1012,7 @@ class TestCourseStructureCache(SplitModuleTest):
         )
 
 
+@attr(shard=2)
 class SplitModuleItemTests(SplitModuleTest):
     '''
     Item read tests including inheritance
@@ -1094,7 +1108,7 @@ class SplitModuleItemTests(SplitModuleTest):
             self.assertEqual(len(block.tabs), 6, "wrong number of tabs")
             self.assertEqual(block.display_name, "The Ancient Greek Hero")
             self.assertEqual(block.advertised_start, "Fall 2013")
-            self.assertEqual(len(block.children), 3)
+            self.assertEqual(len(block.children), 4)
             # check dates and graders--forces loading of descriptor
             self.assertEqual(block.edited_by, "testassist@edx.org")
             self.assertDictEqual(
@@ -1189,13 +1203,14 @@ class SplitModuleItemTests(SplitModuleTest):
         locator = CourseLocator(org='testx', course='GreekHero', run="run", branch=BRANCH_NAME_DRAFT)
         # get all modules
         matches = modulestore().get_items(locator)
-        self.assertEqual(len(matches), 7)
+        self.assertEqual(len(matches), 8)
         matches = modulestore().get_items(locator)
-        self.assertEqual(len(matches), 7)
+        self.assertEqual(len(matches), 8)
         matches = modulestore().get_items(locator, qualifiers={'category': 'chapter'})
-        self.assertEqual(len(matches), 3)
+        self.assertEqual(len(matches), 4)
         matches = modulestore().get_items(locator, qualifiers={'category': 'garbage'})
         self.assertEqual(len(matches), 0)
+        # Test that we don't accidentally get an item with a similar name.
         matches = modulestore().get_items(locator, qualifiers={'name': 'chapter1'})
         self.assertEqual(len(matches), 1)
         matches = modulestore().get_items(locator, qualifiers={'name': ['chapter1', 'chapter2']})
@@ -1209,7 +1224,7 @@ class SplitModuleItemTests(SplitModuleTest):
         matches = modulestore().get_items(locator, settings={'group_access': {'$exists': True}})
         self.assertEqual(len(matches), 1)
         matches = modulestore().get_items(locator, settings={'group_access': {'$exists': False}})
-        self.assertEqual(len(matches), 6)
+        self.assertEqual(len(matches), 7)
 
     def test_get_parents(self):
         '''
@@ -1243,7 +1258,7 @@ class SplitModuleItemTests(SplitModuleTest):
         block = modulestore().get_item(locator)
         children = block.get_children()
         expected_ids = [
-            "chapter1", "chapter2", "chapter3"
+            "chapter1", "chap", "chapter2", "chapter3"
         ]
         for child in children:
             self.assertEqual(child.category, "chapter")
@@ -1260,6 +1275,7 @@ def version_agnostic(children):
     return [child.version_agnostic() for child in children]
 
 
+@attr(shard=2)
 class TestItemCrud(SplitModuleTest):
     """
     Test create update and delete of items
@@ -1752,6 +1768,7 @@ class TestItemCrud(SplitModuleTest):
             store.delete_course(refetch_course.id, user)
 
 
+@attr(shard=2)
 class TestCourseCreation(SplitModuleTest):
     """
     Test create_course
@@ -1950,6 +1967,7 @@ class TestCourseCreation(SplitModuleTest):
                     self.assertEqual(fetched_modified.advertised_start, modified_course.advertised_start)
 
 
+@attr(shard=2)
 class TestInheritance(SplitModuleTest):
     """
     Test the metadata inheritance mechanism.
@@ -2025,16 +2043,11 @@ class TestInheritance(SplitModuleTest):
 #         self.assertTrue(parented_problem.visible_to_staff_only)
 
 
+@attr(shard=2)
 class TestPublish(SplitModuleTest):
     """
     Test the publishing api
     """
-    def setUp(self):
-        super(TestPublish, self).setUp()
-
-    def tearDown(self):
-        SplitModuleTest.tearDown(self)
-
     @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
     def test_publish_safe(self, _from_json):
         """
@@ -2206,6 +2219,7 @@ class TestPublish(SplitModuleTest):
         self.assertEqual(source_block_keys, dest_block_keys)
 
 
+@attr(shard=2)
 class TestSchema(SplitModuleTest):
     """
     Test the db schema (and possibly eventually migrations?)

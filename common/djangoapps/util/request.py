@@ -2,9 +2,9 @@
 import re
 
 from django.conf import settings
-
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
+
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 # accommodates course api urls, excluding any course api routes that do not fall under v*/courses, such as v1/blocks.
@@ -44,6 +44,6 @@ def course_id_from_url(url):
         return None
 
     try:
-        return SlashSeparatedCourseKey.from_deprecated_string(course_id)
+        return CourseKey.from_string(course_id)
     except InvalidKeyError:
         return None

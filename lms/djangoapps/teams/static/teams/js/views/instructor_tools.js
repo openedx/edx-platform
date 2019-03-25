@@ -2,12 +2,12 @@
     'use strict';
 
     define(['backbone',
-            'underscore',
-            'gettext',
-            'edx-ui-toolkit/js/utils/string-utils',
-            'teams/js/views/team_utils',
-            'common/js/components/utils/view_utils',
-            'text!teams/templates/instructor-tools.underscore'],
+        'underscore',
+        'gettext',
+        'edx-ui-toolkit/js/utils/string-utils',
+        'teams/js/views/team_utils',
+        'common/js/components/utils/view_utils',
+        'text!teams/templates/instructor-tools.underscore'],
         function(Backbone, _, gettext, StringUtils, TeamUtils, ViewUtils, instructorToolbarTemplate) {
             return Backbone.View.extend({
 

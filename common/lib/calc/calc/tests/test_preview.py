@@ -84,7 +84,7 @@ class LatexPreviewTest(unittest.TestCase):
 
     def test_number_suffix(self):
         """ Suffixes should be escaped. """
-        self.assertEquals(preview.latex_preview('1.618k'), r'1.618\text{k}')
+        self.assertEquals(preview.latex_preview('1.618%'), r'1.618\text{%}')
 
     def test_number_sci_notation(self):
         """ Numbers with scientific notation should display nicely """
@@ -95,17 +95,6 @@ class LatexPreviewTest(unittest.TestCase):
         self.assertEquals(
             preview.latex_preview('-6.0221413E+23'),
             r'-6.0221413\!\times\!10^{+23}'
-        )
-
-    def test_number_sci_notation_suffix(self):
-        """ Test numbers with both of these. """
-        self.assertEquals(
-            preview.latex_preview('6.0221413E+23k'),
-            r'6.0221413\!\times\!10^{+23}\text{k}'
-        )
-        self.assertEquals(
-            preview.latex_preview('-6.0221413E+23k'),
-            r'-6.0221413\!\times\!10^{+23}\text{k}'
         )
 
     def test_variable_simple(self):

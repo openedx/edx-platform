@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from django.db import migrations, models
 
+
 # We used to have a uniqueness constraint on auth_user.email:
 # https://github.com/edx/edx-platform/commit/c52727b0e0fb241d8211900975d3b69fe5a1bd57
 #
@@ -30,5 +31,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(add_email_uniqueness_constraint)
+        migrations.RunPython(add_email_uniqueness_constraint, atomic=False)
     ]

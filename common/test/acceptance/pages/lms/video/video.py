@@ -2,15 +2,16 @@
 Video player in the courseware.
 """
 
-import time
 import json
+import logging
+import time
+
 import requests
-from selenium.webdriver.common.action_chains import ActionChains
+from bok_choy.javascript import js_defined, wait_for_js
 from bok_choy.page_object import PageObject
 from bok_choy.promise import EmptyPromise, Promise
-from bok_choy.javascript import wait_for_js, js_defined
+from selenium.webdriver.common.action_chains import ActionChains
 
-import logging
 log = logging.getLogger('VideoPage')
 
 VIDEO_BUTTONS = {
@@ -33,7 +34,7 @@ CSS_CLASS_NAMES = {
     'captions_rendered': '.video.is-captions-rendered',
     'captions': '.subtitles',
     'captions_text': '.subtitles li span',
-    'captions_text_getter': '.subtitles li span[role="link"][data-index="1"]',
+    'captions_text_getter': '.subtitles li span[role="link"][data-index="{}"]',
     'closed_captions': '.closed-captions',
     'error_message': '.video .video-player .video-error',
     'video_container': '.video',
@@ -46,11 +47,13 @@ CSS_CLASS_NAMES = {
     'captions_lang_list': '.langs-list li',
     'video_speed': '.speeds .value',
     'poster': '.poster',
+    'active_caption_text': '.subtitles-menu > li.current span',
 }
 
 VIDEO_MODES = {
     'html5': '.video video',
-    'youtube': '.video iframe'
+    'youtube': '.video iframe',
+    'hls': '.video video',
 }
 
 VIDEO_MENUS = {
@@ -65,8 +68,7 @@ VIDEO_MENUS = {
 }
 
 
-@js_defined('window.Video', 'window.RequireJS.require', 'window.jQuery',
-            'window.MathJax', 'window.MathJax.isReady')
+@js_defined('window.Video', 'window.jQuery', 'window.MathJax')
 class VideoPage(PageObject):
     """
     Video player in the courseware.
@@ -89,6 +91,18 @@ class VideoPage(PageObject):
 
         video_selector = '{0}'.format(CSS_CLASS_NAMES['video_container'])
         self.wait_for_element_presence(video_selector, 'Video is initialized')
+
+    def scroll_to_button(self, button_name, index=0):
+        """
+        Scroll to a button specified by `button_name`
+
+        Arguments:
+            button_name (str): button name
+            index (int): query index
+
+        """
+        element = self.q(css=VIDEO_BUTTONS[button_name])[index]
+        self.browser.execute_script("arguments[0].scrollIntoView();", element)
 
     @wait_for_js
     def wait_for_video_player_render(self, autoplay=False):
@@ -204,7 +218,7 @@ class VideoPage(PageObject):
         Check that if video is rendered in `mode`.
 
         Arguments:
-            mode (str): Video mode, `html5` or `youtube`.
+            mode (str): Video mode, one of `html5`, `youtube`, `hls`.
 
         Returns:
             bool: Tells if video is rendered in `mode`.
@@ -222,9 +236,24 @@ class VideoPage(PageObject):
 
             """
             is_present = self.q(css=selector).present
+            # There is no way to get actual HLS video URL. Becuase in hls video
+            # src attribute is not set to original url. https://github.com/video-dev/hls.js/issues/1052
+            # http://www.streambox.fr/playlists/x36xhzz/x36xhzz.m3u8 becomes
+            # "blob:https://studio-hlsvideo.sandbox.edx.org/0e2e72e0-904e-d946-9ce0-06c542894cda"
+            if mode == 'hls':
+                href_src = self.q(css=selector).attrs('src')[0]
+                is_present = href_src.startswith('blob:') or href_src.startswith('mediasource:')
             return is_present, is_present
 
         return Promise(_is_element_present, 'Video Rendering Failed in {0} mode.'.format(mode)).fulfill()
+
+    @property
+    def video_download_url(self):
+        """
+        Return video download url or None
+        """
+        browser_query = self.q(css='.wrapper-download-video .btn-link.video-sources')
+        return browser_query.attrs('href')[0] if browser_query.visible else None
 
     @property
     def is_autoplay_enabled(self):
@@ -409,14 +438,24 @@ class VideoPage(PageObject):
 
         return ' '.join(subs)
 
-    def click_first_line_in_transcript(self):
+    def click_transcript_line(self, line_no):
         """
         Clicks a line in the transcript updating the current caption.
+
+        Arguments:
+            line_no (int): line number to be clicked
         """
 
         self.wait_for_captions()
-        captions_selector = self.q(css=CSS_CLASS_NAMES['captions_text_getter'])
+        captions_selector = self.q(css=CSS_CLASS_NAMES['captions_text_getter'].format(line_no))
         captions_selector.click()
+
+    @property
+    def active_caption_text(self):
+        """
+        Return active caption text.
+        """
+        return self.q(css=CSS_CLASS_NAMES['active_caption_text']).text[0]
 
     @property
     def speed(self):
@@ -440,6 +479,7 @@ class VideoPage(PageObject):
 
         """
         # mouse over to video speed button
+        self.scroll_to_button('speed')
         speed_menu_selector = self.get_element_selector(VIDEO_BUTTONS['speed'])
         element_to_hover_over = self.q(css=speed_menu_selector).results[0]
         hover = ActionChains(self.browser).move_to_element(element_to_hover_over)

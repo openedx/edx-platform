@@ -1,19 +1,16 @@
 """
 Serializer for video outline
 """
+from edxval.api import ValInternalError, get_video_info_for_course_and_profiles
 from rest_framework.reverse import reverse
 
-from xmodule.modulestore.mongo.base import BLOCK_TYPES_WITH_CHILDREN
-from xmodule.modulestore.django import modulestore
 from courseware.access import has_access
 from courseware.courses import get_course_by_id
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
 from util.module_utils import get_dynamic_descriptor_children
-
-from edxval.api import (
-    get_video_info_for_course_and_profiles, ValInternalError
-)
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.mongo.base import BLOCK_TYPES_WITH_CHILDREN
 
 
 class BlockOutline(object):
@@ -139,7 +136,7 @@ def find_urls(course_id, block, child_to_parent, request):
     if block_count > 3:
         position = 1
         for block in section.children:
-            if block.name == block_list[3].url_name:
+            if block.block_id == block_list[3].url_name:
                 break
             position += 1
 
@@ -174,6 +171,8 @@ def video_summary(video_profiles, course_id, video_descriptor, request, local_ca
         "only_on_web": video_descriptor.only_on_web,
     }
 
+    all_sources = []
+
     if video_descriptor.only_on_web:
         ret = {
             "video_url": None,
@@ -182,6 +181,7 @@ def video_summary(video_profiles, course_id, video_descriptor, request, local_ca
             "size": 0,
             "transcripts": {},
             "language": None,
+            "all_sources": all_sources,
         }
         ret.update(always_available_data)
         return ret
@@ -203,8 +203,12 @@ def video_summary(video_profiles, course_id, video_descriptor, request, local_ca
     # Then fall back to VideoDescriptor fields for video URLs
     elif video_descriptor.html5_sources:
         video_url = video_descriptor.html5_sources[0]
+        all_sources = video_descriptor.html5_sources
     else:
         video_url = video_descriptor.source
+
+    if video_descriptor.source:
+        all_sources.append(video_descriptor.source)
 
     # Get duration/size, else default
     duration = video_data.get('duration', None)
@@ -212,7 +216,7 @@ def video_summary(video_profiles, course_id, video_descriptor, request, local_ca
 
     # Transcripts...
     transcripts_info = video_descriptor.get_transcripts_info()
-    transcript_langs = video_descriptor.available_translations(transcripts_info, verify_assets=False)
+    transcript_langs = video_descriptor.available_translations(transcripts=transcripts_info)
 
     transcripts = {
         lang: reverse(
@@ -234,7 +238,8 @@ def video_summary(video_profiles, course_id, video_descriptor, request, local_ca
         "size": size,
         "transcripts": transcripts,
         "language": video_descriptor.get_default_transcript_language(transcripts_info),
-        "encoded_videos": video_data.get('profiles')
+        "encoded_videos": video_data.get('profiles'),
+        "all_sources": all_sources,
     }
     ret.update(always_available_data)
     return ret

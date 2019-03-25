@@ -6,8 +6,7 @@
     function waitForGenex() {
         if (typeof(genex) !== 'undefined' && genex) {
             genex.onInjectionDone('genex');
-        }
-        else {
+        } else {
             setTimeout(function() { waitForGenex(); }, timeout);
         }
     }
@@ -52,8 +51,7 @@
         if (genex_saved_state === '') {
             // Load DNA sequence from xml file
             genex_dna_sequence = genex_default_dna_sequence;
-        }
-        else {
+        } else {
             // Load DNA sequence from saved value
             genex_saved_state = JSON.parse(genex_saved_state);
             genex_dna_sequence = genex_saved_state.genex_dna_sequence;
@@ -67,7 +65,7 @@
 
     genexStoreAnswer = function(answer) {
         var input_field = genexGetInputField();
-        var value = {'genex_dna_sequence': genexGetDNASequence(), 'genex_answer': answer};
+        var value = {genex_dna_sequence: genexGetDNASequence(), genex_answer: answer};
         input_field.val(JSON.stringify(value));
     };
 }).call(this);

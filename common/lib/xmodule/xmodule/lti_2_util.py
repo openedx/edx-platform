@@ -3,17 +3,18 @@
 A mixin class for LTI 2.0 functionality.  This is really just done to refactor the code to
 keep the LTIModule class from getting too big
 """
-import json
-import re
-import mock
-import urllib
-import hashlib
 import base64
+import hashlib
+import json
 import logging
+import re
+import urllib
 
+import mock
+from oauthlib.oauth1 import Client
+from six import text_type
 from webob import Response
 from xblock.core import XBlock
-from oauthlib.oauth1 import Client
 
 log = logging.getLogger(__name__)
 
@@ -231,9 +232,9 @@ class LTI20ModuleMixin(object):
         Returns:
             nothing
         """
-        self.set_user_module_score(user, None, None)
+        self.set_user_module_score(user, None, None, score_deleted=True)
 
-    def set_user_module_score(self, user, score, max_score, comment=u""):
+    def set_user_module_score(self, user, score, max_score, comment=u"", score_deleted=False):
         """
         Sets the module user state, including grades and comments, and also scoring in db's courseware_studentmodule
 
@@ -261,6 +262,7 @@ class LTI20ModuleMixin(object):
                 'value': scaled_score,
                 'max_value': max_score,
                 'user_id': user.id,
+                'score_deleted': score_deleted,
             },
         )
         self.module_score = scaled_score
@@ -289,8 +291,8 @@ class LTI20ModuleMixin(object):
         try:
             self.verify_oauth_body_sign(request, content_type=LTI_2_0_JSON_CONTENT_TYPE)
         except (ValueError, LTIError) as err:
-            log.info("[LTI]: v2.0 result service -- OAuth body verification failed:  {}".format(err.message))
-            raise LTIError(err.message)
+            log.info("[LTI]: v2.0 result service -- OAuth body verification failed:  {}".format(text_type(err)))
+            raise LTIError(text_type(err))
 
     def parse_lti_2_0_result_json(self, json_str):
         """
@@ -359,7 +361,7 @@ class LTI20ModuleMixin(object):
                 log.info("[LTI] {}".format(msg))
                 raise LTIError(msg)
         except (TypeError, ValueError) as err:
-            msg = "Could not convert resultScore to float: {}".format(err.message)
+            msg = "Could not convert resultScore to float: {}".format(text_type(err))
             log.info("[LTI] {}".format(msg))
             raise LTIError(msg)
 

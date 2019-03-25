@@ -5,7 +5,7 @@
 define(['backbone'], function(Backbone) {
     return Backbone.Model.extend({
         defaults: {
-            'explicit_url': ''
+            explicit_url: ''
         },
         url: function() {
             return this.get('explicit_url');

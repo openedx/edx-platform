@@ -43,6 +43,7 @@ class DirectOnlyCategorySemantics(PureModulestoreTestCase):
     Verify the behavior of Direct Only items
     blocks intended to store snippets of course content.
     """
+    shard = 1
 
     __test__ = False
 
@@ -211,7 +212,7 @@ class DirectOnlyCategorySemantics(PureModulestoreTestCase):
         """
         def verify_course_summery_fields(course_summary):
             """ Verify that every `course_summary` object has all the required fields """
-            expected_fields = CourseSummary.course_info_fields + ['id', 'location']
+            expected_fields = CourseSummary.course_info_fields + ['id', 'location', 'has_ended']
             return all([hasattr(course_summary, field) for field in expected_fields])
 
         self.assertTrue(all(verify_course_summery_fields(course_summary) for course_summary in course_summaries))
@@ -415,6 +416,7 @@ class TestSplitDirectOnlyCategorySemantics(DirectOnlyCategorySemantics):
     """
     Verify DIRECT_ONLY_CATEGORY semantics against the SplitMongoModulestore.
     """
+    shard = 1
     MODULESTORE = SPLIT_MODULESTORE_SETUP
     __test__ = True
 
@@ -449,5 +451,6 @@ class TestMongoDirectOnlyCategorySemantics(DirectOnlyCategorySemantics):
     """
     Verify DIRECT_ONLY_CATEGORY semantics against the MongoModulestore
     """
+    shard = 1
     MODULESTORE = MongoModulestoreBuilder()
     __test__ = True

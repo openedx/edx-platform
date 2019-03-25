@@ -7,40 +7,37 @@ paths actually work.
 
 """
 import json
+from itertools import chain, cycle, repeat
+from smtplib import SMTPAuthenticationError, SMTPConnectError, SMTPDataError, SMTPServerDisconnected
 from uuid import uuid4
-from itertools import cycle, chain, repeat
-from mock import patch, Mock
-from nose.plugins.attrib import attr
-from smtplib import SMTPServerDisconnected, SMTPDataError, SMTPConnectError, SMTPAuthenticationError
-from boto.ses.exceptions import (
-    SESAddressNotVerifiedError,
-    SESIdentityNotVerifiedError,
-    SESDomainNotConfirmedError,
-    SESAddressBlacklistedError,
-    SESDailyQuotaExceededError,
-    SESMaxSendingRateExceededError,
-    SESDomainEndsWithDotError,
-    SESLocalAddressCharacterError,
-    SESIllegalAddressError,
-)
+
 from boto.exception import AWSConnectionError
-
-from celery.states import SUCCESS, FAILURE  # pylint: disable=no-name-in-module, import-error
-
+from boto.ses.exceptions import (
+    SESAddressBlacklistedError,
+    SESAddressNotVerifiedError,
+    SESDailyQuotaExceededError,
+    SESDomainEndsWithDotError,
+    SESDomainNotConfirmedError,
+    SESIdentityNotVerifiedError,
+    SESIllegalAddressError,
+    SESLocalAddressCharacterError,
+    SESMaxSendingRateExceededError
+)
+from celery.states import FAILURE, SUCCESS  # pylint: disable=no-name-in-module, import-error
 from django.conf import settings
 from django.core.management import call_command
+from mock import Mock, patch
+from nose.plugins.attrib import attr
+from opaque_keys.edx.locator import CourseLocator
 
-from xmodule.modulestore.tests.factories import CourseFactory
-
-from bulk_email.models import CourseEmail, Optout, SEND_TO_MYSELF, SEND_TO_STAFF, SEND_TO_LEARNERS
+from bulk_email.models import SEND_TO_LEARNERS, SEND_TO_MYSELF, SEND_TO_STAFF, CourseEmail, Optout
 from bulk_email.tasks import _get_course_email_context
-
-from lms.djangoapps.instructor_task.tasks import send_bulk_course_email
-from lms.djangoapps.instructor_task.subtasks import update_subtask_status, SubtaskStatus
 from lms.djangoapps.instructor_task.models import InstructorTask
-from lms.djangoapps.instructor_task.tests.test_base import InstructorTaskCourseTestCase
+from lms.djangoapps.instructor_task.subtasks import SubtaskStatus, update_subtask_status
+from lms.djangoapps.instructor_task.tasks import send_bulk_course_email
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from lms.djangoapps.instructor_task.tests.test_base import InstructorTaskCourseTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class TestTaskFailure(Exception):
@@ -76,7 +73,7 @@ def my_update_subtask_status(entry_id, current_task_id, new_subtask_status):
         update_subtask_status(entry_id, current_task_id, new_subtask_status)
 
 
-@attr(shard=3)
+@attr(shard=5)
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
     """Tests instructor task that send bulk email."""
@@ -123,7 +120,7 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
 
     def test_email_undefined_course(self):
         # Check that we fail when passing in a course that doesn't exist.
-        task_entry = self._create_input_entry(course_id=SlashSeparatedCourseKey("bogus", "course", "id"))
+        task_entry = self._create_input_entry(course_id=CourseLocator("bogus", "course", "id"))
         with self.assertRaises(ValueError):
             self._run_task_with_mock_celery(send_bulk_course_email, task_entry.id, task_entry.task_id)
 
@@ -440,6 +437,7 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         result = _get_course_email_context(self.course)
         self.assertIn('course_title', result)
         self.assertIn('course_root', result)
+        self.assertIn('course_language', result)
         self.assertIn('course_url', result)
         self.assertIn('course_image_url', result)
         self.assertIn('course_end_date', result)

@@ -84,8 +84,7 @@ function toggleSubmitButton(enable) {
             removeClass('is-disabled').
             attr('aria-disabled', false).
             removeProp('disabled');
-    }
-    else {
+    } else {
         $submitButton.
             addClass('is-disabled').
             attr('aria-disabled', true).

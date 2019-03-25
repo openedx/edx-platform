@@ -1,0 +1,68 @@
+<%page expression_filter="h"/>
+<%inherit file="base.html" />
+<%def name="online_help_token()"><% return "files" %></%def>
+<%!
+  from cms.djangoapps.contentstore.config.waffle_utils import should_show_checklists_quality
+  from django.core.urlresolvers import reverse
+  from django.utils.translation import ugettext as _
+  from openedx.core.djangolib.markup import HTML, Text
+  from openedx.core.djangolib.js_utils import js_escaped_string, dump_js_escaped_json
+%>
+<%block name="title">${_("Checklists")}</%block>
+<%block name="bodyclass">is-signedin course view-checklists</%block>
+
+<%namespace name='static' file='static_content.html'/>
+
+<%block name="header_extras">
+    % if not settings.STUDIO_FRONTEND_CONTAINER_URL:
+        <link rel="stylesheet" type="text/css" href="${static.url('common/css/vendor/common.min.css')}" />
+        <link rel="stylesheet" type="text/css" href="${static.url('common/css/vendor/courseHealthCheck.min.css')}" />
+    % endif
+</%block>
+
+<%block name="content">
+
+<div class="wrapper-mast wrapper">
+    <header class="mast has-actions has-subtitle">
+        <h2 class="page-header">
+            <small class="subtitle">${_("Tools")}</small>
+            <span class="sr">- </span>${_("Checklists")}
+        </h2>
+    </header>
+</div>
+
+<div class="wrapper-content wrapper">
+    <div class="content">
+        <%static:studiofrontend entry="courseHealthCheck">
+            <% 
+                course_key = context_course.id
+            %>
+            {
+                "lang": "${language_code | n, js_escaped_string}",
+                "course": {
+                    "id": "${context_course.id | n, js_escaped_string}",
+                    "name": "${context_course.display_name_with_default | n, js_escaped_string}",
+                    "is_course_self_paced": ${context_course.self_paced | n, dump_js_escaped_json},
+                    "url_name": "${context_course.location.name | n, js_escaped_string}",
+                    "org": "${context_course.location.org | n, js_escaped_string}",
+                    "num": "${context_course.location.course | n, js_escaped_string}",
+                    "display_course_number": "${context_course.display_coursenumber | n, js_escaped_string}",
+                    "revision": "${context_course.location.revision | n, js_escaped_string}"
+                },
+                "help_tokens": {
+                    "files": "${get_online_help_info(online_help_token())['doc_url'] | n, js_escaped_string}"
+                },
+                "enable_quality": ${should_show_checklists_quality(request.user, context_course.id) | n, dump_js_escaped_json},
+                "links": {
+                    "certificates": ${reverse('certificates_list_handler', kwargs={'course_key_string': unicode(course_key)})| n, dump_js_escaped_json},
+                    "course_outline": ${reverse('course_handler', kwargs={'course_key_string': unicode(course_key)})| n, dump_js_escaped_json},
+                    "course_updates": ${reverse('course_info_handler', kwargs={'course_key_string': unicode(course_key)})| n, dump_js_escaped_json},
+                    "grading_policy": ${reverse('grading_handler', kwargs={'course_key_string': unicode(course_key)})| n, dump_js_escaped_json},
+                    "settings": ${reverse('settings_handler', kwargs={'course_key_string': unicode(course_key)})| n, dump_js_escaped_json}
+                }
+            }
+        </%static:studiofrontend>
+    </div>
+</div>
+
+</%block>

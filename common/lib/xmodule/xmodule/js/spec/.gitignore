@@ -1,9 +1,0 @@
-*.js
-
-# Tests for video are written in pure JavaScript.
-!video/*.js
-
-# Tests for Time are written in pure JavaScript.
-!time_spec.js
-!collapsible_spec.js
-!xmodule_spec.js

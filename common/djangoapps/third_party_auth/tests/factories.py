@@ -4,8 +4,8 @@ Provides factories for third_party_auth models.
 from factory import SubFactory
 from factory.django import DjangoModelFactory
 
-from third_party_auth.models import SAMLConfiguration, SAMLProviderConfig
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
+from third_party_auth.models import SAMLConfiguration, SAMLProviderConfig
 
 
 class SAMLConfigurationFactory(DjangoModelFactory):
@@ -25,12 +25,12 @@ class SAMLProviderConfigFactory(DjangoModelFactory):
     """
     class Meta(object):
         model = SAMLProviderConfig
-        django_get_or_create = ('idp_slug', 'metadata_source', "entity_id")
+        django_get_or_create = ('slug', 'metadata_source', "entity_id")
 
     site = SubFactory(SiteFactory)
 
     enabled = True
-    idp_slug = "test-shib"
+    slug = "test-shib"
     name = "TestShib College"
 
     entity_id = "https://idp.testshib.org/idp/shibboleth"

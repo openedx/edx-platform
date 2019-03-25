@@ -78,18 +78,18 @@
          },
 
          renderCurrentStep: function() {
-             var stepView, stepEl;
+             var stepView, $stepEl;
 
             // Get or create the step container
-             stepEl = $('#current-step-container');
-             if (!stepEl.length) {
-                 stepEl = $('<div id="current-step-container"></div>').appendTo(this.el);
+             $stepEl = $('#current-step-container');
+             if (!$stepEl.length) {
+                 $stepEl = $('<div id="current-step-container"></div>').appendTo(this.el);
              }
 
             // Render the step subview
             // When the view is rendered, it will overwrite the existing step in the DOM.
              stepView = this.stepViews[this.stepOrder[this.currentStepIndex]];
-             stepView.el = stepEl;
+             stepView.el = $stepEl;
              stepView.render();
          },
 
@@ -111,4 +111,4 @@
              this.render();
          }
      });
- })(jQuery, _, Backbone, gettext);
+ }(jQuery, _, Backbone, gettext));

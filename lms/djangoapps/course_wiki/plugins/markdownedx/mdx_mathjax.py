@@ -1,6 +1,7 @@
 # Source: https://github.com/mayoff/python-markdown-mathjax
 
 import markdown
+
 try:
     # Markdown 2.1.0 changed from 2.0.3. We try importing the new version first,
     # but import the 2.0.3 version if it fails
@@ -26,5 +27,5 @@ class MathJaxExtension(markdown.Extension):
         md.inlinePatterns.add('mathjax', MathJaxPattern(), '<escape')
 
 
-def makeExtension(configs=None):
-    return MathJaxExtension(configs)
+def makeExtension(**kwargs):
+    return MathJaxExtension(**kwargs)

@@ -35,4 +35,4 @@ var edx = edx || {};
         }
 
     });
-})(jQuery);
+}(jQuery));

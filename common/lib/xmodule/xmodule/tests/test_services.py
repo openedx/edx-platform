@@ -6,11 +6,12 @@ import ddt
 import mock
 from unittest import TestCase
 
+from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.test.utils import override_settings
 
 from xblock.runtime import Mixologist
-from xmodule.services import SettingsService
+from xmodule.services import ConfigurationService, SettingsService
 
 
 class _DummyBlock(object):
@@ -18,9 +19,25 @@ class _DummyBlock(object):
     pass
 
 
+class DummyConfig(ConfigurationModel):
+    """
+    Dummy Configuration
+    """
+    class Meta:
+        app_label = 'xmoduletestservices'
+
+
+class DummyUnexpected(object):
+    """
+    Dummy Unexpected Class
+    """
+    pass
+
+
 @ddt.ddt
 class TestSettingsService(TestCase):
     """ Test SettingsService """
+    shard = 1
 
     xblock_setting_key1 = 'dummy_block'
     xblock_setting_key2 = 'other_dummy_block'
@@ -76,3 +93,25 @@ class TestSettingsService(TestCase):
         block = mixologist.mix(_DummyBlock)
         self.assertEqual(settings.XBLOCK_SETTINGS, {"_DummyBlock": [1, 2, 3]})
         self.assertEqual(self.settings_service.get_settings_bucket(block), [1, 2, 3])
+
+
+class TestConfigurationService(TestCase):
+    """
+    Tests for ConfigurationService
+    """
+    shard = 1
+
+    def test_given_unexpected_class_throws_value_error(self):
+        """
+        Test that instantiating ConfigurationService raises exception on passing
+        a class which is not subclass of ConfigurationModel.
+        """
+        with self.assertRaises(ValueError):
+            ConfigurationService(DummyUnexpected)
+
+    def test_configuration_service(self):
+        """
+        Test the correct configuration on instantiating ConfigurationService.
+        """
+        config_service = ConfigurationService(DummyConfig)
+        self.assertEqual(config_service.configuration, DummyConfig)

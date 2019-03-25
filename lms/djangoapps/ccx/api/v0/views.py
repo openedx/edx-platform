@@ -3,45 +3,35 @@
 import datetime
 import json
 import logging
-import pytz
 
+import pytz
+from ccx_keys.locator import CCXLocator
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.http import Http404
+from edx_rest_framework_extensions.authentication import JwtAuthentication
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from ccx_keys.locator import CCXLocator
 from courseware import courses
-from xmodule.modulestore.django import SignalHandler
-from edx_rest_framework_extensions.authentication import JwtAuthentication
-from lms.djangoapps.instructor.enrollment import (
-    enroll_email,
-    get_email_params,
-)
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey, UsageKey
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.lib.api import (
-    authentication,
-    permissions,
-)
-from student.models import CourseEnrollment
-from student.roles import CourseCcxCoachRole
-
-
 from lms.djangoapps.ccx.models import CcxFieldOverride, CustomCourseForEdX
-from lms.djangoapps.ccx.overrides import (
-    override_field_for_ccx,
-)
+from lms.djangoapps.ccx.overrides import override_field_for_ccx
 from lms.djangoapps.ccx.utils import (
     add_master_course_staff_to_ccx,
     assign_staff_role_to_ccx,
-    is_email,
-    get_course_chapters,
+    is_email
 )
+from lms.djangoapps.instructor.enrollment import enroll_email, get_email_params
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.lib.api import authentication, permissions
+from student.models import CourseEnrollment
+from student.roles import CourseCcxCoachRole
+from xmodule.modulestore.django import SignalHandler
+
 from .paginators import CCXAPIPagination
 from .serializers import CCXCourseSerializer
 
@@ -196,9 +186,7 @@ def valid_course_modules(course_module_list, master_course_key):
     Returns:
         bool: whether or not all the course module strings belong to the master course
     """
-    course_chapters = get_course_chapters(master_course_key)
-    if course_chapters is None:
-        return False
+    course_chapters = courses.get_course_chapter_ids(master_course_key)
     return set(course_module_list).intersection(set(course_chapters)) == set(course_module_list)
 
 
@@ -442,6 +430,12 @@ class CCXListView(GenericAPIView):
             )
 
         try:
+            # Retired users should effectively appear to not exist when
+            # attempts are made to modify them, so a direct User model email
+            # lookup is sufficient here.  This corner case relies on the fact
+            # that we scramble emails immediately during user lock-out.  Of
+            # course, the normal cases are that the email just never existed,
+            # or it is currently associated with an active account.
             coach = User.objects.get(email=valid_input['coach_email'])
         except User.DoesNotExist:
             return Response(

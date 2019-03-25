@@ -3,12 +3,13 @@
 End-to-end tests for the main LMS Dashboard (aka, Student Dashboard).
 """
 import datetime
+
 from nose.plugins.attrib import attr
 
-from common.test.acceptance.tests.helpers import UniqueCourseTest, generate_course_key
 from common.test.acceptance.fixtures.course import CourseFixture
-from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.dashboard import DashboardPage
+from common.test.acceptance.tests.helpers import UniqueCourseTest, generate_course_key
 
 DEFAULT_SHORT_DATE_FORMAT = '{dt:%b} {dt.day}, {dt.year}'
 TEST_DATE_FORMAT = '{dt:%b} {dt.day}, {dt.year} {dt.hour:02}:{dt.minute:02}'
@@ -75,19 +76,25 @@ class BaseLmsDashboardTestMultiple(UniqueCourseTest):
                 'org': 'test_org',
                 'number': self.unique_id,
                 'run': 'test_run_A',
-                'display_name': 'Test Course A'
+                'display_name': 'Test Course A',
+                'enrollment_mode': 'audit',
+                'cert_name_long': 'Certificate of Audit Achievement'
             },
             'B': {
                 'org': 'test_org',
                 'number': self.unique_id,
                 'run': 'test_run_B',
-                'display_name': 'Test Course B'
+                'display_name': 'Test Course B',
+                'enrollment_mode': 'verified',
+                'cert_name_long': 'Certificate of Verified Achievement'
             },
             'C': {
                 'org': 'test_org',
                 'number': self.unique_id,
                 'run': 'test_run_C',
-                'display_name': 'Test Course C'
+                'display_name': 'Test Course C',
+                'enrollment_mode': 'credit',
+                'cert_name_long': 'Certificate of Credit Achievement'
             }
         }
 
@@ -112,7 +119,8 @@ class BaseLmsDashboardTestMultiple(UniqueCourseTest):
             )
 
             course_fixture.add_advanced_settings({
-                u"social_sharing_url": {u"value": "http://custom/course/url"}
+                u"social_sharing_url": {u"value": "http://custom/course/url"},
+                u"cert_name_long": {u"value": value['cert_name_long']}
             })
 
             course_fixture.install()
@@ -125,13 +133,15 @@ class BaseLmsDashboardTestMultiple(UniqueCourseTest):
                 self.browser,
                 username=self.username,
                 email=self.email,
-                course_id=course_key
+                course_id=course_key,
+                enrollment_mode=value['enrollment_mode']
             ).visit()
 
         # Navigate the authenticated, enrolled user to the dashboard page and get testing!
         self.dashboard_page.visit()
 
 
+@attr(shard=9)
 class LmsDashboardPageTest(BaseLmsDashboardTest):
     """ Test suite for the LMS Student Dashboard page """
 
@@ -153,21 +163,20 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         Validate the behavior of the social sharing feature
         """
         twitter_widget = self.dashboard_page.get_course_social_sharing_widget('twitter')
-        twitter_url = "https://twitter.com/intent/tweet?text=Testing+feature%3A%20http%3A%2F%2Fcustom%2Fcourse%2Furl"
+        twitter_url = ("https://twitter.com/intent/tweet?text=Testing+feature%3A%20http%3A%2F%2Fcustom%2Fcourse%2Furl"
+                       "%3Futm_campaign%3Dsocial-sharing-db%26utm_medium%3Dsocial%26utm_source%3Dtwitter")
         self.assertEqual(twitter_widget.attrs('title')[0], 'Share on Twitter')
         self.assertEqual(twitter_widget.attrs('data-tooltip')[0], 'Share on Twitter')
-        self.assertEqual(twitter_widget.attrs('aria-haspopup')[0], 'true')
-        self.assertEqual(twitter_widget.attrs('aria-expanded')[0], 'false')
         self.assertEqual(twitter_widget.attrs('target')[0], '_blank')
         self.assertIn(twitter_url, twitter_widget.attrs('href')[0])
         self.assertIn(twitter_url, twitter_widget.attrs('onclick')[0])
 
         facebook_widget = self.dashboard_page.get_course_social_sharing_widget('facebook')
-        facebook_url = "https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fcustom%2Fcourse%2Furl"
+        facebook_url = ("https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fcustom%2Fcourse%2Furl%3F"
+                        "utm_campaign%3Dsocial-sharing-db%26utm_medium%3Dsocial%26utm_source%3Dfacebook&"
+                        "quote=I%27m+taking+Test")
         self.assertEqual(facebook_widget.attrs('title')[0], 'Share on Facebook')
         self.assertEqual(facebook_widget.attrs('data-tooltip')[0], 'Share on Facebook')
-        self.assertEqual(facebook_widget.attrs('aria-haspopup')[0], 'true')
-        self.assertEqual(facebook_widget.attrs('aria-expanded')[0], 'false')
         self.assertEqual(facebook_widget.attrs('target')[0], '_blank')
         self.assertIn(facebook_url, facebook_widget.attrs('href')[0])
         self.assertIn(facebook_url, facebook_widget.attrs('onclick')[0])
@@ -294,7 +303,7 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         self.course_fixture.configure_course()
 
         start_date = TEST_DATE_FORMAT.format(dt=course_start_date)
-        expected_course_date = "Starts - {start_date} GMT".format(start_date=start_date)
+        expected_course_date = "Starts - {start_date} UTC".format(start_date=start_date)
 
         # reload the page for changes to course date changes to appear in dashboard
         self.dashboard_page.visit()
@@ -305,12 +314,89 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         # and course starts within 5 days
         self.assertEqual(course_date, expected_course_date)
 
+    def test_advertised_start_date(self):
+
+        """
+        Scenario:
+            Course Date should be advertised start date
+            if the course on student dashboard has `Course Advertised Start` set.
+
+        As a Student,
+        Given that I have enrolled to a course
+        And the course has `Course Advertised Start` set.
+        When I visit dashboard page
+        Then the advertised start date should be displayed rather course start date"
+        """
+        course_start_date = self.now + datetime.timedelta(days=2)
+        course_advertised_start = "Winter 2018"
+
+        self.course_fixture.add_course_details({
+            'start_date': course_start_date,
+        })
+        self.course_fixture.configure_course()
+
+        self.course_fixture.add_advanced_settings({
+            u"advertised_start": {u"value": course_advertised_start}
+        })
+        self.course_fixture._add_advanced_settings()
+
+        expected_course_date = "Starts - {start_date}".format(start_date=course_advertised_start)
+
+        self.dashboard_page.visit()
+        course_date = self.dashboard_page.get_course_date()
+
+        self.assertEqual(course_date, expected_course_date)
+
     def test_profile_img_alt_empty(self):
         """
         Validate value of profile image alt attribue is null
         """
         profile_img = self.dashboard_page.get_profile_img()
         self.assertEqual(profile_img.attrs('alt')[0], '')
+
+
+class LmsDashboardCourseUnEnrollDialogMessageTest(BaseLmsDashboardTestMultiple):
+    """
+        Class to test lms student dashboard unenroll dialog messages.
+    """
+
+    def test_audit_course_run_unenroll_dialog_msg(self):
+        """
+        Validate unenroll dialog message when user clicks unenroll button for a audit course
+        """
+
+        self.dashboard_page.visit()
+        dialog_message = self.dashboard_page.view_course_unenroll_dialog_message(str(self.course_keys['A']))
+        course_number = self.courses['A']['number']
+        course_name = self.courses['A']['display_name']
+
+        expected_track_message = u'Are you sure you want to unenroll from' + \
+                                 u' <span id="unenroll_course_name">' + course_name + u'</span>' + \
+                                 u' (<span id="unenroll_course_number">' + course_number + u'</span>)?'
+
+        self.assertEqual(dialog_message['track-info'][0], expected_track_message)
+
+    def test_verified_course_run_unenroll_dialog_msg(self):
+        """
+        Validate unenroll dialog message when user clicks unenroll button for a verified course passed refund
+        deadline
+        """
+
+        self.dashboard_page.visit()
+        dialog_message = self.dashboard_page.view_course_unenroll_dialog_message(str(self.course_keys['B']))
+        course_number = self.courses['B']['number']
+        course_name = self.courses['B']['display_name']
+        cert_long_name = self.courses['B']['cert_name_long']
+
+        expected_track_message = u'Are you sure you want to unenroll from the verified' + \
+                                 u' <span id="unenroll_cert_name">' + cert_long_name + u'</span>' + \
+                                 u' track of <span id="unenroll_course_name">' + course_name + u'</span>' +  \
+                                 u' (<span id="unenroll_course_number">' + course_number + u'</span>)?'
+
+        expected_refund_message = u'The refund deadline for this course has passed,so you will not receive a refund.'
+
+        self.assertEqual(dialog_message['track-info'][0], expected_track_message)
+        self.assertEqual(dialog_message['refund-info'][0], expected_refund_message)
 
 
 @attr('a11y')

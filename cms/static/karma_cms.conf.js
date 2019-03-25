@@ -22,26 +22,33 @@ var options = {
     // Otherwise Istanbul which is used for coverage tracking will cause tests to not run.
     sourceFiles: [
         {pattern: 'cms/**/!(*spec|djangojs).js'},
-        {pattern: 'coffee/src/**/!(*spec).js'},
         {pattern: 'js/**/!(*spec|djangojs).js'}
     ],
 
     specFiles: [
         {pattern: 'cms/**/*spec.js'},
-        {pattern: 'coffee/spec/**/*spec.js'},
         {pattern: 'js/certificates/spec/**/*spec.js'},
         {pattern: 'js/spec/**/*spec.js'}
     ],
 
     fixtureFiles: [
-        {pattern: 'coffee/fixtures/**/*.underscore'},
+        {pattern: '../templates/js/**/*.underscore'},
         {pattern: 'templates/**/*.underscore'}
     ],
 
     runFiles: [
-        {pattern: 'cms/js/spec/main.js', included: true}
-    ]
+        {pattern: 'cms/js/spec/main.js', included: true},
+        {pattern: 'jasmine.cms.conf.js', included: true}
+    ],
+
+    preprocessors: {}
 };
+
+(options.sourceFiles.concat(options.specFiles))
+    .filter(function(file) { return file.webpack; })
+    .forEach(function(file) {
+        options.preprocessors[file.pattern] = ['webpack'];
+    });
 
 module.exports = function(config) {
     configModule.configure(config, options);

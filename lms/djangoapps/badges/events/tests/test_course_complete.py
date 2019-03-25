@@ -3,17 +3,18 @@ Tests for the course completion helper functions.
 """
 from datetime import datetime
 
-from student.tests.factories import UserFactory
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-
 from badges.events import course_complete
+from student.tests.factories import UserFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class CourseCompleteTestCase(ModuleStoreTestCase):
     """
     Tests for the course completion helper functions.
     """
+    shard = 4
+
     def setUp(self, **kwargs):
         super(CourseCompleteTestCase, self).setUp()
         # Need key to be deterministic to test slugs.

@@ -20,130 +20,160 @@ Modulestore virtual   |          XML physical (draft, published)
              (a, a)   |  (a, a) | (x, a) | (x, x) | (x, y) | (a, x)
              (a, b)   |  (a, b) | (x, b) | (x, x) | (x, y) | (a, x)
 """
-import logging
-from abc import abstractmethod
-from opaque_keys.edx.locator import LibraryLocator
-import os
-import mimetypes
-from path import Path as path
 import json
+import logging
+import mimetypes
+import os
 import re
-from lxml import etree
+from abc import abstractmethod
 
-from xmodule.library_tools import LibraryToolsService
-from xmodule.modulestore.xml import XMLModuleStore, LibraryXMLModuleStore, ImportSystem
-from xblock.runtime import KvsFieldData, DictKeyValueStore
-from xmodule.x_module import XModuleDescriptor, XModuleMixin
-from opaque_keys.edx.keys import UsageKey
-from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
-from xmodule.contentstore.content import StaticContent
-from .inheritance import own_metadata
-from xmodule.errortracker import make_error_tracker
-from .store_utilities import rewrite_nonportable_content_links
 import xblock
-from xmodule.tabs import CourseTabList
+from lxml import etree
+from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.locator import LibraryLocator
+from path import Path as path
+from xblock.core import XBlockMixin
+from xblock.fields import Reference, ReferenceList, ReferenceValueDict, Scope
+from xblock.runtime import DictKeyValueStore, KvsFieldData
+
 from xmodule.assetstore import AssetMetadata
+from xmodule.contentstore.content import StaticContent
+from xmodule.errortracker import make_error_tracker
+from xmodule.library_tools import LibraryToolsService
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import ASSET_IGNORE_REGEX
 from xmodule.modulestore.exceptions import DuplicateCourseError
 from xmodule.modulestore.mongo.base import MongoRevisionKey
-from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.store_utilities import draft_node_constructor, get_draft_subtree_roots
-from xmodule.modulestore.tests.utils import LocationMixin
+from xmodule.modulestore.xml import ImportSystem, LibraryXMLModuleStore, XMLModuleStore
+from xmodule.tabs import CourseTabList
 from xmodule.util.misc import escape_invalid_characters
+from xmodule.x_module import XModuleDescriptor, XModuleMixin
 
+from .inheritance import own_metadata
+from .store_utilities import rewrite_nonportable_content_links
 
 log = logging.getLogger(__name__)
 
+DEFAULT_STATIC_CONTENT_SUBDIR = 'static'
 
-def import_static_content(
-        course_data_path, static_content_store,
-        target_id, subpath='static', verbose=False):
 
-    remap_dict = {}
+class LocationMixin(XBlockMixin):
+    """
+    Adds a `location` property to an :class:`XBlock` so it is more compatible
+    with old-style :class:`XModule` API. This is a simplified version of
+    :class:`XModuleMixin`.
+    """
+    @property
+    def location(self):
+        """ Get the UsageKey of this block. """
+        return self.scope_ids.usage_id
 
-    # now import all static assets
-    static_dir = course_data_path / subpath
-    try:
-        with open(course_data_path / 'policies/assets.json') as f:
-            policy = json.load(f)
-    except (IOError, ValueError) as err:
-        # xml backed courses won't have this file, only exported courses;
-        # so, its absence is not really an exception.
-        policy = {}
+    @location.setter
+    def location(self, value):
+        """ Set the UsageKey of this block. """
+        assert isinstance(value, UsageKey)
+        self.scope_ids = self.scope_ids._replace(
+            def_id=value,
+            usage_id=value,
+        )
 
-    verbose = True
 
-    mimetypes.add_type('application/octet-stream', '.sjson')
-    mimetypes.add_type('application/octet-stream', '.srt')
-    mimetypes_list = mimetypes.types_map.values()
+class StaticContentImporter:
+    def __init__(self, static_content_store, course_data_path, target_id):
+        self.static_content_store = static_content_store
+        self.target_id = target_id
+        self.course_data_path = course_data_path
+        try:
+            with open(course_data_path / 'policies/assets.json') as f:
+                self.policy = json.load(f)
+        except (IOError, ValueError) as err:
+            # xml backed courses won't have this file, only exported courses;
+            # so, its absence is not really an exception.
+            self.policy = {}
 
-    for dirname, _, filenames in os.walk(static_dir):
-        for filename in filenames:
+        mimetypes.add_type('application/octet-stream', '.sjson')
+        mimetypes.add_type('application/octet-stream', '.srt')
+        self.mimetypes_list = mimetypes.types_map.values()
 
-            content_path = os.path.join(dirname, filename)
+    def import_static_content_directory(self, content_subdir=DEFAULT_STATIC_CONTENT_SUBDIR, verbose=False):
+        remap_dict = {}
 
-            if re.match(ASSET_IGNORE_REGEX, filename):
-                if verbose:
-                    log.debug('skipping static content %s...', content_path)
-                continue
+        static_dir = self.course_data_path / content_subdir
+        for dirname, _, filenames in os.walk(static_dir):
+            for filename in filenames:
 
-            if verbose:
-                log.debug('importing static content %s...', content_path)
+                file_path = os.path.join(dirname, filename)
 
-            try:
-                with open(content_path, 'rb') as f:
-                    data = f.read()
-            except IOError:
-                if filename.startswith('._'):
-                    # OS X "companion files". See
-                    # http://www.diigo.com/annotated/0c936fda5da4aa1159c189cea227e174
+                if re.match(ASSET_IGNORE_REGEX, filename):
+                    if verbose:
+                        log.debug('skipping static content %s...', file_path)
                     continue
-                # Not a 'hidden file', then re-raise exception
-                raise
 
-            # strip away leading path from the name
-            fullname_with_subpath = content_path.replace(static_dir, '')
-            if fullname_with_subpath.startswith('/'):
-                fullname_with_subpath = fullname_with_subpath[1:]
-            asset_key = StaticContent.compute_location(target_id, fullname_with_subpath)
+                if verbose:
+                    log.debug('importing static content %s...', file_path)
 
-            policy_ele = policy.get(asset_key.path, {})
+                imported_file_attrs = self.import_static_file(file_path, base_dir=static_dir)
 
-            # During export display name is used to create files, strip away slashes from name
-            displayname = escape_invalid_characters(
-                name=policy_ele.get('displayname', filename),
-                invalid_char_list=['/', '\\']
-            )
-            locked = policy_ele.get('locked', False)
-            mime_type = policy_ele.get('contentType')
+                if imported_file_attrs:
+                    # store the remapping information which will be needed
+                    # to subsitute in the module data
+                    remap_dict[imported_file_attrs[0]] = imported_file_attrs[1]
 
-            # Check extracted contentType in list of all valid mimetypes
-            if not mime_type or mime_type not in mimetypes_list:
-                mime_type = mimetypes.guess_type(filename)[0]   # Assign guessed mimetype
-            content = StaticContent(
-                asset_key, displayname, mime_type, data,
-                import_path=fullname_with_subpath, locked=locked
-            )
+        return remap_dict
 
-            # first let's save a thumbnail so we can get back a thumbnail location
-            thumbnail_content, thumbnail_location = static_content_store.generate_thumbnail(content)
+    def import_static_file(self, full_file_path, base_dir):
+        filename = os.path.basename(full_file_path)
+        try:
+            with open(full_file_path, 'rb') as f:
+                data = f.read()
+        except IOError:
+            # OS X "companion files". See
+            # http://www.diigo.com/annotated/0c936fda5da4aa1159c189cea227e174
+            if filename.startswith('._'):
+                return None
+            # Not a 'hidden file', then re-raise exception
+            raise
 
-            if thumbnail_content is not None:
-                content.thumbnail_location = thumbnail_location
+        # strip away leading path from the name
+        file_subpath = full_file_path.replace(base_dir, '')
+        if file_subpath.startswith('/'):
+            file_subpath = file_subpath[1:]
+        asset_key = StaticContent.compute_location(self.target_id, file_subpath)
 
-            # then commit the content
-            try:
-                static_content_store.save(content)
-            except Exception as err:
-                log.exception(u'Error importing {0}, error={1}'.format(
-                    fullname_with_subpath, err
-                ))
+        policy_ele = self.policy.get(asset_key.path, {})
 
-            # store the remapping information which will be needed
-            # to subsitute in the module data
-            remap_dict[fullname_with_subpath] = asset_key
+        # During export display name is used to create files, strip away slashes from name
+        displayname = escape_invalid_characters(
+            name=policy_ele.get('displayname', filename),
+            invalid_char_list=['/', '\\']
+        )
+        locked = policy_ele.get('locked', False)
+        mime_type = policy_ele.get('contentType')
 
-    return remap_dict
+        # Check extracted contentType in list of all valid mimetypes
+        if not mime_type or mime_type not in self.mimetypes_list:
+            mime_type = mimetypes.guess_type(filename)[0]  # Assign guessed mimetype
+        content = StaticContent(
+            asset_key, displayname, mime_type, data,
+            import_path=file_subpath, locked=locked
+        )
+
+        # first let's save a thumbnail so we can get back a thumbnail location
+        thumbnail_content, thumbnail_location = self.static_content_store.generate_thumbnail(content)
+
+        if thumbnail_content is not None:
+            content.thumbnail_location = thumbnail_location
+
+        # then commit the content
+        try:
+            self.static_content_store.save(content)
+        except Exception as err:
+            log.exception(u'Error importing {0}, error={1}'.format(
+                file_subpath, err
+            ))
+
+        return file_subpath, asset_key
 
 
 class ImportManager(object):
@@ -174,8 +204,18 @@ class ImportManager(object):
             time the course is loaded. Static content for some courses may also be
             served directly by nginx, instead of going through django.
 
+        do_import_python_lib: if True, import a courselike's python lib file into static_content_store
+            if it exists. This can be useful if the static content import needs to be skipped
+            (e.g.: for performance reasons), but the python lib still needs to be imported. If static
+            content is imported, then the python lib file will be imported regardless of this value.
+
         create_if_not_present: If True, then a new courselike is created if it doesn't already exist.
             Otherwise, it throws an InvalidLocationError if the courselike does not exist.
+
+        static_content_subdir: The subdirectory that contains static content.
+
+        python_lib_filename: The filename of the courselike's python library. Course authors can optionally
+            create this file to implement custom logic in their course.
 
         default_class, load_error_modules: are arguments for constructing the XMLModuleStore (see its doc)
     """
@@ -186,8 +226,10 @@ class ImportManager(object):
             default_class='xmodule.raw_module.RawDescriptor',
             load_error_modules=True, static_content_store=None,
             target_id=None, verbose=False,
-            do_import_static=True, create_if_not_present=False,
-            raise_on_failure=False
+            do_import_static=True, do_import_python_lib=True,
+            create_if_not_present=False, raise_on_failure=False,
+            static_content_subdir=DEFAULT_STATIC_CONTENT_SUBDIR,
+            python_lib_filename='python_lib.zip',
     ):
         self.store = store
         self.user_id = user_id
@@ -197,7 +239,10 @@ class ImportManager(object):
         self.static_content_store = static_content_store
         self.target_id = target_id
         self.verbose = verbose
+        self.static_content_subdir = static_content_subdir
+        self.python_lib_filename = python_lib_filename
         self.do_import_static = do_import_static
+        self.do_import_python_lib = do_import_python_lib
         self.create_if_not_present = create_if_not_present
         self.raise_on_failure = raise_on_failure
         self.xml_module_store = self.store_class(
@@ -224,21 +269,36 @@ class ImportManager(object):
         """
         Import all static items into the content store.
         """
-        if self.static_content_store is not None and self.do_import_static:
-            # first pass to find everything in /static/
-            import_static_content(
-                data_path, self.static_content_store,
-                dest_id, subpath='static', verbose=self.verbose
+        if self.static_content_store is None:
+            log.warning("Static content store is None. Skipping static content import...")
+            return
+
+        static_content_importer = StaticContentImporter(
+            self.static_content_store,
+            course_data_path=data_path,
+            target_id=dest_id
+        )
+        if self.do_import_static:
+            if self.verbose:
+                log.debug("Importing static content and python library")
+            # first pass to find everything in the static content directory
+            static_content_importer.import_static_content_directory(
+                content_subdir=self.static_content_subdir, verbose=self.verbose
             )
+        elif self.do_import_python_lib and self.python_lib_filename:
+            if self.verbose:
+                log.debug("Skipping static content import, still importing python library")
+            python_lib_dir_path = data_path / self.static_content_subdir
+            python_lib_full_path = python_lib_dir_path / self.python_lib_filename
+            if os.path.isfile(python_lib_full_path):
+                static_content_importer.import_static_file(
+                    python_lib_full_path, base_dir=python_lib_dir_path
+                )
+        else:
+            if self.verbose:
+                log.debug("Skipping import of static content and python library")
 
-        elif self.verbose and not self.do_import_static:
-            log.debug(
-                "Skipping import of static content, "
-                "since do_import_static=%s", self.do_import_static
-            )
-
-        # no matter what do_import_static is, import "static_import" directory
-
+        # No matter what do_import_static is, import "static_import" directory.
         # This is needed because the "about" pages (eg "overview") are
         # loaded via load_extra_content, and do not inherit the lms
         # metadata from the course module, and thus do not get
@@ -249,9 +309,10 @@ class ImportManager(object):
 
         simport = 'static_import'
         if os.path.exists(data_path / simport):
-            import_static_content(
-                data_path, self.static_content_store,
-                dest_id, subpath=simport, verbose=self.verbose
+            if self.verbose:
+                log.debug("Importing %s directory", simport)
+            static_content_importer.import_static_content_directory(
+                content_subdir=simport, verbose=self.verbose
             )
 
     def import_asset_metadata(self, data_dir, course_id):
@@ -741,7 +802,7 @@ def _update_and_import_module(
     asides = module.get_asides() if isinstance(module, XModuleMixin) else None
 
     block = store.import_xblock(
-        user_id, dest_course_id, module.location.category,
+        user_id, dest_course_id, module.location.block_type,
         module.location.block_id, fields, runtime, asides=asides
     )
 
@@ -749,7 +810,7 @@ def _update_and_import_module(
     # Get to the point where XML import is happening inside the
     # modulestore that is eventually going to store the data.
     # Ticket: https://openedx.atlassian.net/browse/PLAT-1046
-    if block.location.category == 'library_content':
+    if block.location.block_type == 'library_content':
         # if library exists, update source_library_version and children
         # according to this existing library and library content block.
         if store.get_library(block.source_library_key):
@@ -829,7 +890,7 @@ def _import_course_draft(
         # filtered out from the non-draft store export.
         if parent_url is not None and index is not None:
             course_key = descriptor.location.course_key
-            parent_location = course_key.make_usage_key_from_deprecated_string(parent_url)
+            parent_location = UsageKey.from_string(parent_url).map_into_course(course_key)
 
             # IMPORTANT: Be sure to update the parent in the NEW namespace
             parent_location = parent_location.map_into_course(target_id)
@@ -919,7 +980,7 @@ def check_module_metadata_editability(module):
     we can't support editing. However we always allow 'display_name'
     and 'xml_attributes'
     """
-    allowed = allowed_metadata_by_category(module.location.category)
+    allowed = allowed_metadata_by_category(module.location.block_type)
     if '*' in allowed:
         # everything is allowed
         return 0
@@ -994,7 +1055,7 @@ def validate_no_non_editable_metadata(module_store, course_id, category):
     err_cnt = 0
     for module_loc in module_store.modules[course_id]:
         module = module_store.modules[course_id][module_loc]
-        if module.location.category == category:
+        if module.location.block_type == category:
             err_cnt = err_cnt + check_module_metadata_editability(module)
 
     return err_cnt
@@ -1007,19 +1068,19 @@ def validate_category_hierarchy(
     parents = []
     # get all modules of parent_category
     for module in module_store.modules[course_id].itervalues():
-        if module.location.category == parent_category:
+        if module.location.block_type == parent_category:
             parents.append(module)
 
     for parent in parents:
         for child_loc in parent.children:
-            if child_loc.category != expected_child_category:
+            if child_loc.block_type != expected_child_category:
                 err_cnt += 1
                 print(
                     "ERROR: child {child} of parent {parent} was expected to be "
                     "category of {expected} but was {actual}".format(
                         child=child_loc, parent=parent.location,
                         expected=expected_child_category,
-                        actual=child_loc.category
+                        actual=child_loc.block_type
                     )
                 )
 
@@ -1063,7 +1124,7 @@ def validate_course_policy(module_store, course_id):
     # is there a reliable way to get the module location just given the course_id?
     warn_cnt = 0
     for module in module_store.modules[course_id].itervalues():
-        if module.location.category == 'course':
+        if module.location.block_type == 'course':
             if not module._field_data.has(module, 'rerandomize'):
                 warn_cnt += 1
                 print(

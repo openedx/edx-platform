@@ -3,15 +3,14 @@ from datetime import datetime
 
 import pytz
 from django.utils.translation import ugettext as _
-
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import serializers
 
-from commerce.api.v1.models import Course
 from course_modes.models import CourseMode
-
 from xmodule.modulestore.django import modulestore
+
+from .models import Course
 
 
 class CourseModeSerializer(serializers.ModelSerializer):

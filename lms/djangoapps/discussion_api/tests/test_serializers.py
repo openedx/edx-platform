@@ -7,35 +7,36 @@ from urlparse import urlparse
 import ddt
 import httpretty
 import mock
+from django.test.client import RequestFactory
 from nose.plugins.attrib import attr
 
-from django.test.client import RequestFactory
-
 from discussion_api.serializers import CommentSerializer, ThreadSerializer, get_context
-from discussion_api.tests.utils import (
-    CommentsServiceMockMixin,
-    make_minimal_cs_thread,
-    make_minimal_cs_comment,
-)
+from discussion_api.tests.utils import CommentsServiceMockMixin, make_minimal_cs_comment, make_minimal_cs_thread
+from django_comment_client.tests.utils import ForumsEnableMixin
 from django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_COMMUNITY_TA,
     FORUM_ROLE_MODERATOR,
     FORUM_ROLE_STUDENT,
-    Role,
+    Role
 )
 from lms.lib.comment_client.comment import Comment
 from lms.lib.comment_client.thread import Thread
+from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from student.tests.factories import UserFactory
 from util.testing import UrlResetMixin
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
-from django_comment_client.tests.utils import ForumsEnableMixin
 
 
+@attr(shard=6)
 @ddt.ddt
 class SerializerTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMixin):
+    """
+    Test Mixin for Serializer tests
+    """
     @classmethod
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUpClass(cls):
@@ -47,6 +48,7 @@ class SerializerTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetM
         super(SerializerTestMixin, self).setUp()
         httpretty.reset()
         httpretty.enable()
+        self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
         self.maxDiff = None  # pylint: disable=invalid-name
         self.user = UserFactory.create()
@@ -134,7 +136,7 @@ class SerializerTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetM
         self.assertEqual(serialized["voted"], True)
 
 
-@attr(shard=3)
+@attr(shard=6)
 @ddt.ddt
 class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTestCase):
     """Tests for ThreadSerializer serialization."""
@@ -209,6 +211,8 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTe
         self.assertEqual(serialized["pinned"], False)
 
     def test_group(self):
+        self.course.cohort_config = {"cohorted": True}
+        modulestore().update_item(self.course, ModuleStoreEnum.UserID.test)
         cohort = CohortFactory.create(course_id=self.course.id)
         serialized = self.serialize(self.make_cs_content({"group_id": cohort.id}))
         self.assertEqual(serialized["group_id"], cohort.id)
@@ -234,6 +238,7 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTe
         self.assertNotIn("response_count", serialized)
 
 
+@attr(shard=6)
 @ddt.ddt
 class CommentSerializerTest(SerializerTestMixin, SharedModuleStoreTestCase):
     """Tests for CommentSerializer."""
@@ -393,6 +398,7 @@ class CommentSerializerTest(SerializerTestMixin, SharedModuleStoreTestCase):
         self.assertEqual(serialized["children"][1]["children"][0]["parent_id"], "test_child_2")
 
 
+@attr(shard=6)
 @ddt.ddt
 class ThreadSerializerDeserializationTest(
         ForumsEnableMixin,
@@ -412,6 +418,7 @@ class ThreadSerializerDeserializationTest(
         super(ThreadSerializerDeserializationTest, self).setUp()
         httpretty.reset()
         httpretty.enable()
+        self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
         self.user = UserFactory.create()
         self.register_get_user_response(self.user)
@@ -601,6 +608,7 @@ class ThreadSerializerDeserializationTest(
         )
 
 
+@attr(shard=6)
 @ddt.ddt
 class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModuleStoreTestCase):
     """Tests for ThreadSerializer deserialization."""
@@ -613,6 +621,7 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMoc
         super(CommentSerializerDeserializationTest, self).setUp()
         httpretty.reset()
         httpretty.enable()
+        self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
         self.user = UserFactory.create()
         self.register_get_user_response(self.user)

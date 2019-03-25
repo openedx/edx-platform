@@ -8,7 +8,7 @@
     </div>
 
     <div class="page-content-secondary">
-        <h4 class="team-detail-header"><%- gettext("Team Details") %></h4>
+        <h3 class="team-detail-header"><%- gettext("Team Details") %></h3>
         <% if (isMember) { %>
             <div class="team-user-membership-status">
                 <p><%- gettext("You are a member of this team.") %></p>

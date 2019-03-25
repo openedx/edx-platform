@@ -16,7 +16,7 @@ function(ListItemEditorView, _, $, gettext, ExperimentGroupEditView) {
             'click .action-add-group': 'createGroup',
             'focus .input-text': 'onFocus',
             'blur .input-text': 'onBlur',
-            'submit': 'setAndClose',
+            submit: 'setAndClose',
             'click .action-cancel': 'cancel'
         },
 
@@ -108,7 +108,7 @@ function(ListItemEditorView, _, $, gettext, ExperimentGroupEditView) {
 
                 if (group) {
                     group.set({
-                        'name': $('.group-name', li).val()
+                        name: $('.group-name', li).val()
                     });
                 }
             }, this);

@@ -8,30 +8,30 @@
                 <span class="sr">${_("Filter:")}</span>
                 <select class="forum-nav-filter-main-control">
                     ## Translators: This is a menu option for showing all forum threads unfiltered
-                    <option value="all">${_("Show all")}</option>
+                    <option value="all">${_("Show all posts")}</option>
                     ## Translators: This is a menu option for showing only unread forum threads
-                    <option value="unread">${_("Unread")}</option>
+                    <option value="unread">${_("Unread posts")}</option>
                     ## Translators: This is a menu option for showing only unanswered forum
                     ## question threads
-                    <option value="unanswered">${_("Unanswered")}</option>
+                    <option value="unanswered">${_("Unanswered posts")}</option>
                     %if flag_moderator:
                         ## Translators: This is a menu option for showing only forum threads flagged
                         ## for abuse
                         <option value="flagged">${_("Flagged")}</option>
                     %endif
                 </select>
-            ## safe-lint: disable=python-parse-error,python-wrap-html
-            </label>${"<% if (isCohorted && isPrivilegedUser) { %>" | n, decode.utf8}<label class="forum-nav-filter-cohort">
-                ## Translators: This labels a cohort menu in forum navigation
-                <span class="sr">${_("Cohort:")}</span>
+            ## xss-lint: disable=python-parse-error,python-wrap-html
+            </label>${"<% if (isDiscussionDivisionEnabled && isPrivilegedUser) { %>" | n, decode.utf8}<label class="forum-nav-filter-cohort">
+                ## Translators: This labels a group menu in forum navigation
+                <span class="sr">${_("Group:")}</span>
                 <select class="forum-nav-filter-cohort-control">
-                    <option value="">${_("in all cohorts")}</option>
-                        ## cohorts is not iterable sometimes because inline discussions xmodule doesn't pass it
-                        %for c in (cohorts or []):
-                            <option value="${c['id']}">${c['name']}</option>
+                    <option value="">${_("in all groups")}</option>
+                        ## groups is not iterable sometimes because inline discussions xmodule doesn't pass it
+                        %for group in (groups or []):
+                            <option value="${group['id']}">${group['name']}</option>
                         %endfor
                 </select>
-            ## safe-lint: disable=python-parse-error,python-wrap-html
+            ## xss-lint: disable=python-parse-error,python-wrap-html
             </label>${"<% } %>" | n, decode.utf8}<label class="forum-nav-sort">
                 ## Translators: This labels a sort menu in forum navigation
                 <span class="sr">${_("Sort:")}</span>

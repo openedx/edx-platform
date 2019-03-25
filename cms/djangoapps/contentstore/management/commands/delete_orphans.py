@@ -1,8 +1,11 @@
 """Script for deleting orphans"""
+from __future__ import print_function
+
 from django.core.management.base import BaseCommand, CommandError
-from contentstore.views.item import _delete_orphans
-from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+
+from contentstore.views.item import _delete_orphans
 from xmodule.modulestore import ModuleStoreEnum
 
 
@@ -25,15 +28,15 @@ class Command(BaseCommand):
             raise CommandError("Invalid course key.")
 
         if options['commit']:
-            print 'Deleting orphans from the course:'
+            print('Deleting orphans from the course:')
             deleted_items = _delete_orphans(
                 course_key, ModuleStoreEnum.UserID.mgmt_command, options['commit']
             )
-            print "Success! Deleted the following orphans from the course:"
-            print "\n".join(deleted_items)
+            print("Success! Deleted the following orphans from the course:")
+            print("\n".join(deleted_items))
         else:
-            print 'Dry run. The following orphans would have been deleted from the course:'
+            print('Dry run. The following orphans would have been deleted from the course:')
             deleted_items = _delete_orphans(
                 course_key, ModuleStoreEnum.UserID.mgmt_command, options['commit']
             )
-            print "\n".join(deleted_items)
+            print("\n".join(deleted_items))

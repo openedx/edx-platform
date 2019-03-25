@@ -4,10 +4,15 @@ Middleware to serve assets.
 
 import logging
 import datetime
-import newrelic.agent
+log = logging.getLogger(__name__)
+try:
+    import newrelic.agent
+except ImportError:
+    newrelic = None  # pylint: disable=invalid-name
 from django.http import (
     HttpResponse, HttpResponseNotModified, HttpResponseForbidden,
     HttpResponseBadRequest, HttpResponseNotFound, HttpResponsePermanentRedirect)
+from six import text_type
 from student.models import CourseEnrollment
 
 from xmodule.assetstore.assetmgr import AssetManager
@@ -25,7 +30,6 @@ from .models import CourseAssetCacheTtlConfig, CdnUserAgentsConfig
 # TODO: Soon as we have a reasonable way to serialize/deserialize AssetKeys, we need
 # to change this file so instead of using course_id_partial, we're just using asset keys
 
-log = logging.getLogger(__name__)
 HTTP_DATE_FORMAT = "%a, %d %b %Y %H:%M:%S GMT"
 
 
@@ -86,17 +90,18 @@ class StaticContentServer(object):
             if safe_course_key.run is None:
                 safe_course_key = safe_course_key.replace(run='only')
 
-            newrelic.agent.add_custom_parameter('course_id', safe_course_key)
-            newrelic.agent.add_custom_parameter('org', loc.org)
-            newrelic.agent.add_custom_parameter('contentserver.path', loc.path)
+            if newrelic:
+                newrelic.agent.add_custom_parameter('course_id', safe_course_key)
+                newrelic.agent.add_custom_parameter('org', loc.org)
+                newrelic.agent.add_custom_parameter('contentserver.path', loc.path)
 
-            # Figure out if this is a CDN using us as the origin.
-            is_from_cdn = StaticContentServer.is_cdn_request(request)
-            newrelic.agent.add_custom_parameter('contentserver.from_cdn', is_from_cdn)
+                # Figure out if this is a CDN using us as the origin.
+                is_from_cdn = StaticContentServer.is_cdn_request(request)
+                newrelic.agent.add_custom_parameter('contentserver.from_cdn', is_from_cdn)
 
-            # Check if this content is locked or not.
-            locked = self.is_content_locked(content)
-            newrelic.agent.add_custom_parameter('contentserver.locked', locked)
+                # Check if this content is locked or not.
+                locked = self.is_content_locked(content)
+                newrelic.agent.add_custom_parameter('contentserver.locked', locked)
 
             # Check that user has access to the content.
             if not self.is_user_authorized(request, content, loc):
@@ -128,18 +133,18 @@ class StaticContentServer(object):
                 except ValueError as exception:
                     # If the header field is syntactically invalid it should be ignored.
                     log.exception(
-                        u"%s in Range header: %s for content: %s", exception.message, header_value, unicode(loc)
+                        u"%s in Range header: %s for content: %s", text_type(exception), header_value, unicode(loc)
                     )
                 else:
                     if unit != 'bytes':
                         # Only accept ranges in bytes
-                        log.warning(u"Unknown unit in Range header: %s for content: %s", header_value, unicode(loc))
+                        log.warning(u"Unknown unit in Range header: %s for content: %s", header_value, text_type(loc))
                     elif len(ranges) > 1:
                         # According to Http/1.1 spec content for multiple ranges should be sent as a multipart message.
                         # http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.16
                         # But we send back the full content.
                         log.warning(
-                            u"More than 1 ranges in Range header: %s for content: %s", header_value, unicode(loc)
+                            u"More than 1 ranges in Range header: %s for content: %s", header_value, text_type(loc)
                         )
                     else:
                         first, last = ranges[0]
@@ -153,10 +158,12 @@ class StaticContentServer(object):
                             response['Content-Length'] = str(last - first + 1)
                             response.status_code = 206  # Partial Content
 
-                            newrelic.agent.add_custom_parameter('contentserver.ranged', True)
+                            if newrelic:
+                                newrelic.agent.add_custom_parameter('contentserver.ranged', True)
                         else:
                             log.warning(
-                                u"Cannot satisfy ranges in Range header: %s for content: %s", header_value, unicode(loc)
+                                u"Cannot satisfy ranges in Range header: %s for content: %s",
+                                header_value, text_type(loc)
                             )
                             return HttpResponse(status=416)  # Requested Range Not Satisfiable
 
@@ -165,8 +172,9 @@ class StaticContentServer(object):
                 response = HttpResponse(content.stream_data())
                 response['Content-Length'] = content.length
 
-            newrelic.agent.add_custom_parameter('contentserver.content_len', content.length)
-            newrelic.agent.add_custom_parameter('contentserver.content_type', content.content_type)
+            if newrelic:
+                newrelic.agent.add_custom_parameter('contentserver.content_len', content.length)
+                newrelic.agent.add_custom_parameter('contentserver.content_type', content.content_type)
 
             # "Accept-Ranges: bytes" tells the user that only "bytes" ranges are allowed
             response['Accept-Ranges'] = 'bytes'
@@ -194,12 +202,14 @@ class StaticContentServer(object):
         # indicate there should be no caching whatsoever.
         cache_ttl = CourseAssetCacheTtlConfig.get_cache_ttl()
         if cache_ttl > 0 and not is_locked:
-            newrelic.agent.add_custom_parameter('contentserver.cacheable', True)
+            if newrelic:
+                newrelic.agent.add_custom_parameter('contentserver.cacheable', True)
 
             response['Expires'] = StaticContentServer.get_expiration_value(datetime.datetime.utcnow(), cache_ttl)
             response['Cache-Control'] = "public, max-age={ttl}, s-maxage={ttl}".format(ttl=cache_ttl)
         elif is_locked:
-            newrelic.agent.add_custom_parameter('contentserver.cacheable', False)
+            if newrelic:
+                newrelic.agent.add_custom_parameter('contentserver.cacheable', False)
 
             response['Cache-Control'] = "private, no-cache, no-store"
 
@@ -245,7 +255,7 @@ class StaticContentServer(object):
         if not self.is_content_locked(content):
             return True
 
-        if not hasattr(request, "user") or not request.user.is_authenticated():
+        if not hasattr(request, "user") or not request.user.is_authenticated:
             return False
 
         if not request.user.is_staff:

@@ -1,8 +1,10 @@
 """Login and Registration pages """
 
 from urllib import urlencode
+
 from bok_choy.page_object import PageObject, unguarded
-from bok_choy.promise import Promise, EmptyPromise
+from bok_choy.promise import EmptyPromise, Promise
+
 from common.test.acceptance.pages.lms import BASE_URL
 from common.test.acceptance.pages.lms.dashboard import DashboardPage
 
@@ -70,9 +72,6 @@ class ResetPasswordPage(PageObject):
             browser (Browser): The browser instance.
     """
     url = BASE_URL + "/login#forgot-password-modal"
-
-    def __init__(self, browser):
-        super(ResetPasswordPage, self).__init__(browser)
 
     def is_browser_on_page(self):
         return (
@@ -189,8 +188,7 @@ class CombinedLoginAndRegisterPage(PageObject):
         ).fulfill()
 
     def register(
-            self, email="", password="", username="", full_name="", country="", favorite_movie="",
-            terms_of_service=False
+            self, email="", password="", username="", full_name="", country="", favorite_movie=""
     ):
         """Fills in and submits the registration form.
 
@@ -205,11 +203,10 @@ class CombinedLoginAndRegisterPage(PageObject):
             username (unicode): The user's username.
             full_name (unicode): The user's full name.
             country (unicode): Two-character country code.
-            terms_of_service (boolean): If True, agree to the terms of service and honor code.
 
         """
         # Fill in the form
-        self.wait_for_element_visibility('#register-email', 'Email field is shown')
+        self.wait_for_element_visibility('#toggle_optional_fields', 'Support education research field is shown')
         if email:
             self.q(css="#register-email").fill(email)
         if full_name:
@@ -219,11 +216,9 @@ class CombinedLoginAndRegisterPage(PageObject):
         if password:
             self.q(css="#register-password").fill(password)
         if country:
-            self.q(css="#register-country option[value='{country}']".format(country=country)).click()
+            self.q(css="#register-country").results[0].send_keys(country)
         if favorite_movie:
             self.q(css="#register-favorite_movie").fill(favorite_movie)
-        if terms_of_service:
-            self.q(css="#register-honor_code").click()
 
         # Submit it
         self.q(css=".register-button").click()
@@ -334,6 +329,8 @@ class CombinedLoginAndRegisterPage(PageObject):
         def _check_func():
             """Return success status and any errors that occurred."""
             errors = self.errors
+            if not errors:
+                self.q(css=".register-button").click()
             return (bool(errors), errors)
         return Promise(_check_func, "Errors are visible").fulfill()
 
@@ -356,7 +353,7 @@ class CombinedLoginAndRegisterPage(PageObject):
         """Wait for a status message to be visible following third_party registration, then return it."""
         def _check_func():
             """Return third party auth status notice message."""
-            selector = '.js-auth-warning p'
+            selector = '.js-auth-warning div'
             msg_element = self.q(css=selector)
             if msg_element.visible:
                 return (True, msg_element.text[0])

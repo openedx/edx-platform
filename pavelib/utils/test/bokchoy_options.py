@@ -2,11 +2,10 @@
 Definitions of all options used by the various bok_choy tasks.
 """
 
-from optparse import make_option
 import os
+from optparse import make_option
 
 from pavelib.utils.envs import Env
-
 
 BOKCHOY_IMPORTS_DIR = ('imports-dir=', 'i', 'Directory containing (un-archived) courses to be imported')
 BOKCHOY_IMPORTS_DIR_DEPR = ('imports_dir=', None, 'deprecated in favor of imports-dir')
@@ -20,8 +19,15 @@ BOKCHOY_DEFAULT_STORE_DEPR = make_option(
     default=os.environ.get('DEFAULT_STORE', 'split'),
     help='deprecated in favor of default-store'
 )
-BOKCHOY_FASTTEST = make_option('-a', '--fasttest', action='store_true', help='Skip some setup')
-BOKCHOY_COVERAGERC = make_option('--coveragerc', help='coveragerc file to use during this test')
+BOKCHOY_EVAL_ATTR = make_option(
+    "-a", "--eval-attr",
+    dest="eval_attr", help="Only run tests matching given attribute expression."
+)
+BOKCHOY_FASTTEST = make_option('--fasttest', action='store_true', help='Skip some setup')
+BOKCHOY_COVERAGERC = make_option(
+    '--coveragerc',
+    help='coveragerc file to use during this test'
+)
 
 BOKCHOY_OPTS = [
     ('test-spec=', 't', 'Specific test to run'),
@@ -29,7 +35,9 @@ BOKCHOY_OPTS = [
     ('skip-clean', 'C', 'Skip cleaning repository before running tests'),
     make_option('-r', '--serversonly', action='store_true', help='Prepare suite and leave servers running'),
     make_option('-o', '--testsonly', action='store_true', help='Assume servers are running and execute tests only'),
+    BOKCHOY_COVERAGERC,
     BOKCHOY_DEFAULT_STORE,
+    BOKCHOY_EVAL_ATTR,
     make_option(
         '-d', '--test-dir',
         default='tests',
@@ -81,6 +89,7 @@ BOKCHOY_OPTS = [
     ),
 ]
 
+PA11Y_SINGLE_URL = make_option('--single-url', help='Crawl only the specified url')
 PA11Y_HTML = ('with-html', 'w', 'Include html reports')
 PA11Y_COURSE_KEY = make_option('--course-key', help='Course key for test course')
 PA11Y_FETCH_COURSE = make_option(

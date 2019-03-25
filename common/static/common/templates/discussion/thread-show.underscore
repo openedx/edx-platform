@@ -17,7 +17,7 @@
             </div>
         <% } %>
         <div class="post-header-content">
-            <h4 class="post-title"><%- title %></h4>
+            <h<%- startHeader %> class="post-title"><%- title %></h<%- startHeader%>>
             <p class="posted-details">
             <%
             var timeAgoHtml = interpolate(
@@ -25,16 +25,17 @@
                 {created_at: created_at},
                 true
             );
+            var postedTimeAgoMessage;
+            // Using a separate message to ensure proper translation for different languages
+            // thread_type describes the kind of post this is (e.g. "question" or "discussion");
+            // time_ago is how much time has passed since the post was created (e.g. "4 hours ago")
+            if (thread_type === 'discussion') {
+                postedTimeAgoMessage = gettext('discussion posted %(time_ago)s by %(author)s');
+            } else {
+                postedTimeAgoMessage = gettext('question posted %(time_ago)s by %(author)s');
+            }
             %>
-            <%=
-            interpolate(
-                // Translators: post_type describes the kind of post this is (e.g. "question" or "discussion");
-                // time_ago is how much time has passed since the post was created (e.g. "4 hours ago")
-                _.escape(gettext('%(post_type)s posted %(time_ago)s by %(author)s')),
-                {post_type: thread_type, time_ago: timeAgoHtml, author: author_display},
-                true
-            )
-            %>
+            <%= interpolate(_.escape(postedTimeAgoMessage), {time_ago: timeAgoHtml, author: author_display}, true) %>
             </p>
             <div class="post-labels">
                 <span class="post-label post-label-pinned">
@@ -69,7 +70,7 @@
             %>
         <% } %>
         <div class="group-visibility-label">
-            <% if (obj.group_name) { %>
+            <% if (obj.group_name && is_commentable_divided) { %>
                 <%-
                 interpolate(
                     gettext('This post is visible only to %(group_name)s.'),

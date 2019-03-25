@@ -235,7 +235,8 @@ var edx = edx || {};
                 $('#dirty-schedule').show();
                 $('html, body').animate(
           {scrollTop: $('#dirty-schedule').offset().top},
-          'slow', function() { $('#dirty-schedule').focus();
+          'slow', function() {
+              $('#dirty-schedule').focus();
           });
             } else {
                 $('#dirty-schedule').hide();
@@ -247,8 +248,8 @@ var edx = edx || {};
 
         save: function() {
             self.schedule_collection.set(self.schedule);
-            var button = $('#dirty-schedule #save-changes');
-            button.prop('disabled', true).text(gettext('Saving'));
+            var $button = $('#dirty-schedule #save-changes');
+            $button.prop('disabled', true).text(gettext('Saving'));
       // save_url defined globally in ccx\schedule.html
       /* globals save_url */
             $.ajax({
@@ -259,7 +260,7 @@ var edx = edx || {};
                 success: function(data) {
                     self.dirty = false;
                     self.render();
-                    button.prop('disabled', false).text(gettext('Save changes'));
+                    $button.prop('disabled', false).text(gettext('Save changes'));
 
           // Update textarea with grading policy JSON, since grading policy
           // may have changed.
@@ -270,7 +271,7 @@ var edx = edx || {};
                     $('#ajax-error').show().focus();
                     $('#dirty-schedule').hide();
                     $('form#add-unit select,input,button').prop('disabled', true);
-                    button.prop('disabled', false).text(gettext('Save changes'));
+                    $button.prop('disabled', false).text(gettext('Save changes'));
                 }
             });
         }, // end save
@@ -393,12 +394,12 @@ var edx = edx || {};
 
         expandAll: function() {
             $('table.ccx-schedule > tbody > tr').each(function() {
-                var row = $(this);
-                if (!row.is('.expanded')) {
-                    var children = self.get_children(row);
-                    row.find('.ccx_sr_alert').attr('aria-expanded', 'true');
-                    row.find('.fa-caret-right').removeClass('fa-caret-right').addClass('fa-caret-down');
-                    row.removeClass('collapsed').addClass('expanded');
+                var $row = $(this);
+                if (!$row.is('.expanded')) {
+                    var children = self.get_children($row);
+                    $row.find('.ccx_sr_alert').attr('aria-expanded', 'true');
+                    $row.find('.fa-caret-right').removeClass('fa-caret-right').addClass('fa-caret-down');
+                    $row.removeClass('collapsed').addClass('expanded');
                     children.filter('.collapsed').each(function() {
                         children = children.not(self.get_children(this));
                     });
@@ -409,11 +410,11 @@ var edx = edx || {};
 
         collapseAll: function() {
             $('table.ccx-schedule > tbody > tr').each(function() {
-                var row = $(this);
-                if (row.is('.expanded')) {
-                    $(row).find('.ccx_sr_alert').attr('aria-expanded', 'false');
-                    $(row).find('.fa-caret-down').removeClass('fa-caret-down').addClass('fa-caret-right');
-                    row.removeClass('expanded').addClass('collapsed');
+                var $row = $(this);
+                if ($row.is('.expanded')) {
+                    $($row).find('.ccx_sr_alert').attr('aria-expanded', 'false');
+                    $($row).find('.fa-caret-down').removeClass('fa-caret-down').addClass('fa-caret-right');
+                    $row.removeClass('expanded').addClass('collapsed');
                 }
             });
             $('table.ccx-schedule .sequential,.vertical').hide();
@@ -532,4 +533,4 @@ var edx = edx || {};
       );
         }
     });
-})(jQuery, _, Backbone, gettext);
+}(jQuery, _, Backbone, gettext));

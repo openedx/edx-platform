@@ -8,6 +8,8 @@ class UtilDjangoTests(TestCase):
     """
     Tests for methods exposed in util/django
     """
+    shard = 1
+
     def test_get_current_request(self):
         """
         Since we are running outside of Django assert that get_current_request returns None

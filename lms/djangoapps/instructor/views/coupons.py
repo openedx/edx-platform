@@ -1,16 +1,19 @@
 """
 E-commerce Tab Instructor Dashboard Coupons Operations views
 """
+import datetime
+import logging
+
+import pytz
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
-from django.views.decorators.http import require_POST
 from django.utils.translation import ugettext as _
-from util.json_request import JsonResponse
+from django.views.decorators.http import require_POST
+from opaque_keys.edx.locator import CourseKey
+from six import text_type
+
 from shoppingcart.models import Coupon, CourseRegistrationCode
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-import datetime
-import pytz
-import logging
+from util.json_request import JsonResponse
 
 log = logging.getLogger(__name__)
 
@@ -55,7 +58,7 @@ def add_coupon(request, course_id):
 
     # check if the code is already in the Coupons Table and active
     try:
-        course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+        course_id = CourseKey.from_string(course_id)
         coupon = Coupon.objects.get(is_active=True, code=code, course_id=course_id)
     except Coupon.DoesNotExist:
         # check if the coupon code is in the CourseRegistrationCode Table
@@ -159,7 +162,7 @@ def get_coupon_info(request, course_id):  # pylint: disable=unused-argument
     return JsonResponse({
         'coupon_code': coupon.code,
         'coupon_description': coupon.description,
-        'coupon_course_id': coupon.course_id.to_deprecated_string(),
+        'coupon_course_id': text_type(coupon.course_id),
         'coupon_discount': coupon.percentage_discount,
         'expiry_date': expiry_date,
         'message': _('coupon with the coupon id ({coupon_id}) updated successfully').format(coupon_id=coupon_id)

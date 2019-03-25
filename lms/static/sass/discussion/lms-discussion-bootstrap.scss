@@ -1,0 +1,46 @@
+// ------------------------------
+// LMS discussion main styling
+
+// Set the relative path to the static root
+$static-path: '../..';
+
+// Theme-specific variables
+@import 'lms/theme/variables';
+
+// Bootstrap
+@import 'bootstrap/scss/bootstrap';
+
+// Legacy support
+@import '../bootstrap/legacy';
+
+// Base
+@import '../bootstrap/base';
+@import '../bootstrap/variables';
+
+// Elements
+@import '../bootstrap/header';
+@import '../bootstrap/footer';
+@import '../bootstrap/navigation';
+@import '../bootstrap/layouts';
+@import '../bootstrap/components';
+@import '../course/layout/courseware_preview';
+
+// Discussion variables
+@import 'utilities/variables-bootstrap';
+@import 'utilities/v1-compatibility';
+
+// Discussion styling
+@import 'mixins';
+@import 'discussion'; // Process old file after definitions but before everything else, partial is deprecated.
+@import 'layouts';
+@import 'elements/actions';
+@import 'elements/editor';
+@import 'elements/labels';
+@import 'elements/navigation';
+@import 'views/home';
+@import 'views/thread';
+@import 'views/create-edit-post';
+@import 'views/response';
+@import 'views/search';
+@import 'views/inline';
+@import 'utilities/shame';

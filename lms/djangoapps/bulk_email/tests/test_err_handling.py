@@ -2,31 +2,33 @@
 """
 Unit tests for handling email sending errors
 """
+import json
 from itertools import cycle
+from smtplib import SMTPConnectError, SMTPDataError, SMTPServerDisconnected
 
-from celery.states import SUCCESS, RETRY  # pylint: disable=no-name-in-module, import-error
+import ddt
+from celery.states import RETRY, SUCCESS  # pylint: disable=no-name-in-module, import-error
 from django.conf import settings
 from django.core.management import call_command
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import DatabaseError
-import json
-from mock import patch, Mock
+from mock import Mock, patch
 from nose.plugins.attrib import attr
-from smtplib import SMTPDataError, SMTPServerDisconnected, SMTPConnectError
+from opaque_keys.edx.locator import CourseLocator
+from six import text_type
 
-from bulk_email.models import CourseEmail, SEND_TO_MYSELF, BulkEmailFlag
+from bulk_email.models import SEND_TO_MYSELF, BulkEmailFlag, CourseEmail
 from bulk_email.tasks import perform_delegate_email_batches, send_course_email
+from lms.djangoapps.instructor_task.exceptions import DuplicateTaskException
 from lms.djangoapps.instructor_task.models import InstructorTask
 from lms.djangoapps.instructor_task.subtasks import (
-    initialize_subtask_info,
+    MAX_DATABASE_LOCK_RETRIES,
     SubtaskStatus,
     check_subtask_is_valid,
-    update_subtask_status,
-    DuplicateTaskException,
-    MAX_DATABASE_LOCK_RETRIES,
+    initialize_subtask_info,
+    update_subtask_status
 )
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentFactory
+from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -36,6 +38,7 @@ class EmailTestException(Exception):
     pass
 
 
+@ddt.ddt
 @attr(shard=1)
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class TestEmailErrors(ModuleStoreTestCase):
@@ -54,10 +57,10 @@ class TestEmailErrors(ModuleStoreTestCase):
 
         # load initial content (since we don't run migrations as part of tests):
         call_command("loaddata", "course_email_template.json")
-        self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        self.send_mail_url = reverse('send_email', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        self.url = reverse('instructor_dashboard', kwargs={'course_id': text_type(self.course.id)})
+        self.send_mail_url = reverse('send_email', kwargs={'course_id': text_type(self.course.id)})
         self.success_content = {
-            'course_id': self.course.id.to_deprecated_string(),
+            'course_id': text_type(self.course.id),
             'success': True,
         }
 
@@ -191,7 +194,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         """
         Tests exception when the course in the email doesn't exist
         """
-        course_id = SlashSeparatedCourseKey("I", "DONT", "EXIST")
+        course_id = CourseLocator("I", "DONT", "EXIST")
         email = CourseEmail(course_id=course_id)
         email.save()
         entry = InstructorTask.create(course_id, "task_type", "task_key", "task_input", self.instructor)
@@ -213,15 +216,16 @@ class TestEmailErrors(ModuleStoreTestCase):
                 "dummy body goes here"
             )
 
-    def test_nonexistent_cohort(self):
+    @ddt.data('track', 'cohort')
+    def test_nonexistent_grouping(self, target_type):
         """
-        Tests exception when the cohort doesn't exist
+        Tests exception when the cohort or course mode doesn't exist
         """
-        with self.assertRaisesRegexp(ValueError, 'Cohort IDONTEXIST does not exist *'):
+        with self.assertRaisesRegexp(ValueError, '.* IDONTEXIST does not exist .*'):
             email = CourseEmail.create(  # pylint: disable=unused-variable
                 self.course.id,
                 self.instructor,
-                ["cohort:IDONTEXIST"],
+                ["{}:IDONTEXIST".format(target_type)],
                 "re: subject",
                 "dummy body goes here"
             )
@@ -247,7 +251,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         Tests exception when the course_id in CourseEmail is not the same as one explicitly passed in.
         """
         email = CourseEmail.create(
-            SlashSeparatedCourseKey("bogus", "course", "id"),
+            CourseLocator("bogus", "course", "id"),
             self.instructor,
             [SEND_TO_MYSELF],
             "re: subject",

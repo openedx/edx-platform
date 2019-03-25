@@ -6,17 +6,17 @@ This API is exposed via the middleware(emabargo/middileware.py) layer but may be
 
 """
 import logging
-import pygeoip
 
-from django.core.cache import cache
 from django.conf import settings
-from rest_framework.response import Response
-from rest_framework import status
+from django.core.cache import cache
 from ipware.ip import get_ip
+from rest_framework import status
+from rest_framework.response import Response
 
+import pygeoip
 from student.auth import has_course_author_access
-from .models import CountryAccessRule, RestrictedCourse
 
+from .models import CountryAccessRule, RestrictedCourse
 
 log = logging.getLogger(__name__)
 

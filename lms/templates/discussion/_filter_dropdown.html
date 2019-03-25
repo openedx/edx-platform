@@ -5,35 +5,47 @@ from lms.djangoapps.django_comment_client.constants import TYPE_ENTRY
 from openedx.core.djangolib.markup import HTML
 %>
 
-<%def name="render_dropdown(map)">
+<%def name="render_dropdown(map, topic_list)">
     % for child, c_type in map["children"]:
         % if child in map["entries"] and c_type == TYPE_ENTRY:
-            ${HTML(render_entry(map["entries"], child))}
+            ${HTML(render_entry(map["entries"], child, topic_list))}
         %else:
-            ${HTML(render_category(map["subcategories"], child))}
+            ${HTML(render_category(map["subcategories"], child, topic_list))}
         %endif
     %endfor
 </%def>
 
-<%def name="render_entry(entries, entry)">
+<%def name="render_entry(entries, entry, topic_list)">
     <li
         class="forum-nav-browse-menu-item"
         data-discussion-id='${entries[entry]["id"]}'
         id='${entries[entry]["id"]}'
-        data-cohorted="${str(entries[entry]['is_cohorted']).lower()}"
+        data-divided="${str(entries[entry]['is_divided']).lower()}"
         role="option"
     >
-        <span class="forum-nav-browse-title">${entry}</span>
+    %if entry:
+        <span class="forum-nav-browse-title">
+        %if topic_list:
+            <span class="sr">
+                ${', '.join(topic_list)},  
+            </span>
+        %endif
+        ${entry}
+        </span>
+    %endif
     </li>
 </%def>
 
-<%def name="render_category(categories, category)">
+<%def name="render_category(categories, category, topic_list)">
     <li class="forum-nav-browse-menu-item"
         id='${category | u}'
+        role="option"
     >
         <span class="forum-nav-browse-title">${category}</span>
-        <ul class="forum-nav-browse-submenu">
-            ${HTML(render_dropdown(categories[category]))}
+        <ul class="forum-nav-browse-submenu" role="presentation">
+            <% topic_list.append(category) %>
+            ${HTML(render_dropdown(categories[category], topic_list))}
+            <% topic_list.remove(category) %>
         </ul>
     </li>
 </%def>
@@ -54,6 +66,6 @@ from openedx.core.djangolib.markup import HTML
             <span class="icon fa fa-star" aria-hidden="true"></span>
             <span class="forum-nav-browse-title">${_("Posts I'm Following")}</span>
         </li>
-        ${HTML(render_dropdown(category_map))}
+        ${HTML(render_dropdown(category_map, []))}
     </ul>
 </div>

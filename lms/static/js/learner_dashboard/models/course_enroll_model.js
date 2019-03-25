@@ -1,19 +1,16 @@
+import Backbone from 'backbone';
+
 /**
  *  Store data to enroll learners into the course
  */
-(function(define) {
-    'use strict';
+class CourseEnrollModel extends Backbone.Model {
+  constructor(attrs, ...args) {
+    const defaults = {
+      course_id: '',
+      optIn: false,
+    };
+    super(Object.assign({}, defaults, attrs), ...args);
+  }
+}
 
-    define([
-        'backbone'
-    ],
-        function(Backbone) {
-            return Backbone.Model.extend({
-                defaults: {
-                    course_id: '',
-                    optIn: false
-                }
-            });
-        }
-    );
-}).call(this, define || RequireJS.define);
+export default CourseEnrollModel;

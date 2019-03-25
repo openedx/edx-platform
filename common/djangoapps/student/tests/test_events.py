@@ -2,15 +2,14 @@
 """
 Test that various events are fired for models in the student app.
 """
-from django.test import TestCase
-
-from django_countries.fields import Country
-
-from student.models import PasswordHistory
-from student.tests.factories import UserFactory
-from student.tests.tests import UserSettingsEventTestMixin
 import mock
 from django.db.utils import IntegrityError
+from django.test import TestCase
+from django_countries.fields import Country
+
+from student.models import CourseEnrollmentAllowed, PasswordHistory
+from student.tests.factories import UserFactory, CourseEnrollmentAllowedFactory
+from student.tests.tests import UserSettingsEventTestMixin
 
 
 class TestUserProfileEvents(UserSettingsEventTestMixin, TestCase):
@@ -131,7 +130,7 @@ class TestUserEvents(UserSettingsEventTestMixin, TestCase):
         """
         Verify that we don't emit events for related fields.
         """
-        self.user.passwordhistory_set.add(PasswordHistory(password='new_password'))
+        self.user.passwordhistory_set.create(password='new_password')
         self.user.save()
         self.assert_no_events_were_emitted()
 
@@ -155,3 +154,25 @@ class TestUserEvents(UserSettingsEventTestMixin, TestCase):
         self.user.last_name = "Duck"
         self.user.save()
         self.assert_no_events_were_emitted()
+
+    def test_enrolled_after_email_change(self):
+        """
+        Test that when a user's email changes, the user is enrolled in pending courses.
+        """
+        pending_enrollment = CourseEnrollmentAllowedFactory(auto_enroll=True)
+
+        # the e-mail will change to test@edx.org (from something else)
+        self.assertNotEquals(self.user.email, 'test@edx.org')
+
+        # there's a CEA for the new e-mail
+        self.assertEquals(CourseEnrollmentAllowed.objects.count(), 1)
+        self.assertEquals(CourseEnrollmentAllowed.objects.filter(email='test@edx.org').count(), 1)
+
+        # Changing the e-mail to the enrollment-allowed e-mail should enroll
+        self.user.email = 'test@edx.org'
+        self.user.save()
+        self.assert_user_enrollment_occurred('edX/toy/2012_Fall')
+
+        # CEAs shouldn't have been affected
+        self.assertEquals(CourseEnrollmentAllowed.objects.count(), 1)
+        self.assertEquals(CourseEnrollmentAllowed.objects.filter(email='test@edx.org').count(), 1)

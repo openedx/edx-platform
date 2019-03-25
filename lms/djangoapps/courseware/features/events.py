@@ -1,11 +1,9 @@
 # pylint: disable=missing-docstring
 
-from lettuce import step
-from lettuce import world
-from lettuce import before
+from django.conf import settings
+from lettuce import before, step, world
+from nose.tools import assert_equals, assert_in
 from pymongo import MongoClient
-from nose.tools import assert_equals
-from nose.tools import assert_in
 
 REQUIRED_EVENT_FIELDS = [
     'agent',
@@ -22,7 +20,7 @@ REQUIRED_EVENT_FIELDS = [
 
 @before.all
 def connect_to_mongodb():
-    world.mongo_client = MongoClient()
+    world.mongo_client = MongoClient(host=settings.MONGO_HOST, port=settings.MONGO_PORT_NUM)
     world.event_collection = world.mongo_client['track']['events']
 
 

@@ -1,7 +1,7 @@
 """
 Block Depth Transformer
 """
-from openedx.core.lib.block_structure.transformer import BlockStructureTransformer
+from openedx.core.djangoapps.content.block_structure.transformer import BlockStructureTransformer
 
 
 class BlockDepthTransformer(BlockStructureTransformer):
@@ -9,7 +9,8 @@ class BlockDepthTransformer(BlockStructureTransformer):
     Keep track of the depth of each block within the block structure.  In case
     of multiple paths to a given node (in a DAG), use the shallowest depth.
     """
-    VERSION = 1
+    WRITE_VERSION = 1
+    READ_VERSION = 1
     BLOCK_DEPTH = 'block_depth'
 
     def __init__(self, requested_depth=None):

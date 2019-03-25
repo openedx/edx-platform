@@ -32,7 +32,7 @@
                     spyOn(EnrollmentInterface, 'enroll').and.callFake(function() {});
                     spyOn(ShoppingCartInterface, 'addCourseToCart').and.callFake(function() {});
                     spyOn(EmailOptInInterface, 'setPreference')
-                    .and.callFake(function() { return {'always': function(r) { r(); }}; });
+                    .and.callFake(function() { return {always: function(r) { r(); }}; });
 
                     view.render();
                 };

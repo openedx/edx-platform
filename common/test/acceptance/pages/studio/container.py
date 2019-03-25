@@ -3,13 +3,12 @@ Container page in Studio
 """
 
 from bok_choy.page_object import PageObject
-from bok_choy.promise import Promise, EmptyPromise
-from common.test.acceptance.pages.studio import BASE_URL
-from common.test.acceptance.pages.studio.utils import HelpMixin
+from bok_choy.promise import EmptyPromise, Promise
 
 from common.test.acceptance.pages.common.utils import click_css, confirm_prompt
-
-from common.test.acceptance.pages.studio.utils import type_in_codemirror
+from common.test.acceptance.pages.studio import BASE_URL
+from common.test.acceptance.pages.studio.utils import HelpMixin, type_in_codemirror
+from common.test.acceptance.tests.helpers import click_and_wait_for_window
 
 
 class ContainerPage(PageObject, HelpMixin):
@@ -63,11 +62,16 @@ class ContainerPage(PageObject, HelpMixin):
                 is_done = num_wrappers == (num_initialized_xblocks + num_failed_xblocks)
             return (is_done, is_done)
 
+        def _loading_spinner_hidden():
+            """ promise function to check loading spinner state """
+            is_spinner_hidden = self.q(css='div.ui-loading.is-hidden').present
+            return is_spinner_hidden, is_spinner_hidden
+
         # First make sure that an element with the view-container class is present on the page,
         # and then wait for the loading spinner to go away and all the xblocks to be initialized.
         return (
             self.q(css='body.view-container').present and
-            self.q(css='div.ui-loading.is-hidden').present and
+            Promise(_loading_spinner_hidden, 'loading spinner is hidden.').fulfill() and
             Promise(_is_finished_loading, 'Finished rendering the xblock wrappers.').fulfill()
         )
 
@@ -100,6 +104,13 @@ class ContainerPage(PageObject, HelpMixin):
         Return a list of active xblocks loaded on the container page.
         """
         return self._get_xblocks(".is-active ")
+
+    @property
+    def displayed_children(self):
+        """
+        Return a list of displayed xblocks loaded on the container page.
+        """
+        return self._get_xblocks()[0].children
 
     @property
     def publish_title(self):
@@ -167,6 +178,7 @@ class ContainerPage(PageObject, HelpMixin):
         """
         Returns the link for publishing a unit.
         """
+        self.scroll_to_element('.action-publish')
         return self.q(css='.action-publish').first
 
     def publish(self):
@@ -180,6 +192,7 @@ class ContainerPage(PageObject, HelpMixin):
         """
         Discards draft changes (which will then re-render the page).
         """
+        self.scroll_to_element('a.action-discard')
         click_css(self, 'a.action-discard', 0, require_notification=False)
         confirm_prompt(self)
         self.wait_for_ajax()
@@ -214,8 +227,20 @@ class ContainerPage(PageObject, HelpMixin):
 
         Switches the browser to the newly opened LMS window.
         """
-        self.q(css='.button-view').first.click()
+        click_and_wait_for_window(self, self.q(css='.button-view').first)
         self._switch_to_lms()
+
+    def verify_publish_title(self, expected_title):
+        """
+        Waits for the publish title to change to the expected value.
+        """
+        def wait_for_title_change():
+            """
+            Promise function to check publish title.
+            """
+            return (self.publish_title == expected_title, self.publish_title)
+
+        Promise(wait_for_title_change, "Publish title incorrect. Found '" + self.publish_title + "'").fulfill()
 
     def preview(self):
         """
@@ -243,7 +268,7 @@ class ContainerPage(PageObject, HelpMixin):
         """
         Duplicate the item with index source_index (based on vertical placement in page).
         """
-        click_css(self, 'a.duplicate-button', source_index)
+        click_css(self, '.duplicate-button', source_index)
 
     def delete(self, source_index):
         """
@@ -252,7 +277,7 @@ class ContainerPage(PageObject, HelpMixin):
         The index of the first item is 0.
         """
         # Click the delete button
-        click_css(self, 'a.delete-button', source_index, require_notification=False)
+        click_css(self, '.delete-button', source_index, require_notification=False)
         # Click the confirmation dialog button
         confirm_prompt(self)
 
@@ -261,6 +286,37 @@ class ContainerPage(PageObject, HelpMixin):
         Clicks the "edit" button for the first component on the page.
         """
         return _click_edit(self, '.edit-button', '.xblock-studio_view')
+
+    def edit_visibility(self):
+        """
+        Clicks the edit visibility button for this container.
+        """
+        return _click_edit(self, '.access-button', '.xblock-visibility_view')
+
+    def verify_confirmation_message(self, message, verify_hidden=False):
+        """
+        Verify for confirmation message is present or hidden.
+        """
+        def _verify_message():
+            """ promise function to check confirmation message state """
+            text = self.q(css='#page-alert .alert.confirmation #alert-confirmation-title').text
+            return text and message not in text[0] if verify_hidden else text and message in text[0]
+
+        self.wait_for(_verify_message, description='confirmation message {status}'.format(
+            status='hidden' if verify_hidden else 'present'
+        ))
+
+    def click_undo_move_link(self):
+        """
+        Click undo move link.
+        """
+        click_css(self, '#page-alert .alert.confirmation .nav-actions .action-primary')
+
+    def click_take_me_there_link(self):
+        """
+        Click take me there link.
+        """
+        click_css(self, '#page-alert .alert.confirmation .nav-actions .action-secondary', require_notification=False)
 
     def add_missing_groups(self):
         """
@@ -284,6 +340,16 @@ class ContainerPage(PageObject, HelpMixin):
         Returns an information message for the container page.
         """
         return self.q(css=".xblock-message.information").first.text[0]
+
+    def get_xblock_access_message(self):
+        """
+        Returns a message detailing the access to the specified unit
+        """
+        access_message = self.q(css=".access-message").first
+        if access_message:
+            return access_message.text[0]
+        else:
+            return ""
 
     def is_inline_editing_display_name(self):
         """
@@ -382,7 +448,7 @@ class XBlockWrapper(PageObject):
         """
         Will return any first-generation descendant xblocks of this xblock.
         """
-        descendants = self.q(css=self._bounded_selector(self.BODY_SELECTOR)).map(
+        descendants = self.q(css=self._bounded_selector(self.BODY_SELECTOR)).filter(lambda el: el.is_displayed()).map(
             lambda el: XBlockWrapper(self.browser, el.get_attribute('data-locator'))).results
 
         # Now remove any non-direct descendants.
@@ -451,14 +517,14 @@ class XBlockWrapper(PageObject):
         """
         Returns true if this xblock has a 'duplicate' button
         """
-        return self.q(css=self._bounded_selector('a.duplicate-button'))
+        return self.q(css=self._bounded_selector('.duplicate-button'))
 
     @property
     def has_delete_button(self):
         """
         Returns true if this xblock has a 'delete' button
         """
-        return self.q(css=self._bounded_selector('a.delete-button'))
+        return self.q(css=self._bounded_selector('.delete-button'))
 
     @property
     def has_edit_visibility_button(self):
@@ -466,7 +532,23 @@ class XBlockWrapper(PageObject):
         Returns true if this xblock has an 'edit visibility' button
         :return:
         """
-        return self.q(css=self._bounded_selector('.visibility-button')).is_present()
+        return self.q(css=self._bounded_selector('.access-button')).is_present()
+
+    @property
+    def has_move_modal_button(self):
+        """
+        Returns True if this xblock has move modal button else False
+        """
+        return self.q(css=self._bounded_selector('.move-button')).is_present()
+
+    @property
+    def get_partition_group_message(self):
+        """
+        Returns the message about user partition group visibility, shown under the display name
+        (if not present, returns None).
+        """
+        message = self.q(css=self._bounded_selector('.xblock-group-visibility-label'))
+        return None if len(message) == 0 else message.first.text[0]
 
     def go_to_container(self):
         """
@@ -485,7 +567,7 @@ class XBlockWrapper(PageObject):
         """
         Clicks the edit visibility button for this xblock.
         """
-        return _click_edit(self, '.visibility-button', '.xblock-visibility_view', self._bounded_selector)
+        return _click_edit(self, '.access-button', '.xblock-visibility_view', self._bounded_selector)
 
     def open_advanced_tab(self):
         """
@@ -504,6 +586,15 @@ class XBlockWrapper(PageObject):
         If editing, click on the "Settings" tab
         """
         self._click_button('settings_tab')
+
+    def open_move_modal(self):
+        """
+        Opens the move modal.
+        """
+        click_css(self, '.move-button', require_notification=False)
+        self.wait_for(
+            lambda: self.q(css='.modal-window.move-modal').visible, description='move modal is visible'
+        )
 
     def set_field_val(self, field_display_name, field_value):
         """

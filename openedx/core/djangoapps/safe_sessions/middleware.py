@@ -57,6 +57,9 @@ the entire cookie and use it to impersonate the victim.
 """
 
 from contextlib import contextmanager
+from hashlib import sha256
+from logging import ERROR, getLogger
+
 from django.conf import settings
 from django.contrib.auth import SESSION_KEY
 from django.contrib.auth.views import redirect_to_login
@@ -64,8 +67,7 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from django.core import signing
 from django.http import HttpResponse
 from django.utils.crypto import get_random_string
-from hashlib import sha256
-from logging import getLogger, ERROR
+from six import text_type
 
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 
@@ -185,7 +187,7 @@ class SafeCookieData(object):
             log.error(
                 "SafeCookieData signature error for cookie data {0!r}: {1}".format(  # pylint: disable=logging-format-interpolation
                     unicode(self),
-                    sig_error.message,
+                    text_type(sig_error),
                 )
             )
         return False

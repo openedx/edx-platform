@@ -2,13 +2,14 @@
 unit tests for course_info views and models.
 """
 import json
-from mock import patch
+
 from django.test.utils import override_settings
+from mock import patch
+from opaque_keys.edx.keys import UsageKey
 
 from contentstore.models import PushNotificationConfig
 from contentstore.tests.test_course_settings import CourseTestCase
 from contentstore.utils import reverse_course_url, reverse_usage_url
-from opaque_keys.edx.keys import UsageKey
 from xmodule.modulestore.django import modulestore
 
 
@@ -269,7 +270,7 @@ class CourseUpdateTest(CourseTestCase):
 
         updates_location = self.course.id.make_usage_key('course_info', 'updates')
         self.assertTrue(isinstance(updates_location, UsageKey))
-        self.assertEqual(updates_location.name, u'updates')
+        self.assertEqual(updates_location.block_id, u'updates')
 
         # check posting on handouts
         handouts_location = self.course.id.make_usage_key('course_info', 'handouts')

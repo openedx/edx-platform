@@ -3,33 +3,32 @@ Helper methods related to EdxNotes.
 """
 import json
 import logging
-from json import JSONEncoder
-from uuid import uuid4
 import urlparse
+from datetime import datetime
+from json import JSONEncoder
 from urllib import urlencode
+from uuid import uuid4
 
 import requests
-from datetime import datetime
 from dateutil.parser import parse as dateutil_parse
-from opaque_keys.edx.keys import UsageKey
-from requests.exceptions import RequestException
-
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.translation import ugettext as _
+from opaque_keys.edx.keys import UsageKey
 from provider.oauth2.models import Client
+from requests.exceptions import RequestException
 
+from courseware.access import has_access
+from courseware.courses import get_current_child
 from edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
 from edxnotes.plugins import EdxNotesTab
-from courseware.views.views import get_current_child
-from courseware.access import has_access
+from lms.lib.utils import get_parent_unit
 from openedx.core.lib.token_utils import JwtBuilder
 from student.models import anonymous_id_for_user
 from util.date_utils import get_default_time_display
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
-
 
 log = logging.getLogger(__name__)
 # OAuth2 Client name for edxnotes
@@ -122,19 +121,35 @@ def send_request(user, course_id, page, page_size, path="", text=None):
     return response
 
 
-def get_parent_unit(xblock):
+def delete_all_notes_for_user(user):
     """
-    Find vertical that is a unit, not just some container.
+    helper method to delete all notes for a user, as part of GDPR compliance
+
+    :param user: The user object associated with the deleted notes
+    :return: response (requests) object
+
+    Raises:
+        EdxNotesServiceUnavailable - when notes api is not found/misconfigured.
     """
-    while xblock:
-        xblock = xblock.get_parent()
-        if xblock is None:
-            return None
-        parent = xblock.get_parent()
-        if parent is None:
-            return None
-        if parent.category == 'sequential':
-            return xblock
+    url = get_internal_endpoint('annotations')
+    headers = {
+        "x-annotator-auth-token": get_edxnotes_id_token(user),
+    }
+    data = {
+        "user": anonymous_id_for_user(user, None)
+    }
+    try:
+        response = requests.delete(
+            url=url,
+            headers=headers,
+            data=data,
+            timeout=(settings.EDXNOTES_CONNECT_TIMEOUT, settings.EDXNOTES_READ_TIMEOUT)
+        )
+    except RequestException:
+        log.error("Failed to connect to edx-notes-api: url=%s, params=%s", url, str(headers))
+        raise EdxNotesServiceUnavailable(_("EdxNotes Service is unavailable. Please try again in a few minutes."))
+
+    return response
 
 
 def preprocess_collection(user, course, collection):
@@ -439,8 +454,8 @@ def generate_uid():
     return uuid4().int  # pylint: disable=no-member
 
 
-def is_feature_enabled(course):
+def is_feature_enabled(course, user):
     """
     Returns True if Student Notes feature is enabled for the course, False otherwise.
     """
-    return EdxNotesTab.is_enabled(course)
+    return EdxNotesTab.is_enabled(course, user)

@@ -3,12 +3,12 @@ $(function() {
         header: 'ui-icon-carat-1-e',
         activeHeader: 'ui-icon-carat-1-s'
     };
-    var proctoringAccordionPane = $('#proctoring-accordion');
-    proctoringAccordionPane.accordion(
+    var $proctoringAccordionPane = $('#proctoring-accordion');
+    $proctoringAccordionPane.accordion(
         {
             heightStyle: 'content',
             activate: function(event, ui) {
-                var active = proctoringAccordionPane.accordion('option', 'active');
+                var active = $proctoringAccordionPane.accordion('option', 'active');
                 $.cookie('saved_index', null);
                 $.cookie('saved_index', active);
             },

@@ -1,6 +1,11 @@
-define(['jquery', 'underscore', 'js/views/xblock', 'js/utils/module', 'gettext', 'common/js/components/views/feedback_notification',
-    'jquery.ui'], // The container view uses sortable, which is provided by jquery.ui.
+define([
+    'jquery', 'underscore', 'js/views/xblock', 'js/utils/module',
+    'gettext', 'common/js/components/views/feedback_notification',
+    'jquery.ui'
+], // The container view uses sortable, which is provided by jquery.ui.
     function($, _, XBlockView, ModuleUtils, gettext, NotificationView) {
+        'use strict';
+
         var studioXBlockWrapperClass = '.studio-xblock-wrapper';
 
         var ContainerView = XBlockView.extend({
@@ -12,9 +17,10 @@ define(['jquery', 'underscore', 'js/views/xblock', 'js/utils/module', 'gettext',
             new_child_view: 'reorderable_container_child_preview',
 
             xblockReady: function() {
-                XBlockView.prototype.xblockReady.call(this);
                 var reorderableClass, reorderableContainer,
-                    newParent, oldParent, self = this;
+                    newParent, oldParent,
+                    self = this;
+                XBlockView.prototype.xblockReady.call(this);
 
                 this.requestToken = this.$('div.xblock').first().data('request-token');
                 reorderableClass = this.makeRequestSpecificSelector('.reorderable-container');
@@ -23,13 +29,13 @@ define(['jquery', 'underscore', 'js/views/xblock', 'js/utils/module', 'gettext',
                 reorderableContainer.sortable({
                     handle: '.drag-handle',
 
-                    start: function(event, ui) {
+                    start: function() {
                         // Necessary because of an open bug in JQuery sortable.
                         // http://bugs.jqueryui.com/ticket/4990
                         reorderableContainer.sortable('refreshPositions');
                     },
 
-                    stop: function(event, ui) {
+                    stop: function() {
                         var saving, hideSaving, removeFromParent;
 
                         if (_.isUndefined(oldParent)) {
@@ -91,7 +97,8 @@ define(['jquery', 'underscore', 'js/views/xblock', 'js/utils/module', 'gettext',
             },
 
             updateChildren: function(targetParent, successCallback) {
-                var children, childLocators, xblockInfo = this.model;
+                var children, childLocators,
+                    xblockInfo = this.model;
 
                 // Find descendants with class "studio-xblock-wrapper" whose parent === targetParent.
                 // This is necessary to filter our grandchildren, great-grandchildren, etc.

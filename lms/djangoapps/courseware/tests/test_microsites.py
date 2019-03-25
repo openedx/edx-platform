@@ -1,17 +1,22 @@
 """
-Tests related to the Site COnfiguration feature
+Tests related to the Site Configuration feature
 """
-from django.conf import settings
-from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
-from nose.plugins.attrib import attr
 
-from courseware.tests.helpers import LoginEnrollmentTestCase
+import pytest
+from bs4 import BeautifulSoup
+from contextlib import contextmanager
+from django.conf import settings
+from django.urls import reverse
+from django.test.utils import override_settings
+from mock import patch
+from nose.plugins.attrib import attr
+from six import text_type
+
 from course_modes.models import CourseMode
-from xmodule.course_module import (
-    CATALOG_VISIBILITY_CATALOG_AND_ABOUT, CATALOG_VISIBILITY_NONE)
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from courseware.tests.helpers import LoginEnrollmentTestCase
+from xmodule.course_module import CATALOG_VISIBILITY_CATALOG_AND_ABOUT, CATALOG_VISIBILITY_NONE
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 @attr(shard=1)
@@ -21,6 +26,7 @@ class TestSites(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
 
     STUDENT_INFO = [('view@test.com', 'foo'), ('view2@test.com', 'foo')]
+    ENABLED_SIGNALS = ['course_published']
 
     @classmethod
     def setUpClass(cls):
@@ -57,9 +63,6 @@ class TestSites(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             catalog_visibility=CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
             emit_signals=True,
         )
-
-    def setUp(self):
-        super(TestSites, self).setUp()
 
     def setup_users(self):
         # Create student accounts and activate them.
@@ -131,6 +134,72 @@ class TestSites(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
         # assert that footer template has been properly overriden on homepage
         self.assertNotContains(resp, 'This is a Test Site footer')
+
+    @override_settings(SITE_NAME=settings.MICROSITE_TEST_HOSTNAME)
+    def test_site_homepage_course_max(self):
+        """
+        Verify that the number of courses displayed on the homepage honors
+        the HOMEPAGE_COURSE_MAX setting.
+        """
+        @contextmanager
+        def homepage_course_max_site_config(limit):
+            """Temporarily set the microsite HOMEPAGE_COURSE_MAX setting to desired value."""
+            with patch.dict(settings.MICROSITE_CONFIGURATION, {
+                'test_site': dict(
+                    settings.MICROSITE_CONFIGURATION['test_site'],
+                    HOMEPAGE_COURSE_MAX=limit,
+                )
+            }):
+                yield
+
+        def assert_displayed_course_count(response, expected_count):
+            """Assert that the number of courses displayed matches the expectation."""
+            soup = BeautifulSoup(response.content, 'html.parser')
+            courses = soup.find_all(class_='course')
+            self.assertEqual(len(courses), expected_count)
+
+        # By default the number of courses on the homepage is not limited.
+        # We should see both courses and no link to all courses.
+        resp = self.client.get('/', HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
+        self.assertEqual(resp.status_code, 200)
+        assert_displayed_course_count(resp, 2)
+        self.assertNotContains(resp, 'View all Courses')
+
+        # With the limit set to 5, we should still see both courses and no link to all courses.
+        with homepage_course_max_site_config(5):
+            resp = self.client.get('/', HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
+            self.assertEqual(resp.status_code, 200)
+            assert_displayed_course_count(resp, 2)
+            self.assertNotContains(resp, 'View all Courses')
+
+        # With the limit set to 2, we should still see both courses and no link to all courses.
+        with homepage_course_max_site_config(2):
+            resp = self.client.get('/', HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
+            self.assertEqual(resp.status_code, 200)
+            assert_displayed_course_count(resp, 2)
+            self.assertNotContains(resp, 'View all Courses')
+
+        # With the limit set to 1, we should only see one course.
+        # We should also see the link to all courses.
+        with homepage_course_max_site_config(1):
+            resp = self.client.get('/', HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
+            self.assertEqual(resp.status_code, 200)
+            assert_displayed_course_count(resp, 1)
+            self.assertContains(resp, 'View all Courses')
+
+        # If no site configuration is set, the limit falls back to settings.HOMEPAGE_COURSE_MAX.
+        with override_settings(HOMEPAGE_COURSE_MAX=1):
+            resp = self.client.get('/', HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
+            self.assertEqual(resp.status_code, 200)
+            assert_displayed_course_count(resp, 1)
+            self.assertContains(resp, 'View all Courses')
+
+        # Site configuration takes precedence over settings when both are set.
+        with homepage_course_max_site_config(2), override_settings(HOMEPAGE_COURSE_MAX=1):
+            resp = self.client.get('/', HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
+            self.assertEqual(resp.status_code, 200)
+            assert_displayed_course_count(resp, 2)
+            self.assertNotContains(resp, 'View all Courses')
 
     @override_settings(SITE_NAME=settings.MICROSITE_TEST_HOSTNAME)
     def test_site_anonymous_copyright_content(self):
@@ -210,7 +279,7 @@ class TestSites(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.login(email, password)
         self.enroll(self.course, True)
 
-        resp = self.client.get(reverse('courseware', args=[unicode(self.course.id)]),
+        resp = self.client.get(reverse('courseware', args=[text_type(self.course.id)]),
                                HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
         self.assertContains(resp, 'Test Site Tab:')
 
@@ -220,11 +289,11 @@ class TestSites(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         Make sure the Site is honoring the visible_about_page permissions that is
         set in configuration
         """
-        url = reverse('about_course', args=[self.course_with_visibility.id.to_deprecated_string()])
+        url = reverse('about_course', args=[text_type(self.course_with_visibility.id)])
         resp = self.client.get(url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
         self.assertEqual(resp.status_code, 200)
 
-        url = reverse('about_course', args=[self.course_hidden_visibility.id.to_deprecated_string()])
+        url = reverse('about_course', args=[text_type(self.course_hidden_visibility.id)])
         resp = self.client.get(url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
         self.assertEqual(resp.status_code, 404)
 
@@ -244,14 +313,14 @@ class TestSites(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
         # first try on the non site, which
         # should pick up the global configuration (where ENABLE_PAID_COURSE_REGISTRATIONS = False)
-        url = reverse('about_course', args=[self.course_with_visibility.id.to_deprecated_string()])
+        url = reverse('about_course', args=[text_type(self.course_with_visibility.id)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn("Enroll in {}".format(self.course_with_visibility.id.course), resp.content)
         self.assertNotIn("Add {} to Cart ($10)".format(self.course_with_visibility.id.course), resp.content)
 
         # now try on the site
-        url = reverse('about_course', args=[self.course_with_visibility.id.to_deprecated_string()])
+        url = reverse('about_course', args=[text_type(self.course_with_visibility.id)])
         resp = self.client.get(url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
         self.assertEqual(resp.status_code, 200)
         self.assertNotIn("Enroll in {}".format(self.course_with_visibility.id.course), resp.content)

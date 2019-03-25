@@ -2,26 +2,24 @@
 Tests for contentstore.views.preview.py
 """
 import re
+
 import ddt
 import mock
-from xblock.core import XBlock
-
 from django.test.client import Client, RequestFactory
+from xblock.core import XBlock, XBlockAside
 
-from xblock.core import XBlockAside
-from student.tests.factories import UserFactory
-
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-
-from contentstore.views.preview import get_preview_fragment, _preview_module_system
 from contentstore.utils import reverse_usage_url
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.test_asides import AsideTestType
+from contentstore.views.preview import _preview_module_system, get_preview_fragment
+from student.tests.factories import UserFactory
 from xblock_config.models import StudioConfig
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.test_asides import AsideTestType
 
 
+@ddt.ddt
 class GetPreviewHtmlTestCase(ModuleStoreTestCase):
     """
     Tests for get_preview_fragment.
@@ -136,6 +134,31 @@ class GetPreviewHtmlTestCase(ModuleStoreTestCase):
             )
             response = client.post(url)
             self.assertEqual(response.status_code, 200)
+
+    @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
+    def test_block_branch_not_changed_by_preview_handler(self, default_store):
+        """
+        Tests preview_handler should not update blocks being previewed
+        """
+        client = Client()
+        client.login(username=self.user.username, password=self.user_password)
+
+        with self.store.default_store(default_store):
+            course = CourseFactory.create()
+
+            block = ItemFactory.create(
+                parent_location=course.location,
+                category="problem"
+            )
+
+            url = reverse_usage_url(
+                'preview_handler',
+                block.location,
+                kwargs={'handler': 'xmodule_handler/problem_check'}
+            )
+            response = client.post(url)
+            self.assertEqual(response.status_code, 200)
+            self.assertFalse(modulestore().has_changes(modulestore().get_item(block.location)))
 
 
 @XBlock.needs("field-data")

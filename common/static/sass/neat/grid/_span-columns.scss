@@ -13,7 +13,9 @@
   @if $display-table  {
     display: table-cell;
     width: percentage($columns / $container-columns);
-  } @else {
+  }
+
+  @else {
     float: #{$opposite-direction};
 
     @if $display != no-display {
@@ -31,7 +33,9 @@
         width: flex-grid($columns, $container-columns);
       }
 
-    } @else {
+    }
+
+    @else {
       margin-#{$direction}: flex-gutter($container-columns);
       width: flex-grid($columns, $container-columns);
 

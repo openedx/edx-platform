@@ -32,8 +32,7 @@ define(['backbone', 'jquery', 'js/models/notification', 'js/views/notification',
                 var actionButton = notificationView.$('.action-primary');
                 if (expectedActionText) {
                     expect(actionButton.text().trim()).toBe(expectedActionText);
-                }
-                else {
+                } else {
                     expect(actionButton.length).toBe(0);
                 }
             };

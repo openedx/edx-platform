@@ -1,4 +1,6 @@
 """LMS-hosted Programs pages"""
+from uuid import uuid4
+
 from bok_choy.page_object import PageObject
 
 from common.test.acceptance.pages.lms import BASE_URL
@@ -24,8 +26,8 @@ class ProgramListingPage(PageObject):
 
 class ProgramDetailsPage(PageObject):
     """Program details page."""
-    program_id = 123
-    url = BASE_URL + '/dashboard/programs/{}/program-name/'.format(program_id)
+    program_uuid = str(uuid4())
+    url = '{base}/dashboard/programs/{program_uuid}/'.format(base=BASE_URL, program_uuid=program_uuid)
 
     def is_browser_on_page(self):
         return self.q(css='.js-program-details-wrapper').present

@@ -5,16 +5,13 @@ by the individual custom courses feature.
 import json
 import logging
 
+from ccx_keys.locator import CCXBlockUsageLocator, CCXLocator
 from django.db import transaction
-
-import request_cache
-
-from courseware.field_overrides import FieldOverrideProvider
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from ccx_keys.locator import CCXLocator, CCXBlockUsageLocator
 
+from openedx.core.djangoapps.request_cache import get_cache
+from courseware.field_overrides import FieldOverrideProvider
 from lms.djangoapps.ccx.models import CcxFieldOverride, CustomCourseForEdX
-
 
 log = logging.getLogger(__name__)
 
@@ -70,7 +67,7 @@ def get_current_ccx(course_key):
     if not isinstance(course_key, CCXLocator):
         return None
 
-    ccx_cache = request_cache.get_cache('ccx')
+    ccx_cache = get_cache('ccx')
     if course_key not in ccx_cache:
         ccx_cache[course_key] = CustomCourseForEdX.objects.get(pk=course_key.ccx)
 
@@ -123,7 +120,7 @@ def _get_overrides_for_ccx(ccx):
     Returns a dictionary mapping field name to overriden value for any
     overrides set on this block for this CCX.
     """
-    overrides_cache = request_cache.get_cache('ccx-overrides')
+    overrides_cache = get_cache('ccx-overrides')
 
     if ccx not in overrides_cache:
         overrides = {}

@@ -12,40 +12,37 @@ At present, it differs from Studio exports in several ways:
 * The top-level directory in the resulting tarball is a "safe"
   (i.e. ascii) version of the course_key, rather than the word "course".
 * It only supports the export of courses.  It does not export libraries.
-
 """
 
 import os
 import re
 import shutil
 import tarfile
-from tempfile import mktemp, mkdtemp
+from tempfile import mkdtemp, mktemp
 from textwrap import dedent
 
-from path import Path as path
-
 from django.core.management.base import BaseCommand, CommandError
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+from path import Path as path
 
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml_exporter import export_course_to_xml
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
 
 
 class Command(BaseCommand):
     """
     Export a course to XML. The output is compressed as a tar.gz file.
-
     """
     help = dedent(__doc__).strip()
 
     def add_arguments(self, parser):
         parser.add_argument('course_id')
-        parser.add_argument('--output', default=None)
+        parser.add_argument('--output')
 
     def handle(self, *args, **options):
-
         course_id = options['course_id']
+
         try:
             course_key = CourseKey.from_string(course_id)
         except InvalidKeyError:
@@ -55,6 +52,7 @@ class Command(BaseCommand):
 
         filename = options['output']
         pipe_results = False
+
         if filename is None:
             filename = mktemp()
             pipe_results = True

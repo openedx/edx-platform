@@ -5,6 +5,7 @@ from codejail.safe_exec import not_safe_exec as codejail_not_safe_exec
 from codejail.safe_exec import json_safe, SafeExecException
 from . import lazymod
 from dogapi import dog_stats_api
+from six import text_type
 
 import hashlib
 
@@ -13,6 +14,9 @@ import hashlib
 # The name "random" is a properly-seeded stand-in for the random module.
 CODE_PROLOG = """\
 from __future__ import division
+
+import os
+os.environ["OPENBLAS_NUM_THREADS"] = "1"    # See TNL-6456
 
 import random as random_module
 import sys
@@ -140,7 +144,7 @@ def safe_exec(
             python_path=python_path, extra_files=extra_files, slug=slug,
         )
     except SafeExecException as e:
-        emsg = e.message
+        emsg = text_type(e)
     else:
         emsg = None
 

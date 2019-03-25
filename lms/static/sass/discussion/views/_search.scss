@@ -1,8 +1,18 @@
 .forum-search {
-    @include margin-left($baseline);
-    display: inline-block;
+  display: flex;
+  margin-top: $baseline;
 
-    .search-input {
-        width: input-width(short);
-    }
+  .search-input {
+    width: input-width(short);
+  }
+
+  .search-button {
+    margin-left: 0;
+  }
+
+  @include media-breakpoint-up(sm) {
+    @include margin-left($baseline);
+
+    margin-top: 0;
+  }
 }

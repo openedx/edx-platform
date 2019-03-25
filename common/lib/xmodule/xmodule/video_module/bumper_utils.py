@@ -1,14 +1,14 @@
 """
 Utils for video bumper
 """
+from collections import OrderedDict
 import copy
 import json
-import pytz
 import logging
-from collections import OrderedDict
 
 from datetime import datetime, timedelta
 from django.conf import settings
+import pytz
 
 from .video_utils import set_query_parameter
 
@@ -136,6 +136,9 @@ def bumper_metadata(video, sources):
         ),
         'transcriptAvailableTranslationsUrl': set_query_parameter(
             video.runtime.handler_url(video, 'transcript', 'available_translations').rstrip('/?'), 'is_bumper', 1
+        ),
+        'publishCompletionUrl': set_query_parameter(
+            video.runtime.handler_url(video, 'publish_completion', '').rstrip('?'), 'is_bumper', 1
         ),
     })
 

@@ -5,7 +5,6 @@ import sys
 import subprocess
 
 from paver import tasks
-from paver.easy import sh
 
 from pavelib.utils.process import kill_process
 
@@ -61,6 +60,14 @@ class TestSuite(object):
         """
         return None
 
+    @staticmethod
+    def is_success(exit_code):
+        """
+        Determine if the given exit code represents a success of the test
+        suite.  By default, only a zero counts as a success.
+        """
+        return exit_code == 0
+
     def run_test(self):
         """
         Runs a self.cmd in a subprocess and waits for it to finish.
@@ -88,12 +95,10 @@ class TestSuite(object):
 
         try:
             process = subprocess.Popen(cmd, **kwargs)
-            process.communicate()
+            return self.is_success(process.wait())
         except KeyboardInterrupt:
             kill_process(process)
             sys.exit(1)
-        else:
-            return process.returncode == 0
 
     def run_suite_tests(self):
         """
@@ -109,14 +114,14 @@ class TestSuite(object):
 
             for suite in self.subsuites:
                 suite.run_suite_tests()
-                if len(suite.failed_suites) > 0:
+                if suite.failed_suites:
                     self.failed_suites.extend(suite.failed_suites)
 
     def report_test_results(self):
         """
         Writes a list of failed_suites to sys.stderr
         """
-        if len(self.failed_suites) > 0:
+        if self.failed_suites:
             msg = colorize('red', "\n\n{bar}\nTests failed in the following suites:\n* ".format(bar="=" * 48))
             msg += colorize('red', '\n* '.join([s.root for s in self.failed_suites]) + '\n\n')
         else:
@@ -135,5 +140,5 @@ class TestSuite(object):
 
         self.report_test_results()
 
-        if len(self.failed_suites) > 0:
+        if self.failed_suites:
             sys.exit(1)

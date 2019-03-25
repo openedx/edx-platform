@@ -21,6 +21,8 @@ class TestLibraries(MixedSplitTestCase):
     Test for libraries.
     Mostly tests code found throughout split mongo, but also tests library_root_xblock.py
     """
+    shard = 2
+
     def test_create_library(self):
         """
         Test that we can create a library, and see how many mongo calls it uses to do so.

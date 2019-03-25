@@ -1,11 +1,10 @@
 """
 Table for storing information about whether or not Studio users have course creation privileges.
 """
+from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_init, post_save
-from django.dispatch import receiver, Signal
-from django.contrib.auth.models import User
-
+from django.dispatch import Signal, receiver
 from django.utils import timezone
 from django.utils.translation import ugettext as _
 
@@ -36,7 +35,7 @@ class CourseCreator(models.Model):
         (DENIED, _(u'denied')),
     )
 
-    user = models.OneToOneField(User, help_text=_("Studio user"))
+    user = models.OneToOneField(User, help_text=_("Studio user"), on_delete=models.CASCADE)
     state_changed = models.DateTimeField('state last updated', auto_now_add=True,
                                          help_text=_("The date when state was last updated"))
     state = models.CharField(max_length=24, blank=False, choices=STATES, default=UNREQUESTED,
@@ -46,6 +45,9 @@ class CourseCreator(models.Model):
 
     def __unicode__(self):
         return u"{0} | {1} [{2}]".format(self.user, self.state, self.state_changed)
+
+    class Meta(object):
+        app_label = "course_creators"
 
 
 @receiver(post_init, sender=CourseCreator)

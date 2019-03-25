@@ -1,5 +1,6 @@
 .tooltip {
   @include transition(opacity $tmg-f3 ease-out 0s);
+
   position: absolute;
   top: 0;
   left: 0;
@@ -12,7 +13,7 @@
   pointer-events: none;
   opacity: 0;
 
-  &:after {
+  &::after {
     font-size: font-size(x-large);
     content: '▾';
     display: block;

@@ -1,14 +1,17 @@
 """
 Utility functions for capa.
 """
-import bleach
+import re
 from decimal import Decimal
+
+import bleach
+from lxml import etree
 
 from calc import evaluator
 from cmath import isinf, isnan
-import re
-from lxml import etree
 from openedx.core.djangolib.markup import HTML
+
+
 #-----------------------------------------------------------------------------
 #
 # Utility functions used in CAPA responsetypes

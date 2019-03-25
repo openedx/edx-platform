@@ -5,12 +5,20 @@
 .view-discussion-home {
   @include padding-left($baseline);
 
+  display: none;
+
+  // Only show this component for large sizes
+  @include media-breakpoint-up(lg) {
+    display: block;
+  }
+
   section {
     border-bottom: 1px solid $forum-color-border;
   }
 
   .label {
     @extend %t-copy-sub2;
+
     display: block;
   }
 
@@ -28,10 +36,13 @@
     color: $black;
     margin-bottom: ($baseline/4);
   }
+
   .home-description {
     @extend %t-copy-sub2;
+
     margin-bottom: ($baseline/2);
   }
+
   .home-stats {
     padding: $baseline 0;
 
@@ -48,11 +59,13 @@
 
     .stats-grouping {
       @include padding-left($baseline);
+
       display: inline-block;
       width: 70%;
 
       .profile-stat {
         @extend %t-copy-sub2;
+
         display: inline-block;
         width: 32.5%;
         vertical-align: middle;
@@ -64,7 +77,7 @@
           vertical-align: middle;
         }
 
-        .profile-stat-label{
+        .profile-stat-label {
           vertical-align: middle;
         }
       }
@@ -113,11 +126,13 @@
     }
 
     .row-item-full {
-
       .notification-checkbox {
         @include margin-right($baseline/2);
+
         display: inline-block;
+
         @include padding($baseline/4, 0, $baseline/2, 0);
+
         border-radius: $forum-border-radius;
         border: 1px solid gray;
 
@@ -125,6 +140,7 @@
           display: inline-block;
           text-align: center;
           vertical-align: middle;
+
           @include margin-left($baseline/2);
         }
 
@@ -145,9 +161,9 @@
   }
 
   .helpgrid-row-navigation {
-    .fa-bars {color: $light-gray;}
-    .fa-search {color: $light-gray;}
-    .fa-sort {color: $light-gray;}
+    .fa-bars {color: theme-color("light");}
+    .fa-search {color: $gray-300;}
+    .fa-sort {color: $gray-300;}
   }
 
   .helpgrid-row-participation {
@@ -158,6 +174,6 @@
 
   .helpgrid-row-notification {
     .fa-square {color: $green;}
-    .fa-envelope {color: $light-gray;}
+    .fa-envelope {color: $gray-300;}
   }
 }

@@ -2,10 +2,11 @@
 Javascript tests for the crowdsourcehinter xblock
 """
 from textwrap import dedent
+
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.xblock.crowdsourcehinter_problem import CrowdsourcehinterProblemPage
-from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
 from common.test.acceptance.tests.helpers import UniqueCourseTest
 
 
@@ -13,6 +14,7 @@ class CrowdsourcehinterProblemTest(UniqueCourseTest):
     """
     Test scenario for the hinter.
     """
+    shard = 21
     USERNAME = "STAFF_TESTER"
     EMAIL = "johndoe@example.com"
 

@@ -16,7 +16,16 @@ from xblock.fields import ScopeIds, UNIQUE_ID, NO_CACHE_VALUE
 from xblock.runtime import Runtime
 
 
+def attribute_pair_repr(self):
+    """
+    Custom string representation for the AttributePair namedtuple which is
+    consistent between test runs.
+    """
+    return '<AttributePair name={}>'.format(self.name)
+
+
 AttributePair = namedtuple("AttributePair", ["name", "value"])
+AttributePair.__repr__ = attribute_pair_repr
 
 
 ID_ATTR_NAMES = ("discussion_id", "id",)

@@ -1,13 +1,12 @@
 """
 Theming aware template loaders.
 """
-from django.utils._os import safe_join
 from django.core.exceptions import SuspiciousFileOperation
 from django.template.loaders.filesystem import Loader as FilesystemLoader
+from django.utils._os import safe_join
 
 from edxmako.makoloader import MakoLoader
-from openedx.core.djangoapps.theming.helpers import get_current_request, \
-    get_current_theme, get_all_theme_template_dirs
+from openedx.core.djangoapps.theming.helpers import get_all_theme_template_dirs, get_current_request, get_current_theme
 
 
 class ThemeTemplateLoader(MakoLoader):
@@ -42,13 +41,7 @@ class ThemeFilesystemLoader(FilesystemLoader):
         if isinstance(theme_dirs, list):
             template_dirs = theme_dirs + template_dirs
 
-        for template_dir in template_dirs:
-            try:
-                yield safe_join(template_dir, template_name)
-            except SuspiciousFileOperation:
-                # The joined path was located outside of this template_dir
-                # (it might be inside another one, so this isn't fatal).
-                pass
+        return list(super(ThemeFilesystemLoader, self).get_template_sources(template_name, template_dirs))
 
     @staticmethod
     def get_theme_template_sources():

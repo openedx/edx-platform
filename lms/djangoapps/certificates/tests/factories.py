@@ -4,9 +4,12 @@ from uuid import uuid4
 
 from factory.django import DjangoModelFactory
 
-from certificates.models import (
-    GeneratedCertificate, CertificateStatuses, CertificateHtmlViewConfiguration, CertificateWhitelist,
+from lms.djangoapps.certificates.models import (
+    CertificateHtmlViewConfiguration,
     CertificateInvalidation,
+    CertificateStatuses,
+    CertificateWhitelist,
+    GeneratedCertificate
 )
 from student.models import LinkedInAddToProfileConfiguration
 
@@ -21,6 +24,7 @@ class GeneratedCertificateFactory(DjangoModelFactory):
     mode = GeneratedCertificate.MODES.honor
     name = ''
     verify_uuid = uuid4().hex
+    grade = ''
 
 
 class CertificateWhitelistFactory(DjangoModelFactory):

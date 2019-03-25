@@ -1,19 +1,20 @@
 // studio - views - group-configurations
 // ====================
 .view-group-configurations {
-
   .content-primary, .content-supplementary {
     @include box-sizing(border-box);
-    float: left;
+    @include float(left);
   }
 
   .content-primary {
+    @include margin-right(flex-gutter());
+
     width: flex-grid(9, 12);
-    margin-right: flex-gutter();
 
     .notice-moduledisabled {
       @extend %ui-well;
       @extend %t-copy-base;
+
       background-color: $white;
       padding: ($baseline*1.5) $baseline;
       text-align: center;
@@ -21,6 +22,8 @@
 
     .no-content {
       @extend %no-content;
+
+      color: $gray-d1;
     }
 
     .wrapper-groups {
@@ -29,6 +32,7 @@
       .title {
         @extend %t-title4;
         @extend %t-strong;
+
         margin-bottom: ($baseline/2);
       }
 
@@ -39,11 +43,12 @@
 
     .wrapper-collection {
       @extend %ui-window;
+
       position: relative;
       outline: none;
 
       &:hover .collection .actions {
-        opacity: 1.0;
+        opacity: 1;
       }
 
       .collection-details {
@@ -59,25 +64,39 @@
           @extend %cont-truncated;
           @extend %t-title5;
           @extend %t-strong;
-          margin-right: ($baseline*14);
+
+          @include margin-right($baseline*14);
+
           color: $black;
 
           .toggle {
+            @include padding-left($baseline);
+
             display: inline-block;
-            padding-left: $baseline;
             color: $black;
 
-            &:hover, &:focus {
+            &:hover,
+            &:focus {
               color: $blue;
             }
 
             .ui-toggle-expansion {
               @include transition(rotate .15s ease-in-out .25s);
+
               @extend %t-action1;
+
+              @include margin-left(-$baseline);
+
               display: inline-block;
               width: ($baseline*0.75);
               vertical-align: baseline;
-              margin-left: -$baseline;
+
+              &.fa-caret-right::before {
+                @include rtl {
+                  // Flip to fa-caret-left on RTL
+                  content: "\f0d9";
+                }
+              }
             }
 
             &.is-selectable {
@@ -97,18 +116,22 @@
 
       .collection-info {
         @extend %t-copy-sub1;
+
+        @include margin-left($baseline);
+
         color: $gray-l1;
-        margin-left: $baseline;
 
         &.group-configuration-info-inline {
+          @include margin($baseline/4, 0, $baseline/2, $baseline);
+
           display: table;
           width: 70%;
-          margin: ($baseline/4) 0 ($baseline/2) $baseline;
 
           li {
             @include box-sizing(border-box);
+            @include margin-right(1%);
+
             display: table-cell;
-            margin-right: 1%;
 
             &.group-configuration-usage-count {
               font-style: italic;
@@ -123,14 +146,16 @@
         }
 
         &.collection-info-inline {
+          @include margin($baseline/4, 0, $baseline/2, $baseline);
+
           display: table;
           width: 70%;
-          margin: ($baseline/4) 0 ($baseline/2) $baseline;
 
           li {
             @include box-sizing(border-box);
+            @include margin-right(1%);
+
             display: table-cell;
-            margin-right: 1%;
             padding: ($baseline/4) 0;
 
             &.collection-usage-count {
@@ -150,11 +175,13 @@
       }
 
       .collection-items {
-        margin-left: $baseline;
+        @include margin-left($baseline);
+
         margin-bottom: ($baseline*0.75);
 
         .item {
           @extend %t-copy-lead1;
+
           padding: ($baseline/7) 0 ($baseline/4);
           border-top: 1px solid $gray-l4;
           white-space: nowrap;
@@ -164,29 +191,31 @@
           }
 
           .name {
+            @include margin-right(5%);
+
             overflow: hidden;
             text-overflow: ellipsis;
             display: inline-block;
             vertical-align: middle;
             width: 75%;
-            margin-right: 5%;
           }
         }
       }
 
       .collection-details {
-
         .actions {
           @include transition(opacity .15s .25s ease-in-out);
+          @include right($baseline);
+
           position: absolute;
           top: $baseline;
-          right: $baseline;
-          opacity: 0.0;
+          opacity: 0;
 
           .action {
+            @include margin-right($baseline/4);
+
             display: inline-block;
             vertical-align: middle;
-            margin-right: ($baseline/4);
 
             .edit {
               @extend %ui-btn-non-blue;
@@ -206,8 +235,10 @@
 
       .collection-references {
         @extend %t-copy-sub1;
+
+        @include padding($baseline, $baseline*1.5, $baseline, $baseline*2.5);
+
         box-shadow: 0 2px 2px 0 $shadow inset;
-        padding: $baseline ($baseline*1.5) $baseline ($baseline*2.5);
         color: $gray-l1;
 
         .usage {
@@ -221,12 +252,14 @@
             }
 
             .fa-warning {
-              margin: ($baseline/4) ($baseline/2) 0 ($baseline*1.5);
+              @include margin($baseline/4, $baseline/2, 0, $baseline*1.5);
+
               color: $orange;
             }
 
             .fa-times-circle {
-              margin: ($baseline/4) ($baseline/2) 0 ($baseline*1.5);
+              @include margin($baseline/4, $baseline/2, 0, $baseline*1.5);
+
               color: $red-l2;
             }
           }
@@ -235,14 +268,17 @@
 
       .usage-validation {
         @extend %t-copy-sub1;
+
+        @include padding($baseline, $baseline*1.5, $baseline, $baseline*1.5);
+
         background-color: $gray-l6;
         margin-top: $baseline;
-        padding: $baseline ($baseline*1.5) $baseline ($baseline*1.5);
 
         .fa-warning {
-          margin: ($baseline/2) $baseline 0 0;
+          @include margin($baseline/2, $baseline, 0, 0);
+          @include float(left);
+
           color: $orange;
-          float: left;
         }
 
         .collection-validation-text {
@@ -252,6 +288,7 @@
 
       .collection-edit {
         @include box-sizing(border-box);
+
         border-radius: 2px;
         width: 100%;
         background: $white;
@@ -266,7 +303,9 @@
 
         .tip {
           @extend %t-copy-sub2;
+
           @include transition(color, 0.15s, ease-in-out);
+
           display: block;
           margin-top: ($baseline/4);
           color: $gray-d1;
@@ -279,24 +318,25 @@
 
         .collection-fields {
           @extend %cont-no-list;
+
           margin-bottom: $baseline;
         }
 
         .field {
-          margin: 0 0 ($baseline*0.75) 0;
+          @include margin(0, 0, $baseline*0.75, 0);
 
           &:last-child {
             @extend %wipe-last-child;
           }
 
           &.required {
-
             label {
               @extend %t-strong;
             }
 
-            label:after {
-              margin-left: ($baseline/4);
+            label::after {
+              @include margin-left($baseline/4);
+
               content: "*";
             }
           }
@@ -311,8 +351,9 @@
 
           label {
             @extend %t-copy-sub1;
+
             @include transition(color, 0.15s, ease-in-out);
-            margin: 0 0 ($baseline/4) 0;
+            @include margin(0, 0, $baseline/4, 0);
 
             &.is-focused {
               color: $blue;
@@ -322,6 +363,7 @@
           //this section is borrowed from _account.scss - we should clean up and unify later
           input, textarea {
             @extend %t-copy-base;
+
             height: 100%;
             width: 100%;
             padding: ($baseline/2);
@@ -335,19 +377,19 @@
             }
 
             ::-webkit-input-placeholder {
-               color: $gray-l4;
+              color: $gray-l4;
             }
 
             :-moz-placeholder {
-               color: $gray-l3;
+              color: $gray-l3;
             }
 
             ::-moz-placeholder {
-               color: $gray-l3;
+              color: $gray-l3;
             }
 
             :-ms-input-placeholder {
-               color: $gray-l3;
+              color: $gray-l3;
             }
 
             &:focus {
@@ -358,45 +400,50 @@
           }
 
           &.error {
-              label {
-                color: $red;
-              }
+            label {
+              color: $red;
+            }
 
-              input {
-                border-color: $red;
-              }
+            input {
+              border-color: $red;
+            }
           }
         }
 
         label.required {
           @extend %t-strong;
 
-          &:after {
-            margin-left: ($baseline/4);
+          &::after {
+            @include margin-left($baseline/4);
+
             content: "*";
           }
         }
 
         .field.add-collection-name {
-
           label {
             width: 50%;
+
             @extend %t-title5;
+
             display: inline-block;
             vertical-align: bottom;
           }
 
           .group-configuration-id {
+            @include text-align(right);
+
             display: inline-block;
             width: 45%;
-            text-align: right;
             vertical-align: top;
             color: $gray-l1;
 
             .group-configuration-value {
               @extend %t-strong;
+
+              @include margin-left($baseline*0.5);
+
               white-space: nowrap;
-              margin-left: ($baseline*0.5);
             }
           }
         }
@@ -409,26 +456,29 @@
           background: $gray-l6;
 
           .action {
-            margin-right: ($baseline/4);
+            @include margin-right($baseline/4);
 
             &:last-child {
-              margin-right: 0;
+              @include margin-right(0);
             }
           }
 
           // add a group is below with groups styling
           .action-primary {
             @extend %btn-primary-blue;
+
             padding: ($baseline/4) $baseline;
           }
 
           .action-secondary {
             @extend %btn-secondary-gray;
+
             padding: ($baseline/4) $baseline;
           }
 
           .wrapper-delete-button {
-            float: right;
+            @include float(right);
+
             padding: ($baseline/4) ($baseline/2);
 
             .is-disabled {
@@ -439,7 +489,9 @@
 
         .copy {
           @extend %t-copy-sub2;
-          margin: ($baseline) 0 ($baseline/2) 0;
+
+          @include margin($baseline, 0, $baseline/2, 0);
+
           color: $gray;
 
           strong {
@@ -452,9 +504,11 @@
         @extend %ui-btn-flat-outline;
         @extend %t-action2;
         @extend %t-strong;
+
+        @include margin($baseline*1.5, 0, 0, 0);
+
         display: block;
         width: 100%;
-        margin: ($baseline*1.5) 0 0 0;
         padding: ($baseline/2);
       }
     }
@@ -462,6 +516,7 @@
     // add/new collection
     .action-add {
       @extend %ui-btn-flat-outline;
+
       display: block;
       width: 100%;
       margin-top: ($baseline*0.75);
@@ -472,31 +527,30 @@
       }
 
       .icon {
+        @include margin-right($baseline/2);
+
         display: inline-block;
         vertical-align: middle;
-        @include margin-right($baseline/2);
       }
     }
 
     // specific group-type styles
     .content-groups {
-
       .collection-header{
-
-         .title {
-            margin-bottom: 0;
+        .title {
+          margin-bottom: 0;
         }
       }
     }
 
     .experiment-groups {
-
       .group-configuration-details {
-
         .group-configuration-info {
           @extend %t-copy-sub1;
+
+          @include margin-left($baseline);
+
           color: $gray-l1;
-          margin-left: $baseline;
 
           .group-configuration-label {
             text-transform: uppercase;
@@ -509,11 +563,13 @@
         }
 
         .groups {
-          margin-left: $baseline;
+          @include margin-left($baseline);
+
           margin-bottom: ($baseline*0.75);
 
           .group {
             @extend %t-copy-lead1;
+
             padding: ($baseline/7) 0 ($baseline/4);
             border-top: 1px solid $gray-l4;
             white-space: nowrap;
@@ -523,29 +579,31 @@
             }
 
             .group-name {
+              @include margin-right(5%);
+
               overflow: hidden;
               text-overflow: ellipsis;
               display: inline-block;
               vertical-align: middle;
               width: 75%;
-              margin-right: 5%;
             }
 
             .group-allocation {
+              @include text-align(right);
+
               display: inline-block;
               vertical-align: middle;
               width: 20%;
               color: $gray-l1;
-              text-align: right;
             }
           }
         }
       }
 
       .group-configuration-edit {
-
         .add-collection-name label {
-          padding-right: 5%;
+          @include padding-right(5%);
+
           overflow: hidden;
           text-overflow: ellipsis;
           vertical-align: bottom;
@@ -553,14 +611,15 @@
 
         .field-group {
           @include clearfix();
-          margin: 0 0 ($baseline/2) 0;
-          padding: ($baseline/4) 0 0 0;
+          @include margin(0, 0, $baseline/2, 0);
+          @include padding($baseline/4, 0, 0, 0);
 
           .group-allocation,
           .field {
+            @include margin(0, 3%, 0, 0);
+
             display: inline-block;
             vertical-align: middle;
-            margin: 0 3% 0 0;
           }
 
           .group-allocation {
@@ -583,7 +642,9 @@
 
           .action-close {
             @include transition(color $tmg-f2 ease-in-out);
+
             @extend %t-action1;
+
             display: inline-block;
             border: 0;
             padding: 0;

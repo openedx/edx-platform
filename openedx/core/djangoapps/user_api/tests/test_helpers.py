@@ -2,12 +2,15 @@
 Tests for helper functions.
 """
 import json
+import re
 import mock
 import ddt
 from django import forms
 from django.http import HttpRequest, HttpResponse
 from django.test import TestCase
 from nose.tools import raises
+from six import text_type
+
 from ..helpers import (
     intercept_errors, shim_student_view,
     FormDescription, InvalidFieldError
@@ -52,22 +55,35 @@ class InterceptErrorsTest(TestCase):
 
     @mock.patch('openedx.core.djangoapps.user_api.helpers.LOGGER')
     def test_logs_errors(self, mock_logger):
+        self.maxDiff = None
         exception = 'openedx.core.djangoapps.user_api.tests.test_helpers.FakeInputException'
         expected_log_msg = (
             u"An unexpected error occurred when calling 'intercepted_function' with arguments '()' and "
-            u"keyword arguments '{'raise_error': <class '" + exception + u"'>}': FakeInputException()"
-        )
+            u"keyword arguments '{{'raise_error': <class '{}'>}}' "
+            u"from File \"{}\", line XXX, in test_logs_errors\n"
+            u"    intercepted_function(raise_error=FakeInputException): FakeInputException()"
+        ).format(exception, __file__.rstrip('c'))
 
         # Verify that the raised exception has the error message
         try:
             intercepted_function(raise_error=FakeInputException)
         except FakeOutputException as ex:
-            self.assertEqual(ex.message, expected_log_msg)
+            actual_message = re.sub(r'line \d+', 'line XXX', text_type(ex), flags=re.MULTILINE)
+            self.assertEqual(actual_message, expected_log_msg)
 
         # Verify that the error logger is called
         # This will include the stack trace for the original exception
         # because it's called with log level "ERROR"
-        mock_logger.exception.assert_called_once_with(expected_log_msg)
+        calls = mock_logger.exception.mock_calls
+        self.assertEqual(len(calls), 1)
+        name, args, kwargs = calls[0]
+
+        self.assertEqual(name, '')
+        self.assertEqual(len(args), 1)
+        self.assertEqual(kwargs, {})
+
+        actual_message = re.sub(r'line \d+', 'line XXX', args[0], flags=re.MULTILINE)
+        self.assertEqual(actual_message, expected_log_msg)
 
 
 class FormDescriptionTest(TestCase):
@@ -132,6 +148,44 @@ class FormDescriptionTest(TestCase):
         desc = FormDescription("post", "/submit")
         with self.assertRaises(InvalidFieldError):
             desc.add_field("name", field_type="text", restrictions={"invalid": 0})
+
+    def test_option_overrides(self):
+        desc = FormDescription("post", "/submit")
+        field = {
+            "name": "country",
+            "label": "Country",
+            "field_type": "select",
+            "default": "PK",
+            "required": True,
+            "error_messages": {
+                "required": "You must provide a value!"
+            },
+            "options": [
+                ("US", "United States of America"),
+                ("PK", "Pakistan")
+            ]
+        }
+        desc.override_field_properties(
+            field["name"],
+            default="PK"
+        )
+        desc.add_field(**field)
+        self.assertEqual(
+            desc.fields[0]["options"],
+            [
+                {
+                    'default': False,
+                    'name': 'United States of America',
+                    'value': 'US'
+                },
+                {
+                    'default': True,
+                    'name': 'Pakistan',
+                    'value': 'PK'
+                }
+
+            ]
+        )
 
 
 @ddt.ddt

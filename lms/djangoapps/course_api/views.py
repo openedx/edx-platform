@@ -6,12 +6,15 @@ import search
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from rest_framework.generics import ListAPIView, RetrieveAPIView
+from rest_framework.throttling import UserRateThrottle
 
-from openedx.core.lib.api.paginators import NamespacedPageNumberPagination
-from openedx.core.lib.api.view_utils import view_auth_classes, DeveloperErrorViewMixin
+from edx_rest_framework_extensions.paginators import NamespacedPageNumberPagination
+from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
+
+from . import USE_RATE_LIMIT_2_FOR_COURSE_LIST_API, USE_RATE_LIMIT_10_FOR_COURSE_LIST_API
 from .api import course_detail, list_courses
 from .forms import CourseDetailGetForm, CourseListGetForm
-from .serializers import CourseSerializer, CourseDetailSerializer
+from .serializers import CourseDetailSerializer, CourseSerializer
 
 
 @view_auth_classes(is_authenticated=False)
@@ -122,6 +125,41 @@ class CourseDetailView(DeveloperErrorViewMixin, RetrieveAPIView):
         )
 
 
+class CourseListUserThrottle(UserRateThrottle):
+    """Limit the number of requests users can make to the course list API."""
+    # The course list endpoint is likely being inefficient with how it's querying
+    # various parts of the code and can take courseware down, it needs to be rate
+    # limited until optimized. LEARNER-5527
+
+    THROTTLE_RATES = {
+        'user': '20/minute',
+        'staff': '40/minute',
+    }
+
+    def check_for_switches(self):
+        if USE_RATE_LIMIT_2_FOR_COURSE_LIST_API.is_enabled():
+            self.THROTTLE_RATES = {
+                'user': '2/minute',
+                'staff': '10/minute',
+            }
+        elif USE_RATE_LIMIT_10_FOR_COURSE_LIST_API.is_enabled():
+            self.THROTTLE_RATES = {
+                'user': '10/minute',
+                'staff': '20/minute',
+            }
+
+    def allow_request(self, request, view):
+        self.check_for_switches()
+        # Use a special scope for staff to allow for a separate throttle rate
+        user = request.user
+        if user.is_authenticated and (user.is_staff or user.is_superuser):
+            self.scope = 'staff'
+            self.rate = self.get_rate()
+            self.num_requests, self.duration = self.parse_rate(self.rate)
+
+        return super(CourseListUserThrottle, self).allow_request(request, view)
+
+
 @view_auth_classes(is_authenticated=False)
 class CourseListView(DeveloperErrorViewMixin, ListAPIView):
     """
@@ -194,7 +232,14 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
     """
 
     pagination_class = NamespacedPageNumberPagination
+    pagination_class.max_page_size = 100
     serializer_class = CourseSerializer
+    throttle_classes = CourseListUserThrottle,
+
+    # Return all the results, 10K is the maximum allowed value for ElasticSearch.
+    # We should use 0 after upgrading to 1.1+:
+    #   - https://github.com/elastic/elasticsearch/commit/8b0a863d427b4ebcbcfb1dcd69c996c52e7ae05e
+    results_size_infinity = 10000
 
     # Return all the results, 10K is the maximum allowed value for ElasticSearch.
     # We should use 0 after upgrading to 1.1+:

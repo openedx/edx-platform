@@ -1,14 +1,13 @@
-""" URL definitions for the verify_student app. """
+"""
+URL definitions for the verify_student app.
+"""
 
 from django.conf import settings
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
 from lms.djangoapps.verify_student import views
 
-
-urlpatterns = patterns(
-    '',
-
+urlpatterns = [
     # The user is starting the verification / payment process,
     # most likely after enrolling in a course and selecting
     # a "verified" track.
@@ -105,24 +104,11 @@ urlpatterns = patterns(
         views.ReverifyView.as_view(),
         name="verify_student_reverify"
     ),
-
-    # Endpoint for in-course reverification
-    # Users are sent to this end-point from within courseware
-    # to re-verify their identities by re-submitting face photos.
-    url(
-        r'^reverify/{course_id}/{usage_id}/$'.format(
-            course_id=settings.COURSE_ID_PATTERN,
-            usage_id=settings.USAGE_ID_PATTERN
-        ),
-        views.InCourseReverifyView.as_view(),
-        name="verify_student_incourse_reverify"
-    ),
-)
+]
 
 # Fake response page for incourse reverification ( software secure )
 if settings.FEATURES.get('ENABLE_SOFTWARE_SECURE_FAKE'):
     from lms.djangoapps.verify_student.tests.fake_software_secure import SoftwareSecureFakeView
-    urlpatterns += patterns(
-        'verify_student.tests.fake_software_secure',
+    urlpatterns += [
         url(r'^software-secure-fake-response', SoftwareSecureFakeView.as_view()),
-    )
+    ]

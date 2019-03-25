@@ -6,19 +6,25 @@ only displayed at the course level. This is because it makes it a lot easier to
 optimize and reason about, and it avoids having to tackle the bigger problem of
 general XBlock representation in this rather specialized formatting.
 """
+import os
 from functools import partial
 
 from django.http import Http404, HttpResponse
-from mobile_api.models import MobileApiConfig
-
+from opaque_keys.edx.locator import BlockUsageLocator
 from rest_framework import generics
 from rest_framework.response import Response
-from opaque_keys.edx.locator import BlockUsageLocator
 
+from mobile_api.models import MobileApiConfig
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
+from xmodule.video_module.transcripts_utils import (
+    convert_video_transcript,
+    get_video_transcript_content,
+    Transcript,
+    get_transcript,
+)
 
-from ..utils import mobile_view, mobile_course_access
+from ..decorators import mobile_course_access, mobile_view
 from .serializers import BlockOutline, video_summary
 
 
@@ -112,15 +118,13 @@ class VideoTranscripts(generics.RetrieveAPIView):
         block_id = kwargs['block_id']
         lang = kwargs['lang']
 
-        usage_key = BlockUsageLocator(
-            course.id, block_type="video", block_id=block_id
-        )
+        usage_key = BlockUsageLocator(course.id, block_type='video', block_id=block_id)
+        video_descriptor = modulestore().get_item(usage_key)
+
         try:
-            video_descriptor = modulestore().get_item(usage_key)
-            transcripts = video_descriptor.get_transcripts_info()
-            content, filename, mimetype = video_descriptor.get_transcript(transcripts, lang=lang)
-        except (NotFoundError, ValueError, KeyError):
-            raise Http404(u"Transcript not found for {}, lang: {}".format(block_id, lang))
+            content, filename, mimetype = get_transcript(video_descriptor, lang=lang)
+        except NotFoundError:
+            raise Http404(u'Transcript not found for {}, lang: {}'.format(block_id, lang))
 
         response = HttpResponse(content, content_type=mimetype)
         response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename.encode('utf-8'))

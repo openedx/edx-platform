@@ -4,7 +4,7 @@
 <%namespace name='static' file='static_content.html'/>
 <%!
   from django.utils.translation import ugettext as _
-  from django.core.urlresolvers import reverse
+  from django.urls import reverse
   from xmodule.tabs import StaticTab
   from openedx.core.djangolib.js_utils import js_escaped_string
 %>
@@ -19,10 +19,10 @@
 % endfor
 </%block>
 
-<%block name="requirejs">
-    require(["js/factories/edit_tabs"], function (EditTabsFactory) {
-        EditTabsFactory("${context_course.location | n, js_escaped_string}", "${reverse('contentstore.views.tabs_handler', kwargs={'course_key_string': context_course.id})}");
-    });
+<%block name="page_bundle">
+    <%static:webpack entry="js/factories/edit_tabs">
+        EditTabsFactory("${context_course.location | n, js_escaped_string}", "${reverse('tabs_handler', kwargs={'course_key_string': context_course.id})}");
+    </%static:webpack>
 </%block>
 
 <%block name="content">

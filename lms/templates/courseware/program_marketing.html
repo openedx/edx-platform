@@ -1,0 +1,416 @@
+## mako
+<%page expression_filter="h"/>
+
+<%inherit file="/main.html" />
+<%!
+from datetime import datetime
+
+from django.urls import reverse
+from django.utils.translation import ugettext as _
+from mako import exceptions
+
+from openedx.core.djangolib.markup import HTML, Text
+%>
+<%namespace name='static' file='../static_content.html'/>
+
+## Override the default styles_version to use Bootstrap
+<%! main_css = "css/bootstrap/lms-main.css" %>
+
+
+<%
+faqs = program['faq']
+program_type = program['type'] if program['type'] else 'Program'
+title = program['title']
+courses = program['courses']
+subtitle = program['subtitle']
+overview = program['overview']
+instructors = program['instructors']
+job_outlook_items = program['job_outlook_items']
+weeks_to_complete = program['weeks_to_complete']
+full_program_price_format = '{0:.0f}' if program['full_program_price'].is_integer() else '{0:.2f}'
+full_program_price = full_program_price_format.format(program['full_program_price'])
+expected_learning_items = program['expected_learning_items']
+min_hours_effort_per_week = program['min_hours_effort_per_week']
+max_hours_effort_per_week = program['max_hours_effort_per_week']
+
+## Start Endorsement
+corporate_endorsement = program['corporate_endorsements'][0] if program['corporate_endorsements'] else {}
+corporate_endorsement_name = corporate_endorsement.get('corporation_name')
+corporate_endorsement_image = corporate_endorsement['image']['src'] if corporate_endorsement.get('image') else ''
+endorsements = corporate_endorsement.get('individual_endorsements')
+endorsement = endorsements[0] if endorsements else {}
+endorsement_quote = endorsement.get('quote')
+endorser = endorsement.get('endorser', {})
+endorser_given_name = endorser.get('given_name') if endorser.get('given_name') else ''
+endorser_family_name = endorser.get('family_name') if endorser.get('family_name') else ''
+endorser_name = (endorser_given_name + ' ' + endorser_family_name).strip()
+endorser_position = endorser.get('position') if endorser.get('position') else {}
+endorser_title = endorser_position.get('title', '')
+endorser_org = endorser_position.get('organization_name') or corporate_endorsement_name
+%>
+
+<%block name="js_extra">
+  <script src="${static.url('js/leanModal.js')}"></script>
+  <script src="${static.url('js/program_marketing.js')}"></script>
+</%block>
+
+<%block name="pagetitle">${program['title']}</%block>
+<%block name="marketing_hero">
+  <%
+    banner_image = program.get('banner_image', {}).get('large', {}).get('url', '')
+    authoring_organizations = program['authoring_organizations']
+    video_url = program['video'].get('src') if program['video'] else ''
+    faqs = program['faq']
+    courses = program['courses']
+    instructors = program['instructors']
+    full_program_price_format = '{0:.0f}' if program['full_program_price'].is_integer() else '{0:.2f}'
+    full_program_price = full_program_price_format.format(program['full_program_price'])
+  %>
+  <div id="program-details-hero">
+    <div class="main-banner"
+      style="background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url(${banner_image});">
+      <div class="container" >
+        <div class="row">
+          <div class="col col-12 col-md-8">
+            % if authoring_organizations and authoring_organizations[0]['logo_image_url']:
+            <div>
+              <img class="authoring-org-logo" alt="${authoring_organizations[0]['name']}" src="${authoring_organizations[0]['logo_image_url']}"/>
+            </div>
+            % else:
+            <div class="logo-space"></div>
+            % endif
+            <div>
+              <h1 class="program_title">${program['title']}</h1>
+            </div>
+            <div>
+              <h2>${program['subtitle']}</h2>
+            </div>
+            <div>
+              ## Note: Weird formatting to fix the inline spacing issue.
+              % if program.get('is_learner_eligible_for_one_click_purchase'):
+                <a href="${buy_button_href}" class="btn btn-success">
+                <span>${_('Purchase the Program (')}</span
+                % if program.get('discount_data') and program['discount_data']['is_discounted']:
+                  ><span aria-label="${_('Original Price')}" class="original-price"
+                  >${Text(_('${oldPrice}')).format(
+                      oldPrice=full_program_price_format.format(program['discount_data']['total_incl_tax_excl_discounts'])
+                    )}</span
+                  ><span aria-label="${_('Discounted Price')}" class="discount">
+                      ${Text(_('${newPrice}')).format(
+                        newPrice=full_program_price,
+                      )}
+                  </span
+                  ><span class="savings">
+                    ${Text(_('{currency})')).format(
+                      discount_value=full_program_price_format.format(program['discount_data']['discount_value']),
+                      currency=program['discount_data']['currency']
+                    )}
+                  </span>
+                % else:
+                ><span>${"${price})".format(price=full_program_price)}
+                  </span>
+                % endif
+                </a>
+              % else:
+                <a href="#courses" class="btn btn-success">
+                  ${_('Start Learning')}
+                </a>
+              % endif
+            </div>
+          </div>
+          <div class="col col-12 col-md-4">
+            % if video_url:
+            <div id="program_video">
+              <button type="button" class="btn" aria-label="${_('Play')}" onclick="playVideo('${video_url}')">
+                <span class="icon fa fa-4x fa-play-circle" aria-hidden="true"></span>
+              </button>
+              <iframe class="align-middle" title="${_('YouTube Video')}" src="" frameborder="0" allowfullscreen style="display:none;"></iframe>
+            </div>
+            % endif
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="quick-nav">
+      <div class="container">
+        <div class="row">
+            <ul class="nav nav-fill col-lg-12">
+                % if courses:
+                <li class="nav-item">
+                  <a class="nav-link" href="#courses">${_('View Courses')}</a>
+                </li>
+                % endif
+                % if instructors:
+                <li class="nav-item">
+                  <a class="nav-link" href="#instructors">${_('Meet the Instructors')}</a>
+                </li>
+                % endif
+                % if faqs:
+                <li class="nav-item">
+                  <a class="nav-link" href="#faqs">${_('Frequently Asked Questions')}</a>
+                </li>
+                % endif
+              </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</%block>
+
+<div id="program-details-page" class="container">
+  <div class="row program-info">
+    <div class="col col-12 col-lg-7">
+      <div class="section">
+        <p>${HTML(program['overview'])}</p>
+      </div>
+      <div class="section">
+        % if job_outlook_items:
+        <h3 class="section_title">${_('Job Outlook')}</h3>
+        <p>
+            <ul>
+              % for item in job_outlook_items:
+                <li>${item}</li>
+              % endfor
+            </ul>
+        </p>
+        % endif
+      </div>
+      <div class="section">
+        % if endorsement:
+         <h3 class="section_title">${_('Real Career Impact')}</h3>
+        <p>
+          % if corporate_endorsement_image:
+            <img class="logo" alt="${corporate_endorsement_name}" src="${corporate_endorsement_image}"/>
+          % endif
+          <blockquote class="blockquote">
+            <p class="quote">"${endorsement_quote}"</p>
+            <footer class="blockquote-footer">
+              ${endorser_name}, ${endorser_title}, ${endorser_org}
+            </footer>
+          </blockquote>
+        </p>
+        %endif
+      </div>
+      <div class="section">
+      </div>
+      <div class="section">
+        % if expected_learning_items:
+        <p>
+           <h3 class="section_title">${_('What You\'ll Learn')}</h3>
+          <ul>
+            % for item in expected_learning_items:
+              <li>${item}</li>
+            % endfor
+          </ul>
+        </p>
+        %endif
+      </div>
+    </div>
+    <div class="col col-12 col-lg-5">
+      <div class="facts">
+        <ul class="list-unstyled">
+          <li class="row">
+            <div class="label col col-6">
+              <span class="fa fa-clock-o fa-lg" aria-hidden="true"></span>
+              <span>${_('Average Length')}</span>
+            </div>
+            <div class="description col col-6">
+              ${Text(_('{weeks_to_complete} weeks per course')).format(
+                weeks_to_complete=weeks_to_complete
+              )}
+            </div>
+          </li>
+          <li class="row">
+            <div class="label col col-6">
+              <span class="fa fa-tachometer fa-lg" aria-hidden="true"></span>
+              <span>${_('Effort')}</span>
+            </div>
+            <div class="description col col-6">
+              ${Text(_('{min_hours_effort_per_week}-{max_hours_effort_per_week} hours per week, per course')).format(
+                max_hours_effort_per_week=max_hours_effort_per_week,
+                min_hours_effort_per_week=min_hours_effort_per_week
+              )}
+            </div>
+          </li>
+          <li class="row">
+            <div class="label col col-6">
+              <span class="fa fa-book fa-lg" aria-hidden="true"></span>
+              <span>${_('Number of Courses')}</span>
+            </div>
+            <div class="description col col-6">
+              ${Text(_('{number_of_courses} courses in program')).format(
+                number_of_courses=len(courses)
+              )}
+            </div>
+          </li>
+          <li class="row">
+            <div class="label col col-6">
+              <span class="fa fa-tag fa-lg" aria-hidden="true"></span>
+              <span>${_('Price (USD)')}</span>
+            </div>
+            <div class="description col col-6">
+              % if program.get('discount_data') and program['discount_data']['is_discounted']:
+                <span class="price">
+                  <span aria-label="${_('Original Price')}" class="original-price">
+                    ${Text(_('${oldPrice}')).format(
+                      oldPrice=full_program_price_format.format(program['discount_data']['total_incl_tax_excl_discounts'])
+                    )}
+                  </span>
+                  <span aria-label="${_('Discounted Price')}" class="discount green-highlight">
+                    ${Text(_('${newPrice}{htmlEnd} for entire program')).format(
+                      newPrice=full_program_price,
+                      htmlEnd=HTML('</span>')
+                    )}
+                  <span class="savings green-highlight">
+                    ${Text(_('You save ${discount_value} {currency}')).format(
+                      discount_value=full_program_price_format.format(program['discount_data']['discount_value']),
+                      currency=program['discount_data']['currency']
+                    )}
+                  </span>
+                </span>
+              % else:
+                <span>
+                  ${Text(_('${full_program_price} for entire program')).format(
+                    full_program_price=full_program_price
+                  )}
+                </span>
+              % endif
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  % if courses:
+  <hr class="thick_rule">
+  <div id="courses">
+    <div class="row">
+      <div class="col-12">
+        <h2>
+          ${_('Courses in the {}').format(
+            program_type
+          )}
+        </h2>
+      </div>
+    </div>
+    % for course in courses:
+      <%
+        ## The goal here is to get the `oldest course run that still has open enrollment`.
+        ## We fall back on the newest course if none are available for enrollment.
+        sorted_course_runs = sorted(course['course_runs'], key=lambda run: run['start'])
+        open_course_runs = [run for run in sorted_course_runs if run['is_enrollment_open']]
+        course_run = open_course_runs[0] if open_course_runs else sorted_course_runs[-1]
+        course_img = course_run.get('image')
+        course_about_url = reverse('about_course', args=[course_run['key']])
+        course_purchase_url = course_run['upgrade_url'] if course_run['upgrade_url'] else course_about_url
+      %>
+      <div class="row course">
+        <div class="col-3 col-lg-2 course-image">
+          % if course_img:
+            <img alt="" src="${course_img['src']}" alt=""/>
+          % endif
+        </div>
+        <div class="col-9 col-lg-6">
+          <div>
+            <a href="${course_about_url}">${course_run['title']}</a>
+          </div>
+          <div>${course_run['short_description']}</div>
+          <div>
+            <a href="${course_about_url}">${_('Learn More')}</a>
+          </div>
+        </div>
+        <div class="col-12 col-lg-4 course-enroll">
+          <div>
+            ${Text(_('Starts on {}')).format(
+              datetime.strptime(course_run['start'], '%Y-%m-%dT%H:%M:%SZ').strftime('%B %-d, %Y')
+            )}
+          </div>
+          % if program.get('is_learner_eligible_for_one_click_purchase') != True:
+            % if course_run['is_enrollment_open'] and course_run['can_enroll'] and not course_run['is_course_ended']:
+              <div>
+                <a class="btn btn-primary btn-block btn-success" href="${course_purchase_url}">Enroll Now</a>
+              </div>
+            % else:
+              <div>
+                <a class="btn btn-primary btn-block btn-secondary disabled" href="#" >Not Currently Available</a>
+              </div>
+            % endif
+          % endif
+        </div>
+      </div>
+    % endfor
+  </div>
+  % endif
+  % if instructors:
+    <hr class="thick_rule">
+    <div id="instructors" class="row">
+      <div class="col-12">
+        <h2>${_('Instructors')}</h2>
+      </div>
+      % for instructor in instructors:
+        <%
+          instructor_hash = hash(instructor['name'])
+        %>
+        <div class="col-12 col-sm-6 col-md-4 instructor">
+          <a href="#instructor-details-${instructor_hash}" class="instructor-label">
+            <img alt="" src="${instructor['image']}"/>
+          </a>
+          <a href="#instructor-details-${instructor_hash}" class="instructor-label">
+            <div class="instructor-name">${instructor['name']}</div>
+          </a>
+          % if instructor.get('title'):
+            <div class="instructor-position">${instructor['title']}</div>
+          % endif
+          % if instructor.get('organization'):
+            <div class="instructor-org">${instructor['organization']}</div>
+          % endif
+          % if instructor.get('bio'):
+          <div class="instructor-modal">
+              <div class="col col-12 sm-col-12 md-col-6 lg-col-6 xl-col-6">
+                  <div class="modal modal-custom" id="instructor-details-${instructor_hash}">
+                     <div class="btn-close modal_close"><i class="fa fa-close"></i></div>
+                     <div class="modal-body">
+                       <div class="modal-header">
+                         <div>
+                            <img alt="" src="${instructor['image']}"/>
+                            <div class="instructor-name">${instructor['name']}</div>
+                            <div>
+                              % if instructor.get('title'):
+                                <span>${instructor['title']}</span>,
+                              % endif
+                              % if instructor.get('organization'):
+                                <span>${instructor['organization']}</span>
+                              % endif
+                            </div>
+                         </div>
+                       </div>
+                       <div class="instructor-bio">${HTML(instructor['bio'])}</div>
+                     </div>
+                   </div>
+                </div>
+          </div>
+          % endif
+        </div>
+      % endfor
+    </div>
+  % endif
+  % if faqs:
+  <hr class="thick_rule">
+  <div id="faqs" class="row faqs">
+    <div class="col-12 col-lg-9 col-xl-7">
+      <h2>${_('Frequently Asked Questions')}</h2>
+      <hr>
+    </div>
+    % for faq in faqs:
+      <div class="col-12 col-lg-9 col-xl-7 faq">
+        <h3 class="question">
+          ${faq['question']}
+        </h3>
+        <div class="answer">
+          ${HTML(faq['answer'])}
+        </div>
+      </div>
+    % endfor
+  </div>
+  % endif
+</div>

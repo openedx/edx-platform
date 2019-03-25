@@ -5,44 +5,41 @@ Runs tasks on answers to course problems to validate that code
 paths actually work.
 
 """
-from collections import namedtuple
-import ddt
 import json
 import logging
+import textwrap
+from collections import namedtuple
+
+import ddt
+from celery.states import FAILURE, SUCCESS
+from django.contrib.auth.models import User
+from django.urls import reverse
 from mock import patch
 from nose.plugins.attrib import attr
-import textwrap
+from six import text_type
 
-from celery.states import SUCCESS, FAILURE
-from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
-
-from openedx.core.djangoapps.util.testing import TestConditionalContent
-from capa.tests.response_xml_factory import (CodeResponseXMLFactory,
-                                             CustomResponseXMLFactory)
-from xmodule.modulestore.tests.factories import ItemFactory
-from xmodule.modulestore import ModuleStoreEnum
-
+from capa.responsetypes import StudentInputError
+from capa.tests.response_xml_factory import CodeResponseXMLFactory, CustomResponseXMLFactory
 from courseware.model_data import StudentModule
-
+from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.instructor_task.api import (
+    submit_delete_problem_state_for_all_students,
     submit_rescore_problem_for_all_students,
     submit_rescore_problem_for_student,
-    submit_reset_problem_attempts_for_all_students,
-    submit_delete_problem_state_for_all_students
+    submit_reset_problem_attempts_for_all_students
 )
 from lms.djangoapps.instructor_task.models import InstructorTask
-from lms.djangoapps.instructor_task.tasks_helper import upload_grades_csv
+from lms.djangoapps.instructor_task.tasks_helper.grades import CourseGradeReport
 from lms.djangoapps.instructor_task.tests.test_base import (
-    InstructorTaskModuleTestCase,
-    TestReportMixin,
     OPTION_1,
     OPTION_2,
+    InstructorTaskModuleTestCase,
+    TestReportMixin
 )
-from capa.responsetypes import StudentInputError
-from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
+from openedx.core.djangoapps.util.testing import TestConditionalContent
 from openedx.core.lib.url_utils import quote_slashes
-
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.factories import ItemFactory
 
 log = logging.getLogger(__name__)
 
@@ -60,7 +57,7 @@ class TestIntegrationTask(InstructorTaskModuleTestCase):
         self.assertEqual(instructor_task.task_type, task_type)
         task_input = json.loads(instructor_task.task_input)
         self.assertNotIn('student', task_input)
-        self.assertEqual(task_input['problem_url'], InstructorTaskModuleTestCase.problem_location(problem_url_name).to_deprecated_string())
+        self.assertEqual(task_input['problem_url'], text_type(InstructorTaskModuleTestCase.problem_location(problem_url_name)))
         status = json.loads(instructor_task.task_output)
         self.assertEqual(status['exception'], 'ZeroDivisionError')
         self.assertEqual(status['message'], expected_message)
@@ -102,8 +99,8 @@ class TestRescoringTask(TestIntegrationTask):
         self.login_username(username)
         # make ajax call:
         modx_url = reverse('xblock_handler', kwargs={
-            'course_id': self.course.id.to_deprecated_string(),
-            'usage_id': quote_slashes(InstructorTaskModuleTestCase.problem_location(problem_url_name).to_deprecated_string()),
+            'course_id': text_type(self.course.id),
+            'usage_id': quote_slashes(text_type(InstructorTaskModuleTestCase.problem_location(problem_url_name))),
             'handler': 'xmodule_handler',
             'suffix': 'problem_get',
         })
@@ -134,7 +131,7 @@ class TestRescoringTask(TestIntegrationTask):
         # are in sync.
         expected_subsection_grade = expected_score
 
-        course_grade = CourseGradeFactory().create(user, self.course)
+        course_grade = CourseGradeFactory().read(user, self.course)
         self.assertEquals(
             course_grade.graded_subsections_by_format['Homework'][self.problem_section.location].graded_total.earned,
             expected_subsection_grade,
@@ -224,13 +221,49 @@ class TestRescoringTask(TestIntegrationTask):
     @ddt.data(
         RescoreTestData(edit=dict(), new_expected_scores=(2, 1, 1, 0), new_expected_max=2),
         RescoreTestData(edit=dict(correct_answer=OPTION_2), new_expected_scores=(2, 1, 1, 2), new_expected_max=2),
-        RescoreTestData(edit=dict(num_inputs=2), new_expected_scores=(2, 1, 1, 0), new_expected_max=2),
     )
     @ddt.unpack
     def test_rescoring_if_higher(self, problem_edit, new_expected_scores, new_expected_max):
         self.verify_rescore_results(
             problem_edit, new_expected_scores, new_expected_max, rescore_if_higher=True,
         )
+
+    def test_rescoring_if_higher_scores_equal(self):
+        """
+        Specifically tests rescore when the previous and new raw scores are equal. In this case, the scores should
+        be updated.
+        """
+        problem_edit = dict(num_inputs=2)  # this change to the problem means the problem will now have a max score of 4
+        unchanged_max = 2
+        new_max = 4
+        problem_url_name = 'H1P1'
+        self.define_option_problem(problem_url_name)
+        location = InstructorTaskModuleTestCase.problem_location(problem_url_name)
+        descriptor = self.module_store.get_item(location)
+
+        # first store answers for each of the separate users:
+        self.submit_student_answer('u1', problem_url_name, [OPTION_1, OPTION_1])
+        self.submit_student_answer('u2', problem_url_name, [OPTION_2, OPTION_2])
+
+        # verify each user's grade
+        self.check_state(self.user1, descriptor, 2, 2)  # user 1 has a 2/2
+        self.check_state(self.user2, descriptor, 0, 2)  # user 2 has a 0/2
+
+        # update the data in the problem definition so the answer changes.
+        self.redefine_option_problem(problem_url_name, **problem_edit)
+
+        # confirm that simply rendering the problem again does not change the grade
+        self.render_problem('u1', problem_url_name)
+        self.check_state(self.user1, descriptor, 2, 2)
+        self.check_state(self.user2, descriptor, 0, 2)
+
+        # rescore the problem for all students
+        self.submit_rescore_all_student_answers('instructor', problem_url_name, True)
+
+        # user 1's score would go down, so it remains 2/2. user 2's score was 0/2, which is equivalent to the new score
+        # of 0/4, so user 2's score changes to 0/4.
+        self.check_state(self.user1, descriptor, 2, unchanged_max)
+        self.check_state(self.user2, descriptor, 0, new_max)
 
     def test_rescoring_failure(self):
         """Simulate a failure in rescoring a problem"""
@@ -239,7 +272,7 @@ class TestRescoringTask(TestIntegrationTask):
         self.submit_student_answer('u1', problem_url_name, [OPTION_1, OPTION_1])
 
         expected_message = "bad things happened"
-        with patch('capa.capa_problem.LoncapaProblem.rescore_existing_answers') as mock_rescore:
+        with patch('capa.capa_problem.LoncapaProblem.get_grade_from_current_answers') as mock_rescore:
             mock_rescore.side_effect = ZeroDivisionError(expected_message)
             instructor_task = self.submit_rescore_all_student_answers('instructor', problem_url_name)
         self._assert_task_failure(instructor_task.id, 'rescore_problem', problem_url_name, expected_message)
@@ -257,7 +290,7 @@ class TestRescoringTask(TestIntegrationTask):
 
         # return an input error as if it were a numerical response, with an embedded unicode character:
         expected_message = u"Could not interpret '2/3\u03a9' as a number"
-        with patch('capa.capa_problem.LoncapaProblem.rescore_existing_answers') as mock_rescore:
+        with patch('capa.capa_problem.LoncapaProblem.get_grade_from_current_answers') as mock_rescore:
             mock_rescore.side_effect = StudentInputError(expected_message)
             instructor_task = self.submit_rescore_all_student_answers('instructor', problem_url_name)
 
@@ -268,7 +301,7 @@ class TestRescoringTask(TestIntegrationTask):
         self.assertEqual(instructor_task.task_type, 'rescore_problem')
         task_input = json.loads(instructor_task.task_input)
         self.assertNotIn('student', task_input)
-        self.assertEqual(task_input['problem_url'], InstructorTaskModuleTestCase.problem_location(problem_url_name).to_deprecated_string())
+        self.assertEqual(task_input['problem_url'], text_type(InstructorTaskModuleTestCase.problem_location(problem_url_name)))
         status = json.loads(instructor_task.task_output)
         self.assertEqual(status['attempted'], 1)
         self.assertEqual(status['succeeded'], 0)
@@ -536,10 +569,10 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
     def verify_csv_task_success(self, task_result):
         """
         Verify that all students were successfully graded by
-        `upload_grades_csv`.
+        `CourseGradeReport`.
 
         Arguments:
-            task_result (dict): Return value of `upload_grades_csv`.
+            task_result (dict): Return value of `CourseGradeReport.generate`.
         """
         self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, task_result)
 
@@ -567,7 +600,7 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
             group_config_hdr_tpl = 'Experiment Group ({})'
             return {
                 group_config_hdr_tpl.format(self.partition.name): self.partition.scheme.get_group_for_user(
-                    self.course.id, user, self.partition, track_function=None
+                    self.course.id, user, self.partition
                 ).name
             }
 
@@ -599,8 +632,8 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
         self.submit_student_answer(self.student_a.username, problem_a_url, [OPTION_1, OPTION_1])
         self.submit_student_answer(self.student_b.username, problem_b_url, [OPTION_1, OPTION_2])
 
-        with patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task'):
-            result = upload_grades_csv(None, None, self.course.id, None, 'graded')
+        with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
+            result = CourseGradeReport.generate(None, None, self.course.id, None, 'graded')
             self.verify_csv_task_success(result)
             self.verify_grades_in_csv(
                 [
@@ -632,8 +665,8 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
 
         self.submit_student_answer(self.student_a.username, problem_a_url, [OPTION_1, OPTION_1])
 
-        with patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task'):
-            result = upload_grades_csv(None, None, self.course.id, None, 'graded')
+        with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
+            result = CourseGradeReport.generate(None, None, self.course.id, None, 'graded')
             self.verify_csv_task_success(result)
             self.verify_grades_in_csv(
                 [
@@ -646,7 +679,7 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
                     {
                         self.student_b: {
                             u'Grade': '0.0',
-                            u'Homework': u'Not Available',
+                            u'Homework': u'Not Attempted',
                         }
                     },
                 ],

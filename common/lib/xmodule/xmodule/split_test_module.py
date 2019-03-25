@@ -16,10 +16,11 @@ from xmodule.validation import StudioValidation, StudioValidationMessage
 from xmodule.modulestore.inheritance import UserPartitionList
 
 from lxml import etree
+from six import text_type
 
+from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Scope, Integer, String, ReferenceValueDict
-from xblock.fragment import Fragment
 
 log = logging.getLogger('edx.' + __name__)
 
@@ -58,7 +59,7 @@ class SplitTestFields(object):
 
     display_name = String(
         display_name=_("Display Name"),
-        help=_("This name is used for organizing your course content, but is not shown to students."),
+        help=_("The display name for this component. (Not shown to learners)"),
         scope=Scope.settings,
         default=_("Content Experiment")
     )
@@ -98,7 +99,8 @@ def get_split_user_partitions(user_partitions):
 
 
 @XBlock.needs('user_tags')  # pylint: disable=abstract-method
-@XBlock.wants('partitions')
+@XBlock.needs('partitions')
+@XBlock.needs('user')
 class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
     """
     Show the user the appropriate child.  Uses the ExperimentState
@@ -193,9 +195,9 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
         Returns the group ID, or None if none is available.
         """
         partitions_service = self.runtime.service(self, 'partitions')
-        if not partitions_service:
-            return None
-        return partitions_service.get_user_group_id_for_partition(self.user_partition_id)
+        user_service = self.runtime.service(self, 'user')
+        user = user_service._django_user  # pylint: disable=protected-access
+        return partitions_service.get_user_group_id_for_partition(user, self.user_partition_id)
 
     @property
     def is_configured(self):
@@ -216,7 +218,7 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
             child_descriptor = self.get_child_descriptor_by_location(child_location)
             child = self.system.get_module(child_descriptor)
             rendered_child = child.render(STUDENT_VIEW, context)
-            fragment.add_frag_resources(rendered_child)
+            fragment.add_fragment_resources(rendered_child)
             group_name, updated_group_id = self.get_data_for_vertical(child)
 
             if updated_group_id is None:  # inactive group
@@ -224,7 +226,7 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
                 updated_group_id = [g_id for g_id, loc in self.group_id_to_child.items() if loc == child_location][0]
                 inactive_contents.append({
                     'group_name': _(u'{group_name} (inactive)').format(group_name=group_name),
-                    'id': child.location.to_deprecated_string(),
+                    'id': text_type(child.location),
                     'content': rendered_child.content,
                     'group_id': updated_group_id,
                 })
@@ -232,7 +234,7 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
 
             active_contents.append({
                 'group_name': group_name,
-                'id': child.location.to_deprecated_string(),
+                'id': text_type(child.location),
                 'content': rendered_child.content,
                 'group_id': updated_group_id,
             })
@@ -298,7 +300,7 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
                         DEFAULT_GROUP_NAME.format(group_id=group_id),
                         group_name
                     )
-            fragment.add_frag_resources(rendered_child)
+            fragment.add_fragment_resources(rendered_child)
             html = html + rendered_child.content
 
         return html
@@ -320,7 +322,7 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
                 'child_content': child_fragment.content,
                 'child_id': self.child.scope_ids.usage_id,
             }))
-            fragment.add_frag_resources(child_fragment)
+            fragment.add_fragment_resources(child_fragment)
             fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/split_test_student.js'))
             fragment.initialize_js('SplitTestStudentView')
             return fragment
@@ -331,7 +333,7 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
         Record in the tracking logs which child was rendered
         """
         # TODO: use publish instead, when publish is wired to the tracking logs
-        self.system.track_function('xblock.split_test.child_render', {'child_id': self.child.scope_ids.usage_id.to_deprecated_string()})
+        self.system.track_function('xblock.split_test.child_render', {'child_id': text_type(self.child.scope_ids.usage_id)})
         return Response()
 
     def get_icon_class(self):
@@ -370,8 +372,8 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
 
 
 @XBlock.needs('user_tags')  # pylint: disable=abstract-method
-@XBlock.wants('partitions')
-@XBlock.wants('user')
+@XBlock.needs('partitions')
+@XBlock.needs('user')
 class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDescriptor):
     # the editing interface can be the same as for sequences -- just a container
     module_class = SplitTestModule
@@ -393,7 +395,7 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
         renderable_groups = {}
         # json.dumps doesn't know how to handle Location objects
         for group in self.group_id_to_child:
-            renderable_groups[group] = self.group_id_to_child[group].to_deprecated_string()
+            renderable_groups[group] = text_type(self.group_id_to_child[group])
         xml_object.set('group_id_to_child', json.dumps(renderable_groups))
         xml_object.set('user_partition_id', str(self.user_partition_id))
         for child in self.get_children():
@@ -641,10 +643,6 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
 
         Called from Studio view.
         """
-        user_service = self.runtime.service(self, 'user')
-        if user_service is None:
-            return Response()
-
         user_partition = self.get_selected_partition()
 
         changed = False

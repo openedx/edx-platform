@@ -1,20 +1,30 @@
-"""Grading tests"""
-import ddt
-import unittest
+"""
+Grading tests
+"""
 
+import unittest
+from datetime import datetime, timedelta
+
+import ddt
+from pytz import UTC
+from lms.djangoapps.grades.scores import compute_percent
+from six import text_type
 from xmodule import graders
-from xmodule.graders import ProblemScore, AggregatedScore, aggregate_scores
+from xmodule.graders import (
+    AggregatedScore, ProblemScore, ShowCorrectness, aggregate_scores
+)
 
 
 class GradesheetTest(unittest.TestCase):
     """
     Tests the aggregate_scores method
     """
+    shard = 1
 
     def test_weighted_grading(self):
         scores = []
-        agg_fields = dict(attempted=False)
-        prob_fields = dict(raw_earned=0, raw_possible=0, weight=0, attempted=False)
+        agg_fields = dict(first_attempted=None)
+        prob_fields = dict(raw_earned=0, raw_possible=0, weight=0, first_attempted=None)
 
         # No scores
         all_total, graded_total = aggregate_scores(scores)
@@ -40,8 +50,9 @@ class GradesheetTest(unittest.TestCase):
         )
 
         # (0/5 non-graded) + (3/5 graded) = 3/10 total, 3/5 graded
-        prob_fields['attempted'] = True
-        agg_fields['attempted'] = True
+        now = datetime.now()
+        prob_fields['first_attempted'] = now
+        agg_fields['first_attempted'] = now
         scores.append(ProblemScore(weighted_earned=3, weighted_possible=5, graded=True, **prob_fields))
         all_total, graded_total = aggregate_scores(scores)
         self.assertAlmostEqual(
@@ -71,6 +82,7 @@ class GraderTest(unittest.TestCase):
     """
     Tests grader implementations
     """
+    shard = 1
 
     empty_gradesheet = {
     }
@@ -89,7 +101,11 @@ class GraderTest(unittest.TestCase):
             self.graded_total = graded_total
             self.display_name = display_name
 
-    common_fields = dict(graded=True, attempted=True)
+        @property
+        def percent_graded(self):
+            return compute_percent(self.graded_total.earned, self.graded_total.possible)
+
+    common_fields = dict(graded=True, first_attempted=datetime.now())
     test_gradesheet = {
         'Homework': {
             'hw1': MockGrade(AggregatedScore(tw_earned=2, tw_possible=20.0, **common_fields), display_name='hw1'),
@@ -145,11 +161,11 @@ class GraderTest(unittest.TestCase):
         self.assertEqual(len(graded['section_breakdown']), 12 + 1)
 
         graded = overflow_grader.grade(self.test_gradesheet)
-        self.assertAlmostEqual(graded['percent'], 0.8880952380952382)  # 100% + 10% / 5 assignments
+        self.assertAlmostEqual(graded['percent'], 0.8879999999999999)  # 100% + 10% / 5 assignments
         self.assertEqual(len(graded['section_breakdown']), 7 + 1)
 
         graded = lab_grader.grade(self.test_gradesheet)
-        self.assertAlmostEqual(graded['percent'], 0.9226190476190477)
+        self.assertAlmostEqual(graded['percent'], 0.92249999999999999)
         self.assertEqual(len(graded['section_breakdown']), 7 + 1)
 
     def test_assignment_format_grader_on_single_section_entry(self):
@@ -165,7 +181,7 @@ class GraderTest(unittest.TestCase):
             self.assertEqual(graded['section_breakdown'][0]['label'], 'Midterm')
 
         graded = midterm_grader.grade(self.test_gradesheet)
-        self.assertAlmostEqual(graded['percent'], 0.505)
+        self.assertAlmostEqual(graded['percent'], 0.50)
         self.assertEqual(len(graded['section_breakdown']), 0 + 1)
 
     def test_weighted_subsections_grader(self):
@@ -203,17 +219,17 @@ class GraderTest(unittest.TestCase):
         empty_grader = graders.WeightedSubsectionsGrader([])
 
         graded = weighted_grader.grade(self.test_gradesheet)
-        self.assertAlmostEqual(graded['percent'], 0.5106547619047619)
+        self.assertAlmostEqual(graded['percent'], 0.50812499999999994)
         self.assertEqual(len(graded['section_breakdown']), (12 + 1) + (7 + 1) + 1)
         self.assertEqual(len(graded['grade_breakdown']), 3)
 
         graded = over_one_weights_grader.grade(self.test_gradesheet)
-        self.assertAlmostEqual(graded['percent'], 0.7688095238095238)
+        self.assertAlmostEqual(graded['percent'], 0.76624999999999999)
         self.assertEqual(len(graded['section_breakdown']), (12 + 1) + (7 + 1) + 1)
         self.assertEqual(len(graded['grade_breakdown']), 3)
 
         graded = zero_weights_grader.grade(self.test_gradesheet)
-        self.assertAlmostEqual(graded['percent'], 0.2525)
+        self.assertAlmostEqual(graded['percent'], 0.25)
         self.assertEqual(len(graded['section_breakdown']), (12 + 1) + (7 + 1) + 1)
         self.assertEqual(len(graded['grade_breakdown']), 3)
 
@@ -270,7 +286,7 @@ class GraderTest(unittest.TestCase):
         empty_grader = graders.grader_from_conf([])
 
         graded = weighted_grader.grade(self.test_gradesheet)
-        self.assertAlmostEqual(graded['percent'], 0.5106547619047619)
+        self.assertAlmostEqual(graded['percent'], 0.50812499999999994)
         self.assertEqual(len(graded['section_breakdown']), (12 + 1) + (7 + 1) + 1)
         self.assertEqual(len(graded['grade_breakdown']), 3)
 
@@ -308,4 +324,89 @@ class GraderTest(unittest.TestCase):
     def test_grader_with_invalid_conf(self, invalid_conf, expected_error_message):
         with self.assertRaises(ValueError) as error:
             graders.grader_from_conf([invalid_conf])
-        self.assertIn(expected_error_message, error.exception.message)
+        self.assertIn(expected_error_message, text_type(error.exception))
+
+
+@ddt.ddt
+class ShowCorrectnessTest(unittest.TestCase):
+    """
+    Tests the correctness_available method
+    """
+    shard = 1
+
+    def setUp(self):
+        super(ShowCorrectnessTest, self).setUp()
+
+        now = datetime.now(UTC)
+        day_delta = timedelta(days=1)
+        self.yesterday = now - day_delta
+        self.today = now
+        self.tomorrow = now + day_delta
+
+    def test_show_correctness_default(self):
+        """
+        Test that correctness is visible by default.
+        """
+        self.assertTrue(ShowCorrectness.correctness_available())
+
+    @ddt.data(
+        (ShowCorrectness.ALWAYS, True),
+        (ShowCorrectness.ALWAYS, False),
+        # Any non-constant values behave like "always"
+        ('', True),
+        ('', False),
+        ('other-value', True),
+        ('other-value', False),
+    )
+    @ddt.unpack
+    def test_show_correctness_always(self, show_correctness, has_staff_access):
+        """
+        Test that correctness is visible when show_correctness is turned on.
+        """
+        self.assertTrue(ShowCorrectness.correctness_available(
+            show_correctness=show_correctness,
+            has_staff_access=has_staff_access
+        ))
+
+    @ddt.data(True, False)
+    def test_show_correctness_never(self, has_staff_access):
+        """
+        Test that show_correctness="never" hides correctness from learners and course staff.
+        """
+        self.assertFalse(ShowCorrectness.correctness_available(
+            show_correctness=ShowCorrectness.NEVER,
+            has_staff_access=has_staff_access
+        ))
+
+    @ddt.data(
+        # Correctness not visible to learners if due date in the future
+        ('tomorrow', False, False),
+        # Correctness is visible to learners if due date in the past
+        ('yesterday', False, True),
+        # Correctness is visible to learners if due date in the past (just)
+        ('today', False, True),
+        # Correctness is visible to learners if there is no due date
+        (None, False, True),
+        # Correctness is visible to staff if due date in the future
+        ('tomorrow', True, True),
+        # Correctness is visible to staff if due date in the past
+        ('yesterday', True, True),
+        # Correctness is visible to staff if there is no due date
+        (None, True, True),
+    )
+    @ddt.unpack
+    def test_show_correctness_past_due(self, due_date_str, has_staff_access, expected_result):
+        """
+        Test show_correctness="past_due" to ensure:
+        * correctness is always visible to course staff
+        * correctness is always visible to everyone if there is no due date
+        * correctness is visible to learners after the due date, when there is a due date.
+        """
+        if due_date_str is None:
+            due_date = None
+        else:
+            due_date = getattr(self, due_date_str)
+        self.assertEquals(
+            ShowCorrectness.correctness_available(ShowCorrectness.PAST_DUE, due_date, has_staff_access),
+            expected_result
+        )

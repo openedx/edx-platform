@@ -5,23 +5,26 @@ Tests for Shibboleth Authentication
 @jbau
 """
 import unittest
+from importlib import import_module
+from urllib import urlencode
 
+import pytest
 from ddt import ddt, data
 from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.test import TestCase
 from django.test.client import RequestFactory, Client as DjangoTestClient
 from django.test.utils import override_settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib.auth.models import AnonymousUser, User
-from importlib import import_module
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from openedx.core.djangoapps.external_auth.views import (
     shib_login, course_specific_login, course_specific_register, _flatten_to_ascii
 )
+from openedx.core.djangoapps.user_api import accounts as accounts_settings
 from mock import patch
 from nose.plugins.attrib import attr
-from urllib import urlencode
+from six import text_type
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.views import change_enrollment
@@ -316,7 +319,7 @@ class ShibSPTest(CacheIsolationTestCase):
                     'terms_of_service': u'true',
                     'honor_code': u'true'}
 
-        with patch('student.views.AUDIT_LOG') as mock_audit_log:
+        with patch('student.views.management.AUDIT_LOG') as mock_audit_log:
             self.client.post('/create_account', data=postvars)
 
         mail = identity.get('mail')
@@ -326,20 +329,22 @@ class ShibSPTest(CacheIsolationTestCase):
         self.assertEquals(len(audit_log_calls), 3)
         method_name, args, _kwargs = audit_log_calls[0]
         self.assertEquals(method_name, 'info')
-        self.assertEquals(len(args), 1)
-        self.assertIn(u'Login success on new account creation', args[0])
-        self.assertIn(u'post_username', args[0])
-        method_name, args, _kwargs = audit_log_calls[1]
-        self.assertEquals(method_name, 'info')
         self.assertEquals(len(args), 2)
         self.assertIn(u'User registered with external_auth', args[0])
         self.assertEquals(u'post_username', args[1])
-        method_name, args, _kwargs = audit_log_calls[2]
+
+        method_name, args, _kwargs = audit_log_calls[1]
         self.assertEquals(method_name, 'info')
         self.assertEquals(len(args), 3)
         self.assertIn(u'Updated ExternalAuthMap for ', args[0])
         self.assertEquals(u'post_username', args[1])
         self.assertEquals(u'test_user@stanford.edu', args[2].external_id)
+
+        method_name, args, _kwargs = audit_log_calls[2]
+        self.assertEquals(method_name, 'info')
+        self.assertEquals(len(args), 1)
+        self.assertIn(u'Login success on new account creation', args[0])
+        self.assertIn(u'post_username', args[0])
 
         user = User.objects.get(id=self.client.session['_auth_user_id'])
 
@@ -355,15 +360,14 @@ class ShibSPTest(CacheIsolationTestCase):
 
         # check that the created user profile has the right name, either taken from shib or user input
         profile = UserProfile.objects.get(user=user)
-        sn_empty = not identity.get('sn')
-        given_name_empty = not identity.get('givenName')
+        external_name = self.client.session['ExternalAuthMap'].external_name
         displayname_empty = not identity.get('displayName')
 
         if displayname_empty:
-            if sn_empty and given_name_empty:
+            if len(external_name.strip()) < accounts_settings.NAME_MIN_LENGTH:
                 self.assertEqual(profile.name, postvars['name'])
             else:
-                self.assertEqual(profile.name, self.client.session['ExternalAuthMap'].external_name)
+                self.assertEqual(profile.name, external_name.strip())
                 self.assertNotIn(u';', profile.name)
         else:
             self.assertEqual(profile.name, self.client.session['ExternalAuthMap'].external_name)
@@ -516,10 +520,10 @@ class ShibSPTestModifiedCourseware(ModuleStoreTestCase):
         # Tests the two case for courses, limited and not
         for course in [shib_course, open_enroll_course]:
             for student in [shib_student, other_ext_student, int_student]:
-                request = self.request_factory.post('/change_enrollment')
-
-                request.POST.update({'enrollment_action': 'enroll',
-                                     'course_id': course.id.to_deprecated_string()})
+                request = self.request_factory.post(
+                    '/change_enrollment',
+                    data={'enrollment_action': 'enroll', 'course_id': text_type(course.id)}
+                )
                 request.user = student
                 response = change_enrollment(request)
                 # If course is not limited or student has correct shib extauth then enrollment should be allowed
@@ -561,7 +565,7 @@ class ShibSPTestModifiedCourseware(ModuleStoreTestCase):
         self.assertFalse(CourseEnrollment.is_enrolled(student, course.id))
         self.client.logout()
         params = [
-            ('course_id', course.id.to_deprecated_string()),
+            ('course_id', text_type(course.id)),
             ('enrollment_action', 'enroll'),
             ('next', '/testredirect')
         ]
@@ -569,11 +573,13 @@ class ShibSPTestModifiedCourseware(ModuleStoreTestCase):
                           'data': dict(params),
                           'follow': False,
                           'REMOTE_USER': 'testuser@stanford.edu',
-                          'Shib-Identity-Provider': 'https://idp.stanford.edu/'}
+                          'Shib-Identity-Provider': 'https://idp.stanford.edu/',
+                          'HTTP_ACCEPT': "text/html"}
         response = self.client.get(**request_kwargs)
         # successful login is a redirect to the URL that handles auto-enrollment
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['location'], 'http://testserver/account/finish_auth?{}'.format(urlencode(params)))
+        self.assertEqual(response['location'],
+                         '/account/finish_auth?{}'.format(urlencode(params)))
 
 
 class ShibUtilFnTest(TestCase):

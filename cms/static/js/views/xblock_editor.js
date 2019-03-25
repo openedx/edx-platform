@@ -3,7 +3,7 @@
  * the available modes.
  */
 define(['jquery', 'underscore', 'gettext', 'js/views/xblock', 'js/views/metadata', 'js/collections/metadata',
-        'jquery.inputnumber'],
+    'jquery.inputnumber'],
     function($, _, gettext, XBlockView, MetadataView, MetadataCollection) {
         var XBlockEditorView = XBlockView.extend({
             // takes XBlockInfo as a model

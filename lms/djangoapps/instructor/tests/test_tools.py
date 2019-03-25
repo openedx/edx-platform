@@ -3,13 +3,19 @@ Tests for views/tools.py.
 """
 
 import datetime
-import mock
 import json
 import unittest
 
-from django.utils.timezone import utc
+import mock
+import six
+from django.contrib.auth.models import User
+from django.core.exceptions import MultipleObjectsReturned
+from django.test import TestCase
 from django.test.utils import override_settings
+from pytz import UTC
 from nose.plugins.attrib import attr
+from opaque_keys.edx.keys import CourseKey
+from six import text_type
 
 from courseware.field_overrides import OverrideFieldData
 from lms.djangoapps.ccx.tests.test_overrides import inject_field_overrides
@@ -17,7 +23,6 @@ from student.tests.factories import UserFactory
 from xmodule.fields import Date
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from opaque_keys.edx.keys import CourseKey
 
 from ..views import tools
 
@@ -65,7 +70,7 @@ class TestHandleDashboardError(unittest.TestCase):
 
 
 @attr(shard=1)
-class TestRequireStudentIdentifier(unittest.TestCase):
+class TestRequireStudentIdentifier(TestCase):
     """
     Test require_student_from_identifier()
     """
@@ -95,7 +100,7 @@ class TestParseDatetime(unittest.TestCase):
     def test_parse_no_error(self):
         self.assertEqual(
             tools.parse_datetime('5/12/2010 2:42'),
-            datetime.datetime(2010, 5, 12, 2, 42, tzinfo=utc))
+            datetime.datetime(2010, 5, 12, 2, 42, tzinfo=UTC))
 
     def test_parse_error(self):
         with self.assertRaises(tools.DashboardError):
@@ -119,7 +124,7 @@ class TestFindUnit(SharedModuleStoreTestCase):
         """
         Test finding a nested unit.
         """
-        url = self.homework.location.to_deprecated_string()
+        url = text_type(self.homework.location)
         found_unit = tools.find_unit(self.course, url)
         self.assertEqual(found_unit.location, self.homework.location)
 
@@ -143,7 +148,7 @@ class TestGetUnitsWithDueDate(ModuleStoreTestCase):
         """
         super(TestGetUnitsWithDueDate, self).setUp()
 
-        due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=utc)
+        due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=UTC)
         course = CourseFactory.create()
         week1 = ItemFactory.create(due=due, parent=course)
         week2 = ItemFactory.create(due=due, parent=course)
@@ -160,8 +165,10 @@ class TestGetUnitsWithDueDate(ModuleStoreTestCase):
     def test_it(self):
 
         def urls(seq):
-            "URLs for sequence of nodes."
-            return sorted(i.location.to_deprecated_string() for i in seq)
+            """
+            URLs for sequence of nodes.
+            """
+            return sorted(text_type(i.location) for i in seq)
 
         self.assertEquals(
             urls(tools.get_units_with_due_date(self.course)),
@@ -178,9 +185,18 @@ class TestTitleOrUrl(unittest.TestCase):
         self.assertEquals(tools.title_or_url(unit), 'hello')
 
     def test_url(self):
+        def mock_location_text(self):
+            """
+            Mock implementation of __unicode__ or __str__ for the unit's location.
+            """
+            return u'test:hello'
+
         unit = mock.Mock(display_name=None)
-        unit.location.to_deprecated_string.return_value = 'test:hello'
-        self.assertEquals(tools.title_or_url(unit), 'test:hello')
+        if six.PY2:
+            unit.location.__unicode__ = mock_location_text
+        else:
+            unit.location.__str__ = mock_location_text
+        self.assertEquals(tools.title_or_url(unit), u'test:hello')
 
 
 @attr(shard=1)
@@ -198,7 +214,7 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
         """
         super(TestSetDueDateExtension, self).setUp()
 
-        self.due = due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=utc)
+        self.due = due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=UTC)
         course = CourseFactory.create()
         week1 = ItemFactory.create(due=due, parent=course)
         week2 = ItemFactory.create(due=due, parent=course)
@@ -233,7 +249,7 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
             block.fields['due']._del_cached_value(block)  # pylint: disable=protected-access
 
     def test_set_due_date_extension(self):
-        extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=utc)
+        extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=UTC)
         tools.set_due_date_extension(self.course, self.week1, self.user, extended)
         self._clear_field_data_cache()
         self.assertEqual(self.week1.due, extended)
@@ -241,23 +257,23 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
         self.assertEqual(self.assignment.due, extended)
 
     def test_set_due_date_extension_num_queries(self):
-        extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=utc)
+        extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=UTC)
         with self.assertNumQueries(5):
             tools.set_due_date_extension(self.course, self.week1, self.user, extended)
             self._clear_field_data_cache()
 
     def test_set_due_date_extension_invalid_date(self):
-        extended = datetime.datetime(2009, 1, 1, 0, 0, tzinfo=utc)
+        extended = datetime.datetime(2009, 1, 1, 0, 0, tzinfo=UTC)
         with self.assertRaises(tools.DashboardError):
             tools.set_due_date_extension(self.course, self.week1, self.user, extended)
 
     def test_set_due_date_extension_no_date(self):
-        extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=utc)
+        extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=UTC)
         with self.assertRaises(tools.DashboardError):
             tools.set_due_date_extension(self.course, self.week3, self.user, extended)
 
     def test_reset_due_date_extension(self):
-        extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=utc)
+        extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=UTC)
         tools.set_due_date_extension(self.course, self.week1, self.user, extended)
         tools.set_due_date_extension(self.course, self.week1, self.user, None)
         self.assertEqual(self.week1.due, self.due)
@@ -275,7 +291,7 @@ class TestDataDumps(ModuleStoreTestCase):
         """
         super(TestDataDumps, self).setUp()
 
-        due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=utc)
+        due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=UTC)
         course = CourseFactory.create()
         week1 = ItemFactory.create(due=due, parent=course)
         week2 = ItemFactory.create(due=due, parent=course)
@@ -295,7 +311,7 @@ class TestDataDumps(ModuleStoreTestCase):
         self.user2 = user2
 
     def test_dump_module_extensions(self):
-        extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=utc)
+        extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=UTC)
         tools.set_due_date_extension(self.course, self.week1, self.user1,
                                      extended)
         tools.set_due_date_extension(self.course, self.week1, self.user2,
@@ -315,7 +331,7 @@ class TestDataDumps(ModuleStoreTestCase):
              "Extended Due Date": "2013-12-25 00:00"}])
 
     def test_dump_student_extensions(self):
-        extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=utc)
+        extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=UTC)
         tools.set_due_date_extension(self.course, self.week1, self.user1,
                                      extended)
         tools.set_due_date_extension(self.course, self.week2, self.user1,
@@ -343,3 +359,55 @@ def msk_from_problem_urlname(course_id, urlname, block_type='problem'):
         urlname = urlname[:-4]
 
     return course_id.make_usage_key(block_type, urlname)
+
+
+@attr(shard=1)
+class TestStudentFromIdentifier(TestCase):
+    """
+    Test get_student_from_identifier()
+    """
+    @classmethod
+    def setUpClass(cls):
+        super(TestStudentFromIdentifier, cls).setUpClass()
+        cls.valid_student = UserFactory.create(username='baz@touchstone')
+        cls.student_conflicting_email = UserFactory.create(email='foo@touchstone.com')
+        cls.student_conflicting_username = UserFactory.create(username='foo@touchstone.com')
+
+    def test_valid_student_id(self):
+        """Test with valid username"""
+        assert self.valid_student == tools.get_student_from_identifier(self.valid_student.username)
+
+    def test_valid_student_email(self):
+        """Test with valid email"""
+        assert self.valid_student == tools.get_student_from_identifier(self.valid_student.email)
+
+    def test_student_username_has_conflict_with_others_email(self):
+        """
+        An edge case where there is a user A with username example: foo@touchstone.com and
+        there is user B with email example: foo@touchstone.com
+        """
+        with self.assertRaises(MultipleObjectsReturned):
+            tools.get_student_from_identifier(self.student_conflicting_username.username)
+
+        # can get student with alternative identifier, in this case email.
+        assert self.student_conflicting_username == tools.get_student_from_identifier(
+            self.student_conflicting_username.email
+        )
+
+    def test_student_email_has_conflict_with_others_username(self):
+        """
+        An edge case where there is a user A with email example: foo@touchstone.com and
+        there is user B with username example: foo@touchstone.com
+        """
+        with self.assertRaises(MultipleObjectsReturned):
+            tools.get_student_from_identifier(self.student_conflicting_email.email)
+
+        # can get student with alternative identifier, in this case username.
+        assert self.student_conflicting_email == tools.get_student_from_identifier(
+            self.student_conflicting_email.username
+        )
+
+    def test_invalid_student_id(self):
+        """Test with invalid identifier"""
+        with self.assertRaises(User.DoesNotExist):
+            assert tools.get_student_from_identifier("invalid")

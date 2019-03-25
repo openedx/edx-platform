@@ -1,22 +1,23 @@
 """
 Third-party-auth module for Learning Tools Interoperability
 """
-import logging
 import calendar
+import logging
 import time
 
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from oauthlib.common import Request
 from oauthlib.oauth1.rfc5849.signature import (
-    normalize_base_string_uri,
-    normalize_parameters,
     collect_parameters,
     construct_base_string,
-    sign_hmac_sha1,
+    normalize_base_string_uri,
+    normalize_parameters,
+    sign_hmac_sha1
 )
-from social.backends.base import BaseAuth
-from social.exceptions import AuthFailed
-from social.utils import sanitize_redirect
+from six import text_type
+from social_core.backends.base import BaseAuth
+from social_core.exceptions import AuthFailed
+from social_core.utils import sanitize_redirect
 
 log = logging.getLogger(__name__)
 
@@ -34,15 +35,12 @@ class LTIAuthBackend(BaseAuth):
         """
         Prepare to handle a login request.
 
-        This method replaces social.actions.do_auth and must be kept in sync
+        This method replaces social_core.actions.do_auth and must be kept in sync
         with any upstream changes in that method. In the current version of
         the upstream, this means replacing the logic to populate the session
         from request parameters, and not calling backend.start() to avoid
         an unwanted redirect to the non-existent login page.
         """
-
-        # Clean any partial pipeline data
-        self.strategy.clean_partial_pipeline()
 
         # Save validated LTI parameters (or None if invalid or not submitted)
         validated_lti_params = self.get_validated_lti_params(self.strategy)
@@ -188,7 +186,7 @@ class LTIAuthBackend(BaseAuth):
             if valid:
                 return data
         except AttributeError as error:
-            log.error("'{}' not found.".format(error.message))
+            log.error("'{}' not found.".format(text_type(error)))
         return None
 
     @classmethod

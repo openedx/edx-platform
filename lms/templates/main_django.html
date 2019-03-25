@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 {% load sekizai_tags i18n configuration theme_pipeline optional_include staticfiles %}
-{% load url from future %}
 <html lang="{{LANGUAGE_CODE}}">
 <head>
   <meta charset="UTF-8">
@@ -27,6 +26,8 @@
 </head>
 
 <body class="{% block bodyclass %}{% endblock %} lang_{{LANGUAGE_CODE}}">
+    {% load render_bundle from webpack_loader %}
+    {% render_bundle "commons" %}
   <div class="window-wrap" dir="{{LANGUAGE_BIDI|yesno:'rtl,ltr'}}">
     <a class="nav-skip" href="#main">{% trans "Skip to main content" %}</a>
     {% with course=request.course %}

@@ -11,7 +11,7 @@ define(['jquery'], function($) {  // eslint-disable-line no-unused-vars
                     compare: function(actual, values) {
                         var passed = _.every(values, function(value, key) {
                             return actual.get(key) === value;
-                        }.bind(this));
+                        });
 
                         return {
                             pass: passed

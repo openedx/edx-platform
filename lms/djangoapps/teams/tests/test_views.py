@@ -1,39 +1,41 @@
 # -*- coding: utf-8 -*-
 """Tests for the teams API at the HTTP request level."""
 import json
+import unittest
 from datetime import datetime
 
+import ddt
 import pytz
 from dateutil import parser
-import ddt
-from elasticsearch.exceptions import ConnectionError
-from mock import patch
-from search.search_engine_base import SearchEngine
-from django.core.urlresolvers import reverse
 from django.conf import settings
+from django.urls import reverse
 from django.db.models.signals import post_save
 from django.utils import translation
+from elasticsearch.exceptions import ConnectionError
+from mock import patch
 from nose.plugins.attrib import attr
-import unittest
-from rest_framework.test import APITestCase, APIClient
+from rest_framework.test import APIClient, APITestCase
+from search.search_engine_base import SearchEngine
+
+from common.test.utils import skip_signal
+from courseware.tests.factories import StaffFactory
+from django_comment_common.models import FORUM_ROLE_COMMUNITY_TA, Role
+from django_comment_common.utils import seed_permissions_roles
+from student.models import CourseEnrollment
+from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
+from util.testing import EventTestMixin
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from courseware.tests.factories import StaffFactory
-from common.test.utils import skip_signal
-from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentFactory
-from student.models import CourseEnrollment
-from util.testing import EventTestMixin
-from .factories import CourseTeamFactory, LAST_ACTIVITY_AT
 from ..models import CourseTeamMembership
-from ..search_indexes import CourseTeamIndexer, CourseTeam, course_team_post_save_callback
-from django_comment_common.models import Role, FORUM_ROLE_COMMUNITY_TA
-from django_comment_common.utils import seed_permissions_roles
+from ..search_indexes import CourseTeam, CourseTeamIndexer, course_team_post_save_callback
+from .factories import LAST_ACTIVITY_AT, CourseTeamFactory
 
 
 @attr(shard=1)
 class TestDashboard(SharedModuleStoreTestCase):
     """Tests for the Teams dashboard."""
+    shard = 6
     test_password = "test"
 
     NUM_TOPICS = 10
@@ -196,6 +198,7 @@ class TestDashboard(SharedModuleStoreTestCase):
 class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
     """Base class for Team API test cases."""
 
+    shard = 6
     test_password = 'password'
 
     @classmethod
@@ -542,6 +545,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
 @ddt.ddt
 class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
     """Test cases for the team listing API endpoint."""
+    shard = 6
 
     def setUp(self):  # pylint: disable=arguments-differ
         super(TestListTeamsAPI, self).setUp('lms.djangoapps.teams.utils.tracker')
@@ -720,6 +724,7 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
 @ddt.ddt
 class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):
     """Test cases for the team creation endpoint."""
+    shard = 6
 
     def setUp(self):  # pylint: disable=arguments-differ
         super(TestCreateTeamAPI, self).setUp('lms.djangoapps.teams.utils.tracker')
@@ -892,6 +897,7 @@ class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):
 @ddt.ddt
 class TestDetailTeamAPI(TeamAPITestCase):
     """Test cases for the team detail endpoint."""
+    shard = 6
 
     @ddt.data(
         (None, 401),
@@ -931,6 +937,7 @@ class TestDetailTeamAPI(TeamAPITestCase):
 @ddt.ddt
 class TestDeleteTeamAPI(EventTestMixin, TeamAPITestCase):
     """Test cases for the team delete endpoint."""
+    shard = 6
 
     def setUp(self):  # pylint: disable=arguments-differ
         super(TestDeleteTeamAPI, self).setUp('lms.djangoapps.teams.utils.tracker')
@@ -981,6 +988,7 @@ class TestDeleteTeamAPI(EventTestMixin, TeamAPITestCase):
 @ddt.ddt
 class TestUpdateTeamAPI(EventTestMixin, TeamAPITestCase):
     """Test cases for the team update endpoint."""
+    shard = 6
 
     def setUp(self):  # pylint: disable=arguments-differ
         super(TestUpdateTeamAPI, self).setUp('lms.djangoapps.teams.utils.tracker')
@@ -1057,6 +1065,7 @@ class TestUpdateTeamAPI(EventTestMixin, TeamAPITestCase):
 @ddt.ddt
 class TestListTopicsAPI(TeamAPITestCase):
     """Test cases for the topic listing endpoint."""
+    shard = 6
 
     @ddt.data(
         (None, 401),
@@ -1176,6 +1185,7 @@ class TestListTopicsAPI(TeamAPITestCase):
 @ddt.ddt
 class TestDetailTopicAPI(TeamAPITestCase):
     """Test cases for the topic detail endpoint."""
+    shard = 6
 
     @ddt.data(
         (None, 401),
@@ -1214,6 +1224,7 @@ class TestDetailTopicAPI(TeamAPITestCase):
 @ddt.ddt
 class TestListMembershipAPI(TeamAPITestCase):
     """Test cases for the membership list endpoint."""
+    shard = 6
 
     @ddt.data(
         (None, 401),
@@ -1313,6 +1324,7 @@ class TestListMembershipAPI(TeamAPITestCase):
 @ddt.ddt
 class TestCreateMembershipAPI(EventTestMixin, TeamAPITestCase):
     """Test cases for the membership creation endpoint."""
+    shard = 6
 
     def setUp(self):  # pylint: disable=arguments-differ
         super(TestCreateMembershipAPI, self).setUp('lms.djangoapps.teams.utils.tracker')
@@ -1411,6 +1423,7 @@ class TestCreateMembershipAPI(EventTestMixin, TeamAPITestCase):
 @ddt.ddt
 class TestDetailMembershipAPI(TeamAPITestCase):
     """Test cases for the membership detail endpoint."""
+    shard = 6
 
     @ddt.data(
         (None, 401),
@@ -1477,6 +1490,7 @@ class TestDetailMembershipAPI(TeamAPITestCase):
 @ddt.ddt
 class TestDeleteMembershipAPI(EventTestMixin, TeamAPITestCase):
     """Test cases for the membership deletion endpoint."""
+    shard = 6
 
     def setUp(self):  # pylint: disable=arguments-differ
         super(TestDeleteMembershipAPI, self).setUp('lms.djangoapps.teams.utils.tracker')
@@ -1537,6 +1551,7 @@ class TestDeleteMembershipAPI(EventTestMixin, TeamAPITestCase):
 
 class TestElasticSearchErrors(TeamAPITestCase):
     """Test that the Team API is robust to Elasticsearch connection errors."""
+    shard = 6
 
     ES_ERROR = ConnectionError('N/A', 'connection error', {})
 

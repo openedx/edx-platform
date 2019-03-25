@@ -2,14 +2,15 @@
 Helper functions for the account/profile Python APIs.
 This is NOT part of the public API.
 """
+import json
+import logging
+import traceback
 from collections import defaultdict
 from functools import wraps
-import logging
-import json
 
 from django import forms
 from django.core.serializers.json import DjangoJSONEncoder
-from django.http import HttpResponseBadRequest
+from django.http import HttpResponseBadRequest, HttpRequest
 from django.utils.encoding import force_text
 from django.utils.functional import Promise
 
@@ -65,16 +66,19 @@ def intercept_errors(api_error, ignore_errors=None):
                         LOGGER.warning(msg)
                         raise
 
+                caller = traceback.format_stack(limit=2)[0]
+
                 # Otherwise, log the error and raise the API-specific error
                 msg = (
                     u"An unexpected error occurred when calling '{func_name}' "
-                    u"with arguments '{args}' and keyword arguments '{kwargs}': "
+                    u"with arguments '{args}' and keyword arguments '{kwargs}' from {caller}: "
                     u"{exception}"
                 ).format(
                     func_name=func.func_name,
                     args=args,
                     kwargs=kwargs,
-                    exception=ex.developer_message if hasattr(ex, 'developer_message') else repr(ex)
+                    exception=ex.developer_message if hasattr(ex, 'developer_message') else repr(ex),
+                    caller=caller.strip(),
                 )
                 LOGGER.exception(msg)
                 raise api_error(msg)
@@ -117,12 +121,13 @@ class InvalidFieldError(Exception):
 class FormDescription(object):
     """Generate a JSON representation of a form. """
 
-    ALLOWED_TYPES = ["text", "email", "select", "textarea", "checkbox", "password"]
+    ALLOWED_TYPES = ["text", "email", "select", "textarea", "checkbox", "plaintext", "password", "hidden"]
 
     ALLOWED_RESTRICTIONS = {
         "text": ["min_length", "max_length"],
-        "password": ["min_length", "max_length"],
-        "email": ["min_length", "max_length"],
+        "password": ["min_length", "max_length", "upper", "lower", "digits", "punctuation", "non_ascii", "words",
+                     "numeric", "alphabetic"],
+        "email": ["min_length", "max_length", "readonly"],
     }
 
     FIELD_TYPE_MAP = {
@@ -230,21 +235,29 @@ class FormDescription(object):
             "supplementalText": supplementalText
         }
 
+        field_override = self._field_overrides.get(name, {})
+
         if field_type == "select":
             if options is not None:
                 field_dict["options"] = []
 
-                # Include an empty "default" option at the beginning of the list
+                # Get an existing default value from the field override
+                existing_default_value = field_override.get('defaultValue')
+
+                # Include an empty "default" option at the beginning of the list;
+                # preselect it if there isn't an overriding default.
                 if include_default_option:
                     field_dict["options"].append({
                         "value": "",
                         "name": "--",
-                        "default": True
+                        "default": existing_default_value is None
                     })
-
                 field_dict["options"].extend([
-                    {"value": option_value, "name": option_name}
-                    for option_value, option_name in options
+                    {
+                        'value': option_value,
+                        'name': option_name,
+                        'default': option_value == existing_default_value
+                    } for option_value, option_name in options
                 ])
             else:
                 raise InvalidFieldError("You must provide options for a select field.")
@@ -266,7 +279,7 @@ class FormDescription(object):
 
         # If there are overrides for this field, apply them now.
         # Any field property can be overwritten (for example, the default value or placeholder)
-        field_dict.update(self._field_overrides.get(name, {}))
+        field_dict.update(field_override)
 
         self.fields.append(field_dict)
 
@@ -287,8 +300,8 @@ class FormDescription(object):
                     "placeholder": "",
                     "instructions": "",
                     "options": [
-                        {"value": "cheese", "name": "Cheese"},
-                        {"value": "wine", "name": "Wine"}
+                        {"value": "cheese", "name": "Cheese", "default": False},
+                        {"value": "wine", "name": "Wine", "default": False}
                     ]
                     "restrictions": {},
                     "errorMessages": {},
@@ -395,26 +408,32 @@ def shim_student_view(view_func, check_logged_in=False):
     """
     @wraps(view_func)
     def _inner(request):  # pylint: disable=missing-docstring
-        # Ensure that the POST querydict is mutable
-        request.POST = request.POST.copy()
+        # Make a copy of the current POST request to modify.
+        modified_request = request.POST.copy()
+        if isinstance(request, HttpRequest):
+            # Works for an HttpRequest but not a rest_framework.request.Request.
+            request.POST = modified_request
+        else:
+            # The request must be a rest_framework.request.Request.
+            request._data = modified_request
 
         # The login and registration handlers in student view try to change
         # the user's enrollment status if these parameters are present.
         # Since we want the JavaScript client to communicate directly with
         # the enrollment API, we want to prevent the student views from
         # updating enrollments.
-        if "enrollment_action" in request.POST:
-            del request.POST["enrollment_action"]
-        if "course_id" in request.POST:
-            del request.POST["course_id"]
+        if "enrollment_action" in modified_request:
+            del modified_request["enrollment_action"]
+        if "course_id" in modified_request:
+            del modified_request["course_id"]
 
         # Include the course ID if it's specified in the analytics info
         # so it can be included in analytics events.
-        if "analytics" in request.POST:
+        if "analytics" in modified_request:
             try:
-                analytics = json.loads(request.POST["analytics"])
+                analytics = json.loads(modified_request["analytics"])
                 if "enroll_course_id" in analytics:
-                    request.POST["course_id"] = analytics.get("enroll_course_id")
+                    modified_request["course_id"] = analytics.get("enroll_course_id")
             except (ValueError, TypeError):
                 LOGGER.error(
                     u"Could not parse analytics object sent to user API: {analytics}".format(
@@ -463,7 +482,7 @@ def shim_student_view(view_func, check_logged_in=False):
         # the request through authentication middleware.
         is_authenticated = (
             getattr(request, 'user', None) is not None
-            and request.user.is_authenticated()
+            and request.user.is_authenticated
         )
         if check_logged_in and not is_authenticated:
             # If we get a 403 status code from the student view
@@ -502,3 +521,13 @@ def shim_student_view(view_func, check_logged_in=False):
         return response
 
     return _inner
+
+
+def serializer_is_dirty(preference_serializer):
+    """
+    Return True if saving the supplied (Raw)UserPreferenceSerializer would change the database.
+    """
+    return (
+        preference_serializer.instance is None or
+        preference_serializer.instance.value != preference_serializer.validated_data['value']
+    )

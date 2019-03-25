@@ -13,6 +13,8 @@
 // * +Editing - Xblocks
 // * +Case - Special Xblock Type Overrides
 
+@import 'edx-pattern-library-shims/base/variables';
+
 
 // +Layout - Xblocks
 // ====================
@@ -22,38 +24,50 @@
   border: 1px solid $gray-l4;
   border-radius: ($baseline/5);
   background: $white;
-  box-shadow: 0px 1px 1px $shadow-l1;
+  box-shadow: 0 1px 1px $shadow-l1;
 
   // STATE: hover/focus
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     box-shadow: 0 0 1px $shadow;
   }
 
   // UI: xblock header primary for main title and xblock actions
   .xblock-header-primary {
     @include box-sizing(border-box);
+
     border-bottom: 1px solid $gray-l4;
     border-radius: ($baseline/5) ($baseline/5) 0 0;
     min-height: ($baseline*2.5);
     background-color: $gray-l6;
     padding: ($baseline/2) ($baseline/2) ($baseline/2) ($baseline);
+    display: flex;
+    align-items: center;
 
     .header-details {
       @extend %cont-truncated;
-      display: inline-block;
+
       width: 50%;
       vertical-align: middle;
 
       .xblock-display-name {
-        display: inline-block;
-        vertical-align: middle;
+        @extend %t-copy-lead1;
+
+        font-weight: font-weight(semi-bold);
+      }
+
+      .xblock-group-visibility-label {
+        @extend %t-copy-sub1;
+
+        white-space: normal;
+        font-weight: font-weight(semi-bold);
+        color: $gray;
       }
     }
 
     .header-actions {
-      display: inline-block;
       width: 49%;
-      vertical-align: middle;
+
       @include text-align(right);
     }
   }
@@ -84,6 +98,7 @@
 
         .action-button {
           @include transition(all $tmg-f3 linear 0s);
+
           display: block;
           width: auto;
           height: ($baseline*1.5);
@@ -122,7 +137,9 @@
   .xmodule_display.xmodule_HtmlModule .xblock-license,
   .xmodule_VideoModule .xblock-license {
     @include text-align(right);
+
     @extend %t-title7;
+
     display: block;
     width: auto;
     border-top: 1px solid $gray-l3;
@@ -162,8 +179,10 @@
     .meta-wrap {
       margin: $baseline ($baseline/2);
     }
+
     .meta {
       @extend %t-copy-sub2;
+
       display: inline-block;
       vertical-align: top;
       width: flex-grid(9, 12);
@@ -193,6 +212,7 @@
   // internal headings for problems and video components
   h2 {
     @extend %t-title5;
+
     margin: ($baseline*1.5) ($baseline*2) ($baseline*1.5) 0;
     color: $gray;
     letter-spacing: 1px;
@@ -212,13 +232,13 @@
     // CASE: xblock is collapsible
     &.is-collapsible,
     &.xblock-type-container {
-
       .icon {
         font-style: normal;
       }
 
       .expand-collapse {
         @extend %expand-collapse;
+
         margin: 0 ($baseline/4);
         height: ($baseline*1.25);
         width: $baseline;
@@ -229,7 +249,6 @@
       }
 
       .action-view {
-
         .action-button {
           transition: none;
         }
@@ -240,24 +259,15 @@
         }
       }
     }
-
-    // CASE: xblock has specific visibility based on content groups set
-    &.has-group-visibility-set {
-
-      .action-visibility .visibility-button.visibility-button { // needed to cascade in front of overscoped header-actions CSS rule
-        color: $color-visibility-set;
-      }
-    }
-
   }
 
   // +Messaging - Xblocks
   // ====================
   // xblock message area, for general information as well as validation
   .wrapper-xblock-message {
-
     .xblock-message {
       @extend %t-copy-sub1;
+
       background-color: $gray-d2;
       padding: ($baseline*0.75);
       color: $white;
@@ -268,6 +278,7 @@
 
       &.information {
         @extend %t-copy-sub1;
+
         background-color: $gray-l5;
         color: $gray-d2;
       }
@@ -326,7 +337,6 @@
     }
 
     .xblock-message {
-
       &.validation {
         padding-top: ($baseline*0.75);
       }
@@ -349,14 +359,12 @@
     }
 
     .no-container-content {
-
       .xblock-message-list {
         margin: 0;
         list-style-type: none;
         color: $gray-d2;
       }
     }
-
   }
 
   // +Case: Nesting Level
@@ -364,6 +372,7 @@
   // element wrapper level
   &.level-nesting {
     @include transition(all $tmg-f2 linear 0s);
+
     border: 1px solid $gray-l3;
     padding-bottom: $baseline;
 
@@ -378,6 +387,7 @@
 
     .xblock-header-primary {
       @include ui-flexbox();
+
       margin-bottom: 0;
       border-bottom: none;
       background: none;
@@ -399,6 +409,7 @@
   // ====================
   &.level-element {
     @include transition(all $tmg-f2 linear 0s);
+
     box-shadow: none;
 
     &:hover {
@@ -411,10 +422,12 @@
 
     .xblock-header-primary {
       @extend %t-light;
+
       display: flex;
       margin-bottom: 0;
       border-bottom: 1px solid $gray-l4;
       background-color: $gray-l6;
+
       &.is-collapsed {
         border-bottom: 0;
         border-radius: 3px;
@@ -424,11 +437,11 @@
     .xblock-render {
       margin: ($baseline/2);
       padding: ($baseline/2);
+      overflow: hidden;
     }
 
     // STATE: container/component with children - abbreviated preview
     &.xblock-type-container {
-
       .xblock-header-primary {
         margin-bottom: 0;
         border-bottom: 0;
@@ -441,11 +454,10 @@
     }
 
     .wrapper-xblock-message {
-
       .xblock-message {
-
         &.information {
           @extend %t-copy-sub2;
+
           padding: 0 $baseline ($baseline*0.75) $baseline;
           color: $gray-l1;
         }
@@ -457,9 +469,9 @@
   // ====================
   // edited experiment groups: active and inactive
   .wrapper-groups {
-
     .title {
       @extend %t-title7;
+
       margin-left: ($baseline/2);
       color: $gray-l1;
     }
@@ -480,7 +492,8 @@
 
       .wrapper-xblock.level-nesting {
         @include transition(all $tmg-f2 linear 0s);
-        opacity: .7;
+
+        opacity: 0.7;
 
         &:hover {
           opacity: 1;
@@ -522,7 +535,9 @@
       @extend %ui-btn-flat-outline;
       @extend %t-action3;
       @extend %t-strong;
+
       @include box-sizing(border-box);
+
       display: inline-block;
       padding: ($baseline/2);
       width: 49%;
@@ -533,7 +548,9 @@
       @extend %ui-btn-non;
       @extend %t-action4;
       @extend %t-strong;
+
       @include box-sizing(border-box);
+
       display: inline-block;
       padding: ($baseline/2);
       width: 49%;
@@ -555,6 +572,7 @@
   //settings-list
   .list-input.settings-list {
     @extend %cont-no-list;
+
     overflow: auto;
     max-height: 400px;
 
@@ -568,7 +586,7 @@
     &::-webkit-scrollbar-thumb {
       border-radius: 8px;
       border: 2px solid $gray-l2;
-      background-color: rgba(0, 0, 0, .5);
+      background-color: rgba(0, 0, 0, 0.5);
     }
 
     //component-setting-entry
@@ -586,12 +604,13 @@
 
 
       // STATE: hover & focus
-      &:hover, &:focus {
-        opacity: 1.0;
+      &:hover,
+      &:focus {
+        opacity: 1;
       }
 
       &.is-set {
-        opacity: 1.0;
+        opacity: 1;
         background-color: $white;
 
         .setting-input {
@@ -600,18 +619,21 @@
       }
     }
 
-    .wrapper-comp-setting, .wrapper-comp-setting-text {
+    .wrapper-comp-setting,
+    .wrapper-comp-setting-text {
       min-width: 300px;
       top: 0;
       vertical-align: top;
-      margin-bottom:5px;
+      margin-bottom: 5px;
       position: relative;
     }
 
     .setting-label {
       @include transition(color $tmg-f2 ease-in-out 0s);
+
       @extend %t-copy-sub1;
       @extend %t-strong;
+
       vertical-align: middle;
       display: inline-block;
       position: relative;
@@ -625,10 +647,14 @@
       }
     }
 
-    input, select, input[type="number"] {
+    input,
+    select,
+    input[type="number"] {
       @include placeholder($gray-l4);
-      @include size(100%,100%);
+      @include size(100%, 100%);
+
       @extend %t-copy-base;
+
       width: 45%;
       min-width: 100px;
       padding: ($baseline/2);
@@ -640,7 +666,7 @@
     //Allows users to copy full value of disabled inputs.
     input.is-disabled {
       text-overflow: clip;
-      opacity: .5;
+      opacity: 0.5;
     }
 
     input[type="number"] {
@@ -652,15 +678,16 @@
       }
 
       &:active {
-        background-color: #FFFCF1;
+        background-color: #fffcf1;
       }
     }
 
     select {
-
       &:focus {
         box-shadow: 0 0 1px $shadow;
+
         @include transition(opacity $tmg-f2 ease-in-out 0s);
+
         background-color: $yellow;
       }
 
@@ -671,6 +698,7 @@
 
     .action.setting-clear {
       @extend %t-action4;
+
       color: $gray;
       width: 25px;
       height: 25px;
@@ -685,7 +713,9 @@
 
       &:hover {
         box-shadow: 0 1px 1px $shadow;
+
         @include transition(opacity $tmg-f2 ease-in-out 0s);
+
         background-color: $blue-s3;
         border: 1px solid $blue-s3;
         color: $white;
@@ -698,8 +728,8 @@
 
     .setting-help {
       @extend %t-copy-sub2;
+
       display: inline-block;
-      font-color: $gray-l6;
       min-width: ($baseline*10);
       vertical-align: top;
     }
@@ -713,7 +743,6 @@
 
     // TYPE: enumerated lists of metadata sets
     .metadata-list-enum {
-
       * {
         @include box-sizing(border-box);
       }
@@ -726,7 +755,8 @@
 
       // inputs and labels
       .wrapper-list-settings {
-        @include size(45%,100%);
+        @include size(45%, 100%);
+
         display: inline-block;
         min-width: ($baseline*5);
 
@@ -756,6 +786,7 @@
         @extend %ui-btn-flat-outline;
         @extend %t-action3;
         @extend %t-strong;
+
         display: block;
         width: 100%;
         padding: ($baseline/2);
@@ -767,7 +798,9 @@
 
       .remove-setting {
         @include transition(color $tmg-f2 ease-in-out);
+
         @extend %t-action1;
+
         display: inline-block;
         background: transparent;
         color: $blue-l3;
@@ -786,8 +819,8 @@
 
       // label
       .setting-label {
-          vertical-align: top;
-          margin-top: ($baseline*0.75);
+        vertical-align: top;
+        margin-top: ($baseline*0.75);
       }
 
       // inputs and labels
@@ -827,6 +860,7 @@
         @extend %ui-btn-flat-outline;
         @extend %t-action3;
         @extend %t-strong;
+
         display: block;
         width: 88%;
         padding: ($baseline/2);
@@ -838,7 +872,9 @@
 
       .remove-setting {
         @include transition(color $tmg-f2 ease-in-out);
+
         @extend %t-action1;
+
         display: inline-block;
         background: transparent;
         color: $blue-l3;
@@ -879,16 +915,14 @@ div.wrapper-comp-editor.is-inactive ~ div.launch-latex-compiler {
 
 
 .wrapper-xblock {
-
-    .discussion-preview {
-      color: $gray-l1;
-      font-style: italic;
-    }
+  .discussion-preview {
+    color: $gray-l1;
+    font-style: italic;
+  }
 }
 
 // CASE: xblock license settings
 .wrapper-license {
-
   .license-types {
     text-align: center;
     vertical-align: middle;
@@ -900,7 +934,9 @@ div.wrapper-comp-editor.is-inactive ~ div.launch-latex-compiler {
 
     .action.license-button {
       @include grey-button;
+
       @extend %t-action2;
+
       display: inline-block;
       text-align: center;
       width: 220px;
@@ -923,6 +959,7 @@ div.wrapper-comp-editor.is-inactive ~ div.launch-latex-compiler {
     .tip {
       @extend %t-copy-sub2;
     }
+
     .license-options {
       padding-bottom: ($baseline/2);
 
@@ -945,19 +982,22 @@ div.wrapper-comp-editor.is-inactive ~ div.launch-latex-compiler {
           min-width: auto;
           height: auto;
           border: 0;
-          margin: ($baseline*0.15) 15px 0px;
+          margin: ($baseline*0.15) 15px 0;
         }
 
         .option-name {
           @extend %t-action3;
           @extend %t-strong;
+
           display: inline-block;
           width: 15%;
           vertical-align: top;
           cursor: pointer;
         }
+
         .explanation {
           @extend %t-action4;
+
           display: inline-block;
           width: 75%;
           vertical-align: top;
@@ -966,6 +1006,7 @@ div.wrapper-comp-editor.is-inactive ~ div.launch-latex-compiler {
       }
     }
   }
+
   .license-preview a {
     color: $gray;
 
@@ -973,6 +1014,7 @@ div.wrapper-comp-editor.is-inactive ~ div.launch-latex-compiler {
       color: $ui-link-color;
     }
   }
+
   .list-input.settings-list ul.license-options li {
     // to make sure the padding is correctly overridden
     padding: ($baseline / 2) 0 ($baseline * 0.4);

@@ -1,78 +1,754 @@
 .program-details {
-    .content-wrapper {
-        max-width: 100%;
-        padding-top: 0;
-    }
+  .content-wrapper {
+    max-width: 100%;
+    padding-top: 0;
+  }
 }
 
 .program-header {
-    .banner-content {
-        padding-top: 100px;
+  .banner-content {
+    padding-top: 100px;
+  }
+
+  .title {
+    margin: 0;
+  }
+
+  .title,
+  .subtitle {
+    color: $white;
+    font-weight: font-weight(semi-bold);
+  }
+
+  .org-wrapper {
+    position: absolute;
+    top: 0;
+    background: $white;
+    opacity: 0.7;
+    left: 0;
+    padding: 20px;
+  }
+
+  .org-logo {
+    height: 50px;
+  }
+
+  .breadcrumb-wrapper {
+    padding: $full-width-banner-margin;
+
+    @media (min-width: $bp-screen-xl) {
+      padding-left: 0;
+    }
+  }
+
+  .breadcrumb-list {
+    list-style-type: none;
+    margin: 0;
+  }
+
+  .crumb {
+    @include float(left);
+
+    position: relative;
+    font-size: font-size(x-small);
+    line-height: line-height(x-small);
+    color: palette(grayscale, dark);
+
+    &.active {
+      color: palette(grayscale, dark);
+    }
+  }
+
+  .crumb-link {
+    font-size: inherit;
+    line-height: inherit;
+    color: palette(primary, base);
+
+    &:hover,
+    &:focus {
+      color: palette(grayscale, black);
+      text-decoration: underline;
+    }
+  }
+
+  .crumb-separator {
+    font-size: font-size(xx-small);
+    line-height: line-height(xx-small);
+    padding: 0 $full-width-banner-margin/4;
+  }
+}
+
+// CSS for April 2017 version of Program Details Page
+.program-details {
+  .window-wrap {
+    background-color: $body-bg;
+  }
+
+  .wrapper-footer,
+  footer#footer-edx-v3 {
+    @include clearfix();
+
+    clear: both;
+  }
+}
+
+.program-details-wrapper {
+  .program-details-header {
+    background-color: $light-gray4;
+    display: flex;
+    color: black;
+    font-family: 'Open Sans';
+    font-weight: normal;
+    flex-wrap: wrap;
+    padding: 40px 10px 35px;
+
+    @media (min-width: $bp-screen-md) {
+      padding: {
+        left: 30px;
+        right: 30px;
+      }
     }
 
-    .title {
-        margin: 0;
+    @media (min-width: map-get($container-max-widths, xl)) {
+      padding: {
+        left: calc(((100% - 1180px) / 2) + 30px);
+        right: calc(((100% - 1180px) / 2) + 30px);
+      }
     }
 
-    .title,
-    .subtitle {
-        color: $white;
-        font-weight: font-weight(semi-bold);
+    .hd-1 {
+      font-size: 1.5em;
+
+      @media (min-width: $bp-screen-md) {
+        font-size: 2.375em;
+      }
     }
 
-    .org-wrapper {
-        position: absolute;
-        top: 0;
-        background: $white;
-        opacity: 0.7;
-        left: 0;
-        padding: 20px;
-    }
+    .program-details-icon {
+      @include margin-left(3px);
 
-    .org-logo {
+      margin-top: 10px;
+      height: auto;
+
+      svg {
+        width: inherit;
+      }
+
+      /* IE11 CSS styles */
+      @media (min-width: $bp-screen-md) and (-ms-high-contrast: none), (-ms-high-contrast: active) {
         height: 50px;
+      }
     }
 
-    .breadcrumb-wrapper {
-        padding: $full-width-banner-margin;
+    .micromasters {
+      fill: $micromasters-color;
+      width: 200px;
 
-        @media(min-width: $bp-screen-xl) {
-            padding-left: 0;
+      @media (min-width: $bp-screen-md) {
+        width: 250px;
+      }
+    }
+
+    .xseries {
+      fill: xseries-color;
+      width: 150px;
+
+      @media (min-width: $bp-screen-md) {
+        width: 200px;
+      }
+    }
+
+    .professional.certificate {
+      fill: $professional-certificate-color;
+      width: 250px;
+
+      @media (min-width: $bp-screen-md) {
+        width: 300px;
+      }
+    }
+
+    .meta-info {
+      margin: 0;
+      display: block;
+
+      @media (min-width: $bp-screen-md) {
+        width: 70%;
+      }
+
+      @media (min-width: $bp-screen-lg) {
+        width: 75%;
+      }
+
+      .program-title {
+        font-weight: normal;
+        font-size: 2em;
+      }
+    }
+
+    .authoring-organizations {
+      text-align: center;
+      display: flex;
+
+      @media (min-width: $bp-screen-md) {
+        display: block;
+      }
+
+      .heading {
+        font-family: $font-family-sans-serif;
+        font-weight: bold;
+        color: palette(primary, dark);
+        font-size: 0.9375em;
+        margin-top: auto;
+        margin-bottom: auto;
+
+        @media (min-width: $bp-screen-md) {
+          @include margin-right(10px 0 0 0);
         }
+      }
+
+      @media (min-width: $bp-screen-md) {
+        margin: initial;
+        width: 30%;
+
+        .orgs .org-logo {
+          @include margin-left(2.5%);
+
+          width: 46.5%;
+          height: auto;
+        }
+      }
+
+      @media (min-width: $bp-screen-lg) {
+        width: 25%;
+      }
+    }
+  }
+
+  .program-details-content {
+    width: 100%;
+    margin-bottom: 30px;
+    padding: 30px 10px;
+
+    @media (min-width: $bp-screen-md) {
+      @include float(left);
+      padding: {
+        left: 30px;
+        right: 30px;
+      }
+
+      width: calc(100% - 330px);
+      position: relative;
     }
 
-    .breadcrumb-list {
-        list-style-type: none;
-        margin: 0;
+    @media (min-width: $bp-screen-lg) {
+      width: calc(100% - 510px);
+      max-width: 700px;
     }
 
-    .crumb {
-        position: relative;
+    @media (min-width: map-get($container-max-widths, xl)) {
+      @include margin-left(calc((100% - 1180px) / 2));
+    }
+  }
+
+  .course-list-heading {
+    font-family: $font-family-sans-serif;
+    font-weight: bold;
+    color: palette(primary, dark);
+    font-size: 0.9375em;
+    line-height: normal;
+    padding-bottom: 5px;
+    border-bottom: 3px solid $divider-color;
+    margin: {
+      top: 10px;
+      bottom: 20px;
+    }
+
+    .status {
+      @include margin-right(7px);
+    }
+  }
+
+  .course-list > div:nth-of-type(even) {
+    background-color: $zebra-stripe-color;
+  }
+
+  .course-list-headings {
+    .motivating-section {
+      @include margin-left(15px);
+
+      font-size: 0.9375em;
+      width: 310px;
+
+      @media (min-width: $bp-screen-sm) {
+        width: auto;
+      }
+
+      .motivating-heading {
+        margin-bottom: 0;
+        font-weight: 600;
+      }
+
+      .motivating-message {
+        color: #414141;
+      }
+    }
+  }
+
+  .program-heading {
+    margin-bottom: 40px;
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: column;
+
+    .program-heading-title {
+      font-family: $font-family-sans-serif;
+      font-weight: 600;
+      font-size: 1.3em;
+      color: palette(grayscale, base);
+      margin-bottom: 5px;
+      line-height: normal;
+    }
+
+    .program-heading-message {
+      font-weight: 300;
+    }
+  }
+
+  .course-enroll-view {
+    .view-course-button {
+      background: palette(primary, dark);
+      border-color: palette(primary, dark);
+      height: 37px;
+      padding: 7px 18.5px 0 18.5px;
+      width: auto;
+      border-radius: 0;
+      text-align: center;
+      font-size: 0.9375em;
+      margin-top: 5px;
+
+      /* IE11 CSS styles */
+      @media (min-width: $bp-screen-md) and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+        @include float(right);
+      }
+
+      @media (min-width: $bp-screen-lg) {
+        margin-top: 0;
+      }
+    }
+
+    .enroll-button {
+      width: 100%;
+
+      @media (min-width: $bp-screen-sm) {
+        width: initial;
+        margin-bottom: 0;
+        margin-top: 17px;
+      }
+
+      @media (min-width: $bp-screen-md) {
+        width: initial;
+        margin-top: 0;
+        margin-bottom: 0;
+      }
+
+      button, .enroll-course-button {
+        background-color: palette(primary, dark);
+        height: 37px;
+        width: 128px;
+        padding: 0;
+        margin-bottom: 5px;
+        margin-top: 7px;
+        font-size: 0.9375em;
+
+        &:hover {
+          color: palette(primary, dark);
+          background-color: theme-color("inverse");
+        }
+
+        /* IE11 CSS styles */
+        @media (min-width: $bp-screen-md) and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+          @include float(right);
+        }
+      }
+
+      .enroll-course-button {
+        padding: 7px 18.5px 0 18.5px;
+      }
+    }
+
+    .select-choice {
+      @include margin-right(2px);
+
+      font-family: $font-family-sans-serif;
+      font-weight: bold;
+      font-size: 0.9375em;
+      color: palette(grayscale, base);
+      margin-top: 6px;
+      display: block;
+
+      @media (min-width: $bp-screen-md) {
+        display: inline;
+      }
+    }
+
+    .run-select-container {
+      @media (min-width: $bp-screen-md) {
+        margin-top: 8px;
+        display: flex;
+        flex-wrap: wrap;
+      }
+    }
+
+    .run-select {
+      width: 100%;
+      height: 34px;
+      padding: 0;
+    }
+  }
+
+  .upgrade-button {
+    background: palette(success, text);
+    border-color: palette(success, text);
+    border-radius: 0;
+    padding: 7px;
+    text-align: center;
+    font-size: 0.9375em;
+
+    /* IE11 CSS styles */
+    @media (min-width: $bp-screen-md) and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+      @include float(right);
+    }
+
+    &.complete-program {
+      margin: 10px 15px 10px 5px;
+      align-self: flex-start;
+
+      @media (min-width: $bp-screen-md) {
+        align-self: flex-end;
+      }
+
+      .list-price {
+        text-decoration: line-through;
+      }
+    }
+  }
+
+
+  .program-course-card {
+    width: 100%;
+    padding: 15px;
+
+    @media (min-width: $bp-screen-md) {
+      height: auto;
+    }
+
+    .section {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+
+      @media (min-width: $bp-screen-md) {
+        flex-wrap: wrap;
+      }
+    }
+
+    .section:not(:last-child) {
+      margin-bottom: $baseline/2;
+    }
+
+    .section:not(:first-child) {
+      margin-top: 0;
+    }
+
+    .course-details {
+      width: 100%;
+      float: none;
+
+      @media (min-width: $bp-screen-md) {
+        display: table-cell;
+        vertical-align: top;
         float: left;
-        font-size: font-size(x-small);
-        line-height: line-height(x-small);
-        color: palette(grayscale, dark);
+      }
 
-        &.active {
-            color: palette(grayscale, dark);
+      .course-title {
+        font-size: 1em;
+        font-weight: 600;
+        margin: 0;
+
+        .course-title-link,
+        .course-title-link:visited{
+          color: palette(primary, base);
+          text-decoration: underline;
         }
+      }
+
+      .run-period,
+      .info-expires-at {
+        color: palette(grayscale, base);
+        font-size: 0.9375em;
+      }
+
+      .course-text .enrolled {
+        color: palette(grayscale, base);
+      }
     }
 
-    .crumb-link {
-        font-size: inherit;
-        line-height: inherit;
-        color: palette(primary, base);
+    .course-meta-container {
+      @media (min-width: $bp-screen-md) {
+        display: table;
+        width: 100%;
+      }
 
-        &:hover,
-        &:focus {
-            color: palette(grayscale, black);
-            text-decoration: underline;
+      .course-content {
+        overflow: hidden;
+      }
+    }
+
+    .course-actions {
+      @media (min-width: $bp-screen-md) {
+        width: 100%;
+        text-align: right;
+        float: right;
+      }
+
+      .course-enroll-view {
+        @media (min-width: $bp-screen-md) {
+          text-align: right;
         }
+      }
     }
 
-    .crumb-separator {
-        font-size: font-size(xx-small);
-        line-height: line-height(xx-small);
-        padding: 0 $full-width-banner-margin/4;
+    .course-certificate {
+      width: 100%;
     }
+
+
+    .final-grade {
+      .grade-header {
+        color: palette(grayscale, base);
+        font-weight: bold;
+      }
+      .grade-display {
+          padding-right: 15px;
+          font-size: 1.5em;
+          color: palette(primary, accent);
+      }
+    }
+
+    .upgrade-message {
+      flex-wrap: wrap;
+
+      .action {
+        width: 100%;
+        margin: 5px 0;
+
+        @media (min-width: $bp-screen-md) {
+          margin-left: auto;
+          width: initial;
+        }
+      }
+
+      .certificate-status {
+        padding-top: 0;
+        width: initial;
+
+        @media (min-width: $bp-screen-sm) {
+          width: 300px;
+        }
+
+        @media (min-width: $bp-screen-md) {
+          width: initial;
+        }
+
+        .card-msg {
+          font-family: $font-family-sans-serif;
+          font-weight: bold;
+          font-size: 0.9375em;
+          color: palette(grayscale, base);
+          display: block;
+
+          @media (min-width: $bp-screen-sm) {
+            display: inline;
+          }
+        }
+
+        .price {
+          color: palette(success, text);
+          font-weight: bold;
+        }
+      }
+
+    }
+
+    .certificate-status {
+      .fa-check-circle {
+        color: palette(success, text);
+      }
+
+      .card-msg {
+        font-family: $font-family-sans-serif;
+        font-weight: bold;
+        font-size: 0.9375em;
+        color: palette(grayscale, base);
+      }
+
+      .certificate-status-msg {
+        color: palette(grayscale, base);
+        font-size: 0.9375em;
+      }
+    }
+
+    .expired-notification {
+      display: inline-block;
+      padding-top: 5px;
+      width: 300px;
+
+      @media (min-width: $bp-screen-sm) {
+        padding-top: 10px;
+        width: 500px;
+      }
+
+      @media (min-width: $bp-screen-md) {
+        width: initial;
+      }
+    }
+
+    .expired-icon {
+      @include float(left);
+
+      color: palette(primary, dark);
+    }
+
+    .expired-text {
+      overflow: hidden;
+      padding-left: 10px;
+    }
+  }
+}
+
+.program-sidebar {
+  padding: 30px 10px;
+
+  .program-record {
+    text-align: center;
+    padding-bottom: 2em;
+  }
+
+  @media (min-width: $bp-screen-md) {
+    @include float(right);
+
+    width: 300px;
+    padding-right: 30px;
+    position: relative;
+  }
+
+  @media (min-width: $bp-screen-lg) {
+    width: 450px;
+
+    .program-progress {
+      @include margin-left(50px);
+    }
+  }
+
+  @media (min-width: map-get($container-max-widths, xl)) {
+    @include margin-right(calc((100% - 1180px) / 2));
+  }
+}
+
+.certificate-heading {
+  margin-bottom: 10px;
+
+  @media (min-width: $bp-screen-md) {
+    @include margin-right(30px);
+  }
+
+  @media (min-width: $bp-screen-lg) {
+    @include margin-left(10px);
+    @include margin-right(0);
+  }
+}
+
+.program-cert-link {
+  display: inline-block;
+
+  &:active,
+  &:focus,
+  &:hover {
+    .program-cert {
+      border-color: $blue-d1;
+    }
+  }
+}
+
+.program-cert {
+  width: 100%;
+  border: 1px solid $divider-color;
+
+  @media (min-width: $bp-screen-md) {
+    width: calc(100% - 30px);
+  }
+
+  @media (min-width: $bp-screen-lg) {
+    width: 100%;
+  }
+}
+
+.certificate-list {
+  @include margin(0, 0, 0, 10px);
+
+  list-style: none;
+
+  .certificate {
+    display: flex;
+    flex-direction: row;
+    padding: 5px 0 10px;
+
+    .image-link {
+      flex: 0 0 100px;
+
+      @media (min-width: $bp-screen-md) {
+        flex: 0 0 120px;
+      }
+    }
+  }
+
+  .certificate-link {
+    @include margin-left(20px);
+
+    color: $black;
+    font: {
+      size: 1.1em;
+      weight: 600;
+    }
+
+    @media (min-width: $bp-screen-md) {
+      font-size: 0.9em;
+    }
+
+    @media (min-width: $bp-screen-lg) {
+      font-size: 1.1em;
+    }
+
+    &:active,
+    &:focus,
+    &:hover {
+      .sample-cert {
+        border-color: $blue-d1;
+      }
+    }
+  }
+
+  .sample-cert {
+    width: 120px;
+    border: 3px solid $gray-l3;
+    border-radius: 5px;
+
+    @media (min-width: $bp-screen-md) {
+      width: 100px;
+    }
+
+    @media (min-width: $bp-screen-lg) {
+      width: 120px;
+    }
+  }
 }

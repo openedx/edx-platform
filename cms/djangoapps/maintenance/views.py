@@ -2,23 +2,23 @@
 Views for the maintenance app.
 """
 import logging
-from django.db import transaction
+
 from django.core.validators import ValidationError
+from django.db import transaction
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.views.generic import View
-
-from edxmako.shortcuts import render_to_response
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from six import text_type
+
+from contentstore.management.commands.utils import get_course_versions
+from edxmako.shortcuts import render_to_response
+from util.json_request import JsonResponse
+from util.views import require_global_staff
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
-
-from contentstore.management.commands.utils import get_course_versions
-from util.json_request import JsonResponse
-from util.views import require_global_staff
-
 
 log = logging.getLogger(__name__)
 
@@ -170,10 +170,10 @@ class ForcePublishCourseView(MaintenanceBaseView):
             self.context['msg'] = COURSE_KEY_ERROR_MESSAGES['invalid_course_key']
         except ItemNotFoundError as exc:
             self.context['error'] = True
-            self.context['msg'] = exc.message
+            self.context['msg'] = text_type(exc)
         except ValidationError as exc:
             self.context['error'] = True
-            self.context['msg'] = exc.message
+            self.context['msg'] = text_type(exc)
 
         if self.context['error']:
             return self.render_response()

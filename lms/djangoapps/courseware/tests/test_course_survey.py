@@ -3,18 +3,17 @@ Python tests for the Survey workflows
 """
 
 from collections import OrderedDict
-from nose.plugins.attrib import attr
 from copy import deepcopy
 
-from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
-
-from survey.models import SurveyForm, SurveyAnswer
+from django.urls import reverse
+from nose.plugins.attrib import attr
 
 from common.test.utils import XssTestMixin
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from courseware.tests.helpers import LoginEnrollmentTestCase
+from survey.models import SurveyAnswer, SurveyForm
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @attr(shard=1)
@@ -78,7 +77,7 @@ class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTe
         """
         Helper method to assert that all known redirect points do redirect as expected
         """
-        for view_name in ['courseware', 'info', 'progress']:
+        for view_name in ['courseware', 'openedx.course_experience.course_home', 'progress']:
             resp = self.client.get(
                 reverse(
                     view_name,
@@ -95,7 +94,7 @@ class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTe
         Helper method to asswer that all known conditionally redirect points do
         not redirect as expected
         """
-        for view_name in ['courseware', 'info', 'progress']:
+        for view_name in ['courseware', 'openedx.course_experience.course_home', 'progress']:
             resp = self.client.get(
                 reverse(
                     view_name,
@@ -119,13 +118,13 @@ class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTe
 
     def test_anonymous_user_visiting_course_with_survey(self):
         """
-        Verifies that anonymous user going to the courseware info with an unanswered survey is not
-        redirected to survery and info page renders without server error.
+        Verifies that anonymous user going to the courseware home with an unanswered survey is not
+        redirected to survey and home page renders without server error.
         """
         self.logout()
         resp = self.client.get(
             reverse(
-                'info',
+                'openedx.course_experience.course_home',
                 kwargs={'course_id': unicode(self.course.id)}
             )
         )
@@ -206,9 +205,10 @@ class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTe
                 kwargs={'course_id': unicode(self.course_with_bogus_survey.id)}
             )
         )
+        course_home_path = 'openedx.course_experience.course_home'
         self.assertRedirects(
             resp,
-            reverse('info', kwargs={'course_id': unicode(self.course_with_bogus_survey.id)})
+            reverse(course_home_path, kwargs={'course_id': unicode(self.course_with_bogus_survey.id)})
         )
 
     def test_visiting_survey_with_no_course_survey(self):
@@ -222,9 +222,10 @@ class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTe
                 kwargs={'course_id': unicode(self.course_without_survey.id)}
             )
         )
+        course_home_path = 'openedx.course_experience.course_home'
         self.assertRedirects(
             resp,
-            reverse('info', kwargs={'course_id': unicode(self.course_without_survey.id)})
+            reverse(course_home_path, kwargs={'course_id': unicode(self.course_without_survey.id)})
         )
 
     def test_survey_xss(self):

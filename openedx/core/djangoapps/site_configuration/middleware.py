@@ -3,6 +3,7 @@ This file contains Django middleware related to the site_configuration app.
 """
 
 from django.conf import settings
+
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 

@@ -58,16 +58,16 @@
                         children: [['Test Topic', 'entry'], ['Other Topic', 'entry']],
                         entries: {
                             'Test Topic': {
-                                is_cohorted: true,
+                                is_divided: true,
                                 id: 'test_topic'
                             },
                             'Other Topic': {
-                                is_cohorted: true,
+                                is_divided: true,
                                 id: 'other_topic'
                             }
                         }
                     },
-                    is_cohorted: true,
+                    is_discussion_division_enabled: true,
                     allow_anonymous: false,
                     allow_anonymous_to_peers: false
                 },
@@ -95,7 +95,7 @@
                 'thread-response-edit', 'response-comment-show', 'response-comment-edit', 'thread-list-item',
                 'search-alert', 'new-post', 'thread-type', 'new-post-menu-entry', 'new-post-alert',
                 'new-post-menu-category', 'topic', 'post-user-display', 'inline-discussion', 'pagination',
-                'profile-thread', 'customwmd-prompt', 'nav-loading'
+                'profile-thread', 'customwmd-prompt', 'nav-loading', 'new-post-visibility'
             ];
             templateNamesNoTrailingTemplate = [
                 'forum-action-endorse', 'forum-action-answer', 'forum-action-follow', 'forum-action-vote',
@@ -170,7 +170,7 @@
                 '                            <li' +
                 '                                class="forum-nav-browse-menu-item"' +
                 '                                data-discussion-id="child"' +
-                '                                data-cohorted="false"' +
+                '                                data-divided="false"' +
                 '                            >' +
                 '                                <a href="#" class="forum-nav-browse-title">Child</a>' +
                 '                            </li>' +
@@ -178,7 +178,7 @@
                 '                    <li' +
                 '                        class="forum-nav-browse-menu-item"' +
                 '                        data-discussion-id="sibling"' +
-                '                        data-cohorted="false"' +
+                '                        data-divided="false"' +
                 '                    >' +
                 '                        <a href="#" class="forum-nav-browse-title">Sibling</a>' +
                 '                    </li>' +
@@ -187,7 +187,7 @@
                 '            <li' +
                 '                class="forum-nav-browse-menu-item"' +
                 '                data-discussion-id="other"' +
-                '                data-cohorted="true"' +
+                '                data-divided="true"' +
                 '            >' +
                 '                <a href="#" class="forum-nav-browse-title">Other Category</a>' +
                 '            </li>' +
@@ -203,11 +203,11 @@
                 '                    <option value="flagged">Flagged</option>' +
                 '                </select>' +
                 '            </label>' +
-                '            <% if (isCohorted && isPrivilegedUser) { %>' +
+                '            <% if (isDiscussionDivisionEnabled && isPrivilegedUser) { %>' +
                 '            <label class="forum-nav-filter-cohort">' +
-                '                <span class="sr">Cohort:</span>' +
+                '                <span class="sr">Group:</span>' +
                 '                <select class="forum-nav-filter-cohort-control">' +
-                '                    <option value="">in all cohorts</option>' +
+                '                    <option value="">in all groups</option>' +
                 '                    <option value="1">Cohort1</option>' +
                 '                    <option value="2">Cohort2</option>' +
                 '                </select>' +

@@ -2,38 +2,38 @@
 Test the about xblock
 """
 import datetime
+import ddt
 import pytz
-
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test.utils import override_settings
+from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import patch
 from nose.plugins.attrib import attr
+from six import text_type
+from waffle.testutils import override_switch
 
 from course_modes.models import CourseMode
+from lms.djangoapps.ccx.tests.factories import CcxFactory
+from openedx.features.course_experience.waffle import WAFFLE_NAMESPACE as COURSE_EXPERIENCE_WAFFLE_NAMESPACE
+from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
+from shoppingcart.models import Order, PaidCourseRegistration
+from student.models import CourseEnrollment
+from student.tests.factories import AdminFactory, CourseEnrollmentAllowedFactory, UserFactory
 from track.tests import EventTrackingTestCase
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE
+from util.milestones_helpers import get_prerequisite_courses_display, set_prerequisite_courses
+from xmodule.course_module import CATALOG_VISIBILITY_ABOUT, CATALOG_VISIBILITY_NONE
+from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_MIXED_MODULESTORE,
+    TEST_DATA_SPLIT_MODULESTORE,
+    ModuleStoreTestCase,
+    SharedModuleStoreTestCase
+)
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.utils import TEST_DATA_DIR
 from xmodule.modulestore.xml_importer import import_course_from_xml
 
-from student.models import CourseEnrollment
-from student.tests.factories import AdminFactory, CourseEnrollmentAllowedFactory, UserFactory
-from shoppingcart.models import Order, PaidCourseRegistration
-from xmodule.course_module import CATALOG_VISIBILITY_ABOUT, CATALOG_VISIBILITY_NONE
-from xmodule.modulestore.tests.django_utils import (
-    ModuleStoreTestCase,
-    SharedModuleStoreTestCase,
-    TEST_DATA_SPLIT_MODULESTORE
-)
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from util.milestones_helpers import (
-    set_prerequisite_courses,
-    get_prerequisite_courses_display,
-)
-from milestones.tests.utils import MilestonesTestCaseMixin
-
-from lms.djangoapps.ccx.tests.factories import CcxFactory
 from .helpers import LoginEnrollmentTestCase
 
 # HTML for registration button
@@ -82,7 +82,7 @@ class AboutTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase, EventTra
         """
         This test asserts that a non-logged in user can visit the course about page
         """
-        url = reverse('about_course', args=[self.course.id.to_deprecated_string()])
+        url = reverse('about_course', args=[text_type(self.course.id)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn("OOGIE BLOOGIE", resp.content)
@@ -95,7 +95,7 @@ class AboutTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase, EventTra
         This test asserts that a logged-in user can visit the course about page
         """
         self.setup_user()
-        url = reverse('about_course', args=[self.course.id.to_deprecated_string()])
+        url = reverse('about_course', args=[text_type(self.course.id)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn("OOGIE BLOOGIE", resp.content)
@@ -107,7 +107,7 @@ class AboutTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase, EventTra
         """
         self.setup_user()
         self.enroll(self.course, True)
-        url = reverse('about_course', args=[self.course.id.to_deprecated_string()])
+        url = reverse('about_course', args=[text_type(self.course.id)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn("You are enrolled in this course", resp.content)
@@ -118,38 +118,38 @@ class AboutTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase, EventTra
         """
         Verify that the About Page honors the permission settings in the course module
         """
-        url = reverse('about_course', args=[self.course_with_about.id.to_deprecated_string()])
+        url = reverse('about_course', args=[text_type(self.course_with_about.id)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn("WITH ABOUT", resp.content)
 
-        url = reverse('about_course', args=[self.course_without_about.id.to_deprecated_string()])
+        url = reverse('about_course', args=[text_type(self.course_without_about.id)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 404)
 
     @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
     def test_logged_in_marketing(self):
         self.setup_user()
-        url = reverse('about_course', args=[self.course.id.to_deprecated_string()])
+        url = reverse('about_course', args=[text_type(self.course.id)])
         resp = self.client.get(url)
         # should be redirected
         self.assertEqual(resp.status_code, 302)
-        # follow this time, and check we're redirected to the course info page
+        # follow this time, and check we're redirected to the course home page
         resp = self.client.get(url, follow=True)
         target_url = resp.redirect_chain[-1][0]
-        info_url = reverse('info', args=[self.course.id.to_deprecated_string()])
-        self.assertTrue(target_url.endswith(info_url))
+        course_home_url = reverse('openedx.course_experience.course_home', args=[text_type(self.course.id)])
+        self.assertTrue(target_url.endswith(course_home_url))
 
     @patch.dict(settings.FEATURES, {'ENABLE_PREREQUISITE_COURSES': True})
     def test_pre_requisite_course(self):
         pre_requisite_course = CourseFactory.create(org='edX', course='900', display_name='pre requisite course')
-        course = CourseFactory.create(pre_requisite_courses=[unicode(pre_requisite_course.id)])
+        course = CourseFactory.create(pre_requisite_courses=[text_type(pre_requisite_course.id)])
         self.setup_user()
-        url = reverse('about_course', args=[unicode(course.id)])
+        url = reverse('about_course', args=[text_type(course.id)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         pre_requisite_courses = get_prerequisite_courses_display(course)
-        pre_requisite_course_about_url = reverse('about_course', args=[unicode(pre_requisite_courses[0]['key'])])
+        pre_requisite_course_about_url = reverse('about_course', args=[text_type(pre_requisite_courses[0]['key'])])
         self.assertIn("<span class=\"important-dates-item-text pre-requisite\"><a href=\"{}\">{}</a></span>"
                       .format(pre_requisite_course_about_url, pre_requisite_courses[0]['display']),
                       resp.content.strip('\n'))
@@ -162,7 +162,7 @@ class AboutTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase, EventTra
             display_name='pre requisite course',
         )
 
-        pre_requisite_courses = [unicode(pre_requisite_course.id)]
+        pre_requisite_courses = [text_type(pre_requisite_course.id)]
 
         # for this failure to occur, the enrollment window needs to be in the past
         course = CourseFactory.create(
@@ -181,11 +181,11 @@ class AboutTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase, EventTra
         self.enroll(self.course, True)
         self.enroll(pre_requisite_course, True)
 
-        url = reverse('about_course', args=[unicode(course.id)])
+        url = reverse('about_course', args=[text_type(course.id)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         pre_requisite_courses = get_prerequisite_courses_display(course)
-        pre_requisite_course_about_url = reverse('about_course', args=[unicode(pre_requisite_courses[0]['key'])])
+        pre_requisite_course_about_url = reverse('about_course', args=[text_type(pre_requisite_courses[0]['key'])])
         self.assertIn("<span class=\"important-dates-item-text pre-requisite\"><a href=\"{}\">{}</a></span>"
                       .format(pre_requisite_course_about_url, pre_requisite_courses[0]['display']),
                       resp.content.strip('\n'))
@@ -230,14 +230,14 @@ class AboutTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_logged_in_xml(self):
         self.setup_user()
-        url = reverse('about_course', args=[self.xml_course_id.to_deprecated_string()])
+        url = reverse('about_course', args=[text_type(self.xml_course_id)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn(self.xml_data, resp.content)
 
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_anonymous_user_xml(self):
-        url = reverse('about_course', args=[self.xml_course_id.to_deprecated_string()])
+        url = reverse('about_course', args=[text_type(self.xml_course_id)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn(self.xml_data, resp.content)
@@ -257,18 +257,12 @@ class AboutWithCappedEnrollmentsTestCase(LoginEnrollmentTestCase, SharedModuleSt
             data="OOGIE BLOOGIE", display_name="overview"
         )
 
-    def setUp(self):
-        """
-        Set up the tests
-        """
-        super(AboutWithCappedEnrollmentsTestCase, self).setUp()
-
     def test_enrollment_cap(self):
         """
         This test will make sure that enrollment caps are enforced
         """
         self.setup_user()
-        url = reverse('about_course', args=[self.course.id.to_deprecated_string()])
+        url = reverse('about_course', args=[text_type(self.course.id)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn('<a href="#" class="register">', resp.content)
@@ -310,15 +304,12 @@ class AboutWithInvitationOnly(SharedModuleStoreTestCase):
             display_name="overview"
         )
 
-    def setUp(self):
-        super(AboutWithInvitationOnly, self).setUp()
-
     def test_invitation_only(self):
         """
         Test for user not logged in, invitation only course.
         """
 
-        url = reverse('about_course', args=[self.course.id.to_deprecated_string()])
+        url = reverse('about_course', args=[text_type(self.course.id)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn("Enrollment in this course is by invitation only", resp.content)
@@ -336,7 +327,7 @@ class AboutWithInvitationOnly(SharedModuleStoreTestCase):
         CourseEnrollmentAllowedFactory(email=user.email, course_id=self.course.id)
         self.client.login(username=user.username, password='test')
 
-        url = reverse('about_course', args=[self.course.id.to_deprecated_string()])
+        url = reverse('about_course', args=[text_type(self.course.id)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn(u"Enroll in {}".format(self.course.id.course), resp.content.decode('utf-8'))
@@ -360,15 +351,12 @@ class AboutTestCaseShibCourse(LoginEnrollmentTestCase, SharedModuleStoreTestCase
             data="OOGIE BLOOGIE", display_name="overview"
         )
 
-    def setUp(self):
-        super(AboutTestCaseShibCourse, self).setUp()
-
     def test_logged_in_shib_course(self):
         """
         For shib courses, logged in users will see the enroll button, but get rejected once they click there
         """
         self.setup_user()
-        url = reverse('about_course', args=[self.course.id.to_deprecated_string()])
+        url = reverse('about_course', args=[text_type(self.course.id)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn("OOGIE BLOOGIE", resp.content)
@@ -380,7 +368,7 @@ class AboutTestCaseShibCourse(LoginEnrollmentTestCase, SharedModuleStoreTestCase
         """
         For shib courses, anonymous users will also see the enroll button
         """
-        url = reverse('about_course', args=[self.course.id.to_deprecated_string()])
+        url = reverse('about_course', args=[text_type(self.course.id)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn("OOGIE BLOOGIE", resp.content)
@@ -415,7 +403,7 @@ class AboutWithClosedEnrollment(ModuleStoreTestCase):
         )
 
     def test_closed_enrollmement(self):
-        url = reverse('about_course', args=[self.course.id.to_deprecated_string()])
+        url = reverse('about_course', args=[text_type(self.course.id)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn("Enrollment is Closed", resp.content)
@@ -424,12 +412,56 @@ class AboutWithClosedEnrollment(ModuleStoreTestCase):
         self.assertNotIn(REG_STR, resp.content)
 
     def test_course_price_is_not_visble_in_sidebar(self):
-        url = reverse('about_course', args=[self.course.id.to_deprecated_string()])
+        url = reverse('about_course', args=[text_type(self.course.id)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         # course price is not visible ihe course_about page when the course
         # mode is not set to honor
         self.assertNotIn('<span class="important-dates-item-text">$10</span>', resp.content)
+
+
+@attr(shard=1)
+@ddt.ddt
+class AboutSidebarHTMLTestCase(SharedModuleStoreTestCase):
+    """
+    This test case will check the About page for the content in the HTML sidebar.
+    """
+    def setUp(self):
+        super(AboutSidebarHTMLTestCase, self).setUp()
+        self.course = CourseFactory.create()
+
+    @ddt.data(
+        ("", "", False),
+        ("about_sidebar_html", "About Sidebar HTML Heading", False),
+        ("about_sidebar_html", "", False),
+        ("", "", True),
+        ("about_sidebar_html", "About Sidebar HTML Heading", True),
+        ("about_sidebar_html", "", True),
+    )
+    @ddt.unpack
+    def test_html_sidebar_enabled(self, itemfactory_display_name, itemfactory_data, waffle_switch_value):
+        with override_switch(
+            '{}.{}'.format(
+                COURSE_EXPERIENCE_WAFFLE_NAMESPACE,
+                ENABLE_COURSE_ABOUT_SIDEBAR_HTML
+            ),
+            active=waffle_switch_value
+        ):
+            if itemfactory_display_name:
+                ItemFactory.create(
+                    category="about",
+                    parent_location=self.course.location,
+                    display_name=itemfactory_display_name,
+                    data=itemfactory_data,
+                )
+            url = reverse('about_course', args=[text_type(self.course.id)])
+            resp = self.client.get(url)
+            self.assertEqual(resp.status_code, 200)
+            if waffle_switch_value and itemfactory_display_name and itemfactory_data:
+                self.assertIn('<section class="about-sidebar-html">', resp.content)
+                self.assertIn(itemfactory_data, resp.content)
+            else:
+                self.assertNotIn('<section class="about-sidebar-html">', resp.content)
 
 
 @attr(shard=1)
@@ -478,7 +510,7 @@ class AboutPurchaseCourseTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
         """
         Make sure an anonymous user sees the purchase button
         """
-        url = reverse('about_course', args=[self.course.id.to_deprecated_string()])
+        url = reverse('about_course', args=[text_type(self.course.id)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn("Add buyme to Cart <span>($10 USD)</span>", resp.content)
@@ -488,7 +520,7 @@ class AboutPurchaseCourseTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
         Make sure a logged in user sees the purchase button
         """
         self.setup_user()
-        url = reverse('about_course', args=[self.course.id.to_deprecated_string()])
+        url = reverse('about_course', args=[text_type(self.course.id)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn("Add buyme to Cart <span>($10 USD)</span>", resp.content)
@@ -502,7 +534,7 @@ class AboutPurchaseCourseTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
         cart = Order.get_cart_for_user(self.user)
         PaidCourseRegistration.add_to_order(cart, self.course.id)
 
-        url = reverse('about_course', args=[self.course.id.to_deprecated_string()])
+        url = reverse('about_course', args=[text_type(self.course.id)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn("This course is in your", resp.content)
@@ -519,7 +551,7 @@ class AboutPurchaseCourseTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
         # for paywalled courses
         CourseEnrollment.enroll(self.user, self.course.id)
 
-        url = reverse('about_course', args=[self.course.id.to_deprecated_string()])
+        url = reverse('about_course', args=[text_type(self.course.id)])
 
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
@@ -534,7 +566,7 @@ class AboutPurchaseCourseTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
         """
         self.setup_user()
 
-        url = reverse('about_course', args=[self.closed_course.id.to_deprecated_string()])
+        url = reverse('about_course', args=[text_type(self.closed_course.id)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn("Enrollment is Closed", resp.content)
@@ -553,7 +585,7 @@ class AboutPurchaseCourseTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
         self._set_ecomm(course)
         self.setup_user()
 
-        url = reverse('about_course', args=[course.id.to_deprecated_string()])
+        url = reverse('about_course', args=[text_type(course.id)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn("Enrollment in this course is by invitation only", resp.content)
@@ -572,7 +604,7 @@ class AboutPurchaseCourseTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
         self._set_ecomm(course)
 
         self.setup_user()
-        url = reverse('about_course', args=[course.id.to_deprecated_string()])
+        url = reverse('about_course', args=[text_type(course.id)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn("Add buyme to Cart <span>($10 USD)</span>", resp.content)
@@ -604,7 +636,7 @@ class AboutPurchaseCourseTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
         """
         course = CourseFactory.create(org='MITx', number='free', display_name='Course For Free')
         self.setup_user()
-        url = reverse('about_course', args=[course.id.to_deprecated_string()])
+        url = reverse('about_course', args=[text_type(course.id)])
 
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
@@ -642,7 +674,7 @@ class CourseAboutTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
         ccx_locator = CCXLocator.from_course_locator(self.course.id, unicode(ccx.id))
 
         self.setup_user()
-        url = reverse('info', args=[ccx_locator])
+        url = reverse('openedx.course_experience.course_home', args=[ccx_locator])
         response = self.client.get(url)
         expected = reverse('dashboard')
         self.assertRedirects(response, expected, status_code=302, target_status_code=200)

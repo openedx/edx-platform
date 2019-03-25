@@ -3,5 +3,5 @@
 
 nick: edx
 oeps: {}
-openedx-release: {ref: release, requirements: requirements/edx/github.txt}
+openedx-release: {ref: release}
 track-pulls: true

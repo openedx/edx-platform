@@ -2,16 +2,16 @@
 """
 This test file will verify proper password history enforcement
 """
-from django.test import TestCase
-from django.utils import timezone
-from mock import patch
-from student.tests.factories import UserFactory, AdminFactory
-
-from student.models import PasswordHistory
-from freezegun import freeze_time
 from datetime import timedelta
 
+from django.test import TestCase
 from django.test.utils import override_settings
+from django.utils import timezone
+from freezegun import freeze_time
+from mock import patch
+
+from student.models import PasswordHistory
+from student.tests.factories import AdminFactory, UserFactory
 
 
 @patch.dict("django.conf.settings.FEATURES", {'ADVANCED_SECURITY': True})
@@ -203,3 +203,26 @@ class TestPasswordHistory(TestCase):
         student = self._user_factory_with_history()
 
         self.assertFalse(PasswordHistory.is_password_reset_too_soon(student))
+
+    # We need some policy in place to create a history. It doesn't matter what it is.
+    @patch.dict("django.conf.settings.ADVANCED_SECURITY_CONFIG", {'MIN_DAYS_FOR_STUDENT_ACCOUNTS_PASSWORD_RESETS': 5})
+    def test_retirement(self):
+        """
+        Verify that the user's password history contains no actual
+        passwords after retirement is called.
+        """
+        user = self._user_factory_with_history()
+
+        # create multiple rows in the password history table
+        self._change_password(user, "different")
+        self._change_password(user, "differentagain")
+        # ensure the rows were actually created and stored the passwords
+        self.assertTrue(PasswordHistory.objects.filter(user_id=user.id).exists())
+        for row in PasswordHistory.objects.filter(user_id=user.id):
+            self.assertFalse(row.password == "")
+
+        # retire the user and ensure that the rows are still present, but with no passwords
+        PasswordHistory.retire_user(user.id)
+        self.assertTrue(PasswordHistory.objects.filter(user_id=user.id).exists())
+        for row in PasswordHistory.objects.filter(user_id=user.id):
+            self.assertEqual(row.password, "")

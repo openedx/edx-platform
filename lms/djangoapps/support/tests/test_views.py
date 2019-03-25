@@ -3,22 +3,26 @@
 Tests for support views.
 """
 
-from datetime import datetime, timedelta
 import itertools
 import json
 import re
+from datetime import datetime, timedelta
 
 import ddt
-from django.core.urlresolvers import reverse
+import pytest
+from django.contrib.auth.models import User
+from django.urls import reverse
+from django.db.models import signals
 from nose.plugins.attrib import attr
 from pytz import UTC
 
+from common.test.utils import disable_signal
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.verify_student.models import VerificationDeadline
-from student.models import CourseEnrollment, ManualEnrollmentAudit, ENROLLED_TO_ENROLLED
+from student.models import ENROLLED_TO_ENROLLED, CourseEnrollment, ManualEnrollmentAudit
 from student.roles import GlobalStaff, SupportStaffRole
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -41,6 +45,51 @@ class SupportViewTestCase(ModuleStoreTestCase):
         self.assertTrue(success, msg="Could not log in")
 
 
+class SupportViewManageUserTests(SupportViewTestCase):
+    """
+    Base class for support view tests.
+    """
+
+    def setUp(self):
+        """Make the user support staff"""
+        super(SupportViewManageUserTests, self).setUp()
+        SupportStaffRole().add_users(self.user)
+
+    def test_get_support_form(self):
+        """
+        Tests Support View to return Manage User Form
+        """
+        url = reverse('support:manage_user')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_form_with_user_info(self):
+        """
+        Tests Support View to return Manage User Form
+        with user info
+        """
+        url = reverse('support:manage_user_detail') + self.user.username
+        response = self.client.get(url)
+        data = json.loads(response.content)
+        self.assertEqual(data['username'], self.user.username)
+
+    def test_disable_user_account(self):
+        """
+        Tests Support View to disable the user account
+        """
+        test_user = UserFactory(
+            username='foobar', email='foobar@foobar.com', password='foobar'
+        )
+        url = reverse('support:manage_user_detail') + test_user.username
+        response = self.client.post(url, data={
+            'username_or_email': test_user.username
+        })
+        data = json.loads(response.content)
+        self.assertEqual(data['success_msg'], 'User Disabled Successfully')
+        test_user = User.objects.get(username=test_user.username, email=test_user.email)
+        self.assertEqual(test_user.has_usable_password(), False)
+
+
 @attr(shard=3)
 @ddt.ddt
 class SupportViewAccessTests(SupportViewTestCase):
@@ -56,7 +105,9 @@ class SupportViewAccessTests(SupportViewTestCase):
             'support:certificates',
             'support:refund',
             'support:enrollment',
-            'support:enrollment_list'
+            'support:enrollment_list',
+            'support:manage_user',
+            'support:manage_user_detail',
         ), (
             (GlobalStaff, True),
             (SupportStaffRole, True),
@@ -81,7 +132,9 @@ class SupportViewAccessTests(SupportViewTestCase):
         "support:certificates",
         "support:refund",
         "support:enrollment",
-        "support:enrollment_list"
+        "support:enrollment_list",
+        "support:manage_user",
+        "support:manage_user_detail",
     )
     def test_require_login(self, url_name):
         url = reverse(url_name)
@@ -223,6 +276,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
             'reason': 'Financial Assistance',
         }, json.loads(response.content)[0]['manual_enrollment'])
 
+    @disable_signal(signals, 'post_save')
     @ddt.data('username', 'email')
     def test_change_enrollment(self, search_string_type):
         self.assertIsNone(ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email))
@@ -241,7 +295,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         self.assert_enrollment(CourseMode.VERIFIED)
 
     @ddt.data(
-        ({}, r"The field '\w+' is required."),
+        ({}, r"The field \"'\w+'\" is required."),  # The double quoting goes away in Django 2.0.1
         ({'course_id': 'bad course key'}, 'Could not parse course key.'),
         ({
             'course_id': 'course-v1:TestX+T101+2015',
@@ -274,12 +328,14 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         self.assert_enrollment(CourseMode.AUDIT)
         self.assertIsNone(ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email))
 
+    @disable_signal(signals, 'post_save')
     @ddt.data('honor', 'audit', 'verified', 'professional', 'no-id-professional')
     def test_update_enrollment_for_all_modes(self, new_mode):
         """ Verify support can changed the enrollment to all available modes
         except credit. """
         self.assert_update_enrollment('username', new_mode)
 
+    @disable_signal(signals, 'post_save')
     @ddt.data('honor', 'audit', 'verified', 'professional', 'no-id-professional')
     def test_update_enrollment_for_ended_course(self, new_mode):
         """ Verify support can changed the enrollment of archived course. """
@@ -301,6 +357,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         response = self.client.get(url)
         self._assert_generated_modes(response)
 
+    @disable_signal(signals, 'post_save')
     @ddt.data('username', 'email')
     def test_update_enrollments_with_expired_mode(self, search_string_type):
         """ Verify that enrollment can be updated to verified mode. """

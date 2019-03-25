@@ -5,14 +5,13 @@
 @import 'bourbon/bourbon'; // lib - bourbon
 @import 'vendor/bi-app/bi-app-ltr'; // set the layout for left to right languages
 
-// base - utilities
-@import 'base/variables';
-@import 'base/mixins';
+// Base build
+@import 'base/build';
 
 footer#footer-openedx {
-    @import 'base/reset';
-    @import 'base/extends';
-    @import 'base/base';
+  @import 'base/reset';
+  @import 'base/extends';
+  @import 'base/base';
 }
 
 // base - elements
@@ -20,3 +19,6 @@ footer#footer-openedx {
 
 // shared - platform
 @import 'shared/footer';
+
+// Extra theme-specific rules
+@import 'lms/theme/extras';

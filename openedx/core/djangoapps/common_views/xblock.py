@@ -6,11 +6,9 @@ from __future__ import absolute_import
 import logging
 import mimetypes
 
-from xblock.core import XBlock
-
 from django.conf import settings
 from django.http import Http404, HttpResponse
-
+from xblock.core import XBlock
 
 log = logging.getLogger(__name__)
 

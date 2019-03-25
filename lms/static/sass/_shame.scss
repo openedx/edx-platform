@@ -9,6 +9,7 @@
 %m-btn {
   @include box-sizing(border-box);
   @include transition(color $tmg-f2 ease-in-out, background $tmg-f2 ease-in-out, box-shadow $tmg-f2 ease-in-out);
+
   display: inline-block;
   cursor: pointer;
   text-decoration: none;
@@ -39,6 +40,7 @@
 %m-btn-base {
   @extend %m-btn;
   @extend %m-btn-edged;
+
   border: none;
   padding:($baseline/2) ($baseline);
   text-align: center;
@@ -58,6 +60,7 @@
 // primary button
 %m-btn-primary {
   @extend %m-btn-base;
+
   box-shadow: 0 2px 1px 0 $action-primary-shadow;
   background: $action-primary-bg;
   color: $action-primary-fg;
@@ -65,6 +68,7 @@
   &:hover, &:active, &:focus {
     background: $action-primary-focused-bg;
   }
+
   &:focus {
     box-shadow: 0 0 6px 0 $action-primary-active-focused-shadow;
   }
@@ -89,6 +93,7 @@
 // secondary button
 %m-btn-secondary {
   @extend %m-btn-base;
+
   box-shadow: 0 2px 1px 0 $action-secondary-shadow;
   background: $action-secondary-bg;
   color: $action-secondary-fg;
@@ -96,6 +101,7 @@
   &:hover, &:active, &:focus {
     background: $action-secondary-focused-bg;
   }
+
   &:focus {
     box-shadow: 0 0 6px 0 $action-primary-active-focused-shadow;
   }
@@ -122,7 +128,6 @@
 
 // edx.org marketing site - needed, but bad overrides with importants
 .view-register, .view-login, .view-passwordreset, .view-survey {
-
   .form-actions button[type="submit"] {
     text-transform: none;
     vertical-align: middle;
@@ -140,7 +145,6 @@
 
   //overriding reset link style for nav/header
   .header-global {
-
     .logo a:hover, .logo:active, .logo a:focus {
       border: none;
       text-decoration: none;
@@ -213,6 +217,7 @@ footer .references {
   .action-secondary {
     @extend %btn-no-style;
     @extend %t-strong;
+
     box-shadow: none;
     text-shadow: none;
   }

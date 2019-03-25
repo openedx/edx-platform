@@ -48,12 +48,6 @@ def set_credit_requirements(course_key, requirements):
                 "course-v1-edX-DemoX-1T2015",
                 [
                     {
-                        "namespace": "reverification",
-                        "name": "i4x://edX/DemoX/edx-reverification-block/assessment_uuid",
-                        "display_name": "Assessment 1",
-                        "criteria": {},
-                    },
-                    {
                         "namespace": "proctored_exam",
                         "name": "i4x://edX/DemoX/proctoring-block/final_uuid",
                         "display_name": "Final Exam",
@@ -106,12 +100,6 @@ def get_credit_requirements(course_key, namespace=None):
             {
                 requirements =
                 [
-                    {
-                        "namespace": "reverification",
-                        "name": "i4x://edX/DemoX/edx-reverification-block/assessment_uuid",
-                        "display_name": "Assessment 1",
-                        "criteria": {},
-                    },
                     {
                         "namespace": "proctored_exam",
                         "name": "i4x://edX/DemoX/proctoring-block/final_uuid",
@@ -216,17 +204,6 @@ def set_credit_requirement_status(user, course_key, req_namespace, req_name, sta
     Keyword Arguments:
         status (str): Status of the requirement (either "satisfied" or "failed")
         reason (dict): Reason of the status
-
-    Example:
-        >>> set_credit_requirement_status(
-                "staff",
-                CourseKey.from_string("course-v1-edX-DemoX-1T2015"),
-                "reverification",
-                "i4x://edX/DemoX/edx-reverification-block/assessment_uuid",
-                status="satisfied",
-                reason={}
-            )
-
     """
     # Check whether user has credit eligible enrollment.
     enrollment_mode, is_active = CourseEnrollment.enrollment_mode_for_user(user, course_key)
@@ -317,18 +294,10 @@ def remove_credit_requirement_status(username, course_key, req_namespace, req_na
         req_name (str): Name of the requirement
                         (e.g. "grade" or the location of the ICRV XBlock)
 
-    Example:
-        >>> remove_credit_requirement_status(
-                "staff",
-                CourseKey.from_string("course-v1-edX-DemoX-1T2015"),
-                "reverification",
-                "i4x://edX/DemoX/edx-reverification-block/assessment_uuid".
-            )
-
     """
 
     # Find the requirement we're trying to remove
-    req_to_remove = CreditRequirement.get_course_requirements(course_key, namespace=req_namespace, name=req_name)
+    req_to_remove = CreditRequirement.get_course_requirement(course_key, req_namespace, req_name)
 
     # If we can't find the requirement, then the most likely explanation
     # is that there was a lag removing the credit requirements after the course
@@ -364,16 +333,6 @@ def get_credit_requirement_status(course_key, username, namespace=None, name=Non
         >>> get_credit_requirement_status("course-v1-edX-DemoX-1T2015", "john")
 
                 [
-                    {
-                        "namespace": "reverification",
-                        "name": "i4x://edX/DemoX/edx-reverification-block/assessment_uuid",
-                        "display_name": "In Course Reverification",
-                        "criteria": {},
-                        "reason": {},
-                        "status": "failed",
-                        "status_date": "2015-06-26 07:49:13",
-                        "order": 0,
-                    },
                     {
                         "namespace": "proctored_exam",
                         "name": "i4x://edX/DemoX/proctoring-block/final_uuid",

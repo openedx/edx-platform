@@ -1,34 +1,42 @@
 """ Tests for the api_admin app's views. """
 
 import json
-import unittest
 
 import ddt
 import httpretty
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
 from oauth2_provider.models import get_application_model
 
-from openedx.core.djangoapps.api_admin.models import ApiAccessRequest, ApiAccessConfig
+from openedx.core.djangoapps.api_admin.models import ApiAccessConfig, ApiAccessRequest
 from openedx.core.djangoapps.api_admin.tests.factories import (
-    ApiAccessRequestFactory, ApplicationFactory, CatalogFactory
+    ApiAccessRequestFactory,
+    ApplicationFactory,
+    CatalogFactory
 )
 from openedx.core.djangoapps.api_admin.tests.utils import VALID_DATA
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory
 
 Application = get_application_model()  # pylint: disable=invalid-name
 
 
 class ApiAdminTest(TestCase):
+    """
+    Base class to allow API admin access to tests.
+    """
     def setUp(self):
         super(ApiAdminTest, self).setUp()
         ApiAccessConfig(enabled=True).save()
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class ApiRequestViewTest(ApiAdminTest):
+    """
+    Test the API Request View.
+    """
     def setUp(self):
         super(ApiRequestViewTest, self).setUp()
         self.url = reverse('api_admin:api-request')
@@ -93,10 +101,13 @@ class ApiRequestViewTest(ApiAdminTest):
         self.assertEqual(response.status_code, 404)
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 @override_settings(PLATFORM_NAME='edX')
 @ddt.ddt
 class ApiRequestStatusViewTest(ApiAdminTest):
+    """
+    Tests of the API Status endpoint.
+    """
     def setUp(self):
         super(ApiRequestStatusViewTest, self).setUp()
         password = 'abc123'
@@ -198,10 +209,15 @@ class ApiRequestStatusViewTest(ApiAdminTest):
         self.assertIn('Enter a valid URL.', response.content)
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class ApiTosViewTest(ApiAdminTest):
+    """
+    Tests of the API terms of service endpoint.
+    """
     def test_get_api_tos(self):
-        """Verify that the terms of service can be read."""
+        """
+        Verify that the terms of service can be read.
+        """
         url = reverse('api_admin:api-tos')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -209,6 +225,9 @@ class ApiTosViewTest(ApiAdminTest):
 
 
 class CatalogTest(ApiAdminTest):
+    """
+    Test the catalog API.
+    """
     def setUp(self):
         super(CatalogTest, self).setUp()
         password = 'abc123'
@@ -232,8 +251,11 @@ class CatalogTest(ApiAdminTest):
         )
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class CatalogSearchViewTest(CatalogTest):
+    """
+    Test the catalog search endpoint.
+    """
     def setUp(self):
         super(CatalogSearchViewTest, self).setUp()
         self.url = reverse('api_admin:catalog-search')
@@ -254,8 +276,11 @@ class CatalogSearchViewTest(CatalogTest):
         self.assertRedirects(response, reverse('api_admin:catalog-search'))
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class CatalogListViewTest(CatalogTest):
+    """
+    Test the catalog list endpoint.
+    """
     def setUp(self):
         super(CatalogListViewTest, self).setUp()
         self.catalog_user = UserFactory()
@@ -304,8 +329,11 @@ class CatalogListViewTest(CatalogTest):
         self.assertEqual(len([r for r in httpretty.httpretty.latest_requests if r.method == 'POST']), 0)
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class CatalogEditViewTest(CatalogTest):
+    """
+    Test edits to the catalog endpoint.
+    """
     def setUp(self):
         super(CatalogEditViewTest, self).setUp()
         self.catalog_user = UserFactory()
@@ -353,8 +381,11 @@ class CatalogEditViewTest(CatalogTest):
         self.assertEqual(len([r for r in httpretty.httpretty.latest_requests if r.method == 'PATCH']), 0)
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class CatalogPreviewViewTest(CatalogTest):
+    """
+    Test the catalog preview endpoint.
+    """
     def setUp(self):
         super(CatalogPreviewViewTest, self).setUp()
         self.url = reverse('api_admin:catalog-preview')

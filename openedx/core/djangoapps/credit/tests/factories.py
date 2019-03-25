@@ -8,7 +8,14 @@ import factory
 from factory.fuzzy import FuzzyText
 import pytz
 
-from openedx.core.djangoapps.credit.models import CreditProvider, CreditEligibility, CreditCourse, CreditRequest
+from openedx.core.djangoapps.credit.models import (
+    CreditProvider,
+    CreditEligibility,
+    CreditCourse,
+    CreditRequest,
+    CreditRequirement,
+    CreditRequirementStatus,
+)
 from util.date_utils import to_timestamp
 
 
@@ -18,6 +25,21 @@ class CreditCourseFactory(factory.DjangoModelFactory):
 
     course_key = FuzzyText(prefix='fake.org/', suffix='/fake.run')
     enabled = True
+
+
+class CreditRequirementFactory(factory.DjangoModelFactory):
+    class Meta(object):
+        model = CreditRequirement
+
+    course = factory.SubFactory(CreditCourseFactory)
+
+
+class CreditRequirementStatusFactory(factory.DjangoModelFactory):
+    class Meta(object):
+        model = CreditRequirementStatus
+
+    requirement = factory.SubFactory(CreditRequirementFactory)
+    status = CreditRequirementStatus.REQUIREMENT_STATUS_CHOICES[0][0]
 
 
 class CreditProviderFactory(factory.DjangoModelFactory):

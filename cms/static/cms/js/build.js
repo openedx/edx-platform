@@ -1,26 +1,11 @@
 (function() {
     'use strict';
-    var commonLibrariesPath = 'common/js/common_libraries';
-
-    var getModule = function(moduleName, excludeCommonDeps) {
-        var module = {
-            name: moduleName
-        };
-
-        if (excludeCommonDeps) {
-            module.exclude = [commonLibrariesPath];
-        }
-
-        return module;
-    };
 
     var getModulesList = function(modules) {
-        var result = [getModule(commonLibrariesPath)];
-        return result.concat(modules.map(function(moduleName) {
-            return getModule(moduleName, true);
-        }));
+        return modules.map(function(moduleName) {
+            return {name: moduleName};
+        });
     };
-
 
     var jsOptimize = process.env.REQUIRE_BUILD_PROFILE_OPTIMIZE !== undefined ?
         process.env.REQUIRE_BUILD_PROFILE_OPTIMIZE : 'uglify2';
@@ -34,27 +19,19 @@
         modules: getModulesList([
             'js/factories/asset_index',
             'js/factories/base',
-            'js/factories/container',
             'js/factories/course_create_rerun',
             'js/factories/course_info',
-            'js/factories/edit_tabs',
             'js/factories/export',
             'js/factories/group_configurations',
             'js/certificates/factories/certificates_page_factory',
-            'js/factories/import',
             'js/factories/index',
-            'js/factories/library',
-            'js/factories/login',
             'js/factories/manage_users',
             'js/factories/outline',
             'js/factories/register',
             'js/factories/settings',
             'js/factories/settings_advanced',
             'js/factories/settings_graders',
-            'js/factories/textbooks',
-            'js/factories/videos_index',
-            'js/factories/xblock_validation',
-            'js/programs/program_admin_app'
+            'js/factories/videos_index'
         ]),
         /**
          * By default all the configuration for optimization happens from the command
@@ -79,10 +56,23 @@
          * file should be skipped because it has no dependencies.
          */
         paths: {
-            'gettext': 'empty:',
-            'xmodule': 'empty:',
-            'mathjax': 'empty:',
-            'youtube': 'empty:'
+            backbone: 'empty:',
+            gettext: 'empty:',
+            jquery: 'empty:',
+            'jquery.cookie': 'empty:',
+            'jquery-migrate': 'empty:',
+            logger: 'empty:',
+            mathjax: 'empty:',
+            underscore: 'empty:',
+            'underscore.string': 'empty:',
+            URI: 'empty:',
+            utility: 'empty:',
+            xmodule: 'empty:',
+            youtube: 'empty:',
+
+            // Don't bundle UI Toolkit helpers as they are loaded into the "edx" namespace
+            'edx-ui-toolkit/js/utils/html-utils': 'empty:',
+            'edx-ui-toolkit/js/utils/string-utils': 'empty:'
         },
 
         /**
@@ -104,7 +94,7 @@
          * inlined in the build config.
          */
         shim: {
-            'xmodule': {
+            xmodule: {
                 deps: [
                     'jquery', 'underscore', 'codemirror', 'tinymce',
                     'jquery.tinymce', 'jquery.qtip', 'jquery.scrollTo', 'jquery.flot',

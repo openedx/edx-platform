@@ -17,19 +17,23 @@
   .content-primary {
     @extend %ui-window;
     @extend .ui-col-wide;
+
     padding: $baseline ($baseline*1.5);
   }
 
   // messages - should be synced up with global messages in the future
   .message {
     @extend %t-copy-sub1;
+
     display: block;
   }
 
   .message-status {
     @include border-top-radius(2px);
     @include box-sizing(border-box);
+
     @extend %t-strong;
+
     display: none;
     border-bottom: 2px solid $yellow;
     margin: 0 0 $baseline 0;
@@ -67,7 +71,6 @@
 
     // course details that should appear more like content than elements to change
     .is-not-editable {
-
       label {
 
       }
@@ -75,6 +78,7 @@
       input, textarea {
         @extend %t-copy-lead1;
         @extend %t-strong;
+
         box-shadow: none;
         border: none;
         background: none;
@@ -94,18 +98,28 @@
       .title-2 {
         width: flex-grid(4, 9);
         margin: 0;
+
         @include margin-right(flex-gutter());
         @include float(left);
       }
 
       .tip {
         @extend %t-copy-sub2;
+
         width: flex-grid(5, 9);
+
         @include float(right);
+
         margin-top: ($baseline/2);
+
         @include text-align(right);
+
         color: $gray-d1;
       }
+    }
+
+    legend {
+      width: 100%;
     }
 
     // basic layout/elements
@@ -124,12 +138,15 @@
 
     .instructions {
       @extend %t-copy-sub1;
+
       margin: 0 0 $baseline 0;
     }
 
     .tip {
       @extend %t-copy-sub2;
+
       @include transition(color $tmg-f2 ease-in-out 0s);
+
       display: block;
       margin-top: ($baseline/4);
       color: $gray-d1;
@@ -137,11 +154,13 @@
 
     .tip-inline {
       display: inline;
+
       @include margin-left($baseline/4);
     }
 
     .message-error {
       @extend %t-copy-sub1;
+
       display: block;
       margin-top: ($baseline/4);
       margin-bottom: ($baseline/2);
@@ -151,6 +170,7 @@
     // buttons
     .remove-item {
       @include white-button;
+
       @extend %t-action3;
       @extend %t-strong;
     }
@@ -165,20 +185,22 @@
 
       .show-data{
         .heading{
-          border: 1px solid #E0E0E0;
+          border: 1px solid #e0e0e0;
           padding: 5px 15px;
           margin-top: 5px;
         }
-         .div-grade-requirements{
-            border: 1px solid #E0E0E0;
-            border-top: none;
-            padding: 10px 15px;
-           label{font-weight: 600;}
-           input#entrance-exam-minimum-score-pct{
-              height: 40px;
-              font-size: 18px;
-           }
-         }
+
+        .div-grade-requirements{
+          border: 1px solid #e0e0e0;
+          border-top: none;
+          padding: 10px 15px;
+          label{font-weight: 600;}
+
+          input#entrance-exam-minimum-score-pct{
+            height: 40px;
+            font-size: 18px;
+          }
+        }
       }
 
       #heading-entrance-exam{
@@ -197,12 +219,11 @@
         }
 
         &.required {
-
           label {
             @extend %t-strong;
           }
 
-          label:after {
+          label::after {
             margin-left: ($baseline/4);
             content: "*";
           }
@@ -214,19 +235,23 @@
 
         label {
           @include transition(color $tmg-f2 ease-in-out 0s);
+
           @extend %t-copy-sub1;
           @extend %t-strong;
+
           margin: 0 0 ($baseline/4) 0;
 
           &.is-focused {
-            color: $uxpl-blue-base;
+            color: theme-color("primary");
           }
         }
 
         input, textarea {
           @extend %t-copy-base;
+
           @include placeholder($gray-l4);
-          @include size(100%,100%);
+          @include size(100%, 100%);
+
           padding: ($baseline/2);
 
           &.long {
@@ -240,7 +265,6 @@
           }
 
           &:focus {
-
             + .tip {
               color: $gray-d1;
             }
@@ -249,11 +273,12 @@
 
         .input-minimum-grade {
           @include float(left);
-          @include size(92%,100%);
+          @include size(92%, 100%);
         }
 
         .minimum-grade-percentage-sign {
           @include line-height(30);
+
           padding-left: ($baseline/4);;
         }
 
@@ -275,14 +300,15 @@
 
       .field-group {
         @include clearfix();
+
         margin: 0 0 ($baseline/2) 0;
       }
 
       // enumerated/grouped lists
       &.enum {
-
         .field-group {
           @include box-sizing(border-box);
+
           border-radius: 3px;
           background: $gray-l5;
           padding: $baseline;
@@ -293,6 +319,7 @@
 
           .actions {
             @include clearfix();
+
             margin-top: ($baseline/2);
             border-top: 1px solid $gray-l4;
             padding-top: ($baseline/2);
@@ -316,9 +343,9 @@
 
     // specific fields - basic
     &.basic {
-
       .list-input {
         @include clearfix();
+
         padding: 0 ($baseline/2);
 
         .field {
@@ -327,7 +354,6 @@
       }
 
       .is-not-editable {
-
         input, textarea {
           padding: 0;
         }
@@ -378,6 +404,7 @@
 
         .title {
           @extend %t-copy-sub1;
+
           margin: 0 0 ($baseline/10) 0;
           padding: 0 ($baseline/2);
 
@@ -392,16 +419,18 @@
 
           .link-courseURL {
             @extend %t-copy-lead1;
+
             @include box-sizing(border-box);
+
             display: block;
             width: 100%;
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
-            color: $uxpl-blue-base;
+            color: theme-color("primary");
 
             &:hover {
-                color: $uxpl-blue-hover-active;
+              color: $uxpl-blue-hover-active;
             }
           }
         }
@@ -419,6 +448,7 @@
 
             .icon {
               @extend %t-icon5;
+
               display: inline-block;
               vertical-align: middle;
               margin-top: -3px;
@@ -430,7 +460,6 @@
 
     // specific fields - schedule
     &.schedule {
-
       .list-input {
         margin-bottom: ($baseline*1.5);
 
@@ -441,6 +470,7 @@
 
       .field-group {
         @include clearfix();
+
         border-bottom: 1px solid $gray-l5;
         padding-bottom: ($baseline/2);
 
@@ -450,7 +480,6 @@
         }
 
         .is-not-editable {
-
           input, textarea {
             padding: 10px;
           }
@@ -458,6 +487,7 @@
 
         .field {
           @include float(left);
+
           width: flex-grid(3, 9);
           margin-bottom: ($baseline/4);
           margin-right: flex-gutter();
@@ -469,6 +499,7 @@
           .tip {
             position: absolute;
             top: 0;
+
             @include right(0);
           }
         }
@@ -476,9 +507,10 @@
     }
 
     // specific fields - overview
-    #field-course-overview {
-
-      #course-overview {
+    #field-course-overview,
+    #field-course-about-sidebar-html {
+      #course-overview,
+      #course-about-sidebar-html {
         height: ($baseline*20);
       }
 
@@ -490,15 +522,16 @@
 
     // specific fields - video
     #field-course-introduction-video {
-
       .input-existing {
         @include box-sizing(border-box);
+
         border-radius: 3px;
         background: $gray-l5;
         padding: ($baseline/2);
 
         .actions {
           @include clearfix();
+
           margin-top: ($baseline/2);
           border-top: 1px solid $gray-l4;
           padding-top: ($baseline/2);
@@ -518,7 +551,6 @@
 
     // specific fields - course image
     #field-course-image, #field-banner-image, #field-video-thumbnail-image {
-
       .current-course-image {
         margin-bottom: ($baseline/2);
         padding: ($baseline/2) $baseline;
@@ -545,6 +577,7 @@
 
         .msg {
           @extend %t-copy-sub2;
+
           display: block;
           margin-top: ($baseline/2);
           color: $gray-d3;
@@ -553,18 +586,21 @@
 
       .wrapper-input {
         @include clearfix();
-        width: flex-grid(9,9);
+
+        width: flex-grid(9, 9);
 
         .input {
           float: left;
-          width: flex-grid(6,9);
+          width: flex-grid(6, 9);
           margin-right: flex-gutter();
         }
 
         .action-upload-image {
           @extend %ui-btn-flat-outline;
+
           @include float(right);
-          width: flex-grid(2,9);
+
+          width: flex-grid(2, 9);
           margin-top: ($baseline/4);
           padding: ($baseline/2) $baseline;
         }
@@ -573,7 +609,6 @@
 
     // specific fields - requirements
     &.requirements {
-
       #field-course-effort {
         width: flex-grid(3, 9);
       }
@@ -585,14 +620,16 @@
 
       .grade-controls {
         @include clearfix();
-        width: flex-grid(9,9);
+
+        width: flex-grid(9, 9);
       }
 
       .new-grade-button {
         @include box-sizing(border-box);
         @include linear-gradient(top, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0));
-        box-shadow: 0 1px 0 rgba(255, 255, 255, .3) inset;
-        width: flex-grid(1,9);
+
+        box-shadow: 0 1px 0 rgba(255, 255, 255, 0.3) inset;
+        width: flex-grid(1, 9);
         height: ($baseline*2);
         position: relative;
         display: inline-block;
@@ -615,7 +652,8 @@
 
       .grade-slider {
         @include box-sizing(border-box);
-        width: flex-grid(8,9);
+
+        width: flex-grid(8, 9);
         display: inline-block;
         vertical-align: middle;
 
@@ -630,6 +668,7 @@
 
             li {
               @include font-size(9);
+
               position: absolute;
               top: 52px;
               width: 30px;
@@ -710,6 +749,7 @@
 
               .remove-button {
                 @extend %t-action5;
+
                 display: none;
                 position: absolute;
                 top: -17px;
@@ -741,12 +781,14 @@
               .letter-grade {
                 @extend %t-copy-base;
                 @extend %t-strong;
+
                 display: block;
                 margin: 5px 15px 0 0;
               }
 
               .range {
                 @include font-size(10);
+
                 display: block;
                 margin-right: ($baseline*0.75);
                 line-height: 12px;
@@ -759,9 +801,9 @@
                 height: 50px;
                 width: 2px;
                 background-color: $white;
-                box-shadow: -1px 0 3px rgba(0,0,0,0.1);
-
+                box-shadow: -1px 0 3px rgba(0, 0, 0, 0.1);
                 cursor: ew-resize;
+
                 @include transition(none);
 
                 &:hover {
@@ -777,7 +819,6 @@
 
     // specific fields - grading rules
     &.grade-rules {
-
       #field-course-grading-graceperiod {
         width: flex-grid(3, 9);
       }
@@ -789,9 +830,7 @@
     }
 
     &.assignment-types {
-
       .list-input {
-
         &:last-child {
           margin-bottom: 0;
         }
@@ -799,6 +838,7 @@
 
       .field-group {
         @include clearfix();
+
         width: flex-grid(9, 9);
         margin-bottom: ($baseline*1.5);
         border-bottom: 1px solid $gray-l5;
@@ -842,12 +882,14 @@
     &.course-learning-info {
       .list-input {
         margin-bottom: $baseline;
+
         .course-settings-learning-fields {
           .field {
             .input-learning-info {
               width: flex-grid(10, 12);
               display: inline-block;
             }
+
             .delete-button {
               padding-bottom: 3px;
               line-height: 3.5rem;
@@ -874,19 +916,23 @@
         .course-instructor-details-fields {
           .field {
             width: flex-grid(2, 6);
+
             &.field-course-instructor-bio {
               width: flex-grid(6, 6);
             }
+
             &.current-instructor-image {
               width: flex-grid(6, 6);
               text-align: left;
               padding: 0;
+
               .wrapper-instructor-image {
                 margin: 15px auto;
               }
             }
           }
         }
+
         &:last-child {
           margin-bottom: 0;
         }
@@ -894,6 +940,7 @@
 
       .field-group {
         @include clearfix();
+
         width: flex-grid(9, 9);
         margin-bottom: ($baseline*1.5);
         border-bottom: 1px solid $gray-l5;
@@ -939,6 +986,7 @@
 
           .msg {
             @extend %t-copy-sub2;
+
             display: block;
             margin-top: ($baseline/2);
             color: $gray-l5;
@@ -947,18 +995,20 @@
 
         .wrapper-input {
           @include clearfix();
-          width: flex-grid(9,9);
+
+          width: flex-grid(9, 9);
 
           .input {
             float: left;
-            width: flex-grid(6,9);
+            width: flex-grid(6, 9);
             margin-right: flex-gutter();
           }
 
           .action-upload-instructor-image {
             @extend %ui-btn-flat-outline;
+
             float: right;
-            width: flex-grid(2,9);
+            width: flex-grid(2, 9);
             margin-top: ($baseline/4);
             padding: ($baseline/2) $baseline;
           }
@@ -981,13 +1031,13 @@
 
     // specific fields - advanced settings
     &.advanced-policies {
-
       .wrapper-options {
         margin: (-$baseline/2) 0 ($baseline/2) 0;
         text-align: right;
 
         .wrapper-deprecated-setting {
           @include transition(opacity $tmg-f2 ease-in-out 0s);
+
           opacity: .5;
           position: relative;
           display: inline-block;
@@ -1026,15 +1076,16 @@
 
       .course-advanced-policy-list-item {
         @include clearfix();
+
         position: relative;
 
         .title {
           @extend %t-strong;
+
           margin-top: ($baseline/2);
         }
 
         .field {
-
           input {
             width: 100%;
           }
@@ -1044,9 +1095,8 @@
           }
 
           input.error {
-
             & + .tip {
-              opacity: 0.0;
+              opacity: 0;
             }
           }
         }
@@ -1056,9 +1106,9 @@
           margin: 0 0 ($baseline/2) 0;
         }
 
-       .key {
-         width: flex-grid(3, 9);
-         margin-right: flex-gutter();
+        .key {
+          width: flex-grid(3, 9);
+          margin-right: flex-gutter();
         }
 
         .value {
@@ -1078,7 +1128,7 @@
           background-color: $pink-l5;
 
           .status {
-            color: $pink-l2;
+            color: $pink;
           }
         }
       }
@@ -1091,21 +1141,26 @@
       // specific to code mirror instance in JSON policy editing, need to sync up with other similar code mirror UIs
       .CodeMirror {
         @extend %t-copy-base;
+
         @include box-sizing(border-box);
+
         box-shadow: 0 1px 2px $shadow-l1 inset;
+
         @include linear-gradient($lightGrey, tint($lightGrey, 90%));
+
         padding: 5px 8px;
         border: 1px solid $mediumGrey;
         border-radius: 2px;
         background-color: $lightGrey;
         font-family: $f-monospace;
-        color: $baseFontColor;
+        color: $body-color;
         outline: 0;
         height: auto;
         min-height: ($baseline*2.25);
 
         &.CodeMirror-focused {
           @include linear-gradient($paleYellow, tint($paleYellow, 90%));
+
           outline: 0;
         }
 
@@ -1116,7 +1171,6 @@
         .CodeMirror-scroll {
           @include margin-left(-30px);
           @include margin-right(0);
-
           @include padding-left(30px);
           @include padding-right(0);
         }
@@ -1128,7 +1182,6 @@
 
         // editor color changes just for JSON
         .CodeMirror-lines {
-
           .cm-string {
             color: #cb9c40;
           }
@@ -1146,9 +1199,7 @@
   }
 
   .wrapper-modal-window {
-
     .validation-error-modal-content {
-
       .error-header {
         p {
           strong {
@@ -1195,7 +1246,9 @@
 
       .field-radio {
         display: inline-block;
+
         @include margin-right($baseline/4);
+
         width: auto;
         height: auto;
 

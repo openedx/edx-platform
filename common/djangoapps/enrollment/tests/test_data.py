@@ -6,20 +6,24 @@ import datetime
 import unittest
 
 import ddt
+from django.conf import settings
 from mock import patch
 from nose.tools import raises
 from pytz import UTC
-from django.conf import settings
 
 from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
 from enrollment import data
 from enrollment.errors import (
-    UserNotFoundError, CourseEnrollmentClosedError,
-    CourseEnrollmentFullError, CourseEnrollmentExistsError,
+    CourseEnrollmentClosedError,
+    CourseEnrollmentExistsError,
+    CourseEnrollmentFullError,
+    UserNotFoundError
 )
+from enrollment.serializers import CourseEnrollmentSerializer
 from openedx.core.lib.exceptions import CourseNotFoundError
-from student.tests.factories import UserFactory, CourseModeFactory
-from student.models import CourseEnrollment, EnrollmentClosedError, CourseFullError, AlreadyEnrolledError
+from student.models import AlreadyEnrolledError, CourseEnrollment, CourseFullError, EnrollmentClosedError
+from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -175,6 +179,51 @@ class EnrollmentDataTest(ModuleStoreTestCase):
         result = data.get_course_enrollment(self.user.username, unicode(self.course.id))
         self.assertEqual(self.user.username, result['user'])
         self.assertEqual(enrollment, result)
+
+    @ddt.data(
+        # Default (no course modes in the database)
+        # Expect that users are automatically enrolled as "honor".
+        ([], 'honor'),
+
+        # Audit / Verified / Honor
+        # We should always go to the "choose your course" page.
+        # We should also be enrolled as "honor" by default.
+        (['honor', 'verified', 'audit'], 'verified'),
+    )
+    @ddt.unpack
+    def test_get_user_enrollments(self, course_modes, enrollment_mode):
+        self._create_course_modes(course_modes)
+
+        # Try to get enrollments before they exist.
+        result = data.get_user_enrollments(self.course.id)
+        self.assertFalse(result.exists())
+
+        # Create 10 test users to enroll in the course
+        users = []
+        for i in xrange(10):
+            users.append(UserFactory.create(
+                username=self.USERNAME + str(i),
+                email=self.EMAIL + str(i),
+                password=self.PASSWORD + str(i)
+            ))
+
+        # Create the original enrollments.
+        created_enrollments = []
+        for user in users:
+            created_enrollments.append(data.create_course_enrollment(
+                user.username,
+                unicode(self.course.id),
+                enrollment_mode,
+                True
+            ))
+
+        # Compare the created enrollments with the results
+        # from the get user enrollments request.
+        results = data.get_user_enrollments(
+            self.course.id
+        )
+        self.assertTrue(result.exists())
+        self.assertEqual(CourseEnrollmentSerializer(results, many=True).data, created_enrollments)
 
     @ddt.data(
         # Default (no course modes in the database)

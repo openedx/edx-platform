@@ -13,14 +13,14 @@ describe('Tests for accessibility_tools.js', function() {
         };
 
         beforeEach(function() {
-            var focusedElementBeforeModal;
+            var $focusedElementBeforeModal;
             loadFixtures('js/fixtures/dashboard-fixture.html');
             accessible_modal('#trigger', '#close-modal', '#modalId', '#mainPageId');
             $('#trigger').click();
         });
 
         it('sets focusedElementBeforeModal to trigger', function() {
-            expect(focusedElementBeforeModal).toHaveAttr('id', 'trigger');
+            expect($focusedElementBeforeModal).toHaveAttr('id', 'trigger');
         });
 
         it('sets main page aria-hidden attr to true', function() {
@@ -124,5 +124,4 @@ describe('Tests for accessibility_tools.js', function() {
             );
         });
     });
-
 });

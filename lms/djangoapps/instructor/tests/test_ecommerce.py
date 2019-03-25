@@ -5,17 +5,17 @@ Unit tests for Ecommerce feature flag in new instructor dashboard.
 import datetime
 
 import pytz
-
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from nose.plugins.attrib import attr
+from six import text_type
 
 from course_modes.models import CourseMode
-from student.roles import CourseFinanceAdminRole
+from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from shoppingcart.models import Coupon, CourseRegistrationCode
+from student.roles import CourseFinanceAdminRole
 from student.tests.factories import AdminFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 
 
 @attr(shard=1)
@@ -29,8 +29,8 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         cls.course = CourseFactory.create()
 
         # URL for instructor dash
-        cls.url = reverse('instructor_dashboard', kwargs={'course_id': cls.course.id.to_deprecated_string()})
-        cls.e_commerce_link = '<button type="button" class="btn-link" data-section="e-commerce">E-Commerce</button>'
+        cls.url = reverse('instructor_dashboard', kwargs={'course_id': text_type(cls.course.id)})
+        cls.ecommerce_link = '<button type="button" class="btn-link e-commerce" data-section="e-commerce">E-Commerce</button>'
 
     def setUp(self):
         super(TestECommerceDashboardViews, self).setUp()
@@ -39,7 +39,7 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         self.instructor = AdminFactory.create()
         self.client.login(username=self.instructor.username, password="test")
         mode = CourseMode(
-            course_id=self.course.id.to_deprecated_string(), mode_slug='honor',
+            course_id=text_type(self.course.id), mode_slug='honor',
             mode_display_name='honor', min_price=10, currency='usd'
         )
         mode.save()
@@ -50,7 +50,7 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         Test Pass E-commerce Tab is in the Instructor Dashboard
         """
         response = self.client.get(self.url)
-        self.assertIn(self.e_commerce_link, response.content)
+        self.assertIn(self.ecommerce_link, response.content)
         # Coupons should show up for White Label sites with priced honor modes.
         self.assertIn('Coupon Code List', response.content)
 
@@ -61,7 +61,7 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         self.use_site(site=self.site_other)
         self.client.login(username=self.instructor.username, password="test")
         response = self.client.get(self.url)
-        self.assertIn(self.e_commerce_link, response.content)
+        self.assertIn(self.ecommerce_link, response.content)
         self.assertIn('Create Enrollment Report', response.content)
 
     def test_reports_section_not_under_e_commerce_tab(self):
@@ -70,12 +70,12 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         value
         """
         response = self.client.get(self.url)
-        self.assertIn(self.e_commerce_link, response.content)
+        self.assertIn(self.ecommerce_link, response.content)
         self.assertNotIn('Create Enrollment Report', response.content)
 
     def test_user_has_finance_admin_rights_in_e_commerce_tab(self):
         response = self.client.get(self.url)
-        self.assertIn(self.e_commerce_link, response.content)
+        self.assertIn(self.ecommerce_link, response.content)
 
         # Order/Invoice sales csv button text should render in e-commerce page
         self.assertIn('Total Credit Card Purchases', response.content)
@@ -86,7 +86,7 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         CourseFinanceAdminRole(self.course.id).remove_users(self.instructor)
 
         # Order/Invoice sales csv button text should not be visible in e-commerce page if the user is not finance admin
-        url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('instructor_dashboard', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(url)
         self.assertNotIn('Download All Invoices', response.content)
 
@@ -96,7 +96,7 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         the instructor dashboard
         """
         response = self.client.get(self.url)
-        self.assertIn(self.e_commerce_link, response.content)
+        self.assertIn(self.ecommerce_link, response.content)
 
         # Total amount html should render in e-commerce page, total amount will be 0
         course_honor_mode = CourseMode.mode_for_course(self.course.id, 'honor')
@@ -109,7 +109,7 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         CourseFinanceAdminRole(self.course.id).remove_users(self.instructor)
 
         # total amount should not be visible in e-commerce page if the user is not finance admin
-        url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('instructor_dashboard', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.get(url)
         self.assertNotIn('+ Set Price</a></span>', response.content)
 
@@ -118,20 +118,20 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         # course B
         course2 = CourseFactory.create(org='EDX', display_name='test_course', number='100')
         mode = CourseMode(
-            course_id=course2.id.to_deprecated_string(), mode_slug='honor',
+            course_id=text_type(course2.id), mode_slug='honor',
             mode_display_name='honor', min_price=30, currency='usd'
         )
         mode.save()
         # course A update
         CourseMode.objects.filter(course_id=self.course.id).update(min_price=price)
 
-        set_course_price_url = reverse('set_course_mode_price', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        set_course_price_url = reverse('set_course_mode_price', kwargs={'course_id': text_type(self.course.id)})
         data = {'course_price': price, 'currency': 'usd'}
         response = self.client.post(set_course_price_url, data)
         self.assertIn('CourseMode price updated successfully', response.content)
 
         # Course A updated total amount should be visible in e-commerce page if the user is finance admin
-        url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('instructor_dashboard', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.get(url)
 
         self.assertIn('Course price per seat: <span>$' + str(price) + '</span>', response.content)
@@ -141,7 +141,7 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         test to set the course price related functionality.
         test al the scenarios for setting a new course price
         """
-        set_course_price_url = reverse('set_course_mode_price', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        set_course_price_url = reverse('set_course_mode_price', kwargs={'course_id': text_type(self.course.id)})
         data = {'course_price': '12%', 'currency': 'usd'}
 
         # Value Error course price should be a numeric value
@@ -167,11 +167,11 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         Test Add Coupon Scenarios. Handle all the HttpResponses return by add_coupon view
         """
         # URL for add_coupon
-        add_coupon_url = reverse('add_coupon', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        add_coupon_url = reverse('add_coupon', kwargs={'course_id': text_type(self.course.id)})
         expiration_date = datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=2)
 
         data = {
-            'code': 'A2314', 'course_id': self.course.id.to_deprecated_string(),
+            'code': 'A2314', 'course_id': text_type(self.course.id),
             'description': 'ADSADASDSAD', 'created_by': self.instructor, 'discount': 5,
             'expiration_date': '{month}/{day}/{year}'.format(
                 month=expiration_date.month, day=expiration_date.day, year=expiration_date.year
@@ -186,7 +186,7 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         #now add the coupon with the wrong value in the expiration_date
         # server will through the ValueError Exception in the expiration_date field
         data = {
-            'code': '213454', 'course_id': self.course.id.to_deprecated_string(),
+            'code': '213454', 'course_id': text_type(self.course.id),
             'description': 'ADSADASDSAD', 'created_by': self.instructor, 'discount': 5,
             'expiration_date': expiration_date.strftime('"%d/%m/%Y')
         }
@@ -194,7 +194,7 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         self.assertIn("Please enter the date in this format i-e month/day/year", response.content)
 
         data = {
-            'code': 'A2314', 'course_id': self.course.id.to_deprecated_string(),
+            'code': 'A2314', 'course_id': text_type(self.course.id),
             'description': 'asdsasda', 'created_by': self.instructor, 'discount': 99
         }
         response = self.client.post(add_coupon_url, data)
@@ -206,7 +206,7 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         self.assertNotIn('<td>111</td>', response.content)
 
         data = {
-            'code': 'A2345314', 'course_id': self.course.id.to_deprecated_string(),
+            'code': 'A2345314', 'course_id': text_type(self.course.id),
             'description': 'asdsasda', 'created_by': self.instructor, 'discount': 199
         }
         response = self.client.post(add_coupon_url, data)
@@ -217,7 +217,7 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         self.assertIn('Please Enter the Integer Value for Coupon Discount', response.content)
 
         course_registration = CourseRegistrationCode(
-            code='Vs23Ws4j', course_id=unicode(self.course.id), created_by=self.instructor,
+            code='Vs23Ws4j', course_id=text_type(self.course.id), created_by=self.instructor,
             mode_slug='honor'
         )
         course_registration.save()
@@ -232,7 +232,7 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         Test Delete Coupon Scenarios. Handle all the HttpResponses return by remove_coupon view
         """
         coupon = Coupon(
-            code='AS452', description='asdsadsa', course_id=self.course.id.to_deprecated_string(),
+            code='AS452', description='asdsadsa', course_id=text_type(self.course.id),
             percentage_discount=10, created_by=self.instructor
         )
 
@@ -242,7 +242,7 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         self.assertIn('<td>AS452</td>', response.content)
 
         # URL for remove_coupon
-        delete_coupon_url = reverse('remove_coupon', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        delete_coupon_url = reverse('remove_coupon', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(delete_coupon_url, {'id': coupon.id})
         self.assertIn(
             'coupon with the coupon id ({coupon_id}) updated successfully'.format(coupon_id=coupon.id),
@@ -272,13 +272,13 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         Test Edit Coupon Info Scenarios. Handle all the HttpResponses return by edit_coupon_info view
         """
         coupon = Coupon(
-            code='AS452', description='asdsadsa', course_id=self.course.id.to_deprecated_string(),
+            code='AS452', description='asdsadsa', course_id=text_type(self.course.id),
             percentage_discount=10, created_by=self.instructor,
             expiration_date=datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=2)
         )
         coupon.save()
         # URL for edit_coupon_info
-        edit_url = reverse('get_coupon_info', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        edit_url = reverse('get_coupon_info', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(edit_url, {'id': coupon.id})
         self.assertIn(
             'coupon with the coupon id ({coupon_id}) updated successfully'.format(coupon_id=coupon.id),
@@ -309,7 +309,7 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         Test Update Coupon Info Scenarios. Handle all the HttpResponses return by update_coupon view
         """
         coupon = Coupon(
-            code='AS452', description='asdsadsa', course_id=self.course.id.to_deprecated_string(),
+            code='AS452', description='asdsadsa', course_id=text_type(self.course.id),
             percentage_discount=10, created_by=self.instructor
         )
         coupon.save()
@@ -317,10 +317,10 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         self.assertIn('<td>AS452</td>', response.content)
         data = {
             'coupon_id': coupon.id, 'code': 'AS452', 'discount': '10', 'description': 'updated_description',
-            'course_id': coupon.course_id.to_deprecated_string()
+            'course_id': text_type(coupon.course_id)
         }
         # URL for update_coupon
-        update_coupon_url = reverse('update_coupon', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        update_coupon_url = reverse('update_coupon', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(update_coupon_url, data=data)
         self.assertIn(
             'coupon with the coupon id ({coupon_id}) updated Successfully'.format(coupon_id=coupon.id),
@@ -351,6 +351,39 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
 
         # Get the response value, ensure the Coupon section is not included.
         response = self.client.get(self.url)
-        self.assertIn(self.e_commerce_link, response.content)
+        self.assertIn(self.ecommerce_link, response.content)
         # Coupons should show up for White Label sites with priced honor modes.
         self.assertNotIn('Coupons List', response.content)
+
+    def test_coupon_code_section_not_under_e_commerce_tab(self):
+        """
+        Test Coupon Creation UI, under E-commerce Tab, should not be available in the Instructor Dashboard with
+        e-commerce course
+        """
+        # Setup e-commerce course
+        CourseMode.objects.filter(course_id=self.course.id).update(sku='test_sku')
+
+        response = self.client.get(self.url)
+        self.assertIn(self.ecommerce_link, response.content)
+        self.assertNotIn('Coupon Code List', response.content)
+
+    def test_enrollment_codes_section_not_under_e_commerce_tab(self):
+        """
+        Test Enrollment Codes UI, under E-commerce Tab, should not be available in the Instructor Dashboard with
+        e-commerce course
+        """
+        # Setup e-commerce course
+        CourseMode.objects.filter(course_id=self.course.id).update(sku='test_sku')
+
+        response = self.client.get(self.url)
+        self.assertIn(self.ecommerce_link, response.content)
+        self.assertNotIn('<h3 class="hd hd-3">Enrollment Codes</h3>', response.content)
+
+    def test_enrollment_codes_section_visible_for_non_ecommerce_course(self):
+        """
+        Test Enrollment Codes UI, under E-commerce Tab, should be available in the Instructor Dashboard with non
+        e-commerce course
+        """
+        response = self.client.get(self.url)
+        self.assertIn(self.ecommerce_link, response.content)
+        self.assertIn('<h3 class="hd hd-3">Enrollment Codes</h3>', response.content)

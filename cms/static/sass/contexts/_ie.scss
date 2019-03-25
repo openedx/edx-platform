@@ -6,7 +6,6 @@
 
   // CASE: IE9 doesn't support css animations and negative positioning
   .wrapper-notification {
-
     &.is-shown {
       bottom: 0;
     }

@@ -3,15 +3,18 @@
 This test file will verify proper password policy enforcement, which is an option feature
 """
 import json
+from importlib import import_module
+
+from django.conf import settings
+from django.contrib.auth.models import AnonymousUser
+from django.urls import reverse
 from django.test import TestCase
 from django.test.client import RequestFactory
-from django.core.urlresolvers import reverse
-from django.contrib.auth.models import AnonymousUser
-from importlib import import_module
 from django.test.utils import override_settings
-from django.conf import settings
 from mock import patch
+
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from student.views import create_account
 
 
@@ -40,7 +43,7 @@ class TestPasswordPolicy(TestCase):
         obj = json.loads(response.content)
         self.assertEqual(
             obj['value'],
-            "Password: Invalid Length (must be 6 characters or more)",
+            "Enter a password with at least 6 characters.",
         )
 
     @override_settings(PASSWORD_MIN_LENGTH=6)
@@ -59,7 +62,7 @@ class TestPasswordPolicy(TestCase):
         obj = json.loads(response.content)
         self.assertEqual(
             obj['value'],
-            "Password: Invalid Length (must be 12 characters or fewer)",
+            "Enter a password with at most 12 characters.",
         )
 
     @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'UPPER': 3})
@@ -70,7 +73,7 @@ class TestPasswordPolicy(TestCase):
         obj = json.loads(response.content)
         self.assertEqual(
             obj['value'],
-            "Password: Must be more complex (must contain 3 or more uppercase characters)",
+            "Enter a password with at least 3 uppercase letters.",
         )
 
     @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'UPPER': 3})
@@ -89,7 +92,7 @@ class TestPasswordPolicy(TestCase):
         obj = json.loads(response.content)
         self.assertEqual(
             obj['value'],
-            "Password: Must be more complex (must contain 3 or more lowercase characters)",
+            "Enter a password with at least 3 lowercase letters.",
         )
 
     @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'LOWER': 3})
@@ -108,7 +111,7 @@ class TestPasswordPolicy(TestCase):
         obj = json.loads(response.content)
         self.assertEqual(
             obj['value'],
-            "Password: Must be more complex (must contain 3 or more digits)",
+            "Enter a password with at least 3 digits.",
         )
 
     @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'DIGITS': 3})
@@ -127,7 +130,7 @@ class TestPasswordPolicy(TestCase):
         obj = json.loads(response.content)
         self.assertEqual(
             obj['value'],
-            "Password: Must be more complex (must contain 3 or more punctuation characters)",
+            "Enter a password with at least 3 punctuation marks.",
         )
 
     @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'PUNCTUATION': 3})
@@ -146,12 +149,50 @@ class TestPasswordPolicy(TestCase):
         obj = json.loads(response.content)
         self.assertEqual(
             obj['value'],
-            "Password: Must be more complex (must contain 3 or more unique words)",
+            "Enter a password with at least 3 words.",
         )
 
     @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'WORDS': 3})
     def test_enough_wordss(self):
         self.url_params['password'] = u'this should pass'
+        response = self.client.post(self.url, self.url_params)
+        self.assertEqual(response.status_code, 200)
+        obj = json.loads(response.content)
+        self.assertTrue(obj['success'])
+
+    @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'NUMERIC': 3})
+    def test_not_enough_numeric_characters(self):
+        self.url_params['password'] = u'thishouldfail½2'
+        response = self.client.post(self.url, self.url_params)
+        self.assertEqual(response.status_code, 400)
+        obj = json.loads(response.content)
+        self.assertEqual(
+            obj['value'],
+            "Enter a password with at least 3 numbers.",
+        )
+
+    @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'NUMERIC': 3})
+    def test_enough_numeric_characters(self):
+        self.url_params['password'] = u'thisShouldPass½33'  # This unicode 1/2 should count as a numeric value here
+        response = self.client.post(self.url, self.url_params)
+        self.assertEqual(response.status_code, 200)
+        obj = json.loads(response.content)
+        self.assertTrue(obj['success'])
+
+    @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'ALPHABETIC': 3})
+    def test_not_enough_alphabetic_characters(self):
+        self.url_params['password'] = '123456ab'
+        response = self.client.post(self.url, self.url_params)
+        self.assertEqual(response.status_code, 400)
+        obj = json.loads(response.content)
+        self.assertEqual(
+            obj['value'],
+            "Enter a password with at least 3 letters.",
+        )
+
+    @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'ALPHABETIC': 3})
+    def test_enough_alphabetic_characters(self):
+        self.url_params['password'] = u'𝒯𝓗Ï𝓼𝒫å𝓼𝓼𝔼𝓼'
         response = self.client.post(self.url, self.url_params)
         self.assertEqual(response.status_code, 200)
         obj = json.loads(response.content)
@@ -170,12 +211,11 @@ class TestPasswordPolicy(TestCase):
         self.assertEqual(response.status_code, 400)
         obj = json.loads(response.content)
         errstring = (
-            "Password: Must be more complex ("
-            "must contain 3 or more uppercase characters, "
-            "must contain 3 or more digits, "
-            "must contain 3 or more punctuation characters, "
-            "must contain 3 or more unique words"
-            ")"
+            "Enter a password with at least "
+            "3 uppercase letters & "
+            "3 digits & "
+            "3 punctuation marks & "
+            "3 words."
         )
         self.assertEqual(obj['value'], errstring)
 
@@ -202,7 +242,7 @@ class TestPasswordPolicy(TestCase):
         obj = json.loads(response.content)
         self.assertEqual(
             obj['value'],
-            "Password: Too similar to a restricted dictionary word.",
+            "Password is too similar to a dictionary word.",
         )
 
     @override_settings(PASSWORD_DICTIONARY=['foo', 'bar'])
@@ -214,7 +254,7 @@ class TestPasswordPolicy(TestCase):
         obj = json.loads(response.content)
         self.assertEqual(
             obj['value'],
-            "Password: Too similar to a restricted dictionary word.",
+            "Password is too similar to a dictionary word.",
         )
 
     @override_settings(PASSWORD_DICTIONARY=['foo', 'bar'])
@@ -226,7 +266,7 @@ class TestPasswordPolicy(TestCase):
         obj = json.loads(response.content)
         self.assertEqual(
             obj['value'],
-            "Password: Too similar to a restricted dictionary word.",
+            "Password is too similar to a dictionary word.",
         )
 
     @override_settings(PASSWORD_DICTIONARY=['foo', 'bar'])
@@ -252,6 +292,7 @@ class TestPasswordPolicy(TestCase):
         """
         self.url_params['password'] = 'aaa'  # shouldn't pass validation
         request = self.request_factory.post(self.url, self.url_params)
+        request.site = SiteFactory.create()
         # now indicate we are doing ext_auth by setting 'ExternalAuthMap' in the session.
         request.session = import_module(settings.SESSION_ENGINE).SessionStore()  # empty session
         extauth = ExternalAuthMap(external_id='withmap@stanford.edu',
@@ -292,7 +333,7 @@ class TestUsernamePasswordNonmatch(TestCase):
         obj = json.loads(response.content)
         self.assertEqual(
             obj['value'],
-            "Username and password fields cannot match",
+            "Password cannot be the same as the username.",
         )
 
     def test_with_username_password_nonmatch(self):

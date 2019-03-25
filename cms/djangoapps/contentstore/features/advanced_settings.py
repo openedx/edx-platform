@@ -1,9 +1,10 @@
 # pylint: disable=missing-docstring
 # pylint: disable=redefined-outer-name
 
-from lettuce import world, step
-from nose.tools import assert_false, assert_equal, assert_regexp_matches
-from common import type_in_codemirror, press_the_notification_button, get_codemirror_value
+from lettuce import step, world
+from nose.tools import assert_equal, assert_false, assert_regexp_matches
+
+from common import get_codemirror_value, press_the_notification_button, type_in_codemirror
 
 KEY_CSS = '.key h3.title'
 DISPLAY_NAME_KEY = "Course Display Name"
@@ -16,17 +17,26 @@ DEPRECATED_SETTINGS = ["CSS Class for Course Reruns", "Hide Progress Tab", "XQA 
 @step('I select the Advanced Settings$')
 def i_select_advanced_settings(step):
 
-    world.click_course_settings()
+    world.wait_for_js_to_load()  # pylint: disable=no-member
+    world.wait_for_js_variable_truthy('window.studioNavMenuActive')  # pylint: disable=no-member
 
-    # The click handlers are set up so that if you click <body>
-    # the menu disappears.  This means that if we're even a *little*
-    # bit off on the last item ('Advanced Settings'), the menu
-    # will close and the test will fail.
-    # For this reason, we retrieve the link and visit it directly
-    # This is what the browser *should* be doing, since it's just a native
-    # link with no JavaScript involved.
-    link_css = 'li.nav-course-settings-advanced a'
-    world.wait_for_visible(link_css)
+    for _ in range(5):
+        world.click_course_settings()  # pylint: disable=no-member
+
+        # The click handlers are set up so that if you click <body>
+        # the menu disappears.  This means that if we're even a *little*
+        # bit off on the last item ('Advanced Settings'), the menu
+        # will close and the test will fail.
+        # For this reason, we retrieve the link and visit it directly
+        # This is what the browser *should* be doing, since it's just a native
+        # link with no JavaScript involved.
+        link_css = 'li.nav-course-settings-advanced a'
+        try:
+            world.wait_for_visible(link_css)  # pylint: disable=no-member
+            break
+        except AssertionError:
+            continue
+
     link = world.css_find(link_css).first['href']
     world.visit(link)
 
@@ -55,23 +65,6 @@ def create_JSON_object(step, key):
 @step('I create a non-JSON value not in quotes$')
 def create_value_not_in_quotes(step):
     change_display_name_value(step, 'quote me')
-
-
-@step('I see default advanced settings$')
-def i_see_default_advanced_settings(step):
-    # Test only a few of the existing properties (there are around 34 of them)
-    assert_policy_entries(
-        [ADVANCED_MODULES_KEY, DISPLAY_NAME_KEY, "Show Calculator"], ["[]", DISPLAY_NAME_VALUE, "false"])
-
-
-@step('the settings are alphabetized$')
-def they_are_alphabetized(step):
-    key_elements = world.css_find(KEY_CSS)
-    all_keys = []
-    for key in key_elements:
-        all_keys.append(key.value)
-
-    assert_equal(sorted(all_keys), all_keys, "policy keys were not sorted")
 
 
 @step('it is displayed as formatted$')

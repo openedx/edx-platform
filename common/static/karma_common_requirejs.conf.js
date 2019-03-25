@@ -16,7 +16,6 @@ var options = {
     },
 
     libraryFiles: [
-        {pattern: 'coffee/src/**/*.js'},
         {pattern: 'js/libs/**/*.js'},
         {pattern: 'js/test/**/*.js'},
         {pattern: 'js/vendor/**/*.js'}

@@ -6,7 +6,7 @@
             DiscussionSpecHelper.setUpGlobals();
             DiscussionSpecHelper.setUnderscoreFixtures();
             this.thread = new Thread({
-                'thread_type': 'discussion'
+                thread_type: 'discussion'
             });
             this.response = new Comment({
                 children: [{}, {}],
@@ -24,8 +24,8 @@
             checkCommentForm = function(closed) {
                 var comment, commentData, thread, view;
                 thread = new Thread({
-                    'thread_type': 'discussion',
-                    'closed': closed
+                    thread_type: 'discussion',
+                    closed: closed
                 });
                 commentData = {
                     id: 'dummy',
@@ -51,6 +51,13 @@
             });
             it('show comment form when thread is open', function() {
                 return checkCommentForm(false);
+            });
+        });
+        describe('submitComment', function() {
+            it('focus should be in response container after a new comment is posted', function() {
+                this.view.render();
+                expect(this.view.$('.comments')).toBeVisible();
+                expect(document.activeElement === this.view.$('.forum-response')[0]);
             });
         });
         describe('renderComments', function() {

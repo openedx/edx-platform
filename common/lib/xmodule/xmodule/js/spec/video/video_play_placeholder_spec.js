@@ -55,7 +55,7 @@
             expect(btnPlay).not.toHaveClass('is-hidden');
             expect(btnPlay).toHaveAttrs({
                 'aria-hidden': 'false',
-                'tabindex': '0'
+                tabindex: '0'
             });
 
             state.videoPlayPlaceholder.hide();
@@ -63,7 +63,7 @@
             expect(btnPlay).toHaveClass('is-hidden');
             expect(btnPlay).toHaveAttrs({
                 'aria-hidden': 'true',
-                'tabindex': '-1'
+                tabindex: '-1'
             });
         });
 
@@ -93,8 +93,7 @@
             it(
                 'is shown on paused video on ' + device +
                 ' in HTML5 player',
-                function()
-            {
+                function() {
                     var btnPlay;
 
                     window.onTouchBasedDevice.and.returnValue([device]);
@@ -109,8 +108,7 @@
             it(
                 'is hidden on playing video on ' + device +
                 ' in HTML5 player',
-                function()
-            {
+                function() {
                     var btnPlay;
 
                     window.onTouchBasedDevice.and.returnValue([device]);
@@ -124,8 +122,7 @@
             it(
                 'is hidden on paused video on ' + device +
                 ' in YouTube player',
-                function()
-            {
+                function() {
                     var btnPlay;
 
                     window.onTouchBasedDevice.and.returnValue([device]);

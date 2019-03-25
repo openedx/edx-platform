@@ -1,19 +1,29 @@
 """
 Django storage backends for Open edX.
 """
-from django_pipeline_forgiving.storages import PipelineForgivingStorage
 from django.contrib.staticfiles.storage import StaticFilesStorage
 from django.core.files.storage import get_storage_class
 from django.utils.lru_cache import lru_cache
-
-from pipeline.storage import NonPackagingMixin
+from pipeline.storage import NonPackagingMixin, PipelineCachedStorage
 from require.storage import OptimizedFilesMixin
-from openedx.core.djangoapps.theming.storage import (
-    ThemeStorage,
-    ThemeCachedFilesMixin,
-    ThemePipelineMixin
-)
 from storages.backends.s3boto import S3BotoStorage
+
+from openedx.core.djangoapps.theming.storage import ThemeCachedFilesMixin, ThemePipelineMixin, ThemeStorage
+
+
+class PipelineForgivingStorage(PipelineCachedStorage):
+    """
+    An extension of the django-pipeline storage backend which forgives missing files.
+    """
+    def hashed_name(self, name, content=None, **kwargs):
+        try:
+            out = super(PipelineForgivingStorage, self).hashed_name(name, content, **kwargs)
+        except ValueError:
+            # This means that a file could not be found, and normally this would
+            # cause a fatal error, which seems rather excessive given that
+            # some packages have missing files in their css all the time.
+            out = name
+        return out
 
 
 class ProductionStorage(

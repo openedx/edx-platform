@@ -5,10 +5,8 @@ from contextlib import closing
 import datetime
 from nose.plugins.attrib import attr
 from pytz import UTC
-import unittest
 
-from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import HttpResponse
 
 import ddt
@@ -24,6 +22,7 @@ from openedx.core.djangoapps.user_api.accounts.image_helpers import (
     get_profile_image_names,
     get_profile_image_storage,
 )
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 from ..images import create_profile_images, ImageValidationError
 from ..views import LOG_MESSAGE_CREATE, LOG_MESSAGE_DELETE
@@ -34,40 +33,6 @@ TEST_UPLOAD_DT = datetime.datetime(2002, 1, 9, 15, 43, 01, tzinfo=UTC)
 TEST_UPLOAD_DT2 = datetime.datetime(2003, 1, 9, 15, 43, 01, tzinfo=UTC)
 
 
-class PatchedClient(APIClient):
-    """
-    Patch DRF's APIClient to avoid a unicode error on file upload.
-
-    Famous last words: This is a *temporary* fix that we should be
-    able to remove once we upgrade Django past 1.4.
-    """
-
-    def request(self, *args, **kwargs):
-        """Construct an API request. """
-        # DRF's default test client implementation uses `six.text_type()`
-        # to convert the CONTENT_TYPE to `unicode`.  In Django 1.4,
-        # this causes a `UnicodeDecodeError` when Django parses a multipart
-        # upload.
-        #
-        # This is the DRF code we're working around:
-        #   https://github.com/tomchristie/django-rest-framework/blob/3.1.3/rest_framework/compat.py#L227
-        #
-        # ... and this is the Django code that raises the exception:
-        #
-        #   https://github.com/django/django/blob/1.4.22/django/http/multipartparser.py#L435
-        #
-        # Django unhelpfully swallows the exception, so to the application code
-        # it appears as though the user didn't send any file data.
-        #
-        # This appears to be an issue only with requests constructed in the test
-        # suite, not with the upload code used in production.
-        #
-        if isinstance(kwargs.get("CONTENT_TYPE"), basestring):
-            kwargs["CONTENT_TYPE"] = str(kwargs["CONTENT_TYPE"])
-
-        return super(PatchedClient, self).request(*args, **kwargs)
-
-
 class ProfileImageEndpointMixin(UserSettingsEventTestMixin):
     """
     Base class / shared infrastructure for tests of profile_image "upload" and
@@ -76,7 +41,6 @@ class ProfileImageEndpointMixin(UserSettingsEventTestMixin):
     # subclasses should override this with the name of the view under test, as
     # per the urls.py configuration.
     _view_name = None
-    client_class = PatchedClient
 
     def setUp(self):
         super(ProfileImageEndpointMixin, self).setUp()
@@ -153,7 +117,7 @@ class ProfileImageEndpointMixin(UserSettingsEventTestMixin):
 
 
 @attr(shard=2)
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Profile Image API is only supported in LMS')
+@skip_unless_lms
 @mock.patch('openedx.core.djangoapps.profile_images.views.log')
 class ProfileImageViewGeneralTestCase(ProfileImageEndpointMixin, APITestCase):
     """
@@ -174,7 +138,7 @@ class ProfileImageViewGeneralTestCase(ProfileImageEndpointMixin, APITestCase):
 
 @attr(shard=2)
 @ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Profile Image API is only supported in LMS')
+@skip_unless_lms
 @mock.patch('openedx.core.djangoapps.profile_images.views.log')
 class ProfileImageViewPostTestCase(ProfileImageEndpointMixin, APITestCase):
     """
@@ -279,6 +243,18 @@ class ProfileImageViewPostTestCase(ProfileImageEndpointMixin, APITestCase):
         self.assertFalse(mock_log.info.called)
         self.assert_no_events_were_emitted()
 
+    def test_upload_nonexistent_user(self, mock_log):
+        """
+        Test that an authenticated user who POSTs to a non-existent user's upload
+        endpoint gets an indistinguishable 403.
+        """
+        nonexistent_user_url = reverse(self._view_name, kwargs={'username': 'nonexistent'})
+
+        with make_image_file() as image_file:
+            response = self.client.post(nonexistent_user_url, {'file': image_file}, format='multipart')
+            self.check_response(response, 403)
+        self.assertFalse(mock_log.info.called)
+
     def test_upload_other(self, mock_log):
         """
         Test that an authenticated user cannot POST to another user's upload
@@ -291,7 +267,7 @@ class ProfileImageViewPostTestCase(ProfileImageEndpointMixin, APITestCase):
         different_client.login(username=different_user.username, password=TEST_PASSWORD)
         with make_image_file() as image_file:
             response = different_client.post(self.url, {'file': image_file}, format='multipart')
-            self.check_response(response, 404)
+            self.check_response(response, 403)
             self.check_images(False)
             self.check_has_profile_image(False)
         self.assertFalse(mock_log.info.called)
@@ -384,7 +360,7 @@ class ProfileImageViewPostTestCase(ProfileImageEndpointMixin, APITestCase):
 
 
 @attr(shard=2)
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Profile Image API is only supported in LMS')
+@skip_unless_lms
 @mock.patch('openedx.core.djangoapps.profile_images.views.log')
 class ProfileImageViewDeleteTestCase(ProfileImageEndpointMixin, APITestCase):
     """
@@ -443,7 +419,7 @@ class ProfileImageViewDeleteTestCase(ProfileImageEndpointMixin, APITestCase):
         different_client = APIClient()
         different_client.login(username=different_user.username, password=TEST_PASSWORD)
         response = different_client.delete(self.url)
-        self.check_response(response, 404)
+        self.check_response(response, 403)
         self.check_images(True)  # thumbnails should remain intact.
         self.check_has_profile_image(True)
         self.assertFalse(mock_log.info.called)
@@ -515,7 +491,7 @@ class DeprecatedProfileImageTestMixin(ProfileImageEndpointMixin):
 
 
 @attr(shard=2)
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Profile Image API is only supported in LMS')
+@skip_unless_lms
 @mock.patch('openedx.core.djangoapps.profile_images.views.log')
 class DeprecatedProfileImageUploadTestCase(DeprecatedProfileImageTestMixin, APITestCase):
     """
@@ -528,7 +504,7 @@ class DeprecatedProfileImageUploadTestCase(DeprecatedProfileImageTestMixin, APIT
 
 
 @attr(shard=2)
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Profile Image API is only supported in LMS')
+@skip_unless_lms
 @mock.patch('openedx.core.djangoapps.profile_images.views.log')
 class DeprecatedProfileImageRemoveTestCase(DeprecatedProfileImageTestMixin, APITestCase):
     """

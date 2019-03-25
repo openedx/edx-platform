@@ -7,6 +7,7 @@ from tempfile import mkdtemp
 from shutil import rmtree
 from unittest import TestCase, skip
 import ddt
+from django.test import TestCase
 
 from xmodule.modulestore.xml_importer import import_course_from_xml
 from xmodule.modulestore.xml_exporter import export_course_to_xml
@@ -27,6 +28,7 @@ class CountMongoCallsXMLRoundtrip(TestCase):
     """
     This class exists to test XML import and export to/from Split.
     """
+    shard = 2
 
     def setUp(self):
         super(CountMongoCallsXMLRoundtrip, self).setUp()
@@ -87,6 +89,7 @@ class CountMongoCallsCourseTraversal(TestCase):
     Tests the number of Mongo calls made when traversing a course tree from the top course root
     to the leaf nodes.
     """
+    shard = 2
 
     def _traverse_blocks_in_course(self, course, access_all_block_fields):
         """
@@ -153,9 +156,9 @@ class CountMongoCallsCourseTraversal(TestCase):
         (MIXED_SPLIT_MODULESTORE_BUILDER, 0, False, True, 38),
         (MIXED_SPLIT_MODULESTORE_BUILDER, 0, True, True, 38),
         (MIXED_SPLIT_MODULESTORE_BUILDER, None, False, False, 4),
-        (MIXED_SPLIT_MODULESTORE_BUILDER, None, True, False, 4),
-        (MIXED_SPLIT_MODULESTORE_BUILDER, 0, False, False, 4),
-        (MIXED_SPLIT_MODULESTORE_BUILDER, 0, True, False, 4)
+        (MIXED_SPLIT_MODULESTORE_BUILDER, None, True, False, 3),
+        (MIXED_SPLIT_MODULESTORE_BUILDER, 0, False, False, 3),
+        (MIXED_SPLIT_MODULESTORE_BUILDER, 0, True, False, 3)
     )
     @ddt.unpack
     def test_number_mongo_calls(self, store_builder, depth, lazy, access_all_block_fields, num_mongo_calls):

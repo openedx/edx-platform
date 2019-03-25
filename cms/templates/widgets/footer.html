@@ -1,6 +1,10 @@
 <%!
 from django.utils.translation import ugettext as _
-from django.core.urlresolvers import reverse
+from django.urls import reverse
+from datetime import datetime
+from django.conf import settings
+import pytz
+from cms.djangoapps.contentstore.config.waffle import waffle, ENABLE_ACCESSIBILITY_POLICY_PAGE
 %>
 
 <div class="wrapper-footer wrapper">
@@ -8,11 +12,10 @@ from django.core.urlresolvers import reverse
 
     <div class="footer-content-primary">
       <div class="colophon">
-        <p>&copy; ${settings.COPYRIGHT_YEAR} <a data-rel="edx.org" href="${marketing_link('ROOT')}" rel="external">${settings.PLATFORM_NAME}</a>.</p>
+        <p>&copy; ${datetime.now(pytz.timezone(settings.TIME_ZONE)).year} <a data-rel="edx.org" href="${marketing_link('ROOT')}" rel="external">${settings.PLATFORM_NAME}</a>.</p>
       </div>
 
-      % if is_any_marketing_link_set(['TOS', 'PRIVACY']):
-        <nav class="nav-peripheral">
+        <nav class="nav-peripheral" aria-label="${_("Policies")}">
           <ol>
             % if is_marketing_link_set('TOS'):
               <li class="nav-item nav-peripheral-tos">
@@ -24,12 +27,19 @@ from django.core.urlresolvers import reverse
                 <a data-rel="edx.org" href="${marketing_link('PRIVACY')}">${_("Privacy Policy")}</a>
               </li>
             % endif
+            % if waffle().is_enabled(ENABLE_ACCESSIBILITY_POLICY_PAGE):
+              <li class="nav-item nav-peripheral-aar">
+                <a data-rel="edx.org" href="${reverse('accessibility')}">${_("Accessibility Accommodation Request")}</a>
+              </li>
+            %endif
+            <li class="nav-item">
+              <a data-rel="edx.org" id="lms-link" href="${settings.LMS_ROOT_URL}">${_("LMS")}</a>
+            </li>
           </ol>
         </nav>
-      % endif
     </div>
 
-    <div class="footer-content-secondary" aria-label="{_('Legal')}">
+    <div class="footer-content-secondary" aria-label="${_("Legal")}">
       <div class="footer-about-copyright">
         ## Site operators: Please do not remove this paragraph! This attributes back to edX and makes your acknowledgement of edX's trademarks clear.
         <p>

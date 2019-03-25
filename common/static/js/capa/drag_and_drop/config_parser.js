@@ -4,14 +4,14 @@
 
         function configParser(state, config) {
             state.config = {
-                'draggables': [],
-                'baseImage': '',
-                'targets': [],
-                'onePerTarget': null, // Specified by user. No default.
-                'targetOutline': true,
-                'labelBgColor': '#d6d6d6',
-                'individualTargets': null, // Depends on 'targets'.
-                'foundErrors': false // Whether or not we find errors while processing the config.
+                draggables: [],
+                baseImage: '',
+                targets: [],
+                onePerTarget: null, // Specified by user. No default.
+                targetOutline: true,
+                labelBgColor: '#d6d6d6',
+                individualTargets: null, // Depends on 'targets'.
+                foundErrors: false // Whether or not we find errors while processing the config.
             };
 
             getDraggables(state, config);

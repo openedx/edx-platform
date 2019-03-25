@@ -306,7 +306,7 @@ var edx = edx || {};
 
                     // This method assumes that all items in the order are related to a single course.
                     if (attributeValues != undefined) {
-                        return attributeValues['value'];
+                        return attributeValues.value;
                     }
                 }
             } else {
@@ -342,7 +342,7 @@ var edx = edx || {};
 
                 // This method assumes that all items in the order are related to a single course.
                 if (attributeValues != undefined) {
-                    return attributeValues['value'];
+                    return attributeValues.value;
                 }
             }
 

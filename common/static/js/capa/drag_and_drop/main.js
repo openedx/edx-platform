@@ -1,10 +1,10 @@
 (function(requirejs, require, define) {
     define(
-    ['js/capa/drag_and_drop/state',
-     'js/capa/drag_and_drop/config_parser', 'js/capa/drag_and_drop/container',
-     'js/capa/drag_and_drop/base_image', 'js/capa/drag_and_drop/scroller',
-     'js/capa/drag_and_drop/draggables', 'js/capa/drag_and_drop/targets',
-     'js/capa/drag_and_drop/update_input'],
+        ['js/capa/drag_and_drop/state',
+            'js/capa/drag_and_drop/config_parser', 'js/capa/drag_and_drop/container',
+            'js/capa/drag_and_drop/base_image', 'js/capa/drag_and_drop/scroller',
+            'js/capa/drag_and_drop/draggables', 'js/capa/drag_and_drop/targets',
+            'js/capa/drag_and_drop/update_input'],
     function(State, configParser, Container, BaseImage, Scroller, Draggables, Targets, updateInput) {
         return Main;
 
@@ -23,7 +23,7 @@
 
                     t = Object(this);
                     len = t.length >>> 0;
-                    if (typeof fun != 'function') {
+                    if (typeof fun !== 'function') {
                         throw new TypeError();
                     }
 

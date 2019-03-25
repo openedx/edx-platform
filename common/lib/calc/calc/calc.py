@@ -5,17 +5,36 @@ Uses pyparsing to parse. Main function as of now is evaluator().
 """
 
 import math
-import operator
 import numbers
+import operator
+
 import numpy
 import scipy.constants
-import functions
-
 from pyparsing import (
-    Word, Literal, CaselessLiteral, ZeroOrMore, MatchFirst, Optional, Forward,
-    Group, ParseResults, stringEnd, Suppress, Combine, alphas, nums, alphanums
+    CaselessLiteral,
+    Combine,
+    Forward,
+    Group,
+    Literal,
+    MatchFirst,
+    Optional,
+    ParseResults,
+    Suppress,
+    Word,
+    ZeroOrMore,
+    alphanums,
+    alphas,
+    nums,
+    stringEnd
 )
 
+import functions
+
+# Functions available by default
+# We use scimath variants which give complex results when needed. For example:
+#   np.sqrt(-4+0j) = 2j
+#   np.sqrt(-4) = nan, but
+#   np.lib.scimath.sqrt(-4) = 2j
 DEFAULT_FUNCTIONS = {
     'sin': numpy.sin,
     'cos': numpy.cos,
@@ -23,13 +42,13 @@ DEFAULT_FUNCTIONS = {
     'sec': functions.sec,
     'csc': functions.csc,
     'cot': functions.cot,
-    'sqrt': numpy.sqrt,
-    'log10': numpy.log10,
-    'log2': numpy.log2,
-    'ln': numpy.log,
+    'sqrt': numpy.lib.scimath.sqrt,
+    'log10': numpy.lib.scimath.log10,
+    'log2': numpy.lib.scimath.log2,
+    'ln': numpy.lib.scimath.log,
     'exp': numpy.exp,
-    'arccos': numpy.arccos,
-    'arcsin': numpy.arcsin,
+    'arccos': numpy.lib.scimath.arccos,
+    'arcsin': numpy.lib.scimath.arcsin,
     'arctan': numpy.arctan,
     'arcsec': functions.arcsec,
     'arccsc': functions.arccsc,
@@ -45,37 +64,34 @@ DEFAULT_FUNCTIONS = {
     'coth': functions.coth,
     'arcsinh': numpy.arcsinh,
     'arccosh': numpy.arccosh,
-    'arctanh': numpy.arctanh,
+    'arctanh': numpy.lib.scimath.arctanh,
     'arcsech': functions.arcsech,
     'arccsch': functions.arccsch,
     'arccoth': functions.arccoth
 }
+
 DEFAULT_VARIABLES = {
     'i': numpy.complex(0, 1),
     'j': numpy.complex(0, 1),
     'e': numpy.e,
     'pi': numpy.pi,
-    'k': scipy.constants.k,  # Boltzmann: 1.3806488e-23 (Joules/Kelvin)
-    'c': scipy.constants.c,  # Light Speed: 2.998e8 (m/s)
-    'T': 298.15,  # Typical room temperature: 298.15 (Kelvin), same as 25C/77F
-    'q': scipy.constants.e  # Fund. Charge: 1.602176565e-19 (Coulombs)
 }
 
-# We eliminated the following extreme suffixes:
-#   P (1e15), E (1e18), Z (1e21), Y (1e24),
-#   f (1e-15), a (1e-18), z (1e-21), y (1e-24)
-# since they're rarely used, and potentially confusing.
-# They may also conflict with variables if we ever allow e.g.
-#   5R instead of 5*R
 SUFFIXES = {
-    '%': 0.01, 'k': 1e3, 'M': 1e6, 'G': 1e9, 'T': 1e12,
-    'c': 1e-2, 'm': 1e-3, 'u': 1e-6, 'n': 1e-9, 'p': 1e-12
+    '%': 0.01,
 }
 
 
 class UndefinedVariable(Exception):
     """
     Indicate when a student inputs a variable which was not expected.
+    """
+    pass
+
+
+class UnmatchedParenthesis(Exception):
+    """
+    Indicate when a student inputs a formula with mismatched parentheses.
     """
     pass
 
@@ -229,6 +245,7 @@ def evaluator(variables, functions, math_expr, case_sensitive=False):
         return float('nan')
 
     # Parse the tree.
+    check_parens(math_expr)
     math_interpreter = ParseAugmenter(math_expr, case_sensitive)
     math_interpreter.parse_algebra()
 
@@ -256,6 +273,30 @@ def evaluator(variables, functions, math_expr, case_sensitive=False):
     }
 
     return math_interpreter.reduce_tree(evaluate_actions)
+
+
+def check_parens(formula):
+    """
+    Check that any open parentheses are closed
+
+    Otherwise, raise an UnmatchedParenthesis exception
+    """
+    count = 0
+    delta = {
+        '(': +1,
+        ')': -1
+    }
+    for index, char in enumerate(formula):
+        if char in delta:
+            count += delta[char]
+            if count < 0:
+                msg = "Invalid Input: A closing parenthesis was found after segment " + \
+                      "{}, but there is no matching opening parenthesis before it."
+                raise UnmatchedParenthesis(msg.format(formula[0:index]))
+    if count > 0:
+        msg = "Invalid Input: Parentheses are unmatched. " + \
+              "{} parentheses were opened but never closed."
+        raise UnmatchedParenthesis(msg.format(count))
 
 
 class ParseAugmenter(object):
@@ -329,10 +370,19 @@ class ParseAugmenter(object):
         # Predefine recursive variables.
         expr = Forward()
 
-        # Handle variables passed in. They must start with letters/underscores
-        # and may contain numbers afterward.
-        inner_varname = Word(alphas + "_", alphanums + "_")
-        varname = Group(inner_varname)("variable")
+        # Handle variables passed in. They must start with a letter
+        # and may contain numbers and underscores afterward.
+        inner_varname = Combine(Word(alphas, alphanums + "_") + ZeroOrMore("'"))
+        # Alternative variable name in tensor format
+        # Tensor name must start with a letter, continue with alphanums
+        # Indices may be alphanumeric
+        # e.g., U_{ijk}^{123}
+        upper_indices = Literal("^{") + Word(alphanums) + Literal("}")
+        lower_indices = Literal("_{") + Word(alphanums) + Literal("}")
+        tensor_lower = Combine(Word(alphas, alphanums) + lower_indices + ZeroOrMore("'"))
+        tensor_mixed = Combine(Word(alphas, alphanums) + Optional(lower_indices) + upper_indices + ZeroOrMore("'"))
+        # Test for mixed tensor first, then lower tensor alone, then generic variable name
+        varname = Group(tensor_mixed | tensor_lower | inner_varname)("variable")
         varname.setParseAction(self.variable_parse_action)
 
         # Same thing for functions.

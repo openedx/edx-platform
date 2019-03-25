@@ -15,6 +15,7 @@
 
 %status-value-sub1 {
   @extend %t-title8;
+
   display: block;
 }
 
@@ -24,13 +25,11 @@
   @extend %two-col-1;
 
   .wrapper-mast {
-
     .mast {
       border-bottom: none;
       padding-bottom: 0;
 
       .page-header {
-
         .page-header-title {
           @extend %t-title4;
           @extend %t-strong;
@@ -41,8 +40,10 @@
           // TOOD: abstract this out into a Sass placeholder
           .incontext-editor-input {
             @include transition(box-shadow $tmg-f1 ease-in-out 0, color $tmg-f1 ease-in-out 0);
+
             @extend %t-title4;
             @extend %t-strong;
+
             width: 100%;
             background: none repeat scroll 0 0 $white;
             border: 0;
@@ -50,20 +51,28 @@
 
             // STATE: focus
             &:focus {
-              box-shadow: 0 0 2px 2px rgba($ui-action-primary-color-focus, 0.50) inset;
+              box-shadow: 0 0 2px 2px rgba($ui-action-primary-color-focus, 0.5) inset;
               color: $ui-action-primary-color-focus;
             }
           }
         }
+
+        .container-access {
+          @include font-size(14);
+
+          line-height: 1.5;
+          white-space: normal;
+          color: #707070;
+          font-weight: font-weight(semi-bold);
+        }
       }
 
       &.has-actions {
-
         .nav-actions {
-
           .button {
             @extend %t-action3;
             @extend %t-regular;
+
             padding: ($baseline/4) ($baseline*0.75);
           }
         }
@@ -72,9 +81,9 @@
   }
 
   .content-primary {
-
     .no-container-content {
       @extend %no-content;
+
       padding: ($baseline*1.5) ($baseline*2);
 
       // custom rules to reuse xblock validation styling in ui-well context
@@ -84,7 +93,6 @@
     }
 
     .container-message {
-
       .message {
         border-radius: 3px 3px 0 0;
       }
@@ -92,7 +100,6 @@
 
     // dragging bits
     .ui-sortable-helper {
-
       article {
         display: none;
       }
@@ -110,7 +117,6 @@
   }
 
   .content-supplementary {
-
     label {
       @extend %t-title8;
     }
@@ -164,7 +170,6 @@
       }
 
       .wrapper-last-draft {
-
         .date,
         .user {
           @extend %t-strong;
@@ -176,7 +181,6 @@
       }
 
       .wrapper-release {
-
         .release-date {
           @extend %status-value-base;
         }
@@ -187,9 +191,9 @@
       }
 
       .wrapper-visibility {
-
         .copy {
           @extend %status-value-base;
+
           margin-bottom: ($baseline/10);
         }
 
@@ -218,12 +222,14 @@
 
         .action-publish {
           @extend %btn-primary-blue;
+
           display: block;
           padding: ($baseline/4) ($baseline/2) ($baseline/3) ($baseline/2);
         }
 
         .action-discard {
           @extend %t-copy-sub1;
+
           display: block;
           margin-top: ($baseline/2);
           text-align: right;
@@ -238,7 +244,6 @@
 
     // versioning widget
     .unit-publish-history {
-
       .wrapper-last-publish {
         margin-bottom: $baseline;
         padding: ($baseline*0.75);
@@ -246,7 +251,8 @@
 
         .copy {
           @extend %t-copy-sub2;
-          color: $gray;
+
+          color: $gray-d2;
         }
 
         .date,
@@ -263,18 +269,20 @@
     // location widget
     .unit-location, .library-location {
       @extend %bar-module;
+
       border-top: none;
 
       .wrapper-unit-id, .wrapper-library-id {
-
         .unit-id-value, .library-id-value {
           @extend %status-value-base;
+
           display: inline-block;
           width: 100%;
         }
 
         .tip {
           @extend %t-copy-sub2;
+
           display: inline-block;
           margin: ($baseline/4) 0;
           color: $gray-d1;
@@ -282,12 +290,11 @@
       }
 
       .wrapper-unit-tree-location {
-
         .item-title {
           @extend %cont-text-wrap;
 
           a {
-            color: $blue;
+            color: theme-color("primary");
 
             &:hover {
               color: $orange-d1;
@@ -302,6 +309,7 @@
           .unit-title a {
             @extend %ui-disabled;
             @extend %t-strong;
+
             color: $color-heading-base;
           }
         }
@@ -329,5 +337,120 @@
         }
       }
     }
+  }
+}
+
+
+.move-xblock-modal {
+  button {
+    background: transparent;
+    border-color: transparent;
+    padding: 0;
+    border: none;
+  }
+
+  .breadcrumb-container {
+    margin-bottom: ($baseline/4);
+    border: 1px solid $btn-lms-border;
+    padding: ($baseline/2);
+    background: $color-background-alternate;
+
+    .breadcrumbs {
+      .bc-container {
+        @include font-size(14);
+
+        display: inline-block;
+
+        .breadcrumb-fa-icon {
+          padding: 0 ($baseline/4);
+
+          @include rtl {
+            @include transform(rotate(180deg));
+          }
+        }
+
+        &.last {
+          .parent-displayname {
+            @include font-size(18);
+          }
+        }
+      }
+
+      .bc-container:not(.last) {
+        button, .parent-displayname {
+          text-decoration: underline;
+          color: $ui-link-color;
+        }
+      }
+    }
+  }
+
+  .category-text {
+    @include margin-left($baseline/2);
+    @include font-size(14);
+
+    color: $black;
+  }
+
+  .xblock-items-container {
+    max-height: ($baseline*15);
+    overflow-y: auto;
+
+    .xblock-item {
+      & > * {
+        width: 100%;
+        color: $uxpl-blue-hover-active;
+      }
+
+      .component {
+        display: inline-block;
+        color: $black;
+        padding: ($baseline/4) ($baseline/2);
+      }
+
+      .xblock-displayname {
+        @include float(left);
+      }
+
+      .button-forward, .component {
+        border: none;
+      }
+
+      .button-forward {
+        padding: ($baseline/2);
+
+        .forward-sr-icon {
+          @include float(right);
+
+          @include rtl {
+            @include transform(rotate(180deg));
+          }
+        }
+
+        &:hover,
+        &:focus {
+          background: $color-background-alternate;
+        }
+      }
+    }
+
+    .xblock-no-child-message {
+      @include text-align(center);
+
+      display: block;
+      padding: ($baseline*2);
+    }
+  }
+
+  .truncate {
+    max-width: 90%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .current-location {
+    @include float(left);
+    @include margin-left($baseline);
   }
 }

@@ -1,13 +1,13 @@
 """
 Utility methods useful for Studio page tests.
 """
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.common.keys import Keys
 from bok_choy.javascript import js_defined
 from bok_choy.promise import EmptyPromise
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
 
-from common.test.acceptance.pages.common.utils import click_css, wait_for_notification
-
+from common.test.acceptance.pages.common.utils import click_css, sync_on_notification
+from common.test.acceptance.tests.helpers import click_and_wait_for_window
 
 NAV_HELP_NOT_SIGNED_IN_CSS = '.nav-item.nav-not-signedin-help a'
 NAV_HELP_CSS = '.nav-item.nav-account-help a'
@@ -103,7 +103,7 @@ def add_component(page, item_type, specific_type, is_advanced_problem=False):
         all_options = page.q(css='.new-component-{} ul.new-component-template li button span'.format(item_type))
         chosen_option = all_options.filter(text=specific_type).first
         chosen_option.click()
-    wait_for_notification(page)
+    sync_on_notification(page)
     page.wait_for_ajax()
 
 
@@ -219,7 +219,7 @@ def drag(page, source_index, target_index, placeholder_height=0):
         action.release(target).perform()
     else:
         action.release().perform()
-    wait_for_notification(page)
+    sync_on_notification(page)
 
 
 def verify_ordering(test_class, page, expected_orderings):
@@ -289,8 +289,9 @@ class HelpMixin(object):
         else:
             element_css = NAV_HELP_NOT_SIGNED_IN_CSS
 
-        self.q(css=element_css).first.click()
-        return self.q(css=element_css).results[0]
+        help_element = self.q(css=element_css).results[0]
+        click_and_wait_for_window(self, help_element)
+        return help_element
 
     def get_side_bar_help_element_and_click_help(self, as_list_item=False, index=-1):
         """
@@ -314,5 +315,5 @@ class HelpMixin(object):
             element_css = SIDE_BAR_HELP_CSS
 
         help_element = self.q(css=element_css).results[index]
-        help_element.click()
+        click_and_wait_for_window(self, help_element)
         return help_element

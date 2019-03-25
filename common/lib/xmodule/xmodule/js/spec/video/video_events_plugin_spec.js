@@ -1,15 +1,13 @@
+import '../helper.js'
+
 (function(undefined) {
     'use strict';
-    describe('VideoPlayer Events plugin', function() {
-        var state, oldOTBD, Logger = window.Logger;
+    var describeInfo, state, oldOTBD;
+
+    describeInfo = new jasmine.DescribeInfo('', function() {
+        var Logger = window.Logger;
 
         beforeEach(function() {
-            oldOTBD = window.onTouchBasedDevice;
-            window.onTouchBasedDevice = jasmine
-                .createSpy('onTouchBasedDevice')
-                .and.returnValue(null);
-
-            state = jasmine.initializePlayer();
             spyOn(Logger, 'log');
             spyOn(state.videoEventsPlugin, 'getCurrentTime').and.returnValue(10);
         });
@@ -27,7 +25,8 @@
             state.el.trigger('ready');
             expect(Logger.log).toHaveBeenCalledWith('load_video', {
                 id: 'id',
-                code: 'html5'
+                code: this.code,
+                duration: this.duration
             });
         });
 
@@ -36,8 +35,9 @@
             state.el.trigger('play');
             expect(Logger.log).toHaveBeenCalledWith('play_video', {
                 id: 'id',
-                code: 'html5',
-                currentTime: 10
+                code: this.code,
+                currentTime: 10,
+                duration: this.duration
             });
             expect(state.videoEventsPlugin.emitPlayVideoEvent).toBeFalsy();
         });
@@ -52,8 +52,9 @@
             state.el.trigger('pause');
             expect(Logger.log).toHaveBeenCalledWith('pause_video', {
                 id: 'id',
-                code: 'html5',
-                currentTime: 10
+                code: this.code,
+                currentTime: 10,
+                duration: this.duration
             });
             expect(state.videoEventsPlugin.emitPlayVideoEvent).toBeTruthy();
         });
@@ -62,10 +63,11 @@
             state.el.trigger('speedchange', ['2.0', '1.0']);
             expect(Logger.log).toHaveBeenCalledWith('speed_change_video', {
                 id: 'id',
-                code: 'html5',
+                code: this.code,
                 current_time: 10,
                 old_speed: '1.0',
-                new_speed: '2.0'
+                new_speed: '2.0',
+                duration: this.duration
             });
         });
 
@@ -73,10 +75,11 @@
             state.el.trigger('seek', [1, 0, 'any']);
             expect(Logger.log).toHaveBeenCalledWith('seek_video', {
                 id: 'id',
-                code: 'html5',
+                code: this.code,
                 old_time: 0,
                 new_time: 1,
-                type: 'any'
+                type: 'any',
+                duration: this.duration
             });
             expect(state.videoEventsPlugin.emitPlayVideoEvent).toBeTruthy();
         });
@@ -91,8 +94,9 @@
             state.el.trigger('ended');
             expect(Logger.log).toHaveBeenCalledWith('stop_video', {
                 id: 'id',
-                code: 'html5',
-                currentTime: 10
+                code: this.code,
+                currentTime: 10,
+                duration: this.duration
             });
             expect(state.videoEventsPlugin.emitPlayVideoEvent).toBeTruthy();
 
@@ -100,8 +104,9 @@
             state.el.trigger('stop');
             expect(Logger.log).toHaveBeenCalledWith('stop_video', {
                 id: 'id',
-                code: 'html5',
-                currentTime: 10
+                code: this.code,
+                currentTime: 10,
+                duration: this.duration
             });
             expect(state.videoEventsPlugin.emitPlayVideoEvent).toBeTruthy();
         });
@@ -110,8 +115,9 @@
             state.el.trigger('skip', [false]);
             expect(Logger.log).toHaveBeenCalledWith('skip_video', {
                 id: 'id',
-                code: 'html5',
-                currentTime: 10
+                code: this.code,
+                currentTime: 10,
+                duration: this.duration
             });
         });
 
@@ -119,8 +125,9 @@
             state.el.trigger('skip', [true]);
             expect(Logger.log).toHaveBeenCalledWith('do_not_show_again_video', {
                 id: 'id',
-                code: 'html5',
-                currentTime: 10
+                code: this.code,
+                currentTime: 10,
+                duration: this.duration
             });
         });
 
@@ -128,7 +135,8 @@
             state.el.trigger('language_menu:show');
             expect(Logger.log).toHaveBeenCalledWith('edx.video.language_menu.shown', {
                 id: 'id',
-                code: 'html5'
+                code: this.code,
+                duration: this.duration
             });
         });
 
@@ -136,8 +144,9 @@
             state.el.trigger('language_menu:hide');
             expect(Logger.log).toHaveBeenCalledWith('edx.video.language_menu.hidden', {
                 id: 'id',
-                code: 'html5',
-                language: 'en'
+                code: this.code,
+                language: 'en',
+                duration: this.duration
             });
         });
 
@@ -145,8 +154,9 @@
             state.el.trigger('transcript:show');
             expect(Logger.log).toHaveBeenCalledWith('show_transcript', {
                 id: 'id',
-                code: 'html5',
-                current_time: 10
+                code: this.code,
+                current_time: 10,
+                duration: this.duration
             });
         });
 
@@ -154,8 +164,9 @@
             state.el.trigger('transcript:hide');
             expect(Logger.log).toHaveBeenCalledWith('hide_transcript', {
                 id: 'id',
-                code: 'html5',
-                current_time: 10
+                code: this.code,
+                current_time: 10,
+                duration: this.duration
             });
         });
 
@@ -163,8 +174,9 @@
             state.el.trigger('captions:show');
             expect(Logger.log).toHaveBeenCalledWith('edx.video.closed_captions.shown', {
                 id: 'id',
-                code: 'html5',
-                current_time: 10
+                code: this.code,
+                current_time: 10,
+                duration: this.duration
             });
         });
 
@@ -172,8 +184,9 @@
             state.el.trigger('captions:hide');
             expect(Logger.log).toHaveBeenCalledWith('edx.video.closed_captions.hidden', {
                 id: 'id',
-                code: 'html5',
-                current_time: 10
+                code: this.code,
+                current_time: 10,
+                duration: this.duration
             });
         });
 
@@ -183,21 +196,51 @@
             state.videoEventsPlugin.destroy();
             expect(state.videoEventsPlugin).toBeUndefined();
             expect($.fn.off).toHaveBeenCalledWith({
-                'ready': plugin.onReady,
-                'play': plugin.onPlay,
-                'pause': plugin.onPause,
+                ready: plugin.onReady,
+                play: plugin.onPlay,
+                pause: plugin.onPause,
                 'ended stop': plugin.onEnded,
-                'seek': plugin.onSeek,
-                'skip': plugin.onSkip,
-                'speedchange': plugin.onSpeedChange,
+                seek: plugin.onSeek,
+                skip: plugin.onSkip,
+                speedchange: plugin.onSpeedChange,
+                autoadvancechange: plugin.onAutoAdvanceChange,
                 'language_menu:show': plugin.onShowLanguageMenu,
                 'language_menu:hide': plugin.onHideLanguageMenu,
                 'transcript:show': plugin.onShowTranscript,
                 'transcript:hide': plugin.onHideTranscript,
                 'captions:show': plugin.onShowCaptions,
                 'captions:hide': plugin.onHideCaptions,
-                'destroy': plugin.destroy
+                destroy: plugin.destroy
             });
+        });
+    });
+
+    describe('VideoPlayer Events plugin', function() {
+        beforeEach(function() {
+            oldOTBD = window.onTouchBasedDevice;
+            window.onTouchBasedDevice = jasmine
+                .createSpy('onTouchBasedDevice')
+                .and.returnValue(null);
+        });
+
+        describe('html5 encoding only', function() {
+            beforeEach(function(done) {
+                this.code = 'html5';
+                this.duration = 111;
+                state = jasmine.initializePlayer('video_html5.html');
+                done();
+            });
+            jasmine.getEnv().describe(describeInfo.description, describeInfo.specDefinitions);
+        });
+
+        describe('hls encoding', function() {
+            beforeEach(function(done) {
+                this.code = 'hls';
+                this.duration = 111;
+                state = jasmine.initializeHLSPlayer();
+                done();
+            });
+            jasmine.getEnv().describe(describeInfo.description, describeInfo.specDefinitions);
         });
     });
 }).call(this);

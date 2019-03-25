@@ -2,11 +2,13 @@
 Tests for Version Based App Upgrade Middleware
 """
 from datetime import datetime
+
 import ddt
+import mock
 from django.core.cache import caches
 from django.http import HttpRequest, HttpResponse
-import mock
 from pytz import UTC
+
 from mobile_api.middleware import AppVersionUpgrade
 from mobile_api.models import AppVersionConfig
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
@@ -17,6 +19,7 @@ class TestAppVersionUpgradeMiddleware(CacheIsolationTestCase):
     """
     Tests for version based app upgrade middleware
     """
+    shard = 4
 
     ENABLED_CACHES = ['default']
 

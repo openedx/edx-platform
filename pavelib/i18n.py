@@ -3,13 +3,14 @@ Internationalization tasks
 """
 
 import re
-import sys
 import subprocess
+import sys
 
 from path import Path as path
-from paver.easy import task, cmdopts, needs, sh
+from paver.easy import cmdopts, needs, sh, task
 
 from .utils.cmd import django_cmd
+from .utils.envs import Env
 from .utils.timer import timed
 
 try:
@@ -17,14 +18,13 @@ try:
 except ImportError:
     colorize = lambda color, text: text
 
-DEFAULT_SETTINGS = 'devstack'
+DEFAULT_SETTINGS = Env.DEVSTACK_SETTINGS
 
 
 @task
 @needs(
     "pavelib.prereqs.install_prereqs",
     "pavelib.i18n.i18n_validate_gettext",
-    "pavelib.assets.compile_coffeescript",
 )
 @cmdopts([
     ("verbose", "v", "Sets 'verbose' to True"),
@@ -314,7 +314,7 @@ def find_release_resources():
     if len(resources) == 2:
         return resources
 
-    if len(resources) == 0:
+    if not resources:
         raise ValueError("You need two release-* resources defined to use this command.")
     else:
         msg = "Strange Transifex config! Found these release-* resources:\n" + "\n".join(resources)

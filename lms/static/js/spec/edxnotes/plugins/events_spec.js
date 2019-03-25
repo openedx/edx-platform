@@ -43,7 +43,7 @@ define([
             ]);
             expect(Logger.log).toHaveBeenCalledWith(
                 'edx.course.student_notes.viewed', {
-                    'notes': [{'note_id': 'note-123'}, {'note_id': 'note-789'}]
+                    notes: [{note_id: 'note-123'}, {note_id: 'note-789'}]
                 }
             );
         });
@@ -68,12 +68,12 @@ define([
             AjaxHelpers.respondWithJson(requests, note);
             expect(Logger.log).toHaveBeenCalledWith(
                 'edx.course.student_notes.added', {
-                    'note_id': 'note-123',
-                    'note_text': 'text-123',
-                    'tags': ['tag1', 'tag2'],
-                    'highlighted_content': 'quote-123',
-                    'truncated': [],
-                    'component_usage_id': 'usage-123'
+                    note_id: 'note-123',
+                    note_text: 'text-123',
+                    tags: ['tag1', 'tag2'],
+                    highlighted_content: 'quote-123',
+                    truncated: [],
+                    component_usage_id: 'usage-123'
                 }
             );
         });
@@ -89,14 +89,14 @@ define([
 
             expect(Logger.log).toHaveBeenCalledWith(
                 'edx.course.student_notes.edited', {
-                    'note_id': 'note-123',
-                    'old_note_text': 'text-123',
-                    'note_text': 'text-456',
-                    'old_tags': ['tag1', 'tag2'],
-                    'tags': [],
-                    'highlighted_content': 'quote-123',
-                    'truncated': [],
-                    'component_usage_id': 'usage-123'
+                    note_id: 'note-123',
+                    old_note_text: 'text-123',
+                    note_text: 'text-456',
+                    old_tags: ['tag1', 'tag2'],
+                    tags: [],
+                    highlighted_content: 'quote-123',
+                    truncated: [],
+                    component_usage_id: 'usage-123'
                 }
             );
             expect(this.annotator.plugins.Events.oldNoteText).toBeNull();
@@ -118,12 +118,12 @@ define([
             this.annotator.publish('annotationDeleted', note);
             expect(Logger.log).toHaveBeenCalledWith(
                 'edx.course.student_notes.deleted', {
-                    'note_id': 'note-123',
-                    'note_text': 'text-123',
-                    'tags': ['tag1', 'tag2'],
-                    'highlighted_content': 'quote-123',
-                    'truncated': [],
-                    'component_usage_id': 'usage-123'
+                    note_id: 'note-123',
+                    note_text: 'text-123',
+                    tags: ['tag1', 'tag2'],
+                    highlighted_content: 'quote-123',
+                    truncated: [],
+                    component_usage_id: 'usage-123'
                 }
             );
         });
@@ -148,14 +148,14 @@ define([
 
             expect(Logger.log).toHaveBeenCalledWith(
                 'edx.course.student_notes.edited', {
-                    'note_id': 'note-123',
-                    'old_note_text': Helpers.TRUNCATED_TEXT,
-                    'old_tags': ['review'],
-                    'tags': ['short', 'tags', 'will', 'stay'],
-                    'note_text': Helpers.TRUNCATED_TEXT,
-                    'highlighted_content': Helpers.TRUNCATED_TEXT,
-                    'truncated': ['note_text', 'highlighted_content', 'tags', 'old_note_text', 'old_tags'],
-                    'component_usage_id': 'usage-123'
+                    note_id: 'note-123',
+                    old_note_text: Helpers.TRUNCATED_TEXT,
+                    old_tags: ['review'],
+                    tags: ['short', 'tags', 'will', 'stay'],
+                    note_text: Helpers.TRUNCATED_TEXT,
+                    highlighted_content: Helpers.TRUNCATED_TEXT,
+                    truncated: ['note_text', 'highlighted_content', 'tags', 'old_note_text', 'old_tags'],
+                    component_usage_id: 'usage-123'
                 }
             );
             expect(this.annotator.plugins.Events.oldNoteText).toBeNull();

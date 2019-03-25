@@ -3,7 +3,7 @@
 <%namespace file='main.html' import="login_query"/>
 <%!
 from django.utils.translation import ugettext as _
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils import html
 from django_countries import countries
 from student.models import UserProfile
@@ -85,7 +85,7 @@ import calendar
         $submitButton.
           removeClass('is-disabled').
           attr('aria-disabled', false).
-          removeProp('disabled').
+          prop('disabled', false).
           html("${_('Create My {platform_name} Account').format(platform_name=platform_name)}");
       }
       else {

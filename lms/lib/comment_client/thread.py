@@ -1,10 +1,11 @@
 import logging
 
-from eventtracking import tracker
-from .utils import merge_dict, strip_blank, strip_none, extract, perform_request, CommentClientPaginatedResult
-from .utils import CommentClientRequestError
-import models
 import settings
+
+import models
+from eventtracking import tracker
+
+import utils
 
 log = logging.getLogger(__name__)
 
@@ -49,18 +50,22 @@ class Thread(models.Model):
         # either the 'search' or 'get_all' actions below.  Both already use
         # with_responses=False internally in the comment service, so no additional
         # optimization is required.
-        default_params = {'page': 1,
-                          'per_page': 20,
-                          'course_id': query_params['course_id']}
-        params = merge_dict(default_params, strip_blank(strip_none(query_params)))
+        params = {
+            'page': 1,
+            'per_page': 20,
+            'course_id': query_params['course_id'],
+        }
+        params.update(
+            utils.strip_blank(utils.strip_none(query_params))
+        )
 
         if query_params.get('text'):
             url = cls.url(action='search')
         else:
-            url = cls.url(action='get_all', params=extract(params, 'commentable_id'))
+            url = cls.url(action='get_all', params=utils.extract(params, 'commentable_id'))
             if params.get('commentable_id'):
                 del params['commentable_id']
-        response = perform_request(
+        response = utils.perform_request(
             'get',
             url,
             params,
@@ -98,7 +103,7 @@ class Thread(models.Model):
                 )
             )
 
-        return CommentClientPaginatedResult(
+        return utils.CommentClientPaginatedResult(
             collection=response.get('collection', []),
             page=response.get('page', 1),
             num_pages=response.get('num_pages', 1),
@@ -140,9 +145,9 @@ class Thread(models.Model):
             'resp_skip': kwargs.get('response_skip'),
             'resp_limit': kwargs.get('response_limit'),
         }
-        request_params = strip_none(request_params)
+        request_params = utils.strip_none(request_params)
 
-        response = perform_request(
+        response = utils.perform_request(
             'get',
             url,
             request_params,
@@ -157,9 +162,9 @@ class Thread(models.Model):
         elif voteable.type == 'comment':
             url = _url_for_flag_comment(voteable.id)
         else:
-            raise CommentClientRequestError("Can only flag/unflag threads or comments")
+            raise utils.CommentClientRequestError("Can only flag/unflag threads or comments")
         params = {'user_id': user.id}
-        response = perform_request(
+        response = utils.perform_request(
             'put',
             url,
             params,
@@ -174,13 +179,13 @@ class Thread(models.Model):
         elif voteable.type == 'comment':
             url = _url_for_unflag_comment(voteable.id)
         else:
-            raise CommentClientRequestError("Can only flag/unflag for threads or comments")
+            raise utils.CommentClientRequestError("Can only flag/unflag for threads or comments")
         params = {'user_id': user.id}
         #if you're an admin, when you unflag, remove ALL flags
         if removeAll:
             params['all'] = True
 
-        response = perform_request(
+        response = utils.perform_request(
             'put',
             url,
             params,
@@ -192,7 +197,7 @@ class Thread(models.Model):
     def pin(self, user, thread_id):
         url = _url_for_pin_thread(thread_id)
         params = {'user_id': user.id}
-        response = perform_request(
+        response = utils.perform_request(
             'put',
             url,
             params,
@@ -204,7 +209,7 @@ class Thread(models.Model):
     def un_pin(self, user, thread_id):
         url = _url_for_un_pin_thread(thread_id)
         params = {'user_id': user.id}
-        response = perform_request(
+        response = utils.perform_request(
             'put',
             url,
             params,

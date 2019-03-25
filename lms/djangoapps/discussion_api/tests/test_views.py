@@ -1,37 +1,42 @@
 """
 Tests for Discussion API views
 """
-from datetime import datetime
+from __future__ import unicode_literals
+
 import json
+from datetime import datetime
 from urlparse import urlparse
 
 import ddt
 import httpretty
 import mock
+from django.urls import reverse
 from nose.plugins.attrib import attr
-from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_storage
 from pytz import UTC
-
-from django.core.urlresolvers import reverse
 from rest_framework.parsers import JSONParser
-
 from rest_framework.test import APIClient
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
+from six import text_type
 
 from common.test.utils import disable_signal
 from discussion_api import api
 from discussion_api.tests.utils import (
     CommentsServiceMockMixin,
+    ProfileImageTestMixin,
     make_minimal_cs_comment,
     make_minimal_cs_thread,
-    make_paginated_api_response,
-    ProfileImageTestMixin)
+    make_paginated_api_response
+)
 from django_comment_client.tests.utils import ForumsEnableMixin
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from util.testing import UrlResetMixin, PatchMediaTypeMixin
+from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_storage
+from openedx.core.djangoapps.user_api.models import RetirementState, UserRetirementStatus
+from openedx.core.lib.token_utils import JwtBuilder
+from student.models import get_retired_username_by_username
+from student.tests.factories import CourseEnrollmentFactory, UserFactory, SuperuserFactory
+from util.testing import PatchMediaTypeMixin, UrlResetMixin
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
 
 class DiscussionAPIViewTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMixin):
@@ -76,7 +81,7 @@ class DiscussionAPIViewTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, Ur
         """
         cs_thread = make_minimal_cs_thread({
             "id": "test_thread",
-            "course_id": unicode(self.course.id),
+            "course_id": text_type(self.course.id),
             "commentable_id": "test_topic",
             "username": self.user.username,
             "user_id": str(self.user.id),
@@ -94,7 +99,7 @@ class DiscussionAPIViewTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, Ur
         """
         cs_comment = make_minimal_cs_comment({
             "id": "test_comment",
-            "course_id": unicode(self.course.id),
+            "course_id": text_type(self.course.id),
             "thread_id": "test_thread",
             "username": self.user.username,
             "user_id": str(self.user.id),
@@ -119,12 +124,13 @@ class DiscussionAPIViewTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, Ur
         self.test_basic()
 
 
+@attr(shard=8)
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for CourseView"""
     def setUp(self):
         super(CourseViewTest, self).setUp()
-        self.url = reverse("discussion_course", kwargs={"course_id": unicode(self.course.id)})
+        self.url = reverse("discussion_course", kwargs={"course_id": text_type(self.course.id)})
 
     def test_404(self):
         response = self.client.get(
@@ -142,7 +148,7 @@ class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             response,
             200,
             {
-                "id": unicode(self.course.id),
+                "id": text_type(self.course.id),
                 "blackouts": [],
                 "thread_list_url": "http://testserver/api/discussion/v1/threads/?course_id=x%2Fy%2Fz",
                 "following_thread_list_url": (
@@ -153,6 +159,80 @@ class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         )
 
 
+@attr(shard=8)
+@httpretty.activate
+@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+class RetireViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
+    """Tests for CourseView"""
+    def setUp(self):
+        super(RetireViewTest, self).setUp()
+        RetirementState.objects.create(state_name='PENDING', state_execution_order=1)
+        self.retire_forums_state = RetirementState.objects.create(state_name='RETIRE_FORUMS', state_execution_order=11)
+
+        self.retirement = UserRetirementStatus.create_retirement(self.user)
+        self.retirement.current_state = self.retire_forums_state
+        self.retirement.save()
+
+        self.superuser = SuperuserFactory()
+        self.retired_username = get_retired_username_by_username(self.user.username)
+        self.url = reverse("retire_discussion_user")
+
+    def assert_response_correct(self, response, expected_status, expected_content):
+        """
+        Assert that the response has the given status code and content
+        """
+        self.assertEqual(response.status_code, expected_status)
+
+        if expected_content:
+            self.assertEqual(text_type(response.content), expected_content)
+
+    def build_jwt_headers(self, user):
+        """
+        Helper function for creating headers for the JWT authentication.
+        """
+        token = JwtBuilder(user).build_token([])
+        headers = {'HTTP_AUTHORIZATION': 'JWT ' + token}
+        return headers
+
+    def test_basic(self):
+        """
+        Check successful retirement case
+        """
+        self.register_get_user_retire_response(self.user)
+        headers = self.build_jwt_headers(self.superuser)
+        data = {'username': self.user.username}
+        response = self.client.post(self.url, data, **headers)
+        self.assert_response_correct(response, 204, "")
+
+    def test_downstream_forums_error(self):
+        """
+        Check that we bubble up errors from the comments service
+        """
+        self.register_get_user_retire_response(self.user, status=500, body="Server error")
+        headers = self.build_jwt_headers(self.superuser)
+        data = {'username': self.user.username}
+        response = self.client.post(self.url, data, **headers)
+        self.assert_response_correct(response, 500, '"Server error"')
+
+    def test_nonexistent_user(self):
+        """
+        Check that we handle unknown users appropriately
+        """
+        nonexistent_username = "nonexistent user"
+        self.retired_username = get_retired_username_by_username(nonexistent_username)
+        data = {'username': nonexistent_username}
+        headers = self.build_jwt_headers(self.superuser)
+        response = self.client.post(self.url, data, **headers)
+        self.assert_response_correct(response, 404, None)
+
+    def test_not_authenticated(self):
+        """
+        Override the parent implementation of this, we JWT auth for this API
+        """
+        pass
+
+
+@attr(shard=8)
 @ddt.ddt
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
@@ -161,7 +241,7 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """
     def setUp(self):
         super(CourseTopicsViewTest, self).setUp()
-        self.url = reverse("course_topics", kwargs={"course_id": unicode(self.course.id)})
+        self.url = reverse("course_topics", kwargs={"course_id": text_type(self.course.id)})
 
     def create_course(self, modules_count, module_store, topics):
         """
@@ -176,7 +256,7 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             discussion_topics=topics
         )
         CourseEnrollmentFactory.create(user=self.user, course_id=course.id)
-        course_url = reverse("course_topics", kwargs={"course_id": unicode(course.id)})
+        course_url = reverse("course_topics", kwargs={"course_id": text_type(course.id)})
         # add some discussion xblocks
         for i in range(modules_count):
             ItemFactory.create(
@@ -307,7 +387,7 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         )
 
 
-@attr(shard=3)
+@attr(shard=8)
 @ddt.ddt
 @httpretty.activate
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -324,7 +404,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
         """
         thread = make_minimal_cs_thread({
             "id": "test_thread",
-            "course_id": unicode(self.course.id),
+            "course_id": text_type(self.course.id),
             "commentable_id": "test_topic",
             "user_id": str(self.user.id),
             "username": self.user.username,
@@ -349,7 +429,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
         )
 
     def test_404(self):
-        response = self.client.get(self.url, {"course_id": unicode("non/existent/course")})
+        response = self.client.get(self.url, {"course_id": text_type("non/existent/course")})
         self.assert_response_correct(
             response,
             404,
@@ -372,12 +452,12 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
             "editable_fields": ["abuse_flagged", "following", "read", "voted"],
         })]
         self.register_get_threads_response(source_threads, page=1, num_pages=2)
-        response = self.client.get(self.url, {"course_id": unicode(self.course.id), "following": ""})
+        response = self.client.get(self.url, {"course_id": text_type(self.course.id), "following": ""})
         expected_response = make_paginated_api_response(
             results=expected_threads,
             count=1,
             num_pages=2,
-            next_link="http://testserver/api/discussion/v1/threads/?course_id=x%2Fy%2Fz&page=2",
+            next_link="http://testserver/api/discussion/v1/threads/?course_id=x%2Fy%2Fz&following=&page=2",
             previous_link=None
         )
         expected_response.update({"text_search_rewrite": None})
@@ -387,8 +467,8 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
             expected_response
         )
         self.assert_last_query_params({
-            "user_id": [unicode(self.user.id)],
-            "course_id": [unicode(self.course.id)],
+            "user_id": [text_type(self.user.id)],
+            "course_id": [text_type(self.course.id)],
             "sort_key": ["activity"],
             "page": ["1"],
             "per_page": ["10"],
@@ -402,13 +482,13 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
         self.client.get(
             self.url,
             {
-                "course_id": unicode(self.course.id),
+                "course_id": text_type(self.course.id),
                 "view": query,
             }
         )
         self.assert_last_query_params({
-            "user_id": [unicode(self.user.id)],
-            "course_id": [unicode(self.course.id)],
+            "user_id": [text_type(self.user.id)],
+            "course_id": [text_type(self.course.id)],
             "sort_key": ["activity"],
             "page": ["1"],
             "per_page": ["10"],
@@ -420,7 +500,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
         self.register_get_threads_response([], page=1, num_pages=1)
         response = self.client.get(
             self.url,
-            {"course_id": unicode(self.course.id), "page": "18", "page_size": "4"}
+            {"course_id": text_type(self.course.id), "page": "18", "page_size": "4"}
         )
         self.assert_response_correct(
             response,
@@ -428,8 +508,8 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
             {"developer_message": "Page not found (No results on this page)."}
         )
         self.assert_last_query_params({
-            "user_id": [unicode(self.user.id)],
-            "course_id": [unicode(self.course.id)],
+            "user_id": [text_type(self.user.id)],
+            "course_id": [text_type(self.course.id)],
             "sort_key": ["activity"],
             "page": ["18"],
             "per_page": ["4"],
@@ -440,7 +520,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
         self.register_get_threads_search_response([], None, num_pages=0)
         response = self.client.get(
             self.url,
-            {"course_id": unicode(self.course.id), "text_search": "test search string"}
+            {"course_id": text_type(self.course.id), "text_search": "test search string"}
         )
 
         expected_response = make_paginated_api_response(
@@ -453,8 +533,8 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
             expected_response
         )
         self.assert_last_query_params({
-            "user_id": [unicode(self.user.id)],
-            "course_id": [unicode(self.course.id)],
+            "user_id": [text_type(self.user.id)],
+            "course_id": [text_type(self.course.id)],
             "sort_key": ["activity"],
             "page": ["1"],
             "per_page": ["10"],
@@ -468,7 +548,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
         response = self.client.get(
             self.url,
             {
-                "course_id": unicode(self.course.id),
+                "course_id": text_type(self.course.id),
                 "following": following,
             }
         )
@@ -492,7 +572,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
         response = self.client.get(
             self.url,
             {
-                "course_id": unicode(self.course.id),
+                "course_id": text_type(self.course.id),
                 "following": following,
             }
         )
@@ -508,7 +588,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
         response = self.client.get(
             self.url,
             {
-                "course_id": unicode(self.course.id),
+                "course_id": text_type(self.course.id),
                 "following": "invalid-boolean",
             }
         )
@@ -540,13 +620,13 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
         self.client.get(
             self.url,
             {
-                "course_id": unicode(self.course.id),
+                "course_id": text_type(self.course.id),
                 "order_by": http_query,
             }
         )
         self.assert_last_query_params({
-            "user_id": [unicode(self.user.id)],
-            "course_id": [unicode(self.course.id)],
+            "user_id": [text_type(self.user.id)],
+            "course_id": [text_type(self.course.id)],
             "page": ["1"],
             "per_page": ["10"],
             "sort_key": [cc_query],
@@ -563,13 +643,13 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
         self.client.get(
             self.url,
             {
-                "course_id": unicode(self.course.id),
+                "course_id": text_type(self.course.id),
                 "order_direction": "desc",
             }
         )
         self.assert_last_query_params({
-            "user_id": [unicode(self.user.id)],
-            "course_id": [unicode(self.course.id)],
+            "user_id": [text_type(self.user.id)],
+            "course_id": [text_type(self.course.id)],
             "sort_key": ["activity"],
             "page": ["1"],
             "per_page": ["10"],
@@ -582,7 +662,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
         self.register_get_user_response(self.user)
         self.register_get_threads_search_response([], None, num_pages=0)
         response = self.client.get(self.url, {
-            "course_id": unicode(self.course.id),
+            "course_id": text_type(self.course.id),
             "text_search": "test search string",
             "topic_id": "topic1, topic2",
         })
@@ -615,7 +695,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
 
         response = self.client.get(
             self.url,
-            {"course_id": unicode(self.course.id), "requested_fields": "profile_image"},
+            {"course_id": text_type(self.course.id), "requested_fields": "profile_image"},
         )
         self.assertEqual(response.status_code, 200)
         response_threads = json.loads(response.content)['results']
@@ -640,7 +720,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
 
         response = self.client.get(
             self.url,
-            {"course_id": unicode(self.course.id), "requested_fields": "profile_image"},
+            {"course_id": text_type(self.course.id), "requested_fields": "profile_image"},
         )
         self.assertEqual(response.status_code, 200)
         response_thread = json.loads(response.content)['results'][0]
@@ -648,6 +728,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
         self.assertEqual({}, response_thread['users'])
 
 
+@attr(shard=8)
 @httpretty.activate
 @disable_signal(api, 'thread_created')
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -666,7 +747,7 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         })
         self.register_post_thread_response(cs_thread)
         request_data = {
-            "course_id": unicode(self.course.id),
+            "course_id": text_type(self.course.id),
             "topic_id": "test_topic",
             "type": "discussion",
             "title": "Test Title",
@@ -683,7 +764,7 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.assertEqual(
             httpretty.last_request().parsed_body,
             {
-                "course_id": [unicode(self.course.id)],
+                "course_id": [text_type(self.course.id)],
                 "commentable_id": ["test_topic"],
                 "thread_type": ["discussion"],
                 "title": ["Test Title"],
@@ -712,7 +793,7 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.assertEqual(response_data, expected_response_data)
 
 
-@attr(shard=3)
+@attr(shard=8)
 @ddt.ddt
 @httpretty.activate
 @disable_signal(api, 'thread_edited')
@@ -754,7 +835,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
         self.assertEqual(
             httpretty.last_request().parsed_body,
             {
-                "course_id": [unicode(self.course.id)],
+                "course_id": [text_type(self.course.id)],
                 "commentable_id": ["test_topic"],
                 "thread_type": ["discussion"],
                 "title": ["Test Title"],
@@ -870,6 +951,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
         )
 
 
+@attr(shard=8)
 @httpretty.activate
 @disable_signal(api, 'thread_deleted')
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -884,7 +966,7 @@ class ThreadViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.register_get_user_response(self.user)
         cs_thread = make_minimal_cs_thread({
             "id": self.thread_id,
-            "course_id": unicode(self.course.id),
+            "course_id": text_type(self.course.id),
             "username": self.user.username,
             "user_id": str(self.user.id),
         })
@@ -905,7 +987,7 @@ class ThreadViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.assertEqual(response.status_code, 404)
 
 
-@attr(shard=3)
+@attr(shard=8)
 @ddt.ddt
 @httpretty.activate
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -942,7 +1024,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
         already in overrides.
         """
         overrides = overrides.copy() if overrides else {}
-        overrides.setdefault("course_id", unicode(self.course.id))
+        overrides.setdefault("course_id", text_type(self.course.id))
         return make_minimal_cs_thread(overrides)
 
     def expected_response_comment(self, overrides=None):
@@ -1005,7 +1087,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
         })]
         self.register_get_thread_response({
             "id": self.thread_id,
-            "course_id": unicode(self.course.id),
+            "course_id": text_type(self.course.id),
             "thread_type": "discussion",
             "children": source_comments,
             "resp_total": 100,
@@ -1042,7 +1124,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
         self.register_get_user_response(self.user)
         self.register_get_thread_response(make_minimal_cs_thread({
             "id": self.thread_id,
-            "course_id": unicode(self.course.id),
+            "course_id": text_type(self.course.id),
             "thread_type": "discussion",
             "resp_total": 10,
         }))
@@ -1151,7 +1233,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
         })
         thread = self.make_minimal_cs_thread({
             "id": self.thread_id,
-            "course_id": unicode(self.course.id),
+            "course_id": text_type(self.course.id),
             "thread_type": "discussion",
             "children": [response_1, response_2],
             "resp_total": 2,
@@ -1186,7 +1268,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
         source_comments = [self.create_source_comment()]
         self.register_get_thread_response({
             "id": self.thread_id,
-            "course_id": unicode(self.course.id),
+            "course_id": text_type(self.course.id),
             "thread_type": "discussion",
             "children": source_comments,
             "resp_total": 100,
@@ -1280,6 +1362,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
             self.assertNotIn(response_comment['endorsed_by'], response_users)
 
 
+@attr(shard=8)
 @httpretty.activate
 @disable_signal(api, 'comment_deleted')
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -1295,7 +1378,7 @@ class CommentViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.register_get_user_response(self.user)
         cs_thread = make_minimal_cs_thread({
             "id": "test_thread",
-            "course_id": unicode(self.course.id),
+            "course_id": text_type(self.course.id),
         })
         self.register_get_thread_response(cs_thread)
         cs_comment = make_minimal_cs_comment({
@@ -1322,6 +1405,7 @@ class CommentViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.assertEqual(response.status_code, 404)
 
 
+@attr(shard=8)
 @httpretty.activate
 @disable_signal(api, 'comment_created')
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -1375,7 +1459,7 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.assertEqual(
             httpretty.last_request().parsed_body,
             {
-                "course_id": [unicode(self.course.id)],
+                "course_id": [text_type(self.course.id)],
                 "body": ["Test body"],
                 "user_id": [str(self.user.id)],
             }
@@ -1410,6 +1494,7 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.assertEqual(response.status_code, 403)
 
 
+@attr(shard=8)
 @ddt.ddt
 @disable_signal(api, 'comment_edited')
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -1420,6 +1505,7 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
         super(CommentViewSetPartialUpdateTest, self).setUp()
         httpretty.reset()
         httpretty.enable()
+        self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
         self.register_get_user_response(self.user)
         self.url = reverse("comment-detail", kwargs={"comment_id": "test_comment"})
@@ -1473,7 +1559,7 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
             httpretty.last_request().parsed_body,
             {
                 "body": ["Edited body"],
-                "course_id": [unicode(self.course.id)],
+                "course_id": [text_type(self.course.id)],
                 "user_id": [str(self.user.id)],
                 "anonymous": ["False"],
                 "anonymous_to_peers": ["False"],
@@ -1528,6 +1614,7 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
         self.assertEqual(response.status_code, 400)
 
 
+@attr(shard=8)
 @httpretty.activate
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class ThreadViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, ProfileImageTestMixin):
@@ -1541,7 +1628,7 @@ class ThreadViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase,
         self.register_get_user_response(self.user)
         cs_thread = make_minimal_cs_thread({
             "id": self.thread_id,
-            "course_id": unicode(self.course.id),
+            "course_id": text_type(self.course.id),
             "commentable_id": "test_topic",
             "username": self.user.username,
             "user_id": str(self.user.id),
@@ -1566,7 +1653,7 @@ class ThreadViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase,
         self.register_get_user_response(self.user)
         cs_thread = make_minimal_cs_thread({
             "id": self.thread_id,
-            "course_id": unicode(self.course.id),
+            "course_id": text_type(self.course.id),
             "username": self.user.username,
             "user_id": str(self.user.id),
         })
@@ -1579,6 +1666,7 @@ class ThreadViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase,
         self.assertEqual(expected_profile_data, response_users[self.user.username])
 
 
+@attr(shard=8)
 @httpretty.activate
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class CommentViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, ProfileImageTestMixin):
@@ -1596,7 +1684,7 @@ class CommentViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase
         return make_minimal_cs_comment({
             "id": comment_id,
             "parent_id": parent_id,
-            "course_id": unicode(self.course.id),
+            "course_id": text_type(self.course.id),
             "thread_id": self.thread_id,
             "thread_type": "discussion",
             "username": self.user.username,
@@ -1613,7 +1701,7 @@ class CommentViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase
         cs_comment = self.make_comment_data(self.comment_id, None, [cs_comment_child])
         cs_thread = make_minimal_cs_thread({
             "id": self.thread_id,
-            "course_id": unicode(self.course.id),
+            "course_id": text_type(self.course.id),
             "children": [cs_comment],
         })
         self.register_get_thread_response(cs_thread)
@@ -1661,7 +1749,7 @@ class CommentViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase
         cs_comment = self.make_comment_data(self.comment_id, None, [cs_comment_child])
         cs_thread = make_minimal_cs_thread({
             "id": self.thread_id,
-            "course_id": unicode(self.course.id),
+            "course_id": text_type(self.course.id),
             "children": [cs_comment],
         })
         self.register_get_thread_response(cs_thread)
@@ -1685,7 +1773,7 @@ class CommentViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase
         cs_comment = self.make_comment_data(self.comment_id, None, [cs_comment_child])
         cs_thread = make_minimal_cs_thread({
             'id': self.thread_id,
-            'course_id': unicode(self.course.id),
+            'course_id': text_type(self.course.id),
             'children': [cs_comment],
         })
         self.register_get_thread_response(cs_thread)

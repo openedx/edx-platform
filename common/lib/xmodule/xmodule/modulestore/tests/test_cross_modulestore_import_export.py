@@ -39,9 +39,10 @@ COURSE_DATA_NAMES = (
     'split_test_module_draft',
 )
 
-EXPORTED_COURSE_DIR_NAME = 'exported_source_course'
+EXPORTED_COURSE_DIR_NAME = u'exported_source_course'
 
 
+@attr(shard=2)
 @ddt.ddt
 @attr('mongo')
 class CrossStoreXMLRoundtrip(CourseComparisonTest, PartitionTestCase):
@@ -55,6 +56,7 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest, PartitionTestCase):
         self.export_dir = mkdtemp()
         self.addCleanup(rmtree, self.export_dir, ignore_errors=True)
 
+    @patch('xmodule.video_module.video_module.edxval_api', None)
     @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
     @ddt.data(*itertools.product(
         MODULESTORE_SETUPS,

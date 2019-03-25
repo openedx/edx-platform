@@ -4,8 +4,8 @@ from __future__ import unicode_literals
 from django.db import migrations, models
 import django_countries.fields
 from django.conf import settings
+from opaque_keys.edx.django.models import CourseKeyField
 import student.models
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
 
 class Migration(migrations.Migration):
@@ -38,8 +38,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('date_joined', models.DateTimeField(auto_now_add=True)),
                 ('last_activity_at', models.DateTimeField()),
-                ('team', models.ForeignKey(related_name='membership', to='teams.CourseTeam')),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('team', models.ForeignKey(related_name='membership', to='teams.CourseTeam', on_delete=models.CASCADE)),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
         migrations.AddField(

@@ -22,7 +22,7 @@ define(['js/views/baseview', 'codemirror', 'common/js/components/views/feedback_
 
             render: function() {
                 CourseInfoHelper.changeContentToPreview(
-                this.model, 'data', this.options['base_asset_url']);
+                this.model, 'data', this.options.base_asset_url);
 
                 this.$el.html(
                 $(this.template({
@@ -44,16 +44,20 @@ define(['js/views/baseview', 'codemirror', 'common/js/components/views/feedback_
                 this.$form.show();
 
                 this.$codeMirror = CourseInfoHelper.editWithCodeMirror(
-                self.model, 'data', self.options['base_asset_url'], this.$editor.get(0));
+                self.model, 'data', self.options.base_asset_url, this.$editor.get(0));
 
                 ModalUtils.showModalCover(false, function() { self.closeEditor(); });
             },
 
             onSave: function(event) {
+                var handoutsContent = this.$codeMirror.getValue();
                 $('#handout_error').removeClass('is-shown');
                 $('.save-button').removeClass('is-disabled').attr('aria-disabled', false);
                 if ($('.CodeMirror-lines').find('.cm-error').length == 0) {
-                    this.model.set('data', this.$codeMirror.getValue());
+                    if (handoutsContent === '') {
+                        handoutsContent = '<ol></ol>';
+                    }
+                    this.model.set('data', handoutsContent);
                     var saving = new NotificationView.Mini({
                         title: gettext('Saving')
                     });
@@ -68,7 +72,7 @@ define(['js/views/baseview', 'codemirror', 'common/js/components/views/feedback_
                     this.closeEditor();
 
                     analytics.track('Saved Course Handouts', {
-                        'course': course_location_analytics
+                        course: course_location_analytics
                     });
                 } else {
                     $('#handout_error').addClass('is-shown');

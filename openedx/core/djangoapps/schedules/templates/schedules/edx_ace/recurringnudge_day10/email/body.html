@@ -1,0 +1,45 @@
+{% extends 'ace_common/edx_ace/common/base_body.html' %}
+{% load i18n %}
+
+{% block preview_text %}
+    {% if course_ids|length > 1 %}
+        {% blocktrans trimmed %}
+            Many {{ platform_name }} learners are completing more problems every week, and
+            participating in the discussion forums. What do you want to do to keep learning?
+        {% endblocktrans %}
+    {% else %}
+        {% blocktrans trimmed %}
+            Many {{ platform_name }} learners in {{course_name}} are completing more problems every week, and
+            participating in the discussion forums. What do you want to do to keep learning?
+        {% endblocktrans %}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+        <td>
+            <h1>{% trans "Keep up the momentum!" %}</h1>
+
+            <p>
+                {% if course_ids|length > 1 %}
+                    {% blocktrans trimmed %}
+                        Many {{ platform_name }} learners are completing more problems every week, and
+                        participating in the discussion forums. What do you want to do to keep learning?
+                    {% endblocktrans %}
+                {% else %}
+                    {% blocktrans trimmed %}
+                        Many {{ platform_name }} learners in <strong>{{course_name}}</strong> are completing more problems every week, and
+                        participating in the discussion forums. What do you want to do to keep learning?
+                    {% endblocktrans %}
+                {% endif %}
+            </p>
+
+            {% trans "Keep learning" as course_cta_text %}
+            {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text%}
+
+            {% include "ace_common/edx_ace/common/upsell_cta.html"%}
+        </td>
+    </tr>
+</table>
+{% endblock %}

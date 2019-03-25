@@ -9,11 +9,13 @@ Configuration values:
 If no grade response is configured, a default response will be returned.
 """
 
-from .http import StubHttpRequestHandler, StubHttpService, require_params
-import json
 import copy
-from requests import post
+import json
 from threading import Timer
+
+from requests import post
+
+from .http import StubHttpRequestHandler, StubHttpService, require_params
 
 
 class StubXQueueHandler(StubHttpRequestHandler):

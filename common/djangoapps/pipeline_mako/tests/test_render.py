@@ -1,17 +1,19 @@
 """ Tests for rendering functions in the mako pipeline. """
 
-import ddt
 from unittest import skipUnless
 
+import ddt
+import os
 from django.conf import settings
 from django.test import TestCase
 from paver.easy import call_task
 
-from pipeline_mako import render_require_js_path_overrides, compressed_css, compressed_js
+from pipeline_mako import compressed_css, compressed_js, render_require_js_path_overrides
 
 
 class RequireJSPathOverridesTest(TestCase):
     """Test RequireJS path overrides. """
+    shard = 7
 
     OVERRIDES = {
         'jquery': 'common/js/vendor/jquery.js',
@@ -42,6 +44,7 @@ class RequireJSPathOverridesTest(TestCase):
 @ddt.ddt
 class PipelineRenderTest(TestCase):
     """Test individual pipeline rendering functions. """
+    shard = 7
 
     @classmethod
     def setUpClass(cls):
@@ -49,6 +52,19 @@ class PipelineRenderTest(TestCase):
         Create static assets once for all pipeline render tests.
         """
         super(PipelineRenderTest, cls).setUpClass()
+        # Ensure that the npm requirements are always installed before updating static assets.
+        prereq_install_value_orig = os.environ.get('NO_PREREQ_INSTALL')
+        os.environ['NO_PREREQ_INSTALL'] = 'False'
+        try:
+            call_task('pavelib.prereqs.install_node_prereqs')
+        except:
+            raise
+        finally:
+            if prereq_install_value_orig is None:
+                del os.environ['NO_PREREQ_INSTALL']
+            else:
+                os.environ['NO_PREREQ_INSTALL'] = prereq_install_value_orig
+        # Update all static assets.
         call_task('pavelib.assets.update_assets', args=('lms', '--settings=test', '--themes=no'))
 
     @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in LMS')

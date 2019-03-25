@@ -7,17 +7,17 @@ A microsite enables the following features:
 3) Ability to swap out some branding elements in the website
 """
 import inspect
-
 from importlib import import_module
-from django.conf import settings
-from microsite_configuration.backends.base import BaseMicrositeBackend, BaseMicrositeTemplateBackend
 
+from django.conf import settings
+
+from microsite_configuration.backends.base import BaseMicrositeBackend, BaseMicrositeTemplateBackend
 
 __all__ = [
     'is_request_in_microsite', 'get_value', 'has_override_value',
     'get_template_path', 'get_value_for_org', 'get_all_orgs',
     'clear', 'set_by_domain', 'enable_microsites', 'get_all_config',
-    'is_feature_enabled', 'enable_microsites_pre_startup',
+    'is_feature_enabled',
 ]
 
 BACKEND = None
@@ -100,15 +100,6 @@ def set_by_domain(domain):
     and make it available to the complete django request process
     """
     BACKEND.set_config_by_domain(domain)
-
-
-def enable_microsites_pre_startup(log):
-    """
-    Prepare the feature settings that must be enabled before django.setup() or
-    autostartup() during the startup script
-    """
-    if is_feature_enabled():
-        BACKEND.enable_microsites_pre_startup(log)
 
 
 def enable_microsites(log):

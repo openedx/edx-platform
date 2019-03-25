@@ -4,14 +4,16 @@ Common test utilities for courseware functionality
 # pylint: disable=attribute-defined-outside-init
 
 from abc import ABCMeta, abstractmethod
-from datetime import datetime
+from datetime import datetime, timedelta
+from urllib import urlencode
+
 import ddt
 from mock import patch
-from urllib import urlencode
 
 from lms.djangoapps.courseware.field_overrides import OverrideModulestoreFieldData
 from lms.djangoapps.courseware.url_helpers import get_redirect_url
-from student.tests.factories import AdminFactory, UserFactory, CourseEnrollmentFactory
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
@@ -80,7 +82,9 @@ class RenderXBlockTestMixin(object):
         Options to configure the test course. Intended to be overridden by
         subclasses.
         """
-        return {}
+        return {
+            'start': datetime.now() - timedelta(days=1)
+        }
 
     def setup_course(self, default_store=None):
         """
@@ -101,6 +105,12 @@ class RenderXBlockTestMixin(object):
                 category='html',
                 data="<p>Test HTML Content<p>"
             )
+            self.problem_block = ItemFactory.create(
+                parent=self.vertical_block,
+                category='problem',
+                display_name='Problem'
+            )
+        CourseOverview.load_from_module_store(self.course.id)
 
         # block_name_to_be_tested can be `html_block` or `vertical_block`.
         # These attributes help ensure the positive and negative tests are in sync.
@@ -178,6 +188,8 @@ class RenderXBlockTestMixin(object):
     @ddt.unpack
     def test_success_enrolled_staff(self, default_store, mongo_calls):
         with self.store.default_store(default_store):
+            if default_store is ModuleStoreEnum.Type.mongo:
+                mongo_calls = self.get_success_enrolled_staff_mongo_count()
             self.setup_course(default_store)
             self.setup_user(admin=True, enroll=True, login=True)
 
@@ -196,6 +208,13 @@ class RenderXBlockTestMixin(object):
             #   (5) definition - edx_notes decorator (original_get_html)
             with check_mongo_calls(mongo_calls):
                 self.verify_response()
+
+    def get_success_enrolled_staff_mongo_count(self):
+        """
+        Helper method used by test_success_enrolled_staff because one test
+        class using this mixin has an increased number of mongo (only) queries.
+        """
+        return 5
 
     def test_success_unenrolled_staff(self):
         self.setup_course()

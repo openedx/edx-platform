@@ -2,17 +2,18 @@
 LTI Provider view functions
 """
 
-from django.conf import settings
-from django.http import HttpResponseBadRequest, HttpResponseForbidden, Http404
-from django.views.decorators.csrf import csrf_exempt
 import logging
 
-from lti_provider.outcomes import store_outcome_parameters
+from django.conf import settings
+from django.http import Http404, HttpResponseBadRequest, HttpResponseForbidden
+from django.views.decorators.csrf import csrf_exempt
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey, UsageKey
+
 from lti_provider.models import LtiConsumer
+from lti_provider.outcomes import store_outcome_parameters
 from lti_provider.signature_validator import SignatureValidator
 from lti_provider.users import authenticate_lti_user
-from opaque_keys.edx.keys import CourseKey, UsageKey
-from opaque_keys import InvalidKeyError
 from openedx.core.lib.url_utils import unquote_slashes
 from util.views import add_p3p_header
 
@@ -27,8 +28,8 @@ REQUIRED_PARAMETERS = [
 ]
 
 OPTIONAL_PARAMETERS = [
-    'lis_result_sourcedid', 'lis_outcome_service_url',
-    'tool_consumer_instance_guid'
+    'context_title', 'context_label', 'lis_result_sourcedid',
+    'lis_outcome_service_url', 'tool_consumer_instance_guid'
 ]
 
 

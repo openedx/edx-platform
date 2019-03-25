@@ -5,29 +5,32 @@
 
 .wrapper-footer {
   @extend %ui-print-excluded;
+
   box-shadow: 0 -1px 5px 0 $shadow-l1;
   border-top: 1px solid tint($m-gray, 50%);
   padding: 25px ($baseline/2) ($baseline*1.5) ($baseline/2);
-  background: $footer-bg;
+  background: $body-bg;
   clear: both;
 
   footer#footer-openedx {
     @include clearfix();
     @include box-sizing(border-box);
     @include outer-container;
+
     margin: 0 auto;
 
     p, ol, ul {
-      font-family: $sans-serif;
+      font-family: $font-family-sans-serif;
 
       // override needed for poorly scoped font-family styling on p a:link {}
       a {
-        font-family: $sans-serif;
+        font-family: $font-family-sans-serif;
       }
     }
 
     a {
       @include transition(link-color 0.15s ease-in-out 0s, border 0.15s ease-in-out 0s);
+
       border-bottom: none;
       color: $link-color;
       text-decoration: none !important;
@@ -35,6 +38,11 @@
       &:hover, &:focus, &:active {
         border-bottom: 1px dotted $link-color;
       }
+    }
+
+    .icon {
+      font-family: 'FontAwesome';
+      font-style: normal;
     }
 
     // colophon
@@ -52,10 +60,12 @@
 
       .nav-colophon {
         @include clearfix();
+
         margin: $footer_margin;
 
         li {
           @include float(left);
+
           margin-right: ($baseline*0.75);
 
           a {
@@ -116,6 +126,7 @@
       margin: -2px 0 8px 0;
       font-size: em(11);
       color: $gray; // WCAG 2.0 AA requirements
+
       @include text-align(left);
     }
 
@@ -127,11 +138,7 @@
         display: inline-block;
         font-size: em(11);
 
-      }
-
-      .nav-legal-02 a {
-
-        &:before {
+        &:not(:first-child) a::before {
           margin-right: ($baseline/4);
           content: "-";
         }
@@ -167,6 +174,7 @@
     .footer-about-openedx {
       @include span-columns(4);
       @include text-align(right);
+
       vertical-align: bottom;
 
       @include media($bp-small) {
@@ -179,11 +187,19 @@
 
       a {
         @include float(right);
+
         display: inline-block;
 
         &:hover {
           border-bottom: none;
         }
+      }
+    }
+
+    .footer-language-selector {
+      label[for=footer-language-select] {
+        display: inline-block;
+        cursor: initial;
       }
     }
   }
@@ -204,9 +220,10 @@
 
 // marketing site design syncing
 .view-register, .view-login, .view-passwordreset {
-
   .wrapper-footer footer {
     width: 960px;
+
+    @extend %ui-print-excluded;
 
     .colophon-about img {
       margin-top: ($baseline*1.5);

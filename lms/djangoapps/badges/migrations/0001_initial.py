@@ -7,7 +7,7 @@ import badges.models
 from django.conf import settings
 import django.utils.timezone
 from model_utils import fields
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
+from opaque_keys.edx.django.models import CourseKeyField
 
 
 class Migration(migrations.Migration):
@@ -59,11 +59,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='badgeassertion',
             name='badge_class',
-            field=models.ForeignKey(to='badges.BadgeClass'),
+            field=models.ForeignKey(to='badges.BadgeClass', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='badgeassertion',
             name='user',
-            field=models.ForeignKey(to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE),
         ),
     ]

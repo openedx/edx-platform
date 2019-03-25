@@ -4,19 +4,24 @@ Django module container for classes and operations related to the "Course Module
 import json
 import logging
 from cStringIO import StringIO
-from datetime import datetime
+from datetime import datetime, timedelta
+import dateutil.parser
+
+from django.conf import settings
 
 import requests
 from lazy import lazy
 from lxml import etree
+from openedx.core.djangoapps.video_pipeline.models import VideoUploadsEnabledByDefault
+from openedx.core.lib.license import LicenseMixin
 from path import Path as path
 from pytz import utc
+from six import text_type
 from xblock.fields import Scope, List, String, Dict, Boolean, Integer, Float
 
 from xmodule import course_metadata_utils
 from xmodule.course_metadata_utils import DEFAULT_START_DATE
 from xmodule.graders import grader_from_conf
-from xmodule.mixin import LicenseMixin
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.tabs import CourseTabList, InvalidTabsException
 from .fields import Date
@@ -30,6 +35,14 @@ _ = lambda text: text
 CATALOG_VISIBILITY_CATALOG_AND_ABOUT = "both"
 CATALOG_VISIBILITY_ABOUT = "about"
 CATALOG_VISIBILITY_NONE = "none"
+
+DEFAULT_COURSE_VISIBILITY_IN_CATALOG = getattr(
+    settings,
+    'DEFAULT_COURSE_VISIBILITY_IN_CATALOG',
+    'both'
+)
+
+DEFAULT_MOBILE_AVAILABLE = getattr(settings, 'DEFAULT_MOBILE_AVAILABLE', False)
 
 
 class StringOrDate(Date):
@@ -187,6 +200,10 @@ class CourseFields(object):
         scope=Scope.settings
     )
     end = Date(help=_("Date that this class ends"), scope=Scope.settings)
+    certificate_available_date = Date(
+        help=_("Date that certificates become available to learners"),
+        scope=Scope.content
+    )
     cosmetic_display_price = Integer(
         display_name=_("Cosmetic Course Display Price"),
         help=_(
@@ -293,7 +310,10 @@ class CourseFields(object):
             '{"id": "i4x-InstitutionName-CourseNumber-course-CourseRun"}. For example, one discussion '
             'category may be "Lydian Mode": {"id": "i4x-UniversityX-MUS101-course-2015_T1"}. The "id" '
             'value for each category must be unique. In "id" values, the only special characters that are '
-            'supported are underscore, hyphen, and period.'
+            'supported are underscore, hyphen, and period. You can also specify a category as the default '
+            'for new posts in the Discussion page by setting its "default" attribute to true. For example, '
+            '"Lydian Mode": {"id": "i4x-UniversityX-MUS101-course-2015_T1", "default": true}.'
+
         ),
         scope=Scope.settings
     )
@@ -329,7 +349,7 @@ class CourseFields(object):
     mobile_available = Boolean(
         display_name=_("Mobile Course Available"),
         help=_("Enter true or false. If true, the course will be available to mobile devices."),
-        default=False,
+        default=DEFAULT_MOBILE_AVAILABLE,
         scope=Scope.settings
     )
     video_upload_pipeline = Dict(
@@ -419,6 +439,7 @@ class CourseFields(object):
             "Enter the heading that you want students to see above your course handouts on the Course Home page. "
             "Your course handouts appear in the right panel of the page."
         ),
+        deprecated=True,
         scope=Scope.settings, default=_('Course Handouts'))
     show_timezone = Boolean(
         help=_(
@@ -527,10 +548,11 @@ class CourseFields(object):
         display_name=_("Certificate Web/HTML View Enabled"),
         help=_("If true, certificate Web/HTML views are enabled for the course."),
         scope=Scope.settings,
-        default=False,
+        default=True,
+        deprecated=True
     )
     cert_html_view_overrides = Dict(
-        # Translators: This field is the container for course-specific certifcate configuration values
+        # Translators: This field is the container for course-specific certificate configuration values
         display_name=_("Certificate Web/HTML View Overrides"),
         # Translators: These overrides allow for an alternative configuration of the certificate web view
         help=_("Enter course-specific overrides for the Web/HTML template parameters here (JSON format)"),
@@ -539,7 +561,7 @@ class CourseFields(object):
 
     # Specific certificate information managed via Studio (should eventually fold other cert settings into this)
     certificates = Dict(
-        # Translators: This field is the container for course-specific certifcate configuration values
+        # Translators: This field is the container for course-specific certificate configuration values
         display_name=_("Certificate Configuration"),
         # Translators: These overrides allow for an alternative configuration of the certificate web view
         help=_("Enter course-specific configuration information here (JSON format)"),
@@ -657,7 +679,7 @@ class CourseFields(object):
             "of three values: 'both' (show in catalog and allow access to about page), 'about' (only allow access "
             "to about page), 'none' (do not show in catalog and do not allow access to an about page)."
         ),
-        default=CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
+        default=DEFAULT_COURSE_VISIBILITY_IN_CATALOG,
         scope=Scope.settings,
         values=[
             {"display_name": _("Both"), "value": CATALOG_VISIBILITY_CATALOG_AND_ABOUT},
@@ -675,6 +697,9 @@ class CourseFields(object):
         scope=Scope.settings,
     )
 
+    # Note: Although users enter the entrance exam minimum score
+    # as a percentage value, it is internally converted and stored
+    # as a decimal value less than 1.
     entrance_exam_minimum_score_pct = Float(
         display_name=_("Entrance Exam Minimum Score (%)"),
         help=_(
@@ -720,7 +745,8 @@ class CourseFields(object):
             'For example, to specify that teams should have a maximum of 5 participants and provide a list of '
             '2 topics, enter the configuration in this format: {example_format}. '
             'In "id" values, the only supported special characters are underscore, hyphen, and period.'
-        ).format(
+        ),
+        help_format_args=dict(
             # Put the sample JSON into a format variable so that translators
             # don't muck with it.
             example_format=(
@@ -852,6 +878,14 @@ class CourseFields(object):
         ),
         scope=Scope.settings, default=False
     )
+    highlights_enabled_for_messaging = Boolean(
+        display_name=_("Highlights Enabled for Messaging"),
+        help=_(
+            "Enter true or false. If true, any highlights associated with content in the course will be messaged "
+            "to learners at their scheduled time."
+        ),
+        scope=Scope.settings, default=False
+    )
 
 
 class CourseModule(CourseFields, SequenceModule):  # pylint: disable=abstract-method
@@ -910,7 +944,9 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
             if not getattr(self, "tabs", []):
                 CourseTabList.initialize_default(self)
         except InvalidTabsException as err:
-            raise type(err)('{msg} For course: {course_id}'.format(msg=err.message, course_id=unicode(self.id)))
+            raise type(err)('{msg} For course: {course_id}'.format(msg=text_type(err), course_id=unicode(self.id)))
+
+        self.set_default_certificate_available_date()
 
     def set_grading_policy(self, course_policy):
         """
@@ -936,6 +972,10 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         # Use setters so that side effecting to .definitions works
         self.raw_grader = grading_policy['GRADER']  # used for cms access
         self.grade_cutoffs = grading_policy['GRADE_CUTOFFS']
+
+    def set_default_certificate_available_date(self):
+        if (not self.certificate_available_date) and self.end:
+            self.certificate_available_date = self.end + timedelta(days=2)
 
     @classmethod
     def read_grading_policy(cls, paths, system):
@@ -970,12 +1010,12 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         policy_dir = None
         url_name = xml_obj.get('url_name', xml_obj.get('slug'))
         if url_name:
-            policy_dir = 'policies/' + url_name
+            policy_dir = u'policies/' + url_name
 
         # Try to load grading policy
-        paths = ['grading_policy.json']
+        paths = [u'grading_policy.json']
         if policy_dir:
-            paths = [policy_dir + '/grading_policy.json'] + paths
+            paths = [policy_dir + u'/grading_policy.json'] + paths
 
         try:
             policy = json.loads(cls.read_grading_policy(paths, system))
@@ -1047,7 +1087,9 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         return course_metadata_utils.may_certify_for_course(
             self.certificates_display_behavior,
             self.certificates_show_before_end,
-            self.has_ended()
+            self.has_ended(),
+            self.certificate_available_date,
+            self.self_paced
         )
 
     def has_started(self):
@@ -1154,16 +1196,19 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
     def always_cohort_inline_discussions(self):
         """
         This allow to change the default behavior of inline discussions cohorting. By
-        setting this to False, all inline discussions are non-cohorted unless their
-        ids are specified in cohorted_discussions.
+        setting this to 'True', all inline discussions are cohorted. The default value is
+        now `False`, meaning that inline discussions are not cohorted unless their discussion IDs
+        are specifically listed as cohorted.
 
-        Note: No longer used. See openedx.core.djangoapps.course_groups.models.CourseCohortSettings.
+        Note: No longer used except to get the initial value when cohorts are first enabled on a course
+        (and for migrating old courses). See openedx.core.djangoapps.course_groups.models.CourseCohortSettings.
         """
         config = self.cohort_config
         if config is None:
-            return True
+            # This value sets the default for newly created courses.
+            return False
 
-        return bool(config.get("always_cohort_inline_discussions", True))
+        return bool(config.get("always_cohort_inline_discussions", False))
 
     @property
     def is_newish(self):
@@ -1301,7 +1346,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         """
         Returns whether the video pipeline advanced setting is configured for this course.
         """
-        return (
+        return VideoUploadsEnabledByDefault.feature_enabled(course_id=self.id) or (
             self.video_upload_pipeline is not None and
             'course_video_upload_token' in self.video_upload_pipeline
         )
@@ -1338,23 +1383,6 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         """
         return self.teams_configuration.get('topics', None)
 
-    def get_user_partitions_for_scheme(self, scheme):
-        """
-        Retrieve all user partitions defined in the course for a particular
-        partition scheme.
-
-        Arguments:
-            scheme (object): The user partition scheme.
-
-        Returns:
-            list of `UserPartition`
-
-        """
-        return [
-            p for p in self.user_partitions
-            if p.scheme == scheme
-        ]
-
     def set_user_partitions_for_scheme(self, partitions, scheme):
         """
         Set the user partitions for a particular scheme.
@@ -1380,8 +1408,10 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         Whether or not the course can be set to self-paced at this time.
 
         Returns:
-          bool: False if the course has already started, True otherwise.
+          bool: False if the course has already started or no start date set, True otherwise.
         """
+        if not self.start:
+            return False
         return datetime.now(utc) <= self.start
 
 
@@ -1390,9 +1420,10 @@ class CourseSummary(object):
     A lightweight course summary class, which constructs split/mongo course summary without loading
     the course. It is used at cms for listing courses to global staff user.
     """
-    course_info_fields = ['display_name', 'display_coursenumber', 'display_organization']
+    course_info_fields = ['display_name', 'display_coursenumber', 'display_organization', 'end']
 
-    def __init__(self, course_locator, display_name=u"Empty", display_coursenumber=None, display_organization=None):
+    def __init__(self, course_locator, display_name=u"Empty", display_coursenumber=None, display_organization=None,
+                 end=None):
         """
         Initialize and construct course summary
 
@@ -1409,6 +1440,8 @@ class CourseSummary(object):
 
         display_organization (unicode|None): Course organization that is specified & appears in the courseware
 
+        end (unicode|None): Course end date.  Must contain timezone.
+
         """
         self.display_coursenumber = display_coursenumber
         self.display_organization = display_organization
@@ -1416,6 +1449,9 @@ class CourseSummary(object):
 
         self.id = course_locator  # pylint: disable=invalid-name
         self.location = course_locator.make_usage_key('course', 'course')
+        self.end = end
+        if end is not None and not isinstance(end, datetime):
+            self.end = dateutil.parser.parse(end)
 
     @property
     def display_org_with_default(self):
@@ -1436,3 +1472,18 @@ class CourseSummary(object):
         if self.display_coursenumber:
             return self.display_coursenumber
         return self.location.course
+
+    def has_ended(self):
+        """
+        Returns whether the course has ended.
+        """
+        try:
+            return course_metadata_utils.has_course_ended(self.end)
+        except TypeError as e:
+            log.warning(
+                "Course '{course_id}' has an improperly formatted end date '{end_date}'. Error: '{err}'.".format(
+                    course_id=unicode(self.id), end_date=self.end, err=e
+                )
+            )
+            modified_end = self.end.replace(tzinfo=utc)
+            return course_metadata_utils.has_course_ended(modified_end)

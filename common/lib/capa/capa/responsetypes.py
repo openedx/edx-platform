@@ -7,51 +7,54 @@ of a variety of types.
 
 Used by capa_problem.py
 """
-# TODO: Refactor this code and fix this issue.
+
 # pylint: disable=attribute-defined-outside-init
 # standard library imports
 import abc
+# TODO: Refactor this code and fix this issue.
 import cgi
 import inspect
 import json
 import logging
-import html5lib
 import numbers
-import numpy
-import os
-from pyparsing import ParseException
-import sys
 import random
 import re
-import requests
-import subprocess
+import sys
 import textwrap
 import traceback
-import xml.sax.saxutils as saxutils
-from cmath import isnan
+from collections import namedtuple
+from datetime import datetime
 from sys import float_info
 
-from collections import namedtuple
-from shapely.geometry import Point, MultiPoint
-
-import dogstats_wrapper as dog_stats_api
-
-# specific library imports
-from calc import evaluator, UndefinedVariable
-from . import correctmap
-from .registry import TagRegistry
-from datetime import datetime
-from pytz import UTC
-from .util import (
-    compare_with_tolerance, contextualize_text, convert_files_to_filenames,
-    is_list_of_files, find_with_default, default_tolerance, get_inner_html_from_xpath
-)
+import html5lib
+import numpy
+import requests
 from lxml import etree
-from lxml.html.soupparser import fromstring as fromstring_bs     # uses Beautiful Soup!!! FIXME?
-import capa.xqueue_interface as xqueue_interface
+from lxml.html.soupparser import fromstring as fromstring_bs  # uses Beautiful Soup!!! FIXME?
+from pyparsing import ParseException
+from pytz import UTC
+from shapely.geometry import MultiPoint, Point
+from six import text_type
 
 import capa.safe_exec as safe_exec
+import capa.xqueue_interface as xqueue_interface
+import dogstats_wrapper as dog_stats_api
+# specific library imports
+from calc import UndefinedVariable, UnmatchedParenthesis, evaluator
+from cmath import isnan
 from openedx.core.djangolib.markup import HTML, Text
+
+from . import correctmap
+from .registry import TagRegistry
+from .util import (
+    compare_with_tolerance,
+    contextualize_text,
+    convert_files_to_filenames,
+    default_tolerance,
+    find_with_default,
+    get_inner_html_from_xpath,
+    is_list_of_files
+)
 
 log = logging.getLogger(__name__)
 
@@ -366,7 +369,7 @@ class LoncapaResponse(object):
         # self.runtime.track_function('get_demand_hint', event_info)
         # This this "feedback hint" event
         event_info = dict()
-        event_info['module_id'] = self.capa_module.location.to_deprecated_string()
+        event_info['module_id'] = text_type(self.capa_module.location)
         event_info['problem_part_id'] = self.id
         event_info['trigger_type'] = 'single'  # maybe be overwritten by log_extra
         event_info['hint_label'] = label
@@ -1598,17 +1601,21 @@ class NumericalResponse(LoncapaResponse):
         except UndefinedVariable as undef_var:
             raise StudentInputError(
                 _(u"You may not use variables ({bad_variables}) in numerical problems.").format(
-                    bad_variables=undef_var.message,
+                    bad_variables=text_type(undef_var),
                 )
             )
+        except UnmatchedParenthesis as err:
+            raise StudentInputError(
+                err.args[0]
+            )
         except ValueError as val_err:
-            if 'factorial' in val_err.message:
+            if 'factorial' in text_type(val_err):
                 # This is thrown when fact() or factorial() is used in an answer
                 #   that evaluates on negative and/or non-integer inputs
-                # ve.message will be: `factorial() only accepts integral values` or
+                # text_type(ve) will be: `factorial() only accepts integral values` or
                 # `factorial() not defined for negative values`
                 raise StudentInputError(
-                    _("factorial function evaluated outside its domain:"
+                    _("Factorial function evaluated outside its domain:"
                       "'{student_answer}'").format(student_answer=cgi.escape(student_answer))
                 )
             else:
@@ -1767,7 +1774,7 @@ class NumericalResponse(LoncapaResponse):
         try:
             evaluator(dict(), dict(), answer)
             return True
-        except (StudentInputError, UndefinedVariable):
+        except (StudentInputError, UndefinedVariable, UnmatchedParenthesis):
             return False
 
     def get_answers(self):
@@ -2035,7 +2042,7 @@ class StringResponse(LoncapaResponse):
             except Exception as err:
                 msg = u'[courseware.capa.responsetypes.stringresponse] {error}: {message}'.format(
                     error=_('error'),
-                    message=err.message
+                    message=text_type(err)
                 )
                 log.error(msg, exc_info=True)
                 raise ResponseError(msg)
@@ -2463,8 +2470,7 @@ class CustomResponse(LoncapaResponse):
             msg = msg.replace('&#60;', '&lt;')
 
             # Use etree to prettify the HTML
-            msg = etree.tostring(fromstring_bs(msg, convertEntities=None),
-                                 pretty_print=True)
+            msg = etree.tostring(fromstring_bs(msg), pretty_print=True)
 
             msg = msg.replace('&#13;', '')
 
@@ -2509,7 +2515,7 @@ class CustomResponse(LoncapaResponse):
 
         # Notify student with a student input error
         _, _, traceback_obj = sys.exc_info()
-        raise ResponseError(err.message, traceback_obj)
+        raise ResponseError(text_type(err), traceback_obj)
 
 #-----------------------------------------------------------------------------
 
@@ -3104,13 +3110,21 @@ class FormulaResponse(LoncapaResponse):
                     cgi.escape(answer)
                 )
                 raise StudentInputError(
-                    _("Invalid input: {bad_input} not permitted in answer.").format(bad_input=err.message)
+                    _("Invalid input: {bad_input} not permitted in answer.").format(bad_input=text_type(err))
+                )
+            except UnmatchedParenthesis as err:
+                log.debug(
+                    'formularesponse: unmatched parenthesis in formula=%s',
+                    cgi.escape(answer)
+                )
+                raise StudentInputError(
+                    err.args[0]
                 )
             except ValueError as err:
-                if 'factorial' in err.message:
+                if 'factorial' in text_type(err):
                     # This is thrown when fact() or factorial() is used in a formularesponse answer
                     #   that tests on negative and/or non-integer inputs
-                    # err.message will be: `factorial() only accepts integral values` or
+                    # text_type(err) will be: `factorial() only accepts integral values` or
                     # `factorial() not defined for negative values`
                     log.debug(
                         ('formularesponse: factorial function used in response '
@@ -3119,7 +3133,7 @@ class FormulaResponse(LoncapaResponse):
                         cgi.escape(answer)
                     )
                     raise StudentInputError(
-                        _("factorial function not permitted in answer "
+                        _("Factorial function not permitted in answer "
                           "for this problem. Provided answer was: "
                           "{bad_input}").format(bad_input=cgi.escape(answer))
                     )

@@ -1,22 +1,24 @@
 (function(define) {
     'use strict';
     define(['jquery', 'underscore', 'backbone', 'gettext', 'js/groups/models/cohort',
-            'js/groups/models/verified_track_settings',
-            'js/groups/views/cohort_editor', 'js/groups/views/cohort_form',
-            'js/groups/views/course_cohort_settings_notification',
-            'js/groups/views/cohort_discussions_inline', 'js/groups/views/cohort_discussions_course_wide',
-            'js/groups/views/verified_track_settings_notification',
-            'edx-ui-toolkit/js/utils/html-utils',
-            'js/views/file_uploader', 'js/models/notification', 'js/views/notification', 'string_utils'],
-        function($, _, Backbone, gettext, CohortModel, VerifiedTrackSettingsModel, CohortEditorView, CohortFormView,
-                CourseCohortSettingsNotificationView, InlineDiscussionsView, CourseWideDiscussionsView,
-                 VerifiedTrackSettingsNotificationView, HtmlUtils) {
-            var hiddenClass = 'is-hidden',
+        'js/groups/models/verified_track_settings',
+        'js/groups/views/cohort_editor', 'js/groups/views/cohort_form',
+        'js/groups/views/course_cohort_settings_notification',
+        'js/groups/views/verified_track_settings_notification',
+        'edx-ui-toolkit/js/utils/html-utils',
+        'js/views/base_dashboard_view',
+        'js/views/file_uploader', 'js/models/notification', 'js/views/notification',
+        'string_utils'],
+        function($, _, Backbone, gettext, CohortModel,
+                 VerifiedTrackSettingsModel,
+                 CohortEditorView, CohortFormView,
+                CourseCohortSettingsNotificationView,
+                 VerifiedTrackSettingsNotificationView, HtmlUtils, BaseDashboardView) {
+            var hiddenClass = 'hidden',
                 disabledClass = 'is-disabled',
                 enableCohortsSelector = '.cohorts-state';
 
-
-            var CohortsView = Backbone.View.extend({
+            var CohortsView = BaseDashboardView.extend({
                 events: {
                     'change .cohort-select': 'onCohortSelected',
                     'change .cohorts-state': 'onCohortsEnabledChanged',
@@ -24,13 +26,11 @@
                     'click .cohort-management-add-form .action-save': 'saveAddCohortForm',
                     'click .cohort-management-add-form .action-cancel': 'cancelAddCohortForm',
                     'click .link-cross-reference': 'showSection',
-                    'click .toggle-cohort-management-secondary': 'showCsvUpload',
-                    'click .toggle-cohort-management-discussions': 'showDiscussionTopics'
+                    'click .toggle-cohort-management-secondary': 'showCsvUpload'
                 },
 
                 initialize: function(options) {
                     var model = this.model;
-
                     this.template = HtmlUtils.template($('#cohorts-tpl').text());
                     this.selectorTemplate = HtmlUtils.template($('#cohort-selector-tpl').text());
                     this.context = options.context;
@@ -154,6 +154,7 @@
                     ).done(function() {
                         self.render();
                         self.renderCourseCohortSettingsNotificationView();
+                        self.pubSub.trigger('cohorts:state', fieldData);
                     }).fail(function(result) {
                         self.showNotification({
                             type: 'error',
@@ -303,27 +304,6 @@
                                     title: message
                                 });
                             }
-                        }).render();
-                    }
-                },
-                showDiscussionTopics: function(event) {
-                    event.preventDefault();
-
-                    $(event.currentTarget).addClass(hiddenClass);
-                    var cohortDiscussionsElement = this.$('.cohort-discussions-nav').removeClass(hiddenClass);
-
-                    if (!this.CourseWideDiscussionsView) {
-                        this.CourseWideDiscussionsView = new CourseWideDiscussionsView({
-                            el: cohortDiscussionsElement,
-                            model: this.context.discussionTopicsSettingsModel,
-                            cohortSettings: this.cohortSettings
-                        }).render();
-                    }
-                    if (!this.InlineDiscussionsView) {
-                        this.InlineDiscussionsView = new InlineDiscussionsView({
-                            el: cohortDiscussionsElement,
-                            model: this.context.discussionTopicsSettingsModel,
-                            cohortSettings: this.cohortSettings
                         }).render();
                     }
                 },

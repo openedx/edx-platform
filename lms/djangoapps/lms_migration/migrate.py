@@ -5,12 +5,14 @@
 import json
 import logging
 import os
+
+from django.conf import settings
+from django.http import HttpResponse
+from six import text_type
+
+import track.views
 import xmodule.modulestore.django as xmodule_django
 from xmodule.modulestore.django import modulestore
-
-from django.http import HttpResponse
-from django.conf import settings
-import track.views
 
 try:
     from django.views.decorators.csrf import csrf_exempt
@@ -121,7 +123,7 @@ def manage_modulestores(request, reload_dir=None, commit_id=None):
             settings.EDX_ROOT_URL,
             escape(cdir),
             escape(cdir),
-            course.location.to_deprecated_string()
+            text_type(course.location)
         )
     html += '</ol>'
 

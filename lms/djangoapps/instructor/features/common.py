@@ -7,11 +7,11 @@ Define common steps for instructor dashboard acceptance tests.
 
 from __future__ import absolute_import
 
-from lettuce import world, step
+from lettuce import step, world
 from mock import patch
 from nose.tools import assert_in
 
-from courseware.tests.factories import StaffFactory, InstructorFactory
+from courseware.tests.factories import InstructorFactory, StaffFactory
 
 
 @step(u'Given I am "([^"]*)" for a very large course')

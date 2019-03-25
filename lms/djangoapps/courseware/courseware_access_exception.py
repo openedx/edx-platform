@@ -10,9 +10,8 @@ class CoursewareAccessException(Http404):
     """
 
     def __init__(self, access_response):
-        super(CoursewareAccessException, self).__init__()
+        super(CoursewareAccessException, self).__init__("Course not found.")
         self.access_response = access_response
-        self.message = "Course not found."
 
     def to_json(self):
         """

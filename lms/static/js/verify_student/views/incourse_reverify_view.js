@@ -102,4 +102,4 @@
                 .attr('aria-disabled', !isEnabled);
          }
      });
- })(jQuery, _, _.str, Backbone, gettext, edx.HtmlUtils);
+ }(jQuery, _, _.str, Backbone, gettext, edx.HtmlUtils));

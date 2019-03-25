@@ -41,6 +41,7 @@ class ImageAnnotationModuleTestCase(unittest.TestCase):
             </json>
         </annotatable>
     '''
+    shard = 1
 
     def setUp(self):
         """

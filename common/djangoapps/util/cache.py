@@ -10,8 +10,6 @@ from functools import wraps
 
 from django.conf import settings
 from django.core import cache
-
-
 # If we can't find a 'general' CACHE defined in settings.py, we simply fall back
 # to returning the default cache. This will happen with dev machines.
 from django.utils.translation import get_language
@@ -55,7 +53,7 @@ def cache_if_anonymous(*get_parameters):
             # If that page is cached the authentication doesn't
             # happen, so we disable the cache when that feature is enabled.
             if (
-                not request.user.is_authenticated() and
+                not request.user.is_authenticated and
                 not settings.FEATURES['AUTH_USE_CERTIFICATES']
             ):
                 # Use the cache. The same view accessed through different domain names may

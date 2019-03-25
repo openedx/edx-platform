@@ -1,32 +1,32 @@
 """Management command to grant or revoke superuser access for one or more users"""
+from __future__ import print_function
 
-from optparse import make_option
 from django.contrib.auth.models import User
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
+from six import text_type
 
 
 class Command(BaseCommand):
     """Management command to grant or revoke superuser access for one or more users"""
-    option_list = BaseCommand.option_list + (
-        make_option('--unset',
-                    action='store_true',
-                    dest='unset',
-                    default=False,
-                    help='Set is_superuser to False instead of True'),
-    )
 
-    args = '<user|email> [user|email ...]>'
     help = """
     This command will set is_superuser to true for one or more users.
     Lookup by username or email address, assumes usernames
     do not look like email addresses.
     """
 
-    def handle(self, *args, **options):
-        if len(args) < 1:
-            raise CommandError('Usage is set_superuser {0}'.format(self.args))
+    def add_arguments(self, parser):
+        parser.add_argument('users',
+                            nargs='+',
+                            help='Users to set or unset (with the --unset flag) as superusers')
+        parser.add_argument('--unset',
+                            action='store_true',
+                            dest='unset',
+                            default=False,
+                            help='Set is_superuser to False instead of True')
 
-        for user in args:
+    def handle(self, *args, **options):
+        for user in options['users']:
             try:
                 if '@' in user:
                     userobj = User.objects.get(email=user)
@@ -39,8 +39,10 @@ class Command(BaseCommand):
                     userobj.is_superuser = True
 
                 userobj.save()
+                print('Modified {} sucessfully.'.format(user))
 
             except Exception as err:  # pylint: disable=broad-except
-                print "Error modifying user with identifier {}: {}: {}".format(user, type(err).__name__, err.message)
+                print("Error modifying user with identifier {}: {}: {}".format(user, type(err).__name__,
+                                                                               text_type(err)))
 
-        print 'Success!'
+        print('Complete!')

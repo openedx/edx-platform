@@ -87,7 +87,7 @@ formulaEquationPreview.enable = function() {
                 inputData.url,
                 inputData.inputId,
                 'preview_formcalc',
-                {'formula': formula, 'request_start': now},
+                {formula: formula, request_start: now},
                 inputData.requestCallback
             );
             // ).fail(function () {
@@ -95,8 +95,7 @@ formulaEquationPreview.enable = function() {
             //     // Have an error message and other stuff here?
             //     inputData.$img.css('visibility', 'hidden');
             // });
-        }
-        else {
+        } else {
             inputData.requestCallback({
                 preview: '',
                 request_start: now
@@ -113,7 +112,7 @@ formulaEquationPreview.enable = function() {
      * -Save which request is visible
      */
     function updatePage(inputData, response) {
-        var requestStart = response['request_start'];
+        var requestStart = response.request_start;
         if (requestStart == inputData.lastSent &&
             !inputData.isWaitingForRequest) {
             // Disable icon.

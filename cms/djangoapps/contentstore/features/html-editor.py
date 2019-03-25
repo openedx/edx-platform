@@ -3,9 +3,10 @@
 
 from collections import OrderedDict
 
-from lettuce import world, step
-from nose.tools import assert_in, assert_false, assert_true, assert_equal
-from common import type_in_codemirror, get_codemirror_value
+from lettuce import step, world
+from nose.tools import assert_equal, assert_false, assert_in, assert_true
+
+from common import get_codemirror_value, type_in_codemirror
 
 CODEMIRROR_SELECTOR_PREFIX = "$('iframe').contents().find"
 
@@ -54,22 +55,6 @@ def i_created_etext_in_latex(step):
 @step('I edit the page$')
 def i_click_on_edit_icon(step):
     world.edit_component()
-
-
-@step('I add an image with static link "(.*)" via the Image Plugin Icon$')
-def i_click_on_image_plugin_icon(step, path):
-    use_plugin(
-        '.mce-i-image',
-        lambda: world.css_fill('.mce-textbox', path, 0)
-    )
-
-
-@step('the link is shown as "(.*)" in the Image Plugin$')
-def check_link_in_image_plugin(step, path):
-    use_plugin(
-        '.mce-i-image',
-        lambda: assert_equal(path, world.css_find('.mce-textbox')[0].value)
-    )
 
 
 @step('I add a link with static link "(.*)" via the Link Plugin Icon$')
@@ -166,6 +151,10 @@ def check_toolbar_buttons(step):
         'forecolor',
         # This is our custom "code style" button, which uses an image instead of a class.
         'none',
+        'alignleft',
+        'aligncenter',
+        'alignright',
+        'alignjustify',
         'bullist',
         'numlist',
         'outdent',

@@ -1,39 +1,41 @@
 """
 Test helper functions and base classes.
 """
+
+import functools
 import inspect
 import json
-import unittest
-import functools
 import operator
-import pprint
-import requests
 import os
+import pprint
+import unittest
 import urlparse
 from contextlib import contextmanager
 from datetime import datetime
-from path import Path as path
-from bok_choy.javascript import js_defined
-from bok_choy.web_app_test import WebAppTest
-from bok_choy.promise import EmptyPromise, Promise
-from bok_choy.page_object import XSS_INJECTION
-from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
-from common.test.acceptance.fixtures.course import XBlockFixtureDesc
-from opaque_keys.edx.locator import CourseLocator
-from pymongo import MongoClient, ASCENDING
-from openedx.core.lib.tests.assertions.events import assert_event_matches, is_matching_event, EventMatchTolerates
-from xmodule.partitions.partitions import UserPartition
-from xmodule.partitions.tests.test_partitions import MockUserPartitionScheme
-from selenium.common.exceptions import StaleElementReferenceException
-from selenium.webdriver.support.select import Select
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from unittest import TestCase
 
+import requests
+from bok_choy.javascript import js_defined
+from bok_choy.page_object import XSS_INJECTION
+from bok_choy.promise import EmptyPromise, Promise
+from bok_choy.web_app_test import WebAppTest
+from opaque_keys.edx.locator import CourseLocator
+from path import Path as path
+from pymongo import ASCENDING, MongoClient
+from selenium.common.exceptions import StaleElementReferenceException
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.select import Select
+from selenium.webdriver.support.ui import WebDriverWait
 
+from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
+from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.common import BASE_URL
-
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
+from openedx.core.lib.tests.assertions.events import EventMatchTolerates, assert_event_matches, is_matching_event
+from openedx.core.release import RELEASE_LINE, doc_version
+from xmodule.partitions.partitions import UserPartition
 
 MAX_EVENTS_IN_FAILURE_OUTPUT = 20
 
@@ -213,7 +215,7 @@ def enable_css_animations(page):
     """)
 
 
-def select_option_by_text(select_browser_query, option_text):
+def select_option_by_text(select_browser_query, option_text, focus_out=False):
     """
     Chooses an option within a select by text (helper method for Select's select_by_visible_text method).
 
@@ -225,6 +227,8 @@ def select_option_by_text(select_browser_query, option_text):
         try:
             select = Select(query.first.results[0])
             select.select_by_visible_text(value)
+            if focus_out:
+                query.first.results[0].send_keys(Keys.TAB)
             return True
         except StaleElementReferenceException:
             return False
@@ -267,7 +271,7 @@ def generate_course_key(org, number, run):
     return CourseLocator(org, number, run, deprecated=(default_store == 'draft'))
 
 
-def select_option_by_value(browser_query, value):
+def select_option_by_value(browser_query, value, focus_out=False):
     """
     Selects a html select element by matching value attribute
     """
@@ -288,9 +292,10 @@ def select_option_by_value(browser_query, value):
                 if not opt.is_selected():
                     all_options_selected = False
                     opt.click()
-        # if value is not an option choice then it should return false
         if all_options_selected and not has_option:
             all_options_selected = False
+        if focus_out:
+            browser_query.first.results[0].send_keys(Keys.TAB)
         return all_options_selected
 
     # Make sure specified option is actually selected
@@ -422,9 +427,32 @@ def assert_opened_help_link_is_correct(test, url):
         url (str): url to verify.
     """
     test.browser.switch_to_window(test.browser.window_handles[-1])
-    # Assert that url in the browser is the same.
-    test.assertEqual(url, test.browser.current_url)
-    test.assertNotIn('Maze Found', test.browser.title)
+    WebDriverWait(test.browser, 10).until(lambda driver: driver.current_url == url)
+    # Check that the URL loads. Can't do this in the browser because it might
+    # be loading a "Maze Found" missing content page.
+    response = requests.get(url)
+    test.assertEqual(response.status_code, 200, "URL {!r} returned {}".format(url, response.status_code))
+
+
+EDX_BOOKS = {
+    'course_author': 'edx-partner-course-staff',
+    'learner': 'edx-guide-for-students',
+}
+
+OPEN_BOOKS = {
+    'course_author': 'open-edx-building-and-running-a-course',
+    'learner': 'open-edx-learner-guide',
+}
+
+
+def url_for_help(book_slug, path):
+    """
+    Create a full help URL given a book slug and a path component.
+    """
+    # Emulate the switch between books that happens in envs/bokchoy.py
+    books = EDX_BOOKS if RELEASE_LINE == "master" else OPEN_BOOKS
+    url = 'http://edx.readthedocs.io/projects/{}/en/{}{}'.format(books[book_slug], doc_version(), path)
+    return url
 
 
 class EventsTestMixin(TestCase):
@@ -433,7 +461,8 @@ class EventsTestMixin(TestCase):
     """
     def setUp(self):
         super(EventsTestMixin, self).setUp()
-        self.event_collection = MongoClient()["test"]["events"]
+        mongo_host = 'edx.devstack.mongo' if 'BOK_CHOY_HOSTNAME' in os.environ else 'localhost'
+        self.event_collection = MongoClient(mongo_host)["test"]["events"]
         self.start_time = datetime.now()
 
     def reset_event_tracking(self):
@@ -711,17 +740,44 @@ class AcceptanceTest(WebAppTest):
         # Use long messages so that failures show actual and expected values
         self.longMessage = True  # pylint: disable=invalid-name
 
+    def tearDown(self):
+        try:
+            self.browser.get('http://{}:{}'.format(
+                os.environ.get('BOK_CHOY_HOSTNAME', '127.0.0.1'),
+                os.environ.get('BOK_CHOY_LMS_PORT', 8003),
+            ))
+        except:  # pylint: disable=bare-except
+            self.browser.get('http://{}:{}'.format(
+                os.environ.get('BOK_CHOY_HOSTNAME', '127.0.0.1'),
+                os.environ.get('BOK_CHOY_CMS_PORT', 8031),
+            ))
+        logs = self.browser.execute_script("return window.localStorage.getItem('console_log_capture');")
+        if not logs:
+            return
+        logs = json.loads(logs)
+
+        log_dir = path('test_root') / 'log'
+        if 'shard' in os.environ:
+            log_dir /= "shard_{}".format(os.environ["SHARD"])
+        log_dir.mkdir_p()
+
+        with (log_dir / '{}.browser.log'.format(self.id()[:60])).open('w') as browser_log:
+            for (message, url, line_no, col_no, stack) in logs:
+                browser_log.write(u"{}:{}:{}: {}\n    {}\n".format(
+                    url,
+                    line_no,
+                    col_no,
+                    message,
+                    (stack or "").replace('\n', '\n    ')
+                ))
+
+        super(AcceptanceTest, self).tearDown()
+
 
 class UniqueCourseTest(AcceptanceTest):
     """
     Test that provides a unique course ID.
     """
-
-    def __init__(self, *args, **kwargs):
-        """
-        Create a unique course ID.
-        """
-        super(UniqueCourseTest, self).__init__(*args, **kwargs)
 
     def setUp(self):
         super(UniqueCourseTest, self).setUp()
@@ -761,8 +817,9 @@ class YouTubeStubConfig(object):
     Configure YouTube Stub Server.
     """
 
+    YOUTUBE_HOSTNAME = os.environ.get('BOK_CHOY_HOSTNAME', '127.0.0.1')
     PORT = 9080
-    URL = 'http://127.0.0.1:{}/'.format(PORT)
+    URL = 'http://{}:{}/'.format(YOUTUBE_HOSTNAME, PORT)
 
     @classmethod
     def configure(cls, config):
@@ -823,16 +880,37 @@ class YouTubeStubConfig(object):
             return {}
 
 
+def click_and_wait_for_window(page, element):
+    """
+    To avoid a race condition, click an element that launces a new window, and
+    wait for that window to launch.
+    To check this, make sure the number of window_handles increases by one.
+
+    Arguments:
+    page (PageObject): Page object to perform method on
+    element (WebElement): Clickable element that triggers the new window to open
+    """
+    num_windows = len(page.browser.window_handles)
+    element.click()
+    WebDriverWait(page.browser, 10).until(
+        lambda driver: len(driver.window_handles) > num_windows
+    )
+
+
 def create_user_partition_json(partition_id, name, description, groups, scheme="random"):
     """
     Helper method to create user partition JSON. If scheme is not supplied, "random" is used.
     """
+    # All that is persisted about a scheme is its name.
+    class MockScheme(object):
+        name = scheme
+
     return UserPartition(
-        partition_id, name, description, groups, MockUserPartitionScheme(scheme)
+        partition_id, name, description, groups, MockScheme()
     ).to_json()
 
 
-def assert_nav_help_link(test, page, href, signed_in=True):
+def assert_nav_help_link(test, page, href, signed_in=True, close_window=True):
     """
     Asserts that help link in navigation bar is correct.
 
@@ -843,7 +921,8 @@ def assert_nav_help_link(test, page, href, signed_in=True):
     test (AcceptanceTest): Test object
     page (PageObject): Page object to perform tests on.
     href (str): The help link which we expect to see when it is opened.
-    signed_in (bool): Specifies whether user is logged in or not. (It effects the css)
+    signed_in (bool): Specifies whether user is logged in or not. (It affects the css)
+    close_window(bool): Close the newly-opened help window before continuing
     """
     expected_link = {
         'href': href,
@@ -855,9 +934,12 @@ def assert_nav_help_link(test, page, href, signed_in=True):
     assert_link(test, expected_link, actual_link)
     # Assert that opened link is correct
     assert_opened_help_link_is_correct(test, href)
+    # Close the help window if not kept open intentionally
+    if close_window:
+        close_help_window(page)
 
 
-def assert_side_bar_help_link(test, page, href, help_text, as_list_item=False, index=-1):
+def assert_side_bar_help_link(test, page, href, help_text, as_list_item=False, index=-1, close_window=True):
     """
     Asserts that help link in side bar is correct.
 
@@ -872,6 +954,7 @@ def assert_side_bar_help_link(test, page, href, help_text, as_list_item=False, i
                          'li' inside a sidebar list DOM element.
     index (int): The index of element in case there are more than
                  one matching elements.
+    close_window(bool): Close the newly-opened help window before continuing
     """
     expected_link = {
         'href': href,
@@ -883,6 +966,21 @@ def assert_side_bar_help_link(test, page, href, help_text, as_list_item=False, i
     assert_link(test, expected_link, actual_link)
     # Assert that opened link is correct
     assert_opened_help_link_is_correct(test, href)
+    # Close the help window if not kept open intentionally
+    if close_window:
+        close_help_window(page)
+
+
+def close_help_window(page):
+    """
+    Closes the help window
+    Args:
+        page (PageObject): Page object to perform tests on.
+    """
+    browser_url = page.browser.current_url
+    if browser_url.startswith('https://edx.readthedocs.io') or browser_url.startswith('http://edx.readthedocs.io'):
+        page.browser.close()  # close only the current window
+        page.browser.switch_to_window(page.browser.window_handles[0])
 
 
 class TestWithSearchIndexMixin(object):

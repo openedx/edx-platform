@@ -1,0 +1,25 @@
+<%page expression_filter="h"/>
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
+%>
+<div class="profile-sidebar" role="region" aria-labelledby="account-activation-title">
+  <header class="profile">
+    <h2 id="account-activation-title" class="account-activation-title sr">${_("Account Activation Info")}: </h2>
+  </header>
+  <div class="user-info">
+    <ul>
+      <li class="status status-verification warning" aria-labelledby="status-title" tabindex="-1">
+        <span id="status-title" class="title status-title">
+          <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+          <span class="sr">Notice</span>
+          ${_("Activate your account!")}
+        </span>
+        <p class="status-note">${ activate_account_message | n, decode.utf8 }</p>
+        ## TODO: Add resend activation email functionality.
+        ## TODO: Implementation of this is part of ENT-353.
+        ## <button class="btn btn-neutral"><i class="fa fa-envelope-o"></i> Resend Activation Email </button>
+      </li>
+    </ul>
+  </div>
+</div>

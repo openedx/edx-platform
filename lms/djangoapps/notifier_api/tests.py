@@ -1,23 +1,26 @@
+from __future__ import absolute_import
 import itertools
 
 import ddt
 from django.conf import settings
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from opaque_keys.edx.locator import CourseLocator
 
-from django_comment_common.models import Role, Permission
+from django_comment_common.models import Permission, Role
 from notification_prefs import NOTIFICATION_PREF_KEY
 from notifier_api.views import NotifierUsersViewSet
-from opaque_keys.edx.locator import CourseLocator
-from student.models import CourseEnrollment
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.models import UserPreference
 from openedx.core.djangoapps.user_api.tests.factories import UserPreferenceFactory
+from student.models import CourseEnrollment
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+import six
+from six.moves import range
 
 
 @ddt.ddt
@@ -102,7 +105,7 @@ class NotifierUsersViewSetTest(UrlResetMixin, ModuleStoreTestCase):
                 itertools.product([True, False], [True, False], [True, False])
         ):
             self._set_up_course(is_course_cohorted, is_user_cohorted, is_moderator)
-            expected_course_info[unicode(self.courses[-1].id)] = {
+            expected_course_info[six.text_type(self.courses[-1].id)] = {
                 "cohort_id": self.cohorts[-1].id if is_user_cohorted else None,
                 "see_all_cohorts": is_moderator or not is_course_cohorted
             }
@@ -114,7 +117,7 @@ class NotifierUsersViewSetTest(UrlResetMixin, ModuleStoreTestCase):
         course_id = self.courses[0].id
         CourseEnrollment.unenroll(self.user, course_id)
         result = self._get_detail()
-        self.assertNotIn(unicode(course_id), result["course_info"])
+        self.assertNotIn(six.text_type(course_id), result["course_info"])
 
     def test_course_info_no_enrollments(self):
         result = self._get_detail()
@@ -195,11 +198,11 @@ class NotifierUsersViewSetTest(UrlResetMixin, ModuleStoreTestCase):
         self.assertEqual(
             result_map[self.user.id]["course_info"],
             {
-                unicode(self.courses[0].id): {
+                six.text_type(self.courses[0].id): {
                     "cohort_id": self.cohorts[0].id,
                     "see_all_cohorts": False,
                 },
-                unicode(self.courses[1].id): {
+                six.text_type(self.courses[1].id): {
                     "cohort_id": None,
                     "see_all_cohorts": True,
                 },
@@ -208,7 +211,7 @@ class NotifierUsersViewSetTest(UrlResetMixin, ModuleStoreTestCase):
         self.assertEqual(
             result_map[other_user.id]["course_info"],
             {
-                unicode(self.courses[0].id): {
+                six.text_type(self.courses[0].id): {
                     "cohort_id": None,
                     "see_all_cohorts": False,
                 },

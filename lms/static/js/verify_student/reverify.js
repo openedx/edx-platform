@@ -10,7 +10,7 @@
  (function($, _) {
      'use strict';
      var errorView,
-         el = $('#reverify-container');
+         $el = $('#reverify-container');
 
      edx.verify_student = edx.verify_student || {};
 
@@ -25,20 +25,20 @@
          errorModel: errorView.model,
          stepInfo: {
              'face-photo-step': {
-                 platformName: el.data('platform-name'),
-                 captureSoundPath: el.data('capture-sound')
+                 platformName: $el.data('platform-name'),
+                 captureSoundPath: $el.data('capture-sound')
              },
              'id-photo-step': {
-                 platformName: el.data('platform-name'),
-                 captureSoundPath: el.data('capture-sound')
+                 platformName: $el.data('platform-name'),
+                 captureSoundPath: $el.data('capture-sound')
              },
              'review-photos-step': {
-                 fullName: el.data('full-name'),
-                 platformName: el.data('platform-name')
+                 fullName: $el.data('full-name'),
+                 platformName: $el.data('platform-name')
              },
              'reverify-success-step': {
-                 platformName: el.data('platform-name')
+                 platformName: $el.data('platform-name')
              }
          }
      }).render();
- })(jQuery, _);
+ }(jQuery, _));

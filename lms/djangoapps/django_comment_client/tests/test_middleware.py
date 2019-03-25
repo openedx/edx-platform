@@ -1,10 +1,12 @@
+import json
+
 import django.http
 from django.test import TestCase
 from nose.plugins.attrib import attr
-import json
+from six import text_type
 
-import lms.lib.comment_client
 import django_comment_client.middleware as middleware
+import lms.lib.comment_client
 
 
 @attr(shard=1)
@@ -25,7 +27,7 @@ class AjaxExceptionTestCase(TestCase):
         self.assertIsInstance(response1, middleware.JsonError)
         self.assertEqual(self.exception1.status_code, response1.status_code)
         self.assertEqual(
-            {"errors": json.loads(self.exception1.message)},
+            {"errors": json.loads(text_type(self.exception1))},
             json.loads(response1.content)
         )
 
@@ -33,7 +35,7 @@ class AjaxExceptionTestCase(TestCase):
         self.assertIsInstance(response2, middleware.JsonError)
         self.assertEqual(self.exception2.status_code, response2.status_code)
         self.assertEqual(
-            {"errors": [self.exception2.message]},
+            {"errors": [text_type(self.exception2)]},
             json.loads(response2.content)
         )
 

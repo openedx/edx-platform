@@ -8,8 +8,9 @@ from django.template.response import TemplateResponse
 from hijack_admin.admin import HijackUserAdminMixin
 from ratelimitbackend import admin
 from student.admin import UserAdmin
+
 from openedx.core.djangolib.markup import HTML, Text
-from .models import AlternativeDomain
+from openedx.core.djangoapps.appsembler.sites.models import AlternativeDomain
 from organizations.models import UserOrganizationMapping
 
 from openedx.core.djangoapps.appsembler.sites.forms import MakeAMCAdminForm

@@ -2,26 +2,29 @@
 """
 Tests for file.py
 """
-import ddt
+import os
+from datetime import datetime
 from io import StringIO
 
-from django.test import TestCase
-from datetime import datetime
-from django.utils.timezone import UTC
-from mock import patch, Mock
-from django.http import HttpRequest
+import ddt
+from django.core import exceptions
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.http import HttpRequest
+from django.test import TestCase
+from pytz import UTC
+from mock import Mock, patch
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locations import CourseLocator
+from six import text_type
+
 import util.file
 from util.file import (
+    FileValidationException,
+    UniversalNewlineIterator,
     course_and_time_based_filename_generator,
     course_filename_prefix_generator,
-    store_uploaded_file,
-    FileValidationException,
-    UniversalNewlineIterator
+    store_uploaded_file
 )
-from opaque_keys.edx.locations import CourseLocator, SlashSeparatedCourseKey
-from django.core import exceptions
-import os
 
 
 @ddt.ddt
@@ -29,19 +32,13 @@ class FilenamePrefixGeneratorTestCase(TestCase):
     """
     Tests for course_filename_prefix_generator
     """
-    @ddt.data(CourseLocator, SlashSeparatedCourseKey)
-    def test_locators(self, course_key_class):
-        self.assertEqual(
-            course_filename_prefix_generator(course_key_class(org='foo', course='bar', run='baz')),
-            u'foo_bar_baz'
-        )
+    @ddt.data(CourseLocator(org='foo', course='bar', run='baz'), CourseKey.from_string('foo/bar/baz'))
+    def test_locators(self, course_key):
+        self.assertEqual(course_filename_prefix_generator(course_key), u'foo_bar_baz')
 
-    @ddt.data(CourseLocator, SlashSeparatedCourseKey)
-    def test_custom_separator(self, course_key_class):
-        self.assertEqual(
-            course_filename_prefix_generator(course_key_class(org='foo', course='bar', run='baz'), separator='-'),
-            u'foo-bar-baz'
-        )
+    @ddt.data(CourseLocator(org='foo', course='bar', run='baz'), CourseKey.from_string('foo/bar/baz'))
+    def test_custom_separator(self, course_key):
+        self.assertEqual(course_filename_prefix_generator(course_key, separator='-'), u'foo-bar-baz')
 
 
 @ddt.ddt
@@ -49,7 +46,7 @@ class FilenameGeneratorTestCase(TestCase):
     """
     Tests for course_and_time_based_filename_generator
     """
-    NOW = datetime.strptime('1974-06-22T01:02:03', '%Y-%m-%dT%H:%M:%S').replace(tzinfo=UTC())
+    NOW = datetime.strptime('1974-06-22T01:02:03', '%Y-%m-%dT%H:%M:%S').replace(tzinfo=UTC)
 
     def setUp(self):
         super(FilenameGeneratorTestCase, self).setUp()
@@ -61,21 +58,19 @@ class FilenameGeneratorTestCase(TestCase):
         mocked_datetime.now.return_value = self.NOW
         self.addCleanup(datetime_patcher.stop)
 
-    @ddt.data(CourseLocator, SlashSeparatedCourseKey)
-    def test_filename_generator(self, course_key_class):
+    @ddt.data(CourseLocator(org='foo', course='bar', run='baz'), CourseKey.from_string('foo/bar/baz'))
+    def test_filename_generator(self, course_key):
         """
         Tests that the generator creates names based on course_id, base name, and date.
         """
         self.assertEqual(
             u'foo_bar_baz_file_1974-06-22-010203',
-            course_and_time_based_filename_generator(course_key_class(org='foo', course='bar', run='baz'), 'file')
+            course_and_time_based_filename_generator(course_key, 'file')
         )
 
         self.assertEqual(
             u'foo_bar_baz_base_name_ø_1974-06-22-010203',
-            course_and_time_based_filename_generator(
-                course_key_class(org='foo', course='bar', run='baz'), ' base` name ø '
-            )
+            course_and_time_based_filename_generator(course_key, ' base` name ø ')
         )
 
 
@@ -101,7 +96,7 @@ class StoreUploadedFileTestCase(TestCase):
         """
         Helper method to verify exception text.
         """
-        self.assertEqual(expected_message, error.exception.message)
+        self.assertEqual(expected_message, text_type(error.exception))
 
     def test_error_conditions(self):
         """

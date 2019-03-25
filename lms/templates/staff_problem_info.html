@@ -2,6 +2,7 @@
 <%!
 from django.utils.translation import ugettext as _
 from django.template.defaultfilters import escapejs
+from six import text_type
 %>
 
 ## The JS for this is defined in xqa_interface.html
@@ -25,7 +26,7 @@ ${block_content}
   <a class="instructor-info-action" href="#${element_id}_debug" id="${element_id}_trig">${_("Staff Debug Info")}</a>
 
   %  if settings.FEATURES.get('ENABLE_STUDENT_HISTORY_VIEW') and \
-    location.category == 'problem':
+    location.block_type == 'problem':
     <a class="instructor-info-action" href="#${element_id}_history" id="${element_id}_history_trig">${_("Submission history")}</a>
   %  endif
 </div>
@@ -56,39 +57,48 @@ ${block_content}
 <div aria-hidden="true" role="dialog" tabindex="-1" class="modal staff-modal" id="${element_id}_debug" >
   <div class="inner-wrapper">
     <header>
-      <h2>${_('Staff Debug')}</h2>
+      <h2>${_('Staff Debug:')} ${dict(fields)['display_name']}</h2>
     </header>
 
     <hr />
     <div class="staff_actions">
       <h3>${_('Actions')}</h3>
       <div>
-        <label for="sd_fu_${location.name | h}">${_('Username')}:</label>
-        <input type="text" tabindex="0" id="sd_fu_${location.name | h}" placeholder="${user.username}"/>
+        <label for="sd_fu_${location.block_id | h}">${_('Username')}:</label>
+        <input type="text" tabindex="0" id="sd_fu_${location.block_id | h}" placeholder="${user.username}"/>
       </div>
-      <div data-location="${location | h}" data-location-name="${location.name | h}">
+      % if can_override_problem_score:
+      <div>
+        <label for="sd_fs_${location.block_id | h}">${_('Score (for override only)')}:</label>
+        <input type="text" tabindex="0" id="sd_fs_${location.block_id | h}" placeholder="0"/>
+        <label for="sd_fs_${location.block_id | h}"> / ${max_problem_score}</label>
+      </div>
+      % endif
+      <div data-location="${location | h}" data-location-name="${location.block_id | h}">
         [
         % if can_reset_attempts:
         <button type="button" class="btn-link staff-debug-reset">${_('Reset Learner\'s Attempts to Zero')}</button>
         |
         % endif
-        % if has_instructor_access:
         <button type="button" class="btn-link staff-debug-sdelete">${_('Delete Learner\'s State')}</button>
         % if can_rescore_problem:
         |
         <button type="button" class="btn-link staff-debug-rescore">${_('Rescore Learner\'s Submission')}</button>
         |
         <button type="button" class="btn-link staff-debug-rescore-if-higher">${_('Rescore Only If Score Improves')}</button>
+        |
         % endif
+        % if can_override_problem_score:
+        <button type="button" class="btn-link staff-debug-override-score">${_('Override Score')}</button>
         % endif
         ]
       </div>
-      <div id="result_${location.name | h}"></div>
+      <div id="result_${location.block_id | h}"></div>
     </div>
 
     <div class="staff_info" style="display:block">
       is_released = ${is_released}
-      location = ${location.to_deprecated_string() | h}
+      location = ${text_type(location) | h}
 
       <table summary="${_('Module Fields')}">
         <tr><th>${_('Module Fields')}</th></tr>

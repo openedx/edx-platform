@@ -1,0 +1,40 @@
+{% extends 'ace_common/edx_ace/common/base_body.html' %}
+
+{% load i18n %}
+{% load static %}
+{% block content %}
+<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+        <td>
+            <h1>
+                {% trans "Password Reset" %}
+            </h1>
+            <p style="color: rgba(0,0,0,.75);">
+                {% blocktrans %}You're receiving this e-mail because you requested a password reset for your user account at {{ platform_name }}.{% endblocktrans %}
+                <br />
+            </p>
+
+            {% if failed %}
+                <p style="color: rgba(0,0,0,.75);">
+                    {% blocktrans %}However, there is currently no user account associated with your email address: {{ email_address }}.{% endblocktrans %}
+                    <br />
+                </p>
+
+                <p style="color: rgba(0,0,0,.75);">
+                    {% trans "If you did not request this change, you can ignore this email." %}
+                    <br />
+                </p>
+            {% else %}
+                <p style="color: rgba(0,0,0,.75);">
+                    {% trans "If you didn't request this change, you can disregard this email - we have not yet reset your password." %}
+                    <br />
+                </p>
+
+                {% trans "Change my Password" as course_cta_text %}
+
+                {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text course_cta_url=reset_link %}
+            {% endif %}
+        </td>
+    </tr>
+</table>
+{% endblock %}

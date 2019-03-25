@@ -39,12 +39,7 @@
                     user: user,
                     enrollments: this.enrollments,
                     formatDate: function(date) {
-                        if (!date) {
-                            return 'N/A';
-                        }
-                        else {
-                            return moment(date).format('MM/DD/YYYY (H:MM UTC)');
-                        }
+                        return date ? moment.utc(date).format('lll z') : 'N/A';
                     }
                 }));
 
@@ -88,9 +83,9 @@
              * learner's enrollment.
              */
             changeEnrollment: function(event) {
-                var button = $(event.currentTarget),
-                    course_id = button.data('course_id'),
-                    modes = button.data('modes').split(','),
+                var $button = $(event.currentTarget),
+                    course_id = $button.data('course_id'),
+                    modes = $button.data('modes').split(','),
                     enrollment = this.enrollments.findWhere({course_id: course_id});
                 event.preventDefault();
                 new EnrollmentModal({

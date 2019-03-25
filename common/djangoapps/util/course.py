@@ -2,29 +2,68 @@
 Utility methods related to course
 """
 import logging
-from django.conf import settings
+import urllib
 
-from opaque_keys.edx.keys import CourseKey
+from django.conf import settings
 from openedx.core.djangoapps.appsembler.sites.utils import get_lms_link_from_course_key
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 log = logging.getLogger(__name__)
 
+COURSE_SHARING_UTM_PARAMETERS = {
+    'facebook': {
+        'utm_medium': 'social',
+        'utm_campaign': 'social-sharing-db',
+        'utm_source': 'facebook',
+    },
+    'twitter': {
+        'utm_medium': 'social',
+        'utm_campaign': 'social-sharing-db',
+        'utm_source': 'twitter',
+    },
+}
 
-def get_lms_link_for_about_page(course_key):
-    """
-    Returns the url to the course about page.
-    """
-    assert isinstance(course_key, CourseKey)
 
-    if settings.FEATURES.get('ENABLE_MKTG_SITE'):
-        # Root will be "https://www.edx.org". The complete URL will still not be exactly correct,
-        # but redirects exist from www.edx.org to get to the Drupal course about page URL.
-        about_base = settings.MKTG_URLS['ROOT']
+def get_encoded_course_sharing_utm_params():
+    """
+    Returns encoded Course Sharing UTM Parameters.
+    """
+    return {
+        utm_source: urllib.urlencode(utm_params)
+        for utm_source, utm_params in COURSE_SHARING_UTM_PARAMETERS.iteritems()
+    }
+
+
+def get_link_for_about_page(course):
+    """
+    Arguments:
+        course: This can be either a course overview object or a course descriptor.
+
+    Returns the course sharing url, this can be one of course's social sharing url, marketing url, or
+    lms course about url.
+    """
+    is_social_sharing_enabled = configuration_helpers.get_value(
+        'SOCIAL_SHARING_SETTINGS',
+        getattr(settings, 'SOCIAL_SHARING_SETTINGS', {})
+    ).get('CUSTOM_COURSE_URLS')
+    if is_social_sharing_enabled and course.social_sharing_url:
+        course_about_url = course.social_sharing_url
+    elif settings.FEATURES.get('ENABLE_MKTG_SITE') and getattr(course, 'marketing_url', None):
+        course_about_url = course.marketing_url
     else:
-        about_base = settings.LMS_BASE
-        about_base = "https://{}".format(get_lms_link_from_course_key(about_base, course_key))
+        protocol = 'https' if settings.LMS_ROOT_URL.startswith('https') else 'http'
+        lms_domain = get_lms_link_from_course_key(
+            configuration_helpers.get_value('LMS_BASE', settings.LMS_BASE),
+            course.id,
+        )
+        about_base = u'{protocol}://{lms_domain}'.format(
+            lms_domain=lms_domain,
+            protocol=protocol,
+        )
 
-    return u"{about_base_url}/courses/{course_key}/about".format(
-        about_base_url=about_base,
-        course_key=course_key.to_deprecated_string()
-    )
+        course_about_url = u'{about_base_url}/courses/{course_key}/about'.format(
+            about_base_url=about_base,
+            course_key=unicode(course.id),
+        )
+
+    return course_about_url

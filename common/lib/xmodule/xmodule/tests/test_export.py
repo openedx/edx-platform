@@ -12,6 +12,7 @@ import unittest
 from datetime import datetime, timedelta, tzinfo
 from fs.osfs import OSFS
 from path import Path as path
+from six import text_type
 from tempfile import mkdtemp
 from textwrap import dedent
 
@@ -19,7 +20,7 @@ from xblock.core import XBlock
 from xblock.fields import String, Scope, Integer
 from xblock.test.tools import blocks_are_equivalent
 
-from opaque_keys.edx.locations import Location
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.tests import DATA_DIR
@@ -30,7 +31,7 @@ def strip_filenames(descriptor):
     """
     Recursively strips 'filename' from all children's definitions.
     """
-    print "strip filename from {desc}".format(desc=descriptor.location.to_deprecated_string())
+    print "strip filename from {desc}".format(desc=text_type(descriptor.location))
     if descriptor._field_data.has(descriptor, 'filename'):
         descriptor._field_data.delete(descriptor, 'filename')
 
@@ -61,6 +62,7 @@ class RoundTripTestCase(unittest.TestCase):
     And we compare original import with second import (after export).
     Thus we make sure that export and import work properly.
     """
+    shard = 1
 
     def setUp(self):
         super(RoundTripTestCase, self).setUp()
@@ -68,16 +70,17 @@ class RoundTripTestCase(unittest.TestCase):
         self.temp_dir = mkdtemp()
         self.addCleanup(shutil.rmtree, self.temp_dir)
 
+    @mock.patch('xmodule.video_module.video_module.edxval_api', None)
     @mock.patch('xmodule.course_module.requests.get')
     @ddt.data(
-        "toy",
-        "simple",
-        "conditional_and_poll",
-        "conditional",
-        "self_assessment",
-        "test_exam_registration",
-        "word_cloud",
-        "pure_xblock",
+        u"toy",
+        u"simple",
+        u"conditional_and_poll",
+        u"conditional",
+        u"self_assessment",
+        u"test_exam_registration",
+        u"word_cloud",
+        u"pure_xblock",
     )
     @XBlock.register_temp_plugin(PureXBlock, 'pure')
     def test_export_roundtrip(self, course_dir, mock_get):
@@ -106,12 +109,12 @@ class RoundTripTestCase(unittest.TestCase):
         # will still be there.
         print "Starting export"
         file_system = OSFS(root_dir)
-        initial_course.runtime.export_fs = file_system.makeopendir(course_dir)
+        initial_course.runtime.export_fs = file_system.makedir(course_dir, recreate=True)
         root = lxml.etree.Element('root')
 
         initial_course.add_xml_to_node(root)
-        with initial_course.runtime.export_fs.open('course.xml', 'w') as course_xml:
-            lxml.etree.ElementTree(root).write(course_xml)
+        with initial_course.runtime.export_fs.open('course.xml', 'wb') as course_xml:
+            lxml.etree.ElementTree(root).write(course_xml, encoding='utf-8')
 
         print "Starting second import"
         second_import = XMLModuleStore(root_dir, source_dirs=[course_dir], xblock_mixins=(XModuleMixin,))
@@ -150,6 +153,8 @@ class TestEdxJsonEncoder(unittest.TestCase):
     """
     Tests for xml_exporter.EdxJSONEncoder
     """
+    shard = 1
+
     def setUp(self):
         super(TestEdxJsonEncoder, self).setUp()
 
@@ -169,11 +174,11 @@ class TestEdxJsonEncoder(unittest.TestCase):
         self.null_utc_tz = NullTZ()
 
     def test_encode_location(self):
-        loc = Location('org', 'course', 'run', 'category', 'name', None)
-        self.assertEqual(loc.to_deprecated_string(), self.encoder.default(loc))
+        loc = BlockUsageLocator(CourseLocator('org', 'course', 'run'), 'category', 'name')
+        self.assertEqual(text_type(loc), self.encoder.default(loc))
 
-        loc = Location('org', 'course', 'run', 'category', 'name', 'version')
-        self.assertEqual(loc.to_deprecated_string(), self.encoder.default(loc))
+        loc = BlockUsageLocator(CourseLocator('org', 'course', 'run', branch='version'), 'category', 'name')
+        self.assertEqual(text_type(loc), self.encoder.default(loc))
 
     def test_encode_naive_datetime(self):
         self.assertEqual(

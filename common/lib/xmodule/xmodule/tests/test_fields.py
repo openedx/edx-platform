@@ -3,13 +3,14 @@
 import datetime
 import unittest
 
-from django.utils.timezone import UTC
+from pytz import UTC
 
 from xmodule.fields import Date, Timedelta, RelativeTime
 from xmodule.timeinfo import TimeInfo
 
 
 class DateTest(unittest.TestCase):
+    shard = 1
     date = Date()
 
     def compare_dates(self, dt1, dt2, expected_delta):
@@ -57,15 +58,15 @@ class DateTest(unittest.TestCase):
         self.assertEqual(DateTest.date.enforce_type(""), None)
         self.assertEqual(
             DateTest.date.enforce_type("2012-12-31T23:00:01"),
-            datetime.datetime(2012, 12, 31, 23, 0, 1, tzinfo=UTC())
+            datetime.datetime(2012, 12, 31, 23, 0, 1, tzinfo=UTC)
         )
         self.assertEqual(
             DateTest.date.enforce_type(1234567890000),
-            datetime.datetime(2009, 2, 13, 23, 31, 30, tzinfo=UTC())
+            datetime.datetime(2009, 2, 13, 23, 31, 30, tzinfo=UTC)
         )
         self.assertEqual(
-            DateTest.date.enforce_type(datetime.datetime(2014, 5, 9, 21, 1, 27, tzinfo=UTC())),
-            datetime.datetime(2014, 5, 9, 21, 1, 27, tzinfo=UTC())
+            DateTest.date.enforce_type(datetime.datetime(2014, 5, 9, 21, 1, 27, tzinfo=UTC)),
+            datetime.datetime(2014, 5, 9, 21, 1, 27, tzinfo=UTC)
         )
         with self.assertRaises(TypeError):
             DateTest.date.enforce_type([1])
@@ -79,11 +80,11 @@ class DateTest(unittest.TestCase):
     def test_old_due_date_format(self):
         current = datetime.datetime.today()
         self.assertEqual(
-            datetime.datetime(current.year, 3, 12, 12, tzinfo=UTC()),
+            datetime.datetime(current.year, 3, 12, 12, tzinfo=UTC),
             DateTest.date.from_json("March 12 12:00")
         )
         self.assertEqual(
-            datetime.datetime(current.year, 12, 4, 16, 30, tzinfo=UTC()),
+            datetime.datetime(current.year, 12, 4, 16, 30, tzinfo=UTC),
             DateTest.date.from_json("December 4 16:30")
         )
         self.assertIsNone(DateTest.date.from_json("12 12:00"))
@@ -92,13 +93,13 @@ class DateTest(unittest.TestCase):
         """
         Test the non-standard args being passed to from_json
         """
-        now = datetime.datetime.now(UTC())
-        delta = now - datetime.datetime.fromtimestamp(0, UTC())
+        now = datetime.datetime.now(UTC)
+        delta = now - datetime.datetime.fromtimestamp(0, UTC)
         self.assertEqual(
             DateTest.date.from_json(delta.total_seconds() * 1000),
             now
         )
-        yesterday = datetime.datetime.now(UTC()) - datetime.timedelta(days=-1)
+        yesterday = datetime.datetime.now(UTC) - datetime.timedelta(days=-1)
         self.assertEqual(DateTest.date.from_json(yesterday), yesterday)
 
     def test_to_json(self):
@@ -122,6 +123,7 @@ class DateTest(unittest.TestCase):
 
 
 class TimedeltaTest(unittest.TestCase):
+    shard = 1
     delta = Timedelta()
 
     def test_from_json(self):
@@ -156,8 +158,10 @@ class TimedeltaTest(unittest.TestCase):
 
 
 class TimeInfoTest(unittest.TestCase):
+    shard = 1
+
     def test_time_info(self):
-        due_date = datetime.datetime(2000, 4, 14, 10, tzinfo=UTC())
+        due_date = datetime.datetime(2000, 4, 14, 10, tzinfo=UTC)
         grace_pd_string = '1 day 12 hours 59 minutes 59 seconds'
         timeinfo = TimeInfo(due_date, grace_pd_string)
         self.assertEqual(
@@ -167,6 +171,7 @@ class TimeInfoTest(unittest.TestCase):
 
 
 class RelativeTimeTest(unittest.TestCase):
+    shard = 1
 
     delta = RelativeTime()
 

@@ -8,28 +8,22 @@ import logging
 import urllib
 from functools import wraps
 
-from django.http import (
-    HttpResponse,
-    HttpResponseBadRequest,
-    HttpResponseForbidden,
-    HttpResponseServerError
-)
-from django.views.decorators.http import require_GET, require_POST
 from django.db import transaction
 from django.db.models import Q
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseServerError
 from django.utils.translation import ugettext as _
-
-from certificates import api
-from certificates.models import CertificateInvalidation
-from courseware.access import has_access
-from lms.djangoapps.instructor_task.api import generate_certificates_for_students
+from django.views.decorators.http import require_GET, require_POST
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+
+from lms.djangoapps.certificates import api
+from lms.djangoapps.certificates.models import CertificateInvalidation
+from courseware.access import has_access
+from lms.djangoapps.instructor_task.api import generate_certificates_for_students
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from student.models import User, CourseEnrollment
+from student.models import CourseEnrollment, User
 from util.json_request import JsonResponse
 from xmodule.modulestore.django import modulestore
-
 
 log = logging.getLogger(__name__)
 

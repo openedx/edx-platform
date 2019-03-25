@@ -5,7 +5,7 @@ from django.db import migrations, models
 import django_countries.fields
 import django.db.models.deletion
 from django.conf import settings
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
+from opaque_keys.edx.django.models import CourseKeyField
 
 
 class Migration(migrations.Migration):
@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('rule_type', models.CharField(default=b'blacklist', help_text='Whether to include or exclude the given course. If whitelist countries are specified, then ONLY users from whitelisted countries will be able to access the course.  If blacklist countries are specified, then users from blacklisted countries will NOT be able to access the course.', max_length=255, choices=[(b'whitelist', b'Whitelist (allow only these countries)'), (b'blacklist', b'Blacklist (block these countries)')])),
-                ('country', models.ForeignKey(help_text='The country to which this rule applies.', to='embargo.Country')),
+                ('country', models.ForeignKey(help_text='The country to which this rule applies.', to='embargo.Country', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -95,7 +95,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='countryaccessrule',
             name='restricted_course',
-            field=models.ForeignKey(help_text='The course to which this rule applies.', to='embargo.RestrictedCourse'),
+            field=models.ForeignKey(help_text='The course to which this rule applies.', to='embargo.RestrictedCourse', on_delete=models.CASCADE),
         ),
         migrations.AlterUniqueTogether(
             name='countryaccessrule',

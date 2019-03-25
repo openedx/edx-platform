@@ -1,194 +1,133 @@
+# -*- coding: utf-8 -*-
 """
-Tests of re-verification service.
+Tests for the service classes in verify_student.
 """
+
+from datetime import timedelta
 
 import ddt
+from django.conf import settings
+from mock import patch
+from nose.tools import (
+    assert_equals,
+    assert_false,
+    assert_is_none,
+    assert_true
+)
 
-from opaque_keys.edx.keys import CourseKey
-
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
-from student.models import CourseEnrollment
+from common.test.utils import MockS3Mixin
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, SSOVerification, ManualVerification
+from lms.djangoapps.verify_student.services import IDVerificationService
 from student.tests.factories import UserFactory
-from lms.djangoapps.verify_student.models import VerificationCheckpoint, VerificationStatus, SkippedReverification
-from lms.djangoapps.verify_student.services import ReverificationService
-
-from openedx.core.djangoapps.credit.api import get_credit_requirement_status, set_credit_requirements
-from openedx.core.djangoapps.credit.models import CreditCourse
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory
+
+FAKE_SETTINGS = {
+    "DAYS_GOOD_FOR": 10,
+}
 
 
+@patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
 @ddt.ddt
-class TestReverificationService(ModuleStoreTestCase):
+class TestIDVerificationService(MockS3Mixin, ModuleStoreTestCase):
     """
-    Tests for the re-verification service.
+    Tests for IDVerificationService.
     """
+    shard = 4
 
-    def setUp(self):
-        super(TestReverificationService, self).setUp()
-
-        self.user = UserFactory.create(username="rusty", password="test")
-        self.course = CourseFactory.create(org='Robot', number='999', display_name='Test Course')
-        self.course_id = self.course.id
-        CourseModeFactory.create(
-            mode_slug="verified",
-            course_id=self.course_id,
-            min_price=100,
-        )
-        self.course_key = CourseKey.from_string(unicode(self.course_id))
-
-        self.item = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
-        self.final_checkpoint_location = u'i4x://{org}/{course}/edx-reverification-block/final_uuid'.format(
-            org=self.course_id.org, course=self.course_id.course
-        )
-
-        # Enroll in a verified mode
-        self.enrollment = CourseEnrollment.enroll(self.user, self.course_id, mode=CourseMode.VERIFIED)
-
-    @ddt.data('final', 'midterm')
-    def test_start_verification(self, checkpoint_name):
-        """Test the 'start_verification' service method.
-
-        Check that if a reverification checkpoint exists for a specific course
-        then 'start_verification' method returns that checkpoint otherwise it
-        creates that checkpoint.
+    def test_user_is_verified(self):
         """
-        reverification_service = ReverificationService()
-        checkpoint_location = u'i4x://{org}/{course}/edx-reverification-block/{checkpoint}'.format(
-            org=self.course_id.org, course=self.course_id.course, checkpoint=checkpoint_name
-        )
-        expected_url = (
-            '/verify_student/reverify'
-            '/{course_key}'
-            '/{checkpoint_location}/'
-        ).format(course_key=unicode(self.course_id), checkpoint_location=checkpoint_location)
-
-        self.assertEqual(
-            reverification_service.start_verification(unicode(self.course_id), checkpoint_location),
-            expected_url
-        )
-
-    def test_get_status(self):
-        """Test the verification statuses of a user for a given 'checkpoint'
-        and 'course_id'.
+        Test to make sure we correctly answer whether a user has been verified.
         """
-        reverification_service = ReverificationService()
-        self.assertIsNone(
-            reverification_service.get_status(self.user.id, unicode(self.course_id), self.final_checkpoint_location)
-        )
+        user = UserFactory.create()
+        attempt = SoftwareSecurePhotoVerification(user=user)
+        attempt.save()
 
-        checkpoint_obj = VerificationCheckpoint.objects.create(
-            course_id=unicode(self.course_id),
-            checkpoint_location=self.final_checkpoint_location
-        )
-        VerificationStatus.objects.create(checkpoint=checkpoint_obj, user=self.user, status='submitted')
-        self.assertEqual(
-            reverification_service.get_status(self.user.id, unicode(self.course_id), self.final_checkpoint_location),
-            'submitted'
-        )
+        # If it's any of these, they're not verified...
+        for status in ["created", "ready", "denied", "submitted", "must_retry"]:
+            attempt.status = status
+            attempt.save()
+            assert_false(IDVerificationService.user_is_verified(user), status)
 
-        VerificationStatus.objects.create(checkpoint=checkpoint_obj, user=self.user, status='approved')
-        self.assertEqual(
-            reverification_service.get_status(self.user.id, unicode(self.course_id), self.final_checkpoint_location),
-            'approved'
-        )
+        attempt.status = "approved"
+        attempt.save()
+        assert_true(IDVerificationService.user_is_verified(user), attempt.status)
 
-    def test_skip_verification(self):
+    def test_user_has_valid_or_pending(self):
         """
-        Test adding skip attempt of a user for a reverification checkpoint.
+        Determine whether we have to prompt this user to verify, or if they've
+        already at least initiated a verification submission.
         """
-        reverification_service = ReverificationService()
-        VerificationCheckpoint.objects.create(
-            course_id=unicode(self.course_id),
-            checkpoint_location=self.final_checkpoint_location
-        )
+        user = UserFactory.create()
+        attempt = SoftwareSecurePhotoVerification(user=user)
 
-        reverification_service.skip_verification(self.user.id, unicode(self.course_id), self.final_checkpoint_location)
-        self.assertEqual(
-            SkippedReverification.objects.filter(user=self.user, course_id=self.course_id).count(),
-            1
-        )
+        # If it's any of these statuses, they don't have anything outstanding
+        for status in ["created", "ready", "denied"]:
+            attempt.status = status
+            attempt.save()
+            assert_false(IDVerificationService.user_has_valid_or_pending(user), status)
 
-        # now test that a user can have only one entry for a skipped
-        # reverification for a course
-        reverification_service.skip_verification(self.user.id, unicode(self.course_id), self.final_checkpoint_location)
-        self.assertEqual(
-            SkippedReverification.objects.filter(user=self.user, course_id=self.course_id).count(),
-            1
-        )
+        # Any of these, and we are. Note the benefit of the doubt we're giving
+        # -- must_retry, and submitted both count until we hear otherwise
+        for status in ["submitted", "must_retry", "approved"]:
+            attempt.status = status
+            attempt.save()
+            assert_true(IDVerificationService.user_has_valid_or_pending(user), status)
 
-        # testing service for skipped attempt.
-        self.assertEqual(
-            reverification_service.get_status(self.user.id, unicode(self.course_id), self.final_checkpoint_location),
-            'skipped'
-        )
+    def test_user_status(self):
+        # test for correct status when no error returned
+        user = UserFactory.create()
+        status = IDVerificationService.user_status(user)
+        self.assertDictEqual(status, {'status': 'none', 'error': '', 'should_display': True})
 
+        # test for when photo verification has been created
+        SoftwareSecurePhotoVerification.objects.create(user=user, status='approved')
+        status = IDVerificationService.user_status(user)
+        self.assertDictEqual(status, {'status': 'approved', 'error': '', 'should_display': True})
+
+        # create another photo verification for the same user, make sure the denial
+        # is handled properly
+        SoftwareSecurePhotoVerification.objects.create(
+            user=user, status='denied', error_msg='[{"photoIdReasons": ["Not provided"]}]'
+        )
+        status = IDVerificationService.user_status(user)
+        self.assertDictEqual(status, {'status': 'must_reverify', 'error': ['id_image_missing'], 'should_display': True})
+
+        # test for when sso verification has been created
+        SSOVerification.objects.create(user=user, status='approved')
+        status = IDVerificationService.user_status(user)
+        self.assertDictEqual(status, {'status': 'approved', 'error': '', 'should_display': False})
+
+        # create another sso verification for the same user, make sure the denial
+        # is handled properly
+        SSOVerification.objects.create(user=user, status='denied')
+        status = IDVerificationService.user_status(user)
+        self.assertDictEqual(status, {'status': 'must_reverify', 'error': '', 'should_display': False})
+
+        # test for when manual verification has been created
+        ManualVerification.objects.create(user=user, status='approved')
+        status = IDVerificationService.user_status(user)
+        self.assertDictEqual(status, {'status': 'approved', 'error': '', 'should_display': False})
+
+    @ddt.unpack
     @ddt.data(
-        *CourseMode.CREDIT_ELIGIBLE_MODES
+        {'enrollment_mode': 'honor', 'status': None, 'output': 'N/A'},
+        {'enrollment_mode': 'audit', 'status': None, 'output': 'N/A'},
+        {'enrollment_mode': 'verified', 'status': False, 'output': 'Not ID Verified'},
+        {'enrollment_mode': 'verified', 'status': True, 'output': 'ID Verified'},
     )
-    def test_declined_verification_on_skip(self, mode):
-        """Test that status with value 'declined' is added in credit
-        requirement status model when a user skip's an ICRV.
+    def test_verification_status_for_user(self, enrollment_mode, status, output):
         """
-        reverification_service = ReverificationService()
-        checkpoint = VerificationCheckpoint.objects.create(
-            course_id=unicode(self.course_id),
-            checkpoint_location=self.final_checkpoint_location
-        )
-        # Create credit course and set credit requirements.
-        CreditCourse.objects.create(course_key=self.course_key, enabled=True)
-        self.enrollment.update_enrollment(mode=mode)
-
-        set_credit_requirements(
-            self.course_key,
-            [
-                {
-                    "namespace": "reverification",
-                    "name": checkpoint.checkpoint_location,
-                    "display_name": "Assessment 1",
-                    "criteria": {},
-                }
-            ]
-        )
-
-        reverification_service.skip_verification(self.user.id, unicode(self.course_id), self.final_checkpoint_location)
-        requirement_status = get_credit_requirement_status(
-            self.course_key, self.user.username, 'reverification', checkpoint.checkpoint_location
-        )
-        self.assertEqual(SkippedReverification.objects.filter(user=self.user, course_id=self.course_id).count(), 1)
-        self.assertEqual(len(requirement_status), 1)
-        self.assertEqual(requirement_status[0].get('name'), checkpoint.checkpoint_location)
-        self.assertEqual(requirement_status[0].get('status'), 'declined')
-
-    def test_get_attempts(self):
-        """Check verification attempts count against a user for a given
-        'checkpoint' and 'course_id'.
+        Verify verification_status_for_user returns correct status.
         """
-        reverification_service = ReverificationService()
-        course_id = unicode(self.course_id)
-        self.assertEqual(
-            reverification_service.get_attempts(self.user.id, course_id, self.final_checkpoint_location),
-            0
-        )
+        user = UserFactory.create()
+        CourseFactory.create()
 
-        # now create a checkpoint and add user's entry against it then test
-        # that the 'get_attempts' service method returns correct count
-        checkpoint_obj = VerificationCheckpoint.objects.create(
-            course_id=course_id,
-            checkpoint_location=self.final_checkpoint_location
-        )
-        VerificationStatus.objects.create(checkpoint=checkpoint_obj, user=self.user, status='submitted')
-        self.assertEqual(
-            reverification_service.get_attempts(self.user.id, course_id, self.final_checkpoint_location),
-            1
-        )
+        with patch(
+            'lms.djangoapps.verify_student.services.IDVerificationService.user_is_verified'
+        ) as mock_verification:
 
-    def test_not_in_verified_track(self):
-        # No longer enrolled in a verified track
-        self.enrollment.update_enrollment(mode=CourseMode.HONOR)
+            mock_verification.return_value = status
 
-        # Should be marked as "skipped" (opted out)
-        service = ReverificationService()
-        status = service.get_status(self.user.id, unicode(self.course_id), self.final_checkpoint_location)
-        self.assertEqual(status, service.NON_VERIFIED_TRACK)
+            status = IDVerificationService.verification_status_for_user(user, enrollment_mode)
+            self.assertEqual(status, output)

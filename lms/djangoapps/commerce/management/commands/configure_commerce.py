@@ -4,11 +4,12 @@ We can use this command to enable/disable commerce configuration or disable chec
 """
 
 from __future__ import unicode_literals
+
 import logging
 
 from django.core.management import BaseCommand
 
-from commerce.models import CommerceConfiguration
+from ...models import CommerceConfiguration
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 

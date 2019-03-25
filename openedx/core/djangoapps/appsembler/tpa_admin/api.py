@@ -6,7 +6,10 @@ from openedx.core.lib.api.authentication import (
     OAuth2AuthenticationAllowInactiveUser,
 )
 from third_party_auth.models import SAMLConfiguration, SAMLProviderConfig
-from .serializers import SAMLConfigurationSerializer, SAMLProviderConfigSerializer
+from openedx.core.djangoapps.appsembler.tpa_admin.serializers import (
+    SAMLConfigurationSerializer,
+    SAMLProviderConfigSerializer,
+)
 
 
 class SAMLConfigurationViewSet(viewsets.ModelViewSet):

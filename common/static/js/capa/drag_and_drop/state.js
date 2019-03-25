@@ -6,29 +6,29 @@
             var state;
 
             state = {
-                'config': null,
+                config: null,
 
-                'baseImageEl': null,
-                'baseImageLoaded': false,
+                baseImageEl: null,
+                baseImageLoaded: false,
 
-                'containerEl': null,
+                containerEl: null,
 
-                'sliderEl': null,
+                sliderEl: null,
 
-                'problemId': problemId,
+                problemId: problemId,
 
-                'draggables': [],
-                'numDraggablesInSlider': 0,
-                'currentMovingDraggable': null,
+                draggables: [],
+                numDraggablesInSlider: 0,
+                currentMovingDraggable: null,
 
-                'targets': [],
+                targets: [],
 
-                'updateArrowOpacity': null,
+                updateArrowOpacity: null,
 
-                'uniqueId': 0,
-                'salt': makeSalt(),
+                uniqueId: 0,
+                salt: makeSalt(),
 
-                'getUniqueId': getUniqueId
+                getUniqueId: getUniqueId
             };
 
             $(document).mousemove(function(event) {

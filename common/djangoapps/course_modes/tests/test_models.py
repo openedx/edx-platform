@@ -5,19 +5,23 @@ when you run "manage.py test".
 Replace this with more appropriate tests for your application.
 """
 
-from datetime import datetime, timedelta
 import itertools
+from datetime import timedelta
 
 import ddt
 from django.core.exceptions import ValidationError
-from django.test import TestCase
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from django.test import TestCase, override_settings
+from django.utils.timezone import now
+from mock import patch
 from opaque_keys.edx.locator import CourseLocator
-import pytz
 
 from course_modes.helpers import enrollment_mode_display
-from course_modes.models import CourseMode, Mode
+from course_modes.models import CourseMode, Mode, invalidate_course_mode_cache, get_cosmetic_display_price
 from course_modes.tests.factories import CourseModeFactory
+from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import (
+    ModuleStoreTestCase,
+)
 
 
 @ddt.ddt
@@ -25,11 +29,19 @@ class CourseModeModelTest(TestCase):
     """
     Tests for the CourseMode model
     """
+    NOW = 'now'
+    DATES = {
+        NOW: now(),
+        None: None,
+    }
 
     def setUp(self):
         super(CourseModeModelTest, self).setUp()
-        self.course_key = SlashSeparatedCourseKey('Test', 'TestCourse', 'TestCourseRun')
+        self.course_key = CourseLocator('Test', 'TestCourse', 'TestCourseRun')
         CourseMode.objects.all().delete()
+
+    def tearDown(self):
+        invalidate_course_mode_cache(sender=None)
 
     def create_mode(
             self,
@@ -121,7 +133,7 @@ class CourseModeModelTest(TestCase):
 
     def test_modes_for_course_expired(self):
         expired_mode, _status = self.create_mode('verified', 'Verified Certificate', 10)
-        expired_mode.expiration_datetime = datetime.now(pytz.UTC) + timedelta(days=-1)
+        expired_mode.expiration_datetime = now() + timedelta(days=-1)
         expired_mode.save()
         modes = CourseMode.modes_for_course(self.course_key)
         self.assertEqual([CourseMode.DEFAULT_MODE], modes)
@@ -131,7 +143,7 @@ class CourseModeModelTest(TestCase):
         modes = CourseMode.modes_for_course(self.course_key)
         self.assertEqual([mode1], modes)
 
-        expiration_datetime = datetime.now(pytz.UTC) + timedelta(days=1)
+        expiration_datetime = now() + timedelta(days=1)
         expired_mode.expiration_datetime = expiration_datetime
         expired_mode.save()
         expired_mode_value = Mode(
@@ -148,7 +160,7 @@ class CourseModeModelTest(TestCase):
         modes = CourseMode.modes_for_course(self.course_key)
         self.assertEqual([expired_mode_value, mode1], modes)
 
-        modes = CourseMode.modes_for_course(SlashSeparatedCourseKey('TestOrg', 'TestCourse', 'TestRun'))
+        modes = CourseMode.modes_for_course(CourseLocator('TestOrg', 'TestCourse', 'TestRun'))
         self.assertEqual([CourseMode.DEFAULT_MODE], modes)
 
     def test_verified_mode_for_course(self):
@@ -220,9 +232,9 @@ class CourseModeModelTest(TestCase):
         self.assertEqual(CourseMode.auto_enroll_mode(self.course_key, modes), result)
 
     def test_all_modes_for_courses(self):
-        now = datetime.now(pytz.UTC)
-        future = now + timedelta(days=1)
-        past = now - timedelta(days=1)
+        now_dt = now()
+        future = now_dt + timedelta(days=1)
+        past = now_dt - timedelta(days=1)
 
         # Unexpired, no expiration date
         CourseModeFactory.create(
@@ -310,10 +322,11 @@ class CourseModeModelTest(TestCase):
             CourseMode.PROFESSIONAL,
             CourseMode.NO_ID_PROFESSIONAL_MODE
         ),
-        (datetime.now(), None),
+        (NOW, None),
     ))
     @ddt.unpack
-    def test_invalid_mode_expiration(self, mode_slug, exp_dt):
+    def test_invalid_mode_expiration(self, mode_slug, exp_dt_name):
+        exp_dt = self.DATES[exp_dt_name]
         is_error_expected = CourseMode.is_professional_slug(mode_slug) and exp_dt is not None
         try:
             self.create_mode(mode_slug=mode_slug, mode_name=mode_slug.title(), expiration_datetime=exp_dt, min_price=10)
@@ -417,20 +430,20 @@ class CourseModeModelTest(TestCase):
     def test_expiration_datetime_explicitly_set(self):
         """ Verify that setting the expiration_date property sets the explicit flag. """
         verified_mode, __ = self.create_mode('verified', 'Verified Certificate', 10)
-        now = datetime.now()
-        verified_mode.expiration_datetime = now
+        now_dt = now()
+        verified_mode.expiration_datetime = now_dt
 
         self.assertTrue(verified_mode.expiration_datetime_is_explicit)
-        self.assertEqual(verified_mode.expiration_datetime, now)
+        self.assertEqual(verified_mode.expiration_datetime, now_dt)
 
     def test_expiration_datetime_not_explicitly_set(self):
         """ Verify that setting the _expiration_date property does not set the explicit flag. """
         verified_mode, __ = self.create_mode('verified', 'Verified Certificate', 10)
-        now = datetime.now()
-        verified_mode._expiration_datetime = now  # pylint: disable=protected-access
+        now_dt = now()
+        verified_mode._expiration_datetime = now_dt  # pylint: disable=protected-access
 
         self.assertFalse(verified_mode.expiration_datetime_is_explicit)
-        self.assertEqual(verified_mode.expiration_datetime, now)
+        self.assertEqual(verified_mode.expiration_datetime, now_dt)
 
     def test_expiration_datetime_explicitly_set_to_none(self):
         """ Verify that setting the _expiration_date property does not set the explicit flag. """
@@ -443,7 +456,7 @@ class CourseModeModelTest(TestCase):
 
     @ddt.data(
         (CourseMode.AUDIT, False),
-        (CourseMode.HONOR, True),
+        (CourseMode.HONOR, False),
         (CourseMode.VERIFIED, True),
         (CourseMode.CREDIT_MODE, True),
         (CourseMode.PROFESSIONAL, True),
@@ -471,3 +484,26 @@ class CourseModeModelTest(TestCase):
             self.assertTrue(is_error_expected, "Did not expect a ValidationError to be thrown.")
         else:
             self.assertFalse(is_error_expected, "Expected a ValidationError to be thrown.")
+
+
+class TestDisplayPrices(ModuleStoreTestCase):
+    @override_settings(PAID_COURSE_REGISTRATION_CURRENCY=["USD", "$"])
+    def test_get_cosmetic_display_price(self):
+        """
+        Check that get_cosmetic_display_price() returns the correct price given its inputs.
+        """
+        course = CourseFactory.create()
+        registration_price = 99
+        course.cosmetic_display_price = 10
+        with patch('course_modes.models.CourseMode.min_course_price_for_currency', return_value=registration_price):
+            # Since registration_price is set, it overrides the cosmetic_display_price and should be returned
+            self.assertEqual(get_cosmetic_display_price(course), "$99")
+
+        registration_price = 0
+        with patch('course_modes.models.CourseMode.min_course_price_for_currency', return_value=registration_price):
+            # Since registration_price is not set, cosmetic_display_price should be returned
+            self.assertEqual(get_cosmetic_display_price(course), "$10")
+
+        course.cosmetic_display_price = 0
+        # Since both prices are not set, there is no price, thus "Free"
+        self.assertEqual(get_cosmetic_display_price(course), "Free")

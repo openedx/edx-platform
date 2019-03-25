@@ -3,10 +3,11 @@ Factories for course mode models.
 """
 import random
 
-from course_modes.models import CourseMode
-from factory.django import DjangoModelFactory
 from factory import lazy_attribute
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from factory.django import DjangoModelFactory
+from opaque_keys.edx.locator import CourseLocator
+
+from course_modes.models import CourseMode
 
 
 # Factories are self documenting
@@ -15,8 +16,8 @@ class CourseModeFactory(DjangoModelFactory):
     class Meta(object):
         model = CourseMode
 
-    course_id = SlashSeparatedCourseKey('MITx', '999', 'Robot_Super_Course')
-    mode_slug = 'audit'
+    course_id = CourseLocator('MITx', '999', 'Robot_Super_Course')
+    mode_slug = CourseMode.DEFAULT_MODE_SLUG
     currency = 'usd'
     expiration_datetime = None
     suggested_prices = ''

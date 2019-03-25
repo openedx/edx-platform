@@ -1,22 +1,18 @@
-from mock import patch, Mock
 import unittest
-import ddt
 
-from request_cache.middleware import RequestCache
+import ddt
 from django.conf import settings
+from django.urls import reverse
 from django.http import HttpResponse
 from django.test import TestCase
-from django.test.utils import override_settings
 from django.test.client import RequestFactory
-from django.core.urlresolvers import reverse
+from django.test.utils import override_settings
+from mock import Mock, patch
+
+from edxmako import LOOKUP, add_lookup
 from edxmako.request_context import get_template_request_context
-from edxmako import add_lookup, LOOKUP
-from edxmako.shortcuts import (
-    marketing_link,
-    is_marketing_link_set,
-    is_any_marketing_link_set,
-    render_to_string,
-)
+from edxmako.shortcuts import is_any_marketing_link_set, is_marketing_link_set, marketing_link, render_to_string
+from openedx.core.djangoapps.request_cache.middleware import RequestCache
 from student.tests.factories import UserFactory
 from util.testing import UrlResetMixin
 

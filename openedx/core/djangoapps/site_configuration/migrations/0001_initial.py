@@ -2,8 +2,9 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
+import django.utils.timezone
 import jsonfield.fields
-import django_extensions.db.fields
+import model_utils.fields
 
 
 class Migration(migrations.Migration):
@@ -18,17 +19,17 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('values', jsonfield.fields.JSONField(blank=True)),
-                ('site', models.OneToOneField(related_name='configuration', to='sites.Site')),
+                ('site', models.OneToOneField(related_name='configuration', to='sites.Site', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
             name='SiteConfigurationHistory',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('created', django_extensions.db.fields.CreationDateTimeField(auto_now_add=True, verbose_name='created')),
-                ('modified', django_extensions.db.fields.ModificationDateTimeField(auto_now=True, verbose_name='modified')),
+                ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, verbose_name='created', editable=False)),
+                ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
                 ('values', jsonfield.fields.JSONField(blank=True)),
-                ('site', models.ForeignKey(related_name='configuration_histories', to='sites.Site')),
+                ('site', models.ForeignKey(related_name='configuration_histories', to='sites.Site', on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ('-modified', '-created'),

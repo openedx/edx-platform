@@ -11,17 +11,19 @@ import unittest
 
 import ddt
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase
 import httpretty
 import provider.constants
 from provider.oauth2.models import AccessToken, Client
 from rest_framework.test import APIClient
+from social_django.models import Partial
 
+from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
 from student.tests.factories import UserFactory
 from third_party_auth.tests.utils import ThirdPartyOAuthTestMixinFacebook, ThirdPartyOAuthTestMixinGoogle
 from .mixins import DOPAdapterMixin, DOTAdapterMixin
-from .utils import AccessTokenExchangeTestMixin
+from .utils import AccessTokenExchangeTestMixin, TPA_FEATURE_ENABLED, TPA_FEATURES_KEY
 
 
 @ddt.ddt
@@ -34,6 +36,10 @@ class AccessTokenExchangeViewTest(AccessTokenExchangeTestMixin):
         self.url = reverse("exchange_access_token", kwargs={"backend": self.BACKEND})
         self.csrf_client = APIClient(enforce_csrf_checks=True)
 
+    def tearDown(self):
+        super(AccessTokenExchangeViewTest, self).tearDown()
+        Partial.objects.all().delete()
+
     def _assert_error(self, data, expected_error, expected_error_description):
         response = self.csrf_client.post(self.url, data)
         self.assertEqual(response.status_code, 400)
@@ -42,7 +48,6 @@ class AccessTokenExchangeViewTest(AccessTokenExchangeTestMixin):
             json.loads(response.content),
             {u"error": expected_error, u"error_description": expected_error_description}
         )
-        self.assertNotIn("partial_pipeline", self.client.session)
 
     def _assert_success(self, data, expected_scopes):
         response = self.csrf_client.post(self.url, data)
@@ -101,7 +106,7 @@ class AccessTokenExchangeViewTest(AccessTokenExchangeTestMixin):
 
 
 # This is necessary because cms does not implement third party auth
-@unittest.skipUnless(settings.FEATURES.get("ENABLE_THIRD_PARTY_AUTH"), "third party auth not enabled")
+@unittest.skipUnless(TPA_FEATURE_ENABLED, TPA_FEATURES_KEY + " not enabled")
 @httpretty.activate
 class DOPAccessTokenExchangeViewTestFacebook(
         DOPAdapterMixin,
@@ -115,7 +120,7 @@ class DOPAccessTokenExchangeViewTestFacebook(
     pass
 
 
-@unittest.skipUnless(settings.FEATURES.get("ENABLE_THIRD_PARTY_AUTH"), "third party auth not enabled")
+@unittest.skipUnless(TPA_FEATURE_ENABLED, TPA_FEATURES_KEY + " not enabled")
 @httpretty.activate
 class DOTAccessTokenExchangeViewTestFacebook(
         DOTAdapterMixin,
@@ -130,7 +135,7 @@ class DOTAccessTokenExchangeViewTestFacebook(
 
 
 # This is necessary because cms does not implement third party auth
-@unittest.skipUnless(settings.FEATURES.get("ENABLE_THIRD_PARTY_AUTH"), "third party auth not enabled")
+@unittest.skipUnless(TPA_FEATURE_ENABLED, TPA_FEATURES_KEY + " not enabled")
 @httpretty.activate
 class DOPAccessTokenExchangeViewTestGoogle(
         DOPAdapterMixin,
@@ -146,7 +151,7 @@ class DOPAccessTokenExchangeViewTestGoogle(
 
 
 # This is necessary because cms does not implement third party auth
-@unittest.skipUnless(settings.FEATURES.get("ENABLE_THIRD_PARTY_AUTH"), "third party auth not enabled")
+@unittest.skipUnless(TPA_FEATURE_ENABLED, TPA_FEATURES_KEY + " not enabled")
 @httpretty.activate
 class DOTAccessTokenExchangeViewTestGoogle(
         DOTAdapterMixin,
@@ -181,15 +186,37 @@ class TestLoginWithAccessTokenView(TestCase):
         if expected_cookie_name:
             self.assertIn(expected_cookie_name, response.cookies)
 
-    def test_success(self):
-        access_token = AccessToken.objects.create(
+    def _create_dot_access_token(self, grant_type='Client credentials'):
+        """
+        Create dot based access token
+        """
+        dot_application = dot_factories.ApplicationFactory(user=self.user, authorization_grant_type=grant_type)
+        return dot_factories.AccessTokenFactory(user=self.user, application=dot_application)
+
+    def _create_dop_access_token(self):
+        """
+        Create dop based access token
+        """
+        return AccessToken.objects.create(
             token="test_access_token",
             client=self.oauth2_client,
             user=self.user,
         )
+
+    def test_dop_unsupported(self):
+        access_token = self._create_dop_access_token()
+        self._verify_response(access_token, expected_status_code=401)
+
+    def test_invalid_token(self):
+        self._verify_response("invalid_token", expected_status_code=401)
+        self.assertNotIn("session_key", self.client.session)
+
+    def test_dot_password_grant_supported(self):
+        access_token = self._create_dot_access_token(grant_type='password')
+
         self._verify_response(access_token, expected_status_code=204, expected_cookie_name='sessionid')
         self.assertEqual(int(self.client.session['_auth_user_id']), self.user.id)
 
-    def test_unauthenticated(self):
-        self._verify_response("invalid_token", expected_status_code=401)
-        self.assertNotIn("session_key", self.client.session)
+    def test_dot_client_credentials_unsupported(self):
+        access_token = self._create_dot_access_token()
+        self._verify_response(access_token, expected_status_code=401)

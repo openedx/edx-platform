@@ -1,0 +1,35 @@
+## mako
+
+<%page expression_filter="h"/>
+
+## Override the default styles_version to use Bootstrap
+<%! main_css = "css/bootstrap/lms-main.css" %>
+
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML
+%>
+
+<%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="bodyclass">${tab['body_class']}</%block>
+
+<%def name="online_help_token()"><% return "${tab['online_help_token']}" %></%def>
+
+<%block name="pagetitle">${_(tab['name'])} | ${course.display_number_with_default}</%block>
+
+<%include file="/courseware/course_navigation.html" args="active_page=active_page" />
+
+<%block name="head_extra">
+${HTML(fragment.head_html())}
+</%block>
+
+<%block name="footer_extra">
+<%include file="/mathjax_include.html" args="disable_fast_preview=True"/>
+${HTML(fragment.foot_html())}
+</%block>
+
+<%block name="content">
+    ${HTML(fragment.body_html())}
+</%block>

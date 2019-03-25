@@ -24,7 +24,8 @@ define([
                     name: 'Test View Tab',
                     is_closable: true
                 }
-            }), getView;
+            }),
+            getView;
 
         getView = function(tabsCollection, options) {
             var view;

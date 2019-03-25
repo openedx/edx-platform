@@ -4,10 +4,11 @@ XBlock runtime services for LibraryContentModule
 from django.core.exceptions import PermissionDenied
 from opaque_keys.edx.locator import LibraryLocator, LibraryUsageLocator
 from search.search_engine_base import SearchEngine
+
+from xmodule.capa_module import CapaDescriptor
 from xmodule.library_content_module import ANY_CAPA_TYPE_VALUE
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.capa_module import CapaDescriptor
 
 
 def normalize_key_for_search(library_key):
@@ -176,5 +177,5 @@ class LibraryToolsService(object):
         """
         return [
             (lib.location.library_key.replace(version_guid=None, branch=None), lib.display_name)
-            for lib in self.store.get_libraries()
+            for lib in self.store.get_library_summaries()
         ]

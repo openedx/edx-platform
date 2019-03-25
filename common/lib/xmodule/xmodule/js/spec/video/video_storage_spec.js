@@ -1,4 +1,4 @@
-(function(requirejs, require, define, undefined) {
+(function(require, define, undefined) {
     require(
 ['video/00_video_storage.js'],
 function(VideoStorage) {
@@ -45,7 +45,7 @@ function(VideoStorage) {
             it('setItem', function() {
                 var expected = $.extend(true, {}, data, {item_4: 'value_4'});
 
-                expected[id]['item_3'] = 'value_3';
+                expected[id].item_3 = 'value_3';
                 storage.setItem('item_3', 'value_3', true);
                 storage.setItem('item_4', 'value_4');
                 expect(window[namespace]).toEqual(expected);
@@ -55,8 +55,8 @@ function(VideoStorage) {
                 var data = window[namespace],
                     getItem = storage.getItem;
 
-                expect(getItem('item_1', true)).toBe(data[id]['item_1']);
-                expect(getItem('item_2')).toBe(data['item_2']);
+                expect(getItem('item_1', true)).toBe(data[id].item_1);
+                expect(getItem('item_2')).toBe(data.item_2);
                 expect(getItem('item_3')).toBeUndefined();
             });
 
@@ -66,8 +66,8 @@ function(VideoStorage) {
 
                 removeItem('item_1', true);
                 removeItem('item_2');
-                expect(data[id]['item_1']).toBeUndefined();
-                expect(data['item_2']).toBeUndefined();
+                expect(data[id].item_1).toBeUndefined();
+                expect(data.item_2).toBeUndefined();
             });
 
             it('clear', function() {
@@ -80,4 +80,4 @@ function(VideoStorage) {
         });
     });
 });
-}(RequireJS.requirejs, RequireJS.require, RequireJS.define));
+}(require, define));

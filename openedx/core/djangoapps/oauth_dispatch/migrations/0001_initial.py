@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
             name='RestrictedApplication',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('application', models.ForeignKey(to=settings.OAUTH2_PROVIDER_APPLICATION_MODEL)),
+                ('application', models.ForeignKey(to=settings.OAUTH2_PROVIDER_APPLICATION_MODEL, on_delete=models.CASCADE)),
             ],
         ),
     ]

@@ -4,78 +4,52 @@ test views
 import datetime
 import json
 import re
-import pytz
-import ddt
 import urlparse
-from dateutil.tz import tzutc
-from mock import patch, MagicMock
+
+import ddt
+from ccx_keys.locator import CCXLocator
+from django.conf import settings
+from django.urls import resolve, reverse
+from django.test import RequestFactory
+from django.test.utils import override_settings
+from pytz import UTC
+from django.utils.translation import ugettext as _
+from mock import MagicMock, patch
 from nose.plugins.attrib import attr
+from opaque_keys.edx.keys import CourseKey
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware.courses import get_course_by_id
+from courseware.tabs import get_course_tab_list
 from courseware.tests.factories import StudentModuleFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from courseware.tabs import get_course_tab_list
 from courseware.testutils import FieldOverrideTestMixin
 from django_comment_client.utils import has_forum_access
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from django_comment_common.utils import are_permissions_roles_seeded
-from lms.djangoapps.instructor.access import (
-    allow_access,
-    list_with_level,
-)
-
-from django.conf import settings
-from django.core.urlresolvers import reverse, resolve
-from django.utils.translation import ugettext as _
-from django.utils.timezone import UTC
-from django.test.utils import override_settings
-from django.test import RequestFactory
 from edxmako.shortcuts import render_to_response
-from request_cache.middleware import RequestCache
-from opaque_keys.edx.keys import CourseKey
-from student.roles import (
-    CourseCcxCoachRole,
-    CourseInstructorRole,
-    CourseStaffRole,
-)
-from student.models import (
-    CourseEnrollment,
-    CourseEnrollmentAllowed,
-)
-from student.tests.factories import (
-    AdminFactory,
-    CourseEnrollmentFactory,
-    UserFactory,
-)
-
-from xmodule.x_module import XModuleMixin
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import (
-    ModuleStoreTestCase,
-    SharedModuleStoreTestCase,
-    TEST_DATA_SPLIT_MODULESTORE)
-from xmodule.modulestore.tests.factories import (
-    CourseFactory,
-    ItemFactory,
-    SampleCourseFactory,
-)
-from ccx_keys.locator import CCXLocator
-
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import get_override_for_ccx, override_field_for_ccx
 from lms.djangoapps.ccx.tests.factories import CcxFactory
-from lms.djangoapps.ccx.tests.utils import (
-    CcxTestCase,
-    flatten,
-)
-from lms.djangoapps.ccx.utils import (
-    ccx_course,
-    is_email,
-)
+from lms.djangoapps.ccx.tests.utils import CcxTestCase, flatten
+from lms.djangoapps.ccx.utils import ccx_course, is_email
 from lms.djangoapps.ccx.views import get_date
-
+from lms.djangoapps.grades.tasks import compute_all_grades_for_course
+from lms.djangoapps.instructor.access import allow_access, list_with_level
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.request_cache.middleware import RequestCache
+from student.models import CourseEnrollment, CourseEnrollmentAllowed
+from student.roles import CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
+from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_SPLIT_MODULESTORE,
+    ModuleStoreTestCase,
+    SharedModuleStoreTestCase
+)
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, SampleCourseFactory
+from xmodule.x_module import XModuleMixin
 
 
 def intercept_renderer(path, context):
@@ -136,6 +110,8 @@ def setup_students_and_grades(context):
                         module_state_key=problem.location
                     )
 
+        compute_all_grades_for_course.apply_async(kwargs={'course_key': unicode(context.course.id)})
+
 
 def unhide(unit):
     """
@@ -191,7 +167,7 @@ class TestAdminAccessCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         self.assertEqual(response.status_code, 403)
 
 
-@attr(shard=1)
+@attr(shard=7)
 @override_settings(
     XBLOCK_FIELD_DATA_WRAPPERS=['lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap'],
     MODULESTORE_FIELD_OVERRIDE_PROVIDERS=['ccx.overrides.CustomCoursesForEdxOverrideProvider'],
@@ -206,8 +182,8 @@ class TestCCXProgressChanges(CcxTestCase, LoginEnrollmentTestCase):
         Set up tests
         """
         super(TestCCXProgressChanges, cls).setUpClass()
-        start = datetime.datetime(2016, 7, 1, 0, 0, tzinfo=tzutc())
-        due = datetime.datetime(2016, 7, 8, 0, 0, tzinfo=tzutc())
+        start = datetime.datetime(2016, 7, 1, 0, 0, tzinfo=UTC)
+        due = datetime.datetime(2016, 7, 8, 0, 0, tzinfo=UTC)
 
         cls.course = course = CourseFactory.create(enable_ccx=True, start=start)
         chapter = ItemFactory.create(start=start, parent=course, category=u'chapter')
@@ -306,7 +282,7 @@ class TestCCXProgressChanges(CcxTestCase, LoginEnrollmentTestCase):
         self.assert_progress_summary(ccx_course_key, due)
 
 
-@attr(shard=1)
+@attr(shard=7)
 @ddt.ddt
 class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
     """
@@ -490,7 +466,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         """
         Get CCX schedule, modify it, save it.
         """
-        today.return_value = datetime.datetime(2014, 11, 25, tzinfo=pytz.UTC)
+        today.return_value = datetime.datetime(2014, 11, 25, tzinfo=UTC)
         self.make_coach()
         ccx = self.make_ccx()
         url = reverse(
@@ -618,10 +594,8 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         self.assertEqual(response.status_code, 200)
 
     @ddt.data(
-        ('ccx_invite', True, 1, 'student-ids', ('enrollment-button', 'Enroll')),
-        ('ccx_invite', False, 0, 'student-ids', ('enrollment-button', 'Enroll')),
-        ('ccx_manage_student', True, 1, 'student-id', ('student-action', 'add')),
-        ('ccx_manage_student', False, 0, 'student-id', ('student-action', 'add')),
+        ('ccx-manage-students', True, 1, 'student-ids', ('enrollment-button', 'Enroll')),
+        ('ccx-manage-students', False, 0, 'student-ids', ('enrollment-button', 'Enroll')),
     )
     @ddt.unpack
     def test_enroll_member_student(self, view_name, send_email, outbox_count, student_form_input_name, button_tuple):
@@ -682,7 +656,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         ]
 
         url = reverse(
-            'ccx_invite',
+            'ccx-manage-students',
             kwargs={'course_id': ccx_course_key}
         )
         data = {
@@ -713,81 +687,11 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
             CourseEnrollment.objects.filter(course_id=ccx_course_key, user=students[5]).exists()
         )
 
-    def test_manage_student_enrollment_limit(self):
-        """
-        Enroll students up to the enrollment limit.
-
-        This test is specific to one of the enrollment views: the reason is because
-        the view used in this test cannot perform bulk enrollments.
-        """
-        students_limit = 1
-        self.make_coach()
-        staff = self.make_staff()
-        ccx = self.make_ccx(max_students_allowed=students_limit)
-        ccx_course_key = CCXLocator.from_course_locator(self.course.id, ccx.id)
-        students = [
-            UserFactory.create(is_staff=False) for _ in range(2)
-        ]
-
-        url = reverse(
-            'ccx_manage_student',
-            kwargs={'course_id': CCXLocator.from_course_locator(self.course.id, ccx.id)}
-        )
-        # enroll the first student
-        data = {
-            'student-action': 'add',
-            'student-id': students[0].email,
-        }
-        response = self.client.post(url, data=data, follow=True)
-        self.assertEqual(response.status_code, 200)
-        # a CcxMembership exists for this student
-        self.assertTrue(
-            CourseEnrollment.objects.filter(course_id=ccx_course_key, user=students[0]).exists()
-        )
-
-        # try to enroll the second student without success
-        # enroll the first student
-        data = {
-            'student-action': 'add',
-            'student-id': students[1].email,
-        }
-        response = self.client.post(url, data=data, follow=True)
-        self.assertEqual(response.status_code, 200)
-        # a CcxMembership does not exist for this student
-        self.assertFalse(
-            CourseEnrollment.objects.filter(course_id=ccx_course_key, user=students[1]).exists()
-        )
-        error_message = 'The course is full: the limit is {students_limit}'.format(
-            students_limit=students_limit
-        )
-        self.assertContains(response, error_message, status_code=200)
-
-        # try to enroll the 3rd student which is staff
-        data = {
-            'student-action': 'add',
-            'student-id': staff.email,
-        }
-        response = self.client.post(url, data=data, follow=True)
-        self.assertEqual(response.status_code, 200)
-        # staff gets enroll
-        self.assertTrue(
-            CourseEnrollment.objects.filter(course_id=ccx_course_key, user=staff).exists()
-        )
-
-        self.assertEqual(CourseEnrollment.objects.num_enrolled_in_exclude_admins(ccx_course_key), 1)
-
-        # asert that number of enroll is still 0 because staff and instructor do not count.
-        CourseEnrollment.enroll(staff, self.course.id)
-        self.assertEqual(CourseEnrollment.objects.num_enrolled_in_exclude_admins(self.course.id), 0)
-        # assert that handles  wrong ccx id code
-        ccx_course_key_fake = CCXLocator.from_course_locator(self.course.id, 55)
-        self.assertEqual(CourseEnrollment.objects.num_enrolled_in_exclude_admins(ccx_course_key_fake), 0)
-
     @ddt.data(
-        ('ccx_invite', True, 1, 'student-ids', ('enrollment-button', 'Unenroll')),
-        ('ccx_invite', False, 0, 'student-ids', ('enrollment-button', 'Unenroll')),
-        ('ccx_manage_student', True, 1, 'student-id', ('student-action', 'revoke')),
-        ('ccx_manage_student', False, 0, 'student-id', ('student-action', 'revoke')),
+        ('ccx-manage-students', True, 1, 'student-ids', ('enrollment-button', 'Unenroll')),
+        ('ccx-manage-students', False, 0, 'student-ids', ('enrollment-button', 'Unenroll')),
+        ('ccx-manage-students', True, 1, 'student-id', ('student-action', 'revoke')),
+        ('ccx-manage-students', False, 0, 'student-id', ('student-action', 'revoke')),
     )
     @ddt.unpack
     def test_unenroll_member_student(self, view_name, send_email, outbox_count, student_form_input_name, button_tuple):
@@ -829,14 +733,10 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         )
 
     @ddt.data(
-        ('ccx_invite', True, 1, 'student-ids', ('enrollment-button', 'Enroll'), 'nobody@nowhere.com'),
-        ('ccx_invite', False, 0, 'student-ids', ('enrollment-button', 'Enroll'), 'nobody@nowhere.com'),
-        ('ccx_invite', True, 0, 'student-ids', ('enrollment-button', 'Enroll'), 'nobody'),
-        ('ccx_invite', False, 0, 'student-ids', ('enrollment-button', 'Enroll'), 'nobody'),
-        ('ccx_manage_student', True, 0, 'student-id', ('student-action', 'add'), 'dummy_student_id'),
-        ('ccx_manage_student', False, 0, 'student-id', ('student-action', 'add'), 'dummy_student_id'),
-        ('ccx_manage_student', True, 1, 'student-id', ('student-action', 'add'), 'xyz@gmail.com'),
-        ('ccx_manage_student', False, 0, 'student-id', ('student-action', 'add'), 'xyz@gmail.com'),
+        ('ccx-manage-students', True, 1, 'student-ids', ('enrollment-button', 'Enroll'), 'nobody@nowhere.com'),
+        ('ccx-manage-students', False, 0, 'student-ids', ('enrollment-button', 'Enroll'), 'nobody@nowhere.com'),
+        ('ccx-manage-students', True, 0, 'student-ids', ('enrollment-button', 'Enroll'), 'nobody'),
+        ('ccx-manage-students', False, 0, 'student-ids', ('enrollment-button', 'Enroll'), 'nobody'),
     )
     @ddt.unpack
     def test_enroll_non_user_student(
@@ -886,10 +786,10 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
             )
 
     @ddt.data(
-        ('ccx_invite', True, 0, 'student-ids', ('enrollment-button', 'Unenroll'), 'nobody@nowhere.com'),
-        ('ccx_invite', False, 0, 'student-ids', ('enrollment-button', 'Unenroll'), 'nobody@nowhere.com'),
-        ('ccx_invite', True, 0, 'student-ids', ('enrollment-button', 'Unenroll'), 'nobody'),
-        ('ccx_invite', False, 0, 'student-ids', ('enrollment-button', 'Unenroll'), 'nobody'),
+        ('ccx-manage-students', True, 0, 'student-ids', ('enrollment-button', 'Unenroll'), 'nobody@nowhere.com'),
+        ('ccx-manage-students', False, 0, 'student-ids', ('enrollment-button', 'Unenroll'), 'nobody@nowhere.com'),
+        ('ccx-manage-students', True, 0, 'student-ids', ('enrollment-button', 'Unenroll'), 'nobody'),
+        ('ccx-manage-students', False, 0, 'student-ids', ('enrollment-button', 'Unenroll'), 'nobody'),
     )
     @ddt.unpack
     def test_unenroll_non_user_student(
@@ -928,7 +828,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         )
 
 
-@attr(shard=1)
+@attr(shard=7)
 class TestCoachDashboardSchedule(CcxTestCase, LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Tests of the CCX Coach Dashboard which need to modify the course content.
@@ -942,10 +842,10 @@ class TestCoachDashboardSchedule(CcxTestCase, LoginEnrollmentTestCase, ModuleSto
 
         # Create a course outline
         self.mooc_start = start = datetime.datetime(
-            2010, 5, 12, 2, 42, tzinfo=pytz.UTC
+            2010, 5, 12, 2, 42, tzinfo=UTC
         )
         self.mooc_due = due = datetime.datetime(
-            2010, 7, 7, 0, 0, tzinfo=pytz.UTC
+            2010, 7, 7, 0, 0, tzinfo=UTC
         )
 
         self.chapters = [
@@ -1027,7 +927,7 @@ class TestCoachDashboardSchedule(CcxTestCase, LoginEnrollmentTestCase, ModuleSto
         Hides nodes at a different depth and checks that these nodes
         are not in the schedule.
         """
-        today.return_value = datetime.datetime(2014, 11, 25, tzinfo=pytz.UTC)
+        today.return_value = datetime.datetime(2014, 11, 25, tzinfo=UTC)
         self.make_coach()
         ccx = self.make_ccx()
         url = reverse(
@@ -1070,7 +970,7 @@ def patched_get_children(self, usage_key_filter=None):
     return list(iter_children())
 
 
-@attr(shard=1)
+@attr(shard=7)
 @override_settings(
     XBLOCK_FIELD_DATA_WRAPPERS=['lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap'],
     MODULESTORE_FIELD_OVERRIDE_PROVIDERS=['ccx.overrides.CustomCoursesForEdxOverrideProvider'],
@@ -1086,10 +986,11 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
     def setUpClass(cls):
         super(TestCCXGrades, cls).setUpClass()
         cls._course = course = CourseFactory.create(enable_ccx=True)
+        CourseOverview.load_from_module_store(course.id)
 
         # Create a course outline
         cls.mooc_start = start = datetime.datetime(
-            2010, 5, 12, 2, 42, tzinfo=pytz.UTC
+            2010, 5, 12, 2, 42, tzinfo=UTC
         )
         chapter = ItemFactory.create(
             start=start, parent=course, category='sequential'
@@ -1147,6 +1048,7 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
         # which emulates how a student would get access.
         self.ccx_key = CCXLocator.from_course_locator(self._course.id, unicode(ccx.id))
         self.course = get_course_by_id(self.ccx_key, depth=None)
+        CourseOverview.load_from_module_store(self.course.id)
         setup_students_and_grades(self)
         self.client.login(username=coach.username, password="test")
         self.addCleanup(RequestCache.clear_request_cache)
@@ -1355,7 +1257,7 @@ class TestStudentViewsWithCCX(ModuleStoreTestCase):
 
         # Create a CCX course and enroll the user in it.
         self.ccx = CcxFactory(course_id=self.split_course.id, coach=self.coach)
-        last_week = datetime.datetime.now(UTC()) - datetime.timedelta(days=7)
+        last_week = datetime.datetime.now(UTC) - datetime.timedelta(days=7)
         override_field_for_ccx(self.ccx, self.split_course, 'start', last_week)  # Required by self.ccx.has_started().
         self.ccx_course_key = CCXLocator.from_course_locator(self.split_course.id, self.ccx.id)
         CourseEnrollment.enroll(self.student, self.ccx_course_key)

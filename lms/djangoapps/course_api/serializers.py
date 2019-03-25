@@ -4,7 +4,7 @@ Course API Serializers.  Representing course catalog data
 
 import urllib
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from rest_framework import serializers
 
 from openedx.core.djangoapps.models.course_details import CourseDetails
@@ -74,6 +74,7 @@ class CourseSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
     pacing = serializers.CharField()
     mobile_available = serializers.BooleanField()
     hidden = serializers.SerializerMethodField()
+    invitation_only = serializers.BooleanField()
 
     # 'course_id' is a deprecated field, please use 'id' instead.
     course_id = serializers.CharField(source='id', read_only=True)

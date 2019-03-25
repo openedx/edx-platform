@@ -26,27 +26,27 @@ import logging
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.csrf import ensure_csrf_cookie
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
-
-from contentstore.utils import reverse_course_url
-from edxmako.shortcuts import render_to_response
-from opaque_keys.edx.keys import CourseKey, AssetKey
 from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import AssetKey, CourseKey
+from six import text_type
+
+from contentstore.utils import get_lms_link_for_certificate_web_view, reverse_course_url
+from contentstore.views.assets import delete_asset
+from contentstore.views.exception import AssetNotFoundException
+from course_modes.models import CourseMode
+from edxmako.shortcuts import render_to_response
 from eventtracking import tracker
 from student.auth import has_studio_write_access
 from student.roles import GlobalStaff
-from util.db import generate_int_id, MYSQL_MAX_INT
+from util.db import MYSQL_MAX_INT, generate_int_id
 from util.json_request import JsonResponse
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.django import modulestore
-from contentstore.views.assets import delete_asset
-from contentstore.views.exception import AssetNotFoundException
-from django.core.exceptions import PermissionDenied
-from course_modes.models import CourseMode
-from contentstore.utils import get_lms_link_for_certificate_web_view
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
@@ -158,6 +158,28 @@ class CertificateManager(object):
             )
         if not certificate_data.get("name"):
             raise CertificateValidationError(_("must have name of the certificate"))
+
+    @staticmethod
+    def is_activated(request, course):
+        """
+        Returns whether certificates are activated for the given course,
+        along with the certificates.
+        """
+        is_active = False
+        certificates = None
+
+        current_organization = request.user.organizations.first()
+        if configuration_helpers.get_value_for_org(
+                current_organization.name,
+                'CERTIFICATES_HTML_VIEW',
+                False
+        ):
+            certificates = CertificateManager.get_certificates(course)
+            # we are assuming only one certificate in certificates collection.
+            for certificate in certificates:
+                is_active = certificate.get('is_active', False)
+                break
+        return is_active, certificates
 
     @staticmethod
     def get_used_ids(course):
@@ -371,11 +393,11 @@ def certificates_list_handler(request, course_key_string):
             return JsonResponse({"error": msg}, status=403)
 
         if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
-            certificate_url = reverse_course_url('certificates.certificates_list_handler', course_key)
+            certificate_url = reverse_course_url('certificates_list_handler', course_key)
             course_outline_url = reverse_course_url('course_handler', course_key)
             upload_asset_url = reverse_course_url('assets_handler', course_key)
             activation_handler_url = reverse_course_url(
-                handler_name='certificates.certificate_activation_handler',
+                handler_name='certificate_activation_handler',
                 course_key=course_key
             )
             course_modes = [
@@ -394,19 +416,8 @@ def certificates_list_handler(request, course_key_string):
                 )
             else:
                 certificate_web_view_url = None
-            certificates = None
-            is_active = False
-            current_organization = request.user.organizations.first()
-            if configuration_helpers.get_value_for_org(
-                current_organization.name,
-                "CERTIFICATES_HTML_VIEW",
-                False
-            ):
-                certificates = CertificateManager.get_certificates(course)
-                # we are assuming only one certificate in certificates collection.
-                for certificate in certificates:
-                    is_active = certificate.get('is_active', False)
-                    break
+
+            is_active, certificates = CertificateManager.is_activated(request, course)
 
             return render_to_response('certificates.html', {
                 'context_course': course,
@@ -431,13 +442,13 @@ def certificates_list_handler(request, course_key_string):
                 try:
                     new_certificate = CertificateManager.deserialize_certificate(course, request.body)
                 except CertificateValidationError as err:
-                    return JsonResponse({"error": err.message}, status=400)
+                    return JsonResponse({"error": text_type(err)}, status=400)
                 if course.certificates.get('certificates') is None:
                     course.certificates['certificates'] = []
                 course.certificates['certificates'].append(new_certificate.certificate_data)
                 response = JsonResponse(CertificateManager.serialize_certificate(new_certificate), status=201)
                 response["Location"] = reverse_course_url(
-                    'certificates.certificates_detail_handler',
+                    'certificates_detail_handler',
                     course.id,
                     kwargs={'certificate_id': new_certificate.id}
                 )
@@ -488,7 +499,7 @@ def certificates_detail_handler(request, course_key_string, certificate_id):
         try:
             new_certificate = CertificateManager.deserialize_certificate(course, request.body)
         except CertificateValidationError as err:
-            return JsonResponse({"error": err.message}, status=400)
+            return JsonResponse({"error": text_type(err)}, status=400)
 
         serialized_certificate = CertificateManager.serialize_certificate(new_certificate)
         cert_event_type = 'created'

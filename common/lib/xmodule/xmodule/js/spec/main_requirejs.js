@@ -18,12 +18,10 @@
             if (globalValue) {
                 if (noShim) {
                     define(name, {});
-                }
-                else {
+                } else {
                     define(name, [], function() { return globalValue; });
                 }
-            }
-            else {
+            } else {
                 console.error('Expected library to be included on page, but not found on window object: ' + name);
             }
         };
@@ -35,11 +33,17 @@
         baseUrl: '/base/',
         paths: {
             moment: 'common_static/common/js/vendor/moment-with-locales',
-            'draggabilly': 'common_static/js/vendor/draggabilly',
-            'edx-ui-toolkit': 'common_static/edx-ui-toolkit'
+            draggabilly: 'common_static/js/vendor/draggabilly',
+            'edx-ui-toolkit': 'common_static/edx-ui-toolkit',
+            hls: 'common_static/common/js/vendor/hls'
         },
-        'moment': {
-            exports: 'moment'
+        shim: {
+            moment: {
+                exports: 'moment'
+            },
+            hls: {
+                exports: 'Hls'
+            }
         }
     });
 }).call(this, RequireJS.requirejs, RequireJS.define);

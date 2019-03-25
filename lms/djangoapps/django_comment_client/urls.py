@@ -1,10 +1,8 @@
 """
 Urls for the django_comment_client.
 """
-from django.conf.urls import url, patterns, include
+from django.conf.urls import include, url
 
-urlpatterns = patterns(
-    '',
-
+urlpatterns = [
     url(r'', include('django_comment_client.base.urls')),
-)
+]

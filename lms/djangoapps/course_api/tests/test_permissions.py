@@ -5,9 +5,8 @@ Test authorization functions
 from django.contrib.auth.models import AnonymousUser
 from django.test import TestCase
 
-from .mixins import CourseApiFactoryMixin
-
 from ..permissions import can_view_courses_for_username
+from .mixins import CourseApiFactoryMixin
 
 
 class ViewCoursesForUsernameTestCase(CourseApiFactoryMixin, TestCase):
@@ -17,6 +16,7 @@ class ViewCoursesForUsernameTestCase(CourseApiFactoryMixin, TestCase):
     Any user should be able to view their own courses, and staff users
     should be able to view anyone's courses.
     """
+    shard = 4
 
     @classmethod
     def setUpClass(cls):

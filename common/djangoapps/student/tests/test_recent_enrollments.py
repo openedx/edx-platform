@@ -2,22 +2,26 @@
 Tests for the recently enrolled messaging within the Dashboard.
 """
 import datetime
+import unittest
+
+import ddt
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
+from django.utils.timezone import now
+from nose.plugins.attrib import attr
 from opaque_keys.edx import locator
 from pytz import UTC
-from nose.plugins.attrib import attr
-import unittest
-import ddt
-from shoppingcart.models import DonationConfiguration
 
+from common.test.utils import XssTestMixin
+from course_modes.tests.factories import CourseModeFactory
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
+from shoppingcart.models import DonationConfiguration
+from student.models import CourseEnrollment, DashboardConfiguration
 from student.tests.factories import UserFactory
+from student.views import get_course_enrollments
+from student.views.dashboard import _get_recently_enrolled_courses
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from course_modes.tests.factories import CourseModeFactory
-from student.models import CourseEnrollment, DashboardConfiguration
-from student.views import get_course_enrollments, _get_recently_enrolled_courses
-from common.test.utils import XssTestMixin
 
 
 @attr(shard=3)
@@ -41,7 +45,7 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
         # Old Course
         old_course_location = locator.CourseLocator('Org0', 'Course0', 'Run0')
         __, enrollment = self._create_course_and_enrollment(old_course_location)
-        enrollment.created = datetime.datetime(1900, 12, 31, 0, 0, 0, 0)
+        enrollment.created = datetime.datetime(1900, 12, 31, 0, 0, 0, 0, tzinfo=UTC)
         enrollment.save()
 
         # New Course
@@ -91,7 +95,7 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
         """
         Test that the list of newly created courses are properly sorted to show the most
         recent enrollments first.
-
+        Also test recent enrollment message rendered appropriately for more than two courses.
         """
         self._configure_message_timeout(600)
 
@@ -105,7 +109,7 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
                 'Run{num}'.format(num=idx)
             )
             course, enrollment = self._create_course_and_enrollment(course_location)
-            enrollment.created = datetime.datetime.now(UTC) - datetime.timedelta(seconds=seconds_past)
+            enrollment.created = now() - datetime.timedelta(seconds=seconds_past)
             enrollment.save()
             courses.append(course)
 
@@ -120,14 +124,61 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
         self.assertEqual(recent_course_list[3].course.id, courses[2].id)
         self.assertEqual(recent_course_list[4].course.id, courses[3].id)
 
-    def test_dashboard_rendering(self):
+        self.client.login(username=self.student.username, password=self.PASSWORD)
+        response = self.client.get(reverse("dashboard"))
+
+        # verify recent enrollment message
+        self.assertContains(
+            response,
+            'Thank you for enrolling in:'.format(course_name=self.course.display_name)
+        )
+        self.assertContains(
+            response,
+            ', '.join(enrollment.course.display_name for enrollment in recent_course_list)
+        )
+
+    def test_dashboard_rendering_with_single_course(self):
         """
-        Tests that the dashboard renders the recent enrollment messages appropriately.
+        Tests that the dashboard renders the recent enrollment message appropriately for single course.
         """
         self._configure_message_timeout(600)
         self.client.login(username=self.student.username, password=self.PASSWORD)
         response = self.client.get(reverse("dashboard"))
-        self.assertContains(response, "Thank you for enrolling in")
+        self.assertContains(
+            response,
+            "Thank you for enrolling in {course_name}".format(course_name=self.course.display_name)
+        )
+
+    def test_dashboard_rendering_with_two_courses(self):
+        """
+        Tests that the dashboard renders the recent enrollment message appropriately for two courses.
+        """
+        self._configure_message_timeout(600)
+        course_location = locator.CourseLocator(
+            'Org2',
+            'Course2',
+            'Run2'
+        )
+        course, _ = self._create_course_and_enrollment(course_location)
+
+        self.client.login(username=self.student.username, password=self.PASSWORD)
+        response = self.client.get(reverse("dashboard"))
+
+        courses_enrollments = list(get_course_enrollments(self.student, None, []))
+        courses_enrollments.sort(key=lambda x: x.created, reverse=True)
+        self.assertEqual(len(courses_enrollments), 3)
+
+        recent_course_enrollments = _get_recently_enrolled_courses(courses_enrollments)
+        self.assertEqual(len(recent_course_enrollments), 2)
+
+        self.assertContains(
+            response,
+            "Thank you for enrolling in:".format(course_name=self.course.display_name)
+        )
+        self.assertContains(
+            response,
+            ' and '.join(enrollment.course.display_name for enrollment in recent_course_enrollments)
+        )
 
     def test_dashboard_escaped_rendering(self):
         """
@@ -211,3 +262,29 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
         self.client.login(username=self.student.username, password=self.PASSWORD)
         response = self.client.get(reverse("dashboard"))
         self.assertNotContains(response, "donate-container")
+
+    @ddt.data(
+        (True, False,),
+        (True, True,),
+        (False, False,),
+        (False, True,),
+    )
+    @ddt.unpack
+    def test_donate_button_with_enabled_site_configuration(self, enable_donation_config, enable_donation_site_config):
+        # Enable the enrollment success message and donations
+        self._configure_message_timeout(10000)
+
+        # DonationConfiguration has low precedence if 'ENABLE_DONATIONS' is enable in SiteConfiguration
+        DonationConfiguration(enabled=enable_donation_config).save()
+
+        CourseModeFactory.create(mode_slug="audit", course_id=self.course.id, min_price=0)
+        self.enrollment.mode = "audit"
+        self.enrollment.save()
+        self.client.login(username=self.student.username, password=self.PASSWORD)
+
+        with with_site_configuration_context(configuration={'ENABLE_DONATIONS': enable_donation_site_config}):
+            response = self.client.get(reverse("dashboard"))
+            if enable_donation_site_config:
+                self.assertContains(response, "donate-container")
+            else:
+                self.assertNotContains(response, "donate-container")

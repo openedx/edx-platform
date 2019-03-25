@@ -5,8 +5,8 @@ from django.db import migrations, models
 import model_utils.fields
 import django.utils.timezone
 from django.conf import settings
-from openedx.core.djangoapps.xmodule_django.models import (
-    CourseKeyField, LocationKeyField, BlockTypeKeyField
+from opaque_keys.edx.django.models import (
+    BlockTypeKeyField, CourseKeyField, UsageKeyField
 )
 
 
@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
                 ('created', models.DateTimeField(db_index=True, auto_now_add=True, null=True)),
                 ('updated', models.DateTimeField(auto_now=True, db_index=True)),
                 ('gradeset', models.TextField(null=True, blank=True)),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -49,10 +49,10 @@ class Migration(migrations.Migration):
                 ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, verbose_name='created', editable=False)),
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
                 ('course_id', CourseKeyField(max_length=255, db_index=True)),
-                ('location', LocationKeyField(max_length=255, db_index=True)),
+                ('location', UsageKeyField(max_length=255, db_index=True)),
                 ('field', models.CharField(max_length=255)),
                 ('value', models.TextField(default=b'null')),
-                ('student', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('student', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -60,7 +60,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('module_type', models.CharField(default=b'problem', max_length=32, db_index=True, choices=[(b'problem', b'problem'), (b'video', b'video'), (b'html', b'html'), (b'course', b'course'), (b'chapter', b'Section'), (b'sequential', b'Subsection'), (b'library_content', b'Library Content')])),
-                ('module_state_key', LocationKeyField(max_length=255, db_column=b'module_id', db_index=True)),
+                ('module_state_key', UsageKeyField(max_length=255, db_column=b'module_id', db_index=True)),
                 ('course_id', CourseKeyField(max_length=255, db_index=True)),
                 ('state', models.TextField(null=True, blank=True)),
                 ('grade', models.FloatField(db_index=True, null=True, blank=True)),
@@ -68,7 +68,7 @@ class Migration(migrations.Migration):
                 ('done', models.CharField(default=b'na', max_length=8, db_index=True, choices=[(b'na', b'NOT_APPLICABLE'), (b'f', b'FINISHED'), (b'i', b'INCOMPLETE')])),
                 ('created', models.DateTimeField(auto_now_add=True, db_index=True)),
                 ('modified', models.DateTimeField(auto_now=True, db_index=True)),
-                ('student', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('student', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -80,7 +80,7 @@ class Migration(migrations.Migration):
                 ('state', models.TextField(null=True, blank=True)),
                 ('grade', models.FloatField(null=True, blank=True)),
                 ('max_grade', models.FloatField(null=True, blank=True)),
-                ('student_module', models.ForeignKey(to='courseware.StudentModule')),
+                ('student_module', models.ForeignKey(to='courseware.StudentModule', on_delete=models.CASCADE)),
             ],
             options={
                 'get_latest_by': 'created',
@@ -94,7 +94,7 @@ class Migration(migrations.Migration):
                 ('value', models.TextField(default=b'null')),
                 ('created', models.DateTimeField(auto_now_add=True, db_index=True)),
                 ('modified', models.DateTimeField(auto_now=True, db_index=True)),
-                ('student', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('student', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -106,7 +106,7 @@ class Migration(migrations.Migration):
                 ('created', models.DateTimeField(auto_now_add=True, db_index=True)),
                 ('modified', models.DateTimeField(auto_now=True, db_index=True)),
                 ('module_type', BlockTypeKeyField(max_length=64, db_index=True)),
-                ('student', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('student', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -117,7 +117,7 @@ class Migration(migrations.Migration):
                 ('value', models.TextField(default=b'null')),
                 ('created', models.DateTimeField(auto_now_add=True, db_index=True)),
                 ('modified', models.DateTimeField(auto_now=True, db_index=True)),
-                ('usage_id', LocationKeyField(max_length=255, db_index=True)),
+                ('usage_id', UsageKeyField(max_length=255, db_index=True)),
             ],
         ),
         migrations.AlterUniqueTogether(

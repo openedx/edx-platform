@@ -3,27 +3,26 @@ Provides a function for importing a git repository into the lms
 instance when using a mongo modulestore
 """
 
+import logging
 import os
 import re
 import StringIO
 import subprocess
-import logging
 
+import mongoengine
 from django.conf import settings
 from django.core import management
 from django.core.management.base import CommandError
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-import mongoengine
+from opaque_keys.edx.keys import CourseKey
 
 from dashboard.models import CourseImportLog
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 log = logging.getLogger(__name__)
 
 DEFAULT_GIT_REPO_DIR = '/edx/var/app/edxapp/course_repos'
+DEFAULT_PYTHON_LIB_FILENAME = 'python_lib.zip'
 
 
 class GitImportError(Exception):
@@ -34,7 +33,7 @@ class GitImportError(Exception):
 
     def __init__(self, message=None):
         if message is None:
-            message = self.message
+            message = self.MESSAGE
         super(GitImportError, self).__init__(message)
 
 
@@ -186,6 +185,8 @@ def add_repo(repo, rdir_in, branch=None):
 
     git_repo_dir = getattr(settings, 'GIT_REPO_DIR', DEFAULT_GIT_REPO_DIR)
     git_import_static = getattr(settings, 'GIT_IMPORT_STATIC', True)
+    git_import_python_lib = getattr(settings, 'GIT_IMPORT_PYTHON_LIB', True)
+    python_lib_filename = getattr(settings, 'PYTHON_LIB_FILENAME', DEFAULT_PYTHON_LIB_FILENAME)
 
     # Set defaults even if it isn't defined in settings
     mongo_db = {
@@ -273,8 +274,11 @@ def add_repo(repo, rdir_in, branch=None):
         loggers.append(logger)
 
     try:
-        management.call_command('import', git_repo_dir, rdir,
-                                nostatic=not git_import_static)
+        management.call_command(
+            'import', git_repo_dir, rdir,
+            nostatic=not git_import_static, nopythonlib=not git_import_python_lib,
+            python_lib_filename=python_lib_filename
+        )
     except CommandError:
         raise GitImportErrorXmlImportFailed()
     except NotImplementedError:
@@ -295,10 +299,7 @@ def add_repo(repo, rdir_in, branch=None):
     match = re.search(r'(?ms)===> IMPORTING courselike (\S+)', ret_import)
     if match:
         course_id = match.group(1)
-        try:
-            course_key = CourseKey.from_string(course_id)
-        except InvalidKeyError:
-            course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+        course_key = CourseKey.from_string(course_id)
         cdir = '{0}/{1}'.format(git_repo_dir, course_key.course)
         log.debug('Studio course dir = %s', cdir)
 

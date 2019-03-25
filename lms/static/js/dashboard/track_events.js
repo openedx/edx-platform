@@ -92,4 +92,4 @@ var edx = edx || {};
         edx.dashboard.trackLearnVerifiedLinkClicked($('.verified-info'));
         edx.dashboard.trackFindCourseBtnClicked($('.btn-find-courses'));
     });
-})(jQuery);
+}(jQuery));

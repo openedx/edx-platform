@@ -1,5 +1,6 @@
 %fa-copy {
   @extend %t-copy-base;
+
   padding: ($baseline/2) 0;
   margin: 0;
   color: $m-gray-d2;
@@ -12,7 +13,9 @@
 
   h1 {
     @extend %t-title4;
+
     @include text-align(left);
+
     margin: 0;
     padding: ($baseline/2) 0;
     border-bottom: 4px solid $gray-l5;
@@ -22,12 +25,14 @@
   h2 {
     @extend %t-title6;
     @extend %t-strong;
+
     margin-top: ($baseline/2);
     text-transform: none;
   }
 
   p {
     @extend %fa-copy;
+
     font-size: 0.875em;
   }
 
@@ -53,6 +58,7 @@
 
         .about-me-item {
           @include margin-right(150px);
+
           display: inline-block;
 
           p {
@@ -73,6 +79,7 @@
 
     .action-link {
       @include float(right);
+
       padding: $baseline/2;
       background-color: $m-blue-d2;
       color: $gray-l7;
@@ -97,6 +104,7 @@
 
   .btn-dashboard {
     @include float(right);
+
     color: $white;
 
     &:hover,
@@ -108,18 +116,21 @@
 
   .user-info {
     @include clearfix();
+
     border-bottom: 2px solid $gray-l5;
     padding: 20px 0;
     margin-bottom: 20px;
 
     .info-column {
       @include float(left);
+
       width: 100%;
       margin: 10px 0;
     }
 
     .title {
       @extend %fa-copy;
+
       padding: 0;
 
       &.error {
@@ -129,6 +140,7 @@
 
     .data {
       @extend %fa-copy;
+
       padding: 0;
       color: $black;
       font-size: 1.125em;
@@ -140,6 +152,7 @@
 
     .action-primary {
       @include float(left);
+
       width: auto;
       margin-top: 0;
     }
@@ -166,6 +179,7 @@
           bottom: 3px solid $gray-l1;
           left: none;
         };
+
         box-shadow: none;
       }
 
@@ -180,6 +194,7 @@
 
         & + label {
           @include margin-left(30px);
+
           display: inline-block;
         }
       }

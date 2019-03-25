@@ -2,11 +2,15 @@
 Tests for pavelib/utils/test/utils
 """
 
-from pavelib.utils.test.utils import check_firefox_version, MINIMUM_FIREFOX_VERSION
 import unittest
+
 from mock import patch
 
+from pavelib.utils.envs import Env
+from pavelib.utils.test.utils import MINIMUM_FIREFOX_VERSION, check_firefox_version
 
+
+@unittest.skipIf(Env.USING_DOCKER, 'Firefox version check works differently under Docker Devstack')
 class TestUtils(unittest.TestCase):
     """
     Test utils.py under pavelib/utils/test

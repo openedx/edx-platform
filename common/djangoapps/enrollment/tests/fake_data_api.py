@@ -4,7 +4,6 @@ A Fake Data API for testing purposes.
 import copy
 import datetime
 
-
 _DEFAULT_FAKE_MODE = {
     "slug": "honor",
     "name": "Honor Code Certificate",

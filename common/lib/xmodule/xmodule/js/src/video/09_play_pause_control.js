@@ -56,12 +56,12 @@
         /** Bind any necessary function callbacks to DOM events. */
             bindHandlers: function() {
                 this.el.on({
-                    'click': this.onClick
+                    click: this.onClick
                 });
                 this.state.el.on({
-                    'play': this.play,
+                    play: this.play,
                     'pause ended': this.pause,
-                    'destroy': this.destroy
+                    destroy: this.destroy
                 });
             },
 

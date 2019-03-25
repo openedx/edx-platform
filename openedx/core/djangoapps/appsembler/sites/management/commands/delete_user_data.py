@@ -5,7 +5,6 @@ from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
 from django.contrib.sites.models import Site
 
-from cms.djangoapps.course_creators.models import CourseCreator
 import lms.lib.comment_client as cc
 from organizations.models import Organization
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
@@ -22,6 +21,12 @@ class Command(BaseCommand):
         parser.add_argument('email', nargs='*')
 
     def handle(self, *args, **options):
+        if settings.ROOT_URLCONF == 'lms.urls':
+            # TODO: Not important, but cool: Fix the weird dependency and make it work in LMS.
+            raise CommandError('Run this command only from CMS, it cannot be run from within LMS.')
+
+        from course_creators.models import CourseCreator  # Keep this import local to avoid errors.
+
         for email in options['email']:
             try:
                 user = User.objects.get(email=email)

@@ -1,8 +1,8 @@
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 XMODULES = [
     "book = xmodule.backcompat_module:TranslateCustomTagDescriptor",
-    "chapter = xmodule.seq_module:SequenceDescriptor",
+    "chapter = xmodule.seq_module:SectionDescriptor",
     "conditional = xmodule.conditional_module:ConditionalDescriptor",
     "course = xmodule.course_module:CourseDescriptor",
     "customtag = xmodule.template_module:CustomTagDescriptor",
@@ -61,7 +61,7 @@ setup(
         'xmodule': ['js/module/*'],
     },
 
-    # See http://guide.python-distribute.org/creation.html#entry-points
+    # See http://setuptools.readthedocs.io/en/latest/setuptools.html#dynamic-discovery-of-services-and-plugins
     # for a description of entry_points
     entry_points={
         'xblock.v1': XMODULES + XBLOCKS,

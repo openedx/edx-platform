@@ -154,7 +154,7 @@ def task_track(request_info, task_info, event_type, event, page=None):
             "event": full_event,
             "agent": request_info.get('agent', 'unknown'),
             "page": page,
-            "time": datetime.datetime.utcnow(),
+            "time": datetime.datetime.utcnow().replace(tzinfo=pytz.utc),
             "host": request_info.get('host', 'unknown'),
             "context": eventtracker.get_tracker().resolve_context(),
         }

@@ -1,8 +1,8 @@
 """Organizations views for use with Studio."""
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
 from django.utils.decorators import method_decorator
 from django.views.generic import View
-from django.http import HttpResponse
 
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from util.organizations_helpers import get_organizations

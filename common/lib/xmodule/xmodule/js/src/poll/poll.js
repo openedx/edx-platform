@@ -1,5 +1,11 @@
-window.Poll = function(el) {
-    RequireJS.require(['PollMain'], function(PollMain) {
-        new PollMain(el);
-    });
-};
+define(['poll/poll_main.js'], function(PollMain) {
+    'use strict';
+
+    function Poll(el) {
+        return new PollMain(el);
+    }
+
+    window.Poll = Poll;
+
+    return Poll;
+});

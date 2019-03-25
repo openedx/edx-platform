@@ -5,28 +5,24 @@ Test courseware search
 import json
 import uuid
 
-from common.test.acceptance.tests.helpers import remove_file
-from common.test.acceptance.pages.common.logout import LogoutPage
-from common.test.acceptance.pages.studio.overview import CourseOutlinePage
-from common.test.acceptance.pages.lms.courseware_search import CoursewareSearchPage
-from common.test.acceptance.pages.lms.staff_view import StaffPage
-from common.test.acceptance.fixtures.course import XBlockFixtureDesc
-
 from nose.plugins.attrib import attr
 
-from common.test.acceptance.tests.studio.base_studio_test import ContainerBase
-
-from common.test.acceptance.pages.studio.settings_group_configurations import GroupConfigurationsPage
-from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage as StudioAutoAuthPage
-from common.test.acceptance.fixtures import LMS_BASE_URL
-from common.test.acceptance.pages.studio.component_editor import ComponentVisibilityEditorView
+from common.test.acceptance.fixtures.course import XBlockFixtureDesc
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.common.logout import LogoutPage
+from common.test.acceptance.pages.lms.course_home import CourseHomePage
 from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage
-
-from bok_choy.promise import EmptyPromise
+from common.test.acceptance.pages.lms.staff_view import StaffCoursewarePage
+from common.test.acceptance.pages.studio.xblock_editor import XBlockVisibilityEditorView
+from common.test.acceptance.pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
+from common.test.acceptance.pages.studio.settings_group_configurations import GroupConfigurationsPage
+from common.test.acceptance.tests.discussion.helpers import CohortTestMixin
+from common.test.acceptance.tests.helpers import remove_file
+from common.test.acceptance.tests.studio.base_studio_test import ContainerBase
 
 
 @attr(shard=1)
-class CoursewareSearchCohortTest(ContainerBase):
+class CoursewareSearchCohortTest(ContainerBase, CohortTestMixin):
     """
     Test courseware search.
     """
@@ -45,7 +41,7 @@ class CoursewareSearchCohortTest(ContainerBase):
         super(CoursewareSearchCohortTest, self).setUp(is_staff=is_staff)
         self.staff_user = self.user
 
-        self.course_outline = CourseOutlinePage(
+        self.studio_course_outline = StudioCourseOutlinePage(
             self.browser,
             self.course_info['org'],
             self.course_info['number'],
@@ -58,26 +54,26 @@ class CoursewareSearchCohortTest(ContainerBase):
         # Create a student who will be in "Cohort A"
         self.cohort_a_student_username = "cohort_a_" + str(uuid.uuid4().hex)[:12]
         self.cohort_a_student_email = self.cohort_a_student_username + "@example.com"
-        StudioAutoAuthPage(
+        AutoAuthPage(
             self.browser, username=self.cohort_a_student_username, email=self.cohort_a_student_email, no_login=True
         ).visit()
 
         # Create a student who will be in "Cohort B"
         self.cohort_b_student_username = "cohort_b_" + str(uuid.uuid4().hex)[:12]
         self.cohort_b_student_email = self.cohort_b_student_username + "@example.com"
-        StudioAutoAuthPage(
+        AutoAuthPage(
             self.browser, username=self.cohort_b_student_username, email=self.cohort_b_student_email, no_login=True
         ).visit()
 
         # Create a student who will end up in the default cohort group
         self.cohort_default_student_username = "cohort_default_student"
         self.cohort_default_student_email = "cohort_default_student@example.com"
-        StudioAutoAuthPage(
+        AutoAuthPage(
             self.browser, username=self.cohort_default_student_username,
             email=self.cohort_default_student_email, no_login=True
         ).visit()
 
-        self.courseware_search_page = CoursewareSearchPage(self.browser, self.course_id)
+        self.course_home_page = CourseHomePage(self.browser, self.course_id)
 
         # Enable Cohorting and assign cohorts and content groups
         self._auto_auth(self.staff_user["username"], self.staff_user["email"], True)
@@ -93,26 +89,36 @@ class CoursewareSearchCohortTest(ContainerBase):
         Logout and login with given credentials.
         """
         LogoutPage(self.browser).visit()
-        StudioAutoAuthPage(self.browser, username=username, email=email,
-                           course_id=self.course_id, staff=staff).visit()
+        AutoAuthPage(self.browser, username=username, email=email,
+                     course_id=self.course_id, staff=staff).visit()
 
     def _studio_reindex(self):
         """
         Reindex course content on studio course page
         """
         self._auto_auth(self.staff_user["username"], self.staff_user["email"], True)
-        self.course_outline.visit()
-        self.course_outline.start_reindex()
-        self.course_outline.wait_for_ajax()
+        self.studio_course_outline.visit()
+        self.studio_course_outline.start_reindex()
+        self.studio_course_outline.wait_for_ajax()
 
     def _goto_staff_page(self):
         """
         Open staff page with assertion
         """
-        self.courseware_search_page.visit()
-        staff_page = StaffPage(self.browser, self.course_id)
+        self.course_home_page.visit()
+        self.course_home_page.resume_course_from_header()
+        staff_page = StaffCoursewarePage(self.browser, self.course_id)
         self.assertEqual(staff_page.staff_view_mode, 'Staff')
         return staff_page
+
+    def _search_for_term(self, term):
+        """
+        Search for term in course and return results.
+        """
+        self.course_home_page.visit()
+        course_search_results_page = self.course_home_page.search_for_term(term)
+        results = course_search_results_page.search_results.html
+        return results[0] if len(results) > 0 else []
 
     def populate_course_fixture(self, course_fixture):
         """
@@ -135,15 +141,6 @@ class CoursewareSearchCohortTest(ContainerBase):
                 )
             )
         )
-
-    def enable_cohorting(self, course_fixture):
-        """
-        Enables cohorting for the current course.
-        """
-        url = LMS_BASE_URL + "/courses/" + course_fixture._course_key + '/cohorts/settings'  # pylint: disable=protected-access
-        data = json.dumps({'is_cohorted': True})
-        response = course_fixture.session.patch(url, data=data, headers=course_fixture.headers)
-        self.assertTrue(response.ok, "Failed to enable cohorts")
 
     def create_content_groups(self):
         """
@@ -174,22 +171,18 @@ class CoursewareSearchCohortTest(ContainerBase):
         """
         container_page = self.go_to_unit_page()
 
-        def set_visibility(html_block_index, content_group, second_content_group=None):
+        def set_visibility(html_block_index, groups):
             """
             Set visibility on html blocks to specified groups.
             """
             html_block = container_page.xblocks[html_block_index]
             html_block.edit_visibility()
-            if second_content_group:
-                ComponentVisibilityEditorView(self.browser, html_block.locator).select_option(
-                    second_content_group, save=False
-                )
-            ComponentVisibilityEditorView(self.browser, html_block.locator).select_option(content_group)
+            visibility_dialog = XBlockVisibilityEditorView(self.browser, html_block.locator)
+            visibility_dialog.select_groups_in_partition_scheme(visibility_dialog.CONTENT_GROUP_PARTITION, groups)
 
-        set_visibility(1, self.content_group_a)
-        set_visibility(2, self.content_group_b)
-        set_visibility(3, self.content_group_a, self.content_group_b)
-        set_visibility(4, 'All Students and Staff')  # Does not work without this
+        set_visibility(1, [self.content_group_a])
+        set_visibility(2, [self.content_group_b])
+        set_visibility(3, [self.content_group_a, self.content_group_b])
 
         container_page.publish_action.click()
 
@@ -212,48 +205,21 @@ class CoursewareSearchCohortTest(ContainerBase):
         add_cohort_with_student("Cohort B", self.content_group_b, self.cohort_b_student_username)
         cohort_management_page.wait_for_ajax()
 
-    def test_page_existence(self):
-        """
-        Make sure that the page is accessible.
-        """
-        self._auto_auth(self.cohort_default_student_username, self.cohort_default_student_email, False)
-        self.courseware_search_page.visit()
-
     def test_cohorted_search_user_a_a_content(self):
         """
         Test user can search content restricted to his cohort.
         """
         self._auto_auth(self.cohort_a_student_username, self.cohort_a_student_email, False)
-        self.courseware_search_page.visit()
-        self.courseware_search_page.search_for_term(self.group_a_html)
-        assert self.group_a_html in self.courseware_search_page.search_results.html[0]
+        search_results = self._search_for_term(self.group_a_html)
+        assert self.group_a_html in search_results
 
     def test_cohorted_search_user_b_a_content(self):
         """
         Test user can not search content restricted to his cohort.
         """
         self._auto_auth(self.cohort_b_student_username, self.cohort_b_student_email, False)
-        self.courseware_search_page.visit()
-        self.courseware_search_page.search_for_term(self.group_a_html)
-        assert self.group_a_html not in self.courseware_search_page.search_results.html[0]
-
-    def test_cohorted_search_user_default_ab_content(self):
-        """
-        Test user not enrolled in any cohorts can't see any of restricted content.
-        """
-        self._auto_auth(self.cohort_default_student_username, self.cohort_default_student_email, False)
-        self.courseware_search_page.visit()
-        self.courseware_search_page.search_for_term(self.group_a_and_b_html)
-        assert self.group_a_and_b_html not in self.courseware_search_page.search_results.html[0]
-
-    def test_cohorted_search_user_default_all_content(self):
-        """
-        Test user can search public content if cohorts used on course.
-        """
-        self._auto_auth(self.cohort_default_student_username, self.cohort_default_student_email, False)
-        self.courseware_search_page.visit()
-        self.courseware_search_page.search_for_term(self.visible_to_all_html)
-        assert self.visible_to_all_html in self.courseware_search_page.search_results.html[0]
+        search_results = self._search_for_term(self.group_a_html)
+        assert self.group_a_html not in search_results
 
     def test_cohorted_search_user_staff_all_content(self):
         """
@@ -261,50 +227,47 @@ class CoursewareSearchCohortTest(ContainerBase):
         """
         self._auto_auth(self.staff_user["username"], self.staff_user["email"], False)
         self._goto_staff_page().set_staff_view_mode('Staff')
-        self.courseware_search_page.search_for_term(self.visible_to_all_html)
-        assert self.visible_to_all_html in self.courseware_search_page.search_results.html[0]
-        self.courseware_search_page.clear_search()
-        self.courseware_search_page.search_for_term(self.group_a_and_b_html)
-        assert self.group_a_and_b_html in self.courseware_search_page.search_results.html[0]
-        self.courseware_search_page.clear_search()
-        self.courseware_search_page.search_for_term(self.group_a_html)
-        assert self.group_a_html in self.courseware_search_page.search_results.html[0]
-        self.courseware_search_page.clear_search()
-        self.courseware_search_page.search_for_term(self.group_b_html)
-        assert self.group_b_html in self.courseware_search_page.search_results.html[0]
+        search_results = self._search_for_term(self.visible_to_all_html)
+        assert self.visible_to_all_html in search_results
+        search_results = self._search_for_term(self.group_a_and_b_html)
+        assert self.group_a_and_b_html in search_results
+        search_results = self._search_for_term(self.group_a_html)
+        assert self.group_a_html in search_results
+        search_results = self._search_for_term(self.group_b_html)
+        assert self.group_b_html in search_results
 
     def test_cohorted_search_user_staff_masquerade_student_content(self):
         """
         Test staff user can search just student public content if selected from preview menu.
+
+        NOTE: Although it would be wise to combine these masquerading tests into
+        a single test due to expensive setup, doing so revealed a very low
+        priority bug where searching seems to stick/cache the access of the
+        first user who searches for future searches.
+
         """
         self._auto_auth(self.staff_user["username"], self.staff_user["email"], False)
-        self._goto_staff_page().set_staff_view_mode('Student')
-        self.courseware_search_page.search_for_term(self.visible_to_all_html)
-        assert self.visible_to_all_html in self.courseware_search_page.search_results.html[0]
-        self.courseware_search_page.clear_search()
-        self.courseware_search_page.search_for_term(self.group_a_and_b_html)
-        assert self.group_a_and_b_html not in self.courseware_search_page.search_results.html[0]
-        self.courseware_search_page.clear_search()
-        self.courseware_search_page.search_for_term(self.group_a_html)
-        assert self.group_a_html not in self.courseware_search_page.search_results.html[0]
-        self.courseware_search_page.clear_search()
-        self.courseware_search_page.search_for_term(self.group_b_html)
-        assert self.group_b_html not in self.courseware_search_page.search_results.html[0]
+        self._goto_staff_page().set_staff_view_mode('Learner')
+        search_results = self._search_for_term(self.visible_to_all_html)
+        assert self.visible_to_all_html in search_results
+        search_results = self._search_for_term(self.group_a_and_b_html)
+        assert self.group_a_and_b_html not in search_results
+        search_results = self._search_for_term(self.group_a_html)
+        assert self.group_a_html not in search_results
+        search_results = self._search_for_term(self.group_b_html)
+        assert self.group_b_html not in search_results
 
     def test_cohorted_search_user_staff_masquerade_cohort_content(self):
         """
         Test staff user can search cohort and public content if selected from preview menu.
         """
         self._auto_auth(self.staff_user["username"], self.staff_user["email"], False)
-        self._goto_staff_page().set_staff_view_mode('Student in ' + self.content_group_a)
-        self.courseware_search_page.search_for_term(self.visible_to_all_html)
-        assert self.visible_to_all_html in self.courseware_search_page.search_results.html[0]
-        self.courseware_search_page.clear_search()
-        self.courseware_search_page.search_for_term(self.group_a_and_b_html)
-        assert self.group_a_and_b_html in self.courseware_search_page.search_results.html[0]
-        self.courseware_search_page.clear_search()
-        self.courseware_search_page.search_for_term(self.group_a_html)
-        assert self.group_a_html in self.courseware_search_page.search_results.html[0]
-        self.courseware_search_page.clear_search()
-        self.courseware_search_page.search_for_term(self.group_b_html)
-        assert self.group_b_html not in self.courseware_search_page.search_results.html[0]
+        self._goto_staff_page().set_staff_view_mode('Learner in ' + self.content_group_a)
+        search_results = self._search_for_term(self.visible_to_all_html)
+        assert self.visible_to_all_html in search_results
+        search_results = self._search_for_term(self.group_a_and_b_html)
+        assert self.group_a_and_b_html in search_results
+        search_results = self._search_for_term(self.group_a_html)
+        assert self.group_a_html in search_results
+        search_results = self._search_for_term(self.group_b_html)
+        assert self.group_b_html not in search_results

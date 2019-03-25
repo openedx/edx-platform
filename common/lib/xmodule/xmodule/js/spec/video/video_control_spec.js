@@ -41,8 +41,7 @@
         describe('constructor with start-time', function() {
             it(
                 'saved position is 0, timer slider and VCR set to start-time',
-                function(done)
-            {
+                function(done) {
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};
@@ -69,8 +68,7 @@
             it(
                 'saved position is after start-time, ' +
                 'timer slider and VCR set to saved position',
-                function(done)
-            {
+                function(done) {
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};
@@ -100,8 +98,7 @@
             it(
                 'saved position is negative, ' +
                 'timer slider and VCR set to start-time',
-                function(done)
-            {
+                function(done) {
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};
@@ -131,8 +128,7 @@
             it(
                 'saved position is not a number, ' +
                 'timer slider and VCR set to start-time',
-                function(done)
-            {
+                function(done) {
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};
@@ -162,8 +158,7 @@
             it(
                 'saved position is greater than end-time, ' +
                 'timer slider and VCR set to start-time',
-                function(done)
-            {
+                function(done) {
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};
@@ -195,8 +190,7 @@
             it(
                 'saved position is 0, timer slider and VCR set to 0:00 ' +
                 'and ending at specified end-time',
-                function(done)
-            {
+                function(done) {
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};
@@ -226,8 +220,7 @@
             it(
                 'saved position is after start-time, ' +
                 'timer slider and VCR set to saved position',
-                function(done)
-            {
+                function(done) {
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};
@@ -257,8 +250,7 @@
             // TODO: Fix!
             it(
                 'saved position is negative, timer slider and VCR set to 0:00',
-                function(done)
-            {
+                function(done) {
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};
@@ -288,8 +280,7 @@
             it(
                 'saved position is not a number, ' +
                 'timer slider and VCR set to 0:00',
-                function(done)
-            {
+                function(done) {
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};
@@ -320,8 +311,7 @@
             it(
                 'saved position is greater than end-time, ' +
                 'timer slider and VCR set to 0:00',
-                function(done)
-            {
+                function(done) {
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};
@@ -352,8 +342,7 @@
         describe('constructor with start-time and end-time', function() {
             it(
                 'saved position is 0, timer slider and VCR set to appropriate start and end times',
-                function(done)
-            {
+                function(done) {
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};
@@ -384,8 +373,7 @@
             it(
                 'saved position is after start-time, ' +
                 'timer slider and VCR set to saved position',
-                function(done)
-            {
+                function(done) {
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};
@@ -416,8 +404,7 @@
             it(
                 'saved position is negative, ' +
                 'timer slider and VCR set to start-time',
-                function(done)
-            {
+                function(done) {
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};
@@ -448,8 +435,7 @@
             it(
                 'saved position is not a number, ' +
                 'timer slider and VCR set to start-time',
-                function(done)
-            {
+                function(done) {
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};
@@ -480,8 +466,7 @@
             it(
                 'saved position is greater than end-time, ' +
                 'timer slider and VCR set to start-time',
-                function(done)
-            {
+                function(done) {
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};

@@ -1,9 +1,11 @@
 """Descriptors for XBlocks/Xmodules, that provide editing of atrributes"""
 
-from pkg_resources import resource_string
-from xmodule.mako_module import MakoModuleDescriptor
-from xblock.fields import Scope, String
 import logging
+
+from pkg_resources import resource_string
+from xblock.fields import Scope, String
+
+from xmodule.mako_module import MakoModuleDescriptor
 
 log = logging.getLogger(__name__)
 
@@ -56,8 +58,8 @@ class TabsEditingDescriptor(EditingFields, MakoModuleDescriptor):
     """
     mako_template = "widgets/tabs-aggregator.html"
     css = {'scss': [resource_string(__name__, 'css/tabs/tabs.scss')]}
-    js = {'coffee': [resource_string(
-        __name__, 'js/src/tabs/tabs-aggregator.coffee')]}
+    js = {'js': [resource_string(
+        __name__, 'js/src/tabs/tabs-aggregator.js')]}
     js_module_name = "TabsEditingDescriptor"
     tabs = []
 
@@ -91,7 +93,7 @@ class XMLEditingDescriptor(EditingDescriptor):
 
     css = {'scss': [resource_string(__name__, 'css/codemirror/codemirror.scss')]}
 
-    js = {'coffee': [resource_string(__name__, 'js/src/raw/edit/xml.coffee')]}
+    js = {'js': [resource_string(__name__, 'js/src/raw/edit/xml.js')]}
     js_module_name = "XMLEditingDescriptor"
 
 
@@ -101,7 +103,7 @@ class MetadataOnlyEditingDescriptor(EditingDescriptor):
     not expose a UI for editing the module data
     """
 
-    js = {'coffee': [resource_string(__name__, 'js/src/raw/edit/metadata-only.coffee')]}
+    js = {'js': [resource_string(__name__, 'js/src/raw/edit/metadata-only.js')]}
     js_module_name = "MetadataOnlyEditingDescriptor"
 
     mako_template = "widgets/metadata-only-edit.html"
@@ -115,5 +117,5 @@ class JSONEditingDescriptor(EditingDescriptor):
 
     css = {'scss': [resource_string(__name__, 'css/codemirror/codemirror.scss')]}
 
-    js = {'coffee': [resource_string(__name__, 'js/src/raw/edit/json.coffee')]}
+    js = {'js': [resource_string(__name__, 'js/src/raw/edit/json.js')]}
     js_module_name = "JSONEditingDescriptor"

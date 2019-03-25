@@ -1,0 +1,41 @@
+## mako
+
+<%page expression_filter="h"/>
+
+<%namespace name='static' file='../static_content.html'/>
+
+<%!
+from django.utils.translation import ugettext as _
+%>
+
+<%block name="content">
+<div class="page-content-container">
+    <header class="page-header">
+        <div class="page-header-main">
+            <nav aria-label="Theming Administration" class="sr-is-focusable" tabindex="-1">
+                <h3>${_("Preview Language Setting")}</h3>
+            </nav>
+        </div>
+    </header>
+    <div class="page-content">
+        <div class="page-content-main">
+            <form class="form" action="${request.path}" method="post">
+                <fieldset class="form-group">
+                    <div class="field">
+                        <label class="field-label">${_("Language Code")}
+                            <input class="field-input input-text" type="text" name="preview_language"
+                                   placeholder="${_('e.g. en for English')}" />
+                        </label>
+                    </div>
+                </fieldset>
+                <div class="form-actions">
+                    <button class="btn btn-primary" type="submit" name="action" value="set_preview_language">${_("Submit")}</button>
+                    <button class="btn btn-secondary" type="submit" name="action" value="reset_preview_language">${_("Reset")}</button>
+                </div>
+
+                <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }"/>
+            </form>
+        </div>
+    </div>
+</div>
+</%block>

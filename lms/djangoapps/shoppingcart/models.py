@@ -1,59 +1,59 @@
 # pylint: disable=arguments-differ
 """ Models for the shopping cart and assorted purchase types """
 
-from collections import namedtuple
-from datetime import datetime
-from datetime import timedelta
-from decimal import Decimal
+import csv
 import json
-import analytics
-from io import BytesIO
-from django.db.models import Q, F
-import pytz
 import logging
 import smtplib
 import StringIO
-import csv
+from collections import namedtuple
+from datetime import datetime, timedelta
+from decimal import Decimal
+from io import BytesIO
+
+import analytics
+import pytz
 from boto.exception import BotoServerError  # this is a super-class of SESError and catches connection errors
-from django.dispatch import receiver
-from django.db import models
+from config_models.models import ConfigurationModel
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
-from django.contrib.auth.models import User
-from django.utils.translation import ugettext as _, ugettext_lazy
-from django.db import transaction
-from django.db.models import Sum, Count
-from django.db.models.signals import post_save, post_delete
-
-from django.core.urlresolvers import reverse
+from django.core.mail.message import EmailMessage
+from django.urls import reverse
+from django.db import models, transaction
+from django.db.models import Count, F, Q, Sum
+from django.db.models.signals import post_delete, post_save
+from django.dispatch import receiver
+from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy
 from model_utils.managers import InheritanceManager
 from model_utils.models import TimeStampedModel
-from django.core.mail.message import EmailMessage
-from xmodule.modulestore.django import modulestore
-from eventtracking import tracker
+from opaque_keys.edx.django.models import CourseKeyField
+from six import text_type
 
-from courseware.courses import get_course_by_id
-from config_models.models import ConfigurationModel
 from course_modes.models import CourseMode
+from courseware.courses import get_course_by_id
 from edxmako.shortcuts import render_to_string
-from student.models import CourseEnrollment, UNENROLL_DONE, EnrollStatusChange
+from eventtracking import tracker
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from shoppingcart.pdf import PDFInvoice
+from student.models import CourseEnrollment, EnrollStatusChange
+from student.signals import UNENROLL_DONE
 from util.query import use_read_replica_if_available
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
+from xmodule.modulestore.django import modulestore
+
 from .exceptions import (
-    InvalidCartItem,
-    PurchasedCallbackException,
-    ItemAlreadyInCartException,
     AlreadyEnrolledInCourseException,
     CourseDoesNotExistException,
-    MultipleCouponsNotAllowedException,
+    InvalidCartItem,
     InvalidStatusToRetire,
-    UnexpectedOrderItemStatus,
-    ItemNotFoundInCartException
+    ItemAlreadyInCartException,
+    ItemNotFoundInCartException,
+    MultipleCouponsNotAllowedException,
+    PurchasedCallbackException,
+    UnexpectedOrderItemStatus
 )
-from shoppingcart.pdf import PDFInvoice
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-
 
 log = logging.getLogger("shoppingcart")
 
@@ -113,7 +113,7 @@ class Order(models.Model):
     class Meta(object):
         app_label = "shoppingcart"
 
-    user = models.ForeignKey(User, db_index=True)
+    user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
     currency = models.CharField(default="usd", max_length=8)  # lower case ISO currency codes
     status = models.CharField(max_length=32, default='cart', choices=ORDER_STATUSES)
     purchase_time = models.DateTimeField(null=True, blank=True)
@@ -170,7 +170,7 @@ class Order(models.Model):
         If a item_type is passed in, then we check to see if the cart has at least one of
         those types of OrderItems
         """
-        if not user.is_authenticated():
+        if not user.is_authenticated:
             return False
         cart = cls.get_cart_for_user(user)
 
@@ -645,11 +645,12 @@ class OrderItem(TimeStampedModel):
     """
     class Meta(object):
         app_label = "shoppingcart"
+        base_manager_name = 'objects'
 
     objects = InheritanceManager()
-    order = models.ForeignKey(Order, db_index=True)
+    order = models.ForeignKey(Order, db_index=True, on_delete=models.CASCADE)
     # this is denormalized, but convenient for SQL queries for reports, etc. user should always be = order.user
-    user = models.ForeignKey(User, db_index=True)
+    user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
     # this is denormalized, but convenient for SQL queries for reports, etc. status should always be = order.status
     status = models.CharField(max_length=32, default='cart', choices=ORDER_STATUSES, db_index=True)
     qty = models.IntegerField(default=1)
@@ -667,6 +668,16 @@ class OrderItem(TimeStampedModel):
     def line_cost(self):
         """ Return the total cost of this OrderItem """
         return self.qty * self.unit_cost
+
+    @line_cost.setter
+    def line_cost(self, value):
+        """
+        Django requires there be a setter for this, but it is not
+        necessary for the way we currently use it. Raising errors
+        here will cause a lot of issues and these should not be
+        mutable after construction, so for now we just eat this.
+        """
+        pass
 
     @classmethod
     def add_to_order(cls, order, *args, **kwargs):
@@ -992,7 +1003,7 @@ class InvoiceTransaction(TimeStampedModel):
     class Meta(object):
         app_label = "shoppingcart"
 
-    invoice = models.ForeignKey(Invoice)
+    invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)
     amount = models.DecimalField(
         default=0.0, decimal_places=2, max_digits=30,
         help_text=ugettext_lazy(
@@ -1021,8 +1032,8 @@ class InvoiceTransaction(TimeStampedModel):
             "'cancelled' means that payment or refund was expected, but was cancelled before money was transferred. "
         )
     )
-    created_by = models.ForeignKey(User)
-    last_modified_by = models.ForeignKey(User, related_name='last_modified_by_user')
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    last_modified_by = models.ForeignKey(User, related_name='last_modified_by_user', on_delete=models.CASCADE)
 
     @classmethod
     def get_invoice_transaction(cls, invoice_id):
@@ -1081,9 +1092,10 @@ class InvoiceItem(TimeStampedModel):
     """
     class Meta(object):
         app_label = "shoppingcart"
+        base_manager_name = 'objects'
 
     objects = InheritanceManager()
-    invoice = models.ForeignKey(Invoice, db_index=True)
+    invoice = models.ForeignKey(Invoice, db_index=True, on_delete=models.CASCADE)
     qty = models.IntegerField(
         default=1,
         help_text=ugettext_lazy("The number of items sold.")
@@ -1159,7 +1171,7 @@ class InvoiceHistory(models.Model):
 
     """
     timestamp = models.DateTimeField(auto_now_add=True, db_index=True)
-    invoice = models.ForeignKey(Invoice)
+    invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)
 
     # JSON-serialized representation of the current state
     # of the invoice, including its line items and
@@ -1222,17 +1234,17 @@ class CourseRegistrationCode(models.Model):
 
     code = models.CharField(max_length=32, db_index=True, unique=True)
     course_id = CourseKeyField(max_length=255, db_index=True)
-    created_by = models.ForeignKey(User, related_name='created_by_user')
+    created_by = models.ForeignKey(User, related_name='created_by_user', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
-    order = models.ForeignKey(Order, db_index=True, null=True, related_name="purchase_order")
+    order = models.ForeignKey(Order, db_index=True, null=True, related_name="purchase_order", on_delete=models.CASCADE)
     mode_slug = models.CharField(max_length=100, null=True)
     is_valid = models.BooleanField(default=True)
 
     # For backwards compatibility, we maintain the FK to "invoice"
     # In the future, we will remove this in favor of the FK
     # to "invoice_item" (which can be used to look up the invoice).
-    invoice = models.ForeignKey(Invoice, null=True)
-    invoice_item = models.ForeignKey(CourseRegistrationCodeInvoiceItem, null=True)
+    invoice = models.ForeignKey(Invoice, null=True, on_delete=models.CASCADE)
+    invoice_item = models.ForeignKey(CourseRegistrationCodeInvoiceItem, null=True, on_delete=models.CASCADE)
 
     @classmethod
     def order_generated_registration_codes(cls, course_id):
@@ -1258,11 +1270,11 @@ class RegistrationCodeRedemption(models.Model):
     class Meta(object):
         app_label = "shoppingcart"
 
-    order = models.ForeignKey(Order, db_index=True, null=True)
-    registration_code = models.ForeignKey(CourseRegistrationCode, db_index=True)
-    redeemed_by = models.ForeignKey(User, db_index=True)
+    order = models.ForeignKey(Order, db_index=True, null=True, on_delete=models.CASCADE)
+    registration_code = models.ForeignKey(CourseRegistrationCode, db_index=True, on_delete=models.CASCADE)
+    redeemed_by = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
     redeemed_at = models.DateTimeField(auto_now_add=True, null=True)
-    course_enrollment = models.ForeignKey(CourseEnrollment, null=True)
+    course_enrollment = models.ForeignKey(CourseEnrollment, null=True, on_delete=models.CASCADE)
 
     @classmethod
     def registration_code_used_for_enrollment(cls, course_enrollment):
@@ -1310,21 +1322,6 @@ class RegistrationCodeRedemption(models.Model):
         return code_redemption
 
 
-class SoftDeleteCouponManager(models.Manager):
-    """ Use this manager to get objects that have a is_active=True """
-    def get_active_coupons_queryset(self):
-        """
-        filter the is_active = True Coupons only
-        """
-        return super(SoftDeleteCouponManager, self).get_queryset().filter(is_active=True)
-
-    def get_queryset(self):
-        """
-        get all the coupon objects
-        """
-        return super(SoftDeleteCouponManager, self).get_queryset()
-
-
 class Coupon(models.Model):
     """
     This table contains coupon codes
@@ -1337,15 +1334,13 @@ class Coupon(models.Model):
     description = models.CharField(max_length=255, null=True, blank=True)
     course_id = CourseKeyField(max_length=255)
     percentage_discount = models.IntegerField(default=0)
-    created_by = models.ForeignKey(User)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
     expiration_date = models.DateTimeField(null=True, blank=True)
 
     def __unicode__(self):
         return "[Coupon] code: {} course: {}".format(self.code, self.course_id)
-
-    objects = SoftDeleteCouponManager()
 
     @property
     def display_expiry_date(self):
@@ -1362,9 +1357,9 @@ class CouponRedemption(models.Model):
     class Meta(object):
         app_label = "shoppingcart"
 
-    order = models.ForeignKey(Order, db_index=True)
-    user = models.ForeignKey(User, db_index=True)
-    coupon = models.ForeignKey(Coupon, db_index=True)
+    order = models.ForeignKey(Order, db_index=True, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
+    coupon = models.ForeignKey(Coupon, db_index=True, on_delete=models.CASCADE)
 
     @classmethod
     def remove_code_redemption_from_item(cls, item, user):
@@ -1480,7 +1475,7 @@ class PaidCourseRegistration(OrderItem):
 
     course_id = CourseKeyField(max_length=128, db_index=True)
     mode = models.SlugField(default=CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG)
-    course_enrollment = models.ForeignKey(CourseEnrollment, null=True)
+    course_enrollment = models.ForeignKey(CourseEnrollment, null=True, on_delete=models.CASCADE)
 
     @classmethod
     def get_self_purchased_seat_count(cls, course_key, status='purchased'):
@@ -1844,7 +1839,7 @@ class CourseRegCodeItemAnnotation(models.Model):
 
     def __unicode__(self):
         # pylint: disable=no-member
-        return u"{} : {}".format(self.course_id.to_deprecated_string(), self.annotation)
+        return u"{} : {}".format(text_type(self.course_id), self.annotation)
 
 
 class PaidCourseRegistrationAnnotation(models.Model):
@@ -1862,7 +1857,7 @@ class PaidCourseRegistrationAnnotation(models.Model):
 
     def __unicode__(self):
         # pylint: disable=no-member
-        return u"{} : {}".format(self.course_id.to_deprecated_string(), self.annotation)
+        return u"{} : {}".format(text_type(self.course_id), self.annotation)
 
 
 class CertificateItem(OrderItem):
@@ -1873,7 +1868,7 @@ class CertificateItem(OrderItem):
         app_label = "shoppingcart"
 
     course_id = CourseKeyField(max_length=128, db_index=True)
-    course_enrollment = models.ForeignKey(CourseEnrollment)
+    course_enrollment = models.ForeignKey(CourseEnrollment, on_delete=models.CASCADE)
     mode = models.SlugField()
 
     @receiver(UNENROLL_DONE)

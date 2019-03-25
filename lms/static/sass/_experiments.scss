@@ -1,0 +1,513 @@
+// edX LMS - experiments
+// ====================
+// NOTE: use this area for css for ab tests and other experiments.
+// Please list the ticket number of the experiment
+
+// --------------------
+// LEARNER-3072 Program Purchase on dashboard
+
+/* This css was added as part of the LEARNER-3072 experiment */
+
+.complete-program-dashboard-button {
+  float: right;
+  display: block;
+  box-sizing: border-box;
+  color: rgb(242, 248, 251) !important;
+  cursor: pointer;
+  background: rgb(0, 129, 0) none repeat scroll 0% 0% / auto padding-box border-box !important;
+  font: normal normal 600 normal 15px / normal "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  padding: 7px;
+  transition: color 0.25s ease-in-out 0s, background 0.25s ease-in-out 0s, box-shadow 0.25s ease-in-out 0s;
+  text-decoration: none !important;
+  border: none !important;
+  margin-top: 5px;
+}
+
+.complete-program-dashboard-button:hover {
+  background: #009b00 !important;
+}
+
+.complete-program-dashboard-button .list-price {
+  text-decoration: line-through;
+}
+
+.complete-program-dashboard-span {
+  display: block;
+  float: right;
+}
+
+.complete-program-dashboard-div {
+  display: none;
+  float: right;
+  width: auto;
+  max-width: 420px;
+  margin: 0 0 10px 0;
+}
+
+/* Part of LEARNER-3583 experiment (https://openedx.atlassian.net/browse/LEARNER-3583) */
+
+/* modal-specific */
+
+#upsell-modal, #portfolio-experiment-upsell-modal {
+  display: none;
+
+  /* slick modal from https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick.min.css */
+
+  .slick-list,
+  .slick-slider,
+  .slick-track {
+    position: relative;
+    display: block;
+  }
+
+  .slick-loading {
+    .slick-slide,
+    .slick-track {
+      visibility: hidden;
+    }
+  }
+
+  .slick-slider {
+    box-sizing: border-box;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -khtml-user-select: none;
+    -ms-touch-action: pan-y;
+    touch-action: pan-y;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .slick-list {
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+
+    &:focus {
+      outline: 0;
+    }
+
+    &.dragging {
+      cursor: pointer;
+      cursor: hand;
+    }
+  }
+
+  .slick-slider {
+    .slick-list,
+    .slick-track {
+      -webkit-transform: translate3d(0, 0, 0);
+      -moz-transform: translate3d(0, 0, 0);
+      -ms-transform: translate3d(0, 0, 0);
+      -o-transform: translate3d(0, 0, 0);
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  .slick-track {
+    top: 0;
+    left: 0;
+
+    &::after,
+    &::before {
+      display: table;
+      content: '';
+    }
+
+    &::after {
+      clear: both;
+    }
+  }
+
+  .slick-slide {
+    display: none;
+    float: left;
+    height: 100%;
+    min-height: 1px;
+  }
+
+  [dir=rtl] .slick-slide {
+    float: right;
+  }
+
+  .slick-slide {
+    img {
+      display: block;
+    }
+
+    &.slick-loading img {
+      display: none;
+    }
+
+    &.dragging img {
+      pointer-events: none;
+    }
+  }
+
+  .slick-initialized .slick-slide {
+    display: block;
+  }
+
+  .slick-vertical .slick-slide {
+    display: block;
+    height: auto;
+    border: 1px solid transparent;
+  }
+
+  .slick-arrow.slick-hidden {
+    display: none;
+  }
+
+  /* slick theme from https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick-theme.min.css */
+
+  .slick-dots,
+  .slick-next,
+  .slick-prev {
+    position: absolute;
+    display: block;
+    padding: 0;
+  }
+
+  .slick-dots li button::before,
+  .slick-next::before,
+  .slick-prev::before {
+    font-family: slick;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+
+  .slick-next,
+  .slick-prev {
+    font-size: 0;
+    line-height: 0;
+    top: 50%;
+    width: 20px;
+    height: 20px;
+    -webkit-transform: translate(0, -50%);
+    -ms-transform: translate(0, -50%);
+    transform: translate(0, -50%);
+    cursor: pointer;
+    color: transparent;
+    border: none;
+    outline: 0;
+    background: 0 0;
+  }
+
+  .slick-next {
+    &:focus,
+    &:hover {
+      color: transparent;
+      outline: 0;
+      background: 0 0;
+    }
+  }
+
+  .slick-prev {
+    &:focus,
+    &:hover {
+      color: transparent;
+      outline: 0;
+      background: 0 0;
+    }
+  }
+
+  .slick-next {
+    &:focus::before,
+    &:hover::before {
+      opacity: 1;
+    }
+  }
+
+  .slick-prev {
+    &:focus::before,
+    &:hover::before {
+      opacity: 1;
+    }
+  }
+
+  .slick-next.slick-disabled::before,
+  .slick-prev.slick-disabled::before {
+    opacity: 0.25;
+  }
+
+  .slick-next::before {
+    font-size: 20px;
+    line-height: 1;
+    opacity: 0.75;
+    color: #fff;
+  }
+
+  .slick-prev {
+    &::before {
+      font-size: 20px;
+      line-height: 1;
+      opacity: 0.75;
+      color: #fff;
+    }
+
+    left: -25px;
+  }
+
+  [dir=rtl] .slick-prev {
+    right: -25px;
+    left: auto;
+  }
+
+  .slick-prev::before {
+    content: '• ';
+  }
+
+  .slick-next::before,
+  [dir=rtl] .slick-prev::before {
+    content: '•’';
+  }
+
+  .slick-next {
+    right: -25px;
+  }
+
+  [dir=rtl] .slick-next {
+    right: auto;
+    left: -25px;
+
+    &::before {
+      content: '•';
+    }
+  }
+
+  .slick-dotted.slick-slider {
+    margin-bottom: 30px;
+  }
+
+  .slick-dots {
+    bottom: -25px;
+    width: 100%;
+    margin: 0;
+    list-style: none;
+    text-align: center;
+
+    li {
+      position: relative;
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      margin: 0 5px;
+      padding: 0;
+      cursor: pointer;
+
+      button {
+        font-size: 0;
+        line-height: 0;
+        display: block;
+        width: 20px;
+        height: 20px;
+        padding: 5px;
+        cursor: pointer;
+        color: transparent;
+        border: 0;
+        outline: 0;
+        background: 0 0;
+
+        &:focus,
+        &:hover {
+          outline: 0;
+        }
+
+        &:focus::before,
+        &:hover::before {
+          opacity: 1;
+        }
+
+        &::before {
+          font-size: 6px;
+          line-height: 20px;
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 20px;
+          height: 20px;
+          content: '•';
+          text-align: center;
+          opacity: 0.25;
+          color: #000;
+        }
+      }
+
+      &.slick-active button::before {
+        opacity: 0.75;
+        color: #000;
+      }
+    }
+  }
+
+  .paragon__btn.paragon__btn-secondary {
+    display: none;
+  }
+
+  .paragon__btn.paragon__btn-success {
+    font-size: initial;
+    float: left;
+    background: green;
+  }
+
+  .paragon__btn.paragon__btn-light {
+    line-height: 0.25;
+    font-weight: 600;
+    background: white;
+  }
+
+  .paragon__modal-title {
+    font-weight: 600;
+    color: black;
+  }
+
+  .paragon__modal-title::before {
+    content: "NEW";
+    font-size: small;
+    background-color: #ccdde6;
+    color: #00507e;
+    margin-right: 8px;
+    box-shadow: 0 0 0 4px #ccdde6;
+    font-weight: 500;
+    border-radius: 3px;
+  }
+
+  .paragon__modal-footer {
+    display: inline-block;
+  }
+
+  .carousel-arrow {
+    background: white;
+  }
+
+  .carousel-arrow.prev {
+    position: absolute;
+    bottom: 0;
+    right: 80%;
+    box-shadow: initial;
+    font-size: small;
+    color: black;
+    background-color: white;
+  }
+
+  .carousel-arrow.next {
+    position: absolute;
+    bottom: 0;
+    left: 80%;
+    box-shadow: initial;
+    font-size: small;
+    color: black;
+    background-color: white;
+  }
+
+  .carousel-wrapper {
+    display: flex;
+
+    .slick-dots {
+      margin-bottom: 6%;
+      margin-left: 33%;
+      width: 33%;
+      display: block;
+
+      li {
+        margin: 0;
+      }
+
+      li > button::before {
+        font-size: 32px;
+      }
+    }
+
+    .slick-list {
+      margin-bottom: 10%;
+    }
+  }
+
+  .slick-slide.carousel-item {
+    padding: 0 10px;
+    min-width: 400px;
+  }
+
+  .upsell-certificate {
+    height: 43px;
+    position: absolute;
+    margin: 0;
+    bottom: -58px;
+    left: 220px;
+  }
+
+  .upsell-modal-checkmark-group {
+    list-style: none;
+    padding-left: 30px;
+    margin-bottom: 15px;
+
+    li {
+      margin-bottom: 15px;
+    }
+  }
+
+  .upsell-modal-checkmark {
+    left: 10px;
+    position: absolute;
+    color: black;
+    line-height: 24px;
+  }
+
+  .js-carousel-nav {
+    border: 1px solid #b9bcbc;
+  }
+
+  .icon.fa {
+    font-size: 10px;
+    margin: 5px;
+  }
+
+  .upsell-certificate {
+    margin-top: 30px;
+    margin-left: 20px;
+  }
+
+  .paragon__btn.paragon__btn-success {
+    font-weight: 600;
+    padding: 9px 20px;
+  }
+
+  .slick-slide.carousel-item {
+    color: grey;
+  }
+
+  .slide-header {
+    padding-bottom: 10px;
+    color: black;
+  }
+
+  .my-stats-introduction {
+    padding-bottom: 10px;
+  }
+
+  .my-stats-slide-header {
+    padding-bottom: 10px;
+  }
+
+  .checkmark-group-header {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .feature-screenshot {
+    width: 250px;
+    margin-top: 15px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-bottom: 15px;
+  }
+
+  @media only screen and (max-width: 600px){
+    .slick-slide.carousel-item {
+      min-width: 0;
+    }
+  }
+}

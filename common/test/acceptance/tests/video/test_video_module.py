@@ -4,36 +4,42 @@
 Acceptance tests for Video.
 """
 import os
-from ddt import ddt, unpack, data
+from unittest import skipIf
 
+from ddt import data, ddt, unpack
 from mock import patch
 from nose.plugins.attrib import attr
-from unittest import skipIf, skip
-from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
-from common.test.acceptance.tests.helpers import UniqueCourseTest, is_youtube_available, YouTubeStubConfig
-from common.test.acceptance.pages.lms.video.video import VideoPage
-from common.test.acceptance.pages.lms.tab_nav import TabNavPage
-from common.test.acceptance.pages.lms.courseware import CoursewarePage
-from common.test.acceptance.pages.lms.course_nav import CourseNavPage
-from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
-from common.test.acceptance.pages.lms.course_info import CourseInfoPage
+from selenium.webdriver.common.by import By
+
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
-from common.test.acceptance.tests.helpers import skip_if_browser
-
-from flaky import flaky
-
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.lms.course_info import CourseInfoPage
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.pages.lms.tab_nav import TabNavPage
+from common.test.acceptance.pages.lms.video.video import VideoPage
+from common.test.acceptance.tests.helpers import (
+    UniqueCourseTest,
+    YouTubeStubConfig,
+    is_youtube_available,
+    skip_if_browser
+)
 
 VIDEO_SOURCE_PORT = 8777
+VIDEO_HOSTNAME = os.environ.get('BOK_CHOY_HOSTNAME', 'localhost')
 
 HTML5_SOURCES = [
-    'http://localhost:{0}/gizmo.mp4'.format(VIDEO_SOURCE_PORT),
-    'http://localhost:{0}/gizmo.webm'.format(VIDEO_SOURCE_PORT),
-    'http://localhost:{0}/gizmo.ogv'.format(VIDEO_SOURCE_PORT),
+    'http://{}:{}/gizmo.mp4'.format(VIDEO_HOSTNAME, VIDEO_SOURCE_PORT),
+    'http://{}:{}/gizmo.webm'.format(VIDEO_HOSTNAME, VIDEO_SOURCE_PORT),
+    'http://{}:{}/gizmo.ogv'.format(VIDEO_HOSTNAME, VIDEO_SOURCE_PORT),
 ]
 
 HTML5_SOURCES_INCORRECT = [
-    'http://localhost:{0}/gizmo.mp99'.format(VIDEO_SOURCE_PORT),
+    'http://{}:{}/gizmo.mp99'.format(VIDEO_HOSTNAME, VIDEO_SOURCE_PORT),
+]
+
+HLS_SOURCES = [
+    'http://{}:{}/hls/history.m3u8'.format(VIDEO_HOSTNAME, VIDEO_SOURCE_PORT),
 ]
 
 
@@ -53,8 +59,7 @@ class VideoBaseTest(UniqueCourseTest):
 
         self.video = VideoPage(self.browser)
         self.tab_nav = TabNavPage(self.browser)
-        self.course_nav = CourseNavPage(self.browser)
-        self.courseware = CoursewarePage(self.browser, self.course_id)
+        self.courseware_page = CoursewarePage(self.browser, self.course_id)
         self.course_info_page = CourseInfoPage(self.browser, self.course_id)
         self.auth_page = AutoAuthPage(self.browser, course_id=self.course_id)
 
@@ -137,8 +142,7 @@ class VideoBaseTest(UniqueCourseTest):
         """ Register for the course and navigate to the video unit """
         self.auth_page.visit()
         self.user_info = self.auth_page.user_info
-        self.course_info_page.visit()
-        self.tab_nav.go_to_tab('Course')
+        self.courseware_page.visit()
 
     def _navigate_to_courseware_video_and_render(self):
         """ Wait for the video player to render """
@@ -158,13 +162,16 @@ class VideoBaseTest(UniqueCourseTest):
         :return: dict
         """
         metadata = {}
+        youtube_ids = {
+            'youtube_id_1_0': '',
+            'youtube_id_0_75': '',
+            'youtube_id_1_25': '',
+            'youtube_id_1_5': '',
+        }
 
         if player_mode == 'html5':
+            metadata.update(youtube_ids)
             metadata.update({
-                'youtube_id_1_0': '',
-                'youtube_id_0_75': '',
-                'youtube_id_1_25': '',
-                'youtube_id_1_5': '',
                 'html5_sources': HTML5_SOURCES
             })
 
@@ -179,12 +186,21 @@ class VideoBaseTest(UniqueCourseTest):
             })
 
         if player_mode == 'html5_unsupported_video':
+            metadata.update(youtube_ids)
             metadata.update({
-                'youtube_id_1_0': '',
-                'youtube_id_0_75': '',
-                'youtube_id_1_25': '',
-                'youtube_id_1_5': '',
                 'html5_sources': HTML5_SOURCES_INCORRECT
+            })
+
+        if player_mode == 'hls':
+            metadata.update(youtube_ids)
+            metadata.update({
+                'html5_sources': HLS_SOURCES,
+            })
+
+        if player_mode == 'html5_and_hls':
+            metadata.update(youtube_ids)
+            metadata.update({
+                'html5_sources': HTML5_SOURCES + HLS_SOURCES,
             })
 
         if additional_data:
@@ -196,17 +212,14 @@ class VideoBaseTest(UniqueCourseTest):
         """
         Navigate to sequential specified by `video_display_name`
         """
-        self.courseware.go_to_sequential_position(position)
+        self.courseware_page.go_to_sequential_position(position)
         self.video.wait_for_video_player_render()
 
 
-@attr(shard=4)
+@attr(shard=13)
 @ddt
 class YouTubeVideoTest(VideoBaseTest):
     """ Test YouTube Video Player """
-
-    def setUp(self):
-        super(YouTubeVideoTest, self).setUp()
 
     def test_youtube_video_rendering_wo_html5_sources(self):
         """
@@ -531,7 +544,7 @@ class YouTubeVideoTest(VideoBaseTest):
         self.assertTrue(self.video.downloaded_transcript_contains_text(file_type, search_text))
 
         # open vertical containing video "C"
-        self.course_nav.go_to_vertical('Test Vertical-2')
+        self.courseware_page.nav.go_to_vertical('Test Vertical-2')
 
         # menu "download_transcript" doesn't exist
         self.assertFalse(self.video.is_menu_present('download_transcript'))
@@ -614,52 +627,13 @@ class YouTubeVideoTest(VideoBaseTest):
         self.video.click_player_button('pause')
 
         self.video.select_language('en')
-        self.video.click_first_line_in_transcript()
+        self.video.click_transcript_line(line_no=1)
         self._verify_closed_caption_text('Welcome to edX.')
 
         self.video.select_language('zh')
         unicode_text = "我们今天要讲的题目是".decode('utf-8')
-        self.video.click_first_line_in_transcript()
+        self.video.click_transcript_line(line_no=1)
         self._verify_closed_caption_text(unicode_text)
-
-    def test_multiple_videos_in_sequentials_load_and_work(self):
-        """
-        Scenario: Multiple videos in sequentials all load and work, switching between sequentials
-        Given it has videos "A,B" in "Youtube" mode in position "1" of sequential
-        And videos "C,D" in "Youtube" mode in position "2" of sequential
-        """
-        self.contents_of_verticals = [
-            [{'display_name': 'A'}, {'display_name': 'B'}],
-            [{'display_name': 'C'}, {'display_name': 'D'}]
-        ]
-
-        tab1_video_names = ['A', 'B']
-        tab2_video_names = ['C', 'D']
-
-        def execute_video_steps(video_names):
-            """
-            Execute video steps
-            """
-            for video_name in video_names:
-                self.video.use_video(video_name)
-                self.video.click_player_button('play')
-                self.assertIn(self.video.state, ['playing', 'buffering'])
-                self.video.click_player_button('pause')
-
-        # go to video
-        self.navigate_to_video()
-        execute_video_steps(tab1_video_names)
-
-        # go to second sequential position
-        # import ipdb; ipdb.set_trace()
-        self.go_to_sequential_position(2)
-        execute_video_steps(tab2_video_names)
-
-        # go back to first sequential position
-        # we are again playing tab 1 videos to ensure that switching didn't broke some video functionality.
-        # import ipdb; ipdb.set_trace()
-        self.go_to_sequential_position(1)
-        execute_video_steps(tab1_video_names)
 
     def test_video_component_stores_speed_correctly_for_multiple_videos(self):
         """
@@ -678,17 +652,17 @@ class YouTubeVideoTest(VideoBaseTest):
         self.navigate_to_video()
 
         # select the "2.0" speed on video "A"
-        self.course_nav.go_to_vertical('Test Vertical-0')
+        self.courseware_page.nav.go_to_vertical('Test Vertical-0')
         self.video.wait_for_video_player_render()
         self.video.speed = '2.0'
 
         # select the "0.50" speed on video "B"
-        self.course_nav.go_to_vertical('Test Vertical-1')
+        self.courseware_page.nav.go_to_vertical('Test Vertical-1')
         self.video.wait_for_video_player_render()
         self.video.speed = '0.50'
 
         # open video "C"
-        self.course_nav.go_to_vertical('Test Vertical-2')
+        self.courseware_page.nav.go_to_vertical('Test Vertical-2')
         self.video.wait_for_video_player_render()
 
         # Since the playback speed was set to .5 in "B", this video will also be impacted
@@ -697,7 +671,7 @@ class YouTubeVideoTest(VideoBaseTest):
         self.video.verify_speed_changed('0.75x')
 
         # go to the vertical containing video "A"
-        self.course_nav.go_to_vertical('Test Vertical-0')
+        self.courseware_page.nav.go_to_vertical('Test Vertical-0')
 
         # Video "A" should still play at speed 2.0 because it was explicitly set to that.
         self.assertEqual(self.video.speed, '2.0x')
@@ -706,7 +680,7 @@ class YouTubeVideoTest(VideoBaseTest):
         self.video.reload_page()
 
         # go to the vertical containing video "A"
-        self.course_nav.go_to_vertical('Test Vertical-0')
+        self.courseware_page.nav.go_to_vertical('Test Vertical-0')
 
         # check if video "A" should start playing at speed "2.0"
         self.assertEqual(self.video.speed, '2.0x')
@@ -715,13 +689,13 @@ class YouTubeVideoTest(VideoBaseTest):
         self.video.speed = '1.0'
 
         # go to the vertical containing "B"
-        self.course_nav.go_to_vertical('Test Vertical-1')
+        self.courseware_page.nav.go_to_vertical('Test Vertical-1')
 
         # Video "B" should still play at speed .5 because it was explicitly set to that.
         self.assertEqual(self.video.speed, '0.50x')
 
         # go to the vertical containing video "C"
-        self.course_nav.go_to_vertical('Test Vertical-2')
+        self.courseware_page.nav.go_to_vertical('Test Vertical-2')
 
         # The change of speed for Video "A" should  impact Video "C" because it still has
         # not been explicitly set to a speed.
@@ -788,36 +762,6 @@ class YouTubeVideoTest(VideoBaseTest):
 
         self.assertGreaterEqual(self.video.seconds, 3)
 
-    @skip("Intermittently fails 03 June 2014")
-    def test_video_position_stored_correctly_with_seek(self):
-        """
-        Scenario: Video component stores position correctly when page is reloaded
-        Given the course has a Video component in "Youtube" mode
-        Then the video has rendered in "Youtube" mode
-        And I click video button "play""
-        And I click video button "pause"
-        Then I seek video to "0:10" position
-        And I click video button "play""
-        And I click video button "pause"
-        And I reload the page with video
-        Then video slider should be Equal or Greater than "0:10"
-
-        """
-        self.navigate_to_video()
-
-        self.video.click_player_button('play')
-
-        self.video.seek('0:10')
-
-        self.video.click_player_button('pause')
-
-        self.video.reload_page()
-
-        self.video.click_player_button('play')
-        self.video.click_player_button('pause')
-
-        self.assertGreaterEqual(self.video.seconds, 10)
-
     def test_simplified_and_traditional_chinese_transcripts(self):
         """
         Scenario: Simplified and Traditional Chinese transcripts work as expected in Youtube mode
@@ -841,6 +785,7 @@ class YouTubeVideoTest(VideoBaseTest):
 
         langs = {'zh_HANS': '在线学习是革', 'zh_HANT': '在線學習是革'}
         for lang_code, text in langs.items():
+            self.video.scroll_to_button("transcript_button")
             self.assertTrue(self.video.select_language(lang_code))
             unicode_text = text.decode('utf-8')
             self.assertIn(unicode_text, self.video.captions_text)
@@ -848,93 +793,11 @@ class YouTubeVideoTest(VideoBaseTest):
 
         self.assertEqual(self.video.caption_languages, {'zh_HANS': 'Simplified Chinese', 'zh_HANT': 'Traditional Chinese'})
 
-    def test_video_bumper_render(self):
-        """
-        Scenario: Multiple videos with bumper in sequentials all load and work, switching between sequentials
-        Given it has videos "A,B" in "Youtube" and "HTML5" modes in position "1" of sequential
-        And video "C" in "Youtube" mode in position "2" of sequential
-        When I open sequential position "1"
-        Then I see video "B" has a poster
-        When I click on it
-        Then I see video bumper is playing
-        When I skip the bumper
-        Then I see the main video
-        When I click on video "A"
-        Then the main video starts playing
-        When I open sequential position "2"
-        And click on the poster
-        Then the main video starts playing
-        Then I see that the main video starts playing once I go back to position "2" of sequential
-        When I reload the page
-        Then I see that the main video starts playing when I click on the poster
-        """
-        additional_data = {
-            u'video_bumper': {
-                u'value': {
-                    "transcripts": {},
-                    "video_id": "video_001"
-                }
-            }
-        }
 
-        self.contents_of_verticals = [
-            [{'display_name': 'A'}, {'display_name': 'B', 'metadata': self.metadata_for_mode('html5')}],
-            [{'display_name': 'C'}]
-        ]
-
-        tab1_video_names = ['A', 'B']
-        tab2_video_names = ['C']
-
-        def execute_video_steps(video_names):
-            """
-            Execute video steps
-            """
-            for video_name in video_names:
-                self.video.use_video(video_name)
-                self.assertTrue(self.video.is_poster_shown)
-                self.video.click_on_poster()
-                self.video.wait_for_video_player_render(autoplay=True)
-                self.assertIn(self.video.state, ['playing', 'buffering', 'finished'])
-
-        self.course_fixture.add_advanced_settings(additional_data)
-        self.navigate_to_video_no_render()
-
-        self.video.use_video('B')
-        self.assertTrue(self.video.is_poster_shown)
-        self.video.click_on_poster()
-        self.video.wait_for_video_bumper_render()
-        self.assertIn(self.video.state, ['playing', 'buffering', 'finished'])
-        self.video.click_player_button('skip_bumper')
-
-        # no autoplay here, maybe video is too small, so pause is not switched
-        self.video.wait_for_video_player_render()
-        self.assertIn(self.video.state, ['playing', 'buffering', 'finished'])
-
-        self.video.use_video('A')
-        execute_video_steps(['A'])
-
-        # go to second sequential position
-        self.courseware.go_to_sequential_position(2)
-
-        execute_video_steps(tab2_video_names)
-
-        # go back to first sequential position
-        # we are again playing tab 1 videos to ensure that switching didn't broke some video functionality.
-        self.courseware.go_to_sequential_position(1)
-        execute_video_steps(tab1_video_names)
-
-        self.video.browser.refresh()
-        execute_video_steps(tab1_video_names)
-
-
-@attr(shard=4)
+@attr(shard=13)
 class YouTubeHtml5VideoTest(VideoBaseTest):
     """ Test YouTube HTML5 Video Player """
 
-    def setUp(self):
-        super(YouTubeHtml5VideoTest, self).setUp()
-
-    @flaky  # TODO fix this, see TNL-1642
     def test_youtube_video_rendering_with_unsupported_sources(self):
         """
         Scenario: Video component is rendered in the LMS in Youtube mode
@@ -949,12 +812,9 @@ class YouTubeHtml5VideoTest(VideoBaseTest):
         self.assertTrue(self.video.is_video_rendered('youtube'))
 
 
-@attr(shard=4)
+@attr(shard=19)
 class Html5VideoTest(VideoBaseTest):
     """ Test HTML5 Video Player """
-
-    def setUp(self):
-        super(Html5VideoTest, self).setUp()
 
     def test_autoplay_disabled_for_video_component(self):
         """
@@ -1137,12 +997,9 @@ class Html5VideoTest(VideoBaseTest):
         self.assertTrue(all([source in HTML5_SOURCES for source in self.video.sources]))
 
 
-@attr(shard=4)
+@attr(shard=13)
 class YouTubeQualityTest(VideoBaseTest):
     """ Test YouTube Video Quality Button """
-
-    def setUp(self):
-        super(YouTubeQualityTest, self).setUp()
 
     @skip_if_browser('firefox')
     def test_quality_button_visibility(self):
@@ -1186,52 +1043,6 @@ class YouTubeQualityTest(VideoBaseTest):
         self.video.wait_for(lambda: self.video.is_quality_button_active, 'waiting for quality button activation')
 
 
-@attr(shard=4)
-class DragAndDropTest(VideoBaseTest):
-    """
-    Tests draggability of closed captions within videos.
-    """
-    def setUp(self):
-        super(DragAndDropTest, self).setUp()
-
-    def test_if_captions_are_draggable(self):
-        """
-        Loads transcripts so that closed-captioning is available.
-        Ensures they are draggable by checking start and dropped location.
-        """
-        self.assets.append('subs_3_yD_cEKoCk.srt.sjson')
-        data = {'sub': '3_yD_cEKoCk'}
-
-        self.metadata = self.metadata_for_mode('html5', additional_data=data)
-        self.navigate_to_video()
-        self.assertTrue(self.video.is_video_rendered('html5'))
-        self.video.show_closed_captions()
-        self.video.wait_for_closed_captions()
-        self.assertTrue(self.video.is_closed_captions_visible)
-
-        action = ActionChains(self.browser)
-        captions = self.browser.find_element(By.CLASS_NAME, 'closed-captions')
-
-        captions_start = captions.location
-        action.drag_and_drop_by_offset(captions, 0, -15).perform()
-
-        captions_end = captions.location
-        # We have to branch here due to unexpected behaviour of chrome.
-        # Chrome sets the y offset of element to 834 instead of 650
-        if self.browser.name == 'chrome':
-            self.assertEqual(
-                captions_end.get('y') - 168,
-                captions_start.get('y'),
-                'Closed captions did not get dragged.'
-            )
-        else:
-            self.assertEqual(
-                captions_end.get('y') + 16,
-                captions_start.get('y'),
-                'Closed captions did not get dragged.'
-            )
-
-
 @attr('a11y')
 class LMSVideoModuleA11yTest(VideoBaseTest):
     """
@@ -1267,3 +1078,175 @@ class LMSVideoModuleA11yTest(VideoBaseTest):
             include=["div.video"]
         )
         self.video.a11y_audit.check_for_accessibility_errors()
+
+
+@attr(shard=11)
+class VideoPlayOrderTest(VideoBaseTest):
+    """
+    Test video play order with multiple videos
+
+    Priority of video formats is:
+        * Youtube
+        * HLS
+        * HTML5
+    """
+
+    def setUp(self):
+        super(VideoPlayOrderTest, self).setUp()
+
+    def test_play_youtube_video(self):
+        """
+        Scenario: Correct video is played when we have different video formats.
+
+        Given the course has a Video component with Youtube, HTML5 and HLS sources available.
+        When I view the Video component
+        Then it should play the Youtube video
+        """
+        additional_data = {'youtube_id_1_0': 'b7xgknqkQk8'}
+        self.metadata = self.metadata_for_mode('html5_and_hls', additional_data=additional_data)
+        self.navigate_to_video()
+
+        # Verify that the video is youtube
+        self.assertTrue(self.video.is_video_rendered('youtube'))
+
+    def test_play_html5_hls_video(self):
+        """
+        Scenario: HLS video is played when we have HTML5 and HLS video formats only.
+
+        Given the course has a Video component with HTML5 and HLS sources available.
+        When I view the Video component
+        Then it should play the HLS video
+        """
+        self.metadata = self.metadata_for_mode('html5_and_hls')
+        self.navigate_to_video()
+
+        # Verify that the video is hls
+        self.assertTrue(self.video.is_video_rendered('hls'))
+
+
+@attr(shard=11)
+class HLSVideoTest(VideoBaseTest):
+    """
+    Tests related to HLS video
+    """
+
+    def test_video_play_pause(self):
+        """
+        Scenario: Video play and pause is working as expected for hls video
+
+        Given the course has a Video component with only HLS source available.
+        When I view the Video component
+        Then I can see play and pause are working as expected
+        """
+        self.metadata = self.metadata_for_mode('hls')
+        self.navigate_to_video()
+
+        self.video.click_player_button('play')
+        self.assertEqual(self.video.state, 'playing')
+        self.video.click_player_button('pause')
+        self.assertEqual(self.video.state, 'pause')
+
+    def test_video_seek(self):
+        """
+        Scenario: Video seek is working as expected for hls video
+
+        Given the course has a Video component with only HLS source available.
+        When I view the Video component
+        Then I can seek the video as expected
+        """
+        self.metadata = self.metadata_for_mode('hls')
+        self.navigate_to_video()
+
+        self.video.click_player_button('play')
+        self.video.wait_for_position('0:02')
+        self.video.click_player_button('pause')
+        self.video.seek('0:05')
+        self.assertEqual(self.video.position, '0:05')
+
+    def test_video_download_link(self):
+        """
+        Scenario: Correct video url is selected for download
+
+        Given the course has a Video component with Youtube, HTML5 and HLS sources available.
+        When I view the Video component
+        Then HTML5 video download url is available
+        """
+        self.metadata = self.metadata_for_mode('html5_and_hls', additional_data={'download_video': True})
+        self.navigate_to_video()
+
+        # Verify that the video download url is correct
+        self.assertEqual(self.video.video_download_url, HTML5_SOURCES[0])
+
+    def test_no_video_download_link_for_hls(self):
+        """
+        Scenario: Video download url is not shown for hls videos
+
+        Given the course has a Video component with only HLS sources available.
+        When I view the Video component
+        Then there is no video download url shown
+        """
+        additional_data = {'download_video': True}
+        self.metadata = self.metadata_for_mode('hls', additional_data=additional_data)
+        self.navigate_to_video()
+
+        # Verify that the video download url is not shown
+        self.assertEqual(self.video.video_download_url, None)
+
+    def test_hls_video_with_youtube_blocked(self):
+        """
+        Scenario: HLS video is rendered when the YouTube API is blocked
+        Given the YouTube API is blocked
+        And the course has a Video component with Youtube, HTML5 and HLS sources available
+        Then the HLS video is rendered
+        """
+        # configure youtube server
+        self.youtube_configuration.update({
+            'youtube_api_blocked': True,
+        })
+
+        self.metadata = self.metadata_for_mode('html5_and_hls', additional_data={'youtube_id_1_0': 'b7xgknqkQk8'})
+        self.navigate_to_video()
+        self.assertTrue(self.video.is_video_rendered('hls'))
+
+    def test_hls_video_with_youtube_delayed_response_time(self):
+        """
+        Scenario: HLS video is rendered when the YouTube API response time is slow
+        Given the YouTube server response time is greater than 1.5 seconds
+        And the course has a Video component with Youtube, HTML5 and HLS sources available
+        Then the HLS video is rendered
+        """
+        # configure youtube server
+        self.youtube_configuration.update({
+            'time_to_response': 7.0,
+        })
+
+        self.metadata = self.metadata_for_mode('html5_and_hls', additional_data={'youtube_id_1_0': 'b7xgknqkQk8'})
+        self.navigate_to_video()
+        self.assertTrue(self.video.is_video_rendered('hls'))
+
+    def test_hls_video_with_transcript(self):
+        """
+        Scenario: Transcript work as expected for an HLS video
+
+        Given the course has a Video component with "HLS" video only
+        And I have defined a transcript for the video
+        Then I see the correct text in the captions for transcript
+        Then I click on a caption line
+        And video position should be updated accordingly
+        Then I change video position
+        And video caption should be updated accordingly
+        """
+        data = {'transcripts': {'zh': 'transcript.srt'}}
+        self.metadata = self.metadata_for_mode('hls', additional_data=data)
+        self.assets.append('transcript.srt')
+        self.navigate_to_video()
+
+        self.assertIn("Hi, edX welcomes you0.", self.video.captions_text)
+
+        for line_no in range(5):
+            self.video.click_transcript_line(line_no=line_no)
+            self.video.wait_for_position('0:0{}'.format(line_no))
+
+        for line_no in range(5):
+            self.video.seek('0:0{}'.format(line_no))
+            self.assertEqual(self.video.active_caption_text, 'Hi, edX welcomes you{}.'.format(line_no))

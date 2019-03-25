@@ -10,40 +10,40 @@ define([
 
             REGENERATE_SEARCH_RESULTS = [
                 {
-                    'username': 'student',
-                    'status': 'notpassing',
-                    'created': '2015-08-05T17:32:25+00:00',
-                    'grade': '0.0',
-                    'type': 'honor',
-                    'course_key': 'course-v1:edX+DemoX+Demo_Course',
-                    'download_url': null,
-                    'modified': '2015-08-06T19:47:07+00:00',
-                    'regenerate': true
+                    username: 'student',
+                    status: 'notpassing',
+                    created: '2015-08-05T17:32:25+00:00',
+                    grade: '0.0',
+                    type: 'honor',
+                    course_key: 'course-v1:edX+DemoX+Demo_Course',
+                    download_url: null,
+                    modified: '2015-08-06T19:47:07+00:00',
+                    regenerate: true
                 },
                 {
-                    'username': 'student',
-                    'status': 'downloadable',
-                    'created': '2015-08-05T17:53:33+00:00',
-                    'grade': '1.0',
-                    'type': 'verified',
-                    'course_key': 'edx/test/2015',
-                    'download_url': 'http://www.example.com/certificate.pdf',
-                    'modified': '2015-08-06T19:47:05+00:00',
-                    'regenerate': true
+                    username: 'student',
+                    status: 'downloadable',
+                    created: '2015-08-05T17:53:33+00:00',
+                    grade: '1.0',
+                    type: 'verified',
+                    course_key: 'edx/test/2015',
+                    download_url: 'http://www.example.com/certificate.pdf',
+                    modified: '2015-08-06T19:47:05+00:00',
+                    regenerate: true
                 }
             ],
 
             GENERATE_SEARCH_RESULTS = [
                 {
-                    'username': 'student',
-                    'status': '',
-                    'created': '',
-                    'grade': '',
-                    'type': '',
-                    'course_key': 'edx/test1/2016',
-                    'download_url': null,
-                    'modified': '',
-                    'regenerate': false
+                    username: 'student',
+                    status: '',
+                    created: '',
+                    grade: '',
+                    type: '',
+                    course_key: 'edx/test1/2016',
+                    download_url: null,
+                    modified: '',
+                    regenerate: false
                 }
             ],
 

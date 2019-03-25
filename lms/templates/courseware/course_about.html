@@ -1,11 +1,15 @@
 <%namespace name='static' file='../static_content.html'/>
 <%!
 from django.utils.translation import ugettext as _
-from django.core.urlresolvers import reverse
+from django.utils.translation import pgettext
+from django.urls import reverse
 from courseware.courses import get_course_about_section
 from django.conf import settings
+from six import text_type
 from edxmako.shortcuts import marketing_link
+from openedx.core.djangolib.markup import HTML
 from openedx.core.lib.courses import course_image_url
+from six import string_types
 %>
 
 <%inherit file="../main.html" />
@@ -17,10 +21,6 @@ from openedx.core.lib.courses import course_image_url
 </%block>
 
 <%block name="js_extra">
-  ## CourseTalk widget js script
-  % if show_coursetalk_widget:
-      <script src="//d3q6qq2zt8nhwv.cloudfront.net/s/js/widgets/coursetalk-read-reviews.js"></script>
-  % endif
   <script type="text/javascript">
   (function() {
     $(".register").click(function(event) {
@@ -45,7 +45,7 @@ from openedx.core.lib.courses import course_image_url
 
       $("#add_to_cart_post").click(function(event){
         $.ajax({
-          url: "${reverse('add_course_to_cart', args=[course.id.to_deprecated_string()])}",
+          url: "${reverse('add_course_to_cart', args=[text_type(course.id)])}",
           type: "POST",
           /* Rant: HAD TO USE COMPLETE B/C PROMISE.DONE FOR SOME REASON DOES NOT WORK ON THIS PAGE. */
           complete: add_course_complete_handler
@@ -68,7 +68,7 @@ from openedx.core.lib.courses import course_image_url
       if(xhr.status == 200) {
         location.href = "${reverse('dashboard')}";
       } else if (xhr.status == 403) {
-        location.href = "${reverse('course-specific-register', args=[course.id.to_deprecated_string()])}?course_id=${course.id | u}&enrollment_action=enroll";
+        location.href = "${reverse('course-specific-register', args=[text_type(course.id)])}?course_id=${course.id | u}&enrollment_action=enroll";
       } else if (xhr.status == 400) { //This means the user did not have permission
         $('#register_error').html("${perms_error}").css("display", "block");
       } else {
@@ -108,6 +108,8 @@ from openedx.core.lib.courses import course_image_url
 <%block name="pagetitle">${course.display_name_with_default_escaped}</%block>
 
 <section class="course-info">
+
+  <%block name="course_about_header">
   <header class="course-profile">
     <div class="intro-inner-wrapper">
       <div class="table">
@@ -115,12 +117,13 @@ from openedx.core.lib.courses import course_image_url
         <div class="heading-group">
           <h1>
             ${course.display_name_with_default_escaped}
-            <button type="button">${course.display_org_with_default | h}</button>
           </h1>
+          <br />
+          <span>${course.display_org_with_default | h}</span>
         </div>
 
         <div class="main-cta">
-        %if user.is_authenticated() and registered:
+        %if user.is_authenticated and registered:
           %if show_courseware_link:
             <a href="${course_target}">
           %endif
@@ -149,7 +152,7 @@ from openedx.core.lib.courses import course_image_url
           <span class="register disabled">${_("Enrollment is Closed")}</span>
         %elif can_add_course_to_cart:
           <%
-          if user.is_authenticated():
+          if user.is_authenticated:
             reg_href = "#"
             reg_element_id = "add_to_cart_post"
           else:
@@ -201,8 +204,11 @@ from openedx.core.lib.courses import course_image_url
     </div>
       </div>
   </header>
+  </%block>
 
   <div class="container">
+
+    <%block name="course_about_details">
     <div class="details">
       % if staff_access and studio_url is not None:
         <div class="wrap-instructor-info studio-view">
@@ -213,23 +219,25 @@ from openedx.core.lib.courses import course_image_url
       <div class="inner-wrapper">
         ${get_course_about_section(request, course, "overview")}
       </div>
-  </div>
+    </div>
+    </%block>
 
     <div class="course-sidebar">
       <div class="course-summary">
 
         <%include file="course_about_sidebar_header.html" />
 
+        <%block name="course_about_important_dates">
         <ol class="important-dates">
           <li class="important-dates-item"><span class="icon fa fa-info-circle" aria-hidden="true"></span><p class="important-dates-item-title">${_("Course Number")}</p><span class="important-dates-item-text course-number">${course.display_number_with_default | h}</span></li>
           % if not course.start_date_is_still_default:
               <%
-                  course_start_date = course.start
+                  course_start_date = course.advertised_start or course.start
               %>
             <li class="important-dates-item">
               <span class="icon fa fa-calendar" aria-hidden="true"></span>
               <p class="important-dates-item-title">${_("Classes Start")}</p>
-              % if isinstance(course_start_date, str):
+              % if isinstance(course_start_date, string_types):
                   <span class="important-dates-item-text start-date">${course_start_date}</span>
               % else:
                   <%
@@ -241,7 +249,7 @@ from openedx.core.lib.courses import course_image_url
           % endif
             ## We plan to ditch end_date (which is not stored in course metadata),
             ## but for backwards compatibility, show about/end_date blob if it exists.
-            % if get_course_about_section(request, course, "end_date") or course.end:
+            % if course.end:
                 <%
                     course_end_date = course.end
                 %>
@@ -249,7 +257,7 @@ from openedx.core.lib.courses import course_image_url
             <li class="important-dates-item">
                 <span class="icon fa fa-calendar" aria-hidden="true"></span>
                 <p class="important-dates-item-title">${_("Classes End")}</p>
-                  % if isinstance(course_end_date, str):
+                  % if isinstance(course_end_date, string_types):
                       <span class="important-dates-item-text final-date">${course_end_date}</span>
                   % else:
                     <%
@@ -290,18 +298,20 @@ from openedx.core.lib.courses import course_image_url
             </p>
           </li>
           % endif
+
           % if get_course_about_section(request, course, "prerequisites"):
             <li class="important-dates-item"><span class="icon fa fa-book" aria-hidden="true"></span><p class="important-dates-item-title">${_("Requirements")}</p><span class="important-dates-item-text prerequisites">${get_course_about_section(request, course, "prerequisites")}</span></li>
           % endif
         </ol>
+        </%block>
     </div>
 
-      ## CourseTalk widget
-      % if show_coursetalk_widget:
-      <div class="coursetalk-read-reviews">
-          <div id="ct-custom-read-review-widget" data-provider="${platform_key}" data-course="${course_review_key}"></div>
-      </div>
+      <%block name="course_about_reviews_tool">
+      ## Course reviews tool
+      % if reviews_fragment_view:
+       ${HTML(reviews_fragment_view.body_html())}
       % endif
+      </%block>
 
       ## For now, ocw links are the only thing that goes in additional resources
       % if get_course_about_section(request, course, "ocw_links"):
@@ -318,6 +328,13 @@ from openedx.core.lib.courses import course_image_url
     </div>
       %endif
 
+    % if sidebar_html_enabled:
+      % if get_course_about_section(request, course, "about_sidebar_html"):
+        <section class="about-sidebar-html">
+          ${get_course_about_section(request, course, "about_sidebar_html")}
+        </section>
+      % endif
+    %endif
   </div>
 
   </div>
@@ -330,12 +347,12 @@ from openedx.core.lib.courses import course_image_url
   <div style="display: none;">
     <form id="class_enroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
       <fieldset class="enroll_fieldset">
-        <legend class="sr">${_("Enroll")}</legend>
+        <legend class="sr">${pgettext("self","Enroll")}</legend>
         <input name="course_id" type="hidden" value="${course.id | h}">
         <input name="enrollment_action" type="hidden" value="enroll">
       </fieldset>
       <div class="submit">
-        <input name="submit" type="submit" value="${_('enroll')}">
+        <input name="submit" type="submit" value="${pgettext('self','enroll')}">
       </div>
     </form>
   </div>

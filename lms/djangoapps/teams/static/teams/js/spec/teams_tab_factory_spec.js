@@ -1,5 +1,5 @@
 define(['jquery', 'backbone', 'teams/js/teams_tab_factory', 'teams/js/views/teams_tab',
-        'common/js/spec_helpers/page_helpers', 'teams/js/spec_helpers/team_spec_helpers'],
+    'common/js/spec_helpers/page_helpers', 'teams/js/spec_helpers/team_spec_helpers'],
     function($, Backbone, TeamsTabFactory, TeamsTabView, PageHelpers, TeamSpecHelpers) {
         'use strict';
 

@@ -7,6 +7,7 @@ from xmodule.stringify import stringify_children
 
 
 def test_stringify():
+    shard = 1
     text = 'Hi <div x="foo">there <span>Bruce</span><b>!</b></div>'
     html = '''<html a="b" foo="bar">{0}</html>'''.format(text)
     xml = etree.fromstring(html)
@@ -15,6 +16,7 @@ def test_stringify():
 
 
 def test_stringify_again():
+    shard = 1
     html = r"""<html name="Voltage Source Answer" >A voltage source is non-linear!
 <div align="center">
     <img src="/static/images/circuits/voltage-source.png"/>

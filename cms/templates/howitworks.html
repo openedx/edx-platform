@@ -3,7 +3,7 @@
 <%def name="online_help_token()"><% return "welcome" %></%def>
 <%namespace name='static' file='static_content.html'/>
 <%!
-  from django.core.urlresolvers import reverse
+  from django.urls import reverse
   from django.utils.translation import ugettext as _
   from openedx.core.djangolib.markup import HTML, Text
 %>

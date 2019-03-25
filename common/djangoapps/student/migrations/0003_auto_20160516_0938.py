@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import migrations, models
 import django.utils.timezone
-from django.conf import settings
 import model_utils.fields
+from django.conf import settings
+from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
                 ('name', models.CharField(help_text='Name of this user attribute.', max_length=255)),
                 ('value', models.CharField(help_text='Value of this user attribute.', max_length=255)),
-                ('user', models.ForeignKey(related_name='attributes', to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(related_name='attributes', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
         migrations.AlterUniqueTogether(

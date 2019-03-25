@@ -4,13 +4,13 @@ Test scenarios for the crowdsource hinter xblock.
 import json
 import unittest
 
-from nose.plugins.attrib import attr
-
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
+from nose.plugins.attrib import attr
+from six import text_type
 
-from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from openedx.core.lib.url_utils import quote_slashes
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -57,7 +57,7 @@ class TestCrowdsourceHinter(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         cls.course_url = reverse(
             'courseware_section',
             kwargs={
-                'course_id': cls.course.id.to_deprecated_string(),
+                'course_id': text_type(cls.course.id),
                 'chapter': 'Overview',
                 'section': 'Welcome',
             }
@@ -79,9 +79,8 @@ class TestCrowdsourceHinter(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         if xblock_name is None:
             xblock_name = TestCrowdsourceHinter.XBLOCK_NAMES[0]
         return reverse('xblock_handler', kwargs={
-            'course_id': self.course.id.to_deprecated_string(),
-            'usage_id': quote_slashes(self.course.id.make_usage_key('crowdsourcehinter', xblock_name).
-                                      to_deprecated_string()),
+            'course_id': text_type(self.course.id),
+            'usage_id': quote_slashes(text_type(self.course.id.make_usage_key('crowdsourcehinter', xblock_name))),
             'handler': handler,
             'suffix': ''
         })
@@ -135,7 +134,7 @@ class TestCrowdsourceHinter(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assert_request_status_code(200, self.course_url)
 
 
-@attr(shard=1)
+@attr(shard=6)
 class TestHinterFunctions(TestCrowdsourceHinter):
     """
     Check that the essential functions of the hinter work as expected.

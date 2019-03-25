@@ -2,15 +2,18 @@
 Extra views required for SSO
 """
 from django.conf import settings
-from django.core.urlresolvers import reverse
-from django.http import HttpResponse, HttpResponseServerError, Http404, HttpResponseNotAllowed
+from django.urls import reverse
+from django.http import Http404, HttpResponse, HttpResponseNotAllowed, HttpResponseServerError
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
-import social
-from social.apps.django_app.views import complete
-from social.apps.django_app.utils import load_strategy, load_backend
-from social.utils import setting_name
-from .models import SAMLConfiguration
+from social_django.utils import load_strategy, load_backend, psa
+from social_django.views import complete
+from social_core.utils import setting_name
+
+from student.models import UserProfile
+from student.views import compose_and_send_activation_email
+
+from .models import SAMLConfiguration, SAMLProviderConfig
 
 URL_NAMESPACE = getattr(settings, setting_name('URL_NAMESPACE'), None) or 'social'
 
@@ -28,6 +31,8 @@ def inactive_user_view(request):
     # 'next' may be set to '/account/finish_auth/.../' if this user needs to be auto-enrolled
     # in a course. Otherwise, just redirect them to the dashboard, which displays a message
     # about activating their account.
+    profile = UserProfile.objects.get(user=request.user)
+    compose_and_send_activation_email(request.user, profile)
     return redirect(request.GET.get('next', 'dashboard'))
 
 
@@ -36,13 +41,19 @@ def saml_metadata_view(request):
     Get the Service Provider metadata for this edx-platform instance.
     You must send this XML to any Shibboleth Identity Provider that you wish to use.
     """
-    if not SAMLConfiguration.is_enabled(request.site):
+    idp_slug = request.GET.get('tpa_hint', None)
+    saml_config = 'default'
+    if idp_slug:
+        idp = SAMLProviderConfig.current(idp_slug)
+        if idp.saml_configuration:
+            saml_config = idp.saml_configuration.slug
+    if not SAMLConfiguration.is_enabled(request.site, saml_config):
         raise Http404
     complete_url = reverse('social:complete', args=("tpa-saml", ))
     if settings.APPEND_SLASH and not complete_url.endswith('/'):
         complete_url = complete_url + '/'  # Required for consistency
     saml_backend = load_backend(load_strategy(request), "tpa-saml", redirect_uri=complete_url)
-    metadata, errors = saml_backend.generate_metadata_xml()
+    metadata, errors = saml_backend.generate_metadata_xml(idp_slug)
 
     if not errors:
         return HttpResponse(content=metadata, content_type='text/xml')
@@ -50,7 +61,7 @@ def saml_metadata_view(request):
 
 
 @csrf_exempt
-@social.apps.django_app.utils.psa('{0}:complete'.format(URL_NAMESPACE))
+@psa('{0}:complete'.format(URL_NAMESPACE))
 def lti_login_and_complete_view(request, backend, *args, **kwargs):
     """This is a combination login/complete due to LTI being a one step login"""
 

@@ -8,16 +8,18 @@ import time
 
 import six
 from django.conf import settings
-from django.core.urlresolvers import reverse, NoReverseMatch
+from django.contrib.auth.models import User
+from django.urls import NoReverseMatch, reverse
 from django.dispatch import Signal
 from django.utils.http import cookie_date
 
+from openedx.core.djangoapps.user_api.accounts.utils import retrieve_last_sitewide_block_completed
 from student.models import CourseEnrollment
 
 CREATE_LOGON_COOKIE = Signal(providing_args=['user', 'response'])
 
 
-def _get_cookie_settings(request):
+def standard_cookie_settings(request):
     """ Returns the common cookie settings (e.g. expiration time). """
 
     if request.session.get_expire_at_browser_close():
@@ -58,6 +60,8 @@ def set_logged_in_cookies(request, response, user):
         "username": "test-user",
         "header_urls": {
             "account_settings": "https://example.com/account/settings",
+            "resume_block":
+                "https://example.com//courses/org.0/course_0/Run_0/jump_to/i4x://org.0/course_0/vertical/vertical_4"
             "learner_profile": "https://example.com/u/test-user",
             "logout": "https://example.com/logout"
         }
@@ -73,7 +77,7 @@ def set_logged_in_cookies(request, response, user):
         HttpResponse
 
     """
-    cookie_settings = _get_cookie_settings(request)
+    cookie_settings = standard_cookie_settings(request)
 
     # Backwards compatibility: set the cookie indicating that the user
     # is logged in.  This is just a boolean value, so it's not very useful.
@@ -96,7 +100,7 @@ def set_logged_in_cookies(request, response, user):
 
 def set_user_info_cookie(response, request):
     """ Sets the user info cookie on the response. """
-    cookie_settings = _get_cookie_settings(request)
+    cookie_settings = standard_cookie_settings(request)
 
     # In production, TLS should be enabled so that this cookie is encrypted
     # when we send it.  We also need to set "secure" to True so that the browser
@@ -114,6 +118,32 @@ def set_user_info_cookie(response, request):
         settings.EDXMKTG_USER_INFO_COOKIE_NAME.encode('utf-8'),
         json.dumps(user_info),
         secure=user_info_cookie_is_secure,
+        **cookie_settings
+    )
+
+
+def set_experiments_is_enterprise_cookie(request, response, experiments_is_enterprise):
+    """ Sets the experiments_is_enterprise cookie on the response.
+    This cookie can be used for tests or minor features,
+    but should not be used for payment related or other critical work
+    since users can edit their cookies
+    """
+    cookie_settings = standard_cookie_settings(request)
+    # In production, TLS should be enabled so that this cookie is encrypted
+    # when we send it.  We also need to set "secure" to True so that the browser
+    # will transmit it only over secure connections.
+    #
+    # In non-production environments (acceptance tests, devstack, and sandboxes),
+    # we still want to set this cookie.  However, we do NOT want to set it to "secure"
+    # because the browser won't send it back to us.  This can cause an infinite redirect
+    # loop in the third-party auth flow, which calls `is_logged_in_cookie_set` to determine
+    # whether it needs to set the cookie or continue to the next pipeline stage.
+    cookie_is_secure = request.is_secure()
+
+    response.set_cookie(
+        'experiments_is_enterprise',
+        json.dumps(experiments_is_enterprise),
+        secure=cookie_is_secure,
         **cookie_settings
     )
 
@@ -137,6 +167,12 @@ def get_user_info_cookie_data(request):
         header_urls['account_settings'] = reverse('account_settings')
         header_urls['learner_profile'] = reverse('learner_profile', kwargs={'username': user.username})
     except NoReverseMatch:
+        pass
+
+    # Add 'resume course' last completed block
+    try:
+        header_urls['resume_block'] = retrieve_last_sitewide_block_completed(user)
+    except User.DoesNotExist:
         pass
 
     # Convert relative URL paths to absolute URIs
