@@ -265,6 +265,13 @@ JWT_AUTH.update({
 from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants
 plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS, plugin_constants.SettingsType.DEVSTACK)
 
+
+######################### Django Rest Framework ########################
+
+REST_FRAMEWORK['DEFAULT_RENDERER_CLASSES'] += (
+    'rest_framework.renderers.BrowsableAPIRenderer',
+)
+
 #####################################################################
 # See if the developer has any local overrides.
 if os.path.isfile(join(dirname(abspath(__file__)), 'private.py')):
