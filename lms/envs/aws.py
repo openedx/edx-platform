@@ -870,6 +870,7 @@ if FEATURES.get('EDX_SOLUTIONS_API'):
         'edx_solutions_api_integration',
         'social_engagement',
         'gradebook',
+        'progress',
         'edx_solutions_projects',
         'edx_solutions_organizations',
         'mobileapps',
