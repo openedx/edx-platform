@@ -19,6 +19,7 @@ from enterprise.models import (
     PendingEnterpriseCustomerUser
 )
 
+from third_party_auth.exceptions import IncorrectConfigurationException
 from openedx.core.djangoapps.theming.helpers import get_current_request
 
 STANDARD_SAML_PROVIDER_KEY = 'standard_saml_provider'
@@ -86,6 +87,21 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
             return config
         else:
             return super(SAMLAuthBackend, self).generate_saml_config()
+
+    def get_user_id(self, details, response):
+        """
+        Calling the parent function and handling the exception properly.
+        """
+        try:
+            return super(SAMLAuthBackend, self).get_user_id(details, response)
+        except KeyError as ex:
+            log.warning(
+                u"Error in SAML authentication flow of IdP '{idp_name}': {message}".format(
+                    message=ex.message,
+                    idp_name=response.get('idp_name')
+                )
+            )
+            raise IncorrectConfigurationException(self)
 
     def generate_metadata_xml(self, idp_name=None):  # pylint: disable=arguments-differ
         """
