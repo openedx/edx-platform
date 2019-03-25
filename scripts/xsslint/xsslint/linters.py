@@ -1555,7 +1555,7 @@ class DjangoTemplateLinter(BaseLinter):
 
         return False
 
-    def _is_django_template(self, mako_template):
+    def _is_django_template(self, django_template):
         """
             Determines if the template is actually a Django template.
 
@@ -1566,7 +1566,7 @@ class DjangoTemplateLinter(BaseLinter):
             True if this is really a Django template, and False otherwise.
 
         """
-        if re.search('({%.*%})|({{.*}})|({#.*#})', mako_template) is not None:
+        if re.search('({%.*%})|({{.*}})|({#.*#})', django_template) is not None:
             return True
         return False
 
@@ -1603,8 +1603,13 @@ class DjangoTemplateLinter(BaseLinter):
             A list of Expressions.
         """
 
+        comment_list = list(re.finditer(r'{% comment .*%}', django_template, re.I))
+        endcomment_list = list(re.finditer(r'{% endcomment .*%}', django_template, re.I))
+
         trans_iterator = re.finditer(r'{% trans .*%}', django_template, re.I)
         for trans in trans_iterator:
+            if self._check_expression_not_commented(trans, comment_list, endcomment_list):
+                continue
             trans_expr = TransExpression(self.ruleset,
                                          trans.start(),
                                          trans.end(),
@@ -1616,6 +1621,8 @@ class DjangoTemplateLinter(BaseLinter):
 
         block_trans_iterator = re.finditer(r'{% blocktrans .*?%}', django_template, re.I)
         for trans in block_trans_iterator:
+            if self._check_expression_not_commented(trans, comment_list, endcomment_list):
+                continue
             trans_expr = BlockTransExpression(self.ruleset,
                                          trans.start(),
                                          trans.end(),
@@ -1624,3 +1631,10 @@ class DjangoTemplateLinter(BaseLinter):
                                          template=django_template)
             if trans_expr:
                 expressions.append(trans_expr)
+
+    def _check_expression_not_commented(self, expr, comment_list, endcomment_list):
+        for i in range(len(endcomment_list)):
+            start_comment = comment_list[i]
+            end_comment = endcomment_list[i]
+            if expr.start() >= start_comment.start() and expr.start() <= end_comment.start():
+                return True
