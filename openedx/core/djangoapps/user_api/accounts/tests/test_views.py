@@ -557,7 +557,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         # Note that we store the raw data, so it is up to client to escape the HTML.
         (
             "bio", u"<html>Lacrosse-playing superhero 壓是進界推日不復女</html>",
-            "z" * 3001, u"Ensure this value has at most 3000 characters (it has 3001)."
+            "z" * 301, u"The about me field must be at most 300 characters long."
         ),
         ("account_privacy", ALL_USERS_VISIBILITY),
         ("account_privacy", PRIVATE_VISIBILITY),
