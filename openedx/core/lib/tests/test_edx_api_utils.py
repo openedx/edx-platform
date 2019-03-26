@@ -1,5 +1,6 @@
 """Tests covering edX API utilities."""
 # pylint: disable=missing-docstring
+from __future__ import absolute_import
 import json
 
 import httpretty

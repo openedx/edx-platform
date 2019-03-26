@@ -30,6 +30,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.test_asides import AsideTestType
+import six
 
 
 @ddt.ddt
@@ -106,7 +107,7 @@ class TestXblockUtils(SharedModuleStoreTestCase):
             view='baseview',
             frag=fragment,
             context={"wrap_xblock_data": {"custom-attribute": "custom-value"}},
-            usage_id_serializer=lambda usage_id: quote_slashes(unicode(usage_id)),
+            usage_id_serializer=lambda usage_id: quote_slashes(six.text_type(usage_id)),
             request_token=uuid.uuid1().get_hex()
         )
         self.assertIsInstance(test_wrap_output, Fragment)

@@ -1,5 +1,6 @@
 """Get log settings."""
 
+from __future__ import absolute_import
 import logging
 import platform
 import sys

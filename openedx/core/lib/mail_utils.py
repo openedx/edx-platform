@@ -2,6 +2,7 @@
 Utilities related to mailing.
 """
 
+from __future__ import absolute_import
 import textwrap
 
 MAX_LINE_LENGTH = 900

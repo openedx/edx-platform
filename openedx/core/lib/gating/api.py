@@ -1,6 +1,7 @@
 """
 API for the gating djangoapp
 """
+from __future__ import absolute_import
 import json
 import logging
 
@@ -19,6 +20,7 @@ from util import milestones_helpers
 from xblock.completable import XBlockCompletionMode as CompletionMode
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+import six
 
 log = logging.getLogger(__name__)
 
@@ -162,7 +164,7 @@ def get_prerequisites(course_key):
         milestone = milestones_by_block_id.get(block.location.block_id)
         if milestone:
             milestone['block_display_name'] = block.display_name
-            milestone['block_usage_key'] = unicode(block.location)
+            milestone['block_usage_key'] = six.text_type(block.location)
             result.append(milestone)
 
     return result
@@ -182,7 +184,7 @@ def add_prerequisite(course_key, prereq_content_key):
     """
     milestone = milestones_api.add_milestone(
         {
-            'name': _(u'Gating milestone for {usage_key}').format(usage_key=unicode(prereq_content_key)),
+            'name': _(u'Gating milestone for {usage_key}').format(usage_key=six.text_type(prereq_content_key)),
             'namespace': "{usage_key}{qualifier}".format(
                 usage_key=prereq_content_key,
                 qualifier=GATING_NAMESPACE_QUALIFIER

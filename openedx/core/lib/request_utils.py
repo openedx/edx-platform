@@ -1,7 +1,8 @@
 """ Utility functions related to HTTP requests """
+from __future__ import absolute_import
 import logging
 import re
-from urlparse import urlparse
+from six.moves.urllib.parse import urlparse
 
 import crum
 from django.conf import settings

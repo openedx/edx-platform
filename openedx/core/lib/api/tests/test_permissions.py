@@ -1,5 +1,6 @@
 """ Tests for API permissions classes. """
 
+from __future__ import absolute_import
 import ddt
 from django.contrib.auth.models import AnonymousUser
 from django.http import Http404

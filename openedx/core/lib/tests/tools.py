@@ -9,6 +9,7 @@ We define the ``__unittest`` symbol in their module namespace so unittest will
 skip them when printing tracebacks, just as it does for their corresponding
 methods in ``unittest`` proper.
 """
+from __future__ import absolute_import
 import re
 import unittest
 

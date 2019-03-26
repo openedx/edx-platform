@@ -1,6 +1,7 @@
 """
 Utilities related to API views
 """
+from __future__ import absolute_import
 from collections import Sequence
 from django.core.exceptions import NON_FIELD_ERRORS, ObjectDoesNotExist, ValidationError
 from django.http import Http404
@@ -18,6 +19,7 @@ from six import text_type
 
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.api.permissions import IsUserInUrl
+import six
 
 
 class DeveloperErrorResponseException(Exception):
@@ -129,7 +131,7 @@ def add_serializer_errors(serializer, data, field_errors):
     """Adds errors from serializer validation to field_errors. data is the original data to deserialize."""
     if not serializer.is_valid():
         errors = serializer.errors
-        for key, error in errors.iteritems():
+        for key, error in six.iteritems(errors):
             field_errors[key] = {
                 'developer_message': u"Value '{field_value}' is not valid for field '{field_name}': {error}".format(
                     field_value=data.get(key, ''), field_name=key, error=error

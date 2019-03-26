@@ -2,10 +2,13 @@
 Tests for graph traversal generator functions.
 """
 
+from __future__ import absolute_import
 from collections import defaultdict
 from unittest import TestCase
 
 from ..graph_traversals import traverse_post_order, traverse_pre_order, traverse_topologically
+import six
+from six.moves import range
 
 
 class TestGraphTraversals(TestCase):
@@ -62,7 +65,7 @@ class TestGraphTraversals(TestCase):
                 will be [].
         """
         result = defaultdict(list)
-        for parent, children in parent_to_children_map.iteritems():
+        for parent, children in six.iteritems(parent_to_children_map):
             for child in children:
                 result[child].append(parent)
         return result
