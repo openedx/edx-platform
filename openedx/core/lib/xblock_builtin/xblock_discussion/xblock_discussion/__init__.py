@@ -4,7 +4,7 @@ Discussion XBlock
 """
 from __future__ import absolute_import
 import logging
-import six.moves.urllib.request, six.moves.urllib.parse, six.moves.urllib.error
+from six.moves.urllib.parse import urlencode
 
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.urls import reverse
@@ -176,7 +176,7 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):
         login_msg = ''
 
         if not self.django_user.is_authenticated:
-            qs = six.moves.urllib.parse.urlencode({
+            qs = urlencode({
                 'course_id': self.course_key,
                 'enrollment_action': 'enroll',
                 'email_opt_in': False,
