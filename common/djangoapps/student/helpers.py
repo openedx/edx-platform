@@ -487,7 +487,9 @@ def _cert_info(user, course_overview, cert_status):
     }
 
     certificate_earned_but_not_available_status = 'certificate_earned_but_not_available'
-    default_status = 'processing'
+
+    # open-ended courses should not display the 'processing' message
+    default_status = 'unavailable' if not course_overview.end else 'processing'
 
     default_info = {
         'status': default_status,
