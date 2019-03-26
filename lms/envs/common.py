@@ -477,6 +477,7 @@ OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS = 30
 # Scope description strings are presented to the user
 # on the application authorization page. See
 # lms/templates/oauth2_provider/authorize.html for details.
+# Non-default scopes should be added directly to OAUTH2_PROVIDER['SCOPES'] below.
 OAUTH2_DEFAULT_SCOPES = {
     'read': _('Read access'),
     'write': _('Write access'),
@@ -490,6 +491,7 @@ OAUTH2_PROVIDER = {
     'REFRESH_TOKEN_EXPIRE_SECONDS': 7776000,
     'SCOPES_BACKEND_CLASS': 'openedx.core.djangoapps.oauth_dispatch.scopes.ApplicationModelScopes',
     'SCOPES': dict(OAUTH2_DEFAULT_SCOPES, **{
+        'user_id': _('Retrieve your user identifier'),
         'grades:read': _('Retrieve your grades for your enrolled courses'),
         'certificates:read': _('Retrieve your course certificates'),
     }),

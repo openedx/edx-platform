@@ -100,6 +100,9 @@ def _create_jwt(
         secret (string): Overrides configured JWT secret (signing) key.
     """
     use_asymmetric_key = _get_use_asymmetric_key_value(is_restricted, use_asymmetric_key)
+    # Default scopes should only contain non-privileged data.
+    # Do not be misled by the fact that `email` and `profile` are default scopes. They
+    # were included for legacy compatibility, even though they contain privileged data.
     scopes = scopes or ['email', 'profile']
     iat, exp = _compute_time_fields(expires_in)
 
