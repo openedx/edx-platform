@@ -12,14 +12,20 @@ Note: The access control logic in this file does NOT check for enrollment in
 """
 import logging
 from datetime import datetime
+import traceback
 
 from django.conf import settings
+from django.db.models import Model
 from django.contrib.auth.models import AnonymousUser
+from functools import wraps
+import laboratory
+from laboratory.exceptions import MismatchException
 from pytz import UTC
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from six import text_type
 from xblock.core import XBlock
 
+from bridgekeeper import perms
 from courseware.access_response import (
     MilestoneAccessError,
     MobileAvailabilityError,
@@ -99,6 +105,91 @@ def has_ccx_coach_role(user, course_key):
     return False
 
 
+class HasAccessExperiment(laboratory.Experiment):
+    def publish(self, result):
+        if not result.match:
+            log.warning(
+                "%s(%r) didn't match some candidates:\ncontrol: %r\ncandidates:%s",
+                result.control.name,
+                self.get_context(),
+                result.control,
+                "\n".join(repr(cand) for cand in result.candidates)
+            )
+
+    def _handle_comparison_mismatch(self, control, observation):
+        if self.raise_on_mismatch:
+            if observation.failure:
+                tb = ''.join(traceback.format_exception(*observation.exc_info))
+                msg = '%s raised an exception:\n%s' % (observation.name, tb)
+            else:
+                msg = '%s does not match control value (%s != %s) (context: %r)' % (
+                    observation.name, control.value, observation.value, self.get_context()
+                )
+            raise MismatchException(msg)
+
+        return False
+
+    @classmethod
+    def decorator(cls, candidates, *exp_args, **exp_kwargs):
+        '''
+        Decorate a control function in order to conduct an experiment when called.
+
+        :param callable candidate: your candidate function
+        :param iterable exp_args: positional arguments passed to :class:`Experiment`
+        :param dict exp_kwargs: keyword arguments passed to :class:`Experiment`
+
+        Usage::
+
+            candidate_func = lambda: True
+
+            @Experiment.decorator(candidate_func)
+            def control_func():
+                return True
+
+        '''
+        def wrapper(control):
+            @wraps(control)
+            def inner(user, action, obj, course_key=None):
+                experiment = cls(context={"user": repr(user), "action": action, "obj": repr(obj)}, *exp_args, **exp_kwargs)
+                experiment.control(control, args=[user, action, obj], kwargs={"course_key": course_key})
+                for candidate in candidates:
+                    experiment.candidate(candidate, name=candidate.__name__, args=[user, action, obj], kwargs={"course_key": course_key})
+                return experiment.conduct()
+            return inner
+        return wrapper
+
+    def enabled(self):
+        context = self.get_context()
+        print(context)
+        return context['action'] in ('can_load', 'can_enroll', 'see_exists')
+
+    def compare(self, control, candidate):
+        '''
+        Compares two :class:`Observation` instances.
+
+        :param Observation control: The control block's :class:`Observation`
+        :param Observation candidate: A candidate block's :class:`Observation`
+
+        :raises MismatchException: If ``Experiment.raise_on_mismatch`` is True
+
+        :return bool: match?
+        '''
+        if candidate.failure or bool(control.value) != bool(candidate.value):
+            return self._handle_comparison_mismatch(control, candidate)
+
+        return True
+
+def has_access_via_bridgekeeper(user, action, obj, course_key=None):
+    return user.has_perm("courseware.{}".format(action), obj)
+
+def has_access_via_bridgekeeper_query(user, action, obj, course_key=None):
+    if isinstance(obj, Model):
+        queryset = perms["courseware.{}".format(action)].filter(user, obj.__class__.objects.filter(pk=obj.pk))
+        return queryset.exists()
+    else:
+        return has_access_via_bridgekeeper(user, action, obj, course_key=course_key)
+
+@HasAccessExperiment.decorator([has_access_via_bridgekeeper, has_access_via_bridgekeeper_query], raise_on_mismatch=hasattr(settings, 'TEST_ROOT') or settings.DEBUG)
 def has_access(user, action, obj, course_key=None):
     """
     Check whether a user has the access to do action on obj.  Handles any magic
@@ -327,34 +418,43 @@ def _has_access_course(user, action, courselike):
         if not visible_to_nonstaff:
             staff_access = _has_staff_access_to_descriptor(user, courselike, courselike.id)
             if staff_access:
+                debug("Allow: course not visible to non-staff, but user has staff access to course")
                 return staff_access
             else:
+                debug("Deny: course not visible to non-staff, and user does not have staff access to course")
                 return visible_to_nonstaff
 
         open_for_learner = check_course_open_for_learner(user, courselike)
         if not open_for_learner:
             staff_access = _has_staff_access_to_descriptor(user, courselike, courselike.id)
             if staff_access:
+                debug("Allow: course not open for learner, but user has staff access to course")
                 return staff_access
             else:
+                debug("Deny: course not open for learner, and user does not have staff access to course")
                 return open_for_learner
 
         view_with_prereqs = _can_view_courseware_with_prerequisites(user, courselike)
         if not view_with_prereqs:
             staff_access = _has_staff_access_to_descriptor(user, courselike, courselike.id)
             if staff_access:
+                debug("Allow: user doesn't meet prerequisites, but user has staff access to course")
                 return staff_access
             else:
+                debug("Deny: user doesn't meet prerequisites, and user does not have staff access to course")
                 return view_with_prereqs
 
         has_not_expired = check_course_expired(user, courselike)
         if not has_not_expired:
             staff_access = _has_staff_access_to_descriptor(user, courselike, courselike.id)
             if staff_access:
+                debug("Allow: course has expired, but user has staff access to course")
                 return staff_access
             else:
+                debug("Deny: course has expired, and user does not have staff access to course")
                 return has_not_expired
 
+        debug("Allow: course not restricted")
         return ACCESS_GRANTED
 
     def can_enroll():

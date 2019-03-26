@@ -5,6 +5,7 @@
 #    make upgrade
 #
 -e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
+git+https://github.com/edx/bridgekeeper.git@python2.7#egg=bridgekeeper==0.7
 -e common/lib/calc
 -e common/lib/capa
 -e common/lib/chem
@@ -196,6 +197,7 @@ jmespath==0.9.4
 jsondiff==1.1.1
 jsonfield==2.0.2
 kombu==3.0.37
+laboratory==1.0.1
 lazy-object-proxy==1.3.1
 lazy==1.1
 lepl==5.1.3

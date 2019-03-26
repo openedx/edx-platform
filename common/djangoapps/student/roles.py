@@ -313,14 +313,16 @@ class CourseCcxCoachRole(CourseRole):
 
 class OrgStaffRole(OrgRole):
     """An organization staff member"""
+    ROLE = CourseStaffRole.ROLE
     def __init__(self, *args, **kwargs):
-        super(OrgStaffRole, self).__init__('staff', *args, **kwargs)
+        super(OrgStaffRole, self).__init__(self.ROLE, *args, **kwargs)
 
 
 class OrgInstructorRole(OrgRole):
     """An organization instructor"""
+    ROLE = CourseInstructorRole.ROLE
     def __init__(self, *args, **kwargs):
-        super(OrgInstructorRole, self).__init__('instructor', *args, **kwargs)
+        super(OrgInstructorRole, self).__init__(self.ROLE, *args, **kwargs)
 
 
 class OrgLibraryUserRole(OrgRole):

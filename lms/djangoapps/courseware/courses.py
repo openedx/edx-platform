@@ -5,12 +5,15 @@ courseware.
 import logging
 from collections import defaultdict
 from datetime import datetime
+import traceback
 
 import branding
 import pytz
 from crum import get_current_request
 from openedx.features.course_duration_limits.access import AuditExpiredError
+from bridgekeeper import perms
 from courseware.access import has_access
+import courseware.permissions
 from courseware.access_response import StartDateError, MilestoneAccessError
 from courseware.date_summary import (
     CourseEndDate,
@@ -31,6 +34,8 @@ from django.http import Http404, QueryDict
 from enrollment.api import get_course_enrollment_details
 from edxmako.shortcuts import render_to_string
 from fs.errors import ResourceNotFound
+import laboratory
+from laboratory.exceptions import MismatchException
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
@@ -453,6 +458,31 @@ def get_course_syllabus_section(course, section_key):
     raise KeyError("Invalid about key " + str(section_key))
 
 
+class AccessExperiment(laboratory.Experiment):
+    def publish(self, result):
+        if not result.match:
+            log.warning(
+                "%s(%r) didn't match some candidates:\ncontrol: %r\ncandidates:%s",
+                result.control.name,
+                self.get_context(),
+                result.control,
+                "\n".join(repr(cand) for cand in result.candidates)
+            )
+
+    def _handle_comparison_mismatch(self, control, observation):
+        if self.raise_on_mismatch:
+            if observation.failure:
+                tb = ''.join(traceback.format_exception(*observation.exc_info))
+                msg = '%s raised an exception:\n%s' % (observation.name, tb)
+            else:
+                msg = '%s does not match control value (%s != %s) (context: %r)' % (
+                    observation.name, control.value, observation.value, self.get_context()
+                )
+            raise MismatchException(msg)
+
+        return False
+
+
 def get_courses(user, org=None, filter_=None):
     """
     Return a LazySequence of courses available, optionally filtered by org code (case-insensitive).
@@ -475,8 +505,24 @@ def get_courses(user, org=None, filter_=None):
         settings.COURSE_CATALOG_VISIBILITY_PERMISSION
     )
 
+    prefiltered_courses_query = perms['courseware.' + permission_name].filter(user, courses)
+    # print(perms['courseware.' + permission_name].filter(user, CourseOverview.objects.all()).query)
+    # print(perms['courseware.' + permission_name].filter(user, CourseOverview.objects.all()).query.sql_with_params()[0])
+    # print(prefiltered_courses_query.query)
+    # print(prefiltered_courses_query.query.sql_with_params()[0])
+    prefiltered_courses = iter(prefiltered_courses_query)
+    post_filtered_courses = (course for course in courses if has_access(user, permission_name, course))
+
+    def courses_with_access():
+        experiment = AccessExperiment(context={'permission': permission_name}, raise_on_mismatch=hasattr(settings, 'TEST_ROOT') or settings.DEBUG)
+        experiment.control(next, args=[post_filtered_courses])
+        experiment.candidate(next, args=[prefiltered_courses])
+
+        while True:
+            yield experiment.conduct()
+
     return LazySequence(
-        (c for c in courses if has_access(user, permission_name, c)),
+        courses_with_access(),
         est_len=courses.count()
     )
 
