@@ -153,6 +153,7 @@
     "Adjust video volume": "R\u00e9gler le volume de la vid\u00e9o", 
     "Admin": "Administrateur", 
     "Advanced": "Avanc\u00e9", 
+    "All": "Tout", 
     "All Groups": "Tous les groupes", 
     "All Rights Reserved": "Tous droits r\u00e9serv\u00e9s", 
     "All Time Zones": "Tous les fuseaux horaires", 
@@ -357,6 +358,7 @@
     "Current Role:": "R\u00f4le actuel :", 
     "Current conversation": "Discussion actuelle", 
     "Current tab": "Onglet en cours", 
+    "Data export failed. Reason: <%= error %>": "\u00c9chec d'exportation des donn\u00e9es. Motif\u00a0: <%= error %>", 
     "Date": "Date", 
     "Date Added": "Date ajout\u00e9e", 
     "Date added": "Date ajout\u00e9e", 
@@ -825,6 +827,10 @@
     "Reset Your Password": "R\u00e9initialiser votre mot de passe", 
     "Reset my password": "R\u00e9initialiser mon mot de passe", 
     "Restore enrollment code": "Restaurer le code d'inscription", 
+    "Results retrieved on <%= creation_time %> (<%= seconds %> second).": [
+      "R\u00e9sultats r\u00e9cup\u00e9r\u00e9s le <%= creation_time %> (<%= seconds %> seconde).", 
+      "R\u00e9sultats r\u00e9cup\u00e9r\u00e9s le <%= creation_time %> (<%= seconds %> secondes)."
+    ], 
     "Retake Photo": "Reprendre une photo", 
     "Retake Your Photos": "Reprenez vos photos", 
     "Return and add email address": "Retourner et ajouter une adresse email", 
@@ -982,6 +988,7 @@
     "The page \"{route}\" could not be found.": "Page \"{route}\" non trouv\u00e9e.", 
     "The photo of your face matches the photo on your ID.": "La photo de votre visage concorde avec la photo sur votre pi\u00e8ce d'identit\u00e9.", 
     "The raw error message is:": "Le message d'erreur est:", 
+    "The report is currently being generated\u2026": "Le rapport est en cours de production...", 
     "The selected content group does not exist": "Le groupe de contenu s\u00e9lectionn\u00e9 n'existe pas", 
     "The server could not be contacted.": "Le serveur n'a pas pu \u00eatre contact\u00e9.", 
     "The staff assessment form could not be loaded.": "Le formulaire d'\u00e9valuation de l'\u00e9quipe p\u00e9dagogique n'a pas pu \u00eatre charg\u00e9.", 
@@ -1230,6 +1237,10 @@
     "You have selected an action, and you haven't made any changes on individual fields. You're probably looking for the Go button rather than the Save button.": "Vous avez s\u00e9lectionn\u00e9 une action, et vous n'avez fait aucune modification sur des champs. Vous cherchez probablement le bouton Envoyer et non le bouton Sauvegarder.", 
     "You have selected an action, but you haven't saved your changes to individual fields yet. Please click OK to save. You'll need to re-run the action.": "Vous avez s\u00e9lectionn\u00e9 une action, mais vous n'avez pas encore sauvegard\u00e9 certains champs modifi\u00e9s. Cliquez sur OK pour sauver. Vous devrez r\u00e9appliquer l'action.", 
     "You have unsaved changes on individual editable fields. If you run an action, your unsaved changes will be lost.": "Vous avez des modifications non sauvegard\u00e9es sur certains champs \u00e9ditables. Si vous lancez une action, ces modifications vont \u00eatre perdues.", 
+    "You have used {num_used} of 1 submission.": [
+      "Vous avez utilis\u00e9 {num_used} sur 1 envoi.", 
+      "Vous avez utilis\u00e9 {num_used} sur {max_attempts} envois."
+    ], 
     "You haven't added any assets to this course yet.": "Vous n'avez encore ajout\u00e9 aucune ressource dans ce cours.", 
     "You haven't added any content to this course yet.": "Vous n'avez pas encore ajout\u00e9 de contenu \u00e0 ce cours.", 
     "You haven't added any textbooks to this course yet.": "Vous n'avez encore ajout\u00e9 aucun manuel \u00e0 ce cours.", 

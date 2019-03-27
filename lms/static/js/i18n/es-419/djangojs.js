@@ -307,6 +307,7 @@
     "Align left": "Alienar a la izquierda", 
     "Align right": "Alinear a la derecha", 
     "Alignment": "Alinear a la", 
+    "All": "Todo", 
     "All Groups": "Todos los Grupos", 
     "All Learners and Staff": "Todos los estudiantes y equipo del curso", 
     "All Posts": "Todas las publicaciones", 
@@ -656,6 +657,7 @@
     "Custom...": "Personalizado...", 
     "Cut": "Cortar", 
     "Cut row": "Cortar fila", 
+    "Data export failed. Reason: <%= error %>": "Error en la exportaci\u00f3n de los datos. Motivo: <%= error %>", 
     "Date": "Fecha", 
     "Date Added": "Fecha a\u00f1adida", 
     "Date Joined": "Fecha de Registro", 
@@ -1500,6 +1502,10 @@
     "Restore enrollment code": "Restaurar c\u00f3digo de inscripci\u00f3n", 
     "Restore last draft": "Restaura el \u00faltimo borrador", 
     "Restrict access to:": "Acceso restringido a:", 
+    "Results retrieved on <%= creation_time %> (<%= seconds %> second).": [
+      "Resultados obtenidos en <%= creation_time %> (<%= seconds %> second).", 
+      "Resultados obtenidos en <%= creation_time %> (<%= seconds %> seconds)."
+    ], 
     "Retake Photo": "Tomar nuevamente la foto", 
     "Retake Your Photos": "Tome nuevamente sus fotos", 
     "Retry Verification": "Reenviar verificaci\u00f3n", 
@@ -1806,6 +1812,7 @@
     "The published branch version, {published}, was reset to the draft branch version, {draft}.": "La versi\u00f3n publicada, {published}, fue restablecida a la versi\u00f3n borrador, {draft}.", 
     "The raw error message is:": "El error crudo es:", 
     "The refund deadline for this course has passed,so you will not receive a refund.": "La fecha l\u00edmite para reembolso en este curso ya ha pasado, por lo que a\u00fan si realiz\u00f3 un pago, no recibir\u00e1 devoluci\u00f3n de dinero.", 
+    "The report is currently being generated\u2026": "El informe se est\u00e1 generando...", 
     "The selected content group does not exist": "No existe contenido para el curso seleccionado", 
     "The selected image must be larger than {minFileSizeInKB}.": "La imagen seleccionada debe ser mayor a {minFileSizeInKB}.", 
     "The selected image must be smaller than {maxFileSizeInMB}.": "La imagen seleccionada debe ser inferior a  {maxFileSizeInMB}.", 
@@ -2225,6 +2232,10 @@
     "You have successfully updated your goal.": "Ha actualizado exitosamente su objetivo.", 
     "You have unsaved changes are you sure you want to navigate away?": "Tienes cambios sin guardar, \u00bfest\u00e1s seguro que deseas avanzar en el navegador?", 
     "You have unsaved changes on individual editable fields. If you run an action, your unsaved changes will be lost.": "Tiene cambios sin guardar en campos editables individuales. Si ejecuta una acci\u00f3n, los cambios no guardados se perder\u00e1n.", 
+    "You have used {num_used} of 1 submission.": [
+      "Ha utilizado {num_used} de 1 presentaci\u00f3n.", 
+      "Ha utilizado {num_used} de {max_attempts} presentaciones."
+    ], 
     "You haven't added any assets to this course yet.": "No ha a\u00f1adido a\u00fan ning\u00fan recurso a este curso.", 
     "You haven't added any content to this course yet.": "Todav\u00eda no ha a\u00f1adido ning\u00fan contenido a este curso.", 
     "You haven't added any textbooks to this course yet.": "No ha a\u00f1adido a\u00fan ning\u00fan libro de texto a este curso.", 

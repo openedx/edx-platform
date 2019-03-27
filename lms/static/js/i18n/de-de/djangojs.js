@@ -26,6 +26,7 @@
     ], 
     "6 a.m.": "6 Uhr", 
     "6 p.m.": "18 Uhr", 
+    "All": "Alle", 
     "April": "April", 
     "Assessment": "Beurteilung", 
     "Assessments": "Beurteilungen", 
@@ -48,6 +49,7 @@
     "Couldn't Save This Assignment": "Konnte diese Aufgabe nicht speichern", 
     "Criterion Added": "Kriterium hinzugef\u00fcgt", 
     "Criterion Deleted": "Kriterium gel\u00f6scht", 
+    "Data export failed. Reason: <%= error %>": "Export der Daten ist fehlgeschlagen. Grund: <%= error %>", 
     "December": "Dezember", 
     "Do you want to upload your file before submitting?": "M\u00f6chten Sie die Datei hochladen, bevor Sie Ihre Antwort einreichen?", 
     "Error": "Fehler", 
@@ -96,6 +98,10 @@
     "Preformatted": "Vorformatiert", 
     "Remove": "Entfernen", 
     "Remove all": "Alle entfernen", 
+    "Results retrieved on <%= creation_time %> (<%= seconds %> second).": [
+      "Ergebnisse am <%= creation_time %> (<%= seconds %> second) abgerufen", 
+      "Ergebnisse am <%= creation_time %> (<%= seconds %> second) abgerufen."
+    ], 
     "Saving...": "Speichert...", 
     "Self": "Selbst", 
     "September": "September", 
@@ -104,6 +110,7 @@
     "Status of Your Response": "Status Ihrer Antwort", 
     "The display of ungraded and checked out responses could not be loaded.": "Die Anzeige der unbenoteten und ausgecheckten Antworten konnte nicht geladen werden.", 
     "The following file types are not allowed: ": "Die folgenden Dateitypen sind nicht erlaubt:", 
+    "The report is currently being generated\u2026": "Der Report wird gerade zusammengestellt\u2026", 
     "The server could not be contacted.": "Der Server konnte nicht erreicht werden.", 
     "The staff assessment form could not be loaded.": "Das Mitarbeiterbewertungsformular konnte nicht geladen werden.", 
     "The submission could not be removed from the grading pool.": "Die Einreichung konnte nicht aus dem Einstufungspool entfernt werden.", 
@@ -138,6 +145,10 @@
     "You have selected an action, and you haven't made any changes on individual fields. You're probably looking for the Go button rather than the Save button.": "Sie haben eine Aktion ausgew\u00e4hlt, aber keine \u00c4nderungen an bearbeitbaren Feldern vorgenommen. Sie wollten wahrscheinlich auf \"Ausf\u00fchren\" und nicht auf \"Speichern\" klicken.", 
     "You have selected an action, but you haven't saved your changes to individual fields yet. Please click OK to save. You'll need to re-run the action.": "Sie haben eine Aktion ausgew\u00e4hlt, aber ihre vorgenommenen \u00c4nderungen nicht gespeichert. Klicken Sie OK, um dennoch zu speichern. Danach m\u00fcssen Sie die Aktion erneut ausf\u00fchren.", 
     "You have unsaved changes on individual editable fields. If you run an action, your unsaved changes will be lost.": "Sie haben \u00c4nderungen an bearbeitbaren Feldern vorgenommen und nicht gespeichert. Wollen Sie die Aktion trotzdem ausf\u00fchren und Ihre \u00c4nderungen verwerfen?", 
+    "You have used {num_used} of 1 submission.": [
+      "Sie haben {num_used} von einer Einreichung verwendet.", 
+      "Sie haben {num_used} von {max_attempts} Einreichungen verwendet."
+    ], 
     "You must provide a learner name.": "Name erforderlich", 
     "You're about to submit your response for this assignment. After you submit this response, you can't change it or submit a new response.": "Sie sind dabei Ihre Antwort f\u00fcr diese Aufgabe einzureichen. Nachdem Sie Ihre Antwort abgeschickt haben, k\u00f6nnen Sie diese nicht mehr \u00e4ndern und auch keine neue Antwort geben.", 
     "one letter Friday\u0004F": "Fr", 
