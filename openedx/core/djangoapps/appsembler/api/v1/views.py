@@ -10,6 +10,8 @@ import string
 
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
 from django.conf import settings
+from django.db import transaction
+from django.utils.decorators import method_decorator
 
 from rest_framework import viewsets
 from rest_framework.authentication import TokenAuthentication
@@ -86,6 +88,10 @@ class RegistrationViewSet(TahoeAuthMixin, viewsets.ViewSet):
     throttle_classes = (TahoeAPIUserThrottle,)
     http_method_names = ['post', 'head']
 
+    @method_decorator(transaction.non_atomic_requests)
+    def dispatch(self, *args, **kwargs):
+        return super(RegistrationViewSet, self).dispatch(*args, **kwargs)
+
     def create(self, request):
         """Creates a new user account for the site that calls this view
 
@@ -111,7 +117,7 @@ class RegistrationViewSet(TahoeAuthMixin, viewsets.ViewSet):
         The code here is adapted from the LMS ``appsembler_api`` bulk registration
         code. See the ``appsembler/ginkgo/master`` branch
         """
-        data = request.data
+        data = request.data.copy()  # Using .copy() to make the POST data mutable, see: https://stackoverflow.com/a/49794425/161278
         password_provided = 'password' in data
 
         # set the honor_code and honor_code like checked,
@@ -141,7 +147,7 @@ class RegistrationViewSet(TahoeAuthMixin, viewsets.ViewSet):
             user = create_account_with_params(
                 request=request,
                 params=data,
-                send_activation_email_flag=data['send_activation_email'])
+            )
             # set the user as active if password is provided
             # meaning we don't have to send a password reset email
             user.is_active = password_provided
