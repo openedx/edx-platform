@@ -871,7 +871,10 @@ class RegistrationFormFactory(object):
         """
         # Translators: This is a legal document users must agree to
         # in order to register a new account.
-        terms_label = _(u"Terms of Service")
+        if configuration_helpers.get_value('combine_privacy_and_tos', True):
+            terms_label = _(u"Terms of Service and Privacy Policy")
+        else:
+            terms_label = _(u"Terms of Service")
         terms_link = marketing_link("TOS")
 
         # Translators: "Terms of service" is a legal document users must agree to
