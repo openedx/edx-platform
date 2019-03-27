@@ -1,6 +1,8 @@
 """
 Tests for the API functions in the credit app.
 """
+from __future__ import absolute_import
+
 import datetime
 import json
 
@@ -8,6 +10,7 @@ import ddt
 import httpretty
 import mock
 import pytz
+import six
 from django.contrib.auth.models import User
 from django.core import mail
 from django.db import connection
@@ -195,7 +198,7 @@ class CreditApiTestBase(ModuleStoreTestCase):
         """ Mock GET requests to the ecommerce course API endpoint. """
         httpretty.reset()
         httpretty.register_uri(
-            httpretty.GET, '{}/courses/{}/?include_products=1'.format(TEST_API_URL, unicode(course_key)),
+            httpretty.GET, '{}/courses/{}/?include_products=1'.format(TEST_API_URL, six.text_type(course_key)),
             status=status,
             body=json.dumps(body), content_type='application/json',
         )
@@ -977,7 +980,7 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
         self.assertEqual(parameters['course_org'], self.course_key.org)
         self.assertEqual(parameters['course_num'], self.course_key.course)
         self.assertEqual(parameters['course_run'], self.course_key.run)
-        self.assertEqual(parameters['final_grade'], unicode(self.FINAL_GRADE))
+        self.assertEqual(parameters['final_grade'], six.text_type(self.FINAL_GRADE))
 
         # Validate user information
         for key in self.USER_INFO.keys():
