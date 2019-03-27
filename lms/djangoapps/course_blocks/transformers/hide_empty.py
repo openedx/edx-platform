@@ -37,7 +37,4 @@ class HideEmptyTransformer(BlockStructureTransformer):
             children = block_structure.get_xblock_field(block_key, 'children')
             return has_children and not any(child in block_structure for child in children)
 
-        for _ in block_structure.post_order_traversal(
-            filter_func=block_structure.create_removal_filter(_filter)
-        ):
-            pass
+        block_structure.remove_block_traversal(_filter)
