@@ -27,7 +27,7 @@ from .models import CourseDurationLimitConfig
 LOG = logging.getLogger(__name__)
 
 DEFAULT_NUM_BINS = 24
-EXPIRY_REMINDER_NUM_BINS = 24
+EXPIRY_REMINDER_NUM_BINS = 1
 EXPIRY_REMINDER_LOG_PREFIX = 'FBE Expiry Reminder'
 
 

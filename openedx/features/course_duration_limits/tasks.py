@@ -75,22 +75,20 @@ class CourseDurationLimitMessageBaseTask(LoggedTask):
                 continue
 
             target_date = current_date + datetime.timedelta(days=day_offset)
-            for bin_num in range(cls.num_bins):
-                task_args = (
-                    site.id,
-                    unicode(course_key),
-                    serialize(target_date),
-                    day_offset,
-                    bin_num,
-                    override_recipient_email,
-                )
-                cls().apply_async(
-                    task_args,
-                    retry=False,
-                )
+            task_args = (
+                site.id,
+                unicode(course_key),
+                serialize(target_date),
+                day_offset,
+                override_recipient_email,
+            )
+            cls().apply_async(
+                task_args,
+                retry=False,
+            )
 
     def run(  # pylint: disable=arguments-differ
-        self, site_id, course_key_str, target_day_str, day_offset, bin_num, override_recipient_email=None,
+        self, site_id, course_key_str, target_day_str, day_offset, override_recipient_email=None,
     ):
         try:
             site = Site.objects.select_related('configuration').get(id=site_id)
