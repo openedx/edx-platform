@@ -803,14 +803,14 @@ class RegistrationFormFactory(object):
         # Separate terms of service and honor code checkboxes
         if separate_honor_and_tos:
             terms_label = _(u"Honor Code")
-            terms_link = marketing_link("HONOR")
 
         # Combine terms of service and honor code checkboxes
         else:
             # Translators: This is a legal document users must agree to
             # in order to register a new account.
             terms_label = _(u"Terms of Service and Honor Code")
-            terms_link = marketing_link("HONOR")
+
+        terms_link = settings.ENV_TOKENS.get('TERMS_OF_SERVICE_LINK', ''),
 
         # Translators: "Terms of Service" is a legal document users must agree to
         # in order to register a new account.
@@ -836,7 +836,7 @@ class RegistrationFormFactory(object):
 
             field_type = 'plaintext'
 
-            pp_link = marketing_link("PRIVACY")
+            pp_link = settings.ENV_TOKENS.get('PRIVACY_POLICY_LINK', ''),
             label = Text(_(
                 u"By creating an account with {platform_name}, you agree \
                   to abide by our {platform_name} \
