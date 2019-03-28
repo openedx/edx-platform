@@ -6,9 +6,9 @@ import json
 import uuid
 
 import factory
+from factory.fuzzy import FuzzyText
 import pytz
 from django.contrib.auth.models import User
-from factory.fuzzy import FuzzyText
 
 from openedx.core.djangoapps.credit.models import (
     CreditCourse,
