@@ -1101,11 +1101,6 @@ PROFILE_MICROFRONTEND_URL = ENV_TOKENS.get('PROFILE_MICROFRONTEND_URL', PROFILE_
 
 # This is at the bottom because it is going to load more settings after base settings are loaded
 
-# Load aws.py in plugins for reverse compatibility.  This can be removed after aws.py
-# is officially removed.
-plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS,
-                            plugin_constants.SettingsType.AWS)
-
 # Load production.py in plugins
 plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS, plugin_constants.SettingsType.PRODUCTION)
 
