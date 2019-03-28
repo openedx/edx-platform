@@ -1,6 +1,7 @@
 """
 Test cases for the HTTP endpoints of the profile image api.
 """
+from __future__ import absolute_import
 from contextlib import closing
 import datetime
 from pytz import UTC
@@ -178,7 +179,7 @@ class ProfileImageViewPostTestCase(ProfileImageEndpointMixin, APITestCase):
             self.check_has_profile_image()
         mock_log.info.assert_called_once_with(
             LOG_MESSAGE_CREATE,
-            {'image_names': get_profile_image_names(self.user.username).values(), 'user_id': self.user.id}
+            {'image_names': list(get_profile_image_names(self.user.username).values()), 'user_id': self.user.id}
         )
         self.check_upload_event_emitted()
 
@@ -217,7 +218,7 @@ class ProfileImageViewPostTestCase(ProfileImageEndpointMixin, APITestCase):
             self.check_has_profile_image()
         mock_log.info.assert_called_once_with(
             LOG_MESSAGE_CREATE,
-            {'image_names': get_profile_image_names(self.user.username).values(), 'user_id': self.user.id}
+            {'image_names': list(get_profile_image_names(self.user.username).values()), 'user_id': self.user.id}
         )
         self.check_upload_event_emitted()
 
@@ -400,7 +401,7 @@ class ProfileImageViewDeleteTestCase(ProfileImageEndpointMixin, APITestCase):
         self.check_has_profile_image(False)
         mock_log.info.assert_called_once_with(
             LOG_MESSAGE_DELETE,
-            {'image_names': get_profile_image_names(self.user.username).values(), 'user_id': self.user.id}
+            {'image_names': list(get_profile_image_names(self.user.username).values()), 'user_id': self.user.id}
         )
         self.check_remove_event_emitted()
 
@@ -435,7 +436,7 @@ class ProfileImageViewDeleteTestCase(ProfileImageEndpointMixin, APITestCase):
         self.check_has_profile_image(False)
         mock_log.info.assert_called_once_with(
             LOG_MESSAGE_DELETE,
-            {'image_names': get_profile_image_names(self.user.username).values(), 'user_id': self.user.id}
+            {'image_names': list(get_profile_image_names(self.user.username).values()), 'user_id': self.user.id}
         )
         self.check_remove_event_emitted()
 
