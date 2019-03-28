@@ -189,7 +189,7 @@ def index(request, extra_context=None, user=AnonymousUser()):
     return render_to_response('index.html', context)
 
 
-def compose_and_send_activation_email(user, profile, user_registration=None):
+def compose_and_send_activation_email(user, profile, user_registration=None, third_party_auth_pw=''):
     """
     Construct all the required params and send the activation email
     through celery task
@@ -203,6 +203,7 @@ def compose_and_send_activation_email(user, profile, user_registration=None):
     if user_registration is None:
         user_registration = Registration.objects.get(user=user)
     context = generate_activation_email_context(user, user_registration)
+    context['third_party_auth_pw'] = third_party_auth_pw
     subject = render_to_string('emails/activation_email_subject.txt', context)
     # Email subject *must not* contain newlines
     subject = ''.join(subject.splitlines())
@@ -407,7 +408,8 @@ def change_enrollment(request, check_access=True):
                 course_enrollment_model = None
                 is_vip = False
                 if enroll_mode:
-                    course_enrollment_model = CourseEnrollment.enroll(user, course_id, check_access=check_access, mode=enroll_mode)
+                    course_enrollment_model = CourseEnrollment.enroll(user, course_id, check_access=check_access,
+                                                                      mode=enroll_mode)
 
                 else:
                     if settings.FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION', False):
@@ -723,7 +725,6 @@ def password_change_request_handler(request):
             # no user associated with the email
             if configuration_helpers.get_value('ENABLE_PASSWORD_RESET_FAILURE_EMAIL',
                                                settings.FEATURES['ENABLE_PASSWORD_RESET_FAILURE_EMAIL']):
-
                 site = get_current_site()
                 message_context = get_base_template_context(site)
 
@@ -944,7 +945,7 @@ def validate_new_email(user, new_email):
         validate_email(new_email)
     except ValidationError:
         raise ValueError(_('Valid e-mail address required.'))
-    
+
     if new_email == user.email:
         raise ValueError(_('Old email is the same as the new email.'))
 
@@ -1062,7 +1063,7 @@ def confirm_email_change(request, key):  # pylint: disable=unused-argument
                 message,
                 configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
             )
-        except Exception:    # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             log.warning('Unable to send confirmation email to old address', exc_info=True)
             response = render_to_response("email_change_failed.html", {'email': user.email})
             transaction.set_rollback(True)
