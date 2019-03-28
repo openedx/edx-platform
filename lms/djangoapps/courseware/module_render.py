@@ -56,6 +56,7 @@ from lms.djangoapps.grades.signals.signals import SCORE_PUBLISHED
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem
+from lms.djangoapps.grades.util_services import GradesUtilService
 from lms.djangoapps.verify_student.services import XBlockVerificationService
 from openedx.core.djangoapps.bookmarks.services import BookmarksService
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
@@ -821,6 +822,7 @@ def get_module_system_for_user(
             'credit': CreditService(),
             'bookmarks': BookmarksService(user=user),
             'gating': GatingService(),
+            'grade_utils': GradesUtilService(course_id=course_id),
         },
         get_user_role=lambda: get_user_role(user, course_id),
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
