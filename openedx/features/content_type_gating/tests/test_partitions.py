@@ -119,7 +119,7 @@ class TestContentTypeGatingPartition(CacheIsolationTestCase):
         ):
             fragment = partition.access_denied_fragment(mock_block, global_staff, FULL_ACCESS, 'test_allowed_group')
             self.assertIsNone(fragment)
-            message = partition.access_denied_message(mock_block, global_staff, FULL_ACCESS, 'test_allowed_group')
+            message = partition.access_denied_message(mock_block.scope_ids.usage_id, global_staff, FULL_ACCESS, 'test_allowed_group')
             self.assertIsNone(message)
 
     def test_acess_denied_fragment_for_null_request(self):
