@@ -1,6 +1,7 @@
 """
 Tests for the sync course runs management command.
 """
+from __future__ import absolute_import
 import ddt
 import mock
 
@@ -11,6 +12,7 @@ from openedx.core.djangoapps.catalog.management.commands.sync_course_runs import
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+import six
 
 COMMAND_MODULE = 'openedx.core.djangoapps.catalog.management.commands.sync_course_runs'
 
@@ -29,7 +31,7 @@ class TestSyncCourseRunsCommand(ModuleStoreTestCase):
         self.course_overview = CourseOverview.get_from_id(self.course.id)
         # create a catalog course run with the same course id.
         self.catalog_course_run = CourseRunFactory(
-            key=unicode(self.course.id),
+            key=six.text_type(self.course.id),
             marketing_url='test_marketing_url',
             eligible_for_financial_aid=False
         )
