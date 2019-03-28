@@ -1,10 +1,13 @@
 """Helper functions for working with the catalog service."""
+from __future__ import absolute_import
+
 import copy
 import datetime
 import logging
 import uuid
 
 import pycountry
+import six
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from edx_rest_api_client.client import EdxRestApiClient
@@ -197,7 +200,7 @@ def get_pathways(site, pathway_id=None):
         logger.warning('Failed to get credit pathway ids from the cache.')
 
     pathways = cache.get_many([PATHWAY_CACHE_KEY_TPL.format(id=pathway_id) for pathway_id in pathway_ids])
-    pathways = pathways.values()
+    pathways = list(pathways.values())
 
     # The get_many above sometimes fails to bring back details cached on one or
     # more Memcached nodes. It doesn't look like these keys are being evicted.
@@ -216,7 +219,7 @@ def get_pathways(site, pathway_id=None):
         retried_pathways = cache.get_many(
             [PATHWAY_CACHE_KEY_TPL.format(id=pathway_id) for pathway_id in missing_ids]
         )
-        pathways += retried_pathways.values()
+        pathways += list(retried_pathways.values())
 
         still_missing_ids = set(pathway_ids) - set(pathway['id'] for pathway in pathways)
         for missing_id in still_missing_ids:
@@ -412,7 +415,7 @@ def get_course_uuid_for_course(course_run_key):
         course_run_data = get_edx_api_data(
             catalog_integration,
             'course_runs',
-            resource_id=unicode(course_run_key),
+            resource_id=six.text_type(course_run_key),
             api=api,
             cache_key=run_cache_key if catalog_integration.is_cache_enabled else None,
             long_term_cache=True,
