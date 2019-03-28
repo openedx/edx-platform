@@ -1,3 +1,7 @@
+"""
+Base file for testing email sending functionality
+"""
+from __future__ import absolute_import
 import datetime
 import logging
 from collections import namedtuple
@@ -27,6 +31,7 @@ from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.core.djangolib.testing.utils import FilteredQueryCountMixin
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
+from six.moves import range
 
 SITE_QUERY = 1  # django_site
 SITE_CONFIG_QUERY = 1  # site_configuration_siteconfiguration

@@ -1,6 +1,7 @@
 """
 Tests for send_upgrade_reminder management command.
 """
+from __future__ import absolute_import
 import logging
 from unittest import skipUnless
 
@@ -21,6 +22,7 @@ from openedx.core.djangoapps.schedules.management.commands.tests.send_email_base
 from openedx.core.djangoapps.schedules.models import ScheduleExperience
 from openedx.core.djangolib.testing.utils import skip_unless_lms, CacheIsolationTestCase
 from student.tests.factories import UserFactory
+from six.moves import range
 
 
 LOG = logging.getLogger(__name__)

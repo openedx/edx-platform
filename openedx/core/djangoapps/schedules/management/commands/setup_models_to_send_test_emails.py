@@ -2,6 +2,7 @@
 A managment command that can be used to set up Schedules with various configurations for testing.
 """
 
+from __future__ import absolute_import
 import datetime
 import pytz
 import factory
