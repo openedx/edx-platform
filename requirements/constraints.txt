@@ -46,4 +46,4 @@ pytest-randomly<2.0.0
 tornado<6.0
 
 # Preventing https://github.com/edx/edx-proctoring/pull/557 being installed before https://github.com/edx/edx-platform/pull/19959
-edx-proctoring==1.5.21
+edx-proctoring==1.5.22
