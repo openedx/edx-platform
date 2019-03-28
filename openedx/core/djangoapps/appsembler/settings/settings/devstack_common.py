@@ -12,9 +12,12 @@ def plugin_settings(settings):
     settings.OAUTH_ENFORCE_SECURE = False
     settings.SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
-    # disable caching in dev environment
-    for cache_key in settings.CACHES.keys():
-        settings.CACHES[cache_key]['BACKEND'] = 'django.core.cache.backends.dummy.DummyCache'
+    # Disable caching in dev environment
+    # NOTE: Disabling cache breaks things like Celery subtasks
+    if not FEATURES.get('ENABLE_DEVSTACK_CACHES', True):
+        print('\nDISABLING CACHES...')
+        for cache_key in settings.CACHES.keys():
+            settings.CACHES[cache_key]['BACKEND'] = 'django.core.cache.backends.dummy.DummyCache'
 
     settings.INSTALLED_APPS += (
         'django_extensions',

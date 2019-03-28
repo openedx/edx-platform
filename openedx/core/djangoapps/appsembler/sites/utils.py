@@ -1,14 +1,22 @@
 import json
 from itertools import izip
+from urlparse import urlparse
 
 import cssutils
 import os
 import sass
+from django.core.files.storage import get_storage_class
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
+from django.db.models.query import Q
+from provider.oauth2.models import AccessToken, RefreshToken, Client
+from django.utils.text import slugify
+
+from organizations.api import add_organization
 from organizations import api as org_api
 from organizations import models as org_models
+from organizations.models import UserOrganizationMapping, Organization, UserSiteMapping
 
 from openedx.core.djangoapps.theming.models import SiteTheme
 
@@ -25,6 +33,145 @@ def get_lms_link_from_course_key(base_lms_url, course_key):
         site_domain = "{}.{}".format(course_key.org, base_lms_url)
 
     return site_domain
+
+
+def get_site_by_organization(org):
+    """
+    Get the site matching the organization, throws an error if there's more than one site.
+    """
+    assert org.sites.count() == 1, 'Should have one and only one site.'
+    return org.sites.all()[0]
+
+
+def get_amc_oauth_client():
+    """
+    Return the AMC OAuth2 Client model instance.
+    """
+    return Client.objects.get(url=settings.FEATURES['AMC_APP_URL'])
+
+
+def get_amc_tokens(user):
+    """
+    Return the the access and refresh token with expiry date in a dict.
+    """
+
+    client = get_amc_oauth_client()
+    tokens = {
+        'access_token': '',
+        'access_expires': '',
+        'refresh_token': '',
+    }
+
+    try:
+        access = AccessToken.objects.get(user=user, client=client)
+        tokens.update({
+            'access_token': access.token,
+            'access_expires': access.expires,
+        })
+    except AccessToken.DoesNotExist:
+        return tokens
+
+    try:
+        refresh = RefreshToken.objects.get(user=user, access_token=access, client=client)
+        tokens['refresh_token'] = refresh.token
+    except RefreshToken.DoesNotExist:
+        pass
+
+    return tokens
+
+
+def reset_amc_tokens(user):
+    """
+    Create and return new tokens, or extend existing ones to one year in the future.
+    """
+    client = get_amc_oauth_client()
+    try:
+        access = AccessToken.objects.get(user=user, client=client)
+    except AccessToken.DoesNotExist:
+        access = AccessToken.objects.create(
+            user=user,
+            client=client,
+        )
+
+    access.expires = access.client.get_default_token_expiry()
+    access.save()
+
+    try:
+        refresh = RefreshToken.objects.get(user=user, access_token=access, client=client)
+    except RefreshToken.DoesNotExist:
+        refresh = RefreshToken.objects.create(
+            user=user,
+            client=client,
+            access_token=access,
+        )
+
+    refresh.expired = True
+    refresh.save()
+
+    return get_amc_tokens(user)
+
+
+def get_single_user_organization(user):
+    """
+    Finds the single organization the user is associated with.
+
+    If there's more than one, an exception is thrown.
+    """
+    uom = UserOrganizationMapping.objects.get(user=user)
+    return uom.organization
+
+
+def make_amc_admin(user, org_name):
+    """
+    Make a user AMC admin with the following steps:
+
+      - Reset organization and association.
+      - Reset access and reset tokens, and set the expire one year ahead.
+      - Return the recent tokens.
+    """
+    org = Organization.objects.get(Q(name=org_name) | Q(short_name=org_name))
+    site = get_site_by_organization(org)
+
+    uom, _ = UserOrganizationMapping.objects.get_or_create(user=user, organization=org)
+    uom.is_active = True
+    uom.is_amc_admin = True
+    uom.save()
+
+    usm, _ = UserSiteMapping.objects.get_or_create(user=user, site=site)
+    usm.is_active = True
+    usm.is_amc_admin = True
+    usm.save()
+
+    return {
+        'user_email': user.email,
+        'organization_name': org.name,
+        'tokens': reset_amc_tokens(user),
+    }
+
+
+def to_safe_file_name(url):
+    path = urlparse(url).path.lower()
+    safe_extensions = {'.png', '.jpeg', '.jpg'}
+    sluggified = slugify(path)
+
+    for ext in safe_extensions:
+        if path.endswith(ext):
+            return sluggified + ext
+
+    return sluggified
+
+
+def get_customer_files_storage():
+    kwargs = {}
+    # Passing these settings to the FileSystemStorage causes an exception
+    # TODO: Use settings instead of hardcoded in Python
+    if not settings.DEBUG:
+        kwargs = {
+            'location': 'customer_files',
+            'file_overwrite': False
+        }
+
+    return get_storage_class()(**kwargs)
 
 
 def get_initial_sass_variables():
@@ -162,7 +309,67 @@ def delete_site(site_id):
     site.delete()
 
 
+def migrate_page_element(element):
+    """
+    Translate the `content` in the page element, apply the same for all children elements.
+    """
+    if not isinstance(element, dict):
+        print 'DEBUG:', element
+        raise Exception('An element should be a dict')
+
+    if 'options' not in element:
+        print 'DEBUG:', element
+        raise Exception('Unknown element type')
+
+    options = element['options']
+
+    if 'content' in options or 'text-content' in options:
+        if 'content' in options and 'text-content' in options:
+            print 'DEBUG:', options
+            raise Exception(
+                'Both `content` and `text-content` are there, but which one to translate?'
+            )
+
+        if 'content' in options and not isinstance(options['content'], dict):
+            options['content'] = {
+                'en': options['content']
+            }
+
+        if 'text-content' in options and not isinstance(options['text-content'], dict):
+            options['text-content'] = {
+                'en': options['text-content']
+            }
+
+    for _column_name, children in element.get('children', {}).iteritems():
+        for child_element in children:
+            migrate_page_element(child_element)
+
+
+def to_new_page_elements(page_elements):
+    """
+    Migrate the page elements of a site.
+    """
+    for page_id, page_obj in page_elements.iteritems():
+        if isinstance(page_obj, (unicode, str)):
+            continue  # Skip pages like `"course-card": "course-tile-01"`
+
+        for element in page_obj.get('content', []):
+            migrate_page_element(element)
+
+
 def get_initial_page_elements():
+    """
+    Get the initial page elements, with i18n support.
+    """
+    initial_elements = _get_initial_page_elements()
+    to_new_page_elements(initial_elements)
+    return initial_elements
+
+
+def _get_initial_page_elements():
+    """
+    Get the initial page elements, without i18n support.
+    """
     # pylint: disable=line-too-long
     return {
         "embargo": {

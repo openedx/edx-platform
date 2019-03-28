@@ -35,7 +35,7 @@ def plugin_settings(settings):
 
     settings.MANDRILL_API_KEY = settings.AUTH_TOKENS.get("MANDRILL_API_KEY")
     if settings.MANDRILL_API_KEY:
-        settings.EMAIL_BACKEND = settings.ENV_TOKENS.get('EMAIL_BACKEND', 'anymail.backends.mandrill.MandrillBackend')
+        settings.EMAIL_BACKEND = settings.ENV_TOKENS['EMAIL_BACKEND']
         settings.ANYMAIL = {
             "MANDRILL_API_KEY": settings.MANDRILL_API_KEY,
         }

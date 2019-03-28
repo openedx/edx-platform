@@ -11,6 +11,7 @@ import track.views.segmentio
 urlpatterns = [
     url(r'^event$', track.views.user_track),
     url(r'^segmentio/event$', track.views.segmentio.segmentio_event),
+    url(r'^segmentio/send/(?P<method>[a-z]+)$', track.views.segmentio.send_event),
 ]
 
 if settings.FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):

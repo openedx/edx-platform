@@ -720,6 +720,10 @@ HEARTBEAT_CELERY_TIMEOUT = 5
 
 ############################## EVENT TRACKING #################################
 LMS_SEGMENT_KEY = None
+LMS_SEGMENT_SITE = None
+
+SEGMENT_ORIGINAL_API = 'https://api.segment.io/v1'
+SEGMENT_REPLICATE_API = '/segmentio/send'
 
 # FIXME: Should we be doing this truncation?
 TRACK_MAX_EVENT = 50000
@@ -1003,6 +1007,7 @@ LANGUAGES = [
     ('fi-fi', u'Suomi (Suomi)'),  # Finnish (Finland)
     ('fil', u'Filipino'),  # Filipino
     ('fr', u'Français'),  # French
+    ('fr-ca', u'Français (Canada)'),  # French (Canada)
     ('gl', u'Galego'),  # Galician
     ('gu', u'ગુજરાતી'),  # Gujarati
     ('he', u'עברית'),  # Hebrew
@@ -2163,6 +2168,7 @@ INSTALLED_APPS = [
 
     # User API
     'rest_framework',
+    'rest_framework.authtoken',
     'openedx.core.djangoapps.user_api',
 
     # Shopping cart

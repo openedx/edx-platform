@@ -39,6 +39,7 @@ locales:
     # - fi_FI  # Finnish (Finland)
     # - fil  # Filipino
     - fr  # French
+    - fr_CA # French (Canada)
     # - gl  # Galician
     # - gu  # Gujarati
     - he  # Hebrew

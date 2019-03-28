@@ -30,3 +30,10 @@ class LMSInitializationConfig(AppConfig):
         """
         if settings.LMS_SEGMENT_KEY:
             analytics.write_key = settings.LMS_SEGMENT_KEY
+
+            # Appsembler: Support multiple Segment clients
+            from track.shim import DefaultMultipleSegmentClient  # Keep inline to avoid potential issues
+
+            if settings.LMS_SEGMENT_SITE:
+                analytics.default_client = DefaultMultipleSegmentClient()
+

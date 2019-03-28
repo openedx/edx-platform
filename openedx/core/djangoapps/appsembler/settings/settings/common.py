@@ -19,6 +19,7 @@ def plugin_settings(settings):
 
         'openedx.core.djangoapps.appsembler.sites',
         'openedx.core.djangoapps.appsembler.html_certificates',
+        'openedx.core.djangoapps.appsembler.api',
     )
 
     settings.DEFAULT_TEMPLATE_ENGINE['OPTIONS']['context_processors'] += (

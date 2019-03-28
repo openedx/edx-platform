@@ -74,6 +74,10 @@ class SiteConfiguration(models.Model):
         # fix for a bug with some pages requiring uppercase platform_name variable
         self.values['PLATFORM_NAME'] = self.values.get('platform_name', '')
 
+        # Set the default language code for new sites if missing
+        # TODO: Move it to somewhere else like in AMC
+        self.values['LANGUAGE_CODE'] = self.values.get('LANGUAGE_CODE', 'en')
+
         super(SiteConfiguration, self).save(**kwargs)
 
         # recompile SASS on every save
@@ -219,6 +223,8 @@ class SiteConfiguration(models.Model):
     def _sass_var_override(self, path):
         if 'branding-basics' in path:
             return [(path, self._formatted_sass_variables())]
+        if 'customer-sass-input' in path:
+            return [(path, self.values.get('customer_sass_input', ''))]
         return None
 
     def _get_initial_microsite_values(self):
