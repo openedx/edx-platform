@@ -36,7 +36,8 @@ from lms.djangoapps.grades.models import (
     PersistentSubsectionGradeOverrideHistory,
 )
 from lms.djangoapps.grades.subsection_grade import CreateSubsectionGrade
-from lms.djangoapps.grades.tasks import are_grades_frozen, recalculate_subsection_grade_v3
+from lms.djangoapps.grades.tasks import recalculate_subsection_grade_v3
+from lms.djangoapps.grades.grade_utils import are_grades_frozen
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx.core.djangoapps.course_groups import cohorts

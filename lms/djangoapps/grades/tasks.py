@@ -2,7 +2,6 @@
 This module contains tasks for asynchronous execution of grade updates.
 """
 
-from datetime import timedelta
 from logging import getLogger
 
 import six
@@ -12,7 +11,6 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db.utils import DatabaseError
-from django.utils import timezone
 from edx_django_utils.monitoring import set_custom_metric, set_custom_metrics_for_course_key
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import CourseLocator
@@ -27,7 +25,7 @@ from track.event_transaction_utils import set_event_transaction_id, set_event_tr
 from util.date_utils import from_timestamp
 from xmodule.modulestore.django import modulestore
 
-from .config.waffle import DISABLE_REGRADE_ON_POLICY_CHANGE, ENFORCE_FREEZE_GRADE_AFTER_COURSE_END, waffle, waffle_flags
+from .config.waffle import DISABLE_REGRADE_ON_POLICY_CHANGE, waffle
 from .constants import ScoreDatabaseTableEnum
 from .course_grade_factory import CourseGradeFactory
 from .exceptions import DatabaseNotReadyError
@@ -35,6 +33,7 @@ from .services import GradesService
 from .signals.signals import SUBSECTION_SCORE_CHANGED
 from .subsection_grade_factory import SubsectionGradeFactory
 from .transformer import GradesTransformer
+from .grade_utils import are_grades_frozen
 
 log = getLogger(__name__)
 
@@ -352,14 +351,3 @@ def _course_task_args(course_key, **kwargs):
 
     for offset in six.moves.range(0, enrollment_count, batch_size):
         yield (six.text_type(course_key), offset, batch_size)
-
-
-def are_grades_frozen(course_key):
-    """ Returns whether grades are frozen for the given course. """
-    if waffle_flags()[ENFORCE_FREEZE_GRADE_AFTER_COURSE_END].is_enabled(course_key):
-        course = CourseOverview.get_from_id(course_key)
-        if course.end:
-            freeze_grade_date = course.end + timedelta(30)
-            now = timezone.now()
-            return now > freeze_grade_date
-    return False
