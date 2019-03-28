@@ -18,19 +18,24 @@ import os
 import re
 import sys
 
-pattern = re.compile(u'^{}'.format(sys.argv[1]))
+package_path = sys.argv[1]
+if package_path.endswith('/'):
+    package_path = package_path[:-1]
+
+pattern = re.compile(u'{}'.format(package_path))
 
 data_path = 'reports/dependencies/dependencies.txt'
 if not os.path.exists(data_path):
     print('The dependencies data file is unavailable; run scripts/dependencies/enumerate.sh first.')
+
 with open(data_path, 'r') as f:
     for dep in map(eval, f):
         (from_root, from_name), (to_root, to_name) = dep
         if to_name is None:
             continue
-        if pattern.search(from_name) and not pattern.search(to_name):
+        if pattern.search(from_root) and not pattern.search(to_root):
             # We usually don't care about dependencies between modules in site-packages
-            if from_root.endswith(u'site-packages') and to_root.endswith(u'site-packages'):
+            if from_root.endswith(u'site-packages') or to_root.endswith(u'site-packages'):
                 continue
             # We don't really care about dependencies on the standard library
             if to_root.startswith('/usr/lib/python') or to_root.endswith('lib/python2.7'):
