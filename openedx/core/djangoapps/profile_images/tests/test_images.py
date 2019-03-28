@@ -1,6 +1,7 @@
 """
 Test cases for image processing functions in the profile image package.
 """
+from __future__ import absolute_import
 from contextlib import closing
 from itertools import product
 import os
@@ -243,5 +244,5 @@ class TestRemoveProfileImages(TestCase):
         ):
             remove_profile_images(requested_sizes)
             deleted_names = [v[0][0] for v in mock_storage.delete.call_args_list]
-            self.assertEqual(requested_sizes.values(), deleted_names)
+            self.assertEqual(list(requested_sizes.values()), deleted_names)
             mock_storage.save.reset_mock()
