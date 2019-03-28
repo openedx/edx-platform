@@ -10,7 +10,7 @@ from xsslint import visitors
 from xsslint.reporting import ExpressionRuleViolation, FileResults, RuleViolation
 from xsslint.rules import RuleSet
 from xsslint.utils import Expression, ParseString, StringLines, is_skip_dir
-from xsslint.django_linter import TransExpression, BlockTransExpression
+from xsslint.django_linter import TransExpression, BlockTransExpression, HtmlInterpolateExpression
 
 
 class BaseLinter(object):
@@ -1498,7 +1498,11 @@ class DjangoTemplateLinter(BaseLinter):
         django_escape_variable_mismatch='django-escape-variable-mismatch',
         django_blocktrans_missing_escape_filter='django-blocktrans-missing-escape-filter',
         django_bloctrans_invalid_escape_filter='django-blocktrans-invalid-escape-filter',
-        django_blocktrans_escape_filter_parse_error='django-blocktrans-escape-filter-parse-error'
+        django_blocktrans_escape_filter_parse_error='django-blocktrans-escape-filter-parse-error',
+        django_html_interpolation_missing_safe_filter='django-html-interpolation-missing-safe-filter',
+        django_html_interpolation_missing='django-html-interpolation-missing',
+        django_html_interpolation_invalid_tag='django-html-interpolation-invalid-tag',
+        django_html_interpolation_arg_notfound='django-html-interpolation-arg-notfound',
     )
 
     def __init__(self, skip_dirs=None):
@@ -1587,11 +1591,11 @@ class DjangoTemplateLinter(BaseLinter):
 
         """
         expressions = []
-        self._find_django_expressions(django_template, expressions)
+        self._find_django_expressions(django_template, results, expressions)
         for expr in expressions:
-            expr.validate_expression(django_template, results)
+            expr.validate_expression(django_template, expressions)
 
-    def _find_django_expressions(self, django_template, expressions):
+    def _find_django_expressions(self, django_template, results, expressions):
         """
         Finds all the Django trans/blocktrans expressions in a Django template
         and creates a list of dicts for each expression.
@@ -1611,6 +1615,7 @@ class DjangoTemplateLinter(BaseLinter):
             if self._check_expression_not_commented(trans, comment_list, endcomment_list):
                 continue
             trans_expr = TransExpression(self.ruleset,
+                                         results,
                                          trans.start(),
                                          trans.end(),
                                          start_delim='{%',
@@ -1624,11 +1629,26 @@ class DjangoTemplateLinter(BaseLinter):
             if self._check_expression_not_commented(trans, comment_list, endcomment_list):
                 continue
             trans_expr = BlockTransExpression(self.ruleset,
+                                              results,
                                          trans.start(),
                                          trans.end(),
                                          start_delim='{%',
                                          end_delim='%}',
                                          template=django_template)
+            if trans_expr:
+                expressions.append(trans_expr)
+
+        interpolation_iterator = re.finditer(r'{% interpolate_html .*?%}', django_template, re.I)
+        for interpolate_tag in interpolation_iterator:
+            # if self._check_expression_not_commented(trans, comment_list, endcomment_list):
+            #     continue
+            trans_expr = HtmlInterpolateExpression(self.ruleset,
+                                                    results,
+                                                    interpolate_tag.start(),
+                                                    interpolate_tag.end(),
+                                                    start_delim='{%',
+                                                    end_delim='%}',
+                                                    template=django_template)
             if trans_expr:
                 expressions.append(trans_expr)
 
