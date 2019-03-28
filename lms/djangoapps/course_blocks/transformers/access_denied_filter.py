@@ -37,7 +37,4 @@ class AccessDeniedMessageFilterTransformer(BlockStructureTransformer):
             message = block_structure.get_xblock_field(block_key, 'authorization_denial_message')
             return reason and message
 
-        for _ in block_structure.post_order_traversal(
-            filter_func=block_structure.create_removal_filter(_filter)
-        ):
-            pass
+        block_structure.remove_block_traversal(_filter)
