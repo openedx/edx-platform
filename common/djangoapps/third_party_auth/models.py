@@ -332,6 +332,13 @@ class OAuth2ProviderConfig(ProviderConfig):
 
     .. no_pii:
     """
+    # We are keying the provider config by backend_name here as suggested in the python social
+    # auth documentation. In order to reuse a backend for a second provider, a subclass can be
+    # created with seperate name.
+    # example:
+    # class SecondOpenIDProvider(OpenIDAuth):
+    #   name = "second-openId-provider"
+    KEY_FIELDS = ('backend_name',)
     prefix = 'oa2'
     backend_name = models.CharField(
         max_length=50, blank=False, db_index=True,
