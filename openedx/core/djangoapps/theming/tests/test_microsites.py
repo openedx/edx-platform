@@ -1,9 +1,11 @@
 """
     Tests for microsites and comprehensive themes.
 """
+from __future__ import absolute_import
+
 from django.conf import settings
-from django.test import TestCase
 from django.contrib.sites.models import Site
+from django.test import TestCase
 
 from openedx.core.djangoapps.theming.models import SiteTheme
 from openedx.core.djangolib.testing.utils import skip_unless_lms
