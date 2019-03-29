@@ -14,6 +14,7 @@ from edx_django_utils.cache import RequestCache
 from six import iteritems
 from six.moves import map
 
+
 def request_cached(namespace=None, arg_map_function=None, request_cache_getter=None):
     """
     A function decorator that automatically handles caching its return value for
