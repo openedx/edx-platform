@@ -6,21 +6,20 @@ from __future__ import absolute_import
 import datetime
 import json
 import logging
-import markupsafe
 import re
-import static_replace
 import uuid
+import static_replace
+import markupsafe
 from lxml import html, etree
 from contracts import contract
 
 from django.conf import settings
-from django.contrib.staticfiles.storage import staticfiles_storage
 from django.urls import reverse
-from pytz import UTC
 from django.utils.html import escape
 from django.contrib.auth.models import User
+from django.contrib.staticfiles.storage import staticfiles_storage
+from pytz import UTC
 from edxmako.shortcuts import render_to_string
-from six import text_type
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.exceptions import InvalidScopeError
@@ -34,6 +33,7 @@ from xmodule.x_module import shim_xmodule_js, XModuleDescriptor, XModule, PREVIE
 
 import webpack_loader.utils
 import six
+from six import text_type
 
 log = logging.getLogger(__name__)
 
