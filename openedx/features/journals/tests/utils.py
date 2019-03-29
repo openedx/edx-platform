@@ -1,6 +1,9 @@
 """ Returns the dummy data for journals endpoint of discovery."""
+from __future__ import absolute_import
+
 import uuid
 from functools import wraps
+
 from openedx.features.journals.api import WAFFLE_SWITCHES
 
 
