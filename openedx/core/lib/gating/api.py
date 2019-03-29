@@ -435,20 +435,16 @@ def get_subsection_grade_percentage(subsection_usage_key, user):
     Returns:
         User's grade percentage for given subsection
     """
-    subsection_grade_percentage = 0.0
     try:
         subsection_structure = get_course_blocks(user, subsection_usage_key)
         if any(subsection_structure):
             subsection_grade_factory = SubsectionGradeFactory(user, course_structure=subsection_structure)
             if subsection_usage_key in subsection_structure:
-                # this will force a recalculation of the subsection grade
-                subsection_grade = subsection_grade_factory.update(
-                    subsection_structure[subsection_usage_key], persist_grade=False
-                )
-                subsection_grade_percentage = subsection_grade.percent_graded * 100.0
+                subsection_grade = subsection_grade_factory.update(subsection_structure[subsection_usage_key])
+                return _get_subsection_percentage(subsection_grade)
     except ItemNotFoundError as err:
         log.warning(u"Could not find course_block for subsection=%s error=%s", subsection_usage_key, err)
-    return subsection_grade_percentage
+    return 0.0
 
 
 def get_subsection_completion_percentage(subsection_usage_key, user):

@@ -1,6 +1,8 @@
 """
 Tests for the gating API
 """
+from __future__ import unicode_literals
+
 import unittest
 
 from completion.models import BlockCompletion
@@ -8,6 +10,13 @@ from mock import patch, Mock
 from ddt import ddt, data, unpack
 from django.conf import settings
 from lms.djangoapps.gating import api as lms_gating_api
+from lms.djangoapps.grades.models import (
+    PersistentSubsectionGrade,
+    PersistentSubsectionGradeOverride,
+    PersistentSubsectionGradeOverrideHistory,
+)
+from lms.djangoapps.grades.tests.base import GradeTestBase
+from lms.djangoapps.grades.tests.utils import mock_get_score
 from milestones.tests.utils import MilestonesTestCaseMixin
 from milestones import api as milestones_api
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
@@ -343,3 +352,50 @@ class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
             self.assertTrue(prereq_met)
             self.assertIsNotNone(prereq_meta_info['url'])
             self.assertIsNotNone(prereq_meta_info['display_name'])
+
+
+class TestGatingGradesIntegration(GradeTestBase):
+    """
+    Tests the integration between the gating API and our Persistent Grades framework.
+    """
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    def test_get_subsection_grade_percentage(self):
+        user = self.request.user
+        subsection_key = self.sequence.location
+
+        with mock_get_score(3, 3):
+            # this update() call creates a persistent grade
+            self.subsection_grade_factory.update(self.sequence)
+
+            # it's important that we stay in the mock_get_score() context here,
+            # since get_subsection_grade_percentage() creates its own SubsectionGradeFactory,
+            # which will in turn make calls to get_score().
+            grade_percentage = gating_api.get_subsection_grade_percentage(subsection_key, user)
+            assert 100.0 == grade_percentage
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    def test_get_subsection_grade_percentage_with_override(self):
+        user = self.request.user
+        subsection_key = self.sequence.location
+
+        with mock_get_score(3, 3):
+            # this update() call creates a persistent grade
+            self.subsection_grade_factory.update(self.sequence)
+
+            # there should only be one persistent grade
+            persistent_grade = PersistentSubsectionGrade.objects.first()
+
+            PersistentSubsectionGradeOverride.update_or_create_override(
+                UserFactory(),  # it doesn't matter to us who created the override
+                persistent_grade,
+                earned_graded_override=0,
+                earned_all_override=0,
+                possible_graded_override=3,
+                feature=PersistentSubsectionGradeOverrideHistory.GRADEBOOK,
+            )
+
+            # it's important that we stay in the mock_get_score() context here,
+            # since get_subsection_grade_percentage() creates its own SubsectionGradeFactory,
+            # which will in turn make calls to get_score().
+            grade_percentage = gating_api.get_subsection_grade_percentage(subsection_key, user)
+            assert 0 == grade_percentage
