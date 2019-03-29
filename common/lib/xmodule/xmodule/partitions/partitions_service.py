@@ -104,7 +104,7 @@ def _create_enrollment_track_partition(course):
         log.warning(
             "Can't add 'enrollment_track' partition, as ID {id} is assigned to {partition} in course {course}.".format(
                 id=ENROLLMENT_TRACK_PARTITION_ID,
-                partition=_get_partition_from_id(course.user_partitions, ENROLLMENT_TRACK_PARTITION_ID).name,
+                partition=get_partition_from_id(course.user_partitions, ENROLLMENT_TRACK_PARTITION_ID).name,
                 course=unicode(course.id)
             )
         )
@@ -193,7 +193,7 @@ class PartitionService(object):
         Returns:
             A UserPartition, or None if not found.
         """
-        return _get_partition_from_id(self.course_partitions, user_partition_id)
+        return get_partition_from_id(self.course_partitions, user_partition_id)
 
     def get_group(self, user, user_partition, assign=True):
         """
@@ -206,7 +206,7 @@ class PartitionService(object):
         )
 
 
-def _get_partition_from_id(partitions, user_partition_id):
+def get_partition_from_id(partitions, user_partition_id):
     """
     Look for a user partition with a matching id in the provided list of partitions.
 

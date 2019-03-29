@@ -85,8 +85,8 @@ class ContentTypeGatingPartition(UserPartition):
         if (verified_mode is None or not self._is_audit_enrollment(user, course_key) or
                 user_group == FULL_ACCESS):
             return None
-        ecommerce_checkout_link = self._get_checkout_link(user, verified_mode.sku)
 
+        ecommerce_checkout_link = self._get_checkout_link(user, verified_mode.sku)
         request = crum.get_current_request()
         frag = Fragment(render_to_string('content_type_gating/access_denied_message.html', {
             'mobile_app': request and is_request_from_mobile_app(request),
@@ -95,14 +95,19 @@ class ContentTypeGatingPartition(UserPartition):
         }))
         return frag
 
-    def access_denied_message(self, block, user, user_group, allowed_groups):
-        course_key = self._get_course_key_from_course_block(block)
+    def access_denied_message(self, block_key, user, user_group, allowed_groups):
+        course_key = block_key.course_key
         modes = CourseMode.modes_for_course_dict(course_key)
         verified_mode = modes.get(CourseMode.VERIFIED)
         if (verified_mode is None or not self._is_audit_enrollment(user, course_key) or
                 user_group == FULL_ACCESS):
             return None
-        return _(u"Graded assessments are available to Verified Track learners. Upgrade to Unlock.")
+
+        request = crum.get_current_request()
+        if request and is_request_from_mobile_app(request):
+            return _(u"Graded assessments are available to Verified Track learners.")
+        else:
+            return _(u"Graded assessments are available to Verified Track learners. Upgrade to Unlock.")
 
     def _is_audit_enrollment(self, user, course_key):
         """
