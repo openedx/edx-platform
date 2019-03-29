@@ -95,7 +95,6 @@ django-crum==0.7.3
 django-fernet-fields==0.5
 django-filter==1.0.4
 django-ipware==2.1.0
-django-memcached-hashring==0.1.2
 django-method-override==0.1.0
 django-model-utils==3.0.0
 django-mptt==0.8.7
@@ -172,7 +171,6 @@ fuzzywuzzy==0.17.0
 geoip2==2.9.0
 glob2==0.6
 gunicorn==19.0
-hash-ring==1.3.1
 help-tokens==1.0.3
 html5lib==1.0.1
 httplib2==0.12.1
