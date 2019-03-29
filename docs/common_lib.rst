@@ -8,7 +8,6 @@ out from edx-platform into separate packages at some point.
 .. toctree::
     :maxdepth: 2
 
-    common/lib/calc/modules
     common/lib/capa/modules
     common/lib/chem/modules
     common/lib/safe_lxml/modules
