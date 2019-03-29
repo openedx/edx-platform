@@ -76,12 +76,13 @@ class CourseOutlineFragmentView(EdxFragmentView):
         if xblock_display_names is None:
             xblock_display_names = {}
 
-        if course_block_tree.get('id'):
-            xblock_display_names[course_block_tree['id']] = course_block_tree['display_name']
+        if not course_block_tree.get('authorization_denial_reason'):
+            if course_block_tree.get('id'):
+                xblock_display_names[course_block_tree['id']] = course_block_tree['display_name']
 
-        if course_block_tree.get('children'):
-            for child in course_block_tree['children']:
-                self.create_xblock_id_and_name_dict(child, xblock_display_names)
+            if course_block_tree.get('children'):
+                for child in course_block_tree['children']:
+                    self.create_xblock_id_and_name_dict(child, xblock_display_names)
 
         return xblock_display_names
 
