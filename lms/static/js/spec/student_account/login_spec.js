@@ -47,13 +47,13 @@
                         submit_url: '/user_api/v1/account/login_session/',
                         fields: [
                             {
-                                placeholder: 'username@domain.com',
+                                placeholder: '',
                                 name: 'email',
-                                label: 'Email',
+                                label: 'E-mail or mobile phone number',
                                 defaultValue: '',
                                 type: 'email',
                                 required: true,
-                                instructions: 'Enter your email.',
+                                instructions: 'Enter your E-mail or mobile phone number',
                                 restrictions: {}
                             },
                             {
