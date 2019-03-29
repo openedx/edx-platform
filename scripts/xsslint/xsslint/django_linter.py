@@ -47,7 +47,7 @@ class TransExpression(Expression):
         quote = re.search(r"""\s*['"].*['"]\s*""", trans_expr, re.I)
         if not quote:
             _add_violations(self.results,
-                            self.ruleset.django_blocktrans_escape_filter_parse_error,
+                            self.ruleset.django_trans_escape_filter_parse_error,
                             self)
             return
         trans_expr_msg = trans_expr[quote.start():quote.end()].strip()
@@ -161,7 +161,7 @@ class BlockTransExpression(Expression):
             filter_end_pos = template_file.find('%}', filter_start_pos)
             if filter_end_pos > self.start_index:
                 _add_violations(self.results,
-                                self.ruleset.django_blocktrans_escape_filter_parse_error,
+                                self.ruleset.django_trans_escape_filter_parse_error,
                                 self)
                 return
 

@@ -9,7 +9,9 @@ from unittest import TestCase
 
 from ddt import data, ddt
 
-from xsslint.linters import JavaScriptLinter, MakoTemplateLinter, PythonLinter, UnderscoreTemplateLinter
+from xsslint.linters import (
+    JavaScriptLinter, MakoTemplateLinter, PythonLinter, UnderscoreTemplateLinter, DjangoTemplateLinter
+)
 from xsslint.reporting import FileResults
 from xsslint.utils import ParseString
 
@@ -25,6 +27,8 @@ def _build_mako_linter():
         javascript_linter=_build_javascript_linter(),
         python_linter=PythonLinter(),
     )
+def _build_django_linter():
+    return DjangoTemplateLinter()
 
 
 class TestLinter(TestCase):
@@ -1442,3 +1446,79 @@ class TestMakoTemplateLinter(TestLinter):
             start_inner_index = parse_string.start_index + parse_string.quote_length
             end_inner_index = parse_string.end_index - parse_string.quote_length
             self.assertEqual(data['template'][start_inner_index:end_inner_index], parse_string.string_inner)
+
+@ddt
+class TestDjangoTemplateLinter(TestLinter):
+    """
+    Test DjangoTemplateLinter
+    """
+
+    ruleset = (
+        DjangoTemplateLinter.ruleset
+    )
+    @data(
+        {'expression': '{% trans "whatever" as tmsg %}{{tmsg|force_escape}}',
+         'rule': None},
+
+        {'expression': '{% trans "whatever" as tmsgx %}{{tmsg|force_escape}}',
+         'rule': ruleset.django_escape_variable_mismatch},
+
+        {'expression': '{% trans "whatever" as tmsgx %}{{tmsgx|force_escap}}',
+         'rule': ruleset.django_trans_invalid_escape_filter},
+
+        {'expression': '{% trans "whatever" as tmsg %}',
+         'rule': ruleset.django_trans_missing_escape},
+
+        {'expression': '{% trans "whatever" %}',
+         'rule': ruleset.django_trans_missing_escape},
+
+        {'expression': '{% trans "{span_start} whatever {span_end}" as tmsg %}',
+         'rule': ruleset.django_html_interpolation_missing},
+
+        {'expression': '{% trans "{span_start} whatever {span_end}" as tmsg %}{{tmsg|force_filter}}',
+         'rule': ruleset.django_html_interpolation_missing},
+
+        {'expression': """
+        {% trans "{span_start} whatever {span_end}" as tmsg %}
+        {% interpolate_html tmsg user_name=user_data.name start_span='<span class="a">'|safe end_span='</span>'|safe %}
+        """,'rule': None},
+
+        {'expression': """
+            {% trans "{span_start} whatever {span_end}" as tmsg %}
+            {% interpolate_html %}
+            """, 'rule': [ruleset.django_html_interpolation_missing, ruleset.django_html_interpolation_invalid_tag]},
+
+        {'expression': """
+            {% trans "{span_start} whatever {span_end}" as tmsg %}
+            {% interpolate_html t start_span='<span class="a">'|safe end_span='</span>'|safe %}
+            """, 'rule': ruleset.django_html_interpolation_missing},
+
+        {'expression': """
+        {% trans "{span_start} whatever {span_end}" as tmsg %}
+        {% interpolate_html tmsg start_span='<span class="a">'|unknown end_span='</span>'|safe %}
+        """, 'rule': ruleset.django_html_interpolation_missing_safe_filter},
+
+        {'expression': """
+                    {% trans "<span 'a'='b' 'c'='d'> whatever </span>" as tmsg %}{{tmsg|force_filter}}
+                    """,
+         'rule': ruleset.django_html_interpolation_missing},
+    )
+    def test_check_django_expressions_in_html(self, data):
+        """
+        Test _check_django_file_is_safe in html context provides appropriate violations
+        """
+        linter = _build_django_linter()
+        results = FileResults('')
+
+        django_template = textwrap.dedent(
+            """
+            {load_i18n}
+            {load_django_html}
+            {expression}
+        """.format(expression=data['expression'],
+                   load_i18n='{% load i18n %}',
+                   load_django_html='{% load django_html %}'))
+
+        linter._check_django_file_is_safe(django_template, results)
+
+        self._validate_data_rules(data, results)
