@@ -94,14 +94,13 @@ class CourseDurationLimitMessageBaseTask(LoggedTask):
             site = Site.objects.select_related('configuration').get(id=site_id)
             with emulate_http_request(site=site):
                 msg_type = self.make_message_type(day_offset)
-                _annotate_for_monitoring(msg_type, course_key_str, bin_num, target_day_str, day_offset)
+                _annotate_for_monitoring(msg_type, course_key_str, target_day_str, day_offset)
                 return self.resolver(  # pylint: disable=not-callable
                     self.async_send_task,
                     site,
                     CourseKey.from_string(course_key_str),
                     deserialize(target_day_str),
                     day_offset,
-                    bin_num,
                     override_recipient_email=override_recipient_email,
                 ).send(msg_type)
         except Exception:  # pylint: disable=broad-except
@@ -158,7 +157,7 @@ def _is_delivery_enabled(site, delivery_config_var, log_prefix):  # pylint: disa
         return False
 
 
-def _annotate_for_monitoring(message_type, course_key, bin_num, target_day_str, day_offset):
+def _annotate_for_monitoring(message_type, course_key, target_day_str, day_offset):
     """
     Set custom metrics in monitoring to make it easier to identify what messages are being sent and why.
     """
@@ -166,9 +165,6 @@ def _annotate_for_monitoring(message_type, course_key, bin_num, target_day_str, 
     set_custom_metric('message_name', '{0}.{1}'.format(message_type.app_label, message_type.name))
     # The domain name of the site we are sending the message for.
     set_custom_metric('course_key', course_key)
-    # This is the "bin" of data being processed. We divide up the work into chunks so that we don't tie up celery
-    # workers for too long. This could help us identify particular bins that are problematic.
-    set_custom_metric('bin', bin_num)
     # The date we are processing data for.
     set_custom_metric('target_day', target_day_str)
     # The number of days relative to the current date to process data for.
