@@ -9,10 +9,10 @@ file and check it in at the same time as your model changes. To do that,
 3. It adds the migration file to edx-platform/common/djangoapps/course_action_state/migrations/
 
 """
+from __future__ import absolute_import
 from django.contrib.auth.models import User
 from django.db import models
 from opaque_keys.edx.django.models import CourseKeyField
-
 from course_action_state.managers import CourseActionStateManager, CourseRerunUIStateManager
 
 

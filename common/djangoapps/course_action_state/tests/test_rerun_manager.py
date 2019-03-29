@@ -2,6 +2,8 @@
 Tests specific to the CourseRerunState Model and Manager.
 """
 
+from __future__ import absolute_import
+
 from django.test import TestCase
 from opaque_keys.edx.locations import CourseLocator
 from six import text_type
