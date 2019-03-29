@@ -2,14 +2,15 @@
 This file contains utility functions which will responsible for sending emails.
 """
 
-import HTMLParser
+from __future__ import absolute_import
+
 import logging
 import os
-import urlparse
 import uuid
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 
+import six
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.staticfiles import finders
@@ -17,10 +18,10 @@ from django.core.cache import cache
 from django.core.mail import EmailMessage, SafeMIMEText
 from django.urls import reverse
 from django.utils.translation import ugettext as _
+from eventtracking import tracker
 
 from edxmako.shortcuts import render_to_string
 from edxmako.template import Template
-from eventtracking import tracker
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.credit.models import CreditConfig, CreditProvider
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -106,7 +107,7 @@ def send_credit_notifications(username, course_key):
                 cur_text = cur_file.read()
                 # use html parser to unescape html characters which are changed
                 # by the 'pynliner' while adding inline css to html content
-                html_parser = HTMLParser.HTMLParser()
+                html_parser = six.moves.html_parser.HTMLParser()
                 email_body_content = html_parser.unescape(with_inline_css(cur_text))
                 # cache the email body content before rendering it since the
                 # email context will change for each user e.g., 'full_name'
@@ -193,7 +194,7 @@ def _email_url_parser(url_name, extra_param=None):
     site_name = configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME)
     dashboard_url_path = reverse(url_name) + extra_param if extra_param else reverse(url_name)
     dashboard_link_parts = ("https", site_name, dashboard_url_path, '', '', '')
-    return urlparse.urlunparse(dashboard_link_parts)
+    return six.moves.urllib.parse.urlunparse(dashboard_link_parts)
 
 
 def get_credit_provider_attribute_values(course_key, attribute_name):
@@ -206,7 +207,7 @@ def get_credit_provider_attribute_values(course_key, attribute_name):
     Returns:
         List of provided credit provider attribute values.
     """
-    course_id = unicode(course_key)
+    course_id = six.text_type(course_key)
     credit_config = CreditConfig.current()
 
     cache_key = None
