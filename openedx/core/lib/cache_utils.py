@@ -11,8 +11,8 @@ import wrapt
 
 from django.utils.encoding import force_text
 from edx_django_utils.cache import RequestCache
-from six.moves import map, iteritems
-
+from six import iteritems
+from six.moves import map
 
 def request_cached(namespace=None, arg_map_function=None, request_cache_getter=None):
     """
