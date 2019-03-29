@@ -10,8 +10,8 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from ..courses import course_image_url
 import six
+from ..courses import course_image_url
 
 
 @ddt.ddt

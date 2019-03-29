@@ -3,16 +3,14 @@ Utilities related to caching.
 """
 from __future__ import absolute_import
 import collections
-import six.moves.cPickle as pickle
 import functools
 import itertools
 import zlib
+import wrapt
 
 from django.utils.encoding import force_text
 from edx_django_utils.cache import RequestCache
-import wrapt
-import six
-from six.moves import map
+from six.moves import pickle, map, iteritems
 
 
 def request_cached(namespace=None, arg_map_function=None, request_cache_getter=None):
@@ -99,7 +97,7 @@ def _sorted_kwargs_list(kwargs):
     """
     Returns a unique and deterministic ordered list from the given kwargs.
     """
-    sorted_kwargs = sorted(six.iteritems(kwargs))
+    sorted_kwargs = sorted(iteritems(kwargs))
     sorted_kwargs_list = list(itertools.chain(*sorted_kwargs))
     return sorted_kwargs_list
 

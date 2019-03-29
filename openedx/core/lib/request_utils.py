@@ -2,7 +2,7 @@
 from __future__ import absolute_import
 import logging
 import re
-from six.moves.urllib.parse import urlparse
+from six.moves import urllib
 
 import crum
 from django.conf import settings
@@ -10,9 +10,9 @@ from django.utils.deprecation import MiddlewareMixin
 from django.test.client import RequestFactory
 
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 try:
     import newrelic.agent
@@ -44,7 +44,7 @@ def get_request_or_stub():
         # The settings SITE_NAME may contain a port number, so we need to
         # parse the full URL.
         full_url = "http://{site_name}".format(site_name=settings.SITE_NAME)
-        parsed_url = urlparse(full_url)
+        parsed_url = urllib.parse.urlparse(full_url)
 
         # Construct the fake request.  This can be used to construct absolute
         # URIs to other paths.
@@ -120,8 +120,8 @@ class CookieMetricsMiddleware(MiddlewareMixin):
         for name, size in cookie_names_to_size.items():
             metric_name = 'cookies.{}.size'.format(name)
             newrelic.agent.add_custom_parameter(metric_name, size)
-            log.debug("%s = %d", metric_name, size)
+            log.debug(u'%s = %d', metric_name, size)
 
         total_cookie_size = sum(cookie_names_to_size.values())
         newrelic.agent.add_custom_parameter('cookies_total_size', total_cookie_size)
-        log.debug("cookies_total_size = %d", total_cookie_size)
+        log.debug(u'cookies_total_size = %d', total_cookie_size)

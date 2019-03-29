@@ -6,9 +6,9 @@ from __future__ import absolute_import
 from collections import defaultdict
 from unittest import TestCase
 
-from ..graph_traversals import traverse_post_order, traverse_pre_order, traverse_topologically
 import six
 from six.moves import range
+from ..graph_traversals import traverse_post_order, traverse_pre_order, traverse_topologically
 
 
 class TestGraphTraversals(TestCase):
