@@ -227,7 +227,7 @@ pathlib2==2.3.3           # via pytest, pytest-django
 pathtools==0.1.2
 paver==1.3.4
 pbr==5.1.3
-pdfminer==20140328
+pdfminer.six==20181108
 piexif==1.0.2
 pillow==5.4.1
 pkgconfig==1.4.0
@@ -242,6 +242,7 @@ pycodestyle==2.5.0
 pycontracts==1.7.1
 pycountry==18.12.8
 pycparser==2.19
+pycryptodome==3.8.0
 pycryptodomex==3.4.7
 pydispatcher==2.0.5       # via scrapy
 pyflakes==2.1.1           # via flake8

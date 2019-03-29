@@ -200,6 +200,7 @@ PACKAGES_TO_UNINSTALL = [
     "edx-oauth2-provider",          # Because it moved from github to pypi
     "i18n-tools",                   # Because now it's called edx-i18n-tools
     "python-saml",                  # Because python3-saml shares the same directory name
+    "pdfminer",                     # Replaced by pdfminer.six, which shares the same directory name
 ]
 
 

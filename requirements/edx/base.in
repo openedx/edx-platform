@@ -105,7 +105,7 @@ mysqlclient                         # Driver for the default production relation
 newrelic                            # New Relic agent for performance monitoring
 nodeenv==1.1.1                      # Utility for managing Node.js environments; we use this for deployments and testing
 oauthlib                            # OAuth specification support for authenticating via LTI or other Open edX services
-pdfminer                            # Used in shoppingcart for extracting/parsing pdf text
+pdfminer.six                        # Used in shoppingcart for extracting/parsing pdf text
 piexif==1.0.2                       # Exif image metadata manipulation, used in the profile_images app
 Pillow                              # Image manipulation library; used for course assets, profile images, invoice PDFs, etc.
 py2neo<4.0.0                        # Used to communicate with Neo4j, which is used internally for modulestore inspection
@@ -121,7 +121,7 @@ pymongo                             # MongoDB driver
 pynliner                            # Inlines CSS styles into HTML for email notifications
 python-dateutil==2.4
 python-Levenshtein
-python3-openid ; python_version>='3' 
+python3-openid ; python_version>='3'
 python3-saml
 pyuca==1.1                          # For more accurate sorting of translated country names in django-countries
 reportlab                           # Used for shopping cart's pdf invoice/receipt generation
