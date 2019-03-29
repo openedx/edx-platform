@@ -1,0 +1,3 @@
+# RACCOONGANG
+sentry-sdk==0.7.8
+# RACCOONGANG
