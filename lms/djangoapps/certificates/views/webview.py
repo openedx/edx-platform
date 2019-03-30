@@ -9,6 +9,7 @@ from uuid import uuid4
 
 import pytz
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import Http404, HttpResponse
 from django.template import RequestContext
@@ -482,6 +483,7 @@ def render_cert_by_uuid(request, certificate_uuid):
     template_path="certificates/server-error.html",
     test_func=lambda request: request.GET.get('preview', None)
 )
+@login_required
 def render_html_view(request, user_id, course_id):
     """
     This public view generates an HTML representation of the specified user and course
