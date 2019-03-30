@@ -38,7 +38,7 @@ logger = logging.getLogger(__name__)
 PROGRAM_INFO_FLAG = WaffleFlag(
     waffle_namespace=WaffleFlagNamespace(name=u'experiments'),
     flag_name=u'add_programs',
-    flag_undefined_default=False
+    flag_undefined_default=True
 )
 
 # .. feature_toggle_name: experiments.add_program_price
