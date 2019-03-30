@@ -56,7 +56,7 @@ PROGRAM_INFO_FLAG = WaffleFlag(
 PROGRAM_PRICE_FLAG = WaffleFlag(
     waffle_namespace=WaffleFlagNamespace(name=u'experiments'),
     flag_name=u'add_program_price',
-    flag_undefined_default=False
+    flag_undefined_default=True
 )
 # TODO: clean up as part of REVEM-199 (END)
 
