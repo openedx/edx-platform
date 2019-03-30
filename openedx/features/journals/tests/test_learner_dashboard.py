@@ -1,13 +1,14 @@
 """ Tests for journals learner dashboard views. """
 
-import mock
+from __future__ import absolute_import
 
+import mock
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
-from openedx.features.journals.tests.utils import get_mocked_journal_access, override_switch
 from openedx.features.journals.api import JOURNAL_INTEGRATION
+from openedx.features.journals.tests.utils import get_mocked_journal_access, override_switch
 
 
 @mock.patch.dict(settings.FEATURES, {"JOURNALS_ENABLED": True})
