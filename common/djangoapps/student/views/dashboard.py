@@ -82,7 +82,7 @@ DASHBOARD_METADATA_FLAG = WaffleFlag(experiments_namespace,
 # .. feature_toggle_status: supported
 COURSE_INFO_FLAG = WaffleFlag(experiments_namespace,
                               u'course_info',
-                              flag_undefined_default=False)
+                              flag_undefined_default=True)
 # TODO END: clean up as part of REVEM-199 (End)
 
 
