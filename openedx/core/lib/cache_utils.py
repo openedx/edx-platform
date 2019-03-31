@@ -6,13 +6,13 @@ import collections
 import functools
 import itertools
 import zlib
-import pickle
 import wrapt
 
 from django.utils.encoding import force_text
 from edx_django_utils.cache import RequestCache
 from six import iteritems
 from six.moves import map
+from six.moves import cPickle as pickle
 
 
 def request_cached(namespace=None, arg_map_function=None, request_cache_getter=None):

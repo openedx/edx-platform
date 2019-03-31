@@ -2,7 +2,7 @@
 from __future__ import absolute_import
 import logging
 import re
-from six.moves import urllib
+from six.moves.urllib.parse import urlparse # pylint: disable=import-error
 
 import crum
 from django.conf import settings
@@ -44,7 +44,7 @@ def get_request_or_stub():
         # The settings SITE_NAME may contain a port number, so we need to
         # parse the full URL.
         full_url = "http://{site_name}".format(site_name=settings.SITE_NAME)
-        parsed_url = urllib.parse.urlparse(full_url)
+        parsed_url = urlparse(full_url)
 
         # Construct the fake request.  This can be used to construct absolute
         # URIs to other paths.
