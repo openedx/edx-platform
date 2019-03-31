@@ -340,12 +340,12 @@ class Courses(SysadminDashboardView):
         msg += HTML(u"<pre>{0}</pre>").format(escape(ret))
         return msg
 
-    def make_datatable(self):
+    def make_datatable(self, courses=None):
         """Creates course information datatable"""
 
         data = []
-
-        for course in self.get_courses():
+        courses = courses or self.get_courses()
+        for course in courses:
             gdir = course.id.course
             data.append([course.display_name, text_type(course.id)]
                         + self.git_info_for_course(gdir))
@@ -418,7 +418,7 @@ class Courses(SysadminDashboardView):
                         _('Deleted'), text_type(course.location), text_type(course.id), course.display_name)
 
         context = {
-            'datatable': self.make_datatable(),
+            'datatable': self.make_datatable(courses.values()),
             'msg': self.msg,
             'djangopid': os.getpid(),
             'modeflag': {'courses': 'active-section'},
