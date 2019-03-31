@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-03-29 13:43+0000\n"
-"PO-Revision-Date: 2019-03-29 13:43:21.759189\n"
+"POT-Creation-Date: 2019-03-31 20:38+0000\n"
+"PO-Revision-Date: 2019-03-31 20:38:03.138947\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -10950,6 +10950,11 @@ msgid "Partition for segmenting users by access to gated content types"
 msgstr ""
 
 #: openedx/features/content_type_gating/partitions.py
+#: openedx/features/content_type_gating/templates/content_type_gating/access_denied_message.html
+msgid "Graded assessments are available to Verified Track learners."
+msgstr ""
+
+#: openedx/features/content_type_gating/partitions.py
 msgid ""
 "Graded assessments are available to Verified Track learners. Upgrade to "
 "Unlock."
@@ -10961,10 +10966,6 @@ msgstr ""
 
 #: openedx/features/content_type_gating/templates/content_type_gating/access_denied_message.html
 msgid "Verified Track Access"
-msgstr ""
-
-#: openedx/features/content_type_gating/templates/content_type_gating/access_denied_message.html
-msgid "Graded assessments are available to Verified Track learners."
 msgstr ""
 
 #: openedx/features/content_type_gating/templates/content_type_gating/access_denied_message.html
