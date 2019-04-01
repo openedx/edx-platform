@@ -2,16 +2,19 @@
 Tests for the logic in input type mako templates.
 """
 
+from __future__ import absolute_import
+
 import json
 import unittest
 from collections import OrderedDict
 
-from capa.inputtypes import Status
-from capa.tests.helpers import capa_render_template
 from lxml import etree
 from mako import exceptions
-from openedx.core.djangolib.markup import HTML
+from six.moves import range
 
+from capa.inputtypes import Status
+from capa.tests.helpers import capa_render_template
+from openedx.core.djangolib.markup import HTML
 from xmodule.stringify import stringify_children
 
 
@@ -39,7 +42,7 @@ class TemplateTestCase(unittest.TestCase):
             ('desc-2', '<em>description</em> <mark>text</mark> 2')
         ]
     )
-    DESCRIPTION_IDS = ' '.join(DESCRIPTIONS.keys())
+    DESCRIPTION_IDS = ' '.join(list(DESCRIPTIONS.keys()))
     RESPONSE_DATA = {
         'label': 'question text 101',
         'descriptions': DESCRIPTIONS

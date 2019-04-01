@@ -1,9 +1,12 @@
-from lxml import etree
+from __future__ import absolute_import
+
 import unittest
 import xml.sax.saxutils as saxutils
 
-from capa.tests.helpers import test_capa_system
+from lxml import etree
+
 from capa import customrender
+from capa.tests.helpers import test_capa_system
 
 # just a handy shortcut
 lookup_tag = customrender.registry.get_class_for_tag
