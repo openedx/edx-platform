@@ -294,11 +294,7 @@
                         .trim()
                     );
                 });
-
-                if (subTopic !== 'All Discussions') {
-                    crumbs.push(subTopic);
-                }
-
+                crumbs.push(subTopic);
                 return crumbs;
             }
 
