@@ -41,9 +41,5 @@ class ElitePasswordResetView(APIView):
             user.save() 
             return JsonResponse({'result': 'success', 'code': 200, 'msg': _('Password modified.')})
         else:
-            return JsonResponse({'result': 'failed', 'code': 203, 'msg': _('Wrong password')})    
-
-        
-        
-
-
+            return JsonResponse({'result': 'failed', 'code': 203, 'msg': _('Wrong password')})
+            
