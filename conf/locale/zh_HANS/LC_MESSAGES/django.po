@@ -5,11 +5,11 @@
 # EdX Team <info@edx.org>, 2019.
 #
 # Translators:
-# 婕 高 <j.gao@eliteu.cn>, 2018
 # 微 李 <w.li@eliteu.com.cn>, 2018
+# 婕 高 <j.gao@eliteu.cn>, 2018
 # Yi Li <y.li@eliteu.cn>, 2018
-# 陈滢冲 <yc.chen@eliteu.cn>, 2018
 # 家璧 刘 <jb.liu@eliteu.com.cn>, 2018
+# 陈滢冲 <yc.chen@eliteu.cn>, 2018
 # li ying <code@eliteu.cn>, 2019
 #
 # #-#-#-#-#  django-studio.po (0.1a)  #-#-#-#-#
@@ -49,7 +49,7 @@
 # EdX Team <info@edx.org>, 2019.
 #
 # Translators:
-# li ying <code@eliteu.cn>, 2018
+# li ying <code@eliteu.cn>, 2019
 #
 # #-#-#-#-#  membership.po (0.1a)  #-#-#-#-#
 # #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
@@ -65,8 +65,8 @@
 # EdX Team <info@edx.org>, 2019.
 #
 # Translators:
-# 微 李 <w.li@eliteu.com.cn>, 2018
 # 嘉杰 李 <jj.li@eliteu.com.cn>, 2018
+# 微 李 <w.li@eliteu.com.cn>, 2018
 # li ying <code@eliteu.cn>, 2019
 #
 # #-#-#-#-#  eliteu.po (0.1a)  #-#-#-#-#
@@ -9727,12 +9727,10 @@ msgid "Download the Android app on the Google Play Store"
 msgstr "在Google Play商店下载安卓App"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
-#: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid ","
 msgstr "，"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
-#: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "All rights reserved."
 msgstr "保留所有权利。"
 
@@ -10744,8 +10742,6 @@ msgstr "操作"
 
 #. Translators: This label appears above a field on the password reset
 #. form meant to hold the user's email address.
-#. Translators: This label appears above a field on the login form
-#. meant to hold the user's email address.
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's email address.
 #: openedx/core/djangoapps/user_api/api.py
@@ -10755,20 +10751,32 @@ msgstr "邮箱"
 
 #. Translators: This example email address is used as a placeholder in
 #. a field on the password reset form meant to hold the user's email address.
-#. Translators: This example email address is used as a placeholder in
-#. a field on the login form meant to hold the user's email address.
 #: openedx/core/djangoapps/user_api/api.py
 msgid "username@domain.com"
 msgstr "username@domain.com"
 
 #. Translators: These instructions appear on the password reset form,
 #. immediately below a field meant to hold the user's email address.
-#. Translators: These instructions appear on the login form, immediately
-#. below a field meant to hold the user's email address.
 #: openedx/core/djangoapps/user_api/api.py
 #, python-brace-format
 msgid "The email address you used to register with {platform_name}"
 msgstr "您在{platform_name}上注册的邮箱"
+
+#. Translators: This label appears above a field on the login form
+#. meant to hold the user's email address.
+#: openedx/core/djangoapps/user_api/api.py
+msgctxt "Register and Login"
+msgid "E-mail or mobile phone number"
+msgstr "邮箱或手机号"
+
+#. Translators: These instructions appear on the login form, immediately
+#. below a field meant to hold the user's email address.
+#: openedx/core/djangoapps/user_api/api.py
+#, python-brace-format
+msgid ""
+"The email address you registered on {platform_name}, or the phone number "
+"that is bound."
+msgstr "你在{platform_name}上注册的邮箱，或绑定的手机号"
 
 #: openedx/core/djangoapps/user_api/api.py lms/templates/login.html
 msgid "Remember me"
@@ -11279,6 +11287,13 @@ msgid ""
 "profile. {learn_more_link_start}Learn more{learn_more_link_end}"
 msgstr ""
 "欢迎来到新学员账号页面，提供更多账号信息方便其他学员查看。您也可以选择只显示部分内容。{learn_more_link_start}了解更多内容{learn_more_link_end}"
+
+#: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/normal-theme/lms/templates/footer.html
+msgid ""
+"Guangdong Elite International Education & Technology Co., Ltd.    All Rights"
+" Reserved"
+msgstr "广东英荔国际教育科技有限公司  版权所有"
 
 #: themes/normal-theme/lms/templates/ace_common/edx_ace/common/return_to_course_cta.html
 #: lms/templates/emails/activation_email.txt
@@ -20324,12 +20339,6 @@ msgid "Scan via Wechat to Follow Course Updates"
 msgstr "关注名师开课动态"
 
 #: themes/normal-theme/lms/templates/footer.html
-msgid ""
-"Guangdong Elite International Education & Technology Co., Ltd.    All Rights"
-" Reserved"
-msgstr "广东英荔国际教育科技有限公司  版权所有"
-
-#: themes/normal-theme/lms/templates/footer.html
 msgid "bind your account to your cellphone number"
 msgstr "绑定手机号"
 
@@ -24893,6 +24902,10 @@ msgid ""
 "Thank you for signing up for {studio_name}! To activate your account, please"
 " copy and paste this address into your web browser's address bar:"
 msgstr "感谢您注册{studio_name}！要激活您的账号，请复制并粘贴下面的网址到您的浏览器的地址栏："
+
+#: cms/templates/emails/activation_email.txt
+msgid "Initial password:{third_party_auth_pw}"
+msgstr "初始密码:{third_party_auth_pw}"
 
 #: cms/templates/emails/activation_email.txt
 msgid ""

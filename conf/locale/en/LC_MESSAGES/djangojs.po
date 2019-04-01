@@ -2184,7 +2184,7 @@ msgid "Are you sure you want to delete this response?"
 msgstr ""
 
 #: common/static/common/js/utils/edx.utils.validate.js
-msgid "The email address you've provided isn't formatted correctly."
+msgid "Incorrect format."
 msgstr ""
 
 #: common/static/common/js/utils/edx.utils.validate.js

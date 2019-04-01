@@ -6,8 +6,8 @@
 #
 # Translators:
 # 嘉杰 李 <jj.li@eliteu.com.cn>, 2018
-# 婕 高 <j.gao@eliteu.cn>, 2018
 # 微 李 <w.li@eliteu.com.cn>, 2018
+# 婕 高 <j.gao@eliteu.cn>, 2018
 # 家璧 刘 <jb.liu@eliteu.com.cn>, 2018
 # li ying <code@eliteu.cn>, 2019
 #
@@ -18,7 +18,7 @@
 # EdX Team <info@edx.org>, 2019.
 #
 # Translators:
-# li ying <code@eliteu.cn>, 2018
+# li ying <code@eliteu.cn>, 2019
 #
 # #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)
@@ -37,7 +37,7 @@
 # EdX Team <info@edx.org>, 2019.
 #
 # Translators:
-# li ying <code@eliteu.cn>, 2018
+# li ying <code@eliteu.cn>, 2019
 #
 # #-#-#-#-#  membership-js.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/).
@@ -2202,8 +2202,8 @@ msgid "Are you sure you want to delete this response?"
 msgstr "您确定要删除这个回复吗"
 
 #: common/static/common/js/utils/edx.utils.validate.js
-msgid "The email address you've provided isn't formatted correctly."
-msgstr "您所提供的电子邮件地址的格式不正确。"
+msgid "Incorrect format."
+msgstr "格式不正确"
 
 #: common/static/common/js/utils/edx.utils.validate.js
 msgid "%(field)s must have at least %(count)d characters."
