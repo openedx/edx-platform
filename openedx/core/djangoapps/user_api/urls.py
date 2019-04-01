@@ -20,6 +20,7 @@ from .accounts.views import (
 from .preferences.views import PreferencesDetailView, PreferencesView
 from .verification_api.views import IDVerificationStatusView
 from .validation.views import RegistrationValidationView
+from .elite_password_reset import ElitePasswordResetView
 
 ME = AccountViewSet.as_view({
     'get': 'get',
@@ -188,5 +189,11 @@ urlpatterns = [
         r'^v1/accounts/binding_phone/$',
         VERIFY_CODE_FOR_BINDING,
         name='binding_phone'
+    ),
+
+    url(
+        r'^v1/accounts/elite_password_reset/$',
+        ElitePasswordResetView.as_view(),
+        name='elite_password_reset'
     ),
 ]
