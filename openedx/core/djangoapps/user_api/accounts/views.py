@@ -16,6 +16,7 @@ from django.contrib.auth import authenticate, get_user_model, logout
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.db import transaction
+from django.conf import settings
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 from edx_ace import ace
@@ -293,11 +294,25 @@ class AccountViewSet(ViewSet):
             return Response(status=status.HTTP_403_FORBIDDEN if request.user.is_staff else status.HTTP_404_NOT_FOUND)
 
         # Update VIP info for elite
-        try:
-            from membership.models import VIPInfo
-            account_settings[0].update({'vip_info': VIPInfo.get_vip_info_for_mobile(request.user)})
-        except Exception as exc:
-            log.exception('Unable to get user:{} VIP info'.format(request.user.username))
+        if settings.FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION'):
+            NOT_PURCHASED = 1
+            BOUGHT = 2
+            EXPIRED = 3
+            try:
+                from membership.models import VIPInfo
+                vip_info = VIPInfo.get_vip_info_for_mobile(request.user)
+                vip_info_emb = {}
+                if vip_info['is_vip']:
+                    vip_info_emb['vip_status'] = BOUGHT
+                else:
+                    if VIPInfo.get_vipinfo_for_user(request.user):
+                        vip_info_emb['vip_status'] = EXPIRED
+                    else:
+                        vip_info_emb['vip_status'] = NOT_PURCHASED
+                vip_info_emb['vip_remain_days'] = vip_info['vip_remain_days']
+                account_settings[0].update(vip_info_emb)
+            except Exception as exc:
+                log.exception('Unable to get user:{} VIP info'.format(request.user.username))
 
         return Response(account_settings[0])
 
