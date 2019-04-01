@@ -11,6 +11,7 @@ class SettingsConfig(AppConfig):
     """
     Configuration class for the appsembler.settings Django app.
     """
+    label = 'appsembler_settings'
     name = 'openedx.core.djangoapps.appsembler.settings'
     verbose_name = _('Appsembler Settings')
 

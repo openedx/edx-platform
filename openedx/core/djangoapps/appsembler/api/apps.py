@@ -9,4 +9,4 @@ class TahoeAPIConfig(AppConfig):
     Configuration class for the Tahoe API Django app.
     """
     name = 'openedx.core.djangoapps.appsembler.api'
-    label = 'tahoe.api'
+    label = 'tahoe_api'
