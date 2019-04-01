@@ -295,7 +295,7 @@ class AccountViewSet(ViewSet):
         # Update VIP info for elite
         try:
             from membership.models import VIPInfo
-            account_settings[0].update({'vip_info': VIPInfo.get_vip_info_for_mobile(request.user) or '123'})
+            account_settings[0].update({'vip_info': VIPInfo.get_vip_info_for_mobile(request.user)})
         except Exception as exc:
             log.exception('Unable to get user:{} VIP info'.format(request.user.username))
 
