@@ -22,7 +22,7 @@ from six import text_type, iteritems
 
 import track.views
 from bulk_email.models import BulkEmailFlag, Optout  # pylint: disable=import-error
-from course_modes.models import CourseMode, get_cosmetic_display_price
+from course_modes.models import CourseMode
 from courseware.access import has_access
 from edxmako.shortcuts import render_to_response, render_to_string
 from entitlements.models import CourseEntitlement
@@ -42,7 +42,7 @@ from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled_for_user
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.enterprise_support.api import get_dashboard_consent_notification
-from lms.djangoapps.experiments.utils import get_experiment_dashboard_metadata_context
+from lms.djangoapps.experiments.utils import get_experiment_dashboard_metadata_context, get_dashboard_course_info
 from openedx.features.journals.api import journals_enabled
 from shoppingcart.api import order_history
 from shoppingcart.models import CourseRegistrationCode, DonationConfiguration
@@ -60,12 +60,12 @@ from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger("edx.student")
 
+# TODO START: Delete waffle flag as part of REVEM-204
 experiments_namespace = WaffleFlagNamespace(name=u'student.experiments')
-#TODO START: Delete waffle flag as part of REVEM-204.
-dashboard_metadata_flag = WaffleFlag(experiments_namespace,
+DASHBOARD_METADATA_FLAG = WaffleFlag(experiments_namespace,
                                      u'dashboard_metadata',
                                      flag_undefined_default=False)
-#TODO END: REVEM-204
+# TODO END: REVEM-204
 
 
 def get_org_black_and_whitelist_for_site():
@@ -878,8 +878,11 @@ def student_dashboard(request):
         'recovery_email_activation_message': recovery_email_activation_message,
         # TODO START: Clean up REVEM-205 & REVEM-204.
         # The below context is for experiments in dashboard_metadata
-        'course_prices': get_experiment_dashboard_metadata_context(course_enrollments) if dashboard_metadata_flag.is_enabled() else None,
+        'course_prices': get_experiment_dashboard_metadata_context(course_enrollments) if DASHBOARD_METADATA_FLAG.is_enabled() else None,
         # TODO END: Clean up REVEM-205 & REVEM-204.
+        # TODO START: clean up as part of REVEM-199 (START)
+        'course_info': get_dashboard_course_info(user, course_enrollments),
+        # TODO START: clean up as part of REVEM-199 (END)
     }
 
     if ecommerce_service.is_enabled(request.user):
