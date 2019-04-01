@@ -1457,6 +1457,7 @@ class TestDjangoTemplateLinter(TestLinter):
         DjangoTemplateLinter.ruleset
     )
     @data(
+
         {'expression': '{% trans "whatever" as tmsg %}{{tmsg|force_escape}}',
          'rule': None},
 
@@ -1499,9 +1500,62 @@ class TestDjangoTemplateLinter(TestLinter):
         """, 'rule': ruleset.django_html_interpolation_missing_safe_filter},
 
         {'expression': """
-                    {% trans "<span 'a'='b' 'c'='d'> whatever </span>" as tmsg %}{{tmsg|force_filter}}
-                    """,
-         'rule': ruleset.django_html_interpolation_missing},
+                    {% trans "<span 'a'='b' 'c'='d'> whatever </span>" as tmsg %}
+        """,'rule': ruleset.django_html_interpolation_missing},
+
+        {'expression': """
+                {% filter force_escape %}
+                {% blocktrans %}
+                Some translation
+                {% endblocktrans %}
+                {% endfilter %}
+                """, 'rule': None},
+
+        {'expression': """
+                {% filter force_escape
+                {% blocktrans %}
+                Some translation
+                {% endblocktrans %}
+                {% endfilter %}
+                """, 'rule': ruleset.django_trans_escape_filter_parse_error},
+
+        {'expression': """
+                {% filter someother_filter %}
+                {% blocktrans %}
+                Some translation
+                {% endblocktrans %}
+                {% endfilter %}
+                """, 'rule': ruleset.django_blocktrans_missing_escape_filter},
+
+        {'expression': """
+                {% filter force_escape xyz %}
+                {% blocktrans %}
+                Some translation
+                {% endblocktrans %}
+                {% endfilter %}
+                """, 'rule': ruleset.django_blocktrans_missing_escape_filter},
+
+        {'expression': """
+                {% blocktrans %}
+                Some translation
+                {% endblocktrans %}
+                """, 'rule': ruleset.django_blocktrans_missing_escape_filter},
+
+        {'expression': """
+                {% blocktrans %}
+                Some translation <span 'a'='b' 'c'='d'> whatever </span>
+                {% endblocktrans %}
+                """, 'rule': ruleset.django_html_interpolation_missing},
+
+        {'expression': """
+                {% blocktrans %}
+                Some translation <span 'a'='b' 'c'='d'> whatever </span>
+                endblocktrans %}
+                """, 'rule': ruleset.django_blocktrans_parse_error},
+        {'expression': """
+                {% blocktrans %}
+                Some translation <span 'a'='b' 'c'='d'> whatever </span>
+                """, 'rule': ruleset.django_blocktrans_parse_error},
     )
     def test_check_django_expressions_in_html(self, data):
         """
@@ -1522,3 +1576,77 @@ class TestDjangoTemplateLinter(TestLinter):
         linter._check_django_file_is_safe(django_template, results)
 
         self._validate_data_rules(data, results)
+
+    def test_check_django_expression_disabled(self):
+        """
+        Test _check_django_file_is_safe with disable pragma results in no
+        violation
+        """
+        linter = _build_django_linter()
+        results = FileResults('')
+
+        django_template = textwrap.dedent(
+                    """
+                    {load_i18n}
+                    {load_django_html}
+                    {expression}
+                """.format(expression="""
+                            # xss-lint: disable=django-trans-missing-escape
+                            {% trans 'Documentation' as tmsg%}
+                """,
+                           load_i18n='{% load i18n %}',
+                           load_django_html='{% load django_html %}'))
+
+        linter._check_django_file_is_safe(django_template, results)
+
+        self.assertEqual(len(results.violations), 1)
+        self.assertTrue(results.violations[0].is_disabled)
+
+    def test_check_django_trans_expression_commented(self):
+        """
+        Test _check_django_file_is_safe with comment results in no
+        violation
+        """
+        linter = _build_django_linter()
+        results = FileResults('')
+
+        django_template = textwrap.dedent(
+            """
+            {load_i18n}
+            {load_django_html}
+            {expression}
+        """.format(expression="""
+                            # {% trans 'Documentation' as tmsg%}
+                """,
+                   load_i18n='{% load i18n %}',
+                   load_django_html='{% load django_html %}'))
+
+        linter._check_django_file_is_safe(django_template, results)
+
+        self.assertEqual(len(results.violations), 0)
+
+    def test_check_django_blocktrans_expression_commented(self):
+        """
+        Test _check_django_file_is_safe with comment results in no
+        violation
+        """
+        linter = _build_django_linter()
+        results = FileResults('')
+
+        django_template = textwrap.dedent(
+            """
+            {load_i18n}
+            {load_django_html}
+            {expression}
+        """.format(expression="""
+                            {% comment %}
+                            {% blocktrans %}
+                            {% endblocktrans %}
+                            {% endcomment %}
+                """,
+                   load_i18n='{% load i18n %}',
+                   load_django_html='{% load django_html %}'))
+
+        linter._check_django_file_is_safe(django_template, results)
+
+        self.assertEqual(len(results.violations), 0)

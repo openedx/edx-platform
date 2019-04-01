@@ -52,11 +52,14 @@ class TransExpression(Expression):
             return
         trans_expr_msg = trans_expr[quote.start():quote.end()].strip()
 
-        # Checking if trans tag has html in translations string. Would be tested for possible html
-        # interpolation done somewhere else.
-        if _check_is_string_has_html(trans_expr_msg) or _check_is_string_has_variables(trans_expr_msg):
-            # check for interpolate_html expression for the variable in trans expression
+        if _check_is_string_has_html(trans_expr_msg):
+            _add_violations(self.results, self.ruleset.django_html_interpolation_missing, self)
+            return
 
+        # Checking if trans tag has interpolated variables eg {} in translations string. Would be tested for
+        # possible html interpolation done somewhere else.
+        if _check_is_string_has_variables(trans_expr_msg):
+            # check for interpolate_html expression for the variable in trans expression
             interpolate_tag, html_interpolated = _is_html_interpolated(trans_var_name_used, expressions)
 
             if not html_interpolated:
@@ -142,52 +145,107 @@ class BlockTransExpression(Expression):
             None
         """
 
-        blocktrans_expr_lineno = self.string_lines.index_to_line_number(self.start_index)
-        blocktrans_expr_column = self.string_lines.index_to_column_number(self.start_index)
+        if not self._process_block(template_file):
+            return
 
-        if blocktrans_expr_lineno == 0 and blocktrans_expr_column == 0:
+        filter_start_pos = template_file.rfind('{%', 0, self.start_index)
+        if filter_start_pos == -1:
             _add_violations(self.results,
                             self.ruleset.django_blocktrans_missing_escape_filter,
                             self)
             return
-        if blocktrans_expr_lineno >= 0:
-            filter_start_pos = template_file.rfind('{%', 0, self.start_index)
-            if filter_start_pos == -1:
-                _add_violations(self.results,
-                                self.ruleset.django_blocktrans_missing_escape_filter,
-                                self)
-                return
 
-            filter_end_pos = template_file.find('%}', filter_start_pos)
-            if filter_end_pos > self.start_index:
-                _add_violations(self.results,
-                                self.ruleset.django_trans_escape_filter_parse_error,
-                                self)
-                return
+        filter_end_pos = template_file.find('%}', filter_start_pos)
+        if filter_end_pos > self.start_index:
+            _add_violations(self.results,
+                            self.ruleset.django_trans_escape_filter_parse_error,
+                            self)
+            return
 
-            escape_filter = template_file[filter_start_pos:filter_end_pos + 2]
+        escape_filter = template_file[filter_start_pos:filter_end_pos + 2]
 
-            if len(escape_filter) < len('{%filter force_escape%}'):
-                _add_violations(self.results,
-                                self.ruleset.django_blocktrans_missing_escape_filter,
-                                self)
-                return
+        if len(escape_filter) < len('{%filter force_escape%}'):
+            _add_violations(self.results,
+                            self.ruleset.django_blocktrans_missing_escape_filter,
+                            self)
+            return
 
-            escape_filter = escape_filter[2:-2].strip()
-            escape_filter = escape_filter.split(' ')
+        escape_filter = escape_filter[2:-2].strip()
+        escape_filter = escape_filter.split(' ')
 
-            if len(escape_filter) != 2:
-                _add_violations(self.results,
-                                self.ruleset.django_bloctrans_invalid_escape_filter,
-                                self)
-                return
+        if len(escape_filter) != 2:
+            _add_violations(self.results,
+                            self.ruleset.django_blocktrans_missing_escape_filter,
+                            self)
+            return
 
-            if escape_filter[0] != 'filter' or escape_filter[1] != 'force_escape':
-                _add_violations(self.results,
-                                self.ruleset.django_bloctrans_invalid_escape_filter,
-                                self)
-                return
+        if escape_filter[0] != 'filter' or escape_filter[1] != 'force_escape':
+            _add_violations(self.results,
+                            self.ruleset.django_blocktrans_missing_escape_filter,
+                            self)
+            return
+
         return True
+
+    def _process_block(self, template_file):
+        """
+            process blocktrans..endblocktrans block
+
+            Arguments:
+                template_file: The content of the Django template.
+
+            Returns:
+                None
+        """
+
+        blocktrans_string = self._extract_translation_msg(template_file)
+
+        # if no string extracted might have hit a parse error just return
+        if not blocktrans_string:
+            return
+
+        if _check_is_string_has_html(blocktrans_string):
+            _add_violations(self.results, self.ruleset.django_html_interpolation_missing, self)
+            return
+
+        return True
+
+    def _extract_translation_msg(self, template_file):
+
+        # Double checking parsing issues. This would have been raised by
+        # Django parser. In normal case we would have a closing
+        # endblocktrans for a opening blocktrans
+
+        endblocktrans_spos = template_file.find('{%', self.end_index)
+        if endblocktrans_spos == -1:
+            _add_violations(self.results,
+                            self.ruleset.django_blocktrans_parse_error,
+                            self)
+            return
+        endblocktrans_epos = template_file.find('%}', endblocktrans_spos)
+        if endblocktrans_epos == -1:
+            _add_violations(self.results,
+                            self.ruleset.django_blocktrans_parse_error,
+                            self)
+            return
+
+        endblocktrans_tag = template_file[endblocktrans_spos:endblocktrans_epos + 2]
+
+        # this case would not happen as the dtl parser would have already picked this up.
+        if len(endblocktrans_tag) < len('{%endblocktrans%}'):
+            _add_violations(self.results,
+                            self.ruleset.django_blocktrans_parse_error,
+                            self)
+            return
+
+        endblocktrans_tag = endblocktrans_tag[2:-2].strip()
+        if endblocktrans_tag != 'endblocktrans':
+            _add_violations(self.results,
+                            self.ruleset.django_blocktrans_parse_error,
+                            self)
+            return
+
+        return template_file[self.end_index + 2: endblocktrans_spos].strip(' ')
 
 class HtmlInterpolateExpression(Expression):
     """

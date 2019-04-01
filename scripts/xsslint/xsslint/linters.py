@@ -1497,7 +1497,7 @@ class DjangoTemplateLinter(BaseLinter):
         django_trans_invalid_escape_filter='django-trans-invalid-escape-filter',
         django_escape_variable_mismatch='django-escape-variable-mismatch',
         django_blocktrans_missing_escape_filter='django-blocktrans-missing-escape-filter',
-        django_bloctrans_invalid_escape_filter='django-blocktrans-invalid-escape-filter',
+        django_blocktrans_parse_error='django-blocktrans-parse-error',
         django_trans_escape_filter_parse_error='django-trans-escape-filter-parse-error',
         django_html_interpolation_missing_safe_filter='django-html-interpolation-missing-safe-filter',
         django_html_interpolation_missing='django-html-interpolation-missing',
@@ -1640,8 +1640,8 @@ class DjangoTemplateLinter(BaseLinter):
 
         interpolation_iterator = re.finditer(r'{% interpolate_html .*?%}', django_template, re.I)
         for interpolate_tag in interpolation_iterator:
-            # if self._check_expression_not_commented(trans, comment_list, endcomment_list):
-            #     continue
+            if self._check_expression_not_commented(trans, comment_list, endcomment_list):
+                continue
             trans_expr = HtmlInterpolateExpression(self.ruleset,
                                                     results,
                                                     interpolate_tag.start(),
