@@ -7,6 +7,7 @@ Unit tests for LMS instructor-initiated background tasks helper functions.
 - Tests all of the existing reports.
 
 """
+from __future__ import unicode_literals
 
 import os
 import shutil
@@ -765,7 +766,7 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
-        self.assertIn('Activate Course Enrollment', response.content)
+        self.assertIn('Activate Course Enrollment', response.content.decode('utf-8'))
 
         response = self.client.post(redeem_url)
         self.assertEquals(response.status_code, 200)
@@ -799,7 +800,7 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
-        self.assertIn('Activate Course Enrollment', response.content)
+        self.assertIn('Activate Course Enrollment', response.content.decode('utf-8'))
 
         response = self.client.post(redeem_url)
         self.assertEquals(response.status_code, 200)
@@ -840,7 +841,7 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
-        self.assertIn('Activate Course Enrollment', response.content)
+        self.assertIn('Activate Course Enrollment', response.content.decode('utf-8'))
 
         response = self.client.post(redeem_url)
         self.assertEquals(response.status_code, 200)
@@ -1325,7 +1326,7 @@ class TestExecutiveSummaryReport(TestReportMixin, InstructorTaskCourseTestCase):
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
-        self.assertIn('Activate Course Enrollment', response.content)
+        self.assertIn('Activate Course Enrollment', response.content.decode('utf-8'))
 
         response = self.client.post(redeem_url)
         self.assertEquals(response.status_code, 200)
@@ -1954,7 +1955,6 @@ class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
 
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
             result = CourseGradeReport.generate(None, None, self.course.id, None, 'graded')
-
             self.assertDictContainsSubset(
                 {'action_name': 'graded', 'attempted': 1, 'succeeded': 1, 'failed': 0},
                 result,
@@ -1967,10 +1967,9 @@ class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
                         u'Username': self.student.username,
                         u'Grade': '0.13',
                         u'Homework 1: Subsection': '0.5',
-                        u'Homework 2: Hidden': u'Not Attempted',
-                        u'Homework 3: Unattempted': u'Not Attempted',
-                        u'Homework 4: Empty': u'Not Attempted',
-                        u'Homework (Avg)': '0.125',
+                        u'Homework 2: Unattempted': 'Not Attempted',
+                        u'Homework 3: Empty': 'Not Attempted',
+                        u'Homework (Avg)': text_type(1.0 / 6.0),
                     },
                 ],
                 ignore_other_columns=True,
