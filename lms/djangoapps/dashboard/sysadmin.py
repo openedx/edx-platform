@@ -183,15 +183,6 @@ class Users(SysadminDashboardView):
         self.datatable['data'] = [[_('Total number of users'),
                                    User.objects.all().count()]]
 
-        self.msg += HTML(u'<h2>{0}</h2>').format(
-            _('Courses loaded in the modulestore')
-        )
-        self.msg += HTML(u'<ol>')
-        for course in self.get_courses():
-            self.msg += HTML(u'<li>{0} ({1})</li>').format(
-                escape(text_type(course.id)), text_type(course.location))
-        self.msg += HTML(u'</ol>')
-
     def get(self, request):
 
         if not request.user.is_staff:
