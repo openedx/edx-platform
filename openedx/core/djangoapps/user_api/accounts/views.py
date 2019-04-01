@@ -292,6 +292,13 @@ class AccountViewSet(ViewSet):
         except UserNotFound:
             return Response(status=status.HTTP_403_FORBIDDEN if request.user.is_staff else status.HTTP_404_NOT_FOUND)
 
+        # Update VIP info for elite
+        try:
+            from membership.models import VIPInfo
+            account_settings[0].update({'vip_info': VIPInfo.get_vip_info_for_mobile(request.user) or '123'})
+        except Exception as exc:
+            log.exception('Unable to get user:{} VIP info'.format(request.user.username))
+
         return Response(account_settings[0])
 
     def partial_update(self, request, username):
