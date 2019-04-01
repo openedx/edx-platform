@@ -9,10 +9,10 @@
 # This is required for A2E courses that were created with the temporary (xblock-drag-and-drop-v2-new) DnDv2 branch to continue to work.
 # FIXME: bump version to 2.1.6 when https://github.com/edx-solutions/xblock-drag-and-drop-v2/pull/154 merged and tagged
 -e git+https://github.com/open-craft/xblock-drag-and-drop-v2.git@82c9dc5e16d10793e8b79e60661e1a78893fce25#egg=xblock-drag-and-drop-v2-new
--e git+https://github.com/edx-solutions/xblock-ooyala.git@v2.0.22#egg=xblock-ooyala==2.0.22
+-e git+https://github.com/edx-solutions/xblock-ooyala.git@v2.0.23#egg=xblock-ooyala==2.0.23
 git+https://github.com/edx-solutions/xblock-group-project.git@0.1.2#egg=xblock-group-project==0.1.2
 -e git+https://github.com/edx-solutions/xblock-adventure.git@v0.1.1#egg=xblock-adventure==0.1.1
--e git+https://github.com/open-craft/xblock-poll.git@1.8.2#egg=xblock-poll==1.8.2
+-e git+https://github.com/open-craft/xblock-poll.git@1.8.3#egg=xblock-poll==1.8.3
 -e git+https://github.com/open-craft/edx-notifications.git@9930a7069dd496e3229145d0dee8f750c9d1d7cc#egg=edx-notifications==0.8.4
 -e git+https://github.com/open-craft/problem-builder.git@v3.3.2#egg=xblock-problem-builder==3.3.2
 -e git+https://github.com/OfficeDev/xblock-officemix.git@86238f5968a08db005717dbddc346808f1ed3716#egg=xblock-officemix
