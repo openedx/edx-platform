@@ -245,7 +245,6 @@ such that the value can be defined later than this assignment (file load order).
 
         AuthListWidget.prototype.modify_member_access = function(uniqueStudentIdentifier, action, cb) {
             var authlistwidgetmemberaccess = this;
-            var callback = (typeof cb === 'function') && cb || function() {};
             return $.ajax({
                 type: 'POST',
                 dataType: 'json',
@@ -256,16 +255,10 @@ such that the value can be defined later than this assignment (file load order).
                     action: action
                 },
                 success: function(data) {
-                    if (data.userDoesNotExist) {
-                        return statusAjaxError(function() {
-                            authlistwidgetmemberaccess.clear_input();
-                            return callback(gettext('User "' + data.unique_student_identifier + '" does not exist'));
-                        })();
-                    }
                     return authlistwidgetmemberaccess.member_response(data);
                 },
                 error: statusAjaxError(function() {
-                    return callback(gettext("Error changing user's permissions."));
+                    return typeof cb === 'function' ? cb(gettext("Error changing user's permissions.")) : undefined;
                 })
             });
         };
@@ -276,12 +269,12 @@ such that the value can be defined later than this assignment (file load order).
             this.clear_input();
             if (data.userDoesNotExist) {
                 msg = gettext("Could not find a user with username or email address '<%- identifier %>'.");
-                return this.show_errors(_.template(msg, {
+                return this.show_errors(_.template(msg)({
                     identifier: data.unique_student_identifier
                 }));
             } else if (data.inactiveUser) {
                 msg = gettext("Error: User '<%- username %>' has not yet activated their account. Users must create and activate their accounts before they can be assigned a role.");  // eslint-disable-line max-len
-                return this.show_errors(_.template(msg, {
+                return this.show_errors(_.template(msg)({
                     username: data.unique_student_identifier
                 }));
             } else if (data.removingSelfAsInstructor) {
