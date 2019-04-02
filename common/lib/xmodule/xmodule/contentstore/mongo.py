@@ -1,22 +1,27 @@
 """
 MongoDB/GridFS-level code for the contentstore.
 """
-import os
-import json
-import pymongo
-import gridfs
-from gridfs.errors import NoFile
-from fs.osfs import OSFS
-from bson.son import SON
+from __future__ import absolute_import
 
+import json
+import os
+
+import gridfs
+import pymongo
+import six
+from bson.son import SON
+from fs.osfs import OSFS
+from gridfs.errors import NoFile
 from mongodb_proxy import autoretry_read
 from opaque_keys.edx.keys import AssetKey
+
 from xmodule.contentstore.content import XASSET_LOCATION_TAG
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import ASSET_IGNORE_REGEX
-from xmodule.util.misc import escape_invalid_characters
 from xmodule.mongo_utils import connect_to_mongodb, create_collection_index
-from .content import StaticContent, ContentStore, StaticContentStream
+from xmodule.util.misc import escape_invalid_characters
+
+from .content import ContentStore, StaticContent, StaticContentStream
 
 
 class MongoContentStore(ContentStore):
@@ -88,7 +93,7 @@ class MongoContentStore(ContentStore):
         self.delete(content_id)  # delete is a noop if the entry doesn't exist; so, don't waste time checking
 
         thumbnail_location = content.thumbnail_location.to_deprecated_list_repr() if content.thumbnail_location else None
-        with self.fs.new_file(_id=content_id, filename=unicode(content.location), content_type=content.content_type,
+        with self.fs.new_file(_id=content_id, filename=six.text_type(content.location), content_type=content.content_type,
                               displayname=content.name, content_son=content_son,
                               thumbnail_location=thumbnail_location,
                               import_path=content.import_path,
@@ -194,7 +199,7 @@ class MongoContentStore(ContentStore):
             # When debugging course exports, this might be a good place
             # to look. -- pmitros
             self.export(asset['asset_key'], output_directory)
-            for attr, value in asset.iteritems():
+            for attr, value in six.iteritems(asset):
                 if attr not in ['_id', 'md5', 'uploadDate', 'length', 'chunkSize', 'asset_key']:
                     policy.setdefault(asset['asset_key'].block_id, {})[attr] = value
 
@@ -349,7 +354,7 @@ class MongoContentStore(ContentStore):
 
         :param location:  a c4x asset location
         """
-        for attr in attr_dict.iterkeys():
+        for attr in six.iterkeys(attr_dict):
             if attr in ['_id', 'md5', 'uploadDate', 'length']:
                 raise AttributeError("{} is a protected attribute.".format(attr))
         asset_db_key, __ = self.asset_db_key(location)
@@ -387,7 +392,7 @@ class MongoContentStore(ContentStore):
             asset_key = self.make_id_son(asset)
             # don't convert from string until fs access
             source_content = self.fs.get(asset_key)
-            if isinstance(asset_key, basestring):
+            if isinstance(asset_key, six.string_types):
                 asset_key = AssetKey.from_string(asset_key)
                 __, asset_key = self.asset_db_key(asset_key)
             asset_key['org'] = dest_course_key.org
@@ -398,7 +403,7 @@ class MongoContentStore(ContentStore):
                 asset_id = asset_key
             else:  # add the run, since it's the last field, we're golden
                 asset_key['run'] = dest_course_key.run
-                asset_id = unicode(
+                asset_id = six.text_type(
                     dest_course_key.make_asset_key(asset_key['category'], asset_key['name']).for_branch(None)
                 )
 
@@ -452,7 +457,7 @@ class MongoContentStore(ContentStore):
             # NOTE, there's no need to state that run doesn't exist in the negative case b/c access via
             # SON requires equivalence (same keys and values in exact same order)
             dbkey['run'] = location.run
-            content_id = unicode(location.for_branch(None))
+            content_id = six.text_type(location.for_branch(None))
         return content_id, dbkey
 
     def make_id_son(self, fs_entry):
@@ -462,7 +467,7 @@ class MongoContentStore(ContentStore):
             fs_entry: the element returned by self.fs_files.find
         """
         _id_field = fs_entry.get('_id', fs_entry)
-        if isinstance(_id_field, basestring):
+        if isinstance(_id_field, six.string_types):
             return _id_field
         dbkey = SON((field_name, _id_field.get(field_name)) for field_name in self.ordered_key_fields)
         if 'run' in _id_field:
