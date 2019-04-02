@@ -73,11 +73,10 @@ class CourseOverviewField(serializers.RelatedField):
                 request=request,
             ) if course_overview.is_discussion_tab_enabled() else None,
 
-            'video_outline': reverse(
-                'video-summary-list',
-                kwargs={'api_version': api_version, 'course_id': course_id},
-                request=request,
-            ),
+            # This is an old API that was removed as part of DEPR-4. We keep the
+            # field present in case API parsers expect it, but this API is now
+            # removed.
+            'video_outline': None,
         }
 
 

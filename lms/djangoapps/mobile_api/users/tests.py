@@ -111,7 +111,6 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         self.assertIn('courses/{}/about'.format(self.course.id), found_course['course_about'])
         self.assertIn('course_info/{}/updates'.format(self.course.id), found_course['course_updates'])
         self.assertIn('course_info/{}/handouts'.format(self.course.id), found_course['course_handouts'])
-        self.assertIn('video_outlines/courses/{}'.format(self.course.id), found_course['video_outline'])
         self.assertEqual(found_course['id'], unicode(self.course.id))
         self.assertEqual(courses[0]['mode'], CourseMode.DEFAULT_MODE_SLUG)
         self.assertEqual(courses[0]['course']['subscription_id'], self.course.clean_id(padding_char='_'))
