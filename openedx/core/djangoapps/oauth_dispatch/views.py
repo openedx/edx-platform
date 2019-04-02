@@ -45,10 +45,14 @@ class PasswordGrantFormByPhone(PasswordGrantForm, PublicPasswordGrantForm):
         password = data.get('password')
 
         try:
-            user_obj = UserProfile.objects.get(phone=username).user
+            user_obj = User.objects.get(username=username)
             user = authenticate(username=user_obj.username, password=password)
-        except ObjectDoesNotExist:
-            user = None
+        except User.DoesNotExist:
+            try:
+                user_obj = UserProfile.objects.get(phone=username).user
+                user = authenticate(username=user_obj.username, password=password)
+            except ObjectDoesNotExist:
+                user = None
 
         if user is None:
             error_description = "Username does not exist or invalid credentials given for phone number '{}'.".format(
