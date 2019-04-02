@@ -9,10 +9,10 @@ import six
 from django.db import IntegrityError
 from django.test import TestCase
 
-from microsite_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.api_admin.models import ApiAccessConfig, ApiAccessRequest
 from openedx.core.djangoapps.api_admin.models import log as model_log
 from openedx.core.djangoapps.api_admin.tests.factories import ApiAccessRequestFactory
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory
 
