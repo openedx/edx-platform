@@ -765,7 +765,7 @@ class Registration(models.Model):
     def activate(self):
         self.user.is_active = True
         self._track_activation()
-        self.user.save()
+        self.user.save(update_fields=['is_active'])
         log.info(u'User %s (%s) account is successfully activated.', self.user.username, self.user.email)
 
     def _track_activation(self):
