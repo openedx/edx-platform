@@ -25,7 +25,7 @@ new_contract('CourseKey', CourseKey)
 new_contract('AssetKey', AssetKey)
 new_contract('AssetMetadata', AssetMetadata)
 new_contract('LibraryLocator', LibraryLocator)
-new_contract('long', long)
+new_contract('long', int)
 
 log = logging.getLogger(__name__)
 

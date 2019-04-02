@@ -57,7 +57,7 @@ log = logging.getLogger(__name__)
 new_contract('CourseKey', CourseKey)
 new_contract('AssetKey', AssetKey)
 new_contract('AssetMetadata', AssetMetadata)
-new_contract('long', long)
+new_contract('long', int)
 new_contract('BlockUsageLocator', BlockUsageLocator)
 
 # sort order that returns DRAFT items first
