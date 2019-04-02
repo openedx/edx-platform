@@ -2,7 +2,7 @@
 from __future__ import absolute_import
 import logging
 import re
-from six.moves.urllib.parse import urlparse # pylint: disable=import-error
+from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
 
 import crum
 from django.conf import settings
