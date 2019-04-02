@@ -1,6 +1,8 @@
 """
 Tests for user enrollment.
 """
+from __future__ import absolute_import
+
 import datetime
 import itertools
 import json
@@ -9,19 +11,20 @@ import unittest
 import ddt
 import httpretty
 import pytz
+import six
 from django.conf import settings
 from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
 from django.core.handlers.wsgi import WSGIRequest
-from django.urls import reverse
 from django.test import Client
 from django.test.utils import override_settings
+from django.urls import reverse
 from freezegun import freeze_time
 from mock import patch
 from rest_framework import status
 from rest_framework.test import APITestCase
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls_range
+from six import text_type
+from six.moves import range
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
@@ -33,20 +36,17 @@ from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.djangoapps.embargo.models import Country, CountryAccessRule, RestrictedCourse
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
-from openedx.core.djangoapps.user_api.models import (
-    RetirementState,
-    UserRetirementStatus,
-    UserOrgTag
-)
+from openedx.core.djangoapps.user_api.models import RetirementState, UserOrgTag, UserRetirementStatus
 from openedx.core.lib.django_test_client_utils import get_absolute_url
 from openedx.features.enterprise_support.tests import FAKE_ENTERPRISE_CUSTOMER
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
 from student.models import CourseEnrollment
 from student.roles import CourseStaffRole
-from student.tests.factories import AdminFactory, UserFactory, SuperuserFactory
+from student.tests.factories import AdminFactory, SuperuserFactory, UserFactory
 from util.models import RateLimitConfiguration
 from util.testing import UrlResetMixin
-from six import text_type
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls_range
 
 
 class EnrollmentTestMixin(object):
@@ -75,7 +75,7 @@ class EnrollmentTestMixin(object):
         Returns
             Response
         """
-        course_id = course_id or unicode(self.course.id)
+        course_id = course_id or six.text_type(self.course.id)
         username = username or self.user.username
 
         data = {
@@ -237,11 +237,11 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         # Create an enrollment
         self.assert_enrollment_status()
         resp = self.client.get(
-            reverse('courseenrollment', kwargs={'username': self.user.username, "course_id": unicode(self.course.id)})
+            reverse('courseenrollment', kwargs={'username': self.user.username, "course_id": six.text_type(self.course.id)})
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = json.loads(resp.content)
-        self.assertEqual(unicode(self.course.id), data['course_details']['course_id'])
+        self.assertEqual(six.text_type(self.course.id), data['course_details']['course_id'])
         self.assertEqual(self.course.display_name_with_default, data['course_details']['course_name'])
         self.assertEqual(CourseMode.DEFAULT_MODE_SLUG, data['mode'])
         self.assertTrue(data['is_active'])
@@ -285,7 +285,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         # While the enrollment wrong is invalid, the response content should have
         # all the valid enrollment modes.
         data = json.loads(resp.content)
-        self.assertEqual(unicode(self.course.id), data['course_details']['course_id'])
+        self.assertEqual(six.text_type(self.course.id), data['course_details']['course_id'])
         self.assertEqual(1, len(data['course_details']['course_modes']))
         self.assertEqual('professional', data['course_details']['course_modes'][0]['slug'])
 
@@ -298,11 +298,11 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         # Create an enrollment
         self.assert_enrollment_status()
         resp = self.client.get(
-            reverse('courseenrollment', kwargs={"course_id": unicode(self.course.id)})
+            reverse('courseenrollment', kwargs={"course_id": six.text_type(self.course.id)})
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = json.loads(resp.content)
-        self.assertEqual(unicode(self.course.id), data['course_details']['course_id'])
+        self.assertEqual(six.text_type(self.course.id), data['course_details']['course_id'])
         self.assertEqual(CourseMode.DEFAULT_MODE_SLUG, data['mode'])
         self.assertTrue(data['is_active'])
 
@@ -361,7 +361,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         data = json.loads(response.content)
         self.assertItemsEqual(
             [(datum['course_details']['course_id'], datum['course_details']['course_name']) for datum in data],
-            [(unicode(course.id), course.display_name_with_default) for course in courses]
+            [(six.text_type(course.id), course.display_name_with_default) for course in courses]
         )
 
     def test_enrollment_list_permissions(self):
@@ -373,12 +373,12 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         other_course = CourseFactory.create(emit_signals=True)
         for course in self.course, other_course:
             CourseModeFactory.create(
-                course_id=unicode(course.id),
+                course_id=six.text_type(course.id),
                 mode_slug=CourseMode.DEFAULT_MODE_SLUG,
                 mode_display_name=CourseMode.DEFAULT_MODE_SLUG,
             )
             self.assert_enrollment_status(
-                course_id=unicode(course.id),
+                course_id=six.text_type(course.id),
                 max_mongo_calls=0,
             )
         # Verify the user himself can see both of his enrollments.
@@ -411,7 +411,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
             mode_display_name=CourseMode.HONOR,
         )
         url = reverse('courseenrollment',
-                      kwargs={'username': self.other_user.username, "course_id": unicode(self.course.id)})
+                      kwargs={'username': self.other_user.username, "course_id": six.text_type(self.course.id)})
 
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -436,12 +436,12 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
             bulk_sku="BULK123"
         )
         resp = self.client.get(
-            reverse('courseenrollmentdetails', kwargs={"course_id": unicode(self.course.id)})
+            reverse('courseenrollmentdetails', kwargs={"course_id": six.text_type(self.course.id)})
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
         data = json.loads(resp.content)
-        self.assertEqual(unicode(self.course.id), data['course_id'])
+        self.assertEqual(six.text_type(self.course.id), data['course_id'])
         self.assertEqual(self.course.display_name_with_default, data['course_name'])
         mode = data['course_modes'][0]
         self.assertEqual(mode['slug'], CourseMode.HONOR)
@@ -456,12 +456,12 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
             mode_display_name=CourseMode.CREDIT_MODE,
         )
         resp = self.client.get(
-            reverse('courseenrollmentdetails', kwargs={"course_id": unicode(self.course.id)})
+            reverse('courseenrollmentdetails', kwargs={"course_id": six.text_type(self.course.id)})
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
         data = json.loads(resp.content)
-        self.assertEqual(unicode(self.course.id), data['course_id'])
+        self.assertEqual(six.text_type(self.course.id), data['course_id'])
         mode = data['course_modes'][0]
         self.assertEqual(mode['slug'], CourseMode.CREDIT_MODE)
         self.assertEqual(mode['name'], CourseMode.CREDIT_MODE)
@@ -482,10 +482,10 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         # miss; the modulestore is queried and course metadata is cached.
         __ = CourseOverview.get_from_id(course.id)
 
-        self.assert_enrollment_status(course_id=unicode(course.id))
+        self.assert_enrollment_status(course_id=six.text_type(course.id))
 
         # Check course details
-        url = reverse('courseenrollmentdetails', kwargs={"course_id": unicode(course.id)})
+        url = reverse('courseenrollmentdetails', kwargs={"course_id": six.text_type(course.id)})
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
@@ -494,7 +494,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         self.assertEqual(data['course_end'], expected_end)
 
         # Check enrollment course details
-        url = reverse('courseenrollment', kwargs={"course_id": unicode(course.id)})
+        url = reverse('courseenrollment', kwargs={"course_id": six.text_type(course.id)})
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
@@ -528,7 +528,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
     def test_get_enrollment_internal_error(self, mock_get_enrollment):
         mock_get_enrollment.side_effect = CourseEnrollmentError("Something bad happened.")
         resp = self.client.get(
-            reverse('courseenrollment', kwargs={'username': self.user.username, "course_id": unicode(self.course.id)})
+            reverse('courseenrollment', kwargs={'username': self.user.username, "course_id": six.text_type(self.course.id)})
         )
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -561,7 +561,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
             mode_display_name=CourseMode.DEFAULT_MODE_SLUG,
         )
 
-        for attempt in xrange(self.rate_limit + 2):
+        for attempt in range(self.rate_limit + 2):
             expected_status = status.HTTP_429_TOO_MANY_REQUESTS if attempt >= self.rate_limit else status.HTTP_200_OK
             self.assert_enrollment_status(expected_status=expected_status)
 
@@ -636,7 +636,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
 
         # Passes the include_expired parameter to the API call
         v_response = self.client.get(
-            reverse('courseenrollmentdetails', kwargs={"course_id": unicode(self.course.id)}), {'include_expired': True}
+            reverse('courseenrollmentdetails', kwargs={"course_id": six.text_type(self.course.id)}), {'include_expired': True}
         )
         v_data = json.loads(v_response.content)
 
@@ -644,7 +644,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         self.assertEqual(len(v_data['course_modes']), 2)
 
         # Omits the include_expired parameter from the API call
-        h_response = self.client.get(reverse('courseenrollmentdetails', kwargs={"course_id": unicode(self.course.id)}))
+        h_response = self.client.get(reverse('courseenrollmentdetails', kwargs={"course_id": six.text_type(self.course.id)}))
         h_data = json.loads(h_response.content)
 
         # Ensure that only one course mode is returned and that it is honor
@@ -993,7 +993,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         )
         consent_kwargs = {
             'username': self.user.username,
-            'course_id': unicode(self.course.id),
+            'course_id': six.text_type(self.course.id),
             'ec_uuid': 'this-is-a-real-uuid'
         }
         mock_enterprise_customer_from_api.return_value = FAKE_ENTERPRISE_CUSTOMER
@@ -1109,7 +1109,7 @@ class EnrollmentEmbargoTest(EnrollmentTestMixin, UrlResetMixin, ModuleStoreTestC
     def _generate_data(self):
         return json.dumps({
             'course_details': {
-                'course_id': unicode(self.course.id)
+                'course_id': six.text_type(self.course.id)
             },
             'user': self.user.username
         })
@@ -1249,7 +1249,7 @@ class EnrollmentCrossDomainTest(ModuleStoreTestCase):
     def _get_csrf_cookie(self):
         """Retrieve the cross-domain CSRF cookie. """
         url = reverse('courseenrollment', kwargs={
-            'course_id': unicode(self.course.id)
+            'course_id': six.text_type(self.course.id)
         })
         resp = self.client.get(url, HTTP_REFERER=self.REFERER)
         self.assertEqual(resp.status_code, 200)
@@ -1261,7 +1261,7 @@ class EnrollmentCrossDomainTest(ModuleStoreTestCase):
         url = reverse('courseenrollments')
         params = json.dumps({
             'course_details': {
-                'course_id': unicode(self.course.id),
+                'course_id': six.text_type(self.course.id),
             },
             'user': self.user.username
         })
@@ -1578,31 +1578,31 @@ class CourseEnrollmentsApiListTest(APITestCase, ModuleStoreTestCase):
         with freeze_time(self.CREATED_DATA):
             data.create_course_enrollment(
                 self.student1.username,
-                unicode(self.course.id),
+                six.text_type(self.course.id),
                 'honor',
                 True
             )
             data.create_course_enrollment(
                 self.student2.username,
-                unicode(self.course.id),
+                six.text_type(self.course.id),
                 'honor',
                 True
             )
             data.create_course_enrollment(
                 self.student3.username,
-                unicode(self.course2.id),
+                six.text_type(self.course2.id),
                 'verified',
                 True
             )
             data.create_course_enrollment(
                 self.student2.username,
-                unicode(self.course2.id),
+                six.text_type(self.course2.id),
                 'honor',
                 True
             )
             data.create_course_enrollment(
                 self.staff_user.username,
-                unicode(self.course2.id),
+                six.text_type(self.course2.id),
                 'verified',
                 True
             )
