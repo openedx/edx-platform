@@ -18,7 +18,10 @@ new_contract('AssetKey', AssetKey)
 new_contract('CourseKey', CourseKey)
 new_contract('datetime', datetime)
 new_contract('basestring', six.string_types[0])
-new_contract('long', int)
+if six.PY2:
+    new_contract('long', long)
+else:
+    new_contract('long', int)
 new_contract('AssetElement', lambda x: isinstance(x, etree._Element) and x.tag == "asset")  # pylint: disable=protected-access
 new_contract('AssetsElement', lambda x: isinstance(x, etree._Element) and x.tag == "assets")  # pylint: disable=protected-access
 
