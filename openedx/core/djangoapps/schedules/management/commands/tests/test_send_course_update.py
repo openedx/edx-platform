@@ -1,6 +1,7 @@
 """
 Tests for send_course_update management command.
 """
+from __future__ import absolute_import
 import ddt
 from mock import patch, _is_started
 from unittest import skipUnless
@@ -22,6 +23,7 @@ from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from student.tests.factories import CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from six.moves import range
 
 
 @ddt.ddt
@@ -40,7 +42,7 @@ class TestSendCourseUpdate(ScheduleUpsellTestMixin, ScheduleSendEmailTestMixin, 
     command = nudge.Command
     deliver_config = 'deliver_course_update'
     enqueue_config = 'enqueue_course_update'
-    expected_offsets = range(-7, -77, -7)
+    expected_offsets = list(range(-7, -77, -7))
     experience_type = ScheduleExperience.EXPERIENCES.course_updates
 
     queries_deadline_for_each_course = True

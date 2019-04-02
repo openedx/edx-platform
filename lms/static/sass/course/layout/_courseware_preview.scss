@@ -63,6 +63,7 @@ $proctoring-banner-text-size: 14px;
 
     box-shadow: 0 3px 3px $shadow-d1;
     position: fixed;
+    z-index: 100;
     top: 0;
     width: 100%;
   }

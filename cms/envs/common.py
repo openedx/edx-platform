@@ -654,7 +654,7 @@ SERVER_EMAIL = 'devops@example.com'
 ADMINS = []
 MANAGERS = ADMINS
 
-# Initialize to 'unknown', but read from JSON in aws.py
+# Initialize to 'unknown', but read from JSON in production.py
 EDX_PLATFORM_REVISION = 'unknown'
 
 # Static content
@@ -1569,3 +1569,6 @@ plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.CMS, plugin_c
 # setting for the FileWrapper class used to iterate over the export file data.
 # See: https://docs.python.org/2/library/wsgiref.html#wsgiref.util.FileWrapper
 COURSE_EXPORT_DOWNLOAD_CHUNK_SIZE = 8192
+
+############### Settings for edx-rbac  ###############
+SYSTEM_WIDE_ROLE_CLASSES = os.environ.get("SYSTEM_WIDE_ROLE_CLASSES", [])

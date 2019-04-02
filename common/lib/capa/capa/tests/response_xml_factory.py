@@ -1,13 +1,16 @@
-from lxml import etree
+from __future__ import absolute_import
+
 from abc import ABCMeta, abstractmethod
 
+import six
+from lxml import etree
+from six.moves import range, zip
 
-class ResponseXMLFactory(object):
+
+class ResponseXMLFactory(six.with_metaclass(ABCMeta, object)):
     """ Abstract base class for capa response XML factories.
     Subclasses override create_response_element and
     create_input_element to produce XML of particular response types"""
-
-    __metaclass__ = ABCMeta
 
     @abstractmethod
     def create_response_element(self, **kwargs):
@@ -541,7 +544,7 @@ class FormulaResponseXMLFactory(ResponseXMLFactory):
         low_range_vals = [str(f[0]) for f in sample_dict.values()]
         high_range_vals = [str(f[1]) for f in sample_dict.values()]
         sample_str = (
-            ",".join(sample_dict.keys()) + "@" +
+            ",".join(list(sample_dict.keys())) + "@" +
             ",".join(low_range_vals) + ":" +
             ",".join(high_range_vals) +
             "#" + str(num_samples)
@@ -727,7 +730,7 @@ class StringResponseXMLFactory(ResponseXMLFactory):
         response_element = etree.Element("stringresponse")
 
         # Set the answer attribute
-        response_element.set("answer", unicode(answer))
+        response_element.set("answer", six.text_type(answer))
 
         # Set the case sensitivity and regexp:
         type_value = ''

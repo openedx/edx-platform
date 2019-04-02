@@ -12,6 +12,7 @@
 functools32 ; python_version == "2.7"
 futures ; python_version == "2.7"
 python-openid ; python_version == "2.7"
+pysqlite ; python_version == "2.7"
 
 # six is at 1.12.0, but transifex-client requires ==1.11.0
 # https://github.com/transifex/transifex-client/issues/252

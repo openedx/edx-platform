@@ -1,4 +1,5 @@
 """"Management command to add program information to the cache."""
+from __future__ import absolute_import
 from collections import defaultdict
 import logging
 import sys
@@ -84,7 +85,7 @@ class Command(BaseCommand):
             ))
             cache.set(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=site.domain), uuids, None)
 
-            pathway_ids = new_pathways.keys()
+            pathway_ids = list(new_pathways.keys())
             logger.info(u'Caching ids for {total} pathways for site {site_name}.'.format(
                 total=len(pathway_ids),
                 site_name=site.domain,

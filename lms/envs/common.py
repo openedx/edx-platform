@@ -477,6 +477,7 @@ OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS = 30
 # Scope description strings are presented to the user
 # on the application authorization page. See
 # lms/templates/oauth2_provider/authorize.html for details.
+# Non-default scopes should be added directly to OAUTH2_PROVIDER['SCOPES'] below.
 OAUTH2_DEFAULT_SCOPES = {
     'read': _('Read access'),
     'write': _('Write access'),
@@ -490,6 +491,7 @@ OAUTH2_PROVIDER = {
     'REFRESH_TOKEN_EXPIRE_SECONDS': 7776000,
     'SCOPES_BACKEND_CLASS': 'openedx.core.djangoapps.oauth_dispatch.scopes.ApplicationModelScopes',
     'SCOPES': dict(OAUTH2_DEFAULT_SCOPES, **{
+        'user_id': _('Retrieve your user identifier'),
         'grades:read': _('Retrieve your grades for your enrolled courses'),
         'certificates:read': _('Retrieve your course certificates'),
     }),
@@ -3134,7 +3136,7 @@ JWT_AUTH = {
     'JWT_LOGIN_CLIENT_ID': 'login-service-client-id',
     'JWT_LOGIN_SERVICE_USERNAME': 'login_service_user',
 
-    'JWT_SUPPORTED_VERSION': '1.1.0',
+    'JWT_SUPPORTED_VERSION': '1.2.0',
 
     'JWT_ALGORITHM': 'HS256',
     'JWT_SECRET_KEY': SECRET_KEY,
@@ -3281,7 +3283,7 @@ ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER = {}
 ############## ENTERPRISE SERVICE API CLIENT CONFIGURATION ######################
 # The LMS communicates with the Enterprise service via the EdxRestApiClient class
 # These default settings are utilized by the LMS when interacting with the service,
-# and are overridden by the configuration parameter accessors defined in aws.py
+# and are overridden by the configuration parameter accessors defined in production.py
 
 ENTERPRISE_API_URL = LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/'
 ENTERPRISE_CONSENT_API_URL = LMS_INTERNAL_ROOT_URL + '/consent/api/v1/'
@@ -3383,7 +3385,7 @@ COURSES_API_CACHE_TIMEOUT = 3600  # Value is in seconds
 COURSEGRAPH_JOB_QUEUE = DEFAULT_PRIORITY_QUEUE
 
 
-# Initialize to 'unknown', but read from JSON in aws.py
+# Initialize to 'unknown', but read from JSON in production.py
 EDX_PLATFORM_REVISION = 'unknown'
 
 ############## Settings for Completion API #########################
@@ -3464,3 +3466,6 @@ USER_STATE_BATCH_SIZE = 5000
 from openedx.core.djangoapps.plugins import plugin_apps, plugin_settings, constants as plugin_constants
 INSTALLED_APPS.extend(plugin_apps.get_apps(plugin_constants.ProjectType.LMS))
 plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS, plugin_constants.SettingsType.COMMON)
+
+############### Settings for edx-rbac  ###############
+SYSTEM_WIDE_ROLE_CLASSES = os.environ.get("SYSTEM_WIDE_ROLE_CLASSES", [])

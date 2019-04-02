@@ -1,9 +1,12 @@
 """Tests covering utilities for integrating with the catalog service."""
 # pylint: disable=missing-docstring
 
+from __future__ import absolute_import
+
 from datetime import timedelta
 
 import mock
+import six
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.test import TestCase, override_settings
@@ -32,9 +35,9 @@ from openedx.core.djangoapps.catalog.tests.factories import (
 )
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.catalog.utils import (
+    get_course_run_details,
     get_course_runs,
     get_course_runs_for_course,
-    get_course_run_details,
     get_currency_data,
     get_localized_price_text,
     get_owners_for_course,
@@ -535,7 +538,7 @@ class TestSessionEntitlement(CatalogIntegrationMixin, TestCase):
         course_overview = CourseOverviewFactory.create(id=course_key, start=self.tomorrow)
         CourseModeFactory.create(mode_slug=CourseMode.VERIFIED, min_price=100, course_id=course_overview.id)
         course_enrollment = CourseEnrollmentFactory(
-            user=self.user, course_id=unicode(course_overview.id), mode=CourseMode.VERIFIED
+            user=self.user, course_id=six.text_type(course_overview.id), mode=CourseMode.VERIFIED
         )
         entitlement = CourseEntitlementFactory(
             user=self.user, enrollment_course_run=course_enrollment, mode=CourseMode.VERIFIED
@@ -560,7 +563,7 @@ class TestSessionEntitlement(CatalogIntegrationMixin, TestCase):
             expiration_datetime=now() - timedelta(days=1)
         )
         course_enrollment = CourseEnrollmentFactory(
-            user=self.user, course_id=unicode(course_overview.id), mode=CourseMode.VERIFIED
+            user=self.user, course_id=six.text_type(course_overview.id), mode=CourseMode.VERIFIED
         )
         entitlement = CourseEntitlementFactory(
             user=self.user, enrollment_course_run=course_enrollment, mode=CourseMode.VERIFIED
@@ -586,7 +589,7 @@ class TestSessionEntitlement(CatalogIntegrationMixin, TestCase):
             expiration_datetime=now() - timedelta(days=1)
         )
         course_enrollment = CourseEnrollmentFactory(
-            user=self.user, course_id=unicode(course_overview.id), mode=CourseMode.VERIFIED
+            user=self.user, course_id=six.text_type(course_overview.id), mode=CourseMode.VERIFIED
         )
         entitlement = CourseEntitlementFactory(
             user=self.user, enrollment_course_run=course_enrollment, mode=CourseMode.VERIFIED

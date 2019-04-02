@@ -1,3 +1,7 @@
+"""
+Test cases for cache_programs command.
+"""
+from __future__ import absolute_import
 import json
 
 import httpretty
@@ -192,7 +196,7 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
         call_command('cache_programs')
 
         cached_pathway_keys = cache.get(SITE_PATHWAY_IDS_CACHE_KEY_TPL.format(domain=self.site_domain))
-        pathway_keys = pathways.keys()
+        pathway_keys = list(pathways.keys())
         self.assertEqual(
             set(cached_pathway_keys),
             set(pathway_keys)
@@ -244,7 +248,7 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
         pathways_dict = {
             PATHWAY_CACHE_KEY_TPL.format(id=pathway['id']): pathway for pathway in pathways
         }
-        pathway_keys = pathways_dict.keys()
+        pathway_keys = list(pathways_dict.keys())
 
         cached_pathway_keys = cache.get(SITE_PATHWAY_IDS_CACHE_KEY_TPL.format(domain=self.site_domain))
         self.assertEqual(

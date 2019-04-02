@@ -2,6 +2,8 @@
 import itertools
 from datetime import timedelta
 
+from mock import patch
+
 import ddt
 from django.test import TestCase
 from django.utils.timezone import now
@@ -82,8 +84,10 @@ class TestCreateJWTs(AccessTokenMixin, TestCase):
             )
             self._assert_jwt_is_valid(jwt_token, should_be_asymmetric_key=scopes_enforced and client_restricted)
 
+    @patch('openedx.core.djangoapps.oauth_dispatch.jwt.create_role_auth_claim_for_user')
     @ddt.data(True, False)
-    def test_create_jwt_for_user(self, user_email_verified):
+    def test_create_jwt_for_user(self, user_email_verified, mock_create_roles):
+        mock_create_roles.return_value = ['superuser', 'enterprise-admin']
         self.user.is_active = user_email_verified
         self.user.save()
 
@@ -96,3 +100,4 @@ class TestCreateJWTs(AccessTokenMixin, TestCase):
         )
         self.assertDictContainsSubset(additional_claims, token_payload)
         self.assertEqual(user_email_verified, token_payload['email_verified'])
+        self.assertEqual(token_payload['roles'], mock_create_roles.return_value)

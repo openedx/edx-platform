@@ -2,6 +2,9 @@
 """
 Tests for basic common operations related to Course Action State managers
 """
+from __future__ import absolute_import
+from six.moves import range
+
 from collections import namedtuple
 
 from ddt import data, ddt

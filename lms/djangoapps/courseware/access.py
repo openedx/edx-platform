@@ -503,11 +503,12 @@ def _has_group_access(descriptor, user, course_key):
 
     if missing_groups:
         partition, user_group, allowed_groups = missing_groups[0]
+        block_key = descriptor.scope_ids.usage_id
         return IncorrectPartitionGroupError(
             partition=partition,
             user_group=user_group,
             allowed_groups=allowed_groups,
-            user_message=partition.access_denied_message(descriptor, user, user_group, allowed_groups),
+            user_message=partition.access_denied_message(block_key, user, user_group, allowed_groups),
             user_fragment=partition.access_denied_fragment(descriptor, user, user_group, allowed_groups),
         )
 

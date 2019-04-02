@@ -323,7 +323,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         """
         client = self.login_client(api_client, user)
         response = client.get(reverse("accounts_api", kwargs={'username': "does_not_exist"}))
-        self.assertEqual(403 if user == "staff_user" else 404, response.status_code)
+        self.assertEqual(404, response.status_code)
 
     # Note: using getattr so that the patching works even if there is no configuration.
     # This is needed when testing CMS as the patching is still executed even though the
@@ -557,7 +557,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         # Note that we store the raw data, so it is up to client to escape the HTML.
         (
             "bio", u"<html>Lacrosse-playing superhero 壓是進界推日不復女</html>",
-            "z" * 3001, u"Ensure this value has at most 3000 characters (it has 3001)."
+            "z" * 301, u"The about me field must be at most 300 characters long."
         ),
         ("account_privacy", ALL_USERS_VISIBILITY),
         ("account_privacy", PRIVATE_VISIBILITY),

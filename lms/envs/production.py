@@ -1090,6 +1090,9 @@ RETIREMENT_SERVICE_WORKER_USERNAME = ENV_TOKENS.get(
 )
 RETIREMENT_STATES = ENV_TOKENS.get('RETIREMENT_STATES', RETIREMENT_STATES)
 
+############### Settings for Username Replacement ###############
+USERNAME_REPLACEMENT_WORKER = ENV_TOKENS.get('USERNAME_REPLACEMENT_WORKER', USERNAME_REPLACEMENT_WORKER)
+
 ############## Settings for Course Enrollment Modes ######################
 COURSE_ENROLLMENT_MODES = ENV_TOKENS.get('COURSE_ENROLLMENT_MODES', COURSE_ENROLLMENT_MODES)
 
@@ -1100,11 +1103,6 @@ PROFILE_MICROFRONTEND_URL = ENV_TOKENS.get('PROFILE_MICROFRONTEND_URL', PROFILE_
 ############################### Plugin Settings ###############################
 
 # This is at the bottom because it is going to load more settings after base settings are loaded
-
-# Load aws.py in plugins for reverse compatibility.  This can be removed after aws.py
-# is officially removed.
-plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS,
-                            plugin_constants.SettingsType.AWS)
 
 # Load production.py in plugins
 plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS, plugin_constants.SettingsType.PRODUCTION)

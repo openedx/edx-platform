@@ -27,7 +27,7 @@ from .models import CourseDurationLimitConfig
 LOG = logging.getLogger(__name__)
 
 DEFAULT_NUM_BINS = 24
-EXPIRY_REMINDER_NUM_BINS = 24
+EXPIRY_REMINDER_NUM_BINS = 1
 EXPIRY_REMINDER_LOG_PREFIX = 'FBE Expiry Reminder'
 
 
@@ -47,7 +47,6 @@ class ExpiryReminderResolver(BinnedSchedulesBaseResolver):
         course_key,
         target_datetime,
         day_offset,
-        bin_num,
         override_recipient_email=None
     ):
         access_duration = MIN_DURATION
@@ -65,7 +64,7 @@ class ExpiryReminderResolver(BinnedSchedulesBaseResolver):
             site,
             target_datetime - access_duration,
             day_offset - access_duration.days,
-            bin_num,
+            0,
             override_recipient_email,
         )
 

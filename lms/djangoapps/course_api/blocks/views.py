@@ -183,7 +183,7 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
             Returned only if "show_correctness" is included in the "requested_fields" parameter.
     """
 
-    def list(self, request, usage_key_string):  # pylint: disable=arguments-differ
+    def list(self, request, usage_key_string, hide_access_denials=False):  # pylint: disable=arguments-differ
         """
         REST API endpoint for listing all the blocks information in the course,
         while regarding user access and roles.
@@ -213,6 +213,7 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
                     params.cleaned_data.get('student_view_data', []),
                     params.cleaned_data['return_type'],
                     params.cleaned_data.get('block_types_filter', None),
+                    hide_access_denials=hide_access_denials,
                 )
             )
         except ItemNotFoundError as exception:
@@ -260,7 +261,7 @@ class BlocksInCourseView(BlocksView):
         with a message indicating that the course_id is not valid.
     """
 
-    def list(self, request):  # pylint: disable=arguments-differ
+    def list(self, request, hide_access_denials=False):  # pylint: disable=arguments-differ
         """
         Retrieves the usage_key for the requested course, and then returns the
         same information that would be returned by BlocksView.list, called with
@@ -280,4 +281,4 @@ class BlocksInCourseView(BlocksView):
             course_usage_key = modulestore().make_course_usage_key(course_key)
         except InvalidKeyError:
             raise ValidationError(u"'{}' is not a valid course key.".format(unicode(course_key_string)))
-        return super(BlocksInCourseView, self).list(request, course_usage_key)
+        return super(BlocksInCourseView, self).list(request, course_usage_key, hide_access_denials=hide_access_denials)
