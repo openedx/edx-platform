@@ -4,10 +4,10 @@
 #
 #    make upgrade
 #
-common/lib/calc
-common/lib/chem
-common/lib/sandbox-packages
-common/lib/symmath
+-e file:///home/jenkins/workspace/edx-platform-upgrade-python-requirements/edx-platform/common/lib/calc
+-e file:///home/jenkins/workspace/edx-platform-upgrade-python-requirements/edx-platform/common/lib/chem
+-e file:///home/jenkins/workspace/edx-platform-upgrade-python-requirements/edx-platform/common/lib/sandbox-packages
+-e file:///home/jenkins/workspace/edx-platform-upgrade-python-requirements/edx-platform/common/lib/symmath
 asn1crypto==0.24.0
 cffi==1.12.2
 cryptography==2.6.1
