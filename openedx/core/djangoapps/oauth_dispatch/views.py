@@ -6,11 +6,23 @@ django-oauth-toolkit as appropriate.
 from __future__ import unicode_literals
 
 import json
+import logging
 
 from django.conf import settings
+from django.contrib.auth import authenticate
 from django.views.generic import View
+from django.contrib.auth.models import User
 from edx_django_utils import monitoring as monitoring_utils
 from edx_oauth2_provider import views as dop_views  # django-oauth2-provider views
+from edx_oauth2_provider.forms import PasswordGrantForm
+from django.core.exceptions import ObjectDoesNotExist
+
+from provider.oauth2.views import OAuthError
+from provider.oauth2.forms import PublicPasswordGrantForm
+from provider.forms import OAuthValidationError
+from provider.oauth2.models import Client
+import provider.constants
+
 from oauth2_provider import models as dot_models  # django-oauth-toolkit
 from oauth2_provider import views as dot_views
 from ratelimit import ALL
@@ -20,6 +32,81 @@ from openedx.core.djangoapps.auth_exchange import views as auth_exchange_views
 from openedx.core.djangoapps.oauth_dispatch import adapters
 from openedx.core.djangoapps.oauth_dispatch.dot_overrides import views as dot_overrides_views
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_from_token
+
+from student.models import UserProfile
+
+log = logging.getLogger(__name__)
+
+
+class PasswordGrantFormByPhone(PasswordGrantForm, PublicPasswordGrantForm):
+    def clean(self):
+        data = self.cleaned_data  # pylint: disable=no-member
+        username = data.get('username')
+        password = data.get('password')
+
+        try:
+            user_obj = UserProfile.objects.get(phone=username).user
+            user = authenticate(username=user_obj.username, password=password)
+        except ObjectDoesNotExist:
+            user = None
+
+        if user is None:
+            error_description = "Username does not exist or invalid credentials given for phone number '{}'.".format(
+                username
+            )
+            log.error("OAuth2: {}".format(error_description))
+            raise OAuthValidationError({
+                'error': 'invalid_grant',
+                'error_description': error_description
+            })
+
+        data['user'] = user
+        try:
+            client = Client.objects.get(client_id=data.get('client_id'))
+        except Client.DoesNotExist:
+            error_description = "Client ID '{}' does not exist.".format(data.get('client_id'))
+            log.exception("OAuth2: {}".format(error_description))
+            raise OAuthValidationError({
+                'error': 'invalid_client',
+                'error_description': error_description
+            })
+
+        if client.client_type != provider.constants.PUBLIC:
+            error_description = "'{}' is not a public client.".format(client.client_type)
+            log.error("OAuth2: {}".format(error_description))
+            raise OAuthValidationError({
+                'error': 'invalid_client',
+                'error_description': error_description
+            })
+        data['client'] = client
+        return data
+
+
+class LoginByPhoneNumPasswordBackend(object):
+
+    def authenticate(self, request=None):
+        if request is None:
+            return None
+
+        form = PasswordGrantFormByPhone(request.POST)
+
+        # pylint: disable=no-member
+
+        if form.is_valid():
+            return form.cleaned_data.get('client')
+
+        return None
+
+
+class AccessTokenView2(dop_views.AccessTokenView):
+    authentication = dop_views.AccessTokenView.authentication + (LoginByPhoneNumPasswordBackend,)
+
+    def get_password_grant(self, _request, data, client):
+        form = PasswordGrantFormByPhone(data, client=client)
+        if not form.is_valid():
+            raise OAuthError(form.errors)
+
+        return form.cleaned_data
 
 
 class _DispatchingView(View):
@@ -103,7 +190,7 @@ class AccessTokenView(RatelimitMixin, _DispatchingView):
     Handle access token requests.
     """
     dot_view = NewTokenView
-    dop_view = dop_views.AccessTokenView
+    dop_view = AccessTokenView2
     ratelimit_key = 'openedx.core.djangoapps.util.ratelimit.real_ip'
     ratelimit_rate = settings.RATELIMIT_RATE
     ratelimit_block = True
