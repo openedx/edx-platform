@@ -1,4 +1,10 @@
+"""
+Tests for schedules signals
+"""
+from __future__ import absolute_import
+
 import datetime
+
 import ddt
 import pytest
 from mock import patch
@@ -17,6 +23,7 @@ from student.tests.factories import CourseEnrollmentFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+
 from ..models import Schedule
 from ..tests.factories import ScheduleConfigFactory
 
