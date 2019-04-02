@@ -1,7 +1,7 @@
 """
 Tests for the gating API
 """
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 import unittest
 
@@ -24,6 +24,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.gating.exceptions import GatingValidationError
 from student.tests.factories import UserFactory
+import six
 
 
 @ddt
@@ -78,7 +79,7 @@ class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
 
         self.generic_milestone = {
             'name': 'Test generic milestone',
-            'namespace': unicode(self.seq1.location),
+            'namespace': six.text_type(self.seq1.location),
         }
 
     @patch('openedx.core.lib.gating.api.log.warning')
@@ -148,7 +149,7 @@ class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
         prereqs = gating_api.get_prerequisites(self.course.id)
         self.assertEqual(len(prereqs), 1)
         self.assertEqual(prereqs[0]['block_display_name'], self.seq1.display_name)
-        self.assertEqual(prereqs[0]['block_usage_key'], unicode(self.seq1.location))
+        self.assertEqual(prereqs[0]['block_usage_key'], six.text_type(self.seq1.location))
         self.assertTrue(gating_api.is_prerequisite(self.course.id, self.seq1.location))
 
         gating_api.remove_prerequisite(self.seq1.location)
@@ -165,7 +166,7 @@ class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
         prereq_content_key, min_score, min_completion = gating_api.get_required_content(
             self.course.id, self.seq2.location
         )
-        self.assertEqual(prereq_content_key, unicode(self.seq1.location))
+        self.assertEqual(prereq_content_key, six.text_type(self.seq1.location))
         self.assertEqual(min_score, 100)
         self.assertEqual(min_completion, 100)
 
@@ -194,7 +195,7 @@ class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
         milestone = milestones_api.get_course_content_milestones(self.course.id, self.seq2.location, 'requires')[0]
 
         self.assertEqual(gating_api.get_gated_content(self.course, staff), [])
-        self.assertEqual(gating_api.get_gated_content(self.course, student), [unicode(self.seq2.location)])
+        self.assertEqual(gating_api.get_gated_content(self.course, student), [six.text_type(self.seq2.location)])
 
         milestones_api.add_user_milestone({'id': student.id}, milestone)
 

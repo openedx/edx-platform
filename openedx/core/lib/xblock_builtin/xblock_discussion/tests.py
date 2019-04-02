@@ -1,5 +1,6 @@
 """ Tests for DiscussionXBLock"""
 from __future__ import print_function
+from __future__ import absolute_import
 from collections import namedtuple
 import ddt
 import itertools
@@ -14,6 +15,7 @@ from openedx.core.lib.xblock_builtin.xblock_discussion.xblock_discussion import 
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds, UNIQUE_ID, NO_CACHE_VALUE
 from xblock.runtime import Runtime
+from six.moves import range
 
 
 def attribute_pair_repr(self):
@@ -37,7 +39,7 @@ def _random_string():
     """
     Generates random string
     """
-    return ''.join(random.choice(string.lowercase, ) for _ in xrange(12))
+    return ''.join(random.choice(string.lowercase, ) for _ in range(12))
 
 
 def _make_attribute_test_cases():

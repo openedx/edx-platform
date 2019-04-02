@@ -1,6 +1,7 @@
 """
 Utilities related to timezones
 """
+from __future__ import absolute_import
 from datetime import datetime
 
 from pytz import common_timezones, timezone, utc

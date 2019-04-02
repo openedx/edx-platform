@@ -1,3 +1,7 @@
+"""
+    Middleware utilities
+"""
+from __future__ import absolute_import
 from contextlib import contextmanager
 
 from crum import CurrentRequestUserMiddleware
