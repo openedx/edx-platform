@@ -26,6 +26,7 @@ def plugin_settings(settings):
     # Those are usually hardcoded in devstack.py for some reason
     settings.LMS_BASE = settings.ENV_TOKENS.get('LMS_BASE')
     settings.LMS_ROOT_URL = settings.ENV_TOKENS.get('LMS_ROOT_URL')
+    settings.FEATURES['ENABLE_CREATOR_GROUP'] = settings.ENV_TOKENS['FEATURES'].get('ENABLE_CREATOR_GROUP', False)
 
     settings.MIDDLEWARE_CLASSES += (
         'organizations.middleware.OrganizationMiddleware',
