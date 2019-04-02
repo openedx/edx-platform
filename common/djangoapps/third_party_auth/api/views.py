@@ -8,8 +8,10 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.http import Http404
+from django.urls import reverse
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
-from rest_framework import exceptions, status, throttling
+from rest_framework import exceptions, permissions, status, throttling
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -389,3 +391,53 @@ class UserMappingView(ListAPIView):
         context['provider'] = self.provider
 
         return context
+
+
+class ThirdPartyAuthUserStatusView(APIView):
+    """
+    Provides an API endpoint for retrieving the linked status of the authenticated
+    user with respect to the third party auth providers configured in the system.
+    """
+    authentication_classes = (
+        JwtAuthentication, OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser
+    )
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get(self, request):
+        """
+        GET /api/third_party_auth/v0/providers/user_status/
+
+        **GET Response Values**
+        {
+            "accepts_logins": true,
+            "name": "Google",
+            "disconnect_url": "/auth/disconnect/google-oauth2/?",
+            "connect_url": "/auth/login/google-oauth2/?auth_entry=account_settings&next=%2Faccount%2Fsettings",
+            "connected": false,
+            "id": "oa2-google-oauth2"
+        }
+        """
+        tpa_states = []
+        for state in pipeline.get_provider_user_states(request.user):
+            # We only want to include providers if they are either currently available to be logged
+            # in with, or if the user is already authenticated with them.
+            if state.provider.display_for_login or state.has_account:
+                tpa_states.append({
+                    'id': state.provider.provider_id,
+                    'name': state.provider.name,  # The name of the provider e.g. Facebook
+                    'connected': state.has_account,  # Whether the user's edX account is connected with the provider.
+                    # If the user is not connected, they should be directed to this page to authenticate
+                    # with the particular provider, as long as the provider supports initiating a login.
+                    'connect_url': pipeline.get_login_url(
+                        state.provider.provider_id,
+                        pipeline.AUTH_ENTRY_ACCOUNT_SETTINGS,
+                        # The url the user should be directed to after the auth process has completed.
+                        redirect_url=reverse('account_settings'),
+                    ),
+                    'accepts_logins': state.provider.accepts_logins,
+                    # If the user is connected, sending a POST request to this url removes the connection
+                    # information for this provider from their edX account.
+                    'disconnect_url': pipeline.get_disconnect_url(state.provider.provider_id, state.association_id),
+                })
+
+        return Response(tpa_states)
