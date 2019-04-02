@@ -24,22 +24,36 @@ class ElitePasswordResetView(APIView):
 
     def post(self, request):
         
-        old_password = request.POST['old_password']
-        new_password1 = request.POST['new_password1']
-        new_password2 = request.POST['new_password2']
+        old_password = request.POST.get('old_password', '')
+        new_password1 = request.POST.get('new_password1', '')
+        new_password2 = request.POST.get('new_password2', '')
         user = request.user
         password = new_password1
+
+        parameters_dict = {
+            "old_password": old_password,
+            "new_password1": new_password1,
+            "new_password2": new_password2
+        }
+        for (key, value) in parameters_dict.items():
+            import pdb; pdb.set_trace()
+            if not value: 
+                return JsonResponse({
+                    "success": False,
+                    "code": 400,
+                    "msg": _('Request parameter {key} missing!'.format(key=key)),
+                })
            
         if user.check_password(old_password):    
             if new_password1 != new_password2:
-                return JsonResponse({'result': 'failed', 'code': 201, 'msg': _('New passwords do not match. Please try again.')})
+                return JsonResponse({'success': False, 'code': 201, 'msg': _('New passwords do not match. Please try again.')})
             try:
                 validate_password(password, user=user)
             except ValidationError as err:
-                return JsonResponse({'result': 'failed', 'code': 202, 'msg': ' '.join(err.messages)})                    
+                return JsonResponse({'success': False, 'code': 202, 'msg': ' '.join(err.messages)})                    
             user.set_password(password)
             user.save() 
-            return JsonResponse({'result': 'success', 'code': 200, 'msg': _('Password modified.')})
+            return JsonResponse({'success': True, 'code': 200, 'msg': _('Password modified.')})
         else:
-            return JsonResponse({'result': 'failed', 'code': 203, 'msg': _('Wrong password')})
+            return JsonResponse({'success': False, 'code': 203, 'msg': _('Wrong password')})
             
