@@ -6,11 +6,14 @@ Credit courses allow students to receive university credit for
 successful completion of a course on EdX
 """
 
+from __future__ import absolute_import
+
 import datetime
 import logging
 from collections import defaultdict
 
 import pytz
+import six
 from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.core.cache import cache
@@ -239,12 +242,12 @@ class CreditCourse(models.Model):
         credit_courses = cache.get(cls.CREDIT_COURSES_CACHE_KEY)
         if credit_courses is None:
             credit_courses = set(
-                unicode(course.course_key)
+                six.text_type(course.course_key)
                 for course in cls.objects.filter(enabled=True)
             )
             cache.set(cls.CREDIT_COURSES_CACHE_KEY, credit_courses)
 
-        return unicode(course_key) in credit_courses
+        return six.text_type(course_key) in credit_courses
 
     @classmethod
     def get_credit_course(cls, course_key):
@@ -264,7 +267,7 @@ class CreditCourse(models.Model):
 
     def __unicode__(self):
         """Unicode representation of the credit course. """
-        return unicode(self.course_key)
+        return six.text_type(self.course_key)
 
 
 @receiver(models.signals.post_save, sender=CreditCourse)
