@@ -2,6 +2,7 @@
 Tests for the gating API
 """
 from __future__ import absolute_import
+from __future__ import unicode_literals
 import unittest
 
 from completion.models import BlockCompletion
