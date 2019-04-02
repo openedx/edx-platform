@@ -36,7 +36,6 @@ class ElitePasswordResetView(APIView):
             "new_password2": new_password2
         }
         for (key, value) in parameters_dict.items():
-            import pdb; pdb.set_trace()
             if not value: 
                 return JsonResponse({
                     "success": False,
