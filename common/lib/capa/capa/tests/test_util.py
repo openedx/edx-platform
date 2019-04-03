@@ -1,11 +1,14 @@
 """
 Tests capa util
 """
+from __future__ import absolute_import
+
 import unittest
+
 from lxml import etree
 
 from capa.tests.helpers import test_capa_system
-from capa.util import compare_with_tolerance, sanitize_html, get_inner_html_from_xpath, remove_markup
+from capa.util import compare_with_tolerance, get_inner_html_from_xpath, remove_markup, sanitize_html
 
 
 class UtilTest(unittest.TestCase):

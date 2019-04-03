@@ -1,7 +1,21 @@
+from __future__ import absolute_import
+
+import logging
+import os
 import re
+import StringIO
 import uuid
 
+import six
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import AssetKey, CourseKey
+from opaque_keys.edx.locator import AssetLocator
+from PIL import Image
+from six.moves.urllib.parse import parse_qsl, quote_plus, urlencode, urlparse, urlunparse   # pylint: disable=import-error
+
 from xmodule.assetstore.assetmgr import AssetManager
+from xmodule.exceptions import NotFoundError
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 STATIC_CONTENT_VERSION = 1
 XASSET_LOCATION_TAG = 'c4x'
@@ -10,19 +24,6 @@ XASSET_THUMBNAIL_TAIL_NAME = '.jpg'
 STREAM_DATA_CHUNK_SIZE = 1024
 VERSIONED_ASSETS_PREFIX = '/assets/courseware'
 VERSIONED_ASSETS_PATTERN = r'/assets/courseware/(v[\d]/)?([a-f0-9]{32})'
-
-import os
-import logging
-import StringIO
-from urlparse import urlparse, urlunparse, parse_qsl
-from urllib import urlencode, quote_plus
-
-from opaque_keys.edx.locator import AssetLocator
-from opaque_keys.edx.keys import CourseKey, AssetKey
-from opaque_keys import InvalidKeyError
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.exceptions import NotFoundError
-from PIL import Image
 
 
 class StaticContent(object):
@@ -300,7 +301,7 @@ class StaticContent(object):
         Legacy code expects the serialized asset key to start w/ a slash; so, do that in one place
         :param asset_key:
         """
-        url = unicode(asset_key)
+        url = six.text_type(asset_key)
         if not url.startswith('/'):
             url = '/' + url  # TODO - re-address this once LMS-11198 is tackled.
         return url

@@ -1,21 +1,23 @@
 """Models for API management."""
+from __future__ import absolute_import
+
 import logging
 from smtplib import SMTPException
-from urlparse import urlunsplit
 
 from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.mail import send_mail
-from django.urls import reverse
 from django.db import models
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
+from django.urls import reverse
 from django.utils.translation import ugettext as _
+from model_utils.models import TimeStampedModel
+from six.moves.urllib.parse import urlunsplit  # pylint: disable=import-error
 
 from edxmako.shortcuts import render_to_string
-from model_utils.models import TimeStampedModel
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 log = logging.getLogger(__name__)

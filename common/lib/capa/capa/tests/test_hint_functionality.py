@@ -3,18 +3,19 @@
 Tests of extended hints
 """
 
+from __future__ import absolute_import
 
 import unittest
 
-from ddt import ddt, data, unpack
+from ddt import data, ddt, unpack
+
+from capa.tests.helpers import load_fixture, new_loncapa_problem
 
 # With the use of ddt, some of the data expected_string cases below are naturally long stretches
 # of text text without whitespace. I think it's best to leave such lines intact
 # in the test code. Therefore:
 # pylint: disable=line-too-long
 # For out many ddt data cases, prefer a compact form of { .. }
-
-from capa.tests.helpers import new_loncapa_problem, load_fixture
 
 
 class HintTest(unittest.TestCase):

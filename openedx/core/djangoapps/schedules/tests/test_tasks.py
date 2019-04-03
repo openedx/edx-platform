@@ -1,12 +1,17 @@
+"""
+Tests for schedules tasks
+"""
+from __future__ import absolute_import
+
 import datetime
 from unittest import skipUnless
 
 import ddt
 from django.conf import settings
-from mock import patch, DEFAULT, Mock
+from mock import DEFAULT, Mock, patch
 
-from openedx.core.djangoapps.schedules.tasks import ScheduleMessageBaseTask
 from openedx.core.djangoapps.schedules.resolvers import DEFAULT_NUM_BINS
+from openedx.core.djangoapps.schedules.tasks import ScheduleMessageBaseTask
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleConfigFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms

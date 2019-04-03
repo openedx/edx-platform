@@ -1,4 +1,5 @@
 """Fields useful for edX API implementations."""
+from __future__ import absolute_import
 from rest_framework.serializers import Field, URLField
 
 

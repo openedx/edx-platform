@@ -2,6 +2,7 @@
 Tests for functionality in openedx/core/lib/courses.py.
 """
 
+from __future__ import absolute_import
 import ddt
 from django.test.utils import override_settings
 
@@ -9,6 +10,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
+import six
 from ..courses import course_image_url
 
 
@@ -28,7 +30,7 @@ class CourseImageTestCase(ModuleStoreTestCase):
         """Test image URL formatting."""
         course = CourseFactory.create()
         self.verify_url(
-            unicode(course.id.make_asset_key('asset', course.course_image)),
+            six.text_type(course.id.make_asset_key('asset', course.course_image)),
             course_image_url(course)
         )
 
@@ -37,7 +39,7 @@ class CourseImageTestCase(ModuleStoreTestCase):
         course_image = u'before_\N{SNOWMAN}_after.jpg'
         course = CourseFactory.create(course_image=course_image)
         self.verify_url(
-            unicode(course.id.make_asset_key('asset', course_image.replace(u'\N{SNOWMAN}', '_'))),
+            six.text_type(course.id.make_asset_key('asset', course_image.replace(u'\N{SNOWMAN}', '_'))),
             course_image_url(course)
         )
 
@@ -46,7 +48,7 @@ class CourseImageTestCase(ModuleStoreTestCase):
         course_image = u'before after.jpg'
         course = CourseFactory.create(course_image=u'before after.jpg')
         self.verify_url(
-            unicode(course.id.make_asset_key('asset', course_image.replace(" ", "_"))),
+            six.text_type(course.id.make_asset_key('asset', course_image.replace(" ", "_"))),
             course_image_url(course)
         )
 
@@ -69,7 +71,7 @@ class CourseImageTestCase(ModuleStoreTestCase):
         banner_image = u'banner_image.jpg'
         course = CourseFactory.create(banner_image=banner_image)
         self.verify_url(
-            unicode(course.id.make_asset_key('asset', banner_image)),
+            six.text_type(course.id.make_asset_key('asset', banner_image)),
             course_image_url(course, 'banner_image')
         )
 
@@ -78,6 +80,6 @@ class CourseImageTestCase(ModuleStoreTestCase):
         thumbnail_image = u'thumbnail_image.jpg'
         course = CourseFactory.create(video_thumbnail_image=thumbnail_image)
         self.verify_url(
-            unicode(course.id.make_asset_key('asset', thumbnail_image)),
+            six.text_type(course.id.make_asset_key('asset', thumbnail_image)),
             course_image_url(course, 'video_thumbnail_image')
         )

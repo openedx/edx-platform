@@ -1,5 +1,6 @@
 """Tests covering time zone utilities."""
 
+from __future__ import absolute_import
 from django.test import TestCase
 from freezegun import freeze_time
 from pytz import timezone

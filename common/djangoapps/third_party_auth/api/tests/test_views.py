@@ -351,3 +351,35 @@ class UserMappingViewAPITests(TpaAPITestCase):
             for item in ['results', 'count', 'num_pages']:
                 self.assertIn(item, response.data)
             self.assertItemsEqual(response.data['results'], expect_result)
+
+
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+class TestThirdPartyAuthUserStatusView(ThirdPartyAuthTestMixin, APITestCase):
+    """
+    Tests ThirdPartyAuthStatusView.
+    """
+
+    def setUp(self, *args, **kwargs):
+        super(TestThirdPartyAuthUserStatusView, self).setUp(*args, **kwargs)
+        self.user = UserFactory.create(password=PASSWORD)
+        self.google_provider = self.configure_google_provider(enabled=True, visible=True)
+        self.url = reverse('third_party_auth_user_status_api')
+
+    def test_get(self):
+        """
+        Verify that get returns the expected data.
+        """
+        self.client.login(username=self.user.username, password=PASSWORD)
+        response = self.client.get(self.url, content_type="application/json")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.data,
+            [{
+                "accepts_logins": True,
+                "name": "Google",
+                "disconnect_url": "/auth/disconnect/google-oauth2/?",
+                "connect_url": "/auth/login/google-oauth2/?auth_entry=account_settings&next=%2Faccount%2Fsettings",
+                "connected": False,
+                "id": "oa2-google-oauth2"
+            }]
+        )

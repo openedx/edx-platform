@@ -1,15 +1,18 @@
 """
 Utilities related to caching.
 """
+from __future__ import absolute_import
 import collections
-import cPickle as pickle
 import functools
 import itertools
 import zlib
+import wrapt
 
 from django.utils.encoding import force_text
 from edx_django_utils.cache import RequestCache
-import wrapt
+from six import iteritems
+from six.moves import map
+from six.moves import cPickle as pickle
 
 
 def request_cached(namespace=None, arg_map_function=None, request_cache_getter=None):
@@ -85,10 +88,10 @@ def _func_call_cache_key(func, arg_map_function, *args, **kwargs):
     """
     arg_map_function = arg_map_function or force_text
 
-    converted_args = map(arg_map_function, args)
-    converted_kwargs = map(arg_map_function, _sorted_kwargs_list(kwargs))
+    converted_args = list(map(arg_map_function, args))
+    converted_kwargs = list(map(arg_map_function, _sorted_kwargs_list(kwargs)))
 
-    cache_keys = [func.__module__, func.func_name] + converted_args + converted_kwargs
+    cache_keys = [func.__module__, func.__name__] + converted_args + converted_kwargs
     return u'.'.join(cache_keys)
 
 
@@ -96,7 +99,7 @@ def _sorted_kwargs_list(kwargs):
     """
     Returns a unique and deterministic ordered list from the given kwargs.
     """
-    sorted_kwargs = sorted(kwargs.iteritems())
+    sorted_kwargs = sorted(iteritems(kwargs))
     sorted_kwargs_list = list(itertools.chain(*sorted_kwargs))
     return sorted_kwargs_list
 

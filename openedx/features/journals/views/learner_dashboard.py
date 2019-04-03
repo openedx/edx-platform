@@ -1,16 +1,14 @@
 """ Journal Tab of Learner Dashboard views """
-from datetime import datetime, time
+from __future__ import absolute_import
+
 import logging
+from datetime import datetime, time
 
 from django.http import Http404
 
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
-from openedx.features.journals.api import (
-    fetch_journal_access,
-    journals_enabled,
-)
-
+from openedx.features.journals.api import fetch_journal_access, journals_enabled
 
 logger = logging.getLogger(__name__)
 

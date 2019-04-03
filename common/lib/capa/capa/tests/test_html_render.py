@@ -1,19 +1,22 @@
 """
 CAPA HTML rendering tests.
 """
+from __future__ import absolute_import
+
+import os
 import textwrap
 import unittest
 
 import ddt
 import mock
-import os
+from lxml import etree
+
 # Changes formatting of empty elements; import here to avoid test order dependence
 import xmodule.modulestore.xml  # pylint: disable=unused-import
-from capa.tests.helpers import test_capa_system, new_loncapa_problem
-from lxml import etree
+from capa.tests.helpers import new_loncapa_problem, test_capa_system
 from openedx.core.djangolib.markup import HTML
 
-from .response_xml_factory import StringResponseXMLFactory, CustomResponseXMLFactory
+from .response_xml_factory import CustomResponseXMLFactory, StringResponseXMLFactory
 
 
 @ddt.ddt

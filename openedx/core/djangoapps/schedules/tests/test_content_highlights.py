@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
-from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
-from openedx.core.djangoapps.schedules.content_highlights import get_week_highlights, course_has_highlights
-from openedx.core.djangoapps.schedules.exceptions import CourseUpdateDoesNotExist
-from openedx.core.djangolib.testing.utils import skip_unless_lms
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
+from __future__ import absolute_import
 
+from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
+from openedx.core.djangoapps.schedules.content_highlights import course_has_highlights, get_week_highlights
+from openedx.core.djangoapps.schedules.exceptions import CourseUpdateDoesNotExist
+from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
+from openedx.core.djangolib.testing.utils import skip_unless_lms
+from student.models import CourseEnrollment
+from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from student.tests.factories import UserFactory
-from student.models import CourseEnrollment
 
 
 @skip_unless_lms

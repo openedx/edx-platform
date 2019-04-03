@@ -1,5 +1,7 @@
-from __future__ import print_function
+from __future__ import absolute_import, print_function
+
 from xmodule.contentstore.content import StaticContent
+
 from .django import contentstore
 
 

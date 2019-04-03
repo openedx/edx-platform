@@ -4,13 +4,18 @@ Tests for UserPartitionTransformer.
 """
 import string
 from collections import namedtuple
+from datetime import datetime
 
 import ddt
+from mock import patch
 
+from course_modes.tests.factories import CourseModeFactory
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort
 from openedx.core.djangoapps.course_groups.partition_scheme import CohortPartitionScheme
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory, config_course_cohorts
 from openedx.core.djangoapps.course_groups.views import link_cohort_to_partition_group
+from openedx.features.content_type_gating.models import ContentTypeGatingConfig
+from openedx.features.content_type_gating.partitions import create_content_gating_partition
 from student.tests.factories import CourseEnrollmentFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.partitions.partitions import Group, UserPartition
@@ -173,7 +178,7 @@ class UserPartitionTransformerTestCase(UserPartitionTestMixin, CourseStructureTe
                 '#type': 'vertical',
                 '#ref': 'K',
                 '#parents': ['E'],
-                'metadata': {'group_access': {self.user_partition.id: [4]}},
+                'metadata': {'group_access': {self.user_partition.id: [4, 51]}},
                 '#children': [{'#type': 'vertical', '#ref': 'N'}],
             },
             {
@@ -218,6 +223,32 @@ class UserPartitionTransformerTestCase(UserPartitionTestMixin, CourseStructureTe
             set(trans_block_structure.get_block_keys()),
             self.get_block_key_set(self.blocks, *expected_blocks)
         )
+
+    def test_transform_with_content_gating_partition(self):
+        self.setup_partitions_and_course()
+        CourseModeFactory.create(course_id=self.course.id, mode_slug='audit')
+        CourseModeFactory.create(course_id=self.course.id, mode_slug='verified')
+        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
+        partition = create_content_gating_partition(self.course)
+        self.user_partitions.append(partition)
+        cohort = self.partition_cohorts[0][1]
+        add_user_to_cohort(cohort, self.user.username)
+
+        with patch(
+            'lms.djangoapps.course_blocks.transformers.user_partitions.get_partition_from_id',
+            return_value=partition
+        ), patch(
+            'lms.djangoapps.course_blocks.transformers.user_partitions._MergedGroupAccess.get_allowed_groups',
+            return_value={51: set([])}
+        ):
+            trans_block_structure = get_course_blocks(
+                self.user,
+                self.course.location,
+                self.transformers,
+            )
+            xblocks_denial_reason = [trans_block_structure.get_xblock_field(b, 'authorization_denial_reason')
+                                     for b in trans_block_structure.get_block_keys()]
+            self.assertSetEqual(set(xblocks_denial_reason), set([u'Feature-based Enrollments']))
 
     def test_transform_on_inactive_partition(self):
         """

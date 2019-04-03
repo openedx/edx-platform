@@ -2,6 +2,7 @@
 Common utilities related to the mobile apps.
 """
 
+from __future__ import absolute_import
 import re
 
 from django.conf import settings

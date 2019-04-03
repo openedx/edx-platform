@@ -65,7 +65,7 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
             'end': u'2015-09-19T18:00:00Z',
             'enrollment_start': u'2015-06-15T00:00:00Z',
             'enrollment_end': u'2015-07-15T00:00:00Z',
-            'blocks_url': u'http://testserver/api/courses/v1/blocks/?course_id=edX%2Ftoy%2F2012_Fall',
+            'blocks_url': u'http://testserver/api/courses/v2/blocks/?course_id=edX%2Ftoy%2F2012_Fall',
             'effort': u'6 hours',
             'pacing': 'instructor',
             'mobile_available': True,
