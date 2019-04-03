@@ -12,6 +12,7 @@ function show_help {
 }
 
 function clean_file {
+    echo "we are hitting the clean function at least"
     FILE_PATH=$1
     TEMP_FILE=${FILE_PATH}.tmp
     # If an editable VCS URL has a version number suffix, it was only editable for pip-compile's benefit;
