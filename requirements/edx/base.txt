@@ -76,7 +76,6 @@ django-crum==0.7.3
 django-fernet-fields==0.5
 django-filter==1.0.4
 django-ipware==2.1.0
-django-memcached-hashring==0.1.2
 django-method-override==0.1.0
 django-model-utils==3.0.0
 django-mptt==0.8.7
@@ -113,7 +112,7 @@ edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
 edx-django-utils==1.0.3
 edx-drf-extensions==2.1.0
-edx-enterprise==1.3.5
+edx-enterprise==1.3.7
 edx-i18n-tools==0.4.8
 edx-milestones==0.1.13
 edx-oauth2-provider==1.2.2
@@ -139,7 +138,6 @@ futures==3.2.0 ; python_version == "2.7"  # via python-swiftclient, s3transfer, 
 geoip2==2.9.0
 glob2==0.6
 gunicorn==19.0
-hash-ring==1.3.1          # via django-memcached-hashring
 help-tokens==1.0.3
 html5lib==1.0.1
 httplib2==0.12.1          # via oauth2, zendesk
@@ -179,7 +177,7 @@ path.py==8.2.1
 pathtools==0.1.2
 paver==1.3.4
 pbr==5.1.3
-pdfminer==20140328
+pdfminer.six==20181108
 piexif==1.0.2
 pillow==5.4.1
 pkgconfig==1.4.0          # via xmlsec
@@ -189,6 +187,7 @@ py2neo==3.1.2
 pycontracts==1.7.1
 pycountry==18.12.8
 pycparser==2.19
+pycryptodome==3.8.0       # via pdfminer.six
 pycryptodomex==3.4.7
 pygments==2.3.1
 pygraphviz==1.5
@@ -200,7 +199,7 @@ pyparsing==2.2.0          # via pycontracts
 pysrt==1.1.1
 python-dateutil==2.4.0
 python-levenshtein==0.12.0
-python-memcached==1.48
+python-memcached==1.59
 python-openid==2.2.5 ; python_version == "2.7"  # via social-auth-core
 python-swiftclient==3.7.0
 python3-saml==1.5.0
