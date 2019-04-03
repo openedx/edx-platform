@@ -3631,7 +3631,8 @@ ALIPAY_INFO = {
 import imp
 try:
     imp.find_module('elitemba')
-    if True:
+    HMM_ENABLED = ENV_FEATURES.get('HMM_ENABLED', False)
+    if HMM_ENABLED:
         INSTALLED_APPS.append('elitemba')
         MIDDLEWARE_CLASSES.append('elitemba.middleware.ElitembaDataMiddleware')
         HMM_CONFIGS = ENV_FEATURES.get('HMM_CONFIGS', {
