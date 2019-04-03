@@ -6,7 +6,7 @@ import logging
 import json
 import os
 from path import Path as path
-from .common import ENV_ROOT, FEATURES
+from .common import ENV_ROOT, FEATURES, INSTALLED_APPS, MIDDLEWARE_CLASSES
 
 log = logging.getLogger(__name__)
 
@@ -68,3 +68,21 @@ MOBILE_APP_USER_AGENT_REGEXES = ENV_TOKENS.get('MOBILE_APP_USER_AGENT_REGEXES', 
 
 # Baidu Bridge
 BAIDU_BRIDGE_URL = ENV_TOKENS.get('BAIDU_BRIDGE_URL', '')
+
+# elitemba
+import imp
+try:
+    imp.find_module('elitemba')
+    HMM_ENABLED = ENV_FEATURES.get('HMM_ENABLED', False)
+    if HMM_ENABLED:
+        INSTALLED_APPS.append('elitemba')
+        MIDDLEWARE_CLASSES.append('elitemba.middleware.ElitembaDataMiddleware')
+        HMM_CONFIGS = ENV_FEATURES.get('HMM_CONFIGS', {
+            'HOST': 'https://openapi.myhbp.org.cn',
+            'APP_ID': '',
+            'SOURCE_ID': '',
+            'LHOST': 'https://myhbp.org.cn',
+        })
+except ImportError:
+    print "Error: missing package 'elitemba' is required"
+
