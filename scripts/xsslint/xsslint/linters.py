@@ -1610,17 +1610,17 @@ class DjangoTemplateLinter(BaseLinter):
         comment_list = list(re.finditer(r'{% comment .*%}', django_template, re.I))
         endcomment_list = list(re.finditer(r'{% endcomment .*%}', django_template, re.I))
 
-        trans_iterator = re.finditer(r'{% trans .*%}', django_template, re.I)
+        trans_iterator = re.finditer(r'{% trans .*?%}', django_template, re.I)
         for trans in trans_iterator:
             if self._check_expression_not_commented(trans, comment_list, endcomment_list):
                 continue
             trans_expr = TransExpression(self.ruleset,
-                                         results,
-                                         trans.start(),
-                                         trans.end(),
-                                         start_delim='{%',
-                                         end_delim='%}',
-                                         template=django_template)
+                                        results,
+                                        trans.start(),
+                                        trans.end(),
+                                        start_delim='{%',
+                                        end_delim='%}',
+                                        template=django_template)
             if trans_expr:
                 expressions.append(trans_expr)
 
@@ -1629,12 +1629,12 @@ class DjangoTemplateLinter(BaseLinter):
             if self._check_expression_not_commented(trans, comment_list, endcomment_list):
                 continue
             trans_expr = BlockTransExpression(self.ruleset,
-                                              results,
-                                         trans.start(),
-                                         trans.end(),
-                                         start_delim='{%',
-                                         end_delim='%}',
-                                         template=django_template)
+                                            results,
+                                            trans.start(),
+                                            trans.end(),
+                                            start_delim='{%',
+                                            end_delim='%}',
+                                            template=django_template)
             if trans_expr:
                 expressions.append(trans_expr)
 
@@ -1643,12 +1643,12 @@ class DjangoTemplateLinter(BaseLinter):
             if self._check_expression_not_commented(trans, comment_list, endcomment_list):
                 continue
             trans_expr = HtmlInterpolateExpression(self.ruleset,
-                                                    results,
-                                                    interpolate_tag.start(),
-                                                    interpolate_tag.end(),
-                                                    start_delim='{%',
-                                                    end_delim='%}',
-                                                    template=django_template)
+                                                results,
+                                                interpolate_tag.start(),
+                                                interpolate_tag.end(),
+                                                start_delim='{%',
+                                                end_delim='%}',
+                                                template=django_template)
             if trans_expr:
                 expressions.append(trans_expr)
 

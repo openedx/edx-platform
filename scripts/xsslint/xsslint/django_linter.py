@@ -11,7 +11,7 @@ class TransExpression(Expression):
         The expression handling trans tag
     """
 
-    def __init__(self, ruleset, results,  *args, **kwargs):
+    def __init__(self, ruleset, results, *args, **kwargs):
         super(TransExpression, self).__init__(*args, **kwargs)
         self.string_lines = StringLines(kwargs['template'])
         self.ruleset = ruleset
@@ -28,20 +28,8 @@ class TransExpression(Expression):
         Returns:
             None
         """
-
         trans_expr = self.expression_inner
         trans_expr_lineno = self.string_lines.index_to_line_number(self.start_index)
-        if 'as' not in trans_expr:
-            _add_violations(self.results, self.ruleset.django_trans_missing_escape, self)
-            return
-
-        pos = trans_expr.find('as')
-        if pos == -1:
-            _add_violations(self.results, self.ruleset.django_trans_missing_escape, self)
-            return
-
-        # extracting variable used
-        trans_var_name_used = trans_expr[pos + len('as'):].strip()
 
         # extracting translation string message
         quote = re.search(r"""\s*['"].*['"]\s*""", trans_expr, re.I)
@@ -50,17 +38,28 @@ class TransExpression(Expression):
                             self.ruleset.django_trans_escape_filter_parse_error,
                             self)
             return
+
+        pos = trans_expr.find('as', quote.end())
+        if pos == -1:
+            _add_violations(self.results, self.ruleset.django_trans_missing_escape, self)
+            return
+
+        trans_var_name_used = trans_expr[pos + len('as'):].strip()
         trans_expr_msg = trans_expr[quote.start():quote.end()].strip()
 
         if _check_is_string_has_html(trans_expr_msg):
-            _add_violations(self.results, self.ruleset.django_html_interpolation_missing, self)
+            _add_violations(self.results,
+                            self.ruleset.django_html_interpolation_missing,
+                            self)
             return
 
-        # Checking if trans tag has interpolated variables eg {} in translations string. Would be tested for
+        # Checking if trans tag has interpolated variables eg {}
+        # in translations string. Would be tested for
         # possible html interpolation done somewhere else.
         if _check_is_string_has_variables(trans_expr_msg):
             # check for interpolate_html expression for the variable in trans expression
-            interpolate_tag, html_interpolated = _is_html_interpolated(trans_var_name_used, expressions)
+            interpolate_tag, html_interpolated = _is_html_interpolated(trans_var_name_used,
+                                                                       expressions)
 
             if not html_interpolated:
                 _add_violations(self.results, self.ruleset.django_html_interpolation_missing, self)
@@ -98,7 +97,7 @@ class TransExpression(Expression):
                             self)
             return
 
-        escape_expr = template_file[escape_expr_start_pos + len('{{'):escape_expr_end_pos]
+        escape_expr = template_file[escape_expr_start_pos + len('{{'):escape_expr_end_pos].strip(' ')
         # check escape expression has the right variable and its escaped properly
         # with force_escape filter
         if '|' not in escape_expr \
@@ -108,7 +107,8 @@ class TransExpression(Expression):
                             self)
             return
 
-        escape_expr_var_used, escape_filter = escape_expr.split('|')[0], escape_expr.split('|')[1]
+        escape_expr_var_used, escape_filter = escape_expr.split('|')[0].strip(' '),\
+                                              escape_expr.split('|')[1].strip(' ')
         if trans_var_name_used != escape_expr_var_used:
             _add_violations(self.results,
                             self.ruleset.django_escape_variable_mismatch,
@@ -289,7 +289,7 @@ class HtmlInterpolateExpression(Expression):
         trans_expr = self.expression_inner
 
         html_tags = re.finditer(r"""\s*['"]</?[a-zA-Z0-9 =\-'_"]+\s*>['"]\s*""",
-                                  trans_expr, re.I)
+                                trans_expr, re.I)
 
         for html_tag in html_tags:
             tag_end = html_tag.end()
@@ -305,16 +305,18 @@ class HtmlInterpolateExpression(Expression):
 def _check_is_string_has_html(trans_expr):
     html_tags = re.search(r"""</?[a-zA-Z0-9 =\-'_":]+>""", trans_expr, re.I)
 
-    if html_tags: return True
+    if html_tags:
+        return True
 
 def _check_is_string_has_variables(trans_expr):
     var_tags = re.search(r"""(?<!{){(?!{)[a-zA-Z0-9 =\-'_":]+(?<!})}(?!})""", trans_expr, re.I)
 
-    if var_tags: return True
+    if var_tags:
+        return True
 
 def _is_html_interpolated(trans_var_name_used, expressions):
-    html_interpolated=False
-    interpolate_tag_expr=None
+    html_interpolated = False
+    interpolate_tag_expr = None
     for expr in expressions:
         if isinstance(expr, HtmlInterpolateExpression):
             if expr.interpolated_string_var == trans_var_name_used:
