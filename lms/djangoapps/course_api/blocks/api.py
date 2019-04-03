@@ -26,7 +26,7 @@ def get_blocks(
         student_view_data=None,
         return_type='dict',
         block_types_filter=None,
-        hide_access_denials=True,
+        hide_access_denials=False,
 ):
     """
     Return a serialized representation of the course blocks.
