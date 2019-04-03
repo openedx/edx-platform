@@ -1,6 +1,8 @@
 """
 Enrollment track related signals.
 """
+from __future__ import absolute_import
+
 from django.dispatch import Signal
 
 ENROLLMENT_TRACK_UPDATED = Signal(providing_args=['user', 'course_key'])

@@ -2,22 +2,22 @@
 Student Views
 """
 
+from __future__ import absolute_import
+
 import datetime
 import logging
 import uuid
 from collections import namedtuple
 
-from bulk_email.models import Optout
-from courseware.courses import get_courses, sort_by_announcement, sort_by_start_date
+import six
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import AnonymousUser, User
 from django.contrib.auth.views import password_reset_confirm
 from django.contrib.sites.models import Site
-from django.core.exceptions import ObjectDoesNotExist
 from django.core import mail
-from django.urls import reverse
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import ValidationError, validate_email
 from django.db import transaction
 from django.db.models.signals import post_save
@@ -26,11 +26,12 @@ from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpRespo
 from django.shortcuts import redirect
 from django.template.context_processors import csrf
 from django.template.response import TemplateResponse
+from django.urls import reverse
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import base36_to_int, urlsafe_base64_encode
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
-from django.views.decorators.http import require_GET, require_POST, require_http_methods
+from django.views.decorators.http import require_GET, require_http_methods, require_POST
 from edx_ace import ace
 from edx_ace.recipient import Recipient
 from edx_django_utils import monitoring as monitoring_utils
@@ -41,14 +42,13 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from six import text_type
-from xmodule.modulestore.django import modulestore
-import track.views
-from course_modes.models import CourseMode
-from edx_ace import ace
-from edx_ace.recipient import Recipient
-from edxmako.shortcuts import render_to_response, render_to_string, marketing_link
-from entitlements.models import CourseEntitlement
 
+import track.views
+from bulk_email.models import Optout
+from course_modes.models import CourseMode
+from courseware.courses import get_courses, sort_by_announcement, sort_by_start_date
+from edxmako.shortcuts import marketing_link, render_to_response, render_to_string
+from entitlements.models import CourseEntitlement
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.catalog.utils import get_programs_with_type
 from openedx.core.djangoapps.embargo import api as embargo_api
@@ -60,18 +60,13 @@ from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.theming.helpers import get_current_site
 from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled
 from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
-from openedx.core.djangoapps.user_api.errors import UserNotFound, UserAPIInternalError
+from openedx.core.djangoapps.user_api.errors import UserAPIInternalError, UserNotFound
 from openedx.core.djangoapps.user_api.models import UserRetirementRequest
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
-
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.journals.api import get_journals_context
 from student.forms import AccountCreationForm, PasswordResetFormNoActive, get_registration_extension_form
-from student.helpers import (
-    DISABLE_UNENROLL_CERT_STATES,
-    cert_info,
-    generate_activation_email_context,
-)
+from student.helpers import DISABLE_UNENROLL_CERT_STATES, cert_info, generate_activation_email_context
 from student.message_types import EmailChange, EmailChangeConfirmation, PasswordReset, RecoveryEmailCreate
 from student.models import (
     AccountRecovery,
@@ -85,7 +80,7 @@ from student.models import (
     UserSignupSource,
     UserStanding,
     create_comments_service_user,
-    email_exists_or_retired,
+    email_exists_or_retired
 )
 from student.signals import REFUND_ORDER
 from student.tasks import send_activation_email
@@ -94,6 +89,7 @@ from util.bad_request_rate_limiter import BadRequestRateLimiter
 from util.db import outer_atomic
 from util.json_request import JsonResponse
 from util.password_policy_validators import normalize_password, validate_password
+from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger("edx.student")
 
@@ -389,7 +385,7 @@ def change_enrollment(request, check_access=True):
             return HttpResponse(redirect_url)
 
         if CourseEntitlement.check_for_existing_entitlement_and_enroll(user=user, course_run_key=course_id):
-            return HttpResponse(reverse('courseware', args=[unicode(course_id)]))
+            return HttpResponse(reverse('courseware', args=[six.text_type(course_id)]))
 
         # Check that auto enrollment is allowed for this course
         # (= the course is NOT behind a paywall)

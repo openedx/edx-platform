@@ -2,6 +2,8 @@
 Dashboard view and supporting methods
 """
 
+from __future__ import absolute_import
+
 import datetime
 import logging
 from collections import defaultdict
@@ -11,14 +13,14 @@ from completion.utilities import get_key_to_last_completed_course_block
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.urls import reverse
 from django.shortcuts import redirect
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from edx_django_utils import monitoring as monitoring_utils
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
-from six import text_type, iteritems
+from six import iteritems, text_type
 
 import track.views
 from bulk_email.models import BulkEmailFlag, Optout  # pylint: disable=import-error
@@ -27,6 +29,7 @@ from courseware.access import has_access
 from edxmako.shortcuts import render_to_response, render_to_string
 from entitlements.models import CourseEntitlement
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
+from lms.djangoapps.experiments.utils import get_dashboard_course_info, get_experiment_dashboard_metadata_context
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.catalog.utils import (
     get_programs,
@@ -37,16 +40,15 @@ from openedx.core.djangoapps.credit.email_utils import get_credit_provider_attri
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.utils import ProgramDataExtender, ProgramProgressMeter
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled_for_user
+from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
 from openedx.core.djangoapps.util.maintenance_banner import add_maintenance_banner
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
-from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled_for_user
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.enterprise_support.api import get_dashboard_consent_notification
-from lms.djangoapps.experiments.utils import get_experiment_dashboard_metadata_context, get_dashboard_course_info
 from openedx.features.journals.api import journals_enabled
 from shoppingcart.api import order_history
 from shoppingcart.models import CourseRegistrationCode, DonationConfiguration
-from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
 from student.helpers import cert_info, check_verify_status_by_course
 from student.models import (
     AccountRecovery,
@@ -471,7 +473,7 @@ def _credit_statuses(user, course_enrollments):
         for attribute in CourseEnrollmentAttribute.objects.filter(
             namespace="credit",
             name="provider_id",
-            enrollment__in=credit_enrollments.values()
+            enrollment__in=list(credit_enrollments.values())
         ).select_related("enrollment")
     }
 
@@ -705,7 +707,7 @@ def student_dashboard(request):
     bundles_on_dashboard_flag = WaffleFlag(experiments_namespace, u'bundles_on_dashboard')
 
     # TODO: Delete this code and the relevant HTML code after testing LEARNER-3072 is complete
-    if bundles_on_dashboard_flag.is_enabled() and inverted_programs and inverted_programs.items():
+    if bundles_on_dashboard_flag.is_enabled() and inverted_programs and list(inverted_programs.items()):
         if len(course_enrollments) < 4:
             for program in inverted_programs.values():
                 try:
