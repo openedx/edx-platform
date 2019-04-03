@@ -20,7 +20,11 @@ from lms.djangoapps.courseware.masquerade import (
 )
 from openedx.core.djangoapps.config_model_utils.models import StackedConfigurationModel
 from openedx.core.djangoapps.config_model_utils.utils import is_in_holdback
-from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID, CONTENT_TYPE_GATE_GROUP_IDS
+from openedx.features.content_type_gating.helpers import (
+    CONTENT_GATING_PARTITION_ID,
+    CONTENT_TYPE_GATE_GROUP_IDS,
+    correct_modes_for_fbe
+)
 from student.models import CourseEnrollment
 from student.role_helpers import has_staff_roles
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
@@ -138,6 +142,8 @@ class CourseDurationLimitConfig(StackedConfigurationModel):
         if enrollment is None or not_student_masquerade:
             return cls.enabled_for_course(course_key=course_key, target_datetime=timezone.now())
         else:
+            if not correct_modes_for_fbe(course_key, enrollment, user):
+                return False
             current_config = cls.current(course_key=enrollment.course_id)
             return current_config.enabled_as_of_datetime(target_datetime=enrollment.created)
 
@@ -156,6 +162,8 @@ class CourseDurationLimitConfig(StackedConfigurationModel):
             course_key: The CourseKey of the course being queried.
             target_datetime: The datetime to checked enablement as of. Defaults to the current date and time.
         """
+        if not correct_modes_for_fbe(course_key):
+            return False
 
         if target_datetime is None:
             target_datetime = timezone.now()

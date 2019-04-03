@@ -11,6 +11,7 @@ import ddt
 import mock
 
 from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
 from django_comment_client.tests.factories import RoleFactory
 from django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
@@ -53,8 +54,13 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         self.user = UserFactory()
         self.THREE_YEARS_AGO = now() - timedelta(days=(365 * 3))
 
-        # Make this a verified course so we can test expiration date
+        CourseModeFactory.create(course_id=self.course.id, mode_slug='audit')
         add_course_mode(self.course, upgrade_deadline_expired=False)
+        CourseDurationLimitConfig.objects.create(
+            enabled=True,
+            course=CourseOverview.get_from_id(self.course.id),
+            enabled_as_of=self.course.start,
+        )
 
     def tearDown(self):
         CourseEnrollment.unenroll(self.user, self.course.id)
@@ -108,9 +114,16 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         access_duration = timedelta(weeks=7)
         mock_get_course_run_details.return_value = {'weeks_to_complete': 7}
 
+        self.client.login(username=self.user.username, password='test')
+
         # Content availability date is enrollment date
         start_date = now() - timedelta(weeks=10)
         past_course = CourseFactory(start=start_date)
+        CourseDurationLimitConfig.objects.create(
+            enabled=True,
+            course=CourseOverview.get_from_id(past_course.id),
+            enabled_as_of=past_course.start,
+        )
         enrollment = CourseEnrollment.enroll(self.user, past_course.id, CourseMode.AUDIT)
         result = get_user_course_expiration_date(
             self.user,
@@ -118,6 +131,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         )
         self.assertEqual(result, None)
 
+        CourseModeFactory.create(course_id=past_course.id, mode_slug='audit')
         add_course_mode(past_course, upgrade_deadline_expired=False)
         result = get_user_course_expiration_date(
             self.user,
@@ -129,6 +143,11 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         # Content availability date is course start date
         start_date = now() + timedelta(weeks=10)
         future_course = CourseFactory(start=start_date)
+        CourseDurationLimitConfig.objects.create(
+            enabled=True,
+            course=CourseOverview.get_from_id(future_course.id),
+            enabled_as_of=past_course.start,
+        )
         enrollment = CourseEnrollment.enroll(self.user, future_course.id, CourseMode.AUDIT)
         result = get_user_course_expiration_date(
             self.user,
@@ -136,6 +155,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         )
         self.assertEqual(result, None)
 
+        CourseModeFactory.create(course_id=future_course.id, mode_slug='audit')
         add_course_mode(future_course, upgrade_deadline_expired=False)
         result = get_user_course_expiration_date(
             self.user,
@@ -154,7 +174,13 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
 
         start_date = now() - timedelta(weeks=10)
         course = CourseFactory(start=start_date)
+        CourseDurationLimitConfig.objects.create(
+            enabled=True,
+            course=CourseOverview.get_from_id(course.id),
+            enabled_as_of=course.start,
+        )
         enrollment = CourseEnrollment.enroll(self.user, course.id, CourseMode.AUDIT)
+        CourseModeFactory.create(course_id=course.id, mode_slug='audit')
         add_course_mode(course, upgrade_deadline_expired=True)
         result = get_user_course_expiration_date(
             self.user,
@@ -192,11 +218,6 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
             user=verified_student,
             course_id=self.course.id,
             mode='verified'
-        )
-        CourseDurationLimitConfig.objects.create(
-            enabled=True,
-            course=CourseOverview.get_from_id(self.course.id),
-            enabled_as_of=self.course.start,
         )
 
         instructor = UserFactory.create(username='instructor')
@@ -258,11 +279,6 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
             key=EXPERIMENT_DATA_HOLDBACK_KEY,
             value='True'
         )
-        CourseDurationLimitConfig.objects.create(
-            enabled=True,
-            course=CourseOverview.get_from_id(self.course.id),
-            enabled_as_of=self.course.start,
-        )
 
         instructor = UserFactory.create(username='instructor')
         CourseEnrollmentFactory.create(
@@ -294,11 +310,6 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         )
         enrollment.created = self.course.start
         enrollment.save()
-        CourseDurationLimitConfig.objects.create(
-            enabled=True,
-            course=CourseOverview.get_from_id(self.course.id),
-            enabled_as_of=self.course.start,
-        )
 
         instructor = UserFactory.create(username='instructor')
         CourseEnrollmentFactory.create(
@@ -310,7 +321,6 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         self.client.login(username=instructor.username, password='test')
 
         self.update_masquerade(username='audit')
-
         course_home_url = reverse('openedx.course_experience.course_home', args=[unicode(self.course.id)])
         response = self.client.get(course_home_url, follow=True)
         self.assertEqual(response.status_code, 200)
@@ -344,11 +354,6 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
             enrollment__mode=CourseMode.AUDIT,
             enrollment__course_id=self.course.id,
             enrollment__user=expired_staff
-        )
-        CourseDurationLimitConfig.objects.create(
-            enabled=True,
-            course=CourseOverview.get_from_id(self.course.id),
-            enabled_as_of=self.course.start,
         )
 
         staff_user = StaffFactory.create(password=TEST_PASSWORD, course_key=self.course.id)
@@ -392,12 +397,6 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
             enrollment__mode=CourseMode.AUDIT,
             enrollment__course_id=self.course.id,
             enrollment__user=expired_staff
-        )
-
-        CourseDurationLimitConfig.objects.create(
-            enabled=True,
-            course=CourseOverview.get_from_id(self.course.id),
-            enabled_as_of=self.course.start,
         )
 
         staff_user = StaffFactory.create(password=TEST_PASSWORD, course_key=self.course.id)

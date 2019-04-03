@@ -13,6 +13,7 @@ from django.utils.timezone import now
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import patch
 
+from course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.certificates.api import generate_user_certificates
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
@@ -266,6 +267,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
             course = CourseFactory.create(start=self.LAST_WEEK, mobile_available=True)
             self.enroll(course.id)
 
+        CourseModeFactory.create(course_id=course.id, mode_slug='audit')
         add_course_mode(course, upgrade_deadline_expired=False)
 
     def _get_enrollment_data(self, api_version, expired):

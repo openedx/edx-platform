@@ -19,6 +19,7 @@ from opaque_keys import InvalidKeyError
 
 from bulk_email.models import BulkEmailFlag
 from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
 from entitlements.tests.factories import CourseEntitlementFactory
 from milestones.tests.utils import MilestonesTestCaseMixin
 from opaque_keys.edx.keys import CourseKey
@@ -736,6 +737,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         self.override_waffle_switch(True)
 
         course = CourseFactory.create(start=self.THREE_YEARS_AGO)
+        CourseModeFactory.create(course_id=course.id, mode_slug='audit')
         add_course_mode(course, upgrade_deadline_expired=False)
         enrollment = CourseEnrollmentFactory.create(
             user=self.user,

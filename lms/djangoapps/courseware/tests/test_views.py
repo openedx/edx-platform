@@ -213,8 +213,8 @@ class IndexQueryTestCase(ModuleStoreTestCase):
     NUM_PROBLEMS = 20
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 10, 179),
-        (ModuleStoreEnum.Type.split, 4, 173),
+        (ModuleStoreEnum.Type.mongo, 10, 173),
+        (ModuleStoreEnum.Type.split, 4, 167),
     )
     @ddt.unpack
     def test_index_query_counts(self, store_type, expected_mongo_query_count, expected_mysql_query_count):
@@ -1465,8 +1465,8 @@ class ProgressPageTests(ProgressPageBaseTests):
                 self.assertContains(resp, u"Download Your Certificate")
 
     @ddt.data(
-        (True, 56),
-        (False, 55)
+        (True, 47),
+        (False, 46)
     )
     @ddt.unpack
     def test_progress_queries_paced_courses(self, self_paced, query_count):
@@ -1479,8 +1479,8 @@ class ProgressPageTests(ProgressPageBaseTests):
 
     @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
     @ddt.data(
-        (False, 64, 44),
-        (True, 55, 39)
+        (False, 55, 38),
+        (True, 46, 33)
     )
     @ddt.unpack
     def test_progress_queries(self, enable_waffle, initial, subsequent):
@@ -1698,6 +1698,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         user = UserFactory.create()
         self.assertTrue(self.client.login(username=user.username, password='test'))
+        CourseModeFactory.create(mode_slug=CourseMode.AUDIT, course_id=self.course.id)
         add_course_mode(self.course, upgrade_deadline_expired=False)
         CourseEnrollmentFactory(user=user, course_id=self.course.id, mode=course_mode)
 
@@ -2784,7 +2785,8 @@ class TestIndexViewWithCourseDurationLimits(ModuleStoreTestCase):
         """
         CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         self.assertTrue(self.client.login(username=self.user.username, password='test'))
-        add_course_mode(self.course, upgrade_deadline_expired=False)
+        CourseModeFactory.create(mode_slug=CourseMode.AUDIT, course_id=self.course.id)
+        CourseModeFactory.create(mode_slug=CourseMode.VERIFIED, course_id=self.course.id)
         response = self.client.get(
             reverse(
                 'courseware_section',

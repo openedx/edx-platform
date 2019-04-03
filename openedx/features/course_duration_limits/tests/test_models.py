@@ -12,6 +12,8 @@ import pytz
 
 from edx_django_utils.cache import RequestCache
 from opaque_keys.edx.locator import CourseLocator
+
+from course_modes.tests.factories import CourseModeFactory
 from openedx.core.djangoapps.config_model_utils.models import Provenance
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
@@ -31,6 +33,8 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
 
     def setUp(self):
         self.course_overview = CourseOverviewFactory.create()
+        CourseModeFactory.create(course_id=self.course_overview.id, mode_slug='audit')
+        CourseModeFactory.create(course_id=self.course_overview.id, mode_slug='verified')
         self.user = UserFactory.create()
         super(TestCourseDurationLimitConfig, self).setUp()
 
@@ -81,8 +85,8 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
             course_key = self.course_overview.id
 
         query_count = 7
-        if pass_enrollment and already_enrolled:
-            query_count = 6
+        if not pass_enrollment:
+            query_count = 8
 
         with self.assertNumQueries(query_count):
             enabled = CourseDurationLimitConfig.enabled_for_enrollment(

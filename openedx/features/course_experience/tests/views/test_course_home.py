@@ -213,7 +213,7 @@ class TestCourseHomePage(CourseHomePageTestCase):
 
         # Fetch the view and verify the query counts
         # TODO: decrease query count as part of REVO-28
-        with self.assertNumQueries(89, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
+        with self.assertNumQueries(84, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
             with check_mongo_calls(4):
                 url = course_home_url(self.course)
                 self.client.get(url)
@@ -686,6 +686,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
 
         # Verify that enrolled users are not shown any state warning message when enrolled and course has begun.
         CourseEnrollment.enroll(user, self.course.id)
+        self.client.login(username=user.username, password=self.TEST_PASSWORD)
         url = course_home_url(self.course)
         response = self.client.get(url)
         self.assertNotContains(response, TEST_COURSE_HOME_MESSAGE_ANONYMOUS)
@@ -702,6 +703,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
             enabled_as_of=datetime(2018, 1, 1)
         )
         config.save()
+        CourseMode.objects.create(course_id=self.course.id, mode_slug=CourseMode.AUDIT)
 
         url = course_home_url(self.course)
         response = self.client.get(url)
@@ -737,6 +739,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         config.save()
         url = course_home_url(self.course)
         CourseEnrollment.enroll(self.staff_user, self.course.id)
+        self.client.login(username=self.staff_user.username, password=self.TEST_PASSWORD)
         response = self.client.get(url)
         bannerText = get_expiration_banner_text(self.staff_user, self.course)
         self.assertNotContains(response, bannerText, html=True)
@@ -760,9 +763,12 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
             enabled_as_of=datetime(2018, 1, 1)
         )
         config.save()
+        CourseMode.objects.create(course_id=self.course.id, mode_slug=CourseMode.AUDIT)
+
         url = course_home_url(self.course)
         user = self.create_user_for_course(self.course, CourseUserType.UNENROLLED)
         CourseEnrollment.enroll(user, self.course.id)
+        self.client.login(username=user.username, password=TEST_PASSWORD)
 
         language = 'eo'
         DarkLangConfig(

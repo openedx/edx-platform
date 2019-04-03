@@ -95,7 +95,7 @@ class TestCourseGradeFactory(GradeTestBase):
                 [self.sequence.display_name, self.sequence2.display_name]
             )
 
-        with self.assertNumQueries(5), mock_get_score(1, 2):
+        with self.assertNumQueries(4), mock_get_score(1, 2):
             _assert_read(expected_pass=False, expected_percent=0)  # start off with grade of 0
 
         num_queries = 47
@@ -313,7 +313,7 @@ class TestGradeIteration(SharedModuleStoreTestCase):
             else mock_course_grade.return_value
             for student in self.students
         ]
-        with self.assertNumQueries(7):
+        with self.assertNumQueries(8):
             all_course_grades, all_errors = self._course_grades_and_errors_for(self.course, self.students)
         self.assertEqual(
             {student: text_type(all_errors[student]) for student in all_errors},
