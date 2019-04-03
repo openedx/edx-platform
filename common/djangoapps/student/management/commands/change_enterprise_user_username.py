@@ -8,7 +8,6 @@ import logging
 
 from django.contrib.auth.models import User
 from django.core.management import BaseCommand
-
 from enterprise.models import EnterpriseCustomerUser
 
 LOGGER = logging.getLogger(__name__)

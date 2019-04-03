@@ -2,6 +2,8 @@
 Management command to change many user enrollments in many courses using
 csv file.
 """
+from __future__ import absolute_import
+
 import csv
 import logging
 from os import path
