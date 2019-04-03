@@ -83,6 +83,13 @@ from django.conf import settings
           </a>
         </div>
     % endif
+    % if hasattr(user, 'hmm_profile') and user.hmm_profile.remaining_days > 0:
+        <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
+          <a class="${'active' if reverse('elitemba:hmm') in request.path else ''}tab-nav-link" href="${reverse('elitemba:hmm')}">
+            ${_("Harvard Learning Camp")}
+          </a>
+        </div>
+    % endif
   </div>
   <div class="secondary">
     % if should_display_shopping_cart_func() and not (course and static.is_request_in_themed_site()): # see shoppingcart.context_processor.user_has_cart_context_processor

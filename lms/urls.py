@@ -1070,3 +1070,9 @@ if settings.FEATURES.get('ENABLE_PROFESSORS'):
     urlpatterns += [
         url(r'', include('professors.urls')),
     ]
+
+if settings.HMM_CONFIGS:
+    urlpatterns += [
+        url(r'^elitemba/', include('elitemba.urls', namespace='elitemba')),
+    ]
+

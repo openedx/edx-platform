@@ -1326,6 +1326,8 @@ MIDDLEWARE_CLASSES = [
 
     'edx_rest_framework_extensions.auth.jwt.middleware.EnsureJWTAuthSettingsMiddleware',
 
+    'elitemba.middleware.ElitembaDataMiddleware',
+
     # This must be last
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
 ]
@@ -2325,6 +2327,8 @@ INSTALLED_APPS = [
 
     # edx-drf-extensions
     'csrf.apps.CsrfAppConfig',  # Enables frontend apps to retrieve CSRF tokens.
+
+    'elitemba'
 ]
 
 ######################### CSRF #########################################
@@ -3622,4 +3626,21 @@ ALIPAY_INFO = {
         "REFUND_URL": ""
     }
 }
+
+# elitemba
+import imp
+try:
+    imp.find_module('elitemba')
+    if True:
+        INSTALLED_APPS.append('elitemba')
+        MIDDLEWARE_CLASSES.append('elitemba.middleware.ElitembaDataMiddleware')
+        HMM_CONFIGS = ENV_FEATURES.get('HMM_CONFIGS', {
+            'HOST': 'https://openapi.myhbp.org.cn',
+            'APP_ID': '',
+            'SOURCE_ID': '',
+            'LHOST': 'https://myhbp.org.cn',
+        })
+except ImportError:
+    print "Error: missing package 'elitemba' is required"
+
 
