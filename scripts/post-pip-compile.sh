@@ -26,6 +26,7 @@ function clean_file {
     FILE_URL_REGEX="-e (file:///[^'$'\n'']*)/common/lib/symmath"
     echo "${FILE_CONTENT}" =~ ${FILE_URL_REGEX}
     if [[ "${FILE_CONTENT}" =~ ${FILE_URL_REGEX} ]]; then
+        echo "hitting this"
         BASE_FILE_URL=${BASH_REMATCH[1]}
         sed "s|$BASE_FILE_URL/||" ${FILE_PATH} > ${TEMP_FILE}
         mv ${TEMP_FILE} ${FILE_PATH}
