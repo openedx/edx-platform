@@ -25,7 +25,7 @@ import provider.constants
 
 from oauth2_provider import models as dot_models  # django-oauth-toolkit
 from oauth2_provider import views as dot_views
-from oauth2_provider import oauth2_validators
+
 from ratelimit import ALL
 from ratelimit.mixins import RatelimitMixin
 
@@ -177,28 +177,7 @@ class _DispatchingView(View):
             return request.POST.get('client_id')
 
 
-class NewOAuth2Validator(oauth2_validators.OAuth2Validator):
-    def validate_user(self, username, password, client, request, *args, **kwargs):
-        """
-        Check username/phone number and password correspond to a valid and active User
-        """
-        try:
-            user_obj = User.objects.get(username=username)
-            user = authenticate(username=user_obj.username, password=password)
-        except User.DoesNotExist:
-            try:
-                user_obj = UserProfile.objects.get(phone=username).user
-                user = authenticate(username=user_obj.username, password=password)
-            except ObjectDoesNotExist:
-                user = None
-        if user is not None and user.is_active:
-            request.user = user
-            return True
-        return False
-
-
 class NewTokenView(dot_views.TokenView):
-    validator_class = NewOAuth2Validator
 
     @classmethod
     def get_server(cls):

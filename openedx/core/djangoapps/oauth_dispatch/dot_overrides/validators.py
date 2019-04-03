@@ -8,10 +8,13 @@ from datetime import datetime, timedelta
 from django.contrib.auth import authenticate, get_user_model
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
+from django.core.exceptions import ObjectDoesNotExist
 from oauth2_provider.models import AccessToken
 from oauth2_provider.oauth2_validators import OAuth2Validator
 from oauth2_provider.scopes import get_scopes_backend
 from pytz import utc
+
+from student.models import UserProfile
 
 from ..models import RestrictedApplication
 
@@ -54,11 +57,15 @@ class EdxOAuth2Validator(OAuth2Validator):
         if authenticated_user is None:
             UserModel = get_user_model()  # pylint: disable=invalid-name
             try:
-                email_user = UserModel.objects.get(email=username)
+                email_phone_user = UserModel.objects.get(email=username)
+                authenticated_user = authenticate(username=email_phone_user.username, password=password)
             except UserModel.DoesNotExist:
-                authenticated_user = None
-            else:
-                authenticated_user = authenticate(username=email_user.username, password=password)
+                try:
+                    email_phone_user = UserProfile.objects.get(phone=username).user
+                    authenticated_user = authenticate(username=email_phone_user.username, password=password)
+                except ObjectDoesNotExist:
+                    authenticated_user = None
+
         return authenticated_user
 
     def save_bearer_token(self, token, request, *args, **kwargs):
