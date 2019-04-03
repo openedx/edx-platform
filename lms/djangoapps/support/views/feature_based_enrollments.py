@@ -46,12 +46,17 @@ class FeatureBasedEnrollmentsSupportView(View):
             course = CourseOverview.objects.values('display_name').get(id=key)
             duration_config = CourseDurationLimitConfig.current(course_key=key)
             gating_config = ContentTypeGatingConfig.current(course_key=key)
-            misconfigured = duration_config.enabled != gating_config.enabled
+            partially_enabled = duration_config.enabled != gating_config.enabled
 
-            if misconfigured:
-                enabled = 'Partial'
-                enabled_as_of = 'Misconfigured'
-                reason = 'Misconfiguration'
+            if partially_enabled:
+                if duration_config.enabled:
+                    enabled = 'Course Duration Limits Only'
+                    enabled_as_of = str(duration_config.enabled_as_of) if duration_config.enabled_as_of else 'N/A'
+                    reason = 'Course duration limits are enabled for this course, but content type gating is disabled.'
+                elif gating_config.enabled:
+                    enabled = 'Content Type Gating Only'
+                    enabled_as_of = str(gating_config.enabled_as_of) if gating_config.enabled_as_of else 'N/A'
+                    reason = 'Content type gating is enabled for this course, but course duration limits are disabled.'
             else:
                 enabled = duration_config.enabled or False
                 enabled_as_of = str(duration_config.enabled_as_of) if duration_config.enabled_as_of else 'N/A'
