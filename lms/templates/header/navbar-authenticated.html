@@ -83,7 +83,7 @@ from django.conf import settings
           </a>
         </div>
     % endif
-    % if hasattr(user, 'hmm_profile') and user.hmm_profile.remaining_days > 0:
+    % if settings.HMM_ENABLED and hasattr(user, 'hmm_profile') and user.hmm_profile.remaining_days > 0:
         <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
           <a class="${'active' if reverse('elitemba:hmm') in request.path else ''}tab-nav-link" href="${reverse('elitemba:hmm')}">
             ${_("Harvard Learning Camp")}
