@@ -1437,3 +1437,6 @@ RECALCULATE_SOCIAL_ENGAGEMENT_ROUTING_KEY = LOW_PRIORITY_QUEUE
 
 ############## Settings for CourseGraph ############################
 COURSEGRAPH_JOB_QUEUE = LOW_PRIORITY_QUEUE
+
+# Max no. of bad requests after which ratelimitier backend will block IP's access
+RATE_LIMIT_BACKEND_MAX_REQUESTS = 30

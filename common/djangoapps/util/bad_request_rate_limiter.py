@@ -2,6 +2,8 @@
 A utility class which wraps the RateLimitMixin 3rd party class to do bad request counting
 which can be used for rate limiting
 """
+from django.conf import settings
+
 from ratelimitbackend.backends import RateLimitMixin
 
 
@@ -9,6 +11,8 @@ class BadRequestRateLimiter(RateLimitMixin):
     """
     Use the 3rd party RateLimitMixin to help do rate limiting on the Password Reset flows
     """
+    # get max number value from settings instead of using default one
+    requests = settings.RATE_LIMIT_BACKEND_MAX_REQUESTS
 
     def is_rate_limit_exceeded(self, request):
         """

@@ -3393,3 +3393,6 @@ COMPLETION_AGGREGATOR_BLOCK_TYPES = {
 ############### Settings for user-state-client ##################
 # Maximum number of rows to fetch in XBlockUserStateClient calls. Adjust for performance
 USER_STATE_BATCH_SIZE = 5000
+
+# Max no. of bad requests after which ratelimitier backend will block IP's access
+RATE_LIMIT_BACKEND_MAX_REQUESTS = 30
