@@ -21,12 +21,8 @@ function clean_file {
     # Workaround for https://github.com/jazzband/pip-tools/issues/204 -
     # change absolute paths for local editable packages back to relative ones
     FILE_CONTENT=$(<${FILE_PATH})
-    echo "file content: "
-    echo $FILE_CONTENT
-    FILE_URL_REGEX="-e (file:///[^'$'\n'']*)/common/lib/symmath"
-    echo "${FILE_CONTENT}" =~ ${FILE_URL_REGEX}
+    FILE_URL_REGEX="-e (file:///[^"$'\n'"]*)/common/lib/symmath"
     if [[ "${FILE_CONTENT}" =~ ${FILE_URL_REGEX} ]]; then
-        echo "hitting this"
         BASE_FILE_URL=${BASH_REMATCH[1]}
         sed "s|$BASE_FILE_URL/||" ${FILE_PATH} > ${TEMP_FILE}
         mv ${TEMP_FILE} ${FILE_PATH}
