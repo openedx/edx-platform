@@ -165,7 +165,9 @@ function getPopupLaunchFailedMessage() {
   const baseHTML = '<div style="background-color:rgb(250,250,250); width: 100%; height: 100%; display: table;"> <p style="font-family: \'Open Sans\', Arial, sans-serif; font-size: 14px; color: #000000; padding-top: 54px;">' + firstMessageText + ' <br>' + secondMessageText + '</p> <br><br> '
 
   if (parent.$("body").hasClass("new-theme")) {
-    const newUIStyle = '.new-theme.button {\nfont-weight: 600;\nfont-size: 12px;\nheight: 40px;\nborder-radius: 2px;\ntext-transform: uppercase;\nline-height: 1.83;\nletter-spacing: 0.5px;\ntext-align: center;\npadding: 0 20px;\nbackground-color: #1c3bce;\nborder: 1px solid #1c3bce;\ntransition: .35s;\ncolor: white;cursor:pointer\n}\n.button:hover {\nbackground: #0b0886;\ncolor: white;\n}\n}'
+    const primaryColor = parent.getComputedStyle(parent.document.body).getPropertyValue('--primary');
+    var background_color =  primaryColor ? primaryColor : '#1c3bce';
+    const newUIStyle = '.new-theme.button {\nfont-weight: 600;\nfont-size: 12px;\nheight: 40px;\nborder-radius: 2px;\ntext-transform: uppercase;\nline-height: 1.83;\nletter-spacing: 0.5px;\ntext-align: center;\npadding: 0 20px;\nbackground-color:' + background_color + ';\nborder: 1px solid ' + background_color + ';\ntransition: .35s;\ncolor: white;cursor:pointer\n}\n.button:hover {\nbox-shadow:  inset 0 0 0 3em rgba(0,0,0,0.2);\ncolor: white;\n}\n}';
     return '<head><style>' + newUIStyle + '</style></head><body>'+ baseHTML + '<button onclick="parent.ssla.ssla.popupManually();" style="" class="new-theme button">' + buttonTitle + '</button></div></body>';
   }
   else {
