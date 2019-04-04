@@ -52,7 +52,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-01-15 19:13+0800\n"
+"POT-Creation-Date: 2019-04-04 10:09+0800\n"
 "PO-Revision-Date: 2018-12-07 12:23+0000\n"
 "Last-Translator: li ying <code@eliteu.cn>, 2019\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)\n"
@@ -4522,6 +4522,11 @@ msgstr "电子邮件地址（登录）"
 msgid ""
 "You receive messages from {platform_name} and course teams at this address."
 msgstr "此邮箱地址用于接收来自{platform_name}和课程团队的信息。"
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid ""
+"You have joined Harvard Learning Camp. Email Modification is not supported."
+msgstr "您参加了“哈佛学习营”，暂不支持修改邮箱。"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
