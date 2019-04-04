@@ -1,12 +1,14 @@
 """
 Unit tests for user_management management commands.
 """
+from __future__ import absolute_import
+
 import sys
 
 import ddt
 from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
-from django.core.management import call_command, CommandError
+from django.core.management import CommandError, call_command
 from django.test import TestCase
 
 TEST_EMAIL = 'test@example.com'
@@ -48,7 +50,7 @@ class TestManageGroupCommand(TestCase):
         Checks that the current state of the database matches the specified groups and
         permissions.
         """
-        self.check_groups(group_permissions.keys())
+        self.check_groups(list(group_permissions.keys()))
         for group_name, permission_codenames in group_permissions.items():
             self.check_permissions(group_name, permission_codenames)
 
