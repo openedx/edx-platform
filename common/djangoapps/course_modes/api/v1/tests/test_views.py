@@ -51,6 +51,12 @@ class CourseModesViewTestBase(AuthAndScopesTestMixin):
 
     @classmethod
     def tearDownClass(cls):
+        cls.course.delete()
+        cls.audit_mode.delete()
+        cls.verified_mode.delete()
+
+    @classmethod
+    def tearDownClass(cls):
         cls.audit_mode.delete()
         cls.verified_mode.delete()
 
@@ -285,7 +291,7 @@ class TestCourseModesDetailViews(CourseModesViewTestBase, APITestCase):
         assert status.HTTP_404_NOT_FOUND == response.status_code
 
     def test_update_course_mode_happy_path(self):
-        _ = CourseModeFactory.create(
+        new_mode = CourseModeFactory.create(
             course_id=self.course_key,
             mode_slug='prof-ed',
             mode_display_name='Professional Education',
@@ -309,6 +315,7 @@ class TestCourseModesDetailViews(CourseModesViewTestBase, APITestCase):
         assert 222 == updated_mode.min_price
         assert 'Something Else' == updated_mode.mode_display_name
         assert 'jpy' == updated_mode.currency
+        self.addCleanup(lambda mode: mode.delete(), new_mode)
 
     def test_update_course_mode_fails_when_updating_static_fields(self):
         self.client.login(username=self.global_staff.username, password=self.user_password)
@@ -353,7 +360,7 @@ class TestCourseModesDetailViews(CourseModesViewTestBase, APITestCase):
         assert status.HTTP_404_NOT_FOUND == response.status_code
 
     def test_delete_course_mode_happy_path(self):
-        _ = CourseModeFactory.create(
+        new_mode = CourseModeFactory.create(
             course_id=self.course_key,
             mode_slug='bachelors',
             mode_display_name='Bachelors',
@@ -366,3 +373,4 @@ class TestCourseModesDetailViews(CourseModesViewTestBase, APITestCase):
 
         assert status.HTTP_204_NO_CONTENT == response.status_code
         assert 0 == CourseMode.objects.filter(course_id=self.course_key, mode_slug='bachelors').count()
+        self.addCleanup(lambda mode: mode.delete(), new_mode)
