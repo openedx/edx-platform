@@ -10688,6 +10688,23 @@ msgstr ""
 msgid "System maintenance in progress. Please try again later."
 msgstr ""
 
+#: openedx/core/djangoapps/user_api/elite_password_reset.py
+#, python-brace-format
+msgid "Request parameter {key} missing!"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/elite_password_reset.py
+msgid "New passwords do not match. Please try again."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/elite_password_reset.py
+msgid "Password modified."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/elite_password_reset.py
+msgid "Wrong password"
+msgstr ""
+
 #: openedx/core/djangoapps/user_api/preferences/api.py
 #, python-brace-format
 msgid "Delete failed for user preference '{preference_key}'."
@@ -16209,6 +16226,11 @@ msgstr ""
 msgid "Show notes"
 msgstr ""
 
+#: lms/templates/elitemba/hmm.html
+#: lms/templates/header/navbar-authenticated.html
+msgid "Harvard Learning Camp"
+msgstr ""
+
 #: lms/templates/emails/activation_email.txt
 msgid ""
 "You're almost there! Use the link to activate your account to access "
@@ -16814,6 +16836,10 @@ msgstr ""
 #: lms/templates/header/navbar-authenticated.html
 #: lms/templates/header/navbar-not-authenticated.html
 msgid "Professor"
+msgstr ""
+
+#: lms/templates/header/navbar-authenticated.html
+msgid "Date of Expiry: "
 msgstr ""
 
 #: lms/templates/header/navbar-authenticated.html
@@ -25811,7 +25837,7 @@ msgid "Encounter a problem？"
 msgstr ""
 
 #: membership/templates/membership/index.html
-msgid "Prestige EMBA courses in America"
+msgid "Membership of Prestige EMBA Courses in America"
 msgstr ""
 
 #: membership/templates/membership/index.html

@@ -10,6 +10,7 @@ from django.utils.translation import ugettext as _
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 from openedx.core.djangolib.markup import HTML
 from webpack_loader.templatetags.webpack_loader import render_bundle
+
 %>
 
 <%inherit file="/main.html" />
@@ -38,6 +39,7 @@ from webpack_loader.templatetags.webpack_loader import render_bundle
         platformName = '${ static.get_platform_name() | n, js_escaped_string }',
         contactEmail = '${ static.get_contact_email_address() | n, js_escaped_string }',
         allowEmailChange = ${ bool(settings.FEATURES['ALLOW_EMAIL_ADDRESS_CHANGE']) | n, dump_js_escaped_json },
+        hmmInEffect = ${ hasattr(user, 'hmm_profile') and user.hmm_profile.remaining_days > 0 | n, dump_js_escaped_json },
         socialPlatforms = ${ settings.SOCIAL_PLATFORMS | n, dump_js_escaped_json },
 
         syncLearnerProfileData = ${ bool(sync_learner_profile_data) | n, dump_js_escaped_json },
@@ -59,6 +61,7 @@ from webpack_loader.templatetags.webpack_loader import render_bundle
         platformName,
         contactEmail,
         allowEmailChange,
+        hmmInEffect,
         socialPlatforms,
 
         syncLearnerProfileData,

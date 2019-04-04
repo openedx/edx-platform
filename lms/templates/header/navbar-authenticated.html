@@ -84,11 +84,25 @@ from django.conf import settings
         </div>
     % endif
     % if settings.HMM_ENABLED and hasattr(user, 'hmm_profile') and user.hmm_profile.remaining_days > 0:
-        <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
-          <a class="${'active' if reverse('elitemba:hmm') in request.path else ''}tab-nav-link" href="${reverse('elitemba:hmm')}">
-            ${_("Harvard Learning Camp")}
-          </a>
-        </div>
+         <script>
+            // 哈商
+            var hmm_url = '${reverse('elitemba:hmm')}';
+            var hmm_expiry_date = '${user.hmm_profile.expiry_date}';
+            if (hmm_url && hmm_expiry_date) {
+                var style = document.createElement('style');
+                var css = ".nav-tab-harvard .tab-nav-link{text-align:center;position:relative;top:-9px}.nav-tab-harvard .tab-nav-link span{display:block}.nav-tab-harvard .tab-nav-link span:last-child{font-size:12px;color:#999}@media screen and (max-width:992px){.nav-tab-harvard:hover .tab-nav-link span:last-child{color:#fff}.nav-tab-harvard .tab-nav-link{text-align:left;position:static}.nav-tab-harvard .tab-nav-link span{display:inline-block}.nav-tab-harvard .tab-nav-link span:last-child{float:right;font-size:14px}}";
+                if(style.styleSheet){
+                    style.styleSheet.cssText = css;
+                }else{
+                    style.appendChild(document.createTextNode(css));
+                }
+                document.getElementsByTagName('head')[0].appendChild(style);
+
+                var inline_style = "${'active' if reverse('professor_index') in request.path else ''}";
+                var a = '<div class="' + inline_style + ' mobile-nav-item hidden-mobile nav-item nav-tab nav-tab-harvard"><a class="tab-nav-link" href="' + hmm_url + '"><span>${_("Harvard Learning Camp")}</span><span>${_("Date of Expiry: ")}' + hmm_expiry_date + '</span></a></div>'
+                $('.global-header .main').append(a);
+            }
+        </script>
     % endif
   </div>
   <div class="secondary">
