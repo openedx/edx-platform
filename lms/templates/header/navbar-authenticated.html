@@ -86,7 +86,7 @@ from django.conf import settings
     % if settings.HMM_ENABLED and hasattr(user, 'hmm_profile') and user.hmm_profile.remaining_days > 0:
          <script>
             // 哈商
-            var hmm_url = '${reverse('elitemba:hmm')}';
+            var hmm_url = '${reverse('elitemba:hmm_entry') + '?safari_return=' + reverse('elitemba:hmm')}';
             var hmm_expiry_date = '${user.hmm_profile.expiry_date}';
             if (hmm_url && hmm_expiry_date) {
                 var style = document.createElement('style');
