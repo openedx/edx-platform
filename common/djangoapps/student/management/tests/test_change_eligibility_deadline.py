@@ -1,18 +1,20 @@
 """ Test the change_eligibility_deadline command line script."""
 
+from __future__ import absolute_import
+
 from datetime import datetime, timedelta
 
-from course_modes.tests.factories import CourseMode
 from django.core.management import call_command
 from opaque_keys import InvalidKeyError
 from six import text_type
+from testfixtures import LogCapture
+
+from course_modes.tests.factories import CourseMode
+from openedx.core.djangoapps.credit.models import CreditCourse, CreditEligibility
 from student.models import CourseEnrollment, User
 from student.tests.factories import UserFactory
-from testfixtures import LogCapture
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-
-from openedx.core.djangoapps.credit.models import CreditCourse, CreditEligibility
 
 LOGGER_NAME = 'student.management.commands.change_eligibility_deadline'
 command_args = '--username {username} --course {course} --date {date}'
