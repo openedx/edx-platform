@@ -8,6 +8,7 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 
 import third_party_auth
+from edx_django_utils.cache import TieredCache
 from third_party_auth import pipeline
 from enterprise.models import EnterpriseCustomerUser
 
@@ -38,6 +39,22 @@ def get_cache_key(**kwargs):
     key = '__'.join(['{}:{}'.format(item, value) for item, value in six.iteritems(kwargs)])
 
     return hashlib.md5(key).hexdigest()
+
+
+def get_data_consent_share_cache_key(user_id, course_id):
+    """
+        Returns cache key for data sharing consent needed against user_id and course_id
+    """
+
+    return get_cache_key(type='data_sharing_consent_needed', user_id=user_id, course_id=course_id)
+
+
+def clear_data_consent_share_cache(user_id, course_id):
+    """
+        clears data_sharing_consent_needed cache
+    """
+    consent_cache_key = get_data_consent_share_cache_key(user_id, course_id)
+    TieredCache.delete_all_tiers(consent_cache_key)
 
 
 def update_logistration_context_for_enterprise(request, context, enterprise_customer):
