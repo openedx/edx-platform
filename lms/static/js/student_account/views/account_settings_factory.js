@@ -21,6 +21,7 @@
             platformName,
             contactEmail,
             allowEmailChange,
+            hmmInEffect,
             socialPlatforms,
             syncLearnerProfileData,
             enterpriseName,
@@ -73,7 +74,10 @@
                 ),
                 persistChanges: true
             };
-            if (!allowEmailChange || (syncLearnerProfileData && enterpriseReadonlyAccountFields.fields.indexOf('email') !== -1)) {  // eslint-disable-line max-len
+            if (hmmInEffect) {
+                emailFieldData.helpMessage = gettext('You have joined Harvard Learning Camp. Email Modification is not supported.');
+            }
+            if (!allowEmailChange || hmmInEffect || (syncLearnerProfileData && enterpriseReadonlyAccountFields.fields.indexOf('email') !== -1)) {  // eslint-disable-line max-len
                 emailFieldView = {
                     view: new AccountSettingsFieldViews.ReadonlyFieldView(emailFieldData)
                 };

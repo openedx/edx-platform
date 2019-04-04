@@ -71,10 +71,10 @@ BAIDU_BRIDGE_URL = ENV_TOKENS.get('BAIDU_BRIDGE_URL', '')
 
 # elitemba
 import imp
+HMM_ENABLED = ENV_FEATURES.get('HMM_ENABLED', False)
 try:
-    imp.find_module('elitemba')
-    HMM_ENABLED = ENV_FEATURES.get('HMM_ENABLED', False)
     if HMM_ENABLED:
+        fp, elitemba_path, desc = imp.find_module('elitemba')
         INSTALLED_APPS.append('elitemba')
         MIDDLEWARE_CLASSES.append('elitemba.middleware.ElitembaDataMiddleware')
         HMM_CONFIGS = ENV_FEATURES.get('HMM_CONFIGS', {
@@ -84,5 +84,6 @@ try:
             'LHOST': 'https://myhbp.org.cn',
         })
 except ImportError:
-    print "Error: missing package 'elitemba' is required"
+    HMM_ENABLED = False
+    print "Warnning: missing package 'elitemba'"
 
