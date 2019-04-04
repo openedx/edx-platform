@@ -82,7 +82,7 @@
   } 
   
   .mobile-menu{ 
-    margin-top: 21px;
+    margin-top: 0;
     .mobile-nav-link{  
       outline: none;
       a{  
@@ -92,6 +92,9 @@
         &:hover{  
           background-color:$primary;
           color: #fff !important;
+        }
+        &::after{
+          content: '';
         }
       }
     }
