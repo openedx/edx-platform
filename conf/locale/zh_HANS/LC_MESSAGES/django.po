@@ -24931,7 +24931,7 @@ msgstr "感谢您注册{studio_name}！要激活您的账号，请复制并粘�
 
 #: cms/templates/emails/activation_email.txt
 msgid "Initial password:{third_party_auth_pw}"
-msgstr "初始密码:{third_party_auth_pw}"
+msgstr "初始密码：{third_party_auth_pw}"
 
 #: cms/templates/emails/activation_email.txt
 msgid ""
