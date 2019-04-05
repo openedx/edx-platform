@@ -1,6 +1,8 @@
 """
 Provides a UserPartition driver for cohorts.
 """
+from __future__ import absolute_import
+
 import logging
 
 from courseware.masquerade import (
@@ -11,7 +13,6 @@ from courseware.masquerade import (
 from xmodule.partitions.partitions import NoSuchUserPartitionGroupError
 
 from .cohorts import get_cohort, get_group_info_for_cohort
-
 
 log = logging.getLogger(__name__)
 

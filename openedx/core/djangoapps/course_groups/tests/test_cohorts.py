@@ -2,17 +2,19 @@
 Tests for cohorts
 """
 # pylint: disable=no-member
-import ddt
-from mock import call, patch
+from __future__ import absolute_import
 
 import before_after
-from django.contrib.auth.models import User, AnonymousUser
+import ddt
+from django.contrib.auth.models import AnonymousUser, User
 from django.db import IntegrityError
 from django.http import Http404
 from django.test import TestCase
+from mock import call, patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 from six import text_type
+from six.moves import range
 
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
@@ -21,10 +23,7 @@ from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, 
 from xmodule.modulestore.tests.factories import ToyCourseFactory
 
 from .. import cohorts
-from ..models import (
-    CourseCohort, CourseUserGroup, CourseUserGroupPartitionGroup,
-    UnregisteredLearnerCohortAssignments
-)
+from ..models import CourseCohort, CourseUserGroup, CourseUserGroupPartitionGroup, UnregisteredLearnerCohortAssignments
 from ..tests.helpers import CohortFactory, CourseCohortFactory, config_course_cohorts, config_course_cohorts_legacy
 
 

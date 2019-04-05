@@ -1,9 +1,10 @@
 """
 Cohorts API serializers.
 """
-from rest_framework import serializers
+from __future__ import absolute_import
 
 from django.contrib.auth.models import User
+from rest_framework import serializers
 
 
 class CohortUsersAPISerializer(serializers.ModelSerializer):

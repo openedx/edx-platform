@@ -1,6 +1,8 @@
 """
 course_groups API
 """
+from __future__ import absolute_import
+
 from django.contrib.auth.models import User
 
 from openedx.core.djangoapps.course_groups.models import CohortMembership
