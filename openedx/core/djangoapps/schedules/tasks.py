@@ -2,8 +2,9 @@ from __future__ import absolute_import
 
 import datetime
 import logging
-
 import six
+from six.moves import range
+
 from celery import task
 from celery_utils.logged_task import LoggedTask
 from celery_utils.persist_on_failure import LoggedPersistOnFailureTask
@@ -18,7 +19,6 @@ from edx_ace.utils.date import deserialize, serialize
 from edx_django_utils.monitoring import set_custom_metric
 from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
-from six.moves import range
 
 from openedx.core.djangoapps.schedules import message_types, resolvers
 from openedx.core.djangoapps.schedules.models import Schedule, ScheduleConfig
