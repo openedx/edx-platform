@@ -14,13 +14,21 @@ else
     XDIST_GIT_FETCH_STRING="$XDIST_GIT_BRANCH:$XDIST_GIT_BRANCH"
 fi
 
+# we use tox to install various versions of django, so do not pre-install a fixed version
+# of django during container set up when invoking tests via tox
+if [ -n "$TOXENV" ]; then
+    PIP_COMMAND='pip install -qr requirements/edx/testing.txt'
+else
+    PIP_COMMAND='pip install -qr requirements/edx/testing.txt -r requirements/django.txt'
+fi
+
 ip_list=$(<pytest_task_ips.txt)
 for ip in $(echo $ip_list | sed "s/,/ /g")
 do
     container_reqs_cmd="ssh -o StrictHostKeyChecking=no ubuntu@$ip 'cd /edx/app/edxapp;
     git clone --branch master --depth 1 --no-tags -q https://github.com/edx/edx-platform.git; cd edx-platform;
     git fetch --depth=1 --no-tags -q origin ${XDIST_GIT_FETCH_STRING}; git checkout -q ${XDIST_GIT_BRANCH};
-    source /edx/app/edxapp/edxapp_env; pip install -qr requirements/edx/testing.txt; mkdir reports' & "
+    source /edx/app/edxapp/edxapp_env; ${PIP_COMMAND}; mkdir reports' & "
 
     cmd=$cmd$container_reqs_cmd
 done
