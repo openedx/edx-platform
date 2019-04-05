@@ -40,7 +40,6 @@ class CourseModesMixin(object):
     serializer_class = CourseModeSerializer
     pagination_class = None
     lookup_field = 'course_id'
-    queryset = CourseMode.objects.all()
 
 
 class CourseModesView(CourseModesMixin, ListCreateAPIView):
@@ -87,7 +86,12 @@ class CourseModesView(CourseModesMixin, ListCreateAPIView):
 
         POST: If the request is successful, an HTTP 201 "Created" response is returned.
     """
-    pass
+    def get_queryset(self):
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+        filter_kwargs = {self.lookup_field: self.kwargs[lookup_url_kwarg]}
+        if 'course_id' in filter_kwargs:
+            filter_kwargs['course_id'] = CourseKey.from_string(filter_kwargs['course_id'])
+        return CourseMode.objects.filter(**filter_kwargs)
 
 
 class CourseModesDetailView(CourseModesMixin, RetrieveUpdateDestroyAPIView):
@@ -145,6 +149,7 @@ class CourseModesDetailView(CourseModesMixin, RetrieveUpdateDestroyAPIView):
     http_method_names = ['get', 'patch', 'delete', 'head', 'options']
     parser_classes = (MergePatchParser,)
     multiple_lookup_fields = ('course_id', 'mode_slug')
+    queryset = CourseMode.objects.all()
 
     def get_object(self):
         queryset = self.get_queryset()
@@ -152,7 +157,8 @@ class CourseModesDetailView(CourseModesMixin, RetrieveUpdateDestroyAPIView):
         for field in self.multiple_lookup_fields:
             query_filter[field] = self.kwargs[field]
 
-        query_filter['course_id'] = CourseKey.from_string(query_filter['course_id'])
+        if 'course_id' in query_filter:
+            query_filter['course_id'] = CourseKey.from_string(query_filter['course_id'])
 
         obj = get_object_or_404(queryset, **query_filter)
         self.check_object_permissions(self.request, obj)
