@@ -48,17 +48,23 @@ class CourseModesViewTestBase(AuthAndScopesTestMixin):
             mode_display_name='Verified',
             min_price=25,
         )
+        # use these to make sure we don't fetch data for other courses
+        cls.other_course_key = CourseKey.from_string('course-v1:edX+DemoX+Other_Course')
+        cls.other_course = CourseOverviewFactory.create(id=cls.other_course_key)
+        cls.other_mode = CourseModeFactory.create(
+            course_id=cls.other_course_key,
+            mode_slug='other-audit',
+            mode_display_name='Other Audit',
+            min_price=0,
+        )
 
     @classmethod
     def tearDownClass(cls):
         cls.course.delete()
         cls.audit_mode.delete()
         cls.verified_mode.delete()
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.audit_mode.delete()
-        cls.verified_mode.delete()
+        cls.other_course.delete()
+        cls.other_mode.delete()
 
     def setUp(self):
         super(CourseModesViewTestBase, self).setUp()
@@ -73,7 +79,6 @@ class CourseModesViewTestBase(AuthAndScopesTestMixin):
         """
         Required method to implement AuthAndScopesTestMixin.
         """
-        # TODO
         pass
 
     @ddt.data(*product(JWT_AUTH_TYPES, (True, False)))
@@ -125,10 +130,7 @@ class TestCourseModesListViews(CourseModesViewTestBase, APITestCase):
         response = self.client.get(url)
 
         assert status.HTTP_200_OK == response.status_code
-        actual_results = sorted(
-            [dict(item) for item in response.data],
-            key=lambda item: item['mode_slug'],
-        )
+        actual_results = self._sorted_results(response)
         expected_results = [
             {
                 'course_id': text_type(self.course_key),
@@ -156,6 +158,36 @@ class TestCourseModesListViews(CourseModesViewTestBase, APITestCase):
             },
         ]
         assert expected_results == actual_results
+
+        # Now test the "other" course
+        url = self.get_url(course_id=self.other_course_key)
+
+        other_response = self.client.get(url)
+
+        assert status.HTTP_200_OK == other_response.status_code
+        other_actual_results = self._sorted_results(other_response)
+        other_expected_results = [
+            {
+                'course_id': text_type(self.other_course_key),
+                'mode_slug': 'other-audit',
+                'mode_display_name': 'Other Audit',
+                'min_price': 0,
+                'currency': 'usd',
+                'expiration_datetime': None,
+                'expiration_datetime_is_explicit': False,
+                'description': None,
+                'sku': None,
+                'bulk_sku': None,
+            },
+        ]
+        assert other_expected_results == other_actual_results
+
+    @staticmethod
+    def _sorted_results(response):
+        return sorted(
+            [dict(item) for item in response.data],
+            key=lambda item: item['mode_slug'],
+        )
 
     def test_post_course_mode_forbidden(self):
         self.client.login(username=self.other_student.username, password=self.user_password)
