@@ -1,6 +1,9 @@
 # pylint: disable=missing-docstring
 from __future__ import unicode_literals
 
+import itertools
+
+import ddt
 from mock import MagicMock, patch
 import six
 from django.conf import settings
@@ -17,6 +20,7 @@ from student.models import CourseEnrollment
 from student.tests.factories import UserFactory, AnonymousUserFactory
 
 
+@ddt.ddt
 class CookieTests(TestCase):
     def setUp(self):
         super(CookieTests, self).setUp()
@@ -117,16 +121,20 @@ class CookieTests(TestCase):
         self._assert_consistent_expires(response)
         self._assert_recreate_jwt_from_cookies(response, can_recreate=True)
 
-    @patch.dict("django.conf.settings.FEATURES", {"DISABLE_SET_JWT_COOKIES_FOR_TESTS": False})
-    def test_delete_and_are_logged_in_cookies_set(self):
-        setup_login_oauth_client()
-        response = cookies_api.set_logged_in_cookies(self.request, HttpResponse(), self.user)
-        self._copy_cookies_to_request(response, self.request)
-        self.assertTrue(cookies_api.are_logged_in_cookies_set(self.request))
+    @ddt.data(*itertools.product([True, False], [True, False]))
+    @ddt.unpack
+    def test_delete_and_are_logged_in_cookies_set(self, jwt_cookies_disabled, jwk_is_set):
+        jwt_private_signing_jwk = settings.JWT_AUTH['JWT_PRIVATE_SIGNING_JWK'] if jwk_is_set else None
+        with patch.dict("django.conf.settings.FEATURES", {"DISABLE_SET_JWT_COOKIES_FOR_TESTS": jwt_cookies_disabled}):
+            with patch.dict("django.conf.settings.JWT_AUTH", {"JWT_PRIVATE_SIGNING_JWK": jwt_private_signing_jwk}):
+                setup_login_oauth_client()
+                response = cookies_api.set_logged_in_cookies(self.request, HttpResponse(), self.user)
+                self._copy_cookies_to_request(response, self.request)
+                self.assertTrue(cookies_api.are_logged_in_cookies_set(self.request))
 
-        cookies_api.delete_logged_in_cookies(response)
-        self._copy_cookies_to_request(response, self.request)
-        self.assertFalse(cookies_api.are_logged_in_cookies_set(self.request))
+                cookies_api.delete_logged_in_cookies(response)
+                self._copy_cookies_to_request(response, self.request)
+                self.assertFalse(cookies_api.are_logged_in_cookies_set(self.request))
 
     @patch.dict("django.conf.settings.FEATURES", {"DISABLE_SET_JWT_COOKIES_FOR_TESTS": False})
     def test_refresh_jwt_cookies(self):

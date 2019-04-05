@@ -57,7 +57,7 @@ ALL_LOGGED_IN_COOKIE_NAMES = JWT_COOKIE_NAMES + DEPRECATED_LOGGED_IN_COOKIE_NAME
 
 def are_logged_in_cookies_set(request):
     """ Check whether the request has logged in cookies set. """
-    if settings.FEATURES.get('DISABLE_SET_JWT_COOKIES_FOR_TESTS', False):
+    if _are_jwt_cookies_disabled():
         cookies_that_should_exist = DEPRECATED_LOGGED_IN_COOKIE_NAMES
     else:
         cookies_that_should_exist = ALL_LOGGED_IN_COOKIE_NAMES
@@ -252,19 +252,7 @@ def _get_user_info_cookie_data(request, user):
 def _create_and_set_jwt_cookies(response, request, cookie_settings, user=None, refresh_token=None):
     """ Sets a cookie containing a JWT on the response. """
 
-    # Skip setting JWT cookies for most unit tests, since it raises errors when
-    # a login oauth client cannot be found in the database in ``_get_login_oauth_client``.
-    # This solution is not ideal, but see https://github.com/edx/edx-platform/pull/19180#issue-226706355
-    # for a discussion of alternative solutions that did not work or were halted.
-    if settings.FEATURES.get('DISABLE_SET_JWT_COOKIES_FOR_TESTS', False):
-        return
-
-    # For Ironwood, we don't set JWK settings by default.  Make sure we don't fail trying
-    # to use empty settings.  This means by default, micro-frontends won't work, but Ironwood
-    # has none.  Also, OAuth scopes won't work, but that is still a new and specialized feature.
-    # Installations that need them can create JWKs and add them to the settings.
-    private_signing_jwk = settings.JWT_AUTH['JWT_PRIVATE_SIGNING_JWK']
-    if private_signing_jwk == "None" or not private_signing_jwk:
+    if _are_jwt_cookies_disabled():
         return
 
     # For security reasons, the JWT that is embedded inside the cookie expires
@@ -337,3 +325,25 @@ def _get_login_oauth_client():
         raise AuthFailedError(
             u"OAuth Client for the Login service, '{}', is not configured.".format(login_client_id)
         )
+
+
+def _are_jwt_cookies_disabled():
+    """
+    Returns whether the use of JWT cookies is disabled.
+    """
+    # Skip JWT cookies for most unit tests, since it raises errors when
+    # a login oauth client cannot be found in the database in ``_get_login_oauth_client``.
+    # This solution is not ideal, but see https://github.com/edx/edx-platform/pull/19180#issue-226706355
+    # for a discussion of alternative solutions that did not work or were halted.
+    if settings.FEATURES.get('DISABLE_SET_JWT_COOKIES_FOR_TESTS', False):
+        return True
+
+    # For Ironwood, we don't set JWK settings by default.  Make sure we don't fail trying
+    # to use empty settings.  This means by default, micro-frontends won't work, but Ironwood
+    # has none.  Also, OAuth scopes won't work, but that is still a new and specialized feature.
+    # Installations that need them can create JWKs and add them to the settings.
+    private_signing_jwk = settings.JWT_AUTH['JWT_PRIVATE_SIGNING_JWK']
+    if private_signing_jwk == "None" or not private_signing_jwk:
+        return True
+
+    return False
