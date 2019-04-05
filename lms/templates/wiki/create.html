@@ -33,12 +33,12 @@
       <div class="form-actions">
           <button type="submit" name="save_changes" class="btn btn-primary btn-large">
             <span class="icon fa fa-plus" aria-hidden="true"></span>
-            {% trans "Create article" %}
+            {% trans "Create article" as tmsg%}{{tmsg|force_escape}}
           </button>
 
           <a href="{% url 'wiki:get' path=parent_urlpath.path %}" class="btn btn-large back">
             <span class="icon fa fa-circle-arrow-left" aria-hidden="true"></span>
-            {% trans "Go back" %}
+            {% trans "Go back" as tmsg%}{{tmsg|force_escape}}
           </a>
       </div>
       {% include "wiki/includes/cheatsheet.html" %}

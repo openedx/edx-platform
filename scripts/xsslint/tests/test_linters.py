@@ -1504,9 +1504,13 @@ class TestDjangoTemplateLinter(TestLinter):
         """,'rule': ruleset.django_html_interpolation_missing},
 
         {'expression': """
+                        {% trans "<span 'a'='b' 'c'='d'> whatever </span>" %}
+            """, 'rule': ruleset.django_html_interpolation_missing},
+
+        {'expression': """
                 {% filter force_escape %}
                 {% blocktrans %}
-                Some translation
+                Some translation string
                 {% endblocktrans %}
                 {% endfilter %}
                 """, 'rule': None},
@@ -1514,7 +1518,7 @@ class TestDjangoTemplateLinter(TestLinter):
         {'expression': """
                 {% filter force_escape
                 {% blocktrans %}
-                Some translation
+                Some translation string
                 {% endblocktrans %}
                 {% endfilter %}
                 """, 'rule': ruleset.django_trans_escape_filter_parse_error},
@@ -1522,7 +1526,7 @@ class TestDjangoTemplateLinter(TestLinter):
         {'expression': """
                 {% filter someother_filter %}
                 {% blocktrans %}
-                Some translation
+                Some translation strubg
                 {% endblocktrans %}
                 {% endfilter %}
                 """, 'rule': ruleset.django_blocktrans_missing_escape_filter},
@@ -1530,14 +1534,14 @@ class TestDjangoTemplateLinter(TestLinter):
         {'expression': """
                 {% filter force_escape xyz %}
                 {% blocktrans %}
-                Some translation
+                Some translation string
                 {% endblocktrans %}
                 {% endfilter %}
                 """, 'rule': ruleset.django_blocktrans_missing_escape_filter},
 
         {'expression': """
                 {% blocktrans %}
-                Some translation
+                Some translation string
                 {% endblocktrans %}
                 """, 'rule': ruleset.django_blocktrans_missing_escape_filter},
 
@@ -1616,7 +1620,7 @@ class TestDjangoTemplateLinter(TestLinter):
             {load_django_html}
             {expression}
         """.format(expression="""
-                            # {% trans 'Documentation' as tmsg%}
+                            {# trans 'Documentation' as tmsg #}
                 """,
                    load_i18n='{% load i18n %}',
                    load_django_html='{% load django_html %}'))

@@ -9,6 +9,6 @@
   {% endblocktrans %}
     {% endfilter %}
 {% else %}
-  {% trans "You need to log in or sign up to use this function." as tmsg %} {{ tmsg as force_escape }}
+  {% trans "You need to log in or sign up to use this function." as tmsg %} {{ tmsg|force_escape }}
 {% endif %}
 </em>

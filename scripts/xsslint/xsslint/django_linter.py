@@ -39,19 +39,19 @@ class TransExpression(Expression):
                             self)
             return
 
+        trans_expr_msg = trans_expr[quote.start():quote.end()].strip()
+        if _check_is_string_has_html(trans_expr_msg):
+            _add_violations(self.results,
+                            self.ruleset.django_html_interpolation_missing,
+                            self)
+            return
+
         pos = trans_expr.find('as', quote.end())
         if pos == -1:
             _add_violations(self.results, self.ruleset.django_trans_missing_escape, self)
             return
 
         trans_var_name_used = trans_expr[pos + len('as'):].strip()
-        trans_expr_msg = trans_expr[quote.start():quote.end()].strip()
-
-        if _check_is_string_has_html(trans_expr_msg):
-            _add_violations(self.results,
-                            self.ruleset.django_html_interpolation_missing,
-                            self)
-            return
 
         # Checking if trans tag has interpolated variables eg {}
         # in translations string. Would be tested for
@@ -144,8 +144,7 @@ class BlockTransExpression(Expression):
         Returns:
             None
         """
-
-        if not self._process_block(template_file):
+        if not self._process_block(template_file, expressions):
             return
 
         filter_start_pos = template_file.rfind('{%', 0, self.start_index)
@@ -187,7 +186,7 @@ class BlockTransExpression(Expression):
 
         return True
 
-    def _process_block(self, template_file):
+    def _process_block(self, template_file, expressions):
         """
             process blocktrans..endblocktrans block
 
@@ -197,7 +196,6 @@ class BlockTransExpression(Expression):
             Returns:
                 None
         """
-
         blocktrans_string = self._extract_translation_msg(template_file)
 
         # if no string extracted might have hit a parse error just return
@@ -208,6 +206,27 @@ class BlockTransExpression(Expression):
             _add_violations(self.results, self.ruleset.django_html_interpolation_missing, self)
             return
 
+            # Checking if blocktrans tag has interpolated variables eg {}
+            # in translations string. Would be tested for
+            # possible html interpolation done somewhere else.
+
+        if _check_is_string_has_variables(blocktrans_string):
+            blocktrans_expr = self.expression_inner
+            pos = blocktrans_expr.find('asvar')
+            if pos == -1:
+                _add_violations(self.results, self.ruleset.django_html_interpolation_missing, self)
+                return
+
+            trans_var_name_used = blocktrans_expr[pos + len('asvar'):].strip()
+
+            # check for interpolate_html expression for the variable in trans expression
+            interpolate_tag, html_interpolated = _is_html_interpolated(trans_var_name_used,
+                                                                       expressions)
+            if not html_interpolated:
+                _add_violations(self.results, self.ruleset.django_html_interpolation_missing, self)
+            if interpolate_tag:
+                interpolate_tag.validate_expression(template_file, expressions)
+            return
         return True
 
     def _extract_translation_msg(self, template_file):

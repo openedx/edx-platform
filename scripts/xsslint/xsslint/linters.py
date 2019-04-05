@@ -1490,7 +1490,7 @@ class DjangoTemplateLinter(BaseLinter):
     """
     The linter for Django template files
     """
-    LINE_COMMENT_DELIM = "#"
+    LINE_COMMENT_DELIM = "{#"
 
     ruleset = RuleSet(
         django_trans_missing_escape='django-trans-missing-escape',
@@ -1502,7 +1502,6 @@ class DjangoTemplateLinter(BaseLinter):
         django_html_interpolation_missing_safe_filter='django-html-interpolation-missing-safe-filter',
         django_html_interpolation_missing='django-html-interpolation-missing',
         django_html_interpolation_invalid_tag='django-html-interpolation-invalid-tag',
-        django_html_interpolation_arg_notfound='django-html-interpolation-arg-notfound',
     )
 
     def __init__(self, skip_dirs=None):
