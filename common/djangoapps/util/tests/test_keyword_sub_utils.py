@@ -2,6 +2,9 @@
 Tests for keyword_substitution.py
 """
 
+from __future__ import absolute_import
+
+import six
 from ddt import ddt, file_data
 from mock import patch
 
@@ -114,13 +117,13 @@ class KeywordSubTest(ModuleStoreTestCase):
         test_string = 'This string should not be subbed here %%USER_ID%%'
 
         no_course_context = dict(
-            (key, value) for key, value in self.context.iteritems() if key != 'course_title'
+            (key, value) for key, value in six.iteritems(self.context) if key != 'course_title'
         )
         result = Ks.substitute_keywords_with_data(test_string, no_course_context)
         self.assertEqual(test_string, result)
 
         no_user_id_context = dict(
-            (key, value) for key, value in self.context.iteritems() if key != 'user_id'
+            (key, value) for key, value in six.iteritems(self.context) if key != 'user_id'
         )
         result = Ks.substitute_keywords_with_data(test_string, no_user_id_context)
         self.assertEqual(test_string, result)
