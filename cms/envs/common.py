@@ -1558,6 +1558,8 @@ ZENDESK_CUSTOM_FIELDS = {}
 # (0.0 = 0%, 1.0 = 100%)
 COMPLETION_VIDEO_COMPLETE_PERCENTAGE = 0.95
 
+############### Settings for edx-rbac  ###############
+SYSTEM_WIDE_ROLE_CLASSES = []
 
 ############## Installed Django Apps #########################
 
@@ -1569,6 +1571,3 @@ plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.CMS, plugin_c
 # setting for the FileWrapper class used to iterate over the export file data.
 # See: https://docs.python.org/2/library/wsgiref.html#wsgiref.util.FileWrapper
 COURSE_EXPORT_DOWNLOAD_CHUNK_SIZE = 8192
-
-############### Settings for edx-rbac  ###############
-SYSTEM_WIDE_ROLE_CLASSES = os.environ.get("SYSTEM_WIDE_ROLE_CLASSES", [])
