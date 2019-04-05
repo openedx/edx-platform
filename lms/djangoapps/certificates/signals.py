@@ -146,6 +146,7 @@ def fire_ungenerated_certificate_task(user, course_key, expected_verification_st
         CourseMode.CREDIT_MODE,
         CourseMode.PROFESSIONAL,
         CourseMode.NO_ID_PROFESSIONAL_MODE,
+        CourseMode.MASTERS,
     ]
     enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(user, course_key)
     cert = GeneratedCertificate.certificate_for_student(user, course_key)
