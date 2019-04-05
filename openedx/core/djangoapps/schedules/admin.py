@@ -1,15 +1,19 @@
+from __future__ import absolute_import
+
 import functools
 
-from django.contrib import admin
+import six
 from django import forms
+from django.contrib import admin
 from django.db.models import F
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
+from opaque_keys.edx.keys import CourseKey
+
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangolib.markup import HTML
 
 from . import models
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from opaque_keys.edx.keys import CourseKey
 
 
 class ScheduleExperienceAdminInline(admin.StackedInline):
@@ -92,7 +96,7 @@ class CourseIdFilter(admin.SimpleListFilter):
 
     def lookups(self, request, model_admin):
         return (
-            (overview.id, unicode(overview.id)) for overview in CourseOverview.objects.all().order_by('id')
+            (overview.id, six.text_type(overview.id)) for overview in CourseOverview.objects.all().order_by('id')
         )
 
     def queryset(self, request, queryset):
@@ -111,7 +115,7 @@ class CourseIdFilter(admin.SimpleListFilter):
         for lookup, title in self.lookup_choices:
             yield {
                 'selected': self.value() == lookup,
-                'value': unicode(lookup),
+                'value': six.text_type(lookup),
                 'display': title,
             }
 
