@@ -287,8 +287,8 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
 
             if self.edx_video_id and edxval_api:
                 for index, source_url in enumerate(sources):
-                   new_url = rewrite_video_url(cdn_url, source_url)
-                   if new_url:
+                    new_url = rewrite_video_url(cdn_url, source_url)
+                    if new_url:
                         sources[index] = new_url
 
         # If there was no edx_video_id, or if there was no download specified
