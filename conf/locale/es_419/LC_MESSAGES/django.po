@@ -246,7 +246,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-03-24 20:42+0000\n"
+"POT-Creation-Date: 2019-03-31 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2019\n"
 "Language-Team: Spanish (Latin America) (https://www.transifex.com/open-edx/teams/6205/es_419/)\n"
@@ -12629,6 +12629,12 @@ msgstr ""
 "restringido"
 
 #: openedx/features/content_type_gating/partitions.py
+#: openedx/features/content_type_gating/templates/content_type_gating/access_denied_message.html
+msgid "Graded assessments are available to Verified Track learners."
+msgstr ""
+"Las tareas calificables están disponibles para los estudiantes verificados."
+
+#: openedx/features/content_type_gating/partitions.py
 msgid ""
 "Graded assessments are available to Verified Track learners. Upgrade to "
 "Unlock."
@@ -12643,11 +12649,6 @@ msgstr "Contenido disponible solo para estudiantes verificados"
 #: openedx/features/content_type_gating/templates/content_type_gating/access_denied_message.html
 msgid "Verified Track Access"
 msgstr "Acceso a modalidad verificada"
-
-#: openedx/features/content_type_gating/templates/content_type_gating/access_denied_message.html
-msgid "Graded assessments are available to Verified Track learners."
-msgstr ""
-"Las tareas calificables están disponibles para los estudiantes verificados."
 
 #: openedx/features/content_type_gating/templates/content_type_gating/access_denied_message.html
 msgid "Upgrade to unlock"

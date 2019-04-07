@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-03-31 20:38+0000\n"
-"PO-Revision-Date: 2019-03-31 20:38:03.138947\n"
+"POT-Creation-Date: 2019-04-07 20:37+0000\n"
+"PO-Revision-Date: 2019-04-07 20:37:41.593434\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -450,6 +450,17 @@ msgid ""
 msgstr ""
 "Räw pässwörds äré nöt störéd, sö théré ïs nö wäý tö séé thïs üsér's "
 "pässwörd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: common/djangoapps/student/admin.py
+#, python-format
+msgid "%(count)d student account was unlocked."
+msgid_plural "%(count)d student accounts were unlocked."
+msgstr[0] ""
+"%(count)d stüdént äççöünt wäs ünlöçkéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тє#"
+msgstr[1] ""
+"%(count)d stüdént äççöünts wéré ünlöçkéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєт#"
 
 #: common/djangoapps/student/forms.py
 msgid ""
@@ -5842,6 +5853,31 @@ msgstr ""
 "{display_name} ïs önlý äççéssïßlé tö énrölléd léärnérs. Sïgn ïn ör régïstér,"
 " änd énröll ïn thïs çöürsé tö vïéw ït. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
+#: common/templates/admin/student/loginfailures/change_form_template.html
+msgid "Unlock Account"
+msgstr "Ûnlöçk Àççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#. #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
+#. Translators: this is a control to allow users to exit out of this modal
+#. interface (a menu or piece of UI that takes the full focus of the screen)
+#: common/templates/admin/student/loginfailures/change_form_template.html
+#: lms/templates/wiki/edit.html lms/templates/wiki/history.html
+#: lms/templates/wiki/includes/cheatsheet.html lms/templates/dashboard.html
+#: lms/templates/forgot_password_modal.html lms/templates/help_modal.html
+#: lms/templates/signup_modal.html lms/templates/ccx/schedule.html
+#: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/invalidate_registration_code_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
+#: lms/templates/modal/_modal-settings-language.html
+#: themes/edx.org/lms/templates/dashboard.html
+#: themes/edx.org/lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
+msgid "Close"
+msgstr "Çlösé Ⱡ'σяєм ιρѕ#"
+
 #: common/templates/student/edx_ace/accountrecovery/email/body.html
 msgid "Create Password"
 msgstr "Çréäté Pässwörd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
@@ -7781,11 +7817,6 @@ msgstr "Sïté stätïstïçs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Total number of users"
 msgstr "Tötäl nümßér öf üsérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Courses loaded in the modulestore"
-msgstr ""
-"Çöürsés löädéd ïn thé mödüléstöré Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 #: lms/djangoapps/support/views/manage_user.py lms/templates/tracking_log.html
@@ -11624,26 +11655,6 @@ msgstr "Sävé çhängés Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 #: wiki/templates/wiki/edit.html
 msgid "Preview"
 msgstr "Prévïéw Ⱡ'σяєм ιρѕυм #"
-
-#. #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
-#. Translators: this is a control to allow users to exit out of this modal
-#. interface (a menu or piece of UI that takes the full focus of the screen)
-#: lms/templates/wiki/edit.html lms/templates/wiki/history.html
-#: lms/templates/wiki/includes/cheatsheet.html lms/templates/dashboard.html
-#: lms/templates/forgot_password_modal.html lms/templates/help_modal.html
-#: lms/templates/signup_modal.html lms/templates/ccx/schedule.html
-#: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/invalidate_registration_code_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
-#: lms/templates/modal/_modal-settings-language.html
-#: themes/edx.org/lms/templates/dashboard.html
-#: themes/edx.org/lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
-msgid "Close"
-msgstr "Çlösé Ⱡ'σяєм ιρѕ#"
 
 #: lms/templates/wiki/edit.html
 msgid "Wiki Preview"
