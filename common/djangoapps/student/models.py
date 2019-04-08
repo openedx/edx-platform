@@ -921,8 +921,13 @@ class LoginFailures(models.Model):
         if self.lockout_until is not None:
             date_str = self.lockout_until.isoformat()
 
+        try:
+            username = unicode(self.user.username, 'utf-8')
+        except TypeError:
+            username = self.user.username
+
         return u'LoginFailures({username}, {count}, {date})'.format(
-            username=six.text_type(self.user.username, 'utf-8'),
+            username=username,
             count=self.failure_count,
             date=date_str
         )
@@ -933,8 +938,13 @@ class LoginFailures(models.Model):
         if self.lockout_until is not None:
             date_str = self.lockout_until.isoformat()
 
+        try:
+            username = unicode(self.user.username, 'utf-8')
+        except TypeError:
+            username = self.user.username
+
         return u'{username}: {count} - {date}'.format(
-            username=six.text_type(self.user.username, 'utf-8'),
+            username=username,
             count=self.failure_count,
             date=date_str
         )
