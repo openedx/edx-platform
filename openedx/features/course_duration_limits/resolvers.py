@@ -13,11 +13,12 @@ from django.utils.translation import ugettext as _
 from eventtracking import tracker
 from lms.djangoapps.experiments.utils import stable_bucketing_hash_group
 from openedx.core.djangoapps.catalog.utils import get_course_run_details
+from courseware.date_summary import verified_upgrade_deadline_link, verified_upgrade_link_is_valid
+
 from openedx.core.djangoapps.schedules.resolvers import (
     BinnedSchedulesBaseResolver,
     InvalidContextError,
     _get_trackable_course_home_url,
-    _get_upsell_information_for_schedule
 )
 from track import segment
 
@@ -81,6 +82,38 @@ class ExpiryReminderResolver(BinnedSchedulesBaseResolver):
         first_schedule = None
         first_expiration_date = None
 
+        self.log_info(u"Found %s schedules for %s", len(user_schedules), user.username)
+
+        for schedule in user_schedules:
+            upsell_context = _get_upsell_information_for_schedule(user, schedule)
+            if not upsell_context['show_upsell']:
+                self.log_info(u"No upsell available for %r", schedule.enrollment)
+                continue
+
+            if not CourseDurationLimitConfig.enabled_for_enrollment(enrollment=schedule.enrollment):
+                self.log_info(u"course duration limits not enabled for %r", schedule.enrollment)
+                continue
+
+            expiration_date = get_user_course_expiration_date(user, schedule.enrollment.course)
+            if expiration_date is None:
+                self.log_info(u"No course expiration date for %r", schedule.enrollment.course)
+                continue
+
+            if first_valid_upsell_context is None:
+                first_schedule = schedule
+                first_valid_upsell_context = upsell_context
+                first_expiration_date = expiration_date
+            course_id_str = str(schedule.enrollment.course_id)
+            course_id_strs.append(course_id_str)
+            course_links.append({
+                'url': _get_trackable_course_home_url(schedule.enrollment.course_id),
+                'name': schedule.enrollment.course.display_name
+            })
+
+        if first_schedule is None:
+            self.log_info(u'No courses eligible for upgrade for user %s.', user.username)
+            raise InvalidContextError()
+
         # Experiment code: Skip users who are in the control bucket
         hash_bucket = stable_bucketing_hash_group('fbe_access_expiry_reminder', 2, user.username)
         properties = {
@@ -117,35 +150,6 @@ class ExpiryReminderResolver(BinnedSchedulesBaseResolver):
         if hash_bucket == 0:
             raise InvalidContextError()
 
-        for schedule in user_schedules:
-            upsell_context = _get_upsell_information_for_schedule(user, schedule)
-            if not upsell_context['show_upsell']:
-                continue
-
-            if not CourseDurationLimitConfig.enabled_for_enrollment(enrollment=schedule.enrollment):
-                LOG.info(u"course duration limits not enabled for %s", schedule.enrollment)
-                continue
-
-            expiration_date = get_user_course_expiration_date(user, schedule.enrollment.course)
-            if expiration_date is None:
-                LOG.info(u"No course expiration date for %s", schedule.enrollment.course)
-                continue
-
-            if first_valid_upsell_context is None:
-                first_schedule = schedule
-                first_valid_upsell_context = upsell_context
-                first_expiration_date = expiration_date
-            course_id_str = str(schedule.enrollment.course_id)
-            course_id_strs.append(course_id_str)
-            course_links.append({
-                'url': _get_trackable_course_home_url(schedule.enrollment.course_id),
-                'name': schedule.enrollment.course.display_name
-            })
-
-        if first_schedule is None:
-            self.log_debug('No courses eligible for upgrade for user.')
-            raise InvalidContextError()
-
         context = {
             'course_links': course_links,
             'first_course_name': first_schedule.enrollment.course.display_name,
@@ -156,3 +160,25 @@ class ExpiryReminderResolver(BinnedSchedulesBaseResolver):
         }
         context.update(first_valid_upsell_context)
         return context
+
+
+def _get_verified_upgrade_link(user, schedule):
+    enrollment = schedule.enrollment
+    if verified_upgrade_link_is_valid(enrollment):
+        return verified_upgrade_deadline_link(user, enrollment.course)
+
+
+def _get_upsell_information_for_schedule(user, schedule):
+    """
+    Return upsell variables for inclusion in a message template being sent to this user.
+    """
+    template_context = {}
+
+    verified_upgrade_link = _get_verified_upgrade_link(user, schedule)
+    has_verified_upgrade_link = verified_upgrade_link is not None
+
+    if has_verified_upgrade_link:
+        template_context['upsell_link'] = verified_upgrade_link
+
+    template_context['show_upsell'] = has_verified_upgrade_link
+    return template_context
