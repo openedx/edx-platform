@@ -1,4 +1,5 @@
 {% load i18n %}
+{% load django_markup %}
 <div id="cheatsheetModal" class="modal" aria-hidden="true">
   <div class="inner-wrapper" role="dialog" aria-labelledby="cheatsheet-title" aria-modal=true>
     <button class="close-modal"><span class="icon fa fa-remove" aria-hidden="true"></span> <span class="sr">{% trans 'Close' as tmsg %}{{tmsg|force_escape}}</span></button>
@@ -11,7 +12,8 @@
       <div class="left-column">
         <section>
           <h2>{% trans "Wiki Syntax Help" as tmsg %}{{tmsg|force_escape}}</h2>
-          <p>{% trans "This wiki uses <strong>Markdown</strong> for styling. There are several useful guides online. See any of the links below for in-depth details:" %}</p>
+          <p>{% trans "This wiki uses {start_strong}Markdown{end_strong} for styling. There are several useful guides online. See any of the links below for in-depth details:" as tmsg%}
+              {% interpolate_html tmsg start_strong='<strong>'|safe end_strong='</strong>'|safe %}</p>
           <ul>
               <li><a href="http://daringfireball.net/projects/markdown/basics" target="_blank">{% trans 'Markdown: Basics' as tmsg %}{{tmsg|force_escape}}</a></li>
               <li><a href="http://greg.vario.us/doc/markdown.txt" target="_blank">{% trans 'Quick Markdown Syntax Guide' as tmsg %}{{tmsg|force_escape}}</a></li>

@@ -36,7 +36,7 @@
                 {% filter force_escape %}{% blocktrans %}Please finish your registration and fill out the registration form making sure to use {{ email_address }} in the Email field:{% endblocktrans %}{%endfilter%}
                 <br />
             </p>
-
+            {# xss-lint: disable=django-trans-missing-escape #}
             {% trans "Finish Your Registration" as button_cta_text %}
             {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=button_cta_text course_cta_url=registration_url %}
 

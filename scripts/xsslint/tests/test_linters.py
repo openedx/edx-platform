@@ -1521,7 +1521,7 @@ class TestDjangoTemplateLinter(TestLinter):
                 Some translation string
                 {% endblocktrans %}
                 {% endfilter %}
-                """, 'rule': ruleset.django_trans_escape_filter_parse_error},
+                """, 'rule': ruleset.django_blocktrans_escape_filter_parse_error},
 
         {'expression': """
                 {% filter someother_filter %}
@@ -1581,7 +1581,7 @@ class TestDjangoTemplateLinter(TestLinter):
 
         self._validate_data_rules(data, results)
 
-    def test_check_django_expression_disabled(self):
+    def test_check_django_trans_expression_disabled(self):
         """
         Test _check_django_file_is_safe with disable pragma results in no
         violation
@@ -1590,21 +1590,48 @@ class TestDjangoTemplateLinter(TestLinter):
         results = FileResults('')
 
         django_template = textwrap.dedent(
-                    """
-                    {load_i18n}
-                    {load_django_html}
-                    {expression}
-                """.format(expression="""
-                            # xss-lint: disable=django-trans-missing-escape
-                            {% trans 'Documentation' as tmsg%}
-                """,
-                           load_i18n='{% load i18n %}',
-                           load_django_html='{% load django_html %}'))
+            """
+            {load_i18n}
+            {load_django_html}
+            {expression}
+        """.format(expression="""
+                    {# xss-lint: disable=django-trans-missing-escape #}
+                    {% trans 'Documentation' as tmsg%}
+        """,
+                   load_i18n='{% load i18n %}',
+                   load_django_html='{% load django_html %}'))
 
         linter._check_django_file_is_safe(django_template, results)
 
         self.assertEqual(len(results.violations), 1)
         self.assertTrue(results.violations[0].is_disabled)
+
+        def test_check_django_blocktrans_expression_disabled(self):
+            """
+            Test _check_django_file_is_safe with disable pragma results in no
+            violation
+            """
+            linter = _build_django_linter()
+            results = FileResults('')
+
+            django_template = textwrap.dedent(
+                """
+                {load_i18n}
+                {load_django_html}
+                {expression}
+            """.format(expression="""
+                    {# xss-lint: disable=django-blocktrans-missing-escape-filter #}
+                    {% blocktrans %}
+                    sometext
+                    {% endblocktrans %}
+            """,
+                       load_i18n='{% load i18n %}',
+                       load_django_html='{% load django_html %}'))
+
+            linter._check_django_file_is_safe(django_template, results)
+
+            self.assertEqual(len(results.violations), 1)
+            self.assertTrue(results.violations[0].is_disabled)
 
     def test_check_django_trans_expression_commented(self):
         """

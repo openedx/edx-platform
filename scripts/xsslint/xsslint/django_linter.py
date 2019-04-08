@@ -97,7 +97,8 @@ class TransExpression(Expression):
                             self)
             return
 
-        escape_expr = template_file[escape_expr_start_pos + len('{{'):escape_expr_end_pos].strip(' ')
+        escape_expr = template_file[escape_expr_start_pos + len('{{'):
+                                    escape_expr_end_pos].strip(' ')
         # check escape expression has the right variable and its escaped properly
         # with force_escape filter
         if '|' not in escape_expr \
@@ -157,7 +158,7 @@ class BlockTransExpression(Expression):
         filter_end_pos = template_file.find('%}', filter_start_pos)
         if filter_end_pos > self.start_index:
             _add_violations(self.results,
-                            self.ruleset.django_trans_escape_filter_parse_error,
+                            self.ruleset.django_blocktrans_escape_filter_parse_error,
                             self)
             return
 
@@ -206,9 +207,9 @@ class BlockTransExpression(Expression):
             _add_violations(self.results, self.ruleset.django_html_interpolation_missing, self)
             return
 
-            # Checking if blocktrans tag has interpolated variables eg {}
-            # in translations string. Would be tested for
-            # possible html interpolation done somewhere else.
+        # Checking if blocktrans tag has interpolated variables eg {}
+        # in translations string. Would be tested for
+        # possible html interpolation done somewhere else.
 
         if _check_is_string_has_variables(blocktrans_string):
             blocktrans_expr = self.expression_inner

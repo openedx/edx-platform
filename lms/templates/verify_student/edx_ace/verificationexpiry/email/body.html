@@ -7,30 +7,36 @@
     <tr>
         <td>
             <h1>
-                {% trans "Expired ID Verification" %}
+                {% trans "Expired ID Verification" as tmsg%}{{tmsg|force_escape}}
             </h1>
             <p style="color: rgba(0,0,0,.75);">
+                {% filter force_escape%}
                 {% blocktrans %}
                     Hello {{full_name}},
                     Your {{platform_name}} ID verification has expired.
                 {% endblocktrans %}
+                {% endfilter %}
             </p>
             <p style="color: rgba(0,0,0,.75);">
-                {% trans "You must have a valid ID verification to take proctored exams and qualify for certificates."%}
-                {% trans "Follow the link below to submit your photos and renew your ID verification." %}
-                {% trans "You can also do this from your dashboard." %}
+                {% trans "You must have a valid ID verification to take proctored exams and qualify for certificates." as tmsg%}{{tmsg|force_escape}}
+                {% trans "Follow the link below to submit your photos and renew your ID verification." as tmsg%}{{tmsg|force_escape}}
+                {% trans "You can also do this from your dashboard." as tmsg%}{{tmsg|force_escape}}
             </p>
             <p style="color: rgba(0,0,0,.75);">
+                {% filter force_escape%}
                 {% blocktrans %}
                     Resubmit Verification : {{lms_verification_link}}
                     ID verification FAQ : {{help_center_link}}
                 {% endblocktrans %}
+                {% endfilter %}
             </p>
             <p>
+                {% filter force_escape%}
                 {% blocktrans %}
                 Thank you,
                 The {{ platform_name }} Team
                 {% endblocktrans %}
+                {% endfilter %}
             </p>
         </td>
     </tr>

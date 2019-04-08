@@ -1498,7 +1498,7 @@ class DjangoTemplateLinter(BaseLinter):
         django_escape_variable_mismatch='django-escape-variable-mismatch',
         django_blocktrans_missing_escape_filter='django-blocktrans-missing-escape-filter',
         django_blocktrans_parse_error='django-blocktrans-parse-error',
-        django_trans_escape_filter_parse_error='django-trans-escape-filter-parse-error',
+        django_blocktrans_escape_filter_parse_error='django-blocktrans-escape-filter-parse-error',
         django_html_interpolation_missing_safe_filter='django-html-interpolation-missing-safe-filter',
         django_html_interpolation_missing='django-html-interpolation-missing',
         django_html_interpolation_invalid_tag='django-html-interpolation-invalid-tag',
