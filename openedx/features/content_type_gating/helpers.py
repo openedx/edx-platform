@@ -22,8 +22,10 @@ LOG = logging.getLogger(__name__)
 
 
 def correct_modes_for_fbe(course_key, enrollment=None, user=None):
-    # If CONTENT_TYPE_GATING is enabled use the following logic to determine whether
-    # enabled_for_enrollment should be false
+    """
+    If CONTENT_TYPE_GATING is enabled use the following logic to determine whether
+    enabled_for_enrollment should be false
+    """
     if course_key is None:
         return True
 

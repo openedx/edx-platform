@@ -139,13 +139,16 @@ class CourseDurationLimitConfig(StackedConfigurationModel):
         # course duration limits will be on if they are on for the course.
         # When masquerading as a specific learner, course duration limits
         # will be on if they are currently on for the learner.
+
+        if not correct_modes_for_fbe(course_key, enrollment, user):
+            return False
+
         if enrollment is None or not_student_masquerade:
-            return cls.enabled_for_course(course_key=course_key, target_datetime=timezone.now())
+            target_datetime = timezone.now()
         else:
-            if not correct_modes_for_fbe(course_key, enrollment, user):
-                return False
-            current_config = cls.current(course_key=enrollment.course_id)
-            return current_config.enabled_as_of_datetime(target_datetime=enrollment.created)
+            target_datetime = enrollment.created
+        current_config = cls.current(course_key=course_key)
+        return current_config.enabled_as_of_datetime(target_datetime=target_datetime)
 
     @classmethod
     def enabled_for_course(cls, course_key, target_datetime=None):

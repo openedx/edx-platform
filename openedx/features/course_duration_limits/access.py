@@ -101,6 +101,10 @@ def check_course_expired(user, course):
     """
     Check if the course expired for the user.
     """
+    # masquerading course staff should always have access
+    if get_course_masquerade(user, course.id):
+        return ACCESS_GRANTED
+
     expiration_date = get_user_course_expiration_date(user, course)
     if expiration_date and timezone.now() > expiration_date:
         return AuditExpiredError(user, course, expiration_date)
