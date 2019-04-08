@@ -2,6 +2,7 @@
 Tests for send_upgrade_reminder management command.
 """
 from __future__ import absolute_import
+
 import logging
 from unittest import skipUnless
 
@@ -11,19 +12,18 @@ from edx_ace import Message
 from edx_ace.utils.date import serialize
 from mock import patch
 from opaque_keys.edx.locator import CourseLocator
+from six.moves import range
 
 from course_modes.models import CourseMode
 from openedx.core.djangoapps.schedules import resolvers, tasks
 from openedx.core.djangoapps.schedules.management.commands import send_upgrade_reminder as reminder
 from openedx.core.djangoapps.schedules.management.commands.tests.send_email_base import (
-    ScheduleSendEmailTestMixin,
     ExperienceTest,
+    ScheduleSendEmailTestMixin
 )
 from openedx.core.djangoapps.schedules.models import ScheduleExperience
-from openedx.core.djangolib.testing.utils import skip_unless_lms, CacheIsolationTestCase
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from student.tests.factories import UserFactory
-from six.moves import range
-
 
 LOG = logging.getLogger(__name__)
 

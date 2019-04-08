@@ -2,15 +2,16 @@
 Base file for testing schedules with upsell
 """
 from __future__ import absolute_import
-from collections import namedtuple
-import datetime
-import ddt
-from freezegun import freeze_time
-from mock import patch, PropertyMock
-import itertools
 
-from edx_ace.utils.date import serialize
+import datetime
+import itertools
+from collections import namedtuple
+
+import ddt
 from edx_ace.message import Message
+from edx_ace.utils.date import serialize
+from freezegun import freeze_time
+from mock import PropertyMock, patch
 
 from courseware.models import DynamicUpgradeDeadlineConfiguration
 

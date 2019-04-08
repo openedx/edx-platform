@@ -2,16 +2,17 @@
 Tests for send_email_base_command
 """
 from __future__ import absolute_import
+
 import datetime
 from unittest import skipUnless
 
 import ddt
 import pytz
 from django.conf import settings
-from mock import patch, DEFAULT, Mock
+from mock import DEFAULT, Mock, patch
 
 from openedx.core.djangoapps.schedules.management.commands import SendEmailBaseCommand
-from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory, SiteConfigurationFactory
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 
 

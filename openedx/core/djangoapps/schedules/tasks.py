@@ -1,16 +1,18 @@
+from __future__ import absolute_import
+
 import datetime
 import logging
+import six
+from six.moves import range
 
 from celery import task
+from celery_utils.logged_task import LoggedTask
+from celery_utils.persist_on_failure import LoggedPersistOnFailureTask
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
-
 from django.db.utils import DatabaseError
-
-from celery_utils.logged_task import LoggedTask
-from celery_utils.persist_on_failure import LoggedPersistOnFailureTask
 from edx_ace import ace
 from edx_ace.message import Message
 from edx_ace.utils.date import deserialize, serialize
@@ -18,12 +20,10 @@ from edx_django_utils.monitoring import set_custom_metric
 from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
 
-from openedx.core.djangoapps.schedules import message_types
+from openedx.core.djangoapps.schedules import message_types, resolvers
 from openedx.core.djangoapps.schedules.models import Schedule, ScheduleConfig
-from openedx.core.djangoapps.schedules import resolvers
 from openedx.core.lib.celery.task_utils import emulate_http_request
 from track import segment
-
 
 LOG = logging.getLogger(__name__)
 
@@ -216,8 +216,8 @@ def _track_message_sent(site, user, msg):
         'app_label': msg.app_label,
         'name': msg.name,
         'language': msg.language,
-        'uuid': unicode(msg.uuid),
-        'send_uuid': unicode(msg.send_uuid),
+        'uuid': six.text_type(msg.uuid),
+        'send_uuid': six.text_type(msg.send_uuid),
         'nonInteraction': 1,
     }
     course_ids = msg.context.get('course_ids', [])

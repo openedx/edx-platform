@@ -2,28 +2,29 @@
 Tests for send_course_update management command.
 """
 from __future__ import absolute_import
-import ddt
-from mock import patch, _is_started
+
 from unittest import skipUnless
 
+import ddt
 from django.conf import settings
-
 from edx_ace.utils.date import serialize
+from mock import _is_started, patch
+from six.moves import range
+
 from openedx.core.djangoapps.schedules import resolvers, tasks
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
 from openedx.core.djangoapps.schedules.management.commands import send_course_update as nudge
 from openedx.core.djangoapps.schedules.management.commands.tests.send_email_base import (
-    ScheduleSendEmailTestMixin,
-    ExperienceTest
+    ExperienceTest,
+    ScheduleSendEmailTestMixin
 )
 from openedx.core.djangoapps.schedules.management.commands.tests.upsell_base import ScheduleUpsellTestMixin
 from openedx.core.djangoapps.schedules.models import ScheduleExperience
-from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from six.moves import range
 
 
 @ddt.ddt
