@@ -13,11 +13,11 @@ def plugin_settings(settings):
     settings.SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
     # Disable caching in dev environment
-    # NOTE: Disabling cache breaks things like Celery subtasks
     if not settings.FEATURES.get('ENABLE_DEVSTACK_CACHES', False):
         print('\nDISABLING CACHES...')
         for cache_key in settings.CACHES.keys():
-            settings.CACHES[cache_key]['BACKEND'] = 'django.core.cache.backends.dummy.DummyCache'
+            if cache_key != 'celery':  # NOTE: Disabling cache breaks things like Celery subtasks
+                settings.CACHES[cache_key]['BACKEND'] = 'django.core.cache.backends.dummy.DummyCache'
 
     settings.INSTALLED_APPS += (
         'django_extensions',
