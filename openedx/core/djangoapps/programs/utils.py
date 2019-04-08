@@ -500,9 +500,7 @@ class ProgramDataExtender(object):
                 try:
                     self.course_overview = CourseOverview.get_from_id(self.course_run_key)
                 except CourseOverview.DoesNotExist:
-                    log.warning(u'Failed to get course overview for course run key: %s',
-                                self.course_run.get('key'),
-                                exec_info=True)
+                    log.warning(u'Failed to get course overview for course run key: %s', course_run.get('key'))
                 else:
                     self.enrollment_start = self.course_overview.enrollment_start or DEFAULT_ENROLLMENT_START_DATE
 
