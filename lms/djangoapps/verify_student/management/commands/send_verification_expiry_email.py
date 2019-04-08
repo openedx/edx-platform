@@ -144,7 +144,7 @@ def send_verification_expiry_email(batch_verifications, dry_run=False):
         )
         return
 
-    site = Site.objects.get(name=settings.SITE_NAME)
+    site = Site.objects.get_current()
     message_context = get_base_template_context(site)
     message_context.update({
         'platform_name': settings.PLATFORM_NAME,
