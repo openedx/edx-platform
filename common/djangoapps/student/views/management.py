@@ -98,7 +98,7 @@ from student.models import (
     create_comments_service_user,
     email_exists_or_retired,
 )
-from student.roles import CourseCreatorRole
+from student.roles import CourseAccessRole, CourseCreatorRole
 from student.signals import REFUND_ORDER
 from student.tasks import send_activation_email
 from student.text_me_the_app import TextMeTheAppFragmentView
@@ -724,7 +724,7 @@ def create_account_with_params(request, params):
         if 'registered_from_amc' in params:
             from cms.djangoapps.course_creators.models import CourseCreator
             CourseCreator.objects.update_or_create(user=user, defaults={'state': CourseCreator.GRANTED})
-            CourseCreatorRole().add_users(user)
+            CourseAccessRole.objects.create(user=user, role=CourseCreatorRole.ROLE, course_id=None, org='')
         # APPSEMBLER SPECIFIC END
 
         if do_external_auth:
