@@ -1995,34 +1995,48 @@ class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
         Ensures that grades and scores are shown or not shown on the progress page as required.
         """
 
-        expected_score = "<dd>{score}/{max_score}</dd>".format(score=score, max_score=max_score)
+        expected_score = u"<dd>{score}/{max_score}</dd>".format(score=score, max_score=max_score)
         percent = score / float(max_score)
 
+        # Test individual problem scores
         if show_grades:
             # If grades are shown, we should be able to see the current problem scores.
-            self.assertIn(expected_score, response.content)
+            self.assertIn(expected_score, response.content.decode("utf-8"))
 
             if graded:
-                expected_summary_text = "Problem Scores:"
+                expected_summary_text = u"Problem Scores:"
             else:
-                expected_summary_text = "Practice Scores:"
+                expected_summary_text = u"Practice Scores:"
 
         else:
             # If grades are hidden, we should not be able to see the current problem scores.
-            self.assertNotIn(expected_score, response.content)
+            self.assertNotIn(expected_score, response.content.decode("utf-8"))
 
             if graded:
-                expected_summary_text = "Problem scores are hidden"
+                expected_summary_text = u"Problem scores are hidden"
             else:
-                expected_summary_text = "Practice scores are hidden"
+                expected_summary_text = u"Practice scores are hidden"
 
             if show_correctness == ShowCorrectness.PAST_DUE and due_date:
-                expected_summary_text += ' until the due date.'
+                expected_summary_text += u' until the due date.'
             else:
-                expected_summary_text += '.'
+                expected_summary_text += u'.'
 
         # Ensure that expected text is present
-        self.assertIn(expected_summary_text, response.content)
+        self.assertIn(expected_summary_text, response.content.decode("utf-8"))
+
+        # Test overall sequential score
+        if graded and max_score > 0:
+            percentageString = "{0:.0%}".format(percent) if max_score > 0 else ""
+            template = u'<span> ({0:.3n}/{1:.3n}) {2}</span>'
+            expected_grade_summary = template.format(float(score),
+                                                     float(max_score),
+                                                     percentageString)
+
+            if show_grades:
+                self.assertIn(expected_grade_summary, response.content.decode("utf-8"))
+            else:
+                self.assertNotIn(expected_grade_summary, response.content.decode("utf-8"))
 
     @ddt.data(
         ('', None, False),
