@@ -551,6 +551,32 @@ class CourseMode(models.Model):
         return slug in [cls.PROFESSIONAL, cls.NO_ID_PROFESSIONAL_MODE]
 
     @classmethod
+    def contains_masters_mode(cls, modes_dict):
+        """
+        Check whether the modes_dict contains a Master's mode.
+
+        Args:
+            modes_dict (dict): a dict of course modes
+
+        Returns:
+            bool: whether modes_dict contains a Master's mode
+        """
+        return cls.MASTERS in modes_dict
+
+    @classmethod
+    def is_masters_only(cls, course_id):
+        """
+        Check whether the course contains only a Master's mode.
+
+        Args:
+            course_id (CourseKey): course key of course to check
+
+        Returns: bool: whether the course contains only a Master's mode
+        """
+        modes = cls.modes_for_course_dict(course_id)
+        return cls.contains_masters_mode(modes) and len(modes) == 1
+
+    @classmethod
     def is_mode_upgradeable(cls, mode_slug):
         """
         Returns True if the given mode can be upgraded to another.

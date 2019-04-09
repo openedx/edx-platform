@@ -18,7 +18,7 @@ from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.urls import reverse, reverse_lazy
 from django.http import Http404, HttpResponseBadRequest
-from django.test import TestCase
+from django.test import TestCase, RequestFactory
 from django.test.client import Client
 from django.test.utils import override_settings
 from freezegun import freeze_time
@@ -2516,6 +2516,56 @@ class TestIndexView(ModuleStoreTestCase):
                     self.assertIn('xblock-student_view-vertical', response.content)
                     self.assertIn('xblock-student_view-html', response.content)
                     self.assertIn('xblock-student_view-video', response.content)
+
+    @patch('openedx.core.djangoapps.util.user_messages.PageLevelMessages.register_warning_message')
+    def test_courseware_messages_masters_only(self, patch_register_warning_message):
+        with patch('courseware.views.views.CourseTabView.should_show_enroll_button') as patch_should_show_enroll_button:
+            course = CourseFactory()
+
+            user = self.create_user_for_course(course, CourseUserType.UNENROLLED)
+            request = RequestFactory().get('/')
+            request.user = user
+
+            button_html = '<button class="enroll-btn btn-link">Enroll now</button>'
+
+            patch_should_show_enroll_button.return_value = False
+            views.CourseTabView.register_user_access_warning_messages(request, course)
+            # pull message out of the calls to the mock so that
+            # we can make finer grained assertions than mock provides
+            message = patch_register_warning_message.mock_calls[0][1][1]
+            assert button_html not in message
+
+            patch_register_warning_message.reset_mock()
+
+            patch_should_show_enroll_button.return_value = True
+            views.CourseTabView.register_user_access_warning_messages(request, course)
+            # pull message out of the calls to the mock so that
+            # we can make finer grained assertions than mock provides
+            message = patch_register_warning_message.mock_calls[0][1][1]
+            assert button_html in message
+
+    @ddt.data(
+        [True, True, True, False, ],
+        [False, True, True, False, ],
+        [True, False, True, False, ],
+        [True, True, False, False, ],
+        [False, False, True, False, ],
+        [True, False, False, True, ],
+        [False, True, False, False, ],
+        [False, False, False, False, ],
+    )
+    @ddt.unpack
+    def test_should_show_enroll_button(self, course_open_for_self_enrollment,
+                                       invitation_only, is_masters_only, expected_should_show_enroll_button):
+        with patch('courseware.views.views.course_open_for_self_enrollment') as patch_course_open_for_self_enrollment, \
+                patch('course_modes.models.CourseMode.is_masters_only') as patch_is_masters_only:
+            course = CourseFactory()
+
+            patch_course_open_for_self_enrollment.return_value = course_open_for_self_enrollment
+            patch_is_masters_only.return_value = is_masters_only
+            course.invitation_only = invitation_only
+
+            self.assertEqual(views.CourseTabView.should_show_enroll_button(course), expected_should_show_enroll_button)
 
 
 @ddt.ddt
