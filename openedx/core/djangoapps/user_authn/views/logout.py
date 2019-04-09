@@ -4,8 +4,8 @@ from urlparse import parse_qs, urlsplit, urlunsplit
 import edx_oauth2_provider
 from django.conf import settings
 from django.contrib.auth import logout
-from django.urls import reverse_lazy
 from django.shortcuts import redirect
+from django.template.response import TemplateResponse
 from django.utils.http import urlencode
 from django.views.generic import TemplateView
 from provider.oauth2.models import Client
@@ -26,13 +26,61 @@ class LogoutView(TemplateView):
     # Keep track of the page to which the user should ultimately be redirected.
     default_target = '/'
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request):
         """
-        Proxy to the GET handler.
+        logout user and redirect if a redirect_url is specified
+        """
+        # We do not log here, because we have a handler registered to perform logging on successful logouts.
+        request.is_from_logout = True
 
-        TODO: remove GET as an allowed method, and update all callers to use POST.
+        # Get the list of authorized clients before we clear the session.
+        self.oauth_client_ids = request.session.get(edx_oauth2_provider.constants.AUTHORIZED_CLIENTS_SESSION_KEY, [])
+
+        logout(request)
+
+        # If we are using studio logout directly and there is not OIDC logouts we can just redirect the user
+        if settings.FEATURES.get('DISABLE_STUDIO_SSO_OVER_LMS', False) and not self.oauth_client_ids:
+            response = redirect(self.target)
+
+        else:
+            response = TemplateResponse(
+                request=self.request,
+                template=self.template_name,
+                context=self.get_context_data(),
+            )
+
+        # Clear the cookie used by the edx.org marketing site
+        delete_logged_in_cookies(response)
+
+        return response
+
+    def get(self, request, *args, **kwargs):
         """
-        return self.get(request, *args, **kwargs)
+        Adding get method so we don't break our current functionality
+        That get would be removed once we have replaced get with post in all IDA's.
+        """
+        # We do not log here, because we have a handler registered to perform logging on successful logouts.
+        request.is_from_logout = True
+
+        # Get the list of authorized clients before we clear the session.
+        self.oauth_client_ids = request.session.get(edx_oauth2_provider.constants.AUTHORIZED_CLIENTS_SESSION_KEY, [])
+
+        logout(request)
+
+        # If we are using studio logout directly and there is not OIDC logouts we can just redirect the user
+        if settings.FEATURES.get('DISABLE_STUDIO_SSO_OVER_LMS', False) and not self.oauth_client_ids:
+            response = redirect(self.target)
+        else:
+            response = TemplateResponse(
+                request=self.request,
+                template=self.template_name,
+                context=self.get_context_data(),
+            )
+
+        # Clear the cookie used by the edx.org marketing site
+        delete_logged_in_cookies(response)
+
+        return response
 
     @property
     def target(self):
@@ -47,26 +95,6 @@ class LogoutView(TemplateView):
             return target_url
         else:
             return self.default_target
-
-    def dispatch(self, request, *args, **kwargs):
-        # We do not log here, because we have a handler registered to perform logging on successful logouts.
-        request.is_from_logout = True
-
-        # Get the list of authorized clients before we clear the session.
-        self.oauth_client_ids = request.session.get(edx_oauth2_provider.constants.AUTHORIZED_CLIENTS_SESSION_KEY, [])
-
-        logout(request)
-
-        # If we are using studio logout directly and there is not OIDC logouts we can just redirect the user
-        if settings.FEATURES.get('DISABLE_STUDIO_SSO_OVER_LMS', False) and not self.oauth_client_ids:
-            response = redirect(self.target)
-        else:
-            response = super(LogoutView, self).dispatch(request, *args, **kwargs)
-
-        # Clear the cookie used by the edx.org marketing site
-        delete_logged_in_cookies(response)
-
-        return response
 
     def _build_logout_url(self, url):
         """
