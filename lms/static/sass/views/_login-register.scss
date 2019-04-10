@@ -557,31 +557,43 @@
     }
 
     &.button-oa2-google-oauth2 {
-      color: $google-red;
+      color: white;
+      border-color: $google-blue;
+      background-color: $google-blue;
 
       .icon {
-        background: $google-red;
+        background: transparent;
+
+        .icon-image {
+          margin-left: 2px;
+        }
       }
 
       &:hover,
       &:focus {
-        background-color: $google-red;
-        border: 1px solid #a5382b;
+        background-color: $google-focus-blue;
+        border: 1px solid $google-focus-blue;
         color: $white;
       }
     }
 
     &.button-oa2-facebook {
-      color: $facebook-blue;
+      color: white;
+      border-color: $facebook-blue;
+      background-color: $facebook-blue;
 
       .icon {
-        background: $facebook-blue;
+        background: transparent;
+
+        .icon-image {
+          margin-left: 2px;
+        }
       }
 
       &:hover,
       &:focus {
-        background-color: $facebook-blue;
-        border: 1px solid #263a62;
+        background-color: $facebook-focus-blue;
+        border: 1px solid $facebook-focus-blue;
         color: $white;
       }
     }
@@ -602,16 +614,18 @@
     }
 
     &.button-oa2-azuread-oauth2 {
-      color: $microsoft-black;
+      color: white;
+      border-color: $microsoft-black;
+      background-color: $microsoft-black;
 
       .icon {
-        background: $microsoft-black;
+        background: transparent;
       }
 
       &:hover,
       &:focus {
-        background-color: $microsoft-black;
-        border: 1px solid $microsoft-black;
+        background-color: $microsoft-focus-black;
+        border: 1px solid $microsoft-focus-black;
         color: $white;
       }
     }
