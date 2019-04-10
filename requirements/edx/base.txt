@@ -202,7 +202,7 @@ python-levenshtein==0.12.0
 python-memcached==1.59
 python-openid==2.2.5 ; python_version == "2.7"  # via social-auth-core
 python-swiftclient==3.7.0
-python3-saml==1.6.0
+python3-saml==1.5.0
 pytz==2019.1
 pyuca==1.1
 pyyaml==5.1
