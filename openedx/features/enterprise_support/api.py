@@ -303,7 +303,7 @@ def data_sharing_consent_required(view_func):
         consent_url = get_enterprise_consent_url(request, course_id, enrollment_exists=True)
         if consent_url:
             real_user = getattr(request.user, 'real_user', request.user)
-            LOGGER.warning(
+            LOGGER.info(
                 u'User %s cannot access the course %s because they have not granted consent',
                 real_user,
                 course_id,
