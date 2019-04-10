@@ -68,7 +68,7 @@ celery==3.1.25
 certifi==2019.3.9
 cffi==1.12.2
 chardet==3.0.4
-click-log==0.1.8
+click-log==0.3.2
 click==7.0
 code-annotations==0.3.1
 colorama==0.4.1
@@ -136,7 +136,7 @@ edx-django-utils==1.0.3
 edx-drf-extensions==2.2.0
 edx-enterprise==1.4.1
 edx-i18n-tools==0.4.8
-edx-lint==1.1.1
+edx-lint==1.1.2
 edx-milestones==0.1.13
 edx-oauth2-provider==1.2.2
 edx-opaque-keys[django]==0.4.4
@@ -336,7 +336,7 @@ tox-battery==0.5.1
 tox==3.8.6
 traceback2==1.4.0
 transifex-client==0.13.6
-twisted==18.9.0
+twisted==19.2.0
 typing==3.6.6
 unicodecsv==0.14.1
 unidecode==1.0.23
