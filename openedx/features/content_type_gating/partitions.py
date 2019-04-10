@@ -177,51 +177,10 @@ class ContentTypeGatingPartitionScheme(object):
         """
         Returns the Group for the specified user.
         """
-
-        # For now, treat everyone as a Full-access user, until we have the rest of the
-        # feature gating logic in place.
-
         if not ContentTypeGatingConfig.enabled_for_enrollment(user=user, course_key=course_key,
                                                               user_partition=user_partition):
             return FULL_ACCESS
-
-        # If CONTENT_TYPE_GATING is enabled use the following logic to determine whether a user should have FULL_ACCESS
-        # or LIMITED_ACCESS
-
-        course_mode = apps.get_model('course_modes.CourseMode')
-        modes = course_mode.modes_for_course(course_key, include_expired=True, only_selectable=False)
-        modes_dict = {mode.slug: mode for mode in modes}
-
-        # If there is no verified mode, all users are granted FULL_ACCESS
-        if not course_mode.has_verified_mode(modes_dict):
-            return FULL_ACCESS
-
-        course_enrollment = apps.get_model('student.CourseEnrollment')
-
-        mode_slug, is_active = course_enrollment.enrollment_mode_for_user(user, course_key)
-
-        if mode_slug and is_active:
-            course_mode = course_mode.mode_for_course(
-                course_key,
-                mode_slug,
-                modes=modes,
-            )
-            if course_mode is None:
-                LOG.error(
-                    u"User %s is in an unknown CourseMode '%s'"
-                    u" for course %s. Granting full access to content for this user",
-                    user.username,
-                    mode_slug,
-                    course_key,
-                )
-                return FULL_ACCESS
-
-            if mode_slug == CourseMode.AUDIT:
-                return LIMITED_ACCESS
-            else:
-                return FULL_ACCESS
         else:
-            # Unenrolled users don't get gated content
             return LIMITED_ACCESS
 
     @classmethod

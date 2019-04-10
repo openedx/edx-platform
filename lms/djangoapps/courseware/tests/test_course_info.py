@@ -430,8 +430,8 @@ class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
 
     def test_num_queries_instructor_paced(self):
         # TODO: decrease query count as part of REVO-28
-        self.fetch_course_info_with_queries(self.instructor_paced_course, 44, 3)
+        self.fetch_course_info_with_queries(self.instructor_paced_course, 41, 3)
 
     def test_num_queries_self_paced(self):
         # TODO: decrease query count as part of REVO-28
-        self.fetch_course_info_with_queries(self.self_paced_course, 44, 3)
+        self.fetch_course_info_with_queries(self.self_paced_course, 41, 3)
