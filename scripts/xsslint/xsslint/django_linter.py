@@ -232,40 +232,14 @@ class BlockTransExpression(Expression):
 
     def _extract_translation_msg(self, template_file):
 
-        # Double checking parsing issues. This would have been raised by
-        # Django parser. In normal case we would have a closing
-        # endblocktrans for a opening blocktrans
-
-        endblocktrans_spos = template_file.find('{%', self.end_index)
-        if endblocktrans_spos == -1:
+        endblocktrans = re.compile(r'{%\s*endblocktrans .*?%}').search(template_file, self.end_index)
+        if not endblocktrans.start():
             _add_violations(self.results,
-                            self.ruleset.django_blocktrans_parse_error,
-                            self)
-            return
-        endblocktrans_epos = template_file.find('%}', endblocktrans_spos)
-        if endblocktrans_epos == -1:
-            _add_violations(self.results,
-                            self.ruleset.django_blocktrans_parse_error,
-                            self)
+                                self.ruleset.django_blocktrans_parse_error,
+                                self)
             return
 
-        endblocktrans_tag = template_file[endblocktrans_spos:endblocktrans_epos + 2]
-
-        # this case would not happen as the dtl parser would have already picked this up.
-        if len(endblocktrans_tag) < len('{%endblocktrans%}'):
-            _add_violations(self.results,
-                            self.ruleset.django_blocktrans_parse_error,
-                            self)
-            return
-
-        endblocktrans_tag = endblocktrans_tag[2:-2].strip()
-        if endblocktrans_tag != 'endblocktrans':
-            _add_violations(self.results,
-                            self.ruleset.django_blocktrans_parse_error,
-                            self)
-            return
-
-        return template_file[self.end_index + 2: endblocktrans_spos].strip(' ')
+        return template_file[self.end_index + 2: endblocktrans.start()].strip(' ')
 
 class HtmlInterpolateExpression(Expression):
     """

@@ -1551,15 +1551,6 @@ class TestDjangoTemplateLinter(TestLinter):
                 {% endblocktrans %}
                 """, 'rule': ruleset.django_html_interpolation_missing},
 
-        {'expression': """
-                {% blocktrans %}
-                Some translation <span 'a'='b' 'c'='d'> whatever </span>
-                endblocktrans %}
-                """, 'rule': ruleset.django_blocktrans_parse_error},
-        {'expression': """
-                {% blocktrans %}
-                Some translation <span 'a'='b' 'c'='d'> whatever </span>
-                """, 'rule': ruleset.django_blocktrans_parse_error},
     )
     def test_check_django_expressions_in_html(self, data):
         """
