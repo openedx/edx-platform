@@ -177,6 +177,19 @@ class CourseRunRerunSerializer(CourseRunSerializerCommonFieldsMixin, CourseRunTe
         return value
 
     def update(self, instance, validated_data):
+        def _execute_method_and_log_time(func, *args):
+            """
+            Call func passed in method with logging the time it took to complete.
+            Temporarily added for EDUCATOR-4013, we will remove this once we get the required information.
+            """
+            course_run_key = args[1]
+            if 'MITx+7.00x' not in unicode(course_run_key):
+                return func(*args)
+            start_time = time.time()
+            output = func(*args)
+            log.info(u'[%s] [%s] completed in [%f]', func.__name__, course_run_key, (time.time() - start_time))
+            return output
+
         course_run_key = instance.id
         _id = validated_data.pop('id')
         team = validated_data.pop('team', [])
@@ -185,8 +198,15 @@ class CourseRunRerunSerializer(CourseRunSerializerCommonFieldsMixin, CourseRunTe
             'display_name': instance.display_name
         }
         fields.update(validated_data)
-        new_course_run_key = rerun_course(
-            user, course_run_key, course_run_key.org, course_run_key.course, _id['run'], fields, False
+        new_course_run_key = _execute_method_and_log_time(
+            rerun_course,
+            user,
+            course_run_key,
+            course_run_key.org,
+            course_run_key.course,
+            _id['run'],
+            fields,
+            False
         )
 
         course_run = get_course_and_check_access(new_course_run_key, user)
