@@ -158,9 +158,9 @@ def refresh_jwt_cookies(request, response, user):
     """
     Resets the JWT related cookies in the response for the given user.
     """
-    if user.is_authenticated and not user.is_anonymous:
-        cookie_settings = standard_cookie_settings(request)
-        _create_and_set_jwt_cookies(response, request, cookie_settings, user=user)
+    cookie_settings = standard_cookie_settings(request)
+    _create_and_set_jwt_cookies(response, request, cookie_settings, user=user)
+
     return response
 
 

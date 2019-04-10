@@ -367,9 +367,11 @@ def login_user(request):
 # to get a CSRF token before we need to refresh adds too much
 # complexity.
 @csrf_exempt
-@login_required
 @require_http_methods(['POST'])
 def login_refresh(request):
+    if not request.user.is_authenticated or request.user.is_anonymous:
+        return JsonResponse('Unauthorized', status=401)
+
     try:
         response = JsonResponse({'success': True})
         return refresh_jwt_cookies(request, response, request.user)
