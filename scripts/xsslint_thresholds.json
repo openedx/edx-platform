@@ -26,7 +26,16 @@
         "python-parse-error": 0,
         "python-requires-html-or-text": 0,
         "python-wrap-html": 142,
-        "underscore-not-escaped": 493
+        "underscore-not-escaped": 493,
+        "django-trans-missing-escape": 0,
+        "django-trans-invalid-escape-filter": 0,
+        "django-escape-variable-mismatch": 0,
+        "django-blocktrans-missing-escape-filter": 0,
+        "django-blocktrans-parse-error": 0,
+        "django-blocktrans-escape-filter-parse-error": 0,
+        "django-html-interpolation-missing-safe-filter": 0,
+        "django-html-interpolation-missing": 0,
+        "django-html-interpolation-invalid-tag": 0,
     },
     "total": 1432
 }
