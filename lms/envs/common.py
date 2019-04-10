@@ -35,6 +35,13 @@ import os
 from corsheaders.defaults import default_headers as corsheaders_default_headers
 from path import Path as path
 from django.utils.translation import ugettext_lazy as _
+from enterprise.constants import (
+    ENTERPRISE_ADMIN_ROLE,
+    ENTERPRISE_OPERATOR_ROLE,
+    ENTERPRISE_DASHBOARD_ADMIN_ROLE,
+    ENTERPRISE_CATALOG_ADMIN_ROLE,
+    ENTERPRISE_ENROLLMENT_API_ADMIN_ROLE
+)
 
 from openedx.core.constants import COURSE_KEY_REGEX, COURSE_KEY_PATTERN, COURSE_ID_PATTERN
 from openedx.core.djangoapps.theming.helpers_dirs import (
@@ -3321,6 +3328,14 @@ ENTERPRISE_READONLY_ACCOUNT_FIELDS = [
 ]
 ENTERPRISE_CUSTOMER_COOKIE_NAME = 'enterprise_customer_uuid'
 BASE_COOKIE_DOMAIN = 'localhost'
+SYSTEM_TO_FEATURE_ROLE_MAPPING = {
+    ENTERPRISE_ADMIN_ROLE: [ENTERPRISE_DASHBOARD_ADMIN_ROLE],
+    ENTERPRISE_OPERATOR_ROLE: [
+        ENTERPRISE_DASHBOARD_ADMIN_ROLE,
+        ENTERPRISE_CATALOG_ADMIN_ROLE,
+        ENTERPRISE_ENROLLMENT_API_ADMIN_ROLE
+    ],
+}
 
 DATA_CONSENT_SHARE_CACHE_TIMEOUT = None  # Never expire
 
