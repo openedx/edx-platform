@@ -138,9 +138,3 @@ class CookieTests(TestCase):
         self._assert_cookies_present(response, cookies_api.JWT_COOKIE_NAMES)
         self._assert_consistent_expires(response, num_of_unique_expires=1)
         self._assert_recreate_jwt_from_cookies(response, can_recreate=True)
-
-    @patch.dict("django.conf.settings.FEATURES", {"DISABLE_SET_JWT_COOKIES_FOR_TESTS": False})
-    def test_refresh_jwt_cookies_anonymous_user(self):
-        anonymous_user = AnonymousUserFactory()
-        response = cookies_api.refresh_jwt_cookies(self.request, HttpResponse(), anonymous_user)
-        self._assert_cookies_present(response, [])

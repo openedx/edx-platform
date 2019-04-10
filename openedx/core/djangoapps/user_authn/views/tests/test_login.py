@@ -302,6 +302,12 @@ class LoginTest(CacheIsolationTestCase):
         response = self.client.post(reverse('login_refresh'))
         _assert_jwt_cookie_present(response)
 
+    @patch.dict("django.conf.settings.FEATURES", {"DISABLE_SET_JWT_COOKIES_FOR_TESTS": False})
+    def test_login_refresh_anonymous_user(self):
+        response = self.client.post(reverse('login_refresh'))
+        self.assertEqual(response.status_code, 401)
+        self.assertNotIn(jwt_cookies.jwt_cookie_header_payload_name(), self.client.cookies)
+
     @patch.dict("django.conf.settings.FEATURES", {'PREVENT_CONCURRENT_LOGINS': True})
     def test_single_session(self):
         creds = {'email': 'test@edx.org', 'password': 'test_password'}
