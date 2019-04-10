@@ -1,12 +1,13 @@
 <%!
 from django.utils.translation import ugettext as _
 from django.template.defaultfilters import escapejs
+from openedx.core.djangolib.js_utils import js_escaped_string
 %>
 
 <%page args="section_data" expression_filter="h"/>
 
 <script>
-  ${d3_stacked_bar_graph.body()}
+  '${d3_stacked_bar_graph.body() | n, js_escaped_string}'
 </script>
 
 %if not any (section_data.values()):
@@ -77,26 +78,54 @@ from django.template.defaultfilters import escapejs
         metrics_overlay.data("module-id", module_id);
 
         var header = $(this).closest('.metrics-left').siblings('.metrics-tooltip').text();
-        var overlay_content = '<h3 class="metrics-overlay-title">' + header + '</h3>';
+        var overlay_content  = edx.HtmlUtils.interpolateHtml(
+        edx.HtmlUtils.HTML("<h3 class='metrics-overlay-title'>'{header}'</h3>"),
+        {
+            header:header
+        });
+        ## xss-lint: disable=javascript-jquery-append, javascript-jquery-insertion
         $('.metrics-overlay-content', metrics_overlay).before(overlay_content);
 
         $.ajax({
-          url: "${section_data['get_students_opened_subsection_url']}",
+          url: "${section_data['get_students_opened_subsection_url'] | n, js_escaped_string}",
           type: "GET",
           data: {module_id: module_id},
           dataType: "json",
 
           success: function(response) {
-            overlay_content = "<tr class='header'><th>${_('Name')}</th><th>${_('Username')}</th></tr>";
+            var name = "${_('Name') | n, js_escaped_string}";
+	        var username = "${_('Username') | n, js_escaped_string}";
+
+	        overlay_content  = edx.HtmlUtils.interpolateHtml(
+			edx.HtmlUtils.HTML("<tr class='header'><th>'{name}'</th><th>'{username}'</th></tr>"),
+			    {
+				    name:name,
+				    username:username
+			    });
+            ## xss-lint: disable=javascript-jquery-append
             $('.metrics-overlay-content thead', metrics_overlay).append(overlay_content);
 
             $.each(response.results, function(index, value ){
-              overlay_content = '<tr><td>' + _.escape(value['name']) + "</td><td>" + _.escape(value['username']) + '</td></tr>';
+              overlay_content = "<tr><td>'{name}'</td><td>'{username}'</td></tr>";
+
+              overlay_content  = edx.HtmlUtils.interpolateHtml(
+			  edx.HtmlUtils.HTML("<tr><td>'{name}'</td><td>'{username}'</td></tr>"),
+			  {
+                name:_.escape(value['name']),
+                username:_.escape(value['username'])
+			  });
+			  ## xss-lint: disable=javascript-jquery-append
               $('.metrics-overlay-content tbody', metrics_overlay).append(overlay_content);
             });
             // If student list too long, append message to screen.
             if (response.max_exceeded) {
-              overlay_content = "<p class='overflow-message'>${_('This is a partial list, to view all students download as a csv.')}</p>";
+                var message = "${_('This is a partial list, to view all students download as a csv.') | n, js_escaped_string}";
+	            overlay_content  = edx.HtmlUtils.interpolateHtml(
+			    edx.HtmlUtils.HTML("<p class='overflow-message'>'{message}'</p>"),
+			    {
+				    message:message
+			    });
+			    ## xss-lint: disable=javascript-jquery-insertion
               $('.metrics-overlay-content', metrics_overlay).after(overlay_content);
             }
           }
@@ -117,26 +146,58 @@ from django.template.defaultfilters import escapejs
         var far_index = header.indexOf(' - ');
         var title = header.substring(0, far_index);
 
-        var overlay_content = '<h3 class="metrics-overlay-title">' + title + '</h3>';
+        var overlay_content  = edx.HtmlUtils.interpolateHtml(
+        edx.HtmlUtils.HTML("<h3 class='metrics-overlay-title'>'{title}'</h3>"),
+        {
+            title:title
+        });
+        ## xss-lint: disable=javascript-jquery-insertion
         $('.metrics-overlay-content', metrics_overlay).before(overlay_content);
 
         $.ajax({
-          url: "${section_data['get_students_problem_grades_url']}",
+          url: "${section_data['get_students_problem_grades_url'] | n, js_escaped_string}",
           type: "GET",
           data: {module_id: module_id},
           dataType: "json",
 
           success: function(response) {
-            overlay_content = "<tr class='header'><th>${_('Name')}</th><th>${_('Username')}</th><th>${_('Grade')}</th><th>${_('Percent')}</th></tr>";
+            name = "${_('Name') | n, js_escaped_string}";
+            username = "${_('Username') | n, js_escaped_string}";
+            grade = "${_('Grade') | n, js_escaped_string}";
+            percent = "${_('Percent') | n, js_escaped_string}";
+
+	        overlay_content  = edx.HtmlUtils.interpolateHtml(
+			edx.HtmlUtils.HTML("<tr class='header'><th>'{name}'</th><th>'{username}'</th><th>'{grade}'</th><th>'{percent}'</th></tr>"),
+			{
+			    name:name,
+			    username:username,
+			    grade:grade,
+			    percent:percent
+			});
+			## xss-lint: disable=javascript-jquery-append
             $('.metrics-overlay-content thead', metrics_overlay).append(overlay_content);
 
             $.each(response.results, function(index, value ){
-              overlay_content = '<tr><td>' + _.escape(value['name']) + "</td><td>" + _.escape(value['username']) + "</td><td>" + _.escape(value['grade']) + "</td><td>" + _.escape(value['percent']) + '</td></tr>';
+              overlay_content  = edx.HtmlUtils.interpolateHtml(
+			  edx.HtmlUtils.HTML("<tr><td>'{name}'</td><td>'{username}'</td><td>'{grade}'</td><td>'{percent}'</td></tr>"),
+			  {
+                name:_.escape(value['name']),
+                username:_.escape(value['username']),
+                grade:_.escape(value['grade']),
+                percent:_.escape(value['percent'])
+			  });
+			  ## xss-lint: disable=javascript-jquery-append
               $('.metrics-overlay-content tbody', metrics_overlay).append(overlay_content);
             });
             // If student list too long, append message to screen.
             if (response.max_exceeded) {
-              overlay_content = "<p class='overflow-message'>${_('This is a partial list, to view all students download as a csv.')}</p>";
+              var message = "${_('This is a partial list, to view all students download as a csv.') | n, js_escaped_string}";
+	            overlay_content  = edx.HtmlUtils.interpolateHtml(
+			    edx.HtmlUtils.HTML("<p class='overflow-message'>'{message}'</p>"),
+			    {
+				    message:message
+			    });
+			    ## xss-lint: disable=javascript-jquery-insertion
               $('.metrics-overlay-content', metrics_overlay).after(overlay_content);
             }
           },
@@ -151,26 +212,38 @@ from django.template.defaultfilters import escapejs
         $('.loading').remove();
 
 
-        var nothingText = "${_('There are no problems in this section.')}";
-        var loadingText = "${_('Loading')}";
-        var nothingP = '<p class="nothing">' + nothingText  + '</p>';
-        var loading = '<p class="loading"><span class="icon fa fa-spinner fa-spin fa-large" aria-hidden="true"></span>' + loadingText + '</p>';
+        var nothingText = "${_('There are no problems in this section.') | n, js_escaped_string}";
+        var loadingText = "${_('Loading') | n, js_escaped_string}";
+        var nothingP  = edx.HtmlUtils.interpolateHtml(
+        edx.HtmlUtils.HTML("<p class='nothing'>'{nothingText}'</p>"),
+        {
+            nothingText:nothingText
+        });
+
+        var loading  = edx.HtmlUtils.interpolateHtml(
+        edx.HtmlUtils.HTML("<p class='loading'><span class='icon fa fa-spinner fa-spin fa-large' aria-hidden='true'></span>'{loadingText}'</p>"),
+        {
+            loadingText:loadingText
+        });
 
         // Display spinners or "There are no problems in this section" message
         $('.metrics-left').each(function() {
+          ## xss-lint: disable=javascript-jquery-append
           $(this).append(loading);
         });
         $('.metrics-right p.nothing').remove();
         $('.metrics-right').each(function() {
           if ($(this).data('section-has-problem') === "False") {
+            ## xss-lint: disable=javascript-jquery-append
             $(this).append(nothingP);
           } else {
+            ## xss-lint: disable=javascript-jquery-append
             $(this).append(loading);
           }
         });
         $('.metrics-left svg, .metrics-right svg').remove();
 
-        ${all_section_metrics.body("metric_opened_", "metric_grade_", "metric_attempts_", "metric_tooltip_", course.id, allSubsectionTooltipArr, allProblemTooltipArr)}
+        '${all_section_metrics.body("metric_opened_", "metric_grade_", "metric_attempts_", "metric_tooltip_", course.id, allSubsectionTooltipArr, allProblemTooltipArr) | n, js_escaped_string}'
       }
 
       // For downloading subsection and problem data as csv
@@ -194,7 +267,7 @@ from django.template.defaultfilters import escapejs
         var data = {}
         data['sections'] = JSON.stringify(allSectionArr);
         data['tooltips'] = JSON.stringify(allTooltipArr);
-        data['course_id'] = "${section_data['course_id'] | escapejs}";
+        data['course_id'] = "${section_data['course_id'] | n, js_escaped_string}";
         data['data_type'] = event.type;
 
         var input_data = document.createElement("input");
@@ -203,11 +276,11 @@ from django.template.defaultfilters import escapejs
 
         var csrf_token_input = document.createElement("input");
         csrf_token_input.name = 'csrfmiddlewaretoken';
-        csrf_token_input.value = "${ csrf_token }"
+        csrf_token_input.value = "${ csrf_token | n, js_escaped_string}"
 
         // Send data as a POST so it doesn't create a huge url
         var form = document.createElement("form");
-        form.action = "${section_data['post_metrics_data_csv_url']}";
+        form.action = "${section_data['post_metrics_data_csv_url'] | n, js_escaped_string}";
         form.method = 'post'
 
         form.appendChild(input_data);

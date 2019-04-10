@@ -25,7 +25,7 @@ from six import text_type
         ## Twitter account. {url} should appear at the end of the text.
         tweet_text = _("I just enrolled in {number} {title} through {account}: {url}").format(
             number=course.number,
-            title=course.display_name_with_default_escaped,
+            title=course.display_name_with_default,
             account=static.get_value('course_about_twitter_account', settings.PLATFORM_TWITTER_ACCOUNT),
             url=u"{protocol}://{domain}{path}".format(
                 protocol=site_protocol,
@@ -43,7 +43,7 @@ from six import text_type
             subject=_("Take a course with {platform} online").format(platform=platform_name),
             body=_("I just enrolled in {number} {title} through {platform} {url}").format(
                 number=course.number,
-                title=course.display_name_with_default_escaped,
+                title=course.display_name_with_default,
                 platform=platform_name,
                 url=u"{protocol}://{domain}{path}".format(
                     protocol=site_protocol,

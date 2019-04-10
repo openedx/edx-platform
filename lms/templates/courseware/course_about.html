@@ -10,6 +10,7 @@ from six import text_type
 from edxmako.shortcuts import marketing_link
 from openedx.core.djangolib.js_utils import js_escaped_string
 from openedx.core.djangolib.markup import HTML, Text
+from openedx.core.djangolib.js_utils import js_escaped_string
 from openedx.core.lib.courses import course_image_url
 
 from six import string_types
@@ -57,6 +58,36 @@ from six import string_types
       });
     % endif
 
+<<<<<<< HEAD
+=======
+    ## making the conditional around this entire JS block for sanity
+    %if settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
+      <%
+        perms_error = Text(_('The currently logged-in user account does not have permission to enroll in this course. '
+                        'You may need to {start_logout_tag}log out{end_tag} then try the enroll button again. '
+                        'Please visit the {start_help_tag}help page{end_tag} for a possible solution.')).format(
+                          start_help_tag=HTML("<a href='{url}'>").format(url=marketing_link('FAQ')), end_tag=HTML('</a>'),
+                          start_logout_tag=HTML("<a href='{url}'>").format(url=reverse('logout'))
+                          )
+      %>
+    $('#class_enroll_form').on('ajax:complete', function(event, xhr) {
+      if(xhr.status == 200) {
+        location.href = "${reverse('dashboard') | n, js_escaped_string}";
+      } else if (xhr.status == 403) {
+        ## xss-lint: disable=mako-invalid-js-filter
+        location.href = "${reverse('course-specific-register', args=[text_type(course.id)]) | n, js_escaped_string}?course_id=${course.id | u}&enrollment_action=enroll";
+      } else if (xhr.status == 400) { //This means the user did not have permission
+        $('#register_error').text("${perms_error | n, js_escaped_string}").css("display", "block");
+      } else {
+        $('#register_error').text(
+            (xhr.responseText ? xhr.responseText : "${_("An error occurred. Please try again later.") | n, js_escaped_string}")
+        ).css("display", "block");
+      }
+    });
+
+    %else:
+
+>>>>>>> baa3f4e... Fix xss-lint violations.
     $('#class_enroll_form').on('ajax:complete', function(event, xhr) {
       if(xhr.status == 200) {
         if (xhr.responseText == "") {
@@ -65,9 +96,18 @@ from six import string_types
         else {
           location.href = xhr.responseText;
         }
+<<<<<<< HEAD
       } else {
         $('#register_error').text(
             (xhr.responseText ? xhr.responseText : "${_("An error occurred. Please try again later.") | n, js_escaped_string}")
+=======
+      } else if (xhr.status == 403) {
+          ## xss-lint: disable=mako-invalid-js-filter
+          location.href = "${reverse('register_user') | n, js_escaped_string}?course_id=${course.id | u}&enrollment_action=enroll";
+      } else {
+        $('#register_error').text(
+            (xhr.responseText ? xhr.responseText : "${_("An error occurred. Please try again later.")| n, js_escaped_string}")
+>>>>>>> baa3f4e... Fix xss-lint violations.
         ).css("display", "block");
       }
     });

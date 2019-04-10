@@ -6,6 +6,7 @@ ${static.css(group='style-vendor-tinymce-skin', raw=True)}
 ${static.css(group='style-xmodule-annotations', raw=True)}
 <%!
 from django.utils.translation import ugettext as _
+from openedx.core.djangolib.js_utils import js_escaped_string
 from django.urls import reverse
 %>
 
@@ -81,8 +82,8 @@ from django.urls import reverse
                 optionsAnnotator: {
                     permissions:{
                         user: {
-                            id:"${student.email}",
-                            name:"${student.username}"
+                            id:"${student.email | n, js_escaped_string}",
+                            name:"${student.username | n, js_escaped_string}"
                         },
                         userString: function (user) {
                             if (user && user.name)
@@ -96,9 +97,9 @@ from django.urls import reverse
                         },
                         permissions: {
                                 'read':   [],
-                                'update': ["${student.email}"],
-                                'delete': ["${student.email}"],
-                                'admin':  ["${student.email}"]
+                                'update': ["${student.email | n, js_escaped_string}"],
+                                'delete': ["${student.email | n, js_escaped_string}"],
+                                'admin':  ["${student.email | n, js_escaped_string}"]
                         },
                         showViewPermissionsCheckbox: true,
                         showEditPermissionsCheckbox: false,
@@ -133,11 +134,11 @@ from django.urls import reverse
                           },
                     },
                     auth: {
-                        token: "${token}"
+                        token: "${token | n, js_escaped_string}"
                     },
                     store: {
                         // The endpoint of the store on your server.
-                        prefix: "${storage}",
+                        prefix: "${storage | n, js_escaped_string}",
 
                         annotationData: {},
 
@@ -171,11 +172,11 @@ from django.urls import reverse
                     }
                 },
                 auth: {
-                    token: "${token}"
+                    token: "${token | n, js_escaped_string}"
                 },
                 store: {
                     // The endpoint of the store on your server.
-                    prefix: "${storage}",
+                    prefix: "${storage | n, js_escaped_string}",
 
                     annotationData: {},
 
@@ -190,7 +191,7 @@ from django.urls import reverse
                 }
             };
 
-        var imgURLRoot = "${settings.STATIC_URL}" + "js/vendor/ova/catch/img/";
+        var imgURLRoot = "${settings.STATIC_URL | n, js_escaped_string}" + "js/vendor/ova/catch/img/";
         //remove old instances
         if (Annotator._instances.length !== 0) {
             $('#notesHolder').annotator("destroy");
@@ -214,7 +215,7 @@ from django.urls import reverse
                 showPublicPrivate: true,
                 pagination:pagination,//Number of Annotations per load in the pagination,
                 flags:is_staff,
-                default_tab: "${default_tab}",
+                default_tab: "${default_tab | n, js_escaped_string}",
             },
             Catch = new CatchAnnotation($('#catchDIV'),catchOptions);
             // TODO: Fix to avoid using global scope!

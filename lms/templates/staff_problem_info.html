@@ -3,6 +3,8 @@
 from django.utils.translation import ugettext as _
 from openedx.core.djangolib.markup import Text
 from django.template.defaultfilters import escapejs
+from openedx.core.djangolib.js_utils import js_escaped_string
+
 from six import text_type
 %>
 
@@ -145,15 +147,15 @@ ${block_content}
 $(function () {
     setup_debug('${element_id}',
         %if edit_link:
-        '${edit_link}',
+        '${edit_link | n, js_escaped_string}',
         %else:
         null,
         %endif
         {
             'location': '${location | escapejs}',
-            'xqa_key': '${xqa_key}',
-            'category': '${category}',
-            'user': '${user}'
+            'xqa_key': '${xqa_key | n, js_escaped_string}',
+            'category': '${category | n, js_escaped_string}',
+            'user': '${user | n, js_escaped_string}'
         }
     );
 });

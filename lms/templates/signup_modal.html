@@ -2,6 +2,7 @@
 <%namespace name='static' file='static_content.html'/>
 <%!
 from openedx.core.djangolib.markup import HTML, Text
+from openedx.core.djangolib.js_utils import js_escaped_string
 from django.conf import settings
 from django.urls import reverse
 from django_countries import countries
@@ -167,12 +168,12 @@ import calendar
 <script type="text/javascript">
   (function() {
    $(document).delegate('#register_form', 'ajax:success', function(data, json, xhr) {
-     location.href="${reverse('dashboard')}";
+     location.href="${reverse('dashboard') | n, js_escaped_string}";
     });
    $(document).delegate('#register_form', 'ajax:error', function(event, jqXHR, textStatus) {
      json = $.parseJSON(jqXHR.responseText);
      $(".field-error").removeClass('field-error');
-     $('#register_error').html(json.value).stop().css("display", "block");
+     $('#register_error').text(json.value).stop().css("display", "block");
      $("[data-field='"+json.field+"']").addClass('field-error')
     });
 

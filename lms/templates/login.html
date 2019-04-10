@@ -5,6 +5,7 @@
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 from openedx.core.djangolib.markup import HTML, Text
+from openedx.core.djangolib.js_utils import js_escaped_string
 import third_party_auth
 from third_party_auth import provider, pipeline
 %>
@@ -55,24 +56,24 @@ from third_party_auth import provider, pipeline
         if (request.status === 403) {
           $('.message.submission-error').removeClass('is-shown');
           $('.third-party-signin.message').addClass('is-shown').focus();
-          $('.third-party-signin.message .instructions').html(request.responseText);
+          $('.third-party-signin.message .instructions').text(request.responseText);
         } else {
           $('.third-party-signin.message').removeClass('is-shown');
           $('.message.submission-error').addClass('is-shown').focus();
-          $('.message.submission-error').html(gettext("Your request could not be completed.  Please try again."));
+          $('.message.submission-error').text(gettext("Your request could not be completed.  Please try again."));
         }
       });
 
       $('#login-form').on('ajax:success', function(event, json, xhr) {
         if(json.success) {
-          var nextUrl = "${login_redirect_url}";
+          var nextUrl = "${login_redirect_url | n, js_escaped_string}";
           if (json.redirect_url) {
             nextUrl = json.redirect_url; // Most likely third party auth completion. This trumps 'nextUrl' above.
           }
           if (!isExternal(nextUrl)) {
             location.href=nextUrl;
           } else {
-            location.href="${reverse('dashboard')}";
+            location.href="${reverse('dashboard') | n, js_escaped_string}";
           }
         } else if(json.hasOwnProperty('redirect')) {
           // Shibboleth authentication redirect requested by the server:
@@ -84,7 +85,7 @@ from third_party_auth import provider, pipeline
         } else {
           toggleSubmitButton(true);
           $('.message.submission-error').addClass('is-shown').focus();
-          $('.message.submission-error .message-copy').html(json.value);
+          $('.message.submission-error .message-copy').text(json.value);
         }
       });
       $("#forgot-password-link").click(function() {

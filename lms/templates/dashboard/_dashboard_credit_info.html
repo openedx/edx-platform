@@ -66,7 +66,7 @@
             elif request_status == 'rejected':
                 # REJECTED (by the credit provider)!
                 ## Translators: link_to_provider_site is a link to an external webpage. The text of the link will be the name of a credit provider, such as 'State University' or 'Happy Fun Company'. provider_name is the name of credit provider.
-                credit_msg = _("{provider_name} did not approve your request for course credit. For more information, contact {link_to_provider_site} directly.").format(
+                credit_msg = Text(_("{provider_name} did not approve your request for course credit. For more information, contact {link_to_provider_site} directly.")).format(
                     provider_name=credit_status["provider_name"],
                     link_to_provider_site=provider_link,
                 )
@@ -77,8 +77,8 @@
     <div class="message message-status is-shown credit-message">
 
         <p class="message-copy is-hidden credit-error-msg" data-credit-error="${credit_status['error']}">
-            ${_("An error occurred with this transaction. For help, contact {support_email}.").format(
-            support_email=u'<a href="mailto:{address}">{address}</a>'.format(
+            ${Text(_("An error occurred with this transaction. For help, contact {support_email}.")).format(
+            support_email=HTML(u'<a href="mailto:{address}">{address}</a>').format(
             address=settings.DEFAULT_FEEDBACK_EMAIL
             )
             )}

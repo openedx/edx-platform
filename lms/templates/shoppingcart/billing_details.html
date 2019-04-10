@@ -2,6 +2,7 @@
 <%inherit file="shopping_cart_flow.html" />
 <%!
 from django.utils.translation import ugettext as _
+from openedx.core.djangolib.js_utils import js_escaped_string
 from django.urls import reverse
 %>
 
@@ -75,7 +76,7 @@ from django.urls import reverse
       var recipient_email = $('input[name="recipient_email"]').val();
       var company_contact_email =  $('input[name="company_contact_email"]').val();
       if ( recipient_email != '' && !(validateEmail(recipient_email))) {
-         $('span#recipient_email_error').html('Please enter valid email address');
+         $('span#recipient_email_error').text('Please enter valid email address');
          $('input[name="recipient_email"]').addClass('error');
         is_valid_email = false;
       }
@@ -84,7 +85,7 @@ from django.urls import reverse
         $('span#recipient_email_error').html('');
       }
       if ( company_contact_email != '' && !(validateEmail(company_contact_email))) {
-         $('span#company_contact_email_error').html('Please enter valid email address');
+         $('span#company_contact_email_error').text('Please enter valid email address');
         $('input[name="company_contact_email"]').addClass('error');
         is_valid_email = false;
       }
@@ -98,7 +99,7 @@ from django.urls import reverse
       event.preventDefault();
       // Disable the submit button to prevent duplicate submissions
       $(this).addClass("disabled");
-      var post_url = "${reverse('billing_details')}";
+      var post_url = "${reverse('billing_details') | n, js_escaped_string}";
       var data = {
                "company_name" : $('input[name="company_name"]').val(),
                "company_contact_name" : $('input[name="company_contact_name"]').val(),
@@ -110,7 +111,7 @@ from django.urls import reverse
       $.post(post_url, data)
       .success(function(data) {
             if (data.is_course_enrollment_closed == true) {
-              location.href = "${reverse('shoppingcart.views.show_cart')}";
+              location.href = "${reverse('shoppingcart.views.show_cart') | n, js_escaped_string}";
             }
             else {
               payment_form.submit();

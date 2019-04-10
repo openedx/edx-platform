@@ -5,6 +5,7 @@
 <%!
 from django.utils.translation import ugettext as _
 from openedx.core.djangolib.markup import HTML, Text
+from openedx.core.djangolib.js_utils import js_escaped_string
 from django.urls import reverse
 from django.utils import html
 from django_countries import countries
@@ -52,7 +53,7 @@ import calendar
       });
 
       $('#register-form').on('ajax:success', function(event, json, xhr) {
-        var url = json.redirect_url || "${reverse('dashboard')}";
+        var url = json.redirect_url || "${reverse('dashboard') | n, js_escaped_string}";
         location.href = url;
       });
 
@@ -60,7 +61,7 @@ import calendar
         toggleSubmitButton(true);
         json = $.parseJSON(jqXHR.responseText);
         $('.status.message.submission-error').addClass('is-shown').focus();
-        $('.status.message.submission-error .message-copy').html(json.value).stop().css("display", "block");
+        $('.status.message.submission-error .message-copy').text(json.value).stop().css("display", "block");
         $(".field-error").removeClass('field-error');
         $("[data-field='"+json.field+"']").addClass('field-error')
       });
@@ -74,14 +75,14 @@ import calendar
           removeClass('is-disabled').
           attr('aria-disabled', false).
           removeProp('disabled').
-          text("${_('Update my {platform_name} Account').format(platform_name=settings.PLATFORM_NAME)}");
+          text("${_('Update my {platform_name} Account').format(platform_name=settings.PLATFORM_NAME) | n, js_escaped_string}");
       }
       else {
         $submitButton.
           addClass('is-disabled').
           attr('aria-disabled', true).
           prop('disabled', true).
-          text("${_('Processing your account information')}");
+          text("${_('Processing your account information') | n, js_escaped_string}");
       }
     }
   </script>
