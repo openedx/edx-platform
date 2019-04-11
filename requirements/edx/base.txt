@@ -112,7 +112,7 @@ edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
 edx-django-utils==1.0.3
 edx-drf-extensions==2.2.0
-edx-enterprise==1.4.1
+edx-enterprise==1.4.3
 edx-i18n-tools==0.4.8
 edx-milestones==0.1.13
 edx-oauth2-provider==1.2.2
@@ -202,7 +202,7 @@ python-levenshtein==0.12.0
 python-memcached==1.59
 python-openid==2.2.5 ; python_version == "2.7"  # via social-auth-core
 python-swiftclient==3.7.0
-python3-saml==1.5.0
+python3-saml==1.6.0
 pytz==2019.1
 pyuca==1.1
 pyyaml==5.1
