@@ -28,7 +28,7 @@ class FeatureBasedEnrollmentsSupportView(View):
         if course_key:
             results = self._get_course_duration_info(course_key)
         else:
-            results = []
+            results = {}
 
         return render_to_response('support/feature_based_enrollments.html', {
             'course_key': course_key,
@@ -39,14 +39,12 @@ class FeatureBasedEnrollmentsSupportView(View):
         """
         Fetch course duration information from database
         """
-        results = []
-
         try:
             key = CourseKey.from_string(course_key)
             course = CourseOverview.objects.values('display_name').get(id=key)
             duration_config = CourseDurationLimitConfig.current(course_key=key)
             gating_config = ContentTypeGatingConfig.current(course_key=key)
-            partially_enabled = duration_config.enabled != gating_config.enabled
+            partially_enabled = bool(duration_config.enabled) != bool(gating_config.enabled)
 
             if partially_enabled:
                 if duration_config.enabled:
@@ -62,16 +60,12 @@ class FeatureBasedEnrollmentsSupportView(View):
                 enabled_as_of = str(duration_config.enabled_as_of) if duration_config.enabled_as_of else 'N/A'
                 reason = duration_config.provenances['enabled']
 
-            data = {
+            return {
                 'course_id': course_key,
                 'course_name': course.get('display_name'),
-                'enabled': enabled,
-                'enabled_as_of': enabled_as_of,
-                'reason': reason,
+                'gating_config': gating_config,
+                'duration_config': duration_config,
             }
-            results.append(data)
 
         except (ObjectDoesNotExist, InvalidKeyError):
-            pass
-
-        return results
+            return {}
