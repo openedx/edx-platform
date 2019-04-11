@@ -177,6 +177,7 @@ FEATURES = {
     'ENABLE_DISCUSSION_SERVICE': True,
     'ENABLE_TEXTBOOK': True,
 
+    # .. documented_elsewhere: true
     # .. documented_elsewhere_name: ENABLE_STUDENT_NOTES
     'ENABLE_STUDENT_NOTES': True,
 
