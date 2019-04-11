@@ -305,12 +305,15 @@ class WaffleFlag(object):
         Initializes the waffle flag instance.
 
         Arguments:
-            waffle_namespace (WaffleFlagNamespace): Provides a cached namespace
-                for this flag.
+            waffle_namespace (WaffleFlagNamespace | String): Namespace for this flag.
             flag_name (String): The name of the flag (without namespacing).
             flag_undefined_default (Boolean): A default value to be returned if
                 the waffle flag is to be checked, but doesn't exist.
         """
+        if isinstance(waffle_namespace, six.string_types):
+            waffle_namespace = WaffleFlagNamespace(name=waffle_namespace)
+
+        self.waffle_namespace = waffle_namespace
         self.waffle_namespace = waffle_namespace
         self.flag_name = flag_name
         self.flag_undefined_default = flag_undefined_default

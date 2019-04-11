@@ -3469,6 +3469,9 @@ WRITABLE_GRADEBOOK_URL = None
 # completely removed and this redirect is no longer needed, we can remove this.
 PROFILE_MICROFRONTEND_URL = "http://some.profile.spa/u/"
 
+# URL configuration for new microfrontends.
+ORDER_HISTORY_MICROFRONTEND_URL = "http://some.order_history.spa/"
+
 ############### Settings for django-fernet-fields ##################
 FERNET_KEYS = [
     'DUMMY KEY CHANGE BEFORE GOING TO PRODUCTION',

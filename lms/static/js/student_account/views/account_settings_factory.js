@@ -12,6 +12,7 @@
                  AccountSettingsFieldViews, AccountSettingsView, StringUtils, HtmlUtils) {
         return function(
             fieldsData,
+            disableOrderHistoryTab,
             ordersHistoryData,
             authData,
             passwordResetSupportUrl,
@@ -421,6 +422,7 @@
                     ordersTabSections: ordersSectionData
                 },
                 userPreferencesModel: userPreferencesModel,
+                disableOrderHistoryTab: disableOrderHistoryTab,
                 betaLanguage: betaLanguage
             });
 
