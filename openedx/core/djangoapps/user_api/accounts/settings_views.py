@@ -19,6 +19,7 @@ from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.lang_pref.api import all_languages, released_languages
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.user_api.accounts.toggles import REDIRECT_TO_ORDER_HISTORY_MICROFRONTEND
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from openedx.core.lib.time_zone_utils import TIME_ZONE_CHOICES
@@ -118,11 +119,12 @@ def account_settings_context(request):
         'show_program_listing': ProgramsApiConfig.is_enabled(),
         'show_dashboard_tabs': True,
         'order_history': user_orders,
+        'disable_order_history_tab': REDIRECT_TO_ORDER_HISTORY_MICROFRONTEND.is_enabled(),
         'enable_account_deletion': configuration_helpers.get_value(
             'ENABLE_ACCOUNT_DELETION', settings.FEATURES.get('ENABLE_ACCOUNT_DELETION', False)
         ),
         'extended_profile_fields': _get_extended_profile_fields(),
-        'beta_language': beta_language
+        'beta_language': beta_language,
     }
 
     enterprise_customer = get_enterprise_customer_for_learner(site=request.site, user=request.user)
