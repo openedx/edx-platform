@@ -246,7 +246,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-03-31 20:42+0000\n"
+"POT-Creation-Date: 2019-04-07 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2019\n"
 "Language-Team: Spanish (Latin America) (https://www.transifex.com/open-edx/teams/6205/es_419/)\n"
@@ -626,6 +626,13 @@ msgid ""
 msgstr ""
 "Las contraseñas sin procesar no son almacenadas, así que no hay manera de "
 "ver la contraseña de este usuario."
+
+#: common/djangoapps/student/admin.py
+#, python-format
+msgid "%(count)d student account was unlocked."
+msgid_plural "%(count)d student accounts were unlocked."
+msgstr[0] ""
+msgstr[1] ""
 
 #: common/djangoapps/student/forms.py
 msgid ""
@@ -5379,6 +5386,31 @@ msgstr ""
 "{display_name} sólo es accesible para los estudiantes inscritos. Inicie "
 "sesión o regístrese, e inscríbase en el curso para verlo."
 
+#: common/templates/admin/student/loginfailures/change_form_template.html
+msgid "Unlock Account"
+msgstr ""
+
+#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a control to allow users to exit out of this modal
+#. interface (a menu or piece of UI that takes the full focus of the screen)
+#: common/templates/admin/student/loginfailures/change_form_template.html
+#: lms/templates/wiki/edit.html lms/templates/wiki/history.html
+#: lms/templates/wiki/includes/cheatsheet.html lms/templates/dashboard.html
+#: lms/templates/forgot_password_modal.html lms/templates/help_modal.html
+#: lms/templates/signup_modal.html lms/templates/ccx/schedule.html
+#: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/invalidate_registration_code_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
+#: lms/templates/modal/_modal-settings-language.html
+#: themes/edx.org/lms/templates/dashboard.html
+#: themes/edx.org/lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
+msgid "Close"
+msgstr "Cerrar"
+
 #: common/templates/student/edx_ace/accountrecovery/email/body.html
 msgid "Create Password"
 msgstr "Crear contraseña"
@@ -7080,10 +7112,6 @@ msgstr "Estadísticas del sitio"
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Total number of users"
 msgstr "Número total de usuarios"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Courses loaded in the modulestore"
-msgstr "Cursos cargados en la bodega de módulos"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 #: lms/djangoapps/support/views/manage_user.py lms/templates/tracking_log.html
@@ -10500,26 +10528,6 @@ msgstr "Guardar cambios"
 #: wiki/templates/wiki/edit.html
 msgid "Preview"
 msgstr "Vista previa"
-
-#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-#. Translators: this is a control to allow users to exit out of this modal
-#. interface (a menu or piece of UI that takes the full focus of the screen)
-#: lms/templates/wiki/edit.html lms/templates/wiki/history.html
-#: lms/templates/wiki/includes/cheatsheet.html lms/templates/dashboard.html
-#: lms/templates/forgot_password_modal.html lms/templates/help_modal.html
-#: lms/templates/signup_modal.html lms/templates/ccx/schedule.html
-#: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/invalidate_registration_code_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
-#: lms/templates/modal/_modal-settings-language.html
-#: themes/edx.org/lms/templates/dashboard.html
-#: themes/edx.org/lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
-msgid "Close"
-msgstr "Cerrar"
 
 #: lms/templates/wiki/edit.html
 msgid "Wiki Preview"

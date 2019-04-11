@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-04-07 20:37+0000\n"
-"PO-Revision-Date: 2019-04-07 20:37:41.593434\n"
+"POT-Creation-Date: 2019-04-11 09:52+0000\n"
+"PO-Revision-Date: 2019-04-11 09:52:28.713624\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -14298,23 +14298,6 @@ msgstr ""
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Continue"
 msgstr "Çöntïnüé Ⱡ'σяєм ιρѕυм ∂#"
-
-#: openedx/features/learner_profile/views/learner_profile.py
-#, python-brace-format
-msgid ""
-"Welcome to the new learner profile page. Your full profile now displays more"
-" information to other learners. You can instead choose to display a limited "
-"profile. {learn_more_link_start}Learn more{learn_more_link_end}"
-msgstr ""
-"Wélçömé tö thé néw léärnér pröfïlé pägé. Ýöür füll pröfïlé nöw dïspläýs möré"
-" ïnförmätïön tö öthér léärnérs. Ýöü çän ïnstéäd çhöösé tö dïspläý ä lïmïtéd "
-"pröfïlé. {learn_more_link_start}Léärn möré{learn_more_link_end} Ⱡ'σяєм ιρѕυм"
-" ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
-"ηση ρяσι∂єηт, ѕυηт ιη ¢#"
 
 #: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #, python-format
