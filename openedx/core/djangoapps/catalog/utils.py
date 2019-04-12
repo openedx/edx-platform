@@ -341,7 +341,7 @@ def get_course_run_data(course_run_id):
     user, catalog_integration = check_catalog_integration_and_get_user(error_message_field="Course runs")
     if user:
         api = create_catalog_api_client(user)
-        course_run_data = get_edx_api_data(catalog_integration, 'course_runs/{}'.format(course_run_id), api=api)
+        course_run_data = get_edx_api_data(catalog_integration, 'course_runs', resource_id=course_run_id, api=api)
 
     return course_run_data
 
