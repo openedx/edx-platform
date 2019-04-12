@@ -45,11 +45,7 @@ pytest-xdist              # Parallel execution of tests on multiple CPU cores or
 radon                     # Calculates cyclomatic complexity of Python code (code quality utility)
 selenium                  # Browser automation library, used for acceptance tests
 singledispatch            # Backport of functools.singledispatch from Python 3.4+, used in tests of XBlock rendering
-splinter                  # Browser driver used by lettuce
 testfixtures              # Provides a LogCapture utility used by several tests
 tox                       # virtualenv management for tests
 tox-battery               # Makes tox aware of requirements file changes
 transifex-client          # Command-line interface for the Transifex localization service
-
-# Deprecated acceptance testing framework
--e git+https://github.com/edx/lettuce.git@7a04591c78ac56dac3eb3e91ca94b15cce844133#egg=lettuce==0.2.23+edx.1

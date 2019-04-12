@@ -88,9 +88,8 @@ class Env(object):
         BOK_CHOY_REPORT_DIR = BOK_CHOY_REPORT_DIR / shard_str
         BOK_CHOY_LOG_DIR = BOK_CHOY_LOG_DIR / shard_str
 
-    # For the time being, stubs are used by both the bok-choy and lettuce acceptance tests
-    # For this reason, the stubs package is currently located in the Django app called "terrain"
-    # where other lettuce configuration is stored.
+    # The stubs package is currently located in the Django app called "terrain"
+    # from when they were used by both the bok-choy and lettuce (deprecated) acceptance tests
     BOK_CHOY_STUB_DIR = REPO_ROOT / "common" / "djangoapps" / "terrain"
 
     # Directory that videos are served from
