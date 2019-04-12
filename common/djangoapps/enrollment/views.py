@@ -187,6 +187,7 @@ class EnrollmentView(APIView, ApiKeyPermissionMixIn):
             A JSON serialized representation of the course enrollment.
 
         """
+        import pudb; pudb.set_trace()
         username = username or request.user.username
 
         # TODO Implement proper permissions
@@ -354,6 +355,7 @@ class EnrollmentCourseDetailView(APIView):
             A JSON serialized representation of the course enrollment details.
 
         """
+        import pudb; pudb.set_trace()
         try:
             return Response(api.get_course_enrollment_details(course_id, bool(request.GET.get('include_expired', ''))))
         except CourseNotFoundError:

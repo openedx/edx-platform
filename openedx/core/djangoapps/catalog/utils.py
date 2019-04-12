@@ -326,6 +326,26 @@ def get_programs_with_type(site, include_hidden=True):
     return programs_with_type
 
 
+def get_course_run_data(course_run_id):
+    """
+    Retrieve the course run data from the catalog service for a specific course.
+
+    Arguments:
+        course_run_id(str): course run id
+
+    Returns:
+          dict of course run data
+    """
+    # TODO: should this be cached?
+    course_run_data = None
+    user, catalog_integration = check_catalog_integration_and_get_user(error_message_field="Course runs")
+    if user:
+        api = create_catalog_api_client(user)
+        course_run_data = get_edx_api_data(catalog_integration, 'course_runs/{}'.format(course_run_id), api=api)
+
+    return course_run_data
+
+
 def get_course_runs():
     """
     Retrieve all the course runs from the catalog service.

@@ -93,6 +93,7 @@ def get_enrollments(user_id, include_inactive=False):
         ]
 
     """
+    import pudb; pudb.set_trace()
     return _data_api().get_course_enrollments(user_id, include_inactive)
 
 
