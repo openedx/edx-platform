@@ -545,6 +545,9 @@ MIDDLEWARE_CLASSES = [
 
     'edx_rest_framework_extensions.auth.jwt.middleware.EnsureJWTAuthSettingsMiddleware',
 
+    # Handles automatically storing user ids in django-simple-history tables when possible.
+    'simple_history.middleware.HistoryRequestMiddleware',
+
     # This must be last so that it runs first in the process_response chain
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
 ]

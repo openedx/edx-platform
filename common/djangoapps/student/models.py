@@ -46,6 +46,7 @@ from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
+from simple_history.models import HistoricalRecords
 from six import text_type
 from slumber.exceptions import HttpClientError, HttpServerError
 from user_util import user_util
@@ -1128,6 +1129,14 @@ class CourseEnrollment(models.Model):
     # Represents the modes that are possible. We'll update this later with a
     # list of possible values.
     mode = models.CharField(default=CourseMode.DEFAULT_MODE_SLUG, max_length=100)
+
+    # An audit row will be created for every change to a CourseEnrollment. This
+    # will create a new model behind the scenes - HistoricalCourseEnrollment and a
+    # table named 'student_courseenrollment_history'.
+    history = HistoricalRecords(
+        history_id_field=models.UUIDField(default=uuid.uuid4),
+        table_name='student_courseenrollment_history'
+    )
 
     objects = CourseEnrollmentManager()
 
