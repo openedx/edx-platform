@@ -92,7 +92,19 @@ FEATURES = {
     # in sync with the corresponding ones in cms/envs/common.py
     'ENABLE_DISCUSSION_SERVICE': True,
     'ENABLE_TEXTBOOK': True,
-    'ENABLE_STUDENT_NOTES': True,  # enables the student notes API and UI.
+
+    # .. toggle_name: ENABLE_STUDENT_NOTES
+    # .. toggle_type: feature_flag
+    # .. toggle_default: True
+    # .. toggle_description: Enables the Student Notes API and UI.
+    # .. toggle_category: ????
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2014-11-13
+    # .. toggle_expiration_date: None
+    # .. toggle_warnings: None
+    # .. toggle_tickets: TNL-659
+    # .. toggle_status: supported
+    'ENABLE_STUDENT_NOTES': True,
 
     # discussion home panel, which includes a subscription on/off setting for discussion digest emails.
     # this should remain off in production until digest notifications are online.
@@ -111,6 +123,17 @@ FEATURES = {
 
     'ENABLE_MASQUERADE': True,  # allow course staff to change to student view of courseware
 
+    # .. toggle_name: ENABLE_SYSADMIN_DASHBOARD
+    # .. toggle_type: feature_flag
+    # .. toggle_default: False
+    # .. toggle_description: enables dashboard at /syadmin/ for django staff, for seeing overview of system status, for deleting and loading courses, for seeing log of git imports of courseware.
+    # .. toggle_category: admin
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2013-12-12
+    # .. toggle_expiration_date: None
+    # .. toggle_warnings: some views are not performant when there are more than 100 courses
+    # .. toggle_tickets: None
+    # .. toggle_status: unsupported
     'ENABLE_SYSADMIN_DASHBOARD': False,  # sysadmin dashboard, to see what courses are loaded, to delete & load courses
 
     'DISABLE_LOGIN_BUTTON': False,  # used in systems where login is automatic, eg MIT SSL
