@@ -88,7 +88,7 @@ django-ratelimit-backend==1.1.1
 django-ratelimit==2.0.0
 django-require==1.0.11
 django-rest-swagger==2.2.0
-django-sekizai==0.10.0
+django-sekizai==1.0.0
 django-ses==0.8.4
 django-simple-history==2.7.0
 django-splash==0.2.2
@@ -202,7 +202,7 @@ python-levenshtein==0.12.0
 python-memcached==1.59
 python-openid==2.2.5 ; python_version == "2.7"  # via social-auth-core
 python-swiftclient==3.7.0
-python3-saml==1.5.0
+python3-saml==1.6.0
 pytz==2019.1
 pyuca==1.1
 pyyaml==5.1
