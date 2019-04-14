@@ -246,7 +246,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-04-07 20:42+0000\n"
+"POT-Creation-Date: 2019-04-12 11:15+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2019\n"
 "Language-Team: Spanish (Latin America) (https://www.transifex.com/open-edx/teams/6205/es_419/)\n"
@@ -12852,18 +12852,6 @@ msgstr ""
 msgid "Continue"
 msgstr "Continuar"
 
-#: openedx/features/learner_profile/views/learner_profile.py
-#, python-brace-format
-msgid ""
-"Welcome to the new learner profile page. Your full profile now displays more"
-" information to other learners. You can instead choose to display a limited "
-"profile. {learn_more_link_start}Learn more{learn_more_link_end}"
-msgstr ""
-"Bienvenido/a a la nueva página del perfil del estudiante. Tu perfil completo"
-" ahora muestra más información a otros estudiantes. También puedes elegir "
-"mostrar un perfil limitado. {learn_more_link_start}Aprender "
-"más{learn_more_link_end}"
-
 #: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #, python-format
 msgid ""
@@ -14129,7 +14117,8 @@ msgstr ""
 msgid "Account Status Info"
 msgstr "Información de estado de la cuenta"
 
-#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
+#: lms/templates/dashboard.html lms/templates/header/user_dropdown.html
+#: themes/edx.org/lms/templates/dashboard.html
 msgid "Order History"
 msgstr "Historial de órdenes"
 
