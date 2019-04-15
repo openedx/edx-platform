@@ -450,7 +450,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         ("country", "GB", "XY", u'"XY" is not a valid choice.'),
         ("year_of_birth", 2009, "not_an_int", u"A valid integer is required."),
         ("name", "bob", "z" * 256, u"Ensure this value has at most 255 characters (it has 256)."),
-        ("name", u"ȻħȺɍłɇs", "z   ", u"The name field must be at least 2 characters long."),
+        ("name", u"ȻħȺɍłɇs", "   ", u"The name field must be at least 1 character long."),
         ("goals", "Smell the roses"),
         ("mailing_address", "Sesame Street"),
         # Note that we store the raw data, so it is up to client to escape the HTML.

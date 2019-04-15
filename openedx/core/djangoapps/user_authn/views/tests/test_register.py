@@ -753,12 +753,11 @@ class TestCreateAccountValidation(TestCase):
 
         # Missing
         del params["name"]
-        assert_name_error("Your legal name must be a minimum of two characters long")
+        assert_name_error("Your legal name must be a minimum of one character long")
 
         # Empty, too short
-        for name in ["", "a"]:
-            params["name"] = name
-            assert_name_error("Your legal name must be a minimum of two characters long")
+        params["name"] = ""
+        assert_name_error("Your legal name must be a minimum of one character long")
 
     def test_honor_code(self):
         params = dict(self.minimal_params)

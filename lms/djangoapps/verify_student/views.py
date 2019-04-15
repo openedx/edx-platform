@@ -993,7 +993,7 @@ class SubmitPhotosView(View):
             return HttpResponseBadRequest(_("No profile found for user"))
         except AccountValidationError:
             msg = _(
-                "Name must be at least {min_length} characters long."
+                u"Name must be at least {min_length} character long."
             ).format(min_length=NAME_MIN_LENGTH)
             return HttpResponseBadRequest(msg)
 

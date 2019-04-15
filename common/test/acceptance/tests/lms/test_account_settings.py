@@ -288,7 +288,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
             u'name',
             u'Full Name',
             self.full_name,
-            u'@',
+            u' ',
             [u'<h1>another name<h1>', u'<script>'],
             'Full Name cannot contain the following characters: < >',
             False

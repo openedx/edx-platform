@@ -222,7 +222,7 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
         """ Enforce minimum length for name. """
         if len(new_name) < NAME_MIN_LENGTH:
             raise serializers.ValidationError(
-                "The name field must be at least {} characters long.".format(NAME_MIN_LENGTH)
+                u"The name field must be at least {} character long.".format(NAME_MIN_LENGTH)
             )
         return new_name
 

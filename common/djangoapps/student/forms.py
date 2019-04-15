@@ -281,7 +281,7 @@ class AccountCreationForm(forms.Form):
     """
 
     _EMAIL_INVALID_MSG = _("A properly formatted e-mail is required")
-    _NAME_TOO_SHORT_MSG = _("Your legal name must be a minimum of two characters long")
+    _NAME_TOO_SHORT_MSG = _("Your legal name must be a minimum of one character long")
 
     # TODO: Resolve repetition
 

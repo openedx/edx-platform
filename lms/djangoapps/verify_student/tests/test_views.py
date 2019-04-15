@@ -1558,10 +1558,10 @@ class TestSubmitPhotosForVerification(TestCase):
         response = self._submit_photos(
             face_image=self.IMAGE_DATA,
             photo_id_image=self.IMAGE_DATA,
-            full_name="a",
+            full_name="",
             expected_status_code=400
         )
-        self.assertEqual(response.content, "Name must be at least 2 characters long.")
+        self.assertEqual(response.content, "Name must be at least 1 character long.")
 
     def test_missing_required_param(self):
         # Missing face image parameter
