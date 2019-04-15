@@ -1,5 +1,7 @@
 """ User Authn related Exceptions. """
 
+from openedx.core.djangolib.markup import Text
+
 
 class AuthFailedError(Exception):
     """
@@ -8,7 +10,7 @@ class AuthFailedError(Exception):
     """
     def __init__(self, value=None, redirect=None, redirect_url=None):
         super(AuthFailedError, self).__init__()
-        self.value = value
+        self.value = Text(value)
         self.redirect = redirect
         self.redirect_url = redirect_url
 
