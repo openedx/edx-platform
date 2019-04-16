@@ -747,16 +747,13 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
             mode_changed = enrollment and mode is not None and enrollment['mode'] != mode
             active_changed = enrollment and is_active is not None and enrollment['is_active'] != is_active
             missing_attrs = []
-            audit_with_order = False
             if enrollment_attributes:
                 actual_attrs = [
                     u"{namespace}:{name}".format(**attr)
                     for attr in enrollment_attributes
                 ]
                 missing_attrs = set(REQUIRED_ATTRIBUTES.get(mode, [])) - set(actual_attrs)
-                audit_with_order = mode == 'audit' and 'order:order_number' in actual_attrs
-            # Remove audit_with_order when no longer needed - implemented for REV-141
-            if has_api_key_permissions and (mode_changed or active_changed or audit_with_order):
+            if has_api_key_permissions and (mode_changed or active_changed):
                 if mode_changed and active_changed and not is_active:
                     # if the requester wanted to deactivate but specified the wrong mode, fail
                     # the request (on the assumption that the requester had outdated information
