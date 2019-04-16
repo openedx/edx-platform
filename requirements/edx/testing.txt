@@ -107,7 +107,7 @@ django-ratelimit-backend==1.1.1
 django-ratelimit==2.0.0
 django-require==1.0.11
 django-rest-swagger==2.2.0
-django-sekizai==0.10.0
+django-sekizai==1.0.0
 django-ses==0.8.4
 django-simple-history==2.7.0
 django-splash==0.2.2
@@ -152,7 +152,7 @@ event-tracking==0.2.8
 execnet==1.6.0            # via pytest-xdist
 extras==1.0.0             # via python-subunit, testtools
 factory_boy==2.8.1
-faker==1.0.4              # via factory-boy
+faker==1.0.5              # via factory-boy
 feedparser==5.1.3
 filelock==3.0.10          # via tox
 firebase-token-generator==1.3.2
@@ -180,7 +180,6 @@ idna==2.8
 incremental==17.5.0       # via twisted
 inflect==2.1.0
 ipaddress==1.0.22
-isodate==0.6.0
 isort==4.3.17
 itsdangerous==1.1.0       # via flask
 itypes==1.1.0
@@ -230,7 +229,6 @@ pbr==5.1.3
 pdfminer.six==20181108
 piexif==1.0.2
 pillow==6.0.0
-pkgconfig==1.5.1
 pluggy==0.9.0             # via pytest, tox
 polib==1.1.0
 psutil==1.2.1
@@ -268,7 +266,7 @@ pytest-django==3.4.8
 pytest-forked==1.0.2      # via pytest-xdist
 pytest-randomly==1.2.3
 pytest-xdist==1.28.0
-pytest==4.4.0
+pytest==4.4.1
 python-dateutil==2.4.0
 python-levenshtein==0.12.0
 python-memcached==1.59
@@ -284,7 +282,7 @@ pyyaml==5.1
 queuelib==1.5.0           # via scrapy
 radon==3.0.1
 redis==2.10.6
-reportlab==3.5.18
+reportlab==3.5.19
 requests-oauthlib==1.1.0
 requests==2.21.0
 rest-condition==1.0.3
@@ -308,13 +306,13 @@ social-auth-app-django==2.1.0
 social-auth-core==1.7.0
 sorl-thumbnail==12.3
 sortedcontainers==2.1.0
-soupsieve==1.9
+soupsieve==1.9.1
 splinter==0.9.0
 sqlparse==0.3.0
 stevedore==1.30.1
 sure==1.4.11
 sympy==1.4
-testfixtures==6.6.2
+testfixtures==6.7.0
 testtools==2.3.0          # via fixtures, python-subunit
 text-unidecode==1.2       # via faker
 tincan==0.0.5
@@ -343,7 +341,6 @@ werkzeug==0.15.2          # via flask
 wrapt==1.10.5
 xblock-utils==1.2.1
 xblock==1.2.2
-xmlsec==1.3.3
 xmltodict==0.12.0         # via moto
 zendesk==1.1.1
 zope.interface==4.6.0     # via twisted
