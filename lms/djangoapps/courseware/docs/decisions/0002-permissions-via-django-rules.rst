@@ -1,5 +1,5 @@
-1. Use `django-rules`_ for Permissions and Tracks
-*************************************************
+0002. Use `django-rules`_ for Permissions and Tracks
+****************************************************
 
 ~~~~~~~
 Context
@@ -157,7 +157,7 @@ so that we can track the remaining work with INCR tickets.
 Status
 ~~~~~~
 
-Proposed
+Accepted
 
 ~~~~~~~~~~~~
 Consequences
