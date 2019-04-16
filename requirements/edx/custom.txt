@@ -22,7 +22,7 @@ git+https://github.com/edx-solutions/xblock-group-project.git@0.1.2#egg=xblock-g
 -e git+https://github.com/mckinseyacademy/xblock-diagnosticfeedback.git@v0.2.4#egg=xblock-diagnostic-feedback==0.2.4
 -e git+https://github.com/open-craft/xblock-group-project-v2.git@0.4.14#egg=xblock-group-project-v2==0.4.14
 -e git+https://github.com/open-craft/xblock-virtualreality.git@v0.1.1#egg=xblock-virtualreality==0.1.1
-git+https://github.com/edx-solutions/api-integration.git@v2.7.3#egg=api-integration==2.7.3
+git+https://github.com/edx-solutions/api-integration.git@v2.7.5#egg=api-integration==2.7.5
 git+https://github.com/edx-solutions/organizations-edx-platform-extensions.git@v1.2.7#egg=organizations-edx-platform-extensions==1.2.7
 git+https://github.com/edx-solutions/gradebook-edx-platform-extensions.git@1.1.14#egg=gradebook-edx-platform-extensions==1.1.14
 git+https://github.com/edx-solutions/projects-edx-platform-extensions.git@v1.1.9#egg=projects-edx-platform-extensions==1.1.9
