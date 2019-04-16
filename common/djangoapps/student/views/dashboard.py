@@ -66,7 +66,7 @@ log = logging.getLogger("edx.student")
 experiments_namespace = WaffleFlagNamespace(name=u'student.experiments')
 DASHBOARD_METADATA_FLAG = WaffleFlag(experiments_namespace,
                                      u'dashboard_metadata',
-                                     flag_undefined_default=False)
+                                     flag_undefined_default=True)
 # TODO END: REVEM-204
 
 
