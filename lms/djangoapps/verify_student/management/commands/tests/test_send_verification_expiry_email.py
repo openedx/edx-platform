@@ -2,7 +2,7 @@
 Tests for django admin command `send_verification_expiry_email` in the verify_student module
 """
 
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 import boto
 from django.conf import settings
@@ -10,8 +10,8 @@ from django.contrib.sites.models import Site
 from django.core import mail
 from django.core.management import call_command
 from django.test import TestCase
+from django.utils.timezone import now
 from mock import patch
-from pytz import UTC
 from student.tests.factories import UserFactory
 from testfixtures import LogCapture
 
@@ -54,13 +54,13 @@ class TestSendVerificationExpiryEmail(MockS3Mixin, TestCase):
         user = UserFactory.create()
         verification_in_range = self.create_and_submit(user)
         verification_in_range.status = 'approved'
-        verification_in_range.expiry_date = datetime.now(UTC) - timedelta(days=1)
+        verification_in_range.expiry_date = now() - timedelta(days=1)
         verification_in_range.save()
 
         user = UserFactory.create()
         verification = self.create_and_submit(user)
         verification.status = 'approved'
-        verification.expiry_date = datetime.now(UTC) - timedelta(days=5)
+        verification.expiry_date = now() - timedelta(days=5)
         verification.save()
 
         call_command('send_verification_expiry_email', '--days-range=2')
@@ -80,8 +80,8 @@ class TestSendVerificationExpiryEmail(MockS3Mixin, TestCase):
         user = UserFactory.create()
         verification_in_range = self.create_and_submit(user)
         verification_in_range.status = 'approved'
-        verification_in_range.expiry_date = datetime.now(UTC) - timedelta(days=30)
-        verification_in_range.expiry_email_date = datetime.now(UTC) - timedelta(days=3)
+        verification_in_range.expiry_date = now() - timedelta(days=30)
+        verification_in_range.expiry_email_date = now() - timedelta(days=3)
         verification_in_range.save()
 
         command_args = '--days-range={} --resend-days={}'  # pylint: disable=unicode-format-string
@@ -113,12 +113,12 @@ class TestSendVerificationExpiryEmail(MockS3Mixin, TestCase):
         user = UserFactory.create()
         verification = self.create_and_submit(user)
         verification.status = 'approved'
-        verification.expiry_date = datetime.now(UTC) - timedelta(days=1)
+        verification.expiry_date = now() - timedelta(days=1)
         verification.save()
 
         call_command('send_verification_expiry_email')
 
-        expected_date = datetime.now(UTC)
+        expected_date = now()
         attempt = SoftwareSecurePhotoVerification.objects.get(user_id=verification.user_id)
         self.assertEquals(attempt.expiry_email_date.date(), expected_date.date())
         self.assertEqual(len(mail.outbox), 1)
@@ -131,8 +131,8 @@ class TestSendVerificationExpiryEmail(MockS3Mixin, TestCase):
         user = UserFactory.create()
         verification = self.create_and_submit(user)
         verification.status = 'approved'
-        verification.expiry_date = datetime.now(UTC) - timedelta(days=1)
-        verification.expiry_email_date = datetime.now()
+        verification.expiry_date = now() - timedelta(days=1)
+        verification.expiry_email_date = now()
         verification.save()
 
         call_command('send_verification_expiry_email')
@@ -143,13 +143,13 @@ class TestSendVerificationExpiryEmail(MockS3Mixin, TestCase):
         """
         Test that if no approved and expired verifications are found the management command terminates gracefully
         """
-        start_date = datetime.now(UTC) - timedelta(days=1)  # using default days
+        start_date = now() - timedelta(days=1)  # using default days
         with LogCapture(LOGGER_NAME) as logger:
             call_command('send_verification_expiry_email')
             logger.check(
                 (LOGGER_NAME,
                  'INFO', u"No approved expired entries found in SoftwareSecurePhotoVerification for the "
-                         u"date range {} - {}".format(start_date.date(), datetime.now(UTC).date()))
+                         u"date range {} - {}".format(start_date.date(), now().date()))
             )
 
     def test_dry_run_flag(self):
@@ -159,10 +159,10 @@ class TestSendVerificationExpiryEmail(MockS3Mixin, TestCase):
         user = UserFactory.create()
         verification = self.create_and_submit(user)
         verification.status = 'approved'
-        verification.expiry_date = datetime.now(UTC) - timedelta(days=1)
+        verification.expiry_date = now() - timedelta(days=1)
         verification.save()
 
-        start_date = datetime.now(UTC) - timedelta(days=1)  # using default days
+        start_date = now() - timedelta(days=1)  # using default days
         count = 1
 
         with LogCapture(LOGGER_NAME) as logger:
@@ -171,7 +171,7 @@ class TestSendVerificationExpiryEmail(MockS3Mixin, TestCase):
                 (LOGGER_NAME,
                  'INFO',
                  u"For the date range {} - {}, total Software Secure Photo verification filtered are {}"
-                 .format(start_date.date(), datetime.now(UTC).date(), count)
+                 .format(start_date.date(), now().date(), count)
                  ),
                 (LOGGER_NAME,
                  'INFO',
