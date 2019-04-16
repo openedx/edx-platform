@@ -25,6 +25,8 @@ class TestContentTypeGatingPartition(CacheIsolationTestCase):
     def test_create_content_gating_partition_happy_path(self):
 
         mock_course = Mock(id=self.course_key, user_partitions={})
+        CourseModeFactory.create(course_id=mock_course.id, mode_slug='audit')
+        CourseModeFactory.create(course_id=mock_course.id, mode_slug='verified')
         ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
 
         with patch('openedx.features.content_type_gating.partitions.ContentTypeGatingPartitionScheme.create_user_partition') as mock_create:
@@ -133,6 +135,7 @@ class TestContentTypeGatingPartition(CacheIsolationTestCase):
         mock_request = None
         mock_course = Mock(id=self.course_key, user_partitions={})
         mock_block = Mock(scope_ids=Mock(usage_id=Mock(course_key=mock_course.id)))
+        CourseModeFactory.create(course_id=mock_course.id, mode_slug='audit')
         CourseModeFactory.create(course_id=mock_course.id, mode_slug='verified')
         global_staff = GlobalStaffFactory.create()
         ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))

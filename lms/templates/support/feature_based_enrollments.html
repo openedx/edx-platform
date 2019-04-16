@@ -49,17 +49,17 @@ ${_("Feature Based Enrollments")}
               <td>${results['course_id']}</td>
               <td>${results['course_name']}</td>
               <td class="fb-enrollments-gating-col">
-                ${results['gating_config'].enabled if results['gating_config'].enabled is not None else 'Unknown'}
+                ${results['gating_config']['enabled']}
               </td>
               <td class="fb-enrollments-gating-col">
-                ${results['gating_config'].enabled_as_of if results['gating_config'].enabled_as_of is not None else 'N/A'}
+                ${results['gating_config'].get('enabled_as_of', 'N/A') if results['gating_config']['enabled'] else 'N/A'}
               </td>
               <td class="fb-enrollments-gating-col">
-                ${results['gating_config'].provenances['enabled'].value}
+                ${results['gating_config']['reason']}
               </td>
-              <td>${results['duration_config'].enabled if results['duration_config'].enabled is not None else 'Unknown'}</td>
-              <td>${results['duration_config'].enabled_as_of if results['duration_config'].enabled_as_of is not None else 'N/A'}</td>
-              <td>${results['duration_config'].provenances['enabled'].value}</td>
+              <td>${results['duration_config']['enabled']}</td>
+              <td>${results['duration_config'].get('enabled_as_of', 'N/A') if results['duration_config']['enabled'] else 'N/A'}</td>
+              <td>${results['duration_config']['reason']}</td>
             </tr>
           </tbody>
         </table>

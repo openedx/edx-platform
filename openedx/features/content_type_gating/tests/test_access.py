@@ -365,7 +365,7 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
                     category=component_type,
                     display_name=component_type,
                     graded=True,
-                    metadata={} if component_type == 'html' else METADATA
+                    metadata={} if (component_type == 'html' or len(modes) == 1) else METADATA
                 )
                 blocks_dict[component_type] = block
 
