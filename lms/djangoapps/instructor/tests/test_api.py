@@ -1913,7 +1913,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         # enrolled, active
         url = reverse(
             'get_student_enrollment_status',
-            kwargs={'course_id': self.course.id.to_deprecated_string()},
+            kwargs={'course_id': text_type(self.course.id)},
         )
         params = {
             'unique_student_identifier': 'EnrolledStudent'
