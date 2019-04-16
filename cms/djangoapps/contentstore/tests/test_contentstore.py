@@ -23,8 +23,8 @@ from edxval.api import create_video, get_videos_for_course
 from fs.osfs import OSFS
 from lxml import etree
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey, UsageKey
-from opaque_keys.edx.locations import AssetLocation, CourseLocator
+from opaque_keys.edx.keys import AssetKey, CourseKey, UsageKey
+from opaque_keys.edx.locations import CourseLocator
 from path import Path as path
 from six import text_type
 from waffle.testutils import override_switch
@@ -215,7 +215,7 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         all_thumbnails = content_store.get_all_content_thumbnails_for_course(course.id)
         self.assertGreater(len(all_thumbnails), 0)
 
-        location = AssetLocation.from_deprecated_string('/c4x/edX/toy/asset/just_a_test.jpg')
+        location = AssetKey.from_string('/c4x/edX/toy/asset/just_a_test.jpg')
         content = content_store.find(location)
         self.assertIsNotNone(content)
 

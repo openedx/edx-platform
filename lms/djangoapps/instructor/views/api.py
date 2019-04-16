@@ -1968,7 +1968,7 @@ def get_student_enrollment_status(request, course_id):
             enrollment_status = _(u'Enrollment status for {student}: never enrolled').format(student=email)
 
     response_payload = {
-        'course_id': course_id.to_deprecated_string(),
+        'course_id': text_type(course_id),
         'error': error,
         'enrollment_status': enrollment_status
     }
