@@ -486,6 +486,33 @@ class CourseModeModelTest(TestCase):
         else:
             self.assertFalse(is_error_expected, "Expected a ValidationError to be thrown.")
 
+    @ddt.data(
+        ([], False),
+        ([CourseMode.VERIFIED, CourseMode.AUDIT], False),
+        ([CourseMode.MASTERS], True),
+        ([CourseMode.VERIFIED, CourseMode.AUDIT, CourseMode.MASTERS], True)
+    )
+    @ddt.unpack
+    def test_contains_masters_mode(self, available_modes, expected_contains_masters_mode):
+        for mode in available_modes:
+            self.create_mode(mode, mode, 10)
+
+        modes = CourseMode.modes_for_course_dict(self.course_key)
+        self.assertEqual(CourseMode.contains_masters_mode(modes), expected_contains_masters_mode)
+
+    @ddt.data(
+        ([], False),
+        ([CourseMode.VERIFIED, CourseMode.AUDIT], False),
+        ([CourseMode.MASTERS], True),
+        ([CourseMode.VERIFIED, CourseMode.AUDIT, CourseMode.MASTERS], False)
+    )
+    @ddt.unpack
+    def test_is_masters_only(self, available_modes, expected_is_masters_only):
+        for mode in available_modes:
+            self.create_mode(mode, mode, 10)
+
+        self.assertEqual(CourseMode.is_masters_only(self.course_key), expected_is_masters_only)
+
 
 class TestDisplayPrices(ModuleStoreTestCase):
     @override_settings(PAID_COURSE_REGISTRATION_CURRENCY=["USD", "$"])

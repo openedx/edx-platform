@@ -551,7 +551,7 @@ class CourseTabView(EdxFragmentView):
         else:
             if not CourseEnrollment.is_enrolled(request.user, course.id) and not allow_anonymous:
                 # Only show enroll button if course is open for enrollment.
-                if course_open_for_self_enrollment(course.id) and not course.invitation_only:
+                if CourseTabView.should_show_enroll_button(course):
                     enroll_message = _(u'You must be enrolled in the course to see course content. \
                             {enroll_link_start}Enroll now{enroll_link_end}.')
                     PageLevelMessages.register_warning_message(
@@ -566,6 +566,12 @@ class CourseTabView(EdxFragmentView):
                         request,
                         Text(_('You must be enrolled in the course to see course content.'))
                     )
+
+    @staticmethod
+    def should_show_enroll_button(course):
+        return (course_open_for_self_enrollment(course.id)
+                and not course.invitation_only
+                and not CourseMode.is_masters_only(course.id))
 
     @staticmethod
     def handle_exceptions(request, course_key, course, exception):
