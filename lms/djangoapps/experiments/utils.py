@@ -43,24 +43,6 @@ PROGRAM_INFO_FLAG = WaffleFlag(
     flag_undefined_default=True
 )
 
-# .. toggle_name: experiments.add_program_price
-# .. toggle_type: feature_flag
-# .. toggle_default: True
-# .. toggle_description: Toggle for adding the current course's program price and sku information to user
-#                                metadata
-# .. toggle_category: experiments
-# .. toggle_use_cases: monitored_rollout
-# .. toggle_creation_date: 2019-3-12
-# .. toggle_expiration_date: None
-# .. toggle_warnings: None
-# .. toggle_tickets: REVEM-118, REVEM-206
-# .. toggle_status: supported
-PROGRAM_PRICE_FLAG = WaffleFlag(
-    waffle_namespace=experiments_namespace,
-    flag_name=u'add_program_price',
-    flag_undefined_default=True
-)
-
 # .. toggle_name: experiments.add_dashboard_info
 # .. toggle_type: feature_flag
 # .. toggle_default: True
@@ -300,25 +282,23 @@ def get_experiment_user_metadata_context(course, user):
                 if courses is not None:
                     total_courses = len(courses)
                     complete_enrollment = is_enrolled_in_all_courses(courses, user_enrollments)
-
-                    if PROGRAM_PRICE_FLAG.is_enabled():
-                        status = program.get('status')
-                        is_eligible_for_one_click_purchase = program.get('is_program_eligible_for_one_click_purchase')
-                        # Get the price and purchase URL of the program courses the user has yet to purchase. Say a
-                        # program has 3 courses (A, B and C), and the user previously purchased a certificate for A.
-                        # The user is enrolled in audit mode for B. The "left to purchase price" should be the price of
-                        # B+C.
-                        non_audit_enrollments = [en for en in user_enrollments if en not in
-                                                 audit_enrollments]
-                        courses_left_to_purchase = get_unenrolled_courses(courses, non_audit_enrollments)
-                        if courses_left_to_purchase:
-                            has_courses_left_to_purchase = True
-                            if is_eligible_for_one_click_purchase:
-                                courses_left_to_purchase_price, courses_left_to_purchase_skus = \
-                                    get_program_price_and_skus(courses_left_to_purchase)
-                                if courses_left_to_purchase_skus:
-                                    courses_left_to_purchase_url = EcommerceService().get_checkout_page_url(
-                                        *courses_left_to_purchase_skus, program_uuid=program_uuid)
+                    status = program.get('status')
+                    is_eligible_for_one_click_purchase = program.get('is_program_eligible_for_one_click_purchase')
+                    # Get the price and purchase URL of the program courses the user has yet to purchase. Say a
+                    # program has 3 courses (A, B and C), and the user previously purchased a certificate for A.
+                    # The user is enrolled in audit mode for B. The "left to purchase price" should be the price of
+                    # B+C.
+                    non_audit_enrollments = [en for en in user_enrollments if en not in
+                                             audit_enrollments]
+                    courses_left_to_purchase = get_unenrolled_courses(courses, non_audit_enrollments)
+                    if courses_left_to_purchase:
+                        has_courses_left_to_purchase = True
+                        if is_eligible_for_one_click_purchase:
+                            courses_left_to_purchase_price, courses_left_to_purchase_skus = \
+                                get_program_price_and_skus(courses_left_to_purchase)
+                            if courses_left_to_purchase_skus:
+                                courses_left_to_purchase_url = EcommerceService().get_checkout_page_url(
+                                    *courses_left_to_purchase_skus, program_uuid=program_uuid)
 
                 program_key = {
                     'uuid': program_uuid,
