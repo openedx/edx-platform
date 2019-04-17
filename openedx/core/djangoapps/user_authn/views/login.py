@@ -57,9 +57,9 @@ def _do_third_party_auth(request):
                 username=username, backend_name=backend_name)
         )
         message = Text(_(
-            u"You've successfully logged into your {provider_name} account, "
+            u"You've successfully signed in to your {provider_name} account, "
             u"but this account isn't linked with your {platform_name} account yet. {blank_lines}"
-            u"Use your {platform_name} username and password to log into {platform_name} below, "
+            u"Use your {platform_name} username and password to sign in to {platform_name} below, "
             u"and then link your {platform_name} account with {provider_name} from your dashboard. {blank_lines}"
             u"If you don't have an account on {platform_name} yet, "
             u"click {register_label_strong} at the top of the page."

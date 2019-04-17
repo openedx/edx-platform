@@ -123,7 +123,7 @@ class HelperMixin(object):
         """Asserts failure on /login for missing social auth looks right."""
         self.assertEqual(403, response.status_code)
         self.assertIn(
-            u"successfully logged into your %s account, but this account isn&#39;t linked" % self.provider.name,
+            u"successfully signed in to your %s account, but this account isn&#39;t linked" % self.provider.name,
             response.content.decode(response.charset)
         )
 
