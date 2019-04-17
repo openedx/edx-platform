@@ -77,8 +77,10 @@ def disable_overrides():
     """
     prev = _OVERRIDES_DISABLED.disabled
     _OVERRIDES_DISABLED.disabled += (True,)
-    yield
-    _OVERRIDES_DISABLED.disabled = prev
+    try:
+        yield
+    finally:
+        _OVERRIDES_DISABLED.disabled = prev
 
 
 def overrides_disabled():

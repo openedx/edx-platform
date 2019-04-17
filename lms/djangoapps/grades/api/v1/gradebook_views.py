@@ -71,9 +71,11 @@ def bulk_gradebook_view_context(course_key, users):
     CourseEnrollment.bulk_fetch_enrollment_states(users, course_key)
     cohorts.bulk_cache_cohorts(course_key, users)
     BulkRoleCache.prefetch(users)
-    yield
-    PersistentSubsectionGrade.clear_prefetched_data(course_key)
-    PersistentCourseGrade.clear_prefetched_data(course_key)
+    try:
+        yield
+    finally:
+        PersistentSubsectionGrade.clear_prefetched_data(course_key)
+        PersistentCourseGrade.clear_prefetched_data(course_key)
 
 
 def verify_writable_gradebook_enabled(view_func):
