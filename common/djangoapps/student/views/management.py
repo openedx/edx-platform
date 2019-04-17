@@ -902,11 +902,10 @@ def skip_activation_email(user, do_external_auth, running_pipeline, third_party_
     return (
         settings.FEATURES.get('SKIP_EMAIL_VALIDATION', None) or
         settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING') or
-        (not params.get('send_activation_email', False)) or  # Appsembler: for Tahoe Registration API
+        (not params.get('send_activation_email', True)) or  # Appsembler: for Tahoe Registration API
         (settings.FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH') and do_external_auth) or
-        (third_party_provider and third_party_provider.skip_email_verification and valid_email)
-        and
-        'registered_from_amc' not in params  # don't need to activate email if the user already did that on AMC
+        (third_party_provider and third_party_provider.skip_email_verification and valid_email) or
+        params.get('registered_from_amc')  # Appsembler: No need for activation email for active AMC users
     )
 
 
