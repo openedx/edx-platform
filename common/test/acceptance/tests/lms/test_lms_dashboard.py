@@ -411,6 +411,10 @@ class LmsDashboardA11yTest(BaseLmsDashboardTestMultiple):
         self.dashboard_page.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'button-name',  # TODO: AC-935
+                'landmark-no-duplicate-banner',  # TODO: AC-934
+                'landmark-complementary-is-top-level',  # TODO: AC-939
+                'region'  # TODO: AC-932
             ]
         })
         course_listings = self.dashboard_page.get_courses()
