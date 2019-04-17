@@ -84,9 +84,6 @@ module.exports = Merge.smart({
             // LMS
             SingleSupportForm: './lms/static/support/jsx/single_support_form.jsx',
             AlertStatusBar: './lms/static/js/accessible_components/StatusBarAlert.jsx',
-            LearnerAnalyticsDashboard: './lms/static/js/learner_analytics_dashboard/LearnerAnalyticsDashboard.jsx',
-            UpsellExperimentModal: './lms/static/common/js/components/UpsellExperimentModal.jsx',
-            PortfolioExperimentUpsellModal: './lms/static/common/js/components/PortfolioExperimentUpsellModal.jsx',
             EntitlementSupportPage: './lms/djangoapps/support/static/support/jsx/entitlements/index.jsx',
             PasswordResetConfirmation: './lms/static/js/student_account/components/PasswordResetConfirmation.jsx',
             StudentAccountDeletion: './lms/static/js/student_account/components/StudentAccountDeletion.jsx',
