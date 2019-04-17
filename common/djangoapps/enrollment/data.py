@@ -330,7 +330,7 @@ def get_course_enrollment_info(course_id, include_expired=False):
     import pudb; pudb.set_trace()
     # TODO: this should call discovery to get the course_key instead of pulling it from the course_run_id/course_id
     course_run_data = get_course_run_data(course_id)
-    course_key = course_run_data['course']
+    course_key = CourseKey.from_string(course_run_data['course'])
 
     try:
         course = CourseOverview.get_from_id(course_key)
