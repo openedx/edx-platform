@@ -102,6 +102,7 @@ from webpack_loader.templatetags.webpack_loader import render_bundle
 <script type="text/javascript">
      window.auth = ${ auth | n, dump_js_escaped_json };
      window.isActive = ${ user.is_active | n, dump_js_escaped_json };
+     window.domainName = ${ settings.SESSION_COOKIE_DOMAIN | n, dump_js_escaped_json };
      console.log($);
      $(document).ready(function(){
         
