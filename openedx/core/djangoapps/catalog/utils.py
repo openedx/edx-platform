@@ -349,7 +349,7 @@ def get_course_run_data(course_run_id):
 def get_course_locator(course_run_id):
     """ given a course_run_id properly creates a CourseLocator object, meaning that it populates the org and course fields
      with data from the ACTUAL course id not the lies hiding with in the course_run_id... you know what you've done. """
-    import pudb; pudb.set_trace()
+    # import pudb; pudb.set_trace()
     # TODO: create docstring explaining all the things
     # TODO: make this cache the results
     # TODO: clean up comments
