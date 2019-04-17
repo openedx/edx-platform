@@ -501,8 +501,10 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         from xmodule.capa_module import CapaDescriptor
         generate_report_data = CapaDescriptor.generate_report_data
         del CapaDescriptor.generate_report_data
-        yield
-        CapaDescriptor.generate_report_data = generate_report_data
+        try:
+            yield
+        finally:
+            CapaDescriptor.generate_report_data = generate_report_data
 
     @patch.dict('django.conf.settings.FEATURES', {'MAX_PROBLEM_RESPONSES_COUNT': 4})
     def test_build_student_data_limit(self):

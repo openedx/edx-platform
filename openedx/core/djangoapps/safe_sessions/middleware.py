@@ -505,7 +505,6 @@ def controlled_logging(request, logger):
 
     try:
         yield
-
     finally:
         if from_logout:
             logger.setLevel(default_level)

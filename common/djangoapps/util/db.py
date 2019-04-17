@@ -164,9 +164,11 @@ def enable_named_outer_atomic(*names):
 
     for name in names:
         cache[name] = True
-    yield
-    for name in names:
-        del cache[name]
+    try:
+        yield
+    finally:
+        for name in names:
+            del cache[name]
 
 
 class OuterAtomic(transaction.Atomic):
