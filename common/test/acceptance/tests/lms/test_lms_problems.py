@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Bok choy acceptance tests for problems in the LMS
-
-See also old lettuce tests in lms/djangoapps/courseware/features/problems.feature
 """
 from textwrap import dedent
 import time

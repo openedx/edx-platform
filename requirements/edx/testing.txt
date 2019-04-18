@@ -20,7 +20,6 @@ git+https://github.com/edx/django-rest-framework.git@1ceda7c086fddffd1c440cc8685
 -e git+https://github.com/edx/DoneXBlock.git@01a14f3bd80ae47dd08cdbbe2f88f3eb88d00fba#egg=done-xblock
 -e git+https://github.com/jazkarta/edx-jsme.git@690dbf75441fa91c7c4899df0b83d77f7deb5458#egg=edx-jsme
 git+https://github.com/mitodl/edx-sga.git@3828ba9e413080a81b907a3381e5ffa05e063f81#egg=edx-sga==0.8.3
-git+https://github.com/edx/lettuce.git@7a04591c78ac56dac3eb3e91ca94b15cce844133#egg=lettuce==0.2.23+edx.1
 git+https://github.com/edx/xblock-lti-consumer.git@v1.1.8#egg=lti_consumer-xblock==1.1.8
 git+https://github.com/edx/MongoDBProxy.git@25b99097615bda06bd7cdfe5669ed80dc2a7fed0#egg=MongoDBProxy==0.1.0
 -e .
@@ -44,7 +43,7 @@ anyjson==0.3.3
 apipkg==1.5               # via execnet
 appdirs==1.4.3
 argh==0.26.2
-argparse==1.4.0           # via caniusepython3, unittest2
+argparse==1.4.0           # via caniusepython3
 asn1crypto==0.24.0
 astroid==1.5.3            # via pylint, pylint-celery
 atomicwrites==1.3.0       # via pytest
@@ -150,13 +149,11 @@ entrypoints==0.3          # via flake8
 enum34==1.1.6
 event-tracking==0.2.8
 execnet==1.6.0            # via pytest-xdist
-extras==1.0.0             # via python-subunit, testtools
 factory_boy==2.8.1
 faker==1.0.5              # via factory-boy
 feedparser==5.1.3
 filelock==3.0.10          # via tox
 firebase-token-generator==1.3.2
-fixtures==3.0.0           # via testtools
 flake8-polyfill==1.0.2    # via radon
 flake8==3.7.7             # via flake8-polyfill
 flask==1.0.2              # via moto
@@ -167,7 +164,6 @@ funcsigs==1.0.2           # via pytest
 functools32==3.2.3.post2 ; python_version == "2.7"  # via flake8, parsel
 future==0.17.1
 futures==3.2.0 ; python_version == "2.7"
-fuzzywuzzy==0.17.0
 geoip2==2.9.0
 glob2==0.6
 gunicorn==19.0
@@ -193,7 +189,6 @@ lazy-object-proxy==1.3.1  # via astroid
 lazy==1.1
 lepl==5.1.3
 libsass==0.10.0
-linecache2==1.0.0         # via traceback2
 loremipsum==1.0.5
 lxml==3.8.0
 mailsnake==1.6.4
@@ -270,10 +265,8 @@ pytest==4.4.1
 python-dateutil==2.4.0
 python-levenshtein==0.12.0
 python-memcached==1.59
-python-mimeparse==1.6.0   # via testtools
 python-openid==2.2.5 ; python_version == "2.7"
 python-slugify==1.2.6     # via code-annotations, transifex-client
-python-subunit==1.3.0
 python-swiftclient==3.7.0
 python3-saml==1.5.0
 pytz==2019.1
@@ -307,25 +300,20 @@ social-auth-core==1.7.0
 sorl-thumbnail==12.3
 sortedcontainers==2.1.0
 soupsieve==1.9.1
-splinter==0.9.0
 sqlparse==0.3.0
 stevedore==1.30.1
-sure==1.4.11
 sympy==1.4
 testfixtures==6.7.0
-testtools==2.3.0          # via fixtures, python-subunit
 text-unidecode==1.2       # via faker
 tincan==0.0.5
 toml==0.10.0              # via tox
 tox-battery==0.5.1
 tox==3.9.0
-traceback2==1.4.0         # via testtools, unittest2
 transifex-client==0.13.6
 twisted==19.2.0           # via scrapy
 typing==3.6.6             # via flake8
 unicodecsv==0.14.1
 unidecode==1.0.23         # via python-slugify
-unittest2==1.1.0          # via testtools
 uritemplate==3.0.0
 urllib3==1.23
 urlobject==2.4.3          # via pa11ycrawler
