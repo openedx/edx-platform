@@ -49,3 +49,6 @@ class SiteTheme(models.Model):
             True if given site has an associated site theme in database, returns False otherwise.
         """
         return site.themes.exists()
+
+    class Meta(object):
+        app_label = 'theming'

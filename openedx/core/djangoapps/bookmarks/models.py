@@ -53,7 +53,7 @@ class Bookmark(TimeStampedModel):
         """
         Bookmark metadata.
         """
-        app_label = 'bookmark'
+        app_label = 'bookmarks'
         unique_together = ('user', 'usage_key')
 
     def __unicode__(self):
@@ -204,7 +204,7 @@ class XBlockCache(TimeStampedModel):
         """
         XBlockCache metadata.
         """
-        app_label = 'bookmark'
+        app_label = 'bookmarks'
 
     def __unicode__(self):
         return unicode(self.usage_key)
