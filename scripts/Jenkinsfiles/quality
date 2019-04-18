@@ -231,7 +231,8 @@ pipeline {
                             propagate: false, wait: false
 
                         if (currentBuild.currentResult != "SUCCESS"){
-                            slackSend "`${JOB_NAME}` #${BUILD_NUMBER}: ${currentBuild.currentResult} after ${currentBuild.durationString.replace(' and counting', '')}\n${BUILD_URL}"
+                            slackSend botUser: true,
+                                message: "`${JOB_NAME}` #${BUILD_NUMBER}: ${currentBuild.currentResult} after ${currentBuild.durationString.replace(' and counting', '')}\n${BUILD_URL}"
 
                             email_body = "See: <${BUILD_URL}>\n\nChanges:\n"
                             change_sets = currentBuild.changeSets
@@ -245,7 +246,8 @@ pipeline {
                             emailext body: email_body,
                                 subject: "Build failed in Jenkins: ${JOB_NAME} #${BUILD_NUMBER}", to: 'testeng@edx.org'
                         } else if (currentBuild.currentResult == "SUCCESS" && currentBuild.previousBuild.currentResult != "SUCCESS") {
-                            slackSend "`${JOB_NAME}` #${BUILD_NUMBER}: Back to normal after ${currentBuild.durationString.replace(' and counting', '')}\n${BUILD_URL}"
+                            slackSend botUser: true,
+                                message: "`${JOB_NAME}` #${BUILD_NUMBER}: Back to normal after ${currentBuild.durationString.replace(' and counting', '')}\n${BUILD_URL}"
                             emailext body: "See <${BUILD_URL}>",
                                 subject: "Jenkins Build is back to normal: ${JOB_NAME} #${BUILD_NUMBER}", to: 'testeng@edx.org'
                         }
