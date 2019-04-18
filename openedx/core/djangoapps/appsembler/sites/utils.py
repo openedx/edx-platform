@@ -523,7 +523,7 @@ def _get_initial_page_elements():
                                     "padding-bottom": "padd-b-10",
                                     "text-content": "View our tutorial video!",
                                     "padding-top": "padd-t-10",
-                                    "youtube-video-id": "bJNNp7HNFZw",
+                                    "youtube-video-id": "r5YdS_ZjXnc",
                                     "padding-left": "padd-l-15"
                                 }
                             }
@@ -923,7 +923,7 @@ def _get_initial_page_elements():
                                                 "text-color": "#0090c1",
                                                 "margin-top": "marg-t-5",
                                                 "margin-left": "marg-l-0",
-                                                "text-content": "1. Log in to your AMC Dashboard using the email and password you set up during signup.",
+                                                "text-content": "1. Log in to your Tahoe Dashboard using the email and password you set up during signup.",
                                                 "font-family": "font--primary--light",
                                                 "text-alignment": "text-align--left"
                                             }
