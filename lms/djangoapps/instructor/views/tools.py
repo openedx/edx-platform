@@ -16,6 +16,9 @@ from opaque_keys.edx.keys import UsageKey
 from pytz import UTC
 from six import string_types, text_type
 from six.moves import zip
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
+
 
 from student.models import get_user_by_username_or_email, CourseEnrollment
 
@@ -230,3 +233,20 @@ def add_block_ids(payload):
         for ele in payload['data']:
             if 'module_id' in ele:
                 ele['block_id'] = UsageKey.from_string(ele['module_id']).block_id
+
+
+def get_display_name_from_usage_key(key, course):
+    """
+    Returns problem display name from given block UsageKey.
+
+    Args:
+        key (UsageKey) : Usage key of block
+
+    Returns:
+        String : Returns the display name of block if exists else 'Deleted'.
+    """
+    block = course.get_child(key)
+    if block:
+        return block.display_name
+    else:
+        return 'Deleted'
