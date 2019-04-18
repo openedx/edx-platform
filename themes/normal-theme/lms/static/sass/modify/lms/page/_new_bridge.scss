@@ -1,0 +1,27 @@
+#newBridge .icon-right-center{
+  top: inherit !important;
+  bottom: 100px !important;
+  right: 42px !important;
+}
+#newBridge .nb-icon-skin-0 .nb-icon-inner-wrap{
+  width: 40px !important;
+  height: 40px !important;
+  background-size: 40px;
+}
+
+@media screen and (max-width:767px){
+  #newBridge .icon-right-center{
+    right: 12px !important;
+    bottom: 100px !important;
+  }
+  #newBridge .nb-icon-wrap{
+    width: 40px !important;
+    height: 40px !important;
+    background-size: 40px;
+  }
+  #newBridge .nb-icon-wrap-0{
+    top: inherit !important;
+    bottom: 80px !important;
+    right: 20px !important;
+  }
+}
