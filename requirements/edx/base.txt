@@ -63,7 +63,7 @@ cryptography==2.6.1
 cssutils==1.0.2           # via pynliner
 ddt==1.2.1
 decorator==4.4.0          # via pycontracts
-defusedxml==0.5.0
+defusedxml==0.6.0
 django-appconf==1.0.3     # via django-statici18n
 django-babel-underscore==0.5.2
 django-babel==0.6.2       # via django-babel-underscore
@@ -119,7 +119,7 @@ edx-oauth2-provider==1.2.2
 edx-opaque-keys[django]==0.4.4
 edx-organizations==1.0.1
 edx-proctoring-proctortrack==1.0.5
-edx-proctoring==1.6.1
+edx-proctoring==1.6.2
 edx-rbac==0.1.11          # via edx-enterprise
 edx-rest-api-client==1.9.2
 edx-search==1.2.2
@@ -165,7 +165,7 @@ mongoengine==0.10.0
 mpmath==1.1.0             # via sympy
 mysqlclient==1.4.2.post1
 networkx==1.7
-newrelic==4.16.1.117
+newrelic==4.18.0.118
 nltk==3.4.1
 nodeenv==1.1.1
 numpy==1.16.2             # via scipy
