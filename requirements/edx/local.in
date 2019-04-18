@@ -1,6 +1,6 @@
 # Python libraries to install that are local to the edx-platform repo
 -e .
--e git+https://github.com/stvstnfrd/openedx-calc.git@tests#egg=calc==0.2
+-e git+https://github.com/stvstnfrd/openedx-calc.git@tests#egg=calc==0.4
 -e common/lib/capa
 -e common/lib/chem
 -e common/lib/safe_lxml
