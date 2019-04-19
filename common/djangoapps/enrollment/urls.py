@@ -2,6 +2,8 @@
 URLs for the Enrollment API
 
 """
+from __future__ import absolute_import
+
 from django.conf import settings
 from django.conf.urls import url
 
@@ -11,7 +13,7 @@ from .views import (
     EnrollmentListView,
     EnrollmentUserRolesView,
     EnrollmentView,
-    UnenrollmentView,
+    UnenrollmentView
 )
 
 urlpatterns = [

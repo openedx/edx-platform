@@ -3,6 +3,8 @@ Enrollment API for creating, updating, and deleting enrollments. Also provides a
 course level, such as available course modes.
 
 """
+from __future__ import absolute_import
+
 import importlib
 import logging
 
