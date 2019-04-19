@@ -267,9 +267,9 @@ from six import string_types
         <!-- add vip adver -->
         <div id="vip" style="display: none"></div>
         <div class="about-tabs">
-          <span class="about-tab about-tab-active" onClick="showTab('about-info', 0)">${_(u"Description")}</span>
-          <span class="about-tab" onClick="showTab('about-staff', 1)">${_(u"Instructor")}</span>
-          <span class="about-tab" onClick="showTab('about-outline', 2)">${_(u"Outline")}</span>
+          <span class="about-tab about-tab-active" onClick="showTab('about-info', 0)">${pgettext("CourseAbout", "Description")}</span>
+          <span class="about-tab" onClick="showTab('about-staff', 1)">${pgettext("CourseAbout", "Instructor")}</span>
+          <span class="about-tab" onClick="showTab('about-outline', 2)">${pgettext("CourseAbout", "Outline")}<span>
         </div>
         ${get_course_about_section(request, course, "overview")}
       </div>
@@ -281,15 +281,18 @@ from six import string_types
         }
 
         function showTab(tab, index) {
-          document.getElementsByClassName('about-info')[0].style.display = 'none';
-          document.getElementsByClassName('about-staff')[0].style.display = 'none';
-          document.getElementsByClassName('about-outline')[0].style.display = 'none';
+          if (document.getElementsByClassName('about-info')[0]){
+            document.getElementsByClassName('about-info')[0].style.display = 'none';
+            document.getElementsByClassName('about-staff')[0].style.display = 'none';
+            document.getElementsByClassName('about-outline')[0].style.display = 'none';
+            
+            document.getElementsByClassName('about-tab')[0].className = 'about-tab';
+            document.getElementsByClassName('about-tab')[1].className = 'about-tab';
+            document.getElementsByClassName('about-tab')[2].className = 'about-tab';
+            document.getElementsByClassName('about-tab')[parseInt(index)].className = 'about-tab about-tab-active';
+            document.getElementsByClassName(tab)[0].style.display = 'block';
+          }
           
-          document.getElementsByClassName('about-tab')[0].className = 'about-tab';
-          document.getElementsByClassName('about-tab')[1].className = 'about-tab';
-          document.getElementsByClassName('about-tab')[2].className = 'about-tab';
-          document.getElementsByClassName('about-tab')[parseInt(index)].className = 'about-tab about-tab-active';
-          document.getElementsByClassName(tab)[0].style.display = 'block';
         }
       </script>
       <script src="//oss.elitemba.cn/gtm/membership.js"></script>
