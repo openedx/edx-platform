@@ -535,23 +535,38 @@ class CourseTabView(EdxFragmentView):
         allow_anonymous = allow_public_access(course, [COURSE_VISIBILITY_PUBLIC])
 
         if request.user.is_anonymous and not allow_anonymous:
-            PageLevelMessages.register_warning_message(
-                request,
-                Text(_(u"To see course content, {sign_in_link} or {register_link}.")).format(
-                    sign_in_link=HTML(u'<a href="/login?next={current_url}">{sign_in_label}</a>').format(
-                        sign_in_label=_("sign in"),
-                        current_url=urlquote_plus(request.path),
-                    ),
-                    register_link=HTML(u'<a href="/register?next={current_url}">{register_label}</a>').format(
-                        register_label=_("register"),
-                        current_url=urlquote_plus(request.path),
-                    ),
+            if CourseTabView.course_open_for_learner_enrollment(course):
+                PageLevelMessages.register_warning_message(
+                    request,
+                    Text(_(u"To see course content, {sign_in_link} or {register_link}.")).format(
+                        sign_in_link=HTML(u'<a href="/login?next={current_url}">{sign_in_label}</a>').format(
+                            sign_in_label=_("sign in"),
+                            current_url=urlquote_plus(request.path),
+                        ),
+                        register_link=HTML(u'<a href="/register?next={current_url}">{register_label}</a>').format(
+                            register_label=_("register"),
+                            current_url=urlquote_plus(request.path),
+                        ),
+                    )
                 )
-            )
+            else:
+                PageLevelMessages.register_warning_message(
+                    request,
+                    Text(_(u"{sign_in_link} or {register_link}.")).format(
+                        sign_in_link=HTML(u'<a href="/login?next={current_url}">{sign_in_label}</a>').format(
+                            sign_in_label=_("Sign in"),
+                            current_url=urlquote_plus(request.path),
+                        ),
+                        register_link=HTML(u'<a href="/register?next={current_url}">{register_label}</a>').format(
+                            register_label=_("register"),
+                            current_url=urlquote_plus(request.path),
+                        ),
+                    )
+                )
         else:
             if not CourseEnrollment.is_enrolled(request.user, course.id) and not allow_anonymous:
                 # Only show enroll button if course is open for enrollment.
-                if CourseTabView.should_show_enroll_button(course):
+                if CourseTabView.course_open_for_learner_enrollment(course):
                     enroll_message = _(u'You must be enrolled in the course to see course content. \
                             {enroll_link_start}Enroll now{enroll_link_end}.')
                     PageLevelMessages.register_warning_message(
@@ -568,7 +583,7 @@ class CourseTabView(EdxFragmentView):
                     )
 
     @staticmethod
-    def should_show_enroll_button(course):
+    def course_open_for_learner_enrollment(course):
         return (course_open_for_self_enrollment(course.id)
                 and not course.invitation_only
                 and not CourseMode.is_masters_only(course.id))
