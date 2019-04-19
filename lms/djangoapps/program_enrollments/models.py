@@ -7,7 +7,9 @@ from __future__ import unicode_literals
 from django.contrib.auth.models import User
 from django.db import models
 from model_utils.models import TimeStampedModel
+from opaque_keys.edx.django.models import CourseKeyField
 from simple_history.models import HistoricalRecords
+from student.models import CourseEnrollment as StudentCourseEnrollment
 
 
 class ProgramEnrollment(TimeStampedModel):  # pylint: disable=model-missing-unicode
@@ -61,3 +63,29 @@ class ProgramEnrollment(TimeStampedModel):  # pylint: disable=model-missing-unic
 
         enrollments.update(external_user_key=None)
         return True
+
+
+class ProgramCourseEnrollment(TimeStampedModel):  # pylint: disable=model-missing-unicode
+    """
+    This is a model to represent a learner's enrollment in a course
+    in the context of a program from the registrar service
+
+    .. no_pii:
+    """
+    STATUSES = (
+        ('active', 'active'),
+        ('inactive', 'inactive'),
+    )
+
+    class Meta(object):
+        app_label = "program_enrollments"
+
+    program_enrollment = models.ForeignKey(ProgramEnrollment, on_delete=models.CASCADE)
+    course_enrollment = models.OneToOneField(
+        StudentCourseEnrollment,
+        null=True,
+        blank=True,
+    )
+    course_key = CourseKeyField(max_length=255)
+    status = models.CharField(max_length=9, choices=STATUSES)
+    historical_records = HistoricalRecords()
