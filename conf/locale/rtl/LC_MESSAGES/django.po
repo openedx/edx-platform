@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-04-14 20:37+0000\n"
-"PO-Revision-Date: 2019-04-14 20:37:56.163141\n"
+"POT-Creation-Date: 2019-04-21 20:37+0000\n"
+"PO-Revision-Date: 2019-04-21 20:37:49.802840\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -2436,6 +2436,7 @@ msgstr ""
 #: lms/templates/dashboard/_reason_survey.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 #: lms/templates/survey/survey.html
+#: lms/templates/widgets/footer-language-selector.html
 #: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview-language-fragment.html
 #: openedx/core/djangoapps/theming/templates/theming/theming-admin-fragment.html
 #: themes/stanford-style/lms/templates/register-shib.html
@@ -9895,17 +9896,16 @@ msgid "Expired ID Verification"
 msgstr "ثطحهقثي هي دثقهبهذشفهخر"
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.html
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt
 #, python-format
-msgid ""
-"\n"
-"                    Hello %(full_name)s,\n"
-"                    Your %(platform_name)s ID verification has expired.\n"
-"                "
-msgstr ""
-"\n"
-"                    اثممخ %(full_name)s,\n"
-"                    غخعق %(platform_name)s هي دثقهبهذشفهخر اشس ثطحهقثي.\n"
-"                "
+msgid "Hello %(full_name)s,"
+msgstr "اثممخ %(full_name)s,"
+
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
+#, python-format
+msgid "Your %(platform_name)s ID verification has expired.\" "
+msgstr "غخعق %(platform_name)s هي دثقهبهذشفهخر اشس ثطحهقثي.\" "
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
@@ -9929,63 +9929,41 @@ msgid "You can also do this from your dashboard."
 msgstr "غخع ذشر شمسخ يخ فاهس بقخو غخعق يشسازخشقي."
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
 #, python-format
-msgid ""
-"\n"
-"                    Resubmit Verification : %(lms_verification_link)s\n"
-"                    ID verification FAQ : %(help_center_link)s\n"
-"                "
-msgstr ""
-"\n"
-"                    قثسعزوهف دثقهبهذشفهخر : %(lms_verification_link)s\n"
-"                    هي دثقهبهذشفهخر بشض : %(help_center_link)s\n"
-"                "
+msgid "Resubmit Verification : %(lms_verification_link)s "
+msgstr "قثسعزوهف دثقهبهذشفهخر : %(lms_verification_link)s "
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
 #, python-format
-msgid ""
-"\n"
-"                Thank you,\n"
-"                The %(platform_name)s Team\n"
-"                "
-msgstr ""
-"\n"
-"                فاشرن غخع,\n"
-"                فاث %(platform_name)s فثشو\n"
-"                "
+msgid "ID verification FAQ : %(help_center_link)s "
+msgstr "هي دثقهبهذشفهخر بشض : %(help_center_link)s "
+
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
+#: lms/templates/emails/failed_verification_email.txt
+#: lms/templates/emails/order_confirmation_email.txt
+#: lms/templates/emails/passed_verification_email.txt
+#: lms/templates/emails/photo_submission_confirmation.txt
+msgid "Thank you,"
+msgstr "فاشرن غخع,"
+
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
+#, python-format
+msgid "The %(platform_name)s Team "
+msgstr "فاث %(platform_name)s فثشو "
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
 #, python-format
-msgid ""
-"\n"
-"Hello %(full_name)s,\n"
-"Your %(platform_name)s ID verification has expired.\n"
-msgstr ""
-"\n"
-"اثممخ %(full_name)s,\n"
-"غخعق %(platform_name)s هي دثقهبهذشفهخر اشس ثطحهقثي.\n"
+msgid "Hello %(full_name)s, "
+msgstr "اثممخ %(full_name)s, "
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
 #, python-format
-msgid ""
-"\n"
-"Resubmit Verification : %(lms_verification_link)s\n"
-"ID verification FAQ : %(help_center_link)s\n"
-msgstr ""
-"\n"
-"قثسعزوهف دثقهبهذشفهخر : %(lms_verification_link)s\n"
-"هي دثقهبهذشفهخر بشض : %(help_center_link)s\n"
-
-#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
-#, python-format
-msgid ""
-"\n"
-"Thank you,\n"
-"The %(platform_name)s Team\n"
-msgstr ""
-"\n"
-"فاشرن غخع,\n"
-"فاث %(platform_name)s فثشو\n"
+msgid "Your %(platform_name)s ID verification has expired. "
+msgstr "غخعق %(platform_name)s هي دثقهبهذشفهخر اشس ثطحهقثي. "
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/subject.txt
 #, python-format
@@ -11835,12 +11813,6 @@ msgstr "رخ يشفش حقخدهيثي بخق عسثق حقثبثقثرذث عح
 #: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.html
 #: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt
 #, python-format
-msgid "Hello %(full_name)s,"
-msgstr "اثممخ %(full_name)s,"
-
-#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.html
-#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt
-#, python-format
 msgid ""
 "We received a deletion request for your account on %(platform_name)s. We're "
 "sorry to see you go!"
@@ -11892,31 +11864,19 @@ msgstr "شذذخعرف وخيهبهذشفهخر رخف شممخصثي."
 #: openedx/core/djangoapps/user_authn/views/login.py
 #, python-brace-format
 msgid ""
-"You've successfully logged into your {provider_name} account, but this "
-"account isn't linked with an {platform_name} account yet."
-msgstr ""
-"غخع'دث سعذذثسسبعممغ مخللثي هرفخ غخعق {provider_name} شذذخعرف, زعف فاهس "
-"شذذخعرف هسر'ف مهرنثي صهفا شر {platform_name} شذذخعرف غثف."
-
-#: openedx/core/djangoapps/user_authn/views/login.py
-#, python-brace-format
-msgid ""
-"Use your {platform_name} username and password to log into {platform_name} "
+"You've successfully signed in to your {provider_name} account, but this "
+"account isn't linked with your {platform_name} account yet. {blank_lines}Use"
+" your {platform_name} username and password to sign in to {platform_name} "
 "below, and then link your {platform_name} account with {provider_name} from "
-"your dashboard."
+"your dashboard. {blank_lines}If you don't have an account on {platform_name}"
+" yet, click {register_label_strong} at the top of the page."
 msgstr ""
-"عسث غخعق {platform_name} عسثقرشوث شري حشسسصخقي فخ مخل هرفخ {platform_name} "
+"غخع'دث سعذذثسسبعممغ سهلرثي هر فخ غخعق {provider_name} شذذخعرف, زعف فاهس "
+"شذذخعرف هسر'ف مهرنثي صهفا غخعق {platform_name} شذذخعرف غثف. {blank_lines}عسث"
+" غخعق {platform_name} عسثقرشوث شري حشسسصخقي فخ سهلر هر فخ {platform_name} "
 "زثمخص, شري فاثر مهرن غخعق {platform_name} شذذخعرف صهفا {provider_name} بقخو "
-"غخعق يشسازخشقي."
-
-#: openedx/core/djangoapps/user_authn/views/login.py
-#, python-brace-format
-msgid ""
-"If you don't have an {platform_name} account yet, click "
-"{register_label_strong} at the top of the page."
-msgstr ""
-"هب غخع يخر'ف اشدث شر {platform_name} شذذخعرف غثف, ذمهذن "
-"{register_label_strong} شف فاث فخح خب فاث حشلث."
+"غخعق يشسازخشقي. {blank_lines}هب غخع يخر'ف اشدث شر شذذخعرف خر {platform_name}"
+" غثف, ذمهذن {register_label_strong} شف فاث فخح خب فاث حشلث."
 
 #: openedx/core/djangoapps/user_authn/views/login.py
 #: lms/templates/register-form.html
@@ -11934,15 +11894,15 @@ msgstr "فاثقث صشس شر ثققخق قثذثهدهرل غخعق مخلهر
 #: openedx/core/djangoapps/user_authn/views/login.py
 #, python-brace-format
 msgid ""
-"In order to sign in, you need to activate your account.<br /><br />We just "
-"sent an activation link to <strong>{email}</strong>.  If you do not receive "
-"an email, check your spam folders or <a href=\"{support_url}\">contact "
-"{platform} Support</a>."
+"In order to sign in, you need to activate your account.{blank_lines}We just "
+"sent an activation link to {email_strong}. If you do not receive an email, "
+"check your spam folders or {link_start}contact {platform_name} "
+"Support{link_end}."
 msgstr ""
-"هر خقيثق فخ سهلر هر, غخع رثثي فخ شذفهدشفث غخعق شذذخعرف.<br /><br />صث تعسف "
-"سثرف شر شذفهدشفهخر مهرن فخ <strong>{email}</strong>.  هب غخع يخ رخف قثذثهدث "
-"شر ثوشهم, ذاثذن غخعق سحشو بخميثقس خق <a href=\"{support_url}\">ذخرفشذف "
-"{platform} سعححخقف</a>."
+"هر خقيثق فخ سهلر هر, غخع رثثي فخ شذفهدشفث غخعق شذذخعرف.{blank_lines}صث تعسف "
+"سثرف شر شذفهدشفهخر مهرن فخ {email_strong}. هب غخع يخ رخف قثذثهدث شر ثوشهم, "
+"ذاثذن غخعق سحشو بخميثقس خق {link_start}ذخرفشذف {platform_name} "
+"سعححخقف{link_end}."
 
 #: openedx/core/djangoapps/user_authn/views/login.py
 msgid "Too many failed login attempts. Try again later."
@@ -12299,15 +12259,23 @@ msgstr "سهلر هر"
 
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
+msgid "Welcome to {course_display_name}"
+msgstr "صثمذخوث فخ {course_display_name}"
+
+#: openedx/features/course_experience/views/course_home_messages.py
+msgid ""
+"You must be enrolled in the course to see course content. Please contact "
+"your degree administrator or edX Support if you have questions."
+msgstr ""
+"غخع وعسف زث ثرقخممثي هر فاث ذخعقسث فخ سثث ذخعقسث ذخرفثرف. حمثشسث ذخرفشذف "
+"غخعق يثلقثث شيوهرهسفقشفخق خق ثيط سعححخقف هب غخع اشدث ضعثسفهخرس."
+
+#: openedx/features/course_experience/views/course_home_messages.py
+#, python-brace-format
 msgid ""
 "{open_enroll_link}Enroll now{close_enroll_link} to access the full course."
 msgstr ""
 "{open_enroll_link}ثرقخمم رخص{close_enroll_link} فخ شذذثسس فاث بعمم ذخعقسث."
-
-#: openedx/features/course_experience/views/course_home_messages.py
-#, python-brace-format
-msgid "Welcome to {course_display_name}"
-msgstr "صثمذخوث فخ {course_display_name}"
 
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
@@ -18232,13 +18200,6 @@ msgstr "قثسعزوهف دثقهبهذشفهخر: {reverify_url}"
 #: lms/templates/emails/failed_verification_email.txt
 msgid "ID Verification FAQ: {faq_url}"
 msgstr "هي دثقهبهذشفهخر بشض: {faq_url}"
-
-#: lms/templates/emails/failed_verification_email.txt
-#: lms/templates/emails/order_confirmation_email.txt
-#: lms/templates/emails/passed_verification_email.txt
-#: lms/templates/emails/photo_submission_confirmation.txt
-msgid "Thank you,"
-msgstr "فاشرن غخع,"
 
 #: lms/templates/emails/failed_verification_email.txt
 #: lms/templates/emails/passed_verification_email.txt

@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-04-14 20:37+0000\n"
-"PO-Revision-Date: 2019-04-14 20:37:56.163141\n"
+"POT-Creation-Date: 2019-04-21 20:37+0000\n"
+"PO-Revision-Date: 2019-04-21 20:37:49.802840\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -2774,6 +2774,7 @@ msgstr ""
 #: lms/templates/dashboard/_reason_survey.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 #: lms/templates/survey/survey.html
+#: lms/templates/widgets/footer-language-selector.html
 #: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview-language-fragment.html
 #: openedx/core/djangoapps/theming/templates/theming/theming-admin-fragment.html
 #: themes/stanford-style/lms/templates/register-shib.html
@@ -11441,17 +11442,18 @@ msgid "Expired ID Verification"
 msgstr "Éxpïréd ÌD Vérïfïçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.html
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt
 #, python-format
-msgid ""
-"\n"
-"                    Hello %(full_name)s,\n"
-"                    Your %(platform_name)s ID verification has expired.\n"
-"                "
+msgid "Hello %(full_name)s,"
+msgstr "Héllö %(full_name)s, Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
+#, python-format
+msgid "Your %(platform_name)s ID verification has expired.\" "
 msgstr ""
-"\n"
-"                    Héllö %(full_name)s,\n"
-"                    Ýöür %(platform_name)s ÌD vérïfïçätïön häs éxpïréd.\n"
-"                 Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
+"Ýöür %(platform_name)s ÌD vérïfïçätïön häs éxpïréd.\"  Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя#"
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
@@ -11478,66 +11480,47 @@ msgstr ""
 "¢σηѕє¢тєтυя #"
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
 #, python-format
-msgid ""
-"\n"
-"                    Resubmit Verification : %(lms_verification_link)s\n"
-"                    ID verification FAQ : %(help_center_link)s\n"
-"                "
+msgid "Resubmit Verification : %(lms_verification_link)s "
 msgstr ""
-"\n"
-"                    Résüßmït Vérïfïçätïön : %(lms_verification_link)s\n"
-"                    ÌD vérïfïçätïön FÀQ : %(help_center_link)s\n"
-"                 Ⱡ'σяєм ιρѕυм ∂σłσя #"
+"Résüßmït Vérïfïçätïön : %(lms_verification_link)s  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢#"
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
 #, python-format
-msgid ""
-"\n"
-"                Thank you,\n"
-"                The %(platform_name)s Team\n"
-"                "
+msgid "ID verification FAQ : %(help_center_link)s "
 msgstr ""
-"\n"
-"                Thänk ýöü,\n"
-"                Thé %(platform_name)s Téäm\n"
-"                 Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
+"ÌD vérïfïçätïön FÀQ : %(help_center_link)s  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕ#"
+
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
+#: lms/templates/emails/failed_verification_email.txt
+#: lms/templates/emails/order_confirmation_email.txt
+#: lms/templates/emails/passed_verification_email.txt
+#: lms/templates/emails/photo_submission_confirmation.txt
+msgid "Thank you,"
+msgstr "Thänk ýöü, Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
+#, python-format
+msgid "The %(platform_name)s Team "
+msgstr "Thé %(platform_name)s Téäm  Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
 #, python-format
-msgid ""
-"\n"
-"Hello %(full_name)s,\n"
-"Your %(platform_name)s ID verification has expired.\n"
-msgstr ""
-"\n"
-"Héllö %(full_name)s,\n"
-"Ýöür %(platform_name)s ÌD vérïfïçätïön häs éxpïréd.\n"
-" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#\n"
+msgid "Hello %(full_name)s, "
+msgstr "Héllö %(full_name)s,  Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
 #, python-format
-msgid ""
-"\n"
-"Resubmit Verification : %(lms_verification_link)s\n"
-"ID verification FAQ : %(help_center_link)s\n"
+msgid "Your %(platform_name)s ID verification has expired. "
 msgstr ""
-"\n"
-"Résüßmït Vérïfïçätïön : %(lms_verification_link)s\n"
-"ÌD vérïfïçätïön FÀQ : %(help_center_link)s\n"
-" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#\n"
-
-#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
-#, python-format
-msgid ""
-"\n"
-"Thank you,\n"
-"The %(platform_name)s Team\n"
-msgstr ""
-"\n"
-"Thänk ýöü,\n"
-"Thé %(platform_name)s Téäm\n"
-" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#\n"
+"Ýöür %(platform_name)s ÌD vérïfïçätïön häs éxpïréd.  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя#"
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/subject.txt
 #, python-format
@@ -13685,12 +13668,6 @@ msgstr ""
 #: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.html
 #: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt
 #, python-format
-msgid "Hello %(full_name)s,"
-msgstr "Héllö %(full_name)s, Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.html
-#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt
-#, python-format
 msgid ""
 "We received a deletion request for your account on %(platform_name)s. We're "
 "sorry to see you go!"
@@ -13749,33 +13726,21 @@ msgstr ""
 #: openedx/core/djangoapps/user_authn/views/login.py
 #, python-brace-format
 msgid ""
-"You've successfully logged into your {provider_name} account, but this "
-"account isn't linked with an {platform_name} account yet."
-msgstr ""
-"Ýöü'vé süççéssfüllý löggéd ïntö ýöür {provider_name} äççöünt, ßüt thïs "
-"äççöünt ïsn't lïnkéd wïth än {platform_name} äççöünt ýét. Ⱡ'σяєм ιρѕυм ∂σłσя"
-" ѕιт α#"
-
-#: openedx/core/djangoapps/user_authn/views/login.py
-#, python-brace-format
-msgid ""
-"Use your {platform_name} username and password to log into {platform_name} "
+"You've successfully signed in to your {provider_name} account, but this "
+"account isn't linked with your {platform_name} account yet. {blank_lines}Use"
+" your {platform_name} username and password to sign in to {platform_name} "
 "below, and then link your {platform_name} account with {provider_name} from "
-"your dashboard."
+"your dashboard. {blank_lines}If you don't have an account on {platform_name}"
+" yet, click {register_label_strong} at the top of the page."
 msgstr ""
-"Ûsé ýöür {platform_name} üsérnämé änd pässwörd tö lög ïntö {platform_name} "
+"Ýöü'vé süççéssfüllý sïgnéd ïn tö ýöür {provider_name} äççöünt, ßüt thïs "
+"äççöünt ïsn't lïnkéd wïth ýöür {platform_name} äççöünt ýét. {blank_lines}Ûsé"
+" ýöür {platform_name} üsérnämé änd pässwörd tö sïgn ïn tö {platform_name} "
 "ßélöw, änd thén lïnk ýöür {platform_name} äççöünt wïth {provider_name} fröm "
-"ýöür däshßöärd. Ⱡ'σяєм ιρѕυм #"
-
-#: openedx/core/djangoapps/user_authn/views/login.py
-#, python-brace-format
-msgid ""
-"If you don't have an {platform_name} account yet, click "
-"{register_label_strong} at the top of the page."
-msgstr ""
-"Ìf ýöü dön't hävé än {platform_name} äççöünt ýét, çlïçk "
-"{register_label_strong} ät thé töp öf thé pägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
-" ¢σηѕє¢тєтυя#"
+"ýöür däshßöärd. {blank_lines}Ìf ýöü dön't hävé än äççöünt ön {platform_name}"
+" ýét, çlïçk {register_label_strong} ät thé töp öf thé pägé. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
+"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, q#"
 
 #: openedx/core/djangoapps/user_authn/views/login.py
 #: lms/templates/register-form.html
@@ -13795,20 +13760,20 @@ msgstr ""
 #: openedx/core/djangoapps/user_authn/views/login.py
 #, python-brace-format
 msgid ""
-"In order to sign in, you need to activate your account.<br /><br />We just "
-"sent an activation link to <strong>{email}</strong>.  If you do not receive "
-"an email, check your spam folders or <a href=\"{support_url}\">contact "
-"{platform} Support</a>."
+"In order to sign in, you need to activate your account.{blank_lines}We just "
+"sent an activation link to {email_strong}. If you do not receive an email, "
+"check your spam folders or {link_start}contact {platform_name} "
+"Support{link_end}."
 msgstr ""
-"Ìn ördér tö sïgn ïn, ýöü nééd tö äçtïväté ýöür äççöünt.<br /><br />Wé jüst "
-"sént än äçtïvätïön lïnk tö <strong>{email}</strong>.  Ìf ýöü dö nöt réçéïvé "
-"än émäïl, çhéçk ýöür späm földérs ör <a href=\"{support_url}\">çöntäçt "
-"{platform} Süppört</a>. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg"
-" єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт"
-" єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт "
+"Ìn ördér tö sïgn ïn, ýöü nééd tö äçtïväté ýöür äççöünt.{blank_lines}Wé jüst "
+"sént än äçtïvätïön lïnk tö {email_strong}. Ìf ýöü dö nöt réçéïvé än émäïl, "
+"çhéçk ýöür späm földérs ör {link_start}çöntäçt {platform_name} "
+"Süppört{link_end}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg "
+"єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт "
+"єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт "
 "αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη "
 "νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт "
-"σ¢¢αє¢αт ¢υρι∂αтαт #"
+"σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕ#"
 
 #: openedx/core/djangoapps/user_authn/views/login.py
 msgid "Too many failed login attempts. Try again later."
@@ -14214,16 +14179,30 @@ msgstr "Sïgn ïn Ⱡ'σяєм ιρѕυм #"
 
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
+msgid "Welcome to {course_display_name}"
+msgstr "Wélçömé tö {course_display_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: openedx/features/course_experience/views/course_home_messages.py
+msgid ""
+"You must be enrolled in the course to see course content. Please contact "
+"your degree administrator or edX Support if you have questions."
+msgstr ""
+"Ýöü müst ßé énrölléd ïn thé çöürsé tö séé çöürsé çöntént. Pléäsé çöntäçt "
+"ýöür dégréé ädmïnïsträtör ör édX Süppört ïf ýöü hävé qüéstïöns. Ⱡ'σяєм ιρѕυм"
+" ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
+"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
+"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
+"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
+"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт łαвσя#"
+
+#: openedx/features/course_experience/views/course_home_messages.py
+#, python-brace-format
 msgid ""
 "{open_enroll_link}Enroll now{close_enroll_link} to access the full course."
 msgstr ""
 "{open_enroll_link}Énröll nöw{close_enroll_link} tö äççéss thé füll çöürsé. "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
-
-#: openedx/features/course_experience/views/course_home_messages.py
-#, python-brace-format
-msgid "Welcome to {course_display_name}"
-msgstr "Wélçömé tö {course_display_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
@@ -20878,13 +20857,6 @@ msgstr ""
 #: lms/templates/emails/failed_verification_email.txt
 msgid "ID Verification FAQ: {faq_url}"
 msgstr "ÌD Vérïfïçätïön FÀQ: {faq_url} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
-
-#: lms/templates/emails/failed_verification_email.txt
-#: lms/templates/emails/order_confirmation_email.txt
-#: lms/templates/emails/passed_verification_email.txt
-#: lms/templates/emails/photo_submission_confirmation.txt
-msgid "Thank you,"
-msgstr "Thänk ýöü, Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/templates/emails/failed_verification_email.txt
 #: lms/templates/emails/passed_verification_email.txt
