@@ -12,66 +12,15 @@ from openedx.core.djangolib.js_utils import js_escaped_string
 <div class="manual-content"></div>
 </div>
 <script>
-    var data_m = [
-        {
-        title: '${_("To know more about courses")}',
-        answer: '${_("Click the course to view the course introduction video, browse the course introduction, instructor introduction and course outline, etc.")}'
-        },{
-        title: '${_("To join as a member")}', 
-        answer: '${_("Enter \"Membership\" page, choose your learning duration and payment method. After payment is completed, you can enjoy learning all courses on EliteMBA during the study period.")}',
-        },{
-        title: '${_("To view the end-date of membership")}', 
-        answer: '${_("Enter \"Membership\" page to view the VIP open date and remaining days.")}',
-        },{
-        title: '${_("To enroll as a member")}', 
-        answer: '${_("Enter \"Discover New\" page, click the course or search key words to select courses you are interested in, click \"Free Enrollment for VIP\" button, then the enrollment is fulfilled.")}',
-        },{
-        title: '${_("To purchase a course")}', 
-        answer: '${_("Enter \"Discover New\" page, click the course or search key words to select courses you are interested in, click \"Enroll\" button, then you can start learning after payment is completed.")}',
-        },{
-        title: '${_("To start a course")}', 
-        answer: '${_("Click your avatar in the upper right corner of the page, enter \"Dashboard\" to view the course introduction, watch videos and complete assignments.")}',
-        },{
-        title: '${_("To participate in discussion")}',
-        answer: '${_("Enter \"Dashboard – View Course\" page, click \"Discussion\". You can view discussions, engage with posts and receive updates.")}',
-        },{
-        title: '${_("To view and download handouts")}',
-        answer: '${_("Enter \"Dashboard – View Course\" page, find \"Course Handouts\" on the right side. You can view handout content and download.")}'
-        }
-    ];
-    var tab = '';
-    var content = '';
-    var active = 0;
-    for (var i = 0; i < data_m.length; i++){
-        tab = tab + '<div class="manual-tab" onclick="showBlock(' + i + ')">' + data_m[i].title + '</div>';
-        content = content + '<div class="manual-block" style="display:none"><p class="ques-title">' + data_m[i].title + '</p>' + '<p class="ques-answer">' + data_m[i].answer + '</p></div>';
-    }
-    $('.manual-tabs')[0].innerHTML = tab;
-    $('.manual-content')[0].innerHTML = content;
-    $('.manual-block')[active].style.display = 'block';
-    $('.manual-tab')[active].classList.add('manual-tab-active');
+   function showBlock(index){
+    $('.manual-tab')[active].classList.remove('manual-tab-active');
+    $('.manual-block')[active].style.display = 'none';
 
-    function showBlock(index){
-        $('.manual-tab')[active].classList.remove('manual-tab-active');
-        $('.manual-block')[active].style.display = 'none';
-
-        $('.manual-tab')[index].classList.add('manual-tab-active');
-        $('.manual-block')[index].style.display = 'block';
-        
-        active = index;
-        
-        // var height = $('.manual-block')[index].offsetTop + 40;
-        // $('html, body').animate({ scrollTop: height + 'px'}, 500)
-    }
-    /*
-    window.onscroll = function(){
-        var height = document.documentElement.scrollTop;
-        if (height > 60) {
-            $('.manual-tabs')[0].classList.add('manual-tabs-fixed');
-        } else {
-            $('.manual-tabs')[0].classList.remove('manual-tabs-fixed');
-        }
-    }
-    */
+    $('.manual-tab')[index].classList.add('manual-tab-active');
+    $('.manual-block')[index].style.display = 'block';
+    
+    active = index;
+  }
 </script>
+<script src="/static/normal-theme/js/manual.js"></script>
 
