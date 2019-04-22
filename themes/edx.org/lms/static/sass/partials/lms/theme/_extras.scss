@@ -21,3 +21,15 @@
     }
   }
 }
+.select-lang-button {
+    padding: 3px;
+    color: $m-blue-d3 !important;
+    height: 30px;
+
+    &:hover,
+    &:active,
+    &:focus {
+        background: $m-blue-d3 !important;
+        color: white !important;
+    }
+}
