@@ -3290,7 +3290,6 @@ msgid "Specify what student can learn from the course."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
-#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid "Course Instructor"
 msgstr ""
 
@@ -8546,7 +8545,7 @@ msgstr ""
 msgid "Subscribe to the {platform_name} YouTube channel"
 msgstr ""
 
-#: lms/envs/common.py membership/templates/membership/index.html
+#: lms/envs/common.py
 msgid "Certificate"
 msgstr ""
 
@@ -9173,7 +9172,9 @@ msgstr ""
 msgid "Auto log:"
 msgstr ""
 
-#: lms/templates/wiki/history.html wiki/templates/wiki/history.html
+#: lms/templates/wiki/history.html
+#: lms/templates/student_account/account_settings.html
+#: wiki/templates/wiki/history.html
 msgid "Change"
 msgstr ""
 
@@ -11350,6 +11351,7 @@ msgid "HTML"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/component.py lms/templates/video.html
+#: membership/templates/membership/index.html
 msgid "Video"
 msgstr ""
 
@@ -11860,7 +11862,6 @@ msgstr ""
 
 #: cms/templates/course_outline.html
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid "Course Outline"
 msgstr ""
 
@@ -11939,11 +11940,6 @@ msgstr ""
 #: cms/templates/settings.html
 #: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
 msgid "Course End Date"
-msgstr ""
-
-#: cms/templates/settings.html
-#: themes/normal-theme/lms/templates/courseware/course_about.html
-msgid "Course Short Description"
 msgstr ""
 
 #: cms/templates/settings.html lms/templates/courseware/program_marketing.html
@@ -18697,6 +18693,10 @@ msgid ""
 "collectible course."
 msgstr ""
 
+#: lms/templates/professors/index.html
+msgid "More"
+msgstr ""
+
 #: lms/templates/provider/authorize.html
 msgid ""
 "{start_strong}{application_name}{end_strong} would like to access your data "
@@ -19263,15 +19263,11 @@ msgid "Bind Mobile"
 msgstr ""
 
 #: lms/templates/student_account/account_settings.html
-msgid "Successfully Bound."
+msgid "Mobile Phone No.:"
 msgstr ""
 
 #: lms/templates/student_account/account_settings.html
-msgid "Change Mobile No."
-msgstr ""
-
-#: lms/templates/student_account/account_settings.html
-msgid "bind your EliteMBA account to your cellphone number"
+msgid "Bind your EliteMBA account to your cellphone number"
 msgstr ""
 
 #: lms/templates/student_account/finish_auth.html
@@ -19949,7 +19945,7 @@ msgid "Schools & Partners"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/footer.html
-msgid "Learn to Change·Change to Progress"
+msgid "Learn to Change·Change to Improve"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/footer.html
@@ -19983,16 +19979,11 @@ msgid "Tencent Classroom"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/footer.html
-msgid "Elite MBA"
+msgid "Scan WeChat QR Code"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/footer.html
-#: themes/normal-theme/lms/templates/courseware/course_about_sidebar_header.html
-msgid "WeChat Scan Code"
-msgstr ""
-
-#: themes/normal-theme/lms/templates/footer.html
-msgid "Scan via Wechat to Follow Course Updates"
+msgid "to find out more"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/footer.html
@@ -20042,8 +20033,31 @@ msgstr ""
 msgid ":"
 msgstr ""
 
+#: themes/normal-theme/lms/templates/certificates/_accomplishment-rendering.html
+msgid "Verification Address:"
+msgstr ""
+
 #: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid "Add {course_name} to Cart <span>({price} USD)</span>"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/courseware/course_about.html
+msgctxt "CourseAbout"
+msgid "Description"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/courseware/course_about.html
+msgctxt "CourseAbout"
+msgid "Instructor"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/courseware/course_about.html
+msgctxt "CourseAbout"
+msgid "Outline"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/courseware/course_about_sidebar_header.html
+msgid "WeChat Scan Code"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/courseware/course_about_sidebar_header.html
@@ -21345,6 +21359,87 @@ msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/join_us.html
 msgid "directly or call 400-931-8118."
+msgstr ""
+
+#: themes/normal-theme/lms/templates/static_templates/manual.html
+msgid "To know more about courses"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/static_templates/manual.html
+msgid ""
+"Click the course to view the course introduction video, browse the course "
+"introduction, instructor introduction and course outline, etc."
+msgstr ""
+
+#: themes/normal-theme/lms/templates/static_templates/manual.html
+msgid "To join as a member"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/static_templates/manual.html
+msgid ""
+"Enter \"Membership\" page, choose your learning duration and payment method."
+" After payment is completed, you can enjoy learning all courses on EliteMBA "
+"during the study period."
+msgstr ""
+
+#: themes/normal-theme/lms/templates/static_templates/manual.html
+msgid "To view the end-date of membership"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/static_templates/manual.html
+msgid "Enter \"Membership\" page to view the VIP open date and remaining days."
+msgstr ""
+
+#: themes/normal-theme/lms/templates/static_templates/manual.html
+msgid "To enroll as a member"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/static_templates/manual.html
+msgid ""
+"Enter \"Discover New\" page, click the course or search key words to select "
+"courses you are interested in, click \"Free Enrollment for VIP\" button, "
+"then the enrollment is fulfilled."
+msgstr ""
+
+#: themes/normal-theme/lms/templates/static_templates/manual.html
+msgid "To purchase a course"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/static_templates/manual.html
+msgid ""
+"Enter \"Discover New\" page, click the course or search key words to select "
+"courses you are interested in, click \"Enroll\" button, then you can start "
+"learning after payment is completed."
+msgstr ""
+
+#: themes/normal-theme/lms/templates/static_templates/manual.html
+msgid "To start a course"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/static_templates/manual.html
+msgid ""
+"Click your avatar in the upper right corner of the page, enter \"Dashboard\""
+" to view the course introduction, watch videos and complete assignments."
+msgstr ""
+
+#: themes/normal-theme/lms/templates/static_templates/manual.html
+msgid "To participate in discussion"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/static_templates/manual.html
+msgid ""
+"Enter \"Dashboard \\u2013 View Course\" page, click \"Discussion\". You can "
+"view discussions, engage with posts and receive updates."
+msgstr ""
+
+#: themes/normal-theme/lms/templates/static_templates/manual.html
+msgid "To view and download handouts"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/static_templates/manual.html
+msgid ""
+"Enter \"Dashboard \\u2013 View Course\" page, find \"Course Handouts\" on "
+"the right side. You can view handout content and download."
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/privacy.html
@@ -23921,6 +24016,10 @@ msgid "Displayed on the course details page. Limit to 1000 characters."
 msgstr ""
 
 #: cms/templates/settings.html
+msgid "Course Short Description"
+msgstr ""
+
+#: cms/templates/settings.html
 msgid ""
 "Appears on the course catalog page when students roll over the course name. "
 "Limit to ~150 characters"
@@ -25724,6 +25823,26 @@ msgid ""
 msgstr ""
 
 #: membership/models.py
+msgid "1 Month"
+msgstr ""
+
+#: membership/models.py
+msgid "3 Months"
+msgstr ""
+
+#: membership/models.py
+msgid "6 Months"
+msgstr ""
+
+#: membership/models.py
+msgid "12 Months"
+msgstr ""
+
+#: membership/models.py
+msgid "24 Months"
+msgstr ""
+
+#: membership/models.py
 msgid "Awaiting for payment"
 msgstr ""
 
@@ -25840,7 +25959,7 @@ msgid "Encounter a problem？"
 msgstr ""
 
 #: membership/templates/membership/index.html
-msgid "Prestige EMBA courses in America"
+msgid "Membership of Prestige EMBA Courses in America"
 msgstr ""
 
 #: membership/templates/membership/index.html
@@ -25950,33 +26069,32 @@ msgid ""
 msgstr ""
 
 #: membership/templates/membership/index.html
-msgid "Dr. Bochun Xiao"
+msgid "Dr. Baichun Xiao"
 msgstr ""
 
 #: membership/templates/membership/index.html
 msgid ""
-"Lifetime Professor and Dean of Management Major in School of Business, Long "
-"Island University - C. W. Post, USA"
+"Tenured Professor and Chairman of the Department of Management at LIU Post, "
+"USA"
 msgstr ""
 
 #: membership/templates/membership/index.html
-msgid "Dr. Lloyd E. Shefsky"
-msgstr ""
-
-#: membership/templates/membership/index.html
-msgid ""
-"Clinical Professor, Founder and Co-director of the Center for Family "
-"Enterprises in Kellogg School of Management at Northwestern University, USA"
-msgstr ""
-
-#: membership/templates/membership/index.html
-msgid "Prof. Tim Smithe"
+msgid "Lloyd Shefsky"
 msgstr ""
 
 #: membership/templates/membership/index.html
 msgid ""
-"Vice President & Chief Management Officer of International Finance Education"
-" Association (IFEA)"
+"Former Clinical Professor of Family Enterprises at Kellogg School of "
+"Management at NU, USA"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Tim Smithe"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid ""
+"Vice President & CMO of International Finance Education Association (IFEA)"
 msgstr ""
 
 #: membership/templates/membership/index.html
@@ -25984,9 +26102,7 @@ msgid "Dr. Wei Yang"
 msgstr ""
 
 #: membership/templates/membership/index.html
-msgid ""
-"Lifetime Professor in School of Business,  Long Island University - C. W. "
-"Post, USA"
+msgid "Tenured Professor of the School of Business at LIU Post, USA"
 msgstr ""
 
 #: membership/templates/membership/index.html
@@ -25995,8 +26111,8 @@ msgstr ""
 
 #: membership/templates/membership/index.html
 msgid ""
-"Prior Assistant Professor of School of Labor and Employment Relations, Penn "
-"State University Park, USA"
+"Former Assistant Professor of School of Labor and Employment Relations at "
+"Penn State, USA"
 msgstr ""
 
 #: membership/templates/membership/index.html
@@ -26004,17 +26120,11 @@ msgid "Dr. Jiamin Wang"
 msgstr ""
 
 #: membership/templates/membership/index.html
-msgid ""
-"Lifetime Professor of Information Management & Technology, Long Island "
-"University - C. W. Post, USA"
-msgstr ""
-
-#: membership/templates/membership/index.html
 msgid "Dr. Tianning Li"
 msgstr ""
 
 #: membership/templates/membership/index.html
-msgid "Associate Professor of Finance and Finance, Hood College, USA"
+msgid "Associate Professor of Finance at Hood College, USA"
 msgstr ""
 
 #: membership/templates/membership/index.html
@@ -26022,13 +26132,12 @@ msgid "Dr. Jianjun Shi"
 msgstr ""
 
 #: membership/templates/membership/index.html
-msgid ""
-"Prior President and Professor of the University of International Business "
-"and Economics {br}"
+msgid "Former President and Professor at UIBE"
 msgstr ""
 
 #: membership/templates/membership/index.html
-msgid "Professor of Economics in Davidson College"
+msgid ""
+"The Frontis W. Johnston Professor of Economics at Davidson College, USA"
 msgstr ""
 
 #: membership/templates/membership/index.html
@@ -26036,7 +26145,7 @@ msgid "Dr. Elia Kacapyr"
 msgstr ""
 
 #: membership/templates/membership/index.html
-msgid "Professor of Economics, Ithaca College, USA"
+msgid "Professor of Economics at Ithaca College, USA"
 msgstr ""
 
 #: membership/templates/membership/index.html
@@ -26044,13 +26153,7 @@ msgid "Dr. Robert Graham"
 msgstr ""
 
 #: membership/templates/membership/index.html
-msgid "Professor of Economics, Hanover College, USA"
-msgstr ""
-
-#: membership/templates/membership/index.html
-msgid ""
-"Prior President and Professor of the University of International Business "
-"and Economics"
+msgid "Professor of Economics at Hanover College, USA"
 msgstr ""
 
 #: membership/templates/membership/index.html
@@ -26132,11 +26235,7 @@ msgid "Learning Feature"
 msgstr ""
 
 #: membership/templates/membership/index.html
-msgid "Video Lesson"
-msgstr ""
-
-#: membership/templates/membership/index.html
-msgid "Interaction within Groups"
+msgid "Group Chat"
 msgstr ""
 
 #: membership/templates/membership/index.html
@@ -26144,7 +26243,11 @@ msgid "Live Lecture"
 msgstr ""
 
 #: membership/templates/membership/index.html
-msgid "Exercise Test"
+msgid "Exam"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Credential"
 msgstr ""
 
 #: membership/templates/membership/index.html
