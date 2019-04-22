@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-01-15 19:13+0800\n"
-"PO-Revision-Date: 2019-01-15 11:13:08.364765\n"
+"POT-Creation-Date: 2019-04-19 11:45+0800\n"
+"PO-Revision-Date: 2019-04-19 03:45:58.396241\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -5101,6 +5101,87 @@ msgstr ""
 
 #: themes/normal-theme/lms/static/js/binding.js
 msgid "Cellphone number binding successfully"
+msgstr ""
+
+#: themes/normal-theme/lms/static/js/manual.js
+msgid "To know more about courses"
+msgstr ""
+
+#: themes/normal-theme/lms/static/js/manual.js
+msgid ""
+"Click the course to view the course introduction video, browse the course "
+"introduction, instructor introduction and course outline, etc."
+msgstr ""
+
+#: themes/normal-theme/lms/static/js/manual.js
+msgid "To join as a member"
+msgstr ""
+
+#: themes/normal-theme/lms/static/js/manual.js
+msgid ""
+"Enter \"Membership\" page, choose your learning duration and payment method."
+" After payment is completed, you can enjoy learning all courses on EliteMBA "
+"during the study period."
+msgstr ""
+
+#: themes/normal-theme/lms/static/js/manual.js
+msgid "To view the end-date of membership"
+msgstr ""
+
+#: themes/normal-theme/lms/static/js/manual.js
+msgid "Enter \"Membership\" page to view the VIP open date and remaining days."
+msgstr ""
+
+#: themes/normal-theme/lms/static/js/manual.js
+msgid "To enroll as a member"
+msgstr ""
+
+#: themes/normal-theme/lms/static/js/manual.js
+msgid ""
+"Enter \"Discover New\" page, click the course or search key words to select "
+"courses you are interested in, click \"Free Enrollment for VIP\" button, "
+"then the enrollment is fulfilled."
+msgstr ""
+
+#: themes/normal-theme/lms/static/js/manual.js
+msgid "To purchase a course"
+msgstr ""
+
+#: themes/normal-theme/lms/static/js/manual.js
+msgid ""
+"Enter \"Discover New\" page, click the course or search key words to select "
+"courses you are interested in, click \"Enroll\" button, then you can start "
+"learning after payment is completed."
+msgstr ""
+
+#: themes/normal-theme/lms/static/js/manual.js
+msgid "To start a course"
+msgstr ""
+
+#: themes/normal-theme/lms/static/js/manual.js
+msgid ""
+"Click your avatar in the upper right corner of the page, enter \"Dashboard\""
+" to view the course introduction, watch videos and complete assignments."
+msgstr ""
+
+#: themes/normal-theme/lms/static/js/manual.js
+msgid "To participate in discussion"
+msgstr ""
+
+#: themes/normal-theme/lms/static/js/manual.js
+msgid ""
+"Enter \"Dashboard - View Course\" page, click \"Discussion\". You can view "
+"discussions, engage with posts and receive updates."
+msgstr ""
+
+#: themes/normal-theme/lms/static/js/manual.js
+msgid "To view and download handouts"
+msgstr ""
+
+#: themes/normal-theme/lms/static/js/manual.js
+msgid ""
+"Enter \"Dashboard - View Course\" page, find \"Course Handouts\" on the "
+"right side. You can view handout content and download."
 msgstr ""
 
 #: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
