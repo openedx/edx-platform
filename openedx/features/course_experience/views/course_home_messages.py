@@ -112,11 +112,12 @@ def _register_course_home_messages(request, course, user_access, course_start_da
     allow_anonymous = allow_public_access(course, [COURSE_VISIBILITY_PUBLIC])
 
     if user_access['is_anonymous'] and not allow_anonymous:
+        sign_in_or_register_text = (_(u'{sign_in_link} or {register_link} and then enroll in this course.')
+                                    if not CourseMode.is_masters_only(course.id)
+                                    else _(u'{sign_in_link} or {register_link}.'))
         CourseHomeMessages.register_info_message(
             request,
-            Text(_(
-                u'{sign_in_link} or {register_link} and then enroll in this course.'
-            )).format(
+            Text(sign_in_or_register_text).format(
                 sign_in_link=HTML(u'<a href="/login?next={current_url}">{sign_in_label}</a>').format(
                     sign_in_label=_('Sign in'),
                     current_url=urlquote_plus(request.path),
