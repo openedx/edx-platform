@@ -69,8 +69,8 @@
 # Translators:
 # 嘉杰 李 <jj.li@eliteu.com.cn>, 2018
 # 微 李 <w.li@eliteu.com.cn>, 2018
-# li ying <code@eliteu.cn>, 2019
 # fengri <173770922@qq.com>, 2019
+# li ying <code@eliteu.cn>, 2019
 #
 # #-#-#-#-#  eliteu.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/).
@@ -26669,7 +26669,7 @@ msgstr "施建军 博士"
 
 #: membership/templates/membership/index.html
 msgid "Former President and Professor at UIBE"
-msgstr "原对外经济贸易大学校长、<br>教授"
+msgstr "原对外经济贸易大学校长、<br/>教授"
 
 #: membership/templates/membership/index.html
 msgid ""
