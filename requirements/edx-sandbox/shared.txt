@@ -5,7 +5,7 @@
 #    make upgrade
 #
 asn1crypto==0.24.0        # via cryptography
-cffi==1.12.2              # via cryptography
+cffi==1.12.3              # via cryptography
 cryptography==2.6.1
 enum34==1.1.6             # via cryptography
 ipaddress==1.0.22         # via cryptography

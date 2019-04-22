@@ -62,7 +62,7 @@ botocore==1.8.17
 caniusepython3==7.0.0
 celery==3.1.25
 certifi==2019.3.9
-cffi==1.12.2
+cffi==1.12.3
 chardet==3.0.4
 click-log==0.3.2          # via edx-lint
 click==7.0
