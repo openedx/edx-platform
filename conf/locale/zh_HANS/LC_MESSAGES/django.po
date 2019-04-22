@@ -31,8 +31,8 @@
 # 微 李 <w.li@eliteu.com.cn>, 2018
 # 家璧 刘 <jb.liu@eliteu.com.cn>, 2018
 # 婕 高 <j.gao@eliteu.cn>, 2018
-# li ying <code@eliteu.cn>, 2019
 # fengri <173770922@qq.com>, 2019
+# li ying <code@eliteu.cn>, 2019
 #
 # #-#-#-#-#  mako-studio.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)
@@ -21874,7 +21874,7 @@ msgstr "进入“课程面板-查看课程”页，点击“讨论”，可以�
 
 #: themes/normal-theme/lms/templates/static_templates/manual.html
 msgid "To view and download handouts"
-msgstr "To view and download handouts"
+msgstr "如何查看和下载课程讲义？"
 
 #: themes/normal-theme/lms/templates/static_templates/manual.html
 msgid ""
