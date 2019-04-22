@@ -15,7 +15,7 @@ class AnnouncementsConfig(AppConfig):
         PluginURLs.CONFIG: {
             ProjectType.LMS: {
                 PluginURLs.NAMESPACE: u'announcements',
-                PluginURLs.REGEX: u'announcements/',
+                PluginURLs.REGEX: u'^announcements/',
                 PluginURLs.RELATIVE_PATH: u'urls',
             }
         },

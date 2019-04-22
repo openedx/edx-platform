@@ -50,27 +50,27 @@ urlpatterns = [
 
     # Grade downloads...
     url(r'^list_report_downloads$', api.list_report_downloads, name='list_report_downloads'),
-    url(r'calculate_grades_csv$', api.calculate_grades_csv, name='calculate_grades_csv'),
-    url(r'problem_grade_report$', api.problem_grade_report, name='problem_grade_report'),
+    url(r'^calculate_grades_csv$', api.calculate_grades_csv, name='calculate_grades_csv'),
+    url(r'^problem_grade_report$', api.problem_grade_report, name='problem_grade_report'),
 
     # Financial Report downloads..
     url(r'^list_financial_report_downloads$', api.list_financial_report_downloads,
         name='list_financial_report_downloads'),
 
     # Registration Codes..
-    url(r'get_registration_codes$', api.get_registration_codes, name='get_registration_codes'),
-    url(r'generate_registration_codes$', api.generate_registration_codes, name='generate_registration_codes'),
-    url(r'active_registration_codes$', api.active_registration_codes, name='active_registration_codes'),
-    url(r'spent_registration_codes$', api.spent_registration_codes, name='spent_registration_codes'),
+    url(r'^get_registration_codes$', api.get_registration_codes, name='get_registration_codes'),
+    url(r'^generate_registration_codes$', api.generate_registration_codes, name='generate_registration_codes'),
+    url(r'^active_registration_codes$', api.active_registration_codes, name='active_registration_codes'),
+    url(r'^spent_registration_codes$', api.spent_registration_codes, name='spent_registration_codes'),
 
     # Reports..
-    url(r'get_enrollment_report$', api.get_enrollment_report, name='get_enrollment_report'),
-    url(r'get_exec_summary_report$', api.get_exec_summary_report, name='get_exec_summary_report'),
-    url(r'get_course_survey_results$', api.get_course_survey_results, name='get_course_survey_results'),
-    url(r'export_ora2_data', api.export_ora2_data, name='export_ora2_data'),
+    url(r'^get_enrollment_report$', api.get_enrollment_report, name='get_enrollment_report'),
+    url(r'^get_exec_summary_report$', api.get_exec_summary_report, name='get_exec_summary_report'),
+    url(r'^get_course_survey_results$', api.get_course_survey_results, name='get_course_survey_results'),
+    url(r'^export_ora2_data', api.export_ora2_data, name='export_ora2_data'),
 
     # Coupon Codes..
-    url(r'get_coupon_codes', api.get_coupon_codes, name='get_coupon_codes'),
+    url(r'^get_coupon_codes', api.get_coupon_codes, name='get_coupon_codes'),
 
     # spoc gradebook
     url(r'^gradebook$', gradebook_api.spoc_gradebook, name='spoc_gradebook'),
@@ -78,7 +78,7 @@ urlpatterns = [
     url(r'^gradebook/(?P<offset>[0-9]+)$', gradebook_api.spoc_gradebook, name='spoc_gradebook'),
 
     # Cohort management
-    url(r'add_users_to_cohorts$', api.add_users_to_cohorts, name='add_users_to_cohorts'),
+    url(r'^add_users_to_cohorts$', api.add_users_to_cohorts, name='add_users_to_cohorts'),
 
     # Certificates
     url(r'^generate_example_certificates$', api.generate_example_certificates, name='generate_example_certificates'),

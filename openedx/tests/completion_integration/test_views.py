@@ -31,7 +31,7 @@ class CompletionBatchTestCase(CompletionWaffleTestMixin, ModuleStoreTestCase):
         Create the test data.
         """
         super(CompletionBatchTestCase, self).setUp()
-        self.url = reverse('completion_api:v1:completion-batch')
+        self.url = reverse('completion:v1:completion-batch')
 
         # Enable the waffle flag for all tests
         self.override_waffle_switch(True)
