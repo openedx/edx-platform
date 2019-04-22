@@ -1080,6 +1080,10 @@ class CourseEnrollmentManager(models.Manager):
 CourseEnrollmentState = namedtuple('CourseEnrollmentState', 'mode, is_active')
 
 
+class BogusModelToTestMigrations(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+
 class CourseEnrollment(models.Model):
     """
     Represents a Student's Enrollment record for a single Course. You should
