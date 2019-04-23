@@ -146,6 +146,7 @@ class ExpiryReminderResolver(BinnedSchedulesBaseResolver):
                 user_id=user.id,
                 event_name='edx.bi.experiment.user.bucketed',
                 properties=properties,
+                context={'course_id': self.course_key}
             )
         if hash_bucket == 0:
             raise InvalidContextError()
