@@ -113,4 +113,4 @@ class CourseModeSignalTest(ModuleStoreTestCase):
             # group 2 is verified. 7 is masters
             assert verified_section_ret.group_access[50] == [2, 7]
             assert section2_ret.group_access == {}
-            assert section2_ret.group_access == {50: [1]}
+            assert section3_ret.group_access == {50: [1]}

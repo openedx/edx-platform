@@ -1,8 +1,9 @@
 """
 URL definitions for the course_modes API.
 """
-from django.conf.urls import include, url
+from __future__ import absolute_import
 
+from django.conf.urls import include, url
 
 app_name = 'common.djangoapps.course_modes.api'
 

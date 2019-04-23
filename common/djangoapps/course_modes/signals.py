@@ -4,7 +4,6 @@ Signal handler for setting default course mode expiration dates
 from __future__ import absolute_import, unicode_literals
 
 from crum import get_current_user
-
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.signals import post_save
 from django.dispatch.dispatcher import receiver
