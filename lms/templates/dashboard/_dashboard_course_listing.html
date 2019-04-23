@@ -22,7 +22,6 @@ from student.helpers import (
   DISABLE_UNENROLL_CERT_STATES,
 )
 from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_params
-from membership.models import VIPCourseEnrollment
 %>
 
 <%
@@ -37,7 +36,11 @@ from membership.models import VIPCourseEnrollment
   billing_email = settings.PAYMENT_SUPPORT_EMAIL
 
   is_course_expired = hasattr(show_courseware_link, 'error_code') and show_courseware_link.error_code == 'audit_expired'
-  is_vip_enrollment = enrollment.course_id.html_id() in vip_course_enrollment_ids or False
+  if settings.FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION'):
+    from membership.models import VIPCourseEnrollment
+    is_vip_enrollment = enrollment.course_id.html_id() in vip_course_enrollment_ids or False
+  else:
+    is_vip_enrollment = False
 %>
 
 <%namespace name='static' file='../static_content.html'/>
