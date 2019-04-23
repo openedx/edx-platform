@@ -261,7 +261,6 @@
                             ]
                         }
                     });
-
                     // In order to eliminate all flashing during interactive
                     // preview, it is necessary to set processSectionDelay to 0
                     // (remove delay between input and output phases). This
