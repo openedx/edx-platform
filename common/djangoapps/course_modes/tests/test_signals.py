@@ -1,6 +1,7 @@
 """
 Unit tests for the course_mode signals
 """
+from __future__ import absolute_import, unicode_literals
 
 from datetime import datetime, timedelta
 
@@ -10,8 +11,9 @@ from pytz import UTC
 
 from course_modes.models import CourseMode
 from course_modes.signals import _listen_for_course_publish
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 @ddt.ddt
@@ -87,3 +89,28 @@ class CourseModeSignalTest(ModuleStoreTestCase):
             course_mode.refresh_from_db()
 
             self.assertEqual(course_mode.expiration_datetime, self.end - timedelta(days=verification_window))
+
+    def test_masters_mode(self):
+        # create an xblock with verified group access
+        verified_section = ItemFactory.create(
+            category="sequential",
+            metadata={'group_access': {50: [2]}}
+        )
+        # and a section with no restriction
+        section2 = ItemFactory.create(
+            category="sequential",
+        )
+        section3 = ItemFactory.create(
+            category='sequential',
+            metadata={'group_access': {50: [1]}}
+        )
+        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
+            # create the master's mode. signal will add masters to the verified section
+            self.create_mode('masters', 'masters')
+            verified_section_ret = self.store.get_item(verified_section.location)
+            section2_ret = self.store.get_item(section2.location)
+            section3_ret = self.store.get_item(section3.location)
+            # group 2 is verified. 7 is masters
+            assert verified_section_ret.group_access[50] == [2, 7]
+            assert section2_ret.group_access == {}
+            assert section2_ret.group_access == {50: [1]}
