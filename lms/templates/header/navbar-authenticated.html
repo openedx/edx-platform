@@ -99,7 +99,7 @@ from django.conf import settings
                 document.getElementsByTagName('head')[0].appendChild(style);
 
                 var inline_style = "${'active' if reverse('professor_index') in request.path else ''}";
-                var a = '<div class="' + inline_style + ' mobile-nav-item hidden-mobile nav-item nav-tab nav-tab-harvard"><a class="tab-nav-link" href="' + hmm_url + '"><span>${_("Harvard Learning Camp")}</span><span>${_("Date of Expiry: ")}' + hmm_expiry_date + '</span></a></div>'
+                var a = '<div class="' + inline_style + ' mobile-nav-item hidden-mobile nav-item nav-tab nav-tab-harvard"><a class="tab-nav-link" href="' + hmm_url + '"><span>${_("Harvard ManageMentor")}</span><span>${_("Date of Expiry: ")}' + hmm_expiry_date + '</span></a></div>'
                 $('.global-header .main').append(a);
             }
         </script>
