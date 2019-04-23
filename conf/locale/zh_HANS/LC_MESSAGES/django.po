@@ -31,8 +31,8 @@
 # 微 李 <w.li@eliteu.com.cn>, 2018
 # 家璧 刘 <jb.liu@eliteu.com.cn>, 2018
 # 婕 高 <j.gao@eliteu.cn>, 2018
-# fengri <173770922@qq.com>, 2019
 # li ying <code@eliteu.cn>, 2019
+# fengri <173770922@qq.com>, 2019
 #
 # #-#-#-#-#  mako-studio.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)
@@ -21800,87 +21800,6 @@ msgstr "请直接邮件联系"
 #: themes/normal-theme/lms/templates/static_templates/join_us.html
 msgid "directly or call 400-931-8118."
 msgstr "或致电400-931-8118。"
-
-#: themes/normal-theme/lms/templates/static_templates/manual.html
-msgid "To know more about courses"
-msgstr "如何了解课程？"
-
-#: themes/normal-theme/lms/templates/static_templates/manual.html
-msgid ""
-"Click the course to view the course introduction video, browse the course "
-"introduction, instructor introduction and course outline, etc."
-msgstr "点击课程进入详情页，观看课程简介视频，浏览课程简介、导师简介及课程大纲等。"
-
-#: themes/normal-theme/lms/templates/static_templates/manual.html
-msgid "To join as a member"
-msgstr "如何加入会员？"
-
-#: themes/normal-theme/lms/templates/static_templates/manual.html
-msgid ""
-"Enter \"Membership\" page, choose your learning duration and payment method."
-" After payment is completed, you can enjoy learning all courses on EliteMBA "
-"during the study period."
-msgstr "进入“会员资格”页，选择适合您的学习时长及支付方式，支付成功后便可在会员期限内享受所有课程的学习权益。"
-
-#: themes/normal-theme/lms/templates/static_templates/manual.html
-msgid "To view the end-date of membership"
-msgstr "如何查看已购买的会员期限？"
-
-#: themes/normal-theme/lms/templates/static_templates/manual.html
-msgid "Enter \"Membership\" page to view the VIP open date and remaining days."
-msgstr "进入“会员资格”页，可查看会员已开通时间及剩余时间。"
-
-#: themes/normal-theme/lms/templates/static_templates/manual.html
-msgid "To enroll as a member"
-msgstr "会员如何选课？"
-
-#: themes/normal-theme/lms/templates/static_templates/manual.html
-msgid ""
-"Enter \"Discover New\" page, click the course or search key words to select "
-"courses you are interested in, click \"Free Enrollment for VIP\" button, "
-"then the enrollment is fulfilled."
-msgstr "进入“发现课程”页，直接选择或通过搜索关键字的方式选择您感兴趣的课程，点击“VIP会员免费选修此课程”，即为选课成功。"
-
-#: themes/normal-theme/lms/templates/static_templates/manual.html
-msgid "To purchase a course"
-msgstr "非会员如何购买单课？"
-
-#: themes/normal-theme/lms/templates/static_templates/manual.html
-msgid ""
-"Enter \"Discover New\" page, click the course or search key words to select "
-"courses you are interested in, click \"Enroll\" button, then you can start "
-"learning after payment is completed."
-msgstr "进入“发现课程”页，直接选择或通过搜索关键字的方式选择您感兴趣的课程，点击“选修此课程”，支付成功后即可开始学习该门课程。"
-
-#: themes/normal-theme/lms/templates/static_templates/manual.html
-msgid "To start a course"
-msgstr "如何开始学习？"
-
-#: themes/normal-theme/lms/templates/static_templates/manual.html
-msgid ""
-"Click your avatar in the upper right corner of the page, enter \"Dashboard\""
-" to view the course introduction, watch videos and complete assignments."
-msgstr "点击网页右上角个人头像进入“课程面板-查看课程”，可浏览课程简介；点击“开始学习课程”，可观看课程视频，提交课后习题。"
-
-#: themes/normal-theme/lms/templates/static_templates/manual.html
-msgid "To participate in discussion"
-msgstr "如何参与课程讨论？"
-
-#: themes/normal-theme/lms/templates/static_templates/manual.html
-msgid ""
-"Enter \"Dashboard \\u2013 View Course\" page, click \"Discussion\". You can "
-"view discussions, engage with posts and receive updates."
-msgstr "进入“课程面板-查看课程”页，点击“讨论”，可以查看讨论帖、参与讨论及接收讨论帖更新。"
-
-#: themes/normal-theme/lms/templates/static_templates/manual.html
-msgid "To view and download handouts"
-msgstr "如何查看和下载课程讲义？"
-
-#: themes/normal-theme/lms/templates/static_templates/manual.html
-msgid ""
-"Enter \"Dashboard \\u2013 View Course\" page, find \"Course Handouts\" on "
-"the right side. You can view handout content and download."
-msgstr "进入“课程面板-查看课程”页，在右侧找到“课程讲义”，可查看讲义内容并下载。"
 
 #: themes/normal-theme/lms/templates/static_templates/privacy.html
 #: themes/normal-theme/lms/templates/static_templates/privacy_policy.html
