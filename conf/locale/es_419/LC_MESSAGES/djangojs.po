@@ -14,7 +14,7 @@
 # morsoinferno <cristobal.acosta@usach.cl>, 2014-2015
 # David Salazar <imdjsg@gmail.com>, 2014
 # David Salazar <imdjsg@gmail.com>, 2014
-# Eduardo Zambrano <ezambrano@edx.org>, 2017
+# Eduardo Zambrano <ezambrano@edx.org>, 2017,2019
 # Elias Estay <eestay@u.uchile.cl>, 2015
 # Poxtic <erandelle@outlook.com>, 2017
 # Felipe Schmidt M <fschmidt@cercano.cl>, 2015
@@ -4790,6 +4790,8 @@ msgid ""
 "cannot be undone. EdX will not be able to recover your account or the data "
 "that is deleted."
 msgstr ""
+"Cuidado: la eliminación de tu cuenta y datos personales es permanente e "
+"irreversible. edX no podrá recuperar ni tu cuenta ni los datos eliminados."
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
@@ -4852,6 +4854,11 @@ msgid ""
 " sites offered by MIT Open Learning, Wharton Executive Education, and "
 "Harvard Medical School."
 msgstr ""
+"Si procedes, no será posible usar esta cuenta para tomar cursos ni en la "
+"aplicación móvil de edX, ni en edx.org, ni en cualquier otro sitio hospedado"
+" por edX. Esto incluye el acceso a edx.org desde el sistema de tu empleador "
+"o universidad, y el acceso a sitios privados ofrecidos por MIT Open "
+"Learning, Wharton Executive Education, y Harvard Medical School."
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
@@ -4863,7 +4870,7 @@ msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "Yes, Delete"
-msgstr ""
+msgstr "Si, Eliminar"
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "We're sorry to see you go! Your account will be deleted shortly."
