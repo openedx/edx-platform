@@ -10,6 +10,7 @@ from django.contrib.auth.models import User
 from django.db import transaction
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
+from openedx.core.djangoapps.catalog.utils import get_course_locator
 
 from enrollment.errors import (
     CourseEnrollmentClosedError,
@@ -90,7 +91,7 @@ def get_course_enrollment(username, course_id):
         A serializable dictionary representing the course enrollment.
 
     """
-    course_key = CourseKey.from_string(course_id)
+    course_key = get_course_locator(course_id)
     try:
         enrollment = CourseEnrollment.objects.get(
             user__username=username, course_id=course_key
@@ -330,7 +331,7 @@ def get_course_enrollment_info(course_id, include_expired=False):
         CourseNotFoundError
 
     """
-    course_key = CourseKey.from_string(course_id)
+    course_key = get_course_locator(course_id)
 
     try:
         course = CourseOverview.get_from_id(course_key)

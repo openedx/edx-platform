@@ -23,6 +23,7 @@ from openedx.core.djangoapps.catalog.cache import (
     SITE_PATHWAY_IDS_CACHE_KEY_TPL,
     SITE_PROGRAM_UUIDS_CACHE_KEY_TPL
 )
+from opaque_keys.edx.locator import CourseLocator
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.lib.edx_api_utils import get_edx_api_data
@@ -508,6 +509,68 @@ def get_fulfillable_course_runs_for_entitlement(entitlement, course_runs):
 
     enrollable_sessions.sort(key=lambda session: session.get('start'))
     return enrollable_sessions
+
+
+def get_course_run_data(course_run_id):
+    """
+    Retrieve the course run data from the catalog service for a specific course.
+    Arguments:
+        course_run_id(str): course run id
+    Returns:
+          dict of course run data
+    """
+    course_run_data = None
+    user, catalog_integration = check_catalog_integration_and_get_user(error_message_field="Course runs")
+    if user:
+        api = create_catalog_api_client(user)
+        course_run_data = get_edx_api_data(catalog_integration, 'course_runs', resource_id=course_run_id, api=api)
+
+    return course_run_data
+
+
+def get_course_locator(course_run_id):
+    """
+    Creates an augmented CourseLocator object for the given course_run_id using the actual course_id.
+
+    Normally the course_id is a substring of the course_run_id but this is not always the case.  For example, there
+    could be a course 'edx+DemoX' that has a course run 'edx+DemoY+run1'.  This method creates a CourseLocator based on
+    a combination of the course_id and the course_run_id.  In the given example it would create a CourseLocator with
+    org='edx', course='DemoX' and run='run1'.
+
+    In order to get the actual course_id it needs to make a call to the catalog/discovery service.
+
+    Args:
+        course_run_id: (str) represents course run
+
+    Returns:
+        (CourseLocator) augmented course locator using the actual course_id
+
+    """
+
+    # call course discovery and get the course_id
+    user, catalog_integration = check_catalog_integration_and_get_user(error_message_field="Course runs")
+    if not user:
+        return None
+    api = create_catalog_api_client(user)
+    course_run_data = get_edx_api_data(catalog_integration, 'course_runs', resource_id=course_run_id, api=api)
+    course_id = course_run_data['course']
+
+    # create a course locator object from the course_run_id
+    course_locator = CourseKey.from_string(course_run_id)
+
+    # replace 'org' and 'course' with data from course_id
+    course_parts = course_id.split('+')
+    if len(course_parts) != 2:
+        return None
+
+    return CourseLocator(
+        org=course_parts[0],
+        course=course_parts[1],
+        run=course_locator.run,
+        branch=course_locator.branch,
+        version_guid=course_locator.version_guid,
+        deprecated=course_locator.deprecated
+    )
 
 
 def get_course_run_details(course_run_key, fields):
