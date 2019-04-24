@@ -31,10 +31,10 @@ class LmsModuleTests(TestCase):
 
     def test_api_docs(self):
         """
-        Tests that requests to the `/api-docs/` endpoint do not raise an exception.
+        Tests that requests to the `/swagger/` endpoint do not raise an exception.
         """
         assert settings.FEATURES['ENABLE_API_DOCS']
-        response = self.client.get('/api-docs/')
+        response = self.client.get('/swagger/')
         self.assertEqual(200, response.status_code)
 
 
