@@ -70,6 +70,9 @@ class ProgramEnrollment(TimeStampedModel):  # pylint: disable=model-missing-unic
         enrollments.update(external_user_key=None)
         return True
 
+    def __str__(self):
+        return '[ProgramEnrollment id={}]'.format(self.id)
+
 
 class ProgramCourseEnrollment(TimeStampedModel):  # pylint: disable=model-missing-unicode
     """
@@ -95,3 +98,6 @@ class ProgramCourseEnrollment(TimeStampedModel):  # pylint: disable=model-missin
     course_key = CourseKeyField(max_length=255)
     status = models.CharField(max_length=9, choices=STATUSES)
     historical_records = HistoricalRecords()
+
+    def __str__(self):
+        return '[ProgramCourseEnrollment id={}]'.format(self.id)
