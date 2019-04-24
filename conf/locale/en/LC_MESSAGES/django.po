@@ -8418,6 +8418,7 @@ msgstr ""
 #: lms/envs/common.py lms/templates/certificates/verify.html
 #: themes/normal-theme/lms/templates/footer.html
 #: themes/normal-theme/lms/templates/static_templates/about.html
+#: membership/templates/membership/card.html
 #: membership/templates/membership/index.html
 msgid "EliteMBA"
 msgstr ""
@@ -19267,7 +19268,7 @@ msgid "Mobile Phone No.:"
 msgstr ""
 
 #: lms/templates/student_account/account_settings.html
-msgid "Bind your EliteMBA account to your cellphone number"
+msgid "Bind your EliteMBA account to your cellphone number."
 msgstr ""
 
 #: lms/templates/student_account/finish_auth.html
@@ -20134,7 +20135,6 @@ msgid "To become a reputable brand of digital education in China."
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/contact.html
-#: membership/templates/membership/card.html
 msgid "Elite Education"
 msgstr ""
 
@@ -25861,8 +25861,8 @@ msgstr ""
 
 #: membership/templates/membership/card.html
 msgid ""
-"{span_start}Please do not close the page {span_end}. Please click the button"
-" below accordingly after completing the payment."
+"{span_start}Please do not close the page.{span_end} Please click the button "
+"below accordingly after completing the payment."
 msgstr ""
 
 #: membership/templates/membership/card.html
