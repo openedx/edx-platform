@@ -285,7 +285,6 @@
     "Are you sure you want to remove this video from the list?": "Etes-vous s\u00fbr de vouloir supprimer cette vid\u00e9o de la liste ?", 
     "Are you sure you want to restrict {email} access to \u201c{container}\u201d?": "\u00cates-vous s\u00fbr de vouloir restreindre l'acc\u00e8s de {email} \u00e0 \"{container}\" ?", 
     "Are you sure you want to revert to the last published version of the unit? You cannot undo this action.": "\u00cates-vous s\u00fbr de vouloir revenir \u00e0 la derni\u00e8re version publi\u00e9e de l'unit\u00e9? Vous ne pouvez pas annuler cette action.", 
-    "Are you sure you want to unenroll from %(courseName)s (%(courseNumber)s)?": "\u00cates-vous certain de vouloir vous d\u00e9sinscrire de %(courseName)s (%(courseNumber)s) ?", 
     "Are you sure you want to unenroll from {courseName} ({courseNumber})? You will be refunded the amount you paid.": "\u00cates-vous s\u00fbr de vouloir vous d\u00e9sinscrire de {courseName} ({courseNumber})\u00a0? Le montant que vous aviez pay\u00e9 vous sera rembours\u00e9. ", 
     "Are you sure you wish to delete this item. It cannot be reversed!\n\nAlso any content that links/refers to this item will no longer work (e.g. broken images and/or links)": "\u00cates vous s\u00fbr de vouloir supprimer cet \u00e9l\u00e9ment ? L'op\u00e9ration est irr\u00e9versible !\n\nTout contenu associ\u00e9 ne fonctionnera plus (par exemple : images et/ou liens cass\u00e9s)", 
     "Are you sure?": "\u00cates-vous certain ?", 
