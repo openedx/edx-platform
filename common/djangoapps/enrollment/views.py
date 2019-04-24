@@ -3,7 +3,11 @@ The Enrollment API Views should be simple, lean HTTP endpoints for API access. T
 consist primarily of authentication, request validation, and serialization.
 
 """
+from __future__ import absolute_import
+
 import logging
+
+from six import text_type
 
 from course_modes.models import CourseMode
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
@@ -17,14 +21,13 @@ from enrollment.paginators import CourseEnrollmentsApiListPagination
 from enrollment.serializers import CourseEnrollmentsApiListSerializer
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cross_domain
+from openedx.core.djangoapps.course_groups.cohorts import CourseUserGroup, add_user_to_cohort, get_cohort_by_name
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.user_api.accounts.permissions import CanRetireUser
 from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
-from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, get_cohort_by_name, CourseUserGroup
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission, ApiKeyHeaderPermissionIsAuthenticated
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
@@ -41,7 +44,6 @@ from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
-from six import text_type
 from student.auth import user_has_role
 from student.models import CourseEnrollment, User
 from student.roles import CourseStaffRole, GlobalStaff
@@ -730,20 +732,20 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 enterprise_api_client = EnterpriseApiServiceClient()
                 consent_client = ConsentApiServiceClient()
                 try:
-                    enterprise_api_client.post_enterprise_course_enrollment(username, unicode(course_id), None)
+                    enterprise_api_client.post_enterprise_course_enrollment(username, text_type(course_id), None)
                 except EnterpriseApiException as error:
                     log.exception("An unexpected error occurred while creating the new EnterpriseCourseEnrollment "
                                   "for user [%s] in course run [%s]", username, course_id)
                     raise CourseEnrollmentError(text_type(error))
                 kwargs = {
                     'username': username,
-                    'course_id': unicode(course_id),
+                    'course_id': text_type(course_id),
                     'enterprise_customer_uuid': explicit_linked_enterprise,
                 }
                 consent_client.provide_consent(**kwargs)
 
             enrollment_attributes = request.data.get('enrollment_attributes')
-            enrollment = api.get_enrollment(username, unicode(course_id))
+            enrollment = api.get_enrollment(username, text_type(course_id))
             mode_changed = enrollment and mode is not None and enrollment['mode'] != mode
             active_changed = enrollment and is_active is not None and enrollment['is_active'] != is_active
             missing_attrs = []
@@ -773,7 +775,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
 
                 response = api.update_enrollment(
                     username,
-                    unicode(course_id),
+                    text_type(course_id),
                     mode=mode,
                     is_active=is_active,
                     enrollment_attributes=enrollment_attributes,
@@ -784,7 +786,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 # Will reactivate inactive enrollments.
                 response = api.add_enrollment(
                     username,
-                    unicode(course_id),
+                    text_type(course_id),
                     mode=mode,
                     is_active=is_active,
                     enrollment_attributes=enrollment_attributes
@@ -846,10 +848,10 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
         finally:
             # Assumes that the ecommerce service uses an API key to authenticate.
             if has_api_key_permissions:
-                current_enrollment = api.get_enrollment(username, unicode(course_id))
+                current_enrollment = api.get_enrollment(username, text_type(course_id))
                 audit_log(
                     'enrollment_change_requested',
-                    course_id=unicode(course_id),
+                    course_id=text_type(course_id),
                     requested_mode=mode,
                     actual_mode=current_enrollment['mode'] if current_enrollment else None,
                     requested_activation=is_active,
