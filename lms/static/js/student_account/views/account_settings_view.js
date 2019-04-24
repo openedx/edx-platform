@@ -71,7 +71,11 @@
                         }
                     );
                     betaLangCode = this.options.betaLanguage.code.split('-');
-                    betaLangCode = betaLangCode[0] + '_' + betaLangCode[1].toUpperCase();
+                    if (betaLangCode.length > 1) {
+                        betaLangCode = betaLangCode[0] + '_' + betaLangCode[1].toUpperCase();
+                    } else {
+                        betaLangCode = betaLangCode[0];
+                    }
                     helpTranslateLink = 'https://www.transifex.com/open-edx/edx-platform/translate/#' + betaLangCode;
                     oldLangCode = $.cookie('old-pref-lang');
                     // Deleting the cookie
