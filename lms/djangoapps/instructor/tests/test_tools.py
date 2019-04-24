@@ -15,7 +15,7 @@ from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
-from edx_when import signals
+from edx_when import signals, api
 from edx_when.field_data import DateLookupFieldData
 from student.tests.factories import UserFactory
 from xmodule.fields import Date
@@ -240,6 +240,7 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
             block._field_data._load_dates(self.course.id, self.user, use_cached=False)  # pylint: disable=protected-access
             block.fields['due']._del_cached_value(block)  # pylint: disable=protected-access
 
+    @api.override_enabled()
     def test_set_due_date_extension(self):
         extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=UTC)
         tools.set_due_date_extension(self.course, self.week1, self.user, extended)

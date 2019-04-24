@@ -33,6 +33,7 @@ from courseware.courses import get_course_by_id, get_studio_url
 from django_comment_client.utils import available_division_schemes, has_forum_access
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, CourseDiscussionSettings
 from edxmako.shortcuts import render_to_response
+from edx_when.api import is_enabled_for_course
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
@@ -159,7 +160,7 @@ def instructor_dashboard_2(request, course_id):
             unicode(course_key), len(paid_modes)
         )
 
-    if access['instructor']:
+    if access['instructor'] and is_enabled_for_course(course_key, request=request):
         sections.insert(3, _section_extensions(course))
 
     # Gate access to course email by feature flag & by course-specific authorization
