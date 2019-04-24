@@ -1,26 +1,16 @@
 """ Helper methods for CourseModes. """
 from __future__ import absolute_import, unicode_literals
 
-import logging
-
 import six
-from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
 from course_modes.models import CourseMode
 from student.helpers import VERIFY_STATUS_APPROVED, VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
 
 DISPLAY_VERIFIED = "verified"
 DISPLAY_HONOR = "honor"
 DISPLAY_AUDIT = "audit"
 DISPLAY_PROFESSIONAL = "professional"
-
-MASTERS_ID = settings.COURSE_ENROLLMENT_MODES.get('masters', {}).get('id', None)
-VERIFIED_ID = settings.COURSE_ENROLLMENT_MODES['verified']['id']
-
-log = logging.getLogger(__name__)
 
 
 def enrollment_mode_display(mode, verification_status, course_id):
@@ -93,34 +83,3 @@ def _enrollment_mode_display(enrollment_mode, verification_status, course_id):
         display_mode = enrollment_mode
 
     return display_mode
-
-
-def update_masters_access(item):
-    """
-    Update the XBlock's group access to allow the master's group,
-    in addition to the verified content group.
-    """
-    group_access = item.group_access
-    enrollment_groups = group_access.get(ENROLLMENT_TRACK_PARTITION_ID, None)
-    if enrollment_groups is not None:
-        if VERIFIED_ID in enrollment_groups and MASTERS_ID not in enrollment_groups:
-            enrollment_groups.append(MASTERS_ID)
-            item.group_access = group_access
-            return True
-
-
-def update_masters_access_course(store, course_id, user_id):
-    """
-    Update all blocks in the verified content group to include the master's content group
-    """
-
-    with store.bulk_operations(course_id):
-        try:
-            items = store.get_items(course_id, settings={'group_access': {'$exists': True}}, include_orphans=False)
-        except ItemNotFoundError:
-            return
-        for item in items:
-            if update_masters_access(item):
-                log.info("Publishing %s with Master's group access", item.location)
-                store.update_item(item, user_id)
-                store.publish(item.location, user_id)

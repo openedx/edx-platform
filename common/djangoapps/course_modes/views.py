@@ -10,7 +10,6 @@ import six
 import six.moves.urllib.error
 import six.moves.urllib.parse
 import six.moves.urllib.request
-
 import waffle
 from babel.dates import format_datetime
 from django.contrib.auth.decorators import login_required
