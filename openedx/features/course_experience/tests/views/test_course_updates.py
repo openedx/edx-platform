@@ -1,10 +1,14 @@
 """
 Tests for the course updates page.
 """
+from __future__ import absolute_import
+
 from datetime import datetime
 
-from courseware.courses import get_course_info_usage_key
+import six
 from django.urls import reverse
+
+from courseware.courses import get_course_info_usage_key
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_experience.views.course_updates import STATUS_VISIBLE
@@ -28,7 +32,7 @@ def course_updates_url(course):
     return reverse(
         'openedx.course_experience.course_updates',
         kwargs={
-            'course_id': unicode(course.id),
+            'course_id': six.text_type(course.id),
         }
     )
 

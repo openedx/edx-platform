@@ -1,12 +1,15 @@
 """
 Views that handle course updates.
 """
+from __future__ import absolute_import
+
 from datetime import datetime
 
+import six
 from django.contrib.auth.decorators import login_required
 from django.template.context_processors import csrf
-from django.urls import reverse
 from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_control
 from opaque_keys.edx.keys import CourseKey
@@ -70,7 +73,7 @@ class CourseUpdatesView(CourseTabView):
         return USE_BOOTSTRAP_FLAG.is_enabled(course.id)
 
     def render_to_fragment(self, request, course=None, tab=None, **kwargs):
-        course_id = unicode(course.id)
+        course_id = six.text_type(course.id)
         updates_fragment_view = CourseUpdatesFragmentView()
         return updates_fragment_view.render_to_fragment(request, course_id=course_id, **kwargs)
 
@@ -86,7 +89,7 @@ class CourseUpdatesFragmentView(EdxFragmentView):
         course_key = CourseKey.from_string(course_id)
         course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
         course_url_name = default_course_url_name(course.id)
-        course_url = reverse(course_url_name, kwargs={'course_id': unicode(course.id)})
+        course_url = reverse(course_url_name, kwargs={'course_id': six.text_type(course.id)})
 
         ordered_updates = get_ordered_updates(request, course)
         plain_html_updates = ''

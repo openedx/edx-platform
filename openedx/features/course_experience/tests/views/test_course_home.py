@@ -2,40 +2,43 @@
 """
 Tests for the course home page.
 """
+from __future__ import absolute_import
+
 from datetime import datetime, timedelta
 
 import ddt
 import mock
+import six
 from django.conf import settings
-from django.urls import reverse
 from django.http import QueryDict
+from django.urls import reverse
 from django.utils.http import urlquote_plus
 from django.utils.timezone import now
 from pytz import UTC
 from waffle.models import Flag
 from waffle.testutils import override_flag
 
-from django_comment_common.models import (
-    FORUM_ROLE_ADMINISTRATOR,
-    FORUM_ROLE_MODERATOR,
-    FORUM_ROLE_GROUP_MODERATOR,
-    FORUM_ROLE_COMMUNITY_TA
-)
-from django_comment_client.tests.factories import RoleFactory
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.tests.helpers import get_expiration_banner_text
+from django_comment_client.tests.factories import RoleFactory
+from django_comment_common.models import (
+    FORUM_ROLE_ADMINISTRATOR,
+    FORUM_ROLE_COMMUNITY_TA,
+    FORUM_ROLE_GROUP_MODERATOR,
+    FORUM_ROLE_MODERATOR
+)
 from experiments.models import ExperimentData
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.course_goals.api import add_course_goal, remove_course_goal
 from lms.djangoapps.courseware.tests.factories import (
-    InstructorFactory,
-    StaffFactory,
     BetaTesterFactory,
-    OrgStaffFactory,
-    OrgInstructorFactory,
     GlobalStaffFactory,
+    InstructorFactory,
+    OrgInstructorFactory,
+    OrgStaffFactory,
+    StaffFactory
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
@@ -44,15 +47,15 @@ from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, overri
 from openedx.features.course_duration_limits.config import EXPERIMENT_DATA_HOLDBACK_KEY, EXPERIMENT_ID
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience import (
+    COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
     SHOW_REVIEWS_TOOL_FLAG,
     SHOW_UPGRADE_MSG_ON_COURSE_HOME,
-    UNIFIED_COURSE_TAB_FLAG,
-    COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
+    UNIFIED_COURSE_TAB_FLAG
 )
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from util.date_utils import strftime_localized
-from xmodule.course_module import COURSE_VISIBILITY_PRIVATE, COURSE_VISIBILITY_PUBLIC_OUTLINE, COURSE_VISIBILITY_PUBLIC
+from xmodule.course_module import COURSE_VISIBILITY_PRIVATE, COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import CourseUserType, ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
@@ -89,7 +92,7 @@ def course_home_url(course):
     Arguments:
         course (CourseDescriptor): The course being tested.
     """
-    return course_home_url_from_string(unicode(course.id))
+    return course_home_url_from_string(six.text_type(course.id))
 
 
 def course_home_url_from_string(course_key_string):
