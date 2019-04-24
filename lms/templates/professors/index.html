@@ -29,7 +29,23 @@
             document.getElementById('professor-list').innerHTML = elem;
         }
     });
+
+    // 兼容app，查看教授详情url后加?device=ios/android
+    var getQueryString = function(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i"); 
+        var r = window.location.search.substr(1).match(reg); 
+        if (r != null) return unescape(r[2]); return null; 
+    }
+    var device = getQueryString('device');
+
     function goToPage(id){
-        window.location.href = "/professors/" + id;
+        if (!device){
+          window.location.href = "/professors/" + id;
+        } else if (device == 'ios') {
+          window.location.href = "/professors/" + id + "?device=ios";
+        } else {
+          window.location.href = "/professors/" + id + "?device=android";
+        }
+        
     }
 </script>
