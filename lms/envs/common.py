@@ -2352,6 +2352,7 @@ INSTALLED_APPS = [
 
     # User API
     'rest_framework',
+
     'openedx.core.djangoapps.user_api',
 
     # Shopping cart
@@ -2503,7 +2504,7 @@ INSTALLED_APPS = [
     'django_filters',
 
     # API Documentation
-    'rest_framework_swagger',
+    'drf_yasg',
 
     # edx-drf-extensions
     'csrf.apps.CsrfAppConfig',  # Enables frontend apps to retrieve CSRF tokens.
@@ -2537,6 +2538,9 @@ REST_FRAMEWORK = {
     },
 }
 
+SWAGGER_SETTINGS = {
+    'DEFAULT_INFO': 'openedx.core.openapi.openapi_info',
+}
 
 ######################### MARKETING SITE ###############################
 EDXMKTG_LOGGED_IN_COOKIE_NAME = 'edxloggedin'
