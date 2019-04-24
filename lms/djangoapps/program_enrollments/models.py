@@ -70,6 +70,17 @@ class ProgramEnrollment(TimeStampedModel):  # pylint: disable=model-missing-unic
         enrollments.update(external_user_key=None)
         return True
 
+    def get_program_course_enrollment(self, course_key):
+        """
+        Returns the ProgramCourseEnrollment associated with this ProgramEnrollment and given course,
+         None if it does not exist
+        """
+        try:
+            program_course_enrollment = self.program_course_enrollments.get(course_key=course_key)
+        except ProgramCourseEnrollment.DoesNotExist:
+            return None
+        return program_course_enrollment
+
     def __str__(self):
         return '[ProgramEnrollment id={}]'.format(self.id)
 
@@ -89,7 +100,11 @@ class ProgramCourseEnrollment(TimeStampedModel):  # pylint: disable=model-missin
     class Meta(object):
         app_label = "program_enrollments"
 
-    program_enrollment = models.ForeignKey(ProgramEnrollment, on_delete=models.CASCADE)
+    program_enrollment = models.ForeignKey(
+        ProgramEnrollment,
+        on_delete=models.CASCADE,
+        related_name="program_course_enrollments"
+    )
     course_enrollment = models.OneToOneField(
         StudentCourseEnrollment,
         null=True,

@@ -47,3 +47,8 @@ class JwtMixin(object):
             "username": user.username,
             "email": user.email,
         }
+
+    def generate_jwt_header(self, user, ttl=5, **overrides):
+        """Generate a jwt header value for AUTHORIZATION"""
+        jwt_token = self.generate_id_token(user, ttl, **overrides).decode('utf-8')
+        return 'JWT {token}'.format(token=jwt_token)

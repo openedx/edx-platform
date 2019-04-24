@@ -6,6 +6,8 @@ from __future__ import unicode_literals
 
 from django.apps import AppConfig
 
+from openedx.core.djangoapps.plugins.constants import ProjectType, PluginURLs
+
 
 class ProgramEnrollmentsConfig(AppConfig):
     """
@@ -14,5 +16,11 @@ class ProgramEnrollmentsConfig(AppConfig):
     name = 'lms.djangoapps.program_enrollments'
 
     plugin_app = {
-        'url_config': {},
+        PluginURLs.CONFIG: {
+            ProjectType.LMS: {
+                PluginURLs.NAMESPACE: 'programs_api',
+                PluginURLs.REGEX: 'api/program_enrollments/',
+                PluginURLs.RELATIVE_PATH: 'api.urls',
+            }
+        },
     }
