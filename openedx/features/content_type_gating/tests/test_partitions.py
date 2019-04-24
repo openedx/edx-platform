@@ -3,12 +3,11 @@ from mock import Mock, patch
 from django.conf import settings
 from django.test import RequestFactory
 
-from courseware.masquerade import CourseMasquerade
 from course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID, FULL_ACCESS
+from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID, FULL_ACCESS, LIMITED_ACCESS
 from openedx.features.content_type_gating.partitions import (
     create_content_gating_partition,
     ContentTypeGatingPartition
@@ -67,7 +66,7 @@ class TestContentTypeGatingPartition(CacheIsolationTestCase):
 
     def test_access_denied_fragment_for_masquerading(self):
         """
-        Test that a global staff sees gated content flag when viewing course as `Learner in Audit`
+        Test that a global staff sees gated content flag when viewing course as `Learner in Limited Access`
         Note: Global staff doesn't require to be enrolled in course.
         """
         mock_request = RequestFactory().get('/')
@@ -75,8 +74,8 @@ class TestContentTypeGatingPartition(CacheIsolationTestCase):
         mock_block = Mock(scope_ids=Mock(usage_id=Mock(course_key=mock_course.id)))
         mock_course_masquerade = Mock(
             role='student',
-            user_partition_id=ENROLLMENT_TRACK_PARTITION_ID,
-            group_id=settings.COURSE_ENROLLMENT_MODES['audit']['id'],
+            user_partition_id=CONTENT_GATING_PARTITION_ID,
+            group_id=LIMITED_ACCESS.id,
             user_name=None
         )
         CourseModeFactory.create(course_id=mock_course.id, mode_slug='verified')
@@ -87,16 +86,10 @@ class TestContentTypeGatingPartition(CacheIsolationTestCase):
         partition = create_content_gating_partition(mock_course)
 
         with patch(
-            'courseware.masquerade.get_course_masquerade',
-            return_value=mock_course_masquerade
-        ), patch(
-            'openedx.features.content_type_gating.partitions.get_course_masquerade',
-            return_value=mock_course_masquerade
-        ), patch(
             'crum.get_current_request',
             return_value=mock_request
         ):
-            fragment = partition.access_denied_fragment(mock_block, global_staff, GroupFactory(), 'test_allowed_group')
+            fragment = partition.access_denied_fragment(mock_block, global_staff, LIMITED_ACCESS, [FULL_ACCESS])
 
         self.assertIsNotNone(fragment)
 
@@ -144,10 +137,7 @@ class TestContentTypeGatingPartition(CacheIsolationTestCase):
         with patch(
             'crum.get_current_request',
             return_value=mock_request
-        ), patch(
-            'openedx.features.content_type_gating.partitions.ContentTypeGatingPartition._is_audit_enrollment',
-            return_value=True
         ):
-            fragment = partition.access_denied_fragment(mock_block, global_staff, GroupFactory(), 'test_allowed_group')
+            fragment = partition.access_denied_fragment(mock_block, global_staff, LIMITED_ACCESS, [FULL_ACCESS])
 
         self.assertIsNotNone(fragment)
