@@ -2,8 +2,12 @@
 Unit test for stub YouTube implementation.
 """
 
+from __future__ import absolute_import
+
 import unittest
+
 import requests
+
 from ..youtube import StubYouTubeService
 
 

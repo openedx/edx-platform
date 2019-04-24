@@ -1,10 +1,14 @@
 """
 Unit tests for stub LTI implementation.
 """
-from mock import Mock, patch
+from __future__ import absolute_import
+
 import unittest
-import urllib2
+
 import requests
+import six.moves.urllib.request  # pylint: disable=import-error
+from mock import Mock, patch
+
 from terrain.stubs.lti import StubLtiService
 
 
@@ -70,7 +74,7 @@ class StubLtiServiceTest(unittest.TestCase):
         grade_uri = self.uri + 'grade'
         with patch('terrain.stubs.lti.requests.post') as mocked_post:
             mocked_post.return_value = Mock(content='Test response', status_code=200)
-            response = urllib2.urlopen(grade_uri, data='')
+            response = six.moves.urllib.request.urlopen(grade_uri, data='')
             self.assertIn('Test response', response.read())
 
     @patch('terrain.stubs.lti.signature.verify_hmac_sha1', return_value=True)
@@ -80,7 +84,7 @@ class StubLtiServiceTest(unittest.TestCase):
         grade_uri = self.uri + 'lti2_outcome'
         with patch('terrain.stubs.lti.requests.put') as mocked_put:
             mocked_put.return_value = Mock(status_code=200)
-            response = urllib2.urlopen(grade_uri, data='')
+            response = six.moves.urllib.request.urlopen(grade_uri, data='')
             self.assertIn('LTI consumer (edX) responded with HTTP 200', response.read())
 
     @patch('terrain.stubs.lti.signature.verify_hmac_sha1', return_value=True)
@@ -90,5 +94,5 @@ class StubLtiServiceTest(unittest.TestCase):
         grade_uri = self.uri + 'lti2_delete'
         with patch('terrain.stubs.lti.requests.put') as mocked_put:
             mocked_put.return_value = Mock(status_code=200)
-            response = urllib2.urlopen(grade_uri, data='')
+            response = six.moves.urllib.request.urlopen(grade_uri, data='')
             self.assertIn('LTI consumer (edX) responded with HTTP 200', response.read())

@@ -1,10 +1,13 @@
 """
 Serve HTML5 video sources for acceptance tests
 """
+from __future__ import absolute_import
+
 import os
 from contextlib import contextmanager
 from logging import getLogger
-from SimpleHTTPServer import SimpleHTTPRequestHandler
+
+from six.moves.SimpleHTTPServer import SimpleHTTPRequestHandler
 
 from .http import StubHttpService
 
