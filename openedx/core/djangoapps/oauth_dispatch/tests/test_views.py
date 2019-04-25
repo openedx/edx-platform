@@ -2,26 +2,27 @@
 Tests for Blocks Views
 """
 
+from __future__ import absolute_import
+
 import json
 import unittest
 
 import ddt
 import httpretty
-from django.conf import settings
-from django.urls import reverse
-from django.test import RequestFactory, TestCase
-from mock import call, patch
-
 from Cryptodome.PublicKey import RSA
+from django.conf import settings
+from django.test import RequestFactory, TestCase
+from django.urls import reverse
 from jwkest import jwk
-
+from mock import call, patch
 from oauth2_provider import models as dot_models
 from organizations.tests.factories import OrganizationFactory
+from provider import constants
 
 from openedx.core.djangoapps.oauth_dispatch.toggles import ENFORCE_JWT_SCOPES
-from provider import constants
 from student.tests.factories import UserFactory
 from third_party_auth.tests.utils import ThirdPartyOAuthTestMixin, ThirdPartyOAuthTestMixinGoogle
+
 from . import mixins
 
 # NOTE (CCB): We use this feature flag in a roundabout way to determine if the oauth_dispatch app is installed
@@ -559,7 +560,7 @@ class TestViewDispatch(TestCase):
         msg_not_callable = _msg_base.format(view=view_candidate, reason=u'it is not callable')
         msg_no_request = _msg_base.format(view=view_candidate, reason=u'it has no request argument')
         self.assertTrue(hasattr(view_candidate, '__call__'), msg_not_callable)
-        args = view_candidate.func_code.co_varnames
+        args = view_candidate.__code__.co_varnames
         self.assertTrue(args, msg_no_request)
         self.assertEqual(args[0], 'request')
 
