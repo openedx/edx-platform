@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-04-24 07:15+0000\n"
-"PO-Revision-Date: 2019-04-24 07:15:25.647195\n"
+"POT-Creation-Date: 2019-04-25 12:20+0000\n"
+"PO-Revision-Date: 2019-04-25 12:20:52.198484\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -79,10 +79,8 @@ msgstr "ÖpénÀsséssmént Sävé Érrör Ⱡ'σяєм ιρѕυм ∂σłσя �
 #: cms/static/js/views/modals/edit_xblock.js cms/static/js/views/tabs.js
 #: cms/static/js/views/utils/xblock_utils.js common/static/bundles/commons.js
 #: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/edit_tabs.a28b56db336309954b10.js
 #: common/static/bundles/js/factories/edit_tabs.js
 #: common/static/bundles/js/factories/library.js
-#: common/static/bundles/js/factories/textbooks.19e61143bafa51a8e1da.js
 #: common/static/bundles/js/factories/textbooks.js
 #: lms/static/js/ccx/schedule.js lms/static/js/views/fields.js
 msgid "Saving"
@@ -104,7 +102,6 @@ msgstr ""
 #: cms/static/js/views/asset.js cms/static/js/views/list_item.js
 #: cms/static/js/views/manage_users_and_roles.js
 #: cms/static/js/views/show_textbook.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/js/factories/textbooks.js
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 #: cms/templates/js/certificate-details.underscore
@@ -130,7 +127,6 @@ msgstr "Délété Ⱡ'σяєм ιρѕυ#"
 #: cms/static/js/views/course_info_update.js cms/static/js/views/list_item.js
 #: cms/static/js/views/show_textbook.js cms/static/js/views/tabs.js
 #: cms/static/js/views/utils/xblock_utils.js common/static/bundles/commons.js
-#: common/static/bundles/js/factories/edit_tabs.a28b56db336309954b10.js
 #: common/static/bundles/js/factories/edit_tabs.js
 #: common/static/bundles/js/factories/textbooks.js
 msgid "Deleting"
@@ -147,13 +143,9 @@ msgstr "Délétïng Ⱡ'σяєм ιρѕυм ∂#"
 #: cms/static/js/views/show_textbook.js cms/static/js/views/tabs.js
 #: cms/static/js/views/validation.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/StudentAccountDeletion.710a142b978b35026212.js
 #: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.0acc6efddefe20fd916d.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
-#: common/static/bundles/js/factories/edit_tabs.a28b56db336309954b10.js
 #: common/static/bundles/js/factories/edit_tabs.js
 #: common/static/bundles/js/factories/textbooks.js
 #: common/static/common/js/components/utils/view_utils.js
@@ -253,37 +245,31 @@ msgstr ""
 "Théré wäs än érrör wïth thé üplöäd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
-#: common/static/bundles/CourseOrLibraryListing.50d73b64de2795ddf7b6.js
 #: common/static/bundles/CourseOrLibraryListing.js
 msgid "Organization:"
 msgstr "Örgänïzätïön: Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
-#: common/static/bundles/CourseOrLibraryListing.50d73b64de2795ddf7b6.js
 #: common/static/bundles/CourseOrLibraryListing.js
 msgid "Course Number:"
 msgstr "Çöürsé Nümßér: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
-#: common/static/bundles/CourseOrLibraryListing.50d73b64de2795ddf7b6.js
 #: common/static/bundles/CourseOrLibraryListing.js
 msgid "Course Run:"
 msgstr "Çöürsé Rün: Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
-#: common/static/bundles/CourseOrLibraryListing.50d73b64de2795ddf7b6.js
 #: common/static/bundles/CourseOrLibraryListing.js
 msgid "(Read-only)"
 msgstr "(Réäd-önlý) Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
-#: common/static/bundles/CourseOrLibraryListing.50d73b64de2795ddf7b6.js
 #: common/static/bundles/CourseOrLibraryListing.js
 msgid "Re-run Course"
 msgstr "Ré-rün Çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
-#: common/static/bundles/CourseOrLibraryListing.50d73b64de2795ddf7b6.js
 #: common/static/bundles/CourseOrLibraryListing.js
 #: cms/templates/js/show-textbook.underscore
 msgid "View Live"
@@ -313,7 +299,6 @@ msgid "asset_path is required"
 msgstr "ässét_päth ïs réqüïréd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: cms/static/js/models/course.js cms/static/js/models/section.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 #: common/static/bundles/js/factories/textbooks.js
 msgid "You must specify a name"
@@ -371,7 +356,6 @@ msgstr ""
 #: cms/static/js/views/modals/edit_xblock.js
 #: cms/static/js/views/video_transcripts.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js lms/static/js/student_account/tos_modal.js
 #: cms/templates/js/course-video-settings.underscore
 #: common/static/common/templates/image-modal.underscore
@@ -387,7 +371,6 @@ msgstr "Çlösé Ⱡ'σяєм ιρѕ#"
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/assets.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js cms/templates/js/asset-library.underscore
 #: cms/templates/js/course-instructor-details.underscore
 #: cms/templates/js/previous-video-upload-list.underscore
@@ -413,9 +396,7 @@ msgstr "Àddïng Ⱡ'σяєм ιρѕυ#"
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/course_info_update.js cms/static/js/views/tabs.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
-#: common/static/bundles/js/factories/edit_tabs.a28b56db336309954b10.js
 #: common/static/bundles/js/factories/edit_tabs.js
 #: lms/static/js/Markdown.Editor.js
 #: common/static/common/templates/discussion/alert-popup.underscore
@@ -428,7 +409,6 @@ msgstr "ÖK Ⱡ'σя#"
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/course_video_settings.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "None"
@@ -437,9 +417,7 @@ msgstr "Nöné Ⱡ'σяєм ι#"
 #: cms/static/js/views/course_video_settings.js
 #: cms/static/js/views/metadata.js
 #: cms/static/js/views/previous_video_upload.js
-#: cms/static/js/views/video_transcripts.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
-#: common/static/bundles/commons.js
+#: cms/static/js/views/video_transcripts.js common/static/bundles/commons.js
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 #: lms/static/js/views/image_field.js
 #: cms/templates/js/video/metadata-translations-item.underscore
@@ -458,50 +436,36 @@ msgid "Please select a PDF file to upload."
 msgstr ""
 "Pléäsé séléçt ä PDF fïlé tö üplöäd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
-#: cms/static/js/views/license.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
-#: common/static/bundles/commons.js
+#: cms/static/js/views/license.js common/static/bundles/commons.js
 #: cms/templates/js/license-selector.underscore
 msgid "All Rights Reserved"
 msgstr "Àll Rïghts Résérvéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
-#: cms/static/js/views/license.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
-#: common/static/bundles/commons.js
+#: cms/static/js/views/license.js common/static/bundles/commons.js
 msgid "You reserve all rights for your work"
 msgstr ""
 "Ýöü résérvé äll rïghts för ýöür wörk Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυ#"
 
-#: cms/static/js/views/license.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
-#: common/static/bundles/commons.js
+#: cms/static/js/views/license.js common/static/bundles/commons.js
 msgid "Creative Commons"
 msgstr "Çréätïvé Çömmöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
-#: cms/static/js/views/license.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
-#: common/static/bundles/commons.js
+#: cms/static/js/views/license.js common/static/bundles/commons.js
 msgid "You waive some rights for your work, such that others can use it too"
 msgstr ""
 "Ýöü wäïvé sömé rïghts för ýöür wörk, süçh thät öthérs çän üsé ït töö Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
-#: cms/static/js/views/license.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
-#: common/static/bundles/commons.js
+#: cms/static/js/views/license.js common/static/bundles/commons.js
 msgid "Version"
 msgstr "Vérsïön Ⱡ'σяєм ιρѕυм #"
 
-#: cms/static/js/views/license.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
-#: common/static/bundles/commons.js
+#: cms/static/js/views/license.js common/static/bundles/commons.js
 msgid "Attribution"
 msgstr "Àttrïßütïön Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
-#: cms/static/js/views/license.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
-#: common/static/bundles/commons.js
+#: cms/static/js/views/license.js common/static/bundles/commons.js
 msgid ""
 "Allow others to copy, distribute, display and perform your copyrighted work "
 "but only if they give credit the way you request. Currently, this option is "
@@ -516,15 +480,11 @@ msgstr ""
 " єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
 "¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕє#"
 
-#: cms/static/js/views/license.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
-#: common/static/bundles/commons.js
+#: cms/static/js/views/license.js common/static/bundles/commons.js
 msgid "Noncommercial"
 msgstr "Nönçömmérçïäl Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
-#: cms/static/js/views/license.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
-#: common/static/bundles/commons.js
+#: cms/static/js/views/license.js common/static/bundles/commons.js
 msgid ""
 "Allow others to copy, distribute, display and perform your work - and "
 "derivative works based upon it - but for noncommercial purposes only."
@@ -538,15 +498,11 @@ msgstr ""
 "¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
 "ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт łα#"
 
-#: cms/static/js/views/license.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
-#: common/static/bundles/commons.js
+#: cms/static/js/views/license.js common/static/bundles/commons.js
 msgid "No Derivatives"
 msgstr "Nö Dérïvätïvés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
-#: cms/static/js/views/license.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
-#: common/static/bundles/commons.js
+#: cms/static/js/views/license.js common/static/bundles/commons.js
 msgid ""
 "Allow others to copy, distribute, display and perform only verbatim copies "
 "of your work, not derivative works based upon it. This option is "
@@ -561,15 +517,11 @@ msgstr ""
 "яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα "
 "ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυ#"
 
-#: cms/static/js/views/license.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
-#: common/static/bundles/commons.js
+#: cms/static/js/views/license.js common/static/bundles/commons.js
 msgid "Share Alike"
 msgstr "Shäré Àlïké Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
-#: cms/static/js/views/license.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
-#: common/static/bundles/commons.js
+#: cms/static/js/views/license.js common/static/bundles/commons.js
 msgid ""
 "Allow others to distribute derivative works only under a license identical "
 "to the license that governs your work. This option is incompatible with \"No"
@@ -588,7 +540,6 @@ msgstr ""
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/manage_users_and_roles.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Ok"
 msgstr "Ök Ⱡ'σя#"
@@ -599,17 +550,14 @@ msgid "Unknown"
 msgstr "Ûnknöwn Ⱡ'σяєм ιρѕυм #"
 
 #: cms/static/js/views/manage_users_and_roles.js
-#: common/static/bundles/StudentAccountDeletion.710a142b978b35026212.js
 #: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.0acc6efddefe20fd916d.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "Are you sure?"
 msgstr "Àré ýöü süré? Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
-#: cms/static/js/views/metadata.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
-#: common/static/bundles/commons.js lms/static/js/views/file_uploader.js
+#: cms/static/js/views/metadata.js common/static/bundles/commons.js
+#: lms/static/js/views/file_uploader.js
 msgid "Upload File"
 msgstr "Ûplöäd Fïlé Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
@@ -619,7 +567,6 @@ msgstr "Ûplöäd Fïlé Ⱡ'σяєм ιρѕυм ∂σłσя #"
 #: cms/static/js/views/modals/base_modal.js
 #: cms/static/js/views/modals/course_outline_modals.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 #: cms/templates/js/certificate-editor.underscore
 #: cms/templates/js/content-group-editor.underscore
@@ -641,7 +588,6 @@ msgstr "Sävé Ⱡ'σяєм ι#"
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/modals/course_outline_modals.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 msgid "Advanced"
@@ -889,9 +835,8 @@ msgstr "{totalItems} tötäl Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: cms/static/js/views/previous_video_upload.js
 #: cms/static/js/views/video/translations_editor.js
-#: cms/static/js/views/video_transcripts.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
-#: common/static/bundles/commons.js lms/static/js/views/image_field.js
+#: cms/static/js/views/video_transcripts.js common/static/bundles/commons.js
+#: lms/static/js/views/image_field.js
 msgid "Removing"
 msgstr "Rémövïng Ⱡ'σяєм ιρѕυм ∂#"
 
@@ -909,15 +854,11 @@ msgstr ""
 "Délétïng ä téxtßöök çännöt ßé ündöné änd önçé délétéd äný référénçé tö ït ïn"
 " ýöür çöürséwäré's nävïgätïön wïll älsö ßé rémövéd. Ⱡ'σяє#"
 
-#: cms/static/js/views/tabs.js
-#: common/static/bundles/js/factories/edit_tabs.a28b56db336309954b10.js
-#: common/static/bundles/js/factories/edit_tabs.js
+#: cms/static/js/views/tabs.js common/static/bundles/js/factories/edit_tabs.js
 msgid "Delete Page Confirmation"
 msgstr "Délété Pägé Çönfïrmätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
-#: cms/static/js/views/tabs.js
-#: common/static/bundles/js/factories/edit_tabs.a28b56db336309954b10.js
-#: common/static/bundles/js/factories/edit_tabs.js
+#: cms/static/js/views/tabs.js common/static/bundles/js/factories/edit_tabs.js
 msgid ""
 "Are you sure you want to delete this page? This action cannot be undone."
 msgstr ""
@@ -935,9 +876,7 @@ msgid "We're sorry, there was an error"
 msgstr "Wé'ré sörrý, théré wäs än érrör Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: cms/static/js/views/utils/move_xblock_utils.js
-#: common/static/bundles/js/factories/container.ff517a7a0eed2dd54168.js
 #: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.dacd39eb1d304631c24e.js
 #: common/static/bundles/js/factories/library.js
 msgid "Success! \"{displayName}\" has been moved."
 msgstr ""
@@ -945,9 +884,7 @@ msgstr ""
 "¢σηѕє¢т#"
 
 #: cms/static/js/views/utils/move_xblock_utils.js
-#: common/static/bundles/js/factories/container.ff517a7a0eed2dd54168.js
 #: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.dacd39eb1d304631c24e.js
 #: common/static/bundles/js/factories/library.js
 msgid ""
 "Move cancelled. \"{sourceDisplayName}\" has been moved back to its original "
@@ -957,17 +894,13 @@ msgstr ""
 "löçätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: cms/static/js/views/utils/move_xblock_utils.js
-#: common/static/bundles/js/factories/container.ff517a7a0eed2dd54168.js
 #: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.dacd39eb1d304631c24e.js
 #: common/static/bundles/js/factories/library.js
 msgid "Undo move"
 msgstr "Ûndö mövé Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: cms/static/js/views/utils/move_xblock_utils.js
-#: common/static/bundles/js/factories/container.ff517a7a0eed2dd54168.js
 #: common/static/bundles/js/factories/container.js
-#: common/static/bundles/js/factories/library.dacd39eb1d304631c24e.js
 #: common/static/bundles/js/factories/library.js
 msgid "Take me to the new location"
 msgstr "Täké mé tö thé néw löçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
@@ -1033,7 +966,6 @@ msgid "Your changes have been saved."
 msgstr "Ýöür çhängés hävé ßéén sävéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: cms/static/js/views/video/transcripts/file_uploader.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Please select a file in .srt format."
 msgstr ""
@@ -1041,7 +973,6 @@ msgstr ""
 "¢σηѕє¢тєтυ#"
 
 #: cms/static/js/views/video/transcripts/file_uploader.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Error: Uploading failed."
 msgstr "Érrör: Ûplöädïng fäïléd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
@@ -1062,7 +993,6 @@ msgid "Error: Choosing failed."
 msgstr "Érrör: Çhöösïng fäïléd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: cms/static/js/views/video/transcripts/metadata_videolist.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Error: Connection with server failed."
 msgstr ""
@@ -1070,25 +1000,21 @@ msgstr ""
 "¢σηѕє¢тєтυ#"
 
 #: cms/static/js/views/video/transcripts/metadata_videolist.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Link types should be unique."
 msgstr "Lïnk týpés shöüld ßé ünïqüé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: cms/static/js/views/video/transcripts/metadata_videolist.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Links should be unique."
 msgstr "Lïnks shöüld ßé ünïqüé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: cms/static/js/views/video/transcripts/metadata_videolist.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Incorrect url format."
 msgstr "Ìnçörréçt ürl förmät. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: cms/static/js/views/video/translations_editor.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid ""
 "Sorry, there was an error parsing the subtitles that you uploaded. Please "
@@ -1098,16 +1024,13 @@ msgstr ""
 "çhéçk thé förmät änd trý ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
 
 #: cms/static/js/views/video/translations_editor.js
-#: cms/static/js/views/video_transcripts.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
-#: common/static/bundles/commons.js
+#: cms/static/js/views/video_transcripts.js common/static/bundles/commons.js
 msgid "Are you sure you want to remove this transcript?"
 msgstr ""
 "Àré ýöü süré ýöü wänt tö rémövé thïs tränsçrïpt? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α#"
 
 #: cms/static/js/views/video/translations_editor.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid ""
 "If you remove this transcript, the transcript will not be available for this"
@@ -1117,13 +1040,11 @@ msgstr ""
 " çömpönént. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
 #: cms/static/js/views/video/translations_editor.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Remove Transcript"
 msgstr "Rémövé Tränsçrïpt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: cms/static/js/views/video/translations_editor.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Upload translation"
 msgstr "Ûplöäd tränslätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
@@ -1201,37 +1122,31 @@ msgid "text_word_{uniqueId}"
 msgstr "téxt_wörd_{uniqueId} Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
-#: common/static/bundles/AnnotatableModule.dbbe4d436249d7f6b865.js
 #: common/static/bundles/AnnotatableModule.js
 msgid "Show Annotations"
 msgstr "Shöw Ànnötätïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
-#: common/static/bundles/AnnotatableModule.dbbe4d436249d7f6b865.js
 #: common/static/bundles/AnnotatableModule.js
 msgid "Hide Annotations"
 msgstr "Hïdé Ànnötätïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
-#: common/static/bundles/AnnotatableModule.dbbe4d436249d7f6b865.js
 #: common/static/bundles/AnnotatableModule.js
 msgid "Expand Instructions"
 msgstr "Éxpänd Ìnstrüçtïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
-#: common/static/bundles/AnnotatableModule.dbbe4d436249d7f6b865.js
 #: common/static/bundles/AnnotatableModule.js
 msgid "Collapse Instructions"
 msgstr "Çölläpsé Ìnstrüçtïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
-#: common/static/bundles/AnnotatableModule.dbbe4d436249d7f6b865.js
 #: common/static/bundles/AnnotatableModule.js
 msgid "Commentary"
 msgstr "Çömméntärý Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
-#: common/static/bundles/AnnotatableModule.dbbe4d436249d7f6b865.js
 #: common/static/bundles/AnnotatableModule.js
 msgid "Reply to Annotation"
 msgstr "Réplý tö Ànnötätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
@@ -1239,7 +1154,6 @@ msgstr "Réplý tö Ànnötätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт �
 #. Translators: %(num_points)s is the number of points possible (examples: 1,
 #. 3, 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-#: common/static/bundles/CapaModule.abbac1c40a6b67fec540.js
 #: common/static/bundles/CapaModule.js
 msgid "%(num_points)s point possible (graded, results hidden)"
 msgid_plural "%(num_points)s points possible (graded, results hidden)"
@@ -1253,7 +1167,6 @@ msgstr[1] ""
 #. Translators: %(num_points)s is the number of points possible (examples: 1,
 #. 3, 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-#: common/static/bundles/CapaModule.abbac1c40a6b67fec540.js
 #: common/static/bundles/CapaModule.js
 msgid "%(num_points)s point possible (ungraded, results hidden)"
 msgid_plural "%(num_points)s points possible (ungraded, results hidden)"
@@ -1267,7 +1180,6 @@ msgstr[1] ""
 #. Translators: %(num_points)s is the number of points possible (examples: 1,
 #. 3, 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-#: common/static/bundles/CapaModule.abbac1c40a6b67fec540.js
 #: common/static/bundles/CapaModule.js
 msgid "%(num_points)s point possible (graded)"
 msgid_plural "%(num_points)s points possible (graded)"
@@ -1279,7 +1191,6 @@ msgstr[1] ""
 #. Translators: %(num_points)s is the number of points possible (examples: 1,
 #. 3, 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-#: common/static/bundles/CapaModule.abbac1c40a6b67fec540.js
 #: common/static/bundles/CapaModule.js
 msgid "%(num_points)s point possible (ungraded)"
 msgid_plural "%(num_points)s points possible (ungraded)"
@@ -1295,7 +1206,6 @@ msgstr[1] ""
 #. points will always be at least 1. We pluralize based on the total number of
 #. points (example: 0/1 point; 1/2 points);
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-#: common/static/bundles/CapaModule.abbac1c40a6b67fec540.js
 #: common/static/bundles/CapaModule.js
 msgid "%(earned)s/%(possible)s point (graded)"
 msgid_plural "%(earned)s/%(possible)s points (graded)"
@@ -1309,7 +1219,6 @@ msgstr[1] ""
 #. points will always be at least 1. We pluralize based on the total number of
 #. points (example: 0/1 point; 1/2 points);
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-#: common/static/bundles/CapaModule.abbac1c40a6b67fec540.js
 #: common/static/bundles/CapaModule.js
 msgid "%(earned)s/%(possible)s point (ungraded)"
 msgid_plural "%(earned)s/%(possible)s points (ungraded)"
@@ -1319,7 +1228,6 @@ msgstr[1] ""
 "%(earned)s/%(possible)s pöïnts (üngrädéd) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-#: common/static/bundles/CapaModule.abbac1c40a6b67fec540.js
 #: common/static/bundles/CapaModule.js
 msgid "The grading process is still running. Refresh the page to see updates."
 msgstr ""
@@ -1327,7 +1235,6 @@ msgstr ""
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-#: common/static/bundles/CapaModule.abbac1c40a6b67fec540.js
 #: common/static/bundles/CapaModule.js
 msgid "Could not grade your answer. The submission was aborted."
 msgstr ""
@@ -1335,7 +1242,6 @@ msgstr ""
 "ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-#: common/static/bundles/CapaModule.abbac1c40a6b67fec540.js
 #: common/static/bundles/CapaModule.js
 msgid ""
 "Submission aborted! Sorry, your browser does not support file uploads. If "
@@ -1352,7 +1258,6 @@ msgstr ""
 "¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυ#"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-#: common/static/bundles/CapaModule.abbac1c40a6b67fec540.js
 #: common/static/bundles/CapaModule.js
 msgid "You submitted {filename}; only {allowedFiles} are allowed."
 msgstr ""
@@ -1360,7 +1265,6 @@ msgstr ""
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-#: common/static/bundles/CapaModule.abbac1c40a6b67fec540.js
 #: common/static/bundles/CapaModule.js
 msgid "Your file {filename} is too large (max size: {maxSize}MB)."
 msgstr ""
@@ -1368,7 +1272,6 @@ msgstr ""
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-#: common/static/bundles/CapaModule.abbac1c40a6b67fec540.js
 #: common/static/bundles/CapaModule.js
 msgid "You did not submit the required files: {requiredFiles}."
 msgstr ""
@@ -1376,7 +1279,6 @@ msgstr ""
 "ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-#: common/static/bundles/CapaModule.abbac1c40a6b67fec540.js
 #: common/static/bundles/CapaModule.js
 msgid "You did not select any files to submit."
 msgstr ""
@@ -1386,19 +1288,16 @@ msgstr ""
 #. Translators: This is only translated to allow for reordering of label and
 #. associated status.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-#: common/static/bundles/CapaModule.abbac1c40a6b67fec540.js
 #: common/static/bundles/CapaModule.js
 msgid "{label}: {status}"
 msgstr "{label}: {status} Ⱡ'σяєм ιρѕυм ∂#"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-#: common/static/bundles/CapaModule.abbac1c40a6b67fec540.js
 #: common/static/bundles/CapaModule.js
 msgid "This problem has been reset."
 msgstr "Thïs prößlém häs ßéén rését. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-#: common/static/bundles/CapaModule.abbac1c40a6b67fec540.js
 #: common/static/bundles/CapaModule.js
 msgid "unsubmitted"
 msgstr "ünsüßmïttéd Ⱡ'σяєм ιρѕυм ∂σłσя #"
@@ -1406,13 +1305,11 @@ msgstr "ünsüßmïttéd Ⱡ'σяєм ιρѕυм ∂σłσя #"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Paragraph"
 msgstr "Pärägräph Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Preformatted"
 msgstr "Préförmättéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
@@ -1420,7 +1317,6 @@ msgstr "Préförmättéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Heading 3"
 msgstr "Héädïng 3 Ⱡ'σяєм ιρѕυм ∂σł#"
@@ -1428,7 +1324,6 @@ msgstr "Héädïng 3 Ⱡ'σяєм ιρѕυм ∂σł#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Heading 4"
 msgstr "Héädïng 4 Ⱡ'σяєм ιρѕυм ∂σł#"
@@ -1436,7 +1331,6 @@ msgstr "Héädïng 4 Ⱡ'σяєм ιρѕυм ∂σł#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Heading 5"
 msgstr "Héädïng 5 Ⱡ'σяєм ιρѕυм ∂σł#"
@@ -1444,7 +1338,6 @@ msgstr "Héädïng 5 Ⱡ'σяєм ιρѕυм ∂σł#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Heading 6"
 msgstr "Héädïng 6 Ⱡ'σяєм ιρѕυм ∂σł#"
@@ -1452,7 +1345,6 @@ msgstr "Héädïng 6 Ⱡ'σяєм ιρѕυм ∂σł#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Add to Dictionary"
 msgstr "Àdd tö Dïçtïönärý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
@@ -1460,7 +1352,6 @@ msgstr "Àdd tö Dïçtïönärý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α�
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Align center"
 msgstr "Àlïgn çéntér Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
@@ -1468,7 +1359,6 @@ msgstr "Àlïgn çéntér Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Align left"
 msgstr "Àlïgn léft Ⱡ'σяєм ιρѕυм ∂σłσ#"
@@ -1476,7 +1366,6 @@ msgstr "Àlïgn léft Ⱡ'σяєм ιρѕυм ∂σłσ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Align right"
 msgstr "Àlïgn rïght Ⱡ'σяєм ιρѕυм ∂σłσя #"
@@ -1484,7 +1373,6 @@ msgstr "Àlïgn rïght Ⱡ'σяєм ιρѕυм ∂σłσя #"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Alignment"
 msgstr "Àlïgnmént Ⱡ'σяєм ιρѕυм ∂σł#"
@@ -1492,7 +1380,6 @@ msgstr "Àlïgnmént Ⱡ'σяєм ιρѕυм ∂σł#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Alternative source"
 msgstr "Àltérnätïvé söürçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
@@ -1500,7 +1387,6 @@ msgstr "Àltérnätïvé söürçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт �
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Anchor"
 msgstr "Ànçhör Ⱡ'σяєм ιρѕυ#"
@@ -1508,7 +1394,6 @@ msgstr "Ànçhör Ⱡ'σяєм ιρѕυ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Anchors"
 msgstr "Ànçhörs Ⱡ'σяєм ιρѕυм #"
@@ -1516,7 +1401,6 @@ msgstr "Ànçhörs Ⱡ'σяєм ιρѕυм #"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Author"
 msgstr "Àüthör Ⱡ'σяєм ιρѕυ#"
@@ -1524,7 +1408,6 @@ msgstr "Àüthör Ⱡ'σяєм ιρѕυ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Background color"
 msgstr "Bäçkgröünd çölör Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
@@ -1532,7 +1415,6 @@ msgstr "Bäçkgröünd çölör Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js lms/static/js/Markdown.Editor.js
 msgid "Blockquote"
 msgstr "Blöçkqüöté Ⱡ'σяєм ιρѕυм ∂σłσ#"
@@ -1540,7 +1422,6 @@ msgstr "Blöçkqüöté Ⱡ'σяєм ιρѕυм ∂σłσ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Blocks"
 msgstr "Blöçks Ⱡ'σяєм ιρѕυ#"
@@ -1548,7 +1429,6 @@ msgstr "Blöçks Ⱡ'σяєм ιρѕυ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Body"
 msgstr "Bödý Ⱡ'σяєм ι#"
@@ -1556,7 +1436,6 @@ msgstr "Bödý Ⱡ'σяєм ι#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Bold"
 msgstr "Böld Ⱡ'σяєм ι#"
@@ -1564,7 +1443,6 @@ msgstr "Böld Ⱡ'σяєм ι#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Border color"
 msgstr "Bördér çölör Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
@@ -1572,7 +1450,6 @@ msgstr "Bördér çölör Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Border"
 msgstr "Bördér Ⱡ'σяєм ιρѕυ#"
@@ -1580,7 +1457,6 @@ msgstr "Bördér Ⱡ'σяєм ιρѕυ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Bottom"
 msgstr "Böttöm Ⱡ'σяєм ιρѕυ#"
@@ -1588,7 +1464,6 @@ msgstr "Böttöm Ⱡ'σяєм ιρѕυ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Bullet list"
 msgstr "Büllét lïst Ⱡ'σяєм ιρѕυм ∂σłσя #"
@@ -1596,7 +1471,6 @@ msgstr "Büllét lïst Ⱡ'σяєм ιρѕυм ∂σłσя #"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Caption"
 msgstr "Çäptïön Ⱡ'σяєм ιρѕυм #"
@@ -1604,7 +1478,6 @@ msgstr "Çäptïön Ⱡ'σяєм ιρѕυм #"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Cell padding"
 msgstr "Çéll päddïng Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
@@ -1612,7 +1485,6 @@ msgstr "Çéll päddïng Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Cell properties"
 msgstr "Çéll pröpértïés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
@@ -1620,7 +1492,6 @@ msgstr "Çéll pröpértïés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Cell spacing"
 msgstr "Çéll späçïng Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
@@ -1628,7 +1499,6 @@ msgstr "Çéll späçïng Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Cell type"
 msgstr "Çéll týpé Ⱡ'σяєм ιρѕυм ∂σł#"
@@ -1636,7 +1506,6 @@ msgstr "Çéll týpé Ⱡ'σяєм ιρѕυм ∂σł#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Cell"
 msgstr "Çéll Ⱡ'σяєм ι#"
@@ -1644,7 +1513,6 @@ msgstr "Çéll Ⱡ'σяєм ι#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Center"
 msgstr "Çéntér Ⱡ'σяєм ιρѕυ#"
@@ -1652,7 +1520,6 @@ msgstr "Çéntér Ⱡ'σяєм ιρѕυ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Circle"
 msgstr "Çïrçlé Ⱡ'σяєм ιρѕυ#"
@@ -1660,7 +1527,6 @@ msgstr "Çïrçlé Ⱡ'σяєм ιρѕυ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Clear formatting"
 msgstr "Çléär förmättïng Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
@@ -1674,7 +1540,6 @@ msgstr "Çléär förmättïng Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 #. Translators: this is a toolbar button tooltip from the raw HTML editor
 #. displayed in the browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Code block"
 msgstr "Çödé ßlöçk Ⱡ'σяєм ιρѕυм ∂σłσ#"
@@ -1683,7 +1548,6 @@ msgstr "Çödé ßlöçk Ⱡ'σяєм ιρѕυм ∂σłσ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
 msgid "Code"
@@ -1692,7 +1556,6 @@ msgstr "Çödé Ⱡ'σяєм ι#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Color"
 msgstr "Çölör Ⱡ'σяєм ιρѕ#"
@@ -1700,7 +1563,6 @@ msgstr "Çölör Ⱡ'σяєм ιρѕ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Cols"
 msgstr "Çöls Ⱡ'σяєм ι#"
@@ -1708,7 +1570,6 @@ msgstr "Çöls Ⱡ'σяєм ι#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Column group"
 msgstr "Çölümn gröüp Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
@@ -1716,7 +1577,6 @@ msgstr "Çölümn gröüp Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Column"
 msgstr "Çölümn Ⱡ'σяєм ιρѕυ#"
@@ -1724,7 +1584,6 @@ msgstr "Çölümn Ⱡ'σяєм ιρѕυ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Constrain proportions"
 msgstr "Çönsträïn pröpörtïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
@@ -1732,7 +1591,6 @@ msgstr "Çönsträïn pröpörtïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Copy row"
 msgstr "Çöpý röw Ⱡ'σяєм ιρѕυм ∂#"
@@ -1740,7 +1598,6 @@ msgstr "Çöpý röw Ⱡ'σяєм ιρѕυм ∂#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Copy"
 msgstr "Çöpý Ⱡ'σяєм ι#"
@@ -1748,7 +1605,6 @@ msgstr "Çöpý Ⱡ'σяєм ι#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Could not find the specified string."
 msgstr ""
@@ -1758,7 +1614,6 @@ msgstr ""
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Custom color"
 msgstr "Çüstöm çölör Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
@@ -1766,7 +1621,6 @@ msgstr "Çüstöm çölör Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Custom..."
 msgstr "Çüstöm... Ⱡ'σяєм ιρѕυм ∂σł#"
@@ -1774,7 +1628,6 @@ msgstr "Çüstöm... Ⱡ'σяєм ιρѕυм ∂σł#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Cut row"
 msgstr "Çüt röw Ⱡ'σяєм ιρѕυм #"
@@ -1782,7 +1635,6 @@ msgstr "Çüt röw Ⱡ'σяєм ιρѕυм #"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Cut"
 msgstr "Çüt Ⱡ'σяєм#"
@@ -1790,7 +1642,6 @@ msgstr "Çüt Ⱡ'σяєм#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Decrease indent"
 msgstr "Déçréäsé ïndént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
@@ -1798,7 +1649,6 @@ msgstr "Déçréäsé ïndént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Default"
 msgstr "Défäült Ⱡ'σяєм ιρѕυм #"
@@ -1806,7 +1656,6 @@ msgstr "Défäült Ⱡ'σяєм ιρѕυм #"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Delete column"
 msgstr "Délété çölümn Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
@@ -1814,7 +1663,6 @@ msgstr "Délété çölümn Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Delete row"
 msgstr "Délété röw Ⱡ'σяєм ιρѕυм ∂σłσ#"
@@ -1822,7 +1670,6 @@ msgstr "Délété röw Ⱡ'σяєм ιρѕυм ∂σłσ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Delete table"
 msgstr "Délété täßlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
@@ -1831,7 +1678,6 @@ msgstr "Délété täßlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 #: cms/templates/js/certificate-editor.underscore
 #: cms/templates/js/group-configuration-editor.underscore
@@ -1843,7 +1689,6 @@ msgstr "Désçrïptïön Ⱡ'σяєм ιρѕυм ∂σłσя #"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Dimensions"
 msgstr "Dïménsïöns Ⱡ'σяєм ιρѕυм ∂σłσ#"
@@ -1851,7 +1696,6 @@ msgstr "Dïménsïöns Ⱡ'σяєм ιρѕυм ∂σłσ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Disc"
 msgstr "Dïsç Ⱡ'σяєм ι#"
@@ -1859,7 +1703,6 @@ msgstr "Dïsç Ⱡ'σяєм ι#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Div"
 msgstr "Dïv Ⱡ'σяєм#"
@@ -1867,7 +1710,6 @@ msgstr "Dïv Ⱡ'σяєм#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Document properties"
 msgstr "Döçümént pröpértïés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
@@ -1875,7 +1717,6 @@ msgstr "Döçümént pröpértïés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт �
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Edit HTML"
 msgstr "Édït HTML Ⱡ'σяєм ιρѕυм ∂σł#"
@@ -1884,7 +1725,6 @@ msgstr "Édït HTML Ⱡ'σяєм ιρѕυм ∂σł#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 #: cms/templates/js/certificate-details.underscore
 #: cms/templates/js/course_info_handouts.underscore
@@ -1901,7 +1741,6 @@ msgstr "Édït Ⱡ'σяєм ι#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Embed"
 msgstr "Émßéd Ⱡ'σяєм ιρѕ#"
@@ -1909,7 +1748,6 @@ msgstr "Émßéd Ⱡ'σяєм ιρѕ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Emoticons"
 msgstr "Émötïçöns Ⱡ'σяєм ιρѕυм ∂σł#"
@@ -1917,7 +1755,6 @@ msgstr "Émötïçöns Ⱡ'σяєм ιρѕυм ∂σł#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Encoding"
 msgstr "Énçödïng Ⱡ'σяєм ιρѕυм ∂#"
@@ -1925,7 +1762,6 @@ msgstr "Énçödïng Ⱡ'σяєм ιρѕυм ∂#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "File"
 msgstr "Fïlé Ⱡ'σяєм ι#"
@@ -1933,7 +1769,6 @@ msgstr "Fïlé Ⱡ'σяєм ι#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Find and replace"
 msgstr "Fïnd änd répläçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
@@ -1941,7 +1776,6 @@ msgstr "Fïnd änd répläçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Find next"
 msgstr "Fïnd néxt Ⱡ'σяєм ιρѕυм ∂σł#"
@@ -1949,7 +1783,6 @@ msgstr "Fïnd néxt Ⱡ'σяєм ιρѕυм ∂σł#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Find previous"
 msgstr "Fïnd prévïöüs Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
@@ -1957,7 +1790,6 @@ msgstr "Fïnd prévïöüs Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Find"
 msgstr "Fïnd Ⱡ'σяєм ι#"
@@ -1965,7 +1797,6 @@ msgstr "Fïnd Ⱡ'σяєм ι#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Finish"
 msgstr "Fïnïsh Ⱡ'σяєм ιρѕυ#"
@@ -1973,7 +1804,6 @@ msgstr "Fïnïsh Ⱡ'σяєм ιρѕυ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Font Family"
 msgstr "Fönt Fämïlý Ⱡ'σяєм ιρѕυм ∂σłσя #"
@@ -1981,7 +1811,6 @@ msgstr "Fönt Fämïlý Ⱡ'σяєм ιρѕυм ∂σłσя #"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Font Sizes"
 msgstr "Fönt Sïzés Ⱡ'σяєм ιρѕυм ∂σłσ#"
@@ -1989,7 +1818,6 @@ msgstr "Fönt Sïzés Ⱡ'σяєм ιρѕυм ∂σłσ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Footer"
 msgstr "Föötér Ⱡ'σяєм ιρѕυ#"
@@ -1997,7 +1825,6 @@ msgstr "Föötér Ⱡ'σяєм ιρѕυ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Format"
 msgstr "Förmät Ⱡ'σяєм ιρѕυ#"
@@ -2005,7 +1832,6 @@ msgstr "Förmät Ⱡ'σяєм ιρѕυ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Formats"
 msgstr "Förmäts Ⱡ'σяєм ιρѕυм #"
@@ -2014,7 +1840,6 @@ msgstr "Förmäts Ⱡ'σяєм ιρѕυм #"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 #: common/static/common/templates/image-modal.underscore
 msgid "Fullscreen"
@@ -2023,7 +1848,6 @@ msgstr "Füllsçréén Ⱡ'σяєм ιρѕυм ∂σłσ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "General"
 msgstr "Généräl Ⱡ'σяєм ιρѕυм #"
@@ -2031,7 +1855,6 @@ msgstr "Généräl Ⱡ'σяєм ιρѕυм #"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "H Align"
 msgstr "H Àlïgn Ⱡ'σяєм ιρѕυм #"
@@ -2039,7 +1862,6 @@ msgstr "H Àlïgn Ⱡ'σяєм ιρѕυм #"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Header 1"
 msgstr "Héädér 1 Ⱡ'σяєм ιρѕυм ∂#"
@@ -2047,7 +1869,6 @@ msgstr "Héädér 1 Ⱡ'σяєм ιρѕυм ∂#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Header 2"
 msgstr "Héädér 2 Ⱡ'σяєм ιρѕυм ∂#"
@@ -2055,7 +1876,6 @@ msgstr "Héädér 2 Ⱡ'σяєм ιρѕυм ∂#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Header 3"
 msgstr "Héädér 3 Ⱡ'σяєм ιρѕυм ∂#"
@@ -2063,7 +1883,6 @@ msgstr "Héädér 3 Ⱡ'σяєм ιρѕυм ∂#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Header 4"
 msgstr "Héädér 4 Ⱡ'σяєм ιρѕυм ∂#"
@@ -2071,7 +1890,6 @@ msgstr "Héädér 4 Ⱡ'σяєм ιρѕυм ∂#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Header 5"
 msgstr "Héädér 5 Ⱡ'σяєм ιρѕυм ∂#"
@@ -2079,7 +1897,6 @@ msgstr "Héädér 5 Ⱡ'σяєм ιρѕυм ∂#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Header 6"
 msgstr "Héädér 6 Ⱡ'σяєм ιρѕυм ∂#"
@@ -2087,7 +1904,6 @@ msgstr "Héädér 6 Ⱡ'σяєм ιρѕυм ∂#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Header cell"
 msgstr "Héädér çéll Ⱡ'σяєм ιρѕυм ∂σłσя #"
@@ -2096,17 +1912,13 @@ msgstr "Héädér çéll Ⱡ'σяєм ιρѕυм ∂σłσя #"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
-#: common/static/bundles/CapaDescriptor.c3081e47618a71333eb3.js
-#: common/static/bundles/CapaDescriptor.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
-#: common/static/bundles/commons.js
+#: common/static/bundles/CapaDescriptor.js common/static/bundles/commons.js
 msgid "Header"
 msgstr "Héädér Ⱡ'σяєм ιρѕυ#"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Headers"
 msgstr "Héädérs Ⱡ'σяєм ιρѕυм #"
@@ -2114,7 +1926,6 @@ msgstr "Héädérs Ⱡ'σяєм ιρѕυм #"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Heading 1"
 msgstr "Héädïng 1 Ⱡ'σяєм ιρѕυм ∂σł#"
@@ -2122,7 +1933,6 @@ msgstr "Héädïng 1 Ⱡ'σяєм ιρѕυм ∂σł#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Heading 2"
 msgstr "Héädïng 2 Ⱡ'σяєм ιρѕυм ∂σł#"
@@ -2130,7 +1940,6 @@ msgstr "Héädïng 2 Ⱡ'σяєм ιρѕυм ∂σł#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Headings"
 msgstr "Héädïngs Ⱡ'σяєм ιρѕυм ∂#"
@@ -2138,7 +1947,6 @@ msgstr "Héädïngs Ⱡ'σяєм ιρѕυм ∂#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Height"
 msgstr "Héïght Ⱡ'σяєм ιρѕυ#"
@@ -2146,7 +1954,6 @@ msgstr "Héïght Ⱡ'σяєм ιρѕυ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Horizontal line"
 msgstr "Hörïzöntäl lïné Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
@@ -2154,7 +1961,6 @@ msgstr "Hörïzöntäl lïné Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Horizontal space"
 msgstr "Hörïzöntäl späçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
@@ -2162,7 +1968,6 @@ msgstr "Hörïzöntäl späçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "HTML source code"
 msgstr "HTML söürçé çödé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
@@ -2170,7 +1975,6 @@ msgstr "HTML söürçé çödé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Ignore all"
 msgstr "Ìgnöré äll Ⱡ'σяєм ιρѕυм ∂σłσ#"
@@ -2178,7 +1982,6 @@ msgstr "Ìgnöré äll Ⱡ'σяєм ιρѕυм ∂σłσ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Ignore"
 msgstr "Ìgnöré Ⱡ'σяєм ιρѕυ#"
@@ -2186,7 +1989,6 @@ msgstr "Ìgnöré Ⱡ'σяєм ιρѕυ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Image description"
 msgstr "Ìmägé désçrïptïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
@@ -2194,7 +1996,6 @@ msgstr "Ìmägé désçrïptïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α�
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Increase indent"
 msgstr "Ìnçréäsé ïndént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
@@ -2202,7 +2003,6 @@ msgstr "Ìnçréäsé ïndént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Inline"
 msgstr "Ìnlïné Ⱡ'σяєм ιρѕυ#"
@@ -2210,7 +2010,6 @@ msgstr "Ìnlïné Ⱡ'σяєм ιρѕυ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Insert column after"
 msgstr "Ìnsért çölümn äftér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
@@ -2218,7 +2017,6 @@ msgstr "Ìnsért çölümn äftér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Insert column before"
 msgstr "Ìnsért çölümn ßéföré Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
@@ -2226,7 +2024,6 @@ msgstr "Ìnsért çölümn ßéföré Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Insert date/time"
 msgstr "Ìnsért däté/tïmé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
@@ -2234,7 +2031,6 @@ msgstr "Ìnsért däté/tïmé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Insert image"
 msgstr "Ìnsért ïmägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
@@ -2242,7 +2038,6 @@ msgstr "Ìnsért ïmägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Insert link"
 msgstr "Ìnsért lïnk Ⱡ'σяєм ιρѕυм ∂σłσя #"
@@ -2250,7 +2045,6 @@ msgstr "Ìnsért lïnk Ⱡ'σяєм ιρѕυм ∂σłσя #"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Insert row after"
 msgstr "Ìnsért röw äftér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
@@ -2258,7 +2052,6 @@ msgstr "Ìnsért röw äftér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Insert row before"
 msgstr "Ìnsért röw ßéföré Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
@@ -2266,7 +2059,6 @@ msgstr "Ìnsért röw ßéföré Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Insert table"
 msgstr "Ìnsért täßlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
@@ -2274,7 +2066,6 @@ msgstr "Ìnsért täßlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Insert template"
 msgstr "Ìnsért témpläté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
@@ -2282,7 +2073,6 @@ msgstr "Ìnsért témpläté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Insert video"
 msgstr "Ìnsért vïdéö Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
@@ -2290,7 +2080,6 @@ msgstr "Ìnsért vïdéö Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Insert"
 msgstr "Ìnsért Ⱡ'σяєм ιρѕυ#"
@@ -2298,7 +2087,6 @@ msgstr "Ìnsért Ⱡ'σяєм ιρѕυ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Insert/edit image"
 msgstr "Ìnsért/édït ïmägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
@@ -2306,7 +2094,6 @@ msgstr "Ìnsért/édït ïmägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Insert/edit link"
 msgstr "Ìnsért/édït lïnk Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
@@ -2314,7 +2101,6 @@ msgstr "Ìnsért/édït lïnk Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Insert/edit video"
 msgstr "Ìnsért/édït vïdéö Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
@@ -2322,7 +2108,6 @@ msgstr "Ìnsért/édït vïdéö Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Italic"
 msgstr "Ìtälïç Ⱡ'σяєм ιρѕυ#"
@@ -2330,7 +2115,6 @@ msgstr "Ìtälïç Ⱡ'σяєм ιρѕυ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Justify"
 msgstr "Jüstïfý Ⱡ'σяєм ιρѕυм #"
@@ -2338,7 +2122,6 @@ msgstr "Jüstïfý Ⱡ'σяєм ιρѕυм #"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Keywords"
 msgstr "Kéýwörds Ⱡ'σяєм ιρѕυм ∂#"
@@ -2346,7 +2129,6 @@ msgstr "Kéýwörds Ⱡ'σяєм ιρѕυм ∂#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Left to right"
 msgstr "Léft tö rïght Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
@@ -2354,7 +2136,6 @@ msgstr "Léft tö rïght Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Left"
 msgstr "Léft Ⱡ'σяєм ι#"
@@ -2362,7 +2143,6 @@ msgstr "Léft Ⱡ'σяєм ι#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Lower Alpha"
 msgstr "Löwér Àlphä Ⱡ'σяєм ιρѕυм ∂σłσя #"
@@ -2370,7 +2150,6 @@ msgstr "Löwér Àlphä Ⱡ'σяєм ιρѕυм ∂σłσя #"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Lower Greek"
 msgstr "Löwér Gréék Ⱡ'σяєм ιρѕυм ∂σłσя #"
@@ -2378,7 +2157,6 @@ msgstr "Löwér Gréék Ⱡ'σяєм ιρѕυм ∂σłσя #"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Lower Roman"
 msgstr "Löwér Römän Ⱡ'σяєм ιρѕυм ∂σłσя #"
@@ -2386,7 +2164,6 @@ msgstr "Löwér Römän Ⱡ'σяєм ιρѕυм ∂σłσя #"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Match case"
 msgstr "Mätçh çäsé Ⱡ'σяєм ιρѕυм ∂σłσ#"
@@ -2394,7 +2171,6 @@ msgstr "Mätçh çäsé Ⱡ'σяєм ιρѕυм ∂σłσ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Merge cells"
 msgstr "Mérgé çélls Ⱡ'σяєм ιρѕυм ∂σłσя #"
@@ -2402,7 +2178,6 @@ msgstr "Mérgé çélls Ⱡ'σяєм ιρѕυм ∂σłσя #"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Middle"
 msgstr "Mïddlé Ⱡ'σяєм ιρѕυ#"
@@ -2410,7 +2185,6 @@ msgstr "Mïddlé Ⱡ'σяєм ιρѕυ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "New document"
 msgstr "Néw döçümént Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
@@ -2418,7 +2192,6 @@ msgstr "Néw döçümént Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "New window"
 msgstr "Néw wïndöw Ⱡ'σяєм ιρѕυм ∂σłσ#"
@@ -2427,7 +2200,6 @@ msgstr "Néw wïndöw Ⱡ'σяєм ιρѕυм ∂σłσ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
 #: common/static/common/templates/discussion/pagination.underscore
@@ -2437,7 +2209,6 @@ msgstr "Néxt Ⱡ'σяєм ι#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "No color"
 msgstr "Nö çölör Ⱡ'σяєм ιρѕυм ∂#"
@@ -2445,7 +2216,6 @@ msgstr "Nö çölör Ⱡ'σяєм ιρѕυм ∂#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Nonbreaking space"
 msgstr "Nönßréäkïng späçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
@@ -2453,7 +2223,6 @@ msgstr "Nönßréäkïng späçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α�
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Numbered list"
 msgstr "Nümßéréd lïst Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
@@ -2461,7 +2230,6 @@ msgstr "Nümßéréd lïst Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Page break"
 msgstr "Pägé ßréäk Ⱡ'σяєм ιρѕυм ∂σłσ#"
@@ -2469,7 +2237,6 @@ msgstr "Pägé ßréäk Ⱡ'σяєм ιρѕυм ∂σłσ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Paste as text"
 msgstr "Pästé äs téxt Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
@@ -2477,7 +2244,6 @@ msgstr "Pästé äs téxt Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid ""
 "Paste is now in plain text mode. Contents will now be pasted as plain text "
@@ -2489,7 +2255,6 @@ msgstr ""
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Paste row after"
 msgstr "Pästé röw äftér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
@@ -2497,7 +2262,6 @@ msgstr "Pästé röw äftér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Paste row before"
 msgstr "Pästé röw ßéföré Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
@@ -2505,7 +2269,6 @@ msgstr "Pästé röw ßéföré Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Paste your embed code below:"
 msgstr "Pästé ýöür émßéd çödé ßélöw: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
@@ -2513,7 +2276,6 @@ msgstr "Pästé ýöür émßéd çödé ßélöw: Ⱡ'σяєм ιρѕυм ∂σ
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Paste"
 msgstr "Pästé Ⱡ'σяєм ιρѕ#"
@@ -2521,7 +2283,6 @@ msgstr "Pästé Ⱡ'σяєм ιρѕ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Poster"
 msgstr "Pöstér Ⱡ'σяєм ιρѕυ#"
@@ -2529,7 +2290,6 @@ msgstr "Pöstér Ⱡ'σяєм ιρѕυ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Pre"
 msgstr "Pré Ⱡ'σяєм#"
@@ -2537,7 +2297,6 @@ msgstr "Pré Ⱡ'σяєм#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Prev"
 msgstr "Prév Ⱡ'σяєм ι#"
@@ -2546,7 +2305,6 @@ msgstr "Prév Ⱡ'σяєм ι#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js lms/static/js/customwmd.js
 #: cms/templates/js/asset-library.underscore
 msgid "Preview"
@@ -2555,7 +2313,6 @@ msgstr "Prévïéw Ⱡ'σяєм ιρѕυм #"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Print"
 msgstr "Prïnt Ⱡ'σяєм ιρѕ#"
@@ -2563,7 +2320,6 @@ msgstr "Prïnt Ⱡ'σяєм ιρѕ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Redo"
 msgstr "Rédö Ⱡ'σяєм ι#"
@@ -2571,7 +2327,6 @@ msgstr "Rédö Ⱡ'σяєм ι#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Remove link"
 msgstr "Rémövé lïnk Ⱡ'σяєм ιρѕυм ∂σłσя #"
@@ -2579,7 +2334,6 @@ msgstr "Rémövé lïnk Ⱡ'σяєм ιρѕυм ∂σłσя #"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Replace all"
 msgstr "Répläçé äll Ⱡ'σяєм ιρѕυм ∂σłσя #"
@@ -2587,7 +2341,6 @@ msgstr "Répläçé äll Ⱡ'σяєм ιρѕυм ∂σłσя #"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Replace with"
 msgstr "Répläçé wïth Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
@@ -2596,7 +2349,6 @@ msgstr "Répläçé wïth Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 #: cms/templates/js/metadata-file-uploader-item.underscore
 #: cms/templates/js/video-transcripts.underscore
@@ -2607,7 +2359,6 @@ msgstr "Répläçé Ⱡ'σяєм ιρѕυм #"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Restore last draft"
 msgstr "Réstöré läst dräft Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
@@ -2615,7 +2366,6 @@ msgstr "Réstöré läst dräft Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм�
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid ""
 "Rich Text Area. Press ALT-F9 for menu. Press ALT-F10 for toolbar. Press "
@@ -2627,7 +2377,6 @@ msgstr ""
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Right to left"
 msgstr "Rïght tö léft Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
@@ -2635,7 +2384,6 @@ msgstr "Rïght tö léft Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Right"
 msgstr "Rïght Ⱡ'σяєм ιρѕ#"
@@ -2643,7 +2391,6 @@ msgstr "Rïght Ⱡ'σяєм ιρѕ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Robots"
 msgstr "Rößöts Ⱡ'σяєм ιρѕυ#"
@@ -2651,7 +2398,6 @@ msgstr "Rößöts Ⱡ'σяєм ιρѕυ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Row group"
 msgstr "Röw gröüp Ⱡ'σяєм ιρѕυм ∂σł#"
@@ -2659,7 +2405,6 @@ msgstr "Röw gröüp Ⱡ'σяєм ιρѕυм ∂σł#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Row properties"
 msgstr "Röw pröpértïés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
@@ -2667,7 +2412,6 @@ msgstr "Röw pröpértïés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Row type"
 msgstr "Röw týpé Ⱡ'σяєм ιρѕυм ∂#"
@@ -2675,7 +2419,6 @@ msgstr "Röw týpé Ⱡ'σяєм ιρѕυм ∂#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Row"
 msgstr "Röw Ⱡ'σяєм#"
@@ -2683,7 +2426,6 @@ msgstr "Röw Ⱡ'σяєм#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Rows"
 msgstr "Röws Ⱡ'σяєм ι#"
@@ -2691,7 +2433,6 @@ msgstr "Röws Ⱡ'σяєм ι#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Scope"
 msgstr "Sçöpé Ⱡ'σяєм ιρѕ#"
@@ -2699,7 +2440,6 @@ msgstr "Sçöpé Ⱡ'σяєм ιρѕ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Select all"
 msgstr "Séléçt äll Ⱡ'σяєм ιρѕυм ∂σłσ#"
@@ -2707,7 +2447,6 @@ msgstr "Séléçt äll Ⱡ'σяєм ιρѕυм ∂σłσ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Show blocks"
 msgstr "Shöw ßlöçks Ⱡ'σяєм ιρѕυм ∂σłσя #"
@@ -2715,7 +2454,6 @@ msgstr "Shöw ßlöçks Ⱡ'σяєм ιρѕυм ∂σłσя #"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Show invisible characters"
 msgstr "Shöw ïnvïsïßlé çhäräçtérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
@@ -2723,7 +2461,6 @@ msgstr "Shöw ïnvïsïßlé çhäräçtérs Ⱡ'σяєм ιρѕυм ∂σłσя
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Source code"
 msgstr "Söürçé çödé Ⱡ'σяєм ιρѕυм ∂σłσя #"
@@ -2731,7 +2468,6 @@ msgstr "Söürçé çödé Ⱡ'σяєм ιρѕυм ∂σłσя #"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Source"
 msgstr "Söürçé Ⱡ'σяєм ιρѕυ#"
@@ -2739,7 +2475,6 @@ msgstr "Söürçé Ⱡ'σяєм ιρѕυ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Special character"
 msgstr "Spéçïäl çhäräçtér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
@@ -2747,7 +2482,6 @@ msgstr "Spéçïäl çhäräçtér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Spellcheck"
 msgstr "Spéllçhéçk Ⱡ'σяєм ιρѕυм ∂σłσ#"
@@ -2755,7 +2489,6 @@ msgstr "Spéllçhéçk Ⱡ'σяєм ιρѕυм ∂σłσ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Split cell"
 msgstr "Splït çéll Ⱡ'σяєм ιρѕυм ∂σłσ#"
@@ -2763,7 +2496,6 @@ msgstr "Splït çéll Ⱡ'σяєм ιρѕυм ∂σłσ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Square"
 msgstr "Sqüäré Ⱡ'σяєм ιρѕυ#"
@@ -2771,7 +2503,6 @@ msgstr "Sqüäré Ⱡ'σяєм ιρѕυ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Start search"
 msgstr "Stärt séärçh Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
@@ -2779,7 +2510,6 @@ msgstr "Stärt séärçh Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Strikethrough"
 msgstr "Strïkéthröügh Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
@@ -2787,7 +2517,6 @@ msgstr "Strïkéthröügh Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Style"
 msgstr "Stýlé Ⱡ'σяєм ιρѕ#"
@@ -2795,7 +2524,6 @@ msgstr "Stýlé Ⱡ'σяєм ιρѕ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Subscript"
 msgstr "Süßsçrïpt Ⱡ'σяєм ιρѕυм ∂σł#"
@@ -2803,7 +2531,6 @@ msgstr "Süßsçrïpt Ⱡ'σяєм ιρѕυм ∂σł#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Superscript"
 msgstr "Süpérsçrïpt Ⱡ'σяєм ιρѕυм ∂σłσя #"
@@ -2811,7 +2538,6 @@ msgstr "Süpérsçrïpt Ⱡ'σяєм ιρѕυм ∂σłσя #"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Table properties"
 msgstr "Täßlé pröpértïés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
@@ -2819,7 +2545,6 @@ msgstr "Täßlé pröpértïés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Table"
 msgstr "Täßlé Ⱡ'σяєм ιρѕ#"
@@ -2827,7 +2552,6 @@ msgstr "Täßlé Ⱡ'σяєм ιρѕ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Target"
 msgstr "Tärgét Ⱡ'σяєм ιρѕυ#"
@@ -2835,7 +2559,6 @@ msgstr "Tärgét Ⱡ'σяєм ιρѕυ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Templates"
 msgstr "Témplätés Ⱡ'σяєм ιρѕυм ∂σł#"
@@ -2843,7 +2566,6 @@ msgstr "Témplätés Ⱡ'σяєм ιρѕυм ∂σł#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Text color"
 msgstr "Téxt çölör Ⱡ'σяєм ιρѕυм ∂σłσ#"
@@ -2851,7 +2573,6 @@ msgstr "Téxt çölör Ⱡ'σяєм ιρѕυм ∂σłσ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Text to display"
 msgstr "Téxt tö dïspläý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
@@ -2859,7 +2580,6 @@ msgstr "Téxt tö dïspläý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid ""
 "The URL you entered seems to be an email address. Do you want to add the "
@@ -2871,7 +2591,6 @@ msgstr ""
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid ""
 "The URL you entered seems to be an external link. Do you want to add the "
@@ -2884,7 +2603,6 @@ msgstr ""
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 #: cms/templates/js/course-instructor-details.underscore
 #: cms/templates/js/signatory-details.underscore
@@ -2896,7 +2614,6 @@ msgstr "Tïtlé Ⱡ'σяєм ιρѕ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Tools"
 msgstr "Tööls Ⱡ'σяєм ιρѕ#"
@@ -2904,7 +2621,6 @@ msgstr "Tööls Ⱡ'σяєм ιρѕ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Top"
 msgstr "Töp Ⱡ'σяєм#"
@@ -2912,7 +2628,6 @@ msgstr "Töp Ⱡ'σяєм#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Underline"
 msgstr "Ûndérlïné Ⱡ'σяєм ιρѕυм ∂σł#"
@@ -2920,7 +2635,6 @@ msgstr "Ûndérlïné Ⱡ'σяєм ιρѕυм ∂σł#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Undo"
 msgstr "Ûndö Ⱡ'σяєм ι#"
@@ -2928,7 +2642,6 @@ msgstr "Ûndö Ⱡ'σяєм ι#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Upper Alpha"
 msgstr "Ûppér Àlphä Ⱡ'σяєм ιρѕυм ∂σłσя #"
@@ -2936,7 +2649,6 @@ msgstr "Ûppér Àlphä Ⱡ'σяєм ιρѕυм ∂σłσя #"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Upper Roman"
 msgstr "Ûppér Römän Ⱡ'σяєм ιρѕυм ∂σłσя #"
@@ -2944,7 +2656,6 @@ msgstr "Ûppér Römän Ⱡ'σяєм ιρѕυм ∂σłσя #"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Url"
 msgstr "Ûrl Ⱡ'σяєм#"
@@ -2952,7 +2663,6 @@ msgstr "Ûrl Ⱡ'σяєм#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "V Align"
 msgstr "V Àlïgn Ⱡ'σяєм ιρѕυм #"
@@ -2960,7 +2670,6 @@ msgstr "V Àlïgn Ⱡ'σяєм ιρѕυм #"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Vertical space"
 msgstr "Vértïçäl späçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
@@ -2969,7 +2678,6 @@ msgstr "Vértïçäl späçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 #: openedx/features/course_bookmarks/static/course_bookmarks/templates/bookmarks-list.underscore
 #: openedx/features/course_search/static/course_search/templates/course_search_item.underscore
@@ -2980,7 +2688,6 @@ msgstr "Vïéw Ⱡ'σяєм ι#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Visual aids"
 msgstr "Vïsüäl äïds Ⱡ'σяєм ιρѕυм ∂σłσя #"
@@ -2988,7 +2695,6 @@ msgstr "Vïsüäl äïds Ⱡ'σяєм ιρѕυм ∂σłσя #"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Whole words"
 msgstr "Whölé wörds Ⱡ'σяєм ιρѕυм ∂σłσя #"
@@ -2996,7 +2702,6 @@ msgstr "Whölé wörds Ⱡ'σяєм ιρѕυм ∂σłσя #"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Width"
 msgstr "Wïdth Ⱡ'σяєм ιρѕ#"
@@ -3004,7 +2709,6 @@ msgstr "Wïdth Ⱡ'σяєм ιρѕ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Words: {0}"
 msgstr "Wörds: {0} Ⱡ'σяєм ιρѕυм ∂σłσ#"
@@ -3012,7 +2716,6 @@ msgstr "Wörds: {0} Ⱡ'σяєм ιρѕυм ∂σłσ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "You have unsaved changes are you sure you want to navigate away?"
 msgstr ""
@@ -3022,7 +2725,6 @@ msgstr ""
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid ""
 "Your browser doesn't support direct access to the clipboard. Please use the "
@@ -3034,13 +2736,11 @@ msgstr ""
 #. Translators: this is a toolbar button tooltip from the raw HTML editor
 #. displayed in the browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid "Insert/Edit Image"
 msgstr "Ìnsért/Édït Ìmägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: common/lib/xmodule/xmodule/js/src/lti/lti.js
-#: common/static/bundles/LTIModule.c88611963917ecc1fde3.js
 #: common/static/bundles/LTIModule.js
 msgid ""
 "Click OK to have your username and e-mail address sent to a 3rd party application.\n"
@@ -3052,7 +2752,6 @@ msgstr ""
 "Çlïçk Çänçél tö rétürn tö thïs pägé wïthöüt séndïng ýöür ïnförmätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłι#"
 
 #: common/lib/xmodule/xmodule/js/src/lti/lti.js
-#: common/static/bundles/LTIModule.c88611963917ecc1fde3.js
 #: common/static/bundles/LTIModule.js
 msgid ""
 "Click OK to have your username sent to a 3rd party application.\n"
@@ -3064,7 +2763,6 @@ msgstr ""
 "Çlïçk Çänçél tö rétürn tö thïs pägé wïthöüt séndïng ýöür ïnförmätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт łαвσяυм#"
 
 #: common/lib/xmodule/xmodule/js/src/lti/lti.js
-#: common/static/bundles/LTIModule.c88611963917ecc1fde3.js
 #: common/static/bundles/LTIModule.js
 msgid ""
 "Click OK to have your e-mail address sent to a 3rd party application.\n"
@@ -3076,31 +2774,26 @@ msgstr ""
 "Çlïçk Çänçél tö rétürn tö thïs pägé wïthöüt séndïng ýöür ïnförmätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт ł#"
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
-#: common/static/bundles/CapaDescriptor.c3081e47618a71333eb3.js
 #: common/static/bundles/CapaDescriptor.js
 msgid "incorrect"
 msgstr "ïnçörréçt Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
-#: common/static/bundles/CapaDescriptor.c3081e47618a71333eb3.js
 #: common/static/bundles/CapaDescriptor.js
 msgid "correct"
 msgstr "çörréçt Ⱡ'σяєм ιρѕυм #"
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
-#: common/static/bundles/CapaDescriptor.c3081e47618a71333eb3.js
 #: common/static/bundles/CapaDescriptor.js
 msgid "answer"
 msgstr "änswér Ⱡ'σяєм ιρѕυ#"
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
-#: common/static/bundles/CapaDescriptor.c3081e47618a71333eb3.js
 #: common/static/bundles/CapaDescriptor.js
 msgid "Short explanation"
 msgstr "Shört éxplänätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
-#: common/static/bundles/CapaDescriptor.c3081e47618a71333eb3.js
 #: common/static/bundles/CapaDescriptor.js
 msgid ""
 "If you use the Advanced Editor, this problem will be converted to XML and you will not be able to return to the Simple Editor Interface.\n"
@@ -3112,13 +2805,11 @@ msgstr ""
 "Pröçééd tö thé Àdvänçéd Édïtör änd çönvért thïs prößlém tö XML? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢α#"
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
-#: common/static/bundles/CapaDescriptor.c3081e47618a71333eb3.js
 #: common/static/bundles/CapaDescriptor.js
 msgid "Explanation"
 msgstr "Éxplänätïön Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 msgid ""
 "Sequence error! Cannot navigate to %(tab_name)s in the current "
@@ -3129,7 +2820,6 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
 #: common/static/bundles/VerticalStudentView.js
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
 #: common/static/bundles/commons.js
 #: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmark_button.js
 msgid "Bookmarked"
@@ -3138,116 +2828,99 @@ msgstr "Böökmärkéd Ⱡ'σяєм ιρѕυм ∂σłσ#"
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/09_play_pause_control.js
 #: common/lib/xmodule/xmodule/js/src/video/09_play_skip_control.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid "Play"
 msgstr "Pläý Ⱡ'σяєм ι#"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/09_play_pause_control.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid "Pause"
 msgstr "Päüsé Ⱡ'σяєм ιρѕ#"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid "Mute"
 msgstr "Müté Ⱡ'σяєм ι#"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid "Unmute"
 msgstr "Ûnmüté Ⱡ'σяєм ιρѕυ#"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/04_video_full_screen.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid "Exit full browser"
 msgstr "Éxït füll ßröwsér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/04_video_full_screen.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid "Fill browser"
 msgstr "Fïll ßröwsér Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid "Speed"
 msgstr "Spééd Ⱡ'σяєм ιρѕ#"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/08_video_auto_advance_control.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid "Auto-advance"
 msgstr "Àütö-ädvänçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid "Volume"
 msgstr "Völümé Ⱡ'σяєм ιρѕυ#"
 
 #. Translators: Volume level equals 0%.
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid "Muted"
 msgstr "Mütéd Ⱡ'σяєм ιρѕ#"
 
 #. Translators: Volume level in range ]0,20]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid "Very low"
 msgstr "Vérý löw Ⱡ'σяєм ιρѕυм ∂#"
 
 #. Translators: Volume level in range ]20,40]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid "Low"
 msgstr "Löw Ⱡ'σяєм#"
 
 #. Translators: Volume level in range ]40,60]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid "Average"
 msgstr "Àvérägé Ⱡ'σяєм ιρѕυм #"
 
 #. Translators: Volume level in range ]60,80]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid "Loud"
 msgstr "Löüd Ⱡ'σяєм ι#"
 
 #. Translators: Volume level in range ]80,99]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid "Very loud"
 msgstr "Vérý löüd Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #. Translators: Volume level equals 100%.
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid "Maximum"
 msgstr "Mäxïmüm Ⱡ'σяєм ιρѕυм #"
 
 #: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid "This browser cannot play .mp4, .ogg, or .webm files."
 msgstr ""
@@ -3255,7 +2928,6 @@ msgstr ""
 "αмєт, ¢σηѕє¢тєтυя α#"
 
 #: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid "Try using a different browser, such as Google Chrome."
 msgstr ""
@@ -3263,25 +2935,21 @@ msgstr ""
 " αмєт, ¢σηѕє¢тєтυя α#"
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid "High Definition"
 msgstr "Hïgh Défïnïtïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid "off"
 msgstr "öff Ⱡ'σяєм#"
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid "on"
 msgstr "ön Ⱡ'σя#"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid "Video position. Press space to toggle playback"
 msgstr ""
@@ -3289,19 +2957,16 @@ msgstr ""
 "¢σηѕє¢тєтυя α#"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid "Video ended"
 msgstr "Vïdéö éndéd Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid "Video position"
 msgstr "Vïdéö pösïtïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid "%(value)s hour"
 msgid_plural "%(value)s hours"
@@ -3309,7 +2974,6 @@ msgstr[0] "%(value)s höür Ⱡ'σяєм ιρѕυм ∂#"
 msgstr[1] "%(value)s höürs Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid "%(value)s minute"
 msgid_plural "%(value)s minutes"
@@ -3317,7 +2981,6 @@ msgstr[0] "%(value)s mïnüté Ⱡ'σяєм ιρѕυм ∂σłσ#"
 msgstr[1] "%(value)s mïnütés Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid "%(value)s second"
 msgid_plural "%(value)s seconds"
@@ -3325,7 +2988,6 @@ msgstr[0] "%(value)s séçönd Ⱡ'σяєм ιρѕυм ∂σłσ#"
 msgstr[1] "%(value)s séçönds Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid ""
 "Click on this button to mute or unmute this video or press UP or DOWN "
@@ -3335,13 +2997,11 @@ msgstr ""
 "ßüttöns tö ïnçréäsé ör déçréäsé völümé lévél. Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid "Adjust video volume"
 msgstr "Àdjüst vïdéö völümé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid ""
 "Press UP to enter the speed menu then use the UP and DOWN arrow keys to "
@@ -3358,43 +3018,36 @@ msgstr ""
 "¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт#"
 
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid "Adjust video speed"
 msgstr "Àdjüst vïdéö spééd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid "Video speed: "
 msgstr "Vïdéö spééd:  Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_play_skip_control.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid "Skip"
 msgstr "Skïp Ⱡ'σяєм ι#"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_poster.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid "Play video"
 msgstr "Pläý vïdéö Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_skip_control.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid "Do not show again"
 msgstr "Dö nöt shöw ägäïn Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid "Open language menu"
 msgstr "Öpén längüägé ménü Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid "Transcript will be displayed when you start playing the video."
 msgstr ""
@@ -3402,7 +3055,6 @@ msgstr ""
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid ""
 "Activating a link in this group will skip to the corresponding point in the "
@@ -3412,13 +3064,11 @@ msgstr ""
 "vïdéö. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid "Video transcript"
 msgstr "Vïdéö tränsçrïpt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid "Start of transcript. Skip to the end."
 msgstr ""
@@ -3426,7 +3076,6 @@ msgstr ""
 "¢σηѕє¢тєтυ#"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid "End of transcript. Skip to the start."
 msgstr ""
@@ -3434,7 +3083,6 @@ msgstr ""
 "¢σηѕє¢тєтυ#"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid ""
 "Press the UP arrow key to enter the language menu then use UP and DOWN arrow"
@@ -3451,13 +3099,11 @@ msgstr ""
 "¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυη#"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid "Hide closed captions"
 msgstr "Hïdé çlöséd çäptïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid "(Caption will be displayed when you start playing the video.)"
 msgstr ""
@@ -3465,24 +3111,20 @@ msgstr ""
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid "Turn on closed captioning"
 msgstr "Türn ön çlöséd çäptïönïng Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid "Turn on transcripts"
 msgstr "Türn ön tränsçrïpts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
-#: common/static/bundles/VideoModule.5183b0736cd74b06b1bb.js
 #: common/static/bundles/VideoModule.js
 msgid "Turn off transcripts"
 msgstr "Türn öff tränsçrïpts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
-#: common/static/bundles/CourseGoals.f1cec630cc6bcf51b120.js
 #: common/static/bundles/CourseGoals.js
 #: openedx/features/course_experience/static/course_experience/js/CourseGoals.js
 msgid "Thank you for setting your course goal to {goal}!"
@@ -3490,7 +3132,6 @@ msgstr ""
 "Thänk ýöü för séttïng ýöür çöürsé göäl tö {goal}! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α#"
 
-#: common/static/bundles/CourseGoals.f1cec630cc6bcf51b120.js
 #: common/static/bundles/CourseGoals.js
 msgid ""
 "There was an error in setting your goal, please reload the page and try "
@@ -3499,7 +3140,6 @@ msgstr ""
 "Théré wäs än érrör ïn séttïng ýöür göäl, pléäsé rélöäd thé pägé änd trý "
 "ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
-#: common/static/bundles/CourseHome.8f79f1130ddecdfd2846.js
 #: common/static/bundles/CourseHome.js
 #: openedx/features/course_experience/static/course_experience/js/CourseHome.js
 msgid "You have successfully updated your goal."
@@ -3507,7 +3147,6 @@ msgstr ""
 "Ýöü hävé süççéssfüllý üpdätéd ýöür göäl. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
 
-#: common/static/bundles/CourseHome.8f79f1130ddecdfd2846.js
 #: common/static/bundles/CourseHome.js
 #: openedx/features/course_experience/static/course_experience/js/CourseHome.js
 msgid "There was an error updating your goal."
@@ -3515,79 +3154,61 @@ msgstr ""
 "Théré wäs än érrör üpdätïng ýöür göäl. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
 
-#: common/static/bundles/CourseOutline.47803059a182e233c155.js
 #: common/static/bundles/CourseOutline.js
 #: openedx/features/course_experience/static/course_experience/js/CourseOutline.js
 #: lms/templates/ccx/schedule.underscore
 msgid "Expand All"
 msgstr "Éxpänd Àll Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
-#: common/static/bundles/CourseOutline.47803059a182e233c155.js
 #: common/static/bundles/CourseOutline.js
 #: openedx/features/course_experience/static/course_experience/js/CourseOutline.js
 #: lms/templates/ccx/schedule.underscore
 msgid "Collapse All"
 msgstr "Çölläpsé Àll Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
-#: common/static/bundles/EntitlementFactory.778ec6e278441047fea5.js
 #: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.4a236e59efd3621724ee.js
 #: common/static/bundles/ProgramDetailsFactory.js
 #: lms/static/js/learner_dashboard/models/course_card_model.js
 msgid "(Self-paced) Starts {start}"
 msgstr "(Sélf-päçéd) Stärts {start} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
-#: common/static/bundles/EntitlementFactory.778ec6e278441047fea5.js
 #: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.4a236e59efd3621724ee.js
 #: common/static/bundles/ProgramDetailsFactory.js
 #: lms/static/js/learner_dashboard/models/course_card_model.js
 msgid "(Self-paced) Started {start}"
 msgstr "(Sélf-päçéd) Stärtéd {start} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
-#: common/static/bundles/EntitlementFactory.778ec6e278441047fea5.js
 #: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.4a236e59efd3621724ee.js
 #: common/static/bundles/ProgramDetailsFactory.js
 #: lms/static/js/learner_dashboard/models/course_card_model.js
 msgid "(Self-paced) Ends {end}"
 msgstr "(Sélf-päçéd) Énds {end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
-#: common/static/bundles/EntitlementFactory.778ec6e278441047fea5.js
 #: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.4a236e59efd3621724ee.js
 #: common/static/bundles/ProgramDetailsFactory.js
 #: lms/static/js/learner_dashboard/models/course_card_model.js
 msgid "(Self-paced) Ended {end}"
 msgstr "(Sélf-päçéd) Éndéd {end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
-#: common/static/bundles/EntitlementFactory.778ec6e278441047fea5.js
 #: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.4a236e59efd3621724ee.js
 #: common/static/bundles/ProgramDetailsFactory.js
 #: lms/static/js/learner_dashboard/models/course_card_model.js
 msgid "Starts {start}"
 msgstr "Stärts {start} Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
-#: common/static/bundles/EntitlementFactory.778ec6e278441047fea5.js
 #: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.4a236e59efd3621724ee.js
 #: common/static/bundles/ProgramDetailsFactory.js
 #: lms/static/js/learner_dashboard/models/course_card_model.js
 msgid "Started {start}"
 msgstr "Stärtéd {start} Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
-#: common/static/bundles/EntitlementFactory.778ec6e278441047fea5.js
 #: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.4a236e59efd3621724ee.js
 #: common/static/bundles/ProgramDetailsFactory.js
 #: lms/static/js/learner_dashboard/models/course_card_model.js
 msgid "Ends {end}"
 msgstr "Énds {end} Ⱡ'σяєм ιρѕυм ∂#"
 
-#: common/static/bundles/EntitlementFactory.778ec6e278441047fea5.js
 #: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.4a236e59efd3621724ee.js
 #: common/static/bundles/ProgramDetailsFactory.js
 #: lms/static/js/learner_dashboard/views/course_entitlement_view.js
 msgid "You must select a session to access the course."
@@ -3595,9 +3216,7 @@ msgstr ""
 "Ýöü müst séléçt ä séssïön tö äççéss thé çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
 " ¢σηѕє¢тєтυя α#"
 
-#: common/static/bundles/EntitlementFactory.778ec6e278441047fea5.js
 #: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.4a236e59efd3621724ee.js
 #: common/static/bundles/ProgramDetailsFactory.js
 #: lms/static/js/learner_dashboard/views/course_entitlement_view.js
 msgid "There was an error. Please reload the page and try again."
@@ -3605,45 +3224,27 @@ msgstr ""
 "Théré wäs än érrör. Pléäsé rélöäd thé pägé änd trý ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя"
 " ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
-#: common/static/bundles/EntitlementFactory.778ec6e278441047fea5.js
 #: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.4a236e59efd3621724ee.js
 #: common/static/bundles/ProgramDetailsFactory.js
 #: lms/static/js/learner_dashboard/views/course_entitlement_view.js
 #: lms/templates/learner_dashboard/course_entitlement.underscore
 msgid "Change Session"
 msgstr "Çhängé Séssïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
-#: common/static/bundles/EntitlementFactory.778ec6e278441047fea5.js
 #: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.4a236e59efd3621724ee.js
 #: common/static/bundles/ProgramDetailsFactory.js
 #: lms/static/js/learner_dashboard/views/course_entitlement_view.js
 #: lms/templates/learner_dashboard/course_entitlement.underscore
 msgid "Select Session"
 msgstr "Séléçt Séssïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
-#: common/static/bundles/EntitlementFactory.778ec6e278441047fea5.js
 #: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.4a236e59efd3621724ee.js
 #: common/static/bundles/ProgramDetailsFactory.js
 #: lms/static/js/learner_dashboard/views/course_entitlement_view.js
 msgid "Leave Current Session"
 msgstr "Léävé Çürrént Séssïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
-#: common/static/bundles/EntitlementFactory.778ec6e278441047fea5.js
 #: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.4a236e59efd3621724ee.js
-#: common/static/bundles/ProgramDetailsFactory.js
-#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
-msgid "Are you sure you want to change to a different session?"
-msgstr ""
-"Àré ýöü süré ýöü wänt tö çhängé tö ä dïfférént séssïön? Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: common/static/bundles/EntitlementFactory.778ec6e278441047fea5.js
-#: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.4a236e59efd3621724ee.js
 #: common/static/bundles/ProgramDetailsFactory.js
 #: lms/static/js/learner_dashboard/views/course_entitlement_view.js
 msgid "Are you sure you want to select this session?"
@@ -3651,9 +3252,15 @@ msgstr ""
 "Àré ýöü süré ýöü wänt tö séléçt thïs séssïön? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
 
-#: common/static/bundles/EntitlementFactory.778ec6e278441047fea5.js
 #: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.4a236e59efd3621724ee.js
+#: common/static/bundles/ProgramDetailsFactory.js
+#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
+msgid "Are you sure you want to change to a different session?"
+msgstr ""
+"Àré ýöü süré ýöü wänt tö çhängé tö ä dïfférént séssïön? Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: common/static/bundles/EntitlementFactory.js
 #: common/static/bundles/ProgramDetailsFactory.js
 #: lms/static/js/learner_dashboard/views/course_entitlement_view.js
 msgid "Any course progress or grades from your current session will be lost."
@@ -3661,9 +3268,7 @@ msgstr ""
 "Àný çöürsé prögréss ör grädés fröm ýöür çürrént séssïön wïll ßé löst. Ⱡ'σяєм"
 " ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
-#: common/static/bundles/EntitlementFactory.778ec6e278441047fea5.js
 #: common/static/bundles/EntitlementFactory.js
-#: common/static/bundles/ProgramDetailsFactory.4a236e59efd3621724ee.js
 #: common/static/bundles/ProgramDetailsFactory.js
 #: lms/static/js/learner_dashboard/views/course_entitlement_view.js
 msgid "Are you sure that you want to leave this session?"
@@ -3671,7 +3276,6 @@ msgstr ""
 "Àré ýöü süré thät ýöü wänt tö léävé thïs séssïön? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α#"
 
-#: common/static/bundles/EntitlementUnenrollmentFactory.8436ccff2ed0b3506bcc.js
 #: common/static/bundles/EntitlementUnenrollmentFactory.js
 #: lms/static/js/learner_dashboard/views/entitlement_unenrollment_view.js
 msgid ""
@@ -3680,7 +3284,6 @@ msgstr ""
 "Ýöür ünénröllmént réqüést çöüld nöt ßé pröçésséd. Pléäsé trý ägäïn lätér. "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
 
-#: common/static/bundles/EntitlementUnenrollmentFactory.8436ccff2ed0b3506bcc.js
 #: common/static/bundles/EntitlementUnenrollmentFactory.js
 #: lms/static/js/learner_dashboard/views/entitlement_unenrollment_view.js
 msgid ""
@@ -3690,7 +3293,6 @@ msgstr ""
 "Àré ýöü süré ýöü wänt tö ünénröll fröm {courseName} ({courseNumber})? Ýöü "
 "wïll ßé réfündéd thé ämöünt ýöü päïd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
-#: common/static/bundles/PasswordResetConfirmation.3adc3c8f55e0d75ed252.js
 #: common/static/bundles/PasswordResetConfirmation.js
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
 msgid "Enter and confirm your new password."
@@ -3698,100 +3300,84 @@ msgstr ""
 "Éntér änd çönfïrm ýöür néw pässwörd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυ#"
 
-#: common/static/bundles/PasswordResetConfirmation.3adc3c8f55e0d75ed252.js
 #: common/static/bundles/PasswordResetConfirmation.js
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
 msgid "New Password"
 msgstr "Néw Pässwörd Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
-#: common/static/bundles/PasswordResetConfirmation.3adc3c8f55e0d75ed252.js
 #: common/static/bundles/PasswordResetConfirmation.js
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
 msgid "Confirm Password"
 msgstr "Çönfïrm Pässwörd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
-#: common/static/bundles/PasswordResetConfirmation.3adc3c8f55e0d75ed252.js
 #: common/static/bundles/PasswordResetConfirmation.js
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
 msgid "Passwords do not match."
 msgstr "Pässwörds dö nöt mätçh. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
-#: common/static/bundles/PasswordResetConfirmation.3adc3c8f55e0d75ed252.js
 #: common/static/bundles/PasswordResetConfirmation.js
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
 msgid "Reset My Password"
 msgstr "Rését Mý Pässwörd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
-#: common/static/bundles/PasswordResetConfirmation.3adc3c8f55e0d75ed252.js
 #: common/static/bundles/PasswordResetConfirmation.js
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Reset Your Password"
 msgstr "Rését Ýöür Pässwörd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
-#: common/static/bundles/PasswordResetConfirmation.3adc3c8f55e0d75ed252.js
 #: common/static/bundles/PasswordResetConfirmation.js
 #: lms/static/js/student_account/components/PasswordResetInput.jsx
 msgid "Error: "
 msgstr "Érrör:  Ⱡ'σяєм ιρѕυм #"
 
-#: common/static/bundles/ProblemBrowser.f8ad1140f56bf8994b42.js
 #: common/static/bundles/ProblemBrowser.js
 #: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
 #: cms/templates/js/move-xblock-list.underscore
 msgid "View child items"
 msgstr "Vïéw çhïld ïtéms Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
-#: common/static/bundles/ProblemBrowser.f8ad1140f56bf8994b42.js
 #: common/static/bundles/ProblemBrowser.js
 #: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
 msgid "Navigate up"
 msgstr "Nävïgäté üp Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
-#: common/static/bundles/ProblemBrowser.f8ad1140f56bf8994b42.js
 #: common/static/bundles/ProblemBrowser.js
 #: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
 msgid "Browsing"
 msgstr "Bröwsïng Ⱡ'σяєм ιρѕυм ∂#"
 
-#: common/static/bundles/ProblemBrowser.f8ad1140f56bf8994b42.js
 #: common/static/bundles/ProblemBrowser.js
 #: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
 msgid "Select"
 msgstr "Séléçt Ⱡ'σяєм ιρѕυ#"
 
-#: common/static/bundles/ProblemBrowser.f8ad1140f56bf8994b42.js
 #: common/static/bundles/ProblemBrowser.js
 #: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/Main/Main.jsx
 msgid "Select a section or problem"
 msgstr "Séléçt ä séçtïön ör prößlém Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
-#: common/static/bundles/ProgramDetailsFactory.4a236e59efd3621724ee.js
 #: common/static/bundles/ProgramDetailsFactory.js
 #: lms/static/js/learner_dashboard/views/program_details_sidebar_view.js
 msgid "{type} Progress"
 msgstr "{type} Prögréss Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
-#: common/static/bundles/ProgramDetailsFactory.4a236e59efd3621724ee.js
 #: common/static/bundles/ProgramDetailsFactory.js
 #: lms/static/js/learner_dashboard/views/program_details_sidebar_view.js
 msgid "Earned Certificates"
 msgstr "Éärnéd Çértïfïçätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
-#: common/static/bundles/ProgramDetailsFactory.4a236e59efd3621724ee.js
 #: common/static/bundles/ProgramDetailsFactory.js
 #: lms/static/js/learner_dashboard/views/program_details_view.js
 msgid "Enrolled"
 msgstr "Énrölléd Ⱡ'σяєм ιρѕυм ∂#"
 
-#: common/static/bundles/SingleSupportForm.20d18d7b4ee9ea7ec1ae.js
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/errors_list.jsx
 msgid "Please fix the following errors:"
 msgstr ""
 "Pléäsé fïx thé föllöwïng érrörs: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
-#: common/static/bundles/SingleSupportForm.20d18d7b4ee9ea7ec1ae.js
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/file_upload.jsx
 msgid "Files that you upload must be smaller than 5MB in size."
@@ -3799,7 +3385,6 @@ msgstr ""
 "Fïlés thät ýöü üplöäd müst ßé smällér thän 5MB ïn sïzé. Ⱡ'σяєм ιρѕυм ∂σłσя "
 "ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
-#: common/static/bundles/SingleSupportForm.20d18d7b4ee9ea7ec1ae.js
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/file_upload.jsx
 msgid ""
@@ -3809,7 +3394,6 @@ msgstr ""
 "Fïlés thät ýöü üplöäd müst ßé PDFs ör ïmägé fïlés ïn .gïf, .jpg, .jpég, ör "
 ".png förmät. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
-#: common/static/bundles/SingleSupportForm.20d18d7b4ee9ea7ec1ae.js
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/file_upload.jsx
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
@@ -3818,57 +3402,48 @@ msgstr ""
 "Söméthïng wént wröng. Pléäsé trý ägäïn lätér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
 
-#: common/static/bundles/SingleSupportForm.20d18d7b4ee9ea7ec1ae.js
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/file_upload.jsx
 msgid "Add Attachment"
 msgstr "Àdd Àttäçhmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
-#: common/static/bundles/SingleSupportForm.20d18d7b4ee9ea7ec1ae.js
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/file_upload.jsx
 msgid "(Optional)"
 msgstr "(Öptïönäl) Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
-#: common/static/bundles/SingleSupportForm.20d18d7b4ee9ea7ec1ae.js
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/file_upload.jsx
 msgid "Remove file"
 msgstr "Rémövé fïlé Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
-#: common/static/bundles/SingleSupportForm.20d18d7b4ee9ea7ec1ae.js
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Course Name"
 msgstr "Çöürsé Nämé Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
-#: common/static/bundles/SingleSupportForm.20d18d7b4ee9ea7ec1ae.js
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Not specific to a course"
 msgstr "Nöt spéçïfïç tö ä çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
-#: common/static/bundles/SingleSupportForm.20d18d7b4ee9ea7ec1ae.js
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "What can we help you with, {username}?"
 msgstr ""
 "Whät çän wé hélp ýöü wïth, {username}? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
-#: common/static/bundles/SingleSupportForm.20d18d7b4ee9ea7ec1ae.js
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Subject"
 msgstr "Süßjéçt Ⱡ'σяєм ιρѕυм #"
 
-#: common/static/bundles/SingleSupportForm.20d18d7b4ee9ea7ec1ae.js
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Details"
 msgstr "Détäïls Ⱡ'σяєм ιρѕυм #"
 
-#: common/static/bundles/SingleSupportForm.20d18d7b4ee9ea7ec1ae.js
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "The more you tell us, the more quickly and helpfully we can respond!"
@@ -3876,7 +3451,6 @@ msgstr ""
 "Thé möré ýöü téll üs, thé möré qüïçklý änd hélpfüllý wé çän réspönd! Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
-#: common/static/bundles/SingleSupportForm.20d18d7b4ee9ea7ec1ae.js
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 #: common/static/common/templates/discussion/new-post.underscore
@@ -3886,7 +3460,6 @@ msgstr ""
 msgid "Submit"
 msgstr "Süßmït Ⱡ'σяєм ιρѕυ#"
 
-#: common/static/bundles/SingleSupportForm.20d18d7b4ee9ea7ec1ae.js
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid "Sign in to {platform} so we can help you better."
@@ -3894,19 +3467,16 @@ msgstr ""
 "Sïgn ïn tö {platform} sö wé çän hélp ýöü ßéttér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя #"
 
-#: common/static/bundles/SingleSupportForm.20d18d7b4ee9ea7ec1ae.js
 #: common/static/bundles/SingleSupportForm.js
 #: lms/templates/student_account/hinted_login.underscore
 #: lms/templates/student_account/login.underscore
 msgid "Sign in"
 msgstr "Sïgn ïn Ⱡ'σяєм ιρѕυм #"
 
-#: common/static/bundles/SingleSupportForm.20d18d7b4ee9ea7ec1ae.js
 #: common/static/bundles/SingleSupportForm.js
 msgid "Create an {platform} account"
 msgstr "Çréäté än {platform} äççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
-#: common/static/bundles/SingleSupportForm.20d18d7b4ee9ea7ec1ae.js
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid ""
@@ -3915,7 +3485,6 @@ msgstr ""
 "Ìf ýöü äré ünäßlé tö äççéss ýöür äççöünt çöntäçt üs vïä émäïl üsïng {email}."
 " Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
 
-#: common/static/bundles/SingleSupportForm.20d18d7b4ee9ea7ec1ae.js
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid ""
@@ -3925,7 +3494,6 @@ msgstr ""
 "Séléçt ä çöürsé ör séléçt \"Nöt spéçïfïç tö ä çöürsé\" för ýöür süppört "
 "réqüést. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
-#: common/static/bundles/SingleSupportForm.20d18d7b4ee9ea7ec1ae.js
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Enter a subject for your support request."
@@ -3933,7 +3501,6 @@ msgstr ""
 "Éntér ä süßjéçt för ýöür süppört réqüést. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
 
-#: common/static/bundles/SingleSupportForm.20d18d7b4ee9ea7ec1ae.js
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Enter some details for your support request."
@@ -3941,14 +3508,12 @@ msgstr ""
 "Éntér sömé détäïls för ýöür süppört réqüést. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
 
-#: common/static/bundles/SingleSupportForm.20d18d7b4ee9ea7ec1ae.js
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 #: lms/djangoapps/support/static/support/jsx/success.jsx
 msgid "Contact Us"
 msgstr "Çöntäçt Ûs Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
-#: common/static/bundles/SingleSupportForm.20d18d7b4ee9ea7ec1ae.js
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Find answers to the top questions asked by learners."
@@ -3956,25 +3521,21 @@ msgstr ""
 "Fïnd änswérs tö thé töp qüéstïöns äskéd ßý léärnérs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α#"
 
-#: common/static/bundles/SingleSupportForm.20d18d7b4ee9ea7ec1ae.js
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Search the {platform} Help Center"
 msgstr "Séärçh thé {platform} Hélp Çéntér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
-#: common/static/bundles/SingleSupportForm.20d18d7b4ee9ea7ec1ae.js
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/success.jsx
 msgid "Go to my Dashboard"
 msgstr "Gö tö mý Däshßöärd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
-#: common/static/bundles/SingleSupportForm.20d18d7b4ee9ea7ec1ae.js
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/success.jsx
 msgid "Go to {platform} Home"
 msgstr "Gö tö {platform} Hömé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
-#: common/static/bundles/SingleSupportForm.20d18d7b4ee9ea7ec1ae.js
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/success.jsx
 msgid ""
@@ -3983,15 +3544,12 @@ msgstr ""
 "Thänk ýöü för süßmïttïng ä réqüést! Wé wïll çöntäçt ýöü wïthïn 24 höürs. "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
 
-#: common/static/bundles/SingleSupportForm.20d18d7b4ee9ea7ec1ae.js
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/upload_progress.jsx
 msgid "Cancel upload"
 msgstr "Çänçél üplöäd Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
-#: common/static/bundles/StudentAccountDeletion.710a142b978b35026212.js
 #: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.0acc6efddefe20fd916d.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
@@ -4010,9 +3568,7 @@ msgstr ""
 " qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
 "¢σηѕєqυαт. ∂#"
 
-#: common/static/bundles/StudentAccountDeletion.710a142b978b35026212.js
 #: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.0acc6efddefe20fd916d.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
@@ -4022,9 +3578,7 @@ msgstr ""
 "Béföré pröçéédïng, pléäsé {htmlStart}ünlïnk äll söçïäl médïä "
 "äççöünts{htmlEnd}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
-#: common/static/bundles/StudentAccountDeletion.710a142b978b35026212.js
 #: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.0acc6efddefe20fd916d.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid "Before proceeding, please {htmlStart}activate your account{htmlEnd}."
@@ -4032,9 +3586,7 @@ msgstr ""
 "Béföré pröçéédïng, pléäsé {htmlStart}äçtïväté ýöür äççöünt{htmlEnd}. Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
-#: common/static/bundles/StudentAccountDeletion.710a142b978b35026212.js
 #: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.0acc6efddefe20fd916d.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
@@ -4043,9 +3595,7 @@ msgstr ""
 "{htmlStart}Wänt tö çhängé ýöür émäïl, nämé, ör pässwörd ïnstéäd?{htmlEnd} "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
-#: common/static/bundles/StudentAccountDeletion.710a142b978b35026212.js
 #: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.0acc6efddefe20fd916d.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
@@ -4064,17 +3614,13 @@ msgstr ""
 " νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
 "¢υρι∂αт#"
 
-#: common/static/bundles/StudentAccountDeletion.710a142b978b35026212.js
 #: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.0acc6efddefe20fd916d.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid "We’re sorry to see you go!"
 msgstr "Wé’ré sörrý tö séé ýöü gö! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
-#: common/static/bundles/StudentAccountDeletion.710a142b978b35026212.js
 #: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.0acc6efddefe20fd916d.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
@@ -4091,9 +3637,7 @@ msgstr ""
 " νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
 "¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂#"
 
-#: common/static/bundles/StudentAccountDeletion.710a142b978b35026212.js
 #: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.0acc6efddefe20fd916d.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
@@ -4111,42 +3655,32 @@ msgstr ""
 "ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм "
 "α∂ мιηιм νєη#"
 
-#: common/static/bundles/StudentAccountDeletion.710a142b978b35026212.js
 #: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.0acc6efddefe20fd916d.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Delete My Account"
 msgstr "Délété Mý Àççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
-#: common/static/bundles/StudentAccountDeletion.710a142b978b35026212.js
 #: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.0acc6efddefe20fd916d.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "Password is incorrect"
 msgstr "Pässwörd ïs ïnçörréçt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
-#: common/static/bundles/StudentAccountDeletion.710a142b978b35026212.js
 #: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.0acc6efddefe20fd916d.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "Unable to delete account"
 msgstr "Ûnäßlé tö délété äççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
-#: common/static/bundles/StudentAccountDeletion.710a142b978b35026212.js
 #: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.0acc6efddefe20fd916d.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "Please re-enter your password."
 msgstr "Pléäsé ré-éntér ýöür pässwörd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
-#: common/static/bundles/StudentAccountDeletion.710a142b978b35026212.js
 #: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.0acc6efddefe20fd916d.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
@@ -4156,17 +3690,13 @@ msgstr ""
 "Sörrý, théré wäs än érrör trýïng tö pröçéss ýöür réqüést. Pléäsé trý ägäïn "
 "lätér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
-#: common/static/bundles/StudentAccountDeletion.710a142b978b35026212.js
 #: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.0acc6efddefe20fd916d.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "A Password is required"
 msgstr "À Pässwörd ïs réqüïréd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
-#: common/static/bundles/StudentAccountDeletion.710a142b978b35026212.js
 #: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.0acc6efddefe20fd916d.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
@@ -4183,9 +3713,7 @@ msgstr ""
 "∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα"
 " ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρ#"
 
-#: common/static/bundles/StudentAccountDeletion.710a142b978b35026212.js
 #: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.0acc6efddefe20fd916d.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
@@ -4203,9 +3731,7 @@ msgstr ""
 " єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт"
 " є#"
 
-#: common/static/bundles/StudentAccountDeletion.710a142b978b35026212.js
 #: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.0acc6efddefe20fd916d.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
@@ -4215,17 +3741,13 @@ msgstr ""
 "Ìf ýöü stïll wïsh tö çöntïnüé änd délété ýöür äççöünt, pléäsé éntér ýöür "
 "äççöünt pässwörd: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
-#: common/static/bundles/StudentAccountDeletion.710a142b978b35026212.js
 #: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.0acc6efddefe20fd916d.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "Yes, Delete"
 msgstr "Ýés, Délété Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
-#: common/static/bundles/StudentAccountDeletion.710a142b978b35026212.js
 #: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.0acc6efddefe20fd916d.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "We're sorry to see you go! Your account will be deleted shortly."
@@ -4233,9 +3755,7 @@ msgstr ""
 "Wé'ré sörrý tö séé ýöü gö! Ýöür äççöünt wïll ßé délétéd shörtlý. Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
-#: common/static/bundles/StudentAccountDeletion.710a142b978b35026212.js
 #: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.0acc6efddefe20fd916d.js
 #: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
@@ -4252,7 +3772,6 @@ msgstr ""
 "αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ "
 "ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт#"
 
-#: common/static/bundles/UnenrollmentFactory.e95d8e9e8ad3632637ea.js
 #: common/static/bundles/UnenrollmentFactory.js
 #: lms/static/js/dashboard/legacy.js
 #: lms/static/js/learner_dashboard/views/unenroll_view.js
@@ -4276,38 +3795,6 @@ msgstr ""
 #: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmark_button.js
 msgid "Bookmark this page"
 msgstr "Böökmärk thïs pägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
-
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
-msgid "vardef"
-msgstr "värdéf Ⱡ'σяєм ιρѕυ#"
-
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
-msgid "form"
-msgstr "förm Ⱡ'σяєм ι#"
-
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
-msgid "}"
-msgstr "} Ⱡ#"
-
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
-msgid "stat"
-msgstr "stät Ⱡ'σяєм ι#"
-
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
-msgid ")"
-msgstr ") Ⱡ#"
-
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
-msgid "]"
-msgstr "] Ⱡ#"
-
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
-msgid "*"
-msgstr "* Ⱡ#"
-
-#: common/static/bundles/commons.571d12f73a9ae743de5f.js
-msgid "down"
-msgstr "döwn Ⱡ'σяєм ι#"
 
 #: common/static/bundles/commons.js
 #: common/static/common/js/components/utils/view_utils.js
