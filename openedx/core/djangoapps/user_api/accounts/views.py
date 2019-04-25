@@ -165,6 +165,9 @@ class AccountViewSet(ViewSet):
             * email: Email address for the user. New email addresses must be confirmed
               via a confirmation email, so GET does not reflect the change until
               the address has been confirmed.
+            * secondary_email: A secondary email address for the user. Unlike
+              the email field, GET will reflect the latest update to this field
+              even if changes have yet to be confirmed.
             * gender: One of the following values:
 
                 * null

@@ -554,7 +554,7 @@ def get_enterprise_learner_data(user):
 
 
 @enterprise_is_enabled(otherwise={})
-def get_enterprise_customer_for_learner(site, user):
+def get_enterprise_customer_for_learner(user):
     """
     Return enterprise customer to whom given learner belongs.
     """

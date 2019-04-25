@@ -41,6 +41,7 @@ from openedx.core.djangoapps.user_api.errors import (
 )
 from openedx.core.djangoapps.user_api.preferences.api import update_user_preferences
 from openedx.core.lib.api.view_utils import add_serializer_errors
+from openedx.features.enterprise_support.utils import get_enterprise_readonly_account_fields
 
 from .serializers import (
     AccountLegacyProfileSerializer, AccountUserSerializer,
@@ -143,6 +144,25 @@ def update_account_settings(requesting_user, update, username=None):
     if requesting_user.username != username:
         raise errors.UserNotAuthorized()
 
+    # Check for fields that are not editable. Marking them read-only causes them to be ignored, but we wish to 400.
+    read_only_fields = set(update.keys()).intersection(
+        # Remove email since it is handled separately below when checking for changing_email. 
+        (set(AccountUserSerializer.get_read_only_fields()) - set(["email"])) |
+        set(AccountLegacyProfileSerializer.get_read_only_fields() or set()) |
+        get_enterprise_readonly_account_fields(existing_user)
+    )
+
+    # Build up all field errors, whether read-only, validation, or email errors.
+    field_errors = {}
+
+    if read_only_fields:
+        for read_only_field in read_only_fields:
+            field_errors[read_only_field] = {
+                "developer_message": u"This field is not editable via this API",
+                "user_message": _(u"The '{field_name}' field cannot be edited.").format(field_name=read_only_field)
+            }
+            del update[read_only_field]
+
     # If user has requested to change email, we must call the multi-step process to handle this.
     # It is not handled by the serializer (which considers email to be read-only).
     changing_email = False
@@ -162,22 +182,6 @@ def update_account_settings(requesting_user, update, username=None):
     changing_secondary_email = False
     if "secondary_email" in update:
         changing_secondary_email = True
-
-    # Check for fields that are not editable. Marking them read-only causes them to be ignored, but we wish to 400.
-    read_only_fields = set(update.keys()).intersection(
-        AccountUserSerializer.get_read_only_fields() + AccountLegacyProfileSerializer.get_read_only_fields()
-    )
-
-    # Build up all field errors, whether read-only, validation, or email errors.
-    field_errors = {}
-
-    if read_only_fields:
-        for read_only_field in read_only_fields:
-            field_errors[read_only_field] = {
-                "developer_message": u"This field is not editable via this API",
-                "user_message": _(u"The '{field_name}' field cannot be edited.").format(field_name=read_only_field)
-            }
-            del update[read_only_field]
 
     user_serializer = AccountUserSerializer(existing_user, data=update)
     legacy_profile_serializer = AccountLegacyProfileSerializer(existing_user_profile, data=update)
