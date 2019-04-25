@@ -1,0 +1,42 @@
+# This does not cover all the code in edx-platform but it's a good start.
+
+# Core
+common/djangoapps/third_party_auth/
+common/lib/xmodule/xmodule/
+lms/djangoapps/course_api/blocks
+lms/djangoapps/courseware/
+lms/djangoapps/grades/
+lms/djangoapps/instructor/
+lms/djangoapps/mobile_api/
+openedx/core/djangoapps/contentserver/
+openedx/core/djangoapps/heartbeat/
+openedx/core/djangoapps/oauth_dispatch
+openedx/core/djangoapps/user_api/
+openedx/core/djangoapps/user_authn/
+openedx/features/course_experience/
+
+# Core Extensions 
+common/lib/xmodule/xmodule/capa_module.py
+common/lib/xmodule/xmodule/html_module.py
+common/lib/xmodule/xmodule/video_module
+lms/djangoapps/courseware/
+lms/djangoapps/discussion/
+lms/djangoapps/discussion_api/
+lms/djangoapps/edxnotes
+lms/djangoapps/notifier_api/
+
+# Analytics
+common/djangoapps/track/
+
+# Credentials
+lms/djangoapps/certificates/
+
+# Discovery
+common/djangoapps/course_modes/
+common/djangoapps/enrollment/
+common/djangoapps/student
+lms/djangoapps/commerce/
+lms/djangoapps/courseware/
+lms/djangoapps/experiments/
+lms/djangoapps/learner_dashboard/
+lms/djangoapps/mobile_api/
