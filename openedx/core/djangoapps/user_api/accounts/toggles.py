@@ -1,6 +1,7 @@
 """
 Toggles for accounts related code.
 """
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.waffle_utils import WaffleFlag
 
 
@@ -16,3 +17,8 @@ from openedx.core.djangoapps.waffle_utils import WaffleFlag
 # .. toggle_tickets: DEPR-17
 # .. toggle_status: supported
 REDIRECT_TO_ORDER_HISTORY_MICROFRONTEND = WaffleFlag('order_history', 'redirect_to_microfrontend')
+
+
+def should_redirect_to_order_history_microfrontend():
+    should_redirect_for_current_site = configuration_helpers.get_value('ENABLE_ORDER_HISTORY_MICROFRONTEND')
+    return REDIRECT_TO_ORDER_HISTORY_MICROFRONTEND.is_enabled() and should_redirect_for_current_site
