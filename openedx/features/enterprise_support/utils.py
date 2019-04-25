@@ -260,6 +260,13 @@ def update_account_settings_context_for_enterprise(context, enterprise_customer)
     context.update(enterprise_context)
 
 
+def get_enterprise_readonly_account_fields(user):
+    """
+    Returns a set of account fields that are read-only for enterprise users.
+    """
+    return set(settings.ENTERPRISE_READONLY_ACCOUNT_FIELDS) if is_enterprise_learner(user) else set()
+
+
 def get_enterprise_learner_generic_name(request):
     """
     Get a generic name concatenating the Enterprise Customer name and 'Learner'.

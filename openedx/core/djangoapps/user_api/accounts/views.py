@@ -165,6 +165,9 @@ class AccountViewSet(ViewSet):
             * email: Email address for the user. New email addresses must be confirmed
               via a confirmation email, so GET does not reflect the change until
               the address has been confirmed.
+            * secondary_email: A secondary email address for the user. Unlike
+              the email field, GET will reflect the latest update to this field
+              even if changes have yet to be confirmed.
             * gender: One of the following values:
 
                 * null
@@ -316,7 +319,7 @@ class AccountViewSet(ViewSet):
                 update_account_settings(request.user, request.data, username=username)
                 account_settings = get_account_settings(request, [username])[0]
         except UserNotAuthorized:
-            return Response(status=status.HTTP_403_FORBIDDEN if request.user.is_staff else status.HTTP_404_NOT_FOUND)
+            return Response(status=status.HTTP_403_FORBIDDEN)
         except UserNotFound:
             return Response(status=status.HTTP_404_NOT_FOUND)
         except AccountValidationError as err:

@@ -127,7 +127,7 @@ def account_settings_context(request):
         'beta_language': beta_language,
     }
 
-    enterprise_customer = get_enterprise_customer_for_learner(site=request.site, user=request.user)
+    enterprise_customer = get_enterprise_customer_for_learner(user=request.user)
     update_account_settings_context_for_enterprise(context, enterprise_customer)
 
     if third_party_auth.is_enabled():
