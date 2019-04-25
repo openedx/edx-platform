@@ -1,6 +1,7 @@
 """
 Forms for the password policy app.
 """
+from __future__ import absolute_import
 from django.contrib import messages
 from django.contrib.admin.forms import AdminAuthenticationForm
 from django.forms import ValidationError
