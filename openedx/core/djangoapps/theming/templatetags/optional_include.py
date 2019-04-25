@@ -6,7 +6,6 @@ possible, in order to match the behavior of the {% include %} template tag,
 except for making it optional.
 """
 
-register = Library()
 # that are already in that file
 # pylint: skip-file
 from __future__ import absolute_import
@@ -17,6 +16,7 @@ from django.template import Library, TemplateDoesNotExist
 from django.template.base import TemplateSyntaxError, token_kwargs
 from django.template.loader_tags import IncludeNode
 
+register = Library()
 
 class OptionalIncludeNode(IncludeNode):
     def render(self, context):
