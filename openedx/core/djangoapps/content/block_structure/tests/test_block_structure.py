@@ -1,20 +1,24 @@
 """
 Tests for block_structure.py
 """
-from datetime import datetime
+from __future__ import absolute_import
+
+import itertools
 # pylint: disable=protected-access
 from collections import namedtuple
 from copy import deepcopy
-import itertools
+from datetime import datetime
 from unittest import TestCase
 
 import ddt
+import six
+from six.moves import range
 
 from openedx.core.lib.graph_traversals import traverse_post_order
 
 from ..block_structure import BlockStructure, BlockStructureModulestoreData
 from ..exceptions import TransformerException
-from .helpers import MockXBlock, MockTransformer, ChildrenMapTestMixin
+from .helpers import ChildrenMapTestMixin, MockTransformer, MockXBlock
 
 
 @ddt.ddt
@@ -97,7 +101,7 @@ class TestBlockStructureData(TestCase, ChildrenMapTestMixin):
             block_structure._add_transformer(t_info.transformer)
             for key, val in t_info.structure_wide_data:
                 block_structure.set_transformer_data(t_info.transformer, key, val)
-            for block, block_data in t_info.block_specific_data.iteritems():
+            for block, block_data in six.iteritems(t_info.block_specific_data):
                 for key, val in block_data:
                     block_structure.set_transformer_block_field(block, t_info.transformer, key, val)
 
@@ -112,7 +116,7 @@ class TestBlockStructureData(TestCase, ChildrenMapTestMixin):
                     block_structure.get_transformer_data(t_info.transformer, key),
                     val,
                 )
-            for block, block_data in t_info.block_specific_data.iteritems():
+            for block, block_data in six.iteritems(t_info.block_specific_data):
                 for key, val in block_data:
                     self.assertEquals(
                         block_structure.get_transformer_block_field(block, t_info.transformer, key),
@@ -172,7 +176,7 @@ class TestBlockStructureData(TestCase, ChildrenMapTestMixin):
         block_structure._add_xblock(block.location, block)
         block_structure._get_or_create_block(block.location)
 
-        fields = attribute.keys()
+        fields = list(attribute.keys())
         block_structure.request_xblock_fields(*fields)
 
         # collect fields
@@ -199,7 +203,7 @@ class TestBlockStructureData(TestCase, ChildrenMapTestMixin):
     @ddt.data(
         *itertools.product(
             [True, False],
-            range(7),
+            list(range(7)),
             [
                 ChildrenMapTestMixin.SIMPLE_CHILDREN_MAP,
                 ChildrenMapTestMixin.LINEAR_CHILDREN_MAP,

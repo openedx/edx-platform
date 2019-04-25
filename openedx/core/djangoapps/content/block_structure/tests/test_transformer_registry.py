@@ -2,11 +2,14 @@
 Tests for transformer_registry.py
 """
 
-import ddt
+from __future__ import absolute_import
+
 from unittest import TestCase
 
+import ddt
+
 from ..transformer_registry import TransformerRegistry
-from .helpers import MockTransformer, mock_registered_transformers, clear_registered_transformers_cache
+from .helpers import MockTransformer, clear_registered_transformers_cache, mock_registered_transformers
 
 
 class TestTransformer1(MockTransformer):
