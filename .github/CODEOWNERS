@@ -1,17 +1,17 @@
 # This does not cover all the code in edx-platform but it's a good start.
 
 # Core
-common/djangoapps/student/
+common/djangoapps/student/			@edx/platform-core
 common/djangoapps/third_party_auth/		@edx/platform-authn
-common/lib/xmodule/xmodule/
-lms/djangoapps/course_api/blocks
-lms/djangoapps/courseware/
+common/lib/xmodule/xmodule/			@edx/platform-core
+lms/djangoapps/course_api/blocks		@edx/platform-core
+lms/djangoapps/courseware/			@edx/platform-core
 lms/djangoapps/grades/				@edx/platform-grades
-lms/djangoapps/instructor/
-lms/djangoapps/instructor_task/
+lms/djangoapps/instructor/			@edx/platform-core
+lms/djangoapps/instructor_task/			@edx/platform-core
 lms/djangoapps/mobile_api/			@edx/platform-mobile
-openedx/core/djangoapps/contentserver/
-openedx/core/djangoapps/heartbeat/
+openedx/core/djangoapps/contentserver/		@edx/platform-core
+openedx/core/djangoapps/heartbeat/		@edx/platform-core
 openedx/core/djangoapps/oauth_dispatch		@edx/platform-authn
 openedx/core/djangoapps/user_api/		@edx/platform-authn
 openedx/core/djangoapps/user_authn/		@edx/platform-authn
