@@ -160,11 +160,12 @@
             * Get and return the current URL in parts
             */
             var origin = window.location.origin,
-                pathName = window.location.pathname;
-            return [origin, pathName];
+                pathName = window.location.pathname,
+                search = window.location.search;
+            return [origin, pathName, search];
         };
 
-        Sequence.prototype.determineBrowserUrl = function(origin, pathName, position) {
+        Sequence.prototype.determineBrowserUrl = function(origin, pathName, search, position) {
             /**
             * Determine what the new URL should be.
             */
@@ -180,7 +181,7 @@
                 pathName = pathName.substring(0, pathName.length - 1);
             }
 
-            return origin + pathName + '/' + position;
+            return origin + pathName + '/' + position + search;
         };
 
         Sequence.prototype.pushBrowserUrl = function(newUrl) {
@@ -198,7 +199,7 @@
             var urlParts = this.getUrlParts();
             position = position || this.position;
 
-            var newUrl = this.determineBrowserUrl(urlParts[0], urlParts[1], position);
+            var newUrl = this.determineBrowserUrl(urlParts[0], urlParts[1], urlParts[2], position);
 
             this.pushBrowserUrl(newUrl);
         };
