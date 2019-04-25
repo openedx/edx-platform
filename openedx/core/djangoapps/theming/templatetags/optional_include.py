@@ -18,6 +18,7 @@ from django.template.loader_tags import IncludeNode
 
 register = Library()
 
+
 class OptionalIncludeNode(IncludeNode):
     def render(self, context):
         try:
