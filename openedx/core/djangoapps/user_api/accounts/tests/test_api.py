@@ -145,9 +145,8 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, Retireme
         with self.assertRaises(UserNotAuthorized):
             update_account_settings(self.different_user, {"name": "Pluto"}, username=self.user.username)
 
-    def test_update_user_not_found(self):
-        """Test that UserNotFound is thrown if there is no user with username."""
-        with self.assertRaises(UserNotFound):
+    def test_update_non_existent_user(self):
+        with self.assertRaises(UserNotAuthorized):
             update_account_settings(self.user, {}, username="does_not_exist")
 
         self.user.username = "does_not_exist"
@@ -246,7 +245,7 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, Retireme
             update_account_settings(self.user, update_data)
         field_errors = validation_error.exception.field_errors
         self.assertEqual("This field is not editable via this API", field_errors[field_name]["developer_message"])
-      
+
     def test_update_error_validating(self):
         """Test that AccountValidationError is thrown if incorrect values are supplied."""
         with self.assertRaises(AccountValidationError):
