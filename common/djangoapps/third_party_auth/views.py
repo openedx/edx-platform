@@ -115,7 +115,34 @@ def post_to_custom_auth_form(request):
 
 
 class IdPRedirectView(View):
+    """
+    Redirect to an IdP's login page if the IdP exists; otherwise, return a 404.
+
+    Example usage:
+
+        GET auth/idp_redirect/saml-default
+
+    """
     def get(self, request, *args, **kwargs):
+        """
+        Return either a redirect to the login page of an identity provider that
+        corresponds to the provider_slug keyword argument or a 404 if the
+        provider_slug does not correspond to an identity provider.
+
+        Args:
+            request (HttpRequest)
+
+        Keyword Args:
+            provider_slug (str): a slug corresponding to a configured identity provider
+
+        Returns:
+            HttpResponse: 302 to a provider's login url if the provider_slug kwarg matches an identity provider
+            HttpResponse: 404 if the provider_slug kwarg does not match an identity provider
+        """
+        # this gets the url to redirect to after login/registration/third_party_auth
+        # it also handles checking the safety of the redirect url (next query parameter)
+        # it checks against settings.LOGIN_REDIRECT_WHITELIST, so be sure to add the url
+        # to this setting
         next_destination_url = get_next_url_for_login_page(request)
 
         try:
