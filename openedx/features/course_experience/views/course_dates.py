@@ -1,6 +1,8 @@
 """
 Fragment for rendering the course dates sidebar.
 """
+from __future__ import absolute_import
+
 from django.http import Http404
 from django.template.loader import render_to_string
 from django.utils.translation import get_language_bidi
