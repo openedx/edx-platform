@@ -179,10 +179,10 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
         target.get_users(course_id, user_id)
         for target in targets
     ]
-    combined_set = User.objects.none()
-    for qset in recipient_qsets:
-        combined_set |= qset
-    combined_set = combined_set.distinct()
+    # Use union here to combine the qsets instead of the | operator.  This avoids generating an
+    # inefficient OUTER JOIN query that would read the whole user table.
+    combined_set = recipient_qsets[0].union(*recipient_qsets[1:]) if len(recipient_qsets) > 1 \
+        else recipient_qsets[0]
     recipient_fields = ['profile__name', 'email']
 
     log.info(u"Task %s: Preparing to queue subtasks for sending emails for course %s, email %s",
