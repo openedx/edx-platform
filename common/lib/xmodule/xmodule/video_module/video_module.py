@@ -225,6 +225,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         branding_info = None
         youtube_streams = ""
         video_duration = None
+        video_status = None
 
         # Determine if there is an alternative source for this video
         # based on user locale.  This exists to support cases where
@@ -271,6 +272,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
                 # get video duration
                 video_data = edxval_api.get_video_info(self.edx_video_id.strip())
                 video_duration = video_data.get('duration')
+                video_status = video_data.get('status')
 
             except (edxval_api.ValInternalError, edxval_api.ValVideoNotFoundError):
                 # VAL raises this exception if it can't find data for the edx video ID. This can happen if the
@@ -285,7 +287,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         if getattr(self, 'video_speed_optimizations', True) and cdn_url:
             branding_info = BrandingInfoConfig.get_config().get(self.system.user_location)
 
-            if self.edx_video_id and edxval_api:
+            if self.edx_video_id and edxval_api and video_status != u'external':
                 for index, source_url in enumerate(sources):
                     new_url = rewrite_video_url(cdn_url, source_url)
                     if new_url:
