@@ -37,6 +37,7 @@ locales:
     # - fa  # Persian
     # - fa_IR  # Persian (Iran)
     # - fi_FI  # Finnish (Finland)
+    # - fil  # Filipino
     - fr  # French
     # - gl  # Galician
     # - gu  # Gujarati
@@ -77,7 +78,7 @@ locales:
     # - sw  # Swahili
     - sw_KE  # Swahili (Kenya)
 
-    - ta  # Tamil
+    # - ta  # Tamil
     # - te  # Telugu
     - th  # Thai
     - tr_TR  # Turkish (Turkey)
