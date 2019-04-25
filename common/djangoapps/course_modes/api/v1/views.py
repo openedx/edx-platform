@@ -2,6 +2,7 @@
 Defines the "ReSTful" API for course modes.
 """
 
+from __future__ import absolute_import
 import logging
 
 from django.shortcuts import get_object_or_404

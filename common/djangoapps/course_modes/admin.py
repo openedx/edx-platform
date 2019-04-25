@@ -1,3 +1,6 @@
+"""Django admin for course_modes"""
+from __future__ import absolute_import, unicode_literals
+
 import six
 from django import forms
 from django.conf import settings
@@ -22,7 +25,8 @@ from lms.djangoapps.verify_student import models as verification_models
 from openedx.core.lib.courses import clean_course_id
 from util.date_utils import get_time_display
 
-COURSE_MODE_SLUG_CHOICES = [(key, enrollment_mode['display_name']) for key, enrollment_mode in six.iteritems(settings.COURSE_ENROLLMENT_MODES)]
+COURSE_MODE_SLUG_CHOICES = [(key, enrollment_mode['display_name'])
+                            for key, enrollment_mode in six.iteritems(settings.COURSE_ENROLLMENT_MODES)]
 
 
 class CourseModeForm(forms.ModelForm):

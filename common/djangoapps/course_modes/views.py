@@ -1,11 +1,15 @@
 """
 Views for the course_mode module
 """
+from __future__ import absolute_import, unicode_literals
 
 import decimal
 import json
-import urllib
 
+import six
+import six.moves.urllib.error
+import six.moves.urllib.parse
+import six.moves.urllib.request
 import waffle
 from babel.dates import format_datetime
 from django.contrib.auth.decorators import login_required
@@ -96,7 +100,7 @@ class ChooseModeView(View):
         has_enrolled_professional = (CourseMode.is_professional_slug(enrollment_mode) and is_active)
         if CourseMode.has_professional_mode(modes) and not has_enrolled_professional:
             purchase_workflow = request.GET.get("purchase_workflow", "single")
-            verify_url = reverse('verify_student_start_flow', kwargs={'course_id': unicode(course_key)})
+            verify_url = reverse('verify_student_start_flow', kwargs={'course_id': six.text_type(course_key)})
             redirect_url = "{url}?purchase_workflow={workflow}".format(url=verify_url, workflow=purchase_workflow)
             if ecommerce_service.is_enabled(request.user):
                 professional_mode = modes.get(CourseMode.NO_ID_PROFESSIONAL_MODE) or modes.get(CourseMode.PROFESSIONAL)
@@ -121,12 +125,12 @@ class ChooseModeView(View):
             return redirect(reverse('dashboard'))
 
         donation_for_course = request.session.get("donation_for_course", {})
-        chosen_price = donation_for_course.get(unicode(course_key), None)
+        chosen_price = donation_for_course.get(six.text_type(course_key), None)
 
         if CourseEnrollment.is_enrollment_closed(request.user, course):
             locale = to_locale(get_language())
             enrollment_end_date = format_datetime(course.enrollment_end, 'short', locale=locale)
-            params = urllib.urlencode({'course_closed': enrollment_end_date})
+            params = six.moves.urllib.parse.urlencode({'course_closed': enrollment_end_date})
             return redirect('{0}?{1}'.format(reverse('dashboard'), params))
 
         # When a credit mode is available, students will be given the option
@@ -278,13 +282,13 @@ class ChooseModeView(View):
                 return self.get(request, course_id, error=error_msg)
 
             donation_for_course = request.session.get("donation_for_course", {})
-            donation_for_course[unicode(course_key)] = amount_value
+            donation_for_course[six.text_type(course_key)] = amount_value
             request.session["donation_for_course"] = donation_for_course
 
             return redirect(
                 reverse(
                     'verify_student_start_flow',
-                    kwargs={'course_id': unicode(course_key)}
+                    kwargs={'course_id': six.text_type(course_key)}
                 )
             )
 
@@ -342,7 +346,7 @@ def create_mode(request, course_id):
     }
 
     # Try pulling querystring parameters out of the request
-    for parameter, default in PARAMETERS.iteritems():
+    for parameter, default in six.iteritems(PARAMETERS):
         PARAMETERS[parameter] = request.GET.get(parameter, default)
 
     # Attempt to create the new mode for the given course

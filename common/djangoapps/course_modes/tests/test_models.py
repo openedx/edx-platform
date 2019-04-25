@@ -4,6 +4,7 @@ when you run "manage.py test".
 
 Replace this with more appropriate tests for your application.
 """
+from __future__ import absolute_import, unicode_literals
 
 import itertools
 from datetime import timedelta
@@ -14,14 +15,13 @@ from django.test import TestCase, override_settings
 from django.utils.timezone import now
 from mock import patch
 from opaque_keys.edx.locator import CourseLocator
+from six.moves import zip
 
 from course_modes.helpers import enrollment_mode_display
-from course_modes.models import CourseMode, Mode, invalidate_course_mode_cache, get_cosmetic_display_price
+from course_modes.models import CourseMode, Mode, get_cosmetic_display_price, invalidate_course_mode_cache
 from course_modes.tests.factories import CourseModeFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import (
-    ModuleStoreTestCase,
-)
 
 
 @ddt.ddt
@@ -41,6 +41,7 @@ class CourseModeModelTest(TestCase):
         CourseMode.objects.all().delete()
 
     def tearDown(self):
+        super(CourseModeModelTest, self).tearDown()
         invalidate_course_mode_cache(sender=None)
 
     def create_mode(
@@ -398,11 +399,11 @@ class CourseModeModelTest(TestCase):
 
         # Check the selectable modes, which should exclude credit
         selectable_modes = CourseMode.modes_for_course_dict(self.course_key)
-        self.assertItemsEqual(selectable_modes.keys(), expected_selectable_modes)
+        self.assertItemsEqual(list(selectable_modes.keys()), expected_selectable_modes)
 
         # When we get all unexpired modes, we should see credit as well
         all_modes = CourseMode.modes_for_course_dict(self.course_key, only_selectable=False)
-        self.assertItemsEqual(all_modes.keys(), available_modes)
+        self.assertItemsEqual(list(all_modes.keys()), available_modes)
 
     def _enrollment_display_modes_dicts(self, dict_type):
         """
@@ -421,11 +422,11 @@ class CourseModeModelTest(TestCase):
                              'professional']
         }
         if dict_type in ['verify_need_to_verify', 'verify_submitted']:
-            return dict(zip(dict_keys, display_values.get('verify_need_to_verify')))
+            return dict(list(zip(dict_keys, display_values.get('verify_need_to_verify'))))
         elif dict_type is None or dict_type == 'dummy':
-            return dict(zip(dict_keys, display_values.get('verify_none')))
+            return dict(list(zip(dict_keys, display_values.get('verify_none'))))
         else:
-            return dict(zip(dict_keys, display_values.get(dict_type)))
+            return dict(list(zip(dict_keys, display_values.get(dict_type))))
 
     def test_expiration_datetime_explicitly_set(self):
         """ Verify that setting the expiration_date property sets the explicit flag. """
