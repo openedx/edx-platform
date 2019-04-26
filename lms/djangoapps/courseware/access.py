@@ -273,7 +273,8 @@ def _can_enroll_courselike(user, courselike):
     if _has_staff_access_to_descriptor(user, courselike, course_key):
         return ACCESS_GRANTED
 
-    if courselike.invitation_only:
+    # Access denied when default value of COURSE_DEFAULT_INVITE_ONLY set to True
+    if settings.FEATURES.get('COURSE_DEFAULT_INVITE_ONLY') or courselike.invitation_only:
         debug("Deny: invitation only")
         return ACCESS_DENIED
 

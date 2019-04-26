@@ -90,7 +90,7 @@ from six import string_types
           <span class="register disabled">
             ${_("Course is full")}
           </span>
-        % elif invitation_only and not can_enroll:
+        % elif settings.FEATURES.get('COURSE_DEFAULT_INVITE_ONLY') or invitation_only and not can_enroll:
           <span class="register disabled">${_("Enrollment in this course is by invitation only")}</span>
         ## Shib courses need the enrollment button to be displayed even when can_enroll is False,
         ## because AnonymousUsers cause can_enroll for shib courses to be False, but we need them to be able to click

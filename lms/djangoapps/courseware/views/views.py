@@ -932,7 +932,7 @@ def course_about(request, course_id):
 
         # Used to provide context to message to student if enrollment not allowed
         can_enroll = bool(request.user.has_perm(ENROLL_IN_COURSE, course))
-        invitation_only = course.invitation_only
+        invitation_only = settings.FEATURES.get('COURSE_DEFAULT_INVITE_ONLY') or course.invitation_only
         is_course_full = CourseEnrollment.objects.is_course_full(course)
 
         # Register button should be disabled if one of the following is true:

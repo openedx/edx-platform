@@ -405,6 +405,8 @@ FEATURES = {
     # Whether to display the account deletion section the account settings page
     'ENABLE_ACCOUNT_DELETION': True,
 
+    # Set this to manage the default value across all courses in a given deployment
+    'COURSE_DEFAULT_INVITE_ONLY': False,
     # Enable feature to remove enrollments and users. Used to reset state of master's integration environments
     'ENABLE_ENROLLMENT_RESET': False,
     'DISABLE_MOBILE_COURSE_AVAILABLE': False,
