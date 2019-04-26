@@ -669,7 +669,8 @@ class Transcript(object):
 
             if output_format == 'txt':
                 text = json.loads(content)['text']
-                return HTMLParser().unescape("\n".join(text))
+                text_without_none = [line if line else '' for line in text]
+                return HTMLParser().unescape("\n".join(text_without_none))
 
             elif output_format == 'srt':
                 return generate_srt_from_sjson(json.loads(content), speed=1.0)

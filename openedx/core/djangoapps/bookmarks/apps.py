@@ -1,9 +1,12 @@
 """
 Configuration for bookmarks Django app
 """
+from __future__ import absolute_import
+
 from django.apps import AppConfig
 from django.utils.translation import ugettext_lazy as _
-from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType, PluginURLs, PluginSettings
+
+from openedx.core.djangoapps.plugins.constants import PluginSettings, PluginURLs, ProjectType, SettingsType
 
 
 class BookmarksConfig(AppConfig):
@@ -23,7 +26,7 @@ class BookmarksConfig(AppConfig):
         },
         PluginSettings.CONFIG: {
             ProjectType.LMS: {
-                SettingsType.AWS: {PluginSettings.RELATIVE_PATH: u'settings.aws'},
+                SettingsType.PRODUCTION: {PluginSettings.RELATIVE_PATH: u'settings.production'},
                 SettingsType.COMMON: {PluginSettings.RELATIVE_PATH: u'settings.common'},
             }
         }

@@ -593,22 +593,22 @@
 
       &.button-oa2-google-oauth2:hover,
       &.button-oa2-google-oauth2:focus {
-        background-color: $google-red;
-        border: 1px solid #a5382b;
+        background-color: $google-focus-blue;
+        border: 1px solid $google-focus-blue;
       }
 
       &.button-oa2-google-oauth2:hover {
-        box-shadow: 0 2px 1px 0 #8d3024;
+        box-shadow: 0 2px 1px 0 $google-focus-blue;
       }
 
       &.button-oa2-facebook:hover,
       &.button-oa2-facebook:focus {
-        background-color: $facebook-blue;
-        border: 1px solid #263a62;
+        background-color: $facebook-focus-blue;
+        border: 1px solid $facebook-focus-blue;
       }
 
       &.button-oa2-facebook:hover {
-        box-shadow: 0 2px 1px 0 #30487c;
+        box-shadow: 0 2px 1px 0 $facebook-focus-blue;
       }
 
       &.button-oa2-linkedin-oauth2:hover,

@@ -13,7 +13,8 @@ from .accounts.views import (
     AccountRetirementView,
     AccountViewSet,
     DeactivateLogoutView,
-    LMSAccountRetirementView
+    LMSAccountRetirementView,
+    UsernameReplacementView
 )
 from .preferences.views import PreferencesDetailView, PreferencesView
 from .verification_api.views import IDVerificationStatusView
@@ -149,6 +150,11 @@ urlpatterns = [
         r'^v1/accounts/update_retirement_status/$',
         RETIREMENT_UPDATE,
         name='accounts_retirement_update'
+    ),
+    url(
+        r'^v1/accounts/replace_usernames/$',
+        UsernameReplacementView.as_view(),
+        name='username_replacement'
     ),
     url(
         r'^v1/validation/registration$',

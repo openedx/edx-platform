@@ -2,9 +2,12 @@
 Views for the course home page.
 """
 
-from django.urls import reverse
+from __future__ import absolute_import
+
+import six
 from django.template.context_processors import csrf
 from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -23,17 +26,20 @@ from lms.djangoapps.course_goals.api import (
 )
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.courseware.views.views import CourseTabView
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.util.maintenance_banner import add_maintenance_banner
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.features.course_experience.course_tools import CourseToolsPluginManager
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
+from openedx.features.course_experience.course_tools import CourseToolsPluginManager
 from student.models import CourseEnrollment
 from util.views import ensure_valid_course_key
-from xmodule.course_module import COURSE_VISIBILITY_PUBLIC_OUTLINE, COURSE_VISIBILITY_PUBLIC
+from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
 
 from .. import (
-    LATEST_UPDATE_FLAG, SHOW_UPGRADE_MSG_ON_COURSE_HOME, USE_BOOTSTRAP_FLAG, COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
+    COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
+    LATEST_UPDATE_FLAG,
+    SHOW_UPGRADE_MSG_ON_COURSE_HOME,
+    USE_BOOTSTRAP_FLAG
 )
 from ..utils import get_course_outline_block_tree, get_resume_block
 from .course_dates import CourseDatesFragmentView
@@ -42,7 +48,6 @@ from .course_outline import CourseOutlineFragmentView
 from .course_sock import CourseSockFragmentView
 from .latest_update import LatestUpdateFragmentView
 from .welcome_message import WelcomeMessageFragmentView
-
 
 EMPTY_HANDOUTS_HTML = u'<ol></ol>'
 
@@ -68,7 +73,7 @@ class CourseHomeView(CourseTabView):
         return USE_BOOTSTRAP_FLAG.is_enabled(course.id)
 
     def render_to_fragment(self, request, course=None, tab=None, **kwargs):
-        course_id = unicode(course.id)
+        course_id = six.text_type(course.id)
         home_fragment_view = CourseHomeFragmentView()
         return home_fragment_view.render_to_fragment(request, course_id=course_id, **kwargs)
 

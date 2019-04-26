@@ -43,6 +43,8 @@ class TestCredentialsSignalsSendGrade(TestCase):
         [True, 'no-id-professional', 'downloadable'],
         [True, 'credit', 'downloadable'],
         [True, 'verified', 'notpassing'],
+        [True, 'masters', 'downloadable'],
+        [True, 'masters', 'notpassing'],
         [False, 'audit', 'downloadable'],
         [False, 'professional', 'generating'],
         [False, 'no-id-professional', 'generating'],

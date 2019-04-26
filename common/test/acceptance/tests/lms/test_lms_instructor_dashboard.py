@@ -80,6 +80,7 @@ class LMSInstructorDashboardA11yTest(BaseInstructorDashboardTest):
         self.instructor_dashboard_page.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',  # TODO: AC-932
             ]
         })
         self.instructor_dashboard_page.a11y_audit.check_for_accessibility_errors()
@@ -115,6 +116,9 @@ class BulkEmailTest(BaseInstructorDashboardTest):
         self.send_email_page.a11y_audit.config.set_rules({
             "ignore": [
                 'button-name',  # TODO: TNL-5830
+                'aria-allowed-role',  # TODO: AC-936
+                'color-contrast',  # TODO: AC-938
+                'listitem'  # TODO: AC-937
             ]
         })
         self.send_email_page.a11y_audit.check_for_accessibility_errors()
@@ -232,7 +236,7 @@ class AutoEnrollmentWithCSVTest(BaseInstructorDashboardTest):
         Auto-enrollment with CSV accessibility tests
         """
         self.auto_enroll_section.a11y_audit.config.set_scope([
-            '#member-list-widget-template'
+            '#membership-list-widget-tpl'
         ])
         self.auto_enroll_section.a11y_audit.check_for_accessibility_errors()
 
@@ -707,34 +711,6 @@ class DataDownloadsWithMultipleRoleTests(BaseInstructorDashboardTest):
         self.course_fixture = CourseFixture(**self.course_info).install()
 
     @ddt.data(['staff'], ['instructor'])
-    def test_list_student_profile_information(self, role):
-        """
-        Scenario: List enrolled students' profile information
-        Given I am "<Role>" for a course
-        When I click "List enrolled students' profile information"
-            Then I see a table of student profiles
-            Examples:
-            | Role          |
-            | instructor    |
-            | staff         |
-        """
-        username, user_id, email, __ = self.log_in_as_instructor(
-            global_staff=False,
-            course_access_roles=role
-        )
-        instructor_dashboard_page = self.visit_instructor_dashboard()
-        data_download_section = instructor_dashboard_page.select_data_download()
-
-        data_download_section.enrolled_student_profile_button.click()
-        instructor_dashboard_page.wait_for_ajax()
-        student_profile_info = data_download_section.student_profile_information
-
-        self.assertNotIn(student_profile_info, [u'', u'Loading'])
-        expected_data = [user_id, username, email]
-        for datum in expected_data:
-            self.assertIn(str(datum), student_profile_info[0].split('\n'))
-
-    @ddt.data(['staff'], ['instructor'])
     def test_list_student_profile_information_for_large_course(self, role):
         """
         Scenario: List enrolled students' profile information for a large course
@@ -1141,6 +1117,11 @@ class CertificatesTest(BaseInstructorDashboardTest):
         """
         Certificates page accessibility tests
         """
+        self.certificates_section.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-hidden-focus'  # TODO: AC-938
+            ]
+        })
         self.certificates_section.a11y_audit.config.set_scope([
             '.certificates-wrapper'
         ])
@@ -1350,6 +1331,11 @@ class CertificateInvalidationTest(BaseInstructorDashboardTest):
         """
         Certificate invalidation accessibility tests
         """
+        self.certificates_section.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-hidden-focus'  # TODO: AC-938
+            ]
+        })
         self.certificates_section.a11y_audit.config.set_scope([
             '.certificates-wrapper'
         ])

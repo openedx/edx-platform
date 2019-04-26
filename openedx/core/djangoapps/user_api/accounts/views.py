@@ -7,9 +7,11 @@ https://openedx.atlassian.net/wiki/display/TNL/User+API
 import datetime
 import logging
 from functools import wraps
+import uuid
 
 import pytz
 from consent.models import DataSharingConsent
+from django.apps import apps
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model, logout
 from django.contrib.sites.models import Site
@@ -27,6 +29,7 @@ from rest_framework import permissions, status
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
+from rest_framework.serializers import ValidationError
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
 from six import iteritems, text_type
@@ -71,7 +74,7 @@ from ..models import (
     UserRetirementStatus
 )
 from .api import get_account_settings, update_account_settings
-from .permissions import CanDeactivateUser, CanRetireUser
+from .permissions import CanDeactivateUser, CanReplaceUsername, CanRetireUser
 from .serializers import UserRetirementPartnerReportSerializer, UserRetirementStatusSerializer
 from .signals import (
     USER_RETIRE_LMS_CRITICAL,
@@ -162,6 +165,9 @@ class AccountViewSet(ViewSet):
             * email: Email address for the user. New email addresses must be confirmed
               via a confirmation email, so GET does not reflect the change until
               the address has been confirmed.
+            * secondary_email: A secondary email address for the user. Unlike
+              the email field, GET will reflect the latest update to this field
+              even if changes have yet to be confirmed.
             * gender: One of the following values:
 
                 * null
@@ -284,7 +290,7 @@ class AccountViewSet(ViewSet):
             account_settings = get_account_settings(
                 request, usernames, view=request.query_params.get('view'))
         except UserNotFound:
-            return Response(status=status.HTTP_403_FORBIDDEN if request.user.is_staff else status.HTTP_404_NOT_FOUND)
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
         return Response(account_settings)
 
@@ -296,7 +302,7 @@ class AccountViewSet(ViewSet):
             account_settings = get_account_settings(
                 request, [username], view=request.query_params.get('view'))
         except UserNotFound:
-            return Response(status=status.HTTP_403_FORBIDDEN if request.user.is_staff else status.HTTP_404_NOT_FOUND)
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
         return Response(account_settings[0])
 
@@ -313,7 +319,7 @@ class AccountViewSet(ViewSet):
                 update_account_settings(request.user, request.data, username=username)
                 account_settings = get_account_settings(request, [username])[0]
         except UserNotAuthorized:
-            return Response(status=status.HTTP_403_FORBIDDEN if request.user.is_staff else status.HTTP_404_NOT_FOUND)
+            return Response(status=status.HTTP_403_FORBIDDEN)
         except UserNotFound:
             return Response(status=status.HTTP_404_NOT_FOUND)
         except AccountValidationError as err:
@@ -1002,3 +1008,167 @@ class AccountRetirementView(ViewSet):
         """
         for entitlement in CourseEntitlement.objects.filter(user_id=user.id):
             entitlement.courseentitlementsupportdetail_set.all().update(comments='')
+
+
+class UsernameReplacementView(APIView):
+    """
+    WARNING: This API is only meant to be used as part of a larger job that
+    updates usernames across all services. DO NOT run this alone or users will
+    not match across the system and things will be broken.
+
+    API will recieve a list of current usernames and their requested new
+    username. If their new username is taken, it will randomly assign a new username.
+
+    This API will be called first, before calling the APIs in other services as this
+    one handles the checks on the usernames provided.
+    """
+    authentication_classes = (JwtAuthentication, )
+    permission_classes = (permissions.IsAuthenticated, CanReplaceUsername)
+
+    def post(self, request):
+        """
+        POST /api/user/v1/accounts/replace_usernames/
+        {
+            "username_mappings": [
+                {"current_username_1": "desired_username_1"},
+                {"current_username_2": "desired_username_2"}
+            ]
+        }
+
+        **POST Parameters**
+
+        A POST request must include the following parameter.
+
+        * username_mappings: Required. A list of objects that map the current username (key)
+          to the desired username (value)
+
+        **POST Response Values**
+
+        As long as data validation passes, the request will return a 200 with a new mapping
+        of old usernames (key) to new username (value)
+
+        {
+            "successful_replacements": [
+                {"old_username_1": "new_username_1"}
+            ],
+            "failed_replacements": [
+                {"old_username_2": "new_username_2"}
+            ]
+        }
+        """
+
+        # (model_name, column_name)
+        MODELS_WITH_USERNAME = (
+            ('auth.user', 'username'),
+            ('consent.DataSharingConsent', 'username'),
+            ('consent.HistoricalDataSharingConsent', 'username'),
+            ('credit.CreditEligibility', 'username'),
+            ('credit.CreditRequest', 'username'),
+            ('credit.CreditRequirementStatus', 'username'),
+            ('user_api.UserRetirementPartnerReportingStatus', 'original_username'),
+            ('user_api.UserRetirementStatus', 'original_username')
+        )
+        UNIQUE_SUFFIX_LENGTH = getattr(settings, 'SOCIAL_AUTH_UUID_LENGTH', 4)
+
+        username_mappings = request.data.get("username_mappings")
+        replacement_locations = self._load_models(MODELS_WITH_USERNAME)
+
+        if not self._has_valid_schema(username_mappings):
+            raise ValidationError("Request data does not match schema")
+
+        successful_replacements, failed_replacements = [], []
+
+        for username_pair in username_mappings:
+            current_username = list(username_pair.keys())[0]
+            desired_username = list(username_pair.values())[0]
+            new_username = self._generate_unique_username(desired_username, suffix_length=UNIQUE_SUFFIX_LENGTH)
+            successfully_replaced = self._replace_username_for_all_models(
+                current_username,
+                new_username,
+                replacement_locations
+            )
+            if successfully_replaced:
+                successful_replacements.append({current_username: new_username})
+            else:
+                failed_replacements.append({current_username: new_username})
+        return Response(
+            status=status.HTTP_200_OK,
+            data={
+                "successful_replacements": successful_replacements,
+                "failed_replacements": failed_replacements
+            }
+        )
+
+    def _load_models(self, models_with_fields):
+        """ Takes tuples that contain a model path and returns the list with a loaded version of the model """
+        try:
+            replacement_locations = [(apps.get_model(model), column) for (model, column) in models_with_fields]
+        except LookupError:
+            log.exception("Unable to load models for username replacement")
+            raise
+        return replacement_locations
+
+    def _has_valid_schema(self, post_data):
+        """ Verifies the data is a list of objects with a single key:value pair """
+        if not isinstance(post_data, list):
+            return False
+        for obj in post_data:
+            if not (isinstance(obj, dict) and len(obj) == 1):
+                return False
+        return True
+
+    def _generate_unique_username(self, desired_username, suffix_length=4):
+        """
+        Generates a unique username.
+        If the desired username is available, that will be returned.
+        Otherwise it will generate unique suffixs to the desired username until it is an available username.
+        """
+        new_username = desired_username
+        # Keep checking usernames in case desired_username + random suffix is already taken
+        while True:
+            if User.objects.filter(username=new_username).exists():
+                unique_suffix = uuid.uuid4().hex[:suffix_length]
+                new_username = desired_username + unique_suffix
+            else:
+                break
+        return new_username
+
+    def _replace_username_for_all_models(self, current_username, new_username, replacement_locations):
+        """
+        Replaces current_username with new_username for all (model, column) pairs in replacement locations.
+        Returns if it was successful or not. Will return successful even if no matching
+
+        TODO: Determine if logs of username are a PII issue.
+        """
+        try:
+            with transaction.atomic():
+                num_rows_changed = 0
+                for (model, column) in replacement_locations:
+                    num_rows_changed += model.objects.filter(
+                        **{column: current_username}
+                    ).update(
+                        **{column: new_username}
+                    )
+        except Exception as exc:  # pylint: disable=broad-except
+            log.exception(
+                u"Unable to change username from %s to %s. Failed on table %s because %s",
+                current_username,
+                new_username,
+                model.__class__.__name__,  # Retrieves the model name that it failed on
+                exc
+            )
+            return False
+        if num_rows_changed == 0:
+            log.info(
+                u"Unable to change username from %s to %s because %s doesn't exist.",
+                current_username,
+                new_username,
+                current_username,
+            )
+        else:
+            log.info(
+                u"Successfully changed username from %s to %s.",
+                current_username,
+                new_username,
+            )
+        return True

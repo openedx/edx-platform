@@ -46,7 +46,7 @@ if (typeof MathJax === 'undefined') {
     window.MathJax = {
         menuSettings: {
             collapsible: true,
-            autocollapse: true,
+            autocollapse: false,
             explorer: true
         }
     };

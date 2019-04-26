@@ -90,13 +90,12 @@ def get_course_outline_block_tree(request, course_id, user=None):
                     latest_completion,
                     block=block['children'][idx]
                 )
-                if block['children'][idx]['resume_block'] is True:
+                if block['children'][idx].get('resume_block') is True:
                     block['resume_block'] = True
 
             completable_blocks = [child for child in block['children']
-                                  if child['type'] != 'discussion']
-            if len([child['complete'] for child in block['children']
-                    if child['complete']]) == len(completable_blocks):
+                                  if child.get('type') != 'discussion']
+            if all(child.get('complete') for child in completable_blocks):
                 block['complete'] = True
 
     def mark_last_accessed(user, course_key, block):
@@ -173,7 +172,7 @@ def get_resume_block(block):
     Gets the deepest block marked as 'resume_block'.
 
     """
-    if not block['resume_block']:
+    if block.get('authorization_denial_reason') or not block['resume_block']:
         return None
     if not block.get('children'):
         return block

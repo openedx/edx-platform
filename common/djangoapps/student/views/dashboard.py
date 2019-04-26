@@ -2,6 +2,8 @@
 Dashboard view and supporting methods
 """
 
+from __future__ import absolute_import
+
 import datetime
 import logging
 from collections import defaultdict
@@ -11,14 +13,14 @@ from completion.utilities import get_key_to_last_completed_course_block
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.urls import reverse
 from django.shortcuts import redirect
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from edx_django_utils import monitoring as monitoring_utils
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
-from six import text_type, iteritems
+from six import iteritems, text_type
 
 import track.views
 from bulk_email.models import BulkEmailFlag, Optout  # pylint: disable=import-error
@@ -27,26 +29,26 @@ from courseware.access import has_access
 from edxmako.shortcuts import render_to_response, render_to_string
 from entitlements.models import CourseEntitlement
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
+from lms.djangoapps.experiments.utils import get_dashboard_course_info, get_experiment_dashboard_metadata_context
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.catalog.utils import (
     get_programs,
     get_pseudo_session_for_entitlement,
     get_visible_sessions_for_entitlement
 )
-from openedx.core.djangoapps.credit.email_utils import get_credit_provider_display_names, make_providers_strings
+from openedx.core.djangoapps.credit.email_utils import get_credit_provider_attribute_values, make_providers_strings
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.utils import ProgramDataExtender, ProgramProgressMeter
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled_for_user
+from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
 from openedx.core.djangoapps.util.maintenance_banner import add_maintenance_banner
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
-from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled_for_user
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.enterprise_support.api import get_dashboard_consent_notification
-from openedx.features.enterprise_support.utils import is_enterprise_learner
 from openedx.features.journals.api import journals_enabled
 from shoppingcart.api import order_history
 from shoppingcart.models import CourseRegistrationCode, DonationConfiguration
-from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
 from student.helpers import cert_info, check_verify_status_by_course
 from student.models import (
     AccountRecovery,
@@ -59,6 +61,13 @@ from util.milestones_helpers import get_pre_requisite_courses_not_completed
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger("edx.student")
+
+# TODO START: Delete waffle flag as part of REVEM-204
+experiments_namespace = WaffleFlagNamespace(name=u'student.experiments')
+DASHBOARD_METADATA_FLAG = WaffleFlag(experiments_namespace,
+                                     u'dashboard_metadata',
+                                     flag_undefined_default=True)
+# TODO END: REVEM-204
 
 
 def get_org_black_and_whitelist_for_site():
@@ -464,7 +473,7 @@ def _credit_statuses(user, course_enrollments):
         for attribute in CourseEnrollmentAttribute.objects.filter(
             namespace="credit",
             name="provider_id",
-            enrollment__in=credit_enrollments.values()
+            enrollment__in=list(credit_enrollments.values())
         ).select_related("enrollment")
     }
 
@@ -476,7 +485,7 @@ def _credit_statuses(user, course_enrollments):
     statuses = {}
     for eligibility in credit_api.get_eligibilities_for_user(user.username):
         course_key = CourseKey.from_string(text_type(eligibility["course_key"]))
-        providers_names = get_credit_provider_display_names(course_key)
+        providers_names = get_credit_provider_attribute_values(course_key, 'display_name')
         status = {
             "course_key": text_type(course_key),
             "eligible": True,
@@ -509,6 +518,14 @@ def _credit_statuses(user, course_enrollments):
                 status["provider_name"] = provider_info.get("display_name")
                 status["provider_status_url"] = provider_info.get("status_url")
                 status["provider_id"] = provider_id
+
+                if not status["provider_name"] and not status["provider_status_url"]:
+                    status["error"] = True
+                    log.error(
+                        u"Could not find credit provider info for [%s] in [%s]. The user will not "
+                        u"be able to see his or her credit request status on the student dashboard.",
+                        provider_id, provider_info_by_id
+                    )
 
         statuses[course_key] = status
 
@@ -687,15 +704,15 @@ def student_dashboard(request):
     inverted_programs = meter.invert_programs()
 
     urls, programs_data = {}, {}
-    bundles_on_dashboard_flag = WaffleFlag(WaffleFlagNamespace(name=u'student.experiments'), u'bundles_on_dashboard')
+    bundles_on_dashboard_flag = WaffleFlag(experiments_namespace, u'bundles_on_dashboard')
 
     # TODO: Delete this code and the relevant HTML code after testing LEARNER-3072 is complete
-    if bundles_on_dashboard_flag.is_enabled() and inverted_programs and inverted_programs.items():
+    if bundles_on_dashboard_flag.is_enabled() and inverted_programs and list(inverted_programs.items()):
         if len(course_enrollments) < 4:
             for program in inverted_programs.values():
                 try:
                     program_uuid = program[0]['uuid']
-                    program_data = get_programs(request.site, uuid=program_uuid)
+                    program_data = get_programs(uuid=program_uuid)
                     program_data = ProgramDataExtender(program_data, request.user).extend()
                     skus = program_data.get('skus')
                     checkout_page_url = ecommerce_service.get_checkout_page_url(*skus)
@@ -861,6 +878,13 @@ def student_dashboard(request):
         'empty_dashboard_message': empty_dashboard_message,
         'recovery_email_message': recovery_email_message,
         'recovery_email_activation_message': recovery_email_activation_message,
+        # TODO START: Clean up REVEM-205 & REVEM-204.
+        # The below context is for experiments in dashboard_metadata
+        'course_prices': get_experiment_dashboard_metadata_context(course_enrollments) if DASHBOARD_METADATA_FLAG.is_enabled() else None,
+        # TODO END: Clean up REVEM-205 & REVEM-204.
+        # TODO START: clean up as part of REVEM-199 (START)
+        'course_info': get_dashboard_course_info(user, course_enrollments),
+        # TODO START: clean up as part of REVEM-199 (END)
     }
 
     if ecommerce_service.is_enabled(request.user):

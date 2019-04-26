@@ -1,8 +1,11 @@
 """
 Journals Application Configuration
 """
+from __future__ import absolute_import
+
 from django.apps import AppConfig
-from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType, PluginURLs, PluginSettings
+
+from openedx.core.djangoapps.plugins.constants import PluginSettings, PluginURLs, ProjectType, SettingsType
 
 
 class JournalsConfig(AppConfig):
@@ -21,7 +24,7 @@ class JournalsConfig(AppConfig):
         },
         PluginSettings.CONFIG: {
             ProjectType.LMS: {
-                SettingsType.AWS: {PluginSettings.RELATIVE_PATH: u'settings.aws'},
+                SettingsType.PRODUCTION: {PluginSettings.RELATIVE_PATH: u'settings.production'},
                 SettingsType.COMMON: {PluginSettings.RELATIVE_PATH: u'settings.common'},
                 SettingsType.DEVSTACK: {PluginSettings.RELATIVE_PATH: u'settings.devstack'},
                 SettingsType.TEST: {PluginSettings.RELATIVE_PATH: u'settings.test'},

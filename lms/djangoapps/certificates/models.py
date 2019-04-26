@@ -212,6 +212,25 @@ class EligibleCertificateManager(models.Manager):
         )
 
 
+class EligibleAvailableCertificateManager(EligibleCertificateManager):
+    """
+    A manager for `GeneratedCertificate` models that automatically
+    filters out ineligible certs and any linked to nonexistent courses.
+
+    Adds to the super class filtering ot also exclude certificates for
+    courses that do not have a corresponding CourseOverview.
+    """
+
+    def get_queryset(self):
+        """
+        Return a queryset for `GeneratedCertificate` models, filtering out
+        ineligible certificates and any linked to nonexistent courses.
+        """
+        return super(EligibleAvailableCertificateManager, self).get_queryset().filter(
+            course_id__in=list(CourseOverview.objects.values_list('id', flat=True))
+        )
+
+
 class GeneratedCertificate(models.Model):
     """
     Base model for generated certificates
@@ -228,14 +247,18 @@ class GeneratedCertificate(models.Model):
     # preference to the default `objects` manager in most cases.
     eligible_certificates = EligibleCertificateManager()
 
+    # Only returns eligible certificates for courses that have an
+    # associated CourseOverview
+    eligible_available_certificates = EligibleAvailableCertificateManager()
+
     # Normal object manager, which should only be used when ineligible
     # certificates (i.e. new audit certs) should be included in the
     # results. Django requires us to explicitly declare this.
     objects = models.Manager()
 
-    MODES = Choices('verified', 'honor', 'audit', 'professional', 'no-id-professional')
+    MODES = Choices('verified', 'honor', 'audit', 'professional', 'no-id-professional', 'masters')
 
-    VERIFIED_CERTS_MODES = [CourseMode.VERIFIED, CourseMode.CREDIT_MODE]
+    VERIFIED_CERTS_MODES = [CourseMode.VERIFIED, CourseMode.CREDIT_MODE, CourseMode.MASTERS]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     course_id = CourseKeyField(max_length=255, blank=True, default=None)

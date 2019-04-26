@@ -5,6 +5,7 @@ In this way, courses can be served up via either SplitMongoModuleStore or MongoM
 
 """
 
+import six
 import logging
 from contextlib import contextmanager
 import itertools
@@ -25,7 +26,10 @@ new_contract('CourseKey', CourseKey)
 new_contract('AssetKey', AssetKey)
 new_contract('AssetMetadata', AssetMetadata)
 new_contract('LibraryLocator', LibraryLocator)
-new_contract('long', long)
+if six.PY2:
+    new_contract('long', long)
+else:
+    new_contract('long', int)
 
 log = logging.getLogger(__name__)
 

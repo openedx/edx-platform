@@ -251,15 +251,6 @@ THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS = {
     },
 }
 
-################################## OPENID #####################################
-FEATURES['AUTH_USE_OPENID'] = True
-FEATURES['AUTH_USE_OPENID_PROVIDER'] = True
-
-################################## SHIB #######################################
-FEATURES['AUTH_USE_SHIB'] = True
-FEATURES['SHIB_DISABLE_TOS'] = True
-FEATURES['RESTRICT_ENROLL_BY_REG_METHOD'] = True
-
 OPENID_CREATE_USERS = False
 OPENID_UPDATE_DETAILS_FROM_SREG = True
 OPENID_USE_AS_ADMIN_LOGIN = False
@@ -366,7 +357,6 @@ BLOCK_STRUCTURES_SETTINGS['PRUNING_ACTIVE'] = True
 
 # These ports are carefully chosen so that if the browser needs to
 # access them, they will be available through the SauceLabs SSH tunnel
-LETTUCE_SERVER_PORT = 8003
 XQUEUE_PORT = 8040
 YOUTUBE_PORT = 8031
 LTI_PORT = 8765
@@ -560,6 +550,8 @@ COMPREHENSIVE_THEME_LOCALE_PATHS = [REPO_ROOT / "themes/conf/locale", ]
 
 LMS_ROOT_URL = "http://localhost:8000"
 
+FRONTEND_LOGOUT_URL = LMS_ROOT_URL + '/logout'
+
 ECOMMERCE_API_URL = 'https://ecommerce.example.com/api/v2/'
 ENTERPRISE_API_URL = 'http://enterprise.example.com/enterprise/api/v1/'
 ENTERPRISE_CONSENT_API_URL = 'http://enterprise.example.com/consent/api/v1/'
@@ -615,3 +607,6 @@ plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS, plugin_c
 ########################## Derive Any Derived Settings  #######################
 
 derive_settings(__name__)
+
+############### Settings for edx-rbac  ###############
+SYSTEM_WIDE_ROLE_CLASSES = os.environ.get("SYSTEM_WIDE_ROLE_CLASSES", [])

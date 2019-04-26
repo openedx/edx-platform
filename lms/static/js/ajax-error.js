@@ -1,5 +1,5 @@
 $(document).ajaxError(function(event, jXHR) {
-    if (jXHR.status === 403) {
+    if (jXHR.status === 403 && jXHR.responseText === 'Unauthenticated') {
         var message = gettext(
             'You have been logged out of your edX account. ' +
             'Click Okay to log in again now. ' +

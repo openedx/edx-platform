@@ -1,19 +1,24 @@
 """
 Tests for Cohort API
 """
+from __future__ import absolute_import
+
 import json
 import tempfile
 
 import ddt
+import six
+from six.moves import range
 from django.urls import reverse
 from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
+
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ToyCourseFactory
 
-from openedx.core.djangolib.testing.utils import skip_unless_lms
-from .helpers import CohortFactory
 from .. import cohorts
+from .helpers import CohortFactory
 
 USERNAME = 'honor'
 USER_MAIL = 'honor@example.com'
@@ -40,7 +45,7 @@ class TestCohortOauth(SharedModuleStoreTestCase):
         cls.user = UserFactory(username=USERNAME, email=USER_MAIL, password=cls.password)
         cls.staff_user = UserFactory(is_staff=True, password=cls.password)
         cls.course_key = ToyCourseFactory.create().id
-        cls.course_str = unicode(cls.course_key)
+        cls.course_str = six.text_type(cls.course_key)
 
     @ddt.data({'path_name': 'api_cohorts:cohort_settings'},
               {'path_name': 'api_cohorts:cohort_handler'}, )
@@ -126,7 +131,7 @@ class TestCohortApi(SharedModuleStoreTestCase):
         cls.user = UserFactory(username=USERNAME, email=USER_MAIL, password=cls.password)
         cls.staff_user = UserFactory(is_staff=True, password=cls.password)
         cls.course_key = ToyCourseFactory.create().id
-        cls.course_str = unicode(cls.course_key)
+        cls.course_str = six.text_type(cls.course_key)
 
     @ddt.data(
         {'is_staff': True, 'status': 200},

@@ -2,6 +2,7 @@
 Tests for logout
 """
 import unittest
+import urllib
 
 import ddt
 from django.conf import settings
@@ -61,9 +62,15 @@ class LogoutTests(TestCase):
         self.assertListEqual(self.client.session[AUTHORIZED_CLIENTS_SESSION_KEY], [oauth_client.client_id])
 
     @ddt.data(
-        ('/courses', 'testserver'),
-        ('https://edx.org/courses', 'edx.org'),
-        ('https://test.edx.org/courses', 'edx.org'),
+        ('%2Fcourses', 'testserver'),
+        ('https%3A%2F%2Fedx.org%2Fcourses', 'edx.org'),
+        ('https%3A%2F%2Ftest.edx.org%2Fcourses', 'edx.org'),
+        ('/courses/course-v1:ARTS+D1+2018_T/course/', 'edx.org'),
+        ('%2Fcourses%2Fcourse-v1%3AARTS%2BD1%2B2018_T%2Fcourse%2F', 'edx.org'),
+        ('/courses/course-v1:ARTS+D1+2018_T/course/?q=computer+science', 'edx.org'),
+        ('%2Fcourses%2Fcourse-v1%3AARTS%2BD1%2B2018_T%2Fcourse%2F%3Fq%3Dcomputer+science', 'edx.org'),
+        ('/enterprise/c5dad9a7-741c-4841-868f-850aca3ff848/course/Microsoft+DAT206x/enroll/', 'edx.org'),
+        ('%2Fenterprise%2Fc5dad9a7-741c-4841-868f-850aca3ff848%2Fcourse%2FMicrosoft%2BDAT206x%2Fenroll%2F', 'edx.org'),
     )
     @ddt.unpack
     @override_settings(LOGIN_REDIRECT_WHITELIST=['test.edx.org'])
@@ -74,7 +81,7 @@ class LogoutTests(TestCase):
         )
         response = self.client.get(url, HTTP_HOST=host)
         expected = {
-            'target': redirect_url,
+            'target': urllib.unquote(redirect_url),
         }
         self.assertDictContainsSubset(expected, response.context_data)
 

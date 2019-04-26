@@ -15,8 +15,6 @@ from edxmako.shortcuts import render_to_response
 
 from openedx.core.djangoapps.user_authn.views.register import create_account_with_params
 from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
-from openedx.core.djangoapps.external_auth.login_and_register import login as external_auth_login
-from openedx.core.djangoapps.external_auth.login_and_register import register as external_auth_register
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from student.helpers import (
@@ -32,9 +30,6 @@ from util.json_request import JsonResponse
 @ensure_csrf_cookie
 def signin_user(request):
     """Deprecated. To be replaced by :class:`user_authn.views.login_form.login_and_registration_form`."""
-    external_auth_response = external_auth_login(request)
-    if external_auth_response is not None:
-        return external_auth_response
     # Determine the URL to redirect to following login:
     redirect_to = get_next_url_for_login_page(request)
     if request.user.is_authenticated:
@@ -73,10 +68,6 @@ def register_user(request, extra_context=None):
     redirect_to = get_next_url_for_login_page(request)
     if request.user.is_authenticated:
         return redirect(redirect_to)
-
-    external_auth_response = external_auth_register(request)
-    if external_auth_response is not None:
-        return external_auth_response
 
     context = {
         'login_redirect_url': redirect_to,  # This gets added to the query string of the "Sign In" button in the header

@@ -1,6 +1,7 @@
 """
 Adds support for first class plugins that can be added to the edX platform.
 """
+from __future__ import absolute_import
 from collections import OrderedDict
 
 from stevedore.extension import ExtensionManager

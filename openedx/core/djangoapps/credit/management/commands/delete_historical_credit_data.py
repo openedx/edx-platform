@@ -3,6 +3,7 @@ Command to delete all rows from the credit_historicalcreditrequest and
 credit_historicalcreditrequirementstatus tables.
 """
 
+from __future__ import absolute_import
 import logging
 from openedx.core.djangoapps.credit.models import CreditRequest, CreditRequirementStatus
 from openedx.core.djangoapps.util.row_delete import delete_rows, BaseDeletionCommand

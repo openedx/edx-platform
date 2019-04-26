@@ -1,6 +1,7 @@
 """Helper functions to get data from APIs"""
 from __future__ import unicode_literals
 
+from __future__ import absolute_import
 import logging
 
 from django.core.cache import cache
@@ -55,27 +56,22 @@ def get_edx_api_data(api_config, resource, api, resource_id=None, querystring=No
 
         cached = cache.get(cache_key)
         if cached:
-            log.info("Cached course run was returned for the course: {resource_id} and response is {cached} ".
-                     format(resource_id=resource_id, cached=zunpickle(cached)))
-            return zunpickle(cached)
+            cached_response = zunpickle(cached)
+            if fields:
+                cached_response = get_fields(fields, cached_response)
+
+            return cached_response
 
     try:
         endpoint = getattr(api, resource)
         querystring = querystring if querystring else {}
-        log.info("Hitting discovery for course run:{resource_id}".format(resource_id=resource_id))
         response = endpoint(resource_id).get(**querystring)
-        log.info("Response for the course: {resource_id} from discovery: {response} ".
-                 format(resource_id=resource_id, response=response))
 
-        if resource_id is not None:
-            if fields:
-                results = get_fields(fields, response)
-            else:
-                results = response
-        elif traverse_pagination:
+        if resource_id is None and traverse_pagination:
             results = _traverse_pagination(response, endpoint, querystring, no_data)
         else:
             results = response
+
     except:  # pylint: disable=bare-except
         log.exception('Failed to retrieve data from the %s API.', api_config.API_NAME)
         return no_data
@@ -86,6 +82,9 @@ def get_edx_api_data(api_config, resource, api, resource_id=None, querystring=No
         if long_term_cache:
             cache_ttl = api_config.long_term_cache_ttl
         cache.set(cache_key, zdata, cache_ttl)
+
+    if fields:
+        results = get_fields(fields, results)
 
     return results
 

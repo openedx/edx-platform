@@ -156,7 +156,7 @@ class CourseGradeFactory(object):
             course_data,
             persistent_grade.percent_grade,
             persistent_grade.letter_grade,
-            persistent_grade.letter_grade is not u''
+            persistent_grade.letter_grade != u''
         )
 
     @staticmethod

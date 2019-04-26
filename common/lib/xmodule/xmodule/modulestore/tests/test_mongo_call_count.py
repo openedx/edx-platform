@@ -164,8 +164,6 @@ class CountMongoCallsCourseTraversal(TestCase):
         with store_builder.build(request_cache=request_cache) as (content_store, modulestore):
             course_key = self._import_course(content_store, modulestore)
 
-            # Course traversal modeled after the traversal done here:
-            # lms/djangoapps/mobile_api/video_outlines/serializers.py:BlockOutline
             # Starting at the root course block, do a breadth-first traversal using
             # get_children() to retrieve each block's children.
             with check_mongo_calls(num_mongo_calls):

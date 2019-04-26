@@ -25,11 +25,6 @@
         return function(options) {
             var $learnerProfileElement = $('.wrapper-profile');
 
-            // TODO: LEARNER-2554: 09/2017: Remove this hiding logic when the message is removed.
-            $('.action-dismiss').click(function() {
-                $('.user-messages').hide();
-            });
-
             var accountSettingsModel = new AccountSettingsModel(
                 _.extend(
                     options.account_settings_data,

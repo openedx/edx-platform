@@ -192,6 +192,7 @@ def install_node_prereqs():
 # To add a package to the uninstall list, just add it to this list! No need
 # to touch any other part of this file.
 PACKAGES_TO_UNINSTALL = [
+    "MySQL-python",                 # Because mysqlclient shares the same directory name
     "South",                        # Because it interferes with Django 1.8 migrations.
     "edxval",                       # Because it was bork-installed somehow.
     "django-storages",
@@ -199,6 +200,7 @@ PACKAGES_TO_UNINSTALL = [
     "edx-oauth2-provider",          # Because it moved from github to pypi
     "i18n-tools",                   # Because now it's called edx-i18n-tools
     "python-saml",                  # Because python3-saml shares the same directory name
+    "pdfminer",                     # Replaced by pdfminer.six, which shares the same directory name
 ]
 
 

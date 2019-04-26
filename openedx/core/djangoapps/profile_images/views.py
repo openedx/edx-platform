@@ -1,14 +1,17 @@
 """
 This module implements the upload and remove endpoints of the profile image api.
 """
+from __future__ import absolute_import
+
 import datetime
 import itertools
 import logging
 from contextlib import closing
 
-from pytz import UTC
 from django.utils.translation import ugettext as _
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
+from pytz import UTC
 from rest_framework import permissions, status
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
@@ -110,7 +113,11 @@ class ProfileImageView(DeveloperErrorViewMixin, APIView):
     """
 
     parser_classes = (MultiPartParser, FormParser, TypedFileUploadParser)
-    authentication_classes = (OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser)
+    authentication_classes = (
+        JwtAuthentication,
+        OAuth2AuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
     permission_classes = (permissions.IsAuthenticated, IsUserInUrl)
 
     upload_media_types = set(itertools.chain(*(image_type.mimetypes for image_type in IMAGE_TYPES.values())))
@@ -157,7 +164,7 @@ class ProfileImageView(DeveloperErrorViewMixin, APIView):
 
             log.info(
                 LOG_MESSAGE_CREATE,
-                {'image_names': profile_image_names.values(), 'user_id': request.user.id}
+                {'image_names': list(profile_image_names.values()), 'user_id': request.user.id}
             )
 
         # send client response.
@@ -178,7 +185,7 @@ class ProfileImageView(DeveloperErrorViewMixin, APIView):
 
             log.info(
                 LOG_MESSAGE_DELETE,
-                {'image_names': profile_image_names.values(), 'user_id': request.user.id}
+                {'image_names': list(profile_image_names.values()), 'user_id': request.user.id}
             )
         except UserNotFound:
             return Response(status=status.HTTP_404_NOT_FOUND)

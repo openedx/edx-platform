@@ -29,7 +29,7 @@ class SettingsType(object):
     See https://github.com/edx/edx-platform/master/lms/envs/docs/README.rst for
     further information on each Settings Type.
     """
-    AWS = u'aws'
+    PRODUCTION = u'production'
     COMMON = u'common'
     DEVSTACK = u'devstack'
     TEST = u'test'

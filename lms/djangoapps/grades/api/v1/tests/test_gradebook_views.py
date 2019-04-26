@@ -293,6 +293,17 @@ class GradebookViewTestBase(GradeViewTestMixin, APITestCase):
                 ),
             ],
         }
+
+        # Data about graded subsections visible to staff only
+        # should not be exposed via the gradebook API
+        cls.hidden_subsection = ItemFactory.create(
+            parent_location=cls.chapter_1.location,
+            category='sequential',
+            graded=True,
+            visible_to_staff_only=True,
+            display_name='Hidden Section',
+        )
+
         cls.course_data = CourseData(None, course=cls.course)
         # we have to force the collection of course data from the block_structure API
         # so that CourseGrade.course_data objects can later have a non-null effective_structure
@@ -479,6 +490,12 @@ class GradebookViewTest(GradebookViewTestBase):
         self.assertIsNone(actual_data['next'])
         self.assertIsNone(actual_data['previous'])
         self.assertEqual(expected_results, actual_data['results'])
+        # assert that the hidden subsection data is not represented in the response
+        for actual_user_data in actual_data['results']:
+            actual_subsection_display_names = [
+                item['subsection_name'] for item in actual_user_data['section_breakdown']
+            ]
+            self.assertNotIn(self.hidden_subsection.display_name, actual_subsection_display_names)
 
     def _assert_empty_response(self, response):
         """
@@ -584,6 +601,11 @@ class GradebookViewTest(GradebookViewTestBase):
                 self.assertEqual(status.HTTP_200_OK, resp.status_code)
                 actual_data = dict(resp.data)
                 self.assertEqual(expected_results, actual_data)
+                # assert that the hidden subsection data is not represented in the response
+                actual_subsection_display_names = [
+                    item['subsection_name'] for item in actual_data['section_breakdown']
+                ]
+                self.assertNotIn(self.hidden_subsection.display_name, actual_subsection_display_names)
 
     @ddt.data(
         'login_staff',

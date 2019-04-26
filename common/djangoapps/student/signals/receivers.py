@@ -7,14 +7,8 @@ from django.conf import settings
 from django.utils import timezone
 
 from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, waffle
-from student.helpers import (
-    AccountValidationError,
-    USERNAME_EXISTS_MSG_FMT
-)
-from student.models import (
-    is_email_retired,
-    is_username_retired,
-)
+from student.helpers import USERNAME_EXISTS_MSG_FMT, AccountValidationError
+from student.models import is_email_retired, is_username_retired
 
 
 def update_last_login(sender, user, **kwargs):  # pylint: disable=unused-argument

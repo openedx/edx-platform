@@ -8,6 +8,8 @@ NOTE: These views are deprecated.  These routes are superseded by
 """
 # pylint: enable=unicode-format-string
 
+from __future__ import absolute_import
+
 from django.conf import settings
 from django.conf.urls import url
 

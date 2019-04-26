@@ -317,7 +317,13 @@ def course_info(request, course_id):
             course.id, request.user, course, depth=2
         )
         course_module = get_module_for_descriptor(
-            user, request, course, field_data_cache, course.id, course=course
+            user,
+            request,
+            course,
+            field_data_cache,
+            course.id,
+            course=course,
+            will_recheck_access=True,
         )
         chapter_module = get_current_child(course_module)
         if chapter_module is not None:
@@ -535,23 +541,38 @@ class CourseTabView(EdxFragmentView):
         allow_anonymous = allow_public_access(course, [COURSE_VISIBILITY_PUBLIC])
 
         if request.user.is_anonymous and not allow_anonymous:
-            PageLevelMessages.register_warning_message(
-                request,
-                Text(_(u"To see course content, {sign_in_link} or {register_link}.")).format(
-                    sign_in_link=HTML(u'<a href="/login?next={current_url}">{sign_in_label}</a>').format(
-                        sign_in_label=_("sign in"),
-                        current_url=urlquote_plus(request.path),
-                    ),
-                    register_link=HTML(u'<a href="/register?next={current_url}">{register_label}</a>').format(
-                        register_label=_("register"),
-                        current_url=urlquote_plus(request.path),
-                    ),
+            if CourseTabView.course_open_for_learner_enrollment(course):
+                PageLevelMessages.register_warning_message(
+                    request,
+                    Text(_(u"To see course content, {sign_in_link} or {register_link}.")).format(
+                        sign_in_link=HTML(u'<a href="/login?next={current_url}">{sign_in_label}</a>').format(
+                            sign_in_label=_("sign in"),
+                            current_url=urlquote_plus(request.path),
+                        ),
+                        register_link=HTML(u'<a href="/register?next={current_url}">{register_label}</a>').format(
+                            register_label=_("register"),
+                            current_url=urlquote_plus(request.path),
+                        ),
+                    )
                 )
-            )
+            else:
+                PageLevelMessages.register_warning_message(
+                    request,
+                    Text(_(u"{sign_in_link} or {register_link}.")).format(
+                        sign_in_link=HTML(u'<a href="/login?next={current_url}">{sign_in_label}</a>').format(
+                            sign_in_label=_("Sign in"),
+                            current_url=urlquote_plus(request.path),
+                        ),
+                        register_link=HTML(u'<a href="/register?next={current_url}">{register_label}</a>').format(
+                            register_label=_("register"),
+                            current_url=urlquote_plus(request.path),
+                        ),
+                    )
+                )
         else:
             if not CourseEnrollment.is_enrolled(request.user, course.id) and not allow_anonymous:
                 # Only show enroll button if course is open for enrollment.
-                if course_open_for_self_enrollment(course.id):
+                if CourseTabView.course_open_for_learner_enrollment(course):
                     enroll_message = _(u'You must be enrolled in the course to see course content. \
                             {enroll_link_start}Enroll now{enroll_link_end}.')
                     PageLevelMessages.register_warning_message(
@@ -566,6 +587,12 @@ class CourseTabView(EdxFragmentView):
                         request,
                         Text(_('You must be enrolled in the course to see course content.'))
                     )
+
+    @staticmethod
+    def course_open_for_learner_enrollment(course):
+        return (course_open_for_self_enrollment(course.id)
+                and not course.invitation_only
+                and not CourseMode.is_masters_only(course.id))
 
     @staticmethod
     def handle_exceptions(request, course_key, course, exception):
@@ -900,7 +927,7 @@ def program_marketing(request, program_uuid):
     """
     Display the program marketing page.
     """
-    program_data = get_programs(request.site, uuid=program_uuid)
+    program_data = get_programs(uuid=program_uuid)
 
     if not program_data:
         raise Http404
@@ -1051,11 +1078,14 @@ def _certificate_message(student, course, enrollment_mode):
     if cert_downloadable_status['is_generating']:
         return GENERATING_CERT_DATA
 
-    if cert_downloadable_status['is_unverified'] or _missing_required_verification(student, enrollment_mode):
+    if cert_downloadable_status['is_unverified']:
         return UNVERIFIED_CERT_DATA
 
     if cert_downloadable_status['is_downloadable']:
         return _downloadable_certificate_message(course, cert_downloadable_status)
+
+    if _missing_required_verification(student, enrollment_mode):
+        return UNVERIFIED_CERT_DATA
 
     return REQUESTING_CERT_DATA
 

@@ -11,6 +11,7 @@ from rest_framework import permissions
 
 from django.db import transaction
 from django.utils.translation import ugettext as _
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
@@ -83,7 +84,11 @@ class PreferencesView(APIView):
             If the update is successful, an HTTP 204 "No Content" response is
             returned with no additional content.
     """
-    authentication_classes = (OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser)
+    authentication_classes = (
+        JwtAuthentication,
+        OAuth2AuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
     permission_classes = (permissions.IsAuthenticated, IsUserInUrlOrStaff)
     parser_classes = (MergePatchParser,)
 

@@ -37,9 +37,6 @@ TEST_MONGODB_LOG = {
     'db': 'test_xlog',
 }
 
-FEATURES_WITH_SSL_AUTH = settings.FEATURES.copy()
-FEATURES_WITH_SSL_AUTH['AUTH_USE_CERTIFICATES'] = True
-
 
 @override_settings(
     MONGODB_LOG=TEST_MONGODB_LOG,

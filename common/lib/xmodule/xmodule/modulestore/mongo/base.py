@@ -11,7 +11,7 @@ structure:
     'definition.children': <list of all child text_type(location)s>
 }
 """
-
+import six
 import copy
 from datetime import datetime
 from importlib import import_module
@@ -57,7 +57,10 @@ log = logging.getLogger(__name__)
 new_contract('CourseKey', CourseKey)
 new_contract('AssetKey', AssetKey)
 new_contract('AssetMetadata', AssetMetadata)
-new_contract('long', long)
+if six.PY2:
+    new_contract('long', long)
+else:
+    new_contract('long', int)
 new_contract('BlockUsageLocator', BlockUsageLocator)
 
 # sort order that returns DRAFT items first

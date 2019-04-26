@@ -4,6 +4,7 @@ Helper functions shared by built-in XBlocks.
 """
 
 
+from __future__ import absolute_import
 from django.conf import settings
 
 

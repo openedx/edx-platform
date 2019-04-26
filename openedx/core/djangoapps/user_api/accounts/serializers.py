@@ -24,7 +24,7 @@ from openedx.core.djangoapps.user_api.serializers import ReadOnlyFieldsSerialize
 from student.models import UserProfile, LanguageProficiency, SocialLink
 
 from . import (
-    NAME_MIN_LENGTH, ACCOUNT_VISIBILITY_PREF_KEY, PRIVATE_VISIBILITY, CUSTOM_VISIBILITY,
+    BIO_MAX_LENGTH, NAME_MIN_LENGTH, ACCOUNT_VISIBILITY_PREF_KEY, PRIVATE_VISIBILITY, CUSTOM_VISIBILITY,
     ALL_USERS_VISIBILITY, VISIBILITY_PREFIX
 )
 from .image_helpers import get_profile_image_urls_for_user
@@ -217,6 +217,14 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
         # Currently no read-only field, but keep this so view code doesn't need to know.
         read_only_fields = ()
         explicit_read_only_fields = ("profile_image", "requires_parental_consent")
+
+    def validate_bio(self, new_bio):
+        """ Enforce maximum length for bio. """
+        if len(new_bio) > BIO_MAX_LENGTH:
+            raise serializers.ValidationError(
+                u"The about me field must be at most {} characters long.".format(BIO_MAX_LENGTH)
+            )
+        return new_bio
 
     def validate_name(self, new_name):
         """ Enforce minimum length for name. """
@@ -497,7 +505,7 @@ def _visible_fields(user_profile, user, configuration=None):
 
     profile_visibility = get_profile_visibility(user_profile, user, configuration)
     if profile_visibility == ALL_USERS_VISIBILITY:
-        return configuration.get('shareable_fields')
+        return configuration.get('bulk_shareable_fields')
 
     elif profile_visibility == CUSTOM_VISIBILITY:
         return _visible_fields_from_custom_preferences(user, configuration)
@@ -513,7 +521,7 @@ def _visible_fields_from_custom_preferences(user, configuration):
     """
     preferences = UserPreference.get_all_preferences(user)
     fields_shared_with_all_users = [
-        field_name for field_name in configuration.get('shareable_fields')
+        field_name for field_name in configuration.get('custom_shareable_fields')
         if preferences.get('{}{}'.format(VISIBILITY_PREFIX, field_name)) == 'all_users'
     ]
     return set(fields_shared_with_all_users + configuration.get('public_fields'))

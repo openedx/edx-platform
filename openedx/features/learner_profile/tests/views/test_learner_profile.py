@@ -17,6 +17,7 @@ from django.test.client import RequestFactory
 from opaque_keys.edx.locator import CourseLocator
 from openedx.features.learner_profile import REDIRECT_TO_PROFILE_MICROFRONTEND
 from openedx.features.learner_profile.views.learner_profile import learner_profile_context
+from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
@@ -25,7 +26,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @ddt.ddt
-class LearnerProfileViewTest(UrlResetMixin, ModuleStoreTestCase):
+class LearnerProfileViewTest(SiteMixin, UrlResetMixin, ModuleStoreTestCase):
     """ Tests for the student profile view. """
 
     USERNAME = "username"
@@ -120,6 +121,19 @@ class LearnerProfileViewTest(UrlResetMixin, ModuleStoreTestCase):
         with override_settings(PROFILE_MICROFRONTEND_URL=profile_url):
             with override_waffle_flag(REDIRECT_TO_PROFILE_MICROFRONTEND, active=True):
                 profile_path = reverse('learner_profile', kwargs={'username': self.USERNAME})
+
+                # Test with waffle flag active, site setting disabled
+                response = self.client.get(path=profile_path)
+                for attribute in self.CONTEXT_DATA:
+                    self.assertIn(attribute, response.content)
+
+                # Test with waffle flag active, site setting enabled
+                site_domain = 'othersite.example.com'
+                self.set_up_site(site_domain, {
+                    'SITE_NAME': site_domain,
+                    'ENABLE_PROFILE_MICROFRONTEND': True
+                })
+                self.client.login(username=self.USERNAME, password=self.PASSWORD)
                 response = self.client.get(path=profile_path)
                 self.assertRedirects(response, profile_url + self.USERNAME, target_status_code=404)
 

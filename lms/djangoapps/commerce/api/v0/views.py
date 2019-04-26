@@ -5,6 +5,7 @@ from django.urls import reverse
 from edx_rest_api_client import exceptions
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.status import HTTP_406_NOT_ACCEPTABLE, HTTP_409_CONFLICT
@@ -35,7 +36,9 @@ class BasketsView(APIView):
     """ Creates a basket with a course seat and enrolls users. """
 
     # LMS utilizes User.user_is_active to indicate email verification, not whether an account is active. Sigh!
-    authentication_classes = (EnrollmentCrossDomainSessionAuth, OAuth2AuthenticationAllowInactiveUser)
+    authentication_classes = (JwtAuthentication,
+                              OAuth2AuthenticationAllowInactiveUser,
+                              EnrollmentCrossDomainSessionAuth)
     permission_classes = (IsAuthenticated,)
 
     def _is_data_valid(self, request):

@@ -38,7 +38,7 @@ from user_tasks.tasks import UserTask
 
 from contentstore.courseware_index import CoursewareSearchIndexer, LibrarySearchIndexer, SearchIndexingError
 from contentstore.storage import course_import_export_storage
-from contentstore.utils import initialize_permissions, reverse_usage_url
+from contentstore.utils import initialize_permissions, reverse_usage_url, execute_and_log_time
 from contentstore.video_utils import scrape_youtube_thumbnail
 from course_action_state.models import CourseRerunState
 from models.settings.course_metadata import CourseMetadata
@@ -458,16 +458,18 @@ def rerun_course(source_course_key_string, destination_course_key_string, user_i
         # as the Mongo modulestore doesn't support multiple runs of the same course.
         store = modulestore()
         with store.default_store('split'):
-            store.clone_course(source_course_key, destination_course_key, user_id, fields=fields)
+            execute_and_log_time(
+                store.clone_course, source_course_key, destination_course_key, user_id, fields=fields
+            )
 
         # set initial permissions for the user to access the course.
-        initialize_permissions(destination_course_key, User.objects.get(id=user_id))
+        execute_and_log_time(initialize_permissions, destination_course_key, User.objects.get(id=user_id))
 
         # update state: Succeeded
         CourseRerunState.objects.succeeded(course_key=destination_course_key)
 
         # call edxval to attach videos to the rerun
-        copy_course_videos(source_course_key, destination_course_key)
+        execute_and_log_time(copy_course_videos, source_course_key, destination_course_key)
 
         # Copy OrganizationCourse
         organization_course = OrganizationCourse.objects.filter(course_id=source_course_key_string).first()
@@ -475,14 +477,7 @@ def rerun_course(source_course_key_string, destination_course_key_string, user_i
         if organization_course:
             clone_instance(organization_course, {'course_id': destination_course_key_string})
 
-        # Copy RestrictedCourse
-        restricted_course = RestrictedCourse.objects.filter(course_key=source_course_key).first()
-
-        if restricted_course:
-            country_access_rules = CountryAccessRule.objects.filter(restricted_course=restricted_course)
-            new_restricted_course = clone_instance(restricted_course, {'course_key': destination_course_key})
-            for country_access_rule in country_access_rules:
-                clone_instance(country_access_rule, {'restricted_course': new_restricted_course})
+        execute_and_log_time(add_course_restrictions, source_course_key, destination_course_key)
 
         return "succeeded"
 
@@ -506,6 +501,17 @@ def rerun_course(source_course_key_string, destination_course_key_string, user_i
             pass
 
         return u"exception: " + text_type(exc)
+
+
+def add_course_restrictions(source_course_key, destination_course_key):
+    """Adds course restrictions"""
+    restricted_course = RestrictedCourse.objects.filter(course_key=source_course_key).first()
+
+    if restricted_course:
+        country_access_rules = CountryAccessRule.objects.filter(restricted_course=restricted_course)
+        new_restricted_course = clone_instance(restricted_course, {'course_key': destination_course_key})
+        for country_access_rule in country_access_rules:
+            clone_instance(country_access_rule, {'restricted_course': new_restricted_course})
 
 
 def deserialize_fields(json_fields):

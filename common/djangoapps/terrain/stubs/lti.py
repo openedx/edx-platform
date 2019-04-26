@@ -9,20 +9,27 @@ not possible to have this LTI multiple times on a single page in LMS.
 
 """
 
+from __future__ import absolute_import
+
 import base64
 import hashlib
+import logging
 import os
 import textwrap
-import urllib
 from uuid import uuid4
+
 import mock
 import oauthlib.oauth1
 import requests
-from openedx.core.djangolib.markup import HTML
-from http import StubHttpRequestHandler, StubHttpService
+import six
+import six.moves.urllib.error  # pylint: disable=import-error
+import six.moves.urllib.parse  # pylint: disable=import-error
+import six.moves.urllib.request  # pylint: disable=import-error
 from oauthlib.oauth1.rfc5849 import parameters, signature
 
-import logging
+from openedx.core.djangolib.markup import HTML
+
+from .http import StubHttpRequestHandler, StubHttpService
 
 log = logging.getLogger(__name__)
 
@@ -233,7 +240,7 @@ class StubLtiHandler(StubHttpRequestHandler):
 
         # Currently LTI module doublequotes the lis_result_sourcedid parameter.
         # Unquote response two times.
-        return urllib.unquote(urllib.unquote(response_str))
+        return six.moves.urllib.parse.unquote(six.moves.urllib.parse.unquote(response_str))
 
     def _is_correct_lti_request(self):
         """
@@ -249,8 +256,8 @@ class StubLtiHandler(StubHttpRequestHandler):
         client_key = self.server.config.get('client_key', self.DEFAULT_CLIENT_KEY)
         client_secret = self.server.config.get('client_secret', self.DEFAULT_CLIENT_SECRET)
         client = oauthlib.oauth1.Client(
-            client_key=unicode(client_key),
-            client_secret=unicode(client_secret)
+            client_key=six.text_type(client_key),
+            client_secret=six.text_type(client_secret)
         )
         headers = {
             # This is needed for body encoding:
@@ -260,13 +267,13 @@ class StubLtiHandler(StubHttpRequestHandler):
         # Calculate and encode body hash. See http://oauth.googlecode.com/svn/spec/ext/body_hash/1.0/oauth-bodyhash.html
         sha1 = hashlib.sha1()
         sha1.update(body)
-        oauth_body_hash = unicode(base64.b64encode(sha1.digest()))
+        oauth_body_hash = six.text_type(base64.b64encode(sha1.digest()))
         mock_request = mock.Mock(
-            uri=unicode(urllib.unquote(url)),
+            uri=six.text_type(six.moves.urllib.parse.unquote(url)),
             headers=headers,
             body=u"",
             decoded_body=u"",
-            http_method=unicode(method),
+            http_method=six.text_type(method),
         )
         params = client.get_oauth_params(mock_request)
         mock_request.oauth_params = params
@@ -292,17 +299,17 @@ class StubLtiHandler(StubHttpRequestHandler):
         Returns `True` if signatures are correct, otherwise `False`.
 
         """
-        client_secret = unicode(self.server.config.get('client_secret', self.DEFAULT_CLIENT_SECRET))
+        client_secret = six.text_type(self.server.config.get('client_secret', self.DEFAULT_CLIENT_SECRET))
         host = os.environ.get('BOK_CHOY_HOSTNAME', '127.0.0.1')
         port = self.server.server_address[1]
         lti_base = self.DEFAULT_LTI_ADDRESS.format(host=host, port=port)
         lti_endpoint = self.server.config.get('lti_endpoint', self.DEFAULT_LTI_ENDPOINT)
         url = lti_base + lti_endpoint
         request = mock.Mock()
-        request.params = [(unicode(k), unicode(v)) for k, v in params.items()]
-        request.uri = unicode(url)
+        request.params = [(six.text_type(k), six.text_type(v)) for k, v in params.items()]
+        request.uri = six.text_type(url)
         request.http_method = u'POST'
-        request.signature = unicode(client_signature)
+        request.signature = six.text_type(client_signature)
         return signature.verify_hmac_sha1(request, client_secret)
 
 

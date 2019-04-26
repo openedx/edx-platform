@@ -1,3 +1,8 @@
+"""
+Tests for schedules resolvers
+"""
+from __future__ import absolute_import
+
 import datetime
 from unittest import skipUnless
 
@@ -7,7 +12,7 @@ from mock import Mock
 
 from openedx.core.djangoapps.schedules.resolvers import BinnedSchedulesBaseResolver
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleConfigFactory
-from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory, SiteConfigurationFactory
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 
 

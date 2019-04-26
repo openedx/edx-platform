@@ -426,18 +426,6 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
             'Settings must be saved successfully in order to have confirmation message'
         )
 
-    def test_deprecated_settings_invisible_by_default(self):
-        """
-        Scenario: Test that advanced settings does not have deprecated settings by default
-            Given a staff logs in to studio
-            When this user goes to advanced settings page
-                Then the user does not see the deprecated settings
-                And sees 'Show Deprecated Settings' button
-        """
-        button_text = self.advanced_settings.deprecated_settings_button_text
-        self.assertEqual(button_text, 'Show Deprecated Settings')
-        self.assertFalse(self.advanced_settings.is_deprecated_setting_visible())
-
     def test_deprecated_settings_can_be_toggled(self):
         """
         Scenario: Test that advanced settings can toggle deprecated settings
@@ -772,6 +760,10 @@ class StudioSettingsA11yTest(StudioCourseTest):
         self.settings_page.a11y_audit.config.set_rules({
             "ignore": [
                 'link-href',  # TODO: AC-590
+                'aria-allowed-role',  # TODO: AC-936
+                'landmark-complementary-is-top-level',  # TODO: AC-939
+                'radiogroup',  # TODO:  AC-941
+                'region',  # TODO: AC-932
             ],
         })
 
@@ -831,6 +823,11 @@ class StudioSubsectionSettingsA11yTest(StudioCourseTest):
         self.course_outline.open_subsection_settings_dialog()
         self.course_outline.select_advanced_tab()
 
+        self.course_outline.a11y_audit.config.set_rules({
+            "ignore": [
+                'section',  # TODO: AC-491
+            ],
+        })
         # limit the scope of the audit to the special exams tab on the modal dialog
         self.course_outline.a11y_audit.config.set_scope(
             include=['section.edit-settings-timed-examination']

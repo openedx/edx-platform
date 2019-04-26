@@ -48,7 +48,7 @@ def parse_args():
         '--service-variant',
         choices=['lms', 'lms-xml', 'lms-preview'],
         default='lms',
-        help='Which service variant to run, when using the aws environment')
+        help='Which service variant to run, when using the production environment')
     lms.add_argument(
         '--contracts',
         action='store_true',

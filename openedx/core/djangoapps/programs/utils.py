@@ -109,7 +109,7 @@ class ProgramProgressMeter(object):
         self.course_grade_factory = CourseGradeFactory()
 
         if uuid:
-            self.programs = [get_programs(self.site, uuid=uuid)]
+            self.programs = [get_programs(uuid=uuid)]
         else:
             self.programs = attach_program_detail_url(get_programs(self.site), self.mobile_only)
 
@@ -285,7 +285,7 @@ class ProgramProgressMeter(object):
         Returns a dict of {uuid_string: available_datetime}
         """
         # Query for all user certs up front, for performance reasons (rather than querying per course run).
-        user_certificates = GeneratedCertificate.eligible_certificates.filter(user=self.user)
+        user_certificates = GeneratedCertificate.eligible_available_certificates.filter(user=self.user)
         certificates_by_run = {cert.course_id: cert for cert in user_certificates}
 
         completed = {}
@@ -500,9 +500,7 @@ class ProgramDataExtender(object):
                 try:
                     self.course_overview = CourseOverview.get_from_id(self.course_run_key)
                 except CourseOverview.DoesNotExist:
-                    log.warning(u'Failed to get course overview for course run key: %s',
-                                self.course_run.get('key'),
-                                exec_info=True)
+                    log.warning(u'Failed to get course overview for course run key: %s', course_run.get('key'))
                 else:
                     self.enrollment_start = self.course_overview.enrollment_start or DEFAULT_ENROLLMENT_START_DATE
 

@@ -363,6 +363,7 @@ class CertificateGenerationTaskTest(ModuleStoreTestCase):
         ('verified', True),
         ('no-id-professional', True),
         ('credit', True),
+        ('masters', True),
         ('audit', False),
         ('honor', False),
     )

@@ -2,6 +2,7 @@
 TestCases verifying proper behavior of custom DRF request parsers.
 """
 
+from __future__ import absolute_import
 from collections import namedtuple
 from io import BytesIO
 

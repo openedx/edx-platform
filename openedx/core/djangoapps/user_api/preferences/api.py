@@ -418,20 +418,22 @@ def _create_preference_update_error(preference_key, preference_value, error):
 
 def get_country_time_zones(country_code=None):
     """
-    Returns a sorted list of time zones commonly used in given
-    country or list of all time zones, if country code is None.
+    Returns a sorted list of time zones commonly used in the specified
+    country.  If country_code is None (or unrecognized), or if the country
+    has no defined time zones, return a list of all time zones.
 
     Arguments:
         country_code (str): ISO 3166-1 Alpha-2 country code
-
-    Raises:
-        CountryCodeError: the given country code is invalid
     """
-    if country_code is None:
+    if country_code is None or country_code.upper() not in set(countries.alt_codes):
         return _get_sorted_time_zone_list(common_timezones)
-    if country_code.upper() in set(countries.alt_codes):
+
+    # We can still get a failure here because there are some countries that are
+    # valid, but have no defined timezones in the pytz package (e.g. BV, HM)
+    try:
         return _get_sorted_time_zone_list(country_timezones(country_code))
-    raise CountryCodeError
+    except KeyError:
+        return _get_sorted_time_zone_list(common_timezones)
 
 
 def _get_sorted_time_zone_list(time_zone_list):

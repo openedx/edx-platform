@@ -1,5 +1,6 @@
+#######
 Testing
-=======
+#######
 
 Overview
 --------
@@ -68,13 +69,7 @@ UI Acceptance Tests
 -  We use `Bok Choy`_ to write end-user acceptance tests directly in Python,
    using the framework to maximize reliability and maintainability.
 
--  We used to use `lettuce`_ to write BDD-style tests but it's now deprecated
-   in favor of Bok Choy for new tests.  Most of these tests simulate user
-   interactions through the browser using `splinter`_.
-
 .. _Bok Choy: https://bok-choy.readthedocs.org/en/latest/tutorial.html
-.. _lettuce: http://lettuce.it/
-.. _splinter: http://splinter.cobrateam.info/
 
 
 Internationalization
@@ -101,8 +96,6 @@ Test Locations
 
    -  Set up and helper methods, and stubs for external services:
       ``common/djangoapps/terrain``
-   -  Lettuce Tests: located in ``features`` subpackage within a Django
-      app. For example: ``lms/djangoapps/courseware/features``
    -  Bok Choy Acceptance Tests: located under ``common/test/acceptance/tests``
    -  Bok Choy Accessibility Tests: located under ``common/test/acceptance/tests`` and tagged with ``@attr("a11y")``
    -  Bok Choy PageObjects: located under ``common/test/acceptance/pages``
@@ -208,6 +201,9 @@ To run a single django test class use this command::
 
     paver test_system -t lms/djangoapps/courseware/tests/tests.py::ActivateLoginTest
 
+Running a Single Test
+---------------------
+
 When developing tests, it is often helpful to be able to really just run
 one single test without the overhead of PIP installs, UX builds, etc. In
 this case, it is helpful to look at the output of paver, and run just
@@ -291,14 +287,39 @@ This is an example of how to run a single test and get stdout shown immediately,
 
     pytest cms/djangoapps/contentstore/tests/test_import.py -s
 
+How to output coverage locally
+------------------------------
+
 These are examples of how to run a single test and get coverage::
 
-    pytest cms/djangoapps/contentstore/tests/test_import.py --cov # cms example
-    pytest lms/djangoapps/courseware/tests/test_module_render.py --cov # lms example
+    pytest cms/djangoapps/contentstore/tests/test_import.py --cov --cov-conifg=.coveragerc-local # cms example
+    pytest lms/djangoapps/courseware/tests/test_module_render.py --cov --cov-conifg=.coveragerc-local # lms example
 
-Use this command to generate a coverage report::
+That ``--cov-conifg=.coveragerc-local`` option is important - without it, the coverage
+tool will look for paths that exist on our jenkins test servers, but not on your local devstack.
+
+How to spit out coverage for a single file with a list of each line that is missing coverage::
+
+   pytest lms/djangoapps/grades/tests/test_subsection_grade.py \
+       --cov=lms.djangoapps.grades.subsection_grade \
+       --cov-config=.coveragerc-local \
+       --cov-report=term-missing
+   ---------- coverage: platform linux2, python 2.7.12-final-0 ----------
+
+   Name                                        Stmts   Miss  Cover   Missing
+   -------------------------------------------------------------------------
+   lms/djangoapps/grades/subsection_grade.py     125     38    70%   47-51, 57, 80-81, 85, 89, 99, 109, 113, [...]
+
+Use this command to generate a coverage report (after previously running ``pytest``)::
 
     coverage report
+
+The above command looks for a test coverage data file in ``reports/.coverage`` - this file will
+contain coverage data from your last run of ``pytest``.  Coverage data is recorded for whichever
+paths you specified in your ``--cov`` option, e.g.::
+
+    --cov=.  # will track coverage for the entire project
+    --cov=path.to.your.module  # will track coverage only for "module"
 
 Use this command to generate an HTML report::
 
@@ -403,8 +424,7 @@ Object and Promise design patterns.
 These prerequisites are all automatically installed and available in
 `Devstack`_, the supported development enviornment for the Open edX platform.
 
-* Chromedriver and Chrome (see `Running Lettuce Acceptance Tests`_ below for
-  the latest tested versions)
+* Chromedriver and Chrome
 
 * Mongo
 
@@ -563,65 +583,6 @@ You must run BOTH `--testsonly` and `--fasttest`.
 Control-C. *Warning*: Only hit Control-C one time so the pytest framework can
 properly clean up.
 
-Running Lettuce Acceptance Tests
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Although it's deprecated now `lettuce`_ acceptance tests still exists in the
-code base. Most of our tests use `Splinter`_ to simulate UI browser
-interactions. Splinter, in turn, uses `Selenium`_ to control the Chrome
-browser.
-
-**Prerequisite**: You must have `ChromeDriver`_ installed to run the tests in
-Chrome. The tests are confirmed to run with Chrome (not Chromium) version
-34.0.1847.116 with ChromeDriver version 2.6.232917.
-
-.. _ChromeDriver: https://code.google.com/p/selenium/wiki/ChromeDriver
-
-To run all the acceptance tests, run this command::
-
-    paver test_acceptance
-
-To run only for lms or cms, run one of these commands::
-
-    paver test_acceptance -s lms
-    paver test_acceptance -s cms
-
-For example, this command tests only a specific feature::
-
-    paver test_acceptance -s lms --extra_args="lms/djangoapps/courseware/features/problems.feature"
-
-A command like this tests only a specific scenario::
-
-    paver test_acceptance -s lms --extra_args="lms/djangoapps/courseware/features/problems.feature -s 3"
-
-To start the debugger on failure, pass the ``--pdb`` option to the paver command like this::
-
-    paver test_acceptance -s lms --pdb --extra_args="lms/djangoapps/courseware/features/problems.feature"
-
-To run tests faster by not collecting static files or compiling sass, you can use
-``paver test_acceptance -s lms --fasttest`` and
-``paver test_acceptance -s cms --fasttest``.
-
-By default, all acceptance tests are run with the 'draft' ModuleStore.
-To override the modulestore that is used, use the default\_store option.
-Currently, the possible stores for acceptance tests are: 'split'
-(xmodule.modulestore.split\_mongo.split\_draft.DraftVersioningModuleStore)
-and 'draft' (xmodule.modulestore.mongo.DraftMongoModuleStore). For
-example: paver test\_acceptance --default\_store='draft' Note, however,
-all acceptance tests currently do not pass with 'split'.
-
-Acceptance tests will run on a randomized port and can be run in the
-background of paver cms and lms or unit tests. To specify the port,
-change the LETTUCE\_SERVER\_PORT constant in cms/envs/acceptance.py and
-lms/envs/acceptance.py as well as the port listed in
-cms/djangoapps/contentstore/feature/upload.py
-
-During acceptance test execution, Django log files are written to
-``test_root/log/lms_acceptance.log`` and
-``test_root/log/cms_acceptance.log``.
-
-**Note**: The acceptance tests can *not* currently run in parallel.
-
 Running Tests on Paver Scripts
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -656,50 +617,6 @@ can find those in the following locations::
 
 Do not commit the ``.po``, ``.mo``, ``.js`` files that are generated
 in the above locations during the dummy translation process!
-
-
-Debugging Acceptance Tests on Vagrant
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-If you are using a local Vagrant dev environment to run acceptance
-tests, then you will only get console text output. To actually see what
-is happening, you can turn on automatic screenshots. For each step two
-screenshots will be taken - before, and after. To do this, simply add
-the step::
-
-    Given I enable capturing of screenshots before and after each step
-
-to your scenario. This step can be added anywhere, and will enable
-automatic screenshots for all following steps for that scenario only.
-You can also use the step::
-
-    Given I disable capturing of screenshots before and after each step
-
-to turn off auto screenshots for all steps following it.
-
-Screenshots will be placed in the folder
-``{TEST_ROOT}/log/auto_screenshots``. Each time you launch acceptance
-tests, this folder will be cleaned. Each screenshot will be named
-according to the template string
-``{scenario_number}__{step_number}__{step_function_name}__{"1_before"|"2_after"}``.
-
-If you don't want to have screenshots be captured for all steps, but
-rather want fine grained control, you can use this decorator before any Python function in ``feature_name.py`` file::
-
-    @capture_screenshot_before_after
-
-The decorator will capture two screenshots: one before the decorated function runs,
-and one after. Also, this function is available, and can be inserted at any point in code to capture a
-screenshot specifically in that place::
-
-    from lettuce import world; world.capture_screenshot("image_name")
-
-In both cases the captured screenshots will go to the same folder as when using the step method: ``{TEST_ROOT}/log/auto_screenshot``.
-
-A totally different approach to visually seeing acceptance tests run in
-Vagrant is to redirect Vagrant X11 session to your local machine. Please
-see https://github.com/edx/edx-platform/wiki/Test-engineering-FAQ for
-instruction on how to achieve this.
 
 Viewing Test Coverage
 ---------------------

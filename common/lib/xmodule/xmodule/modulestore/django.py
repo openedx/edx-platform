@@ -198,6 +198,10 @@ class SignalHandler(object):
             log.info('Sent %s signal to %s with kwargs %s. Response was: %s', signal_name, receiver, kwargs, response)
 
 
+# to allow easy imports
+globals().update({sig.name.upper(): sig for sig in SignalHandler.all_signals()})
+
+
 def load_function(path):
     """
     Load a function by name.

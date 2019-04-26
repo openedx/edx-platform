@@ -15,8 +15,6 @@ from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.user_authn.views.deprecated import (
     register_user as old_register_view, signin_user as old_login_view
 )
-from openedx.core.djangoapps.external_auth.login_and_register import login as external_auth_login
-from openedx.core.djangoapps.external_auth.login_and_register import register as external_auth_register
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
 from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled
@@ -96,11 +94,6 @@ def login_and_registration_form(request, initial_mode="login"):
             return old_login_view(request)
         elif initial_mode == "register":
             return old_register_view(request)
-
-    # Allow external auth to intercept and handle the request
-    ext_auth_response = _external_auth_intercept(request, initial_mode)
-    if ext_auth_response is not None:
-        return ext_auth_response
 
     # Account activation message
     account_activation_messages = [
@@ -250,20 +243,3 @@ def _third_party_auth_context(request, redirect_to, tpa_hint=None):
                 break
 
     return context
-
-
-def _external_auth_intercept(request, mode):
-    """Allow external auth to intercept a login/registration request.
-
-    Arguments:
-        request (Request): The original request.
-        mode (str): Either "login" or "register"
-
-    Returns:
-        Response or None
-
-    """
-    if mode == "login":
-        return external_auth_login(request)
-    elif mode == "register":
-        return external_auth_register(request)

@@ -1,13 +1,16 @@
 """
 Discussion API views
 """
+import logging
+
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import permissions
 from rest_framework import status
-from rest_framework.exceptions import UnsupportedMediaType
+from rest_framework.exceptions import ParseError, UnsupportedMediaType
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -49,10 +52,12 @@ from discussion_api.serializers import (
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.api.parsers import MergePatchParser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
-from openedx.core.djangoapps.user_api.accounts.permissions import CanRetireUser
+from openedx.core.djangoapps.user_api.accounts.permissions import CanReplaceUsername, CanRetireUser
 from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 from util.json_request import JsonResponse
 from xmodule.modulestore.django import modulestore
+
+log = logging.getLogger(__name__)
 
 
 @view_auth_classes()
@@ -586,6 +591,107 @@ class RetireUserView(APIView):
             return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ReplaceUsernamesView(APIView):
+    """
+    WARNING: This API is only meant to be used as part of a larger job that
+    updates usernames across all services. DO NOT run this alone or users will
+    not match across the system and things will be broken.
+
+    API will recieve a list of current usernames and their new username.
+
+    POST /api/discussion/v1/accounts/replace_usernames/
+        {
+            "username_mappings": [
+                {"current_username_1": "desired_username_1"},
+                {"current_username_2": "desired_username_2"}
+            ]
+        }
+    """
+
+    authentication_classes = (JwtAuthentication,)
+    permission_classes = (permissions.IsAuthenticated, CanReplaceUsername)
+
+    def post(self, request):
+        """
+        Implements the username replacement endpoint
+        """
+
+        username_mappings = request.data.get("username_mappings")
+
+        if not self._has_valid_schema(username_mappings):
+            raise ParseError("Request data does not match schema")
+
+        successful_replacements, failed_replacements = [], []
+
+        for username_pair in username_mappings:
+            current_username = list(username_pair.keys())[0]
+            new_username = list(username_pair.values())[0]
+            successfully_replaced = self._replace_username(current_username, new_username)
+            if successfully_replaced:
+                successful_replacements.append({current_username: new_username})
+            else:
+                failed_replacements.append({current_username: new_username})
+
+        return Response(
+            status=status.HTTP_200_OK,
+            data={
+                "successful_replacements": successful_replacements,
+                "failed_replacements": failed_replacements
+            }
+        )
+
+    def _replace_username(self, current_username, new_username):
+        """
+        Replaces the current username with the new username in the forums service
+        """
+        try:
+            # This API will be called after the regular LMS API, so the username in
+            # the DB will have already been updated to new_username
+            current_user = User.objects.get(username=new_username)
+            cc_user = comment_client.User.from_django_user(current_user)
+            cc_user.replace_username(new_username)
+        except User.DoesNotExist:
+            log.warning(
+                u"Unable to change username from %s to %s in forums because %s doesn't exist in LMS DB.",
+                current_username,
+                new_username,
+                new_username,
+            )
+            return True
+        except comment_client.CommentClientRequestError as exc:
+            if exc.status_code == 404:
+                log.info(
+                    u"Unable to change username from %s to %s in forums because user doesn't exist in forums",
+                    current_username,
+                    new_username,
+                )
+                return True
+            else:
+                log.exception(
+                    u"Unable to change username from %s to %s in forums because forums API call failed with: %s.",
+                    current_username,
+                    new_username,
+                    exc,
+                )
+            return False
+
+        log.info(
+            u"Successfully changed username from %s to %s in forums.",
+            current_username,
+            new_username,
+        )
+        return True
+
+    def _has_valid_schema(self, post_data):
+        """ Verifies the data is a list of objects with a single key:value pair """
+        if not isinstance(post_data, list):
+            return False
+        for obj in post_data:
+            if not (isinstance(obj, dict) and len(obj) == 1):
+                return False
+        return True
 
 
 class CourseDiscussionSettingsAPIView(DeveloperErrorViewMixin, APIView):

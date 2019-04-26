@@ -1,6 +1,8 @@
 """
 Serializers for all Course Enrollment related return objects.
 """
+from __future__ import absolute_import
+
 import logging
 
 from rest_framework import serializers

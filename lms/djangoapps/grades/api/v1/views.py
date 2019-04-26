@@ -35,8 +35,10 @@ def bulk_course_grade_context(course_key, users):
     on context exit.
     """
     PersistentCourseGrade.prefetch(course_key, users)
-    yield
-    PersistentCourseGrade.clear_prefetched_data(course_key)
+    try:
+        yield
+    finally:
+        PersistentCourseGrade.clear_prefetched_data(course_key)
 
 
 class CourseGradesView(GradeViewMixin, PaginatedAPIView):

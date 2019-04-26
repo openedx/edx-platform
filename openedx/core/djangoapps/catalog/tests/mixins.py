@@ -1,4 +1,6 @@
 """Mixins to help test catalog integration."""
+from __future__ import absolute_import
+
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 
 

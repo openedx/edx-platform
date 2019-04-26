@@ -38,7 +38,7 @@ class AuditExpiredError(AccessError):
         expiration_date = strftime_localized(expiration_date, EXPIRATION_DATE_FORMAT_STR)
         user_message = _(u"Access expired on {expiration_date}").format(expiration_date=expiration_date)
         try:
-            course_name = CourseOverview.get_from_id(course.id).display_name_with_default
+            course_name = course.display_name_with_default
             additional_context_user_message = _(u"Access to {course_name} expired on {expiration_date}").format(
                 course_name=course_name,
                 expiration_date=expiration_date
@@ -77,6 +77,14 @@ def get_user_course_expiration_date(user, course):
         # for most people. Using the schedule date will provide flexibility to deal with
         # more complex business rules in the future.
         content_availability_date = enrollment.schedule.start
+        # We have anecdotally observed a case where the schedule.start was
+        # equal to the course start, but should have been equal to the enrollment start
+        # https://openedx.atlassian.net/browse/PROD-58
+        # This section is meant to address that case
+        if enrollment.created and course.start:
+            if (content_availability_date.date() == course.start.date() and
+               course.start < enrollment.created < timezone.now()):
+                content_availability_date = enrollment.created
     except CourseEnrollment.schedule.RelatedObjectDoesNotExist:
         content_availability_date = max(enrollment.created, course.start)
 

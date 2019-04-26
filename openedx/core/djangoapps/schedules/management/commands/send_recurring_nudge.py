@@ -1,3 +1,8 @@
+"""
+Management command to send recurring Schedule nudges
+"""
+from __future__ import absolute_import
+
 from openedx.core.djangoapps.schedules.management.commands import SendEmailBaseCommand
 from openedx.core.djangoapps.schedules.tasks import ScheduleRecurringNudge
 

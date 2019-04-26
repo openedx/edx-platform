@@ -43,7 +43,6 @@ from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from mobile_api.models import IgnoreMobileAvailableFlagConfig
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from openedx.features.course_duration_limits.access import check_course_expired
 from student import auth
 from student.models import CourseEnrollmentAllowed
@@ -248,21 +247,9 @@ def _can_enroll_courselike(user, courselike):
     Returns:
         AccessResponse, indicating whether the user can enroll.
     """
-    enrollment_domain = courselike.enrollment_domain
     # Courselike objects (e.g., course descriptors and CourseOverviews) have an attribute named `id`
     # which actually points to a CourseKey. Sigh.
     course_key = courselike.id
-
-    # If using a registration method to restrict enrollment (e.g., Shibboleth)
-    if settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and enrollment_domain:
-        if user is not None and user.is_authenticated and \
-                ExternalAuthMap.objects.filter(user=user, external_domain=enrollment_domain):
-            debug("Allow: external_auth of " + enrollment_domain)
-            reg_method_ok = True
-        else:
-            reg_method_ok = False
-    else:
-        reg_method_ok = True
 
     # If the user appears in CourseEnrollmentAllowed paired with the given course key,
     # they may enroll, except if the CEA has already been used by a different user.
@@ -289,7 +276,7 @@ def _can_enroll_courselike(user, courselike):
     now = datetime.now(UTC)
     enrollment_start = courselike.enrollment_start or datetime.min.replace(tzinfo=UTC)
     enrollment_end = courselike.enrollment_end or datetime.max.replace(tzinfo=UTC)
-    if reg_method_ok and enrollment_start < now < enrollment_end:
+    if enrollment_start < now < enrollment_end:
         debug("Allow: in enrollment period")
         return ACCESS_GRANTED
 
@@ -516,11 +503,12 @@ def _has_group_access(descriptor, user, course_key):
 
     if missing_groups:
         partition, user_group, allowed_groups = missing_groups[0]
+        block_key = descriptor.scope_ids.usage_id
         return IncorrectPartitionGroupError(
             partition=partition,
             user_group=user_group,
             allowed_groups=allowed_groups,
-            user_message=partition.access_denied_message(descriptor, user, user_group, allowed_groups),
+            user_message=partition.access_denied_message(block_key, user, user_group, allowed_groups),
             user_fragment=partition.access_denied_fragment(descriptor, user, user_group, allowed_groups),
         )
 

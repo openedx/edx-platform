@@ -6,6 +6,8 @@ from django.conf import settings
 from jwkest import jwk
 from jwkest.jws import JWS
 
+from edx_rbac.utils import create_role_auth_claim_for_user
+
 from edx_django_utils.monitoring import set_custom_metric
 from openedx.core.djangoapps.oauth_dispatch.toggles import ENFORCE_JWT_SCOPES
 from student.models import UserProfile, anonymous_id_for_user
@@ -100,6 +102,9 @@ def _create_jwt(
         secret (string): Overrides configured JWT secret (signing) key.
     """
     use_asymmetric_key = _get_use_asymmetric_key_value(is_restricted, use_asymmetric_key)
+    # Default scopes should only contain non-privileged data.
+    # Do not be misled by the fact that `email` and `profile` are default scopes. They
+    # were included for legacy compatibility, even though they contain privileged data.
     scopes = scopes or ['email', 'profile']
     iat, exp = _compute_time_fields(expires_in)
 
@@ -119,6 +124,9 @@ def _create_jwt(
     }
     payload.update(additional_claims or {})
     _update_from_additional_handlers(payload, user, scopes)
+    role_claims = create_role_auth_claim_for_user(user)
+    if role_claims:
+        payload['roles'] = role_claims
     return _encode_and_sign(payload, use_asymmetric_key, secret)
 
 

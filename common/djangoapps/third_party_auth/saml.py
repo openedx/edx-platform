@@ -19,6 +19,7 @@ from enterprise.models import (
     PendingEnterpriseCustomerUser
 )
 
+from third_party_auth.exceptions import IncorrectConfigurationException
 from openedx.core.djangoapps.theming.helpers import get_current_request
 
 STANDARD_SAML_PROVIDER_KEY = 'standard_saml_provider'
@@ -86,6 +87,21 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
             return config
         else:
             return super(SAMLAuthBackend, self).generate_saml_config()
+
+    def get_user_id(self, details, response):
+        """
+        Calling the parent function and handling the exception properly.
+        """
+        try:
+            return super(SAMLAuthBackend, self).get_user_id(details, response)
+        except KeyError as ex:
+            log.warning(
+                u"Error in SAML authentication flow of IdP '{idp_name}': {message}".format(
+                    message=ex.message,
+                    idp_name=response.get('idp_name')
+                )
+            )
+            raise IncorrectConfigurationException(self)
 
     def generate_metadata_xml(self, idp_name=None):  # pylint: disable=arguments-differ
         """
@@ -219,8 +235,12 @@ class EdXSAMLIdentityProvider(SAMLIdentityProvider):
         another attribute to use.
         """
         key = self.conf.get(conf_key, default_attribute)
-        default = self.conf['attr_defaults'].get(conf_key) or None
-        return attributes[key][0] if key in attributes else default
+        if key in attributes:
+            try:
+                return attributes[key][0]
+            except IndexError:
+                log.warning(u'SAML attribute "%s" value not found.', key)
+        return self.conf['attr_defaults'].get(conf_key) or None
 
     @property
     def saml_sp_configuration(self):
@@ -512,7 +532,14 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
             }
             self.log_bizx_api_exception(transaction_data, err)
             return basic_details
-        return self.get_registration_fields(response)
+        registration_fields = self.get_registration_fields(response)
+        # This statement is here for debugging purposes and should be removed when ENT-1500 is resolved.
+        if user_id != registration_fields.get('username'):
+            log.info(u'loggedinuser_id %s is different from BizX username %s',
+                     user_id,
+                     registration_fields.get('username'))
+
+        return registration_fields
 
 
 def get_saml_idp_choices():

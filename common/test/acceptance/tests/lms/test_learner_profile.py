@@ -329,20 +329,6 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, AcceptanceTest):
         self.assertEqual(profile_page.get_non_editable_mode_value(field_id), displayed_value)
         self.assertTrue(profile_page.mode_for_field(field_id), mode)
 
-    def test_birth_year_not_set(self):
-        """
-        Verify message if birth year is not set.
-
-        Given that I am a registered user.
-        And birth year is not set for the user.
-        And I visit my profile page.
-        Then I should see a message that the profile is private until the year of birth is set.
-        """
-        username, user_id = self.log_in_as_unique_user()
-        message = "You must specify your birth year before you can share your full profile."
-        self.verify_profile_forced_private_message(username, birth_year=None, message=message)
-        self.verify_profile_page_view_event(username, user_id, visibility=self.PRIVACY_PRIVATE)
-
     def test_user_is_under_age(self):
         """
         Verify message if user is under age.
@@ -674,6 +660,7 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, AcceptanceTest):
         profile_page.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',  # TODO: AC-932
             ]
         })
         profile_page.a11y_audit.check_for_accessibility_errors()
@@ -700,6 +687,7 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, AcceptanceTest):
         profile_page.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',  # TODO: AC-932
             ]
         })
         profile_page.a11y_audit.check_for_accessibility_errors()
@@ -715,6 +703,8 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, AcceptanceTest):
         profile_page.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',  # TODO: AC-932
+                'color-contrast'  # AC-938
             ]
         })
         profile_page.display_accomplishments()

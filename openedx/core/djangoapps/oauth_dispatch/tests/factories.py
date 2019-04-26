@@ -1,13 +1,14 @@
 # pylint: disable=missing-docstring
 
+from __future__ import absolute_import
+
 from datetime import datetime, timedelta
 
 import factory
+import pytz
 from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyText
-import pytz
-
-from oauth2_provider.models import Application, AccessToken, RefreshToken
+from oauth2_provider.models import AccessToken, Application, RefreshToken
 from organizations.tests.factories import OrganizationFactory
 
 from openedx.core.djangoapps.oauth_dispatch.models import ApplicationAccess, ApplicationOrganization

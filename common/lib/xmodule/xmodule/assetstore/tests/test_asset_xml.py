@@ -2,12 +2,16 @@
 Test for asset XML generation / parsing.
 """
 
-import unittest
-from path import Path as path
-from lxml import etree
-from contracts import ContractNotRespected
+from __future__ import absolute_import
 
+import unittest
+
+from contracts import ContractNotRespected
+from lxml import etree
 from opaque_keys.edx.locator import CourseLocator
+from path import Path as path
+from six.moves import zip
+
 from xmodule.assetstore import AssetMetadata
 from xmodule.modulestore.tests.test_assetstore import AssetStoreTestData
 
@@ -26,7 +30,7 @@ class TestAssetXml(unittest.TestCase):
 
         self.course_assets = []
         for asset in AssetStoreTestData.all_asset_data:
-            asset_dict = dict(zip(AssetStoreTestData.asset_fields[1:], asset[1:]))
+            asset_dict = dict(list(zip(AssetStoreTestData.asset_fields[1:], asset[1:])))
             asset_md = AssetMetadata(self.course_id.make_asset_key('asset', asset[0]), **asset_dict)
             self.course_assets.append(asset_md)
 

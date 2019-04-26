@@ -2,22 +2,22 @@
 Student Views
 """
 
+from __future__ import absolute_import
+
 import datetime
 import logging
 import uuid
 from collections import namedtuple
 
-from bulk_email.models import Optout
-from courseware.courses import get_courses, sort_by_announcement, sort_by_start_date
+import six
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import AnonymousUser, User
 from django.contrib.auth.views import password_reset_confirm
 from django.contrib.sites.models import Site
-from django.core.exceptions import ObjectDoesNotExist
 from django.core import mail
-from django.urls import reverse
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import ValidationError, validate_email
 from django.db import transaction
 from django.db.models.signals import post_save
@@ -26,11 +26,12 @@ from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpRespo
 from django.shortcuts import redirect
 from django.template.context_processors import csrf
 from django.template.response import TemplateResponse
+from django.urls import reverse
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import base36_to_int, urlsafe_base64_encode
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
-from django.views.decorators.http import require_GET, require_POST, require_http_methods
+from django.views.decorators.http import require_GET, require_http_methods, require_POST
 from edx_ace import ace
 from edx_ace.recipient import Recipient
 from edx_django_utils import monitoring as monitoring_utils
@@ -41,14 +42,13 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from six import text_type
-from xmodule.modulestore.django import modulestore
-import track.views
-from course_modes.models import CourseMode
-from edx_ace import ace
-from edx_ace.recipient import Recipient
-from edxmako.shortcuts import render_to_response, render_to_string
-from entitlements.models import CourseEntitlement
 
+import track.views
+from bulk_email.models import Optout
+from course_modes.models import CourseMode
+from courseware.courses import get_courses, sort_by_announcement, sort_by_start_date
+from edxmako.shortcuts import marketing_link, render_to_response, render_to_string
+from entitlements.models import CourseEntitlement
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.catalog.utils import get_programs_with_type
 from openedx.core.djangoapps.embargo import api as embargo_api
@@ -60,19 +60,14 @@ from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.theming.helpers import get_current_site
 from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled
 from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
-from openedx.core.djangoapps.user_api.errors import UserNotFound, UserAPIInternalError
+from openedx.core.djangoapps.user_api.errors import UserAPIInternalError, UserNotFound
 from openedx.core.djangoapps.user_api.models import UserRetirementRequest
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
-
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.journals.api import get_journals_context
 from student.forms import AccountCreationForm, PasswordResetFormNoActive, get_registration_extension_form
-from student.helpers import (
-    DISABLE_UNENROLL_CERT_STATES,
-    cert_info,
-    generate_activation_email_context,
-)
-from student.message_types import EmailChange, PasswordReset, RecoveryEmailCreate
+from student.helpers import DISABLE_UNENROLL_CERT_STATES, cert_info, generate_activation_email_context
+from student.message_types import EmailChange, EmailChangeConfirmation, PasswordReset, RecoveryEmailCreate
 from student.models import (
     AccountRecovery,
     CourseEnrollment,
@@ -85,7 +80,7 @@ from student.models import (
     UserSignupSource,
     UserStanding,
     create_comments_service_user,
-    email_exists_or_retired,
+    email_exists_or_retired
 )
 from student.signals import REFUND_ORDER
 from student.tasks import send_activation_email
@@ -94,6 +89,7 @@ from util.bad_request_rate_limiter import BadRequestRateLimiter
 from util.db import outer_atomic
 from util.json_request import JsonResponse
 from util.password_policy_validators import normalize_password, validate_password
+from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger("edx.student")
 
@@ -123,7 +119,7 @@ def csrf_token(context):
     if token == 'NOTPROVIDED':
         return ''
     return (HTML(u'<div style="display:none"><input type="hidden"'
-            ' name="csrfmiddlewaretoken" value="{}" /></div>').format(token))
+                 ' name="csrfmiddlewaretoken" value="{}" /></div>').format(Text(token)))
 
 
 # NOTE: This view is not linked to directly--it is called from
@@ -134,8 +130,7 @@ def index(request, extra_context=None, user=AnonymousUser()):
     """
     Render the edX main page.
 
-    extra_context is used to allow immediate display of certain modal windows, eg signup,
-    as used by external_auth.
+    extra_context is used to allow immediate display of certain modal windows, eg signup.
     """
     if extra_context is None:
         extra_context = {}
@@ -390,7 +385,7 @@ def change_enrollment(request, check_access=True):
             return HttpResponse(redirect_url)
 
         if CourseEntitlement.check_for_existing_entitlement_and_enroll(user=user, course_run_key=course_id):
-            return HttpResponse(reverse('courseware', args=[unicode(course_id)]))
+            return HttpResponse(reverse('courseware', args=[six.text_type(course_id)]))
 
         # Check that auto enrollment is allowed for this course
         # (= the course is NOT behind a paywall)
@@ -913,11 +908,20 @@ def password_reset_confirm_wrapper(request, uidb36=None, token=None):
 
         # get the updated user
         updated_user = User.objects.get(id=uid_int)
-
         if 'is_account_recovery' in request.GET:
             try:
                 updated_user.email = updated_user.account_recovery.secondary_email
                 updated_user.account_recovery.delete()
+                # emit an event that the user changed their secondary email to the primary email
+                tracker.emit(
+                    SETTING_CHANGE_INITIATED,
+                    {
+                        "setting": "email",
+                        "old": user.email,
+                        "new": updated_user.email,
+                        "user_id": updated_user.id,
+                    }
+                )
             except ObjectDoesNotExist:
                 log.error(
                     'Account recovery process initiated without AccountRecovery instance for user {username}'.format(
@@ -974,8 +978,9 @@ def validate_secondary_email(account_recovery, new_email):
     """
     Enforce valid email addresses.
     """
+
     from openedx.core.djangoapps.user_api.accounts.api import get_email_validation_error, \
-        get_email_existence_validation_error, get_secondary_email_validation_error
+        get_secondary_email_validation_error
 
     if get_email_validation_error(new_email):
         raise ValueError(_('Valid e-mail address required.'))
@@ -987,10 +992,13 @@ def validate_secondary_email(account_recovery, new_email):
     if new_email == account_recovery.user.email:
         raise ValueError(_('Cannot be same as your sign in email address.'))
 
-    # Make sure that secondary email address is not same as any of the primary emails.
-    message = get_email_existence_validation_error(new_email)
-    if message:
-        raise ValueError(message)
+    # Make sure that secondary email address is not same as any of the primary emails currently in use or retired
+    if email_exists_or_retired(new_email):
+        raise ValueError(
+            _("It looks like {email} belongs to an existing account. Try again with a different email address.").format(
+                email=new_email
+            )
+        )
 
     message = get_secondary_email_validation_error(new_email)
     if message:
@@ -1127,9 +1135,31 @@ def confirm_email_change(request, key):  # pylint: disable=unused-argument
             transaction.set_rollback(True)
             return response
 
-        subject = render_to_string('emails/email_change_subject.txt', address_context)
-        subject = ''.join(subject.splitlines())
-        message = render_to_string('emails/confirm_email_change.txt', address_context)
+        use_https = request.is_secure()
+        if settings.FEATURES['ENABLE_MKTG_SITE']:
+            contact_link = marketing_link('CONTACT')
+        else:
+            contact_link = '{protocol}://{site}{link}'.format(
+                protocol='https' if use_https else 'http',
+                site=configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME),
+                link=reverse('contact'),
+            )
+
+        site = Site.objects.get_current()
+        message_context = get_base_template_context(site)
+        message_context.update({
+            'old_email': user.email,
+            'new_email': pec.new_email,
+            'contact_link': contact_link,
+            'from_address': configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL),
+        })
+
+        msg = EmailChangeConfirmation().personalize(
+            recipient=Recipient(user.username, user.email),
+            language=preferences_api.get_user_preference(user, LANGUAGE_KEY),
+            user_context=message_context,
+        )
+
         u_prof = UserProfile.objects.get(user=user)
         meta = u_prof.get_meta()
         if 'old_emails' not in meta:
@@ -1139,11 +1169,7 @@ def confirm_email_change(request, key):  # pylint: disable=unused-argument
         u_prof.save()
         # Send it to the old email...
         try:
-            user.email_user(
-                subject,
-                message,
-                configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
-            )
+            ace.send(msg)
         except Exception:    # pylint: disable=broad-except
             log.warning('Unable to send confirmation email to old address', exc_info=True)
             response = render_to_response("email_change_failed.html", {'email': user.email})
@@ -1154,12 +1180,9 @@ def confirm_email_change(request, key):  # pylint: disable=unused-argument
         user.save()
         pec.delete()
         # And send it to the new email...
+        msg.recipient = Recipient(user.username, pec.new_email)
         try:
-            user.email_user(
-                subject,
-                message,
-                configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
-            )
+            ace.send(msg)
         except Exception:  # pylint: disable=broad-except
             log.warning('Unable to send confirmation email to new address', exc_info=True)
             response = render_to_response("email_change_failed.html", {'email': pec.new_email})

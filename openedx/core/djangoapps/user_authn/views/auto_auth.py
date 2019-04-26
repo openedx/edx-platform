@@ -14,6 +14,7 @@ from django.template.context_processors import csrf
 from django.utils.translation import ugettext as _
 from django_comment_common.models import assign_role
 
+from lms.djangoapps.verify_student.models import ManualVerification
 from opaque_keys.edx.locator import CourseLocator
 from openedx.core.djangoapps.user_api.accounts.utils import generate_password
 from openedx.features.course_experience import course_home_url_name
@@ -52,6 +53,7 @@ def auto_auth(request):  # pylint: disable=too-many-statements
         course home page if course_id is defined, otherwise it will redirect to dashboard
     * `redirect_to`: will redirect to to this url
     * `is_active` : make/update account with status provided as 'is_active'
+    * `should_manually_verify`: Whether the created user should have their identification verified
     If username, email, or password are not provided, use
     randomly generated credentials.
     """
@@ -73,6 +75,10 @@ def auto_auth(request):  # pylint: disable=too-many-statements
 
     # Valid modes: audit, credit, honor, no-id-professional, professional, verified
     enrollment_mode = request.GET.get('enrollment_mode', 'honor')
+
+    # Whether to add a manual ID verification record for the user (can
+    # be helpful for bypassing certain gated features)
+    should_manually_verify = _str2bool(request.GET.get('should_manually_verify', False))
 
     # Parse roles, stripping whitespace, and filtering out empty strings
     roles = _clean_roles(request.GET.get('roles', '').split(','))
@@ -121,6 +127,9 @@ def auto_auth(request):  # pylint: disable=too-many-statements
     if is_active:
         reg.activate()
         reg.save()
+
+    if should_manually_verify:
+        ManualVerification.objects.get_or_create(user=user, status="approved")
 
     # ensure parental consent threshold is met
     year = datetime.date.today().year

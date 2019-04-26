@@ -533,6 +533,7 @@ class CourseWikiA11yTest(UniqueCourseTest):
         self.course_wiki_page.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',  # TODO: AC-932
             ]
         })
         self.course_wiki_page.a11y_audit.check_for_accessibility_errors()
@@ -545,6 +546,7 @@ class CourseWikiA11yTest(UniqueCourseTest):
         self.course_wiki_edit_page.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',  # TODO: AC-932
             ]
         })
         self.course_wiki_edit_page.a11y_audit.check_for_accessibility_errors()
@@ -558,6 +560,7 @@ class CourseWikiA11yTest(UniqueCourseTest):
         history_page.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',  # TODO: AC-932
             ]
         })
         history_page.wait_for_page()
@@ -572,6 +575,7 @@ class CourseWikiA11yTest(UniqueCourseTest):
         children_page.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',  # TODO: AC-932
             ]
         })
         children_page.wait_for_page()
@@ -1118,53 +1122,6 @@ class EnrollmentClosedRedirectTest(UniqueCourseTest):
         url = BASE_URL + "/course_modes/choose/" + self.course_id
         self.browser.get(url)
         self._assert_dashboard_message()
-
-
-@attr(shard=1)
-class LMSLanguageTest(UniqueCourseTest):
-    """ Test suite for the LMS Language """
-    def setUp(self):
-        super(LMSLanguageTest, self).setUp()
-        self.dashboard_page = DashboardPage(self.browser)
-        self.account_settings = AccountSettingsPage(self.browser)
-        AutoAuthPage(self.browser).visit()
-
-    def test_lms_language_change(self):
-        """
-        Scenario: Ensure that language selection is working fine.
-        First I go to the user dashboard page in LMS. I can see 'English' is selected by default.
-        Then I choose 'Dummy Language' from drop down (at top of the page).
-        Then I visit the student account settings page and I can see the language has been updated to 'Dummy Language'
-        in both drop downs.
-        After that I select the 'English' language and visit the dashboard page again.
-        Then I can see that top level language selector persist its value to 'English'.
-        """
-        self.dashboard_page.visit()
-        language_selector = self.dashboard_page.language_selector
-        self.assertEqual(
-            get_selected_option_text(language_selector),
-            u'English'
-        )
-
-        select_option_by_text(language_selector, 'Dummy Language (Esperanto)')
-        self.dashboard_page.wait_for_ajax()
-        self.account_settings.visit()
-        self.assertEqual(self.account_settings.value_for_dropdown_field('pref-lang'), u'Dummy Language (Esperanto)')
-        self.assertEqual(
-            get_selected_option_text(language_selector),
-            u'Dummy Language (Esperanto)'
-        )
-
-        # changed back to English language.
-        select_option_by_text(language_selector, 'English')
-        self.account_settings.wait_for_ajax()
-        self.assertEqual(self.account_settings.value_for_dropdown_field('pref-lang'), u'English')
-
-        self.dashboard_page.visit()
-        self.assertEqual(
-            get_selected_option_text(language_selector),
-            u'English'
-        )
 
 
 @attr(shard=19)

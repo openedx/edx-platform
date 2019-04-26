@@ -2,15 +2,18 @@
 Views related to course groups functionality.
 """
 
+from __future__ import absolute_import
+
 import logging
 import re
 
+import six
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.paginator import EmptyPage, Paginator
-from django.urls import reverse
 from django.http import Http404, HttpResponseBadRequest
+from django.urls import reverse
 from django.utils.translation import ugettext
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods, require_POST
@@ -18,19 +21,19 @@ from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthenticat
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from edx_rest_framework_extensions.paginators import NamespacedPageNumberPagination
 from opaque_keys.edx.keys import CourseKey
-from rest_framework import status, permissions
+from rest_framework import permissions, status
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.serializers import Serializer
-from six import text_type
 
 from courseware.courses import get_course, get_course_with_access
 from edxmako.shortcuts import render_to_response
-from util.json_request import JsonResponse, expect_json
 from openedx.core.djangoapps.course_groups.models import CohortMembership
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from student.auth import has_course_author_access
+from util.json_request import JsonResponse, expect_json
+
 from . import api, cohorts
 from .models import CourseUserGroup, CourseUserGroupPartitionGroup
 from .serializers import CohortUsersAPISerializer
@@ -130,14 +133,14 @@ def course_cohort_settings_handler(request, course_key_string):
 
     if request.method == 'PATCH':
         if 'is_cohorted' not in request.json:
-            return JsonResponse({"error": unicode("Bad Request")}, 400)
+            return JsonResponse({"error": u"Bad Request"}, 400)
 
         is_cohorted = request.json.get('is_cohorted')
         try:
             cohorts.set_course_cohorted(course_key, is_cohorted)
         except ValueError as err:
             # Note: error message not translated because it is not exposed to the user (UI prevents this state).
-            return JsonResponse({"error": unicode(err)}, 400)
+            return JsonResponse({"error": six.text_type(err)}, 400)
 
     return JsonResponse(_get_course_cohort_settings_representation(
         cohorts.get_course_cohort_id(course_key),
@@ -196,18 +199,18 @@ def cohort_handler(request, course_key_string, cohort_id=None):
             if name != cohort.name:
                 if cohorts.is_cohort_exists(course_key, name):
                     err_msg = ugettext("A cohort with the same name already exists.")
-                    return JsonResponse({"error": unicode(err_msg)}, 400)
+                    return JsonResponse({"error": six.text_type(err_msg)}, 400)
                 cohort.name = name
                 cohort.save()
             try:
                 cohorts.set_assignment_type(cohort, assignment_type)
             except ValueError as err:
-                return JsonResponse({"error": unicode(err)}, 400)
+                return JsonResponse({"error": six.text_type(err)}, 400)
         else:
             try:
                 cohort = cohorts.add_cohort(course_key, name, assignment_type)
             except ValueError as err:
-                return JsonResponse({"error": unicode(err)}, 400)
+                return JsonResponse({"error": six.text_type(err)}, 400)
 
         group_id = request.json.get('group_id')
         if group_id is not None:
@@ -394,7 +397,7 @@ def debug_cohort_mgmt(request, course_key_string):
 
     context = {'cohorts_url': reverse(
         'cohorts',
-        kwargs={'course_key': text_type(course_key)}
+        kwargs={'course_key': six.text_type(course_key)}
     )}
     return render_to_response('/course_groups/debug.html', context)
 

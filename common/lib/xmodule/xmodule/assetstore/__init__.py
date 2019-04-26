@@ -2,20 +2,26 @@
 Classes representing asset metadata.
 """
 
+from __future__ import absolute_import
+
+import json
 from datetime import datetime
+
 import dateutil.parser
 import pytz
-import json
+import six
 from contracts import contract, new_contract
-from opaque_keys.edx.keys import CourseKey, AssetKey
 from lxml import etree
-
+from opaque_keys.edx.keys import AssetKey, CourseKey
 
 new_contract('AssetKey', AssetKey)
 new_contract('CourseKey', CourseKey)
 new_contract('datetime', datetime)
-new_contract('basestring', basestring)
-new_contract('long', long)
+new_contract('basestring', six.string_types[0])
+if six.PY2:
+    new_contract('long', long)
+else:
+    new_contract('long', int)
 new_contract('AssetElement', lambda x: isinstance(x, etree._Element) and x.tag == "asset")  # pylint: disable=protected-access
 new_contract('AssetsElement', lambda x: isinstance(x, etree._Element) and x.tag == "assets")  # pylint: disable=protected-access
 
@@ -123,7 +129,7 @@ class AssetMetadata(object):
         Arguments:
             attr_dict: Prop, val dictionary of all attributes to set.
         """
-        for attr, val in attr_dict.iteritems():
+        for attr, val in six.iteritems(attr_dict):
             if attr in self.ATTRS_ALLOWED_TO_UPDATE:
                 setattr(self, attr, val)
             else:
@@ -233,7 +239,7 @@ class AssetMetadata(object):
             elif isinstance(value, dict):
                 value = json.dumps(value)
             else:
-                value = unicode(value)
+                value = six.text_type(value)
             child.text = value
 
     @staticmethod
@@ -299,4 +305,4 @@ class CourseAssetsFromStorage(object):
         """
         Iterates over the items of the asset dict.
         """
-        return self.asset_md.iteritems()
+        return six.iteritems(self.asset_md)

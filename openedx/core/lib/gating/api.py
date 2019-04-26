@@ -1,6 +1,7 @@
 """
 API for the gating djangoapp
 """
+from __future__ import absolute_import
 import json
 import logging
 
@@ -19,6 +20,7 @@ from util import milestones_helpers
 from xblock.completable import XBlockCompletionMode as CompletionMode
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+import six
 
 log = logging.getLogger(__name__)
 
@@ -162,7 +164,7 @@ def get_prerequisites(course_key):
         milestone = milestones_by_block_id.get(block.location.block_id)
         if milestone:
             milestone['block_display_name'] = block.display_name
-            milestone['block_usage_key'] = unicode(block.location)
+            milestone['block_usage_key'] = six.text_type(block.location)
             result.append(milestone)
 
     return result
@@ -182,7 +184,7 @@ def add_prerequisite(course_key, prereq_content_key):
     """
     milestone = milestones_api.add_milestone(
         {
-            'name': _(u'Gating milestone for {usage_key}').format(usage_key=unicode(prereq_content_key)),
+            'name': _(u'Gating milestone for {usage_key}').format(usage_key=six.text_type(prereq_content_key)),
             'namespace': "{usage_key}{qualifier}".format(
                 usage_key=prereq_content_key,
                 qualifier=GATING_NAMESPACE_QUALIFIER
@@ -435,20 +437,16 @@ def get_subsection_grade_percentage(subsection_usage_key, user):
     Returns:
         User's grade percentage for given subsection
     """
-    subsection_grade_percentage = 0.0
     try:
         subsection_structure = get_course_blocks(user, subsection_usage_key)
         if any(subsection_structure):
             subsection_grade_factory = SubsectionGradeFactory(user, course_structure=subsection_structure)
             if subsection_usage_key in subsection_structure:
-                # this will force a recalculation of the subsection grade
-                subsection_grade = subsection_grade_factory.update(
-                    subsection_structure[subsection_usage_key], persist_grade=False
-                )
-                subsection_grade_percentage = subsection_grade.percent_graded * 100.0
+                subsection_grade = subsection_grade_factory.update(subsection_structure[subsection_usage_key])
+                return _get_subsection_percentage(subsection_grade)
     except ItemNotFoundError as err:
         log.warning(u"Could not find course_block for subsection=%s error=%s", subsection_usage_key, err)
-    return subsection_grade_percentage
+    return 0.0
 
 
 def get_subsection_completion_percentage(subsection_usage_key, user):

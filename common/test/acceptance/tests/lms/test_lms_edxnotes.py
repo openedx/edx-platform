@@ -240,40 +240,6 @@ class EdxNotesDefaultInteractionsTest(EdxNotesTestMixin):
         components = self.note_unit_page.components
         self.assert_text_in_notes(self.note_unit_page.notes)
 
-    def test_can_delete_notes(self):
-        """
-        Scenario: User can delete notes.
-        Given I have a course with 3 components with notes
-        And I open the unit with 2 annotatable components
-        When I remove all notes on the page
-        Then I do not see any notes on the page
-        When I change sequential position to "2"
-        And I remove all notes on the page
-        Then I do not see any notes on the page
-        When I refresh the page
-        Then I do not see any notes on the page
-        When I change sequential position to "1"
-        Then I do not see any notes on the page
-        """
-        self._add_notes()
-        self.note_unit_page.visit()
-
-        components = self.note_unit_page.components
-        self.remove_notes(components)
-        self.assert_notes_are_removed(components)
-
-        self.courseware_page.go_to_sequential_position(2)
-        components = self.note_unit_page.components
-        self.remove_notes(components)
-        self.assert_notes_are_removed(components)
-
-        components = self.note_unit_page.refresh()
-        self.assert_notes_are_removed(components)
-
-        self.courseware_page.go_to_sequential_position(1)
-        components = self.note_unit_page.components
-        self.assert_notes_are_removed(components)
-
     def test_can_create_note_with_tags(self):
         """
         Scenario: a user of notes can define one with tags

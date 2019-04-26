@@ -1,7 +1,5 @@
 """
 Bok choy acceptance and a11y tests for problem types in the LMS
-
-See also lettuce tests in lms/djangoapps/courseware/features/problems.feature
 """
 import random
 import textwrap
@@ -173,7 +171,8 @@ class ProblemTypeA11yTestMixin(object):
 
         # Set the scope to the problem container
         self.problem_page.a11y_audit.config.set_scope(
-            include=['div#seq_content'])
+            include=['div#seq_content']
+        )
 
         # Run the accessibility audit.
         self.problem_page.a11y_audit.check_for_accessibility_errors()
@@ -618,6 +617,7 @@ class AnnotationProblemTypeBase(ProblemTypeTestBase):
         self.problem_page.a11y_audit.config.set_rules({
             "ignore": [
                 'label',  # TODO: AC-491
+                'label-title-only',  # TODO: AC-493
             ]
         })
 

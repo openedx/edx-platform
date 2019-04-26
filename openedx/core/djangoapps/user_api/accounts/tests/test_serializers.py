@@ -24,11 +24,6 @@ class UserReadOnlySerializerTest(TestCase):
         self.user.save()
         self.config = {
             "default_visibility": "public",
-
-            "shareable_fields": [
-                'name',
-            ],
-
             "public_fields": [
                 'email', 'name', 'username'
             ],

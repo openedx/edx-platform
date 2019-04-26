@@ -2,22 +2,25 @@
 Test the partitions and partitions service
 
 """
+from __future__ import absolute_import
+
 import django.test
 from mock import patch
+from six.moves import range
 
 from courseware.tests.test_masquerade import StaffMasqueradeTestCase
-from student.tests.factories import UserFactory
-from xmodule.partitions.partitions import Group, UserPartition, UserPartitionError
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_MIXED_MODULESTORE
-from xmodule.modulestore.tests.factories import ToyCourseFactory
-
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from ..partition_scheme import CohortPartitionScheme, get_cohorted_user_partition
+from student.tests.factories import UserFactory
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import ToyCourseFactory
+from xmodule.partitions.partitions import Group, UserPartition, UserPartitionError
+
+from ..cohorts import add_user_to_cohort, get_course_cohorts, remove_user_from_cohort
 from ..models import CourseUserGroupPartitionGroup
+from ..partition_scheme import CohortPartitionScheme, get_cohorted_user_partition
 from ..views import link_cohort_to_partition_group, unlink_cohort_partition_group
-from ..cohorts import add_user_to_cohort, remove_user_from_cohort, get_course_cohorts
 from .helpers import CohortFactory, config_course_cohorts
 
 

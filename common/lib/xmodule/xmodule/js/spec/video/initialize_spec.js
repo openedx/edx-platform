@@ -186,7 +186,7 @@ function(Initialize) {
 
                     $.each(map, function(key, expected) {
                         Initialize.prototype.setSpeed.call(state, key);
-                        expect(state.speed).toBe(expected);
+                        expect(state.speed).toBe(parseFloat(expected));
                     });
                 });
             });
@@ -205,7 +205,7 @@ function(Initialize) {
                     });
 
                     it('set new speed', function() {
-                        expect(state.speed).toEqual('0.75');
+                        expect(state.speed).toEqual(0.75);
                     });
                 });
 
@@ -215,7 +215,7 @@ function(Initialize) {
                     });
 
                     it('set speed to 1.0x', function() {
-                        expect(state.speed).toEqual('1.0');
+                        expect(state.speed).toEqual(1);
                     });
                 });
 
@@ -228,7 +228,7 @@ function(Initialize) {
 
                     $.each(map, function(key, expected) {
                         Initialize.prototype.setSpeed.call(state, key);
-                        expect(state.speed).toBe(expected);
+                        expect(state.speed).toBe(parseFloat(expected));
                     });
                 });
             });

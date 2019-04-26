@@ -177,13 +177,13 @@ username = get_enterprise_learner_generic_name(request) or student.username
                                         <h4 class="hd hd-4">
                                             <a href="${reverse('courseware_section', kwargs=dict(course_id=text_type(course.id), chapter=chapter['url_name'], section=section.url_name))}">
                                                 ${ section.display_name}
-                                                %if total > 0 or earned > 0:
+                                                %if (total > 0 or earned > 0) and section.show_grades(staff_access):
                                                 <span class="sr">
                                                     ${_("{earned} of {total} possible points").format(earned='{:.3n}'.format(float(earned)), total='{:.3n}'.format(float(total)))}
                                                 </span>
                                                 %endif
                                             </a>
-                                            %if total > 0 or earned > 0:
+                                            %if (total > 0 or earned > 0) and section.show_grades(staff_access):
                                             <span> ${"({0:.3n}/{1:.3n}) {2}".format( float(earned), float(total), percentageString )}</span>
                                             %endif
                                         </h4>

@@ -1,13 +1,15 @@
 """ Journal bundle about page's view """
+from __future__ import absolute_import
+
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import Http404
 
 from edxmako.shortcuts import render_to_response
+from lms.djangoapps.commerce.utils import EcommerceService
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.features.journals.api import get_journal_bundles, get_journals_root_url
-from lms.djangoapps.commerce.utils import EcommerceService
 
 
 def bundle_about(request, bundle_uuid):

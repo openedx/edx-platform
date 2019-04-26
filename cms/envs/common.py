@@ -176,13 +176,14 @@ FEATURES = {
     # in sync with the ones in lms/envs/common.py
     'ENABLE_DISCUSSION_SERVICE': True,
     'ENABLE_TEXTBOOK': True,
+
+    # .. documented_elsewhere: true
+    # .. documented_elsewhere_name: ENABLE_STUDENT_NOTES
     'ENABLE_STUDENT_NOTES': True,
 
     # DO NOT SET TO True IN THIS FILE
     # Doing so will cause all courses to be released on production
     'DISABLE_START_DATES': False,  # When True, all courses will be active, regardless of start date
-
-    'AUTH_USE_CERTIFICATES': False,
 
     # email address for studio staff (eg to request course creation)
     'STUDIO_REQUEST_EMAIL': '',
@@ -441,6 +442,9 @@ LMS_INTERNAL_ROOT_URL = LMS_ROOT_URL
 LMS_ENROLLMENT_API_PATH = "/api/enrollment/v1/"
 ENTERPRISE_API_URL = LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/'
 ENTERPRISE_CONSENT_API_URL = LMS_INTERNAL_ROOT_URL + '/consent/api/v1/'
+FRONTEND_LOGIN_URL = LOGIN_URL
+FRONTEND_LOGOUT_URL = lambda settings: settings.LMS_ROOT_URL + '/logout'
+derived('FRONTEND_LOGOUT_URL')
 
 # List of logout URIs for each IDA that the learner should be logged out of when they logout of
 # Studio. Only applies to IDA for which the social auth flow uses DOT (Django OAuth Toolkit).
@@ -653,7 +657,7 @@ SERVER_EMAIL = 'devops@example.com'
 ADMINS = []
 MANAGERS = ADMINS
 
-# Initialize to 'unknown', but read from JSON in aws.py
+# Initialize to 'unknown', but read from JSON in production.py
 EDX_PLATFORM_REVISION = 'unknown'
 
 # Static content
@@ -1027,7 +1031,6 @@ INSTALLED_APPS = [
 
     'openedx.core.djangoapps.contentserver',
     'course_creators',
-    'openedx.core.djangoapps.external_auth',
     'student.apps.StudentConfig',  # misleading name due to sharing with lms
     'openedx.core.djangoapps.course_groups',  # not used in cms (yet), but tests run
     'xblock_config.apps.XBlockConfig',
@@ -1365,6 +1368,7 @@ ADVANCED_PROBLEM_TYPES = [
     }
 ]
 
+USERNAME_REPLACEMENT_WORKER = "REPLACE WITH VALID USERNAME"
 
 # Files and Uploads type filter values
 
@@ -1558,6 +1562,8 @@ ZENDESK_CUSTOM_FIELDS = {}
 # (0.0 = 0%, 1.0 = 100%)
 COMPLETION_VIDEO_COMPLETE_PERCENTAGE = 0.95
 
+############### Settings for edx-rbac  ###############
+SYSTEM_WIDE_ROLE_CLASSES = []
 
 ############## Installed Django Apps #########################
 

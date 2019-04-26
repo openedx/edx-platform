@@ -1,10 +1,10 @@
 """ Views related to logout. """
+import urllib
 from urlparse import parse_qs, urlsplit, urlunsplit
 
 import edx_oauth2_provider
 from django.conf import settings
 from django.contrib.auth import logout
-from django.urls import reverse_lazy
 from django.shortcuts import redirect
 from django.utils.http import urlencode
 from django.views.generic import TemplateView
@@ -24,7 +24,7 @@ class LogoutView(TemplateView):
     template_name = 'logout.html'
 
     # Keep track of the page to which the user should ultimately be redirected.
-    default_target = reverse_lazy('cas-logout') if settings.FEATURES.get('AUTH_USE_CAS') else '/'
+    default_target = '/'
 
     def post(self, request, *args, **kwargs):
         """
@@ -43,6 +43,18 @@ class LogoutView(TemplateView):
         """
         target_url = self.request.GET.get('redirect_url') or self.request.GET.get('next')
 
+        #  Some third party apps do not build URLs correctly and send next query param without URL-encoding, resulting
+        #  all plus('+') signs interpreted as space(' ') in the process of URL-decoding
+        #  for example if we hit on:
+        #  >> http://example.com/logout?next=/courses/course-v1:ARTS+D1+2018_T/course/
+        #  we will receive in request.GET['next']
+        #  >> /courses/course-v1:ARTS D1 2018_T/course/
+        #  instead of
+        #  >> /courses/course-v1:ARTS+D1+2018_T/course/
+        #  to handle this scenario we need to encode our URL using quote_plus and then unquote it again.
+        if target_url:
+            target_url = urllib.unquote(urllib.quote_plus(target_url))
+
         if target_url and is_safe_login_or_logout_redirect(self.request, target_url):
             return target_url
         else:
@@ -57,7 +69,11 @@ class LogoutView(TemplateView):
 
         logout(request)
 
-        response = super(LogoutView, self).dispatch(request, *args, **kwargs)
+        # If we are using studio logout directly and there is not OIDC logouts we can just redirect the user
+        if settings.FEATURES.get('DISABLE_STUDIO_SSO_OVER_LMS', False) and not self.oauth_client_ids:
+            response = redirect(self.target)
+        else:
+            response = super(LogoutView, self).dispatch(request, *args, **kwargs)
 
         # Clear the cookie used by the edx.org marketing site
         delete_logged_in_cookies(response)

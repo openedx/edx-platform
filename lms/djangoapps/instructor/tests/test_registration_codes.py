@@ -3,8 +3,8 @@ Test for the registration code status information.
 """
 import json
 
-from django.urls import reverse
 from django.test.utils import override_settings
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 from six import text_type
 

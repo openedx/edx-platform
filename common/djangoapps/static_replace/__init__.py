@@ -21,9 +21,9 @@ def _url_replace_regex(prefix):
     To anyone contemplating making this more complicated:
     http://xkcd.com/1171/
     """
-    return ur"""
+    return u"""
         (?x)                      # flags=re.VERBOSE
-        (?P<quote>\\?['"])        # the opening quotes
+        (?P<quote>\\\\?['"])      # the opening quotes
         (?P<prefix>{prefix})      # the prefix
         (?P<rest>.*?)             # everything else in the url
         (?P=quote)                # the first matching closing quote

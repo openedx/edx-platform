@@ -1,6 +1,7 @@
 """
 Common utility functions related to courses.
 """
+from __future__ import absolute_import
 from django import forms
 from django.conf import settings
 

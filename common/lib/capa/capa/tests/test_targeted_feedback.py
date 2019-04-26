@@ -3,11 +3,14 @@ Tests the logic of the "targeted-feedback" attribute for MultipleChoice question
 i.e. those with the <multiplechoiceresponse> element
 """
 
-import unittest
+from __future__ import absolute_import
+
 import textwrap
+import unittest
+
 # Changes formatting of empty elements; import here to avoid test order dependence
 import xmodule.modulestore.xml  # pylint: disable=unused-import
-from capa.tests.helpers import test_capa_system, new_loncapa_problem, load_fixture
+from capa.tests.helpers import load_fixture, new_loncapa_problem, test_capa_system
 
 
 class CapaTargetedFeedbackTest(unittest.TestCase):

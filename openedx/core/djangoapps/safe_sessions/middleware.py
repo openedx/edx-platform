@@ -55,7 +55,7 @@ SSL-protected channel.  Otherwise, a session hijacker could copy
 the entire cookie and use it to impersonate the victim.
 
 """
-
+from base64 import b64encode
 from contextlib import contextmanager
 from hashlib import sha256
 from logging import ERROR, getLogger
@@ -261,7 +261,6 @@ class SafeSessionMiddleware(SessionMiddleware):
         final verification before sending the response (in
         process_response).
         """
-
         cookie_data_string = request.COOKIES.get(settings.SESSION_COOKIE_NAME)
         if cookie_data_string:
 
@@ -459,10 +458,6 @@ def _delete_cookie(request, response):
     Delete the cookie by setting the expiration to a date in the past,
     while maintaining the domain, secure, and httponly settings.
     """
-    log.warning(
-        u"SafeCookieData is deleting session cookie for user %d",
-        request.user.id
-    )
     response.set_cookie(
         settings.SESSION_COOKIE_NAME,
         max_age=0,
@@ -471,6 +466,21 @@ def _delete_cookie(request, response):
         secure=settings.SESSION_COOKIE_SECURE or None,
         httponly=settings.SESSION_COOKIE_HTTPONLY or None,
     )
+
+    # Log the cookie, but cap the length and base64 encode to make sure nothing
+    # malicious gets directly dumped into the log.
+    cookie_header = request.META.get('HTTP_COOKIE', '')[:4096]
+    log.warning(
+        u"Malformed Cookie Header? First 4K, in Base64: %s",
+        b64encode(cookie_header)
+    )
+
+    # Note, there is no request.user attribute at this point.
+    if hasattr(request, 'session') and hasattr(request.session, 'session_key'):
+        log.warning(
+            u"SafeCookieData deleted session cookie for session %s",
+            request.session.session_key
+        )
 
 
 def _is_from_logout(request):
@@ -495,7 +505,6 @@ def controlled_logging(request, logger):
 
     try:
         yield
-
     finally:
         if from_logout:
             logger.setLevel(default_level)

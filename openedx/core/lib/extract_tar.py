@@ -5,6 +5,7 @@ be, or symlink to a file that is, outside of the directory extracted in.
 Adapted from:
 http://stackoverflow.com/questions/10060069/safely-extract-zip-or-tar-using-python
 """
+from __future__ import absolute_import
 import logging
 from os.path import join as joinpath
 from os.path import abspath, dirname, realpath

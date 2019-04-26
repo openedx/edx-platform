@@ -1,5 +1,7 @@
 """URLs for API access management."""
 
+from __future__ import absolute_import
+
 from django.conf.urls import include, url
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required

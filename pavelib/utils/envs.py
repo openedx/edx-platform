@@ -88,9 +88,8 @@ class Env(object):
         BOK_CHOY_REPORT_DIR = BOK_CHOY_REPORT_DIR / shard_str
         BOK_CHOY_LOG_DIR = BOK_CHOY_LOG_DIR / shard_str
 
-    # For the time being, stubs are used by both the bok-choy and lettuce acceptance tests
-    # For this reason, the stubs package is currently located in the Django app called "terrain"
-    # where other lettuce configuration is stored.
+    # The stubs package is currently located in the Django app called "terrain"
+    # from when they were used by both the bok-choy and lettuce (deprecated) acceptance tests
     BOK_CHOY_STUB_DIR = REPO_ROOT / "common" / "djangoapps" / "terrain"
 
     # Directory that videos are served from
@@ -221,6 +220,7 @@ class Env(object):
         if dir_name.isdir() and not dir_name.endswith(IGNORED_TEST_DIRS):
             LIB_TEST_DIRS.append(path("common/lib") / item.basename())
     LIB_TEST_DIRS.append(path("pavelib/paver_tests"))
+    LIB_TEST_DIRS.append(path("scripts/xsslint/tests"))
 
     # Directory for i18n test reports
     I18N_REPORT_DIR = REPORT_DIR / 'i18n'

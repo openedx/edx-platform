@@ -51,6 +51,7 @@ from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_f
 
     AccountSettingsFactory(
         fieldsData,
+        ${ disable_order_history_tab | n, dump_js_escaped_json },
         ordersHistoryData,
         authData,
         '${ password_reset_support_link | n, js_escaped_string }',

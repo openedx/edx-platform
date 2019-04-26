@@ -1,9 +1,12 @@
 """Tests covering utilities for integrating with the catalog service."""
 # pylint: disable=missing-docstring
 
+from __future__ import absolute_import
+
 from datetime import timedelta
 
 import mock
+import six
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.test import TestCase, override_settings
@@ -16,6 +19,7 @@ from course_modes.tests.factories import CourseModeFactory
 from entitlements.tests.factories import CourseEntitlementFactory
 from openedx.core.constants import COURSE_UNPUBLISHED
 from openedx.core.djangoapps.catalog.cache import (
+    COURSE_PROGRAMS_CACHE_KEY_TPL,
     PATHWAY_CACHE_KEY_TPL,
     PROGRAM_CACHE_KEY_TPL,
     SITE_PATHWAY_IDS_CACHE_KEY_TPL,
@@ -31,9 +35,9 @@ from openedx.core.djangoapps.catalog.tests.factories import (
 )
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.catalog.utils import (
+    get_course_run_details,
     get_course_runs,
     get_course_runs_for_course,
-    get_course_run_details,
     get_currency_data,
     get_localized_price_text,
     get_owners_for_course,
@@ -72,7 +76,7 @@ class TestGetPrograms(CacheIsolationTestCase):
 
         # When called before UUIDs are cached, the function should return an
         # empty list and log a warning.
-        self.assertEqual(get_programs(self.site), [])
+        self.assertEqual(get_programs(site=self.site), [])
         mock_warning.assert_called_once_with(
             u'Failed to get program UUIDs from the cache for site {}.'.format(self.site.domain)
         )
@@ -85,7 +89,7 @@ class TestGetPrograms(CacheIsolationTestCase):
             None
         )
 
-        actual_programs = get_programs(self.site)
+        actual_programs = get_programs(site=self.site)
 
         # The 2 cached programs should be returned while info and warning
         # messages should be logged for the missing one.
@@ -113,7 +117,7 @@ class TestGetPrograms(CacheIsolationTestCase):
         }
         cache.set_many(all_programs, None)
 
-        actual_programs = get_programs(self.site)
+        actual_programs = get_programs(site=self.site)
 
         # All 3 programs should be returned.
         self.assertEqual(
@@ -147,7 +151,7 @@ class TestGetPrograms(CacheIsolationTestCase):
         mock_cache.get.return_value = [program['uuid'] for program in programs]
         mock_cache.get_many.side_effect = fake_get_many
 
-        actual_programs = get_programs(self.site)
+        actual_programs = get_programs(site=self.site)
 
         # All 3 cached programs should be returned. An info message should be
         # logged about the one that was initially missing, but the code should
@@ -167,7 +171,7 @@ class TestGetPrograms(CacheIsolationTestCase):
         expected_program = ProgramFactory()
         expected_uuid = expected_program['uuid']
 
-        self.assertEqual(get_programs(self.site, uuid=expected_uuid), None)
+        self.assertEqual(get_programs(uuid=expected_uuid), None)
         mock_warning.assert_called_once_with(
             u'Failed to get details for program {uuid} from the cache.'.format(uuid=expected_uuid)
         )
@@ -179,8 +183,29 @@ class TestGetPrograms(CacheIsolationTestCase):
             None
         )
 
-        actual_program = get_programs(self.site, uuid=expected_uuid)
+        actual_program = get_programs(uuid=expected_uuid)
         self.assertEqual(actual_program, expected_program)
+        self.assertFalse(mock_warning.called)
+
+    def test_get_from_course(self, mock_warning, _mock_info):
+        expected_program = ProgramFactory()
+        expected_course = expected_program['courses'][0]['course_runs'][0]['key']
+
+        self.assertEqual(get_programs(course=expected_course), [])
+
+        cache.set(
+            COURSE_PROGRAMS_CACHE_KEY_TPL.format(course_run_id=expected_course),
+            [expected_program['uuid']],
+            None
+        )
+        cache.set(
+            PROGRAM_CACHE_KEY_TPL.format(uuid=expected_program['uuid']),
+            expected_program,
+            None
+        )
+
+        actual_program = get_programs(course=expected_course)
+        self.assertEqual(actual_program, [expected_program])
         self.assertFalse(mock_warning.called)
 
 
@@ -513,7 +538,7 @@ class TestSessionEntitlement(CatalogIntegrationMixin, TestCase):
         course_overview = CourseOverviewFactory.create(id=course_key, start=self.tomorrow)
         CourseModeFactory.create(mode_slug=CourseMode.VERIFIED, min_price=100, course_id=course_overview.id)
         course_enrollment = CourseEnrollmentFactory(
-            user=self.user, course_id=unicode(course_overview.id), mode=CourseMode.VERIFIED
+            user=self.user, course_id=six.text_type(course_overview.id), mode=CourseMode.VERIFIED
         )
         entitlement = CourseEntitlementFactory(
             user=self.user, enrollment_course_run=course_enrollment, mode=CourseMode.VERIFIED
@@ -538,7 +563,7 @@ class TestSessionEntitlement(CatalogIntegrationMixin, TestCase):
             expiration_datetime=now() - timedelta(days=1)
         )
         course_enrollment = CourseEnrollmentFactory(
-            user=self.user, course_id=unicode(course_overview.id), mode=CourseMode.VERIFIED
+            user=self.user, course_id=six.text_type(course_overview.id), mode=CourseMode.VERIFIED
         )
         entitlement = CourseEntitlementFactory(
             user=self.user, enrollment_course_run=course_enrollment, mode=CourseMode.VERIFIED
@@ -564,7 +589,7 @@ class TestSessionEntitlement(CatalogIntegrationMixin, TestCase):
             expiration_datetime=now() - timedelta(days=1)
         )
         course_enrollment = CourseEnrollmentFactory(
-            user=self.user, course_id=unicode(course_overview.id), mode=CourseMode.VERIFIED
+            user=self.user, course_id=six.text_type(course_overview.id), mode=CourseMode.VERIFIED
         )
         entitlement = CourseEntitlementFactory(
             user=self.user, enrollment_course_run=course_enrollment, mode=CourseMode.VERIFIED

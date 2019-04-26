@@ -26,8 +26,10 @@ def _create_test_csv(csv_data):
     __, file_name = tempfile.mkstemp(text=True)
     with open(file_name, 'w') as file_pointer:
         file_pointer.write(csv_data.encode('utf-8'))
-    yield file_name
-    os.unlink(file_name)
+    try:
+        yield file_name
+    finally:
+        os.unlink(file_name)
 
 
 @mock.patch('openedx.core.djangoapps.user_api.management.commands.bulk_user_org_email_optout.log.info')

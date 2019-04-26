@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
-from django.db import migrations, models
-import openedx.core.djangoapps.credit.models
-import model_utils.fields
-import jsonfield.fields
+import django.core.validators
 import django.db.models.deletion
 import django.utils.timezone
+import jsonfield.fields
+import model_utils.fields
 from django.conf import settings
-import django.core.validators
+from django.db import migrations, models
 from opaque_keys.edx.django.models import CourseKeyField
+
+import openedx.core.djangoapps.credit.models
 
 
 class Migration(migrations.Migration):

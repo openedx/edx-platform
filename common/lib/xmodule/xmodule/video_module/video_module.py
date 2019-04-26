@@ -285,10 +285,11 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         if getattr(self, 'video_speed_optimizations', True) and cdn_url:
             branding_info = BrandingInfoConfig.get_config().get(self.system.user_location)
 
-            for index, source_url in enumerate(sources):
-                new_url = rewrite_video_url(cdn_url, source_url)
-                if new_url:
-                    sources[index] = new_url
+            if self.edx_video_id and edxval_api:
+                for index, source_url in enumerate(sources):
+                    new_url = rewrite_video_url(cdn_url, source_url)
+                    if new_url:
+                        sources[index] = new_url
 
         # If there was no edx_video_id, or if there was no download specified
         # for it, we fall back on whatever we find in the VideoDescriptor

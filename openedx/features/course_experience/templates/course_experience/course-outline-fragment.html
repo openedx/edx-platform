@@ -151,6 +151,11 @@ course_sections = blocks.get('children')
                                     aria-labelledby="${ subsection['id'] }"
                                 >
                     % for vertical in subsection.get('children', []):
+                        <%
+                        vertical_is_access_denied = vertical.get('authorization_denial_reason')
+                        if vertical_is_access_denied:
+                            continue
+                        %>
                                     <li class="vertical outline-item focusable">
                                         <a class="outline-item focusable"
                                             % if enable_links:

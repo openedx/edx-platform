@@ -63,6 +63,31 @@ define(['jquery',
                 expect($('.auth-list-container.active .add-field').attr('disabled')).toBe(undefined);
             });
 
+            it('Error message is shown if user with given identifier does not exist', function() {
+                var url, params;
+                var requests = AjaxHelpers.requests(this);
+                $('.active .add-field').val('smth');
+                $('.active .add').click();
+                expect(requests.length).toEqual(1);
+
+                url = '/courses/course-v1:edx+ed202+2017_T3/instructor/api/modify_access';
+                params = $.param({
+                    unique_student_identifier: 'smth',
+                    rolename: 'staff',
+                    action: 'allow'
+                });
+                AjaxHelpers.expectPostRequest(requests, url, params);
+
+                AjaxHelpers.respondWithJson(requests, {
+                    unique_student_identifier: 'smth',
+                    userDoesNotExist: true
+                });
+
+                expect($('.request-response-error').text()).toEqual(
+                "Could not find a user with username or email address 'smth'."
+                );
+            });
+
             it('When no discussions division scheme is selected error is shown and inputs are disabled', function() {
                 var requests = AjaxHelpers.requests(this),
                     data,

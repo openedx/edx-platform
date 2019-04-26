@@ -1,18 +1,24 @@
 """
 Tests for manager.py
 """
+from __future__ import absolute_import
+
 import ddt
+import six
 from django.test import TestCase
 
 from ..block_structure import BlockStructureBlockData
 from ..config import RAISE_ERROR_WHEN_NOT_FOUND, STORAGE_BACKING_FOR_CACHE, waffle
-from ..exceptions import UsageKeyNotInBlockStructure, BlockStructureNotFound
+from ..exceptions import BlockStructureNotFound, UsageKeyNotInBlockStructure
 from ..manager import BlockStructureManager
 from ..transformers import BlockStructureTransformers
 from .helpers import (
-    MockModulestoreFactory, MockCache, MockTransformer,
-    ChildrenMapTestMixin, UsageKeyFactoryMixin,
-    mock_registered_transformers,
+    ChildrenMapTestMixin,
+    MockCache,
+    MockModulestoreFactory,
+    MockTransformer,
+    UsageKeyFactoryMixin,
+    mock_registered_transformers
 )
 
 
@@ -85,7 +91,7 @@ class TestTransformer1(MockTransformer):
         Returns a unique deterministic value for the given block key
         and data key.
         """
-        return data_key + 't1.val1.' + unicode(block_key)
+        return data_key + 't1.val1.' + six.text_type(block_key)
 
 
 @ddt.ddt

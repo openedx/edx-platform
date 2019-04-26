@@ -15,6 +15,7 @@ from pytz import utc
 
 from course_modes.models import CourseMode
 from entitlements.tests.factories import CourseEntitlementFactory
+from testfixtures import LogCapture
 from waffle.testutils import override_switch
 
 from lms.djangoapps.certificates.api import MODES
@@ -50,6 +51,7 @@ from xmodule.modulestore.tests.factories import CourseFactory as ModuleStoreCour
 CERTIFICATES_API_MODULE = 'lms.djangoapps.certificates.api'
 ECOMMERCE_URL_ROOT = 'https://ecommerce.example.com'
 UTILS_MODULE = 'openedx.core.djangoapps.programs.utils'
+LOGGER_NAME = 'openedx.core.djangoapps.programs.utils'
 
 
 @ddt.ddt
@@ -1187,8 +1189,25 @@ class TestProgramDataExtender(ModuleStoreTestCase):
             applicable_seat_types=[CourseMode.VERIFIED],
         )
         data = ProgramDataExtender(program, self.user).extend()
+
         self.assertFalse(data['is_learner_eligible_for_one_click_purchase'])
         self.assertEqual(data['skus'], [])
+
+    def test_old_course_runs(self):
+        """
+        Test that old course runs may exist for a program which do not exist in LMS.
+        In that case, continue without the course run.
+        """
+        course_run = CourseRunFactory.create()
+        course = CourseFactory.create(course_runs=[course_run])
+        program_data = ProgramFactory(courses=[course])
+
+        with LogCapture(LOGGER_NAME) as logger:
+            ProgramDataExtender(program_data, self.user).extend()
+            logger.check(
+                (LOGGER_NAME,
+                 'WARNING', u'Failed to get course overview for course run key: {}'.format(course_run.get('key')))
+            )
 
     def test_entitlement_product_wrong_mode(self):
         """

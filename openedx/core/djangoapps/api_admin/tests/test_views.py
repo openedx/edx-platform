@@ -1,13 +1,15 @@
 """ Tests for the api_admin app's views. """
 
+from __future__ import absolute_import
+
 import json
 
 import ddt
 import httpretty
 from django.conf import settings
-from django.urls import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.urls import reverse
 from oauth2_provider.models import get_application_model
 
 from openedx.core.djangoapps.api_admin.models import ApiAccessConfig, ApiAccessRequest

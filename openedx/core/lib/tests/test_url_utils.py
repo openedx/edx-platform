@@ -1,6 +1,7 @@
 """
 Tests for url_utils module.
 """
+from __future__ import absolute_import
 from ddt import data, ddt
 from django.test import TestCase
 

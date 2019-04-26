@@ -4,17 +4,12 @@ get_course_blocks function.
 """
 from django.conf import settings
 
+from edx_when import field_data
 from openedx.core.djangoapps.content.block_structure.api import get_block_structure_manager
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
 from openedx.features.content_type_gating.block_transformers import ContentTypeGateTransformer
 
-from .transformers import (
-    library_content,
-    start_date,
-    user_partitions,
-    visibility,
-    load_override_data,
-)
+from .transformers import library_content, load_override_data, start_date, user_partitions, visibility
 from .usage_info import CourseUsageInfo
 
 INDIVIDUAL_STUDENT_OVERRIDE_PROVIDER = (
@@ -46,6 +41,7 @@ def get_course_block_access_transformers(user):
         ContentTypeGateTransformer(),
         user_partitions.UserPartitionTransformer(),
         visibility.VisibilityTransformer(),
+        field_data.DateOverrideTransformer(user),
     ]
 
     if has_individual_student_override_provider():

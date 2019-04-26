@@ -190,12 +190,12 @@ class EvaluatorTest(unittest.TestCase):
 
         # Include those where the real part is between -pi/2 and pi/2
         arcsin_inputs = ['-0.707', '0', '0.5', '0.588', '1.298 + 0.635*j', '-1.1', '1.1']
-        arcsin_angles = [-0.785, 0, 0.524, 0.629, 1 + 1j, -1.570 + 0.443j, 1.570 - 0.443j]
+        arcsin_angles = [-0.785, 0, 0.524, 0.629, 1 + 1j, -1.570 + 0.443j, 1.570 + 0.443j]
         self.assert_function_values('arcsin', arcsin_inputs, arcsin_angles)
 
         # Include those where the real part is between 0 and pi
         arccos_inputs = ['1', '0.866', '0.809', '0.834-0.989*j', '-1.1', '1.1']
-        arccos_angles = [0, 0.524, 0.628, 1 + 1j, 3.141 - 0.443j, 0.443j]
+        arccos_angles = [0, 0.524, 0.628, 1 + 1j, 3.141 - 0.443j, -0.443j]
         self.assert_function_values('arccos', arccos_inputs, arccos_angles)
 
         # Has the same range as arcsin

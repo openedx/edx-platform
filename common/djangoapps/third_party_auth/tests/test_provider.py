@@ -159,6 +159,13 @@ class RegistryTest(testutil.TestCase):
         self.assertIn(google_provider, provider.Registry._enabled_providers())
         self.assertIn(google_provider, provider.Registry.get_enabled_by_backend_name('google-oauth2'))
 
+    def test_oath2_different_slug_from_backend_name(self):
+        """
+        Test that an OAuth2 provider can have a slug that differs from the backend name.
+        """
+        dummy_provider = self.configure_oauth_provider(enabled=True, name="dummy", slug="default", backend_name="dummy")
+        self.assertIn(dummy_provider, provider.Registry.get_enabled_by_backend_name('dummy'))
+
     def test_oauth2_enabled_only_for_supplied_backend(self):
         """
         Test to ensure that Registry.get_enabled_by_backend_name doesn't return OAuth2 providers with incorrect

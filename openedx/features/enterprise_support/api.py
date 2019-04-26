@@ -12,12 +12,13 @@ from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django.utils.http import urlencode
 from django.utils.translation import ugettext as _
+from edx_django_utils.cache import TieredCache
 from edx_rest_api_client.client import EdxRestApiClient
 from slumber.exceptions import HttpClientError, HttpNotFoundError, HttpServerError
 
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.features.enterprise_support.utils import get_cache_key
+from openedx.features.enterprise_support.utils import get_cache_key, get_data_consent_share_cache_key
 from third_party_auth.pipeline import get as get_partial_pipeline
 from third_party_auth.provider import Registry
 
@@ -302,7 +303,7 @@ def data_sharing_consent_required(view_func):
         consent_url = get_enterprise_consent_url(request, course_id, enrollment_exists=True)
         if consent_url:
             real_user = getattr(request.user, 'real_user', request.user)
-            LOGGER.warning(
+            LOGGER.info(
                 u'User %s cannot access the course %s because they have not granted consent',
                 real_user,
                 course_id,
@@ -450,9 +451,9 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
     Wrap the enterprise app check to determine if the user needs to grant
     data sharing permissions before accessing a course.
     """
-    consent_key = ('data_sharing_consent_needed', course_id)
-
-    if request.session.get(consent_key) is False:
+    consent_cache_key = get_data_consent_share_cache_key(user.id, course_id)
+    data_sharing_consent_needed_cache = TieredCache.get_cached_response(consent_cache_key)
+    if data_sharing_consent_needed_cache.is_found and data_sharing_consent_needed_cache.value is 0:
         return False
 
     enterprise_learner_details = get_enterprise_learner_data(user)
@@ -470,9 +471,9 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
             for learner in enterprise_learner_details
         )
     if not consent_needed:
-        # Set an ephemeral item in the user's session to prevent us from needing
+        # Set an ephemeral item in the cache to prevent us from needing
         # to make a Consent API request every time this function is called.
-        request.session[consent_key] = False
+        TieredCache.set_all_tiers(consent_cache_key, 0, settings.DATA_CONSENT_SHARE_CACHE_TIMEOUT)
 
     return consent_needed
 
@@ -553,7 +554,7 @@ def get_enterprise_learner_data(user):
 
 
 @enterprise_is_enabled(otherwise={})
-def get_enterprise_customer_for_learner(site, user):
+def get_enterprise_customer_for_learner(user):
     """
     Return enterprise customer to whom given learner belongs.
     """

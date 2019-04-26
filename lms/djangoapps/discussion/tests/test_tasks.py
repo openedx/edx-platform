@@ -15,6 +15,7 @@ from django_comment_common.models import ForumsConfig
 from django_comment_common.signals import comment_created
 from edx_ace.recipient import Recipient
 from edx_ace.renderers import EmailRenderer
+from edx_ace.channel import ChannelType, get_channel_for_message
 from edx_ace.utils import date
 from lms.djangoapps.discussion.signals.handlers import ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY
 from lms.djangoapps.discussion.tasks import _should_send_message, _track_notification_sent
@@ -230,12 +231,12 @@ class TaskTestCase(ModuleStoreTestCase):
         with emulate_http_request(
             site=message.context['site'], user=self.thread_author
         ):
-            rendered_email = EmailRenderer().render(message)
-            self.assertTrue(self.comment['body'] in rendered_email.body_html)
-            self.assertTrue(self.comment_author.username in rendered_email.body_html)
-            self.assertTrue(self.thread_author.username in rendered_email.body_html)
-            self.assertTrue(self.mock_permalink in rendered_email.body_html)
-            self.assertTrue(message.context['site'].domain in rendered_email.body_html)
+            # pylint: disable=unsupported-membership-test
+            rendered_email = EmailRenderer().render(get_channel_for_message(ChannelType.EMAIL, message), message)
+            assert self.comment['body'] in rendered_email.body_html
+            assert self.comment_author.username in rendered_email.body_html
+            assert self.mock_permalink.return_value in rendered_email.body_html
+            assert message.context['site'].domain in rendered_email.body_html
 
     def run_should_not_send_email_test(self, thread, comment_dict):
         """

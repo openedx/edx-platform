@@ -1,9 +1,11 @@
 """ Form widget classes """
 
+from __future__ import absolute_import
+
 from django.conf import settings
-from django.urls import reverse
 from django.forms.utils import flatatt
 from django.forms.widgets import CheckboxInput
+from django.urls import reverse
 from django.utils.encoding import force_text
 from django.utils.html import format_html
 from django.utils.translation import ugettext as _

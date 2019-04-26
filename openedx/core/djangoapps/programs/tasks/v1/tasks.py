@@ -304,7 +304,7 @@ def award_course_certificate(self, username, course_run_key):
                 username
             )
             return
-        if certificate.mode in CourseMode.CREDIT_ELIGIBLE_MODES + CourseMode.CREDIT_MODES:
+        if certificate.mode in CourseMode.CERTIFICATE_RELEVANT_MODES:
             try:
                 course_overview = CourseOverview.get_from_id(course_key)
             except (CourseOverview.DoesNotExist, IOError):

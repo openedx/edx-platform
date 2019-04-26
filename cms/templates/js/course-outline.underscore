@@ -130,7 +130,7 @@ if (is_proctored_exam) {
             <ul class="actions-list">
                 <% if (xblockInfo.isSequential() && xblockInfo.get('proctoring_exam_configuration_link')) { %>
                 <li class="action-item">
-                    <a href="<%- xblockInfo.get('proctoring_exam_configuration_link') %>" data-tooltip="<%- gettext('Proctoring Settings') %>" class="proctoring-configuration-button" target="_blank">
+                    <a href="<%- xblockInfo.get('proctoring_exam_configuration_link') %>" data-tooltip="<%- gettext('Proctoring Settings') %>" class="proctoring-configuration-button" rel="noopener" target="_blank">
                         <span class="action-button-text"><%- gettext('Proctoring Settings') %></span>
                     </a>
                 </li>

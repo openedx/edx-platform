@@ -1,11 +1,14 @@
 """
 Image file manipulation functions related to profile images.
 """
+from __future__ import absolute_import
+
 from collections import namedtuple
 from contextlib import closing
 from cStringIO import StringIO
 
 import piexif
+import six
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.utils.translation import ugettext as _
@@ -106,7 +109,7 @@ def validate_uploaded_image(uploaded_file):
         raise ImageValidationError(file_upload_too_small)
 
     # check the file extension looks acceptable
-    filename = unicode(uploaded_file.name).lower()
+    filename = six.text_type(uploaded_file.name).lower()
     filetype = [ft for ft in IMAGE_TYPES if any(filename.endswith(ext) for ext in IMAGE_TYPES[ft].extensions)]
     if not filetype:
         file_upload_bad_type = _(

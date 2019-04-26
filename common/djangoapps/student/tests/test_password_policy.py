@@ -3,9 +3,7 @@
 This test file will verify proper password policy enforcement, which is an option feature
 """
 import json
-from importlib import import_module
 
-from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.urls import reverse
 from django.test import TestCase
@@ -13,7 +11,6 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from mock import patch
 
-from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.user_authn.views.deprecated import create_account
 from util.password_policy_validators import create_validator_config
@@ -250,31 +247,6 @@ class TestPasswordPolicy(TestCase):
     def test_with_unicode(self):
         self.url_params['password'] = u'四節比分和七年前'
         response = self.client.post(self.url, self.url_params)
-        self.assertEqual(response.status_code, 200)
-        obj = json.loads(response.content)
-        self.assertTrue(obj['success'])
-
-    @override_settings(AUTH_PASSWORD_VALIDATORS=[
-        create_validator_config('util.password_policy_validators.MinimumLengthValidator', {'min_length': 6})
-    ], SESSION_ENGINE='django.contrib.sessions.backends.cache')
-    def test_ext_auth_password_length_too_short(self):
-        """
-        Tests that even if password policy is enforced, ext_auth registrations aren't subject to it
-        """
-        self.url_params['password'] = u'aaa'  # shouldn't pass validation
-        request = self.request_factory.post(self.url, self.url_params)
-        request.site = SiteFactory.create()
-        # now indicate we are doing ext_auth by setting 'ExternalAuthMap' in the session.
-        request.session = import_module(settings.SESSION_ENGINE).SessionStore()  # empty session
-        extauth = ExternalAuthMap(external_id='withmap@stanford.edu',
-                                  external_email='withmap@stanford.edu',
-                                  internal_password=self.url_params['password'],
-                                  external_domain='shib:https://idp.stanford.edu/')
-        request.session['ExternalAuthMap'] = extauth
-        request.user = AnonymousUser()
-
-        with patch('edxmako.request_context.get_current_request', return_value=request):
-            response = create_account(request)
         self.assertEqual(response.status_code, 200)
         obj = json.loads(response.content)
         self.assertTrue(obj['success'])

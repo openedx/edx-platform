@@ -10,6 +10,7 @@ source =
     lms
     openedx
     pavelib
+    scripts
 
 omit =
     cms/envs/*

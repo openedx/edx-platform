@@ -2,6 +2,8 @@
 Data Aggregation Layer of the Enrollment API. Collects all enrollment specific data into a single
 source to be used throughout the API.
 """
+from __future__ import absolute_import
+
 import logging
 
 from django.contrib.auth.models import User

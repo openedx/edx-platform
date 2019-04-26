@@ -17,6 +17,7 @@ import mock
 import pytz
 from rest_framework.test import APIClient, APITestCase
 
+from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.user_api.accounts import ACCOUNT_VISIBILITY_PREF_KEY
 from openedx.core.djangoapps.user_api.models import UserPreference
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
@@ -230,7 +231,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         Verify that the shareable fields from the account are returned
         """
         data = response.data
-        self.assertEqual(11, len(data))
+        self.assertEqual(12, len(data))
 
         # public fields (3)
         self.assertEqual(account_privacy, data["account_privacy"])
@@ -262,7 +263,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         Verify that all account fields are returned (even those that are not shareable).
         """
         data = response.data
-        self.assertEqual(21, len(data))
+        self.assertEqual(22, len(data))
 
         # public fields (3)
         expected_account_privacy = (
@@ -282,6 +283,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         self.assertIsNotNone(data["social_links"])
         self.assertEqual(UserPreference.get_value(self.user, 'time_zone'), data["time_zone"])
         self.assertIsNotNone(data["accomplishments_shared"])
+        self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
 
         # additional admin fields (10)
         self.assertEqual(self.user.email, data["email"])
@@ -290,7 +292,6 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         self.assertEqual("world peace", data["goals"])
         self.assertTrue(data["is_active"])
         self.assertEqual("Park Ave", data['mailing_address'])
-        self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
         self.assertEquals(requires_parental_consent, data["requires_parental_consent"])
         self.assertIsNone(data["secondary_email"])
         self.assertEqual(year_of_birth, data["year_of_birth"])
@@ -322,7 +323,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         """
         client = self.login_client(api_client, user)
         response = client.get(reverse("accounts_api", kwargs={'username': "does_not_exist"}))
-        self.assertEqual(403 if user == "staff_user" else 404, response.status_code)
+        self.assertEqual(404, response.status_code)
 
     # Note: using getattr so that the patching works even if there is no configuration.
     # This is needed when testing CMS as the patching is still executed even though the
@@ -403,7 +404,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         self.create_mock_profile(self.user)
         # set user's custom visibility preferences
         set_user_preference(self.user, ACCOUNT_VISIBILITY_PREF_KEY, CUSTOM_VISIBILITY)
-        shared_fields = ("bio", "language_proficiencies")
+        shared_fields = ("bio", "language_proficiencies", "name")
         for field_name in shared_fields:
             set_user_preference(self.user, "visibility.{}".format(field_name), ALL_USERS_VISIBILITY)
 
@@ -414,7 +415,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         # verify response
         if requesting_username == "different_user":
             data = response.data
-            self.assertEqual(5, len(data))
+            self.assertEqual(6, len(data))
 
             # public fields
             self.assertEqual(self.user.username, data["username"])
@@ -424,6 +425,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
             # custom shared fields
             self.assertEqual(TEST_BIO_VALUE, data["bio"])
             self.assertEqual([{"code": TEST_LANGUAGE_PROFICIENCY_CODE}], data["language_proficiencies"])
+            self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
         else:
             self._verify_full_account_response(response)
 
@@ -470,7 +472,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
             with self.assertNumQueries(queries):
                 response = self.send_get(self.client)
             data = response.data
-            self.assertEqual(21, len(data))
+            self.assertEqual(22, len(data))
             self.assertEqual(self.user.username, data["username"])
             self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
             for empty_field in ("year_of_birth", "level_of_education", "mailing_address", "bio"):
@@ -525,7 +527,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         is_staff access).
         """
         client = self.login_client(api_client, user)
-        self.send_patch(client, {}, expected_status=403 if user == "staff_user" else 404)
+        self.send_patch(client, {}, expected_status=403)
 
     @ddt.data(
         ("client", "user"),
@@ -534,14 +536,14 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
     @ddt.unpack
     def test_patch_account_unknown_user(self, api_client, user):
         """
-        Test that trying to update a user who does not exist returns a 404.
+        Test that trying to update a user who does not exist returns a 403.
         """
         client = self.login_client(api_client, user)
         response = client.patch(
             reverse("accounts_api", kwargs={'username': "does_not_exist"}),
             data=json.dumps({}), content_type="application/merge-patch+json"
         )
-        self.assertEqual(404, response.status_code)
+        self.assertEqual(403, response.status_code)
 
     @ddt.data(
         ("gender", "f", "not a gender", u'"not a gender" is not a valid choice.'),
@@ -555,7 +557,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         # Note that we store the raw data, so it is up to client to escape the HTML.
         (
             "bio", u"<html>Lacrosse-playing superhero 壓是進界推日不復女</html>",
-            "z" * 3001, u"Ensure this value has at most 3000 characters (it has 3001)."
+            "z" * 301, u"The about me field must be at most 300 characters long."
         ),
         ("account_privacy", ALL_USERS_VISIBILITY),
         ("account_privacy", PRIVATE_VISIBILITY),
@@ -877,7 +879,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         response = self.send_get(client)
         if has_full_access:
             data = response.data
-            self.assertEqual(21, len(data))
+            self.assertEqual(22, len(data))
             self.assertEqual(self.user.username, data["username"])
             self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
             self.assertEqual(self.user.email, data["email"])
@@ -932,3 +934,81 @@ class TestAccountAPITransactions(TransactionTestCase):
         data = response.data
         self.assertEqual(old_email, data["email"])
         self.assertEqual(u"m", data["gender"])
+
+
+@ddt.ddt
+@mock.patch('django.conf.settings.USERNAME_REPLACEMENT_WORKER', 'test_replace_username_service_worker')
+class UsernameReplacementViewTests(APITestCase):
+    """ Tests UsernameReplacementView """
+    SERVICE_USERNAME = 'test_replace_username_service_worker'
+
+    def setUp(self):
+        super(UsernameReplacementViewTests, self).setUp()
+        self.service_user = UserFactory(username=self.SERVICE_USERNAME)
+        self.url = reverse("username_replacement")
+
+    def build_jwt_headers(self, user):
+        """
+        Helper function for creating headers for the JWT authentication.
+        """
+        token = create_jwt_for_user(user)
+        headers = {'HTTP_AUTHORIZATION': u'JWT {}'.format(token)}
+        return headers
+
+    def call_api(self, user, data):
+        """ Helper function to call API with data """
+        data = json.dumps(data)
+        headers = self.build_jwt_headers(user)
+        return self.client.post(self.url, data, content_type='application/json', **headers)
+
+    def test_auth(self):
+        """ Verify the endpoint only works with the service worker """
+        data = {
+            "username_mappings": [
+                {"test_username_1": "test_new_username_1"},
+                {"test_username_2": "test_new_username_2"}
+            ]
+        }
+
+        # Test unauthenticated
+        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, 401)
+
+        # Test non-service worker
+        random_user = UserFactory()
+        response = self.call_api(random_user, data)
+        self.assertEqual(response.status_code, 403)
+
+        # Test service worker
+        response = self.call_api(self.service_user, data)
+        self.assertEqual(response.status_code, 200)
+
+    @ddt.data(
+        [{}, {}],
+        {},
+        [{"test_key": "test_value", "test_key_2": "test_value_2"}]
+    )
+    def test_bad_schema(self, mapping_data):
+        """ Verify the endpoint rejects bad data schema """
+        data = {
+            "username_mappings": mapping_data
+        }
+        response = self.call_api(self.service_user, data)
+        self.assertEqual(response.status_code, 400)
+
+    def test_existing_and_non_existing_users(self):
+        """ Tests a mix of existing and non existing users """
+        random_users = [UserFactory() for _ in range(5)]
+        fake_usernames = ["myname_" + str(x) for x in range(5)]
+        existing_users = [{user.username: user.username + '_new'} for user in random_users]
+        non_existing_users = [{username: username + '_new'} for username in fake_usernames]
+        data = {
+            "username_mappings": existing_users + non_existing_users
+        }
+        expected_response = {
+            'failed_replacements': [],
+            'successful_replacements': existing_users + non_existing_users
+        }
+        response = self.call_api(self.service_user, data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, expected_response)

@@ -2,16 +2,20 @@
 Stub implementation of an HTTP service.
 """
 
+from __future__ import absolute_import
+
 import json
 import threading
-import urllib
-import urlparse
-from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from functools import wraps
 from logging import getLogger
-from SocketServer import ThreadingMixIn
 
+import six
+import six.moves.urllib.error  # pylint: disable=import-error
+import six.moves.urllib.parse  # pylint: disable=import-error
+import six.moves.urllib.request  # pylint: disable=import-error
 from lazy import lazy
+from six.moves.BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer  # pylint: disable=import-error
+from six.moves.socketserver import ThreadingMixIn  # pylint: disable=import-error
 
 LOGGER = getLogger(__name__)
 
@@ -107,7 +111,7 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler, object):
         # None of our parameters are lists, however, so we map [val] --> val
         # If the list contains multiple entries, we pick the first one
         try:
-            post_dict = urlparse.parse_qs(contents, keep_blank_values=True)
+            post_dict = six.moves.urllib.parse.parse_qs(contents, keep_blank_values=True)
             return {
                 key: list_val[0]
                 for key, list_val in post_dict.items()
@@ -121,13 +125,13 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler, object):
         """
         Return the GET parameters (querystring in the URL).
         """
-        query = urlparse.urlparse(self.path).query
+        query = six.moves.urllib.parse.urlparse(self.path).query
 
         # By default, `parse_qs` returns a list of values for each param
         # For convenience, we replace lists of 1 element with just the element
         return {
             key: value[0] if len(value) == 1 else value
-            for key, value in urlparse.parse_qs(query).items()
+            for key, value in six.moves.urllib.parse.parse_qs(query).items()
         }
 
     @lazy
@@ -136,7 +140,7 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler, object):
         Return the URL path without GET parameters.
         Removes the trailing slash if there is one.
         """
-        path = urlparse.urlparse(self.path).path
+        path = six.moves.urllib.parse.urlparse(self.path).path
         if path.endswith('/'):
             return path[:-1]
         else:
@@ -153,12 +157,12 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler, object):
         if self.path == "/set_config" or self.path == "/set_config/":
 
             if len(self.post_dict) > 0:
-                for key, value in self.post_dict.iteritems():
+                for key, value in six.iteritems(self.post_dict):
 
                     # Decode the params as UTF-8
                     try:
-                        key = unicode(key, 'utf-8')
-                        value = unicode(value, 'utf-8')
+                        key = six.text_type(key, 'utf-8')
+                        value = six.text_type(value, 'utf-8')
                     except UnicodeDecodeError:
                         self.log_message("Could not decode request params as UTF-8")
 
@@ -221,7 +225,7 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler, object):
         `args` is an array of values to fill into the string.
         """
         if not args:
-            format_str = urllib.unquote(format_str)
+            format_str = six.moves.urllib.parse.unquote(format_str)
         return u"{0} - - [{1}] {2}\n".format(
             self.client_address[0],
             self.log_date_time_string(),

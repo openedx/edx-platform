@@ -1,22 +1,23 @@
 """
 APIs providing support for Journals functionality.
 """
-from urlparse import urljoin, urlsplit, urlunsplit
-import logging
+from __future__ import absolute_import
 import hashlib
+import logging
 import six
 
+from six.moves.urllib.parse import urljoin, urlsplit, urlunsplit  # pylint: disable=import-error
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from edx_rest_api_client.client import EdxRestApiClient
+from slumber.exceptions import HttpClientError, HttpServerError
+
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
-from slumber.exceptions import HttpClientError, HttpServerError
-
 
 LOGGER = logging.getLogger("edx.journals")
 JOURNALS_CACHE_TIMEOUT = 3600  # Value is in seconds

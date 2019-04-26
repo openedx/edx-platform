@@ -1,20 +1,21 @@
 """
 Tests for bookmarks api.
 """
-import ddt
-from mock import patch
+from __future__ import absolute_import
 
+import ddt
+import six
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-
+from mock import patch
 from opaque_keys.edx.keys import UsageKey
 
+from openedx.core.djangoapps.bookmarks.api import BookmarksLimitReachedError
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from .. import api
 from ..models import Bookmark
-from openedx.core.djangoapps.bookmarks.api import BookmarksLimitReachedError
 from .test_models import BookmarksTestsBase
 
 
@@ -124,10 +125,10 @@ class BookmarksAPITests(BookmarkApiEventTestMixin, BookmarksTestsBase):
         self.assert_bookmark_event_emitted(
             mock_tracker,
             event_name='edx.bookmark.added',
-            course_id=unicode(self.course_id),
+            course_id=six.text_type(self.course_id),
             bookmark_id=bookmark_data['id'],
             component_type=self.vertical_2.location.block_type,
-            component_usage_id=unicode(self.vertical_2.location),
+            component_usage_id=six.text_type(self.vertical_2.location),
         )
 
         self.assertEqual(len(api.get_bookmarks(user=self.user, course_key=self.course.id)), 3)
@@ -145,10 +146,10 @@ class BookmarksAPITests(BookmarkApiEventTestMixin, BookmarksTestsBase):
         self.assert_bookmark_event_emitted(
             mock_tracker,
             event_name='edx.bookmark.added',
-            course_id=unicode(self.course_id),
+            course_id=six.text_type(self.course_id),
             bookmark_id=bookmark_data['id'],
             component_type=self.vertical_2.location.block_type,
-            component_usage_id=unicode(self.vertical_2.location),
+            component_usage_id=six.text_type(self.vertical_2.location),
         )
 
         self.assertEqual(len(api.get_bookmarks(user=self.user, course_key=self.course.id)), 3)
@@ -213,16 +214,16 @@ class BookmarksAPITests(BookmarkApiEventTestMixin, BookmarksTestsBase):
         self.assert_bookmark_event_emitted(
             mock_tracker,
             event_name='edx.bookmark.removed',
-            course_id=unicode(self.course_id),
+            course_id=six.text_type(self.course_id),
             bookmark_id=self.bookmark_1.resource_id,
             component_type=self.sequential_1.location.block_type,
-            component_usage_id=unicode(self.sequential_1.location),
+            component_usage_id=six.text_type(self.sequential_1.location),
         )
 
         bookmarks_data = api.get_bookmarks(user=self.user)
         self.assertEqual(len(bookmarks_data), 2)
-        self.assertNotEqual(unicode(self.sequential_1.location), bookmarks_data[0]['usage_id'])
-        self.assertNotEqual(unicode(self.sequential_1.location), bookmarks_data[1]['usage_id'])
+        self.assertNotEqual(six.text_type(self.sequential_1.location), bookmarks_data[0]['usage_id'])
+        self.assertNotEqual(six.text_type(self.sequential_1.location), bookmarks_data[1]['usage_id'])
 
     @patch('openedx.core.djangoapps.bookmarks.api.tracker.emit')
     def test_delete_bookmark_raises_error(self, mock_tracker):

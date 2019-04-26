@@ -2,9 +2,12 @@
 Tests for bookmark services.
 """
 
+from __future__ import absolute_import
+
 from opaque_keys.edx.keys import UsageKey
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
+
 from ..services import BookmarksService
 from .test_models import BookmarksTestsBase
 

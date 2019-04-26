@@ -7,6 +7,7 @@ Unit tests for LMS instructor-initiated background tasks helper functions.
 - Tests all of the existing reports.
 
 """
+from __future__ import unicode_literals
 
 import os
 import shutil
@@ -413,7 +414,7 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
 
         RequestCache.clear_all_namespaces()
 
-        expected_query_count = 50
+        expected_query_count = 49
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
             with check_mongo_calls(mongo_count):
                 with self.assertNumQueries(expected_query_count):
@@ -501,8 +502,10 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         from xmodule.capa_module import CapaDescriptor
         generate_report_data = CapaDescriptor.generate_report_data
         del CapaDescriptor.generate_report_data
-        yield
-        CapaDescriptor.generate_report_data = generate_report_data
+        try:
+            yield
+        finally:
+            CapaDescriptor.generate_report_data = generate_report_data
 
     @patch.dict('django.conf.settings.FEATURES', {'MAX_PROBLEM_RESPONSES_COUNT': 4})
     def test_build_student_data_limit(self):
@@ -558,24 +561,35 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         """
         self.define_option_problem(u'Problem1')
         self.submit_student_answer(self.student.username, u'Problem1', ['Option 1'])
-        state = {'some': 'state', 'more': 'state!'}
+        state1 = {'some': 'state1', 'more': 'state1!'}
+        state2 = {'some': 'state2', 'more': 'state2!'}
         mock_generate_report_data.return_value = iter([
-            ('student', state),
+            ('student', state1),
+            ('student', state2),
         ])
         student_data, _ = ProblemResponses._build_student_data(
             user_id=self.instructor.id,
             course_key=self.course.id,
             usage_key_str=str(self.course.location),
         )
-        self.assertEquals(len(student_data), 1)
+        self.assertEquals(len(student_data), 2)
         self.assertDictContainsSubset({
             'username': 'student',
             'location': 'test_course > Section > Subsection > Problem1',
             'block_key': 'i4x://edx/1.23x/problem/Problem1',
             'title': 'Problem1',
-            'some': 'state',
-            'more': 'state!',
+            'some': 'state1',
+            'more': 'state1!',
         }, student_data[0])
+        self.assertDictContainsSubset({
+            'username': 'student',
+            'location': 'test_course > Section > Subsection > Problem1',
+            'block_key': 'i4x://edx/1.23x/problem/Problem1',
+            'title': 'Problem1',
+            'some': 'state2',
+            'more': 'state2!',
+        }, student_data[1])
+        self.assertEquals(student_data[0]['state'], student_data[1]['state'])
 
     def test_build_student_data_for_block_with_real_generate_report_data(self):
         """
@@ -752,7 +766,7 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
-        self.assertIn('Activate Course Enrollment', response.content)
+        self.assertIn('Activate Course Enrollment', response.content.decode('utf-8'))
 
         response = self.client.post(redeem_url)
         self.assertEquals(response.status_code, 200)
@@ -786,7 +800,7 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
-        self.assertIn('Activate Course Enrollment', response.content)
+        self.assertIn('Activate Course Enrollment', response.content.decode('utf-8'))
 
         response = self.client.post(redeem_url)
         self.assertEquals(response.status_code, 200)
@@ -827,7 +841,7 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
-        self.assertIn('Activate Course Enrollment', response.content)
+        self.assertIn('Activate Course Enrollment', response.content.decode('utf-8'))
 
         response = self.client.post(redeem_url)
         self.assertEquals(response.status_code, 200)
@@ -1312,7 +1326,7 @@ class TestExecutiveSummaryReport(TestReportMixin, InstructorTaskCourseTestCase):
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
-        self.assertIn('Activate Course Enrollment', response.content)
+        self.assertIn('Activate Course Enrollment', response.content.decode('utf-8'))
 
         response = self.client.post(redeem_url)
         self.assertEquals(response.status_code, 200)
@@ -1941,7 +1955,6 @@ class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
 
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
             result = CourseGradeReport.generate(None, None, self.course.id, None, 'graded')
-
             self.assertDictContainsSubset(
                 {'action_name': 'graded', 'attempted': 1, 'succeeded': 1, 'failed': 0},
                 result,
@@ -1954,10 +1967,9 @@ class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
                         u'Username': self.student.username,
                         u'Grade': '0.13',
                         u'Homework 1: Subsection': '0.5',
-                        u'Homework 2: Hidden': u'Not Attempted',
-                        u'Homework 3: Unattempted': u'Not Attempted',
-                        u'Homework 4: Empty': u'Not Attempted',
-                        u'Homework (Avg)': '0.125',
+                        u'Homework 2: Unattempted': 'Not Attempted',
+                        u'Homework 3: Empty': 'Not Attempted',
+                        u'Homework (Avg)': text_type(1.0 / 6.0),
                     },
                 ],
                 ignore_other_columns=True,

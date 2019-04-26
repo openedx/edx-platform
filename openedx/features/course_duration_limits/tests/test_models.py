@@ -11,6 +11,7 @@ from mock import Mock
 import pytz
 
 from edx_django_utils.cache import RequestCache
+from course_modes.tests.factories import CourseModeFactory
 from opaque_keys.edx.locator import CourseLocator
 from openedx.core.djangoapps.config_model_utils.models import Provenance
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
@@ -18,7 +19,6 @@ from openedx.core.djangoapps.content.course_overviews.tests.factories import Cou
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
-from openedx.features.course_duration_limits.config import CONTENT_TYPE_GATING_FLAG
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 
@@ -32,6 +32,8 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
 
     def setUp(self):
         self.course_overview = CourseOverviewFactory.create()
+        CourseModeFactory.create(course_id=self.course_overview.id, mode_slug='audit')
+        CourseModeFactory.create(course_id=self.course_overview.id, mode_slug='verified')
         self.user = UserFactory.create()
         super(TestCourseDurationLimitConfig, self).setUp()
 
@@ -81,9 +83,9 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
             user = self.user
             course_key = self.course_overview.id
 
-        query_count = 9
+        query_count = 7
         if pass_enrollment and already_enrolled:
-            query_count = 8
+            query_count = 6
 
         with self.assertNumQueries(query_count):
             enabled = CourseDurationLimitConfig.enabled_for_enrollment(
@@ -108,24 +110,6 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
                 None,
                 Mock(name='course_key')
             )
-
-    @override_waffle_flag(CONTENT_TYPE_GATING_FLAG, True)
-    def test_enabled_for_enrollment_flag_override(self):
-        self.assertTrue(CourseDurationLimitConfig.enabled_for_enrollment(
-            None,
-            None,
-            None
-        ))
-        self.assertTrue(CourseDurationLimitConfig.enabled_for_enrollment(
-            Mock(name='enrollment'),
-            Mock(name='user'),
-            None
-        ))
-        self.assertTrue(CourseDurationLimitConfig.enabled_for_enrollment(
-            Mock(name='enrollment'),
-            None,
-            Mock(name='course_key')
-        ))
 
     @ddt.data(True, False)
     def test_enabled_for_course(
@@ -157,10 +141,10 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
 
     @ddt.data(
         # Generate all combinations of setting each configuration level to True/False/None
-        *itertools.product(*[(True, False, None)] * 4)
+        *itertools.product(*([(True, False, None)] * 4 + [(True, False)]))
     )
     @ddt.unpack
-    def test_config_overrides(self, global_setting, site_setting, org_setting, course_setting):
+    def test_config_overrides(self, global_setting, site_setting, org_setting, course_setting, reverse_order):
         """
         Test that the stacked configuration overrides happen in the correct order and priority.
 
@@ -189,10 +173,16 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
         test_course = CourseOverviewFactory.create(org='test-org')
         test_site_cfg = SiteConfigurationFactory.create(values={'course_org_filter': test_course.org})
 
-        CourseDurationLimitConfig.objects.create(enabled=global_setting)
-        CourseDurationLimitConfig.objects.create(course=test_course, enabled=course_setting)
-        CourseDurationLimitConfig.objects.create(org=test_course.org, enabled=org_setting)
-        CourseDurationLimitConfig.objects.create(site=test_site_cfg.site, enabled=site_setting)
+        if reverse_order:
+            CourseDurationLimitConfig.objects.create(site=test_site_cfg.site, enabled=site_setting)
+            CourseDurationLimitConfig.objects.create(org=test_course.org, enabled=org_setting)
+            CourseDurationLimitConfig.objects.create(course=test_course, enabled=course_setting)
+            CourseDurationLimitConfig.objects.create(enabled=global_setting)
+        else:
+            CourseDurationLimitConfig.objects.create(enabled=global_setting)
+            CourseDurationLimitConfig.objects.create(course=test_course, enabled=course_setting)
+            CourseDurationLimitConfig.objects.create(org=test_course.org, enabled=org_setting)
+            CourseDurationLimitConfig.objects.create(site=test_site_cfg.site, enabled=site_setting)
 
         expected_global_setting = self._resolve_settings([global_setting])
         expected_site_setting = self._resolve_settings([global_setting, site_setting])
@@ -245,21 +235,21 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
             all_configs[CourseLocator('7-True', 'test_course', 'run-None')],
             {
                 'enabled': (True, Provenance.org),
-                'enabled_as_of': (datetime(2018, 1, 1, 5, tzinfo=pytz.UTC), Provenance.course),
+                'enabled_as_of': (datetime(2018, 1, 1, 5, tzinfo=pytz.UTC), Provenance.run),
             }
         )
         self.assertEqual(
             all_configs[CourseLocator('7-True', 'test_course', 'run-False')],
             {
-                'enabled': (False, Provenance.course),
-                'enabled_as_of': (datetime(2018, 1, 1, 5, tzinfo=pytz.UTC), Provenance.course),
+                'enabled': (False, Provenance.run),
+                'enabled_as_of': (datetime(2018, 1, 1, 5, tzinfo=pytz.UTC), Provenance.run),
             }
         )
         self.assertEqual(
             all_configs[CourseLocator('7-None', 'test_course', 'run-None')],
             {
                 'enabled': (True, Provenance.site),
-                'enabled_as_of': (datetime(2018, 1, 1, 5, tzinfo=pytz.UTC), Provenance.course),
+                'enabled_as_of': (datetime(2018, 1, 1, 5, tzinfo=pytz.UTC), Provenance.run),
             }
         )
 

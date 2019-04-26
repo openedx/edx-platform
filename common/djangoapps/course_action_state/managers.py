@@ -1,8 +1,9 @@
 """
 Model Managers for Course Actions
 """
+from __future__ import absolute_import
+import six
 import traceback
-
 from django.db import models, transaction
 
 
@@ -88,7 +89,7 @@ class CourseActionUIStateManager(CourseActionStateManager):
 
         # update any additional fields in kwargs
         if kwargs:
-            for key, value in kwargs.iteritems():
+            for key, value in six.iteritems(kwargs):
                 setattr(state_object, key, value)
 
         state_object.save()

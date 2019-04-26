@@ -35,6 +35,13 @@ import os
 from corsheaders.defaults import default_headers as corsheaders_default_headers
 from path import Path as path
 from django.utils.translation import ugettext_lazy as _
+from enterprise.constants import (
+    ENTERPRISE_ADMIN_ROLE,
+    ENTERPRISE_OPERATOR_ROLE,
+    ENTERPRISE_DASHBOARD_ADMIN_ROLE,
+    ENTERPRISE_CATALOG_ADMIN_ROLE,
+    ENTERPRISE_ENROLLMENT_API_ADMIN_ROLE
+)
 
 from openedx.core.constants import COURSE_KEY_REGEX, COURSE_KEY_PATTERN, COURSE_ID_PATTERN
 from openedx.core.djangoapps.theming.helpers_dirs import (
@@ -85,7 +92,19 @@ FEATURES = {
     # in sync with the corresponding ones in cms/envs/common.py
     'ENABLE_DISCUSSION_SERVICE': True,
     'ENABLE_TEXTBOOK': True,
-    'ENABLE_STUDENT_NOTES': True,  # enables the student notes API and UI.
+
+    # .. toggle_name: ENABLE_STUDENT_NOTES
+    # .. toggle_type: feature_flag
+    # .. toggle_default: True
+    # .. toggle_description: Enables the Student Notes API and UI.
+    # .. toggle_category: ????
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2014-11-13
+    # .. toggle_expiration_date: None
+    # .. toggle_warnings: None
+    # .. toggle_tickets: TNL-659
+    # .. toggle_status: supported
+    'ENABLE_STUDENT_NOTES': True,
 
     # discussion home panel, which includes a subscription on/off setting for discussion digest emails.
     # this should remain off in production until digest notifications are online.
@@ -104,22 +123,20 @@ FEATURES = {
 
     'ENABLE_MASQUERADE': True,  # allow course staff to change to student view of courseware
 
+    # .. toggle_name: ENABLE_SYSADMIN_DASHBOARD
+    # .. toggle_type: feature_flag
+    # .. toggle_default: False
+    # .. toggle_description: enables dashboard at /syadmin/ for django staff, for seeing overview of system status, for deleting and loading courses, for seeing log of git imports of courseware.
+    # .. toggle_category: admin
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2013-12-12
+    # .. toggle_expiration_date: None
+    # .. toggle_warnings: some views are not performant when there are more than 100 courses
+    # .. toggle_tickets: None
+    # .. toggle_status: unsupported
     'ENABLE_SYSADMIN_DASHBOARD': False,  # sysadmin dashboard, to see what courses are loaded, to delete & load courses
 
     'DISABLE_LOGIN_BUTTON': False,  # used in systems where login is automatic, eg MIT SSL
-
-    # extrernal access methods
-    'AUTH_USE_OPENID': False,
-    'AUTH_USE_CERTIFICATES': False,
-    'AUTH_USE_OPENID_PROVIDER': False,
-    # Even though external_auth is in common, shib assumes the LMS views / urls, so it should only be enabled
-    # in LMS
-    'AUTH_USE_SHIB': False,
-    'AUTH_USE_CAS': False,
-
-    # This flag disables the requirement of having to agree to the TOS for users registering
-    # with Shib.  Feature was requested by Stanford's office of general counsel
-    'SHIB_DISABLE_TOS': False,
 
     # Toggles OAuth2 authentication provider
     'ENABLE_OAUTH2_PROVIDER': False,
@@ -136,9 +153,6 @@ FEATURES = {
 
     # Set to hide the courses list on the Learner Dashboard if they are not enrolled in any courses yet.
     'HIDE_DASHBOARD_COURSES_UNTIL_ACTIVATED': False,
-
-    # Enables ability to restrict enrollment in specific courses by the user account login method
-    'RESTRICT_ENROLL_BY_REG_METHOD': False,
 
     # enable analytics server.
     # WARNING: THIS SHOULD ALWAYS BE SET TO FALSE UNDER NORMAL
@@ -493,6 +507,7 @@ OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS = 30
 # Scope description strings are presented to the user
 # on the application authorization page. See
 # lms/templates/oauth2_provider/authorize.html for details.
+# Non-default scopes should be added directly to OAUTH2_PROVIDER['SCOPES'] below.
 OAUTH2_DEFAULT_SCOPES = {
     'read': _('Read access'),
     'write': _('Write access'),
@@ -506,6 +521,7 @@ OAUTH2_PROVIDER = {
     'REFRESH_TOKEN_EXPIRE_SECONDS': 7776000,
     'SCOPES_BACKEND_CLASS': 'openedx.core.djangoapps.oauth_dispatch.scopes.ApplicationModelScopes',
     'SCOPES': dict(OAUTH2_DEFAULT_SCOPES, **{
+        'user_id': _('Retrieve your user identifier'),
         'grades:read': _('Retrieve your grades for your enrolled courses'),
         'certificates:read': _('Retrieve your course certificates'),
     }),
@@ -2068,10 +2084,6 @@ INSTALLED_APPS = [
     # Student support tools
     'support',
 
-    # External auth (OpenID, shib)
-    'openedx.core.djangoapps.external_auth',
-    'django_openid_auth',
-
     # django-oauth2-provider (deprecated)
     'provider',
     'provider.oauth2',
@@ -2473,19 +2485,6 @@ if FEATURES.get('CLASS_DASHBOARD'):
 ################ Enable credit eligibility feature ####################
 ENABLE_CREDIT_ELIGIBILITY = True
 FEATURES['ENABLE_CREDIT_ELIGIBILITY'] = ENABLE_CREDIT_ELIGIBILITY
-
-######################## CAS authentication ###########################
-
-if FEATURES.get('AUTH_USE_CAS'):
-    CAS_SERVER_URL = 'https://provide_your_cas_url_here'
-    AUTHENTICATION_BACKENDS = [
-        'django.contrib.auth.backends.ModelBackend',
-        'django_cas.backends.CASBackend',
-    ]
-
-    INSTALLED_APPS.append('django_cas')
-
-    MIDDLEWARE_CLASSES.append('django_cas.middleware.CASMiddleware')
 
 ############# Cross-domain requests #################
 
@@ -2975,10 +2974,11 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
     ],
 }
 
-# The list of all fields that can be shared with other users
-ACCOUNT_VISIBILITY_CONFIGURATION["shareable_fields"] = (
+# The list of all fields that are shared with other users using the bulk 'all_users' privacy setting
+ACCOUNT_VISIBILITY_CONFIGURATION["bulk_shareable_fields"] = (
     ACCOUNT_VISIBILITY_CONFIGURATION["public_fields"] + [
         'bio',
+        'course_certificates',
         'country',
         'date_joined',
         'language_proficiencies',
@@ -2991,16 +2991,22 @@ ACCOUNT_VISIBILITY_CONFIGURATION["shareable_fields"] = (
     ]
 )
 
+# The list of all fields that can be shared selectively with other users using the 'custom' privacy setting
+ACCOUNT_VISIBILITY_CONFIGURATION["custom_shareable_fields"] = (
+    ACCOUNT_VISIBILITY_CONFIGURATION["bulk_shareable_fields"] + [
+        "name",
+    ]
+)
+
 # The list of account fields that are visible only to staff and users viewing their own profiles
 ACCOUNT_VISIBILITY_CONFIGURATION["admin_fields"] = (
-    ACCOUNT_VISIBILITY_CONFIGURATION["shareable_fields"] + [
+    ACCOUNT_VISIBILITY_CONFIGURATION["custom_shareable_fields"] + [
         "email",
         "extended_profile",
         "gender",
         "goals",
         "is_active",
         "mailing_address",
-        "name",
         "requires_parental_consent",
         "secondary_email",
         "year_of_birth",
@@ -3160,7 +3166,7 @@ JWT_AUTH = {
     'JWT_LOGIN_CLIENT_ID': 'login-service-client-id',
     'JWT_LOGIN_SERVICE_USERNAME': 'login_service_user',
 
-    'JWT_SUPPORTED_VERSION': '1.1.0',
+    'JWT_SUPPORTED_VERSION': '1.2.0',
 
     'JWT_ALGORITHM': 'HS256',
     'JWT_SECRET_KEY': SECRET_KEY,
@@ -3307,7 +3313,7 @@ ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER = {}
 ############## ENTERPRISE SERVICE API CLIENT CONFIGURATION ######################
 # The LMS communicates with the Enterprise service via the EdxRestApiClient class
 # These default settings are utilized by the LMS when interacting with the service,
-# and are overridden by the configuration parameter accessors defined in aws.py
+# and are overridden by the configuration parameter accessors defined in production.py
 
 ENTERPRISE_API_URL = LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/'
 ENTERPRISE_CONSENT_API_URL = LMS_INTERNAL_ROOT_URL + '/consent/api/v1/'
@@ -3345,44 +3351,64 @@ ENTERPRISE_READONLY_ACCOUNT_FIELDS = [
 ]
 ENTERPRISE_CUSTOMER_COOKIE_NAME = 'enterprise_customer_uuid'
 BASE_COOKIE_DOMAIN = 'localhost'
+SYSTEM_TO_FEATURE_ROLE_MAPPING = {
+    ENTERPRISE_ADMIN_ROLE: [ENTERPRISE_DASHBOARD_ADMIN_ROLE],
+    ENTERPRISE_OPERATOR_ROLE: [
+        ENTERPRISE_DASHBOARD_ADMIN_ROLE,
+        ENTERPRISE_CATALOG_ADMIN_ROLE,
+        ENTERPRISE_ENROLLMENT_API_ADMIN_ROLE
+    ],
+}
+
+DATA_CONSENT_SHARE_CACHE_TIMEOUT = None  # Never expire
 
 ############## Settings for Course Enrollment Modes ######################
+# The min_price key refers to the minimum price allowed for an instance
+# of a particular type of course enrollment mode. This is not to be confused
+# with the min_price field of the CourseMode model, which refers to the actual
+# price of the CourseMode.
 COURSE_ENROLLMENT_MODES = {
     "audit": {
         "id": 1,
         "slug": "audit",
         "display_name": _("Audit"),
-        "min_price": 0
+        "min_price": 0,
     },
     "verified": {
         "id": 2,
         "slug": "verified",
         "display_name": _("Verified"),
-        "min_price": 0
+        "min_price": 1,
     },
     "professional": {
         "id": 3,
         "slug": "professional",
         "display_name": _("Professional"),
-        "min_price": 0
+        "min_price": 1,
     },
     "no-id-professional": {
         "id": 4,
         "slug": "no-id-professional",
         "display_name": _("No-Id-Professional"),
-        "min_price": 0
+        "min_price": 0,
     },
     "credit": {
         "id": 5,
         "slug": "credit",
         "display_name": _("Credit"),
-        "min_price": 0
+        "min_price": 0,
     },
     "honor": {
         "id": 6,
         "slug": "honor",
         "display_name": _("Honor"),
-        "min_price": 0
+        "min_price": 0,
+    },
+    "masters": {
+        "id": 7,
+        "slug": "masters",
+        "display_name": _("Master's"),
+        "min_price": 0,
     },
 }
 
@@ -3399,7 +3425,7 @@ COURSES_API_CACHE_TIMEOUT = 3600  # Value is in seconds
 COURSEGRAPH_JOB_QUEUE = DEFAULT_PRIORITY_QUEUE
 
 
-# Initialize to 'unknown', but read from JSON in aws.py
+# Initialize to 'unknown', but read from JSON in production.py
 EDX_PLATFORM_REVISION = 'unknown'
 
 ############## Settings for Completion API #########################
@@ -3453,6 +3479,8 @@ RETIREMENT_STATES = [
     'COMPLETE',
 ]
 
+USERNAME_REPLACEMENT_WORKER = "REPLACE WITH VALID USERNAME"
+
 ############## Settings for Microfrontends  #########################
 # If running a Gradebook container locally,
 # modify lms/envs/private.py to give it a non-null value
@@ -3464,6 +3492,9 @@ WRITABLE_GRADEBOOK_URL = None
 # completely removed and this redirect is no longer needed, we can remove this.
 PROFILE_MICROFRONTEND_URL = "http://some.profile.spa/u/"
 
+# URL configuration for new microfrontends.
+ORDER_HISTORY_MICROFRONTEND_URL = "http://some.order_history.spa/"
+
 ############### Settings for django-fernet-fields ##################
 FERNET_KEYS = [
     'DUMMY KEY CHANGE BEFORE GOING TO PRODUCTION',
@@ -3472,6 +3503,9 @@ FERNET_KEYS = [
 ############### Settings for user-state-client ##################
 # Maximum number of rows to fetch in XBlockUserStateClient calls. Adjust for performance
 USER_STATE_BATCH_SIZE = 5000
+
+############### Settings for edx-rbac  ###############
+SYSTEM_WIDE_ROLE_CLASSES = []
 
 ############## Plugin Django Apps #########################
 

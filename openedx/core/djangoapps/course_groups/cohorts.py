@@ -3,10 +3,12 @@ This file contains the logic for cohorts, as exposed internally to the
 forums, and to the cohort admin views.
 """
 
+from __future__ import absolute_import
+
 import logging
 import random
 
-from courseware import courses
+import six
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
@@ -15,8 +17,10 @@ from django.db.models.signals import m2m_changed, post_save
 from django.dispatch import receiver
 from django.http import Http404
 from django.utils.translation import ugettext as _
-from eventtracking import tracker
 from edx_django_utils.cache import RequestCache
+from eventtracking import tracker
+
+from courseware import courses
 from openedx.core.lib.cache_utils import request_cached
 from student.models import get_user_by_username_or_email
 
@@ -184,9 +188,9 @@ def bulk_cache_cohorts(course_key, users):
             for membership in
             CohortMembership.objects.filter(user__in=users, course_id=course_key).select_related('user')
         }
-        for user, membership in cohorts_by_user.iteritems():
+        for user, membership in six.iteritems(cohorts_by_user):
             cache[_cohort_cache_key(user.id, course_key)] = membership.course_user_group
-        uncohorted_users = filter(lambda u: u not in cohorts_by_user, users)
+        uncohorted_users = [u for u in users if u not in cohorts_by_user]
     else:
         uncohorted_users = users
 
@@ -265,7 +269,7 @@ def get_cohort(user, course_key, assign=True, use_cached=False):
         # CourseCohort, CohortMembership.
         log.info(
             u"HANDLING_INTEGRITY_ERROR: IntegrityError encountered for course '%s' and user '%s': %s",
-            course_key, user.id, unicode(integrity_error)
+            course_key, user.id, six.text_type(integrity_error)
         )
         return get_cohort(user, course_key, assign, use_cached)
 
@@ -517,7 +521,7 @@ def get_group_info_for_cohort(cohort, use_cached=False):
     database.
     """
     cache = RequestCache(u"cohorts.get_group_info_for_cohort").data
-    cache_key = unicode(cohort.id)
+    cache_key = six.text_type(cohort.id)
 
     if use_cached and cache_key in cache:
         return cache[cache_key]

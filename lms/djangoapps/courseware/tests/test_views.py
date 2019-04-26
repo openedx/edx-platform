@@ -18,7 +18,7 @@ from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.urls import reverse, reverse_lazy
 from django.http import Http404, HttpResponseBadRequest
-from django.test import TestCase
+from django.test import TestCase, RequestFactory
 from django.test.client import Client
 from django.test.utils import override_settings
 from freezegun import freeze_time
@@ -54,6 +54,7 @@ from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.grades.config.waffle import waffle as grades_waffle
 from lms.djangoapps.grades.config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT
+from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
 from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory, ProgramFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -212,8 +213,8 @@ class IndexQueryTestCase(ModuleStoreTestCase):
     NUM_PROBLEMS = 20
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 10, 179),
-        (ModuleStoreEnum.Type.split, 4, 173),
+        (ModuleStoreEnum.Type.mongo, 10, 176),
+        (ModuleStoreEnum.Type.split, 4, 170),
     )
     @ddt.unpack
     def test_index_query_counts(self, store_type, expected_mongo_query_count, expected_mysql_query_count):
@@ -1331,6 +1332,38 @@ class ProgressPageTests(ProgressPageBaseTests):
 
     @patch('lms.djangoapps.certificates.api.get_active_web_certificate', PropertyMock(return_value=True))
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
+    def test_view_certificate_for_unverified_student(self):
+        """
+        If user has already generated a certificate, it should be visible in case of user being
+        unverified too.
+        """
+        GeneratedCertificateFactory.create(
+            user=self.user,
+            course_id=self.course.id,
+            status=CertificateStatuses.downloadable,
+            mode='verified'
+        )
+
+        # Enable the feature, but do not enable it for this course
+        CertificateGenerationConfiguration(enabled=True).save()
+
+        # Enable certificate generation for this course
+        certs_api.set_cert_generation_enabled(self.course.id, True)
+        CourseEnrollment.enroll(self.user, self.course.id, mode="verified")
+
+        # Check that the user is unverified
+        self.assertFalse(IDVerificationService.user_is_verified(self.user))
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_create:
+            course_grade = mock_create.return_value
+            course_grade.passed = True
+            course_grade.summary = {'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [],
+                                    'grade_breakdown': {}}
+            resp = self._get_progress_page()
+            self.assertNotContains(resp, u"Certificate unavailable")
+            self.assertContains(resp, u"Your certificate is available")
+
+    @patch('lms.djangoapps.certificates.api.get_active_web_certificate', PropertyMock(return_value=True))
+    @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
     def test_view_certificate_link(self):
         """
         If certificate web view is enabled then certificate web view button should appear for user who certificate is
@@ -1432,8 +1465,8 @@ class ProgressPageTests(ProgressPageBaseTests):
                 self.assertContains(resp, u"Download Your Certificate")
 
     @ddt.data(
-        (True, 56),
-        (False, 55)
+        (True, 52),
+        (False, 51)
     )
     @ddt.unpack
     def test_progress_queries_paced_courses(self, self_paced, query_count):
@@ -1446,8 +1479,8 @@ class ProgressPageTests(ProgressPageBaseTests):
 
     @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
     @ddt.data(
-        (False, 64, 44),
-        (True, 55, 39)
+        (False, 60, 40),
+        (True, 51, 35)
     )
     @ddt.unpack
     def test_progress_queries(self, enable_waffle, initial, subsequent):
@@ -1962,34 +1995,48 @@ class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
         Ensures that grades and scores are shown or not shown on the progress page as required.
         """
 
-        expected_score = "<dd>{score}/{max_score}</dd>".format(score=score, max_score=max_score)
+        expected_score = u"<dd>{score}/{max_score}</dd>".format(score=score, max_score=max_score)
         percent = score / float(max_score)
 
+        # Test individual problem scores
         if show_grades:
             # If grades are shown, we should be able to see the current problem scores.
-            self.assertIn(expected_score, response.content)
+            self.assertIn(expected_score, response.content.decode("utf-8"))
 
             if graded:
-                expected_summary_text = "Problem Scores:"
+                expected_summary_text = u"Problem Scores:"
             else:
-                expected_summary_text = "Practice Scores:"
+                expected_summary_text = u"Practice Scores:"
 
         else:
             # If grades are hidden, we should not be able to see the current problem scores.
-            self.assertNotIn(expected_score, response.content)
+            self.assertNotIn(expected_score, response.content.decode("utf-8"))
 
             if graded:
-                expected_summary_text = "Problem scores are hidden"
+                expected_summary_text = u"Problem scores are hidden"
             else:
-                expected_summary_text = "Practice scores are hidden"
+                expected_summary_text = u"Practice scores are hidden"
 
             if show_correctness == ShowCorrectness.PAST_DUE and due_date:
-                expected_summary_text += ' until the due date.'
+                expected_summary_text += u' until the due date.'
             else:
-                expected_summary_text += '.'
+                expected_summary_text += u'.'
 
         # Ensure that expected text is present
-        self.assertIn(expected_summary_text, response.content)
+        self.assertIn(expected_summary_text, response.content.decode("utf-8"))
+
+        # Test overall sequential score
+        if graded and max_score > 0:
+            percentageString = "{0:.0%}".format(percent) if max_score > 0 else ""
+            template = u'<span> ({0:.3n}/{1:.3n}) {2}</span>'
+            expected_grade_summary = template.format(float(score),
+                                                     float(max_score),
+                                                     percentageString)
+
+            if show_grades:
+                self.assertIn(expected_grade_summary, response.content.decode("utf-8"))
+            else:
+                self.assertNotIn(expected_grade_summary, response.content.decode("utf-8"))
 
     @ddt.data(
         ('', None, False),
@@ -2469,6 +2516,89 @@ class TestIndexView(ModuleStoreTestCase):
                     self.assertIn('xblock-student_view-vertical', response.content)
                     self.assertIn('xblock-student_view-html', response.content)
                     self.assertIn('xblock-student_view-video', response.content)
+
+    @patch('courseware.views.views.CourseTabView.course_open_for_learner_enrollment')
+    @patch('openedx.core.djangoapps.util.user_messages.PageLevelMessages.register_warning_message')
+    def test_courseware_messages_differentiate_for_anonymous_users(
+            self, patch_register_warning_message, patch_course_open_for_learner_enrollment
+    ):
+        """
+        Tests that the anonymous user case for the
+        register_user_access_warning_messages returns different
+        messaging based on the possibility of enrollment
+        """
+        course = CourseFactory()
+
+        user = self.create_user_for_course(course, CourseUserType.ANONYMOUS)
+        request = RequestFactory().get('/')
+        request.user = user
+
+        patch_course_open_for_learner_enrollment.return_value = False
+        views.CourseTabView.register_user_access_warning_messages(request, course)
+        open_for_enrollment_message = patch_register_warning_message.mock_calls[0][1][1]
+
+        patch_register_warning_message.reset_mock()
+
+        patch_course_open_for_learner_enrollment.return_value = True
+        views.CourseTabView.register_user_access_warning_messages(request, course)
+        closed_to_enrollment_message = patch_register_warning_message.mock_calls[0][1][1]
+
+        assert open_for_enrollment_message != closed_to_enrollment_message
+
+    @patch('openedx.core.djangoapps.util.user_messages.PageLevelMessages.register_warning_message')
+    def test_courseware_messages_masters_only(self, patch_register_warning_message):
+        with patch(
+                'courseware.views.views.CourseTabView.course_open_for_learner_enrollment'
+        ) as patch_course_open_for_learner_enrollment:
+            course = CourseFactory()
+
+            user = self.create_user_for_course(course, CourseUserType.UNENROLLED)
+            request = RequestFactory().get('/')
+            request.user = user
+
+            button_html = '<button class="enroll-btn btn-link">Enroll now</button>'
+
+            patch_course_open_for_learner_enrollment.return_value = False
+            views.CourseTabView.register_user_access_warning_messages(request, course)
+            # pull message out of the calls to the mock so that
+            # we can make finer grained assertions than mock provides
+            message = patch_register_warning_message.mock_calls[0][1][1]
+            assert button_html not in message
+
+            patch_register_warning_message.reset_mock()
+
+            patch_course_open_for_learner_enrollment.return_value = True
+            views.CourseTabView.register_user_access_warning_messages(request, course)
+            # pull message out of the calls to the mock so that
+            # we can make finer grained assertions than mock provides
+            message = patch_register_warning_message.mock_calls[0][1][1]
+            assert button_html in message
+
+    @ddt.data(
+        [True, True, True, False, ],
+        [False, True, True, False, ],
+        [True, False, True, False, ],
+        [True, True, False, False, ],
+        [False, False, True, False, ],
+        [True, False, False, True, ],
+        [False, True, False, False, ],
+        [False, False, False, False, ],
+    )
+    @ddt.unpack
+    def test_should_show_enroll_button(self, course_open_for_self_enrollment,
+                                       invitation_only, is_masters_only, expected_should_show_enroll_button):
+        with patch('courseware.views.views.course_open_for_self_enrollment') as patch_course_open_for_self_enrollment, \
+                patch('course_modes.models.CourseMode.is_masters_only') as patch_is_masters_only:
+            course = CourseFactory()
+
+            patch_course_open_for_self_enrollment.return_value = course_open_for_self_enrollment
+            patch_is_masters_only.return_value = is_masters_only
+            course.invitation_only = invitation_only
+
+            self.assertEqual(
+                views.CourseTabView.course_open_for_learner_enrollment(course),
+                expected_should_show_enroll_button
+            )
 
 
 @ddt.ddt

@@ -9,7 +9,6 @@ import ddt
 from django.test.client import RequestFactory
 from mock import patch
 from web_fragments.fragment import Fragment
-from six import text_type
 
 from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2
 from openedx.core.lib.url_utils import quote_slashes
@@ -30,6 +29,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.test_asides import AsideTestType
+import six
 
 
 @ddt.ddt
@@ -106,7 +106,7 @@ class TestXblockUtils(SharedModuleStoreTestCase):
             view='baseview',
             frag=fragment,
             context={"wrap_xblock_data": {"custom-attribute": "custom-value"}},
-            usage_id_serializer=lambda usage_id: quote_slashes(unicode(usage_id)),
+            usage_id_serializer=lambda usage_id: quote_slashes(six.text_type(usage_id)),
             request_token=uuid.uuid1().get_hex()
         )
         self.assertIsInstance(test_wrap_output, Fragment)
@@ -248,4 +248,4 @@ class TestXBlockAside(SharedModuleStoreTestCase):
     @XBlockAside.register_temp_plugin(AsideTestType, 'test_aside')
     def test_get_aside(self):
         """test get aside success"""
-        assert get_aside_from_xblock(self.block, text_type("test_aside")) is not None
+        assert get_aside_from_xblock(self.block, six.text_type("test_aside")) is not None

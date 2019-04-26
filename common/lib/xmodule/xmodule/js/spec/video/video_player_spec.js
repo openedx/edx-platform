@@ -56,7 +56,7 @@ function(VideoPlayer, HLS, _) {
 
                 it('create video caption', function() {
                     expect(state.videoCaption).toBeDefined();
-                    expect(state.speed).toEqual('1.50');
+                    expect(state.speed).toEqual(1.5);
                     expect(state.config.transcriptTranslationUrl)
                         .toEqual('/transcript/translation/__lang__');
                 });
@@ -64,7 +64,7 @@ function(VideoPlayer, HLS, _) {
                 it('create video speed control', function() {
                     expect(state.videoSpeedControl).toBeDefined();
                     expect(state.videoSpeedControl.el).toHaveClass('speeds');
-                    expect(state.speed).toEqual('1.50');
+                    expect(state.speed).toEqual(1.5);
                 });
 
                 it('create video progress slider', function() {

@@ -1,18 +1,17 @@
 """
 Test helpers for Comprehensive Theming.
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
-from functools import wraps
+import contextlib
 import os
 import os.path
-import contextlib
 import re
-
-from mock import patch
+from functools import wraps
 
 from django.conf import settings
 from django.contrib.sites.models import Site
+from mock import patch
 
 import edxmako
 from openedx.core.djangoapps.theming.models import SiteTheme

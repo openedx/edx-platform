@@ -43,16 +43,6 @@ def index(request):
                 settings.FEATURES.get('ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER', True)):
             return redirect(reverse('dashboard'))
 
-    if settings.FEATURES.get('AUTH_USE_CERTIFICATES'):
-        from openedx.core.djangoapps.external_auth.views import ssl_login
-        # Set next URL to dashboard if it isn't set to avoid
-        # caching a redirect to / that causes a redirect loop on logout
-        if not request.GET.get('next'):
-            req_new = request.GET.copy()
-            req_new['next'] = reverse('dashboard')
-            request.GET = req_new
-        return ssl_login(request)
-
     enable_mktg_site = configuration_helpers.get_value(
         'ENABLE_MKTG_SITE',
         settings.FEATURES.get('ENABLE_MKTG_SITE', False)

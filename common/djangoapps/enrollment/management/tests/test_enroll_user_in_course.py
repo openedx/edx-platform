@@ -1,5 +1,6 @@
 """ Test the change_enrollment command line script."""
 
+from __future__ import absolute_import
 import ddt
 import unittest
 from uuid import uuid4
@@ -13,6 +14,8 @@ from student.tests.factories import UserFactory
 
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+import six
+from six.moves import range
 
 
 @ddt.ddt
@@ -29,7 +32,7 @@ class EnrollManagementCommandTest(SharedModuleStoreTestCase):
 
     def setUp(self):
         super(EnrollManagementCommandTest, self).setUp()
-        self.course_id = unicode(self.course.id)
+        self.course_id = six.text_type(self.course.id)
         self.username = 'ralph' + uuid4().hex
         self.user_email = self.username + '@example.com'
 

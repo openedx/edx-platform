@@ -2,8 +2,11 @@
 Implementation of "credit" XBlock service
 """
 
+from __future__ import absolute_import
+
 import logging
 
+import six
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from opaque_keys.edx.keys import CourseKey
@@ -21,7 +24,7 @@ def _get_course_key(course_key_or_id):
     """
     return (
         CourseKey.from_string(course_key_or_id)
-        if isinstance(course_key_or_id, basestring)
+        if isinstance(course_key_or_id, six.string_types)
         else course_key_or_id
     )
 

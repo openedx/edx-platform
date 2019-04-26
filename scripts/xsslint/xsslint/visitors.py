@@ -198,7 +198,7 @@ class FormatInterpolateVisitor(BaseVisitor):
             node: The AST root node.
 
         """
-        if isinstance(node.func, ast.Attribute) and node.func.attr is 'format':
+        if isinstance(node.func, ast.Attribute) and node.func.attr == 'format':
             if self.format_caller_node is None:
                 # Store the caller, or left-hand-side node of the initial
                 # format() call.

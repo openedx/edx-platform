@@ -842,9 +842,9 @@ class TestGetHtmlMethod(BaseTestXmodule):
             },
         }
 
-        # test with and without edx_video_id specified.
+        # Only videos with a video id should have their URLs rewritten
+        # based on CDN settings
         cases = [
-            dict(case_data, edx_video_id=""),
             dict(case_data, edx_video_id="vid-v1:12345"),
         ]
 

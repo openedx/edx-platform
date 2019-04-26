@@ -1,5 +1,6 @@
 """ Common Authentication Handlers used across projects. """
 
+from __future__ import absolute_import
 import logging
 
 import django.utils.timezone

@@ -1,5 +1,6 @@
 # pylint: disable=missing-docstring,maybe-no-member
 
+import ddt
 from mock import patch, sentinel
 
 from django.contrib.auth.models import User
@@ -12,7 +13,17 @@ from track.tests import EventTrackingTestCase, FROZEN_TIME
 from openedx.core.lib.tests.assertions.events import assert_event_matches
 
 
+TEST_USERNAME = 'test-username'
+TEST_USER_ID = 1000
+
+
+@ddt.ddt
 class TestTrackViews(EventTrackingTestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        super(TestTrackViews, cls).setUpTestData()
+        User.objects.create(pk=TEST_USER_ID, username=TEST_USERNAME)
 
     def setUp(self):
         super(TestTrackViews, self).setUp()
@@ -74,8 +85,6 @@ class TestTrackViews(EventTrackingTestCase):
         }
         assert_event_matches(expected_event, actual_event)
 
-        views.user_track(request)
-
     def test_user_track_with_empty_event(self):
         request = self.request_factory.get('/event', {
             'page': self.url_with_course,
@@ -97,6 +106,39 @@ class TestTrackViews(EventTrackingTestCase):
             'data': {},
             'timestamp': FROZEN_TIME,
             'name': str(sentinel.event_type)
+        }
+        assert_event_matches(expected_event, actual_event)
+
+    @ddt.data(
+        {
+            'event_data': u'{{"username": "{}"}}'.format(TEST_USERNAME),
+            'expected_event_data': {"username": TEST_USERNAME, "user_id": TEST_USER_ID}
+        },
+        {
+            'event_data': u'{"username": "unknown-user"}',
+            'expected_event_data': {"username": "unknown-user"},
+        }
+    )
+    @ddt.unpack
+    def test_user_track_with_username_in_data(self, event_data, expected_event_data):
+        request = self.request_factory.get('/event', {
+            'event': event_data,
+        })
+
+        views.user_track(request)
+
+        actual_event = self.get_event()
+        expected_event = {
+            'context': {
+                'course_id': '',
+                'org_id': '',
+                'event_source': 'browser',
+                'page': '',
+                'username': 'anonymous'
+            },
+            'data': expected_event_data,
+            'timestamp': FROZEN_TIME,
+            'name': 'unknown'
         }
         assert_event_matches(expected_event, actual_event)
 

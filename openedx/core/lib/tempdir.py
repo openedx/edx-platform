@@ -1,5 +1,6 @@
 """Make temporary directories nicely."""
 
+from __future__ import absolute_import
 import atexit
 import os.path
 import shutil

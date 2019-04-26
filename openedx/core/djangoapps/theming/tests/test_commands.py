@@ -1,8 +1,10 @@
 """
 Tests for Management commands of comprehensive theming.
 """
+from __future__ import absolute_import
+
+from django.core.management import CommandError, call_command
 from django.test import TestCase
-from django.core.management import call_command, CommandError
 
 from openedx.core.djangoapps.theming.helpers import get_themes
 from openedx.core.djangoapps.theming.management.commands.compile_sass import Command

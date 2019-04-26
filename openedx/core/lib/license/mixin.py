@@ -1,6 +1,7 @@
 """
 License mixin for XBlocks and XModules
 """
+from __future__ import absolute_import
 from xblock.core import XBlockMixin
 from xblock.fields import Scope, String
 

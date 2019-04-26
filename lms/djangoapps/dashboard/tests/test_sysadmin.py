@@ -21,6 +21,7 @@ from six import text_type
 
 from dashboard.git_import import GitImportErrorNoDir
 from dashboard.models import CourseImportLog
+from openedx.core.djangolib.markup import Text
 from student.roles import CourseStaffRole, GlobalStaff
 from student.tests.factories import UserFactory
 from util.date_utils import DEFAULT_DATE_TIME_FORMAT, get_time_display
@@ -38,9 +39,6 @@ TEST_MONGODB_LOG = {
     'password': '',
     'db': 'test_xlog',
 }
-
-FEATURES_WITH_SSL_AUTH = settings.FEATURES.copy()
-FEATURES_WITH_SSL_AUTH['AUTH_USE_CERTIFICATES'] = True
 
 
 class SysadminBaseTestCase(SharedModuleStoreTestCase):
@@ -156,7 +154,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
 
         # Create git loaded course
         response = self._add_edx4edx()
-        self.assertIn(escape(text_type(GitImportErrorNoDir(settings.GIT_REPO_DIR))),
+        self.assertIn(Text(text_type(GitImportErrorNoDir(settings.GIT_REPO_DIR))),
                       response.content.decode('UTF-8'))
 
     def test_mongo_course_add_delete(self):

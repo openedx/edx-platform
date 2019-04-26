@@ -10,7 +10,6 @@ from django.views.decorators.clickjacking import xframe_options_deny
 from django.views.decorators.csrf import ensure_csrf_cookie
 
 from edxmako.shortcuts import render_to_response
-from openedx.core.djangoapps.external_auth.views import redirect_with_get, ssl_get_cert_from_request, ssl_login_shortcut
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from waffle.decorators import waffle_switch
 from contentstore.config import waffle
@@ -27,15 +26,10 @@ def signup(request):
     csrf_token = csrf(request)['csrf_token']
     if request.user.is_authenticated:
         return redirect('/course/')
-    if settings.FEATURES.get('AUTH_USE_CERTIFICATES_IMMEDIATE_SIGNUP'):
-        # Redirect to course to login to process their certificate if SSL is enabled
-        # and registration is disabled.
-        return redirect_with_get('login', request.GET, False)
 
     return render_to_response('register.html', {'csrf': csrf_token})
 
 
-@ssl_login_shortcut
 @ensure_csrf_cookie
 @xframe_options_deny
 def login_page(request):
@@ -43,19 +37,6 @@ def login_page(request):
     Display the login form.
     """
     csrf_token = csrf(request)['csrf_token']
-    if (settings.FEATURES['AUTH_USE_CERTIFICATES'] and
-            ssl_get_cert_from_request(request)):
-        # SSL login doesn't require a login view, so redirect
-        # to course now that the user is authenticated via
-        # the decorator.
-        next_url = request.GET.get('next')
-        if next_url:
-            return redirect(next_url)
-        else:
-            return redirect('/course/')
-    if settings.FEATURES.get('AUTH_USE_CAS'):
-        # If CAS is enabled, redirect auth handling to there
-        return redirect(reverse('cas-login'))
 
     return render_to_response(
         'login.html',

@@ -3,17 +3,23 @@ APIs for configuring credit eligibility requirements and tracking
 whether a user has satisfied those requirements.
 """
 
+from __future__ import absolute_import
+
 import logging
 
+import six
 from opaque_keys.edx.keys import CourseKey
 
-from openedx.core.djangoapps.credit.email_utils import send_credit_notifications
-from openedx.core.djangoapps.credit.exceptions import InvalidCreditRequirements, InvalidCreditCourse
-from openedx.core.djangoapps.credit.models import (
-    CreditCourse, CreditRequirement, CreditRequirementStatus, CreditEligibility, CreditRequest
-)
-
 from course_modes.models import CourseMode
+from openedx.core.djangoapps.credit.email_utils import send_credit_notifications
+from openedx.core.djangoapps.credit.exceptions import InvalidCreditCourse, InvalidCreditRequirements
+from openedx.core.djangoapps.credit.models import (
+    CreditCourse,
+    CreditEligibility,
+    CreditRequest,
+    CreditRequirement,
+    CreditRequirementStatus
+)
 from student.models import CourseEnrollment
 
 # TODO: Cleanup this mess! ECOM-2908
@@ -175,12 +181,12 @@ def get_eligibilities_for_user(username, course_key=None):
     """
     eligibilities = CreditEligibility.get_user_eligibilities(username)
     if course_key:
-        course_key = CourseKey.from_string(unicode(course_key))
+        course_key = CourseKey.from_string(six.text_type(course_key))
         eligibilities = eligibilities.filter(course__course_key=course_key)
 
     return [
         {
-            "course_key": unicode(eligibility.course.course_key),
+            "course_key": six.text_type(eligibility.course.course_key),
             "deadline": eligibility.deadline,
         }
         for eligibility in eligibilities
@@ -257,7 +263,7 @@ def set_credit_requirement_status(user, course_key, req_namespace, req_name, sta
                 u'because the requirement does not exist. '
                 u'The user "%s" should have had his/her status updated to "%s".'
             ),
-            unicode(course_key), req_namespace, req_name, user.username, status
+            six.text_type(course_key), req_namespace, req_name, user.username, status
         )
         return
 
@@ -311,7 +317,7 @@ def remove_credit_requirement_status(username, course_key, req_namespace, req_na
                 u'with namespace "%s" and name "%s" '
                 u'because the requirement does not exist. '
             ),
-            unicode(course_key), req_namespace, req_name
+            six.text_type(course_key), req_namespace, req_name
         )
         return
 

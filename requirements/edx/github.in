@@ -61,7 +61,6 @@
 # Python libraries to install directly from github
 
 # Third-party:
--e git+https://github.com/jazzband/django-pipeline.git@d068a019169c9de5ee20ece041a6dea236422852#egg=django-pipeline==1.5.3
 -e git+https://github.com/edx/django-wiki.git@v0.0.21#egg=django-wiki
 -e git+https://github.com/edx/django-openid-auth.git@0.15.1#egg=django-openid-auth==0.15.1
 -e git+https://github.com/edx/MongoDBProxy.git@25b99097615bda06bd7cdfe5669ed80dc2a7fed0#egg=MongoDBProxy==0.1.0
@@ -88,9 +87,9 @@
 # Our libraries:
 -e git+https://github.com/edx/codejail.git@a320d43ce6b9c93b17636b2491f724d9e433be47#egg=codejail
 -e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
--e git+https://github.com/edx/edx-ora2.git@2.2.1#egg=ora2==2.2.1
+-e git+https://github.com/edx/edx-ora2.git@2.2.3#egg=ora2==2.2.3
 -e git+https://github.com/edx/RecommenderXBlock.git@1.4.0#egg=recommender-xblock==1.4.0
--e git+https://github.com/solashirai/crowdsourcehinter.git@518605f0a95190949fe77bd39158450639e2e1dc#egg=crowdsourcehinter-xblock==0.1
+-e git+https://github.com/edx/crowdsourcehinter.git@518605f0a95190949fe77bd39158450639e2e1dc#egg=crowdsourcehinter-xblock==0.1
 -e git+https://github.com/edx/RateXBlock.git@367e19c0f6eac8a5f002fd0f1559555f8e74bfff#egg=rate-xblock
 -e git+https://github.com/edx/DoneXBlock.git@01a14f3bd80ae47dd08cdbbe2f88f3eb88d00fba#egg=done-xblock
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@138e6fa0bf3a2013e904a085b9fed77dab7f3f21#egg=xblock-google-drive

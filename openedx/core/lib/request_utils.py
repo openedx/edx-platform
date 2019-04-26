@@ -1,7 +1,8 @@
 """ Utility functions related to HTTP requests """
+from __future__ import absolute_import
 import logging
 import re
-from urlparse import urlparse
+from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
 
 import crum
 from django.conf import settings
@@ -9,9 +10,9 @@ from django.utils.deprecation import MiddlewareMixin
 from django.test.client import RequestFactory
 
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 try:
     import newrelic.agent
@@ -119,8 +120,8 @@ class CookieMetricsMiddleware(MiddlewareMixin):
         for name, size in cookie_names_to_size.items():
             metric_name = 'cookies.{}.size'.format(name)
             newrelic.agent.add_custom_parameter(metric_name, size)
-            log.debug("%s = %d", metric_name, size)
+            log.debug(u'%s = %d', metric_name, size)
 
         total_cookie_size = sum(cookie_names_to_size.values())
         newrelic.agent.add_custom_parameter('cookies_total_size', total_cookie_size)
-        log.debug("cookies_total_size = %d", total_cookie_size)
+        log.debug(u'cookies_total_size = %d', total_cookie_size)

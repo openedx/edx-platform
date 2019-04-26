@@ -3,10 +3,13 @@ Tests the logic of the "answer-pool" attribute, e.g.
   <choicegroup answer-pool="4">
 """
 
-import unittest
+from __future__ import absolute_import
+
 import textwrap
-from capa.tests.helpers import test_capa_system, new_loncapa_problem
+import unittest
+
 from capa.responsetypes import LoncapaProblemError
+from capa.tests.helpers import new_loncapa_problem, test_capa_system
 
 
 class CapaAnswerPoolTest(unittest.TestCase):
@@ -58,7 +61,7 @@ class CapaAnswerPoolTest(unittest.TestCase):
         self.assertRegexpMatches(the_html, r"<div>\{.*'1_solution_2'.*\}</div>")
         self.assertEqual(the_html, problem.get_html(), 'should be able to call get_html() twice')
         # Check about masking
-        response = problem.responders.values()[0]
+        response = list(problem.responders.values())[0]
         self.assertFalse(response.has_mask())
         self.assertTrue(response.has_answerpool())
         self.assertEqual(response.unmask_order(), ['choice_3', 'choice_5', 'choice_1', 'choice_4'])
@@ -70,7 +73,7 @@ class CapaAnswerPoolTest(unittest.TestCase):
         self.assertRegexpMatches(the_html, r"<div>.*\[.*'wrong-1'.*'wrong-4'.*'wrong-3'.*'correct-1'.*\].*</div>")
         self.assertRegexpMatches(the_html, r"<div>\{.*'1_solution_1'.*\}</div>")
         # Check about masking
-        response = problem.responders.values()[0]
+        response = list(problem.responders.values())[0]
         self.assertFalse(response.has_mask())
         self.assertTrue(hasattr(response, 'has_answerpool'))
         self.assertEqual(response.unmask_order(), ['choice_0', 'choice_4', 'choice_3', 'choice_2'])
@@ -117,7 +120,7 @@ class CapaAnswerPoolTest(unittest.TestCase):
         self.assertRegexpMatches(the_html, r"<div>\{.*'1_solution_1'.*'1_solution_2'.*\}</div>")
         self.assertEqual(the_html, problem.get_html(), 'should be able to call get_html() twice')
         # Check about masking
-        response = problem.responders.values()[0]
+        response = list(problem.responders.values())[0]
         self.assertFalse(response.has_mask())
         self.assertFalse(response.has_answerpool())
 
@@ -161,7 +164,7 @@ class CapaAnswerPoolTest(unittest.TestCase):
         the_html = problem.get_html()
         self.assertRegexpMatches(the_html, r"<div>.*\[.*'wrong-1'.*'wrong-2'.*'correct-1'.*'wrong-3'.*'wrong-4'.*'correct-2'.*\].*</div>")
         self.assertRegexpMatches(the_html, r"<div>\{.*'1_solution_1'.*'1_solution_2'.*\}</div>")
-        response = problem.responders.values()[0]
+        response = list(problem.responders.values())[0]
         self.assertFalse(response.has_mask())
         self.assertFalse(response.has_answerpool())
 
@@ -279,7 +282,7 @@ class CapaAnswerPoolTest(unittest.TestCase):
         the_html = problem.get_html()
         self.assertRegexpMatches(the_html, r"<div>.*\[.*'correct-2'.*'wrong-1'.*'wrong-2'.*.*'wrong-3'.*'wrong-4'.*\].*</div>")
         self.assertRegexpMatches(the_html, r"<div>\{.*'1_solution_2'.*\}</div>")
-        response = problem.responders.values()[0]
+        response = list(problem.responders.values())[0]
         self.assertFalse(response.has_mask())
         self.assertEqual(response.unmask_order(), ['choice_5', 'choice_0', 'choice_1', 'choice_3', 'choice_4'])
 
@@ -540,7 +543,7 @@ class CapaAnswerPoolTest(unittest.TestCase):
 
         self.assertRegexpMatches(the_html, str1)
         # attributes *not* present
-        response = problem.responders.values()[0]
+        response = list(problem.responders.values())[0]
         self.assertFalse(response.has_mask())
         self.assertFalse(response.has_answerpool())
 

@@ -12,6 +12,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.certificates.models import CertificateInvalidation, CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import CertificateInvalidationFactory
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from student.models import CourseEnrollment
 from student.roles import GlobalStaff, SupportStaffRole
 from student.tests.factories import UserFactory
@@ -97,7 +98,11 @@ class CertificateSearchTests(CertificateSupportTestCase):
         Create a course
         """
         super(CertificateSearchTests, self).setUp()
-        self.course = CourseFactory()
+        self.course = CourseFactory(
+            org=self.CERT_COURSE_KEY.org,
+            course=self.CERT_COURSE_KEY.course,
+            run=self.CERT_COURSE_KEY.run,
+        )
         self.course.cert_html_view_enabled = True
 
         #course certificate configurations
@@ -116,6 +121,10 @@ class CertificateSearchTests(CertificateSupportTestCase):
         self.course.certificates = {'certificates': certificates}
         self.course.save()
         self.store.update_item(self.course, self.user.id)
+        self.course_overview = CourseOverviewFactory(
+            id=self.course.id,
+            cert_html_view_enabled=True,
+        )
 
     @ddt.data(
         (GlobalStaff, True),

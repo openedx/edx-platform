@@ -390,46 +390,6 @@ class AboutWithInvitationOnly(SharedModuleStoreTestCase):
         self.assertIn(REG_STR, resp.content)
 
 
-@patch.dict(settings.FEATURES, {'RESTRICT_ENROLL_BY_REG_METHOD': True})
-class AboutTestCaseShibCourse(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
-    """
-    Test cases covering about page behavior for courses that use shib enrollment domain ("shib courses")
-    """
-    @classmethod
-    def setUpClass(cls):
-        super(AboutTestCaseShibCourse, cls).setUpClass()
-        cls.course = CourseFactory.create(enrollment_domain="shib:https://idp.stanford.edu/")
-        cls.about = ItemFactory.create(
-            category="about", parent_location=cls.course.location,
-            data="OOGIE BLOOGIE", display_name="overview"
-        )
-
-    def test_logged_in_shib_course(self):
-        """
-        For shib courses, logged in users will see the enroll button, but get rejected once they click there
-        """
-        self.setup_user()
-        url = reverse('about_course', args=[text_type(self.course.id)])
-        resp = self.client.get(url)
-        self.assertEqual(resp.status_code, 200)
-        self.assertIn("OOGIE BLOOGIE", resp.content)
-        self.assertIn(u"Enroll in {}".format(self.course.id.course), resp.content.decode('utf-8'))
-        self.assertIn(SHIB_ERROR_STR, resp.content)
-        self.assertIn(REG_STR, resp.content)
-
-    def test_anonymous_user_shib_course(self):
-        """
-        For shib courses, anonymous users will also see the enroll button
-        """
-        url = reverse('about_course', args=[text_type(self.course.id)])
-        resp = self.client.get(url)
-        self.assertEqual(resp.status_code, 200)
-        self.assertIn("OOGIE BLOOGIE", resp.content)
-        self.assertIn(u"Enroll in {}".format(self.course.id.course), resp.content.decode('utf-8'))
-        self.assertIn(SHIB_ERROR_STR, resp.content)
-        self.assertIn(REG_STR, resp.content)
-
-
 class AboutWithClosedEnrollment(ModuleStoreTestCase):
     """
     This test case will check the About page for a course that has enrollment start/end

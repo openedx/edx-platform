@@ -56,7 +56,10 @@
             // When upgrading to 2.6, check if this variable name changed.
             window.MathJax = {
                 menuSettings: {
-                    CHTMLpreview: false
+                    CHTMLpreview: false,
+                    collapsible: true,
+                    autocollapse: false,
+                    explorer: true
                 }
             };
         };

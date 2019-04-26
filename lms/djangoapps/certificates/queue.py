@@ -289,7 +289,7 @@ class XQueueCertInterface(object):
         is_eligible_for_certificate = is_whitelisted or CourseMode.is_eligible_for_certificate(enrollment_mode)
         unverified = False
         # For credit mode generate verified certificate
-        if cert_mode == CourseMode.CREDIT_MODE:
+        if cert_mode in (CourseMode.CREDIT_MODE, CourseMode.MASTERS):
             cert_mode = CourseMode.VERIFIED
 
         if template_file is not None:

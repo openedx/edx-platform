@@ -54,7 +54,7 @@ from edx_django_utils.cache import RequestCache
 import lms.lib.comment_client as cc
 from student.signals import UNENROLL_DONE, ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED
 from lms.djangoapps.certificates.models import GeneratedCertificate
-from course_modes.models import CourseMode
+from course_modes.models import CourseMode, get_cosmetic_verified_display_price
 from courseware.models import (
     CourseDynamicUpgradeDeadlineConfiguration,
     DynamicUpgradeDeadlineConfiguration,
@@ -765,7 +765,7 @@ class Registration(models.Model):
     def activate(self):
         self.user.is_active = True
         self._track_activation()
-        self.user.save()
+        self.user.save(update_fields=['is_active'])
         log.info(u'User %s (%s) account is successfully activated.', self.user.username, self.user.email)
 
     def _track_activation(self):
@@ -854,6 +854,7 @@ EVENT_NAME_ENROLLMENT_DEACTIVATED = 'edx.course.enrollment.deactivated'
 EVENT_NAME_ENROLLMENT_MODE_CHANGED = 'edx.course.enrollment.mode_changed'
 
 
+@six.python_2_unicode_compatible
 class LoginFailures(models.Model):
     """
     This model will keep track of failed login attempts.
@@ -929,6 +930,34 @@ class LoginFailures(models.Model):
             entry.delete()
         except ObjectDoesNotExist:
             return
+
+    def __repr__(self):
+        """Repr -> LoginFailures(username, count, date)"""
+        date_str = '-'
+        if self.lockout_until is not None:
+            date_str = self.lockout_until.isoformat()
+
+        return u'LoginFailures({username}, {count}, {date})'.format(
+            username=unicode(self.user.username, 'utf-8'),
+            count=self.failure_count,
+            date=date_str
+        )
+
+    def __str__(self):
+        """Str -> Username: count - date."""
+        date_str = '-'
+        if self.lockout_until is not None:
+            date_str = self.lockout_until.isoformat()
+
+        return u'{username}: {count} - {date}'.format(
+            username=unicode(self.user.username, 'utf-8'),
+            count=self.failure_count,
+            date=date_str
+        )
+
+    class Meta:
+        verbose_name = 'Login Failure'
+        verbose_name_plural = 'Login Failures'
 
 
 class CourseEnrollmentException(Exception):
@@ -1074,6 +1103,10 @@ class CourseEnrollment(models.Model):
         db_constraint=False,
         on_delete=models.DO_NOTHING,
     )
+
+    @property
+    def course_price(self):
+        return get_cosmetic_verified_display_price(self.course)
 
     @property
     def course_id(self):

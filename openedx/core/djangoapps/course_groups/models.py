@@ -2,6 +2,8 @@
 Django models related to course groups functionality.
 """
 
+from __future__ import absolute_import
+
 import json
 import logging
 
@@ -10,8 +12,8 @@ from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
-
 from opaque_keys.edx.django.models import CourseKeyField
+
 from openedx.core.djangolib.model_mixins import DeletableByUserValue
 
 log = logging.getLogger(__name__)

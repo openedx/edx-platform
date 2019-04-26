@@ -4,6 +4,7 @@ Common utility functions useful throughout the contentstore
 from __future__ import print_function
 
 import logging
+import time
 from datetime import datetime
 
 from django.conf import settings
@@ -17,10 +18,6 @@ from six import text_type
 from django_comment_common.models import assign_default_role
 from django_comment_common.utils import seed_permissions_roles
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
-from openedx.features.course_duration_limits.config import (
-    CONTENT_TYPE_GATING_FLAG,
-    FEATURE_BASED_ENROLLMENT_GLOBAL_KILL_FLAG
-)
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.content_type_gating.partitions import CONTENT_TYPE_GATING_SCHEME
 from student import auth
@@ -465,12 +462,9 @@ def get_visibility_partition_info(xblock, course=None):
         if len(partition["groups"]) > 1 or any(group["selected"] for group in partition["groups"]):
             selectable_partitions.append(partition)
 
-    flag_enabled = CONTENT_TYPE_GATING_FLAG.is_enabled() and not FEATURE_BASED_ENROLLMENT_GLOBAL_KILL_FLAG.is_enabled()
     course_key = xblock.scope_ids.usage_id.course_key
     is_library = isinstance(course_key, LibraryLocator)
-    if not is_library and (
-        flag_enabled or ContentTypeGatingConfig.current(course_key=course_key).studio_override_enabled
-    ):
+    if not is_library and ContentTypeGatingConfig.current(course_key=course_key).studio_override_enabled:
         selectable_partitions += get_user_partition_info(xblock, schemes=[CONTENT_TYPE_GATING_SCHEME], course=course)
 
     # Now add the cohort user partitions.
@@ -524,3 +518,18 @@ def is_self_paced(course):
     Returns True if course is self-paced, False otherwise.
     """
     return course and course.self_paced
+
+
+def execute_and_log_time(func, *args, **kwargs):
+    """
+    Call func passed in method with logging the time it took to complete.
+    Temporarily added for EDUCATOR-4013, we will remove this once we get the required information.
+    """
+    course_key = args[1]
+    start_time = time.time()
+    output = func(*args, **kwargs)
+    if 'MITx+7.00x' in unicode(course_key):
+        log.info(
+            u'Execution time for [%s] [%s] completed in [%f]',
+            func.__name__, course_key, (time.time() - start_time))
+    return output

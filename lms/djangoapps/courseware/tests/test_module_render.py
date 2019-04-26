@@ -62,7 +62,7 @@ from openedx.core.djangoapps.credit.models import CreditCourse
 from openedx.core.lib.courses import course_image_url
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.url_utils import quote_slashes
-from student.models import anonymous_id_for_user
+from student.models import anonymous_id_for_user, CourseEnrollment
 from verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from xblock_django.models import XBlockConfiguration
 from xmodule.lti_module import LTIDescriptor
@@ -265,7 +265,7 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             request = self.request_factory.post(self.callback_url, data)
             render.xqueue_callback(
                 request,
-                unicode(self.course_key),
+                text_type(self.course_key),
                 self.mock_user.id,
                 self.mock_module.id,
                 self.dispatch
@@ -288,7 +288,7 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
                 request = self.request_factory.post(self.callback_url, {})
                 render.xqueue_callback(
                     request,
-                    unicode(self.course_key),
+                    text_type(self.course_key),
                     self.mock_user.id,
                     self.mock_module.id,
                     self.dispatch
@@ -299,7 +299,7 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
                 request = self.request_factory.post(self.callback_url, data)
                 render.xqueue_callback(
                     request,
-                    unicode(self.course_key),
+                    text_type(self.course_key),
                     self.mock_user.id,
                     self.mock_module.id,
                     self.dispatch
@@ -327,6 +327,9 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         """Test that anonymous POST is not allowed."""
         dispatch_url = self._get_dispatch_url()
         response = self.client.post(dispatch_url, {'position': 2})
+
+        # https://openedx.atlassian.net/browse/LEARNER-7131
+        self.assertEquals('Unauthenticated', response.content)
         self.assertEquals(403, response.status_code)
 
     def test_session_authentication(self):
@@ -559,8 +562,8 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
         request.user = self.mock_user
         response = render.handle_xblock_callback(
             request,
-            unicode(course.id),
-            quote_slashes(unicode(block.scope_ids.usage_id)),
+            text_type(course.id),
+            quote_slashes(text_type(block.scope_ids.usage_id)),
             handler,
             '',
         )
@@ -726,8 +729,8 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
 
         response = render.handle_xblock_callback(
             request,
-            unicode(course.id),
-            quote_slashes(unicode(block.scope_ids.usage_id)),
+            text_type(course.id),
+            quote_slashes(text_type(block.scope_ids.usage_id)),
             'set_score',
             '',
         )
@@ -758,8 +761,8 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
             with patch('completion.models.BlockCompletionManager.submit_completion') as mock_complete:
                 render.handle_xblock_callback(
                     request,
-                    unicode(course.id),
-                    quote_slashes(unicode(block.scope_ids.usage_id)),
+                    text_type(course.id),
+                    quote_slashes(text_type(block.scope_ids.usage_id)),
                     signal,
                     '',
                 )
@@ -814,7 +817,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
         ) as mocked_webob_to_django_response:
             render.handle_xblock_callback(
                 request,
-                unicode(course.id),
+                text_type(course.id),
                 get_usage_key(),
                 'complete',
                 '',
@@ -840,7 +843,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
         ), self.assertRaises(Http404):
             render.handle_xblock_callback(
                 request,
-                unicode(course.id),
+                text_type(course.id),
                 "foo@bar",
                 'complete',
                 '',
@@ -891,8 +894,8 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
                 mock_masq.return_value = True
                 response = render.handle_xblock_callback(
                     request,
-                    unicode(course.id),
-                    quote_slashes(unicode(block.scope_ids.usage_id)),
+                    text_type(course.id),
+                    quote_slashes(text_type(block.scope_ids.usage_id)),
                     'complete',
                     '',
                 )
@@ -917,10 +920,10 @@ class TestXBlockView(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     def setUp(self):
         super(TestXBlockView, self).setUp()
 
-        self.location = unicode(self.course_key.make_usage_key('html', 'toyhtml'))
+        self.location = text_type(self.course_key.make_usage_key('html', 'toyhtml'))
         self.request_factory = RequestFactory()
 
-        self.view_args = [unicode(self.course_key), quote_slashes(self.location), 'student_view']
+        self.view_args = [text_type(self.course_key), quote_slashes(self.location), 'student_view']
         self.xblock_view_url = reverse('xblock_view', args=self.view_args)
 
     def test_xblock_view_handler(self):
@@ -1353,6 +1356,7 @@ class TestProctoringRendering(SharedModuleStoreTestCase):
             'credit',
             MockCreditService(enrollment_mode=enrollment_mode)
         )
+        CourseEnrollment.enroll(self.request.user, self.course_key, mode=enrollment_mode)
 
         set_runtime_service(
             'grades',
@@ -1365,8 +1369,8 @@ class TestProctoringRendering(SharedModuleStoreTestCase):
         )
 
         exam_id = create_exam(
-            course_id=unicode(self.course_key),
-            content_id=unicode(sequence.location),
+            course_id=text_type(self.course_key),
+            content_id=text_type(sequence.location),
             exam_name='foo',
             time_limit_mins=10,
             is_proctored=True,
@@ -2131,9 +2135,9 @@ class TestModuleTrackingContext(SharedModuleStoreTestCase):
         with patch('xmodule.modulestore.mixed.MixedModuleStore.get_block_original_usage', mock_get_original_usage):
             module_info = self.handle_callback_and_get_module_info(mock_tracker)
             self.assertIn('original_usage_key', module_info)
-            self.assertEqual(module_info['original_usage_key'], unicode(original_usage_key))
+            self.assertEqual(module_info['original_usage_key'], text_type(original_usage_key))
             self.assertIn('original_usage_version', module_info)
-            self.assertEqual(module_info['original_usage_version'], unicode(original_usage_version))
+            self.assertEqual(module_info['original_usage_version'], text_type(original_usage_version))
 
 
 class TestXmoduleRuntimeEvent(TestSubmittingProblems):
@@ -2194,8 +2198,8 @@ class TestXmoduleRuntimeEvent(TestSubmittingProblems):
                 'raw_earned': self.grade_dict['value'],
                 'weight': None,
                 'user_id': self.student_user.id,
-                'course_id': unicode(self.course.id),
-                'usage_id': unicode(self.problem.location),
+                'course_id': text_type(self.course.id),
+                'usage_id': text_type(self.problem.location),
                 'only_if_higher': None,
                 'modified': datetime.now().replace(tzinfo=pytz.UTC),
                 'score_db_table': 'csm',
