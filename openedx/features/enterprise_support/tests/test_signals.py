@@ -1,11 +1,14 @@
 """Tests of email marketing signal handlers."""
+from __future__ import absolute_import
+
 import logging
-import ddt
-from django.test import TestCase
+
 from mock import patch
 
-from student.tests.factories import UserFactory
+import ddt
+from django.test import TestCase
 from openedx.features.enterprise_support.tests.factories import EnterpriseCustomerFactory, EnterpriseCustomerUserFactory
+from student.tests.factories import UserFactory
 
 log = logging.getLogger(__name__)
 

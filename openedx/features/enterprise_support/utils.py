@@ -1,19 +1,20 @@
-from __future__ import unicode_literals
+"""
+Utility methods for Enterprise
+"""
+from __future__ import absolute_import, unicode_literals
 
 import hashlib
 import json
 
 import six
-from django.conf import settings
-from django.utils.translation import ugettext as _
 
 import third_party_auth
+from django.conf import settings
+from django.utils.translation import ugettext as _
 from edx_django_utils.cache import TieredCache
-from third_party_auth import pipeline
 from enterprise.models import EnterpriseCustomerUser
-
-from openedx.core.djangoapps.user_authn.cookies import standard_cookie_settings
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.user_authn.cookies import standard_cookie_settings
 from openedx.core.djangolib.markup import HTML, Text
 
 
@@ -176,7 +177,7 @@ def update_third_party_auth_context_for_enterprise(request, context, enterprise_
         context['data']['third_party_auth']['providers'] = []
         context['data']['third_party_auth']['secondaryProviders'] = []
 
-    running_pipeline = pipeline.get(request)
+    running_pipeline = third_party_auth.pipeline.get(request)
     if running_pipeline is not None:
         current_provider = third_party_auth.provider.Registry.get_from_pipeline(running_pipeline)
         if current_provider is not None and current_provider.skip_registration_form and enterprise_customer:
