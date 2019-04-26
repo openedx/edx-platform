@@ -317,13 +317,7 @@ def course_info(request, course_id):
             course.id, request.user, course, depth=2
         )
         course_module = get_module_for_descriptor(
-            user,
-            request,
-            course,
-            field_data_cache,
-            course.id,
-            course=course,
-            will_recheck_access=True,
+            user, request, course, field_data_cache, course.id, course=course
         )
         chapter_module = get_current_child(course_module)
         if chapter_module is not None:
