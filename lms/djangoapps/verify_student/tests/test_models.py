@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 import json
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 import boto
 import ddt
 import mock
-import pytz
 import requests.exceptions
 from django.conf import settings
 from django.test import TestCase
+from django.utils.timezone import now
 from freezegun import freeze_time
 from mock import patch
 from opaque_keys.edx.keys import CourseKey
@@ -114,7 +114,7 @@ class TestVerification(TestCase):
         # Not active after the expiration date
         attempt.created_at = attempt.created_at - timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
         attempt.save()
-        self.assertFalse(attempt.active_at_datetime(datetime.now(pytz.UTC) + timedelta(days=1)))
+        self.assertFalse(attempt.active_at_datetime(now() + timedelta(days=1)))
 
 
 # Lots of patching to stub in our own settings, and HTTP posting
@@ -309,15 +309,15 @@ class TestPhotoVerification(TestVerification, MockS3Mixin, ModuleStoreTestCase):
         self.assertEqual(second_result, first_result)
 
         # Test method 'get_initial_verification' returns None after expiration
-        expired_future = datetime.utcnow() + timedelta(days=(FAKE_SETTINGS['DAYS_GOOD_FOR'] + 1))
+        expired_future = now() + timedelta(days=(FAKE_SETTINGS['DAYS_GOOD_FOR'] + 1))
         with freeze_time(expired_future):
             third_result = SoftwareSecurePhotoVerification.get_initial_verification(user)
             self.assertIsNone(third_result)
 
         # Test method 'get_initial_verification' returns correct attempt after system expiration,
         # but within earliest allowed override.
-        expired_future = datetime.utcnow() + timedelta(days=(FAKE_SETTINGS['DAYS_GOOD_FOR'] + 1))
-        earliest_allowed = datetime.utcnow() - timedelta(days=1)
+        expired_future = now() + timedelta(days=(FAKE_SETTINGS['DAYS_GOOD_FOR'] + 1))
+        earliest_allowed = now() - timedelta(days=1)
         with freeze_time(expired_future):
             fourth_result = SoftwareSecurePhotoVerification.get_initial_verification(user, earliest_allowed)
             self.assertIsNotNone(fourth_result)
@@ -398,8 +398,8 @@ class VerificationDeadlineTest(CacheIsolationTestCase):
 
     def test_caching(self):
         deadlines = {
-            CourseKey.from_string("edX/DemoX/Fall"): datetime.now(pytz.UTC),
-            CourseKey.from_string("edX/DemoX/Spring"): datetime.now(pytz.UTC) + timedelta(days=1)
+            CourseKey.from_string("edX/DemoX/Fall"): now(),
+            CourseKey.from_string("edX/DemoX/Spring"): now() + timedelta(days=1)
         }
         course_keys = deadlines.keys()
 

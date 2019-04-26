@@ -5,7 +5,7 @@ Tests of verify_student views.
 
 import json
 import urllib
-from datetime import datetime, timedelta
+from datetime import timedelta
 from uuid import uuid4
 
 import boto
@@ -13,7 +13,6 @@ import ddt
 import httpretty
 import mock
 import moto
-import pytz
 import requests
 from bs4 import BeautifulSoup
 from django.conf import settings
@@ -22,6 +21,7 @@ from django.urls import reverse
 from django.test import TestCase
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
+from django.utils.timezone import now
 from django.utils.translation import ugettext as _
 from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
@@ -90,7 +90,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
     USERNAME = "test_user"
     PASSWORD = "test_password"
 
-    NOW = datetime.now(pytz.UTC)
+    NOW = now()
     YESTERDAY = 'yesterday'
     TOMORROW = 'tomorrow'
     NEXT_YEAR = 'next_year'
@@ -729,7 +729,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
 
     @ddt.data("verify_student_start_flow", "verify_student_begin_flow")
     def test_verification_deadline(self, payment_flow):
-        deadline = datetime.now(tz=pytz.UTC) + timedelta(days=360)
+        deadline = now() + timedelta(days=360)
         course = self._create_course("verified")
 
         # Set a deadline on the course mode AND on the verification deadline model.
@@ -745,7 +745,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         self.assertEqual(data['verification_deadline'], unicode(deadline))
 
     def test_course_mode_expired(self):
-        deadline = datetime.now(tz=pytz.UTC) + timedelta(days=-360)
+        deadline = now() + timedelta(days=-360)
         course = self._create_course("verified")
 
         # Set the upgrade deadline (course mode expiration) and verification deadline
@@ -773,13 +773,13 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         # deadline in the future.
         self._set_deadlines(
             course.id,
-            upgrade_deadline=datetime.now(tz=pytz.UTC) + timedelta(days=-360),
+            upgrade_deadline=now() + timedelta(days=-360),
             verification_deadline=verification_deadline,
         )
         # Set the upgrade deadline for credit mode in future.
         self._set_deadlines(
             course.id,
-            upgrade_deadline=datetime.now(tz=pytz.UTC) + timedelta(days=360),
+            upgrade_deadline=now() + timedelta(days=360),
             verification_deadline=verification_deadline,
             mode_slug="credit"
         )
@@ -823,8 +823,8 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         # since it's a bad user experience
         # to purchase a verified track and then not be able to verify,
         # but if it happens we need to handle it gracefully.
-        upgrade_deadline_in_future = datetime.now(tz=pytz.UTC) + timedelta(days=360)
-        verification_deadline_in_past = datetime.now(tz=pytz.UTC) + timedelta(days=-360)
+        upgrade_deadline_in_future = now() + timedelta(days=360)
+        verification_deadline_in_past = now() + timedelta(days=-360)
         self._set_deadlines(
             course.id,
             upgrade_deadline=upgrade_deadline_in_future,
@@ -910,7 +910,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
 
         if status == "expired":
             days_good_for = settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
-            attempt.created_at = datetime.now(pytz.UTC) - timedelta(days=(days_good_for + 1))
+            attempt.created_at = now() - timedelta(days=(days_good_for + 1))
             attempt.save()
 
     def _set_deadlines(self, course_key, upgrade_deadline=None, verification_deadline=None, mode_slug="verified"):
@@ -1764,15 +1764,15 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         """
         Test for verification passed.
         """
-        expiry_date = datetime.now(pytz.UTC) + timedelta(
+        expiry_date = now() + timedelta(
             days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
         )
         verification = SoftwareSecurePhotoVerification.objects.create(user=self.user)
         verification.mark_ready()
         verification.submit()
         verification.approve()
-        verification.expiry_date = datetime.now(pytz.UTC)
-        verification.expiry_email_date = datetime.now(pytz.UTC)
+        verification.expiry_date = now()
+        verification.expiry_email_date = now()
         verification.save()
 
         data = {
@@ -1807,7 +1807,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         """
         Test for verification passed if the learner does not have any previous verification
         """
-        expiry_date = datetime.now(pytz.UTC) + timedelta(
+        expiry_date = now() + timedelta(
             days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
         )
 
@@ -1952,7 +1952,7 @@ class TestReverifyView(TestCase):
         attempt.approve()
 
         days_good_for = settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
-        attempt.created_at = datetime.now(pytz.UTC) - timedelta(days=(days_good_for + 1))
+        attempt.created_at = now() - timedelta(days=(days_good_for + 1))
         attempt.save()
 
         # Allow the student to reverify

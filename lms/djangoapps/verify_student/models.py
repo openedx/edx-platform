@@ -13,10 +13,9 @@ import json
 import logging
 import os.path
 import uuid
-from datetime import datetime, timedelta
+from datetime import timedelta
 from email.utils import formatdate
 
-import pytz
 import requests
 import six
 from django.conf import settings
@@ -27,6 +26,7 @@ from django.urls import reverse
 from django.db import models
 from django.dispatch import receiver
 from django.utils.functional import cached_property
+from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy
 from model_utils import Choices
 from model_utils.models import StatusModel, TimeStampedModel
@@ -138,7 +138,7 @@ class IDVerificationAttempt(StatusModel):
         """
         return (
             self.created_at < deadline and
-            self.expiration_datetime > datetime.now(pytz.UTC)
+            self.expiration_datetime > now()
         )
 
 
@@ -573,7 +573,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
             status is set to `approved`
             expiry_date is set to one year from now
         """
-        self.expiry_date = datetime.now(pytz.UTC) + timedelta(
+        self.expiry_date = now() + timedelta(
             days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
         )
         super(SoftwareSecurePhotoVerification, self).approve(user_id, service)
@@ -675,7 +675,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         try:
             response = self.send_request(copy_id_photo_from=copy_id_photo_from)
             if response.ok:
-                self.submitted_at = datetime.now(pytz.UTC)
+                self.submitted_at = now()
                 self.status = "submitted"
                 self.save()
             else:
