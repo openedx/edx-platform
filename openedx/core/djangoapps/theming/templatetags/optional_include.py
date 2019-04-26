@@ -6,12 +6,12 @@ possible, in order to match the behavior of the {% include %} template tag,
 except for making it optional.
 """
 
+# Because we want to match the original loader_tags.py file as closely as
+# possible, we should disable pylint so it doesn't complain about the violations 
 # that are already in that file
 # pylint: skip-file
 from __future__ import absolute_import
 
-# Because we want to match the original loader_tags.py file as closely as
-# possible, we should disable pylint so it doesn't complain about the violations
 from django.template import Library, TemplateDoesNotExist
 from django.template.base import TemplateSyntaxError, token_kwargs
 from django.template.loader_tags import IncludeNode
