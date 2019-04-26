@@ -2,13 +2,13 @@
 This module contains signals related to enterprise.
 """
 
-from django.dispatch import receiver
-from django.db.models.signals import post_save
+from __future__ import absolute_import
+
 from django.contrib.auth.models import User
-
-from enterprise.models import EnterpriseCustomerUser, EnterpriseCourseEnrollment
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from email_marketing.tasks import update_user
-
+from enterprise.models import EnterpriseCourseEnrollment, EnterpriseCustomerUser
 from openedx.features.enterprise_support.utils import clear_data_consent_share_cache
 
 

@@ -4,8 +4,9 @@ Middleware for the Enterprise feature.
 The Enterprise feature must be turned on for this middleware to have any effect.
 """
 
-from django.core.exceptions import MiddlewareNotUsed
+from __future__ import absolute_import
 
+from django.core.exceptions import MiddlewareNotUsed
 from openedx.features.enterprise_support import api
 
 
