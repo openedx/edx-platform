@@ -3,12 +3,13 @@ Tests for the Sending activation email celery tasks
 """
 
 import mock
-from boto.exception import NoAuthHandlerFound
 from django.conf import settings
 from django.test import TestCase
-
+from edx_ace.errors import ChannelError, RecoverableChannelDeliveryError
 from lms.djangoapps.courseware.tests.factories import UserFactory
+from student.models import Registration
 from student.tasks import send_activation_email
+from student.views.management import compose_activation_email
 
 
 class SendActivationEmailTestCase(TestCase):
@@ -20,18 +21,32 @@ class SendActivationEmailTestCase(TestCase):
         super(SendActivationEmailTestCase, self).setUp()
         self.student = UserFactory()
 
+        registration = Registration()
+        registration.register(self.student)
+
+        self.msg = compose_activation_email("http://www.example.com", self.student, registration)
+
+    def test_ComposeEmail(self):
+        """
+        Tests that attributes of the message are being filled correctly in compose_activation_email
+        """
+        self.assertEquals(self.msg.recipient.username, self.student.username)
+        self.assertEquals(self.msg.recipient.email_address, self.student.email)
+        self.assertEquals(self.msg.context['routed_user'], self.student.username)
+        self.assertEquals(self.msg.context['routed_user_email'], self.student.email)
+        self.assertEquals(self.msg.context['routed_profile_name'], '')
+
     @mock.patch('time.sleep', mock.Mock(return_value=None))
     @mock.patch('student.tasks.log')
-    @mock.patch('django.core.mail.send_mail', mock.Mock(side_effect=NoAuthHandlerFound))
-    def test_send_email(self, mock_log):
+    @mock.patch('student.tasks.ace.send', mock.Mock(side_effect=RecoverableChannelDeliveryError(None, None)))
+    def test_RetrySendUntilFail(self, mock_log):
         """
         Tests retries when the activation email doesn't send
         """
         from_address = 'task_testing@example.com'
         email_max_attempts = settings.RETRY_ACTIVATION_EMAIL_MAX_ATTEMPTS
 
-        # pylint: disable=no-member
-        send_activation_email.delay('Task_test', 'Task_test_message', from_address, self.student.email)
+        send_activation_email.delay(self.msg, from_address=from_address)
 
         # Asserts sending email retry logging.
         for attempt in range(email_max_attempts):
@@ -51,3 +66,26 @@ class SendActivationEmailTestCase(TestCase):
             exc_info=True
         )
         self.assertEquals(mock_log.error.call_count, 1)
+
+    @mock.patch('student.tasks.log')
+    @mock.patch('student.tasks.ace.send', mock.Mock(side_effect=ChannelError))
+    def test_UnrecoverableSendError(self, mock_log):
+        """
+        Tests that a major failure of the send is logged
+        """
+        from_address = 'task_testing@example.com'
+
+        send_activation_email.delay(self.msg, from_address=from_address)
+
+        # Asserts that the error was logged
+        mock_log.exception.assert_called_with(
+            'Unable to send activation email to user from "%s" to "%s"',
+            from_address,
+            self.student.email,
+            exc_info=True
+        )
+
+        # Assert that nothing else was logged
+        self.assertEquals(mock_log.info.call_count, 0)
+        self.assertEquals(mock_log.error.call_count, 0)
+        self.assertEquals(mock_log.exception.call_count, 1)
