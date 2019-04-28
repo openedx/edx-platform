@@ -71,7 +71,8 @@ Integration Tests
 UI Acceptance Tests
 ~~~~~~~~~~~~~~~~~~~
 
--  Use these to test that major program features are working correctly.
+-  There should be very few UI acceptance tests since they are generally slow and
+   flaky. Use these to test only bare minimum happy paths for necessary features.
 
 -  We use `Bok Choy`_ to write end-user acceptance tests directly in Python,
    using the framework to maximize reliability and maintainability.
