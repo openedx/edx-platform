@@ -18,9 +18,7 @@ def get_base_template_context(site):
     try:
         dashboard_url = reverse('dashboard')
     except NoReverseMatch:
-        dashboard_url = reverse('home') 
-
-    import pdb; pdb.set_trace()     
+        dashboard_url = reverse('home')     
 
     return {
         # Platform information
