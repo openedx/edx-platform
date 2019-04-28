@@ -25,7 +25,7 @@ locations.
     :maxdepth: 2
 
     guides
-    docstrings
+    docstrings/docstrings
 
 
 Change History

@@ -2,8 +2,12 @@
 Testing
 #######
 
+.. contents::
+   :local:
+   :depth: 3
+
 Overview
---------
+========
 
 We maintain three kinds of tests: unit tests, integration tests, and
 acceptance tests.
@@ -21,6 +25,9 @@ the code base.
 The pyramid above shows the relative number of unit tests, integration
 tests, and acceptance tests. Most of our tests are unit tests or
 integration tests.
+
+Test Types
+----------
 
 Unit Tests
 ~~~~~~~~~~
@@ -72,12 +79,6 @@ UI Acceptance Tests
 .. _Bok Choy: https://bok-choy.readthedocs.org/en/latest/tutorial.html
 
 
-Internationalization
-~~~~~~~~~~~~~~~~~~~~
-
--  Any new text that is added should be internationalized and translated.
-
-
 Test Locations
 --------------
 
@@ -100,23 +101,6 @@ Test Locations
    -  Bok Choy Accessibility Tests: located under ``common/test/acceptance/tests`` and tagged with ``@attr("a11y")``
    -  Bok Choy PageObjects: located under ``common/test/acceptance/pages``
 
-Factories
----------
-
-Many tests delegate set-up to a "factory" class. For example, there are
-factories for creating courses, problems, and users. This encapsulates
-set-up logic from tests.
-
-Factories are often implemented using `FactoryBoy`_.
-
-In general, factories should be located close to the code they use. For
-example, the factory for creating problem XML definitions is located in
-``common/lib/capa/capa/tests/response_xml_factory.py`` because the
-``capa`` package handles problem XML.
-
-.. _FactoryBoy: https://readthedocs.org/projects/factoryboy/
-
-
 Running Tests
 =============
 
@@ -132,27 +116,6 @@ Note -
 
     paver -h
 
-Connecting to Browser
----------------------
-
-If you want to see the browser being automated for JavaScript or bok-choy tests,
-you can connect to the container running it via VNC.
-
-+------------------------+----------------------+
-| Browser                | VNC connection       |
-+========================+======================+
-| Firefox (Default)      | vnc://0.0.0.0:25900  |
-+------------------------+----------------------+
-| Chrome (via Selenium)  | vnc://0.0.0.0:15900  |
-+------------------------+----------------------+
-
-On macOS, enter the VNC connection string in Safari to connect via VNC. The VNC
-passwords for both browsers are randomly generated and logged at container
-startup, and can be found by running ``make vnc-passwords``.
-
-Most tests are run in Firefox by default.  To use Chrome for tests that normally
-use Firefox instead, prefix the test command with
-``SELENIUM_BROWSER=chrome SELENIUM_HOST=edx.devstack.chrome``.
 
 Running Python Unit tests
 -------------------------
@@ -202,7 +165,7 @@ To run a single django test class use this command::
     paver test_system -t lms/djangoapps/courseware/tests/tests.py::ActivateLoginTest
 
 Running a Single Test
----------------------
+~~~~~~~~~~~~~~~~~~~~~
 
 When developing tests, it is often helpful to be able to really just run
 one single test without the overhead of PIP installs, UX builds, etc. In
@@ -288,7 +251,7 @@ This is an example of how to run a single test and get stdout shown immediately,
     pytest cms/djangoapps/contentstore/tests/test_import.py -s
 
 How to output coverage locally
-------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 These are examples of how to run a single test and get coverage::
 
@@ -372,7 +335,7 @@ If you run into flakiness, check (and feel free to contribute to) this
 `confluence document <https://openedx.atlassian.net/wiki/spaces/TE/pages/884998163/Debugging+test+failures+with+pytest-xdist>`__ for help.
 
 Running Javascript Unit Tests
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------
 
 We use Jasmine to run JavaScript unit tests. To run all the JavaScript
 tests::
@@ -412,7 +375,7 @@ These paver commands call through to Karma. For more
 info, see `karma-runner.github.io <https://karma-runner.github.io/>`__.
 
 Running Bok Choy Acceptance Tests
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------
 
 We use `Bok Choy`_ for acceptance testing. Bok Choy is a UI-level acceptance
 test framework for writing robust `Selenium`_ tests in `Python`_. Bok Choy
@@ -583,145 +546,8 @@ You must run BOTH `--testsonly` and `--fasttest`.
 Control-C. *Warning*: Only hit Control-C one time so the pytest framework can
 properly clean up.
 
-Running Tests on Paver Scripts
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-To run tests on the scripts that power the various Paver commands, use the following command::
-
-  pytest pavelib
-
-
-Testing internationalization with dummy translations
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Any text you add to the platform should be internationalized. To generate
-translations for your new strings, run the following command::
-
-    paver i18n_dummy
-
-This command generates dummy translations for each dummy language in the
-platform and puts the dummy strings in the appropriate language files.
-You can then preview the dummy languages on your local machine and also in
-your sandbox, if and when you create one.
-
-The dummy language files that are generated during this process can be
-found in the following locations::
-
-    conf/locale/{LANG_CODE}
-
-There are a few JavaScript files that are generated from this process. You
-can find those in the following locations::
-
-    lms/static/js/i18n/{LANG_CODE}
-    cms/static/js/i18n/{LANG_CODE}
-
-Do not commit the ``.po``, ``.mo``, ``.js`` files that are generated
-in the above locations during the dummy translation process!
-
-Viewing Test Coverage
----------------------
-
-We currently collect test coverage information for Python
-unit/integration tests.
-
-To view test coverage:
-
-1. Run the test suite with this command::
-
-       paver test
-
-2. Generate reports with this command::
-
-       paver coverage
-
-3. Reports are located in the ``reports`` folder. The command generates
-   HTML and XML (Cobertura format) reports.
-
-Python Code Style Quality
--------------------------
-
-To view Python code style quality (including PEP 8 and pylint violations) run this command::
-
-    paver run_quality
-
-More specific options are below.
-
--  These commands run a particular quality report::
-
-       paver run_pep8
-       paver run_pylint
-
--  This command runs a report, and sets it to fail if it exceeds a given number
-   of violations::
-
-       paver run_pep8 --limit=800
-
--  The ``run_quality`` uses the underlying diff-quality tool (which is packaged
-   with `diff-cover`_). With that, the command can be set to fail if a certain
-   diff threshold is not met. For example, to cause the process to fail if
-   quality expectations are less than 100% when compared to master (or in other
-   words, if style quality is worse than what is already on master)::
-
-       paver run_quality --percentage=100
-
--  Note that 'fixme' violations are not counted with run\_quality. To
-   see all 'TODO' lines, use this command::
-
-       paver find_fixme --system=lms
-
-   ``system`` is an optional argument here. It defaults to
-   ``cms,lms,common``.
-
-.. _diff-cover: https://github.com/Bachmann1234/diff-cover
-
-
-JavaScript Code Style Quality
------------------------------
-
-To view JavaScript code style quality run this command::
-
-    paver run_eslint
-
--  This command also comes with a ``--limit`` switch, this is an example of that switch::
-
-    paver run_eslint --limit=50000
-
-
-
-Code Complexity Tools
----------------------
-
-Two tools are available for evaluating complexity of edx-platform code:
-
-- `radon <https://radon.readthedocs.org/en/latest/>`__ for Python code
-  complexity.  To obtain complexity, run::
-
-       paver run_complexity
-
-- `plato <https://github.com/es-analysis/plato>`__ for JavaScript code
-  complexity. Several options are available on the command line; see
-  documentation.  Below, the following command will produce an HTML report in a
-  subdirectory called "jscomplexity"::
-
-       plato -q -x common/static/js/vendor/ -t common -e .eslintrc.json -r -d jscomplexity common/static/js/
-
-
-
-Testing using queue servers
----------------------------
-
-When testing problems that use a queue server on AWS (e.g.
-sandbox-xqueue.edx.org), you'll need to run your server on your public
-IP, like so::
-
-    ./manage.py lms runserver 0.0.0.0:8000
-
-When you connect to the LMS, you need to use the public ip. Use
-``ifconfig`` to figure out the number, and connect e.g. to
-``http://18.3.4.5:8000/``
-
 Acceptance Test Techniques
---------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 1. **Element existence on the page**: Do not use splinter's built-in browser
    methods directly for determining if elements exist. Use the
@@ -766,3 +592,177 @@ Acceptance Test Techniques
    and "LMS" when they follow this convention: name your feature in the
    .feature file CMS or LMS with a single period and then no other
    periods in the name. The name can contain spaces. E.g. "CMS.Sign Up"
+
+
+Testing internationalization with dummy translations
+----------------------------------------------------
+
+Any text you add to the platform should be internationalized. To generate translations for your new strings, run the following command::
+
+    paver i18n_dummy
+
+This command generates dummy translations for each dummy language in the
+platform and puts the dummy strings in the appropriate language files.
+You can then preview the dummy languages on your local machine and also in your sandbox, if and when you create one.
+
+The dummy language files that are generated during this process can be
+found in the following locations::
+
+    conf/locale/{LANG_CODE}
+
+There are a few JavaScript files that are generated from this process. You can find those in the following locations::
+
+    lms/static/js/i18n/{LANG_CODE}
+    cms/static/js/i18n/{LANG_CODE}
+
+Do not commit the ``.po``, ``.mo``, ``.js`` files that are generated
+in the above locations during the dummy translation process!
+
+Test Coverage and Quality
+-------------------------
+
+Viewing Test Coverage
+~~~~~~~~~~~~~~~~~~~~~
+
+We currently collect test coverage information for Python
+unit/integration tests.
+
+To view test coverage:
+
+1. Run the test suite with this command::
+
+       paver test
+
+2. Generate reports with this command::
+
+       paver coverage
+
+3. Reports are located in the ``reports`` folder. The command generates
+   HTML and XML (Cobertura format) reports.
+
+Python Code Style Quality
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To view Python code style quality (including PEP 8 and pylint violations) run this command::
+
+    paver run_quality
+
+More specific options are below.
+
+-  These commands run a particular quality report::
+
+       paver run_pep8
+       paver run_pylint
+
+-  This command runs a report, and sets it to fail if it exceeds a given number
+   of violations::
+
+       paver run_pep8 --limit=800
+
+-  The ``run_quality`` uses the underlying diff-quality tool (which is packaged
+   with `diff-cover`_). With that, the command can be set to fail if a certain
+   diff threshold is not met. For example, to cause the process to fail if
+   quality expectations are less than 100% when compared to master (or in other
+   words, if style quality is worse than what is already on master)::
+
+       paver run_quality --percentage=100
+
+-  Note that 'fixme' violations are not counted with run\_quality. To
+   see all 'TODO' lines, use this command::
+
+       paver find_fixme --system=lms
+
+   ``system`` is an optional argument here. It defaults to
+   ``cms,lms,common``.
+
+.. _diff-cover: https://github.com/Bachmann1234/diff-cover
+
+
+JavaScript Code Style Quality
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To view JavaScript code style quality run this command::
+
+    paver run_eslint
+
+-  This command also comes with a ``--limit`` switch, this is an example of that switch::
+
+    paver run_eslint --limit=50000
+
+
+Code Complexity Tools
+=====================
+
+Two tools are available for evaluating complexity of edx-platform code:
+
+- `radon <https://radon.readthedocs.org/en/latest/>`__ for Python code
+  complexity.  To obtain complexity, run::
+
+       paver run_complexity
+
+- `plato <https://github.com/es-analysis/plato>`__ for JavaScript code
+  complexity. Several options are available on the command line; see
+  documentation.  Below, the following command will produce an HTML report in a
+  subdirectory called "jscomplexity"::
+
+       plato -q -x common/static/js/vendor/ -t common -e .eslintrc.json -r -d jscomplexity common/static/js/
+
+Other Testing Tips
+==================
+
+Connecting to Browser
+---------------------
+
+If you want to see the browser being automated for JavaScript or bok-choy tests,
+you can connect to the container running it via VNC.
+
++------------------------+----------------------+
+| Browser                | VNC connection       |
++========================+======================+
+| Firefox (Default)      | vnc://0.0.0.0:25900  |
++------------------------+----------------------+
+| Chrome (via Selenium)  | vnc://0.0.0.0:15900  |
++------------------------+----------------------+
+
+On macOS, enter the VNC connection string in Safari to connect via VNC. The VNC
+passwords for both browsers are randomly generated and logged at container
+startup, and can be found by running ``make vnc-passwords``.
+
+Most tests are run in Firefox by default.  To use Chrome for tests that normally
+use Firefox instead, prefix the test command with
+``SELENIUM_BROWSER=chrome SELENIUM_HOST=edx.devstack.chrome``
+
+Factories
+---------
+
+Many tests delegate set-up to a "factory" class. For example, there are
+factories for creating courses, problems, and users. This encapsulates
+set-up logic from tests.
+
+Factories are often implemented using `FactoryBoy`_.
+
+In general, factories should be located close to the code they use. For
+example, the factory for creating problem XML definitions is located in
+``common/lib/capa/capa/tests/response_xml_factory.py`` because the
+``capa`` package handles problem XML.
+
+.. _FactoryBoy: https://readthedocs.org/projects/factoryboy/
+
+Running Tests on Paver Scripts
+------------------------------
+
+To run tests on the scripts that power the various Paver commands, use the following command::
+
+  pytest pavelib
+
+Testing using queue servers
+---------------------------
+
+When testing problems that use a queue server on AWS (e.g.
+sandbox-xqueue.edx.org), you'll need to run your server on your public IP, like so::
+
+    ./manage.py lms runserver 0.0.0.0:8000
+
+When you connect to the LMS, you need to use the public ip. Use
+``ifconfig`` to figure out the number, and connect e.g. to
+``http://18.3.4.5:8000/``
