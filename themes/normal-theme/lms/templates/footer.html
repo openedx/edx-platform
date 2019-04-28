@@ -141,6 +141,21 @@ binding = remind_users_to_bind_phones(request)
         });
       }
     }
+
+    // 兼容app, ?device=ios/android时，隐藏头部尾部咨询按钮
+    var device = getQueryString('device');
+      if(device != undefined){
+        $('.global-header').hide();
+        $('.my-footer').hide();
+        var style = document.createElement('style');
+        var css = "#newBridge{display:none !important}";
+        if(style.styleSheet){
+            style.styleSheet.cssText = css;
+        }else{
+            style.appendChild(document.createTextNode(css));
+        }
+        document.getElementsByTagName('head')[0].appendChild(style);
+      }
   }
 </script>
 <script>

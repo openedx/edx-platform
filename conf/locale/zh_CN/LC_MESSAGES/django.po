@@ -31,8 +31,8 @@
 # 微 李 <w.li@eliteu.com.cn>, 2018
 # 家璧 刘 <jb.liu@eliteu.com.cn>, 2018
 # 婕 高 <j.gao@eliteu.cn>, 2018
-# li ying <code@eliteu.cn>, 2019
 # fengri <173770922@qq.com>, 2019
+# li ying <code@eliteu.cn>, 2019
 #
 # #-#-#-#-#  mako-studio.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)
@@ -8593,6 +8593,7 @@ msgstr "查看{username}的身份验证照片"
 #: lms/envs/common.py lms/templates/certificates/verify.html
 #: themes/normal-theme/lms/templates/footer.html
 #: themes/normal-theme/lms/templates/static_templates/about.html
+#: membership/templates/membership/card.html
 #: membership/templates/membership/index.html
 msgid "EliteMBA"
 msgstr "英荔商学院"
@@ -19639,8 +19640,8 @@ msgid "Mobile Phone No.:"
 msgstr "手机号码："
 
 #: lms/templates/student_account/account_settings.html
-msgid "Bind your EliteMBA account to your cellphone number"
-msgstr " 将您的手机号码与EliteMBA的账号绑定 "
+msgid "Bind your EliteMBA account to your cellphone number."
+msgstr "将您的手机号码与EliteMBA的账号绑定。"
 
 #: lms/templates/student_account/finish_auth.html
 msgid "Please Wait"
@@ -20516,7 +20517,6 @@ msgid "To become a reputable brand of digital education in China."
 msgstr "成为中国享有声誉的数字化教育品牌。"
 
 #: themes/normal-theme/lms/templates/static_templates/contact.html
-#: membership/templates/membership/card.html
 msgid "Elite Education"
 msgstr "英荔教育"
 
@@ -26357,7 +26357,7 @@ msgstr "收费订阅"
 
 #: membership/templates/membership/card.html
 msgid "VIP membership"
-msgstr "VIP会员"
+msgstr "会员资格"
 
 #: membership/templates/membership/card.html
 msgid "Elite MBA VIP membership"
@@ -26397,9 +26397,9 @@ msgstr "请在新页面完成支付"
 
 #: membership/templates/membership/card.html
 msgid ""
-"{span_start}Please do not close the page {span_end}. Please click the button"
-" below accordingly after completing the payment."
-msgstr "{span_start}请不要关闭页面{span_end}，完成支付后请根据情况点击下面按钮"
+"{span_start}Please do not close the page.{span_end} Please click the button "
+"below accordingly after completing the payment."
+msgstr "{span_start}请不要关闭页面，{span_end}完成支付后请根据情况点击下面按钮"
 
 #: membership/templates/membership/card.html
 msgid "Choose another payment method"

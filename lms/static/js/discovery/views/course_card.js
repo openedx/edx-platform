@@ -34,8 +34,11 @@
                 var userLanguage = '',
                     userTimezone = '';
                 if (this.model.userPreferences !== undefined) {
-                    userLanguage = this.model.userPreferences.userLanguage;
-                    userTimezone = this.model.userPreferences.userTimezone;
+                    var lang = document.getElementsByTagName('html')[0].lang;
+                    userLanguage = lang;
+                    userTimezone = lang;
+                    // userLanguage = this.model.userPreferences.userLanguage;
+                    // userTimezone = this.model.userPreferences.userTimezone;
                 }
                 if (data.advertised_start !== undefined) {
                     data.start = data.advertised_start;

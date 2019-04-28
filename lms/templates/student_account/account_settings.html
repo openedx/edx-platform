@@ -90,12 +90,12 @@ from webpack_loader.templatetags.webpack_loader import render_bundle
         % if phone == 'null':
         <button class="u-field-link u-field-link-title-phone " id="u-field-link-phone" aria-describedby="u-field-message-help-phone">${_(u"Bind Mobile")}</button>
         % else:
-        <span class="phone-number">${_(u"Mobile Phone No.:")}${ phone }</span> <span style="float:right; color:#346ca3; cursor: pointer;" class="change-phone-btn">${_(u"Change")}</span>
+        <span class="phone-number">${_(u"Mobile Phone No.:")} ${ phone }</span> <span style="float:right; color:#346ca3; cursor: pointer;" class="change-phone-btn">${_(u"Change")}</span>
         % endif
     </div>
     <span class="u-field-message" id="u-field-message-phone">
         <span class="u-field-message-notification" aria-live="polite"></span>
-        <span class="u-field-message-help" id="u-field-message-help-phone">${_(u"Bind your EliteMBA account to your cellphone number")}</span>
+        <span class="u-field-message-help" id="u-field-message-help-phone">${_(u"Bind your EliteMBA account to your cellphone number.")}</span>
     </span>
     </div> 
 </div>
@@ -103,10 +103,6 @@ from webpack_loader.templatetags.webpack_loader import render_bundle
      window.auth = ${ auth | n, dump_js_escaped_json };
      window.isActive = ${ user.is_active | n, dump_js_escaped_json };
      window.domainName = ${ settings.SESSION_COOKIE_DOMAIN | n, dump_js_escaped_json };
-     console.log($);
-     $(document).ready(function(){
-        
-     })
 </script>
 <%static:webpack entry="StudentAccountDeletionInitializer">
 </%static:webpack>
