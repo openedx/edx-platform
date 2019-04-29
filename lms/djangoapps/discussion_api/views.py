@@ -22,7 +22,7 @@ from django_comment_common.models import Role
 from django_comment_common.utils import get_course_discussion_settings, set_course_discussion_settings
 
 from instructor.access import update_forum_role
-from lms.lib import comment_client
+from django_comment_common import comment_client
 from discussion.views import get_divided_discussions
 from discussion_api.api import (
     create_comment,

@@ -50,8 +50,8 @@ from six import text_type
 from slumber.exceptions import HttpClientError, HttpServerError
 from user_util import user_util
 
+import django_comment_common.comment_client as cc
 from edx_django_utils.cache import RequestCache
-import lms.lib.comment_client as cc
 from student.signals import UNENROLL_DONE, ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from course_modes.models import CourseMode, get_cosmetic_verified_display_price

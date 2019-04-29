@@ -12,6 +12,8 @@ from django.test.client import RequestFactory
 from discussion_api.serializers import CommentSerializer, ThreadSerializer, get_context
 from discussion_api.tests.utils import CommentsServiceMockMixin, make_minimal_cs_comment, make_minimal_cs_thread
 from django_comment_client.tests.utils import ForumsEnableMixin
+from django_comment_common.comment_client.comment import Comment
+from django_comment_common.comment_client.thread import Thread
 from django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_COMMUNITY_TA,
@@ -19,8 +21,6 @@ from django_comment_common.models import (
     FORUM_ROLE_STUDENT,
     Role
 )
-from lms.lib.comment_client.comment import Comment
-from lms.lib.comment_client.thread import Thread
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from student.tests.factories import UserFactory
 from util.testing import UrlResetMixin

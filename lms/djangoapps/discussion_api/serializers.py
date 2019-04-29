@@ -19,12 +19,12 @@ from django_comment_common.models import (
     FORUM_ROLE_MODERATOR,
     Role,
 )
+from django_comment_common.comment_client.comment import Comment
+from django_comment_common.comment_client.thread import Thread
+from django_comment_common.comment_client.user import User as CommentClientUser
+from django_comment_common.comment_client.utils import CommentClientRequestError
 from django_comment_common.utils import get_course_discussion_settings
 from lms.djangoapps.django_comment_client.utils import course_discussion_division_enabled, get_group_names_by_id
-from lms.lib.comment_client.comment import Comment
-from lms.lib.comment_client.thread import Thread
-from lms.lib.comment_client.user import User as CommentClientUser
-from lms.lib.comment_client.utils import CommentClientRequestError
 from student.models import get_user_by_username_or_email
 
 
