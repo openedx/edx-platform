@@ -17,10 +17,6 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
 from six import text_type
 
-from django_comment_common import comment_client
-from django_comment_common.models import Role
-from django_comment_common.utils import get_course_discussion_settings, set_course_discussion_settings
-
 from instructor.access import update_forum_role
 from discussion.views import get_divided_discussions
 from lms.djangoapps.discussion.django_comment_client.utils import available_division_schemes
@@ -52,6 +48,11 @@ from lms.djangoapps.discussion.rest_api.serializers import (
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.api.parsers import MergePatchParser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
+from openedx.core.djangoapps.discussion_common import comment_client
+from openedx.core.djangoapps.discussion_common.models import Role
+from openedx.core.djangoapps.discussion_common.utils import (
+    get_course_discussion_settings, set_course_discussion_settings,
+)
 from openedx.core.djangoapps.user_api.accounts.permissions import CanReplaceUsername, CanRetireUser
 from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 from util.json_request import JsonResponse

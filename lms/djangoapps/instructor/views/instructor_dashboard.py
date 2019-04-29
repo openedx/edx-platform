@@ -31,7 +31,6 @@ from course_modes.models import CourseMode, CourseModesArchive
 from courseware.access import has_access
 from courseware.courses import get_course_by_id, get_studio_url
 from lms.djangoapps.discussion.django_comment_client.utils import available_division_schemes, has_forum_access
-from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, CourseDiscussionSettings
 from edxmako.shortcuts import render_to_response
 from edx_when.api import is_enabled_for_course
 from lms.djangoapps.certificates import api as certs_api
@@ -46,6 +45,7 @@ from lms.djangoapps.certificates.models import (
 from lms.djangoapps.courseware.module_render import get_module_by_usage_id
 from lms.djangoapps.grades.config.waffle import WRITABLE_GRADEBOOK, waffle_flags
 from openedx.core.djangoapps.course_groups.cohorts import DEFAULT_COHORT_NAME, get_course_cohorts, is_course_cohorted
+from openedx.core.djangoapps.discussion_common.models import FORUM_ROLE_ADMINISTRATOR, CourseDiscussionSettings
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.verified_track_content.models import VerifiedTrackCohortedCourse
 from openedx.core.djangolib.markup import HTML, Text

@@ -11,9 +11,9 @@ from lms.djangoapps.discussion.rest_api.permissions import (
     get_initializable_comment_fields,
     get_initializable_thread_fields
 )
-from django_comment_common.comment_client.comment import Comment
-from django_comment_common.comment_client.thread import Thread
-from django_comment_common.comment_client.user import User
+from openedx.core.djangoapps.discussion_common.comment_client.comment import Comment
+from openedx.core.djangoapps.discussion_common.comment_client.thread import Thread
+from openedx.core.djangoapps.discussion_common.comment_client.user import User
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

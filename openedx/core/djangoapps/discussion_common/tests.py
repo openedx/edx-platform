@@ -1,12 +1,14 @@
+# pylint: disable=missing-docstring
 from django.test import TestCase
 from opaque_keys.edx.locator import CourseLocator
 from six import text_type
 
-from django_comment_common.models import Role
-from models import CourseDiscussionSettings
 from openedx.core.djangoapps.course_groups.cohorts import CourseCohortsSettings
+from openedx.core.djangoapps.discussion_common.models import Role, CourseDiscussionSettings
+from openedx.core.djangoapps.discussion_common.utils import (
+    get_course_discussion_settings, set_course_discussion_settings,
+)
 from student.models import CourseEnrollment, User
-from utils import get_course_discussion_settings, set_course_discussion_settings
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

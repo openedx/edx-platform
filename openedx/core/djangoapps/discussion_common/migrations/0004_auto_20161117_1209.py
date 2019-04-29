@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('django_comment_common', '0003_enable_forums'),
+        ('discussion_common', '0003_enable_forums'),
     ]
 
     operations = [

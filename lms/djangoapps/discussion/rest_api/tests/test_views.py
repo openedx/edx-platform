@@ -32,8 +32,8 @@ from lms.djangoapps.discussion.rest_api.tests.utils import (
 from lms.djangoapps.discussion.django_comment_client.tests.utils import (
     ForumsEnableMixin, config_course_discussions, topic_name_to_id,
 )
-from django_comment_common.models import CourseDiscussionSettings, Role
-from django_comment_common.utils import seed_permissions_roles
+from openedx.core.djangoapps.discussion_common.models import CourseDiscussionSettings, Role
+from openedx.core.djangoapps.discussion_common.utils import seed_permissions_roles
 from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_storage

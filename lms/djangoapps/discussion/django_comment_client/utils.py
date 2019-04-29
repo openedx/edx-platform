@@ -21,14 +21,14 @@ from lms.djangoapps.discussion.django_comment_client.permissions import (
     check_permissions_by_view, get_team, has_permission,
 )
 from lms.djangoapps.discussion.django_comment_client.settings import MAX_COMMENT_DEPTH
-from django_comment_common.models import (
+from openedx.core.djangoapps.discussion_common.models import (
     FORUM_ROLE_STUDENT,
     FORUM_ROLE_COMMUNITY_TA,
     CourseDiscussionSettings,
     DiscussionsIdMapping,
     Role
 )
-from django_comment_common.utils import get_course_discussion_settings
+from openedx.core.djangoapps.discussion_common.utils import get_course_discussion_settings
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id, get_cohort_names, is_course_cohorted
 from openedx.core.lib.cache_utils import request_cached
 from student.models import get_user_by_username_or_email

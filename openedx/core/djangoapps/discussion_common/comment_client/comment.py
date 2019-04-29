@@ -1,4 +1,5 @@
-from django_comment_common.comment_client import models, settings
+# pylint: disable=missing-docstring,protected-access
+from openedx.core.djangoapps.discussion_common.comment_client import models, settings
 
 from .thread import Thread, _url_for_flag_abuse_thread, _url_for_unflag_abuse_thread
 from .utils import CommentClientRequestError, perform_request
@@ -42,14 +43,16 @@ class Comment(models.Model):
         return self.thread.context
 
     @classmethod
-    def url_for_comments(cls, params={}):
-        if params.get('parent_id'):
+    def url_for_comments(cls, params=None):
+        if params and params.get('parent_id'):
             return _url_for_comment(params['parent_id'])
         else:
             return _url_for_thread_comments(params['thread_id'])
 
     @classmethod
-    def url(cls, action, params={}):
+    def url(cls, action, params=None):
+        if params is None:
+            params = {}
         if action in ['post']:
             return cls.url_for_comments(params)
         else:

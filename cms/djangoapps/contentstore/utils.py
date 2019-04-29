@@ -15,8 +15,8 @@ from opaque_keys.edx.locator import LibraryLocator
 from pytz import UTC
 from six import text_type
 
-from django_comment_common.models import assign_default_role
-from django_comment_common.utils import seed_permissions_roles
+from openedx.core.djangoapps.discussion_common.models import assign_default_role
+from openedx.core.djangoapps.discussion_common.utils import seed_permissions_roles
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.content_type_gating.partitions import CONTENT_TYPE_GATING_SCHEME

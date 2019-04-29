@@ -10,7 +10,6 @@ LMS and Studio.
     common/djangoapps/course_action_state/modules
     common/djangoapps/course_modes/modules
     common/djangoapps/database_fixups/modules
-    common/djangoapps/django_comment_common/modules
     common/djangoapps/edxmako/modules
     common/djangoapps/enrollment/modules
     common/djangoapps/entitlements/modules

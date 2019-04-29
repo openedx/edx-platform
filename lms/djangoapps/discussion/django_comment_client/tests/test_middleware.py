@@ -6,7 +6,7 @@ from django.test import TestCase
 from six import text_type
 
 import lms.djangoapps.discussion.django_comment_client.middleware as middleware
-import django_comment_common.comment_client
+import openedx.core.djangoapps.discussion_common.comment_client as comment_client
 
 
 class AjaxExceptionTestCase(TestCase):
@@ -16,9 +16,9 @@ class AjaxExceptionTestCase(TestCase):
         self.a = middleware.AjaxExceptionMiddleware()
         self.request1 = django.http.HttpRequest()
         self.request0 = django.http.HttpRequest()
-        self.exception1 = django_comment_common.comment_client.CommentClientRequestError('{}', 401)
-        self.exception2 = django_comment_common.comment_client.CommentClientRequestError('Foo!', 404)
-        self.exception0 = django_comment_common.comment_client.CommentClient500Error("Holy crap the server broke!")
+        self.exception1 = comment_client.CommentClientRequestError('{}', 401)
+        self.exception2 = comment_client.CommentClientRequestError('Foo!', 404)
+        self.exception0 = comment_client.CommentClient500Error("Holy crap the server broke!")
         self.request1.META['HTTP_X_REQUESTED_WITH'] = "XMLHttpRequest"
         self.request0.META['HTTP_X_REQUESTED_WITH'] = "SHADOWFAX"
 

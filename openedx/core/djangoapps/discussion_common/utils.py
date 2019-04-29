@@ -1,8 +1,9 @@
+# pylint: disable=missing-docstring
 """
 Common comment client utility functions.
 """
 
-from django_comment_common.models import (
+from openedx.core.djangoapps.discussion_common.models import (
     CourseDiscussionSettings,
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_COMMUNITY_TA,
@@ -89,7 +90,7 @@ def are_permissions_roles_seeded(course_id):
         moderator_role = Role.objects.get(name=FORUM_ROLE_MODERATOR, course_id=course_id)
         group_moderator_role = Role.objects.get(name=FORUM_ROLE_GROUP_MODERATOR, course_id=course_id)
         student_role = Role.objects.get(name=FORUM_ROLE_STUDENT, course_id=course_id)
-    except:
+    except:  # pylint: disable=bare-except
         return False
 
     for per in STUDENT_ROLE_PERMISSIONS:
@@ -153,7 +154,7 @@ def set_course_discussion_settings(course_key, **kwargs):
     for field, field_type in fields.items():
         if field in kwargs:
             if not isinstance(kwargs[field], field_type):
-                raise ValueError("Incorrect field type for `{}`. Type must be `{}`".format(field, field_type.__name__))
+                raise ValueError(u"Incorrect field type for `{}`. Type must be `{}`".format(field, field_type.__name__))
             setattr(course_discussion_settings, field, kwargs[field])
 
     course_discussion_settings.save()

@@ -26,9 +26,6 @@ from web_fragments.fragment import Fragment
 from courseware.access import has_access
 from courseware.courses import get_course_with_access
 from courseware.views.views import CourseTabView
-import django_comment_common.comment_client as cc
-from django_comment_common.models import CourseDiscussionSettings
-from django_comment_common.utils import ThreadContext, get_course_discussion_settings, set_course_discussion_settings
 import lms.djangoapps.discussion.django_comment_client.utils as utils
 from lms.djangoapps.discussion.django_comment_client.base.views import track_thread_viewed_event
 from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY
@@ -45,6 +42,11 @@ from lms.djangoapps.discussion.django_comment_client.utils import (
     strip_none
 )
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
+import openedx.core.djangoapps.discussion_common.comment_client as cc
+from openedx.core.djangoapps.discussion_common.models import CourseDiscussionSettings
+from openedx.core.djangoapps.discussion_common.utils import (
+    ThreadContext, get_course_discussion_settings, set_course_discussion_settings,
+)
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
 from student.models import CourseEnrollment

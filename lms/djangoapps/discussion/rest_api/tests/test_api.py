@@ -41,7 +41,7 @@ from lms.djangoapps.discussion.rest_api.tests.utils import (
     make_paginated_api_response
 )
 from lms.djangoapps.discussion.django_comment_client.tests.utils import ForumsEnableMixin
-from django_comment_common.models import (
+from openedx.core.djangoapps.discussion_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_COMMUNITY_TA,
     FORUM_ROLE_MODERATOR,

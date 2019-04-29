@@ -4,9 +4,9 @@ Reload forum (comment client) users from existing users.
 """
 from __future__ import print_function
 
-import django_comment_common.comment_client as cc
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
+import openedx.core.djangoapps.discussion_common.comment_client as cc
 
 
 class Command(BaseCommand):

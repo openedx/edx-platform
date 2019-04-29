@@ -7,7 +7,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('django_comment_common', '0007_discussionsidmapping'),
+        ('discussion_common', '0007_discussionsidmapping'),
     ]
 
     operations = [

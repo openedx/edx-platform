@@ -7,7 +7,7 @@ Enrollments.
 from __future__ import print_function
 
 from django.core.management.base import BaseCommand
-from django_comment_common.models import assign_default_role_on_enrollment
+from openedx.core.djangoapps.discussion_common.models import assign_default_role_on_enrollment
 from student.models import CourseEnrollment
 
 

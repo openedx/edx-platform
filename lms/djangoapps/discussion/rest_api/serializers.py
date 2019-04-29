@@ -9,17 +9,17 @@ from django.core.exceptions import ValidationError
 from django.urls import reverse
 from rest_framework import serializers
 
-from django_comment_common.models import (
+from openedx.core.djangoapps.discussion_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_COMMUNITY_TA,
     FORUM_ROLE_MODERATOR,
     Role,
 )
-from django_comment_common.comment_client.comment import Comment
-from django_comment_common.comment_client.thread import Thread
-from django_comment_common.comment_client.user import User as CommentClientUser
-from django_comment_common.comment_client.utils import CommentClientRequestError
-from django_comment_common.utils import get_course_discussion_settings
+from openedx.core.djangoapps.discussion_common.comment_client.comment import Comment
+from openedx.core.djangoapps.discussion_common.comment_client.thread import Thread
+from openedx.core.djangoapps.discussion_common.comment_client.user import User as CommentClientUser
+from openedx.core.djangoapps.discussion_common.comment_client.utils import CommentClientRequestError
+from openedx.core.djangoapps.discussion_common.utils import get_course_discussion_settings
 from lms.djangoapps.discussion.django_comment_client.utils import (
     is_comment_too_deep, get_group_id_for_user, get_group_name,
 )

@@ -22,7 +22,7 @@ def reverse_noop(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('django_comment_common', '0002_forumsconfig'),
+        ('discussion_common', '0002_forumsconfig'),
     ]
 
     operations = [

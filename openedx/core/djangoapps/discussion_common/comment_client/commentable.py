@@ -1,5 +1,6 @@
+# pylint: disable=missing-docstring
 """Provides base Commentable model class"""
-from django_comment_common.comment_client import models, settings
+from openedx.core.djangoapps.discussion_common.comment_client import models, settings
 
 
 class Commentable(models.Model):

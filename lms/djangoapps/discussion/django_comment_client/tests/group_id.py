@@ -4,9 +4,9 @@ import re
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from django_comment_common.models import CourseDiscussionSettings
-from django_comment_common.utils import set_course_discussion_settings
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
+from openedx.core.djangoapps.discussion_common.models import CourseDiscussionSettings
+from openedx.core.djangoapps.discussion_common.utils import set_course_discussion_settings
 
 
 class GroupIdAssertionMixin(object):

@@ -11,8 +11,6 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 
 from celery_utils.logged_task import LoggedTask
-import django_comment_common.comment_client as cc
-from django_comment_common.models import DiscussionsIdMapping
 from edx_ace import ace
 from edx_ace.utils import date
 from edx_ace.recipient import Recipient
@@ -22,9 +20,11 @@ from lms.djangoapps.discussion.django_comment_client.utils import (
 )
 from opaque_keys.edx.keys import CourseKey
 
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.ace_common.message import BaseMessageType
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+import openedx.core.djangoapps.discussion_common.comment_client as cc
+from openedx.core.djangoapps.discussion_common.models import DiscussionsIdMapping
 from openedx.core.lib.celery.task_utils import emulate_http_request
 from track import segment
 

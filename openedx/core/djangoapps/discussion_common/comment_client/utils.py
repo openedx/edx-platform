@@ -1,7 +1,6 @@
+# pylint: disable=missing-docstring,unused-argument,broad-except
 """" Common utilities for comment client wrapper """
 import logging
-from contextlib import contextmanager
-from time import time
 from uuid import uuid4
 
 import requests
@@ -32,7 +31,7 @@ def extract(dic, keys):
 def perform_request(method, url, data_or_params=None, raw=False,
                     metric_action=None, metric_tags=None, paged_results=False):
     # To avoid dependency conflict
-    from django_comment_common.models import ForumsConfig
+    from openedx.core.djangoapps.discussion_common.models import ForumsConfig
     config = ForumsConfig.current()
 
     if not config.enabled:
@@ -135,7 +134,7 @@ def check_forum_heartbeat():
     This function can be connected to the LMS heartbeat checker through the HEARTBEAT_CHECKS variable.
     """
     # To avoid dependency conflict
-    from django_comment_common.models import ForumsConfig
+    from openedx.core.djangoapps.discussion_common.models import ForumsConfig
     config = ForumsConfig.current()
 
     if not config.enabled:

@@ -15,7 +15,7 @@ from django_countries.fields import CountryField
 from model_utils import FieldTracker
 from opaque_keys.edx.django.models import CourseKeyField
 
-from django_comment_common.signals import (
+from openedx.core.djangoapps.discussion_common.signals import (
     comment_created,
     comment_deleted,
     comment_edited,

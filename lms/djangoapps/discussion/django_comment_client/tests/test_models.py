@@ -4,7 +4,7 @@ Tests for the django comment client integration models
 from django.test.testcases import TestCase
 from opaque_keys.edx.keys import CourseKey
 
-import django_comment_common.models as models
+import openedx.core.djangoapps.discussion_common.models as models
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ToyCourseFactory
 

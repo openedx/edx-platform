@@ -14,21 +14,6 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseKey
 from rest_framework.exceptions import PermissionDenied
 
-from django_comment_common.comment_client.comment import Comment
-from django_comment_common.comment_client.thread import Thread
-from django_comment_common.comment_client.utils import CommentClientRequestError
-from django_comment_common.signals import (
-    comment_created,
-    comment_deleted,
-    comment_edited,
-    comment_voted,
-    thread_created,
-    thread_deleted,
-    thread_edited,
-    thread_voted
-)
-from django_comment_common.utils import get_course_discussion_settings
-
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.discussion.rest_api.exceptions import (
     CommentNotFoundError, DiscussionDisabledError, ThreadNotFoundError,
@@ -51,6 +36,20 @@ from lms.djangoapps.discussion.django_comment_client.utils import (
 )
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.discussion.rest_api.pagination import DiscussionAPIPagination
+from openedx.core.djangoapps.discussion_common.comment_client.comment import Comment
+from openedx.core.djangoapps.discussion_common.comment_client.thread import Thread
+from openedx.core.djangoapps.discussion_common.comment_client.utils import CommentClientRequestError
+from openedx.core.djangoapps.discussion_common.signals import (
+    comment_created,
+    comment_deleted,
+    comment_edited,
+    comment_voted,
+    thread_created,
+    thread_deleted,
+    thread_edited,
+    thread_voted
+)
+from openedx.core.djangoapps.discussion_common.utils import get_course_discussion_settings
 from openedx.core.djangoapps.user_api.accounts.views import AccountViewSet
 from openedx.core.lib.exceptions import CourseNotFoundError, DiscussionNotFoundError, PageNotFoundError
 

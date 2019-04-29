@@ -3,7 +3,7 @@ from __future__ import print_function
 
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
-from django_comment_common.models import Role
+from openedx.core.djangoapps.discussion_common.models import Role
 
 
 class Command(BaseCommand):

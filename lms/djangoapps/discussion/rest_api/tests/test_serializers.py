@@ -14,9 +14,9 @@ from lms.djangoapps.discussion.rest_api.tests.utils import (
     CommentsServiceMockMixin, make_minimal_cs_comment, make_minimal_cs_thread,
 )
 from lms.djangoapps.discussion.django_comment_client.tests.utils import ForumsEnableMixin
-from django_comment_common.comment_client.comment import Comment
-from django_comment_common.comment_client.thread import Thread
-from django_comment_common.models import (
+from openedx.core.djangoapps.discussion_common.comment_client.comment import Comment
+from openedx.core.djangoapps.discussion_common.comment_client.thread import Thread
+from openedx.core.djangoapps.discussion_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_COMMUNITY_TA,
     FORUM_ROLE_MODERATOR,

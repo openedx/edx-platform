@@ -42,8 +42,6 @@ from courseware.tests.factories import (
     UserProfileFactory
 )
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from django_comment_common.models import FORUM_ROLE_COMMUNITY_TA
-from django_comment_common.utils import seed_permissions_roles
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.instructor.tests.utils import FakeContentTask, FakeEmail, FakeEmailInfo
@@ -59,6 +57,8 @@ from lms.djangoapps.instructor_task.api_helper import (
     generate_already_running_error_message
 )
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
+from openedx.core.djangoapps.discussion_common.models import FORUM_ROLE_COMMUNITY_TA
+from openedx.core.djangoapps.discussion_common.utils import seed_permissions_roles
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.lib.xblock_utils import grade_histogram

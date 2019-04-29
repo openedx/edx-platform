@@ -21,21 +21,6 @@ from django.views.decorators.http import require_GET, require_POST
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
-import django_comment_common.comment_client as cc
-from django_comment_common.signals import (
-    comment_created,
-    comment_deleted,
-    comment_edited,
-    comment_endorsed,
-    comment_voted,
-    thread_created,
-    thread_deleted,
-    thread_edited,
-    thread_voted,
-    thread_followed,
-    thread_unfollowed,
-)
-from django_comment_common.utils import ThreadContext
 from courseware.access import has_access
 from courseware.courses import get_course_by_id, get_course_overview_with_access, get_course_with_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
@@ -56,6 +41,21 @@ from lms.djangoapps.discussion.django_comment_client.utils import (
     is_comment_too_deep,
     prepare_content
 )
+import openedx.core.djangoapps.discussion_common.comment_client as cc
+from openedx.core.djangoapps.discussion_common.signals import (
+    comment_created,
+    comment_deleted,
+    comment_edited,
+    comment_endorsed,
+    comment_voted,
+    thread_created,
+    thread_deleted,
+    thread_edited,
+    thread_voted,
+    thread_followed,
+    thread_unfollowed,
+)
+from openedx.core.djangoapps.discussion_common.utils import ThreadContext
 import eventtracking
 from util.file import store_uploaded_file
 

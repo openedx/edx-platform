@@ -1,1 +1,1 @@
-# This file is intentionally blank. It has been moved to common/djangoapps/django_comment_common
+# This file is intentionally blank. It has been moved to openedx/core/djangoapps/discussion_common

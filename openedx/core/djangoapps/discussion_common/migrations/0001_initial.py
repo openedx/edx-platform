@@ -37,6 +37,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='permission',
             name='roles',
-            field=models.ManyToManyField(related_name='permissions', to='django_comment_common.Role'),
+            field=models.ManyToManyField(related_name='permissions', to='discussion_common.Role'),
         ),
     ]

@@ -9,7 +9,7 @@ import jsonfield.fields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('django_comment_common', '0005_coursediscussionsettings'),
+        ('discussion_common', '0005_coursediscussionsettings'),
     ]
 
     operations = [

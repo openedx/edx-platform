@@ -35,7 +35,7 @@ from contentstore.views.component import ADVANCED_COMPONENT_TYPES
 from contentstore.config import waffle
 from course_action_state.managers import CourseActionStateItemNotFoundError
 from course_action_state.models import CourseRerunState, CourseRerunUIStateManager
-from django_comment_common.utils import are_permissions_roles_seeded
+from openedx.core.djangoapps.discussion_common.utils import are_permissions_roles_seeded
 from openedx.core.lib.tempdir import mkdtemp_clean
 from student import auth
 from student.models import CourseEnrollment
