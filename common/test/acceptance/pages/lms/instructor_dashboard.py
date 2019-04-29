@@ -3,8 +3,11 @@
 Instructor (2) dashboard page.
 """
 
+from __future__ import absolute_import
+
 import os
 
+import six
 from bok_choy.page_object import PageObject
 from bok_choy.promise import EmptyPromise, Promise
 
@@ -120,7 +123,7 @@ class InstructorDashboardPage(CoursePage):
 
     def is_rescore_unsupported_message_visible(self):
         if (self.q(css='.request-response-error').present):
-            return u'This component cannot be rescored.' in unicode(
+            return u'This component cannot be rescored.' in six.text_type(
                 self.q(css='.request-response-error').html
             )
         return False
@@ -1212,7 +1215,7 @@ class StudentAdminPage(PageObject):
         Returns input box for problem location
         """
         input_box = self.problem_location_input.first.results[0]
-        input_box.send_keys(unicode(problem_location))
+        input_box.send_keys(six.text_type(problem_location))
 
     @property
     def student_email_or_username_input(self):

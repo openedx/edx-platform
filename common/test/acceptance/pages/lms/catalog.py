@@ -1,3 +1,8 @@
+"""
+Course catalog page
+"""
+from __future__ import absolute_import
+
 import re
 
 from bok_choy.page_object import PageObject
