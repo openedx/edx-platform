@@ -14,7 +14,6 @@ from lms.djangoapps.grades.api.serializers import GradingPolicySerializer
 from lms.djangoapps.grades.api.v1.utils import (
     CourseEnrollmentPagination,
     GradeViewMixin,
-    PaginatedAPIView,
     get_course_key,
     verify_course_exists
 )
@@ -22,6 +21,7 @@ from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.grades.models import PersistentCourseGrade
 from opaque_keys import InvalidKeyError
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
+from openedx.core.lib.api.view_utils import PaginatedAPIView
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)

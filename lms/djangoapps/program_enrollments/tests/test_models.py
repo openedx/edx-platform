@@ -21,10 +21,12 @@ class ProgramEnrollmentModelTests(TestCase):
         """
         super(ProgramEnrollmentModelTests, self).setUp()
         self.user = UserFactory.create()
+        self.program_uuid = uuid4()
+        self.other_program_uuid = uuid4()
         self.enrollment = ProgramEnrollment.objects.create(
             user=self.user,
             external_user_key='abc',
-            program_uuid=uuid4(),
+            program_uuid=self.program_uuid,
             curriculum_uuid=uuid4(),
             status='enrolled'
         )

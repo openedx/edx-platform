@@ -20,7 +20,6 @@ from lms.djangoapps.grades.api.v1.utils import (
     USER_MODEL,
     CourseEnrollmentPagination,
     GradeViewMixin,
-    PaginatedAPIView,
     get_course_key,
     verify_course_exists
 )
@@ -43,7 +42,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.djangoapps.util.forms import to_bool
-from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
+from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, PaginatedAPIView, view_auth_classes
 from openedx.core.lib.cache_utils import request_cached
 from student.auth import has_course_author_access
 from student.models import CourseEnrollment
