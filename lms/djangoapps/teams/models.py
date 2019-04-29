@@ -82,7 +82,7 @@ def comment_endorsed_handler(sender, **kwargs):  # pylint: disable=unused-argume
 
 def handle_activity(user, post, original_author_id=None):
     """
-    Handle user activity from django_comment_client and discussion_api
+    Handle user activity from django_comment_client and discussion.rest_api
     and update the user's last activity date. Checks if the user who
     performed the action is the original author, and that the
     discussion has the team context.

@@ -5,7 +5,7 @@ from unittest import TestCase
 
 import ddt
 
-from discussion_api.render import render_body
+from lms.djangoapps.discussion.rest_api.render import render_body
 
 
 def _add_p_tags(raw_body):

@@ -21,8 +21,8 @@ from six import text_type
 from common.test.utils import disable_signal
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from discussion_api import api
-from discussion_api.tests.utils import (
+from lms.djangoapps.discussion.rest_api import api
+from lms.djangoapps.discussion.rest_api.tests.utils import (
     CommentsServiceMockMixin,
     ProfileImageTestMixin,
     make_minimal_cs_comment,
