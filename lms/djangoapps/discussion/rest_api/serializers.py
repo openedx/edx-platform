@@ -10,8 +10,8 @@ from django.urls import reverse
 from rest_framework import serializers
 
 from discussion.views import get_divided_discussions
-from discussion_api.permissions import NON_UPDATABLE_COMMENT_FIELDS, NON_UPDATABLE_THREAD_FIELDS, get_editable_fields
-from discussion_api.render import render_body
+from lms.djangoapps.discussion.rest_api.permissions import NON_UPDATABLE_COMMENT_FIELDS, NON_UPDATABLE_THREAD_FIELDS, get_editable_fields
+from lms.djangoapps.discussion.rest_api.render import render_body
 from django_comment_client.utils import is_comment_too_deep, get_group_id_for_user, get_group_name
 from django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,

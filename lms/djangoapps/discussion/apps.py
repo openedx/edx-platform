@@ -12,7 +12,7 @@ from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType,
 
 class DiscussionConfig(AppConfig):
     """
-    Application Configuration for Grades.
+    Application Configuration for Discussion.
     """
 
     name = u'lms.djangoapps.discussion'

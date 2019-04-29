@@ -5,7 +5,7 @@ import itertools
 
 import ddt
 
-from discussion_api.permissions import (
+from lms.djangoapps.discussion.rest_api.permissions import (
     can_delete,
     get_editable_fields,
     get_initializable_comment_fields,

@@ -15,15 +15,15 @@ from opaque_keys.edx.locator import CourseKey
 from rest_framework.exceptions import PermissionDenied
 
 from courseware.courses import get_course_with_access
-from discussion_api.exceptions import CommentNotFoundError, DiscussionDisabledError, ThreadNotFoundError
-from discussion_api.forms import CommentActionsForm, ThreadActionsForm
-from discussion_api.permissions import (
+from lms.djangoapps.discussion.rest_api.exceptions import CommentNotFoundError, DiscussionDisabledError, ThreadNotFoundError
+from lms.djangoapps.discussion.rest_api.forms import CommentActionsForm, ThreadActionsForm
+from lms.djangoapps.discussion.rest_api.permissions import (
     can_delete,
     get_editable_fields,
     get_initializable_comment_fields,
     get_initializable_thread_fields
 )
-from discussion_api.serializers import CommentSerializer, DiscussionTopicSerializer, ThreadSerializer, get_context
+from lms.djangoapps.discussion.rest_api.serializers import CommentSerializer, DiscussionTopicSerializer, ThreadSerializer, get_context
 from django_comment_client.base.views import track_comment_created_event, track_thread_created_event, track_voted_event
 from django_comment_client.utils import get_accessible_discussion_xblocks, get_group_id_for_user, is_commentable_divided
 from django_comment_common.comment_client.comment import Comment
@@ -41,7 +41,7 @@ from django_comment_common.signals import (
 )
 from django_comment_common.utils import get_course_discussion_settings
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
-from lms.djangoapps.discussion_api.pagination import DiscussionAPIPagination
+from lms.djangoapps.discussion.rest_api.pagination import DiscussionAPIPagination
 from openedx.core.djangoapps.user_api.accounts.views import AccountViewSet
 from openedx.core.lib.exceptions import CourseNotFoundError, DiscussionNotFoundError, PageNotFoundError
 
@@ -175,7 +175,7 @@ def get_course(request, course_key):
 
     Returns:
 
-        The course information; see discussion_api.views.CourseView for more
+        The course information; see discussion.rest_api.views.CourseView for more
         detail.
 
     Raises:
@@ -305,7 +305,7 @@ def get_course_topics(request, course_key, topic_ids=None):
 
     Returns:
 
-        A course topic listing dictionary; see discussion_api.views.CourseTopicViews
+        A course topic listing dictionary; see discussion.rest_api.views.CourseTopicViews
         for more detail.
 
     Raises:
@@ -510,7 +510,7 @@ def get_thread_list(
     Returns:
 
     A paginated result containing a list of threads; see
-    discussion_api.views.ThreadViewSet for more detail.
+    discussion.rest_api.views.ThreadViewSet for more detail.
 
     Raises:
 
@@ -612,7 +612,7 @@ def get_comment_list(request, thread_id, endorsed, page, page_size, requested_fi
     Returns:
 
         A paginated result containing a list of comments; see
-        discussion_api.views.CommentViewSet for more detail.
+        discussion.rest_api.views.CommentViewSet for more detail.
     """
     response_skip = page_size * (page - 1)
     cc_thread, context = _get_thread_and_context(
@@ -809,7 +809,7 @@ def create_thread(request, thread_data):
 
     Returns:
 
-        The created thread; see discussion_api.views.ThreadViewSet for more
+        The created thread; see discussion.rest_api.views.ThreadViewSet for more
         detail.
     """
     course_id = thread_data.get("course_id")
@@ -859,7 +859,7 @@ def create_comment(request, comment_data):
 
     Returns:
 
-        The created comment; see discussion_api.views.CommentViewSet for more
+        The created comment; see discussion.rest_api.views.CommentViewSet for more
         detail.
     """
     thread_id = comment_data.get("thread_id")
@@ -902,7 +902,7 @@ def update_thread(request, thread_id, update_data):
 
     Returns:
 
-        The updated thread; see discussion_api.views.ThreadViewSet for more
+        The updated thread; see discussion.rest_api.views.ThreadViewSet for more
         detail.
     """
     cc_thread, context = _get_thread_and_context(request, thread_id, retrieve_kwargs={"with_responses": True})
@@ -941,7 +941,7 @@ def update_comment(request, comment_id, update_data):
 
     Returns:
 
-        The updated comment; see discussion_api.views.CommentViewSet for more
+        The updated comment; see discussion.rest_api.views.CommentViewSet for more
         detail.
 
     Raises:
