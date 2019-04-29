@@ -21,6 +21,7 @@ from django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
 from django_comment_client.tests.factories import RoleFactory
 from django_comment_client.tests.unicode import UnicodeTestMixin
 from django_comment_client.tests.utils import config_course_discussions, topic_name_to_id
+from django_comment_common.comment_client.utils import CommentClientMaintenanceError, perform_request
 from django_comment_common.models import (
     CourseDiscussionSettings,
     ForumsConfig,
@@ -33,7 +34,6 @@ from django_comment_common.utils import (
     set_course_discussion_settings
 )
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
-from lms.lib.comment_client.utils import CommentClientMaintenanceError, perform_request
 from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory, config_course_cohorts

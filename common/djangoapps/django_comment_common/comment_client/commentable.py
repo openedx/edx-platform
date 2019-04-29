@@ -1,5 +1,5 @@
 """Provides base Commentable model class"""
-from lms.lib.comment_client import models, settings
+from django_comment_common.comment_client import models, settings
 
 
 class Commentable(models.Model):

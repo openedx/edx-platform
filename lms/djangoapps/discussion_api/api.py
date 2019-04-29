@@ -26,6 +26,9 @@ from discussion_api.permissions import (
 from discussion_api.serializers import CommentSerializer, DiscussionTopicSerializer, ThreadSerializer, get_context
 from django_comment_client.base.views import track_comment_created_event, track_thread_created_event, track_voted_event
 from django_comment_client.utils import get_accessible_discussion_xblocks, get_group_id_for_user, is_commentable_divided
+from django_comment_common.comment_client.comment import Comment
+from django_comment_common.comment_client.thread import Thread
+from django_comment_common.comment_client.utils import CommentClientRequestError
 from django_comment_common.signals import (
     comment_created,
     comment_deleted,
@@ -39,9 +42,6 @@ from django_comment_common.signals import (
 from django_comment_common.utils import get_course_discussion_settings
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.discussion_api.pagination import DiscussionAPIPagination
-from lms.lib.comment_client.comment import Comment
-from lms.lib.comment_client.thread import Thread
-from lms.lib.comment_client.utils import CommentClientRequestError
 from openedx.core.djangoapps.user_api.accounts.views import AccountViewSet
 from openedx.core.lib.exceptions import CourseNotFoundError, DiscussionNotFoundError, PageNotFoundError
 

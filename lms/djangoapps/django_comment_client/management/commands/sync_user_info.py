@@ -3,7 +3,7 @@ One-off script to sync all user information to the
 discussion service (later info will be synced automatically)
 """
 
-import lms.lib.comment_client as cc
+import django_comment_common.comment_client as cc
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
 

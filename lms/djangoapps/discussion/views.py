@@ -24,8 +24,8 @@ from rest_framework import status
 from web_fragments.fragment import Fragment
 
 import django_comment_client.utils as utils
+import django_comment_common.comment_client as cc
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
-import lms.lib.comment_client as cc
 from courseware.access import has_access
 from courseware.courses import get_course_with_access
 from courseware.views.views import CourseTabView
