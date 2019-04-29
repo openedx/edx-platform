@@ -87,8 +87,7 @@ def _get_fragment_from_block(block, user_id, course, request_factory, mock_get_c
         user_id=user_id,
         course_id=unicode(course.id),
         usage_key_string=unicode(course.scope_ids.usage_id),
-        course=course,
-        will_recheck_access=True,
+        course=course
     )
     runtime = vertical_xblock.runtime
 
