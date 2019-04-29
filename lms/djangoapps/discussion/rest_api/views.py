@@ -24,7 +24,7 @@ from django_comment_common.utils import get_course_discussion_settings, set_cour
 
 from instructor.access import update_forum_role
 from discussion.views import get_divided_discussions
-from discussion_api.api import (
+from lms.djangoapps.discussion.rest_api.api import (
     create_comment,
     create_thread,
     delete_comment,
@@ -38,13 +38,13 @@ from discussion_api.api import (
     update_comment,
     update_thread
 )
-from discussion_api.forms import (
+from lms.djangoapps.discussion.rest_api.forms import (
     CommentGetForm,
     CommentListGetForm,
     CourseDiscussionSettingsForm,
     ThreadListGetForm,
     CourseDiscussionRolesForm)
-from discussion_api.serializers import (
+from lms.djangoapps.discussion.rest_api.serializers import (
     DiscussionRolesSerializer,
     DiscussionRolesListSerializer,
     DiscussionSettingsSerializer,

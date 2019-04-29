@@ -17,8 +17,8 @@ from rest_framework.exceptions import PermissionDenied
 
 from common.test.utils import MockSignalHandlerMixin, disable_signal
 from courseware.tests.factories import BetaTesterFactory, StaffFactory
-from discussion_api import api
-from discussion_api.api import (
+from lms.djangoapps.discussion.rest_api import api
+from lms.djangoapps.discussion.rest_api.api import (
     create_comment,
     create_thread,
     delete_comment,
@@ -31,8 +31,8 @@ from discussion_api.api import (
     update_comment,
     update_thread
 )
-from discussion_api.exceptions import CommentNotFoundError, DiscussionDisabledError, ThreadNotFoundError
-from discussion_api.tests.utils import (
+from lms.djangoapps.discussion.rest_api.exceptions import CommentNotFoundError, DiscussionDisabledError, ThreadNotFoundError
+from lms.djangoapps.discussion.rest_api.tests.utils import (
     CommentsServiceMockMixin,
     make_minimal_cs_comment,
     make_minimal_cs_thread,
