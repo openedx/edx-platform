@@ -17,7 +17,7 @@ from django.test.utils import override_settings
 from django.contrib.auth.hashers import make_password
 
 from django_comment_common.models import ForumsConfig
-from notification_prefs import NOTIFICATION_PREF_KEY
+from lms.djangoapps.discussion.notification_prefs import NOTIFICATION_PREF_KEY
 from openedx.core.djangoapps.user_authn.views.register import (
     REGISTRATION_AFFILIATE_ID, REGISTRATION_UTM_CREATED_AT, REGISTRATION_UTM_PARAMETERS,
     _skip_activation_email,

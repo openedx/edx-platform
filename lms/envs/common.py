@@ -2139,11 +2139,6 @@ INSTALLED_APPS = [
     # Shopping cart
     'shoppingcart',
 
-    # Notification preferences setting
-    'notification_prefs',
-
-    'notifier_api',
-
     # Different Course Modes
     'course_modes.apps.CourseModesConfig',
 
