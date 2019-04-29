@@ -2125,7 +2125,7 @@ INSTALLED_APPS = [
     # Discussion forums
     'django_comment_client',
     'django_comment_common',
-    'discussion_api',
+    'discussion',
 
     # Notes
     'notes',

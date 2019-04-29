@@ -5,8 +5,8 @@ from unittest import TestCase
 
 from django.test import RequestFactory
 
-from discussion_api.pagination import DiscussionAPIPagination
-from discussion_api.tests.utils import make_paginated_api_response
+from lms.djangoapps.discussion.rest_api.pagination import DiscussionAPIPagination
+from lms.djangoapps.discussion.rest_api.tests.utils import make_paginated_api_response
 
 
 class PaginationSerializerTest(TestCase):

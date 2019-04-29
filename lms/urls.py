@@ -707,7 +707,7 @@ if settings.FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
     urlpatterns += [
         url(
             r'^api/discussion/',
-            include('discussion_api.urls')
+            include('discussion.rest_api.urls')
         ),
         url(
             r'^courses/{}/discussion/'.format(
