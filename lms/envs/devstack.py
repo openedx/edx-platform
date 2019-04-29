@@ -36,7 +36,7 @@ import logging
 LOG_OVERRIDES = [
     ('track.contexts', logging.CRITICAL),
     ('track.middleware', logging.CRITICAL),
-    ('django_comment_client.utils', logging.CRITICAL),
+    ('lms.djangoapps.discussion.django_comment_client.utils', logging.CRITICAL),
 ]
 for log_name, log_level in LOG_OVERRIDES:
     logging.getLogger(log_name).setLevel(log_level)
@@ -60,7 +60,7 @@ DJFS = {
 
 INSTALLED_APPS += ['debug_toolbar', 'debug_toolbar_mongo']
 MIDDLEWARE_CLASSES += [
-    'django_comment_client.utils.QueryCountDebugMiddleware',
+    'lms.djangoapps.discussion.django_comment_client.utils.QueryCountDebugMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 

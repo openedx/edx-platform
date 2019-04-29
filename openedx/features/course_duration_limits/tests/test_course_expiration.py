@@ -11,7 +11,7 @@ import ddt
 import mock
 
 from course_modes.models import CourseMode
-from django_comment_client.tests.factories import RoleFactory
+from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
 from django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_MODERATOR,

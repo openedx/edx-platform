@@ -48,7 +48,7 @@ from bulk_email.models import BulkEmailFlag, CourseEmail
 from courseware.access import has_access
 from courseware.courses import get_course_by_id, get_course_with_access
 from courseware.models import StudentModule
-from django_comment_client.utils import (
+from lms.djangoapps.discussion.django_comment_client.utils import (
     get_course_discussion_settings,
     get_group_id_for_user,
     get_group_name,

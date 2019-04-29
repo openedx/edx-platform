@@ -23,16 +23,16 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from web_fragments.fragment import Fragment
 
-import django_comment_client.utils as utils
+import lms.djangoapps.discussion.django_comment_client.utils as utils
 import django_comment_common.comment_client as cc
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from courseware.access import has_access
 from courseware.courses import get_course_with_access
 from courseware.views.views import CourseTabView
-from django_comment_client.base.views import track_thread_viewed_event
-from django_comment_client.constants import TYPE_ENTRY
-from django_comment_client.permissions import get_team, has_permission
-from django_comment_client.utils import (
+from lms.djangoapps.discussion.django_comment_client.base.views import track_thread_viewed_event
+from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY
+from lms.djangoapps.discussion.django_comment_client.permissions import get_team, has_permission
+from lms.djangoapps.discussion.django_comment_client.utils import (
     add_courseware_context,
     available_division_schemes,
     course_discussion_division_enabled,

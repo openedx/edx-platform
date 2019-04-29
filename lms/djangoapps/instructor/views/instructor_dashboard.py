@@ -30,7 +30,7 @@ from class_dashboard.dashboard_data import get_array_section_has_problem, get_se
 from course_modes.models import CourseMode, CourseModesArchive
 from courseware.access import has_access
 from courseware.courses import get_course_by_id, get_studio_url
-from django_comment_client.utils import available_division_schemes, has_forum_access
+from lms.djangoapps.discussion.django_comment_client.utils import available_division_schemes, has_forum_access
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, CourseDiscussionSettings
 from edxmako.shortcuts import render_to_response
 from edx_when.api import is_enabled_for_course

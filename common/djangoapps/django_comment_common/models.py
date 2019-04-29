@@ -78,7 +78,7 @@ class Role(models.Model):
     course_id = CourseKeyField(max_length=255, blank=True, db_index=True)
 
     class Meta(object):
-        # use existing table that was originally created from django_comment_client app
+        # use existing table that was originally created from lms.djangoapps.discussion.django_comment_client app
         db_table = 'django_comment_client_role'
 
     def __unicode__(self):
@@ -134,7 +134,7 @@ class Permission(models.Model):
     roles = models.ManyToManyField(Role, related_name="permissions")
 
     class Meta(object):
-        # use existing table that was originally created from django_comment_client app
+        # use existing table that was originally created from lms.djangoapps.discussion.django_comment_client app
         db_table = 'django_comment_client_permission'
 
     def __unicode__(self):

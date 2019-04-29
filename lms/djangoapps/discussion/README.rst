@@ -10,7 +10,6 @@ Discussions related functionality is scattered across a number of places and sho
 
 * ``common/djangoapps/django_comment_common``
 * ``lms/djangoapps/discussion``
-* ``lms/djangoapps/django_comment_client``
 * ``lms/djangoapps/notification_prefs``
 * ``lms/djangoapps/notifier_api``
 * ``openedx/core/lib/xblock_builtin/xblock_discussion``

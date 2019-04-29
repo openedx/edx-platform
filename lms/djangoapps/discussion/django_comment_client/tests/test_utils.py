@@ -12,15 +12,15 @@ from mock import Mock, patch
 from pytz import UTC
 from six import text_type
 
-import django_comment_client.utils as utils
+import lms.djangoapps.discussion.django_comment_client.utils as utils
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.tabs import get_course_tab_list
 from courseware.tests.factories import InstructorFactory
-from django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
-from django_comment_client.tests.factories import RoleFactory
-from django_comment_client.tests.unicode import UnicodeTestMixin
-from django_comment_client.tests.utils import config_course_discussions, topic_name_to_id
+from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
+from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
+from lms.djangoapps.discussion.django_comment_client.tests.unicode import UnicodeTestMixin
+from lms.djangoapps.discussion.django_comment_client.tests.utils import config_course_discussions, topic_name_to_id
 from django_comment_common.comment_client.utils import CommentClientMaintenanceError, perform_request
 from django_comment_common.models import (
     CourseDiscussionSettings,
@@ -1592,7 +1592,9 @@ class PermissionsTestCase(ModuleStoreTestCase):
         user = mock.Mock()
         user.id = 1
 
-        with mock.patch('django_comment_client.utils.check_permissions_by_view') as check_perm:
+        with mock.patch(
+            'lms.djangoapps.discussion.django_comment_client.utils.check_permissions_by_view'
+        ) as check_perm:
             check_perm.return_value = True
             self.assertEqual(utils.get_ability(None, content, user), {
                 'editable': True,
@@ -1620,7 +1622,9 @@ class PermissionsTestCase(ModuleStoreTestCase):
         """
         content = {'user_id': '1', 'type': 'thread'}
 
-        with mock.patch('django_comment_client.utils.check_permissions_by_view') as check_perm:
+        with mock.patch(
+            'lms.djangoapps.discussion.django_comment_client.utils.check_permissions_by_view'
+        ) as check_perm:
             # check_permissions_by_view returns false because user is not enrolled in the course.
             check_perm.return_value = False
             global_staff = UserFactory(username='global_staff', email='global_staff@edx.org', is_staff=True)
@@ -1721,7 +1725,10 @@ class GroupModeratorPermissionsTestCase(ModuleStoreTestCase):
         # Give group moderator permissions to group_moderator
         assign_role(self.course.id, self.group_moderator, 'Group Moderator')
 
-    @mock.patch('django_comment_client.permissions._check_condition', side_effect=_check_condition)
+    @mock.patch(
+        'lms.djangoapps.discussion.django_comment_client.permissions._check_condition',
+        side_effect=_check_condition,
+    )
     def test_not_divided(self, check_condition_function):
         """
         Group moderator should not have moderator permissions if the discussions are not divided.
@@ -1754,7 +1761,10 @@ class GroupModeratorPermissionsTestCase(ModuleStoreTestCase):
             'can_report': True
         })
 
-    @mock.patch('django_comment_client.permissions._check_condition', side_effect=_check_condition)
+    @mock.patch(
+        'lms.djangoapps.discussion.django_comment_client.permissions._check_condition',
+        side_effect=_check_condition,
+    )
     def test_divided_within_group(self, check_condition_function):
         """
         Group moderator should have moderator permissions within their group if the discussions are divided.
@@ -1783,7 +1793,10 @@ class GroupModeratorPermissionsTestCase(ModuleStoreTestCase):
             'can_report': True
         })
 
-    @mock.patch('django_comment_client.permissions._check_condition', side_effect=_check_condition)
+    @mock.patch(
+        'lms.djangoapps.discussion.django_comment_client.permissions._check_condition',
+        side_effect=_check_condition,
+    )
     def test_divided_outside_group(self, check_condition_function):
         """
         Group moderator should not have moderator permissions outside of their group.

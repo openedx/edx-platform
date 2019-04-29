@@ -5,7 +5,7 @@ import urllib2
 
 import pytest
 
-from django_comment_client.tests.mock_cs_server.mock_cs_server import MockCommentServiceServer
+from lms.djangoapps.discussion.django_comment_client.tests.mock_cs_server.mock_cs_server import MockCommentServiceServer
 
 
 class MockCommentServiceServerTest(unittest.TestCase):

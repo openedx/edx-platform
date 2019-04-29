@@ -23,7 +23,7 @@ from courseware.tabs import get_course_tab_list
 from courseware.tests.factories import StudentModuleFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.testutils import FieldOverrideTestMixin
-from django_comment_client.utils import has_forum_access
+from lms.djangoapps.discussion.django_comment_client.utils import has_forum_access
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from django_comment_common.utils import are_permissions_roles_seeded
 from edx_django_utils.cache import RequestCache

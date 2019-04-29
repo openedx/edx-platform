@@ -3,7 +3,7 @@ import logging
 
 from six import text_type
 
-from django_comment_client.utils import JsonError
+from lms.djangoapps.discussion.django_comment_client.utils import JsonError
 from django_comment_common.comment_client import CommentClientRequestError
 
 log = logging.getLogger(__name__)

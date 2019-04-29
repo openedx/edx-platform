@@ -14,21 +14,21 @@ from six import text_type
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
-from django_comment_client.permissions import get_team
-from django_comment_client.tests.group_id import (
+from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
+from lms.djangoapps.discussion.django_comment_client.permissions import get_team
+from lms.djangoapps.discussion.django_comment_client.tests.group_id import (
     CohortedTopicGroupIdTestMixin,
     GroupIdAssertionMixin,
     NonCohortedTopicGroupIdTestMixin
 )
-from django_comment_client.tests.unicode import UnicodeTestMixin
-from django_comment_client.tests.utils import (
+from lms.djangoapps.discussion.django_comment_client.tests.unicode import UnicodeTestMixin
+from lms.djangoapps.discussion.django_comment_client.tests.utils import (
     CohortedTestCase,
     ForumsEnableMixin,
     config_course_discussions,
     topic_name_to_id
 )
-from django_comment_client.utils import strip_none
+from lms.djangoapps.discussion.django_comment_client.utils import strip_none
 from django_comment_common.comment_client.utils import CommentClientPaginatedResult
 from django_comment_common.models import (
     CourseDiscussionSettings,

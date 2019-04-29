@@ -3,7 +3,7 @@ Base urls for the django_comment_client.
 """
 from django.conf.urls import url
 
-from django_comment_client.base import views
+from lms.djangoapps.discussion.django_comment_client.base import views
 
 urlpatterns = [
     url(r'^upload$', views.upload, name='upload'),

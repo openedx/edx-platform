@@ -24,8 +24,8 @@ from lms.djangoapps.discussion.rest_api.permissions import (
     get_initializable_thread_fields
 )
 from lms.djangoapps.discussion.rest_api.serializers import CommentSerializer, DiscussionTopicSerializer, ThreadSerializer, get_context
-from django_comment_client.base.views import track_comment_created_event, track_thread_created_event, track_voted_event
-from django_comment_client.utils import get_accessible_discussion_xblocks, get_group_id_for_user, is_commentable_divided
+from lms.djangoapps.discussion.django_comment_client.base.views import track_comment_created_event, track_thread_created_event, track_voted_event
+from lms.djangoapps.discussion.django_comment_client.utils import get_accessible_discussion_xblocks, get_group_id_for_user, is_commentable_divided
 from django_comment_common.comment_client.comment import Comment
 from django_comment_common.comment_client.thread import Thread
 from django_comment_common.comment_client.utils import CommentClientRequestError
