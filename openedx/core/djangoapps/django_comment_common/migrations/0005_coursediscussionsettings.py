@@ -21,5 +21,8 @@ class Migration(migrations.Migration):
                 ('_divided_discussions', models.TextField(null=True, db_column=b'divided_discussions', blank=True)),
                 ('division_scheme', models.CharField(default=b'none', max_length=20, choices=[(b'none', b'None'), (b'cohort', b'Cohort'), (b'enrollment_track', b'Enrollment Track')])),
             ],
+            options={
+                'db_table': 'django_comment_common_coursediscussionsettings',
+            },
         ),
     ]

@@ -12,6 +12,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RunSQL(
-            'CREATE INDEX dcc_role_users_user_role_idx ON django_comment_client_role_users(user_id, role_id);'
+            'CREATE INDEX dcc_role_users_user_role_idx ON django_comment_client_role_users(user_id, role_id);',
+            reverse_sql=migrations.RunSQL.noop,
         ),
     ]

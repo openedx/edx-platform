@@ -25,9 +25,6 @@ from opaque_keys.edx.keys import CourseKey
 
 from courseware.access import has_access
 from courseware.courses import get_course_by_id
-from lms.djangoapps.courseware.field_overrides import disable_overrides
-from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, assign_role
-from django_comment_common.utils import seed_permissions_roles
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import (
@@ -48,9 +45,12 @@ from lms.djangoapps.ccx.utils import (
     get_enrollment_action_and_identifiers,
     parse_date,
 )
+from lms.djangoapps.courseware.field_overrides import disable_overrides
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.instructor.enrollment import enroll_email, get_email_params
 from lms.djangoapps.instructor.views.gradebook_api import get_grade_book_page
+from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, assign_role
+from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from student.models import CourseEnrollment
 from student.roles import CourseCcxCoachRole
 from xmodule.modulestore.django import SignalHandler

@@ -8,9 +8,9 @@ from courseware.courses import get_course_by_id
 from django.db import migrations
 from django.http import Http404
 
-from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, \
+from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, \
     FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_STUDENT
-from django_comment_common.utils import STUDENT_ROLE_PERMISSIONS,  MODERATOR_ROLE_PERMISSIONS, \
+from openedx.core.djangoapps.django_comment_common.utils import STUDENT_ROLE_PERMISSIONS,  MODERATOR_ROLE_PERMISSIONS, \
     ADMINISTRATOR_ROLE_PERMISSIONS
 
 log = logging.getLogger("edx.ccx")

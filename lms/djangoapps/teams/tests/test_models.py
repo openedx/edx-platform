@@ -9,7 +9,7 @@ import pytz
 from mock import Mock
 from opaque_keys.edx.keys import CourseKey
 
-from django_comment_common.signals import (
+from openedx.core.djangoapps.django_comment_common.signals import (
     comment_created,
     comment_deleted,
     comment_edited,

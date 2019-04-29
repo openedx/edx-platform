@@ -1,9 +1,10 @@
+# pylint: disable=missing-docstring,protected-access
 """ User model wrapper for comment service"""
 from six import text_type
 
-import settings
-import models
-import utils
+from . import models
+from . import settings
+from . import utils
 
 
 class User(models.Model):
@@ -46,7 +47,7 @@ class User(models.Model):
 
     def follow(self, source):
         params = {'source_type': source.type, 'source_id': source.id}
-        response = utils.perform_request(
+        utils.perform_request(
             'post',
             _url_for_subscription(self.id),
             params,
@@ -56,7 +57,7 @@ class User(models.Model):
 
     def unfollow(self, source):
         params = {'source_type': source.type, 'source_id': source.id}
-        response = utils.perform_request(
+        utils.perform_request(
             'delete',
             _url_for_subscription(self.id),
             params,
@@ -98,7 +99,9 @@ class User(models.Model):
         )
         voteable._update_from_response(response)
 
-    def active_threads(self, query_params={}):
+    def active_threads(self, query_params=None):
+        if query_params is None:
+            query_params = {}
         if not self.course_id:
             raise utils.CommentClientRequestError("Must provide course_id when retrieving active threads for the user")
         url = _url_for_user_active_threads(self.id)
@@ -114,9 +117,13 @@ class User(models.Model):
         )
         return response.get('collection', []), response.get('page', 1), response.get('num_pages', 1)
 
-    def subscribed_threads(self, query_params={}):
+    def subscribed_threads(self, query_params=None):
+        if query_params is None:
+            query_params = {}
         if not self.course_id:
-            raise utils.CommentClientRequestError("Must provide course_id when retrieving subscribed threads for the user")
+            raise utils.CommentClientRequestError(
+                "Must provide course_id when retrieving subscribed threads for the user",
+            )
         url = _url_for_user_subscribed_threads(self.id)
         params = {'course_id': text_type(self.course_id)}
         params.update(query_params)
