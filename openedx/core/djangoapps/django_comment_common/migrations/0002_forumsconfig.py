@@ -26,6 +26,7 @@ class Migration(migrations.Migration):
             options={
                 'ordering': ('-change_date',),
                 'abstract': False,
+                'db_table': 'django_comment_common_forumsconfig',
             },
         ),
     ]

@@ -1,3 +1,4 @@
+# pylint: disable=missing-docstring,unused-argument
 import logging
 
 from .utils import CommentClientRequestError, extract, perform_request
@@ -94,7 +95,7 @@ class Model(object):
         return tags
 
     @classmethod
-    def find(cls, id):
+    def find(cls, id):  # pylint: disable=redefined-builtin
         return cls(id=id)
 
     def _update_from_response(self, response_data):
@@ -160,19 +161,25 @@ class Model(object):
         self._update_from_response(response)
 
     @classmethod
-    def url_with_id(cls, params={}):
+    def url_with_id(cls, params=None):
+        if params is None:
+            params = {}
         return cls.base_url + '/' + str(params['id'])
 
     @classmethod
-    def url_without_id(cls, params={}):
+    def url_without_id(cls, params=None):
         return cls.base_url
 
     @classmethod
-    def url(cls, action, params={}):
+    def url(cls, action, params=None):
+        if params is None:
+            params = {}
         if cls.base_url is None:
             raise CommentClientRequestError("Must provide base_url when using default url function")
         if action not in cls.DEFAULT_ACTIONS:
-            raise ValueError(u"Invalid action {0}. The supported action must be in {1}".format(action, str(cls.DEFAULT_ACTIONS)))
+            raise ValueError(
+                u"Invalid action {0}. The supported action must be in {1}".format(action, str(cls.DEFAULT_ACTIONS))
+            )
         elif action in cls.DEFAULT_ACTIONS_WITH_ID:
             try:
                 return cls.url_with_id(params)

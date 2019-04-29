@@ -1,3 +1,4 @@
+# pylint: disable=missing-docstring,unused-argument,model-missing-unicode
 import json
 import logging
 
@@ -60,7 +61,7 @@ def assign_role(course_id, user, rolename):
     """
     role, created = Role.objects.get_or_create(course_id=course_id, name=rolename)
     if created:
-        logging.info("EDUCATOR-1635: Created role {} for course {}".format(role, course_id))
+        logging.info(u"EDUCATOR-1635: Created role {} for course {}".format(role, course_id))
     user.roles.add(role)
 
 
@@ -82,7 +83,6 @@ class Role(models.Model):
         db_table = 'django_comment_client_role'
 
     def __unicode__(self):
-        # pylint: disable=no-member
         return self.name + " for " + (text_type(self.course_id) if self.course_id else "all courses")
 
     # TODO the name of this method is a little bit confusing,
@@ -94,7 +94,7 @@ class Role(models.Model):
         """
         if role.course_id and role.course_id != self.course_id:
             logging.warning(
-                "%s cannot inherit permissions from %s due to course_id inconsistency",
+                u"%s cannot inherit permissions from %s due to course_id inconsistency",
                 self,
                 role,
             )
@@ -157,7 +157,7 @@ def permission_blacked_out(course, role_names, permission_name):
     )
 
 
-def all_permissions_for_user_in_course(user, course_id):  # pylint: disable=invalid-name
+def all_permissions_for_user_in_course(user, course_id):
     """
     Returns all the permissions the user has in the given course.
     """
@@ -181,7 +181,7 @@ def all_permissions_for_user_in_course(user, course_id):  # pylint: disable=inva
                 permission_names.add(permission.name)
 
     # Prevent a circular import
-    from django_comment_common.utils import GLOBAL_STAFF_ROLE_PERMISSIONS
+    from openedx.core.djangoapps.django_comment_common.utils import GLOBAL_STAFF_ROLE_PERMISSIONS
 
     if GlobalStaff().has_user(user):
         for permission in GLOBAL_STAFF_ROLE_PERMISSIONS:
@@ -201,6 +201,10 @@ class ForumsConfig(ConfigurationModel):
         default=5.0,
         help_text="Seconds to wait when trying to connect to the comment service.",
     )
+
+    class Meta(ConfigurationModel.Meta):
+        # use existing table that was originally created from django_comment_common app
+        db_table = 'django_comment_common_forumsconfig'
 
     @property
     def api_key(self):
@@ -240,6 +244,10 @@ class CourseDiscussionSettings(models.Model):
     ASSIGNMENT_TYPE_CHOICES = ((NONE, 'None'), (COHORT, 'Cohort'), (ENROLLMENT_TRACK, 'Enrollment Track'))
     division_scheme = models.CharField(max_length=20, choices=ASSIGNMENT_TYPE_CHOICES, default=NONE)
 
+    class Meta(object):
+        # use existing table that was originally created from django_comment_common app
+        db_table = 'django_comment_common_coursediscussionsettings'
+
     @property
     def divided_discussions(self):
         """
@@ -265,6 +273,10 @@ class DiscussionsIdMapping(models.Model):
     mapping = JSONField(
         help_text="Key/value store mapping discussion IDs to discussion XBlock usage keys.",
     )
+
+    class Meta(object):
+        # use existing table that was originally created from django_comment_common app
+        db_table = 'django_comment_common_discussionsidmapping'
 
     @classmethod
     def update_mapping(cls, course_key, discussions_id_map):

@@ -10,8 +10,8 @@ from factory import Sequence, post_generation
 from factory.django import DjangoModelFactory
 from opaque_keys.edx.locator import CourseLocator
 
-from django_comment_common.models import CourseDiscussionSettings
-from django_comment_common.utils import set_course_discussion_settings
+from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
+from openedx.core.djangoapps.django_comment_common.utils import set_course_discussion_settings
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 
