@@ -35,7 +35,7 @@ class SAMLProviderConfigSerializer(serializers.ModelSerializer):
         model = SAMLProviderConfig
         fields = (
             'id', 'site', 'enabled', 'name', 'icon_class', 'icon_image', 'secondary', 'skip_registration_form',
-            'visible', 'skip_email_verification', 'idp_slug', 'entity_id', 'metadata_source', 'attr_user_permanent_id',
+            'visible', 'skip_email_verification', 'slug', 'entity_id', 'metadata_source', 'attr_user_permanent_id',
             'attr_full_name', 'attr_first_name', 'attr_last_name', 'attr_username', 'attr_email', 'other_settings',
             'metadata_ready'
         )
