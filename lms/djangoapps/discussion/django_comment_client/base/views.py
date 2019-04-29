@@ -1,3 +1,4 @@
+# pylint: disable=missing-docstring,unused-argument
 """Views for discussion forums."""
 
 from __future__ import print_function
@@ -20,24 +21,7 @@ from django.views.decorators.http import require_GET, require_POST
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
-import lms.djangoapps.discussion.django_comment_client.settings as cc_settings
 import django_comment_common.comment_client as cc
-from courseware.access import has_access
-from courseware.courses import get_course_by_id, get_course_overview_with_access, get_course_with_access
-from lms.djangoapps.discussion.django_comment_client.permissions import check_permissions_by_view, get_team, has_permission
-from lms.djangoapps.discussion.django_comment_client.utils import (
-    JsonError,
-    JsonResponse,
-    add_courseware_context,
-    discussion_category_id_access,
-    get_ability,
-    get_annotated_content_info,
-    get_cached_discussion_id_map,
-    get_group_id_for_comments_service,
-    get_user_group_ids,
-    is_comment_too_deep,
-    prepare_content
-)
 from django_comment_common.signals import (
     comment_created,
     comment_deleted,
@@ -52,8 +36,27 @@ from django_comment_common.signals import (
     thread_unfollowed,
 )
 from django_comment_common.utils import ThreadContext
-import eventtracking
+from courseware.access import has_access
+from courseware.courses import get_course_by_id, get_course_overview_with_access, get_course_with_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
+from lms.djangoapps.discussion.django_comment_client.permissions import (
+    check_permissions_by_view, get_team, has_permission,
+)
+import lms.djangoapps.discussion.django_comment_client.settings as cc_settings
+from lms.djangoapps.discussion.django_comment_client.utils import (
+    JsonError,
+    JsonResponse,
+    add_courseware_context,
+    discussion_category_id_access,
+    get_ability,
+    get_annotated_content_info,
+    get_cached_discussion_id_map,
+    get_group_id_for_comments_service,
+    get_user_group_ids,
+    is_comment_too_deep,
+    prepare_content
+)
+import eventtracking
 from util.file import store_uploaded_file
 
 log = logging.getLogger(__name__)
@@ -96,10 +99,7 @@ def track_created_event(request, event_name, course, obj, data):
     """
     Send analytics event for a newly created thread, response or comment.
     """
-    if len(obj.body) > TRACKING_MAX_FORUM_BODY:
-        data['truncated'] = True
-    else:
-        data['truncated'] = False
+    data['truncated'] = bool(len(obj.body) > TRACKING_MAX_FORUM_BODY)
     data['body'] = obj.body[:TRACKING_MAX_FORUM_BODY]
     track_forum_event(request, event_name, course, obj, data)
 

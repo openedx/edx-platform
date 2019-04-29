@@ -1,3 +1,4 @@
+# pylint: disable=missing-docstring
 """
 Views to support notification preferences.
 """
@@ -90,7 +91,7 @@ class UsernameCipher(object):
 
         try:
             unpadded = unpadder.update(decrypted) + unpadder.finalize()
-            if len(unpadded) == 0:
+            if len(unpadded) == 0:  # pylint: disable=len-as-condition
                 raise UsernameDecryptionException("padding")
             return unpadded
         except ValueError:

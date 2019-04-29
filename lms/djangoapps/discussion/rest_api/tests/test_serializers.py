@@ -10,7 +10,9 @@ import mock
 from django.test.client import RequestFactory
 
 from lms.djangoapps.discussion.rest_api.serializers import CommentSerializer, ThreadSerializer, get_context
-from lms.djangoapps.discussion.rest_api.tests.utils import CommentsServiceMockMixin, make_minimal_cs_comment, make_minimal_cs_thread
+from lms.djangoapps.discussion.rest_api.tests.utils import (
+    CommentsServiceMockMixin, make_minimal_cs_comment, make_minimal_cs_thread,
+)
 from lms.djangoapps.discussion.django_comment_client.tests.utils import ForumsEnableMixin
 from django_comment_common.comment_client.comment import Comment
 from django_comment_common.comment_client.thread import Thread
@@ -737,7 +739,7 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMoc
 
     @ddt.data(None, -1, 0, 2, 5)
     def test_create_parent_id_too_deep(self, max_depth):
-        with mock.patch("django_comment_client.utils.MAX_COMMENT_DEPTH", max_depth):
+        with mock.patch("lms.djangoapps.discussion.django_comment_client.utils.MAX_COMMENT_DEPTH", max_depth):
             data = self.minimal_data.copy()
             context = get_context(self.course, self.request, make_minimal_cs_thread())
             if max_depth is None or max_depth >= 0:

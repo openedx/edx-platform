@@ -1,3 +1,4 @@
+# pylint: disable=missing-docstring,consider-iterating-dictionary
 import json
 
 from django.contrib.auth.models import AnonymousUser

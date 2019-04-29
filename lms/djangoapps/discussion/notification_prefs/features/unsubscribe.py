@@ -1,3 +1,4 @@
+# pylint: disable=missing-docstring,unused-argument,no-member
 from django.contrib.auth.models import User
 from lettuce import step, world
 

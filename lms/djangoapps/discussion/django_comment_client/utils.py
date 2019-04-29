@@ -1,3 +1,4 @@
+# pylint: skip-file
 import json
 import logging
 from collections import defaultdict
@@ -16,7 +17,9 @@ from six import text_type
 from courseware import courses
 from courseware.access import has_access
 from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
-from lms.djangoapps.discussion.django_comment_client.permissions import check_permissions_by_view, get_team, has_permission
+from lms.djangoapps.discussion.django_comment_client.permissions import (
+    check_permissions_by_view, get_team, has_permission,
+)
 from lms.djangoapps.discussion.django_comment_client.settings import MAX_COMMENT_DEPTH
 from django_comment_common.models import (
     FORUM_ROLE_STUDENT,
@@ -271,7 +274,9 @@ def _filter_unstarted_categories(category_map, course):
                         if key != "start_date":
                             filtered_map["entries"][child][key] = unfiltered_map["entries"][child][key]
                 else:
-                    log.debug(u"Filtering out:%s with start_date: %s", child, unfiltered_map["entries"][child]["start_date"])
+                    log.debug(
+                        u"Filtering out:%s with start_date: %s", child, unfiltered_map["entries"][child]["start_date"]
+                    )
             else:
                 if course.self_paced or unfiltered_map["subcategories"][child]["start_date"] < now:
                     filtered_map["children"].append((child, c_type))
@@ -568,7 +573,9 @@ def get_ability(course_id, content, user):
             user_group_id,
             content_user_group_id
         ),
-        'can_reply': check_permissions_by_view(user, course_id, content, "create_comment" if content['type'] == 'thread' else "create_sub_comment"),
+        'can_reply': check_permissions_by_view(
+            user, course_id, content, "create_comment" if content['type'] == 'thread' else "create_sub_comment",
+        ),
         'can_delete': check_permissions_by_view(
             user,
             course_id,

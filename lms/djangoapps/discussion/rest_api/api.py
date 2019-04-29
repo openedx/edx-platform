@@ -3,29 +3,17 @@ Discussion API internal interface
 """
 import itertools
 from collections import defaultdict
+from enum import Enum
 from urllib import urlencode
 from urlparse import urlunparse
 
 from django.core.exceptions import ValidationError
 from django.urls import reverse
 from django.http import Http404
-from enum import Enum
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseKey
 from rest_framework.exceptions import PermissionDenied
 
-from courseware.courses import get_course_with_access
-from lms.djangoapps.discussion.rest_api.exceptions import CommentNotFoundError, DiscussionDisabledError, ThreadNotFoundError
-from lms.djangoapps.discussion.rest_api.forms import CommentActionsForm, ThreadActionsForm
-from lms.djangoapps.discussion.rest_api.permissions import (
-    can_delete,
-    get_editable_fields,
-    get_initializable_comment_fields,
-    get_initializable_thread_fields
-)
-from lms.djangoapps.discussion.rest_api.serializers import CommentSerializer, DiscussionTopicSerializer, ThreadSerializer, get_context
-from lms.djangoapps.discussion.django_comment_client.base.views import track_comment_created_event, track_thread_created_event, track_voted_event
-from lms.djangoapps.discussion.django_comment_client.utils import get_accessible_discussion_xblocks, get_group_id_for_user, is_commentable_divided
 from django_comment_common.comment_client.comment import Comment
 from django_comment_common.comment_client.thread import Thread
 from django_comment_common.comment_client.utils import CommentClientRequestError
@@ -40,6 +28,27 @@ from django_comment_common.signals import (
     thread_voted
 )
 from django_comment_common.utils import get_course_discussion_settings
+
+from lms.djangoapps.courseware.courses import get_course_with_access
+from lms.djangoapps.discussion.rest_api.exceptions import (
+    CommentNotFoundError, DiscussionDisabledError, ThreadNotFoundError,
+)
+from lms.djangoapps.discussion.rest_api.forms import CommentActionsForm, ThreadActionsForm
+from lms.djangoapps.discussion.rest_api.permissions import (
+    can_delete,
+    get_editable_fields,
+    get_initializable_comment_fields,
+    get_initializable_thread_fields
+)
+from lms.djangoapps.discussion.rest_api.serializers import (
+    CommentSerializer, DiscussionTopicSerializer, ThreadSerializer, get_context,
+)
+from lms.djangoapps.discussion.django_comment_client.base.views import (
+    track_comment_created_event, track_thread_created_event, track_voted_event,
+)
+from lms.djangoapps.discussion.django_comment_client.utils import (
+    get_accessible_discussion_xblocks, get_group_id_for_user, is_commentable_divided,
+)
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.discussion.rest_api.pagination import DiscussionAPIPagination
 from openedx.core.djangoapps.user_api.accounts.views import AccountViewSet
@@ -1042,7 +1051,7 @@ def get_response_comments(request, comment_id, page, page_size, requested_fields
 
         response_skip = page_size * (page - 1)
         paged_response_comments = response_comments[response_skip:(response_skip + page_size)]
-        if len(paged_response_comments) == 0 and page != 1:
+        if not paged_response_comments and page != 1:
             raise PageNotFoundError("Page not found (No results on this page).")
 
         results = _serialize_discussion_entities(

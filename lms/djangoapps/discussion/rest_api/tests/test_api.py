@@ -31,7 +31,9 @@ from lms.djangoapps.discussion.rest_api.api import (
     update_comment,
     update_thread
 )
-from lms.djangoapps.discussion.rest_api.exceptions import CommentNotFoundError, DiscussionDisabledError, ThreadNotFoundError
+from lms.djangoapps.discussion.rest_api.exceptions import (
+    CommentNotFoundError, DiscussionDisabledError, ThreadNotFoundError,
+)
 from lms.djangoapps.discussion.rest_api.tests.utils import (
     CommentsServiceMockMixin,
     make_minimal_cs_comment,
@@ -1549,7 +1551,7 @@ class CreateThreadTest(
         })
         self.register_post_thread_response(cs_thread)
         with self.assert_signal_sent(api, 'thread_created', sender=None, user=self.user, exclude_args=('post',)):
-            actual = create_thread(self.request, data)
+            create_thread(self.request, data)
         event_name, event_data = mock_emit.call_args[0]
         self.assertEqual(event_name, "edx.forum.thread.created")
         self.assertEqual(

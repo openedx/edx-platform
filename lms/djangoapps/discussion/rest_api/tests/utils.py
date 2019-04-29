@@ -521,7 +521,7 @@ class ProfileImageTestMixin(object):
                 self.assertTrue(storage.exists(name))
                 with closing(Image.open(storage.path(name))) as img:
                     self.assertEqual(img.size, (size, size))
-                    self.assertEqual(img.format, 'JPEG')
+                    self.assertEqual(img.format, 'JPEG')  # pylint: disable=no-member
             else:
                 self.assertFalse(storage.exists(name))
 

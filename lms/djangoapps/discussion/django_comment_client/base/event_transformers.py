@@ -1,3 +1,4 @@
+# pylint: skip-file
 """
 Transformers for Discussion-related events.
 """

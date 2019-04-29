@@ -17,7 +17,9 @@ from edx_ace import ace
 from edx_ace.utils import date
 from edx_ace.recipient import Recipient
 from eventtracking import tracker
-from lms.djangoapps.django_comment_client.utils import permalink, get_accessible_discussion_xblocks_by_course_id
+from lms.djangoapps.discussion.django_comment_client.utils import (
+    permalink, get_accessible_discussion_xblocks_by_course_id,
+)
 from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
