@@ -2,14 +2,14 @@
 Theme aware pipeline template tags.
 """
 
+from __future__ import absolute_import
+
 from django import template
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
-
-from pipeline.templatetags.pipeline import StylesheetNode, JavascriptNode
-from pipeline.utils import guess_type
-
 from openedx.core.djangoapps.theming.helpers_static import get_static_file_url
+from pipeline.templatetags.pipeline import JavascriptNode, StylesheetNode
+from pipeline.utils import guess_type
 
 register = template.Library()  # pylint: disable=invalid-name
 
