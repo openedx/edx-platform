@@ -166,7 +166,7 @@ from openedx.core.release import doc_version
 
 # Dummy secret key for dev/test
 SECRET_KEY = 'dev key'
-
+FAVICON_PATH = 'images/favicon.ico'
 STUDIO_NAME = _("Your Platform Studio")
 STUDIO_SHORT_NAME = _("Studio")
 FEATURES = {
