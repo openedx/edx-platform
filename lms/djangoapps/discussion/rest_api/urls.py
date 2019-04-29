@@ -1,3 +1,4 @@
+# pylint: skip-file
 """
 Discussion API URLs
 """
@@ -29,7 +30,7 @@ urlpatterns = [
         name="discussion_course_settings",
     ),
     url(
-        r'^v1/courses/{}/roles/(?P<rolename>[A-Za-z0-9+ _-]+)/?$'.format(
+        r"^v1/courses/{}/roles/(?P<rolename>[A-Za-z0-9+ _-]+)/?$".format(
             settings.COURSE_ID_PATTERN
         ),
         CourseDiscussionRolesAPIView.as_view(),

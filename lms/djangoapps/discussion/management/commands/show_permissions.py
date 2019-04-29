@@ -1,3 +1,4 @@
+# pylint: disable=missing-docstring,too-many-format-args
 from __future__ import print_function
 
 from django.contrib.auth.models import User

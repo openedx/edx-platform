@@ -17,13 +17,13 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
 from six import text_type
 
-from lms.djangoapps.discussion.django_comment_client.utils import available_division_schemes
 from django_comment_common import comment_client
 from django_comment_common.models import Role
 from django_comment_common.utils import get_course_discussion_settings, set_course_discussion_settings
 
 from instructor.access import update_forum_role
 from discussion.views import get_divided_discussions
+from lms.djangoapps.discussion.django_comment_client.utils import available_division_schemes
 from lms.djangoapps.discussion.rest_api.api import (
     create_comment,
     create_thread,
@@ -930,7 +930,7 @@ class CourseDiscussionRolesAPIView(DeveloperErrorViewMixin, APIView):
         try:
             update_forum_role(course_id, user, rolename, action)
         except Role.DoesNotExist:
-            raise ValidationError("Role '{}' does not exist".format(rolename))
+            raise ValidationError(u"Role '{}' does not exist".format(rolename))
 
         role = form.cleaned_data['role']
         data = {'course_id': course_id, 'users': role.users.all()}

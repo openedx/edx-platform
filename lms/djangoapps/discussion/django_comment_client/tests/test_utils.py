@@ -1,3 +1,4 @@
+# pylint: skip-file
 # -*- coding: utf-8 -*-
 import datetime
 import json
@@ -12,15 +13,10 @@ from mock import Mock, patch
 from pytz import UTC
 from six import text_type
 
-import lms.djangoapps.discussion.django_comment_client.utils as utils
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.tabs import get_course_tab_list
 from courseware.tests.factories import InstructorFactory
-from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
-from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
-from lms.djangoapps.discussion.django_comment_client.tests.unicode import UnicodeTestMixin
-from lms.djangoapps.discussion.django_comment_client.tests.utils import config_course_discussions, topic_name_to_id
 from django_comment_common.comment_client.utils import CommentClientMaintenanceError, perform_request
 from django_comment_common.models import (
     CourseDiscussionSettings,
@@ -33,6 +29,11 @@ from django_comment_common.utils import (
     seed_permissions_roles,
     set_course_discussion_settings
 )
+from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
+from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
+from lms.djangoapps.discussion.django_comment_client.tests.unicode import UnicodeTestMixin
+from lms.djangoapps.discussion.django_comment_client.tests.utils import config_course_discussions, topic_name_to_id
+import lms.djangoapps.discussion.django_comment_client.utils as utils
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
 from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted

@@ -146,7 +146,7 @@ class CourseDiscussionSettingsForm(Form):
             self.cleaned_data['course_key'] = course_key
             return course_id
         except InvalidKeyError:
-            raise ValidationError("'{}' is not a valid course key".format(text_type(course_id)))
+            raise ValidationError(u"'{}' is not a valid course key".format(text_type(course_id)))
 
 
 class CourseDiscussionRolesForm(CourseDiscussionSettingsForm):
@@ -160,7 +160,7 @@ class CourseDiscussionRolesForm(CourseDiscussionSettingsForm):
     )
     rolename = ChoiceField(
         ROLE_CHOICES,
-        error_messages={"invalid_choice": "Role '%(value)s' does not exist"}
+        error_messages={u"invalid_choice": u"Role '%(value)s' does not exist"}
     )
 
     def clean_rolename(self):
@@ -171,7 +171,7 @@ class CourseDiscussionRolesForm(CourseDiscussionSettingsForm):
             try:
                 role = Role.objects.get(name=rolename, course_id=course_id)
             except Role.DoesNotExist:
-                raise ValidationError("Role '{}' does not exist".format(rolename))
+                raise ValidationError(u"Role '{}' does not exist".format(rolename))
 
             self.cleaned_data['role'] = role
             return rolename

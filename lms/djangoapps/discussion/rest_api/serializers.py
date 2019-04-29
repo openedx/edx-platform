@@ -9,10 +9,6 @@ from django.core.exceptions import ValidationError
 from django.urls import reverse
 from rest_framework import serializers
 
-from discussion.views import get_divided_discussions
-from lms.djangoapps.discussion.rest_api.permissions import NON_UPDATABLE_COMMENT_FIELDS, NON_UPDATABLE_THREAD_FIELDS, get_editable_fields
-from lms.djangoapps.discussion.rest_api.render import render_body
-from lms.djangoapps.discussion.django_comment_client.utils import is_comment_too_deep, get_group_id_for_user, get_group_name
 from django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_COMMUNITY_TA,
@@ -24,7 +20,17 @@ from django_comment_common.comment_client.thread import Thread
 from django_comment_common.comment_client.user import User as CommentClientUser
 from django_comment_common.comment_client.utils import CommentClientRequestError
 from django_comment_common.utils import get_course_discussion_settings
-from lms.djangoapps.django_comment_client.utils import course_discussion_division_enabled, get_group_names_by_id
+from lms.djangoapps.discussion.django_comment_client.utils import (
+    is_comment_too_deep, get_group_id_for_user, get_group_name,
+)
+from lms.djangoapps.discussion.rest_api.permissions import (
+    NON_UPDATABLE_COMMENT_FIELDS, NON_UPDATABLE_THREAD_FIELDS, get_editable_fields,
+)
+from lms.djangoapps.discussion.rest_api.render import render_body
+from lms.djangoapps.discussion.views import get_divided_discussions
+from lms.djangoapps.discussion.django_comment_client.utils import (
+    course_discussion_division_enabled, get_group_names_by_id,
+)
 from student.models import get_user_by_username_or_email
 
 
@@ -75,6 +81,7 @@ def validate_not_blank(value):
 
 
 class _ContentSerializer(serializers.Serializer):
+    # pylint: disable=abstract-method
     """
     A base class for thread and comment serializers.
     """
@@ -368,6 +375,7 @@ class CommentSerializer(_ContentSerializer):
         ]
 
     def to_representation(self, data):
+        # pylint: disable=arguments-differ
         data = super(CommentSerializer, self).to_representation(data)
 
         # Django Rest Framework v3 no longer includes None values
@@ -529,7 +537,7 @@ class DiscussionRolesSerializer(serializers.Serializer):
             self.user = get_user_by_username_or_email(user_id)
             return user_id
         except DjangoUser.DoesNotExist:
-            raise ValidationError("'{}' is not a valid student identifier".format(user_id))
+            raise ValidationError(u"'{}' is not a valid student identifier".format(user_id))
 
     def validate(self, attrs):
         """Validate the data at an object level."""

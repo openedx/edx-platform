@@ -1,3 +1,4 @@
+# pylint: disable=missing-docstring
 import json
 import re
 

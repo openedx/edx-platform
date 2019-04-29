@@ -1,3 +1,6 @@
+"""
+Django views for the Notifier.
+"""
 from django.contrib.auth.models import User
 from rest_framework import pagination
 from rest_framework.response import Response

@@ -1,3 +1,4 @@
+# pylint: disable=missing-docstring
 """
 Module for checking permissions with the comment_client backend
 """

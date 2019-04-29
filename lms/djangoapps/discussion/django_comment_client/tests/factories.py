@@ -1,3 +1,4 @@
+# pylint: disable=missing-docstring
 from factory.django import DjangoModelFactory
 
 from django_comment_common.models import Permission, Role
