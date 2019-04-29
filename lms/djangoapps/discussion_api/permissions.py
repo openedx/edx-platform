@@ -1,8 +1,8 @@
 """
 Discussion API permission logic
 """
-from lms.lib.comment_client.comment import Comment
-from lms.lib.comment_client.thread import Thread
+from django_comment_common.comment_client.comment import Comment
+from django_comment_common.comment_client.thread import Thread
 
 
 def _is_author(cc_content, context):
