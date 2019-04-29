@@ -2,11 +2,15 @@
 Common utilities for the course experience, including course outline.
 """
 from completion.models import BlockCompletion
+from django.utils.translation import ugettext as _
 
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.course_blocks.utils import get_student_module_as_dict
 from opaque_keys.edx.keys import CourseKey
+from openedx.core.djangolib.markup import HTML
 from openedx.core.lib.cache_utils import request_cached
+from openedx.features.course_experience import FIRST_PURCHASE_OFFER_BANNER_DISPLAY
+from web_fragments.fragment import Fragment
 from xmodule.modulestore.django import modulestore
 
 
@@ -182,3 +186,17 @@ def get_resume_block(block):
         if resume_block:
             return resume_block
     return block
+
+
+def get_first_purchase_offer_banner_fragment(user, course):
+    if FIRST_PURCHASE_OFFER_BANNER_DISPLAY.is_enabled() and user and course:
+        # Translator: xgettext:no-python-format
+        offer_message = _(u'{banner_open}15% off your first upgrade.{span_close}'
+                          u' Discount automatically applied.{div_close}')
+        return Fragment(HTML(offer_message).format(
+            banner_open=HTML(
+                '<div class="first-purchase-offer-banner"><span class="first-purchase-offer-banner-bold">'
+            ),
+            span_close=HTML('</span>'),
+            div_close=HTML('</div>')
+        ))
