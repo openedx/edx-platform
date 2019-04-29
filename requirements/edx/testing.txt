@@ -331,5 +331,6 @@ wrapt==1.10.5
 xblock-utils==1.2.1
 xblock==1.2.2
 xmltodict==0.12.0         # via moto
+yet-another-django-profiler==1.1.0
 zendesk==1.1.1
 zope.interface==4.6.0     # via twisted
