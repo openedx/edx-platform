@@ -56,7 +56,7 @@ pipeline {
             steps {
                 script {
                     def parallel_stages = [:]
-                    for (int i = 1; i <= 25; i++) {
+                    for (int i = 1; i <= 1; i++) {
                         int index = i
                         parallel_stages["${index}"] = {
                             node('jenkins-worker') {
