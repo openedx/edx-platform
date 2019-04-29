@@ -9,7 +9,7 @@ import ddt
 from django.contrib.sites.models import Site
 import mock
 
-import lms.lib.comment_client as cc
+import django_comment_common.comment_client as cc
 
 from django_comment_common.models import ForumsConfig
 from django_comment_common.signals import comment_created

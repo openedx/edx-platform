@@ -21,7 +21,7 @@ from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
 import django_comment_client.settings as cc_settings
-import lms.lib.comment_client as cc
+import django_comment_common.comment_client as cc
 from courseware.access import has_access
 from courseware.courses import get_course_by_id, get_course_overview_with_access, get_course_with_access
 from django_comment_client.permissions import check_permissions_by_view, get_team, has_permission

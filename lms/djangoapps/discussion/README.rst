@@ -14,7 +14,6 @@ Discussions related functionality is scattered across a number of places and sho
 * ``lms/djangoapps/django_comment_client``
 * ``lms/djangoapps/notification_prefs``
 * ``lms/djangoapps/notifier_api``
-* ``lms/lib/comment_client``
 * ``openedx/core/lib/xblock_builtin/xblock_discussion``
 
 Ideally, what we want in the long term is for all of this extracted into a new repository that holds the code for both the inline discussion XBlock as well as all the Django apps. Use of the notifier API should be replaced with edx-ace.
