@@ -23,7 +23,6 @@ common/lib/xmodule/xmodule/html_module.py	@edx/platform-core-extensions
 common/lib/xmodule/xmodule/video_module		@edx/platform-core-extensions
 lms/djangoapps/discussion/			@edx/platform-core-extensions
 lms/djangoapps/edxnotes				@edx/platform-core-extensions
-lms/djangoapps/notifier_api/			@edx/platform-core-extensions
 
 # Analytics
 common/djangoapps/track/			@edx/edx-data-engineering
