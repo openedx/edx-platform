@@ -28,7 +28,7 @@ from lms.djangoapps.certificates.models import (
     CertificateStatuses,
     certificate_status_for_student
 )
-from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService
 from lms.djangoapps.verify_student.utils import is_verification_expiring_soon, verification_for_datetime

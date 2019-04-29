@@ -7,7 +7,6 @@ from django.contrib.auth import get_user_model
 import pytz
 from six import text_type
 
-from lms.djangoapps.courseware.courses import get_course
 from lms.djangoapps.grades.course_data import CourseData
 from lms.djangoapps.grades.subsection_grade import CreateSubsectionGrade
 from lms.djangoapps.utils import _get_key
@@ -15,7 +14,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from track.event_transaction_utils import create_new_event_transaction_id, set_event_transaction_type
 
 from .config.waffle import waffle_flags, REJECTED_EXAM_OVERRIDES_GRADE
-from .constants import ScoreDatabaseTableEnum
+from .constants import ScoreDatabaseTableEnum, GradeOverrideFeatureEnum
 from .events import SUBSECTION_OVERRIDE_EVENT_TYPE
 from .models import (
     PersistentSubsectionGrade,
@@ -89,7 +88,7 @@ class GradesService(object):
         override = PersistentSubsectionGradeOverride.update_or_create_override(
             requesting_user=None,
             subsection_grade_model=grade,
-            feature=PersistentSubsectionGradeOverrideHistory.PROCTORING,
+            feature=GradeOverrideFeatureEnum.proctoring,
             earned_all_override=earned_all,
             earned_graded_override=earned_graded,
         )
@@ -130,7 +129,7 @@ class GradesService(object):
         if override is not None:
             _ = PersistentSubsectionGradeOverrideHistory.objects.create(
                 override_id=override.id,
-                feature=PersistentSubsectionGradeOverrideHistory.PROCTORING,
+                feature=GradeOverrideFeatureEnum.proctoring,
                 action=PersistentSubsectionGradeOverrideHistory.DELETE
             )
             override.delete()
@@ -163,6 +162,7 @@ class GradesService(object):
         Given a user_id, course_key, and subsection usage_key,
         creates a new ``PersistentSubsectionGrade``.
         """
+        from lms.djangoapps.courseware.courses import get_course
         course = get_course(course_key, depth=None)
         subsection = course.get_child(usage_key)
         if not subsection:

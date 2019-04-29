@@ -2,7 +2,7 @@
 from django.conf import settings
 from django.conf.urls import url
 
-from lms.djangoapps.grades.api.v1 import gradebook_views, views
+from lms.djangoapps.grades.rest_api.v1 import gradebook_views, views
 
 
 app_name = 'lms.djangoapps.grades'

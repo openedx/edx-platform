@@ -16,6 +16,7 @@ from freezegun import freeze_time
 from mock import patch
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
+from lms.djangoapps.grades.constants import GradeOverrideFeatureEnum
 from lms.djangoapps.grades.models import (
     BLOCK_RECORD_LIST_VERSION,
     BlockRecord,
@@ -309,7 +310,7 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
             subsection_grade_model=grade,
             earned_all_override=0.0,
             earned_graded_override=0.0,
-            feature=PersistentSubsectionGradeOverrideHistory.GRADEBOOK,
+            feature=GradeOverrideFeatureEnum.gradebook,
         )
 
         grade = PersistentSubsectionGrade.update_or_create_grade(**self.params)

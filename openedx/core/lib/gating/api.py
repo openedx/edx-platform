@@ -12,7 +12,7 @@ from django.utils.translation import ugettext as _
 from completion.models import BlockCompletion
 from lms.djangoapps.courseware.access import _has_access_to_course
 from lms.djangoapps.course_blocks.api import get_course_blocks
-from lms.djangoapps.grades.subsection_grade_factory import SubsectionGradeFactory
+from lms.djangoapps.grades.api import SubsectionGradeFactory
 from milestones import api as milestones_api
 from opaque_keys.edx.keys import UsageKey
 from openedx.core.lib.gating.exceptions import GatingValidationError

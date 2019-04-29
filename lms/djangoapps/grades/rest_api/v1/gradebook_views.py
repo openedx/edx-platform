@@ -15,23 +15,31 @@ from six import text_type
 from util.date_utils import to_timestamp
 
 from courseware.courses import get_course_by_id
-from lms.djangoapps.grades.api.serializers import StudentGradebookEntrySerializer, SubsectionGradeResponseSerializer
-from lms.djangoapps.grades.api.v1.utils import (
-    USER_MODEL,
-    CourseEnrollmentPagination,
-    GradeViewMixin,
+from lms.djangoapps.grades.api import (
+    CourseGradeFactory,
+    is_writable_gradebook_enabled,
+    prefetch_course_and_subsection_grades,
+    clear_prefetched_course_and_subsection_grades,
+    constants as grades_constants,
+    context as grades_context,
+    events as grades_events,
 )
-from lms.djangoapps.grades.config.waffle import WRITABLE_GRADEBOOK, waffle_flags
-from lms.djangoapps.grades.constants import ScoreDatabaseTableEnum
-from lms.djangoapps.grades.context import graded_subsections_for_course
 from lms.djangoapps.grades.course_data import CourseData
-from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
-from lms.djangoapps.grades.events import SUBSECTION_GRADE_CALCULATED, subsection_grade_calculated
+# TODO these imports break abstraction of the core Grades layer. This code needs
+# to be refactored so Gradebook views only access public Grades APIs.
 from lms.djangoapps.grades.models import (
-    PersistentCourseGrade,
     PersistentSubsectionGrade,
     PersistentSubsectionGradeOverride,
     PersistentSubsectionGradeOverrideHistory,
+)
+from lms.djangoapps.grades.rest_api.serializers import (
+    StudentGradebookEntrySerializer,
+    SubsectionGradeResponseSerializer,
+)
+from lms.djangoapps.grades.rest_api.v1.utils import (
+    USER_MODEL,
+    CourseEnrollmentPagination,
+    GradeViewMixin,
 )
 from lms.djangoapps.grades.subsection_grade import CreateSubsectionGrade
 from lms.djangoapps.grades.tasks import recalculate_subsection_grade_v3
@@ -70,16 +78,14 @@ def bulk_gradebook_view_context(course_key, users):
     list of users, also, fetch all the score relavant data,
     storing the result in a RequestCache and deleting grades on context exit.
     """
-    PersistentSubsectionGrade.prefetch(course_key, users)
-    PersistentCourseGrade.prefetch(course_key, users)
+    prefetch_course_and_subsection_grades(course_key, users)
     CourseEnrollment.bulk_fetch_enrollment_states(users, course_key)
     cohorts.bulk_cache_cohorts(course_key, users)
     BulkRoleCache.prefetch(users)
     try:
         yield
     finally:
-        PersistentSubsectionGrade.clear_prefetched_data(course_key)
-        PersistentCourseGrade.clear_prefetched_data(course_key)
+        clear_prefetched_course_and_subsection_grades(course_key)
 
 
 def verify_writable_gradebook_enabled(view_func):
@@ -95,7 +101,7 @@ def verify_writable_gradebook_enabled(view_func):
         Wraps the given view function.
         """
         course_key = get_course_key(request, kwargs.get('course_id'))
-        if not waffle_flags()[WRITABLE_GRADEBOOK].is_enabled(course_key):
+        if not is_writable_gradebook_enabled(course_key):
             raise self.api_error(
                 status_code=status.HTTP_403_FORBIDDEN,
                 developer_message='The writable gradebook feature is not enabled for this course.',
@@ -504,7 +510,7 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
         # over users to determine their subsection grades.  We purposely avoid fetching
         # the user-specific course structure for each user, because that is very expensive.
         course_data = CourseData(user=None, course=course)
-        graded_subsections = list(graded_subsections_for_course(course_data.collected_structure))
+        graded_subsections = list(grades_context.graded_subsections_for_course(course_data.collected_structure))
 
         if request.GET.get('username'):
             with self._get_user_or_raise(request, course_key) as grade_user:
@@ -718,11 +724,11 @@ class GradebookBulkUpdateView(GradeViewMixin, PaginatedAPIView):
         override = PersistentSubsectionGradeOverride.update_or_create_override(
             requesting_user=request_user,
             subsection_grade_model=subsection_grade_model,
-            feature=PersistentSubsectionGradeOverrideHistory.GRADEBOOK,
+            feature=grades_constants.GradeOverrideFeatureEnum.gradebook,
             **override_data
         )
 
-        set_event_transaction_type(SUBSECTION_GRADE_CALCULATED)
+        set_event_transaction_type(grades_events.SUBSECTION_GRADE_CALCULATED)
         create_new_event_transaction_id()
 
         recalculate_subsection_grade_v3.apply(
@@ -736,12 +742,12 @@ class GradebookBulkUpdateView(GradeViewMixin, PaginatedAPIView):
                 score_deleted=False,
                 event_transaction_id=unicode(get_event_transaction_id()),
                 event_transaction_type=unicode(get_event_transaction_type()),
-                score_db_table=ScoreDatabaseTableEnum.overrides,
+                score_db_table=grades_constants.ScoreDatabaseTableEnum.overrides,
                 force_update_subsections=True,
             )
         )
         # Emit events to let our tracking system to know we updated subsection grade
-        subsection_grade_calculated(subsection_grade_model)
+        grades_events.subsection_grade_calculated(subsection_grade_model)
         return override
 
     @staticmethod

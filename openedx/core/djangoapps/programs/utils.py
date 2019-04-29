@@ -24,7 +24,7 @@ from lms.djangoapps.certificates import api as certificate_api
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.access import has_access
-from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.grades.api import CourseGradeFactory
 from openedx.core.djangoapps.catalog.utils import get_programs, get_fulfillable_course_runs_for_entitlement
 from openedx.core.djangoapps.certificates.api import available_date_for_certificate
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client

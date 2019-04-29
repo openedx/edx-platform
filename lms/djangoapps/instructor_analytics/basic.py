@@ -16,10 +16,10 @@ from edx_proctoring.api import get_exam_violation_report
 from opaque_keys.edx.keys import UsageKey
 from six import text_type
 
+from courseware.models import StudentModule
 import xmodule.graders as xmgraders
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
-from courseware.models import StudentModule
-from lms.djangoapps.grades.context import grading_context_for_course
+from lms.djangoapps.grades.api import context as grades_context
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangolib.markup import HTML, Text
@@ -525,7 +525,7 @@ def dump_grading_context(course):
     msg += hbar
     msg += u"Listing grading context for course %s\n" % text_type(course.id)
 
-    gcontext = grading_context_for_course(course)
+    gcontext = grades_context.grading_context_for_course(course)
     msg += "graded sections:\n"
 
     msg += '%s\n' % gcontext['all_graded_subsections_by_type'].keys()

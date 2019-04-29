@@ -28,8 +28,7 @@ from capa.tests.response_xml_factory import (
 from course_modes.models import CourseMode
 from courseware.models import BaseStudentModuleHistory, StudentModule
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
-from lms.djangoapps.grades.tasks import compute_all_grades_for_course
+from lms.djangoapps.grades.api import CourseGradeFactory, task_compute_all_grades_for_course
 from openedx.core.djangoapps.credit.api import get_credit_requirement_status, set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
@@ -406,7 +405,7 @@ class TestCourseGrader(TestSubmittingProblems):
             ]
         }
         self.add_grading_policy(grading_policy)
-        compute_all_grades_for_course.apply_async(kwargs={'course_key': unicode(self.course.id)})
+        task_compute_all_grades_for_course.apply_async(kwargs={'course_key': unicode(self.course.id)})
 
     def dropping_setup(self):
         """

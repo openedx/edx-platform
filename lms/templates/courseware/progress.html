@@ -5,7 +5,7 @@
 <%!
 from course_modes.models import CourseMode
 from lms.djangoapps.certificates.models import CertificateStatuses
-from lms.djangoapps.grades.models import PersistentSubsectionGradeOverrideHistory
+from lms.djangoapps.grades.api import constants as grades_constants
 from django.utils.translation import ugettext as _
 from openedx.core.djangolib.markup import HTML, Text
 from django.urls import reverse
@@ -198,7 +198,7 @@ username = get_enterprise_learner_generic_name(request) or student.username
                                         <p class="override-notice">
                                             %if section.override is not None:
                                                 <%last_override_history = section.override.get_history().order_by('created').last()%>
-                                                %if (not last_override_history or last_override_history.feature == PersistentSubsectionGradeOverrideHistory.PROCTORING) and section.format == "Exam" and earned == 0:
+                                                %if (not last_override_history or last_override_history.feature == grades_constants.GradeOverrideFeatureEnum.proctoring) and section.format == "Exam" and earned == 0:
                                                     ${_("Suspicious activity detected during proctored exam review. Exam score 0.")}
                                                 %else:
                                                     ${_("Section grade has been overridden.")}

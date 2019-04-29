@@ -7,7 +7,7 @@ from six import text_type
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware.tests.factories import StudentModuleFactory
-from lms.djangoapps.grades.tasks import compute_all_grades_for_course
+from lms.djangoapps.grades.api import task_compute_all_grades_for_course
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -73,7 +73,7 @@ class TestGradebook(SharedModuleStoreTestCase):
                     course_id=self.course.id,
                     module_state_key=item.location
                 )
-        compute_all_grades_for_course.apply_async(kwargs={'course_key': text_type(self.course.id)})
+        task_compute_all_grades_for_course.apply_async(kwargs={'course_key': text_type(self.course.id)})
 
         self.response = self.client.get(reverse(
             'spoc_gradebook',

@@ -21,9 +21,11 @@ from courseware.user_state_client import DjangoXBlockUserStateClient
 from instructor_analytics.basic import list_problem_responses
 from instructor_analytics.csvs import format_dictlist
 from lms.djangoapps.certificates.models import CertificateWhitelist, GeneratedCertificate, certificate_info_for_user
-from lms.djangoapps.grades.context import grading_context, grading_context_for_course
-from lms.djangoapps.grades.models import PersistentCourseGrade, PersistentSubsectionGrade
-from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.grades.api import (
+    CourseGradeFactory,
+    context as grades_context,
+    prefetch_course_and_subsection_grades,
+)
 from lms.djangoapps.teams.models import CourseTeamMembership
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
@@ -114,7 +116,7 @@ class _CourseGradeReportContext(object):
         Returns an OrderedDict that maps an assignment type to a dict of
         subsection-headers and average-header.
         """
-        grading_cxt = grading_context(self.course, self.course_structure)
+        grading_cxt = grades_context.grading_context(self.course, self.course_structure)
         graded_assignments_map = OrderedDict()
         for assignment_type_name, subsection_infos in grading_cxt['all_graded_subsections_by_type'].iteritems():
             graded_subsections_map = OrderedDict()
@@ -189,8 +191,7 @@ class _CourseGradeBulkContext(object):
         self.enrollments = _EnrollmentBulkContext(context, users)
         bulk_cache_cohorts(context.course_id, users)
         BulkRoleCache.prefetch(users)
-        PersistentCourseGrade.prefetch(context.course_id, users)
-        PersistentSubsectionGrade.prefetch(context.course_id, users)
+        prefetch_course_and_subsection_grades(context.course_id, users)
         BulkCourseTags.prefetch(context.course_id, users)
 
 
@@ -579,7 +580,7 @@ class ProblemGradeReport(object):
         headers in the final report.
         """
         scorable_blocks_map = OrderedDict()
-        grading_context = grading_context_for_course(course)
+        grading_context = grades_context.grading_context_for_course(course)
         for assignment_type_name, subsection_infos in grading_context['all_graded_subsections_by_type'].iteritems():
             for subsection_index, subsection_info in enumerate(subsection_infos, start=1):
                 for scorable_block in subsection_info['scored_descendants']:

@@ -17,16 +17,6 @@ def grading_context_for_course(course):
     return grading_context(course, course_structure)
 
 
-def visible_to_staff_only(subsection):
-    """
-    Returns True if the given subsection is visible to staff only else False
-    """
-    try:
-        return subsection.transformer_data['visibility'].fields['merged_visible_to_staff_only']
-    except KeyError:
-        return False
-
-
 def graded_subsections_for_course(course_structure):
     """
     Given a course block structure, yields the subsections of the course that are graded
@@ -37,7 +27,7 @@ def graded_subsections_for_course(course_structure):
     for chapter_key in course_structure.get_children(course_structure.root_block_usage_key):
         for subsection_key in course_structure.get_children(chapter_key):
             subsection = course_structure[subsection_key]
-            if not visible_to_staff_only(subsection) and subsection.graded:
+            if not _visible_to_staff_only(subsection) and subsection.graded:
                 yield subsection
 
 
@@ -93,3 +83,13 @@ def grading_context(course, course_structure):
         'count_all_graded_blocks': count_all_graded_blocks,
         'subsection_type_graders': CourseGrade.get_subsection_type_graders(course)
     }
+
+
+def _visible_to_staff_only(subsection):
+    """
+    Returns True if the given subsection is visible to staff only else False
+    """
+    try:
+        return subsection.transformer_data['visibility'].fields['merged_visible_to_staff_only']
+    except KeyError:
+        return False

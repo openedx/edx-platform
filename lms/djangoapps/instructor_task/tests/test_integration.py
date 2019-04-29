@@ -20,7 +20,7 @@ from six import text_type
 from capa.responsetypes import StudentInputError
 from capa.tests.response_xml_factory import CodeResponseXMLFactory, CustomResponseXMLFactory
 from courseware.model_data import StudentModule
-from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.instructor_task.api import (
     submit_delete_problem_state_for_all_students,
     submit_rescore_problem_for_all_students,

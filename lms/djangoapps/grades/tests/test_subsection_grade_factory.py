@@ -9,10 +9,10 @@ from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from lms.djangoapps.grades.config.tests.utils import persistent_grades_feature_flags
 from student.tests.factories import UserFactory
 
+from ..constants import GradeOverrideFeatureEnum
 from ..models import (
     PersistentSubsectionGrade,
     PersistentSubsectionGradeOverride,
-    PersistentSubsectionGradeOverrideHistory,
 )
 from ..subsection_grade_factory import ZeroSubsectionGrade
 from .base import GradeTestBase
@@ -143,7 +143,7 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
             earned_graded_override=earned_graded_override,
             earned_all_override=earned_graded_override,
             possible_graded_override=possible_graded_override,
-            feature=PersistentSubsectionGradeOverrideHistory.GRADEBOOK,
+            feature=GradeOverrideFeatureEnum.gradebook,
         )
 
         # Now, even if the problem scores interface gives us a 2/3,
