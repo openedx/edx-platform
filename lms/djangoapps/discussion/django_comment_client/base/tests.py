@@ -18,14 +18,14 @@ from six import text_type
 from common.test.utils import MockSignalHandlerMixin, disable_signal
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from django_comment_client.base import views
-from django_comment_client.tests.group_id import (
+from lms.djangoapps.discussion.django_comment_client.base import views
+from lms.djangoapps.discussion.django_comment_client.tests.group_id import (
     CohortedTopicGroupIdTestMixin,
     GroupIdAssertionMixin,
     NonCohortedTopicGroupIdTestMixin
 )
-from django_comment_client.tests.unicode import UnicodeTestMixin
-from django_comment_client.tests.utils import CohortedTestCase, ForumsEnableMixin
+from lms.djangoapps.discussion.django_comment_client.tests.unicode import UnicodeTestMixin
+from lms.djangoapps.discussion.django_comment_client.tests.utils import CohortedTestCase, ForumsEnableMixin
 from django_comment_common.comment_client import Thread
 from django_comment_common.models import (
     assign_role,
@@ -641,7 +641,10 @@ class ViewsTestCase(
         with self.assert_discussion_signals('thread_edited'):
             self.update_thread_helper(mock_request)
 
-    @patch('django_comment_client.utils.get_discussion_categories_ids', return_value=["test_commentable"])
+    @patch(
+        'lms.djangoapps.discussion.django_comment_client.utils.get_discussion_categories_ids',
+        return_value=["test_commentable"],
+    )
     def test_update_thread_wrong_commentable_id(self, mock_get_discussion_id_map, mock_request):
         self._test_request_error(
             "update_thread",
@@ -1233,7 +1236,10 @@ class UpdateThreadUnicodeTestCase(
         cls.student = UserFactory.create()
         CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
 
-    @patch('django_comment_client.utils.get_discussion_categories_ids', return_value=["test_commentable"])
+    @patch(
+        'lms.djangoapps.discussion.django_comment_client.utils.get_discussion_categories_ids',
+        return_value=["test_commentable"],
+    )
     @patch('django_comment_common.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request, mock_get_discussion_id_map):
         self._set_mock_request_data(mock_request, {

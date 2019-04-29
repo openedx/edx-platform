@@ -1242,7 +1242,7 @@ MIDDLEWARE_CLASSES = [
     'mobile_api.middleware.AppVersionUpgrade',
     'openedx.core.djangoapps.header_control.middleware.HeaderControlMiddleware',
     'microsite_configuration.middleware.MicrositeMiddleware',
-    'django_comment_client.middleware.AjaxExceptionMiddleware',
+    'lms.djangoapps.discussion.django_comment_client.middleware.AjaxExceptionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sites.middleware.CurrentSiteMiddleware',
     'edx_rest_framework_extensions.auth.jwt.middleware.JwtAuthCookieMiddleware',
@@ -1291,7 +1291,7 @@ MIDDLEWARE_CLASSES = [
     # Must be after DarkLangMiddleware.
     'django.middleware.locale.LocaleMiddleware',
 
-    'django_comment_client.utils.ViewNameMiddleware',
+    'lms.djangoapps.discussion.django_comment_client.utils.ViewNameMiddleware',
     'codejail.django_integration.ConfigureCodeJailMiddleware',
 
     # catches any uncaught RateLimitExceptions and returns a 403 instead of a 500
@@ -2123,7 +2123,6 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.util.apps.UtilConfig',
 
     # Discussion forums
-    'django_comment_client',
     'django_comment_common',
 
     # Notes

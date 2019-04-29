@@ -15,9 +15,9 @@ from six import text_type
 
 from courseware import courses
 from courseware.access import has_access
-from django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
-from django_comment_client.permissions import check_permissions_by_view, get_team, has_permission
-from django_comment_client.settings import MAX_COMMENT_DEPTH
+from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
+from lms.djangoapps.discussion.django_comment_client.permissions import check_permissions_by_view, get_team, has_permission
+from lms.djangoapps.discussion.django_comment_client.settings import MAX_COMMENT_DEPTH
 from django_comment_common.models import (
     FORUM_ROLE_STUDENT,
     FORUM_ROLE_COMMUNITY_TA,

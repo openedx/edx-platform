@@ -19,7 +19,7 @@ from django_comment_common.models import (
     FORUM_ROLE_COMMUNITY_TA,
     Role
 )
-from django_comment_client.tests.factories import RoleFactory
+from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
 from course_modes.tests.factories import CourseModeFactory
 from experiments.models import ExperimentData, ExperimentKeyValue
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID

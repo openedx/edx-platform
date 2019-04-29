@@ -11,7 +11,7 @@ from django.test.client import RequestFactory
 
 from lms.djangoapps.discussion.rest_api.serializers import CommentSerializer, ThreadSerializer, get_context
 from lms.djangoapps.discussion.rest_api.tests.utils import CommentsServiceMockMixin, make_minimal_cs_comment, make_minimal_cs_thread
-from django_comment_client.tests.utils import ForumsEnableMixin
+from lms.djangoapps.discussion.django_comment_client.tests.utils import ForumsEnableMixin
 from django_comment_common.comment_client.comment import Comment
 from django_comment_common.comment_client.thread import Thread
 from django_comment_common.models import (

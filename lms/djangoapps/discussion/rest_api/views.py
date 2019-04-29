@@ -17,7 +17,7 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
 from six import text_type
 
-from django_comment_client.utils import available_division_schemes
+from lms.djangoapps.discussion.django_comment_client.utils import available_division_schemes
 from django_comment_common import comment_client
 from django_comment_common.models import Role
 from django_comment_common.utils import get_course_discussion_settings, set_course_discussion_settings
