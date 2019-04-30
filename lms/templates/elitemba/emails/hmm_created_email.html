@@ -1,0 +1,36 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! from django.conf import settings %>
+<html>
+  <body>
+    <div style="background:#fafafa;padding: 40px 10px 50px;box-sizing: border-box;">
+      <div style="width:100%;max-width:840px;margin:0 auto;font-size:14px;color:#2e313c;line-height: 1.8;background:#fff">
+        <div style="background:#4788C7">
+          <img src="${ settings.LMS_INTERNAL_ROOT_URL }/static/images/elitemba/logo.png" style="width:175px;padding:13px 0 13px 20px"/>
+        </div>
+        <div style="padding: 40px 60px 110px;">
+          <p style="padding:10px 0;margin:0;">尊敬的<b>${name}</b>，</p>
+          <p style="padding:10px 0;margin:0;">恭喜您已经成功报名参加<b>“哈佛管理导师学习营”</b>，祝愿您学有所成！</p>
+          <p style="padding:10px 0;margin:0;">您的专属账户名为：<b style="color:#4788C7">${email}</b></p>
+          %if password:
+          <p style="padding:10px 0;margin:0;">您的专属密码为：<b style="color:#4788C7">${password}</b></p>
+          %endif
+          <p style="padding:10px 0;margin:0;">您的账户已经与您的个人真实身份绑定，请妥善保存您的账户与密码，避免个人资料外泄。出于安全考虑，推荐您在 <a href="${password_change_link}"><span style="color:#4788C7">重置密码</span></a> 更改密码并牢记新密码。</p>
+          <div style="border-top:2px solid #f4f4f4;padding: 35px 0 20px;margin-top:35px">
+            <img style="width:125px;height:125px" src="${ settings.LMS_INTERNAL_ROOT_URL }/static/images/elitemba/qrcode.png" />
+          </div>
+          <p>请扫描上方二维码或者点击右侧蓝字下载<span>英荔商学院App</span>，或在PC浏览器中访问 <a href="${ settings.LMS_INTERNAL_ROOT_URL }"><span style="color:#4788C7">www.EliteMBA.cn</span></a>，并用上述账户名与密码登录，在App页面底部或网页顶端导航栏可以看到<b>“哈佛管理导师”的入口（如图）</b>，点击进入即可开始自由选择学习<b>“哈佛管理导师”的3大板块41个主题超过120门课程</b>。</p>
+          <p style="margin:30px 0 15px"><b>www.EliteMBA.cn（网页效果）</b></p>
+          <img style="width:100%" src="${ settings.LMS_INTERNAL_ROOT_URL }/static/images/elitemba/web.png" />
+          <p style="margin:30px 0 15px"><b>www.EliteMBA.cn（APP效果）</b></p>
+          <img style="width:235px" src="${ settings.LMS_INTERNAL_ROOT_URL }/static/images/elitemba/h5.png" />
+          <p style="margin:30px 0 15px"><b>www.EliteMBA.cn（网页效果）</b></p>
+          <img style="width:235px" src="${ settings.LMS_INTERNAL_ROOT_URL }/static/images/elitemba/app.png" />
+          <p style="margin:60px 0 0">本次“哈佛管理导师学习营”除为期1年的“哈佛管理导师”学习资格外，还包含了同样为期为1年的EliteMBA会员身份，您可在登录状态下在 <a href="${ settings.LMS_INTERNAL_ROOT_URL }"><span style="color:#4788C7">www.EliteMBA.cn</span></a> 选择任意您感兴趣的课程进行选课学习，详细步骤请点击 <a href="${ settings.LMS_INTERNAL_ROOT_URL }/manual"><span style="color:#4788C7">https://www.elitemba.cn/manual</span></a> 中 “会员如何选课？” 查看。</p>
+          <p style="margin:35px 0;">此邮件由“哈佛管理导师学习营”服务组发送，无需回复，谢谢。如有疑问，请通过发送邮件到此邮箱进行咨询，或拨打400-931-8118（周一至周五9:00 - 18:00）。</p>
+          <p style="margin:0"><b>顺祝 商祺！</b></p>
+          <p style="margin:0">广东英荔国际教育有限公司</p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
