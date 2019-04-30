@@ -6179,14 +6179,6 @@ msgstr "未为EdxNotes提供终端点。"
 msgid "Notes"
 msgstr "笔记"
 
-#: lms/djangoapps/elitemba/models.py
-msgid "剩余时间还不到7天"
-msgstr ""
-
-#: lms/djangoapps/elitemba/models.py
-msgid "剩余时间还不到1个月"
-msgstr ""
-
 #: lms/djangoapps/email_marketing/models.py
 msgid "API key for accessing Sailthru. "
 msgstr "用于访问Sailthru的AIP key"
