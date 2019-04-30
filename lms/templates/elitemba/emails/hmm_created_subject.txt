@@ -1,0 +1,2 @@
+<%! from django.utils.translation import ugettext as _ %>
+哈佛管理导师学习营报名成功！
