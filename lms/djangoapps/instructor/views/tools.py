@@ -150,20 +150,20 @@ def title_or_url(node):
     return title
 
 
-def set_due_date_extension(course, unit, student, due_date, actor=None):
+def set_due_date_extension(course, unit, student, due_date, actor=None, reason=''):
     """
     Sets a due date extension. Raises DashboardError if the unit or extended
     due date is invalid.
     """
     if due_date:
         try:
-            api.set_date_for_block(course.id, unit.location, 'due', due_date, user=student, reason=None, actor=actor)
+            api.set_date_for_block(course.id, unit.location, 'due', due_date, user=student, reason=reason, actor=actor)
         except api.MissingDateError:
             raise DashboardError(_(u"Unit {0} has no due date to extend.").format(unit.location))
         except api.InvalidDateError:
             raise DashboardError(_("An extended due date must be later than the original due date."))
     else:
-        api.set_date_for_block(course.id, unit.location, 'due', None, user=student, reason=None, actor=actor)
+        api.set_date_for_block(course.id, unit.location, 'due', None, user=student, reason=reason, actor=actor)
 
 
 def dump_module_extensions(course, unit):

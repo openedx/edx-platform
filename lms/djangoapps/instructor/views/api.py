@@ -2856,7 +2856,9 @@ def change_due_date(request, course_id):
     student = require_student_from_identifier(request.POST.get('student'))
     unit = find_unit(course, request.POST.get('url'))
     due_date = parse_datetime(request.POST.get('due_datetime'))
-    set_due_date_extension(course, unit, student, due_date, request.user)
+    reason = strip_tags(request.POST.get('reason', ''))
+
+    set_due_date_extension(course, unit, student, due_date, request.user, reason=reason)
 
     return JsonResponse(_(
         u'Successfully changed due date for student {0} for {1} '
@@ -2877,7 +2879,9 @@ def reset_due_date(request, course_id):
     course = get_course_by_id(CourseKey.from_string(course_id))
     student = require_student_from_identifier(request.POST.get('student'))
     unit = find_unit(course, request.POST.get('url'))
-    set_due_date_extension(course, unit, student, None, request.user)
+    reason = strip_tags(request.POST.get('reason', ''))
+
+    set_due_date_extension(course, unit, student, None, request.user, reason=reason)
     if not getattr(unit, "due", None):
         # It's possible the normal due date was deleted after an extension was granted:
         return JsonResponse(
