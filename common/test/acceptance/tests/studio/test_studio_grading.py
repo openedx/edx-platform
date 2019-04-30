@@ -242,23 +242,3 @@ class GradingPageTest(StudioCourseTest):
         """
         self.grading_page.try_edit_fail_grade('Failure')
         self.assertNotEqual(self.grading_page.lowest_grade_name, 'Failure')
-
-    def test_grace_period_wrapped_to_correct_time(self):
-        """
-        Scenario: Grace periods of more than 59 minutes are wrapped to the correct time
-            Given I have populated a new course in Studio
-            And I am viewing the grading settings
-            When I change the grace period to "01:99"
-            And I press the "Save" notification button
-            And I reload the page
-            Then I see the grace period is "02:39"
-        """
-        self.ensure_input_fields_are_loaded()
-        self.grading_page.check_field_value('00:00')
-        self.grading_page.set_grace_period('01:99')
-        self.grading_page.check_field_value('01:99')
-        self.grading_page.click_button("save")
-        self.grading_page.refresh_and_wait_for_load()
-        self.ensure_input_fields_are_loaded()
-        grace_time = self.grading_page.grace_period_value
-        self.assertEqual(grace_time, '02:39')
