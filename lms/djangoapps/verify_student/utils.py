@@ -5,9 +5,9 @@ Common Utilities for the verify_student application.
 
 import datetime
 import logging
-import pytz
 
 from django.conf import settings
+from django.utils.timezone import now
 from sailthru import SailthruClient
 
 log = logging.getLogger(__name__)
@@ -18,7 +18,7 @@ def is_verification_expiring_soon(expiration_datetime):
     Returns True if verification is expiring within EXPIRING_SOON_WINDOW.
     """
     if expiration_datetime:
-        if (expiration_datetime - datetime.datetime.now(pytz.UTC)).days <= settings.VERIFY_STUDENT.get(
+        if (expiration_datetime - now()).days <= settings.VERIFY_STUDENT.get(
                 "EXPIRING_SOON_WINDOW"):
             return True
 
@@ -30,7 +30,7 @@ def earliest_allowed_verification_date():
     Returns the earliest allowed date given the settings
     """
     days_good_for = settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
-    return datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=days_good_for)
+    return now() - datetime.timedelta(days=days_good_for)
 
 
 def verification_for_datetime(deadline, candidates):

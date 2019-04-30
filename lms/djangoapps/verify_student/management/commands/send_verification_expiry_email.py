@@ -3,7 +3,7 @@ Django admin command to send verification expiry email to learners
 """
 import logging
 import time
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -11,9 +11,9 @@ from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
 from django.db.models import Q
 from django.urls import reverse
+from django.utils.timezone import now
 from edx_ace import ace
 from edx_ace.recipient import Recipient
-from pytz import UTC
 from util.query import use_read_replica_if_available
 from verify_student.message_types import VerificationExpiry
 
@@ -92,16 +92,17 @@ class Command(BaseCommand):
         days = options['days_range']
         dry_run = options['dry_run']
 
+        end_date = now().replace(hour=0, minute=0, second=0, microsecond=0)
         # If email was sent and user did not re-verify then this date will be used as the criteria for resending email
-        date_resend_days_ago = datetime.now(UTC) - timedelta(days=resend_days)
+        date_resend_days_ago = end_date - timedelta(days=resend_days)
 
-        start_date = datetime.now(UTC) - timedelta(days=days)
+        start_date = end_date - timedelta(days=days)
 
         # Adding an order_by() clause will override the class meta ordering as we don't need ordering here
         query = SoftwareSecurePhotoVerification.objects.filter(Q(status='approved') &
-                                                               (Q(expiry_date__date__gte=start_date.date(),
-                                                                  expiry_date__date__lt=datetime.now(UTC).date()) |
-                                                                Q(expiry_email_date__lt=date_resend_days_ago.date())
+                                                               (Q(expiry_date__gte=start_date,
+                                                                  expiry_date__lt=end_date) |
+                                                                Q(expiry_email_date__lt=date_resend_days_ago)
                                                                 )).order_by()
 
         sspv = use_read_replica_if_available(query)
@@ -109,11 +110,11 @@ class Command(BaseCommand):
         total_verification = sspv.count()
         if not total_verification:
             logger.info(u"No approved expired entries found in SoftwareSecurePhotoVerification for the "
-                        u"date range {} - {}".format(start_date.date(), datetime.now(UTC).date()))
+                        u"date range {} - {}".format(start_date.date(), now().date()))
             return
 
         logger.info(u"For the date range {} - {}, total Software Secure Photo verification filtered are {}"
-                    .format(start_date.date(), datetime.now(UTC).date(), total_verification))
+                    .format(start_date.date(), now().date(), total_verification))
 
         batch_verifications = []
 
@@ -167,4 +168,4 @@ def send_verification_expiry_email(batch_verifications, dry_run=False):
             )
             ace.send(msg)
             verification_qs = SoftwareSecurePhotoVerification.objects.filter(pk=verification.pk)
-            verification_qs.update(expiry_email_date=datetime.now(UTC))
+            verification_qs.update(expiry_email_date=now())
