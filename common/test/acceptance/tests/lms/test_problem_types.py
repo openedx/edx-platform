@@ -339,31 +339,6 @@ class ProblemTypeTestMixin(ProblemTypeA11yTestMixin):
             self.assertFalse(self.problem_page.is_save_notification_visible())
 
     @attr(shard=12)
-    def test_reset_clears_answer_and_focus(self):
-        """
-        Scenario: Reset will clear answers and focus on problem meta
-        If I select an answer
-        and then reset the problem
-        There should be no answer selected
-        And the focus should shift appropriately
-        """
-        self.problem_page.wait_for(
-            lambda: self.problem_page.problem_name == self.problem_name,
-            "Make sure the correct problem is on the page"
-        )
-        self.wait_for_status('unanswered')
-        # Set an answer
-        self.answer_problem(correctness='correct')
-        self.problem_page.click_submit()
-        self.wait_for_status('correct')
-        # clear the answers
-        self.problem_page.click_reset()
-        # Focus should change to meta
-        self.problem_page.wait_for_focus_on_problem_meta()
-        # Answer should be reset
-        self.wait_for_status('unanswered')
-
-    @attr(shard=12)
     def test_reset_shows_errors(self):
         """
         Scenario: Reset will show server errors
