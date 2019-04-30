@@ -5,7 +5,7 @@
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 %>
-<%block name="pagetitle">${_("Harvard Learning Camp")}</%block>
+<%block name="pagetitle">${_("Harvard ManageMentor")}</%block>
 <style>
   body{
     overflow: hidden;
@@ -17,5 +17,5 @@ from django.utils.translation import ugettext as _
     display: none;
   }
 </style>
-<iframe style="width: 100%; height: 100%; border: none; position: absolute;" src="${ reverse('elitemba:hmm_entry') }"></iframe>
+<iframe style="width: 100%; height: 100%; border: none; position: absolute;" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" src="${ reverse('elitemba:hmm_entry') }"></iframe>
 

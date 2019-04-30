@@ -16549,8 +16549,8 @@ msgstr "显示注释"
 
 #: lms/templates/elitemba/hmm.html
 #: lms/templates/header/navbar-authenticated.html
-msgid "Harvard Learning Camp"
-msgstr "哈佛学习营"
+msgid "Harvard ManageMentor"
+msgstr "哈佛管理导师"
 
 #: lms/templates/emails/activation_email.txt
 msgid ""
