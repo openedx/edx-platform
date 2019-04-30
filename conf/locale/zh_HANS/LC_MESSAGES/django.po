@@ -6179,6 +6179,14 @@ msgstr "未为EdxNotes提供终端点。"
 msgid "Notes"
 msgstr "笔记"
 
+#: lms/djangoapps/elitemba/models.py
+msgid "剩余时间还不到7天"
+msgstr ""
+
+#: lms/djangoapps/elitemba/models.py
+msgid "剩余时间还不到1个月"
+msgstr ""
+
 #: lms/djangoapps/email_marketing/models.py
 msgid "API key for accessing Sailthru. "
 msgstr "用于访问Sailthru的AIP key"
@@ -16549,8 +16557,8 @@ msgstr "显示注释"
 
 #: lms/templates/elitemba/hmm.html
 #: lms/templates/header/navbar-authenticated.html
-msgid "Harvard Learning Camp"
-msgstr "哈佛学习营"
+msgid "Harvard ManageMentor"
+msgstr "哈佛管理导师"
 
 #: lms/templates/emails/activation_email.txt
 msgid ""
