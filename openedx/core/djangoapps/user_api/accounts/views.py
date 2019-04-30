@@ -584,7 +584,7 @@ class PhoneBindingViewSet(ViewSet):
             raise Exception(_(u"Please check mobile number format;"))
 
         if UserProfile.objects.filter(phone=mobile):
-            raise Exception(_(u"This mobile number is already bound to another account."))
+            raise Exception(_(u"The mobile number has been occupied."))
 
         code = self.set_verify_code({'username': username, 'name': mobile})
         if language == 'en':

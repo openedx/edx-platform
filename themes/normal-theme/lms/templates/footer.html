@@ -67,7 +67,7 @@ binding = remind_users_to_bind_phones(request)
         <h3>${_(u"Terms Description")}</h3>
         <ul>
           <li><a href="${reverse('user_agreement')}">${_(u"User Agreement")}</a></li>
-          <li><a href="${reverse('privacy_policy')}">${_(u"Privacy Policy")}</a></li>
+          <li><a href="${reverse('privacy')}">${_(u"Privacy Policy")}</a></li>
           <li><a href="${reverse('disclaimer')}">${_(u"Disclaimer")}</a></li>
         </ul>
       </div>
@@ -108,7 +108,7 @@ binding = remind_users_to_bind_phones(request)
   <div class="mesassge-mask">
     <div class="meassage-container">
       <div class="message-title">${_(u"Reminder")}</div>
-      <p class="message-content">${_(u"To meet the requirements of national policies and regulations of using a real legal name，please bind your account to your cellphone number before proceeding.")}</p>
+      <p class="message-content">${_(u"To meet the requirements of national policies and regulations of using a real legal name, please bind your account to your cellphone number before proceeding.")}</p>
       <div class="meassage-op">
         <span class="binding-btn">${_(u"Bind Mobile")}</span> <a class="more" target="_blank" href="http://www.cac.gov.cn/2017-08/25/c_1121541842.htm">${_(u"Learn More")}</a>
       </div>

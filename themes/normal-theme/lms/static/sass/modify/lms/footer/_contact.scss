@@ -22,71 +22,59 @@
   overflow: hidden;
   height: auto;
   margin: 70px auto;
-}
-.contact-dec ul{  
-  padding-left: 0;
-  margin: 0;
-}
-.contact-dec li{  
-  width: 45%;
-  border-bottom: 1px solid #cecece;
-  color: #656D78;
-  margin-top: 25px;
-  height: 115px;
-  box-sizing: border-box;
-}
-.contact-dec li.first{
-  padding-top: 0;
-  box-sizing: border-box;
-}
-.contact-dec li div strong{   
-  display: block;
-  line-height: 40px;
-  color: $title;
-  font-size: 18px;
-  // margin-top: 12px;
-}
-.contact-dec li:nth-child(odd){ 
-  float: left;   
-}
-.contact-dec li:nth-child(even){ 
-  float: right;   
-}
-.contact-dec li p{ 
-  line-height: 2;
-}
-.contact-dec li p:nth-of-type(2){ 
-  margin-top: 0px;
-}
-.contact-dec li p:nth-of-type(7){ 
-  border-bottom: none;
-}
-.contact-dec li p:nth-of-type(8){ 
-  border-bottom: none;
+  ul{  
+    padding-left: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+  }
+  li{  
+    flex: 0 0 50%;
+    color: $font;
+    margin-top: 20px;
+    min-height: 115px;
+    box-sizing: border-box;
+    >div {
+      border-bottom: 1px solid #cecece;
+      height: 100%;
+    }
+    &:nth-child(2n+1) > div{
+      margin: 20px 70px 0 0;
+    }
+    &:nth-child(2n+2) > div{
+      margin: 20px 0 0 70px;
+    }
+  }
+  h2{   
+    display: block;
+    line-height: 40px;
+    color: $title;
+    font-size: 18px;
+    margin-bottom: 0;
+    font-weight: bold;
+  }
+  
+  p{ 
+    margin-top: 0;
+    line-height: 2;
+    &:nth-of-type(7),
+    &:nth-of-type(8){ 
+      border-bottom: none;
+    }
+  }
 }
 
 @media screen and (max-width:900px){
   .contact-dec{
-    margin: 40px auto;
-  }
-  .contact-dec li{
-    width: 100%;
-  }
-  .contact-dec{
-    ul{
-      padding: 10px;
-      li{
-        div {
-          strong{
-            font-size: 16px;
-          }
-        }
-        &:nth-of-type(2){
-          padding-top: 28px;
-        }
-        p{
-          font-size: 12px;
-        }
+    margin: 0 auto;
+    li{
+      flex: 0 0 100%;
+
+      &:nth-child(2n+1) > div{
+        margin: 20px 0;
+      }
+      &:nth-child(2n+2) > div{
+        margin: 20px 0
       }
     }
   }

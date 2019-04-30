@@ -347,3 +347,16 @@ textarea, form#wiki_revision .CodeMirror, input[type="text"]{
   color: $font;
   margin: 0 20px 20px;
 }
+
+
+// wiki article list
+.wiki-wrapper .pagination{
+  width: 100%;
+  ul{
+    text-align: center;
+  }
+  li{
+    display: inline-block;
+    padding: 0 10px;
+  }
+}

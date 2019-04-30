@@ -235,10 +235,9 @@
 }
 .dialog-container{
   width: 500px;
-  height: 250px;
   position: absolute;
   left: 50%;
-  top:50%;
+  top: 40%;
   margin-left: -250px;
   margin-top: -125px;
   background-color: #ffffff;
@@ -247,6 +246,11 @@
   border-radius: 3px;
   box-sizing: border-box;
   padding: 30px 120px;
+  input{
+    font-size: 14px;
+    font-family: $font-family;
+    font-style: normal;
+  }
   .row{
     margin-bottom: 10px;
   }
@@ -263,50 +267,50 @@
   }
   .phone-code{
     display: block;
+    box-sizing: border-box;
     width: 61px;
-    height: 34px;
+    height: 36px;
     background-color: #f5f7fa;
     border: 1px solid #e6e9ed;
-    /* border-right: none; */
+    border-right: none;
     float: left;
     outline: none;
     margin: 0;
     border-radius: 0;
-    border-top-left-radius: 3px;
-    border-bottom-left-radius: 3px;
+    border-top-left-radius: 2px;
+    border-bottom-left-radius: 2px;
     line-height: 34px;
     text-align: center;
+    font-size: 14px;
   }
   .dialog-title{
     font-size: 16px;
-    letter-spacing: 0px;
-    color: #2e313c;
+    color: $title;
     text-align: center;
-    padding-bottom: 18px;
-    
+    line-height: 1.5;
+    padding: 4px 0 18px 0;
   }
   .phone-input-box{
     width: 195px;
-    height: 34px;
     border: 1px solid #e6e9ed;
     height: 36px;
-    float: left;
-    border-left: none;
-    display: block;
     border-radius: 0;
-    border-top-right-radius: 3px;
-    border-bottom-right-radius: 3px;
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
+    line-height: 3;
     &:focus{
       border: 1px solid #e6e9ed;
     }
   }
   .qrcode-input-box{
     width: 150px;
-    height: 34px;
+    height: 36px;
     border: 1px solid #e6e9ed;
     float: left;
     margin-right: 10px;
     border-radius: 2px;
+    font-size: 14px;
+    line-height: 3;
     &.error{
       border: 1px solid #fe8c97;
     }
@@ -314,13 +318,9 @@
       border: 1px solid #e6e9ed;
     }
   }
-  .qrcode-input-box,.phone-input-box{
-    font-style: normal;
-  }
   .get-qrcode-btn{
     width: 98px;
-    height: 34px;
-    
+    height: 36px;
     border-radius: 2px;
     float: left;
     line-height: 34px;
@@ -343,7 +343,6 @@
 
   }
   .error-text{
-    height: 20px;
     line-height: 20px;
     margin-bottom: 10px;
     text-align: center;
@@ -509,10 +508,5 @@
   .fa-message-close, .fa-dialog-close{
     right: 7px;
     top: 4px;
-  }
-}
-.dialog-container{
-  input{
-    font-family: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
   }
 }
