@@ -19,12 +19,10 @@ from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
 from openedx.core.djangoapps.user_api.errors import UserNotAuthorized, UserNotFound
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
 from openedx.core.djangolib.markup import HTML, Text
+from openedx.features.learner_profile.toggles import should_redirect_to_profile_microfrontend
+from openedx.features.learner_profile.views.learner_achievements import LearnerAchievementsFragmentView
 from openedx.features.journals.api import journals_enabled
 from student.models import User
-
-from .. import REDIRECT_TO_PROFILE_MICROFRONTEND
-
-from learner_achievements import LearnerAchievementsFragmentView
 
 
 @login_required
@@ -46,8 +44,7 @@ def learner_profile(request, username):
     Example usage:
         GET /account/profile
     """
-    is_profile_mfe_enabled_for_site = configuration_helpers.get_value('ENABLE_PROFILE_MICROFRONTEND')
-    if is_profile_mfe_enabled_for_site and REDIRECT_TO_PROFILE_MICROFRONTEND.is_enabled():
+    if should_redirect_to_profile_microfrontend():
         profile_microfrontend_url = "{}{}".format(settings.PROFILE_MICROFRONTEND_URL, username)
         return redirect(profile_microfrontend_url)
 

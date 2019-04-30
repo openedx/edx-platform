@@ -13,19 +13,22 @@ from edx_rest_api_client import exceptions
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.tests import factories
 from lms.djangoapps.commerce.tests.mocks import mock_get_orders
+from openedx.core.djangoapps.user_api.accounts.toggles import REDIRECT_TO_ACCOUNT_MICROFRONTEND
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.lang_pref.tests.test_api import EN, LT_LT
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
+from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.user_api.tests.factories import UserPreferenceFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.core.djangoapps.user_api.accounts.settings_views import account_settings_context, get_user_orders
+from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from student.tests.factories import UserFactory
 from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin
 
 
 @skip_unless_lms
-class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase, ProgramsApiConfigMixin):
+class AccountSettingsViewTest(ThirdPartyAuthTestMixin, SiteMixin, ProgramsApiConfigMixin, TestCase):
     """ Tests for the account settings view. """
 
     USERNAME = 'student'
@@ -152,7 +155,7 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase, ProgramsApiConf
 
     def test_view(self):
         """
-        Test that all fields are  visible
+        Test that all fields are visible
         """
         view_path = reverse('account_settings')
         response = self.client.get(path=view_path)
@@ -243,3 +246,22 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase, ProgramsApiConf
             order_detail = get_user_orders(self.user)
 
         self.assertEqual(len(order_detail), 1)
+
+    def test_redirect_view(self):
+        with override_waffle_flag(REDIRECT_TO_ACCOUNT_MICROFRONTEND, active=True):
+            old_url_path = reverse('account_settings')
+
+            # Test with waffle flag active and site setting disabled, does not redirect
+            response = self.client.get(path=old_url_path)
+            for attribute in self.FIELDS:
+                self.assertIn(attribute, response.content)
+
+            # Test with waffle flag active and site setting enabled, redirects to microfrontend
+            site_domain = 'othersite.example.com'
+            self.set_up_site(site_domain, {
+                'SITE_NAME': site_domain,
+                'ENABLE_ACCOUNT_MICROFRONTEND': True
+            })
+            self.client.login(username=self.USERNAME, password=self.PASSWORD)
+            response = self.client.get(path=old_url_path)
+            self.assertRedirects(response, settings.ACCOUNT_MICROFRONTEND_URL, fetch_redirect_response=False)
