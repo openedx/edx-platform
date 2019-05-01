@@ -3,36 +3,31 @@
 ProgramEnrollment Views
 """
 from __future__ import unicode_literals
-
 from functools import wraps
-from django.http import HttpResponse
 
+from django.http import Http404, HttpResponse
+from opaque_keys.edx.keys import CourseKey
+from rest_framework import status
+from rest_framework.exceptions import ValidationError
+from rest_framework.pagination import CursorPagination
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from course_modes.models import CourseMode
 from edx_rest_framework_extensions import permissions
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
-from rest_framework import status
-from rest_framework.pagination import CursorPagination
-
+from lms.djangoapps.program_enrollments.api.v1.constants import CourseEnrollmentResponseStatuses, MAX_ENROLLMENT_RECORDS
 from lms.djangoapps.program_enrollments.api.v1.serializers import (
     ProgramEnrollmentListSerializer,
     ProgramCourseEnrollmentRequestSerializer,
 )
 from lms.djangoapps.program_enrollments.models import ProgramEnrollment, ProgramCourseEnrollment
 from openedx.core.djangoapps.catalog.utils import get_programs
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, PaginatedAPIView
-
-
-from course_modes.models import CourseMode
 from student.models import CourseEnrollment
-from opaque_keys.edx.keys import CourseKey
-from rest_framework.exceptions import ValidationError
-from rest_framework.views import APIView
-from rest_framework.response import Response
-
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-
-from lms.djangoapps.program_enrollments.api.v1.constants import CourseEnrollmentResponseStatuses
 
 def verify_program_exists(view_func):
     """
@@ -170,7 +165,7 @@ class ProgramCourseRunSpecificViewMixin(ProgramSpecificViewMixin):
         self._course_run = None
         self._course_key = None
 
-    def check_existence_and_membership(self):
+    def check_course_existence_and_membership(self):
         """
         Attempting to look up the course and program will trigger 404 responses if:
         - The program does not exist
@@ -206,7 +201,7 @@ class ProgramCourseRunSpecificViewMixin(ProgramSpecificViewMixin):
         """
         try:
             course_key = CourseKey.from_string(self.kwargs['course_id'])
-            course = CourseOverview.get_from_id(course_key)
+            CourseOverview.get_from_id(course_key)
         except CourseOverview.DoesNotExist:
             raise Http404()
         for course in self.program["courses"]:
@@ -240,23 +235,28 @@ class ProgramCourseEnrollmentsView(ProgramCourseRunSpecificViewMixin, APIView):
      * 404: Program does not exist, or course does not exist in program
      * 422: Invalid request, unable to enroll students.
     """
-    authentication_classes = (JwtAuthentication, SessionAuthentication)
-    permission_classes = (IsAuthenticated,)
+    authentication_classes = (
+        JwtAuthentication,
+        OAuth2AuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (permissions.JWT_RESTRICTED_APPLICATION_OR_USER_ACCESS,)
+    pagination_class = ProgramEnrollmentPagination
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, program_uuid=None, course_id=None):
         """
         Enroll a list of students in a course in a program
         """
-        self.check_existence_and_membership()
+        self.check_course_existence_and_membership()
         results = {}
         seen_student_keys = set()
         enrollments = []
 
         if not isinstance(request.data, list):
             raise ValidationError("invalid enrollment record")
-        if len(request.data) > 25:
+        if len(request.data) > MAX_ENROLLMENT_RECORDS:
             return Response(
-                'enrollment limit 25', HTTP_413_REQUEST_ENTITY_TOO_LARGE
+                'enrollment limit 25', status.HTTP_413_REQUEST_ENTITY_TOO_LARGE
             )
 
         try:
@@ -267,9 +267,9 @@ class ProgramCourseEnrollmentsView(ProgramCourseRunSpecificViewMixin, APIView):
                 else:
                     enrollments.append(enrollment_request)
         except (KeyError, ValidationError, TypeError):
-            return Response('invalid enrollment record', HTTP_422_UNPROCESSABLE_ENTITY)
+            return Response('invalid enrollment record', status.HTTP_422_UNPROCESSABLE_ENTITY)
 
-        program_enrollments = self.get_existing_program_enrollments(enrollments)
+        program_enrollments = self.get_existing_program_enrollments(program_uuid, enrollments)
         for enrollment in enrollments:
             student_key = enrollment["student_key"]
             if student_key in results and results[student_key] == CourseEnrollmentResponseStatuses.DUPLICATED:
@@ -278,9 +278,9 @@ class ProgramCourseEnrollmentsView(ProgramCourseRunSpecificViewMixin, APIView):
 
         good_count = sum([1 for _, v in results.items() if v not in CourseEnrollmentResponseStatuses.ERROR_STATUSES])
         if not good_count:
-            return Response(results, HTTP_422_UNPROCESSABLE_ENTITY)
+            return Response(results, status.HTTP_422_UNPROCESSABLE_ENTITY)
         if good_count != len(results):
-            return Response(results, HTTP_207_MULTI_STATUS)
+            return Response(results, status.HTTP_207_MULTI_STATUS)
         else:
             return Response(results)
 
@@ -301,7 +301,7 @@ class ProgramCourseEnrollmentsView(ProgramCourseRunSpecificViewMixin, APIView):
             else:
                 raise e
 
-    def get_existing_program_enrollments(self, enrollments):
+    def get_existing_program_enrollments(self, program_uuid, enrollments):
         """
         Parameters:
             - enrollments: A list of enrollment requests
@@ -311,7 +311,8 @@ class ProgramCourseEnrollmentsView(ProgramCourseRunSpecificViewMixin, APIView):
         """
         external_user_keys = [e["student_key"] for e in enrollments]
         existing_enrollments = ProgramEnrollment.objects.filter(
-            external_user_key__in=external_user_keys
+            external_user_key__in=external_user_keys,
+            program_uuid=program_uuid,
         )
         existing_enrollments = existing_enrollments.prefetch_related('program_course_enrollments')
         return {enrollment.external_user_key: enrollment for enrollment in existing_enrollments}

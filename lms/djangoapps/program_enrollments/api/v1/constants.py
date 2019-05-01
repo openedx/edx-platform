@@ -2,8 +2,9 @@
   Constants and strings for the course-enrollment app
 """
 
-# Captures strings composed of alphanumeric characters, dashes, and underscores.
-PROGRAM_UUID_PATTERN = r'(?P<program_uuid>[A-Za-z0-9-]+)'
+# Captures strings composed of alphanumeric characters a-f and dashes.
+PROGRAM_UUID_PATTERN = r'(?P<program_uuid>[A-Fa-f0-9-]+)'
+MAX_ENROLLMENT_RECORDS = 25
 
 
 class CourseEnrollmentResponseStatuses(object):

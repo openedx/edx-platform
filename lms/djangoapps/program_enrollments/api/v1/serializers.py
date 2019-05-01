@@ -40,3 +40,26 @@ class ProgramEnrollmentListSerializer(serializers.Serializer):
 
     def get_account_exists(self, obj):
         return bool(obj.user)
+
+
+class InvalidStatusMixin(object):
+    """
+    Mixin to provide has_invalid_status method
+    """
+    def has_invalid_status(self):
+        """
+        Returns whether or not this serializer has an invlaid error choice on the "status" field
+        """
+        invalid_status = 'status' in self.errors
+        return invalid_status and self.errors['status'][0].code == 'invalid_choice'
+
+
+# pylint: disable=abstract-method
+class ProgramCourseEnrollmentRequestSerializer(serializers.Serializer, InvalidStatusMixin):
+    """
+    Serializer for request to create a ProgramCourseEnrollment
+    """
+    STATUS_CHOICES = ['active', 'inactive']
+
+    student_key = serializers.CharField(allow_blank=False)
+    status = serializers.ChoiceField(allow_blank=False, choices=STATUS_CHOICES)

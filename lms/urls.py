@@ -139,7 +139,6 @@ urlpatterns = [
 
     url(r'^dashboard/', include('learner_dashboard.urls')),
     url(r'^api/experiments/', include('experiments.urls', namespace='api_experiments')),
-    url(r'^api/program_enrollments/', include('program_enrollments.api.urls', namespace="program_enrollments")),
 ]
 
 if settings.FEATURES.get('ENABLE_MOBILE_REST_API'):
