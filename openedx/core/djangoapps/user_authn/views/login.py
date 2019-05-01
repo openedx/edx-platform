@@ -24,8 +24,8 @@ from openedx.core.djangoapps.password_policy import compliance as password_polic
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangolib.markup import HTML, Text
-from student.models import LoginFailures, UserProfile
-from student.views import compose_and_send_activation_email
+from student.models import LoginFailures
+from student.views import send_reactivation_email_for_user
 from student.forms import send_password_reset_email_for_user
 from track import segment
 import third_party_auth
@@ -163,9 +163,7 @@ def _log_and_raise_inactive_user_auth_error(unauthenticated_user):
             unauthenticated_user.username)
         )
 
-    profile = UserProfile.objects.get(user=unauthenticated_user)
-    compose_and_send_activation_email(unauthenticated_user, profile)
-
+    send_reactivation_email_for_user(unauthenticated_user)
     raise AuthFailedError(_generate_not_activated_message(unauthenticated_user))
 
 
